@@ -63,7 +63,7 @@ namespace umbraco.Linq.Core.Tests
         {
             MockHelpers.SetupFakeHttpContext();
 
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var hps = ctx.CwsHomes;
 
@@ -80,7 +80,7 @@ namespace umbraco.Linq.Core.Tests
         {
             MockHelpers.SetupFakeHttpContext();
 
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var hps = ctx.CwsHomes;
 

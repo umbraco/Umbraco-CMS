@@ -9,7 +9,7 @@ namespace umbraco.Linq.Core
     public sealed class UmbracoInfoAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="umbracoInfoAttribute"/> class.
+        /// Initializes a new instance of the <see cref="UmbracoInfoAttribute"/> class.
         /// </summary>
         /// <param name="alias">The alias for this piece of umbraco info.</param>
         public UmbracoInfoAttribute(string alias)
@@ -32,11 +32,7 @@ namespace umbraco.Linq.Core
         /// </summary>
         /// <value><c>true</c> if mandatory; otherwise, <c>false</c>.</value>
         public bool Mandatory { get; set; }
-        /// <summary>
-        /// Gets or sets the DocumentTypeId
-        /// </summary>
-        /// <value>The id.</value>
-        public int Id { get; set; }
+        
     }
 
     /// <summary>

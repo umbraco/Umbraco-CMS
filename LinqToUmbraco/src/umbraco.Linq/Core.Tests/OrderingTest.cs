@@ -66,7 +66,7 @@ namespace umbraco.Linq.Core.Tests
         {
             MockHelpers.SetupFakeHttpContext();
 
-            using (var orderedContext = new MyumbracoDataContext())
+            using (var orderedContext = new MyUmbracoDataContext())
             {
                 var asc = orderedContext.CwsTextpages.OrderBy(p => p.CreateDate);
 

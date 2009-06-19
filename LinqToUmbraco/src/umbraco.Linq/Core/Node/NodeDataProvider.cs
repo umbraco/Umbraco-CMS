@@ -18,7 +18,7 @@ namespace umbraco.Linq.Core.Node
     /// 
     /// The <see cref="umbraco.Linq.Core.Node.NodeDataProvider"/> is capable of reading the XML cache from either the path provided in the umbraco settings or from a specified location on the file system.
     /// </remarks>
-    public sealed class NodeDataProvider : umbracoDataProvider
+    public sealed class NodeDataProvider : UmbracoDataProvider
     {
         private string _xmlPath;
         private Dictionary<UmbracoInfoAttribute, ITree> _trees;

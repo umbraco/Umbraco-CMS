@@ -66,7 +66,7 @@ namespace umbraco.Linq.Core.Tests
         {
             MockHelpers.SetupFakeHttpContext();
 
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var homePages = from hp in ctx.CwsHomes
                                 select hp;
@@ -84,7 +84,7 @@ namespace umbraco.Linq.Core.Tests
         {
             MockHelpers.SetupFakeHttpContext();
 
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var homePages = ctx.CwsHomes;
 
@@ -101,7 +101,7 @@ namespace umbraco.Linq.Core.Tests
         {
             MockHelpers.SetupFakeHttpContext();
 
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var homePageText = from hp in ctx.CwsHomes
                                    select hp.Bodytext;
@@ -119,7 +119,7 @@ namespace umbraco.Linq.Core.Tests
         {
             MockHelpers.SetupFakeHttpContext();
 
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var homePageText = ctx.CwsHomes.Select(hp => hp.Bodytext);
 
@@ -136,7 +136,7 @@ namespace umbraco.Linq.Core.Tests
         {
             MockHelpers.SetupFakeHttpContext();
 
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var anon = from hp in ctx.CwsHomes
                            select new
@@ -159,7 +159,7 @@ namespace umbraco.Linq.Core.Tests
         {
             MockHelpers.SetupFakeHttpContext();
 
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var anon = ctx.CwsHomes.Select(hp => new
                            {

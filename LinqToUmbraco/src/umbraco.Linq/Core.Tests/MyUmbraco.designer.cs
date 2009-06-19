@@ -15,7 +15,7 @@ namespace umbraco.Test
     using System.Linq;
 
 
-    public partial class MyumbracoDataContext : umbracoDataContext
+    public partial class MyUmbracoDataContext : UmbracoDataContext
     {
 
         #region Partials
@@ -23,13 +23,13 @@ namespace umbraco.Test
         #endregion
 
 
-        public MyumbracoDataContext() :
+        public MyUmbracoDataContext() :
             base()
         {
             OnCreated();
         }
 
-        public MyumbracoDataContext(umbracoDataProvider provider) :
+        public MyUmbracoDataContext(UmbracoDataProvider provider) :
             base(provider)
         {
             OnCreated();
@@ -175,7 +175,7 @@ namespace umbraco.Test
     /// <summary>
     /// The homepage of a Runway website.
     /// </summary>
-    [UmbracoInfo("RunwayHomepage", Id = 1045)]
+    [UmbracoInfo("RunwayHomepage")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class Runwayhomepage : DocTypeBase
@@ -279,7 +279,7 @@ namespace umbraco.Test
     /// <summary>
     /// Runway textpage; this is the standard content page for a Runway website.
     /// </summary>
-    [UmbracoInfo("RunwayTextpage", Id = 1046)]
+    [UmbracoInfo("RunwayTextpage")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class Runwaytextpage : DocTypeBase
@@ -367,7 +367,7 @@ namespace umbraco.Test
     /// <summary>
     /// 
     /// </summary>
-    [UmbracoInfo("Content Folder", Id = 1052)]
+    [UmbracoInfo("Content Folder")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class ContentFolder : DocTypeBase
@@ -399,7 +399,7 @@ namespace umbraco.Test
     /// <summary>
     /// 
     /// </summary>
-    [UmbracoInfo("Person", Id = 1053)]
+    [UmbracoInfo("Person")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class Person : DocTypeBase
@@ -461,7 +461,7 @@ namespace umbraco.Test
     /// <summary>
     /// 
     /// </summary>
-    [UmbracoInfo("Inherited Folder", Id = 1059)]
+    [UmbracoInfo("Inherited Folder")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class InheritedFolder : ContentFolder
@@ -475,7 +475,7 @@ namespace umbraco.Test
     /// <summary>
     /// This is the contact form document type for your site.
     /// </summary>
-    [UmbracoInfo("CWS_Contact", Id = 1079)]
+    [UmbracoInfo("CWS_Contact")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class CwsContact : DocTypeBase
@@ -937,7 +937,7 @@ namespace umbraco.Test
     /// <summary>
     /// This is the email a friend form document type for your site.
     /// </summary>
-    [UmbracoInfo("CWS_EmailAFriend", Id = 1080)]
+    [UmbracoInfo("CWS_EmailAFriend")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class CwsEmailafriend : DocTypeBase
@@ -1302,7 +1302,7 @@ namespace umbraco.Test
     /// <summary>
     /// This is the event document type for your site and lives beneath the News & Events List document type.
     /// </summary>
-    [UmbracoInfo("CWS_EventItem", Id = 1081)]
+    [UmbracoInfo("CWS_EventItem")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class CwsEventitem : DocTypeBase
@@ -1545,7 +1545,7 @@ namespace umbraco.Test
     /// <summary>
     /// This is the Galleries document type for your site which stores the Gallery document type as children.
     /// </summary>
-    [UmbracoInfo("CWS_GalleryList", Id = 1082)]
+    [UmbracoInfo("CWS_GalleryList")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class CwsGallerylist : DocTypeBase
@@ -1806,7 +1806,7 @@ namespace umbraco.Test
     /// <summary>
     /// This is the gallery document type which stores the Photo document type as children.
     /// </summary>
-    [UmbracoInfo("CWS_Gallery", Id = 1083)]
+    [UmbracoInfo("CWS_Gallery")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class CwsGallery : DocTypeBase
@@ -2091,7 +2091,7 @@ namespace umbraco.Test
     /// <summary>
     /// This is the homepage document type for your site.
     /// </summary>
-    [UmbracoInfo("CWS_Home", Id = 1084)]
+    [UmbracoInfo("CWS_Home")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class CwsHome : DocTypeBase
@@ -2466,7 +2466,7 @@ namespace umbraco.Test
     /// <summary>
     /// This is the News & Events List document type for your site which stores the News and Event Item document types as children.
     /// </summary>
-    [UmbracoInfo("CWS_NewsEventsList", Id = 1085)]
+    [UmbracoInfo("CWS_NewsEventsList")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class CwsNewseventslist : DocTypeBase
@@ -2745,7 +2745,7 @@ namespace umbraco.Test
     /// <summary>
     /// This is the news document type for your site and lives beneath the News & Events List document type.
     /// </summary>
-    [UmbracoInfo("CWS_NewsItem", Id = 1086)]
+    [UmbracoInfo("CWS_NewsItem")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class CwsNewsitem : DocTypeBase
@@ -2982,7 +2982,7 @@ namespace umbraco.Test
     /// <summary>
     /// This is the Photo document type for your site and lives beneath the Gallery document type.
     /// </summary>
-    [UmbracoInfo("CWS_Photo", Id = 1087)]
+    [UmbracoInfo("CWS_Photo")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class CwsPhoto : DocTypeBase
@@ -3225,7 +3225,7 @@ namespace umbraco.Test
     /// <summary>
     /// This is the Textpage document type for your site.
     /// </summary>
-    [UmbracoInfo("CWS_Textpage", Id = 1088)]
+    [UmbracoInfo("CWS_Textpage")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class CwsTextpage : DocTypeBase
@@ -3504,7 +3504,7 @@ namespace umbraco.Test
     /// <summary>
     /// This is the Textpage document type for your site which has two columns.
     /// </summary>
-    [UmbracoInfo("CWS_TextpageTwoCol", Id = 1089)]
+    [UmbracoInfo("CWS_TextpageTwoCol")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class CwsTextpagetwocol : DocTypeBase
@@ -3831,7 +3831,7 @@ namespace umbraco.Test
     /// <summary>
     /// 
     /// </summary>
-    [UmbracoInfo("Textpage (Three Col)", Id = 1119)]
+    [UmbracoInfo("Textpage (Three Col)")]
     [System.Runtime.Serialization.DataContractAttribute()]
     [DocType()]
     public partial class TextpageThreeCol : CwsTextpagetwocol

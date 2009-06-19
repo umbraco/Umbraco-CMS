@@ -63,7 +63,7 @@ namespace umbraco.Linq.Core.Tests
         public void CwsReplicationTest_ListGalleries()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var galleryList = ctx.CwsGallerylists.First(); //this would really be a Where(g => g.Id == umbracoContext.Current.PageId.Value) but since I'm not really on a page...
 

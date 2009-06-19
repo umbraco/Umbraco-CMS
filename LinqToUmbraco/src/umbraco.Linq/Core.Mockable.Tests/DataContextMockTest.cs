@@ -63,8 +63,8 @@ namespace umbraco.LinqCore.Mockable.Tests
         [TestMethod]
         public void DataContextMockTest_MockProvider()
         {
-            var dataProvider = MockRepository.GenerateMock<umbracoDataProvider>();
-            using (var ctx = new MyumbracoDataContext(dataProvider))
+            var dataProvider = MockRepository.GenerateMock<UmbracoDataProvider>();
+            using (var ctx = new MyUmbracoDataContext(dataProvider))
             {
             }
         }
@@ -72,10 +72,10 @@ namespace umbraco.LinqCore.Mockable.Tests
         [TestMethod, ExpectedException(typeof(NotImplementedException))]
         public void DataContextMockTest_MockProviderThrowsException()
         {
-            var dataProvider = MockRepository.GenerateMock<umbracoDataProvider>();
+            var dataProvider = MockRepository.GenerateMock<UmbracoDataProvider>();
 
             dataProvider.Stub(d => d.LoadTree<CwsHome>()).Throw(new NotImplementedException());
-            using (var ctx = new MyumbracoDataContext(dataProvider))
+            using (var ctx = new MyUmbracoDataContext(dataProvider))
             {
                 var homes = ctx.CwsHomes;
             }

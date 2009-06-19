@@ -62,7 +62,7 @@ namespace umbraco.Linq.Core.Tests
         public void ParentTest_ParentIdExists()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var p = ctx.CwsTextpages.First();
                 Assert.AreNotEqual(0, p.ParentNodeId);
@@ -73,7 +73,7 @@ namespace umbraco.Linq.Core.Tests
         public void ParentTest_ParentCreated()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var page = ctx.CwsTextpages.Single(p => p.Id == 1099);
 
@@ -89,7 +89,7 @@ namespace umbraco.Linq.Core.Tests
         public void ParentTest_TopParentNull()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var hp = ctx.CwsHomes.First();
                 Assert.IsNull(hp.Parent<CwsHome>());
@@ -100,7 +100,7 @@ namespace umbraco.Linq.Core.Tests
         public void ParentTest_InvalidParentType()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var p = ctx.CwsPhotos.First().Parent<CwsHome>();
             }

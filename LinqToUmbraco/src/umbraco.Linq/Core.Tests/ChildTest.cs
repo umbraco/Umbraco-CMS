@@ -65,7 +65,7 @@ namespace umbraco.Linq.Core.Tests
         public void ChildTest_ChildExist()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var pages = ctx.CwsHomes.First().CwsTextpages;
 
@@ -77,7 +77,7 @@ namespace umbraco.Linq.Core.Tests
         public void ChildTest_ChildToParent()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var page = ctx.CwsHomes.First().CwsTextpages.First();
 
@@ -89,7 +89,7 @@ namespace umbraco.Linq.Core.Tests
         public void ChildTest_AllChildren()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var hp = ctx.CwsHomes.First();
 

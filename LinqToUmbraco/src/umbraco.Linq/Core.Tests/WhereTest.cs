@@ -66,7 +66,7 @@ namespace umbraco.Linq.Core.Tests
         {
             MockHelpers.SetupFakeHttpContext();
 
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var pages = from page in ctx.CwsTextpages
                             where page.Bodytext.Length > 0
@@ -82,7 +82,7 @@ namespace umbraco.Linq.Core.Tests
         {
             MockHelpers.SetupFakeHttpContext();
 
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var pages = from page in ctx.CwsTextpages
                             where page.CreateDate > DateTime.MinValue
@@ -97,7 +97,7 @@ namespace umbraco.Linq.Core.Tests
         public void WhereTest_TwoParameter_Query()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var pages = from page in ctx.CwsTextpages
                             where page.Bodytext.Length > 0
@@ -113,7 +113,7 @@ namespace umbraco.Linq.Core.Tests
         public void WhereTest_ToAnonymous()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var pages = from page in ctx.CwsTextpages
                             where page.Bodytext.Length > 0

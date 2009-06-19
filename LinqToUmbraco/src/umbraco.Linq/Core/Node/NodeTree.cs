@@ -25,7 +25,7 @@ namespace umbraco.Linq.Core.Node
         /// Gets or sets the provider.
         /// </summary>
         /// <value>The provider.</value>
-        public override umbracoDataProvider Provider
+        public override UmbracoDataProvider Provider
         {
             get
             {

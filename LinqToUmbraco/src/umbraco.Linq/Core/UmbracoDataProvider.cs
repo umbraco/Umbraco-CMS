@@ -14,7 +14,7 @@ namespace umbraco.Linq.Core
     /// 
     /// It provides abstractions for all the useful operations of the DataProvider
     /// </remarks>
-    public abstract class umbracoDataProvider : IDisposable
+    public abstract class UmbracoDataProvider : IDisposable
     {
         /// <summary>
         /// Gets the name of the provider

@@ -317,9 +317,9 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
                 //create the custom attribute
                 CodeAttributeDeclarationCollection classAttributes = new CodeAttributeDeclarationCollection(
                     new CodeAttributeDeclaration[] {
-                        new CodeAttributeDeclaration("umbracoInfo",
-                            new CodeAttributeArgument(new CodePrimitiveExpression(docType.Alias)),
-                            new CodeAttributeArgument("Id", new CodePrimitiveExpression(docType.Id))),
+                        new CodeAttributeDeclaration("UmbracoInfo",
+                            new CodeAttributeArgument(new CodePrimitiveExpression(docType.Alias))
+                            ),
                         new CodeAttributeDeclaration(new CodeTypeReference(typeof(DataContractAttribute))),
                         new CodeAttributeDeclaration("DocType")
                     });
@@ -588,7 +588,7 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
         {
             List<CodeAttributeDeclaration> attrs = new List<CodeAttributeDeclaration>();
 
-            CodeAttributeDeclaration umbInfoAtt = new CodeAttributeDeclaration("umbracoInfo",
+            CodeAttributeDeclaration umbInfoAtt = new CodeAttributeDeclaration("UmbracoInfo",
                                     new CodeAttributeArgument(new CodePrimitiveExpression(docTypeProperty.Alias)),
                                     new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(docTypeProperty.Name)),
                                     new CodeAttributeArgument("Mandatory", new CodePrimitiveExpression(docTypeProperty.Mandatory))

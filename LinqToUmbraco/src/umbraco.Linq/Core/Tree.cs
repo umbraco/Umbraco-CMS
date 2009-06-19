@@ -28,7 +28,7 @@ namespace umbraco.Linq.Core
         /// Gets the <see cref="umbracoDataProvider"/> Provider associated with this instance
         /// </summary>
         /// <value>The provider.</value>
-        public abstract umbracoDataProvider Provider { get; protected set; }
+        public abstract UmbracoDataProvider Provider { get; protected set; }
 
         /// <summary>
         /// Gets a value indicating whether this instance is read only. The collection is not ReadOnly by default

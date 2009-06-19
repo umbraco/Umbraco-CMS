@@ -65,7 +65,7 @@ namespace umbraco.Linq.Core.Tests
         public void AncestorTest_NoWhereCondition_Exists()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var textPage = ctx.CwsTextpages.First();
 
@@ -79,7 +79,7 @@ namespace umbraco.Linq.Core.Tests
         public void AncestorTest_NoWhereCondition_NotExists()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var textPage = ctx.CwsTextpages.First();
 
@@ -93,7 +93,7 @@ namespace umbraco.Linq.Core.Tests
         public void AncestorTest_Where_Exists()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var photo = ctx.CwsPhotos.First(p => p.Name.Contains("Umbraco"));
                 var gallery = photo.AncestorOrDefault<CwsGallery>(g => g.Name.Contains("Codegarden"));
@@ -106,7 +106,7 @@ namespace umbraco.Linq.Core.Tests
         public void AncestorTest_Where_NotExists()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var photo = ctx.CwsPhotos.First(p => p.Name.Contains("Umbraco"));
                 var gallery = photo.AncestorOrDefault<CwsGallery>(g => g.Name.Contains("Bookhouses"));

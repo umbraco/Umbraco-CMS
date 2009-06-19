@@ -78,7 +78,7 @@ namespace umbraco.Linq.Core.Tests
         {
             var nodeProvider = new NodeDataProvider(Path.Combine(Environment.CurrentDirectory, "umbraco.config"));
             
-            MyumbracoDataContext ctx = new MyumbracoDataContext(nodeProvider);
+            MyUmbracoDataContext ctx = new MyUmbracoDataContext(nodeProvider);
         }
 
         [TestMethod]
@@ -86,7 +86,7 @@ namespace umbraco.Linq.Core.Tests
         {
             var nodeProvider = new NodeDataProvider(Path.Combine(Environment.CurrentDirectory, "umbraco.config"), true);
 
-            MyumbracoDataContext ctx = new MyumbracoDataContext(nodeProvider);
+            MyUmbracoDataContext ctx = new MyUmbracoDataContext(nodeProvider);
 
             var hp = ctx.CwsHomes.First();
 
@@ -98,7 +98,7 @@ namespace umbraco.Linq.Core.Tests
         {
             MockHelpers.SetupFakeHttpContext();
 
-            var ctx = new MyumbracoDataContext();
+            var ctx = new MyUmbracoDataContext();
             
             Assert.IsInstanceOfType(ctx.DataProvider, typeof(NodeDataProvider));
         }
@@ -107,7 +107,7 @@ namespace umbraco.Linq.Core.Tests
         public void DataContextTest_NodeCached()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var hp = ctx.CwsHomes.First();
                 var hp2 = ctx.CwsHomes.First();
@@ -120,7 +120,7 @@ namespace umbraco.Linq.Core.Tests
         public void DataContextTest_FullCache()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var one = ctx.CwsHomes;
                 var two = ctx.CwsHomes;
@@ -133,7 +133,7 @@ namespace umbraco.Linq.Core.Tests
         public void DataContextTest_OfNodeTypes()
         {
             MockHelpers.SetupFakeHttpContext();
-            using (var ctx = new MyumbracoDataContext())
+            using (var ctx = new MyUmbracoDataContext())
             {
                 var tree = ctx.CwsHomes;
 

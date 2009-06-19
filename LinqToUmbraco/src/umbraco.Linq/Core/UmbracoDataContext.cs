@@ -10,10 +10,10 @@ namespace umbraco.Linq.Core
     /// <summary>
     /// The umbracoDataContext which handles the interaction with an <see cref="umbracoDataProvider"/>
     /// </summary>
-    public abstract class umbracoDataContext : IDisposable
+    public abstract class UmbracoDataContext : IDisposable
     {
         #region Privates
-        private umbracoDataProvider _dataProvider;
+        private UmbracoDataProvider _dataProvider;
         #endregion
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace umbraco.Linq.Core
         /// Gets the data provider.
         /// </summary>
         /// <value>The data provider.</value>
-        public umbracoDataProvider DataProvider
+        public UmbracoDataProvider DataProvider
         {
             get
             {
@@ -46,7 +46,7 @@ namespace umbraco.Linq.Core
         /// <summary>
         /// Initializes a new instance of the <see cref="umbracoDataContext"/> class, using a <see cref="umbraco.Linq.Core.Node.NodeDataProvider"/> data provider with the connection string from the umbraco config
         /// </summary>
-        protected umbracoDataContext() : this(new NodeDataProvider())
+        protected UmbracoDataContext() : this(new NodeDataProvider())
         {
         }
 
@@ -54,7 +54,7 @@ namespace umbraco.Linq.Core
         /// Initializes a new instance of the <see cref="umbracoDataContext"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider to use within the DataContext.</param>
-        protected umbracoDataContext(umbracoDataProvider dataProvider)
+        protected UmbracoDataContext(UmbracoDataProvider dataProvider)
         {
             this._dataProvider = dataProvider;
         }

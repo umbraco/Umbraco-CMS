@@ -70,7 +70,7 @@ namespace umbraco.Linq.Core
             }
         }
 
-        internal umbracoDataProvider Provider { get; set; }
+        internal UmbracoDataProvider Provider { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance has been modified since it was first loaded

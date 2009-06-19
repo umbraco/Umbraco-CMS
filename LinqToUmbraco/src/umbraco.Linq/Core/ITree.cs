@@ -10,7 +10,7 @@ namespace umbraco.Linq.Core
         /// Gets the <see cref="umbracoDataProvider"/> Provider associated with this instance
         /// </summary>
         /// <value>The provider.</value>
-        umbracoDataProvider Provider { get; }
+        UmbracoDataProvider Provider { get; }
         /// <summary>
         /// Gets a value indicating whether this instance is read only.
         /// </summary>

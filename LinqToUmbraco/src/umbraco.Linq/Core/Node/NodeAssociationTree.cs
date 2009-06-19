@@ -76,7 +76,7 @@ namespace umbraco.Linq.Core.Node
         /// Gets or sets the DataProvider associated with this Tree
         /// </summary>
         /// <value>The provider.</value>
-        public override umbracoDataProvider Provider { get; protected set; }
+        public override UmbracoDataProvider Provider { get; protected set; }
 
         public override void ReloadCache()
         {
