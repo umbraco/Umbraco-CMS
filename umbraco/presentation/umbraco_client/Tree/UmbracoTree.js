@@ -281,7 +281,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         this._debug("reloadActionNode: loading ajax for node: " + nodeDef.nodeId);
                         var _this = this;
                         //replace the node to refresh with loading and return the new loading element
-                        var toReplace = $("<li class='last'><a class='loading' href='#'>" + (this._tree.settings.lang.loading || "Loading ...") + "</a></li>").replaceAll(this._actionNode.jsNode);
+                        var toReplace = $("<li class='last'><a class='loading' href='#'><div>" + (this._tree.settings.lang.loading || "Loading ...") + "</div></a></li>").replaceAll(this._actionNode.jsNode);
                         $.get(this._getUrl(nodeDef.sourceUrl), null,
                             function(msg) {
                                 if (!msg || msg.length == 0) {
@@ -740,6 +740,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         theme_path: "/umbraco_client/Tree/Themes/",
                         theme_name: "umbraco",
                         context: null //no context menu by default						
+                    },
+                    lang : {
+                        new_node : "New folder",
+                        loading : "<div>" + (this._tree.settings.lang.loading || "Loading ...") + "</div>"
                     },
                     rules: {
                         metadata: "umb:nodedata",

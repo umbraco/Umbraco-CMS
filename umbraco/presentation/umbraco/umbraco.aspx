@@ -10,35 +10,39 @@
 <head runat="server">
 	<title>Umbraco CMS - <%=Request.Url.Host.ToLower().Replace("www.", "") %></title>
 	<asp:PlaceHolder id="IActionJSFileRef" runat="server"></asp:PlaceHolder>
-	<link href="css/umbracoGui.css" type="text/css" rel="stylesheet" />
-	<link href="/umbraco_client/modal/style.css" type="text/css" rel="stylesheet" />
-	<link rel="stylesheet" type="text/css" href="/umbraco_client/Tree/Themes/tree_component.css" />
-	
-	<script type="text/javascript" src="/umbraco_client/Application/NamespaceManager.js"></script>
-	
-	<script type="text/javascript" src="/umbraco_client/ui/jquery.js"></script>
-	<script type="text/javascript" src="/umbraco_client/ui/jqueryui.js"></script>
-	<script type="text/javascript" src="/umbraco_client/modal/modal.js"></script>
-	<script type="text/javascript" src="/umbraco_client/Application/JQuery/jquery.metadata.min.js"></script>
-	<script type="text/javascript" src="js/guiFunctions.js"></script>
-	<script type="text/javascript" src="js/language.aspx"></script>
-	
-	<script type="text/javascript" src="/umbraco_client/Application/UmbracoApplicationActions.js"></script>	
-	<script type="text/javascript" src="/umbraco_client/Application/UmbracoUtils.js"></script>
-	<script type="text/javascript" src="/umbraco_client/Application/UmbracoClientManager.js"></script>
-
-	<!-- Default js library for events, dimension utills etc -->
-	<script type="text/javascript" src="/umbraco_client/ui/default.js"></script>
-
-	<!-- Support to fix IE bug with multiple resize events -->
-	<script type="text/javascript" src="/umbraco_client/ui/jQueryWresize.js"></script>
-		
+			
 	<script type="text/javascript">
 		this.name = 'umbracoMain';
 	</script>
 	
 </head>
 <body id="umbracoMainPageBody">
+	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="Header" IsDebugMode="false" >
+		<Paths>
+			<umb:ClientDependencyPath Name="UmbracoClient" Path="~/umbraco_client" />
+			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
+		</Paths>		
+	</umb:ClientDependencyLoader>
+	
+	<umb:ClientDependencyInclude runat="server" ID="ClientDependencyInclude3" DependencyType="Css" FilePath="css/umbracoGui.css" PathNameAlias="UmbracoRoot" />
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude1" DependencyType="Css" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude2" DependencyType="Css" FilePath="Tree/Themes/tree_component.css" PathNameAlias="UmbracoClient" />
+		
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude4" DependencyType="Javascript" FilePath="Application/NamespaceManager.js" PathNameAlias="UmbracoClient" Priority="0" CompositeGroupName="JSCore" />
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude5" DependencyType="Javascript" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" CompositeGroupName="JSCore" />
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude6" DependencyType="Javascript" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient" Priority="1" CompositeGroupName="JSAddons" />	
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude8" DependencyType="Javascript" FilePath="Application/JQuery/jquery.metadata.min.js" PathNameAlias="UmbracoClient" Priority="1" CompositeGroupName="JSAddons" />
+	
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude7" DependencyType="Javascript" FilePath="modal/modal.js" PathNameAlias="UmbracoClient" />	
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude11" DependencyType="Javascript" FilePath="Application/UmbracoApplicationActions.js" PathNameAlias="UmbracoClient" CompositeGroupName="UmbApp" />
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude12" DependencyType="Javascript" FilePath="Application/UmbracoUtils.js" PathNameAlias="UmbracoClient" CompositeGroupName="UmbApp" />
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude13" DependencyType="Javascript" FilePath="Application/UmbracoClientManager.js" PathNameAlias="UmbracoClient" CompositeGroupName="UmbApp" />
+	
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude14" DependencyType="Javascript" FilePath="ui/default.js" PathNameAlias="UmbracoClient" CompositeGroupName="UmbApp" />
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude15" DependencyType="Javascript" FilePath="ui/jQueryWresize.js" PathNameAlias="UmbracoClient" CompositeGroupName="UmbApp" />	
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude9" DependencyType="Javascript" FilePath="js/guiFunctions.js" PathNameAlias="UmbracoRoot" CompositeGroupName="UmbApp" />
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude10" DependencyType="Javascript" FilePath="js/language.aspx" PathNameAlias="UmbracoRoot" />
+	
 	
 	
 	<form id="Form1" method="post" runat="server" style="margin: 0px; padding: 0px">

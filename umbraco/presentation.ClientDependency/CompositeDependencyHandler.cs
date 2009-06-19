@@ -64,7 +64,7 @@ namespace umbraco.presentation.ClientDependency
 				throw new ArgumentException("Must specify a fileset in the request");
 
 			byte[] fileBytes = CombineFiles(fileset, context);
-			byte[] outputBytes = fileBytes;//CompressBytes(context, fileBytes);
+			byte[] outputBytes = CompressBytes(context, fileBytes);
 			SetCaching(context);
 
 			context.Response.ContentType = type == ClientDependencyType.Javascript ? "text/javascript" : "text/css";

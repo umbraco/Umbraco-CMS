@@ -17,16 +17,22 @@ namespace umbraco.presentation.ClientDependency
 		private static ClientDependencyProviderCollection m_Providers = null;
 		private static object m_Lock = new object();
 
-		public ClientDependencyProvider DefaultProvider
+		public static ClientDependencyProvider DefaultProvider
 		{
-			get { return m_Provider; }
+            get
+            {
+                LoadProviders();
+                return m_Provider;
+            }
 		}
-		public ClientDependencyProviderCollection ProviderCollection
+        public static ClientDependencyProviderCollection ProviderCollection
 		{
-			get { return m_Providers; }
+            get
+            {
+                LoadProviders();
+                return m_Providers;
+            }
 		}
-
-		private const int StartingIncludeControlPriority = 5000;
 
 		private static void LoadProviders()
 		{			
@@ -113,6 +119,13 @@ namespace umbraco.presentation.ClientDependency
 			ClientDependencyRegistrationService service = new ClientDependencyRegistrationService(control, paths, found);
 			service.ProcessDependencies();
 		}		
+
+        public static void RegisterClientDependencies(ClientDependencyProvider provider, Control control, ClientDependencyPathCollection paths)
+        {
+            LoadProviders();
+            ClientDependencyRegistrationService service = new ClientDependencyRegistrationService(control, paths, provider);
+			service.ProcessDependencies();
+        }
 	
 		internal class ClientDependencyRegistrationService
 		{
@@ -125,7 +138,7 @@ namespace umbraco.presentation.ClientDependency
 			}
 			
 			private Control m_RenderingControl;
-			private List<ClientDependencyAttribute> m_Dependencies = new List<ClientDependencyAttribute>();
+            private List<IClientDependencyFile> m_Dependencies = new List<IClientDependencyFile>();
 			private ClientDependencyPathCollection m_Paths;
 			private ClientDependencyProvider m_Provider;
 
@@ -134,11 +147,11 @@ namespace umbraco.presentation.ClientDependency
 			/// </summary>
 			/// <param name="control"></param>
 			/// <returns></returns>
-			private List<ClientDependencyAttribute> FindDependencies(Control control)
+            private List<IClientDependencyFile> FindDependencies(Control control)
 			{
 				// find dependencies
 				Type controlType = control.GetType();
-				List<ClientDependencyAttribute> dependencies = new List<ClientDependencyAttribute>();
+				List<IClientDependencyFile> dependencies = new List<IClientDependencyFile>();
 				foreach (Attribute attribute in Attribute.GetCustomAttributes(controlType))
 				{
 					if (attribute is ClientDependencyAttribute)
@@ -148,18 +161,17 @@ namespace umbraco.presentation.ClientDependency
 				}
 
 				// add child dependencies
-				int i = StartingIncludeControlPriority;
 				foreach (Control child in control.Controls)
 				{
 					if (child.GetType().Equals(typeof(ClientDependencyInclude)))
 					{
 						ClientDependencyInclude include = (ClientDependencyInclude)child;
-						dependencies.Add(new ClientDependencyAttribute(i, include.Type, include.File));
-						i++;
+						//dependencies.Add(new ClientDependencyAttribute(include.Priority, include.DependencyType, include.FilePath, include.PathName, include.InvokeJavascriptMethodOnLoad, include.CompositeGroupName));
+                        dependencies.Add(include);
 					}
 					else if (child.HasControls())
 					{
-						m_Dependencies.AddRange(FindDependencies(child));
+                        dependencies.AddRange(FindDependencies(child));
 					}					
 				}
 

@@ -7,7 +7,7 @@
     <title></title>   
 </head>
 <body>
-	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="ClientSideRegistration">
+	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="ClientSideRegistration" IsDebugMode="true" >
 		<Paths>
 			<umb:ClientDependencyPath Name="UmbracoClient" Path="~/umbraco_client" />
 			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />

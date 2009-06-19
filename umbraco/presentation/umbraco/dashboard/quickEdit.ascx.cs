@@ -17,7 +17,7 @@ namespace umbraco.presentation.dashboard
 		{
             
             //uses the library function instead, to load the script in the head.. 
-            library.RegisterJavaScriptFile("jqueryAutocomplete", GlobalSettings.Path + "/js/autocomplete/jquery.autocomplete.js");
+            //library.RegisterJavaScriptFile("jqueryAutocomplete", GlobalSettings.Path + "/js/autocomplete/jquery.autocomplete.js");
             //library.RegisterJavaScriptFile("jqueryAutocompleteImplementation", GlobalSettings.Path + "/js/autocomplete/jquery.autocomplete.implementation.js");
 
             /*

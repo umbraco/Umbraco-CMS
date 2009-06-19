@@ -17,6 +17,7 @@ namespace umbraco.presentation.ClientDependency
 		{
 			Paths = new ClientDependencyPathCollection();
 			EmbedType = ClientDependencyEmbedType.Header;
+            IsDebugMode = false;
 		}
 
 		protected override void OnInit(EventArgs e)
@@ -64,13 +65,18 @@ namespace umbraco.presentation.ClientDependency
 			{
 				Page.Trace.Write("ClientDependency", string.Format("Path loaded: {0}", path.Path));
 			}
+            ClientDependencyProvider provider = null;
 			switch (EmbedType)
 			{
 				case ClientDependencyEmbedType.Header:
-					ClientDependencyHelper.RegisterClientDependencies<PageHeaderProvider>(this.Page, Paths);
+                    provider = ClientDependencyHelper.ProviderCollection[PageHeaderProvider.DefaultName];
+                    provider.IsDebugMode = IsDebugMode;
+					ClientDependencyHelper.RegisterClientDependencies(provider, this.Page, Paths);
 					break;
 				case ClientDependencyEmbedType.ClientSideRegistration:
-					ClientDependencyHelper.RegisterClientDependencies<ClientSideRegistrationProvider>(this.Page, Paths);
+                    provider = ClientDependencyHelper.ProviderCollection[ClientSideRegistrationProvider.DefaultName];
+                    provider.IsDebugMode = IsDebugMode;
+					ClientDependencyHelper.RegisterClientDependencies(provider, this.Page, Paths);
 					break;
 			}
 			
@@ -80,6 +86,7 @@ namespace umbraco.presentation.ClientDependency
 		[PersistenceMode(PersistenceMode.InnerProperty)]
 		public ClientDependencyPathCollection Paths { get; private set; }
 		public ClientDependencyEmbedType EmbedType { get; set; }
+        public bool IsDebugMode { get; set; }
 
 
 		private List<ClientDependencyAttribute> m_Dependencies = new List<ClientDependencyAttribute>();

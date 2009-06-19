@@ -11,12 +11,30 @@ namespace umbraco.presentation.ClientDependency.Providers
 	{
 		protected Control DependantControl { get; private set; }
 		protected ClientDependencyPathCollection FolderPaths { get; private set; }
-		protected List<ClientDependencyAttribute> AllDependencies { get; private set; }
+        protected List<IClientDependencyFile> AllDependencies { get; private set; }
+
+        /// <summary>
+        /// Set to true to disable composite scripts so all scripts/css comes through as individual files.
+        /// </summary>
+        public bool IsDebugMode { get; set; }
 
 		protected abstract void RegisterJsFiles(List<IClientDependencyFile> jsDependencies);
 		protected abstract void RegisterCssFiles(List<IClientDependencyFile> cssDependencies);
 
-		public void RegisterDependencies(Control dependantControl, List<ClientDependencyAttribute> dependencies, ClientDependencyPathCollection paths)
+        public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
+        {
+            IsDebugMode = false;
+            if (config != null && config["isDebug"] != null)
+            {
+                bool isDebug;
+                if (bool.TryParse(config["isDebug"], out isDebug))
+                    IsDebugMode = isDebug;              
+            }
+
+            base.Initialize(name, config);
+        }
+
+        public void RegisterDependencies(Control dependantControl, List<IClientDependencyFile> dependencies, ClientDependencyPathCollection paths)
 		{
 			DependantControl = dependantControl;
 			AllDependencies = dependencies;
@@ -25,16 +43,22 @@ namespace umbraco.presentation.ClientDependency.Providers
 			UpdateFilePaths();
 
 			//seperate the types into 2 lists for all dependencies without composite groups
-			List<ClientDependencyAttribute> jsDependencies = AllDependencies.FindAll(
-				delegate(ClientDependencyAttribute a)
+            List<IClientDependencyFile> jsDependencies = AllDependencies.FindAll(
+                delegate(IClientDependencyFile a)
 				{
-					return a.DependencyType == ClientDependencyType.Javascript && string.IsNullOrEmpty(a.CompositeGroupName);
+                    if (!IsDebugMode)
+                        return a.DependencyType == ClientDependencyType.Javascript && string.IsNullOrEmpty(a.CompositeGroupName);
+                    else
+                        return a.DependencyType == ClientDependencyType.Javascript;
 				}
 			);
-			List<ClientDependencyAttribute> cssDependencies = AllDependencies.FindAll(
-				delegate(ClientDependencyAttribute a)
+            List<IClientDependencyFile> cssDependencies = AllDependencies.FindAll(
+                delegate(IClientDependencyFile a)
 				{
-					return a.DependencyType == ClientDependencyType.Css && string.IsNullOrEmpty(a.CompositeGroupName);
+                    if (!IsDebugMode)
+                        return a.DependencyType == ClientDependencyType.Css && string.IsNullOrEmpty(a.CompositeGroupName);
+                    else
+                        return a.DependencyType == ClientDependencyType.Css;
 				}
 			);
 
@@ -42,23 +66,25 @@ namespace umbraco.presentation.ClientDependency.Providers
 			jsDependencies.Sort((a, b) => a.Priority.CompareTo(b.Priority));
 			cssDependencies.Sort((a, b) => a.Priority.CompareTo(b.Priority));
 
-			RegisterCssFiles(cssDependencies.ConvertAll<IClientDependencyFile>(a => { return (IClientDependencyFile)a; }));
-			RegisterCssFiles(ProcessCompositeGroups(ClientDependencyType.Css));
+            if (!IsDebugMode) RegisterCssFiles(ProcessCompositeGroups(ClientDependencyType.Css));
+            RegisterCssFiles(cssDependencies.ConvertAll<IClientDependencyFile>(a => { return (IClientDependencyFile)a; }));
+            if (!IsDebugMode) RegisterJsFiles(ProcessCompositeGroups(ClientDependencyType.Javascript));
 			RegisterJsFiles(jsDependencies.ConvertAll<IClientDependencyFile>(a => { return (IClientDependencyFile)a; }));
-			RegisterJsFiles(ProcessCompositeGroups(ClientDependencyType.Javascript));
+            
 		}
 
 		private List<IClientDependencyFile> ProcessCompositeGroups(ClientDependencyType type)
 		{
-			List<ClientDependencyAttribute> dependencies = AllDependencies.FindAll(
-				delegate(ClientDependencyAttribute a)
+            List<IClientDependencyFile> dependencies = AllDependencies.FindAll(
+                delegate(IClientDependencyFile a)
 				{
 					return a.DependencyType == type && !string.IsNullOrEmpty(a.CompositeGroupName);
 				}
-			);			
+			);
+            
 			List<string> groups = new List<string>();
 			List<IClientDependencyFile> files = new List<IClientDependencyFile>();
-			foreach (ClientDependencyAttribute a in dependencies)
+            foreach (IClientDependencyFile a in dependencies)
 			{
 				if (!groups.Contains(a.CompositeGroupName))
 				{
@@ -77,17 +103,18 @@ namespace umbraco.presentation.ClientDependency.Providers
 		/// <param name="dependencies"></param>
 		/// <param name="groupName"></param>
 		/// <returns></returns>
-		private string ProcessCompositeGroup(List<ClientDependencyAttribute> dependencies, string groupName, ClientDependencyType type)
+        private string ProcessCompositeGroup(List<IClientDependencyFile> dependencies, string groupName, ClientDependencyType type)
 		{
 			string handler = "{0}?s={1}&t={2}";
 			StringBuilder files = new StringBuilder();
-			List<ClientDependencyAttribute> byGroup = AllDependencies.FindAll(
-				delegate(ClientDependencyAttribute a)
+            List<IClientDependencyFile> byGroup = dependencies.FindAll(
+                delegate(IClientDependencyFile a)
 				{
 					return a.CompositeGroupName == groupName;
 				}
 			);
-			foreach (ClientDependencyAttribute a in dependencies)
+            byGroup.Sort((a, b) => a.Priority.CompareTo(b.Priority));
+            foreach (IClientDependencyFile a in byGroup)
 			{
 				files.Append(a.FilePath + ";");
 			}
@@ -113,7 +140,7 @@ namespace umbraco.presentation.ClientDependency.Providers
 		/// <param name="control"></param>
 		private void UpdateFilePaths()
 		{
-			foreach (ClientDependencyAttribute dependency in AllDependencies)
+			foreach (IClientDependencyFile dependency in AllDependencies)
 			{
 				if (!string.IsNullOrEmpty(dependency.PathNameAlias))
 				{
@@ -149,6 +176,8 @@ namespace umbraco.presentation.ClientDependency.Providers
 			public ClientDependencyType DependencyType { get; set; }
 			public string InvokeJavascriptMethodOnLoad { get; set; }
 			public int Priority { get; set; }
+            public string CompositeGroupName { get; set; }
+            public string PathNameAlias { get; set; }
 		}
 
 	}
