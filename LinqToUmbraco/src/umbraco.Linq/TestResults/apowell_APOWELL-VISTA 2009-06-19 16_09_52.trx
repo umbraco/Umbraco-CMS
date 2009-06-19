@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRun id="8c462b2a-782d-464f-ae66-e79f24e379c9" name="apowell@APOWELL-VISTA 2009-06-19 16:09:52" runUser="WDG\apowell" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2006">
+  <TestRunConfiguration name="Local Test Run" id="8e6cf961-1d52-4801-9beb-b129cc3bd405">
+    <Description>This is a default test run configuration for a local test run.</Description>
+    <Deployment runDeploymentRoot="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\TestResults\apowell_APOWELL-VISTA 2009-06-19 16_09_52">
+      <DeploymentItem filename="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core\bin\Debug\Umbraco.Linq.Core.dll" />
+      <DeploymentItem filename="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\dep\Reference Assemblies\Mocking\Typemock.ArrangeActAssert.Dll" />
+      <DeploymentItem filename="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\dep\Reference Assemblies\Umbraco\businesslogic.dll" />
+      <DeploymentItem filename="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\dep\Reference Assemblies\Umbraco\umbraco.dll" />
+      <DeploymentItem filename="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\dep\Reference Assemblies\Umbraco\umbraco.DataLayer.dll" />
+    </Deployment>
+    <CodeCoverage>
+      <Regular>
+        <CodeCoverageItem binaryFile="DTMetal.Engine\bin\Debug\Umbraco.Linq.DTMetal.Engine.dll" pdbFile="DTMetal.Engine\bin\Debug\Umbraco.Linq.DTMetal.Engine.pdb" instrumentInPlace="true" />
+      </Regular>
+    </CodeCoverage>
+    <TestTypeSpecific />
+  </TestRunConfiguration>
+  <ResultSummary outcome="Warning">
+    <Counters total="1" executed="1" passed="1" error="0" failed="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <RunInfos>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-19T16:10:01.0894835+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'MySql.Data' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-19T16:10:01.0894835+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'Lucene.Net' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-19T16:10:01.0894835+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'ICSharpCode.SharpZipLib' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-19T16:10:01.0894835+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'TidyNet' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-19T16:10:01.0894835+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'CookComputing.XmlRpcV2' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-19T16:10:01.0894835+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'controls' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-19T16:10:01.0894835+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'AjaxControlToolkit' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-19T16:10:01.0894835+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'umbraco.providers' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+  <Times creation="2009-06-19T16:09:52.9191080+10:00" queuing="2009-06-19T16:10:26.8270940+10:00" start="2009-06-19T16:10:28.2430190+10:00" finish="2009-06-19T16:10:32.8696760+10:00" />
+  <TestDefinitions>
+    <UnitTest name="CacheTest_ForcedRefresh" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="819c1c57-4bd5-7146-c34e-b401b67a2e91">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="2e73b830-b825-4487-b94b-17cdcb4f316c" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.CacheTest, Umbraco.Linq.Core.Tests" name="CacheTest_ForcedRefresh" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <TestEntries>
+    <TestEntry testId="819c1c57-4bd5-7146-c34e-b401b67a2e91" executionId="2e73b830-b825-4487-b94b-17cdcb4f316c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <Results>
+    <UnitTestResult executionId="2e73b830-b825-4487-b94b-17cdcb4f316c" testId="819c1c57-4bd5-7146-c34e-b401b67a2e91" testName="CacheTest_ForcedRefresh" computerName="APOWELL-VISTA" duration="00:00:01.6130379" startTime="2009-06-19T16:10:28.8230600+10:00" endTime="2009-06-19T16:10:32.3286950+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+  </Results>
+</TestRun>

@@ -1,0 +1,946 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRun id="df7d43e9-7b50-46fb-a476-3688cc8ad05f" name="apowell@APOWELL-VISTA 2009-06-03 16:43:25" runUser="WDG\apowell" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2006">
+  <TestRunConfiguration name="Local Test Run" id="8e6cf961-1d52-4801-9beb-b129cc3bd405">
+    <Description>This is a default test run configuration for a local test run.</Description>
+    <Deployment runDeploymentRoot="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\TestResults\apowell_APOWELL-VISTA 2009-06-03 16_43_25">
+      <DeploymentItem filename="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core\bin\Debug\Umbraco.Linq.Core.dll" />
+      <DeploymentItem filename="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.CodeBuilder\bin\Debug\Umbraco.Linq.DTMetal.CodeBuilder.dll" />
+      <DeploymentItem filename="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\dep\Reference Assemblies\Umbraco\umbraco.DataLayer.dll" />
+      <DeploymentItem filename="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\dep\Reference Assemblies\Umbraco\umbraco.dll" />
+      <DeploymentItem filename="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\dep\Reference Assemblies\Umbraco\businesslogic.dll" />
+      <DeploymentItem filename="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine\bin\Debug\Umbraco.Linq.DTMetal.Engine.dll" />
+      <DeploymentItem filename="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\dep\Reference Assemblies\Mocking\Rhino.Mocks.dll" />
+      <DeploymentItem filename="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\dep\Reference Assemblies\Mocking\Typemock.ArrangeActAssert.Dll" />
+    </Deployment>
+    <CodeCoverage>
+      <Regular>
+        <CodeCoverageItem binaryFile="DTMetal.Engine\bin\Debug\Umbraco.Linq.DTMetal.Engine.dll" pdbFile="DTMetal.Engine\bin\Debug\Umbraco.Linq.DTMetal.Engine.pdb" instrumentInPlace="true" />
+      </Regular>
+    </CodeCoverage>
+    <TestTypeSpecific />
+  </TestRunConfiguration>
+  <ResultSummary outcome="Failed">
+    <Counters total="56" executed="56" passed="53" error="0" failed="3" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <RunInfos>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-03T16:43:29.0102660+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'MySql.Data' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-03T16:43:29.0102660+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'Lucene.Net' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-03T16:43:29.0111190+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'ICSharpCode.SharpZipLib' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-03T16:43:29.0111190+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'TidyNet' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-03T16:43:29.0111190+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'CookComputing.XmlRpcV2' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-03T16:43:29.0111190+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'controls' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-03T16:43:29.0111190+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'AjaxControlToolkit' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+      <RunInfo computerName="APOWELL-VISTA" outcome="Warning" timestamp="2009-06-03T16:43:29.0111190+10:00">
+        <Text>Warning: Test Run deployment issue: The assembly or module 'umbraco.providers' directly or indirectly referenced by the test container 'c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll' was not found.</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+  <Times creation="2009-06-03T16:43:25.4071940+10:00" queuing="2009-06-03T16:43:33.5311660+10:00" start="2009-06-03T16:43:34.2937480+10:00" finish="2009-06-03T16:44:01.2101630+10:00" />
+  <TestDefinitions>
+    <UnitTest name="SelectTest_Anonymous_Query" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="6e0187f1-a985-7267-aac9-b503d0db42c2">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="14c6026e-5327-44b9-b99b-f251304a90f6" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.SelectTest, Umbraco.Linq.Core.Tests" name="SelectTest_Anonymous_Query" />
+    </UnitTest>
+    <UnitTest name="LoadDocTypesTest_ParentIncluded" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="4088973a-35e2-989f-7be9-a1a71c39ac7d">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="0dc870a4-636c-412c-9e6a-8f3805c16d9a" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeObjectBuilderTest, Umbraco.Linq.DTMetal.Engine.Tests" name="LoadDocTypesTest_ParentIncluded" />
+    </UnitTest>
+    <UnitTest name="AncestorTest_NoWhereCondition_NotExists" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="5fae7f64-be90-0be7-6749-e978c7984b83">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="a96db054-260b-4d47-adbc-a2c59344f9cb" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.AncestorTest, Umbraco.Linq.Core.Tests" name="AncestorTest_NoWhereCondition_NotExists" />
+    </UnitTest>
+    <UnitTest name="InheritanceTest_PropertyFromBase" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="ecf2e155-9a8e-8e63-5f9c-7ef3f0b446fd">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="22b0d900-c42f-4e88-9d44-a5f7c7860aa5" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.InheritanceTest, Umbraco.Linq.Core.Tests" name="InheritanceTest_PropertyFromBase" />
+    </UnitTest>
+    <UnitTest name="DocTypeMarkupLanguageBuilderTest_DocTypeWithAssociations" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="cfba73c4-c7de-b432-9d19-946e3f6fafbd">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="c3d9789f-2cc2-49d2-91ff-3d1ae1e8905c" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeMarkupLanguageBuilderTests, Umbraco.Linq.DTMetal.Engine.Tests" name="DocTypeMarkupLanguageBuilderTest_DocTypeWithAssociations" />
+    </UnitTest>
+    <UnitTest name="LoadDocTypesTest_ReaderAccessed" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="cb26c3dd-b083-5942-27a3-eafe3dd4f282">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="3ddfac09-53e4-47a1-ad29-5dc57cfeacb9" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeObjectBuilderTest, Umbraco.Linq.DTMetal.Engine.Tests" name="LoadDocTypesTest_ReaderAccessed" />
+    </UnitTest>
+    <UnitTest name="LoadDocTypesTest_ParentNotIncluded" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="705cc8a7-65a7-9d50-5dbe-2c4f569952fe">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="8bfcc4ac-b29b-44a5-b0ec-4757e58aecc2" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeObjectBuilderTest, Umbraco.Linq.DTMetal.Engine.Tests" name="LoadDocTypesTest_ParentNotIncluded" />
+    </UnitTest>
+    <UnitTest name="DataContextMockTest_MockProvider" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.mockable.tests\bin\debug\umbraco.linqcore.mockable.tests.dll" id="d4949013-8195-0041-b9b7-ae2502a8cca1">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="7330b10b-ffa6-4911-9328-c41f03e348ee" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Mockable.Tests\bin\Debug\Umbraco.LinqCore.Mockable.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.LinqCore.Mockable.Tests.DataContextMockTest, Umbraco.LinqCore.Mockable.Tests" name="DataContextMockTest_MockProvider" />
+    </UnitTest>
+    <UnitTest name="DataContextTest_FileMustExist" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="16a970cb-efea-aa31-bd1b-d6c374ee4ad0">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="de35095d-ccbf-4935-8dd6-506c976bcaa5" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.DataContextTest, Umbraco.Linq.Core.Tests" name="DataContextTest_FileMustExist" />
+    </UnitTest>
+    <UnitTest name="CwsReplicationTest_ListGalleries" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="d7d30b25-2a4b-e82b-7ec9-fe950042e500">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="1fe73c56-1c62-437f-ad4b-6573e8f28233" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.CwsReplicationTest, Umbraco.Linq.Core.Tests" name="CwsReplicationTest_ListGalleries" />
+    </UnitTest>
+    <UnitTest name="SelectTest_LoopTree_Lambda" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="4f6f50c5-5791-b771-ea0d-04fe27df025d">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="a69f1dfe-ef56-459c-a886-43fd56280165" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.SelectTest, Umbraco.Linq.Core.Tests" name="SelectTest_LoopTree_Lambda" />
+    </UnitTest>
+    <UnitTest name="WhereTest_DateTimeGreaterThan_Query" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="ab60c870-c97e-3903-3f94-9b1cd04e2750">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="b03a7eea-107b-441a-8f49-45afaaa57cc8" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.WhereTest, Umbraco.Linq.Core.Tests" name="WhereTest_DateTimeGreaterThan_Query" />
+    </UnitTest>
+    <UnitTest name="LoadDocTypesTest_IntPropertyMapping" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="6dc33ee8-1d74-b6fd-c898-bc123cc01e06">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="2dbb6ec4-e614-49c7-a1c3-74ce173fac51" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeObjectBuilderTest, Umbraco.Linq.DTMetal.Engine.Tests" name="LoadDocTypesTest_IntPropertyMapping" />
+    </UnitTest>
+    <UnitTest name="LoadDocTypesTest_NvarcharPropertyMapping" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="9d0b7dca-11a8-707b-94a4-40f61946d8cd">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="bf7c6040-914a-4cfc-9dee-cfe673ad0b05" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeObjectBuilderTest, Umbraco.Linq.DTMetal.Engine.Tests" name="LoadDocTypesTest_NvarcharPropertyMapping" />
+    </UnitTest>
+    <UnitTest name="DocTypeMarkupLanguageBuilderTest_DataContextName" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="a1140c55-f07f-a7b0-916a-e810c0dad69e">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="ed364f45-c440-44e2-ac32-f563f618bba5" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeMarkupLanguageBuilderTests, Umbraco.Linq.DTMetal.Engine.Tests" name="DocTypeMarkupLanguageBuilderTest_DataContextName" />
+    </UnitTest>
+    <UnitTest name="SelectTest_LoopTree_Query" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="9995e473-e45c-46e5-4b90-9fb40e26b372">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="8d053c34-f0b1-4a4e-b656-91e6ac9fae0b" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.SelectTest, Umbraco.Linq.Core.Tests" name="SelectTest_LoopTree_Query" />
+    </UnitTest>
+    <UnitTest name="DocTypeMarkupLanguageBuilderTest_XmlValidates" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="f190a114-5462-637a-46f1-d65f43fc294a">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="acbd3aee-fb87-4ab8-be77-830e460da2a8" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeMarkupLanguageBuilderTests, Umbraco.Linq.DTMetal.Engine.Tests" name="DocTypeMarkupLanguageBuilderTest_XmlValidates" />
+    </UnitTest>
+    <UnitTest name="LoadDocTypesTest_NtextPropertyMapping" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="aa77d8d7-9994-8f83-49b3-a35d4d7154a9">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="cca15ae8-c6b5-4b0c-8e31-996dd7a1b30a" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeObjectBuilderTest, Umbraco.Linq.DTMetal.Engine.Tests" name="LoadDocTypesTest_NtextPropertyMapping" />
+    </UnitTest>
+    <UnitTest name="SelectTest_SingleProperty_Query" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="4fb22d59-8b15-2879-48bc-eef3769d793e">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="73182e32-d687-4bfb-9bf0-9acc8d055d73" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.SelectTest, Umbraco.Linq.Core.Tests" name="SelectTest_SingleProperty_Query" />
+    </UnitTest>
+    <UnitTest name="ChildTest_ChildExist" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="5adbb0f1-1fee-5a23-1e3a-3030f99f20b7">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="541018c1-9743-49c8-9c56-c9d75780948c" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.ChildTest, Umbraco.Linq.Core.Tests" name="ChildTest_ChildExist" />
+    </UnitTest>
+    <UnitTest name="DataContextTest_OfNodeTypes" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="a0e4e5b6-faf4-3b07-5448-60122368f27b">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="38ea5dfa-e7d1-4252-b0f3-0b2eacf12a22" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.DataContextTest, Umbraco.Linq.Core.Tests" name="DataContextTest_OfNodeTypes" />
+    </UnitTest>
+    <UnitTest name="AncestorTest_Where_NotExists" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="17d6977f-47ab-45fc-6ab3-9e8a0a500aa9">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="bcb2374b-859c-4372-8722-272133a286c2" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.AncestorTest, Umbraco.Linq.Core.Tests" name="AncestorTest_Where_NotExists" />
+    </UnitTest>
+    <UnitTest name="DocTypeMarkupLanguageBuilderTest_NormaliseAlias" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="752b6e7d-596c-0e44-8b41-eb737375ff20">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="2586153e-aac1-4f3d-8c30-7e47849db4ce" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeMarkupLanguageBuilderTests, Umbraco.Linq.DTMetal.Engine.Tests" name="DocTypeMarkupLanguageBuilderTest_NormaliseAlias" />
+    </UnitTest>
+    <UnitTest name="DataContextTest_DefaultConstructorIsNodeProvider" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="491b6b08-f0fc-3140-95b6-30c4c00307c2">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="58022f35-fd9e-47ac-b210-42c4ab166abd" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.DataContextTest, Umbraco.Linq.Core.Tests" name="DataContextTest_DefaultConstructorIsNodeProvider" />
+    </UnitTest>
+    <UnitTest name="LoadDocTypesTest_DocTypeProperties" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="6aeb42f8-defd-0b91-3920-791240ffb650">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="ed6a4a24-21ce-49cf-9ee8-29fe493992da" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeObjectBuilderTest, Umbraco.Linq.DTMetal.Engine.Tests" name="LoadDocTypesTest_DocTypeProperties" />
+    </UnitTest>
+    <UnitTest name="ParentTest_TopParentNull" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="5d512a8d-f22e-eca3-63c9-ef16f0d0277e">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="de2acdbe-6a76-4e08-b32a-ba717b3db599" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.ParentTest, Umbraco.Linq.Core.Tests" name="ParentTest_TopParentNull" />
+    </UnitTest>
+    <UnitTest name="DocTypeMarkupLanguageBuilderTest_Constructor" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="fdedb5ed-665b-0117-1077-5cfdb3652c4b">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="87130b8a-ddf6-4f64-a513-bdb5f0de7621" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeMarkupLanguageBuilderTests, Umbraco.Linq.DTMetal.Engine.Tests" name="DocTypeMarkupLanguageBuilderTest_Constructor" />
+    </UnitTest>
+    <UnitTest name="SelectTest_SingleProperty_Lambda" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="703fd371-9b76-753b-3664-a40434ea16b1">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="1742d435-64c2-4bf4-a776-7308b200a937" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.SelectTest, Umbraco.Linq.Core.Tests" name="SelectTest_SingleProperty_Lambda" />
+    </UnitTest>
+    <UnitTest name="WhereTest_TwoParameter_Query" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="9b3a1f75-d310-4d4e-1d01-3e9aca5552c3">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="1014d6bf-f1a3-4ebc-bc51-f9c16dcc6455" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.WhereTest, Umbraco.Linq.Core.Tests" name="WhereTest_TwoParameter_Query" />
+    </UnitTest>
+    <UnitTest name="AncestorTest_Where_Exists" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="10f8928a-4eaf-bc49-c986-ee3a68a882e5">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="b6027e17-2687-4c27-9871-a8682623c69d" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.AncestorTest, Umbraco.Linq.Core.Tests" name="AncestorTest_Where_Exists" />
+    </UnitTest>
+    <UnitTest name="DocTypeMarkupLanguageBuilderTest_SingleDocType" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="0c43ec12-1283-61a0-e824-7b9054b8a55d">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="9c8fb8d8-0008-4777-99ce-beb2542c31c1" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeMarkupLanguageBuilderTests, Umbraco.Linq.DTMetal.Engine.Tests" name="DocTypeMarkupLanguageBuilderTest_SingleDocType" />
+    </UnitTest>
+    <UnitTest name="LoadDocTypesTest_DatePropertyMapping" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="9eb4e647-bd76-32ac-4e1e-54cb1c232f3f">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="8cd7d582-b857-4f6a-8a40-6a5720cebe82" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeObjectBuilderTest, Umbraco.Linq.DTMetal.Engine.Tests" name="LoadDocTypesTest_DatePropertyMapping" />
+    </UnitTest>
+    <UnitTest name="SelectTest_Anonymous_Lambda" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="8e09ad75-2b62-0141-2d3d-e81f5a81bc23">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="2348094f-48cc-4030-8897-b80e36ab9f4e" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.SelectTest, Umbraco.Linq.Core.Tests" name="SelectTest_Anonymous_Lambda" />
+    </UnitTest>
+    <UnitTest name="LoadDocTypesTest_ParentNotExists" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="02a8eb43-b50a-cbb7-482e-9ae25e9cd387">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="0ccca099-d07c-4f30-b9bb-77cac9045765" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeObjectBuilderTest, Umbraco.Linq.DTMetal.Engine.Tests" name="LoadDocTypesTest_ParentNotExists" />
+    </UnitTest>
+    <UnitTest name="ChildTest_AllChildren" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="a1765099-5967-3d5d-28cb-6b311516f9f0">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="28da966f-a432-49f7-927f-80a469157e44" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.ChildTest, Umbraco.Linq.Core.Tests" name="ChildTest_AllChildren" />
+    </UnitTest>
+    <UnitTest name="OrderingTest_Date" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="b070efe5-440f-ca93-89ce-f34f085e7f2a">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="a7faa7d9-ab42-472c-b5e7-5dc7084efadd" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.OrderingTest, Umbraco.Linq.Core.Tests" name="OrderingTest_Date" />
+    </UnitTest>
+    <UnitTest name="LoadDocTypesTest_RecursiveParent" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="178af685-247e-c895-6887-f9d7a4340a78">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="05813472-aec8-4e67-a099-5b89239d8cf6" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeObjectBuilderTest, Umbraco.Linq.DTMetal.Engine.Tests" name="LoadDocTypesTest_RecursiveParent" />
+    </UnitTest>
+    <UnitTest name="LoadDocTypesTest_DbCalled" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="4ee7a751-a3c1-593f-42e2-b88d348c4312">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="064063c9-38b0-4dae-a0dc-4611382af6f7" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeObjectBuilderTest, Umbraco.Linq.DTMetal.Engine.Tests" name="LoadDocTypesTest_DbCalled" />
+    </UnitTest>
+    <UnitTest name="ParentTest_InvalidParentType" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="8dd25f01-d918-7dc6-ce8c-b1b33d36dc43">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="76f274be-b09f-488c-afd3-6159ffc92bcd" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.ParentTest, Umbraco.Linq.Core.Tests" name="ParentTest_InvalidParentType" />
+    </UnitTest>
+    <UnitTest name="DocTypeMarkupLanguageBuilderTest_DocTypeWithProperties" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="65e9fc0c-d7ca-b05d-8fec-116fba66bf8b">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="75985c48-99bc-4b4b-87aa-2f7b5449d934" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeMarkupLanguageBuilderTests, Umbraco.Linq.DTMetal.Engine.Tests" name="DocTypeMarkupLanguageBuilderTest_DocTypeWithProperties" />
+    </UnitTest>
+    <UnitTest name="DataContextMockTest_MockProviderThrowsException" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.mockable.tests\bin\debug\umbraco.linqcore.mockable.tests.dll" id="9d2dff2d-9d91-be84-3675-d0b2e1f79abf">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="d775f146-dbc3-4884-beaa-6f26a778fd15" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Mockable.Tests\bin\Debug\Umbraco.LinqCore.Mockable.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.LinqCore.Mockable.Tests.DataContextMockTest, Umbraco.LinqCore.Mockable.Tests" name="DataContextMockTest_MockProviderThrowsException" />
+    </UnitTest>
+    <UnitTest name="ParentTest_ParentCreated" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="11b0a7b6-a4d6-132c-ed32-2474a5d2fb99">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="cd05a892-b28a-4a86-a6e4-6ee7b45ed054" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.ParentTest, Umbraco.Linq.Core.Tests" name="ParentTest_ParentCreated" />
+    </UnitTest>
+    <UnitTest name="LoadDocTypesTest_ObjectPropertyMapping" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="63ffcffd-7921-c941-fcfc-0b281b455f69">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="d0d85a5e-cb2b-4dc7-ada2-8c92c67b10c8" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeObjectBuilderTest, Umbraco.Linq.DTMetal.Engine.Tests" name="LoadDocTypesTest_ObjectPropertyMapping" />
+    </UnitTest>
+    <UnitTest name="WhereTest_SingleParameter_Query" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="9b98b905-3265-2820-3e31-86f8f9a14527">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="665c96de-9c32-428b-b238-787aff06cb3b" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.WhereTest, Umbraco.Linq.Core.Tests" name="WhereTest_SingleParameter_Query" />
+    </UnitTest>
+    <UnitTest name="DataContextTest_NodeCached" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="a5443429-b086-09f5-b582-b162a4e9422d">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="08b58156-8004-4655-af1e-d76a0344cd26" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.DataContextTest, Umbraco.Linq.Core.Tests" name="DataContextTest_NodeCached" />
+    </UnitTest>
+    <UnitTest name="WhereTest_ToAnonymous" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="b5c94734-a80d-c253-7d3f-eb343818468d">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="ddf89e49-51a8-4025-a22e-06360ec9113b" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.WhereTest, Umbraco.Linq.Core.Tests" name="WhereTest_ToAnonymous" />
+    </UnitTest>
+    <UnitTest name="ChildTest_ChildToParent" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="4fa4e36f-845f-ef39-5348-03808739c691">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="692e1f8b-7a14-4d20-b62c-db0210ae0bf0" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.ChildTest, Umbraco.Linq.Core.Tests" name="ChildTest_ChildToParent" />
+    </UnitTest>
+    <UnitTest name="ParentTest_ParentIdExists" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="e361a18a-d3c0-cd72-1bbf-a76bf74f2686">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="351a045b-e914-4eeb-be48-280ebc6fd319" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.ParentTest, Umbraco.Linq.Core.Tests" name="ParentTest_ParentIdExists" />
+    </UnitTest>
+    <UnitTest name="InheritanceTest_ImplementsBaseClass" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="e6357dbf-df8a-0dc0-fcf5-b918673ef83e">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="20f86922-6325-4e62-8c4f-b57b45cade65" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.InheritanceTest, Umbraco.Linq.Core.Tests" name="InheritanceTest_ImplementsBaseClass" />
+    </UnitTest>
+    <UnitTest name="DataContextTest_ConstructFromExistingProvider" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="de4cf7d2-bcc2-a09e-bbe3-a2d43cfb69a7">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="bdcc57dc-90ed-4dfb-9b7a-f9e891720bd1" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.DataContextTest, Umbraco.Linq.Core.Tests" name="DataContextTest_ConstructFromExistingProvider" />
+    </UnitTest>
+    <UnitTest name="DataContextTest_FullCache" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="f7f33a5b-e244-4ef1-22b1-983d0133f13b">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="ac363678-a8e4-41de-9477-f8d7a94ad8e0" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.DataContextTest, Umbraco.Linq.Core.Tests" name="DataContextTest_FullCache" />
+    </UnitTest>
+    <UnitTest name="LoadDocTypesTest_GenerateAssociations" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="9cd396fc-186e-6b64-2457-9d913fb7a137">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="f096fee9-7787-45ea-a1d8-76acf4d124e6" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeObjectBuilderTest, Umbraco.Linq.DTMetal.Engine.Tests" name="LoadDocTypesTest_GenerateAssociations" />
+    </UnitTest>
+    <UnitTest name="DataContextTest_FileNameRequired" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="f65b627a-c4d0-aab7-a719-6ec1f011ae2b">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="9fc1108e-e4cb-4c60-8e36-4c9d16277180" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.DataContextTest, Umbraco.Linq.Core.Tests" name="DataContextTest_FileNameRequired" />
+    </UnitTest>
+    <UnitTest name="DataContextTest_EnsureSchemaValidation" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="6a742c79-bb04-8c53-8f18-a5344e6d605f">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="e5174f9f-a38d-4626-86c5-6e125707c97c" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.DataContextTest, Umbraco.Linq.Core.Tests" name="DataContextTest_EnsureSchemaValidation" />
+    </UnitTest>
+    <UnitTest name="AncestorTest_NoWhereCondition_Exists" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\core.tests\bin\debug\umbraco.linq.core.tests.dll" id="6640a4d2-4590-eb79-4b6a-1f26ac4ec6b0">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <DeploymentItems>
+        <DeploymentItem filename="umbraco.config" />
+      </DeploymentItems>
+      <Execution id="0a82162e-4c27-4369-9c98-3c840266823f" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\bin\Debug\Umbraco.Linq.Core.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.Core.Tests.AncestorTest, Umbraco.Linq.Core.Tests" name="AncestorTest_NoWhereCondition_Exists" />
+    </UnitTest>
+    <UnitTest name="LoadDocTypesTest_CreateDocType" storage="c:\users\apowell\documents\umbraco\codeplex\umbraco\branches\try-umbraco-linq\trunk\src\umbraco.linq\dtmetal.engine.tests\bin\debug\umbraco.linq.dtmetal.engine.tests.dll" id="239d3ed3-42a7-cf20-d34a-12ca57d30f3d">
+      <Css projectStructure="" iteration="" />
+      <Owners>
+        <Owner name="" />
+      </Owners>
+      <Execution id="0f2543f4-5992-422b-9432-095ddf7fc08e" />
+      <TestMethod codeBase="C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\DTMetal.Engine.Tests\bin\Debug\Umbraco.Linq.DTMetal.Engine.Tests.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Umbraco.Linq.DTMetal.Engine.Tests.DocTypeObjectBuilderTest, Umbraco.Linq.DTMetal.Engine.Tests" name="LoadDocTypesTest_CreateDocType" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <TestEntries>
+    <TestEntry testId="02a8eb43-b50a-cbb7-482e-9ae25e9cd387" executionId="0ccca099-d07c-4f30-b9bb-77cac9045765" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0c43ec12-1283-61a0-e824-7b9054b8a55d" executionId="9c8fb8d8-0008-4777-99ce-beb2542c31c1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10f8928a-4eaf-bc49-c986-ee3a68a882e5" executionId="b6027e17-2687-4c27-9871-a8682623c69d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11b0a7b6-a4d6-132c-ed32-2474a5d2fb99" executionId="cd05a892-b28a-4a86-a6e4-6ee7b45ed054" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16a970cb-efea-aa31-bd1b-d6c374ee4ad0" executionId="de35095d-ccbf-4935-8dd6-506c976bcaa5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="178af685-247e-c895-6887-f9d7a4340a78" executionId="05813472-aec8-4e67-a099-5b89239d8cf6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17d6977f-47ab-45fc-6ab3-9e8a0a500aa9" executionId="bcb2374b-859c-4372-8722-272133a286c2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="239d3ed3-42a7-cf20-d34a-12ca57d30f3d" executionId="0f2543f4-5992-422b-9432-095ddf7fc08e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4088973a-35e2-989f-7be9-a1a71c39ac7d" executionId="0dc870a4-636c-412c-9e6a-8f3805c16d9a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="491b6b08-f0fc-3140-95b6-30c4c00307c2" executionId="58022f35-fd9e-47ac-b210-42c4ab166abd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4ee7a751-a3c1-593f-42e2-b88d348c4312" executionId="064063c9-38b0-4dae-a0dc-4611382af6f7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4f6f50c5-5791-b771-ea0d-04fe27df025d" executionId="a69f1dfe-ef56-459c-a886-43fd56280165" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4fa4e36f-845f-ef39-5348-03808739c691" executionId="692e1f8b-7a14-4d20-b62c-db0210ae0bf0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4fb22d59-8b15-2879-48bc-eef3769d793e" executionId="73182e32-d687-4bfb-9bf0-9acc8d055d73" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5adbb0f1-1fee-5a23-1e3a-3030f99f20b7" executionId="541018c1-9743-49c8-9c56-c9d75780948c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5d512a8d-f22e-eca3-63c9-ef16f0d0277e" executionId="de2acdbe-6a76-4e08-b32a-ba717b3db599" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5fae7f64-be90-0be7-6749-e978c7984b83" executionId="a96db054-260b-4d47-adbc-a2c59344f9cb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="63ffcffd-7921-c941-fcfc-0b281b455f69" executionId="d0d85a5e-cb2b-4dc7-ada2-8c92c67b10c8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="65e9fc0c-d7ca-b05d-8fec-116fba66bf8b" executionId="75985c48-99bc-4b4b-87aa-2f7b5449d934" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6640a4d2-4590-eb79-4b6a-1f26ac4ec6b0" executionId="0a82162e-4c27-4369-9c98-3c840266823f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6a742c79-bb04-8c53-8f18-a5344e6d605f" executionId="e5174f9f-a38d-4626-86c5-6e125707c97c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6aeb42f8-defd-0b91-3920-791240ffb650" executionId="ed6a4a24-21ce-49cf-9ee8-29fe493992da" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6dc33ee8-1d74-b6fd-c898-bc123cc01e06" executionId="2dbb6ec4-e614-49c7-a1c3-74ce173fac51" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6e0187f1-a985-7267-aac9-b503d0db42c2" executionId="14c6026e-5327-44b9-b99b-f251304a90f6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="703fd371-9b76-753b-3664-a40434ea16b1" executionId="1742d435-64c2-4bf4-a776-7308b200a937" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="705cc8a7-65a7-9d50-5dbe-2c4f569952fe" executionId="8bfcc4ac-b29b-44a5-b0ec-4757e58aecc2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="752b6e7d-596c-0e44-8b41-eb737375ff20" executionId="2586153e-aac1-4f3d-8c30-7e47849db4ce" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8dd25f01-d918-7dc6-ce8c-b1b33d36dc43" executionId="76f274be-b09f-488c-afd3-6159ffc92bcd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8e09ad75-2b62-0141-2d3d-e81f5a81bc23" executionId="2348094f-48cc-4030-8897-b80e36ab9f4e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9995e473-e45c-46e5-4b90-9fb40e26b372" executionId="8d053c34-f0b1-4a4e-b656-91e6ac9fae0b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9b3a1f75-d310-4d4e-1d01-3e9aca5552c3" executionId="1014d6bf-f1a3-4ebc-bc51-f9c16dcc6455" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9b98b905-3265-2820-3e31-86f8f9a14527" executionId="665c96de-9c32-428b-b238-787aff06cb3b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9cd396fc-186e-6b64-2457-9d913fb7a137" executionId="f096fee9-7787-45ea-a1d8-76acf4d124e6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9d0b7dca-11a8-707b-94a4-40f61946d8cd" executionId="bf7c6040-914a-4cfc-9dee-cfe673ad0b05" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9d2dff2d-9d91-be84-3675-d0b2e1f79abf" executionId="d775f146-dbc3-4884-beaa-6f26a778fd15" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9eb4e647-bd76-32ac-4e1e-54cb1c232f3f" executionId="8cd7d582-b857-4f6a-8a40-6a5720cebe82" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a0e4e5b6-faf4-3b07-5448-60122368f27b" executionId="38ea5dfa-e7d1-4252-b0f3-0b2eacf12a22" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a1140c55-f07f-a7b0-916a-e810c0dad69e" executionId="ed364f45-c440-44e2-ac32-f563f618bba5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a1765099-5967-3d5d-28cb-6b311516f9f0" executionId="28da966f-a432-49f7-927f-80a469157e44" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a5443429-b086-09f5-b582-b162a4e9422d" executionId="08b58156-8004-4655-af1e-d76a0344cd26" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="aa77d8d7-9994-8f83-49b3-a35d4d7154a9" executionId="cca15ae8-c6b5-4b0c-8e31-996dd7a1b30a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ab60c870-c97e-3903-3f94-9b1cd04e2750" executionId="b03a7eea-107b-441a-8f49-45afaaa57cc8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b070efe5-440f-ca93-89ce-f34f085e7f2a" executionId="a7faa7d9-ab42-472c-b5e7-5dc7084efadd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b5c94734-a80d-c253-7d3f-eb343818468d" executionId="ddf89e49-51a8-4025-a22e-06360ec9113b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cb26c3dd-b083-5942-27a3-eafe3dd4f282" executionId="3ddfac09-53e4-47a1-ad29-5dc57cfeacb9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cfba73c4-c7de-b432-9d19-946e3f6fafbd" executionId="c3d9789f-2cc2-49d2-91ff-3d1ae1e8905c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d4949013-8195-0041-b9b7-ae2502a8cca1" executionId="7330b10b-ffa6-4911-9328-c41f03e348ee" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d7d30b25-2a4b-e82b-7ec9-fe950042e500" executionId="1fe73c56-1c62-437f-ad4b-6573e8f28233" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="de4cf7d2-bcc2-a09e-bbe3-a2d43cfb69a7" executionId="bdcc57dc-90ed-4dfb-9b7a-f9e891720bd1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e361a18a-d3c0-cd72-1bbf-a76bf74f2686" executionId="351a045b-e914-4eeb-be48-280ebc6fd319" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e6357dbf-df8a-0dc0-fcf5-b918673ef83e" executionId="20f86922-6325-4e62-8c4f-b57b45cade65" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ecf2e155-9a8e-8e63-5f9c-7ef3f0b446fd" executionId="22b0d900-c42f-4e88-9d44-a5f7c7860aa5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f190a114-5462-637a-46f1-d65f43fc294a" executionId="acbd3aee-fb87-4ab8-be77-830e460da2a8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f65b627a-c4d0-aab7-a719-6ec1f011ae2b" executionId="9fc1108e-e4cb-4c60-8e36-4c9d16277180" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f7f33a5b-e244-4ef1-22b1-983d0133f13b" executionId="ac363678-a8e4-41de-9477-f8d7a94ad8e0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="fdedb5ed-665b-0117-1077-5cfdb3652c4b" executionId="87130b8a-ddf6-4f64-a513-bdb5f0de7621" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <Results>
+    <UnitTestResult executionId="0ccca099-d07c-4f30-b9bb-77cac9045765" testId="02a8eb43-b50a-cbb7-482e-9ae25e9cd387" testName="LoadDocTypesTest_ParentNotExists" computerName="APOWELL-VISTA" duration="00:00:01.8844414" startTime="2009-06-03T16:43:34.5232050+10:00" endTime="2009-06-03T16:43:37.1675050+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="9c8fb8d8-0008-4777-99ce-beb2542c31c1" testId="0c43ec12-1283-61a0-e824-7b9054b8a55d" testName="DocTypeMarkupLanguageBuilderTest_SingleDocType" computerName="APOWELL-VISTA" duration="00:00:01.7881258" startTime="2009-06-03T16:43:37.2169790+10:00" endTime="2009-06-03T16:43:38.7327600+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="b6027e17-2687-4c27-9871-a8682623c69d" testId="10f8928a-4eaf-bc49-c986-ee3a68a882e5" testName="AncestorTest_Where_Exists" computerName="APOWELL-VISTA" duration="00:00:03.8952210" startTime="2009-06-03T16:43:38.7472610+10:00" endTime="2009-06-03T16:43:42.9661990+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="cd05a892-b28a-4a86-a6e4-6ee7b45ed054" testId="11b0a7b6-a4d6-132c-ed32-2474a5d2fb99" testName="ParentTest_ParentCreated" computerName="APOWELL-VISTA" duration="00:00:00.1614470" startTime="2009-06-03T16:43:43.0045840+10:00" endTime="2009-06-03T16:43:43.1777430+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="de35095d-ccbf-4935-8dd6-506c976bcaa5" testId="16a970cb-efea-aa31-bd1b-d6c374ee4ad0" testName="DataContextTest_FileMustExist" computerName="APOWELL-VISTA" duration="00:00:00.0224900" startTime="2009-06-03T16:43:43.1896850+10:00" endTime="2009-06-03T16:43:43.2255110+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="05813472-aec8-4e67-a099-5b89239d8cf6" testId="178af685-247e-c895-6887-f9d7a4340a78" testName="LoadDocTypesTest_RecursiveParent" computerName="APOWELL-VISTA" duration="00:00:00.1117792" startTime="2009-06-03T16:43:43.2604840+10:00" endTime="2009-06-03T16:43:43.3781980+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="bcb2374b-859c-4372-8722-272133a286c2" testId="17d6977f-47ab-45fc-6ab3-9e8a0a500aa9" testName="AncestorTest_Where_NotExists" computerName="APOWELL-VISTA" duration="00:00:01.4836902" startTime="2009-06-03T16:43:43.3901400+10:00" endTime="2009-06-03T16:43:44.6653750+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="0f2543f4-5992-422b-9432-095ddf7fc08e" testId="239d3ed3-42a7-cf20-d34a-12ca57d30f3d" testName="LoadDocTypesTest_CreateDocType" computerName="APOWELL-VISTA" duration="00:00:00.1427111" startTime="2009-06-03T16:43:44.6747580+10:00" endTime="2009-06-03T16:43:44.9221280+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="0dc870a4-636c-412c-9e6a-8f3805c16d9a" testId="4088973a-35e2-989f-7be9-a1a71c39ac7d" testName="LoadDocTypesTest_ParentIncluded" computerName="APOWELL-VISTA" duration="00:00:00.0502832" startTime="2009-06-03T16:43:44.9571010+10:00" endTime="2009-06-03T16:43:45.0176640+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="58022f35-fd9e-47ac-b210-42c4ab166abd" testId="491b6b08-f0fc-3140-95b6-30c4c00307c2" testName="DataContextTest_DefaultConstructorIsNodeProvider" computerName="APOWELL-VISTA" duration="00:00:00.0304125" startTime="2009-06-03T16:43:45.0304590+10:00" endTime="2009-06-03T16:43:45.0654320+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="064063c9-38b0-4dae-a0dc-4611382af6f7" testId="4ee7a751-a3c1-593f-42e2-b88d348c4312" testName="LoadDocTypesTest_DbCalled" computerName="APOWELL-VISTA" duration="00:00:00.0481432" startTime="2009-06-03T16:43:45.0782270+10:00" endTime="2009-06-03T16:43:45.1268480+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="a69f1dfe-ef56-459c-a886-43fd56280165" testId="4f6f50c5-5791-b771-ea0d-04fe27df025d" testName="SelectTest_LoopTree_Lambda" computerName="APOWELL-VISTA" duration="00:00:00.1620873" startTime="2009-06-03T16:43:45.1387900+10:00" endTime="2009-06-03T16:43:45.2897710+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="692e1f8b-7a14-4d20-b62c-db0210ae0bf0" testId="4fa4e36f-845f-ef39-5348-03808739c691" testName="ChildTest_ChildToParent" computerName="APOWELL-VISTA" duration="00:00:01.9482624" startTime="2009-06-03T16:43:45.2983010+10:00" endTime="2009-06-03T16:43:46.9292370+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="73182e32-d687-4bfb-9bf0-9acc8d055d73" testId="4fb22d59-8b15-2879-48bc-eef3769d793e" testName="SelectTest_SingleProperty_Query" computerName="APOWELL-VISTA" duration="00:00:00.1289127" startTime="2009-06-03T16:43:46.9650630+10:00" endTime="2009-06-03T16:43:47.0904540+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="541018c1-9743-49c8-9c56-c9d75780948c" testId="5adbb0f1-1fee-5a23-1e3a-3030f99f20b7" testName="ChildTest_ChildExist" computerName="APOWELL-VISTA" duration="00:00:01.2210071" startTime="2009-06-03T16:43:47.1126320+10:00" endTime="2009-06-03T16:43:48.1601160+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="de2acdbe-6a76-4e08-b32a-ba717b3db599" testId="5d512a8d-f22e-eca3-63c9-ef16f0d0277e" testName="ParentTest_TopParentNull" computerName="APOWELL-VISTA" duration="00:00:00.1275237" startTime="2009-06-03T16:43:48.1763230+10:00" endTime="2009-06-03T16:43:48.3162150+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="a96db054-260b-4d47-adbc-a2c59344f9cb" testId="5fae7f64-be90-0be7-6749-e978c7984b83" testName="AncestorTest_NoWhereCondition_NotExists" computerName="APOWELL-VISTA" duration="00:00:01.1407530" startTime="2009-06-03T16:43:48.3307160+10:00" endTime="2009-06-03T16:43:49.2997240+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d0d85a5e-cb2b-4dc7-ada2-8c92c67b10c8" testId="63ffcffd-7921-c941-fcfc-0b281b455f69" testName="LoadDocTypesTest_ObjectPropertyMapping" computerName="APOWELL-VISTA" duration="00:00:00.0660698" startTime="2009-06-03T16:43:49.3125190+10:00" endTime="2009-06-03T16:43:49.3747880+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="75985c48-99bc-4b4b-87aa-2f7b5449d934" testId="65e9fc0c-d7ca-b05d-8fec-116fba66bf8b" testName="DocTypeMarkupLanguageBuilderTest_DocTypeWithProperties" computerName="APOWELL-VISTA" duration="00:00:00.0714680" startTime="2009-06-03T16:43:49.3875830+10:00" endTime="2009-06-03T16:43:49.4600880+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="0a82162e-4c27-4369-9c98-3c840266823f" testId="6640a4d2-4590-eb79-4b6a-1f26ac4ec6b0" testName="AncestorTest_NoWhereCondition_Exists" computerName="APOWELL-VISTA" duration="00:00:01.2239318" startTime="2009-06-03T16:43:49.4694710+10:00" endTime="2009-06-03T16:43:50.5118370+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="e5174f9f-a38d-4626-86c5-6e125707c97c" testId="6a742c79-bb04-8c53-8f18-a5344e6d605f" testName="DataContextTest_EnsureSchemaValidation" computerName="APOWELL-VISTA" duration="00:00:00.0064108" startTime="2009-06-03T16:43:50.5237790+10:00" endTime="2009-06-03T16:43:50.5391330+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="ed6a4a24-21ce-49cf-9ee8-29fe493992da" testId="6aeb42f8-defd-0b91-3920-791240ffb650" testName="LoadDocTypesTest_DocTypeProperties" computerName="APOWELL-VISTA" duration="00:00:00.1950256" startTime="2009-06-03T16:43:50.5485160+10:00" endTime="2009-06-03T16:43:50.7242340+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2dbb6ec4-e614-49c7-a1c3-74ce173fac51" testId="6dc33ee8-1d74-b6fd-c898-bc123cc01e06" testName="LoadDocTypesTest_IntPropertyMapping" computerName="APOWELL-VISTA" duration="00:00:00.0315766" startTime="2009-06-03T16:43:50.7916210+10:00" endTime="2009-06-03T16:43:50.8453600+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="14c6026e-5327-44b9-b99b-f251304a90f6" testId="6e0187f1-a985-7267-aac9-b503d0db42c2" testName="SelectTest_Anonymous_Query" computerName="APOWELL-VISTA" duration="00:00:00.1640281" startTime="2009-06-03T16:43:50.8683910+10:00" endTime="2009-06-03T16:43:51.0364320+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="1742d435-64c2-4bf4-a776-7308b200a937" testId="703fd371-9b76-753b-3664-a40434ea16b1" testName="SelectTest_SingleProperty_Lambda" computerName="APOWELL-VISTA" duration="00:00:00.1142120" startTime="2009-06-03T16:43:51.0620220+10:00" endTime="2009-06-03T16:43:51.1720590+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="8bfcc4ac-b29b-44a5-b0ec-4757e58aecc2" testId="705cc8a7-65a7-9d50-5dbe-2c4f569952fe" testName="LoadDocTypesTest_ParentNotIncluded" computerName="APOWELL-VISTA" duration="00:00:00.0564253" startTime="2009-06-03T16:43:51.1840010+10:00" endTime="2009-06-03T16:43:51.2488290+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2586153e-aac1-4f3d-8c30-7e47849db4ce" testId="752b6e7d-596c-0e44-8b41-eb737375ff20" testName="DocTypeMarkupLanguageBuilderTest_NormaliseAlias" computerName="APOWELL-VISTA" duration="00:00:00.0167216" startTime="2009-06-03T16:43:51.2607710+10:00" endTime="2009-06-03T16:43:51.2863610+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="76f274be-b09f-488c-afd3-6159ffc92bcd" testId="8dd25f01-d918-7dc6-ce8c-b1b33d36dc43" testName="ParentTest_InvalidParentType" computerName="APOWELL-VISTA" duration="00:00:00.1982950" startTime="2009-06-03T16:43:51.3085390+10:00" endTime="2009-06-03T16:43:51.5610270+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2348094f-48cc-4030-8897-b80e36ab9f4e" testId="8e09ad75-2b62-0141-2d3d-e81f5a81bc23" testName="SelectTest_Anonymous_Lambda" computerName="APOWELL-VISTA" duration="00:00:00.1399457" startTime="2009-06-03T16:43:51.5746750+10:00" endTime="2009-06-03T16:43:51.7017720+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="8d053c34-f0b1-4a4e-b656-91e6ac9fae0b" testId="9995e473-e45c-46e5-4b90-9fb40e26b372" testName="SelectTest_LoopTree_Query" computerName="APOWELL-VISTA" duration="00:00:00.3974005" startTime="2009-06-03T16:43:51.7111550+10:00" endTime="2009-06-03T16:43:52.0540610+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method Umbraco.Linq.Core.Tests.SelectTest.SelectTest_LoopTree_Query threw exception:  TypeMock.TypeMockException: 
+*** Unexpected Call to System.Web.HttpContext.get_Items().</Message>
+          <StackTrace> at System.Web.HttpContext.get_Items()
+at umbraco.presentation.UmbracoContext.get_Current()
+at Umbraco.Linq.Core.Tests.SelectTest.&lt;SelectTest_LoopTree_Query&gt;b__1(CwsPhoto p) in C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\SelectTest.cs:line 80
+at System.Linq.Enumerable.Single[TSource](IEnumerable`1 source, Func`2 predicate)
+at Umbraco.Linq.Core.Tests.SelectTest.SelectTest_LoopTree_Query() in C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\SelectTest.cs:line 66
+   at TypeMock.MockManager.a(String A_0, String A_1, Object A_2, Object A_3, Boolean A_4, Object[] A_5)
+   at TypeMock.InternalMockManager.getReturn(Object that, String typeName, String methodName, Object methodParameters, Boolean isInjected)
+   at Umbraco.Linq.Core.Tests.SelectTest.SelectTest_LoopTree_Query() in C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\SelectTest.cs:line 66
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="1014d6bf-f1a3-4ebc-bc51-f9c16dcc6455" testId="9b3a1f75-d310-4d4e-1d01-3e9aca5552c3" testName="WhereTest_TwoParameter_Query" computerName="APOWELL-VISTA" duration="00:00:00.1311865" startTime="2009-06-03T16:43:52.0958580+10:00" endTime="2009-06-03T16:43:52.2195430+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="665c96de-9c32-428b-b238-787aff06cb3b" testId="9b98b905-3265-2820-3e31-86f8f9a14527" testName="WhereTest_SingleParameter_Query" computerName="APOWELL-VISTA" duration="00:00:00.1329087" startTime="2009-06-03T16:43:52.2306320+10:00" endTime="2009-06-03T16:43:52.3526110+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="f096fee9-7787-45ea-a1d8-76acf4d124e6" testId="9cd396fc-186e-6b64-2457-9d913fb7a137" testName="LoadDocTypesTest_GenerateAssociations" computerName="APOWELL-VISTA" duration="00:00:00.0545689" startTime="2009-06-03T16:43:52.3619940+10:00" endTime="2009-06-03T16:43:52.4208510+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="bf7c6040-914a-4cfc-9dee-cfe673ad0b05" testId="9d0b7dca-11a8-707b-94a4-40f61946d8cd" testName="LoadDocTypesTest_NvarcharPropertyMapping" computerName="APOWELL-VISTA" duration="00:00:00.0377405" startTime="2009-06-03T16:43:52.4302340+10:00" endTime="2009-06-03T16:43:52.4686190+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d775f146-dbc3-4884-beaa-6f26a778fd15" testId="9d2dff2d-9d91-be84-3675-d0b2e1f79abf" testName="DataContextMockTest_MockProviderThrowsException" computerName="APOWELL-VISTA" duration="00:00:01.4101839" startTime="2009-06-03T16:43:52.4797080+10:00" endTime="2009-06-03T16:43:54.4441670+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="8cd7d582-b857-4f6a-8a40-6a5720cebe82" testId="9eb4e647-bd76-32ac-4e1e-54cb1c232f3f" testName="LoadDocTypesTest_DatePropertyMapping" computerName="APOWELL-VISTA" duration="00:00:00.0290408" startTime="2009-06-03T16:43:54.4612270+10:00" endTime="2009-06-03T16:43:54.4953470+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="38ea5dfa-e7d1-4252-b0f3-0b2eacf12a22" testId="a0e4e5b6-faf4-3b07-5448-60122368f27b" testName="DataContextTest_OfNodeTypes" computerName="APOWELL-VISTA" duration="00:00:00.1184270" startTime="2009-06-03T16:43:54.5081420+10:00" endTime="2009-06-03T16:43:54.6173260+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="ed364f45-c440-44e2-ac32-f563f618bba5" testId="a1140c55-f07f-a7b0-916a-e810c0dad69e" testName="DocTypeMarkupLanguageBuilderTest_DataContextName" computerName="APOWELL-VISTA" duration="00:00:00.0975956" startTime="2009-06-03T16:43:54.6267090+10:00" endTime="2009-06-03T16:43:54.7196860+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="28da966f-a432-49f7-927f-80a469157e44" testId="a1765099-5967-3d5d-28cb-6b311516f9f0" testName="ChildTest_AllChildren" computerName="APOWELL-VISTA" duration="00:00:02.8555528" startTime="2009-06-03T16:43:54.7290690+10:00" endTime="2009-06-03T16:43:57.1848560+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method Umbraco.Linq.Core.Tests.ChildTest.ChildTest_AllChildren threw exception:  System.Reflection.ReflectionTypeLoadException: Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information..</Message>
+          <StackTrace> at System.Reflection.Module._GetTypesInternal(StackCrawlMark&amp; stackMark)
+at System.Reflection.Module.GetTypesInternal(StackCrawlMark&amp; stackMark)
+at System.Reflection.Assembly.GetTypes()
+at Umbraco.Linq.Core.Node.NodeDataProvider.&lt;DynamicNodeCreation&gt;b__a(Assembly a) in C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core\Node\NodeDataProvider.cs:line 269
+at System.Linq.Enumerable.&lt;SelectManyIterator&gt;d__31`3.MoveNext()
+at System.Linq.Enumerable.WhereSelectEnumerableIterator`2.MoveNext()
+at System.Linq.Enumerable.ToDictionary[TSource,TKey,TElement](IEnumerable`1 source, Func`2 keySelector, Func`2 elementSelector, IEqualityComparer`1 comparer)
+at System.Linq.Enumerable.ToDictionary[TSource,TKey](IEnumerable`1 source, Func`2 keySelector)
+at Umbraco.Linq.Core.Node.NodeDataProvider.DynamicNodeCreation(IEnumerable`1 elements) in C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core\Node\NodeDataProvider.cs:line 268
+at Umbraco.Linq.Core.Node.NodeAssociationTree`1.GetEnumerator() in C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core\Node\NodeAssociationTree.cs:line 49
+at System.Linq.Enumerable.Count[TSource](IEnumerable`1 source)
+at Umbraco.Linq.Core.Tests.ChildTest.ChildTest_AllChildren() in C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\ChildTest.cs:line 96
+   at TypeMock.MockManager.a(String A_0, String A_1, Object A_2, Object A_3, Boolean A_4, Object[] A_5)
+   at TypeMock.InternalMockManager.getReturn(Object that, String typeName, String methodName, Object methodParameters, Boolean isInjected)
+   at Umbraco.Linq.Core.Tests.ChildTest.ChildTest_AllChildren() in C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\ChildTest.cs:line 90
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="08b58156-8004-4655-af1e-d76a0344cd26" testId="a5443429-b086-09f5-b582-b162a4e9422d" testName="DataContextTest_NodeCached" computerName="APOWELL-VISTA" duration="00:00:00.1208301" startTime="2009-06-03T16:43:57.2002100+10:00" endTime="2009-06-03T16:43:57.3145120+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="cca15ae8-c6b5-4b0c-8e31-996dd7a1b30a" testId="aa77d8d7-9994-8f83-49b3-a35d4d7154a9" testName="LoadDocTypesTest_NtextPropertyMapping" computerName="APOWELL-VISTA" duration="00:00:00.0304644" startTime="2009-06-03T16:43:57.3349840+10:00" endTime="2009-06-03T16:43:57.3699570+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="b03a7eea-107b-441a-8f49-45afaaa57cc8" testId="ab60c870-c97e-3903-3f94-9b1cd04e2750" testName="WhereTest_DateTimeGreaterThan_Query" computerName="APOWELL-VISTA" duration="00:00:00.1459397" startTime="2009-06-03T16:43:57.3818990+10:00" endTime="2009-06-03T16:43:57.5098490+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="a7faa7d9-ab42-472c-b5e7-5dc7084efadd" testId="b070efe5-440f-ca93-89ce-f34f085e7f2a" testName="OrderingTest_Date" computerName="APOWELL-VISTA" duration="00:00:00.1673014" startTime="2009-06-03T16:43:57.5260560+10:00" endTime="2009-06-03T16:43:57.6804490+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="ddf89e49-51a8-4025-a22e-06360ec9113b" testId="b5c94734-a80d-c253-7d3f-eb343818468d" testName="WhereTest_ToAnonymous" computerName="APOWELL-VISTA" duration="00:00:00.1479520" startTime="2009-06-03T16:43:57.6906850+10:00" endTime="2009-06-03T16:43:57.8211940+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="3ddfac09-53e4-47a1-ad29-5dc57cfeacb9" testId="cb26c3dd-b083-5942-27a3-eafe3dd4f282" testName="LoadDocTypesTest_ReaderAccessed" computerName="APOWELL-VISTA" duration="00:00:00.0450191" startTime="2009-06-03T16:43:57.8331360+10:00" endTime="2009-06-03T16:43:57.8817570+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="c3d9789f-2cc2-49d2-91ff-3d1ae1e8905c" testId="cfba73c4-c7de-b432-9d19-946e3f6fafbd" testName="DocTypeMarkupLanguageBuilderTest_DocTypeWithAssociations" computerName="APOWELL-VISTA" duration="00:00:00.0439103" startTime="2009-06-03T16:43:57.8954050+10:00" endTime="2009-06-03T16:43:57.9448790+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="7330b10b-ffa6-4911-9328-c41f03e348ee" testId="d4949013-8195-0041-b9b7-ae2502a8cca1" testName="DataContextMockTest_MockProvider" computerName="APOWELL-VISTA" duration="00:00:00.0082585" startTime="2009-06-03T16:43:57.9551150+10:00" endTime="2009-06-03T16:43:57.9713220+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="1fe73c56-1c62-437f-ad4b-6573e8f28233" testId="d7d30b25-2a4b-e82b-7ec9-fe950042e500" testName="CwsReplicationTest_ListGalleries" computerName="APOWELL-VISTA" duration="00:00:02.0359744" startTime="2009-06-03T16:43:57.9789990+10:00" endTime="2009-06-03T16:43:59.7370320+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method Umbraco.Linq.Core.Tests.CwsReplicationTest.CwsReplicationTest_ListGalleries threw exception:  System.Reflection.ReflectionTypeLoadException: Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information..</Message>
+          <StackTrace> at System.Reflection.Module._GetTypesInternal(StackCrawlMark&amp; stackMark)
+at System.Reflection.Module.GetTypesInternal(StackCrawlMark&amp; stackMark)
+at System.Reflection.Assembly.GetTypes()
+at Umbraco.Linq.Core.Node.NodeDataProvider.&lt;DynamicNodeCreation&gt;b__a(Assembly a) in C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core\Node\NodeDataProvider.cs:line 269
+at System.Linq.Enumerable.&lt;SelectManyIterator&gt;d__31`3.MoveNext()
+at System.Linq.Enumerable.WhereSelectEnumerableIterator`2.MoveNext()
+at System.Linq.Enumerable.ToDictionary[TSource,TKey,TElement](IEnumerable`1 source, Func`2 keySelector, Func`2 elementSelector, IEqualityComparer`1 comparer)
+at System.Linq.Enumerable.ToDictionary[TSource,TKey](IEnumerable`1 source, Func`2 keySelector)
+at Umbraco.Linq.Core.Node.NodeDataProvider.DynamicNodeCreation(IEnumerable`1 elements) in C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core\Node\NodeDataProvider.cs:line 268
+at Umbraco.Linq.Core.Node.NodeAssociationTree`1.GetEnumerator() in C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core\Node\NodeAssociationTree.cs:line 49
+at System.Linq.Enumerable.WhereEnumerableIterator`1.MoveNext()
+at System.Linq.Enumerable.&lt;CastIterator&gt;d__aa`1.MoveNext()
+at System.Linq.Enumerable.WhereEnumerableIterator`1.MoveNext()
+at System.Linq.Buffer`1..ctor(IEnumerable`1 source)
+at System.Linq.OrderedEnumerable`1.&lt;GetEnumerator&gt;d__0.MoveNext()
+at System.Linq.Enumerable.WhereSelectEnumerableIterator`2.MoveNext()
+at System.Linq.Enumerable.Count[TSource](IEnumerable`1 source)
+at Umbraco.Linq.Core.Tests.CwsReplicationTest.CwsReplicationTest_ListGalleries() in C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\CwsReplicationTest.cs:line 81
+   at TypeMock.MockManager.a(String A_0, String A_1, Object A_2, Object A_3, Boolean A_4, Object[] A_5)
+   at TypeMock.InternalMockManager.getReturn(Object that, String typeName, String methodName, Object methodParameters, Boolean isInjected)
+   at Umbraco.Linq.Core.Tests.CwsReplicationTest.CwsReplicationTest_ListGalleries() in C:\Users\apowell\Documents\Umbraco\Codeplex\umbraco\branches\try-umbraco-linq\trunk\src\Umbraco.Linq\Core.Tests\CwsReplicationTest.cs:line 64
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="bdcc57dc-90ed-4dfb-9b7a-f9e891720bd1" testId="de4cf7d2-bcc2-a09e-bbe3-a2d43cfb69a7" testName="DataContextTest_ConstructFromExistingProvider" computerName="APOWELL-VISTA" duration="00:00:00.0016127" startTime="2009-06-03T16:43:59.7540920+10:00" endTime="2009-06-03T16:43:59.7660340+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="351a045b-e914-4eeb-be48-280ebc6fd319" testId="e361a18a-d3c0-cd72-1bbf-a76bf74f2686" testName="ParentTest_ParentIdExists" computerName="APOWELL-VISTA" duration="00:00:00.1249443" startTime="2009-06-03T16:43:59.7737110+10:00" endTime="2009-06-03T16:43:59.8888660+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="20f86922-6325-4e62-8c4f-b57b45cade65" testId="e6357dbf-df8a-0dc0-fcf5-b918673ef83e" testName="InheritanceTest_ImplementsBaseClass" computerName="APOWELL-VISTA" duration="00:00:00.0078155" startTime="2009-06-03T16:43:59.8982490+10:00" endTime="2009-06-03T16:43:59.9153090+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="22b0d900-c42f-4e88-9d44-a5f7c7860aa5" testId="ecf2e155-9a8e-8e63-5f9c-7ef3f0b446fd" testName="InheritanceTest_PropertyFromBase" computerName="APOWELL-VISTA" duration="00:00:00.2676926" startTime="2009-06-03T16:43:59.9281040+10:00" endTime="2009-06-03T16:44:00.1626790+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="acbd3aee-fb87-4ab8-be77-830e460da2a8" testId="f190a114-5462-637a-46f1-d65f43fc294a" testName="DocTypeMarkupLanguageBuilderTest_XmlValidates" computerName="APOWELL-VISTA" duration="00:00:00.0416960" startTime="2009-06-03T16:44:00.1712090+10:00" endTime="2009-06-03T16:44:00.2172710+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="9fc1108e-e4cb-4c60-8e36-4c9d16277180" testId="f65b627a-c4d0-aab7-a719-6ec1f011ae2b" testName="DataContextTest_FileNameRequired" computerName="APOWELL-VISTA" duration="00:00:00.0212169" startTime="2009-06-03T16:44:00.2292130+10:00" endTime="2009-06-03T16:44:00.2565090+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="ac363678-a8e4-41de-9477-f8d7a94ad8e0" testId="f7f33a5b-e244-4ef1-22b1-983d0133f13b" testName="DataContextTest_FullCache" computerName="APOWELL-VISTA" duration="00:00:00.0315067" startTime="2009-06-03T16:44:00.2658920+10:00" endTime="2009-06-03T16:44:00.3008650+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="87130b8a-ddf6-4f64-a513-bdb5f0de7621" testId="fdedb5ed-665b-0117-1077-5cfdb3652c4b" testName="DocTypeMarkupLanguageBuilderTest_Constructor" computerName="APOWELL-VISTA" duration="00:00:00.0443221" startTime="2009-06-03T16:44:00.3179250+10:00" endTime="2009-06-03T16:44:00.3639870+10:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d">
+      <Output>
+      </Output>
+    </UnitTestResult>
+  </Results>
+</TestRun>

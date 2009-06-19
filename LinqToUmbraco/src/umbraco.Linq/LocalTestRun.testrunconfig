@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRunConfiguration name="Local Test Run" id="8e6cf961-1d52-4801-9beb-b129cc3bd405" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2006">
+  <Description>This is a default test run configuration for a local test run.</Description>
+  <CodeCoverage enabled="true">
+    <Regular>
+      <CodeCoverageItem binaryFile="DTMetal.Engine\bin\Debug\umbraco.Linq.DTMetal.Engine.dll" pdbFile="DTMetal.Engine\bin\Debug\umbraco.Linq.DTMetal.Engine.pdb" instrumentInPlace="true" />
+    </Regular>
+  </CodeCoverage>
+  <TestTypeSpecific />
+</TestRunConfiguration>

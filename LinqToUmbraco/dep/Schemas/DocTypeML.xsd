@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--Created with Liquid XML Studio - FREE Community Edition 7.0.5.906 (http://www.liquid-technologies.com)-->
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="DocumentTypes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="DocumentType">
+          <xs:annotation>
+            <xs:documentation>Repesents an Umbraco Document Type and its known properties</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:complexContent mixed="false">
+              <xs:extension base="BaseStructure">
+                <xs:sequence>
+                  <xs:element name="Description" type="xs:string" />
+                  <xs:element name="Properties">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element minOccurs="0" maxOccurs="unbounded" name="Property">
+                          <xs:complexType>
+                            <xs:complexContent mixed="false">
+                              <xs:extension base="BaseStructure">
+                                <xs:sequence>
+                                  <xs:element name="Mandatory" type="xs:boolean" />
+                                  <xs:element name="RegularExpression" type="xs:string" />
+                                  <xs:element name="Type" type="xs:string" />
+                                  <xs:element name="ControlId" type="xs:string" />
+                                  <xs:element name="Description" type="xs:string" />
+                                </xs:sequence>
+                              </xs:extension>
+                            </xs:complexContent>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="Associations">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element minOccurs="0" maxOccurs="unbounded" name="Association" type="xs:string" />
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="ParentId" type="xs:int" use="required" />
+              </xs:extension>
+            </xs:complexContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="DataContextName" use="required">
+        <xs:annotation>
+          <xs:documentation>Name prefix for the DataContext that will be generated</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string" />
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="Serialization" use="required">
+        <xs:annotation>
+          <xs:documentation>Serialization mode of the generated classes</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="None" />
+            <xs:enumeration value="Unidirectional" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="PluralizeCollections" type="xs:boolean" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="BaseStructure">
+    <xs:annotation>
+      <xs:documentation>Pairing of ID and Name</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Id" type="xs:int" />
+      <xs:element name="Name" type="xs:string" />
+      <xs:element name="Alias" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

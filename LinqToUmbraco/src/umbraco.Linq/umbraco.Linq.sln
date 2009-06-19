@@ -1,0 +1,117 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTMetal", "DTMetal\DTMetal.csproj", "{11939510-3CFD-4781-9E00-22D23F418908}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4774577B-3170-45DE-B158-7111DE6E207E}"
+	ProjectSection(SolutionItems) = preProject
+		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
+		Solution Items\SolutionInfo.cs = Solution Items\SolutionInfo.cs
+		Umbraco.Linq.vsmdi = Umbraco.Linq.vsmdi
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{31CAEC36-0C3D-4D69-B092-84866811EA07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{A80528D0-E68C-4A94-9489-C712216665B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Mockable.Tests", "Core.Mockable.Tests\Core.Mockable.Tests.csproj", "{324A7FA9-8F19-4D4D-B96A-6F673C82BC92}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependancies", "Dependancies", "{A5EACDEF-4EF4-472D-820A-CC865FF98F19}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Schemas", "Schemas", "{EBEACECA-DAE3-48EB-BF0D-9A549D5DEEAB}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\dep\Schemas\DocTypeML.xsd = ..\..\dep\Schemas\DocTypeML.xsd
+		..\..\dep\Schemas\UmbracoConfig.xsd = ..\..\dep\Schemas\UmbracoConfig.xsd
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTMetal.Engine", "DTMetal.Engine\DTMetal.Engine.csproj", "{B151A571-D2F7-47DD-AFD6-C2C34ECA845B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTMetal.Engine.Tests", "DTMetal.Engine.Tests\DTMetal.Engine.Tests.csproj", "{85CA72D8-7095-4EB1-8997-A190667C723C}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "DTMetal Installer", "DTMetal Installer\DTMetal Installer.vdproj", "{B2D33F95-B16A-4297-83DE-641AF7F2F508}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Helpers", "Test Helpers", "{76B5D06A-C550-4D5B-86DB-6D25DA88E125}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\dep\Test Helpers\umbraco.config = ..\..\dep\Test Helpers\umbraco.config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTMetal.CodeBuilder", "DTMetal.CodeBuilder\DTMetal.CodeBuilder.csproj", "{461089E7-008E-4737-BA17-E1FCD1CC3D0E}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 9
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs01.codeplex.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = DTMetal\\DTMetal.csproj
+		SccProjectName1 = DTMetal
+		SccLocalPath1 = DTMetal
+		SccProjectUniqueName2 = Core\\Core.csproj
+		SccProjectName2 = Core
+		SccLocalPath2 = Core
+		SccProjectUniqueName3 = Core.Tests\\Core.Tests.csproj
+		SccProjectName3 = Core.Tests
+		SccLocalPath3 = Core.Tests
+		SccProjectUniqueName4 = Core.Mockable.Tests\\Core.Mockable.Tests.csproj
+		SccProjectName4 = Core.Mockable.Tests
+		SccLocalPath4 = Core.Mockable.Tests
+		SccProjectUniqueName5 = DTMetal.Engine\\DTMetal.Engine.csproj
+		SccProjectName5 = DTMetal.Engine
+		SccLocalPath5 = DTMetal.Engine
+		SccProjectUniqueName6 = DTMetal.Engine.Tests\\DTMetal.Engine.Tests.csproj
+		SccProjectName6 = DTMetal.Engine.Tests
+		SccLocalPath6 = DTMetal.Engine.Tests
+		SccProjectUniqueName7 = DTMetal\u0020Installer\\DTMetal\u0020Installer.vdproj
+		SccProjectName7 = DTMetal\u0020Installer
+		SccLocalPath7 = DTMetal\u0020Installer
+		SccProjectUniqueName8 = DTMetal.CodeBuilder\\DTMetal.CodeBuilder.csproj
+		SccProjectName8 = DTMetal.CodeBuilder
+		SccLocalPath8 = DTMetal.CodeBuilder
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Umbraco.Linq.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{11939510-3CFD-4781-9E00-22D23F418908}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11939510-3CFD-4781-9E00-22D23F418908}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11939510-3CFD-4781-9E00-22D23F418908}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11939510-3CFD-4781-9E00-22D23F418908}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31CAEC36-0C3D-4D69-B092-84866811EA07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31CAEC36-0C3D-4D69-B092-84866811EA07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31CAEC36-0C3D-4D69-B092-84866811EA07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31CAEC36-0C3D-4D69-B092-84866811EA07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A80528D0-E68C-4A94-9489-C712216665B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A80528D0-E68C-4A94-9489-C712216665B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A80528D0-E68C-4A94-9489-C712216665B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A80528D0-E68C-4A94-9489-C712216665B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{324A7FA9-8F19-4D4D-B96A-6F673C82BC92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{324A7FA9-8F19-4D4D-B96A-6F673C82BC92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{324A7FA9-8F19-4D4D-B96A-6F673C82BC92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{324A7FA9-8F19-4D4D-B96A-6F673C82BC92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B151A571-D2F7-47DD-AFD6-C2C34ECA845B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B151A571-D2F7-47DD-AFD6-C2C34ECA845B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B151A571-D2F7-47DD-AFD6-C2C34ECA845B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B151A571-D2F7-47DD-AFD6-C2C34ECA845B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85CA72D8-7095-4EB1-8997-A190667C723C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85CA72D8-7095-4EB1-8997-A190667C723C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85CA72D8-7095-4EB1-8997-A190667C723C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85CA72D8-7095-4EB1-8997-A190667C723C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2D33F95-B16A-4297-83DE-641AF7F2F508}.Debug|Any CPU.ActiveCfg = Debug
+		{B2D33F95-B16A-4297-83DE-641AF7F2F508}.Release|Any CPU.ActiveCfg = Release
+		{461089E7-008E-4737-BA17-E1FCD1CC3D0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{461089E7-008E-4737-BA17-E1FCD1CC3D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{461089E7-008E-4737-BA17-E1FCD1CC3D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{461089E7-008E-4737-BA17-E1FCD1CC3D0E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EBEACECA-DAE3-48EB-BF0D-9A549D5DEEAB} = {A5EACDEF-4EF4-472D-820A-CC865FF98F19}
+		{76B5D06A-C550-4D5B-86DB-6D25DA88E125} = {A5EACDEF-4EF4-472D-820A-CC865FF98F19}
+	EndGlobalSection
+EndGlobal

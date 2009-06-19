@@ -1,0 +1,31 @@
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>LINQ to Umbraco File</Name>
+    <Description>An empty LINQ to Umbraco file</Description>
+    <Icon>umbraco.ico</Icon>
+    <ProjectType>CSharp</ProjectType>
+    <SortOrder>100</SortOrder>
+    <DefaultName>DataClasses.dtml</DefaultName>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>    
+    <TemplateID>Umbraco.Linq.Core.Designer</TemplateID>
+    <RequiredFrameworkVersion>3.5</RequiredFrameworkVersion>    
+  </TemplateData>
+  <TemplateContent>
+    <References>
+      <Reference>
+        <Assembly>System</Assembly>
+      </Reference>
+      <Reference>
+        <Assembly>System.Core</Assembly>
+      </Reference>
+      <Reference>
+        <Assembly>Umbraco.Linq.Core</Assembly>
+      </Reference>
+    </References>  
+    <ProjectItem TargetFileName="$fileinputname$.dtml" ReplaceParameters="true">dtml.dtml</ProjectItem>
+    <CustomParameters>
+      <CustomParameter Name="$CustomTool$" Value="LINQtoUmbracoGenerator" />
+      <CustomParameter Name="$Namespace$" Value="$rootnamespace$" />
+    </CustomParameters>
+  </TemplateContent>
+</VSTemplate>
