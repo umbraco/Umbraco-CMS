@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema id="umbraco" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+	<xs:element name="umbraco" msdata:IsDataSet="true" msdata:Locale="da-DK">
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="node">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="data" nillable="true" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:simpleContent msdata:ColumnName="data_Text" msdata:Ordinal="2">
+										<xs:extension base="xs:string">
+											<xs:attribute name="version" type="xs:string" />
+											<xs:attribute name="alias" type="xs:string" />
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="id" type="xs:ID" />
+						<xs:attribute name="version" type="xs:string" />
+						<xs:attribute name="parentID" type="xs:string" />
+						<xs:attribute name="level" type="xs:string" />
+						<xs:attribute name="writerID" type="xs:string" />
+						<xs:attribute name="nodeType" type="xs:string" />
+						<xs:attribute name="template" type="xs:string" />
+						<xs:attribute name="sortOrder" type="xs:string" />
+						<xs:attribute name="createDate" type="xs:string" />
+						<xs:attribute name="updateDate" type="xs:string" />
+						<xs:attribute name="nodeName" type="xs:string" />
+						<xs:attribute name="writerName" type="xs:string" />
+						<xs:attribute name="nodeTypeAlias" type="xs:string" />
+						<xs:attribute name="path" type="xs:string" />
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

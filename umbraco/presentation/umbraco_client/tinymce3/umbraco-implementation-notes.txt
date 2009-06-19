@@ -1,0 +1,34 @@
+﻿When upgrading TinyMCE be aware of the following Umbraco specific things:
+1.
+The contextmenu plugin needs to be updated for translation of items and to ensure that it uses the Umbraco image plugin. Compare with a previous version
+
+----
+
+2. The paste plugin needs to be updated with umbraco specific style matching in the _preProcess method:
+// UMBRACO SPECIFIC, remove all headers that's not in the style list
+var umbracoAllowedStyles = this.editor.getParam('theme_umbraco_styles');
+for (var i = 1; i < 7; i++) {
+    if (umbracoAllowedStyles.indexOf("h" + i) == -1) {
+        h = h.replace(new RegExp('<h' + i + '>', 'gi'), '<p><b>');
+        h = h.replace(new RegExp('</h' + i + '>', 'gi'), '</b></p>');
+    }
+}
+
+----
+
+3. Languages
+- Make sure to update new languages in the "advanced" theme of the original tinyMCE distribution to be called "umbraco" instead of "advanced" and placed
+in the "umbraco" folder
+
+-------
+
+4. Update advLink and advImage to point to the Umbraco modals instead of the tinyMCE ones:
+Link:
+				file: tinyMCE.activeEditor.getParam('umbraco_path') + '/plugins/tinymce3/insertLink.aspx',
+					width : 480 + parseInt(ed.getLang('advlink.delta_width', 0)),
+					height : 510 + parseInt(ed.getLang('advlink.delta_height', 0)),
+
+Image:
+				file: tinyMCE.activeEditor.getParam('umbraco_path') + '/plugins/tinymce3/insertImage.aspx',
+				width: 575 + parseInt(ed.getLang('advimage.delta_width', 0)),
+				height: 585 + parseInt(ed.getLang('advimage.delta_height', 0)),

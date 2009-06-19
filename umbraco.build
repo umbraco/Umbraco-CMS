@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" ?>
+<project name="umbraco" default="compile" basedir=".">
+  <description>Build the umbraco 3.1.x Application</description>
+
+  <!-- global properties, generally won't change -->
+
+  <property name="nant.settings.currentframework" value="net-2.0" />
+
+  <!-- filenames and directories, generally won't change -->
+
+  <property name="web.dir" value="D:\inetpub\wwwroot\v4.umbraco.org" />
+  <property name="public.dir" value="D:\inetpub\wwwroot\nightlies\umbraco 4.0" />
+  <property name="root.dir" value="${directory::get-current-directory()}" />
+  <property name="source.dir" value="${root.dir}\umbraco\presentation" />
+  <property name="build.dir" value="${root.dir}\build" />
+  <property name="dlls.dir" value="${root.dir}\foreign dlls" />
+  
+  <property name="build.major" value="4"/>
+  <property name="build.minor" value="0"/>
+  <property name="build.build" value="0"/>
+  <property name="build.revision" value="0"/>
+
+  <property name="docs.dir" value="${root.dir}\docs" />
+
+  <property name="win.dir" value="c:\WINDOWS" />
+  <property name="cc.dir" value="C:\Program Files\CruiseControl.NET\server" />
+  <property name="Webdeploy.dir" value="C:\Program Files\MSBuild\Microsoft\WebDeployment\v8.0" />
+
+  <!-- Sandcastle Directories -->
+  <property name="sandcastle.dir" value="c:\Program Files\Sandcastle" />
+  <property name="sandcastle.workingdir" value="${root.dir}\docs\SandcastleWorkingDir" />
+  <property name="sandcastle.output.dir" value="${sandcastle.workingdir}\Output" />
+  <!-- Sandcastle Executables -->
+  <property name="sandcastle.mrefbuilder"  value="${sandcastle.dir}\productiontools\mrefbuilder.exe" />
+  <property name="sandcastle.buildassembler" value="${sandcastle.dir}\productiontools\buildassembler.exe" />
+  <property name="sandcastle.xsltransform" value="${sandcastle.dir}\productiontools\xsltransform.exe" />
+  <!-- Transformations -->
+  <property name="sandcastle.ApplyVSDocModel.xsl" value="${sandcastle.dir}\ProductionTransforms\ApplyVSDocModel.xsl" />
+  <property name="sandcastle.addguidfilenames.xsl" value="${sandcastle.dir}\ProductionTransforms\AddGuidFilenames.xsl" />
+  <property name="sandcastle.addfriendlyfilenames.xsl" value="${sandcastle.dir}\ProductionTransforms\AddFriendlyFilenames.xsl" />
+  <property name="sandcastle.reflectiontomanifest.xsl" value="${sandcastle.dir}\ProductionTransforms\ReflectionToManifest.xsl" />
+  <property name="sandcastle.reflectiontochmproject.xsl" value="${sandcastle.dir}\ProductionTransforms\ReflectionToChmProject.xsl" />
+  <property name="sandcastle.reflectiontochmcontents.xsl" value="${sandcastle.dir}\ProductionTransforms\ReflectionToChmContents.xsl" />
+  <property name="sandcastle.reflectiontochmindex.xsl" value="${sandcastle.dir}\ProductionTransforms\ReflectionToChmIndex.xsl" />
+
+  <property name="sandcastle.buildassembler.config" value="${sandcastle.dir}\Presentation\wiki\configuration\sandcastle.config" />
+  
+  <target name="compile" depends="init">
+
+    <attrib normal="true" readonly="false">
+      <fileset basedir="${root.dir}">
+        <include name="**/*" />
+      </fileset>
+    </attrib>
+
+    <exec program="${win.dir}\microsoft.net\framework\v3.5\msbuild.exe">
+      <arg value="${root.dir}\umbraco.sln" />
+    </exec>
+
+    <exec program="${win.dir}\microsoft.net\framework\v2.0.50727\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
+
+    <!-- Moves stuff around and zips the distribution-->
+    <call target="zip"/>
+    
+    <!-- Handles documentation 
+    <call target="docs" />
+    -->
+    
+  </target>
+
+  
+  <target name="clean" description="remove generated files">
+
+
+  </target>
+
+  <target name="docs" description="generates documents">
+    
+    <!-- Create a doc dir and move vs comment files to it-->
+    <mkdir dir="${docs.dir}" />
+    <copy todir="${docs.dir}">
+      <fileset basedir="${build.dir}\bin">
+        <include name="*.xml" />
+      </fileset>
+    </copy>
+
+    <!-- Create or Cleanup Working Directory -->
+    <mkdir dir="${sandcastle.workingdir}" if="${not directory::exists(sandcastle.workingdir)}" />
+    <delete>
+      <fileset basedir="${sandcastle.workingdir}">
+        <include name="**\*" />
+      </fileset>
+    </delete>
+
+    <copy file="${sandcastle.buildassembler.config}" tofile="${sandcastle.workingdir}\Sandcastle.config">
+      <filterchain>
+        <replacestring from="%DXROOT%\" to="${sandcastle.dir}" />
+        <replacestring from=".\comments.xml" to="${docs.dir}\*.xml" />
+      </filterchain>
+    </copy>
+
+    <!-- Run MRefBuilder (introspection on assemblies) to create basic Reflection XML -->
+    <exec program="${sandcastle.mrefbuilder}" workingdir="${sandcastle.workingdir}">
+      <arg value="&quot;${build.dir}\bin\businesslogic.dll&quot; " />
+      <arg value="&quot;${build.dir}\bin\cms.dll&quot; " />
+      <arg value="&quot;${build.dir}\bin\controls.dll&quot; " />
+      <arg value="&quot;${build.dir}\bin\interfaces.dll&quot; " />
+      <arg value="&quot;${build.dir}\bin\umbraco.datalayer.dll&quot; " />
+      <arg value="&quot;${build.dir}\bin\umbraco.dll&quot; " />
+      <arg value="&quot;${build.dir}\bin\umbraco.editorcontrols.dll&quot; " />
+      <arg value="&quot;${build.dir}\bin\umbraco.providers.dll&quot; " />
+      <arg value="&quot;${build.dir}\bin\umbraco.webservices.dll&quot; " />
+      <arg value="/out:reflection.org" />
+    </exec>
+
+    <!-- Regroup overloads -->
+    <exec program="${sandcastle.xsltransform}" workingdir="${sandcastle.workingdir}">
+      <arg value="reflection.org" />
+      <arg value="/xsl:&quot;${sandcastle.addfriendlyfilenames.xsl}&quot;" />
+      <arg value="/out:reflection.xml" />
+    </exec> 
+     
+
+    <exec program="${sandcastle.xsltransform}" workingdir="${sandcastle.workingdir}">
+      <arg value="reflection.org" />
+      <arg value="/xsl:&quot;${sandcastle.reflectiontomanifest.xsl}&quot;" />
+      <arg value="/out:manifest.xml" />
+    </exec>
+
+    <exec program="${sandcastle.buildassembler}" workingdir="${sandcastle.workingdir}">
+      <arg value="/config:Sandcastle.config" />
+      <arg value="manifest.xml" />
+    </exec>
+  </target>
+
+  <target name="zip" description="zip the release">
+
+    <mkdir dir="${docs.dir}" />
+    <copy todir="${docs.dir}">
+      <fileset basedir="${build.dir}\bin">
+        <include name="*.xml" />
+      </fileset>
+    </copy>
+    
+    
+    <!--standard web.config-->
+    <copy file="${root.dir}\config templates\web.config" tofile="${build.dir}\web.config" failonerror="false" overwrite="true"/>
+
+    <!--standard /config files-->
+    <copy file="${root.dir}\config templates\config\404handlers.config" tofile="${build.dir}\config\404handlers.config" failonerror="false" overwrite="true"/>
+    <copy file="${root.dir}\config templates\config\dashboard.config" tofile="${build.dir}\config\dashboard.config" failonerror="false" overwrite="true"/>
+    <copy file="${root.dir}\config templates\config\formhandlers.config" tofile="${build.dir}\config\formhandlers.config" failonerror="false" overwrite="true"/>
+    <copy file="${root.dir}\config templates\config\metablogconfig.config" tofile="${build.dir}\config\metablogconfig.config" failonerror="false" overwrite="true"/>
+    <copy file="${root.dir}\config templates\config\restextensions.config" tofile="${build.dir}\config\restextensions.config" failonerror="false" overwrite="true"/>
+    <copy file="${root.dir}\config templates\config\xsltextensions.config" tofile="${build.dir}\config\xsltextensions.config" failonerror="false" overwrite="true"/>
+    <copy file="${root.dir}\config templates\config\tinymceconfig.config" tofile="${build.dir}\config\tinymceconfig.config" failonerror="false" overwrite="true"/>
+    <copy file="${root.dir}\config templates\config\umbracosettings.config" tofile="${build.dir}\config\umbracosettings.config" failonerror="false" overwrite="true"/>
+    <copy file="${root.dir}\config templates\config\urlrewriting.config" tofile="${build.dir}\config\urlrewriting.config" failonerror="false" overwrite="true"/>
+
+    <!--standard /data/packages files-->
+    <copy file="${root.dir}\config templates\packages\installedPackages.config" tofile="${build.dir}\data\packages\installed\installedPackages.config" failonerror="false" overwrite="true"/>
+    <copy file="${root.dir}\config templates\packages\createdPackages.config" tofile="${build.dir}\data\packages\created\createdPackages.config" failonerror="false" overwrite="true"/>
+    
+    <!-- Standard access.xml file-->
+    <copy file="${root.dir}\config templates\access.xml" tofile="${build.dir}\data\access.xml" failonerror="false" overwrite="true"/>
+    
+    <!-- Standard create UI.xml-->
+    <copy file="${root.dir}\config templates\config\UI.xml" tofile="${build.dir}\umbraco\config\create\UI.xml" failonerror="false" overwrite="true"/>
+    
+    <!-- Standard empty cache file -->
+    <copy file="${root.dir}\config templates\umbraco.config" tofile="${build.dir}\umbraco\data\umbraco.config" failonerror="false" overwrite="true"/>
+    
+    <!-- Baseline Language file for translation tool -->
+    <copy file="${build.dir}\umbraco\config\lang\en.xml" tofile="${web.dir}\usercontrols\translation\langs\en.xml" failonerror="false" overwrite="true"/>
+
+    <!--
+    <delete dir="${build.dir}\umbraco\webservices\api" />
+    <mkdir dir="${build.dir}\umbraco\webservices\api" />
+    
+    <copy todir="${build.dir}\umbraco\webservices\api">
+      <fileset basedir="${root.dir}\components\umbraco.webservices}">
+        <include name="*.asmx" />
+      </fileset>
+    </copy>
+    -->
+    
+    <!-- standard folders -->
+    <mkdir dir="${build.dir}\App_Code" />
+    <mkdir dir="${build.dir}\media" />
+    <mkdir dir="${build.dir}\masterpages" />
+    <mkdir dir="${build.dir}\scripts" />
+    <mkdir dir="${build.dir}\css" />
+    <mkdir dir="${build.dir}\python" />
+    <mkdir dir="${build.dir}\xslt" />
+    <mkdir dir="${build.dir}\usercontrols" />
+
+    <delete dir="${build.dir}\webservices" />
+    <delete dir="${build.dir}\umbracoBase" />
+    <delete dir="${build.dir}\Web References" />
+    <delete dir="${build.dir}\obj" />
+    <delete dir="${build.dir}\properties" />
+    <delete>
+      <fileset>
+        <include name="${build.dir}/**/*.build" />
+        <include name="${build.dir}/**/*.csproj" />
+        <include name="${build.dir}/**/*.vspscc" />
+        <include name="${build.dir}/**/*.scc" />
+        <include name="${build.dir}/**/*.sln" />
+        <include name="${build.dir}/**/*.compiled" />
+        <include name="${build.dir}/**/*.resx" />
+        <include name="${build.dir}/PrecompiledApp.config" />
+        <include name="${build.dir}/web.config.template" />
+      </fileset>
+    </delete>
+
+
+    <property name="dist.name" value="${ assemblyname::get-version( assemblyname::get-assembly-name('umbraco/presentation/bin/umbraco.dll') ) }"/>
+    
+
+    <zip zipfile="${web.dir}\nightly\umbraco40.zip" includeemptydirs="true" >
+      <fileset basedir="${root.dir}">
+        <include name="build/*" />
+        <include name="build/**/*" />
+      </fileset>
+    </zip>
+
+    <copy file="${web.dir}\nightly\umbraco40.zip" tofile="${public.dir}\${dist.name}_${datetime::get-ticks(datetime::now())}.zip" />
+
+    <copy file="${root.dir}\build.xml"  tofile="${web.dir}\nightly\build.xml">
+      <filterchain>
+        <replacetokens>
+          <token key="assembly" value="${dist.name}" />
+          <token key="date" value="${datetime::now()}" />
+        </replacetokens>
+      </filterchain>
+    </copy>
+    
+  </target>
+
+  <target name="init" description="init tasks for the build">
+    <delete dir="${build.dir}" />
+    <mkdir dir="${build.dir}" />
+  </target>
+
+  
+</project>

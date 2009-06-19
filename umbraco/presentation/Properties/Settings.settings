@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="umbraco.presentation.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="umbraco_com_regexlib_Webservices" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://regexlib.com/WebServices.asmx</Value>
+    </Setting>
+    <Setting Name="umbraco_org_umbraco_update_CheckForUpgrade" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://update.umbraco.org/checkforupgrade.asmx</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

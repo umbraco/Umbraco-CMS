@@ -1,0 +1,228 @@
+﻿/*****************************************************************
+
+	Live Editing placeholders
+
+/****************************************************************/
+
+umbraco\:iteminfo {
+	cursor: pointer;
+}
+
+/*****************************************************************
+
+	General Toolbar CSS
+
+/****************************************************************/
+
+html {
+	margin-top: 30px !important;	
+}
+
+#LiveEditingToolbar {
+	background: url(/umbraco_client/tabView/images/background.gif) !important;
+	position: fixed !important;
+	width: 100% !important;
+	height: 30px !important;
+	top: 0 !important;
+	left: 0 !important;
+	text-align: left !important;
+	border-bottom: 1px solid #B0B0B0 !important;
+}
+
+#LiveEditingToolbar div {
+	padding: 4px !important;
+}
+
+#LiveEditingToolbar div div {
+	padding: inherit !important;
+}
+
+#LiveEditingToolbar div.ExtraMenuItems {
+	display: inline !important;
+}
+
+#LiveEditingToolbar div {
+	/*background: url(/umbraco/LiveEditing/Images/Canvas.gif) no-repeat right 4px; */
+	width: 100%;
+}
+
+#LiveEditingToolbar * div {
+	background: none;
+	width: auto;
+}
+
+#LiveEditingToolbar input.button {
+	cursor: hand !important;
+	width: 22px !important;
+	height: 23px !important;
+	background: none !important;
+	border: none !important;
+}
+
+#LiveEditingToolbar input.button:hover, #LiveEditingClientToolbar a.mceButtonEnabled:hover {
+	background-image: url(/umbraco_client/menuicon/images/buttonbg.gif) !important;
+	border: none !important;
+}
+
+#LiveEditingToolbar input.close {
+	position: absolute !important;
+	right: 7px !important;
+	top: 6px !important;
+	/*border: none !Important;
+	background: none !Important; */
+	color: #000;
+	width: 150px;
+}
+
+#LiveEditingToolbar input.close:hover {
+	opacity: 1 !important;
+}
+
+#LiveEditingToolbar img.about {
+	margin: 0 5px 5px 5px !important;
+}
+
+#LiveEditingClientToolbar, #LiveEditingClientToolbar div {
+	display: inline !important;
+}
+
+#LiveEditingToolbar span.separator {
+	padding-right: 7px !important;
+}
+
+#LiveEditingToolbar span.separator span {
+	border-left: 1px solid #999999 !important;
+	border-right: 1px solid #EEEEEE !important;
+	position: absolute !important;
+	top: 7px !important;
+	width: 0px !important;
+	overflow: hidden !important;
+}
+
+#LiveEditingToolbar .umbLabelButton 
+{
+	cursor: hand !important;
+	float: left;
+	margin: 1px 5px 1px 1px; 
+	padding: 0 !important;
+}
+
+#LiveEditingToolbar .umbLabelButton:hover 
+{
+	background: #EAEAEA;
+	border: 1px solid #CAC9C9 !Important;
+	margin: 0px 4px 0px 0px; 
+}
+
+#LiveEditingToolbar .umbLabelButton a 
+{
+	text-decoration: none;
+	font-size: 80%;
+	margin-right: 3px;
+	padding: 5px 0;
+}
+
+
+#LiveEditingToolbar .umbLabelButton input.button {
+	width: 22px !important;
+	height: 23px !important;
+	margin-right: 3px;
+	background: none !important;
+	border: none !important;
+	vertical-align: middle;
+}
+
+#LiveEditingToolbar .umbLabelButton input.button:hover {
+	background-image: none !important;
+	border: none !important;
+}
+
+/*****************************************************************
+
+	TinyMCE extra CSS
+
+/****************************************************************/
+
+/* hide the temporary TinyMCE container */
+.tinymceContainer {
+	position: absolute !important;
+	left: -1000px !important;
+}
+
+#LiveEditingClientToolbar .mceToolbarExternal table {
+	display: inline !important;
+	background: none !important;
+}
+
+#LiveEditingClientToolbar .mceToolbarExternal {
+	position: absolute !important;
+	top: 0 !important;	
+}
+
+#LiveEditingClientToolbar a.mceButtonEnabled {
+	width: 22px !important;
+	height: 23px !important;
+}
+
+/*****************************************************************
+
+	Datatypes extra CSS
+
+/****************************************************************/
+
+.relatedlinksdatatype
+{
+	background-color: #fff !important; 
+	border: 1px solid #999 !important;
+}
+
+/*****************************************************************
+
+	Modal dialogs
+
+/****************************************************************/
+
+.modalBackground {
+	background-color:Gray !important;
+	filter:alpha(opacity=70) !important;
+	opacity:0.7 !important;
+}
+
+.modal {
+	background-color: #fff !important;
+	border:5px solid #CAC9C9 !important;
+	font-family:Arial, Verdana !important;
+	font-size: medium !important;
+	padding:0px !important;
+	width:500px !important;
+	min-height: 250px !important;
+	font-size: 11px !Important;
+}
+
+.modaltitle {
+	padding: 0px !important;
+	margin: 0px !important;
+	height: 14px !important;
+	width: 493px !important;
+	background-image: url(../../Images/modalGradiant.gif) !important;
+	color: #378080 !important;
+	border-bottom: 1px solid #CCCCCC !Important;
+}
+
+.modalcontent {
+	padding: 5px !important;
+}
+
+.modal h1 {
+	font-size: larger !important;
+}
+
+.modal h2 {
+	font-size: medium !important;
+}
+
+.modalcontent label{padding-bottom: 2px !Important; display: block !Important; color: #999 !Important; }
+ 
+.modal p {
+	font-size: small !important;
+}

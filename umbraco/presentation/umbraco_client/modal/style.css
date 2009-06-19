@@ -1,0 +1,50 @@
+﻿#umbModalBox {
+	position: absolute;
+	top: 0;
+	border: 5px #a3a3a3 solid;
+	border-top: none;
+	text-align: left;
+	z-index: 10000;
+	display: none;
+	background: #fff;
+	font: bold 100% "Lucida Grande", Arial, sans-serif;
+}
+
+#umbModalBox.loaded{background-image: none;}
+
+.jqmOverlay {background: url(modalBackground.gif)}
+
+#umbModalBoxHeader {
+	margin: 0;
+  text-shadow: #FFF 0 1px 0;
+	padding: .5em 2em .5em .75em;
+	margin: 0;
+	text-align: left;
+}
+
+#umbModalBoxContent {
+	padding: 0px;
+	overflow: hidden;
+	height: 100%;
+}
+
+#umbracModalBoxClose {
+	display: block;
+	position: absolute;
+	right: 5px; top: 2px;
+	padding: 2px 3px;
+	font-weight: bold;
+	text-decoration: none;
+	font-size: 13px;
+}
+
+#umbModalBoxContent {border-top: 1px solid #F9F9F9; }
+
+#umbModalBoxHeader {
+  background: url(modalGradiant.gif) repeat-x bottom #fff;
+  border-bottom: 1px solid #CCC;
+  color: #378080
+}
+
+#umbracModalBoxClose { color: #777 }
+#umbracModalBoxClose:hover { color: #000 }

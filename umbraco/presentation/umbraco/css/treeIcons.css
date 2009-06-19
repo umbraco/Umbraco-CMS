@@ -1,0 +1,48 @@
+.sprTree {
+   background-color: #fff;
+   background-image: url(../images/umbraco/sprites.png);
+   display: inline;
+   padding-bottom: 2px;
+}
+
+.sprTree img{width: 16px; height: 18px; padding-right: 7px;}
+
+.sprTreeDeveloperCacheItem {background-position: -8px -8px;}
+.sprTreeDeveloperCacheTypes {background-position: -8px -40px;}
+.sprTreeDeveloperMacro {background-position: -8px -72px;}
+.sprTreeDeveloperPython {background-position: -8px -104px; width: 15px; height: 15px}
+.sprTreeDeveloperRegistry {background-position: -8px -135px;}
+.sprTreeDeveloperRegistryItem {background-position: -8px -167px;}
+.sprTreeDeveloperXslt {background-position: -8px -199px;}
+
+.sprTreeDoc {background-position: -8px -231px;}
+.sprTreeDoc2 {background-position: -8px -263px;}
+.sprTreeDoc3 {background-position: -8px -295px;}
+.sprTreeDoc4 {background-position: -8px -327px;}
+.sprTreeDoc5 {background-position: -8px -359px;}
+.sprTreeDocPic {background-position: -8px -391px;}
+.sprTreeFolder {background-position: -8px -423px;}
+.sprTreeFolder_o {background-position: -8px -455px;}
+.sprTreeMediaFile {background-position: -8px -487px;}
+.sprTreeMediaMovie {background-position: -8px -519px;}
+.sprTreeMediaMulti {background-position: -8px -551px;}
+.sprTreeMediaPhoto {background-position: -8px -583px;}
+.sprTreeMember {background-position: -8px -615px;}
+.sprTreeMemberGroup {background-position: -8px -647px;}
+.sprTreeMemberType {background-position: -8px -679px;}
+.sprTreeNewsletter {background-position: -8px -711px;}
+.sprTreePackage {background-position: -8px -743px;}
+.sprTreeRepository {background-position: -8px -775px;}
+.sprTreeSettingAgent {background-position: -8px -807px;}
+.sprTreeSettingCss {background-position: -8px -839px;}
+.sprTreeSettingCssItem {background-position: -8px -871px;}
+.sprTreeSettingDataType {background-position: -8px -903px;}
+.sprTreeSettingDataTypeChild {background-position: -8px -935px;}
+.sprTreeSettingDomain {background-position: -8px -967px;}
+.sprTreeSettingLanguage {background-position: -8px -999px;}
+.sprTreeSettingScript {background-position: -8px -1031px;}
+.sprTreeSettingTemplate {background-position: -8px -1063px;}
+.sprTreeSettingXml {background-position: -8px -1095px;}
+.sprTreeStatistik {background-position: -8px -1127px;}
+.sprTreeUser {background-position: -8px -1159px;}
+.sprTreeUserGroup {background-position: -8px -1191px;}

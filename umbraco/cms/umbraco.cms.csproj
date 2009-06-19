@@ -1,0 +1,311 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CCD75EC3-63DB-4184-B49D-51C1DD337230}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>cms</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <RootNamespace>umbraco.cms</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <OldToolsVersion>2.0</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>bin\Release\cms.XML</DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.85.4.369, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Lucene.Net, Version=2.0.0.4, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\Lucene.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data">
+      <Name>System.Data</Name>
+    </Reference>
+    <Reference Include="System.Security">
+      <Name>System.Security</Name>
+    </Reference>
+    <Reference Include="System.Web">
+      <Name>System.Web</Name>
+    </Reference>
+    <Reference Include="System.Web.Extensions, Version=1.0.61025.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml">
+      <Name>System.XML</Name>
+    </Reference>
+    <Reference Include="TidyNet, Version=1.0.0.0, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\TidyNet.dll</HintPath>
+    </Reference>
+    <ProjectReference Include="..\..\components\umbraco.controls\umbraco.controls.csproj">
+      <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
+      <Name>umbraco.controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\businesslogic\umbraco.businesslogic.csproj">
+      <Name>umbraco.businesslogic</Name>
+      <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
+      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+    </ProjectReference>
+    <ProjectReference Include="..\datalayer\umbraco.datalayer.csproj">
+      <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
+      <Name>umbraco.datalayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\interfaces\umbraco.interfaces.csproj">
+      <Name>umbraco.interfaces</Name>
+      <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
+      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Actions\Action.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Actions\defaultActions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\cache\Cache.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\CMSModuleI.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\CMSNode.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\Content.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\ContentItem\ContentItem.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\ContentItem\ContentItemType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\ContentType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\datatype\AbstractDataEditor.cs" />
+    <Compile Include="businesslogic\datatype\BaseDataType.cs" />
+    <Compile Include="businesslogic\datatype\ClientDependencyAttribute.cs" />
+    <Compile Include="businesslogic\datatype\ClientDependencyHelper.cs" />
+    <Compile Include="businesslogic\datatype\DataType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\datatype\DefaultData.cs" />
+    <Compile Include="businesslogic\datatype\DefaultPreValueEditor.cs" />
+    <Compile Include="businesslogic\datatype\factory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\datatype\PreValues.cs" />
+    <Compile Include="businesslogic\Dictionary.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\events\EventArgs.cs" />
+    <Compile Include="businesslogic\index\Indexer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\index\searcher.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\index\SearchItem.cs" />
+    <Compile Include="businesslogic\language\Language.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\language\Text.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\macro\Macro.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\macro\MacroComment.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\macro\MacroProperty.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\macro\macroPropertyType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\Packager\data.cs" />
+    <Compile Include="businesslogic\Packager\PackageInstance\CreatedPackage.cs" />
+    <Compile Include="businesslogic\Packager\PackageInstance\InstalledPackage.cs" />
+    <Compile Include="businesslogic\Packager\PackageInstance\IPackageInstance.cs" />
+    <Compile Include="businesslogic\Packager\PackageInstance\PackageActions.cs" />
+    <Compile Include="businesslogic\Packager\PackageInstance\PackageInstance.cs" />
+    <Compile Include="businesslogic\Packager\PackageActions\StandardPackageActions.cs" />
+    <Compile Include="businesslogic\Packager\PackageInstance\utill.cs" />
+    <Compile Include="businesslogic\Packager\Installer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\media\Media.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\media\MediaType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\member\Member.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\member\MemberGroup.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\member\MemberType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\Packager\Repositories\Repository.cs" />
+    <Compile Include="businesslogic\Packager\Repositories\RepositoryWebservice.cs" />
+    <Compile Include="businesslogic\Packager\Settings.cs" />
+    <Compile Include="businesslogic\Permission.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\propertytype\propertytype.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\Property\Property.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\recycleBin.cs" />
+    <Compile Include="businesslogic\relation\Relation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\relation\RelationType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\stat\Entry.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\stat\Session.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\task\Task.cs" />
+    <Compile Include="businesslogic\task\TaskType.cs" />
+    <Compile Include="businesslogic\template\Template.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\translation\Translation.cs" />
+    <Compile Include="businesslogic\utilities\Diff.cs" />
+    <Compile Include="businesslogic\utilities\File.cs" />
+    <Compile Include="businesslogic\utilities\Zip.cs" />
+    <Compile Include="businesslogic\web\Access.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\web\Document.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\web\DocumentType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\web\Domain.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\web\StyleSheet.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\web\StylesheetProperty.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="businesslogic\workflow\Diff.cs" />
+    <Compile Include="businesslogic\workflow\Notification.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="controls\datePicker.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="controls\datePickerWithpopup.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="helpers\url.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="helpers\xhtml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="businesslogic\translate\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

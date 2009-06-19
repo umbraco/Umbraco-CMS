@@ -1,0 +1,30 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="umbracoPage.master.cs" Inherits="umbraco.presentation.umbraco.masterpages.umbracoPage" %>
+    
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head runat="server">
+    <title></title>
+    
+    <!-- Default script and style -->
+    <link rel="Stylesheet" href="/umbraco_client/ui/default.css" type="text/css" />
+    
+    <script src="/umbraco_client/Application/NamespaceManager.js" type="text/javascript"></script>
+    <script src="/umbraco_client/ui/default.js" type="text/javascript"></script>
+    <script src="/umbraco_client/ui/jquery.js" type="text/javascript"></script>
+    <script src="/umbraco_client/Application/UmbracoApplicationActions.js" type="text/javascript"></script>
+    <script type="text/javascript" src="/umbraco_client/Application/UmbracoUtils.js"></script>
+    <script src="/umbraco_client/Application/UmbracoClientManager.js" type="text/javascript"></script>
+  
+    <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
+</head>
+<body class="umbracoPage">
+    <form id="form1" runat="server">
+        <asp:ScriptManager ID="ScriptManager1" EnablePartialRendering="true" runat="server"></asp:ScriptManager>
+        <asp:ContentPlaceHolder ID="body" runat="server">
+        </asp:ContentPlaceHolder>
+    </form>
+      
+    <asp:ContentPlaceHolder ID="footer" runat="server"></asp:ContentPlaceHolder>    
+</body>
+
+</html>

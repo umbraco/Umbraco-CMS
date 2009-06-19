@@ -1,0 +1,14 @@
+.umbEditItem:hover {
+  border: 1px dotted orange;
+  padding: 5px;
+}
+
+.umbLiveEditingToggleButton 
+{
+	display: none;
+}
+
+.umbLiveEditingCancelButton 
+{
+	margin-left: 10px;
+}

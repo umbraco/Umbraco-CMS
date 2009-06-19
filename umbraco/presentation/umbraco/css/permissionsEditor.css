@@ -1,0 +1,21 @@
+﻿#treeContainer
+{
+	float: left;
+	width: 45%;
+}
+#permissionsPanel
+{
+	display: none;
+	float: right;
+	height: auto !important;
+	min-height: 300px;
+	height: 300px;
+	width: 48%;
+	border-left: 1px solid #D9D7D7;
+	margin-left: 20px;
+	padding-left: 20px;
+}
+#nodepermissionsList
+{
+	list-style: none;
+}

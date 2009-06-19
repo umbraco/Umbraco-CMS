@@ -1,0 +1,107 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Text;
+using System.Web;
+using System.Xml;
+using System.Configuration;
+using umbraco.BasePages;
+using umbraco.BusinessLogic;
+using umbraco.cms.businesslogic;
+using umbraco.cms.businesslogic.cache;
+using umbraco.cms.businesslogic.contentitem;
+using umbraco.cms.businesslogic.datatype;
+using umbraco.cms.businesslogic.language;
+using umbraco.cms.businesslogic.media;
+using umbraco.cms.businesslogic.member;
+using umbraco.cms.businesslogic.property;
+using umbraco.cms.businesslogic.web;
+using umbraco.interfaces;
+using umbraco.DataLayer;
+using umbraco.BusinessLogic.Utils;
+using umbraco.cms.presentation.Trees;
+using umbraco.BusinessLogic.Actions;
+
+
+namespace umbraco
+{
+	/// <summary>
+	/// Handles loading of all umbraco users into the users application tree
+	/// </summary>
+	public class loadUsers : BaseTree
+	{
+        public loadUsers(string application) : base(application) { }
+
+        protected override void CreateRootNode(ref XmlTreeNode rootNode)
+        {                        
+        }
+
+		/// <summary>
+		/// Renders the Javascript.
+		/// </summary>
+		/// <param name="Javascript">The javascript.</param>
+		public override void RenderJS(ref StringBuilder Javascript)
+        {
+            Javascript.Append(
+                @"
+function openUser(id) {
+	parent.right.document.location.href = 'users/editUser.aspx?id=' + id;
+}
+");
+        }
+
+        protected override void CreateAllowedActions(ref List<IAction> actions)
+        {
+            actions.Clear();
+            actions.Add(ActionDisable.Instance);
+        }
+
+        public override void Render(ref XmlTree tree)
+        {
+            User[] users = User.getAll();
+
+            User currUser = UmbracoEnsuredPage.CurrentUser;
+
+            bool currUserIsAdmin = currUser.IsAdmin();
+            foreach (User u in users)
+            {
+                
+                XmlTreeNode xNode = XmlTreeNode.Create(this);
+
+                // special check for ROOT user
+                if (u.Id == 0)
+                {
+                    //if its the administrator, don't create a menu
+                    xNode.Menu = null;
+                    //if the current user is not the administrator, then don't add this node.
+                    if (currUser.Id != 0)
+                        continue;
+                }
+                // Special check for admins in general (only show admins to admins)
+                else if (!currUserIsAdmin && u.IsAdmin())
+                {
+                    continue;
+                }
+
+
+
+				if (u.Disabled)
+					xNode.DimNode();
+
+                    //xNode.IconClass = "umbraco-tree-icon-grey";
+
+                xNode.NodeID = u.Id.ToString();
+                xNode.Text = u.Name;
+                xNode.Action = "javascript:openUser(" + u.Id + ");";
+                xNode.Icon = "user.gif";
+                xNode.OpenIcon = "user.gif";
+
+                tree.Add(xNode);
+            }
+        }
+
+	}
+    
+}

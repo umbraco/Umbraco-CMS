@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CBDB56AC-FF02-4421-9FD4-ED82E339D8E2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>umbraco.webservices</RootNamespace>
+    <AssemblyName>umbraco.webservices</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\umbraco\presentation\bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\umbraco\presentation\bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\umbraco\presentation\bin\umbraco.webservices.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BaseWebService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Common.cs" />
+    <Compile Include="DocumentService.asmx.cs">
+      <DependentUpon>DocumentService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="FileService.asmx.cs">
+      <DependentUpon>FileService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MaintanceService.asmx.cs">
+      <DependentUpon>MaintanceService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MediaService.asmx.cs">
+      <DependentUpon>MediaService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MemberService.asmx.cs">
+      <DependentUpon>MemberService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StylesheetService.asmx.cs">
+      <DependentUpon>StylesheetService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="TemplateService.asmx.cs">
+      <DependentUpon>TemplateService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\umbraco\businesslogic\umbraco.businesslogic.csproj">
+      <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
+      <Name>umbraco.businesslogic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\umbraco\cms\umbraco.cms.csproj">
+      <Project>{CCD75EC3-63DB-4184-B49D-51C1DD337230}</Project>
+      <Name>umbraco.cms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\umbraco\presentation\umbraco.presentation.csproj">
+      <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
+      <Name>umbraco.presentation</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DocumentService.asmx" />
+    <Content Include="FileService.asmx" />
+    <Content Include="MaintanceService.asmx" />
+    <Content Include="MediaService.asmx" />
+    <Content Include="MemberService.asmx" />
+    <Content Include="StylesheetService.asmx" />
+    <Content Include="TemplateService.asmx" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(ProjectDir)*.asmx" "$(ProjectDir)..\..\umbraco\presentation\umbraco\webservices\api\" /Y</PostBuildEvent>
+  </PropertyGroup>
+</Project>
