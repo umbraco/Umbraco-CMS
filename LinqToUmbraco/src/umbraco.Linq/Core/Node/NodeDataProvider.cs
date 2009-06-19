@@ -24,7 +24,7 @@ namespace umbraco.Linq.Core.Node
         private Dictionary<UmbracoInfoAttribute, ITree> _trees;
         private bool _enforceSchemaValidation;
         private XDocument _xml;
-        private const string UMBRACO_XSD_PATH = "umbraco.Linq.Core.Node.umbracoConfig.xsd";
+        private const string UMBRACO_XSD_PATH = "umbraco.Linq.Core.Node.UmbracoConfig.xsd";
         private Dictionary<string, Type> _knownTypes;
 
         internal XDocument Xml

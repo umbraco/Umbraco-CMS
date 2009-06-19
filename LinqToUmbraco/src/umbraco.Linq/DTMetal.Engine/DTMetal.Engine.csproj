@@ -50,7 +50,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.ApplicationBlocks.Data, Version=1.0.1559.20655, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\dep\Reference Assemblies\Umbraco\Microsoft.ApplicationBlocks.Data.dll</HintPath>
+      <HintPath>..\..\..\..\foreign dlls\Microsoft.ApplicationBlocks.Data.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -63,7 +63,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="umbraco.DataLayer, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\dep\Reference Assemblies\Umbraco\umbraco.DataLayer.dll</HintPath>
+      <HintPath>..\..\..\..\umbraco\datalayer\bin\Debug\umbraco.DataLayer.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -84,9 +84,9 @@
     <Content Include="AuthoringTests.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj">
+    <ProjectReference Include="..\Core\umbraco.Linq.Core.csproj">
       <Project>{31CAEC36-0C3D-4D69-B092-84866811EA07}</Project>
-      <Name>Core</Name>
+      <Name>umbraco.Linq.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\DTMetal.CodeBuilder\DTMetal.CodeBuilder.csproj">
       <Project>{461089E7-008E-4737-BA17-E1FCD1CC3D0E}</Project>

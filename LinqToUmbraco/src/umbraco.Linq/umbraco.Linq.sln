@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Umbraco.Linq.vsmdi = Umbraco.Linq.vsmdi
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{31CAEC36-0C3D-4D69-B092-84866811EA07}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.Linq.Core", "Core\umbraco.Linq.Core.csproj", "{31CAEC36-0C3D-4D69-B092-84866811EA07}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{A80528D0-E68C-4A94-9489-C712216665B0}"
 EndProject
@@ -37,36 +37,56 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Helpers", "Test Helper
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTMetal.CodeBuilder", "DTMetal.CodeBuilder\DTMetal.CodeBuilder.csproj", "{461089E7-008E-4737-BA17-E1FCD1CC3D0E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Main Umbraco Projects", "Main Umbraco Projects", "{7F2EEC29-D5A4-46AF-BFB7-E33399F5555E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.datalayer", "..\..\..\umbraco\datalayer\umbraco.datalayer.csproj", "{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.businesslogic", "..\..\..\umbraco\businesslogic\umbraco.businesslogic.csproj", "{E469A9CE-1BEC-423F-AC44-713CD72457EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.presentation", "..\..\..\umbraco\presentation\umbraco.presentation.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 9
+		SccNumberOfProjects = 12
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs01.codeplex.com/
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = DTMetal\\DTMetal.csproj
 		SccProjectName1 = DTMetal
 		SccLocalPath1 = DTMetal
-		SccProjectUniqueName2 = Core\\Core.csproj
-		SccProjectName2 = Core
-		SccLocalPath2 = Core
-		SccProjectUniqueName3 = Core.Tests\\Core.Tests.csproj
-		SccProjectName3 = Core.Tests
-		SccLocalPath3 = Core.Tests
-		SccProjectUniqueName4 = Core.Mockable.Tests\\Core.Mockable.Tests.csproj
-		SccProjectName4 = Core.Mockable.Tests
-		SccLocalPath4 = Core.Mockable.Tests
-		SccProjectUniqueName5 = DTMetal.Engine\\DTMetal.Engine.csproj
-		SccProjectName5 = DTMetal.Engine
-		SccLocalPath5 = DTMetal.Engine
-		SccProjectUniqueName6 = DTMetal.Engine.Tests\\DTMetal.Engine.Tests.csproj
-		SccProjectName6 = DTMetal.Engine.Tests
-		SccLocalPath6 = DTMetal.Engine.Tests
-		SccProjectUniqueName7 = DTMetal\u0020Installer\\DTMetal\u0020Installer.vdproj
-		SccProjectName7 = DTMetal\u0020Installer
-		SccLocalPath7 = DTMetal\u0020Installer
-		SccProjectUniqueName8 = DTMetal.CodeBuilder\\DTMetal.CodeBuilder.csproj
-		SccProjectName8 = DTMetal.CodeBuilder
-		SccLocalPath8 = DTMetal.CodeBuilder
+		SccProjectUniqueName2 = Core.Tests\\Core.Tests.csproj
+		SccProjectName2 = Core.Tests
+		SccLocalPath2 = Core.Tests
+		SccProjectUniqueName3 = Core.Mockable.Tests\\Core.Mockable.Tests.csproj
+		SccProjectName3 = Core.Mockable.Tests
+		SccLocalPath3 = Core.Mockable.Tests
+		SccProjectUniqueName4 = DTMetal.Engine\\DTMetal.Engine.csproj
+		SccProjectName4 = DTMetal.Engine
+		SccLocalPath4 = DTMetal.Engine
+		SccProjectUniqueName5 = DTMetal.Engine.Tests\\DTMetal.Engine.Tests.csproj
+		SccProjectName5 = DTMetal.Engine.Tests
+		SccLocalPath5 = DTMetal.Engine.Tests
+		SccProjectUniqueName6 = DTMetal\u0020Installer\\DTMetal\u0020Installer.vdproj
+		SccProjectName6 = DTMetal\u0020Installer
+		SccLocalPath6 = DTMetal\u0020Installer
+		SccProjectUniqueName7 = DTMetal.CodeBuilder\\DTMetal.CodeBuilder.csproj
+		SccProjectName7 = DTMetal.CodeBuilder
+		SccLocalPath7 = DTMetal.CodeBuilder
+		SccProjectUniqueName8 = Core\\umbraco.Linq.Core.csproj
+		SccProjectName8 = Core
+		SccLocalPath8 = Core
+		SccProjectUniqueName9 = ..\\..\\..\\umbraco\\datalayer\\umbraco.datalayer.csproj
+		SccProjectTopLevelParentUniqueName9 = umbraco.Linq.sln
+		SccProjectName9 = ../../../umbraco/datalayer
+		SccLocalPath9 = ..\\..\\..\\umbraco\\datalayer
+		SccProjectUniqueName10 = ..\\..\\..\\umbraco\\businesslogic\\umbraco.businesslogic.csproj
+		SccProjectTopLevelParentUniqueName10 = umbraco.Linq.sln
+		SccProjectName10 = ../../../umbraco/businesslogic
+		SccLocalPath10 = ..\\..\\..\\umbraco\\businesslogic
+		SccProjectUniqueName11 = ..\\..\\..\\umbraco\\presentation\\umbraco.presentation.csproj
+		SccProjectTopLevelParentUniqueName11 = umbraco.Linq.sln
+		SccProjectName11 = ../../../umbraco/presentation
+		SccLocalPath11 = ..\\..\\..\\umbraco\\presentation
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Umbraco.Linq.vsmdi
@@ -106,6 +126,18 @@ Global
 		{461089E7-008E-4737-BA17-E1FCD1CC3D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{461089E7-008E-4737-BA17-E1FCD1CC3D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{461089E7-008E-4737-BA17-E1FCD1CC3D0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E469A9CE-1BEC-423F-AC44-713CD72457EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E469A9CE-1BEC-423F-AC44-713CD72457EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E469A9CE-1BEC-423F-AC44-713CD72457EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E469A9CE-1BEC-423F-AC44-713CD72457EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{651E1350-91B6-44B7-BD60-7207006D7003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{651E1350-91B6-44B7-BD60-7207006D7003}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{651E1350-91B6-44B7-BD60-7207006D7003}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{651E1350-91B6-44B7-BD60-7207006D7003}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,5 +145,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{EBEACECA-DAE3-48EB-BF0D-9A549D5DEEAB} = {A5EACDEF-4EF4-472D-820A-CC865FF98F19}
 		{76B5D06A-C550-4D5B-86DB-6D25DA88E125} = {A5EACDEF-4EF4-472D-820A-CC865FF98F19}
+		{C7CB79F0-1C97-4B33-BFA7-00731B579AE2} = {7F2EEC29-D5A4-46AF-BFB7-E33399F5555E}
+		{E469A9CE-1BEC-423F-AC44-713CD72457EA} = {7F2EEC29-D5A4-46AF-BFB7-E33399F5555E}
+		{651E1350-91B6-44B7-BD60-7207006D7003} = {7F2EEC29-D5A4-46AF-BFB7-E33399F5555E}
 	EndGlobalSection
 EndGlobal

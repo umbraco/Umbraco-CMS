@@ -67,9 +67,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj">
+    <ProjectReference Include="..\Core\umbraco.Linq.Core.csproj">
       <Project>{31CAEC36-0C3D-4D69-B092-84866811EA07}</Project>
-      <Name>Core</Name>
+      <Name>umbraco.Linq.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

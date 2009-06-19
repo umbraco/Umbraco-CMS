@@ -95,7 +95,7 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyumbracoDataContext())
             {
-                var photo = ctx.CwsPhotos.First(p => p.Name.Contains("umbraco"));
+                var photo = ctx.CwsPhotos.First(p => p.Name.Contains("Umbraco"));
                 var gallery = photo.AncestorOrDefault<CwsGallery>(g => g.Name.Contains("Codegarden"));
 
                 Assert.IsNotNull(gallery);
@@ -108,7 +108,7 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyumbracoDataContext())
             {
-                var photo = ctx.CwsPhotos.First(p => p.Name.Contains("umbraco"));
+                var photo = ctx.CwsPhotos.First(p => p.Name.Contains("Umbraco"));
                 var gallery = photo.AncestorOrDefault<CwsGallery>(g => g.Name.Contains("Bookhouses"));
 
                 Assert.IsNull(gallery);
