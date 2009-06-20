@@ -211,6 +211,18 @@
     <Compile Include="folderbrowser\folderBrowser.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="imagecropper\Config.cs" />
+    <Compile Include="imagecropper\Data.cs" />
+    <Compile Include="imagecropper\DataEditor.cs" />
+    <Compile Include="imagecropper\DataType.cs" />
+    <Compile Include="imagecropper\DataTypeData.cs" />
+    <Compile Include="imagecropper\Helper.cs" />
+    <Compile Include="imagecropper\ImageInfo.cs" />
+    <Compile Include="imagecropper\ImageManipulation.cs" />
+    <Compile Include="imagecropper\PrevalueEditor.cs" />
+    <Compile Include="imagecropper\Resources.Designer.cs" />
+    <Compile Include="imagecropper\SaveData.cs" />
+    <Compile Include="imagecropper\SmartListBox.cs" />
     <Compile Include="KeyValuePrevalueEditor.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -343,6 +355,7 @@
     <Compile Include="yesno\YesNoDataType.cs">
       <SubType>Code</SubType>
     </Compile>
+    <EmbeddedResource Include="imagecropper\Resources.resx" />
     <EmbeddedResource Include="textfield\textFieldDataEditor.resx">
       <DependentUpon>textFieldDataEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
