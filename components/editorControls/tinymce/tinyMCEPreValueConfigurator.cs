@@ -116,20 +116,22 @@ namespace umbraco.editorControls.tinymce
             
             if (!Page.IsPostBack)
 			{
-				string[] config = Configuration.Split("|".ToCharArray());
-				if (config.Length > 0) 
-				{
-                    _selectedButtons = config[0];
-
-                    if (config.Length > 1)
-                        if (config[1] == "1")
-                            _enableRightClick.Checked = true;
-
-                    if (config.Length > 2)
-                        _advancedUsers = config[2];
-
-                    if (config.Length > 4 && config[4].Split(',').Length > 1)
+                if (Configuration != null)
+                {
+                    string[] config = Configuration.Split("|".ToCharArray());
+                    if (config.Length > 0)
                     {
+                        _selectedButtons = config[0];
+
+                        if (config.Length > 1)
+                            if (config[1] == "1")
+                                _enableRightClick.Checked = true;
+
+                        if (config.Length > 2)
+                            _advancedUsers = config[2];
+
+                        if (config.Length > 4 && config[4].Split(',').Length > 1)
+                        {
 //                        if (config[3] == "1")
 //                            _fullWidth.Checked = true;
 //                        else
@@ -137,63 +139,66 @@ namespace umbraco.editorControls.tinymce
                             _width.Text = config[4].Split(',')[0];
                             _height.Text = config[4].Split(',')[1];
 //                        }
+                        }
+
+                        // if width and height are empty or lower than 0 then set default sizes:
+                        int tempWidth, tempHeight;
+                        int.TryParse(_width.Text, out tempWidth);
+                        int.TryParse(_height.Text, out tempHeight);
+                        if (_width.Text.Trim() == "" || tempWidth < 1)
+                            _width.Text = "500";
+                        if (_height.Text.Trim() == "" || tempHeight < 1)
+                            _height.Text = "400";
+
+                        if (config.Length > 5)
+                            _stylesheets = config[5];
+                        if (config.Length > 6 && config[6] != "")
+                            _showLabel.Checked = bool.Parse(config[6]);
+                        if (config.Length > 7 && config[7] != "")
+                            _maxImageWidth.Text = config[7];
+                        else
+                            _maxImageWidth.Text = "500";
                     }
 
-                    // if width and height are empty or lower than 0 then set default sizes:
-				    int tempWidth, tempHeight;
-                    int.TryParse(_width.Text, out tempWidth);
-                    int.TryParse(_height.Text, out tempHeight);
-                    if (_width.Text.Trim() == "" || tempWidth < 1)
-                        _width.Text = "500";
-                    if (_height.Text.Trim() == "" || tempHeight < 1)
-                        _height.Text = "400";
+                    // add editor buttons
+                    IDictionaryEnumerator ide = tinyMCEConfiguration.SortedCommands.GetEnumerator();
+                    while (ide.MoveNext())
+                    {
+                        tinyMCECommand cmd = (tinyMCECommand) ide.Value;
+                        ListItem li =
+                            new ListItem(
+                                string.Format("<img src=\"{0}\" class=\"tinymceIcon\" alt=\"{1}\" />&nbsp;", cmd.Icon,
+                                              cmd.Alias), cmd.Alias);
+                        if (_selectedButtons.IndexOf(cmd.Alias) > -1)
+                            li.Selected = true;
 
-                    if (config.Length > 5)
-                        _stylesheets = config[5];
-                    if (config.Length > 6 && config[6] != "")
-                        _showLabel.Checked = bool.Parse(config[6]);
-                    if (config.Length > 7 && config[7] != "")
-                        _maxImageWidth.Text = config[7];
-                    else
-                        _maxImageWidth.Text = "500";
-                }
-              
-                // add editor buttons
-                IDictionaryEnumerator ide = tinyMCEConfiguration.SortedCommands.GetEnumerator();
-                while (ide.MoveNext()) 
-                {
-                    tinyMCECommand cmd = (tinyMCECommand) ide.Value;
-                    ListItem li = new ListItem(string.Format("<img src=\"{0}\" class=\"tinymceIcon\" alt=\"{1}\" />&nbsp;", cmd.Icon, cmd.Alias), cmd.Alias);
-                    if (_selectedButtons.IndexOf(cmd.Alias) > -1)
-                        li.Selected = true;
+                        _editorButtons.Items.Add(li);
+                    }
 
-                    _editorButtons.Items.Add(li);
-                }
+                    // add users
+                    foreach (BusinessLogic.UserType ut in BusinessLogic.UserType.getAll)
+                    {
+                        ListItem li = new ListItem(ut.Name, ut.Id.ToString());
+                        if (("," + _advancedUsers + ",").IndexOf("," + ut.Id.ToString() + ",") > -1)
+                            li.Selected = true;
 
-                // add users
-                foreach (BusinessLogic.UserType ut in BusinessLogic.UserType.getAll)
-                {
-                    ListItem li = new ListItem(ut.Name, ut.Id.ToString());
-                    if (("," + _advancedUsers + ",").IndexOf("," + ut.Id.ToString() + ",") > -1)
-                        li.Selected = true;
+                        _advancedUsersList.Items.Add(li);
+                    }
 
-                    _advancedUsersList.Items.Add(li);
+                    // add stylesheets
+                    foreach (cms.businesslogic.web.StyleSheet st in cms.businesslogic.web.StyleSheet.GetAll())
+                    {
+                        ListItem li = new ListItem(st.Text, st.Id.ToString());
+                        if (("," + _stylesheets + ",").IndexOf("," + st.Id.ToString() + ",") > -1)
+                            li.Selected = true;
+
+                        _stylesheetList.Items.Add(li);
+                    }
                 }
 
-                // add stylesheets
-                foreach (cms.businesslogic.web.StyleSheet st in cms.businesslogic.web.StyleSheet.GetAll())
-                {
-                    ListItem li = new ListItem(st.Text, st.Id.ToString());
-                    if (("," + _stylesheets + ",").IndexOf("," + st.Id.ToString() + ",") > -1)
-                        li.Selected = true;
-
-                    _stylesheetList.Items.Add(li);
-                }
-                
-
-                // Mark the current db type
+			    // Mark the current db type
                 _dropdownlist.SelectedValue = _datatype.DBType.ToString();
-
+                    
             }
 		}
 		
