@@ -341,6 +341,11 @@ Umbraco.Application.Actions = function() {
             if (this._isDebug) {
                 Sys.Debug.trace("AppActions: " + strMsg);
             }
+        },
+        actionExportCode: function() {
+            /// <summary></summary>
+            UmbClientMgr.mainWindow().openModal("dialogs/exportCode.aspx", UmbClientMgr.uiKeys()['exportDocumentTypeAsCode'], 250, 400);
+            return false;
         }
     }
 }

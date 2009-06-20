@@ -95,5 +95,29 @@ namespace umbraco.presentation
         {
             m_HttpContext = httpContext;
         }
+
+        /// <summary>
+        /// Gets the response for the current context
+        /// </summary>
+        /// <value>The response.</value>
+        public HttpResponse Response
+        {
+            get
+            {
+                return this.m_HttpContext.Response;
+            }
+        }
+
+        /// <summary>
+        /// Gets the request for the current context
+        /// </summary>
+        /// <value>The request.</value>
+        public HttpRequest Request
+        {
+            get
+            {
+                return this.m_HttpContext.Request;
+            }
+        }
     }
 }

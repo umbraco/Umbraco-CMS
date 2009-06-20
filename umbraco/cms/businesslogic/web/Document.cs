@@ -714,7 +714,7 @@ namespace umbraco.cms.businesslogic.web
             Log.Add(LogTypes.New, u, d.Id, "");
 
             // Run Handler				
-            Action.RunActionHandlers(d, ActionNew.Instance);
+            umbraco.BusinessLogic.Actions.Action.RunActionHandlers(d, ActionNew.Instance);
 
             // Index
             AddToIndexEventArgs ie = new AddToIndexEventArgs();
@@ -796,7 +796,7 @@ namespace umbraco.cms.businesslogic.web
                     FireBeforeMoveToTrash(e);
 
                     if (!e.Cancel) {
-                        Action.RunActionHandlers(this, ActionDelete.Instance);
+                        umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
                         UnPublish();
                         Move(-20);
 
@@ -819,7 +819,7 @@ namespace umbraco.cms.businesslogic.web
                         d.delete();
                     }
 
-                    Action.RunActionHandlers(this, ActionDelete.Instance);
+                    umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
 
                     //delete files 
                     interfaces.IDataType uploadField = new cms.businesslogic.datatype.controls.Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));

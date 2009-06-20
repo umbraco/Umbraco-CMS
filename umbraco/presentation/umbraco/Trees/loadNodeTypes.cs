@@ -44,6 +44,7 @@ namespace umbraco
             actions.Add(ActionNew.Instance);
             actions.Add(ContextMenuSeperator.Instance);
             actions.Add(ActionImport.Instance);
+            actions.Add(ActionCodeExport.Instance);
             actions.Add(ContextMenuSeperator.Instance);
             actions.Add(ActionRefresh.Instance);
         }

@@ -11,3 +11,4 @@ using System;
 [assembly: AssemblyProduct("DTMetal.Engine")]
 [assembly: CLSCompliant(false)]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("umbraco.Linq.DTMetal.Engine.Tests")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("umbraco")]

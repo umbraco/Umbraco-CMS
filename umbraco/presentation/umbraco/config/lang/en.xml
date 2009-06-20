@@ -345,6 +345,8 @@
     <key alias="rollback" version="2.1">Rollback</key>
     <key alias="emptyTrashcan" version="3.0">Empty recycle bin</key>
     <key alias="exportDocumentType" version="3.0">Export Document Type</key>
+    <key alias="exportDocumentTypeAsCode" version="3.0">Export to .NET</key>
+    <key alias="exportDocumentTypeAsCode-Full" version="3.0">Export to .NET</key>
     <key alias="importDocumentType" version="3.0">Import Document Type</key>
     <key alias="sendToTranslate" version="3.0">Send To Translation</key>
     <key alias="translate" version="3.0">Translate</key>

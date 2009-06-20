@@ -31,6 +31,17 @@ namespace umbraco.Linq.DTMetal.Engine
             this.DataContextName = dataContextName;
         }
 
+        public DTMLGenerator(string umbracoConnectionString, string dataContextName, bool disablePluralization)
+        {
+            if (string.IsNullOrEmpty(umbracoConnectionString))
+            {
+                throw new ArgumentNullException("umbracoConnectionString");
+            }
+            
+            this.umbracoConnectionString = umbracoConnectionString;
+            this.DataContextName = dataContextName;
+        }
+
         public void GenerateDTMLFile()
         {
             using (var objBuilder = new DocTypeObjectBuilder(this.umbracoConnectionString))
@@ -42,6 +53,20 @@ namespace umbraco.Linq.DTMetal.Engine
                 dtmlGen.BuildXml();
 
                 dtmlGen.Save(Path.Combine(this.SavePath, (string.IsNullOrEmpty(this.DataContextName) ? "umbraco" : this.DataContextName) + fileExtension));
+            }
+        }
+
+        internal DocTypeMarkupLanguageBuilder GenerateDTMLStream()
+        {
+            using (var objBuilder = new DocTypeObjectBuilder(this.umbracoConnectionString))
+            {
+                objBuilder.LoadDocTypes();
+
+                var dtmlGen = new DocTypeMarkupLanguageBuilder(objBuilder.DocumentTypes, this.DataContextName, this.DisablePluralization);
+
+                dtmlGen.BuildXml();
+
+                return dtmlGen;
             }
         }
     }

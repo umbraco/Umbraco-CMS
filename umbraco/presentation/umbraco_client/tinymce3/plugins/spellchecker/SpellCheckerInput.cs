@@ -16,9 +16,25 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
             Words = new List<string>();
         }
 
+        /// <summary>
+        /// Gets or sets the id from TinyMCE
+        /// </summary>
+        /// <value>The id.</value>
         public string Id { get; set; }
+        /// <summary>
+        /// Gets or sets the spellchecking method. eg: checkWords, getSuggestions
+        /// </summary>
+        /// <value>The method.</value>
         public string Method { get; set; }
+        /// <summary>
+        /// Gets or sets the language used by the content
+        /// </summary>
+        /// <value>The language.</value>
         public string Language { get; set; }
+        /// <summary>
+        /// Gets or sets the words which are to be spell checked
+        /// </summary>
+        /// <value>The words.</value>
         public List<string> Words { get; set; }
 
 
@@ -27,17 +43,17 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <returns></returns>
-        public static SpellCheckerInput Parse(StreamReader stream)
+        public static SpellCheckerInput Parse(StreamReader inputStream)
         {
-            if (stream == null)
+            if (inputStream == null)
             {
                 throw new ArgumentNullException("stream");
             }
-            if (stream.EndOfStream)
+            if (inputStream.EndOfStream)
             {
                 throw new ArgumentException("Stream end reached before we started!");
             }
-            var jsonString = stream.ReadLine();
+            var jsonString = inputStream.ReadLine();
             var deserialized = (Dictionary<string, object>)new JavaScriptSerializer().DeserializeObject(jsonString);
             
             var input = new SpellCheckerInput();

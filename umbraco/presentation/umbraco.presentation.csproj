@@ -31,7 +31,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkSubset>
     </TargetFrameworkSubset>
   </PropertyGroup>
@@ -97,8 +97,14 @@
       <Name>System</Name>
     </Reference>
     <Reference Include="System.configuration" />
+    <Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data">
       <Name>System.Data</Name>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing">
@@ -108,13 +114,20 @@
     <Reference Include="System.Web">
       <Name>System.Web</Name>
     </Reference>
-    <Reference Include="System.Web.Extensions, Version=1.0.61025.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="System.Web.Extensions.Design, Version=1.0.61025.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web.Extensions.Design, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Web.Services">
       <Name>System.Web.Services</Name>
     </Reference>
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
+    </Reference>
+    <Reference Include="System.Xml.Linq, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.60829.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -127,6 +140,14 @@
     <ProjectReference Include="..\..\components\umbraco.controls\umbraco.controls.csproj">
       <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
       <Name>umbraco.controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\LinqToUmbraco\src\umbraco.Linq\DTMetal.CodeBuilder\DTMetal.CodeBuilder.csproj">
+      <Project>{461089E7-008E-4737-BA17-E1FCD1CC3D0E}</Project>
+      <Name>DTMetal.CodeBuilder</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\LinqToUmbraco\src\umbraco.Linq\DTMetal.Engine\DTMetal.Engine.csproj">
+      <Project>{B151A571-D2F7-47DD-AFD6-C2C34ECA845B}</Project>
+      <Name>DTMetal.Engine</Name>
     </ProjectReference>
     <ProjectReference Include="..\businesslogic\umbraco.businesslogic.csproj">
       <Name>umbraco.businesslogic</Name>
@@ -449,6 +470,13 @@
     </Compile>
     <Compile Include="umbraco\developer\Xslt\xsltVisualize.aspx.designer.cs">
       <DependentUpon>xsltVisualize.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dialogs\ExportCode.aspx.cs">
+      <DependentUpon>ExportCode.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dialogs\ExportCode.aspx.designer.cs">
+      <DependentUpon>ExportCode.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\dialogs\insertMasterpageContent.aspx.cs">
       <DependentUpon>insertMasterpageContent.aspx</DependentUpon>
@@ -1537,6 +1565,7 @@
     <Content Include="umbraco\controls\passwordChanger.ascx" />
     <Content Include="umbraco\controls\TreeControl.ascx" />
     <Content Include="umbraco\css\permissionsEditor.css" />
+    <Content Include="umbraco\dialogs\ExportCode.aspx" />
     <Content Include="umbraco\images\editor\spellchecker.gif" />
     <Content Include="umbraco_client\Application\JQuery\jquery.cookie.js" />
     <Content Include="umbraco_client\imagecropper\Jcrop.gif" />

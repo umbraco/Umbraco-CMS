@@ -7,7 +7,6 @@ using umbraco.interfaces;
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
 using System.Text;
-using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic.Utils;
 using umbraco.BasePages;
 
@@ -700,7 +699,7 @@ namespace umbraco.cms.presentation.Trees
 				//This also needs to be stored in the attributes object with the class above.
 				Dictionary<string, object> metadata = new Dictionary<string, object>();
 				//the menu:
-				metadata.Add("menu", node.Menu == null ? "" : Action.ToString(node.Menu));
+				metadata.Add("menu", node.Menu == null ? "" : umbraco.BusinessLogic.Actions.Action.ToString(node.Menu));
 				//the tree type:
 				metadata.Add("nodeType", node.NodeType);
 				//the data url for child nodes:

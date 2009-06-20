@@ -81,9 +81,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.presentation.Client
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.Linq.Core", "LinqToUmbraco\src\umbraco.Linq\Core\umbraco.Linq.Core.csproj", "{31CAEC36-0C3D-4D69-B092-84866811EA07}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTMetal.CodeBuilder", "LinqToUmbraco\src\umbraco.Linq\DTMetal.CodeBuilder\DTMetal.CodeBuilder.csproj", "{461089E7-008E-4737-BA17-E1FCD1CC3D0E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LINQ to Umbraco externals", "LINQ to Umbraco externals", "{585F1879-8F6B-4569-8C96-7FCB06314BBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTMetal.Engine", "LinqToUmbraco\src\umbraco.Linq\DTMetal.Engine\DTMetal.Engine.csproj", "{B151A571-D2F7-47DD-AFD6-C2C34ECA845B}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 14
+		SccNumberOfProjects = 16
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs01.codeplex.com/
 		SccLocalPath0 = .
@@ -126,6 +132,14 @@ Global
 		SccProjectUniqueName13 = LinqToUmbraco\\src\\umbraco.Linq\\Core\\umbraco.Linq.Core.csproj
 		SccProjectName13 = LinqToUmbraco/src/umbraco.Linq/Core
 		SccLocalPath13 = LinqToUmbraco\\src\\umbraco.Linq\\Core
+		SccProjectUniqueName14 = LinqToUmbraco\\src\\umbraco.Linq\\DTMetal.CodeBuilder\\DTMetal.CodeBuilder.csproj
+		SccProjectTopLevelParentUniqueName14 = umbraco.sln
+		SccProjectName14 = LinqToUmbraco/src/umbraco.Linq/DTMetal.CodeBuilder
+		SccLocalPath14 = LinqToUmbraco\\src\\umbraco.Linq\\DTMetal.CodeBuilder
+		SccProjectUniqueName15 = LinqToUmbraco\\src\\umbraco.Linq\\DTMetal.Engine\\DTMetal.Engine.csproj
+		SccProjectTopLevelParentUniqueName15 = umbraco.sln
+		SccProjectName15 = LinqToUmbraco/src/umbraco.Linq/DTMetal.Engine
+		SccLocalPath15 = LinqToUmbraco\\src\\umbraco.Linq\\DTMetal.Engine
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug - Fixed Version|Any CPU = Debug - Fixed Version|Any CPU
@@ -211,6 +225,18 @@ Global
 		{31CAEC36-0C3D-4D69-B092-84866811EA07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31CAEC36-0C3D-4D69-B092-84866811EA07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31CAEC36-0C3D-4D69-B092-84866811EA07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{461089E7-008E-4737-BA17-E1FCD1CC3D0E}.Debug - Fixed Version|Any CPU.ActiveCfg = Debug - Fixed Version|Any CPU
+		{461089E7-008E-4737-BA17-E1FCD1CC3D0E}.Debug - Fixed Version|Any CPU.Build.0 = Debug - Fixed Version|Any CPU
+		{461089E7-008E-4737-BA17-E1FCD1CC3D0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{461089E7-008E-4737-BA17-E1FCD1CC3D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{461089E7-008E-4737-BA17-E1FCD1CC3D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{461089E7-008E-4737-BA17-E1FCD1CC3D0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B151A571-D2F7-47DD-AFD6-C2C34ECA845B}.Debug - Fixed Version|Any CPU.ActiveCfg = Debug - Fixed Version|Any CPU
+		{B151A571-D2F7-47DD-AFD6-C2C34ECA845B}.Debug - Fixed Version|Any CPU.Build.0 = Debug - Fixed Version|Any CPU
+		{B151A571-D2F7-47DD-AFD6-C2C34ECA845B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B151A571-D2F7-47DD-AFD6-C2C34ECA845B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B151A571-D2F7-47DD-AFD6-C2C34ECA845B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B151A571-D2F7-47DD-AFD6-C2C34ECA845B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -220,5 +246,7 @@ Global
 		{58072405-85D0-45CA-8F5C-EA8928C32A6A} = {F0242771-6DE6-4E03-BD3A-7B79BA79105B}
 		{5BB61485-B480-4A03-A8DD-1636A5AF575C} = {B8ECDB8B-BF44-462C-B6DA-22421B3EC4D7}
 		{05329DB0-5C47-44A1-B7B8-BF377446BCD1} = {B8ECDB8B-BF44-462C-B6DA-22421B3EC4D7}
+		{461089E7-008E-4737-BA17-E1FCD1CC3D0E} = {585F1879-8F6B-4569-8C96-7FCB06314BBF}
+		{B151A571-D2F7-47DD-AFD6-C2C34ECA845B} = {585F1879-8F6B-4569-8C96-7FCB06314BBF}
 	EndGlobalSection
 EndGlobal

@@ -120,6 +120,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function(msg) {
+                        msg = msg.d;
                         //recreates the tree
                         if ($.inArray(msg.app, _this._loadedApps) == -1) {
                             _this._debug("loading js for app: " + msg.app);
@@ -791,9 +792,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         theme_name: "umbraco",
                         context: null //no context menu by default						
                     },
-                    lang : {
-                        new_node : "New folder",
-                        loading : "<div>" + (this._tree.settings.lang.loading || "Loading ...") + "</div>"
+                    lang: {
+                        new_node: "New folder",
+                        loading: "<div>" + (this._tree.settings.lang.loading || "Loading ...") + "</div>"
                     },
                     rules: {
                         metadata: "umb:nodedata",

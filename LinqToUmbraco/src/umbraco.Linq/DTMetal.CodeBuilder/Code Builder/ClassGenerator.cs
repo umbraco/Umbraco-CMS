@@ -77,6 +77,28 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
             return new ClassGenerator(args);
         }
 
+        public static ClassGenerator CreateBuilder(string ns, GenerationLanguage lang, XDocument dtml)
+        {
+            var args = new ClassGeneratorArgs()
+            {
+                Namespace = ns,
+                Dtml = dtml
+            };
+            switch (lang)
+            {
+                case GenerationLanguage.VB:
+                    args.Provider = new VBCodeProvider();
+                    break;
+
+                case GenerationLanguage.CSharp:
+                default:
+                    args.Provider = new CSharpCodeProvider();
+                    break;
+            }
+
+            return new ClassGenerator(args);
+        }
+
         internal ClassGenerator(ClassGeneratorArgs args)
         {
             this.Args = args;
@@ -96,6 +118,24 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
             using (StreamWriter sourceWriter = new StreamWriter(dtml.FullName.Replace("dtml", "designer." + this.Args.Provider.FileExtension)))
             {
                 this.Args.Provider.GenerateCodeFromCompileUnit(this.Code, sourceWriter, options);
+            }
+        }
+
+        public void Save(Stream stream)
+        {
+            if (this.Code == null)
+            {
+                this.GenerateCode();
+            }
+
+            CodeGeneratorOptions options = new CodeGeneratorOptions()
+            {
+                BracingStyle = "C"
+            };
+
+            using (var sw = new StreamWriter(stream))
+            {
+                this.Args.Provider.GenerateCodeFromCompileUnit(this.Code, sw, options); 
             }
         }
 
@@ -177,7 +217,7 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
                 dataContextName += "DataContext";
             }
             CodeTypeDeclaration dataContext = new CodeTypeDeclaration(dataContextName);
-            dataContext.BaseTypes.Add("umbracoDataContext");
+            dataContext.BaseTypes.Add("UmbracoDataContext");
             dataContext.IsClass = true;
             dataContext.IsPartial = true;
 
@@ -206,7 +246,7 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
             //constructor that takes an umbracoDataProvider
             ctor = new CodeConstructor();
             ctor.Attributes = MemberAttributes.Public;
-            ctor.Parameters.Add(new CodeParameterDeclarationExpression("umbracoDataProvider", "provider"));
+            ctor.Parameters.Add(new CodeParameterDeclarationExpression("UmbracoDataProvider", "provider"));
             ctor.BaseConstructorArgs.Add(new CodePropertyReferenceExpression(null, "provider"));
             ctor.Statements.Add(statement);
             dataContext.Members.Add(ctor);
@@ -489,7 +529,7 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
 
                         currClass.Members.Add(p);
                     }
-                } 
+                }
                 #endregion
 
                 ns.Types.Add(currClass);
@@ -512,7 +552,8 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
                 p.HasSet = false;
 
                 new Switch(retyper)
-                .Case<YesNoRetyper>(b => {
+                .Case<YesNoRetyper>(b =>
+                {
                     p.GetStatements.Add(new CodeMethodReturnStatement(
                         GenerateEqualityConditionalStatement(
                             new CodeFieldReferenceExpression(

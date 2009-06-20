@@ -285,7 +285,7 @@ namespace umbraco.presentation.umbraco.controls
 			});
 
 			List<IAction> allActions = new List<IAction>();
-			foreach (IAction a in Action.GetAll())
+			foreach (IAction a in global::umbraco.BusinessLogic.Actions.Action.GetAll())
 			{
 				if (!string.IsNullOrEmpty(a.Alias) && (!string.IsNullOrEmpty(a.JsFunctionName) || !string.IsNullOrEmpty(a.JsSource)))
 				{
@@ -364,7 +364,7 @@ namespace umbraco.presentation.umbraco.controls
 			get
 			{
 				List<Type> types = new List<Type>();
-				foreach (IAction a in Action.GetAll())
+				foreach (IAction a in global::umbraco.BusinessLogic.Actions.Action.GetAll())
 				{
 					types.Add(a.GetType());
 				}
