@@ -50,15 +50,6 @@ namespace umbraco.cms.presentation {
         protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude1;
         
         /// <summary>
-        /// ClientDependencyInclude2 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude2;
-        
-        /// <summary>
         /// ClientDependencyInclude4 control.
         /// </summary>
         /// <remarks>
@@ -84,15 +75,6 @@ namespace umbraco.cms.presentation {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude6;
-        
-        /// <summary>
-        /// ClientDependencyInclude8 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude8;
         
         /// <summary>
         /// ClientDependencyInclude7 control.

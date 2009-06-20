@@ -1,16 +1,15 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="TreeControl.ascx.cs" Inherits="umbraco.presentation.umbraco.controls.TreeControl" %>
-<asp:ScriptManagerProxy runat="server">
-	<Scripts>
-		<%--<asp:ScriptReference Path="~/umbraco_client/Application/NamespaceManager.js" />--%>
-		<asp:ScriptReference Path="~/umbraco_client/Tree/css.js" />
-		<%--<asp:ScriptReference Path="~/umbraco_client/Application/JQuery/jquery.metadata.min.js" />--%>
-		<asp:ScriptReference Path="~/umbraco_client/Tree/tree_component.min.js" />				
-		<asp:ScriptReference Path="~/umbraco_client/Tree/NodeDefinition.js" />
-		<asp:ScriptReference Path="~/umbraco_client/Tree/UmbracoTree.js" />
-		<%--<asp:ScriptReference Path="~/umbraco_client/Application/UmbracoClientManager.js" />--%>
-		<%--<asp:ScriptReference Path="~/umbraco_client/Application/UmbracoUtils.js" />--%>
-	</Scripts>
-</asp:ScriptManagerProxy>
+
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency" Assembly="umbraco.presentation.ClientDependency" %>
+
+<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude7" DependencyType="Css" FilePath="Tree/Themes/tree_component.css" PathNameAlias="UmbracoClient" />
+
+<umb:ClientDependencyInclude ID="ClientDependencyInclude1" runat="server" DependencyType="Javascript" FilePath="Application/JQuery/jquery.metadata.min.js" PathNameAlias="UmbracoClient" Priority="10" CompositeGroupName="UmbTree" />
+<umb:ClientDependencyInclude ID="ClientDependencyInclude6" runat="server" DependencyType="Javascript" FilePath="Application/JQuery/jquery.cookie.js" PathNameAlias="UmbracoClient" Priority="10" CompositeGroupName="UmbTree" />
+<umb:ClientDependencyInclude ID="ClientDependencyInclude2" runat="server" DependencyType="Javascript" FilePath="Tree/css.js" PathNameAlias="UmbracoClient" Priority="10" CompositeGroupName="UmbTree" />
+<umb:ClientDependencyInclude ID="ClientDependencyInclude5" runat="server" DependencyType="Javascript" FilePath="Tree/tree_component.min.js" PathNameAlias="UmbracoClient" Priority="11" CompositeGroupName="UmbTree" />
+<umb:ClientDependencyInclude ID="ClientDependencyInclude3" runat="server" DependencyType="Javascript" FilePath="Tree/NodeDefinition.js" PathNameAlias="UmbracoClient" Priority="12" CompositeGroupName="UmbTree" />
+<umb:ClientDependencyInclude ID="ClientDependencyInclude4" runat="server" DependencyType="Javascript" FilePath="Tree/UmbracoTree.js" PathNameAlias="UmbracoClient" Priority="13" CompositeGroupName="UmbTree" />
 
 <script type="text/javascript">
 

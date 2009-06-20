@@ -12,13 +12,14 @@ using umbraco.BasePages;
 using System.Xml;
 using System.Xml.XPath;
 using umbraco.BusinessLogic.Actions;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.cms.presentation
 {
 	/// <summary>
 	/// Summary description for _default.
 	/// </summary>
-	public partial class _umbraco : UmbracoEnsuredPage
+ 	public partial class _umbraco : UmbracoEnsuredPage
 	{
 		protected umbWindow UmbWindow1;
 		protected System.Web.UI.WebControls.PlaceHolder bubbleText;

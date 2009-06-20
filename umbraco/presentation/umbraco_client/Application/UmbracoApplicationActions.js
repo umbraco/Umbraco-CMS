@@ -83,6 +83,9 @@ Umbraco.Application.Actions = function() {
 
             this._debug("shiftApp: " + whichApp + ", " + appName + ", " + ignoreDashboard);
 
+
+            UmbClientMgr.mainTree().saveTreeState(this._currApp == "" ? "content" : this._currApp);
+
             this._currApp = whichApp.toLowerCase();
 
             if (this._currApp != 'media' && this._currApp != 'content') {
@@ -95,7 +98,8 @@ Umbraco.Application.Actions = function() {
             if (!ignoreDashboard) {
                 UmbClientMgr.contentFrame('dashboard.aspx?app=' + whichApp);
             }
-
+                        
+            
             UmbClientMgr.mainTree().rebuildTree(whichApp);
 
             jQuery("#treeWindowLabel").html(appName);
@@ -292,13 +296,16 @@ Umbraco.Application.Actions = function() {
             if (UmbClientMgr.mainTree().getActionNode().nodeType == "content" && UmbClientMgr.mainTree().getActionNode().nodeId == '-1')
                 return;
 
+            this._debug("actionDelete");
+
             if (confirm(uiKeys['defaultdialogs_confirmdelete'] + ' "' + UmbClientMgr.mainTree().getActionNode().nodeName + '"?\n\n')) {
                 //raise nodeDeleting event
                 jQuery(this).trigger("nodeDeleting", []);
                 var _this = this;
                 umbraco.presentation.webservices.legacyAjaxCalls.Delete(UmbClientMgr.mainTree().getActionNode().nodeId, "", UmbClientMgr.mainTree().getActionNode().nodeType, function() {
+                    _this._debug("actionDelete: Raising event");
                     //raise nodeDeleted event
-                    jQuery(this).trigger("nodeDeleted", []);
+                    jQuery(_this).trigger("nodeDeleted", []);
                 });
             }
         },

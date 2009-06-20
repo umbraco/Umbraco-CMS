@@ -80,7 +80,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// <summary>This will rebuild the tree structure for the application specified</summary>
 
                 this._debug("rebuildTree");
-
+                
                 if (this._app == null || (this._app.toLowerCase() == app.toLowerCase())) {
                     this._debug("not rebuilding");
                     return;
@@ -95,6 +95,22 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._tree.destroy();
                 this._container.hide();
                 var _this = this;
+                
+                //check if we should rebuild from a saved tree
+                var saveData = this._container.data("tree_" + app);
+                if (saveData != null) {
+                    this._debug("rebuildTree: rebuilding from cache!");
+                    
+                    //create the tree from the saved data.
+                    this._initNode = saveData;
+                    this._tree = $.tree_create();
+                    this._tree.init(this._container, this._getInitOptions());
+                    
+                    this._configureNodes(this._container.find("li"), true);
+                    this._container.show();
+                    return;
+                }
+                
                 //need to get the init node for the new app
                 var parameters = "{'app':'" + app + "','showContextMenu':'" + this._showContext + "', 'isDialog':'" + this._isDialog + "'}"
                 $.ajax({
@@ -125,7 +141,35 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 });
 
             },
-
+            
+            saveTreeState: function(appAlias) {
+                /// <summary>
+                /// Saves the state of the current application trees so we can restore it next time the user visits the app
+                /// </summary>
+                var saveData = this._tree.getJSON(null, [ "id", "umb:type", "class" ], [ "umb:nodedata", "href", "class", "style" ]);
+                
+                //need to update the 'state' of the data. jsTree getJSON doesn't return the state of nodes (yet)!
+                this._updateJSONNodeState(saveData);  
+                
+                this._container.data("tree_" + appAlias, saveData);
+            },
+            
+            _updateJSONNodeState: function(obj) {
+                /// <summary>
+                /// A recursive function to store the state of the node for the JSON object when using saveTreeState.
+                /// This is required since jsTree doesn't output the state of the tree nodes with the request to getJSON method.
+                /// </summary>
+                
+                var c = $("li#" + obj.attributes.id).attr("class");
+                var state = c.indexOf("open") > -1 ? "open" : c.indexOf("closed") > -1 ? "closed" : null;
+                if (state != null) obj.state = state;
+                if (obj.children != null) {
+                    for (var x in obj.children) {
+                        this._updateJSONNodeState(obj.children[x]);
+                    }
+                }
+            },
+            
             syncTree: function(path, forceReload) {
                 /// <summary>
                 /// Syncronizes the tree with the path supplied and makes that node visible/selected.
@@ -346,6 +390,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             onNodeDeleting: function(EV) {
                 /// <summary>Event handler for when a tree node is about to be deleted</summary>
 
+                this._debug("onNodeDeleting")
+
                 //first, close the branch
                 this._tree.close_branch(this._actionNode.jsNode);
                 //show the ajax loader with deleting text
@@ -356,6 +402,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
             onNodeDeleted: function(EV) {
                 /// <summary>Event handler for when a tree node is deleted after ajax call</summary>
+
+                this._debug("onNodeDeleted");
 
                 //remove the ajax loader
                 this._actionNode.jsNode.find("a").removeClass("loading");
@@ -678,7 +726,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// <param name="serviceUrl">Url path for the tree client service</param>
                 /// <param name="dataUrl">Url path for the tree data service</param>
 
-                this._debug("init: creating new tree with class/id: " + treeContainer.attr("class") + " / " + treeContainer.attr("id"));
+                this._debug("_init: creating new tree with class/id: " + treeContainer.attr("class") + " / " + treeContainer.attr("id"));
 
                 this._fullMenu = jFullMenu;
                 this._initNode = jInitNode;
@@ -722,6 +770,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _getInitOptions: function() {
                 /// <summary>return the initialization objects for the tree</summary>
 
+                this._debug("_getInitOptions");
+                
                 var _this = this;
 
                 var options = {

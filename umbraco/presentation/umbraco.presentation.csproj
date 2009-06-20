@@ -1,6 +1,6 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{651E1350-91B6-44B7-BD60-7207006D7003}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -1538,6 +1538,7 @@
     <Content Include="umbraco\controls\TreeControl.ascx" />
     <Content Include="umbraco\css\permissionsEditor.css" />
     <Content Include="umbraco\images\editor\spellchecker.gif" />
+    <Content Include="umbraco_client\Application\JQuery\jquery.cookie.js" />
     <Content Include="umbraco_client\Tree\Themes\default\context.gif" />
     <Content Include="umbraco_client\Tree\Themes\default\create.png" />
     <Content Include="umbraco_client\Tree\Themes\default\dot.gif" />

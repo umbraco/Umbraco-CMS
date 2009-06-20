@@ -11,13 +11,13 @@
 	<title>Umbraco CMS - <%=Request.Url.Host.ToLower().Replace("www.", "") %></title>
 	<asp:PlaceHolder id="IActionJSFileRef" runat="server"></asp:PlaceHolder>
 			
-	<script type="text/javascript">
+	<script type="text/javascript"> 
 		this.name = 'umbracoMain';
 	</script>
 	
 </head>
 <body id="umbracoMainPageBody">
-	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="Header" IsDebugMode="false" >
+	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="Header" IsDebugMode="true" >
 		<Paths>
 			<umb:ClientDependencyPath Name="UmbracoClient" Path="~/umbraco_client" />
 			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
@@ -26,12 +26,10 @@
 	
 	<umb:ClientDependencyInclude runat="server" ID="ClientDependencyInclude3" DependencyType="Css" FilePath="css/umbracoGui.css" PathNameAlias="UmbracoRoot" />
 	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude1" DependencyType="Css" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />
-	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude2" DependencyType="Css" FilePath="Tree/Themes/tree_component.css" PathNameAlias="UmbracoClient" />
 		
 	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude4" DependencyType="Javascript" FilePath="Application/NamespaceManager.js" PathNameAlias="UmbracoClient" Priority="0" CompositeGroupName="JSCore" />
 	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude5" DependencyType="Javascript" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" CompositeGroupName="JSCore" />
 	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude6" DependencyType="Javascript" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient" Priority="1" CompositeGroupName="JSAddons" />	
-	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude8" DependencyType="Javascript" FilePath="Application/JQuery/jquery.metadata.min.js" PathNameAlias="UmbracoClient" Priority="1" CompositeGroupName="JSAddons" />
 	
 	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude7" DependencyType="Javascript" FilePath="modal/modal.js" PathNameAlias="UmbracoClient" />	
 	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude11" DependencyType="Javascript" FilePath="Application/UmbracoApplicationActions.js" PathNameAlias="UmbracoClient" CompositeGroupName="UmbApp" />
