@@ -57,6 +57,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _dataUrl: "", //a path to the tree data service url
             _treeType: "standard", //determines the type of tree: 'standard', 'checkbox' = checkboxes enabled, 'inheritedcheckbox' = parent nodes have checks inherited from children
             _treeClass: "umbTree", //used for other libraries to detect which elements are an umbraco tree
+            _currenAJAXRequest: false, //used to determine if there is currently an ajax request being executed.
 
             addEventHandler: function(fnName, fn) {
                 /// <summary>Adds an event listener to the event name event</summary>
@@ -102,17 +103,40 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     this._debug("rebuildTree: rebuilding from cache!");
                     
                     //create the tree from the saved data.
-                    this._initNode = saveData;
+                    this._initNode = saveData.d;
                     this._tree = $.tree_create();
                     this._tree.init(this._container, this._getInitOptions());
                     
                     this._configureNodes(this._container.find("li"), true);
-                    this._container.show();
+                    //select the last node
+                    var lastSelected = saveData.selected != null ? $(saveData.selected[0]).attr("id") : null;
+                    if (lastSelected != null) {                        
+                        //create an event handler for the tree sync
+                        var _this = this;
+                        var foundHandler = function(EV, node) {
+                            //remove the event handler from firing again
+                            _this.removeEventHandler("syncFound", foundHandler);
+                            this._debug("rebuildTree: node synced, selecting node...");
+                            //ensure the node is selected, ensure the event is fired and reselect is true since jsTree thinks this node is already selected by id
+                            _this.selectNode(node, false, true);
+                            this._container.show();
+                        };
+                        this._debug("rebuildTree: syncing to last selected: " + lastSelected);
+                        //add the event handler for the tree sync and sync the tree
+                        this.addEventHandler("syncFound", foundHandler);
+                        this.setActiveTreeType($(saveData.selected[0]).attr("umb:type"));
+                        this.syncTree(lastSelected);                    
+                    }
+                    else {
+                        this._container.show();
+                    }
+                    
                     return;
                 }
                 
                 //need to get the init node for the new app
                 var parameters = "{'app':'" + app + "','showContextMenu':'" + this._showContext + "', 'isDialog':'" + this._isDialog + "'}"
+                this._currentAJAXRequest = true;
                 $.ajax({
                     type: "POST",
                     url: this._serviceUrl,
@@ -133,10 +157,12 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         _this._tree.init(_this._container, _this._getInitOptions());
                         _this._container.show();
                         _this._loadChildNodes(_this._container.find("li:first"), null);
-                        $(_this).trigger("rebuiltTree", [msg.app]);
+                        _this._currentAJAXRequest = false;
+                        $(_this).trigger("rebuiltTree", [msg.app]);                        
                     },
                     error: function(e) {
                         _this._debug("rebuildTree: AJAX error occurred");
+                        _this._currentAJAXRequest = false;
                         $(_this).trigger("ajaxError", [{ msg: "rebuildTree"}]);
                     }
                 });
@@ -147,23 +173,38 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// <summary>
                 /// Saves the state of the current application trees so we can restore it next time the user visits the app
                 /// </summary>
-                var saveData = this._tree.getJSON(null, [ "id", "umb:type", "class" ], [ "umb:nodedata", "href", "class", "style" ]);
+                
+                this._debug("saveTreeState: " + appAlias + " : ajax request? " + this._currentAJAXRequest);
+                
+                //if an ajax request is currently in progress, abort saving the tree state and set the 
+                //data object for the application to null.
+                if (this._currentAJAXRequest) {
+                    this._container.data("tree_" + appAlias, null);
+                    return;
+                }
+                
+                var treeData = this._tree.getJSON(null, [ "id", "umb:type", "class" ], [ "umb:nodedata", "href", "class", "style" ]);
                 
                 //need to update the 'state' of the data. jsTree getJSON doesn't return the state of nodes (yet)!
-                this._updateJSONNodeState(saveData);  
+                this._updateJSONNodeState(treeData);  
                 
-                this._container.data("tree_" + appAlias, saveData);
+                this._container.data("tree_" + appAlias, {selected: this._tree.selected, d: treeData});
             },
             
             _updateJSONNodeState: function(obj) {
                 /// <summary>
                 /// A recursive function to store the state of the node for the JSON object when using saveTreeState.
                 /// This is required since jsTree doesn't output the state of the tree nodes with the request to getJSON method.
-                /// </summary>
+                /// </summary>              
                 
-                var c = $("li#" + obj.attributes.id).attr("class");
-                var state = c.indexOf("open") > -1 ? "open" : c.indexOf("closed") > -1 ? "closed" : null;
-                if (state != null) obj.state = state;
+                var node = $("li[id='" + obj.attributes.id + "']").filter(function() {
+                    return ($(this).attr("umb:type") == obj.attributes["umb:type"]); //filter based on custom namespace requires custom function
+                }); 
+                var c = node.attr("class");
+                if (c != null) {
+                    var state = c.indexOf("open") > -1 ? "open" : c.indexOf("closed") > -1 ? "closed" : null;
+                    if (state != null) obj.state = state;
+                }                
                 if (obj.children != null) {
                     for (var x in obj.children) {
                         this._updateJSONNodeState(obj.children[x]);
@@ -460,9 +501,16 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// <summary>Gets the node source from the meta data and assigns it to the tree prior to loading</summary>
                 var nodeDef = this._getNodeDef($(NODE));
                 this._debug("onBeforeOpen: " + nodeDef.nodeId);
+                this._currentAJAXRequest = true;
                 TREE_OBJ.settings.data.url = this._getUrl(nodeDef.sourceUrl);
             },
-
+            
+            onJSONData: function(DATA, TREE_OBJ) {
+                this._debug("onJSONData");
+                this._currentAJAXRequest = false;
+                return DATA;
+            },
+            
             onChange: function(NODE, TREE_OBJ) {
                 /// <summary>
                 /// Some code taken from the jsTree checkbox tree theme to allow for checkboxes
@@ -806,7 +854,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         beforeopen: function(N, T) { _this.onBeforeOpen(N, T) },
                         onopen: function(N, T) { _this.onOpen(N, T) },
                         onselect: function(N, T) { _this.onSelect(N, T) },
-                        onchange: function(N, T) { _this.onChange(N, T) }
+                        onchange: function(N, T) { _this.onChange(N, T) },
+                        onJSONdata : function (D, T) { return _this.onJSONData(D, T) }
                     }
                 };
 

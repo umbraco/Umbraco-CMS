@@ -38,6 +38,7 @@ jQuery(document).ready(function() {
 			UmbClientMgr.mainWindow("umbraco.aspx");
 		}
 	});
+	
 });	
 
 </script>

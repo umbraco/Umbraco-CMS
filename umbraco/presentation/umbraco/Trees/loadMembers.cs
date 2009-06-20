@@ -192,7 +192,7 @@ function openContentItem(id) {
                 {
                     XmlElement treeElement = Tree.CreateElement("tree");
                     treeElement.SetAttribute("menu", "");
-                    treeElement.SetAttribute("nodeID", "1002");
+                    treeElement.SetAttribute("nodeID", i.ToString());
                     treeElement.SetAttribute("text", ((char)i).ToString());
                     treeElement.SetAttribute("action", "javascript:viewMembers('" + ((char)i).ToString() + "');");
 
@@ -216,7 +216,7 @@ function openContentItem(id) {
                 {
                     XmlElement treeElementOther = Tree.CreateElement("tree");
                     treeElementOther.SetAttribute("menu", "");
-                    treeElementOther.SetAttribute("nodeID", "1002");
+                    treeElementOther.SetAttribute("nodeID", "Others");
                     treeElementOther.SetAttribute("text", "Others");
                     treeElementOther.SetAttribute("action", "javascript:viewMembers('#');");
                     treeElementOther.SetAttribute("src", "");
