@@ -14,6 +14,15 @@ namespace umbraco.presentation
         private HttpContext m_HttpContext;
 
         /// <summary>
+        /// Creates a new Umbraco context.
+        /// </summary>
+        /// <param name="httpContext">The HTTP context on which the Umbraco context operates.</param>
+        public UmbracoContext(HttpContext httpContext)
+        {
+            m_HttpContext = httpContext;
+        }
+
+        /// <summary>
         /// Gets the current Umbraco Context.
         /// </summary>
         public static UmbracoContext Current
@@ -88,23 +97,14 @@ namespace umbraco.presentation
         }
 
         /// <summary>
-        /// Creates a new Umbraco context.
-        /// </summary>
-        /// <param name="httpContext">The HTTP context on which the Umbraco context operates.</param>
-        public UmbracoContext(HttpContext httpContext)
-        {
-            m_HttpContext = httpContext;
-        }
-
-        /// <summary>
         /// Gets the response for the current context
         /// </summary>
         /// <value>The response.</value>
-        public HttpResponse Response
+        public virtual UmbracoResponse Response
         {
             get
             {
-                return this.m_HttpContext.Response;
+                return new UmbracoResponse(this.m_HttpContext.Response);
             }
         }
 
@@ -112,12 +112,21 @@ namespace umbraco.presentation
         /// Gets the request for the current context
         /// </summary>
         /// <value>The request.</value>
-        public HttpRequest Request
+        public virtual UmbracoRequest Request
         {
             get
             {
-                return this.m_HttpContext.Request;
+                return new UmbracoRequest(this.m_HttpContext.Request);
             }
+        }
+
+        /// <summary>
+        /// Gets the base URL.
+        /// </summary>
+        /// <returns></returns>
+        public virtual string GetBaseUrl()
+        {
+            return this.Request.Url.GetLeftPart(UriPartial.Authority);
         }
     }
 }

@@ -27,6 +27,7 @@ namespace umbraco.presentation.umbraco.dialogs
             cb.GenerateCode();
             cb.Save(UmbracoContext.Current.Response.OutputStream);
             UmbracoContext.Current.Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", dataContextName));
+            UmbracoContext.Current.Response.ContentType = "application/octet-stream";
             UmbracoContext.Current.Response.End();
         }
     }

@@ -114,6 +114,11 @@
     <Reference Include="System.Web">
       <Name>System.Web</Name>
     </Reference>
+    <Reference Include="System.Web.Abstractions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\System.Web.Abstractions.dll</HintPath>
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -323,6 +328,12 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbracoPageHolder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UmbracoRequest.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UmbracoResponse.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco\ActionHandlers\umbEnsureUniqueName.cs">
@@ -1523,6 +1534,7 @@
     <Compile Include="umbraco_client\tinymce3\plugins\spellchecker\SpellCheckerInput.cs" />
     <Compile Include="umbraco_client\tinymce3\plugins\spellchecker\SpellCheckerResult.cs" />
     <Compile Include="viewstateMoverModule.cs" />
+    <Compile Include="VirtualPathProviders\DocType.cs" />
     <Compile Include="Web References\org.umbraco.update\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -3472,10 +3484,6 @@
     <None Include="Web.oldconfig" />
     <EmbeddedResource Include="default.aspx.resx">
       <DependentUpon>default.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Global.asax.resx">
-      <DependentUpon>Global.asax.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="install\default.aspx.resx">

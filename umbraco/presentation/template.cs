@@ -163,9 +163,8 @@ namespace umbraco {
             Control pageContent = new Control();
 
             bool stop = false;
-            bool debugMode = false;
-            if (GlobalSettings.DebugMode && (helper.Request("umbdebugshowtrace") != "" || helper.Request("umbdebug") != ""))
-                debugMode = true;
+            bool debugMode = umbraco.presentation.UmbracoContext.Current.Request.IsDebug;
+            
             while (!stop) {
                 System.Web.HttpContext.Current.Trace.Write("template", "Begining of parsing rutine...");
                 int tagIndex = tempOutput.ToString().ToLower().IndexOf("<?umbraco");

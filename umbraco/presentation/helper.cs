@@ -25,6 +25,7 @@ namespace umbraco
             return umbraco.BasePages.UmbracoEnsuredPage.CurrentUser;
         }
 
+        [Obsolete("Use umbraco.Presentation.UmbracoContext.Current.Request[key]",false)]
         public static string Request(string text)
         {
             string temp = string.Empty;
@@ -181,15 +182,11 @@ namespace umbraco
              */
         }
 
-        
-
-
-
+        [Obsolete("Use umbraco.presentation.UmbracContext.Current.GetBaseUrl()")]
         public static string GetBaseUrl(HttpContext Context)
         {
             return Context.Request.Url.GetLeftPart(UriPartial.Authority);
         }
-
     }
 
     /// <summary>
