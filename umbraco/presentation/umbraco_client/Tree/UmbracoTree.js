@@ -836,7 +836,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         rtl: false,
                         animation: false,
                         hover_mode: true,
-                        theme_path: "/umbraco_client/Tree/Themes/",
+                        //theme_path: "/umbraco_client/Tree/Themes/",
                         theme_name: "umbraco",
                         context: null //no context menu by default						
                     },
@@ -846,7 +846,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     },
                     rules: {
                         metadata: "umb:nodedata",
-                        creatable: "none"
+                        creatable: "none",
+                        draggable   : "none"
                     },
                     callback: {
                         //wrapped functions maintain scope in callback
