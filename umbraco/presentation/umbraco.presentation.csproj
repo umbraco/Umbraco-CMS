@@ -1,6 +1,6 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{651E1350-91B6-44B7-BD60-7207006D7003}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -354,8 +354,8 @@
       <DependentUpon>editContent.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\actions\preview.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
       <DependentUpon>preview.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco\actions\preview.aspx.designer.cs">
       <DependentUpon>preview.aspx</DependentUpon>
@@ -667,8 +667,8 @@
       <DependentUpon>Boost.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\developer\Packages\BrowseRepository.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
       <DependentUpon>BrowseRepository.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco\developer\Packages\BrowseRepository.aspx.designer.cs">
       <DependentUpon>BrowseRepository.aspx</DependentUpon>
@@ -689,8 +689,8 @@
       <DependentUpon>editPackage.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\developer\Packages\installedPackage.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
       <DependentUpon>installedPackage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco\developer\Packages\installedPackage.aspx.designer.cs">
       <DependentUpon>installedPackage.aspx</DependentUpon>
@@ -710,8 +710,8 @@
       <DependentUpon>SubmitPackage.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\developer\Python\editPython.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
       <DependentUpon>editPython.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco\developer\Python\editPython.aspx.designer.cs">
       <DependentUpon>editPython.aspx</DependentUpon>
@@ -798,8 +798,8 @@
       <DependentUpon>editMacro.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\dialogs\emptyTrashcan.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
       <DependentUpon>emptyTrashcan.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco\dialogs\emptyTrashcan.aspx.designer.cs">
       <DependentUpon>emptyTrashcan.aspx</DependentUpon>
@@ -1199,8 +1199,8 @@
       <DependentUpon>publishStatus.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\reindex.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
       <DependentUpon>reindex.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco\reindex.aspx.designer.cs">
       <DependentUpon>reindex.aspx</DependentUpon>

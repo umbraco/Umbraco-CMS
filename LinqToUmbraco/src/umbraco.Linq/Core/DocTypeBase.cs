@@ -64,9 +64,13 @@ namespace umbraco.Linq.Core
             {
                 var attr = ReflectionAssistance.GetumbracoInfoAttribute(p);
 
-                var data = xml.Elements("data").Single(x => (string)x.Attribute("alias") == attr.Alias);
+                var data = xml.Elements("data").Single(x => (string)x.Attribute("alias") == attr.Alias).Value;
+                if (p.PropertyType == typeof(int) && string.IsNullOrEmpty(data))
+                {
+                    data = "-1";
+                }
                 // TODO: Address how Convert.ChangeType works in globalisation
-                p.SetValue(this, Convert.ChangeType(data.Value, p.PropertyType), null);
+                p.SetValue(this, Convert.ChangeType(data, p.PropertyType), null);
             }
         }
 

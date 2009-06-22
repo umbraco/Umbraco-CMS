@@ -85,7 +85,7 @@ namespace umbraco.Linq.Core.Node
         /// Initializes a new instance of the <see cref="NodeDataProvider"/> class using umbraco settings as XML path
         /// </summary>
         public NodeDataProvider()
-            : this(System.Web.HttpContext.Current.Server.MapPath(umbraco.GlobalSettings.Path))
+            : this(umbraco.presentation.UmbracoContext.Current.Server.MapPath(umbraco.presentation.UmbracoContext.Current.Server.ContentXmlPath))
         {
         }
 

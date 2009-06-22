@@ -3,14 +3,51 @@ using System.Web;
 using umbraco.presentation.LiveEditing;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
+using System.Xml.Linq;
 
 namespace umbraco.presentation
 {
+    public class UmbracoServerUtility : HttpServerUtilityWrapper
+    {
+        private HttpServerUtility m_Server;
+
+        public UmbracoServerUtility(HttpServerUtility server) : base(server)
+        {
+            m_Server = server;
+        }
+
+        public string UmbracoPath
+        {
+            get
+            {
+                return GlobalSettings.Path;
+            }
+        }
+
+        public string ContentXmlPath
+        {
+            get
+            {
+                return GlobalSettings.ContentXML;
+            }
+        }
+
+        public XDocument ContentXml
+        {
+            get
+            {
+                return XDocument.Load(this.ContentXmlPath);
+            }
+        }
+    }
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request.
     /// </summary>
     public class UmbracoContext
     {
+        private UmbracoServerUtility m_Server;
+        private UmbracoRequest m_Request;
+        private UmbracoResponse m_Response;
         private HttpContext m_HttpContext;
 
         /// <summary>
@@ -104,7 +141,11 @@ namespace umbraco.presentation
         {
             get
             {
-                return new UmbracoResponse(this.m_HttpContext.Response);
+                if (m_Response == null)
+                {
+                    m_Response = new UmbracoResponse(this.m_HttpContext.Response); 
+                }
+                return m_Response;
             }
         }
 
@@ -116,7 +157,11 @@ namespace umbraco.presentation
         {
             get
             {
-                return new UmbracoRequest(this.m_HttpContext.Request);
+                if (m_Request == null)
+                {
+                    m_Request = new UmbracoRequest(this.m_HttpContext.Request); 
+                }
+                return m_Request;
             }
         }
 
@@ -127,6 +172,18 @@ namespace umbraco.presentation
         public virtual string GetBaseUrl()
         {
             return this.Request.Url.GetLeftPart(UriPartial.Authority);
+        }
+
+        public virtual UmbracoServerUtility Server
+        {
+            get
+            {
+                if (m_Server == null)
+                {
+                    m_Server = new UmbracoServerUtility(this.m_HttpContext.Server);
+                }
+                return m_Server;
+            }
         }
     }
 }
