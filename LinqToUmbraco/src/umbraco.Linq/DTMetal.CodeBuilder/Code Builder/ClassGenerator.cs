@@ -548,6 +548,7 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
                 CodeMemberProperty p = new CodeMemberProperty();
                 p.Type = new CodeTypeReference(retyper.MemberType);
                 p.Name = retyper.MemberName(docTypeProperty.TypeName);
+                p.Attributes = MemberAttributes.Public;
                 p.HasGet = true;
                 p.HasSet = false;
 
