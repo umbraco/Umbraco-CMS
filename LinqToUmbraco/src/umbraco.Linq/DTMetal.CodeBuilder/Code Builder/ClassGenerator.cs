@@ -14,6 +14,7 @@ using System.Globalization;
 using System.Reflection;
 using umbraco.Linq.DTMetal.CodeBuilder.DataType;
 using VB = Microsoft.VisualBasic;
+using System.Text.RegularExpressions;
 
 namespace umbraco.Linq.DTMetal.CodeBuilder
 {
@@ -135,7 +136,7 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
 
             using (var sw = new StreamWriter(stream))
             {
-                this.Args.Provider.GenerateCodeFromCompileUnit(this.Code, sw, options); 
+                this.Args.Provider.GenerateCodeFromCompileUnit(this.Code, sw, options);
             }
         }
 
@@ -725,6 +726,7 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
 
             var invalids = new string[] { "_", "-", ".", "$", "@", "*" };
 
+            input = Regex.Replace(input, "([A-Z])", " $1", RegexOptions.Compiled);
             input = input.Trim().ToLower();
 
             foreach (var i in invalids)
@@ -736,7 +738,6 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
 
             var correctCasedAsArray = correctCasedInput.Split(' ').Where(s => !string.IsNullOrEmpty(s));
 
-            //var firstItem = correctCasedAsArray[0];
             StringBuilder ret = new StringBuilder();
             var foundChar = false;
             foreach (var item in correctCasedAsArray)
