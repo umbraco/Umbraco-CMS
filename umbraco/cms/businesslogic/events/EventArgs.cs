@@ -39,5 +39,12 @@ namespace umbraco.cms.businesslogic {
     public class RemoveMemberShipUserFromDocumentEventArgs : System.ComponentModel.CancelEventArgs { }
     public class AddMembershipUserToDocumentEventArgs : System.ComponentModel.CancelEventArgs { }
 
-
+    //Document Events Arguments
+    public class DocumentNewingEventArgs : System.ComponentModel.CancelEventArgs
+    {
+        public string Text { get; internal set; }
+        public umbraco.BusinessLogic.User User { get; internal set; }
+        public umbraco.cms.businesslogic.web.DocumentType DocumentType { get; internal set; }
+        public int ParentId { get; internal set; }
+    }
 }

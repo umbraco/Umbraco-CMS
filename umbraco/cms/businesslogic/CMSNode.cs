@@ -81,6 +81,10 @@ namespace umbraco.cms.businesslogic {
             get { return Application.SqlHelper; }
         }
 
+        public CMSNode()
+        {
+            throw new NotSupportedException();
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CMSNode"/> class.

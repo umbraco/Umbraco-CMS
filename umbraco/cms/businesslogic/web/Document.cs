@@ -12,6 +12,10 @@ using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.relation;
 using umbraco.cms.helpers;
 using umbraco.DataLayer;
+using System.Collections.Generic;
+using umbraco.cms.businesslogic.propertytype;
+using System.Linq;
+using System.ComponentModel;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -33,6 +37,7 @@ namespace umbraco.cms.businesslogic.web
         private XmlNode _xml;
         private User _creator;
         private User _writer;
+        private bool _optimizedMode;
 
         // special for passing httpcontext object
         private HttpContext _httpContext;
@@ -347,11 +352,15 @@ namespace umbraco.cms.businesslogic.web
             setupDocument();
         }
 
-        public Document(bool OptimizedMode, int id) : base(id, true)
+        public Document(bool OptimizedMode, int id) : base(id, OptimizedMode)
         {
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(
-                                        @"
+            this._optimizedMode = OptimizedMode;
+
+            if (OptimizedMode)
+            {
+                using (IRecordsReader dr =
+                        SqlHelper.ExecuteReader(
+                                                @"
                 Select 
 	                (select count(id) from umbracoNode where parentId = @id) as Children, 
 	                (select Count(published) as tmp from cmsDocument where published = 1 And nodeId = @id) as Published,
@@ -382,46 +391,52 @@ namespace umbraco.cms.businesslogic.web
                 order by
 	                cmsContentVersion.id desc
                 ",
-            SqlHelper.CreateParameter("@id", id)))
-            {
-                if (dr.Read())
+                    SqlHelper.CreateParameter("@id", id)))
                 {
-                    // Initialize node and basic document properties
-                    bool _hc = false;
-                    if (dr.GetInt("children") > 0)
-                        _hc = true;
-                    SetupDocumentForTree(dr.GetGuid("uniqueId"), dr.GetShort("level"),
-                                         dr.GetInt("parentId"), dr.GetInt("documentUser"),
-                                         dr.GetBoolean("published"),
-                                         dr.GetString("path"), dr.GetString("text"),
-                                         dr.GetDateTime("createDate"),
-                                         dr.GetDateTime("updateDate"),
-                                         dr.GetDateTime("versionDate"), dr.GetString("icon"), _hc);
+                    if (dr.Read())
+                    {
+                        // Initialize node and basic document properties
+                        bool _hc = false;
+                        if (dr.GetInt("children") > 0)
+                            _hc = true;
+                        SetupDocumentForTree(dr.GetGuid("uniqueId"), dr.GetShort("level"),
+                                             dr.GetInt("parentId"), dr.GetInt("documentUser"),
+                                             dr.GetBoolean("published"),
+                                             dr.GetString("path"), dr.GetString("text"),
+                                             dr.GetDateTime("createDate"),
+                                             dr.GetDateTime("updateDate"),
+                                             dr.GetDateTime("versionDate"), dr.GetString("icon"), _hc);
 
-                    // initialize content object
-                    InitializeContent(dr.GetInt("ContentType"), dr.GetGuid("versionId"),
-                                      dr.GetDateTime("versionDate"), dr.GetString("icon"));
+                        // initialize content object
+                        InitializeContent(dr.GetInt("ContentType"), dr.GetGuid("versionId"),
+                                          dr.GetDateTime("versionDate"), dr.GetString("icon"));
 
-                    // initialize final document properties
-                    DateTime tmpReleaseDate = new DateTime();
-                    DateTime tmpExpireDate = new DateTime();
-                    if (!dr.IsNull("releaseDate"))
-                        tmpReleaseDate = dr.GetDateTime("releaseDate");
-                    if (!dr.IsNull("expireDate"))
-                        tmpExpireDate = dr.GetDateTime("expireDate");
+                        // initialize final document properties
+                        DateTime tmpReleaseDate = new DateTime();
+                        DateTime tmpExpireDate = new DateTime();
+                        if (!dr.IsNull("releaseDate"))
+                            tmpReleaseDate = dr.GetDateTime("releaseDate");
+                        if (!dr.IsNull("expireDate"))
+                            tmpExpireDate = dr.GetDateTime("expireDate");
 
-                    InitializeDocument(
-                        new User(dr.GetInt("nodeUser"), true),
-                        new User(dr.GetInt("documentUser"), true),
-                        dr.GetString("documentText"),
-                        dr.GetInt("templateId"),
-                        tmpReleaseDate,
-                        tmpExpireDate,
-                        dr.GetDateTime("updateDate"),
-                        dr.GetBoolean("published")
-                        );
+                        InitializeDocument(
+                            new User(dr.GetInt("nodeUser"), true),
+                            new User(dr.GetInt("documentUser"), true),
+                            dr.GetString("documentText"),
+                            dr.GetInt("templateId"),
+                            tmpReleaseDate,
+                            tmpExpireDate,
+                            dr.GetDateTime("updateDate"),
+                            dr.GetBoolean("published")
+                            );
+                    } 
                 }
             }
+        }
+
+        public Document()
+        {
+
         }
 
         /// <summary>
@@ -433,6 +448,20 @@ namespace umbraco.cms.businesslogic.web
             FireBeforeSave(e);
 
             if (!e.Cancel) {
+
+                if (this._optimizedMode)
+                {
+                    
+
+                    //I'd like to see this work by making a single SQL query
+                    //all in due time ;)
+                    foreach (var property in this._knownProperties)
+                    {
+                        var pt = property.Key;
+                        pt.Value = property.Value;
+                    }
+                }
+
                 base.Save();
                 Index(true);
                 FireAfterSave(e);
@@ -683,13 +712,29 @@ namespace umbraco.cms.businesslogic.web
         /// <returns>The newly created document</returns>
         public static Document MakeNew(string Name, DocumentType dct, User u, int ParentId)
         {
+            //allows you to cancel a document before anything goes to the DB
+            var newingArgs = new DocumentNewingEventArgs()
+            {
+                Text = Name,
+                DocumentType = dct,
+                User = u,
+                ParentId = ParentId
+            };
+            Document.Newing(null, newingArgs);
+            if (newingArgs.Cancel)
+            {
+                return null;
+            }
+
+            
             Guid newId = Guid.NewGuid();
+            Document tmp = new Document(newId, true);
+            
             // Updated to match level from base node
             CMSNode n = new CMSNode(ParentId);
             int newLevel = n.Level;
             newLevel++;
             MakeNew(ParentId, _objectType, u.Id, newLevel, Name, newId);
-            Document tmp = new Document(newId, true);
             tmp.CreateContent(dct);
             SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, Text) values (1, " +
                                       tmp.Id + ", 0, " +
@@ -1343,6 +1388,16 @@ order by umbracoNode.sortOrder
                 New(this, e);
         }
 
+        //TODO: Slace - Document this
+        public static event EventHandler<DocumentNewingEventArgs> Newing;
+        protected virtual void OnNewing(DocumentNewingEventArgs e)
+        {
+            if (Newing != null)
+            {
+                Newing(this, e);
+            }
+        }
+
         /// <summary>
         /// Occurs when [before delete].
         /// </summary>
@@ -1556,6 +1611,48 @@ order by umbracoNode.sortOrder
             if (AfterAddToIndex != null)
                 AfterAddToIndex(this, e);
         }
+
+        private Dictionary<Property, object> _knownProperties;
+        private Func<KeyValuePair<Property, object>, string, bool> propertyTypeByAlias = (pt, alias) => pt.Key.PropertyType.Alias == alias;
+        public object this[string alias]
+        {
+            get
+            {
+                if (this._optimizedMode)
+                {
+                    if (this._knownProperties == null) this._knownProperties = new Dictionary<Property, object>();
+
+                    return this._knownProperties.Single(p => propertyTypeByAlias(p, alias)).Value;
+                }
+                else
+                {
+                    return this.getProperty(alias).Value;
+                }
+            }
+            set
+            {
+                if (this._optimizedMode)
+                {
+                    if (this._knownProperties == null) this._knownProperties = new Dictionary<Property, object>();
+
+                    if (this._knownProperties.SingleOrDefault(p => propertyTypeByAlias(p, alias)).Key == null)
+                    {
+                        var pt = this.getProperty(alias);
+
+                        this._knownProperties.Add(pt, pt.Value);
+                    }
+                    else
+                    {
+                        var pt = this._knownProperties.Single(p => propertyTypeByAlias(p, alias)).Key;
+                        this._knownProperties[pt] = value;
+                    }
+                }
+                else
+                {
+                    this.getProperty(alias).Value = value;
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -1614,6 +1711,5 @@ order by umbracoNode.sortOrder
             _text = Text;
             _user = User;
         }
-
     }
 }

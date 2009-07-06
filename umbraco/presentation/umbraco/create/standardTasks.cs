@@ -747,8 +747,17 @@ namespace umbraco
         {
             cms.businesslogic.web.DocumentType dt = new cms.businesslogic.web.DocumentType(TypeID);
             cms.businesslogic.web.Document d = cms.businesslogic.web.Document.MakeNew(Alias, dt, BusinessLogic.User.GetUser(_userID), ParentID);
-            _returnUrl = "editContent.aspx?id=" + d.Id.ToString() + "&isNew=true";
-            return true;
+            if (d == null)
+            {
+                //TODO: This should do some kind of notification to the user. The Page object would be nice about now! :P
+                BasePage.Current.ClientTools.ShowSpeechBubble(BasePage.speechBubbleIcon.error, "Document Creation", "Document creation was canceled");
+                return false;
+            }
+            else
+            {
+                _returnUrl = "editContent.aspx?id=" + d.Id.ToString() + "&isNew=true";
+                return true; 
+            }
         }
 
         public bool Delete()

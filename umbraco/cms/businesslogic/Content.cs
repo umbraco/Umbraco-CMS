@@ -32,6 +32,11 @@ namespace umbraco.cms.businesslogic
         private bool _propertiesInitialized = false;
         private Properties _properties = new Properties();
 
+        public Content()
+        {
+            throw new NotSupportedException();
+        }
+
         /// <summary>
         /// 
         /// </summary>
