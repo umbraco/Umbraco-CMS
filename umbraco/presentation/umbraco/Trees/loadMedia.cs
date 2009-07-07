@@ -51,6 +51,20 @@ namespace umbraco
 						
 		}
 
+		private User m_user;
+
+		/// <summary>
+		/// Returns the current User. This ensures that we don't instantiate a new User object 
+		/// each time.
+		/// </summary>
+		protected User CurrentUser
+		{
+			get
+			{
+				return (m_user == null ? (m_user = UmbracoEnsuredPage.CurrentUser) : m_user);
+			}
+		}
+
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {            
 			//TODO: SD: Find out what openMedia does!?
@@ -81,12 +95,15 @@ namespace umbraco
             actions.Add(ActionRefresh.Instance);
         }
 
+		/// <summary>
+		/// If the user is an admin, always return entire tree structure, otherwise
+		/// return the user's start node id.
+		/// </summary>
 		public override int StartNodeID
 		{
 			get
 			{
-				UmbracoEnsuredPage page = new UmbracoEnsuredPage();
-				return page.getUser().StartMediaId;
+				return CurrentUser.StartMediaId;
 			}
 		}
 

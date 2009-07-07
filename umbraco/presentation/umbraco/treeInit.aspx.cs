@@ -21,7 +21,12 @@ namespace umbraco.cms.presentation
     /// </summary>
     public partial class TreeInit : UmbracoEnsuredPage
     {
-		
+
+		protected override void OnLoad(EventArgs e)
+		{
+			base.OnLoad(e);
+			ClientLoader.DataBind();
+		}
 		
     }
 }

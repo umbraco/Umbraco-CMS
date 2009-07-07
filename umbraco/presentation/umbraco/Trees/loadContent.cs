@@ -131,6 +131,10 @@ namespace umbraco
             
         }
 
+		/// <summary>
+		/// If the user is an admin, always return entire tree structure, otherwise
+		/// return the user's start node id.
+		/// </summary>
 		public override int StartNodeID
 		{
 			get

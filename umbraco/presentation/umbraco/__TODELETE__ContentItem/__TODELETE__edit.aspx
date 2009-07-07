@@ -1,4 +1,4 @@
-<%@ Page language="c#" Codebehind="edit.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.edit" %>
+<%@ Page language="c#" Codebehind="__TODELETE__edit.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.edit" %>
 <HTML>
 	<HEAD>
 		<script>

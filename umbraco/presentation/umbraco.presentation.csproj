@@ -415,14 +415,14 @@
     <Compile Include="umbraco\ClientDependencyTest.aspx.designer.cs">
       <DependentUpon>ClientDependencyTest.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\ContentItem\edit.aspx.cs">
-      <DependentUpon>edit.aspx</DependentUpon>
+    <Compile Include="umbraco\__TODELETE__ContentItem\__TODELETE__edit.aspx.cs">
+      <DependentUpon>__TODELETE__edit.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco\ContentItem\edit.aspx.designer.cs">
-      <DependentUpon>edit.aspx</DependentUpon>
+    <Compile Include="umbraco\__TODELETE__ContentItem\__TODELETE__edit.aspx.designer.cs">
+      <DependentUpon>__TODELETE__edit.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\controls\CheckboxTree.cs" />
+    <Compile Include="umbraco\controls\__TODELETE__CheckboxTree.cs" />
     <Compile Include="umbraco\controls\ContentControl.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -2032,7 +2032,7 @@
     <Content Include="umbraco\translation\preview.aspx" />
     <Content Include="umbraco\translation\translationTasks.dtd" />
     <Content Include="umbraco\translation\xml.aspx" />
-    <Content Include="umbraco\ContentItem\edit.aspx" />
+    <Content Include="umbraco\__TODELETE__ContentItem\__TODELETE__edit.aspx" />
     <Content Include="umbraco\controls\ContentTypeControlNew.ascx" />
     <Content Include="umbraco\controls\GenericProperties\GenericProperty.ascx">
       <SubType>UserControl</SubType>
@@ -3514,8 +3514,8 @@
       <DependentUpon>cacheBrowser.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\ContentItem\edit.aspx.resx">
-      <DependentUpon>edit.aspx.cs</DependentUpon>
+    <EmbeddedResource Include="umbraco\__TODELETE__ContentItem\__TODELETE__edit.aspx.resx">
+      <DependentUpon>__TODELETE__edit.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="umbraco\controls\ContentTypeControlNew.ascx.resx">

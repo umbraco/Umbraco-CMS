@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientDependencyInclude.cs" />
+    <Compile Include="ClientDependencyList.cs" />
     <Compile Include="ClientDependencyType.cs" />
     <Compile Include="IClientDependencyFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

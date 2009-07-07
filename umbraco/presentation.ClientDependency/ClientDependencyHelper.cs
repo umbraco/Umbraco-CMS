@@ -127,18 +127,22 @@ namespace umbraco.presentation.ClientDependency
 			service.ProcessDependencies();
         }
 	
+		/// <summary>
+		/// This class is used to find all dependencies for the current request, d
+		/// </summary>
 		internal class ClientDependencyRegistrationService
 		{
 			public ClientDependencyRegistrationService(Control control, ClientDependencyPathCollection paths, ClientDependencyProvider provider)
 			{
 				m_RenderingControl = control;
 				m_Paths = paths;
+				//find all dependencies
 				m_Dependencies = FindDependencies(m_RenderingControl);
 				m_Provider = provider;
 			}
 			
 			private Control m_RenderingControl;
-            private List<IClientDependencyFile> m_Dependencies = new List<IClientDependencyFile>();
+			private ClientDependencyList m_Dependencies = new ClientDependencyList();
 			private ClientDependencyPathCollection m_Paths;
 			private ClientDependencyProvider m_Provider;
 
@@ -147,11 +151,11 @@ namespace umbraco.presentation.ClientDependency
 			/// </summary>
 			/// <param name="control"></param>
 			/// <returns></returns>
-            private List<IClientDependencyFile> FindDependencies(Control control)
+			private ClientDependencyList FindDependencies(Control control)
 			{
 				// find dependencies
 				Type controlType = control.GetType();
-				List<IClientDependencyFile> dependencies = new List<IClientDependencyFile>();
+				ClientDependencyList dependencies = new ClientDependencyList();
 				foreach (Attribute attribute in Attribute.GetCustomAttributes(controlType))
 				{
 					if (attribute is ClientDependencyAttribute)
@@ -166,13 +170,13 @@ namespace umbraco.presentation.ClientDependency
 					if (child.GetType().Equals(typeof(ClientDependencyInclude)))
 					{
 						ClientDependencyInclude include = (ClientDependencyInclude)child;
-						//dependencies.Add(new ClientDependencyAttribute(include.Priority, include.DependencyType, include.FilePath, include.PathName, include.InvokeJavascriptMethodOnLoad, include.CompositeGroupName));
-                        dependencies.Add(include);
-					}
-					else if (child.HasControls())
+						dependencies.Add(include);
+					}				
+					else
 					{
-                        dependencies.AddRange(FindDependencies(child));
-					}					
+						//recurse and de-duplicate!
+						dependencies.UnionWith(FindDependencies(child));
+					}
 				}
 
 				return dependencies;

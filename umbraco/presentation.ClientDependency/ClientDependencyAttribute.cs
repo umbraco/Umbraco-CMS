@@ -35,7 +35,7 @@ namespace umbraco.presentation.ClientDependency
 		/// performance on the client side.
 		/// Though both javascript and css files may have the same group name specified, they will be treated seperately.
 		/// </remarks>
-		public string CompositeGroupName { get; set; }
+		//public string CompositeGroupName { get; set; }
 
 		/// <summary>
 		/// Gets or sets the priority.
@@ -69,6 +69,14 @@ namespace umbraco.presentation.ClientDependency
 		/// <value>The name of the method.</value>
 		public string InvokeJavascriptMethodOnLoad { get; set; }
 
+		public ClientDependencyAttribute(ClientDependencyType dependencyType, string fullFilePath)
+			: this(DefaultPriority, dependencyType, fullFilePath, string.Empty, string.Empty)
+		{ }
+
+		public ClientDependencyAttribute(ClientDependencyType dependencyType, string fileName, string pathNameAlias)
+			: this(DefaultPriority, dependencyType, fileName, pathNameAlias, string.Empty)
+		{ }
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ClientDependencyAttribute"/> class.
 		/// </summary>
@@ -101,25 +109,22 @@ namespace umbraco.presentation.ClientDependency
 		/// <param name="filePath">The file path to the dependency.</param>
 		/// <param name="appendUmbracoPath">if set to <c>true</c> the current umbraco path will be prefixed to the filePath.</param>
 		/// <param name="invokeJavascriptMethodOnLoad">The name of the Javascript method to invoke when the dependency is loaded.</param>
-        public ClientDependencyAttribute(int priority, ClientDependencyType dependencyType, string fileName, string pathNameAlias, string invokeJavascriptMethodOnLoad)
-            : this(priority, dependencyType, fileName, pathNameAlias, invokeJavascriptMethodOnLoad, string.Empty)
-        { }
+		public ClientDependencyAttribute(int priority, ClientDependencyType dependencyType, string fileName, string pathNameAlias, string invokeJavascriptMethodOnLoad)
+		{
+			if (String.IsNullOrEmpty(fileName))
+				throw new ArgumentNullException("fileName");
 
-        public ClientDependencyAttribute(int priority, ClientDependencyType dependencyType, string fileName, string pathNameAlias, string invokeJavascriptMethodOnLoad, string compositeGroupName)
-        {
-            if (String.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException("fileName");
-
-            Priority = priority;
+			Priority = priority;
 
 
-            FilePath = fileName;
-            PathNameAlias = pathNameAlias;
-            CompositeGroupName = compositeGroupName;
+			FilePath = fileName;
+			PathNameAlias = pathNameAlias;
+			//CompositeGroupName = compositeGroupName;
 
-            DependencyType = dependencyType;
-            InvokeJavascriptMethodOnLoad = invokeJavascriptMethodOnLoad ?? string.Empty;
-        }
+			DependencyType = dependencyType;
+			InvokeJavascriptMethodOnLoad = invokeJavascriptMethodOnLoad ?? string.Empty;
+		}
+        
 	}
 
 	

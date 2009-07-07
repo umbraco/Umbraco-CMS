@@ -25,20 +25,17 @@
 	</umb:ClientDependencyLoader>
 	
 	<umb:ClientDependencyInclude runat="server" ID="ClientDependencyInclude3" DependencyType="Css" FilePath="css/umbracoGui.css" PathNameAlias="UmbracoRoot" />
-	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude1" DependencyType="Css" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />
-		
-	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude4" DependencyType="Javascript" FilePath="Application/NamespaceManager.js" PathNameAlias="UmbracoClient" Priority="0" CompositeGroupName="JSCore" />
-	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude5" DependencyType="Javascript" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" CompositeGroupName="JSCore" />
-	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude6" DependencyType="Javascript" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient" Priority="1" CompositeGroupName="JSAddons" />	
-	
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude1" DependencyType="Css" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />		
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude4" DependencyType="Javascript" FilePath="Application/NamespaceManager.js" PathNameAlias="UmbracoClient" Priority="0" />
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude5" DependencyType="Javascript" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude6" DependencyType="Javascript" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient" Priority="1" />
 	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude7" DependencyType="Javascript" FilePath="modal/modal.js" PathNameAlias="UmbracoClient" />	
-	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude11" DependencyType="Javascript" FilePath="Application/UmbracoApplicationActions.js" PathNameAlias="UmbracoClient" CompositeGroupName="UmbApp" />
-	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude12" DependencyType="Javascript" FilePath="Application/UmbracoUtils.js" PathNameAlias="UmbracoClient" CompositeGroupName="UmbApp" />
-	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude13" DependencyType="Javascript" FilePath="Application/UmbracoClientManager.js" PathNameAlias="UmbracoClient" CompositeGroupName="UmbApp" />
-	
-	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude14" DependencyType="Javascript" FilePath="ui/default.js" PathNameAlias="UmbracoClient" CompositeGroupName="UmbApp" />
-	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude15" DependencyType="Javascript" FilePath="ui/jQueryWresize.js" PathNameAlias="UmbracoClient" CompositeGroupName="UmbApp" />	
-	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude9" DependencyType="Javascript" FilePath="js/guiFunctions.js" PathNameAlias="UmbracoRoot" CompositeGroupName="UmbApp" />
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude11" DependencyType="Javascript" FilePath="Application/UmbracoApplicationActions.js" PathNameAlias="UmbracoClient" />
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude12" DependencyType="Javascript" FilePath="Application/UmbracoUtils.js" PathNameAlias="UmbracoClient" />
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude13" DependencyType="Javascript" FilePath="Application/UmbracoClientManager.js" PathNameAlias="UmbracoClient" />	
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude14" DependencyType="Javascript" FilePath="ui/default.js" PathNameAlias="UmbracoClient" />
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude15" DependencyType="Javascript" FilePath="ui/jQueryWresize.js" PathNameAlias="UmbracoClient" />	
+	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude9" DependencyType="Javascript" FilePath="js/guiFunctions.js" PathNameAlias="UmbracoRoot" />	
 	<umb:ClientDependencyInclude runat="server" id="ClientDependencyInclude10" DependencyType="Javascript" FilePath="js/language.aspx" PathNameAlias="UmbracoRoot" />
 	
 	
