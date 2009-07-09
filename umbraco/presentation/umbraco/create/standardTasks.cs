@@ -749,7 +749,7 @@ namespace umbraco
             cms.businesslogic.web.Document d = cms.businesslogic.web.Document.MakeNew(Alias, dt, BusinessLogic.User.GetUser(_userID), ParentID);
             if (d == null)
             {
-                //TODO: This should do some kind of notification to the user. The Page object would be nice about now! :P
+                //TODO: Slace - Fix this to use the language files
                 BasePage.Current.ClientTools.ShowSpeechBubble(BasePage.speechBubbleIcon.error, "Document Creation", "Document creation was canceled");
                 return false;
             }

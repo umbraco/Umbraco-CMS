@@ -46,6 +46,18 @@ namespace umbraco.cms.businesslogic.web
         private int _userId = -1;
 
         /// <summary>
+        /// Gets a value indicating whether the document was constructed for the optimized mode
+        /// </summary>
+        /// <value><c>true</c> if the document is working in the optimized mode; otherwise, <c>false</c>.</value>
+        public bool OptimizedMode
+        {
+            get
+            {
+                return this._optimizedMode;
+            }
+        }
+
+        /// <summary>
         /// The id of the user whom created the document
         /// </summary>
         public int UserId
@@ -451,10 +463,6 @@ namespace umbraco.cms.businesslogic.web
 
                 if (this._optimizedMode)
                 {
-                    
-
-                    //I'd like to see this work by making a single SQL query
-                    //all in due time ;)
                     foreach (var property in this._knownProperties)
                     {
                         var pt = property.Key;
@@ -728,13 +736,13 @@ namespace umbraco.cms.businesslogic.web
 
             
             Guid newId = Guid.NewGuid();
-            Document tmp = new Document(newId, true);
             
             // Updated to match level from base node
             CMSNode n = new CMSNode(ParentId);
             int newLevel = n.Level;
             newLevel++;
             MakeNew(ParentId, _objectType, u.Id, newLevel, Name, newId);
+            Document tmp = new Document(newId, true);
             tmp.CreateContent(dct);
             SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, Text) values (1, " +
                                       tmp.Id + ", 0, " +
@@ -1355,7 +1363,7 @@ order by umbracoNode.sortOrder
         /// Raises the <see cref="E:BeforeSave"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeSave(SaveEventArgs e) {
+        protected internal new virtual void FireBeforeSave(SaveEventArgs e) {
             if (BeforeSave != null) {
                 BeforeSave(this, e);       }
         }

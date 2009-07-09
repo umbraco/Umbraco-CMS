@@ -12,6 +12,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.uicontrols;
 using Content = umbraco.cms.businesslogic.Content;
+using System.Linq;
 
 namespace umbraco.controls
 {
@@ -38,7 +39,8 @@ namespace umbraco.controls
         private static string _UmbracoPath = GlobalSettings.Path;
         public Pane PropertiesPane = new Pane();
 
-        public Content ContentObject {
+        public Content ContentObject
+        {
             get { return _content; }
         }
 
@@ -153,6 +155,17 @@ namespace umbraco.controls
 
         private void saveClick(object Sender, ImageClickEventArgs e)
         {
+            var doc = this._content as Document;
+            if (doc != null)
+            {
+                var docArgs = new SaveEventArgs();
+                doc.FireBeforeSave(docArgs);
+
+                if (docArgs.Cancel) //TODO: need to have some notification to the user here
+                {
+                    return;
+                }
+            }
             foreach (IDataEditor df in _dataFields)
             {
                 df.Save();
