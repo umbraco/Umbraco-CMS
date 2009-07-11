@@ -153,11 +153,33 @@ namespace umbraco.presentation.developer.packages
                     lt_files.Text += "<li>" + str + "</li>";
                 }
             }
-            else
+
+            if (p.ContainsMacroConflict)
             {
-                pp_unsecureFiles.Visible = false;
+                pp_macroConflicts.Visible = true;
+                foreach (var alias in p.ConflictingMacroAliases)
+                {
+                    ltrMacroAlias.Text += "<li>" + alias + "</li>";
+                }
             }
 
+            if (p.ContainsTemplateConflicts)
+            {
+                pp_templateConflicts.Visible = true;
+                foreach (var alias in p.ConflictingTemplateAliases)
+                {
+                    ltrTemplateAlias.Text += "<li>" + alias + "</li>";
+                }
+            }
+
+            if (p.ContainsStyleSheeConflicts)
+            {
+                pp_stylesheetConflicts.Visible = true;
+                foreach (var alias in p.ConflictingStyleSheetNames)
+                {
+                    ltrStylesheetNames.Text += "<li>" + alias + "</li>";
+                }
+            }
 
             LabelName.Text = p.Name + " Version: " + p.Version;
             LabelMore.Text = "<a href=\"" + p.Url + "\" target=\"_blank\">" + p.Url + "</a>";

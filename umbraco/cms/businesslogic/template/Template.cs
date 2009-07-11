@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic.cache;
+using umbraco.BusinessLogic;
 
 namespace umbraco.cms.businesslogic.template
 {
@@ -69,7 +70,8 @@ namespace umbraco.cms.businesslogic.template
             SaveEventArgs e = new SaveEventArgs();
             FireBeforeSave(e);
 
-            if (!e.Cancel) {
+            if (!e.Cancel)
+            {
                 FlushCache();
                 base.Save();
                 FireAfterSave(e);
@@ -166,7 +168,7 @@ namespace umbraco.cms.businesslogic.template
 
                 SqlHelper.ExecuteNonQuery("Update cmsTemplate set alias = @alias where NodeId = " + this.Id, SqlHelper.CreateParameter("@alias", _alias));
                 _templateAliasesInitialized = false;
-                
+
                 initTemplateAliases();
             }
 
@@ -247,7 +249,8 @@ namespace umbraco.cms.businesslogic.template
         /// <summary>
         /// Removes any references to this templates from child templates
         /// </summary>
-        public void RemoveAllReferences() {
+        public void RemoveAllReferences()
+        {
             if (HasChildren)
             {
                 foreach (Template t in Template.GetAllAsList().FindAll(delegate(Template t) { return t.MasterTemplate == this.Id; }))
@@ -257,15 +260,18 @@ namespace umbraco.cms.businesslogic.template
             }
         }
 
-        public static Template MakeNew(string Name, BusinessLogic.User u, Template master) {
+        public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
+        {
             Template t = MakeNew(Name, u);
             t.MasterTemplate = master.Id;
             t.Design = "";
 
-            if (UmbracoSettings.UseAspNetMasterPages) {
+            if (UmbracoSettings.UseAspNetMasterPages)
+            {
                 string design = t.getMasterPageHeader() + "\n";
 
-                foreach (string cpId in master.contentPlaceholderIds()) {
+                foreach (string cpId in master.contentPlaceholderIds())
+                {
                     design += "<asp:content ContentPlaceHolderId=\"" + cpId + "\" runat=\"server\">\n\t\n</asp:content>\n\n";
                 }
 
@@ -280,7 +286,7 @@ namespace umbraco.cms.businesslogic.template
         {
             // CMSNode MakeNew(int parentId, Guid objectType, int userId, int level, string text, Guid uniqueID)
             CMSNode n = CMSNode.MakeNew(-1, _objectType, u.Id, 1, Name, Guid.NewGuid());
-            Name = Name.Replace("/", ".").Replace("\\","");
+            Name = Name.Replace("/", ".").Replace("\\", "");
 
             if (Name.Length > 100)
                 Name = Name.Substring(0, 95) + "...";
@@ -291,7 +297,7 @@ namespace umbraco.cms.businesslogic.template
                                       SqlHelper.CreateParameter("@alias", Name),
                                       SqlHelper.CreateParameter("@design", ' '),
                                       SqlHelper.CreateParameter("@master", 0));
-            
+
             Template t = new Template(n.Id);
             NewEventArgs e = new NewEventArgs();
             t.OnNew(e);
@@ -358,7 +364,8 @@ namespace umbraco.cms.businesslogic.template
             DeleteEventArgs e = new DeleteEventArgs();
             FireBeforeDelete(e);
 
-            if (!e.Cancel) {
+            if (!e.Cancel)
+            {
                 SqlHelper.ExecuteNonQuery("delete from cmsTemplate where NodeId =" + this.Id);
 
                 // Added to remove template doctype relationship
@@ -395,7 +402,8 @@ namespace umbraco.cms.businesslogic.template
 
         }
 
-        public List<string> contentPlaceholderIds() {
+        public List<string> contentPlaceholderIds()
+        {
             List<string> retVal = new List<string>();
 
             string masterPageFile = this.MasterPageFile;
@@ -404,9 +412,11 @@ namespace umbraco.cms.businesslogic.template
             Regex r = new Regex(pat, RegexOptions.IgnoreCase);
             Match m = r.Match(mp);
 
-            while (m.Success) {
+            while (m.Success)
+            {
                 CaptureCollection cc = m.Groups[3].Captures;
-                foreach (Capture c in cc) {
+                foreach (Capture c in cc)
+                {
                     if (c.Value != "server")
                         retVal.Add(c.Value);
                 }
@@ -415,8 +425,8 @@ namespace umbraco.cms.businesslogic.template
             }
 
             return retVal;
-        } 
-        
+        }
+
 
 
         public string ConvertToMasterPageSyntax(string templateDesign)
@@ -469,11 +479,12 @@ namespace umbraco.cms.businesslogic.template
 
         private string getMasterPageHeader()
         {
-                return String.Format("<%@ Master Language=\"C#\" MasterPageFile=\"~{0}\" AutoEventWireup=\"true\" %>",
-                    currentMasterTemplateFileName()) + Environment.NewLine;
+            return String.Format("<%@ Master Language=\"C#\" MasterPageFile=\"~{0}\" AutoEventWireup=\"true\" %>",
+                currentMasterTemplateFileName()) + Environment.NewLine;
         }
 
-        private string currentMasterTemplateFileName() {
+        private string currentMasterTemplateFileName()
+        {
             if (MasterTemplate != 0)
                 return "/masterpages/" + new Template(MasterTemplate).Alias.Replace(" ", "") + ".master";
             else
@@ -517,17 +528,20 @@ namespace umbraco.cms.businesslogic.template
             //we have a Old Alias if the alias and therefor the masterpage file name has changed...
             //so before we save the new masterfile, we'll clear the old one, so we don't up with 
             //Unused masterpage files
-            if (!string.IsNullOrEmpty(_oldAlias) && _oldAlias != _alias) {
+            if (!string.IsNullOrEmpty(_oldAlias) && _oldAlias != _alias)
+            {
 
                 //Ensure that child templates have the right master masterpage file name
-                if (HasChildren) {
-                    foreach (CMSNode cmn in Children) {
+                if (HasChildren)
+                {
+                    foreach (CMSNode cmn in Children)
+                    {
                         Template t = new Template(cmn.Id);
                         t.SaveAsMasterPage();
                         t.Save();
                     }
                 }
-                
+
                 //then kill the old file.. 
                 string _oldFile = GlobalSettings.FullpathToRoot + "masterpages" + System.IO.Path.DirectorySeparatorChar + _oldAlias.Replace(" ", "") + ".master";
                 if (System.IO.File.Exists(_oldFile))
@@ -537,7 +551,7 @@ namespace umbraco.cms.businesslogic.template
             // save the file in UTF-8
             File.WriteAllText(MasterPageFile, masterPageContent, System.Text.Encoding.UTF8);
 
-            
+
         }
 
         private void getAspNetMasterPageForm(ref string design)
@@ -729,6 +743,24 @@ namespace umbraco.cms.businesslogic.template
         {
             if (AfterDelete != null)
                 AfterDelete(this, e);
+        }
+
+        public static Template Import(XmlNode n, User u)
+        {
+            string alias = xmlHelper.GetNodeValue(n.SelectSingleNode("Alias"));
+
+            Template t = Template.GetByAlias(alias);
+
+            if (t == null)
+            {
+                t = MakeNew(xmlHelper.GetNodeValue(n.SelectSingleNode("Name")), u);
+            }
+
+            t.Alias = alias;
+
+            t.ImportDesign(xmlHelper.GetNodeValue(n.SelectSingleNode("Design")));
+
+            return t;
         }
     }
 }

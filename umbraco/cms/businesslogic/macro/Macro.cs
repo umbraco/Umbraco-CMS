@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
-
+using System.Linq;
 
 namespace umbraco.cms.businesslogic.macro
 {
@@ -215,12 +215,17 @@ namespace umbraco.cms.businesslogic.macro
                 // Add lazy loading
                 if (!m_propertiesLoaded)
                 {
-                    _properties = MacroProperty.GetProperties(Id);
-                    m_propertiesLoaded = true;
+                    LoadProperties();
                 }
                 return _properties;
             }
 		}
+
+        private void LoadProperties()
+        {
+            _properties = MacroProperty.GetProperties(Id);
+            m_propertiesLoaded = true;
+        }
 
 		/// <summary>
 		/// Macro initializer
@@ -237,6 +242,26 @@ namespace umbraco.cms.businesslogic.macro
 			setup();
 		}
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Macro"/> class.
+        /// </summary>
+        /// <param name="alias">The alias.</param>
+        public Macro(string alias)
+        {
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("select macroUseInEditor, macroRefreshRate, macroAlias, macroName, macroScriptType, macroScriptAssembly, macroXSLT, macroPython, macroDontRender, macroCacheByPage, macroCachePersonalized, id from cmsMacro where macroAlias = @alias", SqlHelper.CreateParameter("@alias", alias)))
+            {
+                if (dr.Read())
+                {
+                    PopulateMacroInfo(dr);
+
+                    this.LoadProperties();
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException(string.Format("Alias '{0}' does not match an existing macro", alias));
+                }
+            }
+        }
 
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
@@ -273,65 +298,105 @@ namespace umbraco.cms.businesslogic.macro
             }
         }
 
-        public static Macro Import(XmlNode n) {
+        public static Macro Import(XmlNode n)
+        {
 
-            Macro m = MakeNew(xmlHelper.GetNodeValue(n.SelectSingleNode("name")));
-            try {
-                
+            Macro m = null;
+            string alias = xmlHelper.GetNodeValue(n.SelectSingleNode("alias"));
+            try
+            {
+                //check to see if the macro alreay exists in the system
+                //it's better if it does and we keep using it, alias *should* be unique remember
+                m = new Macro(alias);
+                Macro.GetByAlias(alias);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                m = MakeNew(xmlHelper.GetNodeValue(n.SelectSingleNode("name")));
+            }
 
-                m.Alias = xmlHelper.GetNodeValue(n.SelectSingleNode("alias"));
+            try
+            {
+                m.Alias = alias;
                 m.Assembly = xmlHelper.GetNodeValue(n.SelectSingleNode("scriptAssembly"));
                 m.Type = xmlHelper.GetNodeValue(n.SelectSingleNode("scriptType"));
                 m.Xslt = xmlHelper.GetNodeValue(n.SelectSingleNode("xslt"));
                 m.RefreshRate = int.Parse(xmlHelper.GetNodeValue(n.SelectSingleNode("refreshRate")));
-                try {
+                try
+                {
                     m.UseInEditor = bool.Parse(xmlHelper.GetNodeValue(n.SelectSingleNode("useInEditor")));
-                } catch (Exception macroExp) {
+                }
+                catch (Exception macroExp)
+                {
                     BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, BusinessLogic.User.GetUser(0), -1, "Error creating macro property: " + macroExp.ToString());
                 }
 
                 // macro properties
-                foreach (XmlNode mp in n.SelectNodes("properties/property")) {
-                    try {
-                        cms.businesslogic.macro.MacroProperty.MakeNew(
-                            m,
-                            bool.Parse(mp.Attributes.GetNamedItem("show").Value),
-                            mp.Attributes.GetNamedItem("alias").Value,
-                            mp.Attributes.GetNamedItem("name").Value,
-                            new cms.businesslogic.macro.MacroPropertyType(mp.Attributes.GetNamedItem("propertyType").Value)
+                foreach (XmlNode mp in n.SelectNodes("properties/property"))
+                {
+                    try
+                    {
+                        string propertyAlias = mp.Attributes.GetNamedItem("alias").Value;
+                        var property = m.Properties.SingleOrDefault(p => p.Alias == propertyAlias);
+                        if (property != null)
+                        {
+                            property.Public = bool.Parse(mp.Attributes.GetNamedItem("show").Value);
+                            property.Name = mp.Attributes.GetNamedItem("name").Value;
+                            property.Type = new MacroPropertyType(mp.Attributes.GetNamedItem("propertyType").Value);
+
+                            property.Save();
+                        }
+                        else
+                        {
+                            MacroProperty.MakeNew(
+                                m,
+                                bool.Parse(mp.Attributes.GetNamedItem("show").Value),
+                                propertyAlias,
+                                mp.Attributes.GetNamedItem("name").Value,
+                                new MacroPropertyType(mp.Attributes.GetNamedItem("propertyType").Value)
                             );
-                    } catch (Exception macroPropertyExp) {
+                        }
+                    }
+                    catch (Exception macroPropertyExp)
+                    {
                         BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, BusinessLogic.User.GetUser(0), -1, "Error creating macro property: " + macroPropertyExp.ToString());
                     }
                 }
 
                 m.Save();
-            } catch { return null; }
+            }
+            catch { return null; }
 
             return m;
         }
 
 		private void setup() 
 		{
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select macroUseInEditor, macroRefreshRate, macroAlias, macroName, macroScriptType, macroScriptAssembly, macroXSLT, macroPython, macroDontRender, macroCacheByPage, macroCachePersonalized  from cmsMacro where id = @id", SqlHelper.CreateParameter("@id", _id)))
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("select id, macroUseInEditor, macroRefreshRate, macroAlias, macroName, macroScriptType, macroScriptAssembly, macroXSLT, macroPython, macroDontRender, macroCacheByPage, macroCachePersonalized  from cmsMacro where id = @id", SqlHelper.CreateParameter("@id", _id)))
 			{
 				if(dr.Read())
 				{
-					_useInEditor = dr.GetBoolean("macroUseInEditor");
-					_refreshRate = dr.GetInt("macroRefreshRate");
-					_alias = dr.GetString("macroAlias");
-					_name = dr.GetString("macroName");
-					_assembly = dr.GetString("macroScriptAssembly");
-					_type = dr.GetString("macroScriptType");
-					_xslt = dr.GetString("macroXSLT");
-                    _python = dr.GetString("macroPython");
-
-                    _cacheByPage = dr.GetBoolean("macroCacheByPage");
-                    _cachePersonalized = dr.GetBoolean("macroCachePersonalized");
-                    _renderContent = !dr.GetBoolean("macroDontRender");
+                    PopulateMacroInfo(dr);
 				}
 			}
 		}
+
+        private void PopulateMacroInfo(IRecordsReader dr)
+        {
+            _useInEditor = dr.GetBoolean("macroUseInEditor");
+            _refreshRate = dr.GetInt("macroRefreshRate");
+            _alias = dr.GetString("macroAlias");
+            _id = dr.GetInt("id");
+            _name = dr.GetString("macroName");
+            _assembly = dr.GetString("macroScriptAssembly");
+            _type = dr.GetString("macroScriptType");
+            _xslt = dr.GetString("macroXSLT");
+            _python = dr.GetString("macroPython");
+
+            _cacheByPage = dr.GetBoolean("macroCacheByPage");
+            _cachePersonalized = dr.GetBoolean("macroCachePersonalized");
+            _renderContent = !dr.GetBoolean("macroDontRender");
+        }
 
 		/// <summary>
 		/// Get an xmlrepresentation of the macro, used for exporting the macro to a package for distribution
@@ -416,11 +481,12 @@ namespace umbraco.cms.businesslogic.macro
 		/// </summary>
 		/// <param name="Alias">The alias of the macro</param>
 		/// <returns>If the macro with the given alias exists, it returns the macro, else null</returns>
-		public static Macro GetByAlias(string Alias) 
+		[Obsolete("Use the alias constructor")]
+        public static Macro GetByAlias(string Alias) 
 		{
 			try 
 			{
-				return new Macro(SqlHelper.ExecuteScalar<int>("select id from cmsMacro where macroAlias = @alias", SqlHelper.CreateParameter("@alias", Alias)));
+				return new Macro(Alias);
 			} 
 			catch 
 			{

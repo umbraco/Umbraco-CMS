@@ -179,7 +179,7 @@ namespace umbraco.presentation.developer.packages
         protected void saveOrPublish(object sender, CommandEventArgs e) {
 
             if (!Page.IsValid) {
-                base.speechBubble(BasePages.BasePage.speechBubbleIcon.error, "Saved failed.", "Some fields have not been filled-out correctly");
+                this.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.error, "Saved failed.", "Some fields have not been filled-out correctly");
             }
             else
             {
@@ -198,12 +198,9 @@ namespace umbraco.presentation.developer.packages
 
                         packageUmbFile.Text = " &nbsp; <a href='" + pack.PackagePath + "'>Download</a>";
 
-                        if(cms.businesslogic.packager.repositories.Repository.getAll().Count > 0)
-                            bt_submitButton.Visible = true;
-
-                        base.speechBubble(BasePages.BasePage.speechBubbleIcon.success, "Package saved and published", "");
+                        this.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.success, "Package saved and published", "");
                     } else {
-                        base.speechBubble(BasePages.BasePage.speechBubbleIcon.error, "Save failed", "check your umbraco log.");
+                        this.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.error, "Save failed", "check your umbraco log.");
                     }
                 }
             }
@@ -293,7 +290,7 @@ namespace umbraco.presentation.developer.packages
             createdPackage.Save();
 
             if(showNotification)
-                base.speechBubble(BasePages.BasePage.speechBubbleIcon.save, "Package Saved", "");
+                this.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.save, "Package Saved", "");
         }
 
         protected void addFileToPackage(object sender, EventArgs e)

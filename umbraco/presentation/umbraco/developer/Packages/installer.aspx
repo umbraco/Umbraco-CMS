@@ -88,7 +88,7 @@
                 <p>
                     <strong>Please note:</strong> Installing a package containing several items and
                     files can take some time. Do not refresh the page or navigate away before, the installer
-                    notifies you, the install is completed.
+                    notifies you the install is completed.
                 </p>
             </div>
             <cc1:Pane ID="pane_acceptLicenseInner" runat="server">
@@ -105,23 +105,97 @@
                 <cc1:PropertyPanel ID="PropertyPanel8" runat="server" Text="Read me">
                     <asp:Literal ID="readme" runat="server"></asp:Literal>
                 </cc1:PropertyPanel>
-                <cc1:PropertyPanel ID="pp_unsecureFiles" runat="server" Visible="true" Text="&nbsp;">
+                <cc1:PropertyPanel ID="pp_unsecureFiles" runat="server" Visible="false" Text="&nbsp;">
                     <div class="error" style="width: 370px;">
                         <h3>
                             Binary files in the package!</h3>
-                        <p>
-                            This package contains .NET code. This is <strong>not unusual</strong> as .NET code
-                            is used for any advanced functionality on an Umbraco powered website.</p>
-                        <p>
-                            However, if you <strong>don't know the author</strong> of the package or are unsure why this package
-                            contains these files, it is adviced <strong>not to continue the installation</strong>.
+                        <p style="padding-bottom:1px">
+                            <span id="dll-readMore" style="cursor:pointer;">Read more...</span>    
                         </p>
-                        <p>
-                            <strong>The Files in question:</strong><br />
-                            <ul>
-                                <asp:Literal ID="lt_files" runat="server" />
-                            </ul>
+                        <div id="dll-readMore-pane" style="display:none;">
+                            <p>
+                                This package contains .NET code. This is <strong>not unusual</strong> as .NET code
+                                is used for any advanced functionality on an Umbraco powered website.</p>
+                            <p>
+                                However, if you <strong>don't know the author</strong> of the package or are unsure why this package
+                                contains these files, it is adviced <strong>not to continue the installation</strong>.
+                            </p>
+                            <p>
+                                <strong>The Files in question:</strong><br />
+                                <ul>
+                                    <asp:Literal ID="lt_files" runat="server" />
+                                </ul>
+                            </p>
+                        </div>
+                    </div>
+                </cc1:PropertyPanel>
+                <cc1:PropertyPanel ID="pp_macroConflicts" runat="server" Visible="false" Text="&nbsp;">
+                    <div class="error" style="width: 370px;">
+                        <h3>
+                            Macro Conflicts in the package!</h3>
+                        <p style="padding-bottom:1px;">
+                            <span id="macro-readMore" style="cursor:pointer;">Read more...</span>
                         </p>
+                        <div id="macro-readMore-pane" style="display:none">
+                            <p>
+                                This package contains one or more macros which have the same alias as an existing one on your site, based on the Macro Alias.
+                                </p>
+                            <p>
+                                If you choose to continue your existing macros will be replaced with the ones from this package. If you do not want to overwrite your existing macros you will need to change their alias.
+                            </p>
+                            <p>
+                                <strong>The Macros in question:</strong><br />
+                                <ul>
+                                    <asp:Literal ID="ltrMacroAlias" runat="server" />
+                                </ul>
+                            </p>
+                        </div>
+                    </div>
+                </cc1:PropertyPanel>
+                <cc1:PropertyPanel ID="pp_templateConflicts" runat="server" Visible="false" Text="&nbsp;">
+                    <div class="error" style="width: 370px;">
+                        <h3>
+                            Template Conflicts in the package!</h3>
+                        <p style="padding-bottom:1px;">
+                            <span id="template-readMore" style="cursor:pointer;">Read more...</span>
+                        </p>
+                        <div id="template-readMore-pane" style="display:none">
+                            <p>
+                                This package contains one or more templates which have the same alias as an existing one on your site, based on the Template Alias.
+                                </p>
+                            <p>
+                                If you choose to continue your existing template will be replaced with the ones from this package. If you do not want to overwrite your existing templates you will need to change their alias.
+                            </p>
+                            <p>
+                                <strong>The Templates in question:</strong><br />
+                                <ul>
+                                    <asp:Literal ID="ltrTemplateAlias" runat="server" />
+                                </ul>
+                            </p>
+                        </div>
+                    </div>
+                </cc1:PropertyPanel>
+                <cc1:PropertyPanel ID="pp_stylesheetConflicts" runat="server" Visible="false" Text="&nbsp;">
+                    <div class="error" style="width: 370px;">
+                        <h3>
+                            Stylesheet Conflicts in the package!</h3>
+                        <p style="padding-bottom:1px;">
+                            <span id="stylesheet-readMore" style="cursor:pointer;">Read more...</span>
+                        </p>
+                        <div id="stylesheet-readMore-pane" style="display:none">
+                            <p>
+                                This package contains one or more stylesheets which have the same alias as an existing one on your site, based on the Stylesheet Name.
+                                </p>
+                            <p>
+                                If you choose to continue your existing stylesheets will be replaced with the ones from this package. If you do not want to overwrite your existing stylesheets you will need to change their name.
+                            </p>
+                            <p>
+                                <strong>The Stylesheets in question:</strong><br />
+                                <ul>
+                                    <asp:Literal ID="ltrStylesheetNames" runat="server" />
+                                </ul>
+                            </p>
+                        </div>
                     </div>
                 </cc1:PropertyPanel>
                 <cc1:PropertyPanel runat="server" Text=" ">
@@ -134,6 +208,25 @@
                         OnClick="startInstall"></asp:Button>
                 </cc1:PropertyPanel>
             </cc1:Pane>
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    jQuery('#dll-readMore').click(function() {
+                        jQuery('#dll-readMore-pane').toggle();
+                    });
+
+                    jQuery('#macro-readMore').click(function() {
+                        jQuery('#macro-readMore-pane').toggle();
+                    });
+
+                    jQuery('#template-readMore').click(function() {
+                        jQuery('#template-readMore-pane').toggle();
+                    });
+
+                    jQuery('#stylesheet-readMore').click(function() {
+                        jQuery('#stylesheet-readMore-pane').toggle();
+                    });
+                });
+                    </script>
         </asp:Panel>
         <cc1:Pane ID="pane_installing" runat="server" Visible="false" Text="Installing package">
             <cc1:PropertyPanel runat="server">
@@ -141,8 +234,7 @@
                 <asp:Literal ID="lit_installStatus" runat="server" />
             </cc1:PropertyPanel>
         </cc1:Pane>
-        <cc1:Pane ID="pane_optional" runat="server" Visible="false">
-        </cc1:Pane>
+        <cc1:Pane ID="pane_optional" runat="server" Visible="false" />
         <cc1:Pane ID="pane_success" runat="server" Text="Package is installed" Visible="false">
             <cc1:PropertyPanel runat="server">
                 <p>

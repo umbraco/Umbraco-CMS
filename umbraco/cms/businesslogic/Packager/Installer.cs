@@ -19,6 +19,8 @@ using umbraco.cms.businesslogic.propertytype;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using System.Diagnostics;
+using umbraco.cms.businesslogic.macro;
+using umbraco.cms.businesslogic.template;
 
 namespace umbraco.cms.businesslogic.packager
 {
@@ -51,6 +53,12 @@ namespace umbraco.cms.businesslogic.packager
         private string _control;
         private bool _containUnsecureFiles = false;
         private List<string> _unsecureFiles = new List<string>();
+        private bool _containsMacroConflict = false;
+        private List<string> _conflictingMacroAliases = new List<string>();
+        private bool _containsTemplateConflict = false;
+        private List<string> _conflictingTemplateAliases = new List<string>();
+        private bool _containsStyleSheetConflict = false;
+        private List<string> _conflictingStyleSheetNames = new List<string>();
 
         private ArrayList _macros = new ArrayList();
         private XmlDocument _packageConfig;
@@ -64,9 +72,18 @@ namespace umbraco.cms.businesslogic.packager
         public string AuthorUrl { get { return _authorUrl; } }
         public string ReadMe { get { return _readme; } }
         public string Control { get { return _control; } }
+
+        public bool ContainsMacroConflict { get { return _containsMacroConflict; } }
+        public IEnumerable<string> ConflictingMacroAliases { get { return _conflictingMacroAliases; } }
         
         public bool ContainsUnsecureFiles { get { return _containUnsecureFiles; } }
         public List<string> UnsecureFiles { get { return _unsecureFiles; } }
+
+        public bool ContainsTemplateConflicts { get { return _containsTemplateConflict; } }
+        public IEnumerable<string> ConflictingTemplateAliases { get { return _conflictingTemplateAliases; } }
+
+        public bool ContainsStyleSheeConflicts { get { return _containsStyleSheetConflict; } }
+        public IEnumerable<string> ConflictingStyleSheetNames { get { return _conflictingStyleSheetNames; } }
 
         public int RequirementsMajor { get { return _reqMajor; } }
         public int RequirementsMinor { get { return _reqMinor; } }
@@ -289,11 +306,8 @@ namespace umbraco.cms.businesslogic.packager
 
             // Add Templates
             foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Templates/Template")) {
-                template.Template t = template.Template.MakeNew(xmlHelper.GetNodeValue(n.SelectSingleNode("Name")), u);
-                t.Alias = xmlHelper.GetNodeValue(n.SelectSingleNode("Alias"));
-
-                t.ImportDesign(xmlHelper.GetNodeValue(n.SelectSingleNode("Design")));
-
+                var t = Template.Import(n, u);
+                
                 insPack.Data.Templates.Add(t.Id.ToString());
 
                 saveNeeded = true;
@@ -354,21 +368,7 @@ namespace umbraco.cms.businesslogic.packager
 
             // Stylesheets
             foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Stylesheets/Stylesheet")) {
-                StyleSheet s = StyleSheet.MakeNew(
-                    u,
-                    xmlHelper.GetNodeValue(n.SelectSingleNode("Name")),
-                    xmlHelper.GetNodeValue(n.SelectSingleNode("FileName")),
-                    xmlHelper.GetNodeValue(n.SelectSingleNode("Content")));
-
-                foreach (XmlNode prop in n.SelectNodes("Properties/Property")) {
-                    StylesheetProperty sp = StylesheetProperty.MakeNew(
-                        xmlHelper.GetNodeValue(prop.SelectSingleNode("Name")),
-                        s,
-                        u);
-                    sp.Alias = xmlHelper.GetNodeValue(prop.SelectSingleNode("Alias"));
-                    sp.value = xmlHelper.GetNodeValue(prop.SelectSingleNode("Value"));
-                }
-                s.saveCssToFile();
+                StyleSheet s = StyleSheet.Import(n, u);
 
                 insPack.Data.Stylesheets.Add(s.Id.ToString());
                 saveNeeded = true;
@@ -857,6 +857,48 @@ namespace umbraco.cms.businesslogic.packager
                  }
             }
 
+            //this will check for existing macros with the same alias
+            //since we will not overwrite on import it's a good idea to inform the user what will be overwritten
+            foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//macro"))
+            {
+                var alias = n.SelectSingleNode("alias").InnerText;
+                if (!string.IsNullOrEmpty(alias))
+                {
+                    try
+                    {
+                        var m = new Macro(alias);
+                        this._containsMacroConflict = true;
+                        this._conflictingMacroAliases.Add(alias);
+                    }
+                    catch (IndexOutOfRangeException) { } //thrown when the alias doesn't exist in the DB, ie - macro not there
+                }
+            }
+
+            foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Templates/Template"))
+            {
+                var alias = n.SelectSingleNode("Alias").InnerText;
+                if (!string.IsNullOrEmpty(alias))
+                {
+                    if (Template.GetByAlias(alias) != null)
+                    {
+                        this._containsTemplateConflict = true;
+                        this._conflictingTemplateAliases.Add(alias);
+                    }
+                }
+            }
+
+            foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Stylesheets/Stylesheet"))
+            {
+                var alias = n.SelectSingleNode("Name").InnerText;
+                if (!string.IsNullOrEmpty(alias))
+                {
+                    if (StyleSheet.GetByName(alias) != null)
+                    {
+                        this._containsStyleSheetConflict = true;
+                        this._conflictingStyleSheetNames.Add(alias);
+                    }
+                }
+            }
 
             try
             {

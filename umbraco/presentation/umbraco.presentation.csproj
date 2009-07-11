@@ -3694,10 +3694,6 @@
       <DependentUpon>notifications.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\developer\Packages\installer.aspx.resx">
-      <DependentUpon>installer.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="umbraco\dialogs\paste.aspx.resx">
       <DependentUpon>paste.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>

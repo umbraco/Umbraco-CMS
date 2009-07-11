@@ -4,7 +4,7 @@ using System.IO;
 using System.Data;
 using System.Xml;
 using umbraco.DataLayer;
-
+using System.Linq;
 using System.Text.RegularExpressions;
 using umbraco.cms.businesslogic.cache;
 
@@ -45,7 +45,7 @@ namespace umbraco.cms.businesslogic.web
             set
             {
                 _content = value;
-                SqlHelper.ExecuteNonQuery("update cmsStylesheet set content = '" + _content.Replace("'", "''") + "' where nodeId = " + base.Id.ToString());
+                SqlHelper.ExecuteNonQuery("update cmsStylesheet set content = @content where nodeId = @id", SqlHelper.CreateParameter("@content", this.Content), SqlHelper.CreateParameter("@id", this.Id));
                 InvalidateCache();
             }
         }
@@ -419,6 +419,56 @@ namespace umbraco.cms.businesslogic.web
         {
             if (AfterDelete != null)
                 AfterDelete(this, e);
+        }
+
+        public static StyleSheet GetByName(string name)
+        {
+            try
+            {
+                int id = SqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE text = @text AND nodeObjectType = @objType ", SqlHelper.CreateParameter("@text", name), SqlHelper.CreateParameter("@objType", StyleSheet.ModuleObjectType));
+                return new StyleSheet(id);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public static StyleSheet Import(XmlNode n, umbraco.BusinessLogic.User u)
+        {
+            string stylesheetName = xmlHelper.GetNodeValue(n.SelectSingleNode("Name"));
+            StyleSheet s = GetByName(stylesheetName);
+            if (s == null)
+            {
+                StyleSheet.MakeNew(
+                    u,
+                    stylesheetName,
+                    xmlHelper.GetNodeValue(n.SelectSingleNode("FileName")),
+                    xmlHelper.GetNodeValue(n.SelectSingleNode("Content")));
+            }
+
+            foreach (XmlNode prop in n.SelectNodes("Properties/Property"))
+            {
+                string alias = xmlHelper.GetNodeValue(prop.SelectSingleNode("Alias"));
+                var sp = s.Properties.SingleOrDefault(p => p.Alias == alias);
+                string name = xmlHelper.GetNodeValue(prop.SelectSingleNode("Name"));
+                if (sp == default(StylesheetProperty))
+                {
+                    sp = StylesheetProperty.MakeNew(
+                        name,
+                        s,
+                        u);
+                }
+                else
+                {
+                    sp.Text = name;
+                }
+                sp.Alias = alias;
+                sp.value = xmlHelper.GetNodeValue(prop.SelectSingleNode("Value"));
+            }
+            s.saveCssToFile();
+
+            return s;
         }
     }
 
