@@ -728,7 +728,7 @@ namespace umbraco.cms.businesslogic.web
                 User = u,
                 ParentId = ParentId
             };
-            Document.Newing(null, newingArgs);
+            Document.OnNewing(newingArgs);
             if (newingArgs.Cancel)
             {
                 return null;
@@ -1398,11 +1398,11 @@ order by umbracoNode.sortOrder
 
         //TODO: Slace - Document this
         public static event EventHandler<DocumentNewingEventArgs> Newing;
-        protected virtual void OnNewing(DocumentNewingEventArgs e)
+        protected static void OnNewing(DocumentNewingEventArgs e)
         {
             if (Newing != null)
             {
-                Newing(this, e);
+                Newing(null, e);
             }
         }
 
