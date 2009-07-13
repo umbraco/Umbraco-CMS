@@ -9,6 +9,8 @@ namespace umbraco.presentation.ClientDependency.Providers
 	{		
 
 		public const string DefaultName = "PageHeaderProvider";
+		public const string ScriptEmbed = "<script type=\"text/javascript\" src=\"{0}\"></script>";
+		public const string CssEmbed = "<link rel=\"stylesheet\" type=\"text/css\" href=\"{0}\" />";
 
 		public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
 		{			
@@ -21,22 +23,55 @@ namespace umbraco.presentation.ClientDependency.Providers
 
 		protected override void RegisterJsFiles(List<IClientDependencyFile> jsDependencies)
 		{			
-			string js = "<script type=\"text/javascript\" src=\"{0}\"></script>";
-			foreach (IClientDependencyFile dependency in jsDependencies)
+			
+			if (IsDebugMode)
 			{
-				DependantControl.Page.Trace.Write("ClientDependency", string.Format("Registering: {0}", dependency.FilePath));
-				DependantControl.Page.Header.Controls.Add(new LiteralControl(string.Format(js, dependency.FilePath)));
+				foreach (IClientDependencyFile dependency in jsDependencies)
+				{
+					ProcessSingleJsFile(dependency.FilePath);
+				}
 			}
+			else
+			{
+				List<string> jsList = ProcessCompositeList(jsDependencies, ClientDependencyType.Javascript);
+				DependantControl.Page.Trace.Write("ClientDependency", string.Format("Processed composite list: {0}", jsList[0]));
+				foreach (string js in jsList)
+				{
+					ProcessSingleJsFile(js);
+				}				
+			}			
+		}
+
+		protected override void ProcessSingleJsFile(string js)
+		{
+			DependantControl.Page.Trace.Write("ClientDependency", string.Format("Registering: {0}", js));
+			DependantControl.Page.Header.Controls.Add(new LiteralControl(string.Format(ScriptEmbed, js)));
 		}
 
 		protected override void RegisterCssFiles(List<IClientDependencyFile> cssDependencies)
 		{
-			string css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"{0}\" />";
-			foreach (IClientDependencyFile dependency in cssDependencies)
+			if (IsDebugMode)
 			{
-				DependantControl.Page.Trace.Write("ClientDependency", string.Format("Registering: {0}", dependency.FilePath));
-				DependantControl.Page.Header.Controls.Add(new LiteralControl(string.Format(css, dependency.FilePath)));
+				foreach (IClientDependencyFile dependency in cssDependencies)
+				{
+					ProcessSingleCssFile(dependency.FilePath);
+				}
 			}
+			else
+			{
+				List<string> cssList = ProcessCompositeList(cssDependencies, ClientDependencyType.Css);
+				DependantControl.Page.Trace.Write("ClientDependency", string.Format("Processed composite list: {0}", cssList[0]));
+				foreach (string css in cssList)
+				{
+					ProcessSingleCssFile(css);
+				}				
+			}
+		}
+
+		protected override void ProcessSingleCssFile(string css)
+		{
+			DependantControl.Page.Trace.Write("ClientDependency", string.Format("Registering: {0}", css));
+			DependantControl.Page.Header.Controls.Add(new LiteralControl(string.Format(CssEmbed, css)));
 		}
 	}
 }

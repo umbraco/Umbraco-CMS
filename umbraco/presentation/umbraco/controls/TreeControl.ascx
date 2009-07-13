@@ -12,7 +12,7 @@
 <umb:ClientDependencyInclude runat="server" ID="ClientDependencyInclude2" DependencyType="Javascript" FilePath="Tree/css.js" PathNameAlias="UmbracoClient" Priority="10" />
 <umb:ClientDependencyInclude runat="server" ID="ClientDependencyInclude5" DependencyType="Javascript" FilePath="Tree/tree_component.min.js" PathNameAlias="UmbracoClient" Priority="11"  />
 <umb:ClientDependencyInclude runat="server" ID="ClientDependencyInclude3" DependencyType="Javascript" FilePath="Tree/NodeDefinition.js" PathNameAlias="UmbracoClient" Priority="12"  />
-<umb:ClientDependencyInclude runat="server" ID="ClientDependencyInclude4" DependencyType="Javascript" FilePath="Tree/UmbracoTree.js" PathNameAlias="UmbracoClient" Priority="13" />
+<umb:ClientDependencyInclude runat="server" ID="ClientDependencyInclude4" DependencyType="Javascript" FilePath="Tree/UmbracoTree.min.js" PathNameAlias="UmbracoClient" Priority="13" />
 
 <script type="text/javascript">
 

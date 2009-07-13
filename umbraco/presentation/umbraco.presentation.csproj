@@ -1806,6 +1806,7 @@
     <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\no_dlg.js" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\sv.js" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\sv_dlg.js" />
+    <Content Include="umbraco_client\Tree\UmbracoTree.min.js" />
     <Content Include="umbraco_client\ui\jQueryWresize.js" />
     <Content Include="umbraco\js\quickEdit.js" />
     <Content Include="umbraco\members\search.aspx" />

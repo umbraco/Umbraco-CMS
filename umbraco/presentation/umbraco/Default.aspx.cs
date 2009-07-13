@@ -18,7 +18,7 @@ namespace umbraco
 	{
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-			
+			Server.Transfer("umbraco.aspx");
 			// Put user code to initialize the page here
 		}
 

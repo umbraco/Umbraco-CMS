@@ -15,6 +15,7 @@ namespace umbraco.presentation.ClientDependency
 
 		private static ClientDependencyProvider m_Provider = null;
 		private static ClientDependencyProviderCollection m_Providers = null;
+		private static List<string> m_Extensions;
 		private static object m_Lock = new object();
 
 		public static ClientDependencyProvider DefaultProvider
@@ -34,6 +35,26 @@ namespace umbraco.presentation.ClientDependency
             }
 		}
 
+		/// <summary>
+		/// The file extensions of Client Dependencies that are file based as opposed to request based.
+		/// Any file that doesn't have the extensions listed here will be request based, request based is
+		/// more overhead for the server to process.
+		/// </summary>
+		/// <example>
+		/// A request based JavaScript file may be  a .ashx that dynamically creates JavaScript server side.
+		/// </example>
+		/// <remarks>
+		/// If this is not explicitly set, then the extensions 'js' and 'css' are the defaults.
+		/// </remarks>
+		public static List<string> FileBasedDependencyExtensionList
+		{
+			get
+			{
+				LoadProviders();
+				return m_Extensions;
+			}
+		}
+
 		private static void LoadProviders()
 		{			
 			if (m_Provider == null)
@@ -43,7 +64,7 @@ namespace umbraco.presentation.ClientDependency
 					// Do this again to make sure _provider is still null
 					if (m_Provider == null)
 					{
-						ClientDependencySection section = (ClientDependencySection)WebConfigurationManager.GetSection("system.web/imageService");
+						ClientDependencySection section = (ClientDependencySection)WebConfigurationManager.GetSection("system.web/clientDependency");
 						
 						m_Providers = new ClientDependencyProviderCollection();
 
@@ -55,17 +76,23 @@ namespace umbraco.presentation.ClientDependency
 							ProvidersHelper.InstantiateProviders(section.Providers, m_Providers, typeof(ClientDependencyProvider));
 							m_Provider = m_Providers[section.DefaultProvider];
 							if (m_Provider == null)
-								throw new ProviderException("Unable to load default ImageProvider");
+								throw new ProviderException("Unable to load default ClientDependency provider");
 						}
 						else
 						{
+							//get the default settings
+							section = new ClientDependencySection();
+							m_Extensions = section.FileBasedDependencyExtensionList;
+
 							PageHeaderProvider php = new PageHeaderProvider();
 							php.Initialize(PageHeaderProvider.DefaultName, null);
 							m_Providers.Add(php);
 							ClientSideRegistrationProvider csrp = new ClientSideRegistrationProvider();
 							csrp.Initialize(ClientSideRegistrationProvider.DefaultName, null);
 							m_Providers.Add(csrp);
-							m_Provider = m_Providers[PageHeaderProvider.DefaultName];
+
+							//set the default
+							m_Provider = m_Providers[section.DefaultProvider];
 						}						
 					}
 				}

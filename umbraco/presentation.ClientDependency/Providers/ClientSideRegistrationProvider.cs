@@ -43,6 +43,11 @@ namespace umbraco.presentation.ClientDependency.Providers
 													dependencyCalls.ToString(), true);
 		}
 
+		protected override void ProcessSingleJsFile(string js)
+		{
+			throw new NotImplementedException();
+		}
+
 		protected override void RegisterCssFiles(List<IClientDependencyFile> cssDependencies)
 		{
 			if (cssDependencies.Count == 0)
@@ -60,6 +65,11 @@ namespace umbraco.presentation.ClientDependency.Providers
 			dependencyCalls.Append(';');
 			ScriptManager.RegisterClientScriptBlock(DependantControl, DependantControl.GetType(), cssDependencies.GetHashCode().ToString(),
 													dependencyCalls.ToString(), true);
+		}
+
+		protected override void ProcessSingleCssFile(string css)
+		{
+			throw new NotImplementedException();
 		}
 
 		private void RegisterDependencyLoader()

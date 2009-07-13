@@ -5,6 +5,7 @@ using System.Web;
 using System.Reflection;
 using System.IO;
 using System.IO.Compression;
+using System.Net;
 
 namespace umbraco.presentation.ClientDependency
 {
@@ -63,7 +64,7 @@ namespace umbraco.presentation.ClientDependency
 			if (string.IsNullOrEmpty(fileset))
 				throw new ArgumentException("Must specify a fileset in the request");
 
-			byte[] fileBytes = CombineFiles(fileset, context);
+			byte[] fileBytes = CombineFiles(fileset, context, type);
 			byte[] outputBytes = CompressBytes(context, fileBytes);
 			SetCaching(context);
 
@@ -77,28 +78,135 @@ namespace umbraco.presentation.ClientDependency
 		/// <param name="fileList"></param>
 		/// <param name="context"></param>
 		/// <returns></returns>
-		private byte[] CombineFiles(string fileList, HttpContext context)
+		private byte[] CombineFiles(string fileList, HttpContext context, ClientDependencyType type)
 		{
 			MemoryStream ms = new MemoryStream(5000);
 			//get the file list, and write the contents of each file to the output stream.
 			string[] strFiles = DecodeFrom64(fileList).Split(';');
-			StreamWriter sw = new StreamWriter(ms);			
+			StreamWriter sw = new StreamWriter(ms);
 			foreach (string s in strFiles)
 			{
 				if (!string.IsNullOrEmpty(s))
 				{
-					FileInfo fi = new FileInfo(context.Server.MapPath(s));
-					if (!fi.Exists)
-						throw new NullReferenceException("File could not be found: " + fi.FullName);
-					string fileContents = File.ReadAllText(fi.FullName);
-					sw.WriteLine(fileContents);
+					try
+					{
+						FileInfo fi = new FileInfo(context.Server.MapPath(s));
+						if (ClientDependencyHelper.FileBasedDependencyExtensionList.Contains(fi.Extension.ToLower().Replace(".", "")))
+						{							
+							//if the file doesn't exist, then we'll assume it is a URI external request
+							if (!fi.Exists)
+							{
+								WriteRequestToStream(ref sw, s);
+							}
+							else
+							{
+								//if it is a file based dependency then read it
+								string fileContents = File.ReadAllText(fi.FullName);
+								sw.WriteLine(fileContents);
+							}
+						}
+						else
+						{
+							//if it's not a file based dependency, try to get the request output.
+							WriteRequestToStream(ref sw, s);
+						}
+					}
+					catch (Exception ex)
+					{
+						Type exType = ex.GetType();
+						if (exType.Equals(typeof(NotSupportedException)) || exType.Equals(typeof(ArgumentException)))
+						{
+							//could not parse the string into a fileinfo, so we assume it is a URI
+							WriteRequestToStream(ref sw, s);
+						}
+						else
+						{
+							//if this fails, log the exception in trace, but continue
+							HttpContext.Current.Trace.Warn("ClientDependency", "Could not load file contents from " + s, ex);
+							System.Diagnostics.Debug.Assert(false, "Could not load file contents from " + s, ex.Message);
+						}
+					}
 				}
+
+				if (type == ClientDependencyType.Javascript)
+				{
+					sw.Write(";;;"); //write semicolons in case the js isn't formatted correctly. This also helps for debugging.
+				}
+				
 			}
 			sw.Flush();
 			byte[] outputBytes = ms.ToArray();
 			sw.Close();
 			ms.Close();
 			return outputBytes;
+		}
+
+		/// <summary>
+		/// Writes the output of an external request to the stream. Returns true/false if succesful or not.
+		/// </summary>
+		/// <param name="sw"></param>
+		/// <param name="url"></param>
+		/// <returns></returns>
+		private bool WriteRequestToStream(ref StreamWriter sw, string url)
+		{
+			string requestOutput;
+			bool rVal = false;
+			rVal = TryReadUri(url, out requestOutput);
+			if (rVal)
+			{
+				//write the contents of the external request.
+				sw.WriteLine(requestOutput);
+			}
+			return rVal;
+		}
+
+		/// <summary>
+		/// Tries to convert the url to a uri, then read the request into a string and return it.
+		/// This takes into account relative vs absolute URI's
+		/// </summary>
+		/// <param name="url"></param>
+		/// <param name="requestContents"></param>
+		/// <returns></returns>
+		private bool TryReadUri(string url, out string requestContents)
+		{
+			Uri uri;
+			if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out uri))
+			{
+				if (uri.IsAbsoluteUri)
+				{
+					WebClient client = new WebClient();
+					try
+					{
+						requestContents = client.DownloadString(uri.AbsoluteUri);
+						return true;
+					}
+					catch (Exception ex)
+					{
+						HttpContext.Current.Trace.Warn("ClientDependency", "Could not load file contents from " + url, ex);
+						System.Diagnostics.Debug.Assert(false, "Could not load file contents from " + url, ex.Message);
+					}
+				}
+				else
+				{
+					//its a relative path so use the execute method
+					StringWriter sw = new StringWriter();
+					try
+					{
+						HttpContext.Current.Server.Execute(url, sw);
+						requestContents = sw.ToString();
+						sw.Close();
+						return true;
+					}
+					catch (Exception ex)
+					{
+						HttpContext.Current.Trace.Warn("ClientDependency", "Could not load file contents from " + url, ex);
+						System.Diagnostics.Debug.Assert(false, "Could not load file contents from " + url, ex.Message);
+					}
+				}
+				
+			}
+			requestContents = "";
+			return false;
 		}
 
 		/// <summary>
@@ -112,7 +220,7 @@ namespace umbraco.presentation.ClientDependency
 			TimeSpan duration = TimeSpan.FromDays(10);
 			HttpCachePolicy cache = context.Response.Cache;
 			cache.SetCacheability(HttpCacheability.Public);
-			cache.SetExpires(DateTime.Now.Add(duration));			
+			cache.SetExpires(DateTime.Now.Add(duration));
 			cache.SetMaxAge(duration);
 			cache.SetValidUntilExpires(true);
 			cache.SetLastModified(DateTime.Now);
@@ -133,7 +241,7 @@ namespace umbraco.presentation.ClientDependency
 		/// Compresses the bytes if the browser supports it
 		/// </summary>
 		private byte[] CompressBytes(HttpContext context, byte[] fileBytes)
-		{			
+		{
 			string acceptEncoding = context.Request.Headers["Accept-Encoding"];
 			if (!string.IsNullOrEmpty(acceptEncoding))
 			{
@@ -141,18 +249,21 @@ namespace umbraco.presentation.ClientDependency
 				Stream compressedStream = null;
 				acceptEncoding = acceptEncoding.ToLowerInvariant();
 				bool isCompressed = false;
-				if (acceptEncoding.Contains("gzip"))
-				{
-					context.Response.AddHeader("Content-encoding", "gzip");
-					compressedStream = new GZipStream(ms, CompressionMode.Compress, true);
-					isCompressed = true;
-				}
-				else if (acceptEncoding.Contains("deflate"))
+				
+				//deflate is faster in .Net according to Mads Kristensen (blogengine.net)
+				if (acceptEncoding.Contains("deflate"))
 				{
 					context.Response.AddHeader("Content-encoding", "deflate");
 					compressedStream = new DeflateStream(ms, CompressionMode.Compress, true);
 					isCompressed = true;
 				}
+				else if (acceptEncoding.Contains("gzip"))
+				{
+					context.Response.AddHeader("Content-encoding", "gzip");
+					compressedStream = new GZipStream(ms, CompressionMode.Compress, true);
+					isCompressed = true;
+				}
+				
 				if (isCompressed)
 				{
 					//write the bytes to the compressed stream

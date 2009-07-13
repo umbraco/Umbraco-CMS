@@ -12,5 +12,6 @@ namespace umbraco.presentation.ClientDependency
 		int Priority { get; set; }
         //string CompositeGroupName { get; set; }
         string PathNameAlias { get; set; }
+		bool DoNotOptimize { get; set; }
 	}
 }

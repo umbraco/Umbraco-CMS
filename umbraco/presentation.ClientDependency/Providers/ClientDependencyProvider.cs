@@ -4,6 +4,7 @@ using System.Text;
 using System.Web.UI;
 using System.Configuration.Provider;
 using System.Web;
+using System.Linq;
 
 namespace umbraco.presentation.ClientDependency.Providers
 {
@@ -20,6 +21,8 @@ namespace umbraco.presentation.ClientDependency.Providers
 
 		protected abstract void RegisterJsFiles(List<IClientDependencyFile> jsDependencies);
 		protected abstract void RegisterCssFiles(List<IClientDependencyFile> cssDependencies);
+		protected abstract void ProcessSingleJsFile(string js);
+		protected abstract void ProcessSingleCssFile(string css);
 
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
@@ -98,31 +101,44 @@ namespace umbraco.presentation.ClientDependency.Providers
 		//}
 
 		/// <summary>
-		/// Returns a full url with the encoded query strings for the handler which will process the composite group.
+		/// Returns a list of urls. The array will consist of only one entry if 
+		/// none of the dependencies are tagged as DoNotOptimize, otherwise, if any of them are, 
+		/// this will return the path to the file.
+		/// 
+		/// For the optimized files, the full url with the encoded query strings for the handler which will process the composite list
+		/// of dependencies. The handler will compbine, compress, minify (if JS), and output cache the results
+		/// based on a hash key of the base64 encoded string.
 		/// </summary>
 		/// <param name="dependencies"></param>
 		/// <param name="groupName"></param>
+		/// <remarks>
+		/// If the DoNotOptimize setting has been set for any of the dependencies in the list, then this will ignore them.
+		/// </remarks>
 		/// <returns></returns>
-		//private string ProcessCompositeGroup(List<IClientDependencyFile> dependencies, string groupName, ClientDependencyType type)
-		//{
-		//    string handler = "{0}?s={1}&t={2}";
-		//    StringBuilder files = new StringBuilder();
-		//    List<IClientDependencyFile> byGroup = dependencies.FindAll(
-		//        delegate(IClientDependencyFile a)
-		//        {
-		//            return a.CompositeGroupName == groupName;
-		//        }
-		//    );
-		//    byGroup.Sort((a, b) => a.Priority.CompareTo(b.Priority));
-		//    foreach (IClientDependencyFile a in byGroup)
-		//    {
-		//        files.Append(a.FilePath + ";");
-		//    }
-		//    string url = string.Format(handler, CompositeDependencyHandler.HandlerFileName, HttpContext.Current.Server.UrlEncode(EncodeTo64(files.ToString())), type.ToString());
-		//    if (url.Length > CompositeDependencyHandler.MaxHandlerUrlLength)
-		//        throw new ArgumentOutOfRangeException("The number of files in the composite group " + groupName + " creates a url handler address that exceeds the CompositeDependencyHandler MaxHandlerUrlLength. Reducing the amount of files in this composite group should fix the issue");
-		//    return url;
-		//}
+		protected List<string> ProcessCompositeList(List<IClientDependencyFile> dependencies, ClientDependencyType type)
+		{
+			List<string> rVal = new List<string>();
+			
+			//build the combined composite list url
+			string handler = "{0}?s={1}&t={2}";			
+			StringBuilder files = new StringBuilder();
+			foreach (IClientDependencyFile a in dependencies.Where(x => !x.DoNotOptimize))
+			{
+				files.Append(a.FilePath + ";");
+			}
+			string combinedurl = string.Format(handler, CompositeDependencyHandler.HandlerFileName, HttpContext.Current.Server.UrlEncode(EncodeTo64(files.ToString())), type.ToString());
+			rVal.Add(combinedurl);
+
+			//add any urls that are not to be optimized
+			foreach (IClientDependencyFile a in dependencies.Where(x => x.DoNotOptimize))
+			{
+				rVal.Add(a.FilePath);
+			}
+			
+			//if (url.Length > CompositeDependencyHandler.MaxHandlerUrlLength)
+			//    throw new ArgumentOutOfRangeException("The number of files in the composite group " + groupName + " creates a url handler address that exceeds the CompositeDependencyHandler MaxHandlerUrlLength. Reducing the amount of files in this composite group should fix the issue");
+			return rVal;
+		}
 
 		private string EncodeTo64(string toEncode)
 		{
@@ -164,21 +180,21 @@ namespace umbraco.presentation.ClientDependency.Providers
 			}
 		}
 
-		internal class SimpleDependencyFile : IClientDependencyFile
-		{
-			public SimpleDependencyFile(string filePath, ClientDependencyType type)
-			{
-				FilePath = filePath;
-				DependencyType = type;
-			}
+		//internal class SimpleDependencyFile : IClientDependencyFile
+		//{
+		//    public SimpleDependencyFile(string filePath, ClientDependencyType type)
+		//    {
+		//        FilePath = filePath;
+		//        DependencyType = type;
+		//    }
 
-			public string FilePath{get;set;}
-			public ClientDependencyType DependencyType { get; set; }
-			public string InvokeJavascriptMethodOnLoad { get; set; }
-			public int Priority { get; set; }
-            //public string CompositeGroupName { get; set; }
-            public string PathNameAlias { get; set; }
-		}
+		//    public string FilePath{get;set;}
+		//    public ClientDependencyType DependencyType { get; set; }
+		//    public string InvokeJavascriptMethodOnLoad { get; set; }
+		//    public int Priority { get; set; }
+		//    //public string CompositeGroupName { get; set; }
+		//    public string PathNameAlias { get; set; }
+		//}
 
 	}
 }

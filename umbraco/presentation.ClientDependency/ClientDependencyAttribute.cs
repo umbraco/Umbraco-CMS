@@ -15,6 +15,7 @@ namespace umbraco.presentation.ClientDependency
         public ClientDependencyAttribute()
         {
             Priority = DefaultPriority;
+			DoNotOptimize = false;
         }
 
         /// <summary>
@@ -25,6 +26,16 @@ namespace umbraco.presentation.ClientDependency
         /// have unless the priority is explicitly set above 100.
         /// </remarks>
         protected const int DefaultPriority = 100;
+
+		/// <summary>
+		/// If set to true, this file will not be compressed, combined, etc...
+		/// it will be rendered out as is. 
+		/// </summary>
+		/// <remarks>
+		/// Useful for debugging dodgy scripts.
+		/// Default is false.
+		/// </remarks>
+		public bool DoNotOptimize { get; set; }
 
 		/// <summary>
 		/// If dependencies have a composite group name specified, the system will combine all dependency
