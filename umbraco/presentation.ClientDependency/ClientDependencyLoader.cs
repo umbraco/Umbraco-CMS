@@ -4,6 +4,7 @@ using System.Text;
 using System.Web.UI;
 using System.Web;
 using umbraco.presentation.ClientDependency.Providers;
+using umbraco.presentation.ClientDependency.Config;
 
 namespace umbraco.presentation.ClientDependency
 {
@@ -69,12 +70,12 @@ namespace umbraco.presentation.ClientDependency
 			switch (EmbedType)
 			{
 				case ClientDependencyEmbedType.Header:
-                    provider = ClientDependencyHelper.ProviderCollection[PageHeaderProvider.DefaultName];
+					provider = ClientDependencySettings.Instance.ProviderCollection[PageHeaderProvider.DefaultName];
                     provider.IsDebugMode = IsDebugMode;
 					ClientDependencyHelper.RegisterClientDependencies(provider, this.Page, Paths);
 					break;
 				case ClientDependencyEmbedType.ClientSideRegistration:
-                    provider = ClientDependencyHelper.ProviderCollection[ClientSideRegistrationProvider.DefaultName];
+					provider = ClientDependencySettings.Instance.ProviderCollection[ClientSideRegistrationProvider.DefaultName];
                     provider.IsDebugMode = IsDebugMode;
 					ClientDependencyHelper.RegisterClientDependencies(provider, this.Page, Paths);
 					break;

@@ -46,11 +46,17 @@
     <Reference Include="System.Web.Extensions, Version=1.0.61025.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientDependencyInclude.cs" />
     <Compile Include="ClientDependencyList.cs" />
     <Compile Include="ClientDependencyType.cs" />
+    <Compile Include="CompositeFileMap.cs" />
+    <Compile Include="CompositeFileXmlMapper.cs" />
+    <Compile Include="Config\ClientDependencySettings.cs" />
     <Compile Include="IClientDependencyFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ClientDependencyProvider.cs" />
@@ -61,7 +67,7 @@
     <Compile Include="ClientDependencyPath.cs" />
     <Compile Include="ClientDependencyPathCollection.cs" />
     <Compile Include="Providers\ClientDependencyProviderCollection.cs" />
-    <Compile Include="Providers\ClientDependencySection.cs" />
+    <Compile Include="Config\ClientDependencySection.cs" />
     <Compile Include="Providers\ClientSideRegistrationProvider.cs" />
     <Compile Include="CompositeDependencyHandler.cs" />
     <Compile Include="Providers\PageHeaderProvider.cs" />

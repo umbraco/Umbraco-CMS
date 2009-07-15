@@ -6,6 +6,8 @@ using System.Reflection;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Linq;
+using umbraco.presentation.ClientDependency.Config;
 
 namespace umbraco.presentation.ClientDependency
 {
@@ -64,12 +66,69 @@ namespace umbraco.presentation.ClientDependency
 			if (string.IsNullOrEmpty(fileset))
 				throw new ArgumentException("Must specify a fileset in the request");
 
-			byte[] fileBytes = CombineFiles(fileset, context, type);
-			byte[] outputBytes = CompressBytes(context, fileBytes);
-			SetCaching(context);
+			string compositeFileName;
+			byte[] outputBytes;
+			CompositeFileMap map = CompositeFileXmlMapper.Instance.GetCompositeFile(fileset);			
+			if (map == null || !map.HasFileBytes)
+			{
+				//get the file list
+				string[] strFiles = DecodeFrom64(fileset).Split(';');
+				//combine files
+				byte[] fileBytes = CombineFiles(strFiles, context, type);
+				//compress data
+				CompressionType cType = CompressBytes(context, fileBytes, out outputBytes);
+				SetContentEncodingHeaders(context, cType);
+				//save combined file
+				compositeFileName = SaveCompositeFile(outputBytes, type);
+
+				//Update the XML file map
+				CompositeFileXmlMapper.Instance.CreateMap(fileset, cType.ToString(),
+					strFiles.Select(x => new FileInfo(context.Server.MapPath(x))).ToList(),
+					compositeFileName);
+
+			}
+			else
+			{
+				//the saved file's bytes are already compressed.
+				outputBytes = map.GetCompositeFileBytes();
+				compositeFileName = map.CompositeFileName;
+				CompressionType cType = (CompressionType)Enum.Parse(typeof(CompressionType), map.CompressionType);
+				SetContentEncodingHeaders(context, cType);
+			}
+
+			SetCaching(context, compositeFileName);
 
 			context.Response.ContentType = type == ClientDependencyType.Javascript ? "text/javascript" : "text/css";
 			context.Response.OutputStream.Write(outputBytes, 0, outputBytes.Length);
+		}
+
+		private enum CompressionType 
+		{
+			deflate, gzip, none
+		}
+
+		/// <summary>
+		/// Saves the file's bytes to disk with a hash of the byte array
+		/// </summary>
+		/// <param name="fileContents"></param>
+		/// <param name="type"></param>
+		/// <returns>The new file path</returns>
+		/// <remarks>
+		/// the extension will be: .cdj for JavaScript and .cdc for CSS
+		/// </remarks>
+		private string SaveCompositeFile(byte[] fileContents, ClientDependencyType type)
+		{
+			if (!ClientDependencySettings.Instance.CompositeFilePath.Exists)
+				ClientDependencySettings.Instance.CompositeFilePath.Create();
+			FileInfo fi = new FileInfo(
+				Path.Combine(ClientDependencySettings.Instance.CompositeFilePath.FullName,
+					fileContents.GetHashCode().ToString() + ".cd" + type.ToString().Substring(0, 1).ToLower()));
+			if (fi.Exists)
+				fi.Delete();
+			FileStream fs = fi.Create();
+			fs.Write(fileContents, 0, fileContents.Length);
+			fs.Close();
+			return fi.FullName;
 		}
 
 		/// <summary>
@@ -78,11 +137,9 @@ namespace umbraco.presentation.ClientDependency
 		/// <param name="fileList"></param>
 		/// <param name="context"></param>
 		/// <returns></returns>
-		private byte[] CombineFiles(string fileList, HttpContext context, ClientDependencyType type)
+		private byte[] CombineFiles(string[] strFiles, HttpContext context, ClientDependencyType type)
 		{
-			MemoryStream ms = new MemoryStream(5000);
-			//get the file list, and write the contents of each file to the output stream.
-			string[] strFiles = DecodeFrom64(fileList).Split(';');
+			MemoryStream ms = new MemoryStream(5000);			
 			StreamWriter sw = new StreamWriter(ms);
 			foreach (string s in strFiles)
 			{
@@ -91,7 +148,7 @@ namespace umbraco.presentation.ClientDependency
 					try
 					{
 						FileInfo fi = new FileInfo(context.Server.MapPath(s));
-						if (ClientDependencyHelper.FileBasedDependencyExtensionList.Contains(fi.Extension.ToLower().Replace(".", "")))
+						if (ClientDependencySettings.Instance.FileBasedDependencyExtensionList.Contains(fi.Extension.ToLower().Replace(".", "")))
 						{							
 							//if the file doesn't exist, then we'll assume it is a URI external request
 							if (!fi.Exists)
@@ -213,7 +270,7 @@ namespace umbraco.presentation.ClientDependency
 		/// Sets the output cache parameters and also the client side caching parameters
 		/// </summary>
 		/// <param name="context"></param>
-		private void SetCaching(HttpContext context)
+		private void SetCaching(HttpContext context, string fileName)
 		{
 			//This ensures OutputCaching is set for this handler and also controls
 			//client side caching on the browser side. Default is 10 days.
@@ -235,47 +292,68 @@ namespace umbraco.presentation.ClientDependency
 			//This is the only way to set the max-age cachability header in ASP.Net!
 			FieldInfo maxAgeField = cache.GetType().GetField("_maxAge", BindingFlags.Instance | BindingFlags.NonPublic);
 			maxAgeField.SetValue(cache, duration);
+
+			//make this output cache dependent on the file.
+			context.Response.AddFileDependency(fileName);
+		}
+
+		/// <summary>
+		/// Sets the content encoding headers based on compressions
+		/// </summary>
+		/// <param name="context"></param>
+		/// <param name="type"></param>
+		private void SetContentEncodingHeaders(HttpContext context, CompressionType type)
+		{
+			if (type == CompressionType.deflate)
+			{
+				context.Response.AddHeader("Content-encoding", "deflate");
+			}
+			else if (type == CompressionType.gzip)
+			{
+				context.Response.AddHeader("Content-encoding", "gzip");
+			}
 		}
 
 		/// <summary>
 		/// Compresses the bytes if the browser supports it
 		/// </summary>
-		private byte[] CompressBytes(HttpContext context, byte[] fileBytes)
+		private CompressionType CompressBytes(HttpContext context, byte[] fileBytes, out byte[] outputBytes)
 		{
+			CompressionType type = CompressionType.none;
 			string acceptEncoding = context.Request.Headers["Accept-Encoding"];
+			//not compressed initially
+			outputBytes = fileBytes;
+
 			if (!string.IsNullOrEmpty(acceptEncoding))
 			{
 				MemoryStream ms = new MemoryStream();
 				Stream compressedStream = null;
 				acceptEncoding = acceptEncoding.ToLowerInvariant();
-				bool isCompressed = false;
-				
+
 				//deflate is faster in .Net according to Mads Kristensen (blogengine.net)
 				if (acceptEncoding.Contains("deflate"))
 				{
-					context.Response.AddHeader("Content-encoding", "deflate");
 					compressedStream = new DeflateStream(ms, CompressionMode.Compress, true);
-					isCompressed = true;
+					type = CompressionType.deflate;
 				}
 				else if (acceptEncoding.Contains("gzip"))
 				{
-					context.Response.AddHeader("Content-encoding", "gzip");
 					compressedStream = new GZipStream(ms, CompressionMode.Compress, true);
-					isCompressed = true;
+					type = CompressionType.gzip;
 				}
-				
-				if (isCompressed)
+
+				if (type != CompressionType.none)
 				{
 					//write the bytes to the compressed stream
 					compressedStream.Write(fileBytes, 0, fileBytes.Length);
 					compressedStream.Close();
-					byte[] outputBytes = ms.ToArray();
+					byte[] output = ms.ToArray();
 					ms.Close();
-					return outputBytes;
+					outputBytes = output;
 				}
 			}
-			//not compressed
-			return fileBytes;
+
+			return type;
 		}
 
 		private string DecodeFrom64(string toDecode)

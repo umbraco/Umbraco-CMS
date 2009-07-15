@@ -4,7 +4,7 @@ using System.Text;
 using System.Configuration;
 using System.Linq;
 
-namespace umbraco.presentation.ClientDependency.Providers
+namespace umbraco.presentation.ClientDependency.Config
 {
 	public class ClientDependencySection : ConfigurationSection
 	{
@@ -22,6 +22,16 @@ namespace umbraco.presentation.ClientDependency.Providers
 			set { base["defaultProvider"] = value; }
 		}
 
+		/// <summary>
+		/// This is the folder that composite script/css files will be stored once they are combined.
+		/// </summary>
+		[StringValidator(MinLength = 1)]
+		[ConfigurationProperty("compositeFilePath", DefaultValue = "~/App_Data/ClientDependency")]
+		public string CompositeFilePath
+		{
+			get { return (string)base["compositeFilePath"]; }
+			set { base["compositeFilePath"] = value; }
+		}
 
 		/// <summary>
 		/// The configuration section to set the FileBasedDependencyExtensionList. This is a comma separated list.

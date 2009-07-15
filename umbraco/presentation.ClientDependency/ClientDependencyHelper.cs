@@ -6,98 +6,14 @@ using System.Web;
 using umbraco.presentation.ClientDependency.Providers;
 using System.Web.Configuration;
 using System.Configuration.Provider;
+using umbraco.presentation.ClientDependency.Config;
 
 namespace umbraco.presentation.ClientDependency
 {
 
 	public class ClientDependencyHelper
 	{
-
-		private static ClientDependencyProvider m_Provider = null;
-		private static ClientDependencyProviderCollection m_Providers = null;
-		private static List<string> m_Extensions;
-		private static object m_Lock = new object();
-
-		public static ClientDependencyProvider DefaultProvider
-		{
-            get
-            {
-                LoadProviders();
-                return m_Provider;
-            }
-		}
-        public static ClientDependencyProviderCollection ProviderCollection
-		{
-            get
-            {
-                LoadProviders();
-                return m_Providers;
-            }
-		}
-
-		/// <summary>
-		/// The file extensions of Client Dependencies that are file based as opposed to request based.
-		/// Any file that doesn't have the extensions listed here will be request based, request based is
-		/// more overhead for the server to process.
-		/// </summary>
-		/// <example>
-		/// A request based JavaScript file may be  a .ashx that dynamically creates JavaScript server side.
-		/// </example>
-		/// <remarks>
-		/// If this is not explicitly set, then the extensions 'js' and 'css' are the defaults.
-		/// </remarks>
-		public static List<string> FileBasedDependencyExtensionList
-		{
-			get
-			{
-				LoadProviders();
-				return m_Extensions;
-			}
-		}
-
-		private static void LoadProviders()
-		{			
-			if (m_Provider == null)
-			{
-				lock (m_Lock)
-				{
-					// Do this again to make sure _provider is still null
-					if (m_Provider == null)
-					{
-						ClientDependencySection section = (ClientDependencySection)WebConfigurationManager.GetSection("system.web/clientDependency");
-						
-						m_Providers = new ClientDependencyProviderCollection();
-
-						// if there is no section found, then add the standard providers to the collection with the standard 
-						// default provider
-						if (section != null)
-						{
-							// Load registered providers and point _provider to the default provider	
-							ProvidersHelper.InstantiateProviders(section.Providers, m_Providers, typeof(ClientDependencyProvider));
-							m_Provider = m_Providers[section.DefaultProvider];
-							if (m_Provider == null)
-								throw new ProviderException("Unable to load default ClientDependency provider");
-						}
-						else
-						{
-							//get the default settings
-							section = new ClientDependencySection();
-							m_Extensions = section.FileBasedDependencyExtensionList;
-
-							PageHeaderProvider php = new PageHeaderProvider();
-							php.Initialize(PageHeaderProvider.DefaultName, null);
-							m_Providers.Add(php);
-							ClientSideRegistrationProvider csrp = new ClientSideRegistrationProvider();
-							csrp.Initialize(ClientSideRegistrationProvider.DefaultName, null);
-							m_Providers.Add(csrp);
-
-							//set the default
-							m_Provider = m_Providers[section.DefaultProvider];
-						}						
-					}
-				}
-			}
-		}
+		
 
 		/// <summary>
 		/// Registers dependencies with the default provider
@@ -106,8 +22,8 @@ namespace umbraco.presentation.ClientDependency
 		/// <param name="paths"></param>
 		public static void RegisterClientDependencies(Control control, ClientDependencyPathCollection paths)
 		{
-			LoadProviders();
-			ClientDependencyRegistrationService service = new ClientDependencyRegistrationService(control, paths, m_Provider);
+			ClientDependencyRegistrationService service = new ClientDependencyRegistrationService(control, paths, 
+				ClientDependencySettings.Instance.DefaultProvider);
 			service.ProcessDependencies();
 		}
 
@@ -119,8 +35,8 @@ namespace umbraco.presentation.ClientDependency
 		/// <param name="paths"></param>
 		public static void RegisterClientDependencies(string providerName, Control control, ClientDependencyPathCollection paths)
 		{
-			LoadProviders();
-			ClientDependencyRegistrationService service = new ClientDependencyRegistrationService(control, paths, m_Providers[providerName]);
+			ClientDependencyRegistrationService service = new ClientDependencyRegistrationService(control, paths,
+				ClientDependencySettings.Instance.ProviderCollection[providerName]);
 			service.ProcessDependencies();
 		}
 
@@ -130,10 +46,9 @@ namespace umbraco.presentation.ClientDependency
 		public static void RegisterClientDependencies<T>(Control control, ClientDependencyPathCollection paths)
 			where T: ClientDependencyProvider
 		{
-			LoadProviders();
 			//need to find the provider with the type
 			ClientDependencyProvider found = null;
-			foreach (ClientDependencyProvider p in m_Providers)
+			foreach (ClientDependencyProvider p in ClientDependencySettings.Instance.ProviderCollection)
 			{
 				if (p.GetType().Equals(typeof(T)))
 				{
@@ -149,7 +64,6 @@ namespace umbraco.presentation.ClientDependency
 
         public static void RegisterClientDependencies(ClientDependencyProvider provider, Control control, ClientDependencyPathCollection paths)
         {
-            LoadProviders();
             ClientDependencyRegistrationService service = new ClientDependencyRegistrationService(control, paths, provider);
 			service.ProcessDependencies();
         }
