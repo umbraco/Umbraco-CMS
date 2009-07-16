@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Web.UI;
 
-namespace umbraco.presentation.ClientDependency
+namespace umbraco.presentation.ClientDependency.Controls
 {
-    public class ClientDependencyInclude : Control, IClientDependencyFile
+    public abstract class ClientDependencyInclude : Control, IClientDependencyFile
 	{
 
 		public ClientDependencyInclude()
-		{
-			DependencyType = ClientDependencyType.Javascript;
+		{			
             Priority = DefaultPriority;
 			DoNotOptimize = false;
 		}
@@ -34,7 +33,8 @@ namespace umbraco.presentation.ClientDependency
 		/// </remarks>
 		public bool DoNotOptimize { get; set; }
 
-		public ClientDependencyType DependencyType { get; set; }
+		public ClientDependencyType DependencyType { get; internal set; }
+
 		public string FilePath { get; set; }
         public string PathNameAlias { get; set; }
         public string CompositeGroupName { get; set; }

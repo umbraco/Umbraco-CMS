@@ -7,6 +7,7 @@ using umbraco.presentation.ClientDependency.Providers;
 using System.Web.Configuration;
 using System.Configuration.Provider;
 using umbraco.presentation.ClientDependency.Config;
+using umbraco.presentation.ClientDependency.Controls;
 
 namespace umbraco.presentation.ClientDependency
 {
@@ -106,11 +107,12 @@ namespace umbraco.presentation.ClientDependency
 				}
 
 				// add child dependencies
+				Type iClientDependency = typeof(IClientDependencyFile);
 				foreach (Control child in control.Controls)
 				{
-					if (child.GetType().Equals(typeof(ClientDependencyInclude)))
+					if (iClientDependency.IsAssignableFrom(child.GetType()))
 					{
-						ClientDependencyInclude include = (ClientDependencyInclude)child;
+						IClientDependencyFile include = (IClientDependencyFile)child;
 						dependencies.Add(include);
 					}				
 					else

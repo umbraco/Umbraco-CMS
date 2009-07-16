@@ -7,7 +7,7 @@ namespace umbraco.presentation.ClientDependency
 	public interface IClientDependencyFile
 	{
 		string FilePath { get; set; }
-		ClientDependencyType DependencyType { get; set; }
+		ClientDependencyType DependencyType { get; }
 		string InvokeJavascriptMethodOnLoad { get; set; }
 		int Priority { get; set; }
         //string CompositeGroupName { get; set; }

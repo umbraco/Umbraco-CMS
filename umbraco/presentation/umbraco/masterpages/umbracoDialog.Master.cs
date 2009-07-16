@@ -9,8 +9,9 @@ namespace umbraco.presentation.umbraco.masterpages {
         
         public bool reportModalSize { get; set; }
 
-        protected void Page_Load(object sender, EventArgs e) {
-           
-        }
+		protected void Page_Load(object sender, EventArgs e)
+		{
+			ClientLoader.DataBind();
+		}
     }
 }

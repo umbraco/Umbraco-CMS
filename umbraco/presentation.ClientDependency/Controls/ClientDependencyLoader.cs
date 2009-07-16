@@ -6,7 +6,7 @@ using System.Web;
 using umbraco.presentation.ClientDependency.Providers;
 using umbraco.presentation.ClientDependency.Config;
 
-namespace umbraco.presentation.ClientDependency
+namespace umbraco.presentation.ClientDependency.Controls
 {
 	[ParseChildren(typeof(ClientDependencyPath), ChildrenAsProperties = true)]
 	public class ClientDependencyLoader : Control

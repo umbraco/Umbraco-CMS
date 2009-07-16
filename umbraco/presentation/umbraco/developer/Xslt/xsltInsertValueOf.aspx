@@ -1,5 +1,6 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoDialog.Master" Codebehind="xsltInsertValueOf.aspx.cs" AutoEventWireup="True"  Inherits="umbraco.developer.xsltInsertValueOf" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 <script type="text/javascript">
@@ -33,7 +34,7 @@
   this.focus();
   </script>
 
-<script type="text/javascript" src="../js/umbracoCheckKeys.js"></script>
+<umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/umbracoCheckKeys.js" PathNameAlias="UmbracoRoot"  />
 
 <style type="text/css">
 body{margin: 0px; padding: 0px;}

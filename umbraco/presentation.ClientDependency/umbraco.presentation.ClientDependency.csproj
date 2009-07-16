@@ -51,21 +51,25 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClientDependencyInclude.cs" />
+    <Compile Include="Controls\ClientDependencyInclude.cs" />
     <Compile Include="ClientDependencyList.cs" />
     <Compile Include="ClientDependencyType.cs" />
     <Compile Include="CompositeFileMap.cs" />
+    <Compile Include="CompositeFileProcessor.cs" />
     <Compile Include="CompositeFileXmlMapper.cs" />
     <Compile Include="Config\ClientDependencySettings.cs" />
+    <Compile Include="Controls\CssInclude.cs" />
+    <Compile Include="Controls\JsInclude.cs" />
+    <Compile Include="CssFileUrlFormatter.cs" />
     <Compile Include="IClientDependencyFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ClientDependencyProvider.cs" />
     <Compile Include="ClientDependencyAttribute.cs" />
     <Compile Include="ClientDependencyEmbedType.cs" />
     <Compile Include="ClientDependencyHelper.cs" />
-    <Compile Include="ClientDependencyLoader.cs" />
-    <Compile Include="ClientDependencyPath.cs" />
-    <Compile Include="ClientDependencyPathCollection.cs" />
+    <Compile Include="Controls\ClientDependencyLoader.cs" />
+    <Compile Include="Controls\ClientDependencyPath.cs" />
+    <Compile Include="Controls\ClientDependencyPathCollection.cs" />
     <Compile Include="Providers\ClientDependencyProviderCollection.cs" />
     <Compile Include="Config\ClientDependencySection.cs" />
     <Compile Include="Providers\ClientSideRegistrationProvider.cs" />

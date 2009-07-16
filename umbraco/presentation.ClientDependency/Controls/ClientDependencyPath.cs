@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Web.UI;
 
-namespace umbraco.presentation.ClientDependency
+namespace umbraco.presentation.ClientDependency.Controls
 {
 	
 	/// <summary>

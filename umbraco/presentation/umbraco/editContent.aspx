@@ -1,6 +1,7 @@
 <%@ Page Title="Edit content" Language="c#" MasterPageFile="masterpages/umbracoPage.Master" CodeBehind="editContent.aspx.cs" ValidateRequest="false" AutoEventWireup="True" Inherits="umbraco.cms.presentation.editContent" Trace="false" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
 	<script type="text/javascript">
@@ -32,7 +33,7 @@
 		}
 	</script>
 
-	<script src="js/umbracoCheckKeys.js" type="text/javascript"></script>
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/umbracoCheckKeys.js" PathNameAlias="UmbracoRoot" />
 
 </asp:Content>
 <asp:Content ID="Content1" ContentPlaceHolderID="body" runat="server">

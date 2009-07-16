@@ -50,7 +50,6 @@ namespace umbraco.presentation.ClientDependency
 		/// </summary>
 		private void Initialize()
 		{
-
 			m_XmlFile = new FileInfo(
 					Path.Combine(ClientDependencySettings.Instance.CompositeFilePath.FullName, MapFileName));
 
@@ -90,6 +89,8 @@ namespace umbraco.presentation.ClientDependency
 					//double check
 					if (!m_XmlFile.Exists)
 					{
+						if (!ClientDependencySettings.Instance.CompositeFilePath.Exists)
+							ClientDependencySettings.Instance.CompositeFilePath.Create();
 						CreateNewXmlFile();
 					}
 				}
@@ -105,19 +106,19 @@ namespace umbraco.presentation.ClientDependency
 		public CompositeFileMap GetCompositeFile(string base64Key)
 		{
 			XElement x = FindItem(base64Key);
-			//try
-			//{
+			try
+			{
 				return (x == null ? null : new CompositeFileMap(base64Key,
 				x.Attribute("compression").Value,
 				x.Attribute("file").Value,
 				x.Descendants("file")
 					.Select(f => new FileInfo(f.Attribute("name").Value))
 					.ToList()));
-			//}
-			//catch
-			//{
-			//    return null;
-			//}			
+			}
+			catch
+			{
+				return null;
+			}			
 		}
 
 		/// <summary>

@@ -5,6 +5,7 @@ using System.Web.UI;
 using System.Configuration.Provider;
 using System.Web;
 using System.Linq;
+using umbraco.presentation.ClientDependency.Controls;
 
 namespace umbraco.presentation.ClientDependency.Providers
 {

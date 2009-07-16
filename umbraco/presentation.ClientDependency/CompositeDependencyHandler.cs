@@ -16,12 +16,14 @@ namespace umbraco.presentation.ClientDependency
 		static CompositeDependencyHandler()
 		{
 			HandlerFileName = DefaultHandlerFileName;
-			MaxHandlerUrlLength = DefaultMaxHandlerUrlLength;
+			//MaxHandlerUrlLength = DefaultMaxHandlerUrlLength;
 		}
 
 		private static readonly string _versionNo = string.Empty;
 		private const string DefaultHandlerFileName = "DependencyHandler.axd";
-		private const int DefaultMaxHandlerUrlLength = 2000;
+		//private const int DefaultMaxHandlerUrlLength = 2000;
+
+		private object m_Lock = new object();
 
 		/// <summary>
 		/// The handler file name, by default this is DependencyHandler.axd.
@@ -66,34 +68,54 @@ namespace umbraco.presentation.ClientDependency
 			if (string.IsNullOrEmpty(fileset))
 				throw new ArgumentException("Must specify a fileset in the request");
 
-			string compositeFileName;
-			byte[] outputBytes;
-			CompositeFileMap map = CompositeFileXmlMapper.Instance.GetCompositeFile(fileset);			
-			if (map == null || !map.HasFileBytes)
+			string compositeFileName = "";
+			byte[] outputBytes = null;
+
+			//get the map to the composite file for this file set, if it exists.
+			CompositeFileMap map = CompositeFileXmlMapper.Instance.GetCompositeFile(fileset);
+			
+			if (map != null && map.HasFileBytes)
 			{
-				//get the file list
-				string[] strFiles = DecodeFrom64(fileset).Split(';');
-				//combine files
-				byte[] fileBytes = CombineFiles(strFiles, context, type);
-				//compress data
-				CompressionType cType = CompressBytes(context, fileBytes, out outputBytes);
-				SetContentEncodingHeaders(context, cType);
-				//save combined file
-				compositeFileName = SaveCompositeFile(outputBytes, type);
-
-				//Update the XML file map
-				CompositeFileXmlMapper.Instance.CreateMap(fileset, cType.ToString(),
-					strFiles.Select(x => new FileInfo(context.Server.MapPath(x))).ToList(),
-					compositeFileName);
-
+				ProcessFromFile(context, map, out compositeFileName, out outputBytes);			
 			}
 			else
 			{
-				//the saved file's bytes are already compressed.
-				outputBytes = map.GetCompositeFileBytes();
-				compositeFileName = map.CompositeFileName;
-				CompressionType cType = (CompressionType)Enum.Parse(typeof(CompressionType), map.CompressionType);
-				SetContentEncodingHeaders(context, cType);
+				bool fromFile = false;
+
+				lock (m_Lock)
+				{
+					//check again...
+					if (map == null || !map.HasFileBytes)
+					{
+						//need to do the combining, etc... and save the file map
+
+						//get the file list
+						string[] strFiles = DecodeFrom64(fileset).Split(';');
+						//combine files
+						byte[] fileBytes = CompositeFileProcessor.CombineFiles(strFiles, context, type);
+						//compress data
+						CompressionType cType = GetCompression(context);
+						outputBytes = CompositeFileProcessor.CompressBytes(cType, fileBytes);
+						SetContentEncodingHeaders(context, cType);
+						//save combined file
+						compositeFileName = CompositeFileProcessor.SaveCompositeFile(outputBytes, type);
+
+						//Update the XML file map
+						CompositeFileXmlMapper.Instance.CreateMap(fileset, cType.ToString(),
+							strFiles.Select(x => new FileInfo(context.Server.MapPath(x))).ToList(),
+							compositeFileName);
+					}
+					else
+					{
+						//files are there now, process from file.
+						fromFile = true;
+					}
+				}
+
+				if (fromFile)
+				{
+					ProcessFromFile(context, map, out compositeFileName, out outputBytes);
+				}
 			}
 
 			SetCaching(context, compositeFileName);
@@ -102,168 +124,13 @@ namespace umbraco.presentation.ClientDependency
 			context.Response.OutputStream.Write(outputBytes, 0, outputBytes.Length);
 		}
 
-		private enum CompressionType 
+		private void ProcessFromFile(HttpContext context, CompositeFileMap map, out string compositeFileName, out byte[] outputBytes)
 		{
-			deflate, gzip, none
-		}
-
-		/// <summary>
-		/// Saves the file's bytes to disk with a hash of the byte array
-		/// </summary>
-		/// <param name="fileContents"></param>
-		/// <param name="type"></param>
-		/// <returns>The new file path</returns>
-		/// <remarks>
-		/// the extension will be: .cdj for JavaScript and .cdc for CSS
-		/// </remarks>
-		private string SaveCompositeFile(byte[] fileContents, ClientDependencyType type)
-		{
-			if (!ClientDependencySettings.Instance.CompositeFilePath.Exists)
-				ClientDependencySettings.Instance.CompositeFilePath.Create();
-			FileInfo fi = new FileInfo(
-				Path.Combine(ClientDependencySettings.Instance.CompositeFilePath.FullName,
-					fileContents.GetHashCode().ToString() + ".cd" + type.ToString().Substring(0, 1).ToLower()));
-			if (fi.Exists)
-				fi.Delete();
-			FileStream fs = fi.Create();
-			fs.Write(fileContents, 0, fileContents.Length);
-			fs.Close();
-			return fi.FullName;
-		}
-
-		/// <summary>
-		/// combines all files to a byte array
-		/// </summary>
-		/// <param name="fileList"></param>
-		/// <param name="context"></param>
-		/// <returns></returns>
-		private byte[] CombineFiles(string[] strFiles, HttpContext context, ClientDependencyType type)
-		{
-			MemoryStream ms = new MemoryStream(5000);			
-			StreamWriter sw = new StreamWriter(ms);
-			foreach (string s in strFiles)
-			{
-				if (!string.IsNullOrEmpty(s))
-				{
-					try
-					{
-						FileInfo fi = new FileInfo(context.Server.MapPath(s));
-						if (ClientDependencySettings.Instance.FileBasedDependencyExtensionList.Contains(fi.Extension.ToLower().Replace(".", "")))
-						{							
-							//if the file doesn't exist, then we'll assume it is a URI external request
-							if (!fi.Exists)
-							{
-								WriteRequestToStream(ref sw, s);
-							}
-							else
-							{
-								//if it is a file based dependency then read it
-								string fileContents = File.ReadAllText(fi.FullName);
-								sw.WriteLine(fileContents);
-							}
-						}
-						else
-						{
-							//if it's not a file based dependency, try to get the request output.
-							WriteRequestToStream(ref sw, s);
-						}
-					}
-					catch (Exception ex)
-					{
-						Type exType = ex.GetType();
-						if (exType.Equals(typeof(NotSupportedException)) || exType.Equals(typeof(ArgumentException)))
-						{
-							//could not parse the string into a fileinfo, so we assume it is a URI
-							WriteRequestToStream(ref sw, s);
-						}
-						else
-						{
-							//if this fails, log the exception in trace, but continue
-							HttpContext.Current.Trace.Warn("ClientDependency", "Could not load file contents from " + s, ex);
-							System.Diagnostics.Debug.Assert(false, "Could not load file contents from " + s, ex.Message);
-						}
-					}
-				}
-
-				if (type == ClientDependencyType.Javascript)
-				{
-					sw.Write(";;;"); //write semicolons in case the js isn't formatted correctly. This also helps for debugging.
-				}
-				
-			}
-			sw.Flush();
-			byte[] outputBytes = ms.ToArray();
-			sw.Close();
-			ms.Close();
-			return outputBytes;
-		}
-
-		/// <summary>
-		/// Writes the output of an external request to the stream. Returns true/false if succesful or not.
-		/// </summary>
-		/// <param name="sw"></param>
-		/// <param name="url"></param>
-		/// <returns></returns>
-		private bool WriteRequestToStream(ref StreamWriter sw, string url)
-		{
-			string requestOutput;
-			bool rVal = false;
-			rVal = TryReadUri(url, out requestOutput);
-			if (rVal)
-			{
-				//write the contents of the external request.
-				sw.WriteLine(requestOutput);
-			}
-			return rVal;
-		}
-
-		/// <summary>
-		/// Tries to convert the url to a uri, then read the request into a string and return it.
-		/// This takes into account relative vs absolute URI's
-		/// </summary>
-		/// <param name="url"></param>
-		/// <param name="requestContents"></param>
-		/// <returns></returns>
-		private bool TryReadUri(string url, out string requestContents)
-		{
-			Uri uri;
-			if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out uri))
-			{
-				if (uri.IsAbsoluteUri)
-				{
-					WebClient client = new WebClient();
-					try
-					{
-						requestContents = client.DownloadString(uri.AbsoluteUri);
-						return true;
-					}
-					catch (Exception ex)
-					{
-						HttpContext.Current.Trace.Warn("ClientDependency", "Could not load file contents from " + url, ex);
-						System.Diagnostics.Debug.Assert(false, "Could not load file contents from " + url, ex.Message);
-					}
-				}
-				else
-				{
-					//its a relative path so use the execute method
-					StringWriter sw = new StringWriter();
-					try
-					{
-						HttpContext.Current.Server.Execute(url, sw);
-						requestContents = sw.ToString();
-						sw.Close();
-						return true;
-					}
-					catch (Exception ex)
-					{
-						HttpContext.Current.Trace.Warn("ClientDependency", "Could not load file contents from " + url, ex);
-						System.Diagnostics.Debug.Assert(false, "Could not load file contents from " + url, ex.Message);
-					}
-				}
-				
-			}
-			requestContents = "";
-			return false;
+			//the saved file's bytes are already compressed.
+			outputBytes = map.GetCompositeFileBytes();
+			compositeFileName = map.CompositeFileName;
+			CompressionType cType = (CompressionType)Enum.Parse(typeof(CompressionType), map.CompressionType);
+			SetContentEncodingHeaders(context, cType);	
 		}
 
 		/// <summary>
@@ -315,41 +182,23 @@ namespace umbraco.presentation.ClientDependency
 		}
 
 		/// <summary>
-		/// Compresses the bytes if the browser supports it
+		/// Check what kind of compression to use
 		/// </summary>
-		private CompressionType CompressBytes(HttpContext context, byte[] fileBytes, out byte[] outputBytes)
+		private CompressionType GetCompression(HttpContext context)
 		{
 			CompressionType type = CompressionType.none;
 			string acceptEncoding = context.Request.Headers["Accept-Encoding"];
-			//not compressed initially
-			outputBytes = fileBytes;
 
 			if (!string.IsNullOrEmpty(acceptEncoding))
-			{
-				MemoryStream ms = new MemoryStream();
-				Stream compressedStream = null;
-				acceptEncoding = acceptEncoding.ToLowerInvariant();
-
+			{				
 				//deflate is faster in .Net according to Mads Kristensen (blogengine.net)
 				if (acceptEncoding.Contains("deflate"))
-				{
-					compressedStream = new DeflateStream(ms, CompressionMode.Compress, true);
+				{			
 					type = CompressionType.deflate;
 				}
 				else if (acceptEncoding.Contains("gzip"))
 				{
-					compressedStream = new GZipStream(ms, CompressionMode.Compress, true);
 					type = CompressionType.gzip;
-				}
-
-				if (type != CompressionType.none)
-				{
-					//write the bytes to the compressed stream
-					compressedStream.Write(fileBytes, 0, fileBytes.Length);
-					compressedStream.Close();
-					byte[] output = ms.ToArray();
-					ms.Close();
-					outputBytes = output;
 				}
 			}
 

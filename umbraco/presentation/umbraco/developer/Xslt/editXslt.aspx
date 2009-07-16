@@ -3,6 +3,7 @@
     Inherits="umbraco.cms.presentation.developer.editXslt" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 <asp:Content ContentPlaceHolderID="head" runat="server" ID="cp2">
     <style type="text/css">
         #errorDiv
@@ -58,7 +59,7 @@
 		  
     </script>
 
-    <script type="text/javascript" src="../../js/jquery-fieldselection.js"></script>
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/jquery-fieldselection.js" PathNameAlias="UmbracoRoot"  />
 
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server" ID="cp1">

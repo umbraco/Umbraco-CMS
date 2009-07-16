@@ -13,14 +13,6 @@ using umbraco.presentation.ClientDependency;
 namespace umbraco.controls
 {
 
-	//"<script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/webservices/ajax.js\"></script>");
-	//"<script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/xmlextras.js\"></script>"
-	//"<script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/xmlRequest.js\"></script>");
-	//"<script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/submodal/common.js\"></script>
-	//"<script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/submodal/subModal.js\"></script>
-	//"<link href=\"" + GlobalSettings.Path + "/js/submodal/subModal.css\" type=\"text/css\" rel=\"stylesheet\"></link>");
-
-
 	[ClientDependency(ClientDependencyType.Javascript, "js/xmlextras.js", "UmbracoRoot")]
 	[ClientDependency(ClientDependencyType.Javascript, "js/xmlRequest.js", "UmbracoRoot")]
 	[ClientDependency(ClientDependencyType.Javascript, "webservices/ajax.js", "UmbracoRoot")]
@@ -86,10 +78,7 @@ namespace umbraco.controls
 		protected override void OnInit(EventArgs e)
 		{
 			base.OnInit(e);
-			//base.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "ajax", "<script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/webservices/ajax.js\"></script>");
-			//base.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "ajax1", "<script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/xmlextras.js\"></script><script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/xmlRequest.js\"></script>");
-			//base.Page.ClientScript.RegisterClientScriptBlock(GetType(), "subModal", "<script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/submodal/common.js\"></script><script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/submodal/subModal.js\"></script><link href=\"" + GlobalSettings.Path + "/js/submodal/subModal.css\" type=\"text/css\" rel=\"stylesheet\"></link>");
-
+			
 			// We need to make sure we have a reference to the legacy ajax calls in the scriptmanager
 			presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
 		}

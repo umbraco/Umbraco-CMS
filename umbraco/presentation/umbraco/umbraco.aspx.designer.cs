@@ -29,124 +29,124 @@ namespace umbraco.cms.presentation {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyLoader ClientLoader;
+        protected global::umbraco.presentation.ClientDependency.Controls.ClientDependencyLoader ClientLoader;
         
         /// <summary>
-        /// ClientDependencyInclude3 control.
+        /// CssInclude1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude3;
+        protected global::umbraco.presentation.ClientDependency.Controls.CssInclude CssInclude1;
         
         /// <summary>
-        /// ClientDependencyInclude1 control.
+        /// CssInclude2 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude1;
+        protected global::umbraco.presentation.ClientDependency.Controls.CssInclude CssInclude2;
         
         /// <summary>
-        /// ClientDependencyInclude4 control.
+        /// JsInclude1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude4;
+        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude1;
         
         /// <summary>
-        /// ClientDependencyInclude5 control.
+        /// JsInclude2 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude5;
+        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude2;
         
         /// <summary>
-        /// ClientDependencyInclude6 control.
+        /// JsInclude3 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude6;
+        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude3;
         
         /// <summary>
-        /// ClientDependencyInclude7 control.
+        /// JsInclude5 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude7;
+        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude5;
         
         /// <summary>
-        /// ClientDependencyInclude11 control.
+        /// JsInclude6 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude11;
+        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude6;
         
         /// <summary>
-        /// ClientDependencyInclude12 control.
+        /// JsInclude7 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude12;
+        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude7;
         
         /// <summary>
-        /// ClientDependencyInclude13 control.
+        /// JsInclude8 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude13;
+        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude8;
         
         /// <summary>
-        /// ClientDependencyInclude14 control.
+        /// JsInclude9 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude14;
+        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude9;
         
         /// <summary>
-        /// ClientDependencyInclude15 control.
+        /// JsInclude10 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude15;
+        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude10;
         
         /// <summary>
-        /// ClientDependencyInclude9 control.
+        /// JsInclude11 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude9;
+        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude11;
         
         /// <summary>
-        /// ClientDependencyInclude10 control.
+        /// JsInclude4 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.ClientDependencyInclude ClientDependencyInclude10;
+        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude4;
         
         /// <summary>
         /// Form1 control.

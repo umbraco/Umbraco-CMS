@@ -1,21 +1,29 @@
-﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="umbracoDialog.master.cs" Inherits="umbraco.presentation.umbraco.masterpages.umbracoDialog" %>    
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="umbracoDialog.master.cs" Inherits="umbraco.presentation.umbraco.masterpages.umbracoDialog" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head id="Head1" runat="server">
     <title></title>
     
     <!-- Default script and style -->
-    <link rel="Stylesheet" href="/umbraco_client/ui/default.css" type="text/css" />
+	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="ui/default.css" PathNameAlias="UmbracoClient" />
      
-    <script src="/umbraco_client/Application/NamespaceManager.js" type="text/javascript"></script>
-    <script src="/umbraco_client/ui/default.js" type="text/javascript"></script>
-    <script src="/umbraco_client/ui/jquery.js" type="text/javascript"></script>    
-    <script src="/umbraco_client/Application/UmbracoClientManager.js" type="text/javascript"></script>
+     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="Application/NamespaceManager.js" PathNameAlias="UmbracoClient" Priority="0"  />     
+     <umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="1"  />
+     <umb:JsInclude ID="JsInclude4" runat="server" FilePath="Application/UmbracoClientManager.js" PathNameAlias="UmbracoClient" Priority="2"  />
+     <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" Priority="5"  />     
     
     <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
 </head>
 
 <body class="umbracoDialog" style="margin: 15px 10px 0px 10px;">
+    <umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="Header" IsDebugMode="false" >
+		<Paths>
+			<umb:ClientDependencyPath Name="UmbracoClient" Path="~/umbraco_client" />
+			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
+		</Paths>		
+	</umb:ClientDependencyLoader>
+    
     <form id="form1" runat="server">
         <asp:ScriptManager ID="ScriptManager1" EnablePartialRendering="true" runat="server"></asp:ScriptManager>
         <asp:ContentPlaceHolder ID="body" runat="server">
