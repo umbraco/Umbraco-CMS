@@ -54,11 +54,11 @@ namespace umbraco.cms.businesslogic.packager
         private bool _containUnsecureFiles = false;
         private List<string> _unsecureFiles = new List<string>();
         private bool _containsMacroConflict = false;
-        private List<string> _conflictingMacroAliases = new List<string>();
+        private Dictionary<string, string> _conflictingMacroAliases = new Dictionary<string, string>();
         private bool _containsTemplateConflict = false;
-        private List<string> _conflictingTemplateAliases = new List<string>();
+        private Dictionary<string, string> _conflictingTemplateAliases = new Dictionary<string, string>();
         private bool _containsStyleSheetConflict = false;
-        private List<string> _conflictingStyleSheetNames = new List<string>();
+        private Dictionary<string, string> _conflictingStyleSheetNames = new Dictionary<string, string>();
 
         private ArrayList _macros = new ArrayList();
         private XmlDocument _packageConfig;
@@ -74,16 +74,16 @@ namespace umbraco.cms.businesslogic.packager
         public string Control { get { return _control; } }
 
         public bool ContainsMacroConflict { get { return _containsMacroConflict; } }
-        public IEnumerable<string> ConflictingMacroAliases { get { return _conflictingMacroAliases; } }
+        public IDictionary<string, string> ConflictingMacroAliases { get { return _conflictingMacroAliases; } }
         
         public bool ContainsUnsecureFiles { get { return _containUnsecureFiles; } }
         public List<string> UnsecureFiles { get { return _unsecureFiles; } }
 
         public bool ContainsTemplateConflicts { get { return _containsTemplateConflict; } }
-        public IEnumerable<string> ConflictingTemplateAliases { get { return _conflictingTemplateAliases; } }
+        public IDictionary<string, string> ConflictingTemplateAliases { get { return _conflictingTemplateAliases; } }
 
         public bool ContainsStyleSheeConflicts { get { return _containsStyleSheetConflict; } }
-        public IEnumerable<string> ConflictingStyleSheetNames { get { return _conflictingStyleSheetNames; } }
+        public IDictionary<string, string> ConflictingStyleSheetNames { get { return _conflictingStyleSheetNames; } }
 
         public int RequirementsMajor { get { return _reqMajor; } }
         public int RequirementsMinor { get { return _reqMinor; } }
@@ -868,7 +868,7 @@ namespace umbraco.cms.businesslogic.packager
                     {
                         var m = new Macro(alias);
                         this._containsMacroConflict = true;
-                        this._conflictingMacroAliases.Add(alias);
+                        this._conflictingMacroAliases.Add(m.Name, alias);
                     }
                     catch (IndexOutOfRangeException) { } //thrown when the alias doesn't exist in the DB, ie - macro not there
                 }
@@ -879,10 +879,11 @@ namespace umbraco.cms.businesslogic.packager
                 var alias = n.SelectSingleNode("Alias").InnerText;
                 if (!string.IsNullOrEmpty(alias))
                 {
-                    if (Template.GetByAlias(alias) != null)
+                    var t = Template.GetByAlias(alias);
+                    if (t != null)
                     {
                         this._containsTemplateConflict = true;
-                        this._conflictingTemplateAliases.Add(alias);
+                        this._conflictingTemplateAliases.Add(t.Text, alias);
                     }
                 }
             }
@@ -892,10 +893,11 @@ namespace umbraco.cms.businesslogic.packager
                 var alias = n.SelectSingleNode("Name").InnerText;
                 if (!string.IsNullOrEmpty(alias))
                 {
-                    if (StyleSheet.GetByName(alias) != null)
+                    var s = StyleSheet.GetByName(alias);
+                    if (s != null)
                     {
                         this._containsStyleSheetConflict = true;
-                        this._conflictingStyleSheetNames.Add(alias);
+                        this._conflictingStyleSheetNames.Add(s.Text, alias);
                     }
                 }
             }

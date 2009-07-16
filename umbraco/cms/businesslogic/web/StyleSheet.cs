@@ -450,7 +450,7 @@ namespace umbraco.cms.businesslogic.web
             foreach (XmlNode prop in n.SelectNodes("Properties/Property"))
             {
                 string alias = xmlHelper.GetNodeValue(prop.SelectSingleNode("Alias"));
-                var sp = s.Properties.SingleOrDefault(p => p.Alias == alias);
+                var sp = s.Properties.SingleOrDefault(p => p != null && p.Alias == alias);
                 string name = xmlHelper.GetNodeValue(prop.SelectSingleNode("Name"));
                 if (sp == default(StylesheetProperty))
                 {

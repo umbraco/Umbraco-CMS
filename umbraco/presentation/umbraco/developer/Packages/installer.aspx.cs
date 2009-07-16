@@ -157,27 +157,27 @@ namespace umbraco.presentation.developer.packages
             if (p.ContainsMacroConflict)
             {
                 pp_macroConflicts.Visible = true;
-                foreach (var alias in p.ConflictingMacroAliases)
+                foreach (var item in p.ConflictingMacroAliases)
                 {
-                    ltrMacroAlias.Text += "<li>" + alias + "</li>";
+                    ltrMacroAlias.Text += "<li>" + item.Key + " (Alias: " + item.Value + ")</li>";
                 }
             }
 
             if (p.ContainsTemplateConflicts)
             {
                 pp_templateConflicts.Visible = true;
-                foreach (var alias in p.ConflictingTemplateAliases)
+                foreach (var item in p.ConflictingTemplateAliases)
                 {
-                    ltrTemplateAlias.Text += "<li>" + alias + "</li>";
+                    ltrTemplateAlias.Text += "<li>" + item.Key + " (Alias: " + item.Value + ")</li>";
                 }
             }
 
             if (p.ContainsStyleSheeConflicts)
             {
                 pp_stylesheetConflicts.Visible = true;
-                foreach (var alias in p.ConflictingStyleSheetNames)
+                foreach (var item in p.ConflictingStyleSheetNames)
                 {
-                    ltrStylesheetNames.Text += "<li>" + alias + "</li>";
+                    ltrStylesheetNames.Text += "<li>" + item.Key + " (Alias: " + item.Value + ")</li>";
                 }
             }
 
