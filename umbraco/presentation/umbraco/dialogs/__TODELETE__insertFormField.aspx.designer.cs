@@ -11,78 +11,78 @@
 namespace umbraco.dialogs {
     
     
-    public partial class publish {
+    public partial class insertFormField {
         
         /// <summary>
-        /// masterPagePrefix control.
+        /// Form1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal masterPagePrefix;
+        protected global::System.Web.UI.HtmlControls.HtmlForm Form1;
         
         /// <summary>
-        /// JsInclude1 control.
+        /// macroProperties control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude1;
+        protected global::System.Web.UI.HtmlControls.HtmlTable macroProperties;
         
         /// <summary>
-        /// TheForm control.
+        /// formNavnLabel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel TheForm;
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell formNavnLabel;
         
         /// <summary>
-        /// PublishAll control.
+        /// formSizeLabel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox PublishAll;
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell formSizeLabel;
         
         /// <summary>
-        /// PublishUnpublishedItems control.
+        /// formHeightLabel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox PublishUnpublishedItems;
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell formHeightLabel;
         
         /// <summary>
-        /// ok control.
+        /// formValueLabel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button ok;
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell formValueLabel;
         
         /// <summary>
-        /// theEnd control.
+        /// formSendToLabel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel theEnd;
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell formSendToLabel;
         
         /// <summary>
-        /// feedbackMsg control.
+        /// formRedirectLabel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Feedback feedbackMsg;
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell formRedirectLabel;
     }
 }

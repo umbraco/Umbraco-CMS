@@ -1,5 +1,6 @@
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master"Codebehind="sort.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.sort" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
@@ -29,12 +30,14 @@
     </style>
   
   
-  <script type="text/javascript" src="/umbraco_client/tablesorting/tableFilter.js"></script>
-  <script type="text/javascript" src="/umbraco_client/tablesorting/tableDragAndDrop.js"></script>
+
   
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
+
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="tablesorting/tableFilter.js" PathNameAlias="UmbracoClient"/>
+	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="tablesorting/tableDragAndDrop.js" PathNameAlias="UmbracoClient"/>
 
 <div id="loading" style="display: none;">
 <div class="notice">

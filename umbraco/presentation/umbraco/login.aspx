@@ -2,14 +2,17 @@
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register Namespace="umbraco" TagPrefix="umb" Assembly="umbraco" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" >
-<html style="width: 100%; height: 100%">
-<head>
+<html>
+<head runat="server">
   <title>Umbraco - login</title>
-  <link href="/umbraco_client/ui/default.css" type="text/css" rel="stylesheet"/>
-  <script type="text/javascript" src="/umbraco_client/ui/default.js"></script>
+
+
   
   <style type="text/css">
+  html {width: 100%; height: 100%;}
   body{font-size: 11px; width: 100%; font-family: Trebuchet MS, verdana, arial, Lucida Grande;
   text-align: center; padding-top: 50px; margin: 0px;}
   
@@ -25,6 +28,16 @@
   
 </head>
 <body>
+	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="Header" IsDebugMode="false" >
+		<Paths>
+			<umb:ClientDependencyPath Name="UmbracoClient" Path="~/umbraco_client" />
+			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
+		</Paths>		
+	</umb:ClientDependencyLoader>
+
+	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="ui/default.css" PathNameAlias="UmbracoClient" />
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" />
+
   <form id="Form1" method="post" runat="server">
    
     <cc1:UmbracoPanel Style="text-align: left;" ID="Panel1" runat="server" Height="347px" Width="340px" Text="Umbraco 4 login" AutoResize="false">

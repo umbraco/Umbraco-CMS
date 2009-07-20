@@ -31,12 +31,12 @@
 			invokeSaveHandlers();
 			document.getElementById("TabView1_tab01layer_save").click();
 		}
-	</script>
-
-	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/umbracoCheckKeys.js" PathNameAlias="UmbracoRoot" />
+	</script>	
 
 </asp:Content>
 <asp:Content ID="Content1" ContentPlaceHolderID="body" runat="server">
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/umbracoCheckKeys.js" PathNameAlias="UmbracoRoot" />
+	
 	<table style="height:38px;width:371px;border:none 0px;" cellspacing="0" cellpadding="0">
 		<tr valign="top">
 			<td height="20">

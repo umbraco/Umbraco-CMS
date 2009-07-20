@@ -1,21 +1,17 @@
 using System;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.controls
 {
 	/// <summary>
 	/// Summary description for progressBar.
 	/// </summary>
+	[ClientDependency(ClientDependencyType.Javascript, "progressBar/javascript.js", "UmbracoClient")]
+	[ClientDependency(ClientDependencyType.Css, "progressBar/style.css", "UmbracoClient")]
 	public class progressBar : System.Web.UI.WebControls.WebControl
 	{
 		public progressBar()
 		{
-		}
-
-		protected override void OnInit(EventArgs e)
-		{
-			Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "progressBar", "<script language='javascript' src='/umbraco_client/progressBar/javascript.js'></script>");
-			Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "progressBarCss", "<LINK href=\"/umbraco_client/progressBar/style.css\" type=\"text/css\" rel=\"stylesheet\">");
-			base.OnInit (e);
 		}
 
 

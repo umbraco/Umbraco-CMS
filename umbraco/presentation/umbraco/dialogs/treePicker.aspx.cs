@@ -17,9 +17,10 @@ namespace umbraco.dialogs
 	/// </summary>
 	public partial class treePicker : BasePages.UmbracoEnsuredPage
 	{
-		protected void Page_Load(object sender, System.EventArgs e)
+		protected override void OnLoad(EventArgs e)
 		{
-			// Put user code to initialize the page here
+			base.OnLoad(e);
+			ClientLoader.DataBind();
 		}
 
         protected string TreeInitUrl

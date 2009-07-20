@@ -119,7 +119,9 @@ namespace umbraco.presentation.ClientDependency.Providers
 		protected List<string> ProcessCompositeList(List<IClientDependencyFile> dependencies, ClientDependencyType type)
 		{
 			List<string> rVal = new List<string>();
-			
+			if (dependencies.Count == 0)
+				return rVal;
+
 			//build the combined composite list url
 			string handler = "{0}?s={1}&t={2}";			
 			StringBuilder files = new StringBuilder();

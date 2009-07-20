@@ -1,4 +1,4 @@
-	<%@ Page language="c#" Codebehind="insertTextGen.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.insertTextGen" %>
+	<%@ Page language="c#" Codebehind="__TODELETE__insertTextGen.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.insertTextGen" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <HTML>
 	<HEAD>

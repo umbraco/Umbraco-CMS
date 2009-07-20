@@ -1,4 +1,4 @@
-<%@ Page language="c#" Codebehind="editCell.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.editCell" %>
+<%@ Page language="c#" Codebehind="__TODELETE__editCell.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.editCell" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <HTML>
 	<HEAD>

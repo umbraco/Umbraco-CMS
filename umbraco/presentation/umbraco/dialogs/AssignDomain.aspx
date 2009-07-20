@@ -3,15 +3,14 @@
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 <script type="text/javascript">
-function doSubmit() {document.Form1["ok"].click()}
+	function doSubmit() {document.Form1["ok"].click()}
 	var functionsFrame = this;
 	var tabFrame = this;
 	var isDialog = true;
 	var submitOnEnter = true;
 	</script>
-	<!--
-  <script type="text/javascript" src="../js/umbracoCheckKeys.js"></script>
--->
+
+
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">

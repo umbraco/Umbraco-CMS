@@ -1,4 +1,4 @@
-<%@ Page language="c#" Codebehind="insertLink.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.insertLink" %>
+<%@ Page language="c#" Codebehind="__TODELETE__insertLink.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.insertLink" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <HTML>
 	<HEAD>

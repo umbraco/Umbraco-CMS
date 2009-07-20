@@ -20,10 +20,11 @@ namespace umbraco.cms.presentation
     {
         protected umbWindow treeWindow;
 
-        protected void Page_Load(object sender, System.EventArgs e)
-        {
-
-        }
+		protected override void OnLoad(EventArgs e)
+		{
+			base.OnLoad(e);
+			ClientLoader.DataBind();
+		}
 
 
         protected override void OnPreRender(EventArgs e)

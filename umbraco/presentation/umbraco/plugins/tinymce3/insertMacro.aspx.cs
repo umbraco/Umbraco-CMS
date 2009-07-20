@@ -24,6 +24,8 @@ namespace umbraco.presentation.tinymce3
 
         protected void Page_Load(object sender, EventArgs e)
         {
+			ClientLoader.DataBind();
+
             string reqMacroID = helper.Request("umb_macroID");
             string reqMacroAlias = helper.Request("umb_macroAlias");
             bool ignoreForm = string.IsNullOrEmpty(helper.Request("class"));

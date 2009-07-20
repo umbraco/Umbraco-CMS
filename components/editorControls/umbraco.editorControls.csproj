@@ -354,10 +354,10 @@
     <Compile Include="userControlWrapper\usercontrolDataEditor.cs" />
     <Compile Include="userControlWrapper\usercontrolDataType.cs" />
     <Compile Include="userControlWrapper\usercontrolPrevalueEditor.cs" />
-    <Compile Include="wysiwyg\editor.cs">
+    <Compile Include="__TODELETE__wysiwyg\__TODELETE__editor.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="wysiwyg\WysiwygDataType.cs">
+    <Compile Include="__TODELETE__wysiwyg\__TODELETE__WysiwygDataType.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="yesno\yesNo.cs">

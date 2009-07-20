@@ -1,4 +1,4 @@
-<%@ Page language="c#" Codebehind="insertFormField.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.insertFormField" %>
+<%@ Page language="c#" Codebehind="__TODELETE__insertFormField.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.insertFormField" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <HTML>
 	<HEAD>

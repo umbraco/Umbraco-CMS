@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Web.UI;
+using System.Linq;
 
 namespace umbraco.presentation.ClientDependency.Providers
 {
@@ -34,7 +35,11 @@ namespace umbraco.presentation.ClientDependency.Providers
 			else
 			{
 				List<string> jsList = ProcessCompositeList(jsDependencies, ClientDependencyType.Javascript);
+				if (jsList.Count == 0)
+					return;
+
 				DependantControl.Page.Trace.Write("ClientDependency", string.Format("Processed composite list: {0}", jsList[0]));
+				
 				foreach (string js in jsList)
 				{
 					ProcessSingleJsFile(js);
@@ -44,8 +49,12 @@ namespace umbraco.presentation.ClientDependency.Providers
 
 		protected override void ProcessSingleJsFile(string js)
 		{
+			if (DependantControl.Page.Header == null)
+				throw new NullReferenceException("PageHeaderProvider requires a runat='server' tag in the page's header tag");
+
 			DependantControl.Page.Trace.Write("ClientDependency", string.Format("Registering: {0}", js));
-			DependantControl.Page.Header.Controls.Add(new LiteralControl(string.Format(ScriptEmbed, js)));
+			//DependantControl.Page.Header.Controls.AddAt(m_CurrJsIndex++, new LiteralControl(string.Format(ScriptEmbed, js)));
+			AddToHead(string.Format(ScriptEmbed, js));
 		}
 
 		protected override void RegisterCssFiles(List<IClientDependencyFile> cssDependencies)
@@ -60,7 +69,10 @@ namespace umbraco.presentation.ClientDependency.Providers
 			else
 			{
 				List<string> cssList = ProcessCompositeList(cssDependencies, ClientDependencyType.Css);
-				DependantControl.Page.Trace.Write("ClientDependency", string.Format("Processed composite list: {0}", cssList[0]));
+				if (cssList.Count == 0)
+					return;
+				
+				DependantControl.Page.Trace.Write("ClientDependency", string.Format("Processed composite list: {0}", cssList[0]));				
 				foreach (string css in cssList)
 				{
 					ProcessSingleCssFile(css);
@@ -70,8 +82,38 @@ namespace umbraco.presentation.ClientDependency.Providers
 
 		protected override void ProcessSingleCssFile(string css)
 		{
+			if (DependantControl.Page.Header == null)
+				throw new NullReferenceException("PageHeaderProvider requires a runat='server' tag in the page's header tag");
 			DependantControl.Page.Trace.Write("ClientDependency", string.Format("Registering: {0}", css));
-			DependantControl.Page.Header.Controls.Add(new LiteralControl(string.Format(CssEmbed, css)));
+			//DependantControl.Page.Header.Controls.AddAt(m_CurrJsIndex++, new LiteralControl(string.Format(CssEmbed, css)));
+			AddToHead(string.Format(CssEmbed, css));
+		}
+
+		/// <summary>
+		/// inserts the dependencies at the top of the head so needs to search the head
+		/// controls to find out where to insert.
+		/// </summary>
+		/// <param name="literal"></param>
+		private void AddToHead(string literal)
+		{			
+			List<int> indexes = new List<int>();
+			Type iDependency = typeof(IClientDependencyFile);
+			foreach (Control ctl in DependantControl.Page.Header.Controls)
+			{
+				if (ctl.ID != null && ctl.ID.StartsWith("CD_"))
+					indexes.Add(DependantControl.Page.Header.Controls.IndexOf(ctl));
+			}
+			//now that we have all of the indexes of the client dependencies, we need to insert
+			//the next one after the largest index
+			int newIndex = indexes.Count == 0 ? 0 : indexes.Max() + 1;
+			LiteralControl dCtl = new LiteralControl(literal);
+			dCtl.ID = "CD_" + newIndex.ToString();
+			if (newIndex >= DependantControl.Page.Header.Controls.Count)
+				DependantControl.Page.Header.Controls.Add(dCtl);
+			else
+				DependantControl.Page.Header.Controls.AddAt(newIndex, dCtl);
+
+
 		}
 	}
 }

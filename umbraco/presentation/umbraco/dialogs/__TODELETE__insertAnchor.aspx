@@ -1,4 +1,4 @@
-<%@ Page language="c#" Codebehind="insertAnchor.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.insertAnchor" %>
+<%@ Page language="c#" Codebehind="__TODELETE__insertAnchor.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.insertAnchor" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" > 
 
 <html>

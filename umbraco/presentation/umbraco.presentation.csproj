@@ -772,12 +772,12 @@
     <Compile Include="umbraco\dialogs\cruds.aspx.designer.cs">
       <DependentUpon>cruds.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\dialogs\editCell.aspx.cs">
-      <DependentUpon>editCell.aspx</DependentUpon>
+    <Compile Include="umbraco\dialogs\__TODELETE__editCell.aspx.cs">
+      <DependentUpon>__TODELETE__editCell.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco\dialogs\editCell.aspx.designer.cs">
-      <DependentUpon>editCell.aspx</DependentUpon>
+    <Compile Include="umbraco\dialogs\__TODELETE__editCell.aspx.designer.cs">
+      <DependentUpon>__TODELETE__editCell.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\dialogs\editImage.aspx.cs">
       <DependentUpon>editImage.aspx</DependentUpon>
@@ -815,33 +815,33 @@
       <DependentUpon>importDocumenttype.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco\dialogs\insertAnchor.aspx.cs">
-      <DependentUpon>insertAnchor.aspx</DependentUpon>
+    <Compile Include="umbraco\dialogs\__TODELETE__insertAnchor.aspx.cs">
+      <DependentUpon>__TODELETE__insertAnchor.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco\dialogs\insertAnchor.aspx.designer.cs">
-      <DependentUpon>insertAnchor.aspx</DependentUpon>
+    <Compile Include="umbraco\dialogs\__TODELETE__insertAnchor.aspx.designer.cs">
+      <DependentUpon>__TODELETE__insertAnchor.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\dialogs\insertFormField.aspx.cs">
-      <DependentUpon>insertFormField.aspx</DependentUpon>
+    <Compile Include="umbraco\dialogs\__TODELETE__insertFormField.aspx.cs">
+      <DependentUpon>__TODELETE__insertFormField.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco\dialogs\insertFormField.aspx.designer.cs">
-      <DependentUpon>insertFormField.aspx</DependentUpon>
+    <Compile Include="umbraco\dialogs\__TODELETE__insertFormField.aspx.designer.cs">
+      <DependentUpon>__TODELETE__insertFormField.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\dialogs\insertImage.aspx.cs">
-      <DependentUpon>insertImage.aspx</DependentUpon>
+    <Compile Include="umbraco\dialogs\__TODELETE__insertImage.aspx.cs">
+      <DependentUpon>__TODELETE__insertImage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco\dialogs\insertImage.aspx.designer.cs">
-      <DependentUpon>insertImage.aspx</DependentUpon>
+    <Compile Include="umbraco\dialogs\__TODELETE__insertImage.aspx.designer.cs">
+      <DependentUpon>__TODELETE__insertImage.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\dialogs\insertLink.aspx.cs">
-      <DependentUpon>insertLink.aspx</DependentUpon>
+    <Compile Include="umbraco\dialogs\__TODELETE__insertLink.aspx.cs">
+      <DependentUpon>__TODELETE__insertLink.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco\dialogs\insertLink.aspx.designer.cs">
-      <DependentUpon>insertLink.aspx</DependentUpon>
+    <Compile Include="umbraco\dialogs\__TODELETE__insertLink.aspx.designer.cs">
+      <DependentUpon>__TODELETE__insertLink.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\dialogs\insertMacro.aspx.cs">
       <DependentUpon>insertMacro.aspx</DependentUpon>
@@ -857,12 +857,12 @@
     <Compile Include="umbraco\dialogs\insertTable.aspx.designer.cs">
       <DependentUpon>insertTable.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\dialogs\insertTextGen.aspx.cs">
-      <DependentUpon>insertTextGen.aspx</DependentUpon>
+    <Compile Include="umbraco\dialogs\__TODELETE__insertTextGen.aspx.cs">
+      <DependentUpon>__TODELETE__insertTextGen.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco\dialogs\insertTextGen.aspx.designer.cs">
-      <DependentUpon>insertTextGen.aspx</DependentUpon>
+    <Compile Include="umbraco\dialogs\__TODELETE__insertTextGen.aspx.designer.cs">
+      <DependentUpon>__TODELETE__insertTextGen.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\dialogs\modalHolder.aspx.cs">
       <DependentUpon>modalHolder.aspx</DependentUpon>
@@ -892,12 +892,12 @@
     <Compile Include="umbraco\developer\Packages\installer.aspx.designer.cs">
       <DependentUpon>installer.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\dialogs\paste.aspx.cs">
-      <DependentUpon>paste.aspx</DependentUpon>
+    <Compile Include="umbraco\dialogs\__TODELETE__.aspx.cs">
+      <DependentUpon>__TODELETE__.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco\dialogs\paste.aspx.designer.cs">
-      <DependentUpon>paste.aspx</DependentUpon>
+    <Compile Include="umbraco\dialogs\__TODELETE__.aspx.designer.cs">
+      <DependentUpon>__TODELETE__.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\dialogs\protectPage.aspx.cs">
       <DependentUpon>protectPage.aspx</DependentUpon>
@@ -1577,6 +1577,7 @@
     <Content Include="umbraco\images\editor\spellchecker.gif" />
     <Content Include="umbraco_client\Application\JQuery\jquery.cookie.js" />
     <Content Include="umbraco_client\imagecropper\Jcrop.gif" />
+    <Content Include="umbraco_client\tablesorting\img\bg.gif" />
     <Content Include="umbraco_client\Tree\Themes\default\context.gif" />
     <Content Include="umbraco_client\Tree\Themes\default\create.png" />
     <Content Include="umbraco_client\Tree\Themes\default\dot.gif" />
@@ -1850,25 +1851,25 @@
     <Content Include="umbraco\dialogs\AssignDomain.aspx" />
     <Content Include="umbraco\dialogs\create.aspx" />
     <Content Include="umbraco\dialogs\cruds.aspx" />
-    <Content Include="umbraco\dialogs\editCell.aspx" />
+    <Content Include="umbraco\dialogs\__TODELETE__editCell.aspx" />
     <Content Include="umbraco\dialogs\editImage.aspx" />
     <Content Include="umbraco\dialogs\editMacro.aspx" />
     <Content Include="umbraco\dialogs\emptyTrashcan.aspx" />
     <Content Include="umbraco\dialogs\exportDocumenttype.aspx" />
     <Content Include="umbraco\dialogs\imageViewer.aspx" />
     <Content Include="umbraco\dialogs\importDocumenttype.aspx" />
-    <Content Include="umbraco\dialogs\insertAnchor.aspx" />
-    <Content Include="umbraco\dialogs\insertFormField.aspx" />
-    <Content Include="umbraco\dialogs\insertImage.aspx" />
-    <Content Include="umbraco\dialogs\insertLink.aspx" />
+    <Content Include="umbraco\dialogs\__TODELETE__insertAnchor.aspx" />
+    <Content Include="umbraco\dialogs\__TODELETE__insertFormField.aspx" />
+    <Content Include="umbraco\dialogs\__TODELETE__insertImage.aspx" />
+    <Content Include="umbraco\dialogs\__TODELETE__insertLink.aspx" />
     <Content Include="umbraco\dialogs\insertMacro.aspx" />
     <Content Include="umbraco\dialogs\insertTable.aspx" />
-    <Content Include="umbraco\dialogs\insertTextGen.aspx" />
+    <Content Include="umbraco\dialogs\__TODELETE__insertTextGen.aspx" />
     <Content Include="umbraco\dialogs\modalHolder.aspx" />
     <Content Include="umbraco\dialogs\moveOrCopy.aspx" />
     <Content Include="umbraco\dialogs\notifications.aspx" />
     <Content Include="umbraco\developer\Packages\installer.aspx" />
-    <Content Include="umbraco\dialogs\paste.aspx" />
+    <Content Include="umbraco\dialogs\__TODELETE__.aspx" />
     <Content Include="umbraco\dialogs\protectPage.aspx" />
     <Content Include="umbraco\dialogs\publish.aspx" />
     <Content Include="umbraco\dialogs\RegexWs.aspx" />
@@ -2018,7 +2019,7 @@
     <Content Include="umbraco\js\submodal\maskBG.png" />
     <Content Include="umbraco\js\submodal\subModal.css" />
     <Content Include="umbraco\js\submodal\subModal.js" />
-    <Content Include="umbraco_client\CodeArea\xbf.js" />
+    <Content Include="umbraco_client\CodeArea\__TODELETE__xbf.js" />
     <Content Include="umbraco\plugins\tinymce\images\sample.gif" />
     <Content Include="umbraco\plugins\tinymce\paste.aspx" />
     <Content Include="umbraco\reindex.aspx" />
@@ -2379,11 +2380,11 @@
     <Content Include="umbraco\js\__TODELETE__contextmenu.js" />
     <Content Include="umbraco\js\datepicker.js" />
     <Content Include="umbraco\js\dualSelectBox.js" />
-    <Content Include="umbraco\js\editorBarFunctions.js" />
+    <Content Include="umbraco\js\__TODELETE__editorBarFunctions.js" />
     <Content Include="umbraco_client\GenericProperty\genericProperty.js" />
     <Content Include="umbraco\js\guiFunctions.js" />
     <Content Include="umbraco\js\language.aspx" />
-    <Content Include="umbraco\js\richtextFunctions.js" />
+    <Content Include="umbraco\js\__TODELETE__richtextFunctions.js" />
     <Content Include="umbraco\js\__TODELETE__treeGui.js" />
     <Content Include="umbraco\js\__TODELETE__umbContext.js" />
     <Content Include="umbraco\js\umbracoCheckKeys.js" />
@@ -3627,8 +3628,8 @@
       <DependentUpon>cruds.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\editCell.aspx.resx">
-      <DependentUpon>editCell.aspx.cs</DependentUpon>
+    <EmbeddedResource Include="umbraco\dialogs\__TODELETE__editCell.aspx.resx">
+      <DependentUpon>__TODELETE__editCell.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="umbraco\dialogs\editImage.aspx.resx">
@@ -3651,20 +3652,20 @@
       <DependentUpon>importDocumenttype.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\insertAnchor.aspx.resx">
-      <DependentUpon>insertAnchor.aspx.cs</DependentUpon>
+    <EmbeddedResource Include="umbraco\dialogs\__TODELETE__insertAnchor.aspx.resx">
+      <DependentUpon>__TODELETE__insertAnchor.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\insertFormField.aspx.resx">
-      <DependentUpon>insertFormField.aspx.cs</DependentUpon>
+    <EmbeddedResource Include="umbraco\dialogs\__TODELETE__insertFormField.aspx.resx">
+      <DependentUpon>__TODELETE__insertFormField.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\insertImage.aspx.resx">
-      <DependentUpon>insertImage.aspx.cs</DependentUpon>
+    <EmbeddedResource Include="umbraco\dialogs\__TODELETE__insertImage.aspx.resx">
+      <DependentUpon>__TODELETE__insertImage.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\insertLink.aspx.resx">
-      <DependentUpon>insertLink.aspx.cs</DependentUpon>
+    <EmbeddedResource Include="umbraco\dialogs\__TODELETE__insertLink.aspx.resx">
+      <DependentUpon>__TODELETE__insertLink.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="umbraco\dialogs\insertMacro.aspx.resx">
@@ -3675,8 +3676,8 @@
       <DependentUpon>insertTable.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\insertTextGen.aspx.resx">
-      <DependentUpon>insertTextGen.aspx.cs</DependentUpon>
+    <EmbeddedResource Include="umbraco\dialogs\__TODELETE__insertTextGen.aspx.resx">
+      <DependentUpon>__TODELETE__insertTextGen.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="umbraco\dialogs\modalHolder.aspx.resx">
@@ -3691,8 +3692,8 @@
       <DependentUpon>notifications.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\paste.aspx.resx">
-      <DependentUpon>paste.aspx.cs</DependentUpon>
+    <EmbeddedResource Include="umbraco\dialogs\__TODELETE__.aspx.resx">
+      <DependentUpon>__TODELETE__.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="umbraco\dialogs\protectPage.aspx.resx">

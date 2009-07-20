@@ -1,5 +1,6 @@
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" Codebehind="umbracoField.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.umbracoField" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
  <style type="text/css">
@@ -75,7 +76,7 @@
 	var submitOnEnter = true;
   </script>
 
-  <script type="text/javascript" src="../js/umbracoCheckKeys.js"></script>
+
   
   <style type="text/css">
   .propertyItemheader{width: 170px !Important; }
@@ -83,6 +84,8 @@
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/umbracoCheckKeys.js" PathNameAlias="UmbracoRoot" />
+    
     <input type="hidden" name="tagName" runat="server" id="tagName" value="?UMBRACO_GETITEM">
     
     <cc1:Pane ID="pane_form" runat="server">

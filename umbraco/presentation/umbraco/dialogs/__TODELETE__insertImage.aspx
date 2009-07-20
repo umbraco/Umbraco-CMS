@@ -1,4 +1,4 @@
-<%@ Page language="c#" Codebehind="insertImage.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.insertImage" %>
+<%@ Page language="c#" Codebehind="__TODELETE__insertImage.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.insertImage" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <HTML>
 	<HEAD>

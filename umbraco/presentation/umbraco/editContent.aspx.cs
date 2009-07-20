@@ -76,8 +76,6 @@ namespace umbraco.cms.presentation
 
             jsIds.Text = "var umbPageId = " + _document.Id.ToString() + ";\nvar umbVersionId = '" + _document.Version.ToString() + "';\n";
 
-            // Shortcut keys
-            //Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "umbShortcutKeys", "<script src=\"js/umbracoCheckKeys.js\" type=\"text/javascript\"></script>");
         }
 
         protected void Save(object sender, System.EventArgs e)

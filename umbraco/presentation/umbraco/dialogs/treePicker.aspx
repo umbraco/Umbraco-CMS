@@ -1,42 +1,11 @@
 ﻿<%@ Page Language="c#" Codebehind="treePicker.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.treePicker" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
 
-<head>
-  <title>umbraco</title>
-  <link href="../css/umbracoGui.css" type="text/css" rel="stylesheet"/>
-	<script type="text/javascript" src="/umbraco_client/ui/jquery.js"></script>
-  <script type="text/javascript" language="javascript">
-			function dialogHandler(id) {
-			<%
-			    if (umbraco.helper.Request("useSubModal") != "") {%>
-                window.parent.hidePopWin(true, id)
-			<%
-     } else
-     {
-    %>
-				    window.returnValue = id;
-				    window.close();
-    <%
-    }
-    %>
-			}
-			
-			function closeWindow() {
-			<%
-			    if (umbraco.helper.Request("useSubModal") != "") {%>
-                window.parent.hidePopWin(false)
-			<%
-      } else
-      {
-      %>
-				      window.close();
-      <%
-      }
-      %>
-			}
-</script>
+<head runat="server">
+	<title>umbraco</title>
   
   <style type="text/css">
   #header{
@@ -70,6 +39,47 @@
 </style>
 </head>
 <body onload="this.focus()" style="overflow: hidden; padding: 0px; margin: 0px;">
+	<script type="text/javascript" language="javascript">
+			function dialogHandler(id) {
+			<%
+			    if (umbraco.helper.Request("useSubModal") != "") {%>
+                window.parent.hidePopWin(true, id)
+			<%
+     } else
+     {
+    %>
+				    window.returnValue = id;
+				    window.close();
+    <%
+    }
+    %>
+			}
+			
+			function closeWindow() {
+			<%
+			    if (umbraco.helper.Request("useSubModal") != "") {%>
+                window.parent.hidePopWin(false)
+			<%
+      } else
+      {
+      %>
+				      window.close();
+      <%
+      }
+      %>
+			}
+	</script>
+
+	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="Header" IsDebugMode="false" >
+		<Paths>
+			<umb:ClientDependencyPath Name="UmbracoClient" Path="~/umbraco_client" />
+			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
+		</Paths>		
+	</umb:ClientDependencyLoader>
+	
+	<umb:CssInclude runat="server" FilePath="css/umbracoGui.css" PathNameAlias="UmbracoRoot" />
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" />
+
   <div id="umbModal">
     <div id="header">
       <div id="caption">Pick a node</div>

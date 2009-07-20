@@ -33,7 +33,7 @@ namespace umbraco.uicontrols {
 
            //this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "CodeAreaStyles", "<link rel='stylesheet' href='/umbraco_client/CodeArea/style.css' />");
             this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "CodeAreaJavaScript", "<script language='javascript' src='/umbraco_client/CodeArea/javascript.js'></script>");
-           // this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "CodeAreaJavaScript_new", "<script language='javascript' src='/umbraco_client/CodeArea/xbf.js'></script>");
+           
             
 
         }

@@ -1,5 +1,5 @@
 <%@ Page Language="c#" CodeBehind="moveOrCopy.aspx.cs" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="True" Inherits="umbraco.dialogs.moveOrCopy" %>
-
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
@@ -43,7 +43,7 @@ function doSubmit() {document.Form1["ok"].click()}
 	
 	</script>
 
-	<script type="text/javascript" src="../js/umbracoCheckKeys.js"></script>
+	
 
 	<style type="text/css">
 		.propertyItemheader
@@ -53,6 +53,8 @@ function doSubmit() {document.Form1["ok"].click()}
 	</style>
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/umbracoCheckKeys.js" PathNameAlias="UmbracoRoot"/>
+	
 	<input type="hidden" id="copyTo" name="copyTo" />
 	<cc1:Feedback ID="feedback" runat="server" />
 	<cc1:Pane ID="pane_form" runat="server" Visible="false">

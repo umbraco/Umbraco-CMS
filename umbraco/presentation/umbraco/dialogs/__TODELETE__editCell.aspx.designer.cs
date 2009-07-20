@@ -8,54 +8,45 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace umbraco.cms.presentation {
+namespace umbraco.dialogs {
     
     
-    public partial class sort {
+    public partial class editCell {
         
         /// <summary>
-        /// JsInclude1 control.
+        /// Form1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude1;
+        protected global::System.Web.UI.HtmlControls.HtmlForm Form1;
         
         /// <summary>
-        /// JsInclude2 control.
+        /// macroProperties control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude2;
+        protected global::System.Web.UI.HtmlControls.HtmlTable macroProperties;
         
         /// <summary>
-        /// sortDone control.
+        /// tableAlign control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal sortDone;
+        protected global::System.Web.UI.WebControls.DropDownList tableAlign;
         
         /// <summary>
-        /// sortPane control.
+        /// tableVAlign control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane sortPane;
-        
-        /// <summary>
-        /// lt_nodes control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal lt_nodes;
+        protected global::System.Web.UI.WebControls.DropDownList tableVAlign;
     }
 }

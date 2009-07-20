@@ -1,4 +1,4 @@
-<%@ Page language="c#" Codebehind="paste.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.paste" %>
+<%@ Page language="c#" Codebehind="__TODELETE__.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.paste" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" > 
 
 <html>

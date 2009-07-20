@@ -1,5 +1,6 @@
 <%@ Page Language="c#" Codebehind="rollBack.aspx.cs" MasterPageFile="../masterpages/umbracoDialog.Master"AutoEventWireup="True" Inherits="umbraco.presentation.dialogs.rollBack" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
   <script type="text/javascript">
@@ -11,7 +12,7 @@
 	  var submitOnEnter = true;
   </script>
 
-  <script src="../js/umbracoCheckKeys.js" type="text/javascript"></script>
+
   
   
   <style type="text/css">
@@ -25,7 +26,7 @@
 		</asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
-
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/umbracoCheckKeys.js" PathNameAlias="UmbracoRoot"/>
 
 <cc1:Feedback ID="feedBackMsg" runat="server" />
 
