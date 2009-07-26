@@ -4,12 +4,16 @@ using Microsoft.ApplicationBlocks.Data;
 using System.Data.SqlClient;
 
 using System.Web.UI;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.macroRenderings
 {
 	/// <summary>
-	/// Summary description for content.
+	/// Summary description for media.
 	/// </summary>
+	[ClientDependency(103, ClientDependencyType.Javascript, "js/submodal/common.js", "UmbracoRoot")]
+	[ClientDependency(104, ClientDependencyType.Javascript, "js/submodal/subModal.js", "UmbracoRoot")]
+	[ClientDependency(ClientDependencyType.Css, "js/submodal/subModal.css", "UmbracoRoot")]
     public class media : System.Web.UI.WebControls.WebControl, interfaces.IMacroGuiRendering
 	{
         private string m_value = "";
@@ -38,9 +42,7 @@ namespace umbraco.macroRenderings
 
         protected override void OnInit(EventArgs e) {
             base.OnInit(e);
-            base.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "ajax", "<script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/webservices/ajax.js\"></script>");
-            base.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "ajax1", "<script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/xmlextras.js\"></script><script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/xmlRequest.js\"></script>");
-            base.Page.ClientScript.RegisterClientScriptBlock(GetType(), "subModal", "<script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/submodal/common.js\"></script><script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/submodal/subModal.js\"></script><link href=\"" + GlobalSettings.Path + "/js/submodal/subModal.css\" type=\"text/css\" rel=\"stylesheet\"></link>");
+            
 
             // We need to make sure we have a reference to the legacy ajax calls in the scriptmanager
             ScriptManager sm = ScriptManager.GetCurrent(Page);

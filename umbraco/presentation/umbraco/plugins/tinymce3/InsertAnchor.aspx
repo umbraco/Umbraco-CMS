@@ -1,12 +1,22 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="InsertAnchor.aspx.cs" Inherits="umbraco.presentation.umbraco.plugins.tinymce3.InsertAnchor" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
+<head runat="server">
 	<title><%= umbraco.ui.Text("insertAnchor") %></title>
-	<script type="text/javascript" src="/umbraco_client/tinymce3/tiny_mce_popup.js"></script>
-	<script type="text/javascript" src="/umbraco_client/tinymce3/themes/umbraco/js/anchor.js"></script>
 	<base target="_self" />
 </head>
 <body style="display: none">
+
+	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="Header" IsDebugMode="false" >
+		<Paths>
+			<umb:ClientDependencyPath Name="UmbracoClient" Path="~/umbraco_client" />
+			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
+		</Paths>		
+	</umb:ClientDependencyLoader>
+	
+	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="tinymce3/tiny_mce_popup.js" PathNameAlias="UmbracoClient" Priority="100" />
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="tinymce3/themes/umbraco/js/anchor.js" PathNameAlias="UmbracoClient" Priority="101" />
+
 <form onsubmit="AnchorDialog.update();return false;" action="#">
 	<table border="0" cellpadding="4" cellspacing="0">
 		<tr>

@@ -13,6 +13,8 @@ namespace umbraco.presentation.plugins.tinymce3
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
+			ClientLoader.DataBind();
+
             pp_src.Text = ui.Text("url");
             pp_title.Text = ui.Text("name");
             pp_dimensions.Text = ui.Text("dimensions");

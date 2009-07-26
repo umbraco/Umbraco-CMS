@@ -1,4 +1,5 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="insertLink.aspx.cs" Inherits="umbraco.presentation.plugins.tinymce3.insertLink" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 <%@ Register TagPrefix="ui" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -6,17 +7,6 @@
 
 <head id="Head1" runat="server">
     <title>{#advlink_dlg.title}</title>
-
-    <script type="text/javascript" src="../../../umbraco_client/ui/jquery.js"></script>
-    <!--    
-    <script type="text/javascript" src="../../../umbraco_client/tinymce3/utils/mctabs.js"></script>
-    <script type="text/javascript" src="../../../umbraco_client/tinymce3/utils/validate.js"></script>
-    <link href="../../../umbraco_client/tinymce3/plugins/advlink/css/advlink.css" rel="stylesheet" type="text/css" />
-    -->
-    
-    <script type="text/javascript" src="../../../umbraco_client/tinymce3/tiny_mce_popup.js"></script>
-    <script type="text/javascript" src="../../../umbraco_client/tinymce3/plugins/advlink/js/advlink.js"></script>
-    <script type="text/javascript" src="../../../umbraco_client/tinymce3/utils/form_utils.js"></script>
     
     <base target="_self" />
 
@@ -80,6 +70,19 @@
     
 </head>
 <body id="advlink" style="display: none">
+	
+	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="Header" IsDebugMode="false" >
+		<Paths>
+			<umb:ClientDependencyPath Name="UmbracoClient" Path="~/umbraco_client" />
+			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
+		</Paths>		
+	</umb:ClientDependencyLoader>
+	
+	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="tinymce3/tiny_mce_popup.js" PathNameAlias="UmbracoClient" Priority="100" />
+	<umb:JsInclude ID="JsInclude3" runat="server" FilePath="tinymce3/plugins/advlink/js/advlink.js" PathNameAlias="UmbracoClient" Priority="101" />
+	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="tinymce3/utils/form_utils.js" PathNameAlias="UmbracoClient" Priority="102" />
+
     <form runat="server" action="#">
     <asp:ScriptManager EnablePartialRendering="false" runat="server">
         <Services>

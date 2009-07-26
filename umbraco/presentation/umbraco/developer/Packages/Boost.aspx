@@ -1,8 +1,11 @@
 <%@ Page Language="C#" AutoEventWireup="true" MasterPageFile="../../masterpages/umbracoPage.Master" Title="Install boost" CodeBehind="Boost.aspx.cs" Inherits="umbraco.presentation.developer.packages.Boost" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
-<script type="text/javascript" src="/umbraco_client/ui/accordian.js"></script>
+
+<umb:JsInclude ID="JsInclude1" runat="server" FilePath="ui/accordian.js" PathNameAlias="UmbracoClient" />
+
 <script type="text/javascript">
         function showProgress(button, elementId) {
             var img = document.getElementById(elementId);

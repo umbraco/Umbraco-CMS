@@ -8,8 +8,13 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.uicontrols {
+
+
+	[ClientDependency(ClientDependencyType.Javascript, "panel/javascript.js", "UmbracoClient")]
+	[ClientDependency(ClientDependencyType.Css, "panel/style.css", "UmbracoClient")]
    public class UmbracoPanel : System.Web.UI.WebControls.Panel {
         private ScrollingMenu _menu = new ScrollingMenu();
 
@@ -22,10 +27,6 @@ namespace umbraco.uicontrols {
         }
 
         protected override void OnLoad(System.EventArgs EventArguments) {
-            helper.AddLinkToHeader("PanelStyles", "/umbraco_client/panel/style.css", this.Page);
-            helper.AddScriptToHeader("PanelScript", "/umbraco_client/panel/javascript.js", this.Page);
-            //            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "PanelStyles", "<link rel='stylesheet' href='/umbraco_client/panel/style.css' />");
-//            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "PanelScript", "<script type='text/javascript' src='/umbraco_client/panel/javascript.js'></script>");
 
             _menu.Visible = hasMenu;
 

@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.BasePages;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.controls.GenericProperties
 {
@@ -13,6 +14,8 @@ namespace umbraco.controls.GenericProperties
 	/// <summary>
 	///		Summary description for GenericProperty.
 	/// </summary>
+	[ClientDependency(ClientDependencyType.Css, "GenericProperty/genericproperty.css", "UmbracoClient")]
+	[ClientDependency(ClientDependencyType.Javascript, "GenericProperty/genericproperty.js", "UmbracoClient")]
 	public partial class GenericProperty : System.Web.UI.UserControl
 	{
 
@@ -222,8 +225,7 @@ namespace umbraco.controls.GenericProperties
 			//
 			InitializeComponent();
 			base.OnInit(e);
-            Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "GenericPropertyCss", "<link href=\"/umbraco_client/GenericProperty/genericproperty.css\" type=\"text/css\" rel=\"stylesheet\">");
-			Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "GenericPropertyJs", "<script src=\"/umbraco_client/GenericProperty/genericproperty.js\" type=\"text/javascript\"></script>");
+
 			this.Delete += new System.EventHandler(defaultDeleteHandler);
 		}
 		

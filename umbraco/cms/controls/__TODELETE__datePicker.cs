@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Globalization;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.controls
 {
@@ -13,6 +14,7 @@ namespace umbraco.controls
 	/// </summary>
 	[DefaultProperty("Text"), 
 		ToolboxData("<{0}:datePicker runat=server></{0}:datePicker>")]
+	[ClientDependency(ClientDependencyType.Javascript, "datepicker/javascript.js", "UmbracoClient")]
 	public class datePicker_old : System.Web.UI.WebControls.WebControl
 	{
 		private DateTime _datetime = new DateTime(1900, 1, 1);
@@ -86,7 +88,7 @@ namespace umbraco.controls
 
 		protected override void OnInit(EventArgs e)
 		{
-			Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "datepicker", "<script language='javascript' src='/umbraco_client/datepicker/javascript.js'></script>");
+			
 			base.OnInit (e);
 		}
 

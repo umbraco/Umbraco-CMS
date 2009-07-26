@@ -12,6 +12,17 @@ namespace umbraco.presentation.ClientDependency.Controls
 		{			
             Priority = DefaultPriority;
 			DoNotOptimize = false;
+			PathNameAlias = "";
+		}
+
+		public ClientDependencyInclude(IClientDependencyFile file)
+		{
+			Priority = file.Priority;
+			DoNotOptimize = file.DoNotOptimize;
+			PathNameAlias = file.PathNameAlias;
+			FilePath = file.FilePath;
+			DependencyType = file.DependencyType;
+			InvokeJavascriptMethodOnLoad = file.InvokeJavascriptMethodOnLoad;
 		}
 
         /// <summary>
@@ -21,7 +32,7 @@ namespace umbraco.presentation.ClientDependency.Controls
         /// This will generally mean that if a developer doesn't specify a priority it will come after all other dependencies that 
         /// have unless the priority is explicitly set above 100.
         /// </remarks>
-        protected const int DefaultPriority = 100;
+        public const int DefaultPriority = 100;
 
 		/// <summary>
 		/// If set to true, this file will not be compressed, combined, etc...
@@ -37,7 +48,6 @@ namespace umbraco.presentation.ClientDependency.Controls
 
 		public string FilePath { get; set; }
         public string PathNameAlias { get; set; }
-        public string CompositeGroupName { get; set; }
         public int Priority { get; set; }
         public string InvokeJavascriptMethodOnLoad { get; set; }
 

@@ -50,19 +50,13 @@ namespace umbraco.presentation.ClientDependency.Providers
             List<IClientDependencyFile> jsDependencies = AllDependencies.FindAll(
                 delegate(IClientDependencyFile a)
 				{
-					//if (!IsDebugMode)
-					//    return a.DependencyType == ClientDependencyType.Javascript && string.IsNullOrEmpty(a.CompositeGroupName);
-					//else
-                        return a.DependencyType == ClientDependencyType.Javascript;
+                    return a.DependencyType == ClientDependencyType.Javascript;
 				}
 			);
             List<IClientDependencyFile> cssDependencies = AllDependencies.FindAll(
                 delegate(IClientDependencyFile a)
 				{
-					//if (!IsDebugMode)
-					//    return a.DependencyType == ClientDependencyType.Css && string.IsNullOrEmpty(a.CompositeGroupName);
-					//else
-                        return a.DependencyType == ClientDependencyType.Css;
+                    return a.DependencyType == ClientDependencyType.Css;
 				}
 			);
 
@@ -70,36 +64,28 @@ namespace umbraco.presentation.ClientDependency.Providers
 			jsDependencies.Sort((a, b) => a.Priority.CompareTo(b.Priority));
 			cssDependencies.Sort((a, b) => a.Priority.CompareTo(b.Priority));
 
-            //if (!IsDebugMode) RegisterCssFiles(ProcessCompositeGroups(ClientDependencyType.Css));
             RegisterCssFiles(cssDependencies.ConvertAll<IClientDependencyFile>(a => { return (IClientDependencyFile)a; }));
-            //if (!IsDebugMode) RegisterJsFiles(ProcessCompositeGroups(ClientDependencyType.Javascript));
 			RegisterJsFiles(jsDependencies.ConvertAll<IClientDependencyFile>(a => { return (IClientDependencyFile)a; }));
-            
+
+			//Register all startup scripts in order
+			RegisterStartupScripts(dependencies
+				.Where(x => !string.IsNullOrEmpty(x.InvokeJavascriptMethodOnLoad))
+				.OrderBy(x => x.Priority)
+				.ToList());
 		}
 
-		//private List<IClientDependencyFile> ProcessCompositeGroups(ClientDependencyType type)
-		//{
-		//    List<IClientDependencyFile> dependencies = AllDependencies.FindAll(
-		//        delegate(IClientDependencyFile a)
-		//        {
-		//            return a.DependencyType == type && !string.IsNullOrEmpty(a.CompositeGroupName);
-		//        }
-		//    );
-            
-		//    List<string> groups = new List<string>();
-		//    List<IClientDependencyFile> files = new List<IClientDependencyFile>();
-		//    foreach (IClientDependencyFile a in dependencies)
-		//    {
-		//        if (!groups.Contains(a.CompositeGroupName))
-		//        {
-		//            string url = ProcessCompositeGroup(dependencies, a.CompositeGroupName, type);
-		//            groups.Add(a.CompositeGroupName);
-		//            files.Add(new SimpleDependencyFile(url, type));
-		//            DependantControl.Page.Trace.Write("ClientDependency", "Composite group " + a.CompositeGroupName + " URL: " + url);
-		//        }
-		//    }
-		//    return files;
-		//}
+		/// <summary>
+		/// Registers all of the methods/scripts to be invoked that have been set in the InvokeJavaScriptMethodOnLoad propery
+		/// for each dependent js script.
+		/// </summary>
+		/// <param name="jsDependencies"></param>
+		protected virtual void RegisterStartupScripts(List<IClientDependencyFile> dependencies)
+		{
+			foreach (var js in dependencies)
+			{
+				DependantControl.Page.ClientScript.RegisterStartupScript(this.GetType(), js.GetHashCode().ToString(), js.InvokeJavascriptMethodOnLoad, true);
+			}
+		}
 
 		/// <summary>
 		/// Returns a list of urls. The array will consist of only one entry if 
@@ -182,22 +168,7 @@ namespace umbraco.presentation.ClientDependency.Providers
 				}
 			}
 		}
-
-		//internal class SimpleDependencyFile : IClientDependencyFile
-		//{
-		//    public SimpleDependencyFile(string filePath, ClientDependencyType type)
-		//    {
-		//        FilePath = filePath;
-		//        DependencyType = type;
-		//    }
-
-		//    public string FilePath{get;set;}
-		//    public ClientDependencyType DependencyType { get; set; }
-		//    public string InvokeJavascriptMethodOnLoad { get; set; }
-		//    public int Priority { get; set; }
-		//    //public string CompositeGroupName { get; set; }
-		//    public string PathNameAlias { get; set; }
-		//}
+		
 
 	}
 }

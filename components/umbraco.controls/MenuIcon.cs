@@ -1,7 +1,10 @@
 using System.ComponentModel;
 using System.Web.UI;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.uicontrols {
+
+	[ClientDependency(ClientDependencyType.Css, "menuicon/style.css", "UmbracoClient")]
     internal class MenuIcon : System.Web.UI.WebControls.Image, MenuIconI {
         private string _OnClickCommand = "";
         private string _AltText = "init";
@@ -40,7 +43,7 @@ namespace umbraco.uicontrols {
         }
 
         protected override void OnLoad(System.EventArgs EventArguments) {
-            SetupClientScript();
+
 
             // NH 17-01-2007. Trying to avoid inline styling soup 
             //        Me.Width = WebControls.Unit.Pixel(22)
@@ -66,8 +69,6 @@ namespace umbraco.uicontrols {
             }
         }
 
-        private void SetupClientScript() {
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "MENUICONCSS", "<link rel='stylesheet' href='/umbraco_client/menuicon/style.css' />");
-        }
+
     }
 }

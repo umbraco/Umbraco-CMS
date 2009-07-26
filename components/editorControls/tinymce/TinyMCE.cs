@@ -320,7 +320,7 @@ namespace umbraco.editorControls.tinymce {
         }
 
         protected override void Render(HtmlTextWriter output) {
-            base.JavascriptLocation = "/umbraco_client/tinymce/tiny_mce.js";
+            base.JavascriptLocation = GlobalSettings.ClientPath + "/tinymce/tiny_mce.js";
             base.Render(output);
         }
 

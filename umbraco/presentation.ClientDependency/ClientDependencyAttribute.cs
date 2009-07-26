@@ -16,6 +16,7 @@ namespace umbraco.presentation.ClientDependency
         {
             Priority = DefaultPriority;
 			DoNotOptimize = false;
+			PathNameAlias = "";
         }
 
         /// <summary>
@@ -35,18 +36,7 @@ namespace umbraco.presentation.ClientDependency
 		/// Useful for debugging dodgy scripts.
 		/// Default is false.
 		/// </remarks>
-		public bool DoNotOptimize { get; set; }
-
-		/// <summary>
-		/// If dependencies have a composite group name specified, the system will combine all dependency
-		/// file contents under the one group name and GZIP the output to output cache.
-		/// </summary>
-		/// <remarks>
-		/// This is optional but should be used to decrease the number of requests, save bandwidth and increase
-		/// performance on the client side.
-		/// Though both javascript and css files may have the same group name specified, they will be treated seperately.
-		/// </remarks>
-		//public string CompositeGroupName { get; set; }
+		public bool DoNotOptimize { get; set; }	
 
 		/// <summary>
 		/// Gets or sets the priority.

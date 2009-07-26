@@ -16,6 +16,32 @@ namespace umbraco.presentation.ClientDependency
 	}
 
 	/// <summary>
+	/// A simple class defining a Uri string and whether or not it is a local application file
+	/// </summary>
+	public class CompositeFileDefinition
+	{
+		public CompositeFileDefinition(string uri, bool isLocalFile)
+		{
+			IsLocalFile = isLocalFile;
+			Uri = uri;
+		}
+		public bool IsLocalFile { get; set; }
+		public string Uri { get; set; }
+
+		public override bool Equals(object obj)
+		{
+			return (obj.GetType().Equals(this.GetType())
+				&& ((CompositeFileDefinition)obj).IsLocalFile.Equals(IsLocalFile)
+				&& ((CompositeFileDefinition)obj).Uri.Equals(Uri));
+		}
+
+		public override int GetHashCode()
+		{
+			return Uri.GetHashCode();
+		}
+	}
+
+	/// <summary>
 	/// A utility class for combining, compressing and saving composite scripts/css files
 	/// </summary>
 	public static class CompositeFileProcessor
@@ -52,8 +78,11 @@ namespace umbraco.presentation.ClientDependency
 		/// <param name="fileList"></param>
 		/// <param name="context"></param>
 		/// <returns></returns>
-		public static byte[] CombineFiles(string[] strFiles, HttpContext context, ClientDependencyType type)
+		public static byte[] CombineFiles(string[] strFiles, HttpContext context, ClientDependencyType type, out List<CompositeFileDefinition> fileDefs)
 		{
+
+			List<CompositeFileDefinition> fDefs = new List<CompositeFileDefinition>();
+
 			MemoryStream ms = new MemoryStream(5000);
 			StreamWriter sw = new StreamWriter(ms);
 			foreach (string s in strFiles)
@@ -68,26 +97,28 @@ namespace umbraco.presentation.ClientDependency
 							//if the file doesn't exist, then we'll assume it is a URI external request
 							if (!fi.Exists)
 							{
-								WriteFileToStream(ref sw, s, type);
+								WriteFileToStream(ref sw, s, type, ref fDefs);
 							}
 							else
 							{
-								WriteFileToStream(ref sw, fi, type, s);
+								WriteFileToStream(ref sw, fi, type, s, ref fDefs);
 							}
 						}
 						else
 						{
 							//if it's not a file based dependency, try to get the request output.
-							WriteFileToStream(ref sw, s, type);
+							WriteFileToStream(ref sw, s, type, ref fDefs);
 						}
 					}
 					catch (Exception ex)
 					{
 						Type exType = ex.GetType();
-						if (exType.Equals(typeof(NotSupportedException)) || exType.Equals(typeof(ArgumentException)))
+						if (exType.Equals(typeof(NotSupportedException)) 
+							|| exType.Equals(typeof(ArgumentException))
+							|| exType.Equals(typeof(HttpException)))
 						{
-							//could not parse the string into a fileinfo, so we assume it is a URI
-							WriteFileToStream(ref sw, s, type);
+							//could not parse the string into a fileinfo or couldn't mappath, so we assume it is a URI
+							WriteFileToStream(ref sw, s, type, ref fDefs);
 						}
 						else
 						{
@@ -108,6 +139,7 @@ namespace umbraco.presentation.ClientDependency
 			byte[] outputBytes = ms.ToArray();
 			sw.Close();
 			ms.Close();
+			fileDefs = fDefs;
 			return outputBytes;
 		}
 
@@ -117,7 +149,7 @@ namespace umbraco.presentation.ClientDependency
 		/// <param name="sw"></param>
 		/// <param name="url"></param>
 		/// <returns></returns>
-		private static bool WriteFileToStream(ref StreamWriter sw, string url, ClientDependencyType type)
+		private static bool WriteFileToStream(ref StreamWriter sw, string url, ClientDependencyType type, ref List<CompositeFileDefinition> fileDefs)
 		{
 			string requestOutput;
 			bool rVal = false;
@@ -126,17 +158,19 @@ namespace umbraco.presentation.ClientDependency
 			{
 				//write the contents of the external request.
 				sw.WriteLine(ParseFileContents(requestOutput, type, url));
+				fileDefs.Add(new CompositeFileDefinition(url, false));
 			}
 			return rVal;
 		}
 
-		private static bool WriteFileToStream(ref StreamWriter sw, FileInfo fi, ClientDependencyType type, string origUrl)
+		private static bool WriteFileToStream(ref StreamWriter sw, FileInfo fi, ClientDependencyType type, string origUrl, ref List<CompositeFileDefinition> fileDefs)
 		{
 			try
 			{
 				//if it is a file based dependency then read it
 				string fileContents = File.ReadAllText(fi.FullName);
 				sw.WriteLine(ParseFileContents(fileContents, type, origUrl));
+				fileDefs.Add(new CompositeFileDefinition(origUrl, true));
 				return true;
 			}
 			catch (Exception ex)

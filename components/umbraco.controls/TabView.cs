@@ -8,8 +8,12 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.uicontrols {
+
+	[ClientDependency(ClientDependencyType.Javascript, "tabview/javascript.js", "UmbracoClient")]
+	[ClientDependency(ClientDependencyType.Css, "tabview/style.css", "UmbracoClient")]
     public class TabView : System.Web.UI.WebControls.WebControl {
         private HtmlInputHidden tb = new HtmlInputHidden();
         private ArrayList Tabs = new ArrayList();
@@ -57,8 +61,7 @@ namespace umbraco.uicontrols {
         }
 
         private void SetupClientScript() {
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "TabviewCss", "<link rel='stylesheet' href='/umbraco_client/tabview/style.css' />");
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "TabviewJs", "<script language='javascript' src='/umbraco_client/tabview/javascript.js'></script>");
+            
 
             string strTmp = "";
             for (int i = 1; i <= Tabs.Count; i++) {

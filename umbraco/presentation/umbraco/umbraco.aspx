@@ -19,7 +19,7 @@
 <body id="umbracoMainPageBody">
 	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="Header" IsDebugMode="false" >
 		<Paths>
-			<umb:ClientDependencyPath Name="UmbracoClient" Path="~/umbraco_client" />
+			<umb:ClientDependencyPath Name="UmbracoClient" Path='<%#umbraco.GlobalSettings.ClientPath%>' />
 			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
 		</Paths>		
 	</umb:ClientDependencyLoader>
@@ -40,6 +40,7 @@
 	<umb:JsInclude ID="JsInclude11" runat="server" FilePath="js/language.aspx" PathNameAlias="UmbracoRoot" />
 	
 	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="modal/modal.js" PathNameAlias="UmbracoClient" Priority="10" />	
+	<umb:JsInclude ID="JsInclude12" runat="server" FilePath="js/UmbracoSpeechBubbleBackend.js" PathNameAlias="UmbracoRoot"  />	
 	
 	
 	
@@ -109,7 +110,7 @@
 		</div>
 	</div>
 
-	<script type="text/javascript" src="js/UmbracoSpeechBubbleBackend.js"></script>
+
 
 	<script type="text/javascript">
 

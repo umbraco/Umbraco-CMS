@@ -8,9 +8,11 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.uicontrols {
 
+	[ClientDependency(ClientDependencyType.Javascript, "CodeArea/javascript.js", "UmbracoClient")]
     public class CodeArea : System.Web.UI.WebControls.TextBox {
 
         public CodeArea() {
@@ -28,15 +30,6 @@ namespace umbraco.uicontrols {
         public int OffSetX { get; set; }
         public int OffSetY { get; set; }
 
-        protected override void OnInit(System.EventArgs e) {
-
-
-           //this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "CodeAreaStyles", "<link rel='stylesheet' href='/umbraco_client/CodeArea/style.css' />");
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "CodeAreaJavaScript", "<script language='javascript' src='/umbraco_client/CodeArea/javascript.js'></script>");
-           
-            
-
-        }
 
         protected override void Render(HtmlTextWriter writer) {
             base.Render(writer);
@@ -62,7 +55,7 @@ namespace umbraco.uicontrols {
 
             writer.WriteLine(jsEventCode);
 
-            //this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "CodeAreaEvents", jsEventCode);
+
         }
     }
 

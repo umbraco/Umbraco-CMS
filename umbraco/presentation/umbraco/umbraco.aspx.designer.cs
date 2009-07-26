@@ -149,6 +149,15 @@ namespace umbraco.cms.presentation {
         protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude4;
         
         /// <summary>
+        /// JsInclude12 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.presentation.ClientDependency.Controls.JsInclude JsInclude12;
+        
+        /// <summary>
         /// Form1 control.
         /// </summary>
         /// <remarks>

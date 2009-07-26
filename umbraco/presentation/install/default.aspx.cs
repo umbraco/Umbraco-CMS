@@ -22,6 +22,8 @@ namespace umbraco.presentation.install
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
+			ClientLoader.DataBind();
+
             //If user wishes to subscribe to security updates
             if (!string.IsNullOrEmpty(Request["email"]) && !string.IsNullOrEmpty(Request["name"]))
                 SubscribeToNewsLetter(Request["name"], Request["email"]);

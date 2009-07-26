@@ -287,6 +287,7 @@ namespace umbraco
         /// The editor is therefor turned off by default and a standard Textarea is used instead
         /// </summary>
         /// <value><c>true</c> if the scripteditor is disabled; otherwise, <c>false</c>.</value>
+		[Obsolete("This value is no longer used in the Umbraco core")]
         public static bool ScriptDisableEditor
         {
             get

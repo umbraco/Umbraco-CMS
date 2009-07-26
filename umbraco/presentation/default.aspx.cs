@@ -157,20 +157,7 @@ namespace umbraco
             else
                 Page.Trace.IsEnabled = false;
 
-            // test for edit mode
-            /*if (helper.UserInLiveEditingMode())
-            {
-                // turn off request validation when in Live Editing mode
-                // can probably be removed
-                new System.Web.Configuration.PagesSection().ValidateRequest = false;
-                if (ScriptManager.GetCurrent(this.Page) == null)
-                {
-                    throw new Exception("Umbraco Live Editing Requires a Script Manager in the template");
-                }
-                Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "umbEditCss", "<link href=\"" + GlobalSettings.Path + "/css/umbLiveEditing.css\" type=\"text/css\" rel=\"stylesheet\"></link>", false);
-                Page.ClientScript.RegisterClientScriptInclude(this.GetType(), "umbEditJs", GlobalSettings.Path + "/js/umbLiveEditing.js");
-                Page.ClientScript.RegisterClientScriptInclude(this.GetType(), "umbEditPrototype", GlobalSettings.Path + "/js/prototype.js");
-            }*/
+            
 
         }
 

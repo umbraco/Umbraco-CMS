@@ -1,15 +1,23 @@
+using System.IO;
+using System;
+using System.Data;
+using System.Drawing;
+using System.Web;
+using System.Web.UI.WebControls;
+using System.Web.UI.HtmlControls;
+using System.Collections;
+using System.Web.UI;
+using umbraco.presentation.ClientDependency;
+
 namespace umbraco.controls
 {
-    using System.IO;
-    using System;
-    using System.Data;
-    using System.Drawing;
-    using System.Web;
-    using System.Web.UI.WebControls;
-    using System.Web.UI.HtmlControls;
-    using System.Collections;
-    using System.Web.UI;
-
+	/// <summary>
+	/// TODO: REmove the dependencies on prototype and scriptaculous!!
+	/// doesn't work when combining scripts which is why DoNotOptimize is flagged.
+	/// </summary>
+	[ClientDependency(500, ClientDependencyType.Javascript, "js/prototype.js", "UmbracoRoot", DoNotOptimize = true)]
+	[ClientDependency(501, ClientDependencyType.Javascript, "js/scriptaculous/scriptaculous.js?load=effects,dragdrop", "UmbracoRoot",
+		InvokeJavascriptMethodOnLoad = "Position.includeScrollOffsets = true;", DoNotOptimize = true)]
     public partial class ContentTypeControlNew : System.Web.UI.UserControl
     {
         public uicontrols.TabPage InfoTabPage;
@@ -41,7 +49,7 @@ namespace umbraco.controls
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-            Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "dragdrop", "<script src=\"" + GlobalSettings.Path + "/js/prototype.js\" type=\"text/javascript\"></script><script src=\"" + GlobalSettings.Path + "/js/scriptaculous/scriptaculous.js?load=effects,dragdrop\" type=\"text/javascript\"></script><script type=\"text/javascript\">Position.includeScrollOffsets = true;</script>");
+ 
             
             pp_newTab.Text = ui.Text("newtab", umbraco.BasePages.UmbracoEnsuredPage.CurrentUser);
             pp_alias.Text = umbraco.ui.Text("alias", umbraco.BasePages.UmbracoEnsuredPage.CurrentUser);

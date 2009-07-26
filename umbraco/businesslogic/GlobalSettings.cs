@@ -114,6 +114,20 @@ namespace umbraco
             }
         }
 
+		/// <summary>
+		/// Gets the path to umbraco's client directory (/umbraco_client by default).
+		/// This is a relative path to the Umbraco Path as it always must exist beside the 'umbraco'
+		/// folder since the CSS paths to images depend on it.
+		/// </summary>
+		/// <value>The path.</value>
+		public static string ClientPath
+		{
+			get
+			{
+				return Path + "/../umbraco_client";
+			}
+		}
+
         /// <summary>
         /// Gets the database connection string
         /// </summary>

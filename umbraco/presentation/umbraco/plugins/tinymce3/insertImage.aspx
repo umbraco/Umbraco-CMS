@@ -1,24 +1,12 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="insertImage.aspx.cs" Inherits="umbraco.presentation.plugins.tinymce3.insertImage" %>
 <%@ Register TagPrefix="ui" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title>{#advimage_dlg.dialog_title}</title>
 
-    <script type="text/javascript" src="../../../umbraco_client/ui/jquery.js"></script>
-    <script type="text/javascript" src="../../../umbraco_client/ui/default.js"></script>
-    
-    <script type="text/javascript" src="../../../umbraco_client/tinymce3/tiny_mce_popup.js"></script>
-    <script type="text/javascript" src="../../../umbraco_client/tinymce3/utils/mctabs.js"></script>
-    <script type="text/javascript" src="../../../umbraco_client/tinymce3/utils/form_utils.js"></script>
-    <script type="text/javascript" src="../../../umbraco_client/tinymce3/utils/validate.js"></script>
-    <script type="text/javascript" src="../../../umbraco_client/tinymce3/utils/editable_selects.js"></script>
-    
-    <script type="text/javascript" src="../../../umbraco_client/tinymce3/plugins/umbracoimg/js/image.js"></script>
-    <!--
-    <link href="../../../umbraco_client/tinymce3/plugins/advImage/css/advimage.css" rel="stylesheet" type="text/css" />
-    -->
     <base target="_self" />
 
     <script type="text/javascript" language="javascript">
@@ -111,6 +99,23 @@
 
 </head>
 <body id="advimage" style="display: none">
+
+	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="Header" IsDebugMode="false" >
+		<Paths>
+			<umb:ClientDependencyPath Name="UmbracoClient" Path="~/umbraco_client" />
+			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
+		</Paths>		
+	</umb:ClientDependencyLoader>
+	
+	<umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
+	<umb:JsInclude ID="JsInclude8" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" Priority="4" />
+	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="tinymce3/tiny_mce_popup.js" PathNameAlias="UmbracoClient" Priority="100" />
+	<umb:JsInclude ID="JsInclude5" runat="server" FilePath="tinymce3/utils/mctabs.js" PathNameAlias="UmbracoClient" Priority="101" />
+	<umb:JsInclude ID="JsInclude6" runat="server" FilePath="tinymce3/utils/form_utils.js" PathNameAlias="UmbracoClient" Priority="102" />
+	<umb:JsInclude ID="JsInclude7" runat="server" FilePath="tinymce3/utils/validate.js" PathNameAlias="UmbracoClient" Priority="103" />
+
+	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="tinymce3/utils/editable_selects.js" PathNameAlias="UmbracoClient" Priority="110" />
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="tinymce3/plugins/umbracoimg/js/image.js" PathNameAlias="UmbracoClient" Priority="111" />
 
     <form runat="server" onsubmit="ImageDialog.insert();return false;" action="#">
     <input type="hidden" name="orgWidth" id="orgWidth" /><input type="hidden" name="orgHeight" id="orgHeight" />

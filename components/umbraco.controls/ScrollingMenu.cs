@@ -8,10 +8,14 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.uicontrols {
-    [ToolboxData("<{0}:ScrollingMenu runat=server></{0}:ScrollingMenu>")]
-    public class ScrollingMenu : System.Web.UI.WebControls.WebControl {
+
+    [ToolboxData("<{0}:ScrollingMenu runat=server></{0}:ScrollingMenu>")]    
+	[ClientDependency(ClientDependencyType.Javascript, "scrollingmenu/javascript.js", "UmbracoClient")]
+	[ClientDependency(ClientDependencyType.Css, "scrollingmenu/style.css", "UmbracoClient")]
+	public class ScrollingMenu : System.Web.UI.WebControls.WebControl {
         private ArrayList Icons = new ArrayList();
         private string iconIds;
         private int extraMenuWidth = 0;
@@ -65,16 +69,11 @@ namespace umbraco.uicontrols {
             if (base.Visible)
             {
                 SetupMenu();
-                SetupClientScript();
+                
             }
         }
 
-        private void SetupClientScript() {
-            helper.AddLinkToHeader("SCROLLINGMENUCSS", "/umbraco_client/scrollingmenu/style.css", this.Page);
-            helper.AddScriptToHeader("SCROLLINGMENUJS", "/umbraco_client/scrollingmenu/javascript.js", this.Page);
-//            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "SCROLLINGMENUCSS", "<link rel='stylesheet' href='/umbraco_client/scrollingmenu/style.css' />");
-//            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "SCROLLINGMENUJS", "<script type='text/javascript' src='/umbraco_client/scrollingmenu/javascript.js'></script>");
-        }
+       
 
         private System.Web.UI.WebControls.Image scrollImage() {
             System.Web.UI.WebControls.Image functionReturnValue = null;

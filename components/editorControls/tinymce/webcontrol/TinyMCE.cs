@@ -13,7 +13,7 @@ using Content = umbraco.cms.businesslogic.Content;
 
 namespace umbraco.editorControls.tinymce.webcontrol {
     public class TinyMCE : WebControl, IPostBackDataHandler {
-        private string _javascriptLocation = "/umbraco_client/tinymce";
+		private string _javascriptLocation = GlobalSettings.ClientPath + "/tinymce";
         private string _coreFile = "/tiny_mce.js";
         private int _rows = 13;
         private int _cols = 60;
@@ -91,7 +91,7 @@ namespace umbraco.editorControls.tinymce.webcontrol {
         /// <param name="outWriter">The writer to draw the editor to</param>
         protected override void Render(HtmlTextWriter writer) {
             writer.WriteLine("<!-- tinyMCE -->\n");
-            //            writer.WriteLine("<script language=\"javascript\" type=\"text/javascript\" src=\"" + JavascriptLocation + "\"/>\n");
+
             writer.WriteLine("<script language=\"javascript\" type=\"text/javascript\">");
             writer.WriteLine("tinyMCE.init({");
 

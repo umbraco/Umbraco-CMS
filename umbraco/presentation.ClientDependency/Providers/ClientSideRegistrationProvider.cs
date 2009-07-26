@@ -28,24 +28,35 @@ namespace umbraco.presentation.ClientDependency.Providers
 			if (jsDependencies.Count == 0)
 				return;
 
-			DetectScriptManager();
 			RegisterDependencyLoader();
-						
-			StringBuilder dependencyCalls = new StringBuilder("UmbDependencyLoader");
-			foreach (IClientDependencyFile dependency in jsDependencies)
+
+			if (IsDebugMode)
 			{
-				DependantControl.Page.Trace.Write("ClientDependency", string.Format("Registering: {0}", dependency.FilePath));
-				dependencyCalls.AppendFormat(".AddJs('{0}','{1}')",
-											 dependency.FilePath, dependency.InvokeJavascriptMethodOnLoad);
+				foreach (IClientDependencyFile dependency in jsDependencies)
+				{
+					ProcessSingleJsFile(string.Format("'{0}','{1}'", dependency.FilePath, dependency.InvokeJavascriptMethodOnLoad));
+				}
 			}
-			dependencyCalls.Append(';');
-			ScriptManager.RegisterClientScriptBlock(DependantControl, DependantControl.GetType(), jsDependencies.GetHashCode().ToString(),
-													dependencyCalls.ToString(), true);
+			else
+			{
+				List<string> jsList = ProcessCompositeList(jsDependencies, ClientDependencyType.Javascript);				
+
+				DependantControl.Page.Trace.Write("ClientDependency", string.Format("Processed composite list: {0}", jsList[0]));
+
+				foreach (string js in jsList)
+				{
+					ProcessSingleJsFile(string.Format("'{0}','{1}'", js, string.Empty));
+				}
+			}
 		}
 
 		protected override void ProcessSingleJsFile(string js)
 		{
-			throw new NotImplementedException();
+			StringBuilder strClientLoader = new StringBuilder("UmbDependencyLoader");
+			DependantControl.Page.Trace.Write("ClientDependency", string.Format("Registering: {0}", js));
+			strClientLoader.AppendFormat(".AddJs({0})", js);
+			strClientLoader.Append(';');
+			RegisterScript(strClientLoader.ToString());
 		}
 
 		protected override void RegisterCssFiles(List<IClientDependencyFile> cssDependencies)
@@ -53,47 +64,60 @@ namespace umbraco.presentation.ClientDependency.Providers
 			if (cssDependencies.Count == 0)
 				return;
 
-			DetectScriptManager();
 			RegisterDependencyLoader();
 
-			StringBuilder dependencyCalls = new StringBuilder("UmbDependencyLoader");
-			foreach (IClientDependencyFile dependency in cssDependencies)
+			if (IsDebugMode)
 			{
-				DependantControl.Page.Trace.Write("ClientDependency", string.Format("Registering: {0}", dependency.FilePath));
-				dependencyCalls.AppendFormat(".AddCss('{0}')", dependency.FilePath);
+				foreach (IClientDependencyFile dependency in cssDependencies)
+				{
+					ProcessSingleCssFile(dependency.FilePath);
+				}
 			}
-			dependencyCalls.Append(';');
-			ScriptManager.RegisterClientScriptBlock(DependantControl, DependantControl.GetType(), cssDependencies.GetHashCode().ToString(),
-													dependencyCalls.ToString(), true);
+			else
+			{
+				List<string> cssList = ProcessCompositeList(cssDependencies, ClientDependencyType.Css);
+
+				DependantControl.Page.Trace.Write("ClientDependency", string.Format("Processed composite list: {0}", cssList[0]));
+
+				foreach (string css in cssList)
+				{
+					ProcessSingleCssFile(css);
+				}
+			}
+
+			
 		}
 
 		protected override void ProcessSingleCssFile(string css)
 		{
-			throw new NotImplementedException();
+			StringBuilder strClientLoader = new StringBuilder("UmbDependencyLoader");
+			DependantControl.Page.Trace.Write("ClientDependency", string.Format("Registering: {0}", css));
+			strClientLoader.AppendFormat(".AddCss('{0}')", css);
+			strClientLoader.Append(';');
+			RegisterScript(strClientLoader.ToString());			
 		}
 
+		/// <summary>
+		/// register loader script
+		/// </summary>
 		private void RegisterDependencyLoader()
 		{
-			// register loader script
 			if (!HttpContext.Current.Items.Contains(DependencyLoaderResourceName))
 			{
-				DependantControl.Page.ClientScript.RegisterClientScriptResource(typeof(ClientDependencyHelper), DependencyLoaderResourceName);
+				RegisterScriptFile(DependencyLoaderResourceName);
 				HttpContext.Current.Items[DependencyLoaderResourceName] = true;
 			}
 		}
 
-		private void DetectScriptManager()
+		private void RegisterScriptFile(string scriptPath)
 		{
-			try
-			{
-				Page pg = (Page)HttpContext.Current.CurrentHandler;
-				if (ScriptManager.GetCurrent(pg) == null)
-					throw new NullReferenceException("A ScriptManager needs to be declared on the page for ClientDependencyLoader to work");
-			}
-			catch
-			{
-				throw new NullReferenceException("ClientDependencyLoader only works with an active Page");
-			}
+			DependantControl.Page.ClientScript.RegisterClientScriptResource(this.GetType(), scriptPath);
 		}
+
+		private void RegisterScript(string strScript)
+		{
+			DependantControl.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), strScript.GetHashCode().ToString(), strScript, true);
+		}
+
 	}
 }

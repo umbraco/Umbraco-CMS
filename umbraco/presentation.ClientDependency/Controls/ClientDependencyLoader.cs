@@ -21,16 +21,66 @@ namespace umbraco.presentation.ClientDependency.Controls
             IsDebugMode = false;
 		}
 
+		private const string ContextKey = "ClientDependencyLoader";
+
+		public static void RegisterDependency(string filePath, ClientDependencyType type)
+		{
+			RegisterDependency(filePath, "", type);
+		}
+
+		public static void RegisterDependency(string filePath, string pathNameAlias, ClientDependencyType type)
+		{
+			RegisterDependency(ClientDependencyInclude.DefaultPriority, false, filePath, pathNameAlias, type, "");
+		}
+
+		/// <summary>
+		/// Dynamically registers a dependency into the loader at runtime.
+		/// This is similar to ScriptManager.RegisterClientScriptInclude
+		/// </summary>
+		/// <param name="file"></param>
+		public static void RegisterDependency(int priority, bool doNotOptimize, string filePath, string pathNameAlias, ClientDependencyType type, string invokeJavascriptMethodOnLoad)
+		{
+			if (!HttpContext.Current.Items.Contains(ContextKey))
+				throw new NullReferenceException("No ClientDependencyLoader found in the current request");
+
+			ClientDependencyLoader loader = HttpContext.Current.Items[ContextKey] as ClientDependencyLoader;
+			if (loader == null)
+				throw new Exception("Could not find a ClientDependencyLoader in the current request");
+
+			//loader.RegisteredFiles.Add(file);
+			//create/add a new control to this control's collection
+			if (type == ClientDependencyType.Css)
+			{
+				CssInclude cssInc = new CssInclude();
+				cssInc.DoNotOptimize = doNotOptimize;
+				cssInc.Priority = priority;
+				cssInc.FilePath = filePath;
+				cssInc.PathNameAlias = pathNameAlias;
+				cssInc.InvokeJavascriptMethodOnLoad = invokeJavascriptMethodOnLoad;
+				loader.Controls.Add(cssInc);
+			}
+			else
+			{
+				JsInclude jsInc = new JsInclude();
+				jsInc.DoNotOptimize = doNotOptimize;
+				jsInc.Priority = priority;
+				jsInc.FilePath = filePath;
+				jsInc.PathNameAlias = pathNameAlias;
+				jsInc.InvokeJavascriptMethodOnLoad = invokeJavascriptMethodOnLoad;
+				loader.Controls.Add(jsInc);
+			}
+		}
+
 		protected override void OnInit(EventArgs e)
 		{
 			base.OnInit(e);
-			if (HttpContext.Current.Items.Contains("ClientDependencyLoader"))
+			if (HttpContext.Current.Items.Contains(ContextKey))
 			{
 				throw new Exception("Only one ClientDependencyLoader may exist on a page");
 			}
 			else
 			{
-				HttpContext.Current.Items.Add("ClientDependencyLoader", true);
+				HttpContext.Current.Items.Add(ContextKey, this);
 			}
 		}
 

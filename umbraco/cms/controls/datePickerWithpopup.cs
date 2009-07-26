@@ -5,14 +5,20 @@ using System.ComponentModel;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Globalization;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.controls
 {
+
 	/// <summary>
 	/// Summary description for datePicker.
 	/// </summary>
 	[DefaultProperty("Text"),
 	ToolboxData("<{0}:datePicker runat=server></{0}:datePicker>")]
+	[ClientDependency(200, ClientDependencyType.Javascript, "datepicker/cal_s.js", "UmbracoClient")]
+	[ClientDependency(201, ClientDependencyType.Javascript, "datepicker/cal_set_s.js", "UmbracoClient")]
+	[ClientDependency(202, ClientDependencyType.Javascript, "datepicker/lang/calendar-en.js", "UmbracoClient")]
+	[ClientDependency(ClientDependencyType.Css, "datepicker/aqua/theme.css", "UmbracoClient")]
 	public class datePicker : TextBox
 	{
 		private DateTime _datetime = DateTime.Now;
@@ -134,10 +140,6 @@ namespace umbraco.controls
 						"		 showsTime		:	 true,\n" +
 						"		 timeFormat		:	 24 \n";
 			}
-			Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "datepickerWithPopup", "<script language='javascript' src='/umbraco_client/datepicker/cal_s.js'></script>");
-			Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "datepickerWithPopupHelper", "<script language='javascript' src='/umbraco_client/datepicker/cal_set_s.js'></script>");
-			Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "datepickerWithPopupLang", "<script language='javascript' src='/umbraco_client/datepicker/lang/calendar-en.js'></script>");
-			Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "datepickerWithPopSkin", "<link rel='stylesheet' href='/umbraco_client/datepicker/aqua/theme.css' />");
 			base.OnInit(e);
 		}
 

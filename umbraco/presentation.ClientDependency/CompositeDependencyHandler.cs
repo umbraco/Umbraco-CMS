@@ -91,8 +91,9 @@ namespace umbraco.presentation.ClientDependency
 
 						//get the file list
 						string[] strFiles = DecodeFrom64(fileset).Split(';');
-						//combine files
-						byte[] fileBytes = CompositeFileProcessor.CombineFiles(strFiles, context, type);
+						//combine files and get the definition types of them (internal vs external resources)
+						List<CompositeFileDefinition> fDefs;
+						byte[] fileBytes = CompositeFileProcessor.CombineFiles(strFiles, context, type, out fDefs);
 						//compress data
 						CompressionType cType = GetCompression(context);
 						outputBytes = CompositeFileProcessor.CompressBytes(cType, fileBytes);
@@ -102,8 +103,9 @@ namespace umbraco.presentation.ClientDependency
 
 						//Update the XML file map
 						CompositeFileXmlMapper.Instance.CreateMap(fileset, cType.ToString(),
-							strFiles.Select(x => new FileInfo(context.Server.MapPath(x))).ToList(),
-							compositeFileName);
+							fDefs
+								.Where(f => f.IsLocalFile)
+							    .Select(x => new FileInfo(context.Server.MapPath(x.Uri))).ToList(), compositeFileName);
 					}
 					else
 					{

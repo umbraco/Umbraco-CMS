@@ -12,5 +12,10 @@ namespace umbraco.presentation.ClientDependency.Controls
 		{
 			DependencyType = ClientDependencyType.Css;
 		}
+		public CssInclude(IClientDependencyFile file)
+			: base(file)
+		{
+			DependencyType = ClientDependencyType.Css;
+		}
 	}
 }

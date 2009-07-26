@@ -23,7 +23,9 @@ namespace umbraco.presentation.ClientDependency.Providers
 		}
 
 		protected override void RegisterJsFiles(List<IClientDependencyFile> jsDependencies)
-		{			
+		{
+			if (jsDependencies.Count == 0)
+				return;
 			
 			if (IsDebugMode)
 			{
@@ -35,17 +37,18 @@ namespace umbraco.presentation.ClientDependency.Providers
 			else
 			{
 				List<string> jsList = ProcessCompositeList(jsDependencies, ClientDependencyType.Javascript);
-				if (jsList.Count == 0)
-					return;
-
+				
 				DependantControl.Page.Trace.Write("ClientDependency", string.Format("Processed composite list: {0}", jsList[0]));
 				
 				foreach (string js in jsList)
 				{
 					ProcessSingleJsFile(js);
 				}				
-			}			
+			}
+
 		}
+
+		
 
 		protected override void ProcessSingleJsFile(string js)
 		{
@@ -53,12 +56,14 @@ namespace umbraco.presentation.ClientDependency.Providers
 				throw new NullReferenceException("PageHeaderProvider requires a runat='server' tag in the page's header tag");
 
 			DependantControl.Page.Trace.Write("ClientDependency", string.Format("Registering: {0}", js));
-			//DependantControl.Page.Header.Controls.AddAt(m_CurrJsIndex++, new LiteralControl(string.Format(ScriptEmbed, js)));
 			AddToHead(string.Format(ScriptEmbed, js));
 		}
 
 		protected override void RegisterCssFiles(List<IClientDependencyFile> cssDependencies)
 		{
+			if (cssDependencies.Count == 0)
+				return;
+
 			if (IsDebugMode)
 			{
 				foreach (IClientDependencyFile dependency in cssDependencies)
@@ -68,9 +73,7 @@ namespace umbraco.presentation.ClientDependency.Providers
 			}
 			else
 			{
-				List<string> cssList = ProcessCompositeList(cssDependencies, ClientDependencyType.Css);
-				if (cssList.Count == 0)
-					return;
+				List<string> cssList = ProcessCompositeList(cssDependencies, ClientDependencyType.Css);				
 				
 				DependantControl.Page.Trace.Write("ClientDependency", string.Format("Processed composite list: {0}", cssList[0]));				
 				foreach (string css in cssList)
@@ -85,7 +88,6 @@ namespace umbraco.presentation.ClientDependency.Providers
 			if (DependantControl.Page.Header == null)
 				throw new NullReferenceException("PageHeaderProvider requires a runat='server' tag in the page's header tag");
 			DependantControl.Page.Trace.Write("ClientDependency", string.Format("Registering: {0}", css));
-			//DependantControl.Page.Header.Controls.AddAt(m_CurrJsIndex++, new LiteralControl(string.Format(CssEmbed, css)));
 			AddToHead(string.Format(CssEmbed, css));
 		}
 
@@ -95,7 +97,7 @@ namespace umbraco.presentation.ClientDependency.Providers
 		/// </summary>
 		/// <param name="literal"></param>
 		private void AddToHead(string literal)
-		{			
+		{
 			List<int> indexes = new List<int>();
 			Type iDependency = typeof(IClientDependencyFile);
 			foreach (Control ctl in DependantControl.Page.Header.Controls)

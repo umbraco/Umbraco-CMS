@@ -75,6 +75,12 @@
     <Compile Include="TabPage.cs" />
     <Compile Include="TabView.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\umbraco\presentation.ClientDependency\umbraco.presentation.ClientDependency.csproj">
+      <Project>{EA35B06D-0CC8-4830-A3F7-9BB3D36D0FAF}</Project>
+      <Name>umbraco.presentation.ClientDependency</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

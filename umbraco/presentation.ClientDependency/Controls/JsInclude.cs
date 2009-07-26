@@ -12,6 +12,11 @@ namespace umbraco.presentation.ClientDependency.Controls
 		{
 			DependencyType = ClientDependencyType.Javascript;
 		}
+		public JsInclude(IClientDependencyFile file)
+			: base(file)
+		{
+			DependencyType = ClientDependencyType.Javascript;
+		}
 
 	}
 }

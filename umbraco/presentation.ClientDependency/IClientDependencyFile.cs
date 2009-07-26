@@ -10,7 +10,6 @@ namespace umbraco.presentation.ClientDependency
 		ClientDependencyType DependencyType { get; }
 		string InvokeJavascriptMethodOnLoad { get; set; }
 		int Priority { get; set; }
-        //string CompositeGroupName { get; set; }
         string PathNameAlias { get; set; }
 		bool DoNotOptimize { get; set; }
 	}

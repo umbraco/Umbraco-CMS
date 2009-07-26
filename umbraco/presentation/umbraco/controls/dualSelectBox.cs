@@ -2,12 +2,14 @@ using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.controls
 {
 	/// <summary>
 	/// Summary description for dualSelectbox.
 	/// </summary>
+	[ClientDependency(ClientDependencyType.Javascript, "js/dualSelectBox.js", "UmbracoRoot")]
 	public class DualSelectbox : System.Web.UI.WebControls.WebControl, System.Web.UI.INamingContainer
 	{
 		private ListItemCollection _items = new ListItemCollection();
@@ -123,12 +125,7 @@ namespace umbraco.controls
             _remove.Attributes.Add("onClick", "dualSelectBoxShift('" + this.ClientID + "');");
         }
 
-		protected override void OnInit(EventArgs e)
-		{
-			Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "dualSelectBox", "<script language='javascript' src='" + GlobalSettings.Path + "/js/dualSelectBox.js'></script>");
-			base.OnInit (e);
-
-		}
+		
 
 
 	}

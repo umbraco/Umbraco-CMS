@@ -8,8 +8,11 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.uicontrols {
+
+	[ClientDependency(ClientDependencyType.Css, "menuicon/style.css", "UmbracoClient")]
     public class MenuImageButton : System.Web.UI.WebControls.ImageButton, MenuIconI {
         private string _OnClickCommand = "";
 
@@ -47,7 +50,7 @@ namespace umbraco.uicontrols {
         }
 
         protected override void OnLoad(System.EventArgs EventArguments) {
-            SetupClientScript();
+
 
             this.Width = Unit.Pixel(22);
             this.Height = Unit.Pixel(23);
@@ -63,8 +66,6 @@ namespace umbraco.uicontrols {
             }
         }
 
-        private void SetupClientScript() {
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "MENUICONCSS", "<link rel='stylesheet' href='/umbraco_client/menuicon/style.css' />");
-        }
+
     }
 }

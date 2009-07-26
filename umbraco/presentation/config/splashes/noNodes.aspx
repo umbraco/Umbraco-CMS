@@ -1,10 +1,10 @@
 <%@ Page Language="C#" AutoEventWireup="true" Codebehind="noNodes.aspx.cs" Inherits="umbraco.presentation.config.splashes.noNodes" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <html>
-<head>
+<head runat="server">
   <title>Umbraco <%=umbraco.GlobalSettings.CurrentVersion%> - no pages found</title>
-  	<script type="text/javascript" src="/umbraco_client/ui/jquery.js"></script>
   	
   	<style type="text/css">
   			
@@ -48,6 +48,14 @@
 			  </style>
 </head>
 <body>
+
+	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="Header" IsDebugMode="false" >
+		<Paths>
+			<umb:ClientDependencyPath Name="UmbracoClient" Path='<%#umbraco.GlobalSettings.ClientPath%>' />
+			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
+		</Paths>		
+	</umb:ClientDependencyLoader>
+	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
 
 <form id="Form1" method="post" runat="server">
 

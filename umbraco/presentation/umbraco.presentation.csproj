@@ -1442,12 +1442,12 @@
     </Compile>
     <Compile Include="umbraco\users\UserPermissions.cs" />
     <Compile Include="umbraco\users\UserTypeTasks.cs" />
-    <Compile Include="umbraco\viewHtml.aspx.cs">
-      <DependentUpon>viewHtml.aspx</DependentUpon>
+    <Compile Include="umbraco\__TODELETE__viewHtml.aspx.cs">
+      <DependentUpon>__TODELETE__viewHtml.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco\viewHtml.aspx.designer.cs">
-      <DependentUpon>viewHtml.aspx</DependentUpon>
+    <Compile Include="umbraco\__TODELETE__viewHtml.aspx.designer.cs">
+      <DependentUpon>__TODELETE__viewHtml.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\webService.asmx.cs">
       <DependentUpon>webService.asmx</DependentUpon>
@@ -2434,7 +2434,7 @@
     <Content Include="umbraco\users\EditUser.aspx" />
     <Content Include="umbraco\users\EditUserType.aspx" />
     <Content Include="umbraco\users\PermissionEditor.aspx" />
-    <Content Include="umbraco\viewHtml.aspx" />
+    <Content Include="umbraco\__TODELETE__viewHtml.aspx" />
     <Content Include="umbraco\webService.asmx" />
     <Content Include="umbraco\webservices\ajax.js" />
     <Content Include="umbraco\webservices\CacheRefresher.asmx">
@@ -3861,8 +3861,8 @@
       <DependentUpon>EditUser.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\viewHtml.aspx.resx">
-      <DependentUpon>viewHtml.aspx.cs</DependentUpon>
+    <EmbeddedResource Include="umbraco\__TODELETE__viewHtml.aspx.resx">
+      <DependentUpon>__TODELETE__viewHtml.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="umbraco\webService.asmx.resx">

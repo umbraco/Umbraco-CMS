@@ -51,7 +51,9 @@ namespace umbraco.editorControls
 		{
 			base.OnInit(e);
 
-			base.Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "subModal", "<script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/submodal/common.js\"></script><script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/submodal/subModal.js\"></script><link href=\"" + GlobalSettings.Path + "/js/submodal/subModal.css\" type=\"text/css\" rel=\"stylesheet\"></link>");
+			umbraco.presentation.ClientDependency.Controls.ClientDependencyLoader.RegisterDependency("js/submodal/common.js", "UmbracoRoot", umbraco.presentation.ClientDependency.ClientDependencyType.Javascript);
+			umbraco.presentation.ClientDependency.Controls.ClientDependencyLoader.RegisterDependency("js/submodal/subModal.js", "UmbracoRoot", umbraco.presentation.ClientDependency.ClientDependencyType.Javascript);
+			umbraco.presentation.ClientDependency.Controls.ClientDependencyLoader.RegisterDependency("js/submodal/subModal.css", "UmbracoRoot", umbraco.presentation.ClientDependency.ClientDependencyType.Css);			
 
             // We need to make sure we have a reference to the legacy ajax calls in the scriptmanager
             presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);

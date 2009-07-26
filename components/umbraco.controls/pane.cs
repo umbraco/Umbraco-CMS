@@ -8,8 +8,11 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.uicontrols {
+
+	[ClientDependency(ClientDependencyType.Css, "propertypane/style.css", "UmbracoClient")]
     public class Pane : System.Web.UI.WebControls.Panel {
 
         private TableRow tr = new TableRow();
@@ -77,7 +80,7 @@ namespace umbraco.uicontrols {
 
 
         protected override void OnLoad(System.EventArgs EventArguments) {
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "propertypanestyles", "<link rel='stylesheet' href='/umbraco_client/propertypane/style.css' />");
+
         }
 
         protected override void Render(System.Web.UI.HtmlTextWriter writer) {

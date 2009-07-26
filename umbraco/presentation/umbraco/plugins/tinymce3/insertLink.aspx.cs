@@ -12,6 +12,8 @@ namespace umbraco.presentation.plugins.tinymce3
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
+			ClientLoader.DataBind();
+
             uicontrols.TabPage tp = tv_options.NewTabPage(ui.Text("content"));
             tp.HasMenu = false;
             tp.Controls.Add(pane_content);

@@ -1,4 +1,4 @@
-<%@ Page language="c#" Codebehind="viewHtml.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.viewHtml" %>
+<%@ Page language="c#" Codebehind="__TODELETE__viewHtml.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.viewHtml" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 	<head>

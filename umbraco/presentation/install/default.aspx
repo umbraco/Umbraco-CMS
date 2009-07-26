@@ -1,9 +1,9 @@
 <%@ Page Language="c#" CodeBehind="default.aspx.cs" AutoEventWireup="True" Inherits="umbraco.presentation.install._default" EnableViewState="False" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
-<head>
+<head runat="server">
     <title>Umbraco <%=umbraco.GlobalSettings.CurrentVersion%> Configuration Wizard</title>
     
     <style type="text/css">
@@ -19,17 +19,7 @@
       .actions a:hover{text-decoration: underline;}
       .passtestresult{margin-left: 15px; font-weight: bold; padding: 4px 10px 4px 10px !Important;}
       
-    </style>
-    
-    <script type="text/javascript" src="/umbraco_client/ui/jquery.js"></script>
-    <script type="text/javascript" src="/umbraco_client/modal/modal.js"></script>
-    <script type="text/javascript" src="/umbraco_client/passwordStrength/passwordStrength.js"></script>
-    
-    
-    <link rel="Stylesheet" href="style.css" type="text/css" />
-    <!-- Seperate modal stylesheet -->   
-    <link href="/umbraco_client/modal/style.css" type="text/css" rel="stylesheet" />
-    
+    </style>      
     
     <script type="text/javascript">
 
@@ -64,6 +54,21 @@
     
 </head>
 <body>
+	
+	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="ClientSideRegistration" IsDebugMode="false" >
+		<Paths>
+			<umb:ClientDependencyPath Name="UmbracoClient" Path='<%#umbraco.GlobalSettings.ClientPath%>' />
+			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
+		</Paths>		
+	</umb:ClientDependencyLoader>
+	
+	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="style.css" />
+	<umb:CssInclude ID="CssInclude2" runat="server" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />
+	
+	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="modal/modal.js" PathNameAlias="UmbracoClient" Priority="1" />
+	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="passwordStrength/passwordStrength.js" PathNameAlias="UmbracoClient" Priority="3" />
+
     <form id="Form1" method="post" runat="server">
     <asp:ScriptManager runat="server" ID="umbracoScriptManager">
     </asp:ScriptManager>

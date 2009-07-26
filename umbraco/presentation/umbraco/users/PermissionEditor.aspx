@@ -4,13 +4,12 @@
 <%@ Register Src="NodePermissions.ascx" TagName="NodePermissions" TagPrefix="user" %>
 <%@ Register Namespace="umbraco.presentation.controls" Assembly="umbraco" TagPrefix="tree" %>
 <%@ Register TagPrefix="ui" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
-	<script type="text/javascript" src="/umbraco_client/Application/JQuery/jquery.metadata.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="/umbraco_client/Tree/Themes/tree_component.css" />
-	<link rel="stylesheet" type="text/css" href="/umbraco/css/umbracoGui.css" />
-	<link rel="stylesheet" type="text/css" href="../css/permissionsEditor.css" />
-
-	<script type="text/javascript" src="PermissionsEditor.js"></script>
+		
+	<umb:CssInclude ID="CssInclude2" runat="server" FilePath="css/permissionsEditor.css" PathNameAlias="UmbracoRoot" />
+	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="css/umbracoGui.css" PathNameAlias="UmbracoRoot" />
+	<umb:JsInclude ID="JsInclude1"  runat="server" FilePath="PermissionsEditor.js" />
 	
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">

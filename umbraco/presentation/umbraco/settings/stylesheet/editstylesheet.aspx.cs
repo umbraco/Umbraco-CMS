@@ -26,10 +26,11 @@ namespace umbraco.cms.presentation.settings.stylesheet
             if(!IsPostBack)
             {
                 // editor source
-                if (UmbracoSettings.ScriptDisableEditor)
-                    editorSource.Text = "<script src=\"../../js/textareaEditor.js\" type=\"text/javascript\"></script>";
-                else
-                    editorSource.Text = "<script src=\"../../js/codepress/codepress.js\" type=\"text/javascript\"></script>";
+				
+				if (!UmbracoSettings.ScriptDisableEditor)
+				{
+					// TODO: Register the some script editor js file if you can find a good one.
+				}
 
 				ClientTools
 					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadStylesheets>().Tree.Alias)
