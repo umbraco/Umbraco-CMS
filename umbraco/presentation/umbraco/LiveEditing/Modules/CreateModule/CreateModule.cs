@@ -6,12 +6,13 @@ using umbraco.cms.businesslogic.web;
 using umbraco.presentation.LiveEditing.Controls;
 using Content = umbraco.cms.businesslogic.Content;
 using umbraco.BusinessLogic.Actions;
-
+using umbraco.presentation.ClientDependency;
 namespace umbraco.presentation.LiveEditing.Modules.CreateModule
 {
+	[ClientDependency(200, ClientDependencyType.Javascript, "LiveEditing/Modules/CreateModule/CreateModule.js", "UmbracoRoot")]
     public class CreateModule : BaseModule
     {
-        protected const string CreateModuleScriptFile = "{0}/LiveEditing/Modules/CreateModule/CreateModule.js";
+        //protected const string CreateModuleScriptFile = "{0}/LiveEditing/Modules/CreateModule/CreateModule.js";
 
         protected ImageButton m_CreateButton = new ImageButton();
 
@@ -84,7 +85,7 @@ namespace umbraco.presentation.LiveEditing.Modules.CreateModule
 
             m_CreateModal.Controls.Add(new LiteralControl("</div>"));
 
-            ScriptManager.RegisterClientScriptInclude(this, GetType(), CreateModuleScriptFile, String.Format(CreateModuleScriptFile, GlobalSettings.Path));
+            //ScriptManager.RegisterClientScriptInclude(this, GetType(), CreateModuleScriptFile, String.Format(CreateModuleScriptFile, GlobalSettings.Path));
         }
 
         private void FillAllowedDoctypes()

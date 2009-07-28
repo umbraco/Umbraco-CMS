@@ -11,10 +11,20 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
         /// A class which ensures that all calls made to the objects that it owns are done in the context
         /// of the main Umbraco application window.
         /// </summary>
+
         return {
 
-            _debug: true,
+            _debug: false,
             _mainTree: null,
+            _rootPath: "/umbraco", //this is the default
+
+
+            setUmbracoPath: function(strPath) {
+                /// <summary>
+                /// sets the Umbraco root path folder
+                /// </summary>
+                _rootPath = strPath;
+            },
 
             mainWindow: function() {
                 /// <summary>
@@ -28,9 +38,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 /// Sometimes an Umbraco page will need to be opened without being contained in the iFrame from the main window
                 /// so this method is will construct a false tree to be returned if this is the case as to avoid errors.
                 /// </summary>
-                
+
                 if (this._mainTree == null) {
-                    if (this.mainWindow().jQuery(".umbTree").UmbracoTreeAPI() == null) {                        
+                    if (this.mainWindow().jQuery(".umbTree").UmbracoTreeAPI() == null) {
                         this._mainTree = $("<div id='falseTree' />").appendTo("body").hide().UmbracoTree({
                             uiKeys: this.uiKeys(),
                             jsonFullMenu: {},
@@ -79,6 +89,18 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     return this.mainWindow().right;
                 }
                 else {
+                    //if the path doesn't start with "/" or with the root path then 
+                    //prepend the root path
+                    if (strLocation.substr(0, 1) != "/") {
+                        strLocation = this._rootPath + "/" + strLocation;
+                    }
+                    else if (strLocation.length >= this._rootPath.length
+                        && strLocation.substr(0, this._rootPath.length) != this._rootPath) {
+                        strLocation = this._rootPath + "/" + strLocation;
+                    }
+
+                    this._debug("contentFrame: parsed location: " + strLocation);
+                    
                     this.mainWindow().right.location.href = strLocation;
                 }
             },

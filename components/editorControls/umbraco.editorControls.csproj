@@ -332,19 +332,19 @@
     <Compile Include="ultimatepicker\ultimatePickerDataEditor.cs" />
     <Compile Include="ultimatepicker\ultimatePickerDataType.cs" />
     <Compile Include="ultimatepicker\ultimatePickerPrevalueEditor.cs" />
-    <Compile Include="ultraSimpleMailer\mailerConfiguratorPreValueEditor.cs">
+    <Compile Include="ultraSimpleMailer\__TODELETE__mailerConfiguratorPreValueEditor.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ultraSimpleMailer\mailerHelper.cs">
+    <Compile Include="ultraSimpleMailer\__TODELETE__mailerHelper.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ultraSimpleMailer\mailerLogic.cs">
+    <Compile Include="ultraSimpleMailer\__TODELETE__mailerLogic.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ultraSimpleMailer\ultraSimpleMailerDataType.cs">
+    <Compile Include="ultraSimpleMailer\__TODELETE__ultraSimpleMailerDataType.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ultraSimpleMailer\ultraSimpleMailerEditor.cs">
+    <Compile Include="ultraSimpleMailer\__TODELETE__ultraSimpleMailerEditor.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="uploadfield\DataTypeUploadField.cs">

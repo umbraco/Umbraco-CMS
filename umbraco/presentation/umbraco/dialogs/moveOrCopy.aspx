@@ -25,14 +25,7 @@
 				jQuery("#pageNameHolder").attr("class","success");
 			}
 			
-			function updateTree(current, oldParent, newParent, newParentPath, copy) {
-			    if (!copy) {		        
-                    UmbClientMgr.mainTree().moveNode(current, newParentPath);
-			    } else {
-			        UmbClientMgr.mainTree().copyNode(current, newParentPath);
-			    }
-                
-			}
+
 
 function doSubmit() {document.Form1["ok"].click()}
 

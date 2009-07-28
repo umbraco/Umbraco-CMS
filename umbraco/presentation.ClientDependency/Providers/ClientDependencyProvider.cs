@@ -12,7 +12,7 @@ namespace umbraco.presentation.ClientDependency.Providers
 	public abstract class ClientDependencyProvider : ProviderBase
 	{
 		protected Control DependantControl { get; private set; }
-		protected ClientDependencyPathCollection FolderPaths { get; private set; }
+		protected HashSet<IClientDependencyPath> FolderPaths { get; private set; }
         protected List<IClientDependencyFile> AllDependencies { get; private set; }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace umbraco.presentation.ClientDependency.Providers
 
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
-            IsDebugMode = false;
+            IsDebugMode = true;
             if (config != null && config["isDebug"] != null)
             {
                 bool isDebug;
@@ -38,7 +38,7 @@ namespace umbraco.presentation.ClientDependency.Providers
             base.Initialize(name, config);
         }
 
-		public void RegisterDependencies(Control dependantControl, ClientDependencyList dependencies, ClientDependencyPathCollection paths)
+		public void RegisterDependencies(Control dependantControl, ClientDependencyCollection dependencies, HashSet<IClientDependencyPath> paths)
 		{
 			DependantControl = dependantControl;
 			AllDependencies = new List<IClientDependencyFile>(dependencies);
@@ -46,19 +46,13 @@ namespace umbraco.presentation.ClientDependency.Providers
 
 			UpdateFilePaths();
 
-			//seperate the types into 2 lists for all dependencies without composite groups
-            List<IClientDependencyFile> jsDependencies = AllDependencies.FindAll(
-                delegate(IClientDependencyFile a)
-				{
-                    return a.DependencyType == ClientDependencyType.Javascript;
-				}
-			);
-            List<IClientDependencyFile> cssDependencies = AllDependencies.FindAll(
-                delegate(IClientDependencyFile a)
-				{
-                    return a.DependencyType == ClientDependencyType.Css;
-				}
-			);
+			List<IClientDependencyFile> jsDependencies = AllDependencies
+				.Where(x => x.DependencyType == ClientDependencyType.Javascript)
+				.ToList();
+
+            List<IClientDependencyFile> cssDependencies = AllDependencies
+				.Where(x => x.DependencyType == ClientDependencyType.Css)
+				.ToList();
 
 			// sort by priority
 			jsDependencies.Sort((a, b) => a.Priority.CompareTo(b.Priority));
@@ -81,10 +75,10 @@ namespace umbraco.presentation.ClientDependency.Providers
 		/// <param name="jsDependencies"></param>
 		protected virtual void RegisterStartupScripts(List<IClientDependencyFile> dependencies)
 		{
-			foreach (var js in dependencies)
-			{
-				DependantControl.Page.ClientScript.RegisterStartupScript(this.GetType(), js.GetHashCode().ToString(), js.InvokeJavascriptMethodOnLoad, true);
-			}
+			//foreach (var js in dependencies)
+			//{
+			//    DependantControl.Page.ClientScript.RegisterStartupScript(this.GetType(), js.GetHashCode().ToString(), js.InvokeJavascriptMethodOnLoad, true);
+			//}
 		}
 
 		/// <summary>
@@ -149,8 +143,9 @@ namespace umbraco.presentation.ClientDependency.Providers
 			{
 				if (!string.IsNullOrEmpty(dependency.PathNameAlias))
 				{
-					ClientDependencyPath path = FolderPaths.Find(
-						delegate(ClientDependencyPath p)
+					List<IClientDependencyPath> paths = FolderPaths.ToList();
+					IClientDependencyPath path = paths.Find(
+						delegate(IClientDependencyPath p)
 						{
 							return p.Name == dependency.PathNameAlias;
 						}

@@ -116,6 +116,8 @@
 
 		jQuery(document).ready(function() {
 
+			//UmbClientMgr.setUmbracoPath("<%=umbraco.GlobalSettings.Path %>");
+
 			jQuery(window).load(function() { resizePage('load'); });
 			jQuery(window).wresize(function() { resizePage('resize'); });
 
@@ -127,9 +129,9 @@
 
 			// load dashboard
 			if (rightAction != '') {
-				jQuery("#right").attr("src", rightAction + ".aspx?id=" + rightActionId);
+				UmbClientMgr.contentFrame(rightAction + ".aspx?id=" + rightActionId);
 			} else {
-				jQuery("#right").attr("src", "dashboard.aspx?app=" + initApp);
+				UmbClientMgr.contentFrame("dashboard.aspx?app=" + initApp);
 			}
 
 			if (initApp != '') {

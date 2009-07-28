@@ -56,6 +56,18 @@ namespace umbraco.controls
         {
         }
 
+		/// <summary>
+		/// Constructor to set default properties.
+		/// </summary>
+		/// <param name="c"></param>
+		/// <param name="CanPublish"></param>
+		/// <param name="Id"></param>
+		/// <remarks>
+		/// This method used to create all of the child controls too which is BAD since
+		/// the page hasn't started initializing yet. Control IDs were not being named
+		/// correctly, etc... I've moved the child control setup/creation to the CreateChildControls
+		/// method where they are suposed to be.
+		/// </remarks>
         public ContentControl(Content c, publishModes CanPublish, string Id)
         {
             ID = Id;
@@ -64,40 +76,55 @@ namespace umbraco.controls
 
             Width = 350;
             Height = 350;
-            SaveAndPublish += new EventHandler(standardSaveAndPublishHandler);
-            Save += new EventHandler(standardSaveAndPublishHandler);
-            prntpage = (UmbracoEnsuredPage)Page;
-
-            foreach (ContentType.TabI t in _content.ContentType.getVirtualTabs)
-            {
-                TabPage tp = NewTabPage(t.Caption);
-                addSaveAndPublishButtons(ref tp);
-
-                tp.Style.Add("text-align", "center");
-
-
-                // Iterate through the property types and add them to the tab
-                foreach (PropertyType pt in t.PropertyTypes)
-                {
-                    // table.Rows.Add(addControl(_content.getProperty(editPropertyType.Alias), tp));
-                    addControlNew(_content.getProperty(pt), tp, t.Caption);
-                    inTab.Add(pt.Id.ToString(), true);
-                }
-            }
-
-
-            // Add property pane
-            tpProp = NewTabPage(ui.Text("general", "properties", null));
-            addSaveAndPublishButtons(ref tpProp);
-            tpProp.Controls.Add(
-                new LiteralControl("<div id=\"errorPane_" + tpProp.ClientID +
-                                   "\" style=\"display: none; text-align: left; color: red;width: 100%; border: 1px solid red; background-color: #FCDEDE\"><div><b>There were errors - data has not been saved!</b><br/></div></div>"));
         }
 
+		/// <summary>
+		/// Create and setup all of the controls child controls.
+		/// </summary>
+		protected override void CreateChildControls()
+		{
+			base.CreateChildControls();
 
+			SaveAndPublish += new EventHandler(standardSaveAndPublishHandler);
+			Save += new EventHandler(standardSaveAndPublishHandler);
+			prntpage = (UmbracoEnsuredPage)Page;
+
+			foreach (ContentType.TabI t in _content.ContentType.getVirtualTabs)
+			{
+				TabPage tp = NewTabPage(t.Caption);
+				addSaveAndPublishButtons(ref tp);
+
+				tp.Style.Add("text-align", "center");
+
+
+				// Iterate through the property types and add them to the tab
+				foreach (PropertyType pt in t.PropertyTypes)
+				{
+					// table.Rows.Add(addControl(_content.getProperty(editPropertyType.Alias), tp));
+					addControlNew(_content.getProperty(pt), tp, t.Caption);
+					inTab.Add(pt.Id.ToString(), true);
+				}
+			}
+
+
+			// Add property pane
+			tpProp = NewTabPage(ui.Text("general", "properties", null));
+			addSaveAndPublishButtons(ref tpProp);
+			tpProp.Controls.Add(
+				new LiteralControl("<div id=\"errorPane_" + tpProp.ClientID +
+								   "\" style=\"display: none; text-align: left; color: red;width: 100%; border: 1px solid red; background-color: #FCDEDE\"><div><b>There were errors - data has not been saved!</b><br/></div></div>"));
+		}
+
+		/// <summary>
+		/// Initializes the control and ensures child controls are setup
+		/// </summary>
+		/// <param name="e"></param>
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
+
+			EnsureChildControls();
+
             // Add extras for the property tabpage. .
             ContentControlLoadEventArgs contentcontrolEvent = new ContentControlLoadEventArgs();
             FireBeforeContentControlLoad(contentcontrolEvent);

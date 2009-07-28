@@ -51,8 +51,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BasicClientDependencyFile.cs" />
+    <Compile Include="BasicClientDependencyPath.cs" />
     <Compile Include="Controls\ClientDependencyInclude.cs" />
-    <Compile Include="ClientDependencyList.cs" />
+    <Compile Include="ClientDependencyCollection.cs" />
     <Compile Include="ClientDependencyType.cs" />
     <Compile Include="CompositeFileMap.cs" />
     <Compile Include="CompositeFileProcessor.cs" />
@@ -62,11 +64,12 @@
     <Compile Include="Controls\JsInclude.cs" />
     <Compile Include="CssFileUrlFormatter.cs" />
     <Compile Include="IClientDependencyFile.cs" />
+    <Compile Include="IClientDependencyPath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProviderDependencyList.cs" />
     <Compile Include="Providers\ClientDependencyProvider.cs" />
     <Compile Include="ClientDependencyAttribute.cs" />
     <Compile Include="ClientDependencyEmbedType.cs" />
-    <Compile Include="ClientDependencyHelper.cs" />
     <Compile Include="Controls\ClientDependencyLoader.cs" />
     <Compile Include="Controls\ClientDependencyPath.cs" />
     <Compile Include="Controls\ClientDependencyPathCollection.cs" />

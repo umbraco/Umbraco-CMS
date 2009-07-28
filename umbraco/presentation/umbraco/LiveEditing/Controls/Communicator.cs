@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using umbraco.presentation.ClientDependency;
 
 namespace umbraco.presentation.LiveEditing.Controls
 {
     /// <summary>
     /// Control that can receive messages from the client.
     /// </summary>
+	[ClientDependency(100, ClientDependencyType.Javascript, "LiveEditing/Controls/Communicator.js", "UmbracoRoot")]
     public class Communicator : Control
     {
         /// <summary>
@@ -70,8 +72,8 @@ namespace umbraco.presentation.LiveEditing.Controls
             m_SubmitButton.Click += new EventHandler(SubmitButton_Click);
             m_MainPanel.ContentTemplateContainer.Controls.Add(m_SubmitButton);
 
-            ScriptManager.RegisterClientScriptInclude(this, GetType(), ScriptFile,
-                                                      string.Format(ScriptFile, GlobalSettings.Path));
+			ScriptManager.RegisterClientScriptInclude(this, GetType(), ScriptFile,
+													  string.Format(ScriptFile, GlobalSettings.Path));
         }
 
         /// <summary>

@@ -5,7 +5,6 @@ using System.IO;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using umbraco.cms.businesslogic.datatype;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
@@ -13,14 +12,16 @@ using umbraco.interfaces;
 using umbraco.presentation.LiveEditing.Controls;
 using umbraco.presentation.LiveEditing.Updates;
 using umbraco.presentation.templateControls;
-
+using umbraco.presentation.ClientDependency;
+using umbraco.presentation.ClientDependency.Controls;
+using umbraco.presentation.ClientDependency.Providers;
 namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
 {
     /// <summary>
     /// Control that wraps the editor control to edit a field in Live Editing mode.
     /// </summary>
-    [ClientDependency(1, ClientDependencyType.Javascript, "/umbraco_client/ui/jquery.js", false)]
-    [ClientDependency(2, ClientDependencyType.Javascript, "LiveEditing/Modules/ItemEditing/ItemEditing.js", true, "initializeGlobalItemEditing")]
+    [ClientDependency(1, ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient")]
+	[ClientDependency(21, ClientDependencyType.Javascript, "LiveEditing/Modules/ItemEditing/ItemEditing.js", "UmbracoRoot", InvokeJavascriptMethodOnLoad = "initializeGlobalItemEditing")]
     public class ItemEditor : UpdatePanel
     {
         #region Protected Constants
@@ -104,6 +105,7 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
             ScriptManager.RegisterStartupScript(Page, GetType(), new Guid().ToString(),
                                                 string.Format("ItemEditing.startEdit({0});", ItemId), true);
 
+			EnsureChildControls();
         }
 
         /// <summary>
@@ -145,6 +147,9 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
 
             ID = "ItemEditor";
             RenderMode = UpdatePanelRenderMode.Inline;
+
+			m_Manager.MessageReceived += Manager_MessageReceived;
+			m_Manager.LiveEditingContext.Updates.UpdateAdded += Updates_UpdateAdded;
         }
         
         /// <summary>
@@ -156,6 +161,7 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
             base.OnLoad(e);
 
             // create editor controls if in edit modoe
+			//this NEVER fires because onload occurs before ItemId is set in StartEditing
             if (ItemId != 0)
             {
                 EnsureChildControls();
@@ -164,21 +170,7 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
             // enable editing on all items
             foreach (Item item in Utility.FindControls<Item>(Page.Master))
                 item.Renderer = LiveEditingItemRenderer.Instance;
-
-            m_Manager.MessageReceived += Manager_MessageReceived;
-            m_Manager.LiveEditingContext.Updates.UpdateAdded += Updates_UpdateAdded;
-        }
-
-        /// <summary>
-        /// Raises the <see cref="E:PreRender"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected override void OnPreRender(EventArgs e)
-        {
-            base.OnPreRender(e);
-
-            // add the editor control's client dependencies (the client will ensure they're only loaded once)
-            ClientDependencyHelper.AddClientDependencies(this);
+            
         }
 
 
@@ -192,6 +184,9 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
             // Unfortunately, adding TinyMCE with the client dependencies system does not work
             // due to a bug in the way TinyMCE initializes in IE.
             // Therefore, TinyMCE needs to be added with a script tag.
+			// TODO: Same goes for the pagePicker, mediaPicker controls. This is due to 
+			// the client dependency framework not being able to render things out 
+			// after an async call with an UpdatePanel!
             ScriptManagerProxy proxy = new ScriptManagerProxy();
             proxy.Scripts.Add(new ScriptReference(TinyMCEClientScriptFile));
             ContentTemplateContainer.Controls.Add(proxy);

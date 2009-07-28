@@ -114,7 +114,10 @@ Umbraco.Sys.onScriptAvailable = function(script) {
         if (typeof (eval(script.callbackMethod)) == 'function') {
             UmbDependencyLoader.LoadNextJs();
             Sys.Debug.trace("UmbracoDependencyLoader: Executing '" + script.filePath + "' callback '" + script.callbackMethod + "'.");
-            eval(script.callbackMethod + "()");
+            var func = eval(script.callbackMethod);
+            alert(func);
+            func.call(this);
+            //eval(script.callbackMethod + "()");
         }
         else {
             setTimeout(function() {

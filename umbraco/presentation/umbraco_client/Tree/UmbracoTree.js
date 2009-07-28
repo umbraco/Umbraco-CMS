@@ -53,7 +53,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _app: null, //the reference to the current app
             _showContext: true,
             _isDialog: false,
-            _isDebug: true, //set to true to enable alert debugging
+            _isDebug: false, //set to true to enable alert debugging
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
             _serviceUrl: "", //a path to the tree client service url
             _dataUrl: "", //a path to the tree data service url

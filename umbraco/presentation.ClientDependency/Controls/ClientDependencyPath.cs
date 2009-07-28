@@ -12,7 +12,7 @@ namespace umbraco.presentation.ClientDependency.Controls
 	/// Databinding support has been enabled.
 	/// </summary>
 	[ParseChildren(true)]
-	public class ClientDependencyPath
+	public class ClientDependencyPath : IClientDependencyPath
 	{
 		string _name = "";
 		string _path = "";

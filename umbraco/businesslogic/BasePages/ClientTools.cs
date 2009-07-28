@@ -47,6 +47,8 @@ namespace umbraco.BasePages
 			}
 			public static string ChildNodeCreated = GetMainTree + ".childNodeCreated();";
 			public static string SyncTree { get { return GetMainTree + ".syncTree('{0}', {1});"; } }
+			public static string CopyNode { get { return GetMainTree + ".copyNode('{0}', '{1}');"; } }
+			public static string MoveNode { get { return GetMainTree + ".moveNode('{0}', '{1}');"; } }
 			public static string ReloadActionNode { get { return GetMainTree + ".reloadActionNode({0}, {1}, null);"; } }
 			public static string SetActiveTreeType { get { return GetMainTree + ".setActiveTreeType('{0}');"; } }
 			public static string CloseModalWindow { get { return GetMainWindow + ".closeModal();"; } }
@@ -110,6 +112,16 @@ namespace umbraco.BasePages
 			RegisterClientScript(Scripts.ChangeContentFrameUrl(url));
 			return this;
 		}
+
+		/// <summary>
+		/// Shows the dashboard for the given application
+		/// </summary>
+		/// <param name="app"></param>
+		/// <returns></returns>
+		public ClientTools ShowDashboard(string app)
+		{
+			return ChangeContentFrameUrl(GlobalSettings.Path + string.Format("/dashboard.aspx?app={0}", app));
+		}
 		
 		/// <summary>
 		/// Reloads the children of the current action node and selects the node that didn't exist there before.
@@ -159,7 +171,19 @@ namespace umbraco.BasePages
 		{
 			RegisterClientScript(string.Format(Scripts.SyncTree, path, forceReload.ToString().ToLower()));
 			return this;
-		}		
+		}
+
+		public ClientTools CopyNode(string currNodeId, string newParentPath)
+		{
+			RegisterClientScript(string.Format(Scripts.CopyNode, currNodeId, newParentPath));
+			return this;
+		}
+
+		public ClientTools MoveNode(string currNodeId, string newParentPath)
+		{
+			RegisterClientScript(string.Format(Scripts.MoveNode, currNodeId, newParentPath));
+			return this;
+		}
 
 		/// <summary>
 		/// Reloads only the active node in the tree.

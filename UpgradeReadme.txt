@@ -1,6 +1,7 @@
 * //TODO: All removed files will be in the umbraco.Legacy project 
 
-* DataType: 'editor' removed
+* DataType: 'editor' removed (editor.cs)
+* removed WysiwygDataType.cs
 
 * Many files have been removed but a zip file containing all removed files has been supplied
 
@@ -15,3 +16,6 @@ exists in the current context, and if it doesn't it registers the scripts?)
 
 * The old TinyMCE was not upgraded to use ClientDependency but it's paths have been changed
 to use the UmbracoClientPath setting
+
+* removed CheckBoxTree.cs [permanently!, not in legacy package]
+* removed windowCloser.cs

@@ -468,7 +468,7 @@
     <Compile Include="umbraco\controls\TreeControl.ascx.designer.cs">
       <DependentUpon>TreeControl.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\controls\windowCloser.cs">
+    <Compile Include="umbraco\controls\__TODELETE__windowCloser.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco\developer\Xslt\xsltVisualize.aspx.cs">

@@ -252,7 +252,7 @@ namespace umbraco.dialogs
                         feedback.type = umbraco.uicontrols.Feedback.feedbacktype.success;
 
                         // refresh tree
-                        ScriptManager.RegisterClientScriptBlock(Page, typeof(Page), "treeRefresh", String.Format("updateTree({0}, {1}, {2}, '{3}', false);", currentNode.Id, oldParent, newNode.Id, newNode.Path), true);
+						ClientTools.MoveNode(currentNode.Id.ToString(), newNode.Path);
 
                     } 
 					else 
@@ -261,7 +261,7 @@ namespace umbraco.dialogs
 						d.Copy(int.Parse(helper.Request("copyTo")), this.getUser(), RelateDocuments.Checked);
 						feedback.Text = ui.Text("moveOrCopy", "copyDone", nodes, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow + "'>" + ui.Text("closeThisWindow") + "</a>";
                         feedback.type = umbraco.uicontrols.Feedback.feedbacktype.success;
-                        ScriptManager.RegisterClientScriptBlock(Page, typeof(Page), "treeRefresh", String.Format("updateTree({0}, {1}, {2}, '{3}', true);", currentNode.Id, oldParent, newNode.Id, newNode.Path), true);
+						ClientTools.CopyNode(currentNode.Id.ToString(), newNode.Path);
                     }
 				} 
 			}

@@ -5,12 +5,13 @@ using AjaxControlToolkit;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.LiveEditing.Controls;
 using umbraco.BusinessLogic.Actions;
-
+using umbraco.presentation.ClientDependency;
 namespace umbraco.presentation.LiveEditing.Modules.DeleteModule
 {
+	[ClientDependency(200, ClientDependencyType.Javascript, "LiveEditing/Modules/DeleteModule/DeleteModule.js", "UmbracoRoot")]
     public class DeleteModule : BaseModule
     {
-        protected const string DeleteModuleScriptFile = "{0}/LiveEditing/Modules/DeleteModule/DeleteModule.js";
+        //protected const string DeleteModuleScriptFile = "{0}/LiveEditing/Modules/DeleteModule/DeleteModule.js";
 
         protected ImageButton m_DeleteButton = new ImageButton();
 
@@ -72,7 +73,7 @@ namespace umbraco.presentation.LiveEditing.Modules.DeleteModule
 
             m_DeleteModal.Controls.Add(new LiteralControl("</div>"));
 
-            ScriptManager.RegisterClientScriptInclude(this, GetType(), DeleteModuleScriptFile, String.Format(DeleteModuleScriptFile, GlobalSettings.Path));
+            //ScriptManager.RegisterClientScriptInclude(this, GetType(), DeleteModuleScriptFile, String.Format(DeleteModuleScriptFile, GlobalSettings.Path));
         }
 
         

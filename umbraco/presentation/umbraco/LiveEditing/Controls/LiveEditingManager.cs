@@ -3,7 +3,11 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.presentation.LiveEditing.Modules.ItemEditing;
-using umbraco.cms.businesslogic.datatype;
+using umbraco.presentation.ClientDependency;
+using umbraco.presentation.ClientDependency.Providers;
+using umbraco.presentation.ClientDependency.Controls;
+using umbraco.BasePages;
+using System.Collections.Generic;
 
 namespace umbraco.presentation.LiveEditing.Controls
 {
@@ -12,9 +16,9 @@ namespace umbraco.presentation.LiveEditing.Controls
     /// Provides public properties, events and methods for Live Editing controls.
     /// Add this control to a (master) page to enable Live Editing.
     /// </summary>
-    [ClientDependency(1, ClientDependencyType.Css, "LiveEditing/CSS/LiveEditing.css", true)]
-    [ClientDependency(1, ClientDependencyType.Javascript, "/umbraco_client/ui/jquery.js", false, "_jQueryNoConflict = function(){jQuery.noConflict();}")]
-    [ClientDependency(2, ClientDependencyType.Javascript, "js/UmbracoSpeechBubble.js", true)]
+    [ClientDependency(1, ClientDependencyType.Css, "LiveEditing/CSS/LiveEditing.css", "UmbracoRoot")]
+	[ClientDependency(1, ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient", InvokeJavascriptMethodOnLoad = "_jQueryNoConflict = function(){jQuery.noConflict();};")]
+	[ClientDependency(10, ClientDependencyType.Javascript, "js/UmbracoSpeechBubble.js", "UmbracoRoot")]
     public class LiveEditingManager : Control
     {
 
@@ -90,11 +94,10 @@ namespace umbraco.presentation.LiveEditing.Controls
             EnsureChildControls();
         }
 
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
-            ClientDependencyHelper.AddClientDependencies(this);
-        }
+		protected override void OnPreRender(EventArgs e)
+		{
+			base.OnPreRender(e);
+		}
 
         /// <summary>
         /// Called by the ASP.NET page framework to notify server controls
@@ -104,6 +107,14 @@ namespace umbraco.presentation.LiveEditing.Controls
         protected override void CreateChildControls()
         {
             base.CreateChildControls();
+
+			//we need a DependencyLoader control
+			bool isNew;
+			ClientDependencyLoader.TryCreate(this, out isNew)
+				.AddPath("UmbracoClient", GlobalSettings.ClientPath)
+				.AddPath("UmbracoRoot", GlobalSettings.Path)
+				.EmbedType = ClientDependencyEmbedType.ClientSideRegistration;
+			ClientDependencyLoader.Instance.IsDebugMode = true;
 
             m_Communicator = new Communicator();
             Controls.Add(m_Communicator);
@@ -136,11 +147,20 @@ namespace umbraco.presentation.LiveEditing.Controls
         /// <param name="title">Unescaped title text.</param>
         /// <param name="message">Unescaped message text.</param>
         /// <param name="icon">The icon.</param>
+		[Obsolete("Use the ClientTools library instead: 'ShowSpeechBubble' method.")]
         public virtual void DisplayUserMessage(string title, string message, string icon)
         {
-            ScriptManager.RegisterClientScriptBlock(Page, GetType(), new Guid().ToString(),
-                string.Format("UmbSpeechBubble.ShowMessage('{2}','{0}','{1}');",
-                    EscapeJavascriptString(title), EscapeJavascriptString(message), EscapeJavascriptString(icon)), true);
+			ClientTools cTools = new ClientTools(Page);
+			BasePage.speechBubbleIcon ico = BasePage.speechBubbleIcon.info;
+			try
+			{
+				ico = (BasePage.speechBubbleIcon)(Enum.Parse(typeof(BasePage.speechBubbleIcon), icon));
+			}
+			catch { }
+			cTools.ShowSpeechBubble(BasePage.speechBubbleIcon.info, title, message);
+			//ScriptManager.RegisterClientScriptBlock(Page, GetType(), new Guid().ToString(),
+			//    string.Format("UmbSpeechBubble.ShowMessage('{2}','{0}','{1}');",
+			//        EscapeJavascriptString(title), EscapeJavascriptString(message), EscapeJavascriptString(icon)), true);
         }
  
         #endregion

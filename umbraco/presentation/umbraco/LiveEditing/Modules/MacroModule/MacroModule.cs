@@ -9,12 +9,13 @@ using umbraco.presentation.LiveEditing.Controls;
 using umbraco.presentation.LiveEditing.Updates;
 using umbraco.presentation.templateControls;
 using UM = umbraco.cms.businesslogic.macro;
-
+using umbraco.presentation.ClientDependency;
 namespace umbraco.presentation.LiveEditing.Modules.MacroEditing
 {
+	[ClientDependency(200, ClientDependencyType.Javascript, "LiveEditing/Modules/MacroModule/MacroModule.js", "UmbracoRoot")]
     public class MacroModule : BaseModule
     {
-        protected const string MacroModuleScriptFile = "{0}/LiveEditing/Modules/MacroModule/MacroModule.js";
+        //protected const string MacroModuleScriptFile = "{0}/LiveEditing/Modules/MacroModule/MacroModule.js";
 
         private ImageButton m_MacroButton = new ImageButton();
 
@@ -108,7 +109,7 @@ namespace umbraco.presentation.LiveEditing.Modules.MacroEditing
 
             m_MacroModal.Controls.Add(new LiteralControl("</div>"));
 
-            ScriptManager.RegisterClientScriptInclude(this, GetType(), MacroModuleScriptFile, String.Format(MacroModuleScriptFile, GlobalSettings.Path));
+            //ScriptManager.RegisterClientScriptInclude(this, GetType(), MacroModuleScriptFile, String.Format(MacroModuleScriptFile, GlobalSettings.Path));
 
             
         }

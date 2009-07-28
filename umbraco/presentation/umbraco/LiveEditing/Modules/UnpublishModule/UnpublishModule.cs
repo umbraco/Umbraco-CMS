@@ -5,12 +5,13 @@ using AjaxControlToolkit;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.LiveEditing.Controls;
 using umbraco.BusinessLogic.Actions;
-
+using umbraco.presentation.ClientDependency;
 namespace umbraco.presentation.LiveEditing.Modules.UnpublishModule
 {
+	[ClientDependency(200, ClientDependencyType.Javascript, "LiveEditing/Modules/UnpublishModule/UnpublishModule.js", "UmbracoRoot")]
     public class UnpublishModule : BaseModule
     {
-         protected const string UnpublishModuleScriptFile = "{0}/LiveEditing/Modules/UnpublishModule/UnpublishModule.js";
+         //protected const string UnpublishModuleScriptFile = "{0}/LiveEditing/Modules/UnpublishModule/UnpublishModule.js";
 
          protected ImageButton m_UnpublishButton = new ImageButton();
 
@@ -84,7 +85,7 @@ namespace umbraco.presentation.LiveEditing.Modules.UnpublishModule
 
             m_UnpublishModal.Controls.Add(new LiteralControl("</div>"));
 
-            ScriptManager.RegisterClientScriptInclude(this, GetType(), UnpublishModuleScriptFile, String.Format(UnpublishModuleScriptFile, GlobalSettings.Path));
+            //ScriptManager.RegisterClientScriptInclude(this, GetType(), UnpublishModuleScriptFile, String.Format(UnpublishModuleScriptFile, GlobalSettings.Path));
         }
 
 

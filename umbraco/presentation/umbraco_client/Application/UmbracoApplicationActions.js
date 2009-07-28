@@ -18,7 +18,7 @@ Umbraco.Application.Actions = function() {
         _utils: Umbraco.Utils, //alias to Umbraco Utils
         _dialogWindow: null,
         /// <field name="_dialogWindow">A reference to a dialog window to open, any action that doesn't open in an overlay, opens in a dialog</field>
-        _isDebug: true, //set to true to enable alert debugging
+        _isDebug: false, //set to true to enable alert debugging
         _windowTitle: " - Umbraco CMS - ",
         _currApp: "",
 
@@ -98,8 +98,8 @@ Umbraco.Application.Actions = function() {
             if (!ignoreDashboard) {
                 UmbClientMgr.contentFrame('dashboard.aspx?app=' + whichApp);
             }
-                        
-            
+
+
             UmbClientMgr.mainTree().rebuildTree(whichApp);
 
             jQuery("#treeWindowLabel").html(appName);
@@ -126,7 +126,7 @@ Umbraco.Application.Actions = function() {
         },
 
         openDashboard: function(whichApp) {
-            UmbClientMgr.contentFrame().location.href = 'dashboard.aspx?app=' + whichApp;
+            UmbClientMgr.contentFrame('dashboard.aspx?app=' + whichApp);
         },
 
         actionSort: function() {

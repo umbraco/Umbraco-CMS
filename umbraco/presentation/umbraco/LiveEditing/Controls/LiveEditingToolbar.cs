@@ -7,19 +7,19 @@ using umbraco.presentation.LiveEditing.Modules.DeleteModule;
 using umbraco.presentation.LiveEditing.Modules.ItemEditing;
 //using umbraco.presentation.LiveEditing.Modules.MacroEditing;
 using umbraco.presentation.LiveEditing.Modules.UnpublishModule;
-using umbraco.cms.businesslogic.datatype;
+
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic.Actions;
 using umbraco.presentation.umbraco.controls;
-
+using umbraco.presentation.ClientDependency;
 namespace umbraco.presentation.LiveEditing.Controls
 {
     /// <summary>
     /// The default toolbar used for Live Editing.
     /// </summary>
-    [ClientDependency(1, ClientDependencyType.Javascript, "/umbraco_client/ui/jquery.js", false)]
-    [ClientDependency(2, ClientDependencyType.Javascript, "LiveEditing/Controls/LiveEditingToolbar.js", true)]
+    [ClientDependency(1, ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient")]
+    [ClientDependency(20, ClientDependencyType.Javascript, "LiveEditing/Controls/LiveEditingToolbar.js", "UmbracoRoot")]
     public class LiveEditingToolbar : Control
     {
         #region Protected Constants

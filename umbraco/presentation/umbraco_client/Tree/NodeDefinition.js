@@ -17,7 +17,7 @@ Umbraco.Controls.NodeDefinition = function() {
         sourceUrl: null,
         menu: null,
         treeType: null,
-        _isDebug: true,
+        _isDebug: false,
         
         updateDefinition: function(jsTree, jsNode, nodeId, nodeName, nodeType, sourceUrl, menu, treeType) {
             /// <summary>
