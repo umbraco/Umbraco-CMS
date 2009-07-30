@@ -35,13 +35,13 @@ namespace umbraco.editorControls.ultraSimpleMailer
 
 			// init progressbar
 			pb = new umbraco.controls.progressBar();
-			Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "UltraSimpleMailerJs", "<script language='javascript' src='/umbraco_client/ultraSimpleMailer/javascript.js'></script>");
+			Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "UltraSimpleMailerJs", "<script language='javascript' src='/" + GlobalSettings.ClientPath + "/ultraSimpleMailer/javascript.js'></script>");
 			string[] config = _configuration.Split("|".ToCharArray());
 			cms.businesslogic.member.MemberGroup mg = new umbraco.cms.businesslogic.member.MemberGroup(int.Parse(config[11]));
 			string totalReceip = mailerLogic.GetTotalReceiptients(mg).ToString();
 			Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "ultraSimpleMailerAjax", "<script>\nultraSimpleMailerTotalMails = " + totalReceip + ";\nvar ultraSimpleMailerId = 'ultraSimpleMailerProgress" + this._data.NodeId + "';</script>");
 			Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "progressBar", "<script language='javascript' src='/umbraco_client/progressBar/javascript.js'></script>");
-			Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "progressBarCss", "<link href=\"/umbraco_client/progressBar/style.css\" type=\"text/css\" rel=\"stylesheet\">");
+			Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "progressBarCss", "<link href=\"" + GlobalSettings.ClientPath + "/progressBar/style.css\" type=\"text/css\" rel=\"stylesheet\">");
 
 			// We need to make sure we have a reference to the legacy ajax calls in the scriptmanager
 			presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
@@ -139,14 +139,14 @@ namespace umbraco.editorControls.ultraSimpleMailer
 				// Add the two new buttons
 				MenuIconI menuItemSend = new MenuIconClass();
 				menuItemSend.OnClickCommand = "ultraSimpleMailer_doSend('" + this.ClientID + "')";
-				menuItemSend.ImageURL = "/umbraco_client/ultraSimpleMailer/images/newsletterSend.gif";
+				menuItemSend.ImageURL = GlobalSettings.ClientPath + "/ultraSimpleMailer/images/newsletterSend.gif";
 				menuItemSend.AltText = "Send newsletter to all";
 				menuItemSend.ID = "sendToAll";
 				buttons.Insert(0, menuItemSend);
 
 				MenuIconI menuItemTest = new MenuIconClass();
 				menuItemTest.OnClickCommand = "ultraSimpleMailer_doSendTest('" + this.ClientID + "')";
-				menuItemTest.ImageURL = "/umbraco_client/ultraSimpleMailer/images/newsletterSendTest.gif";
+				menuItemTest.ImageURL = GlobalSettings.ClientPath + "/ultraSimpleMailer/images/newsletterSendTest.gif";
 				menuItemTest.AltText = "Test newsletter by sending to a mail address you specify";
 				menuItemTest.ID = "sendToTest";
 				buttons.Insert(1, menuItemTest);

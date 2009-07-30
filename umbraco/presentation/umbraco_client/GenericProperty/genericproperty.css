@@ -18,7 +18,7 @@
   padding: 7px;
   display: block;
   position: relative;
-  background: url(/umbraco_client/tabView/images/background.gif) #EEEEEE repeat-x bottom;
+  background: url(../tabView/images/background.gif) #EEEEEE repeat-x bottom;
   border: 1px solid #ccc;
   margin-bottom: 3px;
   cursor: move;

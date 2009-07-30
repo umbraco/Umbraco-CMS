@@ -76,6 +76,10 @@
     <Compile Include="TabView.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\umbraco\businesslogic\umbraco.businesslogic.csproj">
+      <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
+      <Name>umbraco.businesslogic</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\umbraco\presentation.ClientDependency\umbraco.presentation.ClientDependency.csproj">
       <Project>{EA35B06D-0CC8-4830-A3F7-9BB3D36D0FAF}</Project>
       <Name>umbraco.presentation.ClientDependency</Name>

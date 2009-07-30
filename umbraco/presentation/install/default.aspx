@@ -1,6 +1,8 @@
 <%@ Page Language="c#" CodeBehind="default.aspx.cs" AutoEventWireup="True" Inherits="umbraco.presentation.install._default" EnableViewState="False" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
+<%@ Register TagPrefix="ctl" Src="~/umbraco/controls/ProgressBar.ascx" TagName="ProgBar"  %>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head runat="server">
@@ -78,7 +80,7 @@
         </div>
         <div id="buttons">
             <div id="loadingBar">
-                <img src="/umbraco_client/images/progressbar.gif" alt="loading, please wait..." />
+                <ctl:ProgBar runat="server" id="ProgBar" />
             </div>
             
             <asp:Button ID="next" OnClientClick="nextStep(this,'loadingBar'); return false;" Text="Next &raquo;" runat="server" />

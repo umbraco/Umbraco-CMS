@@ -1,4 +1,5 @@
 <%@ Page Language="c#" Codebehind="republish.aspx.cs" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="True" Inherits="umbraco.cms.presentation.republish" %>
+<%@ Register TagPrefix="ctl" Src="~/umbraco/controls/ProgressBar.ascx" TagName="ProgBar"  %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
    <script type="text/javascript">
@@ -23,7 +24,9 @@
             <a href="#" onclick="UmbClientMgr.mainWindow().closeModal();"><%=umbraco.ui.Text("cancel")%></a>
           </div>     
       
-      <div id="progress" style="visibility: hidden;"><img src="/umbraco_client/images/progressBar.gif" /></div>
+      <div id="progress" style="visibility: hidden;">
+		<ctl:ProgBar runat="server" id="ProgBar" />
+      </div>
       
     </asp:Panel>
     

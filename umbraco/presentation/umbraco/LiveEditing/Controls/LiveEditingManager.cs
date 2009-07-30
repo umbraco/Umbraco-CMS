@@ -18,6 +18,9 @@ namespace umbraco.presentation.LiveEditing.Controls
     /// </summary>
     [ClientDependency(1, ClientDependencyType.Css, "LiveEditing/CSS/LiveEditing.css", "UmbracoRoot")]
 	[ClientDependency(1, ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient", InvokeJavascriptMethodOnLoad = "_jQueryNoConflict = function(){jQuery.noConflict();};")]
+	[ClientDependency(2, ClientDependencyType.Javascript, "Application/NamespaceManager.js", "UmbracoClient")]
+	[ClientDependency(3, ClientDependencyType.Javascript, "Application/UmbracoClientManager.js", "UmbracoClient")]
+	[ClientDependency(3, ClientDependencyType.Javascript, "js/language.aspx", "UmbracoRoot")]
 	[ClientDependency(10, ClientDependencyType.Javascript, "js/UmbracoSpeechBubble.js", "UmbracoRoot")]
     public class LiveEditingManager : Control
     {
@@ -117,14 +120,18 @@ namespace umbraco.presentation.LiveEditing.Controls
 			ClientDependencyLoader.Instance.IsDebugMode = true;
 
             m_Communicator = new Communicator();
+			m_Communicator.ID = "Communicator";
             Controls.Add(m_Communicator);
 
             m_Toolbar = new LiveEditingToolbar(this);
+			m_Toolbar.ID = "Toolbar";
             Controls.Add(m_Toolbar);
 
             UpdatePanel m_OutputWrapper = new UpdatePanel();
+			m_OutputWrapper.ID = "OutputWrapper";
             Controls.Add(m_OutputWrapper);
             m_Output = new PlaceHolder();
+			m_Output.ID = "Output";
             m_OutputWrapper.ContentTemplateContainer.Controls.Add(m_Output);
         }
 

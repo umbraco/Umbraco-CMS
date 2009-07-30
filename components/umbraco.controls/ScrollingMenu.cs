@@ -19,7 +19,7 @@ namespace umbraco.uicontrols {
         private ArrayList Icons = new ArrayList();
         private string iconIds;
         private int extraMenuWidth = 0;
-        private string _ClientFilesPath = "/umbraco_client/scrollingmenu/";
+        private string _ClientFilesPath = GlobalSettings.ClientPath + "/scrollingmenu/";
 
         public MenuIconI NewIcon(int Index) {
             MenuIcon Icon = new MenuIcon();

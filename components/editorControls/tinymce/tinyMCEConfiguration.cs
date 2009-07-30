@@ -43,7 +43,7 @@ namespace umbraco.editorControls.tinymce
         }
 
         public static string PluginPath = umbraco.GlobalSettings.Path + "/plugins/tinymce3";
-        public static string JavascriptPath = umbraco.GlobalSettings.Path + "/../umbraco_client/tinymce3";
+        public static string JavascriptPath = umbraco.GlobalSettings.ClientPath + "/tinymce3";
 
         private static string _invalidElements;
 

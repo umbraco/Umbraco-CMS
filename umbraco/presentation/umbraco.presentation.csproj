@@ -411,6 +411,13 @@
     <Compile Include="umbraco\ClientDependencyTest.aspx.designer.cs">
       <DependentUpon>ClientDependencyTest.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\controls\ProgressBar.ascx.cs">
+      <DependentUpon>ProgressBar.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\controls\ProgressBar.ascx.designer.cs">
+      <DependentUpon>ProgressBar.ascx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\__TODELETE__ContentItem\__TODELETE__edit.aspx.cs">
       <DependentUpon>__TODELETE__edit.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -458,7 +465,7 @@
     <Compile Include="umbraco\controls\passwordChanger.ascx.designer.cs">
       <DependentUpon>passwordChanger.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\controls\progressBar.cs">
+    <Compile Include="umbraco\controls\__TODELETE__progressBar.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco\controls\TreeControl.ascx.cs">
@@ -1571,6 +1578,7 @@
     <Content Include="umbraco\config\lang\no.xml" />
     <Content Include="umbraco\config\lang\sv.xml" />
     <Content Include="umbraco\controls\passwordChanger.ascx" />
+    <Content Include="umbraco\controls\ProgressBar.ascx" />
     <Content Include="umbraco\controls\TreeControl.ascx" />
     <Content Include="umbraco\css\permissionsEditor.css" />
     <Content Include="umbraco\dialogs\ExportCode.aspx" />
@@ -1810,9 +1818,9 @@
     <Content Include="umbraco\translation\details.aspx" />
     <Content Include="umbraco_client\modal\modalBackground.gif" />
     <Content Include="umbraco_client\modal\modalGradiant.gif" />
-    <Content Include="umbraco\images\speechbubble.png" />
-    <Content Include="umbraco\images\speechbubbleShadow.png" />
-    <Content Include="umbraco\images\speechbubbleShadowNew.gif" />
+    <Content Include="umbraco\images\speechBubble\speechbubble.png" />
+    <Content Include="umbraco\images\speechBubble\speechbubbleShadow.png" />
+    <Content Include="umbraco\images\speechBubble\speechbubbleShadowNew.gif" />
     <Content Include="umbraco\images\speechBubble\error.png" />
     <Content Include="umbraco\images\speechBubble\info.png" />
     <Content Include="umbraco\images\speechBubble\save.png" />
@@ -2050,8 +2058,8 @@
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="umbraco\css\background.gif" />
-    <Content Include="umbraco\css\buttonbg.gif" />
-    <Content Include="umbraco\css\buttonbgdown.gif" />
+    <Content Include="umbraco\css\__TODELETE__buttonbg.gif" />
+    <Content Include="umbraco\css\__TODELETE__buttonbgdown.gif" />
     <Content Include="umbraco\css\cbback.gif" />
     <Content Include="umbraco_client\GenericProperty\genericproperty.css" />
     <Content Include="umbraco\css\__TODELETE__officexp.css" />
@@ -2261,13 +2269,13 @@
     <Content Include="umbraco\images\sort.gif" />
     <Content Include="umbraco\images\sort.png" />
     <Content Include="umbraco\images\sort.small.png" />
-    <Content Include="umbraco\images\speechbubble.gif" />
+    <Content Include="umbraco\images\speechBubble\speechbubble.gif" />
     <Content Include="umbraco\images\speechBubble\error.gif" />
     <Content Include="umbraco\images\speechBubble\info.gif" />
     <Content Include="umbraco\images\speechBubble\save.gif" />
-    <Content Include="umbraco\images\speechbubble_close.gif" />
-    <Content Include="umbraco\images\speechbubble_close_over.gif" />
-    <Content Include="umbraco\images\speechbubble_shadow.gif" />
+    <Content Include="umbraco\images\speechBubble\speechbubble_close.gif" />
+    <Content Include="umbraco\images\speechBubble\speechbubble_close_over.gif" />
+    <Content Include="umbraco\images\speechBubble\speechbubble_shadow.gif" />
     <Content Include="umbraco\images\T.png" />
     <Content Include="umbraco\images\Tminus.png" />
     <Content Include="umbraco\images\topGradient.gif" />
@@ -3454,9 +3462,9 @@
     <Content Include="umbraco_client\ui\default.js" />
     <Content Include="umbraco_client\ui\jquery.js" />
     <Content Include="umbraco_client\ui\jqueryui.js" />
-    <Content Include="umbraco_client\ultraSimpleMailer\images\newsletterSend.gif" />
-    <Content Include="umbraco_client\ultraSimpleMailer\images\newsletterSendTest.gif" />
-    <Content Include="umbraco_client\ultraSimpleMailer\javascript.js" />
+    <Content Include="umbraco_client\__TODELETE__ultraSimpleMailer\__TODELETE__images\__TODELETE__newsletterSend.gif" />
+    <Content Include="umbraco_client\__TODELETE__ultraSimpleMailer\__TODELETE__images\__TODELETE__newsletterSendTest.gif" />
+    <Content Include="umbraco_client\__TODELETE__ultraSimpleMailer\__TODELETE__javascript.js" />
     <Content Include="App_Browsers\w3cvalidator.browser" />
     <Content Include="App_Browsers\Form.browser" />
     <Content Include="umbraco\masterpages\default.Master" />

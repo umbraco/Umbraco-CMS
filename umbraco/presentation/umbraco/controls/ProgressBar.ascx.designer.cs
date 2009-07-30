@@ -8,18 +8,18 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace umbraco.presentation.umbraco {
+namespace umbraco.presentation.umbraco.controls {
     
     
-    public partial class ClientDependencyTest {
+    public partial class ProgressBar {
         
         /// <summary>
-        /// form1 control.
+        /// ImgBar control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+        protected global::System.Web.UI.HtmlControls.HtmlImage ImgBar;
     }
 }

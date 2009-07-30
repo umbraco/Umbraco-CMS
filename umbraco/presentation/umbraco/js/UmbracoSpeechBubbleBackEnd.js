@@ -13,12 +13,12 @@ UmbracoSpeechBubble.prototype.GenerateSpeechBubble = function() {
     var sbHtml = document.getElementById(this.id);
 
     sbHtml.innerHTML = '' +
-	        '<div id="' + this.id + 'Icon" style="left: 10px; position: absolute; top: 16px; width: 30px; height: 30px; background: no-repeat center center url(images/speechbubble/info.png);">&nbsp;' +
+	        '<div id="' + this.id + 'Icon" style="left: 10px; position: absolute; top: 16px; width: 30px; height: 30px; background: no-repeat center center url(images/speechbubble/speechBubble/info.png);">&nbsp;' +
             '</div>' +
             '    <div id="speechClose" style="left: 208px; position: absolute; top: 6px">' +
             '          <a href="javascript:UmbSpeechBubble.Hide()">' +
-            '                      <img id="' + this.id + 'close" style="display: none;" src="/umbraco/images/speechBubble_close.gif" width="18" height="18" border="0" alt="Close"' +
-            '                        onmouseover="this.src = \'/umbraco/images/speechBubble_close_over.gif\';" onmouseout="this.src=\'images/speechBubble_close.gif\';"></a></div>' +
+            '                      <img id="' + this.id + 'close" style="display: none;" src="/umbraco/images/speechBubble/speechBubble_close.gif" width="18" height="18" border="0" alt="Close"' +
+            '                        onmouseover="this.src = \'/umbraco/images/speechBubble/speechBubble_close_over.gif\';" onmouseout="this.src=\'images/speechBubble/speechBubble_close.gif\';"></a></div>' +
             '                  <div id="' + this.id + 'Header" style="font-family: Segoe UI, Trebuchet MS, Lucida Grande, verdana, arial; font-size: 16px; font-weight: 100; color: #0033aa; left: 50px;' +
             '                    position: absolute; top: 6px">' +
             '                    Data gemt!</div>' +

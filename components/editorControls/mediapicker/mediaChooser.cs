@@ -10,9 +10,8 @@ namespace umbraco.editorControls
     /// </summary>
     [ClientDependency(100, ClientDependencyType.Css, "js/submodal/submodal.css", "UmbracoRoot")]
 	[ClientDependency(101, ClientDependencyType.Javascript, "js/submodal/common.js", "UmbracoRoot")]
-	[ClientDependency(102, ClientDependencyType.Javascript, "js/submodal/submodal.js", "UmbracoRoot", InvokeJavascriptMethodOnLoad = "initPopUp")]
-	[ClientDependency(103, ClientDependencyType.Javascript, "webservices/legacyAjaxCalls.asmx/js", "UmbracoRoot")]
-    [ValidationProperty("Value")]
+	[ClientDependency(102, ClientDependencyType.Javascript, "js/submodal/submodal.js", "UmbracoRoot", InvokeJavascriptMethodOnLoad = "initPopUp")]   
+	[ValidationProperty("Value")]
     public class mediaChooser : System.Web.UI.WebControls.HiddenField, interfaces.IDataEditor
     {
         interfaces.IData _data;
@@ -58,11 +57,7 @@ namespace umbraco.editorControls
 
         protected override void OnLoad(EventArgs e)
         {
-            base.OnLoad(e);
-            
-			//umbraco.presentation.ClientDependency.Controls.ClientDependencyLoader.RegisterDependency("js/submodal/common.js", "UmbracoRoot", umbraco.presentation.ClientDependency.ClientDependencyType.Javascript);
-			//umbraco.presentation.ClientDependency.Controls.ClientDependencyLoader.RegisterDependency("js/submodal/subModal.js", "UmbracoRoot", umbraco.presentation.ClientDependency.ClientDependencyType.Javascript);
-			//umbraco.presentation.ClientDependency.Controls.ClientDependencyLoader.RegisterDependency("js/submodal/subModal.css", "UmbracoRoot", umbraco.presentation.ClientDependency.ClientDependencyType.Css);			
+            base.OnLoad(e);           	
 
             // We need to make sure we have a reference to the legacy ajax calls in the scriptmanager
             presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);

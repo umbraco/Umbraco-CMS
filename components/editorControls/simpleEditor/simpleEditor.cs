@@ -87,13 +87,13 @@ namespace umbraco.editorControls.simpleEditor
 			output.WriteLine("<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr><td>");
 		
 			output.WriteLine(	"<p align=\"right\" style=\"margin: 0px; padding:0px\"><a href=\"javascript:insertLink(document.getElementById('" + this.ClientID + "'))\">" +
-				"<img src=\"/umbraco_client/simpleEditor/images/link.gif\" border=\"0\" align=\"right\" />" +
+				"<img src=\"" + GlobalSettings.ClientPath + "/simpleEditor/images/link.gif\" border=\"0\" align=\"right\" />" +
 				"</a>" +
                 "<a href=\"javascript:insertTag(document.getElementById('" + this.ClientID + "'), 'em', '')\">" +
-				"<img src=\"/umbraco_client/simpleEditor/images/italic.gif\" border=\"0\" style=\"margin-left: 3px; margin-right: 3px;\" align=\"right\" />" +
+				"<img src=\"" + GlobalSettings.ClientPath + "/simpleEditor/images/italic.gif\" border=\"0\" style=\"margin-left: 3px; margin-right: 3px;\" align=\"right\" />" +
 				"</a>" +
 				" <a href=\"javascript:insertTag(document.getElementById('" + this.ClientID + "'), 'strong', '')\">" +
-				"<img src=\"/umbraco_client/simpleEditor/images/bold.gif\" border=\"0\" align=\"right\" />" +
+				"<img src=\"" + GlobalSettings.ClientPath + "/simpleEditor/images/bold.gif\" border=\"0\" align=\"right\" />" +
 				"</a>" +
 				"<br/></p>");
 			base.Render(output);

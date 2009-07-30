@@ -14,13 +14,13 @@ UmbracoSpeechBubble.prototype.GenerateSpeechBubble = function() {
     sbHtml = document.createElement('div');
     sbHtml.id = this.id + 'Container';
     sbHtml.innerHTML = '' +
-	    '<div id="' + this.id + '" style="z-index: 10; filter: Alpha(Opacity=0); background-image: url(/umbraco/images/speechbubble.gif); visibility: hidden; width: 231px; position: absolute; height: 84px">' +
+	    '<div id="' + this.id + '" style="z-index: 10; filter: Alpha(Opacity=0); background-image: url(/umbraco/images/speechbubble/speechbubble.gif); visibility: hidden; width: 231px; position: absolute; height: 84px">' +
 	        '<div id="' + this.id + 'Icon" style="left: 10px; position: absolute; top: 16px">' +
-            '<img src="/umbraco/images/speechbubble_info.gif" alt="Info" width="30" height="30" id="' + this.id + 'IconSrc"></div>' +
+            '<img src="/umbraco/images/speechBubble/info.gif" alt="Info" width="30" height="30" id="' + this.id + 'IconSrc"></div>' +
             '    <div id="speechClose" style="left: 208px; position: absolute; top: 6px">' +
             '          <a href="javascript:UmbSpeechBubble.Hide(100)">' +
-            '                      <img src="/umbraco/images/speechBubble_close.gif" width="18" height="18" border="0" alt="Close"' +
-            '                        onmouseover="this.src = \'/umbraco/images/speechBubble_close_over.gif\';" onmouseout="this.src=\'images/speechBubble_close.gif\';"></a></div>' +
+            '                      <img src="/umbraco/images/speechbubble/speechBubble_close.gif" width="18" height="18" border="0" alt="Close"' +
+            '                        onmouseover="this.src = \'/umbraco/images/speechbubble/speechBubble_close_over.gif\';" onmouseout="this.src=\'images/speechbubble/speechBubble_close.gif\';"></a></div>' +
             '                  <div id="' + this.id + 'Header" style="font-family: Segoe UI; lucida sans; sans serif; font-size: 16px; font-weight: 100; color: #0033aa; left: 50px;' +
             '                    position: absolute; top: 6px">' +
             '                    Data gemt!</div>' +

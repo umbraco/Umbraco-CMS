@@ -16,9 +16,6 @@ namespace umbraco.presentation.LiveEditing.Controls
         /// </summary>
         public event EventHandler<MesssageReceivedArgs> MessageReceived;
 
-        /// <summary>Communicator Javascript file.</summary>
-        protected const string ScriptFile = "{0}/LiveEditing/Controls/Communicator.js";
-
         private UpdatePanel m_MainPanel;
         private TextBox m_TypeBox;
         private TextBox m_MessageBox;
@@ -72,8 +69,6 @@ namespace umbraco.presentation.LiveEditing.Controls
             m_SubmitButton.Click += new EventHandler(SubmitButton_Click);
             m_MainPanel.ContentTemplateContainer.Controls.Add(m_SubmitButton);
 
-			ScriptManager.RegisterClientScriptInclude(this, GetType(), ScriptFile,
-													  string.Format(ScriptFile, GlobalSettings.Path));
         }
 
         /// <summary>

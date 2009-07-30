@@ -8,7 +8,7 @@ namespace umbraco.uicontrols {
             this.Height = System.Web.UI.WebControls.Unit.Pixel(21);
             this.Style.Add("border", "0px");
             this.Attributes.Add("class", "editorIconSplit");
-            this.ImageUrl = "/umbraco_client/menuicon/images/split.gif";
+            this.ImageUrl = GlobalSettings.ClientPath + "/menuicon/images/split.gif";
         }
     }
 }

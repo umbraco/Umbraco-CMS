@@ -27,7 +27,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         return {
             //private members
             _userID: -1,
-            _loadingContent: '<div align="center"><br/><br/><br/><br/><br/><br/><br/><img src="/umbraco_client/images/progressBar.gif" /></div>',
+            _loadingContent: '<div align="center"><br/><br/><br/><br/><br/><br/><br/><img src="../../umbraco_client/images/progressBar.gif" /></div>',
             _pPanel: null,
             _tree: null,
             _selectedNodes: new Array(),

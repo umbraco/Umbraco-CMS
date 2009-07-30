@@ -1,6 +1,6 @@
 <%@ Page Language="C#" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="true" CodeBehind="emptyTrashcan.aspx.cs" Inherits="umbraco.presentation.dialogs.emptyTrashcan" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-
+<%@ Register TagPrefix="ctl" Src="~/umbraco/controls/ProgressBar.ascx" TagName="ProgBar"  %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
 		<script type="text/javascript">
 		
@@ -10,7 +10,7 @@
     			jQuery('#formDiv').hide();
     			jQuery('#buttons').hide(); 
 	    		jQuery('#animation').show(); 
-		    	jQuery('#anim').attr("src","/umbraco_client/images/progressBar.gif");
+		    	jQuery('#anim').attr("src","<%=umbraco.GlobalSettings.ClientPath%>/images/progressBar.gif");
 		    	
 		    	// call the empty trashcan webservice
 		    	umbraco.presentation.webservices.trashcan.EmptyTrashcan();
@@ -57,7 +57,8 @@
 		<div id="animation" align="center" style="display: none;">
 		<p><%= umbraco.ui.Text("defaultdialogs", "recycleBinDeleting")%></p>
 		
-		<img src="/umbraco_client/images/progressBar.gif" id="anim" alt="<%=umbraco.ui.Text("actions", "emptyTrashcan", this.getUser())%>"/><br />
+		<ctl:ProgBar runat="server" id="ProgBar" />
+		<br />
 		<span class="guiDialogTiny" id="statusLabel"><%=umbraco.ui.Text("deleting", this.getUser())%></span>
 		</div>
 	  	  	  

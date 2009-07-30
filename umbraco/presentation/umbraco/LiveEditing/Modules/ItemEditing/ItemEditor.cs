@@ -22,15 +22,13 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
     /// </summary>
     [ClientDependency(1, ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient")]
 	[ClientDependency(21, ClientDependencyType.Javascript, "LiveEditing/Modules/ItemEditing/ItemEditing.js", "UmbracoRoot", InvokeJavascriptMethodOnLoad = "initializeGlobalItemEditing")]
+	[ClientDependency(21, ClientDependencyType.Javascript, "tinymce3/tiny_mce_src.js", "UmbracoClient")] //For TinyMCE to work in LiveEdit, we need to ensure that this script is run before it loads...
     public class ItemEditor : UpdatePanel
     {
         #region Protected Constants
         
         /// <summary>Name of the wrapper tag.</summary>
         protected const string EditorWrapperTag = "umbraco:control";
-
-        /// <summary>TinyMCE script file.</summary>
-        protected const string TinyMCEClientScriptFile = "/umbraco_client/tinymce3/tiny_mce_src.js";
 
         #endregion
 
@@ -181,15 +179,7 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
         /// </summary>
         protected override void CreateChildControls()
         {
-            // Unfortunately, adding TinyMCE with the client dependencies system does not work
-            // due to a bug in the way TinyMCE initializes in IE.
-            // Therefore, TinyMCE needs to be added with a script tag.
-			// TODO: Same goes for the pagePicker, mediaPicker controls. This is due to 
-			// the client dependency framework not being able to render things out 
-			// after an async call with an UpdatePanel!
-            ScriptManagerProxy proxy = new ScriptManagerProxy();
-            proxy.Scripts.Add(new ScriptReference(TinyMCEClientScriptFile));
-            ContentTemplateContainer.Controls.Add(proxy);
+ 
 
             if (ItemId != 0)
             {
@@ -218,12 +208,15 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
 
                 // add main container
                 m_Container = new PlaceHolder();
+				m_Container.ID = "Container";
                 ContentTemplateContainer.Controls.Add(m_Container);
 
                 // add editor control, surrounded by a wrapper
                 HtmlGenericControl editorControlWrapper = new EditorWrapper();
+				editorControlWrapper.ID = "EditorControlWrapper";
                 m_Container.Controls.Add(editorControlWrapper);
                 Control dataEditor = CreateFieldDataEditor(item);
+				dataEditor.ID = "DataEditor";
                 editorControlWrapper.Controls.Add(dataEditor);
 
                 // add hidden submit button to the container

@@ -68,6 +68,15 @@ namespace umbraco.dialogs {
         protected global::System.Web.UI.WebControls.Button ok;
         
         /// <summary>
+        /// ProgBar control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.presentation.umbraco.controls.ProgressBar ProgBar;
+        
+        /// <summary>
         /// theEnd control.
         /// </summary>
         /// <remarks>

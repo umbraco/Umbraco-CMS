@@ -18,7 +18,7 @@ namespace umbraco.presentation.ClientDependency.Controls
 		public ClientDependencyLoader()
 		{
 			Paths = new ClientDependencyPathCollection();
-			EmbedType = ClientDependencyEmbedType.Header;
+
             IsDebugMode = false;
 
 			//add this object to the context and validate the context type
@@ -93,21 +93,8 @@ namespace umbraco.presentation.ClientDependency.Controls
 			base.OnPreRender(e);
 
 			m_Paths.UnionWith(Paths.Cast<IClientDependencyPath>());
-			ClientDependencyProvider provider = null;
-			switch (EmbedType)
-			{
-				case ClientDependencyEmbedType.Header:
-					provider = ClientDependencySettings.Instance.ProviderCollection[PageHeaderProvider.DefaultName];
-					provider.IsDebugMode = IsDebugMode;
-					RegisterClientDependencies(provider, this.Page, m_Paths);
-					break;
-				case ClientDependencyEmbedType.ClientSideRegistration:
-					provider = ClientDependencySettings.Instance.ProviderCollection[ClientSideRegistrationProvider.DefaultName];
-					provider.IsDebugMode = IsDebugMode;
-					RegisterClientDependencies(provider, this.Page, m_Paths);
-					break;
-			}
-
+			Provider.IsDebugMode = IsDebugMode;
+			RegisterClientDependencies(Provider, this.Page, m_Paths);
 			RenderDependencies();
 		}
 
@@ -121,8 +108,32 @@ namespace umbraco.presentation.ClientDependency.Controls
 
 		[PersistenceMode(PersistenceMode.InnerProperty)]
 		public ClientDependencyPathCollection Paths { get; private set; }
-		public ClientDependencyEmbedType EmbedType { get; set; }
+		public ClientDependencyEmbedType EmbedType
+		{
+			get
+			{
+				return m_EmbedType;
+			}
+			set
+			{
+				m_EmbedType = value;
+				switch (m_EmbedType)
+				{
+					case ClientDependencyEmbedType.Header:
+						Provider = ClientDependencySettings.Instance.ProviderCollection[PageHeaderProvider.DefaultName];
+						break;
+					case ClientDependencyEmbedType.ClientSideRegistration:
+						Provider = ClientDependencySettings.Instance.ProviderCollection[ClientSideRegistrationProvider.DefaultName];
+						break;
+				}
+			}
+		}
+		private ClientDependencyEmbedType m_EmbedType = ClientDependencyEmbedType.Header;
+
         public bool IsDebugMode { get; set; }
+		public ClientDependencyProvider Provider { get; set; }
+		//TODO: Implement this and remove 'EmbedType'
+		public string ProviderName { get; set; }
 
 
 
@@ -156,7 +167,7 @@ namespace umbraco.presentation.ClientDependency.Controls
 		#endregion
 
 		/// <summary>
-		/// Registers a file dependency with the default provider.
+		/// Registers a file dependency
 		/// </summary>
 		/// <param name="filePath"></param>
 		/// <param name="type"></param>
@@ -165,8 +176,9 @@ namespace umbraco.presentation.ClientDependency.Controls
 			RegisterDependency(filePath, "", type);
 			return this;
 		}
+
 		/// <summary>
-		/// Registers a file dependency with the default provider.
+		/// Registers a file dependency 
 		/// </summary>
 		/// <param name="filePath"></param>
 		/// <param name="pathNameAlias"></param>
@@ -242,17 +254,19 @@ namespace umbraco.presentation.ClientDependency.Controls
 
 		public void RegisterClientDependencies(ClientDependencyCollection dependencies, IEnumerable<IClientDependencyPath> paths)
 		{
-			RegisterClientDependencies(ClientDependencySettings.Instance.DefaultProvider, dependencies, paths);
+			//RegisterClientDependencies(ClientDependencySettings.Instance.DefaultProvider, dependencies, paths);
+			RegisterClientDependencies(Provider, dependencies, paths);
 		}
 
 		/// <summary>
-		/// Registers dependencies with the default provider
+		/// Registers dependencies
 		/// </summary>
 		/// <param name="control"></param>
 		/// <param name="paths"></param>
 		public void RegisterClientDependencies(Control control, ClientDependencyPathCollection paths)
 		{
-			RegisterClientDependencies(ClientDependencySettings.Instance.DefaultProvider, control, paths.Cast<IClientDependencyPath>());
+			//RegisterClientDependencies(ClientDependencySettings.Instance.DefaultProvider, control, paths.Cast<IClientDependencyPath>());
+			RegisterClientDependencies(Provider, control, paths.Cast<IClientDependencyPath>());
 		}
 
 		/// <summary>

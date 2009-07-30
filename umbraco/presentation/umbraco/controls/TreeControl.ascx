@@ -31,6 +31,7 @@ jQuery(document).ready(function() {
         app: app,
         showContext: showContext,
         isDialog: isDialog,
+        umb_clientFolderRoot: "<%#umbraco.GlobalSettings.ClientPath%>",
         treeType: "<%#TreeType.ToString().ToLower()%>",
         dataUrl: "<%#umbraco.GlobalSettings.Path%>/webservices/TreeDataService.ashx",
         serviceUrl: "<%#umbraco.GlobalSettings.Path%>/webservices/TreeClientService.asmx/GetInitAppTreeData"});

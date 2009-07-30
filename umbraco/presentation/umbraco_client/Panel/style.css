@@ -81,7 +81,7 @@
   #treeWindow .innerContent{height: 100%;}
   
   .panel .menubar_panel {
-	background-image: url(/umbraco_client/tabView/images/background.gif);
+	background-image: url(../tabView/images/background.gif);
 	height:32px;
 	
 	display: block;

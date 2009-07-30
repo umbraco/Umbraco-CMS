@@ -24,7 +24,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 showContext: true,
                 isDialog: false,
                 treeType: "standard",
-                umb_clientFolderRoot: "/umbraco_client"
+                umb_clientFolderRoot: "/umbraco_client" //default setting... this gets overriden.
             }, opts);
             new Umbraco.Controls.UmbracoTree().init($(this), conf);
         });

@@ -13,7 +13,7 @@ div.calendar { position: relative;  border: 2px solid #CAC9C9;}
   color: #000;
   cursor: default;
   font-family: "trebuchet ms",verdana,tahoma,sans-serif;
-  background: #fff url(/umbraco_client/propertyPane/images/propertyBackground.gif);
+  background: #fff url(../../propertyPane/images/propertyBackground.gif);
 }
 
 .calendar table {

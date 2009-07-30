@@ -1,7 +1,7 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master" CodeBehind="installer.aspx.cs"
     AutoEventWireup="True" Inherits="umbraco.presentation.developer.packages.Installer"
     Trace="false" %>
-
+<%@ Register TagPrefix="ctl" Src="~/umbraco/controls/ProgressBar.ascx" TagName="ProgBar"  %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
@@ -62,7 +62,8 @@
                 <asp:Button ID="ButtonLoadPackage" runat="server" Enabled="false" Text="Load Package"
                     OnClick="uploadFile"></asp:Button>
                 <span id="loadingbar" style="display: none;">
-                    <img src="/umbraco_client/images/progressbar.gif" id="Img2" alt="Please wait" /></span>
+                    <ctl:ProgBar runat="server" id="ProgBar" />
+                </span>
             </cc1:PropertyPanel>
         </cc1:Pane>
         <cc1:Pane ID="pane_authenticate" runat="server" Visible="false" Text="Repository authentication">
@@ -201,7 +202,8 @@
                 <cc1:PropertyPanel runat="server" Text=" ">
                     <br />
                     <div style="display: none;" id="installingMessage">
-                        <img src="/umbraco_client/images/progressbar.gif" id="pleaseWaitIcon" alt="Please wait" /><br />
+                        <ctl:ProgBar runat="server" id="ProgBar1" />
+                        <br />
                         <em>&nbsp; &nbsp;Installing package, please wait...</em><br />
                     </div>
                     <asp:Button ID="ButtonInstall" runat="server" Text="Install Package" Enabled="False"
@@ -230,7 +232,7 @@
         </asp:Panel>
         <cc1:Pane ID="pane_installing" runat="server" Visible="false" Text="Installing package">
             <cc1:PropertyPanel runat="server">
-                <img src="/umbraco_client/images/progressbar.gif" id="Img1" alt="Please wait" />
+                <ctl:ProgBar runat="server" id="ProgBar2" />
                 <asp:Literal ID="lit_installStatus" runat="server" />
             </cc1:PropertyPanel>
         </cc1:Pane>

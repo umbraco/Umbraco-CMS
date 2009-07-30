@@ -8,7 +8,7 @@
     #sortableFrame{height: 270px; overflow: auto; border: 1px solid #ccc;}
     #sortableNodes{padding: 4px; display: block}
     #sortableNodes thead tr th{border-bottom:1px solid #ccc; padding: 4px; padding-right: 25px;
-                                background-image: url(/umbraco_client/tableSorting/img/bg.gif);     
+                                background-image: url(../../umbraco_client/tableSorting/img/bg.gif);     
                                 cursor: pointer; 
                                 font-weight: bold; 
                                 background-repeat: no-repeat; 
@@ -16,11 +16,11 @@
                                }
     
     #sortableNodes thead tr th.headerSortDown { 
-      background-image: url(/umbraco_client/tableSorting/img/desc.gif); 
+      background-image: url(../../umbraco_client/tableSorting/img/desc.gif); 
     }
      
     #sortableNodes thead tr th.headerSortUp { 
-      background-image: url(/umbraco_client/tableSorting/img/asc.gif); 
+      background-image: url(../../umbraco_client/tableSorting/img/asc.gif); 
     } 
     
     #sortableNodes tbody tr td{border-bottom:1px solid #efefef}
@@ -44,7 +44,7 @@
       <p><%= umbraco.ui.Text("sort", "sortPleaseWait") %></p>
 </div>
 <br />
-<img src="/umbraco_client/images/progressbar.gif" />
+<img src="../../umbraco_client/images/progressbar.gif" />
 </div>
 
 <div id="sortingDone" style="display: none;" class="success">

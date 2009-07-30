@@ -103,7 +103,7 @@ h3
 .propertyuicontrols .Pane, .propertyPane 
 {
 	border: 1px solid #BABABA;
-	background-image: url(/umbraco_client/propertyPane/images/propertyBackground.gif);
+	background-image: url(../propertyPane/images/propertyBackground.gif);
 	margin: 10px;
 	display: block;
 }
@@ -127,7 +127,7 @@ tr.propertyContent td, td.propertyContent
 div.propertyDiv 
 {
 	border: 1px solid #BABABA;
-	background-image: url(/umbraco_client/propertyPane/images/propertyBackground.gif);
+	background-image: url(../propertyPane/images/propertyBackground.gif);
 	display: block;
 	padding: 7px;
 	margin-bottom: 10px;
@@ -287,17 +287,17 @@ th
 
 .editorIconOver {
 	cursor: hand;
-	background-image:	url("buttonbg.gif");
+	background-image:	url("../menuicon/images/buttonbg.gif");
 }
 
 .editorIconDown {
 	cursor: hand;
-	background-image:	url("buttonbgdown.gif");
+	background-image:	url("../menuicon/images/buttonbgdown.gif");
 }
 
 .editorIconOn {
 	cursor: hand;
-	background-image:	url("buttonbgdown.gif");
+	background-image:	url("../menuicon/images/buttonbgdown.gif");
 }
 
 .editorIconDisabled {

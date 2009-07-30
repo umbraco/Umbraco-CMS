@@ -35,7 +35,7 @@ namespace umbraco.presentation.plugins.tinymce3
 
             // UMBRACO: Populate the configsection if it's empty
             configSection.Add("GzipEnabled", "true");
-            configSection.Add("InstallPath", GlobalSettings.Path + "/../umbraco_client/tinymce3");
+            configSection.Add("InstallPath", GlobalSettings.ClientPath + "/tinymce3");
             configSection.Add("GzipExpiresOffset", TimeSpan.FromDays(10).Ticks.ToString());
 
 			// Setup cache

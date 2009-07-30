@@ -116,8 +116,18 @@ namespace umbraco.presentation.ClientDependency.Providers
 
 		private void RegisterScript(string strScript)
 		{
-			DependantControl.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), strScript.GetHashCode().ToString(), strScript, true);
+			ScriptManager mgr = ScriptManager.GetCurrent(DependantControl.Page);
+
+			if (mgr == null)
+			{
+				DependantControl.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), strScript.GetHashCode().ToString(), strScript, true);
+			}
+			else
+			{
+				ScriptManager.RegisterClientScriptBlock(DependantControl, this.GetType(), strScript.GetHashCode().ToString(), strScript, true);
+			}
 		}
 
 	}
+
 }

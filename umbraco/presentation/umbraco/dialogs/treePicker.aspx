@@ -9,7 +9,7 @@
   
   <style type="text/css">
   #header{
-  background: url(/umbraco_client/modal/modalGradiant.gif) repeat-x bottom #fff;
+  background: url(../../umbraco_client/modal/modalGradiant.gif) repeat-x bottom #fff;
   border-bottom: 1px solid #CCC;
   }
  

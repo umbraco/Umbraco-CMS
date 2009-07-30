@@ -104,6 +104,15 @@ namespace umbraco.presentation.install {
         protected global::System.Web.UI.WebControls.PlaceHolder PlaceHolderStep;
         
         /// <summary>
+        /// ProgBar control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.presentation.umbraco.controls.ProgressBar ProgBar;
+        
+        /// <summary>
         /// next control.
         /// </summary>
         /// <remarks>
