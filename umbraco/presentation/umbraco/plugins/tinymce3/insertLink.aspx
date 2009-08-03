@@ -71,12 +71,7 @@
 </head>
 <body id="advlink" style="display: none">
 	
-	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="Header" IsDebugMode="false" >
-		<Paths>
-			<umb:ClientDependencyPath Name="UmbracoClient" Path='<%#umbraco.GlobalSettings.ClientPath%>' />
-			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
-		</Paths>		
-	</umb:ClientDependencyLoader>
+	<ui:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
 	
 	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
 	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="tinymce3/tiny_mce_popup.js" PathNameAlias="UmbracoClient" Priority="100" />

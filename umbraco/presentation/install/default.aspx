@@ -57,12 +57,7 @@
 </head>
 <body>
 	
-	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="ClientSideRegistration" IsDebugMode="false" >
-		<Paths>
-			<umb:ClientDependencyPath Name="UmbracoClient" Path='<%#umbraco.GlobalSettings.ClientPath%>' />
-			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
-		</Paths>		
-	</umb:ClientDependencyLoader>
+	<cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" ProviderName="ClientSideRegistrationProvider" />
 	
 	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="style.css" />
 	<umb:CssInclude ID="CssInclude2" runat="server" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />

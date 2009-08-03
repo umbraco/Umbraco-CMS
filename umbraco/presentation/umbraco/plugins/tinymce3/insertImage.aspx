@@ -100,12 +100,7 @@
 </head>
 <body id="advimage" style="display: none">
 
-	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="Header" IsDebugMode="false" >
-		<Paths>
-			<umb:ClientDependencyPath Name="UmbracoClient" Path='<%#umbraco.GlobalSettings.ClientPath%>' />
-			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
-		</Paths>		
-	</umb:ClientDependencyLoader>
+	<ui:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
 	
 	<umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
 	<umb:JsInclude ID="JsInclude8" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" Priority="4" />

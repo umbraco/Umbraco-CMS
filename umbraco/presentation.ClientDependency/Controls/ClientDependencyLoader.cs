@@ -18,8 +18,9 @@ namespace umbraco.presentation.ClientDependency.Controls
 		public ClientDependencyLoader()
 		{
 			Paths = new ClientDependencyPathCollection();
-
-            IsDebugMode = false;
+            
+            //default debug mode is specified in config but can be overriden in control.
+            this.IsDebugMode = ClientDependencySettings.Instance.IsDebugMode;
 
 			//add this object to the context and validate the context type
 			if (HttpContext.Current != null)
@@ -108,32 +109,42 @@ namespace umbraco.presentation.ClientDependency.Controls
 
 		[PersistenceMode(PersistenceMode.InnerProperty)]
 		public ClientDependencyPathCollection Paths { get; private set; }
-		public ClientDependencyEmbedType EmbedType
-		{
-			get
-			{
-				return m_EmbedType;
-			}
-			set
-			{
-				m_EmbedType = value;
-				switch (m_EmbedType)
-				{
-					case ClientDependencyEmbedType.Header:
-						Provider = ClientDependencySettings.Instance.ProviderCollection[PageHeaderProvider.DefaultName];
-						break;
-					case ClientDependencyEmbedType.ClientSideRegistration:
-						Provider = ClientDependencySettings.Instance.ProviderCollection[ClientSideRegistrationProvider.DefaultName];
-						break;
-				}
-			}
-		}
-		private ClientDependencyEmbedType m_EmbedType = ClientDependencyEmbedType.Header;
+
+        public string ProviderName
+        {
+            get
+            {
+                return Provider.Name;
+            }
+            set
+            {
+                this.Provider = ClientDependencySettings.Instance.ProviderCollection[value];
+            }
+        }
+        //public ClientDependencyEmbedType EmbedType
+        //{
+        //    get
+        //    {
+        //        return m_EmbedType;
+        //    }
+        //    set
+        //    {
+        //        m_EmbedType = value;
+        //        switch (m_EmbedType)
+        //        {
+        //            case ClientDependencyEmbedType.Header:
+        //                Provider = ClientDependencySettings.Instance.ProviderCollection[PageHeaderProvider.DefaultName];
+        //                break;
+        //            case ClientDependencyEmbedType.ClientSideRegistration:
+        //                Provider = ClientDependencySettings.Instance.ProviderCollection[ClientSideRegistrationProvider.DefaultName];
+        //                break;
+        //        }
+        //    }
+        //}
+        //private ClientDependencyEmbedType m_EmbedType = ClientDependencyEmbedType.Header;
 
         public bool IsDebugMode { get; set; }
 		public ClientDependencyProvider Provider { get; set; }
-		//TODO: Implement this and remove 'EmbedType'
-		public string ProviderName { get; set; }
 
 
 

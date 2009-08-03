@@ -49,12 +49,7 @@
 </head>
 <body>
 
-	<umb:ClientDependencyLoader runat="server" id="ClientLoader" EmbedType="Header" IsDebugMode="false" >
-		<Paths>
-			<umb:ClientDependencyPath Name="UmbracoClient" Path='<%#umbraco.GlobalSettings.ClientPath%>' />
-			<umb:ClientDependencyPath Name="UmbracoRoot" Path='<%#umbraco.GlobalSettings.Path%>' />
-		</Paths>		
-	</umb:ClientDependencyLoader>
+	<cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
 	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
 
 <form id="Form1" method="post" runat="server">

@@ -404,13 +404,6 @@
       <DependentUpon>wlwmanifest.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\channels\wordApi.cs" />
-    <Compile Include="umbraco\ClientDependencyTest.aspx.cs">
-      <DependentUpon>ClientDependencyTest.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\ClientDependencyTest.aspx.designer.cs">
-      <DependentUpon>ClientDependencyTest.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco\controls\ProgressBar.ascx.cs">
       <DependentUpon>ProgressBar.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1484,7 +1477,6 @@
     <Content Include="umbraco\actions\publish.aspx" />
     <Content Include="umbraco\channels\rsd.aspx" />
     <Content Include="umbraco\channels\wlwmanifest.aspx" />
-    <Content Include="umbraco\ClientDependencyTest.aspx" />
     <Content Include="umbraco\config\lang\da.xml" />
     <Content Include="umbraco\config\lang\de.xml" />
     <Content Include="umbraco\config\lang\es.xml" />

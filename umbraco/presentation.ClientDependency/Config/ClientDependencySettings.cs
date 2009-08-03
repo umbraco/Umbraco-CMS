@@ -7,6 +7,7 @@ using umbraco.presentation.ClientDependency.Providers;
 using System.Configuration.Provider;
 using System.IO;
 using System.Web;
+using System.Configuration;
 
 namespace umbraco.presentation.ClientDependency.Config
 {
@@ -34,8 +35,8 @@ namespace umbraco.presentation.ClientDependency.Config
 		private object m_Lock = new object();
 		private ClientDependencyProvider m_Provider = null;
 		private ClientDependencyProviderCollection m_Providers = null;
-		private List<string> m_Extensions;
-		private DirectoryInfo m_CompositeFilePath;
+
+        public const string ConfigurationSectionName = "clientDependency";
 
 		/// <summary>
 		/// The file extensions of Client Dependencies that are file based as opposed to request based.
@@ -48,13 +49,17 @@ namespace umbraco.presentation.ClientDependency.Config
 		/// <remarks>
 		/// If this is not explicitly set, then the extensions 'js' and 'css' are the defaults.
 		/// </remarks>
-		public List<string> FileBasedDependencyExtensionList
-		{
-			get
-			{				
-				return m_Extensions;
-			}
-		}
+        public List<string> FileBasedDependencyExtensionList { get; set; }
+
+        /// <summary>
+        /// Flags whether or not to enable composite file script creation.
+        /// Composite file creation will increase performance in the case of cache turnover or application
+        /// startup since the files are already combined and compressed.
+        /// This also allows for the ability to easily clear the cache so the files are refreshed.
+        /// </summary>
+        public bool EnableCompositeFiles { get; set; }
+
+        public bool IsDebugMode { get; set; }
 
 		public ClientDependencyProvider DefaultProvider
 		{
@@ -70,13 +75,7 @@ namespace umbraco.presentation.ClientDependency.Config
 				return m_Providers;
 			}
 		}
-		public DirectoryInfo CompositeFilePath
-		{
-			get
-			{
-				return m_CompositeFilePath;
-			}
-		}
+        public DirectoryInfo CompositeFilePath { get; set; }
 
 		private void LoadProviders()
 		{
@@ -87,7 +86,7 @@ namespace umbraco.presentation.ClientDependency.Config
 					// Do this again to make sure _provider is still null
 					if (m_Provider == null)
 					{
-						ClientDependencySection section = (ClientDependencySection)WebConfigurationManager.GetSection("system.web/clientDependency");
+                        ClientDependencySection section = (ClientDependencySection)ConfigurationManager.GetSection("clientDependency");
 
 						m_Providers = new ClientDependencyProviderCollection();
 
@@ -115,8 +114,10 @@ namespace umbraco.presentation.ClientDependency.Config
 						if (m_Provider == null)
 							throw new ProviderException("Unable to load default ClientDependency provider");
 
-						m_Extensions = section.FileBasedDependencyExtensionList;
-						m_CompositeFilePath = new DirectoryInfo(HttpContext.Current.Server.MapPath(section.CompositeFilePath));
+                        IsDebugMode = section.IsDebugMode;
+                        EnableCompositeFiles = section.EnableCompositeFiles;
+                        FileBasedDependencyExtensionList = section.FileBasedDependencyExtensionList;
+						CompositeFilePath = new DirectoryInfo(HttpContext.Current.Server.MapPath(section.CompositeFilePath));
 					}
 				}
 			}

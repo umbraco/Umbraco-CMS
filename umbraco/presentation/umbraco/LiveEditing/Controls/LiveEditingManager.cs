@@ -8,6 +8,7 @@ using umbraco.presentation.ClientDependency.Providers;
 using umbraco.presentation.ClientDependency.Controls;
 using umbraco.BasePages;
 using System.Collections.Generic;
+using umbraco.uicontrols;
 
 namespace umbraco.presentation.LiveEditing.Controls
 {
@@ -94,6 +95,7 @@ namespace umbraco.presentation.LiveEditing.Controls
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
+
             EnsureChildControls();
         }
 
@@ -113,10 +115,8 @@ namespace umbraco.presentation.LiveEditing.Controls
 
 			//we need a DependencyLoader control
 			bool isNew;
-			ClientDependencyLoader.TryCreate(this, out isNew)
-				.AddPath("UmbracoClient", GlobalSettings.ClientPath)
-				.AddPath("UmbracoRoot", GlobalSettings.Path)
-				.EmbedType = ClientDependencyEmbedType.ClientSideRegistration;
+            UmbracoClientDependencyLoader.TryCreate(this, out isNew);
+            ClientDependencyLoader.Instance.ProviderName = ClientSideRegistrationProvider.DefaultName;
 			ClientDependencyLoader.Instance.IsDebugMode = true;
 
             m_Communicator = new Communicator();

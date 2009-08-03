@@ -33,6 +33,29 @@ namespace umbraco.presentation.ClientDependency.Config
 			set { base["compositeFilePath"] = value; }
 		}
 
+        /// <summary>
+        /// Flags whether or not to enable composite file script creation.
+        /// Composite file creation will increase performance in the case of cache turnover or application
+        /// startup since the files are already combined and compressed.
+        /// This also allows for the ability to easily clear the cache so the files are refreshed.
+        /// </summary>
+        [ConfigurationProperty("enableCompositeFiles", DefaultValue = "true")]
+        public bool EnableCompositeFiles
+        {
+            get { return (bool)base["enableCompositeFiles"]; }
+            set { base["enableCompositeFiles"] = value; }
+        }
+        
+        /// <summary>
+        /// Set the default isDebugMode property for all loaders
+        /// </summary>
+        [ConfigurationProperty("isDebugMode", DefaultValue = "false")]
+        public bool IsDebugMode
+        {
+            get { return (bool)base["isDebugMode"]; }
+            set { base["isDebugMode"] = value; }
+        }
+
 		/// <summary>
 		/// The configuration section to set the FileBasedDependencyExtensionList. This is a comma separated list.
 		/// </summary>

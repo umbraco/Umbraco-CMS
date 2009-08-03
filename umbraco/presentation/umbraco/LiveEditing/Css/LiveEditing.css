@@ -18,7 +18,9 @@ html {
 	margin-top: 30px !important;	
 }
 
-#LiveEditingToolbar {
+#LiveEditingToolbar 
+{
+	font-family:"Trebuchet MS",verdana,arial;
 	background: url(../../../umbraco_client/tabView/images/background.gif) !important;
 	position: fixed !important;
 	width: 100% !important;

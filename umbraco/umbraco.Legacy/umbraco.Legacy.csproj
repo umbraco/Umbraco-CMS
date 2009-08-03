@@ -34,6 +34,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AjaxControlToolkit, Version=3.0.30512.20315, Culture=neutral, PublicKeyToken=28f01b0e84b6d53e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\AjaxControlToolkit.dll</HintPath>
+    </Reference>
     <Reference Include="DotNetOpenMail, Version=1.0.2085.34555, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\DotNetOpenMail.dll</HintPath>
@@ -62,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="controls\datePicker.cs" />
+    <Compile Include="controls\dateTimePicker.cs" />
     <Compile Include="editorControls\wysiwyg\editor.cs" />
     <Compile Include="editorControls\wysiwyg\WysiwygDataType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

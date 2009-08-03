@@ -58,6 +58,10 @@ namespace umbraco.presentation.ClientDependency
 		/// </remarks>
 		public static string SaveCompositeFile(byte[] fileContents, ClientDependencyType type)
 		{
+            //don't save the file if composite files are disabled.
+            if (!ClientDependencySettings.Instance.EnableCompositeFiles)
+                return string.Empty;
+
 			if (!ClientDependencySettings.Instance.CompositeFilePath.Exists)
 				ClientDependencySettings.Instance.CompositeFilePath.Create();
 			FileInfo fi = new FileInfo(

@@ -100,12 +100,14 @@ namespace umbraco.presentation.ClientDependency
 						SetContentEncodingHeaders(context, cType);
 						//save combined file
 						compositeFileName = CompositeFileProcessor.SaveCompositeFile(outputBytes, type);
-
-						//Update the XML file map
-						CompositeFileXmlMapper.Instance.CreateMap(fileset, cType.ToString(),
-							fDefs
-								.Where(f => f.IsLocalFile)
-							    .Select(x => new FileInfo(context.Server.MapPath(x.Uri))).ToList(), compositeFileName);
+                        if (!string.IsNullOrEmpty(compositeFileName))
+                        {
+                            //Update the XML file map
+                            CompositeFileXmlMapper.Instance.CreateMap(fileset, cType.ToString(),
+                                fDefs
+                                    .Where(f => f.IsLocalFile)
+                                    .Select(x => new FileInfo(context.Server.MapPath(x.Uri))).ToList(), compositeFileName);
+                        }						
 					}
 					else
 					{
@@ -162,8 +164,9 @@ namespace umbraco.presentation.ClientDependency
 			FieldInfo maxAgeField = cache.GetType().GetField("_maxAge", BindingFlags.Instance | BindingFlags.NonPublic);
 			maxAgeField.SetValue(cache, duration);
 
-			//make this output cache dependent on the file.
-			context.Response.AddFileDependency(fileName);
+			//make this output cache dependent on the file if there is one.
+            if (!string.IsNullOrEmpty(fileName))
+			    context.Response.AddFileDependency(fileName);
 		}
 
 		/// <summary>

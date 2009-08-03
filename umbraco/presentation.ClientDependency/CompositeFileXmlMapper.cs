@@ -50,6 +50,10 @@ namespace umbraco.presentation.ClientDependency
 		/// </summary>
 		private void Initialize()
 		{
+            //return if composite files are disabled.
+            if (!ClientDependencySettings.Instance.EnableCompositeFiles)
+                return;
+
 			m_XmlFile = new FileInfo(
 					Path.Combine(ClientDependencySettings.Instance.CompositeFilePath.FullName, MapFileName));
 
@@ -72,6 +76,10 @@ namespace umbraco.presentation.ClientDependency
 
 		private void CreateNewXmlFile()
 		{
+            //return if composite files are disabled.
+            if (!ClientDependencySettings.Instance.EnableCompositeFiles)
+                return;
+
 			if (m_XmlFile.Exists)
 				m_XmlFile.Delete();
 
@@ -105,6 +113,10 @@ namespace umbraco.presentation.ClientDependency
 		/// <returns></returns>
 		public CompositeFileMap GetCompositeFile(string base64Key)
 		{
+            //return null if composite files are disabled.
+            if (!ClientDependencySettings.Instance.EnableCompositeFiles)
+                return null;
+
 			XElement x = FindItem(base64Key);
 			try
 			{
@@ -143,6 +155,10 @@ namespace umbraco.presentation.ClientDependency
 		/// </example>
 		public void CreateMap(string base64Key, string compressionType, List<FileInfo> dependentFiles, string compositeFile)
 		{
+            //return if composite files are disabled.
+            if (!ClientDependencySettings.Instance.EnableCompositeFiles)
+                return;
+
 			lock (m_Lock)
 			{
 				//see if we can find an item with the key already
