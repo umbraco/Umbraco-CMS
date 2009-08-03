@@ -1,7 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{255F5DF1-4E43-4758-AC05-7A0B68EB021B}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -97,10 +97,6 @@
     <Reference Include="AjaxControlToolkit, Version=1.0.10920.32880, Culture=neutral, PublicKeyToken=28f01b0e84b6d53e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\AjaxControlToolkit.dll</HintPath>
-    </Reference>
-    <Reference Include="DotNetOpenMail">
-      <Name>DotNetOpenMail</Name>
-      <HintPath>..\..\foreign dlls\DotNetOpenMail.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -313,6 +309,7 @@
     <Compile Include="textfield\TextFieldDataType.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="wysiwyg\editorButton.cs" />
     <Compile Include="tinyMCE3\TinyMCE.cs" />
     <Compile Include="tinyMCE3\tinyMCE3dataType.cs" />
     <Compile Include="tinyMCE3\webcontrol\plugin\ConfigSection.cs" />
@@ -332,21 +329,6 @@
     <Compile Include="ultimatepicker\ultimatePickerDataEditor.cs" />
     <Compile Include="ultimatepicker\ultimatePickerDataType.cs" />
     <Compile Include="ultimatepicker\ultimatePickerPrevalueEditor.cs" />
-    <Compile Include="ultraSimpleMailer\__TODELETE__mailerConfiguratorPreValueEditor.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ultraSimpleMailer\__TODELETE__mailerHelper.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ultraSimpleMailer\__TODELETE__mailerLogic.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ultraSimpleMailer\__TODELETE__ultraSimpleMailerDataType.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ultraSimpleMailer\__TODELETE__ultraSimpleMailerEditor.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="uploadfield\DataTypeUploadField.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -358,19 +340,15 @@
     <Compile Include="userControlWrapper\usercontrolDataEditor.cs" />
     <Compile Include="userControlWrapper\usercontrolDataType.cs" />
     <Compile Include="userControlWrapper\usercontrolPrevalueEditor.cs" />
-    <Compile Include="__TODELETE__wysiwyg\__TODELETE__editor.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="__TODELETE__wysiwyg\__TODELETE__WysiwygDataType.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="yesno\yesNo.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="yesno\YesNoDataType.cs">
       <SubType>Code</SubType>
     </Compile>
-    <EmbeddedResource Include="imagecropper\Resources.resx" />
+    <EmbeddedResource Include="imagecropper\Resources.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="textfield\textFieldDataEditor.resx">
       <DependentUpon>textFieldDataEditor.cs</DependentUpon>
       <SubType>Designer</SubType>

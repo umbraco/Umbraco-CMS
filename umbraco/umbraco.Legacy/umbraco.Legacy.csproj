@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{27A2590E-1313-4A33-89FD-92811540B69C}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -34,6 +34,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotNetOpenMail, Version=1.0.2085.34555, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\DotNetOpenMail.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Core">
@@ -57,7 +61,205 @@
     <Reference Include="System.Web.Mobile" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="controls\datePicker.cs" />
+    <Compile Include="editorControls\wysiwyg\editor.cs" />
+    <Compile Include="editorControls\wysiwyg\WysiwygDataType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="umbraco\ContentItem\edit.aspx.cs">
+      <DependentUpon>edit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\ContentItem\edit.aspx.designer.cs">
+      <DependentUpon>edit.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\controls\CheckboxTree.cs" />
+    <Compile Include="umbraco\controls\progressBar.cs" />
+    <Compile Include="umbraco\controls\windowCloser.cs" />
+    <Compile Include="umbraco\dialogs\paste.aspx.cs">
+      <DependentUpon>paste.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dialogs\paste.aspx.designer.cs">
+      <DependentUpon>paste.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dialogs\editCell.aspx.cs">
+      <DependentUpon>editCell.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dialogs\editCell.aspx.designer.cs">
+      <DependentUpon>editCell.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dialogs\insertAnchor.aspx.cs">
+      <DependentUpon>insertAnchor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dialogs\insertAnchor.aspx.designer.cs">
+      <DependentUpon>insertAnchor.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dialogs\insertFormField.aspx.cs">
+      <DependentUpon>insertFormField.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dialogs\insertFormField.aspx.designer.cs">
+      <DependentUpon>insertFormField.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dialogs\insertImage.aspx.cs">
+      <DependentUpon>insertImage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dialogs\insertImage.aspx.designer.cs">
+      <DependentUpon>insertImage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dialogs\insertLink.aspx.cs">
+      <DependentUpon>insertLink.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dialogs\insertLink.aspx.designer.cs">
+      <DependentUpon>insertLink.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dialogs\insertTextGen.aspx.cs">
+      <DependentUpon>insertTextGen.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dialogs\insertTextGen.aspx.designer.cs">
+      <DependentUpon>insertTextGen.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\js\contextmenu.aspx.cs">
+      <DependentUpon>contextmenu.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\js\contextmenu.aspx.designer.cs">
+      <DependentUpon>contextmenu.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\task.aspx.cs">
+      <DependentUpon>task.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\task.aspx.designer.cs">
+      <DependentUpon>task.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\viewHtml.aspx.cs">
+      <DependentUpon>viewHtml.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\viewHtml.aspx.designer.cs">
+      <DependentUpon>viewHtml.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco_client\ultraSimpleMailer\mailerConfiguratorPreValueEditor.cs" />
+    <Compile Include="umbraco_client\ultraSimpleMailer\mailerHelper.cs" />
+    <Compile Include="umbraco_client\ultraSimpleMailer\mailerLogic.cs" />
+    <Compile Include="umbraco_client\ultraSimpleMailer\ultraSimpleMailerDataType.cs" />
+    <Compile Include="umbraco_client\ultraSimpleMailer\ultraSimpleMailerEditor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="umbraco\ContentItem\edit.aspx" />
+    <Content Include="umbraco\css\buttonbg.gif" />
+    <Content Include="umbraco\css\buttonbgdown.gif" />
+    <Content Include="umbraco\css\modal.css" />
+    <Content Include="umbraco\css\officexp.css" />
+    <Content Include="umbraco\css\umbContext.css" />
+    <Content Include="umbraco\css\umbracoTabs.css" />
+    <Content Include="umbraco\css\xtree.css" />
+    <Content Include="umbraco\dialogs\paste.aspx" />
+    <Content Include="umbraco\dialogs\editCell.aspx" />
+    <Content Include="umbraco\dialogs\insertAnchor.aspx" />
+    <Content Include="umbraco\dialogs\insertFormField.aspx" />
+    <Content Include="umbraco\dialogs\insertImage.aspx" />
+    <Content Include="umbraco\dialogs\insertLink.aspx" />
+    <Content Include="umbraco\dialogs\insertTextGen.aspx" />
+    <Content Include="umbraco\js\contentContextmenu.js" />
+    <Content Include="umbraco\js\contextmenu.aspx" />
+    <Content Include="umbraco\js\contextmenu.js" />
+    <Content Include="umbraco\js\editorBarFunctions.js" />
+    <Content Include="umbraco\js\richtextFunctions.js" />
+    <Content Include="umbraco\js\treeGui.js" />
+    <Content Include="umbraco\js\umbContext.js" />
+    <Content Include="umbraco\js\umbracoDefault.js" />
+    <Content Include="umbraco\js\utilities.js" />
+    <Content Include="umbraco\js\xloadtree.js" />
+    <Content Include="umbraco\js\xtree.js" />
+    <Content Include="umbraco\task.aspx" />
+    <Content Include="umbraco\viewHtml.aspx" />
+    <Content Include="umbraco_client\CodeArea\xbf.js" />
+    <Content Include="umbraco_client\ultraSimpleMailer\images\newsletterSend.gif" />
+    <Content Include="umbraco_client\ultraSimpleMailer\images\newsletterSendTest.gif" />
+    <Content Include="umbraco_client\ultraSimpleMailer\javascript.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="umbraco\ContentItem\edit.aspx.resx">
+      <DependentUpon>edit.aspx.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="umbraco\dialogs\paste.aspx.resx">
+      <DependentUpon>paste.aspx.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="umbraco\dialogs\editCell.aspx.resx">
+      <DependentUpon>editCell.aspx.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="umbraco\dialogs\insertAnchor.aspx.resx">
+      <DependentUpon>insertAnchor.aspx.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="umbraco\dialogs\insertFormField.aspx.resx">
+      <DependentUpon>insertFormField.aspx.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="umbraco\dialogs\insertImage.aspx.resx">
+      <DependentUpon>insertImage.aspx.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="umbraco\dialogs\insertLink.aspx.resx">
+      <DependentUpon>insertLink.aspx.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="umbraco\dialogs\insertTextGen.aspx.resx">
+      <DependentUpon>insertTextGen.aspx.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="umbraco\js\contextmenu.aspx.resx">
+      <DependentUpon>contextmenu.aspx.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="umbraco\task.aspx.resx">
+      <DependentUpon>task.aspx.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="umbraco\viewHtml.aspx.resx">
+      <DependentUpon>viewHtml.aspx.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\components\editorControls\umbraco.editorControls.csproj">
+      <Project>{255F5DF1-4E43-4758-AC05-7A0B68EB021B}</Project>
+      <Name>umbraco.editorControls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\components\umbraco.controls\umbraco.controls.csproj">
+      <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
+      <Name>umbraco.controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\businesslogic\umbraco.businesslogic.csproj">
+      <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
+      <Name>umbraco.businesslogic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\cms\umbraco.cms.csproj">
+      <Project>{CCD75EC3-63DB-4184-B49D-51C1DD337230}</Project>
+      <Name>umbraco.cms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\datalayer\umbraco.datalayer.csproj">
+      <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
+      <Name>umbraco.datalayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\interfaces\umbraco.interfaces.csproj">
+      <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
+      <Name>umbraco.interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\presentation\umbraco.presentation.csproj">
+      <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
+      <Name>umbraco.presentation</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -82,9 +284,6 @@
           <IISUrl>
           </IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

@@ -1,6 +1,6 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{651E1350-91B6-44B7-BD60-7207006D7003}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -418,14 +418,6 @@
     <Compile Include="umbraco\controls\ProgressBar.ascx.designer.cs">
       <DependentUpon>ProgressBar.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\__TODELETE__ContentItem\__TODELETE__edit.aspx.cs">
-      <DependentUpon>__TODELETE__edit.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\__TODELETE__ContentItem\__TODELETE__edit.aspx.designer.cs">
-      <DependentUpon>__TODELETE__edit.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\controls\__TODELETE__CheckboxTree.cs" />
     <Compile Include="umbraco\controls\ContentControl.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -465,18 +457,12 @@
     <Compile Include="umbraco\controls\passwordChanger.ascx.designer.cs">
       <DependentUpon>passwordChanger.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\controls\__TODELETE__progressBar.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="umbraco\controls\TreeControl.ascx.cs">
       <DependentUpon>TreeControl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco\controls\TreeControl.ascx.designer.cs">
       <DependentUpon>TreeControl.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\controls\__TODELETE__windowCloser.cs">
-      <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco\developer\Xslt\xsltVisualize.aspx.cs">
       <DependentUpon>xsltVisualize.aspx</DependentUpon>
@@ -779,13 +765,6 @@
     <Compile Include="umbraco\dialogs\cruds.aspx.designer.cs">
       <DependentUpon>cruds.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\dialogs\__TODELETE__editCell.aspx.cs">
-      <DependentUpon>__TODELETE__editCell.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dialogs\__TODELETE__editCell.aspx.designer.cs">
-      <DependentUpon>__TODELETE__editCell.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco\dialogs\editImage.aspx.cs">
       <DependentUpon>editImage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -822,34 +801,6 @@
       <DependentUpon>importDocumenttype.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco\dialogs\__TODELETE__insertAnchor.aspx.cs">
-      <DependentUpon>__TODELETE__insertAnchor.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dialogs\__TODELETE__insertAnchor.aspx.designer.cs">
-      <DependentUpon>__TODELETE__insertAnchor.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\dialogs\__TODELETE__insertFormField.aspx.cs">
-      <DependentUpon>__TODELETE__insertFormField.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dialogs\__TODELETE__insertFormField.aspx.designer.cs">
-      <DependentUpon>__TODELETE__insertFormField.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\dialogs\__TODELETE__insertImage.aspx.cs">
-      <DependentUpon>__TODELETE__insertImage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dialogs\__TODELETE__insertImage.aspx.designer.cs">
-      <DependentUpon>__TODELETE__insertImage.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\dialogs\__TODELETE__insertLink.aspx.cs">
-      <DependentUpon>__TODELETE__insertLink.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dialogs\__TODELETE__insertLink.aspx.designer.cs">
-      <DependentUpon>__TODELETE__insertLink.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco\dialogs\insertMacro.aspx.cs">
       <DependentUpon>insertMacro.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -863,13 +814,6 @@
     </Compile>
     <Compile Include="umbraco\dialogs\insertTable.aspx.designer.cs">
       <DependentUpon>insertTable.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\dialogs\__TODELETE__insertTextGen.aspx.cs">
-      <DependentUpon>__TODELETE__insertTextGen.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dialogs\__TODELETE__insertTextGen.aspx.designer.cs">
-      <DependentUpon>__TODELETE__insertTextGen.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\dialogs\modalHolder.aspx.cs">
       <DependentUpon>modalHolder.aspx</DependentUpon>
@@ -898,13 +842,6 @@
     </Compile>
     <Compile Include="umbraco\developer\Packages\installer.aspx.designer.cs">
       <DependentUpon>installer.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\dialogs\__TODELETE__.aspx.cs">
-      <DependentUpon>__TODELETE__.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dialogs\__TODELETE__.aspx.designer.cs">
-      <DependentUpon>__TODELETE__.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\dialogs\protectPage.aspx.cs">
       <DependentUpon>protectPage.aspx</DependentUpon>
@@ -982,13 +919,6 @@
     </Compile>
     <Compile Include="umbraco\editMedia.aspx.designer.cs">
       <DependentUpon>editMedia.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\js\__TODELETE__contextmenu.aspx.cs">
-      <DependentUpon>__TODELETE__contextmenu.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\js\__TODELETE__contextmenu.aspx.designer.cs">
-      <DependentUpon>__TODELETE__contextmenu.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\js\language.aspx.cs">
       <DependentUpon>language.aspx</DependentUpon>
@@ -1286,13 +1216,6 @@
       <DependentUpon>TreeClientService.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="umbraco\__TODELETE__task.aspx.cs">
-      <DependentUpon>__TODELETE__task.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\__TODELETE__task.aspx.designer.cs">
-      <DependentUpon>__TODELETE__task.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco\templateControls\DisableEventValidation.cs" />
     <Compile Include="umbraco\templateControls\Item.cs" />
     <Compile Include="umbraco\templateControls\ItemRenderer.cs" />
@@ -1449,13 +1372,6 @@
     </Compile>
     <Compile Include="umbraco\users\UserPermissions.cs" />
     <Compile Include="umbraco\users\UserTypeTasks.cs" />
-    <Compile Include="umbraco\__TODELETE__viewHtml.aspx.cs">
-      <DependentUpon>__TODELETE__viewHtml.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\__TODELETE__viewHtml.aspx.designer.cs">
-      <DependentUpon>__TODELETE__viewHtml.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco\webService.asmx.cs">
       <DependentUpon>webService.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -1604,6 +1520,11 @@
     <Content Include="umbraco_client\Tree\Themes\default\rename.png" />
     <Content Include="umbraco_client\Tree\Themes\default\style.css" />
     <Content Include="umbraco_client\Tree\Themes\default\throbber.gif" />
+    <Content Include="umbraco_client\Tree\Themes\marker.gif" />
+    <Content Include="umbraco_client\Tree\Themes\marker_rtl.gif" />
+    <Content Include="umbraco_client\Tree\Themes\plus.gif" />
+    <Content Include="umbraco_client\Tree\Themes\remove.png" />
+    <Content Include="umbraco_client\Tree\Themes\rename.png" />
     <Content Include="umbraco_client\Tree\Themes\tree_component.css" />
     <Content Include="umbraco_client\Tree\Themes\umbraco\check_0.png" />
     <Content Include="umbraco_client\Tree\Themes\umbraco\check_1.png" />
@@ -1619,11 +1540,6 @@
     <Content Include="umbraco_client\Tree\Themes\umbraco\lastli.gif" />
     <Content Include="umbraco_client\Tree\Themes\umbraco\lastli_rtl.gif" />
     <Content Include="umbraco_client\Tree\Themes\umbraco\li.gif" />
-    <Content Include="umbraco_client\Tree\Themes\umbraco\marker.gif" />
-    <Content Include="umbraco_client\Tree\Themes\umbraco\marker_rtl.gif" />
-    <Content Include="umbraco_client\Tree\Themes\umbraco\plus.gif" />
-    <Content Include="umbraco_client\Tree\Themes\umbraco\remove.png" />
-    <Content Include="umbraco_client\Tree\Themes\umbraco\rename.png" />
     <Content Include="umbraco_client\Tree\Themes\umbraco\style.css" />
     <Content Include="umbraco_client\Tree\Themes\umbraco\throbber.gif" />
     <Content Include="umbraco\css\umbLiveEditing.css" />
@@ -1636,7 +1552,6 @@
     <Content Include="umbraco\dialogs\search.aspx" />
     <Content Include="umbraco\dialogs\SendPublish.aspx" />
     <Content Include="umbraco\create\script.ascx" />
-    <Content Include="umbraco\css\__TODELETE__modal.css" />
     <Content Include="umbraco\css\treeIcons.css" />
     <Content Include="umbraco\images\actions\sprites.png" />
     <Content Include="umbraco_client\Tree\Themes\umbraco\contextMenuBg.gif" />
@@ -1859,25 +1774,18 @@
     <Content Include="umbraco\dialogs\AssignDomain.aspx" />
     <Content Include="umbraco\dialogs\create.aspx" />
     <Content Include="umbraco\dialogs\cruds.aspx" />
-    <Content Include="umbraco\dialogs\__TODELETE__editCell.aspx" />
     <Content Include="umbraco\dialogs\editImage.aspx" />
     <Content Include="umbraco\dialogs\editMacro.aspx" />
     <Content Include="umbraco\dialogs\emptyTrashcan.aspx" />
     <Content Include="umbraco\dialogs\exportDocumenttype.aspx" />
     <Content Include="umbraco\dialogs\imageViewer.aspx" />
     <Content Include="umbraco\dialogs\importDocumenttype.aspx" />
-    <Content Include="umbraco\dialogs\__TODELETE__insertAnchor.aspx" />
-    <Content Include="umbraco\dialogs\__TODELETE__insertFormField.aspx" />
-    <Content Include="umbraco\dialogs\__TODELETE__insertImage.aspx" />
-    <Content Include="umbraco\dialogs\__TODELETE__insertLink.aspx" />
     <Content Include="umbraco\dialogs\insertMacro.aspx" />
     <Content Include="umbraco\dialogs\insertTable.aspx" />
-    <Content Include="umbraco\dialogs\__TODELETE__insertTextGen.aspx" />
     <Content Include="umbraco\dialogs\modalHolder.aspx" />
     <Content Include="umbraco\dialogs\moveOrCopy.aspx" />
     <Content Include="umbraco\dialogs\notifications.aspx" />
     <Content Include="umbraco\developer\Packages\installer.aspx" />
-    <Content Include="umbraco\dialogs\__TODELETE__.aspx" />
     <Content Include="umbraco\dialogs\protectPage.aspx" />
     <Content Include="umbraco\dialogs\publish.aspx" />
     <Content Include="umbraco\dialogs\RegexWs.aspx" />
@@ -2027,7 +1935,6 @@
     <Content Include="umbraco\js\submodal\maskBG.png" />
     <Content Include="umbraco\js\submodal\subModal.css" />
     <Content Include="umbraco\js\submodal\subModal.js" />
-    <Content Include="umbraco_client\CodeArea\__TODELETE__xbf.js" />
     <Content Include="umbraco\plugins\tinymce\images\sample.gif" />
     <Content Include="umbraco\plugins\tinymce\paste.aspx" />
     <Content Include="umbraco\reindex.aspx" />
@@ -2038,7 +1945,6 @@
     <Content Include="umbraco\translation\preview.aspx" />
     <Content Include="umbraco\translation\translationTasks.dtd" />
     <Content Include="umbraco\translation\xml.aspx" />
-    <Content Include="umbraco\__TODELETE__ContentItem\__TODELETE__edit.aspx" />
     <Content Include="umbraco\controls\ContentTypeControlNew.ascx" />
     <Content Include="umbraco\controls\GenericProperties\GenericProperty.ascx">
       <SubType>UserControl</SubType>
@@ -2058,17 +1964,11 @@
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="umbraco\css\background.gif" />
-    <Content Include="umbraco\css\__TODELETE__buttonbg.gif" />
-    <Content Include="umbraco\css\__TODELETE__buttonbgdown.gif" />
     <Content Include="umbraco\css\cbback.gif" />
     <Content Include="umbraco_client\GenericProperty\genericproperty.css" />
-    <Content Include="umbraco\css\__TODELETE__officexp.css" />
     <Content Include="umbraco\css\splitter.gif" />
-    <Content Include="umbraco\css\__TODELETE__umbContext.css" />
     <Content Include="umbraco\css\umbContext_background.gif" />
     <Content Include="umbraco\css\umbracoGui.css" />
-    <Content Include="umbraco\css\__TODELETE__umbracoTabs.css" />
-    <Content Include="umbraco\css\__TODELETE__xtree.css" />
     <Content Include="umbraco\dashboard.aspx" />
     <Content Include="umbraco\dashboard\LatestEdits.ascx" />
     <Content Include="umbraco\dashboard\quickEdit.ascx" />
@@ -2383,25 +2283,14 @@
     <Content Include="umbraco\images\undo.small.png" />
     <Content Include="umbraco\images\versions.png" />
     <Content Include="umbraco\images\wait.gif" />
-    <Content Include="umbraco\js\__TODELETE__contentContextmenu.js" />
-    <Content Include="umbraco\js\__TODELETE__contextmenu.aspx" />
-    <Content Include="umbraco\js\__TODELETE__contextmenu.js" />
     <Content Include="umbraco\js\datepicker.js" />
     <Content Include="umbraco\js\dualSelectBox.js" />
-    <Content Include="umbraco\js\__TODELETE__editorBarFunctions.js" />
     <Content Include="umbraco_client\GenericProperty\genericProperty.js" />
     <Content Include="umbraco\js\guiFunctions.js" />
     <Content Include="umbraco\js\language.aspx" />
-    <Content Include="umbraco\js\__TODELETE__richtextFunctions.js" />
-    <Content Include="umbraco\js\__TODELETE__treeGui.js" />
-    <Content Include="umbraco\js\__TODELETE__umbContext.js" />
     <Content Include="umbraco\js\umbracoCheckKeys.js" />
-    <Content Include="umbraco\js\__TODELETE__umbracoDefault.js" />
-    <Content Include="umbraco\js\__TODELETE__utilities.js" />
-    <Content Include="umbraco\js\__TODELETE__xloadtree.js" />
     <Content Include="umbraco\js\xmlextras.js" />
     <Content Include="umbraco\js\xmlRequest.js" />
-    <Content Include="umbraco\js\__TODELETE__xtree.js" />
     <Content Include="umbraco\keepalive.aspx">
       <SubType>Form</SubType>
     </Content>
@@ -2434,7 +2323,6 @@
     <Content Include="umbraco\settings\stylesheet\editstylesheet.aspx" />
     <Content Include="umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx" />
     <Content Include="umbraco\dialogs\sort.aspx" />
-    <Content Include="umbraco\__TODELETE__task.aspx" />
     <Content Include="umbraco\test.aspx" />
     <Content Include="umbraco\tree.aspx" />
     <Content Include="umbraco\treeInit.aspx" />
@@ -2442,7 +2330,6 @@
     <Content Include="umbraco\users\EditUser.aspx" />
     <Content Include="umbraco\users\EditUserType.aspx" />
     <Content Include="umbraco\users\PermissionEditor.aspx" />
-    <Content Include="umbraco\__TODELETE__viewHtml.aspx" />
     <Content Include="umbraco\webService.asmx" />
     <Content Include="umbraco\webservices\ajax.js" />
     <Content Include="umbraco\webservices\CacheRefresher.asmx">
@@ -3462,9 +3349,6 @@
     <Content Include="umbraco_client\ui\default.js" />
     <Content Include="umbraco_client\ui\jquery.js" />
     <Content Include="umbraco_client\ui\jqueryui.js" />
-    <Content Include="umbraco_client\__TODELETE__ultraSimpleMailer\__TODELETE__images\__TODELETE__newsletterSend.gif" />
-    <Content Include="umbraco_client\__TODELETE__ultraSimpleMailer\__TODELETE__images\__TODELETE__newsletterSendTest.gif" />
-    <Content Include="umbraco_client\__TODELETE__ultraSimpleMailer\__TODELETE__javascript.js" />
     <Content Include="App_Browsers\w3cvalidator.browser" />
     <Content Include="App_Browsers\Form.browser" />
     <Content Include="umbraco\masterpages\default.Master" />
@@ -3488,14 +3372,6 @@
       <DependentUpon>Reference.map</DependentUpon>
     </None>
     <None Include="Web.oldconfig" />
-    <EmbeddedResource Include="default.aspx.resx">
-      <DependentUpon>default.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="install\default.aspx.resx">
-      <DependentUpon>default.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="install\steps\defaultUser.ascx.resx">
       <DependentUpon>defaultUser.ascx.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -3516,389 +3392,13 @@
       <DependentUpon>welcome.ascx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\cacheBrowser.aspx.resx">
-      <DependentUpon>cacheBrowser.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\__TODELETE__ContentItem\__TODELETE__edit.aspx.resx">
-      <DependentUpon>__TODELETE__edit.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\controls\ContentTypeControlNew.ascx.resx">
-      <DependentUpon>ContentTypeControlNew.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\controls\GenericProperties\GenericProperty.ascx.resx">
-      <DependentUpon>GenericProperty.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\create.aspx.resx">
-      <DependentUpon>create.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\create\content.ascx.resx">
-      <DependentUpon>content.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\create\language.ascx.resx">
-      <DependentUpon>language.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\create\media.ascx.resx">
-      <DependentUpon>media.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\create\member.ascx.resx">
-      <DependentUpon>member.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\create\nodeType.ascx.resx">
-      <DependentUpon>nodeType.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\create\simple.ascx.resx">
-      <DependentUpon>simple.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\create\xslt.ascx.resx">
-      <DependentUpon>xslt.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dashboard.aspx.resx">
-      <DependentUpon>dashboard.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dashboard\LatestEdits.ascx.resx">
-      <DependentUpon>LatestEdits.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dashboard\quickEdit.ascx.resx">
-      <DependentUpon>quickEdit.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dashboard\search.aspx.resx">
-      <DependentUpon>search.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\Default.aspx.resx">
-      <DependentUpon>Default.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\developer\Macros\assemblyBrowser.aspx.resx">
-      <DependentUpon>assemblyBrowser.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\developer\autoDoc.aspx.resx">
-      <DependentUpon>autoDoc.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\developer\DataTypes\editDatatype.aspx.resx">
-      <DependentUpon>editDatatype.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\developer\Macros\editMacro.aspx.resx">
-      <DependentUpon>editMacro.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\developer\Xslt\editXslt.aspx.resx">
-      <DependentUpon>editXslt.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\developer\Xslt\getXsltStatus.asmx.resx">
-      <DependentUpon>getXsltStatus.asmx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\developer\Cache\viewCacheItem.aspx.resx">
-      <DependentUpon>viewCacheItem.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\developer\Xslt\xsltChooseExtension.aspx.resx">
-      <DependentUpon>xsltChooseExtension.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\developer\Xslt\xsltInsertValueOf.aspx.resx">
-      <DependentUpon>xsltInsertValueOf.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\about.aspx.resx">
-      <DependentUpon>about.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\AssignDomain.aspx.resx">
-      <DependentUpon>AssignDomain.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\create.aspx.resx">
-      <DependentUpon>create.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\cruds.aspx.resx">
-      <DependentUpon>cruds.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\__TODELETE__editCell.aspx.resx">
-      <DependentUpon>__TODELETE__editCell.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\editImage.aspx.resx">
-      <DependentUpon>editImage.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\editMacro.aspx.resx">
-      <DependentUpon>editMacro.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\exportDocumenttype.aspx.resx">
-      <DependentUpon>exportDocumenttype.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\imageViewer.aspx.resx">
-      <DependentUpon>imageViewer.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\importDocumenttype.aspx.resx">
-      <DependentUpon>importDocumenttype.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\__TODELETE__insertAnchor.aspx.resx">
-      <DependentUpon>__TODELETE__insertAnchor.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\__TODELETE__insertFormField.aspx.resx">
-      <DependentUpon>__TODELETE__insertFormField.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\__TODELETE__insertImage.aspx.resx">
-      <DependentUpon>__TODELETE__insertImage.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\__TODELETE__insertLink.aspx.resx">
-      <DependentUpon>__TODELETE__insertLink.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\insertMacro.aspx.resx">
-      <DependentUpon>insertMacro.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\insertTable.aspx.resx">
-      <DependentUpon>insertTable.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\__TODELETE__insertTextGen.aspx.resx">
-      <DependentUpon>__TODELETE__insertTextGen.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\modalHolder.aspx.resx">
-      <DependentUpon>modalHolder.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\moveOrCopy.aspx.resx">
-      <DependentUpon>moveOrCopy.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\notifications.aspx.resx">
-      <DependentUpon>notifications.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\__TODELETE__.aspx.resx">
-      <DependentUpon>__TODELETE__.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\protectPage.aspx.resx">
-      <DependentUpon>protectPage.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\publish.aspx.resx">
-      <DependentUpon>publish.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\republish.aspx.resx">
-      <DependentUpon>republish.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\rollBack.aspx.resx">
-      <DependentUpon>rollBack.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\treePicker.aspx.resx">
-      <DependentUpon>treePicker.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\umbracoField.aspx.resx">
-      <DependentUpon>umbracoField.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\uploadImage.aspx.resx">
-      <DependentUpon>uploadImage.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\viewAuditTrail.aspx.resx">
-      <DependentUpon>viewAuditTrail.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\editContent.aspx.resx">
-      <DependentUpon>editContent.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\editMedia.aspx.resx">
-      <DependentUpon>editMedia.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\js\__TODELETE__contextmenu.aspx.resx">
-      <DependentUpon>__TODELETE__contextmenu.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="umbraco\js\language.aspx.resx">
       <DependentUpon>language.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\keepalive.aspx.resx">
-      <DependentUpon>keepalive.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\login.aspx.resx">
-      <DependentUpon>login.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\logout.aspx.resx">
-      <DependentUpon>logout.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\macroResultWrapper.aspx.resx">
-      <DependentUpon>macroResultWrapper.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\members\EditMember.aspx.resx">
-      <DependentUpon>EditMember.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\members\EditMemberGroup.aspx.resx">
-      <DependentUpon>EditMemberGroup.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\members\EditMemberType.aspx.resx">
-      <DependentUpon>EditMemberType.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\plugins\tinymce3\insertMacro.aspx.resx">
-      <DependentUpon>insertMacro.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\plugins\tinymce\insertMacro.aspx.resx">
-      <DependentUpon>insertMacro.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\plugins\tinymce\insertImage.aspx.resx">
-      <DependentUpon>insertImage.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\plugins\tinymce\insertLink.aspx.resx">
-      <DependentUpon>insertLink.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\plugins\tinymce\paste.aspx.resx">
-      <DependentUpon>paste.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\publishStatus.aspx.resx">
-      <DependentUpon>publishStatus.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\settings\EditDictionaryItem.aspx.resx">
-      <DependentUpon>EditDictionaryItem.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\settings\editLanguage.aspx.resx">
-      <DependentUpon>editLanguage.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\settings\EditMediaType.aspx.resx">
-      <DependentUpon>EditMediaType.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\settings\EditNodeTypeNew.aspx.resx">
-      <DependentUpon>EditNodeTypeNew.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\settings\editTemplate.aspx.resx">
-      <DependentUpon>editTemplate.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\settings\modals\ShowUmbracoTags.aspx.resx">
-      <DependentUpon>ShowUmbracoTags.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\settings\stylesheet\editstylesheet.aspx.resx">
-      <DependentUpon>editstylesheet.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.resx">
-      <DependentUpon>EditStyleSheetProperty.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\dialogs\sort.aspx.resx">
-      <DependentUpon>sort.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\__TODELETE__task.aspx.resx">
-      <DependentUpon>__TODELETE__task.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="umbraco\templateControls\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\test.aspx.resx">
-      <DependentUpon>test.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\tree.aspx.resx">
-      <DependentUpon>tree.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\treeInit.aspx.resx">
-      <DependentUpon>treeInit.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\umbraco.aspx.resx">
-      <DependentUpon>umbraco.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\users\EditUser.aspx.resx">
-      <DependentUpon>EditUser.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\__TODELETE__viewHtml.aspx.resx">
-      <DependentUpon>__TODELETE__viewHtml.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\webService.asmx.resx">
-      <DependentUpon>webService.asmx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\webservices\CacheRefresher.asmx.resx">
-      <DependentUpon>CacheRefresher.asmx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\webservices\Developer.asmx.resx">
-      <DependentUpon>Developer.asmx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\webservices\progressStatus.asmx.resx">
-      <DependentUpon>progressStatus.asmx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\webservices\publication.asmx.resx">
-      <DependentUpon>publication.asmx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\webservices\Settings.asmx.resx">
-      <DependentUpon>Settings.asmx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\webservices\templates.asmx.resx">
-      <DependentUpon>templates.asmx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Content Include="config\404handlers.config" />
