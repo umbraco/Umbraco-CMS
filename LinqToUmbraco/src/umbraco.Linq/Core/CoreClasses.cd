@@ -7,37 +7,48 @@
       <FileName>AssociationTree.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="umbraco.Linq.Core.DocTypeBase" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="10.75" Y="0.75" Width="1.5" />
+  <Class Name="umbraco.Linq.Core.DocTypeBase" BaseTypeListCollapsed="true">
+    <Position X="8.25" Y="0.75" Width="4.5" />
+    <Compartments>
+      <Compartment Name="Internal" Collapsed="true" />
+      <Compartment Name="Private" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
-      <HashCode>MAASJAACAQCEAAAgAACUYQQBgACAAAAgEAIBAAEEAYI=</HashCode>
+      <HashCode>MAASJAACAQCEAAAgAACUYAQBgACAAAAhEAIBAAEEAYI=</HashCode>
       <FileName>DocTypeBase.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="umbraco.Linq.Core.Tree&lt;TDocType&gt;">
     <Position X="2.5" Y="0.75" Width="3" />
+    <Compartments>
+      <Compartment Name="Private" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
-      <HashCode>AAACAAAAAAAEABAQAAAAAAAAABAAAAAEAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAQAAAAAAAEABAQAAAAAAAAAAAAAAAEAAAAAAAAAAA=</HashCode>
       <FileName>Tree.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="umbraco.Linq.Core.umbracoDataContext" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="12.5" Y="0.75" Width="1.5" />
+  <Class Name="umbraco.Linq.Core.UmbracoDataContext" BaseTypeListCollapsed="true">
+    <Position X="13" Y="0.75" Width="3.5" />
+    <Compartments>
+      <Compartment Name="Private" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAEAAAAAAAAAABAAAAAAAAAAAAACACAAAA=</HashCode>
-      <FileName>umbracoDataContext.cs</FileName>
+      <FileName>UmbracoDataContext.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="umbraco.Linq.Core.Node.NodeAssociationTree&lt;TDocTypeBase&gt;">
     <Position X="0.5" Y="6.75" Width="3.25" />
     <Compartments>
       <Compartment Name="Private" Collapsed="true" />
+      <Compartment Name="Internal" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAABAAAAAAABAQAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAUABAAAAAEABAQAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Node\NodeAssociationTree.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -45,9 +56,10 @@
     <Position X="5.25" Y="12" Width="4.5" />
     <Compartments>
       <Compartment Name="Private" Collapsed="true" />
+      <Compartment Name="Internal" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAiAAAACAEAAQAAAABCKQAAAAAAAAAAAACCAiAAAA=</HashCode>
+      <HashCode>IAAAiAAAACAUAAQAAAABCKQAAAAAAAAAAAACKAiAAAA=</HashCode>
       <FileName>Node\NodeDataProvider.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -55,24 +67,25 @@
     <Position X="4.5" Y="4.75" Width="3.25" />
     <Compartments>
       <Compartment Name="Private" Collapsed="true" />
+      <Compartment Name="Internal" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAACABAAAAAAABAQAAAAAAAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAASABAAAAAEABAQAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Node\NodeTree.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="umbraco.Linq.Core.umbracoDataProvider">
+  <Class Name="umbraco.Linq.Core.UmbracoDataProvider">
     <Position X="5.25" Y="8.75" Width="4.5" />
     <TypeIdentifier>
       <HashCode>AAAAgAAAACAAAAQAAAABAAQAAAAAAAAAAAAAAACAAAA=</HashCode>
-      <FileName>umbracoDataProvider.cs</FileName>
+      <FileName>UmbracoDataProvider.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Interface Name="umbraco.Linq.Core.ITree" Collapsed="true">
-    <Position X="10.75" Y="2" Width="1.5" />
+  <Interface Name="umbraco.Linq.Core.ITree">
+    <Position X="5.75" Y="0.75" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAEAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAQAAAAAAAEAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ITree.cs</FileName>
     </TypeIdentifier>
   </Interface>
