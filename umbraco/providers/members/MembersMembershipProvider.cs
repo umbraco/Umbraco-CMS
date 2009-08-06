@@ -350,7 +350,7 @@ namespace umbraco.providers.members
             }
             else
             {
-                throw new ProviderException("XXXXX");
+                throw new NotSupportedException("Updating the password Question and Answer is not valid if the properties aren't set in the config file");
             }
         }
 
