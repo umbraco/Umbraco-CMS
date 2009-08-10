@@ -8,7 +8,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
-using umbraco.presentation.ClientDependency;
+using ClientDependency.Core;
 
 namespace umbraco.controls
 {

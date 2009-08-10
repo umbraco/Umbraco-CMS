@@ -7,7 +7,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Collections;
 using System.Web.UI;
-using umbraco.presentation.ClientDependency;
+using ClientDependency.Core;
 
 namespace umbraco.controls
 {

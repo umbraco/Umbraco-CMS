@@ -1,7 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{CCD75EC3-63DB-4184-B49D-51C1DD337230}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -79,6 +79,10 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ClientDependency.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\ClientDependency.Core.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.85.4.369, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -130,10 +134,6 @@
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
     </ProjectReference>
-    <ProjectReference Include="..\presentation.ClientDependency\umbraco.presentation.ClientDependency.csproj">
-      <Project>{EA35B06D-0CC8-4830-A3F7-9BB3D36D0FAF}</Project>
-      <Name>umbraco.presentation.ClientDependency</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\Action.cs">
@@ -168,8 +168,6 @@
     </Compile>
     <Compile Include="businesslogic\datatype\AbstractDataEditor.cs" />
     <Compile Include="businesslogic\datatype\BaseDataType.cs" />
-    <Compile Include="businesslogic\datatype\ClientDependencyAttribute.cs" />
-    <Compile Include="businesslogic\datatype\ClientDependencyHelper.cs" />
     <Compile Include="businesslogic\datatype\DataType.cs">
       <SubType>Code</SubType>
     </Compile>

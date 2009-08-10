@@ -1,7 +1,7 @@
 <%@ Page Title="Edit content" Language="c#" MasterPageFile="masterpages/umbracoPage.Master" CodeBehind="editContent.aspx.cs" ValidateRequest="false" AutoEventWireup="True" Inherits="umbraco.cms.presentation.editContent" Trace="false" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
+<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
 	<script type="text/javascript">

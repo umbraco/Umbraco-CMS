@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using System.Web.UI;
-using umbraco.presentation.ClientDependency;
+using ClientDependency.Core;
 
 namespace umbraco.uicontrols {
 

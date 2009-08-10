@@ -79,6 +79,10 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ClientDependency.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\ClientDependency.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.ApplicationBlocks.Data">
       <Name>Microsoft.ApplicationBlocks.Data</Name>
       <HintPath>..\..\foreign dlls\Microsoft.ApplicationBlocks.Data.dll</HintPath>
@@ -119,10 +123,6 @@
       <Name>umbraco.interfaces</Name>
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-    </ProjectReference>
-    <ProjectReference Include="..\..\umbraco\presentation.ClientDependency\umbraco.presentation.ClientDependency.csproj">
-      <Project>{EA35B06D-0CC8-4830-A3F7-9BB3D36D0FAF}</Project>
-      <Name>umbraco.presentation.ClientDependency</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

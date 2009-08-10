@@ -1,6 +1,6 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoDialog.Master" Codebehind="xsltInsertValueOf.aspx.cs" AutoEventWireup="True"  Inherits="umbraco.developer.xsltInsertValueOf" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
+<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 <script type="text/javascript">

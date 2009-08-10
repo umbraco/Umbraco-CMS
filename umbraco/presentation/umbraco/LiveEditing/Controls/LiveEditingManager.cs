@@ -3,9 +3,9 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.presentation.LiveEditing.Modules.ItemEditing;
-using umbraco.presentation.ClientDependency;
-using umbraco.presentation.ClientDependency.Providers;
-using umbraco.presentation.ClientDependency.Controls;
+using ClientDependency.Core;
+using ClientDependency.Core.Providers;
+using ClientDependency.Core.Controls;
 using umbraco.BasePages;
 using System.Collections.Generic;
 using umbraco.uicontrols;
@@ -17,12 +17,14 @@ namespace umbraco.presentation.LiveEditing.Controls
     /// Provides public properties, events and methods for Live Editing controls.
     /// Add this control to a (master) page to enable Live Editing.
     /// </summary>
+
+    //[ClientDependency(2, ClientDependencyType.Javascript, "Application/NamespaceManager.js", "UmbracoClient")]
+    //[ClientDependency(3, ClientDependencyType.Javascript, "Application/UmbracoClientManager.js", "UmbracoClient")]
+    //[ClientDependency(3, ClientDependencyType.Javascript, "js/language.aspx", "UmbracoRoot")]	
+
     [ClientDependency(1, ClientDependencyType.Css, "LiveEditing/CSS/LiveEditing.css", "UmbracoRoot")]
-	[ClientDependency(1, ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient", InvokeJavascriptMethodOnLoad = "_jQueryNoConflict = function(){jQuery.noConflict();};")]
-	[ClientDependency(2, ClientDependencyType.Javascript, "Application/NamespaceManager.js", "UmbracoClient")]
-	[ClientDependency(3, ClientDependencyType.Javascript, "Application/UmbracoClientManager.js", "UmbracoClient")]
-	[ClientDependency(3, ClientDependencyType.Javascript, "js/language.aspx", "UmbracoRoot")]
-	[ClientDependency(10, ClientDependencyType.Javascript, "js/UmbracoSpeechBubble.js", "UmbracoRoot")]
+	[ClientDependency(1, ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient", InvokeJavascriptMethodOnLoad = "jQuery.noConflict")]	
+    [ClientDependency(2, ClientDependencyType.Javascript, "js/UmbracoSpeechBubble.js", "UmbracoRoot", InvokeJavascriptMethodOnLoad = "InitUmbracoSpeechBubble")]
     public class LiveEditingManager : Control
     {
 
@@ -157,17 +159,23 @@ namespace umbraco.presentation.LiveEditing.Controls
 		[Obsolete("Use the ClientTools library instead: 'ShowSpeechBubble' method.")]
         public virtual void DisplayUserMessage(string title, string message, string icon)
         {
-			ClientTools cTools = new ClientTools(Page);
+			
 			BasePage.speechBubbleIcon ico = BasePage.speechBubbleIcon.info;
 			try
 			{
 				ico = (BasePage.speechBubbleIcon)(Enum.Parse(typeof(BasePage.speechBubbleIcon), icon));
 			}
 			catch { }
-			cTools.ShowSpeechBubble(BasePage.speechBubbleIcon.info, title, message);
-			//ScriptManager.RegisterClientScriptBlock(Page, GetType(), new Guid().ToString(),
-			//    string.Format("UmbSpeechBubble.ShowMessage('{2}','{0}','{1}');",
-			//        EscapeJavascriptString(title), EscapeJavascriptString(message), EscapeJavascriptString(icon)), true);
+
+            //TODO: Client tools does not work for this implementation since it is relying on the fact that the speech bubble script is
+            //already loaded and is normally using the UmbracoSpeechBubbleBackEnd.js which is slightly different than the one needed for live
+            //editing since it's doing some lazy loading with js!
+            //ClientTools cTools = new ClientTools(Page);
+			//cTools.ShowSpeechBubble(BasePage.speechBubbleIcon.info, title, message);
+
+
+            ScriptManager.RegisterClientScriptBlock(Page, GetType(), new Guid().ToString(),
+                string.Concat("var sbTimer = setInterval(function() { if (typeof(UmbSpeechBubble) != 'undefined') {UmbSpeechBubble.ShowMessage('", EscapeJavascriptString(icon), "','", EscapeJavascriptString(title), "','", EscapeJavascriptString(message), "'); clearInterval(sbTimer); } }, 100);"), true);
         }
  
         #endregion

@@ -12,7 +12,7 @@ using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic.Actions;
 using umbraco.presentation.umbraco.controls;
-using umbraco.presentation.ClientDependency;
+using ClientDependency.Core;
 namespace umbraco.presentation.LiveEditing.Controls
 {
     /// <summary>

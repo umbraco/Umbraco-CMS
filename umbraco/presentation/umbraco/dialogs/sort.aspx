@@ -1,6 +1,6 @@
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master"Codebehind="sort.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.sort" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
+<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 

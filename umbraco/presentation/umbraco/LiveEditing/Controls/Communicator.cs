@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using umbraco.presentation.ClientDependency;
+using ClientDependency.Core;
 
 namespace umbraco.presentation.LiveEditing.Controls
 {

@@ -9,7 +9,7 @@ using umbraco.presentation.LiveEditing.Controls;
 using umbraco.presentation.LiveEditing.Updates;
 using umbraco.presentation.templateControls;
 using UM = umbraco.cms.businesslogic.macro;
-using umbraco.presentation.ClientDependency;
+using ClientDependency.Core;
 namespace umbraco.presentation.LiveEditing.Modules.MacroEditing
 {
 	[ClientDependency(200, ClientDependencyType.Javascript, "LiveEditing/Modules/MacroModule/MacroModule.js", "UmbracoRoot")]

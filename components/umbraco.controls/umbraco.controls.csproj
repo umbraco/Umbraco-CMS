@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{6EDD2061-82F2-461B-BB6E-879245A832DE}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -45,6 +45,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\AjaxControlToolkit.dll</HintPath>
     </Reference>
+    <Reference Include="ClientDependency.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\ClientDependency.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core">
@@ -80,10 +84,6 @@
     <ProjectReference Include="..\..\umbraco\businesslogic\umbraco.businesslogic.csproj">
       <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
       <Name>umbraco.businesslogic</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\umbraco\presentation.ClientDependency\umbraco.presentation.ClientDependency.csproj">
-      <Project>{EA35B06D-0CC8-4830-A3F7-9BB3D36D0FAF}</Project>
-      <Name>umbraco.presentation.ClientDependency</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

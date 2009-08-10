@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using umbraco.presentation.ClientDependency.Controls;
-using umbraco.presentation.ClientDependency.Providers;
-using umbraco.presentation.ClientDependency.Config;
 using System.Web.UI;
+using ClientDependency.Core.Controls;
+using ClientDependency.Core.Providers;
 
 namespace umbraco.uicontrols
 {

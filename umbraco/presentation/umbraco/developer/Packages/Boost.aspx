@@ -1,6 +1,6 @@
 <%@ Page Language="C#" AutoEventWireup="true" MasterPageFile="../../masterpages/umbracoPage.Master" Title="Install boost" CodeBehind="Boost.aspx.cs" Inherits="umbraco.presentation.developer.packages.Boost" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
+<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <%@ Register TagPrefix="ctl" Src="~/umbraco/controls/ProgressBar.ascx" TagName="ProgBar"  %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">

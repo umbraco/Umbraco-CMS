@@ -3,7 +3,7 @@ using System.Data;
 using Microsoft.ApplicationBlocks.Data;
 using System.Data.SqlClient;
 using System.Web.UI;
-using umbraco.presentation.ClientDependency;
+using ClientDependency.Core;
 
 namespace umbraco.macroRenderings
 {

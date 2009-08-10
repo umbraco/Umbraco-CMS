@@ -75,8 +75,9 @@ function InitUmbracoSpeechBubble() {
     if (UmbSpeechBubble == null)
         UmbSpeechBubble = new UmbracoSpeechBubble("defaultSpeechbubble");
 }
-if (typeof(addEvent) !== 'undefined') {
-    addEvent(window, "load", InitUmbracoSpeechBubble);
-}else if (Sys != undefined) {
-    Sys.Application.add_load(InitUmbracoSpeechBubble);
-}
+
+//if (typeof(addEvent) !== 'undefined') {
+//    addEvent(window, "load", InitUmbracoSpeechBubble);
+//}else if (Sys != undefined) {
+//    Sys.Application.add_load(InitUmbracoSpeechBubble);
+//}

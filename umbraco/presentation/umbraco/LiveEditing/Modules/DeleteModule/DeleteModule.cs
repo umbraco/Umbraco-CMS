@@ -5,7 +5,7 @@ using AjaxControlToolkit;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.LiveEditing.Controls;
 using umbraco.BusinessLogic.Actions;
-using umbraco.presentation.ClientDependency;
+using ClientDependency.Core;
 namespace umbraco.presentation.LiveEditing.Modules.DeleteModule
 {
 	[ClientDependency(200, ClientDependencyType.Javascript, "LiveEditing/Modules/DeleteModule/DeleteModule.js", "UmbracoRoot")]

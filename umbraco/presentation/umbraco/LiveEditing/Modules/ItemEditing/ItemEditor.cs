@@ -12,9 +12,9 @@ using umbraco.interfaces;
 using umbraco.presentation.LiveEditing.Controls;
 using umbraco.presentation.LiveEditing.Updates;
 using umbraco.presentation.templateControls;
-using umbraco.presentation.ClientDependency;
-using umbraco.presentation.ClientDependency.Controls;
-using umbraco.presentation.ClientDependency.Providers;
+using ClientDependency.Core;
+using ClientDependency.Core.Controls;
+using ClientDependency.Core.Providers;
 namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
 {
     /// <summary>

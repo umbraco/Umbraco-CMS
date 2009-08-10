@@ -3,7 +3,7 @@
     Inherits="umbraco.cms.presentation.developer.editXslt" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
+<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <asp:Content ContentPlaceHolderID="head" runat="server" ID="cp2">
     <style type="text/css">
         #errorDiv

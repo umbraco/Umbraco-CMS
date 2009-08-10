@@ -2,7 +2,7 @@ using System;
 using System.Web.UI;
 
 using umbraco.cms.presentation.Trees;
-using umbraco.presentation.ClientDependency;
+using ClientDependency.Core;
 namespace umbraco.editorControls
 {
     /// <summary>

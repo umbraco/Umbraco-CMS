@@ -13,7 +13,8 @@ using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.property;
 using Content = umbraco.cms.businesslogic.Content;
-using umbraco.presentation.ClientDependency.Controls;
+using ClientDependency.Core.Controls;
+using ClientDependency.Core;
 
 namespace umbraco.editorControls.tinyMCE3.webcontrol
 {
@@ -132,7 +133,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
 			{
 				//We're in live edit mode so add the base js file to the dependency list
 				ClientDependencyLoader.Instance.RegisterDependency("tinymce3/tiny_mce_src.js", 
-					"UmbracoClient", umbraco.presentation.ClientDependency.ClientDependencyType.Javascript);
+					"UmbracoClient", ClientDependencyType.Javascript);
 			}
 
 			// Write script tag start

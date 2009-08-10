@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Globalization;
-using umbraco.presentation.ClientDependency;
+using ClientDependency.Core;
 
 namespace umbraco.controls
 {

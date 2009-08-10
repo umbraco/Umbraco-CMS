@@ -6,7 +6,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.presentation.LiveEditing.Controls;
 using Content = umbraco.cms.businesslogic.Content;
 using umbraco.BusinessLogic.Actions;
-using umbraco.presentation.ClientDependency;
+using ClientDependency.Core;
 namespace umbraco.presentation.LiveEditing.Modules.CreateModule
 {
 	[ClientDependency(200, ClientDependencyType.Javascript, "LiveEditing/Modules/CreateModule/CreateModule.js", "UmbracoRoot")]

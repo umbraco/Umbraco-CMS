@@ -12,7 +12,7 @@ using umbraco.BasePages;
 using System.Xml;
 using System.Xml.XPath;
 using umbraco.BusinessLogic.Actions;
-using umbraco.presentation.ClientDependency;
+using ClientDependency.Core;
 
 namespace umbraco.cms.presentation
 {

@@ -1,6 +1,6 @@
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" Codebehind="publish.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.publish" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<%@ Register TagPrefix="umb" Namespace="umbraco.presentation.ClientDependency.Controls" Assembly="umbraco.presentation.ClientDependency" %>
+<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <%@ Register TagPrefix="ctl" Src="~/umbraco/controls/ProgressBar.ascx" TagName="ProgBar"  %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">

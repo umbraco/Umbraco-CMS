@@ -5,7 +5,7 @@ using AjaxControlToolkit;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.LiveEditing.Controls;
 using umbraco.BusinessLogic.Actions;
-using umbraco.presentation.ClientDependency;
+using ClientDependency.Core;
 namespace umbraco.presentation.LiveEditing.Modules.UnpublishModule
 {
 	[ClientDependency(200, ClientDependencyType.Javascript, "LiveEditing/Modules/UnpublishModule/UnpublishModule.js", "UmbracoRoot")]

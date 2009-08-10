@@ -6,7 +6,7 @@ using System.Web;
 
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
-using umbraco.presentation.ClientDependency;
+
 
 namespace umbraco.presentation
 {
@@ -332,8 +332,8 @@ namespace umbraco.presentation
                 //BusinessLogic.Application.RegisterIApplications();
 
 				//define the base settings for the dependency loader to use the global path settings
-				if (!CompositeDependencyHandler.HandlerFileName.StartsWith(GlobalSettings.Path))
-					CompositeDependencyHandler.HandlerFileName = GlobalSettings.Path + "/" + CompositeDependencyHandler.HandlerFileName;
+                //if (!CompositeDependencyHandler.HandlerFileName.StartsWith(GlobalSettings.Path))
+                //    CompositeDependencyHandler.HandlerFileName = GlobalSettings.Path + "/" + CompositeDependencyHandler.HandlerFileName;
 
                 // init done... 
                 s_InitializedAlready = true;
