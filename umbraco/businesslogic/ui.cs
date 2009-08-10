@@ -52,6 +52,7 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Key, User u)
         {
+			//TODO: Perhaps we should use the user parameter for something??
             return GetText(Key);
         }
 
@@ -74,6 +75,7 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key, User u)
         {
+			//TODO: Perhaps we should use the user parameter for something??
             return GetText(Area, Key);
         }
 
@@ -118,7 +120,8 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key, string Variable, User u)
         {
-            return GetText(Area, Key, Variable);
+			//TODO: Perhaps we should use the user parameter for something??
+			return GetText(Area, Key, Variable);
         }
 
         /// <summary>
