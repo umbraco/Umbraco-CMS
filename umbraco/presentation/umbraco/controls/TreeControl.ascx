@@ -11,8 +11,10 @@
 <umb:JsInclude ID="JsInclude6" runat="server" FilePath="Application/JQuery/jquery.metadata.min.js" PathNameAlias="UmbracoClient" Priority="10" />
 <umb:JsInclude ID="JsInclude7" runat="server" FilePath="Tree/css.js" PathNameAlias="UmbracoClient" Priority="10" />
 <umb:JsInclude ID="JsInclude8" runat="server" FilePath="Tree/tree_component.min.js" PathNameAlias="UmbracoClient" Priority="11"  />
+<%--<umb:JsInclude ID="JsInclude8" runat="server" FilePath="Tree/tree_component.js" PathNameAlias="UmbracoClient" Priority="11"  />--%>
 <umb:JsInclude ID="JsInclude9" runat="server" FilePath="Tree/NodeDefinition.js" PathNameAlias="UmbracoClient" Priority="12"  />
 <umb:JsInclude ID="JsInclude10" runat="server" FilePath="Tree/UmbracoTree.min.js" PathNameAlias="UmbracoClient" Priority="13" />
+<%--<umb:JsInclude ID="JsInclude10" runat="server" FilePath="Tree/UmbracoTree.js" PathNameAlias="UmbracoClient" Priority="13" />--%>
 
 <script type="text/javascript">
 

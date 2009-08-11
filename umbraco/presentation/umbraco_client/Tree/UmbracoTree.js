@@ -6,9 +6,6 @@
 /// <reference path="NodeDefinition.js" />
 /// <reference name="MicrosoftAjax.js"/>
 
-//TODO: SD: Do we need to do this for opera??
-//operaContextMenu: function(oItem) { if (window.opera) { return showContextMenu(oItem); } else { this.toggle(oItem); } },
-
 Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
 (function($) {
@@ -586,6 +583,33 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                             TREE_OBJ.hide_context();
                         }, 400);
                     });
+
+                    this._checkContextMenu(TREE_OBJ);
+                }
+            },
+
+            _checkContextMenu: function(TREE_OBJ) {
+                /// <summary>
+                /// we need to check if the menu is too low in the browser.
+                /// in order for this to work, we need to set a timer because there is no event
+                /// for when the context menu is displayed.
+                /// </summary>
+
+                var isVisible = TREE_OBJ.context.is(":visible");
+                if (!isVisible) {
+                    this._debug("_checkContextMenu - waiting for visible menu");
+                    var _this = this;
+                    setTimeout(function() { _this._checkContextMenu(TREE_OBJ); }, 50);
+                    return;
+                }
+                var offset = TREE_OBJ.context.offset();
+                var bodyHeight = $("body").innerHeight();
+                var ctxHeight = TREE_OBJ.context.height();
+                this._debug("_checkContextMenu - offset top: " + offset.top + ", bodyHeight: " + bodyHeight + ", ctxHeight: " + ctxHeight);
+                var diff = (offset.top + ctxHeight) - bodyHeight;
+                if (diff > 0) {
+                    this._debug("_checkContextMenu - Menu needs adjusting, new top: " + diff);
+                    TREE_OBJ.context.css("top", (offset.top - diff - 10) + "px");
                 }
             },
 
