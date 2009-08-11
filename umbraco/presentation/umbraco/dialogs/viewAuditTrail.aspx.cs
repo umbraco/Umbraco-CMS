@@ -37,7 +37,7 @@ namespace umbraco.presentation.umbraco.dialogs
 			{
                 if (string.Compare(a.Alias, action, true) == 0) {
                     if(a.Icon.StartsWith("."))
-                        return "<div class=\"sprTree " + a.Icon.Trim('.') + "\"></div>";
+						return "<div class=\"menuSpr " + a.Icon.Trim('.') + "\"></div>";
                     else
                         return "<img alt=\"" + ui.Text(a.Alias) + "\" src=\"../images/" + a.Icon + " width=\"16\" height=\"16\"/>";
                 }

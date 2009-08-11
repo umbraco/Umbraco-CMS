@@ -5,7 +5,7 @@
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
-<umb:JsInclude ID="JsInclude1" runat="server" FilePath="ui/accordian.js" PathNameAlias="UmbracoClient" />
+<umb:JsInclude ID="JsInclude1" runat="server" FilePath="JQuery/jquery.accordian.js" PathNameAlias="UmbracoClient" />
 
 <script type="text/javascript">
         function showProgress(button, elementId) {

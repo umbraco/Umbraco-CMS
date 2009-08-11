@@ -15,9 +15,11 @@ namespace umbraco.controls
 	/// TODO: REmove the dependencies on prototype and scriptaculous!!
 	/// doesn't work when combining scripts which is why DoNotOptimize is flagged.
 	/// </summary>
+	//[ClientDependency(501, ClientDependencyType.Javascript, "js/scriptaculous/scriptaculous.js?load=effects,dragdrop", "UmbracoRoot", InvokeJavascriptMethodOnLoad = "Position.includeScrollOffsets = true;", DoNotOptimize = true)]
 	[ClientDependency(500, ClientDependencyType.Javascript, "js/prototype.js", "UmbracoRoot", DoNotOptimize = true)]
-	[ClientDependency(501, ClientDependencyType.Javascript, "js/scriptaculous/scriptaculous.js?load=effects,dragdrop", "UmbracoRoot",
-		InvokeJavascriptMethodOnLoad = "Position.includeScrollOffsets = true;", DoNotOptimize = true)]
+	[ClientDependency(501, ClientDependencyType.Javascript, "js/scriptaculous/scriptaculous.js?load=effects,dragdrop", "UmbracoRoot", DoNotOptimize = true)]
+	[ClientDependency(ClientDependencyType.Css, "Tree/treeIcons.css", "UmbracoClient")]
+	[ClientDependency(ClientDependencyType.Css, "Tree/Themes/umbraco/styles.css", "UmbracoClient")]
     public partial class ContentTypeControlNew : System.Web.UI.UserControl
     {
         public uicontrols.TabPage InfoTabPage;
@@ -111,7 +113,7 @@ namespace umbraco.controls
             foreach (string iconClass in cms.businesslogic.CMSNode.DefaultIconClasses)
             {
                 ListItem li = new ListItem(helper.SpaceCamelCasing((iconClass.Substring(1, iconClass.Length - 1))).Replace("Spr Tree", ""), iconClass);
-                li.Attributes.Add("class", "spriteBackground " + iconClass.Trim('.'));
+				li.Attributes.Add("class", "spriteBackground sprTree " + iconClass.Trim('.'));
 
                 if (!this.Page.IsPostBack && li.Value == cType.IconUrl) li.Selected = true;
                 ddlIcons.Items.Add(li);

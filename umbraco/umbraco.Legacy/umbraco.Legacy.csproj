@@ -163,9 +163,11 @@
     <Content Include="umbraco\ContentItem\edit.aspx" />
     <Content Include="umbraco\css\buttonbg.gif" />
     <Content Include="umbraco\css\buttonbgdown.gif" />
+    <Content Include="umbraco\css\cbback.gif" />
     <Content Include="umbraco\css\modal.css" />
     <Content Include="umbraco\css\officexp.css" />
     <Content Include="umbraco\css\umbContext.css" />
+    <Content Include="umbraco\css\umbContext_background.gif" />
     <Content Include="umbraco\css\umbracoTabs.css" />
     <Content Include="umbraco\css\xtree.css" />
     <Content Include="umbraco\dialogs\paste.aspx" />

@@ -515,6 +515,14 @@ guiEditor {
 	display: block;
 }
 
+.umbIconDropdownList option.spriteBackground
+{
+	background-repeat:no-repeat;
+	padding: 1px;
+	padding-left:25px;
+	margin-left:2px;
+	display:block ! important;
+}
 .umbIconDropdownList option.deprecatedImage{
   background-repeat:no-repeat;
   background-position:4px 1px;
@@ -540,3 +548,12 @@ guiEditor {
 .error a {color:#8a1f11;}
 .notice a {color:#514721;}
 .success a {color:#264409;}
+
+
+.sprTree {
+   background-color: #fff;
+   background-image: url(../../umbraco/images/umbraco/sprites.png);
+   display: inline;
+   padding-bottom: 2px;
+}
+.sprTree img{width: 16px; height: 18px; padding-right: 7px;}

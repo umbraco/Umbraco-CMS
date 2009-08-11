@@ -1494,6 +1494,7 @@
     <Content Include="umbraco_client\Application\JQuery\jquery.cookie.js" />
     <Content Include="umbraco_client\imagecropper\Jcrop.gif" />
     <Content Include="umbraco_client\tablesorting\img\bg.gif" />
+    <Content Include="umbraco_client\Tree\menuIcons.css" />
     <Content Include="umbraco_client\Tree\Themes\default\context.gif" />
     <Content Include="umbraco_client\Tree\Themes\default\create.png" />
     <Content Include="umbraco_client\Tree\Themes\default\dot.gif" />
@@ -1544,7 +1545,7 @@
     <Content Include="umbraco\dialogs\search.aspx" />
     <Content Include="umbraco\dialogs\SendPublish.aspx" />
     <Content Include="umbraco\create\script.ascx" />
-    <Content Include="umbraco\css\treeIcons.css" />
+    <Content Include="umbraco_client\Tree\treeIcons.css" />
     <Content Include="umbraco\images\actions\sprites.png" />
     <Content Include="umbraco_client\Tree\Themes\umbraco\contextMenuBg.gif" />
     <Content Include="umbraco\images\editor\dictionaryItem.gif" />
@@ -1955,10 +1956,8 @@
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="umbraco\css\background.gif" />
-    <Content Include="umbraco\css\cbback.gif" />
     <Content Include="umbraco_client\GenericProperty\genericproperty.css" />
     <Content Include="umbraco\css\splitter.gif" />
-    <Content Include="umbraco\css\umbContext_background.gif" />
     <Content Include="umbraco\css\umbracoGui.css" />
     <Content Include="umbraco\dashboard.aspx" />
     <Content Include="umbraco\dashboard\LatestEdits.ascx" />
@@ -3335,7 +3334,7 @@
     <Content Include="umbraco_client\tinymce\utils\mclayer.js" />
     <Content Include="umbraco_client\tinymce\utils\mctabs.js" />
     <Content Include="umbraco_client\tinymce\utils\validate.js" />
-    <Content Include="umbraco_client\ui\accordian.js" />
+    <Content Include="umbraco_client\Application\JQuery\jquery.accordian.js" />
     <Content Include="umbraco_client\ui\default.css" />
     <Content Include="umbraco_client\ui\default.js" />
     <Content Include="umbraco_client\ui\jquery.js" />

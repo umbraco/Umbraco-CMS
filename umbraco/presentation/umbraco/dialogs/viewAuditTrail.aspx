@@ -1,6 +1,7 @@
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoPage.Master"Codebehind="viewAuditTrail.aspx.cs" AutoEventWireup="True"
   Inherits="umbraco.presentation.umbraco.dialogs.viewAuditTrail" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 <style type="text/css">
@@ -8,7 +9,8 @@
 .gridItem{border-color: #D9D7D7;}
 </style>
 
-<link rel="Stylesheet" href="../css/treeIcons.css"></link>
+<umb:CssInclude ID="CssInclude2" runat="server" FilePath="Tree/treeIcons.css" PathNameAlias="UmbracoClient" />
+<umb:CssInclude ID="CssInclude3" runat="server" FilePath="Tree/menuIcons.css" PathNameAlias="UmbracoClient" Priority="11" />
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
