@@ -94,7 +94,8 @@ namespace umbraco.cms.businesslogic.web
         {
             SaveEventArgs e = new SaveEventArgs();
             FireBeforeSave(e);
-            if (!e.Cancel) {
+            if (!e.Cancel)
+            {
                 base.Save();
                 FireAfterSave(e);
             }
@@ -254,7 +255,8 @@ namespace umbraco.cms.businesslogic.web
             DeleteEventArgs e = new DeleteEventArgs();
             FireBeforeDelete(e);
 
-            if (!e.Cancel) {
+            if (!e.Cancel)
+            {
                 File.Delete(System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../css/" + this.Text + ".css"));
                 foreach (StylesheetProperty p in this.Properties)
                     p.delete();
@@ -440,7 +442,7 @@ namespace umbraco.cms.businesslogic.web
             StyleSheet s = GetByName(stylesheetName);
             if (s == null)
             {
-                StyleSheet.MakeNew(
+                s = StyleSheet.MakeNew(
                     u,
                     stylesheetName,
                     xmlHelper.GetNodeValue(n.SelectSingleNode("FileName")),

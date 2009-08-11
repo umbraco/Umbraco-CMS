@@ -62,8 +62,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.editorControls", "c
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.macroRenderings", "components\macroRenderings\umbraco.macroRenderings.csproj", "{52AB8F1F-FB76-4E8C-885F-0747B6CE71EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.standardFormhandlers", "components\standardFormhandlers\umbraco.standardFormhandlers.csproj", "{F58B68F8-AB7F-4559-A37F-6A00AD86365E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.providers", "umbraco\providers\umbraco.providers.csproj", "{D7636876-0756-43CB-A192-138C6F0D5E42}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.datalayer", "umbraco\datalayer\umbraco.datalayer.csproj", "{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}"
@@ -93,6 +91,56 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.Legacy", "umbraco\umbraco.Legacy\umbraco.Legacy.csproj", "{27A2590E-1313-4A33-89FD-92811540B69C}"
 EndProject
 Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 15
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs01.codeplex.com/
+		SccProjectUniqueName0 = umbraco\\presentation\\umbraco.presentation.csproj
+		SccProjectName0 = umbraco/presentation
+		SccLocalPath0 = umbraco\\presentation
+		SccProjectUniqueName1 = umbraco\\businesslogic\\umbraco.businesslogic.csproj
+		SccProjectName1 = umbraco/businesslogic
+		SccLocalPath1 = umbraco\\businesslogic
+		SccProjectUniqueName2 = umbraco\\cms\\umbraco.cms.csproj
+		SccProjectName2 = umbraco/cms
+		SccLocalPath2 = umbraco\\cms
+		SccProjectUniqueName3 = umbraco\\interfaces\\umbraco.interfaces.csproj
+		SccProjectName3 = umbraco/interfaces
+		SccLocalPath3 = umbraco\\interfaces
+		SccProjectUniqueName4 = components\\editorControls\\umbraco.editorControls.csproj
+		SccProjectName4 = components/editorControls
+		SccLocalPath4 = components\\editorControls
+		SccProjectUniqueName5 = components\\macroRenderings\\umbraco.macroRenderings.csproj
+		SccProjectName5 = components/macroRenderings
+		SccLocalPath5 = components\\macroRenderings
+		SccProjectUniqueName6 = umbraco\\providers\\umbraco.providers.csproj
+		SccProjectName6 = umbraco/providers
+		SccLocalPath6 = umbraco\\providers
+		SccProjectUniqueName7 = umbraco\\datalayer\\umbraco.datalayer.csproj
+		SccProjectName7 = umbraco/datalayer
+		SccLocalPath7 = umbraco\\datalayer
+		SccProjectUniqueName8 = components\\umbraco.controls\\umbraco.controls.csproj
+		SccProjectName8 = components/umbraco.controls
+		SccLocalPath8 = components\\umbraco.controls
+		SccProjectUniqueName9 = components\\umbraco.webservices\\umbraco.webservices.csproj
+		SccProjectName9 = components/umbraco.webservices
+		SccLocalPath9 = components\\umbraco.webservices
+		SccProjectUniqueName10 = LinqToUmbraco\\src\\umbraco.Linq\\Core\\umbraco.Linq.Core.csproj
+		SccProjectName10 = LinqToUmbraco/src/umbraco.Linq/Core
+		SccLocalPath10 = LinqToUmbraco\\src\\umbraco.Linq\\Core
+		SccProjectUniqueName11 = LinqToUmbraco\\src\\umbraco.Linq\\DTMetal.CodeBuilder\\DTMetal.CodeBuilder.csproj
+		SccProjectTopLevelParentUniqueName11 = umbraco.sln
+		SccProjectName11 = LinqToUmbraco/src/umbraco.Linq/DTMetal.CodeBuilder
+		SccLocalPath11 = LinqToUmbraco\\src\\umbraco.Linq\\DTMetal.CodeBuilder
+		SccProjectUniqueName12 = LinqToUmbraco\\src\\umbraco.Linq\\DTMetal.Engine\\DTMetal.Engine.csproj
+		SccProjectTopLevelParentUniqueName12 = umbraco.sln
+		SccProjectName12 = LinqToUmbraco/src/umbraco.Linq/DTMetal.Engine
+		SccLocalPath12 = LinqToUmbraco\\src\\umbraco.Linq\\DTMetal.Engine
+		SccProjectUniqueName13 = umbraco\\umbraco.Legacy\\umbraco.Legacy.csproj
+		SccProjectName13 = umbraco/umbraco.Legacy
+		SccLocalPath13 = umbraco\\umbraco.Legacy
+		SccLocalPath14 = .
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug - Fixed Version|Any CPU = Debug - Fixed Version|Any CPU
 		Debug|Any CPU = Debug|Any CPU
@@ -135,12 +183,6 @@ Global
 		{52AB8F1F-FB76-4E8C-885F-0747B6CE71EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52AB8F1F-FB76-4E8C-885F-0747B6CE71EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52AB8F1F-FB76-4E8C-885F-0747B6CE71EC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F58B68F8-AB7F-4559-A37F-6A00AD86365E}.Debug - Fixed Version|Any CPU.ActiveCfg = Debug|Any CPU
-		{F58B68F8-AB7F-4559-A37F-6A00AD86365E}.Debug - Fixed Version|Any CPU.Build.0 = Debug|Any CPU
-		{F58B68F8-AB7F-4559-A37F-6A00AD86365E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F58B68F8-AB7F-4559-A37F-6A00AD86365E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F58B68F8-AB7F-4559-A37F-6A00AD86365E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F58B68F8-AB7F-4559-A37F-6A00AD86365E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D7636876-0756-43CB-A192-138C6F0D5E42}.Debug - Fixed Version|Any CPU.ActiveCfg = Debug|Any CPU
 		{D7636876-0756-43CB-A192-138C6F0D5E42}.Debug - Fixed Version|Any CPU.Build.0 = Debug|Any CPU
 		{D7636876-0756-43CB-A192-138C6F0D5E42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
