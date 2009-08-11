@@ -3353,7 +3353,8 @@
       <DependentUpon>XmlTree.xsd</DependentUpon>
     </None>
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
-    <Content Include="web.config" />
+    <Content Include="web.config.APOWELL-VISTA.xslt" />
+    <Content Include="web.STANDARD.config" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />
     <None Include="Web References\org.umbraco.update\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
@@ -3362,7 +3363,6 @@
     <None Include="Web References\org.umbraco.update\UpgradeResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web.oldconfig" />
     <EmbeddedResource Include="install\steps\defaultUser.ascx.resx">
       <DependentUpon>defaultUser.ascx.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -3453,6 +3453,12 @@
     <Folder Include="xslt\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(ProjectDir)..\..\foreign dlls\MSBuild\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+  <Target Name="AfterBuild">
+    <Copy SourceFiles="web.STANDARD.config" DestinationFiles="web.config" />
+    <Xslt RootTag="" Inputs="web.config" Output="Web.$(COMPUTERNAME).config" Xsl="web.config.$(COMPUTERNAME).xslt" Condition="Exists('web.config.$(COMPUTERNAME).xslt')" />
+    <Copy Condition="Exists('web.$(COMPUTERNAME).config')" SourceFiles="web.$(COMPUTERNAME).config" DestinationFiles="web.config" SkipUnchangedFiles="true" />
+  </Target>
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
