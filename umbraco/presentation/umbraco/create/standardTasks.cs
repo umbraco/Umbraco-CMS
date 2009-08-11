@@ -53,6 +53,18 @@ namespace umbraco
             string fileName = _alias.Substring(_alias.IndexOf("|||") + 3, _alias.Length - _alias.IndexOf("|||") - 3).Replace(" ", "");
             string xsltTemplateSource = System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/xslt/templates/" + template);
             string xsltNewFilename = System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../xslt/" + fileName + ".xslt");
+
+            if (fileName.Contains("/")) //if there's a / create the folder structure for it
+            {
+                string[] folders = fileName.Split("/".ToCharArray());
+                string xsltBasePath = System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../xslt/");
+                for (int i = 0; i < folders.Length - 1; i++)
+                {
+                    xsltBasePath = System.IO.Path.Combine(xsltBasePath, folders[i]);
+                    System.IO.Directory.CreateDirectory(xsltBasePath);
+                }
+            }
+
 //            System.IO.File.Copy(xsltTemplateSource, xsltNewFilename, false);
 
             // update with xslt references
