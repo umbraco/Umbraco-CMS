@@ -50,7 +50,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _app: null, //the reference to the current app
             _showContext: true,
             _isDialog: false,
-            _isDebug: false, //set to true to enable alert debugging
+            _isDebug: true, //set to true to enable alert debugging
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
             _serviceUrl: "", //a path to the tree client service url
             _dataUrl: "", //a path to the tree data service url
@@ -76,11 +76,22 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 jItem.data("UmbracoTree", this);
             },
 
+            clearTreeCache: function() {
+                // <summary>This will remove all stored trees in client side cache so that the next time a tree needs loading it will be refreshed</summary>
+                this._debug("clearTreeCache...");
+
+                for (var a in this._loadedApps) {
+                    this._debug("clearTreeCache: " + this._loadedApps[a]);
+                    this._container.data("tree_" + this._loadedApps[a], null);
+                }
+            },
+
             rebuildTree: function(app) {
                 /// <summary>This will rebuild the tree structure for the application specified</summary>
 
                 this._debug("rebuildTree");
 
+                //are we already on the app being requested to load?
                 if (this._app == null || (this._app.toLowerCase() == app.toLowerCase())) {
                     this._debug("not rebuilding");
                     return;
@@ -99,7 +110,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 //check if we should rebuild from a saved tree
                 var saveData = this._container.data("tree_" + app);
                 if (saveData != null) {
-                    this._debug("rebuildTree: rebuilding from cache!");
+                    this._debug("rebuildTree: rebuilding from cache: app = " + app);
 
                     //create the tree from the saved data.
                     this._initNode = saveData.d;
@@ -829,6 +840,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._container = treeContainer;
                 this._tree = $.tree_create();
                 this._tree.init(this._container, this._getInitOptions());
+
+                //add this app to the loaded apps array
+                if ($.inArray(app, this._loadedApps) == -1) {
+                    this._loadedApps.push(app);
+                }
 
                 //load child nodes of the init node
                 this._loadChildNodes(this._container.find("li:first"), null);

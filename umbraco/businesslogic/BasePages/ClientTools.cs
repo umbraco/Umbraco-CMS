@@ -47,6 +47,7 @@ namespace umbraco.BasePages
 			}
 			public static string ChildNodeCreated = GetMainTree + ".childNodeCreated();";
 			public static string SyncTree { get { return GetMainTree + ".syncTree('{0}', {1});"; } }
+			public static string ClearTreeCache { get { return GetMainTree + ".clearTreeCache();"; } }
 			public static string CopyNode { get { return GetMainTree + ".copyNode('{0}', '{1}');"; } }
 			public static string MoveNode { get { return GetMainTree + ".moveNode('{0}', '{1}');"; } }
 			public static string ReloadActionNode { get { return GetMainTree + ".reloadActionNode({0}, {1}, null);"; } }
@@ -59,7 +60,18 @@ namespace umbraco.BasePages
 		}
 
 		private Page m_page;
-		
+
+		/// <summary>
+		/// This removes all tree JSON data cached in the client browser.
+		/// Useful when you want to ensure that the tree is reloaded from live data.
+		/// </summary>
+		/// <returns></returns>
+		public ClientTools ClearClientTreeCache()
+		{
+			RegisterClientScript(Scripts.ClearTreeCache);
+			return this;
+		}
+
 		/// <summary>
 		/// Change applications
 		/// </summary>

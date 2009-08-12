@@ -261,6 +261,10 @@ namespace umbraco.presentation.developer.packages
             //we will now create the installer manifest, which means that umbraco can register everything that gets added to the system
             //this returns an id of the manifest.
 
+			//ensure that all tree's are refreshed after uninstall
+			ClientTools.ClearClientTreeCache();
+
+
             p.LoadConfig(tempFile.Value);
 
             int pId = p.CreateManifest(tempFile.Value, helper.Request("guid"), helper.Request("repoGuid"));

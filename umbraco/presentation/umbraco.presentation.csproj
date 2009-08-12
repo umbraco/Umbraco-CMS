@@ -3420,6 +3420,7 @@
     </None>
     <None Include="umbraco_client\tinymce\plugins\flash\images\Thumbs.db" />
     <None Include="umbraco_client\tinymce\plugins\umbracomacro\images\Thumbs.db" />
+    <Content Include="web.config" />
     <Content Include="config\UrlRewriting.config" />
   </ItemGroup>
   <ItemGroup>
