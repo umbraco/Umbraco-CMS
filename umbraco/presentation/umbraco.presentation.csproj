@@ -332,6 +332,7 @@
     <Compile Include="UmbracoResponse.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="UmbracoServerUtility.cs" />
     <Compile Include="umbraco\ActionHandlers\umbEnsureUniqueName.cs">
       <SubType>Code</SubType>
     </Compile>
