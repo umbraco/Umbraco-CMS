@@ -146,14 +146,6 @@
       <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
       <Name>umbraco.controls</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\LinqToUmbraco\src\umbraco.Linq\DTMetal.CodeBuilder\DTMetal.CodeBuilder.csproj">
-      <Project>{461089E7-008E-4737-BA17-E1FCD1CC3D0E}</Project>
-      <Name>DTMetal.CodeBuilder</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\LinqToUmbraco\src\umbraco.Linq\DTMetal.Engine\DTMetal.Engine.csproj">
-      <Project>{B151A571-D2F7-47DD-AFD6-C2C34ECA845B}</Project>
-      <Name>DTMetal.Engine</Name>
-    </ProjectReference>
     <ProjectReference Include="..\businesslogic\umbraco.businesslogic.csproj">
       <Name>umbraco.businesslogic</Name>
       <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
