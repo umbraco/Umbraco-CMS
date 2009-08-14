@@ -122,8 +122,6 @@ namespace umbraco.providers.members {
                 group.delete();
                 return true;
             }
-
-            return false;
         }
 
         /// <summary>

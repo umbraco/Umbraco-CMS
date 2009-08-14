@@ -37,6 +37,7 @@ namespace umbraco.cms.businesslogic.member
         /// <summary>
         /// Deltes the current membergroup
         /// </summary>
+        [Obsolete("Use System.Web.Security.Role.DeleteRole")]
         public new void delete()
         {
             DeleteEventArgs e = new DeleteEventArgs();
@@ -69,7 +70,8 @@ namespace umbraco.cms.businesslogic.member
 		/// <summary>
 		/// Retrieve a list of all existing MemberGroups
 		/// </summary>
-		public static MemberGroup[] GetAll 
+		[Obsolete("Use System.Web.Security.Role.GetAllRoles")]
+        public static MemberGroup[] GetAll 
 		{
 			get
 			{
@@ -98,6 +100,7 @@ namespace umbraco.cms.businesslogic.member
             return (int[])retval.ToArray(typeof(int));
         }
 
+        [Obsolete("Use System.Web.Security.Roles.FindUsersInRole")]
         public Member[] GetMembers() {
             ArrayList retval = new ArrayList();
             IRecordsReader dr = SqlHelper.ExecuteReader("select member from cmsMember2MemberGroup where memberGroup = @memberGroup",
@@ -133,7 +136,7 @@ namespace umbraco.cms.businesslogic.member
 		/// </summary>
 		/// <param name="Name">Name of the membergroup</param>
 		/// <returns>If a MemberGroup with the given name exists, it will return this, else: null</returns>
-		public static MemberGroup GetByName(string Name) 
+        public static MemberGroup GetByName(string Name) 
 		{
 			try 
 			{

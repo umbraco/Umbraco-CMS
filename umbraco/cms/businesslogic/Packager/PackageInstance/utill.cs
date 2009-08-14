@@ -80,7 +80,7 @@ namespace umbraco.cms.businesslogic.packager {
             template.AppendChild(_node("Name", tmpl.Text, doc));
             template.AppendChild(_node("Alias", tmpl.Alias, doc));
 
-            if (tmpl.MasterTemplate != null && tmpl.MasterTemplate != 0) {
+            if (tmpl.MasterTemplate != 0) {
                 template.AppendChild(_node("Master", new Template(tmpl.MasterTemplate).Alias, doc));
             }
             template.AppendChild(_node("Design", "<![CDATA[" + tmpl.Design + "]]>", doc));
