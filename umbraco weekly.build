@@ -152,6 +152,7 @@
     <mkdir dir="${build.dir}\usercontrols" />
 
     <delete dir="${build.dir}\webservices" />
+    <delete dir="${build.dir}\VirtualPathProviders" />
     <delete dir="${build.dir}\umbracoBase" />
     <delete dir="${build.dir}\Web References" />
     <delete dir="${build.dir}\obj" />
@@ -181,7 +182,7 @@
       </fileset>
     </zip>
 
-    <copy file="${web.dir}\nightly\weekly.zip" tofile="${public.dir}\${dist.name}_${datetime::get-ticks(datetime::now())}.zip" />
+    <copy file="${web.dir}\nightly\weekly.zip" tofile="${public.dir}\${dist.name}_${datetime::get-ticks(  datetime::now())}.zip" />
 
   </target>
 
