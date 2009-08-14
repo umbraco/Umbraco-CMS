@@ -30,16 +30,13 @@
 
   <property name="YUICompressor.dir" value="D:\inetpub\wwwroot\ccnet\buildTools\YUI" />
 
-
-  <!-- Sandcastle Directories -->
+<!--
   <property name="sandcastle.dir" value="c:\Program Files\Sandcastle" />
   <property name="sandcastle.workingdir" value="${root.dir}\docs\SandcastleWorkingDir" />
   <property name="sandcastle.output.dir" value="${sandcastle.workingdir}\Output" />
-  <!-- Sandcastle Executables -->
   <property name="sandcastle.mrefbuilder"  value="${sandcastle.dir}\productiontools\mrefbuilder.exe" />
   <property name="sandcastle.buildassembler" value="${sandcastle.dir}\productiontools\buildassembler.exe" />
   <property name="sandcastle.xsltransform" value="${sandcastle.dir}\productiontools\xsltransform.exe" />
-  <!-- Transformations -->
   <property name="sandcastle.ApplyVSDocModel.xsl" value="${sandcastle.dir}\ProductionTransforms\ApplyVSDocModel.xsl" />
   <property name="sandcastle.addguidfilenames.xsl" value="${sandcastle.dir}\ProductionTransforms\AddGuidFilenames.xsl" />
   <property name="sandcastle.addfriendlyfilenames.xsl" value="${sandcastle.dir}\ProductionTransforms\AddFriendlyFilenames.xsl" />
@@ -49,7 +46,7 @@
   <property name="sandcastle.reflectiontochmindex.xsl" value="${sandcastle.dir}\ProductionTransforms\ReflectionToChmIndex.xsl" />
 
   <property name="sandcastle.buildassembler.config" value="${sandcastle.dir}\Presentation\wiki\configuration\sandcastle.config" />
-
+-->
   <target name="compile" depends="init">
 
     <attrib normal="true" readonly="false">
@@ -72,7 +69,7 @@
     <call target="zip"/>
 
   </target>
-
+  <!--
   <target name="minify" description="minify JS files">
     <fileset basedir="${build.dir}" id="jsFileSet">
       <include name="umbraco/css/*.css"/>
@@ -99,7 +96,7 @@
       </do>
     </foreach>
   </target>
-
+-->
   <target name="zip" description="zip the release">
     <mkdir dir="${docs.dir}" />
     <copy todir="${docs.dir}">
