@@ -115,8 +115,6 @@
     <copy file="${root.dir}\config templates\config\metablogconfig.config" tofile="${build.dir}\config\metablogconfig.config" failonerror="false" overwrite="true"/>
     <copy file="${root.dir}\config templates\config\restextensions.config" tofile="${build.dir}\config\restextensions.config" failonerror="false" overwrite="true"/>
     <copy file="${root.dir}\config templates\config\xsltextensions.config" tofile="${build.dir}\config\xsltextensions.config" failonerror="false" overwrite="true"/>
-    <copy file="${root.dir}\config templates\config\tidy.cfg" tofile="${build.dir}\config\tidy.cfg" failonerror="false" overwrite="true"/>
-    <copy file="${root.dir}\config templates\config\tidy_liveediting.cfg" tofile="${build.dir}\config\tidy_liveediting.cfg" failonerror="false" overwrite="true"/>
     <copy file="${root.dir}\config templates\config\tinymceconfig.config" tofile="${build.dir}\config\tinymceconfig.config" failonerror="false" overwrite="true"/>
     <copy file="${root.dir}\config templates\config\umbracosettings.config" tofile="${build.dir}\config\umbracosettings.config" failonerror="false" overwrite="true"/>
     <copy file="${root.dir}\config templates\config\urlrewriting.config" tofile="${build.dir}\config\urlrewriting.config" failonerror="false" overwrite="true"/>
