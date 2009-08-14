@@ -167,7 +167,8 @@
         <include name="${build.dir}/**/*.compiled" />
         <include name="${build.dir}/**/*.resx" />
         <include name="${build.dir}/PrecompiledApp.config" />
-        <include name="${build.dir}/web.config.template" />
+        <include name="${build.dir}/web.config.APOWELL-VISTA.xslt" />
+        <include name="${build.dir}/web.STANDARD.config" />
       </fileset>
     </delete>
 
