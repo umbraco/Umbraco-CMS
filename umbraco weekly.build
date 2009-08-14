@@ -4,21 +4,21 @@
 
   <!-- global properties, generally won't change -->
 
-  <property name="nant.settings.currentframework" value="net-2.0" />
+  <property name="nant.settings.currentframework" value="net-3.5" />
 
   <!-- filenames and directories, generally won't change -->
 
   <property name="web.dir" value="D:\inetpub\wwwroot\v4.umbraco.org" />
-  <property name="public.dir" value="D:\inetpub\wwwroot\nightlies\umbraco 4.0 weekly" />
-  
+  <property name="public.dir" value="D:\inetpub\wwwroot\nightlies\umbraco 4.1 weekly" />
+
   <property name="root.dir" value="${directory::get-current-directory()}" />
-  
+
   <property name="source.dir" value="${root.dir}\umbraco\presentation" />
   <property name="build.dir" value="${root.dir}\build" />
   <property name="dlls.dir" value="${root.dir}\foreign dlls" />
-  
+
   <property name="build.major" value="4"/>
-  <property name="build.minor" value="0"/>
+  <property name="build.minor" value="1"/>
   <property name="build.build" value="0"/>
   <property name="build.revision" value="0"/>
 
@@ -27,10 +27,10 @@
   <property name="win.dir" value="c:\WINDOWS" />
   <property name="cc.dir" value="C:\Program Files\CruiseControl.NET\server" />
   <property name="Webdeploy.dir" value="C:\Program Files\MSBuild\Microsoft\WebDeployment\v8.0" />
-  
+
   <property name="YUICompressor.dir" value="D:\inetpub\wwwroot\ccnet\buildTools\YUI" />
 
-  
+
   <!-- Sandcastle Directories -->
   <property name="sandcastle.dir" value="c:\Program Files\Sandcastle" />
   <property name="sandcastle.workingdir" value="${root.dir}\docs\SandcastleWorkingDir" />
@@ -49,7 +49,7 @@
   <property name="sandcastle.reflectiontochmindex.xsl" value="${sandcastle.dir}\ProductionTransforms\ReflectionToChmIndex.xsl" />
 
   <property name="sandcastle.buildassembler.config" value="${sandcastle.dir}\Presentation\wiki\configuration\sandcastle.config" />
-  
+
   <target name="compile" depends="init">
 
     <attrib normal="true" readonly="false">
@@ -60,54 +60,54 @@
 
     <exec program="${win.dir}\microsoft.net\framework\v3.5\msbuild.exe">
       <arg value="${root.dir}\umbraco.sln" />
-      <arg value="/p:Configuration=Release" />      
+      <arg value="/p:Configuration=Release" />
     </exec>
 
     <exec program="${win.dir}\microsoft.net\framework\v2.0.50727\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
-  
+
     <!-- Minify's client files like js and css files -->
     <call target="minify"/>
-    
+
     <!-- Moves stuff around and zips the distribution -->
     <call target="zip"/>
-  
+
   </target>
-  
+
   <target name="minify" description="minify JS files">
     <fileset basedir="${build.dir}" id="jsFileSet">
       <include name="umbraco/css/*.css"/>
       <include name="umbraco/js/**/*.js"/>
-      
+
       <include name="umbraco_client/**/*.js"/>
       <include name="umbraco_client/**/*.css"/>
     </fileset>
 
-     <property name="js_files" value=""/>
-      <foreach item="File" property="file">
-         <in>
-            <items refid="jsFileSet"/>
-         </in>
-         <do>
-            <exec program="java" workingdir="${YUICompressor.dir}" failonerror="false">
-                <arg value="-jar" />
-                <arg value="yuicompressor.jar" />
-                <arg value="-o" />
-                <arg value="${file}.min" />
-                <arg value="${file}" />
-            </exec>
-            <move file="${file}.min" tofile="${file}" overwrite="true" failonerror="false"/>
-         </do>
-      </foreach>
+    <property name="js_files" value=""/>
+    <foreach item="File" property="file">
+      <in>
+        <items refid="jsFileSet"/>
+      </in>
+      <do>
+        <exec program="java" workingdir="${YUICompressor.dir}" failonerror="false">
+          <arg value="-jar" />
+          <arg value="yuicompressor.jar" />
+          <arg value="-o" />
+          <arg value="${file}.min" />
+          <arg value="${file}" />
+        </exec>
+        <move file="${file}.min" tofile="${file}" overwrite="true" failonerror="false"/>
+      </do>
+    </foreach>
   </target>
-   
-<target name="zip" description="zip the release">
+
+  <target name="zip" description="zip the release">
     <mkdir dir="${docs.dir}" />
     <copy todir="${docs.dir}">
       <fileset basedir="${build.dir}\bin">
         <include name="*.xml" />
       </fileset>
     </copy>
-    
+
     <!--standard web.config-->
     <copy file="${root.dir}\config templates\web.config" tofile="${build.dir}\web.config" failonerror="false" overwrite="true"/>
 
@@ -127,16 +127,16 @@
     <!--standard /data/packages files-->
     <copy file="${root.dir}\config templates\packages\installedPackages.config" tofile="${build.dir}\data\packages\installed\installedPackages.config" failonerror="false" overwrite="true"/>
     <copy file="${root.dir}\config templates\packages\createdPackages.config" tofile="${build.dir}\data\packages\created\createdPackages.config" failonerror="false" overwrite="true"/>
-    
+
     <!-- Standard access.xml file-->
     <copy file="${root.dir}\config templates\access.xml" tofile="${build.dir}\data\access.xml" failonerror="false" overwrite="true"/>
-    
+
     <!-- Standard create UI.xml-->
     <copy file="${root.dir}\config templates\config\UI.xml" tofile="${build.dir}\umbraco\config\create\UI.xml" failonerror="false" overwrite="true"/>
-    
+
     <!-- Standard empty cache file -->
     <copy file="${root.dir}\config templates\umbraco.config" tofile="${build.dir}\umbraco\data\umbraco.config" failonerror="false" overwrite="true"/>
-<!--    
+    <!--    
     <delete dir="${build.dir}\umbraco\webservices\api" />
     <mkdir dir="${build.dir}\umbraco\webservices\api" />
     <copy todir="${build.dir}\umbraco\webservices\api">
@@ -145,7 +145,7 @@
       </fileset>
     </copy>
 -->
-  
+
     <!-- standard folders -->
     <mkdir dir="${build.dir}\app_code" />
     <mkdir dir="${build.dir}\media" />
@@ -177,7 +177,7 @@
 
 
     <property name="dist.name" value="${ assemblyname::get-version( assemblyname::get-assembly-name('umbraco/presentation/bin/umbraco.dll') ) }"/>
-    
+
 
     <zip zipfile="${web.dir}\nightly\weekly.zip" includeemptydirs="true" >
       <fileset basedir="${root.dir}">
@@ -187,7 +187,7 @@
     </zip>
 
     <copy file="${web.dir}\nightly\weekly.zip" tofile="${public.dir}\${dist.name}_${datetime::get-ticks(datetime::now())}.zip" />
-    
+
   </target>
 
 
@@ -196,5 +196,5 @@
     <mkdir dir="${build.dir}" />
   </target>
 
-  
+
 </project>
