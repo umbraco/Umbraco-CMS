@@ -63,7 +63,7 @@
     <exec program="${win.dir}\microsoft.net\framework\v2.0.50727\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
 
     <!-- Minify's client files like js and css files -->
-    <call target="minify"/>
+<!--    <call target="minify"/>-->
 
     <!-- Moves stuff around and zips the distribution -->
     <call target="zip"/>
