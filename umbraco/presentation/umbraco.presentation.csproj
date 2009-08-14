@@ -134,6 +134,14 @@
     <Reference Include="System.Xml.Linq, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="umbraco.Linq.DTMetal.CodeBuilder, Version=0.0.1.19717, Culture=neutral, PublicKeyToken=a1619d9c35575289, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\umbraco.Linq.DTMetal.CodeBuilder.dll</HintPath>
+    </Reference>
+    <Reference Include="umbraco.Linq.DTMetal.Engine, Version=0.0.1.19719, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\umbraco.Linq.DTMetal.Engine.dll</HintPath>
+    </Reference>
     <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.60829.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\UrlRewritingNet.UrlRewriter.dll</HintPath>
