@@ -69,7 +69,7 @@ namespace umbraco.dialogs
                 feedback.Text += "<div style=\"text-align: center\"> <a target=\"_blank\" href='" + umbraco.GlobalSettings.Path + "/.." + m.getProperty("umbracoFile").Value.ToString() + "'><img src='" + umbraco.GlobalSettings.Path + "/../" + imagename + "' style='border: none;'/><br/><br/>";
                 feedback.Text += umbraco.ui.Text("thumbnailimageclickfororiginal") + "</a><br/><br/></div>";
     
-                feedback.Text += "<script type=\"text/javascript\">\n parent.refreshTree(); \nparent.updateImageSource('" + umbraco.GlobalSettings.Path + "/.." + m.getProperty("umbracoFile").Value.ToString() + "', '" + TextBoxTitle.Text + "', " + m.getProperty("umbracoWidth").Value.ToString() + ", " + m.getProperty("umbracoHeight").Value.ToString() + ")\n</script>";
+                feedback.Text += "<script type=\"text/javascript\">\n parent.refreshTree(); \nparent.updateImageSource('" + umbraco.GlobalSettings.Path + "/.." + m.getProperty("umbracoFile").Value.ToString() + "', '" + TextBoxTitle.Text + "', " + m.getProperty("umbracoWidth").Value.ToString() + ", " + m.getProperty("umbracoHeight").Value.ToString() + ", " + m.Id +")\n</script>";
 
 			}
 			// Put user code to initialize the page here

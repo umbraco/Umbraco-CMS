@@ -258,6 +258,7 @@
     <Compile Include="mediapicker\MediaPickerDataType.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="mediapicker\MediaPickerPrevalueEditor.cs" />
     <Compile Include="memberpicker\memberPicker.cs">
       <SubType>Code</SubType>
     </Compile>

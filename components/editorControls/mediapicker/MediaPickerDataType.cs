@@ -16,7 +16,9 @@ namespace umbraco.editorControls.mediapicker
 			get
 			{
 				if (_Editor == null)
-					_Editor = new mediaChooser(Data);
+                    _Editor = new mediaChooser(Data,
+                        ((MediaPickerPrevalueEditor)PrevalueEditor).ShowPreview,
+                        ((MediaPickerPrevalueEditor)PrevalueEditor).ShowAdvancedDialog);
 				return _Editor;
 			}
 		}
@@ -51,7 +53,7 @@ namespace umbraco.editorControls.mediapicker
 			get 
 			{
 				if (_prevalueeditor == null)
-					_prevalueeditor = new DefaultPrevalueEditor(this,false);
+                    _prevalueeditor = new MediaPickerPrevalueEditor(this);
 				return _prevalueeditor;
 			}
 		}
