@@ -122,9 +122,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IDataWithPreview.cs" />
-    <Compile Include="IFormhandler.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="ILiveEditingDataEditor.cs" />
     <Compile Include="IMacroGuiRendering.cs">
       <SubType>Code</SubType>

@@ -70,9 +70,6 @@
     <Compile Include="editorControls\wysiwyg\editor.cs" />
     <Compile Include="editorControls\wysiwyg\WysiwygDataType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="standardFormHandlers\formMail.cs" />
-    <Compile Include="standardFormHandlers\memberLogoff.cs" />
-    <Compile Include="standardFormHandlers\validateLogin.cs" />
     <Compile Include="umbraco\ContentItem\edit.aspx.cs">
       <DependentUpon>edit.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

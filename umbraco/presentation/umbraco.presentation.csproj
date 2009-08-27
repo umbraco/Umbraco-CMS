@@ -205,9 +205,6 @@
     <Compile Include="default.aspx.designer.cs">
       <DependentUpon>default.aspx</DependentUpon>
     </Compile>
-    <Compile Include="formHandler.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
       <SubType>Code</SubType>
@@ -485,13 +482,6 @@
     </Compile>
     <Compile Include="umbraco\dialogs\insertMasterpagePlaceholder.aspx.designer.cs">
       <DependentUpon>insertMasterpagePlaceholder.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\dialogs\mediaPicker.aspx.cs">
-      <DependentUpon>mediaPicker.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dialogs\mediaPicker.aspx.designer.cs">
-      <DependentUpon>mediaPicker.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\dialogs\republish.aspx.cs">
       <DependentUpon>republish.aspx</DependentUpon>
@@ -1097,6 +1087,13 @@
     <Compile Include="umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx.designer.cs">
       <DependentUpon>tinymce3tinymceCompress.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\plugins\tinymce\insertMacro.aspx.cs">
+      <DependentUpon>insertMacro.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\plugins\tinymce\insertMacro.aspx.designer.cs">
+      <DependentUpon>insertMacro.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\plugins\tinymce\insertImage.aspx.cs">
       <DependentUpon>insertImage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1110,13 +1107,6 @@
     </Compile>
     <Compile Include="umbraco\plugins\tinymce\insertLink.aspx.designer.cs">
       <DependentUpon>insertLink.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\plugins\tinymce\insertMacro.aspx.cs">
-      <DependentUpon>insertMacro.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\plugins\tinymce\insertMacro.aspx.designer.cs">
-      <DependentUpon>insertMacro.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\plugins\tinymce\paste.aspx.cs">
       <DependentUpon>paste.aspx</DependentUpon>
@@ -1213,11 +1203,6 @@
     <Compile Include="umbraco\dialogs\sort.aspx.designer.cs">
       <DependentUpon>sort.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\webservices\MediaPickerService.asmx.cs">
-      <DependentUpon>MediaPickerService.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco\webservices\MediaPickerServiceHelpers.cs" />
     <Compile Include="umbraco\webservices\TreeClientService.asmx.cs">
       <DependentUpon>TreeClientService.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -1503,19 +1488,7 @@
     <Content Include="umbraco\controls\TreeControl.ascx" />
     <Content Include="umbraco\css\permissionsEditor.css" />
     <Content Include="umbraco\dialogs\ExportCode.aspx" />
-    <Content Include="umbraco\dialogs\mediaPicker.aspx" />
     <Content Include="umbraco\images\editor\spellchecker.gif" />
-    <Content Include="umbraco\plugins\tinymce3\InsertAnchor.aspx" />
-    <Content Include="umbraco\plugins\tinymce3\insertChar.aspx" />
-    <Content Include="umbraco\plugins\tinymce3\insertImage.aspx" />
-    <Content Include="umbraco\plugins\tinymce3\insertLink.aspx" />
-    <Content Include="umbraco\plugins\tinymce3\insertMacro.aspx" />
-    <Content Include="umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
-    <Content Include="umbraco\plugins\tinymce\insertImage.aspx" />
-    <Content Include="umbraco\plugins\tinymce\insertLink.aspx" />
-    <Content Include="umbraco\plugins\tinymce\insertMacro.aspx" />
-    <Content Include="umbraco\plugins\tinymce\paste.aspx" />
-    <Content Include="umbraco\webservices\MediaPickerService.asmx" />
     <Content Include="umbraco_client\Application\JQuery\jquery.cookie.js" />
     <Content Include="umbraco_client\imagecropper\Jcrop.gif" />
     <Content Include="umbraco_client\tablesorting\img\bg.gif" />
@@ -1594,6 +1567,8 @@
     <Content Include="umbraco_client\Tree\tree_component.min.js" />
     <Content Include="umbraco_client\Tree\UmbracoTree.js" />
     <Content Include="umbraco_client\Application\UmbracoClientManager.js" />
+    <Content Include="umbraco\plugins\tinymce3\InsertAnchor.aspx" />
+    <Content Include="umbraco\plugins\tinymce3\insertChar.aspx" />
     <Content Include="umbraco\webservices\TreeClientService.asmx" />
     <Content Include="umbraco_client\Application\NamespaceManager.js" />
     <Content Include="umbraco_client\passwordStrength\passwordstrength.js" />
@@ -1909,6 +1884,10 @@
     <Content Include="umbraco\LiveEditing\Modules\UnpublishModule\unpublish.png" />
     <Content Include="umbraco\LiveEditing\Modules\UnpublishModule\UnpublishModule.js" />
     <Content Include="umbraco\members\ViewMembers.aspx" />
+    <Content Include="umbraco\plugins\tinymce3\insertImage.aspx" />
+    <Content Include="umbraco\plugins\tinymce3\insertLink.aspx" />
+    <Content Include="umbraco\plugins\tinymce3\insertMacro.aspx" />
+    <Content Include="umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -1946,6 +1925,8 @@
     <Content Include="umbraco\js\submodal\maskBG.png" />
     <Content Include="umbraco\js\submodal\subModal.css" />
     <Content Include="umbraco\js\submodal\subModal.js" />
+    <Content Include="umbraco\plugins\tinymce\images\sample.gif" />
+    <Content Include="umbraco\plugins\tinymce\paste.aspx" />
     <Content Include="umbraco\reindex.aspx" />
     <Content Include="umbraco\settings\DictionaryItemList.aspx" />
     <Content Include="umbraco\settings\scripts\editScript.aspx" />
@@ -2314,6 +2295,9 @@
     <Content Include="umbraco\ping.aspx">
       <SubType>Form</SubType>
     </Content>
+    <Content Include="umbraco\plugins\tinymce\insertMacro.aspx" />
+    <Content Include="umbraco\plugins\tinymce\insertImage.aspx" />
+    <Content Include="umbraco\plugins\tinymce\insertLink.aspx" />
     <Content Include="umbraco\publishStatus.aspx" />
     <Content Include="umbraco\schemas\umbraco.xsd">
       <SubType>Designer</SubType>

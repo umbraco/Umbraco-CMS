@@ -320,23 +320,7 @@ namespace umbraco {
             }
             HttpContext.Current.Trace.Write("umbracoRequestHandler", "Access checking ended");
 
-            // Run formhandler
-            if (HttpContext.Current.Request["umbracoAction"] != null)
-                if (HttpContext.Current.Request["umbracoAction"] != string.Empty) {
-                    if (HttpContext.Current.Items["redir"] == null) {
-                        string[] actions = helper.Request("umbracoAction").Split(',');
-                        foreach (string action in actions) {
-                            formHandler fh = new formHandler(action);
-                            int redirectID = fh.Execute();
-                            if (redirectID > -1) {
-                                HttpContext.Current.Items["redir"] = "1";
-                                requestHandler redirHandler = new requestHandler(null, redirectID.ToString());
-                                if (redirHandler.currentPage != null)
-                                    currentPage = redirHandler.currentPage;
-                            }
-                        }
-                    }
-                }
+            
         }
     }
 

@@ -1,4 +1,4 @@
-* //TODO: All removed files will be in the umbraco.Legacy project 
+* //TODO: All removed files will be in the umbraco.Legacy project unless otherwise noted
 
 * DataType: 'editor' removed (editor.cs)
 * removed WysiwygDataType.cs
@@ -19,3 +19,12 @@ to use the UmbracoClientPath setting
 
 * removed CheckBoxTree.cs [permanently!, not in legacy package]
 * removed windowCloser.cs
+
+* All references to the old Client Dependency libraries have been removed completely.
+
+* Moved treeIcons.css to ~/umbraco_client/Tree/treeIcons.css
+
+* Removed all IFormHandler dependencies and therefore removed the idea of FormHandlers all together:
+- IFormHandler
+- /umbraco/formhandler.cs
+- StandardFormHandlers
