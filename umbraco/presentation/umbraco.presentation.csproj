@@ -1203,6 +1203,13 @@
     <Compile Include="umbraco\dialogs\sort.aspx.designer.cs">
       <DependentUpon>sort.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\Trees\BaseMediaTree.cs" />
+    <Compile Include="umbraco\Trees\MediaRecycleBin.cs" />
+    <Compile Include="umbraco\webservices\MediaPickerService.asmx.cs">
+      <DependentUpon>MediaPickerService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="umbraco\webservices\MediaPickerServiceHelpers.cs" />
     <Compile Include="umbraco\webservices\TreeClientService.asmx.cs">
       <DependentUpon>TreeClientService.asmx</DependentUpon>
       <SubType>Component</SubType>

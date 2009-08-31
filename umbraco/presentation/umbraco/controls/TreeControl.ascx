@@ -26,7 +26,7 @@ jQuery(document).ready(function() {
 	var app = "<%#TreeSvc.App%>";
 	var showContext = <%#TreeSvc.ShowContextMenu.ToString().ToLower()%>;
 	var isDialog = <%#TreeSvc.IsDialog.ToString().ToLower()%>;
-	
+
 	jQuery("#<%#string.IsNullOrEmpty(CustomContainerId) ? "treeContainer" : CustomContainerId %>").UmbracoTree({
         jsonFullMenu: ctxMenu,
         jsonInitNode: initNode,

@@ -244,7 +244,7 @@
     <Compile Include="businesslogic\Property\Property.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\recycleBin.cs" />
+    <Compile Include="businesslogic\RecycleBin.cs" />
     <Compile Include="businesslogic\relation\Relation.cs">
       <SubType>Code</SubType>
     </Compile>

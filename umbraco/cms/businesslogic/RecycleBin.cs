@@ -6,13 +6,42 @@ using umbraco.DataLayer;
 
 namespace umbraco.cms.businesslogic
 {
+
     public class RecycleBin : CMSNode
     {
+		/// <summary>
+		/// The types of Recycle Bins.
+		/// </summary>
+		/// <remarks>
+		/// Each enum item represents the integer value of the node Id of the recycle bin in the database.
+		/// </remarks>
+		public enum RecycleBinType
+		{
+			Content = -20,
+			Media = -21
+		}
+
         private Guid _nodeObjectType;
 
-        public RecycleBin(Guid nodeObjectType) : base(-20) {
-            _nodeObjectType = nodeObjectType;
-        }
+		/// <summary>
+		/// Constructor to create a new recycle bin 
+		/// </summary>
+		/// <param name="nodeObjectType"></param>
+		/// <param name="nodeId"></param>
+		public RecycleBin(Guid nodeObjectType, RecycleBinType type)
+			: base((int)type)
+		{
+			_nodeObjectType = nodeObjectType;
+		}
+
+		/// <summary>
+		/// Old constructor to create a content recycle bin
+		/// </summary>
+		/// <param name="nodeObjectType"></param>
+		[Obsolete("Use the other constructors instead")]
+		public RecycleBin(Guid nodeObjectType)
+			: this(nodeObjectType, RecycleBinType.Content) { }
+		
 
         /// <summary>
         /// If I smell, I'm not empty 
@@ -53,6 +82,7 @@ namespace umbraco.cms.businesslogic
         /// Get the number of items in the Recycle Bin
         /// </summary>
         /// <returns>The number of all items in the Recycle Bin</returns>
+		[Obsolete("Create a RecycleBin object to get the count per recycle bin type")]
         public static int Count()
         {
             return SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where path like '%,-20,%'");

@@ -20,11 +20,12 @@ namespace umbraco.DataLayer.SqlHelpers.SqlServer
         #region Private Constants
        
         /// <summary>The latest database version this installer supports.</summary>
-        private const DatabaseVersion LatestVersionSupported = DatabaseVersion.Version4;
+        private const DatabaseVersion LatestVersionSupported = DatabaseVersion.Version4_1;
 
         /// <summary>The specifications to determine the database version.</summary>
         private static readonly VersionSpecs[] m_VersionSpecs = new VersionSpecs[] {
-                    new VersionSpecs("action","umbracoAppTree",DatabaseVersion.Version4),
+					new VersionSpecs("id","umbracoNode", "-21", DatabaseVersion.Version4_1),        
+					new VersionSpecs("action","umbracoAppTree",DatabaseVersion.Version4),
                     new VersionSpecs("description","cmsContentType",DatabaseVersion.Version3),
                     new VersionSpecs("id","sysobjects",DatabaseVersion.None) };
 
@@ -43,7 +44,7 @@ namespace umbraco.DataLayer.SqlHelpers.SqlServer
         {
             get
             {
-                return CurrentVersion == DatabaseVersion.Version3;
+                return CurrentVersion == DatabaseVersion.Version4;
             }
         }
 

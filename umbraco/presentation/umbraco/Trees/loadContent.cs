@@ -166,12 +166,12 @@ namespace umbraco
         /// Override the render method to add the recycle bin to the end of this tree
         /// </summary>
         /// <param name="Tree"></param>
-        public override void Render(ref XmlTree Tree)
+        public override void Render(ref XmlTree tree)
         {
-            base.Render(ref Tree);
+			base.Render(ref tree);
 			XmlTreeNode recycleBin = CreateRecycleBin();
 			if (recycleBin != null)
-				Tree.Add(recycleBin);
+				tree.Add(recycleBin);
         }
        
         

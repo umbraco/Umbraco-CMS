@@ -28,3 +28,5 @@ to use the UmbracoClientPath setting
 - IFormHandler
 - /umbraco/formhandler.cs
 - StandardFormHandlers
+
+* So far only minor database upgrade (not structure just data)

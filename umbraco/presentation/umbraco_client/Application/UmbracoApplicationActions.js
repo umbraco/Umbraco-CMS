@@ -93,11 +93,21 @@ Umbraco.Application.Actions = function() {
             }
             else {
                 jQuery("#buttonCreate").removeAttr("disabled");
+                //need to set the recycle bin node id based on app
+                switch (this._currApp) {
+                    case ("media"):
+                        UmbClientMgr.mainTree().setRecycleBinNodeId(-21);
+                        break;
+                    case ("content"):
+                        UmbClientMgr.mainTree().setRecycleBinNodeId(-20);
+                        break;
+                }
             }
 
             if (!ignoreDashboard) {
                 UmbClientMgr.contentFrame('dashboard.aspx?app=' + whichApp);
             }
+
 
 
             UmbClientMgr.mainTree().rebuildTree(whichApp);

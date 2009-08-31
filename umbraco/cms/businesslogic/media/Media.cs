@@ -1,4 +1,9 @@
 using System;
+using System.IO;
+using umbraco.BusinessLogic.Actions;
+using umbraco.DataLayer;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -9,6 +14,19 @@ namespace umbraco.cms.businesslogic.media
 	/// </summary>
 	public class Media : Content
 	{
+		private const string m_SQLOptimizedChildren = @"
+			select 
+				count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, umbracoNode.nodeUser, umbracoNode.text, 
+				cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId
+			from umbracoNode 
+			left join umbracoNode children on children.parentId = umbracoNode.id
+			inner join cmsContent on cmsContent.nodeId = umbracoNode.id
+			inner join cmsContentType on cmsContentType.nodeId = cmsContent.contentType
+			where {0}
+			group by umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, umbracoNode.nodeUser, umbracoNode.text, 
+				cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId
+			order by {1}";
+
 		/// <summary>
 		/// Contructs a media object given the Id
 		/// </summary>
@@ -24,6 +42,11 @@ namespace umbraco.cms.businesslogic.media
 		public Media(Guid id) : base(id)
 		{}
 
+		public Media(int id, bool noSetup)
+			: base(id, noSetup)
+		{
+
+		}
 
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
@@ -98,11 +121,63 @@ namespace umbraco.cms.businesslogic.media
 		{
 			get
 			{
-				BusinessLogic.console.IconI[] tmp = base.Children;
-				Media[] retval = new Media[tmp.Length];
-				for (int i = 0; i < tmp.Length; i++) retval[i] = new Media(tmp[i].UniqueId);
-				return retval;
+				//SD: Removed old, non-optimized method!
+				//BusinessLogic.console.IconI[] tmp = base.Children;
+				//Media[] retval = new Media[tmp.Length];
+				//for (int i = 0; i < tmp.Length; i++) retval[i] = new Media(tmp[i].UniqueId);
+				//return retval;
+				
+				//return refactored optimized method
+				return Media.GetChildrenForTree(this.Id).ToArray();
 			}
+		}
+
+		public static List<Media> GetChildrenForTree(int nodeId)
+		{
+			List<Media> tmp = new List<Media>();
+			using (IRecordsReader dr =
+				SqlHelper.ExecuteReader(
+					string.Format(m_SQLOptimizedChildren, "umbracoNode.parentID = @parentId", "umbracoNode.sortOrder"), 
+					SqlHelper.CreateParameter("@parentId", nodeId)))
+			{
+
+				while (dr.Read())
+				{
+					Media d = new Media(dr.GetInt("id"), true);
+					bool _hc = false;
+					if (dr.GetInt("children") > 0)
+						_hc = true;
+					int? masterContentType = null;
+					if (!dr.IsNull("masterContentType"))
+						masterContentType = dr.GetInt("masterContentType");
+					d.SetupMediaForTree(dr.GetGuid("uniqueId")
+						, dr.GetShort("level")
+						, dr.GetInt("parentId")
+						, dr.GetInt("nodeUser")
+						, dr.GetString("path")
+						, dr.GetString("text")
+						, dr.GetDateTime("createDate")
+						, dr.GetString("icon")
+						, _hc
+						, dr.GetString("alias")
+						, dr.GetString("thumbnail")
+						, dr.GetString("description")
+						, masterContentType
+						, dr.GetInt("contentTypeId"));
+					tmp.Add(d);
+				}
+
+			}
+			return tmp;
+		}
+
+		private void SetupMediaForTree(Guid uniqueId, int level, int parentId, int user, string path,
+										  string text, DateTime createDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
+											string contentTypeDesc, int? masterContentType, int contentTypeId)
+		{
+			SetupNodeForTree(uniqueId, _objectType, level, parentId, user, path, text, createDate, hasChildren);		
+			ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType);
+			ContentTypeIcon = icon;
 		}
 
 		/// <summary>
@@ -128,48 +203,72 @@ namespace umbraco.cms.businesslogic.media
 		/// </summary>
 		new public void delete() 
 		{
-            DeleteEventArgs e = new DeleteEventArgs();
+			// Check for recyle bin
+			if (!Path.Contains("," + RecycleBin.RecycleBinType.Media.ToString() + ","))
+			{
+				MoveToTrashEventArgs e = new MoveToTrashEventArgs();
+				FireBeforeMoveToTrash(e);
 
-            FireBeforeDelete(e);
+				if (!e.Cancel)
+				{
+					Move((int)RecycleBin.RecycleBinType.Media);
 
-            if (!e.Cancel) {
-                foreach (Media d in this.Children) {
-                    d.delete();
-                }
+					//TODO: Now that we've moved it to trash, we need to move the actual files so they are no longer accessible
+					//from the original URL.
 
-                // Remove all files
-                interfaces.IDataType uploadField = new cms.businesslogic.datatype.controls.Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
-                foreach (cms.businesslogic.property.Property p in this.getProperties)
-                    if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id &&
-                        p.Value.ToString() != "" &&
-                        System.IO.File.Exists(System.Web.HttpContext.Current.Server.MapPath(p.Value.ToString()))
-                        )
-                    {
-                        
-                        System.IO.File.Delete(System.Web.HttpContext.Current.Server.MapPath(p.Value.ToString()));
+					FireAfterMoveToTrash(e);
+				}
+			}
+			else
+			{
+				DeleteEventArgs e = new DeleteEventArgs();
 
-                        string file = p.Value.ToString();
-                        string extension = ((string)file.Substring(file.LastIndexOf(".") + 1, file.Length - file.LastIndexOf(".") - 1)).ToLower();
-                        
-                        //check for thumbnail
-                        if (",jpeg,jpg,gif,bmp,png,tiff,tif,".IndexOf("," + extension + ",") > -1)
-                        {
-                            string thumbnailfile = file.Replace("." + extension, "_thumb");
+				FireBeforeDelete(e);
 
-                            if (System.IO.File.Exists(System.Web.HttpContext.Current.Server.MapPath(thumbnailfile + ".jpg")))
-                                System.IO.File.Delete(System.Web.HttpContext.Current.Server.MapPath(thumbnailfile + ".jpg"));
+				if (!e.Cancel)
+				{
+					foreach (Media d in this.Children)
+					{
+						d.delete();
+					}
 
-                           //should also delete extra thumbnails
-                        }
+					// Remove all files
+					interfaces.IDataType uploadField = new cms.businesslogic.datatype.controls.Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+					foreach (cms.businesslogic.property.Property p in this.getProperties)
+					{
+						FileInfo mediaFile = new FileInfo(System.Web.HttpContext.Current.Server.MapPath(p.Value.ToString()));
 
-                    }
+						if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id
+							&& p.Value.ToString() != ""
+							&& mediaFile.Exists)
+						{
 
-                       
-                
-                base.delete();
+							mediaFile.Delete();
 
-                FireAfterDelete(e);
-            }
+							string file = p.Value.ToString();
+							string extension = ((string)file.Substring(file.LastIndexOf(".") + 1, file.Length - file.LastIndexOf(".") - 1)).ToLower();
+
+							//check for thumbnail
+							if (",jpeg,jpg,gif,bmp,png,tiff,tif,".IndexOf("," + extension + ",") > -1)
+							{
+								string thumbnailfile = file.Replace("." + extension, "_thumb");
+
+								if (System.IO.File.Exists(System.Web.HttpContext.Current.Server.MapPath(thumbnailfile + ".jpg")))
+									System.IO.File.Delete(System.Web.HttpContext.Current.Server.MapPath(thumbnailfile + ".jpg"));
+
+								//should also delete extra thumbnails
+							}
+
+						}
+
+					}
+
+					base.delete();
+
+					FireAfterDelete(e);
+				}
+			}
+            
 		}
 
 
@@ -252,6 +351,38 @@ namespace umbraco.cms.businesslogic.media
             if (AfterDelete != null)
                 AfterDelete(this, e);
         }
+
+		/// <summary>
+		/// The Move to trash event handler
+		/// </summary>
+		public delegate void MoveToTrashEventHandler(Media sender, MoveToTrashEventArgs e);
+		/// <summary>
+		/// Occurs when [before delete].
+		/// </summary>
+		public static event MoveToTrashEventHandler BeforeMoveToTrash;
+		/// <summary>
+		/// Raises the <see cref="E:BeforeDelete"/> event.
+		/// </summary>
+		/// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+		protected virtual void FireBeforeMoveToTrash(MoveToTrashEventArgs e)
+		{
+			if (BeforeMoveToTrash != null)
+				BeforeMoveToTrash(this, e);
+		}
+
+		/// <summary>
+		/// Occurs when [after move to trash].
+		/// </summary>
+		public static event MoveToTrashEventHandler AfterMoveToTrash;
+		/// <summary>
+		/// Fires the after move to trash.
+		/// </summary>
+		/// <param name="e">The <see cref="umbraco.cms.businesslogic.MoveToTrashEventArgs"/> instance containing the event data.</param>
+		protected virtual void FireAfterMoveToTrash(MoveToTrashEventArgs e)
+		{
+			if (AfterMoveToTrash != null)
+				AfterMoveToTrash(this, e);
+		}
     
     }
 }

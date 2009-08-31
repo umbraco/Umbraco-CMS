@@ -27,6 +27,54 @@ namespace umbraco.cms.businesslogic.web
     /// </summary>
     public class Document : Content
     {
+		private const string m_SQLOptimizedSingle = @"
+                Select 
+	                (select count(id) from umbracoNode where parentId = @id) as Children, 
+	                (select Count(published) as tmp from cmsDocument where published = 1 And nodeId = @id) as Published,
+	                cmsContentVersion.VersionId,
+                    cmsContentVersion.versionDate,	                
+	                contentTypeNode.uniqueId as ContentTypeGuid, 
+					cmsContent.ContentType, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId
+	                published, documentUser, coalesce(templateId, cmsDocumentType.templateNodeId) as templateId, cmsDocument.text as DocumentText, releaseDate, expireDate, updateDate, 
+	                umbracoNode.createDate, umbracoNode.trashed, umbracoNode.parentId, umbracoNode.nodeObjectType, umbracoNode.nodeUser, umbracoNode.level, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.uniqueId, umbracoNode.text 
+                from 
+	                umbracoNode 
+                inner join
+	                cmsContentVersion on cmsContentVersion.contentID = umbracoNode.id
+                inner join 
+	                cmsDocument on cmsDocument.versionId = cmsContentVersion.versionId
+                inner join
+	                cmsContent on cmsDocument.nodeId = cmsContent.NodeId
+                inner join
+	                cmsContentType on cmsContentType.nodeId = cmsContent.ContentType
+                inner join 
+	                umbracoNode contentTypeNode on contentTypeNode.id = cmsContentType.nodeId
+                left join cmsDocumentType on 
+	                cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1 
+                where 
+	                {0}
+                order by
+	                {1}
+                ";
+		private const string m_SQLOptimizedChildren = @"
+                  select 
+                  	count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as published, umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId
+                  from umbracoNode 
+                  left join umbracoNode children on children.parentId = umbracoNode.id
+                  inner join cmsContent on cmsContent.nodeId = umbracoNode.id
+                  inner join cmsContentType on cmsContentType.nodeId = cmsContent.contentType
+                  inner join (select contentId, max(versionDate) AS versionDate from cmsContentVersion 
+                  			inner join umbracoNode on umbracoNode.id = cmsContentVersion.contentId and umbracoNode.parentId = @parentId
+                  			group by contentId) AS temp
+                  on temp.contentId = cmsContent.nodeId
+                  inner join cmsContentVersion on cmsContentVersion.contentId = temp.contentId and cmsContentVersion.versionDate = temp.versionDate
+                  inner join cmsDocument on cmsDocument.versionId = cmsContentversion.versionId
+                  left join cmsDocument publishCheck on publishCheck.nodeId = cmsContent.nodeID and publishCheck.published = 1
+                  where {0}
+                  group by umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId
+                  order by {1}
+                  ";
+
         public static Guid _objectType = new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972");
         private DateTime _updated;
         private DateTime _release;
@@ -317,10 +365,7 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="noSetup">true if the data shouldn't loaded from the db</param>
         public Document(Guid id, bool noSetup) : base(id)
         {
-			//SD: added the following as noSetup actually didn't do anything!?!
-			if (!noSetup)
-				setupDocument(); //This should call the below method, but for some reason no inheritance is happening here....?
-				//setupNode();
+	
         }
 
         /// <summary>
@@ -370,39 +415,9 @@ namespace umbraco.cms.businesslogic.web
 
             if (OptimizedMode)
             {
+                
                 using (IRecordsReader dr =
-                        SqlHelper.ExecuteReader(
-                                                @"
-                Select 
-	                (select count(id) from umbracoNode where parentId = @id) as Children, 
-	                (select Count(published) as tmp from cmsDocument where published = 1 And nodeId = @id) as Published,
-	                cmsContentVersion.VersionId,
-                    cmsContentVersion.versionDate,
-	                cmsContent.ContentType, 
-	                contentTypeNode.uniqueId as ContentTypeGuid, 
-	                cmsContentType.alias,
-	                cmsContentType.icon,
-	                published, documentUser, coalesce(templateId, cmsDocumentType.templateNodeId) as templateId, cmsDocument.text as DocumentText, releaseDate, expireDate, updateDate, 
-	                umbracoNode.createDate, umbracoNode.trashed, umbracoNode.parentId, umbracoNode.nodeObjectType, umbracoNode.nodeUser, umbracoNode.level, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.uniqueId, umbracoNode.text 
-                from 
-	                umbracoNode 
-                inner join
-	                cmsContentVersion on cmsContentVersion.contentID = umbracoNode.id
-                inner join 
-	                cmsDocument on cmsDocument.versionId = cmsContentVersion.versionId
-                inner join
-	                cmsContent on cmsDocument.nodeId = cmsContent.NodeId
-                inner join
-	                cmsContentType on cmsContentType.nodeId = cmsContent.ContentType
-                inner join 
-	                umbracoNode contentTypeNode on contentTypeNode.id = cmsContentType.nodeId
-                left join cmsDocumentType on 
-	                cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1 
-                where 
-	                umbracoNode.id = @id
-                order by
-	                cmsContentVersion.id desc
-                ",
+                        SqlHelper.ExecuteReader(string.Format(m_SQLOptimizedSingle, "umbracoNode.id = @id", "cmsContentVersion.id desc"),
                     SqlHelper.CreateParameter("@id", id)))
                 {
                     if (dr.Read())
@@ -411,13 +426,26 @@ namespace umbraco.cms.businesslogic.web
                         bool _hc = false;
                         if (dr.GetInt("children") > 0)
                             _hc = true;
-                        SetupDocumentForTree(dr.GetGuid("uniqueId"), dr.GetShort("level"),
-                                             dr.GetInt("parentId"), dr.GetInt("documentUser"),
-                                             dr.GetBoolean("published"),
-                                             dr.GetString("path"), dr.GetString("text"),
-                                             dr.GetDateTime("createDate"),
-                                             dr.GetDateTime("updateDate"),
-                                             dr.GetDateTime("versionDate"), dr.GetString("icon"), _hc);
+						int? masterContentType = null;
+						if (!dr.IsNull("masterContentType"))
+							masterContentType = dr.GetInt("masterContentType");
+                        SetupDocumentForTree(dr.GetGuid("uniqueId")
+							, dr.GetShort("level")
+							, dr.GetInt("parentId")
+							, dr.GetInt("documentUser")
+							, dr.GetBoolean("published")
+							, dr.GetString("path")
+							, dr.GetString("text")
+							, dr.GetDateTime("createDate")
+							, dr.GetDateTime("updateDate")
+							, dr.GetDateTime("versionDate")
+							, dr.GetString("icon")
+							, _hc
+							, dr.GetString("alias")
+							, dr.GetString("thumbnail")
+							, dr.GetString("description")
+							, masterContentType
+							, dr.GetInt("contentTypeId"));
 
                         // initialize content object
                         InitializeContent(dr.GetInt("ContentType"), dr.GetGuid("versionId"),
@@ -818,10 +846,13 @@ namespace umbraco.cms.businesslogic.web
         {
             get
             {
-                IconI[] tmp = base.Children;
-                Document[] retval = new Document[tmp.Length];
-                for (int i = 0; i < tmp.Length; i++) retval[i] = new Document(tmp[i].Id);
-                return retval;
+				//SD: Removed old, non-optimized method!
+				//IconI[] tmp = base.Children;
+				//Document[] retval = new Document[tmp.Length];
+				//for (int i = 0; i < tmp.Length; i++) retval[i] = new Document(tmp[i].Id);
+				//return retval;
+
+				return Document.GetChildrenForTree(this.Id);
             }
         }
 
@@ -1121,25 +1152,7 @@ namespace umbraco.cms.businesslogic.web
             ArrayList tmp = new ArrayList();
             using (IRecordsReader dr =
                 SqlHelper.ExecuteReader(
-// Ruben Verborgh: Rewrote this without temporary table, but we really should make a view of this
-                                        @"
-select 
-	count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as published, umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon
-from umbracoNode 
-left join umbracoNode children on children.parentId = umbracoNode.id
-inner join cmsContent on cmsContent.nodeId = umbracoNode.id
-inner join cmsContentType on cmsContentType.nodeId = cmsContent.contentType
-inner join (select contentId, max(versionDate) AS versionDate from cmsContentVersion 
-			inner join umbracoNode on umbracoNode.id = cmsContentVersion.contentId and umbracoNode.parentId = @parentId
-			group by contentId) AS temp
-on temp.contentId = cmsContent.nodeId
-inner join cmsContentVersion on cmsContentVersion.contentId = temp.contentId and cmsContentVersion.versionDate = temp.versionDate
-inner join cmsDocument on cmsDocument.versionId = cmsContentversion.versionId
-left join cmsDocument publishCheck on publishCheck.nodeId = cmsContent.nodeID and publishCheck.published = 1
-where umbracoNode.parentID = @parentId
-group by umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon 
-order by umbracoNode.sortOrder
-",
+										string.Format(m_SQLOptimizedChildren, "umbracoNode.parentID = @parentId", "umbracoNode.sortOrder"),
                                         SqlHelper.CreateParameter("@parentId", NodeId)))
             {
                 while (dr.Read())
@@ -1148,14 +1161,26 @@ order by umbracoNode.sortOrder
                     bool _hc = false;
                     if (dr.GetInt("children") > 0)
                         _hc = true;
-                    d.SetupDocumentForTree(dr.GetGuid("uniqueId"), dr.GetShort("level"),
-                                           dr.GetInt("parentId"),
-                                           dr.GetInt("documentUser"),
-                                           (dr.GetInt("published")==1),
-                                           dr.GetString("path"), dr.GetString("text"),
-                                           dr.GetDateTime("createDate"),
-                                           dr.GetDateTime("updateDate"),
-                                           dr.GetDateTime("versionDate"), dr.GetString("icon"), _hc);
+					int? masterContentType = null;
+					if (!dr.IsNull("masterContentType"))
+						masterContentType = dr.GetInt("masterContentType");
+                    d.SetupDocumentForTree(dr.GetGuid("uniqueId")
+						, dr.GetShort("level")
+						, dr.GetInt("parentId")
+						, dr.GetInt("documentUser")
+						, (dr.GetInt("published")==1)
+						, dr.GetString("path")
+						, dr.GetString("text")
+						, dr.GetDateTime("createDate")
+						, dr.GetDateTime("updateDate")
+						, dr.GetDateTime("versionDate")
+						, dr.GetString("icon")
+						, _hc
+						, dr.GetString("alias")
+						, dr.GetString("thumbnail")
+						, dr.GetString("description")
+						, masterContentType
+						, dr.GetInt("contentTypeId"));
                     tmp.Add(d);
                 }
             }
@@ -1170,13 +1195,15 @@ order by umbracoNode.sortOrder
 
         private void SetupDocumentForTree(Guid uniqueId, int level, int parentId, int user, bool publish, string path,
                                           string text, DateTime createDate, DateTime updateDate,
-                                          DateTime versionDate, string icon, bool hasChildren)
+                                          DateTime versionDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
+											string contentTypeDesc, int? masterContentType, int contentTypeId)
         {
             SetupNodeForTree(uniqueId, _objectType, level, parentId, user, path, text, createDate, hasChildren);
 
             _published = publish;
             _updated = updateDate;
-            ContentTypeIcon = icon;
+			ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType);			
+			ContentTypeIcon = icon;
             VersionDate = versionDate;
         }
 

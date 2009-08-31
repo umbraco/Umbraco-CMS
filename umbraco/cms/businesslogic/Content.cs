@@ -56,9 +56,18 @@ namespace umbraco.cms.businesslogic
         /// <param name="id"></param>
         protected Content(Guid id) : base(id) { }
 
+		/// <summary>
+		/// Sets up the ContentType property for this content item and sets the addition content properties manually.
+		/// If the ContentType property is not already set, then this will get the ContentType from Cache.
+		/// </summary>
+		/// <param name="InitContentType"></param>
+		/// <param name="InitVersion"></param>
+		/// <param name="InitVersionDate"></param>
+		/// <param name="InitContentTypeIcon"></param>
         protected void InitializeContent(int InitContentType, Guid InitVersion, DateTime InitVersionDate, string InitContentTypeIcon)
         {
-            _contentType = ContentType.GetContentType(InitContentType);
+            if (_contentType == null)
+				_contentType = ContentType.GetContentType(InitContentType);
             _version = InitVersion;
             _versionDate = InitVersionDate;
             _contentTypeIcon = InitContentTypeIcon;
@@ -117,11 +126,18 @@ namespace umbraco.cms.businesslogic
             base.Save();
         }
 
-
-		// This is for performance only (used in tree)
 		/// <summary>
 		/// The icon used in the tree - placed in this layer for performance reasons.
 		/// </summary>
+		/// <remarks>
+		/// This is here for performance reasons only. If the _contentTypeIcon is manually set
+		/// then a database call is not made to initialize the ContentType.
+		/// 
+		/// The data layer has slightly changed in 4.1 so that for Document and Media, the ContentType
+		/// is automatically initialized with one SQL call when creating the documents/medias so using this
+		/// method or the ContentType.IconUrl property when accessing the icon from Media or Document 
+		/// won't affect performance.
+		/// </remarks>
 		public string ContentTypeIcon 
 		{
 			get 

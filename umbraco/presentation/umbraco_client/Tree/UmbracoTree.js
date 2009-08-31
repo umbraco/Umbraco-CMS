@@ -21,7 +21,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 showContext: true,
                 isDialog: false,
                 treeType: "standard",
-                umb_clientFolderRoot: "/umbraco_client" //default setting... this gets overriden.
+                umb_clientFolderRoot: "/umbraco_client", //default setting... this gets overriden.
+                recycleBinId: -20 //default setting for content tree
             }, opts);
             new Umbraco.Controls.UmbracoTree().init($(this), conf);
         });
@@ -50,7 +51,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _app: null, //the reference to the current app
             _showContext: true,
             _isDialog: false,
-            _isDebug: true, //set to true to enable alert debugging
+            _isDebug: false, //set to true to enable alert debugging
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
             _serviceUrl: "", //a path to the tree client service url
             _dataUrl: "", //a path to the tree data service url
@@ -70,10 +71,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
             init: function(jItem, opts) {
                 /// <summary>Initializes the tree with the options and stores the tree API in the jQuery data object for the current element</summary>
-                this._init(opts.jsonFullMenu, opts.jsonInitNode, jItem, opts.appActions, opts.uiKeys, opts.app, opts.showContext, opts.isDialog, opts.treeType, opts.serviceUrl, opts.dataUrl, opts.umb_clientFolderRoot);
+                this._init(opts.jsonFullMenu, opts.jsonInitNode, jItem, opts.appActions, opts.uiKeys, opts.app, opts.showContext, opts.isDialog, opts.treeType, opts.serviceUrl, opts.dataUrl, opts.umb_clientFolderRoot, opts.recycleBinId);
                 //store the api
                 jItem.addClass(this._treeClass);
                 jItem.data("UmbracoTree", this);
+            },
+
+            setRecycleBinNodeId: function(id) {
+                this._recycleBinId = id;
             },
 
             clearTreeCache: function() {
@@ -599,18 +604,22 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 }
             },
 
-            _checkContextMenu: function(TREE_OBJ) {
+            _checkContextMenu: function(TREE_OBJ, count) {
                 /// <summary>
                 /// we need to check if the menu is too low in the browser.
                 /// in order for this to work, we need to set a timer because there is no event
                 /// for when the context menu is displayed.
                 /// </summary>
 
+                //this ensures there's no infinite loop looking for the context menu if an exception occurs
+                if (count > 20)
+                    return;
+
                 var isVisible = TREE_OBJ.context.is(":visible");
                 if (!isVisible) {
                     this._debug("_checkContextMenu - waiting for visible menu");
                     var _this = this;
-                    setTimeout(function() { _this._checkContextMenu(TREE_OBJ); }, 50);
+                    setTimeout(function() { _this._checkContextMenu(TREE_OBJ, ++count); }, 50);
                     return;
                 }
                 var offset = TREE_OBJ.context.offset();
@@ -682,7 +691,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             },
 
             _updateRecycleBin: function() {
-                this._debug("_updateRecycleBin");
+                this._debug("_updateRecycleBin BinId: " + this._recycleBinId);
 
                 var rNode = this.findNode(this._recycleBinId, true);
                 if (rNode) {
@@ -799,7 +808,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 return null;
             },
 
-            _init: function(jFullMenu, jInitNode, treeContainer, appActions, uiKeys, app, showContext, isDialog, treeType, serviceUrl, dataUrl, umbClientFolder) {
+            _init: function(jFullMenu, jInitNode, treeContainer, appActions, uiKeys, app, showContext, isDialog, treeType, serviceUrl, dataUrl, umbClientFolder, recycleBinId) {
                 /// <summary>initialization method, must be called on page ready.</summary>
                 /// <param name="jFullMenu">JSON markup for the full context menu in accordance with the jsTree context menu object standard</param>
                 /// <param name="jInitNode">JSON markup for the initial node to show</param>
@@ -812,6 +821,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// <param name="serviceUrl">Url path for the tree client service</param>
                 /// <param name="dataUrl">Url path for the tree data service</param>
                 /// <param name="umbClientFolder">Should be set externally!... the root to the umbraco_client folder</param>
+                /// <param name="recycleBinId">the id of the recycle bin for the current tree</param>
 
                 this._debug("_init: creating new tree with class/id: " + treeContainer.attr("class") + " / " + treeContainer.attr("id"));
 
@@ -826,6 +836,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._serviceUrl = serviceUrl;
                 this._dataUrl = dataUrl;
                 this._umb_clientFolderRoot = umbClientFolder;
+                this._recycleBinId = recycleBinId;
 
                 //wire up event handlers
                 if (this._menuActions != null) {

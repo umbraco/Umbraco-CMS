@@ -55,7 +55,7 @@ namespace umbraco.cms.presentation.Trees
         {
             rootNode.Icon = "../tree/bin_empty.png";
 			rootNode.OpenIcon = "../tree/bin.png";
-            if (new RecycleBin(Document._objectType).Smells())
+            if (new RecycleBin(Document._objectType, RecycleBin.RecycleBinType.Content).Smells())
 			{
 				rootNode.Icon = "../tree/bin.png";
 			}				
@@ -87,7 +87,7 @@ namespace umbraco.cms.presentation.Trees
 
         protected override void OnRenderNode(ref XmlTreeNode xNode, Document doc)
         {
-			xNode.DimNode();
+			xNode.Style.DimNode();
         }
 
     }

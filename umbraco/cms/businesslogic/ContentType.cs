@@ -111,6 +111,30 @@ namespace umbraco.cms.businesslogic
         {
         }
 
+		/// <summary>
+		/// Creates a new content type object manually
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="alias"></param>
+		/// <param name="icon"></param>
+		/// <param name="thumbnail"></param>
+		/// <param name="masterContentType"></param>
+		/// <remarks>
+		/// This is like creating a ContentType node using optimized mode but this lets you set
+		/// all of the properties that are initialized normally from the database.
+		/// This is used for performance reasons.
+		/// </remarks>
+		public ContentType(int id, string alias, string icon, string thumbnail, int? masterContentType)
+			: base(id, true)
+		{
+			_alias = alias;
+			_iconurl = icon;
+			_thumbnail = thumbnail;
+			if (masterContentType.HasValue)
+				m_masterContentType = masterContentType.Value;
+		}
+
+
         /// <summary>
         /// Gets the raw text.
         /// </summary>

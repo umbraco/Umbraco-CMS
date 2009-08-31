@@ -27,7 +27,7 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco
 {
-    public class loadMedia : BaseTree
+    public class loadMedia : BaseMediaTree
     {
 
 		/// <summary>
@@ -49,21 +49,7 @@ namespace umbraco
 			: base(application)
 		{
 						
-		}
-
-		private User m_user;
-
-		/// <summary>
-		/// Returns the current User. This ensures that we don't instantiate a new User object 
-		/// each time.
-		/// </summary>
-		protected User CurrentUser
-		{
-			get
-			{
-				return (m_user == null ? (m_user = UmbracoEnsuredPage.CurrentUser) : m_user);
-			}
-		}
+		}		
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {            
@@ -107,105 +93,31 @@ namespace umbraco
 			}
 		}
 
-        public override void RenderJS(ref StringBuilder Javascript)
-        {
-            if (!string.IsNullOrEmpty(this.FunctionToCall))
-            {
-                Javascript.Append("function openMedia(id) {\n");
-                Javascript.Append(this.FunctionToCall + "(id)\n");
-                Javascript.Append("}\n");
-            }
-            else if (HttpContext.Current.Request.QueryString["isDialog"] == null)
-            {
-                Javascript.Append(
-					@"
-function openMedia(id) {
-	" + ClientTools.Scripts.GetContentFrame() + ".location.href = '/umbraco/editMedia.aspx?id=' + id;" + @"
-}
-");
-            }
-            else
-            {
-				//TODO: SD: Find out how what this does...?
-                Javascript.Append(
-                    @"
-function openMedia(id) {
-	if (parent.opener)
-		parent.opener.dialogHandler(id);
-	else
-		parent.dialogHandler(id);	
-}
-");
-            }
-        }
+		/// <summary>
+		/// Adds the recycling bin node. This method should only actually add the recycle bin node when the tree is initially created and if the user
+		/// actually has access to the root node.
+		/// </summary>
+		/// <returns></returns>
+		protected XmlTreeNode CreateRecycleBin()
+		{
+			if (m_id == -1 && !this.IsDialog)
+			{
+				//create a new content recycle bin tree, initialized with it's startnodeid
+				MediaRecycleBin bin = new MediaRecycleBin(this.m_app);
+				bin.ShowContextMenu = this.ShowContextMenu;
+				bin.id = bin.StartNodeID;
+				return bin.RootNode;
+			}
+			return null;
+		}
 
-        public override void Render(ref XmlTree tree)
-        {
-            Media[] docs;
-
-            if (m_id == -1)
-                docs = Media.GetRootMedias();
-            else
-                docs = new Media(m_id).Children;
-            
-            foreach (Media dd in docs)
-            {
-                XmlTreeNode xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = dd.Id.ToString();
-                xNode.Text = dd.Text;
-
-                // Check for dialog behaviour
-                if (!this.IsDialog)
-                {
-                    if (!this.ShowContextMenu)
-                        xNode.Menu = null;
-                    xNode.Action = "javascript:openMedia(" + dd.Id + ");";
-                }
-                else
-                {
-                    if (this.ShowContextMenu)
-                        xNode.Menu = new List<IAction>(new IAction[] { ActionRefresh.Instance });
-                    else
-                        xNode.Menu = null;
-                    if (this.DialogMode == TreeDialogModes.fulllink)
-                    {
-                        string nodeLink = GetLinkValue(dd, dd.Id.ToString());
-                        if (!String.IsNullOrEmpty(nodeLink))
-                        {
-                            xNode.Action = "javascript:openMedia('" + nodeLink + "');";
-                        }
-                        else
-                        {
-                            xNode.Action = null;
-                            xNode.DimNode();
-                        }
-                    }
-                    else
-                    {
-                        xNode.Action = "javascript:openMedia('" + dd.Id.ToString() + "');";
-                    }
-                }
-
-				xNode.HasChildren = dd.HasChildren;
-                if (this.IsDialog)
-                    xNode.Source = GetTreeDialogUrl(dd.Id);
-                else
-                    xNode.Source = GetTreeServiceUrl(dd.Id);                    
-
-                if (dd.ContentType != null)
-                {
-                    xNode.Icon = dd.ContentType.IconUrl;
-                    xNode.OpenIcon = dd.ContentType.IconUrl;                    
-                }
-
-                base.OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
-                if (xNode != null)
-                {
-                    tree.Add(xNode);
-                }
-                base.OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
-            }
-        }
+		public override void Render(ref XmlTree tree)
+		{
+			base.Render(ref tree);
+			XmlTreeNode recycleBin = CreateRecycleBin();
+			if (recycleBin != null)
+				tree.Add(recycleBin);
+		}
 
 		/// <summary>
 		/// Returns the value for a link in WYSIWYG mode, by default only media items that have a 

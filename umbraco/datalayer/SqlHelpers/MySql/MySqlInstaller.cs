@@ -25,6 +25,7 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
 
         /// <summary>The specifications to determine the database version.</summary>
         private static readonly VersionSpecs[] m_VersionSpecs = new VersionSpecs[] {
+					new VersionSpecs("id","umbracoNode", "-21", DatabaseVersion.Version4_1),
                     new VersionSpecs("action","umbracoAppTree",DatabaseVersion.Version4),
                     new VersionSpecs("version()","",DatabaseVersion.None) };
 
@@ -39,7 +40,13 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
         /// 	<c>true</c> if the installer can upgrade the data source; otherwise, <c>false</c>.
         /// </value>
         /// <remarks>Empty data sources can't be upgraded, just installed.</remarks>
-        public override bool CanUpgrade { get { return false; } }
+		public override bool CanUpgrade
+		{
+			get
+			{
+				return CurrentVersion == DatabaseVersion.Version4;
+			}
+		}
 
         #endregion
 
