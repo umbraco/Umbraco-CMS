@@ -204,7 +204,7 @@ namespace umbraco.cms.businesslogic.media
 		new public void delete() 
 		{
 			// Check for recyle bin
-			if (!Path.Contains("," + RecycleBin.RecycleBinType.Media.ToString() + ","))
+			if (!Path.Contains("," + ((int)RecycleBin.RecycleBinType.Media).ToString() + ","))
 			{
 				MoveToTrashEventArgs e = new MoveToTrashEventArgs();
 				FireBeforeMoveToTrash(e);
@@ -227,7 +227,8 @@ namespace umbraco.cms.businesslogic.media
 
 				if (!e.Cancel)
 				{
-					foreach (Media d in this.Children)
+					var children = this.Children;
+					foreach (Media d in children)
 					{
 						d.delete();
 					}

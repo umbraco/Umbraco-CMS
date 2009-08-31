@@ -137,12 +137,12 @@ function openMedia(id) {
                     xNode.OpenIcon = dd.ContentType.IconUrl;                    
                 }
 
-                base.OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 if (xNode != null)
                 {
                     tree.Add(xNode);
                 }
-                base.OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
             }
         }
 

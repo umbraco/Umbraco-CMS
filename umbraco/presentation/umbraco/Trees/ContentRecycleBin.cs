@@ -31,7 +31,24 @@ namespace umbraco.cms.presentation.Trees
     public class ContentRecycleBin : BaseContentTree
     {
 
-        public ContentRecycleBin(string application) : base(application) { }       
+        public ContentRecycleBin(string application) : base(application) { }
+
+		private string m_treeAlias;
+		/// <summary>
+		/// Change the tree alias so that it is the same as the content tree
+		/// </summary>
+		public override string TreeAlias
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(m_treeAlias))
+				{
+					TreeDefinition treeDef = TreeDefinitionCollection.Instance.FindTree<loadContent>();
+					m_treeAlias = (treeDef != null ? treeDef.Tree.Alias : "content");
+				}
+				return m_treeAlias;
+			}
+		}
 
         protected override void CreateRootNodeActions(ref List<IAction> actions)
 		{

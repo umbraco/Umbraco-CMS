@@ -1496,6 +1496,7 @@
     <Content Include="umbraco\css\permissionsEditor.css" />
     <Content Include="umbraco\dialogs\ExportCode.aspx" />
     <Content Include="umbraco\images\editor\spellchecker.gif" />
+    <Content Include="umbraco\webservices\MediaPickerService.asmx" />
     <Content Include="umbraco_client\Application\JQuery\jquery.cookie.js" />
     <Content Include="umbraco_client\imagecropper\Jcrop.gif" />
     <Content Include="umbraco_client\tablesorting\img\bg.gif" />

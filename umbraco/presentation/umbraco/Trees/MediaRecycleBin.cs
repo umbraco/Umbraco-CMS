@@ -35,6 +35,23 @@ namespace umbraco.cms.presentation.Trees
 						
 		}
 
+		private string m_treeAlias;
+		/// <summary>
+		/// Change the tree alias so that it is the same as the media tree
+		/// </summary>
+		public override string TreeAlias
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(m_treeAlias))
+				{
+					TreeDefinition treeDef = TreeDefinitionCollection.Instance.FindTree<loadMedia>();
+					m_treeAlias = (treeDef != null ? treeDef.Tree.Alias : "media");
+				}
+				return m_treeAlias;
+			}
+		}
+
 		protected override void CreateRootNodeActions(ref List<IAction> actions)
 		{
 			actions.Clear();

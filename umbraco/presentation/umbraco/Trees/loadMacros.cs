@@ -78,12 +78,12 @@ function openMacro(id) {
                     xNode.Action = "javascript:openMacro(" + macros.GetInt("id") + ");";
                     xNode.Icon = "developerMacro.gif";
                     xNode.OpenIcon = "developerMacro.gif";
-                    base.OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                    OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
                     if (xNode != null)
                     {
                         tree.Add(xNode);
                     }
-                    base.OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 }
             }
         }

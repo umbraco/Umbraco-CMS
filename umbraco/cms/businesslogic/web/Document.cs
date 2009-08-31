@@ -874,8 +874,8 @@ namespace umbraco.cms.businesslogic.web
         public new void delete()
         {
                 // Check for recyle bin
-                if (!Path.Contains(",-20,")) {
-                
+                if (!Path.Contains("," + ((int)RecycleBin.RecycleBinType.Content).ToString() + ","))
+                {
                     MoveToTrashEventArgs e = new MoveToTrashEventArgs();
                     FireBeforeMoveToTrash(e);
 

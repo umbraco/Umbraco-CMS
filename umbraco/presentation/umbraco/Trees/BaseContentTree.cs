@@ -182,12 +182,12 @@ function openContent(id) {
 
                     OnRenderNode(ref node, dd);
 
-                    base.OnBeforeNodeRender(ref Tree, ref node, EventArgs.Empty);
+                    OnBeforeNodeRender(ref Tree, ref node, EventArgs.Empty);
                     if (node != null)
                     {
                         Tree.Add(node);
                     }
-                    base.OnAfterNodeRender(ref Tree, ref node, EventArgs.Empty);
+                    OnAfterNodeRender(ref Tree, ref node, EventArgs.Empty);
                 }
             }
         }
