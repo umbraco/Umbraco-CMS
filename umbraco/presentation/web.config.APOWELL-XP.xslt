@@ -4,9 +4,13 @@
 
   <!-- Set up a local connection string -->
   <xsl:template match="/configuration/appSettings/add[@key='umbracoDbDSN']/@value">
-    <xsl:attribute name="value">server=.\sqlexpress;database=umbraco-4.1;Integrated Security=true</xsl:attribute>
+    <xsl:attribute name="value">server=.\sqlexpress;database=umbraco-4.1;integrated security=true</xsl:attribute>
   </xsl:template>
-  
+
+  <xsl:template match="/configuration/appSettings/add[@key='umbracoConfigurationStatus']/@value">
+    <xsl:attribute name="value">4.1.0.alpha</xsl:attribute>
+  </xsl:template>
+
   <!-- Default templates to match anything else -->
   <xsl:template match="@*">
     <xsl:copy/>

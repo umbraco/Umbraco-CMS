@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using umbraco.DataLayer;
+using System.Data.SqlTypes;
 
 namespace umbraco.Linq.DTMetal.Engine
 {
@@ -39,7 +40,7 @@ namespace umbraco.Linq.DTMetal.Engine
             {
                 return reader.GetInt("ParentId");
             }
-            catch (NullReferenceException)
+            catch (SqlNullValueException)
             {
                 return 0;
             }

@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using umbraco.BusinessLogic;
 using System.Xml.Linq;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace umbraco.Linq.Core
 {
@@ -367,5 +368,14 @@ namespace umbraco.Linq.Core
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
+
+        protected void ValidateProperty(string regex, string value)
+        {
+            Regex r = new Regex(regex);
+            if (!r.IsMatch(value))
+            {
+                throw new InvalidCastException("Value does not match validation expression from Umbraco");
+            }
+        }
     }
 }

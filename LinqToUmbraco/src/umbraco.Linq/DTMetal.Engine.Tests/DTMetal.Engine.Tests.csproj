@@ -68,7 +68,7 @@
     </Reference>
     <Reference Include="umbraco.DataLayer, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\dep\Reference Assemblies\Umbraco\umbraco.DataLayer.dll</HintPath>
+      <HintPath>..\..\..\..\umbraco\datalayer\bin\Debug\umbraco.DataLayer.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

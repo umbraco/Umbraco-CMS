@@ -3358,7 +3358,7 @@
       <DependentUpon>XmlTree.xsd</DependentUpon>
     </None>
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
-    <Content Include="web.config.APOWELL-VISTA.xslt" />
+    <Content Include="web.config.APOWELL-XP.xslt" />
     <Content Include="web.STANDARD.config" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />
     <None Include="Web References\org.umbraco.update\Reference.map">
@@ -3425,7 +3425,6 @@
     </None>
     <None Include="umbraco_client\tinymce\plugins\flash\images\Thumbs.db" />
     <None Include="umbraco_client\tinymce\plugins\umbracomacro\images\Thumbs.db" />
-    <Content Include="web.config" />
     <Content Include="config\UrlRewriting.config" />
   </ItemGroup>
   <ItemGroup>
@@ -3482,6 +3481,6 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)..\..\foreign dlls\*.dll" "$(TargetDir)*.dll" /Y</PostBuildEvent>
+    <!--<PostBuildEvent>xcopy "$(ProjectDir)..\..\foreign dlls\*.dll" "$(TargetDir)*.dll" /Y</PostBuildEvent>-->
   </PropertyGroup>
 </Project>
