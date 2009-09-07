@@ -85,6 +85,10 @@ namespace umbraco.cms.presentation.Trees
 		{
 			rootNode.Icon = "../tree/bin_empty.png";
 			rootNode.OpenIcon = "../tree/bin.png";
+			//we made this alias the same as media, so the node name would be media,
+			//we need to make it recycle bin
+			TreeDefinition treeDef = TreeDefinitionCollection.Instance.FindTree(this);
+			rootNode.Text = rootNode.Text = GetTreeHeader(treeDef.Tree.Alias);
 			if (new RecycleBin(Media._objectType, RecycleBin.RecycleBinType.Media).Smells())
 			{
 				rootNode.Icon = "../tree/bin.png";

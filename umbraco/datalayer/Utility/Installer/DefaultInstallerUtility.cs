@@ -16,7 +16,7 @@ namespace umbraco.DataLayer.Utility.Installer
     /// Base class for installers that use an ISqlHelper as data source.
     /// </summary>
     /// <typeparam name="S">The SQL helper type.</typeparam>
-    public class DefaultInstallerUtility<S> : BaseUtility<S>, IInstallerUtility where S : ISqlHelper
+    public abstract class DefaultInstallerUtility<S> : BaseUtility<S>, IInstallerUtility where S : ISqlHelper
     {
         #region Private Fields
 
@@ -68,17 +68,6 @@ namespace umbraco.DataLayer.Utility.Installer
         }
 
         /// <summary>
-        /// Gets a value indicating whether this installer can create a new database using the connection.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if the installer can create a new database; otherwise, <c>false</c>.
-        /// </value>
-        public virtual bool CanCreate
-        {
-            get { return false; }
-        }
-
-        /// <summary>
         /// Gets a value indicating whether the data source is empty and ready for installation.
         /// </summary>
         /// <value>
@@ -88,18 +77,7 @@ namespace umbraco.DataLayer.Utility.Installer
         {
             get { return CurrentVersion == DatabaseVersion.None; }
         }
-
-        /// <summary>
-        /// Gets a value indicating whether the data source is not empty but has an older version number.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if the data source is older; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsOlderVersion
-        {
-            get { return CanConnect && !IsEmpty && !IsLatestVersion; }
-        }
-
+		        
         /// <summary>
         /// Gets a value indicating whether the data source has an up to date version.
         /// </summary>
@@ -128,10 +106,8 @@ namespace umbraco.DataLayer.Utility.Installer
         /// Only first matching specification is taken into account.
         /// </summary>
         /// <value>The version specifications.</value>
-        protected virtual VersionSpecs[] VersionSpecs
-        {
-            get { throw new NotSupportedException(); }
-        }
+		protected abstract VersionSpecs[] VersionSpecs { get; }
+
         #endregion
 
         #region Public Constructors
@@ -157,6 +133,13 @@ namespace umbraco.DataLayer.Utility.Installer
 
         #endregion
 
+		#region Protected Properties
+
+		protected abstract string FullInstallSql { get; }
+		protected abstract string UpgradeSql { get; }
+
+		#endregion
+
         #region IUmbracoInstaller Members
 
         /// <summary>
@@ -164,14 +147,41 @@ namespace umbraco.DataLayer.Utility.Installer
         /// </summary>
         /// <exception cref="System.NotSupportedException">
         /// If installing or upgrading is not supported.</exception>
-        public virtual void Install()
-        {
-            throw new NotSupportedException();
-        }
+		public void Install()
+		{
+			if (IsLatestVersion)
+				return;
+
+			// installation on empty database
+			if (IsEmpty)
+			{
+				NewInstall(FullInstallSql);
+			}
+			else
+			// upgrade from older version
+			{
+				if (!CanUpgrade)
+					throw new NotSupportedException("Upgrading from this version is not supported.");
+				
+				// execute version specific upgrade set
+				Upgrade(UpgradeSql);
+			}
+		}
 
         #endregion
 
         #region Protected Methods
+
+		
+		protected virtual void NewInstall(string sql)
+		{
+			ExecuteStatements(sql);
+		}
+
+		protected virtual void Upgrade(string sql)
+		{
+			ExecuteStatements(sql);
+		}
 
         /// <summary>
         /// Determines the current version of the SQL data source,

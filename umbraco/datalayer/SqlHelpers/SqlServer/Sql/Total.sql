@@ -10,7 +10,7 @@
  
 IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
  
-    Database version: 4.0.0.12
+    Database version: 4.1.0.0
     
     Please increment this version number if ANY change is made to this script,
     so compatibility with scripts for other database systems can be verified easily.
@@ -979,4 +979,16 @@ ALTER TABLE [cmsTagRelationship] CHECK CONSTRAINT [cmsTags_cmsTagRelationship]
 alter TABLE [umbracoUser]
 add [defaultToLiveEditing] bit NOT NULL CONSTRAINT
 [DF_umbracoUser_defaultToLiveEditing] DEFAULT (0)
+;
+
+/* INSERT NEW MEDIA RECYCLE BIN NODE */
+SET IDENTITY_INSERT [umbracoNode] ON
+INSERT INTO umbracoNode (id, trashed, parentID, nodeUser, level, path, sortOrder, uniqueID, text, nodeObjectType)
+VALUES (-21, 0, -1, 0, 0, '-1,-21', 0, 'BF7C7CBC-952F-4518-97A2-69E9C7B33842', 'Recycle Bin', 'CF3D8E34-1C1C-41e9-AE56-878B57B32113')
+SET IDENTITY_INSERT [umbracoNode] OFF
+;
+/* Add the mediaRecycleBin tree type */
+IF NOT EXISTS (SELECT treeAlias FROM umbracoAppTree WHERE treeAlias='mediaRecycleBin')
+INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
+VALUES (0, 0, 0, 'media', 'mediaRecycleBin', 'RecycleBin', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.MediaRecycleBin')
 ;

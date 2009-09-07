@@ -39,7 +39,7 @@ namespace umbraco.DataLayer.Utility.Installer
         /// <value>
         /// 	<c>true</c> if the installer can create a new database; otherwise, <c>false</c>.
         /// </value>
-        bool CanCreate { get; }
+		//bool CanCreate { get; }
 
         /// <summary>
         /// Gets a value indicating whether the data source is empty and ready for installation.
@@ -55,7 +55,7 @@ namespace umbraco.DataLayer.Utility.Installer
         /// <value>
         /// 	<c>true</c> if the data source is older; otherwise, <c>false</c>.
         /// </value>
-        bool IsOlderVersion { get; }
+		//bool IsOlderVersion { get; }
 
         /// <summary>
         /// Gets a value indicating whether the data source has an up to date version.

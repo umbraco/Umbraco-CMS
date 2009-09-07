@@ -17,7 +17,7 @@ namespace umbraco.presentation.webservices
 
 		public void ProcessRequest(HttpContext context)
 		{
-
+			Authorize();
 			context.Response.ContentType = "application/json";
 			context.Response.Write(GetXmlTree().ToString());
 
@@ -29,6 +29,13 @@ namespace umbraco.presentation.webservices
 			{
 				return false;
 			}
+		}
+
+		public static void Authorize()
+		{
+			if (!BasePages.BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
+				throw new Exception("Client authorization failed. User is not logged in");
+
 		}
 
 		/// <summary>

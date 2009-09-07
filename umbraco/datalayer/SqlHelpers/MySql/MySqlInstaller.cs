@@ -73,24 +73,27 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
 
         #endregion
 
-        #region DefaultInstaller Members
+        #region DefaultInstaller Members        
 
-        /// <summary>
-        /// Installs the latest version into the data source.
-        /// </summary>
-        /// <exception cref="System.NotSupportedException">
-        /// If installing or upgrading is not supported.</exception>
-        public override void Install()
-        {
-            // Already installed?
-            if (IsLatestVersion)
-                return;
-            // Only empty databases are supported right now.
-            if (!IsEmpty)
-                throw new NotSupportedException("Only empty databases are supported, upgrade not possible.");
-            // Execute installation script.
-            ExecuteStatements(GetMySqlVersion() >= 5 ? SqlResources.Total : ConvertToMySql4(SqlResources.Total));
-        }
+		/// <summary>
+		/// Returns the sql to do a full install
+		/// </summary>
+		protected override string FullInstallSql
+		{
+			get { return GetMySqlVersion() >= 5 ? SqlResources.Total : ConvertToMySql4(SqlResources.Total); }
+		}
+
+		/// <summary>
+		/// Returns the sql to do an upgrade
+		/// </summary>
+		protected override string UpgradeSql
+		{
+			get
+			{
+				string upgradeFile = string.Format("{0}_Upgrade", CurrentVersion.ToString());
+				return SqlResources.ResourceManager.GetString(upgradeFile);
+			}
+		}		
 
         #endregion
 

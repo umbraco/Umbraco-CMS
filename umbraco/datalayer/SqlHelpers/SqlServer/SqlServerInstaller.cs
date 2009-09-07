@@ -75,34 +75,27 @@ namespace umbraco.DataLayer.SqlHelpers.SqlServer
 
         #endregion
 
-        #region DefaultInstaller Members
+        #region DefaultInstaller Members       
 
-        /// <summary>
-        /// Installs the latest version into the data source.
-        /// </summary>
-        /// <exception cref="System.NotSupportedException">
-        /// If installing or upgrading is not supported.</exception>
-        public override void Install()
-        {
-            if (IsLatestVersion)
-                return;
-            // installation on empty database
-            if (IsEmpty)
-            {
-                ExecuteStatements(SqlResources.Total);
-            }
-            else
-            // upgrade from older version
-            {
-                if (!CanUpgrade)
-                    throw new NotSupportedException("Upgrading from this version is not supported.");
-                // execute version specific upgrade set
-                string upgradeFile = string.Format("{0}_Upgrade", CurrentVersion.ToString());
-                ExecuteStatements(SqlResources.ResourceManager.GetString(upgradeFile));
-                // execute common upgrade script
-                // ExecuteStatements(SqlResources.Upgrade);
-            }
-        }
+		/// <summary>
+		/// Returns the sql to do a full install
+		/// </summary>
+		protected override string FullInstallSql
+		{
+			get { return SqlResources.Total; }
+		}
+
+		/// <summary>
+		/// Returns the sql to do an upgrade
+		/// </summary>
+		protected override string UpgradeSql
+		{
+			get
+			{
+				string upgradeFile = string.Format("{0}_Upgrade", CurrentVersion.ToString());
+				return SqlResources.ResourceManager.GetString(upgradeFile);
+			}
+		}		
 
         #endregion
     }

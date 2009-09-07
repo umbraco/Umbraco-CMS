@@ -3359,6 +3359,7 @@
     </None>
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
     <Content Include="web.config.APOWELL-XP.xslt" />
+    <Content Include="web.config.BOMBER.xslt" />
     <Content Include="web.STANDARD.config" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />
     <None Include="Web References\org.umbraco.update\Reference.map">

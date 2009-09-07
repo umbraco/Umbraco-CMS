@@ -48,6 +48,14 @@ namespace umbraco.cms.businesslogic.media
 
 		}
 
+		//TODO: SD: Implement this EVERYWHERE
+		public Media(bool optimizedMode, int id)
+			: base(id, optimizedMode)
+		{
+
+		}
+
+
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
         /// </summary>
@@ -134,11 +142,15 @@ namespace umbraco.cms.businesslogic.media
 
 		public static List<Media> GetChildrenForTree(int nodeId)
 		{
+			
 			List<Media> tmp = new List<Media>();
 			using (IRecordsReader dr =
 				SqlHelper.ExecuteReader(
-					string.Format(m_SQLOptimizedChildren, "umbracoNode.parentID = @parentId", "umbracoNode.sortOrder"), 
-					SqlHelper.CreateParameter("@parentId", nodeId)))
+					string.Format(m_SQLOptimizedChildren
+						, "umbracoNode.parentID = @parentId And umbracoNode.nodeObjectType = @type"
+						, "umbracoNode.sortOrder")
+					, SqlHelper.CreateParameter("@type", _objectType)
+					, SqlHelper.CreateParameter("@parentId", nodeId)))
 			{
 
 				while (dr.Read())

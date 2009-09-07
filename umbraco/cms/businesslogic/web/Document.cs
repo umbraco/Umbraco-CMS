@@ -409,7 +409,9 @@ namespace umbraco.cms.businesslogic.web
             setupDocument();
         }
 
-        public Document(bool OptimizedMode, int id) : base(id, OptimizedMode)
+		//TODO: SD: Implement this EVERYWHERE (90 places apparently)
+		public Document(bool optimizedMode, int id)
+			: base(id, optimizedMode)
         {
             this._optimizedMode = OptimizedMode;
 

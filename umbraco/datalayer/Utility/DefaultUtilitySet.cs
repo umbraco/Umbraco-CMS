@@ -8,6 +8,7 @@
 
 using umbraco.DataLayer.Utility.Installer;
 using umbraco.DataLayer.Utility.Table;
+using System;
 
 namespace umbraco.DataLayer.Utility
 {
@@ -59,7 +60,7 @@ namespace umbraco.DataLayer.Utility
         /// <returns>The default installer.</returns>
         public virtual IInstallerUtility CreateInstaller()
         {
-            return new DefaultInstallerUtility<S>(SqlHelper);
+			throw new NotImplementedException();
         }
 
         /// <summary>
