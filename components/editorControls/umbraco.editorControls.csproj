@@ -310,6 +310,11 @@
     <Compile Include="textfield\TextFieldDataType.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="tinymce\tinyMCEConfiguration.cs" />
+    <Compile Include="tinymce\TinyMCEDataType.cs" />
+    <Compile Include="tinymce\TinyMCELegacyControl.cs" />
+    <Compile Include="tinymce\tinyMCEImageHelper.cs" />
+    <Compile Include="tinymce\tinyMCEPreValueConfigurator.cs" />
     <Compile Include="wysiwyg\editorButton.cs" />
     <Compile Include="tinyMCE3\TinyMCE.cs" />
     <Compile Include="tinyMCE3\tinyMCE3dataType.cs" />
@@ -321,12 +326,6 @@
     <Compile Include="tinyMCE3\webcontrol\plugin\JSONReader.cs" />
     <Compile Include="tinyMCE3\webcontrol\plugin\JSONWriter.cs" />
     <Compile Include="tinyMCE3\webcontrol\TinyMCEWebControl.cs" />
-    <Compile Include="tinymce\TinyMCE.cs" />
-    <Compile Include="tinymce\tinyMCEConfiguration.cs" />
-    <Compile Include="tinymce\TinyMCEDataType.cs" />
-    <Compile Include="tinymce\tinyMCEImageHelper.cs" />
-    <Compile Include="tinymce\tinyMCEPreValueConfigurator.cs" />
-    <Compile Include="tinymce\webcontrol\TinyMCE.cs" />
     <Compile Include="ultimatepicker\ultimatePickerDataEditor.cs" />
     <Compile Include="ultimatepicker\ultimatePickerDataType.cs" />
     <Compile Include="ultimatepicker\ultimatePickerPrevalueEditor.cs" />

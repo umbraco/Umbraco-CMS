@@ -15,7 +15,7 @@ namespace umbraco.editorControls.tinymce
 			get
 			{
 				if (_Editor == null)
-                    _Editor = new TinyMCE(Data, ((tinyMCEPreValueConfigurator)PrevalueEditor).Configuration);
+                    _Editor = new TinyMCELegacyControl();
 				return _Editor;
 			}
 		}
@@ -44,7 +44,7 @@ namespace umbraco.editorControls.tinymce
 			get
 			{
                 if (_prevalueeditor == null)
-                    _prevalueeditor = new tinymce.tinyMCEPreValueConfigurator(this);
+					_prevalueeditor = new TinyMCELegacyControl();
 				return _prevalueeditor;
 			}
 		}

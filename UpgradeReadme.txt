@@ -30,3 +30,7 @@ to use the UmbracoClientPath setting
 - StandardFormHandlers
 
 * So far only minor database upgrade (not structure just data)
+
+* Moved all old TinyMCE supporting files to legacy project
+* Moved all old TinyMCE code files (that are not used to legacy project)
+* Moved all old TinyMCE plugins to legacy project
