@@ -76,23 +76,38 @@ namespace umbraco.controls
 
             Width = 350;
             Height = 350;
+
+            SaveAndPublish += new EventHandler(standardSaveAndPublishHandler);
+			Save += new EventHandler(standardSaveAndPublishHandler);
+			prntpage = (UmbracoEnsuredPage)Page;
+
+            foreach (ContentType.TabI t in _content.ContentType.getVirtualTabs)
+            {
+                TabPage tp = NewTabPage(t.Caption);
+                addSaveAndPublishButtons(ref tp);
+            }
         }
 
-		/// <summary>
-		/// Create and setup all of the controls child controls.
-		/// </summary>
-		protected override void CreateChildControls()
-		{
-			base.CreateChildControls();
+        /// <summary>
+        /// Create and setup all of the controls child controls.
+        /// </summary>
+        protected override void CreateChildControls()
+        {
+            base.CreateChildControls();
 
 			SaveAndPublish += new EventHandler(standardSaveAndPublishHandler);
 			Save += new EventHandler(standardSaveAndPublishHandler);
 			prntpage = (UmbracoEnsuredPage)Page;
-
+            int i = 0;
 			foreach (ContentType.TabI t in _content.ContentType.getVirtualTabs)
 			{
-				TabPage tp = NewTabPage(t.Caption);
-				addSaveAndPublishButtons(ref tp);
+                var tp = this.Panels[i] as TabPage;
+                if (tp == null)
+                {
+                    throw new ArgumentException("Unable to load tab \"" + t.Caption + "\"");
+                }
+				//TabPage tp = NewTabPage(t.Caption);
+				//addSaveAndPublishButtons(ref tp);
 
 				tp.Style.Add("text-align", "center");
 
@@ -104,6 +119,8 @@ namespace umbraco.controls
 					addControlNew(_content.getProperty(pt), tp, t.Caption);
 					inTab.Add(pt.Id.ToString(), true);
 				}
+
+                i++;
 			}
 
 

@@ -17,7 +17,7 @@ namespace umbraco.uicontrols {
     public class TabView : System.Web.UI.WebControls.WebControl {
         private HtmlInputHidden tb = new HtmlInputHidden();
         private ArrayList Tabs = new ArrayList();
-        private ArrayList Panels = new ArrayList();
+        protected ArrayList Panels = new ArrayList();
         private string status = "";
 
         public ArrayList GetPanels() {

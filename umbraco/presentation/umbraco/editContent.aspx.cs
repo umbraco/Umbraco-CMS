@@ -130,7 +130,7 @@ namespace umbraco.cms.presentation
                 _document.Save();
 
                 if (!tmp.DoesPublish)
-                    this.speechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null), ui.Text("speechBubbles", "editContentSavedText", null));
+                    ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null), ui.Text("speechBubbles", "editContentSavedText", null));
 
 				ClientTools.SyncTree(_document.Path, true);
         }
@@ -139,7 +139,7 @@ namespace umbraco.cms.presentation
         {
             if (Page.IsValid)
             {
-                this.speechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSendToPublish", base.getUser()), ui.Text("speechBubbles", "editContentSendToPublishText", base.getUser()));
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSendToPublish", base.getUser()), ui.Text("speechBubbles", "editContentSendToPublishText", base.getUser()));
                 _document.SendToPublication(base.getUser());
             }
         }
@@ -158,7 +158,7 @@ namespace umbraco.cms.presentation
 
                     if (_document.PublishWithResult(base.getUser()))
                     {
-                        this.speechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
+                        ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
                         library.UpdateDocumentCache(_document.Id);
 
                         BusinessLogic.Log.Add(BusinessLogic.LogTypes.Publish, base.getUser(), _document.Id, "");
@@ -171,11 +171,11 @@ namespace umbraco.cms.presentation
                     }
                     else
                     {
-                        this.speechBubble(speechBubbleIcon.error, ui.Text("error"), ui.Text("contentPublishedFailedByEvent"));
+                        ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("error"), ui.Text("contentPublishedFailedByEvent"));
                     }
                 }
                 else
-                    this.speechBubble(speechBubbleIcon.error, ui.Text("error"), ui.Text("speechBubbles", "editContentPublishedFailedByParent"));
+                    ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("error"), ui.Text("speechBubbles", "editContentPublishedFailedByParent"));
                 
                 // page cache disabled...
                 //			cms.businesslogic.cache.Cache.ClearCacheObjectTypes("umbraco.page");
