@@ -483,6 +483,13 @@
     <Compile Include="umbraco\dialogs\insertMasterpagePlaceholder.aspx.designer.cs">
       <DependentUpon>insertMasterpagePlaceholder.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\dialogs\mediaPicker.aspx.cs">
+      <DependentUpon>mediaPicker.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dialogs\mediaPicker.aspx.designer.cs">
+      <DependentUpon>mediaPicker.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\dialogs\republish.aspx.cs">
       <DependentUpon>republish.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1467,6 +1474,7 @@
     <Content Include="umbraco\controls\TreeControl.ascx" />
     <Content Include="umbraco\css\permissionsEditor.css" />
     <Content Include="umbraco\dialogs\ExportCode.aspx" />
+    <Content Include="umbraco\dialogs\mediaPicker.aspx" />
     <Content Include="umbraco\images\editor\spellchecker.gif" />
     <Content Include="umbraco\webservices\MediaPickerService.asmx" />
     <Content Include="umbraco_client\Application\JQuery\jquery.cookie.js" />
@@ -2827,6 +2835,7 @@
     <None Include="umbraco\schemas\umbraco.xsx">
       <DependentUpon>umbraco.xsd</DependentUpon>
     </None>
+    <Content Include="web.config" />
     <Content Include="config\UrlRewriting.config" />
   </ItemGroup>
   <ItemGroup>
