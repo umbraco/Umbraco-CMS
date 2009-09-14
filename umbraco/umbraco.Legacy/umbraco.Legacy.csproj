@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{27A2590E-1313-4A33-89FD-92811540B69C}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -209,7 +209,16 @@
     <Content Include="umbraco\js\contextmenu.aspx" />
     <Content Include="umbraco\js\contextmenu.js" />
     <Content Include="umbraco\js\editorBarFunctions.js" />
+    <Content Include="umbraco\js\prototype.js" />
     <Content Include="umbraco\js\richtextFunctions.js" />
+    <Content Include="umbraco\js\scriptaculous\builder.js" />
+    <Content Include="umbraco\js\scriptaculous\controls.js" />
+    <Content Include="umbraco\js\scriptaculous\dragdrop.js" />
+    <Content Include="umbraco\js\scriptaculous\effects.js" />
+    <Content Include="umbraco\js\scriptaculous\scriptaculous.js" />
+    <Content Include="umbraco\js\scriptaculous\slider.js" />
+    <Content Include="umbraco\js\scriptaculous\sound.js" />
+    <Content Include="umbraco\js\scriptaculous\unittest.js" />
     <Content Include="umbraco\js\treeGui.js" />
     <Content Include="umbraco\js\umbContext.js" />
     <Content Include="umbraco\js\umbracoDefault.js" />
@@ -896,9 +905,6 @@
           <IISUrl>
           </IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

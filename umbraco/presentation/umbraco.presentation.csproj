@@ -97,6 +97,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="IronMath, Version=1.0.60816.1877, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\IronMath.dll</HintPath>
+    </Reference>
+    <Reference Include="IronPython, Version=1.0.60816.1877, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\IronPython.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -1877,6 +1885,7 @@
     <Content Include="umbraco\plugins\tinymce3\insertLink.aspx" />
     <Content Include="umbraco\plugins\tinymce3\insertMacro.aspx" />
     <Content Include="umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
+    <Content Include="config\ClientDependency.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -1901,15 +1910,6 @@
     <Content Include="umbraco\images\umbraco\package.png" />
     <Content Include="umbraco\images\umbraco\settingsScript.gif" />
     <Content Include="umbraco\images\uploadTranslation.png" />
-    <Content Include="umbraco\js\prototype.js" />
-    <Content Include="umbraco\js\scriptaculous\builder.js" />
-    <Content Include="umbraco\js\scriptaculous\controls.js" />
-    <Content Include="umbraco\js\scriptaculous\dragdrop.js" />
-    <Content Include="umbraco\js\scriptaculous\effects.js" />
-    <Content Include="umbraco\js\scriptaculous\scriptaculous.js" />
-    <Content Include="umbraco\js\scriptaculous\slider.js" />
-    <Content Include="umbraco\js\scriptaculous\sound.js" />
-    <Content Include="umbraco\js\scriptaculous\unittest.js" />
     <Content Include="umbraco\js\submodal\common.js" />
     <Content Include="umbraco\js\submodal\maskBG.png" />
     <Content Include="umbraco\js\submodal\subModal.css" />
@@ -2752,7 +2752,6 @@
     <Content Include="umbraco_client\tinymce3\utils\form_utils.js" />
     <Content Include="umbraco_client\tinymce3\utils\mctabs.js" />
     <Content Include="umbraco_client\tinymce3\utils\validate.js" />
-    <Content Include="umbraco_client\Application\JQuery\jquery.accordian.js" />
     <Content Include="umbraco_client\ui\default.css" />
     <Content Include="umbraco_client\ui\default.js" />
     <Content Include="umbraco_client\ui\jquery.js" />

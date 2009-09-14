@@ -11,14 +11,9 @@ using ClientDependency.Core;
 
 namespace umbraco.controls
 {
-	/// <summary>
-	/// TODO: REmove the dependencies on prototype and scriptaculous!!
-	/// doesn't work when combining scripts which is why DoNotOptimize is flagged.
-	/// </summary>
-	//[ClientDependency(501, ClientDependencyType.Javascript, "js/scriptaculous/scriptaculous.js?load=effects,dragdrop", "UmbracoRoot", InvokeJavascriptMethodOnLoad = "Position.includeScrollOffsets = true;", DoNotOptimize = true)]
-	[ClientDependency(500, ClientDependencyType.Javascript, "js/prototype.js", "UmbracoRoot", DoNotOptimize = true)]
-	[ClientDependency(501, ClientDependencyType.Javascript, "js/scriptaculous/scriptaculous.js?load=effects,dragdrop", "UmbracoRoot", DoNotOptimize = true)]
-	[ClientDependency(ClientDependencyType.Css, "Tree/treeIcons.css", "UmbracoClient")]
+	
+    [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Css, "Tree/treeIcons.css", "UmbracoClient")]
 	[ClientDependency(ClientDependencyType.Css, "Tree/Themes/umbraco/styles.css", "UmbracoClient")]
     public partial class ContentTypeControlNew : System.Web.UI.UserControl
     {
@@ -318,7 +313,20 @@ namespace umbraco.controls
                         
                         
                         PropertyTypes.Controls.Add(new LiteralControl("</ul></div>"));
-                        PropertyTypes.Controls.Add(new LiteralControl("<script type='text/javascript'>\n Sortable.create(\"" + t.GetRawCaption().Replace(" ", "").Replace("#", "_") + "Contents\",{onUpdate:function(element) {document.getElementById('" + propSort.ClientID + "').value = Sortable.serialize('" + t.GetRawCaption().Replace(" ", "").Replace("#", "_") + "Contents');},scroll: '" + scrollLayerId + "', dropOnEmpty:false,containment:[\"" + t.GetRawCaption().Replace(" ", "").Replace("#", "_") + "Contents\"],constraint:'vertical'});\n</script>"));
+
+                        var jsSortable = @"                            
+                                (function($) {
+                                    var propSortId = ""#" + propSort.ClientID + @""";
+                                    $(document).ready(function() {
+                                        $(propSortId).next("".genericPropertyList"").sortable({containment: 'parent', tolerance: 'pointer',
+                                            update: function(event, ui) { 
+                                                $(propSortId).val($(this).sortable('serialize'));
+                                            }});
+                                    });
+                                })(jQuery);";
+
+                        Page.ClientScript.RegisterStartupScript(this.GetType(), propSort.ClientID, jsSortable, true);
+
                     }
                     else
                     {
@@ -371,7 +379,21 @@ namespace umbraco.controls
             
            
             propertiesPH.Controls.Add(new LiteralControl("</ul>"));
-            propertiesPH.Controls.Add(new LiteralControl("<script>\n Sortable.create(\"generalPropertiesContents\",{scroll: '" + scrollLayerId + "',dropOnEmpty:false,containment:[\"generalPropertiesContents\"],constraint:'vertical',onUpdate:function(element) {document.getElementById('" + propSort_gp.ClientID + "').value = Sortable.serialize('generalPropertiesContents');}});\n</script>"));
+            //propertiesPH.Controls.Add(new LiteralControl("<script>\n Sortable.create(\"generalPropertiesContents\",{scroll: '" + scrollLayerId + "',dropOnEmpty:false,containment:[\"generalPropertiesContents\"],constraint:'vertical',onUpdate:function(element) {document.getElementById('" + propSort_gp.ClientID + "').value = Sortable.serialize('generalPropertiesContents');}});\n</script>"));
+
+            var jsSortable_gp = @"                
+                    (function($) {
+                        var propSortId = ""#" + propSort_gp.ClientID + @""";
+                        $(document).ready(function() {
+                            $(propSortId).next("".genericPropertyList"").sortable({containment: 'parent', tolerance: 'pointer',
+                                update: function(event, ui) { 
+                                    $(propSortId).val($(this).sortable('serialize'));
+                                }});
+                        });
+                    })(jQuery);";
+
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "propSort_gp", jsSortable_gp, true);
+
             
             if (!propertyTabHasProperties)
             {
