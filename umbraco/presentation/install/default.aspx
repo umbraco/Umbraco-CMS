@@ -57,7 +57,7 @@
 </head>
 <body>
 	
-	<cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" ProviderName="ClientSideRegistrationProvider"  />
+	<cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" ProviderName="LazyLoadProvider"  />
 	
 	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="style.css" />
 	<umb:CssInclude ID="CssInclude2" runat="server" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />

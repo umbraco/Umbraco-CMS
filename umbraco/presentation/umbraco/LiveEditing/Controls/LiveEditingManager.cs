@@ -4,11 +4,11 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.presentation.LiveEditing.Modules.ItemEditing;
 using ClientDependency.Core;
-using ClientDependency.Core.Providers;
 using ClientDependency.Core.Controls;
 using umbraco.BasePages;
 using System.Collections.Generic;
 using umbraco.uicontrols;
+using ClientDependency.Core.FileRegistration.Providers;
 
 namespace umbraco.presentation.LiveEditing.Controls
 {
@@ -118,7 +118,7 @@ namespace umbraco.presentation.LiveEditing.Controls
 			//we need a DependencyLoader control
 			bool isNew;
             UmbracoClientDependencyLoader.TryCreate(this, out isNew);
-            ClientDependencyLoader.Instance.ProviderName = ClientSideRegistrationProvider.DefaultName;
+            ClientDependencyLoader.Instance.ProviderName = LazyLoadProvider.DefaultName;
 			ClientDependencyLoader.Instance.IsDebugMode = true;
 
             m_Communicator = new Communicator();

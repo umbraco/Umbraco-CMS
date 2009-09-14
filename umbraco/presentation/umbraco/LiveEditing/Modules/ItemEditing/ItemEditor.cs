@@ -14,7 +14,7 @@ using umbraco.presentation.LiveEditing.Updates;
 using umbraco.presentation.templateControls;
 using ClientDependency.Core;
 using ClientDependency.Core.Controls;
-using ClientDependency.Core.Providers;
+
 namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
 {
     /// <summary>

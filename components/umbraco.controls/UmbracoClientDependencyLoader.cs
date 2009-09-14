@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Web.UI;
 using ClientDependency.Core.Controls;
-using ClientDependency.Core.Providers;
+using ClientDependency.Core.FileRegistration.Providers;
 
 namespace umbraco.uicontrols
 {
