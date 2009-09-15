@@ -252,6 +252,13 @@
     <Compile Include="listbox\ListBoxKeysDataType.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="macrocontainer\DataType.cs" />
+    <Compile Include="macrocontainer\Editor.cs" />
+    <Compile Include="macrocontainer\MacroContainerEvent.cs" />
+    <Compile Include="macrocontainer\MacroControlFactory.cs" />
+    <Compile Include="macrocontainer\MacroEditor.cs" />
+    <Compile Include="macrocontainer\PersistableMacroProperty.cs" />
+    <Compile Include="macrocontainer\PrevalueEditor.cs" />
     <Compile Include="mediapicker\mediaChooser.cs">
       <SubType>Code</SubType>
     </Compile>

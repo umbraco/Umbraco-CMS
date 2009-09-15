@@ -1192,6 +1192,10 @@
     </Compile>
     <Compile Include="umbraco\Trees\BaseMediaTree.cs" />
     <Compile Include="umbraco\Trees\MediaRecycleBin.cs" />
+    <Compile Include="umbraco\webservices\MacroContainerService.asmx.cs">
+      <DependentUpon>MacroContainerService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="umbraco\webservices\MediaPickerService.asmx.cs">
       <DependentUpon>MediaPickerService.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -1488,6 +1492,8 @@
     <Content Include="umbraco\dialogs\ExportCode.aspx" />
     <Content Include="umbraco\dialogs\mediaPicker.aspx" />
     <Content Include="umbraco\images\editor\spellchecker.gif" />
+    <Content Include="umbraco\js\sortable\jquery-ui-1.7.2.custom.min.js" />
+    <Content Include="umbraco\webservices\MacroContainerService.asmx" />
     <Content Include="umbraco\webservices\MediaPickerService.asmx" />
     <Content Include="umbraco_client\Application\JQuery\jquery.cookie.js" />
     <Content Include="umbraco_client\imagecropper\Jcrop.gif" />
