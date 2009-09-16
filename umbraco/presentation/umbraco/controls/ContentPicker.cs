@@ -9,16 +9,17 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
 using ClientDependency.Core;
+using umbraco.presentation;
+using ClientDependency.Core.Controls;
 
 namespace umbraco.controls
 {
-
 	[ClientDependency(ClientDependencyType.Javascript, "js/xmlextras.js", "UmbracoRoot")]
 	[ClientDependency(ClientDependencyType.Javascript, "js/xmlRequest.js", "UmbracoRoot")]
 	[ClientDependency(ClientDependencyType.Javascript, "webservices/ajax.js", "UmbracoRoot")]
 	[ClientDependency(ClientDependencyType.Javascript, "js/submodal/common.js", "UmbracoRoot")]
 	[ClientDependency(ClientDependencyType.Javascript, "js/submodal/subModal.js", "UmbracoRoot")]
-	[ClientDependency(ClientDependencyType.Css, "js/submodal/subModal.css", "UmbracoRoot")]
+	[ClientDependency(ClientDependencyType.Css, "js/submodal/subModal.css", "UmbracoRoot")]	
 	public class ContentPicker : System.Web.UI.WebControls.WebControl
 	{
 
@@ -80,7 +81,10 @@ namespace umbraco.controls
 			base.OnInit(e);
 			
 			// We need to make sure we have a reference to the legacy ajax calls in the scriptmanager
-			presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
+			if (!UmbracoContext.Current.LiveEditingContext.Enabled)
+				presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
+			else
+				ClientDependencyLoader.Instance.RegisterDependency("webservices/legacyAjaxCalls.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
 		}
 
 

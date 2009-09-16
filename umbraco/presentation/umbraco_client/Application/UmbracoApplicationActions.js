@@ -24,12 +24,12 @@ Umbraco.Application.Actions = function() {
 
         addEventHandler: function(fnName, fn) {
             /// <summary>Adds an event listener to the event name event</summary>
-            jQuery(this).bind(fnName, fn);
+            if (typeof(jQuery)!="undefined") jQuery(this).bind(fnName, fn); //if there's no jQuery, there is no events
         },
 
         removeEventHandler: function(fnName, fn) {
             /// <summary>Removes an event listener to the event name event</summary>
-            jQuery(this).unbind(fnName, fn);
+            if (typeof (jQuery) != "undefined") jQuery(this).unbind(fnName, fn); //if there's no jQuery, there is no events
         },
 
         launchHelp: function(lang, userType) {

@@ -15,7 +15,7 @@ using ClientDependency.Core.Controls;
 
 namespace umbraco.editorControls.macrocontainer
 {
-    //[ClientDependency(100, ClientDependencyType.Javascript, "webservices/MacroContainerService.asmx/js", "UmbracoRoot")]
+    [ClientDependency(100, ClientDependencyType.Javascript, "webservices/MacroContainerService.asmx/js", "UmbracoRoot", ForceProvider = "CanvasProvider")]
     public class Editor : UpdatePanel, IDataEditor
     {
          private IData _data;

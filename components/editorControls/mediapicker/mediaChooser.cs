@@ -3,6 +3,8 @@ using System.Web.UI;
 
 using umbraco.cms.presentation.Trees;
 using ClientDependency.Core;
+using umbraco.presentation;
+using ClientDependency.Core.Controls;
 namespace umbraco.editorControls
 {
     /// <summary>
@@ -10,7 +12,7 @@ namespace umbraco.editorControls
     /// </summary>
     [ClientDependency(100, ClientDependencyType.Css, "js/submodal/submodal.css", "UmbracoRoot")]
 	[ClientDependency(101, ClientDependencyType.Javascript, "js/submodal/common.js", "UmbracoRoot")]
-	[ClientDependency(102, ClientDependencyType.Javascript, "js/submodal/submodal.js", "UmbracoRoot", InvokeJavascriptMethodOnLoad = "initPopUp")]   
+	[ClientDependency(102, ClientDependencyType.Javascript, "js/submodal/submodal.js", "UmbracoRoot", InvokeJavascriptMethodOnLoad = "initPopUp")]	
 	[ValidationProperty("Value")]
     public class mediaChooser : System.Web.UI.WebControls.HiddenField, interfaces.IDataEditor
     {
@@ -70,7 +72,10 @@ namespace umbraco.editorControls
             base.OnLoad(e);           	
 
             // We need to make sure we have a reference to the legacy ajax calls in the scriptmanager
-            presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
+			if (!UmbracoContext.Current.LiveEditingContext.Enabled)
+				presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
+			else
+				ClientDependencyLoader.Instance.RegisterDependency("webservices/legacyAjaxCalls.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
 
             // And a reference to the media picker calls 
             ScriptManager sm = ScriptManager.GetCurrent(base.Page);

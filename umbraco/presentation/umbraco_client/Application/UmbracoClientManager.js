@@ -16,6 +16,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
             _debug: false,
             _mainTree: null,
+            _appActions: null,
             _rootPath: "/umbraco", //this is the default
 
 
@@ -40,7 +41,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 /// </summary>
 
                 if (this._mainTree == null) {
-                    if (this.mainWindow().jQuery(".umbTree").UmbracoTreeAPI() == null) {
+                    if (this.mainWindow().jQuery == null
+                        || this.mainWindow().jQuery(".umbTree").length == 0
+                        || this.mainWindow().jQuery(".umbTree").UmbracoTreeAPI() == null) {
+
                         this._mainTree = $("<div id='falseTree' />").appendTo("body").hide().UmbracoTree({
                             uiKeys: this.uiKeys(),
                             jsonFullMenu: {},
@@ -59,12 +63,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 /// Returns a reference to the application actions object
                 /// </summary>
 
-                //TODO: If there is no main window, we need to go retrieve the appActions from the server!
-                if (typeof this.mainWindow().appActions == 'undefined') {
-                    var w = this.mainWindow();
-                    w.appActions = new Umbraco.Application.Actions();
+                //if the main window has no actions, we'll create some
+                if (this._appActions == null) {
+                    if (typeof this.mainWindow().appActions == 'undefined') {
+                        this._appActions = new Umbraco.Application.Actions();
+                    }
+                    else this._appActions = this.mainWindow().appActions;
                 }
-                return this.mainWindow().appActions;
+                return this._appActions;
             },
             uiKeys: function() {
                 /// <summary>
@@ -100,7 +106,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     }
 
                     this._debug("contentFrame: parsed location: " + strLocation);
-                    
+
                     this.mainWindow().right.location.href = strLocation;
                 }
             },
