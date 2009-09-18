@@ -78,11 +78,18 @@ namespace umbraco.editorControls
 				ClientDependencyLoader.Instance.RegisterDependency("webservices/legacyAjaxCalls.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
 
             // And a reference to the media picker calls 
-            ScriptManager sm = ScriptManager.GetCurrent(base.Page);
-            ServiceReference webservicePath = new ServiceReference(GlobalSettings.Path + "/webservices/MediaPickerService.asmx");
+            if (!UmbracoContext.Current.LiveEditingContext.Enabled)
+            {
+                ScriptManager sm = ScriptManager.GetCurrent(base.Page);
+                ServiceReference webservicePath = new ServiceReference(GlobalSettings.Path + "/webservices/MediaPickerService.asmx");
 
-            if (!sm.Services.Contains(webservicePath))
-                sm.Services.Add(webservicePath);
+                if (!sm.Services.Contains(webservicePath))
+                    sm.Services.Add(webservicePath);
+            }
+            else
+            {
+                ClientDependencyLoader.Instance.RegisterDependency("webservices/MediaPickerService.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
+            }
         }
 
         protected override void Render(System.Web.UI.HtmlTextWriter writer)
