@@ -12,10 +12,12 @@ using System.Text.RegularExpressions;
 using ClientDependency.Core;
 using System.Web;
 using ClientDependency.Core.Controls;
+using umbraco.presentation;
 
 namespace umbraco.editorControls.macrocontainer
 {
 
+    [ClientDependency(100, ClientDependencyType.Javascript, "js/sortable/jquery-ui-1.7.2.custom.min.js", "UmbracoRoot")]
     public class Editor : UpdatePanel, IDataEditor
     {
          private IData _data;
@@ -43,7 +45,12 @@ namespace umbraco.editorControls.macrocontainer
              
  
              base.Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "subModal", "<script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/submodal/common.js\"></script><script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/submodal/subModal.js\"></script><link href=\"" + GlobalSettings.Path + "/js/submodal/subModal.css\" type=\"text/css\" rel=\"stylesheet\"></link>");
-             ajaxHelpers.EnsureLegacyCalls(base.Page);
+
+             if (!UmbracoContext.Current.LiveEditingContext.Enabled)
+                 presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
+             else
+                 ClientDependencyLoader.Instance.RegisterDependency("webservices/legacyAjaxCalls.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
+
 
 
            
@@ -160,16 +167,22 @@ namespace umbraco.editorControls.macrocontainer
              base.OnLoad(e);
 
              // And a reference to the macro container calls 
-             ScriptManager sm = ScriptManager.GetCurrent(base.Page);
-             ServiceReference webservicePath = new ServiceReference(GlobalSettings.Path + "/webservices/MacroContainerService.asmx");
+             if (!UmbracoContext.Current.LiveEditingContext.Enabled)
+             {
+                 ScriptManager sm = ScriptManager.GetCurrent(base.Page);
+                 ServiceReference webservicePath = new ServiceReference(GlobalSettings.Path + "/webservices/MacroContainerService.asmx");
 
-             if (!sm.Services.Contains(webservicePath))
-                 sm.Services.Add(webservicePath);
+                 if (!sm.Services.Contains(webservicePath))
+                     sm.Services.Add(webservicePath);
+             }
+             else
+             {
+                 ClientDependencyLoader.Instance.RegisterDependency("webservices/MacroContainerService.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
+             }
 
 
-
-             ClientDependencyLoader.Instance.RegisterDependency("js/sortable/jquery-ui-1.7.2.custom.min.js",
-                    "UmbracoRoot", ClientDependencyType.Javascript);
+             //ClientDependencyLoader.Instance.RegisterDependency("js/sortable/jquery-ui-1.7.2.custom.min.js",
+             //       "UmbracoRoot", ClientDependencyType.Javascript);
             
 
 
