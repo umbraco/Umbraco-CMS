@@ -64,6 +64,20 @@
 	margin-top:2px;
 }
 
+/* renaming */
+.tree-umbraco li div.renaming 
+{
+	padding: 0px 2px 0px 12px;
+	background: #D5EFFC;
+	border:1px solid #99DEFD;
+	-moz-border-radius: 2px;
+}
+.tree-umbraco li div.renaming input
+{
+	border:0px;
+	font-size: 11px;
+}
+
 /* OVERRIDE TREE_COMPONENT.css */
 .tree-umbraco li
 {

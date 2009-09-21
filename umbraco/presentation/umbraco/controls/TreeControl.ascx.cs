@@ -23,6 +23,12 @@ namespace umbraco.presentation.umbraco.controls
 	public partial class TreeControl : System.Web.UI.UserControl
 	{
 
+		protected override void OnInit(EventArgs e)
+		{
+			base.OnInit(e);
+			EnableViewState = false;
+		}
+
 		public enum TreeMode
 		{
 			Standard, Checkbox, InheritedCheckBox

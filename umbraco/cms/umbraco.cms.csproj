@@ -139,9 +139,43 @@
     <Compile Include="Actions\Action.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Actions\defaultActions.cs">
+    <Compile Include="Actions\ActionAssignDomain.cs" />
+    <Compile Include="Actions\ActionAudit.cs" />
+    <Compile Include="Actions\ActionBrowse.cs" />
+    <Compile Include="Actions\ActionCodeExport.cs" />
+    <Compile Include="Actions\ActionCopy.cs" />
+    <Compile Include="Actions\ActionDelete.cs" />
+    <Compile Include="Actions\ActionDisable.cs" />
+    <Compile Include="Actions\ActionEmptyTranscan.cs" />
+    <Compile Include="Actions\ActionExport.cs" />
+    <Compile Include="Actions\ActionImport.cs" />
+    <Compile Include="Actions\ActionLiveEdit.cs" />
+    <Compile Include="Actions\ActionMove.cs" />
+    <Compile Include="Actions\ActionNew.cs" />
+    <Compile Include="Actions\ActionNewFolder.cs" />
+    <Compile Include="Actions\ActionNotify.cs" />
+    <Compile Include="Actions\ActionNull.cs" />
+    <Compile Include="Actions\ActionPackage.cs" />
+    <Compile Include="Actions\ActionPackageCreate.cs" />
+    <Compile Include="Actions\ActionProtect.cs" />
+    <Compile Include="Actions\ActionPublish.cs" />
+    <Compile Include="Actions\ActionQuit.cs" />
+    <Compile Include="Actions\ActionRefresh.cs" />
+    <Compile Include="Actions\ActionRePublish.cs" />
+    <Compile Include="Actions\ActionRights.cs" />
+    <Compile Include="Actions\ActionRollback.cs" />
+    <Compile Include="Actions\ActionSave.cs" />
+    <Compile Include="Actions\ActionSendToTranslate.cs" />
+    <Compile Include="Actions\ActionSort.cs" />
+    <Compile Include="Actions\ActionToPublish.cs" />
+    <Compile Include="Actions\ActionTranslate.cs" />
+    <Compile Include="Actions\ActionTreeEditMode.cs" />
+    <Compile Include="Actions\ActionUpdate.cs" />
+    <Compile Include="Actions\ContextMenuSeperator.cs" />
+    <Compile Include="Actions\ActionUnPublish.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Actions\IActionHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

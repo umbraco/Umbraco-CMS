@@ -24,12 +24,19 @@ Umbraco.Application.Actions = function() {
 
         addEventHandler: function(fnName, fn) {
             /// <summary>Adds an event listener to the event name event</summary>
-            if (typeof(jQuery)!="undefined") jQuery(this).bind(fnName, fn); //if there's no jQuery, there is no events
+            if (typeof (jQuery) != "undefined") jQuery(this).bind(fnName, fn); //if there's no jQuery, there is no events
         },
 
         removeEventHandler: function(fnName, fn) {
             /// <summary>Removes an event listener to the event name event</summary>
             if (typeof (jQuery) != "undefined") jQuery(this).unbind(fnName, fn); //if there's no jQuery, there is no events
+        },
+
+        showSpeachBubble: function(ico, hdr, msg) {
+            if (typeof (UmbClientMgr.mainWindow().UmbSpeechBubble) != "undefined") {
+                UmbClientMgr.mainWindow().UmbSpeechBubble.ShowMessage(ico, hdr, msg);
+            }
+            else alert(msg);
         },
 
         launchHelp: function(lang, userType) {
@@ -137,6 +144,11 @@ Umbraco.Application.Actions = function() {
 
         openDashboard: function(whichApp) {
             UmbClientMgr.contentFrame('dashboard.aspx?app=' + whichApp);
+        },
+
+        actionTreeEditMode: function() {
+            /// <summary></summary>
+            UmbClientMgr.mainTree().toggleEditMode(true);
         },
 
         actionSort: function() {

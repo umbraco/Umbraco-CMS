@@ -44,14 +44,15 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _umb_clientFolderRoot: "/umbraco_client", //this should be set externally!!!
             _fullMenu: null,
             _initNode: null,
-            _menuActions: null,
+            _appActions: null,
             _tree: null, //reference to the jsTree object
             _uiKeys: null,
             _container: null,
             _app: null, //the reference to the current app
             _showContext: true,
+            _isEditMode: false,
             _isDialog: false,
-            _isDebug: false, //set to true to enable alert debugging
+            _isDebug: true, //set to true to enable alert debugging
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
             _serviceUrl: "", //a path to the tree client service url
             _dataUrl: "", //a path to the tree data service url
@@ -91,6 +92,20 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 }
             },
 
+            toggleEditMode: function(enable) {
+                this._debug("Edit mode. Currently: " + this._tree.settings.rules.draggable);
+                this._isEditMode = enable;
+                
+                this.saveTreeState(this._app);
+                //need to trick the system so it thinks it's a different app, then rebuild with new rules
+                var app = this._app;
+                this._app = "temp";
+                this.rebuildTree(app);
+                
+                this._debug("Edit mode. New Mode: " + this._tree.settings.rules.draggable);
+                this._appActions.showSpeachBubble("info", "Tree Edit Mode", "The tree is now operating in edit mode");
+            },
+
             rebuildTree: function(app) {
                 /// <summary>This will rebuild the tree structure for the application specified</summary>
 
@@ -121,6 +136,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     this._initNode = saveData.d;
                     this._tree = $.tree_create();
                     this._tree.init(this._container, this._getInitOptions());
+                    this._tree.rename = this._umbracoRename; //replaces the jsTree rename method
 
                     this._configureNodes(this._container.find("li"), true);
                     //select the last node
@@ -170,6 +186,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         _this._initNode = eval(msg.json);
                         _this._tree = $.tree_create();
                         _this._tree.init(_this._container, _this._getInitOptions());
+                        _this._tree.rename = _this._umbracoRename; //replaces the jsTree rename method
                         _this._container.show();
                         _this._loadChildNodes(_this._container.find("li:first"), null);
                         _this._currentAJAXRequest = false;
@@ -198,7 +215,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     return;
                 }
 
-                var treeData = this._tree.getJSON(null, ["id", "umb:type", "class"], ["umb:nodedata", "href", "class", "style"]);
+                var treeData = this._tree.getJSON(null, ["id", "umb:type", "class", "rel"], ["umb:nodedata", "href", "class", "style"]);
 
                 //need to update the 'state' of the data. jsTree getJSON doesn't return the state of nodes (yet)!
                 this._updateJSONNodeState(treeData);
@@ -341,16 +358,19 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             },
 
             selectNode: function(node, supressEvent, reselect) {
-                /// <summary>Makes the selected node the active node, but only if it is not already selected or if reselect is true</summary>
+                /// <summary>
+                /// Makes the selected node the active node, but only if it is not already selected or if reselect is true.            
+                /// </summary>
                 /// <param name="supressEvent">If set to true, will select the node but will supress the onSelected event</param>
                 /// <param name="reselect">If set to true, will call the select_branch method even if the node is already selected</param>
 
-                this._debug("selectNode");
+            
+                this._debug("selectNode, edit mode? " + this._isEditMode);
 
                 var selectedId = this._tree.selected != null ? $(this._tree.selected[0]).attr("id") : null;
                 if (reselect || (selectedId == null || selectedId != node.attr("id"))) {
                     //if we don't wan the event to fire, we'll set the callback to a null method and set it back after we call the select_branch method
-                    if (supressEvent) {
+                    if (supressEvent || this._isEditMode) {
                         this._tree.settings.callback.onselect = function() { };
                     }
                     this._tree.select_branch(node);
@@ -358,6 +378,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     var _this = this;
                     this._tree.settings.callback.onselect = function(N, T) { _this.onSelect(N, T) };
                 }
+                
             },
 
             reloadActionNode: function(supressSelect, supressChildReload, callback) {
@@ -481,21 +502,30 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             },
 
             onSelect: function(NODE, TREE_OBJ) {
-                /// <summary>Fires the JS associated with the node</summary>
+                /// <summary>Fires the JS associated with the node, if the tree is in edit mode, allows for rename instead</summary>
+                
+                this._debug("onSelect, edit mode? " + this._isEditMode);
+                 if (this._isEditMode) {
+                    this._tree.rename(NODE);
+                    return false;
+                }
+                else {
+                    this.setActiveTreeType($(NODE).attr("umb:type"));
+                    var js = $(NODE).children("a").attr("href").replace("javascript:", "");
 
-                this.setActiveTreeType($(NODE).attr("umb:type"));
-                var js = $(NODE).children("a").attr("href").replace("javascript:", "");
+                    this._debug("onSelect: js: " + js);
 
-                this._debug("onSelect: js: " + js);
+                    try {
+                        var func = eval(js);
+                        if (func != null) {
+                            func.call();
+                        }
+                    } catch (e) { }
 
-                try {
-                    var func = eval(js);
-                    if (func != null) {
-                        func.call();
-                    }
-                } catch (e) { }
-
-                return true;
+                    return true;
+                }
+                
+                
             },
 
             onOpen: function(NODE, TREE_OBJ) {
@@ -603,7 +633,48 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     this._checkContextMenu(TREE_OBJ);
                 }
             },
-
+                
+            onBeforeMove: function(NODE,REF_NODE,TYPE,TREE_OBJ) {
+                /// <summary>
+                /// First, check if it's a move or a sort
+                /// Second, check for move or sort permissions, depending on the request 
+                /// Third, 
+                /// </summary>
+    
+                var nodeDef = this._getNodeDef($(NODE));
+                var nodeParent = nodeDef.jsNode.parents("li:first");
+                var nodeParentDef = this._getNodeDef(nodeParent);
+                
+                var refNodeDef = this._getNodeDef($(REF_NODE));
+                
+                this._debug("onBeforeMove, TYPE: " + TYPE);                
+                this._debug("onBeforeMove, NODE ID: " + nodeDef.nodeId);
+                this._debug("onBeforeMove, PARENT NODE ID: " + nodeParentDef.nodeId);
+                this._debug("onBeforeMove, REF NODE ID: " + refNodeDef.nodeId);
+                
+                switch(TYPE){
+                    case "inside":
+                        if (nodeParentDef.nodeId == refNodeDef.nodeId) {
+                            //moving to the same node!
+                            this._appActions.showSpeachBubble("warning", "Tree Edit Mode", "Cannot move a node to it's same parent node");
+                            return false;
+                        }
+                        //check move permissions, then attempt move
+                        
+                        break;
+                    case "before":
+                        //if (nodeParentDef.nodeId == nodeDef.
+                        break;
+                    case "after":
+                        break;
+                }
+                
+                
+                //this._currentAJAXRequest = true; 
+                
+                return false;
+            },
+            
             _checkContextMenu: function(TREE_OBJ, count) {
                 /// <summary>
                 /// we need to check if the menu is too low in the browser.
@@ -827,7 +898,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 this._fullMenu = jFullMenu;
                 this._initNode = jInitNode;
-                this._menuActions = appActions;
+                this._appActions = appActions;
                 this._uiKeys = uiKeys;
                 this._app = app;
                 this._showContext = showContext;
@@ -839,19 +910,20 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._recycleBinId = recycleBinId;
 
                 //wire up event handlers
-                if (this._menuActions != null) {
+                if (this._appActions != null) {
                     var _this = this;
                     //wrapped functions maintain scope
-                    this._menuActions.addEventHandler("nodeDeleting", function(E) { _this.onNodeDeleting(E) });
-                    this._menuActions.addEventHandler("nodeDeleted", function(E) { _this.onNodeDeleted(E) });
-                    this._menuActions.addEventHandler("nodeRefresh", function(E) { _this.onNodeRefresh(E) });
+                    this._appActions.addEventHandler("nodeDeleting", function(E) { _this.onNodeDeleting(E) });
+                    this._appActions.addEventHandler("nodeDeleted", function(E) { _this.onNodeDeleted(E) });
+                    this._appActions.addEventHandler("nodeRefresh", function(E) { _this.onNodeRefresh(E) });
                 }
 
                 //initializes the jsTree
                 this._container = treeContainer;
                 this._tree = $.tree_create();
                 this._tree.init(this._container, this._getInitOptions());
-
+                this._tree.rename = this._umbracoRename; //replaces the jsTree rename method
+                
                 //add this app to the loaded apps array
                 if ($.inArray(app, this._loadedApps) == -1) {
                     this._loadedApps.push(app);
@@ -860,6 +932,58 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 //load child nodes of the init node
                 this._loadChildNodes(this._container.find("li:first"), null);
             },
+
+            _umbracoRename : function (obj) {
+                /// <summary>A modified version of the original jsTree rename method. We need to use our own since
+                /// we've modified the rendering so much. This method replaces the tree rename method.
+                /// 'this' in this method context is jsTree.
+                /// </summary>
+				if(this.locked) return this.error("LOCKED");
+				obj = obj ? this.get_node(obj) : this.selected;
+				var _this = this;
+				if(!obj || !obj.size()) return this.error("RENAME: NO NODE SELECTED");
+				if(!this.check("renameable", obj)) return this.error("RENAME: NODE NOT RENAMABLE");
+				if(!this.settings.callback.beforerename.call(null,obj.get(0), _this.current_lang, _this)) return this.error("RENAME: STOPPED BY USER");
+
+				obj.parents("li.closed").each(function () { _this.open_branch(this) });
+				//if(this.current_lang)	obj = obj.find("a." + this.current_lang).get(0);
+				//else					obj = obj.find("a:first").get(0);
+				obj = obj.find("a:first div");				
+				last_value = obj.html();
+				_this.inp = $("<input type='text' autocomplete='off' />");
+				_this.inp
+					.val(last_value.replace(/&amp;/g,"&").replace(/&gt;/g,">").replace(/&lt;/g,"<"))
+					.bind("mousedown",		function (event) { event.stopPropagation(); })
+					.bind("mouseup",		function (event) { event.stopPropagation(); })
+					.bind("click",			function (event) { event.stopPropagation(); })
+					.bind("keyup",			function (event) { 
+							var key = event.keyCode || event.which;
+							if(key == 27) { this.value = last_value; this.blur(); return }
+							if(key == 13) { this.blur(); return }
+						});
+				// Rollback
+				var rb = {}; 
+				rb[this.container.attr("id")] = this.get_rollback();
+					
+				
+				var spn = $("<div />").addClass($(obj).parent().attr("class")).addClass("renaming").append(_this.inp);
+				spn.attr("style", $(obj).attr("style"));
+				obj.parent().hide();
+				
+				obj.parents("li:first").prepend(spn);
+				//_this.inp.get(0).focus();
+				//_this.inp.get(0).select();
+				
+//				_this.inp.blur(function(event) {
+//						if(this.value == "") this.value = last_value; 
+//						var li = obj.parents("li:first")
+//						obj.html(li.find("input").val());
+//						obj.parent().show(); 
+//						li.find("div.renaming").remove(); 
+//						_this.settings.callback.onrename.call(null, _this.get_node(li).get(0), _this.current_lang, _this, rb);
+//						_this.inp = false;
+//					});
+			},
 
             _getUrl: function(nodeSource) {
                 /// <summary>Returns the json service url</summary>
@@ -902,11 +1026,13 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     rules: {
                         metadata: "umb:nodedata",
                         creatable: "none",
-                        draggable: "none"
+                        draggable: (!this._isEditMode ? "none" : ["dataNode"]),
+                        
                     },
                     callback: {
                         //wrapped functions maintain scope in callback
                         onrgtclk: function(N, T, E) { _this.onRightClick(N, T, E) },
+                        beforemove  : function(N,RN,TYPE,T) { _this.onBeforeMove(N,RN,TYPE,T) },
                         beforeopen: function(N, T) { _this.onBeforeOpen(N, T) },
                         onopen: function(N, T) { _this.onOpen(N, T) },
                         onselect: function(N, T) { _this.onSelect(N, T) },

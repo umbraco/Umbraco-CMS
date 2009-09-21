@@ -7,6 +7,9 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using System.Collections.Generic;
+using umbraco.interfaces;
+using umbraco.BusinessLogic.Actions;
 
 namespace umbraco.cms.presentation.Trees
 {
@@ -18,6 +21,12 @@ namespace umbraco.cms.presentation.Trees
     {
 
 		public NullTree(string application) : base(application) { }
+
+		protected override void CreateRootNodeActions(ref List<IAction> actions)
+		{
+			actions.Clear();
+			actions.Add(ActionRefresh.Instance);
+		}
 
         public override void RenderJS(ref System.Text.StringBuilder Javascript) { }
 

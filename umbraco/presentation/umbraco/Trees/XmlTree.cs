@@ -679,6 +679,8 @@ namespace umbraco.cms.presentation.Trees
 
 				data.Add("title", node.Text);
 
+				
+
 				//the attributes object fot the tree node link (a) object created
 				Dictionary<string, object> dataAttributes = new Dictionary<string, object>();
 				string cssClass = "";
@@ -723,6 +725,11 @@ namespace umbraco.cms.presentation.Trees
 				Dictionary<string, object> attributes = new Dictionary<string, object>();
 				attributes.Add("id", node.NodeID);
 				attributes.Add("class", string.Join(" ", node.Style.AppliedClasses.ToArray()));
+				
+				if (node.IsRoot)
+					attributes.Add("rel", "rootNode");
+				else
+					attributes.Add("rel", "dataNode");
 
 				//the tree type should always be set, however if some developers have serialized their tree into an XmlTree
 				//then there is no gaurantees that this will be set if they didn't use the create methods of XmlTreeNode.

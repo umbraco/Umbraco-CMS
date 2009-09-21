@@ -36,13 +36,13 @@
 	
 	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="modal/modal.js" PathNameAlias="UmbracoClient" Priority="10" />	
 	<umb:JsInclude ID="JsInclude12" runat="server" FilePath="js/UmbracoSpeechBubbleBackend.js" PathNameAlias="UmbracoRoot"  />	
-	
-	
+		
 	
 	<form id="Form1" method="post" runat="server" style="margin: 0px; padding: 0px">
 	<asp:ScriptManager runat="server" ID="umbracoScriptManager">
 		<Services>
 			<asp:ServiceReference Path="webservices/legacyAjaxCalls.asmx" />
+			<asp:ServiceReference Path="webservices/nodeSorter.asmx" />
 		</Services>
 	</asp:ScriptManager>
 	</form>
