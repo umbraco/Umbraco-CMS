@@ -19,10 +19,10 @@ namespace umbraco.Linq.Core
     /// </remarks>
     /// <typeparam name="TDocType">The type of the DocType.</typeparam>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
-    public abstract class Tree<TDocType> : ITree, IEnumerable<TDocType>, IEnumerable
+    public abstract class Tree<TDocType> : IContentTree, IEnumerable<TDocType>, IEnumerable
         where TDocType : DocTypeBase, new()
     {
-        #region ITree Members
+        #region IContentTree Members
 
         /// <summary>
         /// Gets the <see cref="umbracoDataProvider"/> Provider associated with this instance
@@ -68,5 +68,10 @@ namespace umbraco.Linq.Core
         }
 
         #endregion
+
+        public abstract void InsertOnSubmit(TDocType item);
+        public abstract void InsertAllOnSubmit(IEnumerable<TDocType> items);
+        public abstract void DeleteOnSubmit(TDocType itemm);
+        public abstract void DeleteAllOnSubmit(IEnumerable<TDocType> items);
     }
 }

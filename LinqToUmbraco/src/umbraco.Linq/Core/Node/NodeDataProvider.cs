@@ -21,7 +21,7 @@ namespace umbraco.Linq.Core.Node
     public sealed class NodeDataProvider : UmbracoDataProvider
     {
         private string _xmlPath;
-        private Dictionary<UmbracoInfoAttribute, ITree> _trees;
+        private Dictionary<UmbracoInfoAttribute, IContentTree> _trees;
         private bool _enforceSchemaValidation;
         private XDocument _xml;
         private const string UMBRACO_XSD_PATH = "umbraco.Linq.Core.Node.UmbracoConfig.xsd";
@@ -78,7 +78,7 @@ namespace umbraco.Linq.Core.Node
             }
             this._xmlPath = xmlPath;
 
-            this._trees = new Dictionary<UmbracoInfoAttribute, ITree>();
+            this._trees = new Dictionary<UmbracoInfoAttribute, IContentTree>();
         }
 
         /// <summary>

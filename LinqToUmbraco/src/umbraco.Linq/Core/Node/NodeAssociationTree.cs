@@ -82,5 +82,25 @@ namespace umbraco.Linq.Core.Node
         {
             this.LoadNodes();
         }
+
+        public override void InsertOnSubmit(TDocTypeBase item)
+        {
+            throw new NotImplementedException("The NodeAssociationTree does not support Inserting items");
+        }
+
+        public override void InsertAllOnSubmit(IEnumerable<TDocTypeBase> items)
+        {
+            throw new NotImplementedException("The NodeAssociationTree does not support Inserting items");
+        }
+
+        public override void DeleteOnSubmit(TDocTypeBase itemm)
+        {
+            throw new NotImplementedException("The NodeAssociationTree does not support Deleting items");
+        }
+
+        public override void DeleteAllOnSubmit(IEnumerable<TDocTypeBase> items)
+        {
+            throw new NotImplementedException("The NodeAssociationTree does not support Deleting items");
+        }
     }
 }

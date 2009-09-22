@@ -80,5 +80,10 @@ namespace umbraco.Linq.Core
         }
 
         #endregion
+
+        protected internal virtual void SubmitChanges()
+        {
+            throw new NotImplementedException("Provider \"" + this.Name + "\" does not implement a submittable pattern");
+        }
     }
 }

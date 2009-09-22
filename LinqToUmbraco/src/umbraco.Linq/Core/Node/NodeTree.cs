@@ -91,5 +91,25 @@ namespace umbraco.Linq.Core.Node
             var attr = ReflectionAssistance.GetumbracoInfoAttribute(typeof(TDocTypeBase));
             this._provider.SetupNodeTree<TDocTypeBase>(attr);
         }
+
+        public override void InsertOnSubmit(TDocTypeBase item)
+        {
+            throw new NotImplementedException("The NodeTree does not support Inserting items");
+        }
+
+        public override void InsertAllOnSubmit(IEnumerable<TDocTypeBase> items)
+        {
+            throw new NotImplementedException("The NodeTree does not support Inserting items");
+        }
+
+        public override void DeleteOnSubmit(TDocTypeBase itemm)
+        {
+            throw new NotImplementedException("The NodeTree does not support Deleting items");
+        }
+
+        public override void DeleteAllOnSubmit(IEnumerable<TDocTypeBase> items)
+        {
+            throw new NotImplementedException("The NodeTree does not support Deleting items");
+        }
     }
 }

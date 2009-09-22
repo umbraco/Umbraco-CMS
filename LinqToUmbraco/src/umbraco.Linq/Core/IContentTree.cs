@@ -4,10 +4,10 @@ namespace umbraco.Linq.Core
     /// <summary>
     /// Base of an umbraco content tree
     /// </summary>
-    public interface ITree
+    public interface IContentTree
     {
         /// <summary>
-        /// Gets the <see cref="umbracoDataProvider"/> Provider associated with this instance
+        /// Gets the <see cref="UmbracoDataProvider"/> Provider associated with this instance
         /// </summary>
         /// <value>The provider.</value>
         UmbracoDataProvider Provider { get; }

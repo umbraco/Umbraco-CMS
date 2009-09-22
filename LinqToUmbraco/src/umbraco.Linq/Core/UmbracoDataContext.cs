@@ -41,6 +41,13 @@ namespace umbraco.Linq.Core
             }
         }
 
+        public void SubmitChanges()
+        {
+            this.CheckDisposed();
+
+            this._dataProvider.SubmitChanges();
+        }
+
         #region Constructors
 
         /// <summary>
