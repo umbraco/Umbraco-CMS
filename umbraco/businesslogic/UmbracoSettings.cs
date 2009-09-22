@@ -282,12 +282,8 @@ namespace umbraco
         }
 
         /// <summary>
-        /// Gets a value indicating whether the rich-text script editor should be disabled for editing templates, css, xslt and scripts
-        /// The current editor is based on Codepress (codepress.org) which is not compatible with internet explorer
-        /// The editor is therefor turned off by default and a standard Textarea is used instead
+        /// Enabled or disable the script/code editor
         /// </summary>
-        /// <value><c>true</c> if the scripteditor is disabled; otherwise, <c>false</c>.</value>
-		[Obsolete("This value is no longer used in the Umbraco core")]
         public static bool ScriptDisableEditor
         {
             get

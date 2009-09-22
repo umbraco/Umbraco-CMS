@@ -31,6 +31,10 @@ namespace umbraco.cms.presentation.settings.scripts
             String file = Request.QueryString["file"];
             NameTxt.Text = file;
 
+            //need to change the editor type if it is XML
+            if (file.EndsWith("xml"))
+                editorSource.CodeBase = umbraco.uicontrols.CodeArea.EditorType.XML;
+
             string appPath = Request.ApplicationPath;
             if (appPath == "/")
                 appPath = "";

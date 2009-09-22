@@ -1,0 +1,46 @@
+body {
+  margin: 0;
+  padding: 3em 6em;
+  color: black;
+  max-width: 50em;
+}
+
+h1 {
+  font-size: 22pt;
+}
+
+.underline {
+  border-bottom: 3px solid #C44;
+}
+
+h2 {
+  font-size: 14pt;
+}
+
+p.rel {
+  padding-left: 2em;
+  text-indent: -2em;
+}
+
+div.border {
+  border: 1px solid black;
+  padding: 3px;
+}
+
+code {
+  font-family: courier, monospace;
+  font-size: 90%;
+  color: #144;
+}
+
+pre.code {
+  margin: 1.1em 12px;
+  border: 1px solid #CCCCCC;
+  color: black;
+  padding: .4em;
+  font-family: courier, monospace;
+}
+
+.warn {
+  color: #C00;
+}

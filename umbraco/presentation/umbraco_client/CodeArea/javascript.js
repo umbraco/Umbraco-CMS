@@ -1,13 +1,5 @@
 
-function resizeTextArea(textEditor, offsetX, offsetY) {
-    var clientHeight = getViewportHeight();
-    var clientWidth = getViewportWidth();
 
-    if (textEditor != null) {
-        textEditor.style.width = (clientWidth - offsetX) + "px";
-        textEditor.style.height = (clientHeight - getY(textEditor) - offsetY) + "px";
-    }
-}
 
 
 // Ctrl + S support
@@ -167,78 +159,6 @@ var tab = {
     }
 };
 
-
-
-function insertCode(open, end, txtEl) {
-    var tArea = document.getElementById(txtEl);
-    
-    var sct = tArea.scrollTop;
-    var open = (open) ? open : "";
-    var end = (end) ? end : "";
-    var sl;
-    var isIE = navigator.userAgent.match('MSIE');
-
-    if (isIE != null)
-        isIE = true;
-    else
-        isIE = false;
-
-
-    if (isIE) {
-        //insertAtCaret(tArea, open);
-        
-        tArea.focus();
-        var curSelect = tArea.currRange;
-        
-        
-        if (arguments[3]) {
-            if (end == "") {
-                curSelect.text = open + arguments[3];
-            } else {
-                curSelect.text = open + arguments[3] + curSelect.text + end;
-            }
-        } else {
-            if (end == "") {
-                curSelect.text = open;
-            } else {
-                curSelect.text = open + curSelect.text + end;
-            }
-        }
-
-        curSelect.select();
-        
-    } else if (!isIE && typeof tArea.selectionStart != "undefined") {
-
-        var selStart = tArea.value.substr(0, tArea.selectionStart);
-        var selEnd = tArea.value.substr(tArea.selectionEnd, tArea.value.length);
-        var curSelection = tArea.value.replace(selStart, "").replace(selEnd, "");
-
-        if (arguments[3]) {
-            if (end == "") {
-                sl = selStart + open + arguments[3];
-                tArea.value = sl + selEnd;
-            } else {
-                sl = selStart + open + arguments[3] + curSelection + end;
-                tArea.value = sl + selEnd;
-            }
-        } else {
-        if (end == "") {
-            sl = selStart + open;
-            tArea.value = sl + selEnd;
-            } else {
-            sl = selStart + open + curSelection + end;
-            tArea.value = sl + selEnd;
-            }
-        }
-
-        tArea.setSelectionRange(sl.length, sl.length);
-        tArea.focus();
-        tArea.scrollTop = sct;
-        
-    } else {
-        tArea.value += (arguments[3]) ? open + arguments[3] + end : open + end;
-    }
-}
 
 //////////////////////////////////////
 // CARET funktioner

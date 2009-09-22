@@ -12,8 +12,8 @@
 
     result = '<xsl:value-of select="' + document.getElementById('<%= valueOf.ClientID %>').value + '"' + checked + '/>';
 
-    top.right.focus();
-    top.right.insertCode(result, '', '<%=umbraco.helper.Request("objectId")%>');
+    UmbClientMgr.contentFrame().focus();
+    UmbClientMgr.contentFrame().UmbEditor.Insert(result, '', '<%=umbraco.helper.Request("objectId")%>');
 
     UmbClientMgr.mainWindow().closeModal();
   }

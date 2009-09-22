@@ -1455,6 +1455,32 @@
     <Content Include="umbraco\images\umbraco\bin.png" />
     <Content Include="umbraco\images\umbraco\bin_closed.png" />
     <Content Include="umbraco\images\umbraco\bin_empty.png" />
+    <Content Include="umbraco_client\CodeArea\UmbracoEditor.js" />
+    <Content Include="umbraco_client\CodeArea\resizeTextEditor.js" />
+    <Content Include="umbraco_client\CodeMirror\css\csscolors.css" />
+    <Content Include="umbraco_client\CodeMirror\css\docs.css" />
+    <Content Include="umbraco_client\CodeMirror\css\jscolors.css" />
+    <Content Include="umbraco_client\CodeMirror\css\people.jpg" />
+    <Content Include="umbraco_client\CodeMirror\css\pythoncolors.css" />
+    <Content Include="umbraco_client\CodeMirror\css\sparqlcolors.css" />
+    <Content Include="umbraco_client\CodeMirror\css\xmlcolors.css" />
+    <Content Include="umbraco_client\CodeMirror\js\codemirror.js" />
+    <Content Include="umbraco_client\CodeMirror\js\editor.js" />
+    <Content Include="umbraco_client\CodeMirror\js\highlight.js" />
+    <Content Include="umbraco_client\CodeMirror\js\mirrorframe.js" />
+    <Content Include="umbraco_client\CodeMirror\js\parsecss.js" />
+    <Content Include="umbraco_client\CodeMirror\js\parsedummy.js" />
+    <Content Include="umbraco_client\CodeMirror\js\parsehtmlmixed.js" />
+    <Content Include="umbraco_client\CodeMirror\js\parsejavascript.js" />
+    <Content Include="umbraco_client\CodeMirror\js\parsepython.js" />
+    <Content Include="umbraco_client\CodeMirror\js\parsesparql.js" />
+    <Content Include="umbraco_client\CodeMirror\js\parsexml.js" />
+    <Content Include="umbraco_client\CodeMirror\js\select.js" />
+    <Content Include="umbraco_client\CodeMirror\js\stringstream.js" />
+    <Content Include="umbraco_client\CodeMirror\js\tokenize.js" />
+    <Content Include="umbraco_client\CodeMirror\js\tokenizejavascript.js" />
+    <Content Include="umbraco_client\CodeMirror\js\undo.js" />
+    <Content Include="umbraco_client\CodeMirror\js\util.js" />
     <Content Include="web.config.SHANDEMVAIO.xslt" />
     <Content Include="default.aspx" />
     <Content Include="Global.asax">
@@ -2672,6 +2698,7 @@
     <None Include="umbraco\Trees\XmlTree.xsx">
       <DependentUpon>XmlTree.xsd</DependentUpon>
     </None>
+    <None Include="umbraco_client\CodeMirror\LICENSE" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
     <Content Include="web.config.APOWELL-XP.xslt" />
     <Content Include="web.config.BOMBER.xslt" />

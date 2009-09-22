@@ -20,5 +20,5 @@
       <xsl:apply-templates select="@*"/>
       <xsl:apply-templates/>
     </xsl:copy>
-  </xsl:template>
+  </xsl:template> 
 </xsl:stylesheet>

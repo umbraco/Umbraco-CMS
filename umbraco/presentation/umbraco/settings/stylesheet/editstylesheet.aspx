@@ -6,7 +6,12 @@
   <script type="text/javascript">
 	    
         function doSubmit() {
-          umbraco.presentation.webservices.codeEditorSave.SaveCss(jQuery('#<%= NameTxt.ClientID %>').val(), '<%= NameTxt.Text %>', jQuery('#<%= editorSource.ClientID %>').val(), '<%= Request.QueryString["id"] %>', submitSucces, submitFailure);
+            var codeVal = jQuery('#<%= editorSource.ClientID %>').val();
+            //if CodeMirror is not defined, then the code editor is disabled.
+            if (typeof(CodeMirror) != "undefined") {
+                codeVal = codeEditor.getCode();
+            }
+          umbraco.presentation.webservices.codeEditorSave.SaveCss(jQuery('#<%= NameTxt.ClientID %>').val(), '<%= NameTxt.Text %>', codeVal, '<%= Request.QueryString["id"] %>', submitSucces, submitFailure);
         }
 
         function submitSucces(t) {
@@ -34,7 +39,7 @@
         <asp:Literal ID="lttPath" runat="server"></asp:Literal>
       </cc1:PropertyPanel>
       <cc1:PropertyPanel id="pp_source" runat="server">
-         <cc1:CodeArea id="editorSource" OffSetX="37" OffSetY="54" AutoResize="true" runat="server" />
+         <cc1:CodeArea id="editorSource" CodeBase="Css" ClientSaveMethod="doSubmit" OffSetX="37" OffSetY="54" AutoResize="true" runat="server" />
       </cc1:PropertyPanel>
      </cc1:Pane>
     </cc1:UmbracoPanel>

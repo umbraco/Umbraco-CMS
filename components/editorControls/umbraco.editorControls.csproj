@@ -1,7 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{255F5DF1-4E43-4758-AC05-7A0B68EB021B}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -207,15 +207,9 @@
     <Compile Include="dictionaryPicker\dictionaryPickerDataType.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="dropdownlist\dropdown.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="dropdownlist\DropDownDataType.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="dropdownlist\dropDownKeysDataType.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="dropdownlist\dropdown.cs" />
+    <Compile Include="dropdownlist\DropDownDataType.cs" />
+    <Compile Include="dropdownlist\dropDownKeysDataType.cs" />
     <Compile Include="folderbrowser\DataTypeFolderbrowser.cs">
       <SubType>Code</SubType>
     </Compile>

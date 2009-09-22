@@ -76,10 +76,8 @@
 			  macroString += "></" + macroElement + ">";
 			<%} %>
      
-			top.right.focus();
-			top.right.insertCode(macroString, '', '<%=umbraco.helper.Request("objectId")%>');
-			
-			//top.right.umbracoInsertFieldDo('<%=umbraco.helper.Request("objectId")%>', macroString, '');
+			UmbClientMgr.contentFrame().focus();
+			UmbClientMgr.contentFrame().UmbEditor.Insert(macroString, '', '<%=umbraco.helper.Request("objectId")%>');			
 			UmbClientMgr.mainWindow().closeModal();
 		}
 

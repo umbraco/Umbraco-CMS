@@ -63,9 +63,9 @@
 			  tagString += " />";
 			<%} %>
 			
-			top.right.focus();
-		  //top.right.umbracoInsertFieldDo('<%=umbraco.helper.Request("objectId")%>', tagString, '<%=umbraco.helper.Request("move")%>');
-		  top.right.insertCode(tagString, '', '<%=umbraco.helper.Request("objectId")%>');
+			UmbClientMgr.contentFrame().focus();
+
+		    UmbClientMgr.contentFrame().UmbEditor.Insert(tagString, '', '<%=umbraco.helper.Request("objectId")%>');
 		  	
 		  UmbClientMgr.mainWindow().closeModal();
 		}

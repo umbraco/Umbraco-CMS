@@ -30,7 +30,14 @@
 
         function doSubmit() {
             closeErrorDiv();
-            umbraco.presentation.webservices.codeEditorSave.SaveXslt(jQuery('#<%= xsltFileName.ClientID %>').val(), '<%= xsltFileName.Text %>', jQuery('#<%= editorSource.ClientID %>').val(), document.getElementById('<%= SkipTesting.ClientID %>').checked, submitSucces, submitFailure);
+            
+            var codeVal = jQuery('#<%= editorSource.ClientID %>').val();
+                //if CodeMirror is not defined, then the code editor is disabled.
+                if (typeof(CodeMirror) != "undefined") {
+                    codeVal = codeEditor.getCode();
+                }
+            
+            umbraco.presentation.webservices.codeEditorSave.SaveXslt(jQuery('#<%= xsltFileName.ClientID %>').val(), '<%= xsltFileName.Text %>', codeVal, document.getElementById('<%= SkipTesting.ClientID %>').checked, submitSucces, submitFailure);
         }
 
         function submitSucces(t) {
@@ -48,7 +55,12 @@
         }
 
         function xsltVisualize() {
-            xsltSnippet = jQuery("#ctl00_body_editorSource").getSelection().text;
+            
+        
+            xsltSnippet = UmbEditor.IsSimpleEditor 
+                ?  jQuery("#ctl00_body_editorSource").getSelection().text 
+                    : UmbEditor._editor.selection();
+                    
             if (xsltSnippet == '') {
                 alert('Please select the xslt to visualize');
             }
@@ -76,7 +88,7 @@
                 <div id="errorDiv" style="display: none;" class="error">
                     hest</div>
             </cc1:PropertyPanel>
-            <cc1:CodeArea ID="editorSource" runat="server" AutoResize="true" OffSetX="47" OffSetY="55" />
+            <cc1:CodeArea ID="editorSource" CodeBase="XML" ClientSaveMethod="doSubmit" runat="server" AutoResize="true" OffSetX="47" OffSetY="55" />
         </cc1:Pane>
     </cc1:UmbracoPanel>
 </asp:Content>

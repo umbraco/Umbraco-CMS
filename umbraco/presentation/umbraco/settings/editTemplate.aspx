@@ -5,7 +5,8 @@
 <asp:Content ContentPlaceHolderID="head" runat="server">
   <script language="javascript" type="text/javascript">
         function doSubmit() {
-            umbraco.presentation.webservices.codeEditorSave.SaveTemplate(jQuery('#<%= NameTxt.ClientID %>').val(), jQuery('#<%= AliasTxt.ClientID %>').val(), jQuery('#<%= editorSource.ClientID %>').val(), '<%= Request.QueryString["templateID"] %>', jQuery('#<%= MasterTemplate.ClientID %>').val(), submitSucces, submitFailure);
+            var codeVal = UmbEditor.GetCode();
+            umbraco.presentation.webservices.codeEditorSave.SaveTemplate(jQuery('#<%= NameTxt.ClientID %>').val(), jQuery('#<%= AliasTxt.ClientID %>').val(), codeVal, '<%= Request.QueryString["templateID"] %>', jQuery('#<%= MasterTemplate.ClientID %>').val(), submitSucces, submitFailure);
         }
         
         function submitSucces(t)
@@ -31,7 +32,7 @@
         }
         
         function umbracoTemplateInsertMasterPageContentContainerDo(result) {
-          insertCode(result + '\n', '\n</asp\:Content>\n', '<%= editorSource.ClientID%>');
+          UmbEditor.Insert(result + '\n', '\n</asp\:Content>\n', '<%= editorSource.ClientID%>');
         }
         
         function changeMasterPageFile(){
@@ -63,7 +64,7 @@
         cp += ' runat="server"';
         cp += '>\n\t<!-- Insert "' + id + '" markup here -->';
 
-        insertCode('\n<' + cp, '\n</asp:Content' + '>\n', '<%= editorSource.ClientID %>');
+        UmbEditor.Insert('\n<' + cp, '\n</asp:Content' + '>\n', '<%= editorSource.ClientID %>');
        }
        
        function insertPlaceHolderElement(id){
@@ -72,7 +73,7 @@
         cp += ' runat="server"';
         cp += '>\n\t<!-- Insert default "' + id + '" markup here -->';
 
-        insertCode('\n<' + cp, '\n</asp:ContentPlaceHolder' + '>\n', '<%= editorSource.ClientID %>');
+        UmbEditor.Insert('\n<' + cp, '\n</asp:ContentPlaceHolder' + '>\n', '<%= editorSource.ClientID %>');
        }
         
   </script>
@@ -91,7 +92,7 @@
             <asp:DropDownList ID="MasterTemplate" Width="350px" runat="server" />
         </cc1:PropertyPanel>
         <cc1:PropertyPanel id="pp_source" runat="server">
-            <cc1:CodeArea ID="editorSource" runat="server" AutoResize="true" OffSetX="37" OffSetY="54" CssClass="codepress html" />
+            <cc1:CodeArea ID="editorSource" runat="server" CodeBase="HTML" ClientSaveMethod="doSubmit" AutoResize="true" OffSetX="37" OffSetY="54" CssClass="codepress html" />
         </cc1:PropertyPanel>
       </cc1:Pane>
     </cc1:UmbracoPanel>
