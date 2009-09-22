@@ -12,6 +12,7 @@ namespace umbraco.Linq.Core.Node
     /// <typeparam name="TDocTypeBase">The type of the doc type base.</typeparam>
     public sealed class NodeAssociationTree<TDocTypeBase> : AssociationTree<TDocTypeBase> where TDocTypeBase : DocTypeBase, new()
     {
+        private object lockObject = new object();
         private IEnumerable<TDocTypeBase> _nodes;
 
         internal NodeAssociationTree(IEnumerable<TDocTypeBase> nodes)
@@ -50,12 +51,15 @@ namespace umbraco.Linq.Core.Node
 
             provider.CheckDisposed();
 
-            var rawNodes = provider.Xml.Descendants("node")
-            .Where(x => (int)x.Attribute("id") == this.ParentNodeId)
-            .Single()
-            .Elements("node")
-            ;
-            this._nodes = provider.DynamicNodeCreation(rawNodes).Cast<TDocTypeBase>(); //drop is back to the type which was asked for
+            lock (lockObject)
+            {
+                var rawNodes = provider.Xml.Descendants("node")
+                    .Where(x => (int)x.Attribute("id") == this.ParentNodeId)
+                    .Single()
+                    .Elements("node")
+                    ;
+                this._nodes = provider.DynamicNodeCreation(rawNodes).Cast<TDocTypeBase>(); //drop is back to the type which was asked for 
+            }
         }
 
         /// <summary>

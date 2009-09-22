@@ -12,6 +12,8 @@ namespace umbraco.Linq.Core.Node
     /// <typeparam name="TDocTypeBase">The type of the doc type base.</typeparam>
     public sealed class NodeTree<TDocTypeBase> : Tree<TDocTypeBase> where TDocTypeBase : DocTypeBase, new()
     {
+        private object lockObject = new object();
+
         private NodeDataProvider _provider;
 
         private List<TDocTypeBase> _nodes;
@@ -67,15 +69,18 @@ namespace umbraco.Linq.Core.Node
                 this._nodes = new List<TDocTypeBase>();
                 var rawNodes = this._provider.Xml.Descendants("node").Where(x => ReflectionAssistance.CompareByAlias(typeof(TDocTypeBase), x));
 
-                foreach (XElement n in rawNodes)
+                lock (lockObject)
                 {
-                    var dt = new TDocTypeBase();
-                    dt.LoadFromXml(n);
+                    foreach (XElement n in rawNodes)
+                    {
+                        var dt = new TDocTypeBase();
+                        dt.LoadFromXml(n);
 
-                    dt.IsDirty = false;
-                    dt.Provider = this._provider;
+                        dt.IsDirty = false;
+                        dt.Provider = this._provider;
 
-                    this._nodes.Add(dt);
+                        this._nodes.Add(dt);
+                    }
                 }
             }
             return this._nodes.GetEnumerator();

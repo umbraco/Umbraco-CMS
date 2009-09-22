@@ -1,5 +1,4 @@
 using System;
-using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -23,7 +22,6 @@ using umbraco.cms.helpers;
 using umbraco.presentation.cache;
 using umbraco.scripting;
 using umbraco.DataLayer;
-using umbraco.presentation.templateControls;
 using System.Web.Security;
 using umbraco.cms.businesslogic.language;
 
@@ -1291,22 +1289,29 @@ namespace umbraco
             if (p != null)
             {
 
-                System.Web.UI.HtmlControls.HtmlGenericControl include = new System.Web.UI.HtmlControls.HtmlGenericControl("script");
-                include.ID = key;
-                include.Attributes.Add("type", "text/javascript");
-                include.Attributes.Add("src", url);
-
-                if (p.Header != null)
+                if (ClientDependency.Core.Controls.ClientDependencyLoader.Instance == null)
                 {
-                    if (p.Header.FindControl(key) == null)
+                    System.Web.UI.HtmlControls.HtmlGenericControl include = new System.Web.UI.HtmlControls.HtmlGenericControl("script");
+                    include.ID = key;
+                    include.Attributes.Add("type", "text/javascript");
+                    include.Attributes.Add("src", url);
+
+                    if (p.Header != null)
                     {
-                        p.Header.Controls.Add(include);
+                        if (p.Header.FindControl(key) == null)
+                        {
+                            p.Header.Controls.Add(include);
+                        }
+                    }
+                    else
+                    {
+                        //This is a fallback in case there is no header
+                        p.ClientScript.RegisterClientScriptInclude(p.GetType(), key, url);
                     }
                 }
                 else
                 {
-                    //This is a fallback in case there is no header
-                    p.ClientScript.RegisterClientScriptInclude(p.GetType(), key, url);
+                    ClientDependency.Core.Controls.ClientDependencyLoader.Instance.RegisterDependency(url, ClientDependency.Core.ClientDependencyType.Javascript);
                 }
             }
         }
@@ -1317,7 +1322,7 @@ namespace umbraco
         /// </summary>
         public static void AddJquery()
         {
-            RegisterJavaScriptFile("jQuery", String.Format("{0}_client/ui/jquery.js", GlobalSettings.Path));
+            RegisterJavaScriptFile("jQuery", String.Format("{0}/ui/jquery.js", GlobalSettings.ClientPath));
         }
 
 

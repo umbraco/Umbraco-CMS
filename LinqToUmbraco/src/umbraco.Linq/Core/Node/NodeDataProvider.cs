@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.IO;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using System.Xml;
 
 namespace umbraco.Linq.Core.Node
 {
@@ -20,6 +21,7 @@ namespace umbraco.Linq.Core.Node
     /// </remarks>
     public sealed class NodeDataProvider : UmbracoDataProvider
     {
+        private object lockObject = new object();
         private string _xmlPath;
         private Dictionary<UmbracoInfoAttribute, IContentTree> _trees;
         private bool _enforceSchemaValidation;
@@ -27,13 +29,30 @@ namespace umbraco.Linq.Core.Node
         private const string UMBRACO_XSD_PATH = "umbraco.Linq.Core.Node.UmbracoConfig.xsd";
         private Dictionary<string, Type> _knownTypes;
 
+        private bool _tryMemoryCache = false;
+
         internal XDocument Xml
         {
             get
             {
                 if (this._xml == null)
                 {
-                    this._xml = XDocument.Load(this._xmlPath);
+                    if (this._tryMemoryCache)
+                    {
+                        var doc = content.Instance.XmlContent;
+                        if (doc != null)
+                        {
+                            this._xml = XDocument.Load(new XmlNodeReader(doc));
+                        }
+                        else
+                        {
+                            this._xml = XDocument.Load(this._xmlPath);
+                        }
+                    }
+                    else
+                    {
+                        this._xml = XDocument.Load(this._xmlPath);
+                    }
 
                     if (this._enforceSchemaValidation)
                     {
@@ -87,6 +106,7 @@ namespace umbraco.Linq.Core.Node
         public NodeDataProvider()
             : this(umbraco.presentation.UmbracoContext.Current.Server.MapPath(umbraco.presentation.UmbracoContext.Current.Server.ContentXmlPath))
         {
+            this._tryMemoryCache = true;
         }
 
         /// <summary>
@@ -179,7 +199,10 @@ namespace umbraco.Linq.Core.Node
             var tree = new NodeTree<TDocType>(this);
             if (!this._trees.ContainsKey(attr))
             {
-                this._trees.Add(attr, tree); //cache so it's faster to get next time 
+                lock (lockObject)
+                {
+                    this._trees.Add(attr, tree); //cache so it's faster to get next time  
+                }
             }
             else
             {
@@ -306,6 +329,17 @@ namespace umbraco.Linq.Core.Node
 
                 return this._knownTypes;
             }
+        }
+
+        /// <summary>
+        /// Flushes the cache for this provider
+        /// </summary>
+        public void Flush()
+        {
+            this.CheckDisposed();
+
+            this._xml = null;
+            this._trees.Clear();
         }
     }
 }
