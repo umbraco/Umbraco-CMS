@@ -62,11 +62,11 @@ namespace umbraco.uicontrols {
             if (!UmbracoSettings.ScriptDisableEditor)
             {
                 ClientDependencyLoader.Instance.RegisterDependency("CodeMirror/js/codemirror.js", "UmbracoClient", ClientDependencyType.Javascript);
+                ClientDependencyLoader.Instance.RegisterDependency("CodeArea/styles.css", "UmbracoClient", ClientDependencyType.Css);
             }
-            //else
-            //{
-                ClientDependencyLoader.Instance.RegisterDependency("CodeArea/javascript.js", "UmbracoClient", ClientDependencyType.Javascript);
-            //}
+            
+            ClientDependencyLoader.Instance.RegisterDependency("CodeArea/javascript.js", "UmbracoClient", ClientDependencyType.Javascript);
+        
         }
 
         protected override void CreateChildControls()
@@ -135,12 +135,14 @@ namespace umbraco.uicontrols {
             }
             else
             {
+                UpdateCodeValueValidator.RenderControl(writer);
+                CodeEditorValue.RenderControl(writer);
+                
                 writer.WriteBeginTag("div");
                 writer.WriteAttribute("id", this.ClientID);
                 writer.WriteAttribute("class", this.CssClass);
                 this.ControlStyle.AddAttributesToRender(writer);
-                UpdateCodeValueValidator.RenderControl(writer);
-                CodeEditorValue.RenderControl(writer);
+                writer.Write(HtmlTextWriter.TagRightChar);            
                 CodeTextBox.RenderControl(writer);
                 writer.WriteEndTag("div");
 
@@ -151,13 +153,21 @@ namespace umbraco.uicontrols {
 
             if (this.AutoResize)
             {
+                if (!UmbracoSettings.ScriptDisableEditor)
+                {
+                    //reduce the width if using code mirror because of the line numbers
+                    OffSetX += 20;
+                }
+
                 jsEventCode += @"                    
 
                     //create the editor
                    var UmbEditor = new Umbraco.Controls.CodeEditor.UmbracoEditor(" + UmbracoSettings.ScriptDisableEditor.ToString().ToLower() + @", '" + this.ClientID + @"');
 
 
-                    var m_textEditor = document.getElementById('" + this.ClientID +@"');
+                    var m_textEditor = jQuery('#" + this.ClientID + @"');
+                    //with codemirror adding divs for line numbers, we need to target a different element
+                    m_textEditor = m_textEditor.find('iframe').length > 0 ? m_textEditor.children('div').get(0) : m_textEditor.get(0);
                     jQuery(window).resize(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
             		jQuery(document).ready(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
                     ";
@@ -188,29 +198,29 @@ namespace umbraco.uicontrols {
         {
 
             string[] parserFiles = new string[] { "tokenizejavascript.js", "parsejavascript.js" };
-            string[] cssFile = new string[] { "jscolors.css" };
+            string[] cssFile = new string[] { "jscolors.css", "umbracoCustom.css" };
 
             switch (CodeBase)
             {
                 case EditorType.JavaScript:
                     parserFiles = new string[] { "tokenizejavascript.js", "parsejavascript.js" };
-                    cssFile = new string[] { "jscolors.css" };
+                    cssFile = new string[] { "jscolors.css", "umbracoCustom.css" };
                     break;
                 case EditorType.Css:
                     parserFiles = new string[] { "parsecss.js" };
-                    cssFile = new string[] { "csscolors.css" };
+                    cssFile = new string[] { "csscolors.css", "umbracoCustom.css" };
                     break;
                 case EditorType.Python:
                     parserFiles = new string[] { "parsepython.js" };
-                    cssFile = new string[] { "pythoncolors.css" };
+                    cssFile = new string[] { "pythoncolors.css", "umbracoCustom.css" };
                     break;
                 case EditorType.XML:
                     parserFiles = new string[] { "parsexml.js" };
-                    cssFile = new string[] { "xmlcolors.css" };
+                    cssFile = new string[] { "xmlcolors.css", "umbracoCustom.css" };
                     break;
                 case EditorType.HTML:
                     parserFiles = new string[] { "parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js" };
-                    cssFile = new string[] { "xmlcolors.css", "jscolors.css", "csscolors" };
+                    cssFile = new string[] { "xmlcolors.css", "jscolors.css", "csscolors", "umbracoCustom.css" };
                     break;
             }
 
@@ -227,8 +237,9 @@ namespace umbraco.uicontrols {
                               var codeEditor = new CodeMirror(CodeMirror.replace(textarea), {
                                 width: ""100%"",
                                 height: ""100%"",
-                                tabMode: ""spaces"",
+                                tabMode: ""shift"",
                                 textWrapping: false,
+                                lineNumbers: true,
                                 parserfile: [" + string.Join(",",
                                                parserFiles
                                                     .Select(x => string.Format(@"""{0}""", x))

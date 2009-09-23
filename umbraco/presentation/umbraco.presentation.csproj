@@ -1463,6 +1463,7 @@
     <Content Include="umbraco_client\CodeMirror\css\people.jpg" />
     <Content Include="umbraco_client\CodeMirror\css\pythoncolors.css" />
     <Content Include="umbraco_client\CodeMirror\css\sparqlcolors.css" />
+    <Content Include="umbraco_client\CodeMirror\css\umbracoCustom.css" />
     <Content Include="umbraco_client\CodeMirror\css\xmlcolors.css" />
     <Content Include="umbraco_client\CodeMirror\js\codemirror.js" />
     <Content Include="umbraco_client\CodeMirror\js\editor.js" />

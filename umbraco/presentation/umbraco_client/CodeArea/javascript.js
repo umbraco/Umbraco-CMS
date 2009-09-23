@@ -1,7 +1,3 @@
-
-
-
-
 // Ctrl + S support
 var ctrlDown = false;
 var shiftDown = false;
@@ -158,58 +154,3 @@ var tab = {
         }
     }
 };
-
-
-//////////////////////////////////////
-// CARET funktioner
-//////////////////////////////////////
-var tempCaretEl;
-function storeCaret(editEl) {
-    if (editEl.createTextRange) {
-        editEl.currRange = document.selection.createRange().duplicate();
-    }
-}
-
-function setCaretToEnd(el) {
-    if (el.createTextRange) {
-        var v = el.value;
-        var r = el.createTextRange();
-        r.moveStart('character', v.length);
-        r.select();
-    }
-}
-
-function insertAtEnd(el, txt) {
-    txt = caretTextUnencode(txt);
-    el.value += txt;
-    setCaretToEnd(el);
-}
-
-function insertAtCaret(el, txt) {
-    txt = caretTextUnencode(txt);
-    if (el.currRange) {
-        el.currRange.text =
-				el.currRange.text.charAt(el.currRange.text.length - 1) != ' ' ? txt :
-			txt + ' ';
-        el.currRange.select();
-
-    }
-    else
-        insertAtEnd(el, txt);
-}
-
-function insertAtCaretAndMove(el, txt, move) {
-    txt = caretTextUnencode(txt);
-    if (el.currRange) {
-        el.currRange.text = el.currRange.text.charAt(el.currRange.text.length - 1) != ' ' ? txt : txt + ' ';
-        el.currRange.moveStart('character', move);
-        el.currRange.moveEnd('character', move);
-        el.currRange.select();
-    }
-    else
-        insertAtEnd(el, txt);
-}
-
-function caretTextUnencode(txt) {
-    return txt; //.replace(/\&quot;/gi,"\"")
-}
