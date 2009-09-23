@@ -58,7 +58,7 @@
             
         
             xsltSnippet = UmbEditor.IsSimpleEditor 
-                ?  jQuery("#ctl00_body_editorSource").getSelection().text 
+                ?  jQuery("#<%= editorSource.ClientID %>").getSelection().text 
                     : UmbEditor._editor.selection();
                     
             if (xsltSnippet == '') {
@@ -71,7 +71,7 @@
 		  
     </script>
 
-	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/jquery-fieldselection.js" PathNameAlias="UmbracoRoot"  />
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="Application/jQuery/jquery-fieldselection.js" PathNameAlias="UmbracoClient"  />
 
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server" ID="cp1">

@@ -1456,7 +1456,6 @@
     <Content Include="umbraco\images\umbraco\bin_closed.png" />
     <Content Include="umbraco\images\umbraco\bin_empty.png" />
     <Content Include="umbraco_client\CodeArea\UmbracoEditor.js" />
-    <Content Include="umbraco_client\CodeArea\resizeTextEditor.js" />
     <Content Include="umbraco_client\CodeMirror\css\csscolors.css" />
     <Content Include="umbraco_client\CodeMirror\css\docs.css" />
     <Content Include="umbraco_client\CodeMirror\css\jscolors.css" />
@@ -1588,7 +1587,7 @@
     <Content Include="umbraco\images\false.png" />
     <Content Include="umbraco\images\new.png" />
     <Content Include="umbraco\images\umbraco\sprites_ie6.gif" />
-    <Content Include="umbraco\js\jquery-fieldselection.js" />
+    <Content Include="umbraco_client\Application\JQuery\jquery-fieldselection.js" />
     <Content Include="umbraco_client\Tree\css.js" />
     <Content Include="umbraco_client\Application\JQuery\jquery.metadata.min.js" />
     <Content Include="umbraco_client\Application\UmbracoUtils.js" />

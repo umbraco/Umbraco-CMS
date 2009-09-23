@@ -34,3 +34,5 @@ to use the UmbracoClientPath setting
 * Moved all old TinyMCE supporting files to legacy project
 * Moved all old TinyMCE code files (that are not used to legacy project)
 * Moved all old TinyMCE plugins to legacy project
+
+* Moved jquery-fieldselection.js to umbraco_client/Application/jQuery

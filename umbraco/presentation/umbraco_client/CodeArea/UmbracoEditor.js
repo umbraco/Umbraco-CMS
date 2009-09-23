@@ -4,6 +4,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
 
 (function($) {
     Umbraco.Controls.CodeEditor.UmbracoEditor = function(isSimpleEditor, controlId) {
+        
+        //initialize
         var _isSimpleEditor = isSimpleEditor;
         var _controlId = controlId;
         
@@ -11,7 +13,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
             throw "CodeMirror editor not found!";
         }        
         
-        return {
+        //create the inner object
+        var obj =  {
             
             _editor: (typeof(codeEditor) == "undefined" ? null : codeEditor), //the codemirror object
             _control: $("#" + _controlId), //the original textbox as a jquery object
@@ -26,13 +29,24 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                     //this is a wrapper for CodeMirror
                     return this._editor.getCode();
                 }                
-            },
-            
-            Insert: function(open, end, txtEl, arg3) {
-                //arg3 gets appended to open, not actually sure why it's needed but we'll keep it for legacy, it's optional
-                
+            },            
+            Insert: function(open, end, txtEl, arg3) {                
+                //arg3 gets appended to open, not actually sure why it's needed but we'll keep it for legacy, it's optional                
                 if (_isSimpleEditor) {
-                    this._insertSimple(open, end, txtEl, arg3);
+                    if (navigator.userAgent.match('MSIE')) {
+                        this._IEInsertSelection(open, end, txtEl, arg3);
+                    }
+                    else {
+                        //if not ie, use jquery field select, it's easier                        
+                        var selection = jQuery("#" + txtEl).getSelection().text;
+                        var replace = (arg3) ? open + arg3 : open; //concat open and arg3, if arg3 specified
+                        if (end != "") {
+                            replace = replace + selection + end;
+                        }
+                        jQuery("#" + txtEl).replaceSelection(replace);
+                        jQuery("#" + txtEl).focus();
+                        this._insertSimple(open, end, txtEl, arg3);
+                    }                    
                 }
                 else {
                     var selection = this._editor.selection();
@@ -44,77 +58,44 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                     this._editor.focus();
                 }
             },
-            _insertSimple: function(open, end, txtEl) {
+            _IEInsertSelection: function(open, end, txtEl) {
                 var tArea = document.getElementById(txtEl);
-    
-                var sct = tArea.scrollTop;
+                tArea.focus();
                 var open = (open) ? open : "";
                 var end = (end) ? end : "";
-                var sl;
-                var isIE = navigator.userAgent.match('MSIE');
-
-                if (isIE != null)
-                    isIE = true;
-                else
-                    isIE = false;
-
-
-                if (isIE) {
-                    //insertAtCaret(tArea, open);
-                    
-                    tArea.focus();
-                    var curSelect = tArea.currRange;
-                    
-                    
-                    if (arguments[3]) {
-                        if (end == "") {
-                            curSelect.text = open + arguments[3];
-                        } else {
-                            curSelect.text = open + arguments[3] + curSelect.text + end;
-                        }
-                    } else {
-                        if (end == "") {
-                            curSelect.text = open;
-                        } else {
-                            curSelect.text = open + curSelect.text + end;
-                        }
-                    }
-
-                    curSelect.select();
-                    
-                } else if (!isIE && typeof tArea.selectionStart != "undefined") {
-
-                    var selStart = tArea.value.substr(0, tArea.selectionStart);
-                    var selEnd = tArea.value.substr(tArea.selectionEnd, tArea.value.length);
-                    var curSelection = tArea.value.replace(selStart, "").replace(selEnd, "");
-
-                    if (arguments[3]) {
-                        if (end == "") {
-                            sl = selStart + open + arguments[3];
-                            tArea.value = sl + selEnd;
-                        } else {
-                            sl = selStart + open + arguments[3] + curSelection + end;
-                            tArea.value = sl + selEnd;
-                        }
-                    } else {
+                var curSelect = tArea.currRange;                
+                if (arguments[3]) {
                     if (end == "") {
-                        sl = selStart + open;
-                        tArea.value = sl + selEnd;
-                        } else {
-                        sl = selStart + open + curSelection + end;
-                        tArea.value = sl + selEnd;
+                        curSelect.text = open + arguments[3];
+                    } else {
+                        curSelect.text = open + arguments[3] + curSelect.text + end;
+                    }
+                } else {
+                    if (end == "") {
+                        curSelect.text = open;
+                    } else {
+                        curSelect.text = open + curSelect.text + end;
+                    }
+                }
+                curSelect.select();
+            },           
+            _IESelectionHelper: function() {
+                 if (navigator.userAgent.match('MSIE')) {
+                 
+                    function storeCaret(editEl) {
+                        if (editEl.createTextRange) {
+                            editEl.currRange = document.selection.createRange().duplicate();
                         }
                     }
-
-                    tArea.setSelectionRange(sl.length, sl.length);
-                    tArea.focus();
-                    tArea.scrollTop = sct;
-                    
-                } else {
-                    tArea.value += (arguments[3]) ? open + arguments[3] + end : open + end;
+                    //wire up events for ie editor
+                    this._control.select( function() {storeCaret(this)} );
+                    this._control.click( function() {storeCaret(this)} );
+                    this._control.keyup( function() {storeCaret(this)} );
                 }
-                                     
             }
         };
+        obj._IESelectionHelper();
+        return obj;
     }    
 })(jQuery); 
+

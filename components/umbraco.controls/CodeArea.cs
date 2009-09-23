@@ -14,8 +14,9 @@ using ClientDependency.Core.Controls;
 
 namespace umbraco.uicontrols {
 
-    [ClientDependency(ClientDependencyType.Javascript, "CodeArea/resizeTextEditor.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Javascript, "CodeArea/javascript.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "CodeArea/UmbracoEditor.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Javascript, "Application/jQuery/jquery-fieldselection.js", "UmbracoClient")]
     public class CodeArea : WebControl
     {
 
@@ -58,15 +59,12 @@ namespace umbraco.uicontrols {
         {
             base.OnInit(e);
             EnsureChildControls();
-            
+
             if (!UmbracoSettings.ScriptDisableEditor)
             {
                 ClientDependencyLoader.Instance.RegisterDependency("CodeMirror/js/codemirror.js", "UmbracoClient", ClientDependencyType.Javascript);
                 ClientDependencyLoader.Instance.RegisterDependency("CodeArea/styles.css", "UmbracoClient", ClientDependencyType.Css);
-            }
-            
-            ClientDependencyLoader.Instance.RegisterDependency("CodeArea/javascript.js", "UmbracoClient", ClientDependencyType.Javascript);
-        
+            }        
         }
 
         protected override void CreateChildControls()
@@ -80,9 +78,6 @@ namespace umbraco.uicontrols {
             if (UmbracoSettings.ScriptDisableEditor)
             {
                 CodeTextBox.Attributes.Add("class", "codepress");
-                CodeTextBox.Attributes.Add("onclick", "storeCaret(this)");
-                CodeTextBox.Attributes.Add("onselect", "storeCaret(this)");
-                CodeTextBox.Attributes.Add("onkeyup", "storeCaret(this)");
                 CodeTextBox.Attributes.Add("wrap", "off");
             }
             else
@@ -182,13 +177,12 @@ namespace umbraco.uicontrols {
         protected string RenderBasicEditor()
         {
             string jsEventCode = @"
-                                    var m_textEditor = document.getElementById('" + this.ClientID + @"');
                                     if (navigator.userAgent.match('MSIE')) {
                                         //addEvent(m_textEditor, ""select"", function() { storeCaret(this); });
 		                                //addEvent(m_textEditor, ""click"", function() { storeCaret(this); });
                                         //addEvent(m_textEditor, ""keyup"", function() { storeCaret(this); });
                                     }
-                                    
+                                    var m_textEditor = document.getElementById('" + this.ClientID + @"');                                   
                                     tab.watch('" + this.ClientID + @"');
                                     ";
             return jsEventCode;

@@ -70,7 +70,6 @@ namespace umbraco.cms.presentation.settings
 
 		
 
-		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)
 		{
             _template = new cms.businesslogic.template.Template(int.Parse(Request.QueryString["templateID"]));
@@ -145,7 +144,7 @@ namespace umbraco.cms.presentation.settings
 		{    
 
 		}
-		#endregion
+
 	}
 
 }

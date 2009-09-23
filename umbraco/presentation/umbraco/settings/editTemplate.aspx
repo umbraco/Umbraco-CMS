@@ -67,7 +67,7 @@
         UmbEditor.Insert('\n<' + cp, '\n</asp:Content' + '>\n', '<%= editorSource.ClientID %>');
        }
        
-       function insertPlaceHolderElement(id){
+       function insertPlaceHolderElement(id){       
         
         var cp = 'asp:ContentPlaceHolder Id="' + id + '"';
         cp += ' runat="server"';
