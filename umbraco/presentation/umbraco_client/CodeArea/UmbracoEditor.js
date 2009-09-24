@@ -18,6 +18,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
             
             _editor: (typeof(codeEditor) == "undefined" ? null : codeEditor), //the codemirror object
             _control: $("#" + _controlId), //the original textbox as a jquery object
+            _cmSave: null,//the saved selection of the code mirror editor (used for IE)
             
             IsSimpleEditor: typeof(CodeMirror) == "undefined" ? true : typeof(codeEditor) == "undefined" ? true : _isSimpleEditor,
             
@@ -49,6 +50,20 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                     }                    
                 }
                 else {
+                    this._editor.win.document.body.focus(); //need to restore the focus to the editor body
+                    
+                    //if the saved selection (IE only) is not null, then
+                    //reselect the selection there is one, otherwise, expand the non-selection by 1
+                    //I know, this is wierd but it's an IE issue and this fixes it.
+                    if (this._cmSave != null) {
+                        if (this._cmSave.text.length > 0) {
+                             this._cmSave.select();
+                        }
+                        else {
+                            this._cmSave.expand("character");
+                        }
+                    }
+                    
                     var selection = this._editor.selection();
                     var replace = (arg3) ? open + arg3 : open; //concat open and arg3, if arg3 specified
                     if (end != "") {
@@ -78,19 +93,32 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                     }
                 }
                 curSelect.select();
-            },           
+            },        
             _IESelectionHelper: function() {
-                 if (navigator.userAgent.match('MSIE')) {
-                 
-                    function storeCaret(editEl) {
-                        if (editEl.createTextRange) {
-                            editEl.currRange = document.selection.createRange().duplicate();
+                 /// <summary>
+                 /// Because IE is lame, we have to continuously save the selections created by the user
+                 /// in the editors so that when the selections are lost (i.e. the user types in a different text box
+                 /// we'll need to restore the selection when they return focus
+                 /// </summary>
+                 if (navigator.userAgent.match('MSIE')) {                 
+                    var _this = this;
+                    if (this._editor == null)  {
+                        function storeCaret(editEl) {
+                            editEl.currRange = document.selection.createRange().duplicate();    
                         }
+                        //need to store the selection details on each event while editing content                        
+                        this._control.select( function() {storeCaret(this)} );
+                        this._control.click( function() {storeCaret(this)} );
+                        this._control.keyup( function() {storeCaret(this)} );
                     }
-                    //wire up events for ie editor
-                    this._control.select( function() {storeCaret(this)} );
-                    this._control.click( function() {storeCaret(this)} );
-                    this._control.keyup( function() {storeCaret(this)} );
+                    else {                        
+                        //when the editor loses focus, save the current selection
+                        this._editor.win.document.body.onblur = function() 
+                        { 
+                            _this._cmSave = _this._editor.win.document.selection.createRange();                   
+                            return true;
+                        };
+                    }                    
                 }
             }
         };

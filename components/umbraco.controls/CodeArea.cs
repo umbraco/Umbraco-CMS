@@ -27,13 +27,6 @@ namespace umbraco.uicontrols {
         }
 
         protected TextBox CodeTextBox;
-        protected HiddenField CodeEditorValue;
-
-        /// <summary>
-        /// Used to track the postback event, this updates the hidden field's value so that
-        /// on postback the value is returned.
-        /// </summary>
-        protected CustomValidator UpdateCodeValueValidator;
 
         public bool AutoResize { get; set ; }
         public int OffSetX { get; set; }
@@ -42,11 +35,11 @@ namespace umbraco.uicontrols {
         {
             get
             {
-                return CodeEditorValue.Value;
+                return CodeTextBox.Text;
             }
             set
             {
-                CodeEditorValue.Value = value;
+                CodeTextBox.Text = value;
             }
         }
 
@@ -70,8 +63,6 @@ namespace umbraco.uicontrols {
         protected override void CreateChildControls()
         {
             base.CreateChildControls();
-            CodeEditorValue = new HiddenField();
-            CodeEditorValue.ID = "CodeEditorValue";
             CodeTextBox = new TextBox();
             CodeTextBox.ID = "CodeTextBox";
 
@@ -80,28 +71,14 @@ namespace umbraco.uicontrols {
                 CodeTextBox.Attributes.Add("class", "codepress");
                 CodeTextBox.Attributes.Add("wrap", "off");
             }
-            else
-            {
-                UpdateCodeValueValidator = new CustomValidator();
-                UpdateCodeValueValidator.ID = "UpdateCodeValueValidator";
-                UpdateCodeValueValidator.ClientValidationFunction = "updateCodeEditorValue";
-                UpdateCodeValueValidator.Display = ValidatorDisplay.None;
-                this.Controls.Add(UpdateCodeValueValidator);
-            }
+            else            
             
             CodeTextBox.TextMode = TextBoxMode.MultiLine;
 
             this.CssClass = "codepress";
 
-            this.Controls.Add(CodeEditorValue);            
             this.Controls.Add(CodeTextBox);
 
-        }
-
-        protected override void OnPreRender(EventArgs e)
-        {
-            base.OnPreRender(e);
-            CodeTextBox.Text = CodeEditorValue.Value;
         }
 
         /// <summary>
@@ -129,10 +106,7 @@ namespace umbraco.uicontrols {
                 jsEventCode = RenderBasicEditor();
             }
             else
-            {
-                UpdateCodeValueValidator.RenderControl(writer);
-                CodeEditorValue.RenderControl(writer);
-                
+            {                
                 writer.WriteBeginTag("div");
                 writer.WriteAttribute("id", this.ClientID);
                 writer.WriteAttribute("class", this.CssClass);
@@ -218,17 +192,11 @@ namespace umbraco.uicontrols {
                     break;
             }
 
-            var jsEventCode = @"
-                               
-                              var textarea = document.getElementById('" + CodeTextBox.ClientID + @"');
-                              var codeVal = document.getElementById('" + CodeEditorValue.ClientID + @"');
-                              function updateCodeEditorValue(source, args) {
-                                codeVal.value = codeEditor.getCode();
-                                //alert(codeVal.value); 
-                                args.IsValid = true;
-                              }
+            var jsEventCode = @"                              
+                            var textarea = document.getElementById('" + CodeTextBox.ClientID + @"');
+                            
 
-                              var codeEditor = new CodeMirror(CodeMirror.replace(textarea), {
+                              var codeEditor = CodeMirror.fromTextArea(textarea, {
                                 width: ""100%"",
                                 height: ""100%"",
                                 tabMode: ""shift"",
@@ -244,7 +212,7 @@ namespace umbraco.uicontrols {
                                                     .ToArray()) + @"],
                                 path: """ + GlobalSettings.ClientPath + @"/CodeMirror/js/"",
                                 content: textarea.value,             
-                                autoMatchParens: true," 
+                                autoMatchParens: false," 
                                     + (string.IsNullOrEmpty(ClientSaveMethod) ? "" : @"saveFunction: " + ClientSaveMethod + ",") + @"
                                 onChange: function() { /*codeVal.value = codeEditor.getCode(); */}});
 
