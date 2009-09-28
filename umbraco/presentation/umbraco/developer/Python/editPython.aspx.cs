@@ -47,11 +47,11 @@ namespace umbraco.cms.presentation.developer
 					{
 						base.speechBubble(speechBubbleIcon.error, ui.Text("errors", "pythonErrorHeader", base.getUser()), ui.Text("errors", "pythonErrorText", base.getUser()));
 						errorHolder.Visible = true;
-						closeErrorMessage.Visible = true;
+						//closeErrorMessage.Visible = true;
 						errorHolder.Attributes.Add("style", "height: 250px; overflow: auto; border: 1px solid CCC; padding: 5px;");
 						errorMessage = errorPython.ToString();
 						pythonError.Text = errorMessage.Replace("\n", "<br/>\n");
-						closeErrorMessage.Visible = true;
+						//closeErrorMessage.Visible = true;
 					}
 				}
 				if (errorMessage == "")

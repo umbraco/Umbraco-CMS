@@ -150,12 +150,7 @@ namespace umbraco.uicontrols {
 
         protected string RenderBasicEditor()
         {
-            string jsEventCode = @"
-                                    if (navigator.userAgent.match('MSIE')) {
-                                        //addEvent(m_textEditor, ""select"", function() { storeCaret(this); });
-		                                //addEvent(m_textEditor, ""click"", function() { storeCaret(this); });
-                                        //addEvent(m_textEditor, ""keyup"", function() { storeCaret(this); });
-                                    }
+            string jsEventCode = @"                                   
                                     var m_textEditor = document.getElementById('" + this.ClientID + @"');                                   
                                     tab.watch('" + this.ClientID + @"');
                                     ";
@@ -164,6 +159,9 @@ namespace umbraco.uicontrols {
 
         protected string RenderCodeEditor()
         {
+            //get the client dependency url for the file so that it's compressed
+            var baseFileSource = ClientDependencyLoader.GetCompositeUrl(new string[] 
+                { GlobalSettings.ClientPath + "/CodeMirror/js/CoreCombined.js" }, ClientDependencyType.Javascript);
 
             string[] parserFiles = new string[] { "tokenizejavascript.js", "parsejavascript.js" };
             string[] cssFile = new string[] { "jscolors.css", "umbracoCustom.css" };
@@ -188,28 +186,26 @@ namespace umbraco.uicontrols {
                     break;
                 case EditorType.HTML:
                     parserFiles = new string[] { "parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js" };
-                    cssFile = new string[] { "xmlcolors.css", "jscolors.css", "csscolors", "umbracoCustom.css" };
+                    cssFile = new string[] { "xmlcolors.css", "jscolors.css", "csscolors.css", "umbracoCustom.css" };
                     break;
             }
-
+            
             var jsEventCode = @"                              
                             var textarea = document.getElementById('" + CodeTextBox.ClientID + @"');
                             
 
                               var codeEditor = CodeMirror.fromTextArea(textarea, {
+                                basefiles: ['" + baseFileSource + @"'],
                                 width: ""100%"",
                                 height: ""100%"",
                                 tabMode: ""shift"",
                                 textWrapping: false,
                                 lineNumbers: true,
-                                parserfile: [" + string.Join(",",
-                                               parserFiles
-                                                    .Select(x => string.Format(@"""{0}""", x))
-                                                    .ToArray()) + @"],
-                                stylesheet: [" + string.Join(",",
+                                parserfile: ['" + ClientDependencyLoader.GetCompositeUrl(parserFiles, ClientDependencyType.Javascript) + @"'],
+                                stylesheet: ['" + ClientDependencyLoader.GetCompositeUrl(
                                                cssFile
-                                                    .Select(x => string.Format(@"""{0}""", GlobalSettings.ClientPath + @"/CodeMirror/css/" + x))
-                                                    .ToArray()) + @"],
+                                                    .Select(x => GlobalSettings.ClientPath + @"/CodeMirror/css/" + x)
+                                                    .ToArray(), ClientDependencyType.Css) + @"'],
                                 path: """ + GlobalSettings.ClientPath + @"/CodeMirror/js/"",
                                 content: textarea.value,             
                                 autoMatchParens: false," 

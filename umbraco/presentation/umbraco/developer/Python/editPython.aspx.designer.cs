@@ -68,13 +68,13 @@ namespace umbraco.cms.presentation.developer {
         protected global::System.Web.UI.WebControls.CheckBox SkipTesting;
         
         /// <summary>
-        /// closeErrorMessage control.
+        /// pp_error control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal closeErrorMessage;
+        protected global::umbraco.uicontrols.PropertyPanel pp_error;
         
         /// <summary>
         /// errorHolder control.
@@ -83,7 +83,7 @@ namespace umbraco.cms.presentation.developer {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel errorHolder;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl errorHolder;
         
         /// <summary>
         /// pythonError control.

@@ -75,8 +75,7 @@
 
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server" ID="cp1">
-    <cc1:UmbracoPanel ID="UmbracoPanel1" runat="server" Text="Edit xsl" hasMenu="true"
-        Height="300" Width="600">
+    <cc1:UmbracoPanel ID="UmbracoPanel1" runat="server" Text="Edit xsl" hasMenu="true" Height="300" Width="600">
         <cc1:Pane ID="Pane1" runat="server" Style="margin-bottom: 10px;">
             <cc1:PropertyPanel ID="pp_filename" runat="server" Text="Filename">
                 <asp:TextBox ID="xsltFileName" runat="server" Width="300" CssClass="guiInputText"></asp:TextBox>
@@ -85,8 +84,7 @@
                 <asp:CheckBox ID="SkipTesting" runat="server"></asp:CheckBox>
             </cc1:PropertyPanel>
             <cc1:PropertyPanel ID="pp_errorMsg" runat="server">
-                <div id="errorDiv" style="display: none;" class="error">
-                    hest</div>
+                <div id="errorDiv" style="display: none;" class="error">test</div>
             </cc1:PropertyPanel>
             <cc1:CodeArea ID="editorSource" CodeBase="XML" ClientSaveMethod="doSubmit" runat="server" AutoResize="true" OffSetX="47" OffSetY="55" />
         </cc1:Pane>

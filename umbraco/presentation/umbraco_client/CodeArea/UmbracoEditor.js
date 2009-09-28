@@ -52,17 +52,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                 else {
                     this._editor.win.document.body.focus(); //need to restore the focus to the editor body
                     
-                    //if the saved selection (IE only) is not null, then
-                    //reselect the selection there is one, otherwise, expand the non-selection by 1
-                    //I know, this is wierd but it's an IE issue and this fixes it.
+                    //if the saved selection (IE only) is not null, then               
                     if (this._cmSave != null) {
-                        if (this._cmSave.text.length > 0) {
-                             this._cmSave.select();
-                        }
-                        else {
-                            this._cmSave.expand("character");
-                        }
-                    }
+                        this._editor.selectLines(this._cmSave.start.line, this._cmSave.start.character, this._cmSave.end.line, this._cmSave.end.character);
+                    }                    
                     
                     var selection = this._editor.selection();
                     var replace = (arg3) ? open + arg3 : open; //concat open and arg3, if arg3 specified
@@ -100,7 +93,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                  /// in the editors so that when the selections are lost (i.e. the user types in a different text box
                  /// we'll need to restore the selection when they return focus
                  /// </summary>
-                 if (navigator.userAgent.match('MSIE')) {                 
+                 if (document.all) {                 
                     var _this = this;
                     if (this._editor == null)  {
                         function storeCaret(editEl) {
@@ -111,13 +104,13 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                         this._control.click( function() {storeCaret(this)} );
                         this._control.keyup( function() {storeCaret(this)} );
                     }
-                    else {                        
-                        //when the editor loses focus, save the current selection
-                        this._editor.win.document.body.onblur = function() 
-                        { 
-                            _this._cmSave = _this._editor.win.document.selection.createRange();                   
-                            return true;
-                        };
+                    else {
+                        this._editor.options.cursorActivity = function() {
+                            _this._cmSave = {
+                                start: _this._editor.cursorPosition(true), //save start position
+                                end: _this._editor.cursorPosition(false) //save end position
+                            }
+                        }
                     }                    
                 }
             }
