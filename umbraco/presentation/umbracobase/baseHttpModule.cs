@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Configuration;
 using System.Web;
 using System.Web.Security;
+using System.Web.SessionState;
 using System.Web.UI;
 using System.Reflection;
 using System.Collections.Specialized;
@@ -14,7 +15,7 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco.presentation.umbracobase
 {
-    public class requestModule : IHttpModule
+    public class requestModule : IHttpModule, IRequiresSessionState
     {
         #region IHttpModule Members
         public void Dispose()
@@ -23,11 +24,11 @@ namespace umbraco.presentation.umbracobase
 
         public void Init(HttpApplication httpApp)
         {
-            httpApp.BeginRequest += new EventHandler(OnBeginRequest);
+            httpApp.PreRequestHandlerExecute += new EventHandler(OnPreRequestHandlerExecute);
         }
 
 
-        public void OnBeginRequest(Object sender, EventArgs e)
+        public void OnPreRequestHandlerExecute(Object sender, EventArgs e)
         {
             HttpApplication httpApp = (HttpApplication)sender;
 
