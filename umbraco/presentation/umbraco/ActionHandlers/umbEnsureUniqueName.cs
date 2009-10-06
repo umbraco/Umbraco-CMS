@@ -42,7 +42,10 @@ namespace umbraco.ActionHandlers
 		// Check for all items underneath the parent to see if they match
 		// as any new created documents are stored in the bottom, we can just
 		// keep checking for other documents with a uniquenumber from 
-		foreach(umbraco.BusinessLogic.console.IconI d in documentObject.Parent.Children) 
+
+        //store children array here because iterating over an Array property object is very inneficient.
+            var c = documentObject.Parent.Children;
+		foreach(umbraco.BusinessLogic.console.IconI d in c) 
 		{
             /*
 			if (d.Id != documentObject.Id && d.getProperty("umbracoUrlName") != null) {

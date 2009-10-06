@@ -36,3 +36,17 @@ to use the UmbracoClientPath setting
 * Moved all old TinyMCE plugins to legacy project
 
 * Moved jquery-fieldselection.js to umbraco_client/Application/jQuery
+
+* Removed old internal indexer/searcher/SearchItem
+* Removed OnBeforeIndexing, OnAfterIndexing, AddToIndexEventArgs, IndexEventHandler, BeforeAddToIndex, 
+FireBeforeAddToIndex, AfterAddToIndex, FireAfterAddToIndex, Document.Index
+
+* Removed /umbraco/dashboard/webService.cs as it wasn't doing anything
+* Removed /umbraco/dashboard/search.aspx as this is an old handler used by quickEdit.ascx
+* Removed /umbraco/dashboard/quickEdit.ascx and replaced with /umbraco/Search/QuickSearch.ascx
+* Removed /umbraco/dashboard/quickEdit.js and repalced with /umbraco/Search/quickEdit.js
+* Moved jquery autocomplete to /umbraco_client/Application/Jquery
+* Removed /umbraco/webservices/Search.asmx as the SearchItem object has been removed
+* Removed /umbraco/reindex.aspx
+
+* Removed /umbraco/dialogs/editImage.aspx since it didn't do anything at all

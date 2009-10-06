@@ -534,7 +534,9 @@ namespace umbraco.cms.businesslogic.template
                 //Ensure that child templates have the right master masterpage file name
                 if (HasChildren)
                 {
-                    foreach (CMSNode cmn in Children)
+                    //store children array here because iterating over an Array property object is very inneficient.
+                    var c = Children;
+                    foreach (CMSNode cmn in c)
                     {
                         Template t = new Template(cmn.Id);
                         t.SaveAsMasterPage();

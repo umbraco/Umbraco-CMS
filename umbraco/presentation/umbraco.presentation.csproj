@@ -150,6 +150,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\umbraco.Linq.DTMetal.Engine.dll</HintPath>
     </Reference>
+    <Reference Include="UmbracoExamine.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\UmbracoExamine.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="UmbracoExamine.Providers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\UmbracoExamine.Providers.dll</HintPath>
+    </Reference>
     <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.60829.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\UrlRewritingNet.UrlRewriter.dll</HintPath>
@@ -463,6 +471,13 @@
     <Compile Include="umbraco\controls\TreeControl.ascx.designer.cs">
       <DependentUpon>TreeControl.ascx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\Search\QuickSearch.ascx.cs">
+      <DependentUpon>QuickSearch.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\Search\QuickSearch.ascx.designer.cs">
+      <DependentUpon>QuickSearch.ascx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\developer\Xslt\xsltVisualize.aspx.cs">
       <DependentUpon>xsltVisualize.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -601,23 +616,6 @@
     </Compile>
     <Compile Include="umbraco\dashboard\LatestEdits.ascx.designer.cs">
       <DependentUpon>LatestEdits.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\dashboard\quickEdit.ascx.cs">
-      <DependentUpon>quickEdit.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dashboard\quickEdit.ascx.designer.cs">
-      <DependentUpon>quickEdit.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\dashboard\search.aspx.cs">
-      <DependentUpon>search.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dashboard\search.aspx.designer.cs">
-      <DependentUpon>search.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\dashboard\webService.cs">
-      <SubType>code</SubType>
     </Compile>
     <Compile Include="umbraco\Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
@@ -770,13 +768,6 @@
     </Compile>
     <Compile Include="umbraco\dialogs\cruds.aspx.designer.cs">
       <DependentUpon>cruds.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\dialogs\editImage.aspx.cs">
-      <DependentUpon>editImage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dialogs\editImage.aspx.designer.cs">
-      <DependentUpon>editImage.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\dialogs\editMacro.aspx.cs">
       <DependentUpon>editMacro.aspx</DependentUpon>
@@ -1110,12 +1101,8 @@
     <Compile Include="umbraco\publishStatus.aspx.designer.cs">
       <DependentUpon>publishStatus.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\reindex.aspx.cs">
-      <DependentUpon>reindex.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\reindex.aspx.designer.cs">
-      <DependentUpon>reindex.aspx</DependentUpon>
+    <Compile Include="umbraco\Search\QuickSearchHandler.ashx.cs">
+      <DependentUpon>QuickSearchHandler.ashx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\settings\DictionaryItemList.aspx.cs">
       <DependentUpon>DictionaryItemList.aspx</DependentUpon>
@@ -1404,10 +1391,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="umbraco\webservices\RegexComWebservice.cs" />
-    <Compile Include="umbraco\webservices\Search.asmx.cs">
-      <DependentUpon>Search.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="umbraco\webservices\Settings.asmx.cs">
       <DependentUpon>Settings.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -1452,6 +1435,7 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
+    <Content Include="umbraco\Search\QuickSearch.ascx" />
     <Content Include="umbraco\images\umbraco\bin.png" />
     <Content Include="umbraco\images\umbraco\bin_closed.png" />
     <Content Include="umbraco\images\umbraco\bin_empty.png" />
@@ -1750,7 +1734,7 @@
     <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\sv_dlg.js" />
     <Content Include="umbraco_client\Tree\UmbracoTree.min.js" />
     <Content Include="umbraco_client\ui\jQueryWresize.js" />
-    <Content Include="umbraco\js\quickEdit.js" />
+    <Content Include="umbraco\Search\quickSearch.js" />
     <Content Include="umbraco\members\search.aspx" />
     <Content Include="umbraco\translation\details.aspx" />
     <Content Include="umbraco_client\modal\modalBackground.gif" />
@@ -1784,7 +1768,7 @@
     <Content Include="umbraco\images\umbraco\package.gif" />
     <Content Include="umbraco\images\umbraco\repository.gif" />
     <Content Include="umbraco\images\umbraco\uploadpackage.gif" />
-    <Content Include="umbraco\js\autocomplete\jquery.autocomplete.js" />
+    <Content Include="umbraco_client\Application\JQuery\jquery.autocomplete.js" />
     <Content Include="umbraco\developer\Packages\Boost.aspx" />
     <Content Include="umbraco\developer\Packages\BrowseRepository.aspx" />
     <Content Include="umbraco\developer\Packages\directoryBrowser.aspx" />
@@ -1796,7 +1780,6 @@
     <Content Include="umbraco\dialogs\AssignDomain.aspx" />
     <Content Include="umbraco\dialogs\create.aspx" />
     <Content Include="umbraco\dialogs\cruds.aspx" />
-    <Content Include="umbraco\dialogs\editImage.aspx" />
     <Content Include="umbraco\dialogs\editMacro.aspx" />
     <Content Include="umbraco\dialogs\emptyTrashcan.aspx" />
     <Content Include="umbraco\dialogs\exportDocumenttype.aspx" />
@@ -1917,6 +1900,8 @@
     <Content Include="umbraco\plugins\tinymce3\insertMacro.aspx" />
     <Content Include="umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
     <Content Include="config\ClientDependency.config" />
+    <Content Include="config\ExamineSettings.config" />
+    <Content Include="config\ExamineIndex.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -1924,6 +1909,7 @@
     <None Include="umbraco\LiveEditing\LiveEditing.cd" />
     <Content Include="umbraco\masterpages\umbracoPage.Master" />
     <Content Include="umbraco\masterpages\umbracoDialog.Master" />
+    <Content Include="umbraco\Search\QuickSearchHandler.ashx" />
     <None Include="umbraco\templateControls\InlineXslt.xsltTemplate" />
     <Content Include="umbraco\users\NodePermissions.ascx" />
     <Content Include="umbraco\users\PermissionEditor.aspx" />
@@ -1944,8 +1930,6 @@
     <Content Include="umbraco\js\submodal\maskBG.png" />
     <Content Include="umbraco\js\submodal\subModal.css" />
     <Content Include="umbraco\js\submodal\subModal.js" />
-    <Content Include="umbraco\plugins\tinymce\images\sample.gif" />
-    <Content Include="umbraco\reindex.aspx" />
     <Content Include="umbraco\settings\DictionaryItemList.aspx" />
     <Content Include="umbraco\settings\scripts\editScript.aspx" />
     <Content Include="umbraco\canvas.aspx" />
@@ -1977,8 +1961,6 @@
     <Content Include="umbraco\css\umbracoGui.css" />
     <Content Include="umbraco\dashboard.aspx" />
     <Content Include="umbraco\dashboard\LatestEdits.ascx" />
-    <Content Include="umbraco\dashboard\quickEdit.ascx" />
-    <Content Include="umbraco\dashboard\search.aspx" />
     <Content Include="umbraco\Default.aspx" />
     <Content Include="umbraco\developer\Macros\assemblyBrowser.aspx" />
     <Content Include="umbraco\developer\autoDoc.aspx" />
@@ -2248,7 +2230,6 @@
       <SubType>Form</SubType>
     </Content>
     <Content Include="umbraco\webservices\publication.asmx" />
-    <Content Include="umbraco\webservices\Search.asmx" />
     <Content Include="umbraco\webservices\Settings.asmx">
       <SubType>Form</SubType>
     </Content>

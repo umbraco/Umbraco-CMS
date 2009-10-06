@@ -104,7 +104,7 @@ img
 
 /* AUTOCOMPLETE */
 
-#umbSearchField{width: 250px; color: #999; padding: 2px;}
+.umbracoSearchHolder #umbSearchField{width: 250px; color: #999; padding: 2px;}
 .ac_results {
 	padding: 3px;
 	border: 1px solid #979797;
@@ -137,16 +137,21 @@ img
 	font-size:11px;
 	height:20px;
 	color: #1a1818;
+	cursor:pointer;
 }
 
-.ac_odd {
+.ac_results .ac_odd {
 	
 }
 
-.ac_over {
+.ac_results .ac_over {
 	background-color: #D5EFFC;
 	border: 1px solid #a8d8eb;
 	padding: 1px !Important;
 	padding-left: 4px !Important;
 }
 
+.ac_results span.nodeId 
+{
+	font-size:smaller;
+}

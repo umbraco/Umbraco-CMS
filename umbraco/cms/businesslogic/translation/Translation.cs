@@ -75,8 +75,12 @@ namespace umbraco.cms.businesslogic.translation
 
             if (IncludeSubpages)
             {
-                foreach (CMSNode n in Node.Children)
+                //store children array here because iterating over an Array property object is very inneficient.
+                var c = Node.Children;
+                foreach (CMSNode n in c)
+                {
                     MakeNew(n, User, Translator, Language, Comment, true, false);
+                }
             }
         }
 

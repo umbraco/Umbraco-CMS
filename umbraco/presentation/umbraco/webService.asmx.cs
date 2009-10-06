@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Web;
 using System.Web.Services;
 using System.Xml;
+using UmbracoExamine.Core;
+using System.Collections.Generic;
 
 
 namespace umbraco
@@ -119,28 +121,6 @@ namespace umbraco
 			XmlDocument xd = new XmlDocument();
 			if (BasePages.BasePage.ValidateUserContextID(ContextID)) 
 			{
-
-				Query = Query.Trim();
-
-				// Check for fulltext or title search
-				string prefix = "";
-				if (Query.Length > 0 && Query.Substring(0,1) != "*")
-					prefix = "Text:";
-				else
-					Query = Query.Substring(1, Query.Length-1);
-
-
-				// Check for spaces
-				if (Query.IndexOf("\"") == -1 && Query.Trim().IndexOf(" ") > 0) 
-				{
-					string[] queries = Query.Split(" ".ToCharArray());
-					Query = "";
-					for (int i=0;i<queries.Length;i++)
-						Query += prefix + queries[i] + "* AND ";
-					Query = Query.Substring(0, Query.Length-5);
-				} else
-					Query = prefix + Query + "*";
-
 				return doQuery(Query, xd, StartNodeId);
 			} 
 			else 
@@ -156,18 +136,18 @@ namespace umbraco
 			XmlNode result = xd.CreateNode(XmlNodeType.Element, "documents", "");
 			try 
 			{
-				System.Collections.Generic.List<cms.businesslogic.index.SearchItem> results = cms.businesslogic.index.searcher.Search(
-					cms.businesslogic.web.Document._objectType, Query, 20);
-				foreach(cms.businesslogic.index.SearchItem si in results)
-				{
-					//				string parent = "";
-					//				if (!dr.IsNull(dr.GetOrdinal("parentText")))
-					//					parent = " (" + dr["parentText"].ToString() + ")";
-					XmlElement x = xd.CreateElement("document");
-                    x.SetAttribute("id", si.NodeId.ToString());
-					x.SetAttribute("nodeName", si.Title);
-					result.AppendChild(x);
-				}
+                var criteria = new SearchCriteria(Query, new string[] { }, new string[] { }, false, StartNodeId > 0 ? (int?)StartNodeId : null, 20);
+                IEnumerable<SearchResult> results = ExamineManager.Instance
+                    .SearchProviderCollection["InternalSearch"]
+                    .Search(criteria);
+
+                foreach (var r in results)
+                {
+                    XmlElement x = xd.CreateElement("document");
+                    x.SetAttribute("id", r.Id.ToString());
+                    x.SetAttribute("nodeName", r.Fields["nodeName"]);
+                    result.AppendChild(x);
+                }
 			} 
 			catch (Exception ee)
 			{
@@ -205,16 +185,6 @@ namespace umbraco
 		}
 		
 		#endregion
-
-		// WEB SERVICE EXAMPLE
-		// The HelloWorld() example service returns the string Hello World
-		// To build, uncomment the following lines then save and build the project
-		// To test this web service, press F5
-
-//		[WebMethod]
-//		public string HelloWorld()
-//		{
-//			return "Hello World";
-//		}
+    
 	}
 }

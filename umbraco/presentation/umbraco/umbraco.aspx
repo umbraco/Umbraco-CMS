@@ -2,7 +2,7 @@
 
 <%@ Register Src="~/umbraco/controls/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<%@ Register TagPrefix="uc1" TagName="quickEdit" Src="dashboard/quickEdit.ascx" %>
+<%@ Register TagPrefix="uc1" TagName="quickSearch" Src="Search/QuickSearch.ascx" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -56,7 +56,7 @@
 			<asp:Panel ID="FindDocuments" runat="server">
 				<div style="float: left; margin-left: 20px;">
 					<form onsubmit="openModal('dialogs/search.aspx?rndo=45.2&search=' + jQuery('#umbSearchField').val(), 'Search', 470, 620); return false;">
-					<uc1:quickEdit ID="QuickEdit1" runat="server"></uc1:quickEdit>
+					<uc1:quickSearch ID="Search" runat="server"></uc1:quickSearch>
 					</form>
 				</div>
 			</asp:Panel>

@@ -7,7 +7,7 @@ using System.Xml;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.BusinessLogic.console;
-using umbraco.cms.businesslogic.index;
+
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.relation;
 using umbraco.cms.helpers;
@@ -86,6 +86,12 @@ namespace umbraco.cms.businesslogic.web
         private User _creator;
         private User _writer;
         private bool _optimizedMode;
+
+        /// <summary>
+        /// This is used to cache the child documents of Document when the children property
+        /// is accessed or enumerated over, this will save alot of database calls.
+        /// </summary>
+        private IEnumerable<Document> _children = null;
 
         // special for passing httpcontext object
         private HttpContext _httpContext;
@@ -240,10 +246,14 @@ namespace umbraco.cms.businesslogic.web
 
 
         public bool PublishWithChildrenWithResult(User u) {
-            if(PublishWithResult(u)){
-                foreach (cms.businesslogic.web.Document dc in this.Children) {
-                          dc.PublishWithChildrenWithResult(u);                    
-                    }
+            if(PublishWithResult(u))
+            {
+                //store children array here because iterating over an Array object is very inneficient.
+                var c = this.Children;   
+                foreach (cms.businesslogic.web.Document dc in c)
+                {
+                    dc.PublishWithChildrenWithResult(u);
+                }
             }else{
                 return false;
             }
@@ -323,7 +333,9 @@ namespace umbraco.cms.businesslogic.web
                 // Update xml in db
                 XmlGenerate(new XmlDocument());
 
-                foreach (Document dc in Children)
+                //store children array here because iterating over an Array object is very inneficient.
+                var c = Children;
+                foreach (Document dc in c)
                     dc.PublishWithSubs(u);
 
                 FireAfterPublish(e);
@@ -501,7 +513,7 @@ namespace umbraco.cms.businesslogic.web
                 }
 
                 base.Save();
-                Index(true);
+
                 FireAfterSave(e);
             }
         }
@@ -732,8 +744,10 @@ namespace umbraco.cms.businesslogic.web
 
 
                 // Copy the children
-                foreach (Document c in Children)
-                    c.Copy(NewDoc.Id, u, RelateToOrignal);
+                //store children array here because iterating over an Array object is very inneficient.
+                var c = Children;
+                foreach (Document d in c)
+                    d.Copy(NewDoc.Id, u, RelateToOrignal);
 
 
                 FireAfterCopy(e);
@@ -799,26 +813,6 @@ namespace umbraco.cms.businesslogic.web
             // Run Handler				
             umbraco.BusinessLogic.Actions.Action.RunActionHandlers(d, ActionNew.Instance);
 
-            // Index
-            AddToIndexEventArgs ie = new AddToIndexEventArgs();
-            d.FireBeforeAddToIndex(ie);
-
-            if (!ie.Cancel) {
-            System.Threading.ThreadPool.QueueUserWorkItem(
-                delegate
-                {
-                    try {
-                        
-                            Indexer.IndexNode(_objectType, d.Id, d.Text, d.User.Name, d.CreateDateTime, null, true);
-                          
-                    
-                    } catch (Exception ee) {
-                        Log.Add(LogTypes.Error, d.User, d.Id,
-                                string.Format("Error indexing document: {0}", ee));
-                    }
-                });
-            d.FireAfterAddToIndex(ie);
-            }
 
             return d;
         }
@@ -854,7 +848,11 @@ namespace umbraco.cms.businesslogic.web
 				//for (int i = 0; i < tmp.Length; i++) retval[i] = new Document(tmp[i].Id);
 				//return retval;
 
-				return Document.GetChildrenForTree(this.Id);
+                //cache the documents children so that this db call doesn't have to occur again
+                if (this._children == null)
+				    this._children = Document.GetChildrenForTree(this.Id);
+
+                return this._children.ToArray();
             }
         }
 
@@ -897,11 +895,10 @@ namespace umbraco.cms.businesslogic.web
 
                     if (!e.Cancel) {
 
-                    try {
-                        Indexer.RemoveNode(Id);
-                    } catch {}
-
-                    foreach (Document d in Children) {
+                    //store children array here because iterating over an Array object is very inneficient.
+                    var c = Children;
+                    foreach (Document d in c) 
+                    {
                         d.delete();
                     }
 
@@ -945,34 +942,6 @@ namespace umbraco.cms.businesslogic.web
                     Document tmp = new Document(c.UniqueId);
                     tmp.delete();
                 }
-            }
-        }
-
-        /// <summary>
-        /// Indexes the documents data for internal search
-        /// </summary>
-        /// <param name="Optimze">If on the indexer will optimize</param>
-        public void Index(bool Optimze)
-        {
-            AddToIndexEventArgs e = new AddToIndexEventArgs();
-            FireBeforeAddToIndex(e);
-
-            if (!e.Cancel) {
-                try {
-
-
-                    Hashtable fields = new Hashtable();
-                    foreach (Property p in getProperties)
-                        fields.Add(p.PropertyType.Alias, p.Value.ToString());
-//                    Indexer.IndexDirectory = HttpContext.Server.MapPath(Indexer.RelativeIndexDir);
-                    Indexer.IndexNode(_objectType, Id, Text, User.Name, CreateDateTime, fields, Optimze);
-
-                    FireAfterAddToIndex(e);
-                } catch (Exception ee) {
-                    Log.Add(LogTypes.Error, User, Id,
-                            string.Format("Error indexing node: {0}", ee));
-                }
-
             }
         }
 
@@ -1053,9 +1022,13 @@ namespace umbraco.cms.businesslogic.web
 
                 if (Deep)
                 {
-                    foreach (Document d in Children)
+                    //store children array here because iterating over an Array property object is very inneficient.
+                    var c = Children;
+                    foreach (Document d in c)
+                    {
                         if (d.Published)
                             x.AppendChild(d.ToXml(xd, true));
+                    }                        
                 }
 
                 return x;
@@ -1107,8 +1080,13 @@ namespace umbraco.cms.businesslogic.web
 
             if (Deep)
             {
-                foreach (Document d in Children)
+                //store children array here because iterating over an Array object is very inneficient.
+                var c = Children;
+                foreach (Document d in c)
+                {
                     x.AppendChild(d.ToXml(xd, true));
+                }
+                    
             }
         }
 
@@ -1380,11 +1358,6 @@ namespace umbraco.cms.businesslogic.web
 
 
         /// <summary>
-        /// The index event handlers
-        /// </summary>
-        public delegate void IndexEventHandler(Document sender, AddToIndexEventArgs e);
-
-        /// <summary>
         /// Occurs when [before save].
         /// </summary>
         public static event SaveEventHandler BeforeSave;
@@ -1621,32 +1594,6 @@ namespace umbraco.cms.businesslogic.web
         protected virtual void FireAfterRollBack(RollBackEventArgs e) {
             if (AfterRollBack != null)
                 AfterRollBack(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [before add to index].
-        /// </summary>
-        public static event IndexEventHandler BeforeAddToIndex;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeAddToIndex"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeAddToIndex(AddToIndexEventArgs e) {
-            if (BeforeAddToIndex != null)
-                BeforeAddToIndex(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after add to index].
-        /// </summary>
-        public static event IndexEventHandler AfterAddToIndex;
-        /// <summary>
-        /// Raises the <see cref="E:AfterAddToIndex"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterAddToIndex(AddToIndexEventArgs e) {
-            if (AfterAddToIndex != null)
-                AfterAddToIndex(this, e);
         }
 
         private Dictionary<Property, object> _knownProperties;

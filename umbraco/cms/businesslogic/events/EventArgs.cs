@@ -7,7 +7,7 @@ namespace umbraco.cms.businesslogic {
     public class PublishEventArgs : System.ComponentModel.CancelEventArgs { }
     public class MoveEventArgs : System.ComponentModel.CancelEventArgs { }
     public class CopyEventArgs : System.ComponentModel.CancelEventArgs { }
-    public class AddToIndexEventArgs : System.ComponentModel.CancelEventArgs { }
+    
     public class UnPublishEventArgs : System.ComponentModel.CancelEventArgs { }
     public class RollBackEventArgs : System.ComponentModel.CancelEventArgs { }
     public class SendToPublishEventArgs : System.ComponentModel.CancelEventArgs { }

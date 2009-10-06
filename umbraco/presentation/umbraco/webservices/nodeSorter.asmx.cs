@@ -36,14 +36,22 @@ namespace umbraco.presentation.webservices
                             _nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
                 } else {
                     // "hack for stylesheet"
-                    if (App == "settings") {
+                    if (App == "settings")
+                    {
                         StyleSheet ss = new StyleSheet(n.Id);
                         foreach (cms.businesslogic.web.StylesheetProperty child in ss.Properties)
                             _nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
 
-                    } else
-                        foreach (cms.businesslogic.CMSNode child in n.Children)
+                    }
+                    else
+                    {
+                        //store children array here because iterating over an Array property object is very inneficient.
+                        var children = n.Children;
+                        foreach (cms.businesslogic.CMSNode child in children)
+                        {
                             _nodes.Add(new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime));
+                        }
+                    }
                 }
 
                 parent.SortNodes = (SortNode[])_nodes.ToArray(typeof(SortNode));

@@ -327,7 +327,9 @@ namespace umbraco.editorControls.ultimatepicker
         {
             if (node.HasChildren)
             {
-                foreach (CMSNode child in node.Children)
+                //store children array here because iterating over an Array property object is very inneficient.
+                var c = node.Children;
+                foreach (CMSNode child in c)
                 {
                     umbraco.cms.businesslogic.Content doc = new umbraco.cms.businesslogic.Content(child.Id);
                     string preText = string.Empty;

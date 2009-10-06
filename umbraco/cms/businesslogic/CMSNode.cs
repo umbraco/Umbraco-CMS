@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 
 using System.Xml;
-using umbraco.cms.businesslogic.index;
+
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
@@ -382,11 +382,13 @@ namespace umbraco.cms.businesslogic {
                     Document d =
                         new umbraco.cms.businesslogic.web.Document(n.Id);
                     d.XmlGenerate(new XmlDocument());
-                    d.Index(true);
+
                 } else if (n.nodeObjectType == media.Media._objectType)
                     new umbraco.cms.businesslogic.media.Media(n.Id).XmlGenerate(new XmlDocument());
 
-                foreach (CMSNode c in this.Children)
+                //store children array here because iterating over an Array property object is very inneficient.
+                var children = this.Children;
+                foreach (CMSNode c in children)
                     c.Move(this.Id);
 
                 FireAfterMove(e);
@@ -625,8 +627,6 @@ namespace umbraco.cms.businesslogic {
             DeleteEventArgs e = new DeleteEventArgs();
             FireBeforeDelete(e);
             if (!e.Cancel) {
-                index.Indexer.RemoveNode(this.Id);
-
                 // remove relations
                 foreach (relation.Relation rel in Relations)
                 {
@@ -687,7 +687,9 @@ namespace umbraco.cms.businesslogic {
             x.Attributes.Append(xmlHelper.addAttribute(xd, "path", this.Path));
 
             if (Deep) {
-                foreach (Content c in this.Children)
+                //store children array here because iterating over an Array property object is very inneficient.
+                var children = this.Children;
+                foreach (Content c in children)
                     x.AppendChild(c.ToXml(xd, true));
             }
         }

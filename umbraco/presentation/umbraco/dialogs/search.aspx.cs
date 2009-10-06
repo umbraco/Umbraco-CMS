@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using UmbracoExamine.Core;
+using System.Xml;
 
-using umbraco.cms.businesslogic.index;
+
 
 namespace umbraco.presentation.dialogs
 {
@@ -14,9 +16,9 @@ namespace umbraco.presentation.dialogs
         {
             this.Page.Form.DefaultButton = this.searchButton.UniqueID;
 
-            if (!IsPostBack && helper.Request("search") != "")
+            if (!IsPostBack && UmbracoContext.Current.Request["search"] != "")
             {
-                keyword.Text = helper.Request("search");
+                keyword.Text = UmbracoContext.Current.Request["search"];
                 doSearch();
 
             }
@@ -32,31 +34,30 @@ namespace umbraco.presentation.dialogs
         private void doSearch()
         {
             string query = keyword.Text;
-            query = query.Trim();
 
-            // Check for fulltext or title search
-            string prefix = "";
-            /*            if (query.Length > 0 && query.Substring(0, 1) != "*")
-                            prefix = "Text:";
-                        else
-                            query = query.Substring(1, query.Length - 1);
-                        */
+            var results = ExamineManager.Instance
+                .SearchProviderCollection["InternalSearch"]
+                .Search(query, 100, false);
 
-            // Check for spaces
-            if (query.IndexOf("\"") == -1 && query.Trim().IndexOf(" ") > 0)
+            searchResult.XPathNavigator = ResultsAsXml(results).CreateNavigator();
+        }
+
+        private XmlDocument ResultsAsXml(IEnumerable<SearchResult> results)
+        {
+            XmlDocument result = new XmlDocument();
+            result.LoadXml("<results/>");
+            
+            foreach (var r in results)
             {
-                string[] queries = query.Split(" ".ToCharArray());
-                query = "";
-                for (int i = 0; i < queries.Length; i++)
-                    query += prefix + queries[i] + "* AND ";
-                query = query.Substring(0, query.Length - 5);
+                XmlNode x = xmlHelper.addTextNode(result, "result", "");
+                x.Attributes.Append(xmlHelper.addAttribute(result, "id", r.Id.ToString()));
+                x.Attributes.Append(xmlHelper.addAttribute(result, "title", r.Fields["nodeName"]));
+                x.Attributes.Append(xmlHelper.addAttribute(result, "author", r.Fields["writerName"]));
+                x.Attributes.Append(xmlHelper.addAttribute(result, "changeDate", r.Fields["updateDate"]));
+                result.DocumentElement.AppendChild(x);
             }
-            else
-                query = prefix + query + "*";
 
-            searchResult.XPathNavigator = cms.businesslogic.index.searcher.SearchAsXml(
-cms.businesslogic.web.Document._objectType, query, 100).CreateNavigator();
-
+            return result;
         }
     }
 }

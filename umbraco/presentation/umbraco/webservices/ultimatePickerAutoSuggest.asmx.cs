@@ -49,8 +49,10 @@ namespace umbraco.presentation.umbraco.webservices
                 if (!showGrandChildren)
                 {
                     nodeCount = 0;
-                  
-                    foreach (CMSNode child in parent.Children)
+
+                    //store children array here because iterating over an Array property object is very inneficient.
+                    var children = parent.Children;
+                    foreach (CMSNode child in children)
                     {
                      
                        
@@ -63,7 +65,9 @@ namespace umbraco.presentation.umbraco.webservices
                     int i = 0;
                     Counter = 0;
                     int level = 1;
-                    foreach (CMSNode child in parent.Children)
+
+                    //why is there a 2nd iteration of the same thing here?
+                    foreach (CMSNode child in children)
                     {
                         
                         addNode(child, level, showGrandChildren,documentAliasFilters);
@@ -74,7 +78,10 @@ namespace umbraco.presentation.umbraco.webservices
                 else
                 {
                     nodeCount = 0;
-                    foreach (CMSNode child in parent.Children)
+
+                    //store children array here because iterating over an Array property object is very inneficient.
+                    var children = parent.Children;
+                    foreach (CMSNode child in children)
                     {
                         nodeChildrenCount(child, true,documentAliasFilters);
                     }
@@ -82,7 +89,8 @@ namespace umbraco.presentation.umbraco.webservices
                     output = new string[nodeCount];
                     Counter = 0;
                     int level = 1;
-                    foreach (CMSNode child in parent.Children)
+
+                    foreach (CMSNode child in children)
                     {
                         addNode(child, level, showGrandChildren,documentAliasFilters);
                     }
@@ -144,7 +152,9 @@ namespace umbraco.presentation.umbraco.webservices
             
             if (countChildren)
             {
-                foreach (CMSNode child in node.Children)
+                //store children array here because iterating over an Array property object is very inneficient.
+                var children = node.Children;
+                foreach (CMSNode child in children)
                 {
                     nodeChildrenCount(child, countChildren,documentAliasFilters);
                 }
@@ -193,7 +203,9 @@ namespace umbraco.presentation.umbraco.webservices
             {
                 if (node.HasChildren)
                 {
-                    foreach (CMSNode child in node.Children)
+                    //store children array here because iterating over an Array property object is very inneficient.
+                    var children = node.Children;
+                    foreach (CMSNode child in children)
                     {
                         addNode(child, level + 1, showGrandChildren,documentAliasFilters);
                     }

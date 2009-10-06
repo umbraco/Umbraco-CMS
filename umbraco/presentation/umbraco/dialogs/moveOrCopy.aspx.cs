@@ -90,7 +90,10 @@ namespace umbraco.dialogs
 		}
         //PPH moving multiple nodes and publishing them aswell.
         private void handleChildNodes(cms.businesslogic.web.Document d) {
-            foreach (cms.businesslogic.web.Document cd in d.Children) {
+            //store children array here because iterating over an Array object is very inneficient.
+            var c = d.Children;
+            foreach (cms.businesslogic.web.Document cd in c) 
+            {
                 if (cd.Published) {
                     cd.Publish(new umbraco.BusinessLogic.User(0));
                     //using library.publish to support load balancing.

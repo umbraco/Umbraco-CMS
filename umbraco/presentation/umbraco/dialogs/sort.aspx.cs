@@ -158,7 +158,9 @@ namespace umbraco.cms.presentation
                             _nodes.Add(createNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime, icon));
 
                     } else {
-                        foreach (cms.businesslogic.CMSNode child in n.Children)
+                        //store children array here because iterating over an Array property object is very inneficient.
+                        var children = n.Children;
+                        foreach (cms.businesslogic.CMSNode child in children)
                             _nodes.Add(createNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime, icon));
                     }
                 }

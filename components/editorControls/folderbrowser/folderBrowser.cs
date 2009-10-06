@@ -45,7 +45,10 @@ namespace umbraco.editorControls
 			uploadfield.DataTypeUploadField uft = new uploadfield.DataTypeUploadField();
 		
 			cms.businesslogic.Content c = cms.businesslogic.media.Media.GetContentFromVersion(_data.Version);
-			foreach (BusinessLogic.console.IconI cc in c.Children) 
+            
+            //store children array here because iterating over an Array property object is very inneficient.
+            var children = c.Children;
+			foreach (BusinessLogic.console.IconI cc in children) 
 			{
 				cms.businesslogic.media.Media m = new cms.businesslogic.media.Media(cc.UniqueId);
 				foreach (cms.businesslogic.property.Property p in m.getProperties) 

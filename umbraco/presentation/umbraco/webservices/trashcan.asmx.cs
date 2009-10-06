@@ -52,7 +52,9 @@ namespace umbraco.presentation.webservices
         private void emptyTrashCanDo()
         {
             RecycleBin trashCan = new RecycleBin(Document._objectType);
-            foreach (IconI d in trashCan.Children)
+            //store children array here because iterating over an Array property object is very inneficient.
+            var c = trashCan.Children;
+            foreach (IconI d in c)
             {
                 new Document(d.Id).delete();
                 Application.Lock();

@@ -75,8 +75,9 @@ namespace umbraco.presentation.channels
                 else
                     rootDoc = new Document(u.StartNodeId);
 
-
-                foreach (Document d in rootDoc.Children)
+                //store children array here because iterating over an Array object is very inneficient.
+                var c = rootDoc.Children;
+                foreach (Document d in c)
                 {
                     int count = 0;
                     blogPosts.AddRange(
@@ -131,8 +132,9 @@ namespace umbraco.presentation.channels
                 else
                     rootDoc = new Document(u.StartNodeId);
 
-
-                foreach (Document d in rootDoc.Children)
+                //store children array here because iterating over an Array object is very inneficient.
+                var c = rootDoc.Children;
+                foreach (Document d in c)
                 {
                     int count = 0;
                     blogPosts.AddRange(

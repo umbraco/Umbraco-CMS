@@ -259,8 +259,9 @@ namespace umbraco.presentation.channels
                     }
                 }
 
-
-                foreach (Document d in rootDoc.Children)
+                //store children array here because iterating over an Array object is very inneficient.
+                var c = rootDoc.Children;
+                foreach (Document d in c)
                 {
                     int count = 0;
                     blogPosts.AddRange(
@@ -324,14 +325,17 @@ namespace umbraco.presentation.channels
             }
 
             if (d.Children != null && d.Children.Length > 0 && fullTree)
-                foreach (Document child in d.Children)
+            {
+                //store children array here because iterating over an Array object is very inneficient.
+                var c = d.Children;
+                foreach (Document child in c)
                 {
                     if (count < max)
                     {
                         list.AddRange(findBlogPosts(userChannel, child, userName, ref count, max, true));
                     }
                 }
-
+            }
             return list;
         }
 

@@ -234,6 +234,9 @@ namespace umbraco.cms.businesslogic
 
 		/// <summary>
 		/// Retrieve a list of generic properties of the content
+        /// TODO: Need to look everywhere in the codebase to see if this property is iterated over
+        /// then change the implementation so that a local variable is declared first, or getProperties.ToList() is
+        /// performed for the iteration... will save many db queries.
 		/// </summary>
 		public Property[] getProperties 
 		{
@@ -447,15 +450,19 @@ namespace umbraco.cms.businesslogic
 
 			if (Deep) 
 			{
-				foreach(BusinessLogic.console.IconI c in this.Children)
-					try 
-					{
-						x.AppendChild(new Content(c.Id).ToXml(xd, true));
-					} 
-					catch (Exception mExp)
-					{
-						System.Web.HttpContext.Current.Trace.Warn("Content", "Error adding node to xml: " + mExp.ToString());
-					}
+                //store children array here because iterating over an Array object is very inneficient.
+                var childs = this.Children;
+                foreach (BusinessLogic.console.IconI c in childs)
+                {
+                    try
+                    {
+                        x.AppendChild(new Content(c.Id).ToXml(xd, true));
+                    }
+                    catch (Exception mExp)
+                    {
+                        System.Web.HttpContext.Current.Trace.Warn("Content", "Error adding node to xml: " + mExp.ToString());
+                    }
+                }					
 			}
 
 			return x;
@@ -512,7 +519,9 @@ namespace umbraco.cms.businesslogic
 
 			if (Deep) 
 			{
-				foreach(Content c in this.Children)
+                //store children array here because iterating over an Array property object is very inneficient.
+                var children = this.Children;
+                foreach (Content c in children)
 					x.AppendChild(c.ToXml(xd, true));
 			}
 		}

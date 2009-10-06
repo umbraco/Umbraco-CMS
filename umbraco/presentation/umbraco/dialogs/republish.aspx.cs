@@ -24,7 +24,11 @@ namespace umbraco.cms.presentation
             } else if (helper.Request("refreshNodes") != "") {
                 Server.ScriptTimeout = 100000;
                 System.Xml.XmlDocument xd = new System.Xml.XmlDocument();
-                foreach (cms.businesslogic.web.Document d in new cms.businesslogic.web.Document(int.Parse(helper.Request("refreshNodes"))).Children) {
+
+                //store children array here because iterating over an Array object is very inneficient.
+                var doc = new cms.businesslogic.web.Document(int.Parse(helper.Request("refreshNodes")));
+                var c = doc.Children;
+                foreach (cms.businesslogic.web.Document d in c) {
                     d.XmlGenerate(xd);
                     Response.Write("<li>Creating xml for " + d.Text + "</li>");
                     Response.Flush();
