@@ -364,7 +364,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// </summary>
                 /// <param name="supressEvent">If set to true, will select the node but will supress the onSelected event</param>
                 /// <param name="reselect">If set to true, will call the select_branch method even if the node is already selected</param>
-
             
                 this._debug("selectNode, edit mode? " + this._isEditMode);
 
@@ -504,7 +503,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
             onSelect: function(NODE, TREE_OBJ) {
                 /// <summary>Fires the JS associated with the node, if the tree is in edit mode, allows for rename instead</summary>
-                
                 this._debug("onSelect, edit mode? " + this._isEditMode);
                  if (this._isEditMode) {
                     this._tree.rename(NODE);

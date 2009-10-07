@@ -13,12 +13,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
         /// </summary>
 
         return {
-
+            _isDirty: false,
             _debug: false,
             _mainTree: null,
             _appActions: null,
             _rootPath: "/umbraco", //this is the default
-
 
             setUmbracoPath: function(strPath) {
                 /// <summary>
@@ -39,6 +38,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 /// Sometimes an Umbraco page will need to be opened without being contained in the iFrame from the main window
                 /// so this method is will construct a false tree to be returned if this is the case as to avoid errors.
                 /// </summary>
+                /// <returns type="Umbraco.Controls.UmbracoTree" />
 
                 if (this._mainTree == null) {
                     if (this.mainWindow().jQuery == null
@@ -114,6 +114,15 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 if (this._isDebug) {
                     Sys.Debug.trace("UmbClientMgr: " + strMsg);
                 }
+            },
+            get_isDirty: function() {
+                return this._isDirty;
+            },
+            set_isDirty: function(value) {
+                this._isDirty = value;
+            },
+            setUp: function() {
+                console.log(this.mainTree().find('a'));
             }
         }
     }
@@ -121,3 +130,4 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
 //define alias for use throughout application
 var UmbClientMgr = new Umbraco.Application.ClientManager();
+UmbClientMgr.setUp();
