@@ -122,7 +122,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 this._isDirty = value;
             },
             setUp: function() {
-                console.log(this.mainTree().find('a'));
+                Sys.Debug.traceDump(this.mainTree().find('a'));
             }
         }
     }
