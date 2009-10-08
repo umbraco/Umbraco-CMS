@@ -120,9 +120,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             },
             set_isDirty: function(value) {
                 this._isDirty = value;
-            },
-            setUp: function() {
-                Sys.Debug.traceDump(this.mainTree().find('a'));
             }
         }
     }
@@ -130,4 +127,3 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
 //define alias for use throughout application
 var UmbClientMgr = new Umbraco.Application.ClientManager();
-UmbClientMgr.setUp();
