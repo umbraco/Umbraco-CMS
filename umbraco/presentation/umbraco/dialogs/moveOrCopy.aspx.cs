@@ -10,6 +10,8 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
+using umbraco.presentation;
+using umbraco.cms.businesslogic.media;
 
 namespace umbraco.dialogs
 {
@@ -163,7 +165,7 @@ namespace umbraco.dialogs
            }
         
         public void HandleMoveOrCopy(object sender, EventArgs e) {
-            if (helper.Request("app") == "settings")
+            if (UmbracoContext.Current.Request["app"] == "settings")
                 HandleDocumentTypeCopy();
             else
                 HandleDocumentMoveOrCopy(); 
@@ -224,32 +226,37 @@ namespace umbraco.dialogs
 
                     string[] nodes = {currentNode.Text, newNodeCaption };
 
-                    if (helper.Request("mode") == "cut") {
-                        //PPH changed this to document instead of cmsNode to handle republishing.
-                        cms.businesslogic.web.Document d = new umbraco.cms.businesslogic.web.Document(int.Parse(helper.Request("id")));
-                        d.Move(int.Parse(helper.Request("copyTo")));
-                        if (d.Published) {
-                            d.Publish(new umbraco.BusinessLogic.User(0));
-                            //using library.publish to support load balancing.
-                            umbraco.library.PublishSingleNode(d.Id);
+                    if (UmbracoContext.Current.Request["mode"] == "cut")
+                    {
+                        if (UmbracoContext.Current.Request["app"] == "content")
+                        {
+                            //PPH changed this to document instead of cmsNode to handle republishing.
+                            cms.businesslogic.web.Document d = new umbraco.cms.businesslogic.web.Document(int.Parse(helper.Request("id")));
+                            d.Move(int.Parse(helper.Request("copyTo")));
+                            if (d.Published)
+                            {
+                                d.Publish(new umbraco.BusinessLogic.User(0));
+                                //using library.publish to support load balancing.
+                                //umbraco.library.PublishSingleNode(d.Id);
+                                umbraco.library.UpdateDocumentCache(d.Id);
 
-                            //PPH added handling of load balanced moving of multiple nodes...
-                            if (d.HasChildren) {
-                                handleChildNodes(d);
+                                //PPH added handling of load balanced moving of multiple nodes...
+                                if (d.HasChildren)
+                                {
+                                    handleChildNodes(d);
+                                }
+
+                                //Using the general Refresh content method instead as it supports load balancing. 
+                                //we only need to do this if the node is actually published.
+                                library.RefreshContent();
                             }
-
-                            //Using the general Refresh content method instead as it supports load balancing. 
-                            //we only need to do this if the node is actually published.
-                            library.RefreshContent();
+                            d.Save(); //stub to save stuff to the db.
                         }
-                        d.Save(); //stub to save stuff to the db.
-
-                        //OLD
-                        //cms.businesslogic.CMSNode c = new cms.businesslogic.CMSNode(int.Parse(helper.Request("id")));
-                        //c.Move(int.Parse(helper.Request("copyTo")));
-
-                        // library.RePublishNodesDotNet(-1, false);
-                        //content.Instance.RefreshContentFromDatabaseAsync();                   
+                        else
+                        {
+                            Media m = new Media(int.Parse(UmbracoContext.Current.Request["id"]));
+                            m.Move(int.Parse(UmbracoContext.Current.Request["copyTo"]));
+                        }                                 
 
                         feedback.Text = ui.Text("moveOrCopy", "moveDone", nodes, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow + "'>" + ui.Text("closeThisWindow") + "</a>";
                         feedback.type = umbraco.uicontrols.Feedback.feedbacktype.success;
