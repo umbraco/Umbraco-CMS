@@ -32,9 +32,14 @@ namespace umbraco
     public class loadContent : BaseContentTree
     {
 
-        public loadContent(string application) : base(application) { }        
+        public loadContent(string application)
+            : base(application)
+        {
+            this._StartNodeID = CurrentUser.StartNodeId;
+        }
 
         private Document m_document;
+        private int _StartNodeID;
 
         /// <summary>
         /// Returns the Document object of the starting node for the current User. This ensures
@@ -44,7 +49,25 @@ namespace umbraco
         {
             get
             {
-                return (m_document == null ? m_document = new Document(StartNodeID) : m_document);
+                if (m_document == null)
+                {
+                    m_document = new Document(StartNodeID);
+                }
+
+                if (!m_document.Path.Contains(CurrentUser.StartNodeId.ToString()))
+                {
+                    var doc = new Document(CurrentUser.StartNodeId);
+                    if (!string.IsNullOrEmpty(doc.Path) && doc.Path.Contains(this.StartNodeID.ToString()))
+                    {
+                        m_document = doc;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+
+                return m_document;
             }
         }
 
@@ -56,13 +79,17 @@ namespace umbraco
         /// </summary>
         /// <param name="actions"></param>
         protected override void CreateRootNodeActions(ref List<IAction> actions)
-		{
-			actions.Clear();
+        {
+            actions.Clear();
 
             if (StartNodeID != -1)
             {
                 //get the document for the start node id
                 Document doc = StartNode;
+                if (doc == null)
+                {
+                    return;
+                }
                 //get the allowed actions for the user for the current node
                 List<IAction> nodeActions = GetUserActionsForNode(doc);
                 //get the allowed actions for the tree based on the users allowed actions
@@ -78,38 +105,38 @@ namespace umbraco
                 actions.Add(ActionRePublish.Instance);
                 actions.Add(ContextMenuSeperator.Instance);
                 actions.Add(ActionRefresh.Instance);
-				actions.Add(ActionTreeEditMode.Instance);
-            }			
-		}
+                actions.Add(ActionTreeEditMode.Instance);
+            }
+        }
 
         protected override void CreateAllowedActions(ref List<IAction> actions)
-		{
-			actions.Clear();
+        {
+            actions.Clear();
             actions.Add(ActionNew.Instance);
             actions.Add(ActionLiveEdit.Instance);
             actions.Add(ContextMenuSeperator.Instance);
             actions.Add(ActionDelete.Instance);
-			actions.Add(ContextMenuSeperator.Instance);
-			actions.Add(ActionMove.Instance);
-			actions.Add(ActionCopy.Instance);
-			actions.Add(ContextMenuSeperator.Instance);
-			actions.Add(ActionSort.Instance);
-			actions.Add(ActionRollback.Instance);
-			actions.Add(ContextMenuSeperator.Instance);
-			actions.Add(ActionPublish.Instance);
+            actions.Add(ContextMenuSeperator.Instance);
+            actions.Add(ActionMove.Instance);
+            actions.Add(ActionCopy.Instance);
+            actions.Add(ContextMenuSeperator.Instance);
+            actions.Add(ActionSort.Instance);
+            actions.Add(ActionRollback.Instance);
+            actions.Add(ContextMenuSeperator.Instance);
+            actions.Add(ActionPublish.Instance);
             actions.Add(ActionToPublish.Instance);
-			actions.Add(ActionAssignDomain.Instance);
-			actions.Add(ActionRights.Instance);
-			actions.Add(ContextMenuSeperator.Instance);
-			actions.Add(ActionProtect.Instance);
-			actions.Add(ContextMenuSeperator.Instance);
-			actions.Add(ActionUnPublish.Instance);
-			actions.Add(ContextMenuSeperator.Instance);
-			actions.Add(ActionNotify.Instance);
-			actions.Add(ActionSendToTranslate.Instance);
+            actions.Add(ActionAssignDomain.Instance);
+            actions.Add(ActionRights.Instance);
+            actions.Add(ContextMenuSeperator.Instance);
+            actions.Add(ActionProtect.Instance);
+            actions.Add(ContextMenuSeperator.Instance);
+            actions.Add(ActionUnPublish.Instance);
+            actions.Add(ContextMenuSeperator.Instance);
+            actions.Add(ActionNotify.Instance);
+            actions.Add(ActionSendToTranslate.Instance);
             actions.Add(ContextMenuSeperator.Instance);
             actions.Add(ActionRefresh.Instance);
-		}
+        }
 
         /// <summary>
         /// Creates the root node for the content tree. If the current User does
@@ -122,27 +149,37 @@ namespace umbraco
             if (StartNodeID != -1)
             {
                 Document doc = StartNode;
-                rootNode = CreateNode(doc, RootNodeActions);
+                if (doc == null)
+                {
+                    rootNode = new NullTree(this.app).RootNode;
+                    rootNode.Text = "You do not have permission for this content tree";
+                    rootNode.HasChildren = false;
+                    rootNode.Source = string.Empty;
+                }
+                else
+                {
+                    rootNode = CreateNode(doc, RootNodeActions); 
+                }
             }
             else
             {
                 if (IsDialog)
                     rootNode.Action = "javascript:openContent(-1);";
             }
-            
+
         }
 
-		/// <summary>
-		/// If the user is an admin, always return entire tree structure, otherwise
-		/// return the user's start node id.
-		/// </summary>
-		public override int StartNodeID
-		{
-			get
-			{
-                return CurrentUser.StartNodeId;
-			}
-		}        
+        /// <summary>
+        /// If the user is an admin, always return entire tree structure, otherwise
+        /// return the user's start node id.
+        /// </summary>
+        public override int StartNodeID
+        {
+            get
+            {
+                return this._StartNodeID;
+            }
+        }
 
         /// <summary>
         /// Adds the recycling bin node. This method should only actually add the recycle bin node when the tree is initially created and if the user
@@ -156,8 +193,8 @@ namespace umbraco
                 //create a new content recycle bin tree, initialized with it's startnodeid
                 ContentRecycleBin bin = new ContentRecycleBin(this.m_app);
                 bin.ShowContextMenu = this.ShowContextMenu;
-                bin.id = bin.StartNodeID; 
-                return bin.RootNode;               
+                bin.id = bin.StartNodeID;
+                return bin.RootNode;
             }
             return null;
         }
@@ -169,15 +206,15 @@ namespace umbraco
         /// <param name="Tree"></param>
         public override void Render(ref XmlTree tree)
         {
-			base.Render(ref tree);
-			XmlTreeNode recycleBin = CreateRecycleBin();
-			if (recycleBin != null)
-				tree.Add(recycleBin);
+            base.Render(ref tree);
+            XmlTreeNode recycleBin = CreateRecycleBin();
+            if (recycleBin != null)
+                tree.Add(recycleBin);
         }
-       
-        
 
-        
+
+
+
 
     }
 }

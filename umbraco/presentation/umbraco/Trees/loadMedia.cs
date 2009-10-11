@@ -30,7 +30,8 @@ namespace umbraco
     public class loadMedia : BaseMediaTree
     {
 
-		/// <summary>
+        private int _StartNodeID;
+        /// <summary>
 		/// Create the linkable data types list and add the DataTypeUploadField guid to it.
 		/// By default, any media type that is to be "linkable" in the WYSIWYG editor must contain
 		/// a DataTypeUploadField data type which will ouput the value for the link, however, if 
@@ -48,7 +49,7 @@ namespace umbraco
 		public loadMedia(string application)
 			: base(application)
 		{
-						
+            _StartNodeID = CurrentUser.StartMediaId;
 		}		
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
@@ -87,10 +88,10 @@ namespace umbraco
 		/// </summary>
 		public override int StartNodeID
 		{
-			get
-			{
-				return CurrentUser.StartMediaId;
-			}
+            get
+            {
+                return _StartNodeID;
+            }
 		}
 
 		/// <summary>

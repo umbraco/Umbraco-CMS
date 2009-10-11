@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Trees">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Tree" maxOccurs="unbounded" minOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Class" minOccurs="1" maxOccurs="1" type="xs:string"></xs:element>
+              <xs:element name="Assembly" minOccurs="1" maxOccurs="1" type="xs:string"></xs:element>
+              <xs:element name="Properties" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="Property" minOccurs="1">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute name="Name" type="xs:string"></xs:attribute>
+                            <xs:attribute name="AccessMode">
+                              <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                  <xs:enumeration value="Property" />
+                                  <xs:enumeration value="Field" />
+                                </xs:restriction>
+                              </xs:simpleType>
+                            </xs:attribute>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

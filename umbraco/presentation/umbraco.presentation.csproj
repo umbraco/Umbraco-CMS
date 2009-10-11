@@ -1,6 +1,6 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{651E1350-91B6-44B7-BD60-7207006D7003}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -1179,6 +1179,7 @@
       <DependentUpon>sort.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\Trees\BaseMediaTree.cs" />
+    <Compile Include="umbraco\Trees\dynamicLoader.cs" />
     <Compile Include="umbraco\Trees\MediaRecycleBin.cs" />
     <Compile Include="umbraco\webservices\MacroContainerService.asmx.cs">
       <DependentUpon>MacroContainerService.asmx</DependentUpon>
@@ -1902,6 +1903,7 @@
     <Content Include="config\ClientDependency.config" />
     <Content Include="config\ExamineSettings.config" />
     <Content Include="config\ExamineIndex.config" />
+    <None Include="App_Data\ApplicationDesigner.xsd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

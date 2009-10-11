@@ -40,5 +40,13 @@ namespace umbraco.presentation
                 return XDocument.Load(this.ContentXmlPath);
             }
         }
+
+        public string DataFolder
+        {
+            get
+            {
+                return GlobalSettings.StorageDirectory;
+            }
+        }
     }
 }
