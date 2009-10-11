@@ -28,6 +28,7 @@ namespace umbraco.presentation.webservices
 		/// <param name="isDialog"></param>
 		/// <returns></returns>
 		[WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
 		public Dictionary<string, string> GetInitAppTreeData(string app, bool showContextMenu, bool isDialog)
 		{
 			Authorize();

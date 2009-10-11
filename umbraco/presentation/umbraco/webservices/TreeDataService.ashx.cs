@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.Services;
 using umbraco.cms.presentation.Trees;
+using System.Threading;
 
 namespace umbraco.presentation.webservices
 {
@@ -18,6 +19,7 @@ namespace umbraco.presentation.webservices
 		public void ProcessRequest(HttpContext context)
 		{
 			Authorize();
+            //Thread.Sleep(100000);
 			context.Response.ContentType = "application/json";
 			context.Response.Write(GetXmlTree().ToString());
 

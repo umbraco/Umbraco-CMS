@@ -59,7 +59,7 @@ namespace umbraco.cms.presentation.Trees
                 Javascript.Append(this.FunctionToCall + "(id)\n");
                 Javascript.Append("}\n");
             }
-            else if (HttpContext.Current.Request.QueryString["isDialog"] == null)
+            else if (!this.IsDialog)
             {
                 Javascript.Append(
 					@"

@@ -323,11 +323,11 @@ namespace umbraco.presentation.umbraco.controls
 		public override IDictionary<string, object> Serialize(object obj, JavaScriptSerializer serializer)
 		{
 			//{
-			//    "id": "create",
+            //    "id": "L",
 			//    "label": "Create",
 			//    "icon": "create.png",
 			//    "visible": function(NODE, TREE_OBJ) { if (NODE.length != 1) return false; return TREE_OBJ.check("creatable", NODE); },
-			//    "action": function(NODE, TREE_OBJ) { TREE_OBJ.create(false, NODE); }
+			//    "action": function(NODE, TREE_OBJ) { TREE_OBJ.create(false, NODE); },
 			//}
 
 

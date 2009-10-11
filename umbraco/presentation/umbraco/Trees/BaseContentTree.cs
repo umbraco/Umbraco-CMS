@@ -232,9 +232,14 @@ function openContent(id) {
                 
                 treeElement.Action = String.Format("javascript:openContent('{0}');", nodeLink.Replace("'","\\'"));
             }
+            else if (this.DialogMode == TreeDialogModes.id || this.DialogMode == TreeDialogModes.none)
+            {
+                treeElement.Action = String.Format("javascript:openContent('{0}');", dd.Id.ToString());
+            }
             else if (!this.IsDialog || (this.DialogMode == TreeDialogModes.id))
             {
-                if (CurrentUser.GetPermissions(dd.Path).Contains(ActionUpdate.Instance.Letter.ToString())) {
+                if (CurrentUser.GetPermissions(dd.Path).Contains(ActionUpdate.Instance.Letter.ToString()))
+                {
                     treeElement.Action = String.Format("javascript:openContent({0});", dd.Id);
                 }
             }

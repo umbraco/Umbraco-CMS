@@ -248,16 +248,16 @@ Umbraco.Application.Actions = function() {
 
         actionNew: function() {
             /// <summary>Show the create new modal overlay</summary>
-
-            if (UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                if (UmbClientMgr.mainTree().getActionNode().nodeType == "content") {
-                    UmbClientMgr.mainWindow().openModal("create.aspx?nodeId=" + UmbClientMgr.mainTree().getActionNode().nodeId + "&nodeType=" + UmbClientMgr.mainTree().getActionNode().nodeType + "&nodeName=" + UmbClientMgr.mainTree().getActionNode().nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], 425, 600);
+            var actionNode = UmbClientMgr.mainTree().getActionNode();
+            if (actionNode.nodeType != '') {
+                if (actionNode.nodeType == "content") {
+                    UmbClientMgr.mainWindow().openModal("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], 425, 600);
                 }
-                else if (UmbClientMgr.mainTree().getActionNode().nodeType == "initmember") {
-                    UmbClientMgr.mainWindow().openModal("create.aspx?nodeId=" + UmbClientMgr.mainTree().getActionNode().nodeId + "&nodeType=" + UmbClientMgr.mainTree().getActionNode().nodeType + "&nodeName=" + UmbClientMgr.mainTree().getActionNode().nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], 380, 420);
+                else if (actionNode.nodeType == "initmember") {
+                    UmbClientMgr.mainWindow().openModal("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], 380, 420);
                 }
                 else {
-                    UmbClientMgr.mainWindow().openModal("create.aspx?nodeId=" + UmbClientMgr.mainTree().getActionNode().nodeId + "&nodeType=" + UmbClientMgr.mainTree().getActionNode().nodeType + "&nodeName=" + UmbClientMgr.mainTree().getActionNode().nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], 270, 420);
+                    UmbClientMgr.mainWindow().openModal("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], 270, 420);
                 }
             }
         },
