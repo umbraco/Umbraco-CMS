@@ -2,7 +2,6 @@
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <umb:JsInclude ID="JsInclude1" runat="server" FilePath="Search/quickSearch.js" PathNameAlias="UmbracoRoot" />
-<umb:JsInclude ID="JsInclude2" runat="server" FilePath="js/quickedit.js" PathNameAlias="UmbracoRoot" />
 <umb:JsInclude ID="JsInclude3" runat="server" FilePath="Application/JQuery/jquery.autocomplete.js" PathNameAlias="UmbracoClient" />
 
 <script type="text/javascript">
