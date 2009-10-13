@@ -1978,7 +1978,8 @@ namespace umbraco
         {
             XmlDocument xd = new XmlDocument();
             xd.LoadXml("<relations/>");
-            foreach (Relation r in new CMSNode(NodeId).Relations)
+            var rels = new CMSNode(NodeId).Relations;
+            foreach (Relation r in rels)
             {
                 XmlElement n = xd.CreateElement("relation");
                 n.AppendChild(xmlHelper.addCDataNode(xd, "comment", r.Comment));

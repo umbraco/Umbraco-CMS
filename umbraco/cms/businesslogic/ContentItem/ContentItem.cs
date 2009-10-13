@@ -36,7 +36,8 @@ namespace umbraco.cms.businesslogic.contentitem
 
 		public static void DeleteFromType(ContentItemType cit) 
 		{
-			foreach (Content c in Content.getContentOfContentType(cit)) 
+            var objs = Content.getContentOfContentType(cit);
+			foreach (Content c in objs) 
 			{
 				// due to recursive structure document might already been deleted..
 				if (CMSNode.IsNode(c.UniqueId)) 

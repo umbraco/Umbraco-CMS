@@ -234,9 +234,6 @@ namespace umbraco.cms.businesslogic
 
 		/// <summary>
 		/// Retrieve a list of generic properties of the content
-        /// TODO: Need to look everywhere in the codebase to see if this property is iterated over
-        /// then change the implementation so that a local variable is declared first, or getProperties.ToList() is
-        /// performed for the iteration... will save many db queries.
 		/// </summary>
 		public Property[] getProperties 
 		{
@@ -490,7 +487,8 @@ namespace umbraco.cms.businesslogic
 
 		public virtual void XmlPopulate(XmlDocument xd, ref XmlNode x, bool Deep) 
 		{
-			foreach (property.Property p in this.getProperties)
+            var props = this.getProperties;
+			foreach (property.Property p in props)
 				if (p != null)
 					x.AppendChild(p.ToXml(xd));
 

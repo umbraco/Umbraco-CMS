@@ -302,6 +302,7 @@ namespace umbraco.cms.businesslogic {
         /// <summary>
         /// The menu items used in the tree view
         /// </summary>
+        [Obsolete("this is not used anywhere")]
         public virtual BusinessLogic.console.MenuItemI[] MenuItems {
             get { return new BusinessLogic.console.MenuItemI[0]; }
         }
@@ -628,7 +629,8 @@ namespace umbraco.cms.businesslogic {
             FireBeforeDelete(e);
             if (!e.Cancel) {
                 // remove relations
-                foreach (relation.Relation rel in Relations)
+                var rels = Relations;
+                foreach (relation.Relation rel in rels)
                 {
                     rel.Delete();
                 }

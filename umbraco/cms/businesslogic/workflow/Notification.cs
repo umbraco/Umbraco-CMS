@@ -68,7 +68,8 @@ namespace umbraco.cms.businesslogic.workflow
 
             // build summary
             StringBuilder summary = new StringBuilder();
-            foreach (Property p in documentObject.getProperties)
+            var props = documentObject.getProperties;
+            foreach (Property p in props)
             {
                 // check if something was changed and display the changes otherwise display the fields
                 Property oldProperty = oldDoc.getProperty(p.PropertyType.Alias);

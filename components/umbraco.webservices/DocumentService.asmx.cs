@@ -278,8 +278,8 @@ namespace umbraco.webservices.documents
 
             carrier.Published = doc.Published;
             carrier.HasChildren = doc.HasChildren;
-
-            foreach (umbraco.cms.businesslogic.property.Property prop in doc.getProperties)
+            var props = doc.getProperties;
+            foreach (umbraco.cms.businesslogic.property.Property prop in props)
             {
                 documentProperty carrierprop = new documentProperty();
 

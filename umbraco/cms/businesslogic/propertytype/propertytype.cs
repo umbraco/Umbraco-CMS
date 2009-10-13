@@ -286,7 +286,8 @@ namespace umbraco.cms.businesslogic.propertytype
             FlushCache();
 
 			// Delete all properties of propertytype
-			foreach(Content c in Content.getContentOfContentType(new ContentType(_contenttypeid)))
+            var objs = Content.getContentOfContentType(new ContentType(_contenttypeid));
+			foreach(Content c in objs)
 			{
 				c.getProperty(this).delete();
 			}

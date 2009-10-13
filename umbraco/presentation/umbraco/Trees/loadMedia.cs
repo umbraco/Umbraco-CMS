@@ -120,38 +120,7 @@ namespace umbraco
 				tree.Add(recycleBin);
 		}
 
-		/// <summary>
-		/// Returns the value for a link in WYSIWYG mode, by default only media items that have a 
-		/// DataTypeUploadField are linkable, however, a custom tree can be created which overrides
-		/// this method, or another GUID for a custom data type can be added to the LinkableMediaDataTypes
-		/// list on application startup.
-		/// </summary>
-		/// <param name="dd"></param>
-		/// <param name="nodeLink"></param>
-		/// <returns></returns>
-        public virtual string GetLinkValue(Media dd, string nodeLink)
-        {
-
-			foreach (Property p in dd.getProperties)
-			{				
-				Guid currId = p.PropertyType.DataTypeDefinition.DataType.Id;
-				if (LinkableMediaDataTypes.Contains(currId) &&  !String.IsNullOrEmpty(p.Value.ToString()))
-				{
-					return p.Value.ToString();
-				}
-			}
-            return "";
-        }
-
-		/// <summary>
-		/// By default, any media type that is to be "linkable" in the WYSIWYG editor must contain
-		/// a DataTypeUploadField data type which will ouput the value for the link, however, if 
-		/// a developer wants the WYSIWYG editor to link to a custom media type, they will either have
-		/// to create their own media tree and inherit from this one and override the GetLinkValue 
-		/// or add another GUID to the LinkableMediaDataType list on application startup that matches
-		/// the GUID of a custom data type. The order of property types on the media item definition will determine the output value.
-		/// </summary>
-		public static List<Guid> LinkableMediaDataTypes { get; private set; }
+	
 
     }
 }

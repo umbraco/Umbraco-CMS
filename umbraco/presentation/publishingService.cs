@@ -28,7 +28,8 @@ namespace umbraco.presentation
 				// DO not run publishing if content is re-loading
 				if(!content.Instance.isInitializing)
 				{
-					foreach(Document d in Document.GetDocumentsForRelease())
+                    var docs = Document.GetDocumentsForRelease();
+					foreach(Document d in docs)
 					{
 						try
 						{
@@ -49,7 +50,6 @@ namespace umbraco.presentation
 								string.Format("Error publishing node: {0}", ee));
 						}
 					}
-
 					foreach(Document d in Document.GetDocumentsForExpiration())
 					{
 						d.HttpContext = (HttpContext)sender;

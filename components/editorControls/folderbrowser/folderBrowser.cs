@@ -51,7 +51,8 @@ namespace umbraco.editorControls
 			foreach (BusinessLogic.console.IconI cc in children) 
 			{
 				cms.businesslogic.media.Media m = new cms.businesslogic.media.Media(cc.UniqueId);
-				foreach (cms.businesslogic.property.Property p in m.getProperties) 
+                var props = m.getProperties;
+				foreach (cms.businesslogic.property.Property p in props) 
 				{
 					if (p.PropertyType.DataTypeDefinition.DataType.Id == uft.Id && p.Value.ToString() != "") 
 					{

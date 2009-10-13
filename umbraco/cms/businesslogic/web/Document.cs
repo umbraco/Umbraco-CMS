@@ -291,7 +291,8 @@ namespace umbraco.cms.businesslogic.web
                 dNew.Text = dOld.Text;
 
                 // Revert all properties
-                foreach (Property p in dOld.getProperties)
+                var props = dOld.getProperties;
+                foreach (Property p in props)
                     try {
                         dNew.getProperty(p.PropertyType).Value = p.Value;
                     } catch {
@@ -731,7 +732,8 @@ namespace umbraco.cms.businesslogic.web
                 NewDoc.Template = Template;
 
                 // Copy the properties of the current document
-                foreach (Property p in getProperties)
+                var props = getProperties;
+                foreach (Property p in props)
                     NewDoc.getProperty(p.PropertyType.Alias).Value = p.Value;
 
                 // Relate?
@@ -906,8 +908,8 @@ namespace umbraco.cms.businesslogic.web
 
                     //delete files 
                     interfaces.IDataType uploadField = new cms.businesslogic.datatype.controls.Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
-
-                    foreach (cms.businesslogic.property.Property p in this.getProperties)
+                    var props = this.getProperties;
+                    foreach (cms.businesslogic.property.Property p in props)
 
                         if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id &&
                             p.Value.ToString() != "" &&
@@ -934,7 +936,8 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="dt">The type of which documents should be deleted</param>
         public static void DeleteFromType(DocumentType dt)
         {
-            foreach (Content c in getContentOfContentType(dt))
+            var objs = getContentOfContentType(dt);
+            foreach (Content c in objs)
             {
                 // due to recursive structure document might already been deleted..
                 if (IsNode(c.UniqueId))
@@ -1046,7 +1049,8 @@ namespace umbraco.cms.businesslogic.web
         public override void XmlPopulate(XmlDocument xd, ref XmlNode x, bool Deep)
         {
             string urlName = this.Text;
-            foreach (Property p in getProperties)
+            var props = getProperties;
+            foreach (Property p in props)
                 if (p != null)
                 {
                     x.AppendChild(p.ToXml(xd));

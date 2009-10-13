@@ -105,7 +105,8 @@ function openContentItem(id) {
                 if (ContentItemParent != "") // show contentitems owned by the specific member!
                 {
                     CMSNode c = new CMSNode(int.Parse(ContentItemParent));
-                    foreach (CMSNode cn in c.ChildrenOfAllObjectTypes)
+                    var childs = c.ChildrenOfAllObjectTypes;
+                    foreach (CMSNode cn in childs)
                     {
                         XmlElement treeElement = Tree.CreateElement("tree");
                         treeElement.SetAttribute("menu", "D,L");

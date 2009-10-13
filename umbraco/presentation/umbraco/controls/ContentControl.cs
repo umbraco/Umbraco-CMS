@@ -185,7 +185,8 @@ namespace umbraco.controls
 
         protected override void OnLoad(EventArgs e)
         {
-            foreach (Property p in _content.getProperties)
+            var props = _content.getProperties;
+            foreach (Property p in props)
             {
                 if (inTab[p.PropertyType.Id.ToString()] == null)
                     addControlNew(p, tpProp, ui.Text("general", "properties", null));

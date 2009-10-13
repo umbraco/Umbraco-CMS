@@ -157,8 +157,8 @@ function openMedia(id) {
 		/// <returns></returns>
         public virtual string GetLinkValue(Media dd, string nodeLink)
         {
-
-			foreach (Property p in dd.getProperties)
+            var props = dd.getProperties;
+			foreach (Property p in props)
 			{				
 				Guid currId = p.PropertyType.DataTypeDefinition.DataType.Id;
 				if (LinkableMediaDataTypes.Contains(currId) &&  !String.IsNullOrEmpty(p.Value.ToString()))
@@ -177,7 +177,7 @@ function openMedia(id) {
 		/// or add another GUID to the LinkableMediaDataType list on application startup that matches
 		/// the GUID of a custom data type. The order of property types on the media item definition will determine the output value.
 		/// </summary>
-		public static List<Guid> LinkableMediaDataTypes { get; private set; }
+		public static List<Guid> LinkableMediaDataTypes { get; protected set; }
 
 	}
 }

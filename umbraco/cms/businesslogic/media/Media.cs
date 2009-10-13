@@ -200,7 +200,8 @@ namespace umbraco.cms.businesslogic.media
 		/// <param name="dt"></param>
 		public static void DeleteFromType(MediaType dt) 
 		{
-			foreach (Content c in Media.getContentOfContentType(dt)) 
+            var objs = Media.getContentOfContentType(dt);
+			foreach (Content c in objs) 
 			{
 				// due to recursive structure document might already been deleted..
 				if (CMSNode.IsNode(c.UniqueId)) 
@@ -247,7 +248,8 @@ namespace umbraco.cms.businesslogic.media
 
 					// Remove all files
 					interfaces.IDataType uploadField = new cms.businesslogic.datatype.controls.Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
-					foreach (cms.businesslogic.property.Property p in this.getProperties)
+                    var props = this.getProperties;
+                    foreach (cms.businesslogic.property.Property p in props)
 					{
 						FileInfo mediaFile = new FileInfo(System.Web.HttpContext.Current.Server.MapPath(p.Value.ToString()));
 

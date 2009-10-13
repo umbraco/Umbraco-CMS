@@ -89,7 +89,8 @@ namespace umbraco.cms.businesslogic.translation
             Document d = new Document(DocumentId);
 
             int words = CountWordsInString(d.Text);
-            foreach (Property p in d.getProperties)
+            var props = d.getProperties;
+            foreach (Property p in props)
             {
                 if (p.Value.GetType() == "".GetType())
                 {

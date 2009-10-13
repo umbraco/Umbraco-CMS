@@ -46,7 +46,8 @@ namespace umbraco.dialogs
 			{
 				
 				cms.businesslogic.media.Media m = cms.businesslogic.media.Media.MakeNew(TextBoxTitle.Text, cms.businesslogic.media.MediaType.GetByAlias("image"), this.getUser(), int.Parse(mediaPickerControl.Text));
-				foreach (cms.businesslogic.property.Property p in m.getProperties) {
+                var props = m.getProperties;
+                foreach (cms.businesslogic.property.Property p in props) {
 					if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id) 
 					{
 						uploadField.DataTypeDefinitionId = p.PropertyType.DataTypeDefinition.Id;

@@ -398,7 +398,8 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="dt">The membertype which are being deleted</param>
         public static void DeleteFromType(MemberType dt)
         {
-            foreach (Content c in getContentOfContentType(dt))
+            var objs = getContentOfContentType(dt);
+            foreach (Content c in objs)
             {
                 // due to recursive structure document might already been deleted..
                 if (IsNode(c.UniqueId))

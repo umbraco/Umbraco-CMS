@@ -63,7 +63,8 @@ namespace umbraco
                              d.UpdateDate, d.Path, d.Version, tmpParentId);
 
             // update page elements
-            foreach (Property p in d.getProperties)
+            var props = d.getProperties;
+            foreach (Property p in props)
             {
                 string sValue = p.Value!=null ? p.Value.ToString() : String.Empty;
                 elements.Add(p.PropertyType.Alias, sValue);
