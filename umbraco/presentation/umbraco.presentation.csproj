@@ -1,6 +1,6 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{651E1350-91B6-44B7-BD60-7207006D7003}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -1472,7 +1472,6 @@
     <Content Include="umbraco_client\Tree\jquery.tree.contextmenu.js" />
     <Content Include="umbraco_client\Tree\jquery.tree.js" />
     <Content Include="umbraco_client\Tree\jquery.tree.metadata.js" />
-    <Content Include="umbraco_client\Tree\jquery.tree.min.js" />
     <Content Include="umbraco_client\Tree\Themes\default\dot_for_ie.gif" />
     <Content Include="umbraco_client\Tree\Themes\default\icons.png" />
     <Content Include="umbraco_client\Tree\Themes\umbraco\icons.png" />
@@ -1722,7 +1721,6 @@
     <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\no_dlg.js" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\sv.js" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\langs\sv_dlg.js" />
-    <Content Include="umbraco_client\Tree\UmbracoTree.min.js" />
     <Content Include="umbraco_client\ui\jQueryWresize.js" />
     <Content Include="umbraco\Search\quickSearch.js" />
     <Content Include="umbraco\members\search.aspx" />

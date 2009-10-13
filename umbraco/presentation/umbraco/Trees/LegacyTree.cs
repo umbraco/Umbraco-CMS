@@ -79,9 +79,12 @@ namespace umbraco.cms.presentation.Trees
             xDoc.LoadXml(tree.ToString(SerializedTreeType.XmlTree));
             Render(ref xDoc);
             tree = SerializableData.Deserialize(xDoc.OuterXml, typeof(XmlTree)) as XmlTree;
-			//ensure that the tree type is set!
-			foreach (XmlTreeNode node in tree)
-				node.TreeType = this.TreeAlias;
+			
+            foreach (XmlTreeNode node in tree)
+            {
+                //ensure that the tree type is set for each node
+                node.TreeType = this.TreeAlias;
+            }
         }
 
 		public override void Render(ref System.Xml.XmlDocument Tree)

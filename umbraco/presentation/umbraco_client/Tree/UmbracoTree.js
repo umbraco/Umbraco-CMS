@@ -53,7 +53,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _showContext: true,
             _isEditMode: false,
             _isDialog: false,
-            _isDebug: true, //set to true to enable alert debugging
+            _isDebug: false, //set to true to enable alert debugging
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
             _serviceUrl: "", //a path to the tree client service url
             _dataUrl: "", //a path to the tree data service url
@@ -180,19 +180,23 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 this._debug("saveTreeState: " + appAlias + " : ajax request? " + this._currentAJAXRequest);
 
+                //clear the saved data for the current app before saving
+                this._container.data("tree_" + appAlias, null);
+                
                 //if an ajax request is currently in progress, abort saving the tree state and set the 
                 //data object for the application to null.
-                if (this._currentAJAXRequest) {
-                    this._container.data("tree_" + appAlias, null);
-                    return;
+                if (!this._currentAJAXRequest) {                                                                    
+                    //only save the data if there are nodes
+                    var nodeCount = this._container.find("li[rel='dataNode']").length;
+                    if (nodeCount > 0) {
+                        this._debug("saveTreeState: node count = " + nodeCount);
+                        var treeData = this._tree.get();                    
+                        //need to update the 'state' of the data. jsTree get doesn't return the state of nodes properly!
+                        this._updateJSONNodeState(treeData);                    
+                        this._debug("saveTreeState: treeData = " + treeData);
+                        this._container.data("tree_" + appAlias, { selected: this._tree.selected, d: treeData });
+                    }
                 }
-                
-                var treeData = this._tree.get();
-                
-                //need to update the 'state' of the data. jsTree get doesn't return the state of nodes properly!
-                this._updateJSONNodeState(treeData);
-
-                this._container.data("tree_" + appAlias, { selected: this._tree.selected, d: treeData });
             },
 
             _updateJSONNodeState: function(obj) {
@@ -927,9 +931,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         rtl: false,
                         animation: false,
                         hover_mode: true,
-                        //theme_path: this._umb_clientFolderRoot + "/Tree/Themes/",
+                        theme_path: this._umb_clientFolderRoot + "/Tree/Themes/",
                         theme_name: "umbraco"
-                        //context: null //no context menu by default						
                     },
                     langs: {
                         new_node: "New folder",

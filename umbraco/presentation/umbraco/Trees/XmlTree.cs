@@ -199,7 +199,7 @@ namespace umbraco.cms.presentation.Trees
 			xNode.NodeType = bTree.TreeAlias;
 			xNode.Text = BaseTree.GetTreeHeader(bTree.TreeAlias);
 			//by default, all root nodes will open the dashboard to their application
-			xNode.Action = ClientTools.Scripts.OpenDashboard(bTree.app);
+			xNode.Action = "javascript:" + ClientTools.Scripts.OpenDashboard(bTree.app);
 			xNode.IsRoot = true;
 			//generally the tree type and node type are the same but in some cased they are not.
 			xNode.m_treeType = bTree.TreeAlias;
@@ -493,6 +493,12 @@ namespace umbraco.cms.presentation.Trees
 							break;
 					}
 				}
+                //need to set the hasChildren property if it is null but there is a source
+                //this happens when the hasChildren attribute is not set because the developer didn't know it was there
+                //only occurs for ITree obviously
+                if (!this.HasChildren && !string.IsNullOrEmpty(this.m_src))
+                    this.HasChildren = true;
+
 			}
 
 			reader.Read();

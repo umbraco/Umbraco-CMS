@@ -211,6 +211,9 @@
 							if(this.src.toString().match(/jquery\.tree.*?js$/)) { _this.settings.ui.theme_path = this.src.toString().replace(/jquery\.tree.*?js$/, "") + "themes/" + _this.settings.ui.theme_name + "/style.css"; return false; }
 						});
 					}
+					else {
+					    this.settings.ui.theme_path += this.settings.ui.theme_name + "/style.css";
+					}
 					if(this.settings.ui.theme_path != "" && $.inArray(this.settings.ui.theme_path, tree_component.themes) == -1) {
 						tree_component.add_sheet({ url : this.settings.ui.theme_path });
 						tree_component.themes.push(this.settings.ui.theme_path);
@@ -1459,7 +1462,6 @@
 						$.ajax({
 							type		: this.settings.data.opts.method,
 							url			: this.settings.data.opts.url, 
-							contentType : this.settings.data.opts.contentType,
 							data		: dd, 
 							dataType	: "text",
 							success		: function (data) {
@@ -1832,7 +1834,6 @@
 						$.ajax({
 							'type'		: opts.method,
 							'url'		: opts.url, 
-							'contentType' : opts.contentType,
 							'data'		: data, 
 							'dataType'	: "html",
 							'success'	: function (d, textStatus) {
@@ -2042,7 +2043,6 @@
 						$.ajax({
 							'type'		: opts.method,
 							'url'		: opts.url, 
-							'contentType': opts.contentType,
 							'data'		: data, 
 							'dataType'	: "json",
 							'success'	: function (d, textStatus) {
