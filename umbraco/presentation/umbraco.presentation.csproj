@@ -2206,7 +2206,7 @@
     <Content Include="umbraco\umbraco.aspx" />
     <Content Include="umbraco\users\EditUser.aspx" />
     <Content Include="umbraco\users\EditUserType.aspx" />
-    <Content Include="umbraco\users\PermissionEditor.aspx" />
+    <!--<Content Include="umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="umbraco\webService.asmx" />
     <Content Include="umbraco\webservices\ajax.js" />
     <Content Include="umbraco\webservices\CacheRefresher.asmx">

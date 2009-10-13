@@ -126,6 +126,7 @@ function openContentItem(id) {
                         treeElement.SetAttribute("icon", "doc.gif");
                         treeElement.SetAttribute("openIcon", "doc.gif");
                         treeElement.SetAttribute("nodeType", "contentItem");
+                        treeElement.SetAttribute("hasChildren", "true");
                         root.AppendChild(treeElement);
                     }
                 }
@@ -145,6 +146,7 @@ function openContentItem(id) {
                             treeElement.SetAttribute("icon", "member.gif");
                             treeElement.SetAttribute("openIcon", "member.gif");
                             treeElement.SetAttribute("nodeType", "member");
+                            treeElement.SetAttribute("hasChildren", "true");
                             root.AppendChild(treeElement);
                         }
                     }
@@ -163,6 +165,7 @@ function openContentItem(id) {
                                 treeElement.SetAttribute("icon", "member.gif");
                                 treeElement.SetAttribute("openIcon", "member.gif");
                                 treeElement.SetAttribute("nodeType", "member");
+                                treeElement.SetAttribute("hasChildren", "true");
                                 root.AppendChild(treeElement);
                             }
                         }
@@ -180,6 +183,7 @@ function openContentItem(id) {
                                 treeElement.SetAttribute("icon", "member.gif");
                                 treeElement.SetAttribute("openIcon", "member.gif");
                                 treeElement.SetAttribute("nodeType", "member");
+                                treeElement.SetAttribute("hasChildren", "true");
                                 root.AppendChild(treeElement);
                             }
                         }
@@ -201,7 +205,7 @@ function openContentItem(id) {
                     treeElement.SetAttribute("icon", FolderIcon);
                     treeElement.SetAttribute("openIcon", FolderIcon);
                     treeElement.SetAttribute("nodeType", "member");
-
+                    treeElement.SetAttribute("hasChildren", "true");
 
                     treeElement.SetAttribute("src",
                         "tree.aspx?letter=" + ((char)i) + "&app=" + m_app + "&treeType=" +
@@ -223,7 +227,7 @@ function openContentItem(id) {
                     treeElementOther.SetAttribute("icon", FolderIcon);
                     treeElementOther.SetAttribute("openIcon", FolderIcon);
                     treeElementOther.SetAttribute("nodeType", "member");
-
+                    treeElementOther.SetAttribute("hasChildren", "true");
 
                     treeElementOther.SetAttribute("src", "tree.aspx?letter=Others&app=" + m_app + "&treeType=" +
                         HttpContext.Current.Request.QueryString["treeType"] + "&rnd=" +

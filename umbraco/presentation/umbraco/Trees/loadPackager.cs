@@ -24,7 +24,7 @@ using umbraco.BusinessLogic.Utils;
 
 namespace umbraco
 {
-    // <summary>
+    /// <summary>
     /// Handles loading of the packager application into the developer application tree
     /// </summary>
     public class loadPackager : ITree
@@ -94,6 +94,7 @@ namespace umbraco
                             treeElement.SetAttribute("nodeType", "installedPackages");
                             treeElement.SetAttribute("menu", "L");
                             treeElement.SetAttribute("text", ui.Text("treeHeaders", "installedPackages"));
+                            treeElement.SetAttribute("hasChildren", "true");
                         }
                         else
                         {
@@ -116,6 +117,7 @@ namespace umbraco
                             treeElement.SetAttribute("nodeType", "packagesRepositories");
                             treeElement.SetAttribute("menu", "L");
                             treeElement.SetAttribute("text", ui.Text("treeHeaders", "repositories"));
+                            treeElement.SetAttribute("hasChildren", "true");
                         }
 
                         //if only one repo, then just list it directly and name it as the repository.
@@ -129,6 +131,7 @@ namespace umbraco
                             treeElement.SetAttribute("action", "javascript:openPackageCategory('BrowseRepository.aspx?repoGuid=" + repos[0].Guid + "');");
                             treeElement.SetAttribute("icon", "repository.gif");
                             treeElement.SetAttribute("openIcon", "repository.gif");
+                            treeElement.SetAttribute("hasChildren", "true");
                         }
 
                        //if none registered, then remove the repo node.
@@ -145,6 +148,7 @@ namespace umbraco
                         treeElement.SetAttribute("nodeType", "createdPackages");
                         treeElement.SetAttribute("menu", "C,L");
                         treeElement.SetAttribute("text", ui.Text("treeHeaders", "createdPackages"));
+                        treeElement.SetAttribute("hasChildren", "true");
                         break;
 
                     case "installer.aspx":
