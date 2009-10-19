@@ -31,7 +31,7 @@ namespace umbraco.uicontrols {
             _menu.Visible = hasMenu;
 
             if(_autoResize)
-                this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "PanelEvents", "<script type='text/javascript'>jQuery(document).ready(function() {jQuery(window).load(function(){ resizePanel('" + this.ClientID + "', " + this.hasMenu.ToString().ToLower() + ",true); }) });</script>");
+                this.Page.ClientScript.RegisterStartupScript(this.GetType(), "PanelEvents", "jQuery(document).ready(function() {jQuery(window).load(function(){ resizePanel('" + this.ClientID + "', " + this.hasMenu.ToString().ToLower() + ",true); }) });", true);
                 //this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "PanelEvents", "<script type='text/javascript'>addEvent(window, \"load\", function(){ resizePanel('" + this.ClientID + "', " + this.hasMenu.ToString().ToLower() + "); }); addEvent(window, \"resize\", function(){ resizePanel('" + this.ClientID + "', " + this.hasMenu.ToString().ToLower() + "); });</script>");
         }
 

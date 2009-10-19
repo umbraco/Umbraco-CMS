@@ -69,11 +69,13 @@ namespace umbraco.uicontrols {
                     strTmp += ",";
                 strTmp += "\"" + this.ClientID + "_tab0" + i + "\"";
             }
-            this.Page.ClientScript.RegisterStartupScript(this.GetType(), this.ClientID + "TabCollection", "<script language='javascript'>var " + this.ClientID + "_tabs = new Array(" + strTmp + ");</script>");
-            this.Page.ClientScript.RegisterStartupScript(this.GetType(), this.ClientID + "TabviewStartUp", "<script language='javascript'>setActiveTab('" + this.ClientID + "','" + this.ActiveTabId + "'," + this.ClientID + "_tabs);</script>");
+            this.Page.ClientScript.RegisterStartupScript(
+                this.GetType(), 
+                this.ClientID + "TabCollection", ";var " + this.ClientID + "_tabs = new Array(" + strTmp + ");setActiveTab('" + this.ClientID + "','" + this.ActiveTabId + "'," + this.ClientID + "_tabs);",
+                true);
 
             if (_autoResize)
-                this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "TabviewEvents", "<script type='text/javascript'>jQuery(document).ready(function(){resizeTabView(" + this.ClientID + "_tabs, '" + this.ClientID + "'); }); jQuery(window).resize(function(){ resizeTabView(" + this.ClientID + "_tabs, '" + this.ClientID + "'); });</script>");
+                this.Page.ClientScript.RegisterStartupScript(this.GetType(), "TabviewEvents", "jQuery(document).ready(function(){resizeTabView(" + this.ClientID + "_tabs, '" + this.ClientID + "'); }); jQuery(window).resize(function(){ resizeTabView(" + this.ClientID + "_tabs, '" + this.ClientID + "'); });", true);
         }
 
         protected override void Render(HtmlTextWriter writer) {

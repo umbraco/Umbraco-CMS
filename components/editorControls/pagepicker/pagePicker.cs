@@ -12,7 +12,8 @@ namespace umbraco.editorControls
 	/// </summary>
 	[ClientDependency(100, ClientDependencyType.Css, "js/submodal/submodal.css", "UmbracoRoot")]
     [ClientDependency(101, ClientDependencyType.Javascript, "js/submodal/common.js", "UmbracoRoot")]
-	[ClientDependency(102, ClientDependencyType.Javascript, "js/submodal/submodal.js", "UmbracoRoot", InvokeJavascriptMethodOnLoad = "initPopUp")]	
+    //TODO: Work out how to include this: , InvokeJavascriptMethodOnLoad = "initPopUp"
+	[ClientDependency(102, ClientDependencyType.Javascript, "js/submodal/submodal.js", "UmbracoRoot")]	
     [ValidationProperty("Value")]
 	public class pagePicker : System.Web.UI.WebControls.HiddenField, interfaces.IDataEditor
 	{
