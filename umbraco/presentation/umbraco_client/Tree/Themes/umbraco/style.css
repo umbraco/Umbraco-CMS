@@ -23,7 +23,10 @@
 .tree-umbraco ul li a.loading ins { background-image:url("throbber.gif") !important; background-position:0 0 !important;display:inline-block; float:left;}
 .tree-umbraco ul li a.loading {padding:0px !important;background:none;}
 /* OPEN or CLOSED */
-.tree-umbraco li.open { background:url("icons.png") -32px -48px no-repeat; }
+.tree-umbraco li { padding-left:0px; }
+.tree-umbraco li li { padding-left: 15px; }
+.tree-umbraco li.open { background-image:none; }
+.tree-umbraco li li.open { background:url("icons.png") -32px -48px no-repeat; }
 .tree-umbraco li.closed, #jstree-dragged.tree-default li li.open { background:url("icons.png") -48px -32px no-repeat; }
 /* Ensure no sprite is loaded */
 .tree-umbraco li a.noSpr, .tree-umbraco li a.noSpr:hover
