@@ -5,6 +5,7 @@ using umbraco.cms.presentation.Trees;
 using ClientDependency.Core;
 using umbraco.presentation;
 using ClientDependency.Core.Controls;
+using umbraco.interfaces;
 namespace umbraco.editorControls
 {
     /// <summary>
@@ -15,7 +16,7 @@ namespace umbraco.editorControls
     //TODO: Work out how to include this: , InvokeJavascriptMethodOnLoad = "initPopUp"
     [ClientDependency(102, ClientDependencyType.Javascript, "js/submodal/submodal.js", "UmbracoRoot")]	
 	[ValidationProperty("Value")]
-    public class mediaChooser : System.Web.UI.WebControls.HiddenField, interfaces.IDataEditor
+    public class mediaChooser : System.Web.UI.WebControls.HiddenField, IDataEditor
     {
         interfaces.IData _data;
         bool _showpreview;
@@ -24,6 +25,12 @@ namespace umbraco.editorControls
         public mediaChooser(interfaces.IData Data)
         {
             _data = Data;
+        }
+
+        protected override void OnPreRender(EventArgs e)
+        {
+            base.OnPreRender(e);
+            Page.ClientScript.RegisterStartupScript(typeof(IDataEditor), "initPopUp", "jQuery(document).ready(function() { initPopUp(); } );", true);
         }
 
         public mediaChooser(interfaces.IData Data, bool ShowPreview, bool ShowAdvanced)
