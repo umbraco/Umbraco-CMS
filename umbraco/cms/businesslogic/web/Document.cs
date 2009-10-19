@@ -207,6 +207,13 @@ namespace umbraco.cms.businesslogic.web
             if (!e.Cancel)
             {
 
+                // make a lookup to see if template is 0 as the template is not initialized in the optimized
+                // Document.Children method which is used in PublishWithChildrenWithResult methhod
+                if (_template == 0)
+                {
+                    _template = new DocumentType(this.ContentType.Id).DefaultTemplate;
+                }
+
                 _published = true;
                 string tempVersion = Version.ToString();
                 Guid newVersion = createNewVersion();
