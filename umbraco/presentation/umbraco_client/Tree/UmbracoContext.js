@@ -57,8 +57,11 @@
                     if (menu != "") {
                         t.settings.plugins.contextmenu.items = _this._getContextMenu(menu);
                     }
-
-				}
+                },
+                ondestroy: function(t) {
+                    //make sure there are no more events on the context menu!
+                    $("#" + this.container.attr("id")).die("contextmenu.jstree")
+                }				
 			}
 		}
 	});

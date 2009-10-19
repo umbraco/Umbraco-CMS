@@ -17,7 +17,8 @@
 	line-height: 18px;
 	height: 18px;
 }
-.tree-umbraco ul li ul {margin-top:2px;}
+.tree-umbraco ul {margin-left:0px;}
+.tree-umbraco ul li ul {margin-top:2px;margin-left:5px;}
 .tree-umbraco li a ins { display:none;}
 /* LOADER */
 .tree-umbraco ul li a.loading ins { background-image:url("throbber.gif") !important; background-position:0 0 !important;display:inline-block; float:left;}
