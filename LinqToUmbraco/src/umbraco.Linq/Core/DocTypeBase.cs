@@ -20,6 +20,7 @@ namespace umbraco.Linq.Core
         private int _Id;
         private string _name;
         private string _versionId;
+        private int _templateId;
         private int _parentId;
         private int _writerID;
         private User _writer;
@@ -59,6 +60,7 @@ namespace umbraco.Linq.Core
             this._creatorID = (int)xml.Attribute("creatorID");
             this._writerID = (int)xml.Attribute("writerID");
             this.Level = (int)xml.Attribute("level");
+            this.TemplateId = (int)xml.Attribute("template");
 
             var properties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.GetCustomAttributes(typeof(PropertyAttribute), true).Count() > 0);
             foreach (var p in properties)
@@ -125,6 +127,30 @@ namespace umbraco.Linq.Core
                 {
                     this.RaisePropertyChanging();
                     this._name = value;
+                    this.IsDirty = true;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the template ID of the umbraco item
+        /// </summary>
+        /// <value>The name.</value>
+        [Field]
+        [UmbracoInfo("template", DisplayName = "Template", Mandatory = true), DataMember(Name = "TemplateId")]
+        public virtual int TemplateId
+        {
+            get
+            {
+                return this._templateId;
+            }
+            set
+            {
+                if (this._templateId != value)
+                {
+                    this.RaisePropertyChanging();
+                    this._templateId = value;
                     this.IsDirty = true;
                     this.RaisePropertyChanged("Name");
                 }
