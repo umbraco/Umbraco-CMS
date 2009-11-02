@@ -53,7 +53,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _showContext: true,
             _isEditMode: false,
             _isDialog: false,
-            _isDebug: false, //set to true to enable alert debugging
+            _isDebug: true, //set to true to enable alert debugging
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
             _serviceUrl: "", //a path to the tree client service url
             _dataUrl: "", //a path to the tree data service url
@@ -669,6 +669,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     //create a div for the text
                     var a = $(this).children("a");
                     var ins = a.children("ins");
+                    ins.remove(); //need to remove before you do a .text() otherwise whitespace is included
                     var txt = $("<div>" + a.text() + "</div>");
                     //check if it's not a sprite, if not then move the ins node just after the anchor, otherwise remove                    
                     if (a.hasClass("noSpr")) {
@@ -678,7 +679,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                     }
                     a.html(txt);
-                    ins.remove();
                     //add the loaded class to each element so we know not to process it again
                     $(this).addClass("loaded");
                 });
