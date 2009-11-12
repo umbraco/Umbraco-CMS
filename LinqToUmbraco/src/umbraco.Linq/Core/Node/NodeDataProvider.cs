@@ -7,6 +7,7 @@ using System.IO;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml;
+using System.Reflection;
 
 namespace umbraco.Linq.Core.Node
 {
@@ -321,10 +322,25 @@ namespace umbraco.Linq.Core.Node
             {
                 if (this._knownTypes == null)
                 {
-                    this._knownTypes = (from a in AppDomain.CurrentDomain.GetAssemblies()
-                                       from t in a.GetTypes()
-                                       where t.GetCustomAttributes(typeof(DocTypeAttribute), true).Length == 1
-                                       select t).ToDictionary(k => ((UmbracoInfoAttribute)k.GetCustomAttributes(typeof(UmbracoInfoAttribute), true)[0]).Alias);
+                    this._knownTypes = new Dictionary<string, Type>();
+                    foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        try
+                        {
+                            foreach (var p in (from t in a.GetTypes()
+                                               where t.GetCustomAttributes(typeof(DocTypeAttribute), true).Length == 1
+                                               select t).ToDictionary(k => ((UmbracoInfoAttribute)k.GetCustomAttributes(typeof(UmbracoInfoAttribute), true)[0]).Alias))
+                            {
+                                this._knownTypes.Add(p.Key, p.Value);
+                            }
+                        }
+                        catch (ReflectionTypeLoadException)
+                        {
+                            //just ignore, this gets thrown if a reference doesn't exist on the server
+                            //for example, the code generation assemblies, they need VS
+                            //but if you're installing VS on a server you'd just doing it wrong...
+                        }
+                    }
                 }
 
                 return this._knownTypes;

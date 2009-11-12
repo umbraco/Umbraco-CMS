@@ -213,13 +213,14 @@ function openContent(id) {
         }
         protected void SetActionAttribute(ref XmlTreeNode treeElement, Document dd)
         {
+            //TODO: Work out why the DialogMode isn't working
             // Check for dialog behaviour
-            if (this.DialogMode == TreeDialogModes.fulllink)
+            if (this.DialogMode == TreeDialogModes.fulllink && !this.IsDialog)
             {
                 string nodeLink = CreateNodeLink(dd);
                 treeElement.Action = String.Format("javascript:openContent('{0}');", nodeLink);
             }
-            else if (this.DialogMode == TreeDialogModes.locallink)
+            else if (this.IsDialog) //(this.DialogMode == TreeDialogModes.locallink)
             {
                 string nodeLink = string.Format("{{localLink:{0}}}", dd.Id);
                 // try to make a niceurl too
