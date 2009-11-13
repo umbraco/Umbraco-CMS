@@ -39,7 +39,7 @@
 
 </style>
 </head>
-<body onload="this.focus()" style="overflow: hidden; padding: 0px; margin: 0px;">
+<body onload="this.focus()" style="overflow: auto; padding: 0px; margin: 0px;">
 	<script type="text/javascript" language="javascript">
 			function dialogHandler(id) {
 			<%
@@ -79,7 +79,7 @@
   <div id="umbModal">
     <div id="header">
       <div id="caption">Pick a node</div>
-      <a id="close" onclick="closeWindow(); return false;"  title="Close window" href="#"><span>&times;</span></a>
+      <a id="close" onclick="closeWindow(); return false;"  title="Close window" href="#" style="margin-right:15px"><span>&times;</span></a>
     </div>
     <div id="body">
         <iframe src="<%=TreeInitUrl %>"  frameborder="0" style="overflow: auto; width: 291px; position: relative; height: 370px; background: white"></iframe>

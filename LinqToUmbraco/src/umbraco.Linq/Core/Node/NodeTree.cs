@@ -74,7 +74,7 @@ namespace umbraco.Linq.Core.Node
                     foreach (XElement n in rawNodes)
                     {
                         var dt = new TDocTypeBase();
-                        dt.LoadFromXml(n);
+                        this._provider.LoadFromXml(n, dt);
 
                         dt.IsDirty = false;
                         dt.Provider = this._provider;

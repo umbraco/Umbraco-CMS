@@ -8,7 +8,7 @@ using umbraco.Linq.Core.Node;
 namespace umbraco.Linq.Core
 {
     /// <summary>
-    /// The umbracoDataContext which handles the interaction with an <see cref="umbracoDataProvider"/>
+    /// The umbracoDataContext which handles the interaction with an <see cref="umbraco.Linq.Core.UmbracoDataProvider"/>
     /// </summary>
     public abstract class UmbracoDataContext : IDisposable
     {
@@ -41,6 +41,9 @@ namespace umbraco.Linq.Core
             }
         }
 
+        /// <summary>
+        /// Submits the changes within the UmbracoDataContext through the <see cref="umbraco.Linq.Core.UmbracoDataProvider"/>
+        /// </summary>
         public void SubmitChanges()
         {
             this.CheckDisposed();
@@ -51,14 +54,14 @@ namespace umbraco.Linq.Core
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="umbracoDataContext"/> class, using a <see cref="umbraco.Linq.Core.Node.NodeDataProvider"/> data provider with the connection string from the umbraco config
+        /// Initializes a new instance of the <see cref="umbraco.Linq.Core.UmbracoDataProvider"/> class, using a <see cref="umbraco.Linq.Core.Node.NodeDataProvider"/> data provider with the connection string from the umbraco config
         /// </summary>
         protected UmbracoDataContext() : this(new NodeDataProvider())
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="umbracoDataContext"/> class.
+        /// Initializes a new instance of the <see cref="umbraco.Linq.Core.UmbracoDataProvider"/> class.
         /// </summary>
         /// <param name="dataProvider">The data provider to use within the DataContext.</param>
         protected UmbracoDataContext(UmbracoDataProvider dataProvider)

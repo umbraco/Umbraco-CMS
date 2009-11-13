@@ -22,9 +22,9 @@ namespace umbraco.Linq.Core
         private string _versionId;
         private int _templateId;
         private int _parentId;
-        private int _writerID;
+        private int writerID;
         private User _writer;
-        private int _creatorID;
+        private int creatorID;
         private User _creator;
         private IEnumerable<DocTypeBase> _ancestors;
         private AssociationTree<DocTypeBase> _children;
@@ -38,46 +38,11 @@ namespace umbraco.Linq.Core
             this.IsDirty = true;
         }
 
-        internal void LoadFromXml(XElement xml)
-        {
-            if (xml.Name != "node")
-            {
-                throw new ArgumentException("Xml provided is not valid");
-            }
-            
-            if (!ReflectionAssistance.CompareByAlias(this.GetType(), xml))
-            {
-                throw new DocTypeMissMatchException((string)xml.Attribute("nodeTypeAlias"), ReflectionAssistance.GetumbracoInfoAttribute(this.GetType()).Alias);
-            }
-
-            this.Id = (int)xml.Attribute("id");
-            this.ParentNodeId = (int)xml.Attribute("parentID");
-            this.Name = (string)xml.Attribute("nodeName");
-            this.Version = (string)xml.Attribute("version");
-            this.CreateDate = (DateTime)xml.Attribute("createDate");
-            this.SortOrder = (int)xml.Attribute("sortOrder");
-            this.UpdateDate = (DateTime)xml.Attribute("updateDate");
-            this._creatorID = (int)xml.Attribute("creatorID");
-            this._writerID = (int)xml.Attribute("writerID");
-            this.Level = (int)xml.Attribute("level");
-            this.TemplateId = (int)xml.Attribute("template");
-
-            var properties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.GetCustomAttributes(typeof(PropertyAttribute), true).Count() > 0);
-            foreach (var p in properties)
-            {
-                var attr = ReflectionAssistance.GetumbracoInfoAttribute(p);
-
-                var data = xml.Elements("data").Single(x => (string)x.Attribute("alias") == attr.Alias).Value;
-                if (p.PropertyType == typeof(int) && string.IsNullOrEmpty(data))
-                {
-                    data = "-1";
-                }
-                // TODO: Address how Convert.ChangeType works in globalisation
-                p.SetValue(this, Convert.ChangeType(data, p.PropertyType), null);
-            }
-        }
-
-        internal UmbracoDataProvider Provider { get; set; }
+        /// <summary>
+        /// Gets or sets the provider.
+        /// </summary>
+        /// <value>The provider.</value>
+        protected internal UmbracoDataProvider Provider { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance has been modified since it was first loaded
@@ -98,7 +63,7 @@ namespace umbraco.Linq.Core
             {
                 return this._Id;
             }
-            protected set
+            protected internal set
             {
                 if (this._Id != value)
                 {
@@ -169,7 +134,7 @@ namespace umbraco.Linq.Core
             {
                 return this._versionId;
             }
-            protected set
+            protected internal set
             {
                 if (this._versionId != value)
                 {
@@ -232,7 +197,7 @@ namespace umbraco.Linq.Core
         /// </summary>
         /// <value>The level.</value>
         [Field]
-        [UmbracoInfo("level", DisplayName="Level"), DataMember(Name="Level")]
+        [UmbracoInfo("level", DisplayName = "Level"), DataMember(Name = "Level")]
         public virtual int Level { get; set; }
         #endregion
 
@@ -315,9 +280,24 @@ namespace umbraco.Linq.Core
             }
 
             return this._ancestors.Where(a => a is TDocType).Cast<TDocType>().FirstOrDefault(func);
-        } 
+        }
         #endregion
 
+        /// <summary>
+        /// Gets or sets the creator ID.
+        /// </summary>
+        /// <value>The creator ID.</value>
+        public int CreatorID
+        {
+            get
+            {
+                return creatorID;
+            }
+            internal set
+            {
+                this.creatorID = value;
+            }
+        }
         /// <summary>
         /// Gets the umbraco user who created the item
         /// </summary>
@@ -328,13 +308,27 @@ namespace umbraco.Linq.Core
             {
                 if (this._creator == null)
                 {
-                    this._creator = new User(this._creatorID);
+                    this._creator = new User(this.CreatorID);
                 }
 
                 return this._creator;
             }
         }
 
+        /// <summary>
+        /// ID of the user who last edited the item
+        /// </summary>
+        public int WriterID
+        {
+            get
+            {
+                return writerID;
+            }
+            internal set
+            {
+                this.writerID = value;
+            }
+        }
         /// <summary>
         /// Gets the umbraco user who last edited the instance
         /// </summary>
@@ -345,7 +339,7 @@ namespace umbraco.Linq.Core
             {
                 if (this._writer == null)
                 {
-                    this._writer = new User(this._writerID);
+                    this._writer = new User(this.WriterID);
                 }
 
                 return this._writer;

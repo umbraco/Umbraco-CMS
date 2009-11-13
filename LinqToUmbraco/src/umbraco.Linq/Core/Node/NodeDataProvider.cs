@@ -237,7 +237,7 @@ namespace umbraco.Linq.Core.Node
             }
 
             var parent = new TDocType();
-            parent.LoadFromXml(parentXml);
+            this.LoadFromXml(parentXml, parent);
 
             return parent;
         }
@@ -306,7 +306,7 @@ namespace umbraco.Linq.Core.Node
                 var alias = (string)ancestor.Attribute("nodeTypeAlias");
                 var t = KnownTypes[alias];
                 var instaceOfT = (DocTypeBase)Activator.CreateInstance(t); //create an instance of the type and down-cast so we can use it
-                instaceOfT.LoadFromXml(ancestor);
+                this.LoadFromXml(ancestor, instaceOfT);
                 instaceOfT.Provider = this;
                 ancestors.Add(instaceOfT);
                 yield return instaceOfT;
@@ -356,6 +356,51 @@ namespace umbraco.Linq.Core.Node
 
             this._xml = null;
             this._trees.Clear();
+        }
+
+        /// <summary>
+        /// Loads from XML.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="xml">The XML.</param>
+        /// <param name="node">The node.</param>
+        public void LoadFromXml<T>(XElement xml, T node) where T : DocTypeBase
+        {
+            if (xml.Name != "node")
+            {
+                throw new ArgumentException("Xml provided is not valid");
+            }
+
+            if (!ReflectionAssistance.CompareByAlias(node.GetType(), xml))
+            {
+                throw new DocTypeMissMatchException((string)xml.Attribute("nodeTypeAlias"), ReflectionAssistance.GetumbracoInfoAttribute(node.GetType()).Alias);
+            }
+
+            node.Id = (int)xml.Attribute("id");
+            node.ParentNodeId = (int)xml.Attribute("parentID");
+            node.Name = (string)xml.Attribute("nodeName");
+            node.Version = (string)xml.Attribute("version");
+            node.CreateDate = (DateTime)xml.Attribute("createDate");
+            node.SortOrder = (int)xml.Attribute("sortOrder");
+            node.UpdateDate = (DateTime)xml.Attribute("updateDate");
+            node.CreatorID = (int)xml.Attribute("creatorID");
+            node.WriterID = (int)xml.Attribute("writerID");
+            node.Level = (int)xml.Attribute("level");
+            node.TemplateId = (int)xml.Attribute("template");
+
+            var properties = node.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.GetCustomAttributes(typeof(PropertyAttribute), true).Count() > 0);
+            foreach (var p in properties)
+            {
+                var attr = ReflectionAssistance.GetumbracoInfoAttribute(p);
+
+                var data = xml.Elements("data").Single(x => (string)x.Attribute("alias") == attr.Alias).Value;
+                if (p.PropertyType == typeof(int) && string.IsNullOrEmpty(data))
+                {
+                    data = "-1";
+                }
+                // TODO: Address how Convert.ChangeType works in globalisation
+                p.SetValue(node, Convert.ChangeType(data, p.PropertyType), null);
+            }
         }
     }
 }
