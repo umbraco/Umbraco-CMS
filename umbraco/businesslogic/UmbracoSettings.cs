@@ -135,6 +135,49 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Gets a value indicating whether the logs will be auto cleaned
+        /// </summary>
+        /// <value><c>true</c> if logs are to be automatically cleaned; otherwise, <c>false</c></value>
+        public static bool AutoCleanLogs
+        {
+            get
+            {
+                string value = GetKey("/settings/logging/autoCleanLogs");
+                bool result;
+                if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
+                    return result;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the value indicating the log cleaning frequency (in miliseconds)
+        /// </summary>
+        public static int CleaningMiliseconds
+        {
+            get
+            {
+                string value = GetKey("/settings/logging/cleaningMiliseconds");
+                int result;
+                if (!string.IsNullOrEmpty(value) && int.TryParse(value, out result))
+                    return result;
+                return -1;
+            }
+        }
+
+        public static int MaxLogAge
+        {
+            get
+            {
+                string value = GetKey("/settings/logging/maxLogAge");
+                int result;
+                if (!string.IsNullOrEmpty(value) && int.TryParse(value, out result))
+                    return result;
+                return -1;
+            }
+        }
+
+        /// <summary>
         /// Gets the disabled log types.
         /// </summary>
         /// <value>The disabled log types.</value>

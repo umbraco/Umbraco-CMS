@@ -6,6 +6,8 @@ using System.Web;
 
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
+using umbraco.cms.businesslogic.cache;
+using System.Web.Caching;
 
 
 namespace umbraco.presentation
@@ -27,6 +29,9 @@ namespace umbraco.presentation
         private List<Exception> unhandledErrors = new List<Exception>();
 
         public const string ORIGINAL_URL_CXT_KEY = "umbOriginalUrl";
+
+        private static string LOG_SCRUBBER_TASK_NAME = "ScrubLogs";
+        private static CacheItemRemovedCallback OnCacheRemove = null;
 
         protected void ApplicationStart(HttpApplication HttpApp)
         {
@@ -79,18 +84,20 @@ namespace umbraco.presentation
             // adding endswith and contains checks to ensure support for custom 404 messages (only 404 parse directory and aspx requests)
             if (querystring.StartsWith("?404") && (!querystring.Contains(".") || querystring.EndsWith(".aspx") || querystring.Contains(".aspx&")))
             {
-                Uri u = new Uri(querystring.Substring(5, querystring.Length-5));
+                Uri u = new Uri(querystring.Substring(5, querystring.Length - 5));
                 string path = u.AbsolutePath;
                 if (returnQuery)
                 {
                     return u.Query;
                 }
-                else {
+                else
+                {
                     return path;
                 }
             }
 
-            if (returnQuery) {
+            if (returnQuery)
+            {
                 return querystring;
             }
             else
@@ -301,6 +308,10 @@ namespace umbraco.presentation
                 try
                 {
                     Log.Add(LogTypes.System, User.GetUser(0), -1, "Application started at " + DateTime.Now);
+                    if (UmbracoSettings.AutoCleanLogs)
+                    {
+                        AddTask(LOG_SCRUBBER_TASK_NAME, GetLogScrubbingInterval());
+                    }
                 }
                 catch
                 {
@@ -331,7 +342,7 @@ namespace umbraco.presentation
                 //Find Applications and event handlers and hook-up the events
                 //BusinessLogic.Application.RegisterIApplications();
 
-				//define the base settings for the dependency loader to use the global path settings
+                //define the base settings for the dependency loader to use the global path settings
                 //if (!CompositeDependencyHandler.HandlerFileName.StartsWith(GlobalSettings.Path))
                 //    CompositeDependencyHandler.HandlerFileName = GlobalSettings.Path + "/" + CompositeDependencyHandler.HandlerFileName;
 
@@ -340,6 +351,62 @@ namespace umbraco.presentation
 
             }
 
+        }
+
+        #endregion
+
+        #region Inteval tasks
+        private static int GetLogScrubbingInterval()
+        {
+            int interval = 24 * 60 * 60; //24 hours
+            try
+            {
+                if (UmbracoSettings.CleaningMiliseconds > -1)
+                    interval = UmbracoSettings.CleaningMiliseconds;
+            }
+            catch (Exception)
+            {
+                Log.Add(LogTypes.System, -1, "Unable to locate a log scrubbing interval.  Defaulting to 24 horus");
+            }
+            return interval;
+        }
+
+        private static int GetLogScrubbingMaximumAge()
+        {
+            int maximumAge = 24 * 60 * 60;
+            try
+            {
+                if (UmbracoSettings.MaxLogAge > -1)
+                    maximumAge = UmbracoSettings.MaxLogAge;
+            }
+            catch (Exception)
+            {
+                Log.Add(LogTypes.System, -1, "Unable to locate a log scrubbing maximum age.  Defaulting to 24 horus");
+            }
+            return maximumAge;
+
+        }
+
+        private void AddTask(string name, int seconds)
+        {
+            OnCacheRemove = new CacheItemRemovedCallback(CacheItemRemoved);
+            HttpRuntime.Cache.Insert(name, seconds, null,
+                DateTime.Now.AddSeconds(seconds), System.Web.Caching.Cache.NoSlidingExpiration,
+                CacheItemPriority.NotRemovable, OnCacheRemove);
+        }
+
+        public void CacheItemRemoved(string k, object v, CacheItemRemovedReason r)
+        {
+            if (k.Equals(LOG_SCRUBBER_TASK_NAME))
+            {
+                ScrubLogs();
+            }
+            AddTask(k, Convert.ToInt32(v));
+        }
+
+        private static void ScrubLogs()
+        {
+            Log.CleanLogs(GetLogScrubbingMaximumAge());
         }
 
         #endregion

@@ -16,7 +16,6 @@ namespace umbraco
 	{
         protected void Application_Start(Object sender, EventArgs e)
         {
-
         }
 
 		protected void Session_Start(Object sender, EventArgs e)
@@ -59,7 +58,7 @@ namespace umbraco
 
 		protected void Application_End(Object sender, EventArgs e)
 		{
-            Log.Add(LogTypes.System, BusinessLogic.User.GetUser(0), -1, "Application shutted down at " + DateTime.Now);
+            Log.Add(LogTypes.System, BusinessLogic.User.GetUser(0), -1, "Application shut down at " + DateTime.Now);
 		}
 	}
 }

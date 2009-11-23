@@ -660,7 +660,7 @@ namespace umbraco.providers.members
                     }
                 }
                 string newPassword = Membership.GeneratePassword(MinRequiredPasswordLength, MinRequiredNonAlphanumericCharacters);
-                m.Password = EncodePassword(newPassword);
+                m.Password = newPassword;
                 return newPassword;
             }
         }

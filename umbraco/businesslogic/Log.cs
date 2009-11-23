@@ -370,6 +370,22 @@ namespace umbraco.BusinessLogic
 
         #endregion
 
+        public static void CleanLogs(int maximumAgeOfLogsInMinutes)
+        {
+            try
+            {
+                DateTime oldestPermittedLogEntry = DateTime.Now.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));
+                SqlHelper.ExecuteNonQuery("delete from umbracoLog where datestamp < @oldestPermittedLogEntry",
+                    SqlHelper.CreateParameter("@oldestPermittedLogEntry", oldestPermittedLogEntry));
+                Add(LogTypes.System, -1, "Log scrubbed.  Removed all items older than " + oldestPermittedLogEntry);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.ToString(), "Error");
+                Trace.WriteLine(e.ToString());
+            }
+        }
+        
         #endregion
     }
 
