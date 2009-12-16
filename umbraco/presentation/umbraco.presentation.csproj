@@ -1436,6 +1436,7 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
+    <Content Include="web.config.SHOCKING.xslt" />
     <Content Include="umbraco\Search\QuickSearch.ascx" />
     <Content Include="umbraco\images\umbraco\bin.png" />
     <Content Include="umbraco\images\umbraco\bin_closed.png" />
@@ -1513,7 +1514,6 @@
     <Content Include="umbraco\dialogs\ExportCode.aspx" />
     <Content Include="umbraco\dialogs\mediaPicker.aspx" />
     <Content Include="umbraco\images\editor\spellchecker.gif" />
-    <Content Include="umbraco\js\sortable\jquery-ui-1.7.2.custom.min.js" />
     <Content Include="umbraco\webservices\MacroContainerService.asmx" />
     <Content Include="umbraco\webservices\MediaPickerService.asmx" />
     <Content Include="umbraco_client\Application\JQuery\jquery.cookie.js" />

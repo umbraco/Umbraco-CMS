@@ -111,7 +111,7 @@
 
 		jQuery(document).ready(function() {
 
-			//UmbClientMgr.setUmbracoPath("<%=umbraco.GlobalSettings.Path %>");
+			UmbClientMgr.setUmbracoPath("<%=umbraco.GlobalSettings.Path %>");
 
 			jQuery(window).load(function() { resizePage('load'); });
 			jQuery(window).wresize(function() { resizePage('resize'); });

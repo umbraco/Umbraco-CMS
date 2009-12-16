@@ -105,7 +105,7 @@ namespace umbraco
                 actions.Add(ActionRePublish.Instance);
                 actions.Add(ContextMenuSeperator.Instance);
                 actions.Add(ActionRefresh.Instance);
-                actions.Add(ActionTreeEditMode.Instance);
+                //actions.Add(ActionTreeEditMode.Instance);
             }
         }
 

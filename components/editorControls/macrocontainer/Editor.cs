@@ -17,7 +17,7 @@ using umbraco.presentation;
 namespace umbraco.editorControls.macrocontainer
 {
 
-    [ClientDependency(100, ClientDependencyType.Javascript, "js/sortable/jquery-ui-1.7.2.custom.min.js", "UmbracoRoot")]
+    [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
     public class Editor : UpdatePanel, IDataEditor
     {
          private IData _data;
@@ -181,8 +181,6 @@ namespace umbraco.editorControls.macrocontainer
              }
 
 
-             //ClientDependencyLoader.Instance.RegisterDependency("js/sortable/jquery-ui-1.7.2.custom.min.js",
-             //       "UmbracoRoot", ClientDependencyType.Javascript);
             
 
 
