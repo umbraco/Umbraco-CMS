@@ -22,7 +22,7 @@ to use the UmbracoClientPath setting
 
 * All references to the old Client Dependency libraries have been removed completely.
 
-* Moved treeIcons.css to ~/umbraco_client/Tree/treeIcons.css
+* Moved treeIcons.css to ~/[UmbracoClientFolder]/Tree/treeIcons.css
 
 * Removed all IFormHandler dependencies and therefore removed the idea of FormHandlers all together:
 - IFormHandler

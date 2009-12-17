@@ -1,7 +1,7 @@
 <%@ Page Language="c#" CodeBehind="default.aspx.cs" AutoEventWireup="True" Inherits="umbraco.presentation.install._default" EnableViewState="False" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
-<%@ Register TagPrefix="ctl" Src="~/umbraco/controls/ProgressBar.ascx" TagName="ProgBar"  %>
+<%@ Register TagPrefix="ctl" Src="../umbraco/controls/ProgressBar.ascx" TagName="ProgBar"  %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >

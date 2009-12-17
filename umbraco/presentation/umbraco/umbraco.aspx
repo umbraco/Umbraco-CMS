@@ -1,6 +1,6 @@
 <%@ Page Trace="false" Language="c#" CodeBehind="umbraco.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation._umbraco" ClientTarget="uplevel" %>
 
-<%@ Register Src="~/umbraco/controls/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
+<%@ Register Src="controls/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="uc1" TagName="quickSearch" Src="Search/QuickSearch.ascx" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>

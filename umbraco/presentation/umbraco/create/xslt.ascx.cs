@@ -69,7 +69,7 @@ namespace umbraco.presentation.create
 					.ChildNodeCreated()
 					.CloseModalWindow();
 
-				//Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "refresh", "<script type='text/javascript'>\ntop.right.location.href = '" + returnUrl + "';\ntop.refreshTree(false, true);\ntop.closeModal();</script>");
+
 
 
 			}

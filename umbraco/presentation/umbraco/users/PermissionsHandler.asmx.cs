@@ -39,7 +39,10 @@ namespace umbraco.cms.presentation.user
             Authorize();
 
             Page page = new Page();
-            NodePermissions nodePermissions = page.LoadControl("~/umbraco/users/NodePermissions.ascx") as NodePermissions;
+
+            string path = umbraco.GlobalSettings.Path + "/users/NodePermissions.ascx";
+            NodePermissions nodePermissions = page.LoadControl(path) as NodePermissions;
+
             nodePermissions.UserID = userID;
             nodePermissions.NodeID = toIntArray(nodes);
             nodePermissions.ID = "nodePermissions";

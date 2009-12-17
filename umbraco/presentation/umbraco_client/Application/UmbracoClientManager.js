@@ -14,7 +14,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
         return {
             _isDirty: false,
-            _debug: false,
+            _isDebug: true,
             _mainTree: null,
             _appActions: null,
             _rootPath: "/umbraco", //this is the default
@@ -23,7 +23,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 /// <summary>
                 /// sets the Umbraco root path folder
                 /// </summary>
-                _rootPath = strPath;
+                this._debug("setUmbracoPath: " + strPath);
+                this._rootPath = strPath;
             },
 
             mainWindow: function() {

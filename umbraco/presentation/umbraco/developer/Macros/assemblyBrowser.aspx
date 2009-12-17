@@ -2,6 +2,9 @@
   Inherits="umbraco.developer.assemblyBrowser" %>
 <%@ Register TagPrefix="wc1" Namespace="umbraco.controls" Assembly="umbraco" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+
+<umb:JsInclude ID="JsInclude6" runat="server" FilePath="Application/UmbracoClientManager.js" PathNameAlias="UmbracoClient"  />
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
 <h3 style="MARGIN-LEFT: 0px"><asp:Label id="AssemblyName" runat="server"></asp:Label></h3>
@@ -24,9 +27,7 @@
 
 				    </p>
 
-<script type="text/javascript">
-	top.right.document.location.href = top.right.document.location.href;
-</script>
+
 </asp:Panel>
 
 </asp:Content>

@@ -1,6 +1,6 @@
 <%@ Page Language="C#" MasterPageFile="../../masterpages/umbracoPage.Master" AutoEventWireup="true" CodeBehind="installedPackage.aspx.cs" Inherits="umbraco.presentation.developer.packages.installedPackage" %>
 <%@ Register TagPrefix="cc2" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<%@ Register TagPrefix="ctl" Src="~/umbraco/controls/ProgressBar.ascx" TagName="ProgBar"  %>
+<%@ Register TagPrefix="ctl" Src="../../controls/ProgressBar.ascx" TagName="ProgBar"  %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
   <script type="text/javascript">
