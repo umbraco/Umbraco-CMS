@@ -68,8 +68,8 @@ namespace umbraco.Linq.Core.Tests
 
             using (var ctx = new MyUmbracoDataContext())
             {
-                var pages = from page in ctx.CwsTextpages
-                            where page.Bodytext.Length > 0
+                var pages = from page in ctx.CWSTextpages
+                            where page.BodyText.Length > 0
                             select page;
 
                 Assert.IsNotNull(pages);
@@ -84,7 +84,7 @@ namespace umbraco.Linq.Core.Tests
 
             using (var ctx = new MyUmbracoDataContext())
             {
-                var pages = from page in ctx.CwsTextpages
+                var pages = from page in ctx.CWSTextpages
                             where page.CreateDate > DateTime.MinValue
                             select page;
 
@@ -99,8 +99,8 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var pages = from page in ctx.CwsTextpages
-                            where page.Bodytext.Length > 0
+                var pages = from page in ctx.CWSTextpages
+                            where page.BodyText.Length > 0
                             && page.CreateDate > DateTime.MinValue
                             select page;
 
@@ -115,12 +115,12 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var pages = from page in ctx.CwsTextpages
-                            where page.Bodytext.Length > 0
+                var pages = from page in ctx.CWSTextpages
+                            where page.BodyText.Length > 0
                             select new
                             {
                                 page.Id,
-                                page.Bodytext
+                                page.BodyText
                             };
 
                 Assert.AreNotEqual(0, pages.Count());

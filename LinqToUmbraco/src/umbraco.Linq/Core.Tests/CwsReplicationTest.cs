@@ -65,17 +65,17 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var galleryList = ctx.CwsGallerylists.First(); //this would really be a Where(g => g.Id == umbracoContext.Current.PageId.Value) but since I'm not really on a page...
+                var galleryList = ctx.CWSGalleryLists.First(); //this would really be a Where(g => g.Id == umbracoContext.Current.PageId.Value) but since I'm not really on a page...
 
-                var galleries = from g in galleryList.CwsGalleries
-                                where g.CwsPhotos.Count() >= 1
+                var galleries = from g in galleryList.CWSGalleries
+                                where g.CWSPhotos.Count() >= 1
                                 orderby g.Name
                                 select new
                                 {
                                     g.Name,
                                     Url = umbraco.library.NiceUrl(g.Id),
-                                    Thumbnail = (string.IsNullOrEmpty(g.Gallerythumbnail) ? "/Assets/Placeholders/gallery_placeholder.gif" : g.Gallerythumbnail),
-                                    PhotoCount = g.CwsPhotos.Count(),
+                                    Thumbnail = (string.IsNullOrEmpty(g.GalleryThumbnail) ? "/Assets/Placeholders/gallery_placeholder.gif" : g.GalleryThumbnail),
+                                    PhotoCount = g.CWSPhotos.Count(),
                                 };
 
                 Assert.AreEqual(3, galleries.Count());

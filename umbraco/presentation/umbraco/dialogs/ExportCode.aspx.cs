@@ -23,7 +23,7 @@ namespace umbraco.presentation.umbraco.dialogs
             string dataContextName = string.IsNullOrEmpty(txtDataContextName.Text) ? "Umbraco" : txtDataContextName.Text;
             var generator = new DTMLGenerator(GlobalSettings.DbDSN, dataContextName, false);
             var dtml = generator.GenerateDTMLStream();
-            var cb = ClassGenerator.CreateBuilder(string.IsNullOrEmpty(txtNamespace.Text) ? "Umbraco" : txtNamespace.Text, language, dtml.DocTypeMarkupLanguage);
+            var cb = ClassGenerator.CreateBuilder(string.IsNullOrEmpty(txtNamespace.Text) ? "Umbraco" : txtNamespace.Text, language, dtml.DocTypeMarkupLanguage, chkAsInterfaces.Checked, chkIncludeIterfaceInheritance.Checked);
             cb.GenerateCode();
             cb.Save(UmbracoContext.Current.Response.OutputStream);
             UmbracoContext.Current.Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", dataContextName));

@@ -65,11 +65,11 @@ namespace umbraco.Linq.Core.Tests
 
             using (var ctx = new MyUmbracoDataContext())
             {
-                var hps = ctx.CwsHomes;
+                var hps = ctx.CWSHomes;
 
-                ctx.CwsHomes.ReloadCache();
+                ctx.CWSHomes.ReloadCache();
 
-                var reloadedHps = ctx.CwsHomes;
+                var reloadedHps = ctx.CWSHomes;
 
                 Assert.AreNotSame(reloadedHps, hps, "Force reload should result in a different object");
             }
@@ -82,9 +82,9 @@ namespace umbraco.Linq.Core.Tests
 
             using (var ctx = new MyUmbracoDataContext())
             {
-                var hps = ctx.CwsHomes;
+                var hps = ctx.CWSHomes;
 
-                var requeriedHps = ctx.CwsHomes;
+                var requeriedHps = ctx.CWSHomes;
 
                 Assert.AreSame(requeriedHps, hps, "Requeried objects should result in the same collection");
             }

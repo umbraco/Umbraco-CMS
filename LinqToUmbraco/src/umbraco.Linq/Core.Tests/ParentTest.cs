@@ -64,7 +64,7 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var p = ctx.CwsTextpages.First();
+                var p = ctx.CWSTextpages.First();
                 Assert.AreNotEqual(0, p.ParentNodeId);
             }
         }
@@ -75,11 +75,11 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var page = ctx.CwsTextpages.Single(p => p.Id == 1099);
+                var page = ctx.CWSTextpages.Single(p => p.Id == 1099);
 
                 Assert.AreEqual(1098, page.ParentNodeId);
 
-                var parent = page.Parent<CwsHome>();
+                var parent = page.Parent<CWSHome>();
 
                 Assert.AreEqual(page.ParentNodeId, parent.Id);
             }
@@ -91,8 +91,8 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var hp = ctx.CwsHomes.First();
-                Assert.IsNull(hp.Parent<CwsHome>());
+                var hp = ctx.CWSHomes.First();
+                Assert.IsNull(hp.Parent<CWSHome>());
             }
         }
 
@@ -102,7 +102,7 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var p = ctx.CwsPhotos.First().Parent<CwsHome>();
+                var p = ctx.CWSPhotos.First().Parent<CWSHome>();
             }
         }
     }

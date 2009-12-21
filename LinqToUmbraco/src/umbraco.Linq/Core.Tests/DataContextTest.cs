@@ -88,7 +88,7 @@ namespace umbraco.Linq.Core.Tests
 
             MyUmbracoDataContext ctx = new MyUmbracoDataContext(nodeProvider);
 
-            var hp = ctx.CwsHomes.First();
+            var hp = ctx.CWSHomes.First();
 
             Assert.IsNotNull(hp);
         }
@@ -109,8 +109,8 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var hp = ctx.CwsHomes.First();
-                var hp2 = ctx.CwsHomes.First();
+                var hp = ctx.CWSHomes.First();
+                var hp2 = ctx.CWSHomes.First();
 
                 Assert.AreSame(hp, hp2);
             }
@@ -122,8 +122,8 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var one = ctx.CwsHomes;
-                var two = ctx.CwsHomes;
+                var one = ctx.CWSHomes;
+                var two = ctx.CWSHomes;
 
                 Assert.AreSame(one, two);
             }
@@ -135,10 +135,10 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var tree = ctx.CwsHomes;
+                var tree = ctx.CWSHomes;
 
-                Assert.IsInstanceOfType(tree, typeof(NodeTree<CwsHome>));
-                Assert.IsInstanceOfType(tree.First().CwsTextpages, typeof(NodeAssociationTree<CwsTextpage>));
+                Assert.IsInstanceOfType(tree, typeof(NodeTree<CWSHome>));
+                Assert.IsInstanceOfType(tree.First().CWSTextpages, typeof(NodeAssociationTree<CWSTextpage>));
             }
         }
     }

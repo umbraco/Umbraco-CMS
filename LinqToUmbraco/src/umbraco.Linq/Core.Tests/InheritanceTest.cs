@@ -64,17 +64,17 @@ namespace umbraco.Linq.Core.Tests
         [TestMethod]
         public void InheritanceTest_ImplementsBaseClass()
         {
-            var tmp = new TextpageThreeCol();
+            var tmp = new TextPageThreeCol();
 
-            Assert.AreEqual(typeof(CwsTextpagetwocol), tmp.GetType().BaseType);
+            Assert.AreEqual(typeof(CWSTextpageTwoCol), tmp.GetType().BaseType);
         }
 
         [TestMethod, Isolated]
         public void InheritanceTest_PropertyFromBase()
         {
-            var fake = Isolate.Fake.Instance<TextpageThreeCol>();
+            var fake = Isolate.Fake.Instance<TextPageThreeCol>();
 
-            Assert.AreEqual(typeof(CwsTextpagetwocol), fake.GetType().GetProperties().Single(p => p.Name == "Headertext").DeclaringType);
+            Assert.AreEqual(typeof(CWSTextpageTwoCol), fake.GetType().GetProperties().Single(p => p.Name == "Headertext").DeclaringType);
         }
     }
 }

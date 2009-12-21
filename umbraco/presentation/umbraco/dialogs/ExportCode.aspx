@@ -35,6 +35,16 @@
             <asp:TextBox ID="txtNamespace" runat="server" Style="width: 180px;" Text="Umbraco" />
         </div>
     </cc1:Pane>
+    <cc1:Pane ID="pane_abstractions" runat="server">
+        <div>
+            <em class="label">Generate Interfaces:</em>
+            <asp:CheckBox ID="chkAsInterfaces" runat="server" />
+        </div>
+        <div>
+            <em class="label">Generate with Interface Inheritance:</em>
+            <asp:CheckBox ID="chkIncludeIterfaceInheritance" runat="server" />
+        </div>
+    </cc1:Pane>
     <div style="margin-top: 10px;">
         <asp:Button ID="btnGenerate" runat="server" Text="Submit" OnClick="btnGenerate_Click" style="MARGIN-TOP: 14px" />
         <em>or </em><a href="#" style="color: Blue; margin-left: 6px;" onclick="UmbClientMgr.mainWindow().closeModal()">

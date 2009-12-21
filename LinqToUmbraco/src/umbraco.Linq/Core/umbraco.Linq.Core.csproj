@@ -74,6 +74,7 @@
     <Compile Include="Attributes.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IContentTree.cs" />
+    <Compile Include="IDocTypeBase.cs" />
     <Compile Include="UmbracoDataProvider.cs" />
     <Compile Include="Node\NodeAssociationTree.cs" />
     <Compile Include="Node\NodeTree.cs" />

@@ -67,9 +67,9 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var textPage = ctx.CwsTextpages.First();
+                var textPage = ctx.CWSTextpages.First();
 
-                var hp = textPage.AncestorOrDefault<CwsHome>();
+                var hp = textPage.AncestorOrDefault<CWSHome>();
 
                 Assert.IsNotNull(hp);
             }
@@ -81,9 +81,9 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var textPage = ctx.CwsTextpages.First();
+                var textPage = ctx.CWSTextpages.First();
 
-                var a = textPage.AncestorOrDefault<CwsPhoto>();
+                var a = textPage.AncestorOrDefault<CWSPhoto>();
 
                 Assert.IsNull(a);
             }
@@ -95,8 +95,8 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var photo = ctx.CwsPhotos.First(p => p.Name.Contains("Umbraco"));
-                var gallery = photo.AncestorOrDefault<CwsGallery>(g => g.Name.Contains("Codegarden"));
+                var photo = ctx.CWSPhotos.First(p => p.Name.Contains("Umbraco"));
+                var gallery = photo.AncestorOrDefault<CWSGallery>(g => g.Name.Contains("Codegarden"));
 
                 Assert.IsNotNull(gallery);
             }
@@ -108,8 +108,8 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var photo = ctx.CwsPhotos.First(p => p.Name.Contains("Umbraco"));
-                var gallery = photo.AncestorOrDefault<CwsGallery>(g => g.Name.Contains("Bookhouses"));
+                var photo = ctx.CWSPhotos.First(p => p.Name.Contains("Umbraco"));
+                var gallery = photo.AncestorOrDefault<CWSGallery>(g => g.Name.Contains("Bookhouses"));
 
                 Assert.IsNull(gallery);
             }

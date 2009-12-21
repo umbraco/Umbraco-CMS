@@ -83,6 +83,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="InheritanceTest.cs" />
     <Compile Include="MockHelpers.cs" />
+    <Compile Include="MyUmbraco.Abstractions.cs" />
     <Compile Include="MyUmbraco.designer.cs" />
     <Compile Include="OrderingTest.cs" />
     <Compile Include="ParentTest.cs" />

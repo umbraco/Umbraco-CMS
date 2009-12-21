@@ -68,13 +68,13 @@ namespace umbraco.Linq.Core.Tests
 
             using (var ctx = new MyUmbracoDataContext())
             {
-                var homePages = from hp in ctx.CwsHomes
+                var homePages = from hp in ctx.CWSHomes
                                 select hp;
 
                 Assert.IsNotNull(homePages);
                 foreach (var item in homePages)
                 {
-                    Assert.IsTrue(item.Bodytext.Length > 0);
+                    Assert.IsTrue(item.BodyText.Length > 0);
                 }
             }
         }
@@ -86,12 +86,12 @@ namespace umbraco.Linq.Core.Tests
 
             using (var ctx = new MyUmbracoDataContext())
             {
-                var homePages = ctx.CwsHomes;
+                var homePages = ctx.CWSHomes;
 
                 Assert.IsNotNull(homePages);
-                foreach (CwsHome item in homePages)
+                foreach (CWSHome item in homePages)
                 {
-                    Assert.IsTrue(item.Bodytext.Length > 0);
+                    Assert.IsTrue(item.BodyText.Length > 0);
                 }
             }
         }
@@ -103,8 +103,8 @@ namespace umbraco.Linq.Core.Tests
 
             using (var ctx = new MyUmbracoDataContext())
             {
-                var homePageText = from hp in ctx.CwsHomes
-                                   select hp.Bodytext;
+                var homePageText = from hp in ctx.CWSHomes
+                                   select hp.BodyText;
 
                 Assert.IsNotNull(homePageText);
                 foreach (var item in homePageText)
@@ -121,7 +121,7 @@ namespace umbraco.Linq.Core.Tests
 
             using (var ctx = new MyUmbracoDataContext())
             {
-                var homePageText = ctx.CwsHomes.Select(hp => hp.Bodytext);
+                var homePageText = ctx.CWSHomes.Select(hp => hp.BodyText);
 
                 Assert.IsNotNull(homePageText);
                 foreach (var item in homePageText)
@@ -138,17 +138,17 @@ namespace umbraco.Linq.Core.Tests
 
             using (var ctx = new MyUmbracoDataContext())
             {
-                var anon = from hp in ctx.CwsHomes
+                var anon = from hp in ctx.CWSHomes
                            select new
                            {
-                               hp.Bodytext,
+                               hp.BodyText,
                                CreatedDate = hp.CreateDate
                            };
 
                 Assert.IsNotNull(anon);
                 foreach (var item in anon)
                 {
-                    Assert.IsNotNull(item.Bodytext);
+                    Assert.IsNotNull(item.BodyText);
                     Assert.AreNotEqual(DateTime.MinValue, item.CreatedDate);
                 }
             }
@@ -161,16 +161,16 @@ namespace umbraco.Linq.Core.Tests
 
             using (var ctx = new MyUmbracoDataContext())
             {
-                var anon = ctx.CwsHomes.Select(hp => new
+                var anon = ctx.CWSHomes.Select(hp => new
                            {
-                               hp.Bodytext,
+                               hp.BodyText,
                                CreatedDate = hp.CreateDate
                            });
 
                 Assert.IsNotNull(anon);
                 foreach (var item in anon)
                 {
-                    Assert.IsNotNull(item.Bodytext);
+                    Assert.IsNotNull(item.BodyText);
                     Assert.AreNotEqual(DateTime.MinValue, item.CreatedDate);
                 }
             }

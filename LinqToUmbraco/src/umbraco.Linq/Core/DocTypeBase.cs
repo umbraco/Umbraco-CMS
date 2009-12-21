@@ -14,7 +14,7 @@ namespace umbraco.Linq.Core
     /// Provides the base framework for an umbraco item
     /// </summary>
     [DataContract]
-    public class DocTypeBase : INotifyPropertyChanging, INotifyPropertyChanged //This class should be abstract but it can't be done AND achieve the Children property like this
+    public class DocTypeBase : umbraco.Linq.Core.IDocTypeBase //This class should be abstract but it can't be done AND achieve the Children property like this
     {
         #region Internal Storage
         private int _Id;

@@ -35,6 +35,8 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
         public CodeDomProvider Provider { get; set; }
         public string DtmlPath { get; set; }
         public XDocument Dtml { get; set; }
+        public bool IsInterface { get; set; }
+        public bool GenerateInterfaceInheritance { get; set; }
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling")]
@@ -61,7 +63,7 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
             var args = new ClassGeneratorArgs()
             {
                 DtmlPath = xmlPath,
-                Namespace = ns
+                Namespace = ns,
             };
             switch (lang)
             {
@@ -78,12 +80,14 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
             return new ClassGenerator(args);
         }
 
-        public static ClassGenerator CreateBuilder(string ns, GenerationLanguage lang, XDocument dtml)
+        public static ClassGenerator CreateBuilder(string ns, GenerationLanguage lang, XDocument dtml, bool isInterface, bool interfaceInheritance)
         {
             var args = new ClassGeneratorArgs()
             {
+                Dtml = dtml,
                 Namespace = ns,
-                Dtml = dtml
+                IsInterface = isInterface,
+                GenerateInterfaceInheritance = interfaceInheritance
             };
             switch (lang)
             {
@@ -196,9 +200,12 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
             this.Code = new CodeCompileUnit();
             CodeNamespace ns = GenerateNamespace(this.Args.Namespace);
 
-            CodeTypeDeclaration dataContext = CreateDataContext(this.Args.Dtml, docTypes);
+            if (!Args.IsInterface)
+            {
+                CodeTypeDeclaration dataContext = CreateDataContext(this.Args.Dtml, docTypes);
 
-            ns.Types.Add(dataContext);
+                ns.Types.Add(dataContext);
+            }
 
             CreateDocTypes(docTypes, ns);
 
@@ -262,7 +269,7 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
                 }
                 var t = new CodeTypeReference("Tree");
                 t.TypeArguments.Add(dt.TypeName);
-
+                
                 CodeMemberProperty p = new CodeMemberProperty();
                 p.Name = name;
                 p.Type = t;
@@ -270,18 +277,21 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
                 p.HasGet = true;
                 p.HasSet = false;
 
-                p.GetStatements.Add(
-                    new CodeMethodReturnStatement(
-                        new CodeMethodInvokeExpression(
-                            new CodeMethodReferenceExpression(
-                                new CodeThisReferenceExpression(),
-                                "LoadTree",
-                                new CodeTypeReference[] { 
+                if (!Args.IsInterface)
+                {
+                    p.GetStatements.Add(
+                new CodeMethodReturnStatement(
+                    new CodeMethodInvokeExpression(
+                        new CodeMethodReferenceExpression(
+                            new CodeThisReferenceExpression(),
+                            "LoadTree",
+                            new CodeTypeReference[] { 
                                     new CodeTypeReference(dt.TypeName) 
                                 }),
-                                new CodeExpression[0])
-                            )
-                        );
+                            new CodeExpression[0])
+                        )
+                    );
+                }
 
                 dataContext.Members.Add(p);
             }
@@ -361,9 +371,14 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
                         new CodeAttributeDeclaration("UmbracoInfo",
                             new CodeAttributeArgument(new CodePrimitiveExpression(docType.Alias))
                             ),
-                        new CodeAttributeDeclaration(new CodeTypeReference(typeof(DataContractAttribute))),
                         new CodeAttributeDeclaration("DocType")
                     });
+
+                if (!Args.IsInterface)
+                {
+                    classAttributes.Add(new CodeAttributeDeclaration(new CodeTypeReference(typeof(DataContractAttribute))));
+                }
+
                 //add the address to the class
                 currClass.CustomAttributes.AddRange(classAttributes);
 
@@ -374,13 +389,37 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
                 currClass.TypeAttributes = TypeAttributes.Public;
                 if (docType.ParentId > 0)
                 {
-                    currClass.BaseTypes.Add(new CodeTypeReference(docTypes.Single(d => d.Id == docType.ParentId).TypeName)); //docType inheritance
+                    string typeName = docTypes.Single(d => d.Id == docType.ParentId).TypeName;
+
+                    if (!Args.IsInterface)
+                    {
+                        currClass.BaseTypes.Add(new CodeTypeReference(typeName)); //docType inheritance 
+                    }
+                    else
+                    {
+                        currClass.BaseTypes.Add(new CodeTypeReference("I" + typeName)); //docType inheritance of interface type
+                    }
                 }
                 else
                 {
-                    currClass.BaseTypes.Add(new CodeTypeReference("DocTypeBase")); //base class 
+                    if (!Args.IsInterface)
+                    {
+                        currClass.BaseTypes.Add(new CodeTypeReference("DocTypeBase")); //base class  
+                    }
+                    else
+                    {
+                        currClass.BaseTypes.Add(new CodeTypeReference("IDocTypeBase")); //base interface  
+                    }
                 }
-                currClass.IsPartial = true;
+                if (!Args.IsInterface)
+                {
+                    currClass.IsPartial = true;
+                }
+                else
+                {
+                    currClass.IsInterface = true;
+                    currClass.Name = "I" + currClass.Name;
+                }
 
                 currClass.Members.AddRange(GenerateConstructors());
 
@@ -476,18 +515,13 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
                     //docType but it is a child of the current
                     if (realDocType != null)
                     {
-                        CodeMemberField childMember = new CodeMemberField();
                         string name = realDocType.TypeName;
                         if (this.PluralizeCollections)
                         {
                             name = PluraliseName(realDocType.TypeName);
                         }
-                        childMember.Attributes = MemberAttributes.Private;
-                        childMember.Name = "_" + name;
                         var t = new CodeTypeReference("AssociationTree");
                         t.TypeArguments.Add(realDocType.TypeName);
-                        childMember.Type = t;
-                        currClass.Members.Add(childMember);
 
                         CodeMemberProperty p = new CodeMemberProperty();
                         p.Name = name;
@@ -496,37 +530,46 @@ namespace umbraco.Linq.DTMetal.CodeBuilder
                         p.HasGet = true;
                         p.HasSet = true;
 
-                        CodeExpression left = new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), childMember.Name);
-                        CodeExpression right = new CodePrimitiveExpression(null);
+                        if (!Args.IsInterface)
+                        {
+                            CodeMemberField childMember = new CodeMemberField();
+                            childMember.Attributes = MemberAttributes.Private;
+                            childMember.Name = "_" + name;
+                            childMember.Type = t;
+                            currClass.Members.Add(childMember);
 
-                        CodeExpression cond = GenerateEqualityConditionalStatement(left, right);
+                            CodeExpression left = new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), childMember.Name);
+                            CodeExpression right = new CodePrimitiveExpression(null);
 
-                        var trues = new CodeConditionStatement(cond, new CodeAssignStatement(
-                            new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), childMember.Name),
-                            new CodeMethodInvokeExpression(
-                                new CodeMethodReferenceExpression(
-                                    new CodeThisReferenceExpression(),
-                                    "ChildrenOfType",
-                                    new CodeTypeReference[] {
+                            CodeExpression cond = GenerateEqualityConditionalStatement(left, right);
+
+                            var trues = new CodeConditionStatement(cond, new CodeAssignStatement(
+                                new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), childMember.Name),
+                                new CodeMethodInvokeExpression(
+                                    new CodeMethodReferenceExpression(
+                                        new CodeThisReferenceExpression(),
+                                        "ChildrenOfType",
+                                        new CodeTypeReference[] {
                                         new CodeTypeReference(realDocType.TypeName)
                                     })
+                                    )
                                 )
-                            )
-                        );
-
-                        p.GetStatements.Add(trues);
-                        p.GetStatements.Add(new CodeMethodReturnStatement(
-                            new CodeFieldReferenceExpression(
-                                new CodeThisReferenceExpression(), childMember.Name))
                             );
 
-                        p.SetStatements.Add(
-                            new CodeAssignStatement(
-                            new CodeFieldReferenceExpression(
-                                new CodeThisReferenceExpression(), childMember.Name),
-                            new CodePropertySetValueReferenceExpression()
-                            )
-                        );
+                            p.GetStatements.Add(trues);
+                            p.GetStatements.Add(new CodeMethodReturnStatement(
+                                new CodeFieldReferenceExpression(
+                                    new CodeThisReferenceExpression(), childMember.Name))
+                                );
+
+                            p.SetStatements.Add(
+                                new CodeAssignStatement(
+                                new CodeFieldReferenceExpression(
+                                    new CodeThisReferenceExpression(), childMember.Name),
+                                new CodePropertySetValueReferenceExpression()
+                                )
+                            );
+                        }
 
                         currClass.Members.Add(p);
                     }

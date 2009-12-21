@@ -68,9 +68,9 @@ namespace umbraco.Linq.Core.Tests
 
             using (var orderedContext = new MyUmbracoDataContext())
             {
-                var asc = orderedContext.CwsTextpages.OrderBy(p => p.CreateDate);
+                var asc = orderedContext.CWSTextpages.OrderBy(p => p.CreateDate);
 
-                var desc = orderedContext.CwsTextpages.OrderByDescending(p => p.CreateDate);
+                var desc = orderedContext.CWSTextpages.OrderByDescending(p => p.CreateDate);
 
                 Assert.AreEqual(asc.Count(), desc.Count());
                 Assert.AreNotEqual(asc.First().Id, desc.First().Id);

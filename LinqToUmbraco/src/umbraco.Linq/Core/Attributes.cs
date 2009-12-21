@@ -5,7 +5,7 @@ namespace umbraco.Linq.Core
     /// <summary>
     /// Standard umbraco info
     /// </summary>
-    [global::System.AttributeUsage(AttributeTargets.Property | AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
+    [global::System.AttributeUsage(AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Interface, Inherited = true, AllowMultiple = false)]
     public sealed class UmbracoInfoAttribute : Attribute
     {
         /// <summary>
@@ -38,7 +38,7 @@ namespace umbraco.Linq.Core
     /// <summary>
     /// Marks a class as an umbraco DocType
     /// </summary>
-    [global::System.AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
+    [global::System.AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, Inherited = true, AllowMultiple = false)]
     public sealed class DocTypeAttribute : Attribute
     {
         /// <summary>

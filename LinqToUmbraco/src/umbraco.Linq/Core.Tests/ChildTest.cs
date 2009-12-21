@@ -67,7 +67,7 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var pages = ctx.CwsHomes.First().CwsTextpages;
+                var pages = ctx.CWSHomes.First().CWSTextpages;
 
                 Assert.AreNotEqual(0, pages.Count());
             }
@@ -79,9 +79,9 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var page = ctx.CwsHomes.First().CwsTextpages.First();
+                var page = ctx.CWSHomes.First().CWSTextpages.First();
 
-                Assert.AreEqual(ctx.CwsHomes.First().Id, page.Parent<CwsHome>().Id);
+                Assert.AreEqual(ctx.CWSHomes.First().Id, page.Parent<CWSHome>().Id);
             }
         }
 
@@ -91,11 +91,11 @@ namespace umbraco.Linq.Core.Tests
             MockHelpers.SetupFakeHttpContext();
             using (var ctx = new MyUmbracoDataContext())
             {
-                var hp = ctx.CwsHomes.First();
+                var hp = ctx.CWSHomes.First();
 
                 Assert.IsTrue(hp.Children.Count() > 0);
-                Assert.IsInstanceOfType(hp.Children.First(), typeof(CwsTextpage));
-                Assert.IsInstanceOfType(hp.Children.Skip(1).First(), typeof(CwsGallerylist));
+                Assert.IsInstanceOfType(hp.Children.First(), typeof(CWSTextpage));
+                Assert.IsInstanceOfType(hp.Children.Skip(1).First(), typeof(CWSGalleryList));
             }
         }
     }

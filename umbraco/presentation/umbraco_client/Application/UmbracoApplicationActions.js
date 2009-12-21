@@ -366,7 +366,7 @@ Umbraco.Application.Actions = function() {
         },
         actionExportCode: function() {
             /// <summary></summary>
-            UmbClientMgr.mainWindow().openModal("dialogs/exportCode.aspx", UmbClientMgr.uiKeys()['exportDocumentTypeAsCode'], 250, 400);
+            UmbClientMgr.mainWindow().openModal("dialogs/exportCode.aspx", UmbClientMgr.uiKeys()['exportDocumentTypeAsCode'], 350, 400);
             return false;
         }
     }
