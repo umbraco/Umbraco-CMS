@@ -370,6 +370,11 @@ namespace umbraco
             return niceUrlDo(nodeID, 1);
         }
 
+        public static string ResolveVirtualPath(string path)
+        {
+            return IOHelper.ResolveUrl(path);
+        }
+
         private static string niceUrlDo(int nodeID, int startNodeDepth)
         {
             XmlDocument umbracoXML = content.Instance.XmlContent;

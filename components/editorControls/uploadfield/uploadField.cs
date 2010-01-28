@@ -112,7 +112,12 @@ namespace umbraco.editorControls
                         _fullFilePath = IOHelper.MapPath(SystemDirectories.Media + "/" + _data.PropertyId.ToString() + "/" + filename);
                         this.PostedFile.SaveAs(_fullFilePath);
 
-                        _data.Value = SystemDirectories.Media + "/" + _data.PropertyId + "/" + filename;
+                        //if we are not in a virtual dir, just save without the ~
+                        string _relFilePath = SystemDirectories.Media + "/" + _data.PropertyId + "/" + filename;
+                        if (SystemDirectories.Root == string.Empty)
+                            _relFilePath = _relFilePath.TrimStart('~');
+
+                        _data.Value = _relFilePath;
                     }
                     else
                     {
@@ -122,7 +127,12 @@ namespace umbraco.editorControls
                         _fullFilePath = IOHelper.MapPath(SystemDirectories.Media + "/" + filename);
                         this.PostedFile.SaveAs(_fullFilePath);
 
-                        _data.Value = SystemDirectories.Media+ "/" + filename;
+                        //if we are not in a virtual dir, just save without the ~
+                        string _relFilePath = SystemDirectories.Media + "/" + filename;
+                        if (SystemDirectories.Root == string.Empty)
+                            _relFilePath = _relFilePath.TrimStart('~');
+
+                        _data.Value = _relFilePath;
                     }
 
                     // hack to find master page prefix client id
@@ -199,10 +209,18 @@ namespace umbraco.editorControls
 
                         if (_thumbnails != "")
                         {
-                            string[] thumbnailSizes = _thumbnails.Split(";".ToCharArray());
+                            char sep = ';';
+
+                            if(!_thumbnails.Contains(sep.ToString()) && _thumbnails.Contains(","))
+                                sep = ',';
+
+                            string[] thumbnailSizes = _thumbnails.Split(sep);
                             foreach (string thumb in thumbnailSizes)
-                                if (thumb != "")
-                                    generateThumbnail(image, int.Parse(thumb), fileWidth, fileHeight, _fullFilePath, ext, fileNameThumb + "_" + thumb + _thumbnailext);
+                            {
+                                int _thum = 0;
+                                if (thumb != "" && int.TryParse(thumb, out _thum))
+                                    generateThumbnail(image, _thum, fileWidth, fileHeight, _fullFilePath, ext, fileNameThumb + "_" + thumb + _thumbnailext);
+                            }
                         }
 
                         image.Dispose();
@@ -363,12 +381,12 @@ namespace umbraco.editorControls
                     thumb.ImageUrl = fileNameThumb;
                     thumb.BorderStyle = BorderStyle.None;
 
-                    output.WriteLine("<a href=\"" + _text + "\" target=\"_blank\">");
+                    output.WriteLine("<a href=\"" + IOHelper.ResolveUrl( _text ) + "\" target=\"_blank\">");
                     thumb.RenderControl(output);
                     output.WriteLine("</a><br/>");
                 }
                 else
-                    output.WriteLine("<a href=\"" + this.Text + "\" target=\"_blank\">" + this.Text + "</a><br/>");
+                    output.WriteLine("<a href=\"" + IOHelper.ResolveUrl(this.Text) + "\" target=\"_blank\">" + IOHelper.ResolveUrl(this.Text) + "</a><br/>");
                 output.WriteLine("<input type=\"checkbox\" id=\"" + this.ClientID + "clear\" name=\"" + this.ClientID + "clear\" value=\"1\"/> <label for=\"" + this.ClientID + "clear\">" + ui.Text("uploadClear") + "</label><br/>");
             }
             base.Render(output);
