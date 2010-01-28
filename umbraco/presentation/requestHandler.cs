@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Diagnostics;
 using System.Reflection;
 using System.Web;
 using System.Xml;
@@ -84,11 +85,15 @@ namespace umbraco {
         }
 
         public static string CreateXPathQuery(string url, bool checkDomain) {
+            string childContainerName = UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME;
+
             string _tempQuery = "";
-            if (GlobalSettings.HideTopLevelNodeFromPath && checkDomain) {
-                _tempQuery = "/root/node";
-            } else if (checkDomain)
-                _tempQuery = "/root";
+            if (GlobalSettings.HideTopLevelNodeFromPath && checkDomain)
+            {
+                _tempQuery = "/root/" + childContainerName + "/*";
+            }
+            else if (checkDomain)
+                _tempQuery = "/root/" + childContainerName;
 
 
             string[] requestRawUrl = url.Split("/".ToCharArray());
@@ -119,31 +124,36 @@ namespace umbraco {
                         return "/domainprefixes-are-used-so-i-do-not-work";
                 }
             } else if (url == "" && !GlobalSettings.HideTopLevelNodeFromPath)
-                _tempQuery += "/node";
+                _tempQuery += "/*";
 
             bool rootAdded = false;
-            if (GlobalSettings.HideTopLevelNodeFromPath && requestRawUrl.Length == 1) {
+            if (GlobalSettings.HideTopLevelNodeFromPath && requestRawUrl.Length == 1)
+            {
                 HttpContext.Current.Trace.Write("umbracoRequestHandler", "xpath: '" + _tempQuery + "'");
                 if (_tempQuery == "")
-                    _tempQuery = "/root/node";
-                _tempQuery = "/root/node [" + _urlName +
+                    _tempQuery = "/root/" + childContainerName + "/*";
+                _tempQuery = "/root/" + childContainerName + "/* [" + _urlName +
                              " = \"" + requestRawUrl[0].Replace(".aspx", "").ToLower() + "\"] | " + _tempQuery;
                 HttpContext.Current.Trace.Write("umbracoRequestHandler", "xpath: '" + _tempQuery + "'");
                 rootAdded = true;
             }
 
 
-            for (int i = 0; i <= requestRawUrl.GetUpperBound(0); i++) {
+            for (int i = 0; i <= requestRawUrl.GetUpperBound(0); i++)
+            {
                 if (requestRawUrl[i] != "")
-                    _tempQuery += "/node [" + _urlName + " = \"" + requestRawUrl[i].Replace(".aspx", "").ToLower() +
+                    _tempQuery += "/" + childContainerName + "/* [" + _urlName + " = \"" + requestRawUrl[i].Replace(".aspx", "").ToLower() +
                                   "\"]";
             }
 
-            if (GlobalSettings.HideTopLevelNodeFromPath && requestRawUrl.Length == 2) {
-                _tempQuery += " | " + pageXPathQueryStart + "/node [" + _urlName + " = \"" +
+            if (GlobalSettings.HideTopLevelNodeFromPath && requestRawUrl.Length == 2)
+            {
+                _tempQuery += " | " + pageXPathQueryStart + "/" + childContainerName + "/* [" + _urlName + " = \"" +
                               requestRawUrl[1].Replace(".aspx", "").ToLower() + "\"]";
             }
             HttpContext.Current.Trace.Write("umbracoRequestHandler", "xpath: '" + _tempQuery + "'");
+
+            Debug.Write(_tempQuery + "(" + pageXPathQueryStart + ")");
 
             if (checkDomain)
                 return _tempQuery;
@@ -162,12 +172,17 @@ namespace umbraco {
                 InitializeUrlName();
 
             // The url exists in cache, and the domain doesn't exists (which makes it ok to do a cache look up on the url alone)
-            if (_processedRequests.ContainsKey(url) && !Domain.Exists(currentDomain)) {
+            // TODO: NH: Remove the flag for friendlyxmlschema when real schema is implemented
+            // as the friendlyxmlschema doesn't have any identifier keys we can't do a lookup
+            // based on ID yet.
+            if (UmbracoSettings.UseLegacyXmlSchema && _processedRequests.ContainsKey(url) && !Domain.Exists(currentDomain))
+            {
                 getByID = true;
                 _pageXPathQuery = _processedRequests[url].ToString();
             }
-                // The url including the domain exists in cache
-            else if (_processedRequests.ContainsKey(currentDomain + url)) {
+            // The url including the domain exists in cache
+            else if (UmbracoSettings.UseLegacyXmlSchema && _processedRequests.ContainsKey(currentDomain + url))
+            {
                 getByID = true;
                 _pageXPathQuery = _processedRequests[currentDomain + url].ToString();
             }

@@ -51,7 +51,8 @@ namespace umbraco
 						XmlNode element = umbracoXML.GetElementById(splitpath[splitpath.Length - i - 1].ToString());
 						if (element == null)
 							continue;
-						XmlNode currentNode = element.SelectSingleNode(string.Format("./data [@alias = '{0}']",
+					    string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data [@alias = '{0}']" : "./{0}";
+						XmlNode currentNode = element.SelectSingleNode(string.Format(xpath,
 							_fieldName));
 						if(currentNode != null && currentNode.FirstChild != null &&
 						   !string.IsNullOrEmpty(currentNode.FirstChild.Value) &&

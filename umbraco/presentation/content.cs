@@ -306,7 +306,7 @@ namespace umbraco
 
             cms.businesslogic.DocumentCacheEventArgs e = new umbraco.cms.businesslogic.DocumentCacheEventArgs();
             FireBeforeUpdateDocumentCache(d, e);
-            
+
             if (!e.Cancel)
             {
 
@@ -727,11 +727,9 @@ namespace umbraco
         private void InitContentDocumentBase(XmlDocument xmlDoc)
         {
             // Create id -1 attribute
-            xmlDoc.LoadXml(@"<!DOCTYPE umbraco [ " +
-                           "<!ELEMENT nodes ANY>  " +
-                           "<!ELEMENT node ANY>  " +
-                           "<!ATTLIST node id ID #REQUIRED> ]>" +
-                           "<root id=\"-1\"/>");
+            xmlDoc.LoadXml(String.Format("<?xml version=\"1.0\" encoding=\"utf-8\" ?>" + Environment.NewLine +
+                "{0}" + Environment.NewLine +
+                "<root id=\"-1\"/>", DocumentType.GenerateDtd()));
         }
 
         /// <summary>
@@ -818,15 +816,34 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             if (parents.ContainsKey(parentId))
             {
                 ArrayList children = (ArrayList)parents[parentId];
+                XmlNode childContainer = UmbracoSettings.UseLegacyXmlSchema || String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME)
+                                             ? parentNode
+                                             : parentNode.SelectSingleNode(
+                                                   UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME);
+
+                if (!UmbracoSettings.UseLegacyXmlSchema && !String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
+                {
+                    if (childContainer == null)
+                    {
+                        childContainer = xmlHelper.addTextNode(parentNode.OwnerDocument, UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME, "");
+                        parentNode.AppendChild(childContainer);
+                    }
+                }
                 foreach (int i in children)
                 {
                     XmlNode childNode = (XmlNode)nodes[i];
-                    parentNode.AppendChild(childNode);
+                    if (UmbracoSettings.UseLegacyXmlSchema || String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
+                    {
+                        parentNode.AppendChild(childNode);
+                    }
+                    else
+                    {
+                        childContainer.AppendChild(childNode);
+                    }
                     GenerateXmlDocument(parents, nodes, i, childNode);
                 }
             }
         }
-
         /// <summary>
         /// Persist a XmlDocument to the Disk Cache
         /// </summary>

@@ -12,6 +12,9 @@ namespace umbraco
     /// </summary>
     public class UmbracoSettings
     {
+        // TODO: Remove for launch
+        public const string TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME = ""; // "children";
+ 
         /// <summary>
         /// Gets the umbraco settings document.
         /// </summary>
@@ -549,6 +552,24 @@ namespace umbraco
                 {
                     return false;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Whether to use the new 4.1 schema or the old legacy schema
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if yes, use the old node/data model; otherwise, <c>false</c>.
+        /// </value>
+        public static bool UseLegacyXmlSchema
+        {
+            get
+            {
+                string value = GetKey("/settings/content/UseLegacyXmlSchema");
+                bool result;
+                if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
+                    return result;
+                return true;
             }
         }
 

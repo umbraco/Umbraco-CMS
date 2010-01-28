@@ -976,8 +976,20 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="xd"></param>
         public new void XmlGenerate(XmlDocument xd)
         {
-            XmlNode x = xd.CreateNode(XmlNodeType.Element, "node", "");
+            string nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : Casing.SafeAlias(ContentType.Alias);
+            XmlNode x = xd.CreateNode(XmlNodeType.Element, nodeName, "");
             XmlPopulate(xd, ref x, false);
+            /*
+                        if (!UmbracoSettings.UseFriendlyXmlSchema)
+                        {
+                        } else
+                        {
+                            XmlNode childNodes = xmlHelper.addTextNode(xd, "data", "");
+                            x.AppendChild(childNodes);
+                            XmlPopulate(xd, ref childNodes, false);
+                        }
+            */
+
 
             // Save to db
             saveXml(x);
@@ -1068,7 +1080,7 @@ namespace umbraco.cms.businesslogic.web
 
             // attributes
             x.Attributes.Append(addAttribute(xd, "id", Id.ToString()));
-            x.Attributes.Append(addAttribute(xd, "version", Version.ToString()));
+//            x.Attributes.Append(addAttribute(xd, "version", Version.ToString()));
             if (Level > 1)
                 x.Attributes.Append(addAttribute(xd, "parentID", Parent.Id.ToString()));
             else
@@ -1086,7 +1098,7 @@ namespace umbraco.cms.businesslogic.web
             x.Attributes.Append(addAttribute(xd, "urlName", url.FormatUrl(urlName.ToLower())));
             x.Attributes.Append(addAttribute(xd, "writerName", _writer.Name));
             x.Attributes.Append(addAttribute(xd, "creatorName", _creator.Name.ToString()));
-			if (ContentType != null)
+			if (ContentType != null && UmbracoSettings.UseLegacyXmlSchema)
 				x.Attributes.Append(addAttribute(xd, "nodeTypeAlias", ContentType.Alias));
             x.Attributes.Append(addAttribute(xd, "path", Path));
 

@@ -73,24 +73,24 @@ namespace umbraco.cms.businesslogic.property
             SqlHelper.ExecuteNonQuery( "Delete from cmsPropertyData where PropertyTypeId =" + _pt.Id + " And contentNodeId = "+ contentId);
 			_data.Delete();
 		}
+        public XmlNode ToXml(XmlDocument xd)
+        {
+            string nodeName = UmbracoSettings.UseLegacyXmlSchema ? "data" : helpers.Casing.SafeAlias(PropertyType.Alias);
+            XmlNode x = xd.CreateNode(XmlNodeType.Element, nodeName, "");
 
-		public XmlNode ToXml(XmlDocument xd) 
-		{
-			XmlNode x = xd.CreateNode(XmlNodeType.Element, "data", "");
+            // Alias
+            if (UmbracoSettings.UseLegacyXmlSchema)
+            {
+                XmlAttribute alias = xd.CreateAttribute("alias");
+                alias.Value = this.PropertyType.Alias;
+                x.Attributes.Append(alias);
+            }
 
-			// Version not necessary after sql publishing has been removed
+            x.AppendChild(_data.ToXMl(xd));
 
-			// Alias
-			XmlAttribute alias = xd.CreateAttribute("alias");
-			alias.Value = this.PropertyType.Alias;
-			x.Attributes.Append(alias);
+            return x;
+        }
 
-			// Check for cdata section
-			// x.AppendChild(xd.CreateCDataSection(this.Value.ToString()));
-			x.AppendChild(_data.ToXMl(xd));
-			
-			return x;
-		}
 
         [MethodImpl(MethodImplOptions.Synchronized)]
 		public static Property MakeNew(propertytype.PropertyType pt, Content c, Guid versionId) 

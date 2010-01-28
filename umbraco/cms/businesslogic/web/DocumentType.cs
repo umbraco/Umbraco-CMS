@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Data;
+using System.Text;
 using System.Xml;
 
 using umbraco.BusinessLogic;
@@ -60,7 +61,8 @@ namespace umbraco.cms.businesslogic.web
             SaveEventArgs e = new SaveEventArgs();
             FireBeforeSave(e);
 
-            if (!e.Cancel) {
+            if (!e.Cancel)
+            {
                 base.Save();
                 FireAfterSave(e);
             }
@@ -134,12 +136,14 @@ namespace umbraco.cms.businesslogic.web
         }
 
         [Obsolete("Use GetAllAsList() method call instead", true)]
-        public new static DocumentType[] GetAll {
-            get {
+        public new static DocumentType[] GetAll
+        {
+            get
+            {
                 return GetAllAsList().ToArray();
             }
         }
-        
+
         public static List<DocumentType> GetAllAsList()
         {
             List<DocumentType> retVal = new List<DocumentType>();
@@ -224,14 +228,15 @@ namespace umbraco.cms.businesslogic.web
             info.AppendChild(xmlHelper.addTextNode(xd, "Thumbnail", Thumbnail));
             info.AppendChild(xmlHelper.addTextNode(xd, "Description", Description));
 
-            if (this.MasterContentType > 0) {
+            if (this.MasterContentType > 0)
+            {
                 DocumentType dt = new DocumentType(this.MasterContentType);
 
-                if(dt != null)
-                    info.AppendChild( xmlHelper.addTextNode(xd, "Master", dt.Alias));
+                if (dt != null)
+                    info.AppendChild(xmlHelper.addTextNode(xd, "Master", dt.Alias));
             }
-            
-            
+
+
             // templates
             XmlElement allowed = xd.CreateElement("AllowedTemplates");
             foreach (template.Template t in allowedTemplates)
@@ -288,10 +293,13 @@ namespace umbraco.cms.businesslogic.web
             DeleteEventArgs e = new DeleteEventArgs();
             FireBeforeDelete(e);
 
-            if (!e.Cancel) {
+            if (!e.Cancel)
+            {
                 // check that no document types uses me as a master
-                foreach (DocumentType dt in DocumentType.GetAllAsList()) {
-                    if (dt.MasterContentType == this.Id) {
+                foreach (DocumentType dt in DocumentType.GetAllAsList())
+                {
+                    if (dt.MasterContentType == this.Id)
+                    {
                         throw new ArgumentException("Can't delete a Document Type used as a Master Content Type. Please remove all references first!");
                     }
                 }
@@ -303,6 +311,34 @@ namespace umbraco.cms.businesslogic.web
 
                 FireAfterDelete(e);
             }
+        }
+
+        /// <summary>
+        /// Generates the complete (simplified) XML DTD 
+        /// </summary>
+        /// <returns>The DTD as a string</returns>
+        public static string GenerateDtd()
+        {
+            StringBuilder dtd = new StringBuilder();
+            dtd.AppendLine("<!DOCTYPE umbraco [ ");
+
+            if (UmbracoSettings.UseLegacyXmlSchema)
+            {
+                dtd.AppendLine("<!ELEMENT node ANY> <!ATTLIST node id ID #REQUIRED>  <!ELEMENT data ANY>");
+            }
+            else
+            {
+                List<DocumentType> dts = GetAllAsList();
+                foreach (DocumentType dt in dts)
+                {
+                    string safeAlias = helpers.Casing.SafeAlias(dt.Alias);
+                    dtd.AppendLine(String.Format("<!ELEMENT {0} ANY>", safeAlias));
+                    dtd.AppendLine(String.Format("<!ATTLIST {0} id ID #REQUIRED>", safeAlias));
+                }
+            }
+            dtd.AppendLine("]>");
+
+            return dtd.ToString();
         }
 
         //EVENTS

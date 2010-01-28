@@ -178,6 +178,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Actions\IActionHandler.cs" />
+    <Compile Include="helpers\Casing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

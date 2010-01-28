@@ -209,16 +209,21 @@ namespace umbraco
             }
 
             // Load all page elements
-            foreach (XmlNode dataNode in xmlNode.SelectNodes("./data"))
+            string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data" : "./* [not(@id)]";
+            foreach (XmlNode dataNode in xmlNode.SelectNodes(xpath))
             {
                 if (dataNode == null)
                     continue;
                 // Only add those data-elements who has content (ie. a childnode)
                 if (dataNode.FirstChild != null)
                 {
+                    string currentAlias = UmbracoSettings.UseLegacyXmlSchema
+                                              ? dataNode.Attributes.GetNamedItem("alias").Value
+                                              : dataNode.Name;
+
                     // Check for redirects
                     if (helper.IsNumeric(dataNode.FirstChild.Value) &&
-                        dataNode.Attributes.GetNamedItem("alias").Value == "umbracoRedirect" &&
+                        currentAlias == "umbracoRedirect" &&
                         int.Parse(dataNode.FirstChild.Value) > 0)
                     {
                         HttpContext.Current.Response.Redirect(library.NiceUrl(int.Parse(dataNode.FirstChild.Value)),
@@ -226,19 +231,19 @@ namespace umbraco
                     }
                     else
                     {
-                        if (elements.ContainsKey(dataNode.Attributes.GetNamedItem("alias").Value))
+                        if (elements.ContainsKey(currentAlias))
                             HttpContext.Current.Trace.Warn("umbracoPage",
                                                            "Aliases must be unique, an element with alias '" +
-                                                           dataNode.Attributes.GetNamedItem("alias").Value +
+                                                           currentAlias +
                                                            "' has already been loaded!");
                         else
                         {
-                            elements.Add(dataNode.Attributes.GetNamedItem("alias").Value,
+                            elements.Add(currentAlias,
                                          dataNode.FirstChild.Value
                                 );
                             HttpContext.Current.Trace.Write("umbracoPage",
                                                             "Element loaded: " +
-                                                            dataNode.Attributes.GetNamedItem("alias").Value);
+                                                            currentAlias);
                         }
                     }
                 }
@@ -246,7 +251,7 @@ namespace umbraco
 
             HttpContext.Current.Trace.Write("umbracoPage",
                                             "Pagedata loaded for " + pageName + " (ID: " + pageID.ToString() +
-                                            ", Version: " + pageVersion.ToString() + ")");
+                                            ")");
 
             // Save to cache
             //			System.Web.HttpRuntime.Cache.Insert("umbPage" + pageID.ToString(), this);
