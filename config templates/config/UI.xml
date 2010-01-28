@@ -242,20 +242,36 @@
       <delete assembly="umbraco" type="cacheTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="initpython">
-    <header>Python file</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="PythonTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="python">
-    <header>Macro</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="PythonTasks" />
-    </tasks>
-  </nodeType>
+    <nodeType alias="initpython">
+        <header>Scripting file</header>
+        <usercontrol>/create/DLRScripting.ascx</usercontrol>
+        <tasks>
+            <create assembly="umbraco" type="PythonTasks" />
+        </tasks>
+    </nodeType>
+    <nodeType alias="python">
+        <header>Macro</header>
+        <usercontrol>/create/DLRScripting.ascx</usercontrol>
+        <tasks>
+            <delete assembly="umbraco" type="PythonTasks" />
+        </tasks>
+    </nodeType>
+
+    <nodeType alias="initdlrscripting">
+        <header>Scripting file</header>
+        <usercontrol>/create/DLRScripting.ascx</usercontrol>
+        <tasks>
+            <create assembly="umbraco" type="DLRScriptingTasks" />
+        </tasks>
+    </nodeType>
+
+    <nodeType alias="dlrscripting">
+        <header>Macro</header>
+        <usercontrol>/create/DLRScripting.ascx</usercontrol>
+        <tasks>
+            <delete assembly="umbraco" type="DLRScriptingTasks" />
+        </tasks>
+    </nodeType>
   <nodeType alias="initscripts">
     <header>Script file</header>
     <usercontrol>/create/script.ascx</usercontrol>
