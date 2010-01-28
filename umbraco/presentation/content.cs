@@ -195,14 +195,15 @@ namespace umbraco
         {
             // Remove all attributes and data nodes from the published node
             PublishedNode.Attributes.RemoveAll();
-            foreach (XmlNode n in PublishedNode.SelectNodes("./data"))
+            string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data" : "./* [not(@id)]";
+            foreach (XmlNode n in PublishedNode.SelectNodes(xpath))
                 PublishedNode.RemoveChild(n);
 
             // Append all attributes and datanodes from the documentnode to the publishednode
             foreach (XmlAttribute att in DocumentNode.Attributes)
                 ((XmlElement)PublishedNode).SetAttribute(att.Name, att.Value);
 
-            foreach (XmlElement el in DocumentNode.SelectNodes("./data"))
+            foreach (XmlElement el in DocumentNode.SelectNodes(xpath))
             {
                 XmlNode newDatael = PublishedNode.OwnerDocument.ImportNode(el, true);
                 PublishedNode.AppendChild(newDatael);
