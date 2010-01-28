@@ -23,6 +23,7 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
+using umbraco.IO;
 
 
 namespace umbraco
@@ -50,7 +51,7 @@ namespace umbraco
 
         protected override string FilePath
         {
-            get { return UmbracoSettings.ScriptFolderPath + "/"; }
+            get { return SystemDirectories.Scripts + "/"; }
         }
 
         protected override string FileSearchPattern

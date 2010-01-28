@@ -13,6 +13,10 @@ using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.cache;
 using System.Net;
+using umbraco.IO;
+using System.Collections;
+using umbraco.presentation.nodeFactory;
+using umbraco.scripting;
 
 namespace umbraco.presentation.webservices
 {
@@ -49,13 +53,15 @@ namespace umbraco.presentation.webservices
                     try
                     {
                         stylesheet.saveCssToFile();
+                        stylesheet.Save();
                         returnValue = "true";
 
 
                         //deletes the old css file if the name was changed... 
                         if (fileName != oldName) {
-                            if (System.IO.File.Exists(Server.MapPath(GlobalSettings.Path + "/../css/" + oldName + ".css")))
-                                System.IO.File.Delete(Server.MapPath(GlobalSettings.Path + "/../css/" + oldName + ".css"));
+                            string p = IOHelper.MapPath(SystemDirectories.Css + "/" + oldName + ".css");
+                            if (System.IO.File.Exists( p ))
+                                System.IO.File.Delete(p);
                         }
 
                     }
@@ -77,7 +83,7 @@ namespace umbraco.presentation.webservices
             if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
             {
                 StreamWriter SW;
-                string tempFileName = Server.MapPath(GlobalSettings.Path + "/../xslt/" + DateTime.Now.Ticks + "_temp.xslt");
+                string tempFileName = IOHelper.MapPath(SystemDirectories.Xslt + "/" + DateTime.Now.Ticks + "_temp.xslt");
                 SW = File.CreateText(tempFileName);
                 SW.Write(fileContents);
                 SW.Close();
@@ -189,13 +195,12 @@ namespace umbraco.presentation.webservices
                     }
                 }
 
-
                 if (errorMessage == "" && fileName.ToLower().EndsWith(".xslt"))
                 {
                     //Hardcoded security-check... only allow saving files in xslt directory... 
-                    string savePath = Server.MapPath(GlobalSettings.Path + "/../xslt/" + fileName);
+                    string savePath = IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName);
 
-                    if (savePath.StartsWith(Server.MapPath(GlobalSettings.Path + "/../xslt/")))
+                    if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Xslt + "/")))
                     {
                         SW = File.CreateText(savePath);
                         SW.Write(fileContents);
@@ -204,8 +209,9 @@ namespace umbraco.presentation.webservices
 
                         //deletes the old xslt file
                         if (fileName != oldName) {
-                            if (System.IO.File.Exists(Server.MapPath(GlobalSettings.Path + "/../xslt/" + oldName)))
-                                System.IO.File.Delete(Server.MapPath(GlobalSettings.Path + "/../xslt/" + oldName));
+                            string p = IOHelper.MapPath(SystemDirectories.Xslt + "/" + oldName);
+                            if (System.IO.File.Exists(p))
+                                System.IO.File.Delete(p);
                         }
                     }
                     else
@@ -221,9 +227,68 @@ namespace umbraco.presentation.webservices
             return "false";
         }
 
-        private string SavePython(string filename, string contents)
+        [WebMethod]
+        public string SaveDLRScript(string fileName, string oldName, string fileContents, bool ignoreDebugging)
         {
-            return "true";
+            StreamWriter SW;
+            string tempFileName = IOHelper.MapPath(SystemDirectories.Python + "/" + System.DateTime.Now.Ticks.ToString() + "_" + fileName);
+            
+    
+			//SW = File.CreateText(tempFileName);
+            SW = new System.IO.StreamWriter(tempFileName, false, new System.Text.UTF8Encoding(false));
+            SW.Write(fileContents);
+			SW.Close();
+                
+				string errorMessage = "";
+
+                if (!ignoreDebugging)
+                {
+                    Hashtable args = new Hashtable();
+
+                    Node n = new Node(Document.GetRootDocuments()[0].Id);
+                    args.Add("currentPage", n);
+
+                    try
+                    {
+                        MacroScript.ExecuteFile(tempFileName, args);
+                    }
+                    catch (Exception err)
+                    {
+                        errorMessage = err.ToString();
+                        errorMessage = errorMessage.Replace("\n", "<br/>\n");
+                    }
+                }
+
+                if (errorMessage == "")
+                {
+                    //Hardcoded security-check... only allow saving files in xslt directory... 
+                    string savePath = IOHelper.MapPath(SystemDirectories.Python + "/" + fileName);
+
+                    if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Python + "/")))
+                    {
+                        SW = File.CreateText(savePath);
+                        SW.Write(fileContents);
+                        SW.Close();
+                        errorMessage = "true";
+
+                        //deletes the old xslt file
+                        if (fileName != oldName)
+                        {
+                            string p = IOHelper.MapPath(SystemDirectories.Python + "/" + oldName);
+                            if (System.IO.File.Exists(p))
+                                System.IO.File.Delete(p);
+                        }
+                    }
+                    else
+                    {
+                        errorMessage = "Illegal path";
+                    }
+                }
+
+                File.Delete(tempFileName);
+                
+
+                return errorMessage;
         }
 
         [WebMethod]
@@ -234,21 +299,22 @@ namespace umbraco.presentation.webservices
                 string val = contents;
                 string returnValue = "false";
                 try
-                {
-                    string savePath = Server.MapPath(UmbracoSettings.ScriptFolderPath + "/" + filename);
+                {                    
+                    string savePath = IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename);
 
                     //Directory check.. only allow files in script dir and below to be edited
-                    if (savePath.StartsWith(Server.MapPath(UmbracoSettings.ScriptFolderPath + "/")))
+                    if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Scripts + "/")))
                     {
                         StreamWriter SW;
-                        SW = File.CreateText(Server.MapPath(UmbracoSettings.ScriptFolderPath + "/" + filename));
+                        SW = File.CreateText(IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename));
                         SW.Write(val);
                         SW.Close();
 
                         //deletes the old file
                         if (filename != oldName) {
-                            if (System.IO.File.Exists(Server.MapPath(UmbracoSettings.ScriptFolderPath + "/" + oldName)))
-                                System.IO.File.Delete(Server.MapPath(UmbracoSettings.ScriptFolderPath + "/" + oldName));
+                            string p = IOHelper.MapPath(SystemDirectories.Scripts + "/" + oldName);
+                            if (System.IO.File.Exists(p))
+                                System.IO.File.Delete(p);
                         }
 
                         returnValue = "true";

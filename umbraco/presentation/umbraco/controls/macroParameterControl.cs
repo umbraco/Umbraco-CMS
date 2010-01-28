@@ -9,6 +9,7 @@ using System.Web.UI.WebControls;
 using umbraco.cms.businesslogic.macro;
 using System.Reflection;
 using System.Collections;
+using umbraco.IO;
 namespace umbraco.controls
 {
     [DefaultProperty("Text")]
@@ -127,7 +128,7 @@ namespace umbraco.controls
                 try
                 {
 
-                    Assembly assembly = Assembly.LoadFrom(HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../bin/" + macroAssembly + ".dll"));
+                    Assembly assembly = Assembly.LoadFrom( IOHelper.MapPath(SystemDirectories.Bin + "/" + macroAssembly + ".dll"));
 
                     Type type = assembly.GetType(macroAssembly + "." + macroType);
                     interfaces.IMacroGuiRendering typeInstance = Activator.CreateInstance(type) as interfaces.IMacroGuiRendering;

@@ -6,6 +6,7 @@ namespace dashboardUtilities
 	using System.Web;
 	using System.Web.UI.WebControls;
 	using System.Web.UI.HtmlControls;
+    using umbraco.IO;
 
 	/// <summary>
 	///		Summary description for LatestEdits.
@@ -43,8 +44,8 @@ namespace dashboardUtilities
 					} 
 					catch {}
 					count++;
-					return 
-						"<a href=\"editContent.aspx?id=" + NodeId.ToString() + "\" style=\"text-decoration: none\"><img src=\"" + umbraco.GlobalSettings.Path + "/images/forward.png\" align=\"absmiddle\" border=\"0\"/> " + d.Text + parent + "</a>. " + umbraco.ui.Text("general", "edited", bp.getUser()) + " " + umbraco.library.ShortDateWithTimeAndGlobal(DateTime.Parse(Date.ToString()).ToString(), umbraco.ui.Culture(bp.getUser())) + "<br/>";
+					return
+                        "<a href=\"editContent.aspx?id=" + NodeId.ToString() + "\" style=\"text-decoration: none\"><img src=\"" + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/images/forward.png\" align=\"absmiddle\" border=\"0\"/> " + d.Text + parent + "</a>. " + umbraco.ui.Text("general", "edited", bp.getUser()) + " " + umbraco.library.ShortDateWithTimeAndGlobal(DateTime.Parse(Date.ToString()).ToString(), umbraco.ui.Culture(bp.getUser())) + "<br/>";
 				}
 				catch {
 					return "";

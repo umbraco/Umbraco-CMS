@@ -7,7 +7,7 @@ function openDialog(diaTitle, diaDoc, dwidth, dheight, optionalParams)
 }
 
 function runStarterKits() {
-  openDialog('packager', 'http://packages.umbraco.org/packages/website-packages?callback=<%=Request.ServerVariables["SERVER_NAME"] + umbraco.GlobalSettings.Path + "/dialogs/packager.aspx" %>', 530, 550, ',scrollbars=yes');
+  openDialog('packager', 'http://packages.umbraco.org/packages/website-packages?callback=<%=Request.ServerVariables["SERVER_NAME"] + umbraco.IO.SystemDirectories.Umbraco + "/dialogs/packager.aspx" %>', 530, 550, ',scrollbars=yes');
 }
 </script>
 
@@ -52,7 +52,7 @@ You installed Runway, so why not see how your new website looks.
 </asp:PlaceHolder>
 </div>
 
-<a href="<%=umbraco.GlobalSettings.Path %>/default.aspx"><h3>Launch Umbraco</h3>
+<a href="<%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/umbraco.aspx"><h3>Launch Umbraco</h3>
 To manage your website, simply open the umbraco back office and start adding content, updating the templates and stylesheets or add new functionality
 </a>
 

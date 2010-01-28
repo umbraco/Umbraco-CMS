@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.BasePages;
 using ClientDependency.Core;
+using umbraco.IO;
 
 namespace umbraco.controls.GenericProperties
 {
@@ -148,11 +149,11 @@ namespace umbraco.controls.GenericProperties
 				FullHeader.Text = _pt.GetRawName() + " (" + _pt.Alias + "), Type: " + _pt.DataTypeDefinition.Text;;
 				Header.Text = _pt.GetRawName();
 				DeleteButton.Visible = true;
-				DeleteButton.ImageUrl = GlobalSettings.Path + "/images/delete_button.png";
+				DeleteButton.ImageUrl = SystemDirectories.Umbraco + "/images/delete_button.png";
 				DeleteButton.Attributes.Add("style", "float: right; cursor: hand;");
 				DeleteButton.Attributes.Add("onclick", "return confirm('" + ui.Text("areyousure") + "');");
 				DeleteButton2.Visible = true;
-				DeleteButton2.ImageUrl = GlobalSettings.Path + "/images/delete_button.png";
+                DeleteButton2.ImageUrl = SystemDirectories.Umbraco + "/images/delete_button.png";
 				DeleteButton2.Attributes.Add("style", "float: right; cursor: hand;");
 				DeleteButton2.Attributes.Add("onclick", "return confirm('" + ui.Text("areyousure") + "');");
 			} 

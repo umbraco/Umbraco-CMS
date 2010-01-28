@@ -146,6 +146,9 @@
     <Compile Include="IconI.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IO\IOHelper.cs" />
+    <Compile Include="IO\SystemDirectories.cs" />
+    <Compile Include="IO\SystemFiles.cs" />
     <Compile Include="Log.cs">
       <SubType>Code</SubType>
     </Compile>

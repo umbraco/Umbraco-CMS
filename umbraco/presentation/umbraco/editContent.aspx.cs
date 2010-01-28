@@ -12,6 +12,7 @@ using System.Web.UI.HtmlControls;
 using System.Reflection;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.helpers;
+using umbraco.IO;
 
 
 namespace umbraco.cms.presentation
@@ -352,7 +353,7 @@ namespace umbraco.cms.presentation
                 uicontrols.MenuIconI menuItem = tp.Menu.NewIcon(3);
                 menuItem.AltText = ui.Text("buttons", "showPage", this.getUser());
                 menuItem.OnClickCommand = "window.open('../" + Request["id"] + ".aspx?umbVersion=" + _document.Version.ToString() + "','umbPreview')";
-                menuItem.ImageURL = GlobalSettings.Path + "/images/editor/vis.gif";
+                menuItem.ImageURL = SystemDirectories.Umbraco + "/images/editor/vis.gif";
                 //				tp.Menu.InsertSplitter(4);
             }
 

@@ -12,6 +12,7 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 
 using umbraco.editorControls;
+using umbraco.IO;
 
 namespace umbraco.editorControls.userControlGrapper
 {
@@ -58,7 +59,7 @@ namespace umbraco.editorControls.userControlGrapper
 
             // populate the usercontrol dropdown
             _dropdownlistUserControl.Items.Add(new ListItem(ui.Text("choose"), ""));
-            populateUserControls(System.Web.HttpContext.Current.Server.MapPath("/usercontrols"));
+            populateUserControls( IOHelper.MapPath( SystemDirectories.Usercontrols) );
 			
 		}
 
@@ -67,8 +68,18 @@ namespace umbraco.editorControls.userControlGrapper
             DirectoryInfo di = new DirectoryInfo(path);
             foreach (FileInfo uc in di.GetFiles("*.ascx"))
             {
+                string root = IOHelper.MapPath(SystemDirectories.Root);
+
                 _dropdownlistUserControl.Items.Add(
-                    new ListItem(uc.FullName.Substring(uc.FullName.IndexOf("\\usercontrols"), uc.FullName.Length - uc.FullName.IndexOf("\\usercontrols")).Replace("\\", "/")));
+                    
+                    new ListItem( 
+                            uc.FullName.Substring(root.Length).Replace(IOHelper.DirSepChar, '/'))
+
+                    /*
+                    new ListItem( 
+                        uc.FullName.Substring( uc.FullName.IndexOf(root), uc.FullName.Length - uc.FullName.IndexOf(root)).Replace(IOHelper.DirSepChar, '/'))
+                      */  
+                        );
 
             }
             foreach (DirectoryInfo dir in di.GetDirectories())

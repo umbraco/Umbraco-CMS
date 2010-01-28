@@ -1,4 +1,5 @@
 using System;
+using umbraco.IO;
 
 namespace umbraco.controls.GenericProperties
 {
@@ -88,7 +89,7 @@ namespace umbraco.controls.GenericProperties
 		protected override void OnInit(EventArgs e)
 		{
 			base.OnInit (e);
-			System.Web.UI.Control u = new System.Web.UI.UserControl().LoadControl(GlobalSettings.Path + "/controls/genericProperties/GenericProperty.ascx");
+            System.Web.UI.Control u = new System.Web.UI.UserControl().LoadControl(SystemDirectories.Umbraco + "/controls/genericProperties/GenericProperty.ascx");
 			u.ID = this.ID + "_control";
 			((GenericProperty) u).Delete += new EventHandler(GenericPropertyWrapper_Delete);
 			((GenericProperty) u).FullId = _fullId;

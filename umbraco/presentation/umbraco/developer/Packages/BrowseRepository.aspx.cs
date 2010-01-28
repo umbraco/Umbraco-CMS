@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Xml;
 using System.Xml.XPath;
+using umbraco.IO;
 
 namespace umbraco.presentation.developer.packages {
     public partial class BrowseRepository : BasePages.UmbracoEnsuredPage {
@@ -32,8 +33,8 @@ namespace umbraco.presentation.developer.packages {
             
             if (!string.IsNullOrEmpty(category))
                 category = "&category=" + category;
-    
-            iframeGen.Text = "<iframe id=\"repoFrame\" frameborder=\"1\" style=\"border: none; display: block\" src=\"" + url + "?repoGuid=" + repoGuid + category + "&callback=" + Request.ServerVariables["SERVER_NAME"] + ":" + Request.ServerVariables["SERVER_PORT"] + GlobalSettings.Path + "/developer/packages/proxy.htm?/" + GlobalSettings.Path.Trim('/') + "/developer/packages/installer.aspx?repoGuid=" + repoGuid +  "&version=v31\"></iframe>";
+
+            iframeGen.Text = "<iframe id=\"repoFrame\" frameborder=\"1\" style=\"border: none; display: block\" src=\"" + url + "?repoGuid=" + repoGuid + category + "&callback=" + Request.ServerVariables["SERVER_NAME"] + ":" + Request.ServerVariables["SERVER_PORT"] + IOHelper.ResolveUrl( SystemDirectories.Umbraco ) + "/developer/packages/proxy.htm?/" + IOHelper.ResolveUrl(SystemDirectories.Umbraco).Trim('/') + "/developer/packages/installer.aspx?repoGuid=" + repoGuid + "&version=v31\"></iframe>";
         }
 
         #region Web Form Designer generated code

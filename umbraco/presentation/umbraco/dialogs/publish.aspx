@@ -1,7 +1,7 @@
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" Codebehind="publish.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.publish" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
-<%@ Register TagPrefix="ctl" Src="../controls/ProgressBar.ascx" TagName="ProgBar"  %>
+
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 
@@ -99,7 +99,7 @@
           <%=umbraco.ui.Text("publish", "inProgress", this.getUser())%>      
         </p>
         
-        <ctl:ProgBar runat="server" id="ProgBar" />
+        <cc1:ProgressBar runat="server" ID="ProgBar1" />
         
         <br />
         <small class="guiDialogTiny"><div id="counter"></div></small>

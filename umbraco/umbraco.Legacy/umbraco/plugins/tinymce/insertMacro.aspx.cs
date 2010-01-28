@@ -50,8 +50,7 @@ namespace umbraco.presentation.tinymce
                     macroType = mp.Type.Type;
                     try
                     {
-                        Assembly assembly =
-                            Assembly.LoadFrom(Server.MapPath(GlobalSettings.Path + "/../bin/" + macroAssembly + ".dll"));
+                        Assembly assembly = Assembly.LoadFrom(Server.MapPath(GlobalSettings.Path + "/../bin/" + macroAssembly + ".dll"));
 
                         Type type = assembly.GetType(macroAssembly + "." + macroType);
                         IMacroGuiRendering typeInstance = Activator.CreateInstance(type) as IMacroGuiRendering;

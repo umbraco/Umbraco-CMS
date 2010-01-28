@@ -29,7 +29,16 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                 else {
                     //this is a wrapper for CodeMirror
                     return this._editor.getCode();
-                }                
+                }
+            },
+            SetCode: function(code) {
+                if (this.IsSimpleEditor) {
+                    this._control.val(code);
+                }
+                else {
+                    //this is a wrapper for CodeMirror
+                    this._editor.setCode(code);
+                }
             },            
             Insert: function(open, end, txtEl, arg3) {                
                 //arg3 gets appended to open, not actually sure why it's needed but we'll keep it for legacy, it's optional                

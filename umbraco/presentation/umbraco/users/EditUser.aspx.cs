@@ -17,6 +17,7 @@ using umbraco.presentation.channels.businesslogic;
 using umbraco.uicontrols;
 using umbraco.providers;
 using umbraco.cms.presentation.Trees;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation.user
 {
@@ -88,7 +89,7 @@ namespace umbraco.cms.presentation.user
             // Populate ui language lsit
             foreach (
                 string f in
-                    Directory.GetFiles(HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/config/lang"), "*.xml")
+                    Directory.GetFiles(IOHelper.MapPath(SystemDirectories.Umbraco + "/config/lang"), "*.xml")
                 )
             {
                 XmlDocument x = new XmlDocument();
@@ -131,7 +132,7 @@ namespace umbraco.cms.presentation.user
 
 
             // Add password changer
-            passw.Controls.Add(new UserControl().LoadControl(GlobalSettings.Path + "/controls/passwordChanger.ascx"));
+            passw.Controls.Add(new UserControl().LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx"));
 
             pp.addProperty(ui.Text("user", "username", base.getUser()), uname);
             pp.addProperty(ui.Text("user", "loginname", base.getUser()), lname);
@@ -167,7 +168,7 @@ namespace umbraco.cms.presentation.user
             userInfo.HasMenu = true;
 
             ImageButton save = userInfo.Menu.NewImageButton();
-            save.ImageUrl = GlobalSettings.Path + "/images/editor/save.gif";
+            save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
             save.Click += new ImageClickEventHandler(saveUser_Click);
 
             sectionValidator.ServerValidate += new ServerValidateEventHandler(sectionValidator_ServerValidate);
@@ -278,7 +279,7 @@ namespace umbraco.cms.presentation.user
 
             channelInfo.HasMenu = true;
             ImageButton save = channelInfo.Menu.NewImageButton();
-            save.ImageUrl = GlobalSettings.Path + "/images/editor/save.gif";
+            save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
             save.Click += new ImageClickEventHandler(saveUser_Click);
 
             if (!IsPostBack)

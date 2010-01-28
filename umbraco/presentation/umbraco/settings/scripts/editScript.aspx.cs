@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.IO;
 using umbraco.cms.presentation.Trees;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation.settings.scripts
 {
@@ -28,27 +29,23 @@ namespace umbraco.cms.presentation.settings.scripts
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-            String file = Request.QueryString["file"];
+            String file = Request.QueryString["file"].TrimStart('/');
             NameTxt.Text = file;
 
             //need to change the editor type if it is XML
             if (file.EndsWith("xml"))
                 editorSource.CodeBase = umbraco.uicontrols.CodeArea.EditorType.XML;
 
-            string appPath = Request.ApplicationPath;
-            if (appPath == "/")
-                appPath = "";
-
-            lttPath.Text = "<a target='_blank' href='" + appPath + UmbracoSettings.ScriptFolderPath + "/" + Request.QueryString["file"] + "'>" + appPath + UmbracoSettings.ScriptFolderPath + "/" + Request.QueryString["file"] + "</a>";
-			            
-            string openPath = Server.MapPath(UmbracoSettings.ScriptFolderPath + "/" + file);
-
-            //security check... only allow
-            if (openPath.StartsWith(Server.MapPath(UmbracoSettings.ScriptFolderPath + "/")))
+            string path = IOHelper.ResolveUrl(SystemDirectories.Scripts + "/" + file);
+                        
+            lttPath.Text = "<a target='_blank' href='" + path + "'>" + path + "</a>";
+			
+            //security check... only allow script files
+            if (path.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Scripts) + "/"))
             {
                 StreamReader SR;
                 string S;
-                SR = File.OpenText(Server.MapPath(UmbracoSettings.ScriptFolderPath + "/" + file));
+                SR = File.OpenText( IOHelper.MapPath( path ));
                 S = SR.ReadToEnd();
                 SR.Close();
                 
@@ -73,7 +70,7 @@ namespace umbraco.cms.presentation.settings.scripts
         override protected void OnInit(EventArgs e)
         {
             uicontrols.MenuIconI save = Panel1.Menu.NewIcon();
-            save.ImageURL = GlobalSettings.Path + "/images/editor/save.gif";
+            save.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
             save.OnClickCommand = "doSubmit()";
             save.AltText = "Save File";
             

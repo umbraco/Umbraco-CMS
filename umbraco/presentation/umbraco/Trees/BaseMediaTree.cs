@@ -23,6 +23,7 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic.Actions;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation.Trees
 {
@@ -64,7 +65,7 @@ namespace umbraco.cms.presentation.Trees
                 Javascript.Append(
 					@"
 function openMedia(id) {
-	" + ClientTools.Scripts.GetContentFrame() + ".location.href = '/umbraco/editMedia.aspx?id=' + id;" + @"
+	" + ClientTools.Scripts.GetContentFrame() + ".location.href = '" + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/editMedia.aspx?id=' + id;" + @"
 }
 ");
             }

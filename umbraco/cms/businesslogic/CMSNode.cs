@@ -10,6 +10,7 @@ using umbraco.BusinessLogic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
+using umbraco.IO;
 
 namespace umbraco.cms.businesslogic {
     /// <summary>
@@ -38,7 +39,7 @@ namespace umbraco.cms.businesslogic {
         private DateTime _createDate;
         private bool _hasChildrenInitialized;
         private string m_image = "default.png";
-        private static readonly string m_DefaultIconCssFile = GlobalSettings.FullpathToRoot + GlobalSettings.ClientPath + System.IO.Path.DirectorySeparatorChar + "Tree" + System.IO.Path.DirectorySeparatorChar + "treeIcons.css";
+        private static readonly string m_DefaultIconCssFile = IOHelper.MapPath(SystemDirectories.Umbraco_client + "/Tree/treeIcons.css");
         private static List<string> m_DefaultIconClasses = new List<string>();
 
         /// <summary>

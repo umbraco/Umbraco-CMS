@@ -9,6 +9,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.helpers;
+using umbraco.IO;
 
 namespace umbraco.presentation.developer.packages {
     public partial class Boost : BasePages.UmbracoEnsuredPage {
@@ -45,7 +46,7 @@ namespace umbraco.presentation.developer.packages {
                  boostInstalled.Visible = true;
                  boostInstalled.Text = ui.Text("installer", "runwayInstalled");
                  boostNotInstalled.Visible = false;
-                 nitroPanel.Controls.Add(new UserControl().LoadControl(GlobalSettings.Path + "/developer/packages/LoadNitros.ascx"));
+                 nitroPanel.Controls.Add(new UserControl().LoadControl(SystemDirectories.Umbraco + "/developer/packages/LoadNitros.ascx"));
               } else {
                  boostInstalled.Visible = false;
                  boostNotInstalled.Visible = true;

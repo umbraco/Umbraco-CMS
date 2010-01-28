@@ -13,6 +13,7 @@ using ClientDependency.Core;
 using System.Web;
 using ClientDependency.Core.Controls;
 using umbraco.presentation;
+using umbraco.IO;
 
 namespace umbraco.editorControls.macrocontainer
 {
@@ -42,9 +43,9 @@ namespace umbraco.editorControls.macrocontainer
          protected override void OnInit(EventArgs e)
          {
              base.OnInit(e);
-             
- 
-             base.Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "subModal", "<script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/submodal/common.js\"></script><script type=\"text/javascript\" src=\"" + GlobalSettings.Path + "/js/submodal/subModal.js\"></script><link href=\"" + GlobalSettings.Path + "/js/submodal/subModal.css\" type=\"text/css\" rel=\"stylesheet\"></link>");
+
+
+             base.Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "subModal", "<script type=\"text/javascript\" src=\"" + SystemDirectories.Umbraco + "/js/submodal/common.js\"></script><script type=\"text/javascript\" src=\"" + SystemDirectories.Umbraco + "/js/submodal/subModal.js\"></script><link href=\"" + SystemDirectories.Umbraco + "/js/submodal/subModal.css\" type=\"text/css\" rel=\"stylesheet\"></link>");
 
              if (!UmbracoContext.Current.LiveEditingContext.Enabled)
                  presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
@@ -170,7 +171,7 @@ namespace umbraco.editorControls.macrocontainer
              if (!UmbracoContext.Current.LiveEditingContext.Enabled)
              {
                  ScriptManager sm = ScriptManager.GetCurrent(base.Page);
-                 ServiceReference webservicePath = new ServiceReference(GlobalSettings.Path + "/webservices/MacroContainerService.asmx");
+                 ServiceReference webservicePath = new ServiceReference(SystemDirectories.Webservices + "/MacroContainerService.asmx");
 
                  if (!sm.Services.Contains(webservicePath))
                      sm.Services.Add(webservicePath);

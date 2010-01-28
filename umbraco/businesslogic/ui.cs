@@ -6,6 +6,7 @@ using System.Web.Caching;
 using System.Xml;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.IO;
 
 namespace umbraco
 {
@@ -16,7 +17,7 @@ namespace umbraco
     public class ui
     {
         private static readonly string umbracoDefaultUILanguage = GlobalSettings.DefaultUILanguage;
-        private static readonly string umbracoPath = GlobalSettings.Path;
+        private static readonly string umbracoPath = SystemDirectories.Umbraco;
 
         /// <summary>
         /// Gets the current Culture for the logged-in users
@@ -289,14 +290,14 @@ namespace umbraco
             {
                 using (XmlTextReader langReader =
                     new XmlTextReader(
-                        HttpContext.Current.Server.MapPath(umbracoPath + "/config/lang/" + language + ".xml")))
+                        IOHelper.MapPath(umbracoPath + "/config/lang/" + language + ".xml")))
                 {
                     try
                     {
                         langFile.Load(langReader);
                         HttpRuntime.Cache.Insert(cacheKey, langFile,
                                                  new CacheDependency(
-                                                     HttpContext.Current.Server.MapPath(umbracoPath + "/config/lang/" +
+                                                     IOHelper.MapPath(umbracoPath + "/config/lang/" +
                                                                                         language + ".xml")));
                     }
                     catch (Exception e)

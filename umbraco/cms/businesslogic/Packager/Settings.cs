@@ -8,6 +8,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.IO;
+using umbraco.IO;
 
 namespace umbraco.cms.businesslogic.packager
 {
@@ -16,27 +17,27 @@ namespace umbraco.cms.businesslogic.packager
 
 		public static string PackagerRoot
 		{
-			get { return GlobalSettings.StorageDirectory + System.IO.Path.DirectorySeparatorChar.ToString() + "packages"; }
+            get { return SystemDirectories.Packages; }
 		}
 
 		public static string PackagesStorage
 		{
-			get { return GlobalSettings.StorageDirectory + System.IO.Path.DirectorySeparatorChar.ToString() + "packages" + System.IO.Path.DirectorySeparatorChar.ToString() + "created"; }
+            get { return SystemDirectories.Packages + IOHelper.DirSepChar + "created"; }
 		}
 
 		public static string InstalledPackagesStorage
 		{
-			get { return GlobalSettings.StorageDirectory + System.IO.Path.DirectorySeparatorChar.ToString() + "packages" + System.IO.Path.DirectorySeparatorChar.ToString() + "installed"; }
+            get { return SystemDirectories.Packages + IOHelper.DirSepChar + "installed"; }
 		}
 
 		public static string InstalledPackagesSettings
 		{
-			get { return GlobalSettings.StorageDirectory + System.IO.Path.DirectorySeparatorChar.ToString() + "packages" + System.IO.Path.DirectorySeparatorChar.ToString() + "installed" + System.IO.Path.DirectorySeparatorChar.ToString() + "installedPackages.config"; }
+            get { return SystemDirectories.Packages + IOHelper.DirSepChar + "installed" + IOHelper.DirSepChar + "installedPackages.config"; }
 		}
 
 		public static string CreatedPackagesSettings
 		{
-			get { return GlobalSettings.StorageDirectory + System.IO.Path.DirectorySeparatorChar.ToString() + "packages" + System.IO.Path.DirectorySeparatorChar.ToString() + "created" + System.IO.Path.DirectorySeparatorChar.ToString() + "createdPackages.config"; }
+            get { return SystemDirectories.Packages + IOHelper.DirSepChar + "created" + IOHelper.DirSepChar + "createdPackages.config"; }
 		}
 
 		public static string PackageFileExtension
@@ -51,17 +52,17 @@ namespace umbraco.cms.businesslogic.packager
 			StreamWriter sw2 = null;
 			try
 			{
-				sw1 = System.IO.File.AppendText(HttpContext.Current.Server.MapPath(InstalledPackagesSettings));
+				sw1 = System.IO.File.AppendText(IOHelper.MapPath(InstalledPackagesSettings));
 				sw1.Close();
 
-				sw2 = System.IO.File.AppendText(HttpContext.Current.Server.MapPath(CreatedPackagesSettings));
+                sw2 = System.IO.File.AppendText(IOHelper.MapPath(CreatedPackagesSettings));
 				sw1.Close();
 
-				System.IO.Directory.CreateDirectory(HttpContext.Current.Server.MapPath(PackagesStorage) + "\\__testFolder__");
-				System.IO.Directory.CreateDirectory(HttpContext.Current.Server.MapPath(InstalledPackagesStorage) + "\\__testFolder__");
+                System.IO.Directory.CreateDirectory(IOHelper.MapPath(PackagesStorage) + IOHelper.DirSepChar + "__testFolder__");
+                System.IO.Directory.CreateDirectory(IOHelper.MapPath(InstalledPackagesStorage) + IOHelper.DirSepChar + "__testFolder__");
 
-				System.IO.Directory.Delete(HttpContext.Current.Server.MapPath(PackagesStorage) + "\\__testFolder__", true);
-				System.IO.Directory.Delete(HttpContext.Current.Server.MapPath(InstalledPackagesStorage) + "\\__testFolder__", true);
+                System.IO.Directory.Delete(IOHelper.MapPath(PackagesStorage) + IOHelper.DirSepChar + "__testFolder__", true);
+                System.IO.Directory.Delete(IOHelper.MapPath(InstalledPackagesStorage) + IOHelper.DirSepChar + "__testFolder__", true);
 
 				hasAccess = true;
 			}

@@ -7,6 +7,7 @@ using umbraco.presentation.LiveEditing.Controls;
 using Content = umbraco.cms.businesslogic.Content;
 using umbraco.BusinessLogic.Actions;
 using ClientDependency.Core;
+using umbraco.IO;
 namespace umbraco.presentation.LiveEditing.Modules.CreateModule
 {
 	[ClientDependency(200, ClientDependencyType.Javascript, "LiveEditing/Modules/CreateModule/CreateModule.js", "UmbracoRoot")]
@@ -43,7 +44,7 @@ namespace umbraco.presentation.LiveEditing.Modules.CreateModule
             m_CreateButton.ID = "LeCreateButton";
             m_CreateButton.CssClass = "button";
             m_CreateButton.ToolTip = "Create";
-            m_CreateButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/CreateModule/create.png", GlobalSettings.Path);
+            m_CreateButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/CreateModule/create.png", SystemDirectories.Umbraco);
             m_CreateButton.Visible = UmbracoContext.Current.HasPermission(ActionNew.Instance.Letter);
 
             Controls.Add(m_CreateModal);
@@ -85,7 +86,7 @@ namespace umbraco.presentation.LiveEditing.Modules.CreateModule
 
             m_CreateModal.Controls.Add(new LiteralControl("</div>"));
 
-            //ScriptManager.RegisterClientScriptInclude(this, GetType(), CreateModuleScriptFile, String.Format(CreateModuleScriptFile, GlobalSettings.Path));
+            //ScriptManager.RegisterClientScriptInclude(this, GetType(), CreateModuleScriptFile, String.Format(CreateModuleScriptFile, umbraco.IO.SystemDirectories.Umbraco));
         }
 
         private void FillAllowedDoctypes()

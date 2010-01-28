@@ -8,6 +8,7 @@ using System.Web.UI.HtmlControls;
 using System.Collections;
 using System.Web.UI;
 using ClientDependency.Core;
+using umbraco.IO;
 
 namespace umbraco.controls
 {
@@ -21,7 +22,7 @@ namespace umbraco.controls
 
         // General Private members
         private cms.businesslogic.ContentType cType;
-        private static string UmbracoPath = GlobalSettings.Path;
+        private static string UmbracoPath = SystemDirectories.Umbraco;
 
         public bool HideStructure { get; set; }
 
@@ -114,7 +115,7 @@ namespace umbraco.controls
                 ddlIcons.Items.Add(li);
             }
 
-            DirectoryInfo dirInfo = new DirectoryInfo(this.Page.Server.MapPath(GlobalSettings.Path + "/images/umbraco"));
+            DirectoryInfo dirInfo = new DirectoryInfo( IOHelper.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
             FileInfo[] fileInfo = dirInfo.GetFiles();
             for (int i = 0; i < fileInfo.Length; i++)
             {
@@ -123,7 +124,7 @@ namespace umbraco.controls
                 {
                     
                     ListItem li = new ListItem(fileInfo[i].Name + " (deprecated)", fileInfo[i].Name);
-                    li.Attributes.Add("style", "background-image: url(" + GlobalSettings.Path + "/images/umbraco/" + fileInfo[i].Name + ");");
+                    li.Attributes.Add("style", "background-image: url(" + SystemDirectories.Umbraco + "/images/umbraco/" + fileInfo[i].Name + ");");
                     li.Attributes.Add("class", "deprecatedImage");
 
                     if (!this.Page.IsPostBack && li.Value == cType.IconUrl) li.Selected = true;
@@ -132,7 +133,7 @@ namespace umbraco.controls
             }
 
             // Get thumbnails
-            dirInfo = new DirectoryInfo(this.Page.Server.MapPath(GlobalSettings.Path + "/images/thumbnails"));
+            dirInfo = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/images/thumbnails"));
             fileInfo = dirInfo.GetFiles();
             for (int i = 0; i < fileInfo.Length; i++)
             {

@@ -7,6 +7,7 @@ using umbraco.DataLayer;
 using System.Linq;
 using System.Text.RegularExpressions;
 using umbraco.cms.businesslogic.cache;
+using umbraco.IO;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -31,7 +32,6 @@ namespace umbraco.cms.businesslogic.web
             {
 
                 //move old file
-                //File.Move(System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../css/" + this.Text + ".css"), System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../css/" + value + ".css"));
                 _filename = value;
                 SqlHelper.ExecuteNonQuery("update cmsStylesheet set filename = '" + _filename + "' where nodeId = " + base.Id.ToString());
                 InvalidateCache();
@@ -117,10 +117,10 @@ namespace umbraco.cms.businesslogic.web
                         _content = dr.GetString("content");
                 }
                 else
-                    if (File.Exists(System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../css/" + this.Text + ".css")))
+                    if (File.Exists(IOHelper.MapPath(SystemDirectories.Css + "/" + this.Text + ".css")))
                     {
 
-                        StreamReader re = File.OpenText(System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../css/" + this.Text + ".css"));
+                        StreamReader re = File.OpenText(IOHelper.MapPath(SystemDirectories.Css + "/" + this.Text + ".css"));
                         string input = null;
                         bool read = true;
                         _content = string.Empty;
@@ -207,7 +207,7 @@ namespace umbraco.cms.businesslogic.web
             }
 
             ArrayList fileStylesheets = new ArrayList();
-            DirectoryInfo fileListing = new DirectoryInfo(System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../css/"));
+            DirectoryInfo fileListing = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Css + "/"));
 
             foreach (FileInfo file in fileListing.GetFiles("*.css"))
             {
@@ -229,7 +229,7 @@ namespace umbraco.cms.businesslogic.web
 
                 string content = string.Empty;
 
-                using (StreamReader re = File.OpenText(System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../css/" + fileStylesheets[i].ToString() + ".css")))
+                using (StreamReader re = File.OpenText(IOHelper.MapPath(SystemDirectories.Css + "/" + fileStylesheets[i].ToString() + ".css")))
                 {
                     content = re.ReadToEnd();
                 }
@@ -257,7 +257,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                File.Delete(System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../css/" + this.Text + ".css"));
+                File.Delete(IOHelper.MapPath(SystemDirectories.Css + "/" + this.Text + ".css"));
                 foreach (StylesheetProperty p in this.Properties)
                     p.delete();
                 SqlHelper.ExecuteNonQuery("delete from cmsStylesheet where nodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
@@ -271,7 +271,7 @@ namespace umbraco.cms.businesslogic.web
         public void saveCssToFile()
         {
             StreamWriter SW;
-            SW = File.CreateText(System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../css/" + this.Text + ".css"));
+            SW = File.CreateText(IOHelper.MapPath(SystemDirectories.Css + "/" + this.Text + ".css"));
             string tmpCss;
             //tmpCss = "/* GENERAL STYLES */\n";
             tmpCss = this.Content + "\n\n";

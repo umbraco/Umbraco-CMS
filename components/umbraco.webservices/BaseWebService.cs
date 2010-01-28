@@ -176,7 +176,7 @@ namespace umbraco.webservices
             {
                 get
                 {
-                    return System.Web.HttpContext.Current.Server.MapPath("/");
+                    return System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
                 }
             }
 

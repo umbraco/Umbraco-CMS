@@ -13,6 +13,7 @@ using System.Collections.Specialized;
 
 using umbraco.cms.businesslogic.macro;
 using System.Collections.Generic;
+using umbraco.IO;
 
 namespace umbraco.developer {
     /// <summary>
@@ -34,17 +35,18 @@ namespace umbraco.developer {
                 if (Request.QueryString["type"] == null) {
                     isUserControl = true;
                     string fileName = Request.QueryString["fileName"];
-                    if (System.IO.File.Exists(Server.MapPath("/" + fileName))) {
+
+                    if (System.IO.File.Exists( IOHelper.MapPath("~/" + fileName))) {
                         UserControl oControl = (UserControl)LoadControl(@"~/" + fileName);
 
                         type = oControl.GetType();
                     } else {
                         errorReadingControl = true;
                         ChooseProperties.Visible = false;
-                        AssemblyName.Text = "<span style=\"color: red;\">User control doesn't exist</span><br /><br />Please verify that you've copied the file to:<br />" + Server.MapPath("~/" + fileName);
+                        AssemblyName.Text = "<span style=\"color: red;\">User control doesn't exist</span><br /><br />Please verify that you've copied the file to:<br />" + IOHelper.MapPath("~/" + fileName);
                     }
                 } else {
-                    string currentAss = Server.MapPath(GlobalSettings.Path + "/../bin/" + Request.QueryString["fileName"] + ".dll");
+                    string currentAss = IOHelper.MapPath( SystemDirectories.Bin + "/" + Request.QueryString["fileName"] + ".dll");
                     Assembly asm = System.Reflection.Assembly.LoadFrom(currentAss);
                     type = asm.GetType(Request.QueryString["type"]);
                 }

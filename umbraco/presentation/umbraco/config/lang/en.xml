@@ -264,6 +264,7 @@
     <key alias="runwayModules" version="4.0">Runway modules</key>
     <key alias="localPackage" version="4.0">Install local package</key>
     <key alias="scripts" version="4.0">Scripts</key>
+    <key alias="scripting" version="4.3">Scripting Files</key>
   </area>
   <area alias="user">
     <key alias="username">Username</key>

@@ -12,6 +12,7 @@ namespace umbraco.presentation.umbraco.masterpages {
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			ClientLoader.DataBind();
+            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "setRoot", "UmbClientMgr.setUmbracoPath(\"" + IO.IOHelper.ResolveUrl( IO.SystemDirectories.Umbraco ) + "\");", true);
 		}
     }
 }

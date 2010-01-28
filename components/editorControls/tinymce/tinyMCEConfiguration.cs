@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 using System.Xml;
+using umbraco.IO;
 
 namespace umbraco.editorControls.tinymce
 {
@@ -42,8 +43,8 @@ namespace umbraco.editorControls.tinymce
             set { _validElements = value; }
         }
 
-        public static string PluginPath = umbraco.GlobalSettings.Path + "/plugins/tinymce3";
-        public static string JavascriptPath = umbraco.GlobalSettings.ClientPath + "/tinymce3";
+        public static string PluginPath = IOHelper.ResolveUrl( SystemDirectories.Umbraco ) + "/plugins/tinymce3";
+        public static string JavascriptPath = IOHelper.ResolveUrl( SystemDirectories.Umbraco_client ) + "/tinymce3";
 
         private static string _invalidElements;
 
@@ -102,7 +103,8 @@ namespace umbraco.editorControls.tinymce
         {
             // Load config
             XmlDocument xd = new XmlDocument();
-            xd.Load(GlobalSettings.FullpathToRoot + System.IO.Path.DirectorySeparatorChar + GlobalSettings.Path + System.IO.Path.DirectorySeparatorChar + ".." + System.IO.Path.DirectorySeparatorChar + "config" + System.IO.Path.DirectorySeparatorChar + "tinyMceConfig.config");
+            xd.Load( IOHelper.MapPath( SystemFiles.TinyMceConfig ) );
+
             foreach (XmlNode n in xd.DocumentElement.SelectNodes("//command"))
             {
                 if (!_commands.ContainsKey(n.SelectSingleNode("./umbracoAlias").FirstChild.Value))
@@ -222,7 +224,7 @@ namespace umbraco.editorControls.tinymce
 
         public string Icon
         {
-            get { return GlobalSettings.Path + "/" + _icon; }
+            get { return SystemDirectories.Umbraco + "/" + _icon; }
             set { _icon = value; }
         }
 

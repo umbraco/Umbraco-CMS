@@ -33,6 +33,7 @@
 
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">
+
 <cc1:Pane ID="Pane1" runat="server" Text="Visualize XSLT">
   <cc1:PropertyPanel ID="PropertyPanel1" runat="server">
     <input type="hidden" runat="server" id="xsltSelection" />

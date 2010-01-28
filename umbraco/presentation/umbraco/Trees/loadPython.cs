@@ -22,6 +22,7 @@ using umbraco.interfaces;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
+using umbraco.IO;
 
 
 namespace umbraco
@@ -29,50 +30,9 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of python items into the developer application tree
 	/// </summary>
-	public class loadPython : FileSystemTree
+	public class loadPython : loadDLRScripts
 	{
         public loadPython(string application) : base(application) { }
-
-        protected override void CreateRootNode(ref XmlTreeNode rootNode)
-        {                           
-			rootNode.NodeType = "init" + TreeAlias;
-			rootNode.NodeID = "init";
-            rootNode.Text = ui.Text("treeHeaders", "python");
-        }
-
-		/// <summary>
-		/// Renders the Javascript.
-		/// </summary>
-		/// <param name="Javascript">The javascript.</param>
-		public override void RenderJS(ref StringBuilder Javascript)
-        {
-            Javascript.Append(
-                @"function openPython(id) {parent.right.document.location.href = 'developer/python/editPython.aspx?file=' + id;}");
-        }
-
-        protected override string FilePath
-        {
-            get
-            {
-                return GlobalSettings.Path + "/../python/";
-            }
-        }
-
-        protected override string FileSearchPattern
-        {
-            get
-            {
-                return "*.py*";
-            }            
-        }
-
-        protected override void OnRenderFileNode(ref XmlTreeNode xNode)
-        {
-            xNode.Action = xNode.Action.Replace("openFile", "openPython");
-            xNode.Icon = "developerPython.gif";
-            xNode.OpenIcon = "developerPython.gif";
-        }
-        
     }
     
 }

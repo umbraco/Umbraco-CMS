@@ -3,6 +3,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.ComponentModel;
 using System.IO;
+using umbraco.IO;
 
 namespace umbraco.editorControls
 {
@@ -59,8 +60,8 @@ namespace umbraco.editorControls
 						// Check for thumbnail!
 						string fileNameOrg = p.Value.ToString();
 						string ext = fileNameOrg.Substring(fileNameOrg.LastIndexOf(".")+1, fileNameOrg.Length-fileNameOrg.LastIndexOf(".")-1);
-						string fileNameThumb = umbraco.GlobalSettings.Path + "/.." + fileNameOrg.Replace("."+ext, "_thumb.jpg");
-						if (File.Exists(System.Web.HttpContext.Current.Server.MapPath(fileNameThumb)))  
+						string fileNameThumb = SystemDirectories.Root + fileNameOrg.Replace("."+ext, "_thumb.jpg");
+						if (File.Exists(IOHelper.MapPath(fileNameThumb)))  
 						{
 							writer.WriteLine("<a href=\"?id=" +  m.Id.ToString() + "\"><img src=\"" + fileNameThumb + "\" alt=\"" + m.Text + "\" style=\"border: none\"/></a> &nbsp; ");
 						}

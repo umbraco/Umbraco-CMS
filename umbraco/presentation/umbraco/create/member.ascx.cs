@@ -10,6 +10,7 @@ namespace umbraco.cms.presentation.create.controls
     using System.Web.Security;
 	using umbraco.cms.helpers;
 	using umbraco.BasePages;
+    using umbraco.cms.businesslogic.member;
 
     /// <summary>
     ///		Summary description for member.

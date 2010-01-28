@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using ClientDependency.Core;
+using umbraco.IO;
 
 
 namespace umbraco.uicontrols {
@@ -20,7 +21,7 @@ namespace umbraco.uicontrols {
         private ArrayList Icons = new ArrayList();
         private string iconIds;
         private int extraMenuWidth = 0;
-        private string _ClientFilesPath = GlobalSettings.ClientPath + "/scrollingmenu/";
+        private string _ClientFilesPath = IOHelper.ResolveUrl( SystemDirectories.Umbraco_client) + "/scrollingmenu/";
 
         public MenuIconI NewIcon(int Index) {
             MenuIcon Icon = new MenuIcon();

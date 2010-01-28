@@ -6,6 +6,7 @@ using umbraco.cms.presentation.Trees;
 using System.Xml.Linq;
 using System.Reflection;
 using umbraco.presentation;
+using umbraco.IO;
 
 namespace umbraco
 {
@@ -41,11 +42,12 @@ namespace umbraco
 
         private void LoadTreeTypes()
         {
-            var xmlFile = UmbracoContext.Current.Server.DataFolder + "\\" + this.app + ".config"; //this is so not cool :/
-            if (string.IsNullOrEmpty(xmlFile))
+            var _xmlFile = IOHelper.MapPath( SystemDirectories.Data + "/" + this.app + ".config");     //UmbracoContext.Current.Server.DataFolder + "\\" + this.app + ".config"; //this is so not cool :/
+
+            if (string.IsNullOrEmpty(_xmlFile))
                 throw new ArgumentException("PromotionsTreeXml");
 
-            var xml = XDocument.Load(HttpContext.Current.Server.MapPath(xmlFile));
+            var xml = XDocument.Load(_xmlFile);
 
             var treesXml = xml.Descendants("Tree");
 

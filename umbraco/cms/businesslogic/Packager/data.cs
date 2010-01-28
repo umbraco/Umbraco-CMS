@@ -7,7 +7,6 @@ namespace umbraco.cms.businesslogic.packager
 {
     public class data
     {
-        //public virtual string sourcePath = System.Web.HttpContext.Current.Server.MapPath(Settings.PackagerSettings);
         private static XmlDocument _source;
         
         public static XmlDocument Source

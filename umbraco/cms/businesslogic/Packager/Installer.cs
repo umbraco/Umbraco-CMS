@@ -21,6 +21,7 @@ using umbraco.DataLayer;
 using System.Diagnostics;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
+using umbraco.IO;
 
 namespace umbraco.cms.businesslogic.packager
 {
@@ -154,9 +155,9 @@ namespace umbraco.cms.businesslogic.packager
         public string Import(string InputFile)
         {
             string tempDir = "";
-            if (File.Exists(HttpContext.Current.Server.MapPath(GlobalSettings.StorageDirectory + Path.DirectorySeparatorChar + InputFile)))
+            if (File.Exists(IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + InputFile)))
             {
-                FileInfo fi = new FileInfo(HttpContext.Current.Server.MapPath(GlobalSettings.StorageDirectory + Path.DirectorySeparatorChar + InputFile));
+                FileInfo fi = new FileInfo(IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + InputFile));
                 // Check if the file is a valid package
                 if (fi.Extension.ToLower() == ".umb")
                 {
@@ -174,7 +175,7 @@ namespace umbraco.cms.businesslogic.packager
                     throw new Exception("Error - file isn't a package (doesn't have a .umb extension). Check if the file automatically got named '.zip' upon download.");
             }
             else
-                throw new Exception("Error - file not found. Could find file named '" + HttpContext.Current.Server.MapPath(GlobalSettings.StorageDirectory + Path.DirectorySeparatorChar + InputFile) + "'");
+                throw new Exception("Error - file not found. Could find file named '" + IOHelper.MapPath(SystemDirectories.Data + Path.DirectorySeparatorChar + InputFile) + "'");
             return tempDir;
         }
 
@@ -210,8 +211,9 @@ namespace umbraco.cms.businesslogic.packager
             packager.InstalledPackage insPack = packager.InstalledPackage.GetById(packageId);
 
             // Move files
-            string virtualBasePath = System.Web.HttpContext.Current.Request.ApplicationPath;
-            string basePath = HttpContext.Current.Server.MapPath(virtualBasePath);
+            //string virtualBasePath = System.Web.HttpContext.Current.Request.ApplicationPath;
+            string basePath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
+
             foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//file")) {
                 //we enclose the whole file-moving to ensure that the entire installer doesn't crash
                 try {
@@ -460,8 +462,7 @@ namespace umbraco.cms.businesslogic.packager
             }
 
             // Move files
-            string virtualBasePath = System.Web.HttpContext.Current.Request.ApplicationPath;
-            string basePath = HttpContext.Current.Server.MapPath(virtualBasePath);
+            string basePath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
             foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//file"))
             {
                 String destPath = getFileName(basePath, xmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")));
@@ -565,6 +566,7 @@ namespace umbraco.cms.businesslogic.packager
                     sp.value = xmlHelper.GetNodeValue(prop.SelectSingleNode("Value"));
                 }
                 s.saveCssToFile();
+                s.Save();
 
                 insPack.Data.Stylesheets.Add(s.Id.ToString());
             }
@@ -771,6 +773,9 @@ namespace umbraco.cms.businesslogic.packager
         /// <returns>The name of the file in the specified path.</returns>
         private static String getFileName(String path, string fileName)
         {
+            //to support virtual dirs we try to lookup the file... 
+            path = IOHelper.FindFile(path);
+
             Debug.Assert(path != null && path.Length >= 1);
             Debug.Assert(fileName != null && fileName.Length >= 1);
 
@@ -834,18 +839,17 @@ namespace umbraco.cms.businesslogic.packager
             _authorName = _packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/author/name").FirstChild.Value;
             _authorUrl = _packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/author/website").FirstChild.Value;
             
-            string virtualBasePath = System.Web.HttpContext.Current.Request.ApplicationPath;
-            string basePath = HttpContext.Current.Server.MapPath(virtualBasePath);
+            string basePath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
             
             foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//file")) {
                 bool badFile = false;
                 string destPath = getFileName(basePath, xmlHelper.GetNodeValue(n.SelectSingleNode("orgPath")));
                 string destFile = getFileName(destPath, xmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
 
-                if (destPath.ToLower().Contains("\\app_code"))
+                if (destPath.ToLower().Contains( IOHelper.DirSepChar + "app_code"))
                     badFile = true;
-                
-                 if (destPath.ToLower().Contains("\\bin"))
+
+                if (destPath.ToLower().Contains(IOHelper.DirSepChar +  "bin"))
                     badFile = true;
 
                  if (destFile.ToLower().EndsWith(".dll"))
@@ -917,7 +921,7 @@ namespace umbraco.cms.businesslogic.packager
         private string unPack(string ZipName)
         {
             // Unzip
-            string tempDir = HttpContext.Current.Server.MapPath(GlobalSettings.StorageDirectory) + Path.DirectorySeparatorChar + Guid.NewGuid().ToString();
+            string tempDir = IOHelper.MapPath(SystemDirectories.Data) + Path.DirectorySeparatorChar + Guid.NewGuid().ToString();
             Directory.CreateDirectory(tempDir);
 
             ZipInputStream s = new ZipInputStream(File.OpenRead(ZipName));
@@ -965,14 +969,14 @@ namespace umbraco.cms.businesslogic.packager
         {
 
             // Check for package directory
-            if (!System.IO.Directory.Exists(System.Web.HttpContext.Current.Server.MapPath(umbraco.GlobalSettings.StorageDirectory + "\\packages")))
-                System.IO.Directory.CreateDirectory(System.Web.HttpContext.Current.Server.MapPath(umbraco.GlobalSettings.StorageDirectory + "\\packages"));
+            if (!System.IO.Directory.Exists(IOHelper.MapPath(SystemDirectories.Packages)))
+                System.IO.Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Packages));
 
             System.Net.WebClient wc = new System.Net.WebClient();
 
             wc.DownloadFile(
                 "http://" + UmbracoSettings.PackageServer + "/fetch?package=" + Package.ToString(),
-                System.Web.HttpContext.Current.Server.MapPath(umbraco.GlobalSettings.StorageDirectory + "\\packages\\" + Package.ToString() + ".umb"));
+                IOHelper.MapPath(SystemDirectories.Packages + "/" + Package.ToString() + ".umb"));
 
             return "packages\\" + Package.ToString() + ".umb";
         }

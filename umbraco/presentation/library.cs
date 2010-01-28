@@ -24,6 +24,7 @@ using umbraco.scripting;
 using umbraco.DataLayer;
 using System.Web.Security;
 using umbraco.cms.businesslogic.language;
+using umbraco.IO;
 
 namespace umbraco
 {
@@ -103,7 +104,7 @@ namespace umbraco
         {
             try
             {
-                string path = HttpContext.Current.Server.MapPath(GlobalSettings.Path + "\\..\\python\\" + file);
+                string path = IOHelper.MapPath(SystemDirectories.Python + "/" + file);
                 object res = python.executeFile(path);
                 return res.ToString();
             }
@@ -373,8 +374,8 @@ namespace umbraco
         {
             XmlDocument umbracoXML = content.Instance.XmlContent;
             bool directoryUrls = GlobalSettings.UseDirectoryUrls;
-            string baseUrl = GlobalSettings.Path;
-            baseUrl = baseUrl.Substring(0, baseUrl.LastIndexOf("/"));
+            string baseUrl = SystemDirectories.Root; // SystemDirectories.Umbraco;
+            //baseUrl = baseUrl.Substring(0, baseUrl.LastIndexOf("/"));
 
             bool atDomain = false;
             string currentDomain = HttpContext.Current.Request.ServerVariables["SERVER_NAME"].ToLower();
@@ -1322,7 +1323,7 @@ namespace umbraco
         /// </summary>
         public static void AddJquery()
         {
-            RegisterJavaScriptFile("jQuery", String.Format("{0}/ui/jquery.js", GlobalSettings.ClientPath));
+            RegisterJavaScriptFile("jQuery", String.Format("{0}/ui/jquery.js", IOHelper.ResolveUrl(SystemDirectories.Umbraco_client)));
         }
 
 
@@ -1626,7 +1627,7 @@ namespace umbraco
             try
             {
                 if (Relative)
-                    xmlDoc.Load(HttpContext.Current.Server.MapPath(Path));
+                    xmlDoc.Load( IOHelper.MapPath(Path) );
                 else
                     xmlDoc.Load(Path);
             }
@@ -2042,29 +2043,7 @@ namespace umbraco
                 return string.Empty;
         }
 
-        /*		public static string Tidy(string StringToTidy, bool LiveEditing) 
-		{
-			try 
-			{
-				string tidyConfig;
-				if (LiveEditing)
-					tidyConfig = System.Web.HttpContext.Current.Server.MapPath(umbraco.GlobalSettings.Path + "/../config/") + "tidy_liveediting.cfg";
-				else
-					tidyConfig = System.Web.HttpContext.Current.Server.MapPath(umbraco.GlobalSettings.Path + "/../config/") + "tidy.cfg";
-
-				NTidy.TidyDocument doc = new NTidy.TidyDocument();
-				doc.LoadConfig(tidyConfig);
-				NTidy.TidyStatus  status = doc.LoadString(StringToTidy);
-				doc.CleanAndRepair();
-
-				return doc.ToString();
-			} catch (Exception ee) {
-				BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, BusinessLogic.User.GetUser(0), -1, "Error tidying: " + ee.ToString());
-				return StringToTidy;
-			}		
-		}
-*/
-
+        
 
         /// <summary>
         /// Cleans the spified string with tidy

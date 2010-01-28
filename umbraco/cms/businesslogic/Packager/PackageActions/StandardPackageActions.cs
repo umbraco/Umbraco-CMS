@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using umbraco.IO;
 
 namespace umbraco.cms.businesslogic.packager.standardPackageActions {
     /*Build in standard actions */
@@ -164,16 +165,17 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions {
 
             if (xmlData.HasChildNodes) {
                 string sectionAlias = xmlData.Attributes["dashboardAlias"].Value;
+                string dbConfig = SystemFiles.DashboardConfig;
 
                 XmlNode section = xmlData.SelectSingleNode("./section");
-                XmlDocument dashboardFile = xmlHelper.OpenAsXmlDocument("/config/dashboard.config");
+                XmlDocument dashboardFile = xmlHelper.OpenAsXmlDocument(dbConfig);
                 XmlNode importedSection = dashboardFile.ImportNode(section, true);
                 XmlAttribute alias = xmlHelper.addAttribute(dashboardFile, "alias", sectionAlias);
                 importedSection.Attributes.Append(alias);
 
                 dashboardFile.DocumentElement.AppendChild( dashboardFile.ImportNode(section, true) );
 
-                dashboardFile.Save(System.Web.HttpContext.Current.Server.MapPath("/config/dashboard.config"));
+                dashboardFile.Save(IOHelper.MapPath(dbConfig));
 
                 return true;
             }
@@ -189,13 +191,14 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions {
         public bool Undo(string packageName, XmlNode xmlData) {
 
             string sectionAlias = xmlData.Attributes["dashboardAlias"].Value;
-            XmlDocument dashboardFile = xmlHelper.OpenAsXmlDocument("/config/dashboard.config");
+            string dbConfig = SystemFiles.DashboardConfig;
+            XmlDocument dashboardFile = xmlHelper.OpenAsXmlDocument(dbConfig);
             
             XmlNode section = dashboardFile.SelectSingleNode("//section [@alias = '" + sectionAlias + "']");
 
             if(section != null){
                 dashboardFile.RemoveChild(section);
-                dashboardFile.Save(System.Web.HttpContext.Current.Server.MapPath("/config/dashboard.config"));
+                dashboardFile.Save(IOHelper.MapPath(dbConfig));
             }
             
             return true;    
@@ -291,10 +294,11 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions {
             string _assembly = xmlData.Attributes["assembly"].Value;
             string _type = xmlData.Attributes["type"].Value;
             string _alias = xmlData.Attributes["extensionAlias"].Value;
+            string xeConfig = SystemFiles.XsltextensionsConfig;
 
             XmlDocument xdoc = new XmlDocument();
             xdoc.PreserveWhitespace = true;
-            xdoc = xmlHelper.OpenAsXmlDocument("/config/xsltExtensions.config");
+            xdoc = xmlHelper.OpenAsXmlDocument(xeConfig);
 
             XmlNode xn = xdoc.SelectSingleNode("//XsltExtensions");
 
@@ -313,8 +317,8 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions {
                     newExt.Attributes.Append(umbraco.xmlHelper.addAttribute(xdoc, "alias", _alias));
                     xn.AppendChild(newExt);
 
-                    
-                    xdoc.Save(System.Web.HttpContext.Current.Server.MapPath("/config/xsltExtensions.config"));
+
+                    xdoc.Save(IOHelper.MapPath(xeConfig));
                     return true;
                 }
             }
@@ -329,10 +333,11 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions {
             string _assembly = xmlData.Attributes["assembly"].Value;
             string _type = xmlData.Attributes["type"].Value;
             string _alias = xmlData.Attributes["extensionAlias"].Value;
+            string xeConfig = SystemFiles.XsltextensionsConfig;
 
             XmlDocument xdoc = new XmlDocument();
             xdoc.PreserveWhitespace = true;
-            xdoc = xmlHelper.OpenAsXmlDocument("/config/xsltExtensions.config");
+            xdoc = xmlHelper.OpenAsXmlDocument(xeConfig);
 
             XmlNode xn = xdoc.SelectSingleNode("//XsltExtensions");
 
@@ -348,7 +353,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions {
                 }
 
                 if (inserted) {
-                    xdoc.Save(System.Web.HttpContext.Current.Server.MapPath("/config/xsltExtensions.config"));
+                    xdoc.Save(IOHelper.MapPath(xeConfig));
                     return true;
                 }
             }
@@ -371,9 +376,12 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions {
             XmlNodeList _newExts = xmlData.SelectNodes("//ext");
 
             if (_newExts.Count > 0) {
+
+                string reConfig = SystemFiles.RestextensionsConfig;
+
                 XmlDocument xdoc = new XmlDocument();
                 xdoc.PreserveWhitespace = true;
-                xdoc.Load("/config/restExtensions.config");
+                xdoc.Load(reConfig);
 
                 XmlNode xn = xdoc.SelectSingleNode("//RestExtensions");
 
@@ -395,7 +403,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions {
                         }
                     }
 
-                    xdoc.Save("/config/restExtensions.config");
+                    xdoc.Save(IOHelper.MapPath(reConfig));
                     return true;
                 }
             }
@@ -409,11 +417,13 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions {
         public bool Undo(string packageName, XmlNode xmlData) {
 
             XmlNodeList _newExts = xmlData.SelectNodes("//ext");
-
+            
             if (_newExts.Count > 0) {
+                string reConfig = SystemFiles.RestextensionsConfig;
+
                 XmlDocument xdoc = new XmlDocument();
                 xdoc.PreserveWhitespace = true;
-                xdoc.Load("/config/restExtensions.config");
+                xdoc.Load(reConfig);
 
                 XmlNode xn = xdoc.SelectSingleNode("//RestExtensions");
 
@@ -434,7 +444,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions {
                     }
 
                     if (inserted) {
-                        xdoc.Save("/config/xsltExtensions.config");
+                        xdoc.Save(IOHelper.MapPath(reConfig));
                         return true;
                     }
                 }

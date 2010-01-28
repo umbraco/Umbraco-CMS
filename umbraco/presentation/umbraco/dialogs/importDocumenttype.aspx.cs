@@ -12,6 +12,7 @@ using System.Web.UI.HtmlControls;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.web;
 using System.Xml;
+using umbraco.IO;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
@@ -70,7 +71,7 @@ namespace umbraco.presentation.umbraco.dialogs
 		private void import_Click(object sender, System.EventArgs e)
 		{
 			XmlDocument xd = new XmlDocument();
-			xd.Load(Server.MapPath(tempFile.Value));
+			xd.Load(tempFile.Value);
 			cms.businesslogic.packager.Installer.ImportDocumentType(xd.DocumentElement, base.getUser(), true);
 			dtNameConfirm.Text = xd.DocumentElement.SelectSingleNode("/DocumentType/Info/Name").FirstChild.Value;
 
@@ -82,12 +83,13 @@ namespace umbraco.presentation.umbraco.dialogs
 		private void submit_Click(object sender, System.EventArgs e)
 		{
 			tempFileName = "justDelete_" + Guid.NewGuid().ToString() + ".udt";
-			string fileName = GlobalSettings.StorageDirectory + System.IO.Path.DirectorySeparatorChar + tempFileName;
+			string fileName = IOHelper.MapPath(SystemDirectories.Data + "/" + tempFileName);
 			tempFile.Value = fileName;
-			documentTypeFile.PostedFile.SaveAs(Server.MapPath(fileName));
+
+			documentTypeFile.PostedFile.SaveAs(fileName);
 
 			XmlDocument xd = new XmlDocument();
-			xd.Load(Server.MapPath(fileName));
+			xd.Load(fileName);
 			dtName.Text = xd.DocumentElement.SelectSingleNode("/DocumentType/Info/Name").FirstChild.Value;
 			dtAlias.Text = xd.DocumentElement.SelectSingleNode("/DocumentType/Info/Alias").FirstChild.Value;
 

@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using umbraco.cms.businesslogic.propertytype;
 using System.Linq;
 using System.ComponentModel;
+using umbraco.IO;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -920,9 +921,9 @@ namespace umbraco.cms.businesslogic.web
 
                         if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id &&
                             p.Value.ToString() != "" &&
-                            System.IO.File.Exists(System.Web.HttpContext.Current.Server.MapPath(p.Value.ToString()))
+                            System.IO.File.Exists( IOHelper.MapPath(p.Value.ToString()))
                             )
-                            System.IO.File.Delete(System.Web.HttpContext.Current.Server.MapPath(p.Value.ToString()));
+                            System.IO.File.Delete( IOHelper.MapPath(p.Value.ToString()));
 
 
                         SqlHelper.ExecuteNonQuery("delete from cmsDocument where NodeId = " + Id);

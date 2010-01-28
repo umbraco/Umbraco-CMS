@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using System.Net;
+using umbraco.IO;
 
 namespace umbraco.cms.businesslogic.packager.repositories {
     public class Repository {
@@ -60,7 +61,7 @@ namespace umbraco.cms.businesslogic.packager.repositories {
             try {
 
                 byte[] pack = new byte[0];
-                fs1 = System.IO.File.Open(System.Web.HttpContext.Current.Server.MapPath(packageFile), FileMode.Open, FileAccess.Read);
+                fs1 = System.IO.File.Open(IOHelper.MapPath(packageFile), FileMode.Open, FileAccess.Read);
                 pack = new byte[fs1.Length];
                 fs1.Read(pack, 0, (int)fs1.Length);
                 fs1.Close();
@@ -191,12 +192,12 @@ namespace umbraco.cms.businesslogic.packager.repositories {
             if (fileByteArray.Length > 0) {
 
                 // Check for package directory
-                if (!System.IO.Directory.Exists(System.Web.HttpContext.Current.Server.MapPath(packager.Settings.PackagerRoot)))
-                    System.IO.Directory.CreateDirectory(System.Web.HttpContext.Current.Server.MapPath(packager.Settings.PackagerRoot));
+                if (!System.IO.Directory.Exists(IOHelper.MapPath(packager.Settings.PackagerRoot)))
+                    System.IO.Directory.CreateDirectory(IOHelper.MapPath(packager.Settings.PackagerRoot));
 
 
                 System.IO.FileStream fs1 = null;
-                fs1 = new FileStream(System.Web.HttpContext.Current.Server.MapPath(packager.Settings.PackagerRoot + System.IO.Path.DirectorySeparatorChar.ToString() + packageGuid + ".umb"), FileMode.Create);
+                fs1 = new FileStream(IOHelper.MapPath(packager.Settings.PackagerRoot + System.IO.Path.DirectorySeparatorChar.ToString() + packageGuid + ".umb"), FileMode.Create);
                 fs1.Write(fileByteArray, 0, fileByteArray.Length);
                 fs1.Close();
                 fs1 = null;

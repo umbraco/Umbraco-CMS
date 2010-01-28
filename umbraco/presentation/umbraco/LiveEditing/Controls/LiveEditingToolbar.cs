@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic.Actions;
 using umbraco.presentation.umbraco.controls;
 using ClientDependency.Core;
+using umbraco.IO;
 namespace umbraco.presentation.LiveEditing.Controls
 {
     /// <summary>
@@ -117,7 +118,7 @@ namespace umbraco.presentation.LiveEditing.Controls
             m_MainPanel.ContentTemplateContainer.Controls.Add(m_SaveButton);
             m_SaveButton.CssClass = "button";
             m_SaveButton.ToolTip = "Save";
-            m_SaveButton.ImageUrl = String.Format("{0}/images/editor/Save.gif", GlobalSettings.Path);
+            m_SaveButton.ImageUrl = String.Format("{0}/images/editor/Save.gif", SystemDirectories.Umbraco);
             m_SaveButton.Click += new ImageClickEventHandler(SaveButton_Click);
             m_SaveButton.OnClientClick = "return LiveEditingToolbar._save()";
             m_SaveButton.Visible = UmbracoContext.Current.HasPermission(ActionUpdate.Instance.Letter);
@@ -126,7 +127,7 @@ namespace umbraco.presentation.LiveEditing.Controls
             m_MainPanel.ContentTemplateContainer.Controls.Add(m_SaveAndPublishButton);
             m_SaveAndPublishButton.CssClass = "button";
             m_SaveAndPublishButton.ToolTip = "Save and publish";
-            m_SaveAndPublishButton.ImageUrl = String.Format("{0}/images/editor/SaveAndPublish.gif", GlobalSettings.Path);
+            m_SaveAndPublishButton.ImageUrl = String.Format("{0}/images/editor/SaveAndPublish.gif", SystemDirectories.Umbraco);
             m_SaveAndPublishButton.Click += new ImageClickEventHandler(SaveAndPublishButton_Click);
             m_SaveAndPublishButton.OnClientClick = "return LiveEditingToolbar._saveAndPublish()";
             m_SaveAndPublishButton.Visible = m_SaveButton.Visible
@@ -140,7 +141,7 @@ namespace umbraco.presentation.LiveEditing.Controls
             m_CloseButton.ToolTip = _btText;
             m_CloseButton.Text = _btText;
 
-            //m_CloseButton.ImageUrl = String.Format("{0}/images/editor/Close.gif", GlobalSettings.Path);
+            //m_CloseButton.ImageUrl = String.Format("{0}/images/editor/Close.gif", GlobalSettings_Path);
             m_CloseButton.Click += new EventHandler(CloseButton_Click);
 
             // add the custom menu items

@@ -8,6 +8,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.IO;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation.Trees
 {
@@ -41,12 +42,12 @@ namespace umbraco.cms.presentation.Trees
             if (!string.IsNullOrEmpty(this.NodeKey))
             {
                 orgPath = this.NodeKey;
-                path = HttpContext.Current.Server.MapPath(FilePath + orgPath);
+                path = IOHelper.MapPath(FilePath + orgPath);
                 orgPath += "/";
             }
             else
             {
-                path = HttpContext.Current.Server.MapPath(FilePath);
+                path = IOHelper.MapPath(FilePath);
             }
 
             DirectoryInfo dirInfo = new DirectoryInfo(path);

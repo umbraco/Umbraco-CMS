@@ -6,6 +6,7 @@ using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
+using umbraco.IO;
 
 namespace umbraco.editorControls
 {
@@ -102,22 +103,26 @@ namespace umbraco.editorControls
 
                     if (umbraco.UmbracoSettings.UploadAllowDirectories)
                     {
-                        filename = _text.Substring(_text.LastIndexOf("\\") + 1, _text.Length - _text.LastIndexOf("\\") - 1).ToLower();
+                        filename = _text.Substring(_text.LastIndexOf( IOHelper.DirSepChar ) + 1, _text.Length - _text.LastIndexOf( IOHelper.DirSepChar ) - 1).ToLower();
                         // Create a new folder in the /media folder with the name /media/propertyid
-                        System.IO.Directory.CreateDirectory(System.Web.HttpContext.Current.Server.MapPath(umbraco.GlobalSettings.Path + "/../media/" + _data.PropertyId.ToString()));
-                        _fullFilePath = System.Web.HttpContext.Current.Server.MapPath(umbraco.GlobalSettings.Path + "/../media/" + _data.PropertyId + "/" + filename);
+                        
+
+                        System.IO.Directory.CreateDirectory( IOHelper.MapPath( SystemDirectories.Media + "/" + _data.PropertyId.ToString() ) );
+
+                        _fullFilePath = IOHelper.MapPath(SystemDirectories.Media + "/" + _data.PropertyId.ToString() + "/" + filename);
                         this.PostedFile.SaveAs(_fullFilePath);
-                        _data.Value = "/media/" + _data.PropertyId + "/" + filename;
+
+                        _data.Value = SystemDirectories.Media + "/" + _data.PropertyId + "/" + filename;
                     }
                     else
                     {
                         //filename = this.
                         filename = System.IO.Path.GetFileName(this.PostedFile.FileName);
-                        //filename = _text.Substring(_text.LastIndexOf("\\") + 1, _text.Length - _text.LastIndexOf("\\") - 1).ToLower();
                         filename = _data.PropertyId + "-" + filename;
-                        _fullFilePath = System.Web.HttpContext.Current.Server.MapPath(umbraco.GlobalSettings.Path + "/../media/" + filename);
+                        _fullFilePath = IOHelper.MapPath(SystemDirectories.Media + "/" + filename);
                         this.PostedFile.SaveAs(_fullFilePath);
-                        _data.Value = "/media/" + filename;
+
+                        _data.Value = SystemDirectories.Media+ "/" + filename;
                     }
 
                     // hack to find master page prefix client id
@@ -212,8 +217,8 @@ namespace umbraco.editorControls
             if (file.Length > 0)
             {
                 // delete old file
-                if (System.IO.File.Exists(System.Web.HttpContext.Current.Server.MapPath(file)))
-                    System.IO.File.Delete(System.Web.HttpContext.Current.Server.MapPath(file));
+                if (System.IO.File.Exists(IOHelper.MapPath(file)))
+                    System.IO.File.Delete(IOHelper.MapPath(file));
 
                 string extension = ((string)file.Substring(file.LastIndexOf(".") + 1, file.Length - file.LastIndexOf(".") - 1));
                 extension = extension.ToLower();
@@ -228,8 +233,8 @@ namespace umbraco.editorControls
 
                     try
                     {
-                        if (System.IO.File.Exists(System.Web.HttpContext.Current.Server.MapPath(thumbnailfile + _thumbnailext)))
-                            System.IO.File.Delete(System.Web.HttpContext.Current.Server.MapPath(thumbnailfile + _thumbnailext));
+                        if (System.IO.File.Exists(IOHelper.MapPath(thumbnailfile + _thumbnailext)))
+                            System.IO.File.Delete(IOHelper.MapPath(thumbnailfile + _thumbnailext));
                     }
                     catch { }
 
@@ -244,8 +249,8 @@ namespace umbraco.editorControls
 
                                 try
                                 {
-                                    if (System.IO.File.Exists(System.Web.HttpContext.Current.Server.MapPath(thumbnailextra)))
-                                        System.IO.File.Delete(System.Web.HttpContext.Current.Server.MapPath(thumbnailextra));
+                                    if (System.IO.File.Exists(IOHelper.MapPath(thumbnailextra)))
+                                        System.IO.File.Delete(IOHelper.MapPath(thumbnailextra));
                                 }
                                 catch { }
                             }
@@ -345,19 +350,25 @@ namespace umbraco.editorControls
             if (this.Text != null && this.Text != "")
             {
                 string ext = _text.Substring(_text.LastIndexOf(".") + 1, _text.Length - _text.LastIndexOf(".") - 1);
-                string fileNameThumb = umbraco.GlobalSettings.Path + "/.." + _text.Replace("." + ext, "_thumb.jpg");
+                string fileNameThumb = _text.Replace("." + ext, "_thumb.jpg");
                 bool hasThumb = false;
                 try
                 {
-                    hasThumb = File.Exists(System.Web.HttpContext.Current.Server.MapPath(fileNameThumb));
+                    hasThumb = File.Exists( IOHelper.MapPath(fileNameThumb));
                 }
                 catch { }
                 if (hasThumb)
                 {
-                    output.WriteLine("<a href=\"" + umbraco.GlobalSettings.Path + "/.." + _text + "\" target=\"_blank\"><img src=\"" + fileNameThumb + "\" border=\"0\"/></a><br/>");
+                    System.Web.UI.WebControls.Image thumb = new System.Web.UI.WebControls.Image();
+                    thumb.ImageUrl = fileNameThumb;
+                    thumb.BorderStyle = BorderStyle.None;
+
+                    output.WriteLine("<a href=\"" + _text + "\" target=\"_blank\">");
+                    thumb.RenderControl(output);
+                    output.WriteLine("</a><br/>");
                 }
                 else
-                    output.WriteLine("<a href=\"" + umbraco.GlobalSettings.Path + "/.." + this.Text + "\" target=\"_blank\">" + this.Text + "</a><br/>");
+                    output.WriteLine("<a href=\"" + this.Text + "\" target=\"_blank\">" + this.Text + "</a><br/>");
                 output.WriteLine("<input type=\"checkbox\" id=\"" + this.ClientID + "clear\" name=\"" + this.ClientID + "clear\" value=\"1\"/> <label for=\"" + this.ClientID + "clear\">" + ui.Text("uploadClear") + "</label><br/>");
             }
             base.Render(output);

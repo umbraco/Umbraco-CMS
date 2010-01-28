@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 using System.Xml;
 using System.Xml.XPath;
 using umbraco.BasePages;
+using umbraco.IO;
 
 namespace umbraco.presentation.developer.packages
 {
@@ -74,9 +75,7 @@ namespace umbraco.presentation.developer.packages
                     fb.Text = "<strong>No connection to repository.</strong> Runway could not be installed as there was no connection to: '" + repo.RepositoryUrl + "'";
                     pane_upload.Visible = false;
                 }
-            }
-
-            
+            }            
 		}
 
         protected override void OnPreRender(EventArgs e)
@@ -113,8 +112,8 @@ namespace umbraco.presentation.developer.packages
 		{
             try {
                 tempFileName = Guid.NewGuid().ToString() + ".umb";
-                string fileName = GlobalSettings.StorageDirectory + System.IO.Path.DirectorySeparatorChar + tempFileName;
-                file1.PostedFile.SaveAs(Server.MapPath(fileName));
+                string fileName = SystemDirectories.Data + System.IO.Path.DirectorySeparatorChar + tempFileName;
+                file1.PostedFile.SaveAs(IOHelper.MapPath(fileName));
                 tempFile.Value = p.Import(tempFileName);
                 updateSettings();
             } catch (Exception ex) {
@@ -223,7 +222,7 @@ namespace umbraco.presentation.developer.packages
                     if (p.Control != null && p.Control != "") {
                         hideAllPanes();
 
-                        configControl = new System.Web.UI.UserControl().LoadControl(GlobalSettings.Path + "/.." + p.Control);
+                        configControl = new System.Web.UI.UserControl().LoadControl(SystemDirectories.Root + p.Control);
                         configControl.ID = "packagerConfigControl";
 
                         pane_optional.Controls.Add(configControl);
@@ -280,7 +279,7 @@ namespace umbraco.presentation.developer.packages
 		{
             hideAllPanes();
 
-			configControl = new System.Web.UI.UserControl().LoadControl(GlobalSettings.Path + "/.." + helper.Request("config"));
+            configControl = new System.Web.UI.UserControl().LoadControl(SystemDirectories.Root + helper.Request("config"));
 			configControl.ID = "packagerConfigControl";
 
 			pane_optional.Controls.Add(configControl);

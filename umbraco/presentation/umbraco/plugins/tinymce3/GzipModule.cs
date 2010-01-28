@@ -9,6 +9,7 @@ using System;
 using System.Web;
 using System.Text.RegularExpressions;
 using System.IO;
+using umbraco.IO;
 
 namespace umbraco.presentation.plugins.tinymce3
 {
@@ -35,7 +36,7 @@ namespace umbraco.presentation.plugins.tinymce3
 
             // UMBRACO: Populate the configsection if it's empty
             configSection.Add("GzipEnabled", "true");
-            configSection.Add("InstallPath", GlobalSettings.ClientPath + "/tinymce3");
+            configSection.Add("InstallPath", IOHelper.ResolveUrl( SystemDirectories.Umbraco_client ) + "/tinymce3");
             configSection.Add("GzipExpiresOffset", TimeSpan.FromDays(10).Ticks.ToString());
 
 			// Setup cache
@@ -51,14 +52,14 @@ namespace umbraco.presentation.plugins.tinymce3
 			gzipCompressor.AddData("var tinyMCEPreInit = {base : '" + new Uri(request.Url, configSection["InstallPath"]).ToString() + "', suffix : '" + suffix + "'};");
 
 			// Add core
-			gzipCompressor.AddFile(server.MapPath(configSection["InstallPath"] + "/tiny_mce" + suffix + ".js"));
+			gzipCompressor.AddFile( IOHelper.MapPath(configSection["InstallPath"] + "/tiny_mce" + suffix + ".js"));
 
 			// Add core languages
             foreach (string lang in languages)
             {
-                if (File.Exists(server.MapPath(configSection["InstallPath"] + "/langs/" + lang + ".js")))
+                if (File.Exists(IOHelper.MapPath(configSection["InstallPath"] + "/langs/" + lang + ".js")))
                 {
-                    gzipCompressor.AddFile(server.MapPath(configSection["InstallPath"] + "/langs/" + lang + ".js"));
+                    gzipCompressor.AddFile(IOHelper.MapPath(configSection["InstallPath"] + "/langs/" + lang + ".js"));
                 }
                 else
                 {
@@ -69,11 +70,11 @@ namespace umbraco.presentation.plugins.tinymce3
 			// Add themes
 			if (request.QueryString["themes"] != null) {
 				foreach (string theme in request.QueryString["themes"].Split(',')) {
-					gzipCompressor.AddFile(server.MapPath(configSection["InstallPath"] + "/themes/" + theme + "/editor_template" + suffix + ".js"));
+                    gzipCompressor.AddFile( IOHelper.MapPath(configSection["InstallPath"] + "/themes/" + theme + "/editor_template" + suffix + ".js"));
 
 					// Add theme languages
 					foreach (string lang in languages) {
-						string path = server.MapPath(configSection["InstallPath"] + "/themes/" + theme + "/langs/" + lang + ".js");
+                        string path = IOHelper.MapPath(configSection["InstallPath"] + "/themes/" + theme + "/langs/" + lang + ".js");
 
 						if (File.Exists(path))
 							gzipCompressor.AddFile(path);
@@ -86,11 +87,11 @@ namespace umbraco.presentation.plugins.tinymce3
 			// Add plugins
 			if (request.QueryString["plugins"] != null) {
 				foreach (string plugin in request.QueryString["plugins"].Split(',')) {
-                    gzipCompressor.AddFile(server.MapPath(configSection["InstallPath"] + "/plugins/" + plugin + "/editor_plugin" + suffix + ".js"));
+                    gzipCompressor.AddFile(IOHelper.MapPath(configSection["InstallPath"] + "/plugins/" + plugin + "/editor_plugin" + suffix + ".js"));
 
 					// Add plugin languages
 					foreach (string lang in languages) {
-						string path = server.MapPath(configSection["InstallPath"] + "/plugins/" + plugin + "/langs/" + lang + ".js");
+						string path = IOHelper.MapPath(configSection["InstallPath"] + "/plugins/" + plugin + "/langs/" + lang + ".js");
 
 						if (File.Exists(path))
 							gzipCompressor.AddFile(path);

@@ -8,6 +8,7 @@ namespace umbraco.cms.presentation.create.controls
 	using System.Web.UI.HtmlControls;
 	using umbraco.cms.helpers;
 	using umbraco.BasePages;
+    using umbraco.BusinessLogic;
 
 	/// <summary>
 	///		Summary description for simple.
@@ -53,6 +54,8 @@ namespace umbraco.cms.presentation.create.controls
 					umbraco.helper.Request("nodeType"),
 					nodeId,
 					rename.Text);
+
+                Log.Add(LogTypes.Debug, -1, "return:" + returnUrl);
 
 				BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)

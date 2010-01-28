@@ -6,6 +6,7 @@ using System.Collections;
 using System.IO;
 
 using System.Web.Security;
+using umbraco.IO;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -24,7 +25,7 @@ namespace umbraco.cms.businesslogic.web
 		static private Hashtable _checkedPages = new Hashtable();
 
 		static private XmlDocument _accessXmlContent;
-		static private string _accessXmlSource = System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.StorageDirectory + "/access.xml");
+		static private string _accessXmlSource = IOHelper.MapPath(SystemFiles.AccessXml, false);
 
 		private static void clearCheckPages() 
 		{

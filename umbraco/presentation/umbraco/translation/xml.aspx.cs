@@ -13,6 +13,7 @@ using System.Xml;
 using System.Xml.Schema;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.web;
+using umbraco.IO;
 
 namespace umbraco.presentation.translation
 {
@@ -85,7 +86,7 @@ namespace umbraco.presentation.translation
             xTask.SetAttributeNode(xmlHelper.addAttribute(xd, "NodeId", t.Node.Id.ToString()));
             xTask.SetAttributeNode(xmlHelper.addAttribute(xd, "TotalWords", cms.businesslogic.translation.Translation.CountWords(d.Id).ToString()));
             xTask.AppendChild(xmlHelper.addCDataNode(xd, "Comment", t.Comment));
-            xTask.AppendChild(xmlHelper.addTextNode(xd, "PreviewUrl", "http://" + Request.ServerVariables["SERVER_NAME"] + GlobalSettings.Path + "/translation/preview.aspx?id=" + t.Id.ToString()));
+            xTask.AppendChild(xmlHelper.addTextNode(xd, "PreviewUrl", "http://" + Request.ServerVariables["SERVER_NAME"] + SystemDirectories.Umbraco + "/translation/preview.aspx?id=" + t.Id.ToString()));
             d.XmlPopulate(xd, ref x, false);
             xTask.AppendChild(x);
 

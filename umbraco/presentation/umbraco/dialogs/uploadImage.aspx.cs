@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 
 using System.Xml;
+using umbraco.IO;
 
 namespace umbraco.dialogs
 {
@@ -67,10 +68,10 @@ namespace umbraco.dialogs
 
                 feedback.Style.Add("margin-top", "8px");
                 feedback.type = umbraco.uicontrols.Feedback.feedbacktype.success;
-                feedback.Text += "<div style=\"text-align: center\"> <a target=\"_blank\" href='" + umbraco.GlobalSettings.Path + "/.." + m.getProperty("umbracoFile").Value.ToString() + "'><img src='" + umbraco.GlobalSettings.Path + "/../" + imagename + "' style='border: none;'/><br/><br/>";
+                feedback.Text += "<div style=\"text-align: center\"> <a target=\"_blank\" href='" + SystemDirectories.Root + m.getProperty("umbracoFile").Value.ToString() + "'><img src='" + SystemDirectories.Root + "/" + imagename + "' style='border: none;'/><br/><br/>";
                 feedback.Text += umbraco.ui.Text("thumbnailimageclickfororiginal") + "</a><br/><br/></div>";
-    
-                feedback.Text += "<script type=\"text/javascript\">\n parent.refreshTree(); \nparent.updateImageSource('" + umbraco.GlobalSettings.Path + "/.." + m.getProperty("umbracoFile").Value.ToString() + "', '" + TextBoxTitle.Text + "', " + m.getProperty("umbracoWidth").Value.ToString() + ", " + m.getProperty("umbracoHeight").Value.ToString() + ", " + m.Id +")\n</script>";
+
+                feedback.Text += "<script type=\"text/javascript\">\n parent.refreshTree(); \nparent.updateImageSource('" + SystemDirectories.Root + m.getProperty("umbracoFile").Value.ToString() + "', '" + TextBoxTitle.Text + "', " + m.getProperty("umbracoWidth").Value.ToString() + ", " + m.getProperty("umbracoHeight").Value.ToString() + ", " + m.Id + ")\n</script>";
 
 			}
 			// Put user code to initialize the page here

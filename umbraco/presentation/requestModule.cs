@@ -8,6 +8,7 @@ using umbraco.BusinessLogic;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic.cache;
 using System.Web.Caching;
+using umbraco.IO;
 
 
 namespace umbraco.presentation
@@ -52,6 +53,7 @@ namespace umbraco.presentation
 
         protected void Application_PreRequestHandlerExecute(object sender, EventArgs e)
         {
+
             HttpContext context = mApp.Context;
             //httpContext.RewritePath( (string) httpContext.Items[ORIGINAL_URL_CXT_KEY] + "?" + httpContext.Request.QueryString );
         }
@@ -63,7 +65,7 @@ namespace umbraco.presentation
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         protected void Application_BeginRequest(Object sender, EventArgs e)
         {
-
+           
             HttpApplication app = (HttpApplication)sender;
 
             //first time init, starts timers, and sets httpContext
@@ -124,7 +126,6 @@ namespace umbraco.presentation
                     context.RewritePath(path.Substring(0, asmxPos + 5),
                                         path.Substring(asmxPos + 5),
                                         context.Request.QueryString.ToString());
-
             }
 
             if (path.IndexOf(".aspx") > -1 || path.IndexOf('.') == -1)
@@ -136,15 +137,19 @@ namespace umbraco.presentation
                 if (!GlobalSettings.IsReservedPathOrUrl(path))
                 {
                     // redirect if Umbraco needs configuration
-                    Nullable<bool> needsConfiguration
-                        = (Nullable<bool>)mApp.Application["umbracoNeedConfiguration"];
+                    Nullable<bool> needsConfiguration = (Nullable<bool>)mApp.Application["umbracoNeedConfiguration"];
+
                     if (needsConfiguration.HasValue && needsConfiguration.Value)
-                        context.Response.Redirect(string.Format("{0}/../install/default.aspx?redir=true&url={1}",
-                                                                GlobalSettings.Path, context.Request.Path.ToLower()), true);
+                    {
+                        string url = SystemDirectories.Install;
+                        string meh = IOHelper.ResolveUrl(url);
+                        string installUrl = string.Format("{0}/default.aspx?redir=true&url={1}", IOHelper.ResolveUrl( SystemDirectories.Install ), context.Request.Path.ToLower());
+                        context.Response.Redirect(installUrl, true);
+                    }
+
                     // show splash?
                     else if (UmbracoSettings.EnableSplashWhileLoading && content.Instance.isInitializing)
-                        context.RewritePath(string.Format("{0}/../config/splashes/booting.aspx",
-                                                                      GlobalSettings.Path));
+                        context.RewritePath(string.Format("{0}/splashes/booting.aspx", SystemDirectories.Config));
                     // rewrite page path
                     else
                     {
@@ -182,8 +187,8 @@ namespace umbraco.presentation
                         context.Items["UmbPage"] = path;
                         context.Items["VirtualUrl"] = String.Format("{0}?{1}", path, query);
                         // rewrite to the new URL
-                        context.RewritePath(string.Format("{0}/../default.aspx?{2}",
-                                                          GlobalSettings.Path, path, query));
+                        context.RewritePath(string.Format("{0}/default.aspx?{2}",
+                                                          SystemDirectories.Root, path, query));
                     }
                 }
             }
@@ -331,7 +336,7 @@ namespace umbraco.presentation
                 /* Initialize SECTION END */
 
                 // add current default url
-                HttpApp.Application["umbracoUrl"] = string.Format("{0}:{1}{2}", HttpApp.Context.Request.ServerVariables["SERVER_NAME"], HttpApp.Context.Request.ServerVariables["SERVER_PORT"], GlobalSettings.Path);
+                HttpApp.Application["umbracoUrl"] = string.Format("{0}:{1}{2}", HttpApp.Context.Request.ServerVariables["SERVER_NAME"], HttpApp.Context.Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl( SystemDirectories.Umbraco ));
 
                 // Start ping / keepalive timer
                 pingTimer = new Timer(new TimerCallback(keepAliveService.PingUmbraco), HttpApp.Context, 60000, 300000);
@@ -343,8 +348,8 @@ namespace umbraco.presentation
                 //BusinessLogic.Application.RegisterIApplications();
 
                 //define the base settings for the dependency loader to use the global path settings
-                //if (!CompositeDependencyHandler.HandlerFileName.StartsWith(GlobalSettings.Path))
-                //    CompositeDependencyHandler.HandlerFileName = GlobalSettings.Path + "/" + CompositeDependencyHandler.HandlerFileName;
+                //if (!CompositeDependencyHandler.HandlerFileName.StartsWith(GlobalSettings_Path))
+                //    CompositeDependencyHandler.HandlerFileName = GlobalSettings_Path + "/" + CompositeDependencyHandler.HandlerFileName;
 
                 // init done... 
                 s_InitializedAlready = true;

@@ -83,13 +83,13 @@ some content. You can do this by clicking the "launch umbraco" button below.
 <tr>
 <td>
 <a target="_blank" href="http://umbraco.org/documentation/videos/getting-started/building-a-simple-site">
-<img src="/install/images/packagesVid1.png" />
+<img runat="server" id="vid1" src="~/install/images/packagesVid1.png" />
 <span>Watch: Building a simple site.</span>
 </a>
 </td>
 <td>
 <a target="_blank" href="http://umbraco.org/documentation/videos/getting-started/using-packages">
-<img src="/install/images/packagesVid2.png" />
+<img runat="server" id="vid2" src="~/install/images/packagesVid2.png" />
 <span>Watch: using packages</span>
 </a>
 </td>

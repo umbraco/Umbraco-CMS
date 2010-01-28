@@ -21,6 +21,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic.Actions;
+using umbraco.IO;
 
 
 namespace umbraco.cms.presentation.Trees
@@ -65,7 +66,7 @@ namespace umbraco.cms.presentation.Trees
                 Javascript.Append(
 					@"
 function openContent(id) {
-	" + ClientTools.Scripts.GetContentFrame() + ".location.href = '/umbraco/editContent.aspx?id=' + id;" + @"
+	" + ClientTools.Scripts.GetContentFrame() + ".location.href = '" + IOHelper.ResolveUrl( SystemDirectories.Umbraco ) + "/editContent.aspx?id=' + id;" + @"
 }
 ");
             }

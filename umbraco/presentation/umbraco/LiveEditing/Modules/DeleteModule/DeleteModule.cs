@@ -6,6 +6,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.presentation.LiveEditing.Controls;
 using umbraco.BusinessLogic.Actions;
 using ClientDependency.Core;
+using umbraco.IO;
 namespace umbraco.presentation.LiveEditing.Modules.DeleteModule
 {
 	[ClientDependency(200, ClientDependencyType.Javascript, "LiveEditing/Modules/DeleteModule/DeleteModule.js", "UmbracoRoot")]
@@ -39,7 +40,7 @@ namespace umbraco.presentation.LiveEditing.Modules.DeleteModule
             m_DeleteButton.ID = "LeDeleteButton";
             m_DeleteButton.CssClass = "button";
             m_DeleteButton.ToolTip = "Delete";
-            m_DeleteButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/DeleteModule/delete.png", GlobalSettings.Path);
+            m_DeleteButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/DeleteModule/delete.png", SystemDirectories.Umbraco);
             m_DeleteButton.Visible = UmbracoContext.Current.HasPermission(ActionDelete.Instance.Letter);
      
             Controls.Add(m_DeleteModal);
@@ -73,7 +74,7 @@ namespace umbraco.presentation.LiveEditing.Modules.DeleteModule
 
             m_DeleteModal.Controls.Add(new LiteralControl("</div>"));
 
-            //ScriptManager.RegisterClientScriptInclude(this, GetType(), DeleteModuleScriptFile, String.Format(DeleteModuleScriptFile, GlobalSettings.Path));
+            //ScriptManager.RegisterClientScriptInclude(this, GetType(), DeleteModuleScriptFile, String.Format(DeleteModuleScriptFile, umbraco.IO.SystemDirectories.Umbraco));
         }
 
         

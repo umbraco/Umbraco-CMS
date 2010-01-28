@@ -10,6 +10,7 @@ using umbraco.editorControls.wysiwyg;
 using umbraco.interfaces;
 using umbraco.uicontrols;
 using umbraco.editorControls.tinymce;
+using umbraco.IO;
 
 
 namespace umbraco.editorControls.tinyMCE3 {
@@ -151,7 +152,7 @@ namespace umbraco.editorControls.tinyMCE3 {
                                 StyleSheet s = new StyleSheet(int.Parse(styleSheetId));
                                 if (s.nodeObjectType == StyleSheet.ModuleObjectType)
                                 {
-                                    cssFiles += GlobalSettings.Path + "/../css/" + s.Text + ".css";
+                                    cssFiles += SystemDirectories.Css + "/" + s.Text + ".css";
 
                                     foreach (StylesheetProperty p in s.Properties)
                                     {
@@ -254,7 +255,7 @@ namespace umbraco.editorControls.tinyMCE3 {
                         }
                     }
 
-                    //if (HttpContext.Current.Request.Path.IndexOf(GlobalSettings.Path) > -1)
+                    //if (HttpContext.Current.Request.Path.IndexOf(umbraco.IO.SystemDirectories.Umbraco) > -1)
                     //    config.Add("language", User.GetUser(BasePage.GetUserId(BasePage.umbracoUserContextID)).Language);
                     //else
                     //    config.Add("language", System.Threading.Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName);

@@ -4,6 +4,7 @@ using umbraco.presentation.LiveEditing;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
 using System.Xml.Linq;
+using umbraco.IO;
 
 namespace umbraco.presentation
 {
@@ -21,7 +22,7 @@ namespace umbraco.presentation
         {
             get
             {
-                return GlobalSettings.Path;
+                return IOHelper.ResolveUrl( SystemDirectories.Umbraco );
             }
         }
 
@@ -29,7 +30,7 @@ namespace umbraco.presentation
         {
             get
             {
-                return GlobalSettings.ContentXML;
+                return IOHelper.ResolveUrl( SystemFiles.ContentCacheXml );
             }
         }
 
@@ -45,7 +46,7 @@ namespace umbraco.presentation
         {
             get
             {
-                return GlobalSettings.StorageDirectory;
+                return IOHelper.ResolveUrl( SystemDirectories.Data );
             }
         }
     }

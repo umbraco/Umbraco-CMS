@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.Globalization;
 using ClientDependency.Core;
+using umbraco.IO;
 
 namespace umbraco.controls
 {
@@ -175,7 +176,7 @@ namespace umbraco.controls
 			base.Render(output);
 			//output.WriteLine("<input type=\"text\" id=\"" + this.ClientID + "\" name=\"" + this.ClientID + "\" value=\"" + dateTimeValue + "\"/>");
 			output.WriteLine("<span id=\"" + this.ClientID + "_show_e\">" + dateTimeVisibleValue + "</span> ");
-			output.WriteLine("<img src=\"" + GlobalSettings.ClientPath + "/datePicker/images/calPickerIcon.png\" onMouseOver=\"this.src='" + GlobalSettings.ClientPath + "/datePicker/images/calPickerIconHover.png'\" onMouseOut=\"this.src='/umbraco_client/datePicker/images/calPickerIcon.png'\" id=\"" + this.ClientID + "_f_trigger_e\" style=\"cursor: pointer; border: 1px solid #CCC\" title=\"" + ui.Text("choose") + " " + ui.Text("date") + "...\" align=\"absmiddle\"/>");
+            output.WriteLine("<img src=\"" + IOHelper.ResolveUrl( SystemDirectories.Umbraco_client ) + "/datePicker/images/calPickerIcon.png\" onMouseOver=\"this.src='" + IOHelper.ResolveUrl(SystemDirectories.Umbraco_client) + "/datePicker/images/calPickerIconHover.png'\" onMouseOut=\"this.src='/umbraco_client/datePicker/images/calPickerIcon.png'\" id=\"" + this.ClientID + "_f_trigger_e\" style=\"cursor: pointer; border: 1px solid #CCC\" title=\"" + ui.Text("choose") + " " + ui.Text("date") + "...\" align=\"absmiddle\"/>");
 			output.WriteLine("<a href=\"javascript:void(0);\" onClick=\"document.forms[0]['" + this.ClientID + "'].value = ''; document.getElementById('" + this.ClientID + "_show_e').innerHTML = '" + ui.Text("noDate") + "';\">" + ui.Text("removeDate") + "</a>");
 
 			string strSetup = "    Calendar.setup({" +

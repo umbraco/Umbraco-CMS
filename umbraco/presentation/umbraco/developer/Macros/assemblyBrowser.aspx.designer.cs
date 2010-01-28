@@ -14,6 +14,15 @@ namespace umbraco.developer {
     public partial class assemblyBrowser {
         
         /// <summary>
+        /// JsInclude6 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude6;
+        
+        /// <summary>
         /// AssemblyName control.
         /// </summary>
         /// <remarks>

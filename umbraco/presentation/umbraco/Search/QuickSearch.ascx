@@ -6,7 +6,7 @@
 
 <script type="text/javascript">
 jQuery(document).ready(function(){
-    jQuery("#umbSearchField").UmbQuickSearch('<%=umbraco.GlobalSettings.Path + "/Search/QuickSearchHandler.ashx" %>');
+jQuery("#umbSearchField").UmbQuickSearch('<%= umbraco.IO.IOHelper.ResolveUrl( umbraco.IO.SystemDirectories.Umbraco ) + "/Search/QuickSearchHandler.ashx" %>');
 });
 </script>
 

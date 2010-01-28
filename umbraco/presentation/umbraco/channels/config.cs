@@ -3,6 +3,7 @@ using System.IO;
 using System.Web;
 using System.Xml;
 using umbraco.BusinessLogic;
+using umbraco.IO;
 
 namespace umbraco.presentation.channels.businesslogic
 {
@@ -17,9 +18,7 @@ namespace umbraco.presentation.channels.businesslogic
                 if (_metablogConfigFile == null)
                 {
                     _metablogConfigFile = new XmlDocument();
-                    _metablogConfigFile.Load(
-                        HttpContext.Current.Server.MapPath(GlobalSettings.Path + Path.DirectorySeparatorChar + ".." +
-                                                           Path.DirectorySeparatorChar + "config/metablogConfig.config"));
+                    _metablogConfigFile.Load(IOHelper.MapPath(SystemFiles.MetablogConfig));
                 }
 
                 return _metablogConfigFile;
@@ -115,8 +114,8 @@ namespace umbraco.presentation.channels.businesslogic
             media.Attributes.Append(xmlHelper.addAttribute(configFile, "mediaTypeFileProperty", MediaTypeFileProperty));
             newChannelxml.AppendChild(media);
             configFile.DocumentElement.AppendChild(newChannelxml);
-            configFile.Save(HttpContext.Current.Server.MapPath(GlobalSettings.Path + Path.DirectorySeparatorChar + ".." +
-                                                           Path.DirectorySeparatorChar + "config/metablogConfig.config"));
+
+            configFile.Save( IOHelper.MapPath( SystemFiles.MetablogConfig ));
 
 
         }

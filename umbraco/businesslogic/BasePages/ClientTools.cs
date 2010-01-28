@@ -4,6 +4,8 @@ using System.Text;
 using System.Web;
 using umbraco.BasePages;
 using System.Web.UI;
+using umbraco.IO;
+using umbraco.BusinessLogic;
 
 namespace umbraco.BasePages
 {
@@ -114,15 +116,18 @@ namespace umbraco.BasePages
 		/// <param name="url"></param>
 		public ClientTools ChangeContentFrameUrl(string url)
 		{
-			//don't load if there is no url
+            //don't load if there is no url
 			if (string.IsNullOrEmpty(url)) return this;
 
-			if (!url.StartsWith("/") || !url.StartsWith(GlobalSettings.Path))
-			{
-				url = GlobalSettings.Path + "/" + url;
-			}
-			RegisterClientScript(Scripts.ChangeContentFrameUrl(url));
-			return this;
+            if (url.StartsWith("/") && !url.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
+                url = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/" + url;
+
+            if (url.Trim().StartsWith("~"))
+                url = IOHelper.ResolveUrl(url);
+
+            RegisterClientScript(Scripts.ChangeContentFrameUrl(url));
+			
+            return this;
 		}
 
 		/// <summary>
@@ -132,7 +137,7 @@ namespace umbraco.BasePages
 		/// <returns></returns>
 		public ClientTools ShowDashboard(string app)
 		{
-			return ChangeContentFrameUrl(GlobalSettings.Path + string.Format("/dashboard.aspx?app={0}", app));
+            return ChangeContentFrameUrl(SystemDirectories.Umbraco + string.Format("/dashboard.aspx?app={0}", app));
 		}
 		
 		/// <summary>

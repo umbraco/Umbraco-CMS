@@ -5,6 +5,7 @@ using System.Text;
 using System.Web.UI;
 using ClientDependency.Core.Controls;
 using ClientDependency.Core.FileRegistration.Providers;
+using umbraco.IO;
 
 namespace umbraco.uicontrols
 {
@@ -15,16 +16,16 @@ namespace umbraco.uicontrols
     /// </summary>
     public class UmbracoClientDependencyLoader : ClientDependencyLoader
     {
- 
         /// <summary>
         /// Set the defaults
         /// </summary>
         public UmbracoClientDependencyLoader()
             : base()
         {
-            this.AddPath("UmbracoClient", GlobalSettings.ClientPath);
-            this.AddPath("UmbracoRoot", GlobalSettings.Path);
-            this.ProviderName = PageHeaderProvider.DefaultName;            
+            this.AddPath("UmbracoClient", IOHelper.ResolveUrl( SystemDirectories.Umbraco_client ));
+            this.AddPath("UmbracoRoot", IOHelper.ResolveUrl( SystemDirectories.Umbraco ));
+            this.ProviderName = PageHeaderProvider.DefaultName;  
+            
         }
 
         public static new ClientDependencyLoader TryCreate(Control parent, out bool isNew)

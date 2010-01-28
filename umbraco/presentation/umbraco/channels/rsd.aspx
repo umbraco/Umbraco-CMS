@@ -4,8 +4,8 @@
     <engineLink>http://umbraco.org/</engineLink>
     <homePageLink>http://<%=Request.ServerVariables["SERVER_NAME"]%></homePageLink>
     <apis>
-      <api name="MetaWeblog" blogID="1" preferred="true" apiLink="http://<%=Request.ServerVariables["SERVER_NAME"]%><%=umbraco.GlobalSettings.Path %>/channels.aspx" />
-      <api name="Blogger" blogID="1" preferred="false" apiLink="http://<%=Request.ServerVariables["SERVER_NAME"]%><%=umbraco.GlobalSettings.Path %>/channels.aspx" />
+      <api name="MetaWeblog" blogID="1" preferred="true" apiLink="http://<%=Request.ServerVariables["SERVER_NAME"]%><%=umbraco.IO.SystemDirectories.Umbraco %>/channels.aspx" />
+      <api name="Blogger" blogID="1" preferred="false" apiLink="http://<%=Request.ServerVariables["SERVER_NAME"]%><%=umbraco.IO.SystemDirectories.Umbraco %>/channels.aspx" />
     </apis>
   </service>
 </rsd>

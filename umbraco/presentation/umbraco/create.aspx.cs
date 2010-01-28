@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 
 using System.Xml.XPath;
 using System.Xml;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation
 {
@@ -31,7 +32,7 @@ namespace umbraco.cms.presentation
 			try 
 			{
 				XmlDocument createDef = new XmlDocument();
-				XmlTextReader defReader = new XmlTextReader(Server.MapPath(GlobalSettings.Path+"/config/create/UI.xml"));
+				XmlTextReader defReader = new XmlTextReader( IOHelper.MapPath(SystemFiles.CreateUiXml ) ); 
 				createDef.Load(defReader);
 				defReader.Close();
 
@@ -39,10 +40,10 @@ namespace umbraco.cms.presentation
 				XmlNode def = createDef.SelectSingleNode("//nodeType [@alias = '" + Request.QueryString["nodeType"] + "']");
 				//title.Text = ui.Text("create") + " " + ui.Text(def.SelectSingleNode("./header").FirstChild.Value.ToLower(), base.getUser());
 				//headerTitle.Text = title.Text;
-				UI.Controls.Add(new UserControl().LoadControl(GlobalSettings.Path+ def.SelectSingleNode("./usercontrol").FirstChild.Value));
+				UI.Controls.Add(new UserControl().LoadControl( SystemDirectories.Umbraco + def.SelectSingleNode("./usercontrol").FirstChild.Value));
 			} 
-			catch {
-				throw new ArgumentException("ERROR CREATING CONTROL FOR NODETYPE: " + Request.QueryString["nodeType"]);
+			catch (Exception ex) {
+				throw new ArgumentException("ERROR CREATING CONTROL FOR NODETYPE: " + Request.QueryString["nodeType"], ex);
 			}
 		}
 

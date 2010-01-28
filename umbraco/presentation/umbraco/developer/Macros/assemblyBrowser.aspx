@@ -4,7 +4,9 @@
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
+<asp:Content runat="server" ContentPlaceHolderID="head">
 <umb:JsInclude ID="JsInclude6" runat="server" FilePath="Application/UmbracoClientManager.js" PathNameAlias="UmbracoClient"  />
+</asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
 <h3 style="MARGIN-LEFT: 0px"><asp:Label id="AssemblyName" runat="server"></asp:Label></h3>

@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 
 using System.Web.UI;
 using ClientDependency.Core;
+using umbraco.IO;
 
 namespace umbraco.macroRenderings
 {
@@ -46,7 +47,7 @@ namespace umbraco.macroRenderings
 
             // We need to make sure we have a reference to the legacy ajax calls in the scriptmanager
             ScriptManager sm = ScriptManager.GetCurrent(Page);
-            ServiceReference legacyPath = new ServiceReference(GlobalSettings.Path + "/webservices/legacyAjaxCalls.asmx");
+            ServiceReference legacyPath = new ServiceReference(SystemDirectories.Webservices + "/legacyAjaxCalls.asmx");
             if (!sm.Services.Contains(legacyPath))
                 sm.Services.Add(legacyPath);
         }
@@ -63,7 +64,7 @@ namespace umbraco.macroRenderings
             } catch { }
 
             writer.WriteLine("<script language=\"javascript\">\nfunction " + this.ClientID + "_chooseId() {" +
-                "\nshowPopWin('" + GlobalSettings.Path + "/dialogs/treePicker.aspx?useSubModal=true&app=media&treeType=media', 300, 400, " + ClientID + "_saveId)" +
+                "\nshowPopWin('" + SystemDirectories.Umbraco + "/dialogs/treePicker.aspx?useSubModal=true&app=media&treeType=media', 300, 400, " + ClientID + "_saveId)" +
                 //				"\nvar treePicker = window.showModalDialog(, 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')			" +
                 "\n}" +
                 "\nfunction " + ClientID + "_saveId(treePicker) {" +

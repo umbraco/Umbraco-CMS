@@ -4,6 +4,7 @@
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+
 <asp:Content ContentPlaceHolderID="head" runat="server" ID="cp2">
     <style type="text/css">
         #errorDiv
@@ -86,6 +87,7 @@
             <cc1:PropertyPanel ID="pp_errorMsg" runat="server">
                 <div id="errorDiv" style="display: none;" class="error">test</div>
             </cc1:PropertyPanel>
+            
             <cc1:CodeArea ID="editorSource" CodeBase="XML" ClientSaveMethod="doSubmit" runat="server" AutoResize="true" OffSetX="47" OffSetY="55" />
         </cc1:Pane>
     </cc1:UmbracoPanel>

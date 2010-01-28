@@ -28,6 +28,6 @@
         </asp:ContentPlaceHolder>
     </form>
       
-    <asp:ContentPlaceHolder ID="footer" runat="server"></asp:ContentPlaceHolder>    
+    <asp:ContentPlaceHolder ID="footer" runat="server"></asp:ContentPlaceHolder>
 </body>
 </html>

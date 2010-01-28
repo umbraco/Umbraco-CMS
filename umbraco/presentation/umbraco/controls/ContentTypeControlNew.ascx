@@ -1,14 +1,14 @@
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<%@ Register TagPrefix="cc2" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Control Language="c#" AutoEventWireup="True" Codebehind="ContentTypeControlNew.ascx.cs"
   Inherits="umbraco.controls.ContentTypeControlNew" TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
-
+<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="cc2" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <cc1:TabView ID="TabView1" Height="392px" Width="552px" runat="server"></cc1:TabView>
 
 <asp:Panel ID="pnlGeneral" runat="server"></asp:Panel>
 
 <asp:Panel ID="pnlTab" Style="text-align: left" runat="server">
+
   <cc2:Pane ID="PaneTabsInherited" runat="server" Visible="false">
   <p><strong>Master Content Type enabled</strong><br />This Content Type uses <em><asp:Literal ID="tabsMasterContentTypeName" runat="server"></asp:Literal></em> as a Master Content Type. Tabs from Master Content Types are not shown and can only be edited on the Master Content Type itself</p>
   </cc2:Pane>

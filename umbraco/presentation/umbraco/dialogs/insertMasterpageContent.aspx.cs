@@ -17,11 +17,11 @@ namespace umbraco.presentation.umbraco.dialogs {
             dd_detectedAlias.Items.Add(li);
 
             cms.businesslogic.template.Template t = new cms.businesslogic.template.Template(int.Parse(Request["id"]) );
-            //string masterPageFile = Server.MapPath(t.MasterPageFile);
+           
 
             if (t.MasterTemplate > 0) {
                 t = new cms.businesslogic.template.Template(t.MasterTemplate);
-                //masterPageFile = Server.MapPath(t.MasterPageFile);    
+               
             }
             
             foreach(string cpId in t.contentPlaceholderIds()){

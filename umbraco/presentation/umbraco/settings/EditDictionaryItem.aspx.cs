@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
+using umbraco.IO;
 
 namespace umbraco.settings
 {
@@ -35,7 +36,7 @@ namespace umbraco.settings
 			ImageButton save = Panel1.Menu.NewImageButton();
 			save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
 			save.AlternateText = ui.Text("save");
-			save.ImageUrl = GlobalSettings.Path +"/images/editor/save.gif";
+            save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
 
             Literal txt = new Literal();
             txt.Text = "<p>" + ui.Text("dictionaryItem", "description", currentItem.key, base.getUser()) + "</p><br/>";

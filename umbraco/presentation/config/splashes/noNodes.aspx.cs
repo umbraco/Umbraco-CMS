@@ -8,6 +8,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using umbraco.IO;
 
 namespace umbraco.presentation.config.splashes
 {
@@ -25,7 +26,9 @@ namespace umbraco.presentation.config.splashes
         protected void Page_Load(object sender, EventArgs e)
         {
 			ClientLoader.DataBind();
-            bt_launch.Attributes.Add("onclick", "document.location.href='../.." + GlobalSettings.Path + "';");
+            bt_launch.Attributes.Add("onclick", "document.location.href='" + SystemDirectories.Umbraco + "/';");
+            vid1.Src = SystemDirectories.Install + "/images/packagesVid1.png";
+            vid2.Src = SystemDirectories.Install + "/images/packagesVid2.png";
         }
     }
 }

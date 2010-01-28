@@ -13,6 +13,7 @@ using System.Xml;
 using System.Xml.XPath;
 using umbraco.BusinessLogic.Actions;
 using ClientDependency.Core;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation
 {
@@ -82,8 +83,8 @@ namespace umbraco.cms.presentation
 
                 // Add scriptmanager version check
                 ScriptManager sm = ScriptManager.GetCurrent(Page);
-                sm.Scripts.Add(new ScriptReference(GlobalSettings.Path + "/js/umbracoUpgradeChecker.js"));
-                sm.Services.Add(new ServiceReference(GlobalSettings.Path + "/webservices/CheckForUpgrade.asmx"));
+                sm.Scripts.Add(new ScriptReference(SystemDirectories.Umbraco + "/js/umbracoUpgradeChecker.js"));
+                sm.Services.Add(new ServiceReference(SystemDirectories.Webservices + "/CheckForUpgrade.asmx"));
 
                 Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "upgradeChecker", "jQuery(document).ready(function() {umbraco.presentation.webservices.CheckForUpgrade.CallUpgradeService(umbracoCheckUpgrade);});", true);
 

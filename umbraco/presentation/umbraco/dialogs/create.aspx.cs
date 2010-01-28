@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Xml;
+using umbraco.IO;
 
 namespace umbraco.dialogs
 {
@@ -40,21 +41,21 @@ namespace umbraco.dialogs
                 panel_buttons.Visible = false;
                 pane_chooseName.Visible = true;
 				XmlDocument createDef = new XmlDocument();
-				XmlTextReader defReader = new XmlTextReader(Server.MapPath(GlobalSettings.Path+"/config/create/UI.xml"));
+				XmlTextReader defReader = new XmlTextReader( IOHelper.MapPath(SystemFiles.CreateUiXml) );
 				createDef.Load(defReader);
 				defReader.Close();
 
 				// Find definition for current nodeType
 				XmlNode def = createDef.SelectSingleNode("//nodeType [@alias = '" + Request.QueryString["app"] + "']");
-				phCreate.Controls.Add(new UserControl().LoadControl(GlobalSettings.Path+ def.SelectSingleNode("./usercontrol").FirstChild.Value));
+				phCreate.Controls.Add(new UserControl().LoadControl(SystemDirectories.Umbraco + def.SelectSingleNode("./usercontrol").FirstChild.Value));
 			}
 		}
 
         protected override void OnPreRender(EventArgs e) {
             base.OnPreRender(e);
 
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/cmsnode.asmx"));
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference( IOHelper.ResolveUrl( SystemDirectories.Webservices) +"/cmsnode.asmx"));
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference( IOHelper.ResolveUrl( SystemDirectories.Webservices) +"/legacyAjaxCalls.asmx"));
         }
 
 		#region Web Form Designer generated code

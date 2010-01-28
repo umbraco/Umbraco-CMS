@@ -10,6 +10,7 @@ using umbraco.BasePages;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 using umbraco.DataLayer;
+using umbraco.IO;
 
 namespace umbraco.presentation.tinymce3
 {
@@ -82,7 +83,7 @@ namespace umbraco.presentation.tinymce3
                         macroType = mp.Type.Type;
                         try
                         {
-                            Assembly assembly = Assembly.LoadFrom(Server.MapPath(GlobalSettings.Path + "/../bin/" + macroAssembly + ".dll"));
+                            Assembly assembly = Assembly.LoadFrom( IOHelper.MapPath(SystemDirectories.Bin + "/" + macroAssembly + ".dll"));
 
                             Type type = assembly.GetType(macroAssembly + "." + macroType);
                             IMacroGuiRendering typeInstance = Activator.CreateInstance(type) as IMacroGuiRendering;

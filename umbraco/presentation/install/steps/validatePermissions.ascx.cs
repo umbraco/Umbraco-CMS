@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Web.UI;
+using umbraco.IO;
 
 namespace umbraco.presentation.install.steps
 {
@@ -9,9 +10,9 @@ namespace umbraco.presentation.install.steps
     /// </summary>
     public partial class validatePermissions : UserControl
     {
-        private string[] permissionDirs = {"css", "config", "data", "media", "masterpages", "xslt"};
-        private string[] permissionFiles = { "data/packages/installed/installedPackages.config", "data/packages/created/createdPackages.config" };
-        private string[] packagesPermissionsDirs = {"bin", "umbraco", "usercontrols", "data/packages"};
+        private string[] permissionDirs = {SystemDirectories.Css, SystemDirectories.Config, SystemDirectories.Data, SystemDirectories.Media, SystemDirectories.Masterpages, SystemDirectories.Xslt, SystemDirectories.Usercontrols};
+        private string[] permissionFiles = { SystemDirectories.Packages + "/installed/installedPackages.config" , SystemDirectories.Packages + "/created/createdPackages.config" };
+        private string[] packagesPermissionsDirs = {SystemDirectories.Bin, SystemDirectories.Umbraco, SystemDirectories.Usercontrols, SystemDirectories.Packages};
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -24,9 +25,8 @@ namespace umbraco.presentation.install.steps
             // Test default dir permissions
             foreach (string dir in permissionDirs)
             {
-                bool result =
-                    SaveAndDeleteFile(Server.MapPath(GlobalSettings.Path + "/../" + dir) +
-                                      "/configWizardPermissionTest.txt");
+                bool result = SaveAndDeleteFile( IOHelper.MapPath( dir + "/configWizardPermissionTest.txt") );
+                
                 if (!result)
                 {
                     permissionsOK = false;
@@ -34,21 +34,21 @@ namespace umbraco.presentation.install.steps
                 }
 
                 // Print
-                valResult += " ./" + dir + " : " + successOrFailure(result) + "!<br/>";
+                valResult += " " + dir + " : " + successOrFailure(result) + "!<br/>";
             }
 
             // Test default file permissions
             foreach (string file in permissionFiles)
             {
-                bool result = OpenFileForWrite(Server.MapPath(GlobalSettings.Path + "/../" + file));
+                bool result = OpenFileForWrite( IOHelper.MapPath(file) );
                 if (!result)
                 {
                     permissionsOK = false;
-                    permSummary.Text += "<li>File: ./" + file + "</li>";
+                    permSummary.Text += "<li>File: " + file + "</li>";
                 }
 
                 // Print
-                valResult += " ./" + file + " : " + successOrFailure(result) + "!<br/>";
+                valResult += " " + file + " : " + successOrFailure(result) + "!<br/>";
             }
             permissionResults.Text = valResult;
 
@@ -57,12 +57,11 @@ namespace umbraco.presentation.install.steps
             foreach (string dir in packagesPermissionsDirs)
             {
                 bool result =
-                    SaveAndDeleteFile(Server.MapPath(GlobalSettings.Path + "/../" + dir) +
-                                      "/configWizardPermissionTest.txt");
+                    SaveAndDeleteFile( IOHelper.MapPath(dir + "/configWizardPermissionTest.txt"));
                 if (!result)
                 {
                     packageOK = false;
-                    permSummary.Text += "<li>Directory: ./" + dir + "</li>";
+                    permSummary.Text += "<li>Directory: " + dir + "</li>";
                 }
 
                 // Print
@@ -80,17 +79,18 @@ namespace umbraco.presentation.install.steps
             {
                 cacheOK = false;
                 xmlResult.Text = "Failed!";
-                string tempFile = GlobalSettings.ContentXML;
+                string tempFile = SystemFiles.ContentCacheXml;
+
                 if (tempFile.Substring(0, 1) == "/")
                     tempFile = tempFile.Substring(1, tempFile.Length - 1);
-                permSummary.Text +=
-                    string.Format("<li>File ./{0}<br/><strong>Error message: </strong>{1}</li>", tempFile, ee);
+
+                permSummary.Text += string.Format("<li>File ./{0}<br/><strong>Error message: </strong>{1}</li>", tempFile, ee);
             }
 
             // Test creation of folders
             try
             {
-                string tempDir = Server.MapPath(GlobalSettings.Path + "/../media") + "/testCreatedByConfigWizard";
+                string tempDir = IOHelper.MapPath( SystemDirectories.Media + "/testCreatedByConfigWizard" );
                 Directory.CreateDirectory(tempDir);
                 Directory.Delete(tempDir);
                 foldersResult.Text = "Success!";
@@ -105,9 +105,7 @@ namespace umbraco.presentation.install.steps
             if (permissionsOK)
             {
                 foreach (
-                    FileInfo configFile in
-                        new DirectoryInfo(GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "config").
-                            GetFiles("*.xml"))
+                    FileInfo configFile in  new DirectoryInfo( IOHelper.MapPath( SystemDirectories.Config )).GetFiles("*.xml"))
                 {
                     try {
                         if (File.Exists(configFile.FullName.Replace(".xml", ".config")))

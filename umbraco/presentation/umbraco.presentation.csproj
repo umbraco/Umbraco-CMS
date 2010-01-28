@@ -1,6 +1,6 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{651E1350-91B6-44B7-BD60-7207006D7003}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -97,13 +97,21 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="IronMath, Version=1.0.60816.1877, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\foreign dlls\IronMath.dll</HintPath>
-    </Reference>
     <Reference Include="IronPython, Version=1.0.60816.1877, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\IronPython.dll</HintPath>
+    </Reference>
+    <Reference Include="IronRuby, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\IronRuby.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Scripting, Version=0.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\Microsoft.Scripting.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Scripting.Core, Version=0.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\Microsoft.Scripting.Core.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -306,11 +314,7 @@
     <Compile Include="page.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs" />
     <Compile Include="publishingService.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -418,19 +422,9 @@
       <DependentUpon>wlwmanifest.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\channels\wordApi.cs" />
-    <Compile Include="umbraco\controls\ProgressBar.ascx.cs">
-      <DependentUpon>ProgressBar.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\controls\ProgressBar.ascx.designer.cs">
-      <DependentUpon>ProgressBar.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\controls\ContentControl.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco\controls\ContentTypeControl.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="umbraco\controls\ContentControl.cs" />
+    <Compile Include="umbraco\controls\ContentPicker.cs" />
+    <Compile Include="umbraco\controls\ContentTypeControl.cs" />
     <Compile Include="umbraco\controls\ContentTypeControlNew.ascx.cs">
       <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -438,12 +432,12 @@
     <Compile Include="umbraco\controls\ContentTypeControlNew.ascx.designer.cs">
       <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\controls\datagrid\DropDownColumn.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco\controls\dualSelectBox.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="umbraco\controls\datagrid\DropDownColumn.cs" />
+    <Compile Include="umbraco\controls\dualSelectBox.cs" />
+    <Compile Include="umbraco\controls\Extenders\CustomDragDropDesigner.cs" />
+    <Compile Include="umbraco\controls\Extenders\CustomDragDropExtender.cs" />
+    <Compile Include="umbraco\controls\Extenders\CustomFloatingBehaviorDesigner.cs" />
+    <Compile Include="umbraco\controls\Extenders\CustomFloatingBehaviorExtender.cs" />
     <Compile Include="umbraco\controls\GenericProperties\GenericProperty.ascx.cs">
       <DependentUpon>GenericProperty.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -451,9 +445,7 @@
     <Compile Include="umbraco\controls\GenericProperties\GenericProperty.ascx.designer.cs">
       <DependentUpon>GenericProperty.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\controls\GenericProperties\GenericPropertyWrapper.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="umbraco\controls\GenericProperties\GenericPropertyWrapper.cs" />
     <Compile Include="umbraco\controls\GenericValidation.cs" />
     <Compile Include="umbraco\controls\LabelButton.cs" />
     <Compile Include="umbraco\controls\macroParameterControl.cs" />
@@ -464,6 +456,13 @@
     <Compile Include="umbraco\controls\passwordChanger.ascx.designer.cs">
       <DependentUpon>passwordChanger.ascx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\controls\ProgressBar.ascx.cs">
+      <DependentUpon>ProgressBar.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\controls\ProgressBar.ascx.designer.cs">
+      <DependentUpon>ProgressBar.ascx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\controls\TreeControl.ascx.cs">
       <DependentUpon>TreeControl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -471,6 +470,18 @@
     <Compile Include="umbraco\controls\TreeControl.ascx.designer.cs">
       <DependentUpon>TreeControl.ascx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\create\DLRScripting.ascx.cs">
+      <DependentUpon>DLRScripting.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\create\DLRScripting.ascx.designer.cs">
+      <DependentUpon>DLRScripting.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\LiveEditing\CanvasClientDependencyProvider.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="umbraco\scripting\MacroScript.cs" />
+    <Compile Include="umbraco\scripting\ScriptEngine.cs" />
     <Compile Include="umbraco\Search\QuickSearch.ascx.cs">
       <DependentUpon>QuickSearch.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -666,7 +677,6 @@
     <Compile Include="umbraco\developer\Packages\BrowseRepository.aspx.designer.cs">
       <DependentUpon>BrowseRepository.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\controls\ContentPicker.cs" />
     <Compile Include="umbraco\developer\Packages\directoryBrowser.aspx.cs">
       <DependentUpon>directoryBrowser.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -931,7 +941,6 @@
     <Compile Include="umbraco\keepalive.aspx.designer.cs">
       <DependentUpon>keepalive.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\LiveEditing\CanvasClientDependencyProvider.cs" />
     <Compile Include="umbraco\LiveEditing\Controls\Communicator.cs" />
     <Compile Include="umbraco\LiveEditing\Modules\BaseModule.cs" />
     <Compile Include="umbraco\LiveEditing\Modules\Separator.cs" />
@@ -940,10 +949,6 @@
     <Compile Include="umbraco\LiveEditing\Modules\ItemEditing\ItemEditor.cs" />
     <Compile Include="umbraco\LiveEditing\Controls\LiveEditingManager.cs" />
     <Compile Include="umbraco\LiveEditing\DefaultLiveEditingContext.cs" />
-    <Compile Include="umbraco\controls\Extenders\CustomDragDropDesigner.cs" />
-    <Compile Include="umbraco\controls\Extenders\CustomDragDropExtender.cs" />
-    <Compile Include="umbraco\controls\Extenders\CustomFloatingBehaviorDesigner.cs" />
-    <Compile Include="umbraco\controls\Extenders\CustomFloatingBehaviorExtender.cs" />
     <Compile Include="umbraco\LiveEditing\Modules\ItemEditing\PageElementEditor.cs" />
     <Compile Include="umbraco\LiveEditing\Modules\UnpublishModule\UnpublishModule.cs" />
     <Compile Include="umbraco\LiveEditing\Updates\DefaultUpdateList.cs" />
@@ -1178,8 +1183,10 @@
     <Compile Include="umbraco\dialogs\sort.aspx.designer.cs">
       <DependentUpon>sort.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\templateControls\Script.cs" />
     <Compile Include="umbraco\Trees\BaseMediaTree.cs" />
     <Compile Include="umbraco\Trees\dynamicLoader.cs" />
+    <Compile Include="umbraco\Trees\loadDLRScripts.cs" />
     <Compile Include="umbraco\Trees\MediaRecycleBin.cs" />
     <Compile Include="umbraco\webservices\MacroContainerService.asmx.cs">
       <DependentUpon>MacroContainerService.asmx</DependentUpon>
@@ -1435,6 +1442,18 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
+    <Content Include="umbraco\controls\ContentTypeControlNew.ascx" />
+    <Content Include="umbraco\controls\Extenders\CustomDragDropBehavior.js" />
+    <Content Include="umbraco\controls\Extenders\CustomFloatingBehavior.js" />
+    <Content Include="umbraco\controls\GenericProperties\GenericProperty.ascx" />
+    <Content Include="umbraco\controls\passwordChanger.ascx" />
+    <Content Include="umbraco\controls\ProgressBar.ascx" />
+    <Content Include="umbraco\controls\TreeControl.ascx" />
+    <Content Include="umbraco\create\DLRScripting.ascx" />
+    <Content Include="umbraco\images\umbraco\developerRuby.gif" />
+    <Content Include="umbraco\images\umbraco\developerScript.gif" />
+    <Content Include="umbraco_client\Tree\sprites.png" />
+    <Content Include="umbraco_client\Tree\sprites_ie6.gif" />
     <Content Include="web.config.SHOCKING.xslt" />
     <Content Include="umbraco\Search\QuickSearch.ascx" />
     <Content Include="umbraco\images\umbraco\bin.png" />
@@ -1506,9 +1525,6 @@
     <Content Include="umbraco\config\lang\nl.xml" />
     <Content Include="umbraco\config\lang\no.xml" />
     <Content Include="umbraco\config\lang\sv.xml" />
-    <Content Include="umbraco\controls\passwordChanger.ascx" />
-    <Content Include="umbraco\controls\ProgressBar.ascx" />
-    <Content Include="umbraco\controls\TreeControl.ascx" />
     <Content Include="umbraco\css\permissionsEditor.css" />
     <Content Include="umbraco\dialogs\ExportCode.aspx" />
     <Content Include="umbraco\dialogs\mediaPicker.aspx" />
@@ -1869,8 +1885,6 @@
     <Content Include="umbraco\LiveEditing\Controls\Communicator.js" />
     <Content Include="umbraco\LiveEditing\Controls\LiveEditingToolbar.js" />
     <Content Include="umbraco\LiveEditing\Css\LiveEditing.css" />
-    <EmbeddedResource Include="umbraco\controls\Extenders\CustomDragDropBehavior.js" />
-    <EmbeddedResource Include="umbraco\controls\Extenders\CustomFloatingBehavior.js" />
     <Content Include="umbraco\LiveEditing\Images\dialog_background.png" />
     <Content Include="umbraco\LiveEditing\Images\canvas.gif" />
     <Content Include="umbraco\LiveEditing\Modules\CreateModule\create.png" />
@@ -1890,14 +1904,18 @@
     <Content Include="config\ExamineSettings.config" />
     <Content Include="config\ExamineIndex.config" />
     <None Include="App_Data\ApplicationDesigner.xsd" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
+    <Content Include="config\scripting.config" />
+    <None Include="Properties\Settings.settings" />
     <None Include="umbraco\LiveEditing\LiveEditing.cd" />
     <Content Include="umbraco\masterpages\umbracoPage.Master" />
     <Content Include="umbraco\masterpages\umbracoDialog.Master" />
     <Content Include="umbraco\Search\QuickSearchHandler.ashx" />
+    <None Include="umbraco\scripting\templates\py\SubpagesAsThumnbnails.py" />
+    <None Include="umbraco\scripting\templates\py\SubpagesFromAChangeableSource.py" />
+    <None Include="umbraco\scripting\templates\py\SubpagesFromCurrentPage.py" />
+    <None Include="umbraco\scripting\templates\rb\SubpagesAsThumnbnails.rb" />
+    <None Include="umbraco\scripting\templates\rb\SubpagesFromAChangeableSource.rb" />
+    <None Include="umbraco\scripting\templates\rb\SubpagesFromCurrentPage.rb" />
     <None Include="umbraco\templateControls\InlineXslt.xsltTemplate" />
     <Content Include="umbraco\users\NodePermissions.ascx" />
     <Content Include="umbraco\users\PermissionEditor.aspx" />
@@ -1925,10 +1943,6 @@
     <Content Include="umbraco\translation\preview.aspx" />
     <Content Include="umbraco\translation\translationTasks.dtd" />
     <Content Include="umbraco\translation\xml.aspx" />
-    <Content Include="umbraco\controls\ContentTypeControlNew.ascx" />
-    <Content Include="umbraco\controls\GenericProperties\GenericProperty.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
     <Content Include="umbraco\create.aspx" />
     <Content Include="umbraco\create\content.ascx" />
     <Content Include="umbraco\create\language.ascx">
@@ -2737,6 +2751,7 @@
     <None Include="umbraco\schemas\umbraco.xsx">
       <DependentUpon>umbraco.xsd</DependentUpon>
     </None>
+    <Content Include="web.config" />
     <Content Include="config\UrlRewriting.config" />
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,6 @@
 <%@ Page Language="c#" CodeBehind="default.aspx.cs" AutoEventWireup="True" Inherits="umbraco.presentation.install._default" EnableViewState="False" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
-<%@ Register TagPrefix="ctl" Src="../umbraco/controls/ProgressBar.ascx" TagName="ProgBar"  %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
@@ -64,7 +63,7 @@
 	
 	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
 	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="modal/modal.js" PathNameAlias="UmbracoClient" Priority="1" />
-	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="passwordStrength/passwordStrength.js" PathNameAlias="UmbracoClient" Priority="3" />
+	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="passwordStrength/passwordstrength.js" PathNameAlias="UmbracoClient" Priority="3" />
 
     <form id="Form1" method="post" runat="server">
     <asp:ScriptManager runat="server" ID="umbracoScriptManager">
@@ -75,7 +74,7 @@
         </div>
         <div id="buttons">
             <div id="loadingBar">
-                <ctl:ProgBar runat="server" id="ProgBar" />
+               <cc1:ProgressBar ID="prgbar" runat="server" Title="Loading..." /><br />
             </div>
             
             <asp:Button ID="next" OnClientClick="nextStep(this,'loadingBar'); return false;" Text="Next &raquo;" runat="server" />

@@ -34,7 +34,7 @@ body{
 #rightDIV{width: 70%; position: absolute; top: 0px; right: 0px;}
 #uiArea{position: relative; margin: 0px 10px 0px 10px; display: none;}
 
-#defaultSpeechbubble{z-index: 10; display: none; background-image: url(/umbraco/images/speechBubble/speechbubble.gif); width: 231px; position: absolute; right: 20px; bottom: 20px; height: 84px;}
+#defaultSpeechbubble{z-index: 10; display: none; background-image: url(../images/speechBubble/speechbubble.gif); width: 231px; position: absolute; right: 20px; bottom: 20px; height: 84px;}
 				
 #tray
 {

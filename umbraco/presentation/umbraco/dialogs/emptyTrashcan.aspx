@@ -1,6 +1,6 @@
 <%@ Page Language="C#" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="true" CodeBehind="emptyTrashcan.aspx.cs" Inherits="umbraco.presentation.dialogs.emptyTrashcan" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<%@ Register TagPrefix="ctl" Src="../controls/ProgressBar.ascx" TagName="ProgBar"  %>
+
 <asp:Content ContentPlaceHolderID="head" runat="server">
 		<script type="text/javascript">
 		
@@ -57,7 +57,7 @@
 		<div id="animation" align="center" style="display: none;">
 		<p><%= umbraco.ui.Text("defaultdialogs", "recycleBinDeleting")%></p>
 		
-		<ctl:ProgBar runat="server" id="ProgBar" />
+		<cc1:ProgressBar ID="progbar" runat="server" Title="Please wait..." />
 		<br />
 		<span class="guiDialogTiny" id="statusLabel"><%=umbraco.ui.Text("deleting", this.getUser())%></span>
 		</div>

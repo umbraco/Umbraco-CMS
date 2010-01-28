@@ -28,8 +28,8 @@ namespace umbraco.dialogs
             get
             {
 				TreeRequestParams treeParams = TreeRequestParams.FromQueryStrings();
-				return TreeService.GetInitUrl(null, treeParams.TreeType, false, true,
-					TreeDialogModes.id, treeParams.Application, "", "");
+
+				return TreeService.GetInitUrl(null, treeParams.TreeType, false, true, TreeDialogModes.id, treeParams.Application, "", "");
             }
         }
 

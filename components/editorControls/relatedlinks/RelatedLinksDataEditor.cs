@@ -10,6 +10,7 @@ using umbraco.interfaces;
 using umbraco.editorControls;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.datatype;
+using umbraco.IO;
 
 namespace umbraco.editorControls.relatedlinks
 {
@@ -206,7 +207,7 @@ namespace umbraco.editorControls.relatedlinks
 
             // All urls
             ContentTemplateContainer.Controls.Add(new LiteralControl(String.Format("<div id=\"{0}_addLinkContainer\" style=\"display: none; padding: 4px; border: 1px solid #ccc; margin-top: 5px;margin-right:10px;\">", ClientID)));
-            ContentTemplateContainer.Controls.Add(new LiteralControl(String.Format("<a href=\"javascript:;\" onClick=\"document.getElementById('{0}_addLinkContainer').style.display='none';\" style=\"border: none;\"><img src=\"{1}/images/close.png\" style=\"float: right\" /></a>", ClientID, GlobalSettings.Path)));
+            ContentTemplateContainer.Controls.Add(new LiteralControl(String.Format("<a href=\"javascript:;\" onClick=\"document.getElementById('{0}_addLinkContainer').style.display='none';\" style=\"border: none;\"><img src=\"{1}/images/close.png\" style=\"float: right\" /></a>", ClientID, SystemDirectories.Umbraco)));
             ContentTemplateContainer.Controls.Add(new LiteralControl(String.Format("{0}:<br />", umbraco.ui.GetText("relatedlinks", "caption"))));
             ContentTemplateContainer.Controls.Add(_textboxLinkTitle);
             ContentTemplateContainer.Controls.Add(new LiteralControl("<br />"));

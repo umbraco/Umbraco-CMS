@@ -1,7 +1,7 @@
 <%@ Page Language="C#" AutoEventWireup="true" MasterPageFile="../../masterpages/umbracoPage.Master" Title="Install boost" CodeBehind="Boost.aspx.cs" Inherits="umbraco.presentation.developer.packages.Boost" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
-<%@ Register TagPrefix="ctl" Src="../../controls/ProgressBar.ascx" TagName="ProgBar"  %>
+
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
@@ -53,7 +53,7 @@
     <asp:Panel ID="nitroPanel"  runat="server"></asp:Panel>
     
     <span id="loadingBar" style="visibility: hidden;">
-        <ctl:ProgBar runat="server" id="ProgBar" />
+        <cc1:ProgressBar ID="progbar" runat="server" Title="Please wait..." />
     </span>
     </cc1:Pane>
     

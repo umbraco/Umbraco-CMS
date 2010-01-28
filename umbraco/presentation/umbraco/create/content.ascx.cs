@@ -7,6 +7,7 @@ using umbraco.presentation.create;
 using Content=umbraco.cms.businesslogic.Content;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation.create.controls
 {
@@ -43,7 +44,7 @@ namespace umbraco.cms.presentation.create.controls
                     docDescription = docDescription.Replace("'", "\'");
 
                     string docImage = (dt.Thumbnail != "") ? dt.Thumbnail : "../nada.gif";
-                    docImage = GlobalSettings.Path + "/images/thumbnails/" + docImage;
+                    docImage = IOHelper.ResolveUrl( SystemDirectories.Umbraco ) + "/images/thumbnails/" + docImage;
 
                     ListItem li = new ListItem();
                     li.Text = dt.Text;

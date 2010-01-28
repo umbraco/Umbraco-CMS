@@ -5,6 +5,7 @@ using System.Web.Security;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
+using umbraco.IO;
 
 namespace umbraco
 {
@@ -51,13 +52,13 @@ namespace umbraco
         {
             string template = _alias.Substring(0, _alias.IndexOf("|||"));
             string fileName = _alias.Substring(_alias.IndexOf("|||") + 3, _alias.Length - _alias.IndexOf("|||") - 3).Replace(" ", "");
-            string xsltTemplateSource = System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/xslt/templates/" + template);
-            string xsltNewFilename = System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../xslt/" + fileName + ".xslt");
+            string xsltTemplateSource = IOHelper.MapPath( SystemDirectories.Umbraco + "/xslt/templates/" + template);
+            string xsltNewFilename = IOHelper.MapPath( SystemDirectories.Xslt + "/" + fileName + ".xslt");
 
             if (fileName.Contains("/")) //if there's a / create the folder structure for it
             {
                 string[] folders = fileName.Split("/".ToCharArray());
-                string xsltBasePath = System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../xslt/");
+                string xsltBasePath = IOHelper.MapPath(SystemDirectories.Xslt);
                 for (int i = 0; i < folders.Length - 1; i++)
                 {
                     xsltBasePath = System.IO.Path.Combine(xsltBasePath, folders[i]);
@@ -89,17 +90,20 @@ namespace umbraco
                 m.Xslt = fileName + ".xslt";
             }
 
-            m_returnUrl = string.Format("developer/xslt/editXslt.aspx?file={0}.xslt", fileName);
+            m_returnUrl = string.Format( SystemDirectories.Umbraco + "/developer/xslt/editXslt.aspx?file={0}.xslt", fileName);
 
             return true;
         }
 
         public bool Delete()
         {
-            System.Web.HttpContext.Current.Trace.Warn("", "*" + Alias + "*");
+            string path = IOHelper.MapPath(SystemDirectories.Xslt + "/" + Alias.TrimStart('/'));
+
+            System.Web.HttpContext.Current.Trace.Warn("", "*" + path + "*");
+            
             try
             {
-                System.IO.File.Delete(Alias);
+                System.IO.File.Delete(path);
             }
             catch (Exception ex)
             {
@@ -126,7 +130,7 @@ namespace umbraco
 
     }
 
-    public class PythonTasks : interfaces.ITaskReturnUrl
+    public class DLRScriptingTasks : interfaces.ITaskReturnUrl
     {
         private string _alias;
         private int _parentID;
@@ -179,22 +183,70 @@ namespace umbraco
 
         public bool Save()
         {
-            string pythonNewFilename = System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../python/" + _alias + ".py");
-            System.IO.FileStream fs = new System.IO.FileStream(pythonNewFilename, System.IO.FileMode.Create);
-            fs.Flush();
-            fs.Close();
-            m_returnUrl = string.Format("developer/python/editPython.aspx?file={0}.py", _alias);
+
+            string template = _alias.Substring(0, _alias.IndexOf("|||")).Trim();
+            string fileName = _alias.Substring(_alias.IndexOf("|||") + 3, _alias.Length - _alias.IndexOf("|||") - 3).Replace(" ", "");
+
+            if (!fileName.Contains("."))
+                fileName = _alias + ".py";
+
+            string scriptContent = "";
+            if (!string.IsNullOrEmpty(template))
+            {
+                System.IO.StreamReader templateFile = System.IO.File.OpenText( IOHelper.MapPath( IO.SystemDirectories.Umbraco + "/scripting/templates/" + template));
+                scriptContent = templateFile.ReadToEnd();
+                templateFile.Close();
+            }
+            
+            
+            if (fileName.Contains("/")) //if there's a / create the folder structure for it
+            {
+                string[] folders = fileName.Split("/".ToCharArray());
+                string basePath = IOHelper.MapPath(SystemDirectories.Python);
+                for (int i = 0; i < folders.Length - 1; i++)
+                {
+                    basePath = System.IO.Path.Combine(basePath, folders[i]);
+                    System.IO.Directory.CreateDirectory(basePath);
+                }
+            }
+
+            string abFileName = IOHelper.MapPath(SystemDirectories.Python + "/" + fileName);
+
+            System.IO.StreamWriter scriptWriter = System.IO.File.CreateText(abFileName);
+            scriptWriter.Write(scriptContent);
+            scriptWriter.Flush();
+            scriptWriter.Close();
+
+
+            if (ParentID == 1)
+            {
+                cms.businesslogic.macro.Macro m = cms.businesslogic.macro.Macro.MakeNew(
+                    helper.SpaceCamelCasing(fileName.Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')));
+                m.ScriptingFile = _alias;
+            }
+
+            m_returnUrl = string.Format(SystemDirectories.Umbraco + "/developer/python/editPython.aspx?file={0}", fileName);
             return true;
         }
 
         public bool Delete()
         {
-            System.Web.HttpContext.Current.Trace.Warn("", "*" + Alias + "*");
-            System.IO.File.Delete(Alias);
+
+            string path = IOHelper.MapPath(SystemDirectories.Python + "/" + Alias.TrimStart('/'));
+
+            System.Web.HttpContext.Current.Trace.Warn("", "*" + path + "*");
+            try
+            {
+                System.IO.File.Delete(path);
+            }
+            catch (Exception ex)
+            {
+                Log.Add(LogTypes.Error, UmbracoEnsuredPage.CurrentUser, -1, "Could not remove XSLT file " + Alias + ". ERROR: " + ex.Message);
+            }
             return true;
         }
 
-        public PythonTasks()
+        public DLRScriptingTasks()
         {
         }
 
@@ -207,7 +259,8 @@ namespace umbraco
 
         #endregion
     }
-
+    public class PythonTasks : DLRScriptingTasks { }
+    
     public class ScriptTasks : interfaces.ITaskReturnUrl
     {
         private string _alias;
@@ -241,36 +294,38 @@ namespace umbraco
         public bool Save()
         {
             string[] scriptFileAr = _alias.Split('¤');
+            
+            
 
-            string path = scriptFileAr[0];
+            string relPath = scriptFileAr[0];
             string fileName = scriptFileAr[1];
             string fileType = scriptFileAr[2];
-            string relativePath = scriptFileAr[3];
+            
             int createFolder = ParentID;
 
-
+            string basePath = IOHelper.MapPath(SystemDirectories.Scripts + "/" + relPath + fileName);
+            
             if (createFolder == 1)
             {
-                System.IO.Directory.CreateDirectory(path + @"\" + fileName);
+                System.IO.Directory.CreateDirectory(basePath);
             }
             else
             {
-
-                System.IO.File.Create(path + @"\" + fileName + "." + fileType).Close();
-                m_returnUrl = string.Format("settings/scripts/editScript.aspx?file={0}{1}.{2}", relativePath.Replace("\\", "/"), fileName, fileType);
+                System.IO.File.Create(basePath + "." + fileType).Close();
+                m_returnUrl = string.Format("settings/scripts/editScript.aspx?file={0}{1}.{2}", relPath, fileName, fileType);
             }
             return true;
         }
 
         public bool Delete()
         {
-            if (System.IO.File.Exists(_alias))
-                System.IO.File.Delete(_alias);
-            else
-            {
-                if (System.IO.Directory.Exists(_alias))
-                    System.IO.Directory.Delete(_alias, true);
-            }
+            string path = IOHelper.MapPath( SystemDirectories.Scripts + "/" + _alias.TrimStart('/'));
+
+            if (System.IO.File.Exists(path))
+                System.IO.File.Delete(path);
+            else if(System.IO.Directory.Exists(path))
+               System.IO.Directory.Delete(path, true);
+            
             BusinessLogic.Log.Add(umbraco.BusinessLogic.LogTypes.Delete, umbraco.BasePages.UmbracoEnsuredPage.CurrentUser, -1, _alias + " Deleted");
             return true;
         }

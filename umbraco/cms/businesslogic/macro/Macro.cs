@@ -35,7 +35,7 @@ namespace umbraco.cms.businesslogic.macro
 		string _assembly;
 		string _type;
 		string _xslt;
-        string _python;
+        string _scriptingFile;
 
 		MacroProperty[] _properties;
 
@@ -161,10 +161,10 @@ namespace umbraco.cms.businesslogic.macro
         /// 
         /// Umbraco assumes that the python file is present in the "/python" folder
         /// </summary>
-        public string Python {
-            get { return _python; }
+        public string ScriptingFile {
+            get { return _scriptingFile; }
             set {
-                _python = value;
+                _scriptingFile = value;
                 SqlHelper.ExecuteNonQuery("update cmsMacro set macroPython = @macroPython where id = @id", SqlHelper.CreateParameter("@macroPython", value), SqlHelper.CreateParameter("@id", this.Id));
             }
         }
@@ -322,6 +322,10 @@ namespace umbraco.cms.businesslogic.macro
                 m.Type = xmlHelper.GetNodeValue(n.SelectSingleNode("scriptType"));
                 m.Xslt = xmlHelper.GetNodeValue(n.SelectSingleNode("xslt"));
                 m.RefreshRate = int.Parse(xmlHelper.GetNodeValue(n.SelectSingleNode("refreshRate")));
+
+                if (n.SelectSingleNode("scriptingFile") != null)
+                    m.ScriptingFile = xmlHelper.GetNodeValue(n.SelectSingleNode("scriptingFile"));
+
                 try
                 {
                     m.UseInEditor = bool.Parse(xmlHelper.GetNodeValue(n.SelectSingleNode("useInEditor")));
@@ -391,7 +395,7 @@ namespace umbraco.cms.businesslogic.macro
             _assembly = dr.GetString("macroScriptAssembly");
             _type = dr.GetString("macroScriptType");
             _xslt = dr.GetString("macroXSLT");
-            _python = dr.GetString("macroPython");
+            _scriptingFile = dr.GetString("macroPython");
 
             _cacheByPage = dr.GetBoolean("macroCacheByPage");
             _cachePersonalized = dr.GetBoolean("macroCachePersonalized");
@@ -415,6 +419,7 @@ namespace umbraco.cms.businesslogic.macro
 			doc.AppendChild(xmlHelper.addTextNode(xd, "xslt", this.Xslt));
 			doc.AppendChild(xmlHelper.addTextNode(xd, "useInEditor", this.UseInEditor.ToString()));
 			doc.AppendChild(xmlHelper.addTextNode(xd, "refreshRate", this.RefreshRate.ToString()));
+            doc.AppendChild(xmlHelper.addTextNode(xd, "scriptingFile", this.ScriptingFile));
 
 			// properties
             XmlNode props = xd.CreateElement("properties");

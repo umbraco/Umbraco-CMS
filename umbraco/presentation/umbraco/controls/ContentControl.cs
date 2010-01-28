@@ -13,6 +13,7 @@ using umbraco.interfaces;
 using umbraco.uicontrols;
 using Content = umbraco.cms.businesslogic.Content;
 using System.Linq;
+using umbraco.IO;
 
 namespace umbraco.controls
 {
@@ -36,7 +37,7 @@ namespace umbraco.controls
         public TextBox NameTxt = new TextBox();
         public PlaceHolder NameTxtHolder = new PlaceHolder();
         public RequiredFieldValidator NameTxtValidator = new RequiredFieldValidator();
-        private static string _UmbracoPath = GlobalSettings.Path;
+        private static string _UmbracoPath = SystemDirectories.Umbraco;
         public Pane PropertiesPane = new Pane();
 
         public Content ContentObject
@@ -368,7 +369,7 @@ namespace umbraco.controls
                     switch (UmbracoSettings.PropertyContextHelpOption)
                     {
                         case "icon":
-                            caption += " <img src=\"" + GlobalSettings.Path + "/images/help.png\" class=\"umbPropertyContextHelp\" alt=\"" + p.PropertyType.Description + "\" title=\"" + p.PropertyType.Description + "\" />";
+                            caption += " <img src=\"" + SystemDirectories.Umbraco + "/images/help.png\" class=\"umbPropertyContextHelp\" alt=\"" + p.PropertyType.Description + "\" title=\"" + p.PropertyType.Description + "\" />";
                             break;
                         case "text":
                             caption += "<br /><small>" + p.PropertyType.Description + "</small>";

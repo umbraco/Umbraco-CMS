@@ -13,6 +13,7 @@ using System.Xml;
 using System.Xml.Xsl;
 using System.Text.RegularExpressions;
 using umbraco.cms.presentation.Trees;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -24,50 +25,12 @@ namespace umbraco.cms.presentation.developer
 
         private void Page_Load(object sender, System.EventArgs e)
         {
-            pythonError.Text = "";
             UmbracoPanel1.hasMenu = true;
 
-			if (IsPostBack)
-			{
-				StreamWriter SW;
-				string tempFileName = Server.MapPath(GlobalSettings.Path + "/../python/" + System.DateTime.Now.Ticks.ToString() + "_temp.py");
-
-				//SW = File.CreateText(tempFileName);
-				SW = new System.IO.StreamWriter(tempFileName, false, new System.Text.UTF8Encoding(true));
-				SW.Write(pythonSource.Text);
-				SW.Close();
-				string errorMessage = "";
-				if (!(SkipTesting.Checked))
-				{
-					try
-					{
-						umbraco.scripting.python.compileFile(tempFileName);
-					}
-					catch (Exception errorPython)
-					{
-						base.speechBubble(speechBubbleIcon.error, ui.Text("errors", "pythonErrorHeader", base.getUser()), ui.Text("errors", "pythonErrorText", base.getUser()));
-						errorHolder.Visible = true;
-						//closeErrorMessage.Visible = true;
-						errorHolder.Attributes.Add("style", "height: 250px; overflow: auto; border: 1px solid CCC; padding: 5px;");
-						errorMessage = errorPython.ToString();
-						pythonError.Text = errorMessage.Replace("\n", "<br/>\n");
-						//closeErrorMessage.Visible = true;
-					}
-				}
-				if (errorMessage == "")
-				{
-					//SW = File.CreateText(Server.MapPath(GlobalSettings.Path + "/../python/" + pythonFileName.Text));
-					SW = new System.IO.StreamWriter(Server.MapPath(GlobalSettings.Path + "/../python/" + pythonFileName.Text), false, new System.Text.UTF8Encoding(true));
-					SW.Write(pythonSource.Text);
-					SW.Close();
-					base.speechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "pythonSavedHeader", base.getUser()), ui.Text("speechBubbles", "pythonSavedText", base.getUser()));
-				}
-				System.IO.File.Delete(tempFileName);
-			}
-			else
+			if (!IsPostBack)
 			{
 				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadPython>().Tree.Alias)
+                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadPython>().Tree.Alias)
 					.SyncTree(Request.QueryString["file"], false);
 			}
         }
@@ -77,9 +40,10 @@ namespace umbraco.cms.presentation.developer
             InitializeComponent();
             base.OnInit(e);
 
-            ImageButton save = UmbracoPanel1.Menu.NewImageButton();
-            save.ImageUrl = GlobalSettings.Path + "/images/editor/save.gif";
-
+            uicontrols.MenuIconI save = UmbracoPanel1.Menu.NewIcon();
+            save.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
+            save.OnClickCommand = "doSubmit()";
+            save.AltText = "Save scripting File";
 
             // Add source and filename
             String file = Request.QueryString["file"];
@@ -87,7 +51,7 @@ namespace umbraco.cms.presentation.developer
 
             StreamReader SR;
             string S;
-            SR = File.OpenText(Server.MapPath(GlobalSettings.Path + "/../python/" + file));
+            SR = File.OpenText( IOHelper.MapPath(SystemDirectories.Python + "/" + file));
             S = SR.ReadToEnd();
             SR.Close();
             pythonSource.Text = S;
@@ -96,6 +60,14 @@ namespace umbraco.cms.presentation.developer
         private void InitializeComponent()
         {
             this.Load += new System.EventHandler(this.Page_Load);
+        }
+
+        protected override void OnPreRender(EventArgs e)
+        {
+            base.OnPreRender(e);
+
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/codeEditorSave.asmx"));
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/legacyAjaxCalls.asmx"));
         }
     }
 }

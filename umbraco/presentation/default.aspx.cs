@@ -63,10 +63,11 @@ namespace umbraco
         {
             Trace.Write("umbracoInit", "handling request");
 
+            if (UmbracoContext.Current == null)
+                UmbracoContext.Current = new UmbracoContext(HttpContext.Current);
             
-
             bool editMode = UmbracoContext.Current.LiveEditingContext.Enabled;
-
+            
             if (editMode)
                 ValidateRequest = false;
 
@@ -108,8 +109,6 @@ namespace umbraco
             }
             else
             {
-               
-
                 m_umbRequest = new requestHandler(content.Instance.XmlContent, m_tmp);
                 Trace.Write("umbracoInit", "Done handling request");
                 if (m_umbRequest.currentPage != null)
@@ -233,7 +232,7 @@ namespace umbraco
                 {
                     // If there's no published content, show friendly error
                     if (umbraco.content.Instance.XmlContent.SelectSingleNode("/root/node") == null)
-                        Response.Redirect("config/splashes/noNodes.aspx");
+                        Response.Redirect( IO.SystemDirectories.Config + "/splashes/noNodes.aspx");
                     else
                     {
 
@@ -253,7 +252,7 @@ namespace umbraco
             }
             else
             {
-                Response.Redirect("config/splashes/booting.aspx?orgUrl=" + Request.Url);
+                Response.Redirect(IO.SystemDirectories.Config + "/splashes/booting.aspx?orgUrl=" + Request.Url);
             }
         }
 

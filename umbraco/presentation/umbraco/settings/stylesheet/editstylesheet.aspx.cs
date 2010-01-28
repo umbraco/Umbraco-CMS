@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation.settings.stylesheet
 {
@@ -38,7 +39,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
             }
 
              uicontrols.MenuIconI save = Panel1.Menu.NewIcon();
-             save.ImageURL = GlobalSettings.Path + "/images/editor/save.gif";
+             save.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
              save.OnClickCommand = "doSubmit()";
              save.AltText = "Save stylesheet";
 

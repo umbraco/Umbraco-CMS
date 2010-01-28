@@ -1,5 +1,6 @@
 using System;
 using umbraco.BusinessLogic;
+using umbraco.IO;
 
 namespace umbraco.BasePages
 {
@@ -81,9 +82,9 @@ namespace umbraco.BasePages
 			{
                 // Some umbraco pages should not be loaded on timeout, but instead reload the main application in the top window. Like the treeview for instance
                 if (RedirectToUmbraco)
-                    Response.Redirect(GlobalSettings.Path+"/logout.aspx?");
+                    Response.Redirect(SystemDirectories.Umbraco +"/logout.aspx?");
                 else
-                    Response.Redirect(GlobalSettings.Path + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl));
+                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl));
             }
 
 			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(ui.Culture(this.getUser()));

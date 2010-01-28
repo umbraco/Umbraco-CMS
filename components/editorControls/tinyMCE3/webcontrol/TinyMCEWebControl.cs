@@ -15,6 +15,7 @@ using umbraco.cms.businesslogic.property;
 using Content = umbraco.cms.businesslogic.Content;
 using ClientDependency.Core.Controls;
 using ClientDependency.Core;
+using umbraco.IO;
 
 namespace umbraco.editorControls.tinyMCE3.webcontrol
 {
@@ -69,7 +70,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
             base.Attributes.Add("style", "visibility: hidden");
             config.Add("mode", "exact");
             config.Add("theme", "umbraco");
-            config.Add("umbraco_path", GlobalSettings.Path);
+            config.Add("umbraco_path", IOHelper.ResolveUrl( SystemDirectories.Umbraco ));
             CssClass = "tinymceContainer";
             plugin.ConfigSection configSection = (plugin.ConfigSection)System.Web.HttpContext.Current.GetSection("TinyMCE");
 
@@ -214,8 +215,8 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                     suffix = "_" + this.mode;
 
                 outURI = this.InstallPath + "/tiny_mce_src" + suffix + ".js";
-                if (!File.Exists(this.Context.Server.MapPath(outURI)))
-                    throw new Exception("Could not locate TinyMCE by URI:" + outURI + ", Physical path:" + this.Context.Server.MapPath(outURI) + ". Make sure that you configured the installPath to a valid location in your web.config. This path should be an relative or site absolute URI to where TinyMCE is located.");
+                if (!File.Exists(IOHelper.MapPath(outURI)))
+                    throw new Exception("Could not locate TinyMCE by URI:" + outURI + ", Physical path:" + IOHelper.MapPath(outURI) + ". Make sure that you configured the installPath to a valid location in your web.config. This path should be an relative or site absolute URI to where TinyMCE is located.");
 
                 // Collect themes, languages and plugins and build gzip URI
                 // TODO: Make sure gzip is re-enabled
@@ -423,10 +424,12 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
 
         private string getLocalMediaPath()
         {
-            string[] umbracoPathSplit = GlobalSettings.Path.Split("/".ToCharArray());
+            string[] umbracoPathSplit = IOHelper.ResolveUrl(SystemDirectories.Umbraco).Split('/');
             string umbracoPath = "";
+            
             for (int i = 0; i < umbracoPathSplit.Length - 1; i++)
                 umbracoPath += umbracoPathSplit[i] + "/";
+
             return umbracoPath + "media/";
         }
 

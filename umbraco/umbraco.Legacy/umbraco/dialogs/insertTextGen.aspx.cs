@@ -27,7 +27,8 @@ namespace umbraco.dialogs
 
 			// Load form config file
 			XmlDocument fontConfig = new XmlDocument();
-			fontConfig.Load(System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/config/fonts/fonts.xml"));
+			fontConfig.Load(IO.IOHelper.MapPath(IO.SystemDirectories.Umbraco + "/config/fonts/fonts.xml"));
+
 			foreach (XmlNode font in fontConfig.SelectSingleNode("//fonts")) 
 				fontList.Items.Add(new ListItem(font.FirstChild.Value, font.Attributes.GetNamedItem("filename").Value));
 			foreach (XmlNode fontSize in fontConfig.SelectSingleNode("//sizes"))

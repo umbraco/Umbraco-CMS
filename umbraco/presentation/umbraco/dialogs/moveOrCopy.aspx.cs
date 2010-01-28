@@ -12,6 +12,7 @@ using umbraco.cms.helpers;
 using umbraco.BasePages;
 using umbraco.presentation;
 using umbraco.cms.businesslogic.media;
+using umbraco.IO;
 
 namespace umbraco.dialogs
 {
@@ -148,7 +149,7 @@ namespace umbraco.dialogs
                             }
                         }
 
-                        string returnUrl = "/" + umbraco.GlobalSettings.Path.Trim('/') + "/settings/editNodeTypeNew.aspx?id=" + dt.Id.ToString();
+                        string returnUrl = SystemDirectories.Umbraco + "/settings/editNodeTypeNew.aspx?id=" + dt.Id.ToString();
                 
                 dt.Save();
 

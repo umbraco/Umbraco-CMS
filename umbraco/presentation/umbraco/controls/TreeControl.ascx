@@ -34,10 +34,10 @@ jQuery(document).ready(function() {
         app: app,
         showContext: showContext,
         isDialog: isDialog,
-        umb_clientFolderRoot: "<%#umbraco.GlobalSettings.ClientPath%>",
+        umb_clientFolderRoot: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco_client) %>",
         treeType: "<%#TreeType.ToString().ToLower()%>",
-        dataUrl: "<%#umbraco.GlobalSettings.Path%>/webservices/TreeDataService.ashx",
-        serviceUrl: "<%#umbraco.GlobalSettings.Path%>/webservices/TreeClientService.asmx/GetInitAppTreeData"});
+        dataUrl: "<%# umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Webservices) %>/TreeDataService.ashx",
+        serviceUrl: "<%# umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Webservices) %>/TreeClientService.asmx/GetInitAppTreeData"});
         
 	//add event handler for ajax errors, this will refresh the whole application
 	UmbClientMgr.mainTree().addEventHandler("ajaxError", function(e) {

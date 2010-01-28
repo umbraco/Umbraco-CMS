@@ -5,6 +5,7 @@ using System.Web;
 using System.Xml;
 
 using umbraco.BusinessLogic;
+using umbraco.IO;
 
 namespace umbraco
 {
@@ -103,6 +104,7 @@ namespace umbraco
         {
             get
             {
+                
                 try
                 {
                     return ConfigurationManager.AppSettings["umbracoPath"];
@@ -597,12 +599,12 @@ namespace umbraco
         /// <returns></returns>
         public static bool RequestIsInUmbracoApplication(HttpContext context)
         {
-            return context.Request.Path.ToLower().IndexOf(GlobalSettings.Path.ToLower()) > -1;
+            return context.Request.Path.ToLower().IndexOf( IOHelper.ResolveUrl( SystemDirectories.Umbraco ) .ToLower()) > -1;
         }
 
         public static bool RequestIsLiveEditRedirector(HttpContext context)
         {
-            return context.Request.Path.ToLower().IndexOf(GlobalSettings.Path.ToLower() + "/liveediting.aspx") > -1;
+            return context.Request.Path.ToLower().IndexOf(SystemDirectories.Umbraco.ToLower() + "/liveediting.aspx") > -1;
         }
 
         /// <summary>
@@ -637,8 +639,7 @@ namespace umbraco
                 if (HttpContext.Current != null)
                 {
                     XmlDocument versionDoc = new XmlDocument();
-                    XmlTextReader versionReader =
-                        new XmlTextReader(HttpContext.Current.Server.MapPath(Path + "/version.xml"));
+                    XmlTextReader versionReader = new XmlTextReader(IOHelper.MapPath(SystemDirectories.Umbraco + "/version.xml"));
                     versionDoc.Load(versionReader);
                     versionReader.Close();
 
@@ -722,17 +723,24 @@ namespace umbraco
                 _reservedPathsCache = GlobalSettings.ReservedPaths;
                 _reservedUrlsCache = GlobalSettings.ReservedUrls;
 
+                string _root = SystemDirectories.Root.Trim().ToLower();
+
                 // add URLs and paths to a new list
                 StartsWithContainer _newReservedList = new StartsWithContainer();
                 foreach (string reservedUrl in _reservedUrlsCache.Split(','))
                 {
-                    string reservedUrlTrimmed = reservedUrl.Trim().ToLower();
+                    //resolves the url to support tilde chars
+                    string reservedUrlTrimmed = IOHelper.ResolveUrl(reservedUrl).Trim().ToLower();
                     if (reservedUrlTrimmed.Length > 0)
                         _newReservedList.Add(reservedUrlTrimmed);
                 }
+
                 foreach (string reservedPath in _reservedPathsCache.Split(','))
                 {
-                    string reservedPathTrimmed = reservedPath.Trim().ToLower();
+                    bool trimEnd = !reservedPath.EndsWith("/");
+                    //resolves the url to support tilde chars
+                    string reservedPathTrimmed = IOHelper.ResolveUrl(reservedPath).Trim().ToLower();
+
                     if (reservedPathTrimmed.Length > 0)
                         _newReservedList.Add(reservedPathTrimmed + (reservedPathTrimmed.EndsWith("/") ? "" : "/"));
                 }
@@ -740,6 +748,13 @@ namespace umbraco
                 // use the new list from now on
                 _reservedList = _newReservedList;
             }
+
+            string res = "";
+            foreach (string st in _reservedList._list.Keys)
+                res += st + ",";
+
+            HttpContext.Current.Trace.Write("umbracoGlobalsettings", "reserverd urls: '" + res + "'");
+
             // return true if url starts with an element of the reserved list
             return _reservedList.StartsWith(url.ToLower());
         }
@@ -754,7 +769,7 @@ namespace umbraco
     public class StartsWithContainer
     {
         /// <summary>Internal sorted list of keys.</summary>
-        private SortedList<string, string> _list
+        public SortedList<string, string> _list
             = new SortedList<string, string>(StartsWithComparator.Instance);
 
         /// <summary>

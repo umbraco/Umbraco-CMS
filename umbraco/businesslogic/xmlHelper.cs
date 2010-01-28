@@ -1,5 +1,6 @@
 using System;
 using System.Xml;
+using umbraco.IO;
 
 namespace umbraco
 {
@@ -27,7 +28,7 @@ namespace umbraco
         /// <returns>Returns a XmlDocument class</returns>
         public static XmlDocument OpenAsXmlDocument(string filePath) {
 
-            XmlTextReader reader = new XmlTextReader(System.Web.HttpContext.Current.Server.MapPath(filePath));
+            XmlTextReader reader = new XmlTextReader(IOHelper.MapPath(filePath));
             
             reader.WhitespaceHandling = WhitespaceHandling.All;
             XmlDocument xmlDoc = new XmlDocument();

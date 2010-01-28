@@ -17,6 +17,7 @@ using System;
 using System.Web.Services.Protocols;
 using System.ComponentModel;
 using System.Web.Services;
+using umbraco.IO;
 
 namespace umbraco.presentation.cache {
 
@@ -29,7 +30,7 @@ namespace umbraco.presentation.cache {
 
         /// <remarks/>
         public CacheRefresher() {
-            this.Url = "http://" + System.Web.HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + GlobalSettings.Path + "/webservices/cacheRefresher.asmx";
+            this.Url = "http://" + System.Web.HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + SystemDirectories.Webservices + "/cacheRefresher.asmx";
         }
 
         /// <remarks/>

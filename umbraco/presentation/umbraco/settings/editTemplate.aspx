@@ -38,18 +38,21 @@
         function changeMasterPageFile(){
           var editor = document.getElementById("<%= editorSource.ClientID %>");
           var templateDropDown = document.getElementById("<%= MasterTemplate.ClientID %>");
-                    
-          var templateCode = editor.value;
+          
+          var templateCode = UmbEditor.GetCode();
           var selectedTemplate = templateDropDown.options[templateDropDown.selectedIndex].id;
-          var masterTemplate = "/masterpages/" + selectedTemplate + ".master";
+          var masterTemplate = "<%= umbraco.IO.SystemDirectories.Masterpages%>/" + selectedTemplate + ".master";
           
           if(selectedTemplate == "")
-            masterTemplate = "/umbraco/masterpages/default.master";
+            masterTemplate = "<%= umbraco.IO.SystemDirectories.Umbraco%>/masterpages/default.master";
                     
-          var regex = /MasterPageFile=[~a-z0-9/."-]+/im;
+          var regex = /MasterPageFile=[~a-z0-9/._"-]+/im;
+          
            if (templateCode.match(regex)) {
              templateCode = templateCode.replace(regex, 'MasterPageFile="' + masterTemplate + '"');
-             editor.value = templateCode;
+             
+             UmbEditor.SetCode(templateCode);
+           
            } else {
              //todo, spot if a directive is there, and if not suggest that the user inserts it.. 
              alert("Master directive not found...");

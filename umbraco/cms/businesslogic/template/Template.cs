@@ -9,6 +9,8 @@ using System.IO;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.BusinessLogic;
+using umbraco.IO;
+using System.Web;
 
 namespace umbraco.cms.businesslogic.template
 {
@@ -26,7 +28,7 @@ namespace umbraco.cms.businesslogic.template
 
         private int _mastertemplate;
         private static bool _templateAliasesInitialized = false;
-        public static readonly string UmbracoMasterTemplate = GlobalSettings.Path + "/masterpages/default.master";
+        public static readonly string UmbracoMasterTemplate = SystemDirectories.Umbraco + "/masterpages/default.master";
         private static Hashtable _templateAliases = new Hashtable();
 
         private static object templateCacheSyncLock = new object();
@@ -34,7 +36,7 @@ namespace umbraco.cms.businesslogic.template
 
         public string MasterPageFile
         {
-            get { return GlobalSettings.FullpathToRoot + "masterpages" + System.IO.Path.DirectorySeparatorChar + Alias.Replace(" ", "") + ".master"; }
+            get { return IOHelper.MapPath( SystemDirectories.Masterpages  + "/" + Alias.Replace(" ", "") + ".master") ; }
         }
 
         public static Hashtable TemplateAliases
@@ -218,6 +220,7 @@ namespace umbraco.cms.businesslogic.template
                 if (UmbracoSettings.UseAspNetMasterPages && isMasterPageSyntax(_design))
                 {
                     SaveMasterPageFile(_design);
+
                     SqlHelper.ExecuteNonQuery("Update cmsTemplate set design = @design where NodeId = @id",
                         SqlHelper.CreateParameter("@design", value),
                         SqlHelper.CreateParameter("@id", Id));
@@ -479,14 +482,14 @@ namespace umbraco.cms.businesslogic.template
 
         private string getMasterPageHeader()
         {
-            return String.Format("<%@ Master Language=\"C#\" MasterPageFile=\"~{0}\" AutoEventWireup=\"true\" %>",
+            return String.Format("<%@ Master Language=\"C#\" MasterPageFile=\"{0}\" AutoEventWireup=\"true\" %>",
                 currentMasterTemplateFileName()) + Environment.NewLine;
         }
 
         private string currentMasterTemplateFileName()
         {
             if (MasterTemplate != 0)
-                return "/masterpages/" + new Template(MasterTemplate).Alias.Replace(" ", "") + ".master";
+                return SystemDirectories.Masterpages + "/" + new Template(MasterTemplate).Alias.Replace(" ", "") + ".master";
             else
                 return UmbracoMasterTemplate;
         }
@@ -545,15 +548,15 @@ namespace umbraco.cms.businesslogic.template
                 }
 
                 //then kill the old file.. 
-                string _oldFile = GlobalSettings.FullpathToRoot + "masterpages" + System.IO.Path.DirectorySeparatorChar + _oldAlias.Replace(" ", "") + ".master";
+                string _oldFile = IOHelper.MapPath(  SystemDirectories.Masterpages  + "/" + _oldAlias.Replace(" ", "") + ".master");
+                
                 if (System.IO.File.Exists(_oldFile))
                     System.IO.File.Delete(_oldFile);
             }
 
             // save the file in UTF-8
+            
             File.WriteAllText(MasterPageFile, masterPageContent, System.Text.Encoding.UTF8);
-
-
         }
 
         private void getAspNetMasterPageForm(ref string design)

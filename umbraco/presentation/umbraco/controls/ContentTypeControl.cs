@@ -3,6 +3,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Collections;
 using System.IO;
+using umbraco.IO;
 namespace umbraco.controls
 {
 	/// <summary>
@@ -44,7 +45,7 @@ namespace umbraco.controls
 			docType = ct;
 			this.Width = Unit.Pixel(600);
 			this.Height = Unit.Pixel(600);
-			string UmbracoPath = GlobalSettings.Path;
+            string UmbracoPath = SystemDirectories.Umbraco;
 			Panel1 = this.NewTabPage("Generelt");
 			uicontrols.MenuImageButton Save = Panel1.Menu.NewImageButton();
 			Save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
@@ -177,7 +178,7 @@ namespace umbraco.controls
 		{
 			uicontrols.Pane pp = new uicontrols.Pane();
 					
-			DirectoryInfo dirInfo = new DirectoryInfo(this.Page.Server.MapPath(GlobalSettings.Path + "/images/umbraco"));
+			DirectoryInfo dirInfo = new DirectoryInfo( IOHelper.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
 			FileInfo[] fileInfo = dirInfo.GetFiles();
 			
 			for(int i = 0; i < fileInfo.Length;i++) 

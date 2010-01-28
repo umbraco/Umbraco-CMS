@@ -33,7 +33,7 @@
       <table id="Table2" cellspacing="0" cellpadding="4" width="98%" border="0" runat="server">
         <tr>
           <td class="propertyHeader" width="30%">
-            <img alt="Xslt Icon" src="../../images/developer/xsltIcon.png" align="absMiddle">
+            <img alt="Xslt Icon" src="../../images/umbraco/developerXslt.gif" align="absMiddle">
             Use XSLT file</td>
           <td class="propertyContent">
             <asp:TextBox ID="macroXslt" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>
@@ -66,8 +66,8 @@
         </tr>
         <tr>
           <td class="propertyHeader" width="30%">
-            <img alt="python Icon" src="../../images/developer/pythonIcon.png" align="absMiddle">
-            or python file</td>
+            <img alt="python Icon" src="../../images/umbraco/developerScript.gif" align="absMiddle">
+            or script file</td>
           <td class="propertyContent">
             <asp:TextBox ID="macroPython" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>
             <asp:DropDownList ID="pythonFiles" runat="server">

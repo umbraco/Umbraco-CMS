@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using System.Web;
 using umbraco.BusinessLogic;
+using umbraco.IO;
 
 namespace umbraco.editorControls.tinymce
 {
@@ -157,8 +158,8 @@ namespace umbraco.editorControls.tinymce
                 string ext = orgSrc.Substring(orgSrc.LastIndexOf(".") + 1, orgSrc.Length - orgSrc.LastIndexOf(".") - 1);
                 newSrc = orgSrc.Replace("." + ext, "_" + newWidth.ToString() + "x" + newHeight.ToString() + ".jpg");
 
-                string fullSrc = HttpContext.Current.Server.MapPath(orgSrc);
-                string fullSrcNew = HttpContext.Current.Server.MapPath(newSrc);
+                string fullSrc = IOHelper.MapPath(orgSrc);
+                string fullSrcNew = IOHelper.MapPath(newSrc);
 
                 // Load original image
                 Image image = Image.FromFile(fullSrc);

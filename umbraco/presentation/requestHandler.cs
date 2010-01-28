@@ -8,6 +8,7 @@ using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
+using umbraco.IO;
 
 namespace umbraco {
     /// <summary>
@@ -40,10 +41,21 @@ namespace umbraco {
         public static string cleanUrl() {
             if (HttpContext.Current.Items["UmbPage"] == null)
                 return string.Empty;
+
             string tmp = HttpContext.Current.Items["UmbPage"].ToString();
+            string root = SystemDirectories.Root.ToLower();
+
+            //if we are running in a virtual dir
+            if (!string.IsNullOrEmpty(root) && tmp.StartsWith(root))
+            {
+                tmp = tmp.Substring(root.Length);
+            }
+
             if (tmp == "/default.aspx")
                 tmp = string.Empty;
             else if (tmp == "/")
+                tmp = string.Empty;
+            else if (tmp == SystemDirectories.Root.ToLower())
                 tmp = string.Empty;
 
             return tmp;
@@ -222,7 +234,7 @@ namespace umbraco {
                 if (_customHandlers == null) {
                     _customHandlers = new XmlDocument();
                     _customHandlers.Load(
-                        HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../config/404handlers.config"));
+                    IOHelper.MapPath( SystemFiles.NotFoundhandlersConfig ) );
                 }
 
                 for (int i = 0; i < _customHandlers.DocumentElement.ChildNodes.Count; i++) {
@@ -242,8 +254,8 @@ namespace umbraco {
                                                                       _chType));
                         Assembly assembly =
                             Assembly.LoadFrom(
-                                HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../bin/" + _chAssembly +
-                                                                   ".dll"));
+                                IOHelper.MapPath( SystemDirectories.Bin + "/" + _chAssembly + ".dll"));
+
                         Type type = assembly.GetType(_chNameSpace + "." + _chType);
                         INotFoundHandler typeInstance = Activator.CreateInstance(type) as INotFoundHandler;
                         if (typeInstance != null) {

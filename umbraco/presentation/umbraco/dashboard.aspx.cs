@@ -12,6 +12,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.XPath;
 using umbraco.uicontrols;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation
 {
@@ -56,7 +57,7 @@ namespace umbraco.cms.presentation
                 _section = getUser().Applications[0].alias;
 
             XmlDocument dashBoardXml = new XmlDocument();
-            dashBoardXml.Load(HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../config/dashboard.config"));
+            dashBoardXml.Load( IOHelper.MapPath(SystemFiles.DashboardConfig) );
 
             // test for new tab interface
             XmlNode section = dashBoardXml.DocumentElement.SelectSingleNode("./section [areas/area = '" + _section.ToLower() + "']");
@@ -64,7 +65,7 @@ namespace umbraco.cms.presentation
             {
                 Panel2.Visible = false;
                 dashboardTabs.Visible = true;
-                //bodyAttributes.Text = " onresize=\"resizeTabView(dashboardTabs_tabs, 'dashboardTabs')\" onload=\"resizeTabView(dashboardTabs_tabs, 'dashboardTabs')\"";
+            
                 foreach (XmlNode entry in section.SelectNodes("./tab"))
                 {
                     TabPage tab = dashboardTabs.NewTabPage(entry.Attributes.GetNamedItem("caption").Value);
@@ -72,14 +73,19 @@ namespace umbraco.cms.presentation
                     tab.Style.Add("padding", "0 10px");
 
                     foreach (XmlNode uc in entry.SelectNodes("./control"))
+                    {
+                        string path = IOHelper.FindFile(uc.FirstChild.Value);
+                        
                         try
                         {
-                            tab.Controls.Add(LoadControl(uc.FirstChild.Value));
+                            //resolving files from dashboard config which probably does not map to a virtual fi
+                            tab.Controls.Add( LoadControl(path) );
                         }
                         catch (Exception ee)
                         {
-                            tab.Controls.Add(new LiteralControl("<p class=\"umbracoErrorMessage\">Could not load control '" + uc.FirstChild.Value + "'. <br/><span class=\"guiDialogTiny\"><strong>Error message:</strong> " + ee.ToString() + "</span></p>"));
+                            tab.Controls.Add(new LiteralControl("<p class=\"umbracoErrorMessage\">Could not load control: '" + path + "'. <br/><span class=\"guiDialogTiny\"><strong>Error message:</strong> " + ee.ToString() + "</span></p>"));
                         }
+                    }
                 }
 
             }
@@ -96,17 +102,19 @@ namespace umbraco.cms.presentation
                     }
                     else
                     {
+                        string path = IOHelper.FindFile(entry.FirstChild.Value);
+
                         try
                         {
-                            placeHolder.Controls.Add(CreateDashBoardWrapperControl(LoadControl(entry.FirstChild.Value)));
+                            placeHolder.Controls.Add(CreateDashBoardWrapperControl(LoadControl(path)));
                         }
                         catch (Exception err)
                         {
                             Trace.Warn("Dashboard", string.Format("error loading control '{0}'",
-                                entry.FirstChild.Value), err);
+                                path), err);
                             placeHolder.Controls.Clear();
                             placeHolder.Controls.Add(CreateDashBoardWrapperControl(new LiteralControl(string.Format(
-                                "Error loading DashBoard Content '{0}'; {1}", entry.FirstChild.Value,
+                                "Error loading DashBoard Content '{0}'; {1}", path,
                                 err.Message))));
                         }
                     }

@@ -6,6 +6,7 @@ using ClientDependency.Core;
 using umbraco.presentation;
 using ClientDependency.Core.Controls;
 using umbraco.interfaces;
+using umbraco.IO;
 namespace umbraco.editorControls
 {
     /// <summary>
@@ -89,7 +90,7 @@ namespace umbraco.editorControls
             if (!UmbracoContext.Current.LiveEditingContext.Enabled)
             {
                 ScriptManager sm = ScriptManager.GetCurrent(base.Page);
-                ServiceReference webservicePath = new ServiceReference(GlobalSettings.Path + "/webservices/MediaPickerService.asmx");
+                ServiceReference webservicePath = new ServiceReference(SystemDirectories.Webservices + "/MediaPickerService.asmx");
 
                 if (!sm.Services.Contains(webservicePath))
                     sm.Services.Add(webservicePath);
@@ -118,7 +119,7 @@ namespace umbraco.editorControls
 
             string dialog = "\nshowPopWin('" + TreeService.GetPickerUrl(true, "media", "media") + "', 300, 400, " + ClientID + "_saveId)";
             if (_showadvanced)
-                dialog = "\nshowPopWin('" + GlobalSettings.Path + "/dialogs/mediaPicker.aspx" + "', 500, 530, " + ClientID + "_saveId)";
+                dialog = "\nshowPopWin('" + SystemDirectories.Umbraco + "/dialogs/mediaPicker.aspx" + "', 500, 530, " + ClientID + "_saveId)";
 
             string preview = string.Empty;
             if (_showpreview)
@@ -128,7 +129,7 @@ namespace umbraco.editorControls
 
             string strScript = "function " + this.ClientID + "_chooseId() {" +
                 //"\nshowPopWin('" + TreeService.GetPickerUrl(true, "media", "media") + "', 300, 400, " + ClientID + "_saveId)" +
-                //"\nshowPopWin('" + GlobalSettings.Path + "/dialogs/mediaPicker.aspx" + "', 500, 530, " + ClientID + "_saveId)" +
+                //"\nshowPopWin('" + umbraco.IO.SystemDirectories.Umbraco + "/dialogs/mediaPicker.aspx" + "', 500, 530, " + ClientID + "_saveId)" +
                 //				"\nvar treePicker = window.showModalDialog(, 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')			" +
                 dialog +
                 "\n}" +

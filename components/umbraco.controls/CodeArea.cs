@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 using ClientDependency.Core;
 using System.Linq;
 using ClientDependency.Core.Controls;
+using umbraco.IO;
 
 namespace umbraco.uicontrols {
 
@@ -159,9 +160,6 @@ namespace umbraco.uicontrols {
 
         protected string RenderCodeEditor()
         {
-            //get the client dependency url for the file so that it's compressed
-            var baseFileSource = ClientDependencyLoader.GetCompositeUrl(new string[] 
-                { GlobalSettings.ClientPath + "/CodeMirror/js/CoreCombined.js" }, ClientDependencyType.Javascript);
 
             string[] parserFiles = new string[] { "tokenizejavascript.js", "parsejavascript.js" };
             string[] cssFile = new string[] { "jscolors.css", "umbracoCustom.css" };
@@ -186,29 +184,33 @@ namespace umbraco.uicontrols {
                     break;
                 case EditorType.HTML:
                     parserFiles = new string[] { "parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js" };
-                    cssFile = new string[] { "xmlcolors.css", "jscolors.css", "csscolors.css", "umbracoCustom.css" };
+                    cssFile = new string[] { "xmlcolors.css", "jscolors.css", "csscolors", "umbracoCustom.css" };
                     break;
             }
-            
+
             var jsEventCode = @"                              
                             var textarea = document.getElementById('" + CodeTextBox.ClientID + @"');
                             
 
                               var codeEditor = CodeMirror.fromTextArea(textarea, {
-                                basefiles: ['" + baseFileSource + @"'],
+
                                 width: ""100%"",
                                 height: ""100%"",
                                 tabMode: ""shift"",
                                 textWrapping: false,
                                 lineNumbers: true,
-                                parserfile: ['" + ClientDependencyLoader.GetCompositeUrl(parserFiles, ClientDependencyType.Javascript) + @"'],
-                                stylesheet: ['" + ClientDependencyLoader.GetCompositeUrl(
+                                parserfile: [" + string.Join(",",
+                                               parserFiles
+                                                    .Select(x => string.Format(@"""{0}""", x))
+                                                    .ToArray()) + @"],
+                                stylesheet: [" + string.Join(",",
+
                                                cssFile
-                                                    .Select(x => GlobalSettings.ClientPath + @"/CodeMirror/css/" + x)
-                                                    .ToArray(), ClientDependencyType.Css) + @"'],
-                                path: """ + GlobalSettings.ClientPath + @"/CodeMirror/js/"",
+                                                    .Select(x => string.Format(@"""{0}""", IOHelper.ResolveUrl( SystemDirectories.Umbraco_client ) + @"/CodeMirror/css/" + x))
+                                                    .ToArray()) + @"],
+                                path: """ + IOHelper.ResolveUrl( SystemDirectories.Umbraco_client) + @"/CodeMirror/js/"",
                                 content: textarea.value,             
-                                autoMatchParens: false," 
+                                autoMatchParens: false,"
                                     + (string.IsNullOrEmpty(ClientSaveMethod) ? "" : @"saveFunction: " + ClientSaveMethod + ",") + @"
                                 onChange: function() { /*codeVal.value = codeEditor.getCode(); */}});
 

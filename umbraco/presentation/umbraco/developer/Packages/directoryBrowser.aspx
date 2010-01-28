@@ -32,7 +32,7 @@
     }
 </script>
 
- <link href="<%=umbraco.GlobalSettings.Path%>/css/umbracoGui.css" type="text/css" rel="stylesheet"/>
+ <link href="<%=umbraco.IO.SystemDirectories.Umbraco%>/css/umbracoGui.css" type="text/css" rel="stylesheet"/>
     
     <style type="text/css">
 
@@ -61,6 +61,7 @@ small a{color: #999; padding-left: 3px !Important; background-image: none !Impor
             //Variables used in script
             string sSubDir; int i; int j;
             string sPrevLink = "";
+            string sebChar = umbraco.IO.IOHelper.DirSepChar.ToString();
             decimal iLen; string sLen;
 
             //Write header, get link param
@@ -71,12 +72,14 @@ small a{color: #999; padding-left: 3px !Important; background-image: none !Impor
             sSubDir = Request.QueryString.Get("path");
             if (sSubDir == null || sSubDir == "") { sSubDir = "/"; }
 
-            sSubDir = sSubDir.Replace("\\", ""); sSubDir = sSubDir.Replace("//", "/");
-            sSubDir = sSubDir.Replace("..", "./"); sSubDir = sSubDir.Replace("/", "\\");
+            sSubDir = sSubDir.Replace(umbraco.IO.IOHelper.DirSepChar.ToString(), ""); 
+            sSubDir = sSubDir.Replace("//", "/");
+            sSubDir = sSubDir.Replace("..", "./"); 
+            sSubDir = sSubDir.Replace('/', umbraco.IO.IOHelper.DirSepChar);
 
             //Clean path for processing and collect path varitations
-            if (sSubDir.Substring(0, 1) != "\\") { sSubDir = "\\" + sSubDir; }
-            if (sSubDir.Substring(sSubDir.Length - 1, 1) != "\\") { sSubDir = sSubDir + "\\"; }
+            if (sSubDir.Substring(0, 1) != sebChar) { sSubDir = sebChar + sSubDir; }
+            if (sSubDir.Substring(sSubDir.Length - 1, 1) != "\\") { sSubDir = sSubDir + sebChar; }
 
             //Get name of the browser script file
             lsScriptName = Request.ServerVariables.Get("SCRIPT_NAME");
@@ -85,12 +88,12 @@ small a{color: #999; padding-left: 3px !Important; background-image: none !Impor
 
             //Create navigation string and other path strings
             sPrevLink += GetNavLink("", "root");
-            if (sSubDir != "\\")
+            if (sSubDir != sebChar)
             {
                 j = 0; i = 0;
                 do
                 {
-                    i = sSubDir.IndexOf("\\", j + 1);
+                    i = sSubDir.IndexOf(sebChar, j + 1);
                     lsWebPath += sSubDir.Substring(j + 1, i - (j + 1)) + "/";
                     sPrevLink += GetNavLink(lsWebPath, sSubDir.Substring(j + 1, i - (j + 1)));
                     j = i;
@@ -101,7 +104,7 @@ small a{color: #999; padding-left: 3px !Important; background-image: none !Impor
             Response.Write("<table cellpadding=3 cellspacing=1><tbody>");
 
             //Output directorys
-            DirectoryInfo oDirInfo = new DirectoryInfo(Server.MapPath("/") + sSubDir);
+            DirectoryInfo oDirInfo = new DirectoryInfo(umbraco.IO.IOHelper.MapPath("~/" + sSubDir));
             DirectoryInfo[] oDirs = oDirInfo.GetDirectories();
             foreach (DirectoryInfo oDir in oDirs)
             {

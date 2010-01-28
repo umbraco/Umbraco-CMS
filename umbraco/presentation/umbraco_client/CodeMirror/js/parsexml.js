@@ -1,11 +1,3 @@
-/* This file defines an XML parser, with a few kludges to make it
- * useable for HTML. autoSelfClosers defines a set of tag names that
- * are expected to not have a closing tag, and doNotIndent specifies
- * the tags inside of which no indentation should happen (see Config
- * object). These can be disabled by passing the editor an object like
- * {useHTMLKludges: false} as parserConfig option.
- */
-
 var XMLParser = Editor.Parser = (function() {
   var Kludges = {
     autoSelfClosers: {"br": true, "img": true, "hr": true, "link": true, "input": true,
@@ -16,9 +8,6 @@ var XMLParser = Editor.Parser = (function() {
   var UseKludges = Kludges;
   var alignCDATA = false;
 
-  // Simple stateful tokenizer for XML documents. Returns a
-  // MochiKit-style iterator, with a state property that contains a
-  // function encapsulating the current state. See tokenize.js.
   var tokenizeXML = (function() {
     function inText(source, setState) {
       var ch = source.next();

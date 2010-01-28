@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Reflection;
 using System.Diagnostics;
+using umbraco.IO;
 
 namespace umbraco.dialogs
 {
@@ -27,7 +28,7 @@ namespace umbraco.dialogs
 
 
 			// umbraco.dll version
-			FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../bin/umbraco.dll"));
+			FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(IOHelper.MapPath(SystemDirectories.Bin + "/umbraco.dll"));
 			version.Text += " (Assembly version: " + myFileVersionInfo.FileVersion + ")";
 		}
 

@@ -5,6 +5,7 @@ using System.Xml.XPath;
 using System.Reflection;
 using umbraco.BusinessLogic;
 using umbraco.BasePages;
+using umbraco.IO;
 
 namespace umbraco.presentation.create
 {
@@ -31,7 +32,7 @@ namespace umbraco.presentation.create
             string taskAssembly = def.SelectSingleNode("./tasks/delete").Attributes.GetNamedItem("assembly").Value;
             string taskType = def.SelectSingleNode("./tasks/delete").Attributes.GetNamedItem("type").Value;
 
-            Assembly assembly = Assembly.LoadFrom(System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../bin/" + taskAssembly + ".dll"));
+            Assembly assembly = Assembly.LoadFrom( IOHelper.MapPath(SystemDirectories.Bin + "/" + taskAssembly + ".dll"));
             Type type = assembly.GetType(taskAssembly + "." + taskType);
             interfaces.ITask typeInstance = Activator.CreateInstance(type) as interfaces.ITask;
             if (typeInstance != null)
@@ -58,7 +59,7 @@ namespace umbraco.presentation.create
             string taskAssembly = def.SelectSingleNode("./tasks/create").Attributes.GetNamedItem("assembly").Value;
             string taskType = def.SelectSingleNode("./tasks/create").Attributes.GetNamedItem("type").Value;
 
-            Assembly assembly = Assembly.LoadFrom(System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../bin/" + taskAssembly + ".dll"));
+            Assembly assembly = Assembly.LoadFrom( IOHelper.MapPath(SystemDirectories.Bin + "/" + taskAssembly + ".dll"));
             Type type = assembly.GetType(taskAssembly + "." + taskType);
             interfaces.ITask typeInstance = Activator.CreateInstance(type) as interfaces.ITask;
             if (typeInstance != null)
@@ -98,7 +99,7 @@ namespace umbraco.presentation.create
         {
             // Load task settings
             XmlDocument createDef = new XmlDocument();
-            XmlTextReader defReader = new XmlTextReader(System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/config/create/UI.xml"));
+            XmlTextReader defReader = new XmlTextReader(IOHelper.MapPath(SystemFiles.CreateUiXml));
             createDef.Load(defReader);
             defReader.Close();
             return createDef;

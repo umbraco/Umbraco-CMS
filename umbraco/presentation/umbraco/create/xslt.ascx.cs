@@ -7,6 +7,7 @@ using System.Web.UI.HtmlControls;
 using System.IO;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
+using umbraco.IO;
 
 namespace umbraco.presentation.create
 {
@@ -21,8 +22,8 @@ namespace umbraco.presentation.create
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-			sbmt.Text = ui.Text("create");
-			foreach (string fileName in Directory.GetFiles(Server.MapPath(GlobalSettings.Path + "\\xslt\\templates"), "*.xslt"))
+            sbmt.Text = ui.Text("create");
+            foreach (string fileName in Directory.GetFiles( IOHelper.MapPath(SystemDirectories.Umbraco + "/xslt/templates"), "*.xslt") )
 			{
 				FileInfo fi = new FileInfo(fileName);
 				if (fi.Name != "Clean.xslt")

@@ -1,7 +1,7 @@
 ﻿.menuSpr
 {
 	float: left;
-	background-image: url(../../../../umbraco/images/actions/sprites.png);
+	background-image: url(sprites.png);
 	background-position: -7px -8px;	
 	margin-top: 1px;
 	width: 17px;

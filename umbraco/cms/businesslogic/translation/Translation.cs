@@ -7,6 +7,7 @@ using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.web;
+using umbraco.IO;
 
 namespace umbraco.cms.businesslogic.translation
 {
@@ -37,7 +38,7 @@ namespace umbraco.cms.businesslogic.translation
                 if(port != 80)
                     serverName += ":" + port.ToString();
 
-                serverName += GlobalSettings.Path;
+                serverName += SystemDirectories.Umbraco;
 
                 // Send mail
                 string[] subjectVars = {serverName, Node.Text};

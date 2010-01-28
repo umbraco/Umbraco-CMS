@@ -17,6 +17,7 @@ using umbraco;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.property;
+using umbraco.IO;
 
 namespace umbraco.presentation.umbracobase
 {
@@ -73,7 +74,7 @@ namespace umbraco.presentation.umbracobase
             bool allowed = false;
 
             XmlDocument baseDoc = new XmlDocument(); //RESTExtension document...
-            baseDoc.Load(System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../config/restExtensions.config"));
+            baseDoc.Load(IOHelper.MapPath(SystemFiles.RestextensionsConfig));
 
             XmlNode baseExt = baseDoc.SelectSingleNode("/RestExtensions/ext [@alias='" + extensionAlias + "']/permission [@method='" + methodName + "']");
 
@@ -106,7 +107,7 @@ namespace umbraco.presentation.umbracobase
             {
                 XmlNode extNode = baseDoc.SelectSingleNode("/RestExtensions/ext [@alias='" + extensionAlias + "']");
                 string asml = extNode.Attributes["assembly"].Value;
-                string assemblyPath = System.Web.HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/.." + asml + ".dll");
+                string assemblyPath = IOHelper.MapPath((SystemDirectories.Root + "/" + asml.TrimStart('/') + ".dll"));
                 Assembly returnAssembly = System.Reflection.Assembly.LoadFrom(assemblyPath);
 
                 string returnTypeName = extNode.Attributes["type"].Value;

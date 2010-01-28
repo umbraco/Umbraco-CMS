@@ -17,6 +17,7 @@ namespace presentation.install.steps
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
+
 			// Check for config!
             if (GlobalSettings.Configured)
             {
@@ -25,6 +26,7 @@ namespace presentation.install.steps
                 Application.UnLock();
                 Response.Redirect(Request.QueryString["url"] ?? "/", true);
             }
+             
 		}
 
 		#region Web Form Designer generated code

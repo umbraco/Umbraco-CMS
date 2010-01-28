@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using System.Web;
 using umbraco.BusinessLogic;
+using umbraco.IO;
 
 namespace umbraco.editorControls.tinymce
 {
@@ -138,6 +139,8 @@ namespace umbraco.editorControls.tinymce
             int newWidth = int.Parse(resizeDimSplit[0]);
             int newHeight = int.Parse(resizeDimSplit[1]);
 
+            //THIS I DO NOW KNOW HOW TO MAKE WORK WITH A VIRTUAL DIRECTORY... 
+
             if (orgHeight > 0 && orgWidth > 0 && resizeDim != "" && orgSrc != "")
             {
                 // Check dimensions
@@ -151,14 +154,14 @@ namespace umbraco.editorControls.tinymce
                 }
 
                 // update orgSrc to remove umbraco reference
-                if (orgSrc.IndexOf("/media/") > -1)
-                    orgSrc = orgSrc.Substring(orgSrc.IndexOf("/media/"), orgSrc.Length - orgSrc.IndexOf("/media/"));
+                if (IOHelper.ResolveUrl(orgSrc).IndexOf( IOHelper.ResolveUrl(SystemDirectories.Media)) > -1)
+                    orgSrc = orgSrc.Substring( orgSrc.IndexOf("/media/"), orgSrc.Length - orgSrc.IndexOf("/media/") );
 
                 string ext = orgSrc.Substring(orgSrc.LastIndexOf(".") + 1, orgSrc.Length - orgSrc.LastIndexOf(".") - 1);
                 newSrc = orgSrc.Replace("." + ext, "_" + newWidth.ToString() + "x" + newHeight.ToString() + ".jpg");
 
-                string fullSrc = HttpContext.Current.Server.MapPath(orgSrc);
-                string fullSrcNew = HttpContext.Current.Server.MapPath(newSrc);
+                string fullSrc = IOHelper.MapPath(orgSrc);
+                string fullSrcNew = IOHelper.MapPath(newSrc);
 
                 // Load original image
                 Image image = Image.FromFile(fullSrc);

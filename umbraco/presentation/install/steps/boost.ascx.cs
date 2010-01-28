@@ -8,6 +8,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using umbraco.IO;
 
 namespace umbraco.presentation.install.steps {
     public partial class boost : System.Web.UI.UserControl {
@@ -24,7 +25,7 @@ namespace umbraco.presentation.install.steps {
                 pl_nitros.Visible = true;
                 pl_boost.Visible = false;
                 
-                ph_nitros.Controls.Add(new UserControl().LoadControl(GlobalSettings.Path + "/developer/packages/LoadNitros.ascx"));
+                ph_nitros.Controls.Add(new UserControl().LoadControl( SystemDirectories.Umbraco + "/developer/packages/LoadNitros.ascx"));
 
                 Button btNext = (Button)Page.FindControl("next");
                 btNext.Text = "Continue without installing";
@@ -89,7 +90,7 @@ namespace umbraco.presentation.install.steps {
 
                     pl_nitros.Visible = true;
                     pl_boost.Visible = false;
-                    ph_nitros.Controls.Add(new UserControl().LoadControl(GlobalSettings.Path + "/developer/packages/LoadNitros.ascx"));
+                    ph_nitros.Controls.Add(new UserControl().LoadControl(SystemDirectories.Umbraco + "/developer/packages/LoadNitros.ascx"));
 
                     Button btNext = (Button)Page.FindControl("next");
                     btNext.Text = "Continue without installing";

@@ -4,6 +4,7 @@ using umbraco.BusinessLogic.Actions;
 using umbraco.DataLayer;
 using System.Collections;
 using System.Collections.Generic;
+using umbraco.IO;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -251,7 +252,7 @@ namespace umbraco.cms.businesslogic.media
                     var props = this.getProperties;
                     foreach (cms.businesslogic.property.Property p in props)
 					{
-						FileInfo mediaFile = new FileInfo(System.Web.HttpContext.Current.Server.MapPath(p.Value.ToString()));
+						FileInfo mediaFile = new FileInfo(IOHelper.MapPath(p.Value.ToString()));
 
 						if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id
 							&& p.Value.ToString() != ""
@@ -268,8 +269,8 @@ namespace umbraco.cms.businesslogic.media
 							{
 								string thumbnailfile = file.Replace("." + extension, "_thumb");
 
-								if (System.IO.File.Exists(System.Web.HttpContext.Current.Server.MapPath(thumbnailfile + ".jpg")))
-									System.IO.File.Delete(System.Web.HttpContext.Current.Server.MapPath(thumbnailfile + ".jpg"));
+                                if (System.IO.File.Exists(IOHelper.MapPath(thumbnailfile + ".jpg")))
+                                    System.IO.File.Delete(IOHelper.MapPath(thumbnailfile + ".jpg"));
 
 								//should also delete extra thumbnails
 							}

@@ -1,5 +1,6 @@
 using System;
 using System.Xml;
+using umbraco.IO;
 
 namespace umbraco.presentation.cache {
     /// <summary>
@@ -34,7 +35,7 @@ namespace umbraco.presentation.cache {
                 {
                     foreach (XmlNode n in UmbracoSettings.DistributionServers.SelectNodes("./server"))
                     {
-                        cr.Url = "http://" + xmlHelper.GetNodeValue(n) + GlobalSettings.Path + "/webservices/cacheRefresher.asmx";
+                        cr.Url = "http://" + xmlHelper.GetNodeValue(n) + SystemDirectories.Webservices + "/cacheRefresher.asmx";
                         cr.RefreshById(uniqueIdentifier, Id, _login, _password);
                     }
                 }
@@ -59,7 +60,7 @@ namespace umbraco.presentation.cache {
                 {
                     foreach (XmlNode n in UmbracoSettings.DistributionServers.SelectNodes("./server"))
                     {
-                        cr.Url = "http://" + xmlHelper.GetNodeValue(n) + GlobalSettings.Path + "/webservices/cacheRefresher.asmx";
+                        cr.Url = "http://" + xmlHelper.GetNodeValue(n) + SystemDirectories.Webservices + "/cacheRefresher.asmx";
                         cr.RefreshByGuid(uniqueIdentifier, Id, _login, _password);
                     }
                 }
@@ -83,7 +84,7 @@ namespace umbraco.presentation.cache {
                 {
                     foreach (XmlNode n in UmbracoSettings.DistributionServers.SelectNodes("./server"))
                     {
-                        cr.Url = "http://" + xmlHelper.GetNodeValue(n) + GlobalSettings.Path + "/webservices/cacheRefresher.asmx";
+                        cr.Url = "http://" + xmlHelper.GetNodeValue(n) + SystemDirectories.Webservices + "/cacheRefresher.asmx";
                         cr.RefreshAll(uniqueIdentifier, _login, _password);
                     }
                 }
@@ -109,7 +110,7 @@ namespace umbraco.presentation.cache {
                 using (                    CacheRefresher cr = new CacheRefresher()) {
                     foreach (XmlNode n in UmbracoSettings.DistributionServers.SelectNodes("./server"))
                     {
-                        cr.Url = "http://" + xmlHelper.GetNodeValue(n) + GlobalSettings.Path + "/webservices/cacheRefresher.asmx";
+                        cr.Url = "http://" + xmlHelper.GetNodeValue(n) + SystemDirectories.Webservices + "/cacheRefresher.asmx";
                         cr.RemoveById(uniqueIdentifier, Id, _login, _password);
                     }
                 }

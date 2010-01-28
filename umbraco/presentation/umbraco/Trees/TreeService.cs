@@ -21,6 +21,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.DataLayer;
 using System.Collections.Specialized;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation.Trees
 {
@@ -180,7 +181,7 @@ namespace umbraco.cms.presentation.Trees
 		/// <returns>Tree service url as a string</returns>
 		public string GetServiceUrl()
 		{
-			return GlobalSettings.Path + "/" + GetUrl(TREE_URL);
+			return SystemDirectories.Umbraco + "/" + GetUrl(TREE_URL);
 		}
 
 		/// <summary>
@@ -208,7 +209,7 @@ namespace umbraco.cms.presentation.Trees
 		/// <returns></returns>
 		public string GetInitUrl()
 		{
-			return GlobalSettings.Path + "/" + GetUrl(INIT_URL);
+			return IOHelper.ResolveUrl( SystemDirectories.Umbraco + "/" + GetUrl(INIT_URL) );
 		}
 
 		/// <summary>
@@ -250,7 +251,7 @@ namespace umbraco.cms.presentation.Trees
 		/// <returns></returns>
 		public string GetPickerUrl(bool useSubModal)
 		{
-			string url = GlobalSettings.Path + "/dialogs/" + GetUrl(PICKER_URL);
+			string url = IOHelper.ResolveUrl( SystemDirectories.Umbraco + "/dialogs/" + GetUrl(PICKER_URL) );
 			return url + (useSubModal ? "&useSubModal=true" : "");
 		}
 

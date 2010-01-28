@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Collections.Specialized;
+using umbraco.IO;
 
 namespace umbraco.presentation.install
 {
@@ -31,11 +32,9 @@ namespace umbraco.presentation.install
             // use buffer, so content isn't sent until it's ready (minimizing the blank screen experience)
             Response.Buffer = true;
 			step.Value = _installStep;
-            ScriptManager sm = Page.FindControl("umbracoScriptManager") as ScriptManager;
-            webservices.ajaxHelpers.EnsureLegacyCalls(Page);
+            //ScriptManager sm = Page.FindControl("umbracoScriptManager") as ScriptManager;
+            //webservices.ajaxHelpers.EnsureLegacyCalls(Page);
             prepareNextButton();
-
-            
         }
 
         private void SubscribeToNewsLetter(string name, string email) {
@@ -69,7 +68,7 @@ namespace umbraco.presentation.install
                 try {
                     ensureContext();
                 } catch {
-                    Response.Redirect(GlobalSettings.Path + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl));
+                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl));
                 }
 
                 //set the first step to upgrade.
@@ -82,7 +81,7 @@ namespace umbraco.presentation.install
 			if (_installStep == "" || _installStep.Contains("/"))
 				_installStep = "welcome";
 
-			PlaceHolderStep.Controls.Add(new System.Web.UI.UserControl().LoadControl(GlobalSettings.Path + "/../install/steps/" + _installStep + ".ascx"));
+			PlaceHolderStep.Controls.Add(new System.Web.UI.UserControl().LoadControl( IOHelper.ResolveUrl( SystemDirectories.Install ) + "/steps/" + _installStep + ".ascx"));
 		}
 		
 		/// <summary>

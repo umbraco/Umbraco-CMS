@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 
 using System.IO;
+using umbraco.IO;
 
 namespace umbraco.dialogs
 {
@@ -69,13 +70,13 @@ namespace umbraco.dialogs
 						}
 						string fileNameOrg = fileName;
 						string ext = fileNameOrg.Substring(fileNameOrg.LastIndexOf(".")+1, fileNameOrg.Length-fileNameOrg.LastIndexOf(".")-1);
-						string fileNameThumb = GlobalSettings.Path + "/.." + fileNameOrg.Replace("."+ext, "_thumb.jpg");
-						image.Controls.Add(new LiteralControl("<a href=\"" + GlobalSettings.Path + "/.." + fileNameOrg + "\" title=\"Zoom\"><img src=\"" + fileNameThumb + "\" border=\"0\"/></a>"));
+						string fileNameThumb = SystemDirectories.Root + fileNameOrg.Replace("."+ext, "_thumb.jpg");
+						image.Controls.Add(new LiteralControl("<a href=\"" + SystemDirectories.Root + fileNameOrg + "\" title=\"Zoom\"><img src=\"" + fileNameThumb + "\" border=\"0\"/></a>"));
 					} 
 					catch {
 					}
 
-					image.Controls.Add(new LiteralControl("<script>\nparent.updateImageSource('" + GlobalSettings.Path + "/.." + fileName.Replace("'", "\\'") + "','"+altText+"','" + fileWidth.ToString() + "','" + fileHeight.ToString() + "')\n</script>"));
+                    image.Controls.Add(new LiteralControl("<script>\nparent.updateImageSource('" + SystemDirectories.Root  + fileName.Replace("'", "\\'") + "','" + altText + "','" + fileWidth.ToString() + "','" + fileHeight.ToString() + "')\n</script>"));
 
 				}
 			}

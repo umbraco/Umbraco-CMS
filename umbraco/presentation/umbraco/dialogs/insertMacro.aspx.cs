@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 
 using System.Reflection;
 using umbraco.DataLayer;
+using umbraco.IO;
 
 namespace umbraco.dialogs
 {
@@ -43,8 +44,8 @@ namespace umbraco.dialogs
 					macroType = mp.Type.Type;
 					try 
 					{
-					
-						Assembly assembly = Assembly.LoadFrom(Server.MapPath(GlobalSettings.Path + "/../bin/"+macroAssembly+".dll"));
+
+                        Assembly assembly = Assembly.LoadFrom( IOHelper.MapPath(SystemDirectories.Bin + "/" + macroAssembly + ".dll"));
 
 						Type type = assembly.GetType(macroAssembly+"."+macroType);
 						interfaces.IMacroGuiRendering typeInstance = Activator.CreateInstance(type) as interfaces.IMacroGuiRendering;

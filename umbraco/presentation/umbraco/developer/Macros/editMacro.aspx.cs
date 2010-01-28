@@ -13,6 +13,7 @@ using umbraco.uicontrols;
 using umbraco.DataLayer;
 using umbraco.cms.presentation.Trees;
 using umbraco.cms.businesslogic.macro;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -44,7 +45,7 @@ namespace umbraco.cms.presentation.developer
                 string tempMacroAssembly = m_macro.Assembly == null ? "" : m_macro.Assembly;
                 string tempMacroType = m_macro.Type == null ? "" : m_macro.Type;
                 macroXslt.Text = m_macro.Xslt;
-                macroPython.Text = m_macro.Python;
+                macroPython.Text = m_macro.ScriptingFile;
                 cachePeriod.Text = m_macro.RefreshRate.ToString();
 
                 macroRenderContent.Checked = m_macro.RenderContent;
@@ -85,7 +86,7 @@ namespace umbraco.cms.presentation.developer
                 populatePythonFiles();
 
                 // Load usercontrols
-                populateUserControls(Server.MapPath("/usercontrols"));
+                populateUserControls(IOHelper.MapPath(SystemDirectories.Usercontrols) );
                 userControlList.Items.Insert(0, new ListItem("Browse usercontrols on server...", string.Empty));
                 userControlList.Attributes.Add("onChange",
                     "document.getElementById('" + macroUserControl.ClientID + "').value = this[this.selectedIndex].value;");
@@ -116,7 +117,7 @@ namespace umbraco.cms.presentation.developer
                 m_macro.Assembly = tempMacroAssembly;
                 m_macro.Type = tempMacroType;
                 m_macro.Xslt = macroXslt.Text;
-                m_macro.Python = macroPython.Text;
+                m_macro.ScriptingFile = macroPython.Text;
                 m_macro.Save();
 
                 // Save elements
@@ -168,6 +169,7 @@ namespace umbraco.cms.presentation.developer
                 getXsltFilesFromDir(orgPath, path + "/" + dir.Name, files);
 
             FileInfo[] fileInfo = dirInfo.GetFiles("*.xsl*");
+
             foreach (FileInfo file in fileInfo)
                 files.Add((path.Replace(orgPath, string.Empty).Trim('/') + "/" + file.Name).Trim('/'));
         }
@@ -175,7 +177,7 @@ namespace umbraco.cms.presentation.developer
         private void populateXsltFiles()
         {
             ArrayList xslts = new ArrayList();
-            string xsltDir = HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../xslt/");
+            string xsltDir = IOHelper.MapPath(SystemDirectories.Xslt + "/");
             getXsltFilesFromDir(xsltDir, xsltDir, xslts);
             xsltFiles.DataSource = xslts;
             xsltFiles.DataBind();
@@ -190,7 +192,7 @@ namespace umbraco.cms.presentation.developer
             if (!dirInfo.Exists)
                 return;
 
-            FileInfo[] fileInfo = dirInfo.GetFiles("*.py");
+            FileInfo[] fileInfo = dirInfo.GetFiles("*.*");
             foreach (FileInfo file in fileInfo)
                 files.Add(path.Replace(orgPath, string.Empty) + file.Name);
 
@@ -203,7 +205,7 @@ namespace umbraco.cms.presentation.developer
         private void populatePythonFiles()
         {
             ArrayList pythons = new ArrayList();
-            string pythonDir = HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../python/");
+            string pythonDir = IOHelper.MapPath(SystemDirectories.Python + "/");
             getPythonFilesFromDir(pythonDir, pythonDir, pythons);
             pythonFiles.DataSource = pythons;
             pythonFiles.DataBind();
@@ -298,10 +300,18 @@ namespace umbraco.cms.presentation.developer
         private void populateUserControls(string path)
         {
             DirectoryInfo di = new DirectoryInfo(path);
+
+            string rootDir = IOHelper.MapPath( SystemDirectories.Root );
+            
             foreach (FileInfo uc in di.GetFiles("*.ascx"))
             {
                 userControlList.Items.Add(
-                    new ListItem(uc.FullName.Substring(uc.FullName.IndexOf("\\usercontrols"), uc.FullName.Length - uc.FullName.IndexOf("\\usercontrols")).Replace("\\", "/")));
+                    new ListItem( 
+                            uc.FullName.Substring(rootDir.Length).Replace(IOHelper.DirSepChar, '/')));
+                /*
+                                        uc.FullName.IndexOf(usercontrolsDir), 
+                                        uc.FullName.Length - uc.FullName.IndexOf(usercontrolsDir)).Replace(IOHelper.DirSepChar, '/')));
+                */
 
             }
             foreach (DirectoryInfo dir in di.GetDirectories())
@@ -328,10 +338,10 @@ namespace umbraco.cms.presentation.developer
             Parameters.Controls.Add(Panel2);
 
             ImageButton save = InfoTabPage.Menu.NewImageButton();
-            save.ImageUrl = GlobalSettings.Path + "/images/editor/save.gif";
+            save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
 
             ImageButton save2 = Parameters.Menu.NewImageButton();
-            save2.ImageUrl = GlobalSettings.Path + "/images/editor/save.gif";
+            save2.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
 
             base.OnInit(e);
         }

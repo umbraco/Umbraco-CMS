@@ -10,6 +10,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
+using umbraco.IO;
 
 namespace umbraco.presentation.umbraco.create
 {
@@ -25,12 +26,11 @@ namespace umbraco.presentation.umbraco.create
 			if (Page.IsValid)
 			{
 				string path = helper.Request("nodeID");
-				string relativepath = path.Replace(System.Web.HttpContext.Current.Server.MapPath(UmbracoSettings.ScriptFolderPath) + "\\", "") + "\\";
+                string relativepath = path + "/";
 
 				if (path == "init")
 				{
-					path = System.Web.HttpContext.Current.Server.MapPath(UmbracoSettings.ScriptFolderPath);
-					relativepath = string.Empty;
+                    relativepath = "";
 				}
 
 				int createFolder = 0;
@@ -40,7 +40,7 @@ namespace umbraco.presentation.umbraco.create
 				string returnUrl = presentation.create.dialogHandler_temp.Create(
 					helper.Request("nodeType"),
 					createFolder,
-					path + "¤" + rename.Text + "¤" + scriptType.SelectedValue + "¤" + relativepath);
+                    relativepath + "¤" + rename.Text + "¤" + scriptType.SelectedValue);
 
 				BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)

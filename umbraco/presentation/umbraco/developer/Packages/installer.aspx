@@ -1,8 +1,8 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master" CodeBehind="installer.aspx.cs"
     AutoEventWireup="True" Inherits="umbraco.presentation.developer.packages.Installer"
     Trace="false" %>
-<%@ Register TagPrefix="ctl" Src="../../controls/ProgressBar.ascx" TagName="ProgBar"  %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
     <script type="text/javascript">
@@ -62,7 +62,7 @@
                 <asp:Button ID="ButtonLoadPackage" runat="server" Enabled="false" Text="Load Package"
                     OnClick="uploadFile"></asp:Button>
                 <span id="loadingbar" style="display: none;">
-                    <ctl:ProgBar runat="server" id="ProgBar" />
+                    <cc1:ProgressBar ID="progbar1" runat="server" Title="Please wait..." />
                 </span>
             </cc1:PropertyPanel>
         </cc1:Pane>
@@ -202,7 +202,7 @@
                 <cc1:PropertyPanel runat="server" Text=" ">
                     <br />
                     <div style="display: none;" id="installingMessage">
-                        <ctl:ProgBar runat="server" id="ProgBar1" />
+                        <cc1:ProgressBar runat="server" ID="_progbar1" />
                         <br />
                         <em>&nbsp; &nbsp;Installing package, please wait...</em><br />
                     </div>
@@ -232,7 +232,7 @@
         </asp:Panel>
         <cc1:Pane ID="pane_installing" runat="server" Visible="false" Text="Installing package">
             <cc1:PropertyPanel runat="server">
-                <ctl:ProgBar runat="server" id="ProgBar2" />
+                <cc1:ProgressBar runat="server" ID="progBar2" />
                 <asp:Literal ID="lit_installStatus" runat="server" />
             </cc1:PropertyPanel>
         </cc1:Pane>

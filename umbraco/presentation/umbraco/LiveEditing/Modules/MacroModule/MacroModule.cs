@@ -10,6 +10,7 @@ using umbraco.presentation.LiveEditing.Updates;
 using umbraco.presentation.templateControls;
 using UM = umbraco.cms.businesslogic.macro;
 using ClientDependency.Core;
+using umbraco.IO;
 namespace umbraco.presentation.LiveEditing.Modules.MacroEditing
 {
 	[ClientDependency(200, ClientDependencyType.Javascript, "LiveEditing/Modules/MacroModule/MacroModule.js", "UmbracoRoot")]
@@ -56,7 +57,7 @@ namespace umbraco.presentation.LiveEditing.Modules.MacroEditing
             m_MacroButton.ID = "LeMacroButton";
             m_MacroButton.CssClass = "button";
             m_MacroButton.ToolTip = "Insert macro";
-            m_MacroButton.ImageUrl = String.Format("{0}/images/editor/insMacro.gif", GlobalSettings.Path);
+            m_MacroButton.ImageUrl = String.Format("{0}/images/editor/insMacro.gif", SystemDirectories.Umbraco);
 
             Controls.Add(m_MacroModal);
             m_MacroModal.ID = "LeMacroModal";
@@ -109,7 +110,7 @@ namespace umbraco.presentation.LiveEditing.Modules.MacroEditing
 
             m_MacroModal.Controls.Add(new LiteralControl("</div>"));
 
-            //ScriptManager.RegisterClientScriptInclude(this, GetType(), MacroModuleScriptFile, String.Format(MacroModuleScriptFile, GlobalSettings.Path));
+            //ScriptManager.RegisterClientScriptInclude(this, GetType(), MacroModuleScriptFile, String.Format(MacroModuleScriptFile, umbraco.IO.SystemDirectories.Umbraco));
 
             
         }

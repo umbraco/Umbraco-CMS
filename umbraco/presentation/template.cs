@@ -12,6 +12,8 @@ using System.Collections.Generic;
 
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
+using umbraco.IO;
+using System.Web;
 
 namespace umbraco {
     /// <summary>
@@ -51,11 +53,13 @@ namespace umbraco {
             get {
 
                 string file = TemplateAlias.Replace(" ", "") + ".master";
+                string path = SystemDirectories.Masterpages + "/" + file;
 
-                if (System.IO.File.Exists(GlobalSettings.FullpathToRoot + "masterPages" + System.IO.Path.DirectorySeparatorChar + file))
-                    return "~/masterPages/" + file;
+
+                if (System.IO.File.Exists(IOHelper.MapPath( VirtualPathUtility.ToAbsolute( path ) )))
+                    return path;
                 else
-                    return "~/" + GlobalSettings.Path.Trim('~','/') + "/masterPages/default.master"; 
+                    return SystemDirectories.Umbraco + "/masterPages/default.master"; 
             }
         }
 

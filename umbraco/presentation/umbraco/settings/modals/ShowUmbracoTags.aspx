@@ -1,24 +1,17 @@
 <%@ Page Language="c#" Codebehind="ShowUmbracoTags.aspx.cs" AutoEventWireup="True"
-  Inherits="umbraco.cms.presentation.settings.modal.ShowUmbracoTags" %>
+  Inherits="umbraco.cms.presentation.settings.modal.ShowUmbracoTags" MasterPageFile="../../masterpages/umbracoDialog.Master" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
-<html>
-<head>
-  <title>ShowUmbracoTags</title>
-  <link href="../../css/umbracoGui.css" type="text/css" rel="stylesheet" />
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 
 <style type="text/css">
 code{display: block; background: #999; color: #fff; padding: 5px; margin-bottom: 10px;}
 small{color: #000 !Important; margin-bottom: 10px; display: block;}
 </style>
 
-</head>
-<body>
-  <form id="Form1" method="post" runat="server">
-  
+</asp:Content>
 
-
+<asp:Content ContentPlaceHolderID="body" runat="server">
 <cc1:Pane ID="Pane7" Style="padding-right: 10px; padding-left: 10px; padding-bottom: 10px;
         padding-top: 10px; text-align: left" runat="server">
         <table id="Table1" width="100%">
@@ -52,9 +45,9 @@ small{color: #000 !Important; margin-bottom: 10px; display: block;}
           </td></tr>
           <tr><th width="120">MetaBlogApi / Content Channels</th><td>
           <code>
-          &lt;link rel="EditURI" type="application/rsd+xml" href="http://<%=Request.ServerVariables["SERVER_NAME"] %><%= umbraco.GlobalSettings.Path %>/channels/rsd.aspx" /&gt;
+          &lt;link rel="EditURI" type="application/rsd+xml" href="http://<%=Request.ServerVariables["SERVER_NAME"] %><%= umbraco.IO.SystemDirectories.Umbraco%>/channels/rsd.aspx" /&gt;
           <br /><br />
-          &lt;link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://<%=Request.ServerVariables["SERVER_NAME"] %><%= umbraco.GlobalSettings.Path %>/channels/wlwmanifest.aspx" /&gt;
+          &lt;link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://<%=Request.ServerVariables["SERVER_NAME"] %><%= umbraco.IO.SystemDirectories.Umbraco %>/channels/wlwmanifest.aspx" /&gt;
           </code>
           <small>
           Insert the above two elements to the head element to gain optimal support for
@@ -65,7 +58,4 @@ small{color: #000 !Important; margin-bottom: 10px; display: block;}
         </table>
 </cc1:Pane>
 
-
-  </form>
-</body>
-</html>
+</asp:Content>

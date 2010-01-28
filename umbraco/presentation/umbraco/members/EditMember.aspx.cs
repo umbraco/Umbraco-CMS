@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 
 using umbraco.cms.businesslogic.member;
 using System.Web.Security;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation.members
 {
@@ -36,7 +37,7 @@ namespace umbraco.cms.presentation.members
 		{
 
             // Add password changer
-            MemberPasswordTxt.Controls.Add(new UserControl().LoadControl(GlobalSettings.Path + "/controls/passwordChanger.ascx"));
+            MemberPasswordTxt.Controls.Add(new UserControl().LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx"));
 
             if (Member.InUmbracoMemberMode())
             {
@@ -192,7 +193,7 @@ namespace umbraco.cms.presentation.members
                 m_MemberShipPanel.hasMenu = true;
                 umbraco.uicontrols.MenuImageButton menuSave = m_MemberShipPanel.Menu.NewImageButton();
                 menuSave.ID = m_MemberShipPanel.ID + "_save";
-                menuSave.ImageUrl = GlobalSettings.Path + "/images/editor/save.gif";
+                menuSave.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
                 menuSave.Click += new ImageClickEventHandler(menuSave_Click);
                 menuSave.AltText = ui.Text("buttons", "save", null);
             

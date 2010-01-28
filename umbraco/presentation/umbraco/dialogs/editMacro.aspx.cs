@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Text;
 using System.IO;
 using umbraco.DataLayer;
+using umbraco.IO;
 
 
 namespace umbraco.dialogs
@@ -54,7 +55,7 @@ namespace umbraco.dialogs
                         macroType = mp.Type.Type;
                         try {
 
-                            Assembly assembly = Assembly.LoadFrom(Server.MapPath(GlobalSettings.Path + "/../bin/" + macroAssembly + ".dll"));
+                            Assembly assembly = Assembly.LoadFrom(IOHelper.MapPath(SystemDirectories.Bin + "/" + macroAssembly + ".dll"));
 
                             Type type = assembly.GetType(macroAssembly + "." + macroType);
                             interfaces.IMacroGuiRendering typeInstance = Activator.CreateInstance(type) as interfaces.IMacroGuiRendering;
@@ -133,6 +134,7 @@ namespace umbraco.dialogs
 		}
 		#endregion
 
+        /*
 		private void renderMacro_Click(object sender, EventArgs e)
 		{
 			int pageID = int.Parse(helper.Request("umbPageId"));
@@ -163,7 +165,8 @@ namespace umbraco.dialogs
 			string div = macro.renderMacroStartTag(attributes, pageID, pageVersion);
 
 			string macroContent = macro.MacroContentByHttp(pageID, pageVersion, attributes).Replace("\\", "\\\\").Replace("'", "\\'").Replace("/", "\\/");
-			if (macroContent.Length > 0 && macroContent.ToLower().IndexOf("<script") > -1)
+			
+            if (macroContent.Length > 0 && macroContent.ToLower().IndexOf("<script") > -1)
 				macroContent = "<b>Macro rendering contains script code</b><br/>This macro won\\'t be rendered in the editor because it contains script code. It will render correct during runtime.";
 			div += macroContent;
 			div += macro.renderMacroEndTag();
@@ -173,5 +176,6 @@ namespace umbraco.dialogs
 			
 
 		}
-	}
+	    */
+    }
 }

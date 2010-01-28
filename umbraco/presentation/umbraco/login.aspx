@@ -1,5 +1,4 @@
 <%@ Page Language="c#" Codebehind="login.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.login" %>
-
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register Namespace="umbraco" TagPrefix="umb" Assembly="umbraco" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
@@ -9,8 +8,6 @@
 <head runat="server">
   <title>Umbraco - login</title>
 
-
-  
   <style type="text/css">
   html {width: 100%; height: 100%;}
   body{font-size: 11px; width: 100%; font-family: Trebuchet MS, verdana, arial, Lucida Grande;

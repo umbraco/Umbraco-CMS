@@ -1,5 +1,5 @@
 <%@ Page Language="c#" Codebehind="republish.aspx.cs" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="True" Inherits="umbraco.cms.presentation.republish" %>
-<%@ Register TagPrefix="ctl" Src="../controls/ProgressBar.ascx" TagName="ProgBar"  %>
+<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
    <script type="text/javascript">
@@ -25,7 +25,7 @@
           </div>     
       
       <div id="progress" style="visibility: hidden;">
-		<ctl:ProgBar runat="server" id="ProgBar" />
+		<cc1:ProgressBar ID="progbar" runat="server" Title="Please wait..." />
       </div>
       
     </asp:Panel>

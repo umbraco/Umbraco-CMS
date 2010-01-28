@@ -11,6 +11,7 @@ using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.controls;
+using umbraco.IO;
 
 namespace umbraco.presentation.developer.packages
 {
@@ -376,7 +377,7 @@ namespace umbraco.presentation.developer.packages
 
             foreach (uicontrols.TabPage tp in TabView1.GetPanels()) {
                 ImageButton saves = tp.Menu.NewImageButton();
-                saves.ImageUrl = GlobalSettings.Path + "/images/editor/save.gif";
+                saves.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
                 saves.CommandName = "save";
                 saves.AlternateText = "Save package";
                 saves.Command += new CommandEventHandler(saveOrPublish);
@@ -385,7 +386,7 @@ namespace umbraco.presentation.developer.packages
                 tp.Style["background"] = "none !Important"; 
                 
                 ImageButton publishes = tp.Menu.NewImageButton();
-                publishes.ImageUrl = GlobalSettings.Path + "/images/editor/saveAndPublish.gif";
+                publishes.ImageUrl = SystemDirectories.Umbraco + "/images/editor/saveAndPublish.gif";
                 publishes.CommandName = "publish";
                 publishes.Command += new CommandEventHandler(saveOrPublish);
                 publishes.AlternateText = "Save and publish the package as a .umb file";

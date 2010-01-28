@@ -18,6 +18,7 @@ using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
+using umbraco.IO;
 
 namespace umbraco
 {
@@ -28,9 +29,11 @@ namespace umbraco
     {
         #region Declarations
 
-        private readonly string UmbracoXmlDiskCacheFileName = HttpRuntime.AppDomainAppPath +
-                                                              GlobalSettings.ContentXML.Replace('/', '\\').TrimStart(
-                                                                  '\\');
+        private readonly string UmbracoXmlDiskCacheFileName = IOHelper.MapPath(SystemFiles.ContentCacheXml, false);
+        /*
+            HttpRuntime.AppDomainAppPath + '\\' +  
+            SystemFiles.ContentCacheXml.Replace('/', '\\').TrimStart('\\');
+        */
 
         private readonly string XmlContextContentItemKey = "UmbracoXmlContextContent";
 

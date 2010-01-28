@@ -7,6 +7,7 @@ using System.Web;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.macro;
+using umbraco.IO;
 
 
 namespace umbraco.cms.businesslogic.packager {
@@ -14,13 +15,13 @@ namespace umbraco.cms.businesslogic.packager {
 
         public static CreatedPackage GetById(int id) {
             CreatedPackage pack = new CreatedPackage(); 
-            pack.Data = data.Package(id, HttpContext.Current.Server.MapPath(Settings.CreatedPackagesSettings));
+            pack.Data = data.Package(id, IOHelper.MapPath(Settings.CreatedPackagesSettings));
             return pack;    
         }
 
         public static CreatedPackage MakeNew(string name) {
-            CreatedPackage pack = new CreatedPackage(); 
-            pack.Data = data.MakeNew(name, HttpContext.Current.Server.MapPath(Settings.CreatedPackagesSettings));
+            CreatedPackage pack = new CreatedPackage();
+            pack.Data = data.MakeNew(name, IOHelper.MapPath(Settings.CreatedPackagesSettings));
 
             NewEventArgs e = new NewEventArgs();
             pack.OnNew(e);
@@ -33,7 +34,7 @@ namespace umbraco.cms.businesslogic.packager {
             FireBeforeSave(e);
 
             if (!e.Cancel) {
-                data.Save(this.Data, HttpContext.Current.Server.MapPath(Settings.CreatedPackagesSettings));
+                data.Save(this.Data, IOHelper.MapPath(Settings.CreatedPackagesSettings));
                 FireAfterSave(e);
             }
         }
@@ -43,7 +44,7 @@ namespace umbraco.cms.businesslogic.packager {
             FireBeforeDelete(e);
 
             if (!e.Cancel) {
-                data.Delete(this.Data.Id, HttpContext.Current.Server.MapPath(Settings.CreatedPackagesSettings));
+                data.Delete(this.Data.Id, IOHelper.MapPath(Settings.CreatedPackagesSettings));
                 FireAfterDelete(e);
             }
         }
@@ -57,7 +58,8 @@ namespace umbraco.cms.businesslogic.packager {
         public static List<CreatedPackage> GetAllCreatedPackages() {
             List<CreatedPackage> val = new List<CreatedPackage>();
 
-            foreach (PackageInstance pack in data.GetAllPackages(HttpContext.Current.Server.MapPath(Settings.CreatedPackagesSettings))) {
+            foreach (PackageInstance pack in data.GetAllPackages(IOHelper.MapPath(Settings.CreatedPackagesSettings)))
+            {
                 CreatedPackage crPack = new CreatedPackage();
                 crPack.Data = pack;
                 val.Add(crPack);
@@ -100,7 +102,7 @@ namespace umbraco.cms.businesslogic.packager {
                     int outInt = 0;
 
                     //Path checking...
-                    string localPath = HttpContext.Current.Server.MapPath(Settings.PackagesStorage + "/" + pack.Folder);
+                    string localPath = IOHelper.MapPath(Settings.PackagesStorage + "/" + pack.Folder);
 
                     if (!System.IO.Directory.Exists(localPath))
                         System.IO.Directory.CreateDirectory(localPath);
@@ -235,8 +237,9 @@ namespace umbraco.cms.businesslogic.packager {
                     _packageManifest = null;
 
 
-                    string packPath = Settings.PackagerRoot.Replace(System.IO.Path.DirectorySeparatorChar.ToString(), "/") + "/" + pack.Name.Replace(' ', '_') + "_" + pack.Version.Replace(' ', '_') + "." + Settings.PackageFileExtension;
-                    utill.ZipPackage(localPath, System.Web.HttpContext.Current.Server.MapPath(packPath));
+                    //string packPath = Settings.PackagerRoot.Replace(System.IO.Path.DirectorySeparatorChar.ToString(), "/") + "/" + pack.Name.Replace(' ', '_') + "_" + pack.Version.Replace(' ', '_') + "." + Settings.PackageFileExtension;
+                    string packPath = Settings.PackagerRoot + "/" + (pack.Name + "_" + pack.Version).Replace(' ', '_') + "." + Settings.PackageFileExtension;
+                    utill.ZipPackage(localPath, IOHelper.MapPath(packPath));
 
                     pack.PackagePath = packPath;
 

@@ -18,6 +18,7 @@ using Post=CookComputing.MetaWeblog.Post;
 
 using System.Collections.Generic;
 using System.Web.Security;
+using umbraco.IO;
 
 namespace umbraco.presentation.channels
 {
@@ -428,22 +429,19 @@ namespace umbraco.presentation.channels
                     if (UmbracoSettings.UploadAllowDirectories)
                     {
                         // Create a new folder in the /media folder with the name /media/propertyid
-                        Directory.CreateDirectory(
-                            HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../media/" + fileObject.Id));
-                        _fullFilePath =
-                            HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../media/" + fileObject.Id +
-                                                               "/" + filename);
-                        fileObject.Value = "/media/" + fileObject.Id + "/" + filename;
+                        Directory.CreateDirectory( IOHelper.MapPath( SystemDirectories.Media + "/" + fileObject.Id));
+
+                        _fullFilePath = IOHelper.MapPath( SystemDirectories.Media + "/" + fileObject.Id + "/" + filename);
+                        fileObject.Value = SystemDirectories.Media + "/" + fileObject.Id + "/" + filename;
                     }
                     else
                     {
                         filename = fileObject.Id + "-" + filename;
-                        _fullFilePath =
-                            HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../media/" + filename);
-                        fileObject.Value = "/media/" + filename;
+                        _fullFilePath = IOHelper.MapPath(SystemDirectories.Media + "/" + filename);
+                        fileObject.Value = SystemDirectories.Media + "/" + filename;
                     }
-                    fileUrl.url = "http://" + HttpContext.Current.Request.ServerVariables["SERVER_NAME"] +
-                                  fileObject.Value.ToString();
+
+                    fileUrl.url = "http://" + HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + fileObject.Value.ToString();
 
                     File.WriteAllBytes(_fullFilePath, file.bits);
 

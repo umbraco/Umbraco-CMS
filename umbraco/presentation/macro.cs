@@ -24,6 +24,7 @@ using Content = umbraco.cms.businesslogic.Content;
 using umbraco.cms.businesslogic;
 using System.Collections.Generic;
 using templateControls = umbraco.presentation.templateControls;
+using umbraco.IO;
 
 namespace umbraco
 {
@@ -55,7 +56,7 @@ namespace umbraco
         private String alias;
         private String name;
         private String xsltFile;
-        private String pythonFile;
+        private String scriptFile;
         private String scriptType;
         private String scriptAssembly;
         private Hashtable properties = new Hashtable();
@@ -120,10 +121,10 @@ namespace umbraco
             get { return xsltFile; }
         }
 
-        public String PythonFile
+        public String ScriptFile
         {
-            set { pythonFile = value; }
-            get { return pythonFile; }
+            set { scriptFile = value; }
+            get { return scriptFile; }
         }
 
         public String ScriptType
@@ -161,7 +162,8 @@ namespace umbraco
             CustomControl = 2,
             UserControl = 3,
             Unknown = 4,
-            Python = 5
+            Python = 5,
+            Script = 6
         }
 
         #endregion
@@ -214,7 +216,7 @@ namespace umbraco
                 ScriptType = tempMacro.ScriptType;
                 ScriptAssembly = tempMacro.ScriptAssembly;
                 XsltFile = tempMacro.XsltFile;
-                PythonFile = tempMacro.PythonFile;
+                scriptFile = tempMacro.ScriptFile;
                 Properties = tempMacro.Properties;
                 propertyDefinitions = tempMacro.propertyDefinitions;
                 RefreshRate = tempMacro.RefreshRate;
@@ -259,8 +261,10 @@ namespace umbraco
                             ScriptAssembly = tmpStr;
                         if (TryGetColumnString(macroDef, "macroXSLT", out tmpStr))
                             XsltFile = tmpStr;
+
                         if (TryGetColumnString(macroDef, "macroPython", out tmpStr))
-                            PythonFile = tmpStr;
+                            ScriptFile = tmpStr;
+                        
                         if (TryGetColumnString(macroDef, "macroPropertyAlias", out tmpStr))
                         {
                             string typeAlias;
@@ -282,16 +286,16 @@ namespace umbraco
                 macroType = (int) eMacroType.XSLT;
             else
             {
-                if (!string.IsNullOrEmpty(PythonFile))
-                    macroType = (int) eMacroType.Python;
+                if (!string.IsNullOrEmpty(ScriptFile))
+                    macroType = (int)eMacroType.Script;
                 else
                 {
                     if (!string.IsNullOrEmpty(ScriptType) && ScriptType.ToLower().IndexOf(".ascx") > -1)
                     {
-                        macroType = (int) eMacroType.UserControl;
+                        macroType = (int)eMacroType.UserControl;
                     }
                     else if (!string.IsNullOrEmpty(ScriptType) && !string.IsNullOrEmpty(ScriptAssembly))
-                        macroType = (int) eMacroType.CustomControl;
+                        macroType = (int)eMacroType.CustomControl;
                 }
             }
             if (macroType.ToString() == string.Empty)
@@ -455,21 +459,36 @@ namespace umbraco
                     case (int) eMacroType.XSLT:
                         macroHtml = loadMacroXSLT(this, attributes, pageElements);
                         break;
-                    case (int) eMacroType.Python:
+                    case (int) eMacroType.Script:
                         try
                         {
-                            HttpContext.Current.Trace.Write("umbracoMacro", "Python script added (" + scriptType + ")");
-                            macroHtml = loadMacroPython(this, attributes, pageElements);
+                            HttpContext.Current.Trace.Write("umbracoMacro", "DLR Script script added (" + ScriptFile + ")");
+                            macroHtml = loadMacroDLR(this, attributes, pageElements);
                             break;
                         }
                         catch (Exception e)
                         {
                             HttpContext.Current.Trace.Warn("umbracoMacro",
-                                                           "Error loading python script (file: " + PythonFile +
+                                                           "Error loading python script (file: " + ScriptFile +
                                                            ", Type: '" + scriptType + "'", e);
-                            macroHtml =
-                                new LiteralControl("Error loading python script (file: " + PythonFile + ", Type: '" +
-                                                   scriptType + "'");
+
+                            LiteralControl result = new LiteralControl("Error loading DLR script (file: " + ScriptFile + ")");
+
+                            /*
+                            string args = "<ul>";
+                            foreach(object key in attributes.Keys)
+                                args += "<li><strong>" + key.ToString() + ": </strong> " + attributes[key] + "</li>";
+
+                            foreach (object key in pageElements.Keys)
+                                args += "<li><strong>" + key.ToString() + ": </strong> " + pageElements[key] + "</li>";
+
+                            args += "</ul>";
+
+                            result.Text += args;
+                            */
+
+                            macroHtml = result;
+
                             break;
                         }
                     default:
@@ -503,14 +522,13 @@ namespace umbraco
             else
             {
                 XmlTextReader xslReader =
-                    new XmlTextReader(HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../xslt/" + XsltFile));
+                    new XmlTextReader( IOHelper.MapPath(SystemDirectories.Xslt + "/" + XsltFile));
 
                 XslCompiledTransform macroXSLT = CreateXsltTransform(xslReader, umbraco.GlobalSettings.DebugMode);
                 HttpRuntime.Cache.Insert(
                     "macroXslt_" + XsltFile,
                     macroXSLT,
-                    new CacheDependency(
-                        HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../xslt/" + XsltFile)));
+                    new CacheDependency( IOHelper.MapPath(SystemDirectories.Xslt + "/" + XsltFile) ));
                 return macroXSLT;
             }
         }
@@ -541,10 +559,21 @@ namespace umbraco
                 HttpRuntime.Cache.Remove("macroXslt_" + XsltFile);
         }
 
+        private Hashtable keysToLowerCase(Hashtable input)
+        {
+            Hashtable retval = new Hashtable();
+            foreach (object key in input.Keys)
+                retval.Add(key.ToString().ToLower(), input[key]);
+
+            return retval;
+        }
         public Control loadMacroXSLT(macro macro, Hashtable attributes, Hashtable pageElements)
         {
             if (XsltFile.Trim() != string.Empty)
             {
+                //get attributes in lowercase...
+                attributes = keysToLowerCase(keysToLowerCase(attributes));
+
                 // Get main XML
                 XmlDocument umbracoXML = content.Instance.XmlContent;
 
@@ -581,7 +610,6 @@ namespace umbraco
                 {
                     try
                     {
-                        //					macroControl.TransformSource = GlobalSettings.Path + "/../xslt/"+this.XsltFile;
                         XslCompiledTransform xsltFile = getXslt(XsltFile);
 
                         try
@@ -721,7 +749,7 @@ namespace umbraco
 
             // Load the XSLT extensions configuration
             XmlDocument xsltExt = new XmlDocument();
-            xsltExt.Load(HttpContext.Current.Server.MapPath(GlobalSettings.Path + "/../config/xsltExtensions.config"));
+            xsltExt.Load( IOHelper.MapPath(SystemDirectories.Config + "/xsltExtensions.config"));
 
             // add all descendants of the XsltExtensions element
             foreach (XmlNode xsltEx in xsltExt.SelectSingleNode("/XsltExtensions"))
@@ -733,9 +761,8 @@ namespace umbraco
                     Debug.Assert(xsltEx.Attributes["alias"] != null, "Extension attribute 'alias' not specified.");
 
                     // load the extension assembly
-                    string extensionFile = HttpContext.Current.Server.MapPath(String.Format("{0}/..{1}.dll",
-                                                                              GlobalSettings.Path,
-                                                                              xsltEx.Attributes["assembly"].Value));
+                    string extensionFile = IOHelper.MapPath( string.Format("{0}/{1}.dll",SystemDirectories.Bin,xsltEx.Attributes["assembly"].Value));
+                    
                     Assembly extensionAssembly;
                     try
                     {
@@ -965,7 +992,7 @@ namespace umbraco
                     }
                 }
 
-                if (string.IsNullOrEmpty(macro.PythonFile))
+                if (string.IsNullOrEmpty(macro.ScriptFile))
                 {
                     ret.Text = string.Empty;
                 }
@@ -973,9 +1000,7 @@ namespace umbraco
                 {
                     // Execute the script and set the text of our LiteralControl with the returned
                     // result of our script.
-                    string path = HttpContext.Current.Server.MapPath(
-                        string.Format("{0}\\..\\python\\{1}",
-                                      GlobalSettings.Path, macro.PythonFile));
+                    string path = IOHelper.MapPath(SystemDirectories.Python + "/" + macro.scriptFile);
                     object res = python.executeFile(path);
                     ret.Text = res.ToString();
                 }
@@ -994,6 +1019,45 @@ namespace umbraco
                 }
                 ret.Text += "</div>";
             }
+            return ret;
+        }
+
+
+        public Control loadMacroDLR(macro macro, Hashtable attributes, Hashtable pageElements)
+        {
+            LiteralControl ret = new LiteralControl();
+            Hashtable args = new Hashtable();
+
+            foreach (DictionaryEntry macroDef in macro.properties)
+            {
+                try
+                {
+                    args.Add(macroDef.Key.ToString(), helper.FindAttribute(pageElements, attributes, macroDef.Key.ToString()));
+                }
+                catch (Exception e)
+                {
+                    HttpContext.Current.Trace.Warn("umbracoMacro","Could not add global variable (" + macroDef.Key + ") to DLR enviroment", e);
+                }
+            }
+
+            foreach (DictionaryEntry pageVal in pageElements)
+            {
+                try
+                {
+                    args.Add(pageVal.Key.ToString(), pageVal.Value);
+                }
+                catch (Exception e)
+                {
+                    HttpContext.Current.Trace.Warn("umbracoMacro", "Could not add page value (" + pageVal.Key + ") to DLR enviroment", e);
+                }
+            }
+
+            
+            args.Add("currentPage", umbraco.presentation.nodeFactory.Node.GetCurrent());
+
+            string path = IOHelper.MapPath(SystemDirectories.Python + "/" + macro.scriptFile);
+            ret.Text = MacroScript.ExecuteFile(path, args);
+
             return ret;
         }
 
@@ -1023,18 +1087,19 @@ namespace umbraco
             Assembly asm;
             try
             {
-                string currentAss = Server.MapPath(string.Format("{0}/../bin/{1}.dll",
-                                                                 GlobalSettings.Path, fileName));
+                string currentAss = IOHelper.MapPath(string.Format("{0}/{1}.dll", SystemDirectories.Bin, fileName));
+                
                 if (!File.Exists(currentAss))
                     return new LiteralControl("Unable to load user control because is does not exist: " + fileName);
                 asm = Assembly.LoadFrom(currentAss);
+                
                 if (HttpContext.Current != null)
                     HttpContext.Current.Trace.Write("umbracoMacro", "Assembly file " + currentAss + " LOADED!!");
             }
             catch
             {
                 throw new ArgumentException(string.Format("ASSEMBLY NOT LOADED PATH: {0} NOT FOUND!!",
-                                                          Server.MapPath(GlobalSettings.Path + "/../bin/" + fileName +
+                                                          IOHelper.MapPath(SystemDirectories.Bin + "/" + fileName +
                                                                          ".dll")));
             }
 
@@ -1128,7 +1193,7 @@ namespace umbraco
             {
                 string userControlPath = @"~/" + fileName;
 
-                if (!File.Exists(HttpContext.Current.Server.MapPath(userControlPath)))
+                if (!File.Exists(IOHelper.MapPath(userControlPath)))
                     return new LiteralControl(string.Format("UserControl {0} does not exist.", fileName));
 
                 UserControl oControl = (UserControl) new UserControl().LoadControl(userControlPath);
@@ -1333,7 +1398,7 @@ namespace umbraco
                 // Create a new 'HttpWebRequest' Object to the mentioned URL.
                 string retVal = string.Empty;
                 string url = "http://" + HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" +
-                             HttpContext.Current.Request.ServerVariables["SERVER_PORT"] + GlobalSettings.Path +
+                             HttpContext.Current.Request.ServerVariables["SERVER_PORT"] + SystemDirectories.Umbraco +
                              "/macroResultWrapper.aspx?" +
                              querystring;
 

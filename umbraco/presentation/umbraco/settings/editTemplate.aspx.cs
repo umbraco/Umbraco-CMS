@@ -10,6 +10,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
+using umbraco.IO;
 
 
 namespace umbraco.cms.presentation.settings
@@ -24,8 +25,8 @@ namespace umbraco.cms.presentation.settings
         protected override void OnPreRender(EventArgs e) {
             base.OnPreRender(e);
 
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/codeEditorSave.asmx"));
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference( IOHelper.ResolveUrl( SystemDirectories.Webservices + "/codeEditorSave.asmx") ));
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference( IOHelper.ResolveUrl( SystemDirectories.Webservices + "/legacyAjaxCalls.asmx") ));
         }
 
 
@@ -81,7 +82,7 @@ namespace umbraco.cms.presentation.settings
 			Panel1.hasMenu = true;
 
             uicontrols.MenuIconI save = Panel1.Menu.NewIcon();
-            save.ImageURL = GlobalSettings.Path + "/images/editor/save.gif";
+            save.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
             save.OnClickCommand = "doSubmit()";
             save.AltText = ui.Text("save");
 	
@@ -99,7 +100,7 @@ namespace umbraco.cms.presentation.settings
 
             // TODO: Update icon
             uicontrols.MenuIconI umbDictionary = Panel1.Menu.NewIcon();
-            umbDictionary.ImageURL = GlobalSettings.Path + "/images/editor/dictionaryItem.gif";
+            umbDictionary.ImageURL = SystemDirectories.Umbraco + "/images/editor/dictionaryItem.gif";
             umbDictionary.OnClickCommand = "top.openModal('dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY', '" + ui.Text("template", "insertDictionaryItem") + "', 590, 640);";
             //umbDictionary.OnClickCommand = "umbracoInsertField(document.forms[0].TemplateBody, 'umbracoField', 'UMBRACOGETDICTIONARY','felt', 640, 650, 'dialogs/');";
             //umbDictionary.OnClickCommand = "top.openModal('dialogs/editMacro.aspx?objectId=" + editorSource.ClientID + "', 'Insert dictionary item', 550, 470);";

@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.Net;
 using System.Web.UI;
+using umbraco.IO;
 
 
 namespace umbraco.presentation.webservices
@@ -162,7 +163,7 @@ namespace umbraco.presentation.webservices
         private string saveXslt(string fileName, string fileContents, bool ignoreDebugging)
         {
             StreamWriter SW;
-            string tempFileName = Server.MapPath(GlobalSettings.Path + "/../xslt/" + System.DateTime.Now.Ticks + "_temp.xslt");
+            string tempFileName = IOHelper.MapPath(SystemDirectories.Xslt + "/" + System.DateTime.Now.Ticks + "_temp.xslt");
             SW = File.CreateText(tempFileName);
             SW.Write(fileContents);
             SW.Close();
@@ -270,9 +271,9 @@ namespace umbraco.presentation.webservices
             if (errorMessage == "" && fileName.ToLower().EndsWith(".xslt"))
             {
                 //Hardcoded security-check... only allow saving files in xslt directory... 
-                string savePath = Server.MapPath(GlobalSettings.Path + "/../xslt/" + fileName);
+                string savePath = IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName);
 
-                if (savePath.StartsWith(Server.MapPath(GlobalSettings.Path + "/../xslt/")))
+                if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Xslt)))
                 {
                     SW = File.CreateText(savePath);
                     SW.Write(fileContents);
@@ -304,13 +305,13 @@ namespace umbraco.presentation.webservices
             string returnValue = "false";
             try
             {
-                string savePath = Server.MapPath(UmbracoSettings.ScriptFolderPath + "/" + filename);
+                string savePath = IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename);
 
                 //Directory check.. only allow files in script dir and below to be edited
-                if (savePath.StartsWith(Server.MapPath(UmbracoSettings.ScriptFolderPath + "/")))
+                if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Scripts + "/")))
                 {
                     StreamWriter SW;
-                    SW = File.CreateText(Server.MapPath(UmbracoSettings.ScriptFolderPath + "/" + filename));
+                    SW = File.CreateText(IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename));
                     SW.Write(val);
                     SW.Close();
                     returnValue = "true";

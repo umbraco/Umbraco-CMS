@@ -10,6 +10,7 @@ using umbraco.BasePages;
 using umbraco.uicontrols;
 using System.Net;
 using umbraco.cms.presentation.Trees;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -47,15 +48,14 @@ namespace umbraco.cms.presentation.developer
 
 
             uicontrols.MenuIconI save = UmbracoPanel1.Menu.NewIcon();
-            save.ImageURL = GlobalSettings.Path + "/images/editor/save.gif";
+            save.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
             save.OnClickCommand = "doSubmit()";
             save.AltText = "Save Xslt File";
-
 
             UmbracoPanel1.Menu.InsertSplitter();
            
             uicontrols.MenuIconI tmp = UmbracoPanel1.Menu.NewIcon();
-            tmp.ImageURL = GlobalSettings.Path + "/images/editor/insField.GIF";
+            tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/insField.GIF";
             tmp.OnClickCommand = "top.openModal('developer/xslt/xsltinsertvalueof.aspx?objectId=" + editorSource.ClientID + "', 'Insert value', 250, 750);";
                 //"umbracoInsertField(document.getElementById('editorSource'), 'xsltInsertValueOf', '','felt', 750, 230, '');";
             tmp.AltText = "Insert xslt:value-of";
@@ -63,33 +63,33 @@ namespace umbraco.cms.presentation.developer
             UmbracoPanel1.Menu.InsertSplitter();
 
             tmp = UmbracoPanel1.Menu.NewIcon();
-            tmp.ImageURL = GlobalSettings.Path + "/images/editor/insMemberItem.GIF";
+            tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/insMemberItem.GIF";
             tmp.OnClickCommand = "UmbEditor.Insert('<xsl:variable name=\"\" select=\"', '\"/>\\n', '" + editorSource.ClientID + "'); return false;";
             tmp.AltText = "Insert xsl:variable";
 
             UmbracoPanel1.Menu.InsertSplitter();
 
             tmp = UmbracoPanel1.Menu.NewIcon();
-            tmp.ImageURL = GlobalSettings.Path + "/images/editor/insChildTemplateNew.GIF";
+            tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/insChildTemplateNew.GIF";
             tmp.OnClickCommand = "UmbEditor.Insert('<xsl:if test=\"CONDITION\">\\n', '\\n</xsl:if>\\n', '" + editorSource.ClientID + "'); return false;";
             tmp.AltText = "Insert xsl:if";
 
             tmp = UmbracoPanel1.Menu.NewIcon();
-            tmp.ImageURL = GlobalSettings.Path + "/images/editor/insChildTemplateNew.GIF";
+            tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/insChildTemplateNew.GIF";
             tmp.OnClickCommand = "UmbEditor.Insert('<xsl:for-each select=\"QUERY\">\\n', '\\n</xsl:for-each>\\n', '" + editorSource.ClientID + "'); return false;";
             tmp.AltText = "Insert xsl:for-each";
 
             UmbracoPanel1.Menu.InsertSplitter();
 
             tmp = UmbracoPanel1.Menu.NewIcon();
-            tmp.ImageURL = GlobalSettings.Path + "/images/editor/insFieldByLevel.GIF";
+            tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/insFieldByLevel.GIF";
             tmp.OnClickCommand = "UmbEditor.Insert('<xsl:choose>\\n<xsl:when test=\"CONDITION\">\\n', '\\n</xsl:when>\\n<xsl:otherwise>\\n</xsl:otherwise>\\n</xsl:choose>\\n', '" + editorSource.ClientID + "'); return false;";
             tmp.AltText = "Insert xsl:choose";
 
             UmbracoPanel1.Menu.InsertSplitter();
 
             tmp = UmbracoPanel1.Menu.NewIcon();
-            tmp.ImageURL = GlobalSettings.Path + "/images/editor/xslVisualize.GIF";
+            tmp.ImageURL = SystemDirectories.Umbraco + "/images/editor/xslVisualize.GIF";
             tmp.OnClickCommand = "xsltVisualize();";
             tmp.AltText = "Visualize XSLT";
 
@@ -104,7 +104,7 @@ namespace umbraco.cms.presentation.developer
 
                 StreamReader SR;
                 string S;
-                SR = File.OpenText(Server.MapPath(GlobalSettings.Path + "/../xslt/" + file));
+                SR = File.OpenText( IOHelper.MapPath(SystemDirectories.Xslt +"/" + file) );
 
                 S = SR.ReadToEnd();
                 SR.Close();
@@ -118,8 +118,8 @@ namespace umbraco.cms.presentation.developer
         protected override void OnPreRender(EventArgs e) {
             base.OnPreRender(e);
 
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/codeEditorSave.asmx"));
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference( IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/codeEditorSave.asmx"));
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference( IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/legacyAjaxCalls.asmx"));
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 <%@ Page Language="C#" MasterPageFile="../../masterpages/umbracoPage.Master" AutoEventWireup="true" CodeBehind="installedPackage.aspx.cs" Inherits="umbraco.presentation.developer.packages.installedPackage" %>
 <%@ Register TagPrefix="cc2" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<%@ Register TagPrefix="ctl" Src="../../controls/ProgressBar.ascx" TagName="ProgBar"  %>
+
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
   <script type="text/javascript">
@@ -142,9 +142,10 @@
           <cc2:PropertyPanel ID="pp_confirm" runat="server" Text="&nbsp;">
           <p>
               <span id="buttons"><asp:Button ID="bt_confirmUninstall" OnClick="confirmUnInstall" Text="Confirm uninstall" runat="server" /> <em><%= umbraco.ui.Text("or") %></em> <a href="#" onclick="toggleDiv('uInstallDiv', true); return false;"><%= umbraco.ui.Text("cancel") %></a></span>
+              
               <span id="loadingbar" style="display: none;">
-				<ctl:ProgBar runat="server" id="ProgBar" />
-			</span>
+				<cc2:ProgressBar ID="progbar" runat="server" Title="Please wait..." />
+			  </span>
           </p>
           
           </cc2:PropertyPanel>

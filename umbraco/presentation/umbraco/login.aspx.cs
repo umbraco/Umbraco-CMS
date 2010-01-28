@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.BusinessLogic;
 using System.Web.Security;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation
 {
@@ -93,7 +94,7 @@ namespace umbraco.cms.presentation
                             throw new Exception("There's currently no content to edit. Please contact your system administrator");
                         }
                     }
-                    string redir = String.Format("{0}/canvas.aspx?redir=/{1}.aspx", GlobalSettings.Path, startNode);
+                    string redir = String.Format("{0}/canvas.aspx?redir=/{1}.aspx", SystemDirectories.Umbraco, startNode);
                     Response.Redirect(redir, true);
                 }
 

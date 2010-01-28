@@ -16,6 +16,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.macro;
 using runtimeMacro = umbraco.macro;
 using System.Xml;
+using umbraco.IO;
 
 namespace umbraco.presentation.developer.packages
 {
@@ -137,7 +138,8 @@ namespace umbraco.presentation.developer.packages
                             try
                             {
                                 Macro m = new Macro(tId);
-                                if (m != null && m.Properties != null)
+
+                                if (m != null && !string.IsNullOrEmpty(m.Name))
                                 { //Macros need an extra check to see if they actually exists. For some reason the macro does not return null, if the id is not found... 
                                     ListItem li = new ListItem(m.Name, m.Id.ToString());
                                     li.Selected = true;
@@ -161,8 +163,8 @@ namespace umbraco.presentation.developer.packages
                     {
                         try
                         {
-
-                            if (!String.IsNullOrEmpty(str) && System.IO.File.Exists(Server.MapPath(str)))
+                            
+                            if (!String.IsNullOrEmpty(str) && System.IO.File.Exists( IOHelper.MapPath(str) ))
                             {
                                 ListItem li = new ListItem(str, str);
                                 li.Selected = true;
@@ -435,20 +437,23 @@ namespace umbraco.presentation.developer.packages
                             // remove from cache
                             new runtimeMacro(s.Id).removeFromCache();
                             s.Delete();
-                            pack.Data.Macros.Remove(nId.ToString());
-
                         }
+
+                        pack.Data.Macros.Remove(nId.ToString());
                     }
                 }
             }
 
             //Remove files
-
             foreach (ListItem li in files.Items)
             {
                 if (li.Selected)
                 {
-                    string filePath = HttpContext.Current.Server.MapPath("/" + li.Value.Trim('/'));
+                    //here we need to try to find the file in question as most packages does not support the tilde char
+
+                    string file = IOHelper.FindFile(li.Value);
+
+                    string filePath = IOHelper.MapPath(file);
                     if (System.IO.File.Exists(filePath))
                     {
                         System.IO.File.Delete(filePath);

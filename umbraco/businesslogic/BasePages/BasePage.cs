@@ -4,6 +4,7 @@ using System.Web;
 
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
+using umbraco.IO;
 
 namespace umbraco.BasePages {
     /// <summary>
@@ -24,7 +25,7 @@ namespace umbraco.BasePages {
         /// <summary>
         /// The path to the umbraco root folder
         /// </summary>
-        protected string UmbracoPath = GlobalSettings.Path;
+        protected string UmbracoPath = SystemDirectories.Umbraco;
 
         /// <summary>
         /// The current user ID

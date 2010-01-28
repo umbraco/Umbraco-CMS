@@ -9,6 +9,7 @@ using System.Web.Script.Serialization;
 using System.Text;
 using umbraco.businesslogic.Utils;
 using umbraco.BasePages;
+using umbraco.IO;
 
 namespace umbraco.cms.presentation.Trees
 {
@@ -652,7 +653,7 @@ namespace umbraco.cms.presentation.Trees
 		/// <summary>
 		/// A reference path to where the icons are actually stored as compared to where the tree themes folder is
 		/// </summary>
-		private static string IconPath = "../../../umbraco/images/umbraco/";
+		private static string IconPath = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/images/umbraco/";
 
 		/// <summary>
 		/// Not implemented as we never need to Deserialize
