@@ -1102,6 +1102,11 @@ namespace umbraco.cms.businesslogic.web
 				x.Attributes.Append(addAttribute(xd, "nodeTypeAlias", ContentType.Alias));
             x.Attributes.Append(addAttribute(xd, "path", Path));
 
+            if (!UmbracoSettings.UseLegacyXmlSchema)
+            {
+                x.Attributes.Append(addAttribute(xd, "isDoc", ""));
+            }
+
             if (Deep)
             {
                 //store children array here because iterating over an Array object is very inneficient.

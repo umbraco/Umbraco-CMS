@@ -96,13 +96,14 @@ namespace umbraco.presentation.webservices
                     try
                     {
                         // Check if there's any documents yet
-                        if (content.Instance.XmlContent.SelectNodes("/root/node").Count > 0)
+                        string xpath = UmbracoSettings.UseLegacyXmlSchema ? "/root/node" : "/root/*";
+                        if (content.Instance.XmlContent.SelectNodes(xpath).Count > 0)
                         {
                             XmlDocument macroXML = new XmlDocument();
                             macroXML.LoadXml("<macro/>");
 
                             XslCompiledTransform macroXSLT = new XslCompiledTransform();
-                            page umbPage = new page(content.Instance.XmlContent.SelectSingleNode("//node [@parentID = -1]"));
+                            page umbPage = new page(content.Instance.XmlContent.SelectSingleNode("//* [@parentID = -1]"));
 
                             XsltArgumentList xslArgs;
                             xslArgs = macro.AddMacroXsltExtensions();
