@@ -11,6 +11,8 @@ namespace umbraco.IO
 {
     public class IOHelper
     {
+        private static string m_rootDir = "";
+
         public static char DirSepChar
         {
             get
@@ -54,7 +56,8 @@ namespace umbraco.IO
             }
             else
             {   
-                string _root = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath.TrimEnd(IOHelper.DirSepChar);
+                string _root = (!String.IsNullOrEmpty(System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath)) ? System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath.TrimEnd(IOHelper.DirSepChar) : getRootDirectorySafe();
+
                 string _path = path.TrimStart('~','/').Replace('/', IOHelper.DirSepChar);
 
                 string retval = _root + IOHelper.DirSepChar.ToString() + _path;
@@ -85,6 +88,26 @@ namespace umbraco.IO
             return returnPath(settingsKey, standardPath, false);
 
         }
+
+        /// <summary>
+        /// Returns the path to the root of the application, by getting the path to where the assembly where this
+        /// method is included is present, then traversing until it's past the /bin directory. Ie. this makes it work
+        /// even if the assembly is in a /bin/debug or /bin/release folder
+        /// </summary>
+        /// <returns></returns>
+        private static string getRootDirectorySafe() {
+            if (!String.IsNullOrEmpty(m_rootDir))
+            {
+                return m_rootDir;
+            }
+
+            string baseDirectory =
+                System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase.Substring(8));
+            m_rootDir = baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin")-1);
+
+            return m_rootDir;
+
+       }
 
     }
 }
