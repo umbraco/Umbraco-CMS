@@ -50,3 +50,16 @@ FireBeforeAddToIndex, AfterAddToIndex, FireAfterAddToIndex, Document.Index
 * Removed /umbraco/reindex.aspx
 
 * Removed /umbraco/dialogs/editImage.aspx since it didn't do anything at all
+
+* MediaPicker has been completely overhauled in regards to the JavaScript implementation and should now work in live editing mode
+ 
+* /umbraco/plugins/tinymce3/insertImage.aspx has been overhauled to use the tree control, image viewer control and upload media image control
+
+* /umbraco/treeInit.aspx has been marked obsolete
+** All pages that used to use TreeInit now use TreeControl (except for Legacy project)
+* /umbraco/dialog/treePicker.aspx has been marked obsolete
+* /umbraco/dialog/uploadImage.aspx has been marked obsolete
+* /umbraco/dialog/imageViewer.aspx has been marked obsolete
+
+* subModal library moved to legacy and no longer used
+* JavaScript Modal window framework overhauled and replaced

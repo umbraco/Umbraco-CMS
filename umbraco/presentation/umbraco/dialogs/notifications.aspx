@@ -18,7 +18,7 @@
 <asp:Panel ID="pl_buttons" runat="server">
 <br />
 <asp:Button ID="Button1" runat="server" Text="" OnClick="Button1_Click"></asp:Button>
-&nbsp; <em><%= umbraco.ui.Text("or") %></em> &nbsp;<a href="#" style="color: blue"  onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("cancel")%></a>      
+&nbsp; <em><%= umbraco.ui.Text("or") %></em> &nbsp;<a href="#" style="color: blue"  onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>      
 </asp:Panel>
 
 </asp:Content>

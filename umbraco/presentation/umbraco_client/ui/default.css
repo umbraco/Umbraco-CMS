@@ -551,9 +551,15 @@ guiEditor {
 
 
 .sprTree {
-   background-color: #fff;
+   /*background-color: #fff;*/
    background-image: url(../../umbraco/images/umbraco/sprites.png);
    display: inline;
    padding-bottom: 2px;
 }
 .sprTree img{width: 16px; height: 18px; padding-right: 7px;}
+
+.treeContainer 
+{
+	padding:5px;
+	background-color:White;
+}

@@ -97,6 +97,12 @@ namespace umbraco.cms.presentation.Trees
 			}
 		}
 
+        /// <summary>
+        /// Override the render js so no duplicate js is rendered.
+        /// </summary>
+        /// <param name="Javascript"></param>
+        public override void RenderJS(ref StringBuilder Javascript) { }
+
         ///// <summary>
         ///// Returns the tree service url to render the tree. Ensures that IsRecycleBin is flagged.
         ///// </summary>

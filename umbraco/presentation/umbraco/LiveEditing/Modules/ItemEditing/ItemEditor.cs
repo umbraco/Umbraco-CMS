@@ -21,8 +21,9 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
     /// Control that wraps the editor control to edit a field in Live Editing mode.
     /// </summary>
     [ClientDependency(1, ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient")]
-	[ClientDependency(21, ClientDependencyType.Javascript, "LiveEditing/Modules/ItemEditing/ItemEditing.js", "UmbracoRoot", InvokeJavascriptMethodOnLoad = "initializeGlobalItemEditing")]
-	[ClientDependency(21, ClientDependencyType.Javascript, "tinymce3/tiny_mce_src.js", "UmbracoClient")] //For TinyMCE to work in LiveEdit, we need to ensure that this script is run before it loads...
+	[ClientDependency(21, ClientDependencyType.Javascript, "LiveEditing/Modules/ItemEditing/ItemEditing.js", "UmbracoRoot")]
+	[ClientDependency(22, ClientDependencyType.Javascript, "LiveEditing/Modules/ItemEditing/ItemEditingInvoke.js", "UmbracoRoot")]
+	[ClientDependency(23, ClientDependencyType.Javascript, "tinymce3/tiny_mce_src.js", "UmbracoClient")] //For TinyMCE to work in LiveEdit, we need to ensure that this script is run before it loads...
     public class ItemEditor : UpdatePanel
     {
         #region Protected Constants

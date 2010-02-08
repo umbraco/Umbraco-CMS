@@ -67,7 +67,7 @@
 
 		    UmbClientMgr.contentFrame().UmbEditor.Insert(tagString, '', '<%=umbraco.helper.Request("objectId")%>');
 		  	
-		  UmbClientMgr.mainWindow().closeModal();
+		  UmbClientMgr.closeModalWindow();
 		}
 		
 	var functionsFrame = this;
@@ -169,6 +169,6 @@
     <br />     
      <input type="button" name="gem" value=" <%=umbraco.ui.Text("insert")%> " onclick="doSubmit()">
      &nbsp; <em> or </em> &nbsp;
-     <a href="#" style="color: blue"  onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+     <a href="#" style="color: blue"  onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
      
 </asp:Content>

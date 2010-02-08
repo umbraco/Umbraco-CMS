@@ -45,7 +45,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 //bind the nodeClicked event
                 var _this = this;
-                this._tree.UmbracoTreeAPI().addEventHandler("nodeClicked", function(e, n) { _this.treeNodeChecked(e, n) });
+                var api = this._tree.UmbracoTreeAPI();
+                api.addEventHandler("nodeClicked", function(e, n) { _this.treeNodeChecked(e, n) });
             },
 
             //public methods

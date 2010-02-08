@@ -42,7 +42,7 @@
 	  function chooseRegex(regex) {
 		var target = top.right.document.getElementById('<%= Request.QueryString["target"] %>');
 		target.value = regex;
-		UmbClientMgr.mainWindow().closeModal(); 
+		UmbClientMgr.closeModalWindow(); 
 	}
   </script>
     

@@ -13,5 +13,5 @@
 <div style="MARGIN-TOP: 15px;">
 <asp:Button id="sbmt" Runat="server" style="MARGIN-TOP: 14px" Width="90" onclick="sbmt_Click"></asp:Button>
 <em> or </em>
-<a href="#" style="color: Blue; margin-left: 6px;" onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("cancel")%></a>
+<a href="#" style="color: Blue; margin-left: 6px;" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
 </div>

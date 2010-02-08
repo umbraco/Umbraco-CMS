@@ -19,7 +19,7 @@
 <div style="margin-right: 15px;">
 	<asp:Button id="sbmt" Runat="server" style="Width: 90px; margin-right: 6px;" onclick="sbmt_Click"></asp:Button>
 	<em> or </em>  
-	<a href="#" style="color: Blue; margin-left: 6px;" onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("cancel")%></a>
+	<a href="#" style="color: Blue; margin-left: 6px;" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
 	
 	<!--
 	 <input type="button" value="" onClick="if (confirm('<%=umbraco.ui.Text("areyousure")%>')) window.close()" style="width: 90px; margin-left: 6px;"/>

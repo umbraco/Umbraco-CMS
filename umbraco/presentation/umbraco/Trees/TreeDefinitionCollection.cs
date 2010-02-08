@@ -141,7 +141,7 @@ namespace umbraco.cms.presentation.Trees
             if (this.Count > 0)
                 return;
 
-            List<Type> foundITrees = TypeFinder.FindClassesOfType<ITree>(true);
+            List<Type> foundITrees = TypeFinder.FindClassesOfType<ITree>();
 
             ApplicationTree[] objTrees = ApplicationTree.getAll();
             List<ApplicationTree> appTrees = new List<ApplicationTree>();

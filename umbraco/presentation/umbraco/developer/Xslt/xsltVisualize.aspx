@@ -8,12 +8,14 @@
     <script type="text/javascript">
 
         jQuery(document).ready(function() {
-            if (jQuery("#ctl00_body_xsltSelection").val() == '') {
-                jQuery("#ctl00_body_xsltSelection").val(parent.top.right.xsltSnippet);
+            var xsltSelection = jQuery("#<%=xsltSelection.ClientID %>");
+            if (xsltSelection.val() == '') {
+                xsltSelection.val(UmbClientMgr.contentFrame().xsltSnippet);
 
                 // automatically submit if page is chosen
-                if (jQuery("#ctl00_body_contentPicker").val() != '') {
-                    jQuery("#ctl00_body_visualizeDo").click();
+                var picker = Umbraco.Controls.TreePicker.GetPickerById('<%=contentPicker.ClientID%>');
+                if (picker.GetValue() != '') {
+                    jQuery("#<%=visualizeDo.ClientID %>").click();
                 }
             }
         });

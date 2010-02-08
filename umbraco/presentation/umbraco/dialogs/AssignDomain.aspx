@@ -43,6 +43,6 @@
     </cc1:Pane>
     
     <p>
-      <a href="#" onclick="UmbClientMgr.mainWindow().closeModal()"><%= umbraco.ui.Text("defaultdialogs", "closeThisWindow")%></a>
+      <a href="#" onclick="UmbClientMgr.closeModalWindow()"><%= umbraco.ui.Text("defaultdialogs", "closeThisWindow")%></a>
     </p>
 </asp:Content>

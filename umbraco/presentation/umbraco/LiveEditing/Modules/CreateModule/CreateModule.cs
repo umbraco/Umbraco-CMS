@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using AjaxControlToolkit;
+//using AjaxControlToolkit;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.LiveEditing.Controls;
 using Content = umbraco.cms.businesslogic.Content;
@@ -18,7 +18,7 @@ namespace umbraco.presentation.LiveEditing.Modules.CreateModule
         protected ImageButton m_CreateButton = new ImageButton();
 
         protected Panel m_CreateModal = new Panel();
-        protected ModalPopupExtender m_CreateModalExtender = new ModalPopupExtender();
+        //protected ModalPopupExtender m_CreateModalExtender = new ModalPopupExtender();
 
         protected TextBox m_NameTextBox = new TextBox();
         protected DropDownList m_AllowedDocTypesDropdown = new DropDownList();
@@ -75,14 +75,14 @@ namespace umbraco.presentation.LiveEditing.Modules.CreateModule
             m_CancelCreateButton.Text = "Cancel";
             m_CancelCreateButton.CssClass = "modalbuton";
 
-            Controls.Add(m_CreateModalExtender);
-            m_CreateModalExtender.ID = "ModalCreate";
-            m_CreateModalExtender.TargetControlID = m_CreateButton.ID;
-            m_CreateModalExtender.PopupControlID = m_CreateModal.ID;
-            m_CreateModalExtender.BackgroundCssClass = "modalBackground";
-            m_CreateModalExtender.OkControlID = m_ConfirmCreateButton.ID;
-            m_CreateModalExtender.CancelControlID = m_CancelCreateButton.ID;
-            m_CreateModalExtender.OnOkScript = string.Format("CreateModuleOk()");
+            //Controls.Add(m_CreateModalExtender);
+            //m_CreateModalExtender.ID = "ModalCreate";
+            //m_CreateModalExtender.TargetControlID = m_CreateButton.ID;
+            //m_CreateModalExtender.PopupControlID = m_CreateModal.ID;
+            //m_CreateModalExtender.BackgroundCssClass = "modalBackground";
+            //m_CreateModalExtender.OkControlID = m_ConfirmCreateButton.ID;
+            //m_CreateModalExtender.CancelControlID = m_CancelCreateButton.ID;
+            //m_CreateModalExtender.OnOkScript = string.Format("CreateModuleOk()");
 
             m_CreateModal.Controls.Add(new LiteralControl("</div>"));
 

@@ -8,6 +8,6 @@
 	<body style="padding: 10px;">
 		<h3><img src="../images/publish.gif" alt="Republish" align="absmiddle" style="float:left; margin-top: 3px; margin-right: 5px"/> <%=umbraco.ui.Text("editContentSendToPublishText")%></h3>
 		<br/>
-		<a href="#" onclick="javascript:UmbClientMgr.mainWindow().closeModal();" style="margin-left: 30px" class="guiDialogNormal"><%=umbraco.ui.Text("closewindow")%></a>
+		<a href="#" onclick="javascript:UmbClientMgr.closeModalWindow();" style="margin-left: 30px" class="guiDialogNormal"><%=umbraco.ui.Text("closewindow")%></a>
 	</body>
 </html>

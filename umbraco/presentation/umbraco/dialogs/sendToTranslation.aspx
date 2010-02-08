@@ -30,7 +30,7 @@
 <asp:Panel ID="pl_buttons" runat="server">
 <p>
 <asp:Button ID="doTranslation" runat="Server" OnClick="doTranslation_Click" />
-&nbsp; <em><%= umbraco.ui.Text("or") %></em> &nbsp;<a href="#" onClick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("cancel")%></a>
+&nbsp; <em><%= umbraco.ui.Text("or") %></em> &nbsp;<a href="#" onClick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
 </p>
 </asp:Panel>
 </asp:Content>

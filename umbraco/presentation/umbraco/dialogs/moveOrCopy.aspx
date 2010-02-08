@@ -1,6 +1,8 @@
 <%@ Page Language="c#" CodeBehind="moveOrCopy.aspx.cs" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="True" Inherits="umbraco.dialogs.moveOrCopy" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register Src="../controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
+
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
 	<script type="text/javascript">
@@ -24,15 +26,6 @@
 				jQuery("#pageNameContent").html("'<strong>" + result + "</strong>' <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %>");
 				jQuery("#pageNameHolder").attr("class","success");
 			}
-			
-
-
-function doSubmit() {document.Form1["ok"].click()}
-
-	var functionsFrame = this;
-	var tabFrame = this;
-	var isDialog = true;
-	var submitOnEnter = true;
 	
 	</script>
 
@@ -51,8 +44,10 @@ function doSubmit() {document.Form1["ok"].click()}
 	<input type="hidden" id="copyTo" name="copyTo" />
 	<cc1:Feedback ID="feedback" runat="server" />
 	<cc1:Pane ID="pane_form" runat="server" Visible="false">
-		<cc1:PropertyPanel runat="server">
-			<iframe src="../TreeInit.aspx?app=<%=umbraco.helper.Request("app")%>&isDialog=true&dialogMode=id&contextMenu=false" style="overflow: auto; width: 100%; position: relative; height: 200px; background-color: white" frameborder="0"></iframe>
+		<cc1:PropertyPanel runat="server" Style="overflow: auto; height: 200px;">
+			<umbraco:TreeControl runat="server" ID="JTree" App='<%#umbraco.helper.Request("app") %>'
+                IsDialog="true" DialogMode="id" ShowContextMenu="false" FunctionToCall="dialogHandler"
+                Height="200"></umbraco:TreeControl>
 		</cc1:PropertyPanel>
 		<cc1:PropertyPanel runat="server" ID="pp_relate" Text="Relate copied items to original">
 			<asp:CheckBox runat="server" ID="RelateDocuments" Checked="false" />
@@ -76,7 +71,7 @@ function doSubmit() {document.Form1["ok"].click()}
 		<p>
 			<asp:Button ID="ok" runat="server" CssClass="guiInputButton" OnClick="HandleMoveOrCopy"></asp:Button>
 			&nbsp; <em>
-				<%=umbraco.ui.Text("general", "or", this.getUser())%></em> &nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.mainWindow().closeModal()">
+				<%=umbraco.ui.Text("general", "or", this.getUser())%></em> &nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()">
 					<%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
 		</p>
 	</asp:Panel>

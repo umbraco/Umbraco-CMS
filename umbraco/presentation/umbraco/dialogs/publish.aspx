@@ -85,7 +85,7 @@
         </p>
         </div>
                
-        <asp:Button ID="ok" runat="server" CssClass="guiInputButton"></asp:Button> <em><%= umbraco.ui.Text("general","or") %></em> <a href="#" style="color: blue" onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+        <asp:Button ID="ok" runat="server" CssClass="guiInputButton"></asp:Button> <em><%= umbraco.ui.Text("general","or") %></em> <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
       </div>
       
       <div id="animDiv" style="display: none;" align="center">

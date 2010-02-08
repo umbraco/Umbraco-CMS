@@ -67,14 +67,14 @@ namespace umbraco.cms.presentation.developer
                 // Check for assemblyBrowser
                 if (tempMacroType.IndexOf(".ascx") > 0)
                     assemblyBrowserUserControl.Controls.Add(
-                        new LiteralControl("<br/><button onClick=\"top.openModal('developer/macros/assemblyBrowser.aspx?fileName=" + macroUserControl.Text +
+                        new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('" + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/developer/macros/assemblyBrowser.aspx?fileName=" + macroUserControl.Text +
                                            "&macroID=" + m_macro.Id.ToString() +
-                                           "', 'Browse Properties', 475,500); return false;\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
+                                           "', 'Browse Properties', true, 475,500); return false;\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
                 else if (tempMacroType != string.Empty && tempMacroAssembly != string.Empty)
                     assemblyBrowser.Controls.Add(
-                        new LiteralControl("<br/><button onClick=\"top.openModal('developer/macros/assemblyBrowser.aspx?fileName=" + macroAssembly.Text +
+                        new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('" + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/developer/macros/assemblyBrowser.aspx?fileName=" + macroAssembly.Text +
                                            "&macroID=" + m_macro.Id.ToString() + "&type=" + macroType.Text +
-                                           "', 'Browse Properties', 475,500); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
+                                           "', 'Browse Properties', true, 475,500); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
 
                 // Load elements from macro
                 macroPropertyBind();
@@ -148,14 +148,14 @@ namespace umbraco.cms.presentation.developer
                 // Check for assemblyBrowser
                 if (tempMacroType.IndexOf(".ascx") > 0)
                     assemblyBrowserUserControl.Controls.Add(
-                        new LiteralControl("<br/><button onClick=\"top.openModal('developer/macros/assemblyBrowser.aspx?fileName=" + macroUserControl.Text +
+                        new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('developer/macros/assemblyBrowser.aspx?fileName=" + macroUserControl.Text +
                             "&macroID=" + Request.QueryString["macroID"] +
-                                "', 'Browse Properties', 475,500); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
+                                "', 'Browse Properties', true, 500, 475); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
                 else if (tempMacroType != string.Empty && tempMacroAssembly != string.Empty)
                     assemblyBrowser.Controls.Add(
-                        new LiteralControl("<br/><button onClick=\"top.openModal('developer/macros/assemblyBrowser.aspx?fileName=" + macroAssembly.Text +
+                        new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('developer/macros/assemblyBrowser.aspx?fileName=" + macroAssembly.Text +
                             "&macroID=" + Request.QueryString["macroID"] + "&type=" + macroType.Text +
-                                "', 'Browse Properties', 475,500); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
+                                "', 'Browse Properties', true, 500, 475); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
             }
         }
 

@@ -211,7 +211,7 @@ namespace umbraco.BusinessLogic
         {
             if (GlobalSettings.Configured) {
                 
-                List<Type> types = TypeFinder.FindClassesOfType<IApplication>(false);
+                List<Type> types = TypeFinder.FindClassesOfType<IApplication>();
                 
                 foreach (Type t in types) {
                     try

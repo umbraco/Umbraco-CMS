@@ -54,11 +54,23 @@ namespace umbraco.BasePages
 			public static string MoveNode { get { return GetMainTree + ".moveNode('{0}', '{1}');"; } }
 			public static string ReloadActionNode { get { return GetMainTree + ".reloadActionNode({0}, {1}, null);"; } }
 			public static string SetActiveTreeType { get { return GetMainTree + ".setActiveTreeType('{0}');"; } }
-			public static string CloseModalWindow { get { return GetMainWindow + ".closeModal();"; } }
-			public static string OpenModalWindow(string url, string name, int height, int width)
-			{
-				return string.Format(GetMainWindow + ".openModal('{0}','{1}',{2},{3});", url, name, height, width);	
-			}
+            public static string CloseModalWindow()
+            {
+                return string.Format("{0}.closeModalWindow();", ClientMgrScript);
+            }
+            public static string CloseModalWindow(string rVal)
+            {
+                return string.Format("{0}.closeModalWindow('{1}');", ClientMgrScript, rVal);
+            }
+            public static string OpenModalWindow(string url, string name, int width, int height)
+            {
+                return OpenModalWindow(url, name, true, width, height, 0, 0, "", "");
+            }
+            public static string OpenModalWindow(string url, string name, bool showHeader, int width, int height, int top, int leftOffset, string closeTriggers, string onCloseCallback)
+            {
+                return string.Format("{0}.openModalWindow('{1}', '{2}', {3}, {4}, {5}, {6}, {7}, '{8}', '{9}');",
+                    new object[] { ClientMgrScript, url, name, showHeader.ToString().ToLower(), width, height, top, leftOffset, closeTriggers, onCloseCallback });
+            }
 		}
 
 		private Page m_page;
@@ -238,14 +250,25 @@ namespace umbraco.BasePages
 		}
 
 		/// <summary>
-		/// Closes the Umbraco dialog window if it is open
+        /// Closes the Umbraco dialog window if it is open
 		/// </summary>
-		public ClientTools CloseModalWindow()
+		/// <param name="returnVal">specify a value to return to add to the onCloseCallback method if one was specified in the OpenModalWindow method</param>
+		/// <returns></returns>
+		public ClientTools CloseModalWindow(string returnVal)
 		{
-			RegisterClientScript(Scripts.CloseModalWindow);
+			RegisterClientScript(Scripts.CloseModalWindow(returnVal));
 			return this;
 		}
-		
+        /// <summary>
+        /// Closes the umbraco dialog window if it is open
+        /// </summary>
+        /// <returns></returns>
+        public ClientTools CloseModalWindow()
+        {
+            return CloseModalWindow("");
+        }
+
+
 		/// <summary>
 		/// Opens a modal window
 		/// </summary>
@@ -254,13 +277,11 @@ namespace umbraco.BasePages
 		/// <param name="height"></param>
 		/// <param name="width"></param>
 		/// <returns></returns>
-		public ClientTools OpenModalWindow(string url, string name, int height, int width)
+		public ClientTools OpenModalWindow(string url, string name, bool showHeader, int width, int height, int top, int leftOffset, string closeTriggers, string onCloseCallback)
 		{
-			RegisterClientScript(Scripts.OpenModalWindow(url, name, height, width));
+			RegisterClientScript(Scripts.OpenModalWindow(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback));
 			return this;
 		}
-		
-
 
 		private Page GetCurrentPage()
 		{

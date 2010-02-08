@@ -15,13 +15,16 @@ namespace umbraco.presentation.umbraco.developer.Xslt
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            HttpCookie cookie = Request.Cookies.Get("XSLTVisualizerPage");
-
-            // Check if cookie exists in the current request.
-            if (cookie != null)
+            if (!IsPostBack)
             {
-                contentPicker.Text = cookie.Value;
-            }
+                HttpCookie cookie = Request.Cookies.Get("XSLTVisualizerPage");
+
+                // Check if cookie exists in the current request.
+                if (cookie != null)
+                {
+                    contentPicker.Text = cookie.Value;
+                }
+            }            
 
         }
 

@@ -34,7 +34,7 @@ namespace umbraco.presentation.cache
 
         private static void Initialize()
         {
-            List<Type> types = TypeFinder.FindClassesOfType<ICacheRefresher>(true);
+            List<Type> types = TypeFinder.FindClassesOfType<ICacheRefresher>();
             foreach (Type t in types)
             {
                 ICacheRefresher typeInstance = Activator.CreateInstance(t) as ICacheRefresher;

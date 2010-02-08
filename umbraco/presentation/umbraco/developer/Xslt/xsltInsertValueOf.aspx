@@ -15,7 +15,7 @@
     UmbClientMgr.contentFrame().focus();
     UmbClientMgr.contentFrame().UmbEditor.Insert(result, '', '<%=umbraco.helper.Request("objectId")%>');
 
-    UmbClientMgr.mainWindow().closeModal();
+    UmbClientMgr.closeModalWindow();
   }
 
   function getExtensionMethod() {
@@ -56,6 +56,6 @@ body{margin: 0px; padding: 0px;}
 </cc1:Pane>
 
 <p>
-          <input type="button" value="Insert value" onclick="doSubmit();" /> <em><%= umbraco.ui.Text("or") %></em> <a href="#" onclick="UmbClientMgr.mainWindow().closeModal(); return false;"><%= umbraco.ui.Text("cancel") %></a>
+          <input type="button" value="Insert value" onclick="doSubmit();" /> <em><%= umbraco.ui.Text("or") %></em> <a href="#" onclick="UmbClientMgr.closeModalWindow(); return false;"><%= umbraco.ui.Text("cancel") %></a>
 </p>
 </asp:Content>

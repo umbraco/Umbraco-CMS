@@ -59,7 +59,7 @@
       <p style="width:95%;">
         <asp:Button ID="doRollback" runat="server" Enabled="False" OnClick="doRollback_Click"></asp:Button>
         &nbsp; <em><%=umbraco.ui.Text("general", "or", this.getUser())%></em> &nbsp;
-        <a href="#" style="color: blue"  onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+        <a href="#" style="color: blue"  onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
       </p>      
       </asp:Panel>
    

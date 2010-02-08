@@ -17,14 +17,14 @@ namespace umbraco.presentation.LiveEditing.Controls
     /// Provides public properties, events and methods for Live Editing controls.
     /// Add this control to a (master) page to enable Live Editing.
     /// </summary>
-
-    //[ClientDependency(2, ClientDependencyType.Javascript, "Application/NamespaceManager.js", "UmbracoClient")]
-    //[ClientDependency(3, ClientDependencyType.Javascript, "Application/UmbracoClientManager.js", "UmbracoClient")]
-    //[ClientDependency(3, ClientDependencyType.Javascript, "js/language.aspx", "UmbracoRoot")]	
-
+    [ClientDependency(0, ClientDependencyType.Javascript, "Application/NamespaceManager.js", "UmbracoClient")]
     [ClientDependency(1, ClientDependencyType.Css, "LiveEditing/CSS/LiveEditing.css", "UmbracoRoot")]
-	[ClientDependency(1, ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient", InvokeJavascriptMethodOnLoad = "jQuery.noConflict")]	
-    [ClientDependency(2, ClientDependencyType.Javascript, "js/UmbracoSpeechBubble.js", "UmbracoRoot", InvokeJavascriptMethodOnLoad = "InitUmbracoSpeechBubble")]
+	[ClientDependency(1, ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient")]
+	[ClientDependency(2, ClientDependencyType.Javascript, "Application/JQuery/jquery.noconflict-invoke.js", "UmbracoClient")]	
+    [ClientDependency(3, ClientDependencyType.Javascript, "js/UmbracoSpeechBubble.js", "UmbracoRoot")]
+	[ClientDependency(4, ClientDependencyType.Javascript, "js/UmbracoSpeechBubbleInit.js", "UmbracoRoot")]
+    [ClientDependency(10, ClientDependencyType.Javascript, "Application/UmbracoUtils.js", "UmbracoClient")] 
+    [ClientDependency(20, ClientDependencyType.Javascript, "Application/UmbracoClientManager.js", "UmbracoClient")] 
     public class LiveEditingManager : Control
     {
 

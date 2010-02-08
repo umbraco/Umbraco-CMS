@@ -18,15 +18,14 @@ namespace umbraco.presentation.plugins.tinymce3
             tp.HasMenu = false;
             tp.Controls.Add(pane_content);
 
-            //tp.Controls.Add(new LiteralControl("<iframe frameborder=\"0\" src=\"../../TreeInit.aspx?app=content&isDialog=true&dialogMode=locallink&functionToCall=parent.dialogHandler&contextMenu=false\" style=\"LEFT: 0px; OVERFLOW: auto; WIDTH: 280px; POSITION: relative; TOP: 0px; HEIGHT: 220px; BACKGROUND-COLOR: white; border: none\"></iframe>"));
+
             
             uicontrols.TabPage tp2 = tv_options.NewTabPage(ui.Text("media"));
             tp2.HasMenu = false;
             tp2.Controls.Add(pane_media);
 
-            //tp2.Controls.Add(new LiteralControl("<iframe frameborder=\"0\" src=\"../../TreeInit.aspx?app=media&isDialog=true&dialogMode=fulllink&functionToCall=parent.dialogHandler&contextMenu=false\" style=\"LEFT: 0px; OVERFLOW: auto; WIDTH: 280px; POSITION: relative; TOP: 0px; HEIGHT: 220px; BACKGROUND-COLOR: white; border: none\"></iframe>"));
 
-            //umbracoLink.Controls.Add(tbv);
+
         }
 
         protected override void Render(HtmlTextWriter writer)

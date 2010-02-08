@@ -78,7 +78,7 @@
      
 			UmbClientMgr.contentFrame().focus();
 			UmbClientMgr.contentFrame().UmbEditor.Insert(macroString, '', '<%=umbraco.helper.Request("objectId")%>');			
-			UmbClientMgr.mainWindow().closeModal();
+			UmbClientMgr.closeModalWindow();
 		}
 
 		function pseudoHtmlEncode(text) {
@@ -104,7 +104,7 @@
         
         <p>
         <input type="button" value="<%=umbraco.ui.Text("general", "ok", this.getUser())%>" onclick="updateMacro()" />
-        <em> or </em><a href="#" style="color: blue" onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+        <em> or </em><a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
         </p>
       </asp:Panel>
       
@@ -117,7 +117,7 @@
         
         <p>
         <asp:Button ID="bt_insert" runat="server" Text="ok" OnClick="renderProperties"></asp:Button>
-        <em> or </em><a href="#" style="color: blue" onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+        <em> or </em><a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
         </p>
       </asp:Panel>
     

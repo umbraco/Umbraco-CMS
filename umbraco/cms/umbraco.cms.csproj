@@ -118,10 +118,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\TidyNet.dll</HintPath>
     </Reference>
-    <ProjectReference Include="..\..\components\umbraco.controls\umbraco.controls.csproj">
-      <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
-      <Name>umbraco.controls</Name>
-    </ProjectReference>
     <ProjectReference Include="..\businesslogic\umbraco.businesslogic.csproj">
       <Name>umbraco.businesslogic</Name>
       <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>

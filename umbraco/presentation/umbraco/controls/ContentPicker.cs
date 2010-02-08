@@ -8,135 +8,70 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
-using ClientDependency.Core;
 using umbraco.presentation;
-using ClientDependency.Core.Controls;
+using umbraco.uicontrols.TreePicker;
 
 namespace umbraco.controls
 {
-	[ClientDependency(ClientDependencyType.Javascript, "js/xmlextras.js", "UmbracoRoot")]
-	[ClientDependency(ClientDependencyType.Javascript, "js/xmlRequest.js", "UmbracoRoot")]
-	[ClientDependency(ClientDependencyType.Javascript, "webservices/ajax.js", "UmbracoRoot")]
-	[ClientDependency(ClientDependencyType.Javascript, "js/submodal/common.js", "UmbracoRoot")]
-	[ClientDependency(ClientDependencyType.Javascript, "js/submodal/subModal.js", "UmbracoRoot")]
-	[ClientDependency(ClientDependencyType.Css, "js/submodal/subModal.css", "UmbracoRoot")]	
-	public class ContentPicker : System.Web.UI.WebControls.WebControl
+
+    public class ContentPicker : BaseTreePicker
 	{
 
-		public System.Web.UI.Control Editor { get { return this; } }
+        public ContentPicker()
+        {
+            AppAlias = "content";
+            TreeAlias = "content";
+        }
 
-		private string _text = "";
+		[Obsolete("Use Value property instead, this simply wraps it.")]
 		public string Text
 		{
 			get
 			{
-				if (Page.IsPostBack && !String.IsNullOrEmpty(helper.Request(this.ClientID)))
-				{
-					_text = helper.Request(this.ClientID);
-				}
-				return _text;
+                return this.Value;
 			}
-			set { _text = value; }
+            set
+            {
+                this.Value = value;
+            }
 		}
 
-		private string _appAlias = "content";
-		public string AppAlias
-		{
-			get { return _appAlias; }
-			set { _appAlias = value; }
-		}
+        public string AppAlias { get; set; }
+        public string TreeAlias { get; set; }
 
+        public override string TreePickerUrl
+        {
+            get
+            {
+                return TreeService.GetPickerUrl(AppAlias, TreeAlias);
+            }
+        }
 
-		private string _treeAlias = "content";
-		public string TreeAlias
-		{
-			get { return _treeAlias; }
-			set { _treeAlias = value; }
-		}
+        public override string ModalWindowTitle
+        {
+            get
+            {
+                return ui.GetText("general", "choose") + " " + ui.GetText("sections", TreeAlias.ToLower());
+            }
+        }
 
-		private bool _showDelete = true;
-		public bool ShowDelete
-		{
-			get { return _showDelete; }
-			set { _showDelete = value; }
-		}
+        protected override string GetItemTitle()
+        {
+            string tempTitle = "";
+            try
+            {
+                if (this.Text != "" && this.Text != "-1")
+                {
+                    tempTitle = new cms.businesslogic.CMSNode(int.Parse(this.Text)).Text;
+                }
+                else
+                {
+                    tempTitle = (!string.IsNullOrEmpty(TreeAlias) ? ui.Text(TreeAlias) : ui.Text(AppAlias));
 
-		private int m_modalWidth = 300;
-		public int ModalWidth
-		{
-			get { return m_modalWidth; }
-			set { m_modalWidth = value; }
-		}
-
-		private int m_modalHeight = 400;
-		public int ModalHeight
-		{
-			get { return m_modalHeight; }
-			set { m_modalHeight = value; }
-		}
-
-
-		protected override void OnInit(EventArgs e)
-		{
-			base.OnInit(e);
-			
-			// We need to make sure we have a reference to the legacy ajax calls in the scriptmanager
-			if (!UmbracoContext.Current.LiveEditingContext.Enabled)
-				presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
-			else
-				ClientDependencyLoader.Instance.RegisterDependency("webservices/legacyAjaxCalls.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
-		}
-
-
-		protected override void Render(System.Web.UI.HtmlTextWriter writer)
-		{
-
-			string tempTitle = "";
-			string deleteLink = " &nbsp; <a href=\"javascript:" + this.ClientID + "_clear();\" style=\"color: red\">" + ui.Text("delete") + "</a> &nbsp; ";
-			try
-			{
-				if (this.Text != "" && this.Text != "-1")
-				{
-					tempTitle = new cms.businesslogic.CMSNode(int.Parse(this.Text)).Text;
-				}
-				else
-				{
-					tempTitle = (!string.IsNullOrEmpty(_treeAlias) ? ui.Text(_treeAlias) : ui.Text(_appAlias));
-
-				}
-			}
-			catch { }
-
-			writer.WriteLine("<script language=\"javascript\">\nfunction " + this.ClientID + "_chooseId() {" +
-				"\nshowPopWin('" + TreeService.GetPickerUrl(true, _appAlias, _treeAlias) + "', " + m_modalWidth + ", " + m_modalHeight + ", " + ClientID + "_saveId)" +
-				//				"\nvar treePicker = window.showModalDialog(, 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')			" +
-				"\n}" +
-				"\nfunction " + ClientID + "_saveId(treePicker) {" +
-				"\nsetTimeout('" + ClientID + "_saveIdDo(' + treePicker + ')', 200);" +
-				"\n}" +
-				"\nfunction " + ClientID + "_saveIdDo(treePicker) {" +
-				"\nif (treePicker != undefined) {" +
-				"\ndocument.getElementById(\"" + this.ClientID + "\").value = treePicker;" +
-				"\nif (treePicker > 0) {" +
-					"\numbraco.presentation.webservices.legacyAjaxCalls.GetNodeName(treePicker, " + this.ClientID + "_updateContentTitle" + ");" +
-				"\n}				" +
-				"\n}" +
-				"\n}			" +
-				"\nfunction " + this.ClientID + "_updateContentTitle(retVal) {" +
-				"\ndocument.getElementById(\"" + this.ClientID + "_title\").innerHTML = \"<strong>\" + retVal + \"</strong>" + deleteLink.Replace("\"", "\\\"") + "\";" +
-				"\n}" +
-				"\nfunction " + this.ClientID + "_clear() {" +
-				"\ndocument.getElementById(\"" + this.ClientID + "_title\").innerHTML = \"\";" +
-				"\ndocument.getElementById(\"" + this.ClientID + "\").value = \"-1\";" +
-				"\n}" +
-				"\n</script>");
-
-			// Clear remove link if text if empty
-			if (this.Text == "" || !_showDelete)
-				deleteLink = "";
-			writer.WriteLine("<span id=\"" + this.ClientID + "_title\"><b>" + tempTitle + "</b>" + deleteLink + "</span> <a href=\"javascript:" + this.ClientID + "_chooseId()\">" + ui.Text("choose") + "...</a> &nbsp; <input type=\"hidden\" id=\"" + this.ClientID + "\" name=\"" + this.ClientID + "\" value=\"" + this.Text + "\">");
-			base.Render(writer);
-		}
-
+                }
+            }
+            catch { }
+            return tempTitle;
+        }
 	}
 }

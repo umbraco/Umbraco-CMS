@@ -5,8 +5,8 @@
 <asp:Content ID="header1" ContentPlaceHolderID="head" runat="server">
 <script type="text/javascript">
     function openItem(url) {
-        parent.right.document.location.href = "../" + url;
-        parent.closeModal();
+        UmbClientMgr.contentFrame("../" + url);
+        UmbClientMgr.closeModalWindow();
     }
 </script>
 </asp:Content>

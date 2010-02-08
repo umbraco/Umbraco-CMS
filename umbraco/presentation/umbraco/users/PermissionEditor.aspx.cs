@@ -32,12 +32,9 @@ namespace umbraco.cms.presentation.user
 
 			if (!IsPostBack)
 			{
-				TreeService treeSvc = new TreeService();
-				treeSvc.App = TreeDefinitionCollection.Instance.FindTree<loadContent>().Tree.ApplicationAlias;
-				treeSvc.ShowContextMenu = false;
-				treeSvc.IsDialog = true;
-
-				JTree.SetTreeService(treeSvc);
+				JTree.App = TreeDefinitionCollection.Instance.FindTree<loadContent>().Tree.ApplicationAlias;
+				JTree.ShowContextMenu = false;
+				JTree.IsDialog = true;
 			}
 		}
 

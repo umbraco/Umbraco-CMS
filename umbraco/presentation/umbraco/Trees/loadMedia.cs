@@ -54,7 +54,7 @@ namespace umbraco
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {            
-			//TODO: SD: Find out what openMedia does!?
+
             if (this.IsDialog)
                 rootNode.Action = "javascript:openMedia(-1);";
             else

@@ -35,7 +35,7 @@
                 } else {
                     jQuery('#div_form').hide();
                     jQuery('#notification').show();
-                    jQuery('#notification').html("<p><%=umbraco.ui.Text("defaultdialogs", "recycleBinIsEmpty")%> </p> <p><a href='#' onclick='UmbClientMgr.mainWindow().closeModal()'><%= umbraco.ui.Text("defaultdialogs", "closeThisWindow")%></a></p>");
+                    jQuery('#notification').html("<p><%=umbraco.ui.Text("defaultdialogs", "recycleBinIsEmpty")%> </p> <p><a href='#' onclick='UmbClientMgr.closeModalWindow()'><%= umbraco.ui.Text("defaultdialogs", "closeThisWindow")%></a></p>");
                     UmbClientMgr.mainTree().reloadActionNode();
                 }
                 
@@ -73,7 +73,7 @@
 		<div id="buttons">
 		<input type="button" ID="ok" value="<%=umbraco.ui.Text("actions", "emptyTrashcan", this.getUser()) %>" class="guiInputButton" onclick="if ($get('confirmDelete').checked) {emptyRecycleBin();}" disabled="true" />  
 		<em><%= umbraco.ui.Text("or") %></em> 
-    <a href="#" onclick="UmbClientMgr.mainWindow().closeModal();">
+    <a href="#" onclick="UmbClientMgr.closeModalWindow();">
       <%=umbraco.ui.Text("cancel")%>
     </a>
 		</div>

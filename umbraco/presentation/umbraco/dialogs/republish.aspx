@@ -21,7 +21,7 @@
           <div id="buttons">
             <asp:Button ID="bt_go" OnClick="go" OnClientClick="showProgress(document.getElementById('buttons'),'progress'); return true;" runat="server" Text="Republish" />
             <em><%= umbraco.ui.Text("or") %></em>  
-            <a href="#" onclick="UmbClientMgr.mainWindow().closeModal();"><%=umbraco.ui.Text("cancel")%></a>
+            <a href="#" onclick="UmbClientMgr.closeModalWindow();"><%=umbraco.ui.Text("cancel")%></a>
           </div>     
       
       <div id="progress" style="visibility: hidden;">
@@ -35,6 +35,6 @@
       <p><%= umbraco.ui.Text("defaultdialogs", "siterepublished")%></p>
       
      </div>
-      <input type="button" class="guiInputButton" onclick="UmbClientMgr.mainWindow().closeModal();" value="Ok" />
+      <input type="button" class="guiInputButton" onclick="UmbClientMgr.closeModalWindow();" value="Ok" />
     </asp:Panel>
 </asp:Content>

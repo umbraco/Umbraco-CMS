@@ -291,6 +291,7 @@ namespace umbraco.cms.presentation.Trees
             this.IsDialog = treeParams.IsDialog;
             this.ShowContextMenu = treeParams.ShowContextMenu;
             this.id = treeParams.StartNodeID;
+
             if (!treeParams.ShowContextMenu)
                 this.RootNode.Menu = null;
         }

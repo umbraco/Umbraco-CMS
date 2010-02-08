@@ -7,201 +7,173 @@ using umbraco.presentation;
 using ClientDependency.Core.Controls;
 using umbraco.interfaces;
 using umbraco.IO;
+using umbraco.BasePages;
+using umbraco.controls.Images;
+using System.Web.UI.WebControls;
+using System.Web.UI.HtmlControls;
+using System.Resources;
+using umbraco.editorControls.mediapicker;
+using umbraco.uicontrols.TreePicker;
 namespace umbraco.editorControls
 {
-    /// <summary>
-    /// Summary description for mediaChooser.
-    /// </summary>
-    [ClientDependency(100, ClientDependencyType.Css, "js/submodal/submodal.css", "UmbracoRoot")]
-	[ClientDependency(101, ClientDependencyType.Javascript, "js/submodal/common.js", "UmbracoRoot")]
-    //TODO: Work out how to include this: , InvokeJavascriptMethodOnLoad = "initPopUp"
-    [ClientDependency(102, ClientDependencyType.Javascript, "js/submodal/submodal.js", "UmbracoRoot")]	
+	/// <summary>
+	/// Summary description for mediaChooser.
+	/// </summary>    
 	[ValidationProperty("Value")]
-    public class mediaChooser : System.Web.UI.WebControls.HiddenField, IDataEditor
-    {
-        interfaces.IData _data;
-        bool _showpreview;
-        bool _showadvanced;
+    public class mediaChooser : BaseTreePickerEditor
+	{
+		bool _showpreview;
+		bool _showadvanced;
+		protected ImageViewer ImgViewer;		
+		protected HtmlGenericControl PreviewContainer;
 
-        public mediaChooser(interfaces.IData Data)
+        public mediaChooser(IData data)
+            : base(data) { }
+        
+
+        public mediaChooser(IData data, bool showPreview, bool showAdvanced)
+            : base(data)
         {
-            _data = Data;
+            _showpreview = showPreview;
+            _showadvanced = showAdvanced;
+        }
+
+        public override string ModalWindowTitle
+        {
+            get
+            {
+                return ui.GetText("general", "choose") + " " + ui.GetText("sections", "media");
+            }
+        }
+
+        public override string TreePickerUrl
+        {
+            get
+            {
+                return _showadvanced ? umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/mediaPicker.aspx" : TreeService.GetPickerUrl("media", "media");
+            }
+        }
+
+        protected override string GetJSScript()
+        {
+            if (!_showpreview)
+            {
+                return base.GetJSScript();
+            }
+            else
+            {
+                /* 0 = this control's client id
+            * 1 = label 
+            * 2 = mediaIdValueClientID
+            * 3 = previewContainerClientID
+            * 4 = imgViewerClientID
+            * 5 = mediaTitleClientID
+            * 6 = mediaPickerUrl
+            * 7 = popup width
+            * 8 = popup height
+            * 9 = umbraco path
+           */
+                return string.Format(@"
+                var mc_{0} = new Umbraco.Controls.MediaChooser('{1}','{2}','{3}','{4}','{5}','{6}',{7},{8},'{9}');",
+                    new string[]
+                 {
+                    this.ClientID,
+                    ModalWindowTitle,
+                    ItemIdValue.ClientID,
+                    _showpreview ? PreviewContainer.ClientID : "__NOTSET",
+                    _showpreview ? ImgViewer.ClientID : "_NOTSET",
+                    ItemTitle.ClientID,
+                    TreePickerUrl,
+                    ModalWidth.ToString(),
+                    ModalHeight.ToString(),
+                    umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco).TrimEnd('/')
+                 });
+            }           
+        }
+
+        /// <summary>
+        /// Renders the required media picker javascript
+        /// </summary>
+        protected override void RenderJSComponents()
+        {
+
+            if (ScriptManager.GetCurrent(Page).IsInAsyncPostBack)
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "MediaChooser", MediaChooserScripts.MediaPicker, true);
+            }
+            else
+            {
+                Page.ClientScript.RegisterClientScriptBlock(typeof(mediaChooser), "MediaChooser", MediaChooserScripts.MediaPicker, true);
+            }
+        }
+
+		protected override void CreateChildControls()
+		{
+			base.CreateChildControls();
+
+			//if preview is enabled, add it to the wrapper
+			if (_showpreview)
+			{
+                //create the preview wrapper
+                PreviewContainer = new HtmlGenericControl("div");
+                PreviewContainer.ID = "preview";
+                this.Controls.Add(PreviewContainer);
+
+                ImgViewer = (ImageViewer)Page.LoadControl(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/controls/Images/ImageViewer.ascx");
+				ImgViewer.ID = "ImgViewer";
+				ImgViewer.ViewerStyle = ImageViewer.Style.ImageLink;				
+				
+				PreviewContainer.Style.Add(HtmlTextWriterStyle.MarginTop, "5px");
+				PreviewContainer.Controls.Add(ImgViewer);				
+			}			
+		}
+
+        /// <summary>
+        /// sets the modal width/height based on properties
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            ModalWidth = _showadvanced ? 530 : 320;
+            ModalHeight = _showadvanced ? 565 : 400;
         }
 
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
-            Page.ClientScript.RegisterStartupScript(typeof(IDataEditor), "initPopUp", "jQuery(document).ready(function() { initPopUp(); } );", true);
-        }
 
-        public mediaChooser(interfaces.IData Data, bool ShowPreview, bool ShowAdvanced)
-        {
-            _data = Data;
-            _showpreview = ShowPreview;
-            _showadvanced = ShowAdvanced;
-        }
 
-        public System.Web.UI.Control Editor { get { return this; } }
-        #region IDataField Members
-
-        //private string _text;
-
-        public virtual bool TreatAsRichTextEditor
-        {
-            get { return false; }
-        }
-
-        public bool ShowLabel
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public void Save()
-        {
-            if (base.Value.Trim() != "")
-                _data.Value = base.Value;
-            else
-                _data.Value = null;
-        }
-
-        protected override void OnInit(EventArgs e)
-        {
-            base.OnInit(e);
-            if (_data != null && _data.Value != null && !String.IsNullOrEmpty(_data.Value.ToString()))
-            {
-                base.Value = _data.Value.ToString();
-            }
-        }
-
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);           	
-
-            // We need to make sure we have a reference to the legacy ajax calls in the scriptmanager
-			if (!UmbracoContext.Current.LiveEditingContext.Enabled)
-				presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
-			else
-				ClientDependencyLoader.Instance.RegisterDependency("webservices/legacyAjaxCalls.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
-
-            // And a reference to the media picker calls 
-            if (!UmbracoContext.Current.LiveEditingContext.Enabled)
-            {
-                ScriptManager sm = ScriptManager.GetCurrent(base.Page);
-                ServiceReference webservicePath = new ServiceReference(SystemDirectories.Webservices + "/MediaPickerService.asmx");
-
-                if (!sm.Services.Contains(webservicePath))
-                    sm.Services.Add(webservicePath);
-            }
-            else
-            {
-                ClientDependencyLoader.Instance.RegisterDependency("webservices/MediaPickerService.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
-            }
-        }
-
-        protected override void Render(System.Web.UI.HtmlTextWriter writer)
-        {
-
-            string tempTitle = "";
-            int mediaId = -1;
-            string deleteLink = " &nbsp; <a href=\"javascript:" + this.ClientID + "_clear();\" style=\"color: red\">" + ui.Text("delete") + "</a> &nbsp; ";
-            try
-            {
-                if (base.Value != "")
-                {
-                    mediaId = int.Parse(base.Value);
-                    tempTitle = new cms.businesslogic.CMSNode(int.Parse(base.Value)).Text;
-                }
-            }
-            catch { }
-
-            string dialog = "\nshowPopWin('" + TreeService.GetPickerUrl(true, "media", "media") + "', 300, 400, " + ClientID + "_saveId)";
-            if (_showadvanced)
-                dialog = "\nshowPopWin('" + SystemDirectories.Umbraco + "/dialogs/mediaPicker.aspx" + "', 500, 530, " + ClientID + "_saveId)";
-
-            string preview = string.Empty;
             if (_showpreview)
-                preview = "\numbraco.presentation.webservices.MediaPickerService.GetThumbNail(treePicker, " + this.ClientID + "_UpdateThumbNail);" +
-                    "\numbraco.presentation.webservices.MediaPickerService.GetFile(treePicker, " + this.ClientID + "_UpdateLink);";
-
-
-            string strScript = "function " + this.ClientID + "_chooseId() {" +
-                //"\nshowPopWin('" + TreeService.GetPickerUrl(true, "media", "media") + "', 300, 400, " + ClientID + "_saveId)" +
-                //"\nshowPopWin('" + umbraco.IO.SystemDirectories.Umbraco + "/dialogs/mediaPicker.aspx" + "', 500, 530, " + ClientID + "_saveId)" +
-                //				"\nvar treePicker = window.showModalDialog(, 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')			" +
-                dialog +
-                "\n}" +
-                "\nfunction " + ClientID + "_saveId(treePicker) {" +
-                "\nsetTimeout('" + ClientID + "_saveIdDo(' + treePicker + ')', 200);" +
-                "\n}" +
-                "\nfunction " + ClientID + "_saveIdDo(treePicker) {" +
-                "\nif (treePicker != undefined) {" +
-                    "\ndocument.getElementById(\"" + this.ClientID + "\").value = treePicker;" +
-                    "\nif (treePicker > 0) {" +
-                    "\numbraco.presentation.webservices.legacyAjaxCalls.GetNodeName(treePicker, " + this.ClientID + "_updateContentTitle" + ");" +
-                    preview+                  
-                    "\n}				" +
-                "\n}" +
-                "\n}			" +
-                "\nfunction " + this.ClientID + "_updateContentTitle(retVal) {" +
-                "\ndocument.getElementById(\"" + this.ClientID + "_title\").innerHTML = \"<strong>\" + retVal + \"</strong>" + deleteLink.Replace("\"", "\\\"") + "\";" +
-                "\n}" +
-                "\nfunction " + this.ClientID + "_clear() {" +
-                "\ndocument.getElementById(\"" + this.ClientID + "_title\").innerHTML = \"\";" +
-                "\ndocument.getElementById(\"" + this.ClientID + "\").value = \"\";" +
-                "\ndocument.getElementById(\"" + this.ClientID + "_preview\").style.display = 'none';" +
-                "\n}" +
-                "\nfunction " + this.ClientID + "_UpdateThumbNail(retVal){" +      
-                "\nif(retVal != \"\"){" +
-                "\ndocument.getElementById(\"" + this.ClientID + "_thumbnail\").src = retVal;" +
-                "\ndocument.getElementById(\"" + this.ClientID + "_preview\").style.display = 'block';}" +
-                "\nelse{document.getElementById(\"" + this.ClientID + "_preview\").style.display = 'none';}" +
-                "\n}"+
-                "\nfunction " + this.ClientID + "_UpdateLink(retVal){" +
-                "\ndocument.getElementById(\"" + this.ClientID + "_thumbnaillink\").href = retVal;" +
-                "\n}";
-
-            try
             {
-                if (ScriptManager.GetCurrent(Page).IsInAsyncPostBack)
-                    ScriptManager.RegisterClientScriptBlock(this, this.GetType(), this.ClientID + "_chooseId", strScript, true);
+                if (string.IsNullOrEmpty(ItemIdValue.Value))
+                {
+                    PreviewContainer.Style.Add(HtmlTextWriterStyle.Display, "none");
+                    ImgViewer.MediaId = -1;
+                }
                 else
-                    Page.ClientScript.RegisterStartupScript(this.GetType(), this.ClientID + "_chooseId", strScript, true);
-            }
-            catch
-            {
-                Page.ClientScript.RegisterStartupScript(this.GetType(), this.ClientID + "_chooseId", strScript, true);
-            }
-            // Clear remove link if text if empty
-            if (base.Value == "")
-                deleteLink = "";
-            writer.WriteLine("<span id=\"" + this.ClientID + "_title\"><b>" + tempTitle + "</b>" + deleteLink + "</span><a href=\"javascript:" + this.ClientID + "_chooseId()\">" + ui.Text("choose") + "...</a> &nbsp; ");// &nbsp; <input type=\"hidden\" id=\"" + this.ClientID + "\" name=\"" + this.ClientID + "\" value=\"" + this.Text + "\">");
-
-
-
-            //Thumbnail preview
-            if (_showpreview)
-            {
-                string thumb = string.Empty;
-                string link = string.Empty;
-                string style = "display:none;";
-                if (mediaId != -1)
                 {
-                    style = string.Empty;
-                    thumb = string.Format(" src=\"{0}\" ", presentation.webservices.MediaPickerServiceHelpers.GetThumbNail(mediaId));
-                    link = string.Format(" href=\"{0}\" ", presentation.webservices.MediaPickerServiceHelpers.GetFile(mediaId));
+                    ImgViewer.MediaId = int.Parse(ItemIdValue.Value);
                 }
-
-                writer.WriteLine("<div id=\"" + this.ClientID + "_preview\" style=\"margin-top:5px;" + style + "\"><a " + link + "id=\"" + this.ClientID + "_thumbnaillink\" target=\"_blank\" ><img " + thumb + "id=\"" + this.ClientID + "_thumbnail\" /></a></div>");
             }
-                
-            
-            
-            
-            base.Render(writer);
+
+            //if (ScriptManager.GetCurrent(Page).IsInAsyncPostBack)
+            //{
+            //    //renders the media picker JS class
+            //    ScriptManager.RegisterStartupScript(this, this.GetType(), "MediaChooser", MediaChooserScripts.MediaPicker, true);
+            //    ScriptManager.RegisterStartupScript(this, this.GetType(), this.ClientID + "MediaPicker", strScript, true);
+
+            //}
+            //else
+            //{
+            //    //renders the media picker JS class
+            //    Page.ClientScript.RegisterClientScriptBlock(typeof(mediaChooser), "MediaChooser", MediaChooserScripts.MediaPicker, true);
+            //    Page.ClientScript.RegisterStartupScript(this.GetType(), this.ClientID + "MediaPicker", strScript, true);
+
+            //}
+           
         }
-        #endregion
-    }
+
+	}
 }

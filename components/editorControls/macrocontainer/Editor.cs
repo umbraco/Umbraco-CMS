@@ -43,18 +43,22 @@ namespace umbraco.editorControls.macrocontainer
          protected override void OnInit(EventArgs e)
          {
              base.OnInit(e);
-
-
-             base.Page.ClientScript.RegisterClientScriptBlock(Page.GetType(), "subModal", "<script type=\"text/javascript\" src=\"" + SystemDirectories.Umbraco + "/js/submodal/common.js\"></script><script type=\"text/javascript\" src=\"" + SystemDirectories.Umbraco + "/js/submodal/subModal.js\"></script><link href=\"" + SystemDirectories.Umbraco + "/js/submodal/subModal.css\" type=\"text/css\" rel=\"stylesheet\"></link>");
-
+ 
+             //SD: This is useless as it won't work in live editing anyways whilst using MS Ajax/ScriptManager for ajax calls
              if (!UmbracoContext.Current.LiveEditingContext.Enabled)
+             {
                  presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
+                 ScriptManager sm = ScriptManager.GetCurrent(base.Page);
+                 ServiceReference webservicePath = new ServiceReference(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/webservices/MacroContainerService.asmx");
+
+                 if (!sm.Services.Contains(webservicePath))
+                     sm.Services.Add(webservicePath);
+             }                 
              else
+             {
                  ClientDependencyLoader.Instance.RegisterDependency("webservices/legacyAjaxCalls.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
-
-
-
-           
+                 ClientDependencyLoader.Instance.RegisterDependency("webservices/MacroContainerService.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
+             }
 
              _addMacro = new LinkButton();
              _addMacro.ID = ID + "_btnaddmacro";

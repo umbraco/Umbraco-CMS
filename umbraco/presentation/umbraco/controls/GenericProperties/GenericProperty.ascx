@@ -13,10 +13,6 @@
 			<a href="javascript:expandCollapse('<%=this.ClientID%>');"><img src="<%=umbraco.IO.SystemDirectories.Umbraco%>/images/expand.png" style="FLOAT: right"/>
 			  <asp:Literal ID="FullHeader" Runat="server"></asp:Literal>
 			</a>
-
-			<!--
-			<a href="#" onclick="UmbClientMgr.mainWindow().openModal('dialogs/propertyEditor.aspx?propertyId=<%= this.Id %>&docTypeId=<%= Request.QueryString["id"] %>', 'Edit the property <%= this.Name %>', 500, 600); return false;">Edit</a>
-			-->
 			
 			</h3>
 			</div>

@@ -14,10 +14,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
         return {
             _isDirty: false,
-            _isDebug: true,
+            _isDebug: false,
             _mainTree: null,
             _appActions: null,
             _rootPath: "/umbraco", //this is the default
+            _modal: null,
 
             setUmbracoPath: function(strPath) {
                 /// <summary>
@@ -49,7 +50,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                         this._mainTree = $("<div id='falseTree' />").appendTo("body").hide().UmbracoTree({
                             uiKeys: this.uiKeys(),
                             jsonFullMenu: {},
-                            jsonInitNode: {},
                             appActions: this.appActions()
                         }).UmbracoTreeAPI();
                     }
@@ -109,6 +109,34 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     this._debug("contentFrame: parsed location: " + strLocation);
 
                     this.mainWindow().right.location.href = strLocation;
+                }
+            },
+            openModalWindow: function(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback) {
+                if (this._modal == null) {
+                    this._modal = new Umbraco.Controls.ModalWindow();
+                }
+                this._modal.open(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback);
+            },
+            closeModalWindow: function(rVal) {
+                /// <summary>
+                /// will close the latest open modal window, otherwise
+                /// if the modal object is null and the mainWindow is not null, this generally means this is
+                /// being called inside a modal window, so we'll check to see if we can get the parent modal
+                /// object and close it instead.
+                /// if an rVal is passed in, then this will be sent to the onCloseCallback method if it was specified.
+                /// </summary>
+                if (this._modal != null) {
+                    this._modal.close(rVal);
+                }
+                else {
+                    //this will recursively try to close a modal window until window.parent or
+                    //window.parent.UmbClientMgr doesn't exist.
+                    if (window.parent == null || window.parent == window) {
+                        return; //don't recurse, exit
+                    }
+                    else if (typeof window.parent.UmbClientMgr != "undefined") {
+                        window.parent.UmbClientMgr.closeModalWindow(rVal);
+                    }
                 }
             },
             _debug: function(strMsg) {

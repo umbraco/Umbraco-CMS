@@ -88,7 +88,7 @@ namespace umbraco.dialogs
             base.getUser().initNotifications();
 
 
-            feedback.Text = ui.Text("notifications") + " " + ui.Text("ok") + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow + "'>" + ui.Text("closeThisWindow") + "</a>";
+            feedback.Text = ui.Text("notifications") + " " + ui.Text("ok") + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
             feedback.type = umbraco.uicontrols.Feedback.feedbacktype.success;
 
             pane_form.Visible = false;

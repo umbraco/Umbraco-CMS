@@ -11,5 +11,5 @@
 <div style="padding-top: 25px;">
 	<asp:Button id="sbmt" Runat="server" style="Width:90px" onclick="sbmt_Click"></asp:Button>
 	&nbsp; <em><%= umbraco.ui.Text("or") %></em> &nbsp;
-  <a href="#" style="color: blue"  onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("cancel")%></a>
+  <a href="#" style="color: blue"  onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
 </div>

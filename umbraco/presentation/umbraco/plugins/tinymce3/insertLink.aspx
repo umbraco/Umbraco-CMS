@@ -1,6 +1,8 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="insertLink.aspx.cs" Inherits="umbraco.presentation.plugins.tinymce3.insertLink" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <%@ Register TagPrefix="ui" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register Src="../../controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
+
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -108,13 +110,17 @@
     <ui:TabView AutoResize="false" Width="460px" Height="305px" runat="server"  ID="tv_options" />
     <ui:Pane ID="pane_content" runat="server"> 
       <div style="padding: 5px; background: #fff; height: 250px;">
-        <iframe id="treeFrame" name="treeFrame" src="../../TreeInit.aspx?app=content&isDialog=true&dialogMode=locallink&functionToCall=parent.dialogHandler&contextMenu=false" style="width: 413px; height: 250px; float: left;" frameborder="0"></iframe>
+        <umbraco:TreeControl runat="server" ID="TreeControl2" App="content"
+                IsDialog="true" DialogMode="locallink" ShowContextMenu="false" FunctionToCall="dialogHandler"
+                Height="250"></umbraco:TreeControl>
       </div>
     </ui:Pane>
     <ui:Pane ID="pane_media" runat="server">
         <div style="padding: 5px; background: #fff; height: 250px;">
-        <iframe id="Iframe1" name="treeFrame" src="../../TreeInit.aspx?app=media&isDialog=true&dialogMode=fulllink&contextMenu=false&functionToCall=parent.dialogHandler" style="width: 413px; height: 250px; float: left; border: 1px solid #ccc;" frameborder="0"></iframe>
-      </div>
+            <umbraco:TreeControl runat="server" ID="TreeControl1" App="media"
+                IsDialog="true" DialogMode="fulllink" ShowContextMenu="false" FunctionToCall="dialogHandler"
+                Height="250"></umbraco:TreeControl>
+        </div>
     </ui:Pane>
     
     <br />

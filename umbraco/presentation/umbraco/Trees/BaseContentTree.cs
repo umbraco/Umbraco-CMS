@@ -58,7 +58,7 @@ namespace umbraco.cms.presentation.Trees
             if (!String.IsNullOrEmpty(this.FunctionToCall))
             {
                 Javascript.Append("function openContent(id) {\n");
-                Javascript.Append(this.FunctionToCall + "(id)\n");
+                Javascript.Append(this.FunctionToCall + "(id);\n");
                 Javascript.Append("}\n");
             }
             else if (!this.IsDialog)
@@ -70,20 +70,20 @@ function openContent(id) {
 }
 ");
             }
-            else
-            {
-				//TODO: SD: Find out how what this does...?
-                Javascript.Append(
-                    @"
-function openContent(id) {
-	if (parent.opener)
-		parent.opener.dialogHandler(id);
-	else
-		parent.dialogHandler(id);	
-}
-
-");
-            }
+			//TODO: SD: UPDATE ALL TREE CODE SO THAT THE FUNCTIONTOCALL IS EXPLICITLY SET WHEN DIALOGHANDLER IS REQUIRED!
+			//            else
+//            {
+//                Javascript.Append(
+//                    @"
+//function openContent(id) {
+//	if (parent.opener)
+//		parent.opener.dialogHandler(id);
+//	else
+//		parent.dialogHandler(id);	
+//}
+//
+//");
+//            }
         }
 
 
@@ -214,14 +214,14 @@ function openContent(id) {
         }
         protected void SetActionAttribute(ref XmlTreeNode treeElement, Document dd)
         {
-            //TODO: Work out why the DialogMode isn't working
+            
             // Check for dialog behaviour
-            if (this.DialogMode == TreeDialogModes.fulllink && !this.IsDialog)
+            if (this.DialogMode == TreeDialogModes.fulllink )
             {
                 string nodeLink = CreateNodeLink(dd);
                 treeElement.Action = String.Format("javascript:openContent('{0}');", nodeLink);
             }
-            else if (this.IsDialog) //(this.DialogMode == TreeDialogModes.locallink)
+            else if (this.DialogMode == TreeDialogModes.locallink)
             {
                 string nodeLink = string.Format("{{localLink:{0}}}", dd.Id);
                 // try to make a niceurl too

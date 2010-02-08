@@ -231,7 +231,7 @@
             // UMBRACO SPECIFIC, open window on space
             if (currentValue == ' ') {
                 $input.blur();
-                openModal("dialogs/search.aspx", 'Search', 470, 620);
+                UmbClientMgr.openModalWindow("dialogs/search.aspx", 'Search', true, 620, 470);
             } else {
                 if (!skipPrevCheck && currentValue == previousValue)
                     return;

@@ -56,9 +56,9 @@
     } else {
       top.right.umbracoInsertMacroDo("<?UMBRACO_MACRO macroAlias=\"" + document.forms[0]["macroAlias"].value + "\" " + macroString + ">");
     }
-    
-    
-    UmbClientMgr.mainWindow().closeModal();
+
+
+    UmbClientMgr.closeModalWindow();
   }
 
   function pseudoHtmlEncode(text) {
@@ -83,7 +83,7 @@
     <p>
     <input type="button" value="<%=umbraco.ui.Text("general", "ok", this.getUser())%>" onclick="updateMacro()" />
     &nbsp; <em> or </em> &nbsp;
-     <a href="#" style="color: blue"  onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+     <a href="#" style="color: blue"  onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
     </p>
     <%} else {%>
     
@@ -95,7 +95,7 @@
     <p>
     <input type="submit" value="<%=umbraco.ui.Text("general", "ok", this.getUser())%>" />
     &nbsp; <em> or </em> &nbsp;
-     <a href="#" style="color: blue"  onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+     <a href="#" style="color: blue"  onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
     </p>
     
     <%}%>

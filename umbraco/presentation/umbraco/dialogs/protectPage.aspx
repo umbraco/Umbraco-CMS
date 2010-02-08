@@ -103,7 +103,7 @@
             </div>
           </cc1:Pane>
           <p>
-             <asp:Button ID="bt_selectMode" runat="server" Text="select" OnClick="selectMode" />&nbsp; <em><%= umbraco.ui.Text("or") %></em>&nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("cancel")%></a>
+             <asp:Button ID="bt_selectMode" runat="server" Text="select" OnClick="selectMode" />&nbsp; <em><%= umbraco.ui.Text("or") %></em>&nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
           </p>
          </asp:Panel>
          
@@ -153,7 +153,7 @@
              <p>
                 <asp:Button ID="bt_protect" runat="server" OnCommand="protect_Click"></asp:Button> 
                 <asp:Button ID="bt_buttonRemoveProtection" runat="server" Visible="False" OnClick="buttonRemoveProtection_Click"/>
-                &nbsp; <em><%= umbraco.ui.Text("or") %></em>&nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("cancel")%></a>
+                &nbsp; <em><%= umbraco.ui.Text("or") %></em>&nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
              </p>             
          </asp:Panel>
          

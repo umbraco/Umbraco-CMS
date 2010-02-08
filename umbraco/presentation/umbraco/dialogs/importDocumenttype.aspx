@@ -21,7 +21,7 @@
             </p>
             
             
-            <asp:Button ID="submit" runat="server"></asp:Button> <em><%= umbraco.ui.Text("or") %></em> <a href="#" onclick="UmbClientMgr.mainWindow().closeModal(); return false;"><%= umbraco.ui.Text("cancel") %></a>
+            <asp:Button ID="submit" runat="server"></asp:Button> <em><%= umbraco.ui.Text("or") %></em> <a href="#" onclick="UmbClientMgr.closeModalWindow(); return false;"><%= umbraco.ui.Text("cancel") %></a>
           </asp:Panel>
           
           

@@ -140,7 +140,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="System.Web.Extensions.Design, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="System.Web.Extensions.Design, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.Services">
       <Name>System.Web.Services</Name>
     </Reference>
@@ -425,6 +425,24 @@
     <Compile Include="umbraco\controls\ContentControl.cs" />
     <Compile Include="umbraco\controls\ContentPicker.cs" />
     <Compile Include="umbraco\controls\ContentTypeControl.cs" />
+    <Compile Include="umbraco\controls\Images\ImageViewer.ascx.cs">
+      <DependentUpon>ImageViewer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\controls\Images\ImageViewer.ascx.designer.cs">
+      <DependentUpon>ImageViewer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\controls\Images\ImageViewerUpdater.asmx.cs">
+      <DependentUpon>ImageViewerUpdater.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="umbraco\controls\Images\UploadMediaImage.ascx.cs">
+      <DependentUpon>UploadMediaImage.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\controls\Images\UploadMediaImage.ascx.designer.cs">
+      <DependentUpon>UploadMediaImage.ascx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\controls\ContentTypeControlNew.ascx.cs">
       <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -457,17 +475,19 @@
       <DependentUpon>passwordChanger.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\controls\ProgressBar.ascx.cs">
-      <DependentUpon>ProgressBar.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
+      <DependentUpon>ProgressBar.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\controls\ProgressBar.ascx.designer.cs">
       <DependentUpon>ProgressBar.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\controls\TreeControl.ascx.cs">
+    <Compile Include="umbraco\controls\Tree\JTreeContextMenu.cs" />
+    <Compile Include="umbraco\controls\Tree\JTreeContextMenuItem.cs" />
+    <Compile Include="umbraco\controls\Tree\TreeControl.ascx.cs">
       <DependentUpon>TreeControl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco\controls\TreeControl.ascx.designer.cs">
+    <Compile Include="umbraco\controls\Tree\TreeControl.ascx.designer.cs">
       <DependentUpon>TreeControl.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\create\DLRScripting.ascx.cs">
@@ -1187,16 +1207,15 @@
     <Compile Include="umbraco\Trees\BaseMediaTree.cs" />
     <Compile Include="umbraco\Trees\dynamicLoader.cs" />
     <Compile Include="umbraco\Trees\loadDLRScripts.cs" />
+    <Compile Include="umbraco\Trees\ITreeService.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="umbraco\Trees\MediaRecycleBin.cs" />
+    <Compile Include="umbraco\Trees\TreeRequestParams.cs" />
     <Compile Include="umbraco\webservices\MacroContainerService.asmx.cs">
       <DependentUpon>MacroContainerService.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="umbraco\webservices\MediaPickerService.asmx.cs">
-      <DependentUpon>MediaPickerService.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco\webservices\MediaPickerServiceHelpers.cs" />
     <Compile Include="umbraco\webservices\TreeClientService.asmx.cs">
       <DependentUpon>TreeClientService.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -1442,24 +1461,35 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
+    <Content Include="umbraco\controls\passwordChanger.ascx" />
+    <Content Include="umbraco\controls\ProgressBar.ascx" />
+    <Content Include="web.config.SHOCKING.xslt" />
     <Content Include="web.config.UMBRACOTOSH.xslt" />
     <Content Include="umbraco\controls\ContentTypeControlNew.ascx" />
     <Content Include="umbraco\controls\Extenders\CustomDragDropBehavior.js" />
     <Content Include="umbraco\controls\Extenders\CustomFloatingBehavior.js" />
     <Content Include="umbraco\controls\GenericProperties\GenericProperty.ascx" />
-    <Content Include="umbraco\controls\passwordChanger.ascx" />
-    <Content Include="umbraco\controls\ProgressBar.ascx" />
-    <Content Include="umbraco\controls\TreeControl.ascx" />
     <Content Include="umbraco\create\DLRScripting.ascx" />
     <Content Include="umbraco\images\umbraco\developerRuby.gif" />
     <Content Include="umbraco\images\umbraco\developerScript.gif" />
     <Content Include="umbraco_client\Tree\sprites.png" />
     <Content Include="umbraco_client\Tree\sprites_ie6.gif" />
-    <Content Include="web.config.SHOCKING.xslt" />
+    <Content Include="umbraco\controls\Images\ImageViewer.ascx" />
+    <Content Include="umbraco\controls\Images\ImageViewer.js" />
+    <Content Include="umbraco\controls\Images\ImageViewerUpdater.asmx" />
+    <Content Include="umbraco\controls\Images\UploadMediaImage.ascx" />
+    <Content Include="umbraco\controls\Images\UploadMediaImage.js" />
+    <Content Include="umbraco\controls\Tree\TreeControl.ascx" />
+    <Content Include="umbraco\images\throbber.gif" />
+    <Content Include="umbraco\js\UmbracoSpeechBubbleInit.js" />
+    <Content Include="umbraco\LiveEditing\Modules\ItemEditing\ItemEditingInvoke.js" />
     <Content Include="umbraco\Search\QuickSearch.ascx" />
     <Content Include="umbraco\images\umbraco\bin.png" />
     <Content Include="umbraco\images\umbraco\bin_closed.png" />
     <Content Include="umbraco\images\umbraco\bin_empty.png" />
+    <Content Include="umbraco_client\Application\JQuery\jquery.noconflict-invoke.js" />
+    <Content Include="umbraco_client\Application\JQuery\VerticalAlign.js" />
+    <Content Include="umbraco_client\Application\UrlEncoder.js" />
     <Content Include="umbraco_client\CodeArea\UmbracoEditor.js" />
     <Content Include="umbraco_client\CodeMirror\css\csscolors.css" />
     <Content Include="umbraco_client\CodeMirror\css\docs.css" />
@@ -1531,7 +1561,6 @@
     <Content Include="umbraco\dialogs\mediaPicker.aspx" />
     <Content Include="umbraco\images\editor\spellchecker.gif" />
     <Content Include="umbraco\webservices\MacroContainerService.asmx" />
-    <Content Include="umbraco\webservices\MediaPickerService.asmx" />
     <Content Include="umbraco_client\Application\JQuery\jquery.cookie.js" />
     <Content Include="umbraco_client\imagecropper\Jcrop.gif" />
     <Content Include="umbraco_client\tablesorting\img\bg.gif" />
@@ -1933,10 +1962,6 @@
     <Content Include="umbraco\images\umbraco\developerPython.gif" />
     <Content Include="umbraco\images\umbraco\package.png" />
     <Content Include="umbraco\images\umbraco\settingsScript.gif" />
-    <Content Include="umbraco\js\submodal\common.js" />
-    <Content Include="umbraco\js\submodal\maskBG.png" />
-    <Content Include="umbraco\js\submodal\subModal.css" />
-    <Content Include="umbraco\js\submodal\subModal.js" />
     <Content Include="umbraco\settings\DictionaryItemList.aspx" />
     <Content Include="umbraco\settings\scripts\editScript.aspx" />
     <Content Include="umbraco\canvas.aspx" />
@@ -2686,7 +2711,6 @@
     <None Include="umbraco_client\CodeMirror\LICENSE" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
     <Content Include="web.config.APOWELL-WIN7.xslt" />
-    <Content Include="web.config.BOMBER.xslt" />
     <Content Include="web.config.SONIC.xslt" />
     <Content Include="web.STANDARD.config" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />
@@ -2752,7 +2776,6 @@
     <None Include="umbraco\schemas\umbraco.xsx">
       <DependentUpon>umbraco.xsd</DependentUpon>
     </None>
-    <Content Include="web.config" />
     <Content Include="config\UrlRewriting.config" />
   </ItemGroup>
   <ItemGroup>

@@ -28,7 +28,7 @@ namespace umbraco.cms.businesslogic.packager {
         
         private static void RegisterPackageActions()
         {
-            List<Type> types = TypeFinder.FindClassesOfType<IPackageAction>(true);
+            List<Type> types = TypeFinder.FindClassesOfType<IPackageAction>();
             foreach (Type t in types)
             {
                 IPackageAction typeInstance = Activator.CreateInstance(t) as IPackageAction;

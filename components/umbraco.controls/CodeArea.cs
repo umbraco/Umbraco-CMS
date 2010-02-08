@@ -36,10 +36,12 @@ namespace umbraco.uicontrols {
         {
             get
             {
+                EnsureChildControls();
                 return CodeTextBox.Text;
             }
             set
             {
+                EnsureChildControls();
                 CodeTextBox.Text = value;
             }
         }

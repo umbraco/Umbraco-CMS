@@ -24,6 +24,8 @@ namespace umbraco.dialogs
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
+            JTree.DataBind();
+
 			// Put user code to initialize the page here
             if (!IsPostBack) {
                 //Document Type copy Hack...
@@ -259,7 +261,7 @@ namespace umbraco.dialogs
                             m.Move(int.Parse(UmbracoContext.Current.Request["copyTo"]));
                         }                                 
 
-                        feedback.Text = ui.Text("moveOrCopy", "moveDone", nodes, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow + "'>" + ui.Text("closeThisWindow") + "</a>";
+                        feedback.Text = ui.Text("moveOrCopy", "moveDone", nodes, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
                         feedback.type = umbraco.uicontrols.Feedback.feedbacktype.success;
 
                         // refresh tree
@@ -270,7 +272,7 @@ namespace umbraco.dialogs
 					{
 						cms.businesslogic.web.Document d = new cms.businesslogic.web.Document(int.Parse(helper.Request("id")));
 						d.Copy(int.Parse(helper.Request("copyTo")), this.getUser(), RelateDocuments.Checked);
-						feedback.Text = ui.Text("moveOrCopy", "copyDone", nodes, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow + "'>" + ui.Text("closeThisWindow") + "</a>";
+						feedback.Text = ui.Text("moveOrCopy", "copyDone", nodes, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
                         feedback.type = umbraco.uicontrols.Feedback.feedbacktype.success;
 						ClientTools.CopyNode(currentNode.Id.ToString(), newNode.Path);
                     }

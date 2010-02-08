@@ -72,7 +72,7 @@ namespace umbraco.cms.businesslogic.datatype.controls
         private static void Initialize()
         {
             // Get all datatypes from interface
-            List<Type> types = TypeFinder.FindClassesOfType<IDataType>(true);
+            List<Type> types = TypeFinder.FindClassesOfType<IDataType>();
             getDataTypes(types);
         }
 

@@ -16,17 +16,19 @@ using System.Web.Services;
 
 namespace umbraco.cms.presentation
 {
-    /// <summary>
-    /// Summary description for TreeInit.
-    /// </summary>
+    [Obsolete("Used the TreeControl control instead. This does however get used by the TreeService when requesting the tree init url.")]
     public partial class TreeInit : UmbracoEnsuredPage
     {
 
-		protected override void OnLoad(EventArgs e)
-		{
-			base.OnLoad(e);
-			ClientLoader.DataBind();
-		}
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            TreeParams = TreeRequestParams.FromQueryStrings().CreateTreeService();
+            DataBind();
+        }
+
+        protected TreeService TreeParams { get; private set; } 
+
 		
     }
 }

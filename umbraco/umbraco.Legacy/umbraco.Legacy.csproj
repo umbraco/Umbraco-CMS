@@ -325,6 +325,10 @@
     <Content Include="umbraco\js\scriptaculous\slider.js" />
     <Content Include="umbraco\js\scriptaculous\sound.js" />
     <Content Include="umbraco\js\scriptaculous\unittest.js" />
+    <Content Include="umbraco\js\submodal\common.js" />
+    <Content Include="umbraco\js\submodal\maskBG.png" />
+    <Content Include="umbraco\js\submodal\subModal.css" />
+    <Content Include="umbraco\js\submodal\subModal.js" />
     <Content Include="umbraco\js\treeGui.js" />
     <Content Include="umbraco\js\umbContext.js" />
     <Content Include="umbraco\js\umbracoDefault.js" />

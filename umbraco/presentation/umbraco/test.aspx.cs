@@ -18,6 +18,7 @@ using System.IO;
 
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.nodeFactory;
+using umbraco.controls;
 
 namespace umbraco.cms.presentation
 {
@@ -26,7 +27,7 @@ namespace umbraco.cms.presentation
 	/// </summary>
 	public partial class test : BasePages.UmbracoEnsuredPage
 	{
-        protected controls.macroParameterControl mp = new umbraco.controls.macroParameterControl();
+        protected macroParameterControl mp = new macroParameterControl();
 
 		protected void Page_Load(object sender, System.EventArgs e) 
 		{

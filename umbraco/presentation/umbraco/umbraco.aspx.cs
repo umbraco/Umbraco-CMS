@@ -14,6 +14,7 @@ using System.Xml.XPath;
 using umbraco.BusinessLogic.Actions;
 using ClientDependency.Core;
 using umbraco.IO;
+using System.Linq;
 
 namespace umbraco.cms.presentation
 {
@@ -28,11 +29,11 @@ namespace umbraco.cms.presentation
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-            BusinessLogic.Application[] apps = this.getUser().Applications;
-            bool userHasAccesstodefaultApp = false;
+            var apps = this.getUser().Applications.ToList();
+            bool userHasAccesstodefaultApp = apps.Where(x => x.alias == "content").Count() > 0;
             
             // Load user module icons ..
-            if (apps.Length > 1) {
+            if (apps.Count() > 1) {
                 PlaceHolderAppIcons.Text = ui.Text("main", "sections", base.getUser());
                 plcIcons.Text = "";
                 foreach (BusinessLogic.Application a in apps) {
@@ -44,19 +45,16 @@ namespace umbraco.cms.presentation
                         iconElement += "<img src=\"images/tray/" + a.icon + "\" class=\"trayIcon\" alt=\"" + ui.Text("sections", a.alias, base.getUser()) + "\"></a></li>";
                     plcIcons.Text += iconElement;
 
-                    if (a.alias == "content")
-                        userHasAccesstodefaultApp = true;
-
                 }
             } else
                 PlaceHolderAppIcons.Visible = false;
 
 
             //if user does not have access to content (ie, he's probably a translator)...
-            if (!userHasAccesstodefaultApp) {
-                Literal loadApp = new Literal();
-				loadApp.Text = ClientTools.Scripts.ShiftApp(apps[0].alias, ui.Text("sections", apps[0].alias, this.getUser()), false);
-                bubbleText.Controls.Add(loadApp);
+            //then change the default tree app
+            if (!userHasAccesstodefaultApp)
+            {
+                JTree.App = apps[0].alias;
             }
 
 

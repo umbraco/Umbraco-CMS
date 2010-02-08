@@ -4,15 +4,16 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using umbraco.BasePages;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
-    public partial class mediaPicker : System.Web.UI.Page
+    public partial class mediaPicker : UmbracoEnsuredPage
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-           
-
+			if (!IsPostBack)
+				DataBind();
            
         }
 

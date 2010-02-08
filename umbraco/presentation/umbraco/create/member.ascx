@@ -28,5 +28,5 @@
     <asp:Button ID="sbmt" runat="server" Style="margin-top: 14px" Width="90" OnClick="sbmt_Click">
     </asp:Button>
     &nbsp; <em>
-        <%= umbraco.ui.Text("or") %></em> &nbsp;<a href="#" style="color: blue" onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("cancel")%></a>
+        <%= umbraco.ui.Text("or") %></em> &nbsp;<a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
 </div>

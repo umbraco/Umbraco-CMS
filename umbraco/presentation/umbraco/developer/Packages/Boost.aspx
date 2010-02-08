@@ -16,7 +16,7 @@
           }
 
           function openDemoModal(id, title) {
-            top.openModal("http://packages.umbraco.org/viewPackageData.aspx?id=" + id, title, 550, 750)
+              UmbClientMgr.openModalWindow("http://packages.umbraco.org/viewPackageData.aspx?id=" + id, title, true, 750, 550)
           }
 
           function InstallPackages(button, elementId) {

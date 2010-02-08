@@ -46,7 +46,7 @@ small a{color: #999; padding-left: 3px !Important; background-image: none !Impor
 <script type="text/javascript">
   function postPath(path) {
     top.right.document.getElementById('<%=target%>').value = path;
-    UmbClientMgr.mainWindow().closeModal();
+    UmbClientMgr.closeModalWindow();
   }
 </script>
 

@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="TreeControl.ascx.cs" Inherits="umbraco.presentation.umbraco.controls.TreeControl" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="TreeControl.ascx.cs" Inherits="umbraco.controls.Tree.TreeControl" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <umb:CssInclude ID="CssInclude2" runat="server" FilePath="Tree/treeIcons.css" PathNameAlias="UmbracoClient" Priority="10" />
@@ -17,38 +17,49 @@
 <umb:JsInclude ID="JsInclude9" runat="server" FilePath="Tree/NodeDefinition.js" PathNameAlias="UmbracoClient" Priority="12"  />
 <umb:JsInclude ID="JsInclude10" runat="server" FilePath="Tree/UmbracoTree.js" PathNameAlias="UmbracoClient" Priority="13" />
 
+
 <script type="text/javascript">
-
 jQuery(document).ready(function() {
-	var ctxMenu = <%#GetJSONContextMenu() %>;
-	var initNode = <%#GetJSONInitNode() %>;
-	var app = "<%#TreeSvc.App%>";
-	var showContext = <%#TreeSvc.ShowContextMenu.ToString().ToLower()%>;
-	var isDialog = <%#TreeSvc.IsDialog.ToString().ToLower()%>;
-
-	jQuery("#<%#string.IsNullOrEmpty(CustomContainerId) ? "treeContainer" : CustomContainerId %>").UmbracoTree({
+    var ctxMenu = <%#GetJSONContextMenu() %>;	
+    var app = "<%#App%>";
+    var showContext = <%#ShowContextMenu.ToString().ToLower()%>;
+    var isDialog = <%#IsDialog.ToString().ToLower()%>;
+    var dialogMode = "<%#DialogMode.ToString()%>";
+    var treeType = "<%#TreeType%>";
+    var functionToCall = "<%#FunctionToCall%>";
+    var nodeKey = "<%#NodeKey%>";
+	
+    //create the javascript tree
+    jQuery("#<%=ClientID%>").UmbracoTree({
         jsonFullMenu: ctxMenu,
-        jsonInitNode: initNode,
+        //jsonInitNode: initNode,
         appActions: UmbClientMgr.appActions(),
         uiKeys: UmbClientMgr.uiKeys(),
         app: app,
         showContext: showContext,
         isDialog: isDialog,
-        umb_clientFolderRoot: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco_client) %>",
-        treeType: "<%#TreeType.ToString().ToLower()%>",
-        dataUrl: "<%# umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Webservices) %>/TreeDataService.ashx",
-        serviceUrl: "<%# umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Webservices) %>/TreeClientService.asmx/GetInitAppTreeData"});
+        dialogMode: dialogMode,
+        treeType: treeType,
+        functionToCall : functionToCall,
+        nodeKey : nodeKey,
+        umbClientFolderRoot: "<%#umbraco.GlobalSettings.ClientPath%>",
+        treeMode: "<%#Mode.ToString().ToLower()%>",
+        dataUrl: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/webservices/TreeDataService.ashx",
+        serviceUrl: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/webservices/TreeClientService.asmx/GetInitAppTreeData"});
         
-	//add event handler for ajax errors, this will refresh the whole application
-	UmbClientMgr.mainTree().addEventHandler("ajaxError", function(e) {
-		if (e.msg == "rebuildTree") {
-			UmbClientMgr.mainWindow("umbraco.aspx");
-		}
-	});
+    //add event handler for ajax errors, this will refresh the whole application
+    UmbClientMgr.mainTree().addEventHandler("ajaxError", function(e) {
+        if (e.msg == "rebuildTree") {
+	        UmbClientMgr.mainWindow("umbraco.aspx");
+        }
+    });
 	
 });	
 
 </script>
 
-<div class="<%#TreeType.ToString().ToLower()%>" id="<%#string.IsNullOrEmpty(CustomContainerId) ? "treeContainer" : CustomContainerId %>">
+
+<div runat="server" id="TreeContainer">
+    <div id="<%=ClientID%>" class="<%#Mode.ToString().ToLower()%>">
+    </div>
 </div>

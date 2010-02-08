@@ -50,7 +50,7 @@
 <div id="sortingDone" style="display: none;" class="success">
   <p><asp:Literal runat="server" ID="sortDone"></asp:Literal></p>
   <p>
-  <a href="#" onclick="UmbClientMgr.mainWindow().closeModal()"><%= umbraco.ui.Text("defaultdialogs", "closeThisWindow")%></a>
+  <a href="#" onclick="UmbClientMgr.closeModalWindow()"><%= umbraco.ui.Text("defaultdialogs", "closeThisWindow")%></a>
   </p>
 </div>
 
@@ -84,7 +84,7 @@
   <br />
   <p>
     <input type="button" onclick="sort(); return false;" value='<%=umbraco.ui.Text("save") %>' />
-    <em> or </em><a href="#" style="color: blue" onclick="UmbClientMgr.mainWindow().closeModal()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>  
+    <em> or </em><a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>  
   </p>
 </div>
   

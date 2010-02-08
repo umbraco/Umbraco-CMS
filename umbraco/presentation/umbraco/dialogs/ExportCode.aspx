@@ -47,7 +47,7 @@
     </cc1:Pane>
     <div style="margin-top: 10px;">
         <asp:Button ID="btnGenerate" runat="server" Text="Submit" OnClick="btnGenerate_Click" style="MARGIN-TOP: 14px" />
-        <em>or </em><a href="#" style="color: Blue; margin-left: 6px;" onclick="UmbClientMgr.mainWindow().closeModal()">
+        <em>or </em><a href="#" style="color: Blue; margin-left: 6px;" onclick="UmbClientMgr.closeModalWindow()">
             <%=umbraco.ui.Text("cancel")%></a>
     </div>
 </asp:Content>

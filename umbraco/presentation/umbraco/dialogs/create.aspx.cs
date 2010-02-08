@@ -10,6 +10,10 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Xml;
 using umbraco.IO;
+using umbraco.presentation;
+using umbraco.BusinessLogic.Actions;
+using umbraco.BasePages;
+using umbraco.cms.businesslogic.web;
 
 namespace umbraco.dialogs
 {
@@ -25,30 +29,41 @@ namespace umbraco.dialogs
 			// Put user code to initialize the page here
 			if (helper.Request("nodeId") == "") 
 			{
-				// Caption and properies on BUTTON
-//				ok.Text = ui.Text("general", "continue", this.getUser());
-//				ok.Attributes.Add("style", "width: 100px");
-//				ok.Attributes.Add("disabled", "true");
+			
 				string appType = ui.Text("sections", helper.Request("app")).ToLower();
                 pane_chooseNode.Text = ui.Text("create", "chooseNode", appType, this.getUser()) + "?";
+
+                DataBind();
 			} 
 			else 
 			{
-                //pane_chooseName.Text = ui.Text("create", "updateData", this.getUser());
-				cms.businesslogic.CMSNode c = new cms.businesslogic.CMSNode(int.Parse(helper.Request("nodeId")));
-				path.Value = c.Path;
-				pane_chooseNode.Visible = false;
-                panel_buttons.Visible = false;
-                pane_chooseName.Visible = true;
-				XmlDocument createDef = new XmlDocument();
-				XmlTextReader defReader = new XmlTextReader( IOHelper.MapPath(SystemFiles.CreateUiXml) );
-				createDef.Load(defReader);
-				defReader.Close();
+                int nodeId = int.Parse(helper.Request("nodeId"));
+                //ensure they have access to create under this node!!
+                if (CheckCreatePermissions(nodeId))
+                {
+                    //pane_chooseName.Text = ui.Text("create", "updateData", this.getUser());
+                    cms.businesslogic.CMSNode c = new cms.businesslogic.CMSNode(nodeId);
+                    path.Value = c.Path;
+                    pane_chooseNode.Visible = false;
+                    panel_buttons.Visible = false;
+                    pane_chooseName.Visible = true;
+                    XmlDocument createDef = new XmlDocument();
+                    XmlTextReader defReader = new XmlTextReader(Server.MapPath(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/config/create/UI.xml"));
+                    createDef.Load(defReader);
+                    defReader.Close();
 
-				// Find definition for current nodeType
-				XmlNode def = createDef.SelectSingleNode("//nodeType [@alias = '" + Request.QueryString["app"] + "']");
-				phCreate.Controls.Add(new UserControl().LoadControl(SystemDirectories.Umbraco + def.SelectSingleNode("./usercontrol").FirstChild.Value));
+                    // Find definition for current nodeType
+                    XmlNode def = createDef.SelectSingleNode("//nodeType [@alias = '" + Request.QueryString["app"] + "']");
+                    phCreate.Controls.Add(new UserControl().LoadControl(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + def.SelectSingleNode("./usercontrol").FirstChild.Value));
+                }
+                else
+                {                    
+                    PageNameHolder.type = umbraco.uicontrols.Feedback.feedbacktype.error;
+                    PageNameHolder.Text = ui.GetText("rights") + " " + ui.GetText("error");
+                    JTree.DataBind();
+                }
 			}
+                        
 		}
 
         protected override void OnPreRender(EventArgs e) {
@@ -58,23 +73,11 @@ namespace umbraco.dialogs
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference( IOHelper.ResolveUrl( SystemDirectories.Webservices) +"/legacyAjaxCalls.asmx"));
         }
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
-		}
-		#endregion
+        private bool CheckCreatePermissions(int nodeId)
+        {
+            return UmbracoEnsuredPage.CurrentUser.GetPermissions(new Document(nodeId).Path)
+                .Contains(ActionNew.Instance.Letter.ToString());
+        }
+
 	}
 }

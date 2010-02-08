@@ -15,7 +15,7 @@ namespace umbraco.controls
 	
     [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "Tree/treeIcons.css", "UmbracoClient")]
-	[ClientDependency(ClientDependencyType.Css, "Tree/Themes/umbraco/styles.css", "UmbracoClient")]
+	[ClientDependency(ClientDependencyType.Css, "Tree/Themes/umbraco/style.css", "UmbracoClient")]
     public partial class ContentTypeControlNew : System.Web.UI.UserControl
     {
         public uicontrols.TabPage InfoTabPage;

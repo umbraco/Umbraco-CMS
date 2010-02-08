@@ -112,6 +112,7 @@
     <Compile Include="IDataEditor.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IDataEditorAjaxAlternative.cs" />
     <Compile Include="IDataFieldWithButtons.cs">
       <SubType>Code</SubType>
     </Compile>

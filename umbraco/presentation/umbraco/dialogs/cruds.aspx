@@ -19,7 +19,7 @@
 <asp:Panel ID="panel_buttons" runat="server" Visible="True">
 <br />
  <asp:Button ID="Button1" runat="server" Text="" OnClick="Button1_Click"></asp:Button>
- &nbsp; <em>or </em>&nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.mainWindow().closeModal()">
+ &nbsp; <em>or </em>&nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()">
  <%=umbraco.ui.Text("general", "cancel", this.getUser())%>
  </a>
 </asp:Panel>

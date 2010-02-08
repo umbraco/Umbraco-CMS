@@ -95,22 +95,19 @@ namespace umbraco.cms.presentation.settings
 			Panel1.Menu.InsertSplitter();
 			uicontrols.MenuIconI umbField = Panel1.Menu.NewIcon();
 			umbField.ImageURL = UmbracoPath + "/images/editor/insField.gif";
-            umbField.OnClickCommand = "top.openModal('dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDATA', '" + ui.Text("template", "insertPageField") + "', 590, 640);";
+            umbField.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDATA", ui.Text("template", "insertPageField"), 640, 550);
             umbField.AltText = ui.Text("template", "insertPageField");
 
             // TODO: Update icon
             uicontrols.MenuIconI umbDictionary = Panel1.Menu.NewIcon();
-            umbDictionary.ImageURL = SystemDirectories.Umbraco + "/images/editor/dictionaryItem.gif";
-            umbDictionary.OnClickCommand = "top.openModal('dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY', '" + ui.Text("template", "insertDictionaryItem") + "', 590, 640);";
-            //umbDictionary.OnClickCommand = "umbracoInsertField(document.forms[0].TemplateBody, 'umbracoField', 'UMBRACOGETDICTIONARY','felt', 640, 650, 'dialogs/');";
-            //umbDictionary.OnClickCommand = "top.openModal('dialogs/editMacro.aspx?objectId=" + editorSource.ClientID + "', 'Insert dictionary item', 550, 470);";
+            umbDictionary.ImageURL = GlobalSettings.Path + "/images/editor/dictionaryItem.gif";
+            umbDictionary.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY", ui.Text("template", "insertDictionaryItem"), 640, 550);
             umbDictionary.AltText = "Insert umbraco dictionary item";
             
             uicontrols.MenuIconI umbMacro = Panel1.Menu.NewIcon();
             umbMacro.ImageURL = UmbracoPath + "/images/editor/insMacro.gif";
             umbMacro.AltText = ui.Text("template", "insertMacro");
-            umbMacro.OnClickCommand = "top.openModal('dialogs/editMacro.aspx?objectId=" + editorSource.ClientID + "', '" + ui.Text("template", "insertMacro") + "', 550, 470);";
-            //umbMacro.OnClickCommand = "umbracoTemplateInsertMacro();";
+            umbMacro.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/editMacro.aspx?objectId=" + editorSource.ClientID, ui.Text("template", "insertMacro"), 470, 530);
 
             if (UmbracoSettings.UseAspNetMasterPages) {
 
@@ -119,20 +116,19 @@ namespace umbraco.cms.presentation.settings
                 uicontrols.MenuIconI umbContainer = Panel1.Menu.NewIcon();
                 umbContainer.ImageURL = UmbracoPath + "/images/editor/masterpagePlaceHolder.gif";
                 umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
-                //umbContainer.OnClickCommand = "umbracoTemplateInsertMasterPageContentContainer();";
-                umbContainer.OnClickCommand = "top.openModal('dialogs/insertMasterpagePlaceholder.aspx?&id=" + _template.Id.ToString() + "', '" + ui.Text("template", "insertContentAreaPlaceHolder") + "', 340, 470);";
+                umbContainer.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/insertMasterpagePlaceholder.aspx?&id=" + _template.Id.ToString(), ui.Text("template", "insertContentAreaPlaceHolder"), 470, 320);
                 
                 uicontrols.MenuIconI umbContent = Panel1.Menu.NewIcon();
                 umbContent.ImageURL = UmbracoPath + "/images/editor/masterpageContent.gif";
                 umbContent.AltText = ui.Text("template", "insertContentArea");
-                umbContent.OnClickCommand = "top.openModal('dialogs/insertMasterpageContent.aspx?id=" + _template.Id.ToString() + "', '" + ui.Text("template", "insertContentArea") + "', 320, 470);";
+                umbContent.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/insertMasterpageContent.aspx?id=" + _template.Id.ToString(), ui.Text("template", "insertContentArea"), 470, 300);
             }
 
 			// Help
 			Panel1.Menu.InsertSplitter();
 
 			uicontrols.MenuIconI helpIcon = Panel1.Menu.NewIcon();
-            helpIcon.OnClickCommand = "top.openModal('settings/modals/showumbracotags.aspx?alias=" + _template.Alias + "', '" + ui.Text("template", "quickGuide") + "', 450, 750);";
+            helpIcon.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/settings/modals/showumbracotags.aspx?alias=" + _template.Alias, ui.Text("template", "quickGuide"), 600, 580);
 			helpIcon.ImageURL = UmbracoPath + "/images/editor/help.png";
             helpIcon.AltText = ui.Text("template", "quickGuide");
 		}

@@ -12,42 +12,17 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco.dialogs
 {
-	/// <summary>
-	/// Summary description for treePicker.
-	/// </summary>
+    [Obsolete("Use the TreeControl instead. This does however get used by the TreeService when requesting the tree init url.")]
 	public partial class treePicker : BasePages.UmbracoEnsuredPage
 	{
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);
-			ClientLoader.DataBind();
+            TreeParams = TreeRequestParams.FromQueryStrings().CreateTreeService();
+            DataBind();
 		}
 
-        protected string TreeInitUrl
-        {
-            get
-            {
-				TreeRequestParams treeParams = TreeRequestParams.FromQueryStrings();
+        protected TreeService TreeParams { get; private set; }        
 
-				return TreeService.GetInitUrl(null, treeParams.TreeType, false, true, TreeDialogModes.id, treeParams.Application, "", "");
-            }
-        }
-
-
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{			
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
-		}
-		#endregion
 	}
 }

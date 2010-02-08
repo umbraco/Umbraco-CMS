@@ -55,7 +55,7 @@ Umbraco.Application.Actions = function() {
 
         launchAbout: function() {
             /// <summary>Launches the about Umbraco window</summary>
-            UmbClientMgr.mainWindow().openModal("dialogs/about.aspx", UmbClientMgr.uiKeys()['general_about'], 390, 450);
+            UmbClientMgr.openModalWindow("dialogs/about.aspx", UmbClientMgr.uiKeys()['general_about'], true, 450, 390);
             return false;
         },
 
@@ -67,7 +67,7 @@ Umbraco.Application.Actions = function() {
                     this._currApp = 'content';
                 }
 
-                UmbClientMgr.mainWindow().openModal("dialogs/create.aspx?nodeType=" + this._currApp + "&app=" + this._currApp + "&rnd=" + this._utils.generateRandom(), UmbClientMgr.uiKeys()['actions_create'] + " " + this._currApp, 470, 620);
+                UmbClientMgr.openModalWindow("dialogs/create.aspx?nodeType=" + this._currApp + "&app=" + this._currApp + "&rnd=" + this._utils.generateRandom(), UmbClientMgr.uiKeys()['actions_create'] + " " + this._currApp, true, 620, 470);
                 return false;
 
             } else
@@ -155,7 +155,7 @@ Umbraco.Application.Actions = function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '0' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.mainWindow().openModal("dialogs/sort.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_sort'], 450, 600);
+                UmbClientMgr.openModalWindow("dialogs/sort.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_sort'], true, 600, 450);
             }
 
         },
@@ -164,7 +164,7 @@ Umbraco.Application.Actions = function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.mainWindow().openModal("dialogs/cruds.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_rights'], 300, 800);
+                UmbClientMgr.openModalWindow("dialogs/cruds.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_rights'], true, 800, 300);
             }
         },
 
@@ -172,14 +172,14 @@ Umbraco.Application.Actions = function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.mainWindow().openModal("dialogs/protectPage.aspx?mode=cut&nodeId=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_protect'], 480, 535);
+                UmbClientMgr.openModalWindow("dialogs/protectPage.aspx?mode=cut&nodeId=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_protect'], true, 535, 480);
             }
         },
 
         actionRollback: function() {
             /// <summary></summary>
 
-            UmbClientMgr.mainWindow().openModal('dialogs/rollback.aspx?nodeId=' + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_rollback'], 550, 600);
+            UmbClientMgr.openModalWindow('dialogs/rollback.aspx?nodeId=' + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_rollback'], true, 600, 550);
         },
 
         actionRefresh: function() {
@@ -193,7 +193,7 @@ Umbraco.Application.Actions = function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.mainWindow().openModal("dialogs/notifications.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_notify'], 480, 300);
+                UmbClientMgr.openModalWindow("dialogs/notifications.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_notify'], true, 300, 480);
             }
         },
 
@@ -205,7 +205,7 @@ Umbraco.Application.Actions = function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '' != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.mainWindow().openModal("dialogs/publish.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId, uiKeys['actions_publish'], 280, 540);
+                UmbClientMgr.openModalWindow("dialogs/publish.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId, uiKeys['actions_publish'], true, 540, 280);
             }
         },
 
@@ -214,7 +214,7 @@ Umbraco.Application.Actions = function() {
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
                 if (confirm(uiKeys['defaultdialogs_confirmSure'] + '\n\n')) {
-                    UmbClientMgr.mainWindow().openModal('dialogs/SendPublish.aspx?id=' + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_sendtopublish'], 200, 300);
+                    UmbClientMgr.openModalWindow('dialogs/SendPublish.aspx?id=' + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_sendtopublish'], true, 300, 200);
                 }
             }
         },
@@ -229,14 +229,14 @@ Umbraco.Application.Actions = function() {
         actionRePublish: function() {
             /// <summary></summary>
 
-            UmbClientMgr.mainWindow().openModal('dialogs/republish.aspx?rnd=' + this._utils.generateRandom(), 'Republishing entire site', 210, 450);
+            UmbClientMgr.openModalWindow('dialogs/republish.aspx?rnd=' + this._utils.generateRandom(), 'Republishing entire site', true, 450, 210);
         },
 
         actionAssignDomain: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.mainWindow().openModal("dialogs/assignDomain.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId, uiKeys['actions_assignDomain'], 420, 500);
+                UmbClientMgr.openModalWindow("dialogs/assignDomain.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId, uiKeys['actions_assignDomain'], true, 500, 420);
             }
         },
 
@@ -251,16 +251,16 @@ Umbraco.Application.Actions = function() {
             var actionNode = UmbClientMgr.mainTree().getActionNode();
             if (actionNode.nodeType != '') {
                 if (actionNode.nodeType == "content") {
-                    UmbClientMgr.mainWindow().openModal("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], 425, 600);
+                    UmbClientMgr.openModalWindow("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], true, 600, 425);
                 }
                 else if (actionNode.nodeType == "initmember") {
-                    UmbClientMgr.mainWindow().openModal("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], 380, 420);
+                    UmbClientMgr.openModalWindow("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], true, 420, 380);
                 }
                 else if (actionNode.nodeType == "initpython" || actionNode.nodeType == "initdlrscripting") {
                     UmbClientMgr.mainWindow().openModal("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], 380, 420);
                 }
                 else {
-                    UmbClientMgr.mainWindow().openModal("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], 270, 420);
+                    UmbClientMgr.openModalWindow("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], true, 420, 270);
                 }
             }
         },
@@ -277,7 +277,7 @@ Umbraco.Application.Actions = function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.mainWindow().openModal("dialogs/sendToTranslation.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_sendToTranslate'], 470, 500);
+                UmbClientMgr.openModalWindow("dialogs/sendToTranslation.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_sendToTranslate'], true, 500, 470);
             }
         },
 
@@ -285,7 +285,7 @@ Umbraco.Application.Actions = function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.mainWindow().openModal("dialogs/emptyTrashcan.aspx", uiKeys['actions_emptyTrashcan'], 220, 500);
+                UmbClientMgr.openModalWindow("dialogs/emptyTrashcan.aspx", uiKeys['actions_emptyTrashcan'], true, 500, 220);
             }
         },
 
@@ -293,7 +293,7 @@ Umbraco.Application.Actions = function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.mainWindow().openModal("dialogs/importDocumentType.aspx?rnd=" + this._utils.generateRandom(), uiKeys['actions_importDocumentType'], 460, 400);
+                UmbClientMgr.openModalWindow("dialogs/importDocumentType.aspx?rnd=" + this._utils.generateRandom(), uiKeys['actions_importDocumentType'], true, 460, 400);
             }
         },
 
@@ -308,7 +308,7 @@ Umbraco.Application.Actions = function() {
         actionAudit: function() {
             /// <summary></summary>
 
-            UmbClientMgr.mainWindow().openModal('dialogs/viewAuditTrail.aspx?nodeId=' + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_auditTrail'], 500, 550);
+            UmbClientMgr.openModalWindow('dialogs/viewAuditTrail.aspx?nodeId=' + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_auditTrail'], true, 550, 500);
         },
 
         actionPackage: function() {
@@ -351,7 +351,7 @@ Umbraco.Application.Actions = function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.mainWindow().openModal("dialogs/moveOrCopy.aspx?app=" + this._currApp + "&mode=cut&id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_move'], 460, 500);
+                UmbClientMgr.openModalWindow("dialogs/moveOrCopy.aspx?app=" + this._currApp + "&mode=cut&id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_move'], true, 500, 460);
             }
         },
 
@@ -359,7 +359,7 @@ Umbraco.Application.Actions = function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.mainWindow().openModal("dialogs/moveOrCopy.aspx?app=" + this._currApp + "&mode=copy&id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_copy'], 470, 500);
+                UmbClientMgr.openModalWindow("dialogs/moveOrCopy.aspx?app=" + this._currApp + "&mode=copy&id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_copy'], true, 500, 470);
             }
         },
         _debug: function(strMsg) {
@@ -369,7 +369,7 @@ Umbraco.Application.Actions = function() {
         },
         actionExportCode: function() {
             /// <summary></summary>
-            UmbClientMgr.mainWindow().openModal("dialogs/exportCode.aspx", UmbClientMgr.uiKeys()['exportDocumentTypeAsCode'], 350, 400);
+            UmbClientMgr.openModalWindow("dialogs/exportCode.aspx", UmbClientMgr.uiKeys()['exportDocumentTypeAsCode'], true, 400, 350);
             return false;
         }
     }

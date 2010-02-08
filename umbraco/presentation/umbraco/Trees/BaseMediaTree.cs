@@ -57,7 +57,7 @@ namespace umbraco.cms.presentation.Trees
             if (!string.IsNullOrEmpty(this.FunctionToCall))
             {
                 Javascript.Append("function openMedia(id) {\n");
-                Javascript.Append(this.FunctionToCall + "(id)\n");
+                Javascript.Append(this.FunctionToCall + "(id);\n");
                 Javascript.Append("}\n");
             }
             else if (!this.IsDialog)
@@ -69,19 +69,19 @@ function openMedia(id) {
 }
 ");
             }
-            else
-            {
-				//TODO: SD: Find out how what this does...?
-                Javascript.Append(
-                    @"
-function openMedia(id) {
-	if (parent.opener)
-		parent.opener.dialogHandler(id);
-	else
-		parent.dialogHandler(id);	
-}
-");
-            }
+			//TODO: SD: UPDATE ALL TREE CODE SO THAT THE FUNCTIONTOCALL IS EXPLICITLY SET WHEN DIALOGHANDLER IS REQUIRED!
+			//            else
+//            {
+//                Javascript.Append(
+//                    @"
+//function openMedia(id) {
+//	if (parent.opener)
+//		parent.opener.dialogHandler(id);
+//	else
+//		parent.dialogHandler(id);	
+//}
+//");
+//            }
         }
 
         public override void Render(ref XmlTree tree)

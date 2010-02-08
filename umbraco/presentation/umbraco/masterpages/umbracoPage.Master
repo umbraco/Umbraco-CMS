@@ -13,14 +13,15 @@
 	<cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
 	
 	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="ui/default.css" PathNameAlias="UmbracoClient" />	
+	<umb:CssInclude ID="CssInclude2" runat="server" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />		
 	
 	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="Application/NamespaceManager.js" PathNameAlias="UmbracoClient" Priority="0" />	
 	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
-	
+	<umb:JsInclude ID="JsInclude8" runat="server" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient" Priority="1" />
 	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="Application/UmbracoApplicationActions.js" PathNameAlias="UmbracoClient" Priority="2" />
 	<umb:JsInclude ID="JsInclude5" runat="server" FilePath="Application/UmbracoUtils.js" PathNameAlias="UmbracoClient" Priority="2" />
 	<umb:JsInclude ID="JsInclude6" runat="server" FilePath="Application/UmbracoClientManager.js" PathNameAlias="UmbracoClient" Priority="3" />
-
+<umb:JsInclude ID="JsInclude7" runat="server" FilePath="modal/modal.js" PathNameAlias="UmbracoClient" Priority="10" />
 	<umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" Priority="10" />
 
     <form id="form1" runat="server">

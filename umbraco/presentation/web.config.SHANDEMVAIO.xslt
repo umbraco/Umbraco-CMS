@@ -4,12 +4,13 @@
 
   <!-- Set up a local connection string -->
   <xsl:template match="/configuration/appSettings/add[@key='umbracoDbDSN']/@value">
-    <xsl:attribute name="value">datalayer=&quot;VistaDB,VistaDB For Umbraco&quot;</xsl:attribute>
+    <xsl:attribute name="value">server=.\sqlexpress;database=UmbracoTest;user id=sa;password=test</xsl:attribute>
   </xsl:template>
+
   <xsl:template match="/configuration/appSettings/add[@key='umbracoConfigurationStatus']/@value">
-    <xsl:attribute name="value">4.1.0.alpha</xsl:attribute>
+    <xsl:attribute name="value">4.1.0.beta</xsl:attribute>
   </xsl:template>
-  
+
   <!-- Default templates to match anything else -->
   <xsl:template match="@*">
     <xsl:copy/>
@@ -20,5 +21,5 @@
       <xsl:apply-templates select="@*"/>
       <xsl:apply-templates/>
     </xsl:copy>
-  </xsl:template> 
+  </xsl:template>
 </xsl:stylesheet>

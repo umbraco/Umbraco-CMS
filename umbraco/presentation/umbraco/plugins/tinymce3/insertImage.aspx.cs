@@ -29,14 +29,10 @@ namespace umbraco.presentation.plugins.tinymce3
             uicontrols.TabPage tp = tv_options.NewTabPage(ui.Text("choose"));
             tp.HasMenu = false;
             tp.Controls.Add(pane_select);
-
-            //tp.Controls.Add(new LiteralControl("<div style=\"padding: 5px;\"><iframe src=\"../../TreeInit.aspx?app=media&isDialog=true&dialogMode=id&contextMenu=false&functionToCall=parent.dialogHandler\" style=\"LEFT: 9px; OVERFLOW: auto; WIDTH: 200px; POSITION: relative; TOP: 0px; HEIGHT: 250px; BACKGROUND-COLOR: white\"></iframe>&nbsp;<iframe src=\"../../dialogs/imageViewer.aspx\" id=\"imageViewer\" style=\"LEFT: 9px; OVERFLOW: auto; WIDTH: 250px; POSITION: relative; TOP: 0px; HEIGHT: 250px; BACKGROUND-COLOR: white\"></iframe></div>"));
-            
+          
             uicontrols.TabPage tp2 = tv_options.NewTabPage(ui.Text("create") + " " + ui.Text("new"));
             tp2.HasMenu = false;
             tp2.Controls.Add(pane_upload);
-
-            //tp2.Controls.Add(new LiteralControl("<iframe frameborder=\"0\" src=\"../../dialogs/uploadImage.aspx\" style=\"LEFT: 0px; OVERFLOW: auto; WIDTH: 500px; POSITION: relative; TOP: 0px; HEIGHT: 220px; BACKGROUND-COLOR: white; border: none\"></iframe>"));
     }
 
         #region Web Form Designer generated code

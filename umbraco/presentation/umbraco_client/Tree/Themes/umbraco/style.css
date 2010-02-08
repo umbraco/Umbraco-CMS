@@ -9,7 +9,7 @@
 .tree-umbraco li a
 {
 	background-image: url(../../../../umbraco/images/umbraco/sprites.png);
-	background-color: #fff;
+	/*background-color: #fff;*/
 	padding: 0px 0px 0px 18px;
 	border: 0;
 	color: #2f2f2f;

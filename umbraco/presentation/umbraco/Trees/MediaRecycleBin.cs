@@ -81,6 +81,12 @@ namespace umbraco.cms.presentation.Trees
 			}
 		}
 
+        /// <summary>
+        /// Override the render js so no duplicate js is rendered.
+        /// </summary>
+        /// <param name="Javascript"></param>
+        public override void RenderJS(ref StringBuilder Javascript) { }
+
 		protected override void CreateRootNode(ref XmlTreeNode rootNode)
 		{
 			rootNode.Icon = "bin_empty.png";

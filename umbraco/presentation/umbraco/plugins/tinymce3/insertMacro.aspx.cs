@@ -27,9 +27,9 @@ namespace umbraco.presentation.tinymce3
         {
 			ClientLoader.DataBind();
 
-            string reqMacroID = helper.Request("umb_macroID");
-            string reqMacroAlias = helper.Request("umb_macroAlias");
-            bool ignoreForm = string.IsNullOrEmpty(helper.Request("class"));
+            string reqMacroID = UmbracoContext.Current.Request["umb_macroID"];
+            string reqMacroAlias = UmbracoContext.Current.Request["umb_macroAlias"];
+            bool ignoreForm = string.IsNullOrEmpty(UmbracoContext.Current.Request["class"]);
 
             pane_insert.Text = ui.Text("insertMacro");
             Page.Title = ui.Text("insertMacro");
@@ -43,13 +43,13 @@ namespace umbraco.presentation.tinymce3
                 insert_buttons.Visible = false;
 
                 // Put user code to initialize the page here
-                if (reqMacroID != "")
+                if (!string.IsNullOrEmpty(reqMacroID))
                 {
                     m = new Macro(int.Parse(reqMacroID));
                 }
                 else
                 {
-                    m = Macro.GetByAlias(reqMacroAlias);
+                    m = new Macro(reqMacroAlias);
                 }
 
                 pane_edit.Text = ui.Text("edit") + " " + m.Name;
@@ -144,7 +144,7 @@ namespace umbraco.presentation.tinymce3
             else
             {
                 IRecordsReader macroRenderings;
-                if (helper.Request("editor") != "")
+                if (UmbracoContext.Current.Request["editor"] != "")
                     macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName");
                 else
                     macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro order by macroName");
@@ -160,10 +160,10 @@ namespace umbraco.presentation.tinymce3
 
         protected void renderMacro_Click(object sender, EventArgs e)
         {
-            int pageID = int.Parse(helper.Request("umbPageId"));
+            int pageID = int.Parse(UmbracoContext.Current.Request["umbPageId"]);
             string macroAttributes = "macroAlias=\"" + m.Alias + "\"";
 
-            Guid pageVersion = new Guid(helper.Request("umbVersionId"));
+            Guid pageVersion = new Guid(UmbracoContext.Current.Request["umbVersionId"]);
 
             Hashtable attributes = new Hashtable();
             attributes.Add("macroAlias", m.Alias);

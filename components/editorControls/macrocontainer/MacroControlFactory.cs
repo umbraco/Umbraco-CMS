@@ -27,26 +27,15 @@ namespace umbraco.editorControls.macrocontainer
         internal static Control GetMacroRenderControlByType(PersistableMacroProperty prop, string uniqueID)
         {
             Control macroControl;
-            //Determine the property type
-            switch (prop.TypeName.ToLower())
+   
+            Type m = MacroControlTypes.FindLast(delegate(Type macroGuiCcontrol) { return macroGuiCcontrol.ToString() == string.Format("{0}.{1}", prop.AssemblyName, prop.TypeName); });
+            IMacroGuiRendering typeInstance;
+            typeInstance = Activator.CreateInstance(m) as IMacroGuiRendering;
+            if (!string.IsNullOrEmpty(prop.Value))
             {
-                //Use a pagepicker instead of a IMacroGuiRendering control
-                case "content":
-                    macroControl = new pagePicker(null);
-                    ((pagePicker)macroControl).Value = prop.Value;
-                    break;
-                ///Default behaviour
-                default:
-                    Type m = MacroControlTypes.FindLast(delegate(Type macroGuiCcontrol) { return macroGuiCcontrol.ToString() == string.Format("{0}.{1}", prop.AssemblyName, prop.TypeName); });
-                    IMacroGuiRendering typeInstance;
-                    typeInstance = Activator.CreateInstance(m) as IMacroGuiRendering;
-                    if (!string.IsNullOrEmpty(prop.Value))
-                    {
-                        ((IMacroGuiRendering)typeInstance).Value = prop.Value;
-                    }
-                    macroControl = (Control)typeInstance;
-                    break;
+                ((IMacroGuiRendering)typeInstance).Value = prop.Value;
             }
+            macroControl = (Control)typeInstance;
 
             macroControl.ID = uniqueID;
             return macroControl;
@@ -59,17 +48,7 @@ namespace umbraco.editorControls.macrocontainer
         /// <returns></returns>
         internal static string GetValueFromMacroControl(Control macroControl)
         {
-            if (macroControl is pagePicker)
-            {
-                //pagePicker Control
-                return ((pagePicker)macroControl).Value;
-            }
-            else
-            {
-                ///Macro control
-                return ((IMacroGuiRendering)macroControl).Value;
-            }
-
+            return ((IMacroGuiRendering)macroControl).Value;
         }
         #endregion
 
@@ -85,7 +64,7 @@ namespace umbraco.editorControls.macrocontainer
                 {
                     //Populate the list with all the types of IMacroGuiRendering
                     _macroControlTypes = new List<Type>();
-                    _macroControlTypes = TypeFinder.FindClassesOfType<IMacroGuiRendering>(true);
+                    _macroControlTypes = TypeFinder.FindClassesOfType<IMacroGuiRendering>();
                 }
 
                 return _macroControlTypes;

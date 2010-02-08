@@ -1,5 +1,5 @@
 <%@ Page Language="c#" CodeBehind="treeInit.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.TreeInit" %>
-<%@ Register Src="controls/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
+<%@ Register Src="controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
@@ -33,7 +33,11 @@
     <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePartialRendering="true" LoadScriptsBeforeUI="true">
 	</asp:ScriptManager>
     <div>
-		<umbraco:TreeControl runat="server" ID="JTree"></umbraco:TreeControl>
+		<umbraco:TreeControl runat="server" ID="JTree" 
+		    App='<%#TreeParams.App %>' TreeType='<%#TreeParams.TreeType %>'
+            IsDialog="<%#TreeParams.IsDialog %>" ShowContextMenu="<%#TreeParams.ShowContextMenu %>" 
+            DialogMode="<%#TreeParams.DialogMode %>" FunctionToCall="<%#TreeParams.FunctionToCall %>" 
+            NodeKey="<%#TreeParams.NodeKey %>" StartNodeID="<%#TreeParams.StartNodeID %>"  />
     </div>
     </form>
 </body>

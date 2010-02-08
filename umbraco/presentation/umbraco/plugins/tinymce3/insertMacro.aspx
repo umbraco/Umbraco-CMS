@@ -7,14 +7,13 @@
 <head runat="server">
 
     <title>{#advlink_dlg.title}</title>
-    
-
         
     <base target="_self" />
 
     <style type="text/css">
       .propertyItemheader{width: 140px !Important;}
       select, textarea, input.guiInputTextStandard{width: 200px;}
+      .macroPane {height: 360px; overflow: auto;}
     </style>
     
     <script type="text/javascript" language="javascript">
@@ -87,7 +86,7 @@
     <% }%>
      
     <ui:Pane id="pane_edit" runat="server" Visible="false">
-        <div style="height: 380px; overflow: auto;">
+        <div class="macroPane" >
           <asp:PlaceHolder ID="macroProperties" runat="server" />
         </div>
     </ui:Pane>

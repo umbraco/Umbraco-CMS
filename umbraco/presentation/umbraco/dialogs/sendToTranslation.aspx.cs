@@ -93,7 +93,7 @@ namespace umbraco.presentation.dialogs
             pane_form.Visible = false;
             pl_buttons.Visible = false;
 
-            feedback.Text = ui.Text("translation","pageHasBeenSendToTranslation", _currentPage.Text, base.getUser()) + "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow + "\">" + ui.Text("defaultdialogs", "closeThisWindow") + "</a></p>";
+            feedback.Text = ui.Text("translation","pageHasBeenSendToTranslation", _currentPage.Text, base.getUser()) + "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow() + "\">" + ui.Text("defaultdialogs", "closeThisWindow") + "</a></p>";
             feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
         }
     }

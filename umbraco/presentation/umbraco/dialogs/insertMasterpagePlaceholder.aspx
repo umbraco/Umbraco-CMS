@@ -9,7 +9,7 @@
     var id = idtb.value;
     
     top.right.insertPlaceHolderElement(id);
-    UmbClientMgr.mainWindow().closeModal();
+    UmbClientMgr.closeModalWindow();
   }
 
 </script>
@@ -31,7 +31,7 @@
   </cc1:Pane>
   
   <p>
-    <input type="button" onclick="insertCode(); return false;" value="<%= umbraco.ui.Text("insert") %>" /> <em><%= umbraco.ui.Text("or") %></em> <a href="#" onclick="UmbClientMgr.mainWindow().closeModal(); return false;"><%= umbraco.ui.Text("cancel") %></a>
+    <input type="button" onclick="insertCode(); return false;" value="<%= umbraco.ui.Text("insert") %>" /> <em><%= umbraco.ui.Text("or") %></em> <a href="#" onclick="UmbClientMgr.closeModalWindow(); return false;"><%= umbraco.ui.Text("cancel") %></a>
   </p>
 
 </asp:Content>

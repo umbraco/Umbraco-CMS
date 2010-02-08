@@ -1,101 +1,97 @@
-﻿<%@ Page Language="C#"  AutoEventWireup="true" CodeBehind="mediaPicker.aspx.cs" Inherits="umbraco.presentation.umbraco.dialogs.mediaPicker" %>
+﻿<%@ Page Language="C#" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="true"
+    CodeBehind="mediaPicker.aspx.cs" Inherits="umbraco.presentation.umbraco.dialogs.mediaPicker" %>
+
 <%@ Register TagPrefix="ui" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="umb2" TagName="Tree" Src="../controls/Tree/TreeControl.ascx" %>
+<%@ Register TagPrefix="umb3" TagName="Image" Src="../controls/Images/ImageViewer.ascx" %>
+<%@ Register TagName="MediaUpload" TagPrefix="umb4" Src="../controls/Images/UploadMediaImage.ascx" %>
 
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" >
-<head id="Head1" runat="server">
-    <title></title>
-    
-    <!-- Default script and style -->
-	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="ui/default.css" PathNameAlias="UmbracoClient" />
-     
-     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="Application/NamespaceManager.js" PathNameAlias="UmbracoClient" Priority="0"  />     
-     <umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="1"  />
-     <umb:JsInclude ID="JsInclude4" runat="server" FilePath="Application/UmbracoClientManager.js" PathNameAlias="UmbracoClient" Priority="2"  />
-     <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" Priority="5"  />     
-    
-    <script type="text/javascript" language="javascript">
+    <script type="text/javascript">
 
+        //need to wire up the submit button click
+        jQuery(document).ready(function() {
+            jQuery("#submitbutton").click(function() {
+                updatePicker();
+                return false;
+            });
+        });
 
-
-
-        var mediaid = -1;
-        
+        //called when the user interacts with a node
         function dialogHandler(id) {
-
             if (id != -1) {
-                mediaid = id;
-                jQuery("#submitbutton").attr("disabled", false);
+                //update the hidden field with the selected id
+                jQuery("#selectedMediaId").val(id);
+                jQuery("#submitbutton").removeAttr("disabled").css("color", "#000");
             }
-            else 
-            {           
-                jQuery("#submitbutton").attr("disabled", true);
+            else {
+                jQuery("#submitbutton").attr("disabled", "disabled").css("color", "gray");
             }
 
-            document.getElementById('imageViewer').src = '/umbraco/dialogs/imageViewer.aspx?id=' + id;
+            jQuery("#<%=ImageViewer.ClientID%>").UmbracoImageViewerAPI().updateImage(id, function(p) {
+                //when the image is loaded, this callback method fires
+                if (p.hasImage) {
+                    jQuery("#submitbutton").removeAttr("disabled").css("color", "#000");                    
+                }
+                else {
+                    jQuery("#submitbutton").attr("disabled", "disabled").css("color", "gray");
+                }
+            });
         }
-        function updateImageSource(src, alt, width, height,id) {
 
-            if (id != null) {
-                mediaid = id;
-                jQuery("#submitbutton").attr("disabled", false);
+        function uploadHandler(e) {
+            dialogHandler(e.id);
+            //get the tree object for the chooser and refresh
+            var tree = jQuery("#treeContainer").UmbracoTreeAPI();
+            tree.refreshTree();
+        }
+
+        function updatePicker() {
+            var id = jQuery("#selectedMediaId").val();
+            if (id != "") {
+                UmbClientMgr.closeModalWindow(id);
             }
-            jQuery("#previewImage").css("background-image", "url(" + src.substring(0, (src.length - 4)) + "_thumb.jpg)");
         }
 
-        function refreshTree() {
-            jQuery("#treeFrame").attr("src", jQuery("#treeFrame").attr("src"));
+        function cancel() {
+            //update the hidden field with the selected id = none
+            jQuery("#selectedMediaId").val("");
+            UmbClientMgr.closeModalWindow();
         }
 
-        function UpdatePicker() {
-           if(mediaid != -1)
-           {
-                parent.hidePopWin(true,mediaid);
-           }
-        }
-    
-</script>
-</head>
+    </script>
 
+    <style type="text/css">        
+        .imageViewer .bgImage {float:right; }
+    </style>
 
-<body class="umbracoDialog" style="margin: 15px 10px 0px 10px;">
-    <ui:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="body" runat="server">
 
-<form id="Form1" runat="server" onsubmit="UpdatePicker();return false;" action="#">
- <ui:Pane ID="pane_src" runat="server" >
- <div style="height:105px"></div>
- <div id="previewImage" style="width: 105px; height: 105px; background: #fff center center no-repeat; border: 1px solid #ccc; position: absolute; top: 3px; right: 3px;">
-         
- </div>
- </ui:Pane>
-      <br /> 
- <ui:TabView AutoResize="false" Width="455px" Height="305px" runat="server"  ID="tv_options" />
-<ui:Pane ID="pane_select" runat="server"> 
-      <div style="padding: 5px; background: #fff; height: 250px;">
-        <iframe id="treeFrame" name="treeFrame" src="../TreeInit.aspx?app=media&isDialog=true&dialogMode=id&contextMenu=false&functionToCall=parent.dialogHandler" style="width: 405px; height: 250px; float: left; border: none;" frameborder="0"></iframe>
-        <iframe src="imageViewer.aspx" id="imageViewer" style="width: 0px; height: 0px; visibility: hidden; float: right; border: none;" frameborder="0"></iframe>
-      </div>
+    <%--when a node is selected, the id will be stored in this field--%>
+    <input type="hidden" id="selectedMediaId" />
+    <ui:Pane ID="pane_src" runat="server">
+        <umb3:Image runat="server" ID="ImageViewer" ViewerStyle="ThumbnailPreview" />
+    </ui:Pane>
+    <br />
+    <ui:TabView AutoResize="false" Width="455px" Height="305px" runat="server" ID="tv_options" />
+    <ui:Pane ID="pane_select" runat="server">
+        <umb2:Tree runat="server" ID="DialogTree" App="media" TreeType="media" IsDialog="true"
+            ShowContextMenu="false" DialogMode="id" FunctionToCall="dialogHandler"
+            Height="250"/>
     </ui:Pane>
     <asp:Panel ID="pane_upload" runat="server">
-        <iframe frameborder="0" src="uploadImage.aspx" style="border: none; width: 435px; height: 250px;"></iframe>
+        <umb4:MediaUpload runat="server" ID="MediaUploader" OnClientUpload="uploadHandler" />
     </asp:Panel>
-    
     <br />
-     <p>
-        <input type="submit" value="select" style="width: 60px;" disabled="true" id="submitbutton"/> <em id="orcopy">or</em>
-        <a href="#" style="color: blue" onclick="parent.hidePopWin(false,0);" id="cancelbutton">{#cancel}</a>
-      </p>      
-      </form>
-
- <script type="text/javascript" language="javascript">
-     jQuery(document).ready(function() {
-         jQuery("#submitbutton").attr("value", '<%= umbraco.ui.Text("select") %>');
-         jQuery("#cancelbutton").text('<%= umbraco.ui.Text("cancel") %>');
-         jQuery("#orcopy").text('<%= umbraco.ui.Text("or") %>'); 
-     });
- </script>
-
-</body>
-</html>
+    <p>
+        <input type="submit" value="<%# umbraco.ui.Text("treepicker")%>" style="width: 60px;
+            color: gray" disabled="disabled" id="submitbutton" />
+        <em id="orcopy">
+            <%# umbraco.ui.Text("or") %></em> <a href="javascript:cancel();" style="color: blue"
+                id="cancelbutton">
+                <%#umbraco.ui.Text("cancel") %></a>
+    </p>
+</asp:Content>

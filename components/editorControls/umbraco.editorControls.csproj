@@ -152,9 +152,8 @@
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
     </ProjectReference>
     <ProjectReference Include="..\..\umbraco\presentation\umbraco.presentation.csproj">
-      <Name>umbraco.presentation</Name>
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+      <Name>umbraco.presentation</Name>
     </ProjectReference>
     <ProjectReference Include="..\umbraco.controls\umbraco.controls.csproj">
       <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
@@ -168,6 +167,7 @@
     <Compile Include="BaseDataType.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="BaseTreePickerEditor.cs" />
     <Compile Include="checkboxlist\CheckBoxDataType.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -255,6 +255,11 @@
     <Compile Include="macrocontainer\PrevalueEditor.cs" />
     <Compile Include="mediapicker\mediaChooser.cs">
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="mediapicker\MediaChooserScripts.Designer.cs">
+      <DependentUpon>MediaChooserScripts.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
     <Compile Include="mediapicker\MediaPickerDataType.cs">
       <SubType>Code</SubType>
@@ -350,6 +355,11 @@
     <EmbeddedResource Include="imagecropper\Resources.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="mediapicker\MediaChooserScripts.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MediaChooserScripts.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="textfield\textFieldDataEditor.resx">
       <DependentUpon>textFieldDataEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -371,6 +381,9 @@
       <ProductName>.NET Framework 3.5</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="mediapicker\MediaPicker.js" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
