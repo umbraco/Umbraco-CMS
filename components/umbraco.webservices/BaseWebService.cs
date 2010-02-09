@@ -9,6 +9,8 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.Web.Services;
 using System.Web.Services.Protocols;
+using umbraco.BusinessLogic;
+using System.IO;
 
 namespace umbraco.webservices
 {
@@ -45,19 +47,24 @@ namespace umbraco.webservices
         /// </summary>
         public umbraco.BusinessLogic.User GetUser(string username, string password)
         {
+           
+            User u = new User(username);
+            if(!HttpContext.Current.Request.Url.Scheme.Equals("https"))
+                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Debug, u, -1, "Webservices login attempted without https");
+
             try
             {
-                umbraco.BusinessLogic.User u =
-                    new umbraco.BusinessLogic.User(username, password);
-                if (u == null || u.Id == -1)
-                    throw new ArgumentException("Invalid username/password");
-
-                return u;
+                if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(username, password))
+                {
+                    BusinessLogic.Log.Add(BusinessLogic.LogTypes.Login, u, -1,"Webservices");
+                    return u;
+                }
             }
             catch
             {
-                return null;
+                
             }
+            return null;
         }
 
 
