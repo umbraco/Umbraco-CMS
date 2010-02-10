@@ -42,7 +42,7 @@ jQuery(document).ready(function() {
         treeType: treeType,
         functionToCall : functionToCall,
         nodeKey : nodeKey,
-        umbClientFolderRoot: "<%#umbraco.GlobalSettings.ClientPath%>",
+        umbClientFolderRoot: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco_client)%>",
         treeMode: "<%#Mode.ToString().ToLower()%>",
         dataUrl: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/webservices/TreeDataService.ashx",
         serviceUrl: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/webservices/TreeClientService.asmx/GetInitAppTreeData"});
