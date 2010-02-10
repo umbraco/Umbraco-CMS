@@ -556,6 +556,31 @@ namespace umbraco
         }
 
         /// <summary>
+        /// If this is enabled, all Umbraco objects will generate data in the preview table (cmsPreviewXml).
+        /// If disabled, only documents will generate data.
+        /// This feature is useful if anyone would like to see how data looked at a given time
+        /// </summary>
+        public static bool EnableGlobalPreviewStorage
+        {
+            get
+            {
+                try
+                {
+                    bool globalPreviewEnabled = false;
+                    string value = GetKey("/settings/content/GlobalPreviewStorageEnabled");
+                    if (bool.TryParse(value, out globalPreviewEnabled))
+                        return !globalPreviewEnabled;
+                    // Return default
+                    return false;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
         /// Whether to use the new 4.1 schema or the old legacy schema
         /// </summary>
         /// <value>

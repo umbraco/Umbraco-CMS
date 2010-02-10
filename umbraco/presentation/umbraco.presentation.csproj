@@ -497,9 +497,17 @@
     <Compile Include="umbraco\create\DLRScripting.ascx.designer.cs">
       <DependentUpon>DLRScripting.ascx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\dialogs\Preview.aspx.cs">
+      <DependentUpon>Preview.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dialogs\Preview.aspx.designer.cs">
+      <DependentUpon>Preview.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\LiveEditing\CanvasClientDependencyProvider.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="umbraco\preview\Preview.cs" />
     <Compile Include="umbraco\scripting\MacroScript.cs" />
     <Compile Include="umbraco\scripting\ScriptEngine.cs" />
     <Compile Include="umbraco\Search\QuickSearch.ascx.cs">
@@ -1461,6 +1469,8 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
+    <Content Include="umbraco\dialogs\Preview.aspx" />
+    <Content Include="web.config.UMBRACOHUMMER.xslt" />
     <Content Include="umbraco\controls\passwordChanger.ascx" />
     <Content Include="umbraco\controls\ProgressBar.ascx" />
     <Content Include="web.config.SHOCKING.xslt" />
@@ -2795,6 +2805,8 @@
   <ItemGroup>
     <Folder Include="css\" />
     <Folder Include="data\" />
+    <Folder Include="data\previews\" />
+    <Folder Include="data\_systemUmbracoIndexDontDelete\" />
     <Folder Include="masterpages\" />
     <Folder Include="media\" />
     <Folder Include="python\" />

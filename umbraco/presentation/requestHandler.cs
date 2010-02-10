@@ -163,7 +163,7 @@ namespace umbraco {
                 return _tempQuery;
         }
 
-        public requestHandler(XmlDocument _umbracoContent, String url) {
+        public requestHandler(XmlDocument umbracoContent, String url) {
             HttpContext.Current.Trace.Write("request handler", "current url '" + url + "'");
             bool getByID = false;
             string currentDomain = HttpContext.Current.Request.ServerVariables["SERVER_NAME"];
@@ -218,14 +218,14 @@ namespace umbraco {
                                                           _pageXPathQuery));
 
             if (getByID)
-                currentPage = content.Instance.XmlContent.GetElementById(_pageXPathQuery.Trim());
+                currentPage = umbracoContent.GetElementById(_pageXPathQuery.Trim());
             else {
                 HttpContext.Current.Trace.Write("umbracoRequestHandler",
                                                 "pageXPathQueryStart: '" + pageXPathQueryStart + "'");
-                currentPage = content.Instance.XmlContent.SelectSingleNode(pageXPathQueryStart + _pageXPathQuery);
+                currentPage =  umbracoContent.SelectSingleNode(pageXPathQueryStart + _pageXPathQuery);
                 if (currentPage == null) {
                     // If no node found, then try with a relative page query
-                    currentPage = content.Instance.XmlContent.SelectSingleNode("/" + _pageXPathQuery);
+                    currentPage = umbracoContent.SelectSingleNode("/" + _pageXPathQuery);
                 }
 
                 // Add to url cache
@@ -277,7 +277,7 @@ namespace umbraco {
                             typeInstance.Execute(url);
                             if (typeInstance.redirectID > 0) {
                                 int redirectID = typeInstance.redirectID;
-                                currentPage = content.Instance.XmlContent.GetElementById(redirectID.ToString());
+                                currentPage = umbracoContent.GetElementById(redirectID.ToString());
                                 HttpContext.Current.Trace.Write("notFoundHandler",
                                                                 string.Format(
                                                                     "NotFoundHandler '{0}.{1} found node matching {2} with id: {3}",
@@ -313,7 +313,7 @@ namespace umbraco {
                     int internalRedirectId = 0;
                     if (int.TryParse(internalRedirect.FirstChild.Value, out internalRedirectId) && internalRedirectId > 0) {
                         currentPage =
-                content.Instance.XmlContent.GetElementById(
+                umbracoContent.GetElementById(
                     internalRedirectId.ToString());
                         HttpContext.Current.Trace.Write("internalRedirection", "Redirecting to " + internalRedirect.FirstChild.Value);
                     } else
@@ -333,7 +333,7 @@ namespace umbraco {
 
                     if (System.Web.Security.Membership.GetUser() == null || !library.IsLoggedOn()) {
                         HttpContext.Current.Trace.Write("umbracoRequestHandler", "Not logged in - redirecting to login page...");
-                        currentPage = content.Instance.XmlContent.GetElementById(Access.GetLoginPage(currentPage.Attributes.GetNamedItem("path").Value).ToString());
+                        currentPage = umbracoContent.GetElementById(Access.GetLoginPage(currentPage.Attributes.GetNamedItem("path").Value).ToString());
                     } else {
 
                         if (System.Web.Security.Membership.GetUser() != null && !Access.HasAccces(int.Parse(currentPage.Attributes.GetNamedItem("id").Value), System.Web.Security.Membership.GetUser().ProviderUserKey)) {

@@ -28,7 +28,7 @@ namespace umbraco.cms.businesslogic.web
     /// </summary>
     public class Document : Content
     {
-		private const string m_SQLOptimizedSingle = @"
+        private const string m_SQLOptimizedSingle = @"
                 Select 
 	                (select count(id) from umbracoNode where parentId = @id) as Children, 
 	                (select Count(published) as tmp from cmsDocument where published = 1 And nodeId = @id) as Published,
@@ -57,7 +57,7 @@ namespace umbraco.cms.businesslogic.web
                 order by
 	                {1}
                 ";
-		private const string m_SQLOptimizedChildren = @"
+        private const string m_SQLOptimizedChildren = @"
                   select 
                   	count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as published, umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId
                   from umbracoNode 
@@ -75,6 +75,14 @@ namespace umbraco.cms.businesslogic.web
                   group by umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId
                   order by {1}
                   ";
+
+        private const string m_SQLOptimizedForPreview = @"
+                select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsDocument.versionId, cmsPreviewXml.xml from cmsDocument
+                inner join umbracoNode on umbracoNode.id = cmsDocument.nodeId
+                inner join cmsPreviewXml on cmsPreviewXml.nodeId = cmsDocument.nodeId and cmsPreviewXml.versionId = cmsDocument.versionId
+                where newest = 1 and trashed = 0 and path like '{0}'
+                order by level,sortOrder
+ ";
 
         public static Guid _objectType = new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972");
         private DateTime _updated;
@@ -130,15 +138,17 @@ namespace umbraco.cms.businesslogic.web
         /// Gets the user who created the document.
         /// </summary>
         /// <value>The creator.</value>
-        public User Creator {
-            get { return _creator;}
+        public User Creator
+        {
+            get { return _creator; }
         }
 
         /// <summary>
         /// Gets the writer.
         /// </summary>
         /// <value>The writer.</value>
-        public User Writer {
+        public User Writer
+        {
             get { return _writer; }
         }
 
@@ -247,22 +257,26 @@ namespace umbraco.cms.businesslogic.web
 
                 return true;
             }
-            else {
+            else
+            {
                 return false;
             }
         }
 
 
-        public bool PublishWithChildrenWithResult(User u) {
-            if(PublishWithResult(u))
+        public bool PublishWithChildrenWithResult(User u)
+        {
+            if (PublishWithResult(u))
             {
                 //store children array here because iterating over an Array object is very inneficient.
-                var c = this.Children;   
+                var c = this.Children;
                 foreach (cms.businesslogic.web.Document dc in c)
                 {
                     dc.PublishWithChildrenWithResult(u);
                 }
-            }else{
+            }
+            else
+            {
                 return false;
             }
 
@@ -280,7 +294,8 @@ namespace umbraco.cms.businesslogic.web
             RollBackEventArgs e = new RollBackEventArgs();
             FireBeforeRollBack(e);
 
-            if (!e.Cancel) {
+            if (!e.Cancel)
+            {
                 Guid newVersion = createNewVersion();
                 SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, Text, TemplateId) values (" +
                                           Id +
@@ -301,9 +316,12 @@ namespace umbraco.cms.businesslogic.web
                 // Revert all properties
                 var props = dOld.getProperties;
                 foreach (Property p in props)
-                    try {
+                    try
+                    {
                         dNew.getProperty(p.PropertyType).Value = p.Value;
-                    } catch {
+                    }
+                    catch
+                    {
                         // property doesn't exists
                     }
 
@@ -320,10 +338,11 @@ namespace umbraco.cms.businesslogic.web
         public void PublishWithSubs(User u)
         {
 
-            PublishEventArgs e = new PublishEventArgs(); 
+            PublishEventArgs e = new PublishEventArgs();
             FireBeforePublish(e);
 
-            if (!e.Cancel) {
+            if (!e.Cancel)
+            {
                 _published = true;
                 string tempVersion = Version.ToString();
                 Guid newVersion = createNewVersion();
@@ -373,7 +392,8 @@ namespace umbraco.cms.businesslogic.web
 
             FireBeforeUnPublish(e);
 
-            if (!e.Cancel) {
+            if (!e.Cancel)
+            {
                 SqlHelper.ExecuteNonQuery(string.Format("update cmsDocument set published = 0 where nodeId = {0}", Id));
                 FireAfterUnPublish(e);
             }
@@ -384,9 +404,10 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="id">Id of the document</param>
         /// <param name="noSetup">true if the data shouldn't loaded from the db</param>
-        public Document(Guid id, bool noSetup) : base(id)
+        public Document(Guid id, bool noSetup)
+            : base(id)
         {
-	
+
         }
 
         /// <summary>
@@ -395,8 +416,9 @@ namespace umbraco.cms.businesslogic.web
         /// therefor only data needed by the tree is initialized.
         /// </summary>
         /// <param name="id">Id of the document</param>
-		/// <param name="noSetup">true if the data shouldn't loaded from the db</param>
-        public Document(int id, bool noSetup) : base(id, noSetup)
+        /// <param name="noSetup">true if the data shouldn't loaded from the db</param>
+        public Document(int id, bool noSetup)
+            : base(id, noSetup)
         {
         }
 
@@ -406,7 +428,8 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="id">The id of the document</param>
         /// <param name="Version">The version of the document</param>
-        public Document(int id, Guid Version) : base(id)
+        public Document(int id, Guid Version)
+            : base(id)
         {
             this.Version = Version;
             setupDocument();
@@ -416,7 +439,8 @@ namespace umbraco.cms.businesslogic.web
         /// Initializes a new instance of the Document class.
         /// </summary>
         /// <param name="id">The id of the document</param>
-        public Document(int id) : base(id)
+        public Document(int id)
+            : base(id)
         {
             setupDocument();
         }
@@ -425,20 +449,21 @@ namespace umbraco.cms.businesslogic.web
         /// Initialize the document
         /// </summary>
         /// <param name="id">The id of the document</param>
-        public Document(Guid id) : base(id)
+        public Document(Guid id)
+            : base(id)
         {
             setupDocument();
         }
 
-		//TODO: SD: Implement this EVERYWHERE (90 places apparently)
-		public Document(bool optimizedMode, int id)
-			: base(id, optimizedMode)
+        //TODO: SD: Implement this EVERYWHERE (90 places apparently)
+        public Document(bool optimizedMode, int id)
+            : base(id, optimizedMode)
         {
             this._optimizedMode = OptimizedMode;
 
             if (OptimizedMode)
             {
-                
+
                 using (IRecordsReader dr =
                         SqlHelper.ExecuteReader(string.Format(m_SQLOptimizedSingle, "umbracoNode.id = @id", "cmsContentVersion.id desc"),
                     SqlHelper.CreateParameter("@id", id)))
@@ -449,26 +474,26 @@ namespace umbraco.cms.businesslogic.web
                         bool _hc = false;
                         if (dr.GetInt("children") > 0)
                             _hc = true;
-						int? masterContentType = null;
-						if (!dr.IsNull("masterContentType"))
-							masterContentType = dr.GetInt("masterContentType");
+                        int? masterContentType = null;
+                        if (!dr.IsNull("masterContentType"))
+                            masterContentType = dr.GetInt("masterContentType");
                         SetupDocumentForTree(dr.GetGuid("uniqueId")
-							, dr.GetShort("level")
-							, dr.GetInt("parentId")
-							, dr.GetInt("documentUser")
-							, dr.GetBoolean("published")
-							, dr.GetString("path")
-							, dr.GetString("text")
-							, dr.GetDateTime("createDate")
-							, dr.GetDateTime("updateDate")
-							, dr.GetDateTime("versionDate")
-							, dr.GetString("icon")
-							, _hc
-							, dr.GetString("alias")
-							, dr.GetString("thumbnail")
-							, dr.GetString("description")
-							, masterContentType
-							, dr.GetInt("contentTypeId"));
+                            , dr.GetShort("level")
+                            , dr.GetInt("parentId")
+                            , dr.GetInt("documentUser")
+                            , dr.GetBoolean("published")
+                            , dr.GetString("path")
+                            , dr.GetString("text")
+                            , dr.GetDateTime("createDate")
+                            , dr.GetDateTime("updateDate")
+                            , dr.GetDateTime("versionDate")
+                            , dr.GetString("icon")
+                            , _hc
+                            , dr.GetString("alias")
+                            , dr.GetString("thumbnail")
+                            , dr.GetString("description")
+                            , masterContentType
+                            , dr.GetInt("contentTypeId"));
 
                         // initialize content object
                         InitializeContent(dr.GetInt("ContentType"), dr.GetGuid("versionId"),
@@ -492,7 +517,7 @@ namespace umbraco.cms.businesslogic.web
                             dr.GetDateTime("updateDate"),
                             dr.GetBoolean("published")
                             );
-                    } 
+                    }
                 }
             }
         }
@@ -510,7 +535,8 @@ namespace umbraco.cms.businesslogic.web
             SaveEventArgs e = new SaveEventArgs();
             FireBeforeSave(e);
 
-            if (!e.Cancel) {
+            if (!e.Cancel)
+            {
 
                 if (this._optimizedMode)
                 {
@@ -522,17 +548,19 @@ namespace umbraco.cms.businesslogic.web
                 }
 
                 base.Save();
+                // update preview xml
+                SaveXmlPreview(new XmlDocument());
 
                 FireAfterSave(e);
             }
         }
 
-		//TODO: Perhaps this should override the setupNode method of the CMSNode so that constructors work properly!
+        //TODO: Perhaps this should override the setupNode method of the CMSNode so that constructors work properly!
         private void setupDocument()
         {
             IRecordsReader dr =
                 SqlHelper.ExecuteReader("select published, documentUser, coalesce(templateId, cmsDocumentType.templateNodeId) as templateId, text, releaseDate, expireDate, updateDate from cmsDocument inner join cmsContent on cmsDocument.nodeId = cmsContent.Nodeid left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1 where versionId = @versionId",
-                                        SqlHelper.CreateParameter("@versionId",Version));
+                                        SqlHelper.CreateParameter("@versionId", Version));
             if (dr.Read())
             {
                 _creator = User;
@@ -549,7 +577,7 @@ namespace umbraco.cms.businesslogic.web
                     _updated = dr.GetDateTime("updateDate");
             }
             dr.Close();
-            _published = (SqlHelper.ExecuteScalar<int>("select Count(published) as tmp from cmsDocument where published = 1 And nodeId ="+Id) > 0);
+            _published = (SqlHelper.ExecuteScalar<int>("select Count(published) as tmp from cmsDocument where published = 1 And nodeId =" + Id) > 0);
         }
 
         protected void InitializeDocument(User InitUser, User InitWriter, string InitText, int InitTemplate,
@@ -732,7 +760,8 @@ namespace umbraco.cms.businesslogic.web
 
             FireBeforeCopy(e);
 
-            if (!e.Cancel) {
+            if (!e.Cancel)
+            {
                 // Make the new document
                 Document NewDoc = MakeNew(Text, new DocumentType(ContentType.Id), u, CopyTo);
 
@@ -745,7 +774,8 @@ namespace umbraco.cms.businesslogic.web
                     NewDoc.getProperty(p.PropertyType.Alias).Value = p.Value;
 
                 // Relate?
-                if (RelateToOrignal) {
+                if (RelateToOrignal)
+                {
                     Relation.MakeNew(Id, NewDoc.Id, RelationType.GetByAlias("relateDocumentOnCopy"), "");
 
                     // Add to audit trail
@@ -788,9 +818,9 @@ namespace umbraco.cms.businesslogic.web
                 return null;
             }
 
-            
+
             Guid newId = Guid.NewGuid();
-            
+
             // Updated to match level from base node
             CMSNode n = new CMSNode(ParentId);
             int newLevel = n.Level;
@@ -823,6 +853,8 @@ namespace umbraco.cms.businesslogic.web
             // Run Handler				
             umbraco.BusinessLogic.Actions.Action.RunActionHandlers(d, ActionNew.Instance);
 
+            // Save doc
+            d.Save();
 
             return d;
         }
@@ -852,15 +884,15 @@ namespace umbraco.cms.businesslogic.web
         {
             get
             {
-				//SD: Removed old, non-optimized method!
-				//IconI[] tmp = base.Children;
-				//Document[] retval = new Document[tmp.Length];
-				//for (int i = 0; i < tmp.Length; i++) retval[i] = new Document(tmp[i].Id);
-				//return retval;
+                //SD: Removed old, non-optimized method!
+                //IconI[] tmp = base.Children;
+                //Document[] retval = new Document[tmp.Length];
+                //for (int i = 0; i < tmp.Length; i++) retval[i] = new Document(tmp[i].Id);
+                //return retval;
 
                 //cache the documents children so that this db call doesn't have to occur again
                 if (this._children == null)
-				    this._children = Document.GetChildrenForTree(this.Id);
+                    this._children = Document.GetChildrenForTree(this.Id);
 
                 return this._children.ToArray();
             }
@@ -883,31 +915,35 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         public new void delete()
         {
-                // Check for recyle bin
-                if (!Path.Contains("," + ((int)RecycleBin.RecycleBinType.Content).ToString() + ","))
+            // Check for recyle bin
+            if (!Path.Contains("," + ((int)RecycleBin.RecycleBinType.Content).ToString() + ","))
+            {
+                MoveToTrashEventArgs e = new MoveToTrashEventArgs();
+                FireBeforeMoveToTrash(e);
+
+                if (!e.Cancel)
                 {
-                    MoveToTrashEventArgs e = new MoveToTrashEventArgs();
-                    FireBeforeMoveToTrash(e);
+                    umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
+                    UnPublish();
+                    Move(-20);
 
-                    if (!e.Cancel) {
-                        umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
-                        UnPublish();
-                        Move(-20);
+                    FireAfterMoveToTrash(e);
+                }
 
-                        FireAfterMoveToTrash(e);
-                    }                
-                
-                } else {
+            }
+            else
+            {
 
-                    DeleteEventArgs e = new DeleteEventArgs();
+                DeleteEventArgs e = new DeleteEventArgs();
 
-                    FireBeforeDelete(e);
+                FireBeforeDelete(e);
 
-                    if (!e.Cancel) {
+                if (!e.Cancel)
+                {
 
                     //store children array here because iterating over an Array object is very inneficient.
                     var c = Children;
-                    foreach (Document d in c) 
+                    foreach (Document d in c)
                     {
                         d.delete();
                     }
@@ -921,19 +957,19 @@ namespace umbraco.cms.businesslogic.web
 
                         if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id &&
                             p.Value.ToString() != "" &&
-                            System.IO.File.Exists( IOHelper.MapPath(p.Value.ToString()))
+                            System.IO.File.Exists(IOHelper.MapPath(p.Value.ToString()))
                             )
-                            System.IO.File.Delete( IOHelper.MapPath(p.Value.ToString()));
+                            System.IO.File.Delete(IOHelper.MapPath(p.Value.ToString()));
 
 
-                        SqlHelper.ExecuteNonQuery("delete from cmsDocument where NodeId = " + Id);
-                        HttpContext.Current.Trace.Write("documentdelete", "base delete");
-                        base.delete();
-                        HttpContext.Current.Trace.Write("documentdelete", "after base delete");
+                    SqlHelper.ExecuteNonQuery("delete from cmsDocument where NodeId = " + Id);
+                    HttpContext.Current.Trace.Write("documentdelete", "base delete");
+                    base.delete();
+                    HttpContext.Current.Trace.Write("documentdelete", "after base delete");
 
-                        FireAfterDelete(e);
-                    }
+                    FireAfterDelete(e);
                 }
+            }
         }
 
         /// <summary>
@@ -971,14 +1007,12 @@ namespace umbraco.cms.businesslogic.web
         }
 
         /// <summary>
-        /// Creates an xmlrepresentation of the documet and saves it to the database
+        /// Creates an xmlrepresentation of the document and saves it to the database
         /// </summary>
         /// <param name="xd"></param>
         public new void XmlGenerate(XmlDocument xd)
         {
-            string nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : Casing.SafeAlias(ContentType.Alias);
-            XmlNode x = xd.CreateNode(XmlNodeType.Element, nodeName, "");
-            XmlPopulate(xd, ref x, false);
+            XmlNode x = generateXmlWithoutSaving(xd);
             /*
                         if (!UmbracoSettings.UseFriendlyXmlSchema)
                         {
@@ -994,6 +1028,7 @@ namespace umbraco.cms.businesslogic.web
             // Save to db
             saveXml(x);
         }
+
 
         private void saveXml(XmlNode x)
         {
@@ -1051,7 +1086,7 @@ namespace umbraco.cms.businesslogic.web
                     {
                         if (d.Published)
                             x.AppendChild(d.ToXml(xd, true));
-                    }                        
+                    }
                 }
 
                 return x;
@@ -1080,7 +1115,7 @@ namespace umbraco.cms.businesslogic.web
 
             // attributes
             x.Attributes.Append(addAttribute(xd, "id", Id.ToString()));
-//            x.Attributes.Append(addAttribute(xd, "version", Version.ToString()));
+            //            x.Attributes.Append(addAttribute(xd, "version", Version.ToString()));
             if (Level > 1)
                 x.Attributes.Append(addAttribute(xd, "parentID", Parent.Id.ToString()));
             else
@@ -1088,8 +1123,8 @@ namespace umbraco.cms.businesslogic.web
             x.Attributes.Append(addAttribute(xd, "level", Level.ToString()));
             x.Attributes.Append(addAttribute(xd, "writerID", _writer.Id.ToString()));
             x.Attributes.Append(addAttribute(xd, "creatorID", _creator.Id.ToString()));
-			if (ContentType != null)
-				x.Attributes.Append(addAttribute(xd, "nodeType", ContentType.Id.ToString()));
+            if (ContentType != null)
+                x.Attributes.Append(addAttribute(xd, "nodeType", ContentType.Id.ToString()));
             x.Attributes.Append(addAttribute(xd, "template", _template.ToString()));
             x.Attributes.Append(addAttribute(xd, "sortOrder", sortOrder.ToString()));
             x.Attributes.Append(addAttribute(xd, "createDate", CreateDateTime.ToString("s")));
@@ -1098,8 +1133,8 @@ namespace umbraco.cms.businesslogic.web
             x.Attributes.Append(addAttribute(xd, "urlName", url.FormatUrl(urlName.ToLower())));
             x.Attributes.Append(addAttribute(xd, "writerName", _writer.Name));
             x.Attributes.Append(addAttribute(xd, "creatorName", _creator.Name.ToString()));
-			if (ContentType != null && UmbracoSettings.UseLegacyXmlSchema)
-				x.Attributes.Append(addAttribute(xd, "nodeTypeAlias", ContentType.Alias));
+            if (ContentType != null && UmbracoSettings.UseLegacyXmlSchema)
+                x.Attributes.Append(addAttribute(xd, "nodeTypeAlias", ContentType.Alias));
             x.Attributes.Append(addAttribute(xd, "path", Path));
 
             if (!UmbracoSettings.UseLegacyXmlSchema)
@@ -1115,7 +1150,7 @@ namespace umbraco.cms.businesslogic.web
                 {
                     x.AppendChild(d.ToXml(xd, true));
                 }
-                    
+
             }
         }
 
@@ -1144,6 +1179,24 @@ namespace umbraco.cms.businesslogic.web
 
         }
 
+        #region XmlPreivew
+
+        public override XmlNode ToPreviewXml(XmlDocument xd)
+        {
+            if (!PreviewExists(Version))
+            {
+                SaveXmlPreview(xd);
+            }
+            return GetPreviewXml(xd, Version);
+        }
+
+        protected void SaveXmlPreview(XmlDocument xd)
+        {
+            savePreviewXml(generateXmlWithoutSaving(xd), Version);
+        }
+
+        #endregion
+
         private XmlAttribute addAttribute(XmlDocument Xd, string Name, string Value)
         {
             XmlAttribute temp = Xd.CreateAttribute(Name);
@@ -1161,7 +1214,7 @@ namespace umbraco.cms.businesslogic.web
             ArrayList tmp = new ArrayList();
             using (IRecordsReader dr =
                 SqlHelper.ExecuteReader(
-										string.Format(m_SQLOptimizedChildren, "umbracoNode.parentID = @parentId", "umbracoNode.sortOrder"),
+                                        string.Format(m_SQLOptimizedChildren, "umbracoNode.parentID = @parentId", "umbracoNode.sortOrder"),
                                         SqlHelper.CreateParameter("@parentId", NodeId)))
             {
                 while (dr.Read())
@@ -1170,34 +1223,34 @@ namespace umbraco.cms.businesslogic.web
                     bool _hc = false;
                     if (dr.GetInt("children") > 0)
                         _hc = true;
-					int? masterContentType = null;
-					if (!dr.IsNull("masterContentType"))
-						masterContentType = dr.GetInt("masterContentType");
+                    int? masterContentType = null;
+                    if (!dr.IsNull("masterContentType"))
+                        masterContentType = dr.GetInt("masterContentType");
                     d.SetupDocumentForTree(dr.GetGuid("uniqueId")
-						, dr.GetShort("level")
-						, dr.GetInt("parentId")
-						, dr.GetInt("documentUser")
-						, (dr.GetInt("published")==1)
-						, dr.GetString("path")
-						, dr.GetString("text")
-						, dr.GetDateTime("createDate")
-						, dr.GetDateTime("updateDate")
-						, dr.GetDateTime("versionDate")
-						, dr.GetString("icon")
-						, _hc
-						, dr.GetString("alias")
-						, dr.GetString("thumbnail")
-						, dr.GetString("description")
-						, masterContentType
-						, dr.GetInt("contentTypeId"));
+                        , dr.GetShort("level")
+                        , dr.GetInt("parentId")
+                        , dr.GetInt("documentUser")
+                        , (dr.GetInt("published") == 1)
+                        , dr.GetString("path")
+                        , dr.GetString("text")
+                        , dr.GetDateTime("createDate")
+                        , dr.GetDateTime("updateDate")
+                        , dr.GetDateTime("versionDate")
+                        , dr.GetString("icon")
+                        , _hc
+                        , dr.GetString("alias")
+                        , dr.GetString("thumbnail")
+                        , dr.GetString("description")
+                        , masterContentType
+                        , dr.GetInt("contentTypeId"));
                     tmp.Add(d);
                 }
             }
 
             Document[] retval = new Document[tmp.Count];
 
-            for (int i = 0; i < tmp.Count; i ++)
-                retval[i] = (Document) tmp[i];
+            for (int i = 0; i < tmp.Count; i++)
+                retval[i] = (Document)tmp[i];
 
             return retval;
         }
@@ -1205,14 +1258,14 @@ namespace umbraco.cms.businesslogic.web
         private void SetupDocumentForTree(Guid uniqueId, int level, int parentId, int user, bool publish, string path,
                                           string text, DateTime createDate, DateTime updateDate,
                                           DateTime versionDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
-											string contentTypeDesc, int? masterContentType, int contentTypeId)
+                                            string contentTypeDesc, int? masterContentType, int contentTypeId)
         {
             SetupNodeForTree(uniqueId, _objectType, level, parentId, user, path, text, createDate, hasChildren);
 
             _published = publish;
             _updated = updateDate;
-			ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType);			
-			ContentTypeIcon = icon;
+            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType);
+            ContentTypeIcon = icon;
             VersionDate = versionDate;
         }
 
@@ -1221,7 +1274,7 @@ namespace umbraco.cms.businesslogic.web
             XmlDocument xd = new XmlDocument();
             SqlHelper.ExecuteNonQuery("truncate table cmsContentXml");
             IRecordsReader dr = SqlHelper.ExecuteReader("select nodeId from cmsDocument where published = 1");
-            
+
             while (dr.Read())
             {
                 try
@@ -1232,6 +1285,26 @@ namespace umbraco.cms.businesslogic.web
                 {
                     Log.Add(LogTypes.Error, User.GetUser(0), dr.GetInt("nodeId"),
                             string.Format("Error generating xml: {0}", ee));
+                }
+            }
+            dr.Close();
+        }
+
+        public static void RegeneratePreviews()
+        {
+            XmlDocument xd = new XmlDocument();
+            IRecordsReader dr = SqlHelper.ExecuteReader("select nodeId from cmsDocument");
+
+            while (dr.Read())
+            {
+                try
+                {
+                    new Document(dr.GetInt("nodeId")).SaveXmlPreview(xd);
+                }
+                catch (Exception ee)
+                {
+                    Log.Add(LogTypes.Error, User.GetUser(0), dr.GetInt("nodeId"),
+                            string.Format("Error generating preview xml: {0}", ee));
                 }
             }
             dr.Close();
@@ -1252,7 +1325,7 @@ namespace umbraco.cms.businesslogic.web
             dr.Close();
 
             Document[] retval = new Document[docs.Count];
-            for (int i = 0; i < docs.Count; i++) retval[i] = new Document((int) docs[i]);
+            for (int i = 0; i < docs.Count; i++) retval[i] = new Document((int)docs[i]);
             return retval;
         }
 
@@ -1268,12 +1341,26 @@ namespace umbraco.cms.businesslogic.web
             while (dr.Read())
                 docs.Add(dr.GetInt("nodeId"));
             dr.Close();
-                        
+
 
             Document[] retval = new Document[docs.Count];
-            for (int i = 0; i < docs.Count; i++) retval[i] = new Document((int) docs[i]);
-                        
+            for (int i = 0; i < docs.Count; i++) retval[i] = new Document((int)docs[i]);
+
             return retval;
+        }
+
+        public override List<CMSPreviewNode> GetNodesForPreview(bool childrenOnly)
+        {
+            List<CMSPreviewNode> nodes = new List<CMSPreviewNode>();
+
+            string pathExp = childrenOnly ? Path + ",%" : Path;
+
+            IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(m_SQLOptimizedForPreview, pathExp));
+            while (dr.Read())
+                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("versionId"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml")));
+            dr.Close();
+
+            return nodes;
         }
 
         /// <summary>
@@ -1294,7 +1381,7 @@ namespace umbraco.cms.businesslogic.web
 
             // Properties
             foreach (XmlElement n in Source.SelectNodes("data"))
-            {   
+            {
                 Property prop = d.getProperty(n.GetAttribute("alias"));
                 string propValue = xmlHelper.GetNodeValue(n);
 
@@ -1338,7 +1425,7 @@ namespace umbraco.cms.businesslogic.web
                         prop.Value = propValue;
                 }
             }
-            
+
             // Subpages
             foreach (XmlElement n in Source.SelectNodes("node"))
                 Import(d.Id, Creator, n);
@@ -1394,9 +1481,12 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:BeforeSave"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected internal new virtual void FireBeforeSave(SaveEventArgs e) {
-            if (BeforeSave != null) {
-                BeforeSave(this, e);       }
+        protected internal new virtual void FireBeforeSave(SaveEventArgs e)
+        {
+            if (BeforeSave != null)
+            {
+                BeforeSave(this, e);
+            }
         }
 
         /// <summary>
@@ -1407,8 +1497,10 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:AfterSave"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterSave(SaveEventArgs e) {
-            if (AfterSave != null) {
+        protected virtual void FireAfterSave(SaveEventArgs e)
+        {
+            if (AfterSave != null)
+            {
                 AfterSave(this, e);
             }
         }
@@ -1422,7 +1514,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:New"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnNew(NewEventArgs e) {
+        protected virtual void OnNew(NewEventArgs e)
+        {
             if (New != null)
                 New(this, e);
         }
@@ -1445,7 +1538,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:BeforeDelete"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeDelete(DeleteEventArgs e) {
+        protected virtual void FireBeforeDelete(DeleteEventArgs e)
+        {
             if (BeforeDelete != null)
                 BeforeDelete(this, e);
         }
@@ -1458,7 +1552,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:AfterDelete"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterDelete(DeleteEventArgs e) {
+        protected virtual void FireAfterDelete(DeleteEventArgs e)
+        {
             if (AfterDelete != null)
                 AfterDelete(this, e);
         }
@@ -1472,7 +1567,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:BeforeDelete"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeMoveToTrash(MoveToTrashEventArgs e) {
+        protected virtual void FireBeforeMoveToTrash(MoveToTrashEventArgs e)
+        {
             if (BeforeMoveToTrash != null)
                 BeforeMoveToTrash(this, e);
         }
@@ -1486,7 +1582,8 @@ namespace umbraco.cms.businesslogic.web
         /// Fires the after move to trash.
         /// </summary>
         /// <param name="e">The <see cref="umbraco.cms.businesslogic.MoveToTrashEventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterMoveToTrash(MoveToTrashEventArgs e) {
+        protected virtual void FireAfterMoveToTrash(MoveToTrashEventArgs e)
+        {
             if (AfterMoveToTrash != null)
                 AfterMoveToTrash(this, e);
         }
@@ -1555,7 +1652,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:BeforeUnPublish"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeUnPublish(UnPublishEventArgs e) {
+        protected virtual void FireBeforeUnPublish(UnPublishEventArgs e)
+        {
             if (BeforeUnPublish != null)
                 BeforeUnPublish(this, e);
         }
@@ -1568,7 +1666,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:AfterUnPublish"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterUnPublish(UnPublishEventArgs e) {
+        protected virtual void FireAfterUnPublish(UnPublishEventArgs e)
+        {
             if (AfterUnPublish != null)
                 AfterUnPublish(this, e);
         }
@@ -1581,7 +1680,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:BeforeCopy"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeCopy(CopyEventArgs e) {
+        protected virtual void FireBeforeCopy(CopyEventArgs e)
+        {
             if (BeforeCopy != null)
                 BeforeCopy(this, e);
         }
@@ -1594,7 +1694,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:AfterCopy"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterCopy(CopyEventArgs e) {
+        protected virtual void FireAfterCopy(CopyEventArgs e)
+        {
             if (AfterCopy != null)
                 AfterCopy(this, e);
         }
@@ -1607,7 +1708,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:BeforeRollBack"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeRollBack(RollBackEventArgs e) {
+        protected virtual void FireBeforeRollBack(RollBackEventArgs e)
+        {
             if (BeforeRollBack != null)
                 BeforeRollBack(this, e);
         }
@@ -1620,7 +1722,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:AfterRollBack"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterRollBack(RollBackEventArgs e) {
+        protected virtual void FireAfterRollBack(RollBackEventArgs e)
+        {
             if (AfterRollBack != null)
                 AfterRollBack(this, e);
         }

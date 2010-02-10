@@ -109,7 +109,7 @@ namespace umbraco
             }
             else
             {
-                m_umbRequest = new requestHandler(content.Instance.XmlContent, m_tmp);
+                m_umbRequest = new requestHandler(UmbracoContext.Current.GetXml(), m_tmp);
                 Trace.Write("umbracoInit", "Done handling request");
                 if (m_umbRequest.currentPage != null)
                 {

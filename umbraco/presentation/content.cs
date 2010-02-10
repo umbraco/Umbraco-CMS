@@ -191,7 +191,7 @@ namespace umbraco
             }
         }
 
-        private void TransferValuesFromDocumentXmlToPublishedXml(XmlNode DocumentNode, XmlNode PublishedNode)
+        public static void TransferValuesFromDocumentXmlToPublishedXml(XmlNode DocumentNode, XmlNode PublishedNode)
         {
             // Remove all attributes and data nodes from the published node
             PublishedNode.Attributes.RemoveAll();
@@ -215,52 +215,72 @@ namespace umbraco
         /// </summary>
         /// <param name="d"></param>
         /// <param name="xmlContentCopy"></param>
-        private void PublishNodeDo(Document d, XmlDocument xmlContentCopy)
+        public static void PublishNodeDo(Document d, XmlDocument xmlContentCopy, bool updateSitemapProvider)
         {
             // check if document *is* published, it could be unpublished by an event
             if (d.Published)
             {
-
-                // Find the document in the xml cache
-                XmlNode x = xmlContentCopy.GetElementById(d.Id.ToString());
-
-                // Find the parent (used for sortering and maybe creation of new node)
-                XmlNode parentNode;
-                if (d.Level == 1)
-                    parentNode = xmlContentCopy.DocumentElement;
-                else
-                    parentNode = xmlContentCopy.GetElementById(d.Parent.Id.ToString());
-
-                if (parentNode != null)
-                {
-                    if (x == null)
-                    {
-                        x = d.ToXml(xmlContentCopy, false);
-                        parentNode.AppendChild(x);
-                    }
-                    else
-                        TransferValuesFromDocumentXmlToPublishedXml(d.ToXml(xmlContentCopy, false), x);
-
-                    XmlNodeList childNodes = parentNode.SelectNodes("./node");
-
-                    // Maybe sort the nodes if the added node has a lower sortorder than the last
-                    if (childNodes.Count > 0)
-                    {
-                        int siblingSortOrder = int.Parse(childNodes[childNodes.Count - 1].Attributes.GetNamedItem("sortOrder").Value);
-                        int currentSortOrder = int.Parse(x.Attributes.GetNamedItem("sortOrder").Value);
-                        if (childNodes.Count > 1 && siblingSortOrder > currentSortOrder)
-                        {
-                            SortNodes(ref parentNode);
-                        }
-                    }
-                }
+                AppendDocumentXml(d.Id, d.Level, d.Parent.Id, getPreviewOrPublishedNode(d, xmlContentCopy, false), xmlContentCopy);
 
                 // update sitemapprovider
-                if (SiteMap.Provider is presentation.nodeFactory.UmbracoSiteMapProvider)
+                if (updateSitemapProvider && SiteMap.Provider is presentation.nodeFactory.UmbracoSiteMapProvider)
                 {
                     presentation.nodeFactory.UmbracoSiteMapProvider prov = (presentation.nodeFactory.UmbracoSiteMapProvider)SiteMap.Provider;
                     prov.UpdateNode(new umbraco.presentation.nodeFactory.Node(d.Id));
                 }
+            }
+        }
+
+        public static void AppendDocumentXml(int id, int level, int parentId, XmlNode docXml, XmlDocument xmlContentCopy)
+        {
+
+
+            // Find the document in the xml cache
+            XmlNode x = xmlContentCopy.GetElementById(id.ToString());
+
+            // Find the parent (used for sortering and maybe creation of new node)
+            XmlNode parentNode;
+            if (level == 1)
+                parentNode = xmlContentCopy.DocumentElement;
+            else
+                parentNode = xmlContentCopy.GetElementById(parentId.ToString());
+
+            if (parentNode != null)
+            {
+                if (x == null)
+                {
+                    x = docXml;
+                    parentNode.AppendChild(x);
+                }
+                else
+                    TransferValuesFromDocumentXmlToPublishedXml(docXml, x);
+
+                // TODO: Update with new schema!
+                string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./node" : "./* [@id]";
+                XmlNodeList childNodes = parentNode.SelectNodes(xpath);
+
+                // Maybe sort the nodes if the added node has a lower sortorder than the last
+                if (childNodes.Count > 0)
+                {
+                    int siblingSortOrder = int.Parse(childNodes[childNodes.Count - 1].Attributes.GetNamedItem("sortOrder").Value);
+                    int currentSortOrder = int.Parse(x.Attributes.GetNamedItem("sortOrder").Value);
+                    if (childNodes.Count > 1 && siblingSortOrder > currentSortOrder)
+                    {
+                        SortNodes(ref parentNode);
+                    }
+                }
+            }
+        }
+
+        private static XmlNode getPreviewOrPublishedNode(Document d, XmlDocument xmlContentCopy, bool isPreview)
+        {
+            if (isPreview)
+            {
+                return d.ToPreviewXml(xmlContentCopy);
+            }
+            else
+            {
+                return d.ToXml(xmlContentCopy, false);
             }
         }
 
@@ -273,12 +293,13 @@ namespace umbraco
             XmlNode n = parentNode.CloneNode(true);
 
             // remove all children from original node
-            foreach (XmlNode child in parentNode.SelectNodes("./node"))
+            string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./node" : "./* [@id]";
+            foreach (XmlNode child in parentNode.SelectNodes(xpath))
                 parentNode.RemoveChild(child);
 
 
             XPathNavigator nav = n.CreateNavigator();
-            XPathExpression expr = nav.Compile("./node");
+            XPathExpression expr = nav.Compile(xpath);
             expr.AddSort("@sortOrder", XmlSortOrder.Ascending, XmlCaseOrder.None, "", XmlDataType.Number);
             XPathNodeIterator iterator = nav.Select(expr);
             while (iterator.MoveNext())
@@ -322,12 +343,12 @@ namespace umbraco
                     {
                         XmlDocument xmlContentCopy = CloneXmlDoc(XmlContentInternal);
 
-                        PublishNodeDo(d, xmlContentCopy);
+                        PublishNodeDo(d, xmlContentCopy, true);
                         XmlContentInternal = xmlContentCopy;
                     }
                     else
                     {
-                        PublishNodeDo(d, XmlContentInternal);
+                        PublishNodeDo(d, XmlContentInternal, true);
                         XmlContentInternal = _xmlContent;
                     }
 
@@ -372,7 +393,7 @@ namespace umbraco
                 XmlDocument xmlContentCopy = CloneXmlDoc(XmlContentInternal);
                 foreach (Document d in Documents)
                 {
-                    PublishNodeDo(d, xmlContentCopy);
+                    PublishNodeDo(d, xmlContentCopy, true);
                 }
                 XmlContentInternal = xmlContentCopy;
                 ClearContextCache();
@@ -797,7 +818,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             catch (OutOfMemoryException)
             {
                 Log.Add(LogTypes.Error, User.GetUser(0), -1,
-                        string.Format("Error Republishin: Out Of Memory. Parents: {0}, Nodes: {1}",
+                        string.Format("Error Republishing: Out Of Memory. Parents: {0}, Nodes: {1}",
                                       parents.Count, nodes.Count));
             }
             catch (Exception ee)

@@ -123,13 +123,22 @@ namespace umbraco.IO
                 return IOHelper.returnPath("umbracoXsltPath", "~/xslt");
             }
         }
-        
+
         public static string Packages
         {
             get
             {
                 //by default the packages folder should exist in the data folder
                 return IOHelper.returnPath("umbracoPackagesPath", Data + IOHelper.DirSepChar + "packages");
+            }
+        }
+
+        public static string Preview
+        {
+            get
+            {
+                //by default the packages folder should exist in the data folder
+                return IOHelper.returnPath("umbracoPreviewPath", Data + IOHelper.DirSepChar + "preview");
             }
         }
 

@@ -997,3 +997,16 @@ IF NOT EXISTS (SELECT treeAlias from umbracoAppTree WHERE treeAlias='dynamicTree
 INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
 VALUES (0, 0, 0, 'content', 'dynamicTree', 'DynamicTree', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.dynamicTree')
 ;
+/* PREVIEW */
+CREATE TABLE [dbo].[cmsPreviewXml](
+	[nodeId] [int] NOT NULL,
+	[versionId] [uniqueidentifier] NOT NULL,
+	[timestamp] [datetime] NOT NULL,
+	[xml] [ntext] NOT NULL,
+ CONSTRAINT [PK_cmsContentPreviewXml] PRIMARY KEY CLUSTERED 
+(
+	[nodeId] ASC,
+	[versionId] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+;

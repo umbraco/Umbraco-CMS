@@ -201,7 +201,7 @@ namespace umbraco.presentation.nodeFactory {
             if (NodeId != -1)
                 _pageXmlNode = ((IHasXmlNode)library.GetXmlNodeById(NodeId.ToString()).Current).GetNode();
             else {
-                _pageXmlNode = content.Instance.XmlContent.DocumentElement;
+                _pageXmlNode = UmbracoContext.Current.GetXml().DocumentElement;
 
             }
             initializeStructure();

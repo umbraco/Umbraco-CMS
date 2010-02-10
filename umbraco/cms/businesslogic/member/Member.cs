@@ -194,7 +194,15 @@ namespace umbraco.cms.businesslogic.member
             if (!e.Cancel)
             {
                 // re-generate xml
-                XmlGenerate(new XmlDocument());
+                XmlDocument xd = new XmlDocument();
+                XmlGenerate(xd);
+
+                // generate preview for blame history?
+                if (UmbracoSettings.EnableGlobalPreviewStorage)
+                {
+                    // Version as new guid to ensure different versions are generated as members are not versioned currently!
+                    savePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());
+                }
 
                 FireAfterSave(e);
             }
@@ -333,12 +341,18 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="xd"></param>
         public override void XmlGenerate(XmlDocument xd)
         {
+            SaveXmlDocument(generateXmlWithoutSaving(xd));
+        }
+
+        protected override XmlNode generateXmlWithoutSaving(XmlDocument xd)
+        {
             XmlNode node = xd.CreateNode(XmlNodeType.Element, "node", "");
             XmlPopulate(xd, ref node, false);
             node.Attributes.Append(xmlHelper.addAttribute(xd, "loginName", LoginName));
             node.Attributes.Append(xmlHelper.addAttribute(xd, "email", Email));
-            SaveXmlDocument(node);
+            return node;
         }
+
 
         /// <summary>
         /// Xmlrepresentation of a member

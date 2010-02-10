@@ -4,6 +4,9 @@ using umbraco.presentation.LiveEditing;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
 using System.Xml.Linq;
+using umbraco.BusinessLogic;
+using System.Xml;
+using umbraco.presentation.preview;
 
 namespace umbraco.presentation
 {
@@ -16,6 +19,7 @@ namespace umbraco.presentation
         private UmbracoRequest m_Request;
         private UmbracoResponse m_Response;
         private HttpContext m_HttpContext;
+        private XmlDocument previewDocument;
 
         /// <summary>
         /// Creates a new Umbraco context.
@@ -60,6 +64,31 @@ namespace umbraco.presentation
                 {
                     return null;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the current user is in a preview mode
+        /// </summary>
+        public virtual bool InPreviewMode
+        {
+            get
+            {
+                return !String.IsNullOrEmpty(StateHelper.GetCookieValue("PreviewSet"));
+            }
+        }
+
+        public XmlDocument GetXml()
+        {
+            if (InPreviewMode)
+            {
+                PreviewContent pc = new PreviewContent(new Guid(StateHelper.GetCookieValue("PreviewSet")));
+                pc.LoadPreviewset();
+                return pc.XmlContent;
+            }
+            else
+            {
+                return content.Instance.XmlContent;
             }
         }
 

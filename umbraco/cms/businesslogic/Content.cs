@@ -8,6 +8,7 @@ using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
+using umbraco.cms.helpers;
 
 namespace umbraco.cms.businesslogic
 {
@@ -480,10 +481,18 @@ namespace umbraco.cms.businesslogic
 		/// <param name="xd"></param>
 		public virtual void XmlGenerate(XmlDocument xd) 
 		{
-			XmlNode node = xd.CreateNode(XmlNodeType.Element, "node", String.Empty);
-            XmlPopulate(xd, ref node, false);
+            XmlNode node = generateXmlWithoutSaving(xd);
             SaveXmlDocument(node);
 		}
+
+        protected virtual XmlNode generateXmlWithoutSaving(XmlDocument xd)
+        {
+            string nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : Casing.SafeAlias(ContentType.Alias);
+            XmlNode x = xd.CreateNode(XmlNodeType.Element, nodeName, "");
+            XmlPopulate(xd, ref x, false);
+            return x;
+        }
+
 
 		public virtual void XmlPopulate(XmlDocument xd, ref XmlNode x, bool Deep) 
 		{
@@ -543,6 +552,25 @@ namespace umbraco.cms.businesslogic
                                       SqlHelper.CreateParameter("@nodeId", Id),
                                       SqlHelper.CreateParameter("@xml", node.OuterXml));
         }
+
+
+        #region XmlPreivew
+
+        public override XmlNode ToPreviewXml(XmlDocument xd)
+        {
+            if (!PreviewExists(Version))
+            {
+                saveXmlPreview(xd);
+            }
+            return GetPreviewXml(xd, Version);
+        }
+
+        private void saveXmlPreview(XmlDocument xd)
+        {
+            savePreviewXml(generateXmlWithoutSaving(xd), Version);
+        }
+
+        #endregion
 	}
 
 	/// <summary>

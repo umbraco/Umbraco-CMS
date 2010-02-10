@@ -25,6 +25,7 @@ using umbraco.DataLayer;
 using System.Web.Security;
 using umbraco.cms.businesslogic.language;
 using umbraco.IO;
+using umbraco.presentation;
 
 namespace umbraco
 {
@@ -377,7 +378,6 @@ namespace umbraco
 
         private static string niceUrlDo(int nodeID, int startNodeDepth)
         {
-            XmlDocument umbracoXML = content.Instance.XmlContent;
             bool directoryUrls = GlobalSettings.UseDirectoryUrls;
             string baseUrl = SystemDirectories.Root; // SystemDirectories.Umbraco;
             //baseUrl = baseUrl.Substring(0, baseUrl.LastIndexOf("/"));
@@ -390,14 +390,14 @@ namespace umbraco
 
             // Find path from nodeID
             String tempUrl = "";
-            XmlElement node = umbracoXML.GetElementById(nodeID.ToString());
+            XmlElement node = UmbracoContext.Current.GetXml().GetElementById(nodeID.ToString());
             String[] splitpath = null;
             if (node != null)
             {
                 try
                 {
                     splitpath =
-                        umbracoXML.GetElementById(nodeID.ToString()).Attributes.GetNamedItem("path").Value.ToString().
+                        node.Attributes.GetNamedItem("path").Value.ToString().
                             Split(",".ToCharArray());
 
                     int startNode = startNodeDepth;
@@ -471,7 +471,7 @@ namespace umbraco
             if (!UmbracoSettings.UseDomainPrefixes || domains.Length == 0)
                 tempUrl += "/" +
                            url.FormatUrl(
-                               content.Instance.XmlContent.GetElementById(DocumentId.ToString()).Attributes.GetNamedItem
+                               UmbracoContext.Current.GetXml().GetElementById(DocumentId.ToString()).Attributes.GetNamedItem
                                    ("urlName").Value);
             else
             {
@@ -493,7 +493,7 @@ namespace umbraco
                         else
                             tempUrl = "/" +
                                       url.FormatUrl(
-                                          content.Instance.XmlContent.GetElementById(DocumentId.ToString()).Attributes.
+                                          UmbracoContext.Current.GetXml().GetElementById(DocumentId.ToString()).Attributes.
                                               GetNamedItem("urlName").Value);
                     }
                     else
@@ -517,7 +517,7 @@ namespace umbraco
         /// <returns>Returns a string with the data from the given element of a node</returns>
         public static string GetItem(int nodeID, String alias)
         {
-            XmlDocument umbracoXML = content.Instance.XmlContent;
+            XmlDocument umbracoXML = UmbracoContext.Current.GetXml();
 
             if (umbracoXML.GetElementById(nodeID.ToString()) != null)
                 if (
@@ -1563,7 +1563,7 @@ namespace umbraco
         {
             try
             {
-                XPathNavigator xp = content.Instance.XmlContent.CreateNavigator();
+                XPathNavigator xp = UmbracoContext.Current.GetXml().CreateNavigator();
                 xp.MoveToId(HttpContext.Current.Items["pageID"].ToString());
                 return xp.Select(".");
             }
@@ -1583,9 +1583,9 @@ namespace umbraco
         /// <returns>Returns the node with the specified id as xml in the form of a XPathNodeIterator</returns>
         public static XPathNodeIterator GetXmlNodeById(string id)
         {
-            if (content.Instance.XmlContent.GetElementById(id) != null)
+            if (UmbracoContext.Current.GetXml().GetElementById(id) != null)
             {
-                XPathNavigator xp = content.Instance.XmlContent.CreateNavigator();
+                XPathNavigator xp = UmbracoContext.Current.GetXml().CreateNavigator();
                 xp.MoveToId(id);
                 return xp.Select(".");
             }
@@ -1615,7 +1615,7 @@ namespace umbraco
         /// <returns>Returns the entire umbraco Xml cache as a XPathNodeIterator</returns>
         public static XPathNodeIterator GetXmlAll()
         {
-            XPathNavigator xp = content.Instance.XmlContent.CreateNavigator();
+            XPathNavigator xp = UmbracoContext.Current.GetXml().CreateNavigator();
             return xp.Select("/root");
         }
 
@@ -1708,10 +1708,10 @@ namespace umbraco
         public static string QueryForNode(string id)
         {
             string XPathQuery = string.Empty;
-            if (content.Instance.XmlContent.GetElementById(id) != null)
+            if (UmbracoContext.Current.GetXml().GetElementById(id) != null)
             {
                 string[] path =
-                    content.Instance.XmlContent.GetElementById(id).Attributes["path"].Value.Split((",").ToCharArray());
+                    UmbracoContext.Current.GetXml().GetElementById(id).Attributes["path"].Value.Split((",").ToCharArray());
                 for (int i = 1; i < path.Length; i++)
                 {
                     if (i > 1)

@@ -18,17 +18,26 @@ namespace umbraco.cms.presentation
 	{
         protected void go(object sender, EventArgs e) {
             // re-create xml
-            if (helper.Request("xml") != "") {
+            if (helper.Request("xml") != "")
+            {
                 Server.ScriptTimeout = 100000;
                 umbraco.cms.businesslogic.web.Document.RePublishAll();
-            } else if (helper.Request("refreshNodes") != "") {
+            }
+            else if (helper.Request("previews") != "")
+            {
+                Server.ScriptTimeout = 100000;
+                umbraco.cms.businesslogic.web.Document.RegeneratePreviews();
+            }
+            else if (helper.Request("refreshNodes") != "")
+            {
                 Server.ScriptTimeout = 100000;
                 System.Xml.XmlDocument xd = new System.Xml.XmlDocument();
 
                 //store children array here because iterating over an Array object is very inneficient.
                 var doc = new cms.businesslogic.web.Document(int.Parse(helper.Request("refreshNodes")));
                 var c = doc.Children;
-                foreach (cms.businesslogic.web.Document d in c) {
+                foreach (cms.businesslogic.web.Document d in c)
+                {
                     d.XmlGenerate(xd);
                     Response.Write("<li>Creating xml for " + d.Text + "</li>");
                     Response.Flush();

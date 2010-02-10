@@ -48,7 +48,7 @@ namespace umbraco.BusinessLogic.Utils
 		{
             if (useSeperateAppDomain)
             {
-                string binFolder = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "bin");
+                string binFolder = Path.Combine(IO.IOHelper.MapPath("/", false), "bin");
                 string[] strTypes = TypeResolver.GetAssignablesFromType<T>(binFolder, "*.dll");
 
                 List<Type> types = new List<Type>();

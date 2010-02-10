@@ -5,6 +5,7 @@ using umbraco.DataLayer;
 using System.Collections;
 using System.Collections.Generic;
 using umbraco.IO;
+using System.Xml;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -69,6 +70,15 @@ namespace umbraco.cms.businesslogic.media
 
                 base.Save();
 
+                XmlDocument xd = new XmlDocument();
+                XmlGenerate(xd);
+
+                // generate preview for blame history?
+                if (UmbracoSettings.EnableGlobalPreviewStorage)
+                {
+                    // Version as new guid to ensure different versions are generated as media are not versioned currently!
+                    savePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());
+                }
 
                 FireAfterSave(e);
             }
