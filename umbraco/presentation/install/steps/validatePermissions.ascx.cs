@@ -152,6 +152,13 @@ namespace umbraco.presentation.install.steps
         {
             try
             {
+                //first check if the directory of the file exists, and if not try to create that first.
+                FileInfo fi = new FileInfo(file);
+                if (!fi.Directory.Exists)
+                {
+                    fi.Directory.Create();
+                }
+
                 File.WriteAllText(file,
                                   "This file has been created by the umbraco configuration wizard. It is safe to delete it!");
                 File.Delete(file);
