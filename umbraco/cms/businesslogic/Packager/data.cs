@@ -2,6 +2,7 @@ using System;
 using System.Xml;
 using System.Xml.XPath;
 using System.Collections.Generic;
+using System.IO;
 
 namespace umbraco.cms.businesslogic.packager
 {
@@ -19,23 +20,33 @@ namespace umbraco.cms.businesslogic.packager
 
         public static void Reload(string dataSource)
         {
-            if (_source == null)
-                _source = new XmlDocument();
-            try {
-
-                _source.Load(dataSource);
-
-            } catch {
-                
-                if (!System.IO.File.Exists(dataSource)) {
-                    System.IO.StreamWriter sw = System.IO.File.CreateText(dataSource);
-                    sw.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-                    sw.WriteLine("<packages></packages>");
-                    sw.Flush();
-                    sw.Close();
+            //do some error checking and create the folders/files if they don't exist
+            if (!File.Exists(dataSource))
+            {
+                if (!Directory.Exists(IO.IOHelper.MapPath(Settings.PackagerRoot)))
+                {
+                    Directory.CreateDirectory(IO.IOHelper.MapPath(Settings.PackagerRoot));
                 }
-                _source.Load(dataSource);
+                if (!Directory.Exists(IO.IOHelper.MapPath(Settings.PackagesStorage)))
+                {
+                    Directory.CreateDirectory(IO.IOHelper.MapPath(Settings.PackagesStorage));
+                }
+                if (!Directory.Exists(IO.IOHelper.MapPath(Settings.InstalledPackagesStorage)))
+                {
+                    Directory.CreateDirectory(IO.IOHelper.MapPath(Settings.InstalledPackagesStorage));
+                }
+
+                StreamWriter sw = File.CreateText(dataSource);
+                sw.Write(umbraco.cms.businesslogic.Packager.FileResources.PackageFiles.Packages);
+                sw.Flush();
+                sw.Close();
             }
+
+            if (_source == null)
+            {
+                _source = new XmlDocument();                
+            }
+            _source.Load(dataSource);
         }
 
         public static XmlNode GetFromId(int Id, string dataSource, bool reload)

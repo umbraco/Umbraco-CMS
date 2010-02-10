@@ -2758,8 +2758,6 @@
     <Content Include="config\tinyMceConfig.config" />
     <Content Include="config\umbracoSettings.config" />
     <Content Include="config\xsltExtensions.config" />
-    <Content Include="data\packages\created\createdPackages.config" />
-    <Content Include="data\packages\installed\installedPackages.config" />
     <None Include="umbraco\schemas\package.xsd">
       <SubType>
       </SubType>
@@ -2796,7 +2794,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="css\" />
-    <Folder Include="data\_systemUmbracoIndexDontDelete\" />
+    <Folder Include="data\" />
     <Folder Include="masterpages\" />
     <Folder Include="media\" />
     <Folder Include="python\" />

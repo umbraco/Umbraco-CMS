@@ -11,7 +11,7 @@ namespace umbraco.presentation.install.steps
     public partial class validatePermissions : UserControl
     {
         private string[] permissionDirs = {SystemDirectories.Css, SystemDirectories.Config, SystemDirectories.Data, SystemDirectories.Media, SystemDirectories.Masterpages, SystemDirectories.Xslt, SystemDirectories.Usercontrols};
-        private string[] permissionFiles = { SystemDirectories.Packages + "/installed/installedPackages.config" , SystemDirectories.Packages + "/created/createdPackages.config" };
+        private string[] permissionFiles = { };
         private string[] packagesPermissionsDirs = {SystemDirectories.Bin, SystemDirectories.Umbraco, SystemDirectories.Usercontrols, SystemDirectories.Packages};
 
         protected void Page_Load(object sender, EventArgs e)

@@ -128,7 +128,8 @@ namespace umbraco.IO
         {
             get
             {
-                return IOHelper.returnPath("umbracoPackagesPath", "~/data/packages");
+                //by default the packages folder should exist in the data folder
+                return IOHelper.returnPath("umbracoPackagesPath", Data + IOHelper.DirSepChar + "packages");
             }
         }
 
