@@ -8,6 +8,9 @@ using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml;
 using System.Reflection;
+using umbraco.presentation;
+using umbraco.cms.helpers;
+using umbraco.BusinessLogic.Utils;
 
 namespace umbraco.Linq.Core.Node
 {
@@ -85,8 +88,13 @@ namespace umbraco.Linq.Core.Node
             }
         }
 
-        private void Init(string xmlPath)
+        private void Init(string xmlPath, bool legacySchema)
         {
+            if (legacySchema)
+            {
+                throw new NotSupportedException("The NodeDataProvider does not support the old XML schema mode. Set \"UseLegacyXmlSchema\" in your umbracoSettings.Config to \"true\" and republish the site");
+            }
+
             if (string.IsNullOrEmpty(xmlPath))
             {
                 throw new ArgumentNullException("xmlPath");
@@ -105,7 +113,7 @@ namespace umbraco.Linq.Core.Node
         /// Initializes a new instance of the <see cref="NodeDataProvider"/> class using umbraco settings as XML path
         /// </summary>
         public NodeDataProvider()
-            : this(umbraco.presentation.UmbracoContext.Current.Server.MapPath(umbraco.presentation.UmbracoContext.Current.Server.ContentXmlPath))
+            : this(UmbracoContext.Current.Server.MapPath(UmbracoContext.Current.Server.ContentXmlPath), !UmbracoContext.Current.NewSchemaMode)
         {
             this._tryMemoryCache = true;
         }
@@ -113,12 +121,13 @@ namespace umbraco.Linq.Core.Node
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeDataProvider"/> class
         /// </summary>
+        /// <param name="xmlPath">The path of the umbraco XML</param>
+        /// <param name="legacySchema">if set to <c>true</c> [legacy schema].</param>
         /// <remarks>
         /// This constructor is ideal for unit testing as it allows for the XML to be located anywhere
         /// </remarks>
-        /// <param name="xmlPath">The path of the umbraco XML</param>
-        public NodeDataProvider(string xmlPath)
-            : this(xmlPath, false)
+        public NodeDataProvider(string xmlPath, bool legacySchema)
+            : this(xmlPath, legacySchema, false)
         {
         }
 
@@ -126,12 +135,13 @@ namespace umbraco.Linq.Core.Node
         /// Initializes a new instance of the <see cref="NodeDataProvider"/> class.
         /// </summary>
         /// <param name="xmlPath">The XML path.</param>
+        /// <param name="legacySchema">if set to <c>true</c> [legacy schema].</param>
         /// <param name="enforceValidation">if set to <c>true</c> when the XML document is accessed validation against the umbraco XSD will be done.</param>
         /// <exception cref="System.ArgumentNullException">Thrown when the xmlPath is null</exception>
         /// <exception cref="System.IO.FileNotFoundException">Thrown when the xmlPath does not resolve to a physical file</exception>
-        public NodeDataProvider(string xmlPath, bool enforceValidation)
+        public NodeDataProvider(string xmlPath, bool legacySchema, bool enforceValidation)
         {
-            this.Init(xmlPath);
+            this.Init(xmlPath, legacySchema);
             this._enforceSchemaValidation = enforceValidation;
         }
 
@@ -185,7 +195,7 @@ namespace umbraco.Linq.Core.Node
         {
             CheckDisposed();
 
-            var attr = ReflectionAssistance.GetumbracoInfoAttribute(typeof(TDocType));
+            var attr = ReflectionAssistance.GetUmbracoInfoAttribute(typeof(TDocType));
 
             if (!this._trees.ContainsKey(attr))
             {
@@ -224,11 +234,11 @@ namespace umbraco.Linq.Core.Node
         {
             CheckDisposed();
 
-            var parentXml = this.Xml.Descendants("node").SingleOrDefault(d => (int)d.Attribute("id") == id);
+            var parentXml = this.Xml.Descendants().SingleOrDefault(d => (int)d.Attribute("id") == id);
 
             if (!ReflectionAssistance.CompareByAlias(typeof(TDocType), parentXml))
             {
-                throw new DocTypeMissMatchException((string)parentXml.Attribute("nodeTypeAlias"), ReflectionAssistance.GetumbracoInfoAttribute(typeof(TDocType)).Alias);
+                throw new DocTypeMissMatchException(parentXml.Name.LocalName, ReflectionAssistance.GetUmbracoInfoAttribute(typeof(TDocType)).Alias);
             }
 
             if (parentXml == null) //really shouldn't happen!
@@ -282,8 +292,8 @@ namespace umbraco.Linq.Core.Node
         {
             CheckDisposed();
 
-            var startElement = this.Xml.Descendants("node").Single(x => (int)x.Attribute("id") == startNodeId);
-            var ancestorElements = startElement.Ancestors("node");
+            var startElement = this.Xml.Descendants().Single(x => (int)x.Attribute("id") == startNodeId);
+            var ancestorElements = startElement.Ancestors();
 
             IEnumerable<DocTypeBase> ancestors = DynamicNodeCreation(ancestorElements);
 
@@ -300,10 +310,10 @@ namespace umbraco.Linq.Core.Node
             // TODO: investigate this method for performance bottlenecks
             // TODO: dataContext knows the types, maybe can load from there?
             List<DocTypeBase> ancestors = new List<DocTypeBase>();
-            
+
             foreach (var ancestor in elements)
             {
-                var alias = (string)ancestor.Attribute("nodeTypeAlias");
+                var alias = Casing.SafeAlias(ancestor.Name.LocalName);
                 var t = KnownTypes[alias];
                 var instaceOfT = (DocTypeBase)Activator.CreateInstance(t); //create an instance of the type and down-cast so we can use it
                 this.LoadFromXml(ancestor, instaceOfT);
@@ -311,11 +321,8 @@ namespace umbraco.Linq.Core.Node
                 ancestors.Add(instaceOfT);
                 yield return instaceOfT;
             }
-
-            //return ancestors;
         }
 
-        //Will this cause a problem with trust levels...?
         internal Dictionary<string, Type> KnownTypes
         {
             get
@@ -323,24 +330,18 @@ namespace umbraco.Linq.Core.Node
                 if (this._knownTypes == null)
                 {
                     this._knownTypes = new Dictionary<string, Type>();
-                    foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+                    var types = TypeFinder
+                        .FindClassesOfType<DocTypeBase>()
+                        .Where(t => t != typeof(DocTypeBase))
+                        .ToDictionary(k =>
+                        {
+                            return ((UmbracoInfoAttribute)k.GetCustomAttributes(typeof(UmbracoInfoAttribute), true)[0]).Alias;
+                        });
+                    foreach (var type in types)
                     {
-                        try
-                        {
-                            foreach (var p in (from t in a.GetTypes()
-                                               where t.GetCustomAttributes(typeof(DocTypeAttribute), true).Length == 1
-                                               select t).ToDictionary(k => ((UmbracoInfoAttribute)k.GetCustomAttributes(typeof(UmbracoInfoAttribute), true)[0]).Alias))
-                            {
-                                this._knownTypes.Add(p.Key, p.Value);
-                            }
-                        }
-                        catch (ReflectionTypeLoadException)
-                        {
-                            //just ignore, this gets thrown if a reference doesn't exist on the server
-                            //for example, the code generation assemblies, they need VS
-                            //but if you're installing VS on a server you'd just doing it wrong...
-                        }
+                        this._knownTypes.Add(Casing.SafeAlias(type.Key), type.Value);
                     }
+
                 }
 
                 return this._knownTypes;
@@ -366,14 +367,9 @@ namespace umbraco.Linq.Core.Node
         /// <param name="node">The node.</param>
         public void LoadFromXml<T>(XElement xml, T node) where T : DocTypeBase
         {
-            if (xml.Name != "node")
-            {
-                throw new ArgumentException("Xml provided is not valid");
-            }
-
             if (!ReflectionAssistance.CompareByAlias(node.GetType(), xml))
             {
-                throw new DocTypeMissMatchException((string)xml.Attribute("nodeTypeAlias"), ReflectionAssistance.GetumbracoInfoAttribute(node.GetType()).Alias);
+                throw new DocTypeMissMatchException(xml.Name.LocalName, ReflectionAssistance.GetUmbracoInfoAttribute(node.GetType()).Alias);
             }
 
             node.Id = (int)xml.Attribute("id");
@@ -391,9 +387,9 @@ namespace umbraco.Linq.Core.Node
             var properties = node.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.GetCustomAttributes(typeof(PropertyAttribute), true).Count() > 0);
             foreach (var p in properties)
             {
-                var attr = ReflectionAssistance.GetumbracoInfoAttribute(p);
+                var attr = ReflectionAssistance.GetUmbracoInfoAttribute(p);
 
-                var data = xml.Elements("data").Single(x => (string)x.Attribute("alias") == attr.Alias).Value;
+                var data = xml.Element(Casing.SafeAlias(attr.Alias)).Value;
                 if (p.PropertyType == typeof(int) && string.IsNullOrEmpty(data))
                 {
                     data = "-1";

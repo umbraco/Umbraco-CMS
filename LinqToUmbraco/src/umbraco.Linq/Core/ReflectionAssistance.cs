@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
+using umbraco.cms.helpers;
 
 namespace umbraco.Linq.Core
 {
@@ -27,7 +28,7 @@ namespace umbraco.Linq.Core
         /// <summary>
         /// Compares a .NET type to an Xml representation
         /// </summary>
-        internal static Func<Type, XElement, bool> CompareByAlias = (t, x) => (string)x.Attribute("nodeTypeAlias") == ReflectionAssistance.GetumbracoInfoAttribute(t).Alias;
+        internal static Func<Type, XElement, bool> CompareByAlias = (t, x) => x.Name.LocalName == Casing.SafeAlias(ReflectionAssistance.GetUmbracoInfoAttribute(t).Alias);
 
         /// <summary>
         /// Get the <see cref="umbraco.Linq.Core.umbracoInfoAttribute"/> for a <see cref="System.Reflection.MethodInfo"/> object
@@ -35,7 +36,7 @@ namespace umbraco.Linq.Core
         /// <param name="member">The methodInfo to get the <see cref="umbraco.Linq.Core.umbracoInfoAttribute"/> for.</param>
         /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "umbraco")]
-        public static UmbracoInfoAttribute GetumbracoInfoAttribute(MemberInfo member)
+        public static UmbracoInfoAttribute GetUmbracoInfoAttribute(MemberInfo member)
         {
             return member.GetCustomAttributes(typeof(UmbracoInfoAttribute), true).Cast<UmbracoInfoAttribute>().SingleOrDefault();
         }
@@ -46,7 +47,7 @@ namespace umbraco.Linq.Core
         /// <param name="type">The type to get the <see cref="umbraco.Linq.Core.umbracoInfoAttribute"/> for.</param>
         /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
-        public static UmbracoInfoAttribute GetumbracoInfoAttribute(Type type)
+        public static UmbracoInfoAttribute GetUmbracoInfoAttribute(Type type)
         {
             return type.GetCustomAttributes(typeof(UmbracoInfoAttribute), true).Cast<UmbracoInfoAttribute>().SingleOrDefault();
         }

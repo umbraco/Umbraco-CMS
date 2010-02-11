@@ -53,10 +53,14 @@ namespace umbraco.Linq.Core.Node
 
             lock (lockObject)
             {
-                var rawNodes = provider.Xml.Descendants("node")
-                    .Where(x => (int)x.Attribute("id") == this.ParentNodeId)
+                var parents = provider
+                    .Xml
+                    .Descendants()
+                    .Where(x => x.Attribute("id") != null && (int)x.Attribute("id") == this.ParentNodeId);
+                var rawNodes = parents
                     .Single()
-                    .Elements("node")
+                    .Elements()
+                    .Where(x => x.HasAttributes)
                     ;
                 this._nodes = provider.DynamicNodeCreation(rawNodes).Cast<TDocTypeBase>(); //drop is back to the type which was asked for 
             }

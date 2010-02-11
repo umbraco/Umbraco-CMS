@@ -18,6 +18,11 @@ namespace umbraco.presentation
             m_Server = server;
         }
 
+        public override string MapPath(string path)
+        {
+            return IOHelper.MapPath(path);
+        }
+
         public string UmbracoPath
         {
             get

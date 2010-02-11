@@ -1,10 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using umbraco.BusinessLogic;
-using System.Xml.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -14,7 +12,7 @@ namespace umbraco.Linq.Core
     /// Provides the base framework for an umbraco item
     /// </summary>
     [DataContract]
-    public class DocTypeBase : umbraco.Linq.Core.IDocTypeBase //This class should be abstract but it can't be done AND achieve the Children property like this
+    public class DocTypeBase : IDocTypeBase //This class should be abstract but it can't be done AND achieve the Children property like this
     {
         #region Internal Storage
         private int _Id;

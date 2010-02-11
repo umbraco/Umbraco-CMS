@@ -108,6 +108,14 @@ namespace umbraco.presentation
                         .Contains(permissionToken.ToString());
         }
 
+        public virtual bool NewSchemaMode
+        {
+            get
+            {
+                return !UmbracoSettings.UseLegacyXmlSchema;
+            }
+        }
+
         /// <summary>
         /// Gets the current Live Editing Context.
         /// </summary>

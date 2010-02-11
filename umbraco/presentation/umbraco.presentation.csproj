@@ -150,14 +150,6 @@
     <Reference Include="System.Xml.Linq, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="umbraco.Linq.DTMetal.CodeBuilder, Version=0.0.1.19717, Culture=neutral, PublicKeyToken=a1619d9c35575289, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\foreign dlls\umbraco.Linq.DTMetal.CodeBuilder.dll</HintPath>
-    </Reference>
-    <Reference Include="umbraco.Linq.DTMetal.Engine, Version=0.0.1.19719, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\foreign dlls\umbraco.Linq.DTMetal.Engine.dll</HintPath>
-    </Reference>
     <Reference Include="UmbracoExamine.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\UmbracoExamine.Core.dll</HintPath>
@@ -2737,7 +2729,8 @@
     </None>
     <None Include="umbraco_client\CodeMirror\LICENSE" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
-    <Content Include="web.config.APOWELL-WIN7.xslt" />
+    <Content Include="web.config.APOWELL-BC-WIN7.xslt" />
+    <Content Include="web.config.BOMBER.xslt" />
     <Content Include="web.config.SONIC.xslt" />
     <Content Include="web.STANDARD.config" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />

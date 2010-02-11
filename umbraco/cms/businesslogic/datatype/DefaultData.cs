@@ -51,6 +51,14 @@ namespace umbraco.cms.businesslogic.datatype
             m_Value = SqlHelper.ExecuteScalar<object>("SELECT " + _dataType.DataFieldName + " FROM cmsPropertyData WHERE id = " + m_PropertyId);
         }
 
+        public DBTypes DatabaseType
+        {
+            get
+            {
+                return this._dataType.DBType;
+            }
+        }
+
 		#region IData Members
 
         /// <summary>

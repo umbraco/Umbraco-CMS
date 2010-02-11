@@ -10,7 +10,7 @@ namespace umbraco.Linq.Core
     /// <summary>
     /// The umbracoDataContext which handles the interaction with an <see cref="umbraco.Linq.Core.UmbracoDataProvider"/>
     /// </summary>
-    public abstract class UmbracoDataContext : IDisposable
+    public abstract class UmbracoDataContext : IUmbracoDataContext
     {
         #region Privates
         private UmbracoDataProvider _dataProvider;

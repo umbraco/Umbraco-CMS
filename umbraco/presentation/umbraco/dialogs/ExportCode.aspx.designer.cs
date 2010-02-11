@@ -23,13 +23,13 @@ namespace umbraco.presentation.umbraco.dialogs {
         protected global::umbraco.uicontrols.Pane pane_language;
         
         /// <summary>
-        /// ddlLanguage control.
+        /// ddlGenerationMode control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlLanguage;
+        protected global::System.Web.UI.WebControls.DropDownList ddlGenerationMode;
         
         /// <summary>
         /// pane_contextName control.
@@ -59,31 +59,13 @@ namespace umbraco.presentation.umbraco.dialogs {
         protected global::System.Web.UI.WebControls.TextBox txtNamespace;
         
         /// <summary>
-        /// pane_abstractions control.
+        /// pnlButtons control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_abstractions;
-        
-        /// <summary>
-        /// chkAsInterfaces control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox chkAsInterfaces;
-        
-        /// <summary>
-        /// chkIncludeIterfaceInheritance control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox chkIncludeIterfaceInheritance;
+        protected global::System.Web.UI.WebControls.Panel pnlButtons;
         
         /// <summary>
         /// btnGenerate control.
@@ -93,5 +75,32 @@ namespace umbraco.presentation.umbraco.dialogs {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnGenerate;
+        
+        /// <summary>
+        /// pane_files control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane pane_files;
+        
+        /// <summary>
+        /// lnkPoco control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HyperLink lnkPoco;
+        
+        /// <summary>
+        /// lnkAbstractions control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HyperLink lnkAbstractions;
     }
 }

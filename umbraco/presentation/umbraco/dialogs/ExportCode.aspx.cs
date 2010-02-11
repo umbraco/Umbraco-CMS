@@ -3,15 +3,192 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using umbraco.Linq.DTMetal.CodeBuilder;
-using umbraco.Linq.DTMetal.Engine;
 using System.IO;
 using System.Text;
+using umbraco.cms.businesslogic.web;
+using umbraco.cms.helpers;
+using umbraco.cms.businesslogic.propertytype;
+using System.Reflection;
+using System.Linq;
+using umbraco.cms.businesslogic.datatype;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
     public partial class ExportCode : System.Web.UI.Page
     {
+        private Dictionary<Guid, Type> dataTypeMapping = new Dictionary<Guid, Type>();
+
+        private List<DocumentType> _docTypes;
+        public List<DocumentType> DocTypes
+        {
+            get
+            {
+                if (_docTypes == null)
+                {
+                    _docTypes = DocumentType.GetAllAsList();
+                }
+                return _docTypes;
+            }
+        }
+
+        #region POCO Template
+        private readonly static string POCO_TEMPLATE = @"using System;
+using System.Linq;
+using umbraco.Linq.Core;
+using System.Collections.Generic;
+
+namespace {0} {{
+	public partial class {1}DataContext : UmbracoDataContext{2} {{
+		#region Partials
+        partial void OnCreated();
+        #endregion
+		
+		public {1}DataContext() : base()
+        {{
+            OnCreated();
+        }}
+
+        public {1}DataContext(UmbracoDataProvider provider) : base(provider)
+        {{
+            OnCreated();
+        }}
+
+        {3}
+	}}
+
+    {4}
+}}";
+        #endregion
+
+        #region Abstraction Template
+        private readonly static string POCO_ABSTRACTION_TEMPLATE = @"using System;
+using System.Linq;
+using umbraco.Linq.Core;
+using System.Collections.Generic;
+
+namespace {0} {{
+	public interface I{1}DataContext : IUmbracoDataContext {{
+        {2}
+	}}
+
+    {3}
+}}";
+        #endregion
+
+        #region Tree Template
+        private readonly static string TREE_TEMPLATE = @"
+        public Tree<{0}> {0}s
+        {{
+            get
+            {{
+                return this.LoadTree<{0}>();
+            }}
+        }}";
+        #endregion
+
+        #region Abstraction Tree Template
+        private readonly static string TREE_ABSTRACTION_TEMPLATE = @"
+        IEnumerable<I{0}> I{1}DataContext.{0}s
+        {{
+            get
+            {{
+                return (IEnumerable<I{0}>)this.LoadTree<{0}>();
+            }}
+        }}";
+        #endregion
+
+        #region Class Template
+        //0 - Alias
+        //1 - class name
+        //2 - interface or string.Empty
+        //3 - properties
+        //4 - child relationships
+        //5 - interface explicit implementation
+        //6 - description
+        private readonly static string CLASS_TEMPLATE = @"
+    /// <summary>
+    /// {6}
+    /// </summary>
+    [UmbracoInfo(""{0}"")]
+    [System.Runtime.Serialization.DataContractAttribute()]
+    [DocType()]
+    public partial class {1} : {7} {2} {{
+        public {1}() {{
+        }}
+        {3}
+        {4}
+        {5}
+}}";
+        #endregion
+
+        #region Interface Template
+        //0 - Class name
+        //1 - properties
+        //2 - child relationshipts
+        private readonly static string INTERFACE_TEMPLATE = @"
+    public interface I{0} : I{3} {{
+        {1}
+        {2}
+}}";
+        #endregion
+
+        #region Properties Template
+        private readonly static string PROPERTIES_TEMPLATE = @"
+        private {0} _{1};
+        /// <summary>
+        /// {2}
+        /// </summary>
+        [UmbracoInfo(""{3}"", DisplayName = ""{4}"", Mandatory = {5})]
+        [Property()]
+        public virtual {0} {1}
+        {{
+            get
+            {{
+                return this._{1};
+            }}
+            set
+            {{
+                if ((this._{1} != value))
+                {{
+                    this.RaisePropertyChanging();
+                    this._{1} = value;
+                    this.RaisePropertyChanged(""{1}"");
+                }}
+            }}
+        }}";
+        #endregion
+
+        #region Child Relationships Template
+        private readonly static string CHILD_RELATIONS_TEMPLATE = @"
+        private AssociationTree<{0}> _{0}s;
+        public AssociationTree<{0}> {0}s
+        {{
+            get
+            {{
+                if ((this._{0}s == null))
+                {{
+                    this._{0}s = this.ChildrenOfType<{0}>();
+                }}
+                return this._{0}s;
+            }}
+            set
+            {{
+                this._{0}s = value;
+            }}
+        }}";
+        #endregion
+
+        #region Child Relationship Abstraction Template
+        private readonly static string CHILD_RELATIONS_ABSTRACTION_TEMPLATE = @"
+        IEnumerable<I{0}> I{1}.{0}s 
+        {{
+            get
+            {{
+                return (IEnumerable<I{0}>)this.{0}s;
+            }}
+        }}";
+        #endregion
+
         protected void Page_Load(object sender, EventArgs e)
         {
             btnGenerate.Text = ui.Text("create");
@@ -19,18 +196,287 @@ namespace umbraco.presentation.umbraco.dialogs
 
         protected void btnGenerate_Click(object sender, EventArgs e)
         {
-            GenerationLanguage language = (GenerationLanguage)Enum.Parse(typeof(GenerationLanguage), ddlLanguage.SelectedValue);
-            string dataContextName = string.IsNullOrEmpty(txtDataContextName.Text) ? "Umbraco" : txtDataContextName.Text;
-            var generator = new DTMLGenerator(GlobalSettings.DbDSN, dataContextName, false);
-            var dtml = generator.GenerateDTMLStream();
-            
-            var cb = ClassGenerator.CreateBuilder(string.IsNullOrEmpty(txtNamespace.Text) ? "Umbraco" : txtNamespace.Text, language, dtml.DocTypeMarkupLanguage, chkAsInterfaces.Checked, chkIncludeIterfaceInheritance.Checked);
-            cb.GenerateCode();
-            cb.Save(UmbracoContext.Current.Response.OutputStream);
-            
-            UmbracoContext.Current.Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}", dataContextName));
-            UmbracoContext.Current.Response.ContentType = "application/octet-stream";
-            UmbracoContext.Current.Response.End();
+            var includeInterfaces = ddlGenerationMode.SelectedValue == "abs";
+
+            var poco = string.Format(POCO_TEMPLATE,
+                this.txtNamespace.Text,
+                this.txtDataContextName.Text,
+                includeInterfaces ? ", I" + this.txtDataContextName.Text + "DataContext" : string.Empty,
+                GenerateDataContextCollections(includeInterfaces),
+                GenerateClasses(includeInterfaces)
+            );
+
+            string pocoFile = Path.Combine(IO.SystemDirectories.Data, this.txtDataContextName.Text + ".txt");
+
+            using (var writer = new StreamWriter(IO.IOHelper.MapPath(pocoFile)))
+            {
+                writer.Write(poco);
+            }
+
+            lnkPoco.NavigateUrl = pocoFile;
+
+            pnlButtons.Visible = false;
+            pane_files.Visible = true;
+
+            if (includeInterfaces)
+            {
+                var abstraction = string.Format(POCO_ABSTRACTION_TEMPLATE,
+                    this.txtNamespace.Text,
+                    this.txtDataContextName.Text,
+                    GenerateDataContextAbstractCollections(),
+                    GenerateClassAbstraction()
+                );
+
+                string abstractionFile = Path.Combine(IO.SystemDirectories.Data, "I" + this.txtDataContextName.Text + ".txt");
+
+                using (var writer = new StreamWriter(IO.IOHelper.MapPath(abstractionFile)))
+                {
+                    writer.Write(abstraction);
+                }
+
+                lnkAbstractions.NavigateUrl = abstractionFile;
+                lnkAbstractions.Enabled = true;
+            }
+        }
+
+        private string GenerateClassAbstraction()
+        {
+            var sb = new StringBuilder();
+
+            foreach (var dt in this.DocTypes)
+            {
+                var baseType = "DocTypeBase";
+                if (dt.MasterContentType > 0)
+                {
+                    var parent = DocTypes.First(d => d.Id == dt.MasterContentType);
+                    baseType = GenerateTypeName(dt.Alias);
+                }
+
+                sb.AppendLine(string.Format(INTERFACE_TEMPLATE,
+                    GenerateTypeName(dt.Alias),
+                    GenerateAbstractProperties(dt),
+                    GenerateAbstractRelations(dt),
+                    baseType
+                    )
+                );
+            }
+
+            return sb.ToString();
+        }
+
+        private string GenerateAbstractRelations(DocumentType dt)
+        {
+            var sb = new StringBuilder();
+
+            var children = dt.AllowedChildContentTypeIDs;
+            foreach (var child in DocTypes.Where(d => children.Contains(d.Id)))
+            {
+                sb.AppendLine(string.Format("IEnumerable<I{0}> {0}s {{ get; }}", 
+                    GenerateTypeName(child.Alias)
+                    )
+                );
+            }
+
+            return sb.ToString();
+        }
+
+        private string GenerateAbstractProperties(DocumentType dt)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var pt in dt.PropertyTypes)
+            {
+                sb.AppendLine(string.Format("{0} {1} {{ get; set; }}",
+                    GetDotNetType(pt),
+                    GenerateTypeName(pt.Alias)
+                    )
+                );
+            }
+
+            return sb.ToString();
+        }
+
+        private string GenerateDataContextAbstractCollections()
+        {
+            var sb = new StringBuilder();
+            foreach (var dt in this.DocTypes)
+            {
+                sb.AppendLine(string.Format("IEnumerable<I{0}> {0}s {{ get; }}", GenerateTypeName(dt.Alias)));
+            }
+            return sb.ToString();
+        }
+
+        private string GenerateClasses(bool includeInterfaces)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var dt in DocTypes)
+            {
+                string className = GenerateTypeName(dt.Alias);
+
+                var baseType = "DocTypeBase";
+                if (dt.MasterContentType > 0)
+                {
+                    var parent = DocTypes.First(d => d.Id == dt.MasterContentType);
+                    baseType = GenerateTypeName(dt.Alias);
+                }
+
+                sb.Append(string.Format(CLASS_TEMPLATE,
+                    dt.Alias,
+                    className,
+                    includeInterfaces ? ", I" + className : string.Empty,
+                    GenerateProperties(dt),
+                    GenerateChildRelationships(dt),
+                    includeInterfaces ? GenerateAbstractionImplementation(dt) : string.Empty,
+                    FormatForComment(dt.Description),
+                    baseType
+                    )
+                );
+            }
+
+            return sb.ToString();
+        }
+
+        private string GenerateAbstractionImplementation(DocumentType dt)
+        {
+            var sb = new StringBuilder();
+
+            var children = dt.AllowedChildContentTypeIDs;
+            foreach (var child in DocTypes.Where(d => children.Contains(d.Id)))
+            {
+                sb.Append(string.Format(CHILD_RELATIONS_ABSTRACTION_TEMPLATE,
+                    GenerateTypeName(child.Alias),
+                    GenerateTypeName(dt.Alias)
+                    )
+                );
+            }
+            return sb.ToString();
+        }
+
+        private object GenerateChildRelationships(DocumentType dt)
+        {
+            var sb = new StringBuilder();
+            var children = dt.AllowedChildContentTypeIDs;
+            foreach (var child in DocTypes.Where(d => children.Contains(d.Id)))
+            {
+                sb.Append(string.Format(CHILD_RELATIONS_TEMPLATE,
+                    GenerateTypeName(child.Alias)
+                    )
+                );
+            }
+            return sb.ToString();
+        }
+
+        private object GenerateProperties(DocumentType dt)
+        {
+            var sb = new StringBuilder();
+            foreach (var pt in dt.PropertyTypes)
+            {
+                sb.Append(string.Format(PROPERTIES_TEMPLATE,
+                    GetDotNetType(pt),
+                    GenerateTypeName(pt.Alias),
+                    FormatForComment(pt.Description),
+                    pt.Alias,
+                    pt.Name,
+                    pt.Mandatory.ToString().ToLower()
+                    )
+                );
+            }
+
+            return sb.ToString();
+        }
+
+        private string GetDotNetType(PropertyType pt)
+        {
+            Guid id = pt.DataTypeDefinition.DataType.Id;
+            if (!dataTypeMapping.ContainsKey(id))
+            {
+                var defaultData = pt.DataTypeDefinition.DataType.Data as DefaultData;
+                if (defaultData != null) //first lets see if it inherits from DefaultData, pretty much all do
+                {
+                    switch (defaultData.DatabaseType)
+                    {
+                        case DBTypes.Integer:
+                            dataTypeMapping.Add(id, typeof(int));
+                            break;
+                        case DBTypes.Date:
+                            dataTypeMapping.Add(id, typeof(DateTime));
+                            break;
+                        case DBTypes.Nvarchar:
+                        case DBTypes.Ntext:
+                            dataTypeMapping.Add(id, typeof(string));
+                            break;
+                        default:
+                            dataTypeMapping.Add(id, typeof(object));
+                            break;
+                    }
+                }
+                else //hmm so it didn't, lets try something else
+                {
+                    var dbType = BusinessLogic.Application.SqlHelper.ExecuteScalar<string>(@"SELECT [t0].[dbType] FROM [cmsDataType] AS [t0] WHERE [t0].[controlId] = @p0", BusinessLogic.Application.SqlHelper.CreateParameter("@p0", id));
+
+                    if (!string.IsNullOrEmpty(dbType)) //can I determine from the DB?
+                    {
+                        switch (dbType.ToUpper())
+                        {
+                            case "INTEGER":
+                                dataTypeMapping.Add(id, typeof(int));
+                                break;
+                            case "DATE":
+                                dataTypeMapping.Add(id, typeof(DateTime));
+                                break;
+                            case "NTEXT":
+                            case "NVARCHAR":
+                                dataTypeMapping.Add(id, typeof(string));
+                                break;
+                            default:
+                                dataTypeMapping.Add(id, typeof(object));
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        //ok, you've got a really freaky data type, so you get an Object back :P
+                        dataTypeMapping.Add(id, typeof(object));
+                    }
+                }
+            }
+            return dataTypeMapping[id].Name;
+        }
+
+        private string GenerateDataContextCollections(bool includeInterfaces)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var dt in DocTypes)
+            {
+                string className = GenerateTypeName(dt.Alias);
+                sb.Append(string.Format(TREE_TEMPLATE,
+                    className
+                    )
+                );
+
+                if (includeInterfaces)
+                {
+                    sb.AppendLine(string.Format(TREE_ABSTRACTION_TEMPLATE,
+                        className,
+                        txtDataContextName.Text
+                        )
+                    );
+                }
+            }
+            return sb.ToString();
+        }
+
+        private static string GenerateTypeName(string alias)
+        {
+            string s = Casing.SafeAlias(alias);
+            return s[0].ToString().ToUpper() + s.Substring(1, s.Length - 1);
+        }
+
+        private static string FormatForComment(string s)
+        {
+            return s.Replace("\r\n", "\r\n///");
         }
     }
 }

@@ -512,7 +512,7 @@
   </area>
   <area alias="editdatatype">
     <key alias="renderControl">Render control</key>
-    <key alias="dataBaseDatatype">Datebase datatype</key>
+    <key alias="dataBaseDatatype">Database datatype</key>
     <key alias="addPrevalue">Add prevalue</key>
     <key alias="rteButtons">Buttons</key>
     <key alias="rteRelatedStylesheets">Related stylesheets</key>

@@ -67,7 +67,7 @@ namespace umbraco.Linq.Core.Node
             if (this._nodes == null)
             {
                 this._nodes = new List<TDocTypeBase>();
-                var rawNodes = this._provider.Xml.Descendants("node").Where(x => ReflectionAssistance.CompareByAlias(typeof(TDocTypeBase), x));
+                var rawNodes = this._provider.Xml.Descendants().Where(x => ReflectionAssistance.CompareByAlias(typeof(TDocTypeBase), x));
 
                 lock (lockObject)
                 {
@@ -93,7 +93,7 @@ namespace umbraco.Linq.Core.Node
         {
             this._provider.CheckDisposed();
 
-            var attr = ReflectionAssistance.GetumbracoInfoAttribute(typeof(TDocTypeBase));
+            var attr = ReflectionAssistance.GetUmbracoInfoAttribute(typeof(TDocTypeBase));
             this._provider.SetupNodeTree<TDocTypeBase>(attr);
         }
 
