@@ -372,7 +372,7 @@ namespace umbraco.editorControls
                 bool hasThumb = false;
                 try
                 {
-                    hasThumb = File.Exists( IOHelper.MapPath(fileNameThumb));
+                    hasThumb = File.Exists(IOHelper.FindFile(fileNameThumb));
                 }
                 catch { }
                 if (hasThumb)
@@ -381,12 +381,13 @@ namespace umbraco.editorControls
                     thumb.ImageUrl = fileNameThumb;
                     thumb.BorderStyle = BorderStyle.None;
 
-                    output.WriteLine("<a href=\"" + IOHelper.ResolveUrl( _text ) + "\" target=\"_blank\">");
+                    output.WriteLine("<a href=\"" + IOHelper.FindFile(_text) + "\" target=\"_blank\">");
                     thumb.RenderControl(output);
                     output.WriteLine("</a><br/>");
                 }
                 else
-                    output.WriteLine("<a href=\"" + IOHelper.ResolveUrl(this.Text) + "\" target=\"_blank\">" + IOHelper.ResolveUrl(this.Text) + "</a><br/>");
+                    output.WriteLine("<a href=\"" + IOHelper.FindFile(this.Text) + "\" target=\"_blank\">" + IOHelper.FindFile(this.Text) + "</a><br/>");
+                
                 output.WriteLine("<input type=\"checkbox\" id=\"" + this.ClientID + "clear\" name=\"" + this.ClientID + "clear\" value=\"1\"/> <label for=\"" + this.ClientID + "clear\">" + ui.Text("uploadClear") + "</label><br/>");
             }
             base.Render(output);
