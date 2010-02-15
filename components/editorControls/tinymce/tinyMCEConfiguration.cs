@@ -224,7 +224,7 @@ namespace umbraco.editorControls.tinymce
 
         public string Icon
         {
-            get { return SystemDirectories.Umbraco + "/" + _icon; }
+            get { return IOHelper.ResolveUrl( SystemDirectories.Umbraco ) + "/" + _icon; }
             set { _icon = value; }
         }
 
