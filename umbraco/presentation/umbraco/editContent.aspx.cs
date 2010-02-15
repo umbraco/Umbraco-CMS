@@ -13,6 +13,7 @@ using System.Reflection;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.helpers;
 using umbraco.IO;
+using umbraco.uicontrols.DatePicker;
 
 
 namespace umbraco.cms.presentation
@@ -31,8 +32,8 @@ namespace umbraco.cms.presentation
         */
 
         private LiteralControl dp = new LiteralControl();
-        private controls.datePicker dpRelease = new controls.datePicker();
-        private controls.datePicker dpExpire = new controls.datePicker();
+        private DateTimePicker dpRelease = new DateTimePicker();
+        private DateTimePicker dpExpire = new DateTimePicker();
 
         //private bool _refreshTree = false;
 

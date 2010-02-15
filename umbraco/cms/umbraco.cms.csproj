@@ -319,9 +319,6 @@
     <Compile Include="businesslogic\workflow\Notification.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="controls\datePickerWithpopup.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="helpers\url.cs">
       <SubType>Code</SubType>
     </Compile>

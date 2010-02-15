@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="controls\datePicker.cs" />
+    <Compile Include="controls\datePickerWithpopup.cs" />
     <Compile Include="controls\dateTimePicker.cs" />
     <Compile Include="editorControls\tinymce\TinyMCE.cs" />
     <Compile Include="editorControls\tinymce\tinyMCEImageHelper.cs" />
@@ -314,6 +315,7 @@
     <Content Include="umbraco\js\contentContextmenu.js" />
     <Content Include="umbraco\js\contextmenu.aspx" />
     <Content Include="umbraco\js\contextmenu.js" />
+    <Content Include="umbraco\js\datepicker.js" />
     <Content Include="umbraco\js\editorBarFunctions.js" />
     <Content Include="umbraco\js\prototype.js" />
     <Content Include="umbraco\js\richtextFunctions.js" />

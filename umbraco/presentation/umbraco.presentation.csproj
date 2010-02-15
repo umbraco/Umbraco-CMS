@@ -1462,25 +1462,14 @@
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
     <Content Include="umbraco\dialogs\Preview.aspx" />
+    <Content Include="umbraco_client\DateTimePicker\images\calSprite.png" />
+    <Content Include="umbraco_client\DateTimePicker\images\ui-icons_666666_256x240.png" />
+    <Content Include="umbraco_client\DateTimePicker\images\ui-icons_999999_256x240.png" />
+    <Content Include="umbraco_client\DateTimePicker\umbDateTimePicker.js" />
     <Content Include="web.config.UMBRACOHUMMER.xslt" />
     <Content Include="umbraco\controls\passwordChanger.ascx" />
     <Content Include="umbraco\controls\ProgressBar.ascx" />
-    <Content Include="umbraco_client\DateTimePicker\images\calPickerIcon.png" />
-    <Content Include="umbraco_client\DateTimePicker\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
-    <Content Include="umbraco_client\DateTimePicker\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
-    <Content Include="umbraco_client\DateTimePicker\images\ui-bg_flat_10_000000_40x100.png" />
-    <Content Include="umbraco_client\DateTimePicker\images\ui-bg_glass_100_f6f6f6_1x400.png" />
-    <Content Include="umbraco_client\DateTimePicker\images\ui-bg_glass_100_fdf5ce_1x400.png" />
-    <Content Include="umbraco_client\DateTimePicker\images\ui-bg_glass_65_ffffff_1x400.png" />
-    <Content Include="umbraco_client\DateTimePicker\images\ui-bg_gloss-wave_35_f6a828_500x100.png" />
-    <Content Include="umbraco_client\DateTimePicker\images\ui-bg_highlight-soft_100_eeeeee_1x100.png" />
-    <Content Include="umbraco_client\DateTimePicker\images\ui-bg_highlight-soft_75_ffe45c_1x100.png" />
-    <Content Include="umbraco_client\DateTimePicker\images\ui-icons_222222_256x240.png" />
-    <Content Include="umbraco_client\DateTimePicker\images\ui-icons_228ef1_256x240.png" />
-    <Content Include="umbraco_client\DateTimePicker\images\ui-icons_ef8c08_256x240.png" />
-    <Content Include="umbraco_client\DateTimePicker\images\ui-icons_ffd27a_256x240.png" />
-    <Content Include="umbraco_client\DateTimePicker\images\ui-icons_ffffff_256x240.png" />
-    <Content Include="umbraco_client\DateTimePicker\jquery-ui-1.7.2.custom.css" />
+    <Content Include="umbraco_client\DateTimePicker\datetimepicker.css" />
     <Content Include="umbraco_client\DateTimePicker\timepicker.js" />
     <Content Include="web.config.SHOCKING.xslt" />
     <Content Include="web.config.UMBRACOTOSH.xslt" />
@@ -2219,7 +2208,6 @@
     <Content Include="umbraco\images\umbraco\user.gif" />
     <Content Include="umbraco\images\umbraco\userGroup.gif" />
     <Content Include="umbraco\images\umbraco\userType.gif" />
-    <Content Include="umbraco\js\datepicker.js" />
     <Content Include="umbraco\js\dualSelectBox.js" />
     <Content Include="umbraco_client\GenericProperty\genericProperty.js" />
     <Content Include="umbraco\js\guiFunctions.js" />
@@ -2730,7 +2718,6 @@
     <None Include="umbraco_client\CodeMirror\LICENSE" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
     <Content Include="web.config.APOWELL-BC-WIN7.xslt" />
-    <Content Include="web.config.BOMBER.xslt" />
     <Content Include="web.config.SONIC.xslt" />
     <Content Include="web.STANDARD.config" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />
@@ -2794,6 +2781,7 @@
     <None Include="umbraco\schemas\umbraco.xsx">
       <DependentUpon>umbraco.xsd</DependentUpon>
     </None>
+    <Content Include="web.config" />
     <Content Include="config\UrlRewriting.config" />
   </ItemGroup>
   <ItemGroup>
@@ -2814,9 +2802,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="css\" />
-    <Folder Include="data\" />
     <Folder Include="data\previews\" />
-    <Folder Include="data\_systemUmbracoIndexDontDelete\" />
     <Folder Include="masterpages\" />
     <Folder Include="media\" />
     <Folder Include="python\" />

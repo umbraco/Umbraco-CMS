@@ -4,6 +4,7 @@ using System.Web.UI.WebControls;
 using System.ComponentModel;
 using System.Collections;
 using System.Globalization;
+using umbraco.uicontrols.DatePicker;
 
 namespace umbraco.editorControls
 {
@@ -12,7 +13,7 @@ namespace umbraco.editorControls
 	/// </summary>
 	[DefaultProperty("Text"), 
 	ToolboxData("<{0}:dateField runat=server></{0}:dateField>")]
-	public class dateField : controls.datePicker, interfaces.IDataEditor
+	public class dateField : DateTimePicker, interfaces.IDataEditor
 	{
 
 		interfaces.IData _data;
@@ -41,12 +42,13 @@ namespace umbraco.editorControls
 				if (this.Text == String.Empty) 
                     throw new FormatException();
 
-				DateTime date = DateTime.Parse(this.Text);
-                this.Text = date.ToString("yyyy-MM-dd") + " " + date.ToLongTimeString();
-                _data.Value = date;
+				//DateTime date = DateTime.Parse(this.Text);
+                //this.Text = date.ToString("yyyy-MM-dd") + " " + date.ToLongTimeString();
+                //_data.Value = date;
+                _data.Value = this.DateTime;
 			} 
 			catch {
-				this.Text = "";
+				//this.Text = "";
 				_data.Value = null;
 			}
 		}
@@ -54,14 +56,17 @@ namespace umbraco.editorControls
 		protected override void OnInit(EventArgs e)
 		{
 			//base.ShowTime = false;
-			base.CustomMinutes = "00, 05, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55";
-			
-			if (_data != null && _data.Value != null && _data.Value.ToString() != "")
-				this.Text = _data.Value.ToString();
-			else {
-				base.EmptyDateAsDefault = true;
-				this.Text = "";
-			}
+			//base.CustomMinutes = "00, 05, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55";
+
+            if (_data != null && _data.Value != null && _data.Value is DateTime)
+            {
+                this.DateTime = (DateTime)_data.Value;
+            }
+            else
+            {
+                //base.EmptyDateAsDefault = true;
+                //this.Text = "";
+            }
 			base.OnInit(e);
 		}
 	}

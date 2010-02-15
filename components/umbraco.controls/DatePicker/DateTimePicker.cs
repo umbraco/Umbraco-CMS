@@ -11,10 +11,11 @@ using System.Web.UI.HtmlControls;
 namespace umbraco.uicontrols.DatePicker
 {
 
-    [ClientDependency(ClientDependencyType.Css, "DateTimePicker/jquery-ui-1.7.2.custom.css", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Css, "DateTimePicker/datetimepicker.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "DateTimePicker/timepicker.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Javascript, "DateTimePicker/umbDateTimePicker.js", "UmbracoClient")]
     public class DateTimePicker : Control
     {
         /// <summary>
@@ -23,9 +24,20 @@ namespace umbraco.uicontrols.DatePicker
         public DateTimePicker()
         {
             ShowTime = true;
+            DateTime = DateTime.MinValue;
         }
 
         protected TextBox m_DateTextBox;
+        protected HtmlGenericControl m_InfoDiv;
+        protected HtmlAnchor m_ClearDate;
+
+        public string Text
+        {
+            get
+            {
+                return m_DateTextBox.Text;
+            }
+        }
 
         public DateTime DateTime
         {
@@ -39,7 +51,14 @@ namespace umbraco.uicontrols.DatePicker
             set
             {
                 EnsureChildControls();
-                m_DateTextBox.Text = value.ToString();
+                if (value == DateTime.MinValue)
+                {
+                    m_DateTextBox.Text = "";
+                }
+                else
+                {
+                    m_DateTextBox.Text = value.ToString(ShowTime ? "yyyy-MM-dd HH:mm" : "yyyy-MM-dd");
+                }
             }
         }
 
@@ -48,7 +67,7 @@ namespace umbraco.uicontrols.DatePicker
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
-
+            EnableViewState = false;
             EnsureChildControls();
         }
 
@@ -62,6 +81,14 @@ namespace umbraco.uicontrols.DatePicker
             m_DateTextBox = new TextBox();
             div.Controls.Add(m_DateTextBox);
 
+            m_InfoDiv = new HtmlGenericControl("div");
+            m_InfoDiv.InnerText = ui.Text("noDate"); ;
+            div.Controls.Add(m_InfoDiv);
+
+            m_ClearDate = new HtmlAnchor();
+            m_ClearDate.InnerText = ui.Text("removeDate");
+            div.Controls.Add(m_ClearDate);
+
             this.Controls.Add(div);
         }
 
@@ -69,24 +96,24 @@ namespace umbraco.uicontrols.DatePicker
         {
             base.OnPreRender(e);
 
+            if (this.DateTime != DateTime.MinValue)
+            {
+                m_InfoDiv.Visible = false;
+            }
+            else
+            {
+                m_ClearDate.Visible = false;
+            }
+
+
             string js = @"
 jQuery(document).ready(function() {  
-     $('#" + m_DateTextBox.ClientID + @"').datepicker({  
-         duration: '',  
-         showTime: " + this.ShowTime.ToString().ToLower() + @",  
-         constrainInput: false,
-        buttonImage: '" + IOHelper.ResolveUrl(SystemDirectories.Umbraco_client) + "/DateTimePicker/images/calPickerIcon.png" + @"',
-        buttonImageOnly: true,
-        buttonText: 'Select date',
-        showButtonPanel: false,
-        showOn: 'button',
-        changeYear: true,
-        dateFormat: 'yy-mm-dd',
-        time24h: true  
-      });  
-}); 
-";
-
+    jQuery('#" + m_DateTextBox.ClientID + @"').umbDateTimePicker(" 
+               + this.ShowTime.ToString().ToLower() + ",'" 
+               + ui.Text("choose") + " " + ui.Text("date") + "','"
+               + ui.Text("noDate") + "','"
+               + ui.Text("removeDate") + "') });";
+    
             try
             {
                 if (ScriptManager.GetCurrent(Page).IsInAsyncPostBack)
