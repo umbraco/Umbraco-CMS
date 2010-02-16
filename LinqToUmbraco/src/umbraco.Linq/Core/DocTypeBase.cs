@@ -313,6 +313,8 @@ namespace umbraco.Linq.Core
             }
         }
 
+        public virtual string CreatorName { get; internal set; }
+
         /// <summary>
         /// ID of the user who last edited the item
         /// </summary>
@@ -343,6 +345,8 @@ namespace umbraco.Linq.Core
                 return this._writer;
             }
         }
+
+        public virtual string WriterName { get; internal set; }
 
         /// <summary>
         /// Raises the property changing event.

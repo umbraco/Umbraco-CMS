@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 
 namespace umbraco.Linq.Core.Node
 {
@@ -60,7 +58,7 @@ namespace umbraco.Linq.Core.Node
                 var rawNodes = parents
                     .Single()
                     .Elements()
-                    .Where(x => x.HasAttributes)
+                    .Where(x => x.Attribute("isDoc") != null)
                     ;
                 this._nodes = provider.DynamicNodeCreation(rawNodes).Cast<TDocTypeBase>(); //drop is back to the type which was asked for 
             }
@@ -86,6 +84,9 @@ namespace umbraco.Linq.Core.Node
         /// <value>The provider.</value>
         public override UmbracoDataProvider Provider { get; protected set; }
 
+        /// <summary>
+        /// Reloads the cache.
+        /// </summary>
         public override void ReloadCache()
         {
             this.LoadNodes();

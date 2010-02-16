@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Linq.Expressions;
 using System.IO;
 using System.Xml.Linq;
-using System.Xml.Schema;
-using System.Xml;
 using System.Reflection;
 using umbraco.presentation;
 using umbraco.cms.helpers;
@@ -18,19 +14,16 @@ namespace umbraco.Linq.Core.Node
     /// Data Provider for LINQ to umbraco via umbraco ndoes
     /// </summary>
     /// <remarks>
-    /// This class provides a data access model for the umbraco XML cache.
-    /// It is responsible for the access to the XML and construction of nodes from it.
-    /// 
-    /// The <see cref="umbraco.Linq.Core.Node.NodeDataProvider"/> is capable of reading the XML cache from either the path provided in the umbraco settings or from a specified location on the file system.
+    /// <para>This class provides a data access model for the umbraco XML cache.
+    /// It is responsible for the access to the XML and construction of nodes from it.</para>
+    /// <para>The <see cref="umbraco.Linq.Core.Node.NodeDataProvider"/> is capable of reading the XML cache from either the path provided in the umbraco settings or from a specified location on the file system.</para>
     /// </remarks>
     public sealed class NodeDataProvider : UmbracoDataProvider
     {
         private object lockObject = new object();
         private string _xmlPath;
         private Dictionary<UmbracoInfoAttribute, IContentTree> _trees;
-        private bool _enforceSchemaValidation;
         private XDocument _xml;
-        private const string UMBRACO_XSD_PATH = "umbraco.Linq.Core.Node.UmbracoConfig.xsd";
         private Dictionary<string, Type> _knownTypes;
 
         private bool _tryMemoryCache = false;
@@ -43,10 +36,10 @@ namespace umbraco.Linq.Core.Node
                 {
                     if (this._tryMemoryCache)
                     {
-                        var doc = content.Instance.XmlContent;
+                        var doc = UmbracoContext.Current.Server.ContentXml;
                         if (doc != null)
                         {
-                            this._xml = XDocument.Load(new XmlNodeReader(doc));
+                            this._xml = doc;
                         }
                         else
                         {
@@ -57,55 +50,29 @@ namespace umbraco.Linq.Core.Node
                     {
                         this._xml = XDocument.Load(this._xmlPath);
                     }
-
-                    if (this._enforceSchemaValidation)
-                    {
-                        XmlSchemaSet schemas = new XmlSchemaSet();
-                        //read the resorce for the XSD to validate against
-                        schemas.Add("", System.Xml.XmlReader.Create(this.GetType().Assembly.GetManifestResourceStream(UMBRACO_XSD_PATH)));
-
-                        //we'll have a list of all validation exceptions to put them to the screen
-                        List<XmlSchemaException> exList = new List<XmlSchemaException>();
-
-                        //some funky in-line event handler. Lambda loving goodness ;)
-                        this._xml.Validate(schemas, (o, e) => { exList.Add(e.Exception); });
-
-                        if (exList.Count > 0)
-                        {
-                            //dump out the exception list
-                            StringBuilder sb = new StringBuilder();
-                            sb.AppendLine("The following validation errors occuring with the XML:");
-                            foreach (var item in exList)
-                            {
-                                sb.AppendLine(" * " + item.Message + " - " + item.StackTrace);
-                            }
-                            throw new XmlSchemaException(sb.ToString());
-                        }
-                    }
                 }
 
                 return this._xml; //cache the XML in memory to increase performance and force the disposable pattern
             }
         }
 
-        private void Init(string xmlPath, bool legacySchema)
+        /// <summary>
+        /// Initializes the NodeDataProvider, performing validation
+        /// </summary>
+        /// <param name="xmlPath">The XML path.</param>
+        /// <param name="newSchemaMode">if set to <c>true</c> [new schema mode].</param>
+        protected void Init(string xmlPath, bool newSchemaMode)
         {
-            if (legacySchema)
-            {
-                throw new NotSupportedException("The NodeDataProvider does not support the old XML schema mode. Set \"UseLegacyXmlSchema\" in your umbracoSettings.Config to \"true\" and republish the site");
-            }
+            if (!newSchemaMode)
+                throw new NotSupportedException(this.Name + " only supports the new XML schema. Change the umbracoSettings.config to implement this and republish");
 
             if (string.IsNullOrEmpty(xmlPath))
-            {
                 throw new ArgumentNullException("xmlPath");
-            }
 
             if (!File.Exists(xmlPath))
-            {
                 throw new FileNotFoundException("The XML used by the provider must exist", xmlPath);
-            }
-            this._xmlPath = xmlPath;
 
+            this._xmlPath = xmlPath;
             this._trees = new Dictionary<UmbracoInfoAttribute, IContentTree>();
         }
 
@@ -113,7 +80,7 @@ namespace umbraco.Linq.Core.Node
         /// Initializes a new instance of the <see cref="NodeDataProvider"/> class using umbraco settings as XML path
         /// </summary>
         public NodeDataProvider()
-            : this(UmbracoContext.Current.Server.MapPath(UmbracoContext.Current.Server.ContentXmlPath), !UmbracoContext.Current.NewSchemaMode)
+            : this(UmbracoContext.Current.Server.MapPath(UmbracoContext.Current.Server.ContentXmlPath), UmbracoContext.Current.NewSchemaMode)
         {
             this._tryMemoryCache = true;
         }
@@ -122,27 +89,13 @@ namespace umbraco.Linq.Core.Node
         /// Initializes a new instance of the <see cref="NodeDataProvider"/> class
         /// </summary>
         /// <param name="xmlPath">The path of the umbraco XML</param>
-        /// <param name="legacySchema">if set to <c>true</c> [legacy schema].</param>
+        /// <param name="newSchemaMode">Indicates which Schema mode is used for the XML file</param>
         /// <remarks>
         /// This constructor is ideal for unit testing as it allows for the XML to be located anywhere
         /// </remarks>
-        public NodeDataProvider(string xmlPath, bool legacySchema)
-            : this(xmlPath, legacySchema, false)
+        public NodeDataProvider(string xmlPath, bool newSchemaMode)
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NodeDataProvider"/> class.
-        /// </summary>
-        /// <param name="xmlPath">The XML path.</param>
-        /// <param name="legacySchema">if set to <c>true</c> [legacy schema].</param>
-        /// <param name="enforceValidation">if set to <c>true</c> when the XML document is accessed validation against the umbraco XSD will be done.</param>
-        /// <exception cref="System.ArgumentNullException">Thrown when the xmlPath is null</exception>
-        /// <exception cref="System.IO.FileNotFoundException">Thrown when the xmlPath does not resolve to a physical file</exception>
-        public NodeDataProvider(string xmlPath, bool legacySchema, bool enforceValidation)
-        {
-            this.Init(xmlPath, legacySchema);
-            this._enforceSchemaValidation = enforceValidation;
+            this.Init(xmlPath, newSchemaMode);
         }
 
         #region IDisposable Members
@@ -198,9 +151,7 @@ namespace umbraco.Linq.Core.Node
             var attr = ReflectionAssistance.GetUmbracoInfoAttribute(typeof(TDocType));
 
             if (!this._trees.ContainsKey(attr))
-            {
                 SetupNodeTree<TDocType>(attr);
-            }
 
             return (NodeTree<TDocType>)this._trees[attr];
         }
@@ -237,14 +188,10 @@ namespace umbraco.Linq.Core.Node
             var parentXml = this.Xml.Descendants().SingleOrDefault(d => (int)d.Attribute("id") == id);
 
             if (!ReflectionAssistance.CompareByAlias(typeof(TDocType), parentXml))
-            {
                 throw new DocTypeMissMatchException(parentXml.Name.LocalName, ReflectionAssistance.GetUmbracoInfoAttribute(typeof(TDocType)).Alias);
-            }
 
             if (parentXml == null) //really shouldn't happen!
-            {
                 throw new ArgumentException("Parent ID \"" + id + "\" cannot be found in the loaded XML. Ensure that the umbracoDataContext is being disposed of once it is no longer needed");
-            }
 
             var parent = new TDocType();
             this.LoadFromXml(parentXml, parent);
@@ -337,10 +284,9 @@ namespace umbraco.Linq.Core.Node
                         {
                             return ((UmbracoInfoAttribute)k.GetCustomAttributes(typeof(UmbracoInfoAttribute), true)[0]).Alias;
                         });
+
                     foreach (var type in types)
-                    {
                         this._knownTypes.Add(Casing.SafeAlias(type.Key), type.Value);
-                    }
 
                 }
 
@@ -380,7 +326,9 @@ namespace umbraco.Linq.Core.Node
             node.SortOrder = (int)xml.Attribute("sortOrder");
             node.UpdateDate = (DateTime)xml.Attribute("updateDate");
             node.CreatorID = (int)xml.Attribute("creatorID");
+            node.CreatorName = (string)xml.Attribute("creatorName");
             node.WriterID = (int)xml.Attribute("writerID");
+            node.WriterName = (string)xml.Attribute("writerName");
             node.Level = (int)xml.Attribute("level");
             node.TemplateId = (int)xml.Attribute("template");
 
@@ -391,9 +339,8 @@ namespace umbraco.Linq.Core.Node
 
                 var data = xml.Element(Casing.SafeAlias(attr.Alias)).Value;
                 if (p.PropertyType == typeof(int) && string.IsNullOrEmpty(data))
-                {
                     data = "-1";
-                }
+
                 // TODO: Address how Convert.ChangeType works in globalisation
                 p.SetValue(node, Convert.ChangeType(data, p.PropertyType), null);
             }

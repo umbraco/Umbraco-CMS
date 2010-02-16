@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Collections;
-using System.ComponentModel;
-using System.Linq.Expressions;
-using System.Xml.Linq;
 
 namespace umbraco.Linq.Core
 {
@@ -12,7 +7,7 @@ namespace umbraco.Linq.Core
     /// Represents a collection within DataProvider of a DocType
     /// </summary>
     /// <remarks>
-    /// Similar to the implementation of <see cref="System.Data.Linq.Table&lt;T&gt;"/>, 
+    /// Similar to the implementation of <see cref="System.Data.Linq.Table&lt;TEntity&gt;"/>, 
     /// providing a single collection which represents all instances of the given type within the DataProvider.
     /// 
     /// Implementers of this type will need to provide a manner of retrieving the TDocType from the DataProvider
@@ -69,9 +64,25 @@ namespace umbraco.Linq.Core
 
         #endregion
 
+        /// <summary>
+        /// Insert an item on submit of the DataContext
+        /// </summary>
+        /// <param name="item">The item.</param>
         public abstract void InsertOnSubmit(TDocType item);
+        /// <summary>
+        /// Insert a collection of items on submit of the DataContext
+        /// </summary>
+        /// <param name="items">The items.</param>
         public abstract void InsertAllOnSubmit(IEnumerable<TDocType> items);
+        /// <summary>
+        /// Deletes an item on submit of the DataContext
+        /// </summary>
+        /// <param name="itemm">The itemm.</param>
         public abstract void DeleteOnSubmit(TDocType itemm);
+        /// <summary>
+        /// Deletes a collection of items on submit of the DataContext
+        /// </summary>
+        /// <param name="items">The items.</param>
         public abstract void DeleteAllOnSubmit(IEnumerable<TDocType> items);
     }
 }

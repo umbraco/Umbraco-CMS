@@ -53,6 +53,9 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Runtime.Serialization">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
@@ -90,9 +93,6 @@
     <Compile Include="Switch.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\..\dep\Schemas\UmbracoConfig.xsd">
-      <Link>Node\UmbracoConfig.xsd</Link>
-    </EmbeddedResource>
     <None Include="CoreClasses.cd" />
   </ItemGroup>
   <ItemGroup>

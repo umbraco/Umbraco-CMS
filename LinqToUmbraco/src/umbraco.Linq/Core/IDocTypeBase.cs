@@ -36,6 +36,11 @@ namespace umbraco.Linq.Core
         /// <value>The creator ID.</value>
         int CreatorID { get; }
         /// <summary>
+        /// Gets the name of the creator.
+        /// </summary>
+        /// <value>The name of the creator.</value>
+        string CreatorName { get; }
+        /// <summary>
         /// Gets the id of the item.
         /// </summary>
         /// <value>The id.</value>
@@ -67,14 +72,6 @@ namespace umbraco.Linq.Core
         /// <value>The parent node id.</value>
         int ParentNodeId { get; set; }
         /// <summary>
-        /// Occurs when a property value changes.
-        /// </summary>
-        event PropertyChangedEventHandler PropertyChanged;
-        /// <summary>
-        /// Occurs when a property value is changing.
-        /// </summary>
-        event PropertyChangingEventHandler PropertyChanging;
-        /// <summary>
         /// Gets or sets the sort order.
         /// </summary>
         /// <value>The sort order.</value>
@@ -99,5 +96,10 @@ namespace umbraco.Linq.Core
         /// </summary>
         /// <value>The writer ID.</value>
         int WriterID { get; }
+        /// <summary>
+        /// Gets the name of the writer.
+        /// </summary>
+        /// <value>The name of the writer.</value>
+        string WriterName { get; }
     }
 }
