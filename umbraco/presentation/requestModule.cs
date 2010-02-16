@@ -40,7 +40,7 @@ namespace umbraco.presentation
             //So everything is moved to beginRequest.
         }
 
-        protected void Application_PostAuthorizeRequest(object sender, EventArgs e)
+        protected void Application_PostResolveRequestCache(object sender, EventArgs e)
         {
             // process rewrite here so forms authentication can Authorize based on url before the original url is discarded
             this.UmbracoRewrite(sender, e);
@@ -281,7 +281,11 @@ namespace umbraco.presentation
             ApplicationStart(context);
             context.BeginRequest += new EventHandler(Application_BeginRequest);
             context.AuthorizeRequest += new EventHandler(Application_AuthorizeRequest);
-            context.PostAuthorizeRequest += new EventHandler(Application_PostAuthorizeRequest);
+
+            // Alex Norcliffe - 2010 02 - Changed this behaviour as it disables OutputCaching due to Rewrite happening too early in the chain
+            // context.PostAuthorizeRequest += new EventHandler(Application_PostAuthorizeRequest);
+            context.PostResolveRequestCache += new EventHandler(Application_PostResolveRequestCache);
+
             context.PreRequestHandlerExecute += new EventHandler(Application_PreRequestHandlerExecute);
             context.Error += new EventHandler(Application_Error);
             mApp = context;
