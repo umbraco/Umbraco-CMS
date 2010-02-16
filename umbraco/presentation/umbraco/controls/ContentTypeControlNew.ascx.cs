@@ -9,13 +9,14 @@ using System.Collections;
 using System.Web.UI;
 using ClientDependency.Core;
 using umbraco.IO;
+using umbraco.presentation;
 
 namespace umbraco.controls
 {
-	
+
     [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "Tree/treeIcons.css", "UmbracoClient")]
-	[ClientDependency(ClientDependencyType.Css, "Tree/Themes/umbraco/style.css", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Css, "Tree/Themes/umbraco/style.css", "UmbracoClient")]
     public partial class ContentTypeControlNew : System.Web.UI.UserControl
     {
         public uicontrols.TabPage InfoTabPage;
@@ -47,16 +48,16 @@ namespace umbraco.controls
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
- 
-            
+
+
             pp_newTab.Text = ui.Text("newtab", umbraco.BasePages.UmbracoEnsuredPage.CurrentUser);
             pp_alias.Text = umbraco.ui.Text("alias", umbraco.BasePages.UmbracoEnsuredPage.CurrentUser);
             pp_name.Text = umbraco.ui.Text("name", umbraco.BasePages.UmbracoEnsuredPage.CurrentUser);
             pp_allowedChildren.Text = umbraco.ui.Text("allowedchildnodetypes", umbraco.BasePages.UmbracoEnsuredPage.CurrentUser);
-            pp_description.Text = umbraco.ui.Text("editcontenttype","description");
+            pp_description.Text = umbraco.ui.Text("editcontenttype", "description");
             pp_icon.Text = umbraco.ui.Text("icon", umbraco.BasePages.UmbracoEnsuredPage.CurrentUser);
             pp_thumbnail.Text = umbraco.ui.Text("editcontenttype", "thumbnail");
-            
+
 
             if (!Page.IsPostBack && cType.MasterContentType != 0)
             {
@@ -77,14 +78,14 @@ namespace umbraco.controls
             cType.Thumbnail = ddlThumbnails.SelectedValue;
             SaveClickEventArgs ea = new SaveClickEventArgs("Saved");
             ea.IconType = umbraco.BasePages.BasePage.speechBubbleIcon.success;
- 
+
             saveProperties(ref ea);
-            
+
             SaveTabs();
 
             SaveAllowedChildTypes();
             bindDataGenericProperties(true);
-            
+
             RaiseBubbleEvent(new object(), ea);
         }
 
@@ -109,22 +110,22 @@ namespace umbraco.controls
             foreach (string iconClass in cms.businesslogic.CMSNode.DefaultIconClasses)
             {
                 ListItem li = new ListItem(helper.SpaceCamelCasing((iconClass.Substring(1, iconClass.Length - 1))).Replace("Spr Tree", ""), iconClass);
-				li.Attributes.Add("class", "spriteBackground sprTree " + iconClass.Trim('.'));
+                li.Attributes.Add("class", "spriteBackground sprTree " + iconClass.Trim('.'));
 
                 if (!this.Page.IsPostBack && li.Value == cType.IconUrl) li.Selected = true;
                 ddlIcons.Items.Add(li);
             }
 
-            DirectoryInfo dirInfo = new DirectoryInfo( IOHelper.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
+            DirectoryInfo dirInfo = new DirectoryInfo(UmbracoContext.Current.Server.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
             FileInfo[] fileInfo = dirInfo.GetFiles();
             for (int i = 0; i < fileInfo.Length; i++)
             {
                 // NH: don't show the sprite file
                 if (fileInfo[i].Name != "sprites.png")
                 {
-                    
+
                     ListItem li = new ListItem(fileInfo[i].Name + " (deprecated)", fileInfo[i].Name);
-                    li.Attributes.Add("style", "background-image: url(" + SystemDirectories.Umbraco + "/images/umbraco/" + fileInfo[i].Name + ");");
+                    li.Attributes.Add("style", "background-image: url(" + this.ResolveClientUrl(SystemDirectories.Umbraco + "/images/umbraco/" + fileInfo[i].Name) + ");");
                     li.Attributes.Add("class", "deprecatedImage");
 
                     if (!this.Page.IsPostBack && li.Value == cType.IconUrl) li.Selected = true;
@@ -301,7 +302,7 @@ namespace umbraco.controls
                                 gpw.DataTypeDefinitions = dtds;
                                 gpw.Delete += new EventHandler(gpw_Delete);
                                 gpw.FullId = t.GetRawCaption().Replace(" ", "").Replace("#", "_") + "Contents_" + +pt.Id;
-                                
+
                                 PropertyTypes.Controls.Add(gpw);
                                 _genericProperties.Add(gpw);
                                 if (Refresh)
@@ -311,8 +312,8 @@ namespace umbraco.controls
                             }
                         }
 
-                        
-                        
+
+
                         PropertyTypes.Controls.Add(new LiteralControl("</ul></div>"));
 
                         var jsSortable = @"                            
@@ -377,8 +378,8 @@ namespace umbraco.controls
                     counter++;
                 }
             }
-            
-           
+
+
             propertiesPH.Controls.Add(new LiteralControl("</ul>"));
             //propertiesPH.Controls.Add(new LiteralControl("<script>\n Sortable.create(\"generalPropertiesContents\",{scroll: '" + scrollLayerId + "',dropOnEmpty:false,containment:[\"generalPropertiesContents\"],constraint:'vertical',onUpdate:function(element) {document.getElementById('" + propSort_gp.ClientID + "').value = Sortable.serialize('generalPropertiesContents');}});\n</script>"));
 
@@ -395,7 +396,7 @@ namespace umbraco.controls
 
             Page.ClientScript.RegisterStartupScript(this.GetType(), "propSort_gp", jsSortable_gp, true);
 
-            
+
             if (!propertyTabHasProperties)
             {
                 PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div>"));
@@ -494,7 +495,8 @@ namespace umbraco.controls
             GenericProperties.GenericProperty gpData = gp.GenricPropertyControl;
             if (gpData.Name.Trim() != "" && gpData.Alias.Trim() != "")
             {
-                if (cType.getPropertyType(gpData.Alias.Trim()) == null) {
+                if (cType.getPropertyType(gpData.Alias.Trim()) == null)
+                {
                     string[] info = { gpData.Name, gpData.Type.ToString() };
                     cType.AddPropertyType(cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(gpData.Type), gpData.Alias, gpData.Name);
                     cms.businesslogic.propertytype.PropertyType pt = cType.getPropertyType(gpData.Alias);
@@ -502,13 +504,16 @@ namespace umbraco.controls
                     pt.ValidationRegExp = gpData.Validation;
                     pt.Description = gpData.Description;
 
-                    if (gpData.Tab != 0) {
+                    if (gpData.Tab != 0)
+                    {
                         cType.SetTabOnPropertyType(cType.getPropertyType(gpData.Alias), gpData.Tab);
                     }
 
                     gpData.Clear();
 
-                } else {
+                }
+                else
+                {
                     e.Message = ui.Text("contentTypeDublicatePropertyType");
                     e.IconType = umbraco.BasePages.BasePage.speechBubbleIcon.warning;
                 }
@@ -753,7 +758,7 @@ namespace umbraco.controls
             if (txtNewTab.Text.Trim() != "")
             {
                 cType.AddVirtualTab(txtNewTab.Text);
-                SaveClickEventArgs ea = new SaveClickEventArgs(ui.Text("contentTypeTabCreated") );
+                SaveClickEventArgs ea = new SaveClickEventArgs(ui.Text("contentTypeTabCreated"));
                 ea.IconType = umbraco.BasePages.BasePage.speechBubbleIcon.success;
 
                 RaiseBubbleEvent(new object(), ea);
@@ -833,7 +838,7 @@ namespace umbraco.controls
     {
         public string Message { get; set; }
         public BasePages.BasePage.speechBubbleIcon IconType { get; set; }
-        
+
         public SaveClickEventArgs(string message)
         {
             Message = message;
