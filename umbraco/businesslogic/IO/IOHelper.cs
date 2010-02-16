@@ -46,6 +46,10 @@ namespace umbraco.IO
 
         public static string MapPath(string path, bool useHttpContext)
         {
+            // Check if the path is already mapped
+            if (path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)      
+                return path;
+
             if (useHttpContext)
             {
                 //string retval;

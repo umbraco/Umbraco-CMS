@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web;
 
 namespace umbraco.IO
 {
@@ -76,7 +79,26 @@ namespace umbraco.IO
         {
             get
             {
+                if (ContentCacheXmlIsEphemeral)
+                {
+                    return Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco.config");
+                }
                 return IOHelper.returnPath("umbracoContentXML", "~/data/umbraco.config");
+            }
+        }
+
+        public static bool ContentCacheXmlIsEphemeral
+        {
+            get
+            {
+                bool returnValue = false;
+                string configSetting = ConfigurationManager.AppSettings["umbracoContentXMLUseLocalTemp"];
+
+                if (!string.IsNullOrEmpty(configSetting))
+                    if(bool.TryParse(configSetting, out returnValue))
+                        return returnValue;
+
+                return false;
             }
         }
     }

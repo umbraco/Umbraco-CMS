@@ -232,7 +232,18 @@ namespace umbraco.presentation
                         else
                             error = "No Context available -> "
                                     + mApp.Context.Server.GetLastError().InnerException;
-                        Log.Add(LogTypes.Error, User.GetUser(0), -1, error);
+
+                        // Hide error if getting the user throws an error (e.g. corrupt / blank db)
+                        User staticUser = null;
+                        try
+                        {
+                            User.GetCurrent();
+                        }
+                        catch
+                        {
+                        }
+
+                        Log.Add(LogTypes.Error, staticUser, -1, error);
                         Trace.TraceError(error);
                         lock (unhandledErrors)
                         {

@@ -181,26 +181,40 @@ namespace umbraco.BasePages {
         /// </summary>
         /// <value>The umbraco user context ID.</value>
         public static string umbracoUserContextID {
-            get {
-                if (System.Web.HttpContext.Current.Request.Cookies.Get("UserContext") != null)
-                    return System.Web.HttpContext.Current.Request.Cookies.Get("UserContext").Value;
-                else
-                    return "";
+            get
+            {
+                if (HttpContext.Current != null)
+                    if (HttpContext.Current.Request != null)
+                        if (HttpContext.Current.Request.Cookies != null)
+                        {
+                            HttpCookie userContext = HttpContext.Current.Request.Cookies.Get("UserContext");
+                            if (userContext != null)
+                                return userContext.Value;
+                        }
+                return "";
             }
             set {
-                // Clearing all old cookies before setting a new one.
-                try {
-                    if (System.Web.HttpContext.Current.Request.Cookies["UserContext"] != null) {
-                        System.Web.HttpContext.Current.Response.Cookies.Clear();
+                if (HttpContext.Current != null)
+                {
+                    // Clearing all old cookies before setting a new one.
+                    try
+                    {
+                        if (HttpContext.Current.Request != null)
+                            if (HttpContext.Current.Request.Cookies["UserContext"] != null)
+                            {
+                                HttpContext.Current.Response.Cookies.Clear();
+                            }
                     }
-                } catch {
+                    catch
+                    {
+                    }
+                    // Create new cookie.
+                    var c = new HttpCookie("UserContext");
+                    c.Name = "UserContext";
+                    c.Value = value;
+                    c.Expires = DateTime.Now.AddDays(1);
+                    HttpContext.Current.Response.Cookies.Add(c);
                 }
-                // Create new cookie.
-                System.Web.HttpCookie c = new System.Web.HttpCookie("UserContext");
-                c.Name = "UserContext";
-                c.Value = value;
-                c.Expires = DateTime.Now.AddDays(1);
-                System.Web.HttpContext.Current.Response.Cookies.Add(c);
             }
         }
 

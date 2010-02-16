@@ -83,6 +83,8 @@ namespace umbraco.presentation.install.steps
                 DbConnectionStringBuilder connectionStringBuilder = new DbConnectionStringBuilder();
                 connectionStringBuilder.ConnectionString = GlobalSettings.DbDSN;
 
+                // "Data Source=.\\SQLEXPRESS;Initial Catalog=BB_Umbraco_Sandbox1;integrated security=false;user id=umbraco;pwd=umbraco"
+
                 // Prepare the fields
 
                 // Prepare data layer type
@@ -97,9 +99,12 @@ namespace umbraco.presentation.install.steps
 
                 // Prepare other fields
                 DatabaseServer.Text = GetConnectionStringValue(connectionStringBuilder, "server");
+                if (string.IsNullOrEmpty(DatabaseServer.Text)) DatabaseServer.Text = GetConnectionStringValue(connectionStringBuilder, "Data Source");
                 DatabaseName.Text = GetConnectionStringValue(connectionStringBuilder, "database");
+                if (string.IsNullOrEmpty(DatabaseName.Text)) DatabaseName.Text = GetConnectionStringValue(connectionStringBuilder, "Initial Catalog");
                 DatabaseUsername.Text = GetConnectionStringValue(connectionStringBuilder, "user id");
                 DatabasePassword.Text = GetConnectionStringValue(connectionStringBuilder, "password");
+                if (string.IsNullOrEmpty(DatabasePassword.Text)) DatabasePassword.Text = GetConnectionStringValue(connectionStringBuilder, "pwd");
             }
 
             // Make sure ASP.Net displays the password text

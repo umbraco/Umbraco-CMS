@@ -29,7 +29,25 @@ namespace umbraco
     {
         #region Declarations
 
-        private readonly string UmbracoXmlDiskCacheFileName = IOHelper.MapPath(SystemFiles.ContentCacheXml, false);
+        private string _umbracoXmlDiskCacheFileName = IOHelper.MapPath(SystemFiles.ContentCacheXml, false);
+
+        /// <summary>
+        /// Gets the path of the umbraco XML disk cache file.
+        /// </summary>
+        /// <value>The name of the umbraco XML disk cache file.</value>
+        public string UmbracoXmlDiskCacheFileName
+        {
+            get
+            {
+                return _umbracoXmlDiskCacheFileName;
+            }
+            set
+            {
+                _umbracoXmlDiskCacheFileName = value;
+            }
+        }
+
+
         /*
             HttpRuntime.AppDomainAppPath + '\\' +  
             SystemFiles.ContentCacheXml.Replace('/', '\\').TrimStart('\\');
@@ -60,13 +78,16 @@ namespace umbraco
 
         static content()
         {
-            Trace.Write("Initializing content");
-            ThreadPool.QueueUserWorkItem(
-                delegate
-                {
-                    XmlDocument xmlDoc = Instance.XmlContentInternal;
-                    Trace.WriteLine("Content initialized");
-                });
+            //Trace.Write("Initializing content");
+            //ThreadPool.QueueUserWorkItem(
+            //    delegate
+            //    {
+            //        XmlDocument xmlDoc = Instance.XmlContentInternal;
+            //        Trace.WriteLine("Content initialized");
+            //    });
+
+            Trace.WriteLine("Checking for xml content initialisation...");
+            Instance.CheckXmlContentPopulation();
         }
 
         #endregion
@@ -124,18 +145,7 @@ namespace umbraco
         {
             get
             {
-                if (isInitializing)
-                {
-                    lock (_xmlContentInternalSyncLock)
-                    {
-                        if (isInitializing)
-                        {
-                            _xmlContent = LoadContent();
-                            if (!UmbracoSettings.isXmlContentCacheDisabled && !IsValidDiskCachePresent())
-                                SaveContentToDiskAsync(_xmlContent);
-                        }
-                    }
-                }
+                CheckXmlContentPopulation();
 
                 return _xmlContent;
             }
@@ -157,12 +167,44 @@ namespace umbraco
             }
         }
 
+        /// <summary>
+        /// Triggers the XML content population if necessary.
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckXmlContentPopulation()
+        {
+            if (isInitializing)
+            {
+                lock (_xmlContentInternalSyncLock)
+                {
+                    if (isInitializing)
+                    {
+                        Trace.WriteLine(string.Format("Initializing content on thread '{0}' (Threadpool? {1})", Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread.ToString()));
+                        _xmlContent = LoadContent();
+                        Trace.WriteLine("Content initialized (loaded)");
+
+                        // Only save new XML cache to disk if we just repopulated it
+                        // TODO: Re-architect this so that a call to this method doesn't invoke a new thread for saving disk cache
+                        if (!UmbracoSettings.isXmlContentCacheDisabled && !IsValidDiskCachePresent())
+                        {
+                            SaveContentToDiskAsync(_xmlContent);
+                        }
+                        return true;
+                    }
+                }
+            }
+            Trace.WriteLine("Content initialized (was already in context)");
+            return false;
+        }
+
         #endregion
 
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
         }
+
+        
 
         #region Public Methods
 
@@ -760,15 +802,30 @@ namespace umbraco
         private XmlDocument LoadContentFromDatabase()
         {
             XmlDocument xmlDoc = new XmlDocument();
-            InitContentDocumentBase(xmlDoc);
+            
+            // Moved User to a local variable - why are we causing user 0 to load from the DB though?
+            // Alex N 20100212
+            User staticUser = null;
+            try
+            {
+                staticUser = User.GetCurrent();  //User.GetUser(0);
+            }
+            catch
+            {
+                /* We don't care later if the staticUser is null */
+            }
 
-            Log.Add(LogTypes.System, User.GetUser(0), -1, "Loading content from database...");
+            // Try to log to the DB
+            Log.Add(LogTypes.System, staticUser, -1, "Loading content from database...");
+
+            // Moved this to after the logging since the 2010 schema accesses the DB just to generate the DTD
+            InitContentDocumentBase(xmlDoc);           
 
             Hashtable nodes = new Hashtable();
             Hashtable parents = new Hashtable();
             try
             {
-                Log.Add(LogTypes.Debug, User.GetUser(0), -1, "Republishing starting");
+                Log.Add(LogTypes.Debug, staticUser, -1, "Republishing starting");
 
                 // Esben Carlsen: At some point we really need to put all data access into to a tier of its own.
                 string sql =
@@ -800,8 +857,9 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                     }
                 }
 
-                Log.Add(LogTypes.Debug, User.GetUser(0), -1, "Xml Pages loaded");
+                Log.Add(LogTypes.Debug, staticUser, -1, "Xml Pages loaded");
 
+                // TODO: Why is the following line here, it should have already been generated? Alex N 20100212
                 // Reset
                 InitContentDocumentBase(xmlDoc);
 
@@ -811,23 +869,23 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                 }
                 catch (Exception ee)
                 {
-                    Log.Add(LogTypes.Error, User.GetUser(0), -1,
+                    Log.Add(LogTypes.Error, staticUser, -1,
                             string.Format("Error while generating XmlDocument from database: {0}", ee));
                 }
             }
             catch (OutOfMemoryException)
             {
-                Log.Add(LogTypes.Error, User.GetUser(0), -1,
+                Log.Add(LogTypes.Error, staticUser, -1,
                         string.Format("Error Republishing: Out Of Memory. Parents: {0}, Nodes: {1}",
                                       parents.Count, nodes.Count));
             }
             catch (Exception ee)
             {
-                Log.Add(LogTypes.Error, User.GetUser(0), -1, string.Format("Error Republishing: {0}", ee));
+                Log.Add(LogTypes.Error, staticUser, -1, string.Format("Error Republishing: {0}", ee));
             }
             finally
             {
-                Log.Add(LogTypes.Debug, User.GetUser(0), -1, "Done republishing Xml Index");
+                Log.Add(LogTypes.Debug, staticUser, -1, "Done republishing Xml Index");
             }
 
             return xmlDoc;
@@ -874,20 +932,42 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         {
             lock (_readerWriterSyncLock)
             {
+                Trace.Write(string.Format("Saving content to disk on thread '{0}' (Threadpool? {1})", Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread.ToString()));
+
+                // Moved the user into a variable and avoided it throwing an error if one can't be loaded (e.g. empty / corrupt db on initial install)
+                User staticUser = null;
+                try
+                {
+                    staticUser = User.GetCurrent();
+                }
+                catch
+                {}
+
                 try
                 {
                     Stopwatch stopWatch = Stopwatch.StartNew();
 
                     ClearDiskCache();
+
+                    // Try to create directory for cache path if it doesn't yet exist
+                    if (!File.Exists(UmbracoXmlDiskCacheFileName) && !Directory.Exists(Path.GetDirectoryName(UmbracoXmlDiskCacheFileName)))
+                    {
+                        // We're already in a try-catch and saving will fail if this does, so don't need another
+                        Directory.CreateDirectory(UmbracoXmlDiskCacheFileName);
+                    }
+
                     xmlDoc.Save(UmbracoXmlDiskCacheFileName);
 
-                    Log.Add(LogTypes.Debug, User.GetUser(0), -1, string.Format("Xml saved in {0}", stopWatch.Elapsed));
+                    Trace.Write(string.Format("Saved content on thread '{0}' in {1} (Threadpool? {2})", Thread.CurrentThread.Name, stopWatch.Elapsed, Thread.CurrentThread.IsThreadPoolThread.ToString()));
+                   Log.Add(LogTypes.Debug, staticUser, -1, string.Format("Xml saved in {0}", stopWatch.Elapsed));
                 }
                 catch (Exception ee)
                 {
                     // If for whatever reason something goes wrong here, invalidate disk cache
                     ClearDiskCache();
-                    Log.Add(LogTypes.Error, User.GetUser(0), -1, string.Format("Xml wasn't saved: {0}", ee));
+
+                    Trace.Write(string.Format("Error saving content on thread '{0}' due to '{1}' (Threadpool? {2})", Thread.CurrentThread.Name, ee.Message, Thread.CurrentThread.IsThreadPoolThread.ToString()));
+                    Log.Add(LogTypes.Error, staticUser, -1, string.Format("Xml wasn't saved: {0}", ee));
                 }
             }
         }

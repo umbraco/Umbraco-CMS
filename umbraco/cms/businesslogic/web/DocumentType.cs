@@ -320,7 +320,10 @@ namespace umbraco.cms.businesslogic.web
         public static string GenerateDtd()
         {
             StringBuilder dtd = new StringBuilder();
-            dtd.AppendLine("<!DOCTYPE umbraco [ ");
+            // Renamed 'umbraco' to 'root' since the top level of the DOCTYPE should specify the name of the root node for it to be valid;
+            // there's no mention of 'umbraco' anywhere in the schema that this DOCTYPE governs
+            // (Alex N 20100212)
+            dtd.AppendLine("<!DOCTYPE root [ ");
 
             if (UmbracoSettings.UseLegacyXmlSchema)
             {
@@ -328,13 +331,33 @@ namespace umbraco.cms.businesslogic.web
             }
             else
             {
-                List<DocumentType> dts = GetAllAsList();
-                foreach (DocumentType dt in dts)
+                // TEMPORARY: Added Try-Catch to this call since trying to generate a DTD against a corrupt db
+                // or a broken connection string is not handled yet
+                // (Alex N 20100212)
+                try
                 {
-                    string safeAlias = helpers.Casing.SafeAlias(dt.Alias);
-                    dtd.AppendLine(String.Format("<!ELEMENT {0} ANY>", safeAlias));
-                    dtd.AppendLine(String.Format("<!ATTLIST {0} id ID #REQUIRED>", safeAlias));
+                    StringBuilder strictSchemaBuilder = new StringBuilder();
+
+                    List<DocumentType> dts = GetAllAsList();
+                    foreach (DocumentType dt in dts)
+                    {
+                        string safeAlias = helpers.Casing.SafeAlias(dt.Alias);
+                        if (safeAlias != null)
+                        {
+                            strictSchemaBuilder.AppendLine(String.Format("<!ELEMENT {0} ANY>", safeAlias));
+                            strictSchemaBuilder.AppendLine(String.Format("<!ATTLIST {0} id ID #REQUIRED>", safeAlias));
+                        }
+                    }
+
+                    // Only commit the strong schema to the container if we didn't generate an error building it
+                    dtd.Append(strictSchemaBuilder);
                 }
+                catch (Exception exception)
+                {
+                    // Note, Log.Add quietly swallows the exception if it can't write to the database
+                    Log.Add(LogTypes.System, -1, string.Format("{0} while trying to build DTD for Xml schema; is Umbraco installed correctly and the connection string configured?", exception.Message));
+                }
+
             }
             dtd.AppendLine("]>");
 
