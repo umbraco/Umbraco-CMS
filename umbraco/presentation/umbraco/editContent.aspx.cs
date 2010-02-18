@@ -350,12 +350,7 @@ namespace umbraco.cms.presentation
 
             foreach (uicontrols.TabPage tp in tmp.GetPanels())
             {
-                tp.Menu.InsertSplitter(2);
-                uicontrols.MenuIconI menuItem = tp.Menu.NewIcon(3);
-                menuItem.AltText = ui.Text("buttons", "showPage", this.getUser());
-                menuItem.OnClickCommand = "window.open('dialogs/preview.aspx?id=" + Request["id"] + "','umbPreview')";
-                menuItem.ImageURL = SystemDirectories.Umbraco + "/images/editor/vis.gif";
-                //				tp.Menu.InsertSplitter(4);
+                addPreviewButton(tp.Menu, _document.Id);
             }
 
             plc.Controls.Add(tmp);
@@ -449,7 +444,20 @@ namespace umbraco.cms.presentation
             tmp.tpProp.Controls.Add(publishProps);
             tmp.tpProp.Controls.Add(linkProps);
 
+            // add preview to properties pane too
+            addPreviewButton(tmp.tpProp.Menu, _document.Id);
 
+
+
+        }
+
+        private void addPreviewButton(uicontrols.ScrollingMenu menu, int id)
+        {
+            menu.InsertSplitter(2);
+            uicontrols.MenuIconI menuItem = menu.NewIcon(3);
+            menuItem.AltText = ui.Text("buttons", "showPage", this.getUser());
+            menuItem.OnClickCommand = "window.open('dialogs/preview.aspx?id=" + id + "','umbPreview')";
+            menuItem.ImageURL = SystemDirectories.Umbraco + "/images/editor/vis.gif";
         }
 
         private void InitializeComponent()
