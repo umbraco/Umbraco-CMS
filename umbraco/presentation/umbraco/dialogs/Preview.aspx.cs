@@ -21,13 +21,14 @@ namespace umbraco.presentation.dialogs
         protected void Page_Load(object sender, EventArgs e)
         {
             Document d = new Document(int.Parse(helper.Request("id")));
-            bool includeChildren = !String.IsNullOrEmpty(UmbracoContext.Current.Request["children"]) ? true : false;
+            bool includeChildren = true; //  !String.IsNullOrEmpty(UmbracoContext.Current.Request["children"]) ? true : false;
             PreviewContent pc = new PreviewContent(Guid.NewGuid());
             pc.PrepareDocument(base.getUser(), d, includeChildren);
             pc.SavePreviewSet();
             docLit.Text = d.Text;
             changeSetUrl.Text = pc.PreviewsetPath;
             StateHelper.SetCookieValue("PreviewSet", pc.PreviewSet.ToString());
+            Response.Redirect("../../" + d.Id.ToString() + ".aspx", true);
         }
     }
 }

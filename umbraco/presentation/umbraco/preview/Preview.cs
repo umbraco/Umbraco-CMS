@@ -36,7 +36,8 @@ namespace umbraco.presentation.preview
             XmlContent = (XmlDocument) content.Instance.XmlContent.Clone();
             
             // inject current document xml
-            content.AppendDocumentXml(documentObject.Id, documentObject.Level, documentObject.Parent.Id, documentObject.ToPreviewXml(XmlContent), XmlContent);
+            int parentId = documentObject.Level == 1 ? -1 : documentObject.Parent.Id;
+            content.AppendDocumentXml(documentObject.Id, documentObject.Level, parentId, documentObject.ToPreviewXml(XmlContent), XmlContent);
 
             if (includeSubs)
             {

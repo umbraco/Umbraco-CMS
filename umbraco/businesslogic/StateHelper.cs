@@ -235,7 +235,7 @@ namespace umbraco.BusinessLogic
             HttpCookie cookie = context.Request.Cookies[key];
             if (cookie == null) {
                 // Check for session
-                if (context.Session[key] != null)
+                if (context.Session != null && context.Session[key] != null)
                     if (context.Session[key].ToString() != "0")
                         tempValue = context.Session[key].ToString();
             }
