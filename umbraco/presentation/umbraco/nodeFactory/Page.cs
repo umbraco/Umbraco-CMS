@@ -7,14 +7,16 @@ using System.Xml.XPath;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.propertytype;
 
-namespace umbraco.presentation.nodeFactory {
+namespace umbraco.presentation.nodeFactory
+{
     /// <summary>
     /// Summary description for Node.
     /// </summary>
 
     [Serializable]
     [XmlType(Namespace = "http://umbraco.org/webservices/")]
-    public class Node {
+    public class Node
+    {
         private Hashtable _aliasToNames = new Hashtable();
 
         private bool _initialized = false;
@@ -37,92 +39,115 @@ namespace umbraco.presentation.nodeFactory {
         private XmlNode _pageXmlNode;
         private int _sortOrder;
 
-        public Nodes Children {
-            get {
+        public Nodes Children
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _children;
             }
         }
 
-        public Node Parent {
-            get {
+        public Node Parent
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _parent;
             }
         }
 
-        public int Id {
-            get {
+        public int Id
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _id;
             }
         }
 
-        public int template {
-            get {
+        public int template
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _template;
             }
         }
 
-        public int SortOrder {
-            get {
+        public int SortOrder
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _sortOrder;
             }
         }
 
-        public string Name {
-            get {
+        public string Name
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _name;
             }
         }
 
-        public string Url {
+        public string Url
+        {
             get { return library.NiceUrl(Id); }
         }
 
-        public string NodeTypeAlias {
-            get {
+        public string NodeTypeAlias
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _nodeTypeAlias;
             }
         }
 
-        public string WriterName {
-            get {
+        public string WriterName
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _writerName;
             }
         }
 
-        public string CreatorName {
-            get {
+        public string CreatorName
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _creatorName;
             }
         }
 
-        public int WriterID {
-            get {
+        public int WriterID
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _writerID;
             }
         }
 
-        public int CreatorID {
-            get {
+        public int CreatorID
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _creatorID;
@@ -130,32 +155,40 @@ namespace umbraco.presentation.nodeFactory {
         }
 
 
-        public string Path {
-            get {
+        public string Path
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _path;
             }
         }
 
-        public DateTime CreateDate {
-            get {
+        public DateTime CreateDate
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _createDate;
             }
         }
 
-        public DateTime UpdateDate {
-            get {
+        public DateTime UpdateDate
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _updateDate;
             }
         }
 
-        public Guid Version {
-            get {
+        public Guid Version
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _version;
@@ -170,27 +203,32 @@ namespace umbraco.presentation.nodeFactory {
             }
         }
 
-        public Properties Properties {
-            get {
+        public Properties Properties
+        {
+            get
+            {
                 if (!_initialized)
                     initialize();
                 return _properties;
             }
         }
 
-        public Node() {
+        public Node()
+        {
             _pageXmlNode = ((IHasXmlNode)library.GetXmlNodeCurrent().Current).GetNode();
             initializeStructure();
             initialize();
         }
 
-        public Node(XmlNode NodeXmlNode) {
+        public Node(XmlNode NodeXmlNode)
+        {
             _pageXmlNode = NodeXmlNode;
             initializeStructure();
             initialize();
         }
 
-        public Node(XmlNode NodeXmlNode, bool DisableInitializing) {
+        public Node(XmlNode NodeXmlNode, bool DisableInitializing)
+        {
             _pageXmlNode = NodeXmlNode;
             initializeStructure();
             if (!DisableInitializing)
@@ -203,8 +241,10 @@ namespace umbraco.presentation.nodeFactory {
         /// </summary>
         /// <param name="NodeId"></param>
         /// <param name="forcePublishedXml"></param>
-        public Node(int NodeId, bool forcePublishedXml) {
-            if (forcePublishedXml) {
+        public Node(int NodeId, bool forcePublishedXml)
+        {
+            if (forcePublishedXml)
+            {
                 if (NodeId != -1)
                     _pageXmlNode = content.Instance.XmlContent.GetElementById(NodeId.ToString());
                 else
@@ -213,7 +253,7 @@ namespace umbraco.presentation.nodeFactory {
 
                 }
                 initializeStructure();
-                initialize();            
+                initialize();
             }
             else
             {
@@ -222,10 +262,12 @@ namespace umbraco.presentation.nodeFactory {
             }
         }
 
-        public Node(int NodeId) {
+        public Node(int NodeId)
+        {
             if (NodeId != -1)
                 _pageXmlNode = ((IHasXmlNode)library.GetXmlNodeById(NodeId.ToString()).Current).GetNode();
-            else {
+            else
+            {
                 _pageXmlNode = UmbracoContext.Current.GetXml().DocumentElement;
 
             }
@@ -233,37 +275,46 @@ namespace umbraco.presentation.nodeFactory {
             initialize();
         }
 
-        public Property GetProperty(string Alias) {
-            foreach (Property p in Properties) {
+        public Property GetProperty(string Alias)
+        {
+            foreach (Property p in Properties)
+            {
                 if (p.Alias == Alias)
                     return p;
             }
             return null;
         }
-        
 
 
-        public DataTable ChildrenAsTable() {
-            if (Children.Count > 0) {
+
+        public DataTable ChildrenAsTable()
+        {
+            if (Children.Count > 0)
+            {
                 DataTable dt = generateDataTable(Children[0]);
 
                 string firstNodeTypeAlias = Children[0].NodeTypeAlias;
 
-                foreach (Node n in Children) {
-                    if (n.NodeTypeAlias == firstNodeTypeAlias) {
+                foreach (Node n in Children)
+                {
+                    if (n.NodeTypeAlias == firstNodeTypeAlias)
+                    {
                         DataRow dr = dt.NewRow();
                         populateRow(ref dr, n, getPropertyHeaders(n));
                         dt.Rows.Add(dr);
                     }
                 }
                 return dt;
-            } else
+            }
+            else
                 return new DataTable();
         }
 
-        public DataTable ChildrenAsTable(string nodeTypeAliasFilter) {
-   
-            if (Children.Count > 0) {
+        public DataTable ChildrenAsTable(string nodeTypeAliasFilter)
+        {
+
+            if (Children.Count > 0)
+            {
 
                 Node Firstnode = null;
                 Boolean nodeFound = false;
@@ -296,17 +347,20 @@ namespace umbraco.presentation.nodeFactory {
                 {
                     return new DataTable();
                 }
-            } else
+            }
+            else
                 return new DataTable();
         }
 
-        private DataTable generateDataTable(Node SchemaNode) {
+        private DataTable generateDataTable(Node SchemaNode)
+        {
             DataTable NodeAsDataTable = new DataTable(SchemaNode.NodeTypeAlias);
             string[] defaultColumns = {
                                           "Id", "NodeName", "NodeTypeAlias", "CreateDate", "UpdateDate", "CreatorName",
                                           "WriterName", "Url"
                                       };
-            foreach (string s in defaultColumns) {
+            foreach (string s in defaultColumns)
+            {
                 DataColumn dc = new DataColumn(s);
                 NodeAsDataTable.Columns.Add(dc);
             }
@@ -314,7 +368,8 @@ namespace umbraco.presentation.nodeFactory {
             // add properties
             Hashtable propertyHeaders = getPropertyHeaders(SchemaNode);
             IDictionaryEnumerator ide = propertyHeaders.GetEnumerator();
-            while (ide.MoveNext()) {
+            while (ide.MoveNext())
+            {
                 DataColumn dc = new DataColumn(ide.Value.ToString());
                 NodeAsDataTable.Columns.Add(dc);
             }
@@ -322,10 +377,12 @@ namespace umbraco.presentation.nodeFactory {
             return NodeAsDataTable;
         }
 
-        private Hashtable getPropertyHeaders(Node SchemaNode) {
+        private Hashtable getPropertyHeaders(Node SchemaNode)
+        {
             if (_aliasToNames.ContainsKey(SchemaNode.NodeTypeAlias))
                 return (Hashtable)_aliasToNames[SchemaNode.NodeTypeAlias];
-            else {
+            else
+            {
                 ContentType ct = ContentType.GetByAlias(SchemaNode.NodeTypeAlias);
                 Hashtable def = new Hashtable();
                 foreach (PropertyType pt in ct.PropertyTypes)
@@ -338,7 +395,8 @@ namespace umbraco.presentation.nodeFactory {
             }
         }
 
-        private void populateRow(ref DataRow dr, Node n, Hashtable AliasesToNames) {
+        private void populateRow(ref DataRow dr, Node n, Hashtable AliasesToNames)
+        {
             dr["Id"] = n.Id;
             dr["NodeName"] = n.Name;
             dr["NodeTypeAlias"] = n.NodeTypeAlias;
@@ -349,8 +407,10 @@ namespace umbraco.presentation.nodeFactory {
             dr["Url"] = library.NiceUrl(n.Id);
 
             int counter = 8;
-            foreach (Property p in n.Properties) {
-                if (p.Value != null) {
+            foreach (Property p in n.Properties)
+            {
+                if (p.Value != null)
+                {
                     dr[AliasesToNames[p.Alias].ToString()] = p.Value;
                     counter++;
                 }
@@ -358,38 +418,45 @@ namespace umbraco.presentation.nodeFactory {
         }
 
 
-        private void initializeStructure() {
+        private void initializeStructure()
+        {
             // Load parent if it exists and is a node
-            if (_pageXmlNode.SelectSingleNode("..") != null)
-                if (_pageXmlNode.SelectSingleNode("..").Name == "node")
-                    _parent = new Node(_pageXmlNode.SelectSingleNode(".."), true);
+
+            if (_pageXmlNode != null && _pageXmlNode.SelectSingleNode("..") != null && _pageXmlNode.SelectSingleNode("..").Name == "node")
+                _parent = new Node(_pageXmlNode.SelectSingleNode(".."), true);
         }
 
-        private void initialize() {
-            if (_pageXmlNode != null) {
+        private void initialize()
+        {
+            if (_pageXmlNode != null)
+            {
                 _initialized = true;
-                if (_pageXmlNode.Attributes != null) {
+                if (_pageXmlNode.Attributes != null)
+                {
                     _id = int.Parse(_pageXmlNode.Attributes.GetNamedItem("id").Value);
                     if (_pageXmlNode.Attributes.GetNamedItem("template") != null)
-                    _template = int.Parse(_pageXmlNode.Attributes.GetNamedItem("template").Value);
-                if (_pageXmlNode.Attributes.GetNamedItem("sortOrder") != null)
-                    _sortOrder = int.Parse(_pageXmlNode.Attributes.GetNamedItem("sortOrder").Value);
-                if (_pageXmlNode.Attributes.GetNamedItem("nodeName") != null)
-                    _name = _pageXmlNode.Attributes.GetNamedItem("nodeName").Value;
-                if (_pageXmlNode.Attributes.GetNamedItem("writerName") != null)
-                    _writerName = _pageXmlNode.Attributes.GetNamedItem("writerName").Value;
-                // Creatorname is new in 2.1, so published xml might not have it!
-                try {
-                    _creatorName = _pageXmlNode.Attributes.GetNamedItem("creatorName").Value;
-                } catch {
-                    _creatorName = _writerName;
-                }
+                        _template = int.Parse(_pageXmlNode.Attributes.GetNamedItem("template").Value);
+                    if (_pageXmlNode.Attributes.GetNamedItem("sortOrder") != null)
+                        _sortOrder = int.Parse(_pageXmlNode.Attributes.GetNamedItem("sortOrder").Value);
+                    if (_pageXmlNode.Attributes.GetNamedItem("nodeName") != null)
+                        _name = _pageXmlNode.Attributes.GetNamedItem("nodeName").Value;
+                    if (_pageXmlNode.Attributes.GetNamedItem("writerName") != null)
+                        _writerName = _pageXmlNode.Attributes.GetNamedItem("writerName").Value;
+                    // Creatorname is new in 2.1, so published xml might not have it!
+                    try
+                    {
+                        _creatorName = _pageXmlNode.Attributes.GetNamedItem("creatorName").Value;
+                    }
+                    catch
+                    {
+                        _creatorName = _writerName;
+                    }
 
-                //Added the actual userID, as a user cannot be looked up via full name only... 
-                if (_pageXmlNode.Attributes.GetNamedItem("creatorID") != null)
-                    _creatorID = int.Parse(_pageXmlNode.Attributes.GetNamedItem("creatorID").Value);
-                if (_pageXmlNode.Attributes.GetNamedItem("writerID") != null)
-                    _writerID = int.Parse(_pageXmlNode.Attributes.GetNamedItem("writerID").Value);
+                    //Added the actual userID, as a user cannot be looked up via full name only... 
+                    if (_pageXmlNode.Attributes.GetNamedItem("creatorID") != null)
+                        _creatorID = int.Parse(_pageXmlNode.Attributes.GetNamedItem("creatorID").Value);
+                    if (_pageXmlNode.Attributes.GetNamedItem("writerID") != null)
+                        _writerID = int.Parse(_pageXmlNode.Attributes.GetNamedItem("writerID").Value);
 
                     if (_pageXmlNode.Attributes.GetNamedItem("nodeTypeAlias") != null)
                         _nodeTypeAlias = _pageXmlNode.Attributes.GetNamedItem("nodeTypeAlias").Value;
@@ -414,16 +481,19 @@ namespace umbraco.presentation.nodeFactory {
                 XPathExpression expr = nav.Compile(childXPath);
                 expr.AddSort("@sortOrder", XmlSortOrder.Ascending, XmlCaseOrder.None, "", XmlDataType.Number);
                 XPathNodeIterator iterator = nav.Select(expr);
-                while (iterator.MoveNext()) {
+                while (iterator.MoveNext())
+                {
                     _children.Add(
                         new Node(((IHasXmlNode)iterator.Current).GetNode(), true)
                         );
                 }
-            } else
+            }
+            else
                 throw new ArgumentNullException("Node xml source is null");
         }
 
-        public static Node GetCurrent() {
+        public static Node GetCurrent()
+        {
             XmlNode n = ((IHasXmlNode)library.GetXmlNodeCurrent().Current).GetNode();
             if (n.Attributes == null || n.Attributes.GetNamedItem("id") == null)
                 throw new ArgumentException("Current node is null. This might be due to previewing an unpublished node. As the NodeFactory works with published data, macros using the node factory won't work in preview mode.", "Current node is " + System.Web.HttpContext.Current.Items["pageID"].ToString());
@@ -432,41 +502,51 @@ namespace umbraco.presentation.nodeFactory {
         }
     }
 
-    public class Nodes : CollectionBase {
-        public virtual void Add(Node NewNode) {
+    public class Nodes : CollectionBase
+    {
+        public virtual void Add(Node NewNode)
+        {
             List.Add(NewNode);
         }
 
-        public virtual Node this[int Index] {
+        public virtual Node this[int Index]
+        {
             get { return (Node)List[Index]; }
         }
     }
 
     [Serializable]
     [XmlType(Namespace = "http://umbraco.org/webservices/")]
-    public class Property {
+    public class Property
+    {
         private Guid _version;
         private string _alias;
         private string _value;
 
-        public string Alias {
+        public string Alias
+        {
             get { return _alias; }
         }
 
-        public string Value {
+        public string Value
+        {
             get { return _value; }
         }
 
-        public Guid Version {
+        public Guid Version
+        {
             get { return _version; }
         }
 
-        public Property() {
+        public Property()
+        {
 
         }
 
-        public Property(XmlNode PropertyXmlData) {
-            if (PropertyXmlData != null) {
+        public Property(XmlNode PropertyXmlData)
+        {
+            if (PropertyXmlData != null)
+            {
                 // For backward compatibility with 2.x (the version attribute has been removed from 3.0 data nodes)
                 if (PropertyXmlData.Attributes.GetNamedItem("versionID") != null)
                     _version = new Guid(PropertyXmlData.Attributes.GetNamedItem("versionID").Value);
@@ -474,17 +554,21 @@ namespace umbraco.presentation.nodeFactory {
                     PropertyXmlData.Attributes.GetNamedItem("alias").Value :
                     PropertyXmlData.Name;
                 _value = xmlHelper.GetNodeValue(PropertyXmlData);
-            } else
+            }
+            else
                 throw new ArgumentNullException("Property xml source is null");
         }
     }
 
-    public class Properties : CollectionBase {
-        public virtual void Add(Property NewProperty) {
+    public class Properties : CollectionBase
+    {
+        public virtual void Add(Property NewProperty)
+        {
             List.Add(NewProperty);
         }
 
-        public virtual Property this[int Index] {
+        public virtual Property this[int Index]
+        {
             get { return (Property)List[Index]; }
         }
     }
