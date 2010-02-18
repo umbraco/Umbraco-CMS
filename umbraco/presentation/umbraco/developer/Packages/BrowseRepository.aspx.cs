@@ -34,7 +34,7 @@ namespace umbraco.presentation.developer.packages {
             if (!string.IsNullOrEmpty(category))
                 category = "&category=" + category;
 
-            iframeGen.Text = "<iframe id=\"repoFrame\" frameborder=\"1\" style=\"border: none; display: block\" src=\"" + url + "?repoGuid=" + repoGuid + category + "&callback=" + Request.ServerVariables["SERVER_NAME"] + ":" + Request.ServerVariables["SERVER_PORT"] + IOHelper.ResolveUrl( SystemDirectories.Umbraco ) + "/developer/packages/proxy.htm?/" + IOHelper.ResolveUrl(SystemDirectories.Umbraco).Trim('/') + "/developer/packages/installer.aspx?repoGuid=" + repoGuid + "&version=v31\"></iframe>";
+            iframeGen.Text = "<iframe id=\"repoFrame\" frameborder=\"1\" style=\"border: none; display: block\" src=\"" + url + "?repoGuid=" + repoGuid + category + "&callback=" + Request.ServerVariables["SERVER_NAME"] + ":" + Request.ServerVariables["SERVER_PORT"] + IOHelper.ResolveUrl( SystemDirectories.Umbraco ) + "/developer/packages/proxy.htm?/" + IOHelper.ResolveUrl(SystemDirectories.Umbraco).Trim('/') + "/developer/packages/installer.aspx?repoGuid=" + repoGuid + "&version=v31&useLegacySchema=" + UmbracoSettings.UseLegacyXmlSchema.ToString() +  "\"></iframe>";
         }
 
         #region Web Form Designer generated code

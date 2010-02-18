@@ -222,7 +222,7 @@ namespace umbraco
             {
                 cms.businesslogic.macro.Macro m = cms.businesslogic.macro.Macro.MakeNew(
                     helper.SpaceCamelCasing(fileName.Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')));
-                m.ScriptingFile = _alias;
+                m.ScriptingFile = fileName;
             }
 
             m_returnUrl = string.Format(SystemDirectories.Umbraco + "/developer/python/editPython.aspx?file={0}", fileName);
