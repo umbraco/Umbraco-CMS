@@ -58,7 +58,7 @@ namespace umbraco.presentation.preview
         {
             PreviewSet = previewSet;
             PreviewsetPath = IO.IOHelper.MapPath(
-                Path.Combine(IO.SystemDirectories.Preview, PreviewSet + ".config"));
+                Path.Combine(IO.SystemDirectories.Preview, m_userId.ToString() + "_" + PreviewSet + ".config"));
         }
 
         public void LoadPreviewset()
@@ -69,6 +69,18 @@ namespace umbraco.presentation.preview
 
         public void SavePreviewSet()
         {
+            // check for old preview sets and try to clean
+            foreach (FileInfo file in new DirectoryInfo(IO.IOHelper.MapPath(IO.SystemDirectories.Preview)).GetFiles(m_userId + "_*.config"))
+            {
+                try
+                {
+                    file.Delete();
+                }
+                catch {
+                    Log.Add(LogTypes.Error, User.GetUser(m_userId), -1, String.Format("Couldn't delete preview set: {0}", file.Name));
+                }
+            }
+
             XmlContent.Save(PreviewsetPath);
         }
     }

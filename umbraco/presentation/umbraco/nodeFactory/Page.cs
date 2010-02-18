@@ -197,6 +197,31 @@ namespace umbraco.presentation.nodeFactory {
                 initialize();
         }
 
+        /// <summary>
+        /// Special constructor for by-passing published vs. preview xml to use
+        /// when updating the SiteMapProvider
+        /// </summary>
+        /// <param name="NodeId"></param>
+        /// <param name="forcePublishedXml"></param>
+        public Node(int NodeId, bool forcePublishedXml) {
+            if (forcePublishedXml) {
+                if (NodeId != -1)
+                    _pageXmlNode = content.Instance.XmlContent.GetElementById(NodeId.ToString());
+                else
+                {
+                    _pageXmlNode = content.Instance.XmlContent.DocumentElement;
+
+                }
+                initializeStructure();
+                initialize();            
+            }
+            else
+            {
+                throw new ArgumentException("Use Node(int NodeId) if not forcing published xml");
+
+            }
+        }
+
         public Node(int NodeId) {
             if (NodeId != -1)
                 _pageXmlNode = ((IHasXmlNode)library.GetXmlNodeById(NodeId.ToString()).Current).GetNode();
@@ -379,12 +404,14 @@ namespace umbraco.presentation.nodeFactory {
                 }
 
                 // load data
-                foreach (XmlNode n in _pageXmlNode.SelectNodes("./data"))
+                string dataXPath = UmbracoSettings.UseLegacyXmlSchema ? "data" : "* [not(@isDoc)]";
+                foreach (XmlNode n in _pageXmlNode.SelectNodes(dataXPath))
                     _properties.Add(new Property(n));
 
                 // load children
+                string childXPath = UmbracoSettings.UseLegacyXmlSchema ? "node" : "* [@isDoc]";
                 XPathNavigator nav = _pageXmlNode.CreateNavigator();
-                XPathExpression expr = nav.Compile("./node");
+                XPathExpression expr = nav.Compile(childXPath);
                 expr.AddSort("@sortOrder", XmlSortOrder.Ascending, XmlCaseOrder.None, "", XmlDataType.Number);
                 XPathNodeIterator iterator = nav.Select(expr);
                 while (iterator.MoveNext()) {
@@ -443,7 +470,9 @@ namespace umbraco.presentation.nodeFactory {
                 // For backward compatibility with 2.x (the version attribute has been removed from 3.0 data nodes)
                 if (PropertyXmlData.Attributes.GetNamedItem("versionID") != null)
                     _version = new Guid(PropertyXmlData.Attributes.GetNamedItem("versionID").Value);
-                _alias = PropertyXmlData.Attributes.GetNamedItem("alias").Value;
+                _alias = UmbracoSettings.UseLegacyXmlSchema ?
+                    PropertyXmlData.Attributes.GetNamedItem("alias").Value :
+                    PropertyXmlData.Name;
                 _value = xmlHelper.GetNodeValue(PropertyXmlData);
             } else
                 throw new ArgumentNullException("Property xml source is null");

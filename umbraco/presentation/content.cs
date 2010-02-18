@@ -269,7 +269,7 @@ namespace umbraco
                 if (updateSitemapProvider && SiteMap.Provider is presentation.nodeFactory.UmbracoSiteMapProvider)
                 {
                     presentation.nodeFactory.UmbracoSiteMapProvider prov = (presentation.nodeFactory.UmbracoSiteMapProvider)SiteMap.Provider;
-                    prov.UpdateNode(new umbraco.presentation.nodeFactory.Node(d.Id));
+                    prov.UpdateNode(new umbraco.presentation.nodeFactory.Node(d.Id, true));
                 }
             }
         }
