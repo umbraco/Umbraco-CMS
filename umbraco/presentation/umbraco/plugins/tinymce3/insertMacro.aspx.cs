@@ -34,7 +34,7 @@ namespace umbraco.presentation.tinymce3
             pane_insert.Text = ui.Text("insertMacro");
             Page.Title = ui.Text("insertMacro");
 
-            if (reqMacroID != "" || reqMacroAlias != "")
+            if (!String.IsNullOrEmpty(reqMacroID) || !String.IsNullOrEmpty(reqMacroAlias))
             {
 
                 pane_edit.Visible = true;

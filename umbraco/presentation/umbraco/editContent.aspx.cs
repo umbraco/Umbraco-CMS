@@ -14,6 +14,8 @@ using umbraco.BusinessLogic.Actions;
 using umbraco.cms.helpers;
 using umbraco.IO;
 using umbraco.uicontrols.DatePicker;
+using umbraco.BusinessLogic;
+using umbraco.presentation.preview;
 
 
 namespace umbraco.cms.presentation
@@ -61,6 +63,11 @@ namespace umbraco.cms.presentation
 
 			//if (helper.Request("frontEdit") != "")
 			//    syncScript.Visible = false;
+
+            // clear preview cookie
+            if (!String.IsNullOrEmpty(StateHelper.GetCookieValue(PreviewContent.PREVIEW_COOKIE_KEY))) {
+                PreviewContent.ClearPreviewCookie();
+            }
 
             if (!IsPostBack)
             {

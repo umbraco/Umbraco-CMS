@@ -19,6 +19,7 @@ namespace umbraco.presentation.preview
 {
     public class PreviewContent
     {
+        public const string PREVIEW_COOKIE_KEY = "PreviewSet";
         public XmlDocument XmlContent { get; set; }
         public Guid PreviewSet { get; set; }
         public string PreviewsetPath { get; set; }
@@ -83,5 +84,14 @@ namespace umbraco.presentation.preview
 
             XmlContent.Save(PreviewsetPath);
         }
+
+        public void ActivatePreviewCookie() {
+            StateHelper.SetCookieValue(PREVIEW_COOKIE_KEY, PreviewSet.ToString());
+        }
+
+        public static void ClearPreviewCookie() {
+            StateHelper.ClearCookie(PREVIEW_COOKIE_KEY);
+        }
+
     }
 }

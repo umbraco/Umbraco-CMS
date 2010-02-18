@@ -81,14 +81,15 @@ namespace umbraco.presentation
         }
 
         /// <summary>
-        /// Determines whether the current user is in a preview mode
+        /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
         public virtual bool InPreviewMode
         {
             get
             {
+                string currentUrl = Request.Url.AbsolutePath;
                 return !String.IsNullOrEmpty(StateHelper.GetCookieValue("PreviewSet")) &&
-                       UmbracoUser != null;
+                       UmbracoUser != null && !currentUrl.StartsWith(IO.IOHelper.ResolveUrl(IO.SystemDirectories.Umbraco));
             }
         }
 

@@ -488,8 +488,8 @@ namespace umbraco.presentation.nodeFactory
                         );
                 }
             }
-            else
-                throw new ArgumentNullException("Node xml source is null");
+//            else
+//                throw new ArgumentNullException("Node xml source is null");
         }
 
         public static Node GetCurrent()

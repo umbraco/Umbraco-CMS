@@ -1398,7 +1398,7 @@ namespace umbraco
                 // Create a new 'HttpWebRequest' Object to the mentioned URL.
                 string retVal = string.Empty;
                 string url = "http://" + HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" +
-                             HttpContext.Current.Request.ServerVariables["SERVER_PORT"] + SystemDirectories.Umbraco +
+                             HttpContext.Current.Request.ServerVariables["SERVER_PORT"] + IOHelper.ResolveUrl( SystemDirectories.Umbraco ) +
                              "/macroResultWrapper.aspx?" +
                              querystring;
 

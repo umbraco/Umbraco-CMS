@@ -27,7 +27,7 @@ namespace umbraco.presentation.dialogs
             pc.SavePreviewSet();
             docLit.Text = d.Text;
             changeSetUrl.Text = pc.PreviewsetPath;
-            StateHelper.SetCookieValue("PreviewSet", pc.PreviewSet.ToString());
+            pc.ActivatePreviewCookie();
             Response.Redirect("../../" + d.Id.ToString() + ".aspx", true);
         }
     }
