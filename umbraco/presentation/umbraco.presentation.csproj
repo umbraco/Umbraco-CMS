@@ -1,6 +1,6 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{651E1350-91B6-44B7-BD60-7207006D7003}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -1465,6 +1465,22 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
+    <Content Include="umbraco\xslt\templates\Schema2\Breadcrumb.xslt" />
+    <Content Include="umbraco\xslt\templates\Schema2\Clean.xslt" />
+    <Content Include="umbraco\xslt\templates\Schema2\ListSubPagesAsThumbnails.xslt" />
+    <Content Include="umbraco\xslt\templates\Schema2\ListSubPagesByDateAndLimit.xslt" />
+    <Content Include="umbraco\xslt\templates\Schema2\ListSubPagesByDocumentType.xslt" />
+    <Content Include="umbraco\xslt\templates\Schema2\ListSubPagesByLevel.xslt" />
+    <Content Include="umbraco\xslt\templates\Schema2\ListSubPagesFromAChangableSource.xslt" />
+    <Content Include="umbraco\xslt\templates\Schema2\ListSubPagesFromCurrentPage.xslt" />
+    <Content Include="umbraco\xslt\templates\Schema2\ListThumbnailsFromCurrentPage.xslt" />
+    <Content Include="umbraco\xslt\templates\Schema2\ListWholeStructureFromCurrentPage.xslt" />
+    <Content Include="umbraco\xslt\templates\Schema2\NavigationPrototype.xslt" />
+    <Content Include="umbraco\xslt\templates\Schema2\RelatedLinks.xslt" />
+    <Content Include="umbraco\xslt\templates\Schema2\RSSFeed.xslt" />
+    <Content Include="umbraco\xslt\templates\Schema2\Sitemap.xslt" />
+    <Content Include="umbraco\xslt\templates\Schema2\TablePrototype.xslt" />
+    <Content Include="web.config.UMBRACO-MIURA.xslt" />
     <Content Include="umbraco\dialogs\Preview.aspx" />
     <Content Include="umbraco_client\DateTimePicker\images\calSprite.png" />
     <Content Include="umbraco_client\DateTimePicker\images\ui-icons_666666_256x240.png" />
