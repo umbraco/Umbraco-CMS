@@ -262,7 +262,8 @@ namespace umbraco
             // check if document *is* published, it could be unpublished by an event
             if (d.Published)
             {
-                AppendDocumentXml(d.Id, d.Level, d.Parent.Id, getPreviewOrPublishedNode(d, xmlContentCopy, false), xmlContentCopy);
+                int parentId = d.Level == 1 ? -1 : d.Parent.Id;
+                AppendDocumentXml(d.Id, d.Level, parentId, getPreviewOrPublishedNode(d, xmlContentCopy, false), xmlContentCopy);
 
                 // update sitemapprovider
                 if (updateSitemapProvider && SiteMap.Provider is presentation.nodeFactory.UmbracoSiteMapProvider)

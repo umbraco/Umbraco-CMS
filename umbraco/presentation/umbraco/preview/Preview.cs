@@ -33,8 +33,8 @@ namespace umbraco.presentation.preview
             m_userId = user.Id;
 
             // clone xml
-            XmlContent = (XmlDocument) content.Instance.XmlContent.Clone();
-            
+            XmlContent = (XmlDocument)content.Instance.XmlContent.Clone();
+
             // inject current document xml
             int parentId = documentObject.Level == 1 ? -1 : documentObject.Parent.Id;
             content.AppendDocumentXml(documentObject.Id, documentObject.Level, parentId, documentObject.ToPreviewXml(XmlContent), XmlContent);
@@ -58,9 +58,7 @@ namespace umbraco.presentation.preview
         {
             PreviewSet = previewSet;
             PreviewsetPath = IO.IOHelper.MapPath(
-                Path.Combine(
-                    Path.Combine(IO.SystemDirectories.Data, "previews"),
-                    PreviewSet + ".config"));
+                Path.Combine(IO.SystemDirectories.Preview, PreviewSet + ".config"));
         }
 
         public void LoadPreviewset()

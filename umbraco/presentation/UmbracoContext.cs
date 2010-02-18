@@ -68,13 +68,27 @@ namespace umbraco.presentation
         }
 
         /// <summary>
+        /// Gets the current logged in Umbraco user (editor).
+        /// </summary>
+        /// <value>The Umbraco user object or null</value>
+        public virtual User UmbracoUser
+        {
+            get
+            {
+                return BasePages.UmbracoEnsuredPage.CurrentUser;
+            }
+
+        }
+
+        /// <summary>
         /// Determines whether the current user is in a preview mode
         /// </summary>
         public virtual bool InPreviewMode
         {
             get
             {
-                return !String.IsNullOrEmpty(StateHelper.GetCookieValue("PreviewSet"));
+                return !String.IsNullOrEmpty(StateHelper.GetCookieValue("PreviewSet")) &&
+                       UmbracoUser != null;
             }
         }
 
@@ -147,7 +161,7 @@ namespace umbraco.presentation
             {
                 if (m_Response == null)
                 {
-                    m_Response = new UmbracoResponse(this.m_HttpContext.Response); 
+                    m_Response = new UmbracoResponse(this.m_HttpContext.Response);
                 }
                 return m_Response;
             }
@@ -163,7 +177,7 @@ namespace umbraco.presentation
             {
                 if (m_Request == null)
                 {
-                    m_Request = new UmbracoRequest(this.m_HttpContext.Request); 
+                    m_Request = new UmbracoRequest(this.m_HttpContext.Request);
                 }
                 return m_Request;
             }

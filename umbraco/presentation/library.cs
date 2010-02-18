@@ -1386,6 +1386,8 @@ namespace umbraco
         /// <returns>Returns the string without starting and endning paragraph tags</returns>
         public static string RemoveFirstParagraphTag(string text)
         {
+            if (String.IsNullOrEmpty(text))
+                return "";
             text = text.Trim().Replace("\n", string.Empty).Replace("\r", string.Empty);
             if (text.Length > 5)
             {
