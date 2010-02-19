@@ -12,8 +12,7 @@ namespace umbraco
     /// <summary>
     /// Summary description for standardTasks.
     /// </summary>
-    /// 
-
+    ///
 
     public class XsltTasks : interfaces.ITaskReturnUrl
     {
