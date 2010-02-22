@@ -24,6 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		umbraco weekly.build = umbraco weekly.build
 		umbraco.build = umbraco.build
 		foreign dlls\umbraco.Linq.DTMetal.Engine.dll = foreign dlls\umbraco.Linq.DTMetal.Engine.dll
+		foreign dlls\UmbracoExamine.Core.dll = foreign dlls\UmbracoExamine.Core.dll
+		foreign dlls\UmbracoExamine.Providers.dll = foreign dlls\UmbracoExamine.Providers.dll
 		foreign dlls\UrlRewritingNet.UrlRewriter.dll = foreign dlls\UrlRewritingNet.UrlRewriter.dll
 		foreign dlls\VistaDB.NET20.dll = foreign dlls\VistaDB.NET20.dll
 	EndProjectSection

@@ -35,9 +35,27 @@ namespace umbraco.presentation.dialogs
         {
             string query = keyword.Text;
 
+            //the app can be Content or Media only, otherwise an exception will be thrown
+            var app = "Content";
+            if (!string.IsNullOrEmpty(UmbracoContext.Current.Request["app"]))
+            {
+                app = UmbracoContext.Current.Request["app"];
+            }
+            IndexType indexType = (IndexType)Enum.Parse(typeof(IndexType), app);
+
+            //if it doesn't start with "*", then search only nodeName and nodeId
+            var criteria = new SearchCriteria(query
+                , query.StartsWith("*") ? new string[] { } : new string[] { "nodeName", "id" }
+                , new string[] { }
+                , false
+                , UmbracoContext.Current.UmbracoUser.StartNodeId > 0 ? (int?)UmbracoContext.Current.UmbracoUser.StartNodeId : null
+                , 100
+                , indexType
+                , false);
+
             var results = ExamineManager.Instance
                 .SearchProviderCollection["InternalSearch"]
-                .Search(query, 100, false);
+                .Search(criteria);
 
             searchResult.XPathNavigator = ResultsAsXml(results).CreateNavigator();
         }

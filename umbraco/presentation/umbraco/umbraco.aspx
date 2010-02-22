@@ -57,9 +57,7 @@
 			</div>
 			<asp:Panel ID="FindDocuments" runat="server">
 				<div style="float: left; margin-left: 20px;">
-					<form action="#" onsubmit="UmbClientMgr.openModalWindow('dialogs/search.aspx?rndo=45.2&search=' + jQuery('#umbSearchField').val(), 'Search', true, 620, 470); return false;">
 					<uc1:quickSearch ID="Search" runat="server"></uc1:quickSearch>
-					</form>
 				</div>
 			</asp:Panel>
 			<div class="topBarButtons">

@@ -1,6 +1,13 @@
 ﻿(function($) {
-    
+
     $.fn.UmbQuickSearch = function(url) {
+
+        var getSearchApp = function() {
+            return (UmbClientMgr.mainWindow().location.hash != "" && UmbClientMgr.mainWindow().location.hash.toLowerCase().substring(1)) == "media".toLowerCase()
+                ? "Media"
+                : "Content";
+        };
+
         var acOptions = {
             minChars: 2,
             max: 100,
@@ -8,6 +15,15 @@
             dataType: 'json',
             matchCase: true,
             matchContains: false,
+            extraParams: {
+                //return the current app, if it's not media, then it's Content as this is the only searches that are supported.
+                app: function() {
+                    return getSearchApp();
+                },
+                rnd: function() {
+                    return Umbraco.Utils.generateRandom();
+                }
+            },
             parse: function(data) {
                 var parsed = [];
                 //data = data.results;
@@ -25,8 +41,8 @@
             formatItem: function(item) {
                 return item.Fields.nodeName + " <span class='nodeId'>(" + item.Id + ")</span>";
             }
-        };    
-        
+        };
+
         $(this)
               .autocomplete(url, acOptions)
               .result(function(e, data) {
@@ -42,6 +58,14 @@
         $(this).blur(function() {
             $(this).val(UmbClientMgr.uiKeys()["general_typeToSearch"]);
         });
+
+        $(this).keyup(function(e) {
+            if (e.keyCode == 13) {
+
+                UmbClientMgr.openModalWindow('dialogs/search.aspx?rndo=' + Umbraco.Utils.generateRandom() + '&search=' + jQuery(this).val() + '&app=' + getSearchApp(), 'Search', true, 620, 470);
+                return false;
+            }
+        });
     }
-        
+
 })(jQuery);
