@@ -27,5 +27,5 @@ Filename (without extension): <asp:RequiredFieldValidator id="RequiredFieldValid
 <div style="MARGIN-TOP: 15px;">
 <asp:Button id="sbmt" Runat="server" style="MARGIN-TOP: 14px" Width="90" onclick="sbmt_Click"></asp:Button>
 &nbsp; <em><%= umbraco.ui.Text("or") %></em> &nbsp;
-<a href="#" style="color: blue"  onclick="top.closeModal()"><%=umbraco.ui.Text("cancel")%></a>
+<a href="#" style="color: blue"  onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
 </div>
