@@ -59,7 +59,7 @@ namespace umbraco.cms.businesslogic.web
                 ";
         private const string m_SQLOptimizedChildren = @"
                   select 
-                  	count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as published, umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId
+                  	count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, cmsDocument.templateId, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as published, umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId
                   from umbracoNode 
                   left join umbracoNode children on children.parentId = umbracoNode.id
                   inner join cmsContent on cmsContent.nodeId = umbracoNode.id
@@ -72,7 +72,7 @@ namespace umbraco.cms.businesslogic.web
                   inner join cmsDocument on cmsDocument.versionId = cmsContentversion.versionId
                   left join cmsDocument publishCheck on publishCheck.nodeId = cmsContent.nodeID and publishCheck.published = 1
                   where {0}
-                  group by umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId
+                  group by umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, cmsDocument.templateId, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId
                   order by {1}
                   ";
 
@@ -493,7 +493,9 @@ namespace umbraco.cms.businesslogic.web
                             , dr.GetString("thumbnail")
                             , dr.GetString("description")
                             , masterContentType
-                            , dr.GetInt("contentTypeId"));
+                            , dr.GetInt("contentTypeId")
+                            , dr.GetInt("templateId")
+                            );
 
                         // initialize content object
                         InitializeContent(dr.GetInt("ContentType"), dr.GetGuid("versionId"),
@@ -1242,7 +1244,8 @@ namespace umbraco.cms.businesslogic.web
                         , dr.GetString("thumbnail")
                         , dr.GetString("description")
                         , masterContentType
-                        , dr.GetInt("contentTypeId"));
+                        , dr.GetInt("contentTypeId")
+                        ,dr.GetInt("templateId"));
                     tmp.Add(d);
                 }
             }
@@ -1258,7 +1261,7 @@ namespace umbraco.cms.businesslogic.web
         private void SetupDocumentForTree(Guid uniqueId, int level, int parentId, int user, bool publish, string path,
                                           string text, DateTime createDate, DateTime updateDate,
                                           DateTime versionDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
-                                            string contentTypeDesc, int? masterContentType, int contentTypeId)
+                                            string contentTypeDesc, int? masterContentType, int contentTypeId, int templateId)
         {
             SetupNodeForTree(uniqueId, _objectType, level, parentId, user, path, text, createDate, hasChildren);
 
@@ -1266,6 +1269,7 @@ namespace umbraco.cms.businesslogic.web
             _updated = updateDate;
             ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType);
             ContentTypeIcon = icon;
+            Template = templateId;
             VersionDate = versionDate;
         }
 
