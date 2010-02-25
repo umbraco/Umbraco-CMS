@@ -155,3 +155,10 @@ img
 {
 	font-size:smaller;
 }
+
+.ac_loading 
+{
+	 background-image: url('../images/throbber.gif');
+	 background-position:right;
+	 background-repeat:no-repeat;
+}

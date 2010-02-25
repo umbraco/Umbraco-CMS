@@ -35,8 +35,11 @@ namespace umbraco.presentation.umbraco.Search
                 app = UmbracoContext.Current.Request["app"];
             }
             IndexType indexType = (IndexType)Enum.Parse(typeof(IndexType), app);
-            int limit = 100;
-            int.TryParse(UmbracoContext.Current.Request["limit"], out limit);
+            int limit;
+            if (!int.TryParse(UmbracoContext.Current.Request["limit"], out limit))
+            {
+                limit = 100;
+            }
 
             //if it doesn't start with "*", then search only nodeName and nodeId
             var criteria = new SearchCriteria(txt
@@ -51,6 +54,7 @@ namespace umbraco.presentation.umbraco.Search
             IEnumerable<SearchResult> results = ExamineManager.Instance
                 .SearchProviderCollection["InternalSearch"]
                 .Search(criteria);
+
 
             JavaScriptSerializer js = new JavaScriptSerializer();
             context.Response.Write(js.Serialize(results));

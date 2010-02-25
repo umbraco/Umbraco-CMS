@@ -26,8 +26,6 @@
             },
             parse: function(data) {
                 var parsed = [];
-                //data = data.results;
-
                 for (var i = 0; i < data.length; i++) {
                     parsed[parsed.length] = {
                         data: data[i],
@@ -35,7 +33,6 @@
                         result: data[i].Fields.nodeName
                     };
                 }
-
                 return parsed;
             },
             formatItem: function(item) {
@@ -50,6 +47,7 @@
                   $("#umbSearchField").val(UmbClientMgr.uiKeys()["general_typeToSearch"]);
                   right.focus();
               });
+        
 
         $(this).focus(function() {
             $(this).val('');

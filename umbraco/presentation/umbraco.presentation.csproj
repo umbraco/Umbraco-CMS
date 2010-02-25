@@ -446,7 +446,6 @@
     <Compile Include="umbraco\controls\ContentTypeControlNew.ascx.designer.cs">
       <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\controls\datagrid\DropDownColumn.cs" />
     <Compile Include="umbraco\controls\dualSelectBox.cs" />
     <Compile Include="umbraco\controls\Extenders\CustomDragDropDesigner.cs" />
     <Compile Include="umbraco\controls\Extenders\CustomDragDropExtender.cs" />
