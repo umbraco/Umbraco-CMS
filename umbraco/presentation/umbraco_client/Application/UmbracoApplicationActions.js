@@ -97,9 +97,11 @@ Umbraco.Application.Actions = function() {
 
             if (this._currApp != 'media' && this._currApp != 'content') {
                 jQuery("#buttonCreate").attr("disabled", "true");
+                jQuery("#FindDocuments .umbracoSearchHolder").fadeOut(400);
             }
             else {
                 jQuery("#buttonCreate").removeAttr("disabled");
+                jQuery("#FindDocuments .umbracoSearchHolder").fadeIn(500);
                 //need to set the recycle bin node id based on app
                 switch (this._currApp) {
                     case ("media"):
