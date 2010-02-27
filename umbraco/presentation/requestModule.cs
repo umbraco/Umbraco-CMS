@@ -175,7 +175,7 @@ namespace umbraco.presentation
                                                                     receivedQuery.Length - ampPos - 1);
                                 }
                                 // get umbPage out of query string (9 = "&umbPage".Length() + 1)
-                                path = receivedQuery.Substring(9, ampPos - 9);
+                                path = receivedQuery.Substring(9, ampPos - 9); //this will fail if there are < 9 characters before the &umbPage query string
                             }
                             else
                             {

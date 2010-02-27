@@ -249,7 +249,7 @@ namespace {0} {{
                 if (dt.MasterContentType > 0)
                 {
                     var parent = DocTypes.First(d => d.Id == dt.MasterContentType);
-                    baseType = GenerateTypeName(dt.Alias);
+                    baseType = GenerateTypeName(parent.Alias);
                 }
 
                 sb.AppendLine(string.Format(INTERFACE_TEMPLATE,
@@ -318,7 +318,7 @@ namespace {0} {{
                 if (dt.MasterContentType > 0)
                 {
                     var parent = DocTypes.First(d => d.Id == dt.MasterContentType);
-                    baseType = GenerateTypeName(dt.Alias);
+                    baseType = GenerateTypeName(parent.Alias);
                 }
 
                 sb.Append(string.Format(CLASS_TEMPLATE,
@@ -476,6 +476,10 @@ namespace {0} {{
 
         private static string FormatForComment(string s)
         {
+            if (string.IsNullOrEmpty(s))
+            {
+                return s;
+            }
             return s.Replace("\r\n", "\r\n///");
         }
     }
