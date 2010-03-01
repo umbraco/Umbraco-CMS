@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using umbraco.uicontrols.TreePicker;
 using umbraco.interfaces;
+using System.Web.UI;
+using umbraco.presentation;
 
 namespace umbraco.editorControls
 {
@@ -44,7 +46,10 @@ namespace umbraco.editorControls
         {
             base.OnLoad(e);
 
-            if (!Page.IsPostBack)
+            //need to check if this is an async postback in live editing, because if it is, we need to set the value
+            if ((ScriptManager.GetCurrent(Page).IsInAsyncPostBack 
+                && UmbracoContext.Current.LiveEditingContext.Enabled)
+                || !Page.IsPostBack)
             {
                 ItemIdValue.Value = StoredItemId != -1 ? StoredItemId.ToString() : "";
             }
@@ -68,7 +73,6 @@ namespace umbraco.editorControls
 
         public void Save()
         {
-            //_text = helper.Request(this.ClientID);
             if (ItemIdValue.Value.Trim() != "")
                 _data.Value = ItemIdValue.Value.Trim();
             else

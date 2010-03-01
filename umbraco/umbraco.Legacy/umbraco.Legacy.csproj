@@ -84,6 +84,13 @@
     <Compile Include="umbraco\controls\CheckboxTree.cs" />
     <Compile Include="umbraco\controls\progressBar.cs" />
     <Compile Include="umbraco\controls\windowCloser.cs" />
+    <Compile Include="umbraco\dialogs\modalHolder.aspx.cs">
+      <DependentUpon>modalHolder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dialogs\modalHolder.aspx.designer.cs">
+      <DependentUpon>modalHolder.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\dialogs\paste.aspx.cs">
       <DependentUpon>paste.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -199,6 +206,7 @@
     <Content Include="umbraco\css\umbContext_background.gif" />
     <Content Include="umbraco\css\umbracoTabs.css" />
     <Content Include="umbraco\css\xtree.css" />
+    <Content Include="umbraco\dialogs\modalHolder.aspx" />
     <Content Include="umbraco\dialogs\paste.aspx" />
     <Content Include="umbraco\dialogs\editCell.aspx" />
     <Content Include="umbraco\dialogs\insertAnchor.aspx" />

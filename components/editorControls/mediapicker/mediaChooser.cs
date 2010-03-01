@@ -96,6 +96,7 @@ namespace umbraco.editorControls
         /// </summary>
         protected override void RenderJSComponents()
         {
+            base.RenderJSComponents();
 
             if (ScriptManager.GetCurrent(Page).IsInAsyncPostBack)
             {

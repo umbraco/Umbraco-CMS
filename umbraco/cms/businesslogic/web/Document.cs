@@ -58,23 +58,25 @@ namespace umbraco.cms.businesslogic.web
 	                {1}
                 ";
         private const string m_SQLOptimizedChildren = @"
-                  select 
-                  	count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, cmsDocument.templateId, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as published, umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId
-                  from umbracoNode 
-                  left join umbracoNode children on children.parentId = umbracoNode.id
-                  inner join cmsContent on cmsContent.nodeId = umbracoNode.id
-                  inner join cmsContentType on cmsContentType.nodeId = cmsContent.contentType
-                  inner join (select contentId, max(versionDate) AS versionDate from cmsContentVersion 
-                  			inner join umbracoNode on umbracoNode.id = cmsContentVersion.contentId and umbracoNode.parentId = @parentId
-                  			group by contentId) AS temp
-                  on temp.contentId = cmsContent.nodeId
-                  inner join cmsContentVersion on cmsContentVersion.contentId = temp.contentId and cmsContentVersion.versionDate = temp.versionDate
-                  inner join cmsDocument on cmsDocument.versionId = cmsContentversion.versionId
-                  left join cmsDocument publishCheck on publishCheck.nodeId = cmsContent.nodeID and publishCheck.published = 1
-                  where {0}
-                  group by umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, cmsDocument.templateId, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId
-                  order by {1}
-                  ";
+                select count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser,
+                    coalesce(cmsDocument.templateId, cmsDocumentType.templateNodeId) as templateId, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as published, umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId
+                from umbracoNode
+                left join umbracoNode children on children.parentId = umbracoNode.id
+                inner join cmsContent on cmsContent.nodeId = umbracoNode.id
+                inner join cmsContentType on cmsContentType.nodeId = cmsContent.contentType
+                inner join (select contentId, max(versionDate) AS versionDate from cmsContentVersion
+                            inner join umbracoNode on umbracoNode.id = cmsContentVersion.contentId and umbracoNode.parentId = @parentId
+                            group by contentId) AS temp
+                on temp.contentId = cmsContent.nodeId
+                inner join cmsContentVersion on cmsContentVersion.contentId = temp.contentId and cmsContentVersion.versionDate = temp.versionDate
+                inner join cmsDocument on cmsDocument.versionId = cmsContentversion.versionId
+                left join cmsDocument publishCheck on publishCheck.nodeId = cmsContent.nodeID and publishCheck.published = 1
+                left join cmsDocumentType on
+                    cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1
+                where {0}
+                group by umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, cmsDocument.templateId, cmsDocumentType.templateNodeId, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId
+                order by {1}
+                ";
 
         private const string m_SQLOptimizedForPreview = @"
                 select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsDocument.versionId, cmsPreviewXml.xml from cmsDocument
@@ -1245,7 +1247,7 @@ namespace umbraco.cms.businesslogic.web
                         , dr.GetString("description")
                         , masterContentType
                         , dr.GetInt("contentTypeId")
-                        ,dr.GetInt("templateId"));
+                        , dr.GetInt("templateId"));
                     tmp.Add(d);
                 }
             }

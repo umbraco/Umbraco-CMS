@@ -133,7 +133,7 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
             ItemUpdate latestUpdate = updates.GetLatest<ItemUpdate>(u => u.NodeId == item.GetParsedNodeId()
                                                                       && u.Field == item.Field);
             if (latestUpdate != null)
-                return latestUpdate.Data.ToString();
+                return latestUpdate.Data as string; //can't use ToString() as a null value will throw an exception
             else
                 return base.GetFieldContents(item);
         }

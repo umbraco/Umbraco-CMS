@@ -845,13 +845,6 @@
     <Compile Include="umbraco\dialogs\insertTable.aspx.designer.cs">
       <DependentUpon>insertTable.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\dialogs\modalHolder.aspx.cs">
-      <DependentUpon>modalHolder.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dialogs\modalHolder.aspx.designer.cs">
-      <DependentUpon>modalHolder.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco\dialogs\moveOrCopy.aspx.cs">
       <DependentUpon>moveOrCopy.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1848,7 +1841,6 @@
     <Content Include="umbraco\dialogs\importDocumenttype.aspx" />
     <Content Include="umbraco\dialogs\insertMacro.aspx" />
     <Content Include="umbraco\dialogs\insertTable.aspx" />
-    <Content Include="umbraco\dialogs\modalHolder.aspx" />
     <Content Include="umbraco\dialogs\moveOrCopy.aspx" />
     <Content Include="umbraco\dialogs\notifications.aspx" />
     <Content Include="umbraco\developer\Packages\installer.aspx" />
@@ -2801,7 +2793,6 @@
     <None Include="umbraco\schemas\umbraco.xsx">
       <DependentUpon>umbraco.xsd</DependentUpon>
     </None>
-    <Content Include="web.config" />
     <Content Include="config\UrlRewriting.config" />
   </ItemGroup>
   <ItemGroup>

@@ -46,12 +46,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     if (this.mainWindow().jQuery == null
                         || this.mainWindow().jQuery(".umbTree").length == 0
                         || this.mainWindow().jQuery(".umbTree").UmbracoTreeAPI() == null) {
-
-                        this._mainTree = $("<div id='falseTree' />").appendTo("body").hide().UmbracoTree({
-                            uiKeys: this.uiKeys(),
-                            jsonFullMenu: {},
-                            appActions: this.appActions()
-                        }).UmbracoTreeAPI();
+                        this._mainTree = null;
                     }
                     else {
                         this._mainTree = this.mainWindow().jQuery(".umbTree").UmbracoTreeAPI();

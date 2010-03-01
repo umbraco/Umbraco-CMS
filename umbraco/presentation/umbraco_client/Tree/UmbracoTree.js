@@ -9,13 +9,18 @@
 
 Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
+
+//TODO: The configuration properties need to be refactored.
+// we should have internal objects holding the properties instead of global class properties, this
+// will make it much easier to use $.extend to set the properties of this class from user properties.
+
 (function($) {
     $.fn.UmbracoTree = function(opts) {
         /// <summary>opts must have these properties: (* is required)
         ///         
-        /// *jsonFullMenu    :
-        /// *appActions    : A reference to a MenuActions object
-        /// *uiKeys : A reference to a uiKeys object
+        /// jsonFullMenu    : The tree menu, by default is empty
+        /// appActions    : A reference to a MenuActions object
+        /// deletingText : the txt to display when a node is deleting
         /// treeMode :determines the type of tree: false/null = normal, 'checkbox' = checkboxes enabled, 'inheritedcheckbox' = parent nodes have checks inherited from children
         /// *serviceUrl :Url path for the tree client service
         /// *dataUrl :Url path for the tree data service
@@ -33,9 +38,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         return this.each(function() {
 
             var conf = $.extend({
-                jsonFullMenu: null,
+                jsonFullMenu: {},
                 appActions: null,
-                uiKeys: null,
 
                 //These are all properties of the ITreeService and are
                 //used to pass the properties in to the InitAppTreeData service
@@ -50,9 +54,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 treeMode: "standard",
                 umbClientFolderRoot: "/umbraco_client", //default setting... this gets overriden.
                 recycleBinId: -20, //default setting for content tree
-                serviceUrl: "", //if these aren't set, nothing will work
-                dataUrl: "" //if these arent' set, nothing will work
+                serviceUrl: "", //if not set, no async calls are made, the tree won't work
+                dataUrl: "" //if not set, no async calls are made, the tree won't work
             }, opts);
+
             new Umbraco.Controls.UmbracoTree().init($(this), conf);
         });
     };
@@ -82,10 +87,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _activeTreeType: "content", //tracks which is the active tree type, this is used in searching and syncing.
             _recycleBinId: -20,
             _umbClientFolderRoot: "/umbraco_client", //this should be set externally!!!
-            _fullMenu: null,
+            _fullMenu: {},
             _appActions: null,
             _tree: null, //reference to the jsTree object
-            _uiKeys: null,
+            _deletingText: "...",
             _app: null, //the reference to the current app
             _showContext: true,
             _isDialog: false,
@@ -120,7 +125,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 this._fullMenu = conf.jsonFullMenu;
                 this._appActions = conf.appActions;
-                this._uiKeys = conf.uiKeys;
+                this._deletingText = conf.deletingText;
                 this._treeMode = conf.treeMode;
                 this._serviceUrl = conf.serviceUrl;
                 this._dataUrl = conf.dataUrl;
@@ -190,7 +195,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this.rebuildTree(app);
 
                 this._debug("Edit mode. New Mode: " + this._tree.settings.rules.draggable);
-                this._appActions.showSpeachBubble("info", "Tree Edit Mode", "The tree is now operating in edit mode");
+                if (this._appActions)
+                    this._appActions.showSpeachBubble("info", "Tree Edit Mode", "The tree is now operating in edit mode");
             },
 
             refreshTree: function() {
@@ -552,7 +558,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 //show the ajax loader with deleting text
                 this._actionNode.jsNode.find("a").attr("class", "loading");
                 this._actionNode.jsNode.find("a").css("background-image", "");
-                this._actionNode.jsNode.find("a").html(this._uiKeys['deleting']);
+                this._actionNode.jsNode.find("a").html(this._deletingText);
             },
 
             onNodeDeleted: function(EV) {
@@ -560,12 +566,17 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 this._debug("onNodeDeleted");
 
+                var nodeToDel = this._actionNode.jsNode;
+
                 //remove the ajax loader
-                this._actionNode.jsNode.find("a").removeClass("loading");
+                nodeToDel.find("a").removeClass("loading");
                 //ensure the branch is closed
-                this._tree.close_branch(this._actionNode.jsNode);
+                this._tree.close_branch(nodeToDel);
                 //make the node disapear
-                this._actionNode.jsNode.hide("drop", { direction: "down" }, 400);
+                nodeToDel.hide("drop", { direction: "down" }, 400, function() {
+                    //remove the node from the DOM
+                    nodeToDel.remove();
+                });
 
                 this._updateRecycleBin();
             },
@@ -697,7 +708,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     case "inside":
                         if (nodeParentDef.nodeId == refNodeDef.nodeId) {
                             //moving to the same node!
-                            this._appActions.showSpeachBubble("warning", "Tree Edit Mode", "Cannot move a node to it's same parent node");
+                            if (this._appActions)
+                                this._appActions.showSpeachBubble("warning", "Tree Edit Mode", "Cannot move a node to it's same parent node");
                             return false;
                         }
                         //check move permissions, then attempt move
@@ -732,7 +744,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             },
 
             _debug: function(strMsg) {
-                if (this._isDebug) {
+                if (this._isDebug && Sys && Sys.Debug) {
                     Sys.Debug.trace("UmbracoTree: " + strMsg);
                 }
             },
@@ -799,6 +811,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             },
 
             _updateRecycleBin: function() {
+                /// <summary>Generally used for when a node is deleted. This will set the actionNode to the recycle bin node and force a refresh of it's children</summary>
                 this._debug("_updateRecycleBin BinId: " + this._recycleBinId);
 
                 var rNode = this.findNode(this._recycleBinId, true);
@@ -1029,11 +1042,18 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     options.plugins.checkbox = { three_state: false }
                 }
 
+                //if there's no service URL, then disable ajax requests
+                if (this._serviceUrl == "" || this._dataUrl == "") {
+                    options.data.async = false;
+                    options.data.opts.static = {};
+                }
+
                 //set global ajax settings:
                 $.ajaxSetup({
                     contentType: "application/json; charset=utf-8"
                 });
 
+                this._debug("_getInitOptions. Async enabled = " + options.data.async);
 
                 return options;
             }

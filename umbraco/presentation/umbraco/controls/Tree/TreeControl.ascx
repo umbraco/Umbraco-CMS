@@ -32,9 +32,8 @@ jQuery(document).ready(function() {
     //create the javascript tree
     jQuery("#<%=ClientID%>").UmbracoTree({
         jsonFullMenu: ctxMenu,
-        //jsonInitNode: initNode,
         appActions: UmbClientMgr.appActions(),
-        uiKeys: UmbClientMgr.uiKeys(),
+        deletingText: '<%=umbraco.ui.GetText("deleting")%>',
         app: app,
         showContext: showContext,
         isDialog: isDialog,
@@ -47,12 +46,15 @@ jQuery(document).ready(function() {
         dataUrl: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/webservices/TreeDataService.ashx",
         serviceUrl: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/webservices/TreeClientService.asmx/GetInitAppTreeData"});
         
-    //add event handler for ajax errors, this will refresh the whole application
-    UmbClientMgr.mainTree().addEventHandler("ajaxError", function(e) {
-        if (e.msg == "rebuildTree") {
-	        UmbClientMgr.mainWindow("umbraco.aspx");
-        }
-    });
+     //add event handler for ajax errors, this will refresh the whole application
+    var mainTree = UmbClientMgr.mainTree();
+    if (mainTree != null) {
+        mainTree.addEventHandler("ajaxError", function(e) {
+            if (e.msg == "rebuildTree") {
+	            UmbClientMgr.mainWindow("umbraco.aspx");
+            }
+        });
+    }
 	
 });	
 
