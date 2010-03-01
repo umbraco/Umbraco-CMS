@@ -18,6 +18,16 @@ namespace umbraco.presentation
             m_Server = server;
         }
 
+        /// <summary>
+        /// Returns the physical file path that corresponds to the specified virtual path on the Web server.
+        /// </summary>
+        /// <param name="path">The virtual path of the Web server.</param>
+        /// <returns>
+        /// The physical file path that corresponds to <paramref name="path"/>.
+        /// </returns>
+        /// <exception cref="T:System.Web.HttpException">
+        /// The current <see cref="T:System.Web.HttpContext"/> is null.
+        /// </exception>
         public override string MapPath(string path)
         {
             return IOHelper.MapPath(path);
@@ -39,11 +49,15 @@ namespace umbraco.presentation
             }
         }
 
+        /// <summary>
+        /// Gets the Umbraco XML cache
+        /// </summary>
+        /// <value>The content XML.</value>
         public XDocument ContentXml
         {
             get
             {
-                return XDocument.Load(this.ContentXmlPath);
+                return XDocument.Load(this.MapPath(this.ContentXmlPath));
             }
         }
 
