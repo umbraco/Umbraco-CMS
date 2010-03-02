@@ -14,7 +14,7 @@ namespace umbraco
     {
         // TODO: Remove for launch
         public const string TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME = ""; // "children";
- 
+
         /// <summary>
         /// Gets the umbraco settings document.
         /// </summary>
@@ -23,7 +23,7 @@ namespace umbraco
         {
             get
             {
-                XmlDocument us = (XmlDocument) HttpRuntime.Cache["umbracoSettingsFile"];
+                XmlDocument us = (XmlDocument)HttpRuntime.Cache["umbracoSettingsFile"];
                 if (us == null)
                     us = ensureSettingsDocument();
                 return us;
@@ -50,6 +50,10 @@ namespace umbraco
                     HttpRuntime.Cache.Insert("umbracoSettingsFile", temp,
                                              new CacheDependency(_path + _filename));
                 }
+                catch (XmlException e)
+                {
+                    throw new XmlException("Your umbracoSettings.config file fails to pass as valid XML. Refer to the InnerException for more information", e);
+                }
                 catch (Exception e)
                 {
                     Log.Add(LogTypes.Error, new User(0), -1, "Error reading umbracoSettings file: " + e.ToString());
@@ -58,7 +62,7 @@ namespace umbraco
                 return temp;
             }
             else
-                return (XmlDocument) settingsFile;
+                return (XmlDocument)settingsFile;
         }
 
         private static void save()
@@ -112,23 +116,28 @@ namespace umbraco
         /// Gets a value indicating whether logging is enabled in umbracoSettings.config (/settings/logging/enableLogging).
         /// </summary>
         /// <value><c>true</c> if logging is enabled; otherwise, <c>false</c>.</value>
-        public static bool EnableLogging {
-            get {
+        public static bool EnableLogging
+        {
+            get
+            {
                 // We return true if no enable logging element is present in 
                 // umbracoSettings (to enable default behaviour when upgrading)
                 string m_EnableLogging = GetKey("/settings/logging/enableLogging");
                 if (String.IsNullOrEmpty(m_EnableLogging))
                     return true;
                 else
-                    return bool.Parse(m_EnableLogging); }
+                    return bool.Parse(m_EnableLogging);
+            }
         }
 
         /// <summary>
         /// Gets a value indicating whether logging happens async.
         /// </summary>
         /// <value><c>true</c> if async logging is enabled; otherwise, <c>false</c>.</value>
-        public static bool EnableAsyncLogging {
-            get {
+        public static bool EnableAsyncLogging
+        {
+            get
+            {
                 string value = GetKey("/settings/logging/enableAsyncLogging");
                 bool result;
                 if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
@@ -184,7 +193,8 @@ namespace umbraco
         /// Gets the disabled log types.
         /// </summary>
         /// <value>The disabled log types.</value>
-        public static XmlNode DisabledLogTypes {
+        public static XmlNode DisabledLogTypes
+        {
             get { return GetKeyAsNode("/settings/logging/disabledLogTypes"); }
         }
 
@@ -201,14 +211,19 @@ namespace umbraco
         /// Gets a value indicating whether umbraco will use domain prefixes.
         /// </summary>
         /// <value><c>true</c> if umbraco will use domain prefixes; otherwise, <c>false</c>.</value>
-        public static bool UseDomainPrefixes {
-            get {
-                try {
+        public static bool UseDomainPrefixes
+        {
+            get
+            {
+                try
+                {
                     bool result;
                     if (bool.TryParse(GetKey("/settings/requestHandler/useDomainPrefixes"), out result))
                         return result;
                     return false;
-                } catch {
+                }
+                catch
+                {
                     return false;
                 }
             }
@@ -218,14 +233,19 @@ namespace umbraco
         /// Gets a value indicating whether umbraco will use ASP.NET MasterPages for rendering instead of its propriatary templating system.
         /// </summary>
         /// <value><c>true</c> if umbraco will use ASP.NET MasterPages; otherwise, <c>false</c>.</value>
-        public static bool UseAspNetMasterPages {
-            get {
-                try {
+        public static bool UseAspNetMasterPages
+        {
+            get
+            {
+                try
+                {
                     bool result;
                     if (bool.TryParse(GetKey("/settings/templates/useAspNetMasterPages"), out result))
                         return result;
                     return false;
-                } catch {
+                }
+                catch
+                {
                     return false;
                 }
             }
@@ -270,7 +290,8 @@ namespace umbraco
         /// <value>The encoding type as string.</value>
         public static string TidyCharEncoding
         {
-            get {
+            get
+            {
                 string encoding = GetKey("/settings/content/TidyCharEncoding");
                 if (String.IsNullOrEmpty(encoding))
                 {
@@ -289,8 +310,9 @@ namespace umbraco
             get { return GetKey("/settings/content/PropertyContextHelpOption").ToLower(); }
         }
 
-        public static string DefaultBackofficeProvider {
-            get 
+        public static string DefaultBackofficeProvider
+        {
+            get
             {
                 string defaultProvider = GetKey("/settings/providers/users/DefaultBackofficeProvider");
                 if (String.IsNullOrEmpty(defaultProvider))
@@ -495,11 +517,16 @@ namespace umbraco
         /// All packages installed from a repository gets the repository alias included in the install information
         /// </summary>
         /// <value>The repository servers.</value>
-        public static XmlNode Repositories {
-            get {
-                try {
+        public static XmlNode Repositories
+        {
+            get
+            {
+                try
+                {
                     return GetKeyAsNode("/settings/repositories");
-                } catch {
+                }
+                catch
+                {
                     return null;
                 }
             }
