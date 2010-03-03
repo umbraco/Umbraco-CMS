@@ -184,47 +184,33 @@ html {
 
 /****************************************************************/
 
-.modalBackground {
-	background-color:Gray !important;
-	filter:alpha(opacity=70) !important;
-	opacity:0.7 !important;
-}
-
-.modal {
-	background-color: #fff !important;
-	border:5px solid #CAC9C9 !important;
-	font-family:Arial, Verdana !important;
-	font-size: medium !important;
-	padding:0px !important;
-	width:500px !important;
-	min-height: 250px !important;
-	font-size: 11px !Important;
-}
-
-.modaltitle {
-	padding: 0px !important;
-	margin: 0px !important;
-	height: 14px !important;
-	width: 493px !important;
-	background-image: url(../../../umbraco_client/modal/modalGradiant.gif) !important;
-	color: #378080 !important;
-	border-bottom: 1px solid #CCCCCC !Important;
-}
-
-.modalcontent {
-	padding: 5px !important;
-}
-
-.modal h1 {
+.umbModalBox h1 
+{
 	font-size: larger !important;
 }
 
-.modal h2 {
+.umbModalBox h2 
+{
 	font-size: medium !important;
 }
 
-.modalcontent label{padding-bottom: 2px !Important; display: block !Important; color: #999 !Important; }
+.umbModalBox label 
+{
+	padding-bottom: 2px !Important; 
+	display: block !Important; 
+	color: #666 !Important; 
+	font-family:Trebuchet MS,Lucida Grande,verdana,arial ! important;
+}
  
-.modal p {
-	font-size: small !important;
+.umbModalBox p 
+{
+	font-size: 12px !important;
+	font-family:Trebuchet MS,Lucida Grande,verdana,arial ! important;
+	color:Black ! important;
+	margin-bottom:5px;
+}
+
+.umbModalBox p select
+{
+	margin-bottom:10px ! important;
 }

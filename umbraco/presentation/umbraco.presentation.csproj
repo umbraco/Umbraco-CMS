@@ -447,10 +447,6 @@
       <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\controls\dualSelectBox.cs" />
-    <Compile Include="umbraco\controls\Extenders\CustomDragDropDesigner.cs" />
-    <Compile Include="umbraco\controls\Extenders\CustomDragDropExtender.cs" />
-    <Compile Include="umbraco\controls\Extenders\CustomFloatingBehaviorDesigner.cs" />
-    <Compile Include="umbraco\controls\Extenders\CustomFloatingBehaviorExtender.cs" />
     <Compile Include="umbraco\controls\GenericProperties\GenericProperty.ascx.cs">
       <DependentUpon>GenericProperty.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1486,8 +1482,6 @@
     <Content Include="web.config.SHOCKING.xslt" />
     <Content Include="web.config.UMBRACOTOSH.xslt" />
     <Content Include="umbraco\controls\ContentTypeControlNew.ascx" />
-    <Content Include="umbraco\controls\Extenders\CustomDragDropBehavior.js" />
-    <Content Include="umbraco\controls\Extenders\CustomFloatingBehavior.js" />
     <Content Include="umbraco\controls\GenericProperties\GenericProperty.ascx" />
     <Content Include="umbraco\create\DLRScripting.ascx" />
     <Content Include="umbraco\images\umbraco\developerRuby.gif" />

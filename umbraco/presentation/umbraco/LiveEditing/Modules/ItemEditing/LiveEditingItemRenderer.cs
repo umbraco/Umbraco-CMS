@@ -94,12 +94,7 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
                 }
                 catch{}
 
-                // hook the click event with by attribute in IE,
-                // as this is the only way to make it work using custom tags
-                if (item.Page.Request.Browser.IsBrowser("IE"))
-                {
-                    writer.AddAttribute("onclick", "umbraco.presentation.LiveEditing.ItemFunctions.prototype.click()");
-                }
+         
                 writer.RenderBeginTag(LiveEditingMarkerTag);
             }
 

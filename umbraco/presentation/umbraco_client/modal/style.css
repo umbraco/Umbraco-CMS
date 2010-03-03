@@ -1,7 +1,7 @@
 ﻿/* TODO: Change these to classes to support many modal boxes */
 
-#umbModalBox, 
-.umbModalBox {
+div#umbModalBox, 
+div.umbModalBox {
 	position: absolute;
 	top: 0;
 	border: 5px #a3a3a3 solid;
@@ -9,36 +9,37 @@
 	text-align: left;
 	z-index: 10000;
 	display: none;
-	background: #fff;
+	background: #fff ! important;
 	font: bold 100% "Lucida Grande", Arial, sans-serif;
 }
 
-#umbModalBox.loaded, 
-.umbModalBox.loaded
-{
+div#umbModalBox.loaded, 
+div.umbModalBox.loaded
+{ 
 	background-image: none;
 }
 
 .jqmOverlay {background: url(modalBackground.gif)}
 
-#umbModalBoxHeader, 
-.umbModalBoxHeader {
+div#umbModalBoxHeader, 
+div.umbModalBoxHeader {
 	margin: 0;
-  text-shadow: #FFF 0 1px 0;
+	text-shadow: #FFF 0 1px 0;
 	padding: .5em 2em .5em .75em;
 	margin: 0;
 	text-align: left;
 }
 
-#umbModalBoxContent, 
-.umbModalBoxContent {
+div#umbModalBoxContent, 
+div.umbModalBoxContent {
 	padding: 0px;
 	overflow: hidden;
-	height: 100%;
+	/*height: 100%;*/
+	background: #fff ! important;
 }
 
-#umbracModalBoxClose, 
-.umbracModalBoxClose {
+a#umbracModalBoxClose, 
+a.umbracModalBoxClose {
 	display: block;
 	position: absolute;
 	right: 5px; top: 2px;
@@ -48,19 +49,19 @@
 	font-size: 13px;
 }
 
-#umbModalBoxContent, 
-.umbModalBoxContent {border-top: 1px solid #F9F9F9; }
+div#umbModalBoxContent, 
+div.umbModalBoxContent {border-top: 1px solid #F9F9F9; }
 
-#umbModalBoxHeader, 
-.umbModalBoxHeader {
-  background: url(modalGradiant.gif) repeat-x bottom #fff;
+div#umbModalBoxHeader, 
+div.umbModalBoxHeader {
+  background: url(modalGradiant.gif) repeat-x bottom #fff ! important;
   border-bottom: 1px solid #CCC;
   color: #378080;
   cursor:move;
 }
 
-#umbracModalBoxClose, 
-.umbracModalBoxClose { color: #777 }
+div#umbracModalBoxClose, 
+div.umbracModalBoxClose { color: #777 }
 
-#umbracModalBoxClose:hover, 
-.umbracModalBoxClose:hover { color: #000 }
+div#umbracModalBoxClose:hover, 
+div.umbracModalBoxClose:hover { color: #000 }

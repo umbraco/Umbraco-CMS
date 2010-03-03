@@ -45,7 +45,7 @@
     <cc1:Pane ID="pane_chooseNode" runat="server" Style="overflow: auto; height: 250px;">
         <umbraco:TreeControl runat="server" ID="JTree" App='<%#umbraco.helper.Request("app") %>'
             IsDialog="true" DialogMode="id" ShowContextMenu="false" FunctionToCall="dialogHandler"
-            Height="250"></umbraco:TreeControl>
+            Height="230"></umbraco:TreeControl>
     </cc1:Pane>
     <asp:Panel runat="server" ID="panel_buttons">
         <cc1:Feedback runat="server" ID="PageNameHolder" type="notice" Style="margin-top: 10px;"

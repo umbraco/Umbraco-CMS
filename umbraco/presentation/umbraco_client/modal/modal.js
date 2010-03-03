@@ -13,13 +13,64 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         return $(this).data("ModalWindowAPI") == null ? null : $(this).data("ModalWindowAPI");
     };
 
+    $.fn.ModalWindowShow = function(name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback) {
+        return $(this).each(function() {
+            //check if the modal exists already
+            if ($(this).closest(".umbModalBox").length) {
+                var api = $(this).closest(".umbModalBox").ModalWindowAPI();
+                api._obj.jqmShow(); //since it exist, just re-show it
+            }
+            else {
+                var modal = Umbraco.Controls.ModalWindow();
+                modal.show(this, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback);
+            }            
+        });
+    };
+
     Umbraco.Controls.ModalWindow = function() {
         /// <summary>Modal window class, when open is called, it will create a temporary html element to attach the window to</summary>
         return {
             _wId: Umbraco.Utils.generateRandom().toString().replace(".", ""), //the modal window ID that will be assigned
             _obj: null, //the jquery element for the modal window
             _rVal: null, //a return value specified when closing that gets passed to the onCloseCallback method
+
+            show: function(selector, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback) {
+                //check if the modal elems exist
+                if (!this._modalElemsExist()) {
+                    this._createModalElems(false, selector);
+                }
+
+                this._open(name, showHeader,
+                    width, height, top, leftOffset,
+                    closeTriggers, onCloseCallback,
+                    function(h) {
+                        //insert the content
+                        var umbModal = $(h.w);
+                        var umbModalContent = $(".umbModalBoxContent", umbModal);
+                        umbModalContent.append($(selector));
+                        $(selector).show();
+                    });
+            },
             open: function(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback) {
+                //check if the modal elems exist
+                if (!this._modalElemsExist()) {
+                    this._createModalElems(true);
+                }
+                var _this = this;
+                this._open(name, showHeader,
+                    width, height, top, leftOffset,
+                    closeTriggers, onCloseCallback,
+                    function(h) {
+                        //get the iframe, and set the url
+                        var umbModal = $(h.w);
+                        var umbModalContent = $("iframe", umbModal);
+                        umbModalContent.html('').attr('src', _this._getUniqueUrl(url));
+                        umbModalContent.width(width);
+                        umbModalContent.height(showHeader ? height - 30 : height);
+                        umbModalContent.show();
+                    });
+            },
+            _open: function(name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback, onCreate) {
                 /// <summary>Opens a modal window</summary>
                 /// <param name="top">Optional</param>
                 /// <param name="leftOffset">Optional</param>
@@ -35,21 +86,12 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// outVal = the value passed to the close window method that was used to close the window (if it was specified)
                 /// <returns>The generated jquery object bound to the modal window</returns>
 
-                //check if the modal elems exist
-                if (!this._modalElemsExist()) {
-                    this._createModalElems();
-                }
-
                 var _this = this;
 
                 this._obj.jqm({
 
                     onShow: function(h) {
                         var umbModal = $(h.w);
-                        var umbModalContent = $("iframe", umbModal);
-
-                        umbModalContent.width(width);
-                        umbModalContent.height(showHeader ? height - 30 : height);
 
                         //remove the header if it shouldn't be shown
                         if (!showHeader) {
@@ -80,10 +122,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                             umbModal.css("left", newLeft);
                         }
 
-                        umbModalContent.html('').attr('src', _this._getUniqueUrl(url));
-
                         umbModal.show();
-                        umbModalContent.show();
+
+                        if (typeof onCreate == "function") {
+                            onCreate.call(_this, h)
+                        }
 
                         $(document).keyup(function(event) {
                             if (event.keyCode == 27 && umbModal.css("display") == "block") {
@@ -99,17 +142,22 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     },
                     onHide: function(h) {
                         var umbModal = $(h.w);
-                        var umbModalContent = $("iframe", umbModal);
+                        var umbModalContent = $(".umbModalBoxContent", umbModal);
+                        var iframe = umbModalContent.find("iframe");
                         if (typeof onCloseCallback == "function") {
                             //call the callback if specified, pass the jquery content object as a param and the output value array
-                            var e = { modalContent: umbModalContent, outVal: _this._rVal };
+                            //pass the iframe if there is one
+                            var e = { modalContent: iframe.length > 0 ? iframe : umbModalContent, outVal: _this._rVal };
                             onCloseCallback.call(_this, e);
                         }
                         h.w.hide();
                         h.o.remove();
-                        umbModalContent.hide();
-                        umbModalContent.html('').attr('src', '');
-                        _this.close();
+                        //remove any iframes that might be in there
+                        if (iframe.length > 0) {
+                            umbModalContent.hide();
+                            umbModalContent.html('').attr('src', '');
+                            _this.close();
+                        }
                     }
                 });
 
@@ -127,35 +175,53 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._obj.remove();
                 return false;
             },
-            _createModalElems: function() {
+            _createModalElems: function(withIFrame, selector) {
                 /// <summary>This will create the html elements required for the modal overlay if they do not already exist in the DOM</summary>
 
-                var overlayHtml = "<div id=\"" + this._wId + "_modal\" class=\"umbModalBox\">" +
-		            "<div class=\"umbModalBoxHeader\"></div><a href=\"#\" class=\"umbracModalBoxClose jqmClose\">&times;</a>" +
-		            "<div class=\"umbModalBoxContent\"><iframe frameborder=\"0\" class=\"umbModalBoxIframe\" src=\"\"></iframe></div>" +
-	                "</div>";
-
-                this._obj = $(overlayHtml).appendTo("body");
+                var overlayHtml = this._getOverlayHtml(withIFrame);
+                //create the modal dialog in the root if no selector, otherwise create at parent
+                //of selector
+                if (!selector) {
+                    this._obj = $(overlayHtml).appendTo("body");
+                }
+                else {
+                    this._obj = $(overlayHtml).appendTo($(selector).parent());
+                }
 
                 var _this = this;
-                if ($.fn.draggable) this._obj.draggable({
-                    cursor: 'move',
-                    distance: 5,
-                    iframeFix: true,
-                    helper: function(event) {
-                        var o = $(this).clone();
-                        o.children().remove();
-                        o.css("border-width", "1px");
-                        return o;
-                    },
-                    start: function(event, ui) {
-                        ui.helper.css("z-index", 20000);
-                    },
-                    stop: function(event, ui) {
-                        _this._obj.css("top", ui.absolutePosition.top);
-                        _this._obj.css("left", ui.absolutePosition.left);
-                    }
-                });
+                if ($.fn.draggable) {
+                    this._obj.draggable({
+                        cursor: 'move',
+                        distance: 5,
+                        iframeFix: withIFrame,
+                        helper: function(event) {
+                            var o = $(this).clone();
+                            o.children().remove();
+                            o.css("border-width", "1px");
+                            return o;
+                        },
+                        start: function(event, ui) {
+                            ui.helper.css("z-index", 20000);
+                        },
+                        stop: function(event, ui) {
+                            _this._obj.css("top", ui.absolutePosition.top);
+                            _this._obj.css("left", ui.absolutePosition.left);
+                        }
+                    });
+                }
+                else {
+                    this._obj.find(".umbModalBoxHeader").css("cursor", "default"); //remove the move cursor if we can't move
+                }
+            },
+            _getOverlayHtml: function(withIFrame) {
+                var overlayHtml = "<div id=\"" + this._wId + "_modal\" class=\"umbModalBox\">" +
+		            "<div class=\"umbModalBoxHeader\"></div><a href=\"#\" class=\"umbracModalBoxClose jqmClose\">&times;</a>" +
+		            "<div class=\"umbModalBoxContent\">";
+                if (withIFrame) {
+                    overlayHtml += "<iframe frameborder=\"0\" class=\"umbModalBoxIframe\" src=\"\"></iframe>";
+                }
+                overlayHtml += "</div></div>";
+                return overlayHtml;
             },
             _modalElemsExist: function() {
                 return ($("#" + this._wId + "_modal").length > 0);

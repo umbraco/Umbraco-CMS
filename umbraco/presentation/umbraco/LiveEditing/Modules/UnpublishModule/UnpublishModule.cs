@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using AjaxControlToolkit;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.LiveEditing.Controls;
 using umbraco.BusinessLogic.Actions;
@@ -9,18 +8,15 @@ using ClientDependency.Core;
 using umbraco.IO;
 namespace umbraco.presentation.LiveEditing.Modules.UnpublishModule
 {
-	[ClientDependency(200, ClientDependencyType.Javascript, "LiveEditing/Modules/UnpublishModule/UnpublishModule.js", "UmbracoRoot")]
+    [ClientDependency(200, ClientDependencyType.Javascript, "LiveEditing/Modules/UnpublishModule/UnpublishModule.js", "UmbracoRoot")]
     public class UnpublishModule : BaseModule
     {
-         //protected const string UnpublishModuleScriptFile = "{0}/LiveEditing/Modules/UnpublishModule/UnpublishModule.js";
+        protected ImageButton m_UnpublishButton;
 
-         protected ImageButton m_UnpublishButton = new ImageButton();
+        protected Panel m_UnpublishModal;
 
-         protected Panel m_UnpublishModal = new Panel();
-         protected ModalPopupExtender m_UnpublishModalExtender = new ModalPopupExtender();
-
-        protected Button m_ConfirmDeleteButton = new Button();
-        protected Button m_CancelDeleteButton = new Button();
+        protected Button m_ConfirmUnpublishButton;
+        protected Button m_CancelDeleteButton;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnpublishModule"/> class.
@@ -34,59 +30,51 @@ namespace umbraco.presentation.LiveEditing.Modules.UnpublishModule
         /// Raises the <see cref="E:System.Web.UI.Control.Init"/> event.
         /// </summary>
         /// <param name="e">An <see cref="T:System.EventArgs"/> object that contains the event data.</param>
-         protected override void OnInit(EventArgs e)
+        protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
             EnsureChildControls();
 
         }
 
-         /// <summary>
-         /// Called by the ASP.NET page framework to notify server controls that use composition-based implementation to create any child controls they contain in preparation for posting back or rendering.
-         /// </summary>
+        /// <summary>
+        /// Called by the ASP.NET page framework to notify server controls that use composition-based implementation to create any child controls they contain in preparation for posting back or rendering.
+        /// </summary>
         protected override void CreateChildControls()
         {
             base.CreateChildControls();
 
-            Controls.Add(m_UnpublishButton);
+            m_UnpublishModal = new Panel();
+            m_UnpublishModal.ID = "LeUnpublishModal";
+            m_UnpublishModal.Attributes.Add("Style", "display: none");
+
+            m_CancelDeleteButton = new Button();
+            m_CancelDeleteButton.ID = "CancelUnpublish";
+            m_CancelDeleteButton.Text = ui.GetText("cancel");
+            m_CancelDeleteButton.CssClass = "modalbuton";
+
+            m_ConfirmUnpublishButton = new Button();
+            m_ConfirmUnpublishButton.Text = ui.GetText("ok");
+            m_ConfirmUnpublishButton.ID = "LeUnpublishModalConfirm";
+            m_ConfirmUnpublishButton.CssClass = "modalbuton";
+            m_ConfirmUnpublishButton.OnClientClick = "UnpublishModuleOk();";
+
+            m_UnpublishModal.Controls.Add(new LiteralControl("<p>" + ui.GetText("areyousure") + "</p>"));
+            m_UnpublishModal.Controls.Add(m_ConfirmUnpublishButton);
+            m_UnpublishModal.Controls.Add(new LiteralControl("&nbsp;"));
+            m_UnpublishModal.Controls.Add(m_CancelDeleteButton);
+
+            Controls.Add(m_UnpublishModal);
+
+            m_UnpublishButton = new ImageButton();
             m_UnpublishButton.ID = "LeUnpublishButton";
             m_UnpublishButton.CssClass = "button";
             m_UnpublishButton.ToolTip = "Unpublish";
             m_UnpublishButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/UnpublishModule/unpublish.png", SystemDirectories.Umbraco);
             m_UnpublishButton.Visible = UmbracoContext.Current.HasPermission(ActionUnPublish.Instance.Letter);
+            m_UnpublishButton.OnClientClick = "jQuery('#" + m_UnpublishModal.ClientID + @"').ModalWindowShow('" + ui.GetText("unPublish") + "',true,300,200,50,0, ['.modalbuton'], null);return false;";
 
-            Controls.Add(m_UnpublishModal);
-            m_UnpublishModal.ID = "LeUnpublishModal";
-            m_UnpublishModal.CssClass = "modal";
-            m_UnpublishModal.Width = 300;
-            m_UnpublishModal.Attributes.Add("Style", "display: none");
-
-            m_UnpublishModal.Controls.Add(new LiteralControl("<div class='modaltitle'>Unpublish Page </div>"));
-            m_UnpublishModal.Controls.Add(new LiteralControl("<div class='modalcontent'><p>Are you sure you want to unpublish this page? </p>"));
-
-            m_UnpublishModal.Controls.Add(m_ConfirmDeleteButton);
-            m_UnpublishModal.Controls.Add(new LiteralControl("&nbsp;"));
-            m_UnpublishModal.Controls.Add(m_CancelDeleteButton);
-
-            m_ConfirmDeleteButton.Text = "Ok";
-            m_ConfirmDeleteButton.ID = "LeUnpublishModalConfirm";
-            m_ConfirmDeleteButton.CssClass = "modalbuton";
-      
-            m_CancelDeleteButton.Text = "Cancel";
-            m_CancelDeleteButton.CssClass = "modalbuton";
-
-            Controls.Add(m_UnpublishModalExtender);
-            m_UnpublishModalExtender.ID = "ModalUnpublish";
-            m_UnpublishModalExtender.TargetControlID = m_UnpublishButton.ID;
-            m_UnpublishModalExtender.PopupControlID = m_UnpublishModal.ID;
-            m_UnpublishModalExtender.BackgroundCssClass = "modalBackground";
-            m_UnpublishModalExtender.OkControlID = m_ConfirmDeleteButton.ID;
-            m_UnpublishModalExtender.CancelControlID = m_CancelDeleteButton.ID;
-            m_UnpublishModalExtender.OnOkScript = string.Format("UnpublishModuleOk()");
-
-            m_UnpublishModal.Controls.Add(new LiteralControl("</div>"));
-
-            //ScriptManager.RegisterClientScriptInclude(this, GetType(), UnpublishModuleScriptFile, String.Format(UnpublishModuleScriptFile, umbraco.IO.SystemDirectories.Umbraco));
+            Controls.Add(m_UnpublishButton);
         }
 
 

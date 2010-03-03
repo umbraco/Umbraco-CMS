@@ -19,19 +19,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 return $("#" + this._itemIdValueClientID).val();
             },
 
-            LaunchPicker: function(e) {
+            LaunchPicker: function() {
                 var _this = this;
                 UmbClientMgr.openModalWindow(this._itemPickerUrl, this._label, this._showHeader, this._width, this._height, 30, 0, ['#cancelbutton'], function(e) { _this.SaveSelection(e); });
-                
-                var aBetterEventObject = jQuery.Event(e);
-                // Now you can do what you want: (Cross-browser)
-                aBetterEventObject.preventDefault()
-                aBetterEventObject.isDefaultPrevented()
-                aBetterEventObject.stopPropagation()
-                aBetterEventObject.isPropagationStopped()
-                aBetterEventObject.stopImmediatePropagation()
-                aBetterEventObject.isImmediatePropagationStopped()
-                return false;
             },
 
             SaveSelection: function(e) {

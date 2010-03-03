@@ -44,7 +44,7 @@
         function uploadHandler(e) {
             dialogHandler(e.id);
             //get the tree object for the chooser and refresh
-            var tree = jQuery("#treeContainer").UmbracoTreeAPI();
+            var tree = jQuery("#<%=DialogTree.ClientID%>").UmbracoTreeAPI();
             tree.refreshTree();
         }
 

@@ -14,12 +14,14 @@ umbraco.presentation.LiveEditing.ItemEditing = function() {
     this._editControl = null;
     this._submitControl = null;
 
-    var itemEditingInternal = this;
+    var _this = this;
     Sys.Debug.trace("Constructor, before init load");
-    if (jQuery.browser.msie && !this._inited) {
-        itemEditingInternal.init();
+    if (!this._inited) {
+        _this.init();
     }
-    Sys.Application.add_load(function() { itemEditingInternal.init() });
+    Sys.Application.add_load(function() {
+        _this.init();
+    });
     Sys.Debug.trace("Constructor, after init load");
 
 }
@@ -35,9 +37,9 @@ umbraco.presentation.LiveEditing.ItemEditing.prototype = {
 
             this.itemsEnable();
 
-
-            LiveEditingToolbar.add_save(function(sender, args) { ItemEditing.delaySaveWhenEditing(args, "save"); });
-            LiveEditingToolbar.add_saveAndPublish(function(sender, args) { ItemEditing.delaySaveWhenEditing(args, "saveAndPublish"); });
+            var _this = this;
+            LiveEditingToolbar.add_save(function(sender, args) { _this.delaySaveWhenEditing(args, "save"); });
+            LiveEditingToolbar.add_saveAndPublish(function(sender, args) { _this.delaySaveWhenEditing(args, "saveAndPublish"); });
 
             this._inited = true;
             Sys.Debug.trace("Live Editing - ItemEditing: Ready.");
@@ -55,22 +57,22 @@ umbraco.presentation.LiveEditing.ItemEditing.prototype = {
 
         this._activeItem = this._items[itemId];
         Sys.Debug.assert(this._activeItem != null, "Live Editing - ItemEditing: Could not find item with ID " + itemId + ".");
-        this._editControl = this.getElementsByTagName("umbraco:control")[0];
-        Sys.Debug.assert(this._editControl != null, "Live Editing - ItemEditing: Could not find the editor control.");
-        this._activeItem.fadeIn();
-        this.moveChildControls(this._editControl, this._activeItem);
+        this._editControl = this.getElementsByTagName("umbraco:control");
+        Sys.Debug.assert(this._editControl.length > 0, "Live Editing - ItemEditing: Could not find the editor control.");
+        //this._activeItem.jItem.fadeIn();
+        this.moveChildControls(this._editControl, this._activeItem.jItem);
 
         // Only elements that are currently present, can cause item editing to stop.
         // This enables transparent use of dynamically created elements (such as context/dropdown menus)
         // as clicks on those elements will not trigger the stop edit signal.
-        jQuery("*").each(function() { this._canStopEditing = true; });
+        jQuery("*").each(function() { $(this).data("canStopEditing", true); });
 
         // raise event
         var handler = this.get_events().getHandler("startEdit");
         if (handler)
             handler(this, Sys.EventArgs.Empty);
 
-        this.ignoreChildClicks(this._activeItem);
+        this.ignoreChildClicks(this._activeItem.jItem);
 
         LiveEditingToolbar.setDirty(true);
     },
@@ -90,7 +92,7 @@ umbraco.presentation.LiveEditing.ItemEditing.prototype = {
             this._submitControl.click();
 
             // hide control
-            this._activeItem.fadeOut();
+            //this._activeItem.jItem.fadeOut();
             this._activeItem = null;
             this._submitControl = null;
             this._editControl = null;
@@ -126,11 +128,23 @@ umbraco.presentation.LiveEditing.ItemEditing.prototype = {
                 var f = function() {
                     Sys.Application.remove_load(f);
                     setTimeout(function() {
+                        Sys.Debug.trace("Live Editing - Delayed Saving Changes to server");
                         UmbracoCommunicator.SendClientMessage(type, "");
                     }, 100);
                 }
                 Sys.Application.add_load(f);
             })();
+        }
+        else {
+            Sys.Debug.trace("Live Editing - Saving Changes to server");
+            if (!Sys.WebForms.PageRequestManager.getInstance().get_isInAsyncPostBack()) {
+                UmbracoCommunicator.SendClientMessage(type, "");
+            }
+            else {
+                Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function() {
+                    UmbracoCommunicator.SendClientMessage(type, "");
+                });
+            }
         }
     },
 
@@ -140,53 +154,33 @@ umbraco.presentation.LiveEditing.ItemEditing.prototype = {
         Sys.Debug.trace("  Found " + items.length + " editable Umbraco item(s).");
 
         // enhance items with edit functionality
-        for (var i = 0; i < items.length; i++) {
-            var item = items[i];
-            this._items[item.getAttribute("itemId")] = item;
-            this.itemsAddFunctionality(item);
-            Sys.Debug.trace("    " + (i + 1) + ". " + item.toString() + " is Live Editing enabled.");
-        }
+        var _this = this;
+        var i = 0;
+        items.each(function() {
+            var item = new umbraco.presentation.LiveEditing.activeItem($(this));
+            _this._items[item.itemId] = item;
+            Sys.Debug.trace("    " + (++i) + ". " + item.toString() + " is Live Editing enabled.");
+        });
+        // disable hyperlinks to make them clickable for Live Editing
+        this.disableHyperlinks();
 
         // add "stop editing" handler when clicking outside the item
-
+        var _this = this;
         jQuery(document).mousedown(function(event) {
-            // the _canStopEditing property is set in startEdit
-            if (ItemEditing._activeItem != null && event.target._canStopEditing) {
-                if (!ItemEditing._activeItem.clicked)
-                    ItemEditing.stopEdit();
+            Sys.Debug.trace("DOCUMENT CLICKED");
+            // the canStopEditing property is set in startEdit
+            if (_this._activeItem != null && $(event.target).data("canStopEditing")) {
+                if (!_this._activeItem.clicked)
+                    _this.stopEdit();
                 else
-                    ItemEditing._activeItem.clicked = false;
+                    _this._activeItem.clicked = false;
             }
         });
         jQuery("#LiveEditingToolbar").mousedown(function() {
-            if (ItemEditing._activeItem != null)
-                ItemEditing._activeItem.clicked = true;
+            Sys.Debug.trace("TOOLBAR CLICKED");
+            if (_this._activeItem != null)
+                _this._activeItem.clicked = true;
         });
-    },
-
-    // Adds Javascript functionality to an item.
-    itemsAddFunctionality: function(item) {
-        // add attributes to item
-        item.itemId = item.getAttribute("itemId");
-        item.nodeId = item.getAttribute("nodeId");
-        item.fieldName = item.getAttribute("name");
-
-        Sys.Debug.assert(item.itemId != null && item.nodeId != null && item.fieldName != null,
-                                 "Live Editing - ItemEditing: Necessary umbraco:iteminfo attributes not present.");
-
-        // add functions to item
-        var itemPrototype = umbraco.presentation.LiveEditing.ItemFunctions.prototype;
-        item.toString = itemPrototype.toString;
-        item.activate = itemPrototype.activate;
-        item.fadeIn = itemPrototype.fadeIn;
-        item.fadeOut = itemPrototype.fadeOut;
-
-        // register events
-        // note: this doesn't work in IE, there it is set server-side as an attribute
-        item.onclick = umbraco.presentation.LiveEditing.ItemFunctions.prototype.click;
-
-        // disable hyperlinks to make them clickable for Live Editing
-        this.disableHyperlinks(item);
     },
 
     // Update items that have changed.
@@ -194,30 +188,26 @@ umbraco.presentation.LiveEditing.ItemEditing.prototype = {
         var itemUpdates = this.getElementsByTagName("umbraco:itemupdate");
         Sys.Debug.trace("Live Editing - ItemEditing: " + itemUpdates.length + " item update(s).");
 
-        // find all item updates
-        for (var i = 0; i < itemUpdates.length; i++) {
-            var itemUpdate = itemUpdates[i];
-            var itemId = itemUpdate.getAttribute("itemId");
-            var item = this._items[itemId];
+        var _this = this;
+        itemUpdates.each(function() {
+            var itemUpdate = $(this);
+            var itemId = itemUpdate.attr("itemId");
+            var item = _this._items[itemId];
 
             if (item != null) {
                 Sys.Debug.trace("  Updating " + item.toString() + ".");
 
                 // remove old children and add updates ones
-                while (item.firstChild != null)
-                    item.removeChild(item.firstChild);
-                while (itemUpdate.firstChild != null)
-                    item.appendChild(itemUpdate.firstChild);
-                item.fadeIn();
+                _this.moveChildControls(itemUpdate, item.jItem);
+                //item.jItem.fadeIn();
 
                 // disable hyperlinks to make them clickable for Live Editing
-                this.disableHyperlinks(item);
+                _this.disableHyperlinks();
             }
             else {
-                while (itemUpdate.firstChild != null)
-                    itemUpdate.removeChild(itemUpdate.firstChild);
+                itemUpdate.html("");
             }
-        }
+        });
     },
 
     // Update controls that have changed.
@@ -227,138 +217,123 @@ umbraco.presentation.LiveEditing.ItemEditing.prototype = {
         Sys.Debug.trace("Live Editing - ItemEditing: " + controlUpdates.length + " control update(s).");
 
         if (controlUpdates.length == 1) {
-            if (this._activeItem != null && controlUpdates[0].firstChild != null) {
+            if (this._activeItem != null && controlUpdates.children().length > 0) {
                 Sys.Debug.trace("Live Editing - ItemEditing: updating edit control.");
-                this.moveChildControls(controlUpdates[0], this._activeItem);
-                this.ignoreChildClicks(this._activeItem);
+                this.moveChildControls(controlUpdates, this._activeItem.jItem);
+                this.ignoreChildClicks();
             }
 
-            this._submitControl = controlUpdates[0].nextSibling;
-            Sys.Debug.assert(this._submitControl != null, "Live Editing - ItemEditing: Submit button not found.");
+            this._submitControl = controlUpdates.next();
+            Sys.Debug.assert(this._submitControl.length > 0, "Live Editing - ItemEditing: Submit button not found.");
         }
     },
 
     // ignores clicks on child elements of the control
-    ignoreChildClicks: function(control) {
-        // all children set the clicked property to true on mousedown
-        // to avoid editing being stopped because of the body mousedown trigger
-
-        for (var i = 0; i < this._activeItem.childNodes.length; i++) {
-            try {
-                $addHandler(ItemEditing._activeItem.childNodes[i], "mousedown", function() {
-                    if (ItemEditing._activeItem != null)
-                        ItemEditing._activeItem.clicked = true;
-                });
-            }
-            // some items don't support the onmousedown property
-            catch (e) { }
-        }
+    ignoreChildClicks: function() {
+        var _this = this;
+        this._activeItem.jItem.children().mousedown(function(e) {
+            _this._activeItem.clicked = true;
+        });
     },
 
     // Moves the child controls from source into destination, overwriting existing elements.
     moveChildControls: function(source, dest) {
-        // save source childs to temp
-        while (dest.firstChild != null)
-            dest.removeChild(dest.firstChild);
-        // add original source fields to dest
-        while (source.firstChild != null)
-            dest.appendChild(source.firstChild);
+        Sys.Debug.trace("Live Editing - Moving Child Controls");
+
+        //remove contents in the destination        
+        dest.html("");
+
+        //add the source to the destination
+        dest.append(source.html());
+
+        //remove teh contents from the source
+        source.html("");
+
     },
 
-    // Gets a list of elements with the specified tagname.
-    // Works with custom namespaces in IE as well.
+    // Gets a list of elements with the specified tagname including namespaced ones
     getElementsByTagName: function(tagname) {
-        var elements = document.getElementsByTagName(tagname);
-        // if no elements are found, retry search without the namespace prefix
-        if (elements.length == 0 && tagname.indexOf(":") > 0)
-            elements = document.getElementsByTagName(tagname.substr(tagname.indexOf(":") + 1));
-        return elements;
+        var found = jQuery("body").find("*").filter(function(index) {
+            if (this.nodeType != 3) {
+                var nn = this.nodeName.toLowerCase();
+                var ftn = tagname.toLowerCase();
+                var ln = (ftn.indexOf(":") > 0 ? ftn.substr(ftn.indexOf(":") + 1) : ftn);
+                return (nn == ftn
+                    || (typeof this.scopeName != "undefined" && nn == ln && this.scopeName.toLowerCase() == ftn.substr(0, ftn.indexOf(":"))));
+            }
+            return false;
+        });
+        Sys.Debug.trace("found " + found.length + " elements with selector: " + tagname);
+        return found;
     },
 
     // Disables hyperlinks inside the specified element.
-    disableHyperlinks: function(element) {
-        var links = element.getElementsByTagName("a");
-        for (var i = 0; i < links.length; i++)
-            links[i].onclick = function() { return false; };
+    disableHyperlinks: function() {
+        jQuery("a").click(function() {
+            return false;
+        });
     }
 }
 
 umbraco.presentation.LiveEditing.ItemEditing.registerClass("umbraco.presentation.LiveEditing.ItemEditing", Sys.Component);
 
-
-
-/********************* Live Editing item member functions *********************/
-
-// The ItemFunctions class contains a set of functions that will be added to umbraco:item elements.
-// This class will not be initialized.
-umbraco.presentation.LiveEditing.ItemFunctions = function() { };
-
-umbraco.presentation.LiveEditing.ItemFunctions.prototype = {
-
-    // Returns a textual representation of an item.
-    toString: function() {
-        return "Item " + this.itemId + " (node " + this.nodeId + ": " + this.fieldName + ")";
-    },
-
-    // Activates an item for editing.
-    activate: function() {
-        ItemEditing._items[this.itemId] = this;
-        if (this != ItemEditing._activeItem) {
-            Sys.Debug.trace("Live Editing - ItemEditing: " + this.toString() + " was activated.");
-            if (!Sys.WebForms.PageRequestManager.getInstance().get_isInAsyncPostBack()) {
-                UmbracoCommunicator.SendClientMessage("edititem", this.itemId);
+//an object to store the information for the active item
+umbraco.presentation.LiveEditing.activeItem = function(item) {
+    //error checking
+    if (item != null && item.length != 1) {
+        return null;
+    }
+    //create the object with values, wire up events and return it
+    var obj = {
+        jItem: item,
+        nodeId: item.attr("nodeId"),
+        fieldName: item.attr("name"),
+        itemId: item.attr("itemId"),
+        clicked: false,
+        toString: function() {
+            return "Item " + this.itemId + " (node " + this.nodeId + ": " + this.fieldName + ")";
+        },
+        // Activates an item for editing.
+        activate: function() {
+            ItemEditing._items[this.itemId] = this;
+            if (this != ItemEditing._activeItem) {
+                Sys.Debug.trace("Live Editing - ItemEditing: " + this.toString() + " was activated.");
+                if (!Sys.WebForms.PageRequestManager.getInstance().get_isInAsyncPostBack()) {
+                    UmbracoCommunicator.SendClientMessage("edititem", this.itemId);
+                }
+                else {
+                    var itemId = this.itemId;
+                    Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function() {
+                        if (itemId != 0) {
+                            UmbracoCommunicator.SendClientMessage("edititem", itemId);
+                            itemId = 0;
+                        }
+                    });
+                }
+                //this.jItem.fadeOut();
+            }
+        },
+        // Item click handler.
+        onClick: function(e) {
+            if (ItemEditing._activeItem != null && ItemEditing._activeItem.itemId == this.itemId) {
+                Sys.Debug.trace("Live Editing - ItemEditing: " + this.toString() + " click ignored because it is already active.");
             }
             else {
-                var itemId = this.itemId;
-                Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function() {
-                    if (itemId != 0) {
-                        UmbracoCommunicator.SendClientMessage("edititem", itemId);
-                        itemId = 0;
-                    }
-                });
-            }
-            this.fadeOut();
-        }
-    },
-
-    // Item click handler.
-    // Note: in IE, this is called through the onclick attribute.
-    click: function(e) {
-        if (ItemEditing._activeItem != null && ItemEditing._activeItem.itemId == this.itemId) {
-            Sys.Debug.trace("Live Editing - ItemEditing: " + this.toString() + " click ignored because it is already active.");
-        }
-        else {
-            Sys.Debug.trace("Live Editing - ItemEditing: " + this.toString() + " was clicked.");
-            if (e) {
+                Sys.Debug.trace("Live Editing - ItemEditing: " + this.toString() + " was clicked.");
                 e.stopPropagation(); // disable click event propagation to parent elements
                 this.activate();
             }
-            else {
-                // Internet Explorer specific code
-                window.event.cancelBubble = true; // disable click event propagation to parent elements
-                // find the iteminfo self-or-ancestor,
-                // and restore the functionality that magically disappeared
-                var element = window.event.srcElement;
-                while (element.tagName != 'iteminfo')
-                    element = element.parentElement;
-                ItemEditing.itemsAddFunctionality(element);
-                element.activate();
-            }
         }
-    },
-
-    // fades in the item
-    fadeIn: function() {
-        if (!jQuery.browser.msie)
-            jQuery(this).stop().fadeTo(1, 0.0).fadeTo(500, 1);
-    },
-
-    // fades out the item
-    fadeOut: function() {
-        if (!jQuery.browser.msie)
-            jQuery(this).stop().fadeTo(1, 1.0).fadeTo(500, 1);
     }
+
+    //keep the scope on the click event method call
+    obj.jItem.click(function(e) {
+        obj.onClick.call(obj, e);
+    });
+
+    return obj;
 }
+
 
 // global instance of the ItemEditing class
 function initializeGlobalItemEditing() {

@@ -64,7 +64,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
     $.fn.UmbracoTreeAPI = function() {
         /// <summary>exposes the Umbraco Tree api for the selected object</summary>
         if ($(this).length != 1) {
-            throw "UmbracoTreeAPI selector requires that there be exactly one control selected";
+            throw "UmbracoTreeAPI selector requires that there be exactly one control selected, this selector returns " + $(this).length;
         };
         // check if there's an api stored for the id of the object specified, if there's not
         // check if the first child is a div and if that has the api specified
