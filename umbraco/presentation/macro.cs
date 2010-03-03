@@ -25,6 +25,7 @@ using umbraco.cms.businesslogic;
 using System.Collections.Generic;
 using templateControls = umbraco.presentation.templateControls;
 using umbraco.IO;
+using umbraco.presentation.nodeFactory;
 
 namespace umbraco
 {
@@ -183,7 +184,7 @@ namespace umbraco
         public static macro ReturnFromAlias(string alias)
         {
             if (_macroAlias.ContainsKey(alias))
-                return new macro((int) _macroAlias[alias]);
+                return new macro((int)_macroAlias[alias]);
             else
             {
                 try
@@ -210,7 +211,7 @@ namespace umbraco
 
             if (macroCache[macroCacheIdentifier + id] != null)
             {
-                macro tempMacro = (macro) macroCache[macroCacheIdentifier + id];
+                macro tempMacro = (macro)macroCache[macroCacheIdentifier + id];
                 Name = tempMacro.Name;
                 Alias = tempMacro.Alias;
                 ScriptType = tempMacro.ScriptType;
@@ -264,7 +265,7 @@ namespace umbraco
 
                         if (TryGetColumnString(macroDef, "macroPython", out tmpStr))
                             ScriptFile = tmpStr;
-                        
+
                         if (TryGetColumnString(macroDef, "macroPropertyAlias", out tmpStr))
                         {
                             string typeAlias;
@@ -283,7 +284,7 @@ namespace umbraco
             }
 
             if (!string.IsNullOrEmpty(XsltFile))
-                macroType = (int) eMacroType.XSLT;
+                macroType = (int)eMacroType.XSLT;
             else
             {
                 if (!string.IsNullOrEmpty(ScriptFile))
@@ -299,12 +300,12 @@ namespace umbraco
                 }
             }
             if (macroType.ToString() == string.Empty)
-                macroType = (int) eMacroType.Unknown;
+                macroType = (int)eMacroType.Unknown;
         }
 
         public static bool TryGetColumnString(IRecordsReader reader, string columnName, out string value)
         {
-            
+
             if (reader.ContainsField(columnName) && !reader.IsNull(columnName))
             {
                 value = reader.GetString(columnName);
@@ -412,7 +413,7 @@ namespace umbraco
             {
                 if (macroCache["macroHtml_" + macroGuid] != null)
                 {
-                    MacroCacheContent cacheContent = (MacroCacheContent) macroCache["macroHtml_" + macroGuid];
+                    MacroCacheContent cacheContent = (MacroCacheContent)macroCache["macroHtml_" + macroGuid];
                     macroHtml = cacheContent.Content;
                     macroHtml.ID = cacheContent.ID;
                     HttpContext.Current.Trace.Write("renderMacro", "Content loaded from cache ('" + macroGuid + "')...");
@@ -423,7 +424,7 @@ namespace umbraco
             {
                 switch (MacroType)
                 {
-                    case (int) eMacroType.UserControl:
+                    case (int)eMacroType.UserControl:
                         try
                         {
                             HttpContext.Current.Trace.Write("umbracoMacro", "Usercontrol added (" + scriptType + ")");
@@ -437,7 +438,7 @@ namespace umbraco
                             macroHtml = new LiteralControl("Error loading userControl '" + scriptType + "'");
                             break;
                         }
-                    case (int) eMacroType.CustomControl:
+                    case (int)eMacroType.CustomControl:
                         try
                         {
                             HttpContext.Current.Trace.Write("umbracoMacro", "Custom control added (" + scriptType + ")");
@@ -456,10 +457,10 @@ namespace umbraco
                                                    scriptType + "'");
                             break;
                         }
-                    case (int) eMacroType.XSLT:
+                    case (int)eMacroType.XSLT:
                         macroHtml = loadMacroXSLT(this, attributes, pageElements);
                         break;
-                    case (int) eMacroType.Script:
+                    case (int)eMacroType.Script:
                         try
                         {
                             HttpContext.Current.Trace.Write("umbracoMacro", "DLR Script script added (" + ScriptFile + ")");
@@ -517,18 +518,18 @@ namespace umbraco
         {
             if (HttpRuntime.Cache["macroXslt_" + XsltFile] != null)
             {
-                return (XslCompiledTransform) HttpRuntime.Cache["macroXslt_" + XsltFile];
+                return (XslCompiledTransform)HttpRuntime.Cache["macroXslt_" + XsltFile];
             }
             else
             {
                 XmlTextReader xslReader =
-                    new XmlTextReader( IOHelper.MapPath(SystemDirectories.Xslt + "/" + XsltFile));
+                    new XmlTextReader(IOHelper.MapPath(SystemDirectories.Xslt + "/" + XsltFile));
 
                 XslCompiledTransform macroXSLT = CreateXsltTransform(xslReader, umbraco.GlobalSettings.DebugMode);
                 HttpRuntime.Cache.Insert(
                     "macroXslt_" + XsltFile,
                     macroXSLT,
-                    new CacheDependency( IOHelper.MapPath(SystemDirectories.Xslt + "/" + XsltFile) ));
+                    new CacheDependency(IOHelper.MapPath(SystemDirectories.Xslt + "/" + XsltFile)));
                 return macroXSLT;
             }
         }
@@ -541,13 +542,19 @@ namespace umbraco
 
             xslReader.EntityHandling = EntityHandling.ExpandEntities;
 
-            try {
-                if (GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium) {
+            try
+            {
+                if (GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium)
+                {
                     macroXSLT.Load(xslReader, XsltSettings.TrustedXslt, xslResolver);
-                } else {
+                }
+                else
+                {
                     macroXSLT.Load(xslReader, XsltSettings.Default, xslResolver);
                 }
-            } finally {
+            }
+            finally
+            {
                 xslReader.Close();
             }
 
@@ -750,7 +757,7 @@ namespace umbraco
 
             // Load the XSLT extensions configuration
             XmlDocument xsltExt = new XmlDocument();
-            xsltExt.Load( IOHelper.MapPath(SystemDirectories.Config + "/xsltExtensions.config"));
+            xsltExt.Load(IOHelper.MapPath(SystemDirectories.Config + "/xsltExtensions.config"));
 
             // add all descendants of the XsltExtensions element
             foreach (XmlNode xsltEx in xsltExt.SelectSingleNode("/XsltExtensions"))
@@ -762,24 +769,24 @@ namespace umbraco
                     Debug.Assert(xsltEx.Attributes["alias"] != null, "Extension attribute 'alias' not specified.");
 
                     // load the extension assembly
-                    string extensionFile = IOHelper.MapPath( string.Format("{0}/{1}.dll",SystemDirectories.Bin,xsltEx.Attributes["assembly"].Value));
-                    
+                    string extensionFile = IOHelper.MapPath(string.Format("{0}/{1}.dll", SystemDirectories.Bin, xsltEx.Attributes["assembly"].Value));
+
                     Assembly extensionAssembly;
                     try
                     {
                         extensionAssembly = Assembly.LoadFrom(extensionFile);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         throw new Exception(String.Format("Could not load assembly {0} for XSLT extension {1}. Please check config/xsltExentions.config.",
-                                                          extensionFile, xsltEx.Attributes["alias"].Value), ex); 
+                                                          extensionFile, xsltEx.Attributes["alias"].Value), ex);
                     }
 
                     // load the extension type
                     Type extensionType = extensionAssembly.GetType(xsltEx.Attributes["type"].Value);
-                    if(extensionType==null)
+                    if (extensionType == null)
                         throw new Exception(String.Format("Could not load type {0} ({1}) for XSLT extension {1}. Please check config/xsltExentions.config.",
-                                  xsltEx.Attributes["type"].Value, extensionFile, xsltEx.Attributes["alias"].Value)); 
+                                  xsltEx.Attributes["type"].Value, extensionFile, xsltEx.Attributes["alias"].Value));
 
                     // create an instance and add it to the extensions list
                     extensions.Add(xsltEx.Attributes["alias"].Value, Activator.CreateInstance(extensionType));
@@ -787,30 +794,44 @@ namespace umbraco
             }
 
             Assembly appCodeAssembly;
-            try {
+            try
+            {
                 if (Directory.GetFiles(GlobalSettings.FullpathToRoot + System.IO.Path.DirectorySeparatorChar + "App_Code",
                                        "*.*",
-                                       SearchOption.AllDirectories).Length > 0) {
+                                       SearchOption.AllDirectories).Length > 0)
+                {
                     appCodeAssembly = Assembly.Load("__code");
                     Type[] appCodeType = appCodeAssembly.GetExportedTypes();
-                    if (appCodeType.Length == 0) {
+                    if (appCodeType.Length == 0)
+                    {
                         Log.Add(LogTypes.System, Node.GetCurrent().Id, String.Format("Could not load types in App_Code ({0}) for XSLT extensions. Ensure you have used the public keyword to ensure class and method exposure.", appCodeAssembly.FullName));
-                    } else {
+                    }
+                    else
+                    {
                         // create an instance and add it to the extensions list
-                        foreach (Type tp in appCodeType) {
+                        foreach (Type tp in appCodeType)
+                        {
                             object[] tpAttributes = tp.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
-                            foreach (XsltExtensionAttribute tpAttribute in tpAttributes) {
-                                if (tpAttribute.Namespace != String.Empty) {
+                            foreach (XsltExtensionAttribute tpAttribute in tpAttributes)
+                            {
+                                if (tpAttribute.Namespace != String.Empty)
+                                {
                                     extensions.Add(tpAttribute.Namespace, Activator.CreateInstance(tp));
-                                } else {
+                                }
+                                else
+                                {
                                     extensions.Add(tp.FullName, Activator.CreateInstance(tp));
                                 }
                             }
                         }
                     }
                 }
-            } catch (FileNotFoundException ex) { //Do nothing - just means there's nothing to load.
-            } catch (Exception ex) {
+            }
+            catch (FileNotFoundException)
+            { //Do nothing - just means there's nothing to load.
+            }
+            catch (Exception ex)
+            {
                 throw new Exception("Could not load App_Code classes for XSLT extensions.", ex);
             }
 
@@ -874,7 +895,7 @@ namespace umbraco
             // If no value is passed, then use the current pageID as value
             if (macroPropertyValue == string.Empty)
             {
-                page umbPage = (page) HttpContext.Current.Items["umbPageObject"];
+                page umbPage = (page)HttpContext.Current.Items["umbPageObject"];
                 if (umbPage == null)
                     return;
                 currentID = umbPage.PageID;
@@ -1065,7 +1086,7 @@ namespace umbraco
                 }
                 catch (Exception e)
                 {
-                    HttpContext.Current.Trace.Warn("umbracoMacro","Could not add global variable (" + macroDef.Key + ") to DLR enviroment", e);
+                    HttpContext.Current.Trace.Warn("umbracoMacro", "Could not add global variable (" + macroDef.Key + ") to DLR enviroment", e);
                 }
             }
 
@@ -1081,7 +1102,7 @@ namespace umbraco
                 }
             }
 
-            
+
             args.Add("currentPage", umbraco.presentation.nodeFactory.Node.GetCurrent());
 
             string path = IOHelper.MapPath(SystemDirectories.Python + "/" + macro.scriptFile);
@@ -1117,11 +1138,11 @@ namespace umbraco
             try
             {
                 string currentAss = IOHelper.MapPath(string.Format("{0}/{1}.dll", SystemDirectories.Bin, fileName));
-                
+
                 if (!File.Exists(currentAss))
                     return new LiteralControl("Unable to load user control because is does not exist: " + fileName);
                 asm = Assembly.LoadFrom(currentAss);
-                
+
                 if (HttpContext.Current != null)
                     HttpContext.Current.Trace.Write("umbracoMacro", "Assembly file " + currentAss + " LOADED!!");
             }
@@ -1162,7 +1183,7 @@ namespace umbraco
 
                 object propValue = helper.FindAttribute(pageElements, attributes, propertyAlias);
                 // Special case for types of webControls.unit
-                if (prop.PropertyType == typeof (Unit))
+                if (prop.PropertyType == typeof(Unit))
                     propValue = Unit.Parse(propValue.ToString());
                 else
                 {
@@ -1177,10 +1198,10 @@ namespace umbraco
                     object o = propertyDefinitions[propertyAlias];
                     if (o == null)
                         continue;
-                    TypeCode st = (TypeCode) Enum.Parse(typeof (TypeCode), o.ToString(), true);
+                    TypeCode st = (TypeCode)Enum.Parse(typeof(TypeCode), o.ToString(), true);
 
                     // Special case for booleans
-                    if (prop.PropertyType == typeof (bool))
+                    if (prop.PropertyType == typeof(bool))
                     {
                         bool parseResult;
                         if (
@@ -1225,7 +1246,7 @@ namespace umbraco
                 if (!File.Exists(IOHelper.MapPath(userControlPath)))
                     return new LiteralControl(string.Format("UserControl {0} does not exist.", fileName));
 
-                UserControl oControl = (UserControl) new UserControl().LoadControl(userControlPath);
+                UserControl oControl = (UserControl)new UserControl().LoadControl(userControlPath);
 
                 int slashIndex = fileName.LastIndexOf("/") + 1;
                 if (slashIndex < 0)
@@ -1265,7 +1286,7 @@ namespace umbraco
                     // Special case for types of webControls.unit
                     try
                     {
-                        if (prop.PropertyType == typeof (Unit))
+                        if (prop.PropertyType == typeof(Unit))
                             propValue = Unit.Parse(propValue.ToString());
                         else
                         {
@@ -1274,10 +1295,10 @@ namespace umbraco
                                 object o = propertyDefinitions[propertyAlias];
                                 if (o == null)
                                     continue;
-                                TypeCode st = (TypeCode) Enum.Parse(typeof (TypeCode), o.ToString(), true);
+                                TypeCode st = (TypeCode)Enum.Parse(typeof(TypeCode), o.ToString(), true);
 
                                 // Special case for booleans
-                                if (prop.PropertyType == typeof (bool))
+                                if (prop.PropertyType == typeof(bool))
                                 {
                                     bool parseResult;
                                     if (
@@ -1357,7 +1378,7 @@ namespace umbraco
 
         public static string renderMacroStartTag(Hashtable attributes, int pageId, Guid versionId)
         {
-            string div = "<div "; 
+            string div = "<div ";
 
             IDictionaryEnumerator ide = attributes.GetEnumerator();
             while (ide.MoveNext())
@@ -1379,7 +1400,7 @@ namespace umbraco
             attributeContents = attributeContents.Replace("\n", "\\n").Replace("\r", "\\r");
 
             // Replace quotes
-            attributeContents = 
+            attributeContents =
                 attributeContents.Replace("\"", "&quot;");
 
             // Replace tag start/ends
@@ -1427,16 +1448,16 @@ namespace umbraco
                 // Create a new 'HttpWebRequest' Object to the mentioned URL.
                 string retVal = string.Empty;
                 string url = "http://" + HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" +
-                             HttpContext.Current.Request.ServerVariables["SERVER_PORT"] + IOHelper.ResolveUrl( SystemDirectories.Umbraco ) +
+                             HttpContext.Current.Request.ServerVariables["SERVER_PORT"] + IOHelper.ResolveUrl(SystemDirectories.Umbraco) +
                              "/macroResultWrapper.aspx?" +
                              querystring;
 
-                HttpWebRequest myHttpWebRequest = (HttpWebRequest) WebRequest.Create(url);
+                HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
                 // Assign the response object of 'HttpWebRequest' to a 'HttpWebResponse' variable.
                 HttpWebResponse myHttpWebResponse = null;
                 try
                 {
-                    myHttpWebResponse = (HttpWebResponse) myHttpWebRequest.GetResponse();
+                    myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
                     if (myHttpWebResponse.StatusCode == HttpStatusCode.OK)
                     {
                         Stream streamResponse = myHttpWebResponse.GetResponseStream();
@@ -1567,7 +1588,8 @@ namespace umbraco
             new macro(Id).removeFromCache();
         }
 
-        void ICacheRefresher.Remove(int Id) {
+        void ICacheRefresher.Remove(int Id)
+        {
             new macro(Id).removeFromCache();
         }
         #endregion

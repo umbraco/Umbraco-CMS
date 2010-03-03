@@ -1201,7 +1201,6 @@
     </Compile>
     <Compile Include="umbraco\templateControls\Script.cs" />
     <Compile Include="umbraco\Trees\BaseMediaTree.cs" />
-    <Compile Include="umbraco\Trees\dynamicLoader.cs" />
     <Compile Include="umbraco\Trees\loadDLRScripts.cs" />
     <Compile Include="umbraco\Trees\ITreeService.cs">
       <SubType>Code</SubType>
@@ -1953,7 +1952,6 @@
     <Content Include="config\ClientDependency.config" />
     <Content Include="config\ExamineSettings.config" />
     <Content Include="config\ExamineIndex.config" />
-    <None Include="App_Data\ApplicationDesigner.xsd" />
     <Content Include="config\scripting.config" />
     <None Include="Properties\Settings.settings" />
     <None Include="umbraco\LiveEditing\LiveEditing.cd" />
@@ -2812,6 +2810,7 @@
     </WebReferenceUrl>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="App_Data\" />
     <Folder Include="css\" />
     <Folder Include="data\previews\" />
     <Folder Include="data\preview\" />

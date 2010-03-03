@@ -6,18 +6,22 @@ using System.Web.UI.WebControls;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.presentation.nodeFactory;
+using umbraco.presentation;
 
-namespace umbraco.editorControls.tags {
-    public class DataEditor : System.Web.UI.UpdatePanel, umbraco.interfaces.IDataEditor, umbraco.interfaces.IUseTags {
+namespace umbraco.editorControls.tags
+{
+    public class DataEditor : System.Web.UI.UpdatePanel, umbraco.interfaces.IDataEditor, umbraco.interfaces.IUseTags
+    {
         #region IDataEditor Members
 
         cms.businesslogic.datatype.DefaultData _data;
         string _group = "";
 
-        public DataEditor(umbraco.interfaces.IData Data, SortedList Prevalues) {
+        public DataEditor(umbraco.interfaces.IData Data, SortedList Prevalues)
+        {
             _data = (cms.businesslogic.datatype.DefaultData)Data;
-            
-            if(Prevalues["group"] != null)
+
+            if (Prevalues["group"] != null)
                 _group = Prevalues["group"].ToString();
         }
 
@@ -35,81 +39,95 @@ namespace umbraco.editorControls.tags {
 
         public Control Editor { get { return this; } }
 
-        public void Save() {
+        public void Save()
+        {
 
             CheckBoxList items = tagCheckList;
             int _nodeID;
             int.TryParse(_data.NodeId.ToString(), out _nodeID);
             string allTags = "";
-            int tagId = 0;            
+            int tagId = 0;
             //first clear out all items associated with this ID...
             SqlHelper.ExecuteNonQuery("DELETE FROM cmsTagRelationship WHERE (nodeId = @nodeId) AND EXISTS (SELECT id FROM cmsTags WHERE (cmsTagRelationship.tagId = id) AND ([group] = @group));",
-                SqlHelper.CreateParameter("@nodeId", nodeId),
+                SqlHelper.CreateParameter("@nodeId", _nodeID),
                 SqlHelper.CreateParameter("@group", _group));
 
             //and now we add them again...
-            foreach (ListItem li in items.Items) {
-                if (li.Selected) {
-                    
-                    if (li.Value == "0") {
-                    
+            foreach (ListItem li in items.Items)
+            {
+                if (li.Selected)
+                {
+
+                    if (li.Value == "0")
+                    {
+
                         tagId = saveTag(li.Text);
                         li.Value = tagId.ToString();
-                    
-                    } else { 
-                        int.TryParse(li.Value, out tagId); 
+
+                    }
+                    else
+                    {
+                        int.TryParse(li.Value, out tagId);
                     }
 
-                    if (tagId > 0) {
+                    if (tagId > 0)
+                    {
 
                         SqlHelper.ExecuteNonQuery("INSERT INTO cmsTagRelationShip(nodeId,tagId) VALUES (@nodeId, @tagId)",
-                            SqlHelper.CreateParameter("@nodeId", nodeId),
-                            SqlHelper.CreateParameter("@tagId", tagId)                
+                            SqlHelper.CreateParameter("@nodeId", _nodeID),
+                            SqlHelper.CreateParameter("@tagId", tagId)
                         );
 
                         tagId = 0;
-                        allTags += "," + li.Text; 
+                        allTags += "," + li.Text;
                     }
                 }
-          }
+            }
             //and just in case, we'll save the tags as plain text on the node itself... 
-          _data.Value = allTags.Trim().Trim(',');
+            _data.Value = allTags.Trim().Trim(',');
         }
 
-        public bool ShowLabel {
+        public bool ShowLabel
+        {
             get { return true; }
         }
 
-        public bool TreatAsRichTextEditor {
+        public bool TreatAsRichTextEditor
+        {
             get { return false; }
         }
 
-        public void tagBoxTextChange(object sender, EventArgs e) {
-            try {
-                CheckBoxList items = tagCheckList; 
+        public void tagBoxTextChange(object sender, EventArgs e)
+        {
+            try
+            {
+                CheckBoxList items = tagCheckList;
 
                 string[] tags = tagBox.Text.Trim().Trim(',').Split(',');
 
 
-                for (int i = 0; i < tags.Length; i++) {
+                for (int i = 0; i < tags.Length; i++)
+                {
                     //if not found we'll get zero and handle that onsave instead...
                     int id = getTagId(tags[i], _group);
 
                     //we don't want 2 of a kind... 
-                    if (items.Items.FindByText(tags[i].Trim()) == null) {
+                    if (items.Items.FindByText(tags[i].Trim()) == null)
+                    {
                         ListItem li = new ListItem(tags[i], id.ToString());
                         li.Selected = true;
-                        items.Items.Add(li);                    
+                        items.Items.Add(li);
                     }
                 }
 
                 //reset the textbox
                 tagBox.Text = "";
-                
+
                 ScriptManager.GetCurrent(Page).SetFocus(tagBox);
 
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Log.Add(LogTypes.Debug, -1, ex.ToString());
             }
         }
@@ -121,7 +139,7 @@ namespace umbraco.editorControls.tags {
                 SqlHelper.CreateParameter("@group", _group));
             return getTagId(tag, _group);
         }
-        
+
         public int getTagId(string tag, string group)
         {
             int retval = 0;
@@ -149,7 +167,7 @@ namespace umbraco.editorControls.tags {
             base.OnInit(e);
 
             string _alias = ((umbraco.cms.businesslogic.datatype.DefaultData)_data).PropertyId.ToString();
-            
+
 
             string tagCss = @"<style>/*AutoComplete flyout */
                             .autocomplete_completionListElement 
@@ -196,12 +214,12 @@ namespace umbraco.editorControls.tags {
             Page.ClientScript.RegisterClientScriptBlock(tagCss.GetType(), "umbracoTagCss", tagCss);
 
             //making sure that we have a ID for context
-            string pageId = umbraco.helper.Request("id");
+            string pageId = UmbracoContext.Current.Request["id"];
 
-            if( string.IsNullOrEmpty(pageId.Trim()))
+            if (string.IsNullOrEmpty(pageId.Trim()))
             {
                 Node currentNode = Node.GetCurrent();
-                if(currentNode != null)
+                if (currentNode != null)
                 {
                     pageId = currentNode.Id.ToString();
                 }
@@ -221,16 +239,16 @@ namespace umbraco.editorControls.tags {
             AjaxControlToolkit.AutoCompleteExtender tagList = new AjaxControlToolkit.AutoCompleteExtender();
             tagList.TargetControlID = "tagBox_" + _alias;
             tagList.ServiceMethod = "getTagList";
-            
+
             tagList.ServicePath = ConfigurationManager.AppSettings["umbracoPath"] + "/webservices/tagService.asmx";
-            tagList.MinimumPrefixLength=2; 
-            tagList.CompletionInterval=1000;
-            tagList.EnableCaching=true;
-            tagList.CompletionSetCount=20; 
-            tagList.CompletionListCssClass="autocomplete_completionListElement"; 
-            tagList.CompletionListItemCssClass="autocomplete_listItem";
+            tagList.MinimumPrefixLength = 2;
+            tagList.CompletionInterval = 1000;
+            tagList.EnableCaching = true;
+            tagList.CompletionSetCount = 20;
+            tagList.CompletionListCssClass = "autocomplete_completionListElement";
+            tagList.CompletionListItemCssClass = "autocomplete_listItem";
             tagList.CompletionListHighlightedItemCssClass = "autocomplete_highlightedListItem";
-            tagList.DelimiterCharacters=";, :";
+            tagList.DelimiterCharacters = ";, :";
             tagList.UseContextKey = true;
             tagList.ContextKey = pageId + "|" + _group;
 
@@ -247,7 +265,7 @@ namespace umbraco.editorControls.tags {
 
             while (rr.Read())
             {
-                ListItem li = new ListItem( rr.GetString("tag"), rr.GetInt("id").ToString());
+                ListItem li = new ListItem(rr.GetString("tag"), rr.GetInt("id").ToString());
                 li.Selected = true;
                 tagCheckList.Items.Add(li);
             }
