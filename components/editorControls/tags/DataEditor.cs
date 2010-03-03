@@ -11,11 +11,11 @@ namespace umbraco.editorControls.tags {
     public class DataEditor : System.Web.UI.UpdatePanel, umbraco.interfaces.IDataEditor, umbraco.interfaces.IUseTags {
         #region IDataEditor Members
 
-        umbraco.interfaces.IData _data;
+        cms.businesslogic.datatype.DefaultData _data;
         string _group = "";
 
         public DataEditor(umbraco.interfaces.IData Data, SortedList Prevalues) {
-            _data = Data;
+            _data = (cms.businesslogic.datatype.DefaultData)Data;
             
             if(Prevalues["group"] != null)
                 _group = Prevalues["group"].ToString();
@@ -38,12 +38,10 @@ namespace umbraco.editorControls.tags {
         public void Save() {
 
             CheckBoxList items = tagCheckList;
-            string nodeId = umbraco.helper.Request("id");
-            int tagId = 0;
-
+            int _nodeID;
+            int.TryParse(_data.NodeId.ToString(), out _nodeID);
             string allTags = "";
-
-            
+            int tagId = 0;            
             //first clear out all items associated with this ID...
             SqlHelper.ExecuteNonQuery("DELETE FROM cmsTagRelationship WHERE (nodeId = @nodeId) AND EXISTS (SELECT id FROM cmsTags WHERE (cmsTagRelationship.tagId = id) AND ([group] = @group));",
                 SqlHelper.CreateParameter("@nodeId", nodeId),
