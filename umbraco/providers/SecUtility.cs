@@ -136,15 +136,6 @@ namespace umbraco.providers
                 string applicationVirtualPath = HostingEnvironment.ApplicationVirtualPath;
                 if (string.IsNullOrEmpty(applicationVirtualPath))
                 {
-                    applicationVirtualPath = Process.GetCurrentProcess().MainModule.ModuleName;
-                    int index = applicationVirtualPath.IndexOf('.');
-                    if (index != -1)
-                    {
-                        applicationVirtualPath = applicationVirtualPath.Remove(index);
-                    }
-                }
-                if (string.IsNullOrEmpty(applicationVirtualPath))
-                {
                     return "/";
                 }
                 return applicationVirtualPath;

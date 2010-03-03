@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Web;
 
 namespace umbraco.BusinessLogic.Utils
 {
@@ -41,11 +42,12 @@ namespace umbraco.BusinessLogic.Utils
 
             AppDomain sandbox = AppDomain.CurrentDomain;
 
-            if (!GlobalSettings.UseMediumTrust) {
+            if ((!GlobalSettings.UseMediumTrust) && (GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium)) {
                 AppDomainSetup domainSetup = new AppDomainSetup();
                 domainSetup.ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
                 domainSetup.ApplicationName = "Umbraco_Sandbox_" + Guid.NewGuid();
                 domainSetup.ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile;
+
                 domainSetup.DynamicBase = AppDomain.CurrentDomain.SetupInformation.DynamicBase;
                 domainSetup.LicenseFile = AppDomain.CurrentDomain.SetupInformation.LicenseFile;
                 domainSetup.LoaderOptimization = AppDomain.CurrentDomain.SetupInformation.LoaderOptimization;
@@ -68,11 +70,10 @@ namespace umbraco.BusinessLogic.Utils
 			{
 				Debug.WriteLine(ex.ToString());
 			}
-			finally
-			{
-                if (!GlobalSettings.UseMediumTrust)
-				    AppDomain.Unload(sandbox);
-			}
+			
+            if ((!GlobalSettings.UseMediumTrust) && (GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium)) {
+                AppDomain.Unload(sandbox);
+            }
 
 
 			return new string[0];

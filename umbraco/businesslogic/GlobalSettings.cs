@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Web;
+using System.Web.Configuration;
 using System.Xml;
 
 using umbraco.BusinessLogic;
@@ -231,14 +232,25 @@ namespace umbraco
         /// <param name="value">Value of the setting to be saved.</param>
         protected static void SaveSetting(string key, string value)
         {
-            ExeConfigurationFileMap webConfig = new ExeConfigurationFileMap();
-            webConfig.ExeConfigFilename = FullpathToRoot + "web.config";
+            WebConfigurationFileMap webConfig = new WebConfigurationFileMap();
+            foreach (VirtualDirectoryMapping v in webConfig.VirtualDirectories) {
+                if (v.IsAppRoot) {
+                    Configuration config = WebConfigurationManager.OpenWebConfiguration(v.VirtualDirectory);
+                    config.AppSettings.Settings[key].Value = value;
+                    config.Save();
+                    ConfigurationManager.RefreshSection("appSettings");
+                    break;
+                }
+            }
 
-            Configuration config =
+            //ExeConfigurationFileMap webConfig = new ExeConfigurationFileMap();
+            //webConfig.ExeConfigFilename = FullpathToRoot + "web.config";
+
+            //Configuration config = WebConfigurationManager.OpenWebConfiguration("~");
+            /* Configuration config =
                 ConfigurationManager.OpenMappedExeConfiguration(webConfig, ConfigurationUserLevel.None);
-            config.AppSettings.Settings[key].Value = value;
-            config.Save();
-            ConfigurationManager.RefreshSection("appSettings");
+             */
+            
         }
 
         /// <summary>
