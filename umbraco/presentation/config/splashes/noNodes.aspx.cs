@@ -26,7 +26,7 @@ namespace umbraco.presentation.config.splashes
         protected void Page_Load(object sender, EventArgs e)
         {
 			ClientLoader.DataBind();
-            bt_launch.Attributes.Add("onclick", "document.location.href='" + SystemDirectories.Umbraco + "/';");
+            bt_launch.Attributes.Add("onclick", "document.location.href='" + ResolveUrl(SystemDirectories.Umbraco) + "/';");
             vid1.Src = SystemDirectories.Install + "/images/packagesVid1.png";
             vid2.Src = SystemDirectories.Install + "/images/packagesVid2.png";
         }
