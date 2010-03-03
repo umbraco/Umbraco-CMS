@@ -541,12 +541,13 @@ namespace umbraco
 
             xslReader.EntityHandling = EntityHandling.ExpandEntities;
 
-            try
-            {
-                macroXSLT.Load(xslReader, XsltSettings.TrustedXslt, xslResolver);
-            }
-            finally
-            {
+            try {
+                if (GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium) {
+                    macroXSLT.Load(xslReader, XsltSettings.TrustedXslt, xslResolver);
+                } else {
+                    macroXSLT.Load(xslReader, XsltSettings.Default, xslResolver);
+                }
+            } finally {
                 xslReader.Close();
             }
 
@@ -783,6 +784,34 @@ namespace umbraco
                     // create an instance and add it to the extensions list
                     extensions.Add(xsltEx.Attributes["alias"].Value, Activator.CreateInstance(extensionType));
                 }
+            }
+
+            Assembly appCodeAssembly;
+            try {
+                if (Directory.GetFiles(GlobalSettings.FullpathToRoot + System.IO.Path.DirectorySeparatorChar + "App_Code",
+                                       "*.*",
+                                       SearchOption.AllDirectories).Length > 0) {
+                    appCodeAssembly = Assembly.Load("__code");
+                    Type[] appCodeType = appCodeAssembly.GetExportedTypes();
+                    if (appCodeType.Length == 0) {
+                        Log.Add(LogTypes.System, Node.GetCurrent().Id, String.Format("Could not load types in App_Code ({0}) for XSLT extensions. Ensure you have used the public keyword to ensure class and method exposure.", appCodeAssembly.FullName));
+                    } else {
+                        // create an instance and add it to the extensions list
+                        foreach (Type tp in appCodeType) {
+                            object[] tpAttributes = tp.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
+                            foreach (XsltExtensionAttribute tpAttribute in tpAttributes) {
+                                if (tpAttribute.Namespace != String.Empty) {
+                                    extensions.Add(tpAttribute.Namespace, Activator.CreateInstance(tp));
+                                } else {
+                                    extensions.Add(tp.FullName, Activator.CreateInstance(tp));
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (FileNotFoundException ex) { //Do nothing - just means there's nothing to load.
+            } catch (Exception ex) {
+                throw new Exception("Could not load App_Code classes for XSLT extensions.", ex);
             }
 
             return extensions;
@@ -1542,5 +1571,27 @@ namespace umbraco
             new macro(Id).removeFromCache();
         }
         #endregion
+    }
+
+    /// <summary>
+    /// Allows App_Code XSLT extensions to be declared using the [XsltExtension] class attribute.
+    /// </summary>
+    /// <remarks>
+    /// An optional XML namespace can be specified using [XsltExtension("MyNamespace")].
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Class)]
+    [AspNetHostingPermission(System.Security.Permissions.SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium, Unrestricted = false)]
+    public class XsltExtensionAttribute : Attribute
+    {
+        public XsltExtensionAttribute()
+        {
+            this.Namespace = String.Empty;
+        }
+        public XsltExtensionAttribute(string ns)
+        {
+            this.Namespace = ns;
+        }
+        public string Namespace { get; set; }
+        public override string ToString() { return this.Namespace; }
     }
 }
