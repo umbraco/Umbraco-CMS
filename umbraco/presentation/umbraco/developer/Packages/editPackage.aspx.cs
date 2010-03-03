@@ -42,7 +42,7 @@ namespace umbraco.presentation.developer.packages
                 bt_submitButton.Attributes.Add("onClick", "window.location = 'submitpackage.aspx?id=" + pack.Id.ToString() + "'; return false;");
                 
                 if (!String.IsNullOrEmpty(pack.PackagePath)) {
-                    packageUmbFile.Text = " &nbsp; <a href='" + pack.PackagePath + "'>Download</a>";
+                    packageUmbFile.Text = " &nbsp; <a href='" + Page.ResolveClientUrl(pack.PackagePath) + "'>Download</a>";
 
                     if (cms.businesslogic.packager.repositories.Repository.getAll().Count > 0)
                         bt_submitButton.Visible = true;                   
@@ -64,7 +64,7 @@ namespace umbraco.presentation.developer.packages
                     /*ACTIONS XML*/
                     tb_actions.Text = pack.Actions;
 
-                    cp.Text = pack.ContentNodeId.ToString();
+                    cp.Value = pack.ContentNodeId.ToString();
                     
                     //startNode.Value = pack.ContentNodeId.ToString();
 
@@ -226,8 +226,8 @@ namespace umbraco.presentation.developer.packages
 
             pack.ContentLoadChildNodes = packageContentSubdirs.Checked;
 
-            if (!String.IsNullOrEmpty(cp.Text))
-                pack.ContentNodeId = cp.Text;
+            if (!String.IsNullOrEmpty(cp.Value))
+                pack.ContentNodeId = cp.Value;
             else
                 pack.ContentNodeId = "";
 
