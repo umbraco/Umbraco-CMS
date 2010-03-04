@@ -2,7 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0242771-6DE6-4E03-BD3A-7B79BA79105B}"
 	ProjectSection(SolutionItems) = preProject
-		foreign dlls\AjaxControlToolkit.dll = foreign dlls\AjaxControlToolkit.dll
 		build.xml = build.xml
 		foreign dlls\ClientDependency.Core.dll = foreign dlls\ClientDependency.Core.dll
 		foreign dlls\CookComputing.XmlRpcV2.dll = foreign dlls\CookComputing.XmlRpcV2.dll
