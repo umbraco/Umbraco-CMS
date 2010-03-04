@@ -56,7 +56,7 @@ namespace umbraco
             Javascript.Append(
                 @"
 function openMemberType(id) {
-	parent.right.document.location.href = 'members/editMemberType.aspx?id=' + id;
+	UmbClientMgr.contentFrame('members/editMemberType.aspx?id=' + id);
 }
 ");
         }

@@ -48,19 +48,19 @@ namespace umbraco
             Javascript.Append(
                 @"
 function openMember(id) {
-	parent.right.document.location.href = 'members/editMember.aspx?id=' + id;
+	UmbClientMgr.contentFrame('members/editMember.aspx?id=' + id);
 }
 
 function searchMembers(id) {
-	parent.right.document.location.href = 'members/search.aspx';
+	UmbClientMgr.contentFrame('members/search.aspx');
 }
 
 function viewMembers(letter) {
-	parent.right.document.location.href = 'members/viewMembers.aspx?letter=' + letter;
+	UmbClientMgr.contentFrame('members/viewMembers.aspx?letter=' + letter);
 }
 
 function openContentItem(id) {
-	parent.right.document.location.href = 'ContentItem/edit.aspx?id=' + id;
+	UmbClientMgr.contentFrame('ContentItem/edit.aspx?id=' + id);
 }
 ");
         }

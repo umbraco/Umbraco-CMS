@@ -66,24 +66,10 @@ namespace umbraco.cms.presentation.Trees
                 Javascript.Append(
 					@"
 function openContent(id) {
-	" + ClientTools.Scripts.GetContentFrame() + ".location.href = '" + IOHelper.ResolveUrl( SystemDirectories.Umbraco ) + "/editContent.aspx?id=' + id;" + @"
+	UmbClientMgr.contentFrame('editContent.aspx?id=' + id);
 }
 ");
             }
-			//TODO: SD: UPDATE ALL TREE CODE SO THAT THE FUNCTIONTOCALL IS EXPLICITLY SET WHEN DIALOGHANDLER IS REQUIRED!
-			//            else
-//            {
-//                Javascript.Append(
-//                    @"
-//function openContent(id) {
-//	if (parent.opener)
-//		parent.opener.dialogHandler(id);
-//	else
-//		parent.dialogHandler(id);	
-//}
-//
-//");
-//            }
         }
 
 

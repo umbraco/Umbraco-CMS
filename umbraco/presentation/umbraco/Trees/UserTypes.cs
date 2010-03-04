@@ -22,7 +22,7 @@ namespace umbraco.cms.presentation.Trees
             Javascript.Append(
                 @"
 function openUserTypes(id) {
-	parent.right.document.location.href = 'users/EditUserType.aspx?id=' + id;
+	UmbClientMgr.contentFrame('users/EditUserType.aspx?id=' + id);
 }
 ");
         }

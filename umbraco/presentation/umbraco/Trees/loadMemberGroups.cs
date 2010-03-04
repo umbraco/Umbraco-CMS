@@ -53,7 +53,7 @@ namespace umbraco
             Javascript.Append(
                 @"
 function openMemberGroup(id) {
-	parent.right.document.location.href = 'members/editMemberGroup.aspx?id=' + id;
+	UmbClientMgr.contentFrame('members/editMemberGroup.aspx?id=' + id);
 }
 ");
         }

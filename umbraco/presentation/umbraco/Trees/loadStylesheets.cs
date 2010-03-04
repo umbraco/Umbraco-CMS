@@ -43,7 +43,7 @@ namespace umbraco
             Javascript.Append(
                 @"
 			function openStylesheet(id) {
-				parent.right.document.location.href = 'settings/stylesheet/editStylesheet.aspx?id=' + id;
+				UmbClientMgr.contentFrame('settings/stylesheet/editStylesheet.aspx?id=' + id);
 			}
 			");
         }

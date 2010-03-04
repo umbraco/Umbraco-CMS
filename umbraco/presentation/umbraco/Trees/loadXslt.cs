@@ -50,7 +50,7 @@ namespace umbraco
             Javascript.Append(
                 @"
 function openXslt(id) {
-	parent.right.document.location.href = 'developer/xslt/editXslt.aspx?file=' + id;
+	UmbClientMgr.contentFrame('developer/xslt/editXslt.aspx?file=' + id);
 }
 ");
         }

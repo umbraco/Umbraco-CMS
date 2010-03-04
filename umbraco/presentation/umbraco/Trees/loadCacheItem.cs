@@ -61,7 +61,7 @@ namespace umbraco
             Javascript.Append(
                 @"
 function openCacheItem(id) {
-	parent.right.document.location.href = 'developer/cache/viewCacheItem.aspx?key=' + id;
+	UmbClientMgr.contentFrame('developer/cache/viewCacheItem.aspx?key=' + id);
 }
 ");
         }

@@ -47,7 +47,7 @@ namespace umbraco
         /// <param name="Javascript">The javascript.</param>
         public override void RenderJS(ref StringBuilder Javascript)
         {
-            Javascript.Append(@"function openDLRScript(id) {parent.right.document.location.href = 'developer/python/editPython.aspx?file=' + id;}");
+            Javascript.Append(@"function openDLRScript(id) {UmbClientMgr.contentFrame('developer/python/editPython.aspx?file=' + id);}");
         }
 
         protected override string FilePath

@@ -42,7 +42,7 @@ namespace umbraco
             Javascript.Append(
                 @"
 function openTemplate(id) {
-	parent.right.document.location.href = 'settings/editTemplate.aspx?templateID=' + id;
+	UmbClientMgr.contentFrame('settings/editTemplate.aspx?templateID=' + id);
 }
 ");
         }

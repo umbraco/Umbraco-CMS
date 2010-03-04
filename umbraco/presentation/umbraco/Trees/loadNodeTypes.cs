@@ -64,7 +64,7 @@ namespace umbraco
             Javascript.Append(
                 @"
 function openNodeType(id) {
-	parent.right.document.location.href = 'settings/editNodeTypeNew.aspx?id=' + id;
+	UmbClientMgr.contentFrame('settings/editNodeTypeNew.aspx?id=' + id);
 }
 ");
         }

@@ -74,7 +74,7 @@ namespace umbraco.cms.presentation.Trees
             Javascript.Append(
                 @"
 function openUserPermissions(id) {
-	parent.right.document.location.href = 'users/PermissionEditor.aspx?id=' + id;
+	UmbClientMgr.contentFrame('users/PermissionEditor.aspx?id=' + id);
 }
 ");
         }

@@ -44,10 +44,10 @@ namespace umbraco {
         public override void RenderJS(ref StringBuilder Javascript) {
            Javascript.Append(@"
                     function openTranslationTask(id) {
-	                    parent.right.document.location.href = 'translation/details.aspx?id=' + id;
+	                    UmbClientMgr.contentFrame('translation/details.aspx?id=' + id);
                     }
                     function openTranslationOverview(id, mode) {
-	                    parent.right.document.location.href = 'translation/default.aspx?id=' + id + '&mode=' + mode;
+	                    UmbClientMgr.contentFrame('translation/default.aspx?id=' + id + '&mode=' + mode);
                     }
                     ");     
         }
@@ -99,7 +99,7 @@ namespace umbraco {
         public override void RenderJS(ref StringBuilder Javascript) {
             Javascript.Append(@"
                     function openTranslationTask(id) {
-	                    parent.right.document.location.href = 'translation/details.aspx?id=' + id;
+	                    UmbClientMgr.contentFrame('translation/details.aspx?id=' + id);
                     }");
         }
 

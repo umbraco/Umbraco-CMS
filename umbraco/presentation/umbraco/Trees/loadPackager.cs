@@ -60,7 +60,7 @@ namespace umbraco
         {
             Javascript.Append(
             @"function openPackageCategory(url) {
-			parent.right.document.location.href = 'developer/packages/' + url;}"
+			UmbClientMgr.contentFrame('developer/packages/' + url);}"
             );
         }
 

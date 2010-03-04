@@ -42,11 +42,11 @@ namespace umbraco
             Javascript.Append(
                 @"
 function openLanguage(id) {
-	parent.right.document.location.href = 'settings/editLanguage.aspx?id=' + id;
+	UmbClientMgr.contentFrame('settings/editLanguage.aspx?id=' + id);
 }
 
 function openDictionary() {
-	parent.right.document.location.href = 'settings/DictionaryItemList.aspx';
+	UmbClientMgr.contentFrame('settings/DictionaryItemList.aspx');
 }");
         }
 

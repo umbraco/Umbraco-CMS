@@ -52,7 +52,7 @@ namespace umbraco
             Javascript.Append(
                 @"
 			function openDictionaryItem(id) {
-				parent.right.document.location.href = 'settings/editDictionaryItem.aspx?id=' + id;
+				UmbClientMgr.contentFrame('settings/editDictionaryItem.aspx?id=' + id);
 			}
 			");
         }

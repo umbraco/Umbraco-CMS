@@ -41,7 +41,7 @@ namespace umbraco
             Javascript.Append(
                 @"
 			function openStylesheetProperty(id) {
-				parent.right.document.location.href = 'settings/stylesheet/property/editStylesheetProperty.aspx?id=' + id;
+				UmbClientMgr.contentFrame('settings/stylesheet/property/editStylesheetProperty.aspx?id=' + id);
 			}
 			");
         }

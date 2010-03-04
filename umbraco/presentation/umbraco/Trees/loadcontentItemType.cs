@@ -40,7 +40,7 @@ namespace umbraco
             Javascript.Append(
                 @"
 function openContentItemType(id) {
-	parent.right.document.location.href = 'settings/editContentItemType.aspx?id=' + id;
+	UmbClientMgr.contentFrame('settings/editContentItemType.aspx?id=' + id);
 }
 ");
         }

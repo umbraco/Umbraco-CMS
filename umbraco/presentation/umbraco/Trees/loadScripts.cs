@@ -44,7 +44,7 @@ namespace umbraco
             Javascript.Append(
                 @"
 			function openScriptEditor(id) {
-			parent.right.document.location.href = 'settings/scripts/editScript.aspx?file=' + id;
+			UmbClientMgr.contentFrame('settings/scripts/editScript.aspx?file=' + id);
 			}
 		");
         }

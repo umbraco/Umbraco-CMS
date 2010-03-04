@@ -49,7 +49,7 @@ namespace umbraco
             Javascript.Append(
                 @"
 function openDataType(id) {
-	parent.right.document.location.href = 'developer/datatypes/editDataType.aspx?id=' + id;
+	UmbClientMgr.contentFrame('developer/datatypes/editDataType.aspx?id=' + id);
 }
 ");
         }

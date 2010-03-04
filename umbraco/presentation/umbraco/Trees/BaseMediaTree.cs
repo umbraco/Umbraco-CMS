@@ -65,23 +65,10 @@ namespace umbraco.cms.presentation.Trees
                 Javascript.Append(
 					@"
 function openMedia(id) {
-	" + ClientTools.Scripts.GetContentFrame() + ".location.href = '" + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/editMedia.aspx?id=' + id;" + @"
+	" + ClientTools.Scripts.GetContentFrame() + ".location.href = 'editMedia.aspx?id=' + id;" + @"
 }
 ");
             }
-			//TODO: SD: UPDATE ALL TREE CODE SO THAT THE FUNCTIONTOCALL IS EXPLICITLY SET WHEN DIALOGHANDLER IS REQUIRED!
-			//            else
-//            {
-//                Javascript.Append(
-//                    @"
-//function openMedia(id) {
-//	if (parent.opener)
-//		parent.opener.dialogHandler(id);
-//	else
-//		parent.dialogHandler(id);	
-//}
-//");
-//            }
         }
 
         public override void Render(ref XmlTree tree)

@@ -40,7 +40,7 @@ namespace umbraco
             Javascript.Append(
                 @"
 function openMediaType(id) {
-	parent.right.document.location.href = 'settings/editMediaType.aspx?id=' + id;
+	UmbClientMgr.contentFrame('settings/editMediaType.aspx?id=' + id);
 }
 ");
         }
