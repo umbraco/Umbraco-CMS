@@ -1480,11 +1480,6 @@ namespace umbraco.cms.businesslogic.web
 
 
         /// <summary>
-        /// The index event handlers
-        /// </summary>
-        public delegate void IndexEventHandler(Document sender, AddToIndexEventArgs e);
-
-        /// <summary>
         /// Occurs when [before save].
         /// </summary>
         public static event SaveEventHandler BeforeSave;
@@ -1737,33 +1732,6 @@ namespace umbraco.cms.businesslogic.web
         {
             if (AfterRollBack != null)
                 AfterRollBack(this, e);
-        }
-
-		/// <summary>
-        /// Occurs when [before add to index].
-        /// </summary>
-        public static event IndexEventHandler BeforeAddToIndex;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeAddToIndex"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeAddToIndex(AddToIndexEventArgs e) {
-            if (BeforeAddToIndex != null)
-                BeforeAddToIndex(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after add to index].
-        /// </summary>
-        public static event IndexEventHandler AfterAddToIndex;
-        /// <summary>
-        /// Raises the <see cref="E:AfterAddToIndex"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterAddToIndex(AddToIndexEventArgs e)
-        {
-            if (AfterAddToIndex != null)
-                AfterAddToIndex(this, e);
         }
 
         private Dictionary<Property, object> _knownProperties;
