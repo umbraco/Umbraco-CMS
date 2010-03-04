@@ -1207,6 +1207,9 @@
       <DependentUpon>MacroContainerService.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="umbraco\webservices\TagsAutoCompleteHandler.ashx.cs">
+      <DependentUpon>TagsAutoCompleteHandler.ashx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\webservices\TreeClientService.asmx.cs">
       <DependentUpon>TreeClientService.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -1413,10 +1416,6 @@
       <DependentUpon>Settings.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="umbraco\webservices\tagService.asmx.cs">
-      <DependentUpon>tagService.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="umbraco\webservices\templates.asmx.cs">
       <DependentUpon>templates.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -1452,6 +1451,7 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
+    <Content Include="web.config.NIBBLE-LAPTOP.xslt" />
     <Content Include="web.config.PETER-PC.xslt" />
     <Content Include="umbraco\xslt\templates\Schema2\Breadcrumb.xslt" />
     <Content Include="umbraco\xslt\templates\Schema2\Clean.xslt" />
@@ -1964,7 +1964,6 @@
     <Content Include="umbraco\users\PermissionsEditor.js" />
     <Content Include="umbraco\users\PermissionsHandler.asmx" />
     <Content Include="umbraco\webservices\CheckForUpgrade.asmx" />
-    <Content Include="umbraco\webservices\tagService.asmx" />
     <Content Include="umbraco\xslt\searchResult.xslt" />
     <Content Include="umbraco\xslt\templates\RelatedLinks.xslt" />
     <Content Include="umbraco\xslt\templates\RSSFeed.xslt" />
@@ -2719,6 +2718,7 @@
     <None Include="umbraco\Trees\XmlTree.xsx">
       <DependentUpon>XmlTree.xsd</DependentUpon>
     </None>
+    <Content Include="umbraco\webservices\TagsAutoCompleteHandler.ashx" />
     <None Include="umbraco_client\CodeMirror\LICENSE" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
     <Content Include="web.config.APOWELL-BC-WIN7.xslt" />
@@ -2785,6 +2785,7 @@
     <None Include="umbraco\schemas\umbraco.xsx">
       <DependentUpon>umbraco.xsd</DependentUpon>
     </None>
+    <Content Include="web.config" />
     <Content Include="config\UrlRewriting.config" />
   </ItemGroup>
   <ItemGroup>
