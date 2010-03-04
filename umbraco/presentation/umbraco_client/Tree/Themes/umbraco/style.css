@@ -5,6 +5,8 @@
 	min-height: 20px;
 	font: icon;
 	position:relative;
+	font-family: Arial,Lucida Grande;
+	font-size: 12px;
 }
 .tree-umbraco li a
 {
@@ -95,32 +97,41 @@
 	background: #f0f0f0 url(contextMenuBg.gif) repeat-y left;
 	border: 1px solid #979797;
 	padding: 3px;
+	padding-top: 2px;
+	padding-bottom: 0px;
 	width: 180px;
 	font-family: Arial,Lucida Grande;
 	font-size: 11px;
 	z-index: 1000;
+	margin: 0px;
+	display: block;
 }
+
+
 #jstree-contextmenu.tree-umbraco-context li 
 {
 	border-left:none;
 	background:transparent;
-	margin:0;	
+	height: 26px;
 }
+
 #jstree-contextmenu.tree-umbraco-context li a
 {
 	border:0px;
-	padding: 1px;
-	margin: 1px;
+	padding: 2px;
 	height: 20px;
 	line-height:20px;	
 	color: #1a1818;
 	text-decoration: none;
 	text-indent: 0px;
+	margin-top: 1px !Important;
+	margin-bottom: 3px !Important;
 }
+
 #jstree-contextmenu.tree-umbraco-context li a:hover
 {
 	border: 1px solid #a8d8eb;
-	padding: 0px;
+	padding: 1px;
 	background: #dcecf3;	
 	text-indent: 0px;	
 }
@@ -131,7 +142,7 @@
 	font-size: 1px;
 	height: 1px;
 	line-height: 1px;
-	margin: 0 2px 0 24px;
+	margin: 0 2px 4px 29px;
 	min-height: 1px;
 	display: block;
 }
@@ -140,11 +151,12 @@
 {
 	height: 16px;
 	width: 16px;
-	margin: 1px 10px 0 2px;
+	margin: 1px 10px 0 4px;
 }
-#jstree-contextmenu.tree-umbraco-context li a ins {display:none;}
-#jstree-contextmenu.tree-umbraco-context li a span {margin:0;padding-left:0px;background:none;}
 
+#jstree-contextmenu.tree-umbraco-context li a ins {display:none;}
+#jstree-contextmenu.tree-umbraco-context li a span {margin:0;padding-left:1px;background:none;}
+#jstree-contextmenu.tree-umbraco-context li a span div.menuLabel{padding-left: 37px;}
 
 /* Tree icons sprites */
 

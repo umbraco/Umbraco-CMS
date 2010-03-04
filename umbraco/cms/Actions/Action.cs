@@ -45,7 +45,7 @@ namespace umbraco.BusinessLogic.Actions
             if (_actionHandlers.Count > 0)
                 return;
 
-            List<Type> foundIActionHandlers = TypeFinder.FindClassesOfType<IActionHandler>();
+            List<Type> foundIActionHandlers = TypeFinder.FindClassesOfType<IActionHandler>(true);
             foreach (Type type in foundIActionHandlers)
             {
                 IActionHandler typeInstance;
@@ -63,7 +63,7 @@ namespace umbraco.BusinessLogic.Actions
             if (_actions.Count > 0)
                 return;
 
-            List<Type> foundIActions = TypeFinder.FindClassesOfType<IAction>();
+            List<Type> foundIActions = TypeFinder.FindClassesOfType<IAction>(true);
             foreach (Type type in foundIActions)
             {
                 IAction typeInstance;
@@ -250,4 +250,6 @@ namespace umbraco.BusinessLogic.Actions
             );
         }
     }
+
+    
 }

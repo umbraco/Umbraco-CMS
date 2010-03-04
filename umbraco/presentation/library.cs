@@ -26,6 +26,8 @@ using System.Web.Security;
 using umbraco.cms.businesslogic.language;
 using umbraco.IO;
 using umbraco.presentation;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace umbraco
 {
@@ -176,7 +178,7 @@ namespace umbraco
                     new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"),
                     DocumentId);
             else
-                content.Instance.UnPublishNode(DocumentId);
+                content.Instance.ClearDocumentCache(DocumentId);
         }
 
         /// <summary>
@@ -863,7 +865,7 @@ namespace umbraco
         /// <returns>A string with the DayOfWeek matching the current contexts culture settings</returns>
         public static string GetWeekDay(string Date)
         {
-            return DateTime.Parse(Date).DayOfWeek.ToString();
+            return DateTime.Parse(Date).ToString("dddd");
         }
 
         /// <summary>
@@ -1149,6 +1151,8 @@ namespace umbraco
             {
                 if (UmbracoSettings.UseAspNetMasterPages)
                 {
+                    System.Collections.Generic.Dictionary<object, object> items = getCurrentContextItems();
+
                     if (!umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled)
                     {
                         HttpContext Context = HttpContext.Current;
@@ -1165,6 +1169,10 @@ namespace umbraco
                         Context.Server.Execute(
                             string.Format("/default.aspx?umbPageID={0}&alttemplate={1}{2}",
                             PageId, new template(TemplateId).TemplateAlias, queryString), sw);
+
+                        // update the local page items again
+                        updateLocalContextItems(items, Context);
+
                         return sw.ToString();
                     }
                     else
@@ -1187,6 +1195,28 @@ namespace umbraco
             catch (Exception ee)
             {
                 return string.Format("<!-- Error generating macroContent: '{0}' -->", ee);
+            }
+        }
+
+        private static System.Collections.Generic.Dictionary<object, object> getCurrentContextItems()
+        {
+            IDictionary items = HttpContext.Current.Items;
+            System.Collections.Generic.Dictionary<object, object> currentItems = new Dictionary<object, object>();
+            IDictionaryEnumerator ide = items.GetEnumerator();
+            while (ide.MoveNext())
+            {
+                currentItems.Add(ide.Key, ide.Value);
+            }
+            return currentItems;
+        }
+
+        private static void updateLocalContextItems(IDictionary items, HttpContext Context)
+        {
+            Context.Items.Clear();
+            IDictionaryEnumerator ide = items.GetEnumerator();
+            while (ide.MoveNext())
+            {
+                Context.Items.Add(ide.Key, ide.Value);
             }
         }
 

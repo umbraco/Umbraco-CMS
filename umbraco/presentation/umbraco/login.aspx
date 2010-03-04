@@ -29,6 +29,7 @@
 
 	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="ui/default.css" PathNameAlias="UmbracoClient" />
 	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" />
+	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient" />
 
   <form id="Form1" method="post" runat="server">
    
@@ -88,11 +89,23 @@
   </form>
 
   <script type="text/javascript">
-			document.getElementById("lname").focus();
-      document.getElementById('<%= hf_height.ClientID %>').value = getViewportHeight();
-      document.getElementById('<%= hf_width.ClientID %>').value = getViewportWidth();    
-  </script>
+        jQuery("#ctl00_body_lname").focus();
+        jQuery('#<%= hf_height.ClientID %>').value = getViewportHeight();
+        jQuery('#<%= hf_width.ClientID %>').value = getViewportWidth();    
+    </script>
   
+	
+<asp:PlaceHolder Visible="false" ID="loginError" runat="server">
+
+        <script type="text/javascript">
+            jQuery(document).ready(function() {
+            jQuery("#loginTable").effect("shake", { times: 5, distance: 5 }, 80);
+            jQuery("#ctl00_body_lname").attr("style", jQuery("#ctl00_body_lname").attr("style") + "; border: 2px solid red;");
+            jQuery("#ctl00_body_passw").attr("style", jQuery("#ctl00_body_lname").attr("style") + "; border: 2px solid red;");
+        });
+        </script>
+
+ </asp:PlaceHolder>
 
 </body>
 </html>

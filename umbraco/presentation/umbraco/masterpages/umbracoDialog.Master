@@ -1,4 +1,4 @@
-﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="umbracoDialog.master.cs" Inherits="umbraco.presentation.umbraco.masterpages.umbracoDialog" %>
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="umbracoDialog.master.cs" Inherits="umbraco.presentation.masterpages.umbracoDialog" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
@@ -6,6 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head id="Head1" runat="server">
     <title></title>
+    
     
     <!-- Default script and style -->
 	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="ui/default.css" PathNameAlias="UmbracoClient" />

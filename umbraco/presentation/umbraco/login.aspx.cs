@@ -109,6 +109,9 @@ namespace umbraco.cms.presentation
                 else
                     Response.Redirect(Request["redir"]);
             }
+            else {
+                loginError.Visible = true;
+            }
         }
 
         /// <summary>

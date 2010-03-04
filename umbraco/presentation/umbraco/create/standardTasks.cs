@@ -6,6 +6,7 @@ using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
 using umbraco.IO;
+using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
@@ -1316,9 +1317,26 @@ namespace umbraco
 
         #endregion
     }
+    public class NewMemberUIEventArgs : System.ComponentModel.CancelEventArgs
+    {
+    }
 
     public class memberTasks : interfaces.ITaskReturnUrl
     {
+        /// <summary>
+        /// The new event handler
+        /// </summary>
+        new public delegate void NewUIMemberEventHandler(Member sender, string unencryptedPassword, NewMemberUIEventArgs e);
+
+        new public static event NewUIMemberEventHandler NewMember;
+        new protected virtual void OnNewMember(NewMemberUIEventArgs e, string unencryptedPassword, Member m)
+        {
+            if (NewMember != null)
+            {
+                NewMember(m, unencryptedPassword, e);
+            }
+        }
+
 
         private string _alias;
         private int _parentID;
@@ -1374,6 +1392,10 @@ namespace umbraco
                 m.Password = password;
                 m.Email = email;
                 m.LoginName = name.Replace(" ", "").ToLower();
+
+                NewMemberUIEventArgs e = new NewMemberUIEventArgs();
+                this.OnNewMember(e, password, m);
+
                 _returnUrl = "members/editMember.aspx?id=" + m.Id.ToString();
             }
             else

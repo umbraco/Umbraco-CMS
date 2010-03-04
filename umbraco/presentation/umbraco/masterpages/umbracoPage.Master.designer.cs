@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace umbraco.presentation.umbraco.masterpages {
+namespace umbraco.presentation.masterpages {
     
     
     public partial class umbracoPage {

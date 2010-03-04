@@ -31,6 +31,7 @@ namespace umbraco.presentation.cache {
         /// <remarks/>
         public CacheRefresher() {
             this.Url = "http://" + System.Web.HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/cacheRefresher.asmx";
+            
         }
 
         /// <remarks/>

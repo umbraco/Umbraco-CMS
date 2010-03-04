@@ -93,6 +93,8 @@
         <!-- Baseline Language file for translation tool -->
         <copy file="${build.dir}\umbraco\config\lang\en.xml" tofile="${web.dir}\usercontrols\translation\langs\en.xml" failonerror="false" overwrite="true"/>
 
+        <!-- LINQ2UMB dll-->
+        <copy file="${root.dir}\LinqToUmbraco\src\umbraco.Linq\Core\bin\Debug - Fixed Version\umbraco.Linq.Core.dll" tofile="${build.dir}\bin\umbraco.Linq.Core.dll" failonerror="false" overwrite="true"/>
 
 
         <delete dir="${build.dir}\webservices" />
@@ -107,7 +109,7 @@
         <delete dir="${build.dir}\python" />
         <delete dir="${build.dir}\xslt" />
         <delete dir="${build.dir}\usercontrols" />
-        
+    
 
         <delete>
             <fileset>
