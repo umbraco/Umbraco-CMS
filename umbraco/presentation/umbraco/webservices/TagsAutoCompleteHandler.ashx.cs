@@ -18,6 +18,7 @@ namespace umbraco.presentation.umbraco.webservices
 
         public void ProcessRequest(HttpContext context)
         {
+
             context.Response.ContentType = "text/plain";
 
             int count = 2;
@@ -25,6 +26,7 @@ namespace umbraco.presentation.umbraco.webservices
             string group = context.Request.QueryString["group"];
             string id = context.Request.QueryString["id"];
            
+            string sql;
 
             IRecordsReader rr;
 
