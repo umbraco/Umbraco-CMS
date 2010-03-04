@@ -2,9 +2,10 @@
 using System.Configuration;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using AjaxControlToolkit;
 using umbraco.cms.businesslogic;
 using umbraco.interfaces;
+using ClientDependency.Core.Controls;
+using ClientDependency.Core;
 
 namespace umbraco.editorControls.ultimatepicker
 {
@@ -111,9 +112,9 @@ namespace umbraco.editorControls.ultimatepicker
             switch (controlType)
             {
                 case "AutoComplete":
-                    if (childtxt.Text.Contains("|"))
+                    if (childtxt.Text.Contains("[") && childtxt.Text.Contains("]"))
                     {
-                        dataToSave = childtxt.Text.Split("|".ToCharArray())[1];
+                        dataToSave = childtxt.Text.Replace("]","").Split("[".ToCharArray())[1];
                     }
 
                     
@@ -381,27 +382,14 @@ namespace umbraco.editorControls.ultimatepicker
         /// </summary>
         private void setupAutoComplete(int parentNodeId)
         {
-            string script = "<style>/*AutoComplete flyout */\r\n                            .autocomplete_completionListElement \r\n                            {  \r\n\t                            visibility : hidden;\r\n\t                            margin : 0px !Important;\r\n\t                            padding: 0px !Important;\r\n                                background-color : #fff;\r\n\t                            color : #000;\r\n\t                            border : #ccc;\r\n\t                            border-width : 1px;\r\n\t                            border-style : solid;\r\n\t                            cursor : 'default';\r\n\t                            overflow : auto;\r\n\t                            height : 100px;\r\n                                text-align : left; \r\n                                list-style: none !Important;\r\n                                width: 400px !Important;\r\n                                z-index: 9999999;\r\n                            }\r\n                            .autocomplete_completionListElement li{\r\n                                display: block;\r\n                                padding: 1px !Important;\r\n                                margin: 0px;\r\n                            }\r\n                            /* AutoComplete highlighted item */\r\n\r\n                            .autocomplete_highlightedListItem\r\n                            {\r\n\t                            background-color: #ffff99;\r\n\t                            color: black;\r\n\t                            padding: 1px;\r\n                            }\r\n\r\n                            /* AutoComplete item */\r\n\r\n                            .autocomplete_listItem \r\n                            {\r\n\t                            background-color : window;\r\n\t                            color : windowtext;\r\n\t                            padding : 1px;\r\n                            }</style>";
-            this.Page.ClientScript.RegisterClientScriptBlock(script.GetType(), "ultimatePickerCss", script);
+            ClientDependencyLoader.Instance.RegisterDependency("Application/JQuery/jquery.autocomplete.js", "UmbracoClient", ClientDependencyType.Javascript);
+            ClientDependencyLoader.Instance.RegisterDependency("css/umbracoGui.css", "UmbracoRoot", ClientDependencyType.Css);
+
+            
             childtxt = new TextBox();
             childtxt.ID = "ultimatePickerBox" + base.ID;
             childtxt.AutoCompleteType = AutoCompleteType.Disabled;
             childtxt.CssClass = "umbEditorTextField";
-            AutoCompleteExtender extender = new AutoCompleteExtender();
-            extender.TargetControlID = "ultimatePickerBox" + base.ID;
-            extender.ServiceMethod = "getNodes";
-            
-            extender.ServicePath = ConfigurationManager.AppSettings["umbracoPath"] + "/webservices/ultimatePickerAutoSuggest.asmx";
-            extender.MinimumPrefixLength = 2;
-            extender.CompletionInterval = 1000;
-            extender.EnableCaching = true;
-            extender.CompletionSetCount = 5;
-            extender.CompletionListCssClass = "autocomplete_completionListElement";
-            extender.CompletionListItemCssClass = "autocomplete_listItem";
-            extender.CompletionListHighlightedItemCssClass = "autocomplete_highlightedListItem";
-            extender.DelimiterCharacters = ";, :";
-            extender.UseContextKey = true;
-            extender.ContextKey = parentNodeId.ToString() + "|" + config[3] + "|" + config[2];
 
             if (_data.Value.ToString().Length > 3)
             {
@@ -417,7 +405,28 @@ namespace umbraco.editorControls.ultimatepicker
             }
 
             base.ContentTemplateContainer.Controls.Add(childtxt);
-            base.ContentTemplateContainer.Controls.Add(extender);
+
+
+            string autoCompleteScript =
+                 "jQuery(\"#"
+                 + childtxt.ClientID + "\").autocomplete(\""
+                 + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)
+                 + "/webservices/UltimatePickerAutoCompleteHandler.ashx\",{minChars: 2,max: 100, extraParams:{id:\"" + parentNodeId.ToString() + "\",showchildren:\"" + config[3] + "\",filter:\"" + config[2] + "\",rnd:\"" + DateTime.Now.Ticks + "\"}});";
+
+
+            string autoCompleteInitScript =
+                "jQuery(document).ready(function(){"
+                + autoCompleteScript
+                + "});";
+
+            Page.ClientScript.RegisterStartupScript(GetType(), ClientID + "_ultimatepickerinit", autoCompleteInitScript, true);
+
+            if (Page.IsPostBack)
+            {
+                ScriptManager.RegisterClientScriptBlock(this, GetType(), ClientID + "_ultimatepicker", autoCompleteScript, true);
+
+            }
+
         }
     }
 }

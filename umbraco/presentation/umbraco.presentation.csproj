@@ -1424,9 +1424,8 @@
       <DependentUpon>trashcan.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="umbraco\webservices\ultimatePickerAutoSuggest.asmx.cs">
-      <DependentUpon>ultimatePickerAutoSuggest.asmx</DependentUpon>
-      <SubType>Component</SubType>
+    <Compile Include="umbraco\webservices\UltimatePickerAutoCompleteHandler.ashx.cs">
+      <DependentUpon>UltimatePickerAutoCompleteHandler.ashx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\Web\UI\ContentPage.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -2273,7 +2272,6 @@
     </Content>
     <Content Include="umbraco\webservices\templates.asmx" />
     <Content Include="umbraco\webservices\trashcan.asmx" />
-    <Content Include="umbraco\webservices\ultimatePickerAutoSuggest.asmx" />
     <Content Include="umbraco\webservices\wsdl.xslt" />
     <Content Include="umbraco\xslt\macroGetCurrent.xsl" />
     <Content Include="umbraco\xslt\macroGetSubs.xsl" />
@@ -2719,6 +2717,7 @@
       <DependentUpon>XmlTree.xsd</DependentUpon>
     </None>
     <Content Include="umbraco\webservices\TagsAutoCompleteHandler.ashx" />
+    <Content Include="umbraco\webservices\UltimatePickerAutoCompleteHandler.ashx" />
     <None Include="umbraco_client\CodeMirror\LICENSE" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
     <Content Include="web.config.APOWELL-BC-WIN7.xslt" />
