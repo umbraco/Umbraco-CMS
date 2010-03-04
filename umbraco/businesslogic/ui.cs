@@ -37,11 +37,34 @@ namespace umbraco
             }
         }
 
-        private static string getLanguage() {
-            if (UmbracoEnsuredPage.CurrentUser != null) {
-                return UmbracoEnsuredPage.CurrentUser.Language;
-            } else {
-                return umbracoDefaultUILanguage;
+        /// <summary>
+        /// Check if th user is logged in, if they are, return their language specified in the database.
+        /// If they aren't logged in, check the current thread culture and return it, however if that is
+        /// null, then return the default Umbraco culture.
+        /// </summary>
+        /// <returns></returns>
+        private static string getLanguage()
+        {
+            return getLanguage(UmbracoEnsuredPage.CurrentUser);
+        }
+
+        /// <summary>
+        /// Check if th user is logged in, if they are, return their language specified in the database.
+        /// If they aren't logged in, check the current thread culture and return it, however if that is
+        /// null, then return the default Umbraco culture.
+        /// </summary>
+        private static string getLanguage(User u)
+        {
+            if (u != null)
+            {
+                return u.Language;
+            }
+            else
+            {
+                string language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+                if (string.IsNullOrEmpty(language))
+                    language = umbracoDefaultUILanguage;
+                return language;
             }
         }
 
@@ -53,8 +76,7 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Key, User u)
         {
-			//TODO: Perhaps we should use the user parameter for something??
-            return GetText(Key);
+            return GetText(string.Empty, Key, null, getLanguage(u));
         }
 
         /// <summary>
@@ -76,8 +98,7 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key, User u)
         {
-			//TODO: Perhaps we should use the user parameter for something??
-            return GetText(Area, Key);
+            return GetText(Area, Key, null, getLanguage(u));
         }
 
         /// <summary>
@@ -101,14 +122,7 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key, string[] Variables, User u)
         {
-            // Check if user is null (AutoForm)
-            string _culture = "";
-            if (u == null)
-                _culture = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
-            else
-                _culture = new System.Globalization.CultureInfo(Culture(u)).TwoLetterISOLanguageName;
-
-            return GetText(Area, Key, Variables, _culture);
+            return GetText(Area, Key, Variables, getLanguage(u));
         }
 
         /// <summary>
@@ -121,8 +135,7 @@ namespace umbraco
         /// <returns></returns>
         public static string Text(string Area, string Key, string Variable, User u)
         {
-			//TODO: Perhaps we should use the user parameter for something??
-			return GetText(Area, Key, Variable);
+            return GetText(Area, Key, new string[] { Variable }, getLanguage(u));
         }
 
         /// <summary>
@@ -132,21 +145,7 @@ namespace umbraco
         /// <returns></returns>
         public static string GetText(string key)
         {
-            if (key == null)
-                return string.Empty;
-
-            string language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
-            if (string.IsNullOrEmpty(language))
-                language = umbracoDefaultUILanguage;
-
-            XmlDocument langFile = getLanguageFile(language);
-            if (langFile != null)
-            {
-                XmlNode node = langFile.SelectSingleNode(string.Format("//key [@alias = '{0}']", key));
-                if (node != null && node.FirstChild != null)
-                    return node.FirstChild.Value;
-            }
-            return "[" + key + "]";
+            return GetText(string.Empty, key, null, getLanguage());            
         }
 
         /// <summary>
@@ -157,22 +156,7 @@ namespace umbraco
         /// <returns></returns>
         public static string GetText(string area, string key)
         {
-            if (string.IsNullOrEmpty(area) || string.IsNullOrEmpty(key))
-                return string.Empty;
-
-            string language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
-            if (string.IsNullOrEmpty(language))
-                language = umbracoDefaultUILanguage;
-
-            XmlDocument langFile = getLanguageFile(language);
-            if (langFile != null)
-            {
-                XmlNode node =
-                    langFile.SelectSingleNode(string.Format("//area [@alias = '{0}']/key [@alias = '{1}']", area, key));
-                if (node != null)
-                    return xmlHelper.GetNodeValue(node);
-            }
-            return "[" + key + "]";
+            return GetText(area, key, null, getLanguage());
         }
 
         /// <summary>
@@ -184,49 +168,62 @@ namespace umbraco
         /// <returns></returns>
         public static string GetText(string area, string key, string[] variables)
         {
-            if (string.IsNullOrEmpty(area) || string.IsNullOrEmpty(key) || variables == null)
-                return string.Empty;
+            return GetText(area, key, variables, getLanguage());
+        }
 
-            string language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
-            if (string.IsNullOrEmpty(language))
-                language = umbracoDefaultUILanguage;
-
-            XmlDocument langFile = getLanguageFile(language);
-            if (langFile != null)
-            {
-                XmlNode node = langFile.SelectSingleNode(string.Format("//area [@alias = '{0}']/key [@alias = '{1}']",
-                                                                       area, key));
-                if (node != null)
-                {
-                    string stringWithVars = GetStringWithVars(node, variables);
-                    return stringWithVars;
-                }
-            }
-            return "[" + key + "]";
+        /// <summary>
+        /// Returns translated UI text with a specific key and area matching the variable send to the method.
+        /// </summary>
+        /// <param name="area">The area.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="variable">The variable.</param>
+        /// <returns></returns>
+        public static string GetText(string area, string key, string variable)
+        {
+            return GetText(area, key, new string[] { variable }, getLanguage());
         }
 
         /// <summary>
         /// Returns translated UI text with a specific key, area and language matching the variables send to the method.
         /// </summary>
-        /// <param name="area">The area.</param>
-        /// <param name="key">The key.</param>
-        /// <param name="variables">The variables.</param>
-        /// <param name="language">The language.</param>
+        /// <param name="area">The area (Optional)</param>
+        /// <param name="key">The key (Required)</param>
+        /// <param name="variables">The variables (Optional)</param>
+        /// <param name="language">The language (Optional)</param>
         /// <returns></returns>
+        /// <remarks>This is the underlying call for all Text/GetText method calls</remarks>
         public static string GetText(string area, string key, string[] variables, string language)
         {
-            if (string.IsNullOrEmpty(area) || string.IsNullOrEmpty(key) || variables == null)
+            if (string.IsNullOrEmpty(key))
                 return string.Empty;
 
+            if (string.IsNullOrEmpty(language))
+                language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
+            
             XmlDocument langFile = getLanguageFile(language);
+            
             if (langFile != null)
             {
-                XmlNode node = langFile.SelectSingleNode(string.Format("//area [@alias = '{0}']/key [@alias = '{1}']",
-                                                                       area, key));
+                XmlNode node;
+                if (string.IsNullOrEmpty(area))
+                {
+                    node = langFile.SelectSingleNode(string.Format("//key [@alias = '{0}']", key));
+                }
+                else
+                {
+                    node = langFile.SelectSingleNode(string.Format("//area [@alias = '{0}']/key [@alias = '{1}']", area, key));
+                }
+                
                 if (node != null)
                 {
-                    string stringWithVars = GetStringWithVars(node, variables);
-                    return stringWithVars;
+                    if (variables != null && variables.Length > 0)
+                    {
+                        return GetStringWithVars(node, variables);
+                    }
+                    else
+                    {
+                        return xmlHelper.GetNodeValue(node);
+                    }
                 }
             }
             return "[" + key + "]";
@@ -245,33 +242,6 @@ namespace umbraco
                                            variables[Convert.ToInt32(var.Groups[0].Value.Replace("%", ""))]);
             }
             return stringWithVars;
-        }
-
-        /// <summary>
-        /// Returns translated UI text with a specific key and area matching the variable send to the method.
-        /// </summary>
-        /// <param name="area">The area.</param>
-        /// <param name="key">The key.</param>
-        /// <param name="variable">The variable.</param>
-        /// <returns></returns>
-        public static string GetText(string area, string key, string variable)
-        {
-            if (string.IsNullOrEmpty(area) || string.IsNullOrEmpty(key) || string.IsNullOrEmpty(variable))
-                return string.Empty;
-
-            string language = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
-            if (string.IsNullOrEmpty(language))
-                language = umbracoDefaultUILanguage;
-
-            XmlDocument langFile = getLanguageFile(language);
-            if (langFile != null)
-            {
-                XmlNode node = langFile.SelectSingleNode(string.Format("//area [@alias = '{0}']/key [@alias = '{1}']",
-                                                                       area, key));
-                if (node != null)
-                    return xmlHelper.GetNodeValue(node).Replace("%0%", variable);
-            }
-            return "[" + key + "]";
         }
 
         /// <summary>
