@@ -35,7 +35,14 @@ namespace umbraco.cms.presentation.Trees
             XmlTreeNode xNode = XmlTreeNode.Create(this);
             xNode.Text = "Error";
             xNode.Menu = null;
-            tree.Add(xNode);
+
+            OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+            if (xNode != null)
+            {
+                tree.Add(xNode);
+                OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+            }
+            
         }
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)

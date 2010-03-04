@@ -77,7 +77,14 @@ namespace umbraco
                 xNode.NodeType = "DictionaryItem"; //this shouldn't be like this, it should be this.TreeAlias but the ui.config file points to this name.
                 xNode.Source = this.GetTreeServiceUrl(di.id);
 				xNode.HasChildren = di.hasChildren;
-                tree.Add(xNode);
+
+                OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                if (xNode != null)
+                {
+                    tree.Add(xNode);
+                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                }
+                
             }
         }
 

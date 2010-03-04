@@ -69,7 +69,13 @@ namespace umbraco {
                     xNode.Icon = ".sprTreeSettingLanguage";
                     xNode.OpenIcon = ".sprTreeSettingLanguage";
 
-                    tree.Add(xNode);
+                    OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                    if (xNode != null)
+                    {
+                        tree.Add(xNode);
+                        OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                    }
+                    
                 }
 
             }
@@ -114,7 +120,13 @@ namespace umbraco {
                     xNode.Icon = ".sprTreeSettingLanguage";
                     xNode.OpenIcon = ".sprTreeSettingLanguage";
 
-                    tree.Add(xNode);
+                    OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                    if (xNode != null)
+                    {
+                        tree.Add(xNode);
+                        OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                    }
+                    
                 }
 
             }

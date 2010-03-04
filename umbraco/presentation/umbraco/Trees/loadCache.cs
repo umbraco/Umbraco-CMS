@@ -72,7 +72,14 @@ namespace umbraco
                 xNode.Icon = "developerCacheTypes.gif";
                 xNode.OpenIcon = "developerCacheTypes.gif";
 				xNode.HasChildren = itemCount > 0;
-                tree.Add(xNode);
+
+                OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                if (xNode != null)
+                {
+                    tree.Add(xNode);
+                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                }
+                
             }
         }
 

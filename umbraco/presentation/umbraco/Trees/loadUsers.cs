@@ -98,7 +98,13 @@ function openUser(id) {
                 xNode.Icon = "user.gif";
                 xNode.OpenIcon = "user.gif";
 
-                tree.Add(xNode);
+                OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                if (xNode != null)
+                {
+                    tree.Add(xNode);
+                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                }
+                
             }
         }
 

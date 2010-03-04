@@ -64,8 +64,14 @@ function openDataType(id) {
                 xNode.Action = "javascript:openDataType(" + dt.Id + ");";
                 xNode.Icon = "developerDatatype.gif";
                 xNode.OpenIcon = "developerDatatype.gif";
+
+                OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                if (xNode != null)
+                {
+                    tree.Add(xNode);
+                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                }
                 
-                tree.Add(xNode);
             }
         }
 

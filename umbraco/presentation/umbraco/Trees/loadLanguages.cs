@@ -60,8 +60,14 @@ function openDictionary() {
                 xNode.Action = "javascript:openLanguage(" + l.id + ");";
                 xNode.Icon = "settingLanguage.gif";
                 xNode.OpenIcon = "settingLanguage.gif";
+
+                OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                if (xNode != null)
+                {
+                    tree.Add(xNode);
+                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                }
                 
-                tree.Add(xNode);
             }
         }
 

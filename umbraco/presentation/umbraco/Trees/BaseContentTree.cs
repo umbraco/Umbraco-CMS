@@ -187,8 +187,9 @@ function openContent(id) {
                     if (node != null)
                     {
                         Tree.Add(node);
+                        OnAfterNodeRender(ref Tree, ref node, EventArgs.Empty);
                     }
-                    OnAfterNodeRender(ref Tree, ref node, EventArgs.Empty);
+                    
                 }
             }
         }

@@ -59,7 +59,13 @@ namespace umbraco
                 xNode.Icon = "settingCssItem.gif";
                 xNode.OpenIcon = "settingCssItem.gif";
 
-                tree.Add(xNode);
+                OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                if (xNode != null)
+                {
+                    tree.Add(xNode);
+                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                }
+                
             }
         }
 

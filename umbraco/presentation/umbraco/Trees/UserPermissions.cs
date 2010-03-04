@@ -52,8 +52,14 @@ namespace umbraco.cms.presentation.Trees
                     node.Text = user.Name;
                     node.Action = "javascript:openUserPermissions('" + user.Id.ToString() + "');";
                     node.Icon = "user.gif";
+
+                    OnBeforeNodeRender(ref tree, ref node, EventArgs.Empty);
+                    if (node != null)
+                    {
+                        tree.Add(node);
+                        OnAfterNodeRender(ref tree, ref node, EventArgs.Empty);
+                    }
                     
-                    tree.Add(node);
                 }
             }
         }

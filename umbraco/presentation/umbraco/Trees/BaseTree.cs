@@ -380,7 +380,9 @@ namespace umbraco.cms.presentation.Trees
 				this.id = id;
 			else
 				this.NodeKey = nodeId;
-			this.Render(ref xTree);
+
+			this.Render(ref xTree);            
+
 			return xTree.ToString();
 		}
 
@@ -460,18 +462,18 @@ namespace umbraco.cms.presentation.Trees
             return treeCaption;
         }
 
-        //EVENTS
-        /// <summary>
-        /// The before node render event handler
-        /// </summary>
+
+        #region Events
+        
+        //These events are poorly designed because they cannot be implemented in the tree inheritance structure,
+        //it would be up to the individual trees to ensure they launch the events which is poor design.
+        //they are also named in appropriately in regards to standards and because everything is by ref, there is no need to 
+        //have 2 events, makes no difference if you want to modify the contents of the data.
         public delegate void BeforeNodeRenderEventHandler(ref XmlTree sender, ref XmlTreeNode node, EventArgs e);
-
-        /// <summary>
-        /// The after node render event handler
-        /// </summary>
         public delegate void AfterNodeRenderEventHandler(ref XmlTree sender, ref XmlTreeNode node, EventArgs e);
-
         public static event BeforeNodeRenderEventHandler BeforeNodeRender;
+        public static event AfterNodeRenderEventHandler AfterNodeRender;
+        
         /// <summary>
         /// Raises the <see cref="E:BeforeNodeRender"/> event.
         /// </summary>
@@ -482,7 +484,7 @@ namespace umbraco.cms.presentation.Trees
                 BeforeNodeRender(ref sender, ref node, e);
         }
 
-        public static event AfterNodeRenderEventHandler AfterNodeRender;
+
         /// <summary>
         /// Raises the <see cref="E:AfterNodeRender"/> event.
         /// </summary>
@@ -492,6 +494,10 @@ namespace umbraco.cms.presentation.Trees
             if (AfterNodeRender != null)
                 AfterNodeRender(ref sender, ref node, e);
         }
+
+        #endregion
+        
+        
 
 
     }

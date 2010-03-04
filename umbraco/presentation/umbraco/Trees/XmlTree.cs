@@ -101,12 +101,6 @@ namespace umbraco.cms.presentation.Trees
 			return "";
 		}
 
-		[System.Runtime.InteropServices.DispIdAttribute(-4)]
-		public IEnumerator GetEnumerator()
-		{
-			return treeCollection.GetEnumerator();
-		}
-
 		public void Add(XmlTreeNode obj)
 		{
 			treeCollection.Add(obj);
@@ -155,7 +149,13 @@ namespace umbraco.cms.presentation.Trees
 			set { __treeCollection = value; }
 		}
 
-	}
+        [System.Runtime.InteropServices.DispIdAttribute(-4)]
+        public IEnumerator GetEnumerator()
+        {
+            return (treeCollection as IEnumerable).GetEnumerator();
+        }
+
+    }
 
 	/// <summary>
 	/// Used for serializing data to XML as the data structure for the JavaScript tree

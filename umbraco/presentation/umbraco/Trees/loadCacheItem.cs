@@ -80,8 +80,14 @@ function openCacheItem(id) {
                 xNode.Action = "javascript:openCacheItem('" + a[i] + "');";
                 xNode.Icon = "developerCacheItem.gif";
                 xNode.OpenIcon = "developerCacheItem.gif";
+
+                OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                if (xNode != null)
+                {
+                    tree.Add(xNode);
+                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                }
                 
-                tree.Add(xNode);
             }
         }
 		

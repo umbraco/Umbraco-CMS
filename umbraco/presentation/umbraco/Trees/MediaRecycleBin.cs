@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Web;
 using System.Xml;
+using System.Linq;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;

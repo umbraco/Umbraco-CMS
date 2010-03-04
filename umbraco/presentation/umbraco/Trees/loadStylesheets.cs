@@ -69,7 +69,14 @@ namespace umbraco
                 xNode.Icon = "settingCss.gif";
                 xNode.OpenIcon = "settingCss.gif";
                 xNode.NodeType = "stylesheet"; //this shouldn't be like this, it should be this.TreeAlias but the ui.config file points to this name.
-                tree.Add(xNode);
+
+                OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                if (xNode != null)
+                {
+                    tree.Add(xNode);
+                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                }
+                
             }
         }
 

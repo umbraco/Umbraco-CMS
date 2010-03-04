@@ -39,8 +39,13 @@ function openUserTypes(id) {
                     node.Action = string.Format("javascript:openUserTypes({0})", userType.Id.ToString());
                     node.Icon = "user.gif";
                     node.Text = userType.Alias;
-                    
-                    tree.Add(node);
+
+                    OnBeforeNodeRender(ref tree, ref node, EventArgs.Empty);
+                    if (node != null)
+                    {
+                        tree.Add(node);
+                        OnAfterNodeRender(ref tree, ref node, EventArgs.Empty);
+                    }
                 }                
             }            
         }

@@ -142,8 +142,9 @@ function openMedia(id) {
                 if (xNode != null)
                 {
                     tree.Add(xNode);
+                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 }
-                OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                
             }
         }
 

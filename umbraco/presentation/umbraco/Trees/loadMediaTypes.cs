@@ -56,7 +56,13 @@ function openMediaType(id) {
                 xNode.Icon = "settingDataType.gif";
                 xNode.OpenIcon = "settingDataType.gif";
 
-                tree.Add(xNode);
+                OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                if (xNode != null)
+                {
+                    tree.Add(xNode);
+                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                }
+                
             }
         }
 

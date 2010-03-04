@@ -65,9 +65,16 @@ namespace umbraco.cms.presentation.Trees
                     xDirNode.Icon = FolderIcon;
                     xDirNode.OpenIcon = FolderIconOpen;
 					xDirNode.HasChildren = dir.GetFiles().Length > 0 || dir.GetDirectories().Length > 0;
+                    
                     OnRenderFolderNode(ref xDirNode);
-
-                    tree.Add(xDirNode);
+                    OnBeforeNodeRender(ref tree, ref xDirNode, EventArgs.Empty);
+                    if (xDirNode != null)
+                    {
+                        tree.Add(xDirNode);
+                        OnAfterNodeRender(ref tree, ref xDirNode, EventArgs.Empty);
+                    }
+                    
+                    
                 }
             }
             FileInfo[] fileInfo = dirInfo.GetFiles(FileSearchPattern);
@@ -86,8 +93,14 @@ namespace umbraco.cms.presentation.Trees
                     xFileNode.OpenIcon = "doc.gif";
 
                     OnRenderFileNode(ref xFileNode);
+                    OnBeforeNodeRender(ref tree, ref xFileNode, EventArgs.Empty);
+                    if (xFileNode != null)
+                    {
+                        tree.Add(xFileNode);
+                        OnAfterNodeRender(ref tree, ref xFileNode, EventArgs.Empty);
+                    }
+                    
 
-                    tree.Add(xFileNode);
                 }
             }
         }
