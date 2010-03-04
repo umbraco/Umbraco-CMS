@@ -5,10 +5,10 @@
 <div id="umbPasswordChanger" style="display: none;">
 <table>
     <tr><th style="width: 270px;">New Password:</th><td style="width: 359px">
-    <asp:TextBox ID="umbPasswordChanger_passwordNew" AutoCompleteType="None" TextMode="password" runat="server"></asp:TextBox>
+    <asp:TextBox ID="umbPasswordChanger_passwordNew" autocomplete="off"  AutoCompleteType="None" TextMode="password" runat="server"></asp:TextBox>
     </td></tr>
     <tr><th>Confirm new Password:</th><td style="width: 359px">
-    <asp:TextBox ID="umbPasswordChanger_passwordNewConfirm"  AutoCompleteType="None" TextMode="password" runat="server"></asp:TextBox>
+    <asp:TextBox ID="umbPasswordChanger_passwordNewConfirm" autocomplete="off"  AutoCompleteType="None" TextMode="password" runat="server"></asp:TextBox>
     <asp:CompareValidator ID="CompareValidator1" runat="server" ErrorMessage="Passwords must match" ControlToValidate="umbPasswordChanger_passwordNew" 
     ControlToCompare="umbPasswordChanger_passwordNewConfirm" Operator="Equal"></asp:CompareValidator>
     </td></tr>
