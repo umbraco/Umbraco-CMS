@@ -7,6 +7,8 @@ using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.presentation.nodeFactory;
 using umbraco.presentation;
+using ClientDependency.Core.Controls;
+using ClientDependency.Core;
 
 namespace umbraco.editorControls.tags
 {
@@ -101,29 +103,32 @@ namespace umbraco.editorControls.tags
         {
             try
             {
-                CheckBoxList items = tagCheckList;
-
-                string[] tags = tagBox.Text.Trim().Trim(',').Split(',');
-
-
-                for (int i = 0; i < tags.Length; i++)
+                if (tagBox.Text.Trim().Length > 0)
                 {
-                    //if not found we'll get zero and handle that onsave instead...
-                    int id = getTagId(tags[i], _group);
+                    CheckBoxList items = tagCheckList;
 
-                    //we don't want 2 of a kind... 
-                    if (items.Items.FindByText(tags[i].Trim()) == null)
+                    string[] tags = tagBox.Text.Trim().Trim(',').Split(',');
+
+
+                    for (int i = 0; i < tags.Length; i++)
                     {
-                        ListItem li = new ListItem(tags[i], id.ToString());
-                        li.Selected = true;
-                        items.Items.Add(li);
+                        //if not found we'll get zero and handle that onsave instead...
+                        int id = getTagId(tags[i], _group);
+
+                        //we don't want 2 of a kind... 
+                        if (items.Items.FindByText(tags[i].Trim()) == null)
+                        {
+                            ListItem li = new ListItem(tags[i], id.ToString());
+                            li.Selected = true;
+                            items.Items.Add(li);
+                        }
                     }
+
+                    //reset the textbox
+                    tagBox.Text = "";
+
+                    ScriptManager.GetCurrent(Page).SetFocus(tagBox);
                 }
-
-                //reset the textbox
-                tagBox.Text = "";
-
-                ScriptManager.GetCurrent(Page).SetFocus(tagBox);
 
             }
             catch (Exception ex)
@@ -166,52 +171,10 @@ namespace umbraco.editorControls.tags
         {
             base.OnInit(e);
 
+            ClientDependencyLoader.Instance.RegisterDependency("Application/JQuery/jquery.autocomplete.js", "UmbracoClient", ClientDependencyType.Javascript);
+            ClientDependencyLoader.Instance.RegisterDependency("css/umbracoGui.css", "UmbracoRoot", ClientDependencyType.Css);
+          
             string _alias = ((umbraco.cms.businesslogic.datatype.DefaultData)_data).PropertyId.ToString();
-
-
-            string tagCss = @"<style>/*AutoComplete flyout */
-                            .autocomplete_completionListElement 
-                            {  
-	                            visibility : hidden;
-	                            margin : 0px !Important;
-	                            padding: 0px !Important;
-                                background-color : #fff;
-	                            color : #000;
-	                            border : #ccc;
-	                            border-width : 1px;
-	                            border-style : solid;
-	                            cursor : 'default';
-	                            overflow : auto;
-	                            height : 100px;
-                                text-align : left; 
-                                list-style: none !Important;
-                                width: 400px !Important;
-                                z-index: 9999999;
-                            }
-                            .autocomplete_completionListElement li{
-                                display: block;
-                                padding: 1px !Important;
-                                margin: 0px;
-                            }
-                            /* AutoComplete highlighted item */
-
-                            .autocomplete_highlightedListItem
-                            {
-	                            background-color: #ffff99;
-	                            color: black;
-	                            padding: 1px;
-                            }
-
-                            /* AutoComplete item */
-
-                            .autocomplete_listItem 
-                            {
-	                            background-color : window;
-	                            color : windowtext;
-	                            padding : 1px;
-                            }</style>";
-
-            Page.ClientScript.RegisterClientScriptBlock(tagCss.GetType(), "umbracoTagCss", tagCss);
 
             //making sure that we have a ID for context
             string pageId = UmbracoContext.Current.Request["id"];
@@ -236,22 +199,6 @@ namespace umbraco.editorControls.tags
             tagButton.Click += new System.EventHandler(this.tagBoxTextChange);
             tagButton.Text = "tag";
 
-            AjaxControlToolkit.AutoCompleteExtender tagList = new AjaxControlToolkit.AutoCompleteExtender();
-            tagList.TargetControlID = "tagBox_" + _alias;
-            tagList.ServiceMethod = "getTagList";
-
-            tagList.ServicePath = ConfigurationManager.AppSettings["umbracoPath"] + "/webservices/tagService.asmx";
-            tagList.MinimumPrefixLength = 2;
-            tagList.CompletionInterval = 1000;
-            tagList.EnableCaching = true;
-            tagList.CompletionSetCount = 20;
-            tagList.CompletionListCssClass = "autocomplete_completionListElement";
-            tagList.CompletionListItemCssClass = "autocomplete_listItem";
-            tagList.CompletionListHighlightedItemCssClass = "autocomplete_highlightedListItem";
-            tagList.DelimiterCharacters = ";, :";
-            tagList.UseContextKey = true;
-            tagList.ContextKey = pageId + "|" + _group;
-
 
             tagCheckList.ID = "tagCheckList_" + _alias;
 
@@ -274,7 +221,28 @@ namespace umbraco.editorControls.tags
             this.ContentTemplateContainer.Controls.Add(tagBox);
             this.ContentTemplateContainer.Controls.Add(tagButton);
             this.ContentTemplateContainer.Controls.Add(tagCheckList);
-            this.ContentTemplateContainer.Controls.Add(tagList);
+
+            string tagsAutoCompleteScript =
+                 "jQuery(\"#"
+                 + tagBox.ClientID + "\").autocomplete(\""
+                 + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)
+                 + "/webservices/TagsAutoCompleteHandler.ashx\",{minChars: 2,max: 100, extraParams:{group:\"" + _group + "\",id:\"" + pageId + "\",rnd:\"" + DateTime.Now.Ticks + "\"}}).result(function(e, data){jQuery(\"#" + tagButton.ClientID + "\").trigger('click');});";
+              
+                
+            string tagsAutoCompleteInitScript =
+                "jQuery(document).ready(function(){"
+                + tagsAutoCompleteScript
+                +"});";
+
+            Page.ClientScript.RegisterStartupScript(GetType(), ClientID + "_tagsinit", tagsAutoCompleteInitScript, true);
+
+            if (Page.IsPostBack)
+            {
+                ScriptManager.RegisterClientScriptBlock(this, GetType(), ClientID + "_tags", tagsAutoCompleteScript, true);
+
+            }
+
+           
         }
 
         #endregion
