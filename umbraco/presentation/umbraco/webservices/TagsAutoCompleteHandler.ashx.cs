@@ -18,7 +18,6 @@ namespace umbraco.presentation.umbraco.webservices
 
         public void ProcessRequest(HttpContext context)
         {
-            Authorize();
             context.Response.ContentType = "text/plain";
 
             int count = 2;
@@ -26,8 +25,6 @@ namespace umbraco.presentation.umbraco.webservices
             string group = context.Request.QueryString["group"];
             string id = context.Request.QueryString["id"];
            
-            //fallback...
-            string sql;
 
             IRecordsReader rr;
 
@@ -94,12 +91,7 @@ namespace umbraco.presentation.umbraco.webservices
             }
         }
 
-        public static void Authorize()
-        {
-            if (!BasePages.BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
-                throw new Exception("Client authorization failed. User is not logged in");
 
-        }
 
         public bool IsReusable
         {
