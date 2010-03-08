@@ -1446,6 +1446,7 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
+    <Content Include="umbraco_client\Tree\Themes\umbraco\arrows.png" />
     <Content Include="web.config.EQUIUM-SAT1.xslt" />
     <Content Include="web.config.INDIGO64.xslt" />
     <Content Include="web.config.NIBBLE-LAPTOP.xslt" />
