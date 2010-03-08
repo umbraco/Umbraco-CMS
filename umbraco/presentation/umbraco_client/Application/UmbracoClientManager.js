@@ -18,7 +18,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             _mainTree: null,
             _appActions: null,
             _rootPath: "/umbraco", //this is the default
-            _modal: null,
+            _modal: new Array(), //track all modal window objects (they get stacked)
 
             setUmbracoPath: function(strPath) {
                 /// <summary>
@@ -107,31 +107,49 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 }
             },
             openModalWindow: function(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback) {
-                if (this._modal == null) {
-                    this._modal = new Umbraco.Controls.ModalWindow();
+                //need to create the modal on the top window if the top window has a client manager, if not, create it on the current window                
+
+                //if this is the top window, or if the top window doesn't have a client manager, create the modal in this manager
+                if (window == this.mainWindow() || !this.mainWindow().UmbClientMgr) {
+                    var m = new Umbraco.Controls.ModalWindow();
+                    this._modal.push(m);
+                    m.open(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback);
                 }
-                this._modal.open(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback);
+                else {
+                    //if the main window has a client manager, then call the main window's open modal method whilst keeping the context of it's manager.
+                    if (this.mainWindow().UmbClientMgr) {
+                        this.mainWindow().UmbClientMgr.openModalWindow.apply(this.mainWindow().UmbClientMgr,
+                            [url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback]);
+                    }
+                    else {
+                        return; //exit recurse.
+                    }
+                }
             },
             closeModalWindow: function(rVal) {
                 /// <summary>
-                /// will close the latest open modal window, otherwise
-                /// if the modal object is null and the mainWindow is not null, this generally means this is
-                /// being called inside a modal window, so we'll check to see if we can get the parent modal
-                /// object and close it instead.
+                /// will close the latest open modal window.
                 /// if an rVal is passed in, then this will be sent to the onCloseCallback method if it was specified.
                 /// </summary>
-                if (this._modal != null) {
-                    this._modal.close(rVal);
+                if (this._modal != null && this._modal.length > 0) {
+                    this._modal.pop().close(rVal);
                 }
                 else {
-                    //this will recursively try to close a modal window until window.parent or
-                    //window.parent.UmbClientMgr doesn't exist.
+                    //this will recursively try to close a modal window until the parent window has a modal object or the window is the top and has the modal object
+                    var mgr = null;
                     if (window.parent == null || window.parent == window) {
-                        return; //don't recurse, exit
+                        //we are at the root window, check if we can close the modal window from here
+                        if (window.UmbClientMgr != null && window.UmbClientMgr._modal != null && window.UmbClientMgr._modal.length > 0) {
+                            mgr = window.UmbClientMgr;
+                        }
+                        else {
+                            return; //exit recursion.
+                        }
                     }
                     else if (typeof window.parent.UmbClientMgr != "undefined") {
-                        window.parent.UmbClientMgr.closeModalWindow(rVal);
+                        mgr = window.parent.UmbClientMgr;
                     }
+                    mgr.closeModalWindow.call(mgr, rVal);
                 }
             },
             _debug: function(strMsg) {

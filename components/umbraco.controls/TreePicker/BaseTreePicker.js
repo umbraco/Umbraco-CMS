@@ -21,7 +21,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
             LaunchPicker: function() {
                 var _this = this;
-                UmbClientMgr.openModalWindow(this._itemPickerUrl, this._label, this._showHeader, this._width, this._height, 30, 0, ['#cancelbutton'], function(e) { _this.SaveSelection(e); });
+                UmbClientMgr.openModalWindow(this._itemPickerUrl, this._label, this._showHeader, this._width, this._height, 60, 0, ['#cancelbutton'], function(e) { _this.SaveSelection(e); });
             },
 
             SaveSelection: function(e) {
