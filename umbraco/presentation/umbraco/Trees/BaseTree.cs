@@ -219,7 +219,18 @@ namespace umbraco.cms.presentation.Trees
                 m_isInitialized = true;
 
                 CreateAllowedActions(); //first create the allowed actions
+                
+                //raise the event, allow developers to modify the collection
+                var nodeActions = new NodeActionsEventArgs(false, m_allowedActions);
+                OnNodeActionsCreated(nodeActions);
+                m_allowedActions = nodeActions.AllowedActions;
+
                 CreateRootNodeActions();//then create the root node actions
+
+                var rootActions = new NodeActionsEventArgs(true, m_initActions);
+                OnNodeActionsCreated(rootActions);
+                m_initActions = rootActions.AllowedActions;
+
                 CreateRootNode(); //finally, create the root node itself
             }            
         }
@@ -261,6 +272,12 @@ namespace umbraco.cms.presentation.Trees
         protected virtual void CreateAllowedActions(ref List<IAction> actions)
         {
             actions.Add(ActionDelete.Instance);
+
+            //raise the event, allow developers to modify the collection
+            var e = new NodeActionsEventArgs(false, actions);
+            OnNodeActionsCreated(e);
+            actions = e.AllowedActions;
+
         }
         protected void CreateAllowedActions()
         {
@@ -466,7 +483,7 @@ namespace umbraco.cms.presentation.Trees
         #region Events
         
         //These events are poorly designed because they cannot be implemented in the tree inheritance structure,
-        //it would be up to the individual trees to ensure they launch the events which is poor design.
+        //it would be up to the individual trees to ensure they launch the events which is not ideal.
         //they are also named in appropriately in regards to standards and because everything is by ref, there is no need to 
         //have 2 events, makes no difference if you want to modify the contents of the data.
         public delegate void BeforeNodeRenderEventHandler(ref XmlTree sender, ref XmlTreeNode node, EventArgs e);
@@ -474,6 +491,7 @@ namespace umbraco.cms.presentation.Trees
         public static event BeforeNodeRenderEventHandler BeforeNodeRender;
         public static event AfterNodeRenderEventHandler AfterNodeRender;
         
+
         /// <summary>
         /// Raises the <see cref="E:BeforeNodeRender"/> event.
         /// </summary>
@@ -493,6 +511,17 @@ namespace umbraco.cms.presentation.Trees
         {
             if (AfterNodeRender != null)
                 AfterNodeRender(ref sender, ref node, e);
+        }
+
+        /// <summary>
+        /// Event that is raised once actions are assigned to nodes
+        /// </summary>
+        public static event EventHandler<NodeActionsEventArgs> NodeActionsCreated;
+
+        protected virtual void OnNodeActionsCreated(NodeActionsEventArgs e)
+        {
+            if (NodeActionsCreated != null)
+                NodeActionsCreated(this, e);
         }
 
         #endregion

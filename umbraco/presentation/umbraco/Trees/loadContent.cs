@@ -135,7 +135,7 @@ namespace umbraco
             actions.Add(ActionNotify.Instance);
             actions.Add(ActionSendToTranslate.Instance);
             actions.Add(ContextMenuSeperator.Instance);
-            actions.Add(ActionRefresh.Instance);
+            actions.Add(ActionRefresh.Instance);           
         }
 
         /// <summary>
