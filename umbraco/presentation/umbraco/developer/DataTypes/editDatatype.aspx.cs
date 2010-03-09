@@ -26,6 +26,8 @@ namespace umbraco.cms.presentation.developer
             pp_name.Text = ui.Text("name");
             pp_renderControl.Text = ui.Text("renderControl");
             pane_settings.Text = ui.Text("settings");
+		    pp_guid.Text = ui.Text("guid");
+
 
 			_id = int.Parse(Request.QueryString["id"]);
 			 dt = cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(_id);
@@ -58,7 +60,7 @@ namespace umbraco.cms.presentation.developer
             
             }
 
-
+		    litGuid.Text = dt.UniqueId.ToString();
             Panel1.Text = umbraco.ui.Text("edit") + " datatype: " + dt.Text;
 			insertPrevalueEditor();
 		}

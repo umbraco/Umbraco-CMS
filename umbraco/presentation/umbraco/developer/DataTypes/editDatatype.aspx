@@ -10,6 +10,9 @@
       <cc1:PropertyPanel id="pp_renderControl" runat="server">
         <asp:DropDownList ID="ddlRenderControl" runat="server"/>
       </cc1:PropertyPanel>
+      <cc1:PropertyPanel id="pp_guid" runat="server">
+        <asp:literal ID="litGuid" runat="server" />
+      </cc1:PropertyPanel>      
       </cc1:Pane>
       
       <cc1:Pane ID="pane_settings" runat="server">
