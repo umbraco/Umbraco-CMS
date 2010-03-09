@@ -211,9 +211,6 @@
 							if(this.src.toString().match(/jquery\.tree.*?js$/)) { _this.settings.ui.theme_path = this.src.toString().replace(/jquery\.tree.*?js$/, "") + "themes/" + _this.settings.ui.theme_name + "/style.css"; return false; }
 						});
 					}
-					else {
-					    this.settings.ui.theme_path += this.settings.ui.theme_name + "/style.css";
-					}
 					if(this.settings.ui.theme_path != "" && $.inArray(this.settings.ui.theme_path, tree_component.themes) == -1) {
 						tree_component.add_sheet({ url : this.settings.ui.theme_path });
 						tree_component.themes.push(this.settings.ui.theme_path);
@@ -395,7 +392,7 @@
 						//event.stopPropagation(); 
 						return true;
 					});
-				$("#" + this.container.attr("id") + " li")
+				$("li", this.container.get(0))
 					.live("click", function(event) { // WHEN CLICK IS ON THE ARROW
 						if(event.target.tagName != "LI") return true;
 						_this.off_height();
@@ -404,8 +401,8 @@
 						event.stopPropagation();
 						return false;
 					});
-				$("#" + this.container.attr("id") + " li a")
-					.live("click.jstree", function (event) { // WHEN CLICK IS ON THE TEXT OR ICON
+				$("a", this.container.get(0))
+					.live("click", function (event) { // WHEN CLICK IS ON THE TEXT OR ICON
 						if(event.which && event.which == 3) return true;
 						if(_this.locked) {
 							event.preventDefault(); 
@@ -418,7 +415,7 @@
 						event.target.blur();
 						return false;
 					})
-					.live("dblclick.jstree", function (event) { // WHEN DOUBLECLICK ON TEXT OR ICON
+					.live("dblclick", function (event) { // WHEN DOUBLECLICK ON TEXT OR ICON
 						if(_this.locked) {
 							event.preventDefault(); 
 							event.stopPropagation();
@@ -430,14 +427,14 @@
 						event.stopPropagation();
 						event.target.blur();
 					})
-					.live("contextmenu.jstree", function (event) {
+					.live("contextmenu", function (event) {
 						if(_this.locked) {
 							event.target.blur();
 							return _this.error("LOCKED");
 						}
 						return _this.callback("onrgtclk", [_this.get_node(event.target).get(0), _this, event]);
 					})
-					.live("mouseover.jstree", function (event) {
+					.live("mouseover", function (event) {
 						if(_this.locked) {
 							event.preventDefault();
 							event.stopPropagation();
@@ -449,7 +446,7 @@
 						}
 						_this.callback("onhover",[_this.get_node(event.target).get(0), _this]);
 					})
-					.live("mousedown.jstree", function (event) {
+					.live("mousedown", function (event) {
 						if(_this.settings.rules.drag_button == "left" && event.which && event.which != 1)	return true;
 						if(_this.settings.rules.drag_button == "right" && event.which && event.which != 3)	return true;
 						_this.focus.apply(_this);
@@ -1779,11 +1776,16 @@
 	tree_component.add_sheet = function(opts) {
 		if(opts.str) {
 			var tmp = document.createElement("style");
-			tmp.type = "text/css";
-			if(tmp.styleSheet) tmp.styleSheet.cssText = opts.str;
-			else tmp.appendChild(document.createTextNode(opts.str));
-			document.getElementsByTagName("head")[0].appendChild(tmp);
-			return tmp.sheet;
+			tmp.setAttribute('type',"text/css");
+			if(tmp.styleSheet) {
+				document.getElementsByTagName("head")[0].appendChild(tmp);
+				tmp.styleSheet.cssText = opts.str;
+			}
+			else {
+				tmp.appendChild(document.createTextNode(opts.str));
+				document.getElementsByTagName("head")[0].appendChild(tmp);
+			}
+			return tmp.sheet || tmp.styleSheet;
 		}
 		if(opts.url) {
 			if(document.createStyleSheet) {
@@ -1805,13 +1807,14 @@
 	$(function () {
 		var u = navigator.userAgent.toLowerCase();
 		var v = (u.match( /.+(?:rv|it|ra|ie)[\/: ]([\d.]+)/ ) || [0,'0'])[1];
+
 		var css = '/* TREE LAYOUT */ .tree ul { margin:0 0 0 5px; padding:0 0 0 0; list-style-type:none; } .tree li { display:block; min-height:18px; line-height:18px; padding:0 0 0 15px; margin:0 0 0 0; /* Background fix */ clear:both; } .tree li ul { display:none; } .tree li a, .tree li span { display:inline-block;line-height:16px;height:16px;color:black;white-space:nowrap;text-decoration:none;padding:1px 4px 1px 4px;margin:0; } .tree li a:focus { outline: none; } .tree li a input, .tree li span input { margin:0;padding:0 0;display:inline-block;height:12px !important;border:1px solid white;background:white;font-size:10px;font-family:Verdana; } .tree li a input:not([class="xxx"]), .tree li span input:not([class="xxx"]) { padding:1px 0; } /* FOR DOTS */ .tree .ltr li.last { float:left; } .tree > ul li.last { overflow:visible; } /* OPEN OR CLOSE */ .tree li.open ul { display:block; } .tree li.closed ul { display:none !important; } /* FOR DRAGGING */ #jstree-dragged { position:absolute; top:-10px; left:-10px; margin:0; padding:0; } #jstree-dragged ul ul ul { display:none; } #jstree-marker { padding:0; margin:0; line-height:5px; font-size:1px; overflow:hidden; height:5px; position:absolute; left:-45px; top:-30px; z-index:1000; background-color:transparent; background-repeat:no-repeat; display:none; } #jstree-marker.marker { width:45px; background-position:-32px top; } #jstree-marker.marker_plus { width:5px; background-position:right top; } /* BACKGROUND DOTS */ .tree li li { overflow:hidden; } .tree > .ltr > li { display:table; } /* ICONS */ .tree ul ins { display:inline-block; text-decoration:none; width:16px; height:16px; } .tree .ltr ins { margin:0 4px 0 0px; } ';
-		if(/msie/.test(u) && !/opera/.test(u)) { 
-			if(parseInt(v) == 6) css += '.tree li { height:18px; zoom:1; } .tree li li { overflow:visible; } .tree .ltr li.last { margin-top: expression( (this.previousSibling && /open/.test(this.previousSibling.className) ) ? "-2px" : "0"); } .marker { width:45px; background-position:-32px top; } .marker_plus { width:5px; background-position:right top; }';
-			if(parseInt(v) == 7) css += '.tree li li { overflow:visible; } .tree .ltr li.last { margin-top: expression( (this.previousSibling && /open/.test(this.previousSibling.className) ) ? "-2px" : "0"); }';
+		if($.browser.msie) { 
+			if($.browser.version == 6) css += '.tree li { height:18px; zoom:1; } .tree li li { overflow:visible; } .tree .ltr li.last { margin-top: expression( (this.previousSibling && /open/.test(this.previousSibling.className) ) ? "-2px" : "0"); } .marker { width:45px; background-position:-32px top; } .marker_plus { width:5px; background-position:right top; }';
+			if($.browser.version == 7) css += '.tree li li { overflow:visible; } .tree .ltr li.last { margin-top: expression( (this.previousSibling && /open/.test(this.previousSibling.className) ) ? "-2px" : "0"); }';
 		}
-		if(/opera/.test(u)) css += '.tree > ul > li.last:after { content:"."; display: block; height:1px; clear:both; visibility:hidden; }';
-		if(/mozilla/.test(u) && !/(compatible|webkit)/.test(u) && v.indexOf("1.8") == 0) css += '.tree .ltr li a { display:inline; float:left; } .tree li ul { clear:both; }';
+		if($.browser.opera) css += '.tree > ul > li.last:after { content:"."; display: block; height:1px; clear:both; visibility:hidden; }';
+		if($.browser.mozilla && $.browser.version.indexOf("1.8") == 0) css += '.tree .ltr li a { display:inline; float:left; } .tree li ul { clear:both; }';
 		tree_component.css = tree_component.add_sheet({ str : css });
 	});
 })(jQuery);

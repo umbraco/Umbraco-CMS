@@ -3,6 +3,7 @@
 
 <umb:CssInclude ID="CssInclude2" runat="server" FilePath="Tree/treeIcons.css" PathNameAlias="UmbracoClient" Priority="10" />
 <umb:CssInclude ID="CssInclude3" runat="server" FilePath="Tree/menuIcons.css" PathNameAlias="UmbracoClient" Priority="11" />
+<umb:CssInclude ID="CssInclude1" runat="server" FilePath="Tree/Themes/umbraco/style.css" PathNameAlias="UmbracoClient" Priority="12" />
 
 <umb:JsInclude ID="JsInclude1" runat="server" FilePath="Application/NamespaceManager.js" PathNameAlias="UmbracoClient" Priority="0" />
 <umb:JsInclude ID="JsInclude2" runat="server" FilePath="Application/UmbracoClientManager.js" PathNameAlias="UmbracoClient" />

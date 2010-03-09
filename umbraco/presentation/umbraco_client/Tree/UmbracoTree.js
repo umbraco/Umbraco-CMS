@@ -24,7 +24,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         /// treeMode :determines the type of tree: false/null = normal, 'checkbox' = checkboxes enabled, 'inheritedcheckbox' = parent nodes have checks inherited from children
         /// *serviceUrl :Url path for the tree client service
         /// *dataUrl :Url path for the tree data service
-        /// *umbClientFolderRoot :Should be set externally!... the root to the umbraco_client folder
         /// recycleBinId : the id of the recycle bin for the current tree
         /// *app : the application name to render
         /// treeType :
@@ -52,7 +51,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 nodeKey: "",
 
                 treeMode: "standard",
-                umbClientFolderRoot: "/umbraco_client", //default setting... this gets overriden.
                 recycleBinId: -20, //default setting for content tree
                 serviceUrl: "", //if not set, no async calls are made, the tree won't work
                 dataUrl: "" //if not set, no async calls are made, the tree won't work
@@ -86,7 +84,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _actionNode: new Umbraco.Controls.NodeDefinition(), //the most recent node right clicked for context menu
             _activeTreeType: "content", //tracks which is the active tree type, this is used in searching and syncing.
             _recycleBinId: -20,
-            _umbClientFolderRoot: "/umbraco_client", //this should be set externally!!!
             _fullMenu: {},
             _appActions: null,
             _tree: null, //reference to the jsTree object
@@ -99,7 +96,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _functionToCall: "",
             _nodeKey: "",
             _isEditMode: false,
-            _isDebug: false, //set to true to enable alert debugging
+            _isDebug: true, //set to true to enable alert debugging
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
             _serviceUrl: "", //a path to the tree client service url
             _dataUrl: "", //a path to the tree data service url
@@ -129,7 +126,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._treeMode = conf.treeMode;
                 this._serviceUrl = conf.serviceUrl;
                 this._dataUrl = conf.dataUrl;
-                this._umbClientFolderRoot = conf.umbClientFolderRoot;
                 this._recycleBinId = conf.recycleBinId;
 
                 this._app = conf.app;
@@ -153,16 +149,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._containerId = jItem.attr("id");
                 this._tree = $.tree.create();
                 this._tree.init(this._getContainer(), this._getInitOptions());
-
-                //this._tree.rename = this._umbracoRename; //replaces the jsTree rename method
-
-                //add this app to the loaded apps array
-                //if ($.inArray(app, this._loadedApps) == -1) {
-                //    this._loadedApps.push(app);
-                //}
-
-                //load child nodes of the init node
-                //this._loadChildNodes(this._getContainer().find("li:first"), null);
 
                 jItem.addClass(this._treeClass);
 
@@ -686,48 +672,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 _this._loadChildNodes($(_this._getContainer()).find("li"), null);
             },
 
-            onBeforeMove: function(NODE, REF_NODE, TYPE, TREE_OBJ) {
-                /// <summary>
-                /// First, check if it's a move or a sort
-                /// Second, check for move or sort permissions, depending on the request 
-                /// Third, 
-                /// </summary>
-
-                var nodeDef = this.getNodeDef($(NODE));
-                var nodeParent = nodeDef.jsNode.parents("li:first");
-                var nodeParentDef = this.getNodeDef(nodeParent);
-
-                var refNodeDef = this.getNodeDef($(REF_NODE));
-
-                this._debug("onBeforeMove, TYPE: " + TYPE);
-                this._debug("onBeforeMove, NODE ID: " + nodeDef.nodeId);
-                this._debug("onBeforeMove, PARENT NODE ID: " + nodeParentDef.nodeId);
-                this._debug("onBeforeMove, REF NODE ID: " + refNodeDef.nodeId);
-
-                switch (TYPE) {
-                    case "inside":
-                        if (nodeParentDef.nodeId == refNodeDef.nodeId) {
-                            //moving to the same node!
-                            if (this._appActions)
-                                this._appActions.showSpeachBubble("warning", "Tree Edit Mode", "Cannot move a node to it's same parent node");
-                            return false;
-                        }
-                        //check move permissions, then attempt move
-
-                        break;
-                    case "before":
-                        //if (nodeParentDef.nodeId == nodeDef.
-                        break;
-                    case "after":
-                        break;
-                }
-
-
-                //this._currentAJAXRequest = true; 
-
-                return false;
-            },
-
             onParse: function(STR, TREE_OBJ) {
                 this._debug("onParse");
 
@@ -908,59 +852,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 }
             },
 
-
-            //            _umbracoRename : function (obj) {
-            //                /// <summary>A modified version of the original jsTree rename method. We need to use our own since
-            //                /// we've modified the rendering so much. This method replaces the tree rename method.
-            //                /// 'this' in this method context is jsTree.
-            //                /// </summary>
-            //				if(this.locked) return this.error("LOCKED");
-            //				obj = obj ? this.get_node(obj) : this.selected;
-            //				var _this = this;
-            //				if(!obj || !obj.size()) return this.error("RENAME: NO NODE SELECTED");
-            //				if(!this.check("renameable", obj)) return this.error("RENAME: NODE NOT RENAMABLE");
-            //				if(!this.settings.callback.beforerename.call(null,obj.get(0), _this.current_lang, _this)) return this.error("RENAME: STOPPED BY USER");
-
-            //				obj.parents("li.closed").each(function () { _this.open_branch(this) });
-            //				//if(this.current_lang)	obj = obj.find("a." + this.current_lang).get(0);
-            //				//else					obj = obj.find("a:first").get(0);
-            //				obj = obj.find("a:first div");				
-            //				last_value = obj.html();
-            //				_this.inp = $("<input type='text' autocomplete='off' />");
-            //				_this.inp
-            //					.val(last_value.replace(/&amp;/g,"&").replace(/&gt;/g,">").replace(/&lt;/g,"<"))
-            //					.bind("mousedown",		function (event) { event.stopPropagation(); })
-            //					.bind("mouseup",		function (event) { event.stopPropagation(); })
-            //					.bind("click",			function (event) { event.stopPropagation(); })
-            //					.bind("keyup",			function (event) { 
-            //							var key = event.keyCode || event.which;
-            //							if(key == 27) { this.value = last_value; this.blur(); return }
-            //							if(key == 13) { this.blur(); return }
-            //						});
-            //				// Rollback
-            //				var rb = {}; 
-            //				rb[this.container.attr("id")] = this.get_rollback();
-            //					
-            //				
-            //				var spn = $("<div />").addClass($(obj).parent().attr("class")).addClass("renaming").append(_this.inp);
-            //				spn.attr("style", $(obj).attr("style"));
-            //				obj.parent().hide();
-            //				
-            //				obj.parents("li:first").prepend(spn);
-            //				//_this.inp.get(0).focus();
-            //				//_this.inp.get(0).select();
-            //				
-            ////				_this.inp.blur(function(event) {
-            ////						if(this.value == "") this.value = last_value; 
-            ////						var li = obj.parents("li:first")
-            ////						obj.html(li.find("input").val());
-            ////						obj.parent().show(); 
-            ////						li.find("div.renaming").remove(); 
-            ////						_this.settings.callback.onrename.call(null, _this.get_node(li).get(0), _this.current_lang, _this, rb);
-            ////						_this.inp = false;
-            ////					});
-            //			},
-
             _getUrlParams: function(nodeSource) {
                 /// <summary>This converts Url query string params to json</summary>
                 var p = {};
@@ -1009,7 +900,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         rtl: false,
                         animation: false,
                         hover_mode: true,
-                        theme_path: this._umbClientFolderRoot + "/Tree/Themes/",
+                        theme_path: false,
                         theme_name: "umbraco"
                     },
                     langs: {
@@ -1020,7 +911,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         //ensures that the node id isn't appended to the async url
                         beforedata: function(N, T) { return _this.onBeforeRequest(N, T); },
                         //wrapped functions maintain scope in callback
-                        beforemove: function(N, RN, TYPE, T) { _this.onBeforeMove(N, RN, TYPE, T); },
                         beforeopen: function(N, T) { _this.onBeforeOpen(N, T); },
                         onselect: function(N, T) { _this.onSelect(N, T); },
                         onchange: function(N, T) { _this.onChange(N, T); },

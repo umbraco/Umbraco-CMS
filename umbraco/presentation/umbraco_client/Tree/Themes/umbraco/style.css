@@ -1,5 +1,5 @@
 /* OVERRIDE TREE_COMPONENT.css */
-.tree-umbraco li
+.tree.tree-umbraco li
 {
 	line-height: 20px;
 	min-height: 20px;
@@ -8,7 +8,7 @@
 	font-family: Arial,Lucida Grande;
 	font-size: 12px;
 }
-.tree-umbraco li a
+.tree.tree-umbraco li a
 {
 	background-image: url(../../../../umbraco/images/umbraco/sprites.png);
 	/*background-color: #fff;*/
@@ -19,33 +19,33 @@
 	line-height: 18px;
 	height: 18px;
 }
-.tree-umbraco ul {margin-left:0px;}
-.tree-umbraco ul li ul {margin-top:2px;margin-left:5px;}
-.tree-umbraco li a ins { display:none;}
+.tree.tree-umbraco ul {margin-left:0px;}
+.tree.tree-umbraco ul li ul {margin-top:2px;margin-left:5px;}
+.tree.tree-umbraco li a ins { display:none;}
 /* LOADER */
-.tree-umbraco ul li a.loading ins { background-image:url("throbber.gif") !important; background-position:0 0 !important;display:inline-block; float:left;}
-.tree-umbraco ul li a.loading {padding:0px !important;background:none;}
+.tree.tree-umbraco ul li a.loading ins { background-image:url("throbber.gif") !important; background-position:0 0 !important;display:inline-block; float:left;}
+.tree.tree-umbraco ul li a.loading {padding:0px !important;background:none;}
 /* OPEN or CLOSED */
-.tree-umbraco li { padding-left:0px; }
-.tree-umbraco li li { padding-left: 15px; }
-.tree-umbraco li.open { background-image:none; }
-.tree-umbraco li li.open { background:url("arrows.png") -18px -43px no-repeat; }
-.tree-umbraco li li:hover.open { background-position: -2px -43px; }
-.tree-umbraco li.closed, #jstree-dragged.tree-default li li.open { background:url("arrows.png") 0px -20px no-repeat; }
-.tree-umbraco li:hover.closed, #jstree-dragged.tree-default li li:hover.open { background-position:0px 2px; }
+.tree.tree-umbraco li { padding-left:0px; }
+.tree.tree-umbraco li li { padding-left: 15px; }
+.tree.tree-umbraco li.open { background-image:none; }
+.tree.tree-umbraco li li.open { background:url("arrows.png") -18px -43px no-repeat; }
+.tree.tree-umbraco li li:hover.open { background-position: -2px -43px; }
+.tree.tree-umbraco li.closed, #jstree-dragged.tree-default li li.open { background:url("arrows.png") 0px -20px no-repeat; }
+.tree.tree-umbraco li:hover.closed, #jstree-dragged.tree-default li li:hover.open { background-position:0px 2px; }
 /* Ensure no sprite is loaded */
-.tree-umbraco li a.noSpr, .tree-umbraco li a.noSpr:hover
+.tree.tree-umbraco li a.noSpr, .tree.tree-umbraco li a.noSpr:hover
 {
 	background-position:0px 0px;
 	background:none;
 }
 /* Hover state */
-.tree-umbraco li a:hover
+.tree.tree-umbraco li a:hover
 {
 	text-decoration: underline;
 }
 /* Menu text styles */
-.tree-umbraco li div 
+.tree.tree-umbraco li div 
 {
 	padding: 1px 3px 1px 3px;
 	height:16px;
@@ -53,7 +53,7 @@
 	cursor:pointer;
 }
 /* highlight the selected element */
-.tree-umbraco li .clicked div 
+.tree.tree-umbraco li .clicked div 
 {
 	padding: 0px 2px 0px 2px;
 	background: #D5EFFC;
@@ -63,7 +63,7 @@
 
 
 /* renaming */
-.tree-umbraco li div.renaming 
+.tree.tree-umbraco li div.renaming 
 {
 	padding: 0px 2px 0px 12px;
 	background: #D5EFFC;
@@ -80,16 +80,16 @@
 
 /* Used for checkbox tree */
 
-.tree-umbraco.inheritedcheckbox li a, 
-.tree-umbraco.inheritedcheckbox li a.unchecked,
-.tree-umbraco.checkbox li a, 
-.tree-umbraco.checkbox li a.unchecked
+.tree.tree-umbraco.inheritedcheckbox li a, 
+.tree.tree-umbraco.inheritedcheckbox li a.unchecked,
+.tree.tree-umbraco.checkbox li a, 
+.tree.tree-umbraco.checkbox li a.unchecked
  { background: url("check_0.png") no-repeat 0px 0px ! important; }
-.tree-umbraco.inheritedcheckbox li a.undetermined,
-.tree-umbraco.checkbox li a.undetermined
+.tree.tree-umbraco.inheritedcheckbox li a.undetermined,
+.tree.tree-umbraco.checkbox li a.undetermined
 { background:url("check_1.png") no-repeat 0px 0px ! important; }
-.tree-umbraco.inheritedcheckbox li a.checked,
-.tree-umbraco.checkbox li a.checked
+.tree.tree-umbraco.inheritedcheckbox li a.checked,
+.tree.tree-umbraco.checkbox li a.checked
 { background:url("check_2.png") no-repeat 0px 0px ! important; }
 
 /* CONTEXT MENU (overriding default styles) */
@@ -163,7 +163,7 @@
 /* Tree icons sprites */
 
 .sprTree,
-.tree-umbraco li a.sprTree.clicked:hover
+.tree.tree-umbraco li a.sprTree.clicked:hover
 {
 	background-image: 0px 0px;
 }
@@ -172,19 +172,19 @@
 
 /* tree node overlays / custom styles */
 
-.tree-umbraco li.dim a
+.tree.tree-umbraco li.dim a
 {
 	color:#C0C0C0;
 }
 
-.tree-umbraco li div.overlay 
+.tree.tree-umbraco li div.overlay 
 {
 	position: absolute;	
 	width: 8px;
 	height: 8px;
 }
 
-.tree-umbraco li div.overlay-new
+.tree.tree-umbraco li div.overlay-new
 {
 	z-index: 500;
 	left: 11px;
@@ -193,7 +193,7 @@
 	_filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='protect_overlay.gif');
 }
 
-.tree-umbraco li div.overlay-protect
+.tree.tree-umbraco li div.overlay-protect
 {
 	z-index: 501;
 	left: 22px;
