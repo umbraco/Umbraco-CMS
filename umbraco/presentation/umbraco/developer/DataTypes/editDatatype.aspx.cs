@@ -60,7 +60,7 @@ namespace umbraco.cms.presentation.developer
             
             }
 
-		    litGuid.Text = dt.UniqueId.ToString();
+		    litGuid.Text = dt.DataType.Id.ToString();
             Panel1.Text = umbraco.ui.Text("edit") + " datatype: " + dt.Text;
 			insertPrevalueEditor();
 		}
