@@ -17,7 +17,7 @@
           Copyright © 2001 -
           <asp:Literal ID="thisYear" runat="server"></asp:Literal>
           umbraco / Niels Hartvig<br />
-          Developed by: <a href="http://umbraco.org/redir/niels-hartvig" target="_blank">Niels Hartvig</a> and the <a href="http://umbraco.org/redir/core-team" target="_blank">core
+          Developed by: <a href="http://umbraco.org/redir/niels-hartvig" target="_blank">Niels Hartvig</a> and the <a href="http://our.umbraco.org/wiki/about/core-team" target="_blank">core
               team</a><br />
           <br />
           
