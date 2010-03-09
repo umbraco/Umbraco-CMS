@@ -2,7 +2,6 @@
 
 <%@ Register Src="../controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
 <%@ Register Src="NodePermissions.ascx" TagName="NodePermissions" TagPrefix="user" %>
-<%@ Register Namespace="umbraco.presentation.controls" Assembly="umbraco" TagPrefix="tree" %>
 <%@ Register TagPrefix="ui" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
