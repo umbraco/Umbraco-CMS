@@ -48,6 +48,7 @@ namespace umbraco.cms.presentation.create.controls
                 passwordRequired.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", ui.Text("password"), BasePages.UmbracoEnsuredPage.CurrentUser);
                 nameRequired.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", nameLiteral.Text, BasePages.UmbracoEnsuredPage.CurrentUser);
                 emailRequired.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", "E-mail", BasePages.UmbracoEnsuredPage.CurrentUser);
+                memberTypeRequired.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", "Member Type", BasePages.UmbracoEnsuredPage.CurrentUser);
                 Password.Text =
                     Membership.GeneratePassword(Membership.MinRequiredPasswordLength, Membership.MinRequiredNonAlphanumericCharacters);
 

@@ -7,7 +7,8 @@
 <asp:TextBox ID="rename" runat="server" Width="350px" CssClass="bigInput"></asp:TextBox>
 <asp:Panel ID="memberChooser" runat="server">
     <%=umbraco.ui.Text("choose")%>
-    <%=umbraco.ui.Text("membertype")%>:<br />
+    <%=umbraco.ui.Text("membertype")%>:<asp:RequiredFieldValidator ID="memberTypeRequired" ErrorMessage="*" ControlToValidate="nodeType"
+        runat="server">*</asp:RequiredFieldValidator><br />
     <asp:ListBox ID="nodeType" runat="server" Width="350px" CssClass="bigInput" Rows="1"
         SelectionMode="Single"></asp:ListBox>
 </asp:Panel>
