@@ -34,9 +34,9 @@ namespace umbraco.BasePages
 			public static string GetMainWindow { get { return string.Format("{0}.mainWindow()", ClientMgrScript); } }
 			public static string GetMainTree { get { return string.Format("{0}.mainTree()", ClientMgrScript); } }
 			public static string GetContentFrame() { return string.Format("{0}.contentFrame()", ClientMgrScript); }
-			public static string ShiftApp(string appAlias, string appName, bool ignoreDashboard)
+			public static string ShiftApp(string appAlias)
 			{
-				return string.Format(GetAppActions + ".shiftApp('{0}','{1}',{2})", appAlias, appName, ignoreDashboard.ToString().ToLower());
+                return string.Format(ClientMgrScript + ".historyManager().addHistory('{0}')", appAlias);
 			}
 			public static string OpenDashboard(string app)
 			{
@@ -89,13 +89,10 @@ namespace umbraco.BasePages
 		/// <summary>
 		/// Change applications
 		/// </summary>
-		/// <param name="appAlias"></param>
-		/// <param name="appName"></param>
-		/// <param name="ignoreDashboard">if true, will not load the dashboard for the specified application</param>
 		/// <returns></returns>
-		public ClientTools ShiftApp(string appAlias, string appName, bool ignoreDashboard)
+		public ClientTools ShiftApp(string appAlias)
 		{
-			RegisterClientScript(Scripts.ShiftApp(appAlias, appName, ignoreDashboard));
+			RegisterClientScript(Scripts.ShiftApp(appAlias));
 			return this;
 		}
 		

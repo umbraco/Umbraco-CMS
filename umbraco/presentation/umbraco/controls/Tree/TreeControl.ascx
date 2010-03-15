@@ -32,6 +32,7 @@ jQuery(document).ready(function() {
 	
     //create the javascript tree
     jQuery("#<%=ClientID%>").UmbracoTree({
+        doNotInit: <%#ManualInitialization.ToString().ToLower()%>,
         jsonFullMenu: ctxMenu,
         appActions: UmbClientMgr.appActions(),
         deletingText: '<%=umbraco.ui.GetText("deleting")%>',
@@ -42,7 +43,6 @@ jQuery(document).ready(function() {
         treeType: treeType,
         functionToCall : functionToCall,
         nodeKey : nodeKey,
-        umbClientFolderRoot: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco_client)%>",
         treeMode: "<%#Mode.ToString().ToLower()%>",
         dataUrl: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/webservices/TreeDataService.ashx",
         serviceUrl: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/webservices/TreeClientService.asmx/GetInitAppTreeData"});

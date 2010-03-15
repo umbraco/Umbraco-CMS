@@ -33,6 +33,7 @@ namespace umbraco.controls.Tree
             Height = Unit.Empty;
             BackColor = Color.Empty;
             CssClass = "";
+            ManualInitialization = false;
         }
        
 		protected override void OnInit(EventArgs e)
@@ -160,7 +161,6 @@ namespace umbraco.controls.Tree
             }
         }
         
-
         /// <summary>
         /// Returns the requires JavaScript as a string for the current application
         /// </summary>
@@ -173,7 +173,14 @@ namespace umbraco.controls.Tree
                     bTree.RenderJS(ref javascript);
                 return javascript.ToString();
             }
-        }		
+        }
+
+        /// <summary>
+        /// By default this is false. If set to true, then the code in the client side of the tree will force calling rebuildTree
+        /// to be called explicitly for the tree to render
+        /// </summary>
+        public bool ManualInitialization { get; set; }
+
         #endregion
 
         /// <summary>

@@ -90,7 +90,6 @@ Umbraco.Application.Actions = function() {
 
             this._debug("shiftApp: " + whichApp + ", " + appName + ", " + ignoreDashboard);
 
-
             UmbClientMgr.mainTree().saveTreeState(this._currApp == "" ? "content" : this._currApp);
 
             this._currApp = whichApp.toLowerCase();
@@ -117,8 +116,6 @@ Umbraco.Application.Actions = function() {
                 UmbClientMgr.contentFrame('dashboard.aspx?app=' + whichApp);
             }
 
-
-
             UmbClientMgr.mainTree().rebuildTree(whichApp);
 
             jQuery("#treeWindowLabel").html(appName);
@@ -126,7 +123,7 @@ Umbraco.Application.Actions = function() {
             UmbClientMgr.mainWindow().document.title = appName + this._windowTitle + window.location.hostname.toLowerCase().replace('www', '');
 
             //TODO: Update this to use microsoft's history manager
-            UmbClientMgr.mainWindow().location.hash = whichApp;
+            //UmbClientMgr.mainWindow().location.hash = whichApp;
         },
 
         getCurrApp: function() {

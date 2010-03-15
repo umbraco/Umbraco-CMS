@@ -37,7 +37,7 @@ namespace umbraco.cms.presentation
                 PlaceHolderAppIcons.Text = ui.Text("main", "sections", base.getUser());
                 plcIcons.Text = "";
                 foreach (BusinessLogic.Application a in apps) {
-					string iconElement = String.Format("<li><a class=\"{0}\" title=\"" + ui.Text("sections", a.alias, base.getUser()) + "\" href=\"umbraco.aspx#" + a.alias + "\" onclick=\"" + ClientTools.Scripts.ShiftApp(a.alias, ui.Text("sections", a.alias, this.getUser()), false) + "; return false;\">", a.icon.Substring(1, a.icon.Length - 1));
+					string iconElement = String.Format("<li><a class=\"{0}\" title=\"" + ui.Text("sections", a.alias, base.getUser()) + "\" href=\"umbraco.aspx#" + a.alias + "\" onclick=\"" + ClientTools.Scripts.ShiftApp(a.alias) + "; return false;\">", a.icon.Substring(1, a.icon.Length - 1));
                     if (a.icon.StartsWith("."))
                         iconElement += 
                             "<img src=\"images/nada.gif\" class=\"trayHolder\" alt=\"\" /></a></li>";
@@ -62,13 +62,13 @@ namespace umbraco.cms.presentation
 			treeWindow.Text = ui.Text("main", "tree", base.getUser());
 
             RenderActionJS();
-
+            
             // Load default right action
-            string rightAction = String.Format(@"
-                var initApp = '{0}';
-                var rightAction = '{1}';
-                var rightActionId = '{2}';", helper.Request("app"), helper.Request("rightAction"), helper.Request("id"));
-            ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "rightAction", rightAction, true);
+//            string rightAction = String.Format(@"
+//                var initApp = '{0}';
+//                var rightAction = '{1}';
+//                var rightActionId = '{2}';", umbraco.presentation.UmbracoContext.Current.Request["app"], helper.Request("rightAction"), helper.Request("id"));
+//            ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "rightAction", rightAction, true);
 
 			// Version check goes here!
 

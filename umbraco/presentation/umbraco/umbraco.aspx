@@ -26,20 +26,19 @@
 	
 	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="Application/NamespaceManager.js" PathNameAlias="UmbracoClient" Priority="0" />
 	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
-	<umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient" Priority="1" />
-	
+	<umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient" Priority="1" />	
+	<umb:JsInclude ID="JsInclude14" runat="server" FilePath="Application/jQuery/jquery.ba-bbq.min.js" PathNameAlias="UmbracoClient" Priority="2" />
 	<umb:JsInclude ID="JsInclude5" runat="server" FilePath="Application/UmbracoApplicationActions.js" PathNameAlias="UmbracoClient" Priority="2" />
 	<umb:JsInclude ID="JsInclude6" runat="server" FilePath="Application/UmbracoUtils.js" PathNameAlias="UmbracoClient" Priority="2" />
-	<umb:JsInclude ID="JsInclude7" runat="server" FilePath="Application/UmbracoClientManager.js" PathNameAlias="UmbracoClient" Priority="3" />	
-	<umb:JsInclude ID="JsInclude8" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" Priority="4" />
+	<umb:JsInclude ID="JsInclude13" runat="server" FilePath="Application/HistoryManager.js" PathNameAlias="UmbracoClient" Priority="3" />
+	<umb:JsInclude ID="JsInclude7" runat="server" FilePath="Application/UmbracoClientManager.js" PathNameAlias="UmbracoClient" Priority="4" />		
+	<umb:JsInclude ID="JsInclude8" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" Priority="5" />
 	<umb:JsInclude ID="JsInclude9" runat="server" FilePath="ui/jQueryWresize.js" PathNameAlias="UmbracoClient" />	
 	<umb:JsInclude ID="JsInclude10" runat="server" FilePath="js/guiFunctions.js" PathNameAlias="UmbracoRoot" />	
-	<umb:JsInclude ID="JsInclude11" runat="server" FilePath="js/language.aspx" PathNameAlias="UmbracoRoot" />
-	
+	<umb:JsInclude ID="JsInclude11" runat="server" FilePath="js/language.aspx" PathNameAlias="UmbracoRoot" />	
 	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="modal/modal.js" PathNameAlias="UmbracoClient" Priority="10" />	
 	<umb:JsInclude ID="JsInclude12" runat="server" FilePath="js/UmbracoSpeechBubbleBackend.js" PathNameAlias="UmbracoRoot"  />	
 		
-	
 	<form id="Form1" method="post" runat="server" style="margin: 0px; padding: 0px">
 	<asp:ScriptManager runat="server" ID="umbracoScriptManager">
 		<Services>
@@ -75,7 +74,7 @@
 	<div id="uiArea">
 		<div id="leftDIV">
 			<cc1:UmbracoPanel AutoResize="false" ID="treeWindow" runat="server" Height="380px" Width="200px" hasMenu="false">
-				<umbraco:TreeControl runat="server" ID="JTree"></umbraco:TreeControl>
+				<umbraco:TreeControl runat="server" ID="JTree" ManualInitialization="true"></umbraco:TreeControl>
 			</cc1:UmbracoPanel>
 			<cc1:UmbracoPanel ID="PlaceHolderAppIcons" Text="Sektioner" runat="server" Height="140px" Width="200px" hasMenu="false" AutoResize="false">
 				<ul id="tray">
@@ -105,31 +104,46 @@
 
 
     <script type="text/javascript">
+        
+        //used for deeplinking to specific content whilst still showing the tree
+        var initApp = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["app"]%>';
+        var rightAction = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["rightAction"]%>';
+        var rightActionId = '{<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["id"]%>}';
 
         jQuery(document).ready(function() {
 
-        UmbClientMgr.setUmbracoPath("<%=umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>");
+            UmbClientMgr.setUmbracoPath("<%=umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>");
 
             jQuery(window).load(function() { resizePage('load'); });
             jQuery(window).wresize(function() { resizePage('resize'); });
 
-            jQuery("#umbracoMainPageBody").css("background", "#fff");
+            //jQuery("#umbracoMainPageBody").css("background", "#fff");
 
-            if (initApp == "" && document.location.hash) {
-                initApp = document.location.hash.substring(1);
-            }
-
-            // load dashboard
             if (rightAction != '') {
+                //if an action is specified, then load it
                 UmbClientMgr.contentFrame(rightAction + ".aspx?id=" + rightActionId);
-            } else {
-            UmbClientMgr.contentFrame("<%= umbraco.IO.IOHelper.ResolveUrl( umbraco.IO.SystemDirectories.Umbraco) %>/dashboard.aspx?app=" + initApp);
+            }
+            else {
+                // load dashboard
+                UmbClientMgr.contentFrame("dashboard.aspx?app=" + initApp);
             }
 
-            if (initApp != '') {
-                UmbClientMgr.appActions().shiftApp(initApp, uiKeys['sections_' + initApp], 'true');
-            }
-            
+            //wire up the history mgr
+            UmbClientMgr.historyManager().addEventHandler("navigating", function(e, app) {
+                
+                //show modal wait dialog. TODO: Finish this
+                //jQuery("<div id='appLoading'>&nbsp;</div>").appendTo("body")
+                //    .ModalWindowShow("", false, 300, 100, 300, 0)
+                //    .closest(".umbModalBox").css("border", "none");
+
+                UmbClientMgr.appActions().shiftApp(app, uiKeys['sections_' + app], true);
+            });
+
+            //add the history
+            UmbClientMgr.historyManager().addHistory(initApp != "" ? initApp :
+                                                        UmbClientMgr.historyManager().getCurrent() != "" ? UmbClientMgr.historyManager().getCurrent() :
+                                                        "content", true);
+
             jQuery("#right").show();
         });
     </script>

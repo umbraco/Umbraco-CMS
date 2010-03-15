@@ -6,6 +6,12 @@ body{
   font-size: 11px;
 }
 
+#appLoading 
+{
+	background: #fff url(../../umbraco_client/images/progressbar.gif) center center no-repeat; overflow: auto;
+	width:300px; height:100px;
+}
+
 /*TOP*/  
 .topBar 
 {

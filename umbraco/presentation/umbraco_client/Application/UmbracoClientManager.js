@@ -1,4 +1,5 @@
 ﻿/// <reference path="/umbraco_client/Application/NamespaceManager.js" />
+/// <reference path="/umbraco_client/Application/HistoryManager.js" />
 /// <reference path="/umbraco_client/ui/jquery.js" />
 /// <reference path="/umbraco_client/Tree/UmbracoTree.js" />
 /// <reference name="MicrosoftAjax.js"/>
@@ -17,8 +18,16 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             _isDebug: false,
             _mainTree: null,
             _appActions: null,
+            _historyMgr: null,
             _rootPath: "/umbraco", //this is the default
             _modal: new Array(), //track all modal window objects (they get stacked)
+
+            historyManager: function() {
+                if (!this._historyMgr) {
+                    this._historyMgr = new Umbraco.Controls.HistoryManager();
+                }
+                return this._historyMgr;
+            },
 
             setUmbracoPath: function(strPath) {
                 /// <summary>

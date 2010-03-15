@@ -9,54 +9,12 @@
 
 Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
-
-//TODO: The configuration properties need to be refactored.
-// we should have internal objects holding the properties instead of global class properties, this
-// will make it much easier to use $.extend to set the properties of this class from user properties.
-
 (function($) {
+
     $.fn.UmbracoTree = function(opts) {
-        /// <summary>opts must have these properties: (* is required)
-        ///         
-        /// jsonFullMenu    : The tree menu, by default is empty
-        /// appActions    : A reference to a MenuActions object
-        /// deletingText : the txt to display when a node is deleting
-        /// treeMode :determines the type of tree: false/null = normal, 'checkbox' = checkboxes enabled, 'inheritedcheckbox' = parent nodes have checks inherited from children
-        /// *serviceUrl :Url path for the tree client service
-        /// *dataUrl :Url path for the tree data service
-        /// recycleBinId : the id of the recycle bin for the current tree
-        /// *app : the application name to render
-        /// treeType :
-        /// showContext    : boolean indicating whether or not to show a context menu
-        /// isDialog :boolean indicating whether or not the tree is in dialog mode
-        /// dialogMode
-        /// functionToCall
-        /// nodeKey    
-        /// </summary>
-
+        /// <summary>jQuery plugin to create an Umbraco tree. See option remarks below.</summary>
         return this.each(function() {
-
-            var conf = $.extend({
-                jsonFullMenu: {},
-                appActions: null,
-
-                //These are all properties of the ITreeService and are
-                //used to pass the properties in to the InitAppTreeData service
-                app: "",
-                treeType: "",
-                showContext: true,
-                isDialog: false,
-                dialogMode: "none",
-                functionToCall: "",
-                nodeKey: "",
-
-                treeMode: "standard",
-                recycleBinId: -20, //default setting for content tree
-                serviceUrl: "", //if not set, no async calls are made, the tree won't work
-                dataUrl: "" //if not set, no async calls are made, the tree won't work
-            }, opts);
-
-            new Umbraco.Controls.UmbracoTree().init($(this), conf);
+            new Umbraco.Controls.UmbracoTree().init($(this), opts);
         });
     };
     $.fn.UmbracoTreeAPI = function() {
@@ -72,35 +30,45 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         return api;
     };
 
+    Umbraco.Controls.TreeDefaultOptions = function() {
+        return {
+            doNotInit: false, //this is used for the main umbraco tree so that the tree doesn't fully initialize until rebuildTree is explicitly called
+            jsonFullMenu: {}, //The tree menu, by default is empty
+            appActions: null, //A reference to a MenuActions object
+            deletingText: "Deleting...", //the txt to display when a node is deleting
+            treeMode: "standard", //determines the type of tree: false/null = normal, 'checkbox' = checkboxes enabled, 'inheritedcheckbox' = parent nodes have checks inherited from children
+            recycleBinId: -20, //the id of the recycle bin for the current tree
+            serviceUrl: "", //Url path for the tree client service
+            dataUrl: "", //Url path for the tree data service
+
+            //These are all properties of the ITreeService and are
+            //used to pass the properties in to the InitAppTreeData service
+            app: "", //the application name to render
+            treeType: "", //the active tree application
+            showContext: true, //boolean indicating whether or not to show a context menu
+            isDialog: false,
+            dialogMode: "none", //boolean indicating whether or not the tree is in dialog mode
+            functionToCall: "",
+            nodeKey: ""
+        };
+    }
+
     Umbraco.Controls.UmbracoTree = function() {
         /// <summary>
         /// The object that manages the Umbraco tree.
         /// Has these events: syncNotFound, syncFound, rebuiltTree, newchildNodeFound, nodeMoved, nodeCopied, ajaxError, nodeClicked
         /// </summary>
         return {
-            _cntr: ++Umbraco.Controls.UmbracoTree.cntr,
+            _opts: {},
+            _cntr: ++Umbraco.Controls.UmbracoTree.cntr, //increments the number of tree instances.
             _containerId: null,
             _context: null, //the jquery context used to get the container
             _actionNode: new Umbraco.Controls.NodeDefinition(), //the most recent node right clicked for context menu
             _activeTreeType: "content", //tracks which is the active tree type, this is used in searching and syncing.
-            _recycleBinId: -20,
-            _fullMenu: {},
-            _appActions: null,
             _tree: null, //reference to the jsTree object
-            _deletingText: "...",
-            _app: null, //the reference to the current app
-            _showContext: true,
-            _isDialog: false,
-            _treeType: "",
-            _dialogMode: "",
-            _functionToCall: "",
-            _nodeKey: "",
-            _isEditMode: false,
+            _isEditMode: false, //not really used YET
             _isDebug: true, //set to true to enable alert debugging
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
-            _serviceUrl: "", //a path to the tree client service url
-            _dataUrl: "", //a path to the tree data service url
-            _treeMode: "standard", //determines the type of tree: 'standard', 'checkbox' = checkboxes enabled
             _treeClass: "umbTree", //used for other libraries to detect which elements are an umbraco tree
             _currenAJAXRequest: false, //used to determine if there is currently an ajax request being executed.
 
@@ -114,41 +82,30 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 $(this).unbind(fnName, fn);
             },
 
-            init: function(jItem, conf) {
+            init: function(jItem, opts) {
                 /// <summary>Initializes the tree with the options and stores the tree API in the jQuery data object for the current element</summary>
                 this._debug("init: creating new tree with class/id: " + jItem.attr("class") + " / " + jItem.attr("id"));
 
+                this._opts = $.extend(Umbraco.Controls.TreeDefaultOptions(), opts);
+
                 this._context = jItem.get(0).ownerDocument;
 
-                this._fullMenu = conf.jsonFullMenu;
-                this._appActions = conf.appActions;
-                this._deletingText = conf.deletingText;
-                this._treeMode = conf.treeMode;
-                this._serviceUrl = conf.serviceUrl;
-                this._dataUrl = conf.dataUrl;
-                this._recycleBinId = conf.recycleBinId;
-
-                this._app = conf.app;
-                this._treeType = conf.treeType;
-                this._showContext = conf.showContext;
-                this._isDialog = conf.isDialog;
-                this._dialogMode = conf.dialogMode;
-                this._functionToCall = conf.functionToCall;
-                this._nodeKey = conf.nodeKey;
-
                 //wire up event handlers
-                if (this._appActions != null) {
+                if (this._opts.appActions != null) {
                     var _this = this;
                     //wrapped functions maintain scope
-                    this._appActions.addEventHandler("nodeDeleting", function(E) { _this.onNodeDeleting(E) });
-                    this._appActions.addEventHandler("nodeDeleted", function(E) { _this.onNodeDeleted(E) });
-                    this._appActions.addEventHandler("nodeRefresh", function(E) { _this.onNodeRefresh(E) });
+                    this._opts.appActions.addEventHandler("nodeDeleting", function(E) { _this.onNodeDeleting(E) });
+                    this._opts.appActions.addEventHandler("nodeDeleted", function(E) { _this.onNodeDeleted(E) });
+                    this._opts.appActions.addEventHandler("nodeRefresh", function(E) { _this.onNodeRefresh(E) });
                 }
 
-                //initializes the jsTree
                 this._containerId = jItem.attr("id");
-                this._tree = $.tree.create();
-                this._tree.init(this._getContainer(), this._getInitOptions());
+
+                if (!this._opts.doNotInit) {
+                    //initializes the jsTree                    
+                    this._tree = $.tree.create();
+                    this._tree.init(this._getContainer(), this._getInitOptions());
+                }
 
                 jItem.addClass(this._treeClass);
 
@@ -160,7 +117,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             },
 
             setRecycleBinNodeId: function(id) {
-                this._recycleBinId = id;
+                this._opts.recycleBinId = id;
             },
 
             clearTreeCache: function() {
@@ -174,15 +131,15 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._debug("Edit mode. Currently: " + this._tree.settings.rules.draggable);
                 this._isEditMode = enable;
 
-                this.saveTreeState(this._app);
+                this.saveTreeState(this._opts.app);
                 //need to trick the system so it thinks it's a different app, then rebuild with new rules
-                var app = this._app;
-                this._app = "temp";
+                var app = this._opts.app;
+                this._opts.app = "temp";
                 this.rebuildTree(app);
 
                 this._debug("Edit mode. New Mode: " + this._tree.settings.rules.draggable);
-                if (this._appActions)
-                    this._appActions.showSpeachBubble("info", "Tree Edit Mode", "The tree is now operating in edit mode");
+                if (this._opts.appActions)
+                    this._opts.appActions.showSpeachBubble("info", "Tree Edit Mode", "The tree is now operating in edit mode");
             },
 
             refreshTree: function() {
@@ -195,16 +152,18 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 this._debug("rebuildTree");
 
-                //are we already on the app being requested to load?
-                if (this._app == null || (this._app.toLowerCase() == app.toLowerCase())) {
+                //don't rebuild if the tree object exists, the app that's being requested to be loaded is 
+                //flagged as already loaded, and the tree actually has nodes in it
+                if (this._tree 
+                        && (this._opts.app.toLowerCase() == app.toLowerCase())) {
                     this._debug("not rebuilding");
                     return;
                 }
                 else {
-                    this._app = app;
+                    this._opts.app = app;
                 }
                 //kill the tree
-                this._tree.destroy();
+                if (this._tree) this._tree.destroy();
 
                 this._getContainer().hide();
                 var _this = this;
@@ -222,8 +181,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                     //ensure the static data is gone
                     this._tree.settings.data.opts.static = null;
-
-                    //this._tree.rename = this._umbracoRename; //replaces the jsTree rename method
 
                     this._configureNodes(this._getContainer().find("li"), true);
                     //select the last node
@@ -304,6 +261,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 //saves the correct title
                 obj.data.title = $.trim(node.children("a").children("div").text());
                 obj.state = obj.data.state;
+                //ensures that the style property of the data contains only single quotes since jsTree puts double around the attr
+                for (var i in obj.data.attributes) {
+                    if (!obj.data.attributes.hasOwnProperty(i)) continue;
+                    if (i == "style" || i == "class") obj.data.attributes[i] = obj.data.attributes[i].replace("\"", "'");
+                }
 
                 //recurse through children
                 if (obj.children != null) {
@@ -544,7 +506,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 //show the ajax loader with deleting text
                 this._actionNode.jsNode.find("a").attr("class", "loading");
                 this._actionNode.jsNode.find("a").css("background-image", "");
-                this._actionNode.jsNode.find("a").html(this._deletingText);
+                this._actionNode.jsNode.find("a").html(this._opts.deletingText);
             },
 
             onNodeDeleted: function(EV) {
@@ -604,7 +566,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             onBeforeOpen: function(NODE, TREE_OBJ) {
                 /// <summary>Before opening child nodes, ensure that the data method and url are set properly</summary>
                 this._currentAJAXRequest = true;
-                TREE_OBJ.settings.data.opts.url = this._dataUrl;
+                TREE_OBJ.settings.data.opts.url = this._opts.dataUrl;
                 TREE_OBJ.settings.data.opts.method = "GET";
             },
 
@@ -635,7 +597,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._ensureContext();
 
                 if (TREE_OBJ.settings.data.opts.method == "POST") {
-                    var parameters = "{'app':'" + this._app + "','showContextMenu':'" + this._showContext + "', 'isDialog':'" + this._isDialog + "', 'dialogMode':'" + this._dialogMode + "', 'treeType':'" + this._treeType + "', 'functionToCall':'" + this._functionToCall + "', 'nodeKey':'" + this._nodeKey + "'}"
+                    var parameters = "{'app':'" + this._opts.app + "','showContextMenu':'" + this._opts.showContext + "', 'isDialog':'" + this._opts.isDialog + "', 'dialogMode':'" + this._opts.dialogMode + "', 'treeType':'" + this._opts.treeType + "', 'functionToCall':'" + this._opts.functionToCall + "', 'nodeKey':'" + this._opts.nodeKey + "'}"
                     return parameters;
                 }
                 else {
@@ -712,7 +674,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 var rxInput = new RegExp("\\boverlay-\\w+\\b", "gi");
                 nodes.each(function() {
                     //if it is checkbox tree (not standard), don't worry about overlays and remove the default icon.
-                    if (_this._treeMode != "standard") {
+                    if (_this._opts.treeMode != "standard") {
                         $(this).children("a:first").css("background", "");
                         return;
                     }
@@ -756,15 +718,15 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
             _updateRecycleBin: function() {
                 /// <summary>Generally used for when a node is deleted. This will set the actionNode to the recycle bin node and force a refresh of it's children</summary>
-                this._debug("_updateRecycleBin BinId: " + this._recycleBinId);
+                this._debug("_updateRecycleBin BinId: " + this._opts.recycleBinId);
 
-                var rNode = this.findNode(this._recycleBinId, true);
+                var rNode = this.findNode(this._opts.recycleBinId, true);
                 if (rNode) {
                     this._actionNode = this.getNodeDef(rNode);
                     var _this = this;
                     this.reloadActionNode(true, true, function(success) {
                         if (success) {
-                            _this.findNode(_this._recycleBinId, true).effect("highlight", {}, 1000);
+                            _this.findNode(_this._opts.recycleBinId, true).effect("highlight", {}, 1000);
                         }
                     });
                 }
@@ -868,10 +830,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// <summary>Returns the json service url</summary>
 
                 if (nodeSource == null || nodeSource == "") {
-                    return this._dataUrl;
+                    return this._opts.dataUrl;
                 }
                 var params = nodeSource.split("?")[1];
-                return this._dataUrl + "?" + params + "&rnd2=" + Umbraco.Utils.generateRandom();
+                return this._opts.dataUrl + "?" + params + "&rnd2=" + Umbraco.Utils.generateRandom();
             },
             _getContainer: function() {
                 return $("#" + this._containerId, this._context);
@@ -890,7 +852,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         opts: {
                             static: initData == null ? null : initData,
                             method: "POST",
-                            url: _this._serviceUrl,
+                            url: _this._opts.serviceUrl,
                             outer_attrib: ["id", "umb:type", "class", "rel"],
                             inner_attrib: ["umb:nodedata", "href", "class", "style"]
                         }
@@ -922,18 +884,18 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     plugins: {
                         //UmbracoContext comes before context menu so that the events fire first
                         UmbracoContext: {
-                            fullMenu: _this._fullMenu,
+                            fullMenu: _this._opts.jsonFullMenu,
                             onBeforeContext: function(N, T, E) { return _this.onBeforeContext(N, T, E); }
                         },
                         contextmenu: {}
                     }
                 };
-                if (this._treeMode != "standard") {
+                if (this._opts.treeMode != "standard") {
                     options.plugins.checkbox = { three_state: false }
                 }
 
                 //if there's no service URL, then disable ajax requests
-                if (this._serviceUrl == "" || this._dataUrl == "") {
+                if (this._opts.serviceUrl == "" || this._opts.dataUrl == "") {
                     options.data.async = false;
                     options.data.opts.static = {};
                 }

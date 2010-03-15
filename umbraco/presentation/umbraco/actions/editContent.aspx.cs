@@ -11,6 +11,10 @@ using System.Web.UI.HtmlControls;
 
 namespace umbraco.presentation.actions
 {
+
+    /// <summary>
+    /// This page is used only to deeplink to the edit content page with the tree
+    /// </summary>
     public partial class editContent : BasePages.UmbracoEnsuredPage
     {
         protected void Page_Load(object sender, EventArgs e)
