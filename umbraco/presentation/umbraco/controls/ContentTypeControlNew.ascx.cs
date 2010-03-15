@@ -10,11 +10,15 @@ using System.Web.UI;
 using ClientDependency.Core;
 using umbraco.IO;
 using umbraco.presentation;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace umbraco.controls
 {
 
     [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Javascript, "ui/jquery.dd.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Css, "ui/dd.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "Tree/treeIcons.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "Tree/Themes/umbraco/style.css", "UmbracoClient")]
     public partial class ContentTypeControlNew : System.Web.UI.UserControl
@@ -104,16 +108,17 @@ namespace umbraco.controls
 
             Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
             Save.AlternateText = ui.Text("save");
-
+            var listOfIcons = new List<ListItem>();
             // Get icons
             // nh css file update, add support for css sprites
             foreach (string iconClass in cms.businesslogic.CMSNode.DefaultIconClasses)
             {
-                ListItem li = new ListItem(helper.SpaceCamelCasing((iconClass.Substring(1, iconClass.Length - 1))).Replace("Spr Tree", ""), iconClass);
+                ListItem li = new ListItem(helper.SpaceCamelCasing((iconClass.Substring(1, iconClass.Length - 1))).Replace("Spr Tree", "").Trim(), iconClass);
                 li.Attributes.Add("class", "spriteBackground sprTree " + iconClass.Trim('.'));
+                li.Attributes.Add("style", "padding-left:20px !important; background-repeat:no-repeat;");
 
                 if (!this.Page.IsPostBack && li.Value == cType.IconUrl) li.Selected = true;
-                ddlIcons.Items.Add(li);
+                listOfIcons.Add(li);
             }
 
             DirectoryInfo dirInfo = new DirectoryInfo(UmbracoContext.Current.Server.MapPath(SystemDirectories.Umbraco + "/images/umbraco"));
@@ -121,17 +126,19 @@ namespace umbraco.controls
             for (int i = 0; i < fileInfo.Length; i++)
             {
                 // NH: don't show the sprite file
-                if (fileInfo[i].Name != "sprites.png")
+                if (fileInfo[i].Name != "sprites.png" && fileInfo[i].Name != "sprites_ie6.gif")
                 {
-
                     ListItem li = new ListItem(fileInfo[i].Name + " (deprecated)", fileInfo[i].Name);
-                    li.Attributes.Add("style", "background-image: url(" + this.ResolveClientUrl(SystemDirectories.Umbraco + "/images/umbraco/" + fileInfo[i].Name) + ");");
-                    li.Attributes.Add("class", "deprecatedImage");
+                    li.Attributes.Add("title", this.ResolveClientUrl(SystemDirectories.Umbraco + "/images/umbraco/" + fileInfo[i].Name));
 
                     if (!this.Page.IsPostBack && li.Value == cType.IconUrl) li.Selected = true;
-                    ddlIcons.Items.Add(li);
+                    listOfIcons.Add(li);
                 }
             }
+
+            ddlIcons.Items.AddRange(listOfIcons.OrderBy(o => o.Text).ToArray());
+
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "iconsDropDown", "jQuery(function() { jQuery('#" + ddlIcons.ClientID + "').msDropDown({ showIcon: false }); });", true);
 
             // Get thumbnails
             dirInfo = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/images/thumbnails"));
@@ -139,9 +146,12 @@ namespace umbraco.controls
             for (int i = 0; i < fileInfo.Length; i++)
             {
                 ListItem li = new ListItem(fileInfo[i].Name);
+                li.Attributes.Add("title", this.ResolveClientUrl(SystemDirectories.Umbraco + "/images/thumbnails/" + fileInfo[i].Name));
                 if (!this.Page.IsPostBack && li.Value == cType.Thumbnail) li.Selected = true;
                 ddlThumbnails.Items.Add(li);
             }
+
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", "jQuery(function() { jQuery('#" + ddlThumbnails.ClientID + "').msDropDown({ showIcon: false, rowHeight: '130', visibleRows: '2' }); });", true);
 
             txtName.Text = cType.GetRawText();
             txtAlias.Text = cType.Alias;
