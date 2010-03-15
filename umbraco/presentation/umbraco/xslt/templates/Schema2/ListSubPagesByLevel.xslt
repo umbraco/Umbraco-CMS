@@ -18,7 +18,7 @@
 
 <!-- The fun starts here -->
 <ul>
-<xsl:for-each select="$currentPage/ancestor-or-self::* [@level=$level]/node [string(umbracoNaviHide) != '1']">
+<xsl:for-each select="$currentPage/ancestor-or-self::* [@level=$level]/* [@isDoc and string(umbracoNaviHide) != '1']">
 	<li>
 		<a href="{umbraco.library:NiceUrl(@id)}">
 			<xsl:value-of select="@nodeName"/>
