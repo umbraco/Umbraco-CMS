@@ -118,9 +118,9 @@ namespace umbraco.presentation.LiveEditing.Controls
 			//we need a DependencyLoader control
 			bool isNew;
             UmbracoClientDependencyLoader.TryCreate(this, out isNew);
-            ClientDependencyLoader.Instance.ProviderName = LazyLoadProvider.DefaultName;
-			ClientDependencyLoader.Instance.IsDebugMode = true;
-
+            //force it to use the canvas provider
+            ClientDependencyLoader.Instance.ProviderName = CanvasClientDependencyProvider.DefaultName;
+			
             m_Communicator = new Communicator();
 			m_Communicator.ID = "Communicator";
             Controls.Add(m_Communicator);

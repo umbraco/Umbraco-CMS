@@ -77,11 +77,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     function(h) {
                         //get the iframe, and set the url
                         var umbModal = _this._$(h.w);
-                        var umbModalContent = _this._$("iframe", umbModal);
-                        umbModalContent.html('').attr('src', _this._getUniqueUrl(url));
-                        umbModalContent.width(width);
-                        umbModalContent.height(showHeader ? height - 30 : height);
-                        umbModalContent.show();
+                        var iframe = _this._$("iframe", umbModal);
+                        iframe.attr('src', _this._getUniqueUrl(url));
+                        iframe.width(width);
+                        iframe.height(showHeader ? height - 30 : height);
+                        iframe.show();
                     });
             },
             _open: function(name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback, onCreate) {
@@ -139,7 +139,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                             umbModal.css("left", newLeft);
                         }
 
-                        umbModal.show();
+                        umbModal.fadeIn(250);
 
                         if (typeof onCreate == "function") {
                             onCreate.call(_this, h)
@@ -167,7 +167,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                                         try {
                                             trigger = h.w.find("iframe").contents().find(closeTriggers[x]);
                                         }
-                                        catch (err) {} //IE throws an exception when navigating iframes, but it stil works...
+                                        catch (err) { } //IE throws an exception when navigating iframes, but it stil works...
                                     }
                                 }
                                 _this._obj.jqmAddClose(trigger);
@@ -185,15 +185,16 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                             var e = { modalContent: iframe.length > 0 ? iframe : umbModalContent, outVal: _this._rVal };
                             onCloseCallback.call(_this, e);
                         }
-                        h.w.hide();
-                        h.o.remove();
-                        //remove any iframes that might be in there
-                        if (iframe.length > 0) {
-                            umbModalContent.hide();
-                            umbModalContent.html('').attr('src', '');
-                            _this._obj.remove();
-                        }
-                        _this._close();
+
+                        h.w.fadeOut(300, function() {
+                            //remove the modal objects and iframes if it's an iframe modal box
+                            if (iframe.length > 0) {
+                                iframe.attr('src', 'javascript:false;document.write(\'\');');
+                                _this._obj.remove();
+                            }
+                            h.o.remove();
+                            _this._close();
+                        });
                     }
                 });
 
@@ -261,7 +262,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 		            "<div class=\"umbModalBoxHeader\"></div><a href=\"#\" class=\"umbracModalBoxClose jqmClose\">&times;</a>" +
 		            "<div class=\"umbModalBoxContent\">";
                 if (withIFrame) {
-                    overlayHtml += "<iframe frameborder=\"0\" class=\"umbModalBoxIframe\" src=\"\"></iframe>";
+                    overlayHtml += "<iframe frameborder=\"0\" class=\"umbModalBoxIframe\" src=\"javascript:false;document.write(\'\');\"></iframe>";
                 }
                 overlayHtml += "</div></div>";
                 return overlayHtml;

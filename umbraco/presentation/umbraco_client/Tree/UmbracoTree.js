@@ -67,7 +67,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _activeTreeType: "content", //tracks which is the active tree type, this is used in searching and syncing.
             _tree: null, //reference to the jsTree object
             _isEditMode: false, //not really used YET
-            _isDebug: true, //set to true to enable alert debugging
+            _isDebug: false, //set to true to enable alert debugging
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
             _treeClass: "umbTree", //used for other libraries to detect which elements are an umbraco tree
             _currenAJAXRequest: false, //used to determine if there is currently an ajax request being executed.
@@ -154,7 +154,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 //don't rebuild if the tree object exists, the app that's being requested to be loaded is 
                 //flagged as already loaded, and the tree actually has nodes in it
-                if (this._tree 
+                if (this._tree
                         && (this._opts.app.toLowerCase() == app.toLowerCase())) {
                     this._debug("not rebuilding");
                     return;
@@ -264,7 +264,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 //ensures that the style property of the data contains only single quotes since jsTree puts double around the attr
                 for (var i in obj.data.attributes) {
                     if (!obj.data.attributes.hasOwnProperty(i)) continue;
-                    if (i == "style" || i == "class") obj.data.attributes[i] = obj.data.attributes[i].replace("\"", "'");
+                    if (i == "style" || i == "class") {
+                        obj.data.attributes[i] = obj.data.attributes[i].replace(/\"/g, "'");
+                    }
                 }
 
                 //recurse through children
@@ -503,10 +505,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 //first, close the branch
                 this._tree.close_branch(this._actionNode.jsNode);
-                //show the ajax loader with deleting text
-                this._actionNode.jsNode.find("a").attr("class", "loading");
-                this._actionNode.jsNode.find("a").css("background-image", "");
-                this._actionNode.jsNode.find("a").html(this._opts.deletingText);
+                //show the deleting text
+                this._actionNode.jsNode.find("a div")
+                    .html(this._opts.deletingText)
+                    .effect("highlight", {}, 1000);
             },
 
             onNodeDeleted: function(EV) {
