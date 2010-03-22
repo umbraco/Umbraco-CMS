@@ -6,8 +6,10 @@ using System.Diagnostics;
 using System.Web;
 using System.Web.Services;
 using System.Xml;
-using UmbracoExamine.Core;
+using UmbracoExamine;
 using System.Collections.Generic;
+using Examine;
+using umbraco.presentation;
 
 
 namespace umbraco
@@ -137,16 +139,30 @@ namespace umbraco
             try
             {
                 //if the query starts with "*" then query all fields
-                var criteria = new SearchCriteria(Query
-                    , Query.StartsWith("*") ? new string[] { } : new string[] { "nodeName", "id" }
-                    , new string[] { }
-                    , false
-                    , StartNodeId > 0 ? (int?)StartNodeId : null
-                    , 20);
+                var internalSearcher = UmbracoContext.Current.InternalSearchProvider;
+                var criteria = internalSearcher.CreateSearchCriteria(20, IndexType.Content);
+                IEnumerable<SearchResult> results;
+                if (Query.StartsWith("*"))
+                {
+                    results = internalSearcher.Search("*", 20, true);
+                }
+                else
+                {
+                    var operation = criteria.NodeName(Query);
+                    if (StartNodeId > 0)
+                    {
+                        operation.Or().Id(StartNodeId);
+                    }
 
-                IEnumerable<SearchResult> results = ExamineManager.Instance
-                    .SearchProviderCollection["InternalSearch"]
-                    .Search(criteria);
+                    results = internalSearcher.Search(operation.Compile());
+                }
+                
+                //var criteria = new SearchCriteria(Query
+                //    , Query.StartsWith("*") ? new string[] { } : new string[] { "nodeName", "id" }
+                //    , new string[] { }
+                //    , false
+                //    , StartNodeId > 0 ? (int?)StartNodeId : null
+                //    , 20);
 
                 foreach (var r in results)
                 {

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using UmbracoExamine.Core;
+using UmbracoExamine;
 using System.Xml;
+using Examine;
 
 
 
@@ -44,18 +45,23 @@ namespace umbraco.presentation.dialogs
             IndexType indexType = (IndexType)Enum.Parse(typeof(IndexType), app);
 
             //if it doesn't start with "*", then search only nodeName and nodeId
-            var criteria = new SearchCriteria(query
-                , query.StartsWith("*") ? new string[] { } : new string[] { "nodeName", "id" }
-                , new string[] { }
-                , false
-                , UmbracoContext.Current.UmbracoUser.StartNodeId > 0 ? (int?)UmbracoContext.Current.UmbracoUser.StartNodeId : null
-                , 100
-                , indexType
-                , false);
+            var internalSearcher = UmbracoContext.Current.InternalSearchProvider;
+            var criteria = internalSearcher.CreateSearchCriteria(100, indexType);
+            IEnumerable<SearchResult> results;
+            if (query.StartsWith("*"))
+            {
+                results = internalSearcher.Search("*", 100, true);
+            }
+            else
+            {
+                var operation = criteria.NodeName(query);
+                if (UmbracoContext.Current.UmbracoUser.StartNodeId > 0)
+                {
+                    operation.Or().Id(UmbracoContext.Current.UmbracoUser.StartNodeId);
+                }
 
-            var results = ExamineManager.Instance
-                .SearchProviderCollection["InternalSearch"]
-                .Search(criteria);
+                results = internalSearcher.Search(operation.Compile());
+            }
 
             searchResult.XPathNavigator = ResultsAsXml(results).CreateNavigator();
         }

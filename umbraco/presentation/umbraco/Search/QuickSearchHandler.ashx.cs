@@ -7,8 +7,9 @@ using System.Web.Services;
 using System.Web.Services.Protocols;
 using System.Xml.Linq;
 using System.Collections.Generic;
-using UmbracoExamine.Core;
+using UmbracoExamine;
 using System.Web.Script.Serialization;
+using Examine;
 
 namespace umbraco.presentation.umbraco.Search
 {
@@ -42,19 +43,23 @@ namespace umbraco.presentation.umbraco.Search
             }
 
             //if it doesn't start with "*", then search only nodeName and nodeId
-            var criteria = new SearchCriteria(txt
-                , txt.StartsWith("*") ? new string[] { } : new string[] { "nodeName", "id" }
-                , new string[] { }
-                , false
-                , UmbracoContext.Current.UmbracoUser.StartNodeId > 0 ? (int?)UmbracoContext.Current.UmbracoUser.StartNodeId : null
-                , limit
-                , indexType
-                , false);
-            
-            IEnumerable<SearchResult> results = ExamineManager.Instance
-                .SearchProviderCollection["InternalSearch"]
-                .Search(criteria);
+            var internalSearcher = UmbracoContext.Current.InternalSearchProvider;
+            var criteria = internalSearcher.CreateSearchCriteria(100, indexType);
+            IEnumerable<SearchResult> results;
+            if (txt.StartsWith("*"))
+            {
+                results = internalSearcher.Search("*", 100, true);
+            }
+            else
+            {
+                var operation = criteria.NodeName(txt);
+                if (UmbracoContext.Current.UmbracoUser.StartNodeId > 0)
+                {
+                    operation.Or().Id(UmbracoContext.Current.UmbracoUser.StartNodeId);
+                }
 
+                results = internalSearcher.Search(operation.Compile());
+            }
 
             JavaScriptSerializer js = new JavaScriptSerializer();
             context.Response.Write(js.Serialize(results));

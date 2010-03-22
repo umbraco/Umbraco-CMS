@@ -7,6 +7,8 @@ using System.Xml.Linq;
 using umbraco.BusinessLogic;
 using System.Xml;
 using umbraco.presentation.preview;
+using Examine.Providers;
+using Examine;
 
 namespace umbraco.presentation
 {
@@ -185,7 +187,7 @@ namespace umbraco.presentation
         }
 
         /// <summary>
-        /// Gets the base URL.
+        /// Gets the base URL for the website
         /// </summary>
         /// <returns></returns>
         public virtual string GetBaseUrl()
@@ -202,6 +204,18 @@ namespace umbraco.presentation
                     m_Server = new UmbracoServerUtility(this.m_HttpContext.Server);
                 }
                 return m_Server;
+            }
+        }
+
+        /// <summary>
+        /// Gets the internal search provider from Examine.
+        /// </summary>
+        /// <value>The internal search provider.</value>
+        public virtual BaseSearchProvider InternalSearchProvider
+        {
+            get
+            {
+                return ExamineManager.Instance.SearchProviderCollection["InternalSearch"];
             }
         }
     }

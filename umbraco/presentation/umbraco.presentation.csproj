@@ -89,6 +89,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
+    <Reference Include="Examine, Version=0.9.0.0, Culture=en-AU, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\Examine.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.83.1.0, Culture=neutral, PublicKeyToken=1b03e6acf1164f73">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -151,13 +155,9 @@
     <Reference Include="System.Xml.Linq, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="UmbracoExamine.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="UmbracoExamine, Version=0.9.0.0, Culture=en-AU, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\foreign dlls\UmbracoExamine.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="UmbracoExamine.Providers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\foreign dlls\UmbracoExamine.Providers.dll</HintPath>
+      <HintPath>..\..\foreign dlls\UmbracoExamine.dll</HintPath>
     </Reference>
     <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.60829.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
