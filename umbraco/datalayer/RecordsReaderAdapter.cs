@@ -282,7 +282,8 @@ namespace umbraco.DataLayer
         /// <exception cref="System.IndexOutOfRangeException">No column with the specified name was found.</exception>
         public int GetInt(string fieldName)
         {
-            return m_DataReader.GetInt32(GetOrdinal(fieldName));
+            int ordinal = GetOrdinal(fieldName);
+            return m_DataReader.IsDBNull(ordinal) ? -1 : m_DataReader.GetInt32(ordinal);
         }
 
         /// <summary>

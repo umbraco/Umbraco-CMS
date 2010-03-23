@@ -992,11 +992,7 @@ IF NOT EXISTS (SELECT treeAlias FROM umbracoAppTree WHERE treeAlias='mediaRecycl
 INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
 VALUES (0, 0, 0, 'media', 'mediaRecycleBin', 'RecycleBin', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.MediaRecycleBin')
 ;
-/* Dynamic Tree - AKA Application Designer Tree */
-IF NOT EXISTS (SELECT treeAlias from umbracoAppTree WHERE treeAlias='dynamicTree')
-INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
-VALUES (0, 0, 0, 'content', 'dynamicTree', 'DynamicTree', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.dynamicTree')
-;
+
 /* PREVIEW */
 CREATE TABLE [dbo].[cmsPreviewXml](
 	[nodeId] [int] NOT NULL,
