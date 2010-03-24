@@ -1152,7 +1152,15 @@ namespace umbraco.cms.businesslogic.web
                 var c = Children;
                 foreach (Document d in c)
                 {
-                    x.AppendChild(d.ToXml(xd, true));
+                    XmlNode xml = d.ToXml(xd, true);
+                    if (xml != null)
+                    {
+                        x.AppendChild(xml);
+                    }
+                    else
+                    {
+                        Log.Add(LogTypes.System, d.Id, "Document not published so XML cannot be generated");
+                    }
                 }
 
             }
