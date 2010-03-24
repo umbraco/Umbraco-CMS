@@ -581,7 +581,7 @@
   <area alias="errorHandling" version="2.1">
     <key alias="errorHeader" version="2.1">There were errors:</key>
     <key alias="errorHeaderWithoutTab" version="2.1">There were errors:</key>
-    <key alias="errorMandatory" version="2.1">%0% at %1% is a mandatory field</key>
+    <key alias="errorMandatory" version="2.1">The %0% field in the %1% tab is mandatory</key>
     <key alias="errorMandatoryWithoutTab" version="2.1">%0% is a mandatory field</key>
     <key alias="errorRegExp" version="2.1">%0% at %1% is not in a correct format</key>
     <key alias="errorRegExpWithoutTab" version="2.1">%0% is not in a correct format</key>
