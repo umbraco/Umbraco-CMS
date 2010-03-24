@@ -4,12 +4,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		build.xml = build.xml
 		default.build = default.build
-		foreign dlls\System.Web.Abstractions.dll = foreign dlls\System.Web.Abstractions.dll
-		foreign dlls\System.Web.Abstractions.xml = foreign dlls\System.Web.Abstractions.xml
 		umbraco weekly.build = umbraco weekly.build
 		umbraco.build = umbraco.build
-		foreign dlls\umbraco.Linq.DTMetal.Engine.dll = foreign dlls\umbraco.Linq.DTMetal.Engine.dll
-		foreign dlls\UmbracoExamine.Core.dll = foreign dlls\UmbracoExamine.Core.dll
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StandardConfig", "StandardConfig", "{B8ECDB8B-BF44-462C-B6DA-22421B3EC4D7}"
@@ -93,10 +89,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{F06D18F6-C
 		foreign dlls\Microsoft.Scripting.dll = foreign dlls\Microsoft.Scripting.dll
 		foreign dlls\Microsoft.Scripting.ExtensionAttribute.dll = foreign dlls\Microsoft.Scripting.ExtensionAttribute.dll
 		foreign dlls\MySql.Data.dll = foreign dlls\MySql.Data.dll
-		foreign dlls\System.Web.Abstractions.dll = foreign dlls\System.Web.Abstractions.dll
 		foreign dlls\TidyNet.dll = foreign dlls\TidyNet.dll
-		foreign dlls\umbraco.Linq.DTMetal.Engine.dll = foreign dlls\umbraco.Linq.DTMetal.Engine.dll
-		foreign dlls\UmbracoExamine.Core.dll = foreign dlls\UmbracoExamine.Core.dll
 		foreign dlls\UmbracoExamine.dll = foreign dlls\UmbracoExamine.dll
 		foreign dlls\UrlRewritingNet.UrlRewriter.dll = foreign dlls\UrlRewritingNet.UrlRewriter.dll
 		foreign dlls\VistaDB For Umbraco.dll = foreign dlls\VistaDB For Umbraco.dll
@@ -228,9 +221,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{B8ECDB8B-BF44-462C-B6DA-22421B3EC4D7} = {F0242771-6DE6-4E03-BD3A-7B79BA79105B}
 		{58072405-85D0-45CA-8F5C-EA8928C32A6A} = {F0242771-6DE6-4E03-BD3A-7B79BA79105B}
-		{C5FA9596-B9DC-4DF9-8380-AFC19C1EF51F} = {F0242771-6DE6-4E03-BD3A-7B79BA79105B}
 		{F06D18F6-C510-4CBA-9514-0F890FD62103} = {F0242771-6DE6-4E03-BD3A-7B79BA79105B}
 		{5BB61485-B480-4A03-A8DD-1636A5AF575C} = {B8ECDB8B-BF44-462C-B6DA-22421B3EC4D7}
 		{05329DB0-5C47-44A1-B7B8-BF377446BCD1} = {B8ECDB8B-BF44-462C-B6DA-22421B3EC4D7}
+		{C5FA9596-B9DC-4DF9-8380-AFC19C1EF51F} = {58072405-85D0-45CA-8F5C-EA8928C32A6A}
 	EndGlobalSection
 EndGlobal
