@@ -1454,6 +1454,7 @@
     <Content Include="web.config.EQUIUM-SAT1.xslt" />
     <Content Include="web.config.INDIGO64.xslt" />
     <Content Include="web.config.NIBBLE-LAPTOP.xslt" />
+    <Content Include="web.config.PETER-MAC-PC.xslt" />
     <Content Include="web.config.PETER-PC.xslt" />
     <Content Include="umbraco\xslt\templates\Schema2\Breadcrumb.xslt" />
     <Content Include="umbraco\xslt\templates\Schema2\Clean.xslt" />
@@ -2787,6 +2788,7 @@
     <None Include="umbraco\schemas\umbraco.xsx">
       <DependentUpon>umbraco.xsd</DependentUpon>
     </None>
+    <Content Include="web.config" />
     <Content Include="config\UrlRewriting.config" />
   </ItemGroup>
   <ItemGroup>
