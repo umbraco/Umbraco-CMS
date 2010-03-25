@@ -259,7 +259,7 @@ namespace umbraco.BusinessLogic
             HttpContext ctx = HttpContext.Current;
 
             if (ctx.Request.Cookies[key] != null)
-                ctx.Request.Cookies[key].Expires = DateTime.Now;
+                ctx.Response.Cookies[key].Expires = DateTime.Now;
         }
 
         /// <summary>

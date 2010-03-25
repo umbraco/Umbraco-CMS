@@ -43,20 +43,8 @@ namespace umbraco
 
             pageContents = template.ParseInternalLinks(pageContents);
 
-            // Parse javascript without types
-            // NH 15.07.08 - Why should we do that on every page when people should fix their templates instead.
-            //            pageContents =
-            //                pageContents.Replace("<script language=\"javascript\">", "<script language=\"javascript\" type=\"text/javascript\">");
-
             output.Write(pageContents);
-            //// Parse form name
-            //if (HttpContext.Current.Items["VirtualUrl"] != null) {
-            //    Regex formReplace = new Regex("action=\"default.aspx([^\"]*)\"");
-            //    if (formReplace.ToString() != "")
-            //        output.Write(
-            //            formReplace.Replace(pageContents, "action=\"" + Convert.ToString(HttpContext.Current.Items["VirtualUrl"]) + "\""));
-            //} else
-            //    base.Render(output);
+
         }
 
         void Page_PreInit(Object sender, EventArgs e)
@@ -156,7 +144,18 @@ namespace umbraco
             else
                 Page.Trace.IsEnabled = false;
 
-            
+            // In preview mode?
+            if (UmbracoContext.Current.InPreviewMode)
+            {
+                Trace.Write("Runtime Engine", "Umbraco is running in preview mode.");
+                if (Page.Header != null)
+                {
+                    Page.Header.Controls.AddAt(0,
+
+                        new LiteralControl(String.Format("{0}{0}<!-- {0}THE FOLLOW IS AUTOMATICALLY INSERTED BY UMBRACO:{0}{0}Umbraco is running in preview mode. {0}To end preview mode, simply refresh the editing view in the Back Office or log out of Umbraco.{0}{0}This message is only shown to authenticated users of Umbraco. Never to your visitors!{0}{0}-->{0}{0}", Environment.NewLine)));
+                }
+            }
+
 
         }
 
