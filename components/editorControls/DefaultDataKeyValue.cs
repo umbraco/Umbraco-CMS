@@ -22,7 +22,7 @@ namespace umbraco.editorControls
 			string v = "";
 			try 
 			{
-				IRecordsReader dr = SqlHelper.ExecuteReader("Select [value] from cmsDataTypeprevalues where id in (" + Value.ToString() +")");
+                IRecordsReader dr = SqlHelper.ExecuteReader("Select [value] from cmsDataTypeprevalues where id in (" + SqlHelper.EscapeString(Value.ToString()) + ")");
 
 				while (dr.Read()) {
 					if (v.Length == 0)
