@@ -53,10 +53,11 @@
 	border:0;
 	padding:0 2px 0 0;
 	vertical-align:middle;
+	max-height: 80px;
+	max-width: 80px;
 }
 .dd .ddChild a.selected {
 	background:#66CCFF;
 	
 }
 .hidden {display:none;}
-s
