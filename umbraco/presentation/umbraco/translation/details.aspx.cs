@@ -90,8 +90,8 @@ namespace umbraco.presentation.umbraco.translation {
             pageTable.Columns.Add(ui.Text("value"));
             
             DataRow pageRow = pageTable.NewRow();
-            pageRow["Name"] = ui.Text("nodeName");
-            pageRow["Value"] = page.Text;
+            pageRow[ui.Text("name")] = ui.Text("nodeName");
+            pageRow[ui.Text("value")] = page.Text;
             pageTable.Rows.Add(pageRow);
             
             foreach (PropertyType pt in page.ContentType.PropertyTypes) {
