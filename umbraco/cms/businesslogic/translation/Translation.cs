@@ -112,10 +112,8 @@ namespace umbraco.cms.businesslogic.translation
             tmpStr = tmpStr.Replace("\n", " ");
             tmpStr = tmpStr.Replace("\r", " ");
 
-            while (tmpStr.IndexOf("  ") != -1)
-                tmpStr = tmpStr.Replace("  ", " ");
-
-            return tmpStr.Split(' ').Length;
+            MatchCollection collection = Regex.Matches(tmpStr, @"[\S]+");
+            return collection.Count; 
         }
     }
 }
