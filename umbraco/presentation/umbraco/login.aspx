@@ -42,7 +42,7 @@
           <asp:Literal ID="TopText" runat="server"></asp:Literal>
         </p>
         
-        <table cellspacing="0" cellpadding="0" border="0">
+        <table id="loginTable" cellspacing="0" cellpadding="0" border="0">
           <tr>
             <td align="right">
             <asp:Label ID="username" runat="server" AssociatedControlID="lname"></asp:Label>
@@ -90,7 +90,7 @@
   </form>
 
   <script type="text/javascript">
-        jQuery("#ctl00_body_lname").focus();
+        jQuery("#<%= lname.ClientID %>").focus();
         jQuery('#<%= hf_height.ClientID %>').value = getViewportHeight();
         jQuery('#<%= hf_width.ClientID %>').value = getViewportWidth();    
     </script>
@@ -101,8 +101,8 @@
         <script type="text/javascript">
             jQuery(document).ready(function() {
             jQuery("#loginTable").effect("shake", { times: 5, distance: 5 }, 80);
-            jQuery("#ctl00_body_lname").attr("style", jQuery("#ctl00_body_lname").attr("style") + "; border: 2px solid red;");
-            jQuery("#ctl00_body_passw").attr("style", jQuery("#ctl00_body_lname").attr("style") + "; border: 2px solid red;");
+            jQuery("#<%= lname.ClientID %>").attr("style", jQuery("#<%= lname.ClientID %>").attr("style") + "; border: 2px solid red;");
+            jQuery("#<%= passw.ClientID %>").attr("style", jQuery("#<%= passw.ClientID %>").attr("style") + "; border: 2px solid red;");
         });
         </script>
 
