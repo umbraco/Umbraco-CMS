@@ -114,15 +114,24 @@ namespace umbraco.cms.businesslogic.language
         /// </summary>
         public void Delete()
         {
-            DeleteEventArgs e = new DeleteEventArgs();
-            FireBeforeDelete(e);
-
-            if (!e.Cancel)
+            if (!SqlHelper.ExecuteReader("SELECT * FROM umbracoDomains where domainDefaultLanguage = @id",
+                SqlHelper.CreateParameter("@id", id)).HasRecords)
             {
-                Cache.ClearCacheItem("UmbracoLanguage" + id);
-                SqlHelper.ExecuteNonQuery("delete from umbracoLanguage where id = @id",
-                    SqlHelper.CreateParameter("@id", id));
-                FireAfterDelete(e);
+
+                DeleteEventArgs e = new DeleteEventArgs();
+                FireBeforeDelete(e);
+
+                if (!e.Cancel)
+                {
+                    Cache.ClearCacheItem("UmbracoLanguage" + id);
+                    SqlHelper.ExecuteNonQuery("delete from umbracoLanguage where id = @id",
+                        SqlHelper.CreateParameter("@id", id));
+                    FireAfterDelete(e);
+                }
+            }
+            else
+            {
+                Log.Add(LogTypes.Error, umbraco.BasePages.UmbracoEnsuredPage.CurrentUser, -1, "Could not remove Language " + _friendlyName + " because it's attached to a node");
             }
         }
 
