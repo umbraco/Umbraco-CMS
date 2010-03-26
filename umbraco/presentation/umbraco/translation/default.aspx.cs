@@ -17,6 +17,7 @@ using ICSharpCode.SharpZipLib.Zip.Compression;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using ICSharpCode.SharpZipLib.GZip;
 using umbraco.IO;
+using System.Collections.Generic;
 
 namespace umbraco.presentation.translation
 {
@@ -103,28 +104,52 @@ namespace umbraco.presentation.translation
                     try
                     {
                         StringBuilder sb = new StringBuilder();
-                        foreach (FileInfo translationFileXml in new DirectoryInfo(ViewState["zipFile"].ToString()).GetFiles("*.xml")) {
-                            try {
-                                Task translation = importTranslatationFile(translationFileXml.FullName);
-                                sb.Append("<li>" + translation.Node.Text + " <a target=\"_blank\" href=\"preview.aspx?id=" + translation.Id + "\">" + ui.Text("preview") + "</a></li>");
-                            } catch (Exception ee) {
+                        foreach (FileInfo translationFileXml in new DirectoryInfo(ViewState["zipFile"].ToString()).GetFiles("*.xml"))
+                        {
+                            try
+                            {
+                                foreach (Task translation in importTranslatationFile(translationFileXml.FullName))
+                                {
+
+                                    sb.Append("<li>" + translation.Node.Text + " <a target=\"_blank\" href=\"preview.aspx?id=" + translation.Id + "\">" + ui.Text("preview") + "</a></li>");
+                                }
+                            }
+                            catch (Exception ee)
+                            {
                                 sb.Append("<li style=\"color: red;\">" + ee.ToString() + "</li>");
                             }
                         }
 
                         feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
-                        feedback.Text = "<h3>" + ui.Text("translation", "MultipleTranslationDone") + "</h3><p>" + ui.Text("translation","translationDoneHelp") + "</p><ul>" + sb.ToString() + "</ul>";
+                        feedback.Text = "<h3>" + ui.Text("translation", "MultipleTranslationDone") + "</h3><p>" + ui.Text("translation", "translationDoneHelp") + "</p><ul>" + sb.ToString() + "</ul>";
                     }
-                    catch (Exception ex) {
+                    catch (Exception ex)
+                    {
                         feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.error;
                         feedback.Text = "<h3>" + ui.Text("translation", "translationFailed") + "</h3><p>" + ex.ToString() + "</>";
                     }
                 }
                 else
                 {
-                    Task t = importTranslatationFile(tempFileName);
-                    feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
-                    feedback.Text = "<h3>" + ui.Text("translation", "translationDone") + "</h3><p>" + ui.Text("translation", "translationDoneHelp") + "</p><p><a target=\"_blank\" href=\"preview.aspx?id=" + t.Id + "\">" + ui.Text("preview") + "</a></p>";
+                    StringBuilder sb = new StringBuilder();
+                    List<Task> l = importTranslatationFile(tempFileName);
+
+                    if (l.Count == 1)
+                    {
+                        feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
+                        feedback.Text = "<h3>" + ui.Text("translation", "translationDone") + "</h3><p>" + ui.Text("translation", "translationDoneHelp") + "</p><p><a target=\"_blank\" href=\"preview.aspx?id=" + l[0].Id + "\">" + ui.Text("preview") + "</a></p>";
+                    }
+
+                    else
+                    {
+                        foreach (Task t in l)
+                        {
+                            sb.Append("<li>" + t.Node.Text + " <a target=\"_blank\" href=\"preview.aspx?id=" + t.Id + "\">" + ui.Text("preview") + "</a></li>");
+                        }
+
+                        feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
+                        feedback.Text = "<h3>" + ui.Text("translation", "MultipleTranslationDone") + "</h3><p>" + ui.Text("translation", "translationDoneHelp") + "</p><ul>" + sb.ToString() + "</ul>";
+                    }
                  }
 
                 // clean up
@@ -136,10 +161,12 @@ namespace umbraco.presentation.translation
             pane_uploadFile.Visible = false;
             pane_tasks.Visible = false;
         }
-        private Task importTranslatationFile(string tempFileName)
+        private List<Task> importTranslatationFile(string tempFileName)
         {
             try
             {
+                List<Task> tl = new List<Task>();
+
                 // open file
                 XmlDocument tf = new XmlDocument();
                 tf.XmlResolver = null;
@@ -173,10 +200,12 @@ namespace umbraco.presentation.translation
                             t.Save();
 
 
-                            return t;
+                            tl.Add(t);
                         }
                     }
                 }
+
+                return tl;
             }
             catch (Exception ee)
             {
