@@ -307,7 +307,7 @@ namespace umbraco {
 
             // Check for internal redirects
             if (currentPage != null) {
-                XmlNode internalRedirect = currentPage.SelectSingleNode("data [@alias = 'umbracoInternalRedirectId']");
+                XmlNode internalRedirect = currentPage.SelectSingleNode(UmbracoSettings.UseLegacyXmlSchema ? "data [@alias = 'umbracoInternalRedirectId']" : "umbracoInternalRedirectId");
                 if (internalRedirect != null && internalRedirect.FirstChild != null && !String.IsNullOrEmpty(internalRedirect.FirstChild.Value)) {
                     HttpContext.Current.Trace.Write("internalRedirection", "Found internal redirect id via umbracoInternalRedirectId property alias");
                     int internalRedirectId = 0;
