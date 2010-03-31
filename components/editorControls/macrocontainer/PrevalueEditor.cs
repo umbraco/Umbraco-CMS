@@ -169,7 +169,10 @@ namespace umbraco.editorControls.macrocontainer
                     List<string> result = new List<string>();
                     string values = Configuration.Split('|')[0];
 
-                    result.AddRange(values.Split(','));
+                    if (!string.IsNullOrEmpty(values))
+                    {
+                        result.AddRange(values.Split(','));
+                    }
 
                     _allowedMacros = result;
 
