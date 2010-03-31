@@ -449,6 +449,24 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Whether to replace double dashes from url (ie my--story----from--dash.aspx caused by multiple url replacement chars
+        /// </summary>
+        public static bool RemoveDoubleDashesFromUrlReplacing
+        {
+            get
+            {
+                try
+                {
+                    return bool.Parse(UrlReplaceCharacters.Attributes.GetNamedItem("removeDoubleDashes").Value);
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether umbraco will use distributed calls.
         /// This enables umbraco to share cache and content across multiple servers.
         /// Used for load-balancing high-traffic sites.

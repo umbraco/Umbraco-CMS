@@ -1,5 +1,6 @@
 using System;
 using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace umbraco.cms.helpers
 {
@@ -24,6 +25,12 @@ namespace umbraco.cms.helpers
 				if (n.Attributes.GetNamedItem("org") != null && n.Attributes.GetNamedItem("org").Value != "")
 					_newUrl = _newUrl.Replace(n.Attributes.GetNamedItem("org").Value,xmlHelper.GetNodeValue(n)); 
 			}
+
+            // check for double dashes
+            if (UmbracoSettings.RemoveDoubleDashesFromUrlReplacing)
+            {
+                _newUrl = Regex.Replace(_newUrl, @"[-]{2,}", "-");
+            }
 
 			return _newUrl;
 		}
