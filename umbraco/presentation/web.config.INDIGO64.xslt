@@ -7,7 +7,7 @@
     <xsl:attribute name="value">Data Source=.\SQLEXPRESS;Initial Catalog=BB_Umbraco_Sandbox1;integrated security=false;user id=umbraco;pwd=umbraco</xsl:attribute>
   </xsl:template>
   <xsl:template match="/configuration/appSettings/add[@key='umbracoConfigurationStatus']/@value">
-    <xsl:attribute name="value">4.1.0.beta</xsl:attribute>
+    <xsl:attribute name="value"></xsl:attribute>
   </xsl:template>
   
   <!-- Default templates to match anything else -->

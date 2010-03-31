@@ -83,7 +83,7 @@
           <xsl:value-of select="umbraco.library:NiceUrl(@id)"/>
         </guid>
         <content:encoded>
-          <xsl:value-of select="concat('&lt;![CDATA[ ', .bodyText,']]&gt;')" disable-output-escaping="yes"/>
+          <xsl:value-of select="concat('&lt;![CDATA[ ', ./bodyText,']]&gt;')" disable-output-escaping="yes"/>
         </content:encoded>
       </item>
     </xsl:if>

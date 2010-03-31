@@ -19,7 +19,7 @@
 
     <!-- The fun starts here -->
     <ul>
-      <xsl:for-each select="$currentPage/* [name() = $propertyAlias]/links/link">
+      <xsl:for-each select="$currentPage/* [name() = $propertyAlias and not(@isDoc)]/links/link">
         <li>
           <xsl:element name="a">
             <xsl:if test="./@newwindow = '1'">
