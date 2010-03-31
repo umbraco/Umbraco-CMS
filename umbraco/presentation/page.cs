@@ -130,7 +130,7 @@ namespace umbraco
             try
             {
                 nodeType = Convert.ToInt32(xmlNode.Attributes.GetNamedItem("nodeType").Value);
-                nodeTypeAlias = xmlNode.Attributes.GetNamedItem("nodeTypeAlias").Value;
+                nodeTypeAlias = UmbracoSettings.UseLegacyXmlSchema ? xmlNode.Attributes.GetNamedItem("nodeTypeAlias").Value : xmlNode.Name;
                 elements.Add("nodeType", nodeType);
                 elements.Add("nodeTypeAlias", nodeTypeAlias);
             }
