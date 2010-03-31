@@ -87,10 +87,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="Lucene.Net, Version=2.0.0.4, Culture=neutral">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\foreign dlls\Lucene.Net.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -174,6 +170,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Actions\IActionHandler.cs" />
+    <Compile Include="businesslogic\datatype\ClientDependencyAttribute.cs" />
     <Compile Include="businesslogic\Packager\FileResources\PackageFiles.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
