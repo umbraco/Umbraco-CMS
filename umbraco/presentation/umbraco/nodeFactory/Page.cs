@@ -458,8 +458,16 @@ namespace umbraco.presentation.nodeFactory
                     if (_pageXmlNode.Attributes.GetNamedItem("writerID") != null)
                         _writerID = int.Parse(_pageXmlNode.Attributes.GetNamedItem("writerID").Value);
 
-                    if (_pageXmlNode.Attributes.GetNamedItem("nodeTypeAlias") != null)
-                        _nodeTypeAlias = _pageXmlNode.Attributes.GetNamedItem("nodeTypeAlias").Value;
+                    if (UmbracoSettings.UseLegacyXmlSchema)
+                    {
+                        if (_pageXmlNode.Attributes.GetNamedItem("nodeTypeAlias") != null)
+                            _nodeTypeAlias = _pageXmlNode.Attributes.GetNamedItem("nodeTypeAlias").Value;
+                    }
+                    else
+                    {
+                        _nodeTypeAlias = _pageXmlNode.Name;
+                    }
+
                     if (_pageXmlNode.Attributes.GetNamedItem("path") != null)
                         _path = _pageXmlNode.Attributes.GetNamedItem("path").Value;
                     if (_pageXmlNode.Attributes.GetNamedItem("version") != null)
