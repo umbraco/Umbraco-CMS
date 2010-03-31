@@ -17,8 +17,8 @@ namespace umbraco.controls
 {
 
     [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Javascript, "ui/jquery.dd.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Css, "ui/dd.css", "UmbracoClient")]
+    //[ClientDependency(ClientDependencyType.Javascript, "ui/jquery.dd.js", "UmbracoClient")]
+    //[ClientDependency(ClientDependencyType.Css, "ui/dd.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "Tree/treeIcons.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "Tree/Themes/umbraco/style.css", "UmbracoClient")]
     public partial class ContentTypeControlNew : System.Web.UI.UserControl
@@ -138,7 +138,7 @@ namespace umbraco.controls
 
             ddlIcons.Items.AddRange(listOfIcons.OrderBy(o => o.Text).ToArray());
 
-            Page.ClientScript.RegisterStartupScript(this.GetType(), "iconsDropDown", "jQuery(function() { jQuery('#" + ddlIcons.ClientID + "').msDropDown({ showIcon: false }); });", true);
+            //Page.ClientScript.RegisterStartupScript(this.GetType(), "iconsDropDown", "jQuery(function() { jQuery('#" + ddlIcons.ClientID + "').msDropDown({ showIcon: false }); });", true);
 
             // Get thumbnails
             dirInfo = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/images/thumbnails"));
@@ -151,7 +151,7 @@ namespace umbraco.controls
                 ddlThumbnails.Items.Add(li);
             }
 
-            Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", "jQuery(function() { jQuery('#" + ddlThumbnails.ClientID + "').msDropDown({ showIcon: false, rowHeight: '130', visibleRows: '2' }); });", true);
+            //Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", "jQuery(function() { jQuery('#" + ddlThumbnails.ClientID + "').msDropDown({ showIcon: false, rowHeight: '130', visibleRows: '2' }); });", true);
 
             txtName.Text = cType.GetRawText();
             txtAlias.Text = cType.Alias;
