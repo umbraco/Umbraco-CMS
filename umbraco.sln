@@ -26,8 +26,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{05329DB0-5C47-44A1-B7B8-BF377446BCD1}"
 	ProjectSection(SolutionItems) = preProject
 		config templates\config\404handlers.config = config templates\config\404handlers.config
+		config templates\config\ClientDependency.config = config templates\config\ClientDependency.config
 		config templates\config\Dashboard.config = config templates\config\Dashboard.config
 		umbraco\presentation\config\ExamineIndex.config = umbraco\presentation\config\ExamineIndex.config
+		config templates\config\ExamineIndex.config = config templates\config\ExamineIndex.config
+		config templates\config\ExamineSettings.config = config templates\config\ExamineSettings.config
 		config templates\config\formHandlers.config = config templates\config\formHandlers.config
 		config templates\config\metablogConfig.config = config templates\config\metablogConfig.config
 		config templates\config\restExtensions.config = config templates\config\restExtensions.config
