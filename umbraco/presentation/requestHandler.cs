@@ -369,14 +369,17 @@ namespace umbraco {
                 string currentDomain = System.Web.HttpContext.Current.Request.ServerVariables["SERVER_NAME"];
                 string prefixXPath = "";
                 if (Domain.Exists(currentDomain)) {
-                    prefixXPath = string.Format("//node [@id = '{0}']", Domain.GetRootFromDomain(currentDomain));
+                    string xpathDomain = UmbracoSettings.UseLegacyXmlSchema ? "//node [@id = '{0}']" : "//* [@isDoc and @id = '{0}']";
+                    prefixXPath = string.Format(xpathDomain, Domain.GetRootFromDomain(currentDomain));
                     _cacheUrl = false;
                 }
 
 
+                string xpath = UmbracoSettings.UseLegacyXmlSchema ? "//node [contains(concat(',',data [@alias = 'umbracoUrlAlias'],','),'," :
+                    "//* [@isDoc and contains(concat(',',umbracoUrlAlias,','),',";
                 XmlNode redir =
                     content.Instance.XmlContent.DocumentElement.SelectSingleNode(
-                        prefixXPath + "//node [contains(concat(',',data [@alias = 'umbracoUrlAlias'],','),'," +
+                        prefixXPath + xpath +
                         tempUrl.Replace(".aspx", string.Empty).ToLower() +
                         ",')]");
                 if (redir != null) {
@@ -527,13 +530,11 @@ namespace umbraco {
 
         public bool CacheUrl {
             get {
-                // TODO:  Add Class1.CacheUrl getter implementation
                 return false;
             }
         }
 
         public bool Execute(string url) {
-            // TODO:  Add Class1.Execute implementation
             try {
                 Log.Add(LogTypes.NotFound, User.GetUser(0), -1,
                         url + " (from '" + HttpContext.Current.Request.UrlReferrer + "')");
@@ -570,7 +571,6 @@ namespace umbraco {
 
         public int redirectID {
             get {
-                // TODO:  Add Class1.redirectID getter implementation
                 return _redirectID;
             }
         }

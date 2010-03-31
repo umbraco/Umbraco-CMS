@@ -230,7 +230,7 @@ namespace umbraco
                 else
                 {
                     // If there's no published content, show friendly error
-                    if (umbraco.content.Instance.XmlContent.SelectSingleNode("/root/node") == null)
+                    if (umbraco.content.Instance.XmlContent.SelectSingleNode("/root/*") == null)
                         Response.Redirect( IO.SystemDirectories.Config + "/splashes/noNodes.aspx");
                     else
                     {
