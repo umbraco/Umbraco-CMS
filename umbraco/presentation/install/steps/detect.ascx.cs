@@ -43,7 +43,8 @@ namespace umbraco.presentation.install.steps
         /// </summary>
         protected bool IsEmbeddedDatabase
         {
-            get { return DatabaseType.SelectedItem.Text.Contains("VistaDB"); }
+            get { return (DatabaseType.SelectedItem.Text.Contains("VistaDB") ||
+                          (DatabaseType.SelectedValue=="SqlServerE")); }
         }
 
         /// <summary>
@@ -224,8 +225,12 @@ namespace umbraco.presentation.install.steps
                 connectionStringBuilder["user id"] = DatabaseUsername.Text;
                 connectionStringBuilder["password"] = DatabasePassword.Text;
             }
+            else if (DatabaseType.SelectedValue == ("SqlServerE"))
+            {
+                connectionStringBuilder.ConnectionString = @"Data Source=.\SQLEXPRESS;AttachDbFilename=|DataDirectory|\umbraco.mdf;Integrated Security=True;User Instance=True;Database=umbraco";
+            }
 
-            if (!String.IsNullOrEmpty(DatabaseType.SelectedValue) && DatabaseType.SelectedValue!="SqlServer")
+            if (!String.IsNullOrEmpty(DatabaseType.SelectedValue) && !DatabaseType.SelectedValue.Contains("SqlServer"))
                 connectionStringBuilder["datalayer"] = DatabaseType.SelectedValue;
 
             return connectionStringBuilder;
