@@ -1,0 +1,698 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>UmbracoExamine</name>
+    </assembly>
+    <members>
+        <member name="P:UmbracoExamine.Config.IndexFieldCollection.Item(System.String)">
+            <summary>
+            Default property for accessing an IndexField definition
+            </summary>
+            <value>Field Name</value>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineSearcher.Search(System.String,System.Int32,System.Boolean)">
+            <summary>
+            Simple search method which defaults to searching content nodes
+            </summary>
+            <param name="searchText"></param>
+            <param name="maxResults"></param>
+            <param name="useWildcards"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineSearcher.PrepareResults(Lucene.Net.Search.TopDocs,System.String[],Lucene.Net.Search.IndexSearcher)">
+            <summary>
+            Creates a list of dictionary's from the hits object and returns a list of SearchResult.
+            This also removes duplicates.
+            </summary>
+            <param name="tDocs">The top docs.</param>
+            <param name="searchFields">The search fields.</param>
+            <param name="searcher">The searcher.</param>
+            <returns></returns>
+        </member>
+        <member name="P:UmbracoExamine.LuceneExamineSearcher.LuceneIndexFolder">
+            <summary>
+            Directory where the Lucene.NET Index resides
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.LuceneExamineSearcher.IndexingAnalyzer">
+            <summary>
+            The analyzer to use when searching content, by default, this is set to StandardAnalyzer
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.LuceneExamineSearcher.IndexSetName">
+            <summary>
+            Name of the Lucene.NET index set
+            </summary>
+        </member>
+        <member name="T:UmbracoExamine.LinqXmlExtensions">
+            <summary>
+            Static methods to help query umbraco xml
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.LinqXmlExtensions.ToXDocument(umbraco.cms.businesslogic.Content,System.Boolean)">
+            <summary>
+            Converts a content node to XDocument
+            </summary>
+            <param name="node"></param>
+            <param name="cacheOnly">true if data is going to be returned from cache</param>
+            <returns></returns>
+            <remarks>
+            If the type of node is not a Document, the cacheOnly has no effect, it will use the API to return
+            the xml. 
+            </remarks>
+        </member>
+        <member name="M:UmbracoExamine.LinqXmlExtensions.ToXElement(System.Xml.XmlNode)">
+            <summary>
+            Converts an <see cref="T:System.Xml.XmlNode"/> to a <see cref="T:System.Xml.Linq.XElement"/>
+            </summary>
+            <param name="node">Node to convert</param>
+            <returns>Converted node</returns>
+        </member>
+        <member name="M:UmbracoExamine.LinqXmlExtensions.ToXDocument(System.Collections.Generic.IEnumerable{System.Xml.Linq.XElement})">
+            <summary>
+            Creates an <see cref="T:System.Xml.Linq.XDocument"/> from the collection of <see cref="T:System.Xml.Linq.XElement"/>
+            </summary>
+            <param name="elements">Elements to create document from</param>
+            <returns>Document containing elements</returns>
+        </member>
+        <member name="M:UmbracoExamine.LinqXmlExtensions.ToXDocument(System.Xml.XPath.XPathNodeIterator)">
+            <summary>
+            Converts an umbraco library call to an XDocument
+            </summary>
+            <param name="xml"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LinqXmlExtensions.UmbIsProperty(System.Xml.Linq.XElement,System.String)">
+            <summary>
+            Checks if the XElement is an umbraco property based on an alias.
+            This works for both types of schemas
+            </summary>
+            <param name="x"></param>
+            <param name="alias"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LinqXmlExtensions.UmbIsElement(System.Xml.Linq.XElement)">
+            <summary>
+            Returns true if the XElement is recognized as an umbraco xml NODE (doc type) 
+            </summary>
+            <param name="x"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LinqXmlExtensions.UmbNodeTypeAlias(System.Xml.Linq.XElement)">
+            <summary>
+            This takes into account both schemas and returns the node type alias.
+            If this isn't recognized as an element node, this returns an empty string
+            </summary>
+            <param name="x"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LinqXmlExtensions.UmbSelectPropertyValue(System.Xml.Linq.XElement,System.String)">
+            <summary>
+            Returns the property value for the doc type element (such as id, path, etc...)
+            If the element is not an umbraco doc type node, or the property name isn't found, it returns String.Empty 
+            </summary>
+            <param name="x"></param>
+            <param name="alias"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LinqXmlExtensions.UmbSelectDataValue(System.Xml.Linq.XElement,System.String)">
+            <summary>
+            Returns umbraco value for a data element with the specified alias.
+            </summary>
+            <param name="xml"></param>
+            <param name="alias"></param>
+            <returns></returns>
+        </member>
+        <member name="T:UmbracoExamine.Config.IndexSetExtensions">
+            <summary>
+            Extension methods for IndexSet
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.Config.IndexSetExtensions.ToIndexCriteria(UmbracoExamine.Config.IndexSet)">
+            <summary>
+            Convert the indexset to indexerdata
+            </summary>
+            <param name="set"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.Config.IndexSetExtensions.CombinedUmbracoFields(UmbracoExamine.Config.IndexSet)">
+            <summary>
+            Returns a string array of all fields that are indexed including Umbraco fields
+            </summary>
+        </member>
+        <member name="T:UmbracoExamine.LuceneExamineIndexer">
+            <summary>
+            
+            </summary>
+            <remarks>
+            Some links picked up along the way:
+            
+            A matrix of concurrent lucene operations: 
+            http://www.jguru.com/faq/view.jsp?EID=913302.
+            
+            based on the info here, it is best to only call optimize when there is no activity,
+            we only optimized after the queue has been processed and at startup:
+            http://www.gossamer-threads.com/lists/lucene/java-dev/47895
+            http://lucene.apache.org/java/2_2_0/api/org/apache/lucene/index/IndexWriter.html
+            </remarks>
+        </member>
+        <member name="F:UmbracoExamine.LuceneExamineIndexer.OptimizationCommitThreshold">
+            <summary>
+            Specifies how many index commits are performed before running an optimization
+            </summary>
+        </member>
+        <member name="F:UmbracoExamine.LuceneExamineIndexer.IndexTypeFieldName">
+            <summary>
+            Used to store a non-tokenized key for the document
+            </summary>
+        </member>
+        <member name="F:UmbracoExamine.LuceneExamineIndexer.IndexNodeIdFieldName">
+            <summary>
+            Used to store a non-tokenized type for the document
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.Initialize(System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Set up all properties for the indexer based on configuration information specified. This will ensure that
+            all of the folders required by the indexer are created and exist. This will also create an instruction
+            file declaring the computer name that is part taking in the indexing. This file will then be used to
+            determine the master indexer machine in a load balanced environment (if one exists).
+            </summary>
+            <param name="name"></param>
+            <param name="config"></param>
+        </member>
+        <member name="F:UmbracoExamine.LuceneExamineIndexer.m_IndexerLocker">
+            <summary>
+            Used to perform thread locking
+            </summary>
+        </member>
+        <member name="F:UmbracoExamine.LuceneExamineIndexer.m_FolderLocker">
+            <summary>
+            used to thread lock calls for creating and verifying folders
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.ReIndexNode(System.Xml.Linq.XElement,Examine.IndexType)">
+            <summary>
+            Forces a particular XML node to be reindexed
+            </summary>
+            <param name="node">XML node to reindex</param>
+            <param name="type">Type of index to use</param>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.RebuildIndex">
+            <summary>
+            Rebuilds the entire index from scratch for all index types
+            </summary>
+            <remarks>This will completely delete the index and recreate it</remarks>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.DeleteFromIndex(System.Xml.Linq.XElement)">
+            <summary>
+            Deletes a node from the index
+            </summary>
+            <param name="node"></param>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.IndexAll(Examine.IndexType)">
+            <summary>
+            Re-indexes all data for the index type specified
+            </summary>
+            <param name="type"></param>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.AddSingleNodeToIndex(System.Xml.Linq.XElement,Examine.IndexType)">
+            <summary>
+            Adds single node to index. If the node already exists, a duplicate will probably be created,
+            To re-index, use the ReIndexNode method.
+            </summary>
+            <param name="node">The node.</param>
+            <param name="type">The type.</param>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.OptimizeIndex">
+            <summary>
+            This wil optimize the index for searching, this gets executed when this class instance is instantiated.
+            </summary>
+            <remarks>
+            This can be an expensive operation and should only be called when there is no indexing activity
+            </remarks>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.DeleteFromIndex(Lucene.Net.Index.Term,Lucene.Net.Index.IndexReader)">
+            <summary>
+            Removes the specified term from the index
+            </summary>
+            <param name="indexTerm"></param>
+            <returns>Boolean if it successfully deleted the term, or there were on errors</returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.ValidateDocument(System.Xml.Linq.XElement)">
+            <summary>
+            Ensures that the node being indexed is of a correct type and is a descendent of the parent id specified.
+            </summary>
+            <param name="node"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.GetDataToIndex(System.Xml.Linq.XElement,Examine.IndexType)">
+            <summary>
+            Collects all of the data that neesd to be indexed as defined in the index set.
+            </summary>
+            <param name="node"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.AddDocument(System.Collections.Generic.Dictionary{System.String,System.String},Lucene.Net.Index.IndexWriter,System.Int32,Examine.IndexType)">
+            <summary>
+            Collects the data for the fields and adds the document.
+            </summary>
+            <remarks>
+            This will normalize (lowercase) all text before it goes in to the index.
+            </remarks>
+            <param name="fields"></param>
+            <param name="writer"></param>
+            <param name="nodeId"></param>
+            <param name="type"></param>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.SafelyProcessQueueItems">
+            <summary>
+            Process all of the queue items. This checks if this machine is the Executive and if it's in a load balanced
+            environments. If then acts accordingly: 
+                Not the executive = doesn't index, i
+                In async mode = use file watcher timer
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.ForceProcessQueueItems">
+            <summary>
+            Loop through all files in the queue item folder and index them.
+            Regardless of weather this machine is the executive indexer or not or is in a load balanced environment
+            or not, this WILL attempt to process the queue items into the index.
+            </summary>
+            <returns>
+            The number of queue items processed
+            </returns>
+            <remarks>
+            Inheritors should be very carefly using this method, SafelyProcessQueueItems will ensure
+            that the correct machine processes the items into the index. SafelyQueueItems calls this method
+            if it confirms that this machine is the one to process the queue.
+            </remarks>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.SaveDeleteIndexQueueItem(System.Collections.Generic.KeyValuePair{System.String,System.String})">
+            <summary>
+            Saves a file indicating that the executive indexer should remove the from the index those that match
+            the term saved in this file.
+            This will save a file prefixed with the current machine name with an extension of .dev
+            </summary>
+            <param name="term"></param>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.SaveAddIndexQueueItem(System.Collections.Generic.Dictionary{System.String,System.String},System.Int32,Examine.IndexType)">
+            <summary>
+            Writes the information for the fields to a file names with the computer's name that is running the index and 
+            a GUID value. The indexer will then index the values stored in the files in another thread so that processing may continue.
+            This will save a file prefixed with the current machine name with an extension of .add
+            </summary>
+            <param name="fields"></param>
+            <param name="nodeId"></param>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.m_FileWatcher_Elapsed(System.Object,System.Timers.ElapsedEventArgs)">
+            <summary>
+            Handles the file watcher timer poll elapsed event
+            This will:
+            - Disable the FileSystemWatcher        
+            - Recursively process all queue items in the folder and check after processing if any more files have been added
+            - Once there's no more files to be processed, re-enables the watcher
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.GetExclusiveIndexWriter(Lucene.Net.Index.IndexWriter@,Lucene.Net.Index.IndexReader@)">
+            <summary>
+            Checks the writer passed in to see if it is active, if not, checks if the index is locked. If it is locked, 
+            returns checks if the reader is not null and tries to close it. if it's still locked returns null, otherwise
+            creates a new writer.
+            </summary>
+            <param name="writer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.GetExclusiveIndexReader(Lucene.Net.Index.IndexReader@,Lucene.Net.Index.IndexWriter@)">
+            <summary>
+            Checks the reader passed in to see if it is active, if not, checks if the index is locked. If it is locked, 
+            returns checks if the writer is not null and tries to close it. if it's still locked returns null, otherwise
+            creates a new reader.
+            </summary>
+            <param name="writer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.ProcessDeleteQueueItem(System.IO.FileInfo,Lucene.Net.Index.IndexReader)">
+            <summary>
+            Reads the FileInfo passed in into a dictionary object and deletes it from the index
+            </summary>
+            <param name="x"></param>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.ProcessAddQueueItem(System.IO.FileInfo,Lucene.Net.Index.IndexWriter)">
+            <summary>
+            Reads the FileInfo passed in into a dictionary object and adds it to the index
+            </summary>
+            <param name="x"></param>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.GetFieldValue(System.String)">
+            <summary>
+            All field data will be stored into Lucene as is except for dates, these can be stored as standard: yyyyMMdd
+            Any standard text will be put in lower case format.
+            </summary>
+            <param name="val"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.GetPage(System.Int32)">
+            <summary>
+            Unfortunately, we need to implement our own IsProtected method since 
+            the Umbraco core code requires an HttpContext for this method and when we're running
+            async, there is no context
+            </summary>
+            <param name="documentId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.IsProtected(System.Int32,System.String)">
+            <summary>
+            Unfortunately, we need to implement our own IsProtected method since 
+            the Umbraco core code requires an HttpContext for this method and when we're running
+            async, there is no context
+            </summary>
+            <param name="nodeId"></param>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.AddNodesToIndex(System.String,Examine.IndexType)">
+            <summary>
+            Adds all nodes with the given xPath root.
+            </summary>
+            <param name="xPath">The x path.</param>
+            <param name="type">The type.</param>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.VerifyFolder(System.IO.DirectoryInfo)">
+            <summary>
+            Creates the folder if it does not exist.
+            </summary>
+            <param name="folder"></param>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.IndexReady">
+            <summary>
+            Checks if the index is ready to open/write to.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.IndexExists">
+            <summary>
+            Check if there is an index in the index folder
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.AddLog(System.Int32,System.String,umbraco.BusinessLogic.LogTypes)">
+            <summary>
+            Adds a log entry to the umbraco log
+            </summary>
+            <param name="nodeId"></param>
+            <param name="msg"></param>
+            <param name="type"></param>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.Dispose">
+            <summary>
+            When the object is disposed, all data should be written
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.LuceneExamineIndexer.IndexingAnalyzer">
+            <summary>
+            The analyzer to use when indexing content, by default, this is set to StandardAnalyzer
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.LuceneExamineIndexer.CommitCount">
+            <summary>
+            Used to keep track of how many index commits have been performed.
+            This is used to determine when index optimization needs to occur.
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.LuceneExamineIndexer.ExecutiveIndex">
+            <summary>
+            The Executive to determine if this is the master indexer
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.LuceneExamineIndexer.SupportProtectedContent">
+            <summary>
+            By default this is false, if set to true then the indexer will include indexing content that is flagged as publicly protected.
+            This property is ignored if SupportUnpublishedContent is set to true.
+            </summary>
+        </member>
+        <member name="E:UmbracoExamine.LuceneExamineIndexer.IndexOptimizing">
+            <summary>
+            Occurs when [index optimizing].
+            </summary>
+        </member>
+        <member name="E:UmbracoExamine.LuceneExamineIndexer.DocumentWriting">
+            <summary>
+            Occurs when [document writing].
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.LuceneExamineIndexer.SupportUnpublishedContent">
+            <summary>
+            Determines if the manager will call the indexing methods when content is saved or deleted as
+            opposed to cache being updated.
+            </summary>
+            <value></value>
+        </member>
+        <member name="M:UmbracoExamine.FileSystemExtensions.ClearFiles(System.IO.DirectoryInfo)">
+            <summary>
+            Deletes all files in the folder and returns the number deleted.
+            </summary>
+            <param name="di"></param>
+            <returns></returns>
+        </member>
+        <member name="T:UmbracoExamine.UmbracoEventManager">
+            <summary>
+            An <see cref="T:umbraco.BusinessLogic.ApplicationBase"/> instance for wiring up Examine to the Umbraco events system
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.UmbracoEventManager.#ctor">
+            <summary>
+            Creates a new instance of the class
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.UmbracoEventManager.Document_AfterSave(umbraco.cms.businesslogic.web.Document,umbraco.cms.businesslogic.SaveEventArgs)">
+            <summary>
+            Only index using providers that SupportUnpublishedContent
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:UmbracoExamine.UmbracoEventManager.Document_AfterDelete(umbraco.cms.businesslogic.web.Document,umbraco.cms.businesslogic.DeleteEventArgs)">
+            <summary>
+            Only remove indexes using providers that SupportUnpublishedContent
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:UmbracoExamine.UmbracoEventManager.content_AfterUpdateDocumentCache(umbraco.cms.businesslogic.web.Document,umbraco.cms.businesslogic.DocumentCacheEventArgs)">
+            <summary>
+            Only Update indexes for providers that dont SupportUnpublishedContent
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:UmbracoExamine.UmbracoEventManager.content_AfterClearDocumentCache(umbraco.cms.businesslogic.web.Document,umbraco.cms.businesslogic.DocumentCacheEventArgs)">
+            <summary>
+            Only update indexes for providers that don't SupportUnpublishedContnet
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="T:UmbracoExamine.Config.ExamineLuceneIndexes">
+            <summary>
+            Defines XPath statements that map to specific umbraco nodes
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.Config.IndexSet.MaxResults">
+            <summary>
+            Set this to configure the default maximum search results for an index set.
+            If not set, 200 is the default.
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.Config.IndexSet.IndexDirectory">
+            <summary>
+            Returns the DirectoryInfo object for the index path.
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.Config.IndexSet.IndexParentId">
+            <summary>
+            When this property is set, the indexing will only index documents that are children of this node.
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.Config.IndexSet.IncludeNodeTypes">
+            <summary>
+            The collection of node types to index, if not specified, all node types will be indexed (apart from the ones specified in the ExcludeNodeTypes collection).
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.Config.IndexSet.ExcludeNodeTypes">
+            <summary>
+            The collection of node types to not index. If specified, these node types will not be indexed.
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.Config.IndexSet.IndexUserFields">
+            <summary>
+            A collection of user defined umbraco fields to index
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.Config.IndexSet.IndexAttributeFields">
+            <summary>
+            The fields umbraco values that will be indexed. i.e. id, nodeTypeAlias, writer, etc...
+            </summary>
+        </member>
+        <member name="T:UmbracoExamine.DocumentWritingEventArgs">
+            <summary>
+            Event arguments for a Document Writing event
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.DocumentWritingEventArgs.#ctor(System.Int32,Lucene.Net.Documents.Document,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            
+            </summary>
+            <param name="nodeId"></param>
+            <param name="d"></param>
+            <param name="fields"></param>
+        </member>
+        <member name="P:UmbracoExamine.DocumentWritingEventArgs.Document">
+            <summary>
+            Lucene.NET Document, including all previously added fields
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.DocumentWritingEventArgs.Fields">
+            <summary>
+            Fields of the indexer
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.DocumentWritingEventArgs.NodeId">
+            <summary>
+            NodeId of the document being written
+            </summary>
+        </member>
+        <member name="T:UmbracoExamine.Config.UmbracoFieldPolicies">
+            <summary>
+            A class that defines the type of index for each Umbraco field (non user defined fields)
+            Alot of standard umbraco fields shouldn't be tokenized or even indexed, just stored into lucene
+            for retreival after searching.
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.Config.UmbracoFieldPolicies.GetPolicy(System.String)">
+            <summary>
+            return the index policy for the field name passed in, if not found, return normal
+            </summary>
+            <param name="fieldName"></param>
+            <returns></returns>
+        </member>
+        <member name="P:UmbracoExamine.Config.IndexSetCollection.Item(System.String)">
+            <summary>
+            Default property for accessing Image Sets
+            </summary>
+            <param name="setType"></param>
+            <returns></returns>
+        </member>
+        <member name="T:UmbracoExamine.IndexerExecutive">
+            <summary>
+            Manages the delegation of authority over which machine in a load balanced environment will perform the indexing.
+            This is done by an IO race on initialization of the LuceneExamineIndexer.
+            If a server's app pool is recycled at a seperate time than the rest of the servers in the cluster, it will generally
+            take over the executive role (this is dependant on the time that the last latest server's app pool was restarted).
+            The Executive is determined by file lock (.lck) file, theoretically there should only be one of these.
+            If there is only 1 server in the cluster, then obviously it is the Executive.
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.IndexerExecutive.TimestampTimer_Elapsed(System.Object,System.Timers.ElapsedEventArgs)">
+            <summary>
+            Fired every 10 minutes by the timer object. This timestamps the EXA file to 
+            enure the system knows that this server is active.
+            This is to ensure that all systems in a Load Balanced environment are aware of exactly how
+            many other servers are taking part in the load balancing and who they are.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:UmbracoExamine.IndexerExecutive.CreateEXAFile">
+            <summary>
+            Creates an xml file to declare that this machine is taking part in the index writing.
+            This is used to determine the master indexer if this app exists in a load balanced environment.
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.IndexerExecutive.CreateLCKFile">
+            <summary>
+            Creates a lock file for this machine if there aren't other ones.
+            </summary>
+            <returns>returns true if a lock file was successfully created for this machine.</returns>
+        </member>
+        <member name="M:UmbracoExamine.IndexerExecutive.ClearOldLCKFiles(System.DateTime)">
+            <summary>
+            delete all old lck files (any that are more than cutoffTime old)
+            </summary>
+            <param name="cutoffTime"></param>
+        </member>
+        <member name="M:UmbracoExamine.IndexerExecutive.ClearOldEXAFiles(System.DateTime)">
+            <summary>
+            delete all old exa files (any that are more than cutoffTime old)
+            </summary>
+            <param name="cutoffTime"></param>
+        </member>
+        <member name="M:UmbracoExamine.IndexerExecutive.GetOtherLCKFiles">
+            <summary>
+            Get all lck files that are not named by this machines name. If there are any, this means that another machine
+            has won the race and created the lck file for itself. If there is a lck file with the current machines name, then this
+            must mean it was previously the master indexer and the apppool has recycled in less than the hour.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.IndexerExecutive.TimestampLck">
+            <summary>
+            Updates the timestamp for lck file if it exists
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.IndexerExecutive.TimestampEXA">
+            <summary>
+            Updates the timestamp for the exa file
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.IndexerExecutive.GetEXA">
+            <summary>
+            Read the machines EXA file
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.IndexerExecutive.GetLCK">
+            <summary>
+            Read the machines LCK file
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.IndexerExecutive.RaceForMasterIndexer">
+            <summary>
+            This will check for any lock files, not created by the current machine. If there are any, then this machine will flag it's
+            exa file as not being the master indexer, otherwise, it will try to create it's own lock file to let others know it is the race
+            winner and therefore the master indexer. If this succeeds, it will update it's exa file to flag it as the master indexer.
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.IndexerExecutive.Dispose">
+            <summary>
+            When the object is disposed, all data should be written
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.IndexerExecutive.IsExecutiveMachine">
+            <summary>
+            Ensures there is an elected Executive, otherwise starts the race. 
+            Returns a bool as to whether or not this is the Executive machine.
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.IndexerExecutive.IsLoadBalancedEnvironment">
+            <summary>
+            Returns a boolean determining whether or not this server involved in a LoadBalanced
+            environment with Umbraco Examine.
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.IndexerExecutive.ExecutiveIndexerMachineName">
+            <summary>
+            Returns the machine name of the executive indexer
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.IndexerExecutive.ServerCount">
+            <summary>
+            The number of servers active in indexing
+            </summary>
+        </member>
+    </members>
+</doc>
