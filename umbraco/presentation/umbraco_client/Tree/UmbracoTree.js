@@ -67,7 +67,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _activeTreeType: "content", //tracks which is the active tree type, this is used in searching and syncing.
             _tree: null, //reference to the jsTree object
             _isEditMode: false, //not really used YET
-            _isDebug: false, //set to true to enable alert debugging
+            _isDebug: true, //set to true to enable alert debugging
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
             _treeClass: "umbTree", //used for other libraries to detect which elements are an umbraco tree
             _currenAJAXRequest: false, //used to determine if there is currently an ajax request being executed.
@@ -921,3 +921,51 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
 
 })(jQuery);
+
+
+var test = [
+    {
+        "data":
+        {
+            "title": "Home",
+            "icon": "/umbraco/images/umbraco/CWS_house.png",
+            "attributes": {
+                "class": "sprTree noSpr",
+                "href": "javascript:openContent(\u00271095\u0027);",
+                "umb:nodedata": '{\u0027menu\u0027:\u0027C:,D,MO,SK,UIR,P,Z,T5,L\u0027,\u0027nodeType\u0027:\u0027content\u0027,\u0027source\u0027:\u0027/umbraco/tree.aspx?rnd=ef1e00591d6d41f684c5b81f3324a24d&id=1095&treeType=content&contextMenu=true&isDialog=false\u0027}'
+            }
+        },
+        "state": "closed",
+        "attributes":
+        {
+            "id": "1095",
+            "class": "",
+            "rel": "dataNode",
+            "umb:type": "content"
+        }
+    },
+    {
+        "data":
+        {
+            "title": "Recycle Bin",
+            "icon": "/umbraco/images/umbraco/bin.png",
+            "attributes": {
+                "class": "sprTree noSpr",
+                "href": "javascript:UmbClientMgr.appActions().openDashboard(\u0027content\u0027);",
+                "umb:nodedata": '{\u0027menu\u0027:\u0027N,L\u0027,\u0027nodeType\u0027:\u0027content\u0027,\u0027source\u0027:\u0027/umbraco/tree.aspx?rnd=15b517b18af74f8fa53e9b454a14e21e&id=-20&treeType=content&contextMenu=true&isDialog=false\u0027}'
+            }
+        },
+        "state": "closed",
+        "attributes":
+        {
+            "id": "-20",
+            "class": "",
+            "rel": "rootNode",
+            "umb:type": "content"
+        }
+    }
+];
+
+
+
+var test2 = { "d": { "json": "[{\"data\":{\"title\":\"Content\",\"attributes\":{\"class\":\"sprTree sprTreeFolder\",\"href\":\"javascript:UmbClientMgr.appActions().openDashboard(\\u0027content\\u0027);\",\"umb:nodedata\":\u0027{\\u0027menu\\u0027:\\u0027CS,B,L\\u0027,\\u0027nodeType\\u0027:\\u0027content\\u0027,\\u0027source\\u0027:\\u0027/umbraco/tree.aspx?rnd=3fb294c1297046a48b61105b34073826&id=-1&treeType=content&contextMenu=true&isDialog=false\\u0027}\u0027}},\"state\":\"closed\",\"attributes\":{\"id\":\"-1\",\"class\":\"\",\"rel\":\"rootNode\",\"umb:type\":\"content\"}}]", "app": "content", "js": "\r\nfunction openContent(id) {\r\n\tUmbClientMgr.contentFrame(\u0027editContent.aspx?id=\u0027 + id);\r\n}\r\n"} };

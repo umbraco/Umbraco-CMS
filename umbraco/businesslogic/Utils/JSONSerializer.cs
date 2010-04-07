@@ -38,20 +38,11 @@ namespace umbraco.businesslogic.Utils
 				| RegexOptions.Compiled
 			);
 			string result = regex1.Replace(output, "$2");
-			
-			//replaces all strings beginning with this prefix to have no single instead of double
-			Regex regex2 = new Regex(string.Format("(\"{0}(.*?)\")+", PrefixSingleQuotes),
-				RegexOptions.Multiline
-				| RegexOptions.CultureInvariant
-				| RegexOptions.Compiled
-			);
-			result = regex2.Replace(result, "'$2'");
-
+		
 			return result;
 		}
 
 		private const string PrefixJavaScriptObject = "@@@@";
-		private const string PrefixSingleQuotes = "!!!!";
 
 		/// <summary>
 		/// method for a string to be converted to a json object.
@@ -67,16 +58,7 @@ namespace umbraco.businesslogic.Utils
 			return PrefixJavaScriptObject + s;
 		}
 
-		/// <summary>
-		/// method to use so that the serializer outputs a string with single quotes instead
-		/// of double quotes.
-		/// </summary>
-		/// <param name="s"></param>
-		/// <returns></returns>
-		public static string ToSingleQuotedString(string s)
-		{
-			return PrefixSingleQuotes + s;
-		}
+	
 	}
 
 	

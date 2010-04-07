@@ -717,7 +717,7 @@ namespace umbraco.cms.presentation.Trees
 				//the metadata/jsTree requires this property to be in a quoted JSON syntax
 				JSONSerializer jsSerializer = new JSONSerializer();
 				string strMetaData = jsSerializer.Serialize(metadata).Replace("\"", "'");
-				dataAttributes.Add("umb:nodedata", JSONSerializer.ToSingleQuotedString(strMetaData));
+                dataAttributes.Add("umb:nodedata", strMetaData);
 
 				data.Add("attributes", dataAttributes);
 
