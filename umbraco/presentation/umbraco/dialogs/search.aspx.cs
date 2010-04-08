@@ -6,7 +6,7 @@ using System.Web.UI.WebControls;
 using UmbracoExamine;
 using System.Xml;
 using Examine;
-
+using System.Linq;
 
 
 namespace umbraco.presentation.dialogs
@@ -46,7 +46,7 @@ namespace umbraco.presentation.dialogs
 
             //if it doesn't start with "*", then search only nodeName and nodeId
             var internalSearcher = UmbracoContext.Current.InternalSearchProvider;
-            var criteria = internalSearcher.CreateSearchCriteria(100, indexType);
+            var criteria = internalSearcher.CreateSearchCriteria(indexType);
             IEnumerable<SearchResult> results;
             if (query.StartsWith("*"))
             {
@@ -60,7 +60,7 @@ namespace umbraco.presentation.dialogs
                     operation.Or().Id(UmbracoContext.Current.UmbracoUser.StartNodeId);
                 }
 
-                results = internalSearcher.Search(operation.Compile());
+                results = internalSearcher.Search(operation.Compile()).Take(100);
             }
 
             searchResult.XPathNavigator = ResultsAsXml(results).CreateNavigator();

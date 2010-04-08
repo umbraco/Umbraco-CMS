@@ -10,7 +10,7 @@ using UmbracoExamine;
 using System.Collections.Generic;
 using Examine;
 using umbraco.presentation;
-
+using System.Linq;
 
 namespace umbraco
 {
@@ -140,7 +140,7 @@ namespace umbraco
             {
                 //if the query starts with "*" then query all fields
                 var internalSearcher = UmbracoContext.Current.InternalSearchProvider;
-                var criteria = internalSearcher.CreateSearchCriteria(20, IndexType.Content);
+                var criteria = internalSearcher.CreateSearchCriteria(IndexType.Content);
                 IEnumerable<SearchResult> results;
                 if (Query.StartsWith("*"))
                 {
@@ -154,7 +154,7 @@ namespace umbraco
                         operation.Or().Id(StartNodeId);
                     }
 
-                    results = internalSearcher.Search(operation.Compile());
+                    results = internalSearcher.Search(operation.Compile()).Take(20);
                 }
                 
                 //var criteria = new SearchCriteria(Query

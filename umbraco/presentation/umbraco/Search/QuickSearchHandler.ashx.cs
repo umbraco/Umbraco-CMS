@@ -44,7 +44,7 @@ namespace umbraco.presentation.umbraco.Search
 
             //if it doesn't start with "*", then search only nodeName and nodeId
             var internalSearcher = UmbracoContext.Current.InternalSearchProvider;
-            var criteria = internalSearcher.CreateSearchCriteria(100, indexType);
+            var criteria = internalSearcher.CreateSearchCriteria(indexType);
             IEnumerable<SearchResult> results;
             if (txt.StartsWith("*"))
             {
@@ -62,7 +62,7 @@ namespace umbraco.presentation.umbraco.Search
             }
 
             JavaScriptSerializer js = new JavaScriptSerializer();
-            context.Response.Write(js.Serialize(results));
+            context.Response.Write(js.Serialize(results.Take(100)));
         }
 
         public static void Authorize()
