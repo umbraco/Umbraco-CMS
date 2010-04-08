@@ -3,6 +3,8 @@ using System.Data;
 using System.Configuration;
 using System.Collections;
 using umbraco.DataLayer;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace umbraco.BusinessLogic {
     /// <summary>
@@ -320,24 +322,20 @@ namespace umbraco.BusinessLogic {
         /// Gets all users
         /// </summary>
         /// <returns></returns>
-        public static User[] getAll() {
-            System.Collections.ArrayList tmpContainer = new System.Collections.ArrayList();
+        public static User[] getAll() {            
 
             IRecordsReader dr;
             dr = SqlHelper.ExecuteReader("Select id from umbracoUser");
 
-            while (dr.Read()) {
-                tmpContainer.Add(BusinessLogic.User.GetUser(dr.GetInt("id")));
+            List<User> users = new List<User>();
+
+            while (dr.Read()) 
+            {
+                users.Add(User.GetUser(dr.GetInt("id")));
             }
             dr.Close();
-            User[] retVal = new User[tmpContainer.Count];
 
-            int c = 0;
-            foreach (User u in tmpContainer) {
-                retVal[c] = u;
-                c++;
-            }
-            return retVal;
+            return users.OrderBy(x => x.Name).ToArray();
         }
 
 

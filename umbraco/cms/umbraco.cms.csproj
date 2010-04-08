@@ -176,6 +176,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>PackageFiles.resx</DependentUpon>
     </Compile>
+    <Compile Include="businesslogic\task\Tasks.cs" />
     <Compile Include="helpers\Casing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

@@ -7,8 +7,8 @@ using umbraco.presentation;
 
 namespace umbraco.presentation.LiveEditing
 {
-	public class CanvasClientDependencyProvider : LazyLoadProvider
-	{
+    public class CanvasClientDependencyProvider : LazyLoadProvider
+    {
         public CanvasClientDependencyProvider()
             : base()
         {
@@ -26,17 +26,20 @@ namespace umbraco.presentation.LiveEditing
             this.IsDebugMode = true;
         }
 
-		protected override void ProcessSingleCssFile(string css)
-		{
-			if (UmbracoContext.Current.LiveEditingContext.Enabled)
-				base.ProcessSingleCssFile(css);
-		}
+        protected override string RenderSingleCssFile(string css)
+        {
+            if (UmbracoContext.Current.LiveEditingContext.Enabled)
+                return base.RenderSingleCssFile(css);
+            return string.Empty;
+        }
 
-		protected override void ProcessSingleJsFile(string js)
-		{
-			if (UmbracoContext.Current.LiveEditingContext.Enabled)
-				base.ProcessSingleJsFile(js);
-		}
+        protected override string RenderSingleJsFile(string js)
+        {
+            if (UmbracoContext.Current.LiveEditingContext.Enabled)
+                return base.RenderSingleJsFile(js);
+            return string.Empty;
+        }
 
-	}
+
+    }
 }
