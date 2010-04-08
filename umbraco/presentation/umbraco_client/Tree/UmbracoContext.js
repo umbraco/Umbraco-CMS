@@ -46,46 +46,39 @@
                     $.tree.plugins.UmbracoContext.settings = t.settings.plugins.UmbracoContext;
                     //need to remove the defaults
                     $.tree.plugins.contextmenu.defaults.items = {};
-
-                    //add events to auto hide the menu on a delay
-                    var pause = true;
-                    var timer = null;
-                    $("#jstree-contextmenu").bind("mouseenter", function() {
-                        pause = true;
-                        clearTimeout(timer);
-                    });
-                    $("#jstree-contextmenu").bind("mouseleave", function() {
-                        pause = false;
-                        timer = setTimeout(function() {
-                            if (!pause) {
-                                $.tree.plugins.contextmenu.hide();
-                            }
-                        }, 500);
-                    });
-                    //disable right clicking the context menu, this is for IE bug
-                    $("#jstree-contextmenu").bind("contextmenu", function(e) {
-                        e.preventDefault();
-                        return false;
-                    });
                 },
                 onrgtclk: function(n, t, e) {
                     ///<summary>Need to set the context menu items for the context menu plugin for the current node</summary>
-
                     var _this = $.tree.plugins.UmbracoContext;
-
 
                     var menu = _this.settings.onBeforeContext.call(this, n, t, e);
                     if (menu != "") {
                         t.settings.plugins.contextmenu.items = _this._getContextMenu(menu);
                     }
-                },
-                ondestroy: function(t) {
-                    $("#jstree-contextmenu").unbind();
                 }
             }
         }
     });
     $(function() {
-        //init code here		
+        //add events to auto hide the menu on a delay
+        var pause = true;
+        var timer = null;
+        $("#jstree-contextmenu").bind("mouseenter", function() {
+            pause = true;
+            clearTimeout(timer);
+        });
+        $("#jstree-contextmenu").bind("mouseleave", function() {
+            pause = false;
+            timer = setTimeout(function() {
+                if (!pause) {
+                    $.tree.plugins.contextmenu.hide();
+                }
+            }, 500);
+        });
+        //disable right clicking the context menu, this is for IE bug
+        $("#jstree-contextmenu").bind("contextmenu", function(e) {
+            e.preventDefault();
+            return false;
+        });
     });
 })(jQuery);

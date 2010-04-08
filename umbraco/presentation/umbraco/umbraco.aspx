@@ -101,8 +101,6 @@
 		<div id="umbModalBoxContent"><iframe frameborder="0" id="umbModalBoxIframe" src=""></iframe></div>
 	</div>
 
-
-
     <script type="text/javascript">
         
         //used for deeplinking to specific content whilst still showing the tree
@@ -113,36 +111,32 @@
         jQuery(document).ready(function() {
 
             UmbClientMgr.setUmbracoPath("<%=umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>");
+            
+            //call wresize first for IE/FF resize issues
+            jQuery(window).wresize(function() { resizePage(); });
+            resizePage();
 
-            jQuery(window).load(function() { resizePage('load'); });
-            jQuery(window).wresize(function() { resizePage('resize'); });
+            jQuery("#umbracoMainPageBody").css("background", "#fff");
 
-            //jQuery("#umbracoMainPageBody").css("background", "#fff");
+            //wire up the history mgr
+            UmbClientMgr.historyManager().addEventHandler("navigating", function(e, app) {
+                //show modal wait dialog. TODO: Finish this
+                //jQuery("<div id='appLoading'>&nbsp;</div>").appendTo("body")
+                //    .ModalWindowShow("", false, 300, 100, 300, 0)
+                //    .closest(".umbModalBox").css("border", "none");
+
+                UmbClientMgr.appActions().shiftApp(app, uiKeys['sections_' + app]);
+            });
 
             if (rightAction != '') {
                 //if an action is specified, then load it
                 UmbClientMgr.contentFrame(rightAction + ".aspx?id=" + rightActionId);
             }
             else {
-                // load dashboard
-                UmbClientMgr.contentFrame("dashboard.aspx?app=" + initApp);
-            }
-
-            //wire up the history mgr
-            UmbClientMgr.historyManager().addEventHandler("navigating", function(e, app) {
-                
-                //show modal wait dialog. TODO: Finish this
-                //jQuery("<div id='appLoading'>&nbsp;</div>").appendTo("body")
-                //    .ModalWindowShow("", false, 300, 100, 300, 0)
-                //    .closest(".umbModalBox").css("border", "none");
-
-                UmbClientMgr.appActions().shiftApp(app, uiKeys['sections_' + app], true);
-            });
-
-            //add the history
-            UmbClientMgr.historyManager().addHistory(initApp != "" ? initApp :
+                UmbClientMgr.historyManager().addHistory(initApp != "" ? initApp :
                                                         UmbClientMgr.historyManager().getCurrent() != "" ? UmbClientMgr.historyManager().getCurrent() :
                                                         "content", true);
+            }
 
             jQuery("#right").show();
         });

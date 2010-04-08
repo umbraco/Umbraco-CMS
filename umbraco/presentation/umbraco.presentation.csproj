@@ -475,6 +475,12 @@
     <Compile Include="umbraco\controls\Tree\TreeControl.ascx.designer.cs">
       <DependentUpon>TreeControl.ascx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\create\contentItemTasks.cs" />
+    <Compile Include="umbraco\create\contentItemTypeTasks.cs" />
+    <Compile Include="umbraco\create\contentTasks.cs" />
+    <Compile Include="umbraco\create\CreatedPackageTasks.cs" />
+    <Compile Include="umbraco\create\DataTypeTasks.cs" />
+    <Compile Include="umbraco\create\dictionaryTasks.cs" />
     <Compile Include="umbraco\create\DLRScripting.ascx.cs">
       <DependentUpon>DLRScripting.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -482,6 +488,22 @@
     <Compile Include="umbraco\create\DLRScripting.ascx.designer.cs">
       <DependentUpon>DLRScripting.ascx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\create\DLRScriptingTasks.cs" />
+    <Compile Include="umbraco\create\macroTasks.cs" />
+    <Compile Include="umbraco\create\mediaTasks.cs" />
+    <Compile Include="umbraco\create\MediaTypeTasks.cs" />
+    <Compile Include="umbraco\create\MemberGroupTasks.cs" />
+    <Compile Include="umbraco\create\memberTasks.cs" />
+    <Compile Include="umbraco\create\MemberTypeTasks.cs" />
+    <Compile Include="umbraco\create\NewMemberUIEventArgs.cs" />
+    <Compile Include="umbraco\create\nodetypeTasks.cs" />
+    <Compile Include="umbraco\create\PythonTasks.cs" />
+    <Compile Include="umbraco\create\ScriptTasks.cs" />
+    <Compile Include="umbraco\create\stylesheetPropertyTasks.cs" />
+    <Compile Include="umbraco\create\StylesheetTasks.cs" />
+    <Compile Include="umbraco\create\templateTasks.cs" />
+    <Compile Include="umbraco\create\userTasks.cs" />
+    <Compile Include="umbraco\create\XsltTasks.cs" />
     <Compile Include="umbraco\dialogs\Preview.aspx.cs">
       <DependentUpon>Preview.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -617,7 +639,7 @@
     <Compile Include="umbraco\create\simple.ascx.designer.cs">
       <DependentUpon>simple.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\create\standardTasks.cs">
+    <Compile Include="umbraco\create\languageTasks.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco\create\xslt.ascx.cs">

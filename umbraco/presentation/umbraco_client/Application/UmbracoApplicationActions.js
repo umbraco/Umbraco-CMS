@@ -24,12 +24,12 @@ Umbraco.Application.Actions = function() {
 
         addEventHandler: function(fnName, fn) {
             /// <summary>Adds an event listener to the event name event</summary>
-            if (typeof (jQuery) != "undefined") jQuery(this).bind(fnName, fn); //if there's no jQuery, there is no events
+            if (typeof (jQuery) != "undefined") jQuery(window.top).bind(fnName, fn); //if there's no jQuery, there is no events
         },
 
         removeEventHandler: function(fnName, fn) {
             /// <summary>Removes an event listener to the event name event</summary>
-            if (typeof (jQuery) != "undefined") jQuery(this).unbind(fnName, fn); //if there's no jQuery, there is no events
+            if (typeof (jQuery) != "undefined") jQuery(window.top).unbind(fnName, fn); //if there's no jQuery, there is no events
         },
 
         showSpeachBubble: function(ico, hdr, msg) {
@@ -78,17 +78,17 @@ Umbraco.Application.Actions = function() {
             /// <summary>Logs the user out</summary>
             if (confirm(UmbClientMgr.uiKeys()["defaultdialogs_confirmlogout"])) {
                 //raise beforeLogout event
-                jQuery(this).trigger("beforeLogout", []);
+                jQuery(window.top).trigger("beforeLogout", []);
 
                 document.location.href = 'logout.aspx';
             }
             return false;
         },
 
-        shiftApp: function(whichApp, appName, ignoreDashboard) {
+        shiftApp: function(whichApp, appName) {
             /// <summary>Changes the application</summary>
 
-            this._debug("shiftApp: " + whichApp + ", " + appName + ", " + ignoreDashboard);
+            this._debug("shiftApp: " + whichApp + ", " + appName);
 
             UmbClientMgr.mainTree().saveTreeState(this._currApp == "" ? "content" : this._currApp);
 
@@ -112,18 +112,18 @@ Umbraco.Application.Actions = function() {
                 }
             }
 
-            if (!ignoreDashboard) {
-                UmbClientMgr.contentFrame('dashboard.aspx?app=' + whichApp);
-            }
-
-            UmbClientMgr.mainTree().rebuildTree(whichApp);
+            UmbClientMgr.mainTree().rebuildTree(whichApp, function(args) {
+                //the callback will fire when the tree rebuilding is done, we
+                //need to check the args to see if the tree was rebuild from cache
+                //and if it had a previously selected node, if it didn't then load the dashboard.
+                if (!args) {
+                    UmbClientMgr.contentFrame('dashboard.aspx?app=' + whichApp);
+                }
+            });
 
             jQuery("#treeWindowLabel").html(appName);
 
             UmbClientMgr.mainWindow().document.title = appName + this._windowTitle + window.location.hostname.toLowerCase().replace('www', '');
-
-            //TODO: Update this to use microsoft's history manager
-            //UmbClientMgr.mainWindow().location.hash = whichApp;
         },
 
         getCurrApp: function() {
@@ -185,7 +185,7 @@ Umbraco.Application.Actions = function() {
             /// <summary></summary>
 
             //raise nodeRefresh event
-            jQuery(this).trigger("nodeRefresh", []);
+            jQuery(window.top).trigger("nodeRefresh", []);
         },
 
         actionNotify: function() {
@@ -324,12 +324,12 @@ Umbraco.Application.Actions = function() {
 
             if (confirm(uiKeys['defaultdialogs_confirmdelete'] + ' "' + UmbClientMgr.mainTree().getActionNode().nodeName + '"?\n\n')) {
                 //raise nodeDeleting event
-                jQuery(this).trigger("nodeDeleting", []);
+                jQuery(window.top).trigger("nodeDeleting", []);
                 var _this = this;
                 umbraco.presentation.webservices.legacyAjaxCalls.Delete(UmbClientMgr.mainTree().getActionNode().nodeId, "", UmbClientMgr.mainTree().getActionNode().nodeType, function() {
                     _this._debug("actionDelete: Raising event");
                     //raise nodeDeleted event
-                    jQuery(_this).trigger("nodeDeleted", []);
+                    jQuery(window.top).trigger("nodeDeleted", []);
                 });
             }
         },

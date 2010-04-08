@@ -401,7 +401,7 @@
 					    event.stopPropagation();
 					    return false;
 					});
-                $("div.tree a", this.container.get(0))
+                $("a", this.container.get(0))
 					.live("click", function(event) { // WHEN CLICK IS ON THE TEXT OR ICON
 					    if (event.which && event.which == 3) return true;
 					    if (_this.locked) {

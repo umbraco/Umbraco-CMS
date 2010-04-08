@@ -114,8 +114,7 @@
     });
     $(function() {
         $.tree.plugins.contextmenu.object.hide().appendTo("body");
-
-        $("#jstree-contextmenu a", $.tree.plugins.contextmenu.object[0])
+        $("a", $.tree.plugins.contextmenu.object[0])
 			.live("click", function(event) {
 			    if (!$(this).hasClass("disabled")) {
 			        $.tree.plugins.contextmenu.exec.apply(null, [$(this).attr("rel")]);

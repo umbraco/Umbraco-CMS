@@ -929,7 +929,8 @@ namespace umbraco.cms.businesslogic.web
                 {
                     umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
                     UnPublish();
-                    Move(-20);
+                    Move((int)RecycleBin.RecycleBinType.Content);
+
 
                     FireAfterMoveToTrash(e);
                 }

@@ -33,23 +33,6 @@ namespace umbraco.cms.presentation.Trees
 
         public ContentRecycleBin(string application) : base(application) { }
 
-		private string m_treeAlias;
-		/// <summary>
-		/// Change the tree alias so that it is the same as the content tree
-		/// </summary>
-		public override string TreeAlias
-		{
-			get
-			{
-				if (string.IsNullOrEmpty(m_treeAlias))
-				{
-					TreeDefinition treeDef = TreeDefinitionCollection.Instance.FindTree<loadContent>();
-					m_treeAlias = (treeDef != null ? treeDef.Tree.Alias : "content");
-				}
-				return m_treeAlias;
-			}
-		}
-
         protected override void CreateRootNodeActions(ref List<IAction> actions)
 		{
 			actions.Clear();
@@ -60,7 +43,7 @@ namespace umbraco.cms.presentation.Trees
 
         protected override void CreateAllowedActions(ref List<IAction> actions)
 		{
-            actions.Clear();            
+            actions.Clear();
             actions.Add(ActionMove.Instance);
             actions.Add(ContextMenuSeperator.Instance);
             actions.Add(ActionDelete.Instance);
@@ -93,7 +76,7 @@ namespace umbraco.cms.presentation.Trees
 		{
 			get
 			{
-                return -20;
+                return (int)RecycleBin.RecycleBinType.Content;
 			}
 		}
 
@@ -102,17 +85,7 @@ namespace umbraco.cms.presentation.Trees
         /// </summary>
         /// <param name="Javascript"></param>
         public override void RenderJS(ref StringBuilder Javascript) { }
-
-        ///// <summary>
-        ///// Returns the tree service url to render the tree. Ensures that IsRecycleBin is flagged.
-        ///// </summary>
-        ///// <returns></returns>
-        //public override string GetTreeInitUrl()
-        //{
-        //    TreeService treeSvc = new TreeService(true, this.StartNodeID, TreeAlias, null, null, "", "");
-        //    return treeSvc.GetInitUrl();
-        //}
-
+      
         protected override void OnRenderNode(ref XmlTreeNode xNode, Document doc)
         {
 			xNode.Style.DimNode();

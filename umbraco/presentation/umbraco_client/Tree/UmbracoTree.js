@@ -67,19 +67,24 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _activeTreeType: "content", //tracks which is the active tree type, this is used in searching and syncing.
             _tree: null, //reference to the jsTree object
             _isEditMode: false, //not really used YET
-            _isDebug: true, //set to true to enable alert debugging
+            _isDebug: false, //set to true to enable alert debugging
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
             _treeClass: "umbTree", //used for other libraries to detect which elements are an umbraco tree
             _currenAJAXRequest: false, //used to determine if there is currently an ajax request being executed.
 
             addEventHandler: function(fnName, fn) {
                 /// <summary>Adds an event listener to the event name event</summary>
-                $(this).bind(fnName, fn);
+                this._getContainer().bind(fnName, fn);
             },
 
             removeEventHandler: function(fnName, fn) {
                 /// <summary>Removes an event listener to the event name event</summary>
-                $(this).unbind(fnName, fn);
+                this._getContainer().unbind(fnName, fn);
+            },
+
+            _raiseEvent: function(evName, args) {
+                /// <summary>Raises an event and attaches it to the container</summary>
+                this._getContainer().trigger(evName, args);
             },
 
             init: function(jItem, opts) {
@@ -147,7 +152,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._debug("refreshTree");
                 this._tree.refresh();
             },
-            rebuildTree: function(app) {
+            rebuildTree: function(app, callback) {
                 /// <summary>This will rebuild the tree structure for the application specified</summary>
 
                 this._debug("rebuildTree");
@@ -163,9 +168,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     this._opts.app = app;
                 }
                 //kill the tree
-                if (this._tree) this._tree.destroy();
+                if (this._tree) {
+                    this._tree.destroy();
+                }
 
-                this._getContainer().hide();
                 var _this = this;
 
                 //check if we should rebuild from a saved tree
@@ -191,10 +197,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         var foundHandler = function(EV, node) {
                             //remove the event handler from firing again
                             _this.removeEventHandler("syncFound", foundHandler);
-                            this._debug("rebuildTree: node synced, selecting node...");
+                            _this._debug("rebuildTree: node synced, selecting node...");
                             //ensure the node is selected, ensure the event is fired and reselect is true since jsTree thinks this node is already selected by id
                             _this.selectNode(node, false, true);
-                            this._getContainer().show();
                         };
                         this._debug("rebuildTree: syncing to last selected: " + lastSelected);
                         //add the event handler for the tree sync and sync the tree
@@ -202,21 +207,19 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         this.setActiveTreeType($(saveData.selected[0]).attr("umb:type"));
                         this.syncTree(lastSelected);
                     }
-                    else {
-                        this._getContainer().show();
-                    }
 
-                    return;
+                    if (typeof callback == "function") callback.apply(this, [lastSelected]);
                 }
                 else {
                     this._debug("rebuildTree: rebuilding from scratch: app = " + app);
+
+                    this._currentAJAXRequest = true;
+
+                    _this._tree = $.tree.create();
+                    _this._tree.init(_this._getContainer(), _this._getInitOptions());
+
+                    if (typeof callback == "function") callback.apply(this, []);
                 }
-
-
-                this._currentAJAXRequest = true;
-
-                _this._tree = $.tree.create();
-                _this._tree.init(_this._getContainer(), _this._getInitOptions());
 
             },
 
@@ -321,7 +324,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         if (found) {
                             _this._debug("childNodeCreated: selecting new child node: " + found.attr("id"));
                             _this.selectNode(found, true, true);
-                            $(_this).trigger("newChildNodeFound", [found]);
+                            _this._raiseEvent("newChildNodeFound", [found]);
                             return;
                         }
                     }
@@ -347,7 +350,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     _this.removeEventHandler("syncFound", foundHandler);
                     //ensure the node is selected, ensure the event is fired and reselect is true since jsTree thinks this node is already selected by id
                     _this.selectNode(node, false, true);
-                    $(_this).trigger("nodeMoved", [node]);
+                    _this._raiseEvent("nodeMoved", [node]);
                 };
                 //add the event handler for the tree sync and sync the tree
                 this.addEventHandler("syncFound", foundHandler);
@@ -370,7 +373,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     _this._loadChildNodes(node, null);
                     //reselect the original node since sync will select the one that was copied
                     if (originalNode) _this.selectNode(originalNode, true);
-                    $(_this).trigger("nodeCopied", [node]);
+                    _this._raiseEvent("nodeCopied", [node]);
                 };
                 //add the event handler for the tree sync and sync the to the parent path
                 this.addEventHandler("syncFound", foundHandler);
@@ -397,9 +400,12 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// <param name="supressEvent">If set to true, will select the node but will supress the onSelected event</param>
                 /// <param name="reselect">If set to true, will call the select_branch method even if the node is already selected</param>
 
-                this._debug("selectNode, edit mode? " + this._isEditMode);
+                //this._debug("selectNode, edit mode? " + this._isEditMode);
 
                 var selectedId = this._tree.selected != null ? $(this._tree.selected[0]).attr("id") : null;
+
+                this._debug("selectNode (" + node.attr("id") + "). supressEvent? " + supressEvent + ", reselect? " + reselect);
+
                 if (reselect || (selectedId == null || selectedId != node.attr("id"))) {
                     //if we don't wan the event to fire, we'll set the callback to a null method and set it back after we call the select_branch method
                     if (supressEvent || this._isEditMode) {
@@ -541,7 +547,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
             onSelect: function(NODE, TREE_OBJ) {
                 /// <summary>Fires the JS associated with the node, if the tree is in edit mode, allows for rename instead</summary>
-                this._debug("onSelect, edit mode? " + this._isEditMode);
+                //this._debug("onSelect, edit mode? " + this._isEditMode);
+                this._debug("onSelect");
                 if (this._isEditMode) {
                     this._tree.rename(NODE);
                     return false;
@@ -610,7 +617,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
             onChange: function(NODE, TREE_OBJ) {
                 //bubble an event!
-                $(this).trigger("nodeClicked", [NODE]);
+                this._raiseEvent("nodeClicked", [NODE]);
             },
 
             onBeforeContext: function(NODE, TREE_OBJ, EV) {
@@ -629,7 +636,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 this._debug("onLoad");
 
-                this._getContainer().show();
                 //ensure the static data is gone
                 this._tree.settings.data.opts.static = null;
                 var _this = this;
@@ -645,6 +651,33 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._configureNodes(obj);
                 //this will return the full html of the configured node
                 return $('<div>').append($(obj).clone()).remove().html();
+            },
+
+            onDestroy: function(TREE_OBJ) {
+                /// <summary>
+                /// When the tree is destroyed we need to ensure that all of the events both
+                /// live and bind are gone. For some reason the jstree unbinding doesn't seem to do it's job
+                /// so instead we need to clear all of the events ourselves
+                /// </summary>
+                this._debug("onDestroy: " + TREE_OBJ.container.attr("id"));
+
+                TREE_OBJ.container
+                    .unbind("contextmenu")
+                    .unbind("click")
+                    .unbind("dblclick")
+                    .unbind("mouseover")
+                    .unbind("mousedown")
+                    .unbind("mouseup");
+
+                $("a", TREE_OBJ.container.get(0))
+                    .die("contextmenu")
+                    .die("click")
+                    .die("dblclick")
+                    .die("mouseover")
+                    .die("mousedown");
+
+                $("li", TREE_OBJ.container.get(0))
+                    .die("click");
             },
 
             onError: function(ERR, TREE_OBJ) {
@@ -779,7 +812,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 //if no node has been found at all in the entire path, then bubble an error event
                 if (!found) {
                     this._debug("no node found in path: " + path + " : " + numPaths);
-                    $(this).trigger("syncNotFound", [path]);
+                    this._raiseEvent("syncNotFound", [path]);
                     return;
                 }
 
@@ -794,7 +827,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         }
                         else {
                             _this._debug("node not found in children: " + path + " : " + numPaths);
-                            $(this).trigger("syncNotFound", [path]);
+                            _this._raiseEvent("syncNotFound", [path]);
                         }
                     });
                 }
@@ -812,7 +845,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         this._configureNodes(found, doReload);
                     }
                     //bubble event
-                    $(this).trigger("syncFound", [found]);
+                    this._raiseEvent("syncFound", [found]);
                 }
             },
 
@@ -881,7 +914,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         ondata: function(D, T) { return _this.onJSONData(D, T); },
                         onload: function(T) { if (initData == null) _this.onLoad(T); },
                         onparse: function(S, T) { return _this.onParse(S, T); },
-                        error: function(E, T) { _this.onError(E, T); }
+                        error: function(E, T) { _this.onError(E, T); },
+                        ondestroy: function(T) { _this.onDestroy(T); }
                     },
                     plugins: {
                         //UmbracoContext comes before context menu so that the events fire first
@@ -921,51 +955,3 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
 
 })(jQuery);
-
-
-var test = [
-    {
-        "data":
-        {
-            "title": "Home",
-            "icon": "/umbraco/images/umbraco/CWS_house.png",
-            "attributes": {
-                "class": "sprTree noSpr",
-                "href": "javascript:openContent(\u00271095\u0027);",
-                "umb:nodedata": '{\u0027menu\u0027:\u0027C:,D,MO,SK,UIR,P,Z,T5,L\u0027,\u0027nodeType\u0027:\u0027content\u0027,\u0027source\u0027:\u0027/umbraco/tree.aspx?rnd=ef1e00591d6d41f684c5b81f3324a24d&id=1095&treeType=content&contextMenu=true&isDialog=false\u0027}'
-            }
-        },
-        "state": "closed",
-        "attributes":
-        {
-            "id": "1095",
-            "class": "",
-            "rel": "dataNode",
-            "umb:type": "content"
-        }
-    },
-    {
-        "data":
-        {
-            "title": "Recycle Bin",
-            "icon": "/umbraco/images/umbraco/bin.png",
-            "attributes": {
-                "class": "sprTree noSpr",
-                "href": "javascript:UmbClientMgr.appActions().openDashboard(\u0027content\u0027);",
-                "umb:nodedata": '{\u0027menu\u0027:\u0027N,L\u0027,\u0027nodeType\u0027:\u0027content\u0027,\u0027source\u0027:\u0027/umbraco/tree.aspx?rnd=15b517b18af74f8fa53e9b454a14e21e&id=-20&treeType=content&contextMenu=true&isDialog=false\u0027}'
-            }
-        },
-        "state": "closed",
-        "attributes":
-        {
-            "id": "-20",
-            "class": "",
-            "rel": "rootNode",
-            "umb:type": "content"
-        }
-    }
-];
-
-
-
-var test2 = { "d": { "json": "[{\"data\":{\"title\":\"Content\",\"attributes\":{\"class\":\"sprTree sprTreeFolder\",\"href\":\"javascript:UmbClientMgr.appActions().openDashboard(\\u0027content\\u0027);\",\"umb:nodedata\":\u0027{\\u0027menu\\u0027:\\u0027CS,B,L\\u0027,\\u0027nodeType\\u0027:\\u0027content\\u0027,\\u0027source\\u0027:\\u0027/umbraco/tree.aspx?rnd=3fb294c1297046a48b61105b34073826&id=-1&treeType=content&contextMenu=true&isDialog=false\\u0027}\u0027}},\"state\":\"closed\",\"attributes\":{\"id\":\"-1\",\"class\":\"\",\"rel\":\"rootNode\",\"umb:type\":\"content\"}}]", "app": "content", "js": "\r\nfunction openContent(id) {\r\n\tUmbClientMgr.contentFrame(\u0027editContent.aspx?id=\u0027 + id);\r\n}\r\n"} };
