@@ -948,6 +948,20 @@ order by level,sortOrder";
             if (AfterMove != null)
                 AfterMove(this, e);
         }
+
+        public override string ToString()
+        {
+            if (Id != int.MinValue || !string.IsNullOrEmpty(Text))
+            {
+                return string.Format("{{ Id: {0}, Text: {1}, ParentId: {2} }}",
+                    Id,
+                    Text,
+                    _parentid
+                );
+            }
+
+            return base.ToString();
+        }
     }
 
     public class CMSPreviewNode
