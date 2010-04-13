@@ -91,7 +91,7 @@ namespace umbraco.cms.presentation
             }
             else
             {
-                //bodyAttributes.Text = " onLoad=\"resizePanel('Panel2',false);\" onResize=\"resizePanel('Panel2',false);\"";
+                
 
                 foreach (XmlNode entry in dashBoardXml.SelectNodes("//entry [@section='" + _section.ToLower() + "']"))
                 {

@@ -311,9 +311,7 @@ namespace umbraco.BasePages {
         /// <param name="e">The <see cref="T:System.EventArgs"></see> object that contains the event data.</param>
         protected override void OnLoad(EventArgs e) {
             base.OnLoad(e);
-            if (OverrideClientTarget)
-                ClientTarget = "uplevel";
-
+           
             if (!Request.IsSecureConnection && GlobalSettings.UseSSL) {
                 string serverName = HttpUtility.UrlEncode(Request.ServerVariables["SERVER_NAME"]);
                 Response.Redirect(string.Format("https://{0}{1}", serverName, Request.FilePath));
@@ -323,6 +321,7 @@ namespace umbraco.BasePages {
         /// <summary>
         /// Override client target.
         /// </summary>
-        public bool OverrideClientTarget = true;
+        [Obsolete("This is no longer supported")]
+        public bool OverrideClientTarget = false;
     }
 }

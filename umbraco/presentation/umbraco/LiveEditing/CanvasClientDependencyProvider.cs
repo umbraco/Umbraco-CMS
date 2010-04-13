@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using ClientDependency.Core.FileRegistration.Providers;
 using umbraco.presentation;
+using ClientDependency.Core;
 
 namespace umbraco.presentation.LiveEditing
 {
@@ -11,19 +12,53 @@ namespace umbraco.presentation.LiveEditing
     {
         public CanvasClientDependencyProvider()
             : base()
-        {
-            //Force this to always be debug mode!
-            this.IsDebugMode = true;
-        }
+        {}
 
         public new const string DefaultName = "CanvasProvider";
 
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
-            base.Initialize(name, config);
+            base.Initialize(name, config);            
+        }
 
-            //Force this to always be debug mode!
-            this.IsDebugMode = true;
+        /// <summary>
+        /// override to never render out the dependency handler address (no compression, combination, etc...)
+        /// </summary>
+        /// <param name="cssDependencies"></param>
+        /// <returns></returns>
+        protected override string RenderCssDependencies(List<ClientDependency.Core.IClientDependencyFile> cssDependencies)
+        {
+            if (cssDependencies.Count == 0)
+                return string.Empty;
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (IClientDependencyFile dependency in cssDependencies)
+            {
+                sb.Append(RenderSingleCssFile(dependency.FilePath));
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// override to never render out the dependency handler address (no compression, combination, etc...)
+        /// </summary>
+        /// <param name="jsDependencies"></param>
+        /// <returns></returns>
+        protected override string RenderJsDependencies(List<ClientDependency.Core.IClientDependencyFile> jsDependencies)
+        {
+            if (jsDependencies.Count == 0)
+                return string.Empty;
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (IClientDependencyFile dependency in jsDependencies)
+            {
+                sb.Append(RenderSingleJsFile(string.Format("'{0}','{1}'", dependency.FilePath, string.Empty)));
+            }
+
+            return sb.ToString();
         }
 
         protected override string RenderSingleCssFile(string css)

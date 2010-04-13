@@ -1,5 +1,5 @@
 <%@ Page Trace="false" Language="c#" CodeBehind="umbraco.aspx.cs" AutoEventWireup="True"
-    Inherits="umbraco.cms.presentation._umbraco" ClientTarget="uplevel" %>
+    Inherits="umbraco.cms.presentation._umbraco"  %>
 
 <%@ Register Src="controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
@@ -40,7 +40,12 @@
 	<umb:JsInclude ID="JsInclude12" runat="server" FilePath="js/UmbracoSpeechBubbleBackend.js" PathNameAlias="UmbracoRoot"  />	
 		
 	<form id="Form1" method="post" runat="server" style="margin: 0px; padding: 0px">
-	<asp:ScriptManager runat="server" ID="umbracoScriptManager">
+	<asp:ScriptManager runat="server" ID="umbracoScriptManager" ScriptMode="Release" >
+	    <CompositeScript ScriptMode="Release">
+	        <Scripts>
+	            <asp:ScriptReference Path="js/dualSelectBox.js" />
+	        </Scripts>
+	    </CompositeScript>
 		<Services>
 			<asp:ServiceReference Path="webservices/legacyAjaxCalls.asmx" />
 			<asp:ServiceReference Path="webservices/nodeSorter.asmx" />

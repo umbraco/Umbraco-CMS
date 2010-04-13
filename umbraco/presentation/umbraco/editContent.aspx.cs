@@ -61,9 +61,6 @@ namespace umbraco.cms.presentation
             if (!CheckUserValidation())
                 return;
 
-			//if (helper.Request("frontEdit") != "")
-			//    syncScript.Visible = false;
-
             // clear preview cookie
             if (!String.IsNullOrEmpty(StateHelper.GetCookieValue(PreviewContent.PREVIEW_COOKIE_KEY))) {
                 PreviewContent.ClearPreviewCookie();
@@ -71,17 +68,11 @@ namespace umbraco.cms.presentation
 
             if (!IsPostBack)
             {
-                //SyncPath.Text = _document.Path;
-				//newName.Text = _document.Text.Replace("'", "\\'");
-                //_refreshTree = true;
+    
                 BusinessLogic.Log.Add(BusinessLogic.LogTypes.Open, base.getUser(), _document.Id, "");
 				ClientTools.SyncTree(_document.Path, false);
             }
-            else
-            {
-                // by default, don't refresh the tree on postbacks
-                //_refreshTree = false;
-            }
+           
 
             jsIds.Text = "var umbPageId = " + _document.Id.ToString() + ";\nvar umbVersionId = '" + _document.Version.ToString() + "';\n";
 
@@ -161,10 +152,6 @@ namespace umbraco.cms.presentation
                 {
                     Trace.Warn("before d.publish");
 
-                    // Refresh tree as the document publishing status changes (we'll always update the tree on publish as the icon can have been marked with the star indicating that the content of the page have been changed)
-                    //_refreshTree = true;
-                    //newPublishStatus.Text = "1";
-
                     if (_document.PublishWithResult(base.getUser()))
                     {
                         ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
@@ -202,8 +189,6 @@ namespace umbraco.cms.presentation
 
             library.UnPublishSingleNode(_document.Id);
 
-            // the treeview should be updated to reflect changes
-            //_refreshTree = true;
             //newPublishStatus.Text = "0";
 
         }
@@ -322,24 +307,12 @@ namespace umbraco.cms.presentation
             }
         }
 
-		//protected override void OnPreRender(EventArgs e)
-		//{
-		//    base.OnPreRender(e);
-		//    if (_refreshTree && _document != null)
-		//    {
-		//        ClientTools.SyncTree(_document.Path);
-		//    }
-
-		//    //syncScript.Visible = _refreshTree;
-		//}
-
         #region Web Form Designer generated code
         override protected void OnInit(EventArgs e)
-        {
-            base.OverrideClientTarget = false;
-
-            InitializeComponent();
+        {            
             base.OnInit(e);
+
+            this.UnPublish.Click += new System.EventHandler(this.UnPublishDo);
 
             _document = new cms.businesslogic.web.Document(int.Parse(Request.QueryString["id"]));
 
@@ -467,10 +440,7 @@ namespace umbraco.cms.presentation
             menuItem.ImageURL = SystemDirectories.Umbraco + "/images/editor/vis.gif";
         }
 
-        private void InitializeComponent()
-        {
-            this.UnPublish.Click += new System.EventHandler(this.UnPublishDo);
-        }
+       
         #endregion
     }
 }
