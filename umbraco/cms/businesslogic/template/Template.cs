@@ -181,16 +181,22 @@ namespace umbraco.cms.businesslogic.template
             get { return (_mastertemplate > 0); }
         }
 
+        private bool _hasChildrenInitialized = false;
+        private bool _hasChildren;
         public override bool HasChildren
         {
             get
             {
-                return
-                    SqlHelper.ExecuteScalar<int>("select count(NodeId) as tmp from cmsTemplate where master = " + Id) > 0;
+                if (!_hasChildrenInitialized)
+                {
+                    _hasChildren = SqlHelper.ExecuteScalar<int>("select count(NodeId) as tmp from cmsTemplate where master = " + Id) > 0;
+                }
+                return _hasChildren;
             }
             set
             {
-                base.HasChildren = value;
+                _hasChildrenInitialized = true;
+                _hasChildren = value;
             }
         }
 

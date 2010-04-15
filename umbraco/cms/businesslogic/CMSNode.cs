@@ -131,6 +131,12 @@ namespace umbraco.cms.businesslogic
             setupNode();
         }
 
+        public CMSNode(IRecordsReader reader)
+        {
+           _id = reader.GetInt("id");
+           PopulateNodeFromReader(reader);
+        }
+
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
         /// </summary>
@@ -500,6 +506,15 @@ namespace umbraco.cms.businesslogic
             }
         }
 
+        public virtual int ChildCount
+        {
+            get
+            {
+                return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode where ParentID = @parentId",
+                                                    SqlHelper.CreateParameter("@parentId", this.Id));
+            }
+        }
+
         /// <summary>
         /// The basic recursive tree pattern
         /// </summary>
@@ -509,19 +524,21 @@ namespace umbraco.cms.businesslogic
             get
             {
                 System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-                IRecordsReader dr = SqlHelper.ExecuteReader("select id from umbracoNode where ParentID = " + this.Id + " And nodeObjectType = @type order by sortOrder",
-                    SqlHelper.CreateParameter("@type", this.nodeObjectType));
-
-                while (dr.Read())
-                    tmp.Add(dr.GetInt("Id"));
+                IRecordsReader dr = SqlHelper.ExecuteReader("SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE ParentID = @ParentID AND nodeObjectType = @type order by sortOrder",
+                    SqlHelper.CreateParameter("@type", this.nodeObjectType), SqlHelper.CreateParameter("ParentID", this.Id));
+                while (dr.Read()){;
+                    tmp.Add(new CMSNode(dr));
+                }
 
                 dr.Close();
 
                 CMSNode[] retval = new CMSNode[tmp.Count];
 
                 for (int i = 0; i < tmp.Count; i++)
-                    retval[i] = new CMSNode((int)tmp[i]);
-
+                {
+                    //retval[i] = new CMSNode((int)tmp[i]);
+                    retval[i] = (CMSNode)tmp[i];
+                }
                 return retval;
             }
         }
@@ -573,6 +590,8 @@ namespace umbraco.cms.businesslogic
             return retval;
         }
 
+        
+
         /// <summary>
         /// Given the protected modifier the CMSNode.MakeNew method can only be accessed by
         /// derived classes &gt; who by definition knows of its own objectType.
@@ -593,7 +612,7 @@ namespace umbraco.cms.businesslogic
             if (level > 0)
             {
                 parent = new CMSNode(parentId);
-                sortOrder = parent.Children.Length + 1;
+                sortOrder = parent.ChildCount + 1;
                 path = parent.Path;
             }
             else
@@ -800,6 +819,21 @@ order by level,sortOrder";
                                       SqlHelper.CreateParameter("@versionId", versionId),
                                       SqlHelper.CreateParameter("@timestamp", DateTime.Now),
                                       SqlHelper.CreateParameter("@xml", x.OuterXml));
+        }
+
+        private void PopulateNodeFromReader(IRecordsReader dr)
+        {
+            if (dr.IsNull("uniqueID")) _uniqueID = Guid.NewGuid();
+            else _uniqueID = dr.GetGuid("uniqueID");
+
+            _nodeObjectType = dr.GetGuid("nodeObjectType");
+            _level = dr.GetShort("level");
+            _path = dr.GetString("path");
+            _parentid = dr.GetInt("parentId");
+            _text = dr.GetString("text");
+            _sortOrder = dr.GetInt("sortOrder");
+            _userId = dr.GetInt("nodeUser");
+            _createDate = dr.GetDateTime("createDate");
         }
 
         private void XmlPopulate(XmlDocument xd, XmlNode x, bool Deep)
