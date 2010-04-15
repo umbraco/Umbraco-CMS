@@ -86,7 +86,7 @@ namespace umbraco.cms.businesslogic.member
 		/// <returns>True if the Member can edit the data</returns>
 		public bool MemberCanEdit(propertytype.PropertyType pt) {
 			if(propertyTypeRegistered(pt)) {
-				return (SqlHelper.ExecuteScalar<bool>("Select memberCanEdit from cmsMemberType where NodeId = " + this.Id +" And propertytypeId = "+pt.Id));				   
+                return (Convert.ToBoolean(SqlHelper.ExecuteScalar<int>("Select memberCanEdit from cmsMemberType where NodeId = " + this.Id + " And propertytypeId = " + pt.Id)));
 			}
 			return false;
 		}	
@@ -112,7 +112,7 @@ namespace umbraco.cms.businesslogic.member
 		{
 			if(propertyTypeRegistered(pt)) 
 			{
-				return SqlHelper.ExecuteScalar<bool>("Select viewOnProfile from cmsMemberType where NodeId = " + this.Id +" And propertytypeId = "+pt.Id);				   
+                return Convert.ToBoolean(SqlHelper.ExecuteScalar<int>("Select viewOnProfile from cmsMemberType where NodeId = " + this.Id + " And propertytypeId = " + pt.Id));
 			}
 			return false;
 		}
