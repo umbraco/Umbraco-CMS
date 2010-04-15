@@ -129,7 +129,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 // <summary>This will remove all stored trees in client side cache so that the next time a tree needs loading it will be refreshed</summary>
                 this._debug("clearTreeCache...");
 
-                this._loadedApps = {};
+                this._loadedApps = [];
             },
 
             toggleEditMode: function(enable) {

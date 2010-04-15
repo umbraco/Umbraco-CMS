@@ -93,7 +93,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{F06D18F6-C
 		foreign dlls\Microsoft.Scripting.ExtensionAttribute.dll = foreign dlls\Microsoft.Scripting.ExtensionAttribute.dll
 		foreign dlls\MySql.Data.dll = foreign dlls\MySql.Data.dll
 		foreign dlls\TidyNet.dll = foreign dlls\TidyNet.dll
-		foreign dlls\UmbracoExamine.dll = foreign dlls\UmbracoExamine.dll
 		foreign dlls\UrlRewritingNet.UrlRewriter.dll = foreign dlls\UrlRewritingNet.UrlRewriter.dll
 		foreign dlls\VistaDB For Umbraco.dll = foreign dlls\VistaDB For Umbraco.dll
 		foreign dlls\VistaDB.NET20.dll = foreign dlls\VistaDB.NET20.dll
