@@ -170,6 +170,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Actions\IActionHandler.cs" />
+    <Compile Include="businesslogic\CMSPreviewNode.cs" />
     <Compile Include="businesslogic\datatype\ClientDependencyAttribute.cs" />
     <Compile Include="businesslogic\Packager\FileResources\PackageFiles.Designer.cs">
       <AutoGen>True</AutoGen>

@@ -24,13 +24,17 @@ namespace umbraco.cms.businesslogic
     /// </summary>
     public class CMSNode : BusinessLogic.console.IconI
     {
+        #region Private Members
+
         private string _text;
         private int _id = 0;
         private Guid _uniqueID;
+
         /// <summary>
         /// Private connectionstring
         /// </summary>
         protected static readonly string _ConnString = GlobalSettings.DbDSN;
+
         private int _parentid;
         private Guid _nodeObjectType;
         private int _level;
@@ -40,25 +44,13 @@ namespace umbraco.cms.businesslogic
         private int _userId;
         private DateTime _createDate;
         private bool _hasChildrenInitialized;
-        private string m_image = "default.png";
+        private string m_image = "default.png"; 
+
+        #endregion
+
+        #region Private static
         private static readonly string m_DefaultIconCssFile = IOHelper.MapPath(SystemDirectories.Umbraco_client + "/Tree/treeIcons.css");
         private static List<string> m_DefaultIconClasses = new List<string>();
-
-        /// <summary>
-        /// Gets the default icon classes.
-        /// </summary>
-        /// <value>The default icon classes.</value>
-        public static List<string> DefaultIconClasses
-        {
-            get
-            {
-                if (m_DefaultIconClasses.Count == 0)
-                    initializeIconClasses();
-
-                return m_DefaultIconClasses;
-            }
-        }
-
         private static void initializeIconClasses()
         {
             StreamReader re = File.OpenText(m_DefaultIconCssFile);
@@ -80,6 +72,206 @@ namespace umbraco.cms.businesslogic
                 m_DefaultIconClasses.Add(cssClass);
             }
         }
+        #endregion
+
+        #region Public static
+
+        /// <summary>
+        /// Get a count on all CMSNodes given the objecttype
+        /// </summary>
+        /// <param name="objectType">The objecttype identifier</param>
+        /// <returns>
+        /// The number of CMSNodes of the given objecttype
+        /// </returns>
+        public static int CountByObjectType(Guid objectType)
+        {
+            return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) from umbracoNode WHERE nodeObjectType = @type", SqlHelper.CreateParameter("@type", objectType));
+        }
+
+        /// <summary>
+        /// Number of children of the current CMSNode
+        /// </summary>
+        /// <param name="Id">The CMSNode Id</param>
+        /// <returns>
+        /// The number of children from the given CMSNode
+        /// </returns>
+        public static int CountSubs(int Id)
+        {
+            return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE ','+path+',' LIKE '%," + Id.ToString() + ",%'");
+        }
+
+        /// <summary>
+        /// Gets the default icon classes.
+        /// </summary>
+        /// <value>The default icon classes.</value>
+        public static List<string> DefaultIconClasses
+        {
+            get
+            {
+                if (m_DefaultIconClasses.Count == 0)
+                    initializeIconClasses();
+
+                return m_DefaultIconClasses;
+            }
+        }
+
+        /// <summary>
+        /// Method for checking if a CMSNode exits with the given Guid
+        /// </summary>
+        /// <param name="uniqueID">Identifier</param>
+        /// <returns>True if there is a CMSNode with the given Guid</returns>
+        public static bool IsNode(Guid uniqueID)
+        {
+            return (SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where uniqueID = @uniqueID", SqlHelper.CreateParameter("@uniqueId", uniqueID)) > 0);
+        }
+
+        /// <summary>
+        /// Method for checking if a CMSNode exits with the given id
+        /// </summary>
+        /// <param name="Id">Identifier</param>
+        /// <returns>True if there is a CMSNode with the given id</returns>
+        public static bool IsNode(int Id)
+        {
+            return (SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where id = '" + Id + "'") > 0);
+        }
+
+        /// <summary>
+        /// Retrieve a list of the unique id's of all CMSNodes given the objecttype
+        /// </summary>
+        /// <param name="objectType">The objecttype identifier</param>
+        /// <returns>
+        /// A list of all unique identifiers which each are associated to a CMSNode
+        /// </returns>
+        public static Guid[] getAllUniquesFromObjectType(Guid objectType)
+        {
+            IRecordsReader dr = SqlHelper.ExecuteReader("Select uniqueID from umbracoNode where nodeObjectType = @type",
+                SqlHelper.CreateParameter("@type", objectType));
+            System.Collections.ArrayList tmp = new System.Collections.ArrayList();
+
+            while (dr.Read()) tmp.Add(dr.GetGuid("uniqueID"));
+            dr.Close();
+
+            Guid[] retval = new Guid[tmp.Count];
+            for (int i = 0; i < tmp.Count; i++) retval[i] = (Guid)tmp[i];
+            return retval;
+        }
+
+        /// <summary>
+        /// Retrieve a list of the node id's of all CMSNodes given the objecttype
+        /// </summary>
+        /// <param name="objectType">The objecttype identifier</param>
+        /// <returns>
+        /// A list of all node ids which each are associated to a CMSNode
+        /// </returns>
+        public static int[] getAllUniqueNodeIdsFromObjectType(Guid objectType)
+        {
+            IRecordsReader dr = SqlHelper.ExecuteReader("Select id from umbracoNode where nodeObjectType = @type",
+                SqlHelper.CreateParameter("@type", objectType));
+            System.Collections.ArrayList tmp = new System.Collections.ArrayList();
+
+            while (dr.Read()) tmp.Add(dr.GetInt("id"));
+            dr.Close();
+
+            return (int[])tmp.ToArray(typeof(int));
+        }
+
+
+        #endregion
+
+        #region Protected static
+        /// <summary>
+        /// Retrieves the top level nodes in the hierarchy
+        /// </summary>
+        /// <param name="ObjectType">The Guid identifier of the type of objects</param>
+        /// <returns>
+        /// A list of all top level nodes given the objecttype
+        /// </returns>
+        protected static Guid[] TopMostNodeIds(Guid ObjectType)
+        {
+            IRecordsReader dr = SqlHelper.ExecuteReader("Select uniqueID from umbracoNode where nodeObjectType = @type And parentId = -1 order by sortOrder",
+                SqlHelper.CreateParameter("@type", ObjectType));
+            System.Collections.ArrayList tmp = new System.Collections.ArrayList();
+
+            while (dr.Read()) tmp.Add(dr.GetGuid("uniqueID"));
+            dr.Close();
+
+            Guid[] retval = new Guid[tmp.Count];
+            for (int i = 0; i < tmp.Count; i++) retval[i] = (Guid)tmp[i];
+            return retval;
+        }
+
+
+        /// <summary>
+        /// Given the protected modifier the CMSNode.MakeNew method can only be accessed by
+        /// derived classes &gt; who by definition knows of its own objectType.
+        /// </summary>
+        /// <param name="parentId">The parent CMSNode id</param>
+        /// <param name="objectType">The objecttype identifier</param>
+        /// <param name="userId">Creator</param>
+        /// <param name="level">The level in the tree hieararchy</param>
+        /// <param name="text">The name of the CMSNode</param>
+        /// <param name="uniqueID">The unique identifier</param>
+        /// <returns></returns>
+        protected static CMSNode MakeNew(int parentId, Guid objectType, int userId, int level, string text, Guid uniqueID)
+        {
+            CMSNode parent;
+            string path = "";
+            int sortOrder = 0;
+
+            if (level > 0)
+            {
+                parent = new CMSNode(parentId);
+                sortOrder = parent.ChildCount + 1;
+                path = parent.Path;
+            }
+            else
+                path = "-1";
+
+            // Ruben 8/1/2007: I replace this with a parameterized version.
+            // But does anyone know what the 'level++' is supposed to be doing there?
+            // Nothing obviously, since it's a postfix.
+
+            SqlHelper.ExecuteNonQuery("INSERT INTO umbracoNode(trashed, parentID, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text) VALUES(@trashed, @parentID, @nodeObjectType, @nodeUser, @level, @path, @sortOrder, @uniqueID, @text)",
+                                      SqlHelper.CreateParameter("@trashed", 0),
+                                      SqlHelper.CreateParameter("@parentID", parentId),
+                                      SqlHelper.CreateParameter("@nodeObjectType", objectType),
+                                      SqlHelper.CreateParameter("@nodeUser", userId),
+                                      SqlHelper.CreateParameter("@level", level++),
+                                      SqlHelper.CreateParameter("@path", path),
+                                      SqlHelper.CreateParameter("@sortOrder", sortOrder),
+                                      SqlHelper.CreateParameter("@uniqueID", uniqueID),
+                                      SqlHelper.CreateParameter("@text", text));
+
+            CMSNode retVal = new CMSNode(uniqueID);
+            retVal.Path = path + "," + retVal.Id.ToString();
+
+            //event
+            NewEventArgs e = new NewEventArgs();
+            retVal.FireAfterNew(e);
+
+            return retVal;
+        }
+
+
+
+        /// <summary>
+        /// Retrieve a list of the id's of all CMSNodes given the objecttype and the first letter of the name.
+        /// </summary>
+        /// <param name="objectType">The objecttype identifier</param>
+        /// <param name="letter">Firstletter</param>
+        /// <returns>
+        /// A list of all CMSNodes which has the objecttype and a name that starts with the given letter
+        /// </returns>
+        protected static int[] getUniquesFromObjectTypeAndFirstLetter(Guid objectType, char letter)
+        {
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("Select id from umbracoNode where nodeObjectType = @objectType AND text like @letter", SqlHelper.CreateParameter("@objectType", objectType), SqlHelper.CreateParameter("@letter", letter.ToString() + "%")))
+            {
+                List<int> tmp = new List<int>();
+                while (dr.Read()) tmp.Add(dr.GetInt("id"));
+                return tmp.ToArray();
+            }
+        }
+
 
         /// <summary>
         /// Gets the SQL helper.
@@ -88,8 +280,10 @@ namespace umbraco.cms.businesslogic
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
-        }
+        } 
+        #endregion
 
+        #region Constructors
         public CMSNode()
         {
             throw new NotSupportedException();
@@ -133,9 +327,12 @@ namespace umbraco.cms.businesslogic
 
         public CMSNode(IRecordsReader reader)
         {
-           _id = reader.GetInt("id");
-           PopulateNodeFromReader(reader);
-        }
+            _id = reader.GetInt("id");
+            PopulateNodeFromReader(reader);
+        } 
+        #endregion
+
+        #region Public Methods
 
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
@@ -151,72 +348,154 @@ namespace umbraco.cms.businesslogic
             }
         }
 
+        public override string ToString()
+        {
+            if (Id != int.MinValue || !string.IsNullOrEmpty(Text))
+            {
+                return string.Format("{{ Id: {0}, Text: {1}, ParentId: {2} }}",
+                    Id,
+                    Text,
+                    _parentid
+                );
+            }
+
+            return base.ToString();
+        }
 
         /// <summary>
-        /// Sets up the internal data of the CMSNode, used by the various constructors
+        /// Moves the CMSNode from the current position in the hierarchy to the target
         /// </summary>
-        protected void setupNode()
+        /// <param name="NewParentId">Target CMSNode id</param>
+        public void Move(int NewParentId)
         {
-            IRecordsReader dr = SqlHelper.ExecuteReader(
-                "SELECT createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE id = " + this.Id
-                );
+            MoveEventArgs e = new MoveEventArgs();
+            FireBeforeMove(e);
 
-            bool noRecord = false;
-
-            if (dr.Read())
+            if (!e.Cancel)
             {
-                // testing purposes only > original umbraco data hasn't any unique values ;)
-                // And we need to have a parent in order to create a new node ..
-                // Should automatically add an unique value if no exists (or throw a decent exception)
-                if (dr.IsNull("uniqueID")) _uniqueID = Guid.NewGuid();
-                else _uniqueID = dr.GetGuid("uniqueID");
+                int maxSortOrder = SqlHelper.ExecuteScalar<int>(
+                    "select coalesce(max(sortOrder),0) from umbracoNode where parentid = @parentId",
+                    SqlHelper.CreateParameter("@parentId", NewParentId));
 
-                _nodeObjectType = dr.GetGuid("nodeObjectType");
-                _level = dr.GetShort("level");
-                _path = dr.GetString("path");
-                _parentid = dr.GetInt("parentId");
-                _text = dr.GetString("text");
-                _sortOrder = dr.GetInt("sortOrder");
-                _userId = dr.GetInt("nodeUser");
-                _createDate = dr.GetDateTime("createDate");
+
+                CMSNode n = new CMSNode(NewParentId);
+                this.Parent = n;
+                this.Level = n.Level + 1;
+                this.Path = n.Path + "," + this.Id.ToString();
+
+                this.sortOrder = maxSortOrder + 1;
+
+
+                if (n.nodeObjectType == web.Document._objectType)
+                {
+                    Document d =
+                        new umbraco.cms.businesslogic.web.Document(n.Id);
+                    d.XmlGenerate(new XmlDocument());
+
+                }
+                else if (n.nodeObjectType == media.Media._objectType)
+                    new umbraco.cms.businesslogic.media.Media(n.Id).XmlGenerate(new XmlDocument());
+
+                //store children array here because iterating over an Array property object is very inneficient.
+                var children = this.Children;
+                foreach (CMSNode c in children)
+                    c.Move(this.Id);
+
+                FireAfterMove(e);
             }
-            else
-                noRecord = true;
+        }
 
+        /// <summary>
+        /// Deletes this instance.
+        /// </summary>
+        public void delete()
+        {
+            DeleteEventArgs e = new DeleteEventArgs();
+            FireBeforeDelete(e);
+            if (!e.Cancel)
+            {
+                // remove relations
+                var rels = Relations;
+                foreach (relation.Relation rel in rels)
+                {
+                    rel.Delete();
+                }
+
+                SqlHelper.ExecuteNonQuery("DELETE FROM umbracoNode WHERE uniqueID= @uniqueId", SqlHelper.CreateParameter("@uniqueId", _uniqueID));
+                FireAfterDelete(e);
+            }
+        }
+
+
+        /// <summary>
+        /// Does the current CMSNode have any child nodes.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance has children; otherwise, <c>false</c>.
+        /// </value>
+        public virtual bool HasChildren
+        {
+            get
+            {
+                if (!_hasChildrenInitialized)
+                {
+                    int tmpChildrenCount = SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where ParentId = " + _id);
+                    HasChildren = (tmpChildrenCount > 0);
+                }
+                return _hasChildren;
+            }
+            set
+            {
+                _hasChildrenInitialized = true;
+                _hasChildren = value;
+            }
+        } 
+        #endregion
+
+        #region Public properties
+
+
+        /// <summary>
+        /// An xml representation of the CMSNOde
+        /// </summary>
+        /// <param name="xd">Xmldocument context</param>
+        /// <param name="Deep">If true the xml will append the CMSNodes child xml</param>
+        /// <returns>The CMSNode Xmlrepresentation</returns>
+        public virtual XmlNode ToXml(XmlDocument xd, bool Deep)
+        {
+            XmlNode x = xd.CreateNode(XmlNodeType.Element, "node", "");
+            XmlPopulate(xd, x, Deep);
+            return x;
+        }
+
+        public virtual XmlNode ToPreviewXml(XmlDocument xd)
+        {
+            // If xml already exists
+            if (!PreviewExists(UniqueId))
+            {
+                savePreviewXml(ToXml(xd, false), UniqueId);
+            }
+            return GetPreviewXml(xd, UniqueId);
+        }
+
+        public virtual List<CMSPreviewNode> GetNodesForPreview(bool childrenOnly)
+        {
+            List<CMSPreviewNode> nodes = new List<CMSPreviewNode>();
+            string sql = @"
+select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsPreviewXml.xml from umbracoNode 
+inner join cmsPreviewXml on cmsPreviewXml.nodeId = umbracoNode.id 
+where trashed = 0 and path like '{0}' 
+order by level,sortOrder";
+
+            string pathExp = childrenOnly ? Path + ",%" : Path;
+
+            IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(sql, pathExp));
+            while (dr.Read())
+                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("uniqueID"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml")));
             dr.Close();
 
-            if (noRecord)
-            {
-                throw new ArgumentException(string.Format("No node exists with id '{0}'", Id));
-            }
+            return nodes;
         }
-
-        /// <summary>
-        /// Sets up the node for the content tree.
-        /// </summary>
-        /// <param name="uniqueID">The unique ID.</param>
-        /// <param name="nodeObjectType">Type of the node object.</param>
-        /// <param name="Level">The level.</param>
-        /// <param name="ParentId">The parent id.</param>
-        /// <param name="UserId">The user id.</param>
-        /// <param name="Path">The path.</param>
-        /// <param name="Text">The text.</param>
-        /// <param name="CreateDate">The create date.</param>
-        /// <param name="hasChildren">if set to <c>true</c> [has children].</param>
-        protected void SetupNodeForTree(Guid uniqueID, Guid nodeObjectType, int Level, int ParentId, int UserId, string Path, string Text,
-            DateTime CreateDate, bool hasChildren)
-        {
-            _uniqueID = uniqueID;
-            _nodeObjectType = nodeObjectType;
-            _level = Level;
-            _parentid = ParentId;
-            _userId = UserId;
-            _path = Path;
-            _text = Text;
-            _createDate = CreateDate;
-            HasChildren = hasChildren;
-        }
-
 
         /// <summary>
         /// Gets or sets the sort order.
@@ -261,28 +540,6 @@ namespace umbraco.cms.businesslogic
         }
 
         /// <summary>
-        /// Method for checking if a CMSNode exits with the given Guid
-        /// </summary>
-        /// <param name="uniqueID">Identifier</param>
-        /// <returns>True if there is a CMSNode with the given Guid</returns>
-        static public bool IsNode(Guid uniqueID)
-        {
-            return (SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where uniqueID = @uniqueID", SqlHelper.CreateParameter("@uniqueId", uniqueID)) > 0);
-        }
-
-        /// <summary>
-        /// Method for checking if a CMSNode exits with the given id
-        /// </summary>
-        /// <param name="Id">Identifier</param>
-        /// <returns>True if there is a CMSNode with the given id</returns>
-        static public bool IsNode(int Id)
-        {
-            return (SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where id = '" + Id + "'") > 0);
-        }
-
-
-
-        /// <summary>
         /// Gets the id.
         /// </summary>
         /// <value>The id.</value>
@@ -307,6 +564,121 @@ namespace umbraco.cms.businesslogic
             {
                 _parentid = value.Id;
                 SqlHelper.ExecuteNonQuery("update umbracoNode set parentId = " + value.Id.ToString() + " where id = " + this.Id.ToString());
+            }
+        }
+
+        /// <summary>
+        /// An comma separated string consisting of integer node id's
+        /// that indicates the path from the topmost node to the given node
+        /// </summary>
+        /// <value>The path.</value>
+        public string Path
+        {
+            get { return _path; }
+            set
+            {
+                _path = value;
+                SqlHelper.ExecuteNonQuery("update umbracoNode set path = '" + _path + "' where id = " + this.Id.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Returns an integer value that indicates in which level of the
+        /// tree structure the given node is
+        /// </summary>
+        /// <value>The level.</value>
+        public int Level
+        {
+            get { return _level; }
+            set
+            {
+                _level = value;
+                SqlHelper.ExecuteNonQuery("update umbracoNode set level = " + _level.ToString() + " where id = " + this.Id.ToString());
+            }
+        }
+
+        /// <summary>
+        /// All CMSNodes has an objecttype ie. Webpage, StyleSheet etc., used to distinguish between the different
+        /// object types for for fast loading children to the tree.
+        /// </summary>
+        /// <value>The type of the node object.</value>
+        public Guid nodeObjectType
+        {
+            get { return _nodeObjectType; }
+        }
+
+        /// <summary>
+        /// Besides the hierarchy it's possible to relate one CMSNode to another, use this for alternative
+        /// non-strict hierarchy
+        /// </summary>
+        /// <value>The relations.</value>
+        public relation.Relation[] Relations
+        {
+            get { return relation.Relation.GetRelations(this.Id); }
+        }
+
+        public virtual int ChildCount
+        {
+            get
+            {
+                return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode where ParentID = @parentId",
+                                                    SqlHelper.CreateParameter("@parentId", this.Id));
+            }
+        }
+
+        /// <summary>
+        /// The basic recursive tree pattern
+        /// </summary>
+        /// <value>The children.</value>
+        public virtual BusinessLogic.console.IconI[] Children
+        {
+            get
+            {
+                System.Collections.ArrayList tmp = new System.Collections.ArrayList();
+                IRecordsReader dr = SqlHelper.ExecuteReader("SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE ParentID = @ParentID AND nodeObjectType = @type order by sortOrder",
+                    SqlHelper.CreateParameter("@type", this.nodeObjectType), SqlHelper.CreateParameter("ParentID", this.Id));
+                while (dr.Read())
+                {
+                    ;
+                    tmp.Add(new CMSNode(dr));
+                }
+
+                dr.Close();
+
+                CMSNode[] retval = new CMSNode[tmp.Count];
+
+                for (int i = 0; i < tmp.Count; i++)
+                {
+                    //retval[i] = new CMSNode((int)tmp[i]);
+                    retval[i] = (CMSNode)tmp[i];
+                }
+                return retval;
+            }
+        }
+
+        /// <summary>
+        /// Retrieve all CMSNodes in the umbraco installation
+        /// Use with care.
+        /// </summary>
+        /// <value>The children of all object types.</value>
+        public BusinessLogic.console.IconI[] ChildrenOfAllObjectTypes
+        {
+            get
+            {
+                System.Collections.ArrayList tmp = new System.Collections.ArrayList();
+                IRecordsReader dr = SqlHelper.ExecuteReader("select id from umbracoNode where ParentID = " + this.Id + " order by sortOrder");
+
+                while (dr.Read())
+                    tmp.Add(dr.GetInt("Id"));
+
+                dr.Close();
+
+                CMSNode[] retval = new CMSNode[tmp.Count];
+
+                for (int i = 0; i < tmp.Count; i++)
+                    retval[i] = new CMSNode((int)tmp[i]);
+
+                return retval;
             }
         }
 
@@ -374,20 +746,82 @@ namespace umbraco.cms.businesslogic
 
         #endregion
 
+        #endregion
+
+        #region Protected methods
 
         /// <summary>
-        /// An comma separated string consisting of integer node id's
-        /// that indicates the path from the topmost node to the given node
+        /// This allows inheritors to set the underlying text property without persisting the change to the database.
         /// </summary>
-        /// <value>The path.</value>
-        public string Path
+        /// <param name="txt"></param>
+        protected void SetText(string txt)
         {
-            get { return _path; }
-            set
+            _text = txt;
+        }
+
+        /// <summary>
+        /// Sets up the internal data of the CMSNode, used by the various constructors
+        /// </summary>
+        protected virtual void setupNode()
+        {
+            IRecordsReader dr = SqlHelper.ExecuteReader(
+                "SELECT createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE id = " + this.Id
+                );
+
+            bool noRecord = false;
+
+            if (dr.Read())
             {
-                _path = value;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set path = '" + _path + "' where id = " + this.Id.ToString());
+                // testing purposes only > original umbraco data hasn't any unique values ;)
+                // And we need to have a parent in order to create a new node ..
+                // Should automatically add an unique value if no exists (or throw a decent exception)
+                if (dr.IsNull("uniqueID")) _uniqueID = Guid.NewGuid();
+                else _uniqueID = dr.GetGuid("uniqueID");
+
+                _nodeObjectType = dr.GetGuid("nodeObjectType");
+                _level = dr.GetShort("level");
+                _path = dr.GetString("path");
+                _parentid = dr.GetInt("parentId");
+                _text = dr.GetString("text");
+                _sortOrder = dr.GetInt("sortOrder");
+                _userId = dr.GetInt("nodeUser");
+                _createDate = dr.GetDateTime("createDate");
             }
+            else
+                noRecord = true;
+
+            dr.Close();
+
+            if (noRecord)
+            {
+                throw new ArgumentException(string.Format("No node exists with id '{0}'", Id));
+            }
+        }
+
+        /// <summary>
+        /// Sets up the node for the content tree, this makes no database calls, just sets the underlying properties
+        /// </summary>
+        /// <param name="uniqueID">The unique ID.</param>
+        /// <param name="nodeObjectType">Type of the node object.</param>
+        /// <param name="Level">The level.</param>
+        /// <param name="ParentId">The parent id.</param>
+        /// <param name="UserId">The user id.</param>
+        /// <param name="Path">The path.</param>
+        /// <param name="Text">The text.</param>
+        /// <param name="CreateDate">The create date.</param>
+        /// <param name="hasChildren">if set to <c>true</c> [has children].</param>
+        protected void SetupNodeForTree(Guid uniqueID, Guid nodeObjectType, int leve, int parentId, int userId, string path, string text,
+            DateTime createDate, bool hasChildren)
+        {
+            _uniqueID = uniqueID;
+            _nodeObjectType = nodeObjectType;
+            _level = leve;
+            _parentid = parentId;
+            _userId = userId;
+            _path = path;
+            _text = text;
+            _createDate = createDate;
+            HasChildren = hasChildren;
         }
 
 
@@ -398,396 +832,6 @@ namespace umbraco.cms.businesslogic
         protected void UpdateTempPathForTree(string Path)
         {
             this._path = Path;
-        }
-
-
-
-        /// <summary>
-        /// Moves the CMSNode from the current position in the hierarchy to the target
-        /// </summary>
-        /// <param name="NewParentId">Target CMSNode id</param>
-        public void Move(int NewParentId)
-        {
-            MoveEventArgs e = new MoveEventArgs();
-            FireBeforeMove(e);
-
-            if (!e.Cancel)
-            {
-                int maxSortOrder = SqlHelper.ExecuteScalar<int>(
-                    "select coalesce(max(sortOrder),0) from umbracoNode where parentid = @parentId",
-                    SqlHelper.CreateParameter("@parentId", NewParentId));
-
-
-                CMSNode n = new CMSNode(NewParentId);
-                this.Parent = n;
-                this.Level = n.Level + 1;
-                this.Path = n.Path + "," + this.Id.ToString();
-
-                this.sortOrder = maxSortOrder + 1;
-
-
-                if (n.nodeObjectType == web.Document._objectType)
-                {
-                    Document d =
-                        new umbraco.cms.businesslogic.web.Document(n.Id);
-                    d.XmlGenerate(new XmlDocument());
-
-                }
-                else if (n.nodeObjectType == media.Media._objectType)
-                    new umbraco.cms.businesslogic.media.Media(n.Id).XmlGenerate(new XmlDocument());
-
-                //store children array here because iterating over an Array property object is very inneficient.
-                var children = this.Children;
-                foreach (CMSNode c in children)
-                    c.Move(this.Id);
-
-                FireAfterMove(e);
-            }
-        }
-
-
-
-        /// <summary>
-        /// Returns an integer value that indicates in which level of the
-        /// tree structure the given node is
-        /// </summary>
-        /// <value>The level.</value>
-        public int Level
-        {
-            get { return _level; }
-            set
-            {
-                _level = value;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set level = " + _level.ToString() + " where id = " + this.Id.ToString());
-            }
-        }
-
-        /// <summary>
-        /// All CMSNodes has an objecttype ie. Webpage, StyleSheet etc., used to distinguish between the different
-        /// object types for for fast loading children to the tree.
-        /// </summary>
-        /// <value>The type of the node object.</value>
-        public Guid nodeObjectType
-        {
-            get { return _nodeObjectType; }
-        }
-
-        /// <summary>
-        /// Besides the hierarchy it's possible to relate one CMSNode to another, use this for alternative
-        /// non-strict hierarchy
-        /// </summary>
-        /// <value>The relations.</value>
-        public relation.Relation[] Relations
-        {
-            get { return relation.Relation.GetRelations(this.Id); }
-        }
-
-        /// <summary>
-        /// Does the current CMSNode have any child nodes.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance has children; otherwise, <c>false</c>.
-        /// </value>
-        public virtual bool HasChildren
-        {
-            get
-            {
-                if (!_hasChildrenInitialized)
-                {
-                    int tmpChildrenCount = SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where ParentId = " + _id);
-                    HasChildren = (tmpChildrenCount > 0);
-                }
-                return _hasChildren;
-            }
-            set
-            {
-                _hasChildrenInitialized = true;
-                _hasChildren = value;
-            }
-        }
-
-        public virtual int ChildCount
-        {
-            get
-            {
-                return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode where ParentID = @parentId",
-                                                    SqlHelper.CreateParameter("@parentId", this.Id));
-            }
-        }
-
-        /// <summary>
-        /// The basic recursive tree pattern
-        /// </summary>
-        /// <value>The children.</value>
-        public virtual BusinessLogic.console.IconI[] Children
-        {
-            get
-            {
-                System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-                IRecordsReader dr = SqlHelper.ExecuteReader("SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE ParentID = @ParentID AND nodeObjectType = @type order by sortOrder",
-                    SqlHelper.CreateParameter("@type", this.nodeObjectType), SqlHelper.CreateParameter("ParentID", this.Id));
-                while (dr.Read()){;
-                    tmp.Add(new CMSNode(dr));
-                }
-
-                dr.Close();
-
-                CMSNode[] retval = new CMSNode[tmp.Count];
-
-                for (int i = 0; i < tmp.Count; i++)
-                {
-                    //retval[i] = new CMSNode((int)tmp[i]);
-                    retval[i] = (CMSNode)tmp[i];
-                }
-                return retval;
-            }
-        }
-
-        /// <summary>
-        /// Retrieve all CMSNodes in the umbraco installation
-        /// Use with care.
-        /// </summary>
-        /// <value>The children of all object types.</value>
-        public BusinessLogic.console.IconI[] ChildrenOfAllObjectTypes
-        {
-            get
-            {
-                System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-                IRecordsReader dr = SqlHelper.ExecuteReader("select id from umbracoNode where ParentID = " + this.Id + " order by sortOrder");
-
-                while (dr.Read())
-                    tmp.Add(dr.GetInt("Id"));
-
-                dr.Close();
-
-                CMSNode[] retval = new CMSNode[tmp.Count];
-
-                for (int i = 0; i < tmp.Count; i++)
-                    retval[i] = new CMSNode((int)tmp[i]);
-
-                return retval;
-            }
-        }
-
-        /// <summary>
-        /// Retrieves the top level nodes in the hierarchy
-        /// </summary>
-        /// <param name="ObjectType">The Guid identifier of the type of objects</param>
-        /// <returns>
-        /// A list of all top level nodes given the objecttype
-        /// </returns>
-        protected static Guid[] TopMostNodeIds(Guid ObjectType)
-        {
-            IRecordsReader dr = SqlHelper.ExecuteReader("Select uniqueID from umbracoNode where nodeObjectType = @type And parentId = -1 order by sortOrder",
-                SqlHelper.CreateParameter("@type", ObjectType));
-            System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-
-            while (dr.Read()) tmp.Add(dr.GetGuid("uniqueID"));
-            dr.Close();
-
-            Guid[] retval = new Guid[tmp.Count];
-            for (int i = 0; i < tmp.Count; i++) retval[i] = (Guid)tmp[i];
-            return retval;
-        }
-
-        
-
-        /// <summary>
-        /// Given the protected modifier the CMSNode.MakeNew method can only be accessed by
-        /// derived classes &gt; who by definition knows of its own objectType.
-        /// </summary>
-        /// <param name="parentId">The parent CMSNode id</param>
-        /// <param name="objectType">The objecttype identifier</param>
-        /// <param name="userId">Creator</param>
-        /// <param name="level">The level in the tree hieararchy</param>
-        /// <param name="text">The name of the CMSNode</param>
-        /// <param name="uniqueID">The unique identifier</param>
-        /// <returns></returns>
-        protected static CMSNode MakeNew(int parentId, Guid objectType, int userId, int level, string text, Guid uniqueID)
-        {
-            CMSNode parent;
-            string path = "";
-            int sortOrder = 0;
-
-            if (level > 0)
-            {
-                parent = new CMSNode(parentId);
-                sortOrder = parent.ChildCount + 1;
-                path = parent.Path;
-            }
-            else
-                path = "-1";
-
-            // Ruben 8/1/2007: I replace this with a parameterized version.
-            // But does anyone know what the 'level++' is supposed to be doing there?
-            // Nothing obviously, since it's a postfix.
-
-            SqlHelper.ExecuteNonQuery("INSERT INTO umbracoNode(trashed, parentID, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text) VALUES(@trashed, @parentID, @nodeObjectType, @nodeUser, @level, @path, @sortOrder, @uniqueID, @text)",
-                                      SqlHelper.CreateParameter("@trashed", 0),
-                                      SqlHelper.CreateParameter("@parentID", parentId),
-                                      SqlHelper.CreateParameter("@nodeObjectType", objectType),
-                                      SqlHelper.CreateParameter("@nodeUser", userId),
-                                      SqlHelper.CreateParameter("@level", level++),
-                                      SqlHelper.CreateParameter("@path", path),
-                                      SqlHelper.CreateParameter("@sortOrder", sortOrder),
-                                      SqlHelper.CreateParameter("@uniqueID", uniqueID),
-                                      SqlHelper.CreateParameter("@text", text));
-
-            CMSNode retVal = new CMSNode(uniqueID);
-            retVal.Path = path + "," + retVal.Id.ToString();
-
-            //event
-            NewEventArgs e = new NewEventArgs();
-            retVal.FireAfterNew(e);
-
-            return retVal;
-        }
-
-        /// <summary>
-        /// Retrieve a list of the unique id's of all CMSNodes given the objecttype
-        /// </summary>
-        /// <param name="objectType">The objecttype identifier</param>
-        /// <returns>
-        /// A list of all unique identifiers which each are associated to a CMSNode
-        /// </returns>
-        public static Guid[] getAllUniquesFromObjectType(Guid objectType)
-        {
-            IRecordsReader dr = SqlHelper.ExecuteReader("Select uniqueID from umbracoNode where nodeObjectType = @type",
-                SqlHelper.CreateParameter("@type", objectType));
-            System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-
-            while (dr.Read()) tmp.Add(dr.GetGuid("uniqueID"));
-            dr.Close();
-
-            Guid[] retval = new Guid[tmp.Count];
-            for (int i = 0; i < tmp.Count; i++) retval[i] = (Guid)tmp[i];
-            return retval;
-        }
-
-        /// <summary>
-        /// Retrieve a list of the node id's of all CMSNodes given the objecttype
-        /// </summary>
-        /// <param name="objectType">The objecttype identifier</param>
-        /// <returns>
-        /// A list of all node ids which each are associated to a CMSNode
-        /// </returns>
-        public static int[] getAllUniqueNodeIdsFromObjectType(Guid objectType)
-        {
-            IRecordsReader dr = SqlHelper.ExecuteReader("Select id from umbracoNode where nodeObjectType = @type",
-                SqlHelper.CreateParameter("@type", objectType));
-            System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-
-            while (dr.Read()) tmp.Add(dr.GetInt("id"));
-            dr.Close();
-
-            return (int[])tmp.ToArray(typeof(int));
-        }
-
-
-        /// <summary>
-        /// Retrieve a list of the id's of all CMSNodes given the objecttype and the first letter of the name.
-        /// </summary>
-        /// <param name="objectType">The objecttype identifier</param>
-        /// <param name="letter">Firstletter</param>
-        /// <returns>
-        /// A list of all CMSNodes which has the objecttype and a name that starts with the given letter
-        /// </returns>
-        protected static int[] getUniquesFromObjectTypeAndFirstLetter(Guid objectType, char letter)
-        {
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("Select id from umbracoNode where nodeObjectType = @objectType AND text like @letter", SqlHelper.CreateParameter("@objectType", objectType), SqlHelper.CreateParameter("@letter", letter.ToString() + "%")))
-            {
-                List<int> tmp = new List<int>();
-                while (dr.Read()) tmp.Add(dr.GetInt("id"));
-                return tmp.ToArray();
-            }
-        }
-
-
-        /// <summary>
-        /// Deletes this instance.
-        /// </summary>
-        public void delete()
-        {
-            DeleteEventArgs e = new DeleteEventArgs();
-            FireBeforeDelete(e);
-            if (!e.Cancel)
-            {
-                // remove relations
-                var rels = Relations;
-                foreach (relation.Relation rel in rels)
-                {
-                    rel.Delete();
-                }
-
-                SqlHelper.ExecuteNonQuery("DELETE FROM umbracoNode WHERE uniqueID= @uniqueId", SqlHelper.CreateParameter("@uniqueId", _uniqueID));
-                FireAfterDelete(e);
-            }
-        }
-
-        /// <summary>
-        /// Get a count on all CMSNodes given the objecttype
-        /// </summary>
-        /// <param name="objectType">The objecttype identifier</param>
-        /// <returns>
-        /// The number of CMSNodes of the given objecttype
-        /// </returns>
-        public static int CountByObjectType(Guid objectType)
-        {
-            return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) from umbracoNode WHERE nodeObjectType = @type", SqlHelper.CreateParameter("@type", objectType));
-        }
-
-        /// <summary>
-        /// Number of children of the current CMSNode
-        /// </summary>
-        /// <param name="Id">The CMSNode Id</param>
-        /// <returns>
-        /// The number of children from the given CMSNode
-        /// </returns>
-        public static int CountSubs(int Id)
-        {
-            return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE ','+path+',' LIKE '%," + Id.ToString() + ",%'");
-        }
-
-        /// <summary>
-        /// An xml representation of the CMSNOde
-        /// </summary>
-        /// <param name="xd">Xmldocument context</param>
-        /// <param name="Deep">If true the xml will append the CMSNodes child xml</param>
-        /// <returns>The CMSNode Xmlrepresentation</returns>
-        public virtual XmlNode ToXml(XmlDocument xd, bool Deep)
-        {
-            XmlNode x = xd.CreateNode(XmlNodeType.Element, "node", "");
-            XmlPopulate(xd, x, Deep);
-            return x;
-        }
-
-        public virtual XmlNode ToPreviewXml(XmlDocument xd)
-        {
-            // If xml already exists
-            if (!PreviewExists(UniqueId))
-            {
-                savePreviewXml(ToXml(xd, false), UniqueId);
-            }
-            return GetPreviewXml(xd, UniqueId);
-        }
-
-        public virtual List<CMSPreviewNode> GetNodesForPreview(bool childrenOnly)
-        {
-            List<CMSPreviewNode> nodes = new List<CMSPreviewNode>();
-            string sql = @"
-select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsPreviewXml.xml from umbracoNode 
-inner join cmsPreviewXml on cmsPreviewXml.nodeId = umbracoNode.id 
-where trashed = 0 and path like '{0}' 
-order by level,sortOrder";
-
-            string pathExp = childrenOnly ? Path + ",%" : Path;
-            
-            IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(sql, pathExp));
-            while (dr.Read())
-                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("uniqueID"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml")));
-            dr.Close();
-
-            return nodes;
         }
 
         protected virtual XmlNode GetPreviewXml(XmlDocument xd, Guid version)
@@ -821,6 +865,9 @@ order by level,sortOrder";
                                       SqlHelper.CreateParameter("@xml", x.OuterXml));
         }
 
+        #endregion
+
+        #region Private Methods
         private void PopulateNodeFromReader(IRecordsReader dr)
         {
             if (dr.IsNull("uniqueID")) _uniqueID = Guid.NewGuid();
@@ -860,6 +907,9 @@ order by level,sortOrder";
             }
         }
 
+        #endregion
+
+        #region Events
         /// <summary>
         /// Calls the subscribers of a cancelable event handler,
         /// stopping at the event handler which cancels the event (if any).
@@ -983,43 +1033,7 @@ order by level,sortOrder";
                 AfterMove(this, e);
         }
 
-        public override string ToString()
-        {
-            if (Id != int.MinValue || !string.IsNullOrEmpty(Text))
-            {
-                return string.Format("{{ Id: {0}, Text: {1}, ParentId: {2} }}",
-                    Id,
-                    Text,
-                    _parentid
-                );
-            }
-
-            return base.ToString();
-        }
-    }
-
-    public class CMSPreviewNode
-    {
-        public int NodeId { get; set; }
-        public int Level { get; set; }
-        public Guid Version { get; set; }
-        public int ParentId { get; set; }
-        public int SortOrder { get; set; }
-        public string Xml { get; set; }
-
-        public CMSPreviewNode()
-        {
-
-        }
-
-        public CMSPreviewNode(int nodeId, Guid version, int parentId, int level, int sortOrder, string xml)
-        {
-            NodeId = nodeId;
-            Version = version;
-            ParentId = parentId;
-            Level = level;
-            SortOrder = sortOrder;
-            Xml = xml;
-        }
+        #endregion
+        
     }
 }

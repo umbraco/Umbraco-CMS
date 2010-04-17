@@ -91,7 +91,6 @@ namespace umbraco.cms.businesslogic.web
         private DateTime _release;
         private DateTime _expire;
         private int _template;
-        private string _text;
         private bool _published;
         private XmlNode _xml;
         private User _creator;
@@ -434,28 +433,19 @@ namespace umbraco.cms.businesslogic.web
             : base(id)
         {
             this.Version = Version;
-            setupDocument();
         }
 
         /// <summary>
         /// Initializes a new instance of the Document class.
         /// </summary>
         /// <param name="id">The id of the document</param>
-        public Document(int id)
-            : base(id)
-        {
-            setupDocument();
-        }
+        public Document(int id) : base(id) { }
 
         /// <summary>
         /// Initialize the document
         /// </summary>
         /// <param name="id">The id of the document</param>
-        public Document(Guid id)
-            : base(id)
-        {
-            setupDocument();
-        }
+        public Document(Guid id) : base(id) { }
 
         //TODO: SD: Implement this EVERYWHERE (90 places apparently)
         public Document(bool optimizedMode, int id)
@@ -559,9 +549,10 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
-        //TODO: Perhaps this should override the setupNode method of the CMSNode so that constructors work properly!
-        private void setupDocument()
+        protected override void setupNode()
         {
+            base.setupNode();
+
             IRecordsReader dr =
                 SqlHelper.ExecuteReader("select published, documentUser, coalesce(templateId, cmsDocumentType.templateNodeId) as templateId, text, releaseDate, expireDate, updateDate from cmsDocument inner join cmsContent on cmsDocument.nodeId = cmsContent.Nodeid left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1 where versionId = @versionId",
                                         SqlHelper.CreateParameter("@versionId", Version));
@@ -569,8 +560,7 @@ namespace umbraco.cms.businesslogic.web
             {
                 _creator = User;
                 _writer = User.GetUser(dr.GetInt("documentUser"));
-
-                _text = dr.GetString("text");
+                
                 if (!dr.IsNull("templateId"))
                     _template = dr.GetInt("templateId");
                 if (!dr.IsNull("releaseDate"))
@@ -590,7 +580,7 @@ namespace umbraco.cms.businesslogic.web
         {
             _creator = InitUser;
             _writer = InitWriter;
-            _text = InitText;
+            SetText(InitText);
             _template = InitTemplate;
             _release = InitReleaseDate;
             _expire = InitExpireDate;
@@ -598,29 +588,46 @@ namespace umbraco.cms.businesslogic.web
             _published = InitPublished;
         }
 
-        /// <summary>
-        /// The name of the document, amongst other used in the nice url.
-        /// </summary>
-        public new string Text
+        public override string Text
         {
             get
             {
-                if (_text == null || _text == "")
-                    _text = SqlHelper.ExecuteScalar<string>(string.Format("select text from umbracoNode where id = {0}", Id));
-                return _text;
+                return base.Text;
             }
             set
-            {
-                _text = value;
+            {               
                 base.Text = value;
                 SqlHelper.ExecuteNonQuery("update cmsDocument set text = @text where versionId = @versionId",
-                                          SqlHelper.CreateParameter("@text", _text),
+                                          SqlHelper.CreateParameter("@text", value),
                                           SqlHelper.CreateParameter("@versionId", Version));
-                CMSNode c = new CMSNode(Id);
-                c.Text = _text;
-
+                //CMSNode c = new CMSNode(Id);
+                //c.Text = value;
             }
         }
+
+        /// <summary>
+        /// The name of the document, amongst other used in the nice url.
+        /// </summary>
+        //public new string Text
+        //{
+        //    get
+        //    {
+        //        if (_text == null || _text == "")
+        //            _text = SqlHelper.ExecuteScalar<string>(string.Format("select text from umbracoNode where id = {0}", Id));
+        //        return _text;
+        //    }
+        //    set
+        //    {
+        //        _text = value;
+        //        base.Text = value;
+        //        SqlHelper.ExecuteNonQuery("update cmsDocument set text = @text where versionId = @versionId",
+        //                                  SqlHelper.CreateParameter("@text", _text),
+        //                                  SqlHelper.CreateParameter("@versionId", Version));
+        //        CMSNode c = new CMSNode(Id);
+        //        c.Text = _text;
+
+        //    }
+        //}
 
         /// <summary>
         /// The date of the last update of the document
@@ -1278,9 +1285,9 @@ namespace umbraco.cms.businesslogic.web
 
             _published = publish;
             _updated = updateDate;
+            _template = templateId;
             ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType);
-            ContentTypeIcon = icon;
-            Template = templateId;
+            ContentTypeIcon = icon;            
             VersionDate = versionDate;
         }
 

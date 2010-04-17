@@ -33,30 +33,17 @@ namespace umbraco.cms.businesslogic.media
 		/// Contructs a media object given the Id
 		/// </summary>
 		/// <param name="id">Identifier</param>
-		public Media(int id) : base(id)
-		{
-		}
+        public Media(int id) : base(id) { }
 
 		/// <summary>
 		/// Contructs a media object given the Id
 		/// </summary>
 		/// <param name="id">Identifier</param>
-		public Media(Guid id) : base(id)
-		{}
+        public Media(Guid id) : base(id) { }
 
-		public Media(int id, bool noSetup)
-			: base(id, noSetup)
-		{
+        public Media(int id, bool noSetup) : base(id, noSetup) { }
 
-		}
-
-		//TODO: SD: Implement this EVERYWHERE
-		public Media(bool optimizedMode, int id)
-			: base(id, optimizedMode)
-		{
-
-		}
-
+        public Media(bool optimizedMode, int id) : base(id, optimizedMode) { }
 
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
@@ -140,12 +127,6 @@ namespace umbraco.cms.businesslogic.media
 		{
 			get
 			{
-				//SD: Removed old, non-optimized method!
-				//BusinessLogic.console.IconI[] tmp = base.Children;
-				//Media[] retval = new Media[tmp.Length];
-				//for (int i = 0; i < tmp.Length; i++) retval[i] = new Media(tmp[i].UniqueId);
-				//return retval;
-				
 				//return refactored optimized method
 				return Media.GetChildrenForTree(this.Id).ToArray();
 			}
