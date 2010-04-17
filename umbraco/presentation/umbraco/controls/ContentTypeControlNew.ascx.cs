@@ -1,17 +1,15 @@
-using System.IO;
 using System;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
 using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
 using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using umbraco.IO;
 using umbraco.presentation;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace umbraco.controls
 {
@@ -290,10 +288,10 @@ namespace umbraco.controls
                     if (t.PropertyTypes.Length > 0)
                     {
                         HtmlInputHidden propSort = new HtmlInputHidden();
-                        propSort.ID = "propSort_" + t.GetRawCaption().Replace(" ", "").Replace("#", "_") + "Content";
+						propSort.ID = "propSort_" + t.Id.ToString() + "_Content";
                         PropertyTypes.Controls.Add(propSort);
                         _sortLists.Add(propSort);
-                        PropertyTypes.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"" + t.GetRawCaption().Replace(" ", "").Replace("#", "_") + "Contents\">"));
+                        PropertyTypes.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"t_" + t.Id.ToString() + "_Contents\">"));
 
                         foreach (cms.businesslogic.propertytype.PropertyType pt in t.PropertyTypes)
                         {
@@ -311,7 +309,7 @@ namespace umbraco.controls
                                 gpw.TabId = t.Id;
                                 gpw.DataTypeDefinitions = dtds;
                                 gpw.Delete += new EventHandler(gpw_Delete);
-                                gpw.FullId = t.GetRawCaption().Replace(" ", "").Replace("#", "_") + "Contents_" + +pt.Id;
+                                gpw.FullId = "t_" + t.Id.ToString() + "_Contents_" + +pt.Id;
 
                                 PropertyTypes.Controls.Add(gpw);
                                 _genericProperties.Add(gpw);
@@ -356,12 +354,12 @@ namespace umbraco.controls
             PropertyTypes.Controls.Add(propertiesPH);
 
             HtmlInputHidden propSort_gp = new HtmlInputHidden();
-            propSort_gp.ID = "propSort_generalPropertiesContent";
+            propSort_gp.ID = "propSort_general_Content";
             propertiesPH.Controls.Add(propSort_gp);
             _sortLists.Add(propSort_gp);
 
 
-            propertiesPH.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"generalPropertiesContents\">"));
+            propertiesPH.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"t_general_Contents\">"));
             foreach (cms.businesslogic.propertytype.PropertyType pt in cType.PropertyTypes)
             {
                 if (pt.ContentTypeId == cType.Id && !inTab.ContainsKey(pt.Id.ToString()))
@@ -377,7 +375,7 @@ namespace umbraco.controls
                     gpw.Tabs = tabs;
                     gpw.DataTypeDefinitions = dtds;
                     gpw.Delete += new EventHandler(gpw_Delete);
-                    gpw.FullId = "generalPropertiesContents_" + pt.Id;
+                    gpw.FullId = "t_general_Contents_" + pt.Id;
 
                     propertiesPH.Controls.Add(gpw);
                     _genericProperties.Add(gpw);
@@ -551,13 +549,17 @@ namespace umbraco.controls
             {
                 if (propSorter.Value.Trim() != "")
                 {
-                    string tabName = propSorter.ID.Replace("propSort_", "");
-                    tabName = tabName.Substring(0, tabName.Length - 7);
+					string tabId = propSorter.ID;
+					// remove leading "propSort_" and trailing "_Content"
+					tabId = tabId.Substring(9, tabId.Length - 9 - 8);
+					// calc the position of the prop SO i.e. after "t_<tabId>Contents[]="
+					int propSOPosition = "t_".Length + tabId.Length + "Contents[]=".Length + 1;
 
                     string[] tempSO = propSorter.Value.Split("&".ToCharArray());
                     for (int i = 0; i < tempSO.Length; i++)
                     {
-                        int currentSortOrder = int.Parse(tempSO[i].Replace(tabName + "Contents[]=", ""));
+						string propSO = tempSO[i].Substring(propSOPosition);
+                        int currentSortOrder = int.Parse(propSO);
                         cms.businesslogic.propertytype.PropertyType.GetPropertyType(currentSortOrder).SortOrder = i;
                     }
                 }
