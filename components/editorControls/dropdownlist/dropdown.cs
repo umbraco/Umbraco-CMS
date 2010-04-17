@@ -4,6 +4,9 @@ using System.Web.UI.WebControls;
 using System.ComponentModel;
 using System.Collections;
 
+using umbraco.cms.businesslogic;
+using umbraco.cms.businesslogic.language;
+
 namespace umbraco.editorControls
 {
 	public class dropdown : System.Web.UI.WebControls.DropDownList, interfaces.IDataEditor
@@ -43,12 +46,33 @@ namespace umbraco.editorControls
 			base.OnInit (e);
             foreach (object key in _prevalues.Keys)
             {
-				this.Items.Add(new ListItem(_prevalues[key].ToString(),key.ToString()));						
+				this.Items.Add(new ListItem(dropdown.DictionaryReplace(_prevalues[key].ToString()), key.ToString()));
 			}
 			base.Items.Insert(0, new ListItem(ui.Text("choose") + "...",""));
 
 			if (_data != null && _data.Value != null)
 				this.SelectedValue = _data.Value.ToString();			
 		}
+
+		static string DictionaryReplace(string text)
+		{
+			if (!text.StartsWith("#"))
+				return text;
+			else
+			{
+				Language lang = Language.GetByCultureCode(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
+				if (lang != null)
+				{
+					if (Dictionary.DictionaryItem.hasKey(text.Substring(1, text.Length - 1)))
+					{
+						Dictionary.DictionaryItem di = new Dictionary.DictionaryItem(text.Substring(1, text.Length - 1));
+						return di.Value(lang.id);
+					}
+				}
+
+				return "[" + text + "]";
+			}
+		}
+
 	}
 }
