@@ -16,7 +16,8 @@ using umbraco.IO;
 using umbraco.uicontrols.DatePicker;
 using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
-
+using umbraco.cms.businesslogic.web;
+using umbraco.presentation;
 
 namespace umbraco.cms.presentation
 {
@@ -25,19 +26,10 @@ namespace umbraco.cms.presentation
         protected uicontrols.TabView TabView1;
         protected System.Web.UI.WebControls.TextBox documentName;
         private cms.businesslogic.web.Document _document;
-        protected System.Web.UI.WebControls.Literal jsIds;
-        
-        /*
-        private controls.datePicker dp = new controls.datePicker();
-        private controls.datePicker dpRelease = new controls.datePicker();
-        private controls.datePicker dpExpire = new controls.datePicker();
-        */
-
+        protected System.Web.UI.WebControls.Literal jsIds;    
         private LiteralControl dp = new LiteralControl();
         private DateTimePicker dpRelease = new DateTimePicker();
         private DateTimePicker dpExpire = new DateTimePicker();
-
-        //private bool _refreshTree = false;
 
         controls.ContentControl tmp;
 
@@ -51,13 +43,150 @@ namespace umbraco.cms.presentation
 
         private Literal l = new Literal();
         private Literal domainText = new Literal();
-
-        //protected System.Web.UI.WebControls.Literal SyncPath;
-
         private controls.ContentControl.publishModes _canPublish = controls.ContentControl.publishModes.Publish;
+
+        private int? m_ContentId = null;
+
+        override protected void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            //validate!
+            int id;
+            if (!int.TryParse(Request.QueryString["id"], out id))
+            {
+                //if this is invalid show an error
+                this.DisplayFatalError("Invalid query string");
+                return;
+            }
+            m_ContentId = id;
+
+
+            this.UnPublish.Click += new System.EventHandler(this.UnPublishDo);
+
+            //_document = new cms.businesslogic.web.Document(int.Parse(Request.QueryString["id"]));
+            _document = new Document(true, id);
+
+            // Check publishing permissions
+            if (!base.getUser().GetPermissions(_document.Path).Contains(ActionPublish.Instance.Letter.ToString()))
+                _canPublish = controls.ContentControl.publishModes.SendToPublish;
+            tmp = new controls.ContentControl(_document, _canPublish, "TabView1");
+
+            tmp.ID = "TabView1";
+
+            tmp.Width = Unit.Pixel(666);
+            tmp.Height = Unit.Pixel(666);
+
+            // Add preview button
+
+            foreach (uicontrols.TabPage tp in tmp.GetPanels())
+            {
+                addPreviewButton(tp.Menu, _document.Id);
+            }
+
+            plc.Controls.Add(tmp);
+
+
+            System.Web.UI.WebControls.PlaceHolder publishStatus = new PlaceHolder();
+            if (_document.Published)
+            {
+                littPublishStatus.Text = ui.Text("content", "lastPublished", base.getUser()) + ": " + _document.VersionDate.ToShortDateString() + " &nbsp; ";
+
+                publishStatus.Controls.Add(littPublishStatus);
+                if (base.getUser().GetPermissions(_document.Path).IndexOf("U") > -1)
+                    UnPublish.Visible = true;
+                else
+                    UnPublish.Visible = false;
+            }
+            else
+            {
+                littPublishStatus.Text = ui.Text("content", "itemNotPublished", base.getUser());
+                publishStatus.Controls.Add(littPublishStatus);
+                UnPublish.Visible = false;
+            }
+
+            UnPublish.Text = ui.Text("content", "unPublish", base.getUser());
+            UnPublish.ID = "UnPublishButton";
+            UnPublish.Attributes.Add("onClick", "if (!confirm('" + ui.Text("defaultdialogs", "confirmSure", base.getUser()) + "')) return false; ");
+            publishStatus.Controls.Add(UnPublish);
+
+            publishProps.addProperty(ui.Text("content", "publishStatus", base.getUser()), publishStatus);
+
+            // Template
+            PlaceHolder template = new PlaceHolder();
+            cms.businesslogic.web.DocumentType DocumentType = new cms.businesslogic.web.DocumentType(_document.ContentType.Id);
+            tmp.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(DocumentType.Text));
+            tmp.PropertiesPane.addProperty(ui.Text("template"), template);
+
+            int defaultTemplate;
+            if (_document.Template != 0)
+                defaultTemplate = _document.Template;
+            else
+                defaultTemplate = DocumentType.DefaultTemplate;
+
+            if (this.getUser().UserType.Name == "writer")
+            {
+                if (defaultTemplate != 0)
+                    template.Controls.Add(new LiteralControl(cms.businesslogic.template.Template.GetTemplate(defaultTemplate).Text));
+                else
+                    template.Controls.Add(new LiteralControl(ui.Text("content", "noDefaultTemplate")));
+            }
+            else
+            {
+                ddlDefaultTemplate.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
+                foreach (cms.businesslogic.template.Template t in DocumentType.allowedTemplates)
+                {
+                    ListItem tTemp = new ListItem(t.Text, t.Id.ToString());
+                    if (t.Id == defaultTemplate)
+                        tTemp.Selected = true;
+                    ddlDefaultTemplate.Items.Add(tTemp);
+                }
+                template.Controls.Add(ddlDefaultTemplate);
+            }
+
+
+            // Editable update date, release date and expire date added by NH 13.12.04
+            dp.ID = "updateDate";
+            dp.Text = _document.UpdateDate.ToShortDateString() + " " + _document.UpdateDate.ToShortTimeString();
+            publishProps.addProperty(ui.Text("content", "updateDate", base.getUser()), dp);
+
+            dpRelease.ID = "releaseDate";
+            dpRelease.DateTime = _document.ReleaseDate;
+            dpRelease.ShowTime = true;
+            publishProps.addProperty(ui.Text("content", "releaseDate", base.getUser()), dpRelease);
+
+            dpExpire.ID = "expireDate";
+            dpExpire.DateTime = _document.ExpireDate;
+            dpExpire.ShowTime = true;
+            publishProps.addProperty(ui.Text("content", "expireDate", base.getUser()), dpExpire);
+
+            // url's
+            updateLinks();
+            linkProps.addProperty(ui.Text("content", "urls", base.getUser()), l);
+
+            if (domainText.Text != "")
+                linkProps.addProperty(ui.Text("content", "alternativeUrls", base.getUser()), domainText);
+
+            tmp.Save += new System.EventHandler(Save);
+            tmp.SaveAndPublish += new System.EventHandler(Publish);
+            tmp.SaveToPublish += new System.EventHandler(SendToPublish);
+
+            // Add panes to property page...
+            tmp.tpProp.Controls.Add(publishProps);
+            tmp.tpProp.Controls.Add(linkProps);
+
+            // add preview to properties pane too
+            addPreviewButton(tmp.tpProp.Menu, _document.Id);
+
+
+
+        }
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
+            if (!m_ContentId.HasValue)
+                return;
+
             if (!CheckUserValidation())
                 return;
 
@@ -191,7 +320,7 @@ namespace umbraco.cms.presentation
 
             //newPublishStatus.Text = "0";
 
-        }
+        }       
 
         private void updateLinks()
         {
@@ -307,129 +436,6 @@ namespace umbraco.cms.presentation
             }
         }
 
-        #region Web Form Designer generated code
-        override protected void OnInit(EventArgs e)
-        {            
-            base.OnInit(e);
-
-            this.UnPublish.Click += new System.EventHandler(this.UnPublishDo);
-
-            _document = new cms.businesslogic.web.Document(int.Parse(Request.QueryString["id"]));
-
-            // Check publishing permissions
-            if (!base.getUser().GetPermissions(_document.Path).Contains(ActionPublish.Instance.Letter.ToString()))
-                _canPublish = controls.ContentControl.publishModes.SendToPublish;
-            tmp = new controls.ContentControl(_document, _canPublish, "TabView1");
-
-            tmp.ID = "TabView1";
-
-            tmp.Width = Unit.Pixel(666);
-            tmp.Height = Unit.Pixel(666);
-
-            // Add preview button
-
-            foreach (uicontrols.TabPage tp in tmp.GetPanels())
-            {
-                addPreviewButton(tp.Menu, _document.Id);
-            }
-
-            plc.Controls.Add(tmp);
-
-
-            System.Web.UI.WebControls.PlaceHolder publishStatus = new PlaceHolder();
-            if (_document.Published)
-            {
-                littPublishStatus.Text = ui.Text("content", "lastPublished", base.getUser()) + ": " + _document.VersionDate.ToShortDateString() + " &nbsp; ";
-
-                publishStatus.Controls.Add(littPublishStatus);
-                if (base.getUser().GetPermissions(_document.Path).IndexOf("U") > -1)
-                    UnPublish.Visible = true;
-                else
-                    UnPublish.Visible = false;
-            }
-            else
-            {
-                littPublishStatus.Text = ui.Text("content", "itemNotPublished", base.getUser());
-                publishStatus.Controls.Add(littPublishStatus);
-                UnPublish.Visible = false;
-            }
-
-            UnPublish.Text = ui.Text("content", "unPublish", base.getUser());
-            UnPublish.ID = "UnPublishButton";
-            UnPublish.Attributes.Add("onClick", "if (!confirm('" + ui.Text("defaultdialogs", "confirmSure", base.getUser()) + "')) return false; ");
-            publishStatus.Controls.Add(UnPublish);
-
-            publishProps.addProperty(ui.Text("content", "publishStatus", base.getUser()), publishStatus);
-
-            // Template
-            PlaceHolder template = new PlaceHolder();
-            cms.businesslogic.web.DocumentType DocumentType = new cms.businesslogic.web.DocumentType(_document.ContentType.Id);
-            tmp.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(DocumentType.Text));
-            tmp.PropertiesPane.addProperty(ui.Text("template"), template);
-
-            int defaultTemplate;
-            if (_document.Template != 0)
-                defaultTemplate = _document.Template;
-            else
-                defaultTemplate = DocumentType.DefaultTemplate;
-
-            if (this.getUser().UserType.Name == "writer")
-            {
-                if (defaultTemplate != 0)
-                    template.Controls.Add(new LiteralControl(cms.businesslogic.template.Template.GetTemplate(defaultTemplate).Text));
-                else
-                    template.Controls.Add(new LiteralControl(ui.Text("content", "noDefaultTemplate")));
-            }
-            else
-            {
-                ddlDefaultTemplate.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
-                foreach (cms.businesslogic.template.Template t in DocumentType.allowedTemplates)
-                {
-                    ListItem tTemp = new ListItem(t.Text, t.Id.ToString());
-                    if (t.Id == defaultTemplate)
-                        tTemp.Selected = true;
-                    ddlDefaultTemplate.Items.Add(tTemp);
-                }
-                template.Controls.Add(ddlDefaultTemplate);
-            }
-
-
-            // Editable update date, release date and expire date added by NH 13.12.04
-            dp.ID = "updateDate";
-            dp.Text = _document.UpdateDate.ToShortDateString() + " " + _document.UpdateDate.ToShortTimeString();
-            publishProps.addProperty(ui.Text("content", "updateDate", base.getUser()), dp);
-
-            dpRelease.ID = "releaseDate";
-            dpRelease.DateTime = _document.ReleaseDate;
-            dpRelease.ShowTime = true;
-            publishProps.addProperty(ui.Text("content", "releaseDate", base.getUser()), dpRelease);
-
-            dpExpire.ID = "expireDate";
-            dpExpire.DateTime = _document.ExpireDate;
-            dpExpire.ShowTime = true;
-            publishProps.addProperty(ui.Text("content", "expireDate", base.getUser()), dpExpire);
-
-            // url's
-            updateLinks();
-            linkProps.addProperty(ui.Text("content", "urls", base.getUser()), l);
-
-            if (domainText.Text != "")
-                linkProps.addProperty(ui.Text("content", "alternativeUrls", base.getUser()), domainText);
-
-            tmp.Save += new System.EventHandler(Save);
-            tmp.SaveAndPublish += new System.EventHandler(Publish);
-            tmp.SaveToPublish += new System.EventHandler(SendToPublish);
-
-            // Add panes to property page...
-            tmp.tpProp.Controls.Add(publishProps);
-            tmp.tpProp.Controls.Add(linkProps);
-
-            // add preview to properties pane too
-            addPreviewButton(tmp.tpProp.Menu, _document.Id);
-
-
-
-        }
 
         private void addPreviewButton(uicontrols.ScrollingMenu menu, int id)
         {
@@ -440,7 +446,5 @@ namespace umbraco.cms.presentation
             menuItem.ImageURL = SystemDirectories.Umbraco + "/images/editor/vis.gif";
         }
 
-       
-        #endregion
     }
 }

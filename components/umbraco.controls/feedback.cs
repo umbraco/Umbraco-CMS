@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ClientDependency.Core;
 
 namespace umbraco.uicontrols {
-    public class Feedback : System.Web.UI.WebControls.Panel {
+    
+    [ClientDependency(ClientDependencyType.Css, "ui/default.css", "UmbracoClient")]
+    public class Feedback : System.Web.UI.WebControls.Panel 
+    {
 
         public Feedback() {
 
@@ -14,9 +18,6 @@ namespace umbraco.uicontrols {
 
         protected override void OnLoad(System.EventArgs EventArguments) {
         }
-
-        private bool _hasMenu = false;
-        private string _StatusBarText = "";
 
         public feedbacktype type { get; set; }
 

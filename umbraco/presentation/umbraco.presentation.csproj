@@ -199,6 +199,7 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="BasePageExtensions.cs" />
     <Compile Include="config\splashes\booting.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
       <DependentUpon>booting.aspx</DependentUpon>

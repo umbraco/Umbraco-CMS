@@ -28,6 +28,7 @@ namespace umbraco.cms.businesslogic.web
     /// </summary>
     public class Document : Content
     {
+        #region Constants
         private const string m_SQLOptimizedSingle = @"
                 Select 
 	                (select count(id) from umbracoNode where parentId = @id) as Children, 
@@ -35,7 +36,7 @@ namespace umbraco.cms.businesslogic.web
 	                cmsContentVersion.VersionId,
                     cmsContentVersion.versionDate,	                
 	                contentTypeNode.uniqueId as ContentTypeGuid, 
-					cmsContent.ContentType, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId
+					cmsContent.ContentType, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId,
 	                published, documentUser, coalesce(templateId, cmsDocumentType.templateNodeId) as templateId, cmsDocument.text as DocumentText, releaseDate, expireDate, updateDate, 
 	                umbracoNode.createDate, umbracoNode.trashed, umbracoNode.parentId, umbracoNode.nodeObjectType, umbracoNode.nodeUser, umbracoNode.level, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.uniqueId, umbracoNode.text 
                 from 
@@ -84,8 +85,10 @@ namespace umbraco.cms.businesslogic.web
                 inner join cmsPreviewXml on cmsPreviewXml.nodeId = cmsDocument.nodeId and cmsPreviewXml.versionId = cmsDocument.versionId
                 where newest = 1 and trashed = 0 and path like '{0}'
                 order by level,sortOrder
- ";
+ "; 
+        #endregion
 
+        #region Private properties
         public static Guid _objectType = new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972");
         private DateTime _updated;
         private DateTime _release;
@@ -108,6 +111,51 @@ namespace umbraco.cms.businesslogic.web
 
         // special for tree performance
         private int _userId = -1;
+
+        private Dictionary<Property, object> _knownProperties = new Dictionary<Property, object>();
+        private Func<KeyValuePair<Property, object>, string, bool> propertyTypeByAlias = (pt, alias) => pt.Key.PropertyType.Alias == alias; 
+        #endregion
+        
+        /// <summary>
+        /// Indexed property to return the property value by name
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        public object this[string alias]
+        {
+            get
+            {
+                if (this._optimizedMode)
+                {
+                    return this._knownProperties.Single(p => propertyTypeByAlias(p, alias)).Value;
+                }
+                else
+                {
+                    return this.getProperty(alias).Value;
+                }
+            }
+            set
+            {
+                if (this._optimizedMode)
+                {
+                    if (this._knownProperties.SingleOrDefault(p => propertyTypeByAlias(p, alias)).Key == null)
+                    {
+                        var pt = this.getProperty(alias);
+
+                        this._knownProperties.Add(pt, pt.Value);
+                    }
+                    else
+                    {
+                        var pt = this._knownProperties.Single(p => propertyTypeByAlias(p, alias)).Key;
+                        this._knownProperties[pt] = value;
+                    }
+                }
+                else
+                {
+                    this.getProperty(alias).Value = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether the document was constructed for the optimized mode
@@ -451,9 +499,9 @@ namespace umbraco.cms.businesslogic.web
         public Document(bool optimizedMode, int id)
             : base(id, optimizedMode)
         {
-            this._optimizedMode = OptimizedMode;
+            this._optimizedMode = optimizedMode;
 
-            if (OptimizedMode)
+            if (optimizedMode)
             {
 
                 using (IRecordsReader dr =
@@ -522,7 +570,7 @@ namespace umbraco.cms.businesslogic.web
         }
 
         /// <summary>
-        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
+        /// Used to persist object changes to the database. 
         /// </summary>
         public override void Save()
         {
@@ -1750,47 +1798,7 @@ namespace umbraco.cms.businesslogic.web
                 AfterRollBack(this, e);
         }
 
-        private Dictionary<Property, object> _knownProperties;
-        private Func<KeyValuePair<Property, object>, string, bool> propertyTypeByAlias = (pt, alias) => pt.Key.PropertyType.Alias == alias;
-        public object this[string alias]
-        {
-            get
-            {
-                if (this._optimizedMode)
-                {
-                    if (this._knownProperties == null) this._knownProperties = new Dictionary<Property, object>();
-
-                    return this._knownProperties.Single(p => propertyTypeByAlias(p, alias)).Value;
-                }
-                else
-                {
-                    return this.getProperty(alias).Value;
-                }
-            }
-            set
-            {
-                if (this._optimizedMode)
-                {
-                    if (this._knownProperties == null) this._knownProperties = new Dictionary<Property, object>();
-
-                    if (this._knownProperties.SingleOrDefault(p => propertyTypeByAlias(p, alias)).Key == null)
-                    {
-                        var pt = this.getProperty(alias);
-
-                        this._knownProperties.Add(pt, pt.Value);
-                    }
-                    else
-                    {
-                        var pt = this._knownProperties.Single(p => propertyTypeByAlias(p, alias)).Key;
-                        this._knownProperties[pt] = value;
-                    }
-                }
-                else
-                {
-                    this.getProperty(alias).Value = value;
-                }
-            }
-        }
+       
     }
 
     /// <summary>
