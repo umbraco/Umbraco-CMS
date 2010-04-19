@@ -515,6 +515,13 @@
     <Compile Include="umbraco\dialogs\Preview.aspx.designer.cs">
       <DependentUpon>Preview.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\endPreview.aspx.cs">
+      <DependentUpon>endPreview.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\endPreview.aspx.designer.cs">
+      <DependentUpon>endPreview.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\LiveEditing\CanvasClientDependencyProvider.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1471,8 +1478,11 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
+    <Content Include="umbraco\endPreview.aspx" />
     <Content Include="umbraco_client\Application\HistoryManager.js" />
     <Content Include="umbraco_client\Application\JQuery\jquery.ba-bbq.min.js" />
+    <Content Include="umbraco_client\Preview\previewModeBadge.png" />
+    <Content Include="umbraco_client\Preview\umbracoPreview.css" />
     <Content Include="umbraco_client\Tree\Themes\umbraco\arrows.png" />
     <Content Include="umbraco_client\ui\dd.css" />
     <Content Include="umbraco_client\ui\dd_arrow.gif" />

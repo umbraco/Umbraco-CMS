@@ -508,6 +508,24 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Gets the html injected into a (x)html page if Umbraco is running in preview mode
+        /// </summary>
+        public static string PreviewBadge
+        {
+            get
+            {
+                try
+                {
+                    return GetKey("/settings/content/PreviewBadge");
+                }
+                catch
+                {
+                    return "<a id=\"umbracoPreviewBadge\" style=\"position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px; background: url('{1}/preview/previewModeBadge.png') no-repeat;\" href=\"{0}/endPreview.aspx?redir={2}\"><span style=\"display:none;\">In Preview Mode - click to end</span></a>";
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets IP or hostnames of the distribution servers.
         /// These servers will receive a call everytime content is created/deleted/removed
         /// and update their content cache accordingly, ensuring a consistent cache on all servers

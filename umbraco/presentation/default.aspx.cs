@@ -43,6 +43,28 @@ namespace umbraco
 
             pageContents = template.ParseInternalLinks(pageContents);
 
+            // preview
+            if (UmbracoContext.Current.InPreviewMode)
+            {
+                Trace.Write("Runtime Engine", "Umbraco is running in preview mode.");
+
+                int bodyPos = pageContents.ToLower().IndexOf("</body>");
+                if (bodyPos > -1)
+                {
+                    string htmlBadge =
+                        String.Format(UmbracoSettings.PreviewBadge, 
+                        umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco),
+                        umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco_client),
+                        Server.UrlEncode(UmbracoContext.Current.Request.Path)
+                        );
+
+                    // inject badge
+                    pageContents =
+                        pageContents.Substring(0, bodyPos) +
+                        htmlBadge + pageContents.Substring(bodyPos, pageContents.Length - bodyPos);
+                }
+            }
+
             output.Write(pageContents);
 
         }
@@ -53,9 +75,9 @@ namespace umbraco
 
             if (UmbracoContext.Current == null)
                 UmbracoContext.Current = new UmbracoContext(HttpContext.Current);
-            
+
             bool editMode = UmbracoContext.Current.LiveEditingContext.Enabled;
-            
+
             if (editMode)
                 ValidateRequest = false;
 
@@ -81,7 +103,7 @@ namespace umbraco
             else
             {
                 if (!string.IsNullOrEmpty(Request["umbPageID"]))
-                {        
+                {
                     int result;
                     if (int.TryParse(Request["umbPageID"], out result))
                     {
@@ -144,17 +166,6 @@ namespace umbraco
             else
                 Page.Trace.IsEnabled = false;
 
-            // In preview mode?
-            if (UmbracoContext.Current.InPreviewMode)
-            {
-                Trace.Write("Runtime Engine", "Umbraco is running in preview mode.");
-                if (Page.Header != null)
-                {
-                    Page.Header.Controls.AddAt(0,
-
-                        new LiteralControl(String.Format("{0}{0}<!-- {0}THE FOLLOW IS AUTOMATICALLY INSERTED BY UMBRACO:{0}{0}Umbraco is running in preview mode. {0}To end preview mode, simply refresh the editing view in the Back Office or log out of Umbraco.{0}{0}This message is only shown to authenticated users of Umbraco. Never to your visitors!{0}{0}-->{0}{0}", Environment.NewLine)));
-                }
-            }
 
 
         }
@@ -184,11 +195,12 @@ namespace umbraco
                     // Add page elements to global items
                     try
                     {
-                        
+
                         System.Web.HttpContext.Current.Items.Add("pageElements", m_umbPage.Elements);
 
                     }
-                    catch(ArgumentException aex) {
+                    catch (ArgumentException aex)
+                    {
 
                         System.Web.HttpContext.Current.Items.Remove("pageElements");
                         System.Web.HttpContext.Current.Items.Add("pageElements", m_umbPage.Elements);
@@ -231,7 +243,7 @@ namespace umbraco
                 {
                     // If there's no published content, show friendly error
                     if (umbraco.content.Instance.XmlContent.SelectSingleNode("/root/*") == null)
-                        Response.Redirect( IO.SystemDirectories.Config + "/splashes/noNodes.aspx");
+                        Response.Redirect(IO.SystemDirectories.Config + "/splashes/noNodes.aspx");
                     else
                     {
 
