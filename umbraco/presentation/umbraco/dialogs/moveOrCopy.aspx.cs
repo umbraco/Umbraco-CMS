@@ -13,6 +13,7 @@ using umbraco.BasePages;
 using umbraco.presentation;
 using umbraco.cms.businesslogic.media;
 using umbraco.IO;
+using System.Linq;
 
 namespace umbraco.dialogs
 {
@@ -132,7 +133,8 @@ namespace umbraco.dialogs
                         dt.MasterContentType = int.Parse(masterType.SelectedValue);
 
                         Hashtable oldNewTabIds = new Hashtable();
-                        foreach (cms.businesslogic.web.DocumentType.TabI tab in eDt.getVirtualTabs) {
+                        foreach (cms.businesslogic.web.DocumentType.TabI tab in eDt.getVirtualTabs.ToList())
+                        {
                             int tId = dt.AddVirtualTab(tab.Caption);
                             oldNewTabIds.Add(tab.Id, tId);
                         }
@@ -199,7 +201,7 @@ namespace umbraco.dialogs
 					nodeAllowed = true;
 				else 
 				{
-					foreach (int i in newNode.ContentType.AllowedChildContentTypeIDs)
+					foreach (int i in newNode.ContentType.AllowedChildContentTypeIDs.ToList())
 						if (i == currentNode.ContentType.Id) 
 						{
 							nodeAllowed = true;

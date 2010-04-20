@@ -2,7 +2,7 @@ using System;
 using System.Data;
 using System.Xml;
 using umbraco.cms.businesslogic.propertytype;
-
+using System.Linq;
 
 namespace umbraco.cms.businesslogic.member
 {
@@ -258,7 +258,7 @@ namespace umbraco.cms.businesslogic.member
 
             // tabs
             XmlElement tabs = xd.CreateElement("Tabs");
-            foreach (TabI t in getVirtualTabs)
+            foreach (TabI t in getVirtualTabs.ToList())
             {
                 XmlElement tabx = xd.CreateElement("Tab");
                 tabx.AppendChild(xmlHelper.addTextNode(xd, "Id", t.Id.ToString()));

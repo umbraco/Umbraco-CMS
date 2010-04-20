@@ -47,6 +47,22 @@ namespace umbraco.controls
         private ArrayList _sortLists = new ArrayList();
         protected System.Web.UI.WebControls.DataGrid dgGeneralTabProperties;
 
+        override protected void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            int docTypeId = int.Parse(Request.QueryString["id"]);
+            cType = new cms.businesslogic.ContentType(docTypeId);
+
+            setupInfoPane();
+            if (!HideStructure)
+            {
+                setupStructurePane();
+            }
+            setupGenericPropertiesPane();
+            setupTabPane();
+
+        }
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
@@ -450,7 +466,7 @@ namespace umbraco.controls
             dtT.Columns.Add("genericProperties");
 
             Hashtable inTab = new Hashtable();
-            foreach (cms.businesslogic.ContentType.TabI tb in cType.getVirtualTabs)
+            foreach (cms.businesslogic.ContentType.TabI tb in cType.getVirtualTabs.ToList())
             {
                 DataRow dr = dtT.NewRow();
                 dr["TabName"] = tb.GetRawCaption();
@@ -615,7 +631,7 @@ namespace umbraco.controls
             if (e.CommandName == "MoveDown")
             {
                 int TabId = int.Parse(e.CommandArgument.ToString());
-                foreach (cms.businesslogic.ContentType.TabI t in cType.getVirtualTabs)
+                foreach (cms.businesslogic.ContentType.TabI t in cType.getVirtualTabs.ToList())
                 {
                     if (t.Id == TabId)
                     {
@@ -627,7 +643,7 @@ namespace umbraco.controls
             if (e.CommandName == "MoveUp")
             {
                 int TabId = int.Parse(e.CommandArgument.ToString());
-                foreach (cms.businesslogic.ContentType.TabI t in cType.getVirtualTabs)
+                foreach (cms.businesslogic.ContentType.TabI t in cType.getVirtualTabs.ToList())
                 {
                     if (t.Id == TabId)
                     {
@@ -687,7 +703,7 @@ namespace umbraco.controls
             dt.Columns.Add("name");
             dt.Columns.Add("id");
             dt.Columns.Add("order");
-            foreach (cms.businesslogic.ContentType.TabI tb in cType.getVirtualTabs)
+            foreach (cms.businesslogic.ContentType.TabI tb in cType.getVirtualTabs.ToList())
             {
                 if (tb.ContentType == cType.Id)
                 {
@@ -800,7 +816,6 @@ namespace umbraco.controls
         }
 
 
-
         private void SaveTabs()
         {
             int tabid;
@@ -820,41 +835,7 @@ namespace umbraco.controls
 
         #endregion
 
-        #region Web Form Designer generated code
-        override protected void OnInit(EventArgs e)
-        {
-            InitializeComponent();
-            base.OnInit(e);
+        
 
-            int docTypeId = int.Parse(Request.QueryString["id"]);
-            cType = new cms.businesslogic.ContentType(docTypeId);
-
-            setupInfoPane();
-            if (!HideStructure)
-            {
-                setupStructurePane();
-            }
-            setupGenericPropertiesPane();
-            setupTabPane();
-
-        }
-
-        private void InitializeComponent()
-        {
-
-        }
-        #endregion
-    }
-
-    public class SaveClickEventArgs : EventArgs
-    {
-        public string Message { get; set; }
-        public BasePages.BasePage.speechBubbleIcon IconType { get; set; }
-
-        public SaveClickEventArgs(string message)
-        {
-            Message = message;
-            IconType = umbraco.BasePages.BasePage.speechBubbleIcon.success;
-        }
     }
 }

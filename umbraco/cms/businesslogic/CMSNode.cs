@@ -328,7 +328,7 @@ namespace umbraco.cms.businesslogic
         public CMSNode(IRecordsReader reader)
         {
             _id = reader.GetInt("id");
-            PopulateNodeFromReader(reader);
+            PopulateCMSNodeFromReader(reader);
         } 
         #endregion
 
@@ -408,7 +408,7 @@ namespace umbraco.cms.businesslogic
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        public void delete()
+        public virtual void delete()
         {
             DeleteEventArgs e = new DeleteEventArgs();
             FireBeforeDelete(e);
@@ -764,37 +764,18 @@ order by level,sortOrder";
         /// </summary>
         protected virtual void setupNode()
         {
-            IRecordsReader dr = SqlHelper.ExecuteReader(
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(
                 "SELECT createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE id = " + this.Id
-                );
-
-            bool noRecord = false;
-
-            if (dr.Read())
+                ))
             {
-                // testing purposes only > original umbraco data hasn't any unique values ;)
-                // And we need to have a parent in order to create a new node ..
-                // Should automatically add an unique value if no exists (or throw a decent exception)
-                if (dr.IsNull("uniqueID")) _uniqueID = Guid.NewGuid();
-                else _uniqueID = dr.GetGuid("uniqueID");
-
-                _nodeObjectType = dr.GetGuid("nodeObjectType");
-                _level = dr.GetShort("level");
-                _path = dr.GetString("path");
-                _parentid = dr.GetInt("parentId");
-                _text = dr.GetString("text");
-                _sortOrder = dr.GetInt("sortOrder");
-                _userId = dr.GetInt("nodeUser");
-                _createDate = dr.GetDateTime("createDate");
-            }
-            else
-                noRecord = true;
-
-            dr.Close();
-
-            if (noRecord)
-            {
-                throw new ArgumentException(string.Format("No node exists with id '{0}'", Id));
+                if (dr.Read())
+                {
+                    PopulateCMSNodeFromReader(dr);
+                }
+                else
+                {
+                    throw new ArgumentException(string.Format("No node exists with id '{0}'", Id));
+                }
             }
         }
 
@@ -865,11 +846,11 @@ order by level,sortOrder";
                                       SqlHelper.CreateParameter("@xml", x.OuterXml));
         }
 
-        #endregion
-
-        #region Private Methods
-        private void PopulateNodeFromReader(IRecordsReader dr)
+        protected void PopulateCMSNodeFromReader(IRecordsReader dr)
         {
+            // testing purposes only > original umbraco data hasn't any unique values ;)
+            // And we need to have a parent in order to create a new node ..
+            // Should automatically add an unique value if no exists (or throw a decent exception)
             if (dr.IsNull("uniqueID")) _uniqueID = Guid.NewGuid();
             else _uniqueID = dr.GetGuid("uniqueID");
 
@@ -882,6 +863,10 @@ order by level,sortOrder";
             _userId = dr.GetInt("nodeUser");
             _createDate = dr.GetDateTime("createDate");
         }
+
+        #endregion
+
+        #region Private Methods
 
         private void XmlPopulate(XmlDocument xd, XmlNode x, bool Deep)
         {

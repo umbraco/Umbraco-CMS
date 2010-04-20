@@ -4,6 +4,8 @@ using System.Web.UI.WebControls;
 using System.Collections;
 using System.IO;
 using umbraco.IO;
+using System.Linq;
+
 namespace umbraco.controls
 {
 	/// <summary>
@@ -261,7 +263,7 @@ namespace umbraco.controls
 		private void LoadExistingTabsOnTabsPane()  
 		{
 			uicontrols.Pane TabsPane = new uicontrols.Pane();
-			foreach (cms.businesslogic.ContentType.TabI t in docType.getVirtualTabs)
+            foreach (cms.businesslogic.ContentType.TabI t in docType.getVirtualTabs.ToList())
 			{
 				Button tb = new Button();
 				tb.Text = "Slet";
@@ -294,7 +296,7 @@ namespace umbraco.controls
 				if(ddl.SelectedIndex >= 0) selVal = ddl.SelectedValue;
 
 				ddl.Items.Clear();
-				foreach (cms.businesslogic.web.DocumentType.TabI t in docType.getVirtualTabs) 
+                foreach (cms.businesslogic.web.DocumentType.TabI t in docType.getVirtualTabs.ToList()) 
 				{
 					ListItem li = new ListItem();
 					li.Text  = t.Caption;
@@ -379,8 +381,8 @@ namespace umbraco.controls
 				// Add create new PropertyType eventhandler
 				btn.Click += new System.EventHandler(this.AddPropertyType);
 
-				
-				foreach (cms.businesslogic.ContentType.TabI t in dt.getVirtualTabs) 
+
+                foreach (cms.businesslogic.ContentType.TabI t in dt.getVirtualTabs.ToList()) 
 				{
 					ListItem li = new ListItem();
 					li.Value = t.Id.ToString();
@@ -504,7 +506,7 @@ namespace umbraco.controls
 					
 					ent.tabDDLs.Add(TabDDL);
 
-					foreach (cms.businesslogic.ContentType.TabI t in ent.docType.getVirtualTabs) 
+                    foreach (cms.businesslogic.ContentType.TabI t in ent.docType.getVirtualTabs.ToList()) 
 						TabDDL.Items.Add(new ListItem(t.Caption,t.Id.ToString()));
 					TabDDL.Items.Add(new ListItem("Egenskaber","0"));
 					if (!Parent.Page.IsPostBack) 

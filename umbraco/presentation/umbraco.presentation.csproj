@@ -471,6 +471,7 @@
     <Compile Include="umbraco\controls\ProgressBar.ascx.designer.cs">
       <DependentUpon>ProgressBar.ascx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\controls\SaveClickEventArgs.cs" />
     <Compile Include="umbraco\controls\Tree\JTreeContextMenu.cs" />
     <Compile Include="umbraco\controls\Tree\JTreeContextMenuItem.cs" />
     <Compile Include="umbraco\controls\Tree\TreeControl.ascx.cs">

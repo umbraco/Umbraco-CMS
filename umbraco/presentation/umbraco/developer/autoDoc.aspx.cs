@@ -8,6 +8,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using System.Linq;
 
 namespace umbraco.developer
 {
@@ -31,12 +32,12 @@ namespace umbraco.developer
 						"<p class=\"type\">" + pt.Id.ToString() + ", " + pt.Alias + ", " + pt.Name + "</p>";
 				if (dt.getVirtualTabs.Length > 0)
 					LabelDoc.Text += "<p class=\"docHeader\">Tabs:</p>";
-				foreach (cms.businesslogic.ContentType.TabI t in dt.getVirtualTabs)
+                foreach (cms.businesslogic.ContentType.TabI t in dt.getVirtualTabs.ToList())
 					LabelDoc.Text +=
 						"<p class=\"type\">" + t.Id.ToString() + ", " + t.Caption + "</p>";
 				if (dt.AllowedChildContentTypeIDs.Length > 0)
 					LabelDoc.Text += "<p class=\"docHeader\">Allowed children:</p>";
-				foreach (int child in dt.AllowedChildContentTypeIDs) 
+				foreach (int child in dt.AllowedChildContentTypeIDs.ToList()) 
 				{
 					cms.businesslogic.ContentType _child = new cms.businesslogic.ContentType(child);
 					LabelDoc.Text +=

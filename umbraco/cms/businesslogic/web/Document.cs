@@ -28,6 +28,117 @@ namespace umbraco.cms.businesslogic.web
     /// </summary>
     public class Document : Content
     {
+        #region Constructors
+        /// <summary>
+        /// Constructs a new document
+        /// </summary>
+        /// <param name="id">Id of the document</param>
+        /// <param name="noSetup">true if the data shouldn't loaded from the db</param>
+        public Document(Guid id, bool noSetup) : base(id) { }
+
+        /// <summary>
+        /// Initializes a new instance of the Document class.
+        /// You can set an optional flag noSetup, used for optimizing for loading nodes in the tree, 
+        /// therefor only data needed by the tree is initialized.
+        /// </summary>
+        /// <param name="id">Id of the document</param>
+        /// <param name="noSetup">true if the data shouldn't loaded from the db</param>
+        public Document(int id, bool noSetup) : base(id, noSetup) { }
+
+        /// <summary>
+        /// Initializes a new instance of the Document class to a specific version, used for rolling back data from a previous version
+        /// of the document.
+        /// </summary>
+        /// <param name="id">The id of the document</param>
+        /// <param name="Version">The version of the document</param>
+        public Document(int id, Guid Version)
+            : base(id)
+        {
+            this.Version = Version;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the Document class.
+        /// </summary>
+        /// <param name="id">The id of the document</param>
+        public Document(int id) : base(id) { }
+
+        /// <summary>
+        /// Initialize the document
+        /// </summary>
+        /// <param name="id">The id of the document</param>
+        public Document(Guid id) : base(id) { }
+
+        //TODO: SD: Implement this EVERYWHERE (90 places apparently)
+        public Document(bool optimizedMode, int id)
+            : base(id, optimizedMode)
+        {
+            this._optimizedMode = optimizedMode;
+
+            if (optimizedMode)
+            {
+
+                using (IRecordsReader dr =
+                        SqlHelper.ExecuteReader(string.Format(m_SQLOptimizedSingle, "umbracoNode.id = @id", "cmsContentVersion.id desc"),
+                    SqlHelper.CreateParameter("@id", id)))
+                {
+                    if (dr.Read())
+                    {
+                        // Initialize node and basic document properties
+                        bool _hc = false;
+                        if (dr.GetInt("children") > 0)
+                            _hc = true;
+                        int? masterContentType = null;
+                        if (!dr.IsNull("masterContentType"))
+                            masterContentType = dr.GetInt("masterContentType");
+                        SetupDocumentForTree(dr.GetGuid("uniqueId")
+                            , dr.GetShort("level")
+                            , dr.GetInt("parentId")
+                            , dr.GetInt("documentUser")
+                            , dr.GetBoolean("published")
+                            , dr.GetString("path")
+                            , dr.GetString("text")
+                            , dr.GetDateTime("createDate")
+                            , dr.GetDateTime("updateDate")
+                            , dr.GetDateTime("versionDate")
+                            , dr.GetString("icon")
+                            , _hc
+                            , dr.GetString("alias")
+                            , dr.GetString("thumbnail")
+                            , dr.GetString("description")
+                            , masterContentType
+                            , dr.GetInt("contentTypeId")
+                            , dr.GetInt("templateId")
+                            );
+
+                        // initialize content object
+                        InitializeContent(dr.GetInt("ContentType"), dr.GetGuid("versionId"),
+                                          dr.GetDateTime("versionDate"), dr.GetString("icon"));
+
+                        // initialize final document properties
+                        DateTime tmpReleaseDate = new DateTime();
+                        DateTime tmpExpireDate = new DateTime();
+                        if (!dr.IsNull("releaseDate"))
+                            tmpReleaseDate = dr.GetDateTime("releaseDate");
+                        if (!dr.IsNull("expireDate"))
+                            tmpExpireDate = dr.GetDateTime("expireDate");
+
+                        InitializeDocument(
+                            new User(dr.GetInt("nodeUser"), true),
+                            new User(dr.GetInt("documentUser"), true),
+                            dr.GetString("documentText"),
+                            dr.GetInt("templateId"),
+                            tmpReleaseDate,
+                            tmpExpireDate,
+                            dr.GetDateTime("updateDate"),
+                            dr.GetBoolean("published")
+                            );
+                    }
+                }
+            }
+        }
+        #endregion
+
         #region Constants
         private const string m_SQLOptimizedSingle = @"
                 Select 
@@ -446,127 +557,6 @@ namespace umbraco.cms.businesslogic.web
                 SqlHelper.ExecuteNonQuery(string.Format("update cmsDocument set published = 0 where nodeId = {0}", Id));
                 FireAfterUnPublish(e);
             }
-        }
-
-        /// <summary>
-        /// Constructs a new document
-        /// </summary>
-        /// <param name="id">Id of the document</param>
-        /// <param name="noSetup">true if the data shouldn't loaded from the db</param>
-        public Document(Guid id, bool noSetup)
-            : base(id)
-        {
-
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the Document class.
-        /// You can set an optional flag noSetup, used for optimizing for loading nodes in the tree, 
-        /// therefor only data needed by the tree is initialized.
-        /// </summary>
-        /// <param name="id">Id of the document</param>
-        /// <param name="noSetup">true if the data shouldn't loaded from the db</param>
-        public Document(int id, bool noSetup)
-            : base(id, noSetup)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the Document class to a specific version, used for rolling back data from a previous version
-        /// of the document.
-        /// </summary>
-        /// <param name="id">The id of the document</param>
-        /// <param name="Version">The version of the document</param>
-        public Document(int id, Guid Version)
-            : base(id)
-        {
-            this.Version = Version;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the Document class.
-        /// </summary>
-        /// <param name="id">The id of the document</param>
-        public Document(int id) : base(id) { }
-
-        /// <summary>
-        /// Initialize the document
-        /// </summary>
-        /// <param name="id">The id of the document</param>
-        public Document(Guid id) : base(id) { }
-
-        //TODO: SD: Implement this EVERYWHERE (90 places apparently)
-        public Document(bool optimizedMode, int id)
-            : base(id, optimizedMode)
-        {
-            this._optimizedMode = optimizedMode;
-
-            if (optimizedMode)
-            {
-
-                using (IRecordsReader dr =
-                        SqlHelper.ExecuteReader(string.Format(m_SQLOptimizedSingle, "umbracoNode.id = @id", "cmsContentVersion.id desc"),
-                    SqlHelper.CreateParameter("@id", id)))
-                {
-                    if (dr.Read())
-                    {
-                        // Initialize node and basic document properties
-                        bool _hc = false;
-                        if (dr.GetInt("children") > 0)
-                            _hc = true;
-                        int? masterContentType = null;
-                        if (!dr.IsNull("masterContentType"))
-                            masterContentType = dr.GetInt("masterContentType");
-                        SetupDocumentForTree(dr.GetGuid("uniqueId")
-                            , dr.GetShort("level")
-                            , dr.GetInt("parentId")
-                            , dr.GetInt("documentUser")
-                            , dr.GetBoolean("published")
-                            , dr.GetString("path")
-                            , dr.GetString("text")
-                            , dr.GetDateTime("createDate")
-                            , dr.GetDateTime("updateDate")
-                            , dr.GetDateTime("versionDate")
-                            , dr.GetString("icon")
-                            , _hc
-                            , dr.GetString("alias")
-                            , dr.GetString("thumbnail")
-                            , dr.GetString("description")
-                            , masterContentType
-                            , dr.GetInt("contentTypeId")
-                            , dr.GetInt("templateId")
-                            );
-
-                        // initialize content object
-                        InitializeContent(dr.GetInt("ContentType"), dr.GetGuid("versionId"),
-                                          dr.GetDateTime("versionDate"), dr.GetString("icon"));
-
-                        // initialize final document properties
-                        DateTime tmpReleaseDate = new DateTime();
-                        DateTime tmpExpireDate = new DateTime();
-                        if (!dr.IsNull("releaseDate"))
-                            tmpReleaseDate = dr.GetDateTime("releaseDate");
-                        if (!dr.IsNull("expireDate"))
-                            tmpExpireDate = dr.GetDateTime("expireDate");
-
-                        InitializeDocument(
-                            new User(dr.GetInt("nodeUser"), true),
-                            new User(dr.GetInt("documentUser"), true),
-                            dr.GetString("documentText"),
-                            dr.GetInt("templateId"),
-                            tmpReleaseDate,
-                            tmpExpireDate,
-                            dr.GetDateTime("updateDate"),
-                            dr.GetBoolean("published")
-                            );
-                    }
-                }
-            }
-        }
-
-        public Document()
-        {
-
         }
 
         /// <summary>

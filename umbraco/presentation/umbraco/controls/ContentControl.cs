@@ -82,7 +82,7 @@ namespace umbraco.controls
 			Save += new EventHandler(standardSaveAndPublishHandler);
 			prntpage = (UmbracoEnsuredPage)Page;
 
-            foreach (ContentType.TabI t in _content.ContentType.getVirtualTabs)
+            foreach (ContentType.TabI t in _content.ContentType.getVirtualTabs.ToList())
             {
                 TabPage tp = NewTabPage(t.Caption);
                 addSaveAndPublishButtons(ref tp);
@@ -100,7 +100,7 @@ namespace umbraco.controls
 			Save += new EventHandler(standardSaveAndPublishHandler);
 			prntpage = (UmbracoEnsuredPage)Page;
             int i = 0;
-			foreach (ContentType.TabI t in _content.ContentType.getVirtualTabs)
+            foreach (ContentType.TabI t in _content.ContentType.getVirtualTabs.ToList())
 			{
                 var tp = this.Panels[i] as TabPage;
                 if (tp == null)

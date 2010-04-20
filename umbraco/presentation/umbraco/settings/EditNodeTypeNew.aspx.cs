@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
+using umbraco.cms.businesslogic.web;
 
 namespace umbraco.settings
 {
@@ -20,9 +21,15 @@ namespace umbraco.settings
 
 		private DataTable dtTemplates = new DataTable();
 
+        override protected void OnInit(EventArgs e)
+        {
+            ContentTypeControlNew1.InfoTabPage.Controls.Add(tmpPane);
+            base.OnInit(e);
+        }
+
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-			dt = new cms.businesslogic.web.DocumentType(int.Parse(Request.QueryString["id"]));
+			dt = new DocumentType(int.Parse(Request.QueryString["id"]));
 			if (!Page.IsPostBack)
 			{
 				bindTemplates();
@@ -142,27 +149,6 @@ namespace umbraco.settings
 			}
 		}
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			ContentTypeControlNew1.InfoTabPage.Controls.Add(tmpPane);
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-
-
 		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
-
-		}
-		#endregion
 	}
 }

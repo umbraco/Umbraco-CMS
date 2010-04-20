@@ -8,7 +8,7 @@ using System.Xml;
 using System.Xml.XPath;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-
+using System.Linq;
 using ICSharpCode.SharpZipLib;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Zip.Compression;
@@ -671,7 +671,7 @@ namespace umbraco.cms.businesslogic.packager
 
             // Get all tabs in hashtable
             Hashtable tabList = new Hashtable();
-            foreach (cms.businesslogic.ContentType.TabI t in dt.getVirtualTabs)
+            foreach (cms.businesslogic.ContentType.TabI t in dt.getVirtualTabs.ToList())
             {
                 if (!tabList.ContainsKey(t.Caption))
                     tabList.Add(t.Caption, t.Id);
@@ -758,7 +758,7 @@ namespace umbraco.cms.businesslogic.packager
             }
 
             // clear caching
-            foreach(DocumentType.TabI t in dt.getVirtualTabs)
+            foreach (DocumentType.TabI t in dt.getVirtualTabs.ToList())
                 DocumentType.FlushTabCache(t.Id, dt.Id);
 
         }

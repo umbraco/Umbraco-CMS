@@ -5,7 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Web;
 using System.Web.Services;
-
+using System.Linq;
 using System.Xml;
 
 namespace umbraco.webservices
@@ -28,7 +28,7 @@ namespace umbraco.webservices
 			{
 				XmlDocument xmlDoc = new XmlDocument();
 				XmlElement tabs = xmlDoc.CreateElement("tabs");
-				foreach (cms.businesslogic.ContentType.TabI t in new cms.businesslogic.ContentType(ContentTypeId).getVirtualTabs) 
+                foreach (cms.businesslogic.ContentType.TabI t in new cms.businesslogic.ContentType(ContentTypeId).getVirtualTabs.ToList()) 
 				{
 					XmlElement mXml = xmlDoc.CreateElement("tab");
 					mXml.Attributes.Append(xmlHelper.addAttribute(xmlDoc, "id", t.Id.ToString()));

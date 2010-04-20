@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using System.Linq;
 using umbraco.IO;
 
 namespace umbraco.cms.businesslogic.packager.standardPackageActions {
@@ -239,7 +240,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions {
                 bool containsId = false;
                 ArrayList tmp = new ArrayList();
 
-                foreach (int i in parentct.AllowedChildContentTypeIDs) {
+                foreach (int i in parentct.AllowedChildContentTypeIDs.ToList()) {
                     tmp.Add(i);
                     if (i == ct.Id)
                         containsId = true;
