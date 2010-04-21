@@ -805,7 +805,6 @@ order by level,sortOrder";
             HasChildren = hasChildren;
         }
 
-
         /// <summary>
         /// Updates the temp path for the content tree.
         /// </summary>

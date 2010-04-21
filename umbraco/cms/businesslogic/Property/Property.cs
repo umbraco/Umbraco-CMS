@@ -108,9 +108,4 @@ namespace umbraco.cms.businesslogic.property
 		}
 	}
 
-    public class Properties : List<property.Property>
-    {
-
-    }
-
 }

@@ -223,8 +223,8 @@ namespace umbraco.cms.businesslogic.web
         // special for tree performance
         private int _userId = -1;
 
-        private Dictionary<Property, object> _knownProperties = new Dictionary<Property, object>();
-        private Func<KeyValuePair<Property, object>, string, bool> propertyTypeByAlias = (pt, alias) => pt.Key.PropertyType.Alias == alias; 
+        //private Dictionary<Property, object> _knownProperties = new Dictionary<Property, object>();
+        //private Func<KeyValuePair<Property, object>, string, bool> propertyTypeByAlias = (pt, alias) => pt.Key.PropertyType.Alias == alias; 
         #endregion
         
         /// <summary>
@@ -232,41 +232,41 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="alias"></param>
         /// <returns></returns>
-        public object this[string alias]
-        {
-            get
-            {
-                if (this._optimizedMode)
-                {
-                    return this._knownProperties.Single(p => propertyTypeByAlias(p, alias)).Value;
-                }
-                else
-                {
-                    return this.getProperty(alias).Value;
-                }
-            }
-            set
-            {
-                if (this._optimizedMode)
-                {
-                    if (this._knownProperties.SingleOrDefault(p => propertyTypeByAlias(p, alias)).Key == null)
-                    {
-                        var pt = this.getProperty(alias);
+        //public object this[string alias]
+        //{
+        //    get
+        //    {
+        //        if (this._optimizedMode)
+        //        {
+        //            return this._knownProperties.Single(p => propertyTypeByAlias(p, alias)).Value;
+        //        }
+        //        else
+        //        {
+        //            return this.getProperty(alias).Value;
+        //        }
+        //    }
+        //    set
+        //    {
+        //        if (this._optimizedMode)
+        //        {
+        //            if (this._knownProperties.SingleOrDefault(p => propertyTypeByAlias(p, alias)).Key == null)
+        //            {
+        //                var pt = this.getProperty(alias);
 
-                        this._knownProperties.Add(pt, pt.Value);
-                    }
-                    else
-                    {
-                        var pt = this._knownProperties.Single(p => propertyTypeByAlias(p, alias)).Key;
-                        this._knownProperties[pt] = value;
-                    }
-                }
-                else
-                {
-                    this.getProperty(alias).Value = value;
-                }
-            }
-        }
+        //                this._knownProperties.Add(pt, pt.Value);
+        //            }
+        //            else
+        //            {
+        //                var pt = this._knownProperties.Single(p => propertyTypeByAlias(p, alias)).Key;
+        //                this._knownProperties[pt] = value;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            this.getProperty(alias).Value = value;
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Gets a value indicating whether the document was constructed for the optimized mode
@@ -570,14 +570,14 @@ namespace umbraco.cms.businesslogic.web
             if (!e.Cancel)
             {
 
-                if (this._optimizedMode)
-                {
-                    foreach (var property in this._knownProperties)
-                    {
-                        var pt = property.Key;
-                        pt.Value = property.Value;
-                    }
-                }
+                //if (this._optimizedMode)
+                //{
+                //    foreach (var property in this._knownProperties)
+                //    {
+                //        var pt = property.Key;
+                //        pt.Value = property.Value;
+                //    }
+                //}
 
                 base.Save();
                 // update preview xml

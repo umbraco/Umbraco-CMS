@@ -172,11 +172,13 @@
     <Compile Include="Actions\IActionHandler.cs" />
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
     <Compile Include="businesslogic\datatype\ClientDependencyAttribute.cs" />
+    <Compile Include="businesslogic\ISaveHandlerContents.cs" />
     <Compile Include="businesslogic\Packager\FileResources\PackageFiles.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>PackageFiles.resx</DependentUpon>
     </Compile>
+    <Compile Include="businesslogic\Property\Properties.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
     <Compile Include="helpers\Casing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

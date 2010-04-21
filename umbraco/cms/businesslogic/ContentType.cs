@@ -85,11 +85,13 @@ namespace umbraco.cms.businesslogic
 
         #endregion
 
+        #region Constants
         private const string m_SQLOptimizedGetAll = @"
             SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text,
                 masterContentType,Alias,icon,thumbnail,description 
             FROM umbracoNode INNER JOIN cmsContentType ON umbracoNode.id = cmsContentType.nodeId
-            WHERE nodeObjectType = @nodeObjectType";
+            WHERE nodeObjectType = @nodeObjectType"; 
+        #endregion
 
         #region Static Methods
 
@@ -181,7 +183,7 @@ namespace umbraco.cms.businesslogic
 
         #region Private Members
 
-        private bool _optimizedMode = false;
+        //private bool _optimizedMode = false;
         private string _alias;
         private string _iconurl;
         private string _description;
@@ -195,9 +197,6 @@ namespace umbraco.cms.businesslogic
 
         #endregion
         
-        //private static Hashtable _analyzedContentTypes = new Hashtable();
-        //private static Hashtable _optimizedContentTypes = new Hashtable();
-
         #region Public Properties
 
         /// <summary>
@@ -238,15 +237,15 @@ namespace umbraco.cms.businesslogic
             }
         }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether [optimized mode].
-        /// </summary>
-        /// <value><c>true</c> if [optimized mode]; otherwise, <c>false</c>.</value>
-        public bool OptimizedMode
-        {
-            get { return _optimizedMode; }
-            set { _optimizedMode = value; }
-        }
+        ///// <summary>
+        ///// Gets or sets a value indicating whether [optimized mode].
+        ///// </summary>
+        ///// <value><c>true</c> if [optimized mode]; otherwise, <c>false</c>.</value>
+        //public bool OptimizedMode
+        //{
+        //    get { return _optimizedMode; }
+        //    set { _optimizedMode = value; }
+        //}
 
         /// <summary>
         /// Human readable name/label
@@ -394,35 +393,7 @@ namespace umbraco.cms.businesslogic
         {
             get
             {
-                //optimize, lazy load the data only one time
-                if (m_VirtualTabs == null)
-                {
-                    m_VirtualTabs = new List<TabI>();
-                    using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                                                      string.Format(
-                                                                          "Select Id,text,sortOrder from cmsTab where contenttypeNodeId = {0} order by sortOrder",
-                                                                          Id)))
-                    {
-                        while (dr.Read())
-                        {
-                            m_VirtualTabs.Add(new Tab(dr.GetInt("id"), dr.GetString("text"), dr.GetInt("sortOrder"), this));
-                        }
-                    }
-
-                    // Master Content Type
-                    if (MasterContentType != 0)
-                    {
-                        foreach (TabI t in ContentType.GetContentType(MasterContentType).getVirtualTabs.ToList())
-                        {
-                            m_VirtualTabs.Add(t);
-                        }
-                    }
-
-                    // sort all tabs
-                    m_VirtualTabs.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
-                }
-
-
+                EnsureVirtualTabs();
                 return m_VirtualTabs.ToArray();
             }
         }
@@ -750,16 +721,71 @@ namespace umbraco.cms.businesslogic
 
             if (HttpRuntime.Cache[string.Format("ContentType_PropertyTypes_Content:{0}", Id.ToString())] != null)
                 HttpRuntime.Cache.Remove(string.Format("ContentType_PropertyTypes_Content:{0}", Id.ToString()));
+
+            ClearVirtualTabs();
         }
 
         protected void FlushAllFromCache()
         {
             cache.Cache.ClearCacheByKeySearch("UmbracoContentType");
             cache.Cache.ClearCacheByKeySearch("ContentType_PropertyTypes_Content");
+
+            ClearVirtualTabs();
         } 
+
         #endregion
 
         #region Private Methods
+
+        /// <summary>
+        /// Clears the locally loaded tabs which forces them to be reloaded next time they requested
+        /// </summary>
+        private void ClearVirtualTabs()
+        {
+            m_VirtualTabs = null;
+        }
+
+        /// <summary>
+        /// Checks if we've loaded the virtual tabs into memory and if not gets them from the databse.
+        /// </summary>
+        private void EnsureVirtualTabs()
+        {
+            //optimize, lazy load the data only one time
+            if (m_VirtualTabs == null)
+            {
+                InitializeVirtualTabs();
+            }
+        }
+
+        /// <summary>
+        /// Loads the tabs into memory from the database and stores them in a local list for retreival
+        /// </summary>
+        private void InitializeVirtualTabs()
+        {
+            m_VirtualTabs = new List<TabI>();
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(
+                                                              string.Format(
+                                                                  "Select Id,text,sortOrder from cmsTab where contenttypeNodeId = {0} order by sortOrder",
+                                                                  Id)))
+            {
+                while (dr.Read())
+                {
+                    m_VirtualTabs.Add(new Tab(dr.GetInt("id"), dr.GetString("text"), dr.GetInt("sortOrder"), this));
+                }
+            }
+
+            // Master Content Type
+            if (MasterContentType != 0)
+            {
+                foreach (TabI t in ContentType.GetContentType(MasterContentType).getVirtualTabs.ToList())
+                {
+                    m_VirtualTabs.Add(t);
+                }
+            }
+
+            // sort all tabs
+            m_VirtualTabs.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+        }
 
         private void PopulateContentTypeNodeFromReader(IRecordsReader dr)
         {
