@@ -57,33 +57,40 @@ namespace umbraco.cms.presentation
                 _section = getUser().Applications[0].alias;
 
             XmlDocument dashBoardXml = new XmlDocument();
-            dashBoardXml.Load( IOHelper.MapPath(SystemFiles.DashboardConfig) );
+            dashBoardXml.Load(IOHelper.MapPath(SystemFiles.DashboardConfig));
 
             // test for new tab interface
             XmlNode section = dashBoardXml.DocumentElement.SelectSingleNode("./section [areas/area = '" + _section.ToLower() + "']");
-            if (section != null)
+            if (section != null && validateAccess(section))
             {
                 Panel2.Visible = false;
                 dashboardTabs.Visible = true;
-            
+
                 foreach (XmlNode entry in section.SelectNodes("./tab"))
                 {
-                    TabPage tab = dashboardTabs.NewTabPage(entry.Attributes.GetNamedItem("caption").Value);
-                    tab.HasMenu = true;
-                    tab.Style.Add("padding", "0 10px");
-
-                    foreach (XmlNode uc in entry.SelectNodes("./control"))
+                    if (validateAccess(entry))
                     {
-                        string path = IOHelper.FindFile(uc.FirstChild.Value);
-                        
-                        try
+                        TabPage tab = dashboardTabs.NewTabPage(entry.Attributes.GetNamedItem("caption").Value);
+                        tab.HasMenu = true;
+                        tab.Style.Add("padding", "0 10px");
+
+                        foreach (XmlNode uc in entry.SelectNodes("./control"))
                         {
-                            //resolving files from dashboard config which probably does not map to a virtual fi
-                            tab.Controls.Add( LoadControl(path) );
-                        }
-                        catch (Exception ee)
-                        {
-                            tab.Controls.Add(new LiteralControl("<p class=\"umbracoErrorMessage\">Could not load control: '" + path + "'. <br/><span class=\"guiDialogTiny\"><strong>Error message:</strong> " + ee.ToString() + "</span></p>"));
+                            if (validateAccess(uc))
+                            {
+                                string control = getFirstText(uc).Trim(' ', '\r', '\n');
+                                string path = IOHelper.FindFile(control);
+
+                                try
+                                {
+                                    //resolving files from dashboard config which probably does not map to a virtual fi
+                                    tab.Controls.Add(LoadControl(path));
+                                }
+                                catch (Exception ee)
+                                {
+                                    tab.Controls.Add(new LiteralControl("<p class=\"umbracoErrorMessage\">Could not load control: '" + path + "'. <br/><span class=\"guiDialogTiny\"><strong>Error message:</strong> " + ee.ToString() + "</span></p>"));
+                                }
+                            }
                         }
                     }
                 }
@@ -91,7 +98,7 @@ namespace umbraco.cms.presentation
             }
             else
             {
-                
+
 
                 foreach (XmlNode entry in dashBoardXml.SelectNodes("//entry [@section='" + _section.ToLower() + "']"))
                 {
@@ -121,6 +128,52 @@ namespace umbraco.cms.presentation
                     dashBoardContent.Controls.Add(placeHolder);
                 }
             }
+        }
+
+        private string getFirstText(XmlNode node)
+        {
+            foreach (XmlNode n in node.ChildNodes)
+            {
+                if (n.NodeType == XmlNodeType.Text)
+                    return n.Value;
+            }
+
+            return "";
+        }
+
+        private bool validateAccess(XmlNode node)
+        {
+            // the root user can always see everything
+            if (CurrentUser.IsRoot())
+            {
+                return true;
+            }
+            else if (node != null)
+            {
+                XmlNode accessRules = node.SelectSingleNode("access");
+
+                if (accessRules != null && accessRules.HasChildNodes)
+                {
+                    string currentUserType = CurrentUser.UserType.Alias.ToLower();
+                    XmlNodeList grantedTypes = accessRules.SelectNodes("grant");
+                    XmlNodeList deniedTypes = accessRules.SelectNodes("deny");
+
+                    // if there's a grant type, everyone who's not granted is automatically denied
+                    if (grantedTypes.Count > 0 && accessRules.SelectSingleNode(String.Format("grant [. = '{0}']", currentUserType)) == null)
+                    {
+                        return false;
+                    }
+                    // if the current type of user is denied we'll say nay
+                    else if (deniedTypes.Count > 0 && accessRules.SelectSingleNode(String.Format("deny [. = '{0}']", currentUserType)) != null)
+                    {
+                        return false;
+                    }
+
+                }
+
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
