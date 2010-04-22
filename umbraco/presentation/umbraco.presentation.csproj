@@ -524,6 +524,13 @@
     <Compile Include="umbraco\endPreview.aspx.designer.cs">
       <DependentUpon>endPreview.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\js\UmbracoCasingRules.aspx.cs">
+      <DependentUpon>UmbracoCasingRules.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\js\UmbracoCasingRules.aspx.designer.cs">
+      <DependentUpon>UmbracoCasingRules.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\LiveEditing\CanvasClientDependencyProvider.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1481,6 +1488,7 @@
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
     <Content Include="umbraco\endPreview.aspx" />
+    <Content Include="umbraco\js\UmbracoCasingRules.aspx" />
     <Content Include="umbraco_client\Application\HistoryManager.js" />
     <Content Include="umbraco_client\Application\JQuery\jquery.ba-bbq.min.js" />
     <Content Include="umbraco_client\Preview\previewModeBadge.png" />

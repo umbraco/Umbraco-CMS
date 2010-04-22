@@ -75,3 +75,9 @@
 .genericPropertyList li h3 input {
   position: relative;
 }
+
+.aliasValidationError 
+{
+    background-color: #ff9999;
+    border: 1px solid: red;
+}

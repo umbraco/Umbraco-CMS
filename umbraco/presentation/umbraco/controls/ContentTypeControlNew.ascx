@@ -91,3 +91,7 @@
       </div>
     </cc2:Pane>
 </asp:Panel>
+
+<script type="text/javascript">
+    duplicatePropertyNameAsSafeAlias('ctl00_body_ContentTypeControlNew1_GenericPropertyNew_control_tbName', 'ctl00_body_ContentTypeControlNew1_GenericPropertyNew_control_tbAlias');
+</script>

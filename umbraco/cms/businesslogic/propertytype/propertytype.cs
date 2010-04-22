@@ -177,7 +177,7 @@ namespace umbraco.cms.businesslogic.propertytype
 				_alias = value;
 				this.InvalidateCache();
                 SqlHelper.ExecuteNonQuery("Update cmsPropertyType set alias = @alias where id= @id", 
-                    SqlHelper.CreateParameter("@alias", _alias),
+                    SqlHelper.CreateParameter("@alias", helpers.Casing.SafeAliasWithForcingCheck(_alias)),
                     SqlHelper.CreateParameter("@id", Id));
 			}
 		}
@@ -240,7 +240,7 @@ namespace umbraco.cms.businesslogic.propertytype
                 SqlHelper.ExecuteNonQuery("INSERT INTO cmsPropertyType (DataTypeId, ContentTypeId, alias, name) VALUES (@DataTypeId, @ContentTypeId, @alias, @name)",
                     SqlHelper.CreateParameter("@DataTypeId", dt.Id),
                     SqlHelper.CreateParameter("@ContentTypeId", ct.Id),
-                    SqlHelper.CreateParameter("@alias", Alias),
+                    SqlHelper.CreateParameter("@alias", helpers.Casing.SafeAliasWithForcingCheck(Alias)),
                     SqlHelper.CreateParameter("@name", Name));
                 pt = new PropertyType(SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyType"));
 			}

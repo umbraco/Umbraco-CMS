@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using umbraco.IO;
 using umbraco.presentation;
+using umbraco.cms.helpers;
 
 namespace umbraco.controls
 {
@@ -103,6 +104,9 @@ namespace umbraco.controls
 
             SaveAllowedChildTypes();
             bindDataGenericProperties(true);
+
+            // we need to re-bind the alias as the SafeAlias method can have changed it
+            txtAlias.Text = cType.Alias;
 
             RaiseBubbleEvent(new object(), ea);
         }
@@ -519,18 +523,18 @@ namespace umbraco.controls
             GenericProperties.GenericProperty gpData = gp.GenricPropertyControl;
             if (gpData.Name.Trim() != "" && gpData.Alias.Trim() != "")
             {
-                if (cType.getPropertyType(gpData.Alias.Trim()) == null)
+                if (cType.getPropertyType(Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim())) == null)
                 {
                     string[] info = { gpData.Name, gpData.Type.ToString() };
-                    cType.AddPropertyType(cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(gpData.Type), gpData.Alias, gpData.Name);
-                    cms.businesslogic.propertytype.PropertyType pt = cType.getPropertyType(gpData.Alias);
+                    cType.AddPropertyType(cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(gpData.Type), Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim()), gpData.Name);
+                    cms.businesslogic.propertytype.PropertyType pt = cType.getPropertyType(Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim()));
                     pt.Mandatory = gpData.Mandatory;
                     pt.ValidationRegExp = gpData.Validation;
                     pt.Description = gpData.Description;
 
                     if (gpData.Tab != 0)
                     {
-                        cType.SetTabOnPropertyType(cType.getPropertyType(gpData.Alias), gpData.Tab);
+                        cType.SetTabOnPropertyType(pt, gpData.Tab);
                     }
 
                     gpData.Clear();

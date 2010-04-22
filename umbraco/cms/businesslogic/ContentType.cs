@@ -149,7 +149,7 @@ namespace umbraco.cms.businesslogic
         protected static void Create(int NodeId, string Alias, string IconUrl)
         {
             SqlHelper.ExecuteNonQuery(
-                                      "Insert into cmsContentType (nodeId,alias,icon) values (" + NodeId + ",'" + Alias +
+                                      "Insert into cmsContentType (nodeId,alias,icon) values (" + NodeId + ",'" + helpers.Casing.SafeAliasWithForcingCheck(Alias) +
                                       "','" + IconUrl + "')");
         }
 
@@ -337,10 +337,11 @@ namespace umbraco.cms.businesslogic
             get { return _alias; }
             set
             {
+                _alias = helpers.Casing.SafeAliasWithForcingCheck(value);
                 SqlHelper.ExecuteNonQuery(
-                                          "update cmsContentType set alias = '" + value + "' where nodeId = " +
-                                          Id.ToString());
-                _alias = value;
+                                          "update cmsContentType set alias = @alias where nodeId = @id",
+                                          SqlHelper.CreateParameter("@alias", _alias),
+                                          SqlHelper.CreateParameter("@id", Id));
 
                 // Remove from cache
                 FlushFromCache(Id);

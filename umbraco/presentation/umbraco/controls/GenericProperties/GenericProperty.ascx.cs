@@ -16,8 +16,9 @@ namespace umbraco.controls.GenericProperties
 	///		Summary description for GenericProperty.
 	/// </summary>
 	[ClientDependency(ClientDependencyType.Css, "GenericProperty/genericproperty.css", "UmbracoClient")]
-	[ClientDependency(ClientDependencyType.Javascript, "GenericProperty/genericproperty.js", "UmbracoClient")]
-	public partial class GenericProperty : System.Web.UI.UserControl
+    [ClientDependency(ClientDependencyType.Javascript, "GenericProperty/genericproperty.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Javascript, "js/UmbracoCasingRules.aspx", "UmbracoRoot")]
+    public partial class GenericProperty : System.Web.UI.UserControl
 	{
 
 		private cms.businesslogic.propertytype.PropertyType _pt;

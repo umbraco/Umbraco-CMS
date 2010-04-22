@@ -323,6 +323,32 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Whether to force safe aliases (no spaces, no special characters) at businesslogic level on contenttypes and propertytypes
+        /// </summary>
+        public static bool ForceSafeAliases
+        {
+            get
+            {
+                string forceSafeAlias = GetKey("/settings/content/ForceSafeAliases");
+                if (String.IsNullOrEmpty(forceSafeAlias))
+                    return true;
+                else
+                {
+                    try
+                    {
+                        return bool.Parse(forceSafeAlias);
+                    }
+                    catch
+                    {
+                        return true;
+                    }
+                }
+
+            }
+        }
+
+
+        /// <summary>
         /// Gets the allowed image file types.
         /// </summary>
         /// <value>The allowed image file types.</value>
