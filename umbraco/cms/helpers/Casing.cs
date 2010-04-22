@@ -7,7 +7,8 @@ namespace umbraco.cms.helpers
 {
     public class Casing
     {
-        public const string VALID_ALIAS_CHARACTERS = "_-abcdefghijklmnopqrstuvwxyz";
+        public const string VALID_ALIAS_CHARACTERS = "_-abcdefghijklmnopqrstuvwxyz1234567890";
+        public const string INVALID_FIRST_CHARACTERS = "01234567890";
 
         /// <summary>
         /// A helper method to ensure that an Alias string doesn't contains any illegal characters
@@ -26,10 +27,17 @@ namespace umbraco.cms.helpers
                 if (VALID_ALIAS_CHARACTERS.Contains(currentChar.ToLower()))
                 {
                     // check for camel (if previous character is a space, we'll upper case the current one
-                    if (i < aliasLength - 1 && i > 0 && alias.Substring(i - 1, 1) == " ")
-                        currentChar = currentChar.ToUpper();
+                    if (i == 0 && INVALID_FIRST_CHARACTERS.Contains(currentChar.ToLower()))
+                    {
+                        currentChar = "";
+                    }
+                    else
+                    {
+                        if (i < aliasLength - 1 && i > 0 && alias.Substring(i - 1, 1) == " ")
+                            currentChar = currentChar.ToUpper();
 
-                    safeString.Append(currentChar);
+                        safeString.Append(currentChar);
+                    }
                 }
             }
 

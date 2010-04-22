@@ -16,7 +16,8 @@ namespace umbraco.presentation.js
             Response.Write(String.Format(@"
 var UMBRACO_FORCE_SAFE_ALIAS = {0};
 var UMBRACO_FORCE_SAFE_ALIAS_VALIDCHARS = '{1}';
-", UmbracoSettings.ForceSafeAliases.ToString().ToLower(), Casing.VALID_ALIAS_CHARACTERS));
+var UMBRACO_FORCE_SAFE_ALIAS_INVALID_FIRST_CHARS = '{2}';
+", UmbracoSettings.ForceSafeAliases.ToString().ToLower(), Casing.VALID_ALIAS_CHARACTERS, Casing.INVALID_FIRST_CHARACTERS));
 
         }
 
