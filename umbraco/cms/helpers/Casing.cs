@@ -25,8 +25,8 @@ namespace umbraco.cms.helpers
                 string currentChar = alias.Substring(i, 1);
                 if (ValidCharacters.Contains(currentChar.ToLower()))
                 {
-                    // check for camel (if next character is a space, we'll upper case the current one
-                    if (i < aliasLength-1 && alias.Substring(i + 1, 1) == " ")
+                    // check for camel (if previous character is a space, we'll upper case the current one
+                    if (i < aliasLength - 1 && i > 0 && alias.Substring(i - 1, 1) == " ")
                         currentChar = currentChar.ToUpper();
 
                     safeString.Append(currentChar);
