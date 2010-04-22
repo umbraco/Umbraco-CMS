@@ -28,7 +28,7 @@ function checkAlias(theId) {
     jQuery('#' + theId).blur(function(event) {
         var currentAlias = jQuery('#' + theId).val();
         jQuery('#' + theId).val(safeAlias(currentAlias));
-        jQuery('#' + theId).toggleClass('aliasValidationError');
+        jQuery('#' + theId).removeClass('aliasValidationError');
     })
 
 }
