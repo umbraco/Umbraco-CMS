@@ -609,7 +609,12 @@ namespace umbraco.cms.businesslogic.web
                     _updated = dr.GetDateTime("updateDate");
             }
             dr.Close();
-            _published = (SqlHelper.ExecuteScalar<int>("select Count(published) as tmp from cmsDocument where published = 1 And nodeId =" + Id) > 0);
+            _published = HasPublishedVersion();
+        }
+
+        public bool HasPublishedVersion()
+        {
+             return (SqlHelper.ExecuteScalar<int>("select Count(published) as tmp from cmsDocument where published = 1 And nodeId =" + Id) > 0);
         }
 
         protected void InitializeDocument(User InitUser, User InitWriter, string InitText, int InitTemplate,

@@ -26,6 +26,7 @@ namespace umbraco.cms.presentation
         protected uicontrols.TabView TabView1;
         protected System.Web.UI.WebControls.TextBox documentName;
         private cms.businesslogic.web.Document _document;
+        private bool _documentHasPublishedVersion = false;
         protected System.Web.UI.WebControls.Literal jsIds;    
         private LiteralControl dp = new LiteralControl();
         private DateTimePicker dpRelease = new DateTimePicker();
@@ -66,6 +67,8 @@ namespace umbraco.cms.presentation
 
             //_document = new cms.businesslogic.web.Document(int.Parse(Request.QueryString["id"]));
             _document = new Document(true, id);
+            // we need to check if there's a published version of this document
+            _documentHasPublishedVersion = _document.HasPublishedVersion();
 
             // Check publishing permissions
             if (!base.getUser().GetPermissions(_document.Path).Contains(ActionPublish.Instance.Letter.ToString()))
@@ -88,7 +91,7 @@ namespace umbraco.cms.presentation
 
 
             System.Web.UI.WebControls.PlaceHolder publishStatus = new PlaceHolder();
-            if (_document.Published)
+            if (_documentHasPublishedVersion)
             {
                 littPublishStatus.Text = ui.Text("content", "lastPublished", base.getUser()) + ": " + _document.VersionDate.ToShortDateString() + " &nbsp; ";
 
@@ -324,7 +327,7 @@ namespace umbraco.cms.presentation
 
         private void updateLinks()
         {
-            if (_document.Published)
+            if (_documentHasPublishedVersion)
             {
                 l.Text = "<a href=\"" + library.NiceUrl(_document.Id) + "\" target=\"_blank\">" + library.NiceUrl(_document.Id) + "</a>";
 

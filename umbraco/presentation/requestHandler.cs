@@ -85,15 +85,14 @@ namespace umbraco {
         }
 
         public static string CreateXPathQuery(string url, bool checkDomain) {
-            string childContainerName = UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME;
 
             string _tempQuery = "";
             if (GlobalSettings.HideTopLevelNodeFromPath && checkDomain)
             {
-                _tempQuery = "/root/" + childContainerName + "/*";
+                _tempQuery = "/root" + getChildContainerName() + "/*";
             }
             else if (checkDomain)
-                _tempQuery = "/root/" + childContainerName;
+                _tempQuery = "/root" + getChildContainerName();
 
 
             string[] requestRawUrl = url.Split("/".ToCharArray());
@@ -131,8 +130,8 @@ namespace umbraco {
             {
                 HttpContext.Current.Trace.Write("umbracoRequestHandler", "xpath: '" + _tempQuery + "'");
                 if (_tempQuery == "")
-                    _tempQuery = "/root/" + childContainerName + "/*";
-                _tempQuery = "/root/" + childContainerName + "/* [" + _urlName +
+                    _tempQuery = "/root" + getChildContainerName() + "/*";
+                _tempQuery = "/root" + getChildContainerName() + "/* [" + _urlName +
                              " = \"" + requestRawUrl[0].Replace(".aspx", "").ToLower() + "\"] | " + _tempQuery;
                 HttpContext.Current.Trace.Write("umbracoRequestHandler", "xpath: '" + _tempQuery + "'");
                 rootAdded = true;
@@ -142,13 +141,13 @@ namespace umbraco {
             for (int i = 0; i <= requestRawUrl.GetUpperBound(0); i++)
             {
                 if (requestRawUrl[i] != "")
-                    _tempQuery += "/" + childContainerName + "/* [" + _urlName + " = \"" + requestRawUrl[i].Replace(".aspx", "").ToLower() +
+                    _tempQuery += getChildContainerName() + "/* [" + _urlName + " = \"" + requestRawUrl[i].Replace(".aspx", "").ToLower() +
                                   "\"]";
             }
 
             if (GlobalSettings.HideTopLevelNodeFromPath && requestRawUrl.Length == 2)
             {
-                _tempQuery += " | " + pageXPathQueryStart + "/" + childContainerName + "/* [" + _urlName + " = \"" +
+                _tempQuery += " | " + pageXPathQueryStart + getChildContainerName() + "/* [" + _urlName + " = \"" +
                               requestRawUrl[1].Replace(".aspx", "").ToLower() + "\"]";
             }
             HttpContext.Current.Trace.Write("umbracoRequestHandler", "xpath: '" + _tempQuery + "'");
@@ -161,6 +160,14 @@ namespace umbraco {
                 return pageXPathQueryStart + _tempQuery;
             else
                 return _tempQuery;
+        }
+
+        private static string getChildContainerName()
+        {
+            if (!String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
+                return "/" + UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME;
+            else
+                return "";
         }
 
         public requestHandler(XmlDocument umbracoContent, String url) {
