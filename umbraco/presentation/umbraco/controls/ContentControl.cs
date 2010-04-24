@@ -32,8 +32,7 @@ namespace umbraco.controls
         public event EventHandler Save;
         private publishModes CanPublish = publishModes.NoPublish;
         public TabPage tpProp;
-        public bool DoesPublish = false;
-        private Hashtable inTab = new Hashtable();
+        public bool DoesPublish = false;        
         public TextBox NameTxt = new TextBox();
         public PlaceHolder NameTxtHolder = new PlaceHolder();
         public RequiredFieldValidator NameTxtValidator = new RequiredFieldValidator();
@@ -100,6 +99,8 @@ namespace umbraco.controls
 			Save += new EventHandler(standardSaveAndPublishHandler);
 			prntpage = (UmbracoEnsuredPage)Page;
             int i = 0;
+            var inTab = new Hashtable();
+
             foreach (ContentType.TabI t in _content.ContentType.getVirtualTabs.ToList())
 			{
                 var tp = this.Panels[i] as TabPage;
@@ -124,13 +125,21 @@ namespace umbraco.controls
                 i++;
 			}
 
-
 			// Add property pane
 			tpProp = NewTabPage(ui.Text("general", "properties", null));
 			addSaveAndPublishButtons(ref tpProp);
 			tpProp.Controls.Add(
 				new LiteralControl("<div id=\"errorPane_" + tpProp.ClientID +
 								   "\" style=\"display: none; text-align: left; color: red;width: 100%; border: 1px solid red; background-color: #FCDEDE\"><div><b>There were errors - data has not been saved!</b><br/></div></div>"));
+
+            //if the property is not in a tab, add it to the general tab
+            var props = _content.GenericProperties;
+            foreach (Property p in props)
+            {
+                if (inTab[p.PropertyType.Id.ToString()] == null)
+                    addControlNew(p, tpProp, ui.Text("general", "properties", null));
+            }
+
 		}
 
 		/// <summary>
@@ -185,13 +194,7 @@ namespace umbraco.controls
         }
 
         protected override void OnLoad(EventArgs e)
-        {
-            var props = _content.getProperties;
-            foreach (Property p in props)
-            {
-                if (inTab[p.PropertyType.Id.ToString()] == null)
-                    addControlNew(p, tpProp, ui.Text("general", "properties", null));
-            }
+        {   
             base.OnLoad(e);
 
             ContentControlLoadEventArgs contentcontrolEvent = new ContentControlLoadEventArgs();

@@ -79,7 +79,7 @@ namespace umbraco.cms.businesslogic.web
             {
 
                 using (IRecordsReader dr =
-                        SqlHelper.ExecuteReader(string.Format(m_SQLOptimizedSingle, "umbracoNode.id = @id", "cmsContentVersion.id desc"),
+                        SqlHelper.ExecuteReader(string.Format(m_SQLOptimizedSingle.Trim(), "umbracoNode.id = @id", "cmsContentVersion.id desc"),
                     SqlHelper.CreateParameter("@id", id)))
                 {
                     if (dr.Read())

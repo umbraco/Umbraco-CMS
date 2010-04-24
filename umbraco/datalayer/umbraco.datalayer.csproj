@@ -94,6 +94,7 @@
     </Compile>
     <Compile Include="SqlHelpers\SqlServer\SqlServerInstaller.cs" />
     <Compile Include="SqlHelpers\SqlServer\SqlServerUtility.cs" />
+    <Compile Include="StringExtensions.cs" />
     <Compile Include="UmbracoException.cs" />
     <Compile Include="Utility\BaseUtility.cs" />
     <Compile Include="Utility\Installer\DatabaseVersion.cs" />

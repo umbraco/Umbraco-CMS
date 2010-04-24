@@ -7,6 +7,7 @@ namespace dashboardUtilities
 	using System.Web.UI.WebControls;
 	using System.Web.UI.HtmlControls;
     using umbraco.IO;
+    using umbraco.cms.businesslogic.web;
 
 	/// <summary>
 	///		Summary description for LatestEdits.
@@ -35,17 +36,10 @@ namespace dashboardUtilities
 				printedIds.Add(NodeId);
 				try 
 				{
-					umbraco.cms.businesslogic.web.Document d = new umbraco.cms.businesslogic.web.Document(int.Parse(NodeId.ToString()));
-					string parent = "";
-					try 
-					{
-						if (d.Parent != null)
-							parent = " (" + d.Parent.Text + ")";
-					} 
-					catch {}
+                    Document d = new Document(int.Parse(NodeId.ToString()));										
 					count++;
 					return
-                        "<a href=\"editContent.aspx?id=" + NodeId.ToString() + "\" style=\"text-decoration: none\"><img src=\"" + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/images/forward.png\" align=\"absmiddle\" border=\"0\"/> " + d.Text + parent + "</a>. " + umbraco.ui.Text("general", "edited", bp.getUser()) + " " + umbraco.library.ShortDateWithTimeAndGlobal(DateTime.Parse(Date.ToString()).ToString(), umbraco.ui.Culture(bp.getUser())) + "<br/>";
+                        "<a href=\"editContent.aspx?id=" + NodeId.ToString() + "\" style=\"text-decoration: none\"><img src=\"" + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/images/forward.png\" align=\"absmiddle\" border=\"0\"/> " + d.Text + "</a>. " + umbraco.ui.Text("general", "edited", bp.getUser()) + " " + umbraco.library.ShortDateWithTimeAndGlobal(DateTime.Parse(Date.ToString()).ToString(), umbraco.ui.Culture(bp.getUser())) + "<br/>";
 				}
 				catch {
 					return "";

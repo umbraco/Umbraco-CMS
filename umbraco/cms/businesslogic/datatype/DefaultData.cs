@@ -17,6 +17,7 @@ namespace umbraco.cms.businesslogic.datatype
 		private object m_Value;
 		protected BaseDataType _dataType;
         private bool m_PreviewMode;
+        private bool m_ValueLoaded = false;
 
         protected static ISqlHelper SqlHelper
         {
@@ -48,7 +49,34 @@ namespace umbraco.cms.businesslogic.datatype
         /// </summary>
         protected virtual void LoadValueFromDatabase()
         {
-            m_Value = SqlHelper.ExecuteScalar<object>("SELECT " + _dataType.DataFieldName + " FROM cmsPropertyData WHERE id = " + m_PropertyId);
+
+            //this is an optimized version of this query. In one call it will return the data type
+            //and the values, this will then set the underlying db type and value of the BaseDataType object
+            //instead of having it query the database itself.
+            var sql = @"
+                SELECT dataInt, dataDate, dataNvarchar, dataNtext, dbType FROM cmsPropertyData 
+                INNER JOIN cmsPropertyType ON cmsPropertyType.id = cmsPropertyData.propertytypeid
+                INNER JOIN cmsDataType ON cmsDataType.nodeId = cmsPropertyType.dataTypeId
+                WHERE cmsPropertyData.id = " + m_PropertyId;
+
+            using (var r = SqlHelper.ExecuteReader(sql))
+            {
+                if (r.Read())
+                {
+                    //the type stored in the cmsDataType table
+                    var strDbType = r.GetString("dbType"); 
+                    //get the enum of the data type
+                    var dbType = BaseDataType.GetDBType(strDbType); 
+                    //get the column name in the cmsPropertyData table that stores the correct information for the data type
+                    var fieldName = BaseDataType.GetDataFieldName(dbType);
+                    //get the value for the data type, if null, set it to an empty string
+                    m_Value = r.GetObject(fieldName) ?? string.Empty;
+
+                    //now that we've set our value, we can update our BaseDataType object with the correct values from the db
+                    //instead of making it query for itself. This is a peformance optimization enhancement.
+                    _dataType.SetDataTypeProperties(fieldName, dbType);
+                }                
+            }
         }
 
         public DBTypes DatabaseType
@@ -82,6 +110,12 @@ namespace umbraco.cms.businesslogic.datatype
 		{
 			get 
 			{
+                //Lazy load the value when it is required.
+                if (!m_ValueLoaded)
+                {
+                    LoadValueFromDatabase();
+                    m_ValueLoaded = true;
+                } 
 				return m_Value;
 			}
 			set 
@@ -140,7 +174,7 @@ namespace umbraco.cms.businesslogic.datatype
 			set
 			{
 				m_PropertyId = value;
-                LoadValueFromDatabase();
+                //LoadValueFromDatabase();
 			}
 		}
 

@@ -9,6 +9,7 @@ using umbraco.cms.businesslogic.propertytype;
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
 using umbraco.cms.helpers;
+using umbraco.BusinessLogic;
 
 namespace umbraco.cms.businesslogic
 {
@@ -202,24 +203,24 @@ namespace umbraco.cms.businesslogic
         {
             get
             {
-                //EnsureProperties();
-                //return m_LoadedProperties.ToArray();
+                EnsureProperties();
+                return m_LoadedProperties.ToArray();
 
-                if (this.ContentType == null)
-                    return new Property[0];
+                //if (this.ContentType == null)
+                //    return new Property[0];
 
-                List<Property> result = new List<Property>();
-                foreach (PropertyType prop in this.ContentType.PropertyTypes)
-                {
-                    if (prop == null)
-                        continue;
-                    Property p = getProperty(prop);
-                    if (p == null)
-                        continue;
-                    result.Add(p);
-                }
+                //List<Property> result = new List<Property>();
+                //foreach (PropertyType prop in this.ContentType.PropertyTypes)
+                //{
+                //    if (prop == null)
+                //        continue;
+                //    Property p = getProperty(prop);
+                //    if (p == null)
+                //        continue;
+                //    result.Add(p);
+                //}
 
-                return result.ToArray();
+                //return result.ToArray();
             }
         }
 
@@ -253,11 +254,13 @@ namespace umbraco.cms.businesslogic
         #region Public Methods
 
         /// <summary>
-        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
+        /// Used to persist object changes to the database. This ensures that the properties are re-loaded from the database.
         /// </summary>
         public override void Save()
-        {
+        {            
             base.Save();
+
+            ClearLoadedProperties();
         }
 
         /// <summary>
@@ -284,32 +287,31 @@ namespace umbraco.cms.businesslogic
         public Property getProperty(PropertyType pt)
         {
 
-            object o = SqlHelper.ExecuteScalar<object>(
-                "select id from cmsPropertyData where versionId=@version and propertyTypeId=@propertyTypeId",
-                SqlHelper.CreateParameter("@version", this.Version),
-                SqlHelper.CreateParameter("@propertyTypeId", pt.Id));
-            if (o == null)
-                return null;
-            int propertyId;
-            if (!int.TryParse(o.ToString(), out propertyId))
-                return null;
-            try
-            {
-                return new Property(propertyId, pt);
-            }
-            catch
-            {
-                return null;
-            }
+            //object o = SqlHelper.ExecuteScalar<object>(
+            //    "select id from cmsPropertyData where versionId=@version and propertyTypeId=@propertyTypeId",
+            //    SqlHelper.CreateParameter("@version", this.Version),
+            //    SqlHelper.CreateParameter("@propertyTypeId", pt.Id));
+            //if (o == null)
+            //    return null;
+            //int propertyId;
+            //if (!int.TryParse(o.ToString(), out propertyId))
+            //    return null;
+            //try
+            //{
+            //    return new Property(propertyId, pt);
+            //}
+            //catch (Exception ex)
+            //{
+            //    Log.Add(LogTypes.Error, this.Id, "An error occurred retreiving property. EXCEPTION: " + ex.Message);
+            //    return null;
+            //}
 
+            EnsureProperties();
 
-
-            //EnsureProperties();
-
-            //var prop = m_LoadedProperties
-            //    .Where(x => x.PropertyType.Id == pt.Id)
-            //    .SingleOrDefault();
-            //return prop;
+            var prop = m_LoadedProperties
+                .Where(x => x.PropertyType.Id == pt.Id)
+                .SingleOrDefault();
+            return prop;
 
         }
 
@@ -321,7 +323,10 @@ namespace umbraco.cms.businesslogic
         /// <returns>The new Property</returns>
         public Property addProperty(PropertyType pt, Guid versionId)
         {
+            ClearLoadedProperties();
+            
             return property.Property.MakeNew(pt, this, versionId);
+
         }
 
         /// <summary>
@@ -440,6 +445,30 @@ namespace umbraco.cms.businesslogic
                     x.AppendChild(c.ToXml(xd, true));
             }
         }
+
+        /// <summary>
+        /// Deletes the current Content object, must be overridden in the child class.
+        /// </summary>
+        public override void delete()
+        {
+            ClearLoadedProperties();
+
+            // Delete all data associated with this content
+            this.deleteAllProperties();
+
+            // Delete version history
+            SqlHelper.ExecuteNonQuery("Delete from cmsContentVersion where ContentId = " + this.Id);
+
+            // Delete Contentspecific data ()
+            SqlHelper.ExecuteNonQuery("Delete from cmsContent where NodeId = " + this.Id);
+
+            // Delete xml
+            SqlHelper.ExecuteNonQuery("delete from cmsContentXml where nodeID = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
+
+            // Delete Nodeinformation!!
+            base.delete();
+        }
+
         #endregion
 
         #region Protected Methods
@@ -453,6 +482,8 @@ namespace umbraco.cms.businesslogic
         /// <param name="InitContentTypeIcon"></param>
         protected void InitializeContent(int InitContentType, Guid InitVersion, DateTime InitVersionDate, string InitContentTypeIcon)
         {
+            ClearLoadedProperties();
+
             if (_contentType == null)
                 _contentType = ContentType.GetContentType(InitContentType);
             _version = InitVersion;
@@ -477,6 +508,8 @@ namespace umbraco.cms.businesslogic
         /// <returns>The new version Id</returns>
         protected Guid createNewVersion()
         {
+            ClearLoadedProperties();
+
             Guid newVersion = Guid.NewGuid();
             bool tempHasVersion = hasVersion();
             foreach (propertytype.PropertyType pt in this.ContentType.PropertyTypes)
@@ -496,28 +529,6 @@ namespace umbraco.cms.businesslogic
             SqlHelper.ExecuteNonQuery("Insert into cmsContentVersion (ContentId,versionId) values (" + this.Id + ",'" + newVersion + "')");
             this.Version = newVersion;
             return newVersion;
-        }
-
-        /// <summary>
-        /// Deletes the current Content object, must be overridden in the child class.
-        /// </summary>
-        protected new void delete()
-        {
-
-            // Delete all data associated with this content
-            this.deleteAllProperties();
-
-            // Delete version history
-            SqlHelper.ExecuteNonQuery("Delete from cmsContentVersion where ContentId = " + this.Id);
-
-            // Delete Contentspecific data ()
-            SqlHelper.ExecuteNonQuery("Delete from cmsContent where NodeId = " + this.Id);
-
-            // Delete xml
-            SqlHelper.ExecuteNonQuery("delete from cmsContentXml where nodeID = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
-
-            // Delete Nodeinformation!!
-            base.delete();
         }
 
         protected virtual XmlNode generateXmlWithoutSaving(XmlDocument xd)
@@ -551,6 +562,14 @@ namespace umbraco.cms.businesslogic
         #endregion
 
         #region Private Methods
+
+        /// <summary>
+        /// Clears the locally loaded properties which forces them to be reloaded next time they requested
+        /// </summary>
+        private void ClearLoadedProperties()
+        {
+            m_LoadedProperties = null;
+        }
 
         /// <summary>
         /// Makes sure that the properties are initialized. If they are already initialized, this does nothing.

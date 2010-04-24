@@ -55,39 +55,63 @@ namespace umbraco.cms.businesslogic.datatype
 		// get it by lookup the value associated to the datatypedefinition id.
 		public string DataFieldName 
 		{
-			get {
-				if (_datafield == "") 
-				{
+            get
+            {
+                if (_datafield == "")
+                {
                     string dbtypestr = SqlHelper.ExecuteScalar<string>("select dbType from cmsDataType where nodeId = @datadefinitionid", SqlHelper.CreateParameter("@datadefinitionid", _datatypedefinitionid));
-					DBTypes DataTypeSQLType = (DBTypes) Enum.Parse(typeof(DBTypes),dbtypestr,true);
-					_DBType = DataTypeSQLType;
-					switch (DataTypeSQLType) 
-					{
-						case DBTypes.Date :
-							_datafield = "dataDate";
-							break;
-						case DBTypes.Integer :
-							_datafield = "DataInt";
-							break;
-						case DBTypes.Ntext :
-							_datafield = "dataNtext";
-							break;
-						case DBTypes.Nvarchar :
-							_datafield = "dataNvarchar";
-							break;
-					}
-					return _datafield;
-				}
-				return _datafield;
-			}
+                    DBTypes DataTypeSQLType = GetDBType(dbtypestr);
+                    _DBType = DataTypeSQLType;
+                    _datafield = GetDataFieldName(_DBType);
+                }
+                return _datafield;
+            }            
 		}
 		#endregion
-	}
-	public enum DBTypes 
-	{
-		Integer,
-		Date,
-		Nvarchar,
-		Ntext
+
+        /// <summary>
+        /// This is used internally for performance reasons since we are querying for all of the data properties at once in the 
+        /// DefaultData object, therefore, the DefaultDataObject will set these properties manually instead of incurring a bunch 
+        /// of additional SQL calls.
+        /// </summary>
+        /// <param name="dataField"></param>
+        /// <param name="dataType"></param>
+        internal void SetDataTypeProperties(string dataField, DBTypes dataType)
+        {
+            _datafield = dataField;
+            _DBType = dataType;
+        }
+
+        /// <summary>
+        /// Returns the DBType based on the row value in the dbType column of the cmsDataType
+        /// </summary>
+        /// <param name="dbtypestr"></param>
+        /// <returns></returns>
+        internal static DBTypes GetDBType(string dbtypestr)
+        {
+            return (DBTypes)Enum.Parse(typeof(DBTypes), dbtypestr, true);
+        }
+
+        /// <summary>
+        /// Returns the data column for the data base where the value resides based on the dbType
+        /// </summary>
+        /// <param name="dbType"></param>
+        /// <returns></returns>
+        internal static string GetDataFieldName(DBTypes dbType)
+        {
+            switch (dbType)
+            {
+                case DBTypes.Date:
+                    return  "dataDate";
+                case DBTypes.Integer:
+                    return "dataInt";
+                case DBTypes.Ntext:
+                    return "dataNtext";
+                case DBTypes.Nvarchar:
+                    return "dataNvarchar";
+                default:
+                    return "dataNvarchar";
+            }
+        }
 	}
 }

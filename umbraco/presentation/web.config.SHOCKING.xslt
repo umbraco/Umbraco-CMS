@@ -20,7 +20,7 @@
   </xsl:template>
 
   <!-- Add trace output -->
-  <xsl:template match="/configuration">
+  <!--<xsl:template match="/configuration">
     <xsl:copy>
       <xsl:apply-templates select="@*"/>
       <xsl:apply-templates/>
@@ -32,7 +32,7 @@
         </trace>
       </system.diagnostics>
     </xsl:copy>
-  </xsl:template>
+  </xsl:template>-->
   
   <!-- Default templates to match anything else -->
   <xsl:template match="@*">

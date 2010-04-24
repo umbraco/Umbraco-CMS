@@ -194,7 +194,7 @@ namespace umbraco.DataLayer
             P[] parametersConverted = ConvertParameters(parameters);
             try
             {
-                return ConvertScalar<T>(ExecuteScalar(commandConverted, parametersConverted));
+                return ConvertScalar<T>(ExecuteScalar(commandConverted.TrimToOneLine(), parametersConverted));
             }
             catch (Exception e)
             {
@@ -217,7 +217,7 @@ namespace umbraco.DataLayer
             P[] parametersConverted = ConvertParameters(parameters);
             try
             {
-                return ExecuteNonQuery(commandConverted, parametersConverted);
+                return ExecuteNonQuery(commandConverted.TrimToOneLine(), parametersConverted);
             }
             catch (Exception e)
             {
@@ -239,8 +239,8 @@ namespace umbraco.DataLayer
             string commandConverted = ConvertCommand(commandText);
             P[] parametersConverted = ConvertParameters(parameters);
             try
-            {                
-                return ExecuteReader(commandConverted, parametersConverted);
+            {
+                return ExecuteReader(commandConverted.TrimToOneLine(), parametersConverted);
             }
             catch (Exception e)
             {
@@ -263,7 +263,7 @@ namespace umbraco.DataLayer
             P[] parametersConverted = ConvertParameters(parameters);
             try
             {
-                return ExecuteXmlReader(commandConverted, parametersConverted);
+                return ExecuteXmlReader(commandConverted.TrimToOneLine(), parametersConverted);
             }
             catch (Exception e)
             {
