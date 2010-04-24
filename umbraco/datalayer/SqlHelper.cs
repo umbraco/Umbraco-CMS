@@ -36,6 +36,7 @@ namespace umbraco.DataLayer
         #endregion
 
         #region Public Properties
+
         /// <summary>
         /// Gets the connection string that provides access to the SQL database.
         /// </summary>
@@ -53,6 +54,7 @@ namespace umbraco.DataLayer
         {
             get { return m_Utility; }
         }
+
         #endregion
 
         #region Public Constructors
@@ -157,6 +159,7 @@ namespace umbraco.DataLayer
         #endregion
 
         #region ISqlHelper Members
+
         /// <summary>
         /// Escapes a string for use in an SQL query.
         /// </summary>
@@ -236,7 +239,7 @@ namespace umbraco.DataLayer
             string commandConverted = ConvertCommand(commandText);
             P[] parametersConverted = ConvertParameters(parameters);
             try
-            {
+            {                
                 return ExecuteReader(commandConverted, parametersConverted);
             }
             catch (Exception e)
@@ -267,6 +270,7 @@ namespace umbraco.DataLayer
                 throw new SqlHelperException("ExecuteXmlReader", commandText, parameters, e);
             }
         }
+        
         #endregion
 
         #region Abstract Query Methods

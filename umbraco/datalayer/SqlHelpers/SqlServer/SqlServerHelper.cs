@@ -11,6 +11,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Xml;
 using SH = Microsoft.ApplicationBlocks.Data.SqlHelper;
+using System.Diagnostics;
 
 namespace umbraco.DataLayer.SqlHelpers.SqlServer
 {
@@ -48,6 +49,11 @@ namespace umbraco.DataLayer.SqlHelpers.SqlServer
         /// <returns>The return value of the command.</returns>
         protected override object ExecuteScalar(string commandText, SqlParameter[] parameters)
         {
+            #if DEBUG && DebugDataLayer
+                // Log Query Execution
+                Trace.TraceInformation(GetType().Name + " SQL ExecuteScalar: " + commandText);
+            #endif
+
             return SH.ExecuteScalar(ConnectionString, CommandType.Text, commandText, parameters);
         }
 
@@ -61,6 +67,11 @@ namespace umbraco.DataLayer.SqlHelpers.SqlServer
         /// </returns>
         protected override int ExecuteNonQuery(string commandText, SqlParameter[] parameters)
         {
+            #if DEBUG && DebugDataLayer
+                // Log Query Execution
+                Trace.TraceInformation(GetType().Name + " SQL ExecuteNonQuery: " + commandText);
+            #endif
+
             return SH.ExecuteNonQuery(ConnectionString, CommandType.Text, commandText, parameters);
         }
 
@@ -74,6 +85,11 @@ namespace umbraco.DataLayer.SqlHelpers.SqlServer
         /// </returns>
         protected override IRecordsReader ExecuteReader(string commandText, SqlParameter[] parameters)
         {
+            #if DEBUG && DebugDataLayer
+                // Log Query Execution
+                Trace.TraceInformation(GetType().Name + " SQL ExecuteReader: " + commandText);
+            #endif
+
             return new SqlServerDataReader(SH.ExecuteReader(ConnectionString, CommandType.Text,
                                                             commandText, parameters));
         }

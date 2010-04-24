@@ -11,6 +11,21 @@
     <xsl:attribute name="value">4.1.0.betaII</xsl:attribute>
   </xsl:template>
 
+  <!-- Add trace output -->
+  <xsl:template match="/configuration">
+    <xsl:copy>
+      <xsl:apply-templates select="@*"/>
+      <xsl:apply-templates/>
+      <system.diagnostics>
+        <trace autoflush="true">
+          <listeners>
+            <add name="SqlListener" type="System.Diagnostics.TextWriterTraceListener" initializeData="trace.log" />
+          </listeners>
+        </trace>
+      </system.diagnostics>
+    </xsl:copy>
+  </xsl:template>
+
   <!-- Default templates to match anything else -->
   <xsl:template match="@*">
     <xsl:copy/>
