@@ -14,11 +14,7 @@ namespace umbraco
 	/// </summary>
 	public class Global : HttpApplication
 	{
-        protected void Application_Start(Object sender, EventArgs e)
-        {
-        }
-
-		protected void Session_Start(Object sender, EventArgs e)
+		protected virtual void Session_Start(Object sender, EventArgs e)
 		{
 			if(GlobalSettings.EnableStat)
 			{
@@ -33,30 +29,8 @@ namespace umbraco
 			}
 		}
 
-        protected void Application_BeginRequest(Object sender, EventArgs e)
-        {
 
-        }
-
-		protected void Application_EndRequest(Object sender, EventArgs e)
-		{
-		}
-
-		protected void Application_AuthenticateRequest(Object sender, EventArgs e)
-		{
-		}
-
-        protected void Application_Error(Object sender, EventArgs e)
-        {
-
-        }
-
-		protected void Session_End(Object sender, EventArgs e)
-		{
-			
-		}
-
-		protected void Application_End(Object sender, EventArgs e)
+		protected virtual void Application_End(Object sender, EventArgs e)
 		{
             Log.Add(LogTypes.System, BusinessLogic.User.GetUser(0), -1, "Application shut down at " + DateTime.Now);
 		}
