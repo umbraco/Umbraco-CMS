@@ -60,7 +60,7 @@ namespace umbraco.cms.presentation.Trees
 			TreeDefinition treeDef = TreeDefinitionCollection.Instance.FindTree(this);
 			rootNode.Text = rootNode.Text = GetTreeHeader(treeDef.Tree.Alias);
 
-            if (new RecycleBin(Document._objectType, RecycleBin.RecycleBinType.Content).Smells())
+            if (new RecycleBin(RecycleBin.RecycleBinType.Content).Smells())
 			{
 				rootNode.Icon = "bin.png";
 			}				

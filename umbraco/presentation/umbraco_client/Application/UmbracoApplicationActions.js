@@ -284,7 +284,7 @@ Umbraco.Application.Actions = function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.openModalWindow("dialogs/emptyTrashcan.aspx", uiKeys['actions_emptyTrashcan'], true, 500, 220);
+                UmbClientMgr.openModalWindow("dialogs/emptyTrashcan.aspx?type=" + this._currApp, uiKeys['actions_emptyTrashcan'], true, 500, 220);
             }
         },
 

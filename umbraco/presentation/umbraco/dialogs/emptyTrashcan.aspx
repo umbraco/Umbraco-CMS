@@ -4,7 +4,8 @@
 <asp:Content ContentPlaceHolderID="head" runat="server">
 		<script type="text/javascript">
 		
-		    var emptyTotal = '<%= umbraco.cms.businesslogic.RecycleBin.Count().ToString()%>';
+		    var recycleBinType = '<%=umbraco.helper.Request("type")%>';
+		    var emptyTotal = '<%= umbraco.cms.businesslogic.RecycleBin.Count((umbraco.cms.businesslogic.RecycleBin.RecycleBinType) Enum.Parse(typeof(umbraco.cms.businesslogic.RecycleBin.RecycleBinType), umbraco.helper.Request("type"), true)).ToString()%>';
 		    
 		    function emptyRecycleBin() {
     			jQuery('#formDiv').hide();
@@ -13,7 +14,7 @@
 		    	jQuery('#anim').attr("src","<%=umbraco.GlobalSettings.ClientPath%>/images/progressBar.gif");
 		    	
 		    	// call the empty trashcan webservice
-		    	umbraco.presentation.webservices.trashcan.EmptyTrashcan();
+		    	umbraco.presentation.webservices.trashcan.EmptyTrashcan(recycleBinType);
 
          // wait one second to start the status update
          setTimeout('updateStatus();', 1000);
@@ -64,7 +65,7 @@
 	  	  	  
 	  <div id="formDiv">
 	    <p><%= umbraco.ui.Text("defaultdialogs", "recycleBinWarning")%></p>
-		   <input type="checkbox" id="confirmDelete" onclick="$get('ok').disabled = !this.checked;" /> <label for="confirmDelete"><%=umbraco.ui.Text("defaultdialogs", "confirmEmptyTrashcan", umbraco.cms.businesslogic.RecycleBin.Count().ToString(), this.getUser())%></label>
+		   <input type="checkbox" id="confirmDelete" onclick="$get('ok').disabled = !this.checked;" /> <label for="confirmDelete"><%=umbraco.ui.Text("defaultdialogs", "confirmEmptyTrashcan", umbraco.cms.businesslogic.RecycleBin.Count((umbraco.cms.businesslogic.RecycleBin.RecycleBinType)Enum.Parse(typeof(umbraco.cms.businesslogic.RecycleBin.RecycleBinType), umbraco.helper.Request("type"), true)).ToString(), this.getUser())%></label>
 		</div>
 	  </cc1:PropertyPanel>
 	  </cc1:Pane>
