@@ -22,25 +22,27 @@ namespace umbraco.presentation.members
 	{
         private MemberGroup _memberGroup = null;
         protected ImageButton save = null;
+        string _memberGroupId = String.Empty;
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-			if (!IsPostBack)
+            _memberGroupId = !String.IsNullOrEmpty(memberGroupName.Value) ? memberGroupName.Value : Request.QueryString["id"];
+            if (!IsPostBack)
 			{
-				ClientTools
+                ClientTools
 					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMemberGroups>().Tree.Alias)
-					.SyncTree(Request.QueryString["id"], false);
+                    .SyncTree(_memberGroupId, false);
 			}
 
             if (!Member.IsUsingUmbracoRoles())
             {
                 NameTxt.Enabled = false;
                 save.Enabled = false;
-                NameTxt.Text = Request.QueryString["id"] + " (not editable from umbraco)";
+                NameTxt.Text = _memberGroupId + " (not editable from umbraco)";
             }
             else
             {
-                _memberGroup = MemberGroup.GetByName(Request.QueryString["id"]);
+                _memberGroup = MemberGroup.GetByName(_memberGroupId);
 
                 if (!IsPostBack)
                 {
@@ -52,9 +54,11 @@ namespace umbraco.presentation.members
 		private void save_click(object sender, System.Web.UI.ImageClickEventArgs e) 
 		{
 			_memberGroup.Text = NameTxt.Text;
+            memberGroupName.Value = NameTxt.Text;
             _memberGroup.Save();
-			this.speechBubble(BasePages.BasePage.speechBubbleIcon.save,ui.Text("speechBubbles", "editMemberGroupSaved", base.getUser()),"");
-
+            this.ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editMemberGroupSaved", base.getUser()),"");
+            ClientTools.ReloadActionNode(true, true);
+            
 		}
 
 		#region Web Form Designer generated code
