@@ -151,27 +151,42 @@ namespace umbraco.cms.presentation
             else if (node != null)
             {
                 XmlNode accessRules = node.SelectSingleNode("access");
-
+                bool retVal = true;
                 if (accessRules != null && accessRules.HasChildNodes)
                 {
+
                     string currentUserType = CurrentUser.UserType.Alias.ToLower();
+                    string allowedSections = ",";
+                    foreach (BusinessLogic.Application app in CurrentUser.Applications)
+                    {
+                        allowedSections += app.alias.ToLower() + ",";
+                    }
                     XmlNodeList grantedTypes = accessRules.SelectNodes("grant");
+                    XmlNodeList grantedBySectionTypes = accessRules.SelectNodes("grantBySection");
                     XmlNodeList deniedTypes = accessRules.SelectNodes("deny");
 
                     // if there's a grant type, everyone who's not granted is automatically denied
-                    if (grantedTypes.Count > 0 && accessRules.SelectSingleNode(String.Format("grant [. = '{0}']", currentUserType)) == null)
+                    if (grantedTypes.Count > 0 || grantedBySectionTypes.Count > 0)
                     {
-                        return false;
+                        retVal = false;
+                        if (grantedBySectionTypes.Count > 0 && accessRules.SelectSingleNode(String.Format("grantBySection [contains('{0}', concat(',',.,','))]", allowedSections)) != null)
+                        {
+                            retVal = true;
+                        }
+                        else if (grantedTypes.Count > 0 && accessRules.SelectSingleNode(String.Format("grant [. = '{0}']", currentUserType)) != null)
+                        {
+                            retVal = true;
+                        }
                     }
                     // if the current type of user is denied we'll say nay
-                    else if (deniedTypes.Count > 0 && accessRules.SelectSingleNode(String.Format("deny [. = '{0}']", currentUserType)) != null)
+                    if (deniedTypes.Count > 0 && accessRules.SelectSingleNode(String.Format("deny [. = '{0}']", currentUserType)) != null)
                     {
-                        return false;
+                        retVal = false;
                     }
 
                 }
 
-                return true;
+                return retVal;
             }
             return false;
         }
