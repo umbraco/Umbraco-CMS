@@ -524,16 +524,13 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 var nodeToDel = this._actionNode.jsNode;
 
-                //remove the ajax loader
-                nodeToDel.find("a").removeClass("loading");
                 //ensure the branch is closed
                 this._tree.close_branch(nodeToDel);
                 //make the node disapear
                 nodeToDel.hide("drop", { direction: "down" }, 400, function() {
-                    //remove the node from the DOM
-                    nodeToDel.remove();
+                    //remove the node from the DOM, do this after 1 second as IE doesn't like it when you try this right away.
+                    setTimeout(function() { nodeToDel.remove(); }, 1000);
                 });
-
                 this._updateRecycleBin();
             },
 

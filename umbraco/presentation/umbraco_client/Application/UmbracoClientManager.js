@@ -100,10 +100,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 /// or set the right content frames location to the one specified by strLocation.
                 /// </summary>
 
-                //TODO: If there is no main window, we need to return the current window!
                 this._debug("contentFrame: " + strLocation);
                 if (strLocation == null || strLocation == "") {
-                    return this.mainWindow().right;
+                    if (typeof this.mainWindow().right != "undefined") {
+                        return this.mainWindow().right;
+                    }
+                    else {
+                        return this.mainWindow(); //return the current window if the content frame doesn't exist in the current context
+                    }
                 }
                 else {
                     //if the path doesn't start with "/" or with the root path then 
@@ -118,7 +122,12 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
                     this._debug("contentFrame: parsed location: " + strLocation);
 
-                    this.mainWindow().right.location.href = strLocation;
+                    if (typeof this.mainWindow().right != "undefined") {
+                        this.mainWindow().right.location.href = strLocation;
+                    }
+                    else {
+                        this.mainWindow().location.href = strLocation; //set the current windows location if the right frame doesn't exist int he current context
+                    }
                 }
             },
             openModalWindow: function(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback) {
