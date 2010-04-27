@@ -67,7 +67,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _activeTreeType: "content", //tracks which is the active tree type, this is used in searching and syncing.
             _tree: null, //reference to the jsTree object
             _isEditMode: false, //not really used YET
-            _isDebug: false, //set to true to enable alert debugging
+            _isDebug: true, //set to true to enable alert debugging
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
             _treeClass: "umbTree", //used for other libraries to detect which elements are an umbraco tree
             _currenAJAXRequest: false, //used to determine if there is currently an ajax request being executed.
@@ -147,10 +147,28 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     this._opts.appActions.showSpeachBubble("info", "Tree Edit Mode", "The tree is now operating in edit mode");
             },
 
-            refreshTree: function() {
-                /// <summary>This wraps the standard jsTree functionality</summary>
-                this._debug("refreshTree");
-                this._tree.refresh();
+            refreshTree: function(treeType) {
+                /// <summary>This wraps the standard jsTree functionality unless a treeType is specified. If one is, then it will just reload that nodes children</summary>
+                this._debug("refreshTree: " + treeType);
+                if (!treeType) {
+                    this._tree.refresh();
+                }
+                else {
+                    var allRoots = this._getContainer().find("li[rel='rootNode']");
+                    var _this = this;
+                    var root = allRoots.filter(function() {
+                        return ($(this).attr("umb:type") == _this._activeTreeType); //filter based on custom namespace requires custom function
+                    });
+                    if (root.length == 1) {
+                        this._debug("refreshTree: reloading tree type: " + treeType);
+                        this._loadChildNodes(root);
+                    }
+                    else {
+                        //couldn't find it, so refresh the whole tree
+                        this._tree.refresh();
+                    }
+                }
+
             },
             rebuildTree: function(app, callback) {
                 /// <summary>This will rebuild the tree structure for the application specified</summary>
@@ -389,7 +407,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     return ($(this).attr("umb:type") == _this._activeTreeType); //filter based on custom namespace requires custom function
                 });
                 var found = branch.length > 0 ? branch : false;
-                this._debug("findNode: " + nodeId + " in '" + this._activeTreeType + "' tree. Found? " + found.length);
+                this._debug("findNode: " + nodeId + " in '" + this._activeTreeType + "' tree. Found? " + found);
                 return found;
             },
 
@@ -831,7 +849,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 else {
                     //only force the reload of this nodes data if forceReload is specified and the node has not already come from the server
                     var doReload = (forceReload && (numAsync == null || numAsync < 1));
-                    this._debug("_syncTree: found! numAsync: " + numAsync + ", forceReload: " + forceReload);
+                    this._debug("_syncTree: found! numAsync: " + numAsync + ", forceReload: " + forceReload + ", doReload: " + doReload);
                     if (doReload) {
                         this._actionNode = this.getNodeDef(found);
                         this.reloadActionNode(false, true, null);

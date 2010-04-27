@@ -44,11 +44,17 @@ namespace umbraco.cms.presentation.members
 				{
 					saveExtras();
 				
-					base.speechBubble(BasePages.BasePage.speechBubbleIcon.save,"Memebertype saved","");
+                    ClientTools
+                        .ShowSpeechBubble(speechBubbleIcon.save, "Memebertype saved", "")
+                        .SyncTree(dt.Id.ToString(), true);					
+                    
 				} 
 				else 
 				{
-					base.speechBubble(BasePages.BasePage.speechBubbleIcon.save,e.Message,"");
+                    ClientTools
+                        .ShowSpeechBubble(speechBubbleIcon.save, e.Message, "")
+                        .SyncTree(dt.Id.ToString(), true);
+                    
 				}
 				handled = true;
 			}

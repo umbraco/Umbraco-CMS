@@ -54,6 +54,8 @@ namespace umbraco.BasePages
 			public static string MoveNode { get { return GetMainTree + ".moveNode('{0}', '{1}');"; } }
 			public static string ReloadActionNode { get { return GetMainTree + ".reloadActionNode({0}, {1}, null);"; } }
 			public static string SetActiveTreeType { get { return GetMainTree + ".setActiveTreeType('{0}');"; } }
+            public static string RefreshTree { get { return GetMainTree + ".refreshTree();"; } }
+            public static string RefreshTreeType { get { return GetMainTree + ".refreshTree('{0}');"; } }
             public static string CloseModalWindow()
             {
                 return string.Format("{0}.closeModalWindow();", ClientMgrScript);
@@ -106,6 +108,22 @@ namespace umbraco.BasePages
 			RegisterClientScript(string.Format(Scripts.RefreshAdmin, seconds * 1000));
 			return this;
 		}
+
+        /// <summary>
+        /// Refreshes the entire current tree
+        /// </summary>
+        /// <returns></returns>
+        public ClientTools RefreshTree()
+        {
+            RegisterClientScript(Scripts.RefreshTree);
+            return this;
+        }
+
+        public ClientTools RefreshTree(string treeType)
+        {
+            RegisterClientScript(string.Format(Scripts.RefreshTreeType, treeType));
+            return this;
+        }
 		
 		/// <summary>
 		/// A reference to the umbraco UI component "speechbubble". The speechbubble appears in the lower right corner of the screen, notifying users of events
@@ -212,7 +230,7 @@ namespace umbraco.BasePages
 		}
 
 		/// <summary>
-		/// Reloads only the active node in the tree.
+		/// Reloads only the last node that the user interacted with via the context menu. To reload a specify node, use SyncTree.
 		/// </summary>
 		/// <param name="reselect"></param>
 		/// <param name="reloadChildren"></param>
@@ -285,13 +303,23 @@ namespace umbraco.BasePages
 			return HttpContext.Current.CurrentHandler as Page;
 		}
 
-		private void RegisterClientScript(string script)
+        /// <summary>
+        /// This will use the ScriptManager to register the script if one is available, otherwise will default to the ClientScript
+        /// class of the page.
+        /// </summary>
+        /// <param name="script"></param>
+        private void RegisterClientScript(string script)
 		{
 			//use the hash code of the script to generate the key, this way, the exact same script won't be
 			//inserted more than once.
-			//m_page.ClientScript.RegisterClientScriptBlock(m_page.GetType(), script.GetHashCode().ToString(), script, true);
-			m_page.ClientScript.RegisterStartupScript(m_page.GetType(), script.GetHashCode().ToString(), script, true);
-
+            if (ScriptManager.GetCurrent(m_page) != null)
+            {
+                ScriptManager.RegisterStartupScript(m_page, m_page.GetType(), script.GetHashCode().ToString(), script, true);
+            }
+            else
+            {
+                m_page.ClientScript.RegisterStartupScript(m_page.GetType(), script.GetHashCode().ToString(), script, true);
+            }
 		}
 
 
