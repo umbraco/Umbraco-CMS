@@ -178,9 +178,9 @@ namespace umbraco.presentation.dialogs
                 feedBackMsg.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
                 string[] vars = {rollback.Text, rollback.VersionDate.ToLongDateString()};
                 feedBackMsg.Text = ui.Text("rollback", "documentRolledBack", vars, new global::umbraco.BusinessLogic.User(0)) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
-                diffPanel.Height = new Unit(200, UnitType.Pixel);             
+                diffPanel.Height = new Unit(200, UnitType.Pixel);
 
-                Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "RollBack", "<script type=\"text/javascript\">\n" + ClientTools.Scripts.ChangeContentFrameUrl("../editContent.aspx?Id=" + d.Id.ToString()) + "\n</script>\n");
+                ClientTools.ChangeContentFrameUrl("editContent.aspx?Id=" + d.Id.ToString());
             }
 		}
 	}
