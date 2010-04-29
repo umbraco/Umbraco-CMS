@@ -4,8 +4,12 @@
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ID="header1" ContentPlaceHolderID="head" runat="server">
 <script type="text/javascript">
-    function openItem(url) {
-        UmbClientMgr.contentFrame("../" + url);
+    function openItem(id) {
+        var url = "editContent.aspx?id=" + id;
+        if (UmbClientMgr.mainWindow().UmbClientMgr.appActions().getCurrApp() == "media") {
+            url = "editMedia.aspx?id=" + id;
+        }
+        UmbClientMgr.contentFrame(url);
         UmbClientMgr.closeModalWindow();
     }
 </script>

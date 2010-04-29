@@ -9,7 +9,7 @@
       <xsl:for-each select="/results/result">
         <li>
           <h4>
-            <a href="#" onClick="openItem('editContent.aspx?id={@id}');">
+            <a href="#" onClick="openItem('{@id}');">
               <!-- add accesskey support for the first 9 results -->
               <xsl:if test="position() &lt; 10">
                 <xsl:attribute name="accesskey">

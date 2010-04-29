@@ -1,3 +1,7 @@
+using System.Web.UI.WebControls;
+using umbraco.cms.businesslogic.template;
+using System.Web.UI;
+
 using System;
 using System.Collections;
 using System.Data;
@@ -218,7 +222,7 @@ namespace umbraco.cms.businesslogic.web
         private IEnumerable<Document> _children = null;
 
         // special for passing httpcontext object
-        private HttpContext _httpContext;
+        //private HttpContext _httpContext;
 
         // special for tree performance
         private int _userId = -1;
@@ -268,6 +272,7 @@ namespace umbraco.cms.businesslogic.web
         //    }
         //}
 
+
         /// <summary>
         /// Gets a value indicating whether the document was constructed for the optimized mode
         /// </summary>
@@ -312,17 +317,21 @@ namespace umbraco.cms.businesslogic.web
             get { return _writer; }
         }
 
+        
+
         /// <summary>
         /// The current HTTPContext
         /// </summary>
+        [Obsolete("DO NOT USE THIS! Get the HttpContext via regular ASP.Net methods instead")]
         public HttpContext HttpContext
         {
-            set { _httpContext = value; }
+            set { /*THERE IS NO REASON TO DO THIS. _httpContext = value; */}
             get
             {
-                if (_httpContext == null)
-                    _httpContext = HttpContext.Current;
-                return _httpContext;
+                //if (_httpContext == null)
+                //    _httpContext = HttpContext.Current;
+                //return _httpContext;
+                return HttpContext.Current;
             }
         }
 

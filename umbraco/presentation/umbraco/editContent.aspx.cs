@@ -67,6 +67,17 @@ namespace umbraco.cms.presentation
 
             //_document = new cms.businesslogic.web.Document(int.Parse(Request.QueryString["id"]));
             _document = new Document(true, id);
+
+            //check if the doc exists
+            if (string.IsNullOrEmpty(_document.Path))
+            {
+                //if this is invalid show an error
+                this.DisplayFatalError("No document found with id " + m_ContentId);
+                //reset the content id to null so processing doesn't continue on OnLoad
+                m_ContentId = null;
+                return;
+            }
+
             // we need to check if there's a published version of this document
             _documentHasPublishedVersion = _document.HasPublishedVersion();
 

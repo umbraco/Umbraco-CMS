@@ -33,7 +33,7 @@ namespace umbraco.presentation
 					{
 						try
 						{
-							d.HttpContext = (HttpContext)sender;
+							//d.HttpContext = (HttpContext)sender;
 
                             d.ReleaseDate = DateTime.MinValue; //new DateTime(1, 1, 1); // Causes release date to be null
 
@@ -52,7 +52,7 @@ namespace umbraco.presentation
 					}
 					foreach(Document d in Document.GetDocumentsForExpiration())
 					{
-						d.HttpContext = (HttpContext)sender;
+						//d.HttpContext = (HttpContext)sender;
 						//d.Published = false;
 						library.UnPublishSingleNode(d.Id);
 					}
