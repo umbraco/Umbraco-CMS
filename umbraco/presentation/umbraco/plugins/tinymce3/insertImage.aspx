@@ -10,7 +10,7 @@
 <head runat="server">
     <title>{#advimage_dlg.dialog_title}</title>
 
-    <%--<base target="_self" />--%>
+    <base target="_self" />
     
     <style type="text/css">        
         .imageViewer .bgImage {position: absolute; top: 3px; right: 3px; }
@@ -106,10 +106,8 @@
         var isDialog = true;
         var submitOnEnter = true;
         var preloadImg = true;
-
         
         jQuery(document).ready(function() {
-            
             //show the image if one is selected
             setTimeout(function() {
                 if (document.forms[0].src.value != "") {
@@ -119,7 +117,15 @@
                     var thumb = src.replace("." + ext, "_thumb.jpg");
                     if (src != "") jQuery("#<%=ImageViewer.ClientID%>").UmbracoImageViewerAPI().showImage(thumb);
                 }
-            }, 500);                       
+            }, 500);
+        });
+
+        jQuery(window).load(function() {
+            //for some very silly reason, we need to manually initialize the tree on window load as firefox and chrome won't load
+            //the tree properly when in the TinyMCE window. This is why we need to specify ManualInitialization="true" on the tree
+            //control.
+            var tree = jQuery("#<%=DialogTree.ClientID%>").UmbracoTreeAPI();
+            tree.rebuildTree("media");
         });
         
     </script>
@@ -165,11 +171,13 @@
     <ui:Pane ID="pane_select" runat="server"> 
       
       <div style="padding: 5px; background: #fff; height: 250px;">
-        
-        <umb2:Tree runat="server" ID="DialogTree" 
+
+        <%--Manual initialization is set to true because the tree doesn't load properly in some browsers in this TinyMCE window--%>
+        <umb2:Tree runat="server" ID="DialogTree" ManualInitialization="true"
             App="media" TreeType="media" IsDialog="true" 
             ShowContextMenu="false" 
             DialogMode="id" FunctionToCall="dialogHandler" />
+            
       </div>
     </ui:Pane>
     <asp:Panel ID="pane_upload" runat="server">
