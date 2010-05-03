@@ -1239,6 +1239,7 @@
     </Compile>
     <Compile Include="umbraco\Trees\MediaRecycleBin.cs" />
     <Compile Include="umbraco\Trees\NodeActionsEventArgs.cs" />
+    <Compile Include="umbraco\Trees\TreeEventArgs.cs" />
     <Compile Include="umbraco\Trees\TreeRequestParams.cs" />
     <Compile Include="umbraco\webservices\MacroContainerService.asmx.cs">
       <DependentUpon>MacroContainerService.asmx</DependentUpon>

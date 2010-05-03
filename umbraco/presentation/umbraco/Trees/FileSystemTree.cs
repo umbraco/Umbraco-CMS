@@ -52,6 +52,10 @@ namespace umbraco.cms.presentation.Trees
 
             DirectoryInfo dirInfo = new DirectoryInfo(path);
             DirectoryInfo[] dirInfos = dirInfo.GetDirectories();
+
+            var args = new TreeEventArgs(tree);
+            OnBeforeTreeRender(dirInfo, args);
+
             foreach (DirectoryInfo dir in dirInfos)
             {
                 if ((dir.Attributes & FileAttributes.Hidden) == 0)
@@ -103,9 +107,7 @@ namespace umbraco.cms.presentation.Trees
 
                 }
             }
-        }
-
-        
-        
+            OnAfterTreeRender(dirInfo, args);
+        }        
     }
 }

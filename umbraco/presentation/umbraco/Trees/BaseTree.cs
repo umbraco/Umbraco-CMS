@@ -1,27 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
+using System.ComponentModel;
 using System.Text;
-using System.Web;
 using System.Xml;
-using System.Configuration;
-using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.contentitem;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.member;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
-using umbraco.DataLayer;
-using umbraco.BusinessLogic.Utils;
 using umbraco.BusinessLogic.Actions;
+using umbraco.interfaces;
 
 namespace umbraco.cms.presentation.Trees
 {
@@ -490,7 +474,9 @@ namespace umbraco.cms.presentation.Trees
         public delegate void AfterNodeRenderEventHandler(ref XmlTree sender, ref XmlTreeNode node, EventArgs e);
         public static event BeforeNodeRenderEventHandler BeforeNodeRender;
         public static event AfterNodeRenderEventHandler AfterNodeRender;
-        
+
+        public static event EventHandler<TreeEventArgs> BeforeTreeRender;
+        public static event EventHandler<TreeEventArgs> AfterTreeRender;
 
         /// <summary>
         /// Raises the <see cref="E:BeforeNodeRender"/> event.
@@ -502,7 +488,6 @@ namespace umbraco.cms.presentation.Trees
                 BeforeNodeRender(ref sender, ref node, e);
         }
 
-
         /// <summary>
         /// Raises the <see cref="E:AfterNodeRender"/> event.
         /// </summary>
@@ -511,6 +496,18 @@ namespace umbraco.cms.presentation.Trees
         {
             if (AfterNodeRender != null)
                 AfterNodeRender(ref sender, ref node, e);
+        }
+
+        protected virtual void OnBeforeTreeRender(object sender, TreeEventArgs e)
+        {
+            if (BeforeTreeRender != null)
+                BeforeTreeRender(sender, e);
+        }
+
+        protected virtual void OnAfterTreeRender(object sender, TreeEventArgs e)
+        {
+            if (AfterTreeRender != null)
+                AfterTreeRender(sender, e);
         }
 
         /// <summary>

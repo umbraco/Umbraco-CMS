@@ -159,6 +159,9 @@ function openContent(id) {
             //get documents to render
             Document[] docs = Document.GetChildrenForTree(m_id);
 
+            var args = new TreeEventArgs(Tree);
+            OnBeforeTreeRender(docs, args);
+
             foreach (Document dd in docs)
             {
                 List<IAction> allowedUserOptions = GetUserActionsForNode(dd);
@@ -175,9 +178,10 @@ function openContent(id) {
                         Tree.Add(node);
                         OnAfterNodeRender(ref Tree, ref node, EventArgs.Empty);
                     }
-                    
                 }
             }
+            //args = new TreeEventArgs(Tree);
+            OnAfterTreeRender(docs, args);
         }
 
         #region Tree Attribute Setter Methods

@@ -1,36 +1,17 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
 using System.Text;
-using System.Web;
-using System.Xml;
-using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.contentitem;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.member;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
-using umbraco.DataLayer;
 using umbraco.BusinessLogic.Actions;
-using umbraco.BusinessLogic.Utils;
-using umbraco.cms.presentation.Trees;
-using umbraco.IO;
+using umbraco.cms.businesslogic.media;
+using umbraco.cms.businesslogic.property;
+using umbraco.interfaces;
 
 namespace umbraco.cms.presentation.Trees
 {
 	public abstract class BaseMediaTree : BaseTree
 	{
-
-		
 		public BaseMediaTree(string application)
 			: base(application)
 		{
@@ -74,7 +55,10 @@ function openMedia(id) {
         public override void Render(ref XmlTree tree)
         {
 			Media[] docs = new Media(m_id).Children;
-            
+
+            var args = new TreeEventArgs(tree);
+            OnBeforeTreeRender(docs, args);
+
             foreach (Media dd in docs)
             {
                 XmlTreeNode xNode = XmlTreeNode.Create(this);
@@ -131,8 +115,8 @@ function openMedia(id) {
                     tree.Add(xNode);
                     OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 }
-                
             }
+            OnAfterTreeRender(docs, args);
         }
 
 		/// <summary>
