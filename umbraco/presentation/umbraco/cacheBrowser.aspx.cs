@@ -1,20 +1,12 @@
-using System;
 using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
+using umbraco.BasePages;
 
 namespace umbraco.cms.presentation
 {
 	/// <summary>
 	/// Summary description for cacheBrowser.
 	/// </summary>
-	public partial class cacheBrowser : System.Web.UI.Page
+    public partial class cacheBrowser : UmbracoEnsuredPage
 	{
 	
 		protected void Page_Load(object sender, System.EventArgs e)
@@ -35,27 +27,6 @@ namespace umbraco.cms.presentation
 						Response.Write(" - " + ((ArrayList) ht[key])[i] + " (<a href=\"?clearByKey=" + ((ArrayList) ht[key])[i] + "\">Delete</a>)<br />");
 			}
 		}
-
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
-
-		}
-		#endregion
-
 		protected void Button1_Click(object sender, System.EventArgs e)
 		{
 			cms.businesslogic.cache.Cache.ClearAllCache();
