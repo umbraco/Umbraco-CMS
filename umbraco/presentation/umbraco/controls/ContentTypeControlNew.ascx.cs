@@ -8,16 +8,16 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
+using umbraco.cms.helpers;
 using umbraco.IO;
 using umbraco.presentation;
-using umbraco.cms.helpers;
 
 namespace umbraco.controls
 {
 
     [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
-    //[ClientDependency(ClientDependencyType.Javascript, "ui/jquery.dd.js", "UmbracoClient")]
-    //[ClientDependency(ClientDependencyType.Css, "ui/dd.css", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Javascript, "ui/jquery.dd.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Css, "ui/dd.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "Tree/treeIcons.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Css, "Tree/Themes/umbraco/style.css", "UmbracoClient")]
     public partial class ContentTypeControlNew : System.Web.UI.UserControl
@@ -156,7 +156,7 @@ namespace umbraco.controls
 
             ddlIcons.Items.AddRange(listOfIcons.OrderBy(o => o.Text).ToArray());
 
-            //Page.ClientScript.RegisterStartupScript(this.GetType(), "iconsDropDown", "jQuery(function() { jQuery('#" + ddlIcons.ClientID + "').msDropDown({ showIcon: false }); });", true);
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "iconsDropDown", "jQuery(function() { jQuery('#" + ddlIcons.ClientID + "').msDropDown({ showIcon: true, style: 'width:250px;' }); });", true);
 
             // Get thumbnails
             dirInfo = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/images/thumbnails"));
@@ -169,7 +169,7 @@ namespace umbraco.controls
                 ddlThumbnails.Items.Add(li);
             }
 
-            //Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", "jQuery(function() { jQuery('#" + ddlThumbnails.ClientID + "').msDropDown({ showIcon: false, rowHeight: '130', visibleRows: '2' }); });", true);
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", "jQuery(function() { jQuery('#" + ddlThumbnails.ClientID + "').msDropDown({ showIcon: false, rowHeight: '130', visibleRows: '2', style: 'width:250px;' }); });", true);
 
             txtName.Text = cType.GetRawText();
             txtAlias.Text = cType.Alias;
@@ -210,7 +210,6 @@ namespace umbraco.controls
                 }
                 dualAllowedContentTypes.Value = chosenContentTypeIDs;
             }
-            //			PlaceHolderAllowedContentTypes.Controls.Add(dualAllowedContentTypes);
         }
 
         private void SaveAllowedChildTypes()
@@ -584,41 +583,6 @@ namespace umbraco.controls
                     }
                 }
             }
-
-
-
-
-            /*
-
-            foreach (DataListItem dli in dlTabs.Items)
-            {
-                DataGrid dg = (DataGrid)dli.FindControl("dgGenericPropertiesOfTab");
-                foreach (DataGridItem dgi in dg.Items) 
-                {
-					
-                    int propertyTypeId = int.Parse(dgi.Cells[0].Text);
-                    cms.businesslogic.propertytype.PropertyType editPropertyType = new cms.businesslogic.propertytype.PropertyType(propertyTypeId);
-                    string tbName = ((TextBox) dgi.FindControl("txtPName")).Text.Replace("'","''");
-                    string tbAlias = ((TextBox) dgi.FindControl("txtPAlias")).Text.Replace("'","''");
-                    int TypeId = int.Parse(((DropDownList) dgi.FindControl("ddlType")).SelectedValue);
-                    int TabId = int.Parse(((DropDownList) dgi.FindControl("dllTab")).SelectedValue);
-				
-                    if (TypeId != editPropertyType.DataTypeDefinition.Id) 
-                        editPropertyType.DataTypeDefinition = new cms.businesslogic.datatype.DataTypeDefinition(TypeId);
-					
-                    if (tbName != editPropertyType.Name) 
-                        editPropertyType.Name = tbName;
-					
-                    if (tbAlias != editPropertyType.Alias) 
-                        editPropertyType.Alias = tbAlias;
-                    if (TabId == 0)
-                        cType.removePropertyTypeFromTab(editPropertyType);
-                    else
-                        cType.SetTabOnPropertyType(editPropertyType,TabId);
-                }
-				
-            }
-            */
         }
 
         public bool HasRows(System.Data.DataView dv)

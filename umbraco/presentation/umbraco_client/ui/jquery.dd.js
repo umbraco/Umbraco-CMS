@@ -160,7 +160,7 @@
             var titletextid = getPostID("postTitleTextID");
             var childid = getPostID("postChildID");
             var arrowid = getPostID("postArrowID");
-            var iWidth = $("#" + elementid).css('width'); //had to change this from .width()
+            var iWidth = $("#" + elementid).width();
             var sStyle = options.style;
             if ($("#" + id).length > 0) {
                 $("#" + id).remove();
