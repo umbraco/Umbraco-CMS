@@ -220,6 +220,11 @@ namespace umbraco.DataLayer.Utility.Installer
         /// <param name="statements">The statements.</param>
         protected void ExecuteStatements(string statements)
         {
+            if (string.IsNullOrEmpty(statements))
+            {
+                throw new ArgumentNullException("statements", "The sql statement to execute is empty. Database version: " + CurrentVersion.ToString());
+            }
+
             // replace block comments by whitespace
             statements = m_findComments.Replace(statements, " ");
             // execute all non-empty statements

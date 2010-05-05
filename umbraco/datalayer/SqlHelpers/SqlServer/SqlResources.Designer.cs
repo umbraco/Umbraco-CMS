@@ -109,5 +109,28 @@ namespace umbraco.DataLayer.SqlHelpers.SqlServer {
                 return ResourceManager.GetString("Version3_Upgrade", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 
+        ////*******************************************************************************************
+        ///
+        ///
+        ///
+        ///
+        ///    Umbraco database installation script for SQL Server (upgrade from Umbraco 4.0.x)
+        /// 
+        ///IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
+        /// 
+        ///    Database version: 4.1.0.0
+        ///    
+        ///    Please increment this version number if ANY change is made to this script,
+        ///    so compatibility with scripts for other database systems can be verified easily.
+        ///    The first 3 digits [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Version4_Upgrade {
+            get {
+                return ResourceManager.GetString("Version4_Upgrade", resourceCulture);
+            }
+        }
     }
 }

@@ -142,7 +142,7 @@
     <None Include="SqlHelpers\MySql\Sql\Total.sql" />
     <None Include="SqlHelpers\MySql\Sql\Version4_Upgrade.sql" />
     <None Include="SqlHelpers\SqlServer\Sql\Version3_Upgrade.sql" />
-    <None Include="SqlHelpers\SqlServer\Sql\Version4_1_Upgrade.sql" />
+    <None Include="SqlHelpers\SqlServer\Sql\Version4_Upgrade.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
