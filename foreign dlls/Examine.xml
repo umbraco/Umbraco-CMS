@@ -36,7 +36,7 @@
             An interface representing an Examine Searcher
             </summary>
         </member>
-        <member name="M:Examine.ISearcher.Search(System.String,System.Int32,System.Boolean)">
+        <member name="M:Examine.ISearcher.Search(System.String,System.Boolean)">
             <summary>
             Searches the specified search text in all fields of the index
             </summary>
@@ -52,13 +52,24 @@
             <param name="searchParameters">The search parameters.</param>
             <returns>Search Results</returns>
         </member>
-        <member name="M:Examine.ISearcher.CreateSearchCriteria(System.Int32,Examine.IndexType)">
+        <member name="M:Examine.ISearcher.CreateSearchCriteria(Examine.IndexType)">
             <summary>
             Creates a search criteria instance as required by the implementation
             </summary>
             <param name="maxResults">The max number of results.</param>
             <param name="type">The type of data in the index.</param>
             <returns>An instance of <see cref="T:Examine.SearchCriteria.ISearchCriteria"/></returns>
+        </member>
+        <member name="M:Examine.ISearcher.CreateSearchCriteria(Examine.IndexType,Examine.SearchCriteria.BooleanOperation)">
+            <summary>
+            Creates a search criteria instance as required by the implementation
+            </summary>
+            <param name="maxResults">The max number of results.</param>
+            <param name="type">The type of data in the index.</param>
+            <param name="defaultOperation">The default operation.</param>
+            <returns>
+            An instance of <see cref="T:Examine.SearchCriteria.ISearchCriteria"/>
+            </returns>
         </member>
         <member name="T:Examine.IIndexer">
             <summary>
@@ -103,7 +114,7 @@
             <returns></returns>
             <remarks>This is just a wrapper for the default provider</remarks>
         </member>
-        <member name="M:Examine.ExamineManager.Search(System.String,System.Int32,System.Boolean)">
+        <member name="M:Examine.ExamineManager.Search(System.String,System.Boolean)">
             <summary>
             Uses the default provider specified to search
             </summary>
@@ -201,7 +212,7 @@
             </summary>
             <value></value>
         </member>
-        <member name="M:Examine.Providers.BaseSearchProvider.Search(System.String,System.Int32,System.Boolean)">
+        <member name="M:Examine.Providers.BaseSearchProvider.Search(System.String,System.Boolean)">
             <summary>
             Simple search method which should default to searching content nodes
             </summary>
@@ -210,11 +221,52 @@
             <param name="useWildcards"></param>
             <returns></returns>
         </member>
-        <member name="M:Examine.Providers.BaseSearchProvider.CreateSearchCriteria(System.Int32,Examine.IndexType)">
+        <member name="M:Examine.Providers.BaseSearchProvider.Search(Examine.SearchCriteria.ISearchCriteria)">
+            <summary>
+            Searches the data source using the Examine Fluent API
+            </summary>
+            <param name="searchParams">The fluent API search.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.Providers.BaseSearchProvider.CreateSearchCriteria(Examine.IndexType)">
             <summary>
             Creates an instance of SearchCriteria for the provider
             </summary>
+            <param name="maxResults">The max number of results.</param>
+            <param name="type">The type of data in the index.</param>
             <returns>A blank SearchCriteria</returns>
+        </member>
+        <member name="M:Examine.Providers.BaseSearchProvider.CreateSearchCriteria(Examine.IndexType,Examine.SearchCriteria.BooleanOperation)">
+            <summary>
+            Creates an instance of SearchCriteria for the provider
+            </summary>
+            <param name="maxResults">The max number of results.</param>
+            <param name="type">The type of data in the index.</param>
+            <param name="defaultOperation">The default operation.</param>
+            <returns>A blank SearchCriteria</returns>
+        </member>
+        <member name="T:Examine.Config.ExamineSettings">
+            <summary>
+            Config section for Examine
+            </summary>
+        </member>
+        <member name="P:Examine.Config.ExamineSettings.Instance">
+            <summary>
+            Gets the instance of the Examine settings.
+            </summary>
+            <value>The instance.</value>
+        </member>
+        <member name="P:Examine.Config.ExamineSettings.SearchProviders">
+            <summary>
+            Gets the search providers.
+            </summary>
+            <value>The search providers.</value>
+        </member>
+        <member name="P:Examine.Config.ExamineSettings.IndexProviders">
+            <summary>
+            Gets the index providers.
+            </summary>
+            <value>The index providers.</value>
         </member>
         <member name="T:Examine.Providers.BaseIndexProvider">
             <summary>
@@ -326,12 +378,6 @@
             </summary>
             <param name="e">The <see cref="T:Examine.IndexingNodesEventArgs"/> instance containing the event data.</param>
         </member>
-        <member name="P:Examine.Providers.BaseIndexProvider.Enabled">
-            <summary>
-            Gets or sets a value indicating whether this <see cref="T:Examine.Providers.BaseIndexProvider"/> is enabled.
-            </summary>
-            <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
-        </member>
         <member name="P:Examine.Providers.BaseIndexProvider.SupportUnpublishedContent">
             <summary>
             Determines if the manager will call the indexing methods when content is saved or deleted as
@@ -426,48 +472,198 @@
             a data structure for storing indexing/searching instructions
             </summary>
         </member>
-        <member name="P:Examine.SearchCriteria.ISearchCriteria.MaxResults">
+        <member name="T:Examine.SearchCriteria.ISearchCriteria">
             <summary>
-            Specifies the number of results to return
+            
             </summary>
         </member>
-        <member name="P:Examine.SearchCriteria.ISearchCriteria.IncludeHitCount">
+        <member name="T:Examine.SearchCriteria.IQuery">
             <summary>
-            If <c>true</c> the total number of matches (hits) will be calculated
+            Defines the query methods for the fluent search API
             </summary>
         </member>
-        <member name="P:Examine.SearchCriteria.ISearchCriteria.TotalHits">
+        <member name="M:Examine.SearchCriteria.IQuery.Id(System.Int32)">
             <summary>
-            Number of matches (hits) from this search criteria
+            Query on the id
             </summary>
+            <param name="id">The id.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.NodeName(System.String)">
+            <summary>
+            Query on the NodeName
+            </summary>
+            <param name="nodeName">Name of the node.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.NodeName(Examine.SearchCriteria.IExamineValue)">
+            <summary>
+            Query on the NodeName
+            </summary>
+            <param name="nodeName">Name of the node.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.NodeTypeAlias(System.String)">
+            <summary>
+            Query on the NodeTypeAlias
+            </summary>
+            <param name="nodeTypeAlias">The node type alias.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.NodeTypeAlias(Examine.SearchCriteria.IExamineValue)">
+            <summary>
+            Query on the NodeTypeAlias
+            </summary>
+            <param name="nodeTypeAlias">The node type alias.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.ParentId(System.Int32)">
+            <summary>
+            Query on the Parent ID
+            </summary>
+            <param name="id">The id of the parent.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.Field(System.String,System.String)">
+            <summary>
+            Query on the specified field
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="fieldValue">The field value.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.Field(System.String,Examine.SearchCriteria.IExamineValue)">
+            <summary>
+            Query on the specified field
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="fieldValue">The field value.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.Range(System.String,System.DateTime,System.DateTime)">
+            <summary>
+            Query on a specified field using a date range. Includes upper and lower bounds
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="lower">The lower.</param>
+            <param name="upper">The upper.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.Range(System.String,System.DateTime,System.DateTime,System.Boolean,System.Boolean)">
+            <summary>
+            Query on a specified field using a date range
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="lower">The lower.</param>
+            <param name="upper">The upper.</param>
+            <param name="includeLower">if set to <c>true</c> the lower.</param>
+            <param name="includeUpper">if set to <c>true</c> the upper.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.Range(System.String,System.Int32,System.Int32)">
+            <summary>
+            Query on a specified field using an int range
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="lower">The lower.</param>
+            <param name="upper">The upper.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.Range(System.String,System.Int32,System.Int32,System.Boolean,System.Boolean)">
+            <summary>
+            Query on a specified field using an int range. Includes upper and lower bounds
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="lower">The lower.</param>
+            <param name="upper">The upper.</param>
+            <param name="includeLower">if set to <c>true</c> [include lower].</param>
+            <param name="includeUpper">if set to <c>true</c> [include upper].</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.Range(System.String,System.String,System.String)">
+            <summary>
+            Query on a specified field using a string range. Includes upper and lower bounds
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="lower">The lower.</param>
+            <param name="upper">The upper.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.Range(System.String,System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Query on a specified field using a string range
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="lower">The lower.</param>
+            <param name="upper">The upper.</param>
+            <param name="includeLower">if set to <c>true</c> [include lower].</param>
+            <param name="includeUpper">if set to <c>true</c> [include upper].</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.GroupedAnd(System.Collections.Generic.IEnumerable{System.String},System.String[])">
+            <summary>
+            Queries multiple fields with each being an And boolean operation
+            </summary>
+            <param name="fields">The fields.</param>
+            <param name="query">The query.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.GroupedOr(System.Collections.Generic.IEnumerable{System.String},System.String[])">
+            <summary>
+            Queries multiple fields with each being an Or boolean operation
+            </summary>
+            <param name="fields">The fields.</param>
+            <param name="query">The query.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.GroupedNot(System.Collections.Generic.IEnumerable{System.String},System.String[])">
+            <summary>
+            Queries multiple fields with each being an Not boolean operation
+            </summary>
+            <param name="fields">The fields.</param>
+            <param name="query">The query.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.GroupedFlexible(System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{Examine.SearchCriteria.BooleanOperation},System.String[])">
+            <summary>
+            Queries on multiple fields with their inclusions customly defined
+            </summary>
+            <param name="fields">The fields.</param>
+            <param name="query">The query.</param>
+            <param name="operations">The operations.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.OrderBy(System.String[])">
+            <summary>
+            Orders the results by the specified fields
+            </summary>
+            <param name="fieldNames">The field names.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchCriteria.IQuery.OrderByDescending(System.String[])">
+            <summary>
+            Orders the results by the specified fields in a descending order
+            </summary>
+            <param name="fieldNames">The field names.</param>
+            <returns></returns>
+        </member>
+        <member name="P:Examine.SearchCriteria.IQuery.BooleanOperation">
+            <summary>
+            Gets the boolean operation which this query method will be added as
+            </summary>
+            <value>The boolean operation.</value>
+        </member>
+        <member name="M:Examine.SearchCriteria.ISearchCriteria.RawQuery(System.String)">
+            <summary>
+            Passes a raw search query to the provider to handle
+            </summary>
+            <param name="query">The query.</param>
+            <returns></returns>
         </member>
         <member name="P:Examine.SearchCriteria.ISearchCriteria.SearchIndexType">
             <summary>
             Indicates the type of data to search on
             </summary>
-        </member>
-        <member name="T:Examine.Config.ExamineSettings">
-            <summary>
-            Config section for Examine
-            </summary>
-        </member>
-        <member name="P:Examine.Config.ExamineSettings.Instance">
-            <summary>
-            Gets the instance of the Examine settings.
-            </summary>
-            <value>The instance.</value>
-        </member>
-        <member name="P:Examine.Config.ExamineSettings.SearchProviders">
-            <summary>
-            Gets the search providers.
-            </summary>
-            <value>The search providers.</value>
-        </member>
-        <member name="P:Examine.Config.ExamineSettings.IndexProviders">
-            <summary>
-            Gets the index providers.
-            </summary>
-            <value>The index providers.</value>
         </member>
     </members>
 </doc>

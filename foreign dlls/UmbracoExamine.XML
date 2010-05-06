@@ -11,23 +11,239 @@
             <value>Field Name</value>
             <returns></returns>
         </member>
-        <member name="M:UmbracoExamine.LuceneExamineSearcher.Search(System.String,System.Int32,System.Boolean)">
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.#ctor(UmbracoExamine.SearchCriteria.LuceneSearchCriteria,Lucene.Net.Search.BooleanClause.Occur)">
+            <summary>
+            Initializes a new instance of the <see cref="T:UmbracoExamine.SearchCriteria.LuceneQuery"/> class.
+            </summary>
+            <param name="search">The search.</param>
+            <param name="occurance">The occurance.</param>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.Id(System.Int32)">
+            <summary>
+            Query on the id
+            </summary>
+            <param name="id">The id.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.NodeName(System.String)">
+            <summary>
+            Query on the NodeName
+            </summary>
+            <param name="nodeName">Name of the node.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.NodeTypeAlias(System.String)">
+            <summary>
+            Query on the NodeTypeAlias
+            </summary>
+            <param name="nodeTypeAlias">The node type alias.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.ParentId(System.Int32)">
+            <summary>
+            Query on the Parent ID
+            </summary>
+            <param name="id">The id of the parent.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.Field(System.String,System.String)">
+            <summary>
+            Query on the specified field
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="fieldValue">The field value.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.Range(System.String,System.DateTime,System.DateTime)">
+            <summary>
+            Ranges the specified field name.
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="start">The start.</param>
+            <param name="end">The end.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.Range(System.String,System.DateTime,System.DateTime,System.Boolean,System.Boolean)">
+            <summary>
+            Ranges the specified field name.
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="start">The start.</param>
+            <param name="end">The end.</param>
+            <param name="includeLower">if set to <c>true</c> [include lower].</param>
+            <param name="includeUpper">if set to <c>true</c> [include upper].</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.Range(System.String,System.Int32,System.Int32)">
+            <summary>
+            Ranges the specified field name.
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="start">The start.</param>
+            <param name="end">The end.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.Range(System.String,System.Int32,System.Int32,System.Boolean,System.Boolean)">
+            <summary>
+            Ranges the specified field name.
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="start">The start.</param>
+            <param name="end">The end.</param>
+            <param name="includeLower">if set to <c>true</c> [include lower].</param>
+            <param name="includeUpper">if set to <c>true</c> [include upper].</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.Range(System.String,System.String,System.String)">
+            <summary>
+            Ranges the specified field name.
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="start">The start.</param>
+            <param name="end">The end.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.Range(System.String,System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Ranges the specified field name.
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="start">The start.</param>
+            <param name="end">The end.</param>
+            <param name="includeLower">if set to <c>true</c> [include lower].</param>
+            <param name="includeUpper">if set to <c>true</c> [include upper].</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.NodeName(Examine.SearchCriteria.IExamineValue)">
+            <summary>
+            Query on the NodeName
+            </summary>
+            <param name="nodeName">Name of the node.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.NodeTypeAlias(Examine.SearchCriteria.IExamineValue)">
+            <summary>
+            Query on the NodeTypeAlias
+            </summary>
+            <param name="nodeTypeAlias">The node type alias.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.Field(System.String,Examine.SearchCriteria.IExamineValue)">
+            <summary>
+            Query on the specified field
+            </summary>
+            <param name="fieldName">Name of the field.</param>
+            <param name="fieldValue">The field value.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.GroupedAnd(System.Collections.Generic.IEnumerable{System.String},System.String[])">
+            <summary>
+            Queries multiple fields with each being an And boolean operation
+            </summary>
+            <param name="fields">The fields.</param>
+            <param name="query">The query.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.GroupedOr(System.Collections.Generic.IEnumerable{System.String},System.String[])">
+            <summary>
+            Queries multiple fields with each being an Or boolean operation
+            </summary>
+            <param name="fields">The fields.</param>
+            <param name="query">The query.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.GroupedNot(System.Collections.Generic.IEnumerable{System.String},System.String[])">
+            <summary>
+            Queries multiple fields with each being an Not boolean operation
+            </summary>
+            <param name="fields">The fields.</param>
+            <param name="query">The query.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.GroupedFlexible(System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{Examine.SearchCriteria.BooleanOperation},System.String[])">
+            <summary>
+            Queries on multiple fields with their inclusions customly defined
+            </summary>
+            <param name="fields">The fields.</param>
+            <param name="operations">The operations.</param>
+            <param name="query">The query.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.OrderBy(System.String[])">
+            <summary>
+            Orders the results by the specified fields
+            </summary>
+            <param name="fieldNames">The field names.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneQuery.OrderByDescending(System.String[])">
+            <summary>
+            Orders the results by the specified fields in a descending order
+            </summary>
+            <param name="fieldNames">The field names.</param>
+            <returns></returns>
+        </member>
+        <member name="P:UmbracoExamine.SearchCriteria.LuceneQuery.BooleanOperation">
+            <summary>
+            Gets the boolean operation which this query method will be added as
+            </summary>
+            <value>The boolean operation.</value>
+        </member>
+        <member name="T:UmbracoExamine.LuceneExamineSearcher">
+            <summary>
+            An Examine searcher which uses Lucene.Net as the 
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineSearcher.Initialize(System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Initializes the provider.
+            </summary>
+            <param name="name">The friendly name of the provider.</param>
+            <param name="config">A collection of the name/value pairs representing the provider-specific attributes specified in the configuration for this provider.</param>
+            <exception cref="T:System.ArgumentNullException">
+            The name of the provider is null.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            The name of the provider has a length of zero.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            An attempt is made to call <see cref="M:System.Configuration.Provider.ProviderBase.Initialize(System.String,System.Collections.Specialized.NameValueCollection)"/> on a provider after the provider has already been initialized.
+            </exception>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineSearcher.Search(System.String,System.Boolean)">
             <summary>
             Simple search method which defaults to searching content nodes
             </summary>
             <param name="searchText"></param>
-            <param name="maxResults"></param>
             <param name="useWildcards"></param>
             <returns></returns>
         </member>
-        <member name="M:UmbracoExamine.LuceneExamineSearcher.PrepareResults(Lucene.Net.Search.TopDocs,System.String[],Lucene.Net.Search.IndexSearcher)">
+        <member name="M:UmbracoExamine.LuceneExamineSearcher.Search(Examine.SearchCriteria.ISearchCriteria)">
             <summary>
-            Creates a list of dictionary's from the hits object and returns a list of SearchResult.
-            This also removes duplicates.
+            Searches the data source using the Examine Fluent API
             </summary>
-            <param name="tDocs">The top docs.</param>
-            <param name="searchFields">The search fields.</param>
-            <param name="searcher">The searcher.</param>
+            <param name="searchParams">The fluent API search.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineSearcher.CreateSearchCriteria(Examine.IndexType)">
+            <summary>
+            Creates an instance of SearchCriteria for the provider
+            </summary>
+            <param name="type">The type of data in the index.</param>
+            <returns>A blank SearchCriteria</returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineSearcher.CreateSearchCriteria(Examine.IndexType,Examine.SearchCriteria.BooleanOperation)">
+            <summary>
+            Creates an instance of SearchCriteria for the provider
+            </summary>
+            <param name="type">The type of data in the index.</param>
+            <param name="defaultOperation">The default operation.</param>
+            <returns>A blank SearchCriteria</returns>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineSearcher.GetSearcher">
+            <summary>
+            Gets the searcher for this instance
+            </summary>
             <returns></returns>
         </member>
         <member name="P:UmbracoExamine.LuceneExamineSearcher.LuceneIndexFolder">
@@ -141,20 +357,66 @@
             Returns a string array of all fields that are indexed including Umbraco fields
             </summary>
         </member>
+        <member name="M:UmbracoExamine.DataServices.UmbracoContentService.StripHtml(System.String)">
+            <summary>
+            removes html markup from a string
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.DataServices.UmbracoContentService.GetPublishedContentByXPath(System.String)">
+            <summary>
+            Gets published content by xpath
+            </summary>
+            <param name="xpath"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.DataServices.UmbracoContentService.GetLatestContentByXPath(System.String)">
+            <summary>
+            This is quite an intensive operation...
+            get all root content, then get the XML structure for all children,
+            then run xpath against the navigator that's created
+            </summary>
+            <param name="xpath"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.DataServices.UmbracoContentService.GetPage(System.Int32)">
+            <summary>
+            Unfortunately, we need to implement our own IsProtected method since 
+            the Umbraco core code requires an HttpContext for this method and when we're running
+            async, there is no context
+            </summary>
+            <param name="documentId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.DataServices.UmbracoContentService.IsProtected(System.Int32,System.String)">
+            <summary>
+            Unfortunately, we need to implement our own IsProtected method since 
+            the Umbraco core code requires an HttpContext for this method and when we're running
+            async, there is no context
+            </summary>
+            <param name="nodeId"></param>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
         <member name="T:UmbracoExamine.LuceneExamineIndexer">
             <summary>
             
             </summary>
             <remarks>
+            <para>
             Some links picked up along the way:
-            
+            </para>
+            <para>
             A matrix of concurrent lucene operations: 
             http://www.jguru.com/faq/view.jsp?EID=913302.
-            
-            based on the info here, it is best to only call optimize when there is no activity,
+            </para>
+            <para>
+            Based on the info here, it is best to only call optimize when there is no activity,
             we only optimized after the queue has been processed and at startup:
             http://www.gossamer-threads.com/lists/lucene/java-dev/47895
             http://lucene.apache.org/java/2_2_0/api/org/apache/lucene/index/IndexWriter.html
+            </para>
             </remarks>
         </member>
         <member name="F:UmbracoExamine.LuceneExamineIndexer.OptimizationCommitThreshold">
@@ -249,7 +511,7 @@
         </member>
         <member name="M:UmbracoExamine.LuceneExamineIndexer.GetDataToIndex(System.Xml.Linq.XElement,Examine.IndexType)">
             <summary>
-            Collects all of the data that neesd to be indexed as defined in the index set.
+            Collects all of the data that needs to be indexed as defined in the index set.
             </summary>
             <param name="node"></param>
             <returns></returns>
@@ -288,6 +550,14 @@
             that the correct machine processes the items into the index. SafelyQueueItems calls this method
             if it confirms that this machine is the one to process the queue.
             </remarks>
+        </member>
+        <member name="M:UmbracoExamine.LuceneExamineIndexer.GetXDocument(System.String,Examine.IndexType)">
+            <summary>
+            Returns an XDocument for the entire tree stored for the IndexType specified.
+            </summary>
+            <param name="xPath"></param>
+            <param name="type"></param>
+            <returns></returns>
         </member>
         <member name="M:UmbracoExamine.LuceneExamineIndexer.SaveDeleteIndexQueueItem(System.Collections.Generic.KeyValuePair{System.String,System.String})">
             <summary>
@@ -355,25 +625,6 @@
             <param name="val"></param>
             <returns></returns>
         </member>
-        <member name="M:UmbracoExamine.LuceneExamineIndexer.GetPage(System.Int32)">
-            <summary>
-            Unfortunately, we need to implement our own IsProtected method since 
-            the Umbraco core code requires an HttpContext for this method and when we're running
-            async, there is no context
-            </summary>
-            <param name="documentId"></param>
-            <returns></returns>
-        </member>
-        <member name="M:UmbracoExamine.LuceneExamineIndexer.IsProtected(System.Int32,System.String)">
-            <summary>
-            Unfortunately, we need to implement our own IsProtected method since 
-            the Umbraco core code requires an HttpContext for this method and when we're running
-            async, there is no context
-            </summary>
-            <param name="nodeId"></param>
-            <param name="path"></param>
-            <returns></returns>
-        </member>
         <member name="M:UmbracoExamine.LuceneExamineIndexer.AddNodesToIndex(System.String,Examine.IndexType)">
             <summary>
             Adds all nodes with the given xPath root.
@@ -399,17 +650,14 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:UmbracoExamine.LuceneExamineIndexer.AddLog(System.Int32,System.String,umbraco.BusinessLogic.LogTypes)">
-            <summary>
-            Adds a log entry to the umbraco log
-            </summary>
-            <param name="nodeId"></param>
-            <param name="msg"></param>
-            <param name="type"></param>
-        </member>
         <member name="M:UmbracoExamine.LuceneExamineIndexer.Dispose">
             <summary>
             When the object is disposed, all data should be written
+            </summary>
+        </member>
+        <member name="P:UmbracoExamine.LuceneExamineIndexer.DataService">
+            <summary>
+            The data service used for retreiving and submitting data to the cms
             </summary>
         </member>
         <member name="P:UmbracoExamine.LuceneExamineIndexer.IndexingAnalyzer">
@@ -451,12 +699,74 @@
             </summary>
             <value></value>
         </member>
+        <member name="T:UmbracoExamine.DataServices.UmbracoMediaService">
+            <summary>
+            Data service used to query for media
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.DataServices.UmbracoMediaService.GetLatestMediaByXpath(System.String)">
+            <summary>
+            This is quite an intensive operation...
+            get all root media, then get the XML structure for all children,
+            then run xpath against the navigator that's created
+            </summary>
+            <param name="xpath"></param>
+            <returns></returns>
+        </member>
         <member name="M:UmbracoExamine.FileSystemExtensions.ClearFiles(System.IO.DirectoryInfo)">
             <summary>
             Deletes all files in the folder and returns the number deleted.
             </summary>
             <param name="di"></param>
             <returns></returns>
+        </member>
+        <member name="T:UmbracoExamine.SearchResults">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:UmbracoExamine.SearchResults.docs">
+            <summary>
+            Internal cache of search results
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.SearchResults.CreateSearchResult(Lucene.Net.Documents.Document,System.Single)">
+            <summary>
+            Creates the search result from a <see cref="T:Lucene.Net.Documents.Document"/>
+            </summary>
+            <param name="doc">The doc to convert.</param>
+            <param name="score">The score.</param>
+            <returns>A populated search result object</returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchResults.Skip(System.Int32)">
+            <summary>
+            Skips to a particular point in the search results.
+            </summary>
+            <remarks>
+            This allows for lazy loading of the results paging. We don't go into Lucene until we have to.
+            </remarks>
+            <param name="skip">The skip.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchResults.GetEnumerator">
+            <summary>
+            Gets the enumerator.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchResults.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through a collection.
+            </summary>
+            <returns>
+            An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
+            </returns>
+        </member>
+        <member name="P:UmbracoExamine.SearchResults.TotalItemCount">
+            <summary>
+            Gets the total number of results for the search
+            </summary>
+            <value>The total item count.</value>
         </member>
         <member name="T:UmbracoExamine.UmbracoEventManager">
             <summary>
@@ -501,11 +811,13 @@
             Defines XPath statements that map to specific umbraco nodes
             </summary>
         </member>
-        <member name="P:UmbracoExamine.Config.IndexSet.MaxResults">
+        <member name="P:UmbracoExamine.Config.IndexSet.IndexPath">
             <summary>
-            Set this to configure the default maximum search results for an index set.
-            If not set, 200 is the default.
+            The folder path of where the lucene index is stored
             </summary>
+            <remarks>
+            This can be set at runtime but will not be persisted to the configuration file
+            </remarks>
         </member>
         <member name="P:UmbracoExamine.Config.IndexSet.IndexDirectory">
             <summary>
@@ -578,6 +890,61 @@
             </summary>
             <param name="fieldName"></param>
             <returns></returns>
+        </member>
+        <member name="T:UmbracoExamine.SearchCriteria.LuceneSearchCriteria">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneSearchCriteria.ToString">
+            <summary>
+            Returns a <see cref="T:System.String"/> that represents this instance.
+            </summary>
+            <returns>
+            A <see cref="T:System.String"/> that represents this instance.
+            </returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneSearchCriteria.Id(System.Int32)">
+            <summary>
+            Query on the id
+            </summary>
+            <param name="id">The id.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneSearchCriteria.RawQuery(System.String)">
+            <summary>
+            Passes a raw search query to the provider to handle
+            </summary>
+            <param name="query">The query.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneSearchCriteria.OrderBy(System.String[])">
+            <summary>
+            Orders the results by the specified fields
+            </summary>
+            <param name="fieldNames">The field names.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneSearchCriteria.OrderByDescending(System.String[])">
+            <summary>
+            Orders the results by the specified fields in a descending order
+            </summary>
+            <param name="fieldNames">The field names.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.SearchCriteria.LuceneSearchCriteria.OrderByInternal(System.Boolean,System.String[])">
+            <summary>
+            Internal operation for adding the ordered results
+            </summary>
+            <param name="descending">if set to <c>true</c> [descending].</param>
+            <param name="fieldNames">The field names.</param>
+            <returns></returns>
+        </member>
+        <member name="P:UmbracoExamine.SearchCriteria.LuceneSearchCriteria.BooleanOperation">
+            <summary>
+            Gets the boolean operation which this query method will be added as
+            </summary>
+            <value>The boolean operation.</value>
         </member>
         <member name="P:UmbracoExamine.Config.IndexSetCollection.Item(System.String)">
             <summary>
@@ -693,6 +1060,20 @@
             <summary>
             The number of servers active in indexing
             </summary>
+        </member>
+        <member name="M:UmbracoExamine.AllHitsCollector.GetDocId(System.Int32)">
+            <summary>
+            Gets the doc id at a specified index
+            </summary>
+            <param name="index">The index.</param>
+            <returns></returns>
+        </member>
+        <member name="M:UmbracoExamine.AllHitsCollector.GetDocScore(System.Int32)">
+            <summary>
+            Gets the doc score for a doc at a specified index
+            </summary>
+            <param name="index">The index.</param>
+            <returns></returns>
         </member>
     </members>
 </doc>
