@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 using System.IO;
+using System.Linq;
 using System.Text;
+using umbraco.cms.businesslogic.datatype;
+using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
-using umbraco.cms.businesslogic.propertytype;
-using System.Reflection;
-using System.Linq;
-using umbraco.cms.businesslogic.datatype;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
@@ -92,7 +88,7 @@ namespace {0} {{
         {{
             get
             {{
-                return (IEnumerable<I{0}>)this.LoadTree<{0}>();
+                return this.LoadTree<{0}>().OfType<I{0}>();
             }}
         }}";
         #endregion
@@ -184,7 +180,7 @@ namespace {0} {{
         {{
             get
             {{
-                return (IEnumerable<I{0}>)this.{0}s;
+                return this.{0}s.OfType<I{0}>();
             }}
         }}";
         #endregion

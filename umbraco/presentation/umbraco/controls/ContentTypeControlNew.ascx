@@ -93,6 +93,8 @@
 </asp:Panel>
 
 <script type="text/javascript">
-    duplicatePropertyNameAsSafeAlias('ctl00_body_ContentTypeControlNew1_GenericPropertyNew_control_tbName', 'ctl00_body_ContentTypeControlNew1_GenericPropertyNew_control_tbAlias');
-    checkAlias('ctl00_body_ContentTypeControlNew1_txtAlias');
+    $(function() {
+        duplicatePropertyNameAsSafeAlias('ctl00_body_ContentTypeControlNew1_GenericPropertyNew_control_tbName', 'ctl00_body_ContentTypeControlNew1_GenericPropertyNew_control_tbAlias');
+        checkAlias('ctl00_body_ContentTypeControlNew1_txtAlias');
+    });
 </script>

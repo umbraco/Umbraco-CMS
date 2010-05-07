@@ -61,5 +61,5 @@
 		</div>
 </li>
 <script type="text/javascript">
-    checkAlias('<%=this.ClientID%>_tbAlias');
+    $(function() { checkAlias('<%=this.ClientID%>_tbAlias'); });
 </script>

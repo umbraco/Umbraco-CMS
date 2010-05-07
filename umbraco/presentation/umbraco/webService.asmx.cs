@@ -144,7 +144,7 @@ namespace umbraco
                 IEnumerable<SearchResult> results;
                 if (Query.StartsWith("*"))
                 {
-                    results = internalSearcher.Search("*", 20, true);
+                    results = internalSearcher.Search("*", true);
                 }
                 else
                 {

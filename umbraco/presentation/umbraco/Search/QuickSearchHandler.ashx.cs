@@ -48,7 +48,7 @@ namespace umbraco.presentation.umbraco.Search
             IEnumerable<SearchResult> results;
             if (txt.StartsWith("*"))
             {
-                results = internalSearcher.Search("*", 100, true);
+                results = internalSearcher.Search("*", true);
             }
             else
             {

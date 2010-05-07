@@ -50,7 +50,7 @@ namespace umbraco.presentation.dialogs
             IEnumerable<SearchResult> results;
             if (query.StartsWith("*"))
             {
-                results = internalSearcher.Search("*", 100, true);
+                results = internalSearcher.Search("*", true);
             }
             else
             {
