@@ -76,7 +76,7 @@ namespace umbraco.cms.businesslogic.member
         /// <summary>
         /// The name of the member
         /// </summary>
-        public new string Text
+        public override string Text
         {
             get
             {
@@ -1177,6 +1177,8 @@ namespace umbraco.cms.businesslogic.member
     /// directly on the UmbracoMemberShipMember class.
     /// This is a helper implementation only to be able to use the encryption functionality 
     /// of the membership provides (which are protected).
+    /// 
+    /// ... which means this class should have been marked internal with a Friend reference to the other assembly right??
     /// </summary>
     public class MemberShipHelper : MembershipProvider
     {
