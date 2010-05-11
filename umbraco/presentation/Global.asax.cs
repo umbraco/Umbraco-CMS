@@ -14,21 +14,45 @@ namespace umbraco
 	/// </summary>
 	public class Global : HttpApplication
 	{
-		protected virtual void Session_Start(Object sender, EventArgs e)
-		{
-			if(GlobalSettings.EnableStat)
-			{
-				try
-				{
-					new Session();
-				}
-				catch(Exception state)
-				{
-                    Log.Add(LogTypes.Error, BusinessLogic.User.GetUser(0), -1, "Error initializing stat: " + state);
-				}
-			}
-		}
+        protected virtual void Application_Start(object sender, EventArgs e)
+        {
 
+        }
+
+        protected virtual void Session_Start(Object sender, EventArgs e)
+        {
+            if (GlobalSettings.EnableStat)
+            {
+                try
+                {
+                    new Session();
+                }
+                catch (Exception state)
+                {
+                    Log.Add(LogTypes.Error, BusinessLogic.User.GetUser(0), -1, "Error initializing stat: " + state);
+                }
+            }
+        }
+
+        protected virtual void Application_BeginRequest(object sender, EventArgs e)
+        {
+
+        }
+
+        protected virtual void Application_AuthenticateRequest(object sender, EventArgs e)
+        {
+
+        }
+
+        protected virtual void Application_Error(object sender, EventArgs e)
+        {
+
+        }
+
+        protected virtual void Session_End(object sender, EventArgs e)
+        {
+
+        }
 
 		protected virtual void Application_End(Object sender, EventArgs e)
 		{

@@ -11,6 +11,7 @@ using ClientDependency.Core;
 using umbraco.cms.helpers;
 using umbraco.IO;
 using umbraco.presentation;
+using umbraco.cms.businesslogic;
 
 namespace umbraco.controls
 {
@@ -199,17 +200,20 @@ namespace umbraco.controls
             if (!Page.IsPostBack)
             {
                 string chosenContentTypeIDs = "";
-                foreach (cms.businesslogic.ContentType ct in cType.GetAll())
+                ContentType[] contentTypes = cType.GetAll();
+                foreach (cms.businesslogic.ContentType ct in contentTypes.OrderBy(x => x.Text))
                 {
                     ListItem li = new ListItem(ct.Text, ct.Id.ToString());
                     dualAllowedContentTypes.Items.Add(li);
                     lstAllowedContentTypes.Items.Add(li);
                     foreach (int i in allowedIds)
+                    {
                         if (i == ct.Id)
                         {
                             li.Selected = true;
                             chosenContentTypeIDs += ct.Id + ",";
                         }
+                    }
                 }
                 dualAllowedContentTypes.Value = chosenContentTypeIDs;
             }

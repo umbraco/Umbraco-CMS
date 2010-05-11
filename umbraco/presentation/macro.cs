@@ -633,7 +633,7 @@ namespace umbraco
                         catch (Exception e)
                         {
                             // inner exception code by Daniel Lindström from SBBS.se
-                            Exception ie = e.InnerException;
+                            Exception ie = e;
                             while (ie != null)
                             {
                                 HttpContext.Current.Trace.Warn("umbracoMacro InnerException", ie.Message, ie);
