@@ -31,10 +31,19 @@ namespace umbraco.cms.businesslogic.datatype
 			setupDataTypeDefinition();
 		}
 
+        public override void delete()
+        {
+            //delete the cmsDataType role, then the umbracoNode
+            SqlHelper.ExecuteNonQuery("delete from cmsDataType where nodeId=@nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
+            base.delete();
+
+            cache.Cache.ClearCacheItem(string.Format("UmbracoDataTypeDefinition{0}", Id));
+        }
+
+        [Obsolete("Use the standard delete() method instead")]
         public void Delete()
         {
             delete();
-            cache.Cache.ClearCacheItem(string.Format("UmbracoDataTypeDefinition{0}", Id));
         }
 
 	    /// <summary>
