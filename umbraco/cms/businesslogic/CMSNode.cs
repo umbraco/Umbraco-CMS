@@ -11,6 +11,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
 using umbraco.IO;
+using umbraco.cms.businesslogic.media;
 
 namespace umbraco.cms.businesslogic
 {
@@ -44,7 +45,8 @@ namespace umbraco.cms.businesslogic
         private int _userId;
         private DateTime _createDate;
         private bool _hasChildrenInitialized;
-        private string m_image = "default.png"; 
+        private string m_image = "default.png";
+        private bool? _isTrashed = null;
 
         #endregion
 
@@ -132,7 +134,7 @@ namespace umbraco.cms.businesslogic
         /// <returns>True if there is a CMSNode with the given id</returns>
         public static bool IsNode(int Id)
         {
-            return (SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where id = '" + Id + "'") > 0);
+            return (SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where id = @id", SqlHelper.CreateParameter("@id", Id)) > 0);
         }
 
         /// <summary>
@@ -231,7 +233,7 @@ namespace umbraco.cms.businesslogic
             // But does anyone know what the 'level++' is supposed to be doing there?
             // Nothing obviously, since it's a postfix.
 
-            SqlHelper.ExecuteNonQuery("INSERT INTO umbracoNode(trashed, parentID, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text) VALUES(@trashed, @parentID, @nodeObjectType, @nodeUser, @level, @path, @sortOrder, @uniqueID, @text)",
+            SqlHelper.ExecuteNonQuery("INSERT INTO umbracoNode(trashed, parentID, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text, createDate) VALUES(@trashed, @parentID, @nodeObjectType, @nodeUser, @level, @path, @sortOrder, @uniqueID, @text, @createDate)",
                                       SqlHelper.CreateParameter("@trashed", 0),
                                       SqlHelper.CreateParameter("@parentID", parentId),
                                       SqlHelper.CreateParameter("@nodeObjectType", objectType),
@@ -240,7 +242,8 @@ namespace umbraco.cms.businesslogic
                                       SqlHelper.CreateParameter("@path", path),
                                       SqlHelper.CreateParameter("@sortOrder", sortOrder),
                                       SqlHelper.CreateParameter("@uniqueID", uniqueID),
-                                      SqlHelper.CreateParameter("@text", text));
+                                      SqlHelper.CreateParameter("@text", text),
+                                      SqlHelper.CreateParameter("@createDate", DateTime.Now));
 
             CMSNode retVal = new CMSNode(uniqueID);
             retVal.Path = path + "," + retVal.Id.ToString();
@@ -334,6 +337,49 @@ namespace umbraco.cms.businesslogic
 
         #region Public Methods
 
+
+        /// <summary>
+        /// An xml representation of the CMSNOde
+        /// </summary>
+        /// <param name="xd">Xmldocument context</param>
+        /// <param name="Deep">If true the xml will append the CMSNodes child xml</param>
+        /// <returns>The CMSNode Xmlrepresentation</returns>
+        public virtual XmlNode ToXml(XmlDocument xd, bool Deep)
+        {
+            XmlNode x = xd.CreateNode(XmlNodeType.Element, "node", "");
+            XmlPopulate(xd, x, Deep);
+            return x;
+        }
+
+        public virtual XmlNode ToPreviewXml(XmlDocument xd)
+        {
+            // If xml already exists
+            if (!PreviewExists(UniqueId))
+            {
+                savePreviewXml(ToXml(xd, false), UniqueId);
+            }
+            return GetPreviewXml(xd, UniqueId);
+        }
+
+        public virtual List<CMSPreviewNode> GetNodesForPreview(bool childrenOnly)
+        {
+            List<CMSPreviewNode> nodes = new List<CMSPreviewNode>();
+            string sql = @"
+select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsPreviewXml.xml from umbracoNode 
+inner join cmsPreviewXml on cmsPreviewXml.nodeId = umbracoNode.id 
+where trashed = 0 and path like '{0}' 
+order by level,sortOrder";
+
+            string pathExp = childrenOnly ? Path + ",%" : Path;
+
+            IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(sql, pathExp));
+            while (dr.Read())
+                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("uniqueID"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml")));
+            dr.Close();
+
+            return nodes;
+        }
+
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
         /// </summary>
@@ -360,46 +406,74 @@ namespace umbraco.cms.businesslogic
             }
 
             return base.ToString();
-        }
+        }      
 
         /// <summary>
         /// Moves the CMSNode from the current position in the hierarchy to the target
         /// </summary>
         /// <param name="NewParentId">Target CMSNode id</param>
-        public void Move(int NewParentId)
+        public void Move(int newParentId)
         {
+            //first we need to establish if the node already exists under the parent node
+            var isSameParent = (Path.Contains("," + newParentId + ","));
+
             MoveEventArgs e = new MoveEventArgs();
             FireBeforeMove(e);
 
             if (!e.Cancel)
             {
-                int maxSortOrder = SqlHelper.ExecuteScalar<int>(
+                CMSNode n = new CMSNode(newParentId);
+
+                //if it's the same parent, we can save some SQL calls since we know these wont change.
+                //level and path might change even if it's the same parent because the parent could be moving somewhere.
+                if (!isSameParent)
+                {
+                    int maxSortOrder = SqlHelper.ExecuteScalar<int>(
                     "select coalesce(max(sortOrder),0) from umbracoNode where parentid = @parentId",
-                    SqlHelper.CreateParameter("@parentId", NewParentId));
+                    SqlHelper.CreateParameter("@parentId", newParentId));
 
-
-                CMSNode n = new CMSNode(NewParentId);
-                this.Parent = n;
+                    this.Parent = n;
+                    this.sortOrder = maxSortOrder + 1;
+                }                
+                
                 this.Level = n.Level + 1;
                 this.Path = n.Path + "," + this.Id.ToString();
 
-                this.sortOrder = maxSortOrder + 1;
+                //this code block should not be here but since the class structure is very poor and doesn't use 
+                //overrides (instead using shadows/new) for the Children property, when iterating over the children
+                //and calling Move(), the super classes overridden OnMove or Move methods never get fired, so 
+                //we now need to hard code this here :(
 
-
-                if (n.nodeObjectType == web.Document._objectType)
+                //make sure the node type is a document/media, if it is a recycle bin then this will not be equal
+                if (n.nodeObjectType == Document._objectType)
                 {
-                    Document d =
-                        new umbraco.cms.businesslogic.web.Document(n.Id);
+                    //regenerate the xml for the parent node
+                    var d = new Document(n.Id);
                     d.XmlGenerate(new XmlDocument());
-
                 }
-                else if (n.nodeObjectType == media.Media._objectType)
-                    new umbraco.cms.businesslogic.media.Media(n.Id).XmlGenerate(new XmlDocument());
+                else if (n.nodeObjectType == Media._objectType)
+                {
+                    //regenerate the xml for the parent node
+                    var m = new Media(n.Id);
+                    m.XmlGenerate(new XmlDocument());                    
+                }
 
-                //store children array here because iterating over an Array property object is very inneficient.
+                if (Path.Contains("," + ((int)RecycleBin.RecycleBinType.Content).ToString() + ",")
+                    || Path.Contains("," + ((int)RecycleBin.RecycleBinType.Media).ToString() + ","))
+                {
+                    //if we've moved this to the recyle bin, we need to update the trashed property
+                    if (!IsTrashed) IsTrashed = true; //don't update if it's not necessary
+                }
+                else
+                {
+                    if (IsTrashed) IsTrashed = false; //don't update if it's not necessary
+                }
+
                 var children = this.Children;
                 foreach (CMSNode c in children)
+                {
                     c.Move(this.Id);
+                }
 
                 FireAfterMove(e);
             }
@@ -454,47 +528,28 @@ namespace umbraco.cms.businesslogic
 
         #region Public properties
 
-
         /// <summary>
-        /// An xml representation of the CMSNOde
+        /// Determines if the node is in the recycle bin.
+        /// This is only relavent for node types that support a recyle bin (such as Document/Media)
         /// </summary>
-        /// <param name="xd">Xmldocument context</param>
-        /// <param name="Deep">If true the xml will append the CMSNodes child xml</param>
-        /// <returns>The CMSNode Xmlrepresentation</returns>
-        public virtual XmlNode ToXml(XmlDocument xd, bool Deep)
+        public bool IsTrashed
         {
-            XmlNode x = xd.CreateNode(XmlNodeType.Element, "node", "");
-            XmlPopulate(xd, x, Deep);
-            return x;
-        }
-
-        public virtual XmlNode ToPreviewXml(XmlDocument xd)
-        {
-            // If xml already exists
-            if (!PreviewExists(UniqueId))
+            get
             {
-                savePreviewXml(ToXml(xd, false), UniqueId);
+                if (!_isTrashed.HasValue)
+                {
+                    _isTrashed = Convert.ToBoolean(SqlHelper.ExecuteScalar<object>("SELECT trashed FROM umbracoNode where id=@id",
+                        SqlHelper.CreateParameter("@id", this.Id)));
+                }
+                return _isTrashed.Value;
             }
-            return GetPreviewXml(xd, UniqueId);
-        }
-
-        public virtual List<CMSPreviewNode> GetNodesForPreview(bool childrenOnly)
-        {
-            List<CMSPreviewNode> nodes = new List<CMSPreviewNode>();
-            string sql = @"
-select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsPreviewXml.xml from umbracoNode 
-inner join cmsPreviewXml on cmsPreviewXml.nodeId = umbracoNode.id 
-where trashed = 0 and path like '{0}' 
-order by level,sortOrder";
-
-            string pathExp = childrenOnly ? Path + ",%" : Path;
-
-            IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(sql, pathExp));
-            while (dr.Read())
-                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("uniqueID"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml")));
-            dr.Close();
-
-            return nodes;
+            set
+            {
+                _isTrashed = value;
+                SqlHelper.ExecuteNonQuery("update umbracoNode set trashed = @trashed where id = @id",
+                    SqlHelper.CreateParameter("@trashed", value),
+                    SqlHelper.CreateParameter("@id", this.Id));
+            }
         }
 
         /// <summary>
@@ -511,7 +566,6 @@ order by level,sortOrder";
             }
         }
 
-
         /// <summary>
         /// Gets or sets the create date time.
         /// </summary>
@@ -525,7 +579,6 @@ order by level,sortOrder";
                 SqlHelper.ExecuteNonQuery("update umbracoNode set createDate = @createDate where id = " + this.Id.ToString(), SqlHelper.CreateParameter("@createDate", _createDate));
             }
         }
-
 
         /// <summary>
         /// Gets the creator
@@ -635,21 +688,19 @@ order by level,sortOrder";
             get
             {
                 System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-                IRecordsReader dr = SqlHelper.ExecuteReader("SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE ParentID = @ParentID AND nodeObjectType = @type order by sortOrder",
-                    SqlHelper.CreateParameter("@type", this.nodeObjectType), SqlHelper.CreateParameter("ParentID", this.Id));
-                while (dr.Read())
+                using (IRecordsReader dr = SqlHelper.ExecuteReader("SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE ParentID = @ParentID AND nodeObjectType = @type order by sortOrder",
+                    SqlHelper.CreateParameter("@type", this.nodeObjectType), SqlHelper.CreateParameter("ParentID", this.Id)))
                 {
-                    ;
-                    tmp.Add(new CMSNode(dr));
+                    while (dr.Read())
+                    {
+                        tmp.Add(new CMSNode(dr));
+                    }
                 }
-
-                dr.Close();
-
+                
                 CMSNode[] retval = new CMSNode[tmp.Count];
 
                 for (int i = 0; i < tmp.Count; i++)
                 {
-                    //retval[i] = new CMSNode((int)tmp[i]);
                     retval[i] = (CMSNode)tmp[i];
                 }
                 return retval;
@@ -818,12 +869,14 @@ order by level,sortOrder";
         {
 
             XmlDocument xmlDoc = new XmlDocument();
-            XmlReader xmlRdr = SqlHelper.ExecuteXmlReader(
+            using (XmlReader xmlRdr = SqlHelper.ExecuteXmlReader(
                                                        "select xml from cmsPreviewXml where nodeID = @nodeId and versionId = @versionId",
                                       SqlHelper.CreateParameter("@nodeId", Id),
-                                      SqlHelper.CreateParameter("@versionId", version));
-            xmlDoc.Load(xmlRdr);
-
+                                      SqlHelper.CreateParameter("@versionId", version)))
+            {
+                xmlDoc.Load(xmlRdr);
+            }
+            
             return xd.ImportNode(xmlDoc.FirstChild, true);
         }
 
@@ -861,6 +914,7 @@ order by level,sortOrder";
             _sortOrder = dr.GetInt("sortOrder");
             _userId = dr.GetInt("nodeUser");
             _createDate = dr.GetDateTime("createDate");
+            _isTrashed = dr.GetBoolean("trashed");
         }
 
         #endregion

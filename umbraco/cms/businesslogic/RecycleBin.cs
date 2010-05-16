@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using System.Linq;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
@@ -23,17 +23,29 @@ namespace umbraco.cms.businesslogic
             Media = -21
         }
 
-        private Guid _nodeObjectType;
+        private const string m_ChildCountSQL = @"select count(id) from umbracoNode where nodeObjectType = @nodeObjectType and parentId = @parentId";
+        private const string m_ChildSQL = @"SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode where ParentID = @parentId And nodeObjectType = @type order by sortOrder";
+        private static object m_Locker = new object(); 
 
+        #region Private variables
+
+        private Guid _nodeObjectType;
+        private RecycleBinType m_BinType;
+        
+        #endregion
+
+        #region Constructors
         /// <summary>
         /// Constructor to create a new recycle bin 
         /// </summary>
         /// <param name="nodeObjectType"></param>
         /// <param name="nodeId"></param>
+        [Obsolete("Use the simple constructor that has the RecycleBinType only parameter")]
         public RecycleBin(Guid nodeObjectType, RecycleBinType type)
             : base((int)type)
         {
             _nodeObjectType = nodeObjectType;
+            m_BinType = type;
         }
 
         /// <summary>
@@ -48,9 +60,11 @@ namespace umbraco.cms.businesslogic
             {
                 case RecycleBinType.Content:
                     _nodeObjectType = Document._objectType;
+                    m_BinType = RecycleBinType.Content;
                     break;
                 case RecycleBinType.Media:
                     _nodeObjectType = Media._objectType;
+                    m_BinType = RecycleBinType.Media;
                     break;
 
             }
@@ -60,46 +74,12 @@ namespace umbraco.cms.businesslogic
         /// Old constructor to create a content recycle bin
         /// </summary>
         /// <param name="nodeObjectType"></param>
-        [Obsolete("Use the other constructors instead")]
+        [Obsolete("Use the simple constructor that has the RecycleBinType only parameter")]
         public RecycleBin(Guid nodeObjectType)
-            : this(nodeObjectType, RecycleBinType.Content) { }
+            : this(nodeObjectType, RecycleBinType.Content) { } 
+        #endregion
 
-
-        /// <summary>
-        /// If I smell, I'm not empty 
-        /// </summary>
-        public bool Smells()
-        {
-            return (SqlHelper.ExecuteScalar<int>(
-                    "select count(id) from umbracoNode where nodeObjectType = @nodeObjectType and parentId = @parentId",
-                    SqlHelper.CreateParameter("@parentId", this.Id),
-                    SqlHelper.CreateParameter("@nodeObjectType", _nodeObjectType)) > 0);
-
-        }
-
-        public override umbraco.BusinessLogic.console.IconI[] Children
-        {
-            get
-            {
-                System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-
-                IRecordsReader dr = SqlHelper.ExecuteReader("select id from umbracoNode where ParentID = " + this.Id + " And nodeObjectType = @type order by sortOrder",
-                                        SqlHelper.CreateParameter("@type", _nodeObjectType));
-
-                while (dr.Read())
-                    tmp.Add(dr.GetInt("Id"));
-
-                dr.Close();
-
-                CMSNode[] retval = new CMSNode[tmp.Count];
-
-                for (int i = 0; i < tmp.Count; i++)
-                    retval[i] = new CMSNode((int)tmp[i]);
-
-                return retval;
-            }
-        }
-
+        #region Static methods
         /// <summary>
         /// Get the number of items in the Recycle Bin
         /// </summary>
@@ -107,15 +87,99 @@ namespace umbraco.cms.businesslogic
         [Obsolete("Create a RecycleBin object to get the count per recycle bin type", true)]
         public static int Count()
         {
-            return SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where path like '%,-20,%'");
+            Guid objectType = Document._objectType;
+
+            return SqlHelper.ExecuteScalar<int>(
+                    RecycleBin.m_ChildCountSQL,
+                    SqlHelper.CreateParameter("@parentId", (int)RecycleBinType.Content),
+                    SqlHelper.CreateParameter("@nodeObjectType", objectType));            
         }
 
         public static int Count(RecycleBinType type)
         {
-            string sql = String.Format("select count(id) from umbracoNode where path like '%,{0},%'", (int)type);
-            return SqlHelper.ExecuteScalar<int>(sql);
+            Guid objectType = Document._objectType;
+
+            switch (type)
+            {
+                case RecycleBinType.Content:
+                    objectType = Document._objectType;
+                    break;
+                case RecycleBinType.Media:
+                    objectType = Media._objectType;
+                    break;
+            }            
+
+            return SqlHelper.ExecuteScalar<int>(
+                    RecycleBin.m_ChildCountSQL,
+                    SqlHelper.CreateParameter("@parentId", (int)type),
+                    SqlHelper.CreateParameter("@nodeObjectType", objectType));            
+        }
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// If I smell, I'm not empty 
+        /// </summary>
+        public bool Smells()
+        {
+            return RecycleBin.Count(m_BinType) > 0;
         }
 
+        /// <summary>
+        /// Empties the trash can
+        /// </summary>
+        /// <param name="itemDeletedCallback">a function to call whenever an item is removed from the bin</param>
+        public void CallTheGarbageMan(Action<int> itemDeletedCallback)
+        {
+            lock (m_Locker)
+            {
+                foreach (var c in Children.ToList())
+                {
+                    switch (m_BinType)
+                    {
+                        case RecycleBinType.Content:
+                            new Document(c.Id).delete();
+                            itemDeletedCallback(RecycleBin.Count(m_BinType));
+                            break;
+                        case RecycleBinType.Media:
+                            new Media(c.Id).delete();
+                            itemDeletedCallback(RecycleBin.Count(m_BinType));
+                            break;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Public properties
+        public override umbraco.BusinessLogic.console.IconI[] Children
+        {
+            get
+            {
+                System.Collections.ArrayList tmp = new System.Collections.ArrayList();
+
+                using (IRecordsReader dr = SqlHelper.ExecuteReader(m_ChildSQL,
+                            SqlHelper.CreateParameter("@parentId", this.Id),
+                            SqlHelper.CreateParameter("@type", _nodeObjectType)))
+                {
+                    while (dr.Read())
+                    {
+                        tmp.Add(new CMSNode(dr));
+                    }
+                }
+
+                CMSNode[] retval = new CMSNode[tmp.Count];
+
+                for (int i = 0; i < tmp.Count; i++)
+                {
+                    retval[i] = (CMSNode)tmp[i];
+                }
+                return retval;
+            }
+        } 
+        #endregion
 
     }
 }

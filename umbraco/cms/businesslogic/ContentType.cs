@@ -284,6 +284,8 @@ namespace umbraco.cms.businesslogic
             }
         }
 
+        //THIS SHOULD BE IENUMERABLE<PROPERTYTYPE> NOT LIST!
+
         /// <summary>
         /// The "datafield/column" definitions, a Content object of this type will have an equivalent
         /// list of Properties.
@@ -668,6 +670,11 @@ namespace umbraco.cms.businesslogic
                     t.Delete();
                 }
             }
+
+            //need to delete the allowed relationships between content types
+            SqlHelper.ExecuteNonQuery("delete from cmsContentTypeAllowedContentType where AllowedId=@allowedId or Id=@id",
+                SqlHelper.CreateParameter("@allowedId", Id),
+                SqlHelper.CreateParameter("@id", Id));
 
             // delete contenttype entrance
             SqlHelper.ExecuteNonQuery("Delete from cmsContentType where NodeId = " + Id);

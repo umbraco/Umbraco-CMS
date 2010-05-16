@@ -30,9 +30,11 @@ namespace umbraco.cms.businesslogic.web
 
         #endregion
 
-        #region Private Members
+        #region Constants and Static members
+        public static Guid _objectType = new Guid("a2cb7800-f571-4787-9638-bc48539a0efb"); 
+        #endregion
 
-        private static Guid _objectType = new Guid("a2cb7800-f571-4787-9638-bc48539a0efb");
+        #region Private Members
 
         private ArrayList _templateIds = new ArrayList();
         private int _defaultTemplate;
@@ -222,6 +224,7 @@ namespace umbraco.cms.businesslogic.web
                 {
                     if (dt.MasterContentType == this.Id)
                     {
+                        //this should be InvalidOperationException (or something other than ArgumentException)!
                         throw new ArgumentException("Can't delete a Document Type used as a Master Content Type. Please remove all references first!");
                     }
                 }

@@ -203,10 +203,11 @@ namespace umbraco.cms.businesslogic.media
 				}
 			}
 		}
-		/// <summary>
+		
+        /// <summary>
 		/// Deletes the current media and all children.
 		/// </summary>
-		new public void delete() 
+		public override void delete() 
 		{
 			// Check for recyle bin
 			if (!Path.Contains("," + ((int)RecycleBin.RecycleBinType.Media).ToString() + ","))
@@ -277,7 +278,6 @@ namespace umbraco.cms.businesslogic.media
 			}
             
 		}
-
 
         //EVENTS
         /// <summary>

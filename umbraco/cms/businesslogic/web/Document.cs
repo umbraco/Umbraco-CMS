@@ -1,25 +1,15 @@
-using System.Web.UI.WebControls;
-using umbraco.cms.businesslogic.template;
-using System.Web.UI;
-
 using System;
 using System.Collections;
-using System.Data;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using System.Xml;
-
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
-using umbraco.BusinessLogic.console;
-
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.relation;
 using umbraco.cms.helpers;
 using umbraco.DataLayer;
-using System.Collections.Generic;
-using umbraco.cms.businesslogic.propertytype;
-using System.Linq;
-using System.ComponentModel;
 using umbraco.IO;
 
 namespace umbraco.cms.businesslogic.web
@@ -143,7 +133,7 @@ namespace umbraco.cms.businesslogic.web
         }
         #endregion
 
-        #region Constants
+        #region Constants and Static members
         private const string m_SQLOptimizedSingle = @"
                 Select 
 	                (select count(id) from umbracoNode where parentId = @id) as Children, 
@@ -200,11 +190,14 @@ namespace umbraco.cms.businesslogic.web
                 inner join cmsPreviewXml on cmsPreviewXml.nodeId = cmsDocument.nodeId and cmsPreviewXml.versionId = cmsDocument.versionId
                 where newest = 1 and trashed = 0 and path like '{0}'
                 order by level,sortOrder
- "; 
+ ";
+
+        public static Guid _objectType = new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972");
+
         #endregion
 
         #region Private properties
-        public static Guid _objectType = new Guid("c66ba18e-eaf3-4cff-8a22-41b16d66a972");
+        
         private DateTime _updated;
         private DateTime _release;
         private DateTime _expire;
@@ -548,10 +541,9 @@ namespace umbraco.cms.businesslogic.web
 
             set
             {
-                // Esben Carlsen: ????? value never used ?? --> needs update
-                _published = false;
+                _published = value;
                 SqlHelper.ExecuteNonQuery(
-                                          string.Format("update cmsDocument set published = 0 where nodeId = {0}", Id));
+                    string.Format("update cmsDocument set published = {0} where nodeId = {1}", Id, value ? 1 : 0));
             }
         }
 
@@ -564,6 +556,9 @@ namespace umbraco.cms.businesslogic.web
             if (!e.Cancel)
             {
                 SqlHelper.ExecuteNonQuery(string.Format("update cmsDocument set published = 0 where nodeId = {0}", Id));
+                
+                _published = false;
+                
                 FireAfterUnPublish(e);
             }
         }
@@ -587,6 +582,8 @@ namespace umbraco.cms.businesslogic.web
                 //        pt.Value = property.Value;
                 //    }
                 //}
+
+                UpdateDate = DateTime.Now; //set the updated date to now
 
                 base.Save();
                 // update preview xml
@@ -624,6 +621,17 @@ namespace umbraco.cms.businesslogic.web
         public bool HasPublishedVersion()
         {
              return (SqlHelper.ExecuteScalar<int>("select Count(published) as tmp from cmsDocument where published = 1 And nodeId =" + Id) > 0);
+        }
+
+        /// <summary>
+        /// Pending changes means that there have been property/data changes since the last published version.
+        /// This is determined by the comparing the version date to the updated date. if they are different by .5 seconds, 
+        /// then this is considered a change.
+        /// </summary>
+        /// <returns></returns>
+        public bool HasPendingChanges()
+        {
+            return new TimeSpan(UpdateDate.Ticks - VersionDate.Ticks).TotalMilliseconds > 500;
         }
 
         protected void InitializeDocument(User InitUser, User InitWriter, string InitText, int InitTemplate,
@@ -976,64 +984,91 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Deletes the current document (and all children recursive)
         /// </summary>
-        public new void delete()
+        public override void delete()
         {
             // Check for recyle bin
             if (!Path.Contains("," + ((int)RecycleBin.RecycleBinType.Content).ToString() + ","))
             {
-                MoveToTrashEventArgs e = new MoveToTrashEventArgs();
-                FireBeforeMoveToTrash(e);
-
-                if (!e.Cancel)
-                {
-                    umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
-                    UnPublish();
-                    Move((int)RecycleBin.RecycleBinType.Content);
-
-
-                    FireAfterMoveToTrash(e);
-                }
-
+                MoveToTrash();
             }
             else
             {
-
-                DeleteEventArgs e = new DeleteEventArgs();
-
-                FireBeforeDelete(e);
-
-                if (!e.Cancel)
-                {
-
-                    //store children array here because iterating over an Array object is very inneficient.
-                    var c = Children;
-                    foreach (Document d in c)
-                    {
-                        d.delete();
-                    }
-
-                    umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
-
-                    //delete files 
-                    interfaces.IDataType uploadField = new cms.businesslogic.datatype.controls.Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
-                    var props = this.getProperties;
-                    foreach (cms.businesslogic.property.Property p in props)
-
-                        if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id &&
-                            p.Value.ToString() != "" &&
-                            System.IO.File.Exists(IOHelper.MapPath(p.Value.ToString()))
-                            )
-                            System.IO.File.Delete(IOHelper.MapPath(p.Value.ToString()));
-
-
-                    SqlHelper.ExecuteNonQuery("delete from cmsDocument where NodeId = " + Id);
-                    HttpContext.Current.Trace.Write("documentdelete", "base delete");
-                    base.delete();
-                    HttpContext.Current.Trace.Write("documentdelete", "after base delete");
-
-                    FireAfterDelete(e);
-                }
+                DeletePermanently(false);
             }
+        }
+
+        /// <summary>
+        /// Used internally to permanently delete the data from the database
+        /// </summary>
+        /// <param name="onlyCurrentDocType">
+        /// if onlyCurrentDocType is set, this means that we shouldn't delete any children that are not
+        /// the current document type and instead just move them to the recycle bin. This is effective if
+        /// we're deleting an entire document type but don't want to delete other data that isn't this document type
+        /// but the ndoe exists as a child of the document type that is being deleted. 
+        /// </param>
+        /// <returns>returns true if deletion isn't cancelled</returns>
+        private bool DeletePermanently(bool onlyCurrentDocType)
+        {
+            DeleteEventArgs e = new DeleteEventArgs();
+
+            FireBeforeDelete(e);
+
+            if (!e.Cancel)
+            {
+
+                var c = Children;
+                foreach (Document d in c)
+                {
+                    if (onlyCurrentDocType && (d.ContentType.Id != this.ContentType.Id))
+                    {                        
+                        d.MoveToTrash();
+                    }
+                    else
+                    {
+                        d.DeletePermanently(onlyCurrentDocType);
+                    }                    
+                }
+
+                umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
+
+                //delete files 
+                interfaces.IDataType uploadField = new cms.businesslogic.datatype.controls.Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+                var props = this.getProperties;
+                foreach (Property p in props)
+                {
+                    if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id &&
+                        p.Value.ToString() != "" &&
+                        System.IO.File.Exists(IOHelper.MapPath(p.Value.ToString())))
+                    {
+                        System.IO.File.Delete(IOHelper.MapPath(p.Value.ToString()));
+                    }
+                }
+
+                SqlHelper.ExecuteNonQuery("delete from cmsDocument where NodeId = " + Id);
+                base.delete();
+
+                FireAfterDelete(e);
+            }
+            return !e.Cancel;
+        }
+
+        /// <summary>
+        /// Used internally to move the node to the recyle bin
+        /// </summary>
+        /// <returns>Returns true if the move was not cancelled</returns>
+        private bool MoveToTrash()
+        {
+            MoveToTrashEventArgs e = new MoveToTrashEventArgs();
+            FireBeforeMoveToTrash(e);
+
+            if (!e.Cancel)
+            {
+                umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
+                UnPublish();
+                Move((int)RecycleBin.RecycleBinType.Content);
+                FireAfterMoveToTrash(e);
+            }
+            return !e.Cancel;
         }
 
         /// <summary>
@@ -1050,8 +1085,8 @@ namespace umbraco.cms.businesslogic.web
                 // due to recursive structure document might already been deleted..
                 if (IsNode(c.UniqueId))
                 {
-                    Document tmp = new Document(c.UniqueId);
-                    tmp.delete();
+                    Document d = new Document(c.UniqueId);
+                    d.DeletePermanently(true);
                 }
             }
         }
@@ -1803,63 +1838,5 @@ namespace umbraco.cms.businesslogic.web
         }
 
        
-    }
-
-    /// <summary>
-    /// A lightweight datastructure used to represent a version of a document
-    /// </summary>
-    public class DocumentVersionList
-    {
-        private Guid _version;
-        private DateTime _date;
-        private string _text;
-        private User _user;
-
-        /// <summary>
-        /// The unique id of the version
-        /// </summary>
-        public Guid Version
-        {
-            get { return _version; }
-        }
-
-        /// <summary>
-        /// The date of the creation of the version 
-        /// </summary>
-        public DateTime Date
-        {
-            get { return _date; }
-        }
-
-        /// <summary>
-        /// The name of the document in the version
-        /// </summary>
-        public string Text
-        {
-            get { return _text; }
-        }
-
-        /// <summary>
-        /// The user which created the version
-        /// </summary>
-        public User User
-        {
-            get { return _user; }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the DocumentVersionList class.
-        /// </summary>
-        /// <param name="Version">Unique version id</param>
-        /// <param name="Date">Version createdate</param>
-        /// <param name="Text">Version name</param>
-        /// <param name="User">Creator</param>
-        public DocumentVersionList(Guid Version, DateTime Date, string Text, User User)
-        {
-            _version = Version;
-            _date = Date;
-            _text = Text;
-            _user = User;
-        }
     }
 }

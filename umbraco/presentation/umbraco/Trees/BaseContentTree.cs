@@ -190,8 +190,9 @@ function openContent(id) {
             treeElement.NotPublished = false;
             if (dd.Published)
             {
-                if (Math.Round(new TimeSpan(dd.UpdateDate.Ticks - dd.VersionDate.Ticks).TotalSeconds, 0) > 1)
-                    treeElement.NotPublished = true;
+                //if (Math.Round(new TimeSpan(dd.UpdateDate.Ticks - dd.VersionDate.Ticks).TotalSeconds, 0) > 1)
+                //    treeElement.NotPublished = true;
+                treeElement.NotPublished = dd.HasPendingChanges();
             }
             else
                 treeElement.NotPublished = true;

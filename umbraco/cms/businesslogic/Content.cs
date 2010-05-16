@@ -459,11 +459,11 @@ namespace umbraco.cms.businesslogic
             // Delete version history
             SqlHelper.ExecuteNonQuery("Delete from cmsContentVersion where ContentId = " + this.Id);
 
-            // Delete Contentspecific data ()
-            SqlHelper.ExecuteNonQuery("Delete from cmsContent where NodeId = " + this.Id);
-
             // Delete xml
             SqlHelper.ExecuteNonQuery("delete from cmsContentXml where nodeID = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
+
+            // Delete Contentspecific data ()
+            SqlHelper.ExecuteNonQuery("Delete from cmsContent where NodeId = " + this.Id);
 
             // Delete Nodeinformation!!
             base.delete();
@@ -646,7 +646,7 @@ namespace umbraco.cms.businesslogic
         /// <summary>
         /// Optimized method for bulk deletion of properties´on a Content object.
         /// </summary>
-        private void deleteAllProperties()
+        protected void deleteAllProperties()
         {
             SqlHelper.ExecuteNonQuery("Delete from cmsPropertyData where contentNodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
         }

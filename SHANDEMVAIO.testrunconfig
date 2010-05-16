@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRunConfiguration name="Umbraco Test" id="338122db-6049-471e-b697-cbaf25469edc" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2006">
+  <Description>This is a default test run configuration for a local test run.</Description>
+  <Hosts type="ASP.NET" skipUnhostableTests="false">
+    <AspNet name="ASP.NET" executionType="WebDev" urlToTest="http://localhost:59454/">
+      <DevelopmentServer pathToWebSite="C:\Users\Shannon\Documents\Visual Studio 2008\Projects\Umbraco\Branch-4.1\umbraco\presentation" webApplicationRoot="/" />
+    </AspNet>
+  </Hosts>
+  <TestTypeSpecific />
+</TestRunConfiguration>

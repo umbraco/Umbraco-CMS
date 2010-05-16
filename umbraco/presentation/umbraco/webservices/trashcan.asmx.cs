@@ -53,27 +53,16 @@ namespace umbraco.presentation.webservices
         private void emptyTrashCanDo(cms.businesslogic.RecycleBin.RecycleBinType type)
         {
             RecycleBin trashCan = new RecycleBin(type);
-            //store children array here because iterating over an Array property object is very inneficient.
-            var c = trashCan.Children;
-            foreach (IconI d in c)
+
+            var callback = new Action<int>(x =>
             {
-                // we need this check as we can't move the responsibility to an interface
-                if (type == RecycleBin.RecycleBinType.Content)
-                {
-                    new Document(d.Id).delete();
-                }
-                else if (type == RecycleBin.RecycleBinType.Media)
-                {
-                    new Media(d.Id).delete();
-                }
-                else
-                {
-                    throw new ArgumentException(String.Format("The type {0} is unknown in the emptyTrashCanDo method", type));
-                }
                 Application.Lock();
-                Application["trashcanEmptyLeft"] = RecycleBin.Count(type).ToString();
+                Application["trashcanEmptyLeft"] = x.ToString();
                 Application.UnLock();
-            }
+            });
+
+            trashCan.CallTheGarbageMan(callback);
+            
         }
     }
 }

@@ -4,8 +4,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		build.xml = build.xml
 		default.build = default.build
+		SHANDEMVAIO.testrunconfig = SHANDEMVAIO.testrunconfig
 		umbraco weekly.build = umbraco weekly.build
 		umbraco.build = umbraco.build
+		umbraco.vsmdi = umbraco.vsmdi
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StandardConfig", "StandardConfig", "{B8ECDB8B-BF44-462C-B6DA-22421B3EC4D7}"
@@ -98,9 +100,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{F06D18F6-C
 		foreign dlls\VistaDB.NET20.dll = foreign dlls\VistaDB.NET20.dll
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.Test", "umbraco.Test\umbraco.Test.csproj", "{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 13
+		SccNumberOfProjects = 14
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs01.codeplex.com/
 		SccLocalPath0 = .
@@ -140,6 +144,12 @@ Global
 		SccProjectUniqueName12 = umbraco\\umbraco.Legacy\\umbraco.Legacy.csproj
 		SccProjectName12 = umbraco/umbraco.Legacy
 		SccLocalPath12 = umbraco\\umbraco.Legacy
+		SccProjectUniqueName13 = umbraco.Test\\umbraco.Test.csproj
+		SccProjectName13 = umbraco.Test
+		SccLocalPath13 = umbraco.Test
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = umbraco.vsmdi
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug - Fixed Version|Any CPU = Debug - Fixed Version|Any CPU
@@ -216,6 +226,12 @@ Global
 		{27A2590E-1313-4A33-89FD-92811540B69C}.Debug - Fixed Version|Any CPU.ActiveCfg = Debug|Any CPU
 		{27A2590E-1313-4A33-89FD-92811540B69C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{27A2590E-1313-4A33-89FD-92811540B69C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}.Debug - Fixed Version|Any CPU.ActiveCfg = Debug|Any CPU
+		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}.Debug - Fixed Version|Any CPU.Build.0 = Debug|Any CPU
+		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -250,9 +250,7 @@ namespace umbraco.cms.presentation
                     //newName.Text = _document.Text;
                 }
 
-                // Update the update date
-                _document.UpdateDate = System.DateTime.Now;
-                dp.Text = _document.UpdateDate.ToShortDateString() + " " + _document.UpdateDate.ToShortTimeString();
+                
                 if (dpRelease.DateTime > new DateTime(1753, 1, 1) && dpRelease.DateTime < new DateTime(9999, 12, 31))
                     _document.ReleaseDate = dpRelease.DateTime;
                 else
@@ -271,6 +269,9 @@ namespace umbraco.cms.presentation
                 // Run Handler				
                 BusinessLogic.Actions.Action.RunActionHandlers(_document, ActionUpdate.Instance);
                 _document.Save();
+
+                // Update the update date
+                dp.Text = _document.UpdateDate.ToShortDateString() + " " + _document.UpdateDate.ToShortTimeString();
 
                 if (!tmp.DoesPublish)
                     ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null), ui.Text("speechBubbles", "editContentSavedText", null));
