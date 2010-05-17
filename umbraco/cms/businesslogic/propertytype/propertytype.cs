@@ -88,6 +88,13 @@ namespace umbraco.cms.businesslogic.propertytype
 			get { return _id; }
 		}
 
+        /// <summary>
+        /// Setting the tab id is not meant to be used directly in code. Use the ContentType SetTabOnPropertyType method instead
+        /// as that will handle all of the caching properly, this will not.
+        /// </summary>
+        /// <remarks>
+        /// Setting the tab id to a negative value will actually set the value to NULL in the database
+        /// </remarks>
 		public int TabId
 		{
 			get { return _tabId; }
@@ -95,8 +102,15 @@ namespace umbraco.cms.businesslogic.propertytype
 			{
 				_tabId = value;
 				this.InvalidateCache();
+                object tabId = value;
+                if (value < 1)
+                {
+                    tabId = DBNull.Value;
+                }
+
 				SqlHelper.ExecuteNonQuery( "Update cmsPropertyType set tabId = @tabId where id = @id",
-					SqlHelper.CreateParameter("@tabId", value), SqlHelper.CreateParameter("@id", this.Id));
+					SqlHelper.CreateParameter("@tabId", tabId), 
+                    SqlHelper.CreateParameter("@id", this.Id));
 			}
 		}
 
@@ -325,7 +339,7 @@ namespace umbraco.cms.businesslogic.propertytype
         protected virtual void FlushCache()
         {
             // clear local cache
-            cache.Cache.ClearCacheItem(GetCacheKey(Id));
+            Cache.ClearCacheItem(GetCacheKey(Id));
 
             // clear cache in contentype
             Cache.ClearCacheItem("ContentType_PropertyTypes_Content:" + this._contenttypeid.ToString());

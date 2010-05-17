@@ -813,3 +813,13 @@ ALTER TABLE umbraconode MODIFY COLUMN id INTEGER NOT NULL AUTO_INCREMENT;
 INSERT IGNORE INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
 VALUES (0, 0, 0, 'media', 'mediaRecycleBin', 'RecycleBin', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.MediaRecycleBin')
 ;
+
+CREATE TABLE cmsPreviewXml(
+	nodeId int NOT NULL,
+	versionId CHAR(36) NOT NULL,
+	timestamp datetime NOT NULL,
+	xml LONGTEXT NOT NULL)
+;
+ALTER TABLE cmsPreviewXml ADD CONSTRAINT PK_cmsContentPreviewXml PRIMARY KEY CLUSTERED (nodeId, versionId) 
+; 
+

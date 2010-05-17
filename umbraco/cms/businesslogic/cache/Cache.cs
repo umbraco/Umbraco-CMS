@@ -9,6 +9,8 @@ namespace umbraco.cms.businesslogic.cache
 	public class Cache
 	{
 
+        public static readonly object m_Locker = new object();
+
 		/// <summary>
 		/// Clears everything in umbraco's runtime cache, which means that not only
 		/// umbraco content is removed, but also other cache items from pages running in
@@ -35,8 +37,15 @@ namespace umbraco.cms.businesslogic.cache
 		{
 			if (System.Web.HttpRuntime.Cache[Key] != null) 
 			{
-				System.Web.HttpRuntime.Cache.Remove(Key);
-				System.Web.HttpContext.Current.Trace.Warn("Cache", "Item " + Key + " removed from cache");
+                lock (m_Locker)
+                {
+                    //check again
+                    if (System.Web.HttpRuntime.Cache[Key] != null)
+                    {
+                        System.Web.HttpRuntime.Cache.Remove(Key);
+                        System.Web.HttpContext.Current.Trace.Warn("Cache", "Item " + Key + " removed from cache");
+                    }
+                }				
 			}
 		}
 		
@@ -54,10 +63,20 @@ namespace umbraco.cms.businesslogic.cache
 				if (c != null) 
 				{
 					System.Collections.IDictionaryEnumerator cacheEnumerator = c.GetEnumerator();
-					while ( cacheEnumerator.MoveNext() )
-						if (cacheEnumerator.Key != null && c[cacheEnumerator.Key.ToString()] != null && c[cacheEnumerator.Key.ToString()].GetType() != null && c[cacheEnumerator.Key.ToString()].GetType().ToString() == TypeName)
-							c.Remove(cacheEnumerator.Key.ToString());
-
+                    while (cacheEnumerator.MoveNext())
+                    {
+                        if (cacheEnumerator.Key != null && c[cacheEnumerator.Key.ToString()] != null && c[cacheEnumerator.Key.ToString()].GetType() != null && c[cacheEnumerator.Key.ToString()].GetType().ToString() == TypeName)
+                        {
+                            lock (m_Locker)
+                            {
+                                //check again
+                                if (cacheEnumerator.Key != null && c[cacheEnumerator.Key.ToString()] != null && c[cacheEnumerator.Key.ToString()].GetType() != null && c[cacheEnumerator.Key.ToString()].GetType().ToString() == TypeName)
+                                {
+                                    c.Remove(cacheEnumerator.Key.ToString());
+                                }
+                            }                            
+                        }
+                    }
 				}
 			} 
 			catch (Exception CacheE) 

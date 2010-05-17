@@ -8,6 +8,9 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.DataLayer;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Umbraco.Test")]
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -22,16 +25,23 @@ namespace umbraco.cms.businesslogic.web
 
         public DocumentType(Guid id) : base(id) { }
 
-        //public DocumentType(bool useOptimizedMode, int id)
-        //    : base(useOptimizedMode, id)
-        //{
-            
-        //} 
+        public DocumentType(int id, bool noSetup) : base(id, noSetup) { }
 
         #endregion
 
         #region Constants and Static members
-        public static Guid _objectType = new Guid("a2cb7800-f571-4787-9638-bc48539a0efb"); 
+        
+        public static Guid _objectType = new Guid("a2cb7800-f571-4787-9638-bc48539a0efb");
+
+        internal const string m_SQLOptimizedGetAll = @"
+            SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text,
+                masterContentType,Alias,icon,thumbnail,description,
+                templateNodeId, IsDefault
+            FROM umbracoNode 
+            INNER JOIN cmsContentType ON umbracoNode.id = cmsContentType.nodeId
+            LEFT OUTER JOIN cmsDocumentType ON cmsContentType.nodeId = cmsDocumentType.contentTypeNodeId
+            WHERE nodeObjectType = @nodeObjectType";
+
         #endregion
 
         #region Private Members
@@ -138,16 +148,40 @@ namespace umbraco.cms.businesslogic.web
         }
 
         public static List<DocumentType> GetAllAsList()
-        {
-            List<DocumentType> retVal = new List<DocumentType>();
-            Guid[] Ids = getAllUniquesFromObjectType(_objectType);
-            for (int i = 0; i < Ids.Length; i++)
+        {         
+
+            var documentTypes = new List<DocumentType>();
+
+            using (IRecordsReader dr =
+                SqlHelper.ExecuteReader(m_SQLOptimizedGetAll, SqlHelper.CreateParameter("@nodeObjectType", DocumentType._objectType)))
             {
-                retVal.Add(new DocumentType(Ids[i]));
+                while (dr.Read())
+                {
+                    //check if the document id has already been added
+                    if (documentTypes.Where(x => x.Id == dr.Get<int>("id")).Count() == 0)
+                    {
+                        //create the DocumentType object without setting up
+                        DocumentType dt = new DocumentType(dr.Get<int>("id"), true);
+                        //populate it's CMSNode properties
+                        dt.PopulateCMSNodeFromReader(dr);
+                        //populate it's ContentType properties
+                        dt.PopulateContentTypeNodeFromReader(dr);
+                        //populate from it's DocumentType properties
+                        dt.PopulateDocumentTypeNodeFromReader(dr);
+
+                        documentTypes.Add(dt);
+                    }
+                    else
+                    {
+                        //we've already created the document type with this id, so we'll add the rest of it's templates to itself
+                        var dt = documentTypes.Where(x => x.Id == dr.Get<int>("id")).Single();
+                        dt.PopulateDocumentTypeNodeFromReader(dr);
+                    }
+                }
             }
 
-            retVal.Sort(delegate(DocumentType dt1, DocumentType dt2) { return dt1.Text.CompareTo(dt2.Text); });
-            return retVal;
+            return documentTypes.OrderBy(x => x.Text).ToList();
+
         } 
         #endregion
 
@@ -212,6 +246,10 @@ namespace umbraco.cms.businesslogic.web
 
         #region Public Methods
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <exception cref="ArgumentException">Throws an exception if trying to delete a document type that is assigned as a master document type</exception>
         public override void delete()
         {
             DeleteEventArgs e = new DeleteEventArgs();
@@ -349,27 +387,34 @@ namespace umbraco.cms.businesslogic.web
 
         #region Protected Methods
 
+        protected void PopulateDocumentTypeNodeFromReader(IRecordsReader dr)
+        {
+            if (!dr.IsNull("templateNodeId"))
+            {
+                _templateIds.Add(dr.GetInt("templateNodeId"));
+                if (!dr.IsNull("IsDefault"))
+                {
+                    if (dr.GetBoolean("IsDefault"))
+                    {
+                        _defaultTemplate = dr.GetInt("templateNodeId");
+                    }
+                }
+            }            
+        }
+
         protected override void setupNode()
         {
             base.setupNode();
 
-            if (SqlHelper.ExecuteScalar<int>("select count(TemplateNodeId) as tmp from cmsDocumentType where contentTypeNodeId =" + Id) > 0)
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("Select templateNodeId, IsDefault from cmsDocumentType where contentTypeNodeId = @id",
+                SqlHelper.CreateParameter("@id", Id)))
             {
-                IRecordsReader dr =
-                    SqlHelper.ExecuteReader(
-                                            "Select templateNodeId, IsDefault from cmsDocumentType where contentTypeNodeId =" +
-                                            Id);
                 while (dr.Read())
                 {
-                    if (template.Template.IsNode(dr.GetInt("templateNodeId")))
-                    {
-                        _templateIds.Add(dr.GetInt("templateNodeId"));
-                        if (dr.GetBoolean("IsDefault"))
-                            _defaultTemplate = dr.GetInt("templateNodeId");
-                    }
+                    PopulateDocumentTypeNodeFromReader(dr);
                 }
-                dr.Close();
             }
+             
         } 
 
         #endregion

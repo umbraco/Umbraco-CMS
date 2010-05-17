@@ -1,14 +1,10 @@
-﻿
-/*******************************************************************************************
-
-
-
+﻿/*******************************************************************************************
 
     Umbraco database installation script for SQL Server (upgrade from Umbraco 4.0.x)
  
-IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
+	IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
  
-    Database version: 4.1.0.0
+    Database version: 4.1.0.2
     
     Please increment this version number if ANY change is made to this script,
     so compatibility with scripts for other database systems can be verified easily.
@@ -24,13 +20,7 @@ IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT 
      * you have documented the code change in this script;
      * you have incremented the version number in this script.
  
-IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
-
-
-
-
-
-
+	IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
 
 ********************************************************************************************/
 
