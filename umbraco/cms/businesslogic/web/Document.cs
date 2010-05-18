@@ -1018,9 +1018,11 @@ namespace umbraco.cms.businesslogic.web
 
                 var c = Children;
                 foreach (Document d in c)
-                {
+                {                    
                     if (onlyCurrentDocType && (d.ContentType.Id != this.ContentType.Id))
-                    {                        
+                    {
+                        //if we're only supposed to be deleting an exact document type, then just move the document
+                        //to the trash
                         d.MoveToTrash();
                     }
                     else
@@ -1043,6 +1045,10 @@ namespace umbraco.cms.businesslogic.web
                         System.IO.File.Delete(IOHelper.MapPath(p.Value.ToString()));
                     }
                 }
+
+                //remove any domains associated
+                var domains = Domain.GetDomainsById(this.Id).ToList();
+                domains.ForEach(x => x.Delete());
 
                 SqlHelper.ExecuteNonQuery("delete from cmsDocument where NodeId = " + Id);
                 base.delete();

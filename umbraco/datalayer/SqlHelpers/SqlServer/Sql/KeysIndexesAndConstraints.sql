@@ -316,6 +316,9 @@ ALTER TABLE dbo.cmsDocument ADD CONSTRAINT
 	 ON DELETE  NO ACTION 
 ;
 
+/* Remove any domains that should not exist as they weren't deleted before when documents were deleted */
+DELETE FROM umbracoDomains WHERE domainRootStructureId NOT IN (SELECT id FROM umbracoNode)
+
 ALTER TABLE dbo.umbracoDomains ADD CONSTRAINT
 	FK_umbracoDomains_umbracoNode FOREIGN KEY
 	(

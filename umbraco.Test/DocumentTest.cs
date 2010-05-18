@@ -12,6 +12,7 @@ using umbraco.cms.businesslogic.datatype;
 using umbraco.editorControls.textfield;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.property;
+using umbraco.cms.businesslogic.language;
 
 namespace umbraco.Test
 {
@@ -33,6 +34,35 @@ namespace umbraco.Test
     {
 
         #region Unit Tests
+
+        /// <summary>
+        /// Creates a doc type, assigns a domain to it and removes it
+        /// </summary>
+        [TestMethod()]
+        public void Document_AssignDomainTest()
+        {
+            var d = CreateNewUnderRoot(GetExistingDocType());
+
+            var languages = Language.getAll.ToList();
+            Assert.IsTrue(languages.Count > 0);
+
+            //get all assigned domains
+            var domains = Domain.GetDomains();
+
+            var domainName = "www." + Guid.NewGuid().ToString("N") + ".com";
+
+            //add a domain name to the node with the first language found
+            Domain.MakeNew(domainName, d.Id, languages[0].id);
+            Assert.IsTrue(Domain.Exists(domainName));
+            Assert.AreEqual<int>(domains.Count + 1, Domain.GetDomains().Count);
+
+            //delete the document, ensure that the domain is gone
+            RecycleAndDelete(d);
+
+            Assert.IsFalse(Domain.Exists(domainName));
+            Assert.AreEqual<int>(domains.Count, Domain.GetDomains().Count);
+        }
+
         /// <summary>
         ///A test for making a new document and deleting it which actuall first moves it to the recycle bin
         ///and then deletes it.
@@ -40,14 +70,7 @@ namespace umbraco.Test
         [TestMethod()]
         public void Document_MakeNewTest()
         {
-            //System.Diagnostics.Debugger.Break();
-            string Name = "TEST-" + Guid.NewGuid().ToString("N");
-            DocumentType dct = new DocumentType(GetExistingDocTypeId());
-            int ParentId = -1;
-            Document actual = Document.MakeNew(Name, dct, m_User, ParentId);
-            var id = actual.Id;
-            Assert.IsTrue(actual.Id > 0);
-            RecycleAndDelete(actual);
+            Assert.IsInstanceOfType(m_NewRootDoc, typeof(Document));
         }
 
         /// <summary>
@@ -120,20 +143,15 @@ namespace umbraco.Test
         public void Document_ToPreviewXmlTest()
         {
             //System.Diagnostics.Debugger.Break();
-            string Name = "TEST-" + Guid.NewGuid().ToString("N");
-            DocumentType dct = new DocumentType(GetExistingDocTypeId());
-            int ParentId = -1;
-            Document actual = Document.MakeNew(Name, dct, m_User, ParentId);
-            var id = actual.Id;
-            Assert.IsTrue(actual.Id > 0);
+            var doc = m_NewRootDoc;
+            var id = doc.Id;
+            Assert.IsTrue(doc.Id > 0);
 
             XmlDocument xd = new XmlDocument();
-            var xmlNode = actual.ToPreviewXml(xd);
+            var xmlNode = doc.ToPreviewXml(xd);
 
             Assert.IsNotNull(xmlNode);
             Assert.IsTrue(xmlNode.HasChildNodes);
-
-            RecycleAndDelete(actual);
         }
 
         /// <summary>
@@ -143,21 +161,16 @@ namespace umbraco.Test
         public void Document_MakeNewAndPublishTest()
         {
             //System.Diagnostics.Debugger.Break();
-            string Name = "TEST-" + Guid.NewGuid().ToString("N");
-            DocumentType dct = new DocumentType(GetExistingDocTypeId());
-            int ParentId = -1;
-            Document actual = Document.MakeNew(Name, dct, m_User, ParentId);
-            var id = actual.Id;
-            Assert.IsTrue(actual.Id > 0);
+            var doc = m_NewRootDoc;
+            var id = doc.Id;
+            Assert.IsTrue(doc.Id > 0);
 
-            var versionCount = actual.GetVersions().Count();
+            var versionCount = doc.GetVersions().Count();
 
-            actual.Publish(m_User);
+            doc.Publish(m_User);
 
-            Assert.IsTrue(actual.Published);
-            Assert.AreEqual(versionCount + 1, actual.GetVersions().Count());
-
-            RecycleAndDelete(actual);
+            Assert.IsTrue(doc.Published);
+            Assert.AreEqual(versionCount + 1, doc.GetVersions().Count());
         }
 
         /// <summary>
@@ -167,25 +180,20 @@ namespace umbraco.Test
         public void Document_PublishThenUnPublishTest()
         {
             //System.Diagnostics.Debugger.Break();
-            string Name = "TEST-" + Guid.NewGuid().ToString("N");
-            DocumentType dct = new DocumentType(GetExistingDocTypeId());
-            int ParentId = -1;
-            Document actual = Document.MakeNew(Name, dct, m_User, ParentId);
-            var id = actual.Id;
-            Assert.IsTrue(actual.Id > 0);
+            var doc = m_NewRootDoc;
+            var id = doc.Id;
+            Assert.IsTrue(doc.Id > 0);
 
-            var versionCount = actual.GetVersions().Count();
+            var versionCount = doc.GetVersions().Count();
 
-            actual.Publish(m_User);
+            doc.Publish(m_User);
 
-            Assert.IsTrue(actual.Published);
-            Assert.AreEqual(versionCount + 1, actual.GetVersions().Count());
+            Assert.IsTrue(doc.Published);
+            Assert.AreEqual(versionCount + 1, doc.GetVersions().Count());
 
-            actual.UnPublish();
+            doc.UnPublish();
 
-            Assert.IsFalse(actual.Published);
-
-            RecycleAndDelete(actual);
+            Assert.IsFalse(doc.Published);
         }
 
         /// <summary>
@@ -197,40 +205,36 @@ namespace umbraco.Test
             //System.Diagnostics.Debugger.Break();
 
             //create new document in the root
-            string Name = "TEST-" + Guid.NewGuid().ToString("N");
-            DocumentType dct = new DocumentType(GetExistingDocTypeId());
-            Document actual = Document.MakeNew(Name, dct, m_User, -1);
-            var id = actual.Id;
-            Assert.IsTrue(actual.Id > 0);
+            var doc = m_NewRootDoc;
+            var id = doc.Id;
+            Assert.IsTrue(doc.Id > 0);
 
             //get a text property
-            var prop = GetTextFieldProperty(dct, actual);
+            var prop = GetTextFieldProperty(m_ExistingDocType, doc);
             var originalPropVal = prop.Value;
-            var versionCount = actual.GetVersions().Count();
+            var versionCount = doc.GetVersions().Count();
 
             //save
             //wait a sec so that there's a time delay between the update time and version time
             Thread.Sleep(1000);
-            actual.Save();
-            Assert.IsTrue(actual.HasPendingChanges());
+            doc.Save();
+            Assert.IsTrue(doc.HasPendingChanges());
 
             //publish and create new version
-            actual.Publish(m_User);
-            Assert.IsTrue(actual.Published);
-            var versions = actual.GetVersions().ToList();
+            doc.Publish(m_User);
+            Assert.IsTrue(doc.Published);
+            var versions = doc.GetVersions().ToList();
             Assert.AreEqual(versionCount + 1, versions.Count());
 
             prop.Value = "updated!"; //udpate the prop            
             Assert.AreNotEqual(originalPropVal, prop.Value);
 
             //rollback to first version            
-            actual.RollBack(versions.OrderBy(x => x.Date).Last().Version, m_User);
+            doc.RollBack(versions.OrderBy(x => x.Date).Last().Version, m_User);
 
             var rolledBack = new Document(id);
 
             Assert.AreEqual(originalPropVal, rolledBack.GenericProperties.ToList().Where(x => x.PropertyType.Alias == "headerText").First().Value);
-
-            RecycleAndDelete(actual);
         }
 
         /// <summary>
@@ -375,6 +379,8 @@ namespace umbraco.Test
         [TestMethod]
         public void Document_EmptyRecycleBinTest()
         {
+            var totalTrashedItems = RecycleBin.Count(RecycleBin.RecycleBinType.Content);                
+
             var docList = new List<Document>();
             var total = 20;
             var dt = new DocumentType(GetExistingDocTypeId());
@@ -396,7 +402,7 @@ namespace umbraco.Test
             var totalDeleted = 0;
             var deleteCallback = new Action<int>(x =>
             {
-                Assert.AreEqual(total - (++totalDeleted), x);
+                Assert.AreEqual((total + totalTrashedItems) - (++totalDeleted), x);
             });
 
             var bin = new RecycleBin(RecycleBin.RecycleBinType.Content);
@@ -711,10 +717,33 @@ namespace umbraco.Test
         #endregion
 
         #region Private properties and methods
+
+        /// <summary>
+        /// The user to be used to create stuff
+        /// </summary>
         private User m_User = new User(0);
 
+        /// <summary>
+        /// Used for each test initialization. Before each test is run a new root doc is created.
+        /// </summary>
+        private Document m_NewRootDoc;
+
+        /// <summary>
+        /// Gets initialized for each test and is set to an existing document type
+        /// </summary>
+        private DocumentType m_ExistingDocType;
+
+        /// <summary>
+        /// Completely remove the document, this will first recycle it and then delete it (the api doesn't directly support deleting completey in one step)
+        /// </summary>
+        /// <param name="d"></param>
         private void RecycleAndDelete(Document d)
         {
+            if (d == null)
+            {
+                return;
+            }
+
             var id = d.Id;
             //now recycle it                        
             d.delete();
@@ -784,6 +813,28 @@ namespace umbraco.Test
             var index = r.Next(0, ids.Count() - 1);
             return ids[index];
         }
+
+        private DocumentType GetExistingDocType()
+        {
+            DocumentType dct = new DocumentType(GetExistingDocTypeId());
+            Assert.IsTrue(dct.Id > 0);
+            return dct;
+        }
+
+        /// <summary>
+        /// Creates a new node based on an existing doc type
+        /// </summary>
+        /// <returns></returns>
+        private Document CreateNewUnderRoot(DocumentType dt)
+        {
+            string Name = "TEST-" + Guid.NewGuid().ToString("N");            
+            int ParentId = -1;
+            Document actual = Document.MakeNew(Name, dt, m_User, ParentId);
+            var id = actual.Id;
+            Assert.IsTrue(actual.Id > 0);
+            return actual;
+        }
+        
         #endregion
 
         #region Test Context
@@ -822,18 +873,27 @@ namespace umbraco.Test
         //{
         //}
         //
-        //Use TestInitialize to run code before running each test
-        //[TestInitialize()]
-        //public void MyTestInitialize()
-        //{
-        //}
-        //
-        //Use TestCleanup to run code after each test has run
-        //[TestCleanup()]
-        //public void MyTestCleanup()
-        //{
-        //}
-        //
+        
+        
+        /// <summary>
+        /// Creates a new root document to use for each test if required
+        /// </summary>
+        [TestInitialize()]
+        public void MyTestInitialize()
+        {
+            m_ExistingDocType = GetExistingDocType();
+            m_NewRootDoc = CreateNewUnderRoot(m_ExistingDocType);
+        }
+        
+        /// <summary>
+        /// Makes sure the root doc is deleted
+        /// </summary>
+        [TestCleanup()]
+        public void MyTestCleanup()
+        {
+            RecycleAndDelete(m_NewRootDoc);
+        }
+        
         #endregion
     }
 }

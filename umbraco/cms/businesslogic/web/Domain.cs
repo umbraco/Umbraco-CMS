@@ -8,6 +8,9 @@ using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.language;
 using umbraco.interfaces;
 using umbraco.DataLayer;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("umbraco.Test")]
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -131,8 +134,9 @@ namespace umbraco.cms.businesslogic.web
 			Cache.ClearCacheItem("UmbracoDomainList");
 		}
 
-		private static object getDomainsSyncLock = new object();
-        private static List<Domain> GetDomains()
+		private static readonly object getDomainsSyncLock = new object();
+        
+        internal static List<Domain> GetDomains()
         {
 			return Cache.GetCacheItem<List<Domain>>("UmbracoDomainList", getDomainsSyncLock, TimeSpan.FromMinutes(30),
         		delegate
@@ -238,35 +242,5 @@ namespace umbraco.cms.businesslogic.web
             if (AfterDelete != null)
                 AfterDelete(this, e);
         }
-    }
-
-    public class DomainDeleteHandler : IActionHandler
-    {
-        #region IActionHandler Members
-
-        public bool Execute(Document documentObject, IAction action)
-        {
-            foreach (Domain d in Domain.GetDomainsById(documentObject.Id))
-            {
-                d.Delete();
-            }
-            // TODO:  Add DomainDeleteHandler.Execute implementation
-            return true;
-        }
-
-        public IAction[] ReturnActions()
-        {
-            // TODO:  Add DomainDeleteHandler.ReturnActions implementation
-            IAction[] _retVal = { ActionDelete.Instance };
-            return _retVal;
-        }
-
-        public string HandlerName()
-        {
-            // TODO:  Add DomainDeleteHandler.HandlerName implementation
-            return "DomainDeleteHandler";
-        }
-
-        #endregion
     }
 }
