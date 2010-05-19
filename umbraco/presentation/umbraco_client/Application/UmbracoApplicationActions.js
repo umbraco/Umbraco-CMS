@@ -317,21 +317,41 @@ Umbraco.Application.Actions = function() {
         actionDelete: function() {
             /// <summary></summary>
 
+            var actionNode = UmbClientMgr.mainTree().getActionNode();
             if (UmbClientMgr.mainTree().getActionNode().nodeType == "content" && UmbClientMgr.mainTree().getActionNode().nodeId == '-1')
                 return;
 
             this._debug("actionDelete");
 
+
             if (confirm(uiKeys['defaultdialogs_confirmdelete'] + ' "' + UmbClientMgr.mainTree().getActionNode().nodeName + '"?\n\n')) {
                 //raise nodeDeleting event
                 jQuery(window.top).trigger("nodeDeleting", []);
                 var _this = this;
-                umbraco.presentation.webservices.legacyAjaxCalls.Delete(UmbClientMgr.mainTree().getActionNode().nodeId, "", UmbClientMgr.mainTree().getActionNode().nodeType, function() {
-                    _this._debug("actionDelete: Raising event");
-                    //raise nodeDeleted event
-                    jQuery(window.top).trigger("nodeDeleted", []);
-                });
+
+                //check if it's in the recycle bin
+                if (actionNode.jsNode.closest("li[id='-20']").length == 1 || actionNode.jsNode.closest("li[id='-21']").length == 1) {
+                    umbraco.presentation.webservices.legacyAjaxCalls.DeleteContentPermanently(
+                        UmbClientMgr.mainTree().getActionNode().nodeId,
+                        UmbClientMgr.mainTree().getActionNode().nodeType,
+                        function() {
+                            _this._debug("actionDelete: Raising event");
+                            //raise nodeDeleted event
+                            jQuery(window.top).trigger("nodeDeleted", []);
+                        });
+                }
+                else {
+                    umbraco.presentation.webservices.legacyAjaxCalls.Delete(
+                        UmbClientMgr.mainTree().getActionNode().nodeId, "",
+                        UmbClientMgr.mainTree().getActionNode().nodeType, 
+                        function() {
+                            _this._debug("actionDelete: Raising event");
+                            //raise nodeDeleted event
+                            jQuery(window.top).trigger("nodeDeleted", []);
+                    });
+                }
             }
+
         },
 
         actionDisable: function() {

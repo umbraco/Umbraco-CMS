@@ -17,6 +17,8 @@ using System.Diagnostics;
 using System.Net;
 using System.Web.UI;
 using umbraco.IO;
+using umbraco.cms.businesslogic.web;
+using umbraco.cms.businesslogic.media;
 
 
 namespace umbraco.presentation.webservices
@@ -32,7 +34,7 @@ namespace umbraco.presentation.webservices
     {
 
         /// <summary>
-        /// Overloaded method to accept a string value for the node id. Used for tree's such as python
+        /// method to accept a string value for the node id. Used for tree's such as python
         /// and xslt since the file names are the node IDs
         /// </summary>
         /// <param name="nodeId"></param>
@@ -51,6 +53,37 @@ namespace umbraco.presentation.webservices
                 presentation.create.dialogHandler_temp.Delete(nodeType, intNodeID, alias);
             else
                 presentation.create.dialogHandler_temp.Delete(nodeType, 0, nodeId);
+        }
+        
+        /// <summary>
+        /// Permanently deletes a document/media object.
+        /// Used to remove an item from the recycle bin.
+        /// </summary>
+        /// <param name="nodeId"></param>
+        [WebMethod]
+        [ScriptMethod]
+        public void DeleteContentPermanently(string nodeId, string nodeType)
+        {
+            Authorize();
+
+            int intNodeID;
+            if (int.TryParse(nodeId, out intNodeID))
+            {
+                switch (nodeType)
+                {
+                    case "media":
+                        new Media(intNodeID).delete();
+                        break;
+                    case "content":
+                        new Document(intNodeID).delete(true);
+                        break;
+                }
+                new Document(intNodeID).delete(true);
+            }
+            else
+            {
+                throw new ArgumentException("The nodeId argument could not be parsed to an integer");
+            }
         }
 
         [WebMethod]

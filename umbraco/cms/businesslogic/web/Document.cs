@@ -146,41 +146,38 @@ namespace umbraco.cms.businesslogic.web
 	                umbracoNode.createDate, umbracoNode.trashed, umbracoNode.parentId, umbracoNode.nodeObjectType, umbracoNode.nodeUser, umbracoNode.level, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.uniqueId, umbracoNode.text 
                 from 
 	                umbracoNode 
-                inner join
-	                cmsContentVersion on cmsContentVersion.contentID = umbracoNode.id
-                inner join 
-	                cmsDocument on cmsDocument.versionId = cmsContentVersion.versionId
-                inner join
-	                cmsContent on cmsDocument.nodeId = cmsContent.NodeId
-                inner join
-	                cmsContentType on cmsContentType.nodeId = cmsContent.ContentType
-                inner join 
-	                umbracoNode contentTypeNode on contentTypeNode.id = cmsContentType.nodeId
-                left join cmsDocumentType on 
-	                cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1 
-                where 
-	                {0}
-                order by
-	                {1}
-                ";
-        private const string m_SQLOptimizedChildren = @"
-                select count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser,
-                    coalesce(cmsDocument.templateId, cmsDocumentType.templateNodeId) as templateId, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as published, umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId
-                from umbracoNode
-                left join umbracoNode children on children.parentId = umbracoNode.id
-                inner join cmsContent on cmsContent.nodeId = umbracoNode.id
-                inner join cmsContentType on cmsContentType.nodeId = cmsContent.contentType
-                inner join (select contentId, max(versionDate) AS versionDate from cmsContentVersion
-                            inner join umbracoNode on umbracoNode.id = cmsContentVersion.contentId and umbracoNode.parentId = @parentId
-                            group by contentId) AS temp
-                on temp.contentId = cmsContent.nodeId
-                inner join cmsContentVersion on cmsContentVersion.contentId = temp.contentId and cmsContentVersion.versionDate = temp.versionDate
-                inner join cmsDocument on cmsDocument.versionId = cmsContentversion.versionId
-                left join cmsDocument publishCheck on publishCheck.nodeId = cmsContent.nodeID and publishCheck.published = 1
-                left join cmsDocumentType on
-                    cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1
+                    inner join cmsContentVersion on cmsContentVersion.contentID = umbracoNode.id
+                    inner join cmsDocument on cmsDocument.versionId = cmsContentVersion.versionId
+                    inner join cmsContent on cmsDocument.nodeId = cmsContent.NodeId
+                    inner join cmsContentType on cmsContentType.nodeId = cmsContent.ContentType
+                    inner join umbracoNode contentTypeNode on contentTypeNode.id = cmsContentType.nodeId
+                    left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1 
                 where {0}
-                group by umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, cmsDocument.templateId, cmsDocumentType.templateNodeId, umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId
+                order by {1}
+                ";
+        private const string m_SQLOptimizedMany = @"
+                select count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, 
+	                cmsDocument.documentUser, coalesce(cmsDocument.templateId, cmsDocumentType.templateNodeId) as templateId, 
+	                umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as published, umbracoNode.createDate, 
+	                cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, 
+	                cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId
+                from umbracoNode
+                    left join umbracoNode children on children.parentId = umbracoNode.id
+                    inner join cmsContent on cmsContent.nodeId = umbracoNode.id
+                    inner join cmsContentType on cmsContentType.nodeId = cmsContent.contentType
+                    inner join cmsContentVersion on cmsContentVersion.contentId = umbracoNode.id
+                    inner join (select contentId, max(versionDate) as versionDate from cmsContentVersion group by contentId) temp
+	                    on cmsContentVersion.contentId = temp.contentId and cmsContentVersion.versionDate = temp.versionDate
+                    inner join cmsDocument on cmsDocument.versionId = cmsContentversion.versionId
+                    left join cmsDocument publishCheck on publishCheck.nodeId = cmsContent.nodeID and publishCheck.published = 1
+                    left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1
+                where {0}
+                group by 
+	                umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, 
+	                cmsDocument.templateId, cmsDocumentType.templateNodeId, umbracoNode.path, umbracoNode.sortOrder, 
+	                coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, 
+	                cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, 
+	                cmsContentType.masterContentType, cmsContentType.nodeId, cmsDocument.updateDate, cmsContentVersion.versionDate
                 order by {1}
                 ";
 
@@ -396,11 +393,13 @@ namespace umbraco.cms.businesslogic.web
                 //PPH make sure that there is only 1 newest node, this is important in regard to schedueled publishing...
                 SqlHelper.ExecuteNonQuery("update cmsDocument set newest = 0 where nodeId = " + Id);
 
-                SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, Text, TemplateId) values (1," +
-                                          Id + ", 0, " + u.Id + ", @versionId, @text,"
-                                          + _template + ")",
-                                          SqlHelper.CreateParameter("@versionId", newVersion),
-                                          SqlHelper.CreateParameter("@text", Text));
+                SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, Text, TemplateId) values (1,@id, 0, @userId, @versionId, @text, @template)",
+                    SqlHelper.CreateParameter("@id", Id),
+                    SqlHelper.CreateParameter("@template", _template > 0 ? (object)_template : (object)DBNull.Value), //pass null in if the template doesn't have a valid id
+                    SqlHelper.CreateParameter("@userId", u.Id),
+                    SqlHelper.CreateParameter("@versionId", newVersion),
+                    SqlHelper.CreateParameter("@text", Text));
+                
                 SqlHelper.ExecuteNonQuery("update cmsDocument set published = 0 where nodeId = " + Id);
                 SqlHelper.ExecuteNonQuery("update cmsDocument set published = 1, newest = 0 where versionId = @versionId",
                                             SqlHelper.CreateParameter("@versionId", tempVersion));
@@ -648,6 +647,38 @@ namespace umbraco.cms.businesslogic.web
             _published = InitPublished;
         }
 
+        protected void PopulateDocumentFromReader(IRecordsReader dr)
+        {
+            bool _hc = false;
+            
+            if (dr.GetInt("children") > 0)
+                _hc = true;
+            
+            int? masterContentType = null;
+            
+            if (!dr.IsNull("masterContentType"))
+                masterContentType = dr.GetInt("masterContentType");
+            
+            SetupDocumentForTree(dr.GetGuid("uniqueId")
+                , dr.GetShort("level")
+                , dr.GetInt("parentId")
+                , dr.GetInt("documentUser")
+                , (dr.GetInt("published") == 1)
+                , dr.GetString("path")
+                , dr.GetString("text")
+                , dr.GetDateTime("createDate")
+                , dr.GetDateTime("updateDate")
+                , dr.GetDateTime("versionDate")
+                , dr.GetString("icon")
+                , _hc
+                , dr.GetString("alias")
+                , dr.GetString("thumbnail")
+                , dr.GetString("description")
+                , masterContentType
+                , dr.GetInt("contentTypeId")
+                , dr.GetInt("templateId"));            
+        }
+
         public override string Text
         {
             get
@@ -836,8 +867,12 @@ namespace umbraco.cms.businesslogic.web
                 // Make the new document
                 Document NewDoc = MakeNew(Text, new DocumentType(ContentType.Id), u, CopyTo);
 
-                // update template
-                NewDoc.Template = Template;
+                // update template if a template is set
+                if (this.Template > 0) 
+                    NewDoc.Template = Template;
+
+                //update the trashed property as it could be copied inside the recycle bin
+                NewDoc.IsTrashed = this.IsTrashed;
 
                 // Copy the properties of the current document
                 var props = getProperties;
@@ -955,12 +990,6 @@ namespace umbraco.cms.businesslogic.web
         {
             get
             {
-                //SD: Removed old, non-optimized method!
-                //IconI[] tmp = base.Children;
-                //Document[] retval = new Document[tmp.Length];
-                //for (int i = 0; i < tmp.Length; i++) retval[i] = new Document(tmp[i].Id);
-                //return retval;
-
                 //cache the documents children so that this db call doesn't have to occur again
                 if (this._children == null)
                     this._children = Document.GetChildrenForTree(this.Id);
@@ -982,32 +1011,40 @@ namespace umbraco.cms.businesslogic.web
         }
 
         /// <summary>
-        /// Deletes the current document (and all children recursive)
+        /// Puts the current document in the trash
         /// </summary>
         public override void delete()
         {
-            // Check for recyle bin
-            if (!Path.Contains("," + ((int)RecycleBin.RecycleBinType.Content).ToString() + ","))
+            MoveToTrash();
+        }
+
+        /// <summary>
+        /// With either move the document to the trash or permanently remove it from the database.
+        /// </summary>
+        /// <param name="deletePermanently">flag to set whether or not to completely remove it from the database or just send to trash</param>
+        public void delete(bool deletePermanently)
+        {
+            if (!deletePermanently)
             {
                 MoveToTrash();
             }
             else
             {
-                DeletePermanently(false);
+                DeletePermanently();
             }
         }
 
         /// <summary>
         /// Used internally to permanently delete the data from the database
         /// </summary>
-        /// <param name="onlyCurrentDocType">
-        /// if onlyCurrentDocType is set, this means that we shouldn't delete any children that are not
-        /// the current document type and instead just move them to the recycle bin. This is effective if
+        /// <param name="onlyThisDocType">
+        /// if onlyThisDocType is set, this means that we shouldn't delete any children that are not
+        /// the document type specified and instead just move them to the recycle bin. This is effective if
         /// we're deleting an entire document type but don't want to delete other data that isn't this document type
         /// but the ndoe exists as a child of the document type that is being deleted. 
         /// </param>
         /// <returns>returns true if deletion isn't cancelled</returns>
-        private bool DeletePermanently(bool onlyCurrentDocType)
+        private bool DeletePermanently()
         {
             DeleteEventArgs e = new DeleteEventArgs();
 
@@ -1015,20 +1052,9 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-
-                var c = Children;
-                foreach (Document d in c)
+                foreach (Document d in Children.ToList())
                 {                    
-                    if (onlyCurrentDocType && (d.ContentType.Id != this.ContentType.Id))
-                    {
-                        //if we're only supposed to be deleting an exact document type, then just move the document
-                        //to the trash
-                        d.MoveToTrash();
-                    }
-                    else
-                    {
-                        d.DeletePermanently(onlyCurrentDocType);
-                    }                    
+                    d.DeletePermanently();                                        
                 }
 
                 umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
@@ -1085,16 +1111,45 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="dt">The type of which documents should be deleted</param>
         public static void DeleteFromType(DocumentType dt)
         {
-            var objs = getContentOfContentType(dt);
-            foreach (Content c in objs)
+            //get all document for the document type and order by level (top level first)
+            var docs = Document.GetDocumentsOfDocumentType(dt.Id)
+                .OrderByDescending(x => x.Level);
+                                   
+            foreach (Document doc in docs)
             {
-                // due to recursive structure document might already been deleted..
-                if (IsNode(c.UniqueId))
+                //before we delete this document, we need to make sure we don't end up deleting other documents that 
+                //are not of this document type that are children. So we'll move all of it's children to the trash first.
+                foreach (Document c in doc.GetDescendants())
                 {
-                    Document d = new Document(c.UniqueId);
-                    d.DeletePermanently(true);
+                    if (c.ContentType.Id != dt.Id)
+                    {
+                        c.MoveToTrash();
+                    }
+                }
+
+                doc.DeletePermanently();
+            }
+        }
+
+        /// <summary>
+        /// Returns all decendants of the current document
+        /// </summary>
+        /// <returns></returns>
+        public override IEnumerable GetDescendants()
+        {
+            var tmp = new List<Document>();
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(
+                                        string.Format(m_SQLOptimizedMany, "umbracoNode.path LIKE '%," + this.Id + ",%'", "umbracoNode.level")))
+            {
+                while (dr.Read())
+                {
+                    Document d = new Document(dr.GetInt("id"), true);
+                    d.PopulateDocumentFromReader(dr);
+                    tmp.Add(d);
                 }
             }
+
+            return tmp.ToArray();
         }
 
         /// <summary>
@@ -1317,6 +1372,25 @@ namespace umbraco.cms.businesslogic.web
             return temp;
         }
 
+        public static IEnumerable<Document> GetDocumentsOfDocumentType(int docTypeId)
+        {
+            var tmp = new List<Document>();
+            using (IRecordsReader dr =
+                SqlHelper.ExecuteReader(
+                                        string.Format(m_SQLOptimizedMany, "cmsContent.contentType = @contentTypeId", "umbracoNode.sortOrder"),
+                                        SqlHelper.CreateParameter("@contentTypeId", docTypeId)))
+            {
+                while (dr.Read())
+                {
+                    Document d = new Document(dr.GetInt("id"), true);
+                    d.PopulateDocumentFromReader(dr);
+                    tmp.Add(d);
+                }                
+            }
+
+            return tmp.ToArray();
+        }
+
         /// <summary>
         /// Performance tuned method for use in the tree
         /// </summary>
@@ -1324,49 +1398,21 @@ namespace umbraco.cms.businesslogic.web
         /// <returns></returns>
         public static Document[] GetChildrenForTree(int NodeId)
         {
-            ArrayList tmp = new ArrayList();
+            var tmp = new List<Document>();
             using (IRecordsReader dr =
                 SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedChildren, "umbracoNode.parentID = @parentId", "umbracoNode.sortOrder"),
+                                        string.Format(m_SQLOptimizedMany, "umbracoNode.parentID = @parentId", "umbracoNode.sortOrder"),
                                         SqlHelper.CreateParameter("@parentId", NodeId)))
             {
                 while (dr.Read())
                 {
                     Document d = new Document(dr.GetInt("id"), true);
-                    bool _hc = false;
-                    if (dr.GetInt("children") > 0)
-                        _hc = true;
-                    int? masterContentType = null;
-                    if (!dr.IsNull("masterContentType"))
-                        masterContentType = dr.GetInt("masterContentType");
-                    d.SetupDocumentForTree(dr.GetGuid("uniqueId")
-                        , dr.GetShort("level")
-                        , dr.GetInt("parentId")
-                        , dr.GetInt("documentUser")
-                        , (dr.GetInt("published") == 1)
-                        , dr.GetString("path")
-                        , dr.GetString("text")
-                        , dr.GetDateTime("createDate")
-                        , dr.GetDateTime("updateDate")
-                        , dr.GetDateTime("versionDate")
-                        , dr.GetString("icon")
-                        , _hc
-                        , dr.GetString("alias")
-                        , dr.GetString("thumbnail")
-                        , dr.GetString("description")
-                        , masterContentType
-                        , dr.GetInt("contentTypeId")
-                        , dr.GetInt("templateId"));
+                    d.PopulateDocumentFromReader(dr);
                     tmp.Add(d);
                 }
             }
 
-            Document[] retval = new Document[tmp.Count];
-
-            for (int i = 0; i < tmp.Count; i++)
-                retval[i] = (Document)tmp[i];
-
-            return retval;
+            return tmp.ToArray();
         }
 
         private void SetupDocumentForTree(Guid uniqueId, int level, int parentId, int user, bool publish, string path,

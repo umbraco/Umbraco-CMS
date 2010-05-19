@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.ComponentModel;
 using umbraco.IO;
 using umbraco.cms.businesslogic.media;
+using System.Collections;
 
 namespace umbraco.cms.businesslogic
 {
@@ -51,6 +52,7 @@ namespace umbraco.cms.businesslogic
         #endregion
 
         #region Private static
+        
         private static readonly string m_DefaultIconCssFile = IOHelper.MapPath(SystemDirectories.Umbraco_client + "/Tree/treeIcons.css");
         private static List<string> m_DefaultIconClasses = new List<string>();
         private static void initializeIconClasses()
@@ -74,6 +76,12 @@ namespace umbraco.cms.businesslogic
                 m_DefaultIconClasses.Add(cssClass);
             }
         }
+        private const string m_SQLSingle = "SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE id = @id";
+        private const string m_SQLDescendants = @"
+            SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text 
+            FROM umbracoNode 
+            WHERE path LIKE '%,{0},%'";
+
         #endregion
 
         #region Public static
@@ -408,55 +416,34 @@ order by level,sortOrder";
             return base.ToString();
         }      
 
-        /// <summary>
-        /// Moves the CMSNode from the current position in the hierarchy to the target
-        /// </summary>
-        /// <param name="NewParentId">Target CMSNode id</param>
-        public void Move(int newParentId)
+        private void Move(CMSNode parent) 
         {
-            //first we need to establish if the node already exists under the parent node
-            var isSameParent = (Path.Contains("," + newParentId + ","));
-
             MoveEventArgs e = new MoveEventArgs();
             FireBeforeMove(e);
 
             if (!e.Cancel)
             {
-                CMSNode n = new CMSNode(newParentId);
+                //first we need to establish if the node already exists under the parent node
+                var isSameParent = (Path.Contains("," + parent.Id + ","));
 
                 //if it's the same parent, we can save some SQL calls since we know these wont change.
                 //level and path might change even if it's the same parent because the parent could be moving somewhere.
                 if (!isSameParent)
                 {
-                    int maxSortOrder = SqlHelper.ExecuteScalar<int>(
-                    "select coalesce(max(sortOrder),0) from umbracoNode where parentid = @parentId",
-                    SqlHelper.CreateParameter("@parentId", newParentId));
+                    int maxSortOrder = SqlHelper.ExecuteScalar<int>("select coalesce(max(sortOrder),0) from umbracoNode where parentid = @parentId",
+                        SqlHelper.CreateParameter("@parentId", parent.Id));
 
-                    this.Parent = n;
+                    this.Parent = parent;
                     this.sortOrder = maxSortOrder + 1;
-                }                
-                
-                this.Level = n.Level + 1;
-                this.Path = n.Path + "," + this.Id.ToString();
+                }
+
+                this.Level = parent.Level + 1;
+                this.Path = parent.Path + "," + this.Id.ToString();
 
                 //this code block should not be here but since the class structure is very poor and doesn't use 
                 //overrides (instead using shadows/new) for the Children property, when iterating over the children
                 //and calling Move(), the super classes overridden OnMove or Move methods never get fired, so 
                 //we now need to hard code this here :(
-
-                //make sure the node type is a document/media, if it is a recycle bin then this will not be equal
-                if (n.nodeObjectType == Document._objectType)
-                {
-                    //regenerate the xml for the parent node
-                    var d = new Document(n.Id);
-                    d.XmlGenerate(new XmlDocument());
-                }
-                else if (n.nodeObjectType == Media._objectType)
-                {
-                    //regenerate the xml for the parent node
-                    var m = new Media(n.Id);
-                    m.XmlGenerate(new XmlDocument());                    
-                }
 
                 if (Path.Contains("," + ((int)RecycleBin.RecycleBinType.Content).ToString() + ",")
                     || Path.Contains("," + ((int)RecycleBin.RecycleBinType.Media).ToString() + ","))
@@ -469,14 +456,38 @@ order by level,sortOrder";
                     if (IsTrashed) IsTrashed = false; //don't update if it's not necessary
                 }
 
+                //make sure the node type is a document/media, if it is a recycle bin then this will not be equal
+                if (!IsTrashed && parent.nodeObjectType == Document._objectType)
+                {
+                    //regenerate the xml for the parent node
+                    var d = new Document(parent.Id);
+                    d.XmlGenerate(new XmlDocument());
+                }
+                else if (!IsTrashed && parent.nodeObjectType == Media._objectType)
+                {
+                    //regenerate the xml for the parent node
+                    var m = new Media(parent.Id);
+                    m.XmlGenerate(new XmlDocument());
+                }
+
                 var children = this.Children;
                 foreach (CMSNode c in children)
                 {
-                    c.Move(this.Id);
+                    c.Move(this);
                 }
 
                 FireAfterMove(e);
             }
+        }
+
+        /// <summary>
+        /// Moves the CMSNode from the current position in the hierarchy to the target
+        /// </summary>
+        /// <param name="NewParentId">Target CMSNode id</param>
+        public void Move(int newParentId)
+        {
+            CMSNode parent = new CMSNode(newParentId);
+            Move(parent);
         }
 
         /// <summary>
@@ -499,7 +510,6 @@ order by level,sortOrder";
                 FireAfterDelete(e);
             }
         }
-
 
         /// <summary>
         /// Does the current CMSNode have any child nodes.
@@ -524,7 +534,31 @@ order by level,sortOrder";
                 _hasChildrenInitialized = true;
                 _hasChildren = value;
             }
-        } 
+        }
+
+        /// <summary>
+        /// Returns all descendant nodes from this node.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// This doesn't return a strongly typed IEnumerable object so that we can override in in super clases
+        /// and since this class isn't a generic (thought it should be) this is not strongly typed.
+        /// </remarks>
+        public virtual IEnumerable GetDescendants()
+        {
+            var descendants = new List<CMSNode>();
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(m_SQLDescendants, Id)))
+            {
+                while (dr.Read())
+                {
+                    var node = new CMSNode(dr.GetInt("id"), true);
+                    node.PopulateCMSNodeFromReader(dr);
+                    descendants.Add(node);
+                }                
+            }
+            return descendants;
+        }
+
         #endregion
 
         #region Public properties
@@ -602,6 +636,13 @@ order by level,sortOrder";
             get { return _id; }
         }
 
+        /// <summary>
+        /// Get the parent id of the node
+        /// </summary>
+        public int ParentId
+        {
+            get { return _parentid; }
+        }
 
         /// <summary>
         /// Given the hierarchical tree structure a CMSNode has only one parent but can have many children
@@ -690,7 +731,8 @@ order by level,sortOrder";
             {
                 System.Collections.ArrayList tmp = new System.Collections.ArrayList();
                 using (IRecordsReader dr = SqlHelper.ExecuteReader("SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE ParentID = @ParentID AND nodeObjectType = @type order by sortOrder",
-                    SqlHelper.CreateParameter("@type", this.nodeObjectType), SqlHelper.CreateParameter("ParentID", this.Id)))
+                    SqlHelper.CreateParameter("@type", this.nodeObjectType), 
+                    SqlHelper.CreateParameter("ParentID", this.Id)))
                 {
                     while (dr.Read())
                     {
@@ -816,9 +858,8 @@ order by level,sortOrder";
         /// </summary>
         protected virtual void setupNode()
         {
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                "SELECT createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE id = " + this.Id
-                ))
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(m_SQLSingle,
+                    SqlHelper.CreateParameter("@id",this.Id)))                
             {
                 if (dr.Read())
                 {

@@ -22,18 +22,80 @@ namespace umbraco.Test
     [TestClass()]
     public class DocumentTypeTest
     {
+        [TestMethod()]
+        public void DocumentType_DeleteDocTypeWithContennt()
+        {
+            var dt = CreateNewDocType();
+            var doc = Document.MakeNew("TEST" + Guid.NewGuid().ToString("N"), dt, m_User, -1);
+            Assert.IsInstanceOfType(doc, typeof(Document));
+            Assert.IsTrue(doc.Id > 0);
+
+            DeleteDocType(dt);
+
+            Assert.IsFalse(Document.IsNode(doc.Id));
+        }
+
+        /// <summary>
+        /// This will create 3 document types, and create nodes in the following structure:
+        /// - root
+        /// -- node1 (of doc type #1)
+        /// --- node 2 (of doc type #2)
+        /// ---- node 3 (of doc type #1)
+        /// ----- node 4 (of doc type #3)
+        /// 
+        /// Then we'll delete doc type #1. The result should be that node1 and node3 are completely deleted from the database and node2 and node4 are
+        /// moved to the recycle bin.
+        /// </summary>
+        [TestMethod()]
+        public void DocumentType_DeleteDocTypeWithContentAndChildrenOfDifferentDocTypes()
+        {
+            //System.Diagnostics.Debugger.Break();
+
+            //create the doc types 
+            var dt1 = CreateNewDocType();
+            var dt2 = CreateNewDocType();
+            var dt3 = CreateNewDocType();
+
+            //create the heirarchy
+            dt1.AllowedChildContentTypeIDs = new int[] { dt2.Id, dt3.Id };
+            dt1.Save();
+            dt2.AllowedChildContentTypeIDs = new int[] { dt1.Id };
+            dt2.Save();
+
+            //create the content tree
+            var node1 = Document.MakeNew("TEST" + Guid.NewGuid().ToString("N"), dt1, m_User, -1);
+            var node2 = Document.MakeNew("TEST" + Guid.NewGuid().ToString("N"), dt2, m_User, node1.Id);
+            var node3 = Document.MakeNew("TEST" + Guid.NewGuid().ToString("N"), dt1, m_User, node2.Id);
+            var node4 = Document.MakeNew("TEST" + Guid.NewGuid().ToString("N"), dt3, m_User, node3.Id);
+
+            //do the deletion of doc type #1
+            DeleteDocType(dt1);
+
+            //do our checks
+            Assert.IsFalse(Document.IsNode(node1.Id), "node1 is not deleted"); //this was of doc type 1, should be gone
+            Assert.IsFalse(Document.IsNode(node3.Id), "node3 is not deleted"); //this was of doc type 1, should be gone
+
+            Assert.IsTrue(Document.IsNode(node2.Id), "node2 is deleted");
+            Assert.IsTrue(Document.IsNode(node4.Id), "node4 is deleted");
+
+            node2 = new Document(node2.Id);//need to re-query the node
+            Assert.IsTrue(node2.IsTrashed, "node2 is not in the trash");
+            node4 = new Document(node4.Id); //need to re-query the node
+            Assert.IsTrue(node4.IsTrashed, "node 4 is not in the trash");
+
+            //remove the old data
+            DeleteDocType(dt2);
+            DeleteDocType(dt3);
+
+        }
 
         /// <summary>
         ///A test for creating a new document type
         ///</summary>
         [TestMethod()]
         public void DocumentType_MakeNewTest()
-        {                   
-            var dt = DocumentType.MakeNew(m_User, "TEST" + Guid.NewGuid().ToString("N"));
-            Assert.IsTrue(dt.Id > 0);
-            Assert.AreEqual(DateTime.Now.Date, dt.CreateDateTime.Date);
-
-            DeleteDocType(dt);
+        {
+            Assert.IsInstanceOfType(m_NewDocType, typeof(DocumentType));
         }
 
         /// <summary>
@@ -43,18 +105,14 @@ namespace umbraco.Test
         public void DocumentType_AddPropertiesToTabThenDeleteItTest()
         {
             //System.Diagnostics.Debugger.Break();
-
-            var dt = DocumentType.MakeNew(m_User, "TEST" + Guid.NewGuid().ToString("N"));
-            Assert.IsTrue(dt.Id > 0);
-            Assert.AreEqual(DateTime.Now.Date, dt.CreateDateTime.Date);
-
+            
             //allow itself to be created under itself
-            dt.AllowedChildContentTypeIDs = new int[] { dt.Id };
+            m_NewDocType.AllowedChildContentTypeIDs = new int[] { m_NewDocType.Id };
             //create a tab 
-            dt.AddVirtualTab("TEST");
+            m_NewDocType.AddVirtualTab("TEST");
 
             //test the tab
-            var tabs = dt.getVirtualTabs.ToList();
+            var tabs = m_NewDocType.getVirtualTabs.ToList();
             Assert.AreEqual(1, tabs.Count);
 
             //create a property
@@ -63,22 +121,20 @@ namespace umbraco.Test
             foreach (var dataType in allDataTypes)
             {
                 //add a property type of the first type found in the list
-                dt.AddPropertyType(dataType, "testProperty" + (++i).ToString(), "Test Property" + i.ToString());
+                m_NewDocType.AddPropertyType(dataType, "testProperty" + (++i).ToString(), "Test Property" + i.ToString());
                 //test the prop
-                var prop = dt.getPropertyType("testProperty" + i.ToString());
+                var prop = m_NewDocType.getPropertyType("testProperty" + i.ToString());
                 Assert.IsTrue(prop.Id > 0);
                 Assert.AreEqual("Test Property" + i.ToString(), prop.Name);
                 //put the properties to the tab
-                dt.SetTabOnPropertyType(prop, tabs[0].Id);                
+                m_NewDocType.SetTabOnPropertyType(prop, tabs[0].Id);                
                 //re-get the property since data is cached in the object
-                prop = dt.getPropertyType("testProperty" + i.ToString());
+                prop = m_NewDocType.getPropertyType("testProperty" + i.ToString());
                 Assert.AreEqual<int>(tabs[0].Id, prop.TabId);
             }
 
             //now we need to delete the tab
-            dt.DeleteVirtualTab(tabs[0].Id);
-
-            dt.delete();
+            m_NewDocType.DeleteVirtualTab(tabs[0].Id);
         }
 
         /// <summary>
@@ -688,6 +744,23 @@ namespace umbraco.Test
         
         private User m_User = new User(0);
 
+        /// <summary>
+        /// before each test starts, this object is created so it can be used for testing.
+        /// </summary>
+        private DocumentType m_NewDocType;
+
+        /// <summary>
+        /// Create a brand new document type
+        /// </summary>
+        /// <returns></returns>
+        private DocumentType CreateNewDocType()
+        {
+            var dt = DocumentType.MakeNew(m_User, "TEST" + Guid.NewGuid().ToString("N"));
+            Assert.IsTrue(dt.Id > 0);
+            Assert.AreEqual(DateTime.Now.Date, dt.CreateDateTime.Date);
+            return dt;
+        }
+
         private void DeleteDocType(DocumentType dt)
         {
             var id = dt.Id;
@@ -739,18 +812,25 @@ namespace umbraco.Test
         //{
         //}
         //
-        //Use TestInitialize to run code before running each test
-        //[TestInitialize()]
-        //public void MyTestInitialize()
-        //{
-        //}
-        //
-        //Use TestCleanup to run code after each test has run
-        //[TestCleanup()]
-        //public void MyTestCleanup()
-        //{
-        //}
-        //
+        
+        /// <summary>
+        /// Create a new document type for use in tests
+        /// </summary>
+        [TestInitialize()]
+        public void MyTestInitialize()
+        {
+            m_NewDocType = CreateNewDocType();
+        }
+        
+        /// <summary>
+        /// Remove the created document type
+        /// </summary>
+        [TestCleanup()]
+        public void MyTestCleanup()
+        {
+            DeleteDocType(m_NewDocType);
+        }
+        
         #endregion
 
     }

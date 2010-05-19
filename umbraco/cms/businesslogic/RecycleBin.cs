@@ -5,6 +5,7 @@ using System.Linq;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
+using System.Threading;
 
 namespace umbraco.cms.businesslogic
 {
@@ -134,12 +135,18 @@ namespace umbraco.cms.businesslogic
         {
             lock (m_Locker)
             {
+                //first, move all nodes underneath the recycle bin directly under the recycle bin node (flatten heirarchy)
+                //then delete them all.
+
+                SqlHelper.ExecuteNonQuery("UPDATE umbracoNode SET parentID=@parentID, level=1 WHERE path LIKE '%," + ((int)m_BinType).ToString() + ",%'",
+                    SqlHelper.CreateParameter("@parentID", (int)m_BinType));
+
                 foreach (var c in Children.ToList())
                 {
                     switch (m_BinType)
                     {
                         case RecycleBinType.Content:
-                            new Document(c.Id).delete();
+                            new Document(c.Id).delete(true);
                             itemDeletedCallback(RecycleBin.Count(m_BinType));
                             break;
                         case RecycleBinType.Media:

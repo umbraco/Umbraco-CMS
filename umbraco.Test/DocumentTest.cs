@@ -13,6 +13,7 @@ using umbraco.editorControls.textfield;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.language;
+using umbraco.BusinessLogic.console;
 
 namespace umbraco.Test
 {
@@ -34,6 +35,50 @@ namespace umbraco.Test
     {
 
         #region Unit Tests
+
+        /// <summary>
+        /// Creates a bunch of nodes in a heirarchy, then deletes the top most node (moves to the recycle bin
+        /// and completely deletes from system.) This should completely delete all of these nodes from the database.
+        /// </summary>
+        [TestMethod()]
+        public void Document_DeleteHeirarchyPermanentlyTest()
+        {
+            var docList = new List<Document>();
+            var total = 20;
+            var dt = new DocumentType(GetExistingDocTypeId());
+            //allow the doc type to be created underneath itself
+            dt.AllowedChildContentTypeIDs = new int[] { dt.Id };
+            dt.Save();
+
+            //create 20 content nodes underneath each other, this will test deleting with heirarchy as well
+            var lastParentId = -1;
+            for (var i = 0; i < total; i++)
+            {
+                var newDoc = Document.MakeNew(i.ToString() + Guid.NewGuid().ToString("N"), dt, m_User, lastParentId);
+                docList.Add(newDoc);
+                Assert.IsTrue(docList[docList.Count - 1].Id > 0);
+                lastParentId = newDoc.Id;
+            }
+
+            //now delete all of them permanently, since they are nested, we only need to delete one
+            docList.First().delete(true);
+
+            //make sure they are all gone
+            foreach (var d in docList)
+            {
+                Assert.IsFalse(Document.IsNode(d.Id));
+            }
+            
+        }
+
+        /// <summary>
+        ///A test for PublishWithResult
+        ///</summary>
+        [TestMethod()]
+        public void Document_PublishWithResultTest()
+        {
+            var val = m_NewRootDoc.PublishWithResult(m_User);            
+        }
 
         /// <summary>
         /// Creates a doc type, assigns a domain to it and removes it
@@ -83,26 +128,28 @@ namespace umbraco.Test
         {
             //System.Diagnostics.Debugger.Break();
             Document target = new Document(GetExistingNodeId());
-            int parentId = target.Level == 1 ? -1 : target.Parent.Id;
+            int parentId = target.ParentId;
             bool RelateToOrignal = false;
 
             //get children ids for the current parent
-            var childrenIds = target.Level == 1 ? Document.GetRootDocuments().ToList().Select(x => x.Id) : target.Parent.Children.ToList().Select(x => x.Id);
+            var childrenIds = GetChildNodesOfParent(target).Select(x => x.Id);
 
             //copy the node
             target.Copy(parentId, m_User, RelateToOrignal);
 
             //test that the child id count + 1 is equal to the total child count
-            Assert.AreEqual(childrenIds.Count() + 1, target.Level == 1 ? Document.GetRootDocuments().Count() : target.Parent.ChildCount);
+            Assert.AreEqual(childrenIds.Count() + 1, GetChildNodesOfParent(target).Count(), "Child node counts do not match");
 
             //get the list of new child ids from the parent
-            var newChildIds = target.Level == 1 ? Document.GetRootDocuments().ToList().Select(x => x.Id) : target.Parent.Children.ToList().Select(x => x.Id);
+            var newChildIds = GetChildNodesOfParent(target).Select(x => x.Id);
             //get the children difference which should be the new node
             var diff = newChildIds.Except(childrenIds);
-
+            
             Assert.AreEqual(1, diff.Count());
 
+            //get the node that is the difference to compare
             Document newDoc = new Document(diff.First());
+            Assert.AreEqual<int>(parentId, newDoc.ParentId);
 
             RecycleAndDelete(newDoc);
         }
@@ -115,15 +162,15 @@ namespace umbraco.Test
         {
             //System.Diagnostics.Debugger.Break();
             Document target = new Document(GetExistingNodeId());
-            int parentId = target.Level == 1 ? -1 : target.Parent.Id;
+            int parentId = target.ParentId;
             bool RelateToOrignal = true;
 
-            //get children ids
-            var childrenIds = target.Parent.Children.ToList().Select(x => x.Id);
+            //get children ids            
+            var childrenIds = GetChildNodesOfParent(target).Select(x => x.Id);
 
             target.Copy(parentId, m_User, RelateToOrignal);
 
-            Assert.AreEqual(childrenIds.Count() + 1, target.Level == 1 ? Document.GetRootDocuments().Count() : target.Parent.ChildCount);
+            Assert.AreEqual(childrenIds.Count() + 1, GetChildNodesOfParent(target).Count());
 
             Document parent = new Document(parentId);
             //get the children difference which should be the new node
@@ -355,7 +402,7 @@ namespace umbraco.Test
             var doc = new Document(GetExistingNodeId());
             //create new content based on the existing content in the same heirarchy
             var dt = new DocumentType(doc.ContentType.Id);
-            var parentId = doc.Level == 1 ? -1 : doc.Parent.Id;
+            var parentId = doc.ParentId;
             var newDoc = Document.MakeNew("NewDoc" + Guid.NewGuid().ToString("N"), dt, m_User, parentId);
             Assert.IsTrue(newDoc.Id > 0);
 
@@ -379,34 +426,36 @@ namespace umbraco.Test
         [TestMethod]
         public void Document_EmptyRecycleBinTest()
         {
-            var totalTrashedItems = RecycleBin.Count(RecycleBin.RecycleBinType.Content);                
-
             var docList = new List<Document>();
             var total = 20;
-            var dt = new DocumentType(GetExistingDocTypeId());
-            //create 20 content nodes
+            var dt = m_ExistingDocType;
+            //allow the doc type to be created underneath itself
+            dt.AllowedChildContentTypeIDs = new int[] { dt.Id };
+            dt.Save();
+
+            //create 20 content nodes underneath each other, this will test deleting with heirarchy as well
+            var lastParentId = -1;
             for (var i = 0; i < total; i++)
             {
-                docList.Add(Document.MakeNew(i.ToString() + Guid.NewGuid().ToString("N"), dt, m_User, -1));
+                var newDoc = Document.MakeNew("R-" + i.ToString() + Guid.NewGuid().ToString("N"), dt, m_User, lastParentId);
+                docList.Add(newDoc);
                 Assert.IsTrue(docList[docList.Count - 1].Id > 0);
+                Assert.AreEqual(lastParentId, newDoc.ParentId);
+                lastParentId = newDoc.Id;
             }
 
-            //now delete all of them
-            foreach (var d in docList)
-            {
-                d.delete();
-                Assert.IsTrue(d.IsTrashed);
-            }
+            //now delete all of them, since they are nested, we only need to delete one
+            docList.First().delete();
 
             //a callback action for each item removed from the recycle bin
             var totalDeleted = 0;
-            var deleteCallback = new Action<int>(x =>
-            {
-                Assert.AreEqual((total + totalTrashedItems) - (++totalDeleted), x);
-            });
 
             var bin = new RecycleBin(RecycleBin.RecycleBinType.Content);
-            bin.CallTheGarbageMan(deleteCallback);
+            var totalTrashedItems = bin.GetDescendants().Cast<object>().Count();
+            bin.CallTheGarbageMan(x =>
+            {
+                Assert.AreEqual(totalTrashedItems - (++totalDeleted), x);
+            });
 
             Assert.AreEqual(0, RecycleBin.Count(RecycleBin.RecycleBinType.Content));
         }
@@ -540,21 +589,7 @@ namespace umbraco.Test
         //    Assert.Inconclusive("A method that does not return a value cannot be verified.");
         //}
 
-        ///// <summary>
-        /////A test for PublishWithResult
-        /////</summary>
-        //[TestMethod()]
-        //public void PublishWithResultTest()
-        //{
-        //    Guid id = new Guid(); // TODO: Initialize to an appropriate value
-        //    Document target = new Document(id); // TODO: Initialize to an appropriate value
-        //    User u = null; // TODO: Initialize to an appropriate value
-        //    bool expected = false; // TODO: Initialize to an appropriate value
-        //    bool actual;
-        //    actual = target.PublishWithResult(u);
-        //    Assert.AreEqual(expected, actual);
-        //    Assert.Inconclusive("Verify the correctness of this test method.");
-        //}
+        
 
         ///// <summary>
         /////A test for PublishWithChildrenWithResult
@@ -745,15 +780,20 @@ namespace umbraco.Test
             }
 
             var id = d.Id;
-            //now recycle it                        
-            d.delete();
 
-            Assert.IsTrue(d.IsTrashed);
+            //check if it is already trashed
+            var alreadyTrashed = d.IsTrashed;
 
-            Document recycled = new Document(id);
-            //now delete it
-            recycled.delete();
+            if (!alreadyTrashed)
+            {
+                //now recycle it
+                d.delete();
 
+                Assert.IsTrue(d.IsTrashed);                
+            }
+
+            //now permanently delete
+            d.delete(true);
             Assert.IsFalse(Document.IsNode(id));
 
             //check with sql that it is gone
@@ -812,6 +852,32 @@ namespace umbraco.Test
             var r = new Random();
             var index = r.Next(0, ids.Count() - 1);
             return ids[index];
+        }
+
+        /// <summary>
+        /// A helper method to get the parent node.
+        /// The reason we need this is because the API currently throws an exception if we access the Parent property
+        /// of a node and the node is on level 1. This also causes issues if the node is in level 1 in the recycle bin.
+        /// </summary>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        private IEnumerable<IconI> GetChildNodesOfParent(Document d)
+        {
+            if (d.ParentId == (int)RecycleBin.RecycleBinType.Content)
+            {
+                return new RecycleBin(RecycleBin.RecycleBinType.Content).Children.ToList();
+            }
+            else
+            {
+                if (d.Level == 1)
+                {
+                    return Document.GetRootDocuments();
+                }
+                else
+                {
+                    return d.Parent.Children;
+                }
+            }
         }
 
         private DocumentType GetExistingDocType()
