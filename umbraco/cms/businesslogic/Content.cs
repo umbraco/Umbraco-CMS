@@ -370,7 +370,6 @@ namespace umbraco.cms.businesslogic
 
             if (Deep)
             {
-                //store children array here because iterating over an Array object is very inneficient.
                 var childs = this.Children;
                 foreach (BusinessLogic.console.IconI c in childs)
                 {

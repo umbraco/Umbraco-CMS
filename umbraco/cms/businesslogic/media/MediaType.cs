@@ -55,13 +55,10 @@ namespace umbraco.cms.businesslogic.media
                                                               SqlHelper.CreateParameter("@alias",Alias)));
 		}
 
-
-		private static Guid _objectType = new Guid("4ea4382b-2f5a-4c2b-9587-ae9b3cf3602e");
-
 		/// <summary>
 		/// Retrieve all MediaTypes in the umbraco installation
 		/// </summary>
-		new public static MediaType[] GetAll 
+		public new static MediaType[] GetAll 
 		{
 			get
 			{
@@ -95,11 +92,12 @@ namespace umbraco.cms.businesslogic.media
             return mt;
 		}
 
+        public static Guid _objectType = new Guid("4ea4382b-2f5a-4c2b-9587-ae9b3cf3602e");
 
 		/// <summary>
 		/// Deletes the current MediaType and all created Medias of the type.
 		/// </summary>
-		new public void delete() 
+		public override void delete() 
 		{
             DeleteEventArgs e = new DeleteEventArgs();
             FireBeforeDelete(e);

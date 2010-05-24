@@ -105,7 +105,7 @@ namespace umbraco
         {
             get
             {
-                
+
                 try
                 {
                     return ConfigurationManager.AppSettings["umbracoPath"];
@@ -117,19 +117,19 @@ namespace umbraco
             }
         }
 
-		/// <summary>
-		/// Gets the path to umbraco's client directory (/umbraco_client by default).
-		/// This is a relative path to the Umbraco Path as it always must exist beside the 'umbraco'
-		/// folder since the CSS paths to images depend on it.
-		/// </summary>
-		/// <value>The path.</value>
-		public static string ClientPath
-		{
-			get
-			{
-				return Path + "/../umbraco_client";
-			}
-		}
+        /// <summary>
+        /// Gets the path to umbraco's client directory (/umbraco_client by default).
+        /// This is a relative path to the Umbraco Path as it always must exist beside the 'umbraco'
+        /// folder since the CSS paths to images depend on it.
+        /// </summary>
+        /// <value>The path.</value>
+        public static string ClientPath
+        {
+            get
+            {
+                return Path + "/../umbraco_client";
+            }
+        }
 
         /// <summary>
         /// Gets the database connection string
@@ -150,7 +150,7 @@ namespace umbraco
             }
             set
             {
-                if(DbDSN!=value)
+                if (DbDSN != value)
                     SaveSetting("umbracoDbDSN", value);
             }
         }
@@ -178,32 +178,39 @@ namespace umbraco
             }
         }
 
-        private static AspNetHostingPermissionLevel m_ApplicationTrustLevel;
-        public static AspNetHostingPermissionLevel ApplicationTrustLevel {
-            get{
-             if (m_ApplicationTrustLevel != AspNetHostingPermissionLevel.None) {
+        private static AspNetHostingPermissionLevel? m_ApplicationTrustLevel = null;
+        public static AspNetHostingPermissionLevel ApplicationTrustLevel
+        {
+            get
+            {
+                if (!m_ApplicationTrustLevel.HasValue)
+                {
+                    //set minimum
+                    m_ApplicationTrustLevel = AspNetHostingPermissionLevel.None;
 
-                foreach (AspNetHostingPermissionLevel trustLevel in
-                        new AspNetHostingPermissionLevel[] {
-                AspNetHostingPermissionLevel.Unrestricted,
-                AspNetHostingPermissionLevel.High,
-                AspNetHostingPermissionLevel.Medium,
-                AspNetHostingPermissionLevel.Low,
-                AspNetHostingPermissionLevel.Minimal 
-            }) {
-                    try {
-                        new AspNetHostingPermission(trustLevel).Demand();
-                    } catch (System.Security.SecurityException) {
-                        continue;
+                    //determine maximum
+                    foreach (AspNetHostingPermissionLevel trustLevel in
+                            new AspNetHostingPermissionLevel[] {
+                                AspNetHostingPermissionLevel.Unrestricted,
+                                AspNetHostingPermissionLevel.High,
+                                AspNetHostingPermissionLevel.Medium,
+                                AspNetHostingPermissionLevel.Low,
+                                AspNetHostingPermissionLevel.Minimal 
+                            })
+                    {
+                        try
+                        {
+                            new AspNetHostingPermission(trustLevel).Demand();
+                            m_ApplicationTrustLevel = trustLevel;
+                            break; //we've set the highest permission we can
+                        }
+                        catch (System.Security.SecurityException)
+                        {
+                            continue;
+                        }                        
                     }
-
-                    m_ApplicationTrustLevel = trustLevel;
                 }
-
-                m_ApplicationTrustLevel = AspNetHostingPermissionLevel.None;
-            }
-
-            return m_ApplicationTrustLevel;
+                return m_ApplicationTrustLevel.Value;
             }
         }
 
@@ -212,14 +219,19 @@ namespace umbraco
         /// Forces umbraco to be medium trust compatible
         /// </summary>
         /// <value>If true, umbraco will be medium-trust compatible, no matter what Permission level the server is on.</value>
-        public static bool UseMediumTrust {
-            get {
-                try {
+        public static bool UseMediumTrust
+        {
+            get
+            {
+                try
+                {
                     if (ApplicationTrustLevel == AspNetHostingPermissionLevel.High || ApplicationTrustLevel == AspNetHostingPermissionLevel.Unrestricted)
                         return false;
-                    else 
+                    else
                         return bool.Parse(ConfigurationManager.AppSettings["umbracoUseMediumTrust"]);
-                }catch {
+                }
+                catch
+                {
                     return false;
                 }
             }
@@ -233,8 +245,10 @@ namespace umbraco
         protected static void SaveSetting(string key, string value)
         {
             WebConfigurationFileMap webConfig = new WebConfigurationFileMap();
-            foreach (VirtualDirectoryMapping v in webConfig.VirtualDirectories) {
-                if (v.IsAppRoot) {
+            foreach (VirtualDirectoryMapping v in webConfig.VirtualDirectories)
+            {
+                if (v.IsAppRoot)
+                {
                     Configuration config = WebConfigurationManager.OpenWebConfiguration(v.VirtualDirectory);
                     config.AppSettings.Settings[key].Value = value;
                     config.Save();
@@ -250,7 +264,7 @@ namespace umbraco
             /* Configuration config =
                 ConfigurationManager.OpenMappedExeConfiguration(webConfig, ConfigurationUserLevel.None);
              */
-            
+
         }
 
         /// <summary>
@@ -309,12 +323,12 @@ namespace umbraco
                     string configStatus = ConfigurationStatus;
                     string currentVersion = CurrentVersion;
 
-                    
+
                     if (currentVersion != configStatus)
                         Log.Add(LogTypes.Debug, User.GetUser(0), -1,
                                 "CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus +
                                 "'");
-                    
+
                     return (configStatus == currentVersion);
                 }
                 catch
@@ -420,7 +434,7 @@ namespace umbraco
                 try
                 {
                     System.Net.Configuration.MailSettingsSectionGroup mailSettings = ConfigurationManager.GetSection("system.net/mailSettings") as System.Net.Configuration.MailSettingsSectionGroup;
-                    
+
                     if (mailSettings != null)
                         return mailSettings.Smtp.Network.Host;
                     else
@@ -525,8 +539,10 @@ namespace umbraco
         /// Gets a value indicating whether statistic logging happens async.
         /// </summary>
         /// <value><c>true</c> if async stats logging is enabled; otherwise, <c>false</c>.</value>
-        public static bool EnableAsyncStatLogging {
-            get {
+        public static bool EnableAsyncStatLogging
+        {
+            get
+            {
                 string value = ConfigurationManager.AppSettings["umbracoAsyncStatLogging"];
                 bool result;
                 if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
@@ -611,7 +627,7 @@ namespace umbraco
         /// <returns></returns>
         public static bool RequestIsInUmbracoApplication(HttpContext context)
         {
-            return context.Request.Path.ToLower().IndexOf( IOHelper.ResolveUrl( SystemDirectories.Umbraco ) .ToLower()) > -1;
+            return context.Request.Path.ToLower().IndexOf(IOHelper.ResolveUrl(SystemDirectories.Umbraco).ToLower()) > -1;
         }
 
         public static bool RequestIsLiveEditRedirector(HttpContext context)
@@ -623,7 +639,7 @@ namespace umbraco
         /// Gets a value indicating whether umbraco should force a secure (https) connection to the backoffice.
         /// </summary>
         /// <value><c>true</c> if [use SSL]; otherwise, <c>false</c>.</value>
-		public static bool UseSSL
+        public static bool UseSSL
         {
             get
             {
@@ -715,8 +731,8 @@ namespace umbraco
                 }
                 return false;
             }
-        } 
-        
+        }
+
 
         /// <summary>
         /// Determines whether the specified URL is reserved or is inside a reserved path.
@@ -772,7 +788,7 @@ namespace umbraco
         }
     }
 
- 
+
 
     /// <summary>
     /// Structure that checks in logarithmic time
@@ -845,7 +861,7 @@ namespace umbraco
                 // let the default string comparer deal with null or when part is not smaller then whole
                 if (part == null || whole == null || part.Length >= whole.Length)
                     return _stringComparer.Compare(part, whole);
-               
+
                 // loop through all characters that part and whole have in common
                 int pos = 0;
                 bool match;

@@ -116,6 +116,7 @@
   <ItemGroup>
     <Compile Include="DocumentTest.cs" />
     <Compile Include="DocumentTypeTest.cs" />
+    <Compile Include="MediaTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -150,7 +150,7 @@ namespace umbraco.cms.businesslogic
                             itemDeletedCallback(RecycleBin.Count(m_BinType));
                             break;
                         case RecycleBinType.Media:
-                            new Media(c.Id).delete();
+                            new Media(c.Id).delete(true);
                             itemDeletedCallback(RecycleBin.Count(m_BinType));
                             break;
                     }

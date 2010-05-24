@@ -34,8 +34,6 @@ namespace umbraco.Test
     public class DocumentTest
     {
 
-        #region Unit Tests
-
         /// <summary>
         /// Creates a bunch of nodes in a heirarchy, then deletes the top most node (moves to the recycle bin
         /// and completely deletes from system.) This should completely delete all of these nodes from the database.
@@ -460,7 +458,6 @@ namespace umbraco.Test
             Assert.AreEqual(0, RecycleBin.Count(RecycleBin.RecycleBinType.Content));
         }
 
-        #endregion
 
         #region TEST TO BE WRITTEN
 

@@ -8,7 +8,7 @@ namespace umbraco.presentation.masterpages {
     public partial class umbracoDialog : System.Web.UI.MasterPage {
         
         public bool reportModalSize { get; set; }
-		public static event MasterPageLoadHandler Load;
+		public static new event MasterPageLoadHandler Load;
         public static event MasterPageLoadHandler Init;
 
 		protected void Page_Load(object sender, EventArgs e)

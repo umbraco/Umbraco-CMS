@@ -8,6 +8,7 @@ using System.Linq;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.datatype;
 using System.Data.SqlClient;
+using umbraco.cms.businesslogic;
 
 namespace umbraco.Test
 {
@@ -23,7 +24,7 @@ namespace umbraco.Test
     public class DocumentTypeTest
     {
         [TestMethod()]
-        public void DocumentType_DeleteDocTypeWithContennt()
+        public void DocumentType_DeleteDocTypeWithContent()
         {
             var dt = CreateNewDocType();
             var doc = Document.MakeNew("TEST" + Guid.NewGuid().ToString("N"), dt, m_User, -1);

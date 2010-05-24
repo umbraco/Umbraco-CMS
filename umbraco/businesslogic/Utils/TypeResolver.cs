@@ -58,23 +58,25 @@ namespace umbraco.BusinessLogic.Utils
                 sandbox = AppDomain.CreateDomain("Sandbox", AppDomain.CurrentDomain.Evidence, domainSetup);
             }
 
-			try
-			{
-				TypeResolver typeResolver = (TypeResolver)sandbox.CreateInstanceAndUnwrap(
-					typeof(TypeResolver).Assembly.GetName().Name,
-					typeof(TypeResolver).FullName);
+            try
+            {
+                TypeResolver typeResolver = (TypeResolver)sandbox.CreateInstanceAndUnwrap(
+                    typeof(TypeResolver).Assembly.GetName().Name,
+                    typeof(TypeResolver).FullName);
 
-				return typeResolver.GetTypes(typeof(T), files);
-			}
-			catch(Exception ex)
-			{
-				Debug.WriteLine(ex.ToString());
-			}
-			
-            if ((!GlobalSettings.UseMediumTrust) && (GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium)) {
-                AppDomain.Unload(sandbox);
+                return typeResolver.GetTypes(typeof(T), files);
             }
-
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                if ((!GlobalSettings.UseMediumTrust) && (GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium))
+                {
+                    AppDomain.Unload(sandbox);
+                }
+            }
 
 			return new string[0];
 		}
