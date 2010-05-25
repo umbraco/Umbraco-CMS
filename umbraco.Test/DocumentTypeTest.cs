@@ -146,7 +146,7 @@ namespace umbraco.Test
         {
             //check with sql that it's the correct number of children
             var ids = new List<int>();
-            using (var reader = Application.SqlHelper.ExecuteReader(DocumentType.m_SQLOptimizedGetAll,
+            using (var reader = Application.SqlHelper.ExecuteReader(DocumentType.m_SQLOptimizedGetAll.Trim(),
                 Application.SqlHelper.CreateParameter("@nodeObjectType", DocumentType._objectType)))
             {
                 while (reader.Read())

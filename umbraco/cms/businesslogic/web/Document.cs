@@ -77,7 +77,8 @@ namespace umbraco.cms.businesslogic.web
 
                 using (IRecordsReader dr =
                         SqlHelper.ExecuteReader(string.Format(m_SQLOptimizedSingle.Trim(), "umbracoNode.id = @id", "cmsContentVersion.id desc"),
-                    SqlHelper.CreateParameter("@id", id)))
+                            SqlHelper.CreateParameter("@nodeObjectType", Document._objectType),    
+                            SqlHelper.CreateParameter("@id", id)))
                 {
                     if (dr.Read())
                     {
@@ -155,7 +156,7 @@ namespace umbraco.cms.businesslogic.web
                     inner join cmsContentType on cmsContentType.nodeId = cmsContent.ContentType
                     inner join umbracoNode contentTypeNode on contentTypeNode.id = cmsContentType.nodeId
                     left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1 
-                where {0}
+                where umbracoNode.nodeObjectType = @nodeObjectType AND {0}
                 order by {1}
                 ";
         private const string m_SQLOptimizedMany = @"
@@ -174,7 +175,7 @@ namespace umbraco.cms.businesslogic.web
                     inner join cmsDocument on cmsDocument.versionId = cmsContentversion.versionId
                     left join cmsDocument publishCheck on publishCheck.nodeId = cmsContent.nodeID and publishCheck.published = 1
                     left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1
-                where {0}
+                where umbracoNode.nodeObjectType = @nodeObjectType AND {0}
                 group by 
 	                umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, 
 	                cmsDocument.templateId, cmsDocumentType.templateNodeId, umbracoNode.path, umbracoNode.sortOrder, 
@@ -423,7 +424,8 @@ namespace umbraco.cms.businesslogic.web
             var tmp = new List<Document>();
             using (IRecordsReader dr =
                 SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany, "cmsContent.contentType = @contentTypeId", "umbracoNode.sortOrder"),
+                                        string.Format(m_SQLOptimizedMany.Trim(), "cmsContent.contentType = @contentTypeId", "umbracoNode.sortOrder"),
+                                        SqlHelper.CreateParameter("@nodeObjectType", Document._objectType),
                                         SqlHelper.CreateParameter("@contentTypeId", docTypeId)))
             {
                 while (dr.Read())
@@ -447,7 +449,8 @@ namespace umbraco.cms.businesslogic.web
             var tmp = new List<Document>();
             using (IRecordsReader dr =
                 SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany, "umbracoNode.parentID = @parentId", "umbracoNode.sortOrder"),
+                                        string.Format(m_SQLOptimizedMany.Trim(), "umbracoNode.parentID = @parentId", "umbracoNode.sortOrder"),
+                                        SqlHelper.CreateParameter("@nodeObjectType", Document._objectType),
                                         SqlHelper.CreateParameter("@parentId", NodeId)))
             {
                 while (dr.Read())
@@ -1177,7 +1180,8 @@ namespace umbraco.cms.businesslogic.web
         {
             var tmp = new List<Document>();
             using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany, "umbracoNode.path LIKE '%," + this.Id + ",%'", "umbracoNode.level")))
+                                        string.Format(m_SQLOptimizedMany.Trim(), "umbracoNode.path LIKE '%," + this.Id + ",%'", "umbracoNode.level"),
+                                        SqlHelper.CreateParameter("@nodeObjectType", Document._objectType)))
             {
                 while (dr.Read())
                 {

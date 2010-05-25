@@ -488,7 +488,7 @@ namespace umbraco.cms.businesslogic
             var contentTypes = new List<ContentType>();
 
             using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(m_SQLOptimizedGetAll, SqlHelper.CreateParameter("@nodeObjectType", base.nodeObjectType)))
+                SqlHelper.ExecuteReader(m_SQLOptimizedGetAll.Trim(), SqlHelper.CreateParameter("@nodeObjectType", base.nodeObjectType)))
             {
                 while (dr.Read())
                 {

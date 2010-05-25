@@ -33,7 +33,7 @@ namespace umbraco.cms.businesslogic.web
         
         public static Guid _objectType = new Guid("a2cb7800-f571-4787-9638-bc48539a0efb");
 
-        internal const string m_SQLOptimizedGetAll = @"
+        new internal const string m_SQLOptimizedGetAll = @"
             SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text,
                 masterContentType,Alias,icon,thumbnail,description,
                 templateNodeId, IsDefault
@@ -153,7 +153,7 @@ namespace umbraco.cms.businesslogic.web
             var documentTypes = new List<DocumentType>();
 
             using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(m_SQLOptimizedGetAll, SqlHelper.CreateParameter("@nodeObjectType", DocumentType._objectType)))
+                SqlHelper.ExecuteReader(m_SQLOptimizedGetAll.Trim(), SqlHelper.CreateParameter("@nodeObjectType", DocumentType._objectType)))
             {
                 while (dr.Read())
                 {

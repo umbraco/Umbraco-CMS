@@ -70,7 +70,7 @@ namespace umbraco.cms.businesslogic.media
             var mediaTypes = new List<MediaType>();
 
             using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(m_SQLOptimizedGetAll, SqlHelper.CreateParameter("@nodeObjectType", MediaType._objectType)))
+                SqlHelper.ExecuteReader(m_SQLOptimizedGetAll.Trim(), SqlHelper.CreateParameter("@nodeObjectType", MediaType._objectType)))
             {
                 while (dr.Read())
                 {

@@ -28,7 +28,7 @@ namespace umbraco.cms.businesslogic.media
 			left join umbracoNode children on children.parentId = umbracoNode.id
 			inner join cmsContent on cmsContent.nodeId = umbracoNode.id
 			inner join cmsContentType on cmsContentType.nodeId = cmsContent.contentType
-			where {0}
+			where umbracoNode.nodeObjectType = @nodeObjectType AND {0}
 			group by umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, umbracoNode.nodeUser, umbracoNode.text, 
 				cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId
 			order by {1}"; 
@@ -106,10 +106,10 @@ namespace umbraco.cms.businesslogic.media
             List<Media> tmp = new List<Media>();
             using (IRecordsReader dr =
                 SqlHelper.ExecuteReader(
-                    string.Format(m_SQLOptimizedMany
-                        , "umbracoNode.parentID = @parentId And umbracoNode.nodeObjectType = @type"
+                    string.Format(m_SQLOptimizedMany.Trim()
+                        , "umbracoNode.parentID = @parentId"
                         , "umbracoNode.sortOrder")
-                    , SqlHelper.CreateParameter("@type", _objectType)
+                    , SqlHelper.CreateParameter("@nodeObjectType", _objectType)
                     , SqlHelper.CreateParameter("@parentId", nodeId)))
             {
 
@@ -129,7 +129,8 @@ namespace umbraco.cms.businesslogic.media
             var tmp = new List<Media>();
             using (IRecordsReader dr =
                 SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany, "cmsContent.contentType = @contentTypeId", "umbracoNode.sortOrder"),
+                                        string.Format(m_SQLOptimizedMany.Trim(), "cmsContent.contentType = @contentTypeId", "umbracoNode.sortOrder"),
+                                        SqlHelper.CreateParameter("@nodeObjectType", _objectType),
                                         SqlHelper.CreateParameter("@contentTypeId", mediaTypeId)))
             {
                 while (dr.Read())
@@ -244,7 +245,8 @@ namespace umbraco.cms.businesslogic.media
         {
             var tmp = new List<Media>();
             using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany, "umbracoNode.path LIKE '%," + this.Id + ",%'", "umbracoNode.level")))
+                                        string.Format(m_SQLOptimizedMany.Trim(), "umbracoNode.path LIKE '%," + this.Id + ",%'", "umbracoNode.level"),
+                                            SqlHelper.CreateParameter("@nodeObjectType", Media._objectType)))
             {
                 while (dr.Read())
                 {
