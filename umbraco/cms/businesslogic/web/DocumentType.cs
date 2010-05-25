@@ -183,6 +183,7 @@ namespace umbraco.cms.businesslogic.web
             return documentTypes.OrderBy(x => x.Text).ToList();
 
         } 
+                
         #endregion
 
         #region Public Properties

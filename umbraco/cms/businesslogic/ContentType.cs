@@ -12,6 +12,8 @@ using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.DataLayer;
 
+[assembly: InternalsVisibleTo("Umbraco.Test")]
+
 namespace umbraco.cms.businesslogic
 {
     /// <summary>
@@ -87,7 +89,7 @@ namespace umbraco.cms.businesslogic
 
         #region Constants and static members
 
-        private const string m_SQLOptimizedGetAll = @"
+        protected internal const string m_SQLOptimizedGetAll = @"
             SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text,
                 masterContentType,Alias,icon,thumbnail,description 
             FROM umbracoNode INNER JOIN cmsContentType ON umbracoNode.id = cmsContentType.nodeId

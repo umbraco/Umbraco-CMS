@@ -345,6 +345,29 @@ namespace umbraco.cms.businesslogic
 
         #region Public Methods
 
+        /// <summary>
+        /// Ensures uniqueness by id
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            var l = obj as CMSNode;
+            if (l != null)
+            {
+                return this._id.Equals(l._id);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Ensures uniqueness by id
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            return _id.GetHashCode();
+        }
 
         /// <summary>
         /// An xml representation of the CMSNOde

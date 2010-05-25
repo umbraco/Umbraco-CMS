@@ -11,6 +11,9 @@ using umbraco.cms.businesslogic.relation;
 using umbraco.cms.helpers;
 using umbraco.DataLayer;
 using umbraco.IO;
+using umbraco.interfaces;
+using umbraco.cms.businesslogic.datatype.controls;
+using System.IO;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -1526,18 +1529,8 @@ namespace umbraco.cms.businesslogic.web
 
                 umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
 
-                //delete files 
-                interfaces.IDataType uploadField = new cms.businesslogic.datatype.controls.Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
-                var props = this.getProperties;
-                foreach (Property p in props)
-                {
-                    if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id &&
-                        p.Value.ToString() != "" &&
-                        System.IO.File.Exists(IOHelper.MapPath(p.Value.ToString())))
-                    {
-                        System.IO.File.Delete(IOHelper.MapPath(p.Value.ToString()));
-                    }
-                }
+                // Remove all files
+                DeleteAssociatedMediaFiles();
 
                 //remove any domains associated
                 var domains = Domain.GetDomainsById(this.Id).ToList();

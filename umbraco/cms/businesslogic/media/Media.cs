@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using umbraco.IO;
 using System.Xml;
 using System.Linq;
+using umbraco.interfaces;
+using umbraco.cms.businesslogic.datatype.controls;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -311,35 +313,7 @@ namespace umbraco.cms.businesslogic.media
                 }               
 
                 // Remove all files
-                interfaces.IDataType uploadField = new cms.businesslogic.datatype.controls.Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
-                foreach (cms.businesslogic.property.Property p in this.getProperties.ToList())
-                {
-                    FileInfo mediaFile = new FileInfo(IOHelper.MapPath(p.Value.ToString()));
-
-                    if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id
-                        && p.Value.ToString() != ""
-                        && mediaFile.Exists)
-                    {
-
-                        mediaFile.Delete();
-
-                        string file = p.Value.ToString();
-                        string extension = ((string)file.Substring(file.LastIndexOf(".") + 1, file.Length - file.LastIndexOf(".") - 1)).ToLower();
-
-                        //check for thumbnail
-                        if (",jpeg,jpg,gif,bmp,png,tiff,tif,".IndexOf("," + extension + ",") > -1)
-                        {
-                            string thumbnailfile = file.Replace("." + extension, "_thumb");
-
-                            if (System.IO.File.Exists(IOHelper.MapPath(thumbnailfile + ".jpg")))
-                                System.IO.File.Delete(IOHelper.MapPath(thumbnailfile + ".jpg"));
-
-                            //should also delete extra thumbnails
-                        }
-
-                    }
-
-                }
+                DeleteAssociatedMediaFiles();
 
                 base.delete();
 

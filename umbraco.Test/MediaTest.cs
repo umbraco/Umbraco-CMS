@@ -8,14 +8,16 @@ using umbraco.editorControls.textfield;
 using umbraco.editorControls.label;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.cms.businesslogic;
+using umbraco.cms.businesslogic.property;
 
 namespace umbraco.Test
 {
     
     
     /// <summary>
-    ///This is a test class for MediaTest and is intended
-    ///to contain all MediaTest Unit Tests
+    /// This will test the Media data layer.
+    /// These test assume the following criteria, if this criteria is not met, these tests will fail:
+    /// - There is a Label data type assigned to one of your Media types.
     ///</summary>
     [TestClass()]
     public class MediaTest
@@ -29,6 +31,24 @@ namespace umbraco.Test
         {
             //System.Diagnostics.Debugger.Break();
             Assert.IsInstanceOfType(m_NewRootMedia, typeof(Media));
+        }
+
+        [TestMethod()]
+        public void Media_UpdateDataTest()
+        {
+            //System.Diagnostics.Debugger.Break();
+            
+            //set the value of a text property
+            var m = CreateNewUnderRoot(m_ExistingMediaType);
+            var p = GetLabelProperty(m_ExistingMediaType, m);
+            p.Value = "HELLO!";
+
+            Assert.AreEqual("HELLO!", m.getProperty(p.PropertyType).Value);
+
+            //completely delete
+            m.delete(true);
+
+            Assert.IsFalse(Media.IsNode(m.Id));
         }
 
         [TestMethod()]
@@ -313,6 +333,27 @@ namespace umbraco.Test
         /// Used for each test initialization. Before each test is run a new root media is created.
         /// </summary>
         private Media m_NewRootMedia;
+
+        /// <summary>
+        /// Returns a label property of the document type specified. This will throw an exception if one is not found.
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        private Property GetLabelProperty(MediaType mt, Media m)
+        {
+            DataTypeNoEdit lblField = new DataTypeNoEdit();
+            var prop = mt.PropertyTypes
+                    .Where(x => x.DataTypeDefinition.DataType.Id == lblField.Id).First();
+            return m.GenericProperties.Where(x => x.PropertyType.Id == prop.Id).First();
+        }
+
+        private Property GetUploadProperty(MediaType mt, Media m)
+        {
+            DataTypeNoEdit lblField = new DataTypeNoEdit();
+            var prop = mt.PropertyTypes
+                    .Where(x => x.DataTypeDefinition.DataType.Id == lblField.Id).First();
+            return m.GenericProperties.Where(x => x.PropertyType.Id == prop.Id).First();
+        }
 
         /// <summary>
         /// Gets initialized for each test and is set to an existing document type

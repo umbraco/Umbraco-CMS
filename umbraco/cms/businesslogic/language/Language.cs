@@ -6,6 +6,10 @@ using System.Xml;
 using umbraco.cms.businesslogic.cache;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Umbraco.Test")]
 
 namespace umbraco.cms.businesslogic.language
 {
@@ -20,17 +24,18 @@ namespace umbraco.cms.businesslogic.language
     /// </summary>
     public class Language
     {
+        #region Private members
         private int _id;
         private string _name = "";
         private string _friendlyName;
-        private string _cultureAlias;
+        private string _cultureAlias; 
+        #endregion
 
+        #region Constants and static members
 
         private static string _ConnString = GlobalSettings.DbDSN;
         private static object getLanguageSyncLock = new object();
-
         private static readonly string UmbracoLanguageCacheKey = "UmbracoPropertyTypeCache";
-
 
         /// <summary>
         /// Gets the SQL helper.
@@ -41,6 +46,13 @@ namespace umbraco.cms.businesslogic.language
             get { return Application.SqlHelper; }
         }
 
+        protected internal const string m_SQLOptimizedGetAll = @"select * from umbracoLanguage";
+
+        private static readonly object m_Locker = new object();
+
+        #endregion
+        
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Language"/> class.
@@ -48,46 +60,27 @@ namespace umbraco.cms.businesslogic.language
         /// <param name="id">The id.</param>
         public Language(int id)
         {
-            _id = id;
-            _cultureAlias = Cache.GetCacheItem<string>("UmbracoLanguage" + id, getLanguageSyncLock, TimeSpan.FromMinutes(60),
-                delegate
-                {
-                    return SqlHelper.ExecuteScalar<string>(
-                        "select languageISOCode from umbracoLanguage where id = @LanguageId", SqlHelper.CreateParameter("@LanguageId", id));
-                });
-
-            updateNames();
+            var lang = GetAllAsList()
+                .Where(x => x.id == id)
+                .SingleOrDefault();
+            if (lang == null)
+            {
+                throw new ArgumentException("No language found with the specified id");
+            }
+            
+            _id = lang.id;
+            _cultureAlias = lang.CultureAlias;
+            _friendlyName = lang.FriendlyName;
         }
-
-
 
         /// <summary>
-        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
+        /// Empty constructor used to create a language object manually
         /// </summary>
-        public virtual void Save()
-        {
-            SaveEventArgs e = new SaveEventArgs();
-            FireBeforeSave(e);
+        internal Language() { }
 
-            if (!e.Cancel)
-            {
-                Cache.ClearCacheItem("UmbracoLanguage" + id);
-                FireAfterSave(e);
-            }
-        }
+        #endregion
 
-        private void updateNames()
-        {
-            try
-            {
-                CultureInfo ci = new CultureInfo(_cultureAlias);
-                _friendlyName = ci.DisplayName;
-            }
-            catch
-            {
-                _friendlyName = _name + "(unknown Culture)";
-            }
-        }
+        #region Static methods
 
         /// <summary>
         /// Creates a new language given the culture code - ie. da-dk  (denmark)
@@ -101,57 +94,56 @@ namespace umbraco.cms.businesslogic.language
                     "insert into umbracoLanguage (languageISOCode) values (@CultureCode)",
                     SqlHelper.CreateParameter("@CultureCode", CultureCode));
 
+                InvalidateCache();
+
                 NewEventArgs e = new NewEventArgs();
                 GetByCultureCode(CultureCode).OnNew(e);
-
             }
         }
 
-        /// <summary>
-        /// Deletes the current Language.
-        /// 
-        /// Notice: this can have various sideeffects - use with care.
-        /// </summary>
-        public void Delete()
+        private static void InvalidateCache()
         {
-            if (!SqlHelper.ExecuteReader("SELECT * FROM umbracoDomains where domainDefaultLanguage = @id",
-                SqlHelper.CreateParameter("@id", id)).HasRecords)
-            {
-
-                DeleteEventArgs e = new DeleteEventArgs();
-                FireBeforeDelete(e);
-
-                if (!e.Cancel)
-                {
-                    Cache.ClearCacheItem("UmbracoLanguage" + id);
-                    SqlHelper.ExecuteNonQuery("delete from umbracoLanguage where id = @id",
-                        SqlHelper.CreateParameter("@id", id));
-                    FireAfterDelete(e);
-                }
-            }
-            else
-            {
-                Log.Add(LogTypes.Error, umbraco.BasePages.UmbracoEnsuredPage.CurrentUser, -1, "Could not remove Language " + _friendlyName + " because it's attached to a node");
-            }
+            Cache.ClearCacheItem(UmbracoLanguageCacheKey);
         }
 
         /// <summary>
         /// Method for accessing all installed languagess
         /// </summary>
+        [Obsolete("Use the GetAllAsList() method instead")]
         public static Language[] getAll
         {
             get
             {
-                List<Language> tmp = new List<Language>();
-
-                using (IRecordsReader dr = SqlHelper.ExecuteReader("select id from umbracoLanguage"))
-                {
-                    while (dr.Read())
-                        tmp.Add(new Language(dr.GetShort("id")));
-                }
-
-                return tmp.ToArray();
+                return GetAllAsList().ToArray();
             }
+        }
+
+        /// <summary>
+        /// Returns all installed languages
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// This will return a cached set of all languages. if the cache is not found it will create it.
+        /// </remarks>
+        public static IEnumerable<Language> GetAllAsList()
+        {
+            return Cache.GetCacheItem<IEnumerable<Language>>(UmbracoLanguageCacheKey, getLanguageSyncLock, TimeSpan.FromMinutes(60),
+                delegate
+                {
+                    var languages = new List<Language>();
+
+                    using (IRecordsReader dr = SqlHelper.ExecuteReader(m_SQLOptimizedGetAll))
+                    {
+                        while (dr.Read())
+                        {
+                            //create the ContentType object without setting up
+                            Language ct = new Language();
+                            ct.PopulateFromReader(dr);
+                            languages.Add(ct);
+                        }
+                    }
+                    return languages;
+                });
         }
 
         /// <summary>
@@ -159,40 +151,40 @@ namespace umbraco.cms.businesslogic.language
         /// </summary>
         /// <param name="CultureCode">The culture code.</param>
         /// <returns></returns>
-        public static Language GetByCultureCode(String CultureCode)
+        public static Language GetByCultureCode(String cultureCode)
         {
-            if (new CultureInfo(CultureCode) != null)
+            if (new CultureInfo(cultureCode) != null)
             {
-                return Cache.GetCacheItem<Language>(GetCacheKeyByCultureAlias(CultureCode), getLanguageSyncLock,
-                TimeSpan.FromHours(6),
-                delegate
-                {
-                    try
-                    {
-                        object sqlLangId =
-                            SqlHelper.ExecuteScalar<object>(
-                                "select id from umbracoLanguage where languageISOCode = @CultureCode",
-                                SqlHelper.CreateParameter("@CultureCode", CultureCode));
-                        if (sqlLangId != null)
-                        {
-                            int langId;
-                            if (int.TryParse(sqlLangId.ToString(), out langId))
-                            {
-                                return new Language(langId);
-                            }
-                        }
-                        return null;
-                    }
-                    catch
-                    {
-                        return null;
-                    }
-                });
+                return GetAllAsList()
+                        .Where(x => x.CultureAlias == cultureCode)
+                        .SingleOrDefault();
             }
 
             return null;
         }
 
+        /// <summary>
+        /// Imports a language from XML
+        /// </summary>
+        /// <param name="xmlData">The XML data.</param>
+        /// <returns></returns>
+        public static Language Import(XmlNode xmlData)
+        {
+            string cA = xmlData.Attributes["CultureAlias"].Value;
+            if (Language.GetByCultureCode(cA) == null)
+            {
+                Language.MakeNew(cA);
+                return Language.GetByCultureCode(cA);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        #endregion
+
+        #region Public Properties
         /// <summary>
         /// The id used by umbraco to identify the language
         /// </summary>
@@ -223,6 +215,81 @@ namespace umbraco.cms.businesslogic.language
         public string FriendlyName
         {
             get { return _friendlyName; }
+        } 
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Ensures uniqueness by id
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            var l = obj as Language;
+            if (l != null)
+            {
+                return id.Equals(l.id);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Ensures uniqueness by id
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            return id.GetHashCode();
+        }
+
+        /// <summary>
+        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
+        /// </summary>
+        public virtual void Save()
+        {
+            SaveEventArgs e = new SaveEventArgs();
+            FireBeforeSave(e);
+
+            if (!e.Cancel)
+            {
+                InvalidateCache();
+                FireAfterSave(e);
+            }
+        }
+
+        /// <summary>
+        /// Deletes the current Language.
+        /// 
+        /// Notice: this can have various sideeffects - use with care.
+        /// </summary>
+        public void Delete()
+        {
+            //when we delete we should maybe remove the translations for this language?
+
+            if (SqlHelper.ExecuteScalar<int>("SELECT count(id) FROM umbracoDomains where domainDefaultLanguage = @id",
+                SqlHelper.CreateParameter("@id", id)) == 0)
+            {
+
+                DeleteEventArgs e = new DeleteEventArgs();
+                FireBeforeDelete(e);
+
+                if (!e.Cancel)
+                {
+                    InvalidateCache();
+
+                    SqlHelper.ExecuteNonQuery("delete from umbracoLanguage where id = @id",
+                        SqlHelper.CreateParameter("@id", id));
+                    
+                    FireAfterDelete(e);
+                }
+            }
+            else
+            {
+                Log.Add(LogTypes.Error, umbraco.BasePages.UmbracoEnsuredPage.CurrentUser, -1, "Could not remove Language " + _friendlyName + " because it's attached to a node");
+                throw new DataException("Cannot remove language " + _friendlyName + " because it's attached to a domain on a node");                
+            }
         }
 
         /// <summary>
@@ -238,46 +305,39 @@ namespace umbraco.cms.businesslogic.language
             language.Attributes.Append(xmlHelper.addAttribute(xd, "FriendlyName", this.FriendlyName));
 
             return language;
-        }
+        } 
+        #endregion
 
+        #region Protected methods
 
-        /// <summary>
-        /// Imports a language from XML
-        /// </summary>
-        /// <param name="xmlData">The XML data.</param>
-        /// <returns></returns>
-        public static Language Import(XmlNode xmlData)
+        protected void PopulateFromReader(IRecordsReader dr)
         {
-            string cA = xmlData.Attributes["CultureAlias"].Value;
-            if (Language.GetByCultureCode(cA) == null)
+            _id = Convert.ToInt32(dr.GetShort("id"));
+            _cultureAlias = dr.GetString("languageISOCode");
+            
+            updateNames();
+        } 
+        #endregion
+
+        #region Private methods
+
+        private void updateNames()
+        {
+            try
             {
-                Language.MakeNew(cA);
-                return Language.GetByCultureCode(cA);
+                CultureInfo ci = new CultureInfo(_cultureAlias);
+                _friendlyName = ci.DisplayName;
             }
-            else
+            catch
             {
-                return null;
+                _friendlyName = _name + "(unknown Culture)";
             }
-        }
+        } 
 
+        #endregion
 
-        private void InvalidateCache()
-        {
-            Cache.ClearCacheItem(GetCacheKey(this.id));
-            Cache.ClearCacheItem(GetCacheKeyByCultureAlias(this.CultureAlias));
-        }
+        #region Events
 
-        private static string GetCacheKey(int id)
-        {
-            return UmbracoLanguageCacheKey + id;
-        }
-
-        private static string GetCacheKeyByCultureAlias(string cultureAlias)
-        {
-            return UmbracoLanguageCacheKey + cultureAlias;
-        }
-
-        //EVENTS
         /// <summary>
         /// The save event handler
         /// </summary>
@@ -290,7 +350,6 @@ namespace umbraco.cms.businesslogic.language
         /// The delete event handler
         /// </summary>
         public delegate void DeleteEventHandler(Language sender, DeleteEventArgs e);
-
 
         /// <summary>
         /// Occurs when a language is saved.
@@ -328,6 +387,7 @@ namespace umbraco.cms.businesslogic.language
         {
             if (AfterDelete != null)
                 AfterDelete(this, e);
-        }
+        } 
+        #endregion
     }
 }

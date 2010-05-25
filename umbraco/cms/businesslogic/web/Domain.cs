@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-
+using System.Linq;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.cache;
@@ -189,6 +189,12 @@ namespace umbraco.cms.businesslogic.web
                 throw new Exception("Domain " + DomainName + " already exists!");
             else
             {
+                //need to check if the language exists first
+                if (Language.GetAllAsList().Where(x => x.id == LanguageId).SingleOrDefault() == null)
+                {
+                    throw new ArgumentException("No language exists for the LanguageId specified");
+                }
+                
                 SqlHelper.ExecuteNonQuery("insert into umbracoDomains (domainDefaultLanguage, domainRootStructureID, domainName) values (@domainDefaultLanguage, @domainRootStructureID, @domainName)",
                                           SqlHelper.CreateParameter("@domainDefaultLanguage", LanguageId),
                                           SqlHelper.CreateParameter("@domainRootStructureID", RootNodeId),

@@ -10,6 +10,10 @@ using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
 using umbraco.cms.helpers;
 using umbraco.BusinessLogic;
+using umbraco.interfaces;
+using System.IO;
+using umbraco.IO;
+using umbraco.cms.businesslogic.datatype.controls;
 
 namespace umbraco.cms.businesslogic
 {
@@ -471,6 +475,7 @@ namespace umbraco.cms.businesslogic
         #endregion
 
         #region Protected Methods
+
         /// <summary>
         /// Sets up the ContentType property for this content item and sets the addition content properties manually.
         /// If the ContentType property is not already set, then this will get the ContentType from Cache.
@@ -556,6 +561,34 @@ namespace umbraco.cms.businesslogic
             SqlHelper.ExecuteNonQuery(query,
                                       SqlHelper.CreateParameter("@nodeId", Id),
                                       SqlHelper.CreateParameter("@xml", node.OuterXml));
+        }
+
+        /// <summary>
+        /// Deletes all files and the folder that have been saved with this content item which are based on the Upload data
+        /// type. This is called when a media or content tree node is deleted. 
+        /// </summary>
+        protected void DeleteAssociatedMediaFiles()
+        {
+            // Remove all files
+            IDataType uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+
+            foreach (Property p in GenericProperties)
+            {
+
+                if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id &&
+                    p.Value.ToString() != "" &&
+                    File.Exists(IOHelper.MapPath(p.Value.ToString())))
+                {
+                    var fi = new FileInfo(IOHelper.MapPath(p.Value.ToString()));
+
+                    fi.Directory.GetFiles().ToList().ForEach(x =>
+                    {
+                        x.Delete();
+                    });
+                    fi.Directory.Delete(true);
+                }
+
+            }
         }
 
         #endregion

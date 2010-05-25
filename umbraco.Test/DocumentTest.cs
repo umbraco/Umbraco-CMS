@@ -753,7 +753,7 @@ namespace umbraco.Test
         /// <summary>
         /// The user to be used to create stuff
         /// </summary>
-        private User m_User = new User(0);
+        private static User m_User = new User(0);
 
         /// <summary>
         /// Used for each test initialization. Before each test is run a new root doc is created.
@@ -769,7 +769,7 @@ namespace umbraco.Test
         /// Completely remove the document, this will first recycle it and then delete it (the api doesn't directly support deleting completey in one step)
         /// </summary>
         /// <param name="d"></param>
-        private void RecycleAndDelete(Document d)
+        internal static void RecycleAndDelete(Document d)
         {
             if (d == null)
             {
@@ -804,7 +804,7 @@ namespace umbraco.Test
         /// Returns a random docuemnt type that supports a text property
         /// </summary>
         /// <returns></returns>
-        private int GetExistingDocTypeId()
+        internal static int GetExistingDocTypeId()
         {
             var types = DocumentType.GetAllAsList();
             DocumentType found = null;
@@ -831,7 +831,7 @@ namespace umbraco.Test
         /// </summary>
         /// <param name="dt"></param>
         /// <returns></returns>
-        private Property GetTextFieldProperty(DocumentType dt, Document d)
+        internal static Property GetTextFieldProperty(DocumentType dt, Document d)
         {
             TextFieldDataType txtField = new TextFieldDataType();
             var prop = dt.PropertyTypes
@@ -843,7 +843,7 @@ namespace umbraco.Test
         /// Returns a content node
         /// </summary>
         /// <returns></returns>
-        private int GetExistingNodeId()
+        internal static int GetExistingNodeId()
         {
             var ids = Document.getAllUniqueNodeIdsFromObjectType(Document._objectType).ToList();
             var r = new Random();
@@ -858,7 +858,7 @@ namespace umbraco.Test
         /// </summary>
         /// <param name="d"></param>
         /// <returns></returns>
-        private IEnumerable<IconI> GetChildNodesOfParent(Document d)
+        internal static IEnumerable<IconI> GetChildNodesOfParent(Document d)
         {
             if (d.ParentId == (int)RecycleBin.RecycleBinType.Content)
             {
@@ -877,7 +877,7 @@ namespace umbraco.Test
             }
         }
 
-        private DocumentType GetExistingDocType()
+        internal static DocumentType GetExistingDocType()
         {
             DocumentType dct = new DocumentType(GetExistingDocTypeId());
             Assert.IsTrue(dct.Id > 0);
@@ -888,7 +888,7 @@ namespace umbraco.Test
         /// Creates a new node based on an existing doc type
         /// </summary>
         /// <returns></returns>
-        private Document CreateNewUnderRoot(DocumentType dt)
+        internal static Document CreateNewUnderRoot(DocumentType dt)
         {
             string Name = "TEST-" + Guid.NewGuid().ToString("N");            
             int ParentId = -1;
