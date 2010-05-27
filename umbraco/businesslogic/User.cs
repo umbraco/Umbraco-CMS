@@ -77,19 +77,24 @@ namespace umbraco.BusinessLogic {
             using (IRecordsReader dr = SqlHelper.ExecuteReader(
                 "Select userNoConsole, userDisabled, userType,startStructureID, startMediaId, userName,userLogin,userEmail,userDefaultPermissions, userLanguage, defaultToLiveEditing from umbracoUser where id = @id",
                 SqlHelper.CreateParameter("@id", ID))) {
-                if (dr.Read()) {
-                    _userNoConsole = dr.GetBoolean("usernoconsole");
-                    _userDisabled = dr.GetBoolean("userDisabled");
-                    _name = dr.GetString("userName");
-                    _loginname = dr.GetString("userLogin");
-                    _email = dr.GetString("userEmail");
-                    _language = dr.GetString("userLanguage");
-                    _startnodeid = dr.GetInt("startStructureID");
-                    if (!dr.IsNull("startMediaId"))
-                        _startmediaid = dr.GetInt("startMediaID");
-                    _usertype = UserType.GetUserType(dr.GetShort("UserType"));
-                    _defaultToLiveEditing = dr.GetBoolean("defaultToLiveEditing");
-                }
+                    if (dr.Read())
+                    {
+                        _userNoConsole = dr.GetBoolean("usernoconsole");
+                        _userDisabled = dr.GetBoolean("userDisabled");
+                        _name = dr.GetString("userName");
+                        _loginname = dr.GetString("userLogin");
+                        _email = dr.GetString("userEmail");
+                        _language = dr.GetString("userLanguage");
+                        _startnodeid = dr.GetInt("startStructureID");
+                        if (!dr.IsNull("startMediaId"))
+                            _startmediaid = dr.GetInt("startMediaID");
+                        _usertype = UserType.GetUserType(dr.GetShort("UserType"));
+                        _defaultToLiveEditing = dr.GetBoolean("defaultToLiveEditing");
+                    }
+                    else
+                    {
+                        throw new ArgumentException("No User exists with ID " + ID.ToString());
+                    }
             }
             _isInitialized = true;
         }
@@ -743,8 +748,18 @@ namespace umbraco.BusinessLogic {
         /// <returns></returns>
         public static User GetUser(int id) {
             if (System.Web.HttpRuntime.Cache[string.Format("UmbracoUser{0}", id.ToString())] == null) {
-                User u = new User(id);
-                System.Web.HttpRuntime.Cache.Insert(string.Format("UmbracoUser{0}", id.ToString()), u);
+
+                try
+                {
+                    User u = new User(id);
+                    System.Web.HttpRuntime.Cache.Insert(string.Format("UmbracoUser{0}", id.ToString()), u);
+                }
+                catch (ArgumentException)
+                {
+                    //no user was found
+                    return null;
+                }                
+                
             }
             return (User)System.Web.HttpRuntime.Cache[string.Format("UmbracoUser{0}", id.ToString())];
         }
