@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0242771-6DE6-4E03-BD3A-7B79BA79105B}"
 	ProjectSection(SolutionItems) = preProject
 		build.xml = build.xml
@@ -43,39 +43,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{05329D
 		config templates\config\xsltExtensions.config = config templates\config\xsltExtensions.config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.presentation", "umbraco\presentation\umbraco.presentation.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.businesslogic", "umbraco\businesslogic\umbraco.businesslogic.csproj", "{E469A9CE-1BEC-423F-AC44-713CD72457EA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.cms", "umbraco\cms\umbraco.cms.csproj", "{CCD75EC3-63DB-4184-B49D-51C1DD337230}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.interfaces", "umbraco\interfaces\umbraco.interfaces.csproj", "{511F6D8D-7717-440A-9A57-A507E9A8B27F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.editorControls", "components\editorControls\umbraco.editorControls.csproj", "{255F5DF1-4E43-4758-AC05-7A0B68EB021B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.macroRenderings", "components\macroRenderings\umbraco.macroRenderings.csproj", "{52AB8F1F-FB76-4E8C-885F-0747B6CE71EC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.providers", "umbraco\providers\umbraco.providers.csproj", "{D7636876-0756-43CB-A192-138C6F0D5E42}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.datalayer", "umbraco\datalayer\umbraco.datalayer.csproj", "{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.controls", "components\umbraco.controls\umbraco.controls.csproj", "{6EDD2061-82F2-461B-BB6E-879245A832DE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.webservices", "components\umbraco.webservices\umbraco.webservices.csproj", "{CBDB56AC-FF02-4421-9FD4-ED82E339D8E2}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{58072405-85D0-45CA-8F5C-EA8928C32A6A}"
 	ProjectSection(SolutionItems) = preProject
 		docs\Umbraco 4 beta 2 update.docx = docs\Umbraco 4 beta 2 update.docx
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.Linq.Core", "LinqToUmbraco\src\umbraco.Linq\Core\umbraco.Linq.Core.csproj", "{31CAEC36-0C3D-4D69-B092-84866811EA07}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Upgrade 4.1", "Upgrade 4.1", "{C5FA9596-B9DC-4DF9-8380-AFC19C1EF51F}"
 	ProjectSection(SolutionItems) = preProject
 		UpgradeReadme.txt = UpgradeReadme.txt
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.Legacy", "umbraco\umbraco.Legacy\umbraco.Legacy.csproj", "{27A2590E-1313-4A33-89FD-92811540B69C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{F06D18F6-C510-4CBA-9514-0F890FD62103}"
 	ProjectSection(SolutionItems) = preProject
@@ -99,6 +75,30 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{F06D18F6-C
 		foreign dlls\VistaDB For Umbraco.dll = foreign dlls\VistaDB For Umbraco.dll
 		foreign dlls\VistaDB.NET20.dll = foreign dlls\VistaDB.NET20.dll
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.presentation", "umbraco\presentation\umbraco.presentation.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.businesslogic", "umbraco\businesslogic\umbraco.businesslogic.csproj", "{E469A9CE-1BEC-423F-AC44-713CD72457EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.cms", "umbraco\cms\umbraco.cms.csproj", "{CCD75EC3-63DB-4184-B49D-51C1DD337230}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.interfaces", "umbraco\interfaces\umbraco.interfaces.csproj", "{511F6D8D-7717-440A-9A57-A507E9A8B27F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.editorControls", "components\editorControls\umbraco.editorControls.csproj", "{255F5DF1-4E43-4758-AC05-7A0B68EB021B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.macroRenderings", "components\macroRenderings\umbraco.macroRenderings.csproj", "{52AB8F1F-FB76-4E8C-885F-0747B6CE71EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.providers", "umbraco\providers\umbraco.providers.csproj", "{D7636876-0756-43CB-A192-138C6F0D5E42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.datalayer", "umbraco\datalayer\umbraco.datalayer.csproj", "{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.controls", "components\umbraco.controls\umbraco.controls.csproj", "{6EDD2061-82F2-461B-BB6E-879245A832DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.webservices", "components\umbraco.webservices\umbraco.webservices.csproj", "{CBDB56AC-FF02-4421-9FD4-ED82E339D8E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.Linq.Core", "LinqToUmbraco\src\umbraco.Linq\Core\umbraco.Linq.Core.csproj", "{31CAEC36-0C3D-4D69-B092-84866811EA07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.Legacy", "umbraco\umbraco.Legacy\umbraco.Legacy.csproj", "{27A2590E-1313-4A33-89FD-92811540B69C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.Test", "umbraco.Test\umbraco.Test.csproj", "{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}"
 EndProject

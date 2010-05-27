@@ -25,7 +25,7 @@ namespace umbraco.cms.businesslogic.web
 		static private Hashtable _checkedPages = new Hashtable();
 
 		static private XmlDocument _accessXmlContent;
-		static private string _accessXmlSource = IOHelper.MapPath(SystemFiles.AccessXml, false);
+		static private string _accessXmlSource;
 
 		private static void clearCheckPages() 
 		{
@@ -37,6 +37,12 @@ namespace umbraco.cms.businesslogic.web
 			get {
 				if (_accessXmlContent == null) 
 				{
+                    if (_accessXmlSource == null)
+                    {
+                        //if we pop it here it'll make for better stack traces ;)
+                        _accessXmlSource = IOHelper.MapPath(SystemFiles.AccessXml, false);
+                    }
+
 					_accessXmlContent = new XmlDocument();
 
 					if (!System.IO.File.Exists(_accessXmlSource)) 
