@@ -295,6 +295,13 @@
     <Compile Include="install\steps\welcome.ascx.designer.cs">
       <DependentUpon>welcome.ascx</DependentUpon>
     </Compile>
+    <Compile Include="install\Title.ascx.cs">
+      <DependentUpon>Title.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\Title.ascx.designer.cs">
+      <DependentUpon>Title.ascx</DependentUpon>
+    </Compile>
     <Compile Include="item.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1489,6 +1496,7 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
+    <Content Include="install\Title.ascx" />
     <Content Include="web.config.Az-VAIO.xslt" />
     <Content Include="umbraco\endPreview.aspx" />
     <Content Include="umbraco\js\UmbracoCasingRules.aspx" />

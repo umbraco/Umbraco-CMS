@@ -1,12 +1,14 @@
 <%@ Page Language="c#" CodeBehind="default.aspx.cs" AutoEventWireup="True" Inherits="umbraco.presentation.install._default" EnableViewState="False" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register Src="~/install/Title.ascx" TagPrefix="umb1" TagName="PageTitle" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head runat="server">
-    <title>Umbraco <%=umbraco.GlobalSettings.CurrentVersion%> Configuration Wizard</title>
     
+    <umb1:PageTitle runat="server" />
+
     <style type="text/css">
       #generatedCategories{display: none;}
       #list1a{height: 300px; overflow: auto;}
@@ -22,41 +24,41 @@
       
     </style>      
     
+</head>
+<body>
+	
     <script type="text/javascript">
 
-          function nextStep(button, elementId) {
+        function nextStep(button, elementId) {
             showProgress(button, elementId);
             setTimeout('document.location.href = \'default.aspx?installStep=' + document.getElementById("step").value + '\'', 100);
-          }
+        }
 
-          function showProgress(button, elementId) {
+        function showProgress(button, elementId) {
             var img = document.getElementById(elementId);
 
             img.style.visibility = "visible";
             button.style.display = "none";
-          }
+        }
 
-          function InstallPackages(button, elementId) {
+        function InstallPackages(button, elementId) {
             var next = document.getElementById('<%= next.ClientID %>');
             next.style.display = "none";
-            
-            showProgress(button, elementId);
-          }
-          
-          function toggleModules() {
-            document.getElementById("generatedCategories").style.display = "block";
-          }
 
-          function openDemoModal(id, name) {
-              UmbClientMgr.openModalWindow("http://packages.umbraco.org/viewPackageData.aspx?id=" + id, name, true, 750, 550)
+            showProgress(button, elementId);
+        }
+
+        function toggleModules() {
+            document.getElementById("generatedCategories").style.display = "block";
+        }
+
+        function openDemoModal(id, name) {
+            UmbClientMgr.openModalWindow("http://packages.umbraco.org/viewPackageData.aspx?id=" + id, name, true, 750, 550)
             return false;
-          }
+        }
     </script>
-    
-</head>
-<body>
-	
-	<cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" ProviderName="LazyLoadProvider"  />
+
+	<cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader"  />
 	
 	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="style.css" />
 	<umb:CssInclude ID="CssInclude2" runat="server" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />

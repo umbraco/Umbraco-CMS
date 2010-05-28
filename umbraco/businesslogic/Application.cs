@@ -15,14 +15,12 @@ namespace umbraco.BusinessLogic
     /// </summary>
     public class Application
     {
-        //Applications found through reflection
+        /// <summary>
+        /// Applications found through reflection
+        /// </summary>
         private static readonly List<IApplication> _applications = new List<IApplication>();
-        private static string _ConnString = GlobalSettings.DbDSN;
-        private static ISqlHelper _sqlHelper;
-        /*Use this declaration to log SQL queries:
-        private static ISqlHelper _sqlHelper= new SqlHelperExtender(
-                                                        DataLayerHelper.CreateSqlHelper(_ConnString),
-                                                        new Logger(@"c:\temp\sql.log"));*/
+        
+        private static ISqlHelper _sqlHelper;               
 
         private const string CACHE_KEY = "ApplicationCache";
 
@@ -32,7 +30,7 @@ namespace umbraco.BusinessLogic
         private static List<Application> Apps
         {
             get
-            {
+            {                
                 //ensure cache exists
                 if (HttpRuntime.Cache[CACHE_KEY] == null)
                     ReCache();
@@ -61,7 +59,7 @@ namespace umbraco.BusinessLogic
                 {
                     try
                     {
-                        _sqlHelper = DataLayerHelper.CreateSqlHelper(_ConnString);
+                        _sqlHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN);
                     }
                     catch { }
                 }
