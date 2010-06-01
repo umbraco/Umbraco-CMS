@@ -21,7 +21,7 @@ namespace umbraco.Test
         ///A test for GetAll
         ///</summary>
         [TestMethod()]
-        public void MediaType_GetAllTest()
+        public void MediaType_Get_All()
         {
             //check with sql that it's the correct number of children
             var ids = new List<int>();
@@ -51,7 +51,7 @@ namespace umbraco.Test
         /// moved to the recycle bin.
         /// </summary>
         [TestMethod()]
-        public void MediaType_DeleteDocTypeWithContentAndChildrenOfDifferentDocTypes()
+        public void MediaType_Delete_Media_Type_With_Media_And_Children_Of_Diff_Media_Types()
         {
             //System.Diagnostics.Debugger.Break();
 
@@ -97,7 +97,7 @@ namespace umbraco.Test
         /// Tests adding every type of property to a new media type on a new tab, then delete the tab, then the media type
         /// </summary>
         [TestMethod()]
-        public void MediaType_AddPropertiesToTabThenDeleteItTest()
+        public void MediaType_Add_Properties_To_Tab_Then_Delete_It_Test()
         {
             //System.Diagnostics.Debugger.Break();
 

@@ -35,6 +35,7 @@ namespace umbraco.cms.businesslogic.media
         #endregion
 
         #region Constructors
+
         /// <summary>
         /// Contructs a media object given the Id
         /// </summary>
@@ -49,7 +50,8 @@ namespace umbraco.cms.businesslogic.media
 
         public Media(int id, bool noSetup) : base(id, noSetup) { }
 
-        public Media(bool optimizedMode, int id) : base(id, optimizedMode) { } 
+        public Media(Guid id, bool noSetup) : base(id, noSetup) { }
+        
         #endregion
 
         #region Static Methods

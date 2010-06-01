@@ -5,17 +5,14 @@ using System.Data;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Web;
-using System.Web.Caching;
 using System.Xml;
-
 using umbraco.cms.businesslogic.cache;
-
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
-
 using System.Web.Security;
 using System.Text;
 using System.Security.Cryptography;
+using System.Linq;
 
 namespace umbraco.cms.businesslogic.member
 {
@@ -29,70 +26,52 @@ namespace umbraco.cms.businesslogic.member
     /// </summary>
     public class Member : Content
     {
+        #region Constants and static members
         public static readonly string UmbracoMemberProviderName = "UmbracoMembershipProvider";
         public static readonly string UmbracoRoleProviderName = "UmbracoRoleProvider";
         public static readonly Guid _objectType = new Guid("39eb0f98-b348-42a1-8662-e7eb18487560");
-        private static readonly System.Web.Caching.Cache _memberCache = HttpRuntime.Cache;
-        private static object memberCacheSyncLock = new object();
-        private static readonly string memberLookupCacheKey = "memberLookupId_";
+
+        private static readonly object m_Locker = new object();
         private static readonly string UmbracoMemberIdCookieKey = "umbracoMemberId";
         private static readonly string UmbracoMemberGuidCookieKey = "umbracoMemberGuid";
-        private static readonly string UmbracoMemberLoginCookieKey = "umbracoMemberLogin";
-        private string _text;
+        private static readonly string UmbracoMemberLoginCookieKey = "umbracoMemberLogin"; 
+        #endregion
 
-        private Hashtable _groups = null;
+        #region Private members
+        private string m_Text;
+        private string m_Email;
+        private string m_Password;
+        private string m_LoginName;
+        private Hashtable m_Groups = null; 
+        #endregion
+
+        #region Constructors   
 
         /// <summary>
         /// Initializes a new instance of the Member class.
         /// </summary>
         /// <param name="id">Identifier</param>
-        public Member(int id)
-            : base(id)
-        {
-        }
+        public Member(int id) : base(id) { }
 
         /// <summary>
         /// Initializes a new instance of the Member class.
         /// </summary>
         /// <param name="id">Identifier</param>
-        public Member(Guid id)
-            : base(id)
-        {
-        }
+        public Member(Guid id) : base(id) { }
 
         /// <summary>
         /// Initializes a new instance of the Member class, with an option to only initialize 
         /// the data used by the tree in the umbraco console.
-        /// 
-        /// Performace
         /// </summary>
         /// <param name="id">Identifier</param>
         /// <param name="noSetup"></param>
-        public Member(int id, bool noSetup)
-            : base(id, noSetup)
-        {
-        }
+        public Member(int id, bool noSetup) : base(id, noSetup) { }
 
-        /// <summary>
-        /// The name of the member
-        /// </summary>
-        public override string Text
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_text))
-                    _text = SqlHelper.ExecuteScalar<string>(
-                        "select text from umbracoNode where id = @id",
-                        SqlHelper.CreateParameter("@id", Id));
-                return _text;
-            }
-            set
-            {
-                _text = value;
-                base.Text = value;
-            }
-        }
+        public Member(Guid id, bool noSetup) : base(id, noSetup) { } 
 
+        #endregion
+
+        #region Static methods
         /// <summary>
         /// A list of all members in the current umbraco install
         /// 
@@ -106,105 +85,6 @@ namespace umbraco.cms.businesslogic.member
                 Guid[] tmp = getAllUniquesFromObjectType(_objectType);
 
                 return Array.ConvertAll<Guid, Member>(tmp, delegate(Guid g) { return new Member(g); });
-            }
-        }
-
-        /// <summary>
-        /// The members password, used when logging in on the public website
-        /// </summary>
-        public string Password
-        {
-            get
-            {
-                return SqlHelper.ExecuteScalar<string>(
-                    "select Password from cmsMember where nodeId = @id",
-                    SqlHelper.CreateParameter("@id", Id));
-            }
-            set
-            {
-                // We need to use the provider for this in order for hashing, etc. support
-                // To write directly to the db use the ChangePassword method
-                // this is not pretty but nessecary due to a design flaw (the membership provider should have been a part of the cms project)
-                MemberShipHelper helper = new MemberShipHelper();
-                ChangePassword(helper.EncodePassword(value, Membership.Provider.PasswordFormat));
-            }
-        }
-
-        /// <summary>
-        /// The loginname of the member, used when logging in
-        /// </summary>
-        public string LoginName
-        {
-            get
-            {
-                return SqlHelper.ExecuteScalar<string>(
-                    "select LoginName from cmsMember where nodeId = @id",
-                    SqlHelper.CreateParameter("@id", Id));
-            }
-            set
-            {
-                SqlHelper.ExecuteNonQuery(
-                    "update cmsMember set LoginName = @loginName where nodeId =  @id",
-                    SqlHelper.CreateParameter("@loginName", value),
-                    SqlHelper.CreateParameter("@id", Id));
-            }
-        }
-
-        /// <summary>
-        /// A list of groups the member are member of
-        /// </summary>
-        [Obsolete("Use System.Web.Security.Roles.GetRolesForUser()")]
-        public Hashtable Groups
-        {
-            get
-            {
-                if (_groups == null)
-                    populateGroups();
-                return _groups;
-            }
-        }
-
-        /// <summary>
-        /// The members email
-        /// </summary>
-        public string Email
-        {
-            get
-            {
-                return SqlHelper.ExecuteScalar<string>(
-                    "select Email from cmsMember where nodeId = @id",
-                    SqlHelper.CreateParameter("@id", Id));
-            }
-            set
-            {
-                SqlHelper.ExecuteNonQuery(
-                    "update cmsMember set Email = @email where nodeId = @id",
-                    SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@email", value));
-            }
-        }
-
-        /// <summary>
-        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
-        /// </summary>
-        public override void Save()
-        {
-            SaveEventArgs e = new SaveEventArgs();
-            FireBeforeSave(e);
-
-            if (!e.Cancel)
-            {
-                // re-generate xml
-                XmlDocument xd = new XmlDocument();
-                XmlGenerate(xd);
-
-                // generate preview for blame history?
-                if (UmbracoSettings.EnableGlobalPreviewStorage)
-                {
-                    // Version as new guid to ensure different versions are generated as members are not versioned currently!
-                    savePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());
-                }
-
-                FireAfterSave(e);
             }
         }
 
@@ -223,7 +103,7 @@ namespace umbraco.cms.businesslogic.member
                 while (dr.Read())
                 {
                     Member newMember = new Member(dr.GetInt("id"), true);
-                    newMember._text = dr.GetString("text");
+                    newMember.m_Text = dr.GetString("text");
                     m.Add(new Member(newMember.Id));
                 }
             }
@@ -259,7 +139,7 @@ namespace umbraco.cms.businesslogic.member
                 while (dr.Read())
                 {
                     Member newMember = new Member(dr.GetInt("id"), true);
-                    newMember._text = dr.GetString("text");
+                    newMember.m_Text = dr.GetString("text");
                     m.Add(new Member(newMember.Id));
                 }
             }
@@ -277,24 +157,7 @@ namespace umbraco.cms.businesslogic.member
         [Obsolete("Use System.Web.Security.Membership.CreateUser")]
         public static Member MakeNew(string Name, MemberType mbt, User u)
         {
-            return MakeNew(Name, "", mbt, u);
-            /*
-            Guid newId = Guid.NewGuid();
-            MakeNew(-1, _objectType, u.Id, 1, Name, newId);
-
-            Member tmp = new Member(newId);
-
-            tmp.CreateContent(mbt);
-            // Create member specific data ..
-            SqlHelper.ExecuteNonQuery(
-                "insert into cmsMember (nodeId,Email,LoginName,Password) values (@id,'',@text,'')",
-                SqlHelper.CreateParameter("@id", tmp.Id),
-                SqlHelper.CreateParameter("@text", tmp.Text));
-
-            NewEventArgs e = new NewEventArgs();
-            tmp.OnNew(e);
-
-            return tmp;*/
+            return MakeNew(Name, "", mbt, u);           
         }
 
         /// <summary>
@@ -315,11 +178,17 @@ namespace umbraco.cms.businesslogic.member
                 throw new Exception(String.Format("Duplicate User name! A member with the user name {0} already exists", Name));
 
             Guid newId = Guid.NewGuid();
-            MakeNew(-1, _objectType, u.Id, 1, Name, newId);
 
-            Member tmp = new Member(newId);
+            //create the cms node first
+            CMSNode newNode = MakeNew(-1, _objectType, u.Id, 1, Name, newId);
 
+            //we need to create an empty member and set the underlying text property
+            Member tmp = new Member(newId, true);
+            tmp.SetText(Name);
+
+            //create the content data for the new member
             tmp.CreateContent(mbt);
+            
             // Create member specific data ..
             SqlHelper.ExecuteNonQuery(
                 "insert into cmsMember (nodeId,Email,LoginName,Password) values (@id,@email,@text,'')",
@@ -327,169 +196,15 @@ namespace umbraco.cms.businesslogic.member
                 SqlHelper.CreateParameter("@text", tmp.Text),
                 SqlHelper.CreateParameter("@email", Email));
 
+            //read the whole object from the db
+            Member m = new Member(newId);
+
             NewEventArgs e = new NewEventArgs();
-            tmp.OnNew(e);
+            m.OnNew(e);
 
-            tmp.Save();
+            m.Save();
 
-            return tmp;
-        }
-
-        /// <summary>
-        /// Generates the xmlrepresentation of a member
-        /// </summary>
-        /// <param name="xd"></param>
-        public override void XmlGenerate(XmlDocument xd)
-        {
-            SaveXmlDocument(generateXmlWithoutSaving(xd));
-        }
-
-        protected override XmlNode generateXmlWithoutSaving(XmlDocument xd)
-        {
-            XmlNode node = xd.CreateNode(XmlNodeType.Element, "node", "");
-            XmlPopulate(xd, ref node, false);
-            node.Attributes.Append(xmlHelper.addAttribute(xd, "loginName", LoginName));
-            node.Attributes.Append(xmlHelper.addAttribute(xd, "email", Email));
-            return node;
-        }
-
-
-        /// <summary>
-        /// Xmlrepresentation of a member
-        /// </summary>
-        /// <param name="xd">The xmldocument context</param>
-        /// <param name="Deep">Recursive - should always be set to false</param>
-        /// <returns>A the xmlrepresentation of the current member</returns>
-        public override XmlNode ToXml(XmlDocument xd, bool Deep)
-        {
-            XmlNode x = base.ToXml(xd, Deep);
-            if (x.Attributes["loginName"] == null)
-            {
-                x.Attributes.Append(xmlHelper.addAttribute(xd, "loginName", LoginName));
-                x.Attributes.Append(xmlHelper.addAttribute(xd, "email", Email));
-            }
-            return x;
-        }
-
-        /// <summary>
-        /// Deltes the current member
-        /// </summary>
-        [Obsolete("Use System.Web.Security.Membership.DeleteUser")]
-        public new void delete()
-        {
-            DeleteEventArgs e = new DeleteEventArgs();
-            FireBeforeDelete(e);
-
-            if (!e.Cancel)
-            {
-                // Remove from cache (if exists)
-                umbraco.cms.businesslogic.cache.Cache.ClearCacheItem(memberLookupCacheKey + Id);
-
-                // delete memeberspecific data!
-                SqlHelper.ExecuteNonQuery("Delete from cmsMember where nodeId = @id",
-                    SqlHelper.CreateParameter("@id", Id));
-
-                // delete all relations to groups
-                foreach (int groupId in this.Groups.Keys)
-                {
-                    RemoveGroup(groupId);
-                }
-
-                // Delete all content and cmsnode specific data!
-                base.delete();
-
-                FireAfterDelete(e);
-            }
-        }
-
-        /// <summary>
-        /// Deletes all members of the membertype specified
-        /// 
-        /// Used when a membertype is deleted
-        /// 
-        /// Use with care
-        /// </summary>
-        /// <param name="dt">The membertype which are being deleted</param>
-        public static void DeleteFromType(MemberType dt)
-        {
-            var objs = getContentOfContentType(dt);
-            foreach (Content c in objs)
-            {
-                // due to recursive structure document might already been deleted..
-                if (IsNode(c.UniqueId))
-                {
-                    Member tmp = new Member(c.UniqueId);
-                    tmp.delete();
-                }
-            }
-        }
-
-        public void ChangePassword(string newPassword)
-        {
-            SqlHelper.ExecuteNonQuery(
-                    "update cmsMember set Password = @password where nodeId = @id",
-                    SqlHelper.CreateParameter("@password", newPassword),
-                    SqlHelper.CreateParameter("@id", Id));
-        }
-
-        /// <summary>
-        /// Adds the member to group with the specified id
-        /// </summary>
-        /// <param name="GroupId">The id of the group which the member is being added to</param>
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        [Obsolete("Use System.Web.Security.Roles.AddUserToRole")]
-        public void AddGroup(int GroupId)
-        {
-            AddGroupEventArgs e = new AddGroupEventArgs();
-            FireBeforeAddGroup(e);
-
-            if (!e.Cancel)
-            {
-                IParameter[] parameters = new IParameter[] { SqlHelper.CreateParameter("@id", Id),
-                                                         SqlHelper.CreateParameter("@groupId", GroupId) };
-                bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(member) FROM cmsMember2MemberGroup WHERE member = @id AND memberGroup = @groupId",
-                                                           parameters) > 0;
-                if (!exists)
-                    SqlHelper.ExecuteNonQuery("INSERT INTO cmsMember2MemberGroup (member, memberGroup) values (@id, @groupId)",
-                                              parameters);
-                populateGroups();
-
-                FireAfterAddGroup(e);
-            }
-        }
-
-        /// <summary>
-        /// Removes the member from the MemberGroup specified
-        /// </summary>
-        /// <param name="GroupId">The MemberGroup from which the Member is removed</param>
-        [Obsolete("Use System.Web.Security.Roles.RemoveUserFromRole")]
-        public void RemoveGroup(int GroupId)
-        {
-            RemoveGroupEventArgs e = new RemoveGroupEventArgs();
-            FireBeforeRemoveGroup(e);
-
-            if (!e.Cancel)
-            {
-                SqlHelper.ExecuteNonQuery(
-                    "delete from cmsMember2MemberGroup where member = @id and Membergroup = @groupId",
-                    SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@groupId", GroupId));
-                populateGroups();
-                FireAfterRemoveGroup(e);
-            }
-        }
-
-        private void populateGroups()
-        {
-            Hashtable temp = new Hashtable();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                "select memberGroup from cmsMember2MemberGroup where member = @id",
-                SqlHelper.CreateParameter("@id", Id)))
-            {
-                while (dr.Read())
-                    temp.Add(dr.GetInt("memberGroup"),
-                        new MemberGroup(dr.GetInt("memberGroup")));
-            }
-            _groups = temp;
+            return m;
         }
 
         /// <summary>
@@ -629,13 +344,336 @@ namespace umbraco.cms.businesslogic.member
             return count > 0;
         }
 
-        /*
-        public contentitem.ContentItem[] CreatedContent() {
-            return new contentitem.ContentItem[0];
+        /// <summary>
+        /// Deletes all members of the membertype specified
+        /// 
+        /// Used when a membertype is deleted
+        /// 
+        /// Use with care
+        /// </summary>
+        /// <param name="dt">The membertype which are being deleted</param>
+        public static void DeleteFromType(MemberType dt)
+        {
+            var objs = getContentOfContentType(dt);
+            foreach (Content c in objs)
+            {
+                // due to recursive structure document might already been deleted..
+                if (IsNode(c.UniqueId))
+                {
+                    Member tmp = new Member(c.UniqueId);
+                    tmp.delete();
+                }
+            }
         }
-        */
 
+        #endregion
 
+        #region Public Properties
+
+        /// <summary>
+        /// The name of the member
+        /// </summary>
+        public override string Text
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(m_Text))
+                {
+                    m_Text = SqlHelper.ExecuteScalar<string>(
+                        "select text from umbracoNode where id = @id",
+                        SqlHelper.CreateParameter("@id", Id));
+                }
+                return m_Text;
+            }
+            set
+            {
+                m_Text = value;
+                base.Text = value;
+            }
+        }
+
+        /// <summary>
+        /// The members password, used when logging in on the public website
+        /// </summary>
+        public string Password
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(m_Password))
+                {
+                    m_Password = SqlHelper.ExecuteScalar<string>(
+                    "select Password from cmsMember where nodeId = @id",
+                    SqlHelper.CreateParameter("@id", Id));
+                }
+                return m_Password;
+                
+            }
+            set
+            {
+                // We need to use the provider for this in order for hashing, etc. support
+                // To write directly to the db use the ChangePassword method
+                // this is not pretty but nessecary due to a design flaw (the membership provider should have been a part of the cms project)
+                MemberShipHelper helper = new MemberShipHelper();
+                ChangePassword(helper.EncodePassword(value, Membership.Provider.PasswordFormat));
+            }
+        }
+
+        /// <summary>
+        /// The loginname of the member, used when logging in
+        /// </summary>
+        public string LoginName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(m_LoginName))
+                {
+                    m_LoginName = SqlHelper.ExecuteScalar<string>(
+                        "select LoginName from cmsMember where nodeId = @id",
+                        SqlHelper.CreateParameter("@id", Id));
+                }
+                return m_LoginName;                
+            }
+            set
+            {
+                SqlHelper.ExecuteNonQuery(
+                    "update cmsMember set LoginName = @loginName where nodeId =  @id",
+                    SqlHelper.CreateParameter("@loginName", value),
+                    SqlHelper.CreateParameter("@id", Id));
+                m_LoginName = value;
+            }
+        }
+
+        /// <summary>
+        /// A list of groups the member are member of
+        /// </summary>
+        [Obsolete("Use System.Web.Security.Roles.GetRolesForUser()")]
+        public Hashtable Groups
+        {
+            get
+            {
+                if (m_Groups == null)
+                    populateGroups();
+                return m_Groups;
+            }
+        }
+
+        /// <summary>
+        /// The members email
+        /// </summary>
+        public string Email
+        {
+            get
+            {
+                return SqlHelper.ExecuteScalar<string>(
+                    "select Email from cmsMember where nodeId = @id",
+                    SqlHelper.CreateParameter("@id", Id));
+            }
+            set
+            {
+                SqlHelper.ExecuteNonQuery(
+                    "update cmsMember set Email = @email where nodeId = @id",
+                    SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@email", value));
+            }
+        } 
+        #endregion
+
+        #region Public Methods
+
+        protected override void setupNode()
+        {
+            base.setupNode();
+
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(
+                    @"SELECT Email, LoginName, Password FROM cmsMember WHERE nodeId=@nodeId",
+                     SqlHelper.CreateParameter("@nodeId", this.Id)))
+            {
+                if (dr.Read())
+                {
+                    if (!dr.IsNull("Email"))
+                        m_Email = dr.GetString("Email");
+                    m_LoginName = dr.GetString("LoginName");
+                    m_Password = dr.GetString("Password");
+                }
+                else
+                {
+                    throw new ArgumentException(string.Format("No Member exists with Id '{0}'", this.Id));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
+        /// </summary>
+        public override void Save()
+        {
+            SaveEventArgs e = new SaveEventArgs();
+            FireBeforeSave(e);
+
+            if (!e.Cancel)
+            {
+                // re-generate xml
+                XmlDocument xd = new XmlDocument();
+                XmlGenerate(xd);
+
+                // generate preview for blame history?
+                if (UmbracoSettings.EnableGlobalPreviewStorage)
+                {
+                    // Version as new guid to ensure different versions are generated as members are not versioned currently!
+                    savePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());
+                }
+
+                FireAfterSave(e);
+            }
+        }
+
+        /// <summary>
+        /// Generates the xmlrepresentation of a member
+        /// </summary>
+        /// <param name="xd"></param>
+        public override void XmlGenerate(XmlDocument xd)
+        {
+            SaveXmlDocument(generateXmlWithoutSaving(xd));
+        }
+
+        /// <summary>
+        /// Xmlrepresentation of a member
+        /// </summary>
+        /// <param name="xd">The xmldocument context</param>
+        /// <param name="Deep">Recursive - should always be set to false</param>
+        /// <returns>A the xmlrepresentation of the current member</returns>
+        public override XmlNode ToXml(XmlDocument xd, bool Deep)
+        {
+            XmlNode x = base.ToXml(xd, Deep);
+            if (x.Attributes["loginName"] == null)
+            {
+                x.Attributes.Append(xmlHelper.addAttribute(xd, "loginName", LoginName));
+                x.Attributes.Append(xmlHelper.addAttribute(xd, "email", Email));
+            }
+            return x;
+        }
+
+        /// <summary>
+        /// Deltes the current member
+        /// </summary>
+        [Obsolete("Use System.Web.Security.Membership.DeleteUser")]
+        public override void delete()
+        {
+            DeleteEventArgs e = new DeleteEventArgs();
+            FireBeforeDelete(e);
+
+            if (!e.Cancel)
+            {
+                // Remove from cache (if exists)
+                Cache.ClearCacheItem(GetCacheKey(Id));
+
+                // delete all relations to groups
+                foreach (int groupId in this.Groups.Keys)
+                {
+                    RemoveGroup(groupId);
+                }
+
+                // delete memeberspecific data!
+                SqlHelper.ExecuteNonQuery("Delete from cmsMember where nodeId = @id",
+                    SqlHelper.CreateParameter("@id", Id));
+
+                // Delete all content and cmsnode specific data!
+                base.delete();
+
+                FireAfterDelete(e);
+            }
+        }
+
+        public void ChangePassword(string newPassword)
+        {
+            SqlHelper.ExecuteNonQuery(
+                    "update cmsMember set Password = @password where nodeId = @id",
+                    SqlHelper.CreateParameter("@password", newPassword),
+                    SqlHelper.CreateParameter("@id", Id));
+
+            //update this object's password
+            m_Password = newPassword;
+        }
+
+        /// <summary>
+        /// Adds the member to group with the specified id
+        /// </summary>
+        /// <param name="GroupId">The id of the group which the member is being added to</param>
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        [Obsolete("Use System.Web.Security.Roles.AddUserToRole")]
+        public void AddGroup(int GroupId)
+        {
+            AddGroupEventArgs e = new AddGroupEventArgs();
+            FireBeforeAddGroup(e);
+
+            if (!e.Cancel)
+            {
+                IParameter[] parameters = new IParameter[] { SqlHelper.CreateParameter("@id", Id),
+                                                         SqlHelper.CreateParameter("@groupId", GroupId) };
+                bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(member) FROM cmsMember2MemberGroup WHERE member = @id AND memberGroup = @groupId",
+                                                           parameters) > 0;
+                if (!exists)
+                    SqlHelper.ExecuteNonQuery("INSERT INTO cmsMember2MemberGroup (member, memberGroup) values (@id, @groupId)",
+                                              parameters);
+                populateGroups();
+
+                FireAfterAddGroup(e);
+            }
+        }
+
+        /// <summary>
+        /// Removes the member from the MemberGroup specified
+        /// </summary>
+        /// <param name="GroupId">The MemberGroup from which the Member is removed</param>
+        [Obsolete("Use System.Web.Security.Roles.RemoveUserFromRole")]
+        public void RemoveGroup(int GroupId)
+        {
+            RemoveGroupEventArgs e = new RemoveGroupEventArgs();
+            FireBeforeRemoveGroup(e);
+
+            if (!e.Cancel)
+            {
+                SqlHelper.ExecuteNonQuery(
+                    "delete from cmsMember2MemberGroup where member = @id and Membergroup = @groupId",
+                    SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@groupId", GroupId));
+                populateGroups();
+                FireAfterRemoveGroup(e);
+            }
+        } 
+        #endregion
+
+        #region Protected methods
+        protected override XmlNode generateXmlWithoutSaving(XmlDocument xd)
+        {
+            XmlNode node = xd.CreateNode(XmlNodeType.Element, "node", "");
+            XmlPopulate(xd, ref node, false);
+            node.Attributes.Append(xmlHelper.addAttribute(xd, "loginName", LoginName));
+            node.Attributes.Append(xmlHelper.addAttribute(xd, "email", Email));
+            return node;
+        }
+
+        #endregion
+
+        #region Private methods
+        private void populateGroups()
+        {
+            Hashtable temp = new Hashtable();
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(
+                "select memberGroup from cmsMember2MemberGroup where member = @id",
+                SqlHelper.CreateParameter("@id", Id)))
+            {
+                while (dr.Read())
+                    temp.Add(dr.GetInt("memberGroup"),
+                        new MemberGroup(dr.GetInt("memberGroup")));
+            }
+            m_Groups = temp;
+        }
+
+        private static string GetCacheKey(int id)
+        {
+            return string.Format("MemberCacheItem_{0}", id);
+        }
+
+        #endregion
 
         #region MemberHandle functions
 
@@ -659,13 +697,6 @@ namespace umbraco.cms.businesslogic.member
 
                 if (!e.Cancel)
                 {
-
-                    Hashtable umbracoMembers = CachedMembers();
-
-                    // Check if member already exists
-                    if (umbracoMembers[m.Id] == null)
-                        umbracoMembers.Add(m.Id, m);
-
                     removeCookie("umbracoMemberId");
 
                     // Add cookie with member-id, guid and loginname
@@ -673,12 +704,18 @@ namespace umbraco.cms.businesslogic.member
                     addCookie("umbracoMemberGuid", m.UniqueId.ToString(), 365);
                     addCookie("umbracoMemberLogin", m.LoginName, 365);
 
-                    // Debug information
-                    HttpContext.Current.Trace.Write("member",
-                        "Member added to cache: " + m.Text + "/" + m.LoginName + " (" +
-                        m.Id + ")");
+                    //cache the member
+                    var cachedMember = Cache.GetCacheItem<Member>(GetCacheKey(m.Id), m_Locker,
+                        TimeSpan.FromMinutes(30),
+                        delegate
+                        {
+                            // Debug information
+                            HttpContext.Current.Trace.Write("member",
+                                string.Format("Member added to cache: {0}/{1} ({2})",
+                                    m.Text, m.LoginName, m.Id));
 
-                    _memberCache["umbracoMembers"] = umbracoMembers;
+                            return m;
+                        });
 
                     FormsAuthentication.SetAuthCookie(m.LoginName, true);
 
@@ -769,13 +806,6 @@ namespace umbraco.cms.businesslogic.member
                 if (!e.Cancel)
                 {
 
-
-                    Hashtable umbracoMembers = CachedMembers();
-
-                    // Check if member already exists
-                    if (umbracoMembers[m.Id] == null)
-                        umbracoMembers.Add(m.Id, m);
-
                     if (!UseSession)
                     {
                         removeCookie("umbracoMemberId");
@@ -792,14 +822,20 @@ namespace umbraco.cms.businesslogic.member
                         HttpContext.Current.Session["umbracoMemberLogin"] = m.LoginName;
                     }
 
-                    // Debug information
-                    HttpContext.Current.Trace.Write("member",
-                        string.Format("Member added to cache: {0}/{1} ({2})",
-                            m.Text, m.LoginName, m.Id));
+                    //cache the member
+                    var cachedMember = Cache.GetCacheItem<Member>(GetCacheKey(m.Id), m_Locker,
+                        TimeSpan.FromMinutes(30),
+                        delegate
+                        {
+                            // Debug information
+                            HttpContext.Current.Trace.Write("member",
+                                string.Format("Member added to cache: {0}/{1} ({2})",
+                                    m.Text, m.LoginName, m.Id));
 
-                    _memberCache["umbracoMembers"] = umbracoMembers;
+                            return m;
+                        });
 
-
+                   
                     FormsAuthentication.SetAuthCookie(m.LoginName, false);
 
                     m.FireAfterAddToCache(e);
@@ -828,11 +864,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="NodeId">Node Id of the member to remove</param>
         public static void RemoveMemberFromCache(int NodeId)
         {
-            Hashtable umbracoMembers = CachedMembers();
-            if (umbracoMembers.ContainsKey(NodeId))
-                umbracoMembers.Remove(NodeId);
-
-            _memberCache["umbracoMembers"] = umbracoMembers;
+            Cache.ClearCacheItem(GetCacheKey(NodeId));
         }
 
         /// <summary>
@@ -885,15 +917,17 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>A collection of cached members</returns>
         public static Hashtable CachedMembers()
         {
-            Hashtable umbracoMembers;
-
-            // Check for member hashtable in cache
-            if (_memberCache["umbracoMembers"] == null)
-                umbracoMembers = new Hashtable();
-            else
-                umbracoMembers = (Hashtable)_memberCache["umbracoMembers"];
-
-            return umbracoMembers;
+            var h = new Hashtable();
+            Cache.ReturnCacheItemsOrdred()
+                .Cast<DictionaryEntry>()
+                .Where(x => x.Key.ToString().StartsWith("MemberCacheItem_"))
+                .Select(x => (Member)x.Value)
+                .ToList()
+                .ForEach(x =>
+                {
+                    h.Add(x.Id, x);
+                });
+            return h;    
         }
 
         /// <summary>
@@ -1025,22 +1059,22 @@ namespace umbraco.cms.businesslogic.member
 
         #endregion
 
+        #region Events
 
-        //EVENTS
         /// <summary>
         /// The save event handler
         /// </summary>
-        new public delegate void SaveEventHandler(Member sender, SaveEventArgs e);
+        public delegate void SaveEventHandler(Member sender, SaveEventArgs e);
 
         /// <summary>
         /// The new event handler
         /// </summary>
-        new public delegate void NewEventHandler(Member sender, NewEventArgs e);
+        public delegate void NewEventHandler(Member sender, NewEventArgs e);
 
         /// <summary>
         /// The delete event handler
         /// </summary>
-        new public delegate void DeleteEventHandler(Member sender, DeleteEventArgs e);
+        public delegate void DeleteEventHandler(Member sender, DeleteEventArgs e);
 
         /// <summary>
         /// The add to cache event handler
@@ -1085,8 +1119,8 @@ namespace umbraco.cms.businesslogic.member
         }
 
 
-        new public static event NewEventHandler New;
-        new protected virtual void OnNew(NewEventArgs e)
+        public static event NewEventHandler New;
+        protected virtual void OnNew(NewEventArgs e)
         {
             if (New != null)
             {
@@ -1167,182 +1201,188 @@ namespace umbraco.cms.businesslogic.member
             {
                 AfterDelete(this, e);
             }
-        }
-    }
+        } 
+        #endregion
 
-    /// <summary>
-    /// ONLY FOR INTERNAL USE.
-    /// This is needed due to a design flaw where the Umbraco membership provider is located 
-    /// in a separate project referencing this project, which means we can't call special methods
-    /// directly on the UmbracoMemberShipMember class.
-    /// This is a helper implementation only to be able to use the encryption functionality 
-    /// of the membership provides (which are protected).
-    /// 
-    /// ... which means this class should have been marked internal with a Friend reference to the other assembly right??
-    /// </summary>
-    public class MemberShipHelper : MembershipProvider
-    {
-        public override string ApplicationName
+        #region Membership helper class used for encryption methods
+        /// <summary>
+        /// ONLY FOR INTERNAL USE.
+        /// This is needed due to a design flaw where the Umbraco membership provider is located 
+        /// in a separate project referencing this project, which means we can't call special methods
+        /// directly on the UmbracoMemberShipMember class.
+        /// This is a helper implementation only to be able to use the encryption functionality 
+        /// of the membership provides (which are protected).
+        /// 
+        /// ... which means this class should have been marked internal with a Friend reference to the other assembly right??
+        /// </summary>
+        internal class MemberShipHelper : MembershipProvider
         {
-            get
+            public override string ApplicationName
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+                set
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public override bool ChangePassword(string username, string oldPassword, string newPassword)
             {
                 throw new NotImplementedException();
             }
-            set
+
+            public override bool ChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
             {
                 throw new NotImplementedException();
             }
-        }
 
-        public override bool ChangePassword(string username, string oldPassword, string newPassword)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool ChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool DeleteUser(string username, bool deleteAllRelatedData)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string EncodePassword(string password, MembershipPasswordFormat pwFormat)
-        {
-            string encodedPassword = password;
-            switch (pwFormat)
+            public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
             {
-                case MembershipPasswordFormat.Clear:
-                    break;
-                case MembershipPasswordFormat.Encrypted:
-                    encodedPassword =
-                      Convert.ToBase64String(EncryptPassword(Encoding.Unicode.GetBytes(password)));
-                    break;
-                case MembershipPasswordFormat.Hashed:
-                    HMACSHA1 hash = new HMACSHA1();
-                    hash.Key = Encoding.Unicode.GetBytes(password);
-                    encodedPassword =
-                      Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
-                    break;
+                throw new NotImplementedException();
             }
-            return encodedPassword;
-        }
 
-        public override bool EnablePasswordReset
-        {
-            get { throw new NotImplementedException(); }
-        }
+            public override bool DeleteUser(string username, bool deleteAllRelatedData)
+            {
+                throw new NotImplementedException();
+            }
 
-        public override bool EnablePasswordRetrieval
-        {
-            get { throw new NotImplementedException(); }
-        }
+            public string EncodePassword(string password, MembershipPasswordFormat pwFormat)
+            {
+                string encodedPassword = password;
+                switch (pwFormat)
+                {
+                    case MembershipPasswordFormat.Clear:
+                        break;
+                    case MembershipPasswordFormat.Encrypted:
+                        encodedPassword =
+                          Convert.ToBase64String(EncryptPassword(Encoding.Unicode.GetBytes(password)));
+                        break;
+                    case MembershipPasswordFormat.Hashed:
+                        HMACSHA1 hash = new HMACSHA1();
+                        hash.Key = Encoding.Unicode.GetBytes(password);
+                        encodedPassword =
+                          Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
+                        break;
+                }
+                return encodedPassword;
+            }
 
-        public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
-        {
-            throw new NotImplementedException();
-        }
+            public override bool EnablePasswordReset
+            {
+                get { throw new NotImplementedException(); }
+            }
 
-        public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
-        {
-            throw new NotImplementedException();
-        }
+            public override bool EnablePasswordRetrieval
+            {
+                get { throw new NotImplementedException(); }
+            }
 
-        public override MembershipUserCollection GetAllUsers(int pageIndex, int pageSize, out int totalRecords)
-        {
-            throw new NotImplementedException();
-        }
+            public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
+            {
+                throw new NotImplementedException();
+            }
 
-        public override int GetNumberOfUsersOnline()
-        {
-            throw new NotImplementedException();
-        }
+            public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
+            {
+                throw new NotImplementedException();
+            }
 
-        public override string GetPassword(string username, string answer)
-        {
-            throw new NotImplementedException();
-        }
+            public override MembershipUserCollection GetAllUsers(int pageIndex, int pageSize, out int totalRecords)
+            {
+                throw new NotImplementedException();
+            }
 
-        public override MembershipUser GetUser(string username, bool userIsOnline)
-        {
-            throw new NotImplementedException();
-        }
+            public override int GetNumberOfUsersOnline()
+            {
+                throw new NotImplementedException();
+            }
 
-        public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
-        {
-            throw new NotImplementedException();
-        }
+            public override string GetPassword(string username, string answer)
+            {
+                throw new NotImplementedException();
+            }
 
-        public override string GetUserNameByEmail(string email)
-        {
-            throw new NotImplementedException();
-        }
+            public override MembershipUser GetUser(string username, bool userIsOnline)
+            {
+                throw new NotImplementedException();
+            }
 
-        public override int MaxInvalidPasswordAttempts
-        {
-            get { throw new NotImplementedException(); }
-        }
+            public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
+            {
+                throw new NotImplementedException();
+            }
 
-        public override int MinRequiredNonAlphanumericCharacters
-        {
-            get { throw new NotImplementedException(); }
-        }
+            public override string GetUserNameByEmail(string email)
+            {
+                throw new NotImplementedException();
+            }
 
-        public override int MinRequiredPasswordLength
-        {
-            get { throw new NotImplementedException(); }
-        }
+            public override int MaxInvalidPasswordAttempts
+            {
+                get { throw new NotImplementedException(); }
+            }
 
-        public override int PasswordAttemptWindow
-        {
-            get { throw new NotImplementedException(); }
-        }
+            public override int MinRequiredNonAlphanumericCharacters
+            {
+                get { throw new NotImplementedException(); }
+            }
 
-        public override MembershipPasswordFormat PasswordFormat
-        {
-            get { throw new NotImplementedException(); }
-        }
+            public override int MinRequiredPasswordLength
+            {
+                get { throw new NotImplementedException(); }
+            }
 
-        public override string PasswordStrengthRegularExpression
-        {
-            get { throw new NotImplementedException(); }
-        }
+            public override int PasswordAttemptWindow
+            {
+                get { throw new NotImplementedException(); }
+            }
 
-        public override bool RequiresQuestionAndAnswer
-        {
-            get { throw new NotImplementedException(); }
-        }
+            public override MembershipPasswordFormat PasswordFormat
+            {
+                get { throw new NotImplementedException(); }
+            }
 
-        public override bool RequiresUniqueEmail
-        {
-            get { throw new NotImplementedException(); }
-        }
+            public override string PasswordStrengthRegularExpression
+            {
+                get { throw new NotImplementedException(); }
+            }
 
-        public override string ResetPassword(string username, string answer)
-        {
-            throw new NotImplementedException();
-        }
+            public override bool RequiresQuestionAndAnswer
+            {
+                get { throw new NotImplementedException(); }
+            }
 
-        public override bool UnlockUser(string userName)
-        {
-            throw new NotImplementedException();
-        }
+            public override bool RequiresUniqueEmail
+            {
+                get { throw new NotImplementedException(); }
+            }
 
-        public override void UpdateUser(MembershipUser user)
-        {
-            throw new NotImplementedException();
-        }
+            public override string ResetPassword(string username, string answer)
+            {
+                throw new NotImplementedException();
+            }
 
-        public override bool ValidateUser(string username, string password)
-        {
-            throw new NotImplementedException();
-        }
+            public override bool UnlockUser(string userName)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void UpdateUser(MembershipUser user)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override bool ValidateUser(string username, string password)
+            {
+                throw new NotImplementedException();
+            }
+        } 
+        #endregion
+    
     }
+
+    
 }

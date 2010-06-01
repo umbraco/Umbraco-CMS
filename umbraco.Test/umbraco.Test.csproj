@@ -136,12 +136,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dictionary_DictionaryItemTest.cs" />
+    <Compile Include="DictionaryTest.cs" />
     <Compile Include="DocumentTest.cs" />
     <Compile Include="DocumentTypeTest.cs" />
     <Compile Include="LanguageTest.cs" />
     <Compile Include="MediaTest.cs" />
     <Compile Include="MediaTypeTest.cs" />
+    <Compile Include="MemberTest.cs" />
+    <Compile Include="MemberTypeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserTest.cs" />
   </ItemGroup>

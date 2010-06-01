@@ -44,6 +44,8 @@ namespace umbraco.cms.businesslogic
 
         public ContentType(int id, bool noSetup) : base(id, noSetup) { }
 
+        public ContentType(Guid id, bool noSetup) : base(id, noSetup) { }
+
         ///// <summary>
         ///// Initializes a new instance of the <see cref="ContentType"/> class.
         ///// </summary>

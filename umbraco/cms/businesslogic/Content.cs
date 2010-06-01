@@ -41,25 +41,16 @@ namespace umbraco.cms.businesslogic
 
         #endregion
 
-        #region Constructors
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
+        #region Constructors        
+      
         public Content(int id) : base(id) { }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="noSetup"></param>
         protected Content(int id, bool noSetup) : base(id, noSetup) { }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
+       
         protected Content(Guid id) : base(id) { }
+
+        protected Content(Guid id, bool noSetup) : base(id, noSetup) { }
+
         #endregion
 
         #region Static Methods
@@ -504,6 +495,8 @@ namespace umbraco.cms.businesslogic
             SqlHelper.ExecuteNonQuery("insert into cmsContent (nodeId,ContentType) values (" + this.Id + "," + ct.Id + ")");
             createNewVersion();
         }
+
+
 
         /// <summary>
         /// Method for creating a new version of the data associated to the Content.

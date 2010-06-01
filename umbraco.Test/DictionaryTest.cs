@@ -17,6 +17,18 @@ namespace umbraco.Test
     [TestClass()]
     public class DictionaryTest
     {
+        [TestMethod()]
+        public void Dictionary_Get_Top_Level_Items()
+        {
+            var items = Dictionary.getTopMostItems;
+
+            var d = CreateNew();
+
+            Assert.AreEqual<int>(items.Count() + 1, Dictionary.getTopMostItems.Count());
+
+            DeleteItem(d);
+        }
+
         /// <summary>
         /// Creates a new dictionary entry, adds values for all languages assigned, then deletes the 
         /// entry and ensure that all other data is gone too.
@@ -230,6 +242,34 @@ namespace umbraco.Test
             Assert.AreEqual(0, count);
 
             DeleteItem(d);
+        }
+
+        /// <summary>
+        /// Tries to create a duplicate key and ensures it's not possible.
+        /// </summary>
+        [TestMethod()]
+        public void Dictionary_Attempt_Duplicate_Key()
+        {
+            var key = "Test" + Guid.NewGuid().ToString("N");
+            var d1Id = Dictionary.DictionaryItem.addKey(key, "");
+            Assert.IsTrue(d1Id > 0);
+            var d1 = new Dictionary.DictionaryItem(d1Id);
+            Assert.IsInstanceOfType(d1, typeof(Dictionary.DictionaryItem));
+
+            var alreadyExists = false;
+            try
+            {
+                var d2Id = Dictionary.DictionaryItem.addKey(key, "");
+                Assert.IsTrue(d2Id > 0);
+                var d2 = new Dictionary.DictionaryItem(d2Id);
+            }
+            catch (ArgumentException)
+            {
+                alreadyExists = true;
+            }
+            Assert.IsTrue(alreadyExists);
+
+            DeleteItem(d1);
         }
 
         #region Private methods

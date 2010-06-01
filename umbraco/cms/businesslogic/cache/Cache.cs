@@ -1,15 +1,14 @@
 using System;
 using System.Web.Caching;
+using System.Web;
 
 namespace umbraco.cms.businesslogic.cache
 {
 	/// <summary>
-	/// Summary description for Cache.
+	/// Used to easily store and retreive items from the cache.
 	/// </summary>
 	public class Cache
 	{
-
-        public static readonly object m_Locker = new object();
 
 		/// <summary>
 		/// Clears everything in umbraco's runtime cache, which means that not only
@@ -36,16 +35,9 @@ namespace umbraco.cms.businesslogic.cache
 		public static void ClearCacheItem(string Key) 
 		{
 			if (System.Web.HttpRuntime.Cache[Key] != null) 
-			{
-                lock (m_Locker)
-                {
-                    //check again
-                    if (System.Web.HttpRuntime.Cache[Key] != null)
-                    {
-                        System.Web.HttpRuntime.Cache.Remove(Key);
-                        System.Web.HttpContext.Current.Trace.Warn("Cache", "Item " + Key + " removed from cache");
-                    }
-                }				
+			{               
+                HttpRuntime.Cache.Remove(Key);
+                HttpContext.Current.Trace.Warn("Cache", "Item " + Key + " removed from cache");       			
 			}
 		}
 		
@@ -67,14 +59,7 @@ namespace umbraco.cms.businesslogic.cache
                     {
                         if (cacheEnumerator.Key != null && c[cacheEnumerator.Key.ToString()] != null && c[cacheEnumerator.Key.ToString()].GetType() != null && c[cacheEnumerator.Key.ToString()].GetType().ToString() == TypeName)
                         {
-                            lock (m_Locker)
-                            {
-                                //check again
-                                if (cacheEnumerator.Key != null && c[cacheEnumerator.Key.ToString()] != null && c[cacheEnumerator.Key.ToString()].GetType() != null && c[cacheEnumerator.Key.ToString()].GetType().ToString() == TypeName)
-                                {
-                                    c.Remove(cacheEnumerator.Key.ToString());
-                                }
-                            }                            
+                            c.Remove(cacheEnumerator.Key.ToString());                         
                         }
                     }
 				}

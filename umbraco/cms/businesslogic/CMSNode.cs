@@ -295,6 +295,11 @@ namespace umbraco.cms.businesslogic
         #endregion
 
         #region Constructors
+
+        /// <summary>
+        /// Empty constructor that is not suported
+        /// ...why is it here?
+        /// </summary>
         public CMSNode()
         {
             throw new NotSupportedException();
@@ -310,7 +315,6 @@ namespace umbraco.cms.businesslogic
             setupNode();
         }
 
-
         /// <summary>
         /// Initializes a new instance of the <see cref="CMSNode"/> class.
         /// </summary>
@@ -320,10 +324,8 @@ namespace umbraco.cms.businesslogic
         {
             _id = id;
 
-            //TODO: add the following as noSetup currenlty doesn't actuall do anything!?? This can't happen until
-            //inheriting classes can override setupNode instead of using their own implementation (i.e. Document: setupDocument)
-            //if (!noSetup)
-            //setupNode();
+            if (!noSetup)
+                setupNode();
         }
 
         /// <summary>
@@ -336,11 +338,20 @@ namespace umbraco.cms.businesslogic
             setupNode();
         }
 
-        public CMSNode(IRecordsReader reader)
+        public CMSNode(Guid uniqueID, bool noSetup)
+        {
+            _id = SqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE uniqueID = @uniqueId", SqlHelper.CreateParameter("@uniqueId", uniqueID));
+            
+            if (!noSetup)
+                setupNode();
+        }
+
+        protected internal CMSNode(IRecordsReader reader)
         {
             _id = reader.GetInt("id");
             PopulateCMSNodeFromReader(reader);
         } 
+        
         #endregion
 
         #region Public Methods

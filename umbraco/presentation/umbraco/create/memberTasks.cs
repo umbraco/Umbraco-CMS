@@ -76,9 +76,8 @@ namespace umbraco
             if (cms.businesslogic.member.Member.InUmbracoMemberMode() && TypeID != -1)
             {
                 cms.businesslogic.member.MemberType dt = new cms.businesslogic.member.MemberType(TypeID);
-                cms.businesslogic.member.Member m = cms.businesslogic.member.Member.MakeNew(name, dt, BusinessLogic.User.GetUser(_userID));
-                m.Password = password;
-                m.Email = email;
+                cms.businesslogic.member.Member m = cms.businesslogic.member.Member.MakeNew(name, email, dt, BusinessLogic.User.GetUser(_userID));
+                m.Password = password;                
                 m.LoginName = name.Replace(" ", "").ToLower();
 
                 NewMemberUIEventArgs e = new NewMemberUIEventArgs();

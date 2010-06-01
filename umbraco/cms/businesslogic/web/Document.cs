@@ -27,12 +27,13 @@ namespace umbraco.cms.businesslogic.web
     public class Document : Content
     {
         #region Constructors
+
         /// <summary>
         /// Constructs a new document
         /// </summary>
         /// <param name="id">Id of the document</param>
         /// <param name="noSetup">true if the data shouldn't loaded from the db</param>
-        public Document(Guid id, bool noSetup) : base(id) { }
+        public Document(Guid id, bool noSetup) : base(id, noSetup) { }
 
         /// <summary>
         /// Initializes a new instance of the Document class.
@@ -49,8 +50,7 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="id">The id of the document</param>
         /// <param name="Version">The version of the document</param>
-        public Document(int id, Guid Version)
-            : base(id)
+        public Document(int id, Guid Version) : base(id)
         {
             this.Version = Version;
         }
@@ -67,9 +67,12 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="id">The id of the document</param>
         public Document(Guid id) : base(id) { }
 
-        //TODO: SD: Implement this EVERYWHERE (90 places apparently)
-        public Document(bool optimizedMode, int id)
-            : base(id, optimizedMode)
+        /// <summary>
+        /// Initializes a Document object with one SQL query instead of many
+        /// </summary>
+        /// <param name="optimizedMode"></param>
+        /// <param name="id"></param>
+        public Document(bool optimizedMode, int id) : base(id, optimizedMode)
         {
             this._optimizedMode = optimizedMode;
 
@@ -136,6 +139,7 @@ namespace umbraco.cms.businesslogic.web
                 }
             }
         }
+       
         #endregion
 
         #region Constants and Static members
@@ -329,9 +333,18 @@ namespace umbraco.cms.businesslogic.web
             CMSNode n = new CMSNode(ParentId);
             int newLevel = n.Level;
             newLevel++;
-            MakeNew(ParentId, _objectType, u.Id, newLevel, Name, newId);
+            
+            //create the cms node first
+            CMSNode newNode = MakeNew(ParentId, _objectType, u.Id, newLevel, Name, newId);
+            
+            //we need to create an empty document and set the underlying text property
             Document tmp = new Document(newId, true);
+            tmp.SetText(Name);
+            
+            //create the content data for the new document
             tmp.CreateContent(dct);
+            
+            //now create the document data
             SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, Text) values (1, " +
                                       tmp.Id + ", 0, " +
                                       u.Id + ", @versionId, @text)",
@@ -341,10 +354,10 @@ namespace umbraco.cms.businesslogic.web
             // Update the sortOrder if the parent was the root!
             if (ParentId == -1)
             {
-                CMSNode c = new CMSNode(newId);
-                c.sortOrder = GetRootDocuments().Length + 1;
+                newNode.sortOrder = GetRootDocuments().Length + 1;
             }
 
+            //read the whole object from the db
             Document d = new Document(newId);
 
             //event
@@ -1396,24 +1409,30 @@ namespace umbraco.cms.businesslogic.web
         {
             base.setupNode();
 
-            IRecordsReader dr =
+            using (var dr =
                 SqlHelper.ExecuteReader("select published, documentUser, coalesce(templateId, cmsDocumentType.templateNodeId) as templateId, text, releaseDate, expireDate, updateDate from cmsDocument inner join cmsContent on cmsDocument.nodeId = cmsContent.Nodeid left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1 where versionId = @versionId",
-                                        SqlHelper.CreateParameter("@versionId", Version));
-            if (dr.Read())
+                                        SqlHelper.CreateParameter("@versionId", Version)))
             {
-                _creator = User;
-                _writer = User.GetUser(dr.GetInt("documentUser"));
+                if (dr.Read())
+                {
+                    _creator = User;
+                    _writer = User.GetUser(dr.GetInt("documentUser"));
 
-                if (!dr.IsNull("templateId"))
-                    _template = dr.GetInt("templateId");
-                if (!dr.IsNull("releaseDate"))
-                    _release = dr.GetDateTime("releaseDate");
-                if (!dr.IsNull("expireDate"))
-                    _expire = dr.GetDateTime("expireDate");
-                if (!dr.IsNull("updateDate"))
-                    _updated = dr.GetDateTime("updateDate");
+                    if (!dr.IsNull("templateId"))
+                        _template = dr.GetInt("templateId");
+                    if (!dr.IsNull("releaseDate"))
+                        _release = dr.GetDateTime("releaseDate");
+                    if (!dr.IsNull("expireDate"))
+                        _expire = dr.GetDateTime("expireDate");
+                    if (!dr.IsNull("updateDate"))
+                        _updated = dr.GetDateTime("updateDate");
+                }
+                else
+                {
+                    throw new ArgumentException(string.Format("No Document exists with Version '{0}'", Version));
+                }
             }
-            dr.Close();
+            
             _published = HasPublishedVersion();
         }
 

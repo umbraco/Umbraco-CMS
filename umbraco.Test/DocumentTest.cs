@@ -168,11 +168,11 @@ namespace umbraco.Test
 
             target.Copy(parentId, m_User, RelateToOrignal);
 
-            Assert.AreEqual(childrenIds.Count() + 1, GetChildNodesOfParent(target).Count());
-
-            Document parent = new Document(parentId);
+            var parentChildNodes = GetChildNodesOfParent(target);
+            Assert.AreEqual(childrenIds.Count() + 1, parentChildNodes.Count());
+           
             //get the children difference which should be the new node
-            var diff = parent.Children.ToList().Select(x => x.Id).Except(childrenIds);
+            var diff = parentChildNodes.Select(x => x.Id).Except(childrenIds);
 
             Assert.AreEqual(1, diff.Count());
 
