@@ -348,6 +348,13 @@ ALTER TABLE dbo.cmsLanguageText ADD CONSTRAINT
 	 ON DELETE  NO ACTION 
 ;
 
+-- It would be good to add constraints from cmsLanguageText to umbracoLanguage but unfortunately, a 'zero' id 
+-- is entered into cmsLanguageText when a new entry is made, since there's not language with id of zero this won't work.
+-- However, we need to remove translations that aren't related to a language (these would be left over from deleting a language)
+DELETE FROM cmsLanguageText
+WHERE languageId <> 0 AND languageId NOT IN (SELECT id FROM umbracoLanguage)
+
+
 ALTER TABLE dbo.umbracoUser2NodeNotify ADD CONSTRAINT
 	FK_umbracoUser2NodeNotify_umbracoUser FOREIGN KEY
 	(
@@ -419,17 +426,6 @@ ALTER TABLE dbo.cmsTask ADD CONSTRAINT
 	(
 	nodeId
 	) REFERENCES dbo.umbracoNode
-	(
-	id
-	) ON UPDATE  NO ACTION 
-	 ON DELETE  NO ACTION 
-;
-
-ALTER TABLE dbo.cmsDictionary ADD CONSTRAINT
-	FK_cmsDictionary_cmsDictionary FOREIGN KEY
-	(
-	parent
-	) REFERENCES dbo.cmsDictionary
 	(
 	id
 	) ON UPDATE  NO ACTION 

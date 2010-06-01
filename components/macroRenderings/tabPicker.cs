@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Web;
 using umbraco.DataLayer;
 using umbraco.interfaces;
+using umbraco.BusinessLogic;
 
 
 namespace umbraco.macroRenderings
@@ -19,7 +20,6 @@ namespace umbraco.macroRenderings
 		string _value = "";
 		bool _multiple = false;
         private static ISqlHelper _sqlHelper;
-        private static string _ConnString = GlobalSettings.DbDSN;
 
 		public bool ShowCaption 
 		{
@@ -52,15 +52,9 @@ namespace umbraco.macroRenderings
 			}
 		}
 
-        public static ISqlHelper SqlHelper {
-            get {
-                if (_sqlHelper == null) {
-                    try {
-                        _sqlHelper = DataLayerHelper.CreateSqlHelper(_ConnString);
-                    } catch { }
-                }
-                return _sqlHelper;
-            }
+        public static ISqlHelper SqlHelper
+        {
+            get { return Application.SqlHelper; }
         }
 
 		public tabPicker()

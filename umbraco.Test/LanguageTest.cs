@@ -22,11 +22,23 @@ namespace umbraco.Test
     [TestClass()]
     public class LanguageTest
     {
+
+        /// <summary>
+        /// A test to ensure you cannot delete the default language: en-US
+        /// </summary>
+        [ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod()]
+        public void Language_Delete_Default_Language()
+        {
+            var lang = Language.GetByCultureCode("en-US");
+            lang.Delete();
+        }
+
         /// <summary>
         ///A test for getAll
         ///</summary>
         [TestMethod()]
-        public void Language_GetAllTest()
+        public void Language_GetAll()
         {
             //check with sql that it's the correct number of children
             var ids = new List<int>();
@@ -47,7 +59,7 @@ namespace umbraco.Test
         ///A test for ToXml
         ///</summary>
         [TestMethod()]
-        public void Language_ToXmlTest()
+        public void Language_ToXml()
         {
             var all = Language.GetAllAsList();
 
@@ -63,7 +75,7 @@ namespace umbraco.Test
         ///A test for GetByCultureCode
         ///</summary>
         [TestMethod()]
-        public void Language_GetByCultureCodeTest()
+        public void Language_GetByCultureCode()
         {
             var all = Language.GetAllAsList();
             var lang = Language.GetByCultureCode(all.First().CultureAlias);
@@ -74,7 +86,7 @@ namespace umbraco.Test
         ///A test for MakeNew
         ///</summary>
         [TestMethod()]
-        public void Language_MakeNewTest()
+        public void Language_MakeNew()
         {
             var newLang = MakeNew();                             
             DeleteLanguage(newLang);
@@ -85,14 +97,14 @@ namespace umbraco.Test
         /// </summary>
         [TestMethod()]
         [ExpectedException(typeof(SqlHelperException))]
-        public void Language_MakeDuplicateTest()
+        public void Language_MakeDuplicate()
         {
             var all = Language.GetAllAsList();
             Language.MakeNew(all.First().CultureAlias);
         }
 
         [TestMethod()]
-        public void Language_DeleteWithAssignedDomainTest()
+        public void Language_Delete_With_Assigned_Domain()
         {
             var newLang = MakeNew();            
 
@@ -115,6 +127,21 @@ namespace umbraco.Test
             //we will need to delete the domain first, then the language
             var d = Domain.GetDomainsById(newDoc.Id).First();
             d.Delete();
+
+            DeleteLanguage(newLang);
+        }
+
+        /// <summary>
+        /// Ensure that a language that has dictionary items assigned to it with values
+        /// is able to be deleted propery. Ensure that all translations for the language are 
+        /// removed as well.
+        /// </summary>
+        [TestMethod()]
+        public void Language_Delete_With_Assigned_Dictionary_Items() 
+        {
+            var newLang = MakeNew();
+
+
 
             DeleteLanguage(newLang);
         }

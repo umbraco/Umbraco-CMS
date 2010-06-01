@@ -74,26 +74,10 @@ namespace umbraco.presentation.umbraco.webservices
 
         }
 
-        private static ISqlHelper _sqlHelper;
-        private static string _ConnString = GlobalSettings.DbDSN;
-
         public static ISqlHelper SqlHelper
         {
-            get
-            {
-                if (_sqlHelper == null)
-                {
-                    try
-                    {
-                        _sqlHelper = DataLayerHelper.CreateSqlHelper(_ConnString);
-                    }
-                    catch { }
-                }
-                return _sqlHelper;
-            }
+            get { return Application.SqlHelper; }
         }
-
-
 
         public bool IsReusable
         {

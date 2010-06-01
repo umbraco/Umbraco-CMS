@@ -11,6 +11,14 @@
     <xsl:attribute name="value">4.1.0.betaII</xsl:attribute>
   </xsl:template>
 
+  <xsl:template match="/configuration/appSettings/add[@key='umbracoContentXML']/@value">
+    <xsl:attribute name="value">~/App_Data/umbraco.config</xsl:attribute>
+  </xsl:template>
+
+  <xsl:template match="/configuration/appSettings/add[@key='umbracoStorageDirectory']/@value">
+    <xsl:attribute name="value">~/App_Data</xsl:attribute>
+  </xsl:template>
+
   <!-- Add trace output -->
   <!--<xsl:template match="/configuration">
     <xsl:copy>

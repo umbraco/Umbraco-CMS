@@ -2,10 +2,11 @@ using System;
 using System.Collections;
 using System.Data;
 using System.Xml;
-
+using System.Linq;
 using umbraco.cms.businesslogic.language;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
+using System.Runtime.CompilerServices;
 
 namespace umbraco.cms.businesslogic
 {
@@ -16,9 +17,9 @@ namespace umbraco.cms.businesslogic
     /// </summary>
     public class Dictionary
     {
-        private static bool cacheIsEnsured = false;
-        private static Hashtable DictionaryItems = new Hashtable();
-        private static string _ConnString = GlobalSettings.DbDSN;
+        private static volatile bool cacheIsEnsured = false;
+        private static readonly object m_Locker = new object();
+        private static Hashtable DictionaryItems = Hashtable.Synchronized(new Hashtable());
         private static Guid topLevelParent = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
 
         protected static ISqlHelper SqlHelper
@@ -26,21 +27,34 @@ namespace umbraco.cms.businesslogic
             get { return Application.SqlHelper; }
         }
 
+        /// <summary>
+        /// Reads all items from the database and stores in local cache
+        /// </summary>
         private static void ensureCache()
         {
             if (!cacheIsEnsured)
             {
-                IRecordsReader dr =
-                    SqlHelper.ExecuteReader("Select id, [key] from cmsDictionary");
-
-                while (dr.Read())
+                lock (m_Locker)
                 {
-                    Guid tmp = dr.GetGuid("id");
-                    string key = dr.GetString("key");
-                    DictionaryItems.Add(key, tmp);
-                }
-                dr.Close();
-                cacheIsEnsured = true;
+                    if (!cacheIsEnsured)
+                    {
+                        using (IRecordsReader dr = SqlHelper.ExecuteReader("Select pk, id, [key], parent from cmsDictionary"))
+                        {
+                            while (dr.Read())
+                            {
+                                //create new dictionaryitem object and put in cache
+                                var item = new DictionaryItem(dr.GetInt("pk"),
+                                    dr.GetString("key"),
+                                    dr.GetGuid("id"),
+                                    dr.GetGuid("parent"));
+
+                                DictionaryItems.Add(item.key, item);
+                            }
+                        }
+
+                        cacheIsEnsured = true;
+                    }
+                }                
             }
         }
 
@@ -51,18 +65,11 @@ namespace umbraco.cms.businesslogic
         {
             get
             {
-                ArrayList tmp = new ArrayList();
-                IRecordsReader dr =
-                    SqlHelper.ExecuteReader("Select [Key] from cmsDictionary where parent = '" +
-                                            topLevelParent.ToString() + "' order by [key]");
-                while (dr.Read())
-                {
-                    tmp.Add(dr.GetString("key"));
-                }
-                dr.Close();
-                DictionaryItem[] retval = new DictionaryItem[tmp.Count];
-                for (int i = 0; i < tmp.Count; i++) retval[i] = new DictionaryItem(tmp[i].ToString());
-                return retval;
+                ensureCache();
+
+                return DictionaryItems.Values.Cast<DictionaryItem>()
+                    .Where(x => x.ParentId == topLevelParent)
+                    .ToArray();
             }
         }
 
@@ -72,67 +79,99 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         public class DictionaryItem
         {
-            private Guid _uniqueID;
+            
             private string _key;
 
+            internal Guid UniqueId { get; private set; }
+            internal Guid ParentId { get; private set; }
+
+            /// <summary>
+            /// Used internally to construct a new item object and store in cache
+            /// </summary>
+            /// <param name="id"></param>
+            /// <param name="key"></param>
+            /// <param name="uniqueKey"></param>
+            /// <param name="parentId"></param>
+            internal DictionaryItem(int id, string key, Guid uniqueKey, Guid parentId)
+            {
+                this.id = id;
+                this._key = key;
+                this.UniqueId = uniqueKey;
+                this.ParentId = parentId;
+            }
 
             public DictionaryItem(string key)
             {
                 ensureCache();
-                if (hasKey(key))
+
+                var item = DictionaryItems.Values.Cast<DictionaryItem>()
+                    .Where(x => x.key == key)                    
+                    .SingleOrDefault();
+
+                if (item == null)
                 {
-                    _uniqueID = (Guid)DictionaryItems[key];
-                    _key = key;
+                    throw new ArgumentException("No key " + key + " exists in dictionary");
                 }
-                else throw new ArgumentException("No key " + key + " exists in dictionary");
+
+                this.id = item.id;
+                this._key = item.key;
+                this.ParentId = item.ParentId;
+                this.UniqueId = item.UniqueId;
             }
 
             public DictionaryItem(Guid id)
             {
-                string key =
-                    SqlHelper.ExecuteScalar<string>("Select [key] from cmsDictionary where id = @id",
-                                                    SqlHelper.CreateParameter("@id", id));
-
                 ensureCache();
-                if (hasKey(key))
+
+                var item = DictionaryItems.Values.Cast<DictionaryItem>()
+                    .Where(x => x.UniqueId == id)
+                    .SingleOrDefault();
+
+                if (item == null)
                 {
-                    _uniqueID = (Guid)DictionaryItems[key];
-                    _key = key;
+                    throw new ArgumentException("No unique id " + id.ToString() + " exists in dictionary");
                 }
-                else throw new ArgumentException("No key " + key + " exists in dictionary");
+
+                this.id = item.id;
+                this._key = item.key;
+                this.ParentId = item.ParentId;
+                this.UniqueId = item.UniqueId;
             }
 
             public DictionaryItem(int id)
             {
-                string key =
-                    SqlHelper.ExecuteScalar<string>("Select [key] from cmsDictionary where pk = " + id.ToString());
-
                 ensureCache();
-                if (hasKey(key))
+
+                var item = DictionaryItems.Values.Cast<DictionaryItem>()
+                    .Where(x => x.id == id)
+                    .SingleOrDefault();
+
+                if (item == null)
                 {
-                    _uniqueID = (Guid)DictionaryItems[key];
-                    _key = key;
+                    throw new ArgumentException("No id " + id + " exists in dictionary");
                 }
-                else throw new ArgumentException("No key " + key + " exists in dictionary");
+
+                this.id = item.id;
+                this._key = item.key;
+                this.ParentId = item.ParentId;
+                this.UniqueId = item.UniqueId;                               
             }
 
             private DictionaryItem _parent;
 
             /// <summary>
-            /// Returns if the dictionaryItem is the root item.
-            /// Modified by Richard Soeteman on 3-4-2009. The execute scalar throws an error because a Guid instead of string is returned
-            /// Solves issue http://umbraco.codeplex.com/WorkItem/View.aspx?WorkItemId=21902
+            /// Returns if the dictionaryItem is the root item.            
             /// </summary>
             public bool IsTopMostItem()
             {
-                return (SqlHelper.ExecuteScalar<Guid>("Select parent from cmsDictionary where pk = " +
-                                                id) == topLevelParent);
+                return DictionaryItems.Values.Cast<DictionaryItem>()
+                    .Where(x => x.id == id)
+                    .Select(x => x.ParentId)
+                    .SingleOrDefault() == topLevelParent;
             }
 
             /// <summary>
             /// Returns the parent.
-            /// Modified by Richard Soeteman on 3-4-2009. The execute scalar throws an error because a Guid instead of string is returned
-            /// Solves issue http://umbraco.codeplex.com/WorkItem/View.aspx?WorkItemId=21903
             /// </summary>
             public DictionaryItem Parent
             {
@@ -140,43 +179,40 @@ namespace umbraco.cms.businesslogic
                 {
                     if (_parent == null)
                     {
-                        Guid parentGuid =
-                            SqlHelper.ExecuteScalar<Guid>("Select parent from cmsDictionary where pk = " +
-                                                    id.ToString());
-                        if (parentGuid != topLevelParent)
-                            _parent =
-                                new DictionaryItem(parentGuid);
-                        else
+                        var p = DictionaryItems.Values.Cast<DictionaryItem>()
+                            .Where(x => x.UniqueId == this.ParentId)
+                            .SingleOrDefault();
+
+                        if (p == null)
+                        {
                             throw new ArgumentException("Top most dictionary items doesn't have a parent");
+                        }
+                        else
+                        {
+                            _parent = p;
+                        }
                     }
 
                     return _parent;
                 }
             }
 
+            /// <summary>
+            /// The primary key in the database
+            /// </summary>
             public int id
             {
-                get
-                {
-                    return SqlHelper.ExecuteScalar<int>("Select pk from cmsDictionary where [key] = '" + key + "'");
-                }
+                get;
+                private set;
             }
 
             public DictionaryItem[] Children
             {
                 get
                 {
-                    ArrayList tmp = new ArrayList();
-                    IRecordsReader dr =
-                        SqlHelper.ExecuteReader("Select [Key] from cmsDictionary where parent=@uniqueId order by [Key]", SqlHelper.CreateParameter("@uniqueId", _uniqueID));
-                    while (dr.Read())
-                    {
-                        tmp.Add(dr.GetString("key"));
-                    }
-                    dr.Close();
-                    DictionaryItem[] retval = new DictionaryItem[tmp.Count];
-                    for (int i = 0; i < tmp.Count; i++) retval[i] = new DictionaryItem(tmp[i].ToString());
-                    return retval;
+                    return DictionaryItems.Values.Cast<DictionaryItem>()
+                        .Where(x => x.ParentId == this.UniqueId)
+                        .ToArray();
                 }
             }
 
@@ -190,14 +226,12 @@ namespace umbraco.cms.businesslogic
             {
                 get
                 {
-                    return (SqlHelper.ExecuteScalar<int>("select count([key]) as tmp from cmsDictionary where parent=@uniqueId", SqlHelper.CreateParameter("@uniqueId", _uniqueID)) > 0);
+                    return (SqlHelper.ExecuteScalar<int>("select count([key]) as tmp from cmsDictionary where parent=@uniqueId", SqlHelper.CreateParameter("@uniqueId", UniqueId)) > 0);
                 }
             }
 
             /// <summary>
             /// Returns or sets the key.
-            /// Modified by Richard Soeteman on 3-4-2009
-            /// Solves issue http://umbraco.codeplex.com/WorkItem/View.aspx?WorkItemId=21927
             /// </summary>
             public string key
             {
@@ -206,13 +240,37 @@ namespace umbraco.cms.businesslogic
                 {
                     if (!hasKey(value))
                     {
-                        object tmp = DictionaryItems[key];
+                        lock (m_Locker)
+                        {
+                            SqlHelper.ExecuteNonQuery("Update cmsDictionary set [key] = @key WHERE pk = @Id", SqlHelper.CreateParameter("@key", value),
+                                SqlHelper.CreateParameter("@Id", id));
+                            
+                            //remove the cached item since the key is different
+                            DictionaryItems.Remove(key);
 
-                        DictionaryItems.Remove(key);
-                        SqlHelper.ExecuteNonQuery("Update cmsDictionary set [key] = @key WHERE pk = @Id", SqlHelper.CreateParameter("@key", value), SqlHelper.CreateParameter("@Id", id));
-                        _key = value;
-                        DictionaryItems.Add(key, tmp);
+                            using (IRecordsReader dr =
+                                SqlHelper.ExecuteReader("Select pk, id, [key], parent from cmsDictionary where id=@id",
+                            SqlHelper.CreateParameter("@id", this.UniqueId)))
+                            {
+                                if (dr.Read())
+                                {
+                                    //create new dictionaryitem object and put in cache
+                                    var item = new DictionaryItem(dr.GetInt("pk"),
+                                        dr.GetString("key"),
+                                        dr.GetGuid("id"),
+                                        dr.GetGuid("parent"));
 
+                                    DictionaryItems.Add(item.key, item);                                    
+                                }
+                                else
+                                {
+                                    throw new DataException("Could not load updated created dictionary item with id " + id.ToString());
+                                }
+                            }                                
+                            
+                            //finally update this objects value
+                            this._key = value; 
+                        }
                     }
                     else
                         throw new ArgumentException("New value of key already exists (is key)");
@@ -224,39 +282,44 @@ namespace umbraco.cms.businesslogic
                 if (languageId == 0)
                     return Value();
 
-                if (Item.hasText(_uniqueID, languageId))
-                    return Item.Text(_uniqueID, languageId);
+                if (Item.hasText(UniqueId, languageId))
+                    return Item.Text(UniqueId, languageId);
 
                 return "";
             }
 
             public void setValue(int languageId, string value)
             {
-                if (Item.hasText(_uniqueID, languageId))
-                    Item.setText(languageId, _uniqueID, value);
+                if (Item.hasText(UniqueId, languageId))
+                    Item.setText(languageId, UniqueId, value);
                 else
-                    Item.addText(languageId, _uniqueID, value);
+                    Item.addText(languageId, UniqueId, value);
             }
 
             public string Value()
             {
-                return Item.Text(_uniqueID, 1);
+                return Item.Text(UniqueId, 1);
             }
 
+            /// <summary>
+            /// This sets the value for the placeholder language (id = 0), not for a language with an ID
+            /// </summary>
+            /// <param name="value"></param>
             public void setValue(string value)
             {
-                if (Item.hasText(_uniqueID, 0))
-                    Item.setText(0, _uniqueID, value);
+                if (Item.hasText(UniqueId, 0))
+                    Item.setText(0, UniqueId, value);
                 else
-                    Item.addText(0, _uniqueID, value);
+                    Item.addText(0, UniqueId, value);
             }
 
             public static int addKey(string key, string defaultValue, string parentKey)
             {
                 ensureCache();
+
                 if (hasKey(parentKey))
                 {
-                    int retval = createKey(key, new DictionaryItem(parentKey)._uniqueID, defaultValue);
+                    int retval = createKey(key, new DictionaryItem(parentKey).UniqueId, defaultValue);
                     return retval;
                 }
                 else
@@ -279,13 +342,13 @@ namespace umbraco.cms.businesslogic
                     dd.delete();
 
                 // remove all language values from key
-                Item.removeText(_uniqueID);
-
-                // Remove key from cache
-                DictionaryItems.Remove(key);
+                Item.removeText(UniqueId);
 
                 // remove key from database
                 SqlHelper.ExecuteNonQuery("delete from cmsDictionary where [key] ='" + key + "'");
+
+                // Remove key from cache
+                DictionaryItems.Remove(key);
             }
 
             public void Save()
@@ -299,7 +362,7 @@ namespace umbraco.cms.businesslogic
 
                 XmlNode dictionaryItem = xd.CreateElement("DictionaryItem");
                 dictionaryItem.Attributes.Append(xmlHelper.addAttribute(xd, "Key", this.key));
-                foreach (Language lang in Language.getAll)
+                foreach (Language lang in Language.GetAllAsList())
                 {
                     XmlNode itemValue = xmlHelper.addCDataNode(xd, "Value", this.Value(lang.id));
                     itemValue.Attributes.Append(xmlHelper.addAttribute(xd, "LanguageId", lang.id.ToString()));
@@ -375,21 +438,43 @@ namespace umbraco.cms.businesslogic
                     return null;
             }
 
+            [MethodImpl(MethodImplOptions.Synchronized)]
             private static int createKey(string key, Guid parentId, string defaultValue)
             {
                 if (!hasKey(key))
                 {
                     Guid newId = Guid.NewGuid();
-                    SqlHelper.ExecuteNonQuery("Insert into cmsDictionary (id,parent,[key]) values (@id,@parentId,'" + key + "')",
+                    SqlHelper.ExecuteNonQuery("Insert into cmsDictionary (id,parent,[key]) values (@id, @parentId, @dictionaryKey)",
                                               SqlHelper.CreateParameter("@id", newId),
-                                              SqlHelper.CreateParameter("@parentId", parentId));
-                    DictionaryItems.Add(key, newId);
-                    DictionaryItem di = new DictionaryItem(key);
-                    di.setValue(defaultValue);
+                                              SqlHelper.CreateParameter("@parentId", parentId),
+                                              SqlHelper.CreateParameter("@dictionaryKey", key));
 
-                    di.OnNew(EventArgs.Empty);
+                    using (IRecordsReader dr = 
+                        SqlHelper.ExecuteReader("Select pk, id, [key], parent from cmsDictionary where id=@id",
+                            SqlHelper.CreateParameter("@id", newId)))
+                    {
+                        if (dr.Read())
+                        {
+                            //create new dictionaryitem object and put in cache
+                            var item = new DictionaryItem(dr.GetInt("pk"),
+                                dr.GetString("key"),
+                                dr.GetGuid("id"),
+                                dr.GetGuid("parent"));
 
-                    return di.id;
+                            DictionaryItems.Add(item.key, item);
+
+                            item.setValue(defaultValue);
+
+                            item.OnNew(EventArgs.Empty);
+
+                            return item.id;
+                        }
+                        else
+                        {
+                            throw new DataException("Could not load newly created dictionary item with id " + newId.ToString());
+                        }
+                    }                    
+                    
                 }
                 else
                 {
@@ -397,6 +482,7 @@ namespace umbraco.cms.businesslogic
                 }
             }
 
+            #region Events
             public delegate void SaveEventHandler(DictionaryItem sender, EventArgs e);
             public delegate void NewEventHandler(DictionaryItem sender, EventArgs e);
             public delegate void DeleteEventHandler(DictionaryItem sender, EventArgs e);
@@ -420,7 +506,8 @@ namespace umbraco.cms.businesslogic
             {
                 if (Deleting != null)
                     Deleting(this, e);
-            }
+            } 
+            #endregion
         }
     }
 }

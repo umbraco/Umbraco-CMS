@@ -15,6 +15,8 @@ namespace umbraco.BusinessLogic
     {
 
         private const string CACHE_KEY = "ApplicationTreeCache";
+        
+        private static readonly object m_Locker = new object();
 
         /// <summary>
         /// The cache storage for all application trees
@@ -34,8 +36,6 @@ namespace umbraco.BusinessLogic
             }
         }
 
-        private static string _ConnString = GlobalSettings.DbDSN;
-        private static ISqlHelper _sqlHelper = DataLayerHelper.CreateSqlHelper(_ConnString);
 
         /// <summary>
         /// Gets the SQL helper.
@@ -43,7 +43,7 @@ namespace umbraco.BusinessLogic
         /// <value>The SQL helper.</value>
         public static ISqlHelper SqlHelper
         {
-            get { return _sqlHelper; }
+            get { return Application.SqlHelper; }
         }
 
         private bool _silent;
@@ -350,35 +350,42 @@ namespace umbraco.BusinessLogic
         /// </summary>
         private static void Cache()
         {
-            //don't query the database is the cache is not null
-            if (HttpRuntime.Cache[CACHE_KEY] != null)
-                return;
-
-            List<ApplicationTree> list = new List<ApplicationTree>();
-
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(@"Select treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, 
-                                                                treeIconOpen, treeHandlerAssembly, treeHandlerType, action from umbracoAppTree order by treeSortOrder"))
+            //don't query the database if the cache is not null
+            if (HttpRuntime.Cache[CACHE_KEY] == null)
             {
-                while (dr.Read())
+                lock (m_Locker)
                 {
+                    if (HttpRuntime.Cache[CACHE_KEY] == null)
+                    {
+                        List<ApplicationTree> list = new List<ApplicationTree>();
 
-                    list.Add(new ApplicationTree(
-                        dr.GetBoolean("treeSilent"),
-                        dr.GetBoolean("treeInitialize"),
-                        dr.GetByte("treeSortOrder"),
-                        dr.GetString("appAlias"),
-                        dr.GetString("treeAlias"),
-                        dr.GetString("treeTitle"),
-                        dr.GetString("treeIconClosed"),
-                        dr.GetString("treeIconOpen"),
-                        dr.GetString("treeHandlerAssembly"),
-                        dr.GetString("treeHandlerType"),
-                        dr.GetString("action")));
+                        using (IRecordsReader dr = SqlHelper.ExecuteReader(@"Select treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, 
+                                                                treeIconOpen, treeHandlerAssembly, treeHandlerType, action from umbracoAppTree order by treeSortOrder"))
+                        {
+                            while (dr.Read())
+                            {
 
+                                list.Add(new ApplicationTree(
+                                    dr.GetBoolean("treeSilent"),
+                                    dr.GetBoolean("treeInitialize"),
+                                    dr.GetByte("treeSortOrder"),
+                                    dr.GetString("appAlias"),
+                                    dr.GetString("treeAlias"),
+                                    dr.GetString("treeTitle"),
+                                    dr.GetString("treeIconClosed"),
+                                    dr.GetString("treeIconOpen"),
+                                    dr.GetString("treeHandlerAssembly"),
+                                    dr.GetString("treeHandlerType"),
+                                    dr.GetString("action")));
+
+                            }
+                        }
+
+                        AppTrees = list;
+                    }
                 }
             }
-
-            AppTrees = list;
+            
         }
 
     }

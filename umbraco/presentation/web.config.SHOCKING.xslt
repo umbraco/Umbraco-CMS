@@ -14,7 +14,11 @@
   <xsl:template match="/configuration/appSettings/add[@key='umbracoContentXML']/@value">
     <xsl:attribute name="value">~/App_Data/umbraco.config</xsl:attribute>
   </xsl:template>
-  
+
+  <xsl:template match="/configuration/appSettings/add[@key='umbracoStorageDirectory']/@value">
+    <xsl:attribute name="value">~/App_Data</xsl:attribute>
+  </xsl:template>
+
   <xsl:template match="/configuration/appSettings/add[@key='umbracoPath']/@value">
     <xsl:attribute name="value">~/umbraco</xsl:attribute>
   </xsl:template>

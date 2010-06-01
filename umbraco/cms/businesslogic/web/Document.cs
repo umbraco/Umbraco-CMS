@@ -14,6 +14,7 @@ using umbraco.IO;
 using umbraco.interfaces;
 using umbraco.cms.businesslogic.datatype.controls;
 using System.IO;
+using System.Diagnostics;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -604,7 +605,7 @@ namespace umbraco.cms.businesslogic.web
                 //if (_httpContext == null)
                 //    _httpContext = HttpContext.Current;
                 //return _httpContext;
-                return HttpContext.Current;
+                return System.Web.HttpContext.Current;
             }
         }
 
@@ -1283,8 +1284,7 @@ namespace umbraco.cms.businesslogic.web
         public override void XmlPopulate(XmlDocument xd, ref XmlNode x, bool Deep)
         {
             string urlName = this.Text;
-            var props = getProperties;
-            foreach (Property p in props)
+            foreach (Property p in GenericProperties)
                 if (p != null)
                 {
                     x.AppendChild(p.ToXml(xd));
@@ -1299,7 +1299,7 @@ namespace umbraco.cms.businesslogic.web
                 x.Attributes.Append(addAttribute(xd, "parentID", Parent.Id.ToString()));
             else
                 x.Attributes.Append(addAttribute(xd, "parentID", "-1"));
-            x.Attributes.Append(addAttribute(xd, "level", Level.ToString()));
+            x.Attributes.Append(addAttribute(xd, "level", Level.ToString()));          
             x.Attributes.Append(addAttribute(xd, "writerID", _writer.Id.ToString()));
             x.Attributes.Append(addAttribute(xd, "creatorID", _creator.Id.ToString()));
             if (ContentType != null)
@@ -1421,6 +1421,14 @@ namespace umbraco.cms.businesslogic.web
                                           DateTime InitReleaseDate, DateTime InitExpireDate, DateTime InitUpdateDate,
                                           bool InitPublished)
         {
+            if (InitUser == null)
+            {
+                throw new ArgumentNullException("InitUser");
+            }
+            if (InitWriter == null)
+            {
+                throw new ArgumentNullException("InitWriter");
+            }
             _creator = InitUser;
             _writer = InitWriter;
             SetText(InitText);
@@ -1668,12 +1676,13 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Occurs when [before delete].
         /// </summary>
-        public static event DeleteEventHandler BeforeDelete;
+        public new static event DeleteEventHandler BeforeDelete;
+        
         /// <summary>
         /// Raises the <see cref="E:BeforeDelete"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeDelete(DeleteEventArgs e)
+        protected new virtual void FireBeforeDelete(DeleteEventArgs e)
         {
             if (BeforeDelete != null)
                 BeforeDelete(this, e);
@@ -1682,12 +1691,13 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Occurs when [after delete].
         /// </summary>
-        public static event DeleteEventHandler AfterDelete;
+        public new static event DeleteEventHandler AfterDelete;
+        
         /// <summary>
         /// Raises the <see cref="E:AfterDelete"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterDelete(DeleteEventArgs e)
+        protected new virtual void FireAfterDelete(DeleteEventArgs e)
         {
             if (AfterDelete != null)
                 AfterDelete(this, e);

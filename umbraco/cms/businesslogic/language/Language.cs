@@ -33,9 +33,10 @@ namespace umbraco.cms.businesslogic.language
 
         #region Constants and static members
 
-        private static string _ConnString = GlobalSettings.DbDSN;
         private static object getLanguageSyncLock = new object();
         private static readonly string UmbracoLanguageCacheKey = "UmbracoPropertyTypeCache";
+
+        private const int DefaultLanguageId = 1;
 
         /// <summary>
         /// Gets the SQL helper.
@@ -264,9 +265,18 @@ namespace umbraco.cms.businesslogic.language
         /// 
         /// Notice: this can have various sideeffects - use with care.
         /// </summary>
+        /// <remarks>
+        /// You cannot delete the default language: en-US, this is installed by default and is required.
+        /// </remarks>
         public void Delete()
         {
-            //when we delete we should maybe remove the translations for this language?
+            
+
+            if (this.id == DefaultLanguageId)
+            {
+                throw new InvalidOperationException("You cannot delete the default language: en-US");
+            }
+
 
             if (SqlHelper.ExecuteScalar<int>("SELECT count(id) FROM umbracoDomains where domainDefaultLanguage = @id",
                 SqlHelper.CreateParameter("@id", id)) == 0)
@@ -277,6 +287,9 @@ namespace umbraco.cms.businesslogic.language
 
                 if (!e.Cancel)
                 {
+                    //remove the dictionary entries first
+                    Item.RemoveByLanguage(id);
+
                     InvalidateCache();
 
                     SqlHelper.ExecuteNonQuery("delete from umbracoLanguage where id = @id",

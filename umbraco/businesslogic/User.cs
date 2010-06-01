@@ -11,8 +11,6 @@ namespace umbraco.BusinessLogic {
     /// represents a Umbraco back end user
     /// </summary>
     public class User {
-        // private SqlConnection _conn = new SqlConnection(GlobalSettings.DbDSN);
-
 
         private int _id;
         private bool _isInitialized;
