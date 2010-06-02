@@ -27,14 +27,14 @@ namespace umbraco.Test
         ///and then deletes it.
         ///</summary>
         [TestMethod()]
-        public void Media_MakeNewTest()
+        public void Media_Make_New()
         {
             //System.Diagnostics.Debugger.Break();
             Assert.IsInstanceOfType(m_NewRootMedia, typeof(Media));
         }
 
         [TestMethod()]
-        public void Media_UpdateDataTest()
+        public void Media_Update_Data()
         {
             //System.Diagnostics.Debugger.Break();
             
@@ -52,7 +52,7 @@ namespace umbraco.Test
         }
 
         [TestMethod()]
-        public void Media_DeleteHeirarchyPermanentlyTest()
+        public void Media_Delete_Heirarchy_Permanently()
         {
             var mediaList = new List<Media>();
             var total = 20;
@@ -83,7 +83,7 @@ namespace umbraco.Test
         }
         
         [TestMethod]
-        public void Media_MoveTest()
+        public void Media_Move()
         {
             //first need to document type that allows other types of document types to exist underneath it
             MediaType parent = null;
@@ -125,7 +125,7 @@ namespace umbraco.Test
         }
 
         [TestMethod()]
-        public void Media_DeleteAllDocsByDocumentTypeTest()
+        public void Media_Delete_All_Docs_By_Document_Type()
         {
             //System.Diagnostics.Debugger.Break();
 
@@ -181,7 +181,7 @@ namespace umbraco.Test
         }
 
         [TestMethod]
-        public void Media_EmptyRecycleBinTest()
+        public void Media_Empty_Recycle_Bin()
         {
             //System.Diagnostics.Debugger.Break();
 
@@ -220,7 +220,7 @@ namespace umbraco.Test
         }
 
         [TestMethod]
-        public void Media_UndeleteTest()
+        public void Media_Undelete()
         {
             //find existing content
             var media = new Media(GetExistingNodeId());

@@ -59,7 +59,7 @@ namespace umbraco.Test
         ///A test for ToXml
         ///</summary>
         [TestMethod()]
-        public void Language_ToXml()
+        public void Language_To_Xml()
         {
             var all = Language.GetAllAsList();
 
@@ -75,7 +75,7 @@ namespace umbraco.Test
         ///A test for GetByCultureCode
         ///</summary>
         [TestMethod()]
-        public void Language_GetByCultureCode()
+        public void Language_Get_By_Culture_Code()
         {
             var all = Language.GetAllAsList();
             var lang = Language.GetByCultureCode(all.First().CultureAlias);
@@ -86,7 +86,7 @@ namespace umbraco.Test
         ///A test for MakeNew
         ///</summary>
         [TestMethod()]
-        public void Language_MakeNew()
+        public void Language_Make_New()
         {
             var newLang = MakeNew();                             
             DeleteLanguage(newLang);
@@ -97,7 +97,7 @@ namespace umbraco.Test
         /// </summary>
         [TestMethod()]
         [ExpectedException(typeof(SqlHelperException))]
-        public void Language_MakeDuplicate()
+        public void Language_Make_Duplicate()
         {
             var all = Language.GetAllAsList();
             Language.MakeNew(all.First().CultureAlias);

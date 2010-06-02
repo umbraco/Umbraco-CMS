@@ -24,7 +24,7 @@ namespace umbraco.Test
     public class DocumentTypeTest
     {
         [TestMethod()]
-        public void DocumentType_DeleteDocTypeWithContent()
+        public void DocumentType_Delete_Doc_Type_With_Content()
         {
             var dt = CreateNewDocType();
             var doc = Document.MakeNew("TEST" + Guid.NewGuid().ToString("N"), dt, m_User, -1);
@@ -48,7 +48,7 @@ namespace umbraco.Test
         /// moved to the recycle bin.
         /// </summary>
         [TestMethod()]
-        public void DocumentType_DeleteDocTypeWithContentAndChildrenOfDifferentDocTypes()
+        public void DocumentType_Delete_Doc_Type_With_Content_And_Children_Of_Different_Doc_Types()
         {
             //System.Diagnostics.Debugger.Break();
 
@@ -94,7 +94,7 @@ namespace umbraco.Test
         ///A test for creating a new document type
         ///</summary>
         [TestMethod()]
-        public void DocumentType_MakeNewTest()
+        public void DocumentType_Make_New()
         {
             Assert.IsInstanceOfType(m_NewDocType, typeof(DocumentType));
         }
@@ -103,7 +103,7 @@ namespace umbraco.Test
         /// Tests adding every type of property to a new document type on a new tab, then delete the tab, then the document type
         /// </summary>
         [TestMethod()]
-        public void DocumentType_AddPropertiesToTabThenDeleteItTest()
+        public void DocumentType_Add_Properties_To_Tab_Then_Delete_It()
         {
             //System.Diagnostics.Debugger.Break();
             
@@ -142,7 +142,7 @@ namespace umbraco.Test
         ///A test for GetAll
         ///</summary>
         [TestMethod()]
-        public void DocumentType_GetAllTest()
+        public void DocumentType_Get_All()
         {
             //check with sql that it's the correct number of children
             var ids = new List<int>();
@@ -163,8 +163,8 @@ namespace umbraco.Test
         /// <summary>
         ///A test for HasChildren
         ///</summary>
-        [TestMethod()]        
-        public void DocumentType_HasChildrenTest()
+        [TestMethod()]
+        public void DocumentType_Has_Children()
         {
             //System.Diagnostics.Debugger.Break();
 

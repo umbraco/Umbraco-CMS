@@ -97,7 +97,7 @@ namespace umbraco.Test
         /// Tests adding every type of property to a new media type on a new tab, then delete the tab, then the media type
         /// </summary>
         [TestMethod()]
-        public void MediaType_Add_Properties_To_Tab_Then_Delete_It_Test()
+        public void MediaType_Add_Properties_To_Tab_Then_Delete_It()
         {
             //System.Diagnostics.Debugger.Break();
 

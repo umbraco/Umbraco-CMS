@@ -70,7 +70,7 @@ namespace umbraco.Test
         }
 
         [TestMethod()]
-        public void User_Make_New_DuplicateLogin()
+        public void User_Make_New_Duplicate_Login()
         {
             var name1 = "TEST" + Guid.NewGuid().ToString("N");
             var name2 = "TEST" + Guid.NewGuid().ToString("N");

@@ -39,7 +39,7 @@ namespace umbraco.Test
         /// and completely deletes from system.) This should completely delete all of these nodes from the database.
         /// </summary>
         [TestMethod()]
-        public void Document_DeleteHeirarchyPermanentlyTest()
+        public void Document_Delete_Heirarchy_Permanently()
         {
             var docList = new List<Document>();
             var total = 20;
@@ -73,7 +73,7 @@ namespace umbraco.Test
         ///A test for PublishWithResult
         ///</summary>
         [TestMethod()]
-        public void Document_PublishWithResultTest()
+        public void Document_Publish_With_Result()
         {
             var val = m_NewRootDoc.PublishWithResult(m_User);            
         }
@@ -82,7 +82,7 @@ namespace umbraco.Test
         /// Creates a doc type, assigns a domain to it and removes it
         /// </summary>
         [TestMethod()]
-        public void Document_AssignDomainTest()
+        public void Document_Assign_Domain()
         {
             var d = CreateNewUnderRoot(GetExistingDocType());
 
@@ -111,7 +111,7 @@ namespace umbraco.Test
         ///and then deletes it.
         ///</summary>
         [TestMethod()]
-        public void Document_MakeNewTest()
+        public void Document_Make_New()
         {
             Assert.IsInstanceOfType(m_NewRootDoc, typeof(Document));
         }
@@ -122,7 +122,7 @@ namespace umbraco.Test
         /// lookup the root docs to do the test.
         ///</summary>
         [TestMethod()]
-        public void Document_CopyTest()
+        public void Document_Copy()
         {
             //System.Diagnostics.Debugger.Break();
             Document target = new Document(GetExistingNodeId());
@@ -156,7 +156,7 @@ namespace umbraco.Test
         /// Tests copying by relating nodes, then deleting
         /// </summary>
         [TestMethod()]
-        public void Document_CopyAndRelateTest()
+        public void Document_Copy_And_Relate()
         {
             //System.Diagnostics.Debugger.Break();
             Document target = new Document(GetExistingNodeId());
@@ -185,7 +185,7 @@ namespace umbraco.Test
         ///Create a new document, create preview xml for it, then delete it
         ///</summary>
         [TestMethod()]
-        public void Document_ToPreviewXmlTest()
+        public void Document_To_Preview_Xml()
         {
             //System.Diagnostics.Debugger.Break();
             var doc = m_NewRootDoc;
@@ -203,7 +203,7 @@ namespace umbraco.Test
         /// Run test to create a node, publish it and delete it. This will test the versioning too.
         /// </summary>
         [TestMethod()]
-        public void Document_MakeNewAndPublishTest()
+        public void Document_Make_New_And_Publish()
         {
             //System.Diagnostics.Debugger.Break();
             var doc = m_NewRootDoc;
@@ -222,7 +222,7 @@ namespace umbraco.Test
         ///A test that creates a new document, publishes it, unpublishes it and finally deletes it
         ///</summary>
         [TestMethod()]
-        public void Document_PublishThenUnPublishTest()
+        public void Document_Publish_Then_UnPublish()
         {
             //System.Diagnostics.Debugger.Break();
             var doc = m_NewRootDoc;
@@ -245,7 +245,7 @@ namespace umbraco.Test
         ///A test that makes a new document, updates some properties, saves and publishes the document, then rolls the document back and finally deletes it.
         ///</summary>
         [TestMethod()]
-        public void Document_SaveAndPublishThenRollBackTest()
+        public void Document_Save_And_Publish_Then_Roll_Back()
         {
             //System.Diagnostics.Debugger.Break();
 
@@ -289,7 +289,7 @@ namespace umbraco.Test
         ///them as children of each other to ensure the deletion occurs correctly.
         ///</summary>
         [TestMethod()]
-        public void Document_DeleteAllDocsByDocumentTypeTest()
+        public void Document_Delete_All_Docs_By_Document_Type()
         {
             //System.Diagnostics.Debugger.Break();
 
@@ -349,7 +349,7 @@ namespace umbraco.Test
         /// then move it to the second one and finally delete everything that was created.
         /// </summary>
         [TestMethod]
-        public void Document_MoveTest()
+        public void Document_Move()
         {
             //first need to document type that allows other types of document types to exist underneath it
             DocumentType parent = null;
@@ -394,7 +394,7 @@ namespace umbraco.Test
         /// This will find an existing node, copy it to the same parent, delete the copied node and restore it, then finally completley remove it.
         /// </summary>
         [TestMethod]
-        public void Document_UndeleteTest()
+        public void Document_Undelete()
         {
             //find existing content
             var doc = new Document(GetExistingNodeId());
@@ -422,7 +422,7 @@ namespace umbraco.Test
         /// This method will create 20 content nodes, send them to the recycle bin and then empty the recycle bin
         /// </summary>
         [TestMethod]
-        public void Document_EmptyRecycleBinTest()
+        public void Document_Empty_Recycle_Bin()
         {
             var docList = new List<Document>();
             var total = 20;
