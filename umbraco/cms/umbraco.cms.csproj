@@ -191,6 +191,7 @@
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
     <Compile Include="businesslogic\datatype\ClientDependencyAttribute.cs" />
     <Compile Include="businesslogic\datatype\DBTypes.cs" />
+    <Compile Include="businesslogic\datatype\PreValue.cs" />
     <Compile Include="businesslogic\ISaveHandlerContents.cs" />
     <Compile Include="businesslogic\Packager\FileResources\PackageFiles.Designer.cs">
       <AutoGen>True</AutoGen>

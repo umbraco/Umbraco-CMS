@@ -136,6 +136,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataTypeDefinitionTest.cs" />
     <Compile Include="DictionaryTest.cs" />
     <Compile Include="DocumentTest.cs" />
     <Compile Include="DocumentTypeTest.cs" />
@@ -145,6 +146,7 @@
     <Compile Include="MemberTest.cs" />
     <Compile Include="MemberTypeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyTypeTest.cs" />
     <Compile Include="UserTest.cs" />
   </ItemGroup>
   <ItemGroup>

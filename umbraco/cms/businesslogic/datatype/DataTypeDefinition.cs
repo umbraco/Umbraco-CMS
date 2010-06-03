@@ -5,6 +5,7 @@ using System.Collections;
 using umbraco.DataLayer;
 using System.Xml;
 using umbraco.interfaces;
+using umbraco.cms.businesslogic.propertytype;
 
 namespace umbraco.cms.businesslogic.datatype
 {
@@ -66,6 +67,16 @@ namespace umbraco.cms.businesslogic.datatype
         #region Public methods
         public override void delete()
         {
+            //first clear the prevalues
+            PreValues.DeleteByDataTypeDefinition(this.Id);
+           
+            //next clear out the property types
+            var propTypes = PropertyType.GetByDataTypeDefinition(this.Id);
+            foreach (var p in propTypes)
+            {
+                p.delete();
+            }
+
             //delete the cmsDataType role, then the umbracoNode
             SqlHelper.ExecuteNonQuery("delete from cmsDataType where nodeId=@nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
             base.delete();
@@ -295,14 +306,16 @@ namespace umbraco.cms.businesslogic.datatype
         {
             base.setupNode();
 
-            IRecordsReader dr = SqlHelper.ExecuteReader("select dbType, controlId from cmsDataType where nodeId = '" + this.Id.ToString() + "'");
-            if (dr.Read())
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("select dbType, controlId from cmsDataType where nodeId = '" + this.Id.ToString() + "'"))
             {
-                _controlId = dr.GetGuid("controlId");
+                if (dr.Read())
+                {
+                    _controlId = dr.GetGuid("controlId");
+                }
+                else
+                    throw new ArgumentException("No dataType with id = " + this.Id.ToString() + " found");
             }
-            else
-                throw new ArgumentException("No dataType with id = " + this.Id.ToString() + " found");
-            dr.Close();
+            
         } 
         #endregion
 

@@ -566,12 +566,25 @@ namespace umbraco.cms.businesslogic
             IDataType uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
 
             foreach (Property p in GenericProperties)
-            {
-
-                if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id &&
-                    p.Value.ToString() != "" &&
-                    File.Exists(IOHelper.MapPath(p.Value.ToString())))
+            {               
+                var isUploadField = false;
+                try
                 {
+                    if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id
+                         && p.Value.ToString() != ""
+                         && File.Exists(IOHelper.MapPath(p.Value.ToString())))
+                    {
+                        isUploadField = true;
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    //the data type definition may not exist anymore at this point because another thread may
+                    //have deleted it.
+                    isUploadField = false;
+                }
+                if (isUploadField)
+                {                    
                     var fi = new FileInfo(IOHelper.MapPath(p.Value.ToString()));
 
                     fi.Directory.GetFiles().ToList().ForEach(x =>
@@ -580,7 +593,6 @@ namespace umbraco.cms.businesslogic
                     });
                     fi.Directory.Delete(true);
                 }
-
             }
         }
 

@@ -110,19 +110,13 @@ namespace umbraco.cms.businesslogic
         /// <returns></returns>
         public static ContentType GetContentType(int id)
         {
-            if (HttpRuntime.Cache[string.Format("UmbracoContentType{0}", id.ToString())] == null)
-            {
-                lock (m_Locker)
+            return Cache.GetCacheItem<ContentType>(string.Format("UmbracoContentType{0}", id.ToString()),
+                m_Locker,
+                TimeSpan.FromMinutes(30),
+                delegate
                 {
-                    //double check
-                    if (HttpRuntime.Cache[string.Format("UmbracoContentType{0}", id.ToString())] == null)
-                    {
-                        ContentType ct = new ContentType(id);
-                        HttpRuntime.Cache.Insert(string.Format("UmbracoContentType{0}", id.ToString()), ct);
-                    }
-                }                
-            }
-            return (ContentType)HttpRuntime.Cache[string.Format("UmbracoContentType{0}", id.ToString())];
+                    return new ContentType(id);
+                });            
         }
 
         /// <summary>
@@ -756,20 +750,8 @@ namespace umbraco.cms.businesslogic
         /// <param name="Id">The id.</param>
         protected void FlushFromCache(int Id)
         {
-            if (HttpRuntime.Cache[string.Format("UmbracoContentType{0}", Id.ToString())] != null)
-            {
-                lock (m_Locker)
-                {
-                    //double check
-                    if (HttpRuntime.Cache[string.Format("UmbracoContentType{0}", Id.ToString())] != null)
-                    {
-                        HttpRuntime.Cache.Remove(string.Format("UmbracoContentType{0}", Id.ToString()));
-                    }                    
-                }
-            }
-
-            string cacheKey = GetPropertiesCacheKey();
-            Cache.ClearCacheItem(cacheKey);
+            Cache.ClearCacheItem(string.Format("UmbracoContentType{0}", Id.ToString()));
+            Cache.ClearCacheItem(GetPropertiesCacheKey());
 
             ClearVirtualTabs();
         }

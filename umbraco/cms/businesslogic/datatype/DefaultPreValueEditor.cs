@@ -16,6 +16,8 @@ namespace umbraco.cms.businesslogic.datatype
 
         // referenced datatype
         private cms.businesslogic.datatype.BaseDataType _datatype;
+        
+        //WHY IS THIS HERE... IT IS NEVER SET!?
         private BaseDataType _datatypeOld;
 
         private bool _isEnsured = false;
@@ -130,17 +132,11 @@ namespace umbraco.cms.businesslogic.datatype
                 else
                     throw new ArgumentException("Datatype is not initialized");
 
-
-                bool hasPrevalue = (SqlHelper.ExecuteScalar<int>("select count(id) from cmsDataTypePreValues where dataTypeNodeId = " + defId) > 0);
-                IParameter[] SqlParams = new IParameter[]
-                    {
-                        SqlHelper.CreateParameter("@value", _textbox.Text),
-                        SqlHelper.CreateParameter("@dtdefid", defId)
-                    };
+                bool hasPrevalue = PreValues.CountOfPreValues(defId) > 0;
+                
                 if (!hasPrevalue)
                 {
-                    SqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",
-                                              SqlParams);
+                    PreValue.MakeNew(defId, _textbox.Text);
                 }
                 _isEnsured = true;
             }
@@ -195,6 +191,7 @@ namespace umbraco.cms.businesslogic.datatype
 
         }
 
+        [Obsolete("Use the PreValues class for data access instead")]
         public static string GetPrevalueFromId(int Id)
         {
             return SqlHelper.ExecuteScalar<string>("Select [value] from cmsDataTypePreValues where id = @id",

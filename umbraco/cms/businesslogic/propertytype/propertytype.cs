@@ -4,7 +4,7 @@ using System.Data;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Web.UI;
-
+using System.Linq;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.cms.businesslogic.language;
@@ -250,29 +250,19 @@ namespace umbraco.cms.businesslogic.propertytype
 		    PropertyType pt;
 			try
 			{
-                // The method is synchronized
+                // The method is synchronized, but we'll still look it up with an additional parameter (alias)
                 SqlHelper.ExecuteNonQuery("INSERT INTO cmsPropertyType (DataTypeId, ContentTypeId, alias, name) VALUES (@DataTypeId, @ContentTypeId, @alias, @name)",
                     SqlHelper.CreateParameter("@DataTypeId", dt.Id),
                     SqlHelper.CreateParameter("@ContentTypeId", ct.Id),
                     SqlHelper.CreateParameter("@alias", helpers.Casing.SafeAliasWithForcingCheck(Alias)),
                     SqlHelper.CreateParameter("@name", Name));
-                pt = new PropertyType(SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyType"));
+                pt = new PropertyType(SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyType WHERE alias=@alias",
+                    SqlHelper.CreateParameter("@alias", Alias)));
 			}
 			finally
 			{
 				// Clear cached items
-				System.Web.Caching.Cache c = System.Web.HttpRuntime.Cache;
-				if (c != null)
-				{
-					System.Collections.IDictionaryEnumerator cacheEnumerator = c.GetEnumerator();
-					while (cacheEnumerator.MoveNext())
-					{
-						if (cacheEnumerator.Key is string && ((string)cacheEnumerator.Key).StartsWith(UmbracoPropertyTypeCacheKey))
-						{
-							Cache.ClearCacheItem((string)cacheEnumerator.Key);
-						}
-					}
-				}
+                Cache.ClearCacheByKeySearch(UmbracoPropertyTypeCacheKey);               
 			}
 
 		    return pt;
@@ -289,10 +279,33 @@ namespace umbraco.cms.businesslogic.propertytype
 					PropertyType pt = GetPropertyType(dr.GetInt("id"));
 					if(pt != null)
 						result.Add(pt);
-				}
-				return result.ToArray();
+				}				
 			}
+            return result.ToArray();
 		}
+
+        /// <summary>
+        /// Returns all property types based on the data type definition
+        /// </summary>
+        /// <param name="dataTypeDefId"></param>
+        /// <returns></returns>
+        public static IEnumerable<PropertyType> GetByDataTypeDefinition(int dataTypeDefId)
+        {
+            List<PropertyType> result = new List<PropertyType>();
+            using (IRecordsReader dr =
+                SqlHelper.ExecuteReader(
+                    "select id, Name from cmsPropertyType where dataTypeId=@dataTypeId order by Name",
+                    SqlHelper.CreateParameter("@dataTypeId", dataTypeDefId)))
+            {
+                while (dr.Read())
+                {
+                    PropertyType pt = GetPropertyType(dr.GetInt("id"));
+                    if (pt != null)
+                        result.Add(pt);
+                }                
+            }
+            return result.ToList();
+        }
 
 		public void delete()
 		{
@@ -301,9 +314,13 @@ namespace umbraco.cms.businesslogic.propertytype
 
 			// Delete all properties of propertytype
             var objs = Content.getContentOfContentType(new ContentType(_contenttypeid));
-			foreach(Content c in objs)
+			foreach(Content c in objs.ToList())
 			{
-				c.getProperty(this).delete();
+                var prop = c.getProperty(this);
+				if (prop != null) 
+                {
+                    prop.delete();   
+                }
 			}
 			// Delete PropertyType ..
 			SqlHelper.ExecuteNonQuery("Delete from cmsPropertyType where id = " + this.Id);
