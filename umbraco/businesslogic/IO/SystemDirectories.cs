@@ -146,7 +146,7 @@ namespace umbraco.IO
         {
             get
             {
-                string appPath = HttpRuntime.AppDomainAppVirtualPath;
+                string appPath = HttpRuntime.AppDomainAppVirtualPath ?? string.Empty;
                 if (appPath == "/")
                     appPath = string.Empty;
 

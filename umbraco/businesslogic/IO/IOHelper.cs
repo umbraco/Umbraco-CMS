@@ -9,7 +9,7 @@ using umbraco.BusinessLogic;
 
 namespace umbraco.IO
 {
-    public class IOHelper
+    public static class IOHelper
     {
         private static string m_rootDir = "";
 

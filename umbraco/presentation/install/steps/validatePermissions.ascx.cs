@@ -72,7 +72,7 @@ namespace umbraco.presentation.install.steps
             // Test umbraco.xml file
             try
             {
-                content.Instance.SaveContentToDisk(content.Instance.XmlContent);
+                content.Instance.PersistXmlToFile();
                 xmlResult.Text = "Success!";
             }
             catch (Exception ee)

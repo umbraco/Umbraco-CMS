@@ -1,11 +1,6 @@
-/// <changelog>
-///   <item who="Esben" when="18. november 2006">Rewrote</item>
-/// </changelog>
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -29,7 +24,7 @@ namespace umbraco
     {
         #region Declarations
 
-        private string _umbracoXmlDiskCacheFileName = IOHelper.MapPath(SystemFiles.ContentCacheXml, false);
+        private string _umbracoXmlDiskCacheFileName = string.Empty;
 
         /// <summary>
         /// Gets the path of the umbraco XML disk cache file.
@@ -39,6 +34,10 @@ namespace umbraco
         {
             get
             {
+                if (string.IsNullOrEmpty(_umbracoXmlDiskCacheFileName))
+                {
+                    _umbracoXmlDiskCacheFileName = IOHelper.MapPath(SystemFiles.ContentCacheXml);
+                }
                 return _umbracoXmlDiskCacheFileName;
             }
             set
@@ -47,25 +46,19 @@ namespace umbraco
             }
         }
 
-
-        /*
-            HttpRuntime.AppDomainAppPath + '\\' +  
-            SystemFiles.ContentCacheXml.Replace('/', '\\').TrimStart('\\');
-        */
-
         private readonly string XmlContextContentItemKey = "UmbracoXmlContextContent";
 
         // Current content
         private volatile XmlDocument _xmlContent = null;
 
         // Sync access to disk file
-        private object _readerWriterSyncLock = new object();
+        private static object _readerWriterSyncLock = new object();
 
         // Sync access to internal cache
-        private object _xmlContentInternalSyncLock = new object();
+        private static object _xmlContentInternalSyncLock = new object();
 
         // Sync database access
-        private object _dbReadSyncLock = new object();
+        private static object _dbReadSyncLock = new object();
 
         #endregion
 
@@ -108,8 +101,6 @@ namespace umbraco
         /// subsequent calls will be blocked until initialization is done
         /// Further we cache(in context) xmlContent for each request to ensure that
         /// we always have the same XmlDoc throughout the whole request.
-        /// Note that context cache does not need to be locked, because all access
-        /// to it is done from a web request which runs in a single thread
         /// </summary>
         public virtual XmlDocument XmlContent
         {
@@ -159,10 +150,10 @@ namespace umbraco
                     _xmlContent = value;
 
                     if (!UmbracoSettings.isXmlContentCacheDisabled && UmbracoSettings.continouslyUpdateXmlDiskCache)
-                        SaveContentToDiskAsync(_xmlContent);
+                        QueueXmlForPersistence();
                     else
                         // Clear cache...
-                        ClearDiskCacheAsync();
+                        DeleteXmlCache();
                 }
             }
         }
@@ -187,7 +178,7 @@ namespace umbraco
                         // TODO: Re-architect this so that a call to this method doesn't invoke a new thread for saving disk cache
                         if (!UmbracoSettings.isXmlContentCacheDisabled && !IsValidDiskCachePresent())
                         {
-                            SaveContentToDiskAsync(_xmlContent);
+                            QueueXmlForPersistence();
                         }
                         return true;
                     }
@@ -225,8 +216,12 @@ namespace umbraco
                         XmlDocument xmlDoc = LoadContentFromDatabase();
                         XmlContentInternal = xmlDoc;
 
-                        if (!UmbracoSettings.isXmlContentCacheDisabled)
-                            SaveContentToDisk(xmlDoc);
+                        // It is correct to manually call PersistXmlToFile here event though the setter of XmlContentInternal
+                        // queues this up, because this delegate is executing on a different thread and may complete
+                        // after the request which invoked it (which would normally persist the file on completion)
+                        // So we are responsible for ensuring the content is persisted in this case.
+                        if (!UmbracoSettings.isXmlContentCacheDisabled && UmbracoSettings.continouslyUpdateXmlDiskCache)
+                            PersistXmlToFile(xmlDoc);
                     });
 
                 FireAfterRefreshContent(e);
@@ -448,6 +443,7 @@ namespace umbraco
             }
         }
 
+        [Obsolete("Method obsolete in version 4.1 and later, please use UpdateDocumentCache", true)]
         /// <summary>
         /// Updates the document cache async.
         /// </summary>
@@ -459,6 +455,7 @@ namespace umbraco
 
 
 
+        [Obsolete("Method obsolete in version 4.1 and later, please use ClearDocumentCache", true)]
         /// <summary>
         /// Clears the document cache async.
         /// </summary>
@@ -536,7 +533,7 @@ namespace umbraco
         /// Unpublishes the  node.
         /// </summary>
         /// <param name="documentId">The document id.</param>
-        [Obsolete("Please use: umbraco.content.ClearDocumentCache")]
+        [Obsolete("Please use: umbraco.content.ClearDocumentCache", true)]
         public virtual void UnPublishNode(int documentId)
         {
             ClearDocumentCache(documentId);
@@ -546,7 +543,7 @@ namespace umbraco
         /// Uns the publish node async.
         /// </summary>
         /// <param name="documentId">The document id.</param>
-        [Obsolete("Please use: umbraco.content.ClearDocumentCacheAsync")]
+        [Obsolete("Please use: umbraco.content.ClearDocumentCacheAsync", true)]
         public virtual void UnPublishNodeAsync(int documentId)
         {
             ThreadPool.QueueUserWorkItem(delegate { ClearDocumentCache(documentId); });
@@ -556,7 +553,7 @@ namespace umbraco
         /// Legacy method - you should use the overloaded publishnode(document d) method whenever possible
         /// </summary>
         /// <param name="documentId"></param>
-        [Obsolete("Please use: umbraco.content.UpdateDocumentCache")]
+        [Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
         public virtual void PublishNode(int documentId)
         {
             // Get the document
@@ -568,7 +565,7 @@ namespace umbraco
         /// Publishes the node async.
         /// </summary>
         /// <param name="documentId">The document id.</param>
-        [Obsolete("Please use: umbraco.content.UpdateDocumentCacheAsync")]
+        [Obsolete("Please use: umbraco.content.UpdateDocumentCacheAsync", true)]
         public virtual void PublishNodeAsync(int documentId)
         {
             UpdateDocumentCacheAsync(documentId);
@@ -578,7 +575,7 @@ namespace umbraco
         /// Publishes the node.
         /// </summary>
         /// <param name="Documents">The documents.</param>
-        [Obsolete("Please use: umbraco.content.UpdateDocumentCache")]
+        [Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
         public virtual void PublishNode(List<Document> Documents)
         {
             UpdateDocumentCache(Documents);
@@ -589,7 +586,7 @@ namespace umbraco
         /// Publishes the node.
         /// </summary>
         /// <param name="d">The document.</param>
-        [Obsolete("Please use: umbraco.content.UpdateDocumentCache")]
+        [Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
         public virtual void PublishNode(Document d)
         {
             UpdateDocumentCache(d);
@@ -713,15 +710,21 @@ namespace umbraco
         /// <summary>
         /// Invalidates the disk content cache file. Effectively just deletes it.
         /// </summary>
-        private void ClearDiskCache()
+        private void DeleteXmlCache()
         {
             lock (_readerWriterSyncLock)
             {
                 if (File.Exists(UmbracoXmlDiskCacheFileName))
                 {
                     // Reset file attributes, to make sure we can delete file
-                    File.SetAttributes(UmbracoXmlDiskCacheFileName, FileAttributes.Normal);
-                    File.Delete(UmbracoXmlDiskCacheFileName);
+                    try
+                    {
+                        File.SetAttributes(UmbracoXmlDiskCacheFileName, FileAttributes.Normal);
+                    }
+                    finally
+                    {
+                        File.Delete(UmbracoXmlDiskCacheFileName);
+                    }
                 }
             }
         }
@@ -736,6 +739,7 @@ namespace umbraco
                 HttpContext.Current.Items.Remove(XmlContextContentItemKey);
         }
 
+        [Obsolete("This method is obsolete in version 4.1 and above, please use DeleteXmlCache", true)]
         /// <summary>
         /// Invalidates the disk content cache file. Effectively just deletes it.
         /// </summary>
@@ -745,7 +749,7 @@ namespace umbraco
             // We queue this function, because there can be a write process running at the same time
             // and we don't want this method to block web request
             ThreadPool.QueueUserWorkItem(
-                delegate { ClearDiskCache(); });
+                delegate { DeleteXmlCache(); });
         }
 
         /// <summary>
@@ -764,7 +768,7 @@ namespace umbraco
                 {
                     // This is really bad, loading from cache file failed for some reason, now fallback to loading from database
                     Debug.WriteLine("Content file cache load failed: " + e);
-                    ClearDiskCache();
+                    DeleteXmlCache();
                 }
             }
             return LoadContentFromDatabase();
@@ -772,7 +776,14 @@ namespace umbraco
 
         private bool IsValidDiskCachePresent()
         {
-            return File.Exists(UmbracoXmlDiskCacheFileName);
+            if (File.Exists(UmbracoXmlDiskCacheFileName))
+            {
+                // Only return true if we don't have a zero-byte file
+                var f = new FileInfo(UmbracoXmlDiskCacheFileName);
+                if (f.Length > 0)
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -803,90 +814,98 @@ namespace umbraco
         private XmlDocument LoadContentFromDatabase()
         {
             XmlDocument xmlDoc = new XmlDocument();
-            
-            // Moved User to a local variable - why are we causing user 0 to load from the DB though?
-            // Alex N 20100212
-            User staticUser = null;
+
+            // Alex N - 2010 06 - Very generic try-catch simply because at the moment, unfortunately, this method gets called inside a ThreadPool thread
+            // and we need to guarantee it won't tear down the app pool by throwing an unhandled exception
             try
             {
-                staticUser = User.GetCurrent();  //User.GetUser(0);
-            }
-            catch
-            {
-                /* We don't care later if the staticUser is null */
-            }
 
-            // Try to log to the DB
-            Log.Add(LogTypes.System, staticUser, -1, "Loading content from database...");
+                // Moved User to a local variable - why are we causing user 0 to load from the DB though?
+                // Alex N 20100212
+                User staticUser = null;
+                try
+                {
+                    staticUser = User.GetCurrent();  //User.GetUser(0);
+                }
+                catch
+                {
+                    /* We don't care later if the staticUser is null */
+                }
 
-            // Moved this to after the logging since the 2010 schema accesses the DB just to generate the DTD
-            InitContentDocumentBase(xmlDoc);           
+                // Try to log to the DB
+                Log.Add(LogTypes.System, staticUser, -1, "Loading content from database...");
 
-            Hashtable nodes = new Hashtable();
-            Hashtable parents = new Hashtable();
-            try
-            {
-                Log.Add(LogTypes.Debug, staticUser, -1, "Republishing starting");
+                // Moved this to after the logging since the 2010 schema accesses the DB just to generate the DTD
+                InitContentDocumentBase(xmlDoc);
 
-                // Esben Carlsen: At some point we really need to put all data access into to a tier of its own.
-                string sql =
-                    @"select umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, cmsContentXml.xml from umbracoNode 
+                Hashtable nodes = new Hashtable();
+                Hashtable parents = new Hashtable();
+                try
+                {
+                    Log.Add(LogTypes.Debug, staticUser, -1, "Republishing starting");
+
+                    // Esben Carlsen: At some point we really need to put all data access into to a tier of its own.
+                    string sql =
+                        @"select umbracoNode.id, umbracoNode.parentId, umbracoNode.sortOrder, cmsContentXml.xml from umbracoNode 
 inner join cmsContentXml on cmsContentXml.nodeId = umbracoNode.id and umbracoNode.nodeObjectType = @type
 order by umbracoNode.level, umbracoNode.sortOrder";
 
-                lock (_dbReadSyncLock)
-                {
-                    using (IRecordsReader dr = SqlHelper.ExecuteReader(sql, SqlHelper.CreateParameter("@type", new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"))))
+                    lock (_dbReadSyncLock)
                     {
-                        while (dr.Read())
+                        using (IRecordsReader dr = SqlHelper.ExecuteReader(sql, SqlHelper.CreateParameter("@type", new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"))))
                         {
-                            int currentId = dr.GetInt("id");
-                            int parentId = dr.GetInt("parentId");
-
-                            xmlDoc.LoadXml(dr.GetString("xml"));
-                            nodes.Add(currentId, xmlDoc.FirstChild);
-
-                            if (parents.ContainsKey(parentId))
-                                ((ArrayList)parents[parentId]).Add(currentId);
-                            else
+                            while (dr.Read())
                             {
-                                ArrayList a = new ArrayList();
-                                a.Add(currentId);
-                                parents.Add(parentId, a);
+                                int currentId = dr.GetInt("id");
+                                int parentId = dr.GetInt("parentId");
+
+                                xmlDoc.LoadXml(dr.GetString("xml"));
+                                nodes.Add(currentId, xmlDoc.FirstChild);
+
+                                if (parents.ContainsKey(parentId))
+                                    ((ArrayList)parents[parentId]).Add(currentId);
+                                else
+                                {
+                                    ArrayList a = new ArrayList();
+                                    a.Add(currentId);
+                                    parents.Add(parentId, a);
+                                }
                             }
                         }
                     }
+
+                    Log.Add(LogTypes.Debug, staticUser, -1, "Xml Pages loaded");
+
+                    // TODO: Why is the following line here, it should have already been generated? Alex N 20100212
+                    // Reset
+                    InitContentDocumentBase(xmlDoc);
+
+                    try
+                    {
+                        GenerateXmlDocument(parents, nodes, -1, xmlDoc.DocumentElement);
+
+                        Log.Add(LogTypes.Debug, staticUser, -1, "Done republishing Xml Index");
+                    }
+                    catch (Exception ee)
+                    {
+                        Log.Add(LogTypes.Error, staticUser, -1,
+                                string.Format("Error while generating XmlDocument from database: {0}", ee));
+                    }
                 }
-
-                Log.Add(LogTypes.Debug, staticUser, -1, "Xml Pages loaded");
-
-                // TODO: Why is the following line here, it should have already been generated? Alex N 20100212
-                // Reset
-                InitContentDocumentBase(xmlDoc);
-
-                try
+                catch (OutOfMemoryException)
                 {
-                    GenerateXmlDocument(parents, nodes, -1, xmlDoc.DocumentElement);
+                    Log.Add(LogTypes.Error, staticUser, -1,
+                            string.Format("Error Republishing: Out Of Memory. Parents: {0}, Nodes: {1}",
+                                          parents.Count, nodes.Count));
                 }
                 catch (Exception ee)
                 {
-                    Log.Add(LogTypes.Error, staticUser, -1,
-                            string.Format("Error while generating XmlDocument from database: {0}", ee));
+                    Log.Add(LogTypes.Error, staticUser, -1, string.Format("Error Republishing: {0}", ee));
                 }
-            }
-            catch (OutOfMemoryException)
-            {
-                Log.Add(LogTypes.Error, staticUser, -1,
-                        string.Format("Error Republishing: Out Of Memory. Parents: {0}, Nodes: {1}",
-                                      parents.Count, nodes.Count));
             }
             catch (Exception ee)
             {
-                Log.Add(LogTypes.Error, staticUser, -1, string.Format("Error Republishing: {0}", ee));
-            }
-            finally
-            {
-                Log.Add(LogTypes.Debug, staticUser, -1, "Done republishing Xml Index");
+                Log.Add(LogTypes.Error, -1, string.Format("Error Republishing: {0}", ee));
             }
 
             return xmlDoc;
@@ -925,72 +944,104 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                 }
             }
         }
+
+        public void PersistXmlToFile()
+        {
+            PersistXmlToFile(_xmlContent);
+        }
+
         /// <summary>
         /// Persist a XmlDocument to the Disk Cache
         /// </summary>
         /// <param name="xmlDoc"></param>
-        internal void SaveContentToDisk(XmlDocument xmlDoc)
+        internal void PersistXmlToFile(XmlDocument xmlDoc)
         {
             lock (_readerWriterSyncLock)
             {
-                Trace.Write(string.Format("Saving content to disk on thread '{0}' (Threadpool? {1})", Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread.ToString()));
-
-                // Moved the user into a variable and avoided it throwing an error if one can't be loaded (e.g. empty / corrupt db on initial install)
-                User staticUser = null;
-                try
+                if (xmlDoc != null)
                 {
-                    staticUser = User.GetCurrent();
-                }
-                catch
-                {}
+                    Trace.Write(string.Format("Saving content to disk on thread '{0}' (Threadpool? {1})", Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread.ToString()));
 
-                try
-                {
-                    Stopwatch stopWatch = Stopwatch.StartNew();
-
-                    ClearDiskCache();
-
-                    // Try to create directory for cache path if it doesn't yet exist
-                    if (!File.Exists(UmbracoXmlDiskCacheFileName) && !Directory.Exists(Path.GetDirectoryName(UmbracoXmlDiskCacheFileName)))
+                    // Moved the user into a variable and avoided it throwing an error if one can't be loaded (e.g. empty / corrupt db on initial install)
+                    User staticUser = null;
+                    try
                     {
-                        // We're already in a try-catch and saving will fail if this does, so don't need another
-                        Directory.CreateDirectory(UmbracoXmlDiskCacheFileName);
+                        staticUser = User.GetCurrent();
                     }
+                    catch
+                    { }
 
-                    xmlDoc.Save(UmbracoXmlDiskCacheFileName);
+                    try
+                    {
+                        Stopwatch stopWatch = Stopwatch.StartNew();
 
-                    Trace.Write(string.Format("Saved content on thread '{0}' in {1} (Threadpool? {2})", Thread.CurrentThread.Name, stopWatch.Elapsed, Thread.CurrentThread.IsThreadPoolThread.ToString()));
-                   Log.Add(LogTypes.Debug, staticUser, -1, string.Format("Xml saved in {0}", stopWatch.Elapsed));
-                }
-                catch (Exception ee)
-                {
-                    // If for whatever reason something goes wrong here, invalidate disk cache
-                    ClearDiskCache();
+                        DeleteXmlCache();
 
-                    Trace.Write(string.Format("Error saving content on thread '{0}' due to '{1}' (Threadpool? {2})", Thread.CurrentThread.Name, ee.Message, Thread.CurrentThread.IsThreadPoolThread.ToString()));
-                    Log.Add(LogTypes.Error, staticUser, -1, string.Format("Xml wasn't saved: {0}", ee));
+                        // Try to create directory for cache path if it doesn't yet exist
+                        if (!File.Exists(UmbracoXmlDiskCacheFileName) && !Directory.Exists(Path.GetDirectoryName(UmbracoXmlDiskCacheFileName)))
+                        {
+                            // We're already in a try-catch and saving will fail if this does, so don't need another
+                            Directory.CreateDirectory(UmbracoXmlDiskCacheFileName);
+                        }
+
+                        xmlDoc.Save(UmbracoXmlDiskCacheFileName);
+
+                        Trace.Write(string.Format("Saved content on thread '{0}' in {1} (Threadpool? {2})", Thread.CurrentThread.Name, stopWatch.Elapsed, Thread.CurrentThread.IsThreadPoolThread.ToString()));
+
+                        Log.Add(LogTypes.Debug, staticUser, -1, string.Format("Xml saved in {0}", stopWatch.Elapsed));
+                    }
+                    catch (Exception ee)
+                    {
+                        // If for whatever reason something goes wrong here, invalidate disk cache
+                        DeleteXmlCache();
+
+                        Trace.Write(string.Format("Error saving content on thread '{0}' due to '{1}' (Threadpool? {2})", Thread.CurrentThread.Name, ee.Message, Thread.CurrentThread.IsThreadPoolThread.ToString()));
+                        Log.Add(LogTypes.Error, staticUser, -1, string.Format("Xml wasn't saved: {0}", ee));
+                    }
                 }
             }
         }
 
+        internal const string PersistenceFlagContextKey = "vnc38ykjnkjdnk2jt98ygkxjng";
         /// <summary>
-        /// Persist xml document to disk cache in a background thread
+        /// Marks a flag in the HttpContext so that, upon page execution completion, the Xml cache will
+        /// get persisted to disk. Ensure this method is only called from a thread executing a page request
+        /// since umbraco.presentation.requestModule is the only monitor of this flag and is responsible
+        /// for enacting the persistence at the PostRequestHandlerExecute stage of the page lifecycle.
         /// </summary>
-        /// <param name="xmlDoc"></param>
-        private void SaveContentToDiskAsync(XmlDocument xmlDoc)
+        private void QueueXmlForPersistence()
         {
-            // Save copy of content
-            if (UmbracoSettings.CloneXmlCacheOnPublish)
+            /* Alex Norcliffe 2010 06 03 - removing all launching of ThreadPool threads, instead we just 
+             * flag on the context that the Xml should be saved and an event in the requestModule
+             * will check for this and call PersistXmlToFile() if necessary */
+            HttpContext.Current.Items[PersistenceFlagContextKey] = true;
+
+
+            //// Save copy of content
+            //if (UmbracoSettings.CloneXmlCacheOnPublish)
+            //{
+            //    XmlDocument xmlContentCopy = CloneXmlDoc(_xmlContent);
+
+            //    ThreadPool.QueueUserWorkItem(
+            //        delegate { PersistXmlToFile(xmlContentCopy); });
+
+            //}
+            //else
+            //    ThreadPool.QueueUserWorkItem(
+            //        delegate { PersistXmlToFile(); });
+        }
+
+        internal bool IsXmlQueuedForPersistenceToFile
+        {
+            get
             {
-                XmlDocument xmlContentCopy = CloneXmlDoc(xmlDoc);
-
-                ThreadPool.QueueUserWorkItem(
-                    delegate { SaveContentToDisk(xmlContentCopy); });
-
+                var val = HttpContext.Current.Items.Contains(PersistenceFlagContextKey);
+                if (val != null)
+                {
+                    return bool.Parse(val.ToString());
+                }
+                return false;
             }
-            else
-                ThreadPool.QueueUserWorkItem(
-                    delegate { SaveContentToDisk(xmlDoc); });
         }
 
         /// <summary>

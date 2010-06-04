@@ -69,7 +69,7 @@ namespace umbraco.presentation.cache
         /// </summary>
         /// <param name="Id">The id.</param>
         public void Refresh(int Id) {
-            content.Instance.PublishNode(Id);
+            content.Instance.UpdateDocumentCache(Id);
         }
 
 
@@ -78,7 +78,7 @@ namespace umbraco.presentation.cache
         /// </summary>
         /// <param name="Id">The id.</param>
         public void Remove(int Id) {
-            content.Instance.UnPublishNode(Id);
+            content.Instance.ClearDocumentCache(Id);
         }
 
     		#endregion

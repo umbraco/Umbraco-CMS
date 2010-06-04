@@ -68,7 +68,7 @@ namespace umbraco.webservices
         [WebMethod]
         public void SaveXmlCacheToDisk()
         {
-			content.Instance.SaveContentToDisk(content.Instance.XmlContent);
+            content.Instance.PersistXmlToFile();
         }
 
 		#region Component Designer generated code

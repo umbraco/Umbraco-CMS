@@ -287,8 +287,20 @@ namespace umbraco.presentation
             context.PostResolveRequestCache += new EventHandler(Application_PostResolveRequestCache);
 
             context.PreRequestHandlerExecute += new EventHandler(Application_PreRequestHandlerExecute);
+
+            // Alex Norcliffe - 2010 06 - Added a check at the end of the page lifecycle to see if we should persist Xml cache to disk
+            // (a replacement for all those parallel Async methods launching ThreadPool threads)
+            context.PostRequestHandlerExecute += new EventHandler(context_PostRequestHandlerExecute);
             context.Error += new EventHandler(Application_Error);
             mApp = context;
+        }
+
+        void context_PostRequestHandlerExecute(object sender, EventArgs e)
+        {
+            if (content.Instance.IsXmlQueuedForPersistenceToFile)
+            {
+                content.Instance.PersistXmlToFile();
+            }
         }
 
 
