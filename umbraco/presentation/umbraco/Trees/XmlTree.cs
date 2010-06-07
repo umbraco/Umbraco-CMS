@@ -239,7 +239,18 @@ namespace umbraco.cms.presentation.Trees
 			internal set { m_treeType = value; }
 		}
 
-		public bool HasChildren { get; set; }
+        public bool HasChildren
+        {
+            get
+            {
+                return m_HasChildren ?? !string.IsNullOrEmpty(this.Source); //defaults to true if source is specified
+            }
+            set
+            {
+                m_HasChildren = value;
+            }
+        }
+        private bool? m_HasChildren = null;
 
 		public string NodeID
 		{

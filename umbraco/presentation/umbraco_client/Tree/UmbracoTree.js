@@ -71,6 +71,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
             _treeClass: "umbTree", //used for other libraries to detect which elements are an umbraco tree
             _currenAJAXRequest: false, //used to determine if there is currently an ajax request being executed.
+            _isSyncing: false,
 
             addEventHandler: function(fnName, fn) {
                 /// <summary>Adds an event listener to the event name event</summary>
@@ -306,6 +307,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// <param name="forceReload">If true, will ensure that the node to be synced is synced with data from the server</param>
 
                 this._debug("syncTree: " + path + ", " + forceReload);
+
+                //set the flag so that multiple synces aren't attempted
+                this._isSyncing = true;
 
                 this._syncTree.call(this, path, forceReload, null, null);
 
@@ -827,6 +831,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 //if no node has been found at all in the entire path, then bubble an error event
                 if (!found) {
                     this._debug("no node found in path: " + path + " : " + numPaths);
+                    this._isSyncing = false; //reset flag
                     this._raiseEvent("syncNotFound", [path]);
                     return;
                 }
@@ -842,6 +847,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         }
                         else {
                             _this._debug("node not found in children: " + path + " : " + numPaths);
+                            this._isSyncing = false; //reset flag
                             _this._raiseEvent("syncNotFound", [path]);
                         }
                     });
@@ -849,7 +855,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 else {
                     //only force the reload of this nodes data if forceReload is specified and the node has not already come from the server
                     var doReload = (forceReload && (numAsync == null || numAsync < 1));
-                    this._debug("_syncTree: found! numAsync: " + numAsync + ", forceReload: " + forceReload + ", doReload: " + doReload);
+                    this._debug("_syncTree: found! numAsync: " + numAsync + ", forceReload: " + forceReload + ", doReload: " + doReload);                                        
                     if (doReload) {
                         this._actionNode = this.getNodeDef(found);
                         this.reloadActionNode(false, true, null);
@@ -859,6 +865,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         if (found.attr("id") != "-1") this.selectNode(found, true);
                         this._configureNodes(found, doReload);
                     }
+                    this._isSyncing = false; //reset flag
                     //bubble event
                     this._raiseEvent("syncFound", [found]);
                 }
