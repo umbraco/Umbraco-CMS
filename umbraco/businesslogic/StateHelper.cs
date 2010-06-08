@@ -250,12 +250,24 @@ namespace umbraco.BusinessLogic
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
-		public static void SetCookieValue(string key, string value)
-		{
-			SetCookieValue(HttpContext.Current, key, value);
-		}
+        public static void SetCookieValue(string key, string value)
+        {
+            SetCookieValue(HttpContext.Current, key, value);
+        }
 
-        public static void ClearCookie(string key) {
+        /// <summary>
+        /// Sets the cookie value including the number of days to persist the cookie
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="daysToPersist">How long the cookie should be present in the browser</param>
+        public static void SetCookieValue(string key, string value, double daysToPersist)
+        {
+            SetCookieValue(HttpContext.Current, key, value, daysToPersist);
+        }
+
+        public static void ClearCookie(string key)
+        {
             HttpContext ctx = HttpContext.Current;
 
             if (ctx.Request.Cookies[key] != null)
@@ -268,24 +280,36 @@ namespace umbraco.BusinessLogic
         /// <param name="context">The context.</param>
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
-		public static void SetCookieValue(HttpContext context, string key, string value)
-		{
-			if (context == null || context.Request == null)
-				return;
-			HttpCookie cookie = context.Request.Cookies[key];
-            
-			if (cookie == null)
-				cookie = new HttpCookie(key);
+        public static void SetCookieValue(HttpContext context, string key, string value)
+        {
+            SetCookieValue(context, key, value, 30);
+        }
 
-			cookie.Value = value;
+        /// <summary>
+        /// Sets the cookie value including the number of days to persist the cookie
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="daysToPersist">How long the cookie should be present in the browser</param>
+        public static void SetCookieValue(HttpContext context, string key, string value, double daysToPersist)
+        {
+            if (context == null || context.Request == null)
+                return;
+            HttpCookie cookie = context.Request.Cookies[key];
+
+            if (cookie == null)
+                cookie = new HttpCookie(key);
+
+            cookie.Value = value;
 
             // add default exp on a month
-		    cookie.Expires = DateTime.Now.AddMonths(1);
+            cookie.Expires = DateTime.Now.AddDays(daysToPersist);
 
             // if cookie exists, remove
             context.Response.Cookies.Add(cookie);
-		}
+        }
 
-		#endregion
+        #endregion
 	}
 }

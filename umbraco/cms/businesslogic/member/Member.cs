@@ -697,12 +697,14 @@ namespace umbraco.cms.businesslogic.member
 
                 if (!e.Cancel)
                 {
-                    removeCookie("umbracoMemberId");
+                    
+                    StateHelper.ClearCookie("umbracoMemberId");
 
                     // Add cookie with member-id, guid and loginname
-                    addCookie("umbracoMemberId", m.Id.ToString(), 365);
-                    addCookie("umbracoMemberGuid", m.UniqueId.ToString(), 365);
-                    addCookie("umbracoMemberLogin", m.LoginName, 365);
+                    
+                    StateHelper.SetCookieValue("umbracoMemberId", m.Id.ToString());
+                    StateHelper.SetCookieValue("umbracoMemberGuid", m.UniqueId.ToString());
+                    StateHelper.SetCookieValue("umbracoMemberLogin", m.LoginName);
 
                     //cache the member
                     var cachedMember = Cache.GetCacheItem<Member>(GetCacheKey(m.Id), m_Locker,
@@ -726,9 +728,9 @@ namespace umbraco.cms.businesslogic.member
         }
 
 
-
         #region cookieHelperMethods
 
+/*
         private static void removeCookie(string Name)
         {
             HttpCookie c = HttpContext.Current.Request.Cookies[Name];
@@ -781,7 +783,7 @@ namespace umbraco.cms.businesslogic.member
 
             return tempValue;
         }
-
+*/
         #endregion
 
         /// <summary>
@@ -808,12 +810,12 @@ namespace umbraco.cms.businesslogic.member
 
                     if (!UseSession)
                     {
-                        removeCookie("umbracoMemberId");
+                        StateHelper.ClearCookie("umbracoMemberId");
 
                         // Add cookie with member-id
-                        addCookie("umbracoMemberId", m.Id.ToString(), TimespanForCookie);
-                        addCookie("umbracoMemberGuid", m.UniqueId.ToString(), TimespanForCookie);
-                        addCookie("umbracoMemberLogin", m.LoginName, TimespanForCookie);
+                        StateHelper.SetCookieValue("umbracoMemberId", m.Id.ToString(), TimespanForCookie.TotalDays);
+                        StateHelper.SetCookieValue("umbracoMemberGuid", m.UniqueId.ToString(), TimespanForCookie.TotalDays);
+                        StateHelper.SetCookieValue("umbracoMemberLogin", m.LoginName, TimespanForCookie.TotalDays);
                     }
                     else
                     {
@@ -882,9 +884,9 @@ namespace umbraco.cms.businesslogic.member
             else
             {
                 // If the member doesn't exists as an object, we'll just make sure that cookies are cleared
-                removeCookie("umbracoMemberId");
-                removeCookie("umbracoMemberGuid");
-                removeCookie("umbracoMemberLogin");
+                StateHelper.ClearCookie("umbracoMemberId");
+                StateHelper.ClearCookie("umbracoMemberGuid");
+                StateHelper.ClearCookie("umbracoMemberLogin");
             }
 
             FormsAuthentication.SignOut();
@@ -899,9 +901,9 @@ namespace umbraco.cms.businesslogic.member
         public static void ClearMemberFromClient(int NodeId)
         {
 
-            removeCookie("umbracoMemberId");
-            removeCookie("umbracoMemberGuid");
-            removeCookie("umbracoMemberLogin");
+            StateHelper.ClearCookie("umbracoMemberId");
+            StateHelper.ClearCookie("umbracoMemberGuid");
+            StateHelper.ClearCookie("umbracoMemberLogin");
 
             RemoveMemberFromCache(NodeId);
 
@@ -1042,8 +1044,8 @@ namespace umbraco.cms.businesslogic.member
                     if (m == null)
                         m = new Member(_currentMemberId);
 
-                    if (HttpContext.Current.User.Identity.IsAuthenticated || (m.UniqueId == new Guid(getCookieValue("umbracoMemberGuid")) &&
-                       m.LoginName == getCookieValue("umbracoMemberLogin")))
+                    if (HttpContext.Current.User.Identity.IsAuthenticated || (m.UniqueId == new Guid(StateHelper.GetCookieValue("umbracoMemberGuid")) &&
+                       m.LoginName == StateHelper.GetCookieValue("umbracoMemberLogin")))
                         return m;
 
                     return null;
