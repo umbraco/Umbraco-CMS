@@ -44,11 +44,11 @@
             </fileset>
         </attrib>
 
-        <exec program="${win.dir}\microsoft.net\framework\v3.5\msbuild.exe">
+        <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
             <arg value="${root.dir}\umbraco.sln" />
         </exec>
 
-        <exec program="${win.dir}\microsoft.net\framework\v2.0.50727\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
+        <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
     </target>
 
 
