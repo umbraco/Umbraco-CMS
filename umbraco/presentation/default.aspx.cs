@@ -226,18 +226,6 @@ namespace umbraco
                         umbPageHolder.Populate(m_umbPage);
                     }
 
-                    // Stat
-                    if (GlobalSettings.EnableStat)
-                    {
-                        if (Session["umbracoSessionId"] != null)
-                        {
-                            // If session just has been initialized we should use the cookie from the response object
-                            if (Session["umbracoSessionId"] == null)
-                                cms.businesslogic.stat.Session.AddEntry(new Guid(Session["umbracoSessionId"].ToString()), m_umbPage.PageID);
-                            else
-                                cms.businesslogic.stat.Session.AddEntry(new Guid(Session["umbracoSessionId"].ToString()), m_umbPage.PageID);
-                        }
-                    }
                 }
                 else
                 {

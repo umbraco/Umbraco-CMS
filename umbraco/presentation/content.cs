@@ -146,6 +146,11 @@ namespace umbraco
                 {
                     // Clear macro cache
                     Cache.ClearCacheObjectTypes("umbraco.MacroCacheContent");
+                    // Clear library cache
+                    if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
+                    {
+                        Cache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
+                    }
                     requestHandler.ClearProcessedRequests();
                     _xmlContent = value;
 
@@ -1014,21 +1019,28 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             /* Alex Norcliffe 2010 06 03 - removing all launching of ThreadPool threads, instead we just 
              * flag on the context that the Xml should be saved and an event in the requestModule
              * will check for this and call PersistXmlToFile() if necessary */
-            HttpContext.Current.Items[PersistenceFlagContextKey] = true;
+            if (HttpContext.Current != null)
+            {
+                if (!HttpContext.Current.Items.Contains(PersistenceFlagContextKey))
+                    HttpContext.Current.Items.Add(PersistenceFlagContextKey, null);
+                HttpContext.Current.Items[PersistenceFlagContextKey] = true;
+            }
+            else
+            {
 
+                //// Save copy of content
+                if (UmbracoSettings.CloneXmlCacheOnPublish)
+                {
+                    XmlDocument xmlContentCopy = CloneXmlDoc(_xmlContent);
 
-            //// Save copy of content
-            //if (UmbracoSettings.CloneXmlCacheOnPublish)
-            //{
-            //    XmlDocument xmlContentCopy = CloneXmlDoc(_xmlContent);
+                    ThreadPool.QueueUserWorkItem(
+                        delegate { PersistXmlToFile(xmlContentCopy); });
 
-            //    ThreadPool.QueueUserWorkItem(
-            //        delegate { PersistXmlToFile(xmlContentCopy); });
-
-            //}
-            //else
-            //    ThreadPool.QueueUserWorkItem(
-            //        delegate { PersistXmlToFile(); });
+                }
+                else
+                    ThreadPool.QueueUserWorkItem(
+                        delegate { PersistXmlToFile(); });
+            }
         }
 
         internal bool IsXmlQueuedForPersistenceToFile

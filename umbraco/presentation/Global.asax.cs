@@ -5,7 +5,6 @@ using System.Threading;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.datatype.controls;
-using umbraco.cms.businesslogic.stat;
 
 namespace umbraco
 {
@@ -17,21 +16,6 @@ namespace umbraco
         protected virtual void Application_Start(object sender, EventArgs e)
         {
 
-        }
-
-        protected virtual void Session_Start(Object sender, EventArgs e)
-        {
-            if (GlobalSettings.EnableStat)
-            {
-                try
-                {
-                    new Session();
-                }
-                catch (Exception state)
-                {
-                    Log.Add(LogTypes.Error, BusinessLogic.User.GetUser(0), -1, "Error initializing stat: " + state);
-                }
-            }
         }
 
         protected virtual void Application_BeginRequest(object sender, EventArgs e)

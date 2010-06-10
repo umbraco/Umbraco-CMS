@@ -400,6 +400,7 @@
     <Compile Include="umbraco\cache\factory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="umbraco\cache\libraryRefreshers.cs" />
     <Compile Include="umbraco\cache\pageRefresher.cs">
       <SubType>Code</SubType>
     </Compile>
