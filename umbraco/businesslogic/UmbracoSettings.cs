@@ -367,6 +367,32 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Gets the duration in seconds to cache queries to umbraco library member and media methods
+        /// Default is 1800 seconds (30 minutes)
+        /// </summary>
+        public static int UmbracoLibraryCacheDuration
+        {
+            get
+            {
+                string libraryCacheDuration = GetKey("/settings/content/UmbracoLibraryCacheDuration");
+                if (String.IsNullOrEmpty(libraryCacheDuration))
+                    return 1800;
+                else
+                {
+                    try
+                    {
+                        return int.Parse(libraryCacheDuration);
+                    }
+                    catch
+                    {
+                        return 1800;
+                    }
+                }
+
+            }
+        }
+
+        /// <summary>
         /// Gets the path to the scripts folder used by the script editor.
         /// </summary>
         /// <value>The script folder path.</value>

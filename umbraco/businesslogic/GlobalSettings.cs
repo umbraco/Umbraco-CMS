@@ -272,21 +272,6 @@ namespace umbraco
         }
 
         /// <summary>
-        /// Stats database connection string. This can be used instead of the normal umbraco connection string to store umbracoStats data.
-        /// </summary>
-        /// <value>The stat db DSN.</value>
-        public static string StatDbDSN
-        {
-            get
-            {
-                string statdb = ConfigurationManager.AppSettings["umbracoStatDbDSN"];
-                if (string.IsNullOrEmpty(statdb))
-                    return DbDSN;
-                return statdb.Trim();
-            }
-        }
-
-        /// <summary>
         /// Gets a value indicating whether umbraco is running in [debug mode].
         /// </summary>
         /// <value><c>true</c> if [debug mode]; otherwise, <c>false</c>.</value>
@@ -510,38 +495,6 @@ namespace umbraco
             {
                 if (HttpContext.Current != null)
                     return bool.Parse(ConfigurationManager.AppSettings["umbracoHideTopLevelNodeFromPath"]);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether stat is enabled.
-        /// </summary>
-        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
-        public static bool EnableStat
-        {
-            get
-            {
-                string value = ConfigurationManager.AppSettings["umbracoEnableStat"];
-                bool result;
-                if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
-                    return result;
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether statistic logging happens async.
-        /// </summary>
-        /// <value><c>true</c> if async stats logging is enabled; otherwise, <c>false</c>.</value>
-        public static bool EnableAsyncStatLogging
-        {
-            get
-            {
-                string value = ConfigurationManager.AppSettings["umbracoAsyncStatLogging"];
-                bool result;
-                if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
-                    return result;
                 return false;
             }
         }

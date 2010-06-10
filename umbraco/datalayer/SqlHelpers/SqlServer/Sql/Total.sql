@@ -272,31 +272,6 @@ CREATE TABLE [cmsMember]
 ) 
  
 ; 
-CREATE TABLE [umbracoStatSession] 
-( 
-[id] [int] NOT NULL IDENTITY(1, 1), 
-[MemberId] [uniqueidentifier] NULL, 
-[NewsletterId] [int] NULL, 
-[ReturningUser] [bit] NOT NULL, 
-[SessionStart] [datetime] NOT NULL, 
-[SessionEnd] [datetime] NULL, 
-[Language] [nvarchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, 
-[UserAgent] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, 
-[Browser] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, 
-[BrowserVersion] [nvarchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, 
-[OperatingSystem] [nvarchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, 
-[Ip] [nvarchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, 
-[Referrer] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, 
-[ReferrerKeyword] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, 
-[allowCookies] [bit] NOT NULL CONSTRAINT [DF__umbracoSt__allow__22751F6C] DEFAULT (0), 
-[visitorId] [char] (36) COLLATE Danish_Norwegian_CI_AS NULL, 
-[browserType] [nvarchar] (255) COLLATE Danish_Norwegian_CI_AS NULL, 
-[isHuman] [bit] NULL CONSTRAINT [DF__umbracoSt__isHum__7C4F7684] DEFAULT (0) 
-) 
- 
-; 
-ALTER TABLE [umbracoStatSession] ADD CONSTRAINT [PK_umbracoStartSession] PRIMARY KEY CLUSTERED  ([id]) 
-; 
 CREATE TABLE [umbracoNode] 
 ( 
 [id] [int] NOT NULL IDENTITY(1, 1), 
@@ -521,16 +496,6 @@ CREATE TABLE [umbracoRelationType]
 ; 
 ALTER TABLE [umbracoRelationType] ADD CONSTRAINT [PK_umbracoRelationType] PRIMARY KEY CLUSTERED  ([id]) 
 ; 
-CREATE TABLE [umbracoStatEntry] 
-( 
-[SessionId] [int] NOT NULL, 
-[EntryTime] [datetime] NOT NULL, 
-[RefNodeId] [int] NOT NULL, 
-[NodeId] [int] NOT NULL 
-) 
- 
-; 
-ALTER TABLE [umbracoStatEntry] ADD CONSTRAINT [PK_umbracoStatEntry] PRIMARY KEY CLUSTERED  ([SessionId], [EntryTime], [RefNodeId], [NodeId]) 
 ; 
 CREATE TABLE [umbracoStylesheet] 
 ( 

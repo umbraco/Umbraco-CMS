@@ -505,6 +505,7 @@ namespace umbraco.BusinessLogic {
         /// <summary>
         /// Deletes this instance.
         /// </summary>
+        [Obsolete("Deleting users are NOT supported as history needs to be kept. Please use the disable() method instead")]
         public void delete() {
             OnDeleting(EventArgs.Empty);
 

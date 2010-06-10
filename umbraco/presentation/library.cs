@@ -28,6 +28,7 @@ using umbraco.IO;
 using umbraco.presentation;
 using System.Collections;
 using System.Collections.Generic;
+using umbraco.cms.businesslogic.cache;
 
 namespace umbraco
 {
@@ -55,6 +56,9 @@ namespace umbraco
         /// </summary>
         public static DateTime PublishStart;
         private page _page;
+        private static readonly object libraryCacheLock = new object();
+        private const string GETMEDIA_CACHE_KEY = "GetMedia";
+        private const string GETMEMBER_CACHE_KEY = "GetMember";
 
         #endregion
 
@@ -634,14 +638,24 @@ namespace umbraco
         {
             try
             {
-                Media m = new Media(MediaId);
-                if (m.nodeObjectType == Media._objectType)
+                if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
                 {
-                    XmlDocument mXml = new XmlDocument();
-                    mXml.LoadXml(m.ToXml(mXml, Deep).OuterXml);
-                    XPathNavigator xp = mXml.CreateNavigator();
-                    return xp.Select("/node");
+                    XPathNodeIterator retVal = Cache.GetCacheItem<XPathNodeIterator>(String.Format(
+                        "UL_{0}_{1}_{2}", GETMEDIA_CACHE_KEY, MediaId, Deep), libraryCacheLock,
+                        TimeSpan.FromSeconds(UmbracoSettings.UmbracoLibraryCacheDuration),
+                        delegate
+                        {
+                            return getMediaDo(MediaId, Deep);
+                        });
+
+                    if (retVal != null)
+                        return retVal;
                 }
+                else
+                {
+                    return getMediaDo(MediaId, Deep);
+                }
+
             }
             catch
             {
@@ -650,6 +664,20 @@ namespace umbraco
             XmlDocument xd = new XmlDocument();
             xd.LoadXml(string.Format("<error>No media is maching '{0}'</error>", MediaId));
             return xd.CreateNavigator().Select("/");
+        }
+
+        private static XPathNodeIterator getMediaDo(int MediaId, bool Deep)
+        {
+            Media m = new Media(MediaId);
+            if (m.nodeObjectType == Media._objectType)
+            {
+                XmlDocument mXml = new XmlDocument();
+                mXml.LoadXml(m.ToXml(mXml, Deep).OuterXml);
+                XPathNavigator xp = mXml.CreateNavigator();
+                string xpath = UmbracoSettings.UseLegacyXmlSchema ? "/node" : String.Format("/{0}", m.ContentType.Alias);
+                return xp.Select(xpath);
+            }
+            return null;
         }
 
         /// <summary>
@@ -663,11 +691,24 @@ namespace umbraco
         {
             try
             {
-                Member m = new Member(MemberId);
-                XmlDocument mXml = new XmlDocument();
-                mXml.LoadXml(m.ToXml(mXml, false).OuterXml);
-                XPathNavigator xp = mXml.CreateNavigator();
-                return xp.Select("/node");
+                if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
+                {
+                    XPathNodeIterator retVal = Cache.GetCacheItem<XPathNodeIterator>(String.Format(
+                        "UL_{0}_{1}", GETMEMBER_CACHE_KEY, MemberId), libraryCacheLock,
+                        TimeSpan.FromSeconds(UmbracoSettings.UmbracoLibraryCacheDuration),
+                        delegate
+                        {
+                            return getMemberDo(MemberId);
+                        });
+
+                    if (retVal != null)
+                        return retVal;
+                }
+                else
+                {
+                    return getMemberDo(MemberId);
+                }
+
             }
             catch
             {
@@ -677,6 +718,14 @@ namespace umbraco
             return xd.CreateNavigator().Select("/");
         }
 
+        private static XPathNodeIterator getMemberDo(int MemberId)
+        {
+            Member m = new Member(MemberId);
+            XmlDocument mXml = new XmlDocument();
+            mXml.LoadXml(m.ToXml(mXml, false).OuterXml);
+            XPathNavigator xp = mXml.CreateNavigator();
+            return xp.Select("/node");
+        }
         /// <summary>
         /// Get the current member as an xml node
         /// </summary>
@@ -1664,7 +1713,7 @@ namespace umbraco
             try
             {
                 if (Relative)
-                    xmlDoc.Load( IOHelper.MapPath(Path) );
+                    xmlDoc.Load(IOHelper.MapPath(Path));
                 else
                     xmlDoc.Load(Path);
             }
@@ -2001,6 +2050,50 @@ namespace umbraco
             return new CMSNode(NodeId).Relations;
         }
 
+
+
+        public static void ClearLibraryCacheForMedia(int mediaId)
+        {
+            if (UmbracoSettings.UseDistributedCalls)
+                dispatcher.Refresh(
+                    new Guid("B29286DD-2D40-4DDB-B325-681226589FEC"),
+                    mediaId);
+            else
+                ClearLibraryCacheForMediaDo(mediaId);
+        }
+
+        public static void ClearLibraryCacheForMediaDo(int mediaId)
+        {
+            Media m = new Media(mediaId);
+            if (m.nodeObjectType == Media._objectType)
+            {
+                foreach (string id in m.Path.Split(','))
+                {
+                    Cache.ClearCacheByKeySearch(String.Format("UL_{0}_{1}_", GETMEDIA_CACHE_KEY, id));
+                }
+            }
+        }
+
+        public static void ClearLibraryCacheForMember(int mediaId)
+        {
+            if (UmbracoSettings.UseDistributedCalls)
+                dispatcher.Refresh(
+                    new Guid("E285DF34-ACDC-4226-AE32-C0CB5CF388DA"),
+                    mediaId);
+            else
+                ClearLibraryCacheForMemberDo(mediaId);
+        }
+
+
+        public static void ClearLibraryCacheForMemberDo(int memberId)
+        {
+            Member m = new Member(memberId);
+            if (m.nodeObjectType == Member._objectType)
+            {
+                Cache.ClearCacheByKeySearch(String.Format("UL_{0}_{1}", GETMEMBER_CACHE_KEY, memberId));
+            }
+        }
+
         /// <summary>
         /// Gets the related nodes, of the node with the specified Id, as XML.
         /// </summary>
@@ -2080,7 +2173,7 @@ namespace umbraco
                 return string.Empty;
         }
 
-        
+
 
         /// <summary>
         /// Cleans the spified string with tidy
@@ -2144,5 +2237,42 @@ namespace umbraco
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// Special class made to listen to save events on objects where umbraco.library caches some of their objects
+    /// </summary>
+    public class LibraryCacheRefresher : ApplicationBase
+    {
+        public LibraryCacheRefresher()
+        {
+            if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
+            {
+                Member.AfterSave += new Member.SaveEventHandler(Member_AfterSave);
+                Member.AfterDelete += new Member.DeleteEventHandler(Member_AfterDelete);
+                Media.AfterSave += new Media.SaveEventHandler(Media_AfterSave);
+                Media.AfterDelete += new Media.DeleteEventHandler(Media_AfterDelete);
+            }
+        }
+
+        void Media_AfterDelete(Media sender, DeleteEventArgs e)
+        {
+            library.ClearLibraryCacheForMedia(sender.Id);
+        }
+
+        void Member_AfterDelete(Member sender, DeleteEventArgs e)
+        {
+            library.ClearLibraryCacheForMember(sender.Id);
+        }
+
+        void Media_AfterSave(Media sender, SaveEventArgs e)
+        {
+            library.ClearLibraryCacheForMedia(sender.Id);
+        }
+
+        void Member_AfterSave(Member sender, SaveEventArgs e)
+        {
+            library.ClearLibraryCacheForMember(sender.Id);
+        }
     }
 }

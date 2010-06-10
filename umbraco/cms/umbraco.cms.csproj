@@ -304,12 +304,6 @@
     <Compile Include="businesslogic\relation\RelationType.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\stat\Entry.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\stat\Session.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="businesslogic\task\Task.cs" />
     <Compile Include="businesslogic\task\TaskType.cs" />
     <Compile Include="businesslogic\template\Template.cs">

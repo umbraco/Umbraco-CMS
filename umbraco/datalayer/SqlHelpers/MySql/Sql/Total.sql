@@ -240,29 +240,6 @@ Password nvarchar (1000) NOT NULL DEFAULT ''
 ) 
  
 ; 
-CREATE TABLE umbracoStatSession 
-( 
-id int NOT NULL PRIMARY KEY AUTO_INCREMENT, 
-MemberId CHAR(36) NULL, 
-NewsletterId int NULL, 
-ReturningUser bit NOT NULL, 
-SessionStart datetime NOT NULL, 
-SessionEnd datetime NULL, 
-Language nvarchar (20) NOT NULL, 
-UserAgent nvarchar (255) NOT NULL, 
-Browser nvarchar (255) NOT NULL, 
-BrowserVersion nvarchar (20) NOT NULL, 
-OperatingSystem nvarchar (50) NOT NULL, 
-Ip nvarchar (50) NOT NULL, 
-Referrer nvarchar (255) NOT NULL, 
-ReferrerKeyword nvarchar (255) NOT NULL, 
-allowCookies bit NOT NULL DEFAULT 0, 
-visitorId char (36) NULL, 
-browserType nvarchar (255) NULL, 
-isHuman bit NULL DEFAULT 0 
-) 
- 
-; 
 CREATE TABLE umbracoNode 
 ( 
 id int NOT NULL PRIMARY KEY, 
@@ -460,17 +437,6 @@ name nvarchar (255) NOT NULL,
 alias nvarchar (100) NULL 
 )
  
-; 
-CREATE TABLE umbracoStatEntry 
-( 
-SessionId int NOT NULL, 
-EntryTime datetime NOT NULL, 
-RefNodeId int NOT NULL, 
-NodeId int NOT NULL 
-) 
- 
-; 
-ALTER TABLE umbracoStatEntry ADD CONSTRAINT PK_umbracoStatEntry PRIMARY KEY CLUSTERED  (SessionId, EntryTime, RefNodeId, NodeId) 
 ; 
 CREATE TABLE umbracoStylesheet 
 ( 
