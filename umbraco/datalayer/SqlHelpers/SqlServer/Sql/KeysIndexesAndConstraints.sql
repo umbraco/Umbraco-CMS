@@ -7,6 +7,24 @@ NOT GOING TO BREAK UMBRACO.
 
 */
 
+/************************** CLEANUP ***********************************************/
+
+/* CLEAN UNUSED CONTENT ROWS */
+select * from cmsContent where nodeId not in (select id from umbracoNode)
+
+/* CLEAN UNUSED VERSIONS */
+delete from cmsContentVersion where contentid not in (select nodeId from cmsContent)
+
+/* CLEAN UNUSED XML */
+delete from cmsContentXml where nodeid not in (select nodeId from cmsContent)
+
+/* CLEAN UNUSED DOCUMENT TYPES */
+delete from cmsDocumentType where contentTypeNodeId not in (select nodeId from cmsContentType)
+delete from cmsDocumentType where templateNodeId not in (select nodeid from cmsTemplate)
+
+/************************** CLEANUP END ********************************************/
+
+
 /* Create missing indexes and primary keys */
 CREATE NONCLUSTERED INDEX [IX_Icon] ON CMSContenttype(nodeId, Icon)
 ;
