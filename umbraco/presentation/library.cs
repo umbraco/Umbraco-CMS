@@ -2069,7 +2069,12 @@ namespace umbraco
             {
                 foreach (string id in m.Path.Split(','))
                 {
-                    Cache.ClearCacheByKeySearch(String.Format("UL_{0}_{1}_", GETMEDIA_CACHE_KEY, id));
+                    Cache.ClearCacheByKeySearch(String.Format("UL_{0}_{1}_True", GETMEDIA_CACHE_KEY, id));
+                
+                    // Also clear calls that only query this specific item!
+                    if (id == m.Id.ToString())
+                        Cache.ClearCacheByKeySearch(String.Format("UL_{0}_{1}", GETMEDIA_CACHE_KEY, id));
+
                 }
             }
         }
