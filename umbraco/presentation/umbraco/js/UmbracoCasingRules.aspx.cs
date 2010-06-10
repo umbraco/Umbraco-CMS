@@ -8,7 +8,7 @@ using umbraco.cms.helpers;
 
 namespace umbraco.presentation.js
 {
-    public partial class UmbracoCasingRules : System.Web.UI.Page
+    public partial class UmbracoCasingRules : BasePages.UmbracoEnsuredPage
     {
         protected void Page_Load(object sender, EventArgs e)
         {

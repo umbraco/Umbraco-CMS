@@ -1,10 +1,11 @@
 /**
- * $Id: form_utils.js 996 2009-02-06 17:32:20Z spocke $
+ * form_utils.js
  *
- * Various form utilitiy functions.
+ * Copyright 2009, Moxiecode Systems AB
+ * Released under LGPL License.
  *
- * @author Moxiecode
- * @copyright Copyright © 2004-2008, Moxiecode Systems AB, All rights reserved.
+ * License: http://tinymce.moxiecode.com/license
+ * Contributing: http://tinymce.moxiecode.com/contributing
  */
 
 var themeBaseURL = tinyMCEPopup.editor.baseURI.toAbsolute('themes/' + tinyMCEPopup.getParam("theme"));
@@ -92,7 +93,7 @@ function selectByValue(form_obj, field_name, value, add_custom, ignore_case) {
 function getSelectValue(form_obj, field_name) {
 	var elm = form_obj.elements[field_name];
 
-	if (elm == null || elm.options == null)
+	if (elm == null || elm.options == null || elm.selectedIndex === -1)
 		return "";
 
 	return elm.options[elm.selectedIndex].value;

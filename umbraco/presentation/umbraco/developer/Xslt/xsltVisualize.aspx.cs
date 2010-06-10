@@ -11,7 +11,7 @@ using umbraco.IO;
 
 namespace umbraco.presentation.umbraco.developer.Xslt
 {
-    public partial class xsltVisualize : System.Web.UI.Page
+    public partial class xsltVisualize : BasePages.UmbracoEnsuredPage
     {
         protected void Page_Load(object sender, EventArgs e)
         {

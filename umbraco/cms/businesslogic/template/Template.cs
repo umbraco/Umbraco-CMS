@@ -19,6 +19,7 @@ namespace umbraco.cms.businesslogic.template
     /// </summary>
     public class Template : CMSNode
     {
+        private static object _templateLoaderLocker = new object(); 
         private static Guid _objectType = new Guid("6fbde604-4178-42ce-a10b-8a2600a2f07d");
         private string _OutputContentType;
         private string _design;
@@ -357,11 +358,14 @@ namespace umbraco.cms.businesslogic.template
         {
             if (!_templateAliasesInitialized)
             {
-                _templateAliases.Clear();
-                foreach (Template t in GetAllAsList())
-                    TemplateAliases.Add(t.Alias.ToLower(), t.Id);
+                lock (_templateLoaderLocker)
+                {
+                    _templateAliases.Clear();
+                    foreach (Template t in GetAllAsList())
+                        TemplateAliases.Add(t.Alias.ToLower(), t.Id);
 
-                _templateAliasesInitialized = true;
+                    _templateAliasesInitialized = true;
+                }
             }
         }
 

@@ -13,8 +13,10 @@ using umbraco.editorControls.tinymce;
 using umbraco.IO;
 
 
-namespace umbraco.editorControls.tinyMCE3 {
-    public class TinyMCE : webcontrol.TinyMCEWebControl , IDataEditor, IMenuElement, ILiveEditingDataEditor {
+namespace umbraco.editorControls.tinyMCE3
+{
+    public class TinyMCE : webcontrol.TinyMCEWebControl, IDataEditor, IMenuElement, ILiveEditingDataEditor
+    {
         private IData _data;
         private bool m_isInLiveEditingMode = false;
         private bool _enableContextMenu = false;
@@ -36,12 +38,14 @@ namespace umbraco.editorControls.tinyMCE3 {
         private int m_maxImageWidth = 500;
 
 
-        public virtual string Plugins {
+        public virtual string Plugins
+        {
             get { return _plugins; }
             set { _plugins = value; }
         }
 
-        public TinyMCE(IData Data, string Configuration) {
+        public TinyMCE(IData Data, string Configuration)
+        {
             _data = Data;
             try
             {
@@ -242,7 +246,7 @@ namespace umbraco.editorControls.tinyMCE3 {
                     config.Add("event_elements", "div");
                     config.Add("paste_auto_cleanup_on_paste", "true");
 
-                    config.Add("valid_elements", tinyMCEConfiguration.ValidElements.Substring(1, tinyMCEConfiguration.ValidElements.Length-2));
+                    config.Add("valid_elements", tinyMCEConfiguration.ValidElements.Substring(1, tinyMCEConfiguration.ValidElements.Length - 2));
                     config.Add("invalid_elements", tinyMCEConfiguration.InvalidElements);
 
                     // custom commands
@@ -284,7 +288,8 @@ namespace umbraco.editorControls.tinyMCE3 {
 
         #region TreatAsRichTextEditor
 
-        public virtual bool TreatAsRichTextEditor {
+        public virtual bool TreatAsRichTextEditor
+        {
             get { return false; }
         }
 
@@ -292,7 +297,8 @@ namespace umbraco.editorControls.tinyMCE3 {
 
         #region ShowLabel
 
-        public virtual bool ShowLabel {
+        public virtual bool ShowLabel
+        {
             get { return _showLabel; }
         }
 
@@ -300,7 +306,8 @@ namespace umbraco.editorControls.tinyMCE3 {
 
         #region Editor
 
-        public Control Editor {
+        public Control Editor
+        {
             get { return this; }
         }
 
@@ -308,30 +315,38 @@ namespace umbraco.editorControls.tinyMCE3 {
 
         #region Save()
 
-        public virtual void Save() {
+        public virtual void Save()
+        {
             string parsedString = base.Text.Trim();
-            if (parsedString != string.Empty) {
+            if (parsedString != string.Empty)
+            {
                 parsedString = replaceMacroTags(parsedString).Trim();
 
                 // clean macros and add paragraph element for tidy
                 bool removeParagraphs = false;
-                if (parsedString.Length > 16 && parsedString.ToLower().Substring(0, 17) == "|||?umbraco_macro") {
+                if (parsedString.Length > 16 && parsedString.ToLower().Substring(0, 17) == "|||?umbraco_macro")
+                {
                     removeParagraphs = true;
                     parsedString = "<p>" + parsedString + "</p>";
                 }
 
                 // tidy html
 
-                if (UmbracoSettings.TidyEditorContent) {
+                if (UmbracoSettings.TidyEditorContent)
+                {
                     string tidyTxt = library.Tidy(parsedString, false);
-                    if (tidyTxt != "[error]") {
+                    if (tidyTxt != "[error]")
+                    {
                         // compensate for breaking macro tags by tidy
                         parsedString = tidyTxt.Replace("/?>", "/>");
-                        if (removeParagraphs) {
+                        if (removeParagraphs)
+                        {
                             if (parsedString.Length - parsedString.Replace("<", "").Length == 2)
                                 parsedString = parsedString.Replace("<p>", "").Replace("</p>", "");
                         }
-                    } else {
+                    }
+                    else
+                    {
                         // TODO
                         // How to log errors? _data.NodeId does not exist?
                         //BusinessLogic.Log.Add(BusinessLogic.LogTypes.Error, BusinessLogic.User.GetUser(0), _data.NodeId, "Error tidying txt from property: " + _data.PropertyId.ToString());
@@ -346,7 +361,8 @@ namespace umbraco.editorControls.tinyMCE3 {
 
                 // parse current domain and instances of slash before anchor (to fix anchor bug)
                 // NH 31-08-2007
-                if (HttpContext.Current.Request.ServerVariables != null) {
+                if (HttpContext.Current.Request.ServerVariables != null)
+                {
                     parsedString = parsedString.Replace(helper.GetBaseUrl(HttpContext.Current) + "/#", "#");
                     parsedString = parsedString.Replace(helper.GetBaseUrl(HttpContext.Current), "");
                 }
@@ -363,8 +379,10 @@ namespace umbraco.editorControls.tinyMCE3 {
 
         #endregion
 
-        protected override void OnLoad(EventArgs e) {
-            try {
+        protected override void OnLoad(EventArgs e)
+        {
+            try
+            {
                 // add current page info
                 base.NodeId = ((cms.businesslogic.datatype.DefaultData)_data).NodeId;
                 base.VersionId = ((cms.businesslogic.datatype.DefaultData)_data).Version;
@@ -381,12 +399,15 @@ namespace umbraco.editorControls.tinyMCE3 {
                                "LiveEditingClientToolbar");
 
                 }
-                else {
+                else
+                {
                     config.Add("umbraco_toolbar_id",
                ElementIdPreFix + ((cms.businesslogic.datatype.DefaultData)_data).PropertyId.ToString());
 
                 }
-            } catch {
+            }
+            catch
+            {
                 // Empty catch as this is caused by the document doesn't exists yet,
                 // like when using this on an autoform
             }
@@ -394,34 +415,40 @@ namespace umbraco.editorControls.tinyMCE3 {
 
         }
 
-        protected override void OnInit(EventArgs e) {
+        protected override void OnInit(EventArgs e)
+        {
             base.OnInit(e);
             if (_data != null && _data.Value != null)
                 base.Text = _data.Value.ToString();
         }
 
-        private string replaceMacroTags(string text) {
-            while (findStartTag(text) > -1) {
+        private string replaceMacroTags(string text)
+        {
+            while (findStartTag(text) > -1)
+            {
                 string result = text.Substring(findStartTag(text), findEndTag(text) - findStartTag(text));
                 text = text.Replace(result, generateMacroTag(result));
             }
             return text;
         }
 
-        private string generateMacroTag(string macroContent) {
+        private string generateMacroTag(string macroContent)
+        {
             string macroAttr = macroContent.Substring(5, macroContent.IndexOf(">") - 5);
             string macroTag = "|||?UMBRACO_MACRO ";
             Hashtable attributes = ReturnAttributes(macroAttr);
             IDictionaryEnumerator ide = attributes.GetEnumerator();
-            while (ide.MoveNext()) {
-                if (ide.Key.ToString().IndexOf("umb_") != -1) {
+            while (ide.MoveNext())
+            {
+                if (ide.Key.ToString().IndexOf("umb_") != -1)
+                {
                     // Hack to compensate for Firefox adding all attributes as lowercase
                     string orgKey = ide.Key.ToString();
                     if (orgKey == "umb_macroalias")
                         orgKey = "umb_macroAlias";
 
                     macroTag += orgKey.Substring(4, orgKey.ToString().Length - 4) + "=|*|" +
-                                ide.Value.ToString() + "|*| ";
+ ide.Value.ToString().Replace("\\r\\n", Environment.NewLine) + "|*| ";
                 }
             }
             macroTag += "/|||";
@@ -429,7 +456,8 @@ namespace umbraco.editorControls.tinyMCE3 {
             return macroTag;
         }
 
-        public static Hashtable ReturnAttributes(String tag) {
+        public static Hashtable ReturnAttributes(String tag)
+        {
             Hashtable ht = new Hashtable();
             MatchCollection m =
                 Regex.Matches(tag, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",
@@ -441,17 +469,20 @@ namespace umbraco.editorControls.tinyMCE3 {
             return ht;
         }
 
-        private int findStartTag(string text) {
+        private int findStartTag(string text)
+        {
             string temp = "";
             text = text.ToLower();
-            if (text.IndexOf("ismacro=\"true\"") > -1) {
+            if (text.IndexOf("ismacro=\"true\"") > -1)
+            {
                 temp = text.Substring(0, text.IndexOf("ismacro=\"true\""));
                 return temp.LastIndexOf("<");
             }
             return -1;
         }
 
-        private int findEndTag(string text) {
+        private int findEndTag(string text)
+        {
             string find = "<!-- endumbmacro -->";
 
             int endMacroIndex = text.ToLower().IndexOf(find);
@@ -470,8 +501,10 @@ namespace umbraco.editorControls.tinyMCE3 {
 
         #region IDataFieldWithButtons Members
 
-        public object[] MenuIcons {
-            get {
+        public object[] MenuIcons
+        {
+            get
+            {
                 initButtons();
 
                 object[] tempIcons = new object[_menuIcons.Count];
@@ -481,8 +514,10 @@ namespace umbraco.editorControls.tinyMCE3 {
             }
         }
 
-        private void initButtons() {
-            if (!_isInitialized) {
+        private void initButtons()
+        {
+            if (!_isInitialized)
+            {
                 _isInitialized = true;
 
                 // Add icons for the editor control:
@@ -495,9 +530,12 @@ namespace umbraco.editorControls.tinyMCE3 {
                 // Link, Anchor
                 // Insert: Image, macro, table, formular
 
-                foreach (string button in _activateButtons.Split(',')) {
-                    if (button.Trim() != "") {
-                        try {
+                foreach (string button in _activateButtons.Split(','))
+                {
+                    if (button.Trim() != "")
+                    {
+                        try
+                        {
                             umbraco.editorControls.tinymce.tinyMCECommand cmd = (umbraco.editorControls.tinymce.tinyMCECommand)umbraco.editorControls.tinymce.tinyMCEConfiguration.Commands[button];
 
                             string appendValue = "";
@@ -508,7 +546,9 @@ namespace umbraco.editorControls.tinyMCE3 {
                                          new editorButton(cmd.Alias, ui.Text("buttons", cmd.Alias, null), cmd.Icon,
                                                           "tinyMCE.execInstanceCommand('" + ClientID + "', '" +
                                                           cmd.Command + "', " + cmd.UserInterface + appendValue + ")"));
-                        } catch (Exception ee) {
+                        }
+                        catch (Exception ee)
+                        {
                             Log.Add(LogTypes.Error, User.GetUser(0), -1,
                                     string.Format("TinyMCE: Error initializing button '{0}': {1}", button, ee.ToString()));
                         }
@@ -518,7 +558,8 @@ namespace umbraco.editorControls.tinyMCE3 {
                 // add save icon
                 int separatorPriority = 0;
                 IDictionaryEnumerator ide = _buttons.GetEnumerator();
-                while (ide.MoveNext()) {
+                while (ide.MoveNext())
+                {
                     object buttonObj = ide.Value;
                     int curPriority = (int)ide.Key;
 
@@ -528,7 +569,8 @@ namespace umbraco.editorControls.tinyMCE3 {
                         Math.Floor(decimal.Parse(separatorPriority.ToString()) / 10))
                         _menuIcons.Add("|");
 
-                    try {
+                    try
+                    {
                         editorButton e = (editorButton)buttonObj;
 
                         MenuIconI menuItem = new MenuIconClass();
@@ -538,7 +580,9 @@ namespace umbraco.editorControls.tinyMCE3 {
                         menuItem.AltText = e.alttag;
                         menuItem.ID = e.id;
                         _menuIcons.Add(menuItem);
-                    } catch {
+                    }
+                    catch
+                    {
                     }
 
                     separatorPriority = curPriority;
@@ -550,20 +594,25 @@ namespace umbraco.editorControls.tinyMCE3 {
 
         #region IMenuElement Members
 
-        public string ElementName {
+        public string ElementName
+        {
             get { return "div"; }
         }
 
-        public string ElementIdPreFix {
+        public string ElementIdPreFix
+        {
             get { return "umbTinymceMenu"; }
         }
 
-        public string ElementClass {
+        public string ElementClass
+        {
             get { return "tinymceMenuBar"; }
         }
 
-        public int ExtraMenuWidth {
-            get {
+        public int ExtraMenuWidth
+        {
+            get
+            {
                 initButtons();
                 return _buttons.Count * 40 + 300;
             }
@@ -575,7 +624,8 @@ namespace umbraco.editorControls.tinyMCE3 {
 
         public Control LiveEditingControl
         {
-            get {
+            get
+            {
                 m_isInLiveEditingMode = true;
                 base.IsInLiveEditingMode = true;
                 return this;

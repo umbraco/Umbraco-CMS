@@ -11,7 +11,7 @@ namespace umbraco.developer
     /// <summary>
     /// Summary description for xsltChooseExtension.
     /// </summary>
-	public partial class xsltChooseExtension : System.Web.UI.Page
+	public partial class xsltChooseExtension : BasePages.UmbracoEnsuredPage
 	{
 
 

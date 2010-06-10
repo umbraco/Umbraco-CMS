@@ -8,7 +8,7 @@
       
       <div style="padding-right: 5px; padding-left: 5px; padding-bottom: 0px; padding-top: 10px;  text-align: center;">
         
-        <img src="../images/umbracoSplash.gif" />
+        <img src="../images/umbracoSplash.png" />
           
         <p style="padding-right: 5px; padding-left: 5px; padding-bottom: 0px; margin: 0px; padding-top: 5px">
           umbraco v

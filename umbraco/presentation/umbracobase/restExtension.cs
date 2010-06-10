@@ -91,7 +91,7 @@ namespace umbraco.presentation.umbracobase
                 if (!allowed)
                 {
                     //Member Based permissions.. check for group, type and ID... 
-                    Member currentMem = library.library.GetCurrentMember(); // <-- /TODO/ uses bases own member class as umbracos doesn't work yet... 
+                    Member currentMem = Member.GetCurrentMember();
 
                     //not basic.. and not logged in? - out.. 
                     if (currentMem == null)

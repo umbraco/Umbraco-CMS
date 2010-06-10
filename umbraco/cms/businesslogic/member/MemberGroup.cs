@@ -148,7 +148,7 @@ namespace umbraco.cms.businesslogic.member
         }
 
         public bool HasMember(int memberId) {
-            return SqlHelper.ExecuteScalar<int>("select count(member) from cmsMember2MemberGroup where member = @member and memberGroup = @membergroup",
+            return SqlHelper.ExecuteScalar<int>("select count(member) from cmsMember2MemberGroup where member = @member and memberGroup = @memberGroup",
                 SqlHelper.CreateParameter("@member", memberId),
                 SqlHelper.CreateParameter("@memberGroup", Id)) > 0; 
         }

@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using umbraco.cms.businesslogic;
 
 namespace umbraco.presentation.umbraco.dialogs {
-    public partial class insertMasterpageContent : System.Web.UI.Page {
+    public partial class insertMasterpageContent : BasePages.UmbracoEnsuredPage {
         protected void Page_Load(object sender, EventArgs e) {
 
             //Add a default Item

@@ -15,7 +15,7 @@ namespace umbraco.developer
 	/// <summary>
 	/// Summary description for xsltInsertValueOf.
 	/// </summary>
-	public partial class xsltInsertValueOf : System.Web.UI.Page
+	public partial class xsltInsertValueOf : BasePages.UmbracoEnsuredPage
 	{
 	
 		protected void Page_Load(object sender, System.EventArgs e)

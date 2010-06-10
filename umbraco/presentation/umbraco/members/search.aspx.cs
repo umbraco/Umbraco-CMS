@@ -11,7 +11,7 @@ using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.members
 {
-    public partial class search : System.Web.UI.Page
+    public partial class search : BasePages.UmbracoEnsuredPage
     {
         protected override void OnLoad(EventArgs e)
         {

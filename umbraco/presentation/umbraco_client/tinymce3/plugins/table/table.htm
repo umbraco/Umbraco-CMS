@@ -108,9 +108,9 @@
 						</tr>
 
 						<tr>
-							<td class="column1"><label for="frame">{#table_dlg.frame}</label></td> 
+							<td class="column1"><label for="tframe">{#table_dlg.frame}</label></td> 
 							<td>
-								<select id="frame" name="frame" class="advfield"> 
+								<select id="tframe" name="tframe" class="advfield"> 
 										<option value="">{#not_set}</option>
 										<option value="void">{#table_dlg.rules_void}</option>
 										<option value="above">{#table_dlg.rules_above}</option> 
@@ -179,13 +179,8 @@
 		</div>
 
 		<div class="mceActionPanel">
-			<div style="float: left">
-				<input type="submit" id="insert" name="insert" value="{#insert}" />
-			</div>
-
-			<div style="float: right">
-				<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
-			</div>
+			<input type="submit" id="insert" name="insert" value="{#insert}" />
+			<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
 		</div>
 	</form>
 </body>

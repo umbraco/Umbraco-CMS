@@ -10,7 +10,7 @@ using umbraco.cms.helpers;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
-    public partial class ExportCode : System.Web.UI.Page
+    public partial class ExportCode : BasePages.UmbracoEnsuredPage
     {
         private Dictionary<Guid, Type> dataTypeMapping = new Dictionary<Guid, Type>();
 

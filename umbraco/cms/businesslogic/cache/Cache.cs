@@ -149,8 +149,11 @@ namespace umbraco.cms.businesslogic.cache
 					if (result == null)
 					{
 						result = getCacheItem();
-						System.Web.HttpRuntime.Cache.Add(cacheKey, result, cacheDependency,
-							DateTime.Now.Add(timeout), TimeSpan.Zero, priority, refreshAction);
+                        if (result != null)
+                        {
+                            System.Web.HttpRuntime.Cache.Add(cacheKey, result, cacheDependency,
+                                DateTime.Now.Add(timeout), TimeSpan.Zero, priority, refreshAction);
+                        }
 					}
 				}
 			}

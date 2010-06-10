@@ -16,7 +16,7 @@ namespace umbraco.presentation
 	/// <summary>
 	/// Summary description for macroResultWrapper.
 	/// </summary>
-	public partial class macroResultWrapper : System.Web.UI.Page
+	public partial class macroResultWrapper : BasePages.UmbracoEnsuredPage
 	{
 	
 		protected void Page_Load(object sender, System.EventArgs e)

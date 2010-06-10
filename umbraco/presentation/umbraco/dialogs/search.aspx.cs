@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace umbraco.presentation.dialogs
 {
-    public partial class search : System.Web.UI.Page
+    public partial class search : BasePages.UmbracoEnsuredPage
     {
         protected void Page_Load(object sender, EventArgs e)
         {

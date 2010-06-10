@@ -1,8 +1,11 @@
 /**
- * $Id: editor_plugin_src.js 1037 2009-03-02 16:41:15Z spocke $
+ * editor_plugin_src.js
  *
- * @author Moxiecode
- * @copyright Copyright © 2004-2008, Moxiecode Systems AB, All rights reserved.
+ * Copyright 2009, Moxiecode Systems AB
+ * Released under LGPL License.
+ *
+ * License: http://tinymce.moxiecode.com/license
+ * Contributing: http://tinymce.moxiecode.com/contributing
  */
 
 (function() {
@@ -61,7 +64,7 @@
 				if (ed.settings.content_css !== false)
 					ed.dom.loadCSS(url + "/css/content.css");
 
-				if (ed.theme.onResolveName) {
+				if (ed.theme && ed.theme.onResolveName) {
 					ed.theme.onResolveName.add(function(th, o) {
 						if (o.name == 'img') {
 							each(lo, function(v, k) {
@@ -234,7 +237,7 @@
 			if (stc) {
 				ob = dom.create('span', {
 					id : p.id,
-					mce_name : 'object',
+					_mce_name : 'object',
 					type : 'application/x-shockwave-flash',
 					data : p.src,
 					style : dom.getAttrib(n, 'style'),
@@ -244,7 +247,7 @@
 			} else {
 				ob = dom.create('span', {
 					id : p.id,
-					mce_name : 'object',
+					_mce_name : 'object',
 					classid : "clsid:" + o.classid,
 					style : dom.getAttrib(n, 'style'),
 					codebase : o.codebase,
@@ -260,12 +263,12 @@
 						k = 'url';
 
 					if (v)
-						dom.add(ob, 'span', {mce_name : 'param', name : k, '_mce_value' : v});
+						dom.add(ob, 'span', {_mce_name : 'param', name : k, '_mce_value' : v});
 				}
 			});
 
 			if (!stc)
-				dom.add(ob, 'span', tinymce.extend({mce_name : 'embed', type : o.type, style : dom.getAttrib(n, 'style')}, p));
+				dom.add(ob, 'span', tinymce.extend({_mce_name : 'embed', type : o.type, style : dom.getAttrib(n, 'style')}, p));
 
 			return ob;
 		},
@@ -341,7 +344,7 @@
 		_createImg : function(cl, n) {
 			var im, dom = this.editor.dom, pa = {}, ti = '', args;
 
-			args = ['id', 'name', 'width', 'height', 'bgcolor', 'align', 'flashvars', 'src', 'wmode', 'allowfullscreen', 'quality'];	
+			args = ['id', 'name', 'width', 'height', 'bgcolor', 'align', 'flashvars', 'src', 'wmode', 'allowfullscreen', 'quality', 'data'];	
 
 			// Create image
 			im = dom.create('img', {
@@ -370,6 +373,12 @@
 			if (pa.movie) {
 				pa.src = pa.movie;
 				delete pa.movie;
+			}
+
+			// No src try data
+			if (!pa.src) {
+				pa.src = pa.data;
+				delete pa.data;
 			}
 
 			// Merge with embed args

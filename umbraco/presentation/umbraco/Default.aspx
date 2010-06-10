@@ -29,7 +29,7 @@
 </head>
 <body onload="startUmbraco();">
   <form id="Form1" method="post" runat="server">
-  <img src="images/umbracoSplash.gif" alt="umbraco" style="width: 354px; height: 61px;" /><br />
+  <img src="images/umbracoSplash.png" alt="umbraco" style="width: 354px; height: 61px;" /><br />
   <br />
   <h3>umbraco <%=umbraco.ui.Text("dashboard", "openinnew")%></h3>
   

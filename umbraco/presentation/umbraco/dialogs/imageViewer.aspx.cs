@@ -15,7 +15,7 @@ using umbraco.IO;
 namespace umbraco.dialogs
 {
 	[Obsolete("Use the ImageViewer user control instead")]
-	public partial class imageViewer : System.Web.UI.Page
+	public partial class imageViewer : BasePages.UmbracoEnsuredPage
 	{
 	
 		protected void Page_Load(object sender, System.EventArgs e)

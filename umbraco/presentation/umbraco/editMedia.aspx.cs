@@ -21,7 +21,7 @@ namespace umbraco.cms.presentation
 	{
 		protected uicontrols.TabView TabView1;
 		protected System.Web.UI.WebControls.TextBox documentName;
-		private cms.businesslogic.media.Media _document;
+		private cms.businesslogic.media.Media _media;
 		controls.ContentControl tmp;
 
 		//protected System.Web.UI.WebControls.Literal SyncPath;
@@ -30,12 +30,12 @@ namespace umbraco.cms.presentation
 		{
 			//if (!IsPostBack) 
 			//{
-			//    SyncPath.Text = _document.Path;
-			//    newName.Text = _document.Text.Replace("'", "\\'");
+			//    SyncPath.Text = _media.Path;
+			//    newName.Text = _media.Text.Replace("'", "\\'");
 			//}
 			if (!IsPostBack)
 			{
-				ClientTools.SyncTree(_document.Path, false);
+				ClientTools.SyncTree(_media.Path, false);
 			}			
 		}
 
@@ -59,9 +59,9 @@ namespace umbraco.cms.presentation
                     tp.ErrorControl.Visible = false;
                 }
             }
-            _document.Save();
-			_document.XmlGenerate(new XmlDocument());
-			ClientTools.SyncTree(_document.Path, true);
+            _media.Save();
+			_media.XmlGenerate(new XmlDocument());
+			ClientTools.SyncTree(_media.Path, true);
 		}
 
 		#region Web Form Designer generated code
@@ -73,16 +73,16 @@ namespace umbraco.cms.presentation
 			InitializeComponent();
 			base.OnInit(e);
 
-			_document = new cms.businesslogic.media.Media(int.Parse(Request.QueryString["id"]));
+			_media = new cms.businesslogic.media.Media(int.Parse(Request.QueryString["id"]));
 
             // Save media on first load
             bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @nodeId",
-                                       SqlHelper.CreateParameter("@nodeId", _document.Id)) > 0;
+                                       SqlHelper.CreateParameter("@nodeId", _media.Id)) > 0;
             if (!exists)
-                _document.XmlGenerate(new XmlDocument());
+                _media.XmlGenerate(new XmlDocument());
 
 
-			tmp = new controls.ContentControl(_document,controls.ContentControl.publishModes.NoPublish, "TabView1");
+			tmp = new controls.ContentControl(_media,controls.ContentControl.publishModes.NoPublish, "TabView1");
 			tmp.Width = Unit.Pixel(666);
 			tmp.Height = Unit.Pixel(666);
 			plc.Controls.Add(tmp);

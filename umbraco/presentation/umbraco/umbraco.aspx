@@ -66,7 +66,7 @@
 			</asp:Panel>
 			<div class="topBarButtons">
 				<button onclick="UmbClientMgr.appActions().launchAbout();" class="topBarButton">
-					<img src="images/about.png" alt="about" /><span><%=umbraco.ui.Text("general", "about")%></span></button>
+					<img src="images/aboutNew.png" alt="about" /><span><%=umbraco.ui.Text("general", "about")%></span></button>
 				<button onclick="UmbClientMgr.appActions().launchHelp('<%=this.getUser().Language%>', '<%=this.getUser().UserType.Name%>');" class="topBarButton">
 					<img src="images/help.png" alt="Help" /><span><%=umbraco.ui.Text("general", "help")%></span></button>
 				<button onclick="UmbClientMgr.appActions().logout();" class="topBarButton">

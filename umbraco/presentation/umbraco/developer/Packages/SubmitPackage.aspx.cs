@@ -12,7 +12,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 
 namespace umbraco.presentation.developer.packages {
-    public partial class SubmitPackage : System.Web.UI.Page {
+    public partial class SubmitPackage : BasePages.UmbracoEnsuredPage {
 
         private cms.businesslogic.packager.PackageInstance pack;
         private cms.businesslogic.packager.CreatedPackage createdPackage;
