@@ -22,6 +22,9 @@ delete from cmsContentXml where nodeid not in (select nodeId from cmsContent)
 delete from cmsDocumentType where contentTypeNodeId not in (select nodeId from cmsContentType)
 delete from cmsDocumentType where templateNodeId not in (select nodeid from cmsTemplate)
 
+/* UPDATE EMPTY TEMPLATE REFERENCES IN DOCUMENTS */
+update cmsDocument set templateId = NULL where templateId not in (select nodeId from cmsTemplate)
+
 /************************** CLEANUP END ********************************************/
 
 
