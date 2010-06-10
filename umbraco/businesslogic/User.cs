@@ -508,6 +508,9 @@ namespace umbraco.BusinessLogic {
         public void delete() {
             OnDeleting(EventArgs.Empty);
 
+
+            SqlHelper.ExecuteNonQuery("delete from umbracoUserLogins where userID = @id", SqlHelper.CreateParameter("@id", Id));
+
             SqlHelper.ExecuteNonQuery("delete from umbracoUser where id = @id", SqlHelper.CreateParameter("@id", Id));
             FlushFromCache();
         }
