@@ -107,13 +107,21 @@ namespace umbraco.presentation.install
                     loadContent();
                     break;
                 case "detect":
-					step.Value = "validatePermissions";
+                    // upgrade!
+                    if (!String.IsNullOrEmpty(GlobalSettings.ConfigurationStatus.Trim()))
+                        step.Value = "renaming";
+                    else
+                        step.Value = "validatePermissions";
 					loadContent();
 					break;
 				case "upgradeIndex":
 					step.Value = "validatePermissions";
 					loadContent();
 					break;
+                case "renaming" :
+                    step.Value = "validatePermissions";
+                    loadContent();
+                    break;
 				case "validatePermissions":
 					step.Value = "defaultUser";
 					loadContent();

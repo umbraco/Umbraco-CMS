@@ -180,6 +180,24 @@ namespace umbraco.cms.businesslogic.web
                 new Access().FireAfterRemoveMemberShipRoleFromDocument(new Document(documentId), role, e);
             }
         }
+
+        public static bool RenameMemberShipRole(string oldRolename, string newRolename)
+        {
+            bool hasChange = false;
+            if (oldRolename != newRolename)
+            {
+                foreach (XmlNode x in AccessXml.SelectNodes("//group [@id = '" + oldRolename + "']"))
+                {
+                    x.Attributes["id"].Value = newRolename;
+                    hasChange = true;
+                }
+                if (hasChange)
+                    save();
+            }
+
+            return hasChange;
+    
+        }
         
         public static void ProtectPage(bool Simple, int DocumentId, int LoginDocumentId, int ErrorDocumentId) 
 		{

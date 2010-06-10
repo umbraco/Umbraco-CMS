@@ -267,6 +267,13 @@
     <Compile Include="install\steps\license.ascx.designer.cs">
       <DependentUpon>license.ascx</DependentUpon>
     </Compile>
+    <Compile Include="install\steps\renaming.ascx.cs">
+      <DependentUpon>renaming.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\steps\renaming.ascx.designer.cs">
+      <DependentUpon>renaming.ascx</DependentUpon>
+    </Compile>
     <Compile Include="install\steps\theend.ascx.cs">
       <DependentUpon>theend.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1497,6 +1504,7 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
+    <Content Include="install\steps\renaming.ascx" />
     <Content Include="install\Title.ascx" />
     <Content Include="web.config.Az-VAIO.xslt" />
     <Content Include="umbraco\endPreview.aspx" />

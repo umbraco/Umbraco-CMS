@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using umbraco.DataLayer;
 using System.Collections;
+using umbraco.cms.businesslogic.web;
 
 namespace umbraco.cms.businesslogic.member
 {
@@ -15,6 +16,7 @@ namespace umbraco.cms.businesslogic.member
 	public class MemberGroup : CMSNode
 	{
 		private static Guid _objectType = new Guid("366e63b9-880f-4e13-a61c-98069b029728");
+        private string _oldGroupName;
 
 		/// <summary>
 		/// Initialize a new object of the MemberGroup class
@@ -33,6 +35,20 @@ namespace umbraco.cms.businesslogic.member
 		{
 			
 		}
+
+        public override string Text
+        {
+            get
+            {
+                return base.Text;
+            }
+            set
+            {
+                // in order to be able to update access.xml if name changes we need to store a reference to the old name
+                _oldGroupName = Text;
+                base.Text = value;
+            }
+        }
 
         /// <summary>
         /// Deltes the current membergroup
@@ -61,6 +77,12 @@ namespace umbraco.cms.businesslogic.member
         {
             SaveEventArgs e = new SaveEventArgs();
             FireBeforeSave(e);
+
+            // if the name has changed we need to update the public access
+            if (_oldGroupName != Text)
+            {
+                Access.RenameMemberShipRole(_oldGroupName, Text);
+            }
 
             if (!e.Cancel) {
                 FireAfterSave(e);

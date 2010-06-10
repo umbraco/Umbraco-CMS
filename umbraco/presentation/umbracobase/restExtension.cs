@@ -107,7 +107,7 @@ namespace umbraco.presentation.umbracobase
             {
                 XmlNode extNode = baseDoc.SelectSingleNode("/RestExtensions/ext [@alias='" + extensionAlias + "']");
                 string asml = extNode.Attributes["assembly"].Value;
-                string assemblyPath = IOHelper.MapPath((SystemDirectories.Root + "/" + asml.TrimStart('/') + ".dll"));
+                string assemblyPath = IOHelper.MapPath(string.Format("{0}/{1}.dll", SystemDirectories.Bin, asml.TrimStart('/')));
                 Assembly returnAssembly = System.Reflection.Assembly.LoadFrom(assemblyPath);
 
                 string returnTypeName = extNode.Attributes["type"].Value;

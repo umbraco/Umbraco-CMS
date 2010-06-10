@@ -15,7 +15,7 @@ namespace umbraco.IO
         {
             get
             {
-                return SystemDirectories.Data + "/access.xml";
+                return SystemDirectories.Data + "/access.config";
             }
         }
 
