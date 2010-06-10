@@ -1506,6 +1506,8 @@
     <Content Include="config\splashes\worker.png" />
     <Content Include="install\steps\renaming.ascx" />
     <Content Include="install\Title.ascx" />
+    <Content Include="umbraco\images\aboutNew.png" />
+    <Content Include="umbraco\images\umbracoSplash.png" />
     <Content Include="web.config.Az-VAIO.xslt" />
     <Content Include="umbraco\endPreview.aspx" />
     <Content Include="umbraco\js\UmbracoCasingRules.aspx" />
