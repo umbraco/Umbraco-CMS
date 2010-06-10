@@ -215,7 +215,7 @@ namespace umbraco.presentation
         {
             get
             {
-                return ExamineManager.Instance.SearchProviderCollection["InternalSearch"];
+                return ExamineManager.Instance.SearchProviderCollection["InternalSearcher"];
             }
         }
     }

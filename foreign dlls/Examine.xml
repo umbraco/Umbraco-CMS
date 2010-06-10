@@ -4,6 +4,38 @@
         <name>Examine</name>
     </assembly>
     <members>
+        <member name="M:Examine.SearchResult.Equals(System.Object)">
+            <summary>
+            Override this method so that the Distinct() operator works
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Examine.SearchResult.GetHashCode">
+            <summary>
+            Override this method so that the Distinct() operator works
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Examine.SearchResult.Item(System.Int32)">
+            <summary>
+            Returns the key value pair for the index specified
+            </summary>
+            <param name="resultIndex"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Examine.SearchResult.Item(System.String)">
+            <summary>
+            Returns the value for the key specified
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Examine.IndexCriteria">
+            <summary>
+            a data structure for storing indexing/searching instructions
+            </summary>
+        </member>
         <member name="T:Examine.ISearcher">
             <summary>
             An interface representing an Examine Searcher
@@ -77,71 +109,6 @@
             <param name="defaultOperation">The default operation.</param>
             <returns>A blank SearchCriteria</returns>
         </member>
-        <member name="M:Examine.SearchResult.Equals(System.Object)">
-            <summary>
-            Override this method so that the Distinct() operator works
-            </summary>
-            <param name="obj"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Examine.SearchResult.GetHashCode">
-            <summary>
-            Override this method so that the Distinct() operator works
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="P:Examine.SearchResult.Item(System.Int32)">
-            <summary>
-            Returns the key value pair for the index specified
-            </summary>
-            <param name="resultIndex"></param>
-            <returns></returns>
-        </member>
-        <member name="P:Examine.SearchResult.Item(System.String)">
-            <summary>
-            Returns the value for the key specified
-            </summary>
-            <param name="key"></param>
-            <returns></returns>
-        </member>
-        <member name="T:Examine.IndexCriteria">
-            <summary>
-            a data structure for storing indexing/searching instructions
-            </summary>
-        </member>
-        <member name="T:Examine.Config.SearchProvidersSection">
-            <summary>
-            Config section for the Examine search providers
-            </summary>
-        </member>
-        <member name="P:Examine.Config.SearchProvidersSection.Providers">
-            <summary>
-            Gets the search providers.
-            </summary>
-            <value>The providers.</value>
-        </member>
-        <member name="P:Examine.Config.SearchProvidersSection.DefaultProvider">
-            <summary>
-            Gets or sets the default provider.
-            </summary>
-            <value>The default provider.</value>
-        </member>
-        <member name="T:Examine.Config.IndexProvidersSection">
-            <summary>
-            Config section for the Examine Index Providers
-            </summary>
-        </member>
-        <member name="P:Examine.Config.IndexProvidersSection.Providers">
-            <summary>
-            Gets the indexing providers.
-            </summary>
-            <value>The providers.</value>
-        </member>
-        <member name="P:Examine.Config.IndexProvidersSection.EnableDefaultEventHandler">
-            <summary>
-            If true, the IndexingActionHandler will be run to keep the default index up to date.
-            </summary>
-        </member>
         <member name="T:Examine.IIndexer">
             <summary>
             Interface to represent an Examine Indexer
@@ -158,7 +125,7 @@
             <summary>
             Deletes a node from the index
             </summary>
-            <param name="node">Node to delete</param>
+            <param name="nodeId">Node to delete</param>
         </member>
         <member name="M:Examine.IIndexer.IndexAll(Examine.IndexType)">
             <summary>
@@ -225,11 +192,6 @@
         <member name="P:Examine.ExamineManager.Instance">
             <summary>
             Singleton
-            </summary>
-        </member>
-        <member name="T:Examine.SearchCriteria.ISearchCriteria">
-            <summary>
-            
             </summary>
         </member>
         <member name="T:Examine.SearchCriteria.IQuery">
@@ -408,27 +370,84 @@
             </summary>
             <value>The boolean operation.</value>
         </member>
-        <member name="M:Examine.SearchCriteria.ISearchCriteria.RawQuery(System.String)">
+        <member name="T:Examine.Config.SearchProvidersSection">
             <summary>
-            Passes a text string which is preformatted for the underlying search API. Examine will not modify this
+            Config section for the Examine search providers
             </summary>
-            <remarks>
-            This allows a developer to completely bypass and Examine logic and comprise their own query text which they are passing in.
-            It means that if the search is too complex to achieve with the fluent API, or too dynamic to achieve with a static language
-            the provider can still handle it.
-            </remarks>
-            <param name="query">The query.</param>
+        </member>
+        <member name="P:Examine.Config.SearchProvidersSection.Providers">
+            <summary>
+            Gets the search providers.
+            </summary>
+            <value>The providers.</value>
+        </member>
+        <member name="P:Examine.Config.SearchProvidersSection.DefaultProvider">
+            <summary>
+            Gets or sets the default provider.
+            </summary>
+            <value>The default provider.</value>
+        </member>
+        <member name="T:Examine.Config.IndexProvidersSection">
+            <summary>
+            Config section for the Examine Index Providers
+            </summary>
+        </member>
+        <member name="P:Examine.Config.IndexProvidersSection.Providers">
+            <summary>
+            Gets the indexing providers.
+            </summary>
+            <value>The providers.</value>
+        </member>
+        <member name="T:Examine.Providers.IndexProviderCollection">
+            <summary>
+            A collection of Examine Index Providers
+            </summary>
+        </member>
+        <member name="M:Examine.Providers.IndexProviderCollection.Add(System.Configuration.Provider.ProviderBase)">
+            <summary>
+            Adds a provider to the collection.
+            </summary>
+            <param name="provider">The provider to be added.</param>
+            <exception cref="T:System.NotSupportedException">
+            The collection is read-only.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            	<paramref name="provider"/> is null.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            The <see cref="P:System.Configuration.Provider.ProviderBase.Name"/> of <paramref name="provider"/> is null.
+            - or -
+            The length of the <see cref="P:System.Configuration.Provider.ProviderBase.Name"/> of <paramref name="provider"/> is less than 1.
+            </exception>
+            <PermissionSet>
+            	<IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="UnmanagedCode, ControlEvidence"/>
+            </PermissionSet>
+        </member>
+        <member name="M:Examine.Providers.IndexProviderCollection.System#Collections#Generic#IEnumerable{Examine#Providers#BaseIndexProvider}#GetEnumerator">
+            <summary>
+            Gets the enumerator.
+            </summary>
             <returns></returns>
         </member>
-        <member name="P:Examine.SearchCriteria.ISearchCriteria.SearchIndexType">
+        <member name="M:Examine.Providers.IndexProviderCollection.System#Collections#IEnumerable#GetEnumerator">
             <summary>
-            Indicates the type of data to search on
+            Returns an object that implements the <see cref="T:System.Collections.IEnumerator"/> interface to iterate through the collection.
             </summary>
+            <returns>
+            An object that implements <see cref="T:System.Collections.IEnumerator"/> to iterate through the collection.
+            </returns>
         </member>
-        <member name="T:Examine.IndexedNode">
+        <member name="P:Examine.Providers.IndexProviderCollection.Item(System.String)">
             <summary>
-            Simple class to store the definition of an indexed node
+            Gets the <see cref="T:Examine.Providers.BaseIndexProvider"/> with the specified name.
             </summary>
+            <value></value>
+        </member>
+        <member name="P:Examine.Providers.IndexProviderCollection.Item(System.Int32)">
+            <summary>
+            Gets the <see cref="T:Examine.Providers.BaseIndexProvider"/> at the specified index.
+            </summary>
+            <value></value>
         </member>
         <member name="T:Examine.Config.ExamineSettings">
             <summary>
@@ -452,6 +471,28 @@
             Gets the index providers.
             </summary>
             <value>The index providers.</value>
+        </member>
+        <member name="T:Examine.SearchCriteria.ISearchCriteria">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Examine.SearchCriteria.ISearchCriteria.RawQuery(System.String)">
+            <summary>
+            Passes a text string which is preformatted for the underlying search API. Examine will not modify this
+            </summary>
+            <remarks>
+            This allows a developer to completely bypass and Examine logic and comprise their own query text which they are passing in.
+            It means that if the search is too complex to achieve with the fluent API, or too dynamic to achieve with a static language
+            the provider can still handle it.
+            </remarks>
+            <param name="query">The query.</param>
+            <returns></returns>
+        </member>
+        <member name="P:Examine.SearchCriteria.ISearchCriteria.SearchIndexType">
+            <summary>
+            Indicates the type of data to search on
+            </summary>
         </member>
         <member name="T:Examine.Providers.BaseIndexProvider">
             <summary>
@@ -563,6 +604,11 @@
             </summary>
             <param name="e">The <see cref="T:Examine.IndexingNodesEventArgs"/> instance containing the event data.</param>
         </member>
+        <member name="P:Examine.Providers.BaseIndexProvider.EnableDefaultEventHandler">
+            <summary>
+            If true, the IndexingActionHandler will be run to keep the default index up to date.
+            </summary>
+        </member>
         <member name="P:Examine.Providers.BaseIndexProvider.SupportUnpublishedContent">
             <summary>
             Determines if the manager will call the indexing methods when content is saved or deleted as
@@ -619,56 +665,10 @@
             Occurs when node is found but outside the supported node set
             </summary>
         </member>
-        <member name="T:Examine.Providers.IndexProviderCollection">
+        <member name="T:Examine.IndexedNode">
             <summary>
-            A collection of Examine Index Providers
+            Simple class to store the definition of an indexed node
             </summary>
-        </member>
-        <member name="M:Examine.Providers.IndexProviderCollection.Add(System.Configuration.Provider.ProviderBase)">
-            <summary>
-            Adds a provider to the collection.
-            </summary>
-            <param name="provider">The provider to be added.</param>
-            <exception cref="T:System.NotSupportedException">
-            The collection is read-only.
-            </exception>
-            <exception cref="T:System.ArgumentNullException">
-            	<paramref name="provider"/> is null.
-            </exception>
-            <exception cref="T:System.ArgumentException">
-            The <see cref="P:System.Configuration.Provider.ProviderBase.Name"/> of <paramref name="provider"/> is null.
-            - or -
-            The length of the <see cref="P:System.Configuration.Provider.ProviderBase.Name"/> of <paramref name="provider"/> is less than 1.
-            </exception>
-            <PermissionSet>
-            	<IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="UnmanagedCode, ControlEvidence"/>
-            </PermissionSet>
-        </member>
-        <member name="M:Examine.Providers.IndexProviderCollection.System#Collections#Generic#IEnumerable{Examine#Providers#BaseIndexProvider}#GetEnumerator">
-            <summary>
-            Gets the enumerator.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Examine.Providers.IndexProviderCollection.System#Collections#IEnumerable#GetEnumerator">
-            <summary>
-            Returns an object that implements the <see cref="T:System.Collections.IEnumerator"/> interface to iterate through the collection.
-            </summary>
-            <returns>
-            An object that implements <see cref="T:System.Collections.IEnumerator"/> to iterate through the collection.
-            </returns>
-        </member>
-        <member name="P:Examine.Providers.IndexProviderCollection.Item(System.String)">
-            <summary>
-            Gets the <see cref="T:Examine.Providers.BaseIndexProvider"/> with the specified name.
-            </summary>
-            <value></value>
-        </member>
-        <member name="P:Examine.Providers.IndexProviderCollection.Item(System.Int32)">
-            <summary>
-            Gets the <see cref="T:Examine.Providers.BaseIndexProvider"/> at the specified index.
-            </summary>
-            <value></value>
         </member>
     </members>
 </doc>
