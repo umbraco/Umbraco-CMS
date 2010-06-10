@@ -307,6 +307,7 @@ namespace umbraco.cms.presentation
                         if (base.getUser().GetPermissions(_document.Path).IndexOf("U") > -1)
                             UnPublish.Visible = true;
 
+                        _documentHasPublishedVersion = _document.HasPublishedVersion();
                         updateLinks();
                     }
                     else
