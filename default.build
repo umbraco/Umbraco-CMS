@@ -3,8 +3,11 @@
     <description>Build the umbraco 3.1.x Application</description>
 
     <!-- global properties, generally won't change -->
-
+    <!--
     <property name="nant.settings.currentframework" value="net-2.0" />
+    -->
+    <property name="nant.settings.currentframework" value="net-4.0" />,
+
 
     <!-- filenames and directories, generally won't change -->
 
@@ -44,11 +47,16 @@
             </fileset>
         </attrib>
 
+        
         <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
             <arg value="${root.dir}\umbraco.sln" />
+            <arg value="/v:n" />
+            <arg value="/p:WarningLevel=0" />
+            <arg value="/p:ToolsVersion=4.0" />
         </exec>
 
         <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
+        
     </target>
 
 
@@ -323,6 +331,15 @@
 
 
     <target name="init" description="init tasks for the build">
+
+        <!-- Clean the plugins dir any leftovers, only tinyMCE belongs in here -->
+        <delete>
+            <fileset>
+                <include name="${build.dir}\umbraco\plugins\*" />
+                <exclude name="${build.dir}\umbraco\plugins\tinymce3" />
+            </fileset>
+        </delete>
+
         <delete dir="${build.dir}" />
         <mkdir dir="${build.dir}" />
     </target>
