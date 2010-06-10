@@ -6,12 +6,13 @@ using umbraco.DataLayer;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace umbraco.BusinessLogic {
+namespace umbraco.BusinessLogic
+{
     /// <summary>
     /// represents a Umbraco back end user
     /// </summary>
-    public class User {
-
+    public class User
+    {
         private int _id;
         private bool _isInitialized;
         private string _name;
@@ -31,7 +32,8 @@ namespace umbraco.BusinessLogic {
         private Hashtable _notifications = new Hashtable();
         private bool _notificationsInitialized = false;
 
-        private static ISqlHelper SqlHelper {
+        private static ISqlHelper SqlHelper
+        {
             get { return Application.SqlHelper; }
         }
 
@@ -39,7 +41,8 @@ namespace umbraco.BusinessLogic {
         /// Initializes a new instance of the <see cref="User"/> class.
         /// </summary>
         /// <param name="ID">The ID.</param>
-        public User(int ID) {
+        public User(int ID)
+        {
             setupUser(ID);
         }
 
@@ -48,7 +51,8 @@ namespace umbraco.BusinessLogic {
         /// </summary>
         /// <param name="ID">The ID.</param>
         /// <param name="noSetup">if set to <c>true</c> [no setup].</param>
-        public User(int ID, bool noSetup) {
+        public User(int ID, bool noSetup)
+        {
             _id = ID;
         }
 
@@ -57,7 +61,8 @@ namespace umbraco.BusinessLogic {
         /// </summary>
         /// <param name="Login">The login.</param>
         /// <param name="Password">The password.</param>
-        public User(string Login, string Password) {
+        public User(string Login, string Password)
+        {
             setupUser(getUserId(Login, Password));
         }
 
@@ -65,34 +70,33 @@ namespace umbraco.BusinessLogic {
         /// Initializes a new instance of the <see cref="User"/> class.
         /// </summary>
         /// <param name="Login">The login.</param>
-        public User(string Login) {
+        public User(string Login)
+        {
             setupUser(getUserId(Login));
         }
 
-        private void setupUser(int ID) {
+        private void setupUser(int ID)
+        {
             _id = ID;
 
             using (IRecordsReader dr = SqlHelper.ExecuteReader(
                 "Select userNoConsole, userDisabled, userType,startStructureID, startMediaId, userName,userLogin,userEmail,userDefaultPermissions, userLanguage, defaultToLiveEditing from umbracoUser where id = @id",
-                SqlHelper.CreateParameter("@id", ID))) {
-                    if (dr.Read())
-                    {
-                        _userNoConsole = dr.GetBoolean("usernoconsole");
-                        _userDisabled = dr.GetBoolean("userDisabled");
-                        _name = dr.GetString("userName");
-                        _loginname = dr.GetString("userLogin");
-                        _email = dr.GetString("userEmail");
-                        _language = dr.GetString("userLanguage");
-                        _startnodeid = dr.GetInt("startStructureID");
-                        if (!dr.IsNull("startMediaId"))
-                            _startmediaid = dr.GetInt("startMediaID");
-                        _usertype = UserType.GetUserType(dr.GetShort("UserType"));
-                        _defaultToLiveEditing = dr.GetBoolean("defaultToLiveEditing");
-                    }
-                    else
-                    {
-                        throw new ArgumentException("No User exists with ID " + ID.ToString());
-                    }
+                SqlHelper.CreateParameter("@id", ID)))
+            {
+                if (dr.Read())
+                {
+                    _userNoConsole = dr.GetBoolean("usernoconsole");
+                    _userDisabled = dr.GetBoolean("userDisabled");
+                    _name = dr.GetString("userName");
+                    _loginname = dr.GetString("userLogin");
+                    _email = dr.GetString("userEmail");
+                    _language = dr.GetString("userLanguage");
+                    _startnodeid = dr.GetInt("startStructureID");
+                    if (!dr.IsNull("startMediaId"))
+                        _startmediaid = dr.GetInt("startMediaID");
+                    _usertype = UserType.GetUserType(dr.GetShort("UserType"));
+                    _defaultToLiveEditing = dr.GetBoolean("defaultToLiveEditing");
+                }
             }
             _isInitialized = true;
         }
@@ -100,7 +104,8 @@ namespace umbraco.BusinessLogic {
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
         /// </summary>
-        public void Save() {
+        public void Save()
+        {
             OnSaving(EventArgs.Empty);
         }
 
@@ -108,13 +113,16 @@ namespace umbraco.BusinessLogic {
         /// Gets or sets the users name.
         /// </summary>
         /// <value>The name.</value>
-        public string Name {
-            get {
+        public string Name
+        {
+            get
+            {
                 if (!_isInitialized)
                     setupUser(_id);
                 return _name;
             }
-            set {
+            set
+            {
                 _name = value;
                 SqlHelper.ExecuteNonQuery("Update umbracoUser set UserName = @userName where id = @id", SqlHelper.CreateParameter("@userName", value), SqlHelper.CreateParameter("@id", Id));
                 FlushFromCache();
@@ -125,13 +133,16 @@ namespace umbraco.BusinessLogic {
         /// Gets or sets the users email.
         /// </summary>
         /// <value>The email.</value>
-        public string Email {
-            get {
+        public string Email
+        {
+            get
+            {
                 if (!_isInitialized)
                     setupUser(_id);
                 return _email;
             }
-            set {
+            set
+            {
                 _email = value;
                 SqlHelper.ExecuteNonQuery("Update umbracoUser set UserEmail = @email where id = @id", SqlHelper.CreateParameter("@id", this.Id), SqlHelper.CreateParameter("@email", value));
                 FlushFromCache();
@@ -142,13 +153,16 @@ namespace umbraco.BusinessLogic {
         /// Gets or sets the users language.
         /// </summary>
         /// <value>The language.</value>
-        public string Language {
-            get {
+        public string Language
+        {
+            get
+            {
                 if (!_isInitialized)
                     setupUser(_id);
                 return _language;
             }
-            set {
+            set
+            {
                 _language = value;
                 SqlHelper.ExecuteNonQuery("Update umbracoUser set userLanguage = @language where id = @id", SqlHelper.CreateParameter("@language", value), SqlHelper.CreateParameter("@id", Id));
                 FlushFromCache();
@@ -159,11 +173,14 @@ namespace umbraco.BusinessLogic {
         /// Gets or sets the users password.
         /// </summary>
         /// <value>The password.</value>
-        public string Password {
-            get {
+        public string Password
+        {
+            get
+            {
                 return GetPassword();
             }
-            set {
+            set
+            {
                 SqlHelper.ExecuteNonQuery("Update umbracoUser set UserPassword = @pw where id = @id", SqlHelper.CreateParameter("@pw", value), SqlHelper.CreateParameter("@id", Id));
                 FlushFromCache();
             }
@@ -173,8 +190,9 @@ namespace umbraco.BusinessLogic {
         /// Gets the password.
         /// </summary>
         /// <returns></returns>
-        public string GetPassword() { 
-            return 
+        public string GetPassword()
+        {
+            return
                 SqlHelper.ExecuteScalar<string>("select UserPassword from umbracoUser where id = @id",
                 SqlHelper.CreateParameter("@id", this.Id));
         }
@@ -186,13 +204,15 @@ namespace umbraco.BusinessLogic {
         /// <returns>
         /// 	<c>true</c> if this user is admin; otherwise, <c>false</c>.
         /// </returns>
-        public bool IsAdmin() {
+        public bool IsAdmin()
+        {
             return UserType.Alias == "admin";
         }
 
-        public bool ValidatePassword(string password) {
+        public bool ValidatePassword(string password)
+        {
             string userLogin =
-                SqlHelper.ExecuteScalar<string>("select userLogin from umbracoUser where userLogin = @login and UserPassword = @pw", 
+                SqlHelper.ExecuteScalar<string>("select userLogin from umbracoUser where userLogin = @login and UserPassword = @pw",
                 SqlHelper.CreateParameter("@pw", password),
                 SqlHelper.CreateParameter("@login", LoginName)
                 );
@@ -205,7 +225,8 @@ namespace umbraco.BusinessLogic {
         /// <returns>
         /// 	<c>true</c> if this user is root; otherwise, <c>false</c>.
         /// </returns>
-        public bool IsRoot() {
+        public bool IsRoot()
+        {
             return Id == 0;
         }
 
@@ -213,14 +234,18 @@ namespace umbraco.BusinessLogic {
         /// Gets the applications which the user has access to.
         /// </summary>
         /// <value>The users applications.</value>
-        public Application[] Applications {
-            get {
+        public Application[] Applications
+        {
+            get
+            {
                 if (!_isInitialized)
                     setupUser(_id);
                 ArrayList al = new ArrayList();
 
-                using (IRecordsReader appIcons = SqlHelper.ExecuteReader("select appAlias, appIcon, appname from umbracoApp app join umbracoUser2app u2a on u2a.app = app.appAlias and u2a.[user] = @userID order by app.sortOrder", SqlHelper.CreateParameter("@userID", this.Id))) {
-                    while (appIcons.Read()) {
+                using (IRecordsReader appIcons = SqlHelper.ExecuteReader("select appAlias, appIcon, appname from umbracoApp app join umbracoUser2app u2a on u2a.app = app.appAlias and u2a.[user] = @userID order by app.sortOrder", SqlHelper.CreateParameter("@userID", this.Id)))
+                {
+                    while (appIcons.Read())
+                    {
                         Application tmp = new Application();
                         tmp.name = appIcons.GetString("appName");
                         tmp.icon = appIcons.GetString("appIcon");
@@ -231,7 +256,8 @@ namespace umbraco.BusinessLogic {
 
                 Application[] retVal = new Application[al.Count];
 
-                for (int i = 0; i < al.Count; i++) {
+                for (int i = 0; i < al.Count; i++)
+                {
                     retVal[i] = (Application)al[i];
                 }
                 return retVal;
@@ -242,13 +268,16 @@ namespace umbraco.BusinessLogic {
         /// Gets or sets the users  login name
         /// </summary>
         /// <value>The loginname.</value>
-        public string LoginName {
-            get {
+        public string LoginName
+        {
+            get
+            {
                 if (!_isInitialized)
                     setupUser(_id);
                 return _loginname;
             }
-            set {
+            set
+            {
                 if (!ensureUniqueLoginName(value, this))
                     throw new Exception(String.Format("A user with the login '{0}' already exists", value));
                 _loginname = value;
@@ -257,7 +286,8 @@ namespace umbraco.BusinessLogic {
             }
         }
 
-        private static bool ensureUniqueLoginName(string loginName, User currentUser) {
+        private static bool ensureUniqueLoginName(string loginName, User currentUser)
+        {
             User[] u = User.getAllByLoginName(loginName);
             if (u.Length != 0)
             {
@@ -274,7 +304,8 @@ namespace umbraco.BusinessLogic {
         /// <param name="lname">The login name.</param>
         /// <param name="passw">The password.</param>
         /// <returns></returns>
-        public static bool validateCredentials(string lname, string passw) {
+        public static bool validateCredentials(string lname, string passw)
+        {
             return validateCredentials(lname, passw, true);
         }
 
@@ -285,7 +316,8 @@ namespace umbraco.BusinessLogic {
         /// <param name="passw">The password.</param>
         /// <param name="checkForUmbracoConsoleAccess">if set to <c>true</c> [check for umbraco console access].</param>
         /// <returns></returns>
-        public static bool validateCredentials(string lname, string passw, bool checkForUmbracoConsoleAccess) {
+        public static bool validateCredentials(string lname, string passw, bool checkForUmbracoConsoleAccess)
+        {
             string consoleCheckSql = "";
             if (checkForUmbracoConsoleAccess)
                 consoleCheckSql = "and userNoConsole = 0 ";
@@ -304,13 +336,16 @@ namespace umbraco.BusinessLogic {
         /// Gets or sets the type of the user.
         /// </summary>
         /// <value>The type of the user.</value>
-        public UserType UserType {
-            get {
+        public UserType UserType
+        {
+            get
+            {
                 if (!_isInitialized)
                     setupUser(_id);
                 return _usertype;
             }
-            set {
+            set
+            {
                 _usertype = value;
                 SqlHelper.ExecuteNonQuery(
                     @"Update umbracoUser set userType = @type where id = @id",
@@ -325,14 +360,15 @@ namespace umbraco.BusinessLogic {
         /// Gets all users
         /// </summary>
         /// <returns></returns>
-        public static User[] getAll() {            
+        public static User[] getAll()
+        {
 
             IRecordsReader dr;
             dr = SqlHelper.ExecuteReader("Select id from umbracoUser");
 
             List<User> users = new List<User>();
 
-            while (dr.Read()) 
+            while (dr.Read())
             {
                 users.Add(User.GetUser(dr.GetInt("id")));
             }
@@ -360,21 +396,24 @@ namespace umbraco.BusinessLogic {
         /// </summary>
         /// <param name="email">The email.</param>
         /// <returns></returns>
-        public static User[] getAllByEmail(string email) {
+        public static User[] getAllByEmail(string email)
+        {
             System.Collections.ArrayList tmpContainer = new System.Collections.ArrayList();
 
             IRecordsReader dr;
             dr = SqlHelper.ExecuteReader(
                 "Select id from umbracoUser where userEmail LIKE %@email%", SqlHelper.CreateParameter("@email", email));
 
-            while (dr.Read()) {
+            while (dr.Read())
+            {
                 tmpContainer.Add(BusinessLogic.User.GetUser(dr.GetInt("id")));
             }
             dr.Close();
             User[] retVal = new User[tmpContainer.Count];
 
             int c = 0;
-            foreach (User u in tmpContainer) {
+            foreach (User u in tmpContainer)
+            {
                 retVal[c] = u;
                 c++;
             }
@@ -386,21 +425,24 @@ namespace umbraco.BusinessLogic {
         /// </summary>
         /// <param name="login">The login.</param>
         /// <returns></returns>
-        public static User[] getAllByLoginName(string login) {
+        public static User[] getAllByLoginName(string login)
+        {
             System.Collections.ArrayList tmpContainer = new System.Collections.ArrayList();
 
             IRecordsReader dr;
             dr = SqlHelper.ExecuteReader(
                 "Select id from umbracoUser where userLogin LIKE @login", SqlHelper.CreateParameter("@login", String.Format("%{0}%", login)));
 
-            while (dr.Read()) {
+            while (dr.Read())
+            {
                 tmpContainer.Add(BusinessLogic.User.GetUser(dr.GetInt("id")));
             }
             dr.Close();
             User[] retVal = new User[tmpContainer.Count];
 
             int c = 0;
-            foreach (User u in tmpContainer) {
+            foreach (User u in tmpContainer)
+            {
                 retVal[c] = u;
                 c++;
             }
@@ -414,7 +456,8 @@ namespace umbraco.BusinessLogic {
         /// <param name="lname">The login name.</param>
         /// <param name="passw">The password.</param>
         /// <param name="ut">The user type.</param>
-        public static void MakeNew(string name, string lname, string passw, UserType ut) {
+        public static void MakeNew(string name, string lname, string passw, UserType ut)
+        {
 
             SqlHelper.ExecuteNonQuery(@"
 				insert into umbracoUser 
@@ -438,7 +481,8 @@ namespace umbraco.BusinessLogic {
         /// <param name="passw">The passw.</param>
         /// <param name="email">The email.</param>
         /// <param name="ut">The ut.</param>
-        public static void MakeNew(string name, string lname, string passw, string email, UserType ut) {
+        public static void MakeNew(string name, string lname, string passw, string email, UserType ut)
+        {
             SqlHelper.ExecuteNonQuery(@"
 				insert into umbracoUser 
 				(UserType,startStructureId,startMediaId, UserName, userLogin, userPassword, userEmail,userLanguage) 
@@ -462,11 +506,12 @@ namespace umbraco.BusinessLogic {
         /// <param name="lname">The lname.</param>
         /// <param name="email">The email.</param>
         /// <param name="ut">The ut.</param>
-        public static void Update(int id, string name, string lname, string email, UserType ut) {
+        public static void Update(int id, string name, string lname, string email, UserType ut)
+        {
             if (!ensureUniqueLoginName(lname, User.GetUser(id)))
                 throw new Exception(String.Format("A user with the login '{0}' already exists", lname));
 
-            
+
             SqlHelper.ExecuteNonQuery(@"Update umbracoUser set userName=@name, userLogin=@lname, userEmail=@email, UserType=@type where id = @id",
                 SqlHelper.CreateParameter("@name", name),
                 SqlHelper.CreateParameter("@lname", lname),
@@ -481,7 +526,8 @@ namespace umbraco.BusinessLogic {
         /// <param name="lname">The login name.</param>
         /// <param name="passw">The password.</param>
         /// <returns>a user ID</returns>
-        public static int getUserId(string lname, string passw) {
+        public static int getUserId(string lname, string passw)
+        {
             return getUserId("select id from umbracoUser where userDisabled = 0 and userNoConsole = 0 and userLogin = @login and userPassword = @pw",
                 SqlHelper.CreateParameter("@login", lname),
                 SqlHelper.CreateParameter("@pw", passw));
@@ -492,21 +538,24 @@ namespace umbraco.BusinessLogic {
         /// </summary>
         /// <param name="lname">The login name.</param>
         /// <returns>a user ID</returns>
-        public static int getUserId(string lname) {
+        public static int getUserId(string lname)
+        {
             return getUserId("select id from umbracoUser where userLogin = @login",
                  SqlHelper.CreateParameter("@login", lname));
         }
 
-        private static int getUserId(string query, params IParameter[] parameterValues) {
+        private static int getUserId(string query, params IParameter[] parameterValues)
+        {
             object userId = SqlHelper.ExecuteScalar<object>(query, parameterValues);
-            return (userId != null && userId!=DBNull.Value) ? int.Parse(userId.ToString()) : -1;
+            return (userId != null && userId != DBNull.Value) ? int.Parse(userId.ToString()) : -1;
         }
 
         /// <summary>
         /// Deletes this instance.
         /// </summary>
         [Obsolete("Deleting users are NOT supported as history needs to be kept. Please use the disable() method instead")]
-        public void delete() {
+        public void delete()
+        {
             OnDeleting(EventArgs.Empty);
 
 
@@ -519,7 +568,8 @@ namespace umbraco.BusinessLogic {
         /// <summary>
         /// Disables this instance.
         /// </summary>
-        public void disable() {
+        public void disable()
+        {
             OnDisabling(EventArgs.Empty);
             this.Disabled = true;
         }
@@ -529,7 +579,8 @@ namespace umbraco.BusinessLogic {
         /// </summary>
         /// <param name="Path">The path.</param>
         /// <returns></returns>
-        public string GetPermissions(string Path) {
+        public string GetPermissions(string Path)
+        {
             if (!_isInitialized)
                 setupUser(_id);
             string cruds = UserType.DefaultPermissions;
@@ -537,7 +588,8 @@ namespace umbraco.BusinessLogic {
             if (!_crudsInitialized)
                 initCruds();
 
-            foreach (string nodeId in Path.Split(',')) {
+            foreach (string nodeId in Path.Split(','))
+            {
                 if (_cruds.ContainsKey(int.Parse(nodeId)))
                     cruds = _cruds[int.Parse(nodeId)].ToString();
             }
@@ -548,7 +600,8 @@ namespace umbraco.BusinessLogic {
         /// <summary>
         /// Initializes the user node permissions
         /// </summary>
-        public void initCruds() {
+        public void initCruds()
+        {
             if (!_isInitialized)
                 setupUser(_id);
 
@@ -557,9 +610,11 @@ namespace umbraco.BusinessLogic {
             _cruds.Clear();
             System.Web.HttpContext.Current.Application.UnLock();
 
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodePermission where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", this.Id))) {
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodePermission where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", this.Id)))
+            {
                 //	int currentId = -1;
-                while (dr.Read()) {
+                while (dr.Read())
+                {
                     if (!_cruds.ContainsKey(dr.GetInt("nodeId")))
                         _cruds.Add(dr.GetInt("nodeId"), String.Empty);
 
@@ -574,13 +629,15 @@ namespace umbraco.BusinessLogic {
         /// </summary>
         /// <param name="Path">The node path.</param>
         /// <returns></returns>
-        public string GetNotifications(string Path) {
+        public string GetNotifications(string Path)
+        {
             string notifications = "";
 
             if (!_notificationsInitialized)
                 initNotifications();
 
-            foreach (string nodeId in Path.Split(',')) {
+            foreach (string nodeId in Path.Split(','))
+            {
                 if (_notifications.ContainsKey(int.Parse(nodeId)))
                     notifications = _notifications[int.Parse(nodeId)].ToString();
             }
@@ -591,7 +648,8 @@ namespace umbraco.BusinessLogic {
         /// <summary>
         /// Clears the internal hashtable containing cached information about notifications for the user
         /// </summary>
-        public void resetNotificationCache() {
+        public void resetNotificationCache()
+        {
             _notificationsInitialized = false;
             _notifications.Clear();
         }
@@ -599,12 +657,15 @@ namespace umbraco.BusinessLogic {
         /// <summary>
         /// Initializes the notifications and caches them.
         /// </summary>
-        public void initNotifications() {
+        public void initNotifications()
+        {
             if (!_isInitialized)
                 setupUser(_id);
 
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodeNotify where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", this.Id))) {
-                while (dr.Read()) {
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodeNotify where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", this.Id)))
+            {
+                while (dr.Read())
+                {
                     int nodeId = dr.GetInt("nodeId");
                     if (!_notifications.ContainsKey(nodeId))
                         _notifications.Add(nodeId, String.Empty);
@@ -619,14 +680,16 @@ namespace umbraco.BusinessLogic {
         /// Gets the user id.
         /// </summary>
         /// <value>The id.</value>
-        public int Id {
+        public int Id
+        {
             get { return _id; }
         }
 
         /// <summary>
         /// Clears the list of applications the user has access to.
         /// </summary>
-        public void clearApplications() {
+        public void clearApplications()
+        {
             SqlHelper.ExecuteNonQuery("delete from umbracoUser2app where [user] = @id", SqlHelper.CreateParameter("@id", this.Id));
         }
 
@@ -634,7 +697,8 @@ namespace umbraco.BusinessLogic {
         /// Adds a application to the list of allowed applications
         /// </summary>
         /// <param name="AppAlias">The app alias.</param>
-        public void addApplication(string AppAlias) {
+        public void addApplication(string AppAlias)
+        {
             SqlHelper.ExecuteNonQuery("insert into umbracoUser2app ([user],app) values (@id, @app)", SqlHelper.CreateParameter("@id", this.Id), SqlHelper.CreateParameter("@app", AppAlias));
         }
 
@@ -642,13 +706,16 @@ namespace umbraco.BusinessLogic {
         /// Gets or sets a value indicating whether the user has access to the Umbraco back end.
         /// </summary>
         /// <value><c>true</c> if the user has access to the back end; otherwise, <c>false</c>.</value>
-        public bool NoConsole {
-            get {
+        public bool NoConsole
+        {
+            get
+            {
                 if (!_isInitialized)
                     setupUser(_id);
                 return _userNoConsole;
             }
-            set {
+            set
+            {
                 _userNoConsole = value;
                 SqlHelper.ExecuteNonQuery("update umbracoUser set userNoConsole = @userNoConsole where id = @id", SqlHelper.CreateParameter("@id", this.Id), SqlHelper.CreateParameter("@userNoConsole", _userNoConsole));
                 FlushFromCache();
@@ -701,13 +768,16 @@ namespace umbraco.BusinessLogic {
         /// Gets or sets the start content node id.
         /// </summary>
         /// <value>The start node id.</value>
-        public int StartNodeId {
-            get {
+        public int StartNodeId
+        {
+            get
+            {
                 if (!_isInitialized)
                     setupUser(_id);
                 return _startnodeid;
             }
-            set {
+            set
+            {
 
                 _startnodeid = value;
                 SqlHelper.ExecuteNonQuery("update umbracoUser set  startStructureId = @start where id = @id", SqlHelper.CreateParameter("@start", value), SqlHelper.CreateParameter("@id", this.Id));
@@ -719,13 +789,16 @@ namespace umbraco.BusinessLogic {
         /// Gets or sets the start media id.
         /// </summary>
         /// <value>The start media id.</value>
-        public int StartMediaId {
-            get {
+        public int StartMediaId
+        {
+            get
+            {
                 if (!_isInitialized)
                     setupUser(_id);
                 return _startmediaid;
             }
-            set {
+            set
+            {
 
                 _startmediaid = value;
                 SqlHelper.ExecuteNonQuery("update umbracoUser set  startMediaId = @start where id = @id", SqlHelper.CreateParameter("@start", value), SqlHelper.CreateParameter("@id", this.Id));
@@ -736,7 +809,8 @@ namespace umbraco.BusinessLogic {
         /// <summary>
         /// Flushes the user from cache.
         /// </summary>
-        protected void FlushFromCache() {
+        protected void FlushFromCache()
+        {
             OnFlushingFromCache(EventArgs.Empty);
 
             if (System.Web.HttpRuntime.Cache[string.Format("UmbracoUser{0}", Id.ToString())] != null)
@@ -748,8 +822,10 @@ namespace umbraco.BusinessLogic {
         /// </summary>
         /// <param name="id">The id.</param>
         /// <returns></returns>
-        public static User GetUser(int id) {
-            if (System.Web.HttpRuntime.Cache[string.Format("UmbracoUser{0}", id.ToString())] == null) {
+        public static User GetUser(int id)
+        {
+            if (System.Web.HttpRuntime.Cache[string.Format("UmbracoUser{0}", id.ToString())] == null)
+            {
 
                 try
                 {
@@ -760,8 +836,8 @@ namespace umbraco.BusinessLogic {
                 {
                     //no user was found
                     return null;
-                }                
-                
+                }
+
             }
             return (User)System.Web.HttpRuntime.Cache[string.Format("UmbracoUser{0}", id.ToString())];
         }
@@ -797,7 +873,8 @@ namespace umbraco.BusinessLogic {
         /// Raises the <see cref="E:Saving"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnSaving(EventArgs e) {
+        protected virtual void OnSaving(EventArgs e)
+        {
             if (Saving != null)
                 Saving(this, e);
         }
@@ -810,7 +887,8 @@ namespace umbraco.BusinessLogic {
         /// Raises the <see cref="E:New"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnNew(EventArgs e) {
+        protected virtual void OnNew(EventArgs e)
+        {
             if (New != null)
                 New(this, e);
         }
@@ -823,7 +901,8 @@ namespace umbraco.BusinessLogic {
         /// Raises the <see cref="E:Disabling"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnDisabling(EventArgs e) {
+        protected virtual void OnDisabling(EventArgs e)
+        {
             if (Disabling != null)
                 Disabling(this, e);
         }
@@ -836,7 +915,8 @@ namespace umbraco.BusinessLogic {
         /// Raises the <see cref="E:Deleting"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnDeleting(EventArgs e) {
+        protected virtual void OnDeleting(EventArgs e)
+        {
             if (Deleting != null)
                 Deleting(this, e);
         }
@@ -849,7 +929,8 @@ namespace umbraco.BusinessLogic {
         /// Raises the <see cref="E:FlushingFromCache"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnFlushingFromCache(EventArgs e) {
+        protected virtual void OnFlushingFromCache(EventArgs e)
+        {
             if (FlushingFromCache != null)
                 FlushingFromCache(this, e);
         }
