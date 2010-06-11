@@ -2018,7 +2018,10 @@
     <Content Include="config\ExamineSettings.config" />
     <Content Include="config\ExamineIndex.config" />
     <Content Include="config\scripting.config" />
-    <None Include="Properties\Settings.settings" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
+    </None>
     <None Include="umbraco\LiveEditing\LiveEditing.cd" />
     <Content Include="umbraco\masterpages\umbracoPage.Master" />
     <Content Include="umbraco\masterpages\umbracoDialog.Master" />

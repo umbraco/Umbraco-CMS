@@ -250,7 +250,7 @@ namespace umbraco.cms.businesslogic.web
             return StylesheetProperty.MakeNew(Alias, this, u);
         }
 
-        new public void delete()
+        public override void delete()
         {
             DeleteEventArgs e = new DeleteEventArgs();
             FireBeforeDelete(e);

@@ -97,6 +97,10 @@ namespace umbraco.BusinessLogic
                     _usertype = UserType.GetUserType(dr.GetShort("UserType"));
                     _defaultToLiveEditing = dr.GetBoolean("defaultToLiveEditing");
                 }
+                else
+                {
+                    throw new ArgumentException("No User exists with ID " + ID.ToString());
+                }
             }
             _isInitialized = true;
         }

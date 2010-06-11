@@ -36,6 +36,7 @@ namespace umbraco.Test
             var user = User.GetUser(id);
             Assert.AreEqual(id, user.Id);
 
+            //System.Diagnostics.Debugger.Launch();
             user.delete();
 
             var stillUser = User.GetUser(id);

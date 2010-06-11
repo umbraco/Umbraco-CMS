@@ -92,6 +92,12 @@
             <param name="searchParams">The fluent API search.</param>
             <returns></returns>
         </member>
+        <member name="M:Examine.Providers.BaseSearchProvider.CreateSearchCriteria">
+            <summary>
+            Creates an instance of SearchCriteria for the provider
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Examine.Providers.BaseSearchProvider.CreateSearchCriteria(Examine.IndexType)">
             <summary>
             Creates an instance of SearchCriteria for the provider

@@ -378,10 +378,14 @@ namespace umbraco.cms.businesslogic.macro
 		{
             using (IRecordsReader dr = SqlHelper.ExecuteReader("select id, macroUseInEditor, macroRefreshRate, macroAlias, macroName, macroScriptType, macroScriptAssembly, macroXSLT, macroPython, macroDontRender, macroCacheByPage, macroCachePersonalized  from cmsMacro where id = @id", SqlHelper.CreateParameter("@id", _id)))
 			{
-				if(dr.Read())
-				{
+                if (dr.Read())
+                {
                     PopulateMacroInfo(dr);
-				}
+                }
+                else
+                {
+                    throw new ArgumentException("No macro found for the id specified");
+                }
 			}
 		}
 

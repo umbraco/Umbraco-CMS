@@ -79,7 +79,7 @@ namespace umbraco.cms.businesslogic.web
             return ssp;
 		}
 
-		new public void delete() 
+		public override void delete() 
 		{
             DeleteEventArgs e = new DeleteEventArgs();
             FireBeforeDelete(e);
