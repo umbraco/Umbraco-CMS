@@ -2092,11 +2092,7 @@ namespace umbraco
 
         public static void ClearLibraryCacheForMemberDo(int memberId)
         {
-            Member m = new Member(memberId);
-            if (m.nodeObjectType == Member._objectType)
-            {
-                Cache.ClearCacheByKeySearch(String.Format("UL_{0}_{1}", GETMEMBER_CACHE_KEY, memberId));
-            }
+            Cache.ClearCacheByKeySearch(String.Format("UL_{0}_{1}", GETMEMBER_CACHE_KEY, memberId));
         }
 
         /// <summary>
@@ -2254,20 +2250,20 @@ namespace umbraco
             if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
             {
                 Member.AfterSave += new Member.SaveEventHandler(Member_AfterSave);
-                Member.AfterDelete += new Member.DeleteEventHandler(Member_AfterDelete);
+                Member.BeforeDelete += new Member.DeleteEventHandler(Member_BeforeDelete);
                 Media.AfterSave += new Media.SaveEventHandler(Media_AfterSave);
-                Media.AfterDelete += new Media.DeleteEventHandler(Media_AfterDelete);
+                Media.BeforeDelete += new Media.DeleteEventHandler(Media_BeforeDelete);
             }
         }
 
-        void Media_AfterDelete(Media sender, DeleteEventArgs e)
-        {
-            library.ClearLibraryCacheForMedia(sender.Id);
-        }
-
-        void Member_AfterDelete(Member sender, DeleteEventArgs e)
+        void Member_BeforeDelete(Member sender, DeleteEventArgs e)
         {
             library.ClearLibraryCacheForMember(sender.Id);
+        }
+
+        void Media_BeforeDelete(Media sender, DeleteEventArgs e)
+        {
+            library.ClearLibraryCacheForMedia(sender.Id);
         }
 
         void Media_AfterSave(Media sender, SaveEventArgs e)
