@@ -60,7 +60,7 @@ namespace umbraco.cms.presentation.user
             );
 
             //ensure that only the nodes that the user has permissions to update are updated
-            List<int> lstNoPermissions = new List<int>();           
+            List<int> lstNoPermissions = new List<int>();
             foreach (int nodeID in nodeIDs)
             {
                 string nodeActions = UmbracoEnsuredPage.CurrentUser.GetPermissions(GetNodePath(nodeID));
@@ -78,11 +78,11 @@ namespace umbraco.cms.presentation.user
             //get the complete list of node ids that this change will affect
             List<int> allNodes = new List<int>();
             if (replaceChildren)
-				foreach (int nodeID in nodeIDs)
-				{
-					allNodes.Add(nodeID);
-					allNodes.AddRange(FindChildNodes(nodeID));
-				}                               
+                foreach (int nodeID in nodeIDs)
+                {
+                    allNodes.Add(nodeID);
+                    allNodes.AddRange(FindChildNodes(nodeID));
+                }
             else
                 allNodes.AddRange(nodeIDs);
 
@@ -98,7 +98,7 @@ namespace umbraco.cms.presentation.user
                 //If there are NO permissions for this node, we need to assign the ActionNull permission otherwise
                 //the node will inherit from it's parent.
                 InsertPermissions(nodeIDs, ActionNull.Instance);
-            }                
+            }
 
             //clear umbraco cache (this is the exact syntax umbraco uses... which should be a public method).
             HttpRuntime.Cache.Remove(string.Format("UmbracoUser{0}", m_user.Id.ToString()));
@@ -129,8 +129,13 @@ namespace umbraco.cms.presentation.user
         /// <returns></returns>
         private string GetNodePath(int iNodeID)
         {
-			Document doc = new Document(iNodeID);
-			return doc.Path;
+            if (Document.IsDocument(iNodeID))
+            {
+                Document doc = new Document(iNodeID);
+                return doc.Path;
+            } 
+            
+            return "";
         }
 
         /// <summary>
@@ -141,18 +146,18 @@ namespace umbraco.cms.presentation.user
         /// <returns></returns>
         private List<int> FindChildNodes(int nodeID)
         {
-			Document[] docs = Document.GetChildrenForTree(nodeID);
-			List<int> nodeIds = new List<int>();
-			foreach (Document doc in docs)
-			{
-				nodeIds.Add(doc.Id);
-				if (doc.HasChildren)
-				{
-					nodeIds.AddRange(FindChildNodes(doc.Id));
-				}
-			}
-			return nodeIds;
-        }        
+            Document[] docs = Document.GetChildrenForTree(nodeID);
+            List<int> nodeIds = new List<int>();
+            foreach (Document doc in docs)
+            {
+                nodeIds.Add(doc.Id);
+                if (doc.HasChildren)
+                {
+                    nodeIds.AddRange(FindChildNodes(doc.Id));
+                }
+            }
+            return nodeIds;
+        }
 
         private void InsertPermissions(int[] nodeIDs, IAction permission)
         {
@@ -161,12 +166,12 @@ namespace umbraco.cms.presentation.user
         }
 
         private void InsertPermission(int nodeID, IAction permission)
-        {            
+        {
             //create a new CMSNode object but don't initialize (this prevents a db query)
             CMSNode node = new CMSNode(nodeID, false);
-            Permission.MakeNew(m_user, node, permission.Letter);         
+            Permission.MakeNew(m_user, node, permission.Letter);
         }
-   
+
         private static void DeletePermissions(int iUserID, int iNodeID)
         {
             DeletePermissions(iUserID, new int[] { iNodeID });
@@ -185,6 +190,6 @@ namespace umbraco.cms.presentation.user
         {
             return from.ToString();
         }
-        
+
     }
 }

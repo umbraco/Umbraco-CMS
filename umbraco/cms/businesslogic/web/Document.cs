@@ -377,6 +377,26 @@ namespace umbraco.cms.businesslogic.web
         }
 
         /// <summary>
+        /// Check if a node is a document
+        /// </summary>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
+        public static bool IsDocument(int nodeId)
+        {
+            bool isDoc = false;
+            using (IRecordsReader dr =
+            SqlHelper.ExecuteReader(string.Format("select nodeId from cmsDocument where nodeId = @id"),
+                SqlHelper.CreateParameter("@id", nodeId))) {
+
+                    if (dr.Read())
+                    {
+                        isDoc = true;
+                    }
+            }
+
+            return isDoc;
+        }
+
         /// Used to get the firstlevel/root documents of the hierachy
         /// </summary>
         /// <returns>Root documents</returns>

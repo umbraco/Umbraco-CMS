@@ -1539,7 +1539,7 @@
     <Content Include="umbraco\xslt\templates\Schema2\RSSFeed.xslt" />
     <Content Include="umbraco\xslt\templates\Schema2\Sitemap.xslt" />
     <Content Include="umbraco\xslt\templates\Schema2\TablePrototype.xslt" />
-    <Content Include="web.config.UMBRACO-MIURA.xslt" />
+    <Content Include="web.config.UMBRACOELISE.xslt" />
     <Content Include="umbraco\dialogs\Preview.aspx" />
     <Content Include="umbraco_client\DateTimePicker\images\calSprite.png" />
     <Content Include="umbraco_client\DateTimePicker\images\ui-icons_666666_256x240.png" />
