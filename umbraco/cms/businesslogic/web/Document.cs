@@ -404,13 +404,12 @@ namespace umbraco.cms.businesslogic.web
         {
             Guid[] topNodeIds = TopMostNodeIds(_objectType);
 
-            Document[] retval = new Document[topNodeIds.Length];
+            var docs = new List<Document>();
             for (int i = 0; i < topNodeIds.Length; i++)
             {
-                Document d = new Document(topNodeIds[i]);
-                retval[i] = d;
+                docs.Add(new Document(topNodeIds[i]));
             }
-            return retval;
+            return docs.ToArray();
         }
 
         public static int CountSubs(int parentId, bool publishedOnly)

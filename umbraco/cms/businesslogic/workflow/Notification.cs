@@ -4,13 +4,14 @@ using System.Net.Mail;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Web;
-
+using System.Collections.Generic;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.DataLayer;
 using umbraco.IO;
+using System.Collections;
 
 namespace umbraco.cms.businesslogic.workflow
 {
@@ -21,6 +22,16 @@ namespace umbraco.cms.businesslogic.workflow
     /// </summary>
     public class Notification
     {
+
+        public int NodeId { get; private set; }
+        public int UserId { get; private set; }
+        public char ActionId { get; private set; }
+
+        /// <summary>
+        /// Private constructor as this object should not be allowed to be created currently
+        /// </summary>
+        private Notification() { }
+
         /// <summary>
         /// Gets the SQL helper.
         /// </summary>
@@ -31,7 +42,7 @@ namespace umbraco.cms.businesslogic.workflow
         }
 
         /// <summary>
-        /// Gets the notifications for the specified user regarding the specified node and action.
+        /// Sends the notifications for the specified user regarding the specified node and action.
         /// </summary>
         /// <param name="Node">The node.</param>
         /// <param name="user">The user.</param>
@@ -159,6 +170,86 @@ namespace umbraco.cms.businesslogic.workflow
         }
 
         /// <summary>
+        /// Returns the notifications for a user
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public static IEnumerable<Notification> GetUserNotifications(User user)
+        {
+            var items = new List<Notification>();
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodeNotify where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", user.Id)))
+            {
+                while (dr.Read())
+                {
+                    items.Add(new Notification()
+                    {
+                        NodeId = dr.GetInt("nodeId"),
+                        ActionId = Convert.ToChar(dr.GetString("action")),
+                        UserId = dr.GetInt("userId")
+                    });
+                }
+            }
+            return items;
+        }
+
+        /// <summary>
+        /// Returns the notifications for a node
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public static IEnumerable<Notification> GetNodeNotifications(CMSNode node)
+        {
+            var items = new List<Notification>();
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodeNotify where nodeId = @nodeId order by nodeId", SqlHelper.CreateParameter("@nodeId", node.Id)))
+            {
+                while (dr.Read())
+                {
+                    items.Add(new Notification()
+                    {
+                        NodeId = dr.GetInt("nodeId"),
+                        ActionId = Convert.ToChar(dr.GetString("action")),
+                        UserId = dr.GetInt("userId")
+                    });
+                }
+            }
+            return items;
+        }
+
+        /// <summary>
+        /// Deletes notifications by node
+        /// </summary>
+        /// <param name="nodeId"></param>
+        public static void DeleteNotifications(CMSNode node)
+        {
+            // delete all settings on the node for this node id
+            SqlHelper.ExecuteNonQuery("delete from umbracoUser2NodeNotify where nodeId = @nodeId",
+                                      SqlHelper.CreateParameter("@nodeId", node.Id));
+        }
+
+        /// <summary>
+        /// Delete notifications by user
+        /// </summary>
+        /// <param name="user"></param>
+        public static void DeleteNotifications(User user)
+        {
+            // delete all settings on the node for this node id
+            SqlHelper.ExecuteNonQuery("delete from umbracoUser2NodeNotify where userId = @userId",
+                                      SqlHelper.CreateParameter("@userId", user.Id));
+        }
+
+        /// <summary>
+        /// Delete notifications by user and node
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="node"></param>
+        public static void DeleteNotifications(User user, CMSNode node)
+        {
+            // delete all settings on the node for this user
+            SqlHelper.ExecuteNonQuery("delete from umbracoUser2NodeNotify where userId = @userId and nodeId = @nodeId",
+                                      SqlHelper.CreateParameter("@userId", user.Id), SqlHelper.CreateParameter("@nodeId", node.Id));
+        }
+
+        /// <summary>
         /// Creates a new notification
         /// </summary>
         /// <param name="User">The user.</param>
@@ -186,12 +277,11 @@ namespace umbraco.cms.businesslogic.workflow
         /// <param name="User">The user.</param>
         /// <param name="Node">The node.</param>
         /// <param name="Notifications">The notifications.</param>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static void UpdateNotifications(User User, CMSNode Node, string Notifications)
         {
             // delete all settings on the node for this user
-            SqlHelper.ExecuteNonQuery(
-                                      "delete from umbracoUser2NodeNotify where userId = @userId and nodeId = @nodeId",
-                                      SqlHelper.CreateParameter("@userId", User.Id), SqlHelper.CreateParameter("@nodeId", Node.Id));
+            DeleteNotifications(User, Node);
 
             // Loop through the permissions and create them
             foreach (char c in Notifications.ToCharArray())

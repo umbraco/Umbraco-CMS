@@ -17,6 +17,27 @@ namespace umbraco.Test
     {
 
         /// <summary>
+        /// Make sure that the admin account cannot be deleted
+        /// </summary>
+        [TestMethod()]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void User_Delete_Admin_Not_Allowed() 
+        {
+            User u = new User(0);
+            u.delete();
+        }
+
+        /// <summary>
+        /// Test the constructor to throw an exception when the object is not found by id
+        ///</summary>
+        [TestMethod()]
+        [ExpectedException(typeof(ArgumentException))]
+        public void User_Not_Found_Constructor()
+        {
+            User u = new User(-1111);
+        }
+
+        /// <summary>
         ///A test for MakeNew
         ///</summary>
         [TestMethod()]

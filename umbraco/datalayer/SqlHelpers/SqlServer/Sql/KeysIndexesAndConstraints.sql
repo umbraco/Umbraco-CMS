@@ -9,21 +9,99 @@ NOT GOING TO BREAK UMBRACO.
 
 /************************** CLEANUP ***********************************************/
 
+/* DELETE NON-EXISTING DOCUMENTS */
+delete from cmsDocument where nodeId not in (select id from umbracoNode)
+;
+
 /* CLEAN UNUSED CONTENT ROWS */
-select * from cmsContent where nodeId not in (select id from umbracoNode)
+delete from cmsContent where nodeId not in (select id from umbracoNode)
+;
 
 /* CLEAN UNUSED VERSIONS */
 delete from cmsContentVersion where contentid not in (select nodeId from cmsContent)
+;
 
 /* CLEAN UNUSED XML */
 delete from cmsContentXml where nodeid not in (select nodeId from cmsContent)
+;
 
 /* CLEAN UNUSED DOCUMENT TYPES */
 delete from cmsDocumentType where contentTypeNodeId not in (select nodeId from cmsContentType)
+;
 delete from cmsDocumentType where templateNodeId not in (select nodeid from cmsTemplate)
+;
 
 /* UPDATE EMPTY TEMPLATE REFERENCES IN DOCUMENTS */
 update cmsDocument set templateId = NULL where templateId not in (select nodeId from cmsTemplate)
+;
+
+/* DELETE ALL NOTIFICATIONS THAT NO LONGER HAVE NODES */
+delete from umbracoUser2NodeNotify where nodeId not in (select id from umbracoNode)
+;
+
+/* DELETE ALL NOTIFICATIONS THAT NO LONGER HAVE USERS */
+delete from umbracoUser2NodeNotify where userId not in (select id from umbracoUser)
+;
+
+/* DELETE UMBRACO NODE DATA THAT IS FLAGGED AS A DOCUMENT OBJECT TYPE THAT DOESN'T EXIST IN THE CONTENT TABLE ANY LONGER */
+delete from umbracoNode where id not in
+(select nodeId from cmsContent) and nodeObjectType = 'c66ba18e-eaf3-4cff-8a22-41b16d66a972'
+;
+
+/* DELETE PERMISSIONS THAT RELATED TO NON-EXISTING USERS */ 
+delete from umbracoUser2NodePermission where userId not in (select id from umbracoUser)
+;
+
+/* DELETE PERMISSIONS THAT RELATED TO NON-EXISTING NODES */
+delete from umbracoUser2NodePermission where nodeId not in (select id from umbracoNode)
+;
+
+/* 
+We need to remove any data type that doesn't exist in umbracoNode as these shouldn't actually exist 
+I think they must be left over from how Umbraco used to show the types of data types registered instead
+of using reflection. Here are the data types in the cmsDataType table that are not in umbracoNode:
+
+12	-91	A74EA9C9-8E18-4D2A-8CF6-73C6206C5DA6	Nvarchar
+22	-44	A3776494-0574-4D93-B7DE-EFDFDEC6F2D1	Ntext
+23	-128	A52C7C1C-C330-476E-8605-D63D3B84B6A6	Nvarchar
+24	-129	928639ED-9C73-4028-920C-1E55DBB68783	Nvarchar
+25	-130	A74EA9C9-8E18-4D2A-8CF6-73C6206C5DA6	Nvarchar
+26	-131	A74EA9C9-8E18-4D2A-8CF6-73C6206C5DA6	Nvarchar
+27	-132	A74EA9C9-8E18-4D2A-8CF6-73C6206C5DA6	Nvarchar
+28	-133	6C738306-4C17-4D88-B9BD-6546F3771597	Ntext
+29	-134	928639ED-9C73-4028-920C-1E55DBB68783	Nvarchar
+30	-50	AAF99BB2-DBBE-444D-A296-185076BF0484	Date
+39	1042	5E9B75AE-FACE-41C8-B47E-5F4B0FD82F83	Ntext
+40	1043	5E9B75AE-FACE-41C8-B47E-5F4B0FD82F83	Ntext
+41	1044	A74EA9C9-8E18-4D2A-8CF6-73C6206C5DA6	Ntext
+42	1045	A74EA9C9-8E18-4D2A-8CF6-73C6206C5DA6	Ntext
+47	1194	D15E1281-E456-4B24-AA86-1DDA3E4299D5	Ntext
+
+*/
+DELETE FROM cmsDataType WHERE nodeId NOT IN (SELECT id FROM umbracoNode)
+;
+
+/* Need to remove any data type prevalues that aren't related to a data type */
+DELETE FROM cmsDataTypePreValues WHERE dataTypeNodeID NOT IN (SELECT nodeId FROM cmsDataType)
+;
+
+/* Remove any domains that should not exist as they weren't deleted before when documents were deleted */
+DELETE FROM umbracoDomains WHERE domainRootStructureId NOT IN (SELECT id FROM umbracoNode)
+;
+
+-- It would be good to add constraints from cmsLanguageText to umbracoLanguage but unfortunately, a 'zero' id 
+-- is entered into cmsLanguageText when a new entry is made, since there's not language with id of zero this won't work.
+-- However, we need to remove translations that aren't related to a language (these would be left over from deleting a language)
+DELETE FROM cmsLanguageText
+WHERE languageId <> 0 AND languageId NOT IN (SELECT id FROM umbracoLanguage)
+;
+
+/* need to remove any content restrictions that don't exist in cmsContent */
+
+DELETE FROM cmsContentTypeAllowedContentType WHERE id NOT IN (SELECT nodeId FROM cmsContentType)
+;
+DELETE FROM cmsContentTypeAllowedContentType WHERE Allowedid NOT IN (SELECT nodeId FROM cmsContentType)
+;
 
 /************************** CLEANUP END ********************************************/
 
@@ -44,7 +122,7 @@ ALTER TABLE dbo.cmsContent ADD CONSTRAINT
 	(
 	nodeId
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-
+;
 
 ALTER TABLE dbo.cmsContentVersion ADD CONSTRAINT
 	FK_cmsContentVersion_cmsContent FOREIGN KEY
@@ -140,29 +218,7 @@ ALTER TABLE dbo.cmsDataType ADD CONSTRAINT
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
-/* 
-We need to remove any data type that doesn't exist in umbracoNode as these shouldn't actually exist 
-I think they must be left over from how Umbraco used to show the types of data types registered instead
-of using reflection. Here are the data types in the cmsDataType table that are not in umbracoNode:
 
-12	-91	A74EA9C9-8E18-4D2A-8CF6-73C6206C5DA6	Nvarchar
-22	-44	A3776494-0574-4D93-B7DE-EFDFDEC6F2D1	Ntext
-23	-128	A52C7C1C-C330-476E-8605-D63D3B84B6A6	Nvarchar
-24	-129	928639ED-9C73-4028-920C-1E55DBB68783	Nvarchar
-25	-130	A74EA9C9-8E18-4D2A-8CF6-73C6206C5DA6	Nvarchar
-26	-131	A74EA9C9-8E18-4D2A-8CF6-73C6206C5DA6	Nvarchar
-27	-132	A74EA9C9-8E18-4D2A-8CF6-73C6206C5DA6	Nvarchar
-28	-133	6C738306-4C17-4D88-B9BD-6546F3771597	Ntext
-29	-134	928639ED-9C73-4028-920C-1E55DBB68783	Nvarchar
-30	-50	AAF99BB2-DBBE-444D-A296-185076BF0484	Date
-39	1042	5E9B75AE-FACE-41C8-B47E-5F4B0FD82F83	Ntext
-40	1043	5E9B75AE-FACE-41C8-B47E-5F4B0FD82F83	Ntext
-41	1044	A74EA9C9-8E18-4D2A-8CF6-73C6206C5DA6	Ntext
-42	1045	A74EA9C9-8E18-4D2A-8CF6-73C6206C5DA6	Ntext
-47	1194	D15E1281-E456-4B24-AA86-1DDA3E4299D5	Ntext
-
-*/
-DELETE FROM cmsDataType WHERE nodeId NOT IN (SELECT id FROM umbracoNode)
 
 ALTER TABLE dbo.cmsDataType ADD CONSTRAINT
 	FK_cmsDataType_umbracoNode FOREIGN KEY
@@ -175,9 +231,7 @@ ALTER TABLE dbo.cmsDataType ADD CONSTRAINT
 	 ON DELETE  NO ACTION 
 ;
 
-/* Need to remove any data type prevalues that aren't related to a data type */
-DELETE FROM cmsDataTypePreValues WHERE dataTypeNodeID NOT IN (SELECT nodeId FROM cmsDataType)
-;
+
 
 ALTER TABLE dbo.cmsDataTypePreValues ADD CONSTRAINT
 	FK_cmsDataTypePreValues_cmsDataType FOREIGN KEY
@@ -337,8 +391,6 @@ ALTER TABLE dbo.cmsDocument ADD CONSTRAINT
 	 ON DELETE  NO ACTION 
 ;
 
-/* Remove any domains that should not exist as they weren't deleted before when documents were deleted */
-DELETE FROM umbracoDomains WHERE domainRootStructureId NOT IN (SELECT id FROM umbracoNode)
 
 ALTER TABLE dbo.umbracoDomains ADD CONSTRAINT
 	FK_umbracoDomains_umbracoNode FOREIGN KEY
@@ -369,11 +421,6 @@ ALTER TABLE dbo.cmsLanguageText ADD CONSTRAINT
 	 ON DELETE  NO ACTION 
 ;
 
--- It would be good to add constraints from cmsLanguageText to umbracoLanguage but unfortunately, a 'zero' id 
--- is entered into cmsLanguageText when a new entry is made, since there's not language with id of zero this won't work.
--- However, we need to remove translations that aren't related to a language (these would be left over from deleting a language)
-DELETE FROM cmsLanguageText
-WHERE languageId <> 0 AND languageId NOT IN (SELECT id FROM umbracoLanguage)
 
 
 ALTER TABLE dbo.umbracoUser2NodeNotify ADD CONSTRAINT
@@ -492,10 +539,7 @@ ALTER TABLE dbo.umbracoRelation ADD CONSTRAINT
 	 ON DELETE  NO ACTION 
 ;
 
-/* need to remove any content restrictions that don't exist in cmsContent */
 
-DELETE FROM cmsContentTypeAllowedContentType WHERE id NOT IN (SELECT nodeId FROM cmsContentType)
-DELETE FROM cmsContentTypeAllowedContentType WHERE Allowedid NOT IN (SELECT nodeId FROM cmsContentType)
 
 ALTER TABLE dbo.cmsContentTypeAllowedContentType ADD CONSTRAINT
 	FK_cmsContentTypeAllowedContentType_cmsContentType FOREIGN KEY
@@ -532,3 +576,9 @@ ALTER TABLE dbo.umbracoUser ADD CONSTRAINT
 	userLogin
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
+
+ALTER TABLE dbo.cmsTaskType ADD CONSTRAINT
+	IX_cmsTaskType UNIQUE NONCLUSTERED 
+	(
+	alias
+	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]

@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
+using System.Collections.Generic;
 
 
 namespace umbraco.cms.businesslogic.macro
@@ -132,6 +133,10 @@ namespace umbraco.cms.businesslogic.macro
                     _name = dr.GetString("macroPropertyName");
                     _type = new MacroPropertyType(dr.GetShort("macroPropertyType"));
                 }
+                else
+                {
+                    throw new ArgumentException("No macro property found for the id specified");
+                }
             }
         }
 
@@ -190,17 +195,14 @@ namespace umbraco.cms.businesslogic.macro
         /// <returns>All MacroProperties of a macro</returns>
         public static MacroProperty[] GetProperties(int MacroId)
         {
-            int totalProperties = SqlHelper.ExecuteScalar<int>("select count(*) from cmsMacroProperty where macro = @macroID", SqlHelper.CreateParameter("@macroID", MacroId));
-            int count = 0;
+            var props = new List<MacroProperty>();
             using (IRecordsReader dr = SqlHelper.ExecuteReader("select id from cmsMacroProperty where macro = @macroId order by macroPropertySortOrder, id ASC", SqlHelper.CreateParameter("@macroId", MacroId)))
-            {
-                MacroProperty[] retval = new MacroProperty[totalProperties];
+            {                
                 while (dr.Read())
                 {
-                    retval[count] = new MacroProperty(dr.GetInt("id"));
-                    count++;
+                    props.Add(new MacroProperty(dr.GetInt("id")));
                 }
-                return retval;
+                return props.ToArray();
             }
         }
 

@@ -7,6 +7,7 @@ using System.Web;
 using umbraco.DataLayer;
 using umbraco.interfaces;
 using umbraco.BusinessLogic.Utils;
+using System.Runtime.CompilerServices;
 
 namespace umbraco.BusinessLogic
 {
@@ -131,6 +132,7 @@ namespace umbraco.BusinessLogic
         /// <param name="name">The application name.</param>
         /// <param name="alias">The application alias.</param>
         /// <param name="icon">The application icon, which has to be located in umbraco/images/tray folder.</param>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static void MakeNew(string name, string alias, string icon)
         {
             bool exist = false;
@@ -159,14 +161,14 @@ namespace umbraco.BusinessLogic
         }
 
 
-        public static void MakeNew(IApplication Iapp, bool installAppTrees) {
+        //public static void MakeNew(IApplication Iapp, bool installAppTrees) {
 
-            MakeNew(Iapp.Name, Iapp.Alias, Iapp.Icon);
+        //    MakeNew(Iapp.Name, Iapp.Alias, Iapp.Icon);
 
-            if (installAppTrees) {
+        //    if (installAppTrees) {
                 
-            }
-        }
+        //    }
+        //}
 
 
         /// <summary>
@@ -186,7 +188,18 @@ namespace umbraco.BusinessLogic
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        public void Delete() {
+        public void Delete() 
+        {
+            //delete the assigned applications
+            SqlHelper.ExecuteNonQuery("delete from umbracoUser2App where app = @appAlias", SqlHelper.CreateParameter("@appAlias", this.alias));
+
+            //delete the assigned trees
+            var trees = ApplicationTree.getApplicationTree(this.alias);
+            foreach (var t in trees)
+            {
+                t.Delete();
+            }
+
             SqlHelper.ExecuteNonQuery("delete from umbracoApp where appAlias = @appAlias",
                 SqlHelper.CreateParameter("@appAlias", this._alias));
 

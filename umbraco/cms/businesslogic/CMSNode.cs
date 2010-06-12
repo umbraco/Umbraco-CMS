@@ -13,6 +13,8 @@ using System.ComponentModel;
 using umbraco.IO;
 using umbraco.cms.businesslogic.media;
 using System.Collections;
+using umbraco.cms.businesslogic.task;
+using umbraco.cms.businesslogic.workflow;
 
 namespace umbraco.cms.businesslogic
 {
@@ -540,6 +542,18 @@ order by level,sortOrder";
                     rel.Delete();
                 }
 
+                //removes tasks
+                foreach (Task t in Tasks)
+                {
+                    t.Delete();
+                }
+
+                //remove notifications
+                Notification.DeleteNotifications(this);
+
+                //remove permissions
+                Permission.DeletePermissions(this);
+
                 SqlHelper.ExecuteNonQuery("DELETE FROM umbracoNode WHERE uniqueID= @uniqueId", SqlHelper.CreateParameter("@uniqueId", _uniqueID));
                 FireAfterDelete(e);
             }
@@ -744,6 +758,14 @@ order by level,sortOrder";
         public relation.Relation[] Relations
         {
             get { return relation.Relation.GetRelations(this.Id); }
+        }
+
+        /// <summary>
+        /// Returns all tasks associated with this node
+        /// </summary>
+        public Tasks Tasks
+        {
+            get { return Task.GetTasks(this.Id); }
         }
 
         public virtual int ChildCount

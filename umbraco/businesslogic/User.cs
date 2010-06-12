@@ -5,6 +5,7 @@ using System.Collections;
 using umbraco.DataLayer;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace umbraco.BusinessLogic
 {
@@ -244,7 +245,8 @@ namespace umbraco.BusinessLogic
             {
                 if (!_isInitialized)
                     setupUser(_id);
-                ArrayList al = new ArrayList();
+
+                var apps = new List<Application>();
 
                 using (IRecordsReader appIcons = SqlHelper.ExecuteReader("select appAlias, appIcon, appname from umbracoApp app join umbracoUser2app u2a on u2a.app = app.appAlias and u2a.[user] = @userID order by app.sortOrder", SqlHelper.CreateParameter("@userID", this.Id)))
                 {
@@ -254,17 +256,11 @@ namespace umbraco.BusinessLogic
                         tmp.name = appIcons.GetString("appName");
                         tmp.icon = appIcons.GetString("appIcon");
                         tmp.alias = appIcons.GetString("appAlias");
-                        al.Add(tmp);
+                        apps.Add(tmp);
                     }
                 }
 
-                Application[] retVal = new Application[al.Count];
-
-                for (int i = 0; i < al.Count; i++)
-                {
-                    retVal[i] = (Application)al[i];
-                }
-                return retVal;
+                return apps.ToArray();
             }
         }
 
@@ -460,7 +456,8 @@ namespace umbraco.BusinessLogic
         /// <param name="lname">The login name.</param>
         /// <param name="passw">The password.</param>
         /// <param name="ut">The user type.</param>
-        public static void MakeNew(string name, string lname, string passw, UserType ut)
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public static User MakeNew(string name, string lname, string passw, UserType ut)
         {
 
             SqlHelper.ExecuteNonQuery(@"
@@ -473,7 +470,10 @@ namespace umbraco.BusinessLogic
                 SqlHelper.CreateParameter("@type", ut.Id),
                 SqlHelper.CreateParameter("@pw", passw));
 
-            new User(lname).OnNew(EventArgs.Empty);
+            var u = new User(lname);
+            u.OnNew(EventArgs.Empty);
+
+            return u;
         }
 
 
@@ -485,7 +485,8 @@ namespace umbraco.BusinessLogic
         /// <param name="passw">The passw.</param>
         /// <param name="email">The email.</param>
         /// <param name="ut">The ut.</param>
-        public static void MakeNew(string name, string lname, string passw, string email, UserType ut)
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public static User MakeNew(string name, string lname, string passw, string email, UserType ut)
         {
             SqlHelper.ExecuteNonQuery(@"
 				insert into umbracoUser 
@@ -498,7 +499,10 @@ namespace umbraco.BusinessLogic
                 SqlHelper.CreateParameter("@type", ut.Id),
                 SqlHelper.CreateParameter("@pw", passw));
 
-            new User(lname).OnNew(EventArgs.Empty);
+            var u = new User(lname);
+            u.OnNew(EventArgs.Empty);
+
+            return u;
         }
 
 
@@ -560,8 +564,20 @@ namespace umbraco.BusinessLogic
         [Obsolete("Deleting users are NOT supported as history needs to be kept. Please use the disable() method instead")]
         public void delete()
         {
+            //make sure you cannot delete the admin user!
+            if (this.Id == 0)
+                throw new InvalidOperationException("The Administrator account cannot be deleted");
+
             OnDeleting(EventArgs.Empty);
 
+            //would be better in the notifications class but since we can't reference the cms project (poorly architected) we need to use raw sql
+            SqlHelper.ExecuteNonQuery("delete from umbracoUser2NodeNotify where userId = @userId", SqlHelper.CreateParameter("@userId", Id));
+
+            //would be better in the permissions class but since we can't reference the cms project (poorly architected) we need to use raw sql
+            SqlHelper.ExecuteNonQuery("delete from umbracoUser2NodePermission where userId = @userId", SqlHelper.CreateParameter("@userId", Id));
+
+            //delete the assigned applications
+            clearApplications();
 
             SqlHelper.ExecuteNonQuery("delete from umbracoUserLogins where userID = @id", SqlHelper.CreateParameter("@id", Id));
 

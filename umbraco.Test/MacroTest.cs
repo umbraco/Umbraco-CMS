@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Xml;
+using System.Linq;
 
 namespace umbraco.Test
 {
@@ -14,6 +15,16 @@ namespace umbraco.Test
     [TestClass()]
     public class MacroTest
     {
+
+        /// <summary>
+        /// Test the constructor to throw an exception when the object is not found by id
+        ///</summary>
+        [TestMethod()]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Macro_Not_Found_Constructor()
+        {
+            Macro target = new Macro(-1111);  
+        }
 
         /// <summary>
         ///A test for MakeNew
@@ -40,18 +51,48 @@ namespace umbraco.Test
             Assert.IsFalse(isfound);
         }
 
+        /// <summary>
+        /// Creates a new macro, add a property to it and delete the macro ensuring the properties are all gone.
+        /// </summary>
+        [TestMethod()]
+        public void Macro_Make_New_Add_Property()
+        {
+            var m = Macro.MakeNew(Guid.NewGuid().ToString("N"));
+            Assert.IsTrue(m.Id > 0);
+            Assert.IsInstanceOfType(m, typeof(Macro));
+
+            //now, add a property...
+            
+            //get the first macro property type we can find
+            var mpt = MacroPropertyType.GetAll.First();
+            var mp = MacroProperty.MakeNew(m, false, Guid.NewGuid().ToString("N"), Guid.NewGuid().ToString("N"), mpt);
+            Assert.IsTrue(mp.Id > 0);
+            Assert.IsInstanceOfType(mp, typeof(MacroProperty));
+
+            m.Delete();
+            
+            //make sure the property is gone 
+            var props = MacroProperty.GetProperties(m.Id);
+            Assert.IsFalse(props.Select(x => x.Id).Contains(mp.Id));
+            
+            var isfound = false;
+            try
+            {
+                var asdf = new Macro(m.Id);
+                isfound = true;
+            }
+            catch (ArgumentException)
+            {
+                isfound = false;
+            }
+
+            Assert.IsFalse(isfound);
+
+        }
+
 
         #region Tests to write
-        ///// <summary>
-        /////A test for Macro Constructor
-        /////</summary>
-        //[TestMethod()]
-        //public void MacroConstructorTest()
-        //{
-        //    string alias = string.Empty; // TODO: Initialize to an appropriate value
-        //    Macro target = new Macro(alias);
-        //    Assert.Inconclusive("TODO: Implement code to verify target");
-        //}
+        
 
         ///// <summary>
         /////A test for Macro Constructor

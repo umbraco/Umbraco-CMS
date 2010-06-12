@@ -136,20 +136,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationTest.cs" />
+    <Compile Include="ApplicationTreeTest.cs" />
     <Compile Include="DataTypeDefinitionTest.cs" />
     <Compile Include="DictionaryTest.cs" />
     <Compile Include="DocumentTest.cs" />
     <Compile Include="DocumentTypeTest.cs" />
     <Compile Include="IOHelperTest.cs" />
     <Compile Include="LanguageTest.cs" />
+    <Compile Include="MacroPropertyTypeTest.cs" />
     <Compile Include="MacroTest.cs" />
     <Compile Include="MediaTest.cs" />
     <Compile Include="MediaTypeTest.cs" />
     <Compile Include="MemberTest.cs" />
     <Compile Include="MemberTypeTest.cs" />
+    <Compile Include="NotificationTest.cs" />
+    <Compile Include="PermissionTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyTypeTest.cs" />
     <Compile Include="StyleSheetTest.cs" />
+    <Compile Include="TaskTest.cs" />
+    <Compile Include="TaskTypeTest.cs" />
     <Compile Include="UserTest.cs" />
   </ItemGroup>
   <ItemGroup>
