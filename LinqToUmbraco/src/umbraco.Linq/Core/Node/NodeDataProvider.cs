@@ -185,7 +185,7 @@ namespace umbraco.Linq.Core.Node
         {
             CheckDisposed();
 
-            var parentXml = this.Xml.Descendants().SingleOrDefault(d => (int)d.Attribute("id") == id);
+            var parentXml = this.Xml.Descendants().SingleOrDefault(d => d.Attribute("isDoc") != null && (int)d.Attribute("id") == id);
 
             if (!ReflectionAssistance.CompareByAlias(typeof(TDocType), parentXml))
                 throw new DocTypeMissMatchException(parentXml.Name.LocalName, ReflectionAssistance.GetUmbracoInfoAttribute(typeof(TDocType)).Alias);
@@ -239,7 +239,7 @@ namespace umbraco.Linq.Core.Node
         {
             CheckDisposed();
 
-            var startElement = this.Xml.Descendants().Single(x => (int)x.Attribute("id") == startNodeId);
+            var startElement = this.Xml.Descendants().Single(x => x.Attribute("isDoc") != null && (int)x.Attribute("id") == startNodeId);
             var ancestorElements = startElement.Ancestors();
 
             IEnumerable<DocTypeBase> ancestors = DynamicNodeCreation(ancestorElements);
