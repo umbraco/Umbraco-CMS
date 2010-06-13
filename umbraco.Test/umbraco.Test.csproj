@@ -157,6 +157,7 @@
     <Compile Include="StyleSheetTest.cs" />
     <Compile Include="TaskTest.cs" />
     <Compile Include="TaskTypeTest.cs" />
+    <Compile Include="TemplateTest.cs" />
     <Compile Include="UserTest.cs" />
   </ItemGroup>
   <ItemGroup>

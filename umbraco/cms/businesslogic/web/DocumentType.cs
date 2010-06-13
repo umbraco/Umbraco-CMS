@@ -217,6 +217,9 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
+        /// <summary>
+        /// Gets/sets the allowed templates for this document type.
+        /// </summary>
         public template.Template[] allowedTemplates
         {
             get
@@ -270,6 +273,8 @@ namespace umbraco.cms.businesslogic.web
 
                 // delete all documents of this type
                 Document.DeleteFromType(this);
+
+                clearTemplates();
 
                 // Delete contentType
                 base.delete();

@@ -56,6 +56,9 @@ delete from umbracoUser2NodePermission where userId not in (select id from umbra
 delete from umbracoUser2NodePermission where nodeId not in (select id from umbracoNode)
 ;
 
+/* SET MASTER TEMPLATE TO NULL WHEN THERE ISN'T ONE SPECIFIED */
+update cmsTemplate set [master] = NULL where [master] = 0
+
 /* 
 We need to remove any data type that doesn't exist in umbracoNode as these shouldn't actually exist 
 I think they must be left over from how Umbraco used to show the types of data types registered instead
@@ -582,3 +585,26 @@ ALTER TABLE dbo.cmsTaskType ADD CONSTRAINT
 	(
 	alias
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+ALTER TABLE dbo.cmsDocumentType ADD CONSTRAINT
+	FK_cmsDocumentType_cmsTemplate FOREIGN KEY
+	(
+	templateNodeId
+	) REFERENCES dbo.cmsTemplate
+	(
+	nodeId
+	) ON UPDATE  NO ACTION 
+	 ON DELETE  NO ACTION 
+;
+
+ALTER TABLE dbo.cmsTemplate ADD CONSTRAINT
+	FK_cmsTemplate_cmsTemplate FOREIGN KEY
+	(
+	master
+	) REFERENCES dbo.cmsTemplate
+	(
+	nodeId
+	) ON UPDATE  NO ACTION 
+	 ON DELETE  NO ACTION 
+;
