@@ -31,14 +31,6 @@ namespace umbraco.editorControls.tags
         public TextBox tagBox = new TextBox();
 
 
-        public static ISqlHelper SqlHelper
-        {
-            get
-            {
-                return Application.SqlHelper;
-            }
-        }
-
         public Control Editor { get { return this; } }
 
         public void Save()
@@ -49,10 +41,10 @@ namespace umbraco.editorControls.tags
             int.TryParse(_data.NodeId.ToString(), out _nodeID);
             string allTags = "";
             int tagId = 0;
+            
+            
             //first clear out all items associated with this ID...
-            SqlHelper.ExecuteNonQuery("DELETE FROM cmsTagRelationship WHERE (nodeId = @nodeId) AND EXISTS (SELECT id FROM cmsTags WHERE (cmsTagRelationship.tagId = id) AND ([group] = @group));",
-                SqlHelper.CreateParameter("@nodeId", _nodeID),
-                SqlHelper.CreateParameter("@group", _group));
+            umbraco.cms.businesslogic.Tags.Tag.RemoveTagsFromNode(_nodeID, _group);
 
             //and now we add them again...
             foreach (ListItem li in items.Items)
@@ -62,8 +54,7 @@ namespace umbraco.editorControls.tags
 
                     if (li.Value == "0")
                     {
-
-                        tagId = saveTag(li.Text);
+                        tagId = umbraco.cms.businesslogic.Tags.Tag.AddTag(li.Text, _group);
                         li.Value = tagId.ToString();
 
                     }
@@ -75,10 +66,7 @@ namespace umbraco.editorControls.tags
                     if (tagId > 0)
                     {
 
-                        SqlHelper.ExecuteNonQuery("INSERT INTO cmsTagRelationShip(nodeId,tagId) VALUES (@nodeId, @tagId)",
-                            SqlHelper.CreateParameter("@nodeId", _nodeID),
-                            SqlHelper.CreateParameter("@tagId", tagId)
-                        );
+                        umbraco.cms.businesslogic.Tags.Tag.AssociateTagToNode(_nodeID, tagId);
 
                         tagId = 0;
                         allTags += "," + li.Text;
@@ -137,33 +125,11 @@ namespace umbraco.editorControls.tags
             }
         }
 
-        private int saveTag(string tag)
-        {
-            SqlHelper.ExecuteNonQuery("INSERT INTO cmsTags(tag,[group]) VALUES (@tag,@group)",
-                SqlHelper.CreateParameter("@tag", tag.Trim()),
-                SqlHelper.CreateParameter("@group", _group));
-            return getTagId(tag, _group);
-        }
 
+        [Obsolete("use the umbraco.cms.businesslogic.Tags.Tag class instead")]
         public int getTagId(string tag, string group)
         {
-            int retval = 0;
-            try
-            {
-                string sql = "SELECT id FROM cmsTags where tag=@tag AND [group]=@group;";
-                object result = SqlHelper.ExecuteScalar<object>(sql,
-                    SqlHelper.CreateParameter("@tag", tag),
-                    SqlHelper.CreateParameter("@group", _group));
-
-                if (result != null)
-                    retval = int.Parse(result.ToString());
-            }
-            catch (Exception ex)
-            {
-                umbraco.BusinessLogic.Log.Add(umbraco.BusinessLogic.LogTypes.Error, -1, ex.ToString());
-            }
-
-            return retval;
+            return umbraco.cms.businesslogic.Tags.Tag.GetTagId(tag, group);
         }
 
 
@@ -202,21 +168,14 @@ namespace umbraco.editorControls.tags
 
             tagCheckList.ID = "tagCheckList_" + _alias;
 
-            //fetch the current tags
-            IRecordsReader rr = SqlHelper.ExecuteReader(
-                @"SELECT * FROM cmsTags
-                  INNER JOIN cmsTagRelationship ON cmsTagRelationShip.tagId = cmsTags.id
-                  WHERE cmsTags.[group] = @group AND cmsTagRelationship.nodeid = @nodeid",
-                SqlHelper.CreateParameter("@group", _group),
-                SqlHelper.CreateParameter("@nodeid", pageId));
+            var tags = umbraco.cms.businesslogic.Tags.Tag.GetTags(int.Parse(pageId), _group);
 
-            while (rr.Read())
+            foreach(var t in tags)
             {
-                ListItem li = new ListItem(rr.GetString("tag"), rr.GetInt("id").ToString());
+                ListItem li = new ListItem(t.TagCaption, t.Id.ToString());
                 li.Selected = true;
                 tagCheckList.Items.Add(li);
             }
-            rr.Close();
 
             this.ContentTemplateContainer.Controls.Add(tagBox);
             this.ContentTemplateContainer.Controls.Add(tagButton);

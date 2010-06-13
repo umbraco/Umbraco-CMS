@@ -199,6 +199,7 @@
       <DependentUpon>PackageFiles.resx</DependentUpon>
     </Compile>
     <Compile Include="businesslogic\Property\Properties.cs" />
+    <Compile Include="businesslogic\Tags\Tag.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
     <Compile Include="helpers\Casing.cs" />
