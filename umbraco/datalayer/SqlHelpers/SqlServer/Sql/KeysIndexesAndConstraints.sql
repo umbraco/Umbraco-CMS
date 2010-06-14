@@ -106,6 +106,10 @@ DELETE FROM cmsContentTypeAllowedContentType WHERE id NOT IN (SELECT nodeId FROM
 DELETE FROM cmsContentTypeAllowedContentType WHERE Allowedid NOT IN (SELECT nodeId FROM cmsContentType)
 ;
 
+/* Though this should not have to be run because it's a new install, you need to clean the previews if you've been testing before the RC */
+DELETE FROM cmsPreviewXml WHERE VersionID NOT IN (SELECT VersionId FROM cmsContentVersion)
+;
+
 /************************** CLEANUP END ********************************************/
 
 
@@ -605,6 +609,53 @@ ALTER TABLE dbo.cmsTemplate ADD CONSTRAINT
 	) REFERENCES dbo.cmsTemplate
 	(
 	nodeId
+	) ON UPDATE  NO ACTION 
+	 ON DELETE  NO ACTION 
+;
+
+ALTER TABLE dbo.cmsContentVersion ADD CONSTRAINT
+	IX_cmsContentVersion UNIQUE NONCLUSTERED 
+	(
+	VersionId
+	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+ALTER TABLE dbo.cmsPreviewXml ADD CONSTRAINT
+	FK_cmsPreviewXml_cmsContentVersion FOREIGN KEY
+	(
+	versionId
+	) REFERENCES dbo.cmsContentVersion
+	(
+	VersionId
+	) ON UPDATE  NO ACTION 
+	 ON DELETE  NO ACTION 
+;
+
+ALTER TABLE dbo.cmsPreviewXml ADD CONSTRAINT
+	FK_cmsPreviewXml_cmsContent FOREIGN KEY
+	(
+	nodeId
+	) REFERENCES dbo.cmsContent
+	(
+	nodeId
+	) ON UPDATE  NO ACTION 
+	 ON DELETE  NO ACTION 
+;
+
+ALTER TABLE dbo.cmsMemberType ADD CONSTRAINT
+	IX_cmsMemberType UNIQUE NONCLUSTERED 
+	(
+	NodeId
+	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+;
+
+ALTER TABLE dbo.cmsMember2MemberGroup ADD CONSTRAINT
+	FK_cmsMember2MemberGroup_umbracoNode FOREIGN KEY
+	(
+	MemberGroup
+	) REFERENCES dbo.umbracoNode
+	(
+	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;

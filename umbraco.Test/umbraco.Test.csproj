@@ -111,6 +111,7 @@
     <Reference Include="System.Web.Abstractions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.Extensions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -148,6 +149,7 @@
     <Compile Include="MacroTest.cs" />
     <Compile Include="MediaTest.cs" />
     <Compile Include="MediaTypeTest.cs" />
+    <Compile Include="MemberGroupTest.cs" />
     <Compile Include="MemberTest.cs" />
     <Compile Include="MemberTypeTest.cs" />
     <Compile Include="NotificationTest.cs" />
@@ -160,6 +162,7 @@
     <Compile Include="TaskTest.cs" />
     <Compile Include="TaskTypeTest.cs" />
     <Compile Include="TemplateTest.cs" />
+    <Compile Include="UmbracoMembershipProviderTest.cs" />
     <Compile Include="UserTest.cs" />
   </ItemGroup>
   <ItemGroup>

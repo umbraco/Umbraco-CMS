@@ -450,6 +450,9 @@ namespace umbraco.cms.businesslogic
             // Delete all data associated with this content
             this.deleteAllProperties();
 
+            // Remove all content preview xml
+            SqlHelper.ExecuteNonQuery("delete from cmsPreviewXml where nodeId = " + Id);
+
             // Delete version history
             SqlHelper.ExecuteNonQuery("Delete from cmsContentVersion where ContentId = " + this.Id);
 

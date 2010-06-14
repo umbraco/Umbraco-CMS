@@ -54,7 +54,7 @@ namespace umbraco.cms.businesslogic.member
         /// Deltes the current membergroup
         /// </summary>
         [Obsolete("Use System.Web.Security.Role.DeleteRole")]
-        public new void delete()
+        public override void delete()
         {
             DeleteEventArgs e = new DeleteEventArgs();
             FireBeforeDelete(e);

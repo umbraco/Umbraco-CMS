@@ -1610,10 +1610,7 @@ namespace umbraco.cms.businesslogic.web
 
                 // Remove all files
                 DeleteAssociatedMediaFiles();
-
-                // Remove all content preview xml
-                SqlHelper.ExecuteNonQuery("delete from cmsPreviewXml where nodeId = " + Id);
-
+                
                 //remove any domains associated
                 var domains = Domain.GetDomainsById(this.Id).ToList();
                 domains.ForEach(x => x.Delete());

@@ -81,15 +81,20 @@ userGroupName nvarchar (255) NOT NULL
 ) 
  
 ; 
+
+/* TABLE IS NEVER USED, REMOVED FOR 4.1
+
 CREATE TABLE umbracoUser2userGroup 
 ( 
 user int NOT NULL, 
 userGroup smallint NOT NULL 
-) 
- 
+)  
 ; 
 ALTER TABLE umbracoUser2userGroup ADD CONSTRAINT PK_user2userGroup PRIMARY KEY CLUSTERED (user, userGroup) 
 ; 
+
+*/
+
 CREATE TABLE umbracoApp 
 ( 
 sortOrder tinyint NOT NULL DEFAULT 0, 
@@ -143,8 +148,10 @@ macroPropertyTypeRenderAssembly nvarchar (255) NULL,
 macroPropertyTypeRenderType nvarchar (255) NULL, 
 macroPropertyTypeBaseType nvarchar (255) NULL 
 ) 
- 
 ; 
+
+/* TABLE IS NEVER USED, REMOVED FOR 4.1
+
 CREATE TABLE umbracoStylesheetProperty 
 ( 
 id smallint NOT NULL PRIMARY KEY AUTO_INCREMENT, 
@@ -153,9 +160,11 @@ stylesheet tinyint NOT NULL,
 stylesheetPropertyAlias nvarchar (50) NULL, 
 stylesheetPropertyName nvarchar (255) NULL, 
 stylesheetPropertyValue nvarchar (400) NULL 
-) 
- 
+)  
 ; 
+
+*/
+
 CREATE TABLE cmsTab 
 ( 
 id int NOT NULL PRIMARY KEY AUTO_INCREMENT, 
@@ -436,16 +445,20 @@ childObjectType CHAR(36) NOT NULL,
 name nvarchar (255) NOT NULL, 
 alias nvarchar (100) NULL 
 )
+;
+
+/* TABLE IS NEVER USED, REMOVED FOR 4.1
  
-; 
 CREATE TABLE umbracoStylesheet 
 ( 
 nodeId int NOT NULL PRIMARY KEY, 
 filename nvarchar (100) NOT NULL, 
 content LONGTEXT NULL 
-) 
- 
+)  
 ; 
+
+*/
+
 CREATE TABLE umbracoUser2NodeNotify 
 ( 
 userId int NOT NULL, 
@@ -639,10 +652,16 @@ ALTER TABLE umbracoAppTree ADD FOREIGN KEY (appAlias) REFERENCES umbracoApp (app
 ; 
 ALTER TABLE cmsPropertyData ADD FOREIGN KEY (contentNodeId) REFERENCES umbracoNode (id) 
 ; 
+
+/* TABLE IS NEVER USED, REMOVED FOR 4.1
+
 ALTER TABLE umbracoUser2userGroup ADD FOREIGN KEY (user) REFERENCES umbracoUser (id)
 ;
 ALTER TABLE umbracoUser2userGroup ADD FOREIGN KEY (userGroup) REFERENCES umbracoUserGroup (id) 
 ; 
+
+*/
+
 ALTER TABLE cmsDocument ADD FOREIGN KEY (nodeId) REFERENCES umbracoNode (id) 
 ; 
 ALTER TABLE cmsMacroProperty ADD FOREIGN KEY (macroPropertyType) REFERENCES cmsMacroPropertyType (id) 
@@ -661,8 +680,14 @@ ALTER TABLE cmsContent ADD FOREIGN KEY (nodeId) REFERENCES umbracoNode (id)
 ; 
 ALTER TABLE umbracoUser2app ADD FOREIGN KEY (app) REFERENCES umbracoApp (appAlias)
 ;
+
+/* TABLE IS NEVER USED, REMOVED FOR 4.1
+
 ALTER TABLE umbracoUser2userGroup ADD FOREIGN KEY (user) REFERENCES umbracoUser (id) 
 ;
+
+*/
+
 CREATE TABLE cmsTask
 (
 closed bit NOT NULL DEFAULT 0,

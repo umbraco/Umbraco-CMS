@@ -61,7 +61,7 @@ namespace umbraco.Test
             Assert.AreEqual(1, m.Groups.Count);
             Assert.AreEqual<int>(mg.Id, ((MemberGroup)m.Groups.Cast<DictionaryEntry>().First().Value).Id);
 
-            //remove the grup
+            //remove the grup association
             m.RemoveGroup(mg.Id);
 
             //ensure they are removed
