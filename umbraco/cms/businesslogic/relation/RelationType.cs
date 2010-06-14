@@ -4,6 +4,7 @@ using System.Web;
 
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
+using System.Collections.Generic;
 
 namespace umbraco.cms.businesslogic.relation
 {
@@ -32,20 +33,24 @@ namespace umbraco.cms.businesslogic.relation
 
 		#region Constructors
 
-		public RelationType(int Id)
+        /// <summary>
+        /// Internal constructor to create a new relation type
+        /// </summary>
+        internal RelationType() { }
+
+		public RelationType(int id)
 		{
 			using (IRecordsReader dr = SqlHelper.ExecuteReader(
-				"select id, dual, name, alias from umbracoRelationType where id = @id", SqlHelper.CreateParameter("@id", Id)))
+				"select id, dual, name, alias from umbracoRelationType where id = @id", SqlHelper.CreateParameter("@id", id)))
 			{
-				if(dr.Read())
-				{
-					this._id = dr.GetInt("id");
-					this._dual = dr.GetBoolean("dual");
-					//this._parentObjectType = dr.GetGuid("parentObjectType");
-					//this._childObjectType = dr.GetGuid("childObjectType");
-					this._name = dr.GetString("name");
-					this._alias = dr.GetString("alias");
-				}
+                if (dr.Read())
+                {
+                    PopulateFromReader(dr);
+                }
+                else
+                {
+                    throw new ArgumentException("Not RelationType found for id " + id.ToString());
+                }
 			}
 		}
 
@@ -96,6 +101,16 @@ namespace umbraco.cms.businesslogic.relation
 
 		#endregion
 
+        private void PopulateFromReader(IRecordsReader dr)
+        {
+            this._id = dr.GetInt("id");
+            this._dual = dr.GetBoolean("dual");
+            //this._parentObjectType = dr.GetGuid("parentObjectType");
+            //this._childObjectType = dr.GetGuid("childObjectType");
+            this._name = dr.GetString("name");
+            this._alias = dr.GetString("alias");
+        }
+
 		#region Methods
 
 		/// <summary>
@@ -104,6 +119,27 @@ namespace umbraco.cms.businesslogic.relation
 		public virtual void Save()
 		{
 		}
+
+        /// <summary>
+        /// Return all relation types
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<RelationType> GetAll()
+        {
+            var relationTypes = new List<RelationType>();
+
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("select id, dual, name, alias from umbracoRelationType"))
+            {
+                while (dr.Read())
+                {
+                    var rt = new RelationType();
+                    rt.PopulateFromReader(dr);
+                    relationTypes.Add(rt);
+                }
+            }
+
+            return relationTypes;
+        }
 
 		public static RelationType GetById(int id)
 		{

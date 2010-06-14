@@ -3,6 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic;
+using umbraco.cms.businesslogic.web;
+using System.Linq;
+using umbraco.BusinessLogic;
 
 namespace umbraco.Test
 {
@@ -16,19 +19,61 @@ namespace umbraco.Test
     public class RelationTest
     {
 
-        ///// <summary>
-        ///// Creates 2 documents and relates them
-        /////</summary>
-        //[TestMethod()]
-        //public void Relation_Make_New()
-        //{
-            
-            
-            
-        //    actual = Relation.MakeNew(ParentId, ChildId, RelType, Comment);
-        //    Assert.AreEqual(expected, actual);
-        //    Assert.Inconclusive("Verify the correctness of this test method.");
-        //}
+        /// <summary>
+        /// Creates 2 documents and relates them, then deletes the relation
+        ///</summary>
+        [TestMethod()]
+        public void Relation_Make_New()
+        {
+            var dt = DocumentType.GetAllAsList().First();
+            var parent = Document.MakeNew(Guid.NewGuid().ToString("N"), dt, m_User, -1);
+            var child = Document.MakeNew(Guid.NewGuid().ToString("N"), dt, m_User, -1);
+            var rt = RelationType.GetAll().First();
+
+            //make the relation
+            var r = Relation.MakeNew(parent.Id, child.Id, rt, Guid.NewGuid().ToString("N"));
+            Assert.IsTrue(r.Id > 0);
+            Assert.IsInstanceOfType(r, typeof(Relation));
+
+            //delete the relation
+            r.Delete();
+            //make sure it's gone by looking up both parent & children
+            Assert.AreEqual<int>(0, Relation.GetRelations(parent.Id).Count());
+            Assert.AreEqual<int>(0, Relation.GetRelations(child.Id).Count());
+
+            //now remove the documents
+            child.delete(true);
+            parent.delete(true);
+        }
+
+        /// <summary>
+        /// Creates 2 documents, relates them, then deletes the parent doc and ensure that the relation is gone
+        /// </summary>
+        [TestMethod()]
+        public void Relation_Relate_Docs_And_Delete_Parent()
+        {
+            var dt = DocumentType.GetAllAsList().First();
+            var parent = Document.MakeNew(Guid.NewGuid().ToString("N"), dt, m_User, -1);
+            var child = Document.MakeNew(Guid.NewGuid().ToString("N"), dt, m_User, -1);
+            var rt = RelationType.GetAll().First();
+
+            //make the relation
+            var r = Relation.MakeNew(parent.Id, child.Id, rt, Guid.NewGuid().ToString("N"));
+            Assert.IsTrue(r.Id > 0);
+            Assert.IsInstanceOfType(r, typeof(Relation));
+
+            //deletes the parent
+            parent.delete(true);
+
+            //make sure it's gone by looking up both parent & children
+            Assert.AreEqual<int>(0, Relation.GetRelations(parent.Id).Count());
+            Assert.AreEqual<int>(0, Relation.GetRelations(child.Id).Count());
+
+            //now remove the documents
+            child.delete(true);
+        }
+
+        private User m_User = new User(0);
 
         #region Tests to write
 
