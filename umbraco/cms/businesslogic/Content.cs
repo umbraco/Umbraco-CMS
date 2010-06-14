@@ -724,7 +724,7 @@ namespace umbraco.cms.businesslogic
 
         private void saveXmlPreview(XmlDocument xd)
         {
-            savePreviewXml(generateXmlWithoutSaving(xd), Version);
+            SavePreviewXml(generateXmlWithoutSaving(xd), Version);
         }
 
         #endregion

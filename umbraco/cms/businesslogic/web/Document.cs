@@ -96,6 +96,7 @@ namespace umbraco.cms.businesslogic.web
                         SetupDocumentForTree(dr.GetGuid("uniqueId")
                             , dr.GetShort("level")
                             , dr.GetInt("parentId")
+                            , dr.GetInt("nodeUser")
                             , dr.GetInt("documentUser")
                             , dr.GetBoolean("published")
                             , dr.GetString("path")
@@ -169,7 +170,8 @@ namespace umbraco.cms.businesslogic.web
 	                cmsDocument.documentUser, coalesce(cmsDocument.templateId, cmsDocumentType.templateNodeId) as templateId, 
 	                umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as published, umbracoNode.createDate, 
 	                cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, 
-	                cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId
+	                cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId,
+                    umbracoNode.nodeUser
                 from umbracoNode
                     left join umbracoNode children on children.parentId = umbracoNode.id
                     inner join cmsContent on cmsContent.nodeId = umbracoNode.id
@@ -186,7 +188,7 @@ namespace umbraco.cms.businesslogic.web
 	                cmsDocument.templateId, cmsDocumentType.templateNodeId, umbracoNode.path, umbracoNode.sortOrder, 
 	                coalesce(publishCheck.published,0), umbracoNode.createDate, cmsDocument.text, 
 	                cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, 
-	                cmsContentType.masterContentType, cmsContentType.nodeId, cmsDocument.updateDate, cmsContentVersion.versionDate
+	                cmsContentType.masterContentType, cmsContentType.nodeId, cmsDocument.updateDate, cmsContentVersion.versionDate, umbracoNode.nodeUser
                 order by {1}
                 ";
 
@@ -212,6 +214,7 @@ namespace umbraco.cms.businesslogic.web
         private XmlNode _xml;
         private User _creator;
         private User _writer;
+        private int? _writerId;
         private bool _optimizedMode;
 
         /// <summary>
@@ -633,7 +636,14 @@ namespace umbraco.cms.businesslogic.web
         /// <value>The creator.</value>
         public User Creator
         {
-            get { return _creator; }
+            get
+            {
+                if (_creator == null)
+                {
+                    _creator = User;
+                }
+                return _creator;
+            }
         }
 
         /// <summary>
@@ -642,7 +652,18 @@ namespace umbraco.cms.businesslogic.web
         /// <value>The writer.</value>
         public User Writer
         {
-            get { return _writer; }
+            get
+            {
+                if (_writer == null)
+                {
+                    if (!_writerId.HasValue)
+                    {
+                        throw new NullReferenceException("Writer ID has not been specified for this document");
+                    }
+                    _writer = User.GetUser(_writerId.Value);
+                }
+                return _writer;
+            }
         }
 
         /// <summary>
@@ -943,9 +964,7 @@ namespace umbraco.cms.businesslogic.web
         {
             if (PublishWithResult(u))
             {
-                //store children array here because iterating over an Array object is very inneficient.
-                var c = this.Children;
-                foreach (cms.businesslogic.web.Document dc in c)
+                foreach (cms.businesslogic.web.Document dc in Children.ToList())
                 {
                     dc.PublishWithChildrenWithResult(u);
                 }
@@ -1036,9 +1055,7 @@ namespace umbraco.cms.businesslogic.web
                 // Update xml in db
                 XmlGenerate(new XmlDocument());
 
-                //store children array here because iterating over an Array object is very inneficient.
-                var c = Children;
-                foreach (Document dc in c)
+                foreach (Document dc in Children.ToList())
                     dc.PublishWithSubs(u);
 
                 FireAfterPublish(e);
@@ -1361,8 +1378,8 @@ namespace umbraco.cms.businesslogic.web
             else
                 x.Attributes.Append(addAttribute(xd, "parentID", "-1"));
             x.Attributes.Append(addAttribute(xd, "level", Level.ToString()));          
-            x.Attributes.Append(addAttribute(xd, "writerID", _writer.Id.ToString()));
-            x.Attributes.Append(addAttribute(xd, "creatorID", _creator.Id.ToString()));
+            x.Attributes.Append(addAttribute(xd, "writerID", Writer.Id.ToString()));
+            x.Attributes.Append(addAttribute(xd, "creatorID", Creator.Id.ToString()));
             if (ContentType != null)
                 x.Attributes.Append(addAttribute(xd, "nodeType", ContentType.Id.ToString()));
             x.Attributes.Append(addAttribute(xd, "template", _template.ToString()));
@@ -1371,8 +1388,8 @@ namespace umbraco.cms.businesslogic.web
             x.Attributes.Append(addAttribute(xd, "updateDate", VersionDate.ToString("s")));
             x.Attributes.Append(addAttribute(xd, "nodeName", Text));
             x.Attributes.Append(addAttribute(xd, "urlName", url.FormatUrl(urlName.ToLower())));
-            x.Attributes.Append(addAttribute(xd, "writerName", _writer.Name));
-            x.Attributes.Append(addAttribute(xd, "creatorName", _creator.Name.ToString()));
+            x.Attributes.Append(addAttribute(xd, "writerName", Writer.Name));
+            x.Attributes.Append(addAttribute(xd, "creatorName", Creator.Name.ToString()));
             if (ContentType != null && UmbracoSettings.UseLegacyXmlSchema)
                 x.Attributes.Append(addAttribute(xd, "nodeTypeAlias", ContentType.Alias));
             x.Attributes.Append(addAttribute(xd, "path", Path));
@@ -1521,6 +1538,7 @@ namespace umbraco.cms.businesslogic.web
             SetupDocumentForTree(dr.GetGuid("uniqueId")
                 , dr.GetShort("level")
                 , dr.GetInt("parentId")
+                , dr.GetInt("nodeUser")
                 , dr.GetInt("documentUser")
                 , (dr.GetInt("published") == 1)
                 , dr.GetString("path")
@@ -1540,19 +1558,20 @@ namespace umbraco.cms.businesslogic.web
 
         protected void SaveXmlPreview(XmlDocument xd)
         {
-            savePreviewXml(generateXmlWithoutSaving(xd), Version);
+            SavePreviewXml(generateXmlWithoutSaving(xd), Version);
         }
 
         #endregion
 
         #region Private Methods
-        private void SetupDocumentForTree(Guid uniqueId, int level, int parentId, int user, bool publish, string path,
+        private void SetupDocumentForTree(Guid uniqueId, int level, int parentId, int creator, int writer, bool publish, string path,
                                          string text, DateTime createDate, DateTime updateDate,
                                          DateTime versionDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
                                            string contentTypeDesc, int? masterContentType, int contentTypeId, int templateId)
         {
-            SetupNodeForTree(uniqueId, _objectType, level, parentId, user, path, text, createDate, hasChildren);
+            SetupNodeForTree(uniqueId, _objectType, level, parentId, creator, path, text, createDate, hasChildren);
 
+            _writerId = writer;
             _published = publish;
             _updated = updateDate;
             _template = templateId;

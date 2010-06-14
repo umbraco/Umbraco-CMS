@@ -519,7 +519,7 @@ namespace umbraco.cms.businesslogic.member
                 if (UmbracoSettings.EnableGlobalPreviewStorage)
                 {
                     // Version as new guid to ensure different versions are generated as members are not versioned currently!
-                    savePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());
+                    SavePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());
                 }
 
                 FireAfterSave(e);

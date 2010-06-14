@@ -195,6 +195,9 @@ namespace umbraco.Test
             XmlDocument xd = new XmlDocument();
             var xmlNode = doc.ToPreviewXml(xd);
 
+            //check the preview exists
+            Assert.IsTrue(doc.PreviewExists(doc.Version));
+
             Assert.IsNotNull(xmlNode);
             Assert.IsTrue(xmlNode.HasChildNodes);
         }
@@ -459,6 +462,87 @@ namespace umbraco.Test
         }
 
 
+        /// <summary>
+        ///A test for RePublishAll
+        ///</summary>
+        [TestMethod()]
+        public void Document_RePublish_All()
+        {
+            //publish the node
+            m_NewRootDoc.Publish(m_User);
+
+            Document.RePublishAll();
+
+            //now ensure that the xml has been generated
+            Assert.AreEqual<int>(1, Application.SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId=@nodeId",
+                Application.SqlHelper.CreateParameter("@nodeId", m_NewRootDoc.Id)));
+
+        }
+
+        /// <summary>
+        ///A test for RegeneratePreviews
+        ///</summary>
+        [TestMethod()]
+        public void Document_Regenerate_Previews()
+        {
+            //there won't be a preview yet...
+            Document.RegeneratePreviews();
+
+            Assert.IsTrue(m_NewRootDoc.PreviewExists(m_NewRootDoc.Version));
+        }
+
+        /// <summary>
+        ///A test for PublishWithSubs
+        ///</summary>
+        [TestMethod()]
+        public void Document_Publish_With_Subs()
+        {
+            var docList = new List<Document>();
+            var total = 20;
+            var dt = new DocumentType(GetExistingDocTypeId());
+            //allow the doc type to be created underneath itself
+            dt.AllowedChildContentTypeIDs = new int[] { dt.Id };
+            dt.Save();
+
+            Document firstNode = null;
+
+            
+
+            //create 20 content nodes underneath each other, this will test deleting with heirarchy as well
+            var lastParentId = -1;
+            for (var i = 0; i < total; i++)
+            {
+                var newDoc = Document.MakeNew(i.ToString() + Guid.NewGuid().ToString("N"), dt, m_User, lastParentId);
+                docList.Add(newDoc);
+                if (firstNode == null) firstNode = newDoc; //assign the first node
+                Assert.IsTrue(docList[docList.Count - 1].Id > 0);
+                lastParentId = newDoc.Id;
+            }
+
+            
+            //now publish the main one with subs
+            firstNode.PublishWithSubs(m_User);
+
+            //now make sure all children are published, but we need to look them up again as the data layer isn't persistent
+            var nodes = new Document(firstNode.Id).Children.ToList();
+            Assert.IsTrue(firstNode.Published);
+            foreach (var d in nodes)
+            {
+                Assert.IsTrue(d.Published);
+            }
+
+            //now delete them all
+            firstNode.delete(true);
+
+            //make sure they are all gone
+            foreach (var d in docList)
+            {
+                Assert.IsFalse(Document.IsNode(d.Id));
+            }
+
+
+        }
+
         #region TEST TO BE WRITTEN
 
         ///// <summary>
@@ -541,25 +625,9 @@ namespace umbraco.Test
         //    Assert.Inconclusive("Verify the correctness of this test method.");
         //}
 
-        ///// <summary>
-        /////A test for RePublishAll
-        /////</summary>
-        //[TestMethod()]
-        //public void RePublishAllTest()
-        //{
-        //    Document.RePublishAll();
-        //    Assert.Inconclusive("A method that does not return a value cannot be verified.");
-        //}
+      
 
-        ///// <summary>
-        /////A test for RegeneratePreviews
-        /////</summary>
-        //[TestMethod()]
-        //public void RegeneratePreviewsTest()
-        //{
-        //    Document.RegeneratePreviews();
-        //    Assert.Inconclusive("A method that does not return a value cannot be verified.");
-        //}
+        
 
         ///// <summary>
         /////A test for refreshXmlSortOrder
@@ -573,18 +641,7 @@ namespace umbraco.Test
         //    Assert.Inconclusive("A method that does not return a value cannot be verified.");
         //}
 
-        ///// <summary>
-        /////A test for PublishWithSubs
-        /////</summary>
-        //[TestMethod()]
-        //public void PublishWithSubsTest()
-        //{
-        //    Guid id = new Guid(); // TODO: Initialize to an appropriate value
-        //    Document target = new Document(id); // TODO: Initialize to an appropriate value
-        //    User u = null; // TODO: Initialize to an appropriate value
-        //    target.PublishWithSubs(u);
-        //    Assert.Inconclusive("A method that does not return a value cannot be verified.");
-        //}
+    
 
         
 

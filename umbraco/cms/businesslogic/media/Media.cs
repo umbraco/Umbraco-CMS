@@ -212,7 +212,7 @@ namespace umbraco.cms.businesslogic.media
                 if (UmbracoSettings.EnableGlobalPreviewStorage)
                 {
                     // Version as new guid to ensure different versions are generated as media are not versioned currently!
-                    savePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());
+                    SavePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());
                 }
 
                 FireAfterSave(e);

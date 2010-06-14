@@ -401,7 +401,7 @@ namespace umbraco.cms.businesslogic
             // If xml already exists
             if (!PreviewExists(UniqueId))
             {
-                savePreviewXml(ToXml(xd, false), UniqueId);
+                SavePreviewXml(ToXml(xd, false), UniqueId);
             }
             return GetPreviewXml(xd, UniqueId);
         }
@@ -982,14 +982,14 @@ order by level,sortOrder";
             return xd.ImportNode(xmlDoc.FirstChild, true);
         }
 
-        protected virtual bool PreviewExists(Guid versionId)
+        protected internal virtual bool PreviewExists(Guid versionId)
         {
             return (SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId=@nodeId and versionId = @versionId",
                         SqlHelper.CreateParameter("@nodeId", Id), SqlHelper.CreateParameter("@versionId", versionId)) != 0);
 
         }
 
-        protected void savePreviewXml(XmlNode x, Guid versionId)
+        protected void SavePreviewXml(XmlNode x, Guid versionId)
         {
             string sql = PreviewExists(versionId) ? "UPDATE cmsPreviewXml SET xml = @xml, timestamp = @timestamp WHERE nodeId=@nodeId AND versionId = @versionId"
                                 : "INSERT INTO cmsPreviewXml(nodeId, versionId, timestamp, xml) VALUES (@nodeId, @versionId, @timestamp, @xml)";
