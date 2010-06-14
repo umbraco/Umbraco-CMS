@@ -22,10 +22,23 @@ namespace umbraco.presentation.tinymce3
         protected Button Button1;
         private ArrayList _dataFields = new ArrayList();
         public Macro m;
+        private string _scriptOnLoad = "";
+
+        protected override void OnPreRender(EventArgs e)
+        {
+            base.OnPreRender(e);
+
+            if (!String.IsNullOrEmpty(_scriptOnLoad))
+            {
+                jQueryReady.Text = _scriptOnLoad;
+            }
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
 			ClientLoader.DataBind();
+
+            _scriptOnLoad = "";
 
             string reqMacroID = UmbracoContext.Current.Request["umb_macroID"];
             string reqMacroAlias = UmbracoContext.Current.Request["umb_macroAlias"];
@@ -119,7 +132,8 @@ namespace umbraco.presentation.tinymce3
                                 uicontrols.PropertyPanel pp = new global::umbraco.uicontrols.PropertyPanel();
                                 pp.Text = mp.Name;
                                 pp.Controls.Add(control);
-                                pp.Controls.Add(new LiteralControl("<script type=\"text/javascript\">registerAlias('" + control.ID + "');</script>\n"));
+                                _scriptOnLoad += "\t\tregisterAlias('" + control.ID + "');\n";
+//                                pp.Controls.Add(new LiteralControl("<script type=\"text/javascript\"></script>\n"));
                                 macroProperties.Controls.Add(pp);
 
                                 _dataFields.Add(control);
@@ -202,12 +216,15 @@ namespace umbraco.presentation.tinymce3
             div += macroContent;
             div += macro.renderMacroEndTag();
 
+            _scriptOnLoad += "\t\tumbracoEditMacroDo('" + macroAttributes.Replace("'", "\\'") +
+                                               "', '" + m.Name.Replace("'", "\\'") + "', '" + div + "');\n";
+/*
             ClientScript.RegisterStartupScript(GetType(), "postbackScript",
                                                "<script>\n umbracoEditMacroDo('" + macroAttributes.Replace("'", "\\'") +
                                                "', '" + m.Name.Replace("'", "\\'") + "', '" + div + "');\n</script>");
             ClientScript.RegisterStartupScript(GetType(), "postbackScriptWindowClose",
                                                "<script>\n //setTimeout('window.close()',300);\n</script>");
-            //theForm.Visible = false;
+*/            //theForm.Visible = false;
         }
     }
 }
