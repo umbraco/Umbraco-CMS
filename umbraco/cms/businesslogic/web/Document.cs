@@ -472,6 +472,26 @@ namespace umbraco.cms.businesslogic.web
             return tmp.ToArray();
         }
 
+        public static IEnumerable<Document> GetDocumentsOfTemplate(int templateId)
+        {
+            var tmp = new List<Document>();
+            using (IRecordsReader dr =
+                SqlHelper.ExecuteReader(
+                                        string.Format(m_SQLOptimizedMany.Trim(), "cmsDocument.templateId = @templateId", "umbracoNode.sortOrder"),
+                                        SqlHelper.CreateParameter("@nodeObjectType", Document._objectType),
+                                        SqlHelper.CreateParameter("@templateId", templateId)))
+            {
+                while (dr.Read())
+                {
+                    Document d = new Document(dr.GetInt("id"), true);
+                    d.PopulateDocumentFromReader(dr);
+                    tmp.Add(d);
+                }
+            }
+
+            return tmp.ToArray();
+        }
+
         /// <summary>
         /// Performance tuned method for use in the tree
         /// </summary>
@@ -744,9 +764,18 @@ namespace umbraco.cms.businesslogic.web
             set
             {
                 _template = value;
-                SqlHelper.ExecuteNonQuery("update cmsDocument set templateId = @value where versionId = @versionId",
-                                          SqlHelper.CreateParameter("@value", _template),
-                                          SqlHelper.CreateParameter("@versionId", Version));
+                if (value == 0)
+                {
+                    SqlHelper.ExecuteNonQuery("update cmsDocument set templateId = @value where versionId = @versionId",
+                                              SqlHelper.CreateParameter("@value", DBNull.Value),
+                                              SqlHelper.CreateParameter("@versionId", Version));
+                }
+                else
+                {
+                    SqlHelper.ExecuteNonQuery("update cmsDocument set templateId = @value where versionId = @versionId",
+                                              SqlHelper.CreateParameter("@value", _template),
+                                              SqlHelper.CreateParameter("@versionId", Version));
+                }
             }
         }
 

@@ -30,7 +30,7 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Constants and Static members
-        
+
         public static Guid _objectType = new Guid("a2cb7800-f571-4787-9638-bc48539a0efb");
 
         new internal const string m_SQLOptimizedGetAll = @"
@@ -148,7 +148,7 @@ namespace umbraco.cms.businesslogic.web
         }
 
         public static List<DocumentType> GetAllAsList()
-        {         
+        {
 
             var documentTypes = new List<DocumentType>();
 
@@ -182,8 +182,8 @@ namespace umbraco.cms.businesslogic.web
 
             return documentTypes.OrderBy(x => x.Text).ToList();
 
-        } 
-                
+        }
+
         #endregion
 
         #region Public Properties
@@ -249,6 +249,22 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Public Methods
+
+        public void RemoveTemplate(int templateId)
+        {
+            // remove if default template
+            if (this.DefaultTemplate == templateId) {
+                RemoveDefaultTemplate();
+            }
+
+            // remove from list of document type templates
+            if (_templateIds.Contains(templateId)) {
+                    SqlHelper.ExecuteNonQuery("delete from cmsDocumentType where contentTypeNodeId = @id and templateNodeId = @templateId",
+                        SqlHelper.CreateParameter("@id", this.Id), SqlHelper.CreateParameter("@templateId", templateId)
+                        );
+                _templateIds.Remove(templateId);
+            }
+        }
 
         /// <summary>
         /// 
@@ -387,7 +403,7 @@ namespace umbraco.cms.businesslogic.web
                 base.Save();
                 FireAfterSave(e);
             }
-        } 
+        }
 
         #endregion
 
@@ -405,7 +421,7 @@ namespace umbraco.cms.businesslogic.web
                         _defaultTemplate = dr.GetInt("templateNodeId");
                     }
                 }
-            }            
+            }
         }
 
         protected override void setupNode()
@@ -420,8 +436,8 @@ namespace umbraco.cms.businesslogic.web
                     PopulateDocumentTypeNodeFromReader(dr);
                 }
             }
-             
-        } 
+
+        }
 
         #endregion
 
@@ -431,10 +447,10 @@ namespace umbraco.cms.businesslogic.web
         private void setupDocumentType()
         {
             setupNode();
-        } 
+        }
 
         #endregion
-        
+
         #region Events
         /// <summary>
         /// The save event handler
@@ -517,7 +533,7 @@ namespace umbraco.cms.businesslogic.web
         {
             if (AfterDelete != null)
                 AfterDelete(this, e);
-        } 
+        }
         #endregion
     }
 }

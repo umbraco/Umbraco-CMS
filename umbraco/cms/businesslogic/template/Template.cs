@@ -263,7 +263,7 @@ namespace umbraco.cms.businesslogic.template
         }
 
         /// <summary>
-        /// Removes any references to this templates from child templates
+        /// Removes any references to this templates from child templates, documenttypes and documents
         /// </summary>
         public void RemoveAllReferences()
         {
@@ -274,7 +274,28 @@ namespace umbraco.cms.businesslogic.template
                     t.MasterTemplate = 0;
                 }
             }
+
+            RemoveFromDocumentTypes();
+
+            // remove from documents
+            foreach (Document d in Document.GetDocumentsOfTemplate(this.Id))
+            {
+                d.Template = 0;
+                d.Save();
+            }
+
+
         }
+
+        public void RemoveFromDocumentTypes()
+        {
+            foreach (DocumentType dt in DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id)))
+            {
+                dt.RemoveTemplate(this.Id);
+            }
+        }
+
+
 
         public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
         {
@@ -402,13 +423,17 @@ namespace umbraco.cms.businesslogic.template
 
             if (!e.Cancel)
             {
+                // the uncommented code below have been refactored into removeAllReferences method that clears template
+                // from documenttypes, subtemplates and documents.
+                RemoveAllReferences();
+                /*
 
                 // Added to remove template doctype relationship
                 SqlHelper.ExecuteNonQuery("delete from cmsDocumentType where templateNodeId =" + this.Id);
 
                 // Need to update any other template that references this one as it's master to NULL
                 SqlHelper.ExecuteNonQuery("update cmsTemplate set [master] = NULL where [master] = " + this.Id);
-
+                */
                 //re-set the template aliases
                 _templateAliasesInitialized = false;
                 initTemplateAliases();

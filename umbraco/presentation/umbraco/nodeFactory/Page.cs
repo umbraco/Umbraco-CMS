@@ -422,7 +422,8 @@ namespace umbraco.presentation.nodeFactory
         {
             // Load parent if it exists and is a node
 
-            if (_pageXmlNode != null && _pageXmlNode.SelectSingleNode("..") != null && _pageXmlNode.SelectSingleNode("..").Name == "node")
+            if (_pageXmlNode != null && _pageXmlNode.SelectSingleNode("..") != null && (
+                _pageXmlNode.SelectSingleNode("..").Name == "node" || _pageXmlNode.SelectSingleNode("..").Attributes.GetNamedItem("isDoc") != null))
                 _parent = new Node(_pageXmlNode.SelectSingleNode(".."), true);
         }
 

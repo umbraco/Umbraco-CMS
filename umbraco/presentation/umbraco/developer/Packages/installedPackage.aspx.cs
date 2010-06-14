@@ -414,7 +414,6 @@ namespace umbraco.presentation.developer.packages
                         Template s = new Template(nId);
                         if (s != null)
                         {
-                            s.RemoveAllReferences();
                             s.delete();
                             pack.Data.Templates.Remove(nId.ToString());
                         }
