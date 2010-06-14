@@ -9,6 +9,7 @@ using System.Collections;
 using System.Web.UI;
 using System.Web.UI.WebControls.WebParts;
 using System.Collections.Generic;
+using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.developer.packages {
     public partial class LoadNitros : System.Web.UI.UserControl {
@@ -160,9 +161,17 @@ namespace umbraco.presentation.developer.packages {
 
             if (repo.HasConnection()) {
                 try {
-                    rep_nitros.DataSource = repo.Webservice.NitrosCategorized();
+
+                    if(UmbracoSettings.UseLegacyXmlSchema)
+                        rep_nitros.DataSource = repo.Webservice.NitrosCategorizedByVersion(cms.businesslogic.packager.repositories.Version.Version4);
+                    else
+                        rep_nitros.DataSource = repo.Webservice.NitrosCategorizedByVersion(cms.businesslogic.packager.repositories.Version.Version41);
+                    
                     rep_nitros.DataBind();
                 } catch (Exception ex) {
+
+                    Log.Add(LogTypes.Debug, -1, ex.ToString());
+
                     loadNitros.Controls.Clear();
                     loadNitros.Controls.Add(fb);
                     //nitroList.Visible = false;

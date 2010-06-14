@@ -22,10 +22,6 @@
           function InstallPackages(button, elementId) {
             showProgress(button, elementId);
           }
-
-  jQuery().ready(function() {
-  jQuery('#list1a').accordion({ header: '.accordianOpener', autoheight: true });
-  });
 </script>
 
 <style type="text/css">
@@ -70,4 +66,11 @@
     
     </cc1:Pane>
   </cc1:UmbracoPanel>
+
+  <script type="text/javascript">
+    jQuery().ready(function() {
+        jQuery('#list1a').accordion({ header: '.accordianOpener', autoheight: true });
+    });
+   </script>
+
 </asp:Content>
