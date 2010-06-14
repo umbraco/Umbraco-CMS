@@ -155,6 +155,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyTypeTest.cs" />
     <Compile Include="StyleSheetTest.cs" />
+    <Compile Include="TagTest.cs" />
     <Compile Include="TaskTest.cs" />
     <Compile Include="TaskTypeTest.cs" />
     <Compile Include="TemplateTest.cs" />

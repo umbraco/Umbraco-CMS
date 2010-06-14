@@ -79,6 +79,18 @@ namespace umbraco.cms.businesslogic.Tags
         }
 
         /// <summary>
+        /// Removes a tag from the database, this will also remove all relations
+        /// </summary>
+        /// <param name="tagId"></param>
+        public static void RemoveTag(int tagId)
+        {
+            SqlHelper.ExecuteNonQuery("DELETE FROM cmsTagRelationship WHERE (tagid = @tagId)",
+               SqlHelper.CreateParameter("@tagId", tagId));
+            SqlHelper.ExecuteNonQuery("DELETE FROM cmsTags WHERE (id = @tagId)",
+               SqlHelper.CreateParameter("@tagId", tagId));
+        }
+
+        /// <summary>
         /// Delete all tag associations for the node specified
         /// </summary>
         /// <param name="nodeId"></param>
