@@ -15,6 +15,7 @@ using umbraco.cms.businesslogic.media;
 using System.Collections;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.workflow;
+using umbraco.cms.businesslogic.Tags;
 
 namespace umbraco.cms.businesslogic
 {
@@ -553,6 +554,9 @@ order by level,sortOrder";
 
                 //remove permissions
                 Permission.DeletePermissions(this);
+
+                //removes tag associations (i know the key is set to cascade but do it anyways)
+                Tag.RemoveTagsFromNode(this.Id);
 
                 SqlHelper.ExecuteNonQuery("DELETE FROM umbracoNode WHERE uniqueID= @uniqueId", SqlHelper.CreateParameter("@uniqueId", _uniqueID));
                 FireAfterDelete(e);

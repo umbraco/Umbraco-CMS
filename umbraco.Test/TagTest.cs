@@ -5,6 +5,7 @@ using umbraco.cms.businesslogic.web;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic;
 using System.Linq;
+using umbraco.BusinessLogic;
 
 namespace umbraco.Test
 {
@@ -34,6 +35,73 @@ namespace umbraco.Test
          
         }
 
+
+        /// <summary>
+        /// Creates a new tag and a new document, assigns the tag to the document and deletes the document
+        /// </summary>
+        [TestMethod()]
+        public void Tag_Make_New_Assign_Node_Delete_Node()
+        {
+
+            var t = Tag.AddTag(Guid.NewGuid().ToString("N"), Guid.NewGuid().ToString("N"));
+            Assert.IsTrue(t > 0); //id should be greater than zero
+            Assert.AreEqual<int>(1, Tag.GetTags().Where(x => x.Id == t).Count());
+
+            var dt = DocumentType.GetAllAsList().First();
+            var doc = Document.MakeNew(Guid.NewGuid().ToString("N"), dt, m_User, -1);
+
+            Tag.AssociateTagToNode(doc.Id, t);
+            //make sure it's associated
+            Assert.AreEqual<int>(1, Tag.GetTags(doc.Id).Count());
+
+            //delete the doc
+            doc.delete(true);
+
+            //make sure it's not related any more
+            Assert.AreEqual<int>(0, Tag.GetTags(doc.Id).Count());
+
+            Tag.RemoveTag(t);
+            //make sure it's gone
+            Assert.AreEqual<int>(0, Tag.GetTags().Where(x => x.Id == t).Count());
+
+        }
+
+        /// <summary>
+        /// Test the AddTagsToNode method and deletes it
+        /// </summary>
+        [TestMethod()]
+        public void Tag_Add_Tags_To_Node()
+        {
+            var dt = DocumentType.GetAllAsList().First();
+            var doc = Document.MakeNew(Guid.NewGuid().ToString("N"), dt, m_User, -1);
+
+            var grp = Guid.NewGuid().ToString("N");
+            Tag.AddTagsToNode(doc.Id, string.Format("{0},{1}", Guid.NewGuid().ToString("N"), Guid.NewGuid().ToString("N")), grp);
+
+            var tags = Tag.GetTags(doc.Id);
+            //make sure they are there by document
+            Assert.AreEqual<int>(2, tags.Count());
+
+            //make sure they are there by group
+            Assert.AreEqual<int>(2, Tag.GetTags(grp).Count());
+
+            //make sure they are there by both group and node
+            Assert.AreEqual<int>(2, Tag.GetTags(doc.Id, grp).Count());
+
+            doc.delete(true);
+
+            //make sure associations are gone
+            Assert.AreEqual<int>(0, Tag.GetTags(doc.Id).Count());
+
+            //delete the tags
+            foreach (var t in tags)
+            {
+                Tag.RemoveTag(t.Id);
+                Assert.AreEqual<int>(0, Tag.GetTags().Where(x => x.Id == t.Id).Count());
+            }
+        }
+
+        private User m_User = new User(0);
 
         #region Tests to write
 

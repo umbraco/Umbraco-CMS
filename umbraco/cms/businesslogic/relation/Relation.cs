@@ -79,15 +79,19 @@ namespace umbraco.cms.businesslogic.relation
 		{
 			using (IRecordsReader dr = SqlHelper.ExecuteReader("select * from umbracoRelation where id = @id", SqlHelper.CreateParameter("@id", Id)))
 			{
-				if(dr.Read())
-				{
-					this._id = dr.GetInt("id");
-					this._parentNode = new CMSNode(dr.GetInt("parentId"));
-					this._childNode = new CMSNode(dr.GetInt("childId"));
-					this._relType = RelationType.GetById(dr.GetInt("relType"));
-					this._comment = dr.GetString("comment");
-					this._datetime = dr.GetDateTime("datetime");
-				}
+                if (dr.Read())
+                {
+                    this._id = dr.GetInt("id");
+                    this._parentNode = new CMSNode(dr.GetInt("parentId"));
+                    this._childNode = new CMSNode(dr.GetInt("childId"));
+                    this._relType = RelationType.GetById(dr.GetInt("relType"));
+                    this._comment = dr.GetString("comment");
+                    this._datetime = dr.GetDateTime("datetime");
+                }
+                else
+                {
+                    throw new ArgumentException("No relation found for id " + Id.ToString());
+                }
 			}
 		}
 
@@ -133,7 +137,7 @@ namespace umbraco.cms.businesslogic.relation
 			return _rels;
 		}
 
-public static bool IsRelated(int ParentID, int ChildId) {
+        public static bool IsRelated(int ParentID, int ChildId) {
             int count = SqlHelper.ExecuteScalar<int>("SELECT count(*) FROM umbracoRelation WHERE childId = @childId AND parentId = @parentId",
                   SqlHelper.CreateParameter("@childId", ChildId),
                   SqlHelper.CreateParameter("@parentId", ParentID));

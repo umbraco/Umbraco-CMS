@@ -153,9 +153,10 @@ namespace umbraco.cms.businesslogic.Tags
 
         public static IEnumerable<Tag> GetTags(int nodeId, string group)
         {
-            var sql = @"SELECT * FROM cmsTags
+            var sql = @"SELECT cmsTags.id, cmsTags.tag, cmsTags.[group], count(cmsTagRelationShip.tagid) AS nodeCount FROM cmsTags
                   INNER JOIN cmsTagRelationship ON cmsTagRelationShip.tagId = cmsTags.id
-                  WHERE cmsTags.[group] = @group AND cmsTagRelationship.nodeid = @nodeid";
+                  WHERE cmsTags.[group] = @group AND cmsTagRelationship.nodeid = @nodeid
+                  GROUP BY cmsTags.id, cmsTags.tag, cmsTags.[group]";
 
             return ConvertSqlToTags(sql, 
                 SqlHelper.CreateParameter("@group", group),
@@ -190,7 +191,6 @@ namespace umbraco.cms.businesslogic.Tags
 
             string sql = @"SELECT cmsTags.id, cmsTags.tag, cmsTags.[group], count(cmsTagRelationShip.tagid) AS nodeCount FROM cmsTags
                             INNER JOIN cmsTagRelationShip ON cmsTagRelationShip.tagid = cmsTags.id
-                            INNER JOIN cmsContentXml ON cmsContentXml.nodeid = cmsTagRelationShip.nodeId
                             WHERE cmsTags.[group] = @group
                             GROUP BY cmsTags.id, cmsTags.tag, cmsTags.[group]";
 
@@ -207,11 +207,10 @@ namespace umbraco.cms.businesslogic.Tags
         {
 
             string sql = @"SELECT cmsTags.id, cmsTags.tag, cmsTags.[group], count(cmsTagRelationShip.tagid) AS nodeCount FROM cmsTags
-                            INNER JOIN cmsTagRelationShip ON cmsTagRelationShip.tagid = cmsTags.id
-                            Inner JOIN cmsContentXml ON cmsContentXml.nodeid = cmsTagRelationShip.nodeId
+                            LEFT JOIN cmsTagRelationShip ON cmsTagRelationShip.tagid = cmsTags.id
                             GROUP BY cmsTags.id, cmsTags.tag, cmsTags.[group]";
 
-            return ConvertSqlToTags(sql, SqlHelper.CreateParameter("@nodeId", "0"));
+            return ConvertSqlToTags(sql);
 
         }
 
