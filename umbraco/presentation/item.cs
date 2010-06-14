@@ -43,7 +43,8 @@ namespace umbraco
 				// Loop through XML children we need to find the fields recursive
 				if(helper.FindAttribute(attributes, "recursive") == "true")
 				{
-					XmlDocument umbracoXML = content.Instance.XmlContent;
+
+					XmlDocument umbracoXML = presentation.UmbracoContext.Current.GetXml();
 
 					String[] splitpath = (String[]) elements["splitpath"];
 					for(int i = 0; i < splitpath.Length - 1; i++)
