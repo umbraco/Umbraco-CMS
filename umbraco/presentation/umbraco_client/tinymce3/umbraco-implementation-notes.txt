@@ -32,3 +32,5 @@ Image:
 				file: tinyMCE.activeEditor.getParam('umbraco_path') + '/plugins/tinymce3/insertImage.aspx',
 				width: 575 + parseInt(ed.getLang('advimage.delta_width', 0)),
 				height: 585 + parseInt(ed.getLang('advimage.delta_height', 0)),
+
+5. Update the advlink.js to make sure that it doesn't check for the loads of tabs in the traditional tiny link dialog (check old version)

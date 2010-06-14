@@ -5,7 +5,7 @@
 * @copyright Copyright © 2004-2008, Moxiecode Systems AB, All rights reserved.
 */
 
-(function() {
+(function () {
     // Load plugin specific language pack
     tinymce.PluginManager.requireLangPack('umbraco');
 
@@ -18,18 +18,18 @@
         * @param {tinymce.Editor} ed Editor instance that the plugin is initialized in.
         * @param {string} url Absolute URL to where the plugin is located.
         */
-        init: function(ed, url) {
+        init: function (ed, url) {
 
             this.editor = ed;
 
             // Register the command so that it can be invoked by using tinyMCE.activeEditor.execCommand('mceExample');
-            ed.addCommand('mceumbracosetstyle', function() {
+            ed.addCommand('mceumbracosetstyle', function () {
                 alert('blah');
             });
 
 
             // Add a node change handler, selects the button in the UI when a image is selected
-            ed.onNodeChange.add(function(ed, cm, n) {
+            ed.onNodeChange.add(function (ed, cm, n) {
                 var c = cm.get('umbracostyles');
                 var formatSelected = false;
 
@@ -66,7 +66,7 @@
                 if (c = cm.get('formatselect')) {
                 p = DOM.getParent(n, DOM.isBlock);
 
-                    if (p)
+                if (p)
                 c.select(p.nodeName.toLowerCase());
                 }
                 */
@@ -83,7 +83,7 @@
         * @param {tinymce.ControlManager} cm Control manager to use inorder to create new control.
         * @return {tinymce.ui.Control} New control instance or null if no control was created.
         */
-        createControl: function(n, cm) {
+        createControl: function (n, cm) {
 
             // add style dropdown
             if (n == 'umbracocss') {
@@ -92,20 +92,41 @@
 
                 var styles = cm.createListBox('umbracostyles', {
                     title: this.editor.getLang('umbraco.style_select'),
-                    onselect: function(v) {
+                    onselect: function (v) {
                         if (v == '') {
                             if (styles.selectedValue.indexOf('.') == 0) {
                                 // remove style
-                                tinyMCE.activeEditor.execCommand('mceSetStyleInfo', 0, { command: 'removeformat' });
+                                var styleObj = tinymce.activeEditor.formatter.get('umb' + v.substring(1, v.length));
+                                if (styleObj == undefined) {
+                                    tinymce.activeEditor.formatter.register('umb' + v.substring(1, v.length), {
+                                        inline: 'span',
+                                        selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img',
+                                        classes: v.substring(1, v.length)
+                                    });
+                                }
+                                tinyMCE.activeEditor.formatter.remove('umb' + v.substring(1, v.length));
+
+                                //                                tinymce.activeEditor.execCommand('mceSetStyleInfo', 0, { command: 'removeformat' });
                             } else {
                                 // remove block element
-                                tinyMCE.activeEditor.execCommand('FormatBlock', false, 'p');
+                                tinymce.activeEditor.execCommand('FormatBlock', false, 'p');
                             }
                         }
                         else if (v.indexOf('.') != '0') {
-                            tinyMCE.activeEditor.execCommand('FormatBlock', false, v);
+                            tinymce.activeEditor.execCommand('FormatBlock', false, v);
                         } else {
-                            tinyMCE.activeEditor.execCommand('mceSetCSSClass', false, v.substring(1, v.length));
+                            // use new formatting engine
+                            if (tinymce.activeEditor.formatter.get(v.substring(1, v.length)) == undefined) {
+                                tinymce.activeEditor.formatter.register('umb' + v.substring(1, v.length), {
+                                    inline: 'span',
+                                    selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img',
+                                    classes: v.substring(1, v.length)
+                                });
+                            }
+                            var styleObj = tinymce.activeEditor.formatter.get('umb' + v.substring(1, v.length));
+                            tinyMCE.activeEditor.formatter.apply('umb' + v.substring(1, v.length));
+
+                            //                            tinyMCE.activeEditor.execCommand('mceSetCSSClass', false, v.substring(1, v.length));
 
                         }
                         return false;
@@ -120,7 +141,12 @@
 
                         if (alias.indexOf('.') < 0)
                             alias = alias.toLowerCase();
-
+                        else if (alias.length > 1) {
+                            // register with new formatter engine (can't access from here so a hack in the set style above!)
+                            //                            tinyMCE.activeEditor.formatter.register('umb' + alias.substring(1, alias.length), {
+                            //                                classes: alias.substring(1, alias.length)
+                            //                            });
+                        }
                         styles.add(name, alias);
                     }
                 }
@@ -132,13 +158,14 @@
             return null;
         },
 
+
         /**
         * Returns information about the plugin as a name/value array.
         * The current keys are longname, author, authorurl, infourl and version.
         *
         * @return {Object} Name/value array containing information about the plugin.
         */
-        getInfo: function() {
+        getInfo: function () {
             return {
                 longname: 'Umbraco CSS/Styling Plugin',
                 author: 'Umbraco',

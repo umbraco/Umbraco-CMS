@@ -27,12 +27,13 @@ function init() {
 	var elm = inst.selection.getNode();
 	var action = "insert";
 	var html;
+	document.getElementById('anchorlistcontainer').innerHTML = getAnchorListHTML('anchorlist', 'href');
+	document.getElementById('targetlistcontainer').innerHTML = getTargetListHTML('targetlist', 'target');
 
+/*
 	document.getElementById('hrefbrowsercontainer').innerHTML = getBrowserHTML('hrefbrowser','href','file','advlink');
 	document.getElementById('popupurlbrowsercontainer').innerHTML = getBrowserHTML('popupurlbrowser','popupurl','file','advlink');
 	document.getElementById('linklisthrefcontainer').innerHTML = getLinkListHTML('linklisthref','href');
-	document.getElementById('anchorlistcontainer').innerHTML = getAnchorListHTML('anchorlist','href');
-	document.getElementById('targetlistcontainer').innerHTML = getTargetListHTML('targetlist','target');
 
 	// Link list
 	html = getLinkListHTML('linklisthref','href');
@@ -48,18 +49,31 @@ function init() {
 	if (isVisible('popupurlbrowser'))
 		document.getElementById('popupurl').style.width = '180px';
 
-	elm = inst.dom.getParent(elm, "A");
-	if (elm != null && elm.nodeName == "A")
-		action = "update";
-
-	formObj.insert.value = tinyMCEPopup.getLang(action, 'Insert', true); 
 
 	setPopupControlsDisabled(true);
+    */
+
+	elm = inst.dom.getParent(elm, "A");
+	if (elm != null && elm.nodeName == "A")
+	    action = "update";
+
+	formObj.insert.value = tinyMCEPopup.getLang(action, 'Insert', true);
 
 	if (action == "update") {
-		var href = inst.dom.getAttrib(elm, 'href');
-		var onclick = inst.dom.getAttrib(elm, 'onclick');
+	    // umbraco specific, check local links
+	    var href = validateUmbracoLink(inst.dom.getAttrib(elm, 'href'));
+	    var onclick = inst.dom.getAttrib(elm, 'onclick');
 
+	    // Setup form data
+	    setFormValue('href', href);
+	    setFormValue('title', inst.dom.getAttrib(elm, 'title'));
+	    //setFormValue('target', inst.dom.getAttrib(elm, 'target'));
+
+	    if (href.charAt(0) == '#')
+	        selectByValue(formObj, 'anchorlist', href);
+
+	    selectByValue(formObj, 'targetlist', inst.dom.getAttrib(elm, 'target'), true);
+        /*
 		// Setup form data
 		setFormValue('href', href);
 		setFormValue('title', inst.dom.getAttrib(elm, 'title'));
@@ -108,13 +122,15 @@ function init() {
 
 		selectByValue(formObj, 'classlist', inst.dom.getAttrib(elm, 'class'), true);
 		selectByValue(formObj, 'targetlist', inst.dom.getAttrib(elm, 'target'), true);
-	} else
-		addClassesToList('classlist', 'advlink_styles');
+        */
+	} 
+//    else
+//		addClassesToList('classlist', 'advlink_styles');
 }
 
 function checkPrefix(n) {
-	if (n.value && Validator.isEmail(n) && !/^\s*mailto:/i.test(n.value) && confirm(tinyMCEPopup.getLang('advlink_dlg.is_email')))
-		n.value = 'mailto:' + n.value;
+//	if (n.value && Validator.isEmail(n) && !/^\s*mailto:/i.test(n.value) && confirm(tinyMCEPopup.getLang('advlink_dlg.is_email')))
+//		n.value = 'mailto:' + n.value;
 
 	if (/^\s*www\./i.test(n.value) && confirm(tinyMCEPopup.getLang('advlink_dlg.is_external')))
 		n.value = 'http://' + n.value;
@@ -381,6 +397,11 @@ function getAnchorListHTML(id, target) {
 function insertAction() {
 	var inst = tinyMCEPopup.editor;
 	var elm, elementArray, i;
+
+	// umbraco specific - if there's a locallink, we'll grap that
+	if (document.forms[0].localUrl.value) {
+	    document.forms[0].href.value = document.forms[0].localUrl.value;
+	}
 
 	elm = inst.selection.getNode();
 	checkPrefix(document.forms[0].href);
