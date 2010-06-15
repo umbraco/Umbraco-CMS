@@ -475,24 +475,10 @@ namespace umbraco.cms.businesslogic.web
             return tmp.ToArray();
         }
 
-        public static IEnumerable<Document> GetDocumentsOfTemplate(int templateId)
+        public static void RemoveTemplateFromDocument(int templateId)
         {
-            var tmp = new List<Document>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany.Trim(), "cmsDocument.templateId = @templateId", "umbracoNode.sortOrder"),
-                                        SqlHelper.CreateParameter("@nodeObjectType", Document._objectType),
-                                        SqlHelper.CreateParameter("@templateId", templateId)))
-            {
-                while (dr.Read())
-                {
-                    Document d = new Document(dr.GetInt("id"), true);
-                    d.PopulateDocumentFromReader(dr);
-                    tmp.Add(d);
-                }
-            }
-
-            return tmp.ToArray();
+            SqlHelper.ExecuteNonQuery("update cmsDocument set templateId = NULL where templateId = @templateId",
+                                        SqlHelper.CreateParameter("@templateId", templateId));
         }
 
         /// <summary>

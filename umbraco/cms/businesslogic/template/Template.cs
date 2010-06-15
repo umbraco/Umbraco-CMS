@@ -278,11 +278,7 @@ namespace umbraco.cms.businesslogic.template
             RemoveFromDocumentTypes();
 
             // remove from documents
-            foreach (Document d in Document.GetDocumentsOfTemplate(this.Id))
-            {
-                d.Template = 0;
-                d.Save();
-            }
+            Document.RemoveTemplateFromDocument(this.Id);
 
 
         }
