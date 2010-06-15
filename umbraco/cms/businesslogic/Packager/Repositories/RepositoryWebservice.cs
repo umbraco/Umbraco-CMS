@@ -20,13 +20,23 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
         private System.Threading.SendOrPostCallback CategoriesOperationCompleted;
         private System.Threading.SendOrPostCallback NitrosOperationCompleted;
+
         private System.Threading.SendOrPostCallback NitrosByVersionOperationCompleted;
+
         private System.Threading.SendOrPostCallback NitrosCategorizedOperationCompleted;
+
         private System.Threading.SendOrPostCallback NitrosCategorizedByVersionOperationCompleted;
+
         private System.Threading.SendOrPostCallback authenticateOperationCompleted;
+
+        private System.Threading.SendOrPostCallback fetchPackageByVersionOperationCompleted;
+
         private System.Threading.SendOrPostCallback fetchPackageOperationCompleted;
+
         private System.Threading.SendOrPostCallback fetchProtectedPackageOperationCompleted;
+
         private System.Threading.SendOrPostCallback SubmitPackageOperationCompleted;
+
         private System.Threading.SendOrPostCallback PackageByGuidOperationCompleted;
 
         /// <remarks/>
@@ -52,6 +62,9 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
         /// <remarks/>
         public event authenticateCompletedEventHandler authenticateCompleted;
+
+        /// <remarks/>
+        public event fetchPackageByVersionCompletedEventHandler fetchPackageByVersionCompleted;
 
         /// <remarks/>
         public event fetchPackageCompletedEventHandler fetchPackageCompleted;
@@ -353,6 +366,59 @@ namespace umbraco.cms.businesslogic.packager.repositories
             {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.authenticateCompleted(this, new authenticateCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://packages.umbraco.org/webservices/fetchPackageByVersion", RequestNamespace = "http://packages.umbraco.org/webservices/", ResponseNamespace = "http://packages.umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        [return: System.Xml.Serialization.XmlElementAttribute(DataType = "base64Binary")]
+        public byte[] fetchPackageByVersion(string packageGuid, Version schemaVersion)
+        {
+            object[] results = this.Invoke("fetchPackageByVersion", new object[] {
+                    packageGuid,
+                    schemaVersion});
+            return ((byte[])(results[0]));
+        }
+
+        /// <remarks/>
+        public System.IAsyncResult BeginfetchPackageByVersion(string packageGuid, Version schemaVersion, System.AsyncCallback callback, object asyncState)
+        {
+            return this.BeginInvoke("fetchPackageByVersion", new object[] {
+                    packageGuid,
+                    schemaVersion}, callback, asyncState);
+        }
+
+        /// <remarks/>
+        public byte[] EndfetchPackageByVersion(System.IAsyncResult asyncResult)
+        {
+            object[] results = this.EndInvoke(asyncResult);
+            return ((byte[])(results[0]));
+        }
+
+        /// <remarks/>
+        public void fetchPackageByVersionAsync(string packageGuid, Version schemaVersion)
+        {
+            this.fetchPackageByVersionAsync(packageGuid, schemaVersion, null);
+        }
+
+        /// <remarks/>
+        public void fetchPackageByVersionAsync(string packageGuid, Version schemaVersion, object userState)
+        {
+            if ((this.fetchPackageByVersionOperationCompleted == null))
+            {
+                this.fetchPackageByVersionOperationCompleted = new System.Threading.SendOrPostCallback(this.OnfetchPackageByVersionOperationCompleted);
+            }
+            this.InvokeAsync("fetchPackageByVersion", new object[] {
+                    packageGuid,
+                    schemaVersion}, this.fetchPackageByVersionOperationCompleted, userState);
+        }
+
+        private void OnfetchPackageByVersionOperationCompleted(object arg)
+        {
+            if ((this.fetchPackageByVersionCompleted != null))
+            {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.fetchPackageByVersionCompleted(this, new fetchPackageByVersionCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
 
@@ -1112,6 +1178,36 @@ namespace umbraco.cms.businesslogic.packager.repositories
             {
                 this.RaiseExceptionIfNecessary();
                 return ((string)(this.results[0]));
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    public delegate void fetchPackageByVersionCompletedEventHandler(object sender, fetchPackageByVersionCompletedEventArgs e);
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class fetchPackageByVersionCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs
+    {
+
+        private object[] results;
+
+        internal fetchPackageByVersionCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) :
+            base(exception, cancelled, userState)
+        {
+            this.results = results;
+        }
+
+        /// <remarks/>
+        public byte[] Result
+        {
+            get
+            {
+                this.RaiseExceptionIfNecessary();
+                return ((byte[])(this.results[0]));
             }
         }
     }
