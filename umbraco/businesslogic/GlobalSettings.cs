@@ -17,7 +17,7 @@ namespace umbraco
     {
         #region Private static fields
         // CURRENT UMBRACO VERSION ID
-        private static string _currentVersion = "4.1.0.betaII";
+        private static string _currentVersion = "4.1.0.RC";
 
         private static string _reservedUrlsCache;
         private static string _reservedPathsCache;
