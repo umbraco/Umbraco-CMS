@@ -70,8 +70,15 @@ namespace umbraco.presentation.preview
 
         public void SavePreviewSet()
         {
+            //make sure the preview folder exists first
+            var dir = new DirectoryInfo(IO.IOHelper.MapPath(IO.SystemDirectories.Preview));
+            if (!dir.Exists)
+            {
+                dir.Create();
+            }
+
             // check for old preview sets and try to clean
-            foreach (FileInfo file in new DirectoryInfo(IO.IOHelper.MapPath(IO.SystemDirectories.Preview)).GetFiles(m_userId + "_*.config"))
+            foreach (FileInfo file in dir.GetFiles(m_userId + "_*.config"))
             {
                 try
                 {
