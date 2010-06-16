@@ -83,7 +83,7 @@ namespace umbraco.IO
                 {
                     return Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco.config");
                 }
-                return IOHelper.returnPath("umbracoContentXML", "~/data/umbraco.config");
+                return IOHelper.returnPath("umbracoContentXML", "~/App_Data/umbraco.config");
             }
         }
 

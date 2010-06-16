@@ -40,7 +40,7 @@ namespace umbraco.IO
         {
             get
             {
-                return IOHelper.returnPath("umbracoStorageDirectory", "~/data");
+                return IOHelper.returnPath("umbracoStorageDirectory", "~/App_Data");
             }
         }
 
