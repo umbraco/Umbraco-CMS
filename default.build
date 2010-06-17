@@ -56,7 +56,6 @@
         </exec>
 
         <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
-        
     </target>
 
 
@@ -136,7 +135,8 @@
                 <include name="${build.dir}/**/*.compiled" />
                 <include name="${build.dir}/**/*.resx" />
                 <include name="${build.dir}/**/*.user" />
-                
+                <include name="${build.dir}/**/*.bak" />
+                    
                 <include name="${build.dir}/PrecompiledApp.config" />
                 <include name="${build.dir}/web.config.template" />
                 <include name="${build.dir}/*.xslt" />
@@ -149,6 +149,8 @@
         <!-- standard folders -->
         <mkdir dir="${build.dir}\App_Code" />
         <mkdir dir="${build.dir}\App_Data" />
+        <mkdir dir="${build.dir}\App_Data\ClientDependency" />
+        <mkdir dir="${build.dir}\App_Data\ExamineIndexes" />
 
         <mkdir dir="${build.dir}\media" />
         <mkdir dir="${build.dir}\masterpages" />

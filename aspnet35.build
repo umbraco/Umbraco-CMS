@@ -138,11 +138,12 @@
                 <include name="${build.dir}/site.py" />
             </fileset>
         </delete>
-
-
+        
         <!-- standard folders -->
         <mkdir dir="${build.dir}\App_Code" />
         <mkdir dir="${build.dir}\App_Data" />
+        <mkdir dir="${build.dir}\App_Data\ClientDependency" />
+        <mkdir dir="${build.dir}\App_Data\ExamineIndexes" />
 
         <mkdir dir="${build.dir}\media" />
         <mkdir dir="${build.dir}\masterpages" />
