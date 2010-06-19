@@ -113,18 +113,18 @@
         var rightAction = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["rightAction"]%>';
         var rightActionId = '{<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["id"]%>}';
 
-        jQuery(document).ready(function() {
+        jQuery(document).ready(function () {
 
             UmbClientMgr.setUmbracoPath("<%=umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>");
-            
+
             //call wresize first for IE/FF resize issues
-            jQuery(window).wresize(function() { resizePage(); });
+            jQuery(window).wresize(function () { resizePage(); });
             resizePage();
 
             jQuery("#umbracoMainPageBody").css("background", "#fff");
 
             //wire up the history mgr
-            UmbClientMgr.historyManager().addEventHandler("navigating", function(e, app) {
+            UmbClientMgr.historyManager().addEventHandler("navigating", function (e, app) {
                 //show modal wait dialog. TODO: Finish this
                 //jQuery("<div id='appLoading'>&nbsp;</div>").appendTo("body")
                 //    .ModalWindowShow("", false, 300, 100, 300, 0)
@@ -143,8 +143,42 @@
                                                         "content", true);
             }
 
+            
+
             jQuery("#right").show();
         });
+
+
+        // Handles single vs double click on application item icon buttons...
+
+        function appItemSingleClick(itemName) {
+            UmbClientMgr.historyManager().addHistory(itemName);
+            return false;
+        }
+        function appItemDoubleClick(itemName) {
+            //When double clicking, we'll clear the tree cache so that it loads the dashboard
+            UmbClientMgr.mainTree().clearTreeCache();
+            UmbClientMgr.historyManager().addHistory(itemName);
+            return false;
+        }
+        function appClick(appItem) {            
+            var that = this;
+            setTimeout(function () {
+                var dblclick = parseInt($(that).data('double'), 10);
+                if (dblclick > 0) {
+                    $(that).data('double', dblclick - 1);
+                } else {
+                    appItemSingleClick.call(that, appItem);
+                }
+            }, 300);
+            return false;
+        }
+        function appDblClick(appItem) {
+            $(this).data('double', 2);
+            appItemDoubleClick.call(this, appItem);
+            return false;
+        }
+
     </script>
 
 </body>

@@ -41,7 +41,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{05329D
 		config templates\config\metablogConfig.config = config templates\config\metablogConfig.config
 		config templates\config\restExtensions.config = config templates\config\restExtensions.config
 		config templates\config\scripting.config = config templates\config\scripting.config
-		config templates\config\tinyMceConfig.config = config templates\config\tinyMceConfig.config
 		config templates\config\umbracoSettings.config = config templates\config\umbracoSettings.config
 		config templates\config\UrlRewriting.config = config templates\config\UrlRewriting.config
 		config templates\config\xsltExtensions.config = config templates\config\xsltExtensions.config
