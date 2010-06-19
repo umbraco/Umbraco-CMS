@@ -313,7 +313,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions {
                 }
                 if (insertExt) {
                     XmlNode newExt = umbraco.xmlHelper.addTextNode(xdoc, "ext", "");
-                    newExt.Attributes.Append(umbraco.xmlHelper.addAttribute(xdoc, "assembly", _assembly));
+                    newExt.Attributes.Append(umbraco.xmlHelper.addAttribute(xdoc, "assembly", _assembly.Replace("/bin/","")));
                     newExt.Attributes.Append(umbraco.xmlHelper.addAttribute(xdoc, "type", _type));
                     newExt.Attributes.Append(umbraco.xmlHelper.addAttribute(xdoc, "alias", _alias));
                     xn.AppendChild(newExt);
