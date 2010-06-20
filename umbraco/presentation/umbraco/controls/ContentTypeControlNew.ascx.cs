@@ -153,14 +153,13 @@ namespace umbraco.controls
                     ListItem li = new ListItem(fileInfo[i].Name + " (deprecated)", fileInfo[i].Name);
                     li.Attributes.Add("title", this.ResolveClientUrl(SystemDirectories.Umbraco + "/images/umbraco/" + fileInfo[i].Name));
 
-                    if (!this.Page.IsPostBack && li.Value == cType.IconUrl) li.Selected = true;
+                    if (li.Value == cType.IconUrl) 
+                        li.Selected = true;
                     listOfIcons.Add(li);
                 }
             }
 
             ddlIcons.Items.AddRange(listOfIcons.OrderBy(o => o.Text).ToArray());
-
-            Page.ClientScript.RegisterStartupScript(this.GetType(), "iconsDropDown", "jQuery(function() { jQuery('#" + ddlIcons.ClientID + "').msDropDown({ showIcon: true, style: 'width:250px;' }); });", true);
 
             // Get thumbnails
             dirInfo = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/images/thumbnails"));
@@ -173,7 +172,13 @@ namespace umbraco.controls
                 ddlThumbnails.Items.Add(li);
             }
 
-            Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", "jQuery(function() { jQuery('#" + ddlThumbnails.ClientID + "').msDropDown({ showIcon: false, rowHeight: '130', visibleRows: '2', style: 'width:250px;' }); });", true);
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", @"
+function refreshDropDowns() {
+    jQuery('#" + ddlIcons.ClientID + @"').msDropDown({ showIcon: true, style: 'width:250px;' });
+    jQuery('#" + ddlThumbnails.ClientID + @"').msDropDown({ showIcon: false, rowHeight: '130', visibleRows: '2', style: 'width:250px;' });
+}
+jQuery(function() { refreshDropDowns(); });
+", true);
 
             txtName.Text = cType.GetRawText();
             txtAlias.Text = cType.Alias;
@@ -770,6 +775,12 @@ namespace umbraco.controls
                 bindTabs();
                 bindDataGenericProperties(true);
             }
+
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "dropDowns", @"
+Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
+    refreshDropDowns();
+});
+", true);
         }
 
         protected void dgTabs_ItemCommand(object source, DataGridCommandEventArgs e)
