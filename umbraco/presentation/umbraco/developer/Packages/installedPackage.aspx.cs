@@ -377,8 +377,7 @@ namespace umbraco.presentation.developer.packages
 
         protected void confirmUnInstall(object sender, EventArgs e)
         {
-			//ensure that all tree's are refreshed after uninstall
-			ClientTools.ClearClientTreeCache();
+			
 
 
             bool refreshCache = false;
@@ -560,6 +559,10 @@ namespace umbraco.presentation.developer.packages
             if (refreshCache) {
                 library.RefreshContent();
             }
+
+            //ensure that all tree's are refreshed after uninstall
+            ClientTools.ClearClientTreeCache()
+                .RefreshTree();
 
         }
 

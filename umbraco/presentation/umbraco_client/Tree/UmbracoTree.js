@@ -152,7 +152,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// <summary>This wraps the standard jsTree functionality unless a treeType is specified. If one is, then it will just reload that nodes children</summary>
                 this._debug("refreshTree: " + treeType);
                 if (!treeType) {
-                    this._tree.refresh();
+                    this.rebuildTree();
                 }
                 else {
                     var allRoots = this._getContainer().find("li[rel='rootNode']");
@@ -166,7 +166,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     }
                     else {
                         //couldn't find it, so refresh the whole tree
-                        this._tree.refresh();
+                        this.rebuildTree();
                     }
                 }
 
@@ -176,11 +176,17 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 this._debug("rebuildTree");
 
-                //don't rebuild if the tree object exists, the app that's being requested to be loaded is 
-                //flagged as already loaded, and the tree actually has nodes in it
-                if (this._tree
-                        && (this._opts.app.toLowerCase() == app.toLowerCase())) {
+                //if app is null, then we will rebuild the current app which also means clearing the cache.
+                if (!app) {                                        
+                    this.clearTreeCache();
+                    this._opts.app = this._opts.app;
+                }
+                else if (this._tree&& (this._opts.app.toLowerCase() == app.toLowerCase())) {
                     this._debug("not rebuilding");
+                    
+                    //don't rebuild if the tree object exists, the app that's being requested to be loaded is 
+                    //flagged as already loaded, and the tree actually has nodes in it
+                    
                     return;
                 }
                 else {
@@ -468,7 +474,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                             function(msg) {
                                 if (!msg || msg.length == 0) {
                                     _this._debug("reloadActionNode: error loading ajax data, performing jsTree refresh");
-                                    _this._tree.refresh(); /*try jsTree refresh as last resort */
+                                    _this.rebuildTree(); /*try jsTree refresh as last resort */
                                     if (callback != null) callback.call(_this, false);
                                     return;
                                 }
@@ -496,7 +502,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                                 }
                                 else {
                                     _this._debug("reloadActionNode: error finding child node in ajax data, performing jsTree refresh");
-                                    _this._tree.refresh(); /*try jsTree refresh as last resort */
+                                    _this.rebuildTree(); /*try jsTree refresh as last resort */
                                     if (callback != null) callback.call(_this, false);
                                 }
                             }, "json");
@@ -504,7 +510,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     }
 
                     this._debug("reloadActionNode: error finding parent node, performing jsTree refresh");
-                    this._tree.refresh(); /*try jsTree refresh as last resort */
+                    this.rebuildTree(); /*try jsTree refresh as last resort */
                     if (callback != null) callback.call(this, false);
                 }
             },

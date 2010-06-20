@@ -24,6 +24,8 @@
 <asp:Content ContentPlaceHolderID="body" runat="server">
     <cc1:UmbracoPanel ID="Panel1" Text="Install package" runat="server" Width="496px"
         Height="584px">
+       
+
         <cc1:Feedback ID="fb" Style="margin-top: 7px;" runat="server" />
         <cc1:Pane ID="pane_upload" runat="server" Text="Install from local package file">
             <cc1:PropertyPanel runat="server" Text="">
