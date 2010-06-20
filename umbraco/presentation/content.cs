@@ -200,7 +200,35 @@ namespace umbraco
             get { return Application.SqlHelper; }
         }
 
-        
+        protected static void ReGenerateSchema(XmlDocument xmlDoc)
+        {
+            string dtd = DocumentType.GenerateXmlDocumentType();
+
+            // remove current doctype
+            XmlNode n = xmlDoc.FirstChild;
+            while (n.NodeType != XmlNodeType.DocumentType && n.NextSibling != null)
+            {
+                n = n.NextSibling;
+            }
+            if (n.NodeType == XmlNodeType.DocumentType)
+            {
+                xmlDoc.RemoveChild(n);
+            }
+            XmlDocumentType docType = xmlDoc.CreateDocumentType("root", null, null, dtd);
+            xmlDoc.InsertAfter(docType, xmlDoc.FirstChild);
+
+        }
+
+        protected static void ValidateSchema(string docTypeAlias, XmlDocument xmlDoc)
+        {
+            // if doctype is not defined i)n schema, then regenerate it
+            if (!xmlDoc.DocumentType.InternalSubset.Contains(String.Format("<!ATTLIST {0} id ID #REQUIRED>", docTypeAlias)))
+            {
+                // we need to re-load the content, else the dtd changes won't be picked up by the XmlDocument
+                content.Instance.XmlContentInternal = content.Instance.LoadContentFromDatabase();
+            }
+        }
+
 
         #region Public Methods
 
@@ -276,7 +304,11 @@ namespace umbraco
 
         public static void AppendDocumentXml(int id, int level, int parentId, XmlNode docXml, XmlDocument xmlContentCopy)
         {
-
+            // Validate schema (that a definition of the current document type exists in the DTD
+            if (!UmbracoSettings.UseLegacyXmlSchema)
+            {
+                ValidateSchema(docXml.Name, xmlContentCopy);
+            }
 
             // Find the document in the xml cache
             XmlNode x = xmlContentCopy.GetElementById(id.ToString());

@@ -67,6 +67,15 @@ namespace umbraco.cms.businesslogic.web
             // (Alex N 20100212)
             dtd.AppendLine("<!DOCTYPE root [ ");
 
+            dtd.AppendLine(GenerateXmlDocumentType());
+            dtd.AppendLine("]>");
+
+            return dtd.ToString();
+        }
+
+        public static string GenerateXmlDocumentType()
+        {
+            StringBuilder dtd = new StringBuilder();
             if (UmbracoSettings.UseLegacyXmlSchema)
             {
                 dtd.AppendLine("<!ELEMENT node ANY> <!ATTLIST node id ID #REQUIRED>  <!ELEMENT data ANY>");
@@ -101,9 +110,8 @@ namespace umbraco.cms.businesslogic.web
                 }
 
             }
-            dtd.AppendLine("]>");
-
             return dtd.ToString();
+
         }
 
         public new static DocumentType GetByAlias(string Alias)
@@ -253,15 +261,17 @@ namespace umbraco.cms.businesslogic.web
         public void RemoveTemplate(int templateId)
         {
             // remove if default template
-            if (this.DefaultTemplate == templateId) {
+            if (this.DefaultTemplate == templateId)
+            {
                 RemoveDefaultTemplate();
             }
 
             // remove from list of document type templates
-            if (_templateIds.Contains(templateId)) {
-                    SqlHelper.ExecuteNonQuery("delete from cmsDocumentType where contentTypeNodeId = @id and templateNodeId = @templateId",
-                        SqlHelper.CreateParameter("@id", this.Id), SqlHelper.CreateParameter("@templateId", templateId)
-                        );
+            if (_templateIds.Contains(templateId))
+            {
+                SqlHelper.ExecuteNonQuery("delete from cmsDocumentType where contentTypeNodeId = @id and templateNodeId = @templateId",
+                    SqlHelper.CreateParameter("@id", this.Id), SqlHelper.CreateParameter("@templateId", templateId)
+                    );
                 _templateIds.Remove(templateId);
             }
         }
