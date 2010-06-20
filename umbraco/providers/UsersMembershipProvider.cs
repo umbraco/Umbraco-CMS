@@ -564,11 +564,20 @@ namespace umbraco.providers
         /// </returns>
         public override bool ValidateUser(string username, string password)
         {
-            User user = new User(username);
-            if (user != null && user.Id != -1)
+            // we need to wrap this in a try/catch as passing a non existing 
+            // user will throw an exception
+            try
             {
-                if (user.Disabled) return false;
-                else return user.ValidatePassword(EncodePassword(password));
+                User user = new User(username);
+                if (user != null && user.Id != -1)
+                {
+                    if (user.Disabled) return false;
+                    else return user.ValidatePassword(EncodePassword(password));
+                }
+            }
+            catch
+            {
+                // nothing to catch here - move on
             }
 
             return false;
