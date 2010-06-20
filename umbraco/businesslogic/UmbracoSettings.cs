@@ -599,6 +599,26 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Gets HelpPage configurations.
+        /// A help page configuration specify language, user type, application, application url and 
+        /// the target help page url.
+        /// </summary>
+        public static XmlNode HelpPages
+        {
+            get
+            {
+                try
+                {
+                    return GetKeyAsNode("/settings/help");
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets all repositories registered, and returns them as XmlNodes, containing name, alias and webservice url.
         /// These repositories are used by the build-in package installer and uninstaller to install new packages and check for updates.
         /// All repositories should have a unique alias.
