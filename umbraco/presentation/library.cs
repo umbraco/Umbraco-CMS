@@ -41,6 +41,8 @@ namespace umbraco
     /// </summary>
     public class library
     {
+        private static object locker = new object();
+
         #region Declarations
 
         /// <summary>
@@ -382,82 +384,95 @@ namespace umbraco
             return IOHelper.ResolveUrl(path);
         }
 
+        private static IDictionary<int, string> niceUrlCache = new Dictionary<int, string>();
+
         private static string niceUrlDo(int nodeID, int startNodeDepth)
         {
-            bool directoryUrls = GlobalSettings.UseDirectoryUrls;
-            string baseUrl = SystemDirectories.Root; // SystemDirectories.Umbraco;
-            //baseUrl = baseUrl.Substring(0, baseUrl.LastIndexOf("/"));
-
-            bool atDomain = false;
-            string currentDomain = HttpContext.Current.Request.ServerVariables["SERVER_NAME"].ToLower();
-            if (UmbracoSettings.UseDomainPrefixes && Domain.Exists(currentDomain))
-                atDomain = true;
-
-
-            // Find path from nodeID
-            String tempUrl = "";
-            XmlElement node = UmbracoContext.Current.GetXml().GetElementById(nodeID.ToString());
-            String[] splitpath = null;
-            if (node != null)
+            if (!niceUrlCache.ContainsKey(nodeID))
             {
-                try
+                lock (locker)
                 {
-                    splitpath =
-                        node.Attributes.GetNamedItem("path").Value.ToString().
-                            Split(",".ToCharArray());
-
-                    int startNode = startNodeDepth;
-
-                    // check root nodes for domains
-                    if (UmbracoSettings.UseDomainPrefixes && startNode > 1)
+                    if (!niceUrlCache.ContainsKey(nodeID))
                     {
-                        if (node.ParentNode.Name.ToLower() == "node")
+                        bool directoryUrls = GlobalSettings.UseDirectoryUrls;
+                        string baseUrl = SystemDirectories.Root; // SystemDirectories.Umbraco;
+                        //baseUrl = baseUrl.Substring(0, baseUrl.LastIndexOf("/"));
+
+                        bool atDomain = false;
+                        string currentDomain = HttpContext.Current.Request.ServerVariables["SERVER_NAME"].ToLower();
+                        if (UmbracoSettings.UseDomainPrefixes && Domain.Exists(currentDomain))
+                            atDomain = true;
+
+
+                        // Find path from nodeID
+                        String tempUrl = "";
+                        XmlElement node = UmbracoContext.Current.GetXml().GetElementById(nodeID.ToString());
+                        String[] splitpath = null;
+                        if (node != null)
                         {
-                            Domain[] domains =
-                                Domain.GetDomainsById(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value));
-                            if (
-                                domains.Length > 0)
+                            try
                             {
-                                tempUrl =
-                                    getUrlByDomain(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value), "",
-                                                   atDomain, currentDomain, true);
+                                splitpath =
+                                    node.Attributes.GetNamedItem("path").Value.ToString().
+                                        Split(",".ToCharArray());
+
+                                int startNode = startNodeDepth;
+
+                                // check root nodes for domains
+                                if (UmbracoSettings.UseDomainPrefixes && startNode > 1)
+                                {
+                                    if (node.ParentNode.Name.ToLower() == "node")
+                                    {
+                                        Domain[] domains =
+                                            Domain.GetDomainsById(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value));
+                                        if (
+                                            domains.Length > 0)
+                                        {
+                                            tempUrl =
+                                                getUrlByDomain(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value), "",
+                                                               atDomain, currentDomain, true);
+                                        }
+                                        // test for domains on root nodes, then make the url domain only
+                                    }
+                                    else if (Domain.GetDomainsById(nodeID).Length > 0)
+                                    {
+                                        tempUrl = getUrlByDomain(nodeID, "",
+                                                                 false, currentDomain, false);
+                                        return tempUrl;
+                                    }
+                                }
+
+
+                                if (splitpath.Length > startNode)
+                                {
+                                    for (int i = startNode; i < splitpath.Length; i++)
+                                    {
+                                        tempUrl = getUrlByDomain(int.Parse(splitpath[i]), tempUrl, atDomain, currentDomain, false);
+                                    }
+                                }
+                                else
+                                {
+                                    // check the root node for language
+                                    tempUrl += getUrlByDomain(nodeID, "", atDomain, currentDomain, false);
+                                }
                             }
-                            // test for domains on root nodes, then make the url domain only
+                            catch (Exception e)
+                            {
+                                HttpContext.Current.Trace.Warn("library.NiceUrl",
+                                                               string.Format("Error generating nice url for id '{0}'", nodeID), e);
+                                tempUrl = "/" + nodeID;
+                            }
+                            tempUrl = appendUrlExtension(baseUrl, directoryUrls, tempUrl);
                         }
-                        else if (Domain.GetDomainsById(nodeID).Length > 0)
-                        {
-                            tempUrl = getUrlByDomain(nodeID, "",
-                                                     false, currentDomain, false);
-                            return tempUrl;
-                        }
-                    }
+                        else
+                            HttpContext.Current.Trace.Warn("niceurl", string.Format("No node found at '{0}'", nodeID));
 
-
-                    if (splitpath.Length > startNode)
-                    {
-                        for (int i = startNode; i < splitpath.Length; i++)
-                        {
-                            tempUrl = getUrlByDomain(int.Parse(splitpath[i]), tempUrl, atDomain, currentDomain, false);
-                        }
-                    }
-                    else
-                    {
-                        // check the root node for language
-                        tempUrl += getUrlByDomain(nodeID, "", atDomain, currentDomain, false);
+                        niceUrlCache.Add(nodeID, tempUrl);  
                     }
                 }
-                catch (Exception e)
-                {
-                    HttpContext.Current.Trace.Warn("library.NiceUrl",
-                                                   string.Format("Error generating nice url for id '{0}'", nodeID), e);
-                    tempUrl = "/" + nodeID;
-                }
-                tempUrl = appendUrlExtension(baseUrl, directoryUrls, tempUrl);
             }
-            else
-                HttpContext.Current.Trace.Warn("niceurl", string.Format("No node found at '{0}'", nodeID));
 
-            return tempUrl;
+            return niceUrlCache[nodeID];
         }
 
         private static string appendUrlExtension(string baseUrl, bool directoryUrls, string tempUrl)
