@@ -7,6 +7,7 @@
 <head id="Head1" runat="server">
     <title></title>
     
+    <cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
     
     <!-- Default script and style -->
 	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="ui/default.css" PathNameAlias="UmbracoClient" />
@@ -20,7 +21,7 @@
 </head>
 
 <body class="umbracoDialog" style="margin: 15px 10px 0px 10px;">
-    <cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
+    
     
     <form id="form1" runat="server">
         <asp:ScriptManager ID="ScriptManager1" EnablePartialRendering="true" runat="server"></asp:ScriptManager>

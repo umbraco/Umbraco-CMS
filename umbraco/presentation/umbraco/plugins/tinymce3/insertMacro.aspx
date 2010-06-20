@@ -8,6 +8,21 @@
 <head runat="server">
     <title>{#advlink_dlg.title}</title>
     <base target="_self" />
+
+    <ui:UmbracoClientDependencyLoader runat="server" ID="ClientLoader" />
+    <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient"
+        Priority="0" />
+    <umb:JsInclude ID="JsInclude8" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient"
+        Priority="4" />
+    <umb:JsInclude ID="JsInclude1" runat="server" FilePath="tinymce3/tiny_mce_popup.js"
+        PathNameAlias="UmbracoClient" Priority="100" />
+    <umb:JsInclude ID="JsInclude3" runat="server" FilePath="tinymce3/utils/mctabs.js"
+        PathNameAlias="UmbracoClient" Priority="101" />
+    <umb:JsInclude ID="JsInclude4" runat="server" FilePath="tinymce3/utils/form_utils.js"
+        PathNameAlias="UmbracoClient" Priority="102" />
+    <umb:JsInclude ID="JsInclude5" runat="server" FilePath="tinymce3/utils/validate.js"
+        PathNameAlias="UmbracoClient" Priority="103" />
+
     <style type="text/css">
         .propertyItemheader
         {
@@ -70,19 +85,7 @@
 </script>
 </head>
 <body>
-    <ui:UmbracoClientDependencyLoader runat="server" ID="ClientLoader" />
-    <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient"
-        Priority="0" />
-    <umb:JsInclude ID="JsInclude8" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient"
-        Priority="4" />
-    <umb:JsInclude ID="JsInclude1" runat="server" FilePath="tinymce3/tiny_mce_popup.js"
-        PathNameAlias="UmbracoClient" Priority="100" />
-    <umb:JsInclude ID="JsInclude3" runat="server" FilePath="tinymce3/utils/mctabs.js"
-        PathNameAlias="UmbracoClient" Priority="101" />
-    <umb:JsInclude ID="JsInclude4" runat="server" FilePath="tinymce3/utils/form_utils.js"
-        PathNameAlias="UmbracoClient" Priority="102" />
-    <umb:JsInclude ID="JsInclude5" runat="server" FilePath="tinymce3/utils/validate.js"
-        PathNameAlias="UmbracoClient" Priority="103" />
+    
     <form id="Form1" runat="server">
     <asp:ScriptManager ID="ScriptManager1" runat="server">
     </asp:ScriptManager>

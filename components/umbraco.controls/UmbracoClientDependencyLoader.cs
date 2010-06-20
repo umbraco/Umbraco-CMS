@@ -24,7 +24,7 @@ namespace umbraco.uicontrols
         {
             this.AddPath("UmbracoClient", IOHelper.ResolveUrl( SystemDirectories.Umbraco_client ));
             this.AddPath("UmbracoRoot", IOHelper.ResolveUrl( SystemDirectories.Umbraco ));
-            this.ProviderName = PageHeaderProvider.DefaultName;  
+            this.ProviderName = LoaderControlProvider.DefaultName;  
             
         }
 

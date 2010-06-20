@@ -9,6 +9,16 @@
     
     <umb1:PageTitle runat="server" />
 
+    <cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader"  />
+	
+	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="style.css" />
+	<umb:CssInclude ID="CssInclude2" runat="server" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />
+	
+	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
+	<umb:JsInclude ID="JsInclude3" runat="server" FilePath="Application/NamespaceManager.js" PathNameAlias="UmbracoClient" Priority="0" />
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="modal/modal.js" PathNameAlias="UmbracoClient" Priority="10" />
+	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="passwordStrength/passwordstrength.js" PathNameAlias="UmbracoClient" Priority="11" />
+
     <style type="text/css">
       #generatedCategories{display: none;}
       #list1a{height: 300px; overflow: auto;}
@@ -58,15 +68,7 @@
         }
     </script>
 
-	<cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader"  />
 	
-	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="style.css" />
-	<umb:CssInclude ID="CssInclude2" runat="server" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />
-	
-	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
-	<umb:JsInclude ID="JsInclude3" runat="server" FilePath="Application/NamespaceManager.js" PathNameAlias="UmbracoClient" Priority="0" />
-	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="modal/modal.js" PathNameAlias="UmbracoClient" Priority="10" />
-	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="passwordStrength/passwordstrength.js" PathNameAlias="UmbracoClient" Priority="11" />
 
     <form id="Form1" method="post" runat="server">
     <asp:ScriptManager runat="server" ID="umbracoScriptManager">

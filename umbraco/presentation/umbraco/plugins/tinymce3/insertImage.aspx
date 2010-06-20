@@ -11,6 +11,21 @@
     <title>{#advimage_dlg.dialog_title}</title>
 
     <base target="_self" />
+
+    <ui:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
+	
+	<umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
+	<umb:JsInclude ID="JsInclude9" runat="server" FilePath="Application/jQuery/jquery.noconflict-invoke.js" PathNameAlias="UmbracoClient" Priority="1" />
+	<umb:JsInclude ID="JsInclude8" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" Priority="4" />
+	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="tinymce3/tiny_mce_popup.js" PathNameAlias="UmbracoClient" Priority="100" />
+	<umb:JsInclude ID="JsInclude5" runat="server" FilePath="tinymce3/utils/mctabs.js" PathNameAlias="UmbracoClient" Priority="101" />
+	<umb:JsInclude ID="JsInclude6" runat="server" FilePath="tinymce3/utils/form_utils.js" PathNameAlias="UmbracoClient" Priority="102" />
+	<umb:JsInclude ID="JsInclude7" runat="server" FilePath="tinymce3/utils/validate.js" PathNameAlias="UmbracoClient" Priority="103" />
+
+	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="tinymce3/utils/editable_selects.js" PathNameAlias="UmbracoClient" Priority="110" />
+	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="tinymce3/plugins/umbracoimg/js/image.js" PathNameAlias="UmbracoClient" Priority="111" />
+
+    
     
     <style type="text/css">        
         .imageViewer .bgImage {position: absolute; top: 3px; right: 3px; }
@@ -130,18 +145,7 @@
         
     </script>
     
-	<ui:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
 	
-	<umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
-	<umb:JsInclude ID="JsInclude9" runat="server" FilePath="Application/jQuery/jquery.noconflict-invoke.js" PathNameAlias="UmbracoClient" Priority="1" />
-	<umb:JsInclude ID="JsInclude8" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" Priority="4" />
-	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="tinymce3/tiny_mce_popup.js" PathNameAlias="UmbracoClient" Priority="100" />
-	<umb:JsInclude ID="JsInclude5" runat="server" FilePath="tinymce3/utils/mctabs.js" PathNameAlias="UmbracoClient" Priority="101" />
-	<umb:JsInclude ID="JsInclude6" runat="server" FilePath="tinymce3/utils/form_utils.js" PathNameAlias="UmbracoClient" Priority="102" />
-	<umb:JsInclude ID="JsInclude7" runat="server" FilePath="tinymce3/utils/validate.js" PathNameAlias="UmbracoClient" Priority="103" />
-
-	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="tinymce3/utils/editable_selects.js" PathNameAlias="UmbracoClient" Priority="110" />
-	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="tinymce3/plugins/umbracoimg/js/image.js" PathNameAlias="UmbracoClient" Priority="111" />
       
     <form id="Form1" runat="server">
     

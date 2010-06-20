@@ -5,14 +5,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
 	<title><%= umbraco.ui.Text("insertAnchor") %></title>
-	<base target="_self" />
-</head>
-<body style="display: none">
+	
+    <base target="_self" />
 
-	<cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
+    <cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
 	
 	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="tinymce3/tiny_mce_popup.js" PathNameAlias="UmbracoClient" Priority="100" />
 	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="tinymce3/themes/umbraco/js/anchor.js" PathNameAlias="UmbracoClient" Priority="101" />
+    
+    
+</head>
+<body style="display: none">
+
+	
 
 <form onsubmit="AnchorDialog.update();return false;" action="#">
 	<table border="0" cellpadding="4" cellspacing="0">

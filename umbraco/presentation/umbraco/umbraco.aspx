@@ -11,15 +11,8 @@
 
 <head runat="server">
     <title>Umbraco CMS - <%=Request.Url.Host.ToLower().Replace("www.", "") %></title>
-    <asp:PlaceHolder id="IActionJSFileRef" runat="server"></asp:PlaceHolder>
-
-    <script type="text/javascript">
-        this.name = 'umbracoMain';
-    </script>
-</head>
-
-<body id="umbracoMainPageBody">
-	<cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
+    
+    <cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
 	
 	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="css/umbracoGui.css" PathNameAlias="UmbracoRoot" />
 	<umb:CssInclude ID="CssInclude2" runat="server" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />		
@@ -38,6 +31,16 @@
 	<umb:JsInclude ID="JsInclude11" runat="server" FilePath="js/language.aspx" PathNameAlias="UmbracoRoot" />	
 	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="modal/modal.js" PathNameAlias="UmbracoClient" Priority="10" />	
 	<umb:JsInclude ID="JsInclude12" runat="server" FilePath="js/UmbracoSpeechBubbleBackend.js" PathNameAlias="UmbracoRoot"  />	
+    
+    <asp:PlaceHolder id="IActionJSFileRef" runat="server"></asp:PlaceHolder>
+
+    <script type="text/javascript">
+        this.name = 'umbracoMain';
+    </script>
+</head>
+
+<body id="umbracoMainPageBody">
+	
 		
 	<form id="Form1" method="post" runat="server" style="margin: 0px; padding: 0px">
 	<asp:ScriptManager runat="server" ID="umbracoScriptManager" ScriptMode="Release" >

@@ -45,6 +45,7 @@ namespace umbraco.cms.presentation
 
                     string aiconSubstring = a.icon.Substring(1, a.icon.Length - 1);
                     
+                    //adds client side event handlers to the icon buttons
                     JSEvents.Append(@"jQuery('." + aiconSubstring + "').click(function() { appClick.call(this, '" + a.alias + "'); } );");
                     JSEvents.Append(@"jQuery('." + aiconSubstring + "').dblclick(function() { appDblClick.call(this, '" + a.alias + "'); } );");
                     
@@ -58,6 +59,7 @@ namespace umbraco.cms.presentation
 
                 }
 
+                //registers the jquery event handlers.
                 Page.ClientScript.RegisterStartupScript(this.GetType(), "AppIcons", "jQuery(document).ready(function() { " + JSEvents.ToString() + " } );", true);
 
             }

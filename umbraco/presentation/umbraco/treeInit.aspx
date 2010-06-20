@@ -8,7 +8,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head id="Head1" runat="server">
     <title></title>
-	<style type="text/css">
+	
+    <cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
+    
+    <umb:CssInclude ID="CssInclude1" runat="server" FilePath="css/umbracoGui.css" PathNameAlias="UmbracoRoot" />
+    
+    <style type="text/css">
         body
         {
             background: #fff;
@@ -25,9 +30,7 @@
     <![endif]-->
 </head>
 <body>
-    <cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
     
-    <umb:CssInclude ID="CssInclude1" runat="server" FilePath="css/umbracoGui.css" PathNameAlias="UmbracoRoot" />
     
     <form id="form1" runat="server">
     <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePartialRendering="true" LoadScriptsBeforeUI="true">

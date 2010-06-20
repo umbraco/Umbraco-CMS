@@ -6,15 +6,20 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
 	<title><%= umbraco.ui.Text("insertCharacter")%></title>
-	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-	<base target="_self" />
-</head>
-<body id="charmap" style="display:none">
 	
-	<cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
+    <base target="_self" />
+
+    <cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
 	
 	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="tinymce3/tiny_mce_popup.js" PathNameAlias="UmbracoClient" Priority="100" />
 	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="tinymce3/themes/umbraco/js/charmap.js" PathNameAlias="UmbracoClient" Priority="101" />
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+	
+</head>
+<body id="charmap" style="display:none">
+	
+	
 
 <table align="center" border="0" cellspacing="0" cellpadding="2">
     <tr>
