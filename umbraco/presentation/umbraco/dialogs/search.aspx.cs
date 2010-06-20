@@ -34,7 +34,7 @@ namespace umbraco.presentation.dialogs
 
         private void doSearch()
         {
-            string query = keyword.Text;
+            string query = keyword.Text.ToLower();
 
             //the app can be Content or Media only, otherwise an exception will be thrown
             var app = "Content";
@@ -42,11 +42,10 @@ namespace umbraco.presentation.dialogs
             {
                 app = UmbracoContext.Current.Request["app"];
             }
-            IndexType indexType = (IndexType)Enum.Parse(typeof(IndexType), app);
-
+            
             //if it doesn't start with "*", then search only nodeName and nodeId
             var internalSearcher = UmbracoContext.Current.InternalSearchProvider;
-            var criteria = internalSearcher.CreateSearchCriteria(indexType);
+            var criteria = internalSearcher.CreateSearchCriteria(app);
             IEnumerable<SearchResult> results;
             if (query.StartsWith("*"))
             {

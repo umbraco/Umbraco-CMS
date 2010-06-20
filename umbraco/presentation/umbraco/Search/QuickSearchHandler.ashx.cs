@@ -27,7 +27,7 @@ namespace umbraco.presentation.umbraco.Search
 
             context.Response.ContentType = "application/json";
 
-            var txt = UmbracoContext.Current.Request["q"];
+            var txt = UmbracoContext.Current.Request["q"].ToLower();
 
             //the app can be Content or Media only, otherwise an exception will be thrown
             var app = "Content";
@@ -35,7 +35,7 @@ namespace umbraco.presentation.umbraco.Search
             {
                 app = UmbracoContext.Current.Request["app"];
             }
-            IndexType indexType = (IndexType)Enum.Parse(typeof(IndexType), app);
+            
             int limit;
             if (!int.TryParse(UmbracoContext.Current.Request["limit"], out limit))
             {
@@ -44,7 +44,7 @@ namespace umbraco.presentation.umbraco.Search
 
             //if it doesn't start with "*", then search only nodeName and nodeId
             var internalSearcher = UmbracoContext.Current.InternalSearchProvider;
-            var criteria = internalSearcher.CreateSearchCriteria(indexType);
+            var criteria = internalSearcher.CreateSearchCriteria(app);
             IEnumerable<SearchResult> results;
             if (txt.StartsWith("*"))
             {

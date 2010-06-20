@@ -123,7 +123,7 @@ namespace umbraco
             XmlDocument xd = new XmlDocument();
             if (BasePages.BasePage.ValidateUserContextID(ContextID))
             {
-                return doQuery(Query, xd, StartNodeId);
+                return doQuery(Query.ToLower(), xd, StartNodeId);
             }
             else
             {
@@ -140,7 +140,7 @@ namespace umbraco
             {
                 //if the query starts with "*" then query all fields
                 var internalSearcher = UmbracoContext.Current.InternalSearchProvider;
-                var criteria = internalSearcher.CreateSearchCriteria(IndexType.Content);
+                var criteria = internalSearcher.CreateSearchCriteria(IndexTypes.Content);
                 IEnumerable<SearchResult> results;
                 if (Query.StartsWith("*"))
                 {
@@ -148,7 +148,7 @@ namespace umbraco
                 }
                 else
                 {
-                    var operation = criteria.NodeName(Query);
+                    var operation = criteria.NodeName(Query.ToLower());
                     if (StartNodeId > 0)
                     {
                         operation.Or().Id(StartNodeId);
