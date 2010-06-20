@@ -99,7 +99,9 @@ namespace umbraco.dialogs
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-            if (!Page.IsPostBack) {
+
+            if (!Page.IsPostBack)
+            {
                 IRecordsReader macroRenderings;
                 if (helper.Request("editor") != "")
                     macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName");
@@ -111,6 +113,11 @@ namespace umbraco.dialogs
                 umb_macroAlias.DataTextField = "macroName";
                 umb_macroAlias.DataBind();
                 macroRenderings.Close();
+            }
+            else
+            {
+
+                ScriptManager.RegisterOnSubmitStatement(Page, Page.GetType(), "myHandlerKey", "updateMacro()");
             }
         }
 
