@@ -105,7 +105,7 @@ namespace umbraco
                                 }
                                 else
                                 {
-                                    XmlDocument umbracoXML = content.Instance.XmlContent;
+                                    XmlDocument umbracoXML = presentation.UmbracoContext.Current.GetXml();
 
                                     String[] splitpath = (String[])pageElements["splitpath"];
                                     for (int i = 0; i < splitpath.Length - 1; i++)
@@ -113,7 +113,8 @@ namespace umbraco
                                         XmlNode element = umbracoXML.GetElementById(splitpath[splitpath.Length - i - 1].ToString());
                                         if (element == null)
                                             continue;
-                                        XmlNode currentNode = element.SelectSingleNode(string.Format("./data [@alias = '{0}']",
+                                        string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data [@alias = '{0}']" : "{0}"; 
+                                        XmlNode currentNode = element.SelectSingleNode(string.Format(xpath,
                                             keyName));
                                         if (currentNode != null && currentNode.FirstChild != null &&
                                            !string.IsNullOrEmpty(currentNode.FirstChild.Value) &&
