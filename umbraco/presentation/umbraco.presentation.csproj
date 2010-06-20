@@ -540,6 +540,13 @@
     <Compile Include="umbraco\endPreview.aspx.designer.cs">
       <DependentUpon>endPreview.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\helpRedirect.aspx.cs">
+      <DependentUpon>helpRedirect.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\helpRedirect.aspx.designer.cs">
+      <DependentUpon>helpRedirect.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\js\UmbracoCasingRules.aspx.cs">
       <DependentUpon>UmbracoCasingRules.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1506,6 +1513,7 @@
     <Content Include="config\splashes\worker.png" />
     <Content Include="install\steps\renaming.ascx" />
     <Content Include="install\Title.ascx" />
+    <Content Include="umbraco\helpRedirect.aspx" />
     <Content Include="umbraco\images\aboutNew.png" />
     <Content Include="umbraco\images\umbracoSplash.png" />
     <Content Include="web.config.Az-VAIO.xslt" />
