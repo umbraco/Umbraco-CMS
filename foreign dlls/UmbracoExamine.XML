@@ -252,6 +252,12 @@
             <param name="searchParams">The fluent API search.</param>
             <returns></returns>
         </member>
+        <member name="M:UmbracoExamine.LuceneExamineSearcher.CreateSearchCriteria">
+            <summary>
+            Creates search criteria that defaults to IndexType.Any and BooleanOperation.And
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:UmbracoExamine.LuceneExamineSearcher.CreateSearchCriteria(Examine.IndexType)">
             <summary>
             Creates an instance of SearchCriteria for the provider
@@ -496,35 +502,6 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="T:UmbracoExamine.XsltExtensions">
-            <summary>
-            Methods to support Umbraco XSLT extensions
-            </summary>
-        </member>
-        <member name="M:UmbracoExamine.XsltExtensions.Search(System.String)">
-            <summary>
-            Uses the default provider specified to search, returning an XPathNodeIterator
-            </summary>
-            <param name="searchText">The search query</param>
-            <returns>A node-set of the search results</returns>
-        </member>
-        <member name="M:UmbracoExamine.XsltExtensions.Search(System.String,System.Boolean,System.String)">
-            <summary>
-            Uses the provider specified to search, returning an XPathNodeIterator
-            </summary>
-            <param name="searchText"></param>
-            <param name="useWildcards"></param>
-            <param name="providerName"></param>
-            <returns></returns>
-        </member>
-        <member name="M:UmbracoExamine.XsltExtensions.Search(System.String,System.Boolean)">
-            <summary>
-            Uses the default provider specified to search, returning an XPathNodeIterator
-            </summary>
-            <param name="searchText">The search query</param>
-            <param name="useWildcards">Enable a wildcard search query</param>
-            <returns>A node-set of the search results</returns>
-        </member>
         <member name="M:UmbracoExamine.SearchCriteria.LuceneSearchExtensions.SingleCharacterWildcard(System.String)">
             <summary>
             Adds a single character wildcard to the string for Lucene wildcard matching
@@ -671,8 +648,17 @@
             file declaring the computer name that is part taking in the indexing. This file will then be used to
             determine the master indexer machine in a load balanced environment (if one exists).
             </summary>
-            <param name="name"></param>
-            <param name="config"></param>
+            <param name="name">The friendly name of the provider.</param>
+            <param name="config">A collection of the name/value pairs representing the provider-specific attributes specified in the configuration for this provider.</param>
+            <exception cref="T:System.ArgumentNullException">
+            The name of the provider is null.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            The name of the provider has a length of zero.
+            </exception>
+            <exception cref="T:System.InvalidOperationException">
+            An attempt is made to call <see cref="M:System.Configuration.Provider.ProviderBase.Initialize(System.String,System.Collections.Specialized.NameValueCollection)"/> on a provider after the provider has already been initialized.
+            </exception>
         </member>
         <member name="F:UmbracoExamine.LuceneExamineIndexer.m_IndexerLocker">
             <summary>
@@ -1093,6 +1079,7 @@
             <summary>
             The folder path of where the lucene index is stored
             </summary>
+            <value>The index path.</value>
             <remarks>
             This can be set at runtime but will not be persisted to the configuration file
             </remarks>
@@ -1101,6 +1088,7 @@
             <summary>
             Returns the DirectoryInfo object for the index path.
             </summary>
+            <value>The index directory.</value>
         </member>
         <member name="P:UmbracoExamine.Config.IndexSet.IndexParentId">
             <summary>

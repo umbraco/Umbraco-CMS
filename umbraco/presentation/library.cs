@@ -41,6 +41,14 @@ namespace umbraco
     /// </summary>
     public class library
     {
+        internal static void ClearNiceUrlCache()
+        {
+            lock (locker)
+            {
+                niceUrlCache.Clear();
+            }
+        }
+
         private static object locker = new object();
 
         #region Declarations
@@ -2269,6 +2277,13 @@ namespace umbraco
                 Media.AfterSave += new Media.SaveEventHandler(Media_AfterSave);
                 Media.BeforeDelete += new Media.DeleteEventHandler(Media_BeforeDelete);
             }
+
+            content.AfterUpdateDocumentCache += new content.DocumentCacheEventHandler(content_AfterUpdateDocumentCache);
+        }
+
+        void content_AfterUpdateDocumentCache(Document sender, DocumentCacheEventArgs e)
+        {
+            library.ClearNiceUrlCache();
         }
 
         void Member_BeforeDelete(Member sender, DeleteEventArgs e)

@@ -41,7 +41,6 @@
             Searches the specified search text in all fields of the index
             </summary>
             <param name="searchText">The search text.</param>
-            <param name="maxResults">The max number of results.</param>
             <param name="useWildcards">if set to <c>true</c> the search will use wildcards.</param>
             <returns>Search Results</returns>
         </member>
@@ -52,11 +51,16 @@
             <param name="searchParameters">The search parameters.</param>
             <returns>Search Results</returns>
         </member>
+        <member name="M:Examine.ISearcher.CreateSearchCriteria">
+            <summary>
+            Creates a search criteria instance as required by the implementation
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Examine.ISearcher.CreateSearchCriteria(Examine.IndexType)">
             <summary>
             Creates a search criteria instance as required by the implementation
             </summary>
-            <param name="maxResults">The max number of results.</param>
             <param name="type">The type of data in the index.</param>
             <returns>An instance of <see cref="T:Examine.SearchCriteria.ISearchCriteria"/></returns>
         </member>
@@ -64,7 +68,6 @@
             <summary>
             Creates a search criteria instance as required by the implementation
             </summary>
-            <param name="maxResults">The max number of results.</param>
             <param name="type">The type of data in the index.</param>
             <param name="defaultOperation">The default operation.</param>
             <returns>
@@ -135,7 +138,7 @@
             <summary>
             Deletes index for node for the specified providers
             </summary>
-            <param name="node"></param>
+            <param name="nodeId"></param>
             <param name="providers"></param>
         </member>
         <member name="M:Examine.ExamineManager.ReIndexNode(System.Xml.Linq.XElement,Examine.IndexType)">
@@ -150,6 +153,12 @@
             Deletes index for node for all providers
             </summary>
             <param name="node"></param>
+        </member>
+        <member name="M:Examine.ExamineManager.CreateSearchCriteria">
+            <summary>
+            Creates search criteria that defaults to IndexType.Any and BooleanOperation.And
+            </summary>
+            <returns></returns>
         </member>
         <member name="P:Examine.ExamineManager.Instance">
             <summary>
