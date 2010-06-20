@@ -34,7 +34,20 @@ namespace umbraco.cms.businesslogic.member
         private static readonly object m_Locker = new object();
         private static readonly string UmbracoMemberIdCookieKey = "umbracoMemberId";
         private static readonly string UmbracoMemberGuidCookieKey = "umbracoMemberGuid";
-        private static readonly string UmbracoMemberLoginCookieKey = "umbracoMemberLogin"; 
+        private static readonly string UmbracoMemberLoginCookieKey = "umbracoMemberLogin";
+
+        private const string m_SQLOptimizedMany = @"	
+			select 
+	            umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, 
+	            umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, 
+	            umbracoNode.nodeUser, umbracoNode.text, 
+	            cmsMember.Email, cmsMember.LoginName, cmsMember.Password
+            from umbracoNode 
+            inner join cmsContent on cmsContent.nodeId = umbracoNode.id
+            inner join cmsMember on  cmsMember.nodeId = cmsContent.nodeId
+			where umbracoNode.nodeObjectType = @nodeObjectType AND {0}			
+			order by {1}"; 
+
         #endregion
 
         #region Private members
@@ -82,10 +95,26 @@ namespace umbraco.cms.businesslogic.member
         {
             get
             {
-                Guid[] tmp = getAllUniquesFromObjectType(_objectType);
-
-                return Array.ConvertAll<Guid, Member>(tmp, delegate(Guid g) { return new Member(g); });
+                return GetAllAsList().ToArray();
             }
+        }
+
+        public static IEnumerable<Member> GetAllAsList()
+        {
+            var tmp = new List<Member>();
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(
+                                        string.Format(m_SQLOptimizedMany.Trim(), "1=1", "umbracoNode.text"),
+                                            SqlHelper.CreateParameter("@nodeObjectType", Member._objectType)))
+            {
+                while (dr.Read())
+                {
+                    Member m = new Member(dr.GetInt("id"), true);
+                    m.PopulateMemberFromReader(dr);
+                    tmp.Add(m);
+                }
+            }
+
+            return tmp.ToArray();
         }
 
         /// <summary>
@@ -94,21 +123,21 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>array of members</returns>
         public static Member[] getAllOtherMembers()
         {
-            string query =
-                "SELECT id, text FROM umbracoNode WHERE (nodeObjectType = @nodeObjectType) AND (ASCII(SUBSTRING(text, 1, 1)) NOT BETWEEN ASCII('a') AND ASCII('z')) AND (ASCII(SUBSTRING(text, 1, 1)) NOT BETWEEN ASCII('A') AND ASCII('Z'))";
-            List<Member> m = new List<Member>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(query,
-                SqlHelper.CreateParameter("@nodeObjectType", _objectType)))
+
+            var tmp = new List<Member>();
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(
+                                        string.Format(m_SQLOptimizedMany.Trim(), "(ASCII(SUBSTRING(text, 1, 1)) NOT BETWEEN ASCII('a') AND ASCII('z')) AND (ASCII(SUBSTRING(text, 1, 1)) NOT BETWEEN ASCII('A') AND ASCII('Z'))", "umbracoNode.text"),
+                                            SqlHelper.CreateParameter("@nodeObjectType", Member._objectType)))
             {
                 while (dr.Read())
                 {
-                    Member newMember = new Member(dr.GetInt("id"), true);
-                    newMember.m_Text = dr.GetString("text");
-                    m.Add(new Member(newMember.Id));
+                    Member m = new Member(dr.GetInt("id"), true);
+                    m.PopulateMemberFromReader(dr);
+                    tmp.Add(m);
                 }
             }
 
-            return m.ToArray();
+            return tmp.ToArray();
         }
 
         /// <summary>
@@ -125,25 +154,25 @@ namespace umbraco.cms.businesslogic.member
         [Obsolete("Use System.Web.Security.Membership.FindUsersByName(string letter)")]
         public static Member[] GetMemberByName(string usernameToMatch, bool matchByNameInsteadOfLogin)
         {
-            string field = matchByNameInsteadOfLogin ? "text" : "loginName";
-            string query =
-                String.Format(
-                "Select id, text from umbracoNode inner join cmsMember on cmsMember.nodeId = umbracoNode.id where nodeObjectType = @objectType and {0} like @letter order by text",
-                field);
-            List<Member> m = new List<Member>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(query,
-                SqlHelper.CreateParameter("@objectType", _objectType),
-                SqlHelper.CreateParameter("@field", field),
-                SqlHelper.CreateParameter("@letter", usernameToMatch + "%")))
+            string field = matchByNameInsteadOfLogin ? "umbracoNode.text" : "cmsMember.loginName";
+
+            var tmp = new List<Member>();
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(
+                                        string.Format(m_SQLOptimizedMany.Trim(),
+                                        string.Format("{0} like @letter", field),
+                                        "umbracoNode.text"),
+                                            SqlHelper.CreateParameter("@nodeObjectType", Member._objectType),
+                                            SqlHelper.CreateParameter("@letter", usernameToMatch + "%")))
             {
                 while (dr.Read())
                 {
-                    Member newMember = new Member(dr.GetInt("id"), true);
-                    newMember.m_Text = dr.GetString("text");
-                    m.Add(new Member(newMember.Id));
+                    Member m = new Member(dr.GetInt("id"), true);
+                    m.PopulateMemberFromReader(dr);
+                    tmp.Add(m);
                 }
             }
-            return m.ToArray();
+
+            return tmp.ToArray();          
 
         }
 
@@ -651,9 +680,28 @@ namespace umbraco.cms.businesslogic.member
             return node;
         }
 
+        protected void PopulateMemberFromReader(IRecordsReader dr)
+        {
+
+            SetupNodeForTree(dr.GetGuid("uniqueId"), 
+                _objectType, dr.GetShort("level"), 
+                dr.GetInt("parentId"), 
+                dr.GetInt("nodeUser"), 
+                dr.GetString("path"), 
+                dr.GetString("text"), 
+                dr.GetDateTime("createDate"), false);
+
+            if (!dr.IsNull("Email"))
+                m_Email = dr.GetString("Email");
+            m_LoginName = dr.GetString("LoginName");
+            m_Password = dr.GetString("Password");
+
+        } 
+
         #endregion
 
         #region Private methods
+
         private void populateGroups()
         {
             Hashtable temp = new Hashtable();
@@ -672,6 +720,7 @@ namespace umbraco.cms.businesslogic.member
         {
             return string.Format("MemberCacheItem_{0}", id);
         }
+
 
         #endregion
 
