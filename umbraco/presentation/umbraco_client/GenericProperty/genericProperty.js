@@ -44,6 +44,10 @@ function safeAlias(alias) {
                 if (i == 0 && UMBRACO_FORCE_SAFE_ALIAS_INVALID_FIRST_CHARS.indexOf(currentChar.toLowerCase()) > 0) { 
                     currentChar = '';
                 } else {
+                    // first char should always be lowercase (camel style)
+                    if (safeAlias.length == 0)
+                        currentChar = currentChar.toLowerCase();
+
                     if (i < aliasLength - 1 && i > 0 && alias.substring(i - 1, i) == ' ')
                         currentChar = currentChar.toUpperCase();
 
