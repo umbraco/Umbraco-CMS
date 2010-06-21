@@ -43,13 +43,13 @@ namespace umbraco.cms.presentation
                 foreach (BusinessLogic.Application a in apps)
                 {
 
-                    string aiconSubstring = a.icon.Substring(1, a.icon.Length - 1);
+                    string appClass = a.icon.StartsWith(".") ? a.icon.Substring(1, a.icon.Length - 1) : a.alias;
                     
                     //adds client side event handlers to the icon buttons
-                    JSEvents.Append(@"jQuery('." + aiconSubstring + "').click(function() { appClick.call(this, '" + a.alias + "'); } );");
-                    JSEvents.Append(@"jQuery('." + aiconSubstring + "').dblclick(function() { appDblClick.call(this, '" + a.alias + "'); } );");
-                    
-                    string iconElement = String.Format("<li><a class=\"{0}\" title=\"" + ui.Text("sections", a.alias, base.getUser()) + "\" href=\"javascript:void(0);\">", aiconSubstring);
+                    JSEvents.Append(@"jQuery('." + appClass + "').click(function() { appClick.call(this, '" + a.alias + "'); } );");
+                    JSEvents.Append(@"jQuery('." + appClass + "').dblclick(function() { appDblClick.call(this, '" + a.alias + "'); } );");
+
+                    string iconElement = String.Format("<li><a class=\"{0}\" title=\"" + ui.Text("sections", a.alias, base.getUser()) + "\" href=\"javascript:void(0);\">", appClass);
                     if (a.icon.StartsWith("."))
                         iconElement +=
                             "<img src=\"images/nada.gif\" class=\"trayHolder\" alt=\"\" /></a></li>";
