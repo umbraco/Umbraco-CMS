@@ -4,6 +4,8 @@ using System;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.propertytype;
 using System.Xml;
+using umbraco.cms.businesslogic.datatype;
+using System.Linq;
 
 namespace umbraco.Test
 {
@@ -16,6 +18,37 @@ namespace umbraco.Test
     [TestClass()]
     public class MemberTypeTest
     {
+
+        [TestMethod()]
+        public void MemberType_Make_New_Add_Remove_Properties()
+        {
+            var m = MemberType.MakeNew(m_User, "TEST" + Guid.NewGuid().ToString("N"));
+
+            Assert.IsInstanceOfType(m, typeof(MemberType));
+            Assert.IsTrue(m.Id > 0);
+
+            //System.Diagnostics.Debugger.Launch();
+
+            AddMemberTypeProperty(ref m);
+            AddMemberTypeProperty(ref m);
+            AddMemberTypeProperty(ref m);
+            AddMemberTypeProperty(ref m);
+
+            //remove it
+            m.delete();
+            Assert.IsFalse(MemberType.IsNode(m.Id));
+        }
+
+        private void AddMemberTypeProperty(ref MemberType m)
+        {
+            var ddt = DataTypeDefinition.GetAll().First();
+            //needs to start with a letter
+            var alias = "m" + Guid.NewGuid().ToString("N");
+            m.AddPropertyType(ddt, alias, alias);
+            //make sure it's there
+            var prop = m.getPropertyType(alias);
+            Assert.IsInstanceOfType(prop, typeof(PropertyType));
+        }
 
         /// <summary>
         ///A test for MakeNew

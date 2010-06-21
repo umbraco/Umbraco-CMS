@@ -110,6 +110,11 @@ DELETE FROM cmsContentTypeAllowedContentType WHERE Allowedid NOT IN (SELECT node
 DELETE FROM cmsPreviewXml WHERE VersionID NOT IN (SELECT VersionId FROM cmsContentVersion)
 ;
 
+/* Though this should not have to run because it's a new install, you need to remove this constraint if you've been testing with the RC */
+IF EXISTS (SELECT name FROM sysindexes WHERE name = 'IX_cmsMemberType')
+ALTER TABLE [dbo].[cmsMemberType] DROP CONSTRAINT [IX_cmsMemberType]
+;
+
 /************************** CLEANUP END ********************************************/
 
 
@@ -640,13 +645,6 @@ ALTER TABLE dbo.cmsPreviewXml ADD CONSTRAINT
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
-;
-
-ALTER TABLE dbo.cmsMemberType ADD CONSTRAINT
-	IX_cmsMemberType UNIQUE NONCLUSTERED 
-	(
-	NodeId
-	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
 ALTER TABLE dbo.cmsMember2MemberGroup ADD CONSTRAINT

@@ -245,8 +245,16 @@ namespace umbraco.cms.businesslogic.propertytype
             return _description;
         }
         [MethodImpl(MethodImplOptions.Synchronized)]
-		public static PropertyType MakeNew(DataTypeDefinition dt, ContentType ct, string Name, string Alias)
+		public static PropertyType MakeNew(DataTypeDefinition dt, ContentType ct, string name, string alias)
 		{
+            //make sure that the alias starts with a letter
+            if (string.IsNullOrEmpty(alias))
+                throw new ArgumentNullException("alias");
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException("name");
+            if (!Char.IsLetter(alias[0]))
+                throw new ArgumentException("alias must start with a letter", "alias");
+
 		    PropertyType pt;
 			try
 			{
@@ -254,10 +262,10 @@ namespace umbraco.cms.businesslogic.propertytype
                 SqlHelper.ExecuteNonQuery("INSERT INTO cmsPropertyType (DataTypeId, ContentTypeId, alias, name) VALUES (@DataTypeId, @ContentTypeId, @alias, @name)",
                     SqlHelper.CreateParameter("@DataTypeId", dt.Id),
                     SqlHelper.CreateParameter("@ContentTypeId", ct.Id),
-                    SqlHelper.CreateParameter("@alias", helpers.Casing.SafeAliasWithForcingCheck(Alias)),
-                    SqlHelper.CreateParameter("@name", Name));
+                    SqlHelper.CreateParameter("@alias", helpers.Casing.SafeAliasWithForcingCheck(alias)),
+                    SqlHelper.CreateParameter("@name", name));
                 pt = new PropertyType(SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyType WHERE alias=@alias",
-                    SqlHelper.CreateParameter("@alias", Alias)));
+                    SqlHelper.CreateParameter("@alias", alias)));
 			}
 			finally
 			{
