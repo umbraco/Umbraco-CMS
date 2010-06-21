@@ -6,6 +6,9 @@ using umbraco.cms.businesslogic.web;
 using System.Xml;
 using System.Text;
 using umbraco.editorControls.imagecropper;
+using umbraco.cms.businesslogic.media;
+using umbraco.cms.businesslogic;
+using umbraco.cms.businesslogic.member;
 
 namespace umbraco.editorControls.imagecropper
 {
@@ -33,19 +36,37 @@ namespace umbraco.editorControls.imagecropper
         public Control Editor { get { return this; } }
 
         protected override void OnInit(EventArgs e)
-            //protected override void OnLoad(EventArgs e)
+        //protected override void OnLoad(EventArgs e)
         {
             this.ID = "ImageCropper";
             //base.OnInit(e);
-                                
-            int propertyId = ((umbraco.cms.businesslogic.datatype.DefaultData) data).PropertyId;
+
+            int propertyId = ((umbraco.cms.businesslogic.datatype.DefaultData)data).PropertyId;
 
             int currentDocumentId = ((umbraco.cms.businesslogic.datatype.DefaultData)data).NodeId;
-            Document currentDocument = new Document(currentDocumentId);
+            Property uploadProperty;
 
-            Property uploadProperty = currentDocument.getProperty(config.UploadPropertyAlias);
-
-            if(uploadProperty == null) return;
+            // we need this ugly code because there's no way to use a base class
+            CMSNode node = new CMSNode(currentDocumentId);
+            if (node.nodeObjectType == Document._objectType)
+            {
+                uploadProperty =
+                    new Document(currentDocumentId).getProperty(config.UploadPropertyAlias);
+            }
+            else if (node.nodeObjectType == umbraco.cms.businesslogic.media.Media._objectType)
+            {
+                uploadProperty =
+                    new Media(currentDocumentId).getProperty(config.UploadPropertyAlias);
+            }
+            else if (node.nodeObjectType == Member._objectType)
+            {
+                uploadProperty =
+                    new Member(currentDocumentId).getProperty(config.UploadPropertyAlias);
+            }
+            else
+            {
+                throw new Exception("Unsupported Umbraco Node type for Image Cropper (only Document, Media and Members are supported.");
+            }
 
             string relativeImagePath = uploadProperty.Value.ToString();
 
@@ -71,7 +92,7 @@ namespace umbraco.editorControls.imagecropper
 
             for (int i = 0; i < config.presets.Count; i++)
             {
-                Preset preset = (Preset) config.presets[i];
+                Preset preset = (Preset)config.presets[i];
                 Crop crop;
 
                 sbJson.Append("{\"name\":'" + preset.Name + "'");
@@ -104,12 +125,12 @@ namespace umbraco.editorControls.imagecropper
                     int xml_y2 = Convert.ToInt32(xmlNode.Attributes["y2"].Value);
 
                     DateTime fileDate = Convert.ToDateTime(_xml.DocumentElement.Attributes["date"].Value);
-                            
+
                     // only use xml values if image is the same and different from defaults (document is stored inbetween image upload and cropping)
                     //if (xml_x2 - xml_x != preset.TargetWidth || xml_y2 - xml_y != preset.TargetHeight)
                     //fileDate == imageInfo.DateStamp && (
 
-                    if(crop.X != xml_x || crop.X2 != xml_x2 || crop.Y != xml_y || crop.Y2 != xml_y2)
+                    if (crop.X != xml_x || crop.X2 != xml_x2 || crop.Y != xml_y || crop.Y2 != xml_y2)
                     {
                         crop.X = xml_x;
                         crop.Y = xml_y;
@@ -126,7 +147,7 @@ namespace umbraco.editorControls.imagecropper
                     sbJson.Append(",");
                     sbRaw.Append(";");
                 }
-            }            
+            }
 
             sbJson.Append("]}");
 
@@ -140,11 +161,11 @@ namespace umbraco.editorControls.imagecropper
             Controls.Add(hdnJson);
             Controls.Add(hdnRaw);
 
-            string imageCropperInitScript = 
+            string imageCropperInitScript =
                 "initImageCropper('" +
                 imgImage.ClientID + "', '" +
                 hdnJson.ClientID + "', '" +
-                hdnRaw.ClientID + 
+                hdnRaw.ClientID +
                 "');";
 
             Page.ClientScript.RegisterStartupScript(GetType(), ClientID + "_imageCropper", imageCropperInitScript, true);
