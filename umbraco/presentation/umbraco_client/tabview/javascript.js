@@ -28,7 +28,6 @@ Umbraco.Controls.TabView = (function () {
         },
 
         onActiveTabChange: function (fn) {
-            console.log('adding function');
             onChangeEvents.push(fn);
         },
 
