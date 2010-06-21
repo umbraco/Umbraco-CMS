@@ -197,7 +197,7 @@ namespace umbraco.presentation.developer.packages
 
                     if (!string.IsNullOrEmpty(pack.PackagePath)) {
 
-                        packageUmbFile.Text = " &nbsp; <a href='" + pack.PackagePath + "'>Download</a>";
+                        packageUmbFile.Text = " &nbsp; <a href='" + IO.IOHelper.ResolveUrl(pack.PackagePath) + "'>Download</a>";
 
                         this.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.success, "Package saved and published", "");
                     } else {
