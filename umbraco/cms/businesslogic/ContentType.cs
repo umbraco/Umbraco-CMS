@@ -756,7 +756,7 @@ namespace umbraco.cms.businesslogic
             ClearVirtualTabs();
         }
 
-        protected void FlushAllFromCache()
+        protected internal void FlushAllFromCache()
         {
             Cache.ClearCacheByKeySearch("UmbracoContentType");
             Cache.ClearCacheByKeySearch("ContentType_PropertyTypes_Content");

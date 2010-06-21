@@ -381,7 +381,8 @@ namespace umbraco.controls.Tree
             {
                 if (!string.IsNullOrEmpty(a.Alias) && (!string.IsNullOrEmpty(a.JsSource)))
                 {
-                    Page.ClientScript.RegisterClientScriptInclude(a.GetType(), a.Alias, a.JsSource);
+                    Page.ClientScript.RegisterClientScriptBlock(a.GetType(), a.Alias, a.JsSource, true);
+                    //Page.ClientScript.RegisterClientScriptInclude(a.GetType(), a.Alias, a.JsSource);
                 }
             }            
         }
