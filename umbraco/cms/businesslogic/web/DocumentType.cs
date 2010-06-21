@@ -120,8 +120,9 @@ namespace umbraco.cms.businesslogic.web
             {
                 return
                     new DocumentType(
-                            SqlHelper.ExecuteScalar<int>("SELECT nodeid from cmsContentType where alias = @alias",
-                                                         SqlHelper.CreateParameter("@alias", Alias)));
+                            SqlHelper.ExecuteScalar<int>(@"SELECT nodeid from cmsContentType INNER JOIN umbracoNode on cmsContentType.nodeId = umbracoNode.id WHERE nodeObjectType=@nodeObjectType AND alias=@alias",
+                                SqlHelper.CreateParameter("@nodeObjectType", DocumentType._objectType),
+                                SqlHelper.CreateParameter("@alias", Alias)));
             }
             catch
             {

@@ -95,11 +95,21 @@ namespace umbraco.cms.businesslogic.member
 		/// </summary>
 		/// <param name="Alias">The alias of the MemberType</param>
 		/// <returns>The MemberType with the given Alias</returns>
-		public static new MemberType GetByAlias(string Alias) 
-		{
-            return new MemberType(SqlHelper.ExecuteScalar<int>("SELECT nodeid from cmsContentType where alias = @alias",
-                                                                SqlHelper.CreateParameter("@alias", Alias)));
-		}
+        public new static MemberType GetByAlias(string Alias)
+        {            
+            try
+            {
+                return
+                    new MemberType(
+                            SqlHelper.ExecuteScalar<int>(@"SELECT nodeid from cmsContentType INNER JOIN umbracoNode on cmsContentType.nodeId = umbracoNode.id WHERE nodeObjectType=@nodeObjectType AND alias=@alias",
+                                SqlHelper.CreateParameter("@nodeObjectType", MemberType._objectType),
+                                SqlHelper.CreateParameter("@alias", Alias)));
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
 
 		/// <summary>
