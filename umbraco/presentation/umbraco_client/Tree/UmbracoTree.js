@@ -67,7 +67,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _activeTreeType: "content", //tracks which is the active tree type, this is used in searching and syncing.
             _tree: null, //reference to the jsTree object
             _isEditMode: false, //not really used YET
-            _isDebug: true, //set to true to enable alert debugging
+            _isDebug: false, //set to true to enable alert debugging
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
             _treeClass: "umbTree", //used for other libraries to detect which elements are an umbraco tree
             _currenAJAXRequest: false, //used to determine if there is currently an ajax request being executed.

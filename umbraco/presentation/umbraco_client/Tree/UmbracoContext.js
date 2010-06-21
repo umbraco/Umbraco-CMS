@@ -1,4 +1,4 @@
-(function($) {
+(function ($) {
     ///<summary>Custom plugin to create the Umbraco context menu, this configures the context menu plugin before it's callbacks eecute</summary>
 
     $.extend($.tree.plugins, {
@@ -9,8 +9,9 @@
                 onBeforeContext: false
             },
 
-            _getContextMenu: function(strMenu) {
+            _getContextMenu: function (strMenu) {
                 /// <summary>Builds a new context menu object (array) based on the string representation passed in</summary>
+
                 var newMenu = new Array();
                 var separatorIndexes = new Array();
                 for (var i = 0; i < strMenu.length; i++) {
@@ -28,7 +29,8 @@
                 return newMenu;
             },
 
-            _getMenuItemByLetter: function(letter) {
+            _getMenuItemByLetter: function (letter) {
+
                 /// <summary>Finds the menu item in our full menu by the letter and returns object</summary>
                 var fullMenu = $.tree.plugins.UmbracoContext.settings.fullMenu;
                 //insert selector if it's a comma
@@ -42,12 +44,12 @@
             },
 
             callbacks: {
-                oninit: function(t) {
+                oninit: function (t) {
                     $.tree.plugins.UmbracoContext.settings = t.settings.plugins.UmbracoContext;
                     //need to remove the defaults
                     $.tree.plugins.contextmenu.defaults.items = {};
                 },
-                onrgtclk: function(n, t, e) {
+                onrgtclk: function (n, t, e) {
                     ///<summary>Need to set the context menu items for the context menu plugin for the current node</summary>
                     var _this = $.tree.plugins.UmbracoContext;
 
@@ -55,28 +57,31 @@
                     if (menu != "") {
                         t.settings.plugins.contextmenu.items = _this._getContextMenu(menu);
                     }
+                    else {
+                        t.settings.plugins.contextmenu.items = [];
+                    }
                 }
             }
         }
     });
-    $(function() {
+    $(function () {
         //add events to auto hide the menu on a delay
         var pause = true;
         var timer = null;
-        $("#jstree-contextmenu").bind("mouseenter", function() {
+        $("#jstree-contextmenu").bind("mouseenter", function () {
             pause = true;
             clearTimeout(timer);
         });
-        $("#jstree-contextmenu").bind("mouseleave", function() {
+        $("#jstree-contextmenu").bind("mouseleave", function () {
             pause = false;
-            timer = setTimeout(function() {
+            timer = setTimeout(function () {
                 if (!pause) {
                     $.tree.plugins.contextmenu.hide();
                 }
             }, 500);
         });
         //disable right clicking the context menu, this is for IE bug
-        $("#jstree-contextmenu").bind("contextmenu", function(e) {
+        $("#jstree-contextmenu").bind("contextmenu", function (e) {
             e.preventDefault();
             return false;
         });
