@@ -32,7 +32,7 @@ namespace umbraco.cms.presentation
         private DateTimePicker dpRelease = new DateTimePicker();
         private DateTimePicker dpExpire = new DateTimePicker();
 
-        controls.ContentControl tmp;
+        controls.ContentControl cControl;
 
         DropDownList ddlDefaultTemplate = new DropDownList();
 
@@ -84,21 +84,21 @@ namespace umbraco.cms.presentation
             // Check publishing permissions
             if (!base.getUser().GetPermissions(_document.Path).Contains(ActionPublish.Instance.Letter.ToString()))
                 _canPublish = controls.ContentControl.publishModes.SendToPublish;
-            tmp = new controls.ContentControl(_document, _canPublish, "TabView1");
+            cControl = new controls.ContentControl(_document, _canPublish, "TabView1");
 
-            tmp.ID = "TabView1";
+            cControl.ID = "TabView1";
 
-            tmp.Width = Unit.Pixel(666);
-            tmp.Height = Unit.Pixel(666);
+            cControl.Width = Unit.Pixel(666);
+            cControl.Height = Unit.Pixel(666);
 
             // Add preview button
 
-            foreach (uicontrols.TabPage tp in tmp.GetPanels())
+            foreach (uicontrols.TabPage tp in cControl.GetPanels())
             {
                 addPreviewButton(tp.Menu, _document.Id);
             }
 
-            plc.Controls.Add(tmp);
+            plc.Controls.Add(cControl);
 
 
             System.Web.UI.WebControls.PlaceHolder publishStatus = new PlaceHolder();
@@ -129,8 +129,8 @@ namespace umbraco.cms.presentation
             // Template
             PlaceHolder template = new PlaceHolder();
             cms.businesslogic.web.DocumentType DocumentType = new cms.businesslogic.web.DocumentType(_document.ContentType.Id);
-            tmp.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(DocumentType.Text));
-            tmp.PropertiesPane.addProperty(ui.Text("template"), template);
+            cControl.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(DocumentType.Text));
+            cControl.PropertiesPane.addProperty(ui.Text("template"), template);
 
             int defaultTemplate;
             if (_document.Template != 0)
@@ -181,16 +181,16 @@ namespace umbraco.cms.presentation
             if (domainText.Text != "")
                 linkProps.addProperty(ui.Text("content", "alternativeUrls", base.getUser()), domainText);
 
-            tmp.Save += new System.EventHandler(Save);
-            tmp.SaveAndPublish += new System.EventHandler(Publish);
-            tmp.SaveToPublish += new System.EventHandler(SendToPublish);
+            cControl.Save += new System.EventHandler(Save);
+            cControl.SaveAndPublish += new System.EventHandler(Publish);
+            cControl.SaveToPublish += new System.EventHandler(SendToPublish);
 
             // Add panes to property page...
-            tmp.tpProp.Controls.Add(publishProps);
-            tmp.tpProp.Controls.Add(linkProps);
+            cControl.tpProp.Controls.AddAt(1,publishProps);
+            cControl.tpProp.Controls.AddAt(2,linkProps);
 
             // add preview to properties pane too
-            addPreviewButton(tmp.tpProp.Menu, _document.Id);
+            addPreviewButton(cControl.tpProp.Menu, _document.Id);
 
 
 
@@ -226,7 +226,7 @@ namespace umbraco.cms.presentation
             // error handling test
             if (!Page.IsValid)
             {
-                foreach (uicontrols.TabPage tp in tmp.GetPanels())
+                foreach (uicontrols.TabPage tp in cControl.GetPanels())
                 {
                     tp.ErrorControl.Visible = true;
                     tp.ErrorHeader = ui.Text("errorHandling", "errorButDataWasSaved");
@@ -234,7 +234,7 @@ namespace umbraco.cms.presentation
                 }
             } else if (Page.IsPostBack) {
                 // hide validation summaries
-                foreach (uicontrols.TabPage tp in tmp.GetPanels())
+                foreach (uicontrols.TabPage tp in cControl.GetPanels())
                 {
                     tp.ErrorControl.Visible = false;
                 }
@@ -243,10 +243,10 @@ namespace umbraco.cms.presentation
                 BusinessLogic.Log.Add(BusinessLogic.LogTypes.Save, base.getUser(), _document.Id, "");
 
                 // Update name 
-                if (_document.Text != tmp.NameTxt.Text)
+                if (_document.Text != cControl.NameTxt.Text)
                 {
                     //_refreshTree = true;
-                    _document.Text = tmp.NameTxt.Text;
+                    _document.Text = cControl.NameTxt.Text;
                     //newName.Text = _document.Text;
                 }
 
@@ -273,7 +273,7 @@ namespace umbraco.cms.presentation
                 // Update the update date
                 dp.Text = _document.UpdateDate.ToShortDateString() + " " + _document.UpdateDate.ToShortTimeString();
 
-                if (!tmp.DoesPublish)
+                if (!cControl.DoesPublish)
                     ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null), ui.Text("speechBubbles", "editContentSavedText", null));
 
 				ClientTools.SyncTree(_document.Path, true);
