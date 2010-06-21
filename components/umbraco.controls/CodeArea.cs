@@ -153,7 +153,7 @@ namespace umbraco.uicontrols {
 
                 if (!UmbracoSettings.ScriptDisableEditor && HttpContext.Current.Request.Browser.Browser == "IE")
                 {
-                    jsEventCode += "jQuery('<p style=\"color:#999\">" + ui.Text("codemirroriewarning") +"</p>').insertAfter('#" + this.ClientID + "');";
+                    jsEventCode += "jQuery('<p style=\"color:#999\">" + ui.Text("codemirroriewarning").Replace("'", "\\'") +"</p>').insertAfter('#" + this.ClientID + "');";
                 }
 
             }

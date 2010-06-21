@@ -14,6 +14,7 @@ using umbraco.presentation;
 using umbraco.cms.businesslogic.media;
 using umbraco.IO;
 using System.Linq;
+using umbraco.cms.businesslogic;
 
 namespace umbraco.dialogs
 {
@@ -77,10 +78,10 @@ namespace umbraco.dialogs
 
                    
                     string currentPath = "";
-                    cms.businesslogic.web.Document d = new cms.businesslogic.web.Document(int.Parse(helper.Request("id")));
+                    CMSNode d  = new CMSNode(int.Parse(helper.Request("id")));
                     foreach (string s in d.Path.Split(',')) {
                         if (int.Parse(s) > 0)
-                            currentPath += "/" + new cms.businesslogic.web.Document(int.Parse(s)).Text;
+                            currentPath += "/" + new CMSNode(int.Parse(s)).Text;
                     }
 
                     if (helper.Request("mode") == "cut") {

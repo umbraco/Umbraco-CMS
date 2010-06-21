@@ -506,6 +506,28 @@ namespace umbraco.cms.businesslogic.web
             return tmp.ToArray();
         }
 
+        public static List<Document> GetChildrenBySearch(int NodeId, string searchString)
+        {
+            var tmp = new List<Document>();
+            using (IRecordsReader dr =
+                SqlHelper.ExecuteReader(
+                                        string.Format(m_SQLOptimizedMany.Trim(), "umbracoNode.parentID = @parentId and umbracoNode.text like @search", "umbracoNode.sortOrder"),
+                                        SqlHelper.CreateParameter("@nodeObjectType", Document._objectType),
+                                        SqlHelper.CreateParameter("@search", searchString),
+                                        SqlHelper.CreateParameter("@parentId", NodeId)))
+            {
+                while (dr.Read())
+                {
+                    Document d = new Document(dr.GetInt("id"), true);
+                    d.PopulateDocumentFromReader(dr);
+                    tmp.Add(d);
+                }
+            }
+              
+            return tmp;
+        }
+
+
         public static void RePublishAll()
         {
             XmlDocument xd = new XmlDocument();

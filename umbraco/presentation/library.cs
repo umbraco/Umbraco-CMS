@@ -697,8 +697,8 @@ namespace umbraco
                 XmlDocument mXml = new XmlDocument();
                 mXml.LoadXml(m.ToXml(mXml, Deep).OuterXml);
                 XPathNavigator xp = mXml.CreateNavigator();
-                string xpath = UmbracoSettings.UseLegacyXmlSchema ? "/node" : String.Format("/{0}", m.ContentType.Alias);
-                return xp.Select(xpath);
+//                string xpath = UmbracoSettings.UseLegacyXmlSchema ? "/node" : String.Format("/{0}", m.ContentType.Alias);
+                return xp.Select(".");
             }
             return null;
         }
