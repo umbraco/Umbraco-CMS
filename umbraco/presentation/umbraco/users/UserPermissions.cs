@@ -14,7 +14,6 @@ using umbraco.BusinessLogic.Actions;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic;
 using umbraco.interfaces;
-using System.Xml.XPath;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
 
@@ -22,12 +21,7 @@ namespace umbraco.cms.presentation.user
 {
     /// <summary>
     /// Provides umbraco user permission functionality on various nodes. Only nodes that are published are queried via the cache.
-    /// </summary>
-    /// <remarks>
-    /// Uses the Umbraco API for the majority of operations, however, there is 1 manual SQL operation performed since using the Umbraco API to perform these
-    /// tasks would have been very database intensive. Also, there are quite a few XPath queries on the Umbraco cache file since using the Umbraco API to look up
-    /// these values would also have been very database intensive.
-    /// </remarks>
+    /// </summary>    
     public class UserPermissions
     {
 
@@ -87,7 +81,7 @@ namespace umbraco.cms.presentation.user
                 allNodes.AddRange(nodeIDs);
 
             //First remove all permissions for all nodes in question       
-            DeletePermissions(m_user.Id, allNodes.ToArray());
+            Permission.DeletePermissions(m_user.Id, allNodes.ToArray());
 
             //if permissions are to be assigned, then assign them
             if (permissions.Count > 0)
@@ -172,24 +166,7 @@ namespace umbraco.cms.presentation.user
             Permission.MakeNew(m_user, node, permission.Letter);
         }
 
-        private static void DeletePermissions(int iUserID, int iNodeID)
-        {
-            DeletePermissions(iUserID, new int[] { iNodeID });
-        }
-
-        private static void DeletePermissions(int iUserID, int[] iNodeIDs)
-        {
-            string sql = "DELETE FROM umbracoUser2NodePermission WHERE nodeID IN ({0}) AND userID=@userID";
-            string nodeIDs = string.Join(",", Array.ConvertAll<int, string>(iNodeIDs, Converter));
-            sql = string.Format(sql, nodeIDs);
-            SqlHelper.ExecuteNonQuery(sql,
-                new IParameter[] { SqlHelper.CreateParameter("@userID", iUserID) });
-        }
-
-        private static string Converter(int from)
-        {
-            return from.ToString();
-        }
+        
 
     }
 }

@@ -45,7 +45,7 @@ namespace umbraco.cms.presentation.Trees
         {
             foreach (umbraco.BusinessLogic.User user in umbraco.BusinessLogic.User.getAll())
             {
-                if (user.Id > 0)
+                if (user.Id > 0 && !user.Disabled)
                 {
                     XmlTreeNode node = XmlTreeNode.Create(this);
                     node.NodeID = user.Id.ToString();

@@ -114,6 +114,23 @@ namespace umbraco.BusinessLogic
                 SqlHelper.CreateParameter("@userId", user.Id)); 
         }
 
+        public static void DeletePermissions(int iUserID, int[] iNodeIDs)
+        {
+            string sql = "DELETE FROM umbracoUser2NodePermission WHERE nodeID IN ({0}) AND userID=@userID";
+            string nodeIDs = string.Join(",", Array.ConvertAll<int, string>(iNodeIDs, Converter));
+            sql = string.Format(sql, nodeIDs);
+            SqlHelper.ExecuteNonQuery(sql,
+                new IParameter[] { SqlHelper.CreateParameter("@userID", iUserID) });
+        }
+        public static void DeletePermissions(int iUserID, int iNodeID)
+        {
+            DeletePermissions(iUserID, new int[] { iNodeID });
+        }
+        private static string Converter(int from)
+        {
+            return from.ToString();
+        }
+
         /// <summary>
         /// delete all permissions for this node
         /// </summary>
