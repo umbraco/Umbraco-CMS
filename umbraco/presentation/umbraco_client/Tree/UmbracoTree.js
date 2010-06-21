@@ -67,7 +67,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _activeTreeType: "content", //tracks which is the active tree type, this is used in searching and syncing.
             _tree: null, //reference to the jsTree object
             _isEditMode: false, //not really used YET
-            _isDebug: false, //set to true to enable alert debugging
+            _isDebug: true, //set to true to enable alert debugging
             _loadedApps: [], //stores the application names that have been loaded to track which JavaScript code has been inserted into the DOM
             _treeClass: "umbTree", //used for other libraries to detect which elements are an umbraco tree
             _currenAJAXRequest: false, //used to determine if there is currently an ajax request being executed.
@@ -806,7 +806,15 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._debug("_loadChildNodes: " + liNode.attr("id"));
 
                 liNode.removeClass("leaf");
-                this._tree.close_branch(liNode, true);
+                
+                var _this = this;
+                
+                //close branch will actually cause a select to happen so we'll intercept the select callback and then reset it once complete
+                //if we don't wan the event to fire, we'll set the callback to a null method and set it back after we call the select_branch method               
+                this._tree.settings.callback.onselect = function() { };
+                this._tree.close_branch(liNode, true);                
+                this._tree.settings.callback.onselect = function(N, T) { _this.onSelect(N, T) };
+
                 liNode.children("ul:eq(0)").remove();
                 this._tree.open_branch(liNode, false, callback);
             },
