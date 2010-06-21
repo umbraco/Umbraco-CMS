@@ -386,7 +386,7 @@ namespace umbraco.cms.businesslogic.packager
             //Package Actions
             foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Actions/Action")) {
 
-                if (n.Attributes["undo"] == null || n.Attributes["undo"].Value == "false") {
+                if (n.Attributes["undo"] == null || n.Attributes["undo"].Value == "true") {
                     insPack.Data.Actions += n.OuterXml;
                     Log.Add(LogTypes.Debug, -1, HttpUtility.HtmlEncode(n.OuterXml));
                 }
