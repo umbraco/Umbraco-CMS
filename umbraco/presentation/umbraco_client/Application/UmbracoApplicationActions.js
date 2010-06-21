@@ -94,12 +94,18 @@ Umbraco.Application.Actions = function () {
 
             this._currApp = whichApp.toLowerCase();
 
-            if (this._currApp != 'media' && this._currApp != 'content') {
+            if (this._currApp != 'media' && this._currApp != 'content' && this._currApp != 'member') {
                 jQuery("#buttonCreate").attr("disabled", "true");
                 jQuery("#FindDocuments .umbracoSearchHolder").fadeOut(400);
             }
             else {
-                jQuery("#buttonCreate").removeAttr("disabled");
+                // create button should still remain disabled for the memebers section
+                if (this._currApp == 'member') {
+                    jQuery("#buttonCreate").attr("disabled", "true");
+                }
+                else {
+                    jQuery("#buttonCreate").removeAttr("disabled");
+                }
                 jQuery("#FindDocuments .umbracoSearchHolder").fadeIn(500);
                 //need to set the recycle bin node id based on app
                 switch (this._currApp) {

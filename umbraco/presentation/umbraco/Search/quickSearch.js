@@ -3,10 +3,28 @@
     $.fn.UmbQuickSearch = function (url) {
 
         var getSearchApp = function () {
-            return (UmbClientMgr.mainWindow().location.hash != ""
-                && UmbClientMgr.mainWindow().location.hash.toLowerCase().substring(1)) == "media".toLowerCase()
-                ? "Media"
-                : "Content";
+
+            if (UmbClientMgr.mainWindow().location.hash != "") {
+                switch (UmbClientMgr.mainWindow().location.hash.toLowerCase().substring(1).toLowerCase()) {
+                    case "media":
+                        return "Media";
+                        break;
+                    case "content":
+                        return "Content";
+                        break;
+                    case "member":
+                        return "Member";
+                        break;
+                    default:
+                        return "Content";
+                }
+            }
+            return "Content";
+
+            /* return (UmbClientMgr.mainWindow().location.hash != ""
+            && UmbClientMgr.mainWindow().location.hash.toLowerCase().substring(1)) == "media".toLowerCase()
+            ? "Media"
+            : "Content"; */
         };
 
         var acOptions = {
@@ -44,7 +62,21 @@
         $(this)
               .autocomplete(url, acOptions)
               .result(function (e, data) {
-                  var url = getSearchApp() == "Media" ? "editMedia.aspx" : "editContent.aspx";
+
+                  var url = "";
+                  switch (getSearchApp()) {
+                      case "Media":
+                          url = "editMedia.aspx";
+                          break;
+                      case "Content":
+                          url = "editContent.aspx";
+                          break;
+                      case "Member":
+                          url = "members/editMember.aspx";
+                          break;
+                      default:
+                          url = "editContent.aspx";
+                  }
                   UmbClientMgr.contentFrame().location.href = url + "?id=" + data.Id;
                   $("#umbSearchField").val(UmbClientMgr.uiKeys()["general_typeToSearch"]);
                   right.focus();

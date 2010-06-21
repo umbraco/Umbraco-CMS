@@ -1502,6 +1502,13 @@
     <Compile Include="umbraco_client\tinymce3\plugins\spellchecker\SpellChecker.cs" />
     <Compile Include="umbraco_client\tinymce3\plugins\spellchecker\SpellCheckerInput.cs" />
     <Compile Include="umbraco_client\tinymce3\plugins\spellchecker\SpellCheckerResult.cs" />
+    <Compile Include="usercontrols\test.aspx.cs">
+      <DependentUpon>test.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="usercontrols\test.aspx.designer.cs">
+      <DependentUpon>test.aspx</DependentUpon>
+    </Compile>
     <Compile Include="viewstateMoverModule.cs" />
     <Compile Include="Web References\org.umbraco.update\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -1516,6 +1523,7 @@
     <Content Include="umbraco\helpRedirect.aspx" />
     <Content Include="umbraco\images\aboutNew.png" />
     <Content Include="umbraco\images\umbracoSplash.png" />
+    <Content Include="usercontrols\test.aspx" />
     <Content Include="web.config.Az-VAIO.xslt" />
     <Content Include="umbraco\endPreview.aspx" />
     <Content Include="umbraco\js\UmbracoCasingRules.aspx" />
@@ -2854,7 +2862,6 @@
     <Folder Include="umbraco\library\" />
     <Folder Include="umbraco\webservices\api\" />
     <Folder Include="umbraco_client\tagging\" />
-    <Folder Include="usercontrols\" />
     <Folder Include="xslt\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

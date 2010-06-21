@@ -136,6 +136,7 @@
                 UmbClientMgr.appActions().shiftApp(app, uiKeys['sections_' + app]);
             });
 
+
             if (rightAction != '') {
                 //if an action is specified, then load it
                 UmbClientMgr.contentFrame(rightAction + ".aspx?id=" + rightActionId);

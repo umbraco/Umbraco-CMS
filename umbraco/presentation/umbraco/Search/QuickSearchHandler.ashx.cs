@@ -42,8 +42,11 @@ namespace umbraco.presentation.umbraco.Search
                 limit = 100;
             }
 
+
             //if it doesn't start with "*", then search only nodeName and nodeId
-            var internalSearcher = UmbracoContext.Current.InternalSearchProvider;
+            var internalSearcher = (app == "Member")
+                ? UmbracoContext.Current.InternalMemberSearchProvider 
+                : UmbracoContext.Current.InternalSearchProvider;
             var criteria = internalSearcher.CreateSearchCriteria(app);
             IEnumerable<SearchResult> results;
             if (txt.StartsWith("*"))

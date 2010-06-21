@@ -5,10 +5,30 @@
 <asp:Content ID="header1" ContentPlaceHolderID="head" runat="server">
 <script type="text/javascript">
     function openItem(id) {
-        var url = "editContent.aspx?id=" + id;
-        if (UmbClientMgr.mainWindow().UmbClientMgr.appActions().getCurrApp() == "media") {
-            url = "editMedia.aspx?id=" + id;
+//        var url = "editContent.aspx?id=" + id;
+//        if (UmbClientMgr.mainWindow().UmbClientMgr.appActions().getCurrApp() == "media") {
+//            url = "editMedia.aspx?id=" + id;
+//        }
+
+        var url = "";
+
+        alert(UmbClientMgr.mainWindow().UmbClientMgr.appActions().getCurrApp());
+        switch (UmbClientMgr.mainWindow().UmbClientMgr.appActions().getCurrApp().toLowerCase()) {
+            case "media":
+                url = "editMedia.aspx";
+                break;
+            case "content":
+                url = "editContent.aspx";
+                break;
+            case "member":
+                url = "members/editMember.aspx";
+                break;
+            default:
+                url = "editContent.aspx";
         }
+        url = url + "?id=" + id;
+
+
         UmbClientMgr.contentFrame(url);
         UmbClientMgr.closeModalWindow();
     }

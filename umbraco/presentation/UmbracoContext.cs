@@ -218,5 +218,17 @@ namespace umbraco.presentation
                 return ExamineManager.Instance.SearchProviderCollection["InternalSearcher"];
             }
         }
+
+        /// <summary>
+        /// Gets the internal member search provider from Examine.
+        /// </summary>
+        /// <value>The internal search provider.</value>
+        public virtual BaseSearchProvider InternalMemberSearchProvider
+        {
+            get
+            {
+                return ExamineManager.Instance.SearchProviderCollection["InternalMemberSearcher"];
+            }
+        }
     }
 }
