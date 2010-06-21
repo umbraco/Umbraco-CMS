@@ -172,18 +172,18 @@ namespace umbraco.editorControls.macrocontainer
              base.OnLoad(e);
 
              // And a reference to the macro container calls 
-             if (!UmbracoContext.Current.LiveEditingContext.Enabled)
-             {
-                 ScriptManager sm = ScriptManager.GetCurrent(base.Page);
-                 ServiceReference webservicePath = new ServiceReference(SystemDirectories.Webservices + "/MacroContainerService.asmx");
+             //if (!UmbracoContext.Current.LiveEditingContext.Enabled)
+             //{
+             //    ScriptManager sm = ScriptManager.GetCurrent(base.Page);
+             //    ServiceReference webservicePath = new ServiceReference(SystemDirectories.Webservices + "/MacroContainerService.asmx");
 
-                 if (!sm.Services.Contains(webservicePath))
-                     sm.Services.Add(webservicePath);
-             }
-             else
-             {
-                 ClientDependencyLoader.Instance.RegisterDependency("webservices/MacroContainerService.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
-             }
+             //    if (!sm.Services.Contains(webservicePath))
+             //        sm.Services.Add(webservicePath);
+             //}
+             //else
+             //{
+             //    ClientDependencyLoader.Instance.RegisterDependency("webservices/MacroContainerService.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
+             //}
 
 
             
