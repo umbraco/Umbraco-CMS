@@ -1,0 +1,1163 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>IronPython.Modules</name>
+    </assembly>
+    <members>
+        <member name="M:IronPython.Modules.PythonCodecs.charmap_build(System.String)">
+            <summary>
+            Creates an optimized encoding mapping that can be consumed by an optimized version of charmap_encode.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonCodecs.charmap_decode(System.String,System.String,System.String)">
+            <summary>
+            Decodes the input string using the provided string mapping.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonCodecs.charmap_encode(System.String,System.String,IronPython.Modules.PythonCodecs.EncodingMap)">
+            <summary>
+            Encodes the input string with the specified optimized encoding map.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.PythonCodecs.EncodingMap">
+            <summary>
+            Optimied encoding mapping that can be consumed by charmap_encode.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.ModuleOps">
+            <summary>
+            Provides helper functions which need to be called from generated code to implement various 
+            portions of modules.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.PythonBytesIOModule._BytesIO">
+            <summary>
+            BytesIO([initializer]) -> object
+            
+            Create a buffered I/O implementation using an in-memory bytes
+            buffer, ready for reading and writing.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonBytesIOModule._BytesIO.close">
+            <summary>
+            close() -> None.  Disable all I/O operations.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonBytesIOModule._BytesIO.flush">
+            <summary>
+            flush() -> None.  Does nothing.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonBytesIOModule._BytesIO.getvalue">
+            <summary>
+            getvalue() -> bytes.
+            
+            Retrieve the entire contents of the BytesIO object.
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.PythonBytesIOModule._BytesIO.closed">
+            <summary>
+            True if the file is closed.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonCollections.deque.WalkDeque(IronPython.Modules.PythonCollections.deque.DequeWalker)">
+            <summary>
+            Walks the queue calling back to the specified delegate for
+            each populated index in the queue.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonCopyReg.EnsureCallable(IronPython.Runtime.CodeContext,System.Object,System.String)">
+            <summary>
+            Throw TypeError with a specified message if object isn't callable.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonCopyReg.GetCode(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Convert object to ushort, throwing ValueError on overflow.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.PythonPickle.IFileInput">
+            <summary>
+            Interface for "file-like objects" that implement the protocol needed by load() and friends.
+            This enables the creation of thin wrappers that make fast .NET types and slow Python types look the same.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.PythonPickle.IFileOutput">
+            <summary>
+            Interface for "file-like objects" that implement the protocol needed by dump() and friends.
+            This enables the creation of thin wrappers that make fast .NET types and slow Python types look the same.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.SaveObject(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Call the appropriate reduce method for obj and pickle the object using
+            the resulting data. Use the first available of
+            copy_reg.dispatch_table[type(obj)], obj.__reduce_ex__, and obj.__reduce__.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.SaveReduce(IronPython.Runtime.CodeContext,System.Object,System.Object,System.Object,System.Object,System.Object,System.Object,System.Object)">
+            <summary>
+            Pickle the result of a reduce function.
+            
+            Only context, obj, func, and reduceCallable are required; all other arguments may be null.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.WriteFloatAsString(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Write value in pickle decimalnl_short format.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.WriteFloat64(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Write value in pickle float8 format.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.WriteUInt8(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Write value in pickle uint1 format.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.WriteUInt16(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Write value in pickle uint2 format.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.WriteInt32(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Write value in pickle int4 format.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.WriteIntAsString(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Write value in pickle decimalnl_short format.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.WriteLongAsString(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Write value in pickle decimalnl_long format.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.WriteUnicodeStringRaw(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Write value in pickle unicodestringnl format.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.WriteUnicodeStringUtf8(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Write value in pickle unicodestring4 format.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.WriteStringPair(IronPython.Runtime.CodeContext,System.Object,System.Object)">
+            <summary>
+            Write value in pickle stringnl_noescape_pair format.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.IsUInt8(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Return true if value is appropriate for formatting in pickle uint1 format.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.IsUInt16(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Return true if value is appropriate for formatting in pickle uint2 format.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.IsInt32(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Return true if value is appropriate for formatting in pickle int4 format.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.BatchAppends(IronPython.Runtime.CodeContext,System.Collections.IEnumerator)">
+            <summary>
+            Emit a series of opcodes that will set append all items indexed by iter
+            to the object at the top of the stack. Use APPENDS if possible, but
+            append no more than BatchSize items at a time.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.BatchSetItems(IronPython.Runtime.CodeContext,System.Collections.IEnumerator)">
+            <summary>
+            Emit a series of opcodes that will set all (key, value) pairs indexed by
+            iter in the object at the top of the stack. Use SETITEMS if possible,
+            but append no more than BatchSize items at a time.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.PicklerObject.FindModuleForGlobal(IronPython.Runtime.CodeContext,System.Object,System.Object)">
+            <summary>
+            Find the module for obj and ensure that obj is reachable in that module by the given name.
+            
+            Throw PicklingError if any of the following are true:
+             - The module couldn't be determined.
+             - The module couldn't be loaded.
+             - The given name doesn't exist in the module.
+             - The given name is a different object than obj.
+            
+            Otherwise, return the name of the module.
+            
+            To determine which module obj lives in, obj.__module__ is used if available. The
+            module named by obj.__module__ is loaded if needed. If obj has no __module__
+            attribute, then each loaded module is searched. If a loaded module has an
+            attribute with the given name, and that attribute is the same object as obj,
+            then that module is used.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonPickle.UnpicklerObject.SetItems(IronPython.Runtime.PythonDictionary,System.Int32)">
+            <summary>
+            Interpret everything from markIndex to the top of the stack as a sequence
+            of key, value, key, value, etc. Set dict[key] = value for each. Pop
+            everything from markIndex up when done.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonDateTime.date.CheckType(System.Object,System.Boolean)">
+            <summary>
+            Used to check the type to see if we can do a comparison.  Returns true if we can
+            or false if we should return NotImplemented.  May throw if the type's really wrong.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonDateTime.time.CompareTo(System.Object)">
+            <summary>
+            Helper function for doing the comparisons.  time has no __cmp__ method
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.PythonIterTools.IterBase">
+            <summary>
+            Base class used for iterator wrappers.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonLocale.LocaleInfo.CreateConventionsDict">
+            <summary>
+            Popupates the given directory w/ the locale information from the given
+            CultureInfo.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonNT.access(IronPython.Runtime.CodeContext,System.String,System.Int32)">
+            <summary>
+            Checks for the specific permissions, provided by the mode parameter, are available for the provided path.  Permissions can be:
+            
+            F_OK: Check to see if the file exists
+            R_OK | W_OK | X_OK: Check for the specific permissions.  Only W_OK is respected.
+            </summary>
+        </member>
+        <member name="F:IronPython.Modules.PythonNT.environ">
+            <summary>
+            single instance of environment dictionary is shared between multiple runtimes because the environment
+            is shared by multiple runtimes.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonNT.spawnl(IronPython.Runtime.CodeContext,System.Int32,System.String,System.Object[])">
+            <summary>
+            spawns a new process.
+            
+            If mode is nt.P_WAIT then then the call blocks until the process exits and the return value
+            is the exit code.
+            
+            Otherwise the call returns a handle to the process.  The caller must then call nt.waitpid(pid, options)
+            to free the handle and get the exit code of the process.  Failure to call nt.waitpid will result
+            in a handle leak.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonNT.spawnle(IronPython.Runtime.CodeContext,System.Int32,System.String,System.Object[])">
+            <summary>
+            spawns a new process.
+            
+            If mode is nt.P_WAIT then then the call blocks until the process exits and the return value
+            is the exit code.
+            
+            Otherwise the call returns a handle to the process.  The caller must then call nt.waitpid(pid, options)
+            to free the handle and get the exit code of the process.  Failure to call nt.waitpid will result
+            in a handle leak.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonNT.spawnv(IronPython.Runtime.CodeContext,System.Int32,System.String,System.Object)">
+            <summary>
+            spawns a new process.
+            
+            If mode is nt.P_WAIT then then the call blocks until the process exits and the return value
+            is the exit code.
+            
+            Otherwise the call returns a handle to the process.  The caller must then call nt.waitpid(pid, options)
+            to free the handle and get the exit code of the process.  Failure to call nt.waitpid will result
+            in a handle leak.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonNT.spawnve(IronPython.Runtime.CodeContext,System.Int32,System.String,System.Object,System.Object)">
+            <summary>
+            spawns a new process.
+            
+            If mode is nt.P_WAIT then then the call blocks until the process exits and the return value
+            is the exit code.
+            
+            Otherwise the call returns a handle to the process.  The caller must then call nt.waitpid(pid, options)
+            to free the handle and get the exit code of the process.  Failure to call nt.waitpid will result
+            in a handle leak.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonNT.SetEnvironment(System.Collections.Specialized.StringDictionary,System.Object)">
+            <summary>
+            Copy elements from a Python mapping of dict environment variables to a StringDictionary.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonNT.ArgumentsToString(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Convert a sequence of args to a string suitable for using to spawn a process.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.PythonRegex">
+            <summary>
+            Python regular expression module.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonRegex.PreParseRegex(IronPython.Runtime.CodeContext,System.String)">
+            <summary>
+            Preparses a regular expression text returning a ParsedRegex class
+            that can be used for further regular expressions.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.PythonRegex.RE_Pattern">
+            <summary>
+            Compiled reg-ex pattern
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSelect.ProcessSocketSequence(IronPython.Runtime.CodeContext,System.Object,IronPython.Runtime.List@,System.Collections.Generic.Dictionary{System.Net.Sockets.Socket,System.Object}@)">
+            <summary>
+            Process a sequence of objects that are compatible with ObjectToSocket(). Return two
+            things as out params: an in-order List of sockets that correspond to the original
+            objects in the passed-in sequence, and a mapping of these socket objects to their
+            original objects.
+            
+            The socketToOriginal mapping is generated because the CPython select module supports
+            passing to select either file descriptor numbers or an object with a fileno() method.
+            We try to be faithful to what was originally requested when we return.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSelect.ObjectToSocket(IronPython.Runtime.CodeContext,System.Object)">
+            <summary>
+            Return the System.Net.Sockets.Socket object that corresponds to the passed-in
+            object. obj can be a System.Net.Sockets.Socket, a PythonSocket.SocketObj, a
+            long integer (representing a socket handle), or a Python object with a fileno()
+            method (whose result is used to look up an existing PythonSocket.SocketObj,
+            which is in turn converted to a Socket.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSocket.SignInsensitiveToInt32(System.Object)">
+            <summary>
+            Convert an object to a 32-bit integer. This adds two features to Converter.ToInt32:
+              1. Sign is ignored. For example, 0xffff0000 converts to 4294901760, where Convert.ToInt32
+                 would throw because 0xffff0000 is less than zero.
+              2. Overflow exceptions are thrown. Converter.ToInt32 throws TypeError if x is
+                 an integer, but is bigger than 32 bits. Instead, we throw OverflowException.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSocket.SignInsensitiveToInt16(System.Object)">
+            <summary>
+            Convert an object to a 16-bit integer. This adds two features to Converter.ToInt16:
+              1. Sign is ignored. For example, 0xff00 converts to 65280, where Convert.ToInt16
+                 would throw because signed 0xff00 is -256.
+              2. Overflow exceptions are thrown. Converter.ToInt16 throws TypeError if x is
+                 an integer, but is bigger than 16 bits. Instead, we throw OverflowException.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSocket.MakeException(IronPython.Runtime.CodeContext,System.Exception)">
+            <summary>
+            Return a standard socket exception (socket.error) whose message and error code come from a SocketException
+            This will eventually be enhanced to generate the correct error type (error, herror, gaierror) based on the error code.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSocket.IPv6BytesToColonHex(System.Byte[])">
+            <summary>
+            Convert an IPv6 address byte array to a string in standard colon-hex notation.
+            The .NET IPAddress.ToString() method uses dotted-quad for the last 32 bits,
+            which differs from the normal Python implementation (but is allowed by the IETF);
+            this method returns the standard (no dotted-quad) colon-hex form.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSocket.ConvertSpecialAddresses(System.String)">
+            <summary>
+            Handle conversion of "" to INADDR_ANY and "&lt;broadcast&gt;" to INADDR_BROADCAST.
+            Otherwise returns host unchanged.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSocket.HostToAddress(IronPython.Runtime.CodeContext,System.String,System.Net.Sockets.AddressFamily)">
+            <summary>
+            Return the IP address associated with host, with optional address family checking.
+            host may be either a name or an IP address (in string form).
+            
+            If family is non-null, a gaierror will be thrown if the host's address family is
+            not the same as the specified family. gaierror is also raised if the hostname cannot be
+            converted to an IP address (e.g. through a name lookup failure).
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSocket.HostToAddresses(IronPython.Runtime.CodeContext,System.String,System.Net.Sockets.AddressFamily)">
+            <summary>
+            Return the IP address associated with host, with optional address family checking.
+            host may be either a name or an IP address (in string form).
+            
+            If family is non-null, a gaierror will be thrown if the host's address family is
+            not the same as the specified family. gaierror is also raised if the hostname cannot be
+            converted to an IP address (e.g. through a name lookup failure).
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSocket.RemoveLocalDomain(System.String)">
+            <summary>
+            Return fqdn, but with its domain removed if it's on the same domain as the local machine.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSocket.TupleToEndPoint(IronPython.Runtime.CodeContext,IronPython.Runtime.PythonTuple,System.Net.Sockets.AddressFamily,System.String@)">
+            <summary>
+            Convert a (host, port) tuple [IPv4] (host, port, flowinfo, scopeid) tuple [IPv6]
+            to its corresponding IPEndPoint.
+            
+            Throws gaierror if host is not a valid address.
+            Throws ArgumentTypeException if any of the following are true:
+             - address does not have exactly two elements
+             - address[0] is not a string
+             - address[1] is not an int
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSocket.EndPointToTuple(System.Net.IPEndPoint)">
+            <summary>
+            Convert an IPEndPoint to its corresponding (host, port) [IPv4] or (host, port, flowinfo, scopeid) [IPv6] tuple.
+            Throws SocketException if the address family is other than IPv4 or IPv6.
+            </summary>
+        </member>
+        <member name="F:IronPython.Modules.PythonSocket.socket._handleToSocket">
+            <summary>
+            handleToSocket allows us to translate from Python's idea of a socket resource (file
+            descriptor numbers) to .NET's idea of a socket resource (System.Net.Socket objects).
+            In particular, this allows the select module to convert file numbers (as returned by
+            fileno()) and convert them to Socket objects so that it can do something useful with them.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSocket.socket.HandleToSocket(System.Int64)">
+            <summary>
+            Return the internal System.Net.Sockets.Socket socket object associated with the given
+            handle (as returned by GetHandle()), or null if no corresponding socket exists. This is
+            primarily intended to be used by other modules (such as select) that implement
+            networking primitives. User code should not normally need to call this function.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSocket.socket.#ctor(IronPython.Runtime.CodeContext,System.Net.Sockets.Socket)">
+            <summary>
+            Create a Python socket object from an existing .NET socket object
+            (like one returned from Socket.Accept())
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSocket.socket.Initialize(IronPython.Runtime.CodeContext,System.Net.Sockets.Socket)">
+            <summary>
+            Perform initialization common to all constructors
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.LocalOrArg">
+            <summary>
+            Wrapper class for emitting locals/variables during marshalling code gen.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.MemoryHolder">
+            <summary>
+            A wrapper around allocated memory to ensure it gets released and isn't accessed
+            when it could be finalized.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.MemoryHolder.#ctor(System.Int32)">
+            <summary>
+            Creates a new MemoryHolder and allocates a buffer of the specified size.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.MemoryHolder.#ctor(System.IntPtr,System.Int32)">
+            <summary>
+            Creates a new MemoryHolder at the specified address which is not tracked
+            by us and we will never free.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.MemoryHolder.#ctor(System.IntPtr,System.Int32,IronPython.Modules.MemoryHolder)">
+            <summary>
+            Creates a new MemoryHolder at the specified address which will keep alive the 
+            parent memory holder.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.MemoryHolder.AddObject(System.Object,System.Object)">
+            <summary>
+            Used to track the lifetime of objects when one memory region depends upon
+            another memory region.  For example if you have an array of objects that
+            each have an element which has it's own lifetime the array needs to keep
+            the individual elements alive.
+            
+            The keys used here match CPython's keys as tested by CPython's test_ctypes. 
+            Typically they are a string which is the array index, "ffffffff" when
+            from_buffer is used, or when it's a simple type there's just a string
+            instead of the full dictionary - we store that under the key "str".
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.MemoryHolder.CopyFrom(System.IntPtr,System.IntPtr)">
+            <summary>
+            Copies the data in data into this MemoryHolder.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.MemoryHolder.CopyTo(IronPython.Modules.MemoryHolder,System.Int32,System.Int32)">
+            <summary>
+            Copies memory from one location to another keeping the associated memory holders alive during the
+            operation.
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.MemoryHolder.UnsafeAddress">
+            <summary>
+            Gets the address of the held memory.  The caller should ensure the MemoryHolder
+            is always alive as long as the address will continue to be accessed.
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.MemoryHolder.Objects">
+            <summary>
+            Gets a list of objects which need to be kept alive for this MemoryHolder to be 
+            remain valid.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.NativeFunctions">
+            <summary>
+            Native functions used for exposing ctypes functionality.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.NativeFunctions.Calloc(System.IntPtr)">
+            <summary>
+            Allocates memory that's zero-filled
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.NativeFunctions.MemSet(System.IntPtr,System.Byte,System.IntPtr)">
+            <summary>
+            Helper function for implementing memset.  Could be more efficient if we 
+            could P/Invoke or call some otherwise native code to do this.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes">
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+            <summary>
+            Provides support for interop with native code from Python code.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.Cast(System.IntPtr,System.IntPtr,System.IntPtr)">
+            <summary>
+            Implementation of our cast function.  data is marshalled as a void*
+            so it ends up as an address.  obj and type are marshalled as an object
+            so we need to unmarshal them.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.POINTER(IronPython.Runtime.CodeContext,IronPython.Runtime.Types.PythonType)">
+            <summary>
+            Returns a new type which represents a pointer given the existing type.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.PyObj_FromPtr(System.IntPtr)">
+            <summary>
+            Converts an address acquired from PyObj_FromPtr or that has been
+            marshaled as type 'O' back into an object.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.PyObj_ToPtr(System.Object)">
+            <summary>
+            Converts an object into an opaque address which can be handed out to
+            managed code.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.Py_DECREF(System.Object)">
+            <summary>
+            Decreases the ref count on an object which has been increased with
+            Py_INCREF.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.Py_INCREF(System.Object)">
+            <summary>
+            Increases the ref count on an object ensuring that it will not be collected.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.addressof(IronPython.Modules.CTypes.CData)">
+            <summary>
+            returns address of C instance internal buffer.
+            
+            It is the callers responsibility to ensure that the provided instance will 
+            stay alive if memory in the resulting address is to be used later.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.alignment(IronPython.Runtime.Types.PythonType)">
+            <summary>
+            Gets the required alignment of the given type.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.alignment(System.Object)">
+            <summary>
+            Gets the required alignment of an object.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.pointer(IronPython.Runtime.CodeContext,IronPython.Modules.CTypes.CData)">
+            <summary>
+            Returns a pointer instance for the given CData
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.GetMarshalTypeFromSize(System.Int32)">
+            <summary>
+            Given a specific size returns a .NET type of the equivalent size that
+            we can use when marshalling these values across calls.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.GetFieldInfo(IronPython.Modules.CTypes.INativeType,System.Object,System.String@,IronPython.Modules.CTypes.INativeType@,System.Nullable{System.Int32}@)">
+            <summary>
+            Shared helper between struct and union for getting field info and validating it.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.CheckBits(IronPython.Modules.CTypes.INativeType,IronPython.Runtime.PythonTuple)">
+            <summary>
+            Verifies that the provided bit field settings are valid for this type.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.GetFieldsList(System.Object)">
+            <summary>
+            Shared helper to get the _fields_ list for struct/union and validate it.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.StringAt(System.IntPtr,System.Int32)">
+            <summary>
+            Helper function for translating from memset to NT's FillMemory API.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.WStringAt(System.IntPtr,System.Int32)">
+            <summary>
+            Helper function for translating from memset to NT's FillMemory API.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.EmitCDataCreation(IronPython.Modules.CTypes.INativeType,System.Reflection.Emit.ILGenerator,System.Collections.Generic.List{System.Object},System.Int32)">
+            <summary>
+            Emits the marshalling code to create a CData object for reverse marshalling.
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.CTypes._cast_addr">
+            <summary>
+            Gets a function which casts the specified memory.  Because this is used only
+            w/ Python API we use a delegate as the return type instead of an actual address.
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.CTypes.DynamicModule">
+            <summary>
+            Gets the ModuleBuilder used to generate our unsafe call stubs into.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes.SimpleTypeKind">
+            <summary>
+            The enum used for tracking the various ctypes primitive types.
+            </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.Char">
+            <summary> 'c' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.SignedByte">
+            <summary> 'b' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.UnsignedByte">
+            <summary> 'B' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.SignedShort">
+            <summary> 'h' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.UnsignedShort">
+            <summary> 'H' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.SignedInt">
+            <summary> 'i' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.UnsignedInt">
+            <summary> 'I' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.SignedLong">
+            <summary> 'l' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.UnsignedLong">
+            <summary> 'L' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.Single">
+            <summary> 'f' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.Double">
+            <summary> 'd', 'g' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.SignedLongLong">
+            <summary> 'q' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.UnsignedLongLong">
+            <summary> 'Q' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.Object">
+            <summary> 'O' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.Pointer">
+            <summary> 'P' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.CharPointer">
+            <summary> 'z' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.WCharPointer">
+            <summary> 'Z' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.WChar">
+            <summary> 'u' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.Boolean">
+            <summary> '?' </summary>
+        </member>
+        <member name="F:IronPython.Modules.CTypes.SimpleTypeKind.VariantBool">
+            <summary> 'v' </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes.CData">
+            <summary>
+            Base class for all ctypes interop types.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes.ArrayType">
+            <summary>
+            The meta class for ctypes array instances.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes.INativeType">
+            <summary>
+            Common functionality that all of the meta classes provide which is part of
+            our implementation.  This is used to implement the serialization/deserialization
+            of values into/out of memory, emit the marshalling logic for call stubs, and
+            provide common information (size/alignment) for the types.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.INativeType.GetValue(IronPython.Modules.MemoryHolder,System.Object,System.Int32,System.Boolean)">
+            <summary>
+            Deserialized the value of this type from the given address at the given
+            offset.  Any new objects which are created will keep the provided 
+            MemoryHolder alive.
+            
+            raw determines if the cdata is returned or if the primitive value is
+            returned.  This is only applicable for subtypes of simple cdata types.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.INativeType.SetValue(IronPython.Modules.MemoryHolder,System.Int32,System.Object)">
+            <summary>
+            Serializes the provided value into the specified address at the given
+            offset.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.INativeType.GetNativeType">
+            <summary>
+            Gets the .NET type which is used when calling or returning the value
+            from native code.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.INativeType.GetPythonType">
+            <summary>
+            Gets the .NET type which the native type is converted into when going to Python
+            code.  This is usually int, BigInt, double, object, or a CData type.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.INativeType.EmitMarshalling(System.Reflection.Emit.ILGenerator,IronPython.Modules.LocalOrArg,System.Collections.Generic.List{System.Object},System.Int32)">
+            <summary>
+            Emits marshalling of an object from Python to native code.  This produces the
+            native type from the Python type.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.INativeType.EmitReverseMarshalling(System.Reflection.Emit.ILGenerator,IronPython.Modules.LocalOrArg,System.Collections.Generic.List{System.Object},System.Int32)">
+            <summary>
+            Emits marshalling from native code to Python code This produces the python type 
+            from the native type.  This is used for return values and parameters 
+            to Python callable objects that are passed back out to native code.
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.CTypes.INativeType.Size">
+            <summary>
+            Gets the native size of the type
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.CTypes.INativeType.Alignment">
+            <summary>
+            Gets the required alignment for the type
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.CTypes.INativeType.TypeFormat">
+            <summary>
+            Returns a string which describes the type.  Used for _buffer_info implementation which
+            only exists for testing purposes.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.ArrayType.from_param(System.Object)">
+            <summary>
+            Converts an object into a function call parameter.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes._CFuncPtr.#ctor(IronPython.Runtime.PythonTuple)">
+            <summary>
+            Creates a new CFuncPtr object from a tuple.  The 1st element of the
+            tuple is the ordinal or function name.  The second is an object with
+            a _handle property.  The _handle property is the handle of the module
+            from which the function will be loaded.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes._CFuncPtr.#ctor(System.Int32)">
+            <summary>
+            Creates a new CFuncPtr with the specfied address.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes._CFuncPtr.#ctor(Microsoft.Scripting.Math.BigInteger)">
+            <summary>
+            Creates a new CFuncPtr with the specfied address.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes._CFuncPtr.Meta.AddKeepAlives(IronPython.Modules.CTypes._CFuncPtr.Meta.ArgumentMarshaller[],System.Collections.Generic.List{Microsoft.Scripting.Ast.Expression})">
+            <summary>
+            we need to keep alive any methods which have arguments for the duration of the
+            call.  Otherwise they could be collected on the finalizer thread before we come back.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes._CFuncPtr.Meta.CreateInteropInvoker(System.Runtime.InteropServices.CallingConvention,IronPython.Modules.CTypes._CFuncPtr.Meta.ArgumentMarshaller[],IronPython.Modules.CTypes.INativeType,System.Boolean,System.Collections.Generic.List{System.Object})">
+            <summary>
+            Creates a method for calling with the specified signature.  The returned method has a signature
+            of the form:
+            
+            (IntPtr funcAddress, arg0, arg1, ..., object[] constantPool)
+            
+            where IntPtr is the address of the function to be called.  The arguments types are based upon
+            the types that the ArgumentMarshaller requires.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes._CFuncPtr.Meta.ArgumentMarshaller">
+            <summary>
+            Base class for marshalling arguments from the user provided value to the
+            call stub.  This class provides the logic for creating the call stub and
+            calling it.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes._CFuncPtr.Meta.ArgumentMarshaller.EmitCallStubArgument(System.Reflection.Emit.ILGenerator,System.Int32,System.Collections.Generic.List{System.Object},System.Int32)">
+            <summary>
+            Emits the IL to get the argument for the call stub generated into
+            a dynamic method.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes._CFuncPtr.Meta.ArgumentMarshaller.GetKeepAlive">
+            <summary>
+            Gets an expression which keeps alive the argument for the duration of the call.  
+            
+            Returns null if a keep alive is not necessary.
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.CTypes._CFuncPtr.Meta.ArgumentMarshaller.ArgumentExpression">
+            <summary>
+            Gets the expression used to provide the argument.  This is the expression
+            from an incoming DynamicMetaObject.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes._CFuncPtr.Meta.PrimitiveMarshaller">
+            <summary>
+            Provides marshalling of primitive values when the function type
+            has no type information or when the user has provided us with
+            an explicit cdata instance.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes._CFuncPtr.Meta.CDataMarshaller">
+            <summary>
+            Provides marshalling for when the function type provide argument information.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes._CFuncPtr.Meta.NativeArgumentMarshaller">
+            <summary>
+            Provides marshalling for when the user provides a native argument object
+            (usually gotten by byref or pointer) and the function type has no type information.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes.CFuncPtrType">
+            <summary>
+            The meta class for ctypes function pointer instances.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.CFuncPtrType.from_param(System.Object)">
+            <summary>
+            Converts an object into a function call parameter.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes.Field">
+            <summary>
+            Fields are created when a Structure is defined and provide
+            introspection of the structure.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.Field.ExtractBits(System.Object)">
+            <summary>
+            Called for fields which have been limited to a range of bits.  Given the
+            value for the full type this extracts the individual bits.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.Field.SetBitsValue(IronPython.Modules.MemoryHolder,System.Int32,System.Object)">
+            <summary>
+            Called for fields which have been limited to a range of bits.  Sets the 
+            specified value into the bits for the field.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes.PointerType">
+            <summary>
+            The meta class for ctypes pointers.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.PointerType.from_param(IronPython.Modules.CTypes.Pointer)">
+            <summary>
+            Converts an object into a function call parameter.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.PointerType.from_address(System.Object)">
+            <summary>
+            Access an instance at the specified address
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes.SimpleType">
+            <summary>
+            The meta class for ctypes simple data types.  These include primitives like ints,
+            floats, etc... char/wchar pointers, and untyped pointers.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.SimpleType.from_param(System.Object)">
+            <summary>
+            Converts an object into a function call parameter.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.SimpleType.ReadChar(IronPython.Modules.MemoryHolder,System.Int32)">
+            <summary>
+            Helper function for reading char/wchar's.  This is used for reading from
+            arrays and pointers to avoid creating lots of 1-char strings.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes.StructType">
+            <summary>
+            Meta class for structures.  Validates _fields_ on creation, provides factory
+            methods for creating instances from addresses and translating to parameters.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.StructType.from_param(System.Object)">
+            <summary>
+            Converts an object into a function call parameter.
+            
+            Structures just return themselves.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.StructType.EnsureSizeAndAlignment">
+            <summary>
+            If our size/alignment hasn't been initialized then grabs the size/alignment
+            from all of our base classes.  If later new _fields_ are added we'll be
+            initialized and these values will be replaced.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes._Structure">
+            <summary>
+            Base class for data structures.  Subclasses can define _fields_ which 
+            specifies the in memory layout of the values.  Instances can then
+            be created with the initial values provided as the array.  The values
+            can then be accessed from the instance by field name.  The value can also
+            be passed to a foreign C API and the type can be used in other structures.
+            
+            class MyStructure(Structure):
+                _fields_ = [('a', c_int), ('b', c_int)]
+                
+            MyStructure(1, 2).a
+            MyStructure()
+            
+            class MyOtherStructure(Structure):
+                _fields_ = [('c', MyStructure), ('b', c_int)]
+                
+            MyOtherStructure((1, 2), 3)
+            MyOtherStructure(MyStructure(1, 2), 3)
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.CTypes.UnionType">
+            <summary>
+            The meta class for ctypes unions.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.CTypes.UnionType.from_param(System.Object)">
+            <summary>
+            Converts an object into a function call parameter.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.PythonStruct.FormatType">
+            <summary>
+            Enum which specifies the format type for a compiled struct
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.PythonStruct.Format">
+            <summary>
+            Struct used to store the format and the number of times it should be repeated.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.PythonThread._local.ThreadLocalDictionaryStorage">
+            <summary>
+            Provides a dictionary storage implementation whose storage is local to
+            the thread.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.PythonTime.FoundDateComponents">
+            <summary>
+            Represents the date components that we found while parsing the date.  Used for zeroing out values
+            which have different defaults from CPython.  Currently we only know that we need to do this for
+            the year.
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.xxsubtype">
+            <summary>
+            Samples on how to subtype built-in types from C#
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.xxsubtype.spamlist.state">
+            <summary>
+            an int variable for demonstration purposes
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.xxsubtype.spamdict.state">
+            <summary>
+            an int variable for demonstration purposes
+            </summary>
+        </member>
+        <member name="T:IronPython.Modules.FunctionTools.partial">
+            <summary>
+            Returns a new callable object with the provided initial set of arguments
+            bound to it.  Calling the new function then appends to the additional
+            user provided arguments.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.FunctionTools.partial.#ctor(IronPython.Runtime.CodeContext,System.Object,System.Object[])">
+            <summary>
+            Creates a new partial object with the provided positional arguments.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.FunctionTools.partial.#ctor(IronPython.Runtime.CodeContext,System.Object,System.Collections.Generic.IDictionary{System.Object,System.Object},System.Object[])">
+            <summary>
+            Creates a new partial object with the provided positional and keyword arguments.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.FunctionTools.partial.Call(IronPython.Runtime.CodeContext,System.Object[])">
+            <summary>
+            Calls func with the previously provided arguments and more positional arguments.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.FunctionTools.partial.Call(IronPython.Runtime.CodeContext,System.Collections.Generic.IDictionary{System.Object,System.Object},System.Object[])">
+            <summary>
+            Calls func with the previously provided arguments and more positional arguments and keyword arguments.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.FunctionTools.partial.SetMemberAfter(IronPython.Runtime.CodeContext,System.String,System.Object)">
+            <summary>
+            Operator method to set arbitrary members on the partial object.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.FunctionTools.partial.GetBoundMember(IronPython.Runtime.CodeContext,System.String)">
+            <summary>
+            Operator method to get additional arbitrary members defined on the partial object.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.FunctionTools.partial.DeleteMember(IronPython.Runtime.CodeContext,System.String)">
+            <summary>
+            Operator method to delete arbitrary members defined in the partial object.
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.FunctionTools.partial.func">
+            <summary>
+            Gets the function which will be called
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.FunctionTools.partial.args">
+            <summary>
+            Gets the initially provided positional arguments.
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.FunctionTools.partial.keywords">
+            <summary>
+            Gets the initially provided keyword arguments or None.
+            </summary>
+        </member>
+        <member name="P:IronPython.Modules.FunctionTools.partial.__dict__">
+            <summary>
+            Gets or sets the dictionary used for storing extra attributes on the partial object.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonSsl.ReadInt(System.Byte[],System.Int32@)">
+            <summary>
+            BER encoding of an integer value is the number of bytes
+            required to represent the integer followed by the bytes
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonWeakRef.ref.__hash__(IronPython.Runtime.CodeContext)">
+            <summary>
+            Special hash function because IStructuralEquatable.GetHashCode is not allowed to throw.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonWeakRef.ref.RefEquals(System.Object,System.Object,System.Collections.IEqualityComparer)">
+            <summary>
+            Special equals because none of the special cases in Ops.Equals
+            are applicable here, and the reference equality check breaks some tests.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonWeakRef.weakproxy.GetObject">
+            <summary>
+            gets the object or throws a reference exception
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonWeakRef.weakproxy.__eq__(System.Object)">
+            <summary>
+            Special equality function because IStructuralEquatable.Equals is not allowed to throw.
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonWeakRef.weakcallableproxy.GetObject">
+            <summary>
+            gets the object or throws a reference exception
+            </summary>
+        </member>
+        <member name="M:IronPython.Modules.PythonWeakRef.weakcallableproxy.__eq__(System.Object)">
+            <summary>
+            Special equality function because IStructuralEquatable.Equals is not allowed to throw.
+            </summary>
+        </member>
+    </members>
+</doc>
