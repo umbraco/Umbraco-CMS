@@ -748,7 +748,7 @@ namespace umbraco.cms.businesslogic
         /// Flushes the cache.
         /// </summary>
         /// <param name="Id">The id.</param>
-        protected void FlushFromCache(int Id)
+        public void FlushFromCache(int Id)
         {
             Cache.ClearCacheItem(string.Format("UmbracoContentType{0}", Id.ToString()));
             Cache.ClearCacheItem(GetPropertiesCacheKey());

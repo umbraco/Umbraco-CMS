@@ -450,6 +450,7 @@ jQuery(function() { refreshDropDowns(); });
         {
             GenericProperties.GenericPropertyWrapper gpw = (GenericProperties.GenericPropertyWrapper)sender;
             gpw.GenricPropertyControl.PropertyType.delete();
+            cType = ContentType.GetContentType(cType.Id);
             this.bindDataGenericProperties(true);
         }
 

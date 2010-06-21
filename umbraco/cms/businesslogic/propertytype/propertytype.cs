@@ -307,7 +307,7 @@ namespace umbraco.cms.businesslogic.propertytype
             return result.ToList();
         }
 
-		public void delete()
+		public void delete()    
 		{
             // flush cache
             FlushCache();
@@ -322,8 +322,15 @@ namespace umbraco.cms.businesslogic.propertytype
                     prop.delete();   
                 }
 			}
-			// Delete PropertyType ..
+
+            // invalidate content type cache
+            ContentType.GetContentType(this.ContentTypeId).FlushFromCache(this.ContentTypeId);
+            
+            // Delete PropertyType ..
 			SqlHelper.ExecuteNonQuery("Delete from cmsPropertyType where id = " + this.Id);
+
+
+            // delete 
 			this.InvalidateCache();
 		}
 
