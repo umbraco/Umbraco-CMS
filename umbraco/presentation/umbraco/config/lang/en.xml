@@ -370,6 +370,7 @@
     <key alias="pythonErrorText">The python script has not been saved, because it contained error(s)</key>
     <key alias="contentTypeAliasAndNameNotNull">Please fill both alias and name on the new propertytype!</key>
     <key alias="filePermissionsError">There is a problem with read/write access to a specific file or folder</key>
+    <key alias="codemirroriewarning">NOTE! Even though CodeMirror is enabled by configuration, it is disabled in IE due to automatic hyperlinking.</key>
   </area>
   <area alias="speechBubbles">
     <key alias="xsltSavedHeader">Xslt saved</key>

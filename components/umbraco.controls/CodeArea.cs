@@ -46,6 +46,14 @@ namespace umbraco.uicontrols {
             }
         }
 
+        public bool CodeMirrorEnabled
+        {
+            get
+            {
+                return !UmbracoSettings.ScriptDisableEditor && HttpContext.Current.Request.Browser.Browser != "IE";
+            }
+        }
+
         public EditorType CodeBase { get; set; }
         public string ClientSaveMethod { get; set; }
 
@@ -56,7 +64,7 @@ namespace umbraco.uicontrols {
             base.OnInit(e);
             EnsureChildControls();
 
-            if (!UmbracoSettings.ScriptDisableEditor)
+            if (CodeMirrorEnabled)
             {
                 ClientDependencyLoader.Instance.RegisterDependency("CodeMirror/js/codemirror.js", "UmbracoClient", ClientDependencyType.Javascript);
                 ClientDependencyLoader.Instance.RegisterDependency("CodeArea/styles.css", "UmbracoClient", ClientDependencyType.Css);
@@ -69,12 +77,11 @@ namespace umbraco.uicontrols {
             CodeTextBox = new TextBox();
             CodeTextBox.ID = "CodeTextBox";
 
-            if (UmbracoSettings.ScriptDisableEditor)
+            if (!CodeMirrorEnabled)
             {
                 CodeTextBox.Attributes.Add("class", "codepress");
                 CodeTextBox.Attributes.Add("wrap", "off");
             }
-            else            
             
             CodeTextBox.TextMode = TextBoxMode.MultiLine;
 
@@ -91,7 +98,7 @@ namespace umbraco.uicontrols {
         {
             get
             {
-                if (UmbracoSettings.ScriptDisableEditor)
+                if (!CodeMirrorEnabled)
                     return CodeTextBox.ClientID;
                 else
                     return base.ClientID;
@@ -103,7 +110,7 @@ namespace umbraco.uicontrols {
             EnsureChildControls();
 
             var jsEventCode = "";
-            if (UmbracoSettings.ScriptDisableEditor)
+            if (!CodeMirrorEnabled)
             {
                 CodeTextBox.RenderControl(writer);
                 jsEventCode = RenderBasicEditor();
@@ -125,7 +132,7 @@ namespace umbraco.uicontrols {
 
             if (this.AutoResize)
             {
-                if (!UmbracoSettings.ScriptDisableEditor)
+                if (CodeMirrorEnabled)
                 {
                     //reduce the width if using code mirror because of the line numbers
                     OffSetX += 20;
@@ -134,7 +141,7 @@ namespace umbraco.uicontrols {
                 jsEventCode += @"                    
 
                     //create the editor
-                   var UmbEditor = new Umbraco.Controls.CodeEditor.UmbracoEditor(" + UmbracoSettings.ScriptDisableEditor.ToString().ToLower() + @", '" + this.ClientID + @"');
+                   var UmbEditor = new Umbraco.Controls.CodeEditor.UmbracoEditor(" + (!CodeMirrorEnabled).ToString().ToLower() + @", '" + this.ClientID + @"');
 
 
                     var m_textEditor = jQuery('#" + this.ClientID + @"');
@@ -143,6 +150,12 @@ namespace umbraco.uicontrols {
                     jQuery(window).resize(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
             		jQuery(document).ready(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
                     ";
+
+                if (!UmbracoSettings.ScriptDisableEditor && HttpContext.Current.Request.Browser.Browser == "IE")
+                {
+                    jsEventCode += "jQuery('<p style=\"color:#999\">" + ui.Text("codemirroriewarning") +"</p>').insertAfter('#" + this.ClientID + "');";
+                }
+
             }
 
             jsEventCode = string.Format(@"<script type=""text/javascript"">{0}</script>", jsEventCode);
