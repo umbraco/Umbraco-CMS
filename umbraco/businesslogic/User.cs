@@ -591,7 +591,14 @@ namespace umbraco.BusinessLogic
         public void disable()
         {
             OnDisabling(EventArgs.Empty);
+            //change disabled and userLogin (prefix with yyyyMMdd_ )
             this.Disabled = true;
+            //can't rename if it's going to take up too many chars
+            if (this.LoginName.Length + 9 <= 125)
+            {
+                this.LoginName = DateTime.Now.ToString("yyyyMMdd") + "_" + this.LoginName;
+            }
+            
         }
 
         /// <summary>

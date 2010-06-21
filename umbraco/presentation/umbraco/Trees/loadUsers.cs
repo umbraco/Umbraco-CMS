@@ -67,43 +67,50 @@ function openUser(id) {
             bool currUserIsAdmin = currUser.IsAdmin();
             foreach (User u in users)
             {
-                
-                XmlTreeNode xNode = XmlTreeNode.Create(this);
 
-                // special check for ROOT user
-                if (u.Id == 0)
+
+                if (!u.Disabled)
                 {
-                    //if its the administrator, don't create a menu
-                    xNode.Menu = null;
-                    //if the current user is not the administrator, then don't add this node.
-                    if (currUser.Id != 0)
+
+                    XmlTreeNode xNode = XmlTreeNode.Create(this);
+
+                    // special check for ROOT user
+                    if (u.Id == 0)
+                    {
+                        //if its the administrator, don't create a menu
+                        xNode.Menu = null;
+                        //if the current user is not the administrator, then don't add this node.
+                        if (currUser.Id != 0)
+                            continue;
+                    }
+                    // Special check for admins in general (only show admins to admins)
+                    else if (!currUserIsAdmin && u.IsAdmin())
+                    {
                         continue;
-                }
-                // Special check for admins in general (only show admins to admins)
-                else if (!currUserIsAdmin && u.IsAdmin())
-                {
-                    continue;
-                }
+                    }
 
 
 
-				if (u.Disabled)
-					xNode.DimNode();
+
 
                     //xNode.IconClass = "umbraco-tree-icon-grey";
 
-                xNode.NodeID = u.Id.ToString();
-                xNode.Text = u.Name;
-                xNode.Action = "javascript:openUser(" + u.Id + ");";
-                xNode.Icon = "user.gif";
-                xNode.OpenIcon = "user.gif";
+                    xNode.NodeID = u.Id.ToString();
+                    xNode.Text = u.Name;
+                    xNode.Action = "javascript:openUser(" + u.Id + ");";
+                    xNode.Icon = "user.gif";
+                    xNode.OpenIcon = "user.gif";
 
-                OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
-                if (xNode != null)
-                {
-                    tree.Add(xNode);
-                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                    OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                    if (xNode != null)
+                    {
+                        tree.Add(xNode);
+                        OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                    }
+                
+
                 }
+                
                 
             }
         }

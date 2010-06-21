@@ -93,7 +93,7 @@ namespace umbraco.presentation.webservices
 
             Authorize();
 
-            BusinessLogic.User.GetUser(userId).Disabled = true;
+            BusinessLogic.User.GetUser(userId).disable();
         }
 
         [WebMethod]
