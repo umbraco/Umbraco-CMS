@@ -375,7 +375,7 @@ namespace umbraco.controls
                             caption += " <img src=\"" + SystemDirectories.Umbraco + "/images/help.png\" class=\"umbPropertyContextHelp\" alt=\"" + p.PropertyType.Description + "\" title=\"" + p.PropertyType.Description + "\" />";
                             break;
                         case "text":
-                            caption += "<br /><small>" + p.PropertyType.Description + "</small>";
+                            caption += "<br /><small>" + umbraco.library.ReplaceLineBreaks(p.PropertyType.Description) + "</small>";
                             break;
                     }
                 pp.addProperty(caption, holder);
