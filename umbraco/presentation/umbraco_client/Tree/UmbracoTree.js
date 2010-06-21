@@ -880,12 +880,15 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _getUrlParams: function(nodeSource) {
                 /// <summary>This converts Url query string params to json</summary>
                 var p = {};
-                var sp = nodeSource.split("?")[1].split("&");
-                for (var i = 0; i < sp.length; i++) {
-                    var e = sp[i].split("=");
-                    p[e[0]] = e[1];
+                var urlSplit = nodeSource.split("?");
+                if (urlSplit.length > 1) {
+                    var sp = urlSplit[1].split("&");
+                    for (var i = 0; i < sp.length; i++) {
+                        var e = sp[i].split("=");
+                        p[e[0]] = e[1];
+                    }
+                    p["rnd2"] = Umbraco.Utils.generateRandom();                    
                 }
-                p["rnd2"] = Umbraco.Utils.generateRandom();
                 return p;
             },
 
