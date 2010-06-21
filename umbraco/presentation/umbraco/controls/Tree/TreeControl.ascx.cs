@@ -162,7 +162,7 @@ namespace umbraco.controls.Tree
         }
         
         /// <summary>
-        /// Returns the requires JavaScript as a string for the current application
+        /// Returns the required JavaScript as a string for the current application
         /// </summary>
         public string JSCurrApp
         {
@@ -257,6 +257,8 @@ namespace umbraco.controls.Tree
 
 			//Render out the JavaScript associated with all of the trees for the application
 			RenderTreeJS();
+
+            RenderActionJS();
 
             //apply the styles
             if (Width != Unit.Empty)
@@ -365,12 +367,24 @@ namespace umbraco.controls.Tree
 			}
 		}
 
-		
-
 		private void RenderTreeJS()
 		{
             Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "Trees_" + GetCurrentApp(), JSCurrApp, true);
 		}
+
+        /// <summary>
+        /// renders out the script block sources defined in any IAction
+        /// </summary>
+        private void RenderActionJS()
+        {
+            foreach (IAction a in global::umbraco.BusinessLogic.Actions.Action.GetAll())
+            {
+                if (!string.IsNullOrEmpty(a.Alias) && (!string.IsNullOrEmpty(a.JsSource)))
+                {
+                    Page.ClientScript.RegisterClientScriptInclude(a.GetType(), a.Alias, a.JsSource);
+                }
+            }            
+        }
 
 		/// <summary>
 		/// Return the current application alias. If neither the TreeType of Application is specified

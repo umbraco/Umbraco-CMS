@@ -64,8 +64,8 @@ namespace umbraco.controls.Tree
 
 			//required by jsTree
 			data.Add("visible", JSONSerializer.ToJSONObject("function() {return true;}"));
-			//The action handler is what is assigned to the IAction, but for flexibility, we'll call our onContextMenuSelect method which will need to return true if the function is to execute.
-			//TODO: Check if there is a JSSource
+			
+            //The action handler is what is assigned to the IAction, but for flexibility, we'll call our onContextMenuSelect method which will need to return true if the function is to execute.
 			data.Add("action", JSONSerializer.ToJSONObject("function(N,T){" + a.JsFunctionName + ";}"));
 
 			return data;
