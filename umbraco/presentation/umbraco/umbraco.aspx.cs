@@ -27,6 +27,8 @@ namespace umbraco.cms.presentation
 		protected umbWindow UmbWindow1;
 		protected System.Web.UI.WebControls.PlaceHolder bubbleText;
 
+        public string DefaultApp { get; private set; }
+
         protected void Page_Load(object sender, System.EventArgs e)
         {
             var apps = this.getUser().Applications.ToList();
@@ -72,6 +74,11 @@ namespace umbraco.cms.presentation
             if (!userHasAccesstodefaultApp)
             {
                 JTree.App = apps[0].alias;
+                DefaultApp = apps[0].alias;
+            }
+            else
+            {
+                DefaultApp = "content";
             }
 
 

@@ -427,26 +427,41 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public static User[] getAllByLoginName(string login)
         {
-            System.Collections.ArrayList tmpContainer = new System.Collections.ArrayList();
+            return GetAllByLoginName(login, false).ToArray();
+        }
 
-            IRecordsReader dr;
-            dr = SqlHelper.ExecuteReader(
-                "Select id from umbracoUser where userLogin LIKE @login", SqlHelper.CreateParameter("@login", String.Format("%{0}%", login)));
+        public static IEnumerable<User> GetAllByLoginName(string login, bool partialMatch)
+        {
 
-            while (dr.Read())
-            {
-                tmpContainer.Add(BusinessLogic.User.GetUser(dr.GetInt("id")));
+            var users = new List<User>();
+
+            if (partialMatch)
+            {                
+                using (var dr = SqlHelper.ExecuteReader(
+                    "Select id from umbracoUser where userLogin LIKE @login", SqlHelper.CreateParameter("@login", String.Format("%{0}%", login))))
+                {
+                    while (dr.Read())
+                    {
+                        users.Add(BusinessLogic.User.GetUser(dr.GetInt("id")));
+                    }
+                }
+
             }
-            dr.Close();
-            User[] retVal = new User[tmpContainer.Count];
-
-            int c = 0;
-            foreach (User u in tmpContainer)
+            else
             {
-                retVal[c] = u;
-                c++;
+                using (var dr = SqlHelper.ExecuteReader(
+                    "Select id from umbracoUser where userLogin=@login", SqlHelper.CreateParameter("@login", login)))
+                {
+                    while (dr.Read())
+                    {
+                        users.Add(BusinessLogic.User.GetUser(dr.GetInt("id")));
+                    }
+                }
             }
-            return retVal;
+
+            return users;
+
+            
         }
 
         /// <summary>

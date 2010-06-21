@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Web.Util;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
+using System.Linq;
 #endregion
 
 namespace umbraco.providers
@@ -391,7 +392,7 @@ namespace umbraco.providers
             int startIndex = pageSize * pageIndex;
             int endIndex = startIndex + pageSize - 1;
             MembershipUserCollection usersList = new MembershipUserCollection();
-            User[] usersArray = User.getAllByLoginName(usernameToMatch);
+            User[] usersArray = User.GetAllByLoginName(usernameToMatch, true).ToArray();
             totalRecords = usersArray.Length;
 
             foreach (User user in usersArray)

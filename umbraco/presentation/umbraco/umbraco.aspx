@@ -144,7 +144,7 @@
             else {
                 UmbClientMgr.historyManager().addHistory(initApp != "" ? initApp :
                                                         UmbClientMgr.historyManager().getCurrent() != "" ? UmbClientMgr.historyManager().getCurrent() :
-                                                        "content", true);
+                                                        "<%=DefaultApp%>", true);
             }
 
             
