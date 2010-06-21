@@ -572,6 +572,13 @@
     <Compile Include="umbraco\LiveEditing\CanvasClientDependencyProvider.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="umbraco\members\MemberSearch.ascx.cs">
+      <DependentUpon>MemberSearch.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\members\MemberSearch.ascx.designer.cs">
+      <DependentUpon>MemberSearch.ascx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\preview\Preview.cs" />
     <Compile Include="umbraco\scripting\MacroScript.cs" />
     <Compile Include="umbraco\scripting\ScriptEngine.cs" />
@@ -1531,6 +1538,7 @@
     <Content Include="umbraco\helpRedirect.aspx" />
     <Content Include="umbraco\images\aboutNew.png" />
     <Content Include="umbraco\images\umbracoSplash.png" />
+    <Content Include="umbraco\members\MemberSearch.ascx" />
     <Content Include="web.config.Az-VAIO.xslt" />
     <Content Include="umbraco\endPreview.aspx" />
     <Content Include="umbraco\js\UmbracoCasingRules.aspx" />

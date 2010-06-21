@@ -65,7 +65,7 @@ namespace umbraco.presentation.umbraco.Search
             }
 
             JavaScriptSerializer js = new JavaScriptSerializer();
-            context.Response.Write(js.Serialize(results.Take(100)));
+            context.Response.Write(js.Serialize(results.Take(limit)));
         }
 
         public static void Authorize()

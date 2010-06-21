@@ -34,6 +34,13 @@ namespace umbraco.presentation.dialogs
 
         private void doSearch()
         {
+
+            int limit;
+            if (!int.TryParse(UmbracoContext.Current.Request["limit"], out limit))
+            {
+                limit = 100;
+            }
+
             string query = keyword.Text.ToLower();
 
             //the app can be Content or Media only, otherwise an exception will be thrown
@@ -61,7 +68,7 @@ namespace umbraco.presentation.dialogs
                     operation.Or().Id(UmbracoContext.Current.UmbracoUser.StartNodeId);
                 }
 
-                results = internalSearcher.Search(operation.Compile()).Take(100);
+                results = internalSearcher.Search(operation.Compile()).Take(limit);
             }
 
             searchResult.XPathNavigator = ResultsAsXml(results).CreateNavigator();

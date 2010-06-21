@@ -7,20 +7,28 @@
     
     <asp:Repeater ID="rp_members" OnItemDataBound="bindMember" runat="server">
     <HeaderTemplate>
-    <table width="100%" rules="rows">
+    <table rules="rows" border="0" class="members_table">
     <thead>
-    <tr style="border-bottom: 2px solid #D9D7D7;"><th><%= umbraco.ui.Text("name") %></th><th><%= umbraco.ui.Text("email") %></th><th colspan="2"><%= umbraco.ui.Text("login") %></th></tr>
+    <tr><th><%= umbraco.ui.Text("name") %></th><th><%= umbraco.ui.Text("email") %></th><th colspan="2"><%= umbraco.ui.Text("login") %></th></tr>
     </thead>
     <tbody>
     </HeaderTemplate>
       <ItemTemplate>
-        <tr style="border-bottom: 1px solid #D9D7D7;">
+        <tr>
           <td><asp:Literal ID="lt_name" runat="server"></asp:Literal></td>
           <td><asp:Literal ID="lt_email" runat="server"></asp:Literal></td>
           <td><asp:Literal ID="lt_login" runat="server"></asp:Literal></td>
           <td><asp:Button ID="bt_delete" runat="server" OnCommand="deleteMember" Text="Delete" /></td>
         </tr>
       </ItemTemplate>
+      <AlternatingItemTemplate>
+        <tr class="alt">
+          <td><asp:Literal ID="lt_name" runat="server"></asp:Literal></td>
+          <td><asp:Literal ID="lt_email" runat="server"></asp:Literal></td>
+          <td><asp:Literal ID="lt_login" runat="server"></asp:Literal></td>
+          <td><asp:Button ID="bt_delete" runat="server" OnCommand="deleteMember" Text="Delete" /></td>
+        </tr>
+      </AlternatingItemTemplate>
     <FooterTemplate>
     </tbody>
     </table>
