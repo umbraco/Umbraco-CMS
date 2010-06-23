@@ -2279,6 +2279,12 @@ namespace umbraco
             }
 
             content.AfterUpdateDocumentCache += new content.DocumentCacheEventHandler(content_AfterUpdateDocumentCache);
+            content.AfterRefreshContent += new content.RefreshContentEventHandler(content_AfterRefreshContent);
+        }
+
+        void content_AfterRefreshContent(Document sender, RefreshContentEventArgs e)
+        {
+            library.ClearNiceUrlCache();
         }
 
         void content_AfterUpdateDocumentCache(Document sender, DocumentCacheEventArgs e)

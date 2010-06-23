@@ -11,7 +11,7 @@ using System.Web;
 
 namespace umbraco.editorControls.macrocontainer
 {
-    public class MacroEditor: System.Web.UI.Control
+    public class MacroEditor : System.Web.UI.Control
     {
         private List<string> _allowedMacros;
         private DropDownList _macroSelectDropdown;
@@ -19,6 +19,7 @@ namespace umbraco.editorControls.macrocontainer
         private Table _formTable;
         private Hashtable _dataValues;
         private string _data;
+        private LiteralControl propertiesHeader = new LiteralControl("<h4>" + ui.Text("macroContainerSettings") + " <span class=\"settingsToggle\"><a href=\"#\" onClick=\"jQuery(this).closest('.macroeditor').find('.macroSettings').toggle()\">Show/Hide</a></span> </h4> ");
 
         public MacroEditor(string Data, List<string> allowedMacros)
         {
@@ -28,29 +29,33 @@ namespace umbraco.editorControls.macrocontainer
 
         protected override void OnInit(EventArgs e)
         {
-             base.OnInit(e);
+            base.OnInit(e);
 
-             _macroSelectDropdown = new DropDownList();
-             _macroSelectDropdown.ID = ID + "_ddselectmacro";
-             _macroSelectDropdown.SelectedIndexChanged += new EventHandler(_macroSelectDropdown_SelectedIndexChanged);
-             _macroSelectDropdown.Items.Add(new ListItem(umbraco.ui.Text("choose"), ""));
-             foreach (string item in _allowedMacros)
-             {
-                 _macroSelectDropdown.Items.Add(new ListItem(Macro.GetByAlias(item).Name, item));
-             }
-             _macroSelectDropdown.AutoPostBack = true;
+            _macroSelectDropdown = new DropDownList();
+            _macroSelectDropdown.ID = ID + "_ddselectmacro";
+            _macroSelectDropdown.SelectedIndexChanged += new EventHandler(_macroSelectDropdown_SelectedIndexChanged);
+            _macroSelectDropdown.Items.Add(new ListItem(umbraco.ui.Text("choose"), ""));
+            foreach (string item in _allowedMacros)
+            {
+                _macroSelectDropdown.Items.Add(new ListItem(Macro.GetByAlias(item).Name, item));
+            }
+            _macroSelectDropdown.AutoPostBack = true;
 
-             _delete = new LinkButton();
-             _delete.ID = ID + "_btndelete";
-             _delete.Text = "Delete";
-             _delete.Attributes.Add("style", "color:red;");
-             _delete.Click += new EventHandler(_delete_Click);
-             _formTable = new Table();
-             _formTable.ID = ID + "_tblform";
+            _delete = new LinkButton();
+            _delete.CssClass = "macroDelete";
+            _delete.ID = ID + "_btndelete";
+            _delete.Text = ui.Text("removeMacro");
+            _delete.Attributes.Add("style", "color:red;");
+            _delete.Click += new EventHandler(_delete_Click);
+            _formTable = new Table();
+            _formTable.ID = ID + "_tblform";
+            _formTable.CssClass = "macroSettings";
 
-             this.Controls.Add(_macroSelectDropdown);
-             this.Controls.Add(_delete);
-             this.Controls.Add(_formTable);
+            propertiesHeader.Visible = false;
+            this.Controls.Add(_delete);
+            this.Controls.Add(_macroSelectDropdown);
+            this.Controls.Add(propertiesHeader);
+            this.Controls.Add(_formTable);
         }
 
         void _delete_Click(object sender, EventArgs e)
@@ -61,89 +66,90 @@ namespace umbraco.editorControls.macrocontainer
             MacroContainerEvent.Delete();
         }
 
-        
+
 
         protected override void OnLoad(EventArgs e)
         {
-             base.OnLoad(e);
+            base.OnLoad(e);
 
 
-             if (!GlobalSettings.RequestIsInUmbracoApplication(HttpContext.Current) && umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled)
-             {
-                 if (ViewState[ID + "init"] == null)
-                 {
-                     if (DataValues["macroalias"] != null)
-                     {
-                         //Data is available from the database, initialize the form with the data
-                         string alias = DataValues["macroalias"].ToString();
+            if (!GlobalSettings.RequestIsInUmbracoApplication(HttpContext.Current) && umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled)
+            {
+                if (ViewState[ID + "init"] == null)
+                {
+                    if (DataValues["macroalias"] != null)
+                    {
+                        //Data is available from the database, initialize the form with the data
+                        string alias = DataValues["macroalias"].ToString();
 
-                         //Set Pulldown selected value based on the macro alias
-                         _macroSelectDropdown.SelectedValue = alias;
+                        //Set Pulldown selected value based on the macro alias
+                        _macroSelectDropdown.SelectedValue = alias;
 
-                         //Create from with values based on the alias
-                         InitializeForm(alias);
-                     }
-                     else
-                     {
-                         this.Visible = false;
-                     }
+                        //Create from with values based on the alias
+                        InitializeForm(alias);
+                    }
+                    else
+                    {
+                        this.Visible = false;
+                    }
 
-                     ViewState[ID + "init"] = "ok";
-                 }
-                 else
-                 {
-                     //Render form if properties are in the viewstate
-                     if (SelectedProperties.Count > 0)
-                     {
-                         RendeFormControls();
-                     }
-                 }
-             }
-             else
-             {
+                    ViewState[ID + "init"] = "ok";
+                }
+                else
+                {
+                    //Render form if properties are in the viewstate
+                    if (SelectedProperties.Count > 0)
+                    {
+                        RendeFormControls();
+                    }
+                }
+            }
+            else
+            {
 
-                 if (!Page.IsPostBack)
-                 {
+                if (!Page.IsPostBack)
+                {
 
-                     //Handle Initial Request
-                     if (DataValues["macroalias"] != null)
-                     {
-                         //Data is available from the database, initialize the form with the data
-                         string alias = DataValues["macroalias"].ToString();
+                    //Handle Initial Request
+                    if (DataValues["macroalias"] != null)
+                    {
+                        //Data is available from the database, initialize the form with the data
+                        string alias = DataValues["macroalias"].ToString();
 
-                         //Set Pulldown selected value based on the macro alias
-                         _macroSelectDropdown.SelectedValue = alias;
+                        //Set Pulldown selected value based on the macro alias
+                        _macroSelectDropdown.SelectedValue = alias;
 
-                         //Create from with values based on the alias
-                         InitializeForm(alias);
-                     }
-                     else
-                     {
-                         this.Visible = false;
-                     }
+                        //Create from with values based on the alias
+                        InitializeForm(alias);
+                    }
+                    else
+                    {
+                        this.Visible = false;
+                    }
 
-                 }
-                 else
-                 {
-                     //Render form if properties are in the viewstate
-                     if (SelectedProperties.Count > 0)
-                     {
-                         RendeFormControls();
-                     }
-                 }
-             }
-             //Make sure child controls get rendered
-             EnsureChildControls();
+                }
+                else
+                {
+                    //Render form if properties are in the viewstate
+                    if (SelectedProperties.Count > 0)
+                    {
+                        RendeFormControls();
+                    }
+                }
+            }
+            //Make sure child controls get rendered
+            EnsureChildControls();
 
         }
 
         protected override void Render(HtmlTextWriter writer)
-        {
-
+        {            
             writer.Write("<div id=\"container" + ID + "\" class=\"macroeditor\">");
+            _delete.RenderControl(writer);
+            writer.Write("<h4>Macro:</h4>");
             _macroSelectDropdown.RenderControl(writer);
             writer.Write(" ");//<a style=\"color: red;\" href=\"javascript:deletemacro('" + _macroSelectDropdown.ClientID + "','"+ID+"container' )\">Delete</a>");
-            _delete.RenderControl(writer);
+            propertiesHeader.RenderControl(writer);
             _formTable.RenderControl(writer);
             writer.Write("</div>");
         }
@@ -174,6 +180,10 @@ namespace umbraco.editorControls.macrocontainer
                 ///Only render form when macro is found
                 if (formMacro != null)
                 {
+                    if (formMacro.Properties.Length > 0)
+                    {
+                        propertiesHeader.Visible = true;
+                    }
                     foreach (MacroProperty macroProperty in formMacro.Properties)
                     {
                         //Only add properties that people may see.
@@ -216,7 +226,7 @@ namespace umbraco.editorControls.macrocontainer
                 caption.Text = prop.Name;
 
                 //Get the MacroControl 
-                Control macroControl = MacroControlFactory.GetMacroRenderControlByType(prop,ID + "_" + prop.Alias);
+                Control macroControl = MacroControlFactory.GetMacroRenderControlByType(prop, ID + "_" + prop.Alias);
 
                 AddFormRow(caption, macroControl);
 
@@ -286,7 +296,7 @@ namespace umbraco.editorControls.macrocontainer
 
         private string SelectedMacroAlias
         {
-          
+
             get { return string.Format("{0}", ViewState[ID + "SelectedMacroAlias"]); }
             set { ViewState[ID + "SelectedMacroAlias"] = value; }
         }

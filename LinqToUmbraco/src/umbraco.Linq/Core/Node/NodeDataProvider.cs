@@ -260,7 +260,7 @@ namespace umbraco.Linq.Core.Node
 
             foreach (var ancestor in elements)
             {
-                var alias = Casing.SafeAlias(ancestor.Name.LocalName);
+                var alias = Casing.SafeAliasWithForcingCheck(ancestor.Name.LocalName);
                 var t = KnownTypes[alias];
                 var instaceOfT = (DocTypeBase)Activator.CreateInstance(t); //create an instance of the type and down-cast so we can use it
                 this.LoadFromXml(ancestor, instaceOfT);
@@ -286,7 +286,7 @@ namespace umbraco.Linq.Core.Node
                         });
 
                     foreach (var type in types)
-                        this._knownTypes.Add(Casing.SafeAlias(type.Key), type.Value);
+                        this._knownTypes.Add(Casing.SafeAliasWithForcingCheck(type.Key), type.Value);
 
                 }
 
@@ -337,7 +337,7 @@ namespace umbraco.Linq.Core.Node
             {
                 var attr = ReflectionAssistance.GetUmbracoInfoAttribute(p);
 
-                var data = xml.Element(Casing.SafeAlias(attr.Alias)).Value;
+                var data = xml.Element(Casing.SafeAliasWithForcingCheck(attr.Alias)).Value;
                 if (p.PropertyType == typeof(int) && string.IsNullOrEmpty(data))
                     data = "-1";
 

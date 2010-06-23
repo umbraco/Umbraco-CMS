@@ -34,8 +34,9 @@ namespace umbraco.cms.helpers
                     else
                     {
                         // first char should always be lowercase (camel style)
-                        if (safeString.Length == 0)
-                            currentChar = currentChar.ToLower();
+                        // Skipping this check as it can cause incompatibility issues with 3rd party packages
+//                        if (safeString.Length == 0)
+//                            currentChar = currentChar.ToLower();
                         if (i < aliasLength - 1 && i > 0 && alias.Substring(i - 1, 1) == " ")
                             currentChar = currentChar.ToUpper();
 

@@ -533,7 +533,7 @@ namespace umbraco.cms.businesslogic
 
         protected virtual XmlNode generateXmlWithoutSaving(XmlDocument xd)
         {
-            string nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : Casing.SafeAlias(ContentType.Alias);
+            string nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : Casing.SafeAliasWithForcingCheck(ContentType.Alias);
             XmlNode x = xd.CreateNode(XmlNodeType.Element, nodeName, "");
             XmlPopulate(xd, ref x, false);
             return x;

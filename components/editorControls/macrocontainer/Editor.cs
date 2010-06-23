@@ -19,6 +19,7 @@ namespace umbraco.editorControls.macrocontainer
 {
 
     [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Css, "/macroContainer/macroContainer.css", "UmbracoClient")]
     public class Editor : UpdatePanel, IDataEditor
     {
          private IData _data;
@@ -65,7 +66,8 @@ namespace umbraco.editorControls.macrocontainer
 
 
              _addMacro.Click += new EventHandler(_addMacro_Click);
-             _addMacro.Text = "Add";
+             _addMacro.Text = ui.Text("insertMacro");
+             _addMacro.CssClass = "macroContainerAdd";
 
              this.ContentTemplateContainer.Controls.Add(_addMacro);
 
@@ -77,7 +79,13 @@ namespace umbraco.editorControls.macrocontainer
 
              this.ContentTemplateContainer.Controls.Add(_limit);
 
-             this.ContentTemplateContainer.Controls.Add(new LiteralControl("<div id=\"" + ID + "container\" class=\"macrocontainer\">"));
+             string widthHeight = "";
+             if (_preferedHeight > 0 && _preferedWidth > 0)
+             {
+                 widthHeight = String.Format(" style=\"min-width: {0}px; min-height: {1}px;\"", _preferedWidth, _preferedHeight);
+             }
+
+             this.ContentTemplateContainer.Controls.Add(new LiteralControl(String.Format("<div id=\"" + ID + "container\" class=\"macrocontainer\"{0}>", widthHeight)));
 
              Regex tagregex = new Regex("<[^>]*(>|$)", RegexOptions.Singleline | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
              MatchCollection tags = tagregex.Matches(_data.Value.ToString());
