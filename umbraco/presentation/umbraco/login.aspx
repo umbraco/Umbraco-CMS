@@ -31,7 +31,7 @@
         
         #Panel1_content
         {
-            background: url(images/loginBg.gif) no-repeat 1px 5px;
+            background: url(images/loginBg.png) no-repeat 1px 5px;
         }
         #Panel1_innerContent
         {

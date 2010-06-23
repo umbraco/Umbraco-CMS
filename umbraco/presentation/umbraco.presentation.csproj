@@ -1540,6 +1540,7 @@
     <Content Include="install\Title.ascx" />
     <Content Include="umbraco\helpRedirect.aspx" />
     <Content Include="umbraco\images\aboutNew.png" />
+    <Content Include="umbraco\images\loginBg.png" />
     <Content Include="umbraco\images\umbracoSplash.png" />
     <Content Include="umbraco\members\MemberSearch.ascx" />
     <Content Include="web.config.Az-VAIO.xslt" />
