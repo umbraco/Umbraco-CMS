@@ -8,18 +8,18 @@ Umbraco.Controls.TabView = (function () {
     var obj = {
         setActiveTab: function (tabviewid, tabid, tabs) {
             for (var i = 0; i < tabs.length; i++) {
-                $("#" + tabs[i]).attr("class", "tabOff");
-                $("#" + tabs[i] + "layer").hide();
+                jQuery("#" + tabs[i]).attr("class", "tabOff");
+                jQuery("#" + tabs[i] + "layer").hide();
             }
 
-            var activeTab = $("#" + tabid).attr("class", "tabOn");
-            $("#" + tabid + "layer").show();
-            $("#" + tabviewid + '_activetab').val(tabid);
+            var activeTab = jQuery("#" + tabid).attr("class", "tabOn");
+            jQuery("#" + tabid + "layer").show();
+            jQuery("#" + tabviewid + '_activetab').val(tabid);
 
             // show first tinymce toolbar
-            $(".tinymceMenuBar").hide();
-            $(document).ready(function () {
-                $("#" + tabid + "layer .tinymceMenuBar:first").show();
+            jQuery(".tinymceMenuBar").hide();
+            jQuery(document).ready(function () {
+                jQuery("#" + tabid + "layer .tinymceMenuBar:first").show();
             });
             for (var i = 0; i < onChangeEvents.length; i++) {
                 var fn = onChangeEvents[i];
@@ -75,7 +75,7 @@ Umbraco.Controls.TabView = (function () {
 
             // Try to grab the next one!
             if (nextTab != "00") {
-                if ($("#" + preFix + '_tab' + nextTab) != null) {
+                if (jQuery("#" + preFix + '_tab' + nextTab) != null) {
                     setActiveTab(preFix, preFix + '_tab' + nextTab, eval(preFix + '_tabs'));
                 }
             }
@@ -83,7 +83,7 @@ Umbraco.Controls.TabView = (function () {
     };
 
     return obj;
-})(jQuery);
+})();
 
 function setActiveTab(tabviewid, tabid, tabs) {
     Umbraco.Controls.TabView.setActiveTab(tabviewid, tabid, tabs);

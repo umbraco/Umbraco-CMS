@@ -137,6 +137,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\LinqToUmbraco\src\umbraco.Linq\Solution Items\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
     <Compile Include="ApplicationTest.cs" />
     <Compile Include="ApplicationTreeTest.cs" />
     <Compile Include="DataTypeDefinitionTest.cs" />

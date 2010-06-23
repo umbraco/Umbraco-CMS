@@ -76,6 +76,9 @@
     <Reference Include="System.Web.Mobile" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\LinqToUmbraco\src\umbraco.Linq\Solution Items\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
     <Compile Include="controls\datePicker.cs" />
     <Compile Include="controls\datePickerWithpopup.cs" />
     <Compile Include="controls\dateTimePicker.cs" />

@@ -77,6 +77,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\LinqToUmbraco\src\umbraco.Linq\Solution Items\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
     <Compile Include="DatePicker\DateTimePicker.cs" />
     <Compile Include="ProgressBar.cs" />
     <Compile Include="TreePicker\BaseTreePicker.cs" />

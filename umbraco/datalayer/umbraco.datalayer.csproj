@@ -86,6 +86,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\LinqToUmbraco\src\umbraco.Linq\Solution Items\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
     <Compile Include="DataLayerHelper.cs" />
     <Compile Include="Extensions\ISqlHelperExtension.cs" />
     <Compile Include="Extensions\Logger.cs" />

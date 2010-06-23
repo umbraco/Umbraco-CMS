@@ -2,11 +2,11 @@ using System.Reflection;
 using System.Resources;
 
 [assembly: AssemblyCompany("umbraco")]
-[assembly: AssemblyCopyright("Copyright © 2009")]
+[assembly: AssemblyCopyright("Copyright © 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
-[assembly: AssemblyVersion("0.0.1.*")]
-[assembly: AssemblyFileVersion("0.0.1.0")] 
+
+[assembly: AssemblyVersion("1.0.*")]

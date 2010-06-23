@@ -212,7 +212,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs">
+    <Compile Include="..\..\LinqToUmbraco\src\umbraco.Linq\Solution Items\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="BasePageExtensions.cs" />
@@ -2845,7 +2848,6 @@
       <DependentUpon>umbraco.xsd</DependentUpon>
     </None>
     <Content Include="config\UrlRewriting.config" />
-    <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
