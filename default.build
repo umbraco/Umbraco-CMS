@@ -91,18 +91,20 @@
         <copy file="${root.dir}\config templates\config\scripting.config" tofile="${build.dir}\config\scripting.config" failonerror="false" overwrite="true"/>
         
         
+      
         <!--standard /data/packages files-->
-        <copy file="${root.dir}\config templates\packages\installedPackages.config" tofile="${build.dir}\data\packages\installed\installedPackages.config" failonerror="false" overwrite="true"/>
-        <copy file="${root.dir}\config templates\packages\createdPackages.config" tofile="${build.dir}\data\packages\created\createdPackages.config" failonerror="false" overwrite="true"/>
+        <mkdir dir="${build.dir}\App_Data" />
+        <copy file="${root.dir}\config templates\packages\installedPackages.config" tofile="${build.dir}\app_data\packages\installed\installedPackages.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\packages\createdPackages.config" tofile="${build.dir}\app_data\packages\created\createdPackages.config" failonerror="false" overwrite="true"/>
 
         <!-- Standard access.xml file-->
-        <copy file="${root.dir}\config templates\access.xml" tofile="${build.dir}\data\access.xml" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\access.xml" tofile="${build.dir}\app_data\access.xml" failonerror="false" overwrite="true"/>
 
         <!-- Standard create UI.xml-->
         <copy file="${root.dir}\config templates\config\UI.xml" tofile="${build.dir}\umbraco\config\create\UI.xml" failonerror="false" overwrite="true"/>
 
         <!-- Standard empty cache file -->
-        <copy file="${root.dir}\config templates\umbraco.config" tofile="${build.dir}\umbraco\data\umbraco.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\umbraco.config" tofile="${build.dir}\umbraco\app_data\umbraco.config" failonerror="false" overwrite="true"/>
 
         <!-- Baseline Language file for translation tool -->
         <copy file="${build.dir}\umbraco\config\lang\en.xml" tofile="${web.dir}\usercontrols\translation\langs\en.xml" failonerror="false" overwrite="true"/>
@@ -136,6 +138,7 @@
                 <include name="${build.dir}/**/*.resx" />
                 <include name="${build.dir}/**/*.user" />
                 <include name="${build.dir}/**/*.bak" />
+                <include name="${build.dir}/**/*.pdb" />
                     
                 <include name="${build.dir}/PrecompiledApp.config" />
                 <include name="${build.dir}/web.config.template" />
@@ -148,7 +151,6 @@
 
         <!-- standard folders -->
         <mkdir dir="${build.dir}\App_Code" />
-        <mkdir dir="${build.dir}\App_Data" />
         <mkdir dir="${build.dir}\App_Data\ClientDependency" />
         <mkdir dir="${build.dir}\App_Data\ExamineIndexes" />
 
