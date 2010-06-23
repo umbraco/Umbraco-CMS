@@ -134,7 +134,7 @@ namespace umbraco.cms.businesslogic.packager {
          
             if (appendFile) {
                 if (!string.IsNullOrEmpty(mcr.Xslt))
-                    AppendFileToManifest("/xslt/" + mcr.Xslt, packageDirectory, doc);
+                    AppendFileToManifest(SystemDirectories.Xslt + mcr.Xslt, packageDirectory, doc);
 
                 if (!string.IsNullOrEmpty(mcr.Type))
                     AppendFileToManifest(mcr.Type, packageDirectory, doc);
@@ -151,6 +151,10 @@ namespace umbraco.cms.businesslogic.packager {
         /// <param name="packageDirectory">The package directory.</param>
         /// <param name="doc">The doc.</param>
         public static void AppendFileToManifest(string path, string packageDirectory, XmlDocument doc) {
+
+            if (!path.StartsWith("~/") && !path.StartsWith("/"))
+                path = "~/" + path;
+            
             string serverPath = IOHelper.MapPath(path);
 
             if (System.IO.File.Exists(serverPath)) {
