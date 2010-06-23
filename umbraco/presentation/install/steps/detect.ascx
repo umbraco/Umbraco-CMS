@@ -26,7 +26,6 @@
                     AutoPostBack="True" onselectedindexchanged="DatabaseType_SelectedIndexChanged">
                     <asp:ListItem Value="SqlServer" Text="Microsoft SQL Server" Selected="True" />
                     <asp:ListItem Value="MySql" Text="MySQL" />
-<!--                    <asp:ListItem Value="SqlServerE" Text="Embedded database (Microsoft SQL Server Express user instance)" /> -->
                     <asp:ListItem Value="" Text="Custom connection" />
                 </asp:DropDownList>
             </li>
