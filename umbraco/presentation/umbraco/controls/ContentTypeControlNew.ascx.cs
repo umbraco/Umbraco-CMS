@@ -31,7 +31,6 @@ namespace umbraco.controls
         // General Private members
         private cms.businesslogic.ContentType cType;
         private static string UmbracoPath = SystemDirectories.Umbraco;
-
         public bool HideStructure { get; set; }
 
         // "Tab" tab
@@ -90,6 +89,8 @@ namespace umbraco.controls
                 PaneTabsInherited.Visible = true;
                 PanePropertiesInherited.Visible = true;
             }
+
+            theClientId.Text = this.ClientID;
         }
 
         protected void save_click(object sender, System.Web.UI.ImageClickEventArgs e)

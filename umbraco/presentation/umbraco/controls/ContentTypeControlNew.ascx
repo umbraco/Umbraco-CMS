@@ -90,11 +90,13 @@
             <asp:PlaceHolder ID="PropertyTypes" runat="server"></asp:PlaceHolder>
       </div>
     </cc2:Pane>
+
 </asp:Panel>
 
 <script type="text/javascript">
-    $(function() {
-        duplicatePropertyNameAsSafeAlias('ctl00_body_ContentTypeControlNew1_GenericPropertyNew_control_tbName', 'ctl00_body_ContentTypeControlNew1_GenericPropertyNew_control_tbAlias');
-        checkAlias('ctl00_body_ContentTypeControlNew1_txtAlias');
+    $(function () {
+        var mailControlId = '<asp:Literal id="theClientId" runat="server"/>';
+        duplicatePropertyNameAsSafeAlias(mailControlId + '_GenericPropertyNew_control_tbName', mailControlId + '_GenericPropertyNew_control_tbAlias');
+        checkAlias(mailControlId + '_GenericPropertyNew_control_txtAlias');
     });
 </script>
