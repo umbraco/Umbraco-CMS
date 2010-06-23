@@ -701,6 +701,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     .die("mouseover")
                     .die("mousedown");
 
+                //also need to kill the custom selector we've fixed in jstree source
+                $("#" + TREE_OBJ.container.attr("id") + " li").die("click");
+
                 $("li", TREE_OBJ.container.get(0))
                     .die("click");
             },

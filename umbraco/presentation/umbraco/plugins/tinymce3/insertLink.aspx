@@ -25,6 +25,8 @@
         var currentLink = "";
 
         function dialogHandler(id) {
+            id = id.toString();
+            if (id == "-1") return;
             var returnValues = id.split("|");
             if (returnValues.length > 1) {
                 if (returnValues[1] != '')
