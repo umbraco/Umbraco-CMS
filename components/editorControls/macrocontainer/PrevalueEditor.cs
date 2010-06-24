@@ -61,19 +61,20 @@ namespace umbraco.editorControls.macrocontainer
             numberPropertyPanel.Controls.Add(_txtMaxNumber);
             Controls.Add(numberPropertyPanel);
 
-            PropertyPanel heightPropertyPanel = new PropertyPanel();
-            heightPropertyPanel.Text = "Prefered height";
-            _txtPreferedHeight= new TextBox();
-            _txtPreferedHeight.ID = "prefheight";
-            heightPropertyPanel.Controls.Add(_txtPreferedHeight);
-            Controls.Add(heightPropertyPanel);
-
             PropertyPanel widthPropertyPanel = new PropertyPanel();
             widthPropertyPanel.Text = "Prefered width";
             _txtPreferedWidth = new TextBox();
             _txtPreferedWidth.ID = "prefwidth";
             widthPropertyPanel.Controls.Add(_txtPreferedWidth);
             Controls.Add(widthPropertyPanel);
+
+            PropertyPanel heightPropertyPanel = new PropertyPanel();
+            heightPropertyPanel.Text = "Prefered height";
+            _txtPreferedHeight = new TextBox();
+            _txtPreferedHeight.ID = "prefheight";
+            heightPropertyPanel.Controls.Add(_txtPreferedHeight);
+            Controls.Add(heightPropertyPanel);
+
         }
 
         /// <summary>
@@ -84,19 +85,21 @@ namespace umbraco.editorControls.macrocontainer
         {
             base.OnLoad(e);
 
-            if (!Page.IsPostBack)
+            if (_macroList.Items.Count < 1)
             {
                 _macroList.DataValueField = "Alias";
                 _macroList.DataTextField = "Name";
                 _macroList.DataSource = Macro.GetAll();
                 _macroList.DataBound += new EventHandler(MacroList_DataBound);
-
+            }
+            if (!Page.IsPostBack)
+            {
                 if(MaxNumber != 0)
                     _txtMaxNumber.Text = MaxNumber.ToString();
-                if (PreferedHeight != 0)
-                    _txtPreferedHeight.Text = PreferedHeight.ToString();
                 if(PreferedWidth != 0)
                     _txtPreferedWidth.Text = PreferedWidth.ToString();
+                if (PreferedHeight != 0)
+                    _txtPreferedHeight.Text = PreferedHeight.ToString();
             }
 
             _macroList.DataBind();
@@ -167,7 +170,7 @@ namespace umbraco.editorControls.macrocontainer
                 if (_allowedMacros == null)
                 {
                     List<string> result = new List<string>();
-                    string values = Configuration.Split('|')[0];
+                    string values = !String.IsNullOrEmpty(Configuration) ? Configuration.Split('|')[0] : "";
 
                     if (!string.IsNullOrEmpty(values))
                     {
