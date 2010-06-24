@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Web;
+using System.Web.Hosting;
 using System.Web.Configuration;
 using System.Xml;
 
@@ -248,17 +249,21 @@ namespace umbraco
         {
             WebConfigurationFileMap webConfig = new WebConfigurationFileMap();
             var vDirs = webConfig.VirtualDirectories;
-            var vDir = "~";
+            var vDir = FullpathToRoot;
             foreach (VirtualDirectoryMapping v in webConfig.VirtualDirectories)
             {
                 if (v.IsAppRoot)
                 {
-                    vDir = v.VirtualDirectory;
+                    vDir = v.PhysicalDirectory;
                 }
             }
-            Configuration config = WebConfigurationManager.OpenWebConfiguration(vDir);
-            config.AppSettings.Settings[key].Value = value;
-            config.Save();
+            
+            XmlDocument doc = new XmlDocument();
+            doc.Load(String.Concat(vDir, "web.config"));
+            XmlNode root = doc.DocumentElement;
+            XmlNode setting = doc.SelectSingleNode(String.Concat("//appSettings/add[@key='", key, "']"));
+            setting.Attributes["value"].InnerText = value;
+            doc.Save(String.Concat(vDir, "web.config"));
             ConfigurationManager.RefreshSection("appSettings");
         }
 

@@ -125,6 +125,7 @@
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
     </ProjectReference>
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\LinqToUmbraco\src\umbraco.Linq\Solution Items\SolutionInfo.cs">
