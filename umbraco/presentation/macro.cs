@@ -27,7 +27,6 @@ using umbraco.scripting;
 using umbraco.presentation.nodeFactory;
 using templateControls = umbraco.presentation.templateControls;
 using umbraco.IO;
-using umbraco.presentation.nodeFactory;
 
 namespace umbraco
 {

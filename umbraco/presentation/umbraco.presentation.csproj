@@ -313,7 +313,11 @@
     <Compile Include="page.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs" />
+    <Compile Include="Properties\Settings1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="publishingService.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -2820,6 +2824,7 @@
       <DependentUpon>umbraco.xsd</DependentUpon>
     </None>
     <Content Include="config\UrlRewriting.config" />
+    <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
