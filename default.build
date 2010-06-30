@@ -70,6 +70,13 @@
             </fileset>
         </copy>
 
+        <!-- asp.net 4.0 DLR dlls -->
+        <copy todir="${build.dir}\bin">
+            <fileset basedir="${dlls.dir}\DLR 4.0">
+                <include name="*.dll" />
+            </fileset>
+        </copy>
+
         <!--standard web.config-->
         <copy file="${root.dir}\config templates\web.config" tofile="${build.dir}\web.config" failonerror="false" overwrite="true"/>
 

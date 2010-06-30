@@ -24,7 +24,7 @@
     <property name="YUICompressor.dir" value="D:\inetpub\wwwroot\ccnet\buildTools\YUI" />
 
 
-    <!-- Build source -->
+   
     <target name="build" depends="init">
         <attrib normal="true" readonly="false">
             <fileset basedir="${root.dir}">
@@ -41,6 +41,8 @@
 
         <exec program="${win.dir}\microsoft.net\framework\v2.0.50727\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
     </target>
+    
+
 
     <!-- Directories and files -->
     <target name="directories" depends="build">
@@ -53,9 +55,9 @@
             </fileset>
         </copy>
 
-        <!-- asp.net 3.5 DLR dlls -->
+        <!-- asp.net 2.0 SP1 DLR dlls -->
         <copy todir="${build.dir}\bin">
-            <fileset basedir="${dlls.dir}\asp.net 3.5 Assemblies">
+            <fileset basedir="${dlls.dir}\DLR 2.0 SP1">
                 <include name="*.dll" />
             </fileset>
         </copy>
