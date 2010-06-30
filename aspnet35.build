@@ -20,16 +20,6 @@
     <property name="win.dir" value="c:\WINDOWS" />
     <property name="Webdeploy.dir" value="C:\Program Files\MSBuild\Microsoft\WebDeployment\v8.0" />
 
-    <!-- Sandcastle Directories -->
-    <property name="sandcastle.dir" value="c:\Program Files\Sandcastle" />
-    <property name="sandcastle.workingdir" value="${root.dir}\docs\SandcastleWorkingDir" />
-    <property name="sandcastle.output.dir" value="${sandcastle.workingdir}\Output" />
-
-    <!-- Sandcastle -->
-    <property name="sandcastle.mrefbuilder"  value="${sandcastle.dir}\productiontools\mrefbuilder.exe" />
-    <property name="sandcastle.buildassembler" value="${sandcastle.dir}\productiontools\buildassembler.exe" />
-    <property name="sandcastle.xsltransform" value="${sandcastle.dir}\productiontools\xsltransform.exe" />
-
     <!-- YUI -->
     <property name="YUICompressor.dir" value="D:\inetpub\wwwroot\ccnet\buildTools\YUI" />
 
@@ -41,7 +31,6 @@
                 <include name="**/*" />
             </fileset>
         </attrib>
-
         
         <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
             <arg value="${root.dir}\umbraco.sln" />
@@ -53,7 +42,6 @@
         <exec program="${win.dir}\microsoft.net\framework\v2.0.50727\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
     </target>
 
-
     <!-- Directories and files -->
     <target name="directories" depends="build">
 
@@ -62,6 +50,13 @@
         <copy todir="${docs.dir}">
             <fileset basedir="${build.dir}\bin">
                 <include name="*.xml" />
+            </fileset>
+        </copy>
+
+        <!-- asp.net 3.5 DLR dlls -->
+        <copy todir="${build.dir}\bin">
+            <fileset basedir="${dlls.dir}\asp.net 3.5 Assemblies">
+                <include name="*.dll" />
             </fileset>
         </copy>
 
@@ -130,7 +125,8 @@
                 <include name="${build.dir}/**/*.compiled" />
                 <include name="${build.dir}/**/*.resx" />
                 <include name="${build.dir}/**/*.user" />
-                
+                <include name="${build.dir}/**/*.pdb" />
+
                 <include name="${build.dir}/PrecompiledApp.config" />
                 <include name="${build.dir}/web.config.template" />
                 <include name="${build.dir}/*.xslt" />

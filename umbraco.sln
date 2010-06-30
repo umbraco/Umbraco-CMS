@@ -2,6 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0242771-6DE6-4E03-BD3A-7B79BA79105B}"
 	ProjectSection(SolutionItems) = preProject
+		aspnet35.build = aspnet35.build
 		build.xml = build.xml
 		default.build = default.build
 		INDIGO64.testrunconfig = INDIGO64.testrunconfig
@@ -65,14 +66,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{F06D18F6-C
 		foreign dlls\ICSharpCode.SharpZipLib.dll = foreign dlls\ICSharpCode.SharpZipLib.dll
 		foreign dlls\IronMath.dll = foreign dlls\IronMath.dll
 		IronPython License.Rtf = IronPython License.Rtf
-		foreign dlls\IronPython.dll = foreign dlls\IronPython.dll
-		foreign dlls\IronRuby.dll = foreign dlls\IronRuby.dll
 		License.txt = License.txt
 		foreign dlls\Lucene.Net.dll = foreign dlls\Lucene.Net.dll
 		foreign dlls\Microsoft.ApplicationBlocks.Data.dll = foreign dlls\Microsoft.ApplicationBlocks.Data.dll
-		foreign dlls\Microsoft.Scripting.Core.dll = foreign dlls\Microsoft.Scripting.Core.dll
-		foreign dlls\Microsoft.Scripting.dll = foreign dlls\Microsoft.Scripting.dll
-		foreign dlls\Microsoft.Scripting.ExtensionAttribute.dll = foreign dlls\Microsoft.Scripting.ExtensionAttribute.dll
 		foreign dlls\MySql.Data.dll = foreign dlls\MySql.Data.dll
 		foreign dlls\TidyNet.dll = foreign dlls\TidyNet.dll
 		foreign dlls\UmbracoExamine.dll = foreign dlls\UmbracoExamine.dll
