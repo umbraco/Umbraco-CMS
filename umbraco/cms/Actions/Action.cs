@@ -8,6 +8,7 @@ using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.workflow;
 using umbraco.interfaces;
+using System.Text.RegularExpressions;
 
 namespace umbraco.BusinessLogic.Actions
 {
@@ -249,7 +250,69 @@ namespace umbraco.BusinessLogic.Actions
                 }
             );
         }
+
+        /// <summary>
+        /// Check if the current IAction is using legacy javascript methods
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns>false if the Iaction is incompatible with 4.5</returns>
+        public static bool ValidateActionJs(IAction action)
+        {
+            return !action.JsFunctionName.Contains("+");
+        }
+
+        /// <summary>
+        /// Method to convert the old modal calls to the new ones
+        /// </summary>
+        /// <param name="javascript"></param>
+        /// <returns></returns>
+        public static string ConvertLegacyJs(string javascript)
+        {
+            MatchCollection tags =
+    Regex.Matches(javascript, "openModal[^;]*;", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+            foreach (Match tag in tags)
+            {
+                string[] function = tag.Value.Split(',');
+                if (function.Length > 0)
+                {
+                    string newFunction = "UmbClientMgr.openModalWindow" + function[0].Substring(9).Replace("parent.nodeID", "UmbClientMgr.mainTree().getActionNode().nodeId").Replace("nodeID", "UmbClientMgr.mainTree().getActionNode().nodeId").Replace("parent.returnRandom()", "'" + Guid.NewGuid().ToString() + "'");
+                    newFunction += ", " + function[1];
+                    newFunction += ", true";
+                    newFunction += ", " + function[2];
+                    newFunction += ", " + function[3];
+                    javascript = javascript.Replace(tag.Value, newFunction);
+                }
+            }
+
+            return javascript;
+        }
     }
 
-    
+    /// <summary>
+    /// This class is used to manipulate IActions that are implemented in a wrong way
+    /// For instance incompatible trees with 4.0 vs 4.5
+    /// </summary>
+    public class PlaceboAction : IAction
+    {
+        public char Letter { get; set; }
+        public bool ShowInNotifier { get; set; }
+        public bool CanBePermissionAssigned { get; set; }
+        public string Icon { get; set; }
+        public string Alias { get; set; }
+        public string JsFunctionName { get; set; }
+        public string JsSource { get; set; }
+
+        public PlaceboAction() { }
+        public PlaceboAction(IAction legacyAction)
+        {
+            Letter = legacyAction.Letter;
+            ShowInNotifier = legacyAction.ShowInNotifier;
+            CanBePermissionAssigned = legacyAction.CanBePermissionAssigned;
+            Icon = legacyAction.Icon;
+            Alias = legacyAction.Alias;
+            JsFunctionName = legacyAction.JsFunctionName;
+            JsSource = legacyAction.JsSource;
+        }
+    }
+
 }
