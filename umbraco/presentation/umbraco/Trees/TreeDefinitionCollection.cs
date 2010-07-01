@@ -103,7 +103,7 @@ namespace umbraco.cms.presentation.Trees
             return this.FindAll(
                 delegate(TreeDefinition tree)
                 {
-                    return (tree.App.alias.ToLower() == appAlias.ToLower());
+                    return (tree.App != null && tree.App.alias.ToLower() == appAlias.ToLower());
                 }
             );
         }
@@ -118,7 +118,7 @@ namespace umbraco.cms.presentation.Trees
             return this.FindAll(
                 delegate(TreeDefinition tree)
                 {
-                    return (tree.App.alias.ToLower() == appAlias.ToLower() && tree.Tree.Initialize);
+                    return (tree.App != null && tree.App.alias.ToLower() == appAlias.ToLower() && tree.Tree.Initialize);
                 }
             );
         }
