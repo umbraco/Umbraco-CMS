@@ -60,10 +60,10 @@ namespace umbraco.editorControls
 						// Check for thumbnail!
 						string fileNameOrg = p.Value.ToString();
 						string ext = fileNameOrg.Substring(fileNameOrg.LastIndexOf(".")+1, fileNameOrg.Length-fileNameOrg.LastIndexOf(".")-1);
-						string fileNameThumb = SystemDirectories.Root + fileNameOrg.Replace("."+ext, "_thumb.jpg");
-						if (File.Exists(IOHelper.MapPath(fileNameThumb)))  
+						string fileNameThumb = fileNameOrg.Replace("."+ext, "_thumb.jpg");
+						if (File.Exists(IOHelper.MapPath(IOHelper.FindFile(fileNameThumb))))  
 						{
-							writer.WriteLine("<a href=\"?id=" +  m.Id.ToString() + "\"><img src=\"" + fileNameThumb + "\" alt=\"" + m.Text + "\" style=\"border: none\"/></a> &nbsp; ");
+							writer.WriteLine("<a href=\"?id=" +  m.Id.ToString() + "\"><img src=\"" + IOHelper.ResolveUrl(fileNameThumb) + "\" alt=\"" + m.Text + "\" style=\"border: none\"/></a> &nbsp; ");
 						}
 					}
 				}
