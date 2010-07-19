@@ -697,8 +697,8 @@ namespace umbraco
                 XmlDocument mXml = new XmlDocument();
                 mXml.LoadXml(m.ToXml(mXml, Deep).OuterXml);
                 XPathNavigator xp = mXml.CreateNavigator();
-//                string xpath = UmbracoSettings.UseLegacyXmlSchema ? "/node" : String.Format("/{0}", m.ContentType.Alias);
-                return xp.Select(".");
+                string xpath = UmbracoSettings.UseLegacyXmlSchema ? "/node" : String.Format("/{0}", Casing.SafeAliasWithForcingCheck(m.ContentType.Alias));
+                return xp.Select(xpath);
             }
             return null;
         }
@@ -747,7 +747,8 @@ namespace umbraco
             XmlDocument mXml = new XmlDocument();
             mXml.LoadXml(m.ToXml(mXml, false).OuterXml);
             XPathNavigator xp = mXml.CreateNavigator();
-            return xp.Select("/node");
+            string xpath = UmbracoSettings.UseLegacyXmlSchema ? "/node" : String.Format("/{0}", Casing.SafeAliasWithForcingCheck(m.ContentType.Alias));
+            return xp.Select(xpath);
         }
         /// <summary>
         /// Get the current member as an xml node
