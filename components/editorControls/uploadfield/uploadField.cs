@@ -372,7 +372,7 @@ namespace umbraco.editorControls
                 bool hasThumb = false;
                 try
                 {
-                    hasThumb = File.Exists(IOHelper.FindFile(fileNameThumb));
+                    hasThumb = File.Exists(IOHelper.MapPath(IOHelper.FindFile(fileNameThumb)));
                 }
                 catch { }
                 if (hasThumb)
