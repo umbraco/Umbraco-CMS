@@ -11,8 +11,8 @@
             The License (MIT):</h3>
         <p>
             Copyright (c)
-            <%=DateTime.Now.Year %>
-            umbraco I/S</p>
+            2002 - <%=DateTime.Now.Year %>
+            Umbraco I/S</p>
         <p>
             Permission is hereby granted, free of charge, to any person obtaining a copy of
             this software and associated documentation files (the "Software"), to deal in the
