@@ -23,7 +23,7 @@ namespace umbraco.cms.businesslogic.template
 
 
         #region Private members
-        
+
         private string _OutputContentType;
         private string _design;
         private string _alias;
@@ -42,13 +42,13 @@ namespace umbraco.cms.businesslogic.template
         private static object templateCacheSyncLock = new object();
         private static readonly string UmbracoTemplateCacheKey = "UmbracoTemplateCache";
         private static object _templateLoaderLocker = new object();
-        private static Guid _objectType = new Guid("6fbde604-4178-42ce-a10b-8a2600a2f07d"); 
+        private static Guid _objectType = new Guid("6fbde604-4178-42ce-a10b-8a2600a2f07d");
 
         #endregion
 
         public string MasterPageFile
         {
-            get { return IOHelper.MapPath( SystemDirectories.Masterpages  + "/" + Alias.Replace(" ", "") + ".master") ; }
+            get { return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + Alias.Replace(" ", "") + ".master"); }
         }
 
         public static Hashtable TemplateAliases
@@ -60,7 +60,7 @@ namespace umbraco.cms.businesslogic.template
         #region Constructors
         public Template(int id) : base(id) { }
 
-        public Template(Guid id) : base(id) { } 
+        public Template(Guid id) : base(id) { }
         #endregion
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace umbraco.cms.businesslogic.template
             get { return (_mastertemplate > 0); }
         }
 
-        
+
         public override bool HasChildren
         {
             get
@@ -315,7 +315,7 @@ namespace umbraco.cms.businesslogic.template
             return t;
         }
 
-        public static Template  MakeNew(string Name, BusinessLogic.User u)
+        public static Template MakeNew(string Name, BusinessLogic.User u)
         {
             // CMSNode MakeNew(int parentId, Guid objectType, int userId, int level, string text, Guid uniqueID)
             CMSNode n = CMSNode.MakeNew(-1, _objectType, u.Id, 1, Name, Guid.NewGuid());
@@ -392,7 +392,7 @@ namespace umbraco.cms.businesslogic.template
 
                         _templateAliasesInitialized = true;
                     }
-                    
+
                 }
             }
         }
@@ -406,18 +406,9 @@ namespace umbraco.cms.businesslogic.template
                 throw new InvalidOperationException("Can't delete a master template. Remove any bindings from child templates first.");
             }
 
-            // don't allow template deletion if it is in use
-            // (get all doc types and filter based on any that have the template id of this one)
+            // NH: Changed this; if you delete a template we'll remove all references instead of 
+            // throwing an exception
             if (DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id)).Count() > 0)
-            {
-                Log.Add(LogTypes.Error, this.Id, "Can't delete a template that is assigned to existing content");
-                throw new InvalidOperationException("Can't delete a template that is assigned to existing content");
-            }            
-
-            DeleteEventArgs e = new DeleteEventArgs();
-            FireBeforeDelete(e);
-
-            if (!e.Cancel)
             {
                 // the uncommented code below have been refactored into removeAllReferences method that clears template
                 // from documenttypes, subtemplates and documents.
@@ -430,6 +421,20 @@ namespace umbraco.cms.businesslogic.template
                 // Need to update any other template that references this one as it's master to NULL
                 SqlHelper.ExecuteNonQuery("update cmsTemplate set [master] = NULL where [master] = " + this.Id);
                 */
+
+                // don't allow template deletion if it is in use
+                // (get all doc types and filter based on any that have the template id of this one)
+                /*
+                Log.Add(LogTypes.Error, this.Id, "Can't delete a template that is assigned to existing content");
+                throw new InvalidOperationException("Can't delete a template that is assigned to existing content");
+            */
+            }
+
+            DeleteEventArgs e = new DeleteEventArgs();
+            FireBeforeDelete(e);
+
+            if (!e.Cancel)
+            {
                 //re-set the template aliases
                 _templateAliasesInitialized = false;
                 initTemplateAliases();
@@ -611,14 +616,14 @@ namespace umbraco.cms.businesslogic.template
                 }
 
                 //then kill the old file.. 
-                string _oldFile = IOHelper.MapPath(  SystemDirectories.Masterpages  + "/" + _oldAlias.Replace(" ", "") + ".master");
-                
+                string _oldFile = IOHelper.MapPath(SystemDirectories.Masterpages + "/" + _oldAlias.Replace(" ", "") + ".master");
+
                 if (System.IO.File.Exists(_oldFile))
                     System.IO.File.Delete(_oldFile);
             }
 
             // save the file in UTF-8
-            
+
             File.WriteAllText(MasterPageFile, masterPageContent, System.Text.Encoding.UTF8);
         }
 
@@ -831,7 +836,7 @@ namespace umbraco.cms.businesslogic.template
         {
             if (AfterDelete != null)
                 AfterDelete(this, e);
-        } 
+        }
         #endregion
 
     }

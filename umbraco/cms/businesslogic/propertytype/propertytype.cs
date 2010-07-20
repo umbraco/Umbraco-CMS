@@ -11,6 +11,7 @@ using umbraco.cms.businesslogic.language;
 using umbraco.interfaces;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
+using umbraco.cms.businesslogic.web;
 
 namespace umbraco.cms.businesslogic.propertytype
 {
@@ -320,20 +321,12 @@ namespace umbraco.cms.businesslogic.propertytype
             // flush cache
             FlushCache();
 
-			// Delete all properties of propertytype
-            var objs = Content.getContentOfContentType(new ContentType(_contenttypeid));
-			foreach(Content c in objs.ToList())
-			{
-                var prop = c.getProperty(this);
-				if (prop != null) 
-                {
-                    prop.delete();   
-                }
-			}
+            // clean all properties on inherited document types (if this propertytype is removed from a master)
+            DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == _contenttypeid).ForEach(dt => cleanPropertiesOnDeletion(dt.Id));
 
-            // invalidate content type cache
-            ContentType.GetContentType(this.ContentTypeId).FlushFromCache(this.ContentTypeId);
-            
+            // Delete all properties of propertytype
+            cleanPropertiesOnDeletion(_contenttypeid);
+
             // Delete PropertyType ..
 			SqlHelper.ExecuteNonQuery("Delete from cmsPropertyType where id = " + this.Id);
 
@@ -341,6 +334,22 @@ namespace umbraco.cms.businesslogic.propertytype
             // delete 
 			this.InvalidateCache();
 		}
+
+        private void cleanPropertiesOnDeletion(int contentTypeId)
+        {
+            var objs = Content.getContentOfContentType(new ContentType(contentTypeId));
+            foreach (Content c in objs.ToList())
+            {
+                var prop = c.getProperty(this);
+                if (prop != null)
+                {
+                    prop.delete();
+                }
+            }
+
+            // invalidate content type cache
+            ContentType.GetContentType(contentTypeId).FlushFromCache(contentTypeId);
+        }
 
 		public IDataType GetEditControl(object Value, bool IsPostBack)
 		{
