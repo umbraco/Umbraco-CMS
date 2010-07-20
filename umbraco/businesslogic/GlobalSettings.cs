@@ -708,7 +708,7 @@ namespace umbraco
 
                 // add URLs and paths to a new list
                 StartsWithContainer _newReservedList = new StartsWithContainer();
-                foreach (string reservedUrl in _reservedUrlsCache.Split(','))
+                foreach (string reservedUrl in _reservedUrlsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     //resolves the url to support tilde chars
                     string reservedUrlTrimmed = IOHelper.ResolveUrl(reservedUrl).Trim().ToLower();
@@ -716,7 +716,7 @@ namespace umbraco
                         _newReservedList.Add(reservedUrlTrimmed);
                 }
 
-                foreach (string reservedPath in _reservedPathsCache.Split(','))
+                foreach (string reservedPath in _reservedPathsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     bool trimEnd = !reservedPath.EndsWith("/");
                     //resolves the url to support tilde chars
