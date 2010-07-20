@@ -182,13 +182,13 @@ namespace umbraco {
             // TODO: NH: Remove the flag for friendlyxmlschema when real schema is implemented
             // as the friendlyxmlschema doesn't have any identifier keys we can't do a lookup
             // based on ID yet.
-            if (UmbracoSettings.UseLegacyXmlSchema && _processedRequests.ContainsKey(url) && !Domain.Exists(currentDomain))
+            if (_processedRequests.ContainsKey(url) && !Domain.Exists(currentDomain))
             {
                 getByID = true;
                 _pageXPathQuery = _processedRequests[url].ToString();
             }
             // The url including the domain exists in cache
-            else if (UmbracoSettings.UseLegacyXmlSchema && _processedRequests.ContainsKey(currentDomain + url))
+            else if (_processedRequests.ContainsKey(currentDomain + url))
             {
                 getByID = true;
                 _pageXPathQuery = _processedRequests[currentDomain + url].ToString();
