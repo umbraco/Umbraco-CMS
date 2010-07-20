@@ -41,14 +41,14 @@ function safeAlias(alias) {
             currentChar = alias.substring(i, i + 1);
             if (UMBRACO_FORCE_SAFE_ALIAS_VALIDCHARS.indexOf(currentChar.toLowerCase()) > -1) {
                 // check for camel (if previous character is a space, we'll upper case the current one
-                if (i == 0 && UMBRACO_FORCE_SAFE_ALIAS_INVALID_FIRST_CHARS.indexOf(currentChar.toLowerCase()) > 0) { 
+                if (safeAlias == '' && UMBRACO_FORCE_SAFE_ALIAS_INVALID_FIRST_CHARS.indexOf(currentChar.toLowerCase()) > 0) { 
                     currentChar = '';
                 } else {
                     // first char should always be lowercase (camel style)
                     if (safeAlias.length == 0)
                         currentChar = currentChar.toLowerCase();
 
-                    if (i < aliasLength - 1 && i > 0 && alias.substring(i - 1, i) == ' ')
+                    if (i < aliasLength - 1 && safeAlias != '' && alias.substring(i - 1, i) == ' ')
                         currentChar = currentChar.toUpperCase();
 
                     safeAlias += currentChar;

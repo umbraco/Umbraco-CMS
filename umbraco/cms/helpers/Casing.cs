@@ -27,7 +27,7 @@ namespace umbraco.cms.helpers
                 if (VALID_ALIAS_CHARACTERS.Contains(currentChar.ToLower()))
                 {
                     // check for camel (if previous character is a space, we'll upper case the current one
-                    if (i == 0 && INVALID_FIRST_CHARACTERS.Contains(currentChar.ToLower()))
+                    if (safeString.Length == 0 && INVALID_FIRST_CHARACTERS.Contains(currentChar.ToLower()))
                     {
                         currentChar = "";
                     }
