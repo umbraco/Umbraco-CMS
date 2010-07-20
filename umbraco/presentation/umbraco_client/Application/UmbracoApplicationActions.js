@@ -160,7 +160,7 @@ Umbraco.Application.Actions = function () {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '0' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                UmbClientMgr.openModalWindow("dialogs/sort.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_sort'], true, 600, 450);
+                UmbClientMgr.openModalWindow("dialogs/sort.aspx?id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&app=' + this._currApp + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_sort'], true, 600, 450);
             }
 
         },
