@@ -27,6 +27,8 @@ namespace umbraco
 {
     public class loadPackages : BaseTree {
 
+        public const string PACKAGE_TREE_PREFIX = "package_";
+
         public loadPackages(string application) : base(application) { }
         
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
@@ -61,7 +63,7 @@ namespace umbraco
                     foreach (cms.businesslogic.packager.InstalledPackage p in cms.businesslogic.packager.InstalledPackage.GetAllInstalledPackages())
                     {
                         XmlTreeNode xNode = XmlTreeNode.Create(this);
-                        xNode.NodeID = "package_" + p.Data.Id.ToString();
+                        xNode.NodeID = PACKAGE_TREE_PREFIX + p.Data.Id.ToString();
                         xNode.Text = p.Data.Name;
                         xNode.Action = "javascript:openInstalledPackage('" + p.Data.Id.ToString() + "');";
                         xNode.Icon = "package.gif";
@@ -78,13 +80,13 @@ namespace umbraco
                     {
 
                         XmlTreeNode xNode = XmlTreeNode.Create(this);
-                        xNode.NodeID = "package_" + p.Data.Id.ToString();
+                        xNode.NodeID = PACKAGE_TREE_PREFIX + p.Data.Id.ToString();
                         xNode.Text = p.Data.Name;
                         xNode.Action = "javascript:openCreatedPackage('" + p.Data.Id.ToString() + "');";
                         xNode.Icon = "package.gif";
                         xNode.OpenIcon = "package.gif";
                         xNode.NodeType = "createdPackageInstance";
-                        xNode.Menu.Add( umbraco.BusinessLogic.Actions.ActionDelete.Instance );
+//                        xNode.Menu.Add( umbraco.BusinessLogic.Actions.ActionDelete.Instance );
 
                         tree.Add(xNode);
                     }
