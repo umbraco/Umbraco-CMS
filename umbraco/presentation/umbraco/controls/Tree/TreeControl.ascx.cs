@@ -13,16 +13,17 @@ using umbraco.cms.presentation.Trees;
 using umbraco.BasePages;
 using System.Web.Services;
 using System.Drawing;
+using umbraco.BusinessLogic;
 
 namespace umbraco.controls.Tree
 {
 
-	/// <summary>
-	/// The Umbraco tree control.
-	/// <remarks>If this control doesn't exist on an UmbracoEnsuredPage it will not work.</remarks>
-	/// </summary>
-	public partial class TreeControl : System.Web.UI.UserControl, ITreeService
-	{
+    /// <summary>
+    /// The Umbraco tree control.
+    /// <remarks>If this control doesn't exist on an UmbracoEnsuredPage it will not work.</remarks>
+    /// </summary>
+    public partial class TreeControl : System.Web.UI.UserControl, ITreeService
+    {
 
         /// <summary>
         /// Set the defaults
@@ -35,37 +36,37 @@ namespace umbraco.controls.Tree
             CssClass = "";
             ManualInitialization = false;
         }
-       
-		protected override void OnInit(EventArgs e)
-		{
-			base.OnInit(e);
-			EnableViewState = false;            
-		}
 
-		public enum TreeMode
-		{
-			Standard, Checkbox, InheritedCheckBox
-		}
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+            EnableViewState = false;
+        }
 
-		/// <summary>
-		/// If there is not application or tree specified in a query string then this is the application to load.
-		/// </summary>
-		private const string DEFAULT_APP = "content";
+        public enum TreeMode
+        {
+            Standard, Checkbox, InheritedCheckBox
+        }
 
-		private List<BaseTree> m_ActiveTrees = new List<BaseTree>();
-		private List<BaseTree> m_AllAppTrees = new List<BaseTree>();
-		private List<TreeDefinition> m_ActiveTreeDefs = null;
-		private TreeMode m_TreeType = TreeMode.Standard;
-		private bool m_IsInit = false;
-		private TreeService m_TreeService = new TreeService();
-        
+        /// <summary>
+        /// If there is not application or tree specified in a query string then this is the application to load.
+        /// </summary>
+        private const string DEFAULT_APP = "content";
+
+        private List<BaseTree> m_ActiveTrees = new List<BaseTree>();
+        private List<BaseTree> m_AllAppTrees = new List<BaseTree>();
+        private List<TreeDefinition> m_ActiveTreeDefs = null;
+        private TreeMode m_TreeType = TreeMode.Standard;
+        private bool m_IsInit = false;
+        private TreeService m_TreeService = new TreeService();
+
         #region Public Properties
 
         #region Style Properties
         public string CssClass { get; set; }
         public Unit Height { get; set; }
         public Unit Width { get; set; }
-        public Color BackColor { get; set; } 
+        public Color BackColor { get; set; }
         #endregion
 
         #region TreeService parameters.
@@ -160,7 +161,7 @@ namespace umbraco.controls.Tree
                 m_TreeType = value;
             }
         }
-        
+
         /// <summary>
         /// Returns the required JavaScript as a string for the current application
         /// </summary>
@@ -195,74 +196,74 @@ namespace umbraco.controls.Tree
             Initialize();
         }
 
-		/// <summary>
-		/// Initializes the control and looks up the tree structures that are required to be rendered.
-		/// Properties of the control (or SetTreeService) need to be set before pre render or calling
-		/// GetJSONContextMenu or GetJSONNode
-		/// </summary>
-		protected void Initialize()
-		{
-			//use the query strings if the TreeParams isn't explicitly set
-			if (m_TreeService == null)
-			{
-				m_TreeService = TreeRequestParams.FromQueryStrings().CreateTreeService();
-			}
-			m_TreeService.App = GetCurrentApp();
+        /// <summary>
+        /// Initializes the control and looks up the tree structures that are required to be rendered.
+        /// Properties of the control (or SetTreeService) need to be set before pre render or calling
+        /// GetJSONContextMenu or GetJSONNode
+        /// </summary>
+        protected void Initialize()
+        {
+            //use the query strings if the TreeParams isn't explicitly set
+            if (m_TreeService == null)
+            {
+                m_TreeService = TreeRequestParams.FromQueryStrings().CreateTreeService();
+            }
+            m_TreeService.App = GetCurrentApp();
 
-			// Validate permissions
-			if (!BasePages.BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
-				return;
-			UmbracoEnsuredPage page = new UmbracoEnsuredPage();
-			if (!page.ValidateUserApp(GetCurrentApp()))
-				throw new ArgumentException("The current user doesn't have access to this application. Please contact the system administrator.");
+            // Validate permissions
+            if (!BasePages.BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
+                return;
+            UmbracoEnsuredPage page = new UmbracoEnsuredPage();
+            if (!page.ValidateUserApp(GetCurrentApp()))
+                throw new ArgumentException("The current user doesn't have access to this application. Please contact the system administrator.");
 
-			//find all tree definitions that have the current application alias that are ACTIVE
-			m_ActiveTreeDefs = TreeDefinitionCollection.Instance.FindActiveTrees(GetCurrentApp());
-			//find all tree defs that exists for the current application regardless of if they are active
-			List<TreeDefinition> appTreeDefs = TreeDefinitionCollection.Instance.FindTrees(GetCurrentApp());
+            //find all tree definitions that have the current application alias that are ACTIVE
+            m_ActiveTreeDefs = TreeDefinitionCollection.Instance.FindActiveTrees(GetCurrentApp());
+            //find all tree defs that exists for the current application regardless of if they are active
+            List<TreeDefinition> appTreeDefs = TreeDefinitionCollection.Instance.FindTrees(GetCurrentApp());
 
-			//Create the BaseTree's based on the tree definitions found
-			foreach (TreeDefinition treeDef in appTreeDefs)
-			{
-				//create the tree and initialize it
-				BaseTree bTree = treeDef.CreateInstance();
-				bTree.SetTreeParameters(m_TreeService);
+            //Create the BaseTree's based on the tree definitions found
+            foreach (TreeDefinition treeDef in appTreeDefs)
+            {
+                //create the tree and initialize it
+                BaseTree bTree = treeDef.CreateInstance();
+                bTree.SetTreeParameters(m_TreeService);
 
-				//store the created tree
-				m_AllAppTrees.Add(bTree);
-				if (treeDef.Tree.Initialize)
-					m_ActiveTrees.Add(bTree);
-			}
+                //store the created tree
+                m_AllAppTrees.Add(bTree);
+                if (treeDef.Tree.Initialize)
+                    m_ActiveTrees.Add(bTree);
+            }
 
-			m_IsInit = true;
-		}
+            m_IsInit = true;
+        }
 
-		/// <summary>
-		/// This calls the databind method to bind the data binding syntax on the front-end.
-		/// <remarks>
-		/// Databinding was used instead of inline tags in case the tree properties needed to be set
-		/// by other classes at runtime
-		/// </remarks>
-		/// </summary>
-		/// <param name="e"></param>
-		/// <remarks>
-		/// This will initialize the control so all TreeService properties need to be set before hand
-		/// </remarks>
-		protected override void OnPreRender(EventArgs e)
-		{
-			base.OnPreRender(e);
+        /// <summary>
+        /// This calls the databind method to bind the data binding syntax on the front-end.
+        /// <remarks>
+        /// Databinding was used instead of inline tags in case the tree properties needed to be set
+        /// by other classes at runtime
+        /// </remarks>
+        /// </summary>
+        /// <param name="e"></param>
+        /// <remarks>
+        /// This will initialize the control so all TreeService properties need to be set before hand
+        /// </remarks>
+        protected override void OnPreRender(EventArgs e)
+        {
+            base.OnPreRender(e);
 
-			if (!m_IsInit)
-				Initialize();
+            if (!m_IsInit)
+                Initialize();
 
-			//Render out the JavaScript associated with all of the trees for the application
-			RenderTreeJS();
+            //Render out the JavaScript associated with all of the trees for the application
+            RenderTreeJS();
 
             RenderActionJS();
 
             //apply the styles
             if (Width != Unit.Empty)
-                TreeContainer.Style.Add( HtmlTextWriterStyle.Width, Width.ToString());
+                TreeContainer.Style.Add(HtmlTextWriterStyle.Width, Width.ToString());
             if (Height != Unit.Empty)
                 TreeContainer.Style.Add(HtmlTextWriterStyle.Height, Height.ToString());
             if (BackColor != Color.Empty)
@@ -276,16 +277,16 @@ namespace umbraco.controls.Tree
                 //add the default class
                 TreeContainer.Attributes.Add("class", "treeContainer");
             }
-                
 
-			DataBind();
-		}
 
-		/// <summary>
-		/// Returns the JSON markup for the full context menu
-		/// </summary>
-		public string GetJSONContextMenu()
-		{
+            DataBind();
+        }
+
+        /// <summary>
+        /// Returns the JSON markup for the full context menu
+        /// </summary>
+        public string GetJSONContextMenu()
+        {
             if (ShowContextMenu)
             {
                 JTreeContextMenu menu = new JTreeContextMenu();
@@ -295,8 +296,8 @@ namespace umbraco.controls.Tree
             {
                 return "{}";
             }
-			
-		}
+
+        }
 
         /// <summary>
         /// Returns a string with javascript proxy methods for IActions that are using old javascript
@@ -307,15 +308,23 @@ namespace umbraco.controls.Tree
             StringBuilder js = new StringBuilder();
             foreach (IAction a in global::umbraco.BusinessLogic.Actions.Action.GetAll())
             {
-                if (!string.IsNullOrEmpty(a.Alias) && (!string.IsNullOrEmpty(a.JsFunctionName) || !string.IsNullOrEmpty(a.JsSource)))
+                // NH: Added a try/catch block to this as an error in a 3rd party action can crash the whole menu initialization
+                try
                 {
-                    // if the action is using invalid javascript we need to do something about this
-                    if (!umbraco.BusinessLogic.Actions.Action.ValidateActionJs(a))
+                    if (!string.IsNullOrEmpty(a.Alias) && (!string.IsNullOrEmpty(a.JsFunctionName) || !string.IsNullOrEmpty(a.JsSource)))
                     {
-                        js.AppendLine("function IActionProxy_" + umbraco.cms.helpers.Casing.SafeAlias(a.Alias) + "() {");
-                        js.AppendLine(umbraco.BusinessLogic.Actions.Action.ConvertLegacyJs(a.JsFunctionName)); // .Replace("openModal", "UmbClientMgr.openModalWindow"));
-                        js.AppendLine("}");
+                        // if the action is using invalid javascript we need to do something about this
+                        if (!umbraco.BusinessLogic.Actions.Action.ValidateActionJs(a))
+                        {
+                            js.AppendLine("function IActionProxy_" + umbraco.cms.helpers.Casing.SafeAlias(a.Alias) + "() {");
+                            js.AppendLine(umbraco.BusinessLogic.Actions.Action.ConvertLegacyJs(a.JsFunctionName)); // .Replace("openModal", "UmbClientMgr.openModalWindow"));
+                            js.AppendLine("}");
+                        }
                     }
+                }
+                catch (Exception ee)
+                {
+                    Log.Add(LogTypes.Error, -1, "Error initializing tree action: " + ee.ToString());
                 }
             }
 
@@ -327,79 +336,79 @@ namespace umbraco.controls.Tree
             return js.ToString();
         }
 
-		/// <summary>
-		/// Returns the JSON markup for one node
-		/// </summary>
-		/// <param name="treeAlias"></param>
-		/// <param name="nodeId"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// This will initialize the control so all TreeService properties need to be set before hand
-		/// </remarks>
-		public string GetJSONNode(string nodeId)
-		{
-			if (!m_IsInit)
-				Initialize();
+        /// <summary>
+        /// Returns the JSON markup for one node
+        /// </summary>
+        /// <param name="treeAlias"></param>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This will initialize the control so all TreeService properties need to be set before hand
+        /// </remarks>
+        public string GetJSONNode(string nodeId)
+        {
+            if (!m_IsInit)
+                Initialize();
 
-			if (string.IsNullOrEmpty(m_TreeService.TreeType))
-			{
-				throw new ArgumentException("The TreeType is not set on the tree service");
-			}
+            if (string.IsNullOrEmpty(m_TreeService.TreeType))
+            {
+                throw new ArgumentException("The TreeType is not set on the tree service");
+            }
 
-			BaseTree tree = m_ActiveTrees.Find(
-				delegate(BaseTree t)
-				{
-					return (t.TreeAlias == m_TreeService.TreeType);
-				}
-			);
-			return tree.GetSerializedNodeData(nodeId);
-		}
+            BaseTree tree = m_ActiveTrees.Find(
+                delegate(BaseTree t)
+                {
+                    return (t.TreeAlias == m_TreeService.TreeType);
+                }
+            );
+            return tree.GetSerializedNodeData(nodeId);
+        }
 
-		/// <summary>
-		/// Returns the JSON markup for the first node in the tree
-		/// </summary>
-		
-		public string GetJSONInitNode()
-		{
-			if (!m_IsInit)
-				Initialize();
+        /// <summary>
+        /// Returns the JSON markup for the first node in the tree
+        /// </summary>
 
-			//if there is only one tree to render, we don't want to have a node to hold sub trees, we just want the
-			//stand alone tree, so we'll just add a TreeType to the TreeService and ensure that the right method gets loaded in tree.aspx
-			if (m_ActiveTrees.Count == 1)
-			{
-				m_TreeService.TreeType = m_ActiveTreeDefs[0].Tree.Alias;
+        public string GetJSONInitNode()
+        {
+            if (!m_IsInit)
+                Initialize();
 
-				//convert the menu to a string
-				//string initActions = (TreeSvc.ShowContextMenu ? Action.ToString(m_ActiveTrees[0].RootNodeActions) : "");
+            //if there is only one tree to render, we don't want to have a node to hold sub trees, we just want the
+            //stand alone tree, so we'll just add a TreeType to the TreeService and ensure that the right method gets loaded in tree.aspx
+            if (m_ActiveTrees.Count == 1)
+            {
+                m_TreeService.TreeType = m_ActiveTreeDefs[0].Tree.Alias;
 
-				//Since there's only 1 tree, render out the tree's RootNode properties
-				XmlTree xTree = new XmlTree();
-				xTree.Add(m_ActiveTrees[0].RootNode);
-				return xTree.ToString();
-			}
-			else
-			{
+                //convert the menu to a string
+                //string initActions = (TreeSvc.ShowContextMenu ? Action.ToString(m_ActiveTrees[0].RootNodeActions) : "");
 
-				//If there is more than 1 tree for the application than render out a 
-				//container node labelled with the current application.
-				XmlTree xTree = new XmlTree();
-				XmlTreeNode xNode = XmlTreeNode.CreateRoot(new NullTree(GetCurrentApp()));
-				xNode.Text = ui.Text("sections", GetCurrentApp(), UmbracoEnsuredPage.CurrentUser);
-				xNode.Source = m_TreeService.GetServiceUrl();
-				xNode.Action = ClientTools.Scripts.OpenDashboard(GetCurrentApp());
-				xNode.NodeType = m_TreeService.App.ToLower();
-				xNode.NodeID = "-1";
-				xNode.Icon = ".sprTreeFolder";
-				xTree.Add(xNode);
-				return xTree.ToString();
-			}
-		}
+                //Since there's only 1 tree, render out the tree's RootNode properties
+                XmlTree xTree = new XmlTree();
+                xTree.Add(m_ActiveTrees[0].RootNode);
+                return xTree.ToString();
+            }
+            else
+            {
 
-		private void RenderTreeJS()
-		{
+                //If there is more than 1 tree for the application than render out a 
+                //container node labelled with the current application.
+                XmlTree xTree = new XmlTree();
+                XmlTreeNode xNode = XmlTreeNode.CreateRoot(new NullTree(GetCurrentApp()));
+                xNode.Text = ui.Text("sections", GetCurrentApp(), UmbracoEnsuredPage.CurrentUser);
+                xNode.Source = m_TreeService.GetServiceUrl();
+                xNode.Action = ClientTools.Scripts.OpenDashboard(GetCurrentApp());
+                xNode.NodeType = m_TreeService.App.ToLower();
+                xNode.NodeID = "-1";
+                xNode.Icon = ".sprTreeFolder";
+                xTree.Add(xNode);
+                return xTree.ToString();
+            }
+        }
+
+        private void RenderTreeJS()
+        {
             Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "Trees_" + GetCurrentApp(), JSCurrApp, true);
-		}
+        }
 
         /// <summary>
         /// renders out the script block sources defined in any IAction
@@ -408,34 +417,42 @@ namespace umbraco.controls.Tree
         {
             foreach (IAction a in global::umbraco.BusinessLogic.Actions.Action.GetAll())
             {
-                if (!string.IsNullOrEmpty(a.Alias) && (!string.IsNullOrEmpty(a.JsSource)))
+                // NH: Added a try/catch block to this as an error in a 3rd party action can crash the whole menu initialization
+                try
                 {
-                    Page.ClientScript.RegisterClientScriptBlock(a.GetType(), a.Alias, a.JsSource, true);
-                    //Page.ClientScript.RegisterClientScriptInclude(a.GetType(), a.Alias, a.JsSource);
+                    if (!string.IsNullOrEmpty(a.Alias) && (!string.IsNullOrEmpty(a.JsSource)))
+                    {
+                        Page.ClientScript.RegisterClientScriptBlock(a.GetType(), a.Alias, a.JsSource, true);
+                        //Page.ClientScript.RegisterClientScriptInclude(a.GetType(), a.Alias, a.JsSource);
+                    }
                 }
-            }            
+                catch (Exception ee)
+                {
+                    Log.Add(LogTypes.Error, -1, "Error initializing tree action: " + ee.ToString());
+                }
+            }
         }
 
-		/// <summary>
-		/// Return the current application alias. If neither the TreeType of Application is specified
-		/// than return the default application. If the Application is null but there is a TreeType then
-		/// find the application that the tree type is associated with.
-		/// </summary>
-		private string GetCurrentApp()
-		{
-			//if theres an treetype specified but no application
-			if (string.IsNullOrEmpty(m_TreeService.App) &&
-				!string.IsNullOrEmpty(m_TreeService.TreeType))
-			{
-				TreeDefinition treeDef = TreeDefinitionCollection.Instance.FindTree(m_TreeService.TreeType);
-				if (treeDef != null)
-					return treeDef.App.alias;
-			}
-			else if (!string.IsNullOrEmpty(m_TreeService.App))
-				return m_TreeService.App;
+        /// <summary>
+        /// Return the current application alias. If neither the TreeType of Application is specified
+        /// than return the default application. If the Application is null but there is a TreeType then
+        /// find the application that the tree type is associated with.
+        /// </summary>
+        private string GetCurrentApp()
+        {
+            //if theres an treetype specified but no application
+            if (string.IsNullOrEmpty(m_TreeService.App) &&
+                !string.IsNullOrEmpty(m_TreeService.TreeType))
+            {
+                TreeDefinition treeDef = TreeDefinitionCollection.Instance.FindTree(m_TreeService.TreeType);
+                if (treeDef != null)
+                    return treeDef.App.alias;
+            }
+            else if (!string.IsNullOrEmpty(m_TreeService.App))
+                return m_TreeService.App;
 
-			//if everything is null then return the default app
-			return DEFAULT_APP;
-		}
-	}
+            //if everything is null then return the default app
+            return DEFAULT_APP;
+        }
+    }
 }
