@@ -7,12 +7,14 @@ using umbraco.cms.businesslogic.datatype;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
+using umbraco.IO;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
     public partial class ExportCode : BasePages.UmbracoEnsuredPage
     {
         private Dictionary<Guid, Type> dataTypeMapping = new Dictionary<Guid, Type>();
+        private const string EXPORT_FOLDER = "exported-doctypes/";
 
         private List<DocumentType> _docTypes;
         public List<DocumentType> DocTypes
@@ -202,7 +204,9 @@ namespace {0} {{
                 GenerateClasses(includeInterfaces)
             );
 
-            string pocoFile = Path.Combine(IO.SystemDirectories.Data, this.txtDataContextName.Text + ".txt");
+            // As we save in a new folder under Media, we need to ensure it exists
+            EnsureExportFolder();
+            string pocoFile = Path.Combine(IO.SystemDirectories.Media + EXPORT_FOLDER, this.txtDataContextName.Text + ".txt");
 
             using (var writer = new StreamWriter(IO.IOHelper.MapPath(pocoFile)))
             {
@@ -223,7 +227,7 @@ namespace {0} {{
                     GenerateClassAbstraction()
                 );
 
-                string abstractionFile = Path.Combine(IO.SystemDirectories.Data, "I" + this.txtDataContextName.Text + ".txt");
+                string abstractionFile = Path.Combine(IO.SystemDirectories.Media + EXPORT_FOLDER, "I" + this.txtDataContextName.Text + ".txt");
 
                 using (var writer = new StreamWriter(IO.IOHelper.MapPath(abstractionFile)))
                 {
@@ -267,7 +271,7 @@ namespace {0} {{
             var children = dt.AllowedChildContentTypeIDs;
             foreach (var child in DocTypes.Where(d => children.Contains(d.Id)))
             {
-                sb.AppendLine(string.Format("IEnumerable<I{0}> {0}s {{ get; }}", 
+                sb.AppendLine(string.Format("IEnumerable<I{0}> {0}s {{ get; }}",
                     GenerateTypeName(child.Alias)
                     )
                 );
@@ -477,6 +481,13 @@ namespace {0} {{
                 return s;
             }
             return s.Replace("\r\n", "\r\n///");
+        }
+
+        private static void EnsureExportFolder()
+        {
+            string packagesDirectory = IO.SystemDirectories.Media + EXPORT_FOLDER;
+            if (!System.IO.Directory.Exists(IOHelper.MapPath(packagesDirectory)))
+                System.IO.Directory.CreateDirectory(IOHelper.MapPath(packagesDirectory));
         }
     }
 }
