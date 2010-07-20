@@ -93,7 +93,7 @@ namespace umbraco.controls.Images
 				}
 
 				MediaItemPath = pFile.Value != null && !string.IsNullOrEmpty(pFile.Value.ToString()) 
-                    ? umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/.." + pFile.Value.ToString() 
+                    ? umbraco.IO.IOHelper.ResolveUrl(pFile.Value.ToString()) 
                     : "#";
 				AltText = MediaItemPath != "#" ? m.Text : ui.GetText("no") + " " + ui.GetText("media");
 
@@ -102,7 +102,7 @@ namespace umbraco.controls.Images
 
 				if (pWidth != null && pWidth.Value != null && pHeight != null && pHeight.Value != null)
 				{
-					int.TryParse(pHeight.Value.ToString(), out m_FileWidth);
+					int.TryParse(pWidth.Value.ToString(), out m_FileWidth);
 					int.TryParse(pHeight.Value.ToString(), out m_FileHeight);
 				}
 
