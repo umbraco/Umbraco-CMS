@@ -122,13 +122,13 @@ namespace umbraco.cms.businesslogic.workflow
 
 
             string[] subjectVars = {
-                                       HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" + HttpContext.Current.Request.Url.Port.ToString() + SystemDirectories.Umbraco, ui.Text(Action.Alias)
+                                       HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" + HttpContext.Current.Request.Url.Port.ToString() + IOHelper.ResolveUrl(SystemDirectories.Umbraco), ui.Text(Action.Alias)
                                        ,
                                        documentObject.Text
                                    };
             string[] bodyVars = {
                                     mailingUser.Name, ui.Text(Action.Alias), documentObject.Text, performingUser.Name,
-                                    HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" + HttpContext.Current.Request.Url.Port.ToString() + SystemDirectories.Umbraco,
+                                    HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" + HttpContext.Current.Request.Url.Port.ToString() +IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                     documentObject.Id.ToString(), summary.ToString(), 
                                     String.Format("http://{0}/{1}", 
                                         HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" + HttpContext.Current.Request.Url.Port.ToString(), 

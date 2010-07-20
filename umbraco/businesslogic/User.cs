@@ -398,26 +398,20 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public static User[] getAllByEmail(string email)
         {
+            List<User> retVal = new List<User>();
             System.Collections.ArrayList tmpContainer = new System.Collections.ArrayList();
 
             IRecordsReader dr;
             dr = SqlHelper.ExecuteReader(
-                "Select id from umbracoUser where userEmail LIKE %@email%", SqlHelper.CreateParameter("@email", email));
+            "Select id from umbracoUser where userEmail LIKE @email", SqlHelper.CreateParameter("@email", String.Format("%{0}%", email)));
 
             while (dr.Read())
             {
-                tmpContainer.Add(BusinessLogic.User.GetUser(dr.GetInt("id")));
+                retVal.Add(BusinessLogic.User.GetUser(dr.GetInt("id")));
             }
             dr.Close();
-            User[] retVal = new User[tmpContainer.Count];
 
-            int c = 0;
-            foreach (User u in tmpContainer)
-            {
-                retVal[c] = u;
-                c++;
-            }
-            return retVal;
+            return retVal.ToArray();
         }
 
         /// <summary>
@@ -436,7 +430,7 @@ namespace umbraco.BusinessLogic
             var users = new List<User>();
 
             if (partialMatch)
-            {                
+            {
                 using (var dr = SqlHelper.ExecuteReader(
                     "Select id from umbracoUser where userLogin LIKE @login", SqlHelper.CreateParameter("@login", String.Format("%{0}%", login))))
                 {
@@ -461,7 +455,7 @@ namespace umbraco.BusinessLogic
 
             return users;
 
-            
+
         }
 
         /// <summary>
@@ -613,7 +607,7 @@ namespace umbraco.BusinessLogic
             {
                 this.LoginName = DateTime.Now.ToString("yyyyMMdd") + "_" + this.LoginName;
             }
-            
+
         }
 
         /// <summary>
