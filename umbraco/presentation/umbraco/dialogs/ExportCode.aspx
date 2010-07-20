@@ -2,7 +2,7 @@
     CodeBehind="ExportCode.aspx.cs" Inherits="umbraco.presentation.umbraco.dialogs.ExportCode" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<asp:Content ContentPlaceHolderID="head" runat="server">
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style type="text/css">
         .label
         {
@@ -12,7 +12,7 @@
         }
     </style>
 </asp:Content>
-<asp:Content ContentPlaceHolderID="body" runat="server">
+<asp:Content ID="Content2" ContentPlaceHolderID="body" runat="server">
     <p id="pageName" style="text-align: center;">
         <%=
            umbraco.ui.GetText("exportDocumentTypeAsCode-Full") 
@@ -38,15 +38,15 @@
     <asp:Panel ID="pnlButtons" runat="server" Style="margin-top: 10px;">
         <asp:Button ID="btnGenerate" runat="server" Text="Submit" OnClick="btnGenerate_Click"
             Style="margin-top: 14px" />
-        <em>or </em><a href="#" style="color: Blue; margin-left: 6px;" onclick="UmbClientMgr.mainWindow().closeModal()">
+        <em>or </em><a href="#" style="color: Blue; margin-left: 6px;" onclick="UmbClientMgr.closeModalWindow()">
             <%=umbraco.ui.Text("cancel")%></a>
     </asp:Panel>
     <cc1:Pane ID="pane_files" runat="server" Visible="false">
         <p>
             <strong>Don't forget to change the extensions to .cs!</strong>
         </p>
-        <asp:HyperLink ID="lnkPoco" runat="server" Text="POCO" />
+        <asp:HyperLink ID="lnkPoco" runat="server" Text="POCO" Target="_blank" />
         <br />
-        <asp:HyperLink ID="lnkAbstractions" runat="server" Text="Abstractions" Enabled="false" />
+        <asp:HyperLink ID="lnkAbstractions" runat="server" Text="Abstractions" Target="_blank" Enabled="false" />
     </cc1:Pane>
 </asp:Content>
