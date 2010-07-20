@@ -459,7 +459,7 @@
   </area>
   <area alias="sort">
     <key alias="sortPleaseWait"><![CDATA[ Please wait. Items are being sorted, this can take a while.<br/> <br/> Do not close this window during sorting]]></key>
-    <key alias="sortHelp"><![CDATA[Drag the different items up or down below to set how they should be arranged. Or click the coloumn headers to sort the entire collection of items]]></key>
+    <key alias="sortHelp"><![CDATA[Drag the different items up or down below to set how they should be arranged. Or click the column headers to sort the entire collection of items]]></key>
     <key alias="sortDone">Sorting complete.</key>
   </area>
   <area alias="publish">
