@@ -54,7 +54,9 @@ namespace umbraco.presentation.channels
     public struct wpCategory
     {
         public string name;
-        public string parent_id;
+        public string slug;
+        public int parent_id;
+        string description;
     }
 
 

@@ -4,8 +4,8 @@
  <watermarkImageUrl>http://umbraco.org/images/liveWriterWatermark.png</watermarkImageUrl>
  <homepageLinkText>View your site/weblog</homepageLinkText>
  <adminLinkText>Edit your site/weblog</adminLinkText>
- <adminUrl>{blog-homepage-url}<%= umbraco.IO.SystemDirectories.Umbraco %>/</adminUrl>
- <postEditingUrl>{blog-homepage-url}<%= umbraco.IO.SystemDirectories.Umbraco%>/actions/editContent.aspx?id={post-id}</postEditingUrl>
+ <adminUrl>{blog-homepage-url}<%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/</adminUrl>
+ <postEditingUrl>{blog-homepage-url}<%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/actions/editContent.aspx?id={post-id}</postEditingUrl>
 
  </weblog>
  <views>
