@@ -739,7 +739,7 @@ namespace umbraco
             // Do transformation
             HttpContext.Current.Trace.Write("umbracoMacro", "Before performing transformation");
             xslt.Transform(macroXML.CreateNavigator(), xslArgs, tw);
-            return tw.ToString();
+            return IOHelper.ResolveUrlsFromTextString(tw.ToString());
         }
 
         public static XsltArgumentList AddXsltExtensions()

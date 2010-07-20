@@ -10,6 +10,7 @@ using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.umbraco.templateControls;
+using umbraco.IO;
 
 namespace umbraco.presentation.templateControls
 {
@@ -62,7 +63,8 @@ namespace umbraco.presentation.templateControls
                                                : XsltTransform(item.Xslt, renderOutput, item.XsltDisableEscaping);
                 // handle text before/after
                 xsltTransformedOutput = AddBeforeAfterText(xsltTransformedOutput, helper.FindAttribute(item.LegacyAttributes, "insertTextBefore"), helper.FindAttribute(item.LegacyAttributes, "insertTextAfter"));
-                writer.Write(xsltTransformedOutput.Trim().Length > 0 ? xsltTransformedOutput : GetEmptyText(item));
+                 string finalResult = xsltTransformedOutput.Trim().Length > 0 ? xsltTransformedOutput : GetEmptyText(item); 
+                writer.Write(IOHelper.ResolveUrlsFromTextString(finalResult));
             }
             catch (Exception renderException)
             {

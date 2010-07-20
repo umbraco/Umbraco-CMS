@@ -285,10 +285,10 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
         private string formatMedia(string html)
         {
             // Local media path
-            string localMediaPath = getLocalMediaPath();
+            string localMediaPath = IOHelper.ResolveUrl(SystemDirectories.Media);
 
             // Find all media images
-            string pattern = "<img [^>]*src=\"(?<mediaString>/media[^\"]*)\" [^>]*>";
+            string pattern = String.Format("<img [^>]*src=\"(?<mediaString>{0}[^\"]*)\" [^>]*>", SystemDirectories.Media);
 
             MatchCollection tags =
                 Regex.Matches(html, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
@@ -321,9 +321,9 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
 
                     // Find the original filename, by removing the might added width and height
                     orgSrc =
-                        orgSrc.Replace(
+                        IOHelper.ResolveUrl(orgSrc.Replace(
                             "_" + helper.FindAttribute(ht, "width") + "x" + helper.FindAttribute(ht, "height"), "").
-                            Replace("%20", " ");
+                            Replace("%20", " "));
 
                     // Check for either id or guid from media
                     string mediaId = getIdFromSource(orgSrc, localMediaPath);
@@ -383,6 +383,9 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
 
         private string getIdFromSource(string src, string localMediaPath)
         {
+            if (!localMediaPath.EndsWith("/"))
+                localMediaPath += "/";
+
             // important - remove out the umbraco path + media!
             src = src.Replace(localMediaPath, "");
 

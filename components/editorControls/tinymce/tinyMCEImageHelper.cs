@@ -139,8 +139,6 @@ namespace umbraco.editorControls.tinymce
             int newWidth = int.Parse(resizeDimSplit[0]);
             int newHeight = int.Parse(resizeDimSplit[1]);
 
-            //THIS I DO NOW KNOW HOW TO MAKE WORK WITH A VIRTUAL DIRECTORY... 
-
             if (orgHeight > 0 && orgWidth > 0 && resizeDim != "" && orgSrc != "")
             {
                 // Check dimensions
@@ -154,9 +152,11 @@ namespace umbraco.editorControls.tinymce
                 }
 
                 // update orgSrc to remove umbraco reference
-                if (IOHelper.ResolveUrl(orgSrc).IndexOf( IOHelper.ResolveUrl(SystemDirectories.Media)) > -1)
-                    orgSrc = orgSrc.Substring( orgSrc.IndexOf("/media/"), orgSrc.Length - orgSrc.IndexOf("/media/") );
-
+                string resolvedMedia = IOHelper.ResolveUrl(SystemDirectories.Media);
+                if (IOHelper.ResolveUrl(orgSrc).IndexOf(resolvedMedia) > -1)
+                {
+                    orgSrc = SystemDirectories.Media + orgSrc.Substring(orgSrc.IndexOf(resolvedMedia) + resolvedMedia.Length); //, orgSrc.Length - orgSrc.IndexOf(String.Format("/media/", SystemDirectories.Media)));
+                }
                 string ext = orgSrc.Substring(orgSrc.LastIndexOf(".") + 1, orgSrc.Length - orgSrc.LastIndexOf(".") - 1);
                 newSrc = orgSrc.Replace("." + ext, "_" + newWidth.ToString() + "x" + newHeight.ToString() + ".jpg");
 

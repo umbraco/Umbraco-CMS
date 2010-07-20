@@ -6,6 +6,7 @@ using System.IO;
 using System.Configuration;
 using System.Web;
 using umbraco.BusinessLogic;
+using System.Text.RegularExpressions;
 
 namespace umbraco.IO
 {
@@ -28,8 +29,8 @@ namespace umbraco.IO
 
             if (virtualPath.StartsWith("~"))
                 retval = virtualPath.Replace("~", SystemDirectories.Root);
-            
-            if(virtualPath.StartsWith("/") && !virtualPath.StartsWith(SystemDirectories.Root))
+
+            if (virtualPath.StartsWith("/") && !virtualPath.StartsWith(SystemDirectories.Root))
                 retval = SystemDirectories.Root + "/" + virtualPath.TrimStart('/');
 
             return retval;
@@ -39,15 +40,42 @@ namespace umbraco.IO
         public static string ResolveUrl(string virtualPath)
         {
             if (virtualPath.StartsWith("~"))
-                return virtualPath.Replace("~", SystemDirectories.Root).Replace("//","/");
+                return virtualPath.Replace("~", SystemDirectories.Root).Replace("//", "/");
             else
                 return VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root);
+        }
+
+        public static string ResolveUrlsFromTextString(string text)
+        {
+            // find all relative urls (ie. urls that contain ~)
+            string pattern = "(/~/[^'\"\\s\\v]*)[\"\\s\\<]|(~/[^'\"\\s\\v]*)[\"\\s\\<]|(~/[^'\"\\s\\v]*)";
+            MatchCollection tags =
+                Regex.Matches(text, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+            foreach (Match tag in tags)
+            {
+                string url = "";
+                if (tag.Groups[0].Success)
+                    url = tag.Groups[0].Value;
+                else if (tag.Groups[1].Success)
+                    url = tag.Groups[1].Value;
+                else
+                    url = tag.Groups[2].Value;
+
+                // The richtext editor inserts a slash in front of the url. That's why we need this little fix
+//                if (url.StartsWith("/"))
+//                    text = text.Replace(url, ResolveUrl(url.Substring(1)));
+//                else
+                    text = text.Replace(url, ResolveUrl(url));
+
+            }
+
+            return text;
         }
 
         public static string MapPath(string path, bool useHttpContext)
         {
             // Check if the path is already mapped
-            if (path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)      
+            if (path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
                 return path;
 
             if (useHttpContext)
@@ -59,13 +87,13 @@ namespace umbraco.IO
                     return System.Web.Hosting.HostingEnvironment.MapPath("~/" + path.TrimStart('/'));
             }
             else
-            {   
+            {
                 string _root = (!String.IsNullOrEmpty(System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath)) ? System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath.TrimEnd(IOHelper.DirSepChar) : getRootDirectorySafe();
 
-                string _path = path.TrimStart('~','/').Replace('/', IOHelper.DirSepChar);
+                string _path = path.TrimStart('~', '/').Replace('/', IOHelper.DirSepChar);
 
                 string retval = _root + IOHelper.DirSepChar.ToString() + _path;
-                
+
                 return retval;
             }
         }
@@ -80,13 +108,13 @@ namespace umbraco.IO
         {
             string retval = ConfigurationManager.AppSettings[settingsKey];
 
-            if ( string.IsNullOrEmpty(retval) )
+            if (string.IsNullOrEmpty(retval))
                 retval = standardPath;
 
             return retval.TrimEnd('/');
         }
 
-        
+
         public static string returnPath(string settingsKey, string standardPath)
         {
             return returnPath(settingsKey, standardPath, false);
@@ -99,7 +127,8 @@ namespace umbraco.IO
         /// even if the assembly is in a /bin/debug or /bin/release folder
         /// </summary>
         /// <returns></returns>
-        private static string getRootDirectorySafe() {
+        private static string getRootDirectorySafe()
+        {
             if (!String.IsNullOrEmpty(m_rootDir))
             {
                 return m_rootDir;
@@ -107,11 +136,11 @@ namespace umbraco.IO
 
             string baseDirectory =
                 System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase.Substring(8));
-            m_rootDir = baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin")-1);
+            m_rootDir = baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin") - 1);
 
             return m_rootDir;
 
-       }
+        }
 
     }
 }
