@@ -38,7 +38,7 @@ namespace umbraco.cms.businesslogic.translation
                 if(port != 80)
                     serverName += ":" + port.ToString();
 
-                serverName += SystemDirectories.Umbraco;
+                serverName += IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 
                 // Send mail
                 string[] subjectVars = {serverName, Node.Text};
