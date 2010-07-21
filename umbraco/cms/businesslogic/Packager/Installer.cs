@@ -379,7 +379,7 @@ namespace umbraco.cms.businesslogic.packager
             if (saveNeeded) { insPack.Save(); saveNeeded = false; }
 
             // Documents
-            foreach (XmlElement n in _packageConfig.DocumentElement.SelectNodes("Documents/DocumentSet [@importMode = 'root']/node")) {
+            foreach (XmlElement n in _packageConfig.DocumentElement.SelectNodes("Documents/DocumentSet [@importMode = 'root']/*")) {
                 insPack.Data.ContentNodeId = cms.businesslogic.web.Document.Import(-1, u, n).ToString();
             }
 
@@ -572,7 +572,7 @@ namespace umbraco.cms.businesslogic.packager
             }
 
             // Documents
-            foreach (XmlElement n in _packageConfig.DocumentElement.SelectNodes("Documents/DocumentSet [@importMode = 'root']/node")) {
+            foreach (XmlElement n in _packageConfig.DocumentElement.SelectNodes("Documents/DocumentSet [@importMode = 'root']/*")) {
                 cms.businesslogic.web.Document.Import(-1, u, n);
 
                 //PPH todo log document install... 

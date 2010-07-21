@@ -243,63 +243,103 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="Source">Xmlsource</param>
         public static int Import(int ParentId, User Creator, XmlElement Source)
         {
-            Document d = MakeNew(
-                Source.GetAttribute("nodeName"),
-                DocumentType.GetByAlias(Source.GetAttribute("nodeTypeAlias")),
-                Creator,
-                ParentId);
+            // check what schema is used for the xml
+            bool sourceIsLegacySchema = Source.Name.ToLower() == "node" ? true : false;
+
+            // check whether or not to create a new document
+            int id = int.Parse(Source.GetAttribute("id"));
+            Document d = null;
+            if (Document.IsDocument(id))
+            {
+                try
+                {
+                    // if the parent is the same, we'll update the existing document. Else we'll create a new document below
+                    d = new Document(id);
+                    if (d.ParentId != ParentId)
+                        d = null;
+                }
+                catch { }
+            }
+
+            // document either didn't exist or had another parent so we'll create a new one
+            if (d == null)
+            {
+                string nodeTypeAlias = sourceIsLegacySchema ? Source.GetAttribute("nodeTypeAlias") : Source.Name;
+                d = MakeNew(
+                    Source.GetAttribute("nodeName"),
+                    DocumentType.GetByAlias(nodeTypeAlias),
+                    Creator,
+                    ParentId);
+            }
+            else
+            {
+                // update name of the document
+                d.Text = Source.GetAttribute("nodeName");
+            }
 
             d.CreateDateTime = DateTime.Parse(Source.GetAttribute("createDate"));
 
             // Properties
-            foreach (XmlElement n in Source.SelectNodes("data"))
+            string propertyXPath = sourceIsLegacySchema ? "data" : "* [not(@isDoc)]";
+            foreach (XmlElement n in Source.SelectNodes(propertyXPath))
             {
-                Property prop = d.getProperty(n.GetAttribute("alias"));
+                string propertyAlias = sourceIsLegacySchema ? n.GetAttribute("alias") : n.Name;
+                Property prop = d.getProperty(propertyAlias);
                 string propValue = xmlHelper.GetNodeValue(n);
 
-                // only update real values
-                if (!String.IsNullOrEmpty(propValue))
+                if (prop != null)
                 {
-                    //test if the property has prevalues, of so, try to convert the imported values so they match the new ones
-                    SortedList prevals = cms.businesslogic.datatype.PreValues.GetPreValues(prop.PropertyType.DataTypeDefinition.Id);
-
-                    //Okey we found some prevalue, let's replace the vals with some ids
-                    if (prevals.Count > 0)
+                    // only update real values
+                    if (!String.IsNullOrEmpty(propValue))
                     {
-                        System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>(propValue.Split(','));
+                        //test if the property has prevalues, of so, try to convert the imported values so they match the new ones
+                        SortedList prevals = cms.businesslogic.datatype.PreValues.GetPreValues(prop.PropertyType.DataTypeDefinition.Id);
 
-                        foreach (DictionaryEntry item in prevals)
+                        //Okey we found some prevalue, let's replace the vals with some ids
+                        if (prevals.Count > 0)
                         {
-                            string pval = ((umbraco.cms.businesslogic.datatype.PreValue)item.Value).Value;
-                            string pid = ((umbraco.cms.businesslogic.datatype.PreValue)item.Value).Id.ToString();
+                            System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string>(propValue.Split(','));
 
-                            if (list.Contains(pval))
-                                list[list.IndexOf(pval)] = pid;
+                            foreach (DictionaryEntry item in prevals)
+                            {
+                                string pval = ((umbraco.cms.businesslogic.datatype.PreValue)item.Value).Value;
+                                string pid = ((umbraco.cms.businesslogic.datatype.PreValue)item.Value).Id.ToString();
+
+                                if (list.Contains(pval))
+                                    list[list.IndexOf(pval)] = pid;
+
+                            }
+
+                            //join the list of new values and return it as the new property value
+                            System.Text.StringBuilder builder = new System.Text.StringBuilder();
+                            bool isFirst = true;
+
+                            foreach (string str in list)
+                            {
+                                if (!isFirst)
+                                    builder.Append(",");
+
+                                builder.Append(str);
+                                isFirst = false;
+                            }
+                            prop.Value = builder.ToString();
 
                         }
-
-                        //join the list of new values and return it as the new property value
-                        System.Text.StringBuilder builder = new System.Text.StringBuilder();
-                        bool isFirst = true;
-
-                        foreach (string str in list)
-                        {
-                            if (!isFirst)
-                                builder.Append(",");
-
-                            builder.Append(str);
-                            isFirst = false;
-                        }
-                        prop.Value = builder.ToString();
-
+                        else
+                            prop.Value = propValue;
                     }
-                    else
-                        prop.Value = propValue;
+                }
+                else
+                {
+                    Log.Add(LogTypes.Error, d.Id, String.Format("Couldn't import property '{0}' as the property type doesn't exist on this document type", propertyAlias));
                 }
             }
 
+            d.Save();
+
             // Subpages
-            foreach (XmlElement n in Source.SelectNodes("node"))
+            string subXPath = sourceIsLegacySchema ? "node" : "* [@isDoc]";
+            foreach (XmlElement n in Source.SelectNodes(subXPath))
                 Import(d.Id, Creator, n);
 
             return d.Id;

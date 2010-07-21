@@ -20,23 +20,25 @@ namespace umbraco.presentation.translation
     public partial class xml : BasePages.UmbracoEnsuredPage
     {
         private XmlDocument xd = new XmlDocument();
-        
+
         protected void Page_Load(object sender, EventArgs e)
         {
             Response.ContentType = "text/xml";
             int pageId;
 
             XmlNode root = xd.CreateElement("tasks");
-                        
+
             if (int.TryParse(Request["id"], out pageId))
             {
                 Task t = new Task(pageId);
-                if (t.User.Id == base.getUser().Id || t.ParentUser.Id == base.getUser().Id) {
+                if (t.User.Id == base.getUser().Id || t.ParentUser.Id == base.getUser().Id)
+                {
                     XmlNode x = CreateTaskNode(t, xd);
                     root.AppendChild(x);
 
-                   xmlContents.Text = root.OuterXml;
-                   Response.AddHeader("Content-Disposition", "attachment; filename=" + x.SelectSingleNode("//node").Attributes.GetNamedItem("nodeName").Value.Replace(" ", "_") + ".xml");
+                    xmlContents.Text = root.OuterXml;
+
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + t.Node.Text.Replace(" ", "_") + ".xml");
                 }
             }
             else
@@ -46,7 +48,8 @@ namespace umbraco.presentation.translation
 
                 foreach (Task t in Task.GetTasks(base.getUser(), false))
                 {
-                    if (!nodes.ContainsKey(t.Node.Path)) {
+                    if (!nodes.ContainsKey(t.Node.Path))
+                    {
                         XmlElement xTask = CreateTaskNode(t, xd);
                         totalWords += int.Parse(xTask.Attributes.GetNamedItem("TotalWords").Value);
                         nodes.Add(t.Node.Path, xTask);
@@ -58,17 +61,19 @@ namespace umbraco.presentation.translation
                 while (ide.MoveNext())
                 {
                     XmlElement x = (XmlElement)ide.Value;
-                    XmlNode parent = xd.SelectSingleNode("//node [@id = '" + x.SelectSingleNode("//node").Attributes.GetNamedItem("parentID").Value + "']");
+                    string parentXpath = UmbracoSettings.UseLegacyXmlSchema ? "//node [@id = '" + x.SelectSingleNode("//node").Attributes.GetNamedItem("parentID").Value + "']" :
+                        "//* [@isDoc and @id = '" + x.SelectSingleNode("//* [@isDoc]").Attributes.GetNamedItem("parentID").Value + "']";
+                    XmlNode parent = xd.SelectSingleNode(parentXpath);
 
                     if (parent == null)
                         parent = root;
                     else
                         parent = parent.ParentNode;
 
-                    parent.AppendChild((XmlElement) ide.Value);
+                    parent.AppendChild((XmlElement)ide.Value);
                 }
 
-                root.Attributes.Append(global::umbraco.xmlHelper.addAttribute(xd, "TotalWords" , totalWords.ToString() ) );
+                root.Attributes.Append(global::umbraco.xmlHelper.addAttribute(xd, "TotalWords", totalWords.ToString()));
                 xmlContents.Text = root.OuterXml;
                 Response.AddHeader("Content-Disposition", "attachment; filename=all.xml");
 
@@ -78,7 +83,7 @@ namespace umbraco.presentation.translation
         private XmlElement CreateTaskNode(Task t, XmlDocument xd)
         {
             Document d = new Document(t.Node.Id);
-            XmlNode x = xd.CreateNode(XmlNodeType.Element, "node", "");
+            XmlNode x = d.ToPreviewXml(xd);//  xd.CreateNode(XmlNodeType.Element, "node", "");
 
             XmlElement xTask = xd.CreateElement("task");
             xTask.SetAttributeNode(xmlHelper.addAttribute(xd, "Id", t.Id.ToString()));
@@ -87,7 +92,7 @@ namespace umbraco.presentation.translation
             xTask.SetAttributeNode(xmlHelper.addAttribute(xd, "TotalWords", cms.businesslogic.translation.Translation.CountWords(d.Id).ToString()));
             xTask.AppendChild(xmlHelper.addCDataNode(xd, "Comment", t.Comment));
             xTask.AppendChild(xmlHelper.addTextNode(xd, "PreviewUrl", "http://" + Request.ServerVariables["SERVER_NAME"] + SystemDirectories.Umbraco + "/translation/preview.aspx?id=" + t.Id.ToString()));
-            d.XmlPopulate(xd, ref x, false);
+            //            d.XmlPopulate(xd, ref x, false);
             xTask.AppendChild(x);
 
             return xTask;

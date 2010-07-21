@@ -14,7 +14,7 @@ namespace umbraco.presentation.umbraco.dialogs
     public partial class ExportCode : BasePages.UmbracoEnsuredPage
     {
         private Dictionary<Guid, Type> dataTypeMapping = new Dictionary<Guid, Type>();
-        private const string EXPORT_FOLDER = "exported-doctypes/";
+        private const string EXPORT_FOLDER = "/exported-doctypes/";
 
         private List<DocumentType> _docTypes;
         public List<DocumentType> DocTypes

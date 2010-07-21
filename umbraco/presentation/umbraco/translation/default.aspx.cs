@@ -176,7 +176,8 @@ namespace umbraco.presentation.translation
                 XmlNodeList tasks = tf.SelectNodes("//task");
 
                 foreach (XmlNode taskXml in tasks) {
-                    XmlNode taskNode = taskXml.SelectSingleNode("node");
+                    string xpath = UmbracoSettings.UseLegacyXmlSchema ? "node" : "* [@isDoc]";
+                    XmlNode taskNode = taskXml.SelectSingleNode(xpath);
 
                     // validate file
                     Task t = new Task(int.Parse(taskXml.Attributes.GetNamedItem("Id").Value));
@@ -186,7 +187,8 @@ namespace umbraco.presentation.translation
                             
                             // update node contents
                             Document d = new Document(t.Node.Id);
-                            d.Text = taskNode.Attributes.GetNamedItem("nodeName").Value.Trim();
+                            Document.Import(d.ParentId, getUser(), (XmlElement)taskNode);
+/*                            d.Text = taskNode.Attributes.GetNamedItem("nodeName").Value.Trim();
 
                             // update data elements
                             foreach (XmlNode data in taskNode.SelectNodes("data"))
@@ -194,7 +196,7 @@ namespace umbraco.presentation.translation
                                     d.getProperty(data.Attributes.GetNamedItem("alias").Value).Value = data.FirstChild.Value;
                                 else
                                     d.getProperty(data.Attributes.GetNamedItem("alias").Value).Value = "";
-
+                            */
 
                             t.Closed = true;
                             t.Save();

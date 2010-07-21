@@ -27,13 +27,13 @@ namespace umbraco.presentation.translation
 
             Task t = new Task(taskId);
             Document translated = new Document(t.Node.Id);
-                        
-            translatedUrl = String.Format("/{0}.aspx?umbVersion={1}", translated.Id.ToString(), translated.Version.ToString());
+
+            translatedUrl = String.Format("../dialogs/preview.aspx?id={0}", translated.Id.ToString(), translated.Version.ToString());
 
             Relation[] orgRel = Relation.GetRelations(t.Node.Id, RelationType.GetByAlias("relateDocumentOnCopy"));
             if (orgRel.Length > 0) {
                 Document original = new Document(orgRel[0].Parent.Id);
-                originalUrl = String.Format("/{0}.aspx?umbVersion={1}", original.Id.ToString(), original.Version.ToString());
+                originalUrl = String.Format("../dialogs/preview.aspx?id={0}", original.Id.ToString(), original.Version.ToString());
             } else {
                 Response.Redirect(translatedUrl);
             }
