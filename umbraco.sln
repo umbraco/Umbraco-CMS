@@ -2,7 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0242771-6DE6-4E03-BD3A-7B79BA79105B}"
 	ProjectSection(SolutionItems) = preProject
-		aspnet35.build = aspnet35.build
 		build.xml = build.xml
 		default.build = default.build
 		INDIGO64.testrunconfig = INDIGO64.testrunconfig
@@ -10,7 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		SHOCKING.testrunconfig = SHOCKING.testrunconfig
 		umbraco weekly.build = umbraco weekly.build
 		umbraco.build = umbraco.build
-		umbraco1.vsmdi = umbraco1.vsmdi
 		UMBRACOELISE.testrunconfig = UMBRACOELISE.testrunconfig
 		UMBRACOHUMMER.testrunconfig = UMBRACOHUMMER.testrunconfig
 	EndProjectSection
@@ -43,6 +41,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{05329D
 		config templates\config\metablogConfig.config = config templates\config\metablogConfig.config
 		config templates\config\restExtensions.config = config templates\config\restExtensions.config
 		config templates\config\scripting.config = config templates\config\scripting.config
+		config templates\config\tinyMceConfig.config = config templates\config\tinyMceConfig.config
 		config templates\config\umbracoSettings.config = config templates\config\umbracoSettings.config
 		config templates\config\UrlRewriting.config = config templates\config\UrlRewriting.config
 		config templates\config\xsltExtensions.config = config templates\config\xsltExtensions.config
@@ -50,7 +49,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{05329D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{58072405-85D0-45CA-8F5C-EA8928C32A6A}"
 	ProjectSection(SolutionItems) = preProject
-		docs\Umbraco 4 beta 2 update.docx = docs\Umbraco 4 beta 2 update.docx
+		docs\changelog.docx = docs\changelog.docx
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Upgrade 4.1", "Upgrade 4.1", "{C5FA9596-B9DC-4DF9-8380-AFC19C1EF51F}"
@@ -66,9 +65,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{F06D18F6-C
 		foreign dlls\ICSharpCode.SharpZipLib.dll = foreign dlls\ICSharpCode.SharpZipLib.dll
 		foreign dlls\IronMath.dll = foreign dlls\IronMath.dll
 		IronPython License.Rtf = IronPython License.Rtf
+		foreign dlls\IronPython.dll = foreign dlls\IronPython.dll
+		foreign dlls\IronRuby.dll = foreign dlls\IronRuby.dll
 		License.txt = License.txt
 		foreign dlls\Lucene.Net.dll = foreign dlls\Lucene.Net.dll
 		foreign dlls\Microsoft.ApplicationBlocks.Data.dll = foreign dlls\Microsoft.ApplicationBlocks.Data.dll
+		foreign dlls\Microsoft.Scripting.Core.dll = foreign dlls\Microsoft.Scripting.Core.dll
+		foreign dlls\Microsoft.Scripting.dll = foreign dlls\Microsoft.Scripting.dll
+		foreign dlls\Microsoft.Scripting.ExtensionAttribute.dll = foreign dlls\Microsoft.Scripting.ExtensionAttribute.dll
 		foreign dlls\MySql.Data.dll = foreign dlls\MySql.Data.dll
 		foreign dlls\TidyNet.dll = foreign dlls\TidyNet.dll
 		foreign dlls\UmbracoExamine.dll = foreign dlls\UmbracoExamine.dll
@@ -150,7 +154,7 @@ Global
 		SccLocalPath13 = umbraco.Test
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = umbraco1.vsmdi
+		CategoryFile = umbraco.vsmdi
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
