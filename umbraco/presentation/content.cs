@@ -1053,9 +1053,11 @@ order by umbracoNode.level, umbracoNode.sortOrder";
              * will check for this and call PersistXmlToFile() if necessary */
             if (HttpContext.Current != null)
             {
-                if (!HttpContext.Current.Items.Contains(PersistenceFlagContextKey))
-                    HttpContext.Current.Items.Add(PersistenceFlagContextKey, null);
-                HttpContext.Current.Items[PersistenceFlagContextKey] = true;
+                HttpContext.Current.Application.Lock();
+                if (HttpContext.Current.Application[PersistenceFlagContextKey] != null)
+                    HttpContext.Current.Application.Add(PersistenceFlagContextKey, null);
+                HttpContext.Current.Application[PersistenceFlagContextKey] = true;
+                HttpContext.Current.Application.UnLock();
             }
             else
             {
@@ -1079,7 +1081,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         {
             get
             {
-                var val = HttpContext.Current.Items.Contains(PersistenceFlagContextKey);
+                var val = HttpContext.Current.Application[PersistenceFlagContextKey] != null;
                 if (val != null)
                 {
                     return bool.Parse(val.ToString());
