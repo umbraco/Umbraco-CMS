@@ -143,4 +143,7 @@
   </Target>-->
   <Target Name="AfterBuild">
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>XCOPY "$(TargetPath)" "$(SolutionDir)\umbraco\presentation\bin" /Y</PostBuildEvent>
+  </PropertyGroup>
 </Project>
