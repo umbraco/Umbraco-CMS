@@ -114,7 +114,7 @@
         //used for deeplinking to specific content whilst still showing the tree
         var initApp = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["app"]%>';
         var rightAction = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["rightAction"]%>';
-        var rightActionId = '{<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["id"]%>}';
+        var rightActionId = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["id"]%>';
 
         jQuery(document).ready(function () {
 
@@ -139,6 +139,9 @@
 
             if (rightAction != '') {
                 //if an action is specified, then load it
+                UmbClientMgr.historyManager().addHistory(initApp != "" ? initApp :
+                                                        UmbClientMgr.historyManager().getCurrent() != "" ? UmbClientMgr.historyManager().getCurrent() :
+                                                        "<%=DefaultApp%>", true);
                 UmbClientMgr.contentFrame(rightAction + ".aspx?id=" + rightActionId);
             }
             else {
