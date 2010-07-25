@@ -429,7 +429,7 @@ namespace umbraco
                                 // check root nodes for domains
                                 if (UmbracoSettings.UseDomainPrefixes && startNode > 1)
                                 {
-                                    if (node.ParentNode.Name.ToLower() == "node")
+                                    if (node.ParentNode.Name.ToLower() != "root")
                                     {
                                         Domain[] domains =
                                             Domain.GetDomainsById(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value));
@@ -486,10 +486,16 @@ namespace umbraco
         private static string appendUrlExtension(string baseUrl, bool directoryUrls, string tempUrl)
         {
             if (!directoryUrls)
+            {
                 // append .aspx extension if the url includes other than just the domain name
                 if (tempUrl.ToString() != "" &&
                     (!tempUrl.StartsWith("http://") || tempUrl.Replace("http://", "").IndexOf("/") > -1))
                     tempUrl = baseUrl + tempUrl + ".aspx";
+            }
+            else
+            {
+                tempUrl = baseUrl + tempUrl;
+            }
             return tempUrl;
         }
 
