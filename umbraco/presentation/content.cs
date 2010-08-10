@@ -1026,6 +1026,11 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                         Trace.Write(string.Format("Saved content on thread '{0}' in {1} (Threadpool? {2})", Thread.CurrentThread.Name, stopWatch.Elapsed, Thread.CurrentThread.IsThreadPoolThread.ToString()));
 
                         Log.Add(LogTypes.Debug, staticUser, -1, string.Format("Xml saved in {0}", stopWatch.Elapsed));
+
+                        // Clear persistence flag
+                        HttpContext.Current.Application.Lock();
+                        HttpContext.Current.Application[PersistenceFlagContextKey] = null;
+                        HttpContext.Current.Application.UnLock();
                     }
                     catch (Exception ee)
                     {
