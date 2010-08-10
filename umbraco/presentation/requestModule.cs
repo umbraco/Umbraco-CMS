@@ -183,11 +183,16 @@ namespace umbraco.presentation
                                 query = receivedQuery.Substring(1);
                             }
                         }
+
+                        // Add questionmark to query string if it's not empty
+                        if (!String.IsNullOrEmpty(query))
+                            query = "?" + query;
+
                         // save original URL
                         context.Items["UmbPage"] = path;
-                        context.Items["VirtualUrl"] = String.Format("{0}?{1}", path, query);
+                        context.Items["VirtualUrl"] = String.Format("{0}{1}", path, query);
                         // rewrite to the new URL
-                        context.RewritePath(string.Format("{0}/default.aspx?{2}",
+                        context.RewritePath(string.Format("{0}/default.aspx{2}",
                                                           SystemDirectories.Root, path, query));
                     }
                 }
