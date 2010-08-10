@@ -722,7 +722,7 @@ namespace umbraco
             {
                 if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
                 {
-                    XPathNodeIterator retVal = Cache.GetCacheItem<XPathNodeIterator>(String.Format(
+                    XmlDocument retVal = Cache.GetCacheItem<XmlDocument>(String.Format(
                         "UL_{0}_{1}", GETMEMBER_CACHE_KEY, MemberId), libraryCacheLock,
                         TimeSpan.FromSeconds(UmbracoSettings.UmbracoLibraryCacheDuration),
                         delegate
@@ -731,11 +731,11 @@ namespace umbraco
                         });
 
                     if (retVal != null)
-                        return retVal;
+                        return retVal.CreateNavigator().Select("/");
                 }
                 else
                 {
-                    return getMemberDo(MemberId);
+                    return getMemberDo(MemberId).CreateNavigator().Select("/");
                 }
 
             }
@@ -747,15 +747,14 @@ namespace umbraco
             return xd.CreateNavigator().Select("/");
         }
 
-        private static XPathNodeIterator getMemberDo(int MemberId)
+        private static XmlDocument getMemberDo(int MemberId)
         {
             Member m = new Member(MemberId);
             XmlDocument mXml = new XmlDocument();
             mXml.LoadXml(m.ToXml(mXml, false).OuterXml);
-            XPathNavigator xp = mXml.CreateNavigator();
-            string xpath = UmbracoSettings.UseLegacyXmlSchema ? "/node" : String.Format("/{0}", Casing.SafeAliasWithForcingCheck(m.ContentType.Alias));
-            return xp.Select(xpath);
+            return mXml;
         }
+
         /// <summary>
         /// Get the current member as an xml node
         /// </summary>
