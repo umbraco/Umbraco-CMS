@@ -109,7 +109,7 @@ namespace umbraco
 
                 try
                 {
-                    return ConfigurationManager.AppSettings["umbracoPath"];
+                    return IOHelper.ResolveUrl(ConfigurationManager.AppSettings["umbracoPath"]);
                 }
                 catch
                 {
