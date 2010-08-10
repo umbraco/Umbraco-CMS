@@ -302,7 +302,7 @@ CREATE TABLE cmsMacro
 id int NOT NULL PRIMARY KEY AUTO_INCREMENT, 
 macroUseInEditor bit NOT NULL DEFAULT 0, 
 macroRefreshRate int NOT NULL DEFAULT 0, 
-macroAlias nvarchar (50) NOT NULL, 
+macroAlias nvarchar (255) NOT NULL, 
 macroName nvarchar (255) NULL, 
 macroScriptType nvarchar (255) NULL, 
 macroScriptAssembly nvarchar (255) NULL, 

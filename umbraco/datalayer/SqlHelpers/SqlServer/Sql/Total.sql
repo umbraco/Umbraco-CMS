@@ -342,7 +342,7 @@ CREATE TABLE [cmsMacro]
 [id] [int] NOT NULL IDENTITY(1, 1), 
 [macroUseInEditor] [bit] NOT NULL CONSTRAINT [DF_macro_macroUseInEditor] DEFAULT (0), 
 [macroRefreshRate] [int] NOT NULL CONSTRAINT [DF_macro_macroRefreshRate] DEFAULT (0), 
-[macroAlias] [nvarchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, 
+[macroAlias] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, 
 [macroName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL, 
 [macroScriptType] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL, 
 [macroScriptAssembly] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL, 
@@ -821,7 +821,7 @@ set identity_insert umbracoNode off
 ;
 ALTER TABLE cmsDataTypePreValues ALTER COLUMN value NVARCHAR(2500) NULL
 ;
-CREATE TABLE [dbo].[cmsTask]
+CREATE TABLE [cmsTask]
 (
 [closed] [bit] NOT NULL CONSTRAINT [DF__cmsTask__closed__04E4BC85] DEFAULT ((0)),
 [id] [int] NOT NULL IDENTITY(1, 1),
@@ -833,18 +833,18 @@ CREATE TABLE [dbo].[cmsTask]
 [Comment] [nvarchar] (500) NULL
 )
 ;
-ALTER TABLE [dbo].[cmsTask] ADD CONSTRAINT [PK_cmsTask] PRIMARY KEY CLUSTERED  ([id])
+ALTER TABLE [cmsTask] ADD CONSTRAINT [PK_cmsTask] PRIMARY KEY CLUSTERED  ([id])
 ;
-CREATE TABLE [dbo].[cmsTaskType]
+CREATE TABLE [cmsTaskType]
 (
 [id] [tinyint] NOT NULL IDENTITY(1, 1),
 [alias] [nvarchar] (255) NOT NULL
 )
 ;
-ALTER TABLE [dbo].[cmsTaskType] ADD CONSTRAINT [PK_cmsTaskType] PRIMARY KEY CLUSTERED  ([id])
+ALTER TABLE [cmsTaskType] ADD CONSTRAINT [PK_cmsTaskType] PRIMARY KEY CLUSTERED  ([id])
 ;
-ALTER TABLE [dbo].[cmsTask] ADD
-CONSTRAINT [FK_cmsTask_cmsTaskType] FOREIGN KEY ([taskTypeId]) REFERENCES [dbo].[cmsTaskType] ([id])
+ALTER TABLE [cmsTask] ADD
+CONSTRAINT [FK_cmsTask_cmsTaskType] FOREIGN KEY ([taskTypeId]) REFERENCES [cmsTaskType] ([id])
 ;
 insert into cmsTaskType (alias) values ('toTranslate')
 ;
@@ -992,7 +992,7 @@ VALUES (0, 0, 0, 'media', 'mediaRecycleBin', 'RecycleBin', 'folder.gif', 'folder
 ;
 
 /* PREVIEW */
-CREATE TABLE [dbo].[cmsPreviewXml](
+CREATE TABLE [cmsPreviewXml](
 	[nodeId] [int] NOT NULL,
 	[versionId] [uniqueidentifier] NOT NULL,
 	[timestamp] [datetime] NOT NULL,
@@ -1122,7 +1122,7 @@ DELETE FROM cmsPreviewXml WHERE VersionID NOT IN (SELECT VersionId FROM cmsConte
 
 /* Though this should not have to run because it's a new install, you need to remove this constraint if you've been testing with the RC */
 IF EXISTS (SELECT name FROM sysindexes WHERE name = 'IX_cmsMemberType')
-ALTER TABLE [dbo].[cmsMemberType] DROP CONSTRAINT [IX_cmsMemberType]
+ALTER TABLE [cmsMemberType] DROP CONSTRAINT [IX_cmsMemberType]
 
 /************************** CLEANUP END ********************************************/
 
@@ -1131,108 +1131,108 @@ ALTER TABLE [dbo].[cmsMemberType] DROP CONSTRAINT [IX_cmsMemberType]
 CREATE NONCLUSTERED INDEX [IX_Icon] ON CMSContenttype(nodeId, Icon)
 ;
 
-ALTER TABLE dbo.cmsContentType ADD CONSTRAINT
+ALTER TABLE cmsContentType ADD CONSTRAINT
 	IX_cmsContentType UNIQUE NONCLUSTERED 
 	(
 	nodeId
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
-ALTER TABLE dbo.cmsContent ADD CONSTRAINT
+ALTER TABLE cmsContent ADD CONSTRAINT
 	IX_cmsContent UNIQUE NONCLUSTERED 
 	(
 	nodeId
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
-ALTER TABLE dbo.cmsContentVersion ADD CONSTRAINT
+ALTER TABLE cmsContentVersion ADD CONSTRAINT
 	FK_cmsContentVersion_cmsContent FOREIGN KEY
 	(
 	ContentId
-	) REFERENCES dbo.cmsContent
+	) REFERENCES cmsContent
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsMember ADD CONSTRAINT
+ALTER TABLE cmsMember ADD CONSTRAINT
 	PK_cmsMember PRIMARY KEY CLUSTERED 
 	(
 	nodeId
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
-ALTER TABLE dbo.cmsMember ADD CONSTRAINT
+ALTER TABLE cmsMember ADD CONSTRAINT
 	FK_cmsMember_cmsContent FOREIGN KEY
 	(
 	nodeId
-	) REFERENCES dbo.cmsContent
+	) REFERENCES cmsContent
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsMember ADD CONSTRAINT
+ALTER TABLE cmsMember ADD CONSTRAINT
 	FK_cmsMember_umbracoNode FOREIGN KEY
 	(
 	nodeId
-	) REFERENCES dbo.umbracoNode
+	) REFERENCES umbracoNode
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsStylesheet ADD CONSTRAINT
+ALTER TABLE cmsStylesheet ADD CONSTRAINT
 	PK_cmsStylesheet PRIMARY KEY CLUSTERED 
 	(
 	nodeId
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
-ALTER TABLE dbo.cmsStylesheetProperty ADD CONSTRAINT
+ALTER TABLE cmsStylesheetProperty ADD CONSTRAINT
 	PK_cmsStylesheetProperty PRIMARY KEY CLUSTERED 
 	(
 	nodeId
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
-ALTER TABLE dbo.cmsStylesheetProperty ADD CONSTRAINT
+ALTER TABLE cmsStylesheetProperty ADD CONSTRAINT
 	FK_cmsStylesheetProperty_umbracoNode FOREIGN KEY
 	(
 	nodeId
-	) REFERENCES dbo.umbracoNode
+	) REFERENCES umbracoNode
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsStylesheet ADD CONSTRAINT
+ALTER TABLE cmsStylesheet ADD CONSTRAINT
 	FK_cmsStylesheet_umbracoNode FOREIGN KEY
 	(
 	nodeId
-	) REFERENCES dbo.umbracoNode
+	) REFERENCES umbracoNode
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsContentXml ADD CONSTRAINT
+ALTER TABLE cmsContentXml ADD CONSTRAINT
 	FK_cmsContentXml_cmsContent FOREIGN KEY
 	(
 	nodeId
-	) REFERENCES dbo.cmsContent
+	) REFERENCES cmsContent
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsDataType ADD CONSTRAINT
+ALTER TABLE cmsDataType ADD CONSTRAINT
 	IX_cmsDataType UNIQUE NONCLUSTERED 
 	(
 	nodeId
@@ -1241,11 +1241,11 @@ ALTER TABLE dbo.cmsDataType ADD CONSTRAINT
 
 
 
-ALTER TABLE dbo.cmsDataType ADD CONSTRAINT
+ALTER TABLE cmsDataType ADD CONSTRAINT
 	FK_cmsDataType_umbracoNode FOREIGN KEY
 	(
 	nodeId
-	) REFERENCES dbo.umbracoNode
+	) REFERENCES umbracoNode
 	(
 	id
 	) ON UPDATE  NO ACTION 
@@ -1254,95 +1254,95 @@ ALTER TABLE dbo.cmsDataType ADD CONSTRAINT
 
 
 
-ALTER TABLE dbo.cmsDataTypePreValues ADD CONSTRAINT
+ALTER TABLE cmsDataTypePreValues ADD CONSTRAINT
 	FK_cmsDataTypePreValues_cmsDataType FOREIGN KEY
 	(
 	datatypeNodeId
-	) REFERENCES dbo.cmsDataType
+	) REFERENCES cmsDataType
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsDocument ADD CONSTRAINT
+ALTER TABLE cmsDocument ADD CONSTRAINT
 	FK_cmsDocument_cmsContent FOREIGN KEY
 	(
 	nodeId
-	) REFERENCES dbo.cmsContent
+	) REFERENCES cmsContent
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsDocumentType ADD CONSTRAINT
+ALTER TABLE cmsDocumentType ADD CONSTRAINT
 	FK_cmsDocumentType_cmsContentType FOREIGN KEY
 	(
 	contentTypeNodeId
-	) REFERENCES dbo.cmsContentType
+	) REFERENCES cmsContentType
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsDocumentType ADD CONSTRAINT
+ALTER TABLE cmsDocumentType ADD CONSTRAINT
 	FK_cmsDocumentType_umbracoNode FOREIGN KEY
 	(
 	contentTypeNodeId
-	) REFERENCES dbo.umbracoNode
+	) REFERENCES umbracoNode
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsMacroProperty ADD CONSTRAINT
+ALTER TABLE cmsMacroProperty ADD CONSTRAINT
 	FK_cmsMacroProperty_cmsMacro FOREIGN KEY
 	(
 	macro
-	) REFERENCES dbo.cmsMacro
+	) REFERENCES cmsMacro
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsMemberType ADD CONSTRAINT
+ALTER TABLE cmsMemberType ADD CONSTRAINT
 	FK_cmsMemberType_cmsContentType FOREIGN KEY
 	(
 	NodeId
-	) REFERENCES dbo.cmsContentType
+	) REFERENCES cmsContentType
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsMemberType ADD CONSTRAINT
+ALTER TABLE cmsMemberType ADD CONSTRAINT
 	FK_cmsMemberType_umbracoNode FOREIGN KEY
 	(
 	NodeId
-	) REFERENCES dbo.umbracoNode
+	) REFERENCES umbracoNode
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsMember2MemberGroup ADD CONSTRAINT
+ALTER TABLE cmsMember2MemberGroup ADD CONSTRAINT
 	FK_cmsMember2MemberGroup_cmsMember FOREIGN KEY
 	(
 	Member
-	) REFERENCES dbo.cmsMember
+	) REFERENCES cmsMember
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsDocument ADD CONSTRAINT
+ALTER TABLE cmsDocument ADD CONSTRAINT
 	IX_cmsDocument UNIQUE NONCLUSTERED 
 	(
 	nodeId,
@@ -1350,62 +1350,62 @@ ALTER TABLE dbo.cmsDocument ADD CONSTRAINT
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
-ALTER TABLE dbo.cmsPropertyData ADD CONSTRAINT
+ALTER TABLE cmsPropertyData ADD CONSTRAINT
 	FK_cmsPropertyData_cmsPropertyType FOREIGN KEY
 	(
 	propertytypeid
-	) REFERENCES dbo.cmsPropertyType
+	) REFERENCES cmsPropertyType
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsPropertyType ADD CONSTRAINT
+ALTER TABLE cmsPropertyType ADD CONSTRAINT
 	FK_cmsPropertyType_cmsContentType FOREIGN KEY
 	(
 	contentTypeId
-	) REFERENCES dbo.cmsContentType
+	) REFERENCES cmsContentType
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsPropertyType ADD CONSTRAINT
+ALTER TABLE cmsPropertyType ADD CONSTRAINT
 	FK_cmsPropertyType_cmsDataType FOREIGN KEY
 	(
 	dataTypeId
-	) REFERENCES dbo.cmsDataType
+	) REFERENCES cmsDataType
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsTab ADD CONSTRAINT
+ALTER TABLE cmsTab ADD CONSTRAINT
 	FK_cmsTab_cmsContentType FOREIGN KEY
 	(
 	contenttypeNodeId
-	) REFERENCES dbo.cmsContentType
+	) REFERENCES cmsContentType
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsTemplate ADD CONSTRAINT
+ALTER TABLE cmsTemplate ADD CONSTRAINT
 	IX_cmsTemplate UNIQUE NONCLUSTERED 
 	(
 	nodeId
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
-ALTER TABLE dbo.cmsDocument ADD CONSTRAINT
+ALTER TABLE cmsDocument ADD CONSTRAINT
 	FK_cmsDocument_cmsTemplate FOREIGN KEY
 	(
 	templateId
-	) REFERENCES dbo.cmsTemplate
+	) REFERENCES cmsTemplate
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
@@ -1413,29 +1413,29 @@ ALTER TABLE dbo.cmsDocument ADD CONSTRAINT
 ;
 
 
-ALTER TABLE dbo.umbracoDomains ADD CONSTRAINT
+ALTER TABLE umbracoDomains ADD CONSTRAINT
 	FK_umbracoDomains_umbracoNode FOREIGN KEY
 	(
 	domainRootStructureID
-	) REFERENCES dbo.umbracoNode
+	) REFERENCES umbracoNode
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsDictionary ADD CONSTRAINT
+ALTER TABLE cmsDictionary ADD CONSTRAINT
 	IX_cmsDictionary UNIQUE NONCLUSTERED 
 	(
 	id
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
-ALTER TABLE dbo.cmsLanguageText ADD CONSTRAINT
+ALTER TABLE cmsLanguageText ADD CONSTRAINT
 	FK_cmsLanguageText_cmsDictionary FOREIGN KEY
 	(
 	UniqueId
-	) REFERENCES dbo.cmsDictionary
+	) REFERENCES cmsDictionary
 	(
 	id
 	) ON UPDATE  NO ACTION 
@@ -1444,116 +1444,116 @@ ALTER TABLE dbo.cmsLanguageText ADD CONSTRAINT
 
 
 
-ALTER TABLE dbo.umbracoUser2NodeNotify ADD CONSTRAINT
+ALTER TABLE umbracoUser2NodeNotify ADD CONSTRAINT
 	FK_umbracoUser2NodeNotify_umbracoUser FOREIGN KEY
 	(
 	userId
-	) REFERENCES dbo.umbracoUser
+	) REFERENCES umbracoUser
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.umbracoUser2NodeNotify ADD CONSTRAINT
+ALTER TABLE umbracoUser2NodeNotify ADD CONSTRAINT
 	FK_umbracoUser2NodeNotify_umbracoNode FOREIGN KEY
 	(
 	nodeId
-	) REFERENCES dbo.umbracoNode
+	) REFERENCES umbracoNode
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.umbracoUser2NodePermission ADD CONSTRAINT
+ALTER TABLE umbracoUser2NodePermission ADD CONSTRAINT
 	FK_umbracoUser2NodePermission_umbracoUser FOREIGN KEY
 	(
 	userId
-	) REFERENCES dbo.umbracoUser
+	) REFERENCES umbracoUser
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.umbracoUser2NodePermission ADD CONSTRAINT
+ALTER TABLE umbracoUser2NodePermission ADD CONSTRAINT
 	FK_umbracoUser2NodePermission_umbracoNode FOREIGN KEY
 	(
 	nodeId
-	) REFERENCES dbo.umbracoNode
+	) REFERENCES umbracoNode
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsTask ADD CONSTRAINT
+ALTER TABLE cmsTask ADD CONSTRAINT
 	FK_cmsTask_umbracoUser FOREIGN KEY
 	(
 	parentUserId
-	) REFERENCES dbo.umbracoUser
+	) REFERENCES umbracoUser
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsTask ADD CONSTRAINT
+ALTER TABLE cmsTask ADD CONSTRAINT
 	FK_cmsTask_umbracoUser1 FOREIGN KEY
 	(
 	userId
-	) REFERENCES dbo.umbracoUser
+	) REFERENCES umbracoUser
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsTask ADD CONSTRAINT
+ALTER TABLE cmsTask ADD CONSTRAINT
 	FK_cmsTask_umbracoNode FOREIGN KEY
 	(
 	nodeId
-	) REFERENCES dbo.umbracoNode
+	) REFERENCES umbracoNode
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-CREATE NONCLUSTERED INDEX IX_umbracoLog ON dbo.umbracoLog
+CREATE NONCLUSTERED INDEX IX_umbracoLog ON umbracoLog
 	(
 	NodeId
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
-ALTER TABLE dbo.umbracoRelation ADD CONSTRAINT
+ALTER TABLE umbracoRelation ADD CONSTRAINT
 	FK_umbracoRelation_umbracoRelationType FOREIGN KEY
 	(
 	relType
-	) REFERENCES dbo.umbracoRelationType
+	) REFERENCES umbracoRelationType
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.umbracoRelation ADD CONSTRAINT
+ALTER TABLE umbracoRelation ADD CONSTRAINT
 	FK_umbracoRelation_umbracoNode FOREIGN KEY
 	(
 	parentId
-	) REFERENCES dbo.umbracoNode
+	) REFERENCES umbracoNode
 	(
 	id
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.umbracoRelation ADD CONSTRAINT
+ALTER TABLE umbracoRelation ADD CONSTRAINT
 	FK_umbracoRelation_umbracoNode1 FOREIGN KEY
 	(
 	childId
-	) REFERENCES dbo.umbracoNode
+	) REFERENCES umbracoNode
 	(
 	id
 	) ON UPDATE  NO ACTION 
@@ -1562,94 +1562,94 @@ ALTER TABLE dbo.umbracoRelation ADD CONSTRAINT
 
 
 
-ALTER TABLE dbo.cmsContentTypeAllowedContentType ADD CONSTRAINT
+ALTER TABLE cmsContentTypeAllowedContentType ADD CONSTRAINT
 	FK_cmsContentTypeAllowedContentType_cmsContentType FOREIGN KEY
 	(
 	Id
-	) REFERENCES dbo.cmsContentType
+	) REFERENCES cmsContentType
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsContentTypeAllowedContentType ADD CONSTRAINT
+ALTER TABLE cmsContentTypeAllowedContentType ADD CONSTRAINT
 	FK_cmsContentTypeAllowedContentType_cmsContentType1 FOREIGN KEY
 	(
 	AllowedId
-	) REFERENCES dbo.cmsContentType
+	) REFERENCES cmsContentType
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.umbracoLanguage ADD CONSTRAINT
+ALTER TABLE umbracoLanguage ADD CONSTRAINT
 	IX_umbracoLanguage UNIQUE NONCLUSTERED 
 	(
 	languageISOCode
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
-ALTER TABLE dbo.umbracoUser ADD CONSTRAINT
+ALTER TABLE umbracoUser ADD CONSTRAINT
 	IX_umbracoUser UNIQUE NONCLUSTERED 
 	(
 	userLogin
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
-ALTER TABLE dbo.cmsTaskType ADD CONSTRAINT
+ALTER TABLE cmsTaskType ADD CONSTRAINT
 	IX_cmsTaskType UNIQUE NONCLUSTERED 
 	(
 	alias
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
-ALTER TABLE dbo.cmsDocumentType ADD CONSTRAINT
+ALTER TABLE cmsDocumentType ADD CONSTRAINT
 	FK_cmsDocumentType_cmsTemplate FOREIGN KEY
 	(
 	templateNodeId
-	) REFERENCES dbo.cmsTemplate
+	) REFERENCES cmsTemplate
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsTemplate ADD CONSTRAINT
+ALTER TABLE cmsTemplate ADD CONSTRAINT
 	FK_cmsTemplate_cmsTemplate FOREIGN KEY
 	(
 	master
-	) REFERENCES dbo.cmsTemplate
+	) REFERENCES cmsTemplate
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsContentVersion ADD CONSTRAINT
+ALTER TABLE cmsContentVersion ADD CONSTRAINT
 	IX_cmsContentVersion UNIQUE NONCLUSTERED 
 	(
 	VersionId
 	) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ;
 
-ALTER TABLE dbo.cmsPreviewXml ADD CONSTRAINT
+ALTER TABLE cmsPreviewXml ADD CONSTRAINT
 	FK_cmsPreviewXml_cmsContentVersion FOREIGN KEY
 	(
 	versionId
-	) REFERENCES dbo.cmsContentVersion
+	) REFERENCES cmsContentVersion
 	(
 	VersionId
 	) ON UPDATE  NO ACTION 
 	 ON DELETE  NO ACTION 
 ;
 
-ALTER TABLE dbo.cmsPreviewXml ADD CONSTRAINT
+ALTER TABLE cmsPreviewXml ADD CONSTRAINT
 	FK_cmsPreviewXml_cmsContent FOREIGN KEY
 	(
 	nodeId
-	) REFERENCES dbo.cmsContent
+	) REFERENCES cmsContent
 	(
 	nodeId
 	) ON UPDATE  NO ACTION 
@@ -1657,11 +1657,11 @@ ALTER TABLE dbo.cmsPreviewXml ADD CONSTRAINT
 ;
 
 
-ALTER TABLE dbo.cmsMember2MemberGroup ADD CONSTRAINT
+ALTER TABLE cmsMember2MemberGroup ADD CONSTRAINT
 	FK_cmsMember2MemberGroup_umbracoNode FOREIGN KEY
 	(
 	MemberGroup
-	) REFERENCES dbo.umbracoNode
+	) REFERENCES umbracoNode
 	(
 	id
 	) ON UPDATE  NO ACTION 

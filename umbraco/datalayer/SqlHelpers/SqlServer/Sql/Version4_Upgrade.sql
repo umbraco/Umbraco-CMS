@@ -37,7 +37,7 @@ VALUES (0, 0, 0, 'media', 'mediaRecycleBin', 'RecycleBin', 'folder.gif', 'folder
 ;
 
 
-CREATE TABLE [dbo].[cmsPreviewXml](
+CREATE TABLE [cmsPreviewXml](
 	[nodeId] [int] NOT NULL,
 	[versionId] [uniqueidentifier] NOT NULL,
 	[timestamp] [datetime] NOT NULL,
