@@ -412,8 +412,8 @@ namespace umbraco.cms.presentation.Trees
 			/// </summary>
 			public void SecureNode()
 			{
-				if (!AppliedClasses.Contains(HighlightNodeCssClass))
-					AppliedClasses.Add(HighlightNodeCssClass);
+                if (!AppliedClasses.Contains(SecureNodeCssClass))
+                    AppliedClasses.Add(SecureNodeCssClass);
 			}
 
 			/// <summary>
