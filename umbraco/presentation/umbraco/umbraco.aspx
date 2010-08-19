@@ -31,8 +31,6 @@
 	<umb:JsInclude ID="JsInclude11" runat="server" FilePath="js/language.aspx" PathNameAlias="UmbracoRoot" />	
 	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="modal/modal.js" PathNameAlias="UmbracoClient" Priority="10" />	
 	<umb:JsInclude ID="JsInclude12" runat="server" FilePath="js/UmbracoSpeechBubbleBackend.js" PathNameAlias="UmbracoRoot"  />	
-    
-    <asp:PlaceHolder id="IActionJSFileRef" runat="server"></asp:PlaceHolder>
 
     <script type="text/javascript">
         this.name = 'umbracoMain';

@@ -16,6 +16,8 @@ using ClientDependency.Core;
 using umbraco.IO;
 using System.Linq;
 using System.Text;
+using ClientDependency.Core.Controls;
+using System.Text.RegularExpressions;
 
 namespace umbraco.cms.presentation
 {
@@ -87,13 +89,6 @@ namespace umbraco.cms.presentation
 
             RenderActionJS();
 
-            // Load default right action
-            //            string rightAction = String.Format(@"
-            //                var initApp = '{0}';
-            //                var rightAction = '{1}';
-            //                var rightActionId = '{2}';", umbraco.presentation.UmbracoContext.Current.Request["app"], helper.Request("rightAction"), helper.Request("id"));
-            //            ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "rightAction", rightAction, true);
-
             // Version check goes here!
 
             string updateCheckCookie = "";
@@ -121,30 +116,54 @@ namespace umbraco.cms.presentation
         /// Renders out all JavaScript references that have bee declared in IActions
         /// </summary>
         private void RenderActionJS()
-        {
-            string script = @"<script type=""text/javascript"" src=""{0}""></script>";
-            foreach (string jsFile in umbraco.BusinessLogic.Actions.Action.GetJavaScriptFileReferences())
-                IActionJSFileRef.Controls.Add(new LiteralControl(string.Format(script, jsFile)));
+        {            
+            var item = 0;
+            foreach (var jsFile in umbraco.BusinessLogic.Actions.Action.GetJavaScriptFileReferences())
+            {
+                //validate that this is a url, if it is not, we'll assume that it is a text block and render it as a text
+                //block instead.
+                var isValid = true;
+                try
+                {
+                    var jsUrl = new Uri(jsFile, UriKind.RelativeOrAbsolute);
+                    //ok it validates, but so does alert('hello'); ! so we need to do more checks
+                    
+                    //here are the valid chars in a url without escaping
+                    if (Regex.IsMatch(jsFile, @"[^a-zA-Z0-9-._~:/?#\[\]@!$&'\(\)*\+,%;=]"))
+                        isValid = false;
+
+                    //we'll have to be smarter and just check for certain js patterns now too!
+                    var jsPatterns = new string[] { @"\+\s*\=", @"\);", @"function\s*\(", @"!=", @"==" };
+                    foreach (var p in jsPatterns)
+                    {
+                        if (Regex.IsMatch(jsFile, p))
+                        {
+                            isValid = false;
+                            break;
+                        }
+                    }
+
+                    if (isValid)
+                    {
+                        //add to page
+                        Page.ClientScript.RegisterClientScriptInclude(this.GetType(), item.ToString(), jsFile);
+                    }                    
+                }
+                catch (UriFormatException)
+                {
+                    isValid = false;
+                }
+
+                if (!isValid)
+                {
+                    //it is invalid, let's render it as a script block instead as devs may have written real Javascript instead
+                    //of a JS path
+                    Page.ClientScript.RegisterClientScriptBlock(this.GetType(), item.ToString(), jsFile, true);
+                }
+
+                item++;
+            }
         }
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
-
-		}
-		#endregion
 	}
 }

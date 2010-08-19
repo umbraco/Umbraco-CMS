@@ -259,8 +259,6 @@ namespace umbraco.controls.Tree
             //Render out the JavaScript associated with all of the trees for the application
             RenderTreeJS();
 
-            RenderActionJS();
-
             //apply the styles
             if (Width != Unit.Empty)
                 TreeContainer.Style.Add(HtmlTextWriterStyle.Width, Width.ToString());
@@ -408,29 +406,6 @@ namespace umbraco.controls.Tree
         private void RenderTreeJS()
         {
             Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "Trees_" + GetCurrentApp(), JSCurrApp, true);
-        }
-
-        /// <summary>
-        /// renders out the script block sources defined in any IAction
-        /// </summary>
-        private void RenderActionJS()
-        {
-            foreach (IAction a in global::umbraco.BusinessLogic.Actions.Action.GetAll())
-            {
-                // NH: Added a try/catch block to this as an error in a 3rd party action can crash the whole menu initialization
-                try
-                {
-                    if (!string.IsNullOrEmpty(a.Alias) && (!string.IsNullOrEmpty(a.JsSource)))
-                    {
-                        Page.ClientScript.RegisterClientScriptBlock(a.GetType(), a.Alias, a.JsSource, true);
-                        //Page.ClientScript.RegisterClientScriptInclude(a.GetType(), a.Alias, a.JsSource);
-                    }
-                }
-                catch (Exception ee)
-                {
-                    Log.Add(LogTypes.Error, -1, "Error initializing tree action: " + ee.ToString());
-                }
-            }
         }
 
         /// <summary>
