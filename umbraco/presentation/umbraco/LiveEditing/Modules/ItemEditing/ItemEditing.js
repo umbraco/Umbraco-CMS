@@ -65,7 +65,7 @@ umbraco.presentation.LiveEditing.ItemEditing.prototype = {
         // Only elements that are currently present, can cause item editing to stop.
         // This enables transparent use of dynamically created elements (such as context/dropdown menus)
         // as clicks on those elements will not trigger the stop edit signal.
-        jQuery("*").each(function() { $(this).data("canStopEditing", true); });
+        jQuery("*").each(function () { jQuery(this).data("canStopEditing", true); });
 
         // raise event
         var handler = this.get_events().getHandler("startEdit");
@@ -157,7 +157,7 @@ umbraco.presentation.LiveEditing.ItemEditing.prototype = {
         var _this = this;
         var i = 0;
         items.each(function() {
-            var item = new umbraco.presentation.LiveEditing.activeItem($(this));
+            var item = new umbraco.presentation.LiveEditing.activeItem(jQuery(this));
             _this._items[item.itemId] = item;
             Sys.Debug.trace("    " + (++i) + ". " + item.toString() + " is Live Editing enabled.");
         });
@@ -169,7 +169,7 @@ umbraco.presentation.LiveEditing.ItemEditing.prototype = {
         jQuery(document).mousedown(function(event) {
             Sys.Debug.trace("DOCUMENT CLICKED");
             // the canStopEditing property is set in startEdit
-            if (_this._activeItem != null && $(event.target).data("canStopEditing")) {
+            if (_this._activeItem != null && jQuery(event.target).data("canStopEditing")) {
                 if (!_this._activeItem.clicked)
                     _this.stopEdit();
                 else
@@ -190,7 +190,7 @@ umbraco.presentation.LiveEditing.ItemEditing.prototype = {
 
         var _this = this;
         itemUpdates.each(function() {
-            var itemUpdate = $(this);
+            var itemUpdate = jQuery(this);
             var itemId = itemUpdate.attr("itemId");
             var item = _this._items[itemId];
 
