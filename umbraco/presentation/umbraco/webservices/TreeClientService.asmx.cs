@@ -33,19 +33,44 @@ namespace umbraco.presentation.webservices
 
 			TreeControl treeCtl = new TreeControl()
 			{
-				ShowContextMenu = showContextMenu,
-				IsDialog = isDialog,
-				DialogMode = dialogMode,
-				App = app,
-				TreeType = "",
-				NodeKey = "",
-				StartNodeID = -1,
-				FunctionToCall = null
+                ShowContextMenu = showContextMenu,
+                IsDialog = isDialog,
+                DialogMode = dialogMode,
+                App = app,
+                TreeType = string.IsNullOrEmpty(treeType) ? "" : treeType, //don't set the tree type unless explicitly set
+                NodeKey = string.IsNullOrEmpty(nodeKey) ? "" : nodeKey,
+                StartNodeID = -1, //TODO: set this based on parameters!
+                FunctionToCall = string.IsNullOrEmpty(functionToCall) ? "" : functionToCall
 			};
 
 			Dictionary<string, string> returnVal = new Dictionary<string, string>();
-			returnVal.Add("json", treeCtl.GetJSONInitNode());
-			returnVal.Add("app", app);
+
+            if (string.IsNullOrEmpty(treeType))
+            {
+                //if there's not tree type specified, then render out the tree as per normal with the normal 
+                //way of doing things
+                returnVal.Add("json", treeCtl.GetJSONInitNode());
+            }
+            else
+            {
+               
+                //get the tree that we need to render
+                var tree = TreeDefinitionCollection.Instance.FindTree(treeType).CreateInstance();
+                tree.ShowContextMenu = showContextMenu;
+                tree.IsDialog = isDialog;
+                tree.DialogMode = dialogMode;
+                tree.NodeKey = string.IsNullOrEmpty(nodeKey) ? "" : nodeKey;
+                tree.FunctionToCall = string.IsNullOrEmpty(functionToCall) ? "" : functionToCall;
+                //this would be nice to set, but no parameters :( 
+                //tree.StartNodeID =
+
+                //now render it's start node
+                XmlTree xTree = new XmlTree();
+                xTree.Add(tree.RootNode);
+                returnVal.Add("json", xTree.ToString());
+            }
+
+            returnVal.Add("app", app);
 			returnVal.Add("js", treeCtl.JSCurrApp);
 
 			return returnVal;
