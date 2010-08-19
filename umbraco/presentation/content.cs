@@ -1026,11 +1026,6 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                         Trace.Write(string.Format("Saved content on thread '{0}' in {1} (Threadpool? {2})", Thread.CurrentThread.Name, stopWatch.Elapsed, Thread.CurrentThread.IsThreadPoolThread.ToString()));
 
                         Log.Add(LogTypes.Debug, staticUser, -1, string.Format("Xml saved in {0}", stopWatch.Elapsed));
-
-                        // Clear persistence flag
-                        HttpContext.Current.Application.Lock();
-                        HttpContext.Current.Application[PersistenceFlagContextKey] = null;
-                        HttpContext.Current.Application.UnLock();
                     }
                     catch (Exception ee)
                     {
@@ -1061,7 +1056,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                 HttpContext.Current.Application.Lock();
                 if (HttpContext.Current.Application[PersistenceFlagContextKey] != null)
                     HttpContext.Current.Application.Add(PersistenceFlagContextKey, null);
-                HttpContext.Current.Application[PersistenceFlagContextKey] = true;
+                HttpContext.Current.Application[PersistenceFlagContextKey] = DateTime.Now;
                 HttpContext.Current.Application.UnLock();
             }
             else
@@ -1086,13 +1081,44 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         {
             get
             {
-                var val = HttpContext.Current.Application[PersistenceFlagContextKey] != null;
-                if (val != null)
+                if (HttpContext.Current != null)
                 {
-                    return bool.Parse(val.ToString());
+                    var val = HttpContext.Current.Application[PersistenceFlagContextKey] != null;
+                    if (val != false)
+                    {
+                        DateTime persistenceTime = DateTime.MinValue;
+                        try
+                        {
+                            persistenceTime = (DateTime)HttpContext.Current.Application[PersistenceFlagContextKey];
+                            if (persistenceTime > GetCacheFileUpdateTime())
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                HttpContext.Current.Application.Lock();
+                                HttpContext.Current.Application[PersistenceFlagContextKey] = null;
+                                HttpContext.Current.Application.UnLock();
+                            }
+                        }
+                        catch
+                        {
+                            // Nothing to catch here - we'll just persist
+                        }
+                    }
                 }
                 return false;
             }
+        }
+
+        internal DateTime GetCacheFileUpdateTime()
+        {
+            if (System.IO.File.Exists(UmbracoXmlDiskCacheFileName))
+            {
+                return new FileInfo(UmbracoXmlDiskCacheFileName).LastWriteTime;
+            }
+
+            return DateTime.MinValue;
         }
 
         /// <summary>
