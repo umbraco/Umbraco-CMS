@@ -474,6 +474,7 @@ order by level,sortOrder";
                     this.sortOrder = maxSortOrder + 1;
                 }
 
+                this.Parent = parent;
                 this.Level = parent.Level + 1;
                 this.Path = parent.Path + "," + this.Id.ToString();
 
