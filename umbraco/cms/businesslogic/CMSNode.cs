@@ -858,7 +858,7 @@ order by level,sortOrder";
             {
                 _text = value;
                 SqlHelper.ExecuteNonQuery("UPDATE umbracoNode SET text = @text WHERE id = @id",
-                                          SqlHelper.CreateParameter("@text", value),
+                                          SqlHelper.CreateParameter("@text", value.Trim()),
                                           SqlHelper.CreateParameter("@id", this.Id));
 
             }

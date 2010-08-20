@@ -753,6 +753,7 @@ namespace umbraco.cms.businesslogic.web
             }
             set
             {
+                value = value.Trim();
                 base.Text = value;
                 SqlHelper.ExecuteNonQuery("update cmsDocument set text = @text where versionId = @versionId",
                                           SqlHelper.CreateParameter("@text", value),
