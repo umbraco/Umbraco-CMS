@@ -350,6 +350,13 @@ namespace umbraco.cms.businesslogic
             set
             {
                 _alias = helpers.Casing.SafeAliasWithForcingCheck(value);
+                
+                // validate if alias is empty
+                if (String.IsNullOrEmpty(_alias))
+                {
+                    throw new ArgumentOutOfRangeException("An Alias cannot be empty");
+                }
+
                 SqlHelper.ExecuteNonQuery(
                                           "update cmsContentType set alias = @alias where nodeId = @id",
                                           SqlHelper.CreateParameter("@alias", _alias),

@@ -50,10 +50,12 @@
   <cc2:Pane ID="Pane3" runat="server">
     <cc2:PropertyPanel ID="pp_name" runat="server" Text="Name">
         <asp:TextBox ID="txtName" CssClass="guiInputText guiInputStandardSize" runat="server"></asp:TextBox>
+        <asp:RequiredFieldValidator ID="RequiredFieldValidator1" ControlToValidate="txtName" runat="server" ErrorMessage="Name cannot be empty!"></asp:RequiredFieldValidator>
     </cc2:PropertyPanel>
     
     <cc2:PropertyPanel ID="pp_alias" runat="server" Text="Alias">
          <asp:TextBox ID="txtAlias" CssClass="guiInputText guiInputStandardSize" runat="server"></asp:TextBox>
+         <asp:RequiredFieldValidator ControlToValidate="txtAlias" runat="server" ErrorMessage="Alias cannot be empty!"></asp:RequiredFieldValidator>
     </cc2:PropertyPanel>
   </cc2:Pane>
   
