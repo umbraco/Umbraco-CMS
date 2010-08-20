@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.cms.businesslogic.media;
+using umbraco.cms.businesslogic;
 
 namespace umbraco.controls.Images
 {
@@ -77,40 +78,44 @@ namespace umbraco.controls.Images
 		}
 
 		private void LookupData()
-		{			
-			if (MediaId > 0)
-			{
-				Media m = new Media(MediaId);
+		{
+            if (MediaId > 0 && Media.IsNode(MediaId))
+            {
+                Media m = new Media(MediaId);
 
-				// TODO: Remove "Magic strings" from code.
-				var pFile = m.getProperty("fileName");
-				if (pFile == null) pFile = m.getProperty("umbracoFile");
-				if (pFile == null) pFile = m.getProperty("file");
-				if (pFile == null)
-				{
-					//the media requested does not correspond with the standard umbraco properties
-					return;
-				}
+                // TODO: Remove "Magic strings" from code.
+                var pFile = m.getProperty("fileName");
+                if (pFile == null) pFile = m.getProperty("umbracoFile");
+                if (pFile == null) pFile = m.getProperty("file");
+                if (pFile == null)
+                {
+                    //the media requested does not correspond with the standard umbraco properties
+                    return;
+                }
 
-				MediaItemPath = pFile.Value != null && !string.IsNullOrEmpty(pFile.Value.ToString()) 
-                    ? umbraco.IO.IOHelper.ResolveUrl(pFile.Value.ToString()) 
+                MediaItemPath = pFile.Value != null && !string.IsNullOrEmpty(pFile.Value.ToString())
+                    ? umbraco.IO.IOHelper.ResolveUrl(pFile.Value.ToString())
                     : "#";
-				AltText = MediaItemPath != "#" ? m.Text : ui.GetText("no") + " " + ui.GetText("media");
+                AltText = MediaItemPath != "#" ? m.Text : ui.GetText("no") + " " + ui.GetText("media");
 
-				var pWidth = m.getProperty("umbracoWidth");
-				var pHeight = m.getProperty("umbracoHeight");
+                var pWidth = m.getProperty("umbracoWidth");
+                var pHeight = m.getProperty("umbracoHeight");
 
-				if (pWidth != null && pWidth.Value != null && pHeight != null && pHeight.Value != null)
-				{
-					int.TryParse(pWidth.Value.ToString(), out m_FileWidth);
-					int.TryParse(pHeight.Value.ToString(), out m_FileHeight);
-				}
+                if (pWidth != null && pWidth.Value != null && pHeight != null && pHeight.Value != null)
+                {
+                    int.TryParse(pWidth.Value.ToString(), out m_FileWidth);
+                    int.TryParse(pHeight.Value.ToString(), out m_FileHeight);
+                }
 
-				string ext = MediaItemPath.Substring(MediaItemPath.LastIndexOf(".") + 1, MediaItemPath.Length - MediaItemPath.LastIndexOf(".") - 1);
-				MediaItemThumbnailPath = MediaItemPath.Replace("." + ext, "_thumb.jpg");
+                string ext = MediaItemPath.Substring(MediaItemPath.LastIndexOf(".") + 1, MediaItemPath.Length - MediaItemPath.LastIndexOf(".") - 1);
+                MediaItemThumbnailPath = MediaItemPath.Replace("." + ext, "_thumb.jpg");
 
-				ImageFound = true;
-			}
+                ImageFound = true;
+            }
+            else
+            {
+                ImageFound = false;
+            }
 		}
 	}
 }

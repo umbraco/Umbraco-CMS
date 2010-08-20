@@ -14,6 +14,7 @@ using System.Web.UI.HtmlControls;
 using System.Resources;
 using umbraco.editorControls.mediapicker;
 using umbraco.uicontrols.TreePicker;
+using umbraco.cms.businesslogic;
 namespace umbraco.editorControls
 {
 	/// <summary>
@@ -148,7 +149,7 @@ namespace umbraco.editorControls
 
             if (_showpreview)
             {
-                if (string.IsNullOrEmpty(ItemIdValue.Value))
+                if (string.IsNullOrEmpty(ItemIdValue.Value) || !CMSNode.IsNode(int.Parse(ItemIdValue.Value)))
                 {
                     PreviewContainer.Style.Add(HtmlTextWriterStyle.Display, "none");
                     ImgViewer.MediaId = -1;
