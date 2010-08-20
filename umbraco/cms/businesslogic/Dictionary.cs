@@ -68,7 +68,7 @@ namespace umbraco.cms.businesslogic
                 ensureCache();
 
                 return DictionaryItems.Values.Cast<DictionaryItem>()
-                    .Where(x => x.ParentId == topLevelParent)
+                    .Where(x => x.ParentId == topLevelParent).OrderBy(item => item.key)
                     .ToArray();
             }
         }
@@ -211,7 +211,7 @@ namespace umbraco.cms.businesslogic
                 get
                 {
                     return DictionaryItems.Values.Cast<DictionaryItem>()
-                        .Where(x => x.ParentId == this.UniqueId)
+                        .Where(x => x.ParentId == this.UniqueId).OrderBy(item => item.key)
                         .ToArray();
                 }
             }
