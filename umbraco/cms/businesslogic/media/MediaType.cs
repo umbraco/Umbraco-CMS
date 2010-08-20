@@ -8,13 +8,13 @@ using System.Linq;
 
 namespace umbraco.cms.businesslogic.media
 {
-	/// <summary>
-	/// The Mediatype
-	/// 
-	/// Due to the inheritance of the ContentType class,it enables definition of generic datafields on a Media.
-	/// </summary>
-	public class MediaType : ContentType
-	{
+    /// <summary>
+    /// The Mediatype
+    /// 
+    /// Due to the inheritance of the ContentType class,it enables definition of generic datafields on a Media.
+    /// </summary>
+    public class MediaType : ContentType
+    {
 
         #region Constructors
 
@@ -36,7 +36,7 @@ namespace umbraco.cms.businesslogic.media
 
         #region Constants and static members
 
-        public static Guid _objectType = new Guid("4ea4382b-2f5a-4c2b-9587-ae9b3cf3602e");       
+        public static Guid _objectType = new Guid("4ea4382b-2f5a-4c2b-9587-ae9b3cf3602e");
 
         #endregion
 
@@ -48,8 +48,10 @@ namespace umbraco.cms.businesslogic.media
         /// <returns>The MediaType with the alias</returns>
         public static new MediaType GetByAlias(string Alias)
         {
-            return new MediaType(SqlHelper.ExecuteScalar<int>("SELECT nodeid from cmsContentType where alias = @alias",
-                                                              SqlHelper.CreateParameter("@alias", Alias)));
+            return new MediaType(
+                            SqlHelper.ExecuteScalar<int>(@"SELECT nodeid from cmsContentType INNER JOIN umbracoNode on cmsContentType.nodeId = umbracoNode.id WHERE nodeObjectType=@nodeObjectType AND alias=@alias",
+                                SqlHelper.CreateParameter("@nodeObjectType", MediaType._objectType),
+                                SqlHelper.CreateParameter("@alias", Alias)));
         }
 
         /// <summary>
@@ -66,7 +68,7 @@ namespace umbraco.cms.businesslogic.media
 
         public static IEnumerable<MediaType> GetAllAsList()
         {
-            
+
             var mediaTypes = new List<MediaType>();
 
             using (IRecordsReader dr =
@@ -96,7 +98,7 @@ namespace umbraco.cms.businesslogic.media
 
             return mediaTypes.OrderBy(x => x.Text).ToList();
 
-        } 
+        }
 
         /// <summary>
         /// Create a new Mediatype
@@ -119,7 +121,7 @@ namespace umbraco.cms.businesslogic.media
             mt.OnNew(e);
 
             return mt;
-        } 
+        }
         #endregion
 
         #region Public Methods
@@ -156,7 +158,7 @@ namespace umbraco.cms.businesslogic.media
 
                 FireAfterDelete(e);
             }
-        } 
+        }
         #endregion
 
         #region Events
@@ -243,8 +245,8 @@ namespace umbraco.cms.businesslogic.media
         {
             if (AfterDelete != null)
                 AfterDelete(this, e);
-        } 
+        }
         #endregion
 
-	}
+    }
 }
