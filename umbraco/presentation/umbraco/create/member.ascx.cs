@@ -48,6 +48,9 @@ namespace umbraco.cms.presentation.create.controls
                 passwordRequired.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", ui.Text("password"), BasePages.UmbracoEnsuredPage.CurrentUser);
                 nameRequired.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", nameLiteral.Text, BasePages.UmbracoEnsuredPage.CurrentUser);
                 emailRequired.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", "E-mail", BasePages.UmbracoEnsuredPage.CurrentUser);
+                loginRequired.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", "Login Name", BasePages.UmbracoEnsuredPage.CurrentUser);
+                loginExistsCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "Login Name", BasePages.UmbracoEnsuredPage.CurrentUser);
+                emailExistsCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "E-mail", BasePages.UmbracoEnsuredPage.CurrentUser);
                 memberTypeRequired.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", "Member Type", BasePages.UmbracoEnsuredPage.CurrentUser);
                 Password.Text =
                     Membership.GeneratePassword(Membership.MinRequiredPasswordLength, Membership.MinRequiredNonAlphanumericCharacters);
@@ -83,7 +86,7 @@ namespace umbraco.cms.presentation.create.controls
             if (Page.IsValid)
             {
                 int memberType = memberChooser.Visible ? int.Parse(nodeType.SelectedValue) : -1;
-                string emailAppend = String.IsNullOrEmpty(Email.Text) ? "" : String.Format("|{0}|{1}", Email.Text, Password.Text);
+                string emailAppend = String.IsNullOrEmpty(Email.Text) ? "" : String.Format("|{0}|{1}|{2}", Email.Text, Password.Text,Login.Text);
                 string returnUrl = umbraco.presentation.create.dialogHandler_temp.Create(
                     umbraco.helper.Request("nodeType"),
                     memberType,
@@ -96,6 +99,34 @@ namespace umbraco.cms.presentation.create.controls
 
             }
 
+        }
+
+
+        /// <summary>
+        /// Validation to Check if Login Name Exists
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void LoginExistsCheck(object sender, ServerValidateEventArgs e)
+        {
+            if (Login.Text != "" && Member.GetMemberFromLoginName(Login.Text.Replace(" ", "").ToLower()) != null)
+                e.IsValid = false;
+            else
+                e.IsValid = true;
+        }
+
+
+        /// <summary>
+        /// Validation to Check if Member with email Exists
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void EmailExistsCheck(object sender, ServerValidateEventArgs e)
+        {
+            if (Email.Text != "" && Member.GetMemberFromEmail(Email.Text.ToLower()) != null)
+                e.IsValid = false;
+            else
+                e.IsValid = true;
         }
     }
 }

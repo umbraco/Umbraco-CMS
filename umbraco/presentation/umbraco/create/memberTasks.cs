@@ -73,12 +73,13 @@ namespace umbraco
             string name = nameAndMail[0];
             string email = nameAndMail.Length > 0 ? nameAndMail[1] : "";
             string password = nameAndMail.Length > 1 ? nameAndMail[2] : "";
+            string loginName = nameAndMail.Length > 2 ? nameAndMail[3] : "";
             if (cms.businesslogic.member.Member.InUmbracoMemberMode() && TypeID != -1)
             {
                 cms.businesslogic.member.MemberType dt = new cms.businesslogic.member.MemberType(TypeID);
-                cms.businesslogic.member.Member m = cms.businesslogic.member.Member.MakeNew(name, email, dt, BusinessLogic.User.GetUser(_userID));
+                cms.businesslogic.member.Member m = cms.businesslogic.member.Member.MakeNew(name, loginName, email, dt, BusinessLogic.User.GetUser(_userID));
                 m.Password = password;                
-                m.LoginName = name.Replace(" ", "").ToLower();
+                m.LoginName = loginName.Replace(" ", "").ToLower();
 
                 NewMemberUIEventArgs e = new NewMemberUIEventArgs();
                 this.OnNewMember(e, password, m);

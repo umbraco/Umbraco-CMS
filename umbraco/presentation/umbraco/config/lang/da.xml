@@ -549,6 +549,7 @@
         <key alias="errorHeaderWithoutTab"><![CDATA[Der var fejl i formularen:]]></key>
         <key alias="errorMandatory"><![CDATA[%0% under %1% er et obligatorisk felt og skal udfyldes]]></key>
         <key alias="errorMandatoryWithoutTab"><![CDATA[%0% er et obligatorisk felt og skal udfyldes]]></key>
+        <key alias="errorExistsWithoutTab" version="2.1"><![CDATA[%0% der findes allerede]]></key>
         <key alias="errorRegExp"><![CDATA[%0% under %1% er ikke i et korrekt format]]></key>
         <key alias="errorRegExpWithoutTab"><![CDATA[%0% er ikke i et korrekt format]]></key>
         <key alias="errorButDataWasSaved"><![CDATA[Dine data er blevet gemt, men før du kan udgive denne side er der nogle fejl der skal rettes:]]></key>

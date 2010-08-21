@@ -2824,6 +2824,7 @@
       <DependentUpon>umbraco.xsd</DependentUpon>
     </None>
     <Content Include="config\UrlRewriting.config" />
+    <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />

@@ -186,8 +186,9 @@ namespace umbraco.cms.businesslogic.member
         [Obsolete("Use System.Web.Security.Membership.CreateUser")]
         public static Member MakeNew(string Name, MemberType mbt, User u)
         {
-            return MakeNew(Name, "", mbt, u);           
+            return MakeNew(Name, "", "", mbt, u);           
         }
+
 
         /// <summary>
         /// Creates a new member
@@ -200,10 +201,25 @@ namespace umbraco.cms.businesslogic.member
         [Obsolete("Use System.Web.Security.Membership.CreateUser")]
         public static Member MakeNew(string Name, string Email, MemberType mbt, User u)
         {
+            return MakeNew(Name, "", Email, mbt, u);
+        }
+
+        /// <summary>
+        /// Creates a new member
+        /// </summary>
+        /// <param name="Name">Membername</param>
+        /// <param name="mbt">Member type</param>
+        /// <param name="u">The umbraco usercontext</param>
+        /// <param name="Email">The email of the user</param>
+        /// <returns>The new member</returns>
+        [Obsolete("Use System.Web.Security.Membership.CreateUser")]
+        public static Member MakeNew(string Name, string LoginName, string Email, MemberType mbt, User u)
+        {
+            var loginName = (!String.IsNullOrEmpty(LoginName)) ? LoginName : Name;
             // Test for e-mail
             if (Email != "" && Member.GetMemberFromEmail(Email) != null)
                 throw new Exception(String.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
-            else if (Member.GetMemberFromLoginName(Name) != null)
+            else if (Member.GetMemberFromLoginName(LoginName) != null)
                 throw new Exception(String.Format("Duplicate User name! A member with the user name {0} already exists", Name));
 
             Guid newId = Guid.NewGuid();
@@ -220,9 +236,9 @@ namespace umbraco.cms.businesslogic.member
             
             // Create member specific data ..
             SqlHelper.ExecuteNonQuery(
-                "insert into cmsMember (nodeId,Email,LoginName,Password) values (@id,@email,@text,'')",
+                "insert into cmsMember (nodeId,Email,LoginName,Password) values (@id,@email,@loginName,'')",
                 SqlHelper.CreateParameter("@id", tmp.Id),
-                SqlHelper.CreateParameter("@text", tmp.Text),
+                SqlHelper.CreateParameter("@loginName", loginName),
                 SqlHelper.CreateParameter("@email", Email));
 
             //read the whole object from the db

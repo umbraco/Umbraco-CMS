@@ -3,7 +3,8 @@
 <asp:ValidationSummary runat="server" DisplayMode="BulletList" ID="validationSummary"
     CssClass="error"></asp:ValidationSummary>
 <asp:Literal ID="nameLiteral" runat="server"></asp:Literal>:<asp:RequiredFieldValidator
-    ID="nameRequired" ErrorMessage="*" ControlToValidate="rename" runat="server">*</asp:RequiredFieldValidator><br />
+    ID="nameRequired" ErrorMessage="*" ControlToValidate="rename" runat="server">*</asp:RequiredFieldValidator>
+    <br />
 <asp:TextBox ID="rename" runat="server" Width="350px" CssClass="bigInput"></asp:TextBox>
 <asp:Panel ID="memberChooser" runat="server">
     <%=umbraco.ui.Text("choose")%>
@@ -13,8 +14,17 @@
         SelectionMode="Single"></asp:ListBox>
 </asp:Panel>
 <p>
+    Login Name:<asp:RequiredFieldValidator ID="loginRequired" ErrorMessage="*" ControlToValidate="Login"
+        runat="server">*</asp:RequiredFieldValidator>
+        <asp:CustomValidator ID="loginExistsCheck" runat="server" ErrorMessage="*" ControlToValidate="Login" ValidateEmptyText="false" OnServerValidate="LoginExistsCheck"></asp:CustomValidator>
+        <br />
+    <asp:TextBox ID="Login" runat="server" Width="350px" CssClass="bigInput"></asp:TextBox><br />
+</p>
+<p>
     E-mail:<asp:RequiredFieldValidator ID="emailRequired" ErrorMessage="*" ControlToValidate="Email"
-        runat="server">*</asp:RequiredFieldValidator><br />
+        runat="server">*</asp:RequiredFieldValidator>
+        <asp:CustomValidator ID="emailExistsCheck" runat="server" ErrorMessage="*" ControlToValidate="Email" ValidateEmptyText="false" OnServerValidate="EmailExistsCheck"></asp:CustomValidator>
+        <br />
     <asp:TextBox ID="Email" runat="server" Width="350px" CssClass="bigInput"></asp:TextBox><br />
 </p>
 <p>
