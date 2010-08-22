@@ -394,7 +394,10 @@ jQuery(function() { refreshDropDowns(); });
             propertiesPH.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"t_general_Contents\">"));
             foreach (cms.businesslogic.propertytype.PropertyType pt in cType.PropertyTypes)
             {
-                if (pt.ContentTypeId == cType.Id && !inTab.ContainsKey(pt.Id.ToString()))
+                //This use to be:
+                //if (pt.ContentTypeId == cType.Id && !inTab.ContainsKey(pt.Id.ToString())
+                //But seriously, if it's not on a tab the tabId is 0, it's a lot easier to read IMO
+                if (pt.ContentTypeId == cType.Id && pt.TabId == 0)
                 {
                     GenericProperties.GenericPropertyWrapper gpw = new umbraco.controls.GenericProperties.GenericPropertyWrapper();
 

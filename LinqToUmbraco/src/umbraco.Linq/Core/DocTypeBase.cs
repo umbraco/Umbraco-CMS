@@ -16,7 +16,7 @@ namespace umbraco.Linq.Core
     {
         #region Internal Storage
         private int _Id;
-        private string _name;
+        private string _nodeName;
         private string _versionId;
         private int _templateId;
         private int _parentId;
@@ -24,6 +24,7 @@ namespace umbraco.Linq.Core
         private User _writer;
         private int creatorID;
         private User _creator;
+        private string _path;
         private IEnumerable<DocTypeBase> _ancestors;
         private AssociationTree<DocTypeBase> _children;
         #endregion
@@ -77,22 +78,36 @@ namespace umbraco.Linq.Core
         /// </summary>
         /// <value>The name.</value>
         [Field]
-        [UmbracoInfo("nodeName", DisplayName = "Name", Mandatory = true), DataMember(Name = "Name")]
+        [UmbracoInfo("nodeName", DisplayName = "NodeName", Mandatory = true), DataMember(Name = "NodeName")]
+        public virtual string NodeName
+        {
+            get
+            {
+                return this._nodeName;
+            }
+            set
+            {
+                if (this._nodeName != value)
+                {
+                    this.RaisePropertyChanging();
+                    this._nodeName = value;
+                    this.IsDirty = true;
+                    this.RaisePropertyChanged("NodeName");
+                }
+            }
+        }
+
+        [Field]
+        [Obsolete("Name property is obsolete, use NodeName instead")] //this is because most people expect NodeName not Name as the property
         public virtual string Name
         {
             get
             {
-                return this._name;
+                return this.NodeName;
             }
             set
             {
-                if (this._name != value)
-                {
-                    this.RaisePropertyChanging();
-                    this._name = value;
-                    this.IsDirty = true;
-                    this.RaisePropertyChanged("Name");
-                }
+                this.NodeName = value;
             }
         }
 
@@ -115,7 +130,7 @@ namespace umbraco.Linq.Core
                     this.RaisePropertyChanging();
                     this._templateId = value;
                     this.IsDirty = true;
-                    this.RaisePropertyChanged("Name");
+                    this.RaisePropertyChanged("Template");
                 }
             }
         }
@@ -161,7 +176,7 @@ namespace umbraco.Linq.Core
                 {
                     this.RaisePropertyChanging();
                     this._parentId = value;
-                    this.RaisePropertyChanged("Version");
+                    this.RaisePropertyChanged("ParentId");
                 }
             }
         }
@@ -197,6 +212,30 @@ namespace umbraco.Linq.Core
         [Field]
         [UmbracoInfo("level", DisplayName = "Level"), DataMember(Name = "Level")]
         public virtual int Level { get; set; }
+
+        /// <summary>
+        /// Gets or sets the path.
+        /// </summary>
+        /// <value>The path.</value>
+        [Field]
+        [UmbracoInfo("path", DisplayName = "Path")]
+        [DataMember(Name = "Path")]
+        public virtual string Path
+        {
+            get
+            {
+                return this._path;
+            }
+            set
+            {
+                if (this._path != value)
+                {
+                    this.RaisePropertyChanging();
+                    this._path = value;
+                    this.RaisePropertyChanged("Path");
+                }
+            }
+        }
         #endregion
 
         #region Parents and Children

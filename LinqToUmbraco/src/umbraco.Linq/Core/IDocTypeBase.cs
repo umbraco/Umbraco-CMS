@@ -59,6 +59,12 @@ namespace umbraco.Linq.Core
         /// Gets or sets the name.
         /// </summary>
         /// <value>The name.</value>
+        string NodeName { get; set; }
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
+        /// <value>The name.</value>
+        [Obsolete("Name property is obsolete, use NodeName instead")] //this is because most people expect NodeName not Name as the property
         string Name { get; set; }
         /// <summary>
         /// Parent if current instance
@@ -101,5 +107,10 @@ namespace umbraco.Linq.Core
         /// </summary>
         /// <value>The name of the writer.</value>
         string WriterName { get; }
+        /// <summary>
+        /// Gets or sets the path.
+        /// </summary>
+        /// <value>The path.</value>
+        string Path { get; set; }
     }
 }

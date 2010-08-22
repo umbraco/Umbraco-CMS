@@ -320,7 +320,7 @@ namespace umbraco.Linq.Core.Node
 
             node.Id = (int)xml.Attribute("id");
             node.ParentNodeId = (int)xml.Attribute("parentID");
-            node.Name = (string)xml.Attribute("nodeName");
+            node.NodeName = (string)xml.Attribute("nodeName");
             node.Version = (string)xml.Attribute("version");
             node.CreateDate = (DateTime)xml.Attribute("createDate");
             node.SortOrder = (int)xml.Attribute("sortOrder");
@@ -337,12 +337,29 @@ namespace umbraco.Linq.Core.Node
             {
                 var attr = ReflectionAssistance.GetUmbracoInfoAttribute(p);
 
-                var data = xml.Element(Casing.SafeAliasWithForcingCheck(attr.Alias)).Value;
-                if (p.PropertyType == typeof(int) && string.IsNullOrEmpty(data))
-                    data = "-1";
+                //here is where you would put a check if the property exists in the XML
+                //I'm NOT putting the check in here, as there will be unusual results if the XML doesn't
+                //contain the property, you'd get nulls when something shouldn't really be null
+                string data = xml.Element(Casing.SafeAliasWithForcingCheck(attr.Alias)).Value;
 
-                // TODO: Address how Convert.ChangeType works in globalisation
-                p.SetValue(node, Convert.ChangeType(data, p.PropertyType), null);
+                if (p.PropertyType.IsValueType && typeof(Nullable<>).IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition()))
+                {
+                    if (string.IsNullOrEmpty(data))
+                    {
+                        //non-mandatory structs which have no value will be null
+                        p.SetValue(node, null, null);
+                    }
+                    else
+                    {
+                        //non-mandatory structs which do have a value have to be cast based on the type of their Nullable<T>, found from the first (well, only) GenericArgument
+                        p.SetValue(node, Convert.ChangeType(data, p.PropertyType.GetGenericArguments()[0]), null);
+                    }
+                }
+                else
+                {
+                    // TODO: Address how Convert.ChangeType works in globalisation
+                    p.SetValue(node, Convert.ChangeType(data, p.PropertyType), null); 
+                }
             }
         }
     }
