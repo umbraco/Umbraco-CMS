@@ -337,10 +337,12 @@ namespace umbraco.Linq.Core.Node
             {
                 var attr = ReflectionAssistance.GetUmbracoInfoAttribute(p);
 
-                //here is where you would put a check if the property exists in the XML
-                //I'm NOT putting the check in here, as there will be unusual results if the XML doesn't
-                //contain the property, you'd get nulls when something shouldn't really be null
-                string data = xml.Element(Casing.SafeAliasWithForcingCheck(attr.Alias)).Value;
+                XElement propertyXml = xml.Element(Casing.SafeAliasWithForcingCheck(attr.Alias));
+                string data = null;
+                //if the XML doesn't contain the property it means that the node hasn't been re-published with the property
+                //so then we'll leave the data at null, otherwise let's grab it
+                if (propertyXml != null)
+                    data = propertyXml.Value;
 
                 if (p.PropertyType.IsValueType && typeof(Nullable<>).IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition()))
                 {
@@ -358,7 +360,7 @@ namespace umbraco.Linq.Core.Node
                 else
                 {
                     // TODO: Address how Convert.ChangeType works in globalisation
-                    p.SetValue(node, Convert.ChangeType(data, p.PropertyType), null); 
+                    p.SetValue(node, Convert.ChangeType(data, p.PropertyType), null);
                 }
             }
         }
