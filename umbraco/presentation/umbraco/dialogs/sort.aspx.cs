@@ -24,11 +24,14 @@ namespace umbraco.cms.presentation
         {
             parentId = int.Parse(Request.QueryString["id"]);
 
-            sortDone.Text = ui.Text("sort","sortDone");           
+            sortDone.Text = ui.Text("sort", "sortDone");
+
+
         }
 
 
-        protected override void OnPreRender(EventArgs e) {
+        protected override void OnPreRender(EventArgs e)
+        {
             base.OnPreRender(e);
 
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/nodesorter.asmx"));
@@ -38,30 +41,41 @@ namespace umbraco.cms.presentation
             string App = umbraco.helper.Request("app");
             string icon = "../images/umbraco/doc.gif";
 
-            if (int.TryParse(umbraco.helper.Request("ID"), out ParentId)) {
-                
-                if (ParentId == -1) {
+            if (int.TryParse(umbraco.helper.Request("ID"), out ParentId))
+            {
 
-                    if (App == "media") {
+                if (ParentId == -1)
+                {
+
+                    if (App == "media")
+                    {
                         icon = "../images/umbraco/mediaPhoto.gif";
                         foreach (cms.businesslogic.media.Media child in cms.businesslogic.media.Media.GetRootMedias())
                             _nodes.Add(createNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime, icon));
 
-                    } else {
-                        foreach (cms.businesslogic.web.Document child in cms.businesslogic.web.Document.GetRootDocuments()) {
-                            _nodes.Add(createNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime, icon));
-                        }                        
                     }
-                } else {
+                    else
+                    {
+                        foreach (cms.businesslogic.web.Document child in cms.businesslogic.web.Document.GetRootDocuments())
+                        {
+                            _nodes.Add(createNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime, icon));
+                        }
+                    }
+                }
+                else
+                {
                     // "hack for stylesheet"
                     cms.businesslogic.CMSNode n = new cms.businesslogic.CMSNode(ParentId);
-                    if (App == "settings") {
+                    if (App == "settings")
+                    {
                         icon = "../images/umbraco/settingCss.gif";
                         StyleSheet ss = new StyleSheet(n.Id);
                         foreach (cms.businesslogic.web.StylesheetProperty child in ss.Properties)
                             _nodes.Add(createNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime, icon));
 
-                    } else {
+                    }
+                    else
+                    {
                         //store children array here because iterating over an Array property object is very inneficient.
                         var children = n.Children;
                         foreach (cms.businesslogic.CMSNode child in children)
@@ -73,10 +87,13 @@ namespace umbraco.cms.presentation
             }
         }
 
-        public void bindNodesToList(string sortBy) {
-                   
-            if (!string.IsNullOrEmpty(sortBy)) {
-                switch (sortBy) {
+        public void bindNodesToList(string sortBy)
+        {
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy)
+                {
                     case "nodeName":
                         _nodes.Sort(new nodeNameCompare());
                         break;
@@ -88,15 +105,17 @@ namespace umbraco.cms.presentation
                 }
             }
 
-           //lt_nodes.Text = "";
+            //lt_nodes.Text = "";
 
-            foreach (SortableNode n in _nodes) {
+            foreach (SortableNode n in _nodes)
+            {
                 lt_nodes.Text += "<tr id='node_" + n.id.ToString() + "'><td>" + n.Name + "</td><td class='nowrap'>" + n.createDate.ToShortDateString() + " " + n.createDate.ToShortTimeString() + "</td><td style='text-align: center;'>" + n.sortOder + "</td></tr>";
             }
-            
+
         }
 
-        private static SortableNode createNode(int id, int sortOrder, string name, DateTime createDateTime, string icon) {
+        private static SortableNode createNode(int id, int sortOrder, string name, DateTime createDateTime, string icon)
+        {
             SortableNode _node = new SortableNode();
             _node.id = id;
             _node.sortOder = sortOrder;
@@ -106,7 +125,8 @@ namespace umbraco.cms.presentation
             return _node;
         }
 
-        public struct SortableNode {
+        public struct SortableNode
+        {
             public int id;
             public int sortOder;
             public string Name;
@@ -137,30 +157,34 @@ namespace umbraco.cms.presentation
         #endregion
     }
 
-    public class nodeNameCompare : IComparer<sort.SortableNode> {
+    public class nodeNameCompare : IComparer<sort.SortableNode>
+    {
 
         #region IComparer<CMSNode> Members
 
-        public int Compare(sort.SortableNode x, sort.SortableNode y) {
+        public int Compare(sort.SortableNode x, sort.SortableNode y)
+        {
             int returnValue = 1;
-           
-                returnValue = x.Name.CompareTo(y.Name);
-            
+
+            returnValue = x.Name.CompareTo(y.Name);
+
             return returnValue;
         }
 
         #endregion
     }
 
-    public class createDateCompare : IComparer<sort.SortableNode> {
+    public class createDateCompare : IComparer<sort.SortableNode>
+    {
 
         #region IComparer<CMSNode> Members
 
-        public int Compare(sort.SortableNode x, sort.SortableNode y) {
+        public int Compare(sort.SortableNode x, sort.SortableNode y)
+        {
             int returnValue = 1;
 
-                returnValue = x.createDate.CompareTo(y.createDate);
-            
+            returnValue = x.createDate.CompareTo(y.createDate);
+
 
             return returnValue;
         }
