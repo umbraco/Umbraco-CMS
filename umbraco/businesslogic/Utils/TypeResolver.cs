@@ -5,15 +5,18 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Web;
 
+using System.Security;
+using System.Security.Permissions;
+
 namespace umbraco.BusinessLogic.Utils
 {
     /// <summary>
     /// Represents the Umbraco Typeresolver class.
     /// The typeresolver is a collection of utillities for finding and determining types and classes with reflection.
     /// </summary>
-	[Serializable]  
-	public class TypeResolver : MarshalByRefObject
-	{
+    [Serializable]
+    public class TypeResolver : MarshalByRefObject
+    {
         /// <summary>
         /// Gets a collection of assignables of type T from a collection of a specific file type from a specified path.
         /// </summary>
@@ -21,15 +24,15 @@ namespace umbraco.BusinessLogic.Utils
         /// <param name="path">The path.</param>
         /// <param name="filePattern">The file pattern.</param>
         /// <returns></returns>
-		public static string[] GetAssignablesFromType<T>(string path, string filePattern)
-		{
-			FileInfo[] fis = Array.ConvertAll<string, FileInfo>(
-				Directory.GetFiles(path, filePattern),
-				delegate(string s) { return new FileInfo(s); });
-			string[] absoluteFiles = Array.ConvertAll<FileInfo, string>(
-				fis, delegate(FileInfo fi) { return fi.FullName; });
-			return GetAssignablesFromType<T>(absoluteFiles);
-		}
+        public static string[] GetAssignablesFromType<T>(string path, string filePattern)
+        {
+            FileInfo[] fis = Array.ConvertAll<string, FileInfo>(
+                Directory.GetFiles(path, filePattern),
+                delegate(string s) { return new FileInfo(s); });
+            string[] absoluteFiles = Array.ConvertAll<FileInfo, string>(
+                fis, delegate(FileInfo fi) { return fi.FullName; });
+            return GetAssignablesFromType<T>(absoluteFiles);
+        }
 
         /// <summary>
         /// Gets a collection of assignables of type T from a collection of files
@@ -37,12 +40,13 @@ namespace umbraco.BusinessLogic.Utils
         /// <typeparam name="T"></typeparam>
         /// <param name="files">The files.</param>
         /// <returns></returns>
-		public static string[] GetAssignablesFromType<T>(string[] files)
-		{
+        public static string[] GetAssignablesFromType<T>(string[] files)
+        {
 
             AppDomain sandbox = AppDomain.CurrentDomain;
 
-            if ((!GlobalSettings.UseMediumTrust) && (GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium)) {
+            if ((!GlobalSettings.UseMediumTrust) && (GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium))
+            {
                 AppDomainSetup domainSetup = new AppDomainSetup();
                 domainSetup.ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
                 domainSetup.ApplicationName = "Umbraco_Sandbox_" + Guid.NewGuid();
@@ -55,7 +59,9 @@ namespace umbraco.BusinessLogic.Utils
                 domainSetup.PrivateBinPathProbe = AppDomain.CurrentDomain.SetupInformation.PrivateBinPathProbe;
                 domainSetup.ShadowCopyFiles = "false";
 
-                sandbox = AppDomain.CreateDomain("Sandbox", AppDomain.CurrentDomain.Evidence, domainSetup);
+                PermissionSet trustedLoadFromRemoteSourceGrantSet = new PermissionSet(PermissionState.Unrestricted);
+                sandbox = AppDomain.CreateDomain("Sandbox", AppDomain.CurrentDomain.Evidence, domainSetup, trustedLoadFromRemoteSourceGrantSet);
+//                sandbox = AppDomain.CreateDomain("Sandbox", AppDomain.CurrentDomain.Evidence, domainSetup);
             }
 
             try
@@ -78,8 +84,8 @@ namespace umbraco.BusinessLogic.Utils
                 }
             }
 
-			return new string[0];
-		}
+            return new string[0];
+        }
 
         /// <summary>
         /// Returns of a collection of type names from a collection of assembky files.
@@ -87,29 +93,31 @@ namespace umbraco.BusinessLogic.Utils
         /// <param name="assignTypeFrom">The assign type.</param>
         /// <param name="assemblyFiles">The assembly files.</param>
         /// <returns></returns>
-		public string[] GetTypes(Type assignTypeFrom, string[] assemblyFiles)
-		{
-			List<string> result = new List<string>();
-			foreach(string fileName in assemblyFiles)
-			{
-				if(!File.Exists(fileName))
-					continue;
-				try
-				{
-					Assembly assembly = Assembly.LoadFile(fileName);
+        public string[] GetTypes(Type assignTypeFrom, string[] assemblyFiles)
+        {
+            List<string> result = new List<string>();
+            foreach (string fileName in assemblyFiles)
+            {
+                if (!File.Exists(fileName))
+                    continue;
+                try
+                {
+                    Assembly assembly = Assembly.LoadFile(fileName);
 
-                    if (assembly != null) {
-                        foreach (Type t in assembly.GetTypes()) {
+                    if (assembly != null)
+                    {
+                        foreach (Type t in assembly.GetTypes())
+                        {
                             if (!t.IsInterface && assignTypeFrom.IsAssignableFrom(t))
                                 result.Add(t.AssemblyQualifiedName);
                         }
                     }
-				}
-				catch(Exception e)
-				{
-					Debug.WriteLine(string.Format("Error loading assembly: {0}\n{1}", fileName, e));
-			    }
-			}
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(string.Format("Error loading assembly: {0}\n{1}", fileName, e));
+                }
+            }
 
             /*
             try{
@@ -135,7 +143,7 @@ namespace umbraco.BusinessLogic.Utils
             }
             */
 
-			return result.ToArray();
-		}
-	}
+            return result.ToArray();
+        }
+    }
 }

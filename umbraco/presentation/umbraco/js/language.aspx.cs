@@ -36,7 +36,8 @@ namespace umbraco.js
 						continue;
 					string _tempKey = string.Format("{0}_{1}", n1.Value, n2.Value);
 
-					string tmpStr = key.FirstChild.Value.Replace("\\", "\\\\").Replace("'", "\\'").Replace("\r\n", "\\r\\n");
+                    // we need to remove linie breaks as they can't break js
+					string tmpStr = key.FirstChild.Value.Replace("\\", "\\\\").Replace("'", "\\'").Replace("\r", "").Replace("\n", "");
 					Response.Write(string.Format("uiKeys['{0}'] = '{1}';\n", _tempKey, tmpStr));
 				}
 			}
