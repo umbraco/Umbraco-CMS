@@ -37,16 +37,16 @@
         <!-- They will get added again after build is completed, no worries no dependencies during build-->
         <delete>
             <fileset>
-                <include name="${root.dir}/bin/IronPython.dll" />
-                <include name="${root.dir}/bin/IronPython.Modules.dll" />
-                <include name="${root.dir}/bin/IronRuby.dll" />
-                <include name="${root.dir}/bin/IronRuby.Libraries.dll" />
-                <include name="${root.dir}/bin/IronRuby.Libraries.Yaml.dll" />
-                <include name="${root.dir}/bin/Microsoft.Dynamic.dll" />
-                <include name="${root.dir}/bin/Microsoft.ScriptinG.Core.dll" />
-                <include name="${root.dir}/bin/Microsoft.Scripting.Debugging.dll" />
-                <include name="${root.dir}/bin/Microsoft.Scripting.dll" />
-                <include name="${root.dir}/bin/Microsoft.Scripting.ExtensionAttribute.dll" />
+                <include name="${source.dir}\bin\IronPython.dll" />
+                <include name="${source.dir}\bin\IronPython.Modules.dll" />
+                <include name="${source.dir}\bin\IronRuby.dll" />
+                <include name="${source.dir}\bin\IronRuby.Libraries.dll" />
+                <include name="${source.dir}\bin\IronRuby.Libraries.Yaml.dll" />
+                <include name="${source.dir}\bin\Microsoft.Dynamic.dll" />
+                <include name="${source.dir}\bin\Microsoft.ScriptinG.Core.dll" />
+                <include name="${source.dir}\bin\Microsoft.Scripting.Debugging.dll" />
+                <include name="${source.dir}\bin\Microsoft.Scripting.dll" />
+                <include name="${source.dir}\bin\Microsoft.Scripting.ExtensionAttribute.dll" />
             </fileset>
         </delete>
         
@@ -77,6 +77,7 @@
         <copy todir="${build.dir}\bin">
             <fileset basedir="${dlls.dir}\DLR 2.0 SP1">
                 <include name="*.dll" />
+                <exclude name="Microsoft.Scripting.ExtensionAttribute.dll" />
             </fileset>
         </copy>
 
