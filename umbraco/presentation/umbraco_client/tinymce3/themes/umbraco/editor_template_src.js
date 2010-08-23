@@ -5,7 +5,7 @@
  * @copyright Copyright © 2004-2008, Moxiecode Systems AB, All rights reserved.
  */
 
-(function() {
+(function () {
     var DOM = tinymce.DOM, Event = tinymce.dom.Event, extend = tinymce.extend, each = tinymce.each, Cookie = tinymce.util.Cookie, lastExtID, explode = tinymce.explode;
 
     // Tell it to load theme specific language pack(s)
@@ -56,7 +56,7 @@
 
         stateControls: ['bold', 'italic', 'underline', 'strikethrough', 'bullist', 'numlist', 'justifyleft', 'justifycenter', 'justifyright', 'justifyfull', 'sub', 'sup', 'blockquote'],
 
-        init: function(ed, url) {
+        init: function (ed, url) {
             var t = this, s, v, o;
 
             t.editor = ed;
@@ -92,7 +92,7 @@
                 // Parse string value
                 o = {};
                 ed.settings.theme_umbraco_font_sizes = s.theme_umbraco_font_sizes;
-                each(ed.getParam('theme_umbraco_font_sizes', '', 'hash'), function(v, k) {
+                each(ed.getParam('theme_umbraco_font_sizes', '', 'hash'), function (v, k) {
                     var cl;
 
                     if (k == v && v >= 1 && v <= 7) {
@@ -120,18 +120,18 @@
                 s.theme_umbraco_statusbar_location = 0;
 
             // Init editor
-            ed.onInit.add(function() {
+            ed.onInit.add(function () {
                 ed.onNodeChange.add(t._nodeChanged, t);
 
                 if (ed.settings.content_css !== false)
                     ed.dom.loadCSS(ed.baseURI.toAbsolute("themes/umbraco/skins/" + ed.settings.skin + "/content.css"));
             });
 
-            ed.onSetProgressState.add(function(ed, b, ti) {
+            ed.onSetProgressState.add(function (ed, b, ti) {
                 var co, id = ed.id, tb;
 
                 if (b) {
-                    t.progressTimer = setTimeout(function() {
+                    t.progressTimer = setTimeout(function () {
                         co = ed.getContainer();
                         co = co.insertBefore(DOM.create('DIV', { style: 'position:relative' }), co.firstChild);
                         tb = DOM.get(ed.id + '_tbl');
@@ -152,7 +152,7 @@
                 DOM.loadCSS(url + "/skins/" + ed.settings.skin + "/ui_" + s.skin_variant + ".css");
         },
 
-        createControl: function(n, cf) {
+        createControl: function (n, cf) {
             var cd, c;
 
             if (c = cf.createControl(n))
@@ -182,7 +182,7 @@
                 return cf.createButton(n, { title: "umbraco." + cd[0], cmd: cd[1], ui: cd[2], value: cd[3] });
         },
 
-        execCommand: function(cmd, ui, val) {
+        execCommand: function (cmd, ui, val) {
             var f = this['_' + cmd];
 
             if (f) {
@@ -193,20 +193,20 @@
             return false;
         },
 
-        _importClasses: function(e) {
+        _importClasses: function (e) {
             var ed = this.editor, c = ed.controlManager.get('styleselect');
 
             if (c.getLength() == 0) {
-                each(ed.dom.getClasses(), function(o) {
+                each(ed.dom.getClasses(), function (o) {
                     c.add(o['class'], o['class']);
                 });
             }
         },
 
-        _createStyleSelect: function(n) {
+        _createStyleSelect: function (n) {
             var t = this, ed = t.editor, cf = ed.controlManager, c = cf.createListBox('styleselect', {
                 title: 'umbraco.style_select',
-                onselect: function(v) {
+                onselect: function (v) {
                     if (c.selectedValue === v) {
                         ed.execCommand('mceSetStyleInfo', 0, { command: 'removeformat' });
                         c.select();
@@ -217,14 +217,14 @@
             });
 
             if (c) {
-            
-                each(ed.getParam('theme_umbraco_styles', '', 'hash'), function(v, k) {
+
+                each(ed.getParam('theme_umbraco_styles', '', 'hash'), function (v, k) {
                     if (v) {
                         c.add(t.editor.translate(k), v);
                     }
                 });
 
-                c.onPostRender.add(function(ed, n) {
+                c.onPostRender.add(function (ed, n) {
                     if (!c.NativeListBox) {
                         Event.add(n.id + '_text', 'focus', t._importClasses, t);
                         Event.add(n.id + '_text', 'mousedown', t._importClasses, t);
@@ -238,12 +238,12 @@
             return c;
         },
 
-        _createFontSelect: function() {
+        _createFontSelect: function () {
             var c, t = this, ed = t.editor;
 
             c = ed.controlManager.createListBox('fontselect', { title: 'umbraco.fontdefault', cmd: 'FontName' });
             if (c) {
-                each(ed.getParam('theme_umbraco_fonts', t.settings.theme_umbraco_fonts, 'hash'), function(v, k) {
+                each(ed.getParam('theme_umbraco_fonts', t.settings.theme_umbraco_fonts, 'hash'), function (v, k) {
                     c.add(ed.translate(k), v, { style: v.indexOf('dings') == -1 ? 'font-family:' + v : '' });
                 });
             }
@@ -251,14 +251,14 @@
             return c;
         },
 
-        _createFontSizeSelect: function() {
+        _createFontSizeSelect: function () {
             var t = this, ed = t.editor, c, i = 0, cl = [];
 
-            c = ed.controlManager.createListBox('fontsizeselect', { title: 'umbraco.font_size', onselect: function(v) {
+            c = ed.controlManager.createListBox('fontsizeselect', { title: 'umbraco.font_size', onselect: function (v) {
                 if (v.fontSize)
                     ed.execCommand('FontSize', false, v.fontSize);
                 else {
-                    each(t.settings.theme_umbraco_font_sizes, function(v, k) {
+                    each(t.settings.theme_umbraco_font_sizes, function (v, k) {
                         if (v['class'])
                             cl.push(v['class']);
                     });
@@ -269,7 +269,7 @@
             });
 
             if (c) {
-                each(t.settings.theme_umbraco_font_sizes, function(v, k) {
+                each(t.settings.theme_umbraco_font_sizes, function (v, k) {
                     var fz = v.fontSize;
 
                     if (fz >= 1 && fz <= 7)
@@ -282,7 +282,7 @@
             return c;
         },
 
-        _createBlockFormats: function() {
+        _createBlockFormats: function () {
             var c, fmts = {
                 p: 'umbraco.paragraph',
                 address: 'umbraco.address',
@@ -303,7 +303,7 @@
 
             c = t.editor.controlManager.createListBox('formatselect', { title: 'umbraco.block', cmd: 'FormatBlock' });
             if (c) {
-                each(t.editor.getParam('theme_umbraco_blockformats', t.settings.theme_umbraco_blockformats, 'hash'), function(v, k) {
+                each(t.editor.getParam('theme_umbraco_blockformats', t.settings.theme_umbraco_blockformats, 'hash'), function (v, k) {
                     c.add(t.editor.translate(k != v ? k : fmts[v]), v, { 'class': 'mce_formatPreview mce_' + v });
                 });
             }
@@ -311,14 +311,14 @@
             return c;
         },
 
-        _createForeColorMenu: function() {
+        _createForeColorMenu: function () {
             var c, t = this, s = t.settings, o = {}, v;
 
             if (s.theme_umbraco_more_colors) {
-                o.more_colors_func = function() {
+                o.more_colors_func = function () {
                     t._mceColorPicker(0, {
                         color: c.value,
-                        func: function(co) {
+                        func: function (co) {
                             c.setColor(co);
                         }
                     });
@@ -337,14 +337,14 @@
             return c;
         },
 
-        _createBackColorMenu: function() {
+        _createBackColorMenu: function () {
             var c, t = this, s = t.settings, o = {}, v;
 
             if (s.theme_umbraco_more_colors) {
-                o.more_colors_func = function() {
+                o.more_colors_func = function () {
                     t._mceColorPicker(0, {
                         color: c.value,
-                        func: function(co) {
+                        func: function (co) {
                             c.setColor(co);
                         }
                     });
@@ -363,7 +363,7 @@
             return c;
         },
 
-        renderUI: function(o) {
+        renderUI: function (o) {
             var n, ic, tb, t = this, ed = t.editor, s = t.settings, sc, p, nl;
 
             n = p = DOM.create('span', { id: ed.id + '_parent', 'class': 'mceEditor ' + ed.settings.skin + 'Skin' + (s.skin_variant ? ' ' + ed.settings.skin + 'Skin' + t._ufirst(s.skin_variant) : '') });
@@ -395,7 +395,7 @@
             DOM.addClass(nl[nl.length - 1], 'mceLast');
 
             // Add classes to first and last TDs
-            each(DOM.select('tr', tb), function(n) {
+            each(DOM.select('tr', tb), function (n) {
                 DOM.addClass(n.firstChild, 'mceFirst');
                 DOM.addClass(n.childNodes[n.childNodes.length - 1], 'mceLast');
             });
@@ -405,7 +405,7 @@
             else
                 DOM.insertAfter(p, n);
 
-            Event.add(ed.id + '_path_row', 'click', function(e) {
+            Event.add(ed.id + '_path_row', 'click', function (e) {
                 e = e.target;
 
                 if (e.nodeName == 'A') {
@@ -419,16 +419,16 @@
             Event.add(ed.id + '_tbl', 'mouseover', function(e) {
             var re;
 	
-					e = e.target;
+            e = e.target;
 
-					if (e.nodeName == 'SPAN' && DOM.hasClass(e.parentNode, 'mceButton')) {
+            if (e.nodeName == 'SPAN' && DOM.hasClass(e.parentNode, 'mceButton')) {
             re = DOM.get(ed.id + '_path_row');
             t.lastPath = re.innerHTML;
             DOM.setHTML(re, e.parentNode.title);
             }
             });
 
-				Event.add(ed.id + '_tbl', 'mouseout', function(e) {
+            Event.add(ed.id + '_tbl', 'mouseout', function(e) {
             if (t.lastPath) {
             DOM.setHTML(ed.id + '_path_row', t.lastPath);
             t.lastPath = 0;
@@ -438,7 +438,7 @@
             */
 
             if (!ed.getParam('accessibility_focus') || ed.getParam('tab_focus'))
-                Event.add(DOM.add(p, 'a', { href: '#' }, '<!-- IE -->'), 'focus', function() { tinyMCE.get(ed.id).focus(); });
+                Event.add(DOM.add(p, 'a', { href: '#' }, '<!-- IE -->'), 'focus', function () { tinyMCE.get(ed.id).focus(); });
 
             if (s.theme_umbraco_toolbar_location == 'external')
                 o.deltaHeight = 0;
@@ -454,7 +454,7 @@
             };
         },
 
-        getInfo: function() {
+        getInfo: function () {
             return {
                 longname: 'Umbraco theme',
                 author: 'Umbraco, based on work in the umbraco theme by Moxiecode Systems AB',
@@ -463,13 +463,13 @@
             }
         },
 
-        resizeBy: function(dw, dh) {
+        resizeBy: function (dw, dh) {
             var e = DOM.get(this.editor.id + '_tbl');
 
             this.resizeTo(e.clientWidth + dw, e.clientHeight + dh);
         },
 
-        resizeTo: function(w, h) {
+        resizeTo: function (w, h) {
             var ed = this.editor, s = ed.settings, e = DOM.get(ed.id + '_tbl'), ifr = DOM.get(ed.id + '_ifr'), dh;
 
             // Boundery fix box
@@ -486,7 +486,7 @@
             DOM.setStyles(e, { width: w, height: h });
         },
 
-        destroy: function() {
+        destroy: function () {
             var id = this.editor.id;
 
             Event.clear(id + '_resize');
@@ -496,7 +496,7 @@
 
         // Internal functions
 
-        _simpleLayout: function(s, tb, o, p) {
+        _simpleLayout: function (s, tb, o, p) {
             var t = this, ed = t.editor, lo = s.theme_umbraco_toolbar_location, sl = s.theme_umbraco_statusbar_location, n, ic, etb, c;
 
             if (s.readonly) {
@@ -520,16 +520,24 @@
                 document.getElementById(ed.getParam("umbraco_toolbar_id", "*")).appendChild(c);
 
                 if (jQuery("#LiveEditingToolbar")) {
+                    // NH: Live editing hack for empty div in IE
+                    if (jQuery.browser.msie) {
+                        var emptyDiv = jQuery("#" + ed.getParam("umbraco_toolbar_id", "*")).prev();
+                        if (emptyDiv.get(0).tagName == "DIV" && emptyDiv.html() == "") {
+                            emptyDiv.hide();
+                        }
+                    }
+
                     t._addToolbars(etb, o);
                     DOM.show(DOM.get(ed.id + '_external'));
                 } else {
-                    jQuery(document).ready(function() {
+                    jQuery(document).ready(function () {
                         t._addToolbars(etb, o);
                         DOM.show(DOM.get(ed.id + '_external'));
                     });
                 }
 
-                ed.onMouseUp.add(function() {
+                ed.onMouseUp.add(function () {
                     jQuery(".tinymceMenuBar").hide();
                     jQuery("#" + ed.id + "_external").parent().show();
                 });
@@ -554,13 +562,13 @@
             return ic;
         },
 
-        _rowLayout: function(s, tb, o) {
+        _rowLayout: function (s, tb, o) {
             var t = this, ed = t.editor, dc, da, cf = ed.controlManager, n, ic, to, a;
 
             dc = s.theme_umbraco_containers_default_class || '';
             da = s.theme_umbraco_containers_default_align || 'center';
 
-            each(explode(s.theme_umbraco_containers || ''), function(c, i) {
+            each(explode(s.theme_umbraco_containers || ''), function (c, i) {
                 var v = s['theme_umbraco_container_' + c] || '';
 
                 switch (v.toLowerCase()) {
@@ -591,13 +599,13 @@
             return ic;
         },
 
-        _addControls: function(v, tb) {
+        _addControls: function (v, tb) {
             var t = this, s = t.settings, di, cf = t.editor.controlManager;
 
             if (s.theme_umbraco_disable && !t._disabled) {
                 di = {};
 
-                each(explode(s.theme_umbraco_disable), function(v) {
+                each(explode(s.theme_umbraco_disable), function (v) {
                     di[v] = 1;
                 });
 
@@ -605,7 +613,7 @@
             } else
                 di = t._disabled;
 
-            each(explode(v), function(n) {
+            each(explode(v), function (n) {
                 var c;
 
                 if (di && di[n])
@@ -613,7 +621,7 @@
 
                 // Compatiblity with 2.x
                 if (n == 'tablecontrols') {
-                    each(["table", "|", "row_props", "cell_props", "|", "row_before", "row_after", "delete_row", "|", "col_before", "col_after", "delete_col", "|", "split_cells", "merge_cells"], function(n) {
+                    each(["table", "|", "row_props", "cell_props", "|", "row_before", "row_after", "delete_row", "|", "col_before", "col_after", "delete_col", "|", "split_cells", "merge_cells"], function (n) {
                         n = t.createControl(n, cf);
 
                         if (n)
@@ -630,7 +638,7 @@
             });
         },
 
-        _addToolbars: function(c, o) {
+        _addToolbars: function (c, o) {
             var t = this, i, tb, ed = t.editor, s = t.settings, v, cf = ed.controlManager, di, n, h = [], a;
 
             a = s.theme_umbraco_toolbar_align.toLowerCase();
@@ -665,7 +673,7 @@
             DOM.setHTML(n, h.join(''));
         },
 
-        _addStatusBar: function(tb, o) {
+        _addStatusBar: function (tb, o) {
             var n, t = this, ed = t.editor, s = t.settings, r, mf, me, td;
 
             n = DOM.add(tb, 'tr');
@@ -677,7 +685,7 @@
                 DOM.add(td, 'a', { id: ed.id + '_resize', href: 'javascript:;', onclick: "return false;", 'class': 'mceResize' });
 
                 if (s.theme_umbraco_resizing_use_cookie) {
-                    ed.onPostRender.add(function() {
+                    ed.onPostRender.add(function () {
                         var o = Cookie.getHash("TinyMCE_" + ed.id + "_size"), c = DOM.get(ed.id + '_tbl');
 
                         if (!o)
@@ -691,8 +699,8 @@
                     });
                 }
 
-                ed.onPostRender.add(function() {
-                    Event.add(ed.id + '_resize', 'mousedown', function(e) {
+                ed.onPostRender.add(function () {
+                    Event.add(ed.id + '_resize', 'mousedown', function (e) {
                         var c, p, w, h, n, pa;
 
                         // Measure container
@@ -724,7 +732,7 @@
                         };
 
                         // Start listening
-                        mf = Event.add(DOM.doc, 'mousemove', function(e) {
+                        mf = Event.add(DOM.doc, 'mousemove', function (e) {
                             var w, h;
 
                             // Calc delta values
@@ -746,7 +754,7 @@
                             return Event.cancel(e);
                         });
 
-                        me = Event.add(DOM.doc, 'mouseup', function(e) {
+                        me = Event.add(DOM.doc, 'mouseup', function (e) {
                             var ifr;
 
                             // Stop listening
@@ -784,13 +792,13 @@
             n = tb = null;
         },
 
-        _nodeChanged: function(ed, cm, n, co) {
+        _nodeChanged: function (ed, cm, n, co) {
             var t = this, p, de = 0, v, c, s = t.settings, cl, fz, fn;
 
             if (s.readonly)
                 return;
 
-            tinymce.each(t.stateControls, function(c) {
+            tinymce.each(t.stateControls, function (c) {
                 cm.setActive(c, ed.queryCommandState(t.controls[c][1]));
             });
 
@@ -841,7 +849,7 @@
             }
 
             if (ed.settings.convert_fonts_to_spans) {
-                ed.dom.getParent(n, function(n) {
+                ed.dom.getParent(n, function (n) {
                     if (n.nodeName === 'SPAN') {
                         if (!cl && n.className)
                             cl = n.className;
@@ -857,13 +865,13 @@
                 });
 
                 if (c = cm.get('fontselect')) {
-                    c.select(function(v) {
+                    c.select(function (v) {
                         return v.replace(/^([^,]+).*/, '$1').toLowerCase() == fn;
                     });
                 }
 
                 if (c = cm.get('fontsizeselect')) {
-                    c.select(function(v) {
+                    c.select(function (v) {
                         if (v.fontSize && v.fontSize === fz)
                             return true;
 
@@ -877,7 +885,7 @@
 
                 if (c = cm.get('fontsizeselect')) {
                     v = ed.queryCommandValue('FontSize');
-                    c.select(function(iv) {
+                    c.select(function (iv) {
                         return iv.fontSize == v;
                     });
                 }
@@ -887,7 +895,7 @@
                 p = DOM.get(ed.id + '_path') || DOM.add(ed.id + '_path_row', 'span', { id: ed.id + '_path' });
                 DOM.setHTML(p, '');
 
-                ed.dom.getParent(n, function(n) {
+                ed.dom.getParent(n, function (n) {
                     var na = n.nodeName.toLowerCase(), u, pi, ti = '';
 
                     // Ignore non element and hidden elements
@@ -988,11 +996,11 @@
 
         // Commands gets called by execCommand
 
-        _sel: function(v) {
+        _sel: function (v) {
             this.editor.execCommand('mceSelectNodeDepth', false, v);
         },
 
-        _mceInsertAnchor: function(ui, v) {
+        _mceInsertAnchor: function (ui, v) {
             var ed = this.editor;
 
             ed.windowManager.open({
@@ -1006,7 +1014,7 @@
             });
         },
 
-        _mceCharMap: function() {
+        _mceCharMap: function () {
             var ed = this.editor;
 
             ed.windowManager.open({
@@ -1020,7 +1028,7 @@
             });
         },
 
-        _mceHelp: function() {
+        _mceHelp: function () {
             var ed = this.editor;
 
             ed.windowManager.open({
@@ -1033,7 +1041,7 @@
             });
         },
 
-        _mceColorPicker: function(u, v) {
+        _mceColorPicker: function (u, v) {
             var ed = this.editor;
 
             v = v || {};
@@ -1051,7 +1059,7 @@
             });
         },
 
-        _mceCodeEditor: function(ui, val) {
+        _mceCodeEditor: function (ui, val) {
             var ed = this.editor;
 
             ed.windowManager.open({
@@ -1066,7 +1074,7 @@
             });
         },
 
-        _mceImage: function(ui, val) {
+        _mceImage: function (ui, val) {
             var ed = this.editor;
 
             // Internal image object like a flash placeholder
@@ -1083,7 +1091,7 @@
             });
         },
 
-        _mceLink: function(ui, val) {
+        _mceLink: function (ui, val) {
             var ed = this.editor;
 
             ed.windowManager.open({
@@ -1096,40 +1104,40 @@
             });
         },
 
-        _mceNewDocument: function() {
+        _mceNewDocument: function () {
             var ed = this.editor;
 
-            ed.windowManager.confirm('umbraco.newdocument', function(s) {
+            ed.windowManager.confirm('umbraco.newdocument', function (s) {
                 if (s)
                     ed.execCommand('mceSetContent', false, '');
             });
         },
 
-        _mceForeColor: function() {
+        _mceForeColor: function () {
             var t = this;
 
             this._mceColorPicker(0, {
                 color: t.fgColor,
-                func: function(co) {
+                func: function (co) {
                     t.fgColor = co;
                     t.editor.execCommand('ForeColor', false, co);
                 }
             });
         },
 
-        _mceBackColor: function() {
+        _mceBackColor: function () {
             var t = this;
 
             this._mceColorPicker(0, {
                 color: t.bgColor,
-                func: function(co) {
+                func: function (co) {
                     t.bgColor = co;
                     t.editor.execCommand('HiliteColor', false, co);
                 }
             });
         },
 
-        _ufirst: function(s) {
+        _ufirst: function (s) {
             return s.substring(0, 1).toUpperCase() + s.substring(1);
         }
     });

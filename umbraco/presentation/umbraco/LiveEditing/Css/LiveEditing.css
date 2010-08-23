@@ -6,6 +6,18 @@
 
 umbraco\:iteminfo {
 	cursor: pointer;
+	border: 1px dashed #bbb;
+	padding: 5px;
+}
+
+.liveEditingForceBlockMode {
+	display: block;
+}
+
+umbraco\:iteminfo:hover 
+{
+	border: 2px dashed #f36f21;
+	padding: 5px;
 }
 
 /*****************************************************************

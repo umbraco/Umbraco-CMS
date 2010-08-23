@@ -1,7 +1,10 @@
-﻿using System.Web.UI;
+﻿using System;
+using System.Web.UI;
 using umbraco.presentation.LiveEditing.Updates;
 using umbraco.presentation.templateControls;
 using umbraco.presentation.nodeFactory;
+using umbraco.cms.businesslogic.web;
+using umbraco.interfaces;
 
 namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
 {
@@ -10,6 +13,7 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
     /// </summary>
     public class LiveEditingItemRenderer : ItemRenderer
     {
+        public const string RICHTEXTEDITOR_DATATYPE_ID = "{5E9B75AE-FACE-41c8-B47E-5F4B0FD82F83}";
         /// <summary>Returns the instance of <see cref="LiveEditingItemRenderer"/>.</summary>
         public new readonly static LiveEditingItemRenderer Instance = new LiveEditingItemRenderer();
 
@@ -93,6 +97,17 @@ namespace umbraco.presentation.LiveEditing.Modules.ItemEditing
                                                                new Node(item.GetParsedNodeId().Value).Name));
                 }
                 catch{}
+
+                try
+                {
+                    IDataType dt = new Document(item.GetParsedNodeId().Value).getProperty(item.Field).PropertyType.DataTypeDefinition.DataType;
+                    if (dt.Id == new Guid(RICHTEXTEDITOR_DATATYPE_ID))
+                    {
+                        writer.AddAttribute("class", "liveEditingForceBlockMode");
+                    }
+                }
+                catch { }
+
 
          
                 writer.RenderBeginTag(LiveEditingMarkerTag);
