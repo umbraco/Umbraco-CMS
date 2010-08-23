@@ -151,6 +151,7 @@ namespace {0} {{
 				{{
 					this.RaisePropertyChanging();
 					this._{1} = value;
+                    this.IsDirty = true;
 					this.RaisePropertyChanged(""{1}"");
 				}}
 			}}

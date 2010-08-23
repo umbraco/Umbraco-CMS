@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Linq.Expressions;
 
 namespace umbraco.Linq.Core
 {
     /// <summary>
-    /// Provides the methods required for a data access model within the LINQ to umbraco project
+    /// Provides the methods required for a data access model within the LINQ to Umbraco project
     /// </summary>
     /// <remarks>
     /// This base class is used when defining how a DataProvider operates against a data source (such as the umbraco.config).
@@ -17,27 +14,32 @@ namespace umbraco.Linq.Core
     public abstract class UmbracoDataProvider : IDisposable
     {
         /// <summary>
+        /// Indicates the disposal status of the current provider
+        /// </summary>
+        protected bool _disposed;
+
+        /// <summary>
         /// Gets the name of the provider
         /// </summary>
         /// <value>The name of the provider.</value>
         public abstract string Name { get; }
 
         /// <summary>
-        /// Loads the tree with the relivent DocTypes
+        /// Loads the tree with the relevant DocTypes
         /// </summary>
         /// <typeparam name="TDocType">The type of the DocType to load.</typeparam>
         /// <returns></returns>
         public abstract Tree<TDocType> LoadTree<TDocType>() where TDocType : DocTypeBase, new();
 
         /// <summary>
-        /// Loads the associated nodes with the relivent DocTypes
+        /// Loads the associated nodes with the relevant DocTypes
         /// </summary>
         /// <param name="parentNodeId">The parent node id.</param>
         /// <returns></returns>
         public abstract AssociationTree<DocTypeBase> LoadAssociation(int parentNodeId);
 
         /// <summary>
-        /// Loads the associated nodes with the relivent DocTypes
+        /// Loads the associated nodes with the relevant DocTypes
         /// </summary>
         /// <typeparam name="TDocType">The type of the DocType to load.</typeparam>
         /// <param name="nodes">The nodes.</param>
@@ -62,6 +64,15 @@ namespace umbraco.Linq.Core
         #region IDisposable Members
 
         /// <summary>
+        /// Checks if the provider has been disposed
+        /// </summary>
+        protected internal void CheckDisposed()
+        {
+            if (this._disposed)
+                throw new ObjectDisposedException(null);
+        }
+
+        /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
@@ -77,10 +88,16 @@ namespace umbraco.Linq.Core
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")]
         protected internal virtual void Dispose(bool disposing)
         {
+            this._disposed = true;
         }
 
         #endregion
 
+        /// <summary>
+        /// Submits the changes tracked by the UmbracoDataProvider
+        /// </summary>
+        /// <remarks>It is up to the implementor of the UmbracoDataProvider to decide whether or not they are supporting change submission in their provider. This will thrown an exception unless it is explicitly implemented.</remarks>
+        /// <exception cref="System.NotImplementedException">Thrown unless the method is implemented in a custom UmbracoDataProvider.</exception>
         protected internal virtual void SubmitChanges()
         {
             throw new NotImplementedException("Provider \"" + this.Name + "\" does not implement a submittable pattern");

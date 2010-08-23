@@ -100,28 +100,18 @@ namespace umbraco.Linq.Core.Node
 
         #region IDisposable Members
 
-        private bool _disposed;
-
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources
         /// </summary>
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected internal override void Dispose(bool disposing)
         {
-            if (!this._disposed && disposing)
+            if (disposing)
             {
                 this._xmlPath = null;
-
-                this._disposed = true;
             }
-        }
 
-        internal void CheckDisposed()
-        {
-            if (this._disposed)
-            {
-                throw new ObjectDisposedException(null);
-            }
+            base.Dispose(disposing);
         }
 
         #endregion
@@ -344,7 +334,7 @@ namespace umbraco.Linq.Core.Node
                 if (propertyXml != null)
                     data = propertyXml.Value;
 
-                if (p.PropertyType.IsValueType && typeof(Nullable<>).IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition()))
+                if (p.PropertyType.IsValueType && p.PropertyType.GetGenericArguments().Length > 0 && typeof(Nullable<>).IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition()))
                 {
                     if (string.IsNullOrEmpty(data))
                     {
