@@ -44,7 +44,7 @@ namespace umbraco.cms.businesslogic.translation
                 string[] subjectVars = {serverName, Node.Text};
                 string[] bodyVars = {
                                         Translator.Name, Node.Text, User.Name,
-                                        serverName, Node.Id.ToString(),
+                                        serverName, t.Id.ToString(),
                                         Language.FriendlyName
                                     };
 

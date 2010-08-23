@@ -245,6 +245,7 @@ namespace umbraco.cms.businesslogic.member
             Member m = new Member(newId);
 
             NewEventArgs e = new NewEventArgs();
+
             m.OnNew(e);
 
             m.Save();
