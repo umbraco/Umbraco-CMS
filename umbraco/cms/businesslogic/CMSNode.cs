@@ -76,7 +76,10 @@ namespace umbraco.cms.businesslogic
             {
                 GroupCollection groups = match.Groups;
                 string cssClass = groups[1].Value.Replace("\n", "").Replace("\r", "").Trim().Trim(Environment.NewLine.ToCharArray());
-                m_DefaultIconClasses.Add(cssClass);
+                if (!String.IsNullOrEmpty(cssClass))
+                {
+                    m_DefaultIconClasses.Add(cssClass);
+                }
             }
         }
         private const string m_SQLSingle = "SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE id = @id";
