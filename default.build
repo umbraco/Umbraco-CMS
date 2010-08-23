@@ -41,13 +41,31 @@
 
     <!-- Build source -->
     <target name="build" depends="init">
+
+        <!-- set everything to writable-->
         <attrib normal="true" readonly="false">
             <fileset basedir="${root.dir}">
                 <include name="**/*" />
             </fileset>
         </attrib>
 
-        
+        <!-- Remove those damn DLR dlls that might be left behind by careless devs...-->
+        <!-- They will get added again after build is completed, no worries no dependencies during build-->
+        <delete>
+            <fileset>
+                <include name="${root.dir}/bin/IronPython.dll" />
+                <include name="${root.dir}/bin/IronPython.Modules.dll" />
+                <include name="${root.dir}/bin/IronRuby.dll" />
+                <include name="${root.dir}/bin/IronRuby.Libraries.dll" />
+                <include name="${root.dir}/bin/IronRuby.Libraries.Yaml.dll" />
+                <include name="${root.dir}/bin/Microsoft.Dynamic.dll" />
+                <include name="${root.dir}/bin/Microsoft.ScriptinG.Core.dll" />
+                <include name="${root.dir}/bin/Microsoft.Scripting.Debugging.dll" />
+                <include name="${root.dir}/bin/Microsoft.Scripting.dll" />
+                <include name="${root.dir}/bin/Microsoft.Scripting.ExtensionAttribute.dll" />
+            </fileset>
+        </delete>
+
         <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
             <arg value="${root.dir}\umbraco.sln" />
             <arg value="/v:n" />
