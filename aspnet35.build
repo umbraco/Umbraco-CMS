@@ -74,6 +74,14 @@
         </copy>
 
         <!-- asp.net 2.0 SP1 DLR dlls -->
+        <delete>
+            <fileset>
+                <include name="${build.dir}\bin\Microsoft.Scripting.*" />
+                <include name="${build.dir}\bin\Microsoft.Dynamic.*" />
+                <include name="${build.dir}\bin\IronPython.*" />
+                <include name="${build.dir}\bin\IronRuby.*" />
+            </fileset>
+        </delete>
         <copy todir="${build.dir}\bin">
             <fileset basedir="${dlls.dir}\DLR 2.0 SP1">
                 <include name="*.dll" />

@@ -49,8 +49,6 @@
             </fileset>
         </attrib>
 
-        <!-- Remove those damn DLR dlls that might be left behind by careless devs...-->
-        <!-- They will get added again after build is completed, no worries no dependencies during build-->
         <delete>
             <fileset>
                 <include name="${source.dir}\bin\IronPython.dll" />
@@ -65,7 +63,7 @@
                 <include name="${source.dir}\bin\Microsoft.Scripting.ExtensionAttribute.dll" />
             </fileset>
         </delete>
-        
+
         <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
             <arg value="${root.dir}\umbraco.sln" />
             <arg value="/v:n" />
@@ -73,7 +71,6 @@
             <arg value="/p:ToolsVersion=4.0" />
         </exec>
         <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
-        
     </target>
 
 
@@ -87,9 +84,19 @@
                 <include name="*.xml" />
             </fileset>
         </copy>
-
         
-        <copy todir="${build.dir}\bin">
+        
+        <!-- DLR FILES -->
+        <delete>
+            <fileset>
+                <include name="${build.dir}\bin\Microsoft.Scripting.*" />
+                <include name="${build.dir}\bin\Microsoft.Dynamic.*" />
+                <include name="${build.dir}\bin\IronPython.*" />
+                <include name="${build.dir}\bin\IronRuby.*" />
+            </fileset>
+        </delete>
+                
+        <copy todir="${build.dir}\bin" overwrite="true">
             <fileset basedir="${dlls.dir}\DLR 4.0">
                 <include name="*.dll" />
                 <exclude name="Microsoft.Scripting.ExtensionAttribute.dll" />
@@ -187,6 +194,8 @@
         <mkdir dir="${build.dir}\xslt" />
         <mkdir dir="${build.dir}\usercontrols" />
     </target>
+
+    
 
     <!-- Minify -->
     <target name="minify" description="minify JS files" depends="directories">
