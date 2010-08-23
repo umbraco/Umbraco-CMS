@@ -28,7 +28,7 @@ namespace umbraco.presentation.cache
 
         public void Refresh(int Id)
         {
-            library.ClearLibraryCacheForMedia(Id);
+            library.ClearLibraryCacheForMediaDo(Id);
         }
 
         public void Remove(int Id)
@@ -64,7 +64,7 @@ namespace umbraco.presentation.cache
 
         public void Refresh(int Id)
         {
-            library.ClearLibraryCacheForMember(Id);
+            library.ClearLibraryCacheForMemberDo(Id);
         }
 
         public void Remove(int Id)
