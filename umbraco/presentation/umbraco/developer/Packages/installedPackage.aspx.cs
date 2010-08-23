@@ -17,6 +17,7 @@ using umbraco.cms.businesslogic.macro;
 using runtimeMacro = umbraco.macro;
 using System.Xml;
 using umbraco.IO;
+using umbraco.cms.presentation.Trees;
 
 namespace umbraco.presentation.developer.packages
 {
@@ -563,6 +564,8 @@ namespace umbraco.presentation.developer.packages
             //ensure that all tree's are refreshed after uninstall
             ClientTools.ClearClientTreeCache()
                 .RefreshTree();
+
+            TreeDefinitionCollection.Instance.ReRegisterTrees();
 
         }
 
