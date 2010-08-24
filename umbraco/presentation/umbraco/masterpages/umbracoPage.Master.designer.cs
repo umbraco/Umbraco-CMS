@@ -67,6 +67,15 @@ namespace umbraco.presentation.masterpages {
         protected global::ClientDependency.Core.Controls.JsInclude JsInclude8;
         
         /// <summary>
+        /// JsInclude9 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude9;
+        
+        /// <summary>
         /// JsInclude4 control.
         /// </summary>
         /// <remarks>

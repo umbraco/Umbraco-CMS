@@ -43,4 +43,8 @@ function resizePanelTo(PanelName, hasMenu, pWidth, pHeight) {
         jQuery("#" + PanelName + "_menu_slh").width(scrollwidth);
         jQuery("#" + PanelName + "_menubackground").width(panelWidth - 2);
     }
+
+    // set cookies
+    jQuery.cookie('umbPanel_pWidth', pWidth);
+    jQuery.cookie('umbPanel_pHeight', pHeight);
 }

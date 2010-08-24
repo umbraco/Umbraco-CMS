@@ -9,30 +9,54 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using ClientDependency.Core;
+using umbraco.BusinessLogic;
 
-namespace umbraco.uicontrols {
+namespace umbraco.uicontrols
+{
 
 
-	[ClientDependency(ClientDependencyType.Javascript, "panel/javascript.js", "UmbracoClient")]
-	[ClientDependency(ClientDependencyType.Css, "panel/style.css", "UmbracoClient")]
-   public class UmbracoPanel : System.Web.UI.WebControls.Panel {
+    [ClientDependency(ClientDependencyType.Javascript, "panel/javascript.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Css, "panel/style.css", "UmbracoClient")]
+    public class UmbracoPanel : System.Web.UI.WebControls.Panel
+    {
         private ScrollingMenu _menu = new ScrollingMenu();
 
-        public UmbracoPanel() {
+        public UmbracoPanel()
+        {
 
         }
 
-        protected override void OnInit(EventArgs e) {
+        protected override void OnInit(EventArgs e)
+        {
+            // We can grab the cached window size from cookie values
+            if (AutoResize)
+            {
+                if (!String.IsNullOrEmpty(StateHelper.GetCookieValue("umbPanel_pWidth")))
+                {
+                    int pWidth = 0;
+                    int pHeight = 0;
+                    if (int.TryParse(StateHelper.GetCookieValue("umbPanel_pWidth"), out pWidth))
+                    {
+                        Width = Unit.Pixel(pWidth);
+                    }
+                    if (int.TryParse(StateHelper.GetCookieValue("umbPanel_pHeight"), out pHeight))
+                    {
+                        Height = Unit.Pixel(pHeight);
+                    }
+                }
+            }
+
             setupMenu();
         }
 
-        protected override void OnLoad(System.EventArgs EventArguments) {
+        protected override void OnLoad(System.EventArgs EventArguments)
+        {
 
             _menu.Visible = hasMenu;
 
-            if(_autoResize)
+            if (_autoResize)
                 this.Page.ClientScript.RegisterStartupScript(this.GetType(), "PanelEvents", "jQuery(document).ready(function() {jQuery(window).load(function(){ resizePanel('" + this.ClientID + "', " + this.hasMenu.ToString().ToLower() + ",true); }) });", true);
-                //this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "PanelEvents", "<script type='text/javascript'>addEvent(window, \"load\", function(){ resizePanel('" + this.ClientID + "', " + this.hasMenu.ToString().ToLower() + "); }); addEvent(window, \"resize\", function(){ resizePanel('" + this.ClientID + "', " + this.hasMenu.ToString().ToLower() + "); });</script>");
+            //this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "PanelEvents", "<script type='text/javascript'>addEvent(window, \"load\", function(){ resizePanel('" + this.ClientID + "', " + this.hasMenu.ToString().ToLower() + "); }); addEvent(window, \"resize\", function(){ resizePanel('" + this.ClientID + "', " + this.hasMenu.ToString().ToLower() + "); });</script>");
         }
 
         private bool _hasMenu = false;
@@ -40,19 +64,24 @@ namespace umbraco.uicontrols {
         private string _text;
         private bool _autoResize = true;
 
-        public bool hasMenu {
+        public bool hasMenu
+        {
             get { return _hasMenu; }
             set { _hasMenu = value; }
         }
 
-        public bool AutoResize {
+        public bool AutoResize
+        {
             get { return _autoResize; }
             set { _autoResize = value; }
         }
 
-        public string Text {
-            get {
-                if (_text == "") {
+        public string Text
+        {
+            get
+            {
+                if (_text == "")
+                {
                     _text = "&nbsp;";
                 }
                 return _text;
@@ -61,29 +90,35 @@ namespace umbraco.uicontrols {
             set { _text = value; }
         }
 
-        public string StatusBarText {
+        public string StatusBarText
+        {
             get { return _StatusBarText; }
             set { _StatusBarText = value; }
         }
 
-        public ScrollingMenu Menu {
+        public ScrollingMenu Menu
+        {
             get { return _menu; }
         }
 
-        internal void setupMenu() {
-                _menu.ID = this.ID + "_menu";
-                if (this.Width.Value < 20)
-                    this.Width = Unit.Pixel(24);
-                _menu.Width = (int)Unit.Pixel((int)this.Width.Value - 20).Value;
-                this.Controls.Add(_menu);
+        internal void setupMenu()
+        {
+            _menu.ID = this.ID + "_menu";
+            if (this.Width.Value < 20)
+                this.Width = Unit.Pixel(24);
+            _menu.Width = (int)Unit.Pixel((int)this.Width.Value - 20).Value;
+            this.Controls.Add(_menu);
 
         }
-       
-        protected override void Render(System.Web.UI.HtmlTextWriter writer) {
+
+        protected override void Render(System.Web.UI.HtmlTextWriter writer)
+        {
             base.CreateChildControls();
-            
-            try {
-                if (System.Web.HttpContext.Current == null) {
+
+            try
+            {
+                if (System.Web.HttpContext.Current == null)
+                {
                     writer.WriteLine("Number of child controls : " + this.Controls.Count);
                 }
                 writer.WriteLine("<div id=\"" + this.ClientID + "\" class=\"panel\" style=\"height:" + this.Height.Value + "px;width:" + this.Width.Value + "px;\">");
@@ -91,8 +126,9 @@ namespace umbraco.uicontrols {
                 writer.WriteLine("<h2 id=\"" + this.ClientID + "Label\">" + this.Text + "</h2>");
                 writer.WriteLine("</div>");
                 writer.WriteLine("<div class=\"boxbody\">");
-                
-                if (this.hasMenu) {
+
+                if (this.hasMenu)
+                {
                     writer.WriteLine("<div id='" + this.ClientID + "_menubackground' class=\"menubar_panel\">");
                     _menu.RenderControl(writer);
                     writer.WriteLine("</div>");
@@ -103,18 +139,21 @@ namespace umbraco.uicontrols {
 
                 if (this.hasMenu)
                     upHeight = upHeight - 34;
-                
+
                 writer.WriteLine("<div id=\"" + this.ClientID + "_content\" class=\"content\" style=\"width: auto; height:" + (upHeight) + "px;\">");
 
                 string styleString = "";
 
-                foreach (string key in this.Style.Keys) {
+                foreach (string key in this.Style.Keys)
+                {
                     styleString += key + ":" + this.Style[key] + ";";
                 }
 
                 writer.WriteLine("<div class=\"innerContent\" id=\"" + this.ClientID + "_innerContent\" style='" + styleString + "'>");
-                foreach (Control c in this.Controls) {
-                    if (!(c.ID == _menu.ID)) {
+                foreach (Control c in this.Controls)
+                {
+                    if (!(c.ID == _menu.ID))
+                    {
                         c.RenderControl(writer);
                     }
                 }
@@ -130,7 +169,9 @@ namespace umbraco.uicontrols {
                     writer.WriteLine("<script type=\"text/javascript\">jQuery(document).ready(function(){ resizePanel('" + this.ClientID + "', " + this.hasMenu.ToString().ToLower() + ");});</script>");
                 */
 
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 this.Page.Trace.Warn("Error rendering umbracopanel control" + ex.ToString());
             }
         }

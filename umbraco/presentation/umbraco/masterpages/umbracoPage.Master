@@ -17,6 +17,8 @@
         Priority="0" />
     <umb:JsInclude ID="JsInclude8" runat="server" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient"
         Priority="1" />
+    <umb:JsInclude ID="JsInclude9" runat="server" FilePath="Application/jQuery/jquery.cookie.js" PathNameAlias="UmbracoClient"
+        Priority="1" />
     <umb:JsInclude ID="JsInclude4" runat="server" FilePath="Application/UmbracoApplicationActions.js"
         PathNameAlias="UmbracoClient" Priority="2" />
     <umb:JsInclude ID="JsInclude5" runat="server" FilePath="Application/UmbracoUtils.js"
