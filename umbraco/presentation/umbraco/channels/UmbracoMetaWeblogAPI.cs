@@ -441,7 +441,7 @@ namespace umbraco.presentation.channels
                         fileObject.Value = SystemDirectories.Media + "/" + filename;
                     }
 
-                    fileUrl.url = "http://" + HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + fileObject.Value.ToString();
+                    fileUrl.url = "http://" + HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + IOHelper.ResolveUrl(fileObject.Value.ToString());
 
                     File.WriteAllBytes(_fullFilePath, file.bits);
 
