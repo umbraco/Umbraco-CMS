@@ -13,6 +13,7 @@ using System.Xml.XPath;
 using umbraco.BasePages;
 using umbraco.IO;
 using umbraco.cms.presentation.Trees;
+using BizLogicAction = umbraco.BusinessLogic.Actions.Action;
 
 namespace umbraco.presentation.developer.packages
 {
@@ -253,6 +254,8 @@ namespace umbraco.presentation.developer.packages
                         .RefreshTree("packager");
 
                     TreeDefinitionCollection.Instance.ReRegisterTrees();
+
+                    BizLogicAction.ReRegisterActionsAndHandlers();
 
                     break;
                 default:

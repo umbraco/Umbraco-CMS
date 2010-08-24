@@ -27,15 +27,33 @@ namespace umbraco.BusinessLogic.Actions
     /// </summary>
     public class Action
     {
-        private static readonly List<IAction> _actions = new List<IAction>();
-        private static readonly Dictionary<string, string> _actionJs = new Dictionary<string, string>();
-        private static readonly List<IActionHandler> _actionHandlers = new List<IActionHandler>();
+        private static List<IAction> _actions = new List<IAction>();        
+        private static List<IActionHandler> _actionHandlers = new List<IActionHandler>();
+
         private static readonly List<string> _actionJSReference = new List<string>();
+        private static readonly Dictionary<string, string> _actionJs = new Dictionary<string, string>();
+
+        private static readonly object m_Lock = new object();
+        private static readonly object m_LockerReRegister = new object();
 
         static Action()
         {
-            RegisterIActions();
-            RegisterIActionHandlers();
+            ReRegisterActionsAndHandlers();
+        }
+
+        /// <summary>
+        /// This is used when an IAction or IActionHandler is installed into the system
+        /// and needs to be loaded into memory.
+        /// </summary>
+        public static void ReRegisterActionsAndHandlers()
+        {
+            lock (m_Lock)
+            {
+                _actions.Clear();
+                _actionHandlers.Clear();
+                RegisterIActions();
+                RegisterIActionHandlers(); 
+            }
         }
 
         /// <summary>
@@ -43,17 +61,20 @@ namespace umbraco.BusinessLogic.Actions
         /// </summary>
         private static void RegisterIActionHandlers()
         {
-            if (_actionHandlers.Count > 0)
-                return;
 
-            List<Type> foundIActionHandlers = TypeFinder.FindClassesOfType<IActionHandler>(true);
-            foreach (Type type in foundIActionHandlers)
+            if (_actionHandlers.Count == 0)
             {
-                IActionHandler typeInstance;
-                typeInstance = Activator.CreateInstance(type) as IActionHandler;
-                if (typeInstance != null)
-                    _actionHandlers.Add(typeInstance);
+
+                List<Type> foundIActionHandlers = TypeFinder.FindClassesOfType<IActionHandler>(true);
+                foreach (Type type in foundIActionHandlers)
+                {
+                    IActionHandler typeInstance;
+                    typeInstance = Activator.CreateInstance(type) as IActionHandler;
+                    if (typeInstance != null)
+                        _actionHandlers.Add(typeInstance);
+                }
             }
+
         }
 
         /// <summary>
@@ -61,28 +82,29 @@ namespace umbraco.BusinessLogic.Actions
         /// </summary>
         private static void RegisterIActions()
         {
-            if (_actions.Count > 0)
-                return;
 
-            List<Type> foundIActions = TypeFinder.FindClassesOfType<IAction>(true);
-            foreach (Type type in foundIActions)
+            if (_actions.Count == 0)
             {
-                IAction typeInstance;
-                PropertyInfo instance = type.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
-                //if the singletone initializer is not found, try simply creating an instance of the IAction if it supports public constructors
-                if (instance == null)
-                    typeInstance = Activator.CreateInstance(type) as IAction;
-                else
-                    typeInstance = instance.GetValue(null, null) as IAction;
-
-                if (typeInstance != null)
+                List<Type> foundIActions = TypeFinder.FindClassesOfType<IAction>(true);
+                foreach (Type type in foundIActions)
                 {
-                    if (!string.IsNullOrEmpty(typeInstance.JsSource))
-                        _actionJSReference.Add(typeInstance.JsSource);
-                    _actions.Add(typeInstance);
-                }
+                    IAction typeInstance;
+                    PropertyInfo instance = type.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
+                    //if the singletone initializer is not found, try simply creating an instance of the IAction if it supports public constructors
+                    if (instance == null)
+                        typeInstance = Activator.CreateInstance(type) as IAction;
+                    else
+                        typeInstance = instance.GetValue(null, null) as IAction;
 
+                    if (typeInstance != null)
+                    {
+                        if (!string.IsNullOrEmpty(typeInstance.JsSource))
+                            _actionJSReference.Add(typeInstance.JsSource);
+                        _actions.Add(typeInstance);
+                    }
+                }
             }
+
         }
 
         /// <summary>

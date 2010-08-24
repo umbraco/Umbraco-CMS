@@ -18,6 +18,7 @@ using runtimeMacro = umbraco.macro;
 using System.Xml;
 using umbraco.IO;
 using umbraco.cms.presentation.Trees;
+using BizLogicAction = umbraco.BusinessLogic.Actions.Action;
 
 namespace umbraco.presentation.developer.packages
 {
@@ -567,6 +568,8 @@ namespace umbraco.presentation.developer.packages
 
             TreeDefinitionCollection.Instance.ReRegisterTrees();
 
+            BizLogicAction.ReRegisterActionsAndHandlers();
+            
         }
 
         private bool isManifestEmpty()
