@@ -21,6 +21,7 @@ namespace umbraco
         private String pageName;
         private int parentId;
         private String writerName;
+        private String creatorName;
         private String path;
         private int nodeType;
         private String nodeTypeAlias;
@@ -59,7 +60,7 @@ namespace umbraco
             {
             }
             // create page
-            populatePageData(Id, d.Text, d.ContentType.Id, d.ContentType.Alias, d.User.Name, d.CreateDateTime,
+            populatePageData(Id, d.Text, d.ContentType.Id, d.ContentType.Alias, d.User.Name, d.Creator.Name, d.CreateDateTime,
                              d.UpdateDate, d.Path, d.Version, tmpParentId);
 
             // update page elements
@@ -76,7 +77,7 @@ namespace umbraco
             //			RenderPage(template);
         }
 
-        private void populatePageData(int pageID, string pageName, int nodeType, string nodeTypeAlias, string writerName,
+        private void populatePageData(int pageID, string pageName, int nodeType, string nodeTypeAlias, string writerName, string creatorName,
                                       DateTime createDate, DateTime updateDate, string path, Guid pageVersion,
                                       int parentId)
         {
@@ -85,6 +86,7 @@ namespace umbraco
             this.nodeType = nodeType;
             this.nodeTypeAlias = nodeTypeAlias;
             this.writerName = writerName;
+            this.creatorName = creatorName;
             this.createDate = createDate;
             this.updateDate = updateDate;
             this.parentId = parentId;
@@ -99,6 +101,7 @@ namespace umbraco
             elements.Add("nodeType", nodeType);
             elements.Add("nodeTypeAlias", nodeTypeAlias);
             elements.Add("writerName", writerName);
+            elements.Add("creatorName", creatorName);
             elements.Add("createDate", createDate);
             elements.Add("updateDate", updateDate);
             elements.Add("path", path);
@@ -141,6 +144,14 @@ namespace umbraco
             {
                 writerName = xmlNode.Attributes.GetNamedItem("writerName").Value;
                 elements.Add("writerName", writerName);
+            }
+            catch
+            {
+            }
+            try
+            {
+                creatorName = xmlNode.Attributes.GetNamedItem("creatorName").Value;
+                elements.Add("creatorName", creatorName);
             }
             catch
             {
@@ -326,6 +337,11 @@ namespace umbraco
         public String WriterName
         {
             get { return writerName; }
+        }
+
+        public String CreatorName
+        {
+            get { return creatorName; }
         }
 
         public DateTime CreateDate

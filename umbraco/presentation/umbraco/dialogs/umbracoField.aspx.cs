@@ -18,7 +18,7 @@ namespace umbraco.dialogs
 	/// </summary>
 	public partial class umbracoField : BasePages.UmbracoEnsuredPage
 	{
-		string[] preValuesSource = {"@pageID", "@parentID", "@level", "@writerID", "@nodeType", "@template", "@createDate", "@updateDate", "@pageName", "@urlName", "@writerName", "@nodeTypeAlias", "@path"};
+        string[] preValuesSource = { "@createDate", "@creatorName", "@level", "@nodeType", "@nodeTypeAlias", "@pageID", "@pageName", "@parentID", "@path", "@template", "@updateDate", "@writerID", "@writerName" };
         bool m_IsDictionaryMode = false;
 
 		protected void Page_Load(object sender, System.EventArgs e)
