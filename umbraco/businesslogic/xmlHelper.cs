@@ -91,7 +91,9 @@ namespace umbraco
 		{
 			if (n == null || n.FirstChild == null)
 				return string.Empty;
-			return n.FirstChild.Value;
+            if(n.FirstChild.Value != null)
+			    return n.FirstChild.Value;
+            return n.InnerXml;
 		}
 	}
 }
