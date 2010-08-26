@@ -101,8 +101,8 @@ namespace umbraco {
             string domainUrl = "";
             if (checkDomain && Domain.Exists(HttpContext.Current.Request.ServerVariables["SERVER_NAME"])) {
                 domainUrl =
-                    library.NiceUrlFullPath(
-                        Domain.GetRootFromDomain(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]));
+                    library.NiceUrlFetch(
+                        Domain.GetRootFromDomain(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]), 1); // we use niceUrlFetch because we have to bypass caching
                 // If at domain root
                 if (url == "") {
                     _tempQuery = "";

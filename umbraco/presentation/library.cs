@@ -394,6 +394,13 @@ namespace umbraco
 
         private static IDictionary<int, string> niceUrlCache = new Dictionary<int, string>();
 
+        /// <summary>
+        /// This is used in the requesthandler for domain lookups to ensure that we don't use the cache 
+        /// </summary>
+        /// <param name="nodeID"></param>
+        /// <param name="startNodeDepth"></param>
+        /// <param name="byPassCache"></param>
+        /// <returns></returns>
         private static string niceUrlDo(int nodeID, int startNodeDepth)
         {
             if (!niceUrlCache.ContainsKey(nodeID))
@@ -402,85 +409,95 @@ namespace umbraco
                 {
                     if (!niceUrlCache.ContainsKey(nodeID))
                     {
-                        bool directoryUrls = GlobalSettings.UseDirectoryUrls;
-                        string baseUrl = SystemDirectories.Root; // SystemDirectories.Umbraco;
-                        //baseUrl = baseUrl.Substring(0, baseUrl.LastIndexOf("/"));
-
-                        bool atDomain = false;
-                        string currentDomain = HttpContext.Current.Request.ServerVariables["SERVER_NAME"].ToLower();
-                        if (UmbracoSettings.UseDomainPrefixes && Domain.Exists(currentDomain))
-                            atDomain = true;
-
-
-                        // Find path from nodeID
-                        String tempUrl = "";
-                        XmlElement node = UmbracoContext.Current.GetXml().GetElementById(nodeID.ToString());
-                        String[] splitpath = null;
-                        if (node != null)
+                        string tempUrl = NiceUrlFetch(nodeID, startNodeDepth);
+                        if (!String.IsNullOrEmpty(tempUrl))
                         {
-                            try
-                            {
-                                splitpath =
-                                    node.Attributes.GetNamedItem("path").Value.ToString().
-                                        Split(",".ToCharArray());
-
-                                int startNode = startNodeDepth;
-
-                                // check root nodes for domains
-                                if (UmbracoSettings.UseDomainPrefixes && startNode > 1)
-                                {
-                                    if (node.ParentNode.Name.ToLower() != "root")
-                                    {
-                                        Domain[] domains =
-                                            Domain.GetDomainsById(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value));
-                                        if (
-                                            domains.Length > 0)
-                                        {
-                                            tempUrl =
-                                                getUrlByDomain(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value), "",
-                                                               atDomain, currentDomain, true);
-                                        }
-                                        // test for domains on root nodes, then make the url domain only
-                                    }
-                                    else if (Domain.GetDomainsById(nodeID).Length > 0)
-                                    {
-                                        tempUrl = getUrlByDomain(nodeID, "",
-                                                                 false, currentDomain, false);
-                                        return tempUrl;
-                                    }
-                                }
-
-
-                                if (splitpath.Length > startNode)
-                                {
-                                    for (int i = startNode; i < splitpath.Length; i++)
-                                    {
-                                        tempUrl = getUrlByDomain(int.Parse(splitpath[i]), tempUrl, atDomain, currentDomain, false);
-                                    }
-                                }
-                                else
-                                {
-                                    // check the root node for language
-                                    tempUrl += getUrlByDomain(nodeID, "", atDomain, currentDomain, false);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                HttpContext.Current.Trace.Warn("library.NiceUrl",
-                                                               string.Format("Error generating nice url for id '{0}'", nodeID), e);
-                                tempUrl = "/" + nodeID;
-                            }
-                            tempUrl = appendUrlExtension(baseUrl, directoryUrls, tempUrl);
+                            niceUrlCache.Add(nodeID, tempUrl);
                         }
-                        else
-                            HttpContext.Current.Trace.Warn("niceurl", string.Format("No node found at '{0}'", nodeID));
-
-                        niceUrlCache.Add(nodeID, tempUrl);  
                     }
                 }
             }
 
             return niceUrlCache[nodeID];
+        }
+
+        internal static string NiceUrlFetch(int nodeID, int startNodeDepth)
+        {
+            bool directoryUrls = GlobalSettings.UseDirectoryUrls;
+            string baseUrl = SystemDirectories.Root; // SystemDirectories.Umbraco;
+            //baseUrl = baseUrl.Substring(0, baseUrl.LastIndexOf("/"));
+
+            bool atDomain = false;
+            string currentDomain = HttpContext.Current.Request.ServerVariables["SERVER_NAME"].ToLower();
+            if (UmbracoSettings.UseDomainPrefixes && Domain.Exists(currentDomain))
+                atDomain = true;
+
+
+            // Find path from nodeID
+            String tempUrl = "";
+            XmlElement node = UmbracoContext.Current.GetXml().GetElementById(nodeID.ToString());
+            String[] splitpath = null;
+            if (node != null)
+            {
+                try
+                {
+                    splitpath =
+                        node.Attributes.GetNamedItem("path").Value.ToString().
+                            Split(",".ToCharArray());
+
+                    int startNode = startNodeDepth;
+
+                    // check root nodes for domains
+                    if (UmbracoSettings.UseDomainPrefixes && startNode > 1)
+                    {
+                        if (node.ParentNode.Name.ToLower() != "root")
+                        {
+                            Domain[] domains =
+                                Domain.GetDomainsById(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value));
+                            if (
+                                domains.Length > 0)
+                            {
+                                tempUrl =
+                                    getUrlByDomain(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value), "",
+                                                   atDomain, currentDomain, true);
+                            }
+                            // test for domains on root nodes, then make the url domain only
+                        }
+                        else if (Domain.GetDomainsById(nodeID).Length > 0)
+                        {
+                            tempUrl = getUrlByDomain(nodeID, "",
+                                                     false, currentDomain, false);
+                            return tempUrl;
+                        }
+                    }
+
+
+                    if (splitpath.Length > startNode)
+                    {
+                        for (int i = startNode; i < splitpath.Length; i++)
+                        {
+                            tempUrl = getUrlByDomain(int.Parse(splitpath[i]), tempUrl, atDomain, currentDomain, false);
+                        }
+                    }
+                    else
+                    {
+                        // check the root node for language
+                        tempUrl += getUrlByDomain(nodeID, "", atDomain, currentDomain, false);
+                    }
+                }
+                catch (Exception e)
+                {
+                    HttpContext.Current.Trace.Warn("library.NiceUrl",
+                                                   string.Format("Error generating nice url for id '{0}'", nodeID), e);
+                    tempUrl = "/" + nodeID;
+                }
+                tempUrl = appendUrlExtension(baseUrl, directoryUrls, tempUrl);
+            }
+            else
+                HttpContext.Current.Trace.Warn("niceurl", string.Format("No node found at '{0}'", nodeID));
+
+            return tempUrl;
+
         }
 
         private static string appendUrlExtension(string baseUrl, bool directoryUrls, string tempUrl)
@@ -2099,7 +2116,7 @@ namespace umbraco
                 foreach (string id in m.Path.Split(','))
                 {
                     Cache.ClearCacheByKeySearch(String.Format("UL_{0}_{1}_True", GETMEDIA_CACHE_KEY, id));
-                
+
                     // Also clear calls that only query this specific item!
                     if (id == m.Id.ToString())
                         Cache.ClearCacheByKeySearch(String.Format("UL_{0}_{1}", GETMEDIA_CACHE_KEY, id));
