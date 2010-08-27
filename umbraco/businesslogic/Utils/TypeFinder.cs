@@ -56,6 +56,11 @@ namespace umbraco.BusinessLogic.Utils
                 foreach (string type in strTypes)
                     types.Add(Type.GetType(type));
 
+                // also add types from app_code
+                foreach (Type type in System.Reflection.Assembly.Load("App_Code").GetTypes())
+                    types.Add(type);
+
+
                 return types.FindAll(OnlyConcreteClasses(typeof(T), onlyConcreteClasses));
             }
             else
