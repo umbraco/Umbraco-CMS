@@ -294,8 +294,14 @@
       <delete assembly="umbraco" type="ScriptTasks" />
     </tasks>
   </nodeType>
-
   <nodeType alias="initpackager">
+    <header>Package</header>
+    <usercontrol>/create/simple.ascx</usercontrol>
+    <tasks>
+      <create assembly="umbraco" type="CreatedPackageTasks" />
+    </tasks>
+  </nodeType>
+  <nodeType alias="packager">
     <header>Package</header>
     <usercontrol>/create/simple.ascx</usercontrol>
     <tasks>
