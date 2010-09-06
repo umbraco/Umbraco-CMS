@@ -10,13 +10,14 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Collections.Specialized;
 using umbraco.IO;
+using umbraco.cms.businesslogic.installer;
 
 namespace umbraco.presentation.install
 {
 	/// <summary>
 	/// Summary description for _default.
 	/// </summary>
-    public partial class _default : BasePages.BasePage
+	public partial class _default : BasePages.BasePage
 	{
 
 		private string _installStep = "";
@@ -25,63 +26,83 @@ namespace umbraco.presentation.install
 		{
 			ClientLoader.DataBind();
 
-            //If user wishes to subscribe to security updates
-            if (!string.IsNullOrEmpty(Request["email"]) && !string.IsNullOrEmpty(Request["name"]))
-                SubscribeToNewsLetter(Request["name"], Request["email"]);
+			//If user wishes to subscribe to security updates
+			if (!string.IsNullOrEmpty(Request["email"]) && !string.IsNullOrEmpty(Request["name"]))
+				SubscribeToNewsLetter(Request["name"], Request["email"]);
 
-            // use buffer, so content isn't sent until it's ready (minimizing the blank screen experience)
-            Response.Buffer = true;
-			step.Value = _installStep;
-            //ScriptManager sm = Page.FindControl("umbracoScriptManager") as ScriptManager;
-            //webservices.ajaxHelpers.EnsureLegacyCalls(Page);
-            prepareNextButton();
-        }
+			// use buffer, so content isn't sent until it's ready (minimizing the blank screen experience)
+			Response.Buffer = true;
+			
+			//ScriptManager sm = Page.FindControl("umbracoScriptManager") as ScriptManager;
+			//webservices.ajaxHelpers.EnsureLegacyCalls(Page);
+			//prepareNextButton();
+		}
 
-        private void SubscribeToNewsLetter(string name, string email) {
-            try {
-                System.Net.WebClient client = new System.Net.WebClient();
-                NameValueCollection values = new NameValueCollection();
-                values.Add("name", name);
-                values.Add("email", email);
+		private void SubscribeToNewsLetter(string name, string email) {
+			try {
+				System.Net.WebClient client = new System.Net.WebClient();
+				NameValueCollection values = new NameValueCollection();
+				values.Add("name", name);
+				values.Add("email", email);
 
-                client.UploadValues("http://umbraco.org/base/Ecom/SubmitEmail/installer.aspx", values);
+				client.UploadValues("http://umbraco.org/base/Ecom/SubmitEmail/installer.aspx", values);
 
-            } catch { /* fail in silence */ }
-        }
+			} catch { /* fail in silence */ }
+		}
 
 
-		private void loadContent() 
+		private void loadContent(InstallerStep currentStep) 
 		{
-            //Response.Redirect("./default.aspx?installStep=" + step.Value, true);
+			PlaceHolderStep.Controls.Clear();
+			PlaceHolderStep.Controls.Add(new System.Web.UI.UserControl().LoadControl(IOHelper.ResolveUrl( currentStep.UserControl ) ));
+			step.Value = currentStep.Alias;
+			next.CommandArgument = currentStep.Alias;
+			lt_header.Text = currentStep.Name;
+		}
 
+
+		protected void onNextCommand(object sender, CommandEventArgs e)
+		{
+			string currentStep = (string)e.CommandArgument;
+			InstallerStep _s = InstallerSteps().GotoNextStep(currentStep);
+			Response.Redirect("?installStep=" + _s.Alias);
 		}
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)
 		{
-            InitializeComponent();
-            base.OnInit(e);
-            _installStep = helper.Request("installStep");
-            
-            //if this is not an upgrade we will log in with the default user.
-            if (!String.IsNullOrEmpty(GlobalSettings.ConfigurationStatus.Trim())) {
-                try {
-                    ensureContext();
-                } catch {
-                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl));
-                }
+			InitializeComponent();
+			base.OnInit(e);
 
-                //set the first step to upgrade.
-                if (string.IsNullOrEmpty(_installStep))
-                    _installStep = "upgrade";
+			//we might override the beginning step here
+			_installStep = helper.Request("installStep");
+		  
+			InstallerStep currentStep;
+			//if this is not an upgrade we will log in with the default user.
+			
+			if (!String.IsNullOrEmpty(GlobalSettings.ConfigurationStatus.Trim())) {
+				try {
+					ensureContext();
+				} catch {
+					Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl));
+				}
 
-            }
+				//set the first step to upgrade.
+				if (string.IsNullOrEmpty(_installStep))
+					_installStep = "upgrade";
 
-           	// empty / security check: only controls inside steps folder allowed
-			if (_installStep == "" || _installStep.Contains("/"))
-				_installStep = "welcome";
+			}
 
-			PlaceHolderStep.Controls.Add(new System.Web.UI.UserControl().LoadControl( IOHelper.ResolveUrl( SystemDirectories.Install ) + "/steps/" + _installStep + ".ascx"));
+			if (!string.IsNullOrEmpty(_installStep) && InstallerSteps().StepExists(_installStep))
+				currentStep = InstallerSteps().Get(_installStep);
+			else
+				currentStep = InstallerSteps().FirstAvailableStep();
+
+			//if the step we are loading is complete, we will continue to the next one if it's set to auto redirect
+			if (currentStep.Completed() && currentStep.MoveToNextStepAutomaticly)
+				currentStep = InstallerSteps().FirstAvailableStep();
+
+			loadContent(currentStep);
 		}
 		
 		/// <summary>
@@ -94,34 +115,46 @@ namespace umbraco.presentation.install
 		}
 		#endregion
 
+
+		private static InstallerStepCollection InstallerSteps()
+		{
+			InstallerStepCollection ics = new InstallerStepCollection();
+			ics.Add(new install.steps.Definitions.License());
+			ics.Add(new install.steps.Definitions.FilePermissions());
+			ics.Add(new install.steps.Definitions.Database());
+			//ics.Add(new install.steps.Definitions.DefaultUser());
+			ics.Add(new install.steps.Definitions.TheEnd());
+			return ics;
+		}
+/*
 		protected void prepareNextButton()
 		{
 			switch (step.Value) 
 			{
-                case "welcome": case "upgrade":
-                    step.Value = "license";
-                    loadContent();
-                    break;
-                case "license":
-                    step.Value = "detect";
-                    loadContent();
-                    break;
-                case "detect":
-                    // upgrade!
-                    if (!String.IsNullOrEmpty(GlobalSettings.ConfigurationStatus.Trim()))
-                        step.Value = "renaming";
-                    else
-                        step.Value = "validatePermissions";
+				case "welcome": case "upgrade":
+					step.Value = "license";
+					loadContent();
+					break;
+				case "license":
+					step.Value = "detect";
+					loadContent();
+					break;
+				case "detect":
+					// upgrade!
+					if (!String.IsNullOrEmpty(GlobalSettings.ConfigurationStatus.Trim()))
+						step.Value = "renaming";
+					else
+						step.Value = "validatePermissions";
 					loadContent();
 					break;
 				case "upgradeIndex":
 					step.Value = "validatePermissions";
 					loadContent();
 					break;
-                case "renaming" :
-                    step.Value = "validatePermissions";
-                    loadContent();
-                    break;
+				case "renaming" :
+					step.Value = "validatePermissions";
+					loadContent();
+					break;
 				case "validatePermissions":
 					step.Value = "defaultUser";
 					loadContent();
@@ -136,6 +169,6 @@ namespace umbraco.presentation.install
 				default:
 					break;
 			}
-		}
+		}*/ 
 	}
 }

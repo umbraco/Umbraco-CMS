@@ -6,6 +6,7 @@ using System.Xml;
 using System.Text.RegularExpressions;
 using umbraco.presentation;
 using umbraco.cms.businesslogic.web;
+using umbraco.cms.businesslogic;
 
 namespace umbraco
 {
@@ -141,6 +142,8 @@ namespace umbraco
 
             if (UmbracoSettings.UseAspNetMasterPages)
             {
+                HttpContext.Current.Trace.Write("umbracoPage", "Looking up skin information");
+
                 if (m_umbPage != null)
                     this.MasterPageFile = template.GetMasterPageName(m_umbPage.Template);
 
@@ -165,9 +168,6 @@ namespace umbraco
             }
             else
                 Page.Trace.IsEnabled = false;
-
-
-
         }
 
 
@@ -187,71 +187,85 @@ namespace umbraco
 
         private void initUmbracoPage()
         {
-            if (!UmbracoSettings.EnableSplashWhileLoading || !content.Instance.isInitializing)
+
+            RequestInitEventArgs e = new RequestInitEventArgs();
+            e.Page = m_umbPage;
+            e.PageId = m_umbPage.PageID;
+            e.Context = System.Web.HttpContext.Current;
+            
+            FireBeforeRequestInit(e);
+            if (!e.Cancel)
             {
 
-                if (m_umbPage != null)
+
+                if (!UmbracoSettings.EnableSplashWhileLoading || !content.Instance.isInitializing)
                 {
-                    // Add page elements to global items
-                    try
-                    {
 
-                        System.Web.HttpContext.Current.Items.Add("pageElements", m_umbPage.Elements);
+                    if (m_umbPage != null)
+                    {
+                        // Add page elements to global items
+                        try
+                        {
+
+                            System.Web.HttpContext.Current.Items.Add("pageElements", m_umbPage.Elements);
+
+                        }
+                        catch (ArgumentException aex)
+                        {
+
+                            System.Web.HttpContext.Current.Items.Remove("pageElements");
+                            System.Web.HttpContext.Current.Items.Add("pageElements", m_umbPage.Elements);
+                        }
+
+                        string tempCulture = m_umbPage.GetCulture();
+                        if (tempCulture != "")
+                        {
+                            System.Web.HttpContext.Current.Trace.Write("default.aspx", "Culture changed to " + tempCulture);
+                            System.Threading.Thread.CurrentThread.CurrentCulture =
+                                System.Globalization.CultureInfo.CreateSpecificCulture(tempCulture);
+                            System.Threading.Thread.CurrentThread.CurrentUICulture = System.Threading.Thread.CurrentThread.CurrentCulture;
+                        }
+
+                        if (!UmbracoSettings.UseAspNetMasterPages)
+                        {
+                            layoutControls.umbracoPageHolder pageHolder = new umbraco.layoutControls.umbracoPageHolder();
+                            pageHolder.ID = "umbPageHolder";
+                            Page.Controls.Add(pageHolder);
+                            m_umbPage.RenderPage(m_umbPage.Template);
+                            layoutControls.umbracoPageHolder umbPageHolder =
+                                (layoutControls.umbracoPageHolder)Page.FindControl("umbPageHolder");
+                            umbPageHolder.Populate(m_umbPage);
+                        }
 
                     }
-                    catch (ArgumentException aex)
+                    else
                     {
+                        // If there's no published content, show friendly error
+                        if (umbraco.content.Instance.XmlContent.SelectSingleNode("/root/*") == null)
+                            Response.Redirect(IO.SystemDirectories.Config + "/splashes/noNodes.aspx");
+                        else
+                        {
 
-                        System.Web.HttpContext.Current.Items.Remove("pageElements");
-                        System.Web.HttpContext.Current.Items.Add("pageElements", m_umbPage.Elements);
+                            Response.StatusCode = 404;
+                            Response.Write("<html><body><h1>Page not found</h1>");
+                            if (m_umbRequest != null)
+                                HttpContext.Current.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(Request.Url.ToString()) + "'</h3><p>umbraco tried this to match it using this xpath query'" + m_umbRequest.PageXPathQuery + "')");
+                            else
+                                HttpContext.Current.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(Request.Url.ToString()) + "'</h3>");
+                            Response.Write("</p>");
+                            Response.Write("<p>This page can be replaced with a custom 404 page by adding the id of the umbraco document to show as 404 page in the /config/umbracoSettings.config file. Just add the id to the '/settings/content/errors/error404' element.</p>");
+                            Response.Write("<p>For more information, visit <a href=\"http://umbraco.org/redir/custom-404\">information about custom 404</a> on the umbraco website.</p>");
+                            Response.Write("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");
+                            Response.Write("</body></html>");
+                        }
                     }
-
-                    string tempCulture = m_umbPage.GetCulture();
-                    if (tempCulture != "")
-                    {
-                        System.Web.HttpContext.Current.Trace.Write("default.aspx", "Culture changed to " + tempCulture);
-                        System.Threading.Thread.CurrentThread.CurrentCulture =
-                            System.Globalization.CultureInfo.CreateSpecificCulture(tempCulture);
-                        System.Threading.Thread.CurrentThread.CurrentUICulture = System.Threading.Thread.CurrentThread.CurrentCulture;
-                    }
-
-                    if (!UmbracoSettings.UseAspNetMasterPages)
-                    {
-                        layoutControls.umbracoPageHolder pageHolder = new umbraco.layoutControls.umbracoPageHolder();
-                        pageHolder.ID = "umbPageHolder";
-                        Page.Controls.Add(pageHolder);
-                        m_umbPage.RenderPage(m_umbPage.Template);
-                        layoutControls.umbracoPageHolder umbPageHolder =
-                            (layoutControls.umbracoPageHolder)Page.FindControl("umbPageHolder");
-                        umbPageHolder.Populate(m_umbPage);
-                    }
-
                 }
                 else
                 {
-                    // If there's no published content, show friendly error
-                    if (umbraco.content.Instance.XmlContent.SelectSingleNode("/root/*") == null)
-                        Response.Redirect(IO.SystemDirectories.Config + "/splashes/noNodes.aspx");
-                    else
-                    {
-
-                        Response.StatusCode = 404;
-                        Response.Write("<html><body><h1>Page not found</h1>");
-                        if (m_umbRequest != null)
-                            HttpContext.Current.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(Request.Url.ToString()) + "'</h3><p>umbraco tried this to match it using this xpath query'" + m_umbRequest.PageXPathQuery + "')");
-                        else
-                            HttpContext.Current.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(Request.Url.ToString()) + "'</h3>");
-                        Response.Write("</p>");
-                        Response.Write("<p>This page can be replaced with a custom 404 page by adding the id of the umbraco document to show as 404 page in the /config/umbracoSettings.config file. Just add the id to the '/settings/content/errors/error404' element.</p>");
-                        Response.Write("<p>For more information, visit <a href=\"http://umbraco.org/redir/custom-404\">information about custom 404</a> on the umbraco website.</p>");
-                        Response.Write("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");
-                        Response.Write("</body></html>");
-                    }
+                    Response.Redirect(IO.SystemDirectories.Config + "/splashes/booting.aspx?orgUrl=" + Request.Url);
                 }
-            }
-            else
-            {
-                Response.Redirect(IO.SystemDirectories.Config + "/splashes/booting.aspx?orgUrl=" + Request.Url);
+
+                FireAfterRequestInit(e);
             }
         }
 
@@ -264,5 +278,49 @@ namespace umbraco
         }
 
         #endregion
+
+
+
+        /// <summary>
+        /// The preinit event handler
+        /// </summary>
+        public delegate void RequestInitEventHandler(object sender, RequestInitEventArgs e);
+        /// <summary>
+        /// occurs before the umbraco page is initialized for rendering.
+        /// </summary>
+        public static event RequestInitEventHandler BeforeRequestInit;
+        /// <summary>
+        /// Raises the <see cref="E:BeforeRequestInit"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        protected internal new virtual void FireBeforeRequestInit(RequestInitEventArgs e)
+        {
+            if (BeforeRequestInit != null)
+                BeforeRequestInit(this, e);
+        }
+
+        /// <summary>
+        /// Occurs when [after save].
+        /// </summary>
+        public static event RequestInitEventHandler AfterRequestInit;
+        /// <summary>
+        /// Raises the <see cref="E:AfterRequestInit"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        protected virtual void FireAfterRequestInit(RequestInitEventArgs e)
+        {
+            if (AfterRequestInit != null)
+                AfterRequestInit(this, e);
+            
+        }        
     }
+
+        //Request Init Events Arguments
+        public class RequestInitEventArgs : System.ComponentModel.CancelEventArgs
+        {
+            public page Page { get; internal set; }
+            public HttpContext Context { get; internal set; }
+            public string Url { get; internal set; }
+            public int PageId { get; internal set; }
+        }
 }

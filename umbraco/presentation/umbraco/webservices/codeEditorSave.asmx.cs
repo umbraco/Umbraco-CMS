@@ -300,22 +300,33 @@ namespace umbraco.presentation.webservices
                 string val = contents;
                 string returnValue = "false";
                 try
-                {                    
-                    string savePath = IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename);
+                {
+                    string saveOldPath = "";
+                    if (oldName.StartsWith("~/"))
+                        saveOldPath = IOHelper.MapPath(oldName);
+                    else
+                        saveOldPath = IOHelper.MapPath(SystemDirectories.Scripts + "/" + oldName);
+
+                    string savePath = "";
+                    if (filename.StartsWith("~/"))
+                        savePath = IOHelper.MapPath(filename);
+                    else
+                        savePath = IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename);
+
 
                     //Directory check.. only allow files in script dir and below to be edited
-                    if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Scripts + "/")))
+                    if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Scripts + "/")) || savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Masterpages + "/")))
                     {
                         StreamWriter SW;
-                        SW = File.CreateText(IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename));
+                        SW = File.CreateText(savePath);
                         SW.Write(val);
                         SW.Close();
 
                         //deletes the old file
-                        if (filename != oldName) {
-                            string p = IOHelper.MapPath(SystemDirectories.Scripts + "/" + oldName);
-                            if (System.IO.File.Exists(p))
-                                System.IO.File.Delete(p);
+                        if (savePath != saveOldPath)
+                        {
+                            if (System.IO.File.Exists(saveOldPath))
+                                System.IO.File.Delete(saveOldPath);
                         }
 
                         returnValue = "true";

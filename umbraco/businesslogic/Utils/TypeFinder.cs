@@ -52,6 +52,9 @@ namespace umbraco.BusinessLogic.Utils
                 string binFolder = Path.Combine(IO.IOHelper.MapPath("/", false), "bin");
                 string[] strTypes = TypeResolver.GetAssignablesFromType<T>(binFolder, "*.dll");
 
+               
+
+
                 List<Type> types = new List<Type>();
 
                 foreach (string type in strTypes)

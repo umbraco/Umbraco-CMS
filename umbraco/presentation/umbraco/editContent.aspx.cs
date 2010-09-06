@@ -18,6 +18,8 @@ using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation;
+using umbraco.cms.businesslogic.skinning;
+using System.Collections.Generic;
 
 namespace umbraco.cms.presentation
 {
@@ -27,7 +29,7 @@ namespace umbraco.cms.presentation
         protected System.Web.UI.WebControls.TextBox documentName;
         private cms.businesslogic.web.Document _document;
         private bool _documentHasPublishedVersion = false;
-        protected System.Web.UI.WebControls.Literal jsIds;    
+        protected System.Web.UI.WebControls.Literal jsIds;
         private LiteralControl dp = new LiteralControl();
         private DateTimePicker dpRelease = new DateTimePicker();
         private DateTimePicker dpExpire = new DateTimePicker();
@@ -35,7 +37,7 @@ namespace umbraco.cms.presentation
         controls.ContentControl cControl;
 
         DropDownList ddlDefaultTemplate = new DropDownList();
-
+        
         uicontrols.Pane publishProps = new uicontrols.Pane();
         uicontrols.Pane linkProps = new uicontrols.Pane();
 
@@ -130,8 +132,12 @@ namespace umbraco.cms.presentation
             PlaceHolder template = new PlaceHolder();
             cms.businesslogic.web.DocumentType DocumentType = new cms.businesslogic.web.DocumentType(_document.ContentType.Id);
             cControl.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(DocumentType.Text));
-            cControl.PropertiesPane.addProperty(ui.Text("template"), template);
 
+           
+           
+
+            //template picker
+            cControl.PropertiesPane.addProperty(ui.Text("template"), template);
             int defaultTemplate;
             if (_document.Template != 0)
                 defaultTemplate = _document.Template;
@@ -186,12 +192,11 @@ namespace umbraco.cms.presentation
             cControl.SaveToPublish += new System.EventHandler(SendToPublish);
 
             // Add panes to property page...
-            cControl.tpProp.Controls.AddAt(1,publishProps);
-            cControl.tpProp.Controls.AddAt(2,linkProps);
+            cControl.tpProp.Controls.AddAt(1, publishProps);
+            cControl.tpProp.Controls.AddAt(2, linkProps);
 
             // add preview to properties pane too
             addPreviewButton(cControl.tpProp.Menu, _document.Id);
-
 
 
         }
@@ -205,17 +210,18 @@ namespace umbraco.cms.presentation
                 return;
 
             // clear preview cookie
-            if (!String.IsNullOrEmpty(StateHelper.GetCookieValue(PreviewContent.PREVIEW_COOKIE_KEY))) {
+            if (!String.IsNullOrEmpty(StateHelper.GetCookieValue(PreviewContent.PREVIEW_COOKIE_KEY)))
+            {
                 PreviewContent.ClearPreviewCookie();
             }
 
             if (!IsPostBack)
             {
-    
+
                 BusinessLogic.Log.Add(BusinessLogic.LogTypes.Open, base.getUser(), _document.Id, "");
-				ClientTools.SyncTree(_document.Path, false);
+                ClientTools.SyncTree(_document.Path, false);
             }
-           
+
 
             jsIds.Text = "var umbPageId = " + _document.Id.ToString() + ";\nvar umbVersionId = '" + _document.Version.ToString() + "';\n";
 
@@ -232,51 +238,56 @@ namespace umbraco.cms.presentation
                     tp.ErrorHeader = ui.Text("errorHandling", "errorButDataWasSaved");
                     tp.CloseCaption = ui.Text("close");
                 }
-            } else if (Page.IsPostBack) {
+            }
+            else if (Page.IsPostBack)
+            {
                 // hide validation summaries
                 foreach (uicontrols.TabPage tp in cControl.GetPanels())
                 {
                     tp.ErrorControl.Visible = false;
                 }
             }
-                //Audit trail...
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Save, base.getUser(), _document.Id, "");
+            //Audit trail...
+            BusinessLogic.Log.Add(BusinessLogic.LogTypes.Save, base.getUser(), _document.Id, "");
 
-                // Update name 
-                if (_document.Text != cControl.NameTxt.Text)
-                {
-                    //_refreshTree = true;
-                    _document.Text = cControl.NameTxt.Text;
-                    //newName.Text = _document.Text;
-                }
+            // Update name 
+            if (_document.Text != cControl.NameTxt.Text)
+            {
+                //_refreshTree = true;
+                _document.Text = cControl.NameTxt.Text;
+                //newName.Text = _document.Text;
+            }
 
-                
-                if (dpRelease.DateTime > new DateTime(1753, 1, 1) && dpRelease.DateTime < new DateTime(9999, 12, 31))
-                    _document.ReleaseDate = dpRelease.DateTime;
-                else
-                    _document.ReleaseDate = new DateTime(1, 1, 1, 0, 0, 0);
-                if (dpExpire.DateTime > new DateTime(1753, 1, 1) && dpExpire.DateTime < new DateTime(9999, 12, 31))
-                    _document.ExpireDate = dpExpire.DateTime;
-                else
-                    _document.ExpireDate = new DateTime(1, 1, 1, 0, 0, 0);
 
-                // Update default template
-                if (ddlDefaultTemplate.SelectedIndex > 0)
-                {
-                    _document.Template = int.Parse(ddlDefaultTemplate.SelectedValue);
-                }
+            if (dpRelease.DateTime > new DateTime(1753, 1, 1) && dpRelease.DateTime < new DateTime(9999, 12, 31))
+                _document.ReleaseDate = dpRelease.DateTime;
+            else
+                _document.ReleaseDate = new DateTime(1, 1, 1, 0, 0, 0);
+            if (dpExpire.DateTime > new DateTime(1753, 1, 1) && dpExpire.DateTime < new DateTime(9999, 12, 31))
+                _document.ExpireDate = dpExpire.DateTime;
+            else
+                _document.ExpireDate = new DateTime(1, 1, 1, 0, 0, 0);
 
-                // Run Handler				
-                BusinessLogic.Actions.Action.RunActionHandlers(_document, ActionUpdate.Instance);
-                _document.Save();
+            // Update default template
+            if (ddlDefaultTemplate.SelectedIndex > 0)
+            {
+                _document.Template = int.Parse(ddlDefaultTemplate.SelectedValue);
+            }
 
-                // Update the update date
-                dp.Text = _document.UpdateDate.ToShortDateString() + " " + _document.UpdateDate.ToShortTimeString();
+          
 
-                if (!cControl.DoesPublish)
-                    ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null), ui.Text("speechBubbles", "editContentSavedText", null));
 
-				ClientTools.SyncTree(_document.Path, true);
+            // Run Handler				
+            BusinessLogic.Actions.Action.RunActionHandlers(_document, ActionUpdate.Instance);
+            _document.Save();
+
+            // Update the update date
+            dp.Text = _document.UpdateDate.ToShortDateString() + " " + _document.UpdateDate.ToShortTimeString();
+
+            if (!cControl.DoesPublish)
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentSavedHeader", null), ui.Text("speechBubbles", "editContentSavedText", null));
+
+            ClientTools.SyncTree(_document.Path, true);
         }
 
         protected void SendToPublish(object sender, System.EventArgs e)
@@ -298,12 +309,13 @@ namespace umbraco.cms.presentation
 
                     if (_document.PublishWithResult(base.getUser()))
                     {
+                        
                         ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
                         library.UpdateDocumentCache(_document.Id);
 
                         BusinessLogic.Log.Add(BusinessLogic.LogTypes.Publish, base.getUser(), _document.Id, "");
                         littPublishStatus.Text = ui.Text("content", "lastPublished", base.getUser()) + ": " + _document.VersionDate.ToString() + "<br/>";
-                        
+
                         if (base.getUser().GetPermissions(_document.Path).IndexOf("U") > -1)
                             UnPublish.Visible = true;
 
@@ -317,7 +329,7 @@ namespace umbraco.cms.presentation
                 }
                 else
                     ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("error"), ui.Text("speechBubbles", "editContentPublishedFailedByParent"));
-                
+
                 // page cache disabled...
                 //			cms.businesslogic.cache.Cache.ClearCacheObjectTypes("umbraco.page");
 
@@ -336,7 +348,7 @@ namespace umbraco.cms.presentation
 
             //newPublishStatus.Text = "0";
 
-        }       
+        }
 
         private void updateLinks()
         {

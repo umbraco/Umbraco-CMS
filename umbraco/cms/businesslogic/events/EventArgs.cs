@@ -47,4 +47,6 @@ namespace umbraco.cms.businesslogic {
         public umbraco.cms.businesslogic.web.DocumentType DocumentType { get; internal set; }
         public int ParentId { get; internal set; }
     }
+
+    
 }

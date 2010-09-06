@@ -63,6 +63,39 @@ namespace umbraco {
             }
         }
 
+        //Support for template folders, if a alternative skin folder is requested
+        //we will try to look for template files in another folder
+        public string AlternateMasterPageFile(string templateFolder)
+        {
+            string file = TemplateAlias.Replace(" ", "") + ".master";
+            string path = SystemDirectories.Masterpages + "/" + templateFolder + "/" + file;
+
+            //if it doesn't exists then we return the normal file
+            if (!System.IO.File.Exists(IOHelper.MapPath(VirtualPathUtility.ToAbsolute(path)))){
+
+                string originalPath = IOHelper.MapPath(VirtualPathUtility.ToAbsolute(MasterPageFile));
+                string copyPath = IOHelper.MapPath(VirtualPathUtility.ToAbsolute(path));
+
+                FileStream fs = new FileStream(originalPath, FileMode.Open, FileAccess.ReadWrite);
+                StreamReader f = new StreamReader(fs);
+                String newfile = f.ReadToEnd();
+                f.Close();
+                fs.Close();
+
+                newfile = newfile.Replace("MasterPageFile=\"~/masterpages/", "MasterPageFile=\"");
+
+                fs = new FileStream(copyPath, FileMode.Create, FileAccess.Write);
+
+                StreamWriter replacement = new StreamWriter(fs);
+                replacement.Write(newfile);
+                replacement.Close();
+            }
+            
+            return path;
+            
+        }
+
+
         public string TemplateAlias {
             get { return _templateAlias; }
         }
@@ -383,13 +416,21 @@ namespace umbraco {
 
         #region constructors
 
-        public static string GetMasterPageName(int templateID) {
+        public static string GetMasterPageName(int templateID)
+        {
+            return GetMasterPageName(templateID, null);
+        }
+
+        public static string GetMasterPageName(int templateID, string templateFolder) {
             template t = (template)templateCache["template" + templateID];
             if (t == null)
                 t = new template(templateID);
 
             if (t != null)
-                return t.MasterPageFile;
+                if (!string.IsNullOrEmpty(templateFolder))
+                    return t.AlternateMasterPageFile(templateFolder);
+                else
+                    return t.MasterPageFile;
             else
                 throw new ArgumentException(String.Format("Template with id '{0}' not found", templateID));
         }

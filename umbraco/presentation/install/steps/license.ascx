@@ -1,11 +1,14 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="license.ascx.cs" Inherits="umbraco.presentation.install.steps.license" %>
-<h1>
-    Step 1/5 Accept license</h1>
+<h2>
+    Accept the license for umbraco CMS</h2>
+
+<div class="abstract">
 <p>
     By clicking the next button (or modifying the umbracoConfigurationStatus in web.config),
     you accept the license for this software as specified in the box below.</p>
-<div style="border: 1px solid #ccc; padding: 0px; width: 642px; height: 355px; overflow: auto;">
-    <div style="padding: 10px;">
+</div>
+
+<div id="licenseText">
         <a name="mit"></a>
         <h3>
             The License (MIT):</h3>
@@ -30,9 +33,6 @@
             BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
             TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
             USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
-        <p>&nbsp;
-        </p>
-        <p>
-            (That's all. That didn't hurt, did it?)</p>
-    </div>
+       
+        <p>That's all. That didn't hurt, did it?)</p>
 </div>

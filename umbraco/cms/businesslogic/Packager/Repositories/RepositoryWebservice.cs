@@ -19,6 +19,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
     {
 
         private System.Threading.SendOrPostCallback CategoriesOperationCompleted;
+
         private System.Threading.SendOrPostCallback NitrosOperationCompleted;
 
         private System.Threading.SendOrPostCallback NitrosByVersionOperationCompleted;
@@ -26,6 +27,8 @@ namespace umbraco.cms.businesslogic.packager.repositories
         private System.Threading.SendOrPostCallback NitrosCategorizedOperationCompleted;
 
         private System.Threading.SendOrPostCallback NitrosCategorizedByVersionOperationCompleted;
+
+        private System.Threading.SendOrPostCallback StarterKitsOperationCompleted;
 
         private System.Threading.SendOrPostCallback authenticateOperationCompleted;
 
@@ -39,10 +42,14 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
         private System.Threading.SendOrPostCallback PackageByGuidOperationCompleted;
 
+        private System.Threading.SendOrPostCallback SkinByGuidOperationCompleted;
+
+        private System.Threading.SendOrPostCallback SkinsOperationCompleted;
+
         /// <remarks/>
         public RepositoryWebservice(string url)
         {
-            this.Url = url; // "http://packages.umbraco.org/umbraco/webservices/api/repository.asmx";
+            this.Url = url; //"http://packages.umbraco.org/umbraco/webservices/api/repository.asmx";
         }
 
         /// <remarks/>
@@ -61,6 +68,9 @@ namespace umbraco.cms.businesslogic.packager.repositories
         public event NitrosCategorizedByVersionCompletedEventHandler NitrosCategorizedByVersionCompleted;
 
         /// <remarks/>
+        public event StarterKitsCompletedEventHandler StarterKitsCompleted;
+
+        /// <remarks/>
         public event authenticateCompletedEventHandler authenticateCompleted;
 
         /// <remarks/>
@@ -77,6 +87,12 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
         /// <remarks/>
         public event PackageByGuidCompletedEventHandler PackageByGuidCompleted;
+
+        /// <remarks/>
+        public event SkinByGuidCompletedEventHandler SkinByGuidCompleted;
+
+        /// <remarks/>
+        public event SkinsCompletedEventHandler SkinsCompleted;
 
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://packages.umbraco.org/webservices/Categories", RequestNamespace = "http://packages.umbraco.org/webservices/", ResponseNamespace = "http://packages.umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
@@ -314,6 +330,52 @@ namespace umbraco.cms.businesslogic.packager.repositories
             {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.NitrosCategorizedByVersionCompleted(this, new NitrosCategorizedByVersionCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://packages.umbraco.org/webservices/StarterKits", RequestNamespace = "http://packages.umbraco.org/webservices/", ResponseNamespace = "http://packages.umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public Package[] StarterKits()
+        {
+            object[] results = this.Invoke("StarterKits", new object[0]);
+            return ((Package[])(results[0]));
+        }
+
+        /// <remarks/>
+        public System.IAsyncResult BeginStarterKits(System.AsyncCallback callback, object asyncState)
+        {
+            return this.BeginInvoke("StarterKits", new object[0], callback, asyncState);
+        }
+
+        /// <remarks/>
+        public Package[] EndStarterKits(System.IAsyncResult asyncResult)
+        {
+            object[] results = this.EndInvoke(asyncResult);
+            return ((Package[])(results[0]));
+        }
+
+        /// <remarks/>
+        public void StarterKitsAsync()
+        {
+            this.StarterKitsAsync(null);
+        }
+
+        /// <remarks/>
+        public void StarterKitsAsync(object userState)
+        {
+            if ((this.StarterKitsOperationCompleted == null))
+            {
+                this.StarterKitsOperationCompleted = new System.Threading.SendOrPostCallback(this.OnStarterKitsOperationCompleted);
+            }
+            this.InvokeAsync("StarterKits", new object[0], this.StarterKitsOperationCompleted, userState);
+        }
+
+        private void OnStarterKitsOperationCompleted(object arg)
+        {
+            if ((this.StarterKitsCompleted != null))
+            {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.StarterKitsCompleted(this, new StarterKitsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
 
@@ -651,6 +713,104 @@ namespace umbraco.cms.businesslogic.packager.repositories
         }
 
         /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://packages.umbraco.org/webservices/SkinByGuid", RequestNamespace = "http://packages.umbraco.org/webservices/", ResponseNamespace = "http://packages.umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public Skin SkinByGuid(string skinGuid)
+        {
+            object[] results = this.Invoke("SkinByGuid", new object[] {
+                    skinGuid});
+            return ((Skin)(results[0]));
+        }
+
+        /// <remarks/>
+        public System.IAsyncResult BeginSkinByGuid(string skinGuid, System.AsyncCallback callback, object asyncState)
+        {
+            return this.BeginInvoke("SkinByGuid", new object[] {
+                    skinGuid}, callback, asyncState);
+        }
+
+        /// <remarks/>
+        public Skin EndSkinByGuid(System.IAsyncResult asyncResult)
+        {
+            object[] results = this.EndInvoke(asyncResult);
+            return ((Skin)(results[0]));
+        }
+
+        /// <remarks/>
+        public void SkinByGuidAsync(string skinGuid)
+        {
+            this.SkinByGuidAsync(skinGuid, null);
+        }
+
+        /// <remarks/>
+        public void SkinByGuidAsync(string skinGuid, object userState)
+        {
+            if ((this.SkinByGuidOperationCompleted == null))
+            {
+                this.SkinByGuidOperationCompleted = new System.Threading.SendOrPostCallback(this.OnSkinByGuidOperationCompleted);
+            }
+            this.InvokeAsync("SkinByGuid", new object[] {
+                    skinGuid}, this.SkinByGuidOperationCompleted, userState);
+        }
+
+        private void OnSkinByGuidOperationCompleted(object arg)
+        {
+            if ((this.SkinByGuidCompleted != null))
+            {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.SkinByGuidCompleted(this, new SkinByGuidCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://packages.umbraco.org/webservices/Skins", RequestNamespace = "http://packages.umbraco.org/webservices/", ResponseNamespace = "http://packages.umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public Skin[] Skins(string starterKitGuid)
+        {
+            object[] results = this.Invoke("Skins", new object[] {
+                    starterKitGuid});
+            return ((Skin[])(results[0]));
+        }
+
+        /// <remarks/>
+        public System.IAsyncResult BeginSkins(string starterKitGuid, System.AsyncCallback callback, object asyncState)
+        {
+            return this.BeginInvoke("Skins", new object[] {
+                    starterKitGuid}, callback, asyncState);
+        }
+
+        /// <remarks/>
+        public Skin[] EndSkins(System.IAsyncResult asyncResult)
+        {
+            object[] results = this.EndInvoke(asyncResult);
+            return ((Skin[])(results[0]));
+        }
+
+        /// <remarks/>
+        public void SkinsAsync(string starterKitGuid)
+        {
+            this.SkinsAsync(starterKitGuid, null);
+        }
+
+        /// <remarks/>
+        public void SkinsAsync(string starterKitGuid, object userState)
+        {
+            if ((this.SkinsOperationCompleted == null))
+            {
+                this.SkinsOperationCompleted = new System.Threading.SendOrPostCallback(this.OnSkinsOperationCompleted);
+            }
+            this.InvokeAsync("Skins", new object[] {
+                    starterKitGuid}, this.SkinsOperationCompleted, userState);
+        }
+
+        private void OnSkinsOperationCompleted(object arg)
+        {
+            if ((this.SkinsCompleted != null))
+            {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.SkinsCompleted(this, new SkinsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+
+        /// <remarks/>
         public new void CancelAsync(object userState)
         {
             base.CancelAsync(userState);
@@ -965,6 +1125,151 @@ namespace umbraco.cms.businesslogic.packager.repositories
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
     [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://packages.umbraco.org/webservices/")]
+    public partial class Skin
+    {
+
+        private System.Guid repoGuidField;
+
+        private string textField;
+
+        private string thumbnailField;
+
+        private string previewField;
+
+        private string descriptionField;
+
+        private string authorField;
+
+        private string authorUrlField;
+
+        private string licenseField;
+
+        private string licenseUrlField;
+
+        /// <remarks/>
+        public System.Guid RepoGuid
+        {
+            get
+            {
+                return this.repoGuidField;
+            }
+            set
+            {
+                this.repoGuidField = value;
+            }
+        }
+
+        /// <remarks/>
+        public string Text
+        {
+            get
+            {
+                return this.textField;
+            }
+            set
+            {
+                this.textField = value;
+            }
+        }
+
+        /// <remarks/>
+        public string Thumbnail
+        {
+            get
+            {
+                return this.thumbnailField;
+            }
+            set
+            {
+                this.thumbnailField = value;
+            }
+        }
+
+        /// <remarks/>
+        public string Preview
+        {
+            get
+            {
+                return this.previewField;
+            }
+            set
+            {
+                this.previewField = value;
+            }
+        }
+
+        /// <remarks/>
+        public string Description
+        {
+            get
+            {
+                return this.descriptionField;
+            }
+            set
+            {
+                this.descriptionField = value;
+            }
+        }
+
+        /// <remarks/>
+        public string Author
+        {
+            get
+            {
+                return this.authorField;
+            }
+            set
+            {
+                this.authorField = value;
+            }
+        }
+
+        /// <remarks/>
+        public string AuthorUrl
+        {
+            get
+            {
+                return this.authorUrlField;
+            }
+            set
+            {
+                this.authorUrlField = value;
+            }
+        }
+
+        /// <remarks/>
+        public string License
+        {
+            get
+            {
+                return this.licenseField;
+            }
+            set
+            {
+                this.licenseField = value;
+            }
+        }
+
+        /// <remarks/>
+        public string LicenseUrl
+        {
+            get
+            {
+                return this.licenseUrlField;
+            }
+            set
+            {
+                this.licenseUrlField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://packages.umbraco.org/webservices/")]
     public enum Version
     {
@@ -977,6 +1282,9 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
         /// <remarks/>
         Version41,
+
+        /// <remarks/>
+        Version41Legacy,
 
         /// <remarks/>
         Version50,
@@ -1148,6 +1456,36 @@ namespace umbraco.cms.businesslogic.packager.repositories
             {
                 this.RaiseExceptionIfNecessary();
                 return ((Category[])(this.results[0]));
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    public delegate void StarterKitsCompletedEventHandler(object sender, StarterKitsCompletedEventArgs e);
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class StarterKitsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs
+    {
+
+        private object[] results;
+
+        internal StarterKitsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) :
+            base(exception, cancelled, userState)
+        {
+            this.results = results;
+        }
+
+        /// <remarks/>
+        public Package[] Result
+        {
+            get
+            {
+                this.RaiseExceptionIfNecessary();
+                return ((Package[])(this.results[0]));
             }
         }
     }
@@ -1331,4 +1669,65 @@ namespace umbraco.cms.businesslogic.packager.repositories
             }
         }
     }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    public delegate void SkinByGuidCompletedEventHandler(object sender, SkinByGuidCompletedEventArgs e);
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class SkinByGuidCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs
+    {
+
+        private object[] results;
+
+        internal SkinByGuidCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) :
+            base(exception, cancelled, userState)
+        {
+            this.results = results;
+        }
+
+        /// <remarks/>
+        public Skin Result
+        {
+            get
+            {
+                this.RaiseExceptionIfNecessary();
+                return ((Skin)(this.results[0]));
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    public delegate void SkinsCompletedEventHandler(object sender, SkinsCompletedEventArgs e);
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class SkinsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs
+    {
+
+        private object[] results;
+
+        internal SkinsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) :
+            base(exception, cancelled, userState)
+        {
+            this.results = results;
+        }
+
+        /// <remarks/>
+        public Skin[] Result
+        {
+            get
+            {
+                this.RaiseExceptionIfNecessary();
+                return ((Skin[])(this.results[0]));
+            }
+        }
+    }
+
 }

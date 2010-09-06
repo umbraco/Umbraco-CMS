@@ -24,6 +24,7 @@ using umbraco.cms.businesslogic.template;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
+using umbraco.cms.businesslogic.skinning;
 
 namespace umbraco
 {
@@ -41,13 +42,133 @@ namespace umbraco
         {
             Javascript.Append(
                 @"
-function openTemplate(id) {
-	UmbClientMgr.contentFrame('settings/editTemplate.aspx?templateID=' + id);
-}
-");
+                function openTemplate(id) {
+	                UmbClientMgr.contentFrame('settings/editTemplate.aspx?templateID=' + id);
+                }
+
+                function openSkin(id) {
+	                UmbClientMgr.contentFrame('settings/editSkin.aspx?skinID=' + id);
+                }
+                ");
         }
 
         public override void Render(ref XmlTree tree)
+        {
+            string folder = umbraco.library.Request("folder");
+            string folderPath = umbraco.library.Request("folderPath");
+
+            if (!string.IsNullOrEmpty(folder))
+                RenderTemplateFolderItems(folder, folderPath, ref tree);
+            else
+            {
+                if(UmbracoSettings.EnableTemplateFolders)
+                    RenderTemplateFolders(ref tree);
+                
+                RenderTemplates(ref tree);
+            }
+        }
+
+
+        private void RenderTemplateFolderItems(string folder, string folderPath, ref XmlTree tree)
+        {
+            string relPath = IO.SystemDirectories.Masterpages + "/" + folder;
+            if (!string.IsNullOrEmpty(folderPath))
+                relPath += folderPath;
+
+            string fullPath = IO.IOHelper.MapPath(relPath);
+
+            foreach (string dir in System.IO.Directory.GetDirectories(fullPath))
+            {
+                System.IO.DirectoryInfo directoryInfo = new DirectoryInfo(dir);
+                XmlTreeNode xNode = XmlTreeNode.Create(this);
+                xNode.Menu.Clear();
+                xNode.Menu.Add(ActionRefresh.Instance);
+                xNode.NodeID = "-1";
+                xNode.Text = directoryInfo.Name;
+                xNode.HasChildren = true;
+                xNode.Icon = "folder.gif";
+                xNode.OpenIcon = "folder_o.gif";
+                xNode.Source = GetTreeServiceUrl(directoryInfo.Name) + "&folder=" + folder + "&folderPath=" + folderPath + "/" + directoryInfo.Name;
+                tree.Add(xNode);
+            }
+
+            foreach (string file in System.IO.Directory.GetFiles(fullPath))
+            {
+                System.IO.FileInfo fileinfo = new FileInfo(file);
+                string ext = fileinfo.Extension.ToLower().Trim('.');
+               
+                XmlTreeNode xNode = XmlTreeNode.Create(this);
+                xNode.Menu.Clear();
+                xNode.Menu.Add(ActionRefresh.Instance);
+                xNode.NodeID = "-1";
+                xNode.Text = Path.GetFileName(file);
+                xNode.HasChildren = false;
+                xNode.Action = "javascript:openScriptEditor('" + relPath + "/" + Path.GetFileName(file) + "');";
+
+                //tree.Add(xNode);
+               
+                
+                switch (ext)
+                {
+                    case "master":
+                         xNode.Icon = "settingTemplate.gif";
+                         xNode.OpenIcon = "settingTemplate.gif";
+                         tree.Add(xNode);
+                        break;
+                    case "css":
+                    case "js":
+                        xNode.Icon = "settingsScript.gif";
+                        xNode.OpenIcon = "settingsScript.gif";
+                        tree.Add(xNode);
+                        break;
+                    case "xml":
+                        if (xNode.Text == "skin.xml")
+                        {
+                            xNode.Icon = "settingXml.gif";
+                            xNode.OpenIcon = "settingXml.gif";
+                            tree.Add(xNode);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                       
+                
+                //xNode.Source = GetTreeServiceUrl(s.Alias) + "&skin=" + skin + "&path=" + path;
+           }
+            
+            
+        }
+
+        private void RenderTemplateFolders(ref XmlTree tree)
+        {
+            if (base.m_id == -1)
+            {
+                List<Skin> skins = Skinning.GetAllSkins();
+                foreach (Skin s in skins)
+                {
+                    XmlTreeNode xNode = XmlTreeNode.Create(this);
+                    xNode.NodeID = s.Alias;
+                    xNode.Text = s.Name;
+                    xNode.Icon = "folder.gif";
+                    xNode.OpenIcon = "folder_o.gif";
+                    xNode.Source = GetTreeServiceUrl(s.Alias) + "&folder=" + s.Alias;
+                    xNode.HasChildren = true;
+                    xNode.Menu.Clear();
+                    xNode.Menu.Add(ActionRefresh.Instance);
+
+                    OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                    if (xNode != null)
+                    {
+                        tree.Add(xNode);
+                        OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                    }
+                }
+            }
+        }
+
+        private void RenderTemplates(ref XmlTree tree)
         {
             List<Template> templates = null;
             if (base.m_id == -1)
@@ -63,9 +184,10 @@ function openTemplate(id) {
                 xNode.Action = "javascript:openTemplate(" + t.Id + ");";
                 xNode.Icon = "settingTemplate.gif";
                 xNode.OpenIcon = "settingTemplate.gif";
-				xNode.Source = GetTreeServiceUrl(t.Id);
-				xNode.HasChildren = t.HasChildren;
-                if (t.HasChildren) {                    
+                xNode.Source = GetTreeServiceUrl(t.Id);
+                xNode.HasChildren = t.HasChildren;
+                if (t.HasChildren)
+                {
                     xNode.Icon = "settingMasterTemplate.gif";
                     xNode.OpenIcon = "settingMasterTemplate.gif";
                 }
@@ -76,9 +198,11 @@ function openTemplate(id) {
                     tree.Add(xNode);
                     OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 }
-                
+
             }
+
         }
+
 
         protected override void CreateAllowedActions(ref List<IAction> actions) {
             actions.Clear();

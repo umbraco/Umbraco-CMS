@@ -80,11 +80,14 @@ namespace umbraco.cms.presentation
                             {
                                 string control = getFirstText(uc).Trim(' ', '\r', '\n');
                                 string path = IOHelper.FindFile(control);
+                                
 
                                 try
                                 {
+                                    Control c = LoadControl(path);
+                                
                                     //resolving files from dashboard config which probably does not map to a virtual fi
-                                    tab.Controls.Add(LoadControl(path));
+                                    tab.Controls.Add(c);
                                 }
                                 catch (Exception ee)
                                 {

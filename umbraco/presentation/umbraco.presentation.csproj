@@ -186,6 +186,41 @@
     <Compile Include="..\..\LinqToUmbraco\src\umbraco.Linq\Solution Items\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="install\steps\database.ascx.cs">
+      <DependentUpon>database.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\steps\database.ascx.designer.cs">
+      <DependentUpon>database.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="install\steps\Definitions\Database.cs" />
+    <Compile Include="install\steps\Definitions\DefaultUser.cs" />
+    <Compile Include="install\steps\Definitions\FilePermissions.cs" />
+    <Compile Include="install\steps\Definitions\Skinning.cs" />
+    <Compile Include="install\steps\Definitions\TheEnd.cs" />
+    <Compile Include="install\steps\Definitions\Welcome.cs" />
+    <Compile Include="install\steps\skinning.ascx.cs">
+      <DependentUpon>skinning.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\steps\skinning.ascx.designer.cs">
+      <DependentUpon>skinning.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="install\steps\Skinning\loadStarterKitDesigns.ascx.cs">
+      <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\steps\Skinning\loadStarterKitDesigns.ascx.designer.cs">
+      <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="install\steps\Skinning\loadStarterKits.ascx.cs">
+      <DependentUpon>loadStarterKits.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\steps\Skinning\loadStarterKits.ascx.designer.cs">
+      <DependentUpon>loadStarterKits.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="install\utills\FilePermissions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -241,13 +276,6 @@
     </Compile>
     <Compile Include="install\steps\defaultUser.ascx.designer.cs">
       <DependentUpon>defaultUser.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="install\steps\detect.ascx.cs">
-      <DependentUpon>detect.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="install\steps\detect.ascx.designer.cs">
-      <DependentUpon>detect.ascx</DependentUpon>
     </Compile>
     <Compile Include="install\steps\license.ascx.cs">
       <DependentUpon>license.ascx</DependentUpon>
@@ -519,6 +547,13 @@
     <Compile Include="umbraco\create\templateTasks.cs" />
     <Compile Include="umbraco\create\userTasks.cs" />
     <Compile Include="umbraco\create\XsltTasks.cs" />
+    <Compile Include="umbraco\dashboard\Settings\Applyskin.ascx.cs">
+      <DependentUpon>Applyskin.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dashboard\Settings\Applyskin.ascx.designer.cs">
+      <DependentUpon>Applyskin.ascx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\dialogs\Preview.aspx.cs">
       <DependentUpon>Preview.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -550,6 +585,14 @@
     <Compile Include="umbraco\LiveEditing\CanvasClientDependencyProvider.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx.cs">
+      <DependentUpon>SkinCustomizer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx.designer.cs">
+      <DependentUpon>SkinCustomizer.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\LiveEditing\Modules\SkinModule\SkinModule.cs" />
     <Compile Include="umbraco\members\MemberSearch.ascx.cs">
       <DependentUpon>MemberSearch.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1511,13 +1554,50 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
+    <Content Include="install\installer.js" />
+    <Content Include="install\steps\database.ascx" />
     <Content Include="install\steps\renaming.ascx" />
+    <Content Include="install\steps\skinning.ascx" />
+    <Content Include="install\steps\Skinning\loadStarterKitDesigns.ascx" />
+    <Content Include="install\steps\Skinning\loadStarterKits.ascx" />
     <Content Include="install\Title.ascx" />
+    <Content Include="umbraco\dashboard\Settings\Applyskin.ascx" />
     <Content Include="umbraco\helpRedirect.aspx" />
     <Content Include="umbraco\images\aboutNew.png" />
     <Content Include="umbraco\images\loginBg.png" />
     <Content Include="umbraco\images\umbracoSplash.png" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\skin.png" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinModule.js" />
     <Content Include="umbraco\members\MemberSearch.ascx" />
+    <Content Include="umbraco_client\colorpicker\css\colorpicker.css" />
+    <Content Include="umbraco_client\colorpicker\images\blank.gif" />
+    <Content Include="umbraco_client\colorpicker\images\colorpicker_background.png" />
+    <Content Include="umbraco_client\colorpicker\images\colorpicker_hex.png" />
+    <Content Include="umbraco_client\colorpicker\images\colorpicker_hsb_b.png" />
+    <Content Include="umbraco_client\colorpicker\images\colorpicker_hsb_h.png" />
+    <Content Include="umbraco_client\colorpicker\images\colorpicker_hsb_s.png" />
+    <Content Include="umbraco_client\colorpicker\images\colorpicker_indic.gif" />
+    <Content Include="umbraco_client\colorpicker\images\colorpicker_overlay.png" />
+    <Content Include="umbraco_client\colorpicker\images\colorpicker_rgb_b.png" />
+    <Content Include="umbraco_client\colorpicker\images\colorpicker_rgb_g.png" />
+    <Content Include="umbraco_client\colorpicker\images\colorpicker_rgb_r.png" />
+    <Content Include="umbraco_client\colorpicker\images\colorpicker_select.gif" />
+    <Content Include="umbraco_client\colorpicker\images\colorpicker_submit.png" />
+    <Content Include="umbraco_client\colorpicker\images\custom_background.png" />
+    <Content Include="umbraco_client\colorpicker\images\custom_hex.png" />
+    <Content Include="umbraco_client\colorpicker\images\custom_hsb_b.png" />
+    <Content Include="umbraco_client\colorpicker\images\custom_hsb_h.png" />
+    <Content Include="umbraco_client\colorpicker\images\custom_hsb_s.png" />
+    <Content Include="umbraco_client\colorpicker\images\custom_indic.gif" />
+    <Content Include="umbraco_client\colorpicker\images\custom_rgb_b.png" />
+    <Content Include="umbraco_client\colorpicker\images\custom_rgb_g.png" />
+    <Content Include="umbraco_client\colorpicker\images\custom_rgb_r.png" />
+    <Content Include="umbraco_client\colorpicker\images\custom_submit.png" />
+    <Content Include="umbraco_client\colorpicker\images\select.png" />
+    <Content Include="umbraco_client\colorpicker\images\select2.png" />
+    <Content Include="umbraco_client\colorpicker\images\slider.png" />
+    <Content Include="umbraco_client\colorpicker\js\colorpicker.js" />
     <Content Include="web.config.Az-VAIO.xslt" />
     <Content Include="umbraco\endPreview.aspx" />
     <Content Include="umbraco\js\UmbracoCasingRules.aspx" />
@@ -1980,9 +2060,6 @@
     <Content Include="install\steps\defaultUser.ascx">
       <SubType>UserControl</SubType>
     </Content>
-    <Content Include="install\steps\detect.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
     <Content Include="install\steps\theend.ascx">
       <SubType>UserControl</SubType>
     </Content>
@@ -2028,6 +2105,7 @@
     <Content Include="config\ExamineSettings.config" />
     <Content Include="config\ExamineIndex.config" />
     <Content Include="config\scripting.config" />
+    <Content Include="config\Skinning.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
@@ -2770,12 +2848,11 @@
     <None Include="Web References\org.umbraco.update\UpgradeResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
+    <EmbeddedResource Include="install\steps\database.ascx.resx">
+      <DependentUpon>database.ascx.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="install\steps\defaultUser.ascx.resx">
       <DependentUpon>defaultUser.ascx.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="install\steps\detect.ascx.resx">
-      <DependentUpon>detect.ascx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="install\steps\theend.ascx.resx">

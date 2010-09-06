@@ -31,6 +31,8 @@ namespace umbraco
         private int pageID;
         private Guid pageVersion;
         private int template;
+
+       
         private Hashtable elements = new Hashtable();
         private StringBuilder pageContent = new StringBuilder();
         private Control pageContentControl = new Control();
@@ -70,11 +72,14 @@ namespace umbraco
                 string sValue = p.Value!=null ? p.Value.ToString() : String.Empty;
                 elements.Add(p.PropertyType.Alias, sValue);
             }
+
             template = d.Template;
+
+
             HttpContext.Current.Trace.Write("umbracoPage",
                                             "Pagedata loaded for " + pageName + " (ID: " + pageID.ToString() +
                                             ", Version: " + pageVersion.ToString() + ")");
-            //			RenderPage(template);
+            //RenderPage(template);
         }
 
         private void populatePageData(int pageID, string pageName, int nodeType, string nodeTypeAlias, string writerName, string creatorName,
@@ -191,6 +196,7 @@ namespace umbraco
             {
             }
 
+            HttpContext.Current.Trace.Write("umbracoPage", "testing altTemplate");
             // Check for alternative template
             if (HttpContext.Current.Items["altTemplate"] != null &&
                 HttpContext.Current.Items["altTemplate"].ToString() != "")
@@ -218,7 +224,8 @@ namespace umbraco
                     HttpContext.Current.Trace.Warn("umbracoPage", "No template defined");
                 }
             }
-
+                        
+            
             // Load all page elements
             string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data" : "./* [not(@id)]";
             foreach (XmlNode dataNode in xmlNode.SelectNodes(xpath))

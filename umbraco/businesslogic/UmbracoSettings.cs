@@ -251,6 +251,29 @@ namespace umbraco
             }
         }
 
+
+        /// <summary>
+        /// Gets a value indicating whether umbraco will attempt to load any skins to override default template files
+        /// </summary>
+        /// <value><c>true</c> if umbraco will override templates with skins if present and configured <c>false</c>.</value>
+        public static bool EnableTemplateFolders
+        {
+            get
+            {
+                try
+                {
+                    bool result;
+                    if (bool.TryParse(GetKey("/settings/templates/enableTemplateFolders"), out result))
+                        return result;
+                    return false;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
         /// <summary>
         /// Gets a value indicating whether umbraco will clone XML cache on publish.
         /// </summary>

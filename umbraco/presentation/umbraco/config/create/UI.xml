@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <createUI>
   <nodeType alias="initnodeTypes">
     <header>Nodetype</header>
@@ -53,10 +53,10 @@
   <nodeType alias="contentRecycleBin">
     <header>Page</header>
     <usercontrol>/create/content.ascx</usercontrol>
-    <tasks>      
+    <tasks>
       <delete assembly="umbraco" type="contentTasks" />
     </tasks>
-  </nodeType>  
+  </nodeType>
   <nodeType alias="content">
     <header>Page</header>
     <usercontrol>/create/content.ascx</usercontrol>
@@ -270,7 +270,6 @@
       <delete assembly="umbraco" type="PythonTasks" />
     </tasks>
   </nodeType>
-
   <nodeType alias="initdlrscripting">
     <header>Scripting file</header>
     <usercontrol>/create/DLRScripting.ascx</usercontrol>
@@ -278,7 +277,6 @@
       <create assembly="umbraco" type="DLRScriptingTasks" />
     </tasks>
   </nodeType>
-
   <nodeType alias="dlrscripting">
     <header>Macro</header>
     <usercontrol>/create/DLRScripting.ascx</usercontrol>
@@ -286,7 +284,6 @@
       <delete assembly="umbraco" type="DLRScriptingTasks" />
     </tasks>
   </nodeType>
-
   <nodeType alias="initscripts">
     <header>Script file</header>
     <usercontrol>/create/script.ascx</usercontrol>
@@ -309,7 +306,6 @@
       <delete assembly="umbraco" type="ScriptTasks" />
     </tasks>
   </nodeType>
-
   <nodeType alias="initpackager">
     <header>Package</header>
     <usercontrol>/create/simple.ascx</usercontrol>
@@ -346,5 +342,28 @@
       <delete assembly="umbraco" type="cms.presentation.user.UserTypeTasks" />
     </tasks>
   </nodeType>
-
+  <nodeType alias="forms">
+    <header>Forms</header>
+    <usercontrol>/plugins/umbracocontour/createform.ascx</usercontrol>
+    <tasks>
+      <create assembly="Umbraco.Forms.UI" type="Tasks.FormTasks" />
+      <delete assembly="Umbraco.Forms.UI" type="Tasks.FormTasks" />
+    </tasks>
+  </nodeType>
+  <nodeType alias="formdatasources">
+    <header>Datasources</header>
+    <usercontrol>/create/simple.ascx</usercontrol>
+    <tasks>
+      <create assembly="Umbraco.Forms.UI" type="Tasks.DataSourceTasks" />
+      <delete assembly="Umbraco.Forms.UI" type="Tasks.DataSourceTasks" />
+    </tasks>
+  </nodeType>
+  <nodeType alias="formprevaluesource">
+    <header>Prevalue source</header>
+    <usercontrol>/create/simple.ascx</usercontrol>
+    <tasks>
+      <create assembly="Umbraco.Forms.UI" type="Tasks.PrevalueSourceTasks" />
+      <delete assembly="Umbraco.Forms.UI" type="Tasks.PrevalueSourceTasks" />
+    </tasks>
+  </nodeType>
 </createUI>

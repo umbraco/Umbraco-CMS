@@ -67,6 +67,15 @@ namespace umbraco.IO
             }
         }
 
+
+        public static string SkinningXml
+        {
+            get
+            {
+                return SystemDirectories.Data + "/skinning.config";
+            }
+        }
+
         public static string NotFoundhandlersConfig
         {
             get
