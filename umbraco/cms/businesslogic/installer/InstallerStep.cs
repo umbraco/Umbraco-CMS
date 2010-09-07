@@ -5,7 +5,7 @@ using System.Text;
 
 namespace umbraco.cms.businesslogic.installer
 {
-    public abstract class InstallerStep : umbraco.cms.businesslogic.installer.IInstallerStep
+    public abstract class InstallerStep : IInstallerStep
     {
         public abstract string Alias { get; }
         public abstract string Name { get; }
@@ -17,8 +17,15 @@ namespace umbraco.cms.businesslogic.installer
 
         public abstract bool Completed();
 
-        public virtual string NextStep(){
-            return "meh";
+        public virtual string NextButtonText
+        {
+            get { return "Next »"; }
         }
+
+        public virtual string NextButtonClientSideClick
+        {
+            get { return "showProgress(this,'loadingBar'); return true;"; }
+        }
+
     }
 }

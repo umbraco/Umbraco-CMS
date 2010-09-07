@@ -1,14 +1,9 @@
 <%@ Control Language="c#" AutoEventWireup="True" Codebehind="defaultUser.ascx.cs" Inherits="umbraco.presentation.install.steps.defaultUser" TargetSchema="http://schemas.microsoft.com/intellisense/ie5"%>
-<h1>Step 4/5: Check umbraco security</h1>
 <asp:Panel ID="identify" Runat="server" Visible="True">
 <p>
-  umbraco creates a default user with a login <strong>('admin')</strong> and password <strong>('default')</strong>. It's <strong>important</strong> that the password is 
-  changed to something unique.
+  Please configure the password for the default umbraco administrator.
 </p>
 
-<p>
-  This step will check the default user's password and suggest if it needs to be changed.
-</p>
 
 <asp:Literal id="identifyResult" Runat="server"></asp:Literal>
 </asp:Panel>

@@ -6,7 +6,9 @@ namespace umbraco.cms.businesslogic.installer
         string Alias { get;}
         bool Completed();
         string Name { get;}
-        string NextStep();
         string UserControl {get;}
+
+        string NextButtonText { get; }
+        string NextButtonClientSideClick { get; }
     }
 }

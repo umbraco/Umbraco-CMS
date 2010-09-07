@@ -199,9 +199,7 @@
     <Compile Include="businesslogic\datatype\DBTypes.cs" />
     <Compile Include="businesslogic\datatype\PreValue.cs" />
     <Compile Include="businesslogic\installer\IInstallerStep.cs" />
-    <Compile Include="businesslogic\installer\InstallerStep.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="businesslogic\installer\InstallerStep.cs" />
     <Compile Include="businesslogic\installer\InstallStepCollection.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using umbraco.cms.businesslogic.installer;
+using umbraco.cms.businesslogic.packager;
 
 namespace umbraco.presentation.install.steps.Definitions
 {
@@ -18,6 +19,14 @@ namespace umbraco.presentation.install.steps.Definitions
             get { return "Configure your site"; }
         }
 
+        public override bool HideNextButtonUntillCompleted
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override string UserControl
         {
             get { return IO.SystemDirectories.Install + "/steps/skinning.ascx"; }
@@ -25,7 +34,10 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override bool Completed()
         {
-            return false;
+            if (InstalledPackage.GetAllInstalledPackages().Count > 0)
+                return true;
+            else
+                return false;
         }
     }
 }

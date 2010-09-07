@@ -24,7 +24,7 @@
     <umb:JsInclude ID="JsInclude5" runat="server" FilePath="installer.js"  Priority="0" />
 
 </head>
-<body>
+<body class="<%= currentStepClass %>">
 	
     <script type="text/javascript">
 

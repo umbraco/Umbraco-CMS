@@ -1,6 +1,8 @@
 <%@ Control Language="c#" AutoEventWireup="True" Codebehind="database.ascx.cs" Inherits="umbraco.presentation.install.steps.detect"
   TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
-<h1>Step 2/5: Database configuration</h1>
+
+
+<h2>Database configuration</h2>
 <asp:Panel ID="settings" runat="server" Visible="true">
     
         

@@ -19,9 +19,6 @@ namespace umbraco.presentation.install.steps
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-			// Disable back/forward buttons
-			Page.FindControl("next").Visible = false;
-		
 			BusinessLogic.User u = BusinessLogic.User.GetUser(0);
 
 			if (u.NoConsole || u.Disabled) 

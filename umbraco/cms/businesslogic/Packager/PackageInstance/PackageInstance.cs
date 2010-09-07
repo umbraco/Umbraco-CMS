@@ -40,6 +40,7 @@ namespace umbraco.cms.businesslogic.packager
         private string _repoGuid;
         private string _packageGuid;
         private bool _hasUpdate;
+        private bool _enableSkins = false; 
         private string _actions;
 
         public int Id
@@ -61,6 +62,12 @@ namespace umbraco.cms.businesslogic.packager
         public bool HasUpdate {
             get { return _hasUpdate; }
             set { _hasUpdate = value; }
+        }
+
+        public bool EnableSkins
+        {
+            get { return _enableSkins; }
+            set { _enableSkins = value; }
         }
 
         public String Name

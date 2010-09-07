@@ -35,7 +35,6 @@ namespace umbraco.presentation.install.steps.Skinning
                     {                        
                         rep_starterKits.DataSource = repo.Webservice.StarterKits();
                         rep_starterKits.DataBind(); 
-
                     }
                     catch (Exception ex)
                     {
@@ -60,6 +59,7 @@ namespace umbraco.presentation.install.steps.Skinning
             pl_loadStarterKits.Controls.Clear();
             pl_loadStarterKits.Controls.Add(fb);
         }
+
         protected void SelectStarterKit(object sender, EventArgs e)
         {
             Guid kitGuid = new Guid(((LinkButton)sender).CommandArgument);

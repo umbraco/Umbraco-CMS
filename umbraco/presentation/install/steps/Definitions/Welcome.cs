@@ -35,5 +35,13 @@ namespace umbraco.presentation.install.steps.Definitions
         {
             return false;
         }
+
+        public override string NextButtonText
+        {
+            get
+            {
+                return "I accept the license";
+            }
+        }
     }
 }

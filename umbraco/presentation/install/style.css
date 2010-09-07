@@ -24,3 +24,15 @@
         #buttons img{margin: auto; margin-top: 15px;}
         #buttons .next{position: absolute; top: 10px; right: 10px;}
        
+
+       #starterKits{list-style: none; margin: 0; padding: 10px;}
+       #starterKits li{float: left; margin: 20px; display: block; width: 20%; padding: 5px; border: 1px solid #efefef; text-align: center;}
+       #starterKits li a{text-decoration: none; color: #999}
+       #starterKits li span{display: block; text-align: center; padding-top: 10px;}
+       #starterKits li div{display: none !Important;}
+       #starterKits li img{border: none;}
+
+       #starterKitDesc{clear: both; font-size: 1.5em; font-weight: bold; color: #999; padding: 10px; text-align: center;}
+       #declineStarterKits{display: block; font-size: 1em; padding: 20px;}
+
+       #loadingBar{display: none;}

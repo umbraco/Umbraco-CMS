@@ -15,14 +15,14 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override string Name
         {
-            get { return "Default user"; }
+            get { return "Configure the administrator password"; }
         }
 
         public override bool HideNextButtonUntillCompleted
         {
             get
             {
-                return false;
+                return true;
             }
         }
 

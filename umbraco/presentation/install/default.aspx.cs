@@ -21,6 +21,7 @@ namespace umbraco.presentation.install
 	{
 
 		private string _installStep = "";
+        public string currentStepClass = "";
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
@@ -56,8 +57,19 @@ namespace umbraco.presentation.install
 			PlaceHolderStep.Controls.Clear();
 			PlaceHolderStep.Controls.Add(new System.Web.UI.UserControl().LoadControl(IOHelper.ResolveUrl( currentStep.UserControl ) ));
 			step.Value = currentStep.Alias;
-			next.CommandArgument = currentStep.Alias;
+
+            if (!currentStep.Completed() && currentStep.HideNextButtonUntillCompleted)
+                next.Visible = false;
+            else
+            {
+                next.Visible = true;
+                next.CommandArgument = currentStep.Alias;
+                next.Text = currentStep.NextButtonText;
+                next.OnClientClick = currentStep.NextButtonClientSideClick;    
+            }
+            
 			lt_header.Text = currentStep.Name;
+            currentStepClass = currentStep.Alias;
 		}
 
 
@@ -122,7 +134,8 @@ namespace umbraco.presentation.install
 			ics.Add(new install.steps.Definitions.License());
 			ics.Add(new install.steps.Definitions.FilePermissions());
 			ics.Add(new install.steps.Definitions.Database());
-			//ics.Add(new install.steps.Definitions.DefaultUser());
+            ics.Add(new install.steps.Definitions.DefaultUser());
+            ics.Add( new install.steps.Definitions.Skinning() );
 			ics.Add(new install.steps.Definitions.TheEnd());
 			return ics;
 		}

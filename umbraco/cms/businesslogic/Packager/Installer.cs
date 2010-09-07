@@ -189,6 +189,9 @@ namespace umbraco.cms.businesslogic.packager
             string _packReadme = xmlHelper.GetNodeValue(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/readme"));
             string _packLicense = xmlHelper.GetNodeValue(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/license "));
 
+            bool _enableSkins = bool.Parse(xmlHelper.GetNodeValue(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/enableSkins")));
+
+
 
             //Create a new package instance to record all the installed package adds - this is the same format as the created packages has.
             //save the package meta data
@@ -198,6 +201,8 @@ namespace umbraco.cms.businesslogic.packager
             insPack.Data.Version = _packVersion;
             insPack.Data.Readme = _packReadme;
             insPack.Data.License = _packLicense;
+            insPack.Data.EnableSkins = _enableSkins;
+
             insPack.Data.PackageGuid = guid; //the package unique key.
             insPack.Data.RepositoryGuid = repoGuid; //the repository unique key, if the package is a file install, the repository will not get logged.
             insPack.Save();
@@ -353,8 +358,10 @@ namespace umbraco.cms.businesslogic.packager
                     ArrayList allowed = new ArrayList();
                     foreach (XmlNode structure in n.SelectNodes("Structure/DocumentType")) {
                         DocumentType dtt = DocumentType.GetByAlias(xmlHelper.GetNodeValue(structure));
-                        allowed.Add(dtt.Id);
+                        if(dtt != null)
+                            allowed.Add(dtt.Id);
                     }
+
                     int[] adt = new int[allowed.Count];
                     for (int i = 0; i < allowed.Count; i++)
                         adt[i] = (int)allowed[i];

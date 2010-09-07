@@ -186,6 +186,20 @@
     <Compile Include="..\..\LinqToUmbraco\src\umbraco.Linq\Solution Items\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="install\steps\chooseStarterKit.ascx.cs">
+      <DependentUpon>chooseStarterKit.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\steps\chooseStarterKit.ascx.designer.cs">
+      <DependentUpon>chooseStarterKit.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="install\steps\chooseStarterKitDesign.ascx.cs">
+      <DependentUpon>chooseStarterKitDesign.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\steps\chooseStarterKitDesign.ascx.designer.cs">
+      <DependentUpon>chooseStarterKitDesign.ascx</DependentUpon>
+    </Compile>
     <Compile Include="install\steps\database.ascx.cs">
       <DependentUpon>database.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1554,7 +1568,10 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="config\splashes\worker.png" />
+    <Content Include="install\images\logo_type.png" />
     <Content Include="install\installer.js" />
+    <Content Include="install\steps\chooseStarterKit.ascx" />
+    <Content Include="install\steps\chooseStarterKitDesign.ascx" />
     <Content Include="install\steps\database.ascx" />
     <Content Include="install\steps\renaming.ascx" />
     <Content Include="install\steps\skinning.ascx" />
