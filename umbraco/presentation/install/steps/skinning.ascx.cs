@@ -12,17 +12,17 @@ namespace umbraco.presentation.install.steps
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            if (!cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
+                showStarterKits();
+            else
+                showStarterKitDesigns((Guid)cms.businesslogic.skinning.Skinning.StarterKitGuid());
         }
 
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
-            
-            if (string.IsNullOrEmpty(Request.QueryString["starterKit"]))
-                showStarterKits();
-            else
-                showStarterKitDesigns(new Guid(Request.QueryString["starterKit"]));
+
+           
 
         }
         private void showStarterKits()
@@ -31,6 +31,8 @@ namespace umbraco.presentation.install.steps
 
             pl_starterKit.Visible = true;
             pl_starterKitDesign.Visible = false;
+
+           
         }
 
         public void showStarterKitDesigns(Guid starterKitGuid)
@@ -42,6 +44,20 @@ namespace umbraco.presentation.install.steps
 
             pl_starterKit.Visible = false;
             pl_starterKitDesign.Visible = true;
+
+            Page.FindControl("next").Visible = true;
+            ((Button)Page.FindControl("next")).Text = "...I prefer not to install a skin";
+        }
+
+        public void showCustomizeSkin()
+        {
+            Page.FindControl("next").Visible = true;
+            ((Button)Page.FindControl("next")).Text = "next";
+
+            ph_customizeDesig.Controls.Add(new UserControl().LoadControl(SystemDirectories.Install + "/steps/Skinning/customizeSkin.ascx"));
+
+            pl_starterKitDesign.Visible = false;
+            pl_customizeDesign.Visible = true;
         }
     }
 }

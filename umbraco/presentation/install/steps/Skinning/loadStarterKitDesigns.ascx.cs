@@ -80,8 +80,11 @@ namespace umbraco.presentation.install.steps.Skinning
 
                 library.RefreshContent();
 
-                //((skinning)Parent.Parent.Parent).showStarterKitDesigns(kitGuid);
-
+                try
+                {
+                    ((skinning)Parent.Parent.Parent).showCustomizeSkin();
+                }
+                catch { }
             }
             else
             {

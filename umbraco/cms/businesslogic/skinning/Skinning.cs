@@ -237,6 +237,28 @@ namespace umbraco.cms.businesslogic.skinning
                 return new Dictionary<string, string>();
         }
 
+        public static bool IsStarterKitInstalled()
+        {
+           foreach(packager.InstalledPackage p in packager.InstalledPackage.GetAllInstalledPackages())
+           {
+               if (p.Data.EnableSkins)
+                   return true;
+               
+           }
+           return false;
+        }
+
+        public static Guid? StarterKitGuid()
+        {
+            foreach (packager.InstalledPackage p in packager.InstalledPackage.GetAllInstalledPackages())
+            {
+                if (p.Data.EnableSkins)
+                    return new Guid(p.Data.PackageGuid);
+
+            }
+            return null;
+        }
+
         public static Guid? StarterKitGuid(int template)
         {
             XmlDocument installed = new XmlDocument();
@@ -246,7 +268,7 @@ namespace umbraco.cms.businesslogic.skinning
                 string.Format("//templates [contains (., '{0}') ]//ancestor::package",template));
 
             if (starterKit != null)
-                return new Guid(starterKit.Attributes["repositoryGuid"].Value);
+                return new Guid(starterKit.Attributes["packageGuid"].Value);
             else
                 return null;
         }

@@ -224,6 +224,13 @@
     <Compile Include="install\steps\skinning.ascx.designer.cs">
       <DependentUpon>skinning.ascx</DependentUpon>
     </Compile>
+    <Compile Include="install\steps\Skinning\customizeSkin.ascx.cs">
+      <DependentUpon>customizeSkin.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\steps\Skinning\customizeSkin.ascx.designer.cs">
+      <DependentUpon>customizeSkin.ascx</DependentUpon>
+    </Compile>
     <Compile Include="install\steps\Skinning\loadStarterKitDesigns.ascx.cs">
       <DependentUpon>loadStarterKitDesigns.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1579,6 +1586,7 @@
     <Content Include="install\steps\database.ascx" />
     <Content Include="install\steps\renaming.ascx" />
     <Content Include="install\steps\skinning.ascx" />
+    <Content Include="install\steps\Skinning\customizeSkin.ascx" />
     <Content Include="install\steps\Skinning\loadStarterKitDesigns.ascx" />
     <Content Include="install\steps\Skinning\loadStarterKits.ascx" />
     <Content Include="install\Title.ascx" />

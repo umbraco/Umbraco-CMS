@@ -11,6 +11,7 @@
 
 </asp:Panel>
 
+<!-- Choose starter kit design -->
 
 <asp:Panel ID="pl_starterKitDesign" Runat="server" Visible="True">
 
@@ -21,4 +22,15 @@
 
 </asp:Panel>
 
-<!-- Choose starter kit design -->
+
+<!-- Customize skin -->
+
+<asp:Panel ID="pl_customizeDesign" Runat="server" Visible="True">
+
+
+<div id="customizeSkin">
+<asp:PlaceHolder ID="ph_customizeDesig" runat="server" />
+</div>
+
+</asp:Panel>
+

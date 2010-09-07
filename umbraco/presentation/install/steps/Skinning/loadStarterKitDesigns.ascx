@@ -7,25 +7,44 @@
 
 <asp:Repeater ID="rep_starterKitDesigns" runat="server">
     <HeaderTemplate>
-        <ul>
+        <ul id="starterKitDesigns">
     </HeaderTemplate>
     <ItemTemplate>
         <li>
 
         <asp:LinkButton ID="bt_selectKit" runat="server" onclick="SelectStarterKitDesign" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>">
-         <%# ((Skin)Container.DataItem).Text %>
+
+         <img src="<%# ((Skin)Container.DataItem).Thumbnail %>" alt="<%# ((Skin)Container.DataItem).Text %>" />
+        
+        <span><%# ((Skin)Container.DataItem).Text %></span>
+
+       
         </asp:LinkButton>
 
-         <br />
-
-        <img src="<%# ((Skin)Container.DataItem).Thumbnail %>" />
+         <div><%# ((Skin)Container.DataItem).Description %></div>
         
         </li>
     </ItemTemplate>
     <FooterTemplate>
+
+
         </ul>
+
+         <div id="starterKitDesignDesc">Click a skin icon above to install it</div>
+
+      
     </FooterTemplate>
 </asp:Repeater>
+
+<script type="text/javascript">
+
+    jQuery(document).ready(function () {
+        jQuery("#starterKitDesigns li").mouseover(function () {
+            jQuery("#starterKitDesignDesc").html(jQuery("div", this).html());
+        });
+    });
+
+</script>
 
 
 </asp:Panel>
