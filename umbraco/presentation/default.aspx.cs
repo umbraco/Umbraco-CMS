@@ -190,14 +190,15 @@ namespace umbraco
 
             RequestInitEventArgs e = new RequestInitEventArgs();
             e.Page = m_umbPage;
-            e.PageId = m_umbPage.PageID;
+
+            if(m_umbPage != null)
+                e.PageId = m_umbPage.PageID;
+            
             e.Context = System.Web.HttpContext.Current;
             
             FireBeforeRequestInit(e);
             if (!e.Cancel)
             {
-
-
                 if (!UmbracoSettings.EnableSplashWhileLoading || !content.Instance.isInitializing)
                 {
 

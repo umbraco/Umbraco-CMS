@@ -5,21 +5,20 @@ function openDialog(diaTitle, diaDoc, dwidth, dheight, optionalParams)
 {
   theDialogWindow = window.open(diaDoc,'dialogpage', "width="+dwidth+"px,height="+dheight+"px"+optionalParams);// window.showModalDialog(diaDoc, "MyDialog", strFeatures);
 }
-
 function runStarterKits() {
   openDialog('packager', 'http://packages.umbraco.org/packages/website-packages?callback=<%=Request.ServerVariables["SERVER_NAME"] + umbraco.IO.SystemDirectories.Umbraco + "/dialogs/packager.aspx" %>', 530, 550, ',scrollbars=yes');
 }
 </script>
 
 
-<h1 style="padding: 10px 0px 10px 0px;">Umbraco <%=umbraco.GlobalSettings.CurrentVersion%> is installed and ready for use</h1>
-
 <asp:Panel ID="updateUmbracoSettingsFailed" Visible="false" runat="server">
+
 <div class="error">
 <p id="errorDetails"><asp:Literal ID="errorLiteral" runat="server"></asp:Literal></p>
 <p> To finish the installation, you'll need to 
 manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>umbracoConfigurationStatus</strong> in the bottom to the value of <strong>'<%=umbraco.GlobalSettings.CurrentVersion %>'</strong>.</p>
 </div>
+
 </asp:Panel>
 
 <div class="success">
@@ -36,18 +35,21 @@ you can find plenty of resources on our getting started pages.
 Receive security bulletins and our monthly newsletter with special offers. No spam, period.
 </a>
 <div id="newsLetterResponse" style="display: none;">Thank you</div>
-<div id="newsLetterForm">
-<label for="name">Name</label><input class="text" type="text" name="name" id="name" /><br />
-<label for="email">Email</label><input class="text" type="text" name="email" id="email" /><br/>
+
+<ol class="form" id="newsLetterForm">
+    <li><label for="name">Name</label><input class="text" type="text" name="name" id="name" /></li>
+    <li><label for="email">Email</label><input class="text" type="text" name="email" id="email" /></li>
+</ol>
+
 <p>
-<input type="button" id="subscribeButton" value="Register" />
+    <input type="button" id="subscribeButton" value="Register" />
 </p>
 </div>
 
 <div style="display: none">
 <asp:PlaceHolder ID="viewSite" runat="server" Visible="false">
 <a href="/" target="_blank"><h3>Browse your new site</h3>
-You installed Runway, so why not see how your new website looks.
+You installed a starter package, so why not see what your new website looks like.
 </a>
 </asp:PlaceHolder>
 </div>
@@ -59,7 +61,6 @@ To manage your website, simply open the umbraco back office and start adding con
 <a href="http://umbraco.org/documentation/getting-started" target="_blank"><h3>Further help and information</h3>
 Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the umbraco terminology
 </a>
-</div>
 
 <script type="text/javascript">
   jQuery(document).ready(function() {

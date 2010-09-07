@@ -27,7 +27,7 @@
 
         <div id="starterKitDesc">Click a starterkit icon above to install it</div>
 
-        <a href="#" id="declineStarterKits">...I prefer <strong>not</strong> to install a starter kit</a>
+        <asp:LinkButton runat="server" CssClass="declineStarterKits" ID="declineStarterKits" OnClientClick="return confirm('Are you sure you do not want to install a starter kit?');" OnClick="NextStep">I prefer not to install a starter kit</asp:LinkButton>
 
     </FooterTemplate>
 </asp:Repeater>

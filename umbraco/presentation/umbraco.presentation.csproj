@@ -210,8 +210,12 @@
     <Compile Include="install\steps\Definitions\Database.cs" />
     <Compile Include="install\steps\Definitions\DefaultUser.cs" />
     <Compile Include="install\steps\Definitions\FilePermissions.cs" />
+    <Compile Include="install\steps\Definitions\InstallerControl.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="install\steps\Definitions\Skinning.cs" />
     <Compile Include="install\steps\Definitions\TheEnd.cs" />
+    <Compile Include="install\steps\Definitions\WebPi.cs" />
     <Compile Include="install\steps\Definitions\Welcome.cs" />
     <Compile Include="install\steps\skinning.ascx.cs">
       <DependentUpon>skinning.ascx</DependentUpon>

@@ -75,10 +75,16 @@ namespace umbraco.presentation.install
 
 		protected void onNextCommand(object sender, CommandEventArgs e)
 		{
-			string currentStep = (string)e.CommandArgument;
-			InstallerStep _s = InstallerSteps().GotoNextStep(currentStep);
-			Response.Redirect("?installStep=" + _s.Alias);
+            string currentStep = (string)e.CommandArgument;
+            GotoNextStep(currentStep);
 		}
+
+        public void GotoNextStep(string currentStep)
+        {
+            InstallerStep _s = InstallerSteps().GotoNextStep(currentStep);
+            Response.Redirect("?installStep=" + _s.Alias);
+        }
+
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)
@@ -136,7 +142,8 @@ namespace umbraco.presentation.install
 			ics.Add(new install.steps.Definitions.Database());
             ics.Add(new install.steps.Definitions.DefaultUser());
             ics.Add( new install.steps.Definitions.Skinning() );
-			ics.Add(new install.steps.Definitions.TheEnd());
+            ics.Add(new install.steps.Definitions.WebPi());
+            ics.Add(new install.steps.Definitions.TheEnd());
 			return ics;
 		}
 /*
