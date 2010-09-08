@@ -42,10 +42,12 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                 if(string.IsNullOrEmpty(StyleSheet))
                     s.Attributes.Add("href", Value);
                 else
-                s.Attributes.Add("href", StyleSheet);
+                    s.Attributes.Add("href", StyleSheet);
 
                 if(!string.IsNullOrEmpty(Media))
                     s.Attributes.Add("media", Media);
+
+                head.AppendChild(s);
             }
 
           
