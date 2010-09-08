@@ -88,8 +88,11 @@ namespace umbraco.presentation.install.steps.Skinning
 
                 try
                 {
-                    GlobalSettings.ConfigurationStatus = GlobalSettings.CurrentVersion;
-                    Application["umbracoNeedConfiguration"] = false;
+                    if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus))
+                    {
+                        GlobalSettings.ConfigurationStatus = GlobalSettings.CurrentVersion;
+                        Application["umbracoNeedConfiguration"] = false;
+                    }
                 }
                 catch { }
 
