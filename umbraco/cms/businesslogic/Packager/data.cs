@@ -181,7 +181,10 @@ namespace umbraco.cms.businesslogic.packager
                     retVal.RepositoryGuid = safeAttribute("repositoryGuid", n);
                     retVal.PackageGuid = safeAttribute("packageGuid", n);
                     retVal.HasUpdate = bool.Parse(safeAttribute("hasUpdate",n));
-                    retVal.EnableSkins = bool.Parse(safeAttribute("enableSkins", n));
+
+                    bool _enableSkins = false;
+                    bool.TryParse(safeAttribute("enableSkins", n), out _enableSkins);
+                    retVal.EnableSkins = _enableSkins;
 
                     retVal.License = safeNodeValue(n.SelectSingleNode("license"));
                     retVal.LicenseUrl = n.SelectSingleNode("license").Attributes.GetNamedItem("url").Value;

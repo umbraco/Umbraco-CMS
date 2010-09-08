@@ -25,8 +25,8 @@
         #buttons .next{position: absolute; top: 10px; right: 10px;}
        
 
-       #starterKits, #starterKitDesigns {list-style: none; margin: 0; padding: 10px;}
-       #starterKits li, #starterKitDesigns li{float: left; margin: 20px; display: block; width: 20%; padding: 5px; border: 1px solid #efefef; text-align: center;}
+       #starterKits, #starterKitDesigns {list-style: none; margin: 0; padding: 0px;}
+       #starterKits li, #starterKitDesigns li{float: left; margin: 15px; display: block; width: 20%; padding: 5px; border: 1px solid #efefef; text-align: center;}
        #starterKits li a, #starterKitDesigns li a{text-decoration: none; color: #999}
        #starterKits li span, #starterKitDesigns li span{display: block; text-align: center; padding-top: 10px;}
        #starterKits li div, #starterKitDesigns li div{display: none !Important;}
