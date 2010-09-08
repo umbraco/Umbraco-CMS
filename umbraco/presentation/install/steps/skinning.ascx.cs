@@ -51,12 +51,7 @@ namespace umbraco.presentation.install.steps
 
         public void showCustomizeSkin()
         {
-            Page.FindControl("next").Visible = true;
-
-            ph_customizeDesig.Controls.Add(new UserControl().LoadControl(SystemDirectories.Install + "/steps/Skinning/customizeSkin.ascx"));
-
-            pl_starterKitDesign.Visible = false;
-            pl_customizeDesign.Visible = true;
+            Response.Redirect(GlobalSettings.Path + "/canvas.aspx?redir=" + this.ResolveUrl("~/") + "&skinning=true");
         }
     }
 }
