@@ -81,6 +81,7 @@ namespace umbraco.presentation.install.steps.Skinning
                 p.LoadConfig(tempFile);
                 int pID = p.CreateManifest(tempFile, kitGuid.ToString(), repoGuid);
 
+                p.InstallFiles(pID, tempFile);
                 p.InstallBusinessLogic(pID, tempFile);
                 p.InstallCleanUp(pID, tempFile);
 
