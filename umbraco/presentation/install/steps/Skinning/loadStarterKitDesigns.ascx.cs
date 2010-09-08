@@ -99,14 +99,15 @@ namespace umbraco.presentation.install.steps.Skinning
                         GlobalSettings.ConfigurationStatus = GlobalSettings.CurrentVersion;
                         Application["umbracoNeedConfiguration"] = false;
                     }
-                }
-                catch { }
 
-                try
-                {
                     ((skinning)Parent.Parent.Parent).showCustomizeSkin();
                 }
-                catch { }
+                catch {
+
+                    _default p = (_default)this.Page;
+                    p.GotoNextStep(helper.Request("installStep"));
+                }
+
             }
             else
             {
