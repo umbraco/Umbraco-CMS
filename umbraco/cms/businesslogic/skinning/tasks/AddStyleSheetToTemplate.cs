@@ -23,34 +23,38 @@ namespace umbraco.cms.businesslogic.skinning.tasks
         {
             TaskExecutionDetails d = new TaskExecutionDetails();
 
+
             //open template
 
             HtmlDocument doc = new HtmlDocument();
             doc.Load(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
 
-
-            HtmlNode head = doc.DocumentNode.SelectSingleNode("//head");
-
-            if (head != null)
+            if (doc.DocumentNode.SelectSingleNode(string.Format("//link [@href = '{0}']", Value)) == null)
             {
-                HtmlNode s = new HtmlNode(HtmlNodeType.Element, doc, 0);
-                s.Name = "link";
-                s.Attributes.Add("rel", "stylesheet");
-                s.Attributes.Add("type", "text/css");
 
-               
-                s.Attributes.Add("href", Value);
-               
+                HtmlNode head = doc.DocumentNode.SelectSingleNode("//head");
 
-                if(!string.IsNullOrEmpty(Media))
-                    s.Attributes.Add("media", Media);
+                if (head != null)
+                {
+                    HtmlNode s = new HtmlNode(HtmlNodeType.Element, doc, 0);
+                    s.Name = "link";
+                    s.Attributes.Add("rel", "stylesheet");
+                    s.Attributes.Add("type", "text/css");
 
-                head.AppendChild(s);
+
+                    s.Attributes.Add("href", Value);
+
+
+                    if (!string.IsNullOrEmpty(Media))
+                        s.Attributes.Add("media", Media);
+
+                    head.AppendChild(s);
+                }
+
+
+
+                doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
             }
-
-          
-
-            doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
 
             d.TaskExecutionStatus = TaskExecutionStatus.Completed;
             d.NewValue = Value;
