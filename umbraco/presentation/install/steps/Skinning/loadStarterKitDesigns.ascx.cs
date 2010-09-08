@@ -104,8 +104,8 @@ namespace umbraco.presentation.install.steps.Skinning
                 }
                 catch {
 
-                    _default p = (_default)this.Page;
-                    p.GotoNextStep(helper.Request("installStep"));
+                    _default pa = (_default)this.Page;
+                    pa.GotoNextStep(helper.Request("installStep"));
                 }
 
             }
