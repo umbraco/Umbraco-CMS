@@ -81,14 +81,14 @@ namespace umbraco.cms.businesslogic.skinning.tasks
         {
             return string.Format(
                    @"jQuery('#{0}').bind('{2}', function() {{ 
-                        var link = $('<link>');
+                        var link = jQuery('<link>');
                         link.attr({{
                                 type: 'text/css',
                                 rel: 'stylesheet',
                                 {3}
                                 href:{1}
                         }});
-                        $('head').append(link); 
+                        jQuery('head').append(link); 
                 }});",
                    ControlClientId,
                    ClientSideGetValueScript,
