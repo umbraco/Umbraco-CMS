@@ -34,27 +34,29 @@ namespace umbraco.cms.businesslogic.skinning.tasks
             HtmlDocument doc = new HtmlDocument();
             doc.Load(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" +TargetFile);
 
-            foreach(HtmlNode target in doc.DocumentNode.SelectNodes(string.Format("//*[@id = '{0}']",TargetID)))
+            if (doc.DocumentNode.SelectNodes(string.Format("//*[@id = '{0}']", TargetID)) != null)
             {
-                if (string.IsNullOrEmpty(TargetAttribute))
+                foreach (HtmlNode target in doc.DocumentNode.SelectNodes(string.Format("//*[@id = '{0}']", TargetID)))
                 {
-                    d.OriginalValue = target.InnerHtml;
-                    target.InnerHtml = Value;
-                }
-                else
-                {
-                    if (target.Attributes[TargetAttribute] == null)
+                    if (string.IsNullOrEmpty(TargetAttribute))
                     {
-                        target.Attributes.Add(TargetAttribute, Value);
+                        d.OriginalValue = target.InnerHtml;
+                        target.InnerHtml = Value;
                     }
                     else
                     {
-                        d.OriginalValue = target.Attributes[TargetAttribute].Value;
-                        target.Attributes[TargetAttribute].Value = Value;
+                        if (target.Attributes[TargetAttribute] == null)
+                        {
+                            target.Attributes.Add(TargetAttribute, Value);
+                        }
+                        else
+                        {
+                            d.OriginalValue = target.Attributes[TargetAttribute].Value;
+                            target.Attributes[TargetAttribute].Value = Value;
+                        }
                     }
                 }
             }
-
             doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
 
             d.TaskExecutionStatus = TaskExecutionStatus.Completed;
