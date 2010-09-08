@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using System.Xml.XPath;
+using umbraco.interfaces.skinning;
 
 namespace umbraco.cms.businesslogic.skinning
 {
@@ -244,6 +245,25 @@ namespace umbraco.cms.businesslogic.skinning
             }
 
             //3. put on some clothes
+        }
+
+        public void ExecuteInstallTasks()
+        {
+            XmlDocument manifest = new XmlDocument();
+            manifest.Load(FullFileName);
+
+            foreach (XmlNode tNode in manifest.SelectNodes("/Skin/Install/Task"))
+            {
+                Task t = Task.CreateFromXmlNode(tNode);
+                TaskExecutionDetails details = t.TaskType.Execute(t.Value);
+
+                if (details.TaskExecutionStatus == TaskExecutionStatus.Completed)
+                {
+                   AddTaskHistoryNode(
+                        t.TaskType.ToXml(details.OriginalValue, details.NewValue));
+                }
+
+            }
         }
 
         public void AddTaskHistoryNode(XmlNode taskNode)
