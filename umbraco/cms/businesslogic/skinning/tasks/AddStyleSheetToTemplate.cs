@@ -38,12 +38,17 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                 s.Name = "link";
                 s.Attributes.Add("rel", "stylesheet");
                 s.Attributes.Add("type", "text/css");
+
+                if(string.IsNullOrEmpty(StyleSheet))
+                    s.Attributes.Add("href", Value);
+                else
                 s.Attributes.Add("href", StyleSheet);
 
                 if(!string.IsNullOrEmpty(Media))
                     s.Attributes.Add("media", Media);
             }
 
+          
 
             doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
 
@@ -56,8 +61,21 @@ namespace umbraco.cms.businesslogic.skinning.tasks
 
         public override string PreviewClientScript(string ControlClientId, string ClientSidePreviewEventType, string ClientSideGetValueScript)
         {
-            //will be run on installation so currently no need for a client preview script
-            return string.Empty;
+            return string.Format(
+                   @"jQuery('#{0}').bind('{2}', function() {{ 
+                        var link = $('<link>');
+                        link.attr({{
+                                type: 'text/css',
+                                rel: 'stylesheet',
+                                {3}
+                                href:{1}
+                        }});
+                        $('head').append(link); 
+                }});",
+                   ControlClientId,
+                   ClientSideGetValueScript,
+                   ClientSidePreviewEventType,
+                   string.IsNullOrEmpty(Media) ? "" : string.Format("media :''{0}",Media));
         }
     }
 }
