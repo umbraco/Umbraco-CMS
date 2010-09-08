@@ -61,6 +61,20 @@ namespace umbraco.cms.businesslogic.skinning.tasks
             return d;
         }
 
+        public override TaskExecutionStatus RollBack(string OriginalValue)
+        {
+            HtmlDocument doc = new HtmlDocument();
+            doc.Load(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
+
+            HtmlNode s = doc.DocumentNode.SelectSingleNode(string.Format("//link [@href = '{0}']", string.IsNullOrEmpty(StyleSheet) ? Value : StyleSheet));
+
+            s.Remove();
+
+            doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
+
+            return TaskExecutionStatus.Completed;
+        }
+
         public override string PreviewClientScript(string ControlClientId, string ClientSidePreviewEventType, string ClientSideGetValueScript)
         {
             return string.Format(
