@@ -8,6 +8,7 @@ using System.Web.UI.WebControls;
 using umbraco.presentation.LiveEditing.Controls;
 using umbraco.IO;
 using System.Web.UI;
+using umbraco.cms.businesslogic.skinning;
 
 namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 {
@@ -47,7 +48,8 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             m_SkinButton.CssClass = "button";
             m_SkinButton.ToolTip = ui.GetText("skin");
             m_SkinButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/SKinModule/skin.png", SystemDirectories.Umbraco);
-            m_SkinButton.OnClientClick = "setTasksClientScripts();jQuery('#" + m_SkinModal.ClientID + @"').ModalWindowShow('" + ui.GetText("skin") + "',true,500,400,50,0, ['.modalbuton'], null);return false;";
+            m_SkinButton.OnClientClick =
+                (Skin.CreateFromAlias(Skinning.GetCurrentSkinAlias(nodeFactory.Node.GetCurrent().template)) != null ? "setTasksClientScripts();" : "") + "jQuery('#" + m_SkinModal.ClientID + @"').ModalWindowShow('" + ui.GetText("skin") + "',true,500,400,50,0, ['.modalbuton'], null);return false;";
 
             Controls.Add(m_SkinButton);
 
