@@ -17,7 +17,8 @@ namespace umbraco.presentation
                 else if (Request.UrlReferrer != null && !Request.UrlReferrer.AbsolutePath.Contains("login.aspx"))
                     redirUrl = Request.UrlReferrer.AbsolutePath;
 
-                Response.Redirect(redirUrl, true);
+                Response.Redirect(redirUrl + 
+                    (string.IsNullOrEmpty(UmbracoContext.Current.Request["skinning"]) ? "" : "?skinning=true") , true);
             }
             else
             {

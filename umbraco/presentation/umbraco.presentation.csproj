@@ -1595,6 +1595,7 @@
     <Content Include="umbraco\images\aboutNew.png" />
     <Content Include="umbraco\images\loginBg.png" />
     <Content Include="umbraco\images\umbracoSplash.png" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinModuleShowOnStartup.js" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\skin.png" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinModule.js" />

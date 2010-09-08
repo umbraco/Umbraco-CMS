@@ -23,6 +23,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
         {            
             
 
+
             nodeFactory.Node n = nodeFactory.Node.GetCurrent();
 
             ActiveSkin = Skin.CreateFromAlias(Skinning.GetCurrentSkinAlias(n.template));

@@ -9,6 +9,7 @@ using umbraco.presentation.LiveEditing.Controls;
 using umbraco.IO;
 using System.Web.UI;
 using umbraco.cms.businesslogic.skinning;
+using ClientDependency.Core.Controls;
 
 namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 {
@@ -48,11 +49,25 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             m_SkinButton.CssClass = "button";
             m_SkinButton.ToolTip = ui.GetText("skin");
             m_SkinButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/SKinModule/skin.png", SystemDirectories.Umbraco);
-            m_SkinButton.OnClientClick =
-                (Skin.CreateFromAlias(Skinning.GetCurrentSkinAlias(nodeFactory.Node.GetCurrent().template)) != null ? "setTasksClientScripts();" : "") + "jQuery('#" + m_SkinModal.ClientID + @"').ModalWindowShow('" + ui.GetText("skin") + "',true,500,400,50,0, ['.modalbuton'], null);return false;";
+
+            string s = (Skin.CreateFromAlias(Skinning.GetCurrentSkinAlias(nodeFactory.Node.GetCurrent().template)) != null ? "setTasksClientScripts();" : "") + "jQuery('#" + m_SkinModal.ClientID + @"').ModalWindowShow('" + ui.GetText("skin") + "',true,500,400,50,0, ['.modalbuton'], null);";
+
+            m_SkinButton.OnClientClick = s +"return false;";
 
             Controls.Add(m_SkinButton);
 
+            if (!string.IsNullOrEmpty(UmbracoContext.Current.Request["skinning"]))
+            {
+                ScriptManager.RegisterClientScriptBlock(
+                   this,
+                   this.GetType(),
+                   "ShowSkinModule",
+                   "function ShowSkinModule(){" + s + "}",
+                   true);
+
+
+                ClientDependencyLoader.Instance.RegisterDependency(500, "LiveEditing/Modules/SkinModule/SkinModuleShowOnStartup.js", "UmbracoRoot", ClientDependencyType.Javascript);
+            }
         }
     }
 }
