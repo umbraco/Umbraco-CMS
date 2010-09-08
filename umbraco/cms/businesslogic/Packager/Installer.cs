@@ -189,7 +189,10 @@ namespace umbraco.cms.businesslogic.packager
             string _packReadme = xmlHelper.GetNodeValue(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/readme"));
             string _packLicense = xmlHelper.GetNodeValue(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/license "));
 
-            bool _enableSkins = bool.Parse(xmlHelper.GetNodeValue(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/enableSkins")));
+            bool _enableSkins = false;
+
+            if(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/enableSkins") != null)
+                _enableSkins = bool.Parse(xmlHelper.GetNodeValue(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/enableSkins")));
 
 
 
