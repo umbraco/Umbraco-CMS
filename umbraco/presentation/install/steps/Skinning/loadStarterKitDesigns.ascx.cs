@@ -87,6 +87,11 @@ namespace umbraco.presentation.install.steps.Skinning
 
                 library.RefreshContent();
 
+                if (cms.businesslogic.skinning.Skinning.GetAllSkins().Count > 0)
+                {
+                    cms.businesslogic.skinning.Skinning.ActivateAsCurrentSkin(cms.businesslogic.skinning.Skinning.GetAllSkins()[0]);
+                }
+
                 try
                 {
                     if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus))
