@@ -32,6 +32,7 @@
 
          <div id="starterKitDesignDesc">Click a skin icon above to install it</div>
 
+          <asp:LinkButton runat="server" CssClass="declineStarterKits" ID="declineStarterKitDesigns" OnClientClick="return confirm('Are you sure you do not want to install a skin?');" OnClick="NextStep">I prefer not to install a skin</asp:LinkButton>
       
     </FooterTemplate>
 </asp:Repeater>

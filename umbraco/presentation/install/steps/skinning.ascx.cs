@@ -38,6 +38,8 @@ namespace umbraco.presentation.install.steps
         public void showStarterKitDesigns(Guid starterKitGuid)
         {
             Skinning.loadStarterKitDesigns ctrl = (Skinning.loadStarterKitDesigns)new UserControl().LoadControl(SystemDirectories.Install + "/steps/Skinning/loadStarterKitDesigns.ascx");
+            ctrl.ID = "StarterKitDesigns";
+
             ctrl.StarterKitGuid = starterKitGuid;
 
             ph_starterKitDesigns.Controls.Add(ctrl);
@@ -45,14 +47,11 @@ namespace umbraco.presentation.install.steps
             pl_starterKit.Visible = false;
             pl_starterKitDesign.Visible = true;
 
-            Page.FindControl("next").Visible = true;
-            ((Button)Page.FindControl("next")).Text = "...I prefer not to install a skin";
         }
 
         public void showCustomizeSkin()
         {
             Page.FindControl("next").Visible = true;
-            ((Button)Page.FindControl("next")).Text = "next";
 
             ph_customizeDesig.Controls.Add(new UserControl().LoadControl(SystemDirectories.Install + "/steps/Skinning/customizeSkin.ascx"));
 

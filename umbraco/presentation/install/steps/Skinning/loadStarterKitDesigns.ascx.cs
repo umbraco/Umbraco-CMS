@@ -25,6 +25,12 @@ namespace umbraco.presentation.install.steps.Skinning
 
         }
 
+        protected void NextStep(object sender, EventArgs e)
+        {
+            _default p = (_default)this.Page;
+            p.GotoNextStep(helper.Request("installStep"));
+        }
+
         protected override void OnInit(EventArgs e)
         {
              base.OnInit(e);
@@ -79,6 +85,13 @@ namespace umbraco.presentation.install.steps.Skinning
                 p.InstallCleanUp(pID, tempFile);
 
                 library.RefreshContent();
+
+                try
+                {
+                    GlobalSettings.ConfigurationStatus = GlobalSettings.CurrentVersion;
+                    Application["umbracoNeedConfiguration"] = false;
+                }
+                catch { }
 
                 try
                 {
