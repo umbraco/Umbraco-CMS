@@ -91,7 +91,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                    ControlClientId,
                    ClientSideGetValueScript,
                    ClientSidePreviewEventType,
-                   string.IsNullOrEmpty(Media) ? "" : string.Format("media :''{0}",Media));
+                   string.IsNullOrEmpty(Media) ? "" : string.Format("media :'{0}',",Media));
         }
     }
 }
