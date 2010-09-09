@@ -73,24 +73,41 @@ namespace umbraco.cms.businesslogic.skinning.tasks
             {
                 return string.Format(
                     @"jQuery('#{0}').bind('{3}', function() {{ 
-                    jQuery('#{1}').html({2}); 
-                }});",
+                        jQuery('#{1}').html({2}); 
+                    }});
+                
+                    //cancel support
+                     var init{4} = jQuery('#{1}').html(); 
+                     jQuery('#cancelSkinCustomization').click(function () {{ 
+                        jQuery('#{1}').html(init{4}); 
+                    }});
+                    ",
                     ControlClientId,
                     TargetID,
                     ClientSideGetValueScript,
-                    ClientSidePreviewEventType);
+                    ClientSidePreviewEventType,
+                    new Guid().ToString().Replace("-",""));
             }
             else
             {
                 return string.Format(
                    @"jQuery('#{0}').bind('{4}', function() {{ 
-                    jQuery('#{1}').attr('{2}',{3}); 
-                }});",
+                        jQuery('#{1}').attr('{2}',{3}); 
+                    }});
+
+
+                    //cancel support
+                     var init{5} = jQuery('#{1}').attr('{2}'); 
+                     jQuery('#cancelSkinCustomization').click(function () {{ 
+                        jQuery('#{1}').attr('{2}',init{5}); 
+                    }});
+                    ",
                    ControlClientId,
                    TargetID,
                    TargetAttribute,
                     ClientSideGetValueScript,
-                    ClientSidePreviewEventType);
+                    ClientSidePreviewEventType,
+                    new Guid().ToString().Replace("-", ""));
             }
         }
     }

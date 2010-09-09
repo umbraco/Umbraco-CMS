@@ -87,20 +87,30 @@ namespace umbraco.cms.businesslogic.skinning.tasks
         public override string PreviewClientScript(string ControlClientId, string ClientSidePreviewEventType, string ClientSideGetValueScript)
         {
             return string.Format(
-                   @"jQuery('#{0}').bind('{2}', function() {{ 
-                        var link = jQuery('<link>');
-                        link.attr({{
+                   @"var link{4};
+                    jQuery('#{0}').bind('{2}', function() {{ 
+                        jQuery(link{4}).remove();
+                        link{4} = jQuery('<link>');
+                        link{4}.attr({{
                                 type: 'text/css',
                                 rel: 'stylesheet',
                                 {3}
                                 href:{1}
                         }});
-                        jQuery('head').append(link); 
-                }});",
+                        jQuery('head').append(link{4}); 
+                    }});
+
+
+                    //cancel support
+                    jQuery('#cancelSkinCustomization').click(function () {{ 
+                        jQuery(link{4}).remove();       
+                    }});
+                    ",
                    ControlClientId,
                    ClientSideGetValueScript,
                    ClientSidePreviewEventType,
-                   string.IsNullOrEmpty(Media) ? "" : string.Format("media :'{0}',",Media));
+                   string.IsNullOrEmpty(Media) ? "" : string.Format("media :'{0}',",Media),
+                   new Guid().ToString().Replace("-", ""));
         }
     }
 }

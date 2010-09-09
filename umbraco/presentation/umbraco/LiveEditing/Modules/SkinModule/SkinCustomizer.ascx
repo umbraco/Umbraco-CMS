@@ -10,7 +10,8 @@
     <p runat="server" id="pChangeSkin">... or <a href="#" onclick="jQuery('#costumizeSkin').hide();jQuery('#changeSkin').show();">change</a> skin</p>
 
     <asp:Button ID="btnOk" runat="server" Text="Ok" onclick="btnOk_Click" />
-    <asp:Button ID="btnCancel" runat="server" Text="Cancel" CssClass="modalbuton" />
+
+    <button type="button" class="modalbuton" id="cancelSkinCustomization">Cancel</button>
 
 </div>
 
@@ -43,7 +44,7 @@
 
     <p runat="server" id="pCustomizeSkin">... or <a href="#" onclick="jQuery('#changeSkin').hide();jQuery('#costumizeSkin').show();">customize</a> current skin</p>
 
-    <asp:Button ID="btnCancelSkin" runat="server" Text="Cancel" CssClass="modalbuton" />
+    <button type="button" class="modalbuton">Cancel</button>
 
 </div>
 

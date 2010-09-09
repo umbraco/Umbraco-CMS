@@ -45,13 +45,23 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                 @"jQuery('#{0}').bind('{5}', function() {{ 
                         var val = '{3}'; 
                         jQuery('{1}').css('{2}', val.replace('${{Output}}',{4})); 
-                }});",
+                }});
+
+
+                //cancel support
+                var init{6} = jQuery('{1}').css('{2}');
+                jQuery('#cancelSkinCustomization').click(function () {{ 
+                    jQuery('{1}').css('{2}',init{6}); 
+                }});
+
+                ",
                 ControlClientId,
                 TargetRule,
                 TargetParameter,
                 Value,
                 ClientSideGetValueScript,
-                ClientSidePreviewEventType);
+                ClientSidePreviewEventType,
+                new Guid().ToString().Replace("-", ""));
         }
     }
 }

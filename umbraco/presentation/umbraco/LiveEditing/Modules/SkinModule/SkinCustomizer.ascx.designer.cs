@@ -49,15 +49,6 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule {
         protected global::System.Web.UI.WebControls.Button btnOk;
         
         /// <summary>
-        /// btnCancel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCancel;
-        
-        /// <summary>
         /// ltChangeSkinStyle control.
         /// </summary>
         /// <remarks>
@@ -83,14 +74,5 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl pCustomizeSkin;
-        
-        /// <summary>
-        /// btnCancelSkin control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCancelSkin;
     }
 }
