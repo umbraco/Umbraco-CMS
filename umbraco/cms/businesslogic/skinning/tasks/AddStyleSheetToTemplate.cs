@@ -71,9 +71,12 @@ namespace umbraco.cms.businesslogic.skinning.tasks
 
             HtmlNode s = doc.DocumentNode.SelectSingleNode(string.Format("//link [@href = '{0}']", Value));
 
-            s.Remove();
+            if (s != null)
+            {
+                s.Remove();
 
-            doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
+                doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
+            }
 
             return TaskExecutionStatus.Completed;
         }
