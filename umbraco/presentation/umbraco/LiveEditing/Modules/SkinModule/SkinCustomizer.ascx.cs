@@ -19,6 +19,15 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
         private List<Dependency> sDependencies = new List<Dependency>();
 
+        private cms.businesslogic.packager.repositories.Repository repo;
+        private string repoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
+
+        public SkinCustomizer()
+        {
+            repo = cms.businesslogic.packager.repositories.Repository.getByGuid(repoGuid);
+        }
+
+
         protected void Page_Load(object sender, EventArgs e)
         {            
             
@@ -53,11 +62,24 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             }
             else
             {
-                install.steps.Skinning.loadStarterKitDesigns ctrl =
-                    (install.steps.Skinning.loadStarterKitDesigns)new UserControl().LoadControl(SystemDirectories.Install + "/steps/Skinning/loadStarterKitDesigns.ascx");
-                ctrl.StarterKitGuid = (Guid)g;
+                if (repo.HasConnection())
+                {
+                    try
+                    {
+                        rep_starterKitDesigns.DataSource = repo.Webservice.Skins(g.ToString());
+                        rep_starterKitDesigns.DataBind();
+                    }
+                    catch (Exception ex)
+                    {
+                        BusinessLogic.Log.Add(BusinessLogic.LogTypes.Debug, -1, ex.ToString());
 
-                ph_skins.Controls.Add(ctrl);
+                        //ShowConnectionError();
+                    }
+                }
+                else
+                {
+                    //ShowConnectionError();
+                }
             }
 
             
@@ -170,9 +192,37 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             return value;
         }
 
-        protected void bt_ChangeSkin_Click(object sender, EventArgs e)
+        protected void SelectStarterKitDesign(object sender, EventArgs e)
         {
-           
+            Guid kitGuid = new Guid(((Button)sender).CommandArgument);
+
+            cms.businesslogic.packager.Installer installer = new cms.businesslogic.packager.Installer();
+
+            if (repo.HasConnection())
+            {
+                cms.businesslogic.packager.Installer p = new cms.businesslogic.packager.Installer();
+
+                string tempFile = p.Import(repo.fetch(kitGuid.ToString()));
+                p.LoadConfig(tempFile);
+                int pID = p.CreateManifest(tempFile, kitGuid.ToString(), repoGuid);
+
+                p.InstallFiles(pID, tempFile);
+                p.InstallBusinessLogic(pID, tempFile);
+                p.InstallCleanUp(pID, tempFile);
+
+                library.RefreshContent();
+
+                if (cms.businesslogic.skinning.Skinning.GetAllSkins().Count > 0)
+                {
+                    cms.businesslogic.skinning.Skinning.ActivateAsCurrentSkin(cms.businesslogic.skinning.Skinning.GetAllSkins()[0]);
+                }
+
+                
+            }
+            else
+            {
+                //ShowConnectionError();
+            }
         }
     }
 }

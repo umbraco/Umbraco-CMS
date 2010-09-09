@@ -67,13 +67,13 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule {
         protected global::System.Web.UI.WebControls.Literal ltChangeSkinStyle;
         
         /// <summary>
-        /// ph_skins control.
+        /// rep_starterKitDesigns control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder ph_skins;
+        protected global::System.Web.UI.WebControls.Repeater rep_starterKitDesigns;
         
         /// <summary>
         /// pCustomizeSkin control.
