@@ -25,8 +25,6 @@ namespace umbraco.cms.businesslogic.skinning.tasks
             TaskExecutionDetails d = new TaskExecutionDetails();
 
 
-            //open template
-
             HtmlDocument doc = new HtmlDocument();
             doc.Load(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
 
@@ -55,11 +53,15 @@ namespace umbraco.cms.businesslogic.skinning.tasks
 
 
                 doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
-            }
 
-            d.TaskExecutionStatus = TaskExecutionStatus.Completed;
-            d.NewValue = Value;
-            //save
+                d.TaskExecutionStatus = TaskExecutionStatus.Completed;
+                d.NewValue = Value;
+            }
+            else
+                d.TaskExecutionStatus = TaskExecutionStatus.Cancelled;
+
+           
+
 
             return d;
         }
@@ -76,9 +78,13 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                 s.Remove();
 
                 doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
-            }
 
-            return TaskExecutionStatus.Completed;
+                return TaskExecutionStatus.Completed;
+            }
+            else
+                return TaskExecutionStatus.Cancelled;
+
+            
         }
 
         public override string PreviewClientScript(string ControlClientId, string ClientSidePreviewEventType, string ClientSideGetValueScript)
