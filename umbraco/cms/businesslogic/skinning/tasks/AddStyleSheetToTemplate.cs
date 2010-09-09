@@ -48,20 +48,17 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                         s.Attributes.Add("media", Media);
 
                     target.AppendChild(s);
+
+                    doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
+
+                    d.TaskExecutionStatus = TaskExecutionStatus.Completed;
+                    d.NewValue = Value;
                 }
-
-
-
-                doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
-
-                d.TaskExecutionStatus = TaskExecutionStatus.Completed;
-                d.NewValue = Value;
+                else
+                    d.TaskExecutionStatus = TaskExecutionStatus.Cancelled;   
             }
             else
                 d.TaskExecutionStatus = TaskExecutionStatus.Cancelled;
-
-           
-
 
             return d;
         }
