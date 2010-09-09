@@ -11,6 +11,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
     public class AddStyleSheetToTemplate : TaskType
     {
         public string TargetFile { get; set; }
+        public string TargetSelector { get; set; }
         public string Media { get; set; }
 
         public AddStyleSheetToTemplate()
@@ -32,9 +33,9 @@ namespace umbraco.cms.businesslogic.skinning.tasks
             if (doc.DocumentNode.SelectSingleNode(string.Format("//link [@href = '{0}']", Value)) == null)
             {
 
-                HtmlNode head = doc.DocumentNode.SelectSingleNode("//head");
+                HtmlNode target = doc.DocumentNode.SelectSingleNode(string.IsNullOrEmpty(TargetSelector) ? "//head" : TargetSelector.ToLower());
 
-                if (head != null)
+                if (target != null)
                 {
                     HtmlNode s = new HtmlNode(HtmlNodeType.Element, doc, 0);
                     s.Name = "link";
@@ -48,7 +49,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                     if (!string.IsNullOrEmpty(Media))
                         s.Attributes.Add("media", Media);
 
-                    head.AppendChild(s);
+                    target.AppendChild(s);
                 }
 
 
