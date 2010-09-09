@@ -68,6 +68,9 @@ namespace umbraco.cms.businesslogic.skinning
                     newSkin.DeployTemplateFiles();
 
                 SetSkin(template, skinAlias);
+
+                newSkin.ExecuteInstallTasks();
+
                 save();
             }
         }
