@@ -20,6 +20,7 @@
 
         function closeModal() {
 
+            top.jQuery('.umbModalBoxIframe').closest(".umbModalBox").ModalWindowAPI().close();
             return false;
         }
     
@@ -27,7 +28,6 @@
 </head>
 <body>
     <form id="form1" runat="server">
-
 
     <asp:HiddenField ID="Image" runat="server" />
 
