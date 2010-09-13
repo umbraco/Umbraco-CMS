@@ -31,6 +31,51 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule {
         protected global::System.Web.UI.WebControls.HiddenField Image;
         
         /// <summary>
+        /// FileName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField FileName;
+        
+        /// <summary>
+        /// X control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField X;
+        
+        /// <summary>
+        /// Y control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField Y;
+        
+        /// <summary>
+        /// Scale control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField Scale;
+        
+        /// <summary>
+        /// pnl_upload control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnl_upload;
+        
+        /// <summary>
         /// FileUpload1 control.
         /// </summary>
         /// <remarks>
@@ -49,6 +94,15 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule {
         protected global::System.Web.UI.WebControls.Button bt_upload;
         
         /// <summary>
+        /// pnl_crop control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnl_crop;
+        
+        /// <summary>
         /// Image1 control.
         /// </summary>
         /// <remarks>
@@ -56,5 +110,14 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Image Image1;
+        
+        /// <summary>
+        /// bt_crop control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button bt_crop;
     }
 }
