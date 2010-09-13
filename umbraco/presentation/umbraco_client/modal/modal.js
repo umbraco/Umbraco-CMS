@@ -18,6 +18,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         return $(this).each(function() {
             //check if the modal exists already
             if ($(this).closest(".umbModalBox").length > 0) {
+                Umbraco.Controls.ModalWindow.cntr++;
                 var api = $(this).closest(".umbModalBox").ModalWindowAPI();
                 api._obj.jqmShow(); //since it exist, just re-show it
             }
@@ -39,7 +40,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             _wId: Umbraco.Utils.generateRandom().toString().replace(".", ""), //the modal window ID that will be assigned
             _obj: null, //the jquery element for the modal window
             _rVal: null, //a return value specified when closing that gets passed to the onCloseCallback method
-            _cntr: ++Umbraco.Controls.ModalWindow.cntr, //counts instances
+            _cntr: Umbraco.Controls.ModalWindow.cntr++, //counts instances
             //get a reference to the topmost jquery object if there is a modal framework there, otherwise use current
             _$: (window.top.jQuery && window.top.jQuery.jqm) ? window.top.jQuery : $,
             //get a reference to the topmost document if we're selecting the topmost jquery, otherwise use the current
@@ -99,6 +100,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// modalContent = the jQuery object for the popup window to query against
                 /// outVal = the value passed to the close window method that was used to close the window (if it was specified)
                 /// <returns>The generated jquery object bound to the modal window</returns>
+
+
 
                 var _this = this;
 
