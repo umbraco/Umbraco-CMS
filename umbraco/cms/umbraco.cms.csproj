@@ -211,6 +211,7 @@
     </Compile>
     <Compile Include="businesslogic\Property\Properties.cs" />
     <Compile Include="businesslogic\skinning\controls\ColorPicker.cs" />
+    <Compile Include="businesslogic\skinning\controls\ImageUploader.cs" />
     <Compile Include="businesslogic\skinning\dependencies\Color.cs" />
     <Compile Include="businesslogic\skinning\dependencies\Image.cs" />
     <Compile Include="businesslogic\skinning\dependencies\Text.cs" />

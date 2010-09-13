@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.UI.WebControls;
+using umbraco.cms.businesslogic.skinning.controls;
 
 namespace umbraco.cms.businesslogic.skinning.dependencies
 {
@@ -13,16 +14,16 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
         public string Width { get; set; }
         //currently just returning a textbox, need to replace this with a custom image control
 
-        public System.Web.UI.WebControls.TextBox tb;
+        public ImageUploader iu;
         public List<Object> _value;
 
         public Image()
         {
             this.Name = "Text";
             this.Description = "Will render a text input";
-          
 
-            tb = new TextBox();
+
+            iu = new ImageUploader();
             _value = new List<object>();
         }
         
@@ -30,13 +31,14 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
         {
             get
             {
-                tb.TextMode = System.Web.UI.WebControls.TextBoxMode.SingleLine;
-                tb.CssClass = "text";
+                iu.TextMode = System.Web.UI.WebControls.TextBoxMode.SingleLine;
+                iu.CssClass = "image";
+                iu.ID = "imageupload";
 
                 if (_value.Count > 0)
-                    tb.Text = _value[0].ToString();
-               
-                return tb;
+                    iu.Text = _value[0].ToString();
+
+                return iu;
             }
             set
             {
@@ -48,10 +50,10 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
         {
             get
             {
-                if (tb.Text != "")
+                if (iu.Text != "")
                 {
                     _value.Clear();
-                    _value.Add(tb.Text);
+                    _value.Add(iu.Text);
                 }
                 return _value;
             }
