@@ -69,6 +69,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
 
         public override string PreviewClientScript(string ControlClientId,string ClientSidePreviewEventType, string ClientSideGetValueScript)
         {
+
             if (string.IsNullOrEmpty(TargetAttribute))
             {
                 return string.Format(
@@ -86,7 +87,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                     TargetID,
                     ClientSideGetValueScript,
                     ClientSidePreviewEventType,
-                    new Guid().ToString().Replace("-",""));
+                    Guid.NewGuid().ToString().Replace("-", ""));
             }
             else
             {
@@ -107,7 +108,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                    TargetAttribute,
                     ClientSideGetValueScript,
                     ClientSidePreviewEventType,
-                    new Guid().ToString().Replace("-", ""));
+                    Guid.NewGuid().ToString().Replace("-", ""));
             }
         }
     }

@@ -110,7 +110,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                    ClientSideGetValueScript,
                    ClientSidePreviewEventType,
                    string.IsNullOrEmpty(Media) ? "" : string.Format("media :'{0}',",Media),
-                   new Guid().ToString().Replace("-", ""));
+                   Guid.NewGuid().ToString().Replace("-", ""));
         }
     }
 }

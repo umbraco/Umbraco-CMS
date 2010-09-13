@@ -61,7 +61,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                 Value,
                 ClientSideGetValueScript,
                 ClientSidePreviewEventType,
-                new Guid().ToString().Replace("-", ""));
+                Guid.NewGuid().ToString().Replace("-", ""));
         }
     }
 }
