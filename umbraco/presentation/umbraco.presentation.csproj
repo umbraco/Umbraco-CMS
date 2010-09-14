@@ -565,6 +565,13 @@
     <Compile Include="umbraco\dialogs\Preview.aspx.designer.cs">
       <DependentUpon>Preview.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\dialogs\TemplateSkinning.aspx.cs">
+      <DependentUpon>TemplateSkinning.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dialogs\TemplateSkinning.aspx.designer.cs">
+      <DependentUpon>TemplateSkinning.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\endPreview.aspx.cs">
       <DependentUpon>endPreview.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1574,6 +1581,7 @@
     <Content Include="install\steps\Skinning\loadStarterKits.ascx" />
     <Content Include="install\Title.ascx" />
     <Content Include="umbraco\dashboard\Settings\Applyskin.ascx" />
+    <Content Include="umbraco\dialogs\TemplateSkinning.aspx" />
     <Content Include="umbraco\helpRedirect.aspx" />
     <Content Include="umbraco\images\aboutNew.png" />
     <Content Include="umbraco\images\loginBg.png" />

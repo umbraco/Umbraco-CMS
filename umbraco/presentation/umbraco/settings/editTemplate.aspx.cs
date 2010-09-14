@@ -11,6 +11,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
 using umbraco.IO;
+using umbraco.cms.businesslogic.skinning;
 
 
 namespace umbraco.cms.presentation.settings
@@ -123,6 +124,16 @@ namespace umbraco.cms.presentation.settings
                 umbContent.AltText = ui.Text("template", "insertContentArea");
                 umbContent.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/insertMasterpageContent.aspx?id=" + _template.Id.ToString(), ui.Text("template", "insertContentArea"), 470, 300);
             }
+
+            if (Skinning.StarterKitGuid(_template.Id).HasValue)
+            {
+                Panel1.Menu.InsertSplitter();
+                uicontrols.MenuIconI umbContainer = Panel1.Menu.NewIcon();
+                umbContainer.ImageURL = UmbracoPath + "/images/editor/masterpagePlaceHolder.gif";
+                umbContainer.AltText = ui.Text("template", "modifyTemplateSkin");
+                umbContainer.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/TemplateSkinning.aspx?&id=" + _template.Id.ToString(), ui.Text("template", "modifyTemplateSkin"), 570, 420);
+            }
+
 
 			// Help
 			Panel1.Menu.InsertSplitter();

@@ -17,7 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StandardConfig", "StandardConfig", "{B8ECDB8B-BF44-462C-B6DA-22421B3EC4D7}"
 	ProjectSection(SolutionItems) = preProject
-		config templates\access.xml = config templates\access.xml
 		aspnet35.config = aspnet35.config
 		config templates\config\UI.xml = config templates\config\UI.xml
 		config templates\umbraco.config = config templates\umbraco.config
@@ -71,7 +70,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{F06D18F6-C
 		foreign dlls\IronPython.dll = foreign dlls\IronPython.dll
 		foreign dlls\IronRuby.dll = foreign dlls\IronRuby.dll
 		License.txt = License.txt
-		foreign dlls\Lucene.Net.dll = foreign dlls\Lucene.Net.dll
 		foreign dlls\Microsoft.ApplicationBlocks.Data.dll = foreign dlls\Microsoft.ApplicationBlocks.Data.dll
 		foreign dlls\MySql.Data.dll = foreign dlls\MySql.Data.dll
 		foreign dlls\TidyNet.dll = foreign dlls\TidyNet.dll

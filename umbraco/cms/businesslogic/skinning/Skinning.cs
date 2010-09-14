@@ -225,6 +225,13 @@ namespace umbraco.cms.businesslogic.skinning
             return IsSkinnable(template.Alias);
         }
 
+
+        public static Dictionary<string, string> AllowedSkins(int templateID)
+        {
+            Template template = new Template(templateID);
+            return AllowedSkins(template.Alias);
+        }
+
         public static Dictionary<string, string> AllowedSkins(Template template)
         {
             return AllowedSkins(template.Alias);
@@ -268,8 +275,8 @@ namespace umbraco.cms.businesslogic.skinning
             installed.Load(IO.IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config");
 
             XmlNode starterKit = installed.SelectSingleNode(
-                string.Format("//templates [contains (., '{0}') ]//ancestor::package",template));
-
+                string.Format("//package [@enableSkins = 'True' and contains(./templates, '{0}')]", template));
+            
             if (starterKit != null)
                 return new Guid(starterKit.Attributes["packageGuid"].Value);
             else
