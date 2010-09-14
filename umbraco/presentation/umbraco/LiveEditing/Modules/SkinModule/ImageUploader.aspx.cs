@@ -36,8 +36,16 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                 {
                     Image1.ImageUrl = this.ResolveUrl("~/media/upload/" + g) + "/" + FileUpload1.FileName;
                     Image.Value = Image1.ImageUrl;
-                    pnl_crop.Visible = true;
-                    pnl_upload.Visible = false;
+
+                    if (!string.IsNullOrEmpty(Request["w"]) && !string.IsNullOrEmpty(Request["h"]))
+                    {
+                        pnl_crop.Visible = true;
+                        pnl_upload.Visible = false;
+                    }
+                    else
+                    {
+                        Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "setimage", " $(function () { setImage(); })", true);
+                    }
                 }
                 else
                     throw new Exception("Not a valid image");
