@@ -35,6 +35,17 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
                 iu.CssClass = "image";
                 iu.ID = "imageupload";
 
+                int w;
+
+                if(int.TryParse(Width, out w))
+                    iu.ImageWidth = w;
+
+                int h;
+
+                if(int.TryParse(Height, out h))
+                    iu.ImageHeight = h;
+
+
                 if (_value.Count > 0)
                     iu.Text = _value[0].ToString();
 
