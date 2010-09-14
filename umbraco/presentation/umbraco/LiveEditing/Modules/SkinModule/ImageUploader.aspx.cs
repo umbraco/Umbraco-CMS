@@ -12,6 +12,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 {
     public partial class ImageUploader : BasePages.UmbracoEnsuredPage
     {
+        //max width and height is used to make sure the cropper doesn't grow bigger then the modal window
         public int MaxWidth = 700;
         public int MaxHeight = 480;
 
