@@ -66,6 +66,11 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             }
         }
 
+        protected void bt_uploadother_Click(object sender, EventArgs e)
+        {
+            pnl_crop.Visible = false;
+            pnl_upload.Visible = true;
+        }
 
         protected void bt_crop_Click(object sender, EventArgs e)
         {

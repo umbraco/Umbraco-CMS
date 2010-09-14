@@ -172,8 +172,9 @@
         <asp:Image ID="Image1" runat="server" />
     </div>
 
-    <a href="#" onclick="ResetToDefault();return false;">Reset</a>
-   
+    <a href="#" onclick="ResetToDefault();return false;">Reset</a>&nbsp;
+    <asp:LinkButton ID="bt_uploadother" runat="server" onclick="bt_uploadother_Click">upload other image</asp:LinkButton>
+
     <div id="slidercontainer" style="display:none;">
 	     <div id="slider"></div>
     </div>
