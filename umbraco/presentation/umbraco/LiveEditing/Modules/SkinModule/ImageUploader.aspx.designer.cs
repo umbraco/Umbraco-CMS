@@ -13,6 +13,33 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule {
     public partial class ImageUploader {
         
         /// <summary>
+        /// JsInclude1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
+        
+        /// <summary>
+        /// JsInclude2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude2;
+        
+        /// <summary>
+        /// JsInclude3 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude3;
+        
+        /// <summary>
         /// form1 control.
         /// </summary>
         /// <remarks>

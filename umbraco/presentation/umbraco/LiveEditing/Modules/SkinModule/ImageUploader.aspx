@@ -1,4 +1,6 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ImageUploader.aspx.cs" Inherits="umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule.ImageUploader" %>
+<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -26,9 +28,14 @@
     -->
     </style>
 
-    <script type="text/javascript" src="../../../../umbraco_client/ui/jquery.js"></script>
-    <script type="text/javascript" src="../../../../umbraco_client/ui/jqueryui.js"></script>
-    <script type="text/javascript" src="../../../../umbraco_client/mousewheel/jquery.mousewheel.js"></script>
+    <cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
+
+    <umb:JsInclude ID="JsInclude1" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient"
+        Priority="0" />
+    <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient"
+        Priority="1" />
+    <umb:JsInclude ID="JsInclude3" runat="server" FilePath="mousewheel/jquery.mousewheel.js" PathNameAlias="UmbracoClient"
+        Priority="2" />
 
 
     <script type="text/javascript">
