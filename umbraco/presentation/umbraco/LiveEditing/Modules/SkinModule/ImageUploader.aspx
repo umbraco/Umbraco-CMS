@@ -60,8 +60,13 @@
 
         var sliderChange = function (e, ui) {
 
-            if (origwidht == 0) { origwidht = $('#<%= Image1.ClientID %>').width(); }
-            if (origheight == 0) { origheight = $('#<%= Image1.ClientID %>').height(); }
+            if (origwidht == 0) { 
+                origwidht = $('#<%= Image1.ClientID %>').width(); 
+
+            }
+            if (origheight == 0) { 
+                origheight = $('#<%= Image1.ClientID %>').height(); 
+            }
 
             $('#cropper img').each(function (index, item) {
                 var _new = $('#slider').slider("value");
@@ -76,6 +81,17 @@
         var origwidht = 0;
 
         $(function () {
+
+            if(<%= Request["w"] %> > <%= MaxWidth %> || <%= Request["h"] %> >  <%= MaxHeight %>)
+            {               
+                $("#cropper").css('width', <%= Request["w"] %> / 2);
+                $("#cropper").css('height', <%= Request["h"] %> / 2);
+
+                $("#workingscale").show();
+
+            }
+
+
             $("#<%= Image1.ClientID %>").draggable({
 
                 stop: function () {
@@ -151,11 +167,13 @@
     <h1>Crop image</h1>
     <div id="cropcontainer">
 
+    <span id="workingscale" style="display:none;">Result will be twice the size.</span>
     <div id="cropper">
         <asp:Image ID="Image1" runat="server" />
     </div>
 
     <a href="#" onclick="ResetToDefault();return false;">Reset</a>
+   
     <div id="slidercontainer" style="display:none;">
 	     <div id="slider"></div>
     </div>

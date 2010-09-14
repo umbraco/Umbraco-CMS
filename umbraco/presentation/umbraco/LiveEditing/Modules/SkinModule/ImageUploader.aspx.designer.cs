@@ -13,6 +13,15 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule {
     public partial class ImageUploader {
         
         /// <summary>
+        /// ClientLoader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.UmbracoClientDependencyLoader ClientLoader;
+        
+        /// <summary>
         /// JsInclude1 control.
         /// </summary>
         /// <remarks>

@@ -12,6 +12,9 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 {
     public partial class ImageUploader : BasePages.UmbracoEnsuredPage
     {
+        public int MaxWidth = 700;
+        public int MaxHeight = 480;
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
@@ -39,6 +42,16 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
                     if (!string.IsNullOrEmpty(Request["w"]) && !string.IsNullOrEmpty(Request["h"]))
                     {
+
+
+                        if (Convert.ToInt32(Request["w"]) > MaxWidth || Convert.ToInt32(Request["h"]) > MaxHeight)
+                        {
+                            System.Drawing.Image img = System.Drawing.Image.FromFile(IO.IOHelper.MapPath(Image.Value));
+
+                            Image1.Width = img.Width / 2;
+                            Image1.Height = img.Height / 2;
+                        }
+
                         pnl_crop.Visible = true;
                         pnl_upload.Visible = false;
                     }
@@ -70,8 +83,15 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             Graphics g = Graphics.FromImage((System.Drawing.Image)b);
             g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
+            float x = Convert.ToSingle(X.Value);
+            float y = Convert.ToSingle(Y.Value);
 
-            g.DrawImage(imgToResize, Convert.ToSingle(X.Value), Convert.ToSingle(Y.Value), destWidth, destHeight);
+            if (Convert.ToInt32(Request["w"]) > MaxWidth || Convert.ToInt32(Request["h"]) > MaxHeight)
+            {
+                x = x * 2;
+                y = y * 2;
+            }
+            g.DrawImage(imgToResize, x, y, destWidth, destHeight);
 
             g.Dispose();
 
