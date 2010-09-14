@@ -99,7 +99,16 @@
             });
         });
 
+        function ResetToDefault() {
 
+            $("#slider").slider("value", 100);
+
+            $('#cropper img').css('left','0px')
+            $('#cropper img').css('top','0px');
+
+            $('#<%= X.ClientID %>').val(0);
+            $('#<%= Y.ClientID %>').val(0);
+        }
 
     </script>
 </head>
@@ -139,13 +148,14 @@
         <asp:Image ID="Image1" runat="server" />
     </div>
 
+    <a href="#" onclick="ResetToDefault();return false;">Reset</a>
     <div id="slidercontainer" style="display:none;">
 	     <div id="slider"></div>
     </div>
 
     </div>
 
-    <asp:Button ID="bt_crop" runat="server" Text="Crop"  onclick="bt_crop_Click" />
+    <asp:Button ID="bt_crop" runat="server" Text="OK"  onclick="bt_crop_Click" />
      <button type="button" onclick="closeModal();">Cancel</button>
 
     </asp:Panel>
