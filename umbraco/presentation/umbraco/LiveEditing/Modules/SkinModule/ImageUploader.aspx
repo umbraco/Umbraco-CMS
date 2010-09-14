@@ -155,6 +155,7 @@
     <asp:Button ID="bt_upload" runat="server" Text="Upload" 
         onclick="bt_upload_Click" /><br />
 
+        <asp:Literal ID="lit_notvalid" runat="server" Text="Please upload a valid image file" Visible="false"></asp:Literal>
 
      <br />
 

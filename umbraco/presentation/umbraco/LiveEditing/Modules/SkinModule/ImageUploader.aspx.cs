@@ -25,6 +25,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
         {
             if (FileUpload1.HasFile)
             {
+                lit_notvalid.Visible = false;
                 
                 Guid g = Guid.NewGuid();
                 DirectoryInfo updir = new DirectoryInfo(IO.IOHelper.MapPath("~/media/upload/" + g));
@@ -62,7 +63,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                     }
                 }
                 else
-                    throw new Exception("Not a valid image");
+                    lit_notvalid.Visible = true;
             }
         }
 
