@@ -1612,6 +1612,7 @@
     <Content Include="umbraco_client\colorpicker\images\select2.png" />
     <Content Include="umbraco_client\colorpicker\images\slider.png" />
     <Content Include="umbraco_client\colorpicker\js\colorpicker.js" />
+    <Content Include="umbraco_client\colorpicker\js\initcolorpicker.js" />
     <Content Include="umbraco_client\mousewheel\jquery.mousewheel.js" />
     <Content Include="web.config.Az-VAIO.xslt" />
     <Content Include="umbraco\endPreview.aspx" />
