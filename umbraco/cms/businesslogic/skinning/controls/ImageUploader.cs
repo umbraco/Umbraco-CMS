@@ -22,7 +22,7 @@ namespace umbraco.cms.businesslogic.skinning.controls
             writer.WriteLine(
                 string.Format(
                 "&nbsp;<a href=\"#\" onclick=\"{0}\">Upload image</a>",
-                "Umbraco.Controls.ModalWindow().open('" + this.ResolveUrl(GlobalSettings.Path) + "/LiveEditing/Modules/SkinModule/ImageUploader.aspx?ctrl=" + this.ClientID + "&w="+this.ImageWidth+"&h="+this.ImageHeight +"','Upload image',true,700,500,50,0, ['.modalbuton'], null);return false;"));
+                "Umbraco.Controls.ModalWindow().open('" + this.ResolveUrl(GlobalSettings.Path) + "/LiveEditing/Modules/SkinModule/ImageUploader.aspx?ctrl=" + this.ClientID + "&w="+this.ImageWidth+"&h="+this.ImageHeight +"','Upload image',true,750,550,50,0, ['.modalbuton'], null);return false;"));
         }
     }
 }
