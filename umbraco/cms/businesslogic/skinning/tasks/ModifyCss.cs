@@ -26,7 +26,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
             TaskExecutionDetails d = new TaskExecutionDetails();
 
             //currently just appending it to the end of the css file
-            StreamWriter sw = File.AppendText(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
+            StreamWriter sw = File.AppendText(IO.IOHelper.MapPath(SystemDirectories.Css) + "/" + TargetFile);
             sw.WriteLine(string.Format("{0}{{ {1}:{2};}}", TargetRule, TargetParameter, Value));
             sw.Close();
 
@@ -37,6 +37,29 @@ namespace umbraco.cms.businesslogic.skinning.tasks
             return d;
         }
 
+        public override TaskExecutionStatus RollBack(string OriginalValue)
+        {
+            string[] filecontents = File.ReadAllLines(IO.IOHelper.MapPath(SystemDirectories.Css) + "/" + TargetFile);
+
+            for (int i = filecontents.Length; i >= 0; i--)
+            {
+                if (filecontents[i - 1].Contains(string.Format("{0}{{ {1}:", TargetRule, TargetParameter)))
+                    filecontents[i - 1] = string.Empty;
+            }
+
+            StringBuilder s = new StringBuilder();
+
+            foreach (string line in filecontents)
+                s.AppendLine(line);
+
+            System.IO.StreamWriter file = new System.IO.StreamWriter(IO.IOHelper.MapPath(SystemDirectories.Css) + "/" + TargetFile);
+            file.WriteLine(s.ToString());
+
+            file.Close();
+
+
+            return TaskExecutionStatus.Completed;
+        }
 
         public override string PreviewClientScript(string ControlClientId,string ClientSidePreviewEventType, string ClientSideGetValueScript)
         {
