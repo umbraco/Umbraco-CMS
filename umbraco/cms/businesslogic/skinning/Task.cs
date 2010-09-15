@@ -26,13 +26,14 @@ namespace umbraco.cms.businesslogic.skinning
                 {
                     //custom task type
 
-                    string assemblyFile =
-                        HttpContext.Current.Server.MapPath(
-                        String.Format("{0}/../bin/{1}.dll",
-                        GlobalSettings.Path,
-                        node.Attributes["assembly"].Value));
+                    //string assemblyFile =
+                    //    HttpContext.Current.Server.MapPath(
+                    //    String.Format("{0}/../bin/{1}.dll",
+                    //    GlobalSettings.Path,
+                    //    node.Attributes["assembly"].Value));
 
-                    Assembly customAssembly = Assembly.LoadFrom(assemblyFile);
+                    //Assembly customAssembly = Assembly.LoadFrom(assemblyFile);
+                    Assembly customAssembly = Assembly.Load(node.Attributes["assembly"].Value);
 
                     t.TaskType = (TaskType)Activator.CreateInstance(
                         customAssembly.GetType(node.Attributes["type"].Value));
@@ -44,13 +45,15 @@ namespace umbraco.cms.businesslogic.skinning
                 {
                     //internal dependency type
 
-                    string assemblyFile =
-                        HttpContext.Current.Server.MapPath(
-                        String.Format("{0}/../bin/{1}.dll",
-                        GlobalSettings.Path,
-                        "cms"));
+                    //string assemblyFile =
+                    //    HttpContext.Current.Server.MapPath(
+                    //    String.Format("{0}/../bin/{1}.dll",
+                    //    GlobalSettings.Path,
+                    //    "cms"));
 
-                    Assembly defaultAssembly = Assembly.LoadFrom(assemblyFile);
+                    //Assembly defaultAssembly = Assembly.LoadFrom(assemblyFile);
+
+                    Assembly defaultAssembly = Assembly.Load("cms");
 
                     t.TaskType = (TaskType)Activator.CreateInstance(
                         defaultAssembly.GetType(
