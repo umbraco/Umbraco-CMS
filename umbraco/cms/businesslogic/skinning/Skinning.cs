@@ -303,6 +303,17 @@ namespace umbraco.cms.businesslogic.skinning
             }
             return r;
         }
+
+        public static bool IsSkinInstalled(Guid SkinGuid)
+        {
+            XmlDocument installed = new XmlDocument();
+            installed.Load(IO.IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config");
+
+            XmlNode skinNode = installed.SelectSingleNode(
+                string.Format("//package [@ packageGuid = '{0}']", SkinGuid.ToString()));
+
+            return skinNode != null;
+        }
         #region old code
 
 

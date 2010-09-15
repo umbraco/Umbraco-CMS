@@ -30,7 +30,7 @@
 <div id="changeSkin" <asp:Literal ID="ltChangeSkinStyle" runat="server" Text="style='display:none;'"></asp:Literal>>
     
     <div id="skins">
-        <asp:Repeater ID="rep_starterKitDesigns" runat="server">
+        <asp:Repeater ID="rep_starterKitDesigns" runat="server" onitemdatabound="rep_starterKitDesigns_ItemDataBound">
             <HeaderTemplate>
                 <ul id="starterKitDesigns">
             </HeaderTemplate>

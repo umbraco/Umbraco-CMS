@@ -85,6 +85,22 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             
         }
 
+        protected void rep_starterKitDesigns_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.DataItem != null)
+            {
+                cms.businesslogic.packager.repositories.Skin s = (cms.businesslogic.packager.repositories.Skin)e.Item.DataItem;
+
+                if (Skinning.IsSkinInstalled(s.RepoGuid))
+                {
+                    Button inst = (Button)e.Item.FindControl("Button1");
+                    inst.Text = "Already downloaded";
+                    inst.Enabled = false;
+
+                }
+            }
+
+        }
        
         protected void LoadDependencies()
         {

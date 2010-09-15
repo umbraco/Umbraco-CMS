@@ -27,7 +27,8 @@
     <cc1:Pane ID="p_download" runat="server" Visible="false">
      
      <div id="skins">
-        <asp:Repeater ID="rep_starterKitDesigns" runat="server">
+        <asp:Repeater ID="rep_starterKitDesigns" runat="server" 
+             onitemdatabound="rep_starterKitDesigns_ItemDataBound" >
             <HeaderTemplate>
                 <ul id="starterKitDesigns">
             </HeaderTemplate>
