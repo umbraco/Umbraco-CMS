@@ -40,6 +40,15 @@ namespace umbraco.presentation.umbraco.dialogs {
         protected global::System.Web.UI.WebControls.DropDownList dd_skins;
         
         /// <summary>
+        /// bt_repo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton bt_repo;
+        
+        /// <summary>
         /// PropertyPanel2 control.
         /// </summary>
         /// <remarks>
@@ -83,5 +92,14 @@ namespace umbraco.presentation.umbraco.dialogs {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.uicontrols.Pane p_download;
+        
+        /// <summary>
+        /// rep_starterKitDesigns control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rep_starterKitDesigns;
     }
 }
