@@ -217,6 +217,7 @@
     <Compile Include="businesslogic\skinning\dependencies\Text.cs" />
     <Compile Include="businesslogic\skinning\Dependency.cs" />
     <Compile Include="businesslogic\skinning\DependencyType.cs" />
+    <Compile Include="businesslogic\skinning\Palette.cs" />
     <Compile Include="businesslogic\skinning\ProviderBase.cs" />
     <Compile Include="businesslogic\skinning\Skin.cs" />
     <Compile Include="businesslogic\skinning\Task.cs" />
