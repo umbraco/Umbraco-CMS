@@ -15,7 +15,7 @@ namespace umbraco.cms.businesslogic.skinning
         {
             AllowedDocumentTypeAliases = new List<string>();
             Dependencies = new List<Dependency>();
-            Palettes = new List<Palette>();
+            //Palettes = new List<Palette>();
         }
 
         public static Skin CreateFromFile(string filename)
@@ -80,10 +80,10 @@ namespace umbraco.cms.businesslogic.skinning
                 }
             }
 
-            foreach (XmlNode palNode in node.SelectNodes("/Skin//Palette"))
-            {
-                s.Palettes.Add(Palette.CreateFromXmlNode(palNode));
-            }
+            //foreach (XmlNode palNode in node.SelectNodes("/Skin//Palette"))
+            //{
+            //    s.Palettes.Add(Palette.CreateFromXmlNode(palNode));
+            //}
 
             return s;
         }
@@ -158,7 +158,7 @@ namespace umbraco.cms.businesslogic.skinning
 
         public List<Dependency> Dependencies { get; set; }
 
-        public List<Palette> Palettes { get; set; }
+        //public List<Palette> Palettes { get; set; }
 
         public void RollbackDependencies()
         {
