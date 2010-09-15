@@ -41,10 +41,13 @@ namespace umbraco.cms.businesslogic.skinning.tasks
         {
             string[] filecontents = File.ReadAllLines(IO.IOHelper.MapPath(SystemDirectories.Css) + "/" + TargetFile);
 
-            for (int i = filecontents.Length; i >= 0; i--)
+            for (int i = filecontents.Length; i > 0; i--)
             {
                 if (filecontents[i - 1].Contains(string.Format("{0}{{ {1}:", TargetRule, TargetParameter)))
+                {
                     filecontents[i - 1] = string.Empty;
+                    break;
+                }
             }
 
             StringBuilder s = new StringBuilder();
