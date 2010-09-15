@@ -181,7 +181,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                 }
             }
 
-            
+         
         }
 
         private string ParsePlaceHolders(string value,string output)
@@ -217,7 +217,8 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                     cms.businesslogic.skinning.Skinning.ActivateAsCurrentSkin(cms.businesslogic.skinning.Skinning.GetAllSkins()[0]);
                 }
 
-                
+
+                Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
             }
             else
             {

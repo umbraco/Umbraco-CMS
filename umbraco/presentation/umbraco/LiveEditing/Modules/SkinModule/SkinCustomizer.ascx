@@ -1,6 +1,18 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SkinCustomizer.ascx.cs" Inherits="umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule.SkinCustomizer" %>
 <%@ Import Namespace="umbraco.cms.businesslogic.packager.repositories"  %>
 
+
+<script type="text/javascript">
+
+    function closeCustomizeSkinModal() {
+
+        jQuery('#cancelSkinCustomization').trigger('click');
+        UmbSpeechBubble.ShowMessage("Info", "Skin", "Skin updated...");
+    }
+
+</script>
+
+
 <div id="costumizeSkin" <asp:Literal ID="ltCustomizeSkinStyle" runat="server" Text=""></asp:Literal>>
 
     <div id="dependencies">
@@ -9,7 +21,7 @@
 
     <p runat="server" id="pChangeSkin">... or <a href="#" onclick="jQuery('#costumizeSkin').hide();jQuery('#changeSkin').show();">change</a> skin</p>
 
-    <asp:Button ID="btnOk" runat="server" Text="Ok" onclick="btnOk_Click" />
+    <asp:Button ID="btnOk" runat="server" Text="Ok" onclick="btnOk_Click" OnClientClick="closeCustomizeSkinModal();"/>
 
     <button type="button" class="modalbuton" id="cancelSkinCustomization">Cancel</button>
 
