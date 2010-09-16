@@ -97,35 +97,55 @@ namespace umbraco.presentation.umbraco.dialogs
 
         protected void SelectStarterKitDesign(object sender, EventArgs e)
         {
-            Guid kitGuid = new Guid(((Button)sender).CommandArgument);
-
-            cms.businesslogic.packager.Installer installer = new cms.businesslogic.packager.Installer();
-
-            if (repo.HasConnection())
+            if (((Button)sender).CommandName == "apply")
             {
-                cms.businesslogic.packager.Installer p = new cms.businesslogic.packager.Installer();
+                Skin s = Skin.CreateFromName(((Button)sender).CommandArgument);
+                Skinning.ActivateAsCurrentSkin(s);
 
-                string tempFile = p.Import(repo.fetch(kitGuid.ToString()));
-                p.LoadConfig(tempFile);
-                int pID = p.CreateManifest(tempFile, kitGuid.ToString(), repoGuid);
+                Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
+            }
+            else if (((Button)sender).CommandName == "remove")
+            {
+                nodeFactory.Node n = nodeFactory.Node.GetCurrent();
 
-                p.InstallFiles(pID, tempFile);
-                p.InstallBusinessLogic(pID, tempFile);
-                p.InstallCleanUp(pID, tempFile);
-
-                library.RefreshContent();
-
-                if (cms.businesslogic.skinning.Skinning.GetAllSkins().Count > 0)
-                {
-                    cms.businesslogic.skinning.Skinning.ActivateAsCurrentSkin(cms.businesslogic.skinning.Skinning.GetAllSkins()[0]);
-                }
-
+                Template t = new Template(n.template);
+                Skinning.RollbackSkin(t.Id);
 
                 Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
             }
             else
             {
-                //ShowConnectionError();
+
+                Guid kitGuid = new Guid(((Button)sender).CommandArgument);
+
+                cms.businesslogic.packager.Installer installer = new cms.businesslogic.packager.Installer();
+
+                if (repo.HasConnection())
+                {
+                    cms.businesslogic.packager.Installer p = new cms.businesslogic.packager.Installer();
+
+                    string tempFile = p.Import(repo.fetch(kitGuid.ToString()));
+                    p.LoadConfig(tempFile);
+                    int pID = p.CreateManifest(tempFile, kitGuid.ToString(), repoGuid);
+
+                    p.InstallFiles(pID, tempFile);
+                    p.InstallBusinessLogic(pID, tempFile);
+                    p.InstallCleanUp(pID, tempFile);
+
+                    library.RefreshContent();
+
+                    if (cms.businesslogic.skinning.Skinning.GetAllSkins().Count > 0)
+                    {
+                        cms.businesslogic.skinning.Skinning.ActivateAsCurrentSkin(cms.businesslogic.skinning.Skinning.GetAllSkins()[0]);
+                    }
+
+
+                    Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
+                }
+                else
+                {
+                    //ShowConnectionError();
+                }
             }
         }
 
@@ -152,9 +172,18 @@ namespace umbraco.presentation.umbraco.dialogs
                 if (Skinning.IsSkinInstalled(s.RepoGuid))
                 {
                     Button inst = (Button)e.Item.FindControl("Button1");
-                    inst.Text = "Already downloaded";
-                    inst.Enabled = false;
+                    inst.Text = "Apply (already downloaded)";
+                    inst.CommandName = "apply";
+                    inst.CommandArgument = s.Text;
 
+                }
+
+                if (Skin.CreateFromAlias(Skinning.GetCurrentSkinAlias(templateID)).Name == s.Text)
+                {
+                    Button inst = (Button)e.Item.FindControl("Button1");
+                    inst.Text = "Rollback (active skin)";
+                    inst.CommandName = "remove";
+                    inst.CommandArgument = s.Text;
                 }
             }
 

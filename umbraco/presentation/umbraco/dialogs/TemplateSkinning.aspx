@@ -41,7 +41,7 @@
 
                    <br />
                        
-                    <asp:Button ID="Button1" runat="server" Text="Download and apply" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>" OnClick="SelectStarterKitDesign"/>
+                    <asp:Button ID="Button1" runat="server" Text="Download and apply" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>" OnClick="SelectStarterKitDesign" CommandName="<%# ((Skin)Container.DataItem).Text %>"/>
                 </li>
             </ItemTemplate>
             
