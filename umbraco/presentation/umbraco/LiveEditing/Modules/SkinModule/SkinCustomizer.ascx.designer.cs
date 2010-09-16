@@ -13,6 +13,15 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule {
     public partial class SkinCustomizer {
         
         /// <summary>
+        /// pnl_connectionerror control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnl_connectionerror;
+        
+        /// <summary>
         /// ltCustomizeSkinStyle control.
         /// </summary>
         /// <remarks>

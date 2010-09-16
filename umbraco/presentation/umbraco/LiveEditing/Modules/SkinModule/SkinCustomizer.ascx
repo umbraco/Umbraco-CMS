@@ -4,8 +4,6 @@
 
 <script type="text/javascript">
 
-
-
     function closeCustomizeSkinModal() {
 
         jQuery('#cancelSkinInstall').trigger('click');
@@ -13,6 +11,10 @@
     }
 
 </script>
+
+<asp:Panel ID="pnl_connectionerror" runat="server" Visible="false">
+<p>Connection to repository failed...</p>
+</asp:Panel>
 
 
 <div id="costumizeSkin" <asp:Literal ID="ltCustomizeSkinStyle" runat="server" Text=""></asp:Literal>>

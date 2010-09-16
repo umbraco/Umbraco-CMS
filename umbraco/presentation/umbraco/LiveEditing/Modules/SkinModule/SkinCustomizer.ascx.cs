@@ -38,6 +38,8 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
             ActiveSkin = Skin.CreateFromAlias(Skinning.GetCurrentSkinAlias(n.template));
 
+            pnl_connectionerror.Visible = false;
+
             //load dependencies
             if (ActiveSkin != null)
                 LoadDependencies();
@@ -74,12 +76,12 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                     {
                         BusinessLogic.Log.Add(BusinessLogic.LogTypes.Debug, -1, ex.ToString());
 
-                        //ShowConnectionError();
+                        ShowConnectionError();
                     }
                 }
                 else
                 {
-                    //ShowConnectionError();
+                    ShowConnectionError();
                 }
             }
 
@@ -263,11 +265,16 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                 }
                 else
                 {
-                    //ShowConnectionError();
+                    ShowConnectionError();
                 }
             }
         }
 
+
+        private void ShowConnectionError()
+        {
+            pnl_connectionerror.Visible = true;
+        }
    
     }
 }
