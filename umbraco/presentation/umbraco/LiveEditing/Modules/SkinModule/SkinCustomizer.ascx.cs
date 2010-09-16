@@ -76,7 +76,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                     {
                         BusinessLogic.Log.Add(BusinessLogic.LogTypes.Debug, -1, ex.ToString());
 
-                        ShowConnectionError();
+                        //ShowConnectionError();
                     }
                 }
                 else
