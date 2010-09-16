@@ -4,9 +4,11 @@
 
 <script type="text/javascript">
 
+
+
     function closeCustomizeSkinModal() {
 
-        jQuery('#cancelSkinCustomization').trigger('click');
+        jQuery('#cancelSkinInstall').trigger('click');
         UmbSpeechBubble.ShowMessage("Info", "Skin", "Skin updated...");
     }
 
@@ -56,7 +58,7 @@
 
     <p runat="server" id="pCustomizeSkin">... or <a href="#" onclick="jQuery('#changeSkin').hide();jQuery('#costumizeSkin').show();">customize</a> current skin</p>
 
-    <button type="button" class="modalbuton">Cancel</button>
+    <button type="button" class="modalbuton" id="cancelSkinInstall">Cancel</button>
 
 </div>
 
