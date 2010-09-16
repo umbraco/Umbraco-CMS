@@ -172,8 +172,18 @@ namespace umbraco.cms.businesslogic.skinning
 
         public void RollbackDependencies()
         {
+
             XmlDocument manifest = new XmlDocument();
             manifest.Load(FullFileName);
+
+            //emtpy output tags
+
+            foreach(XmlNode oNode in  manifest.SelectNodes("/Skin/Dependencies/Dependency/Properties/Output"))
+            {
+                oNode.RemoveAll();
+            }
+
+            //execute rollback tasks
             XmlNode hNode = manifest.SelectSingleNode("/Skin/History");
 
             if (!(hNode == null || hNode.SelectNodes("Task").Count == 0))
@@ -193,8 +203,10 @@ namespace umbraco.cms.businesslogic.skinning
                 }
 
                 hNode.RemoveAll();
-                manifest.Save(FullFileName);
-            }      
+                
+            }
+
+            manifest.Save(FullFileName);
         }
 
         public void DeployTemplateFiles()
