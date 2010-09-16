@@ -94,6 +94,16 @@ namespace umbraco.cms.businesslogic.skinning
             return CreateFromFile(manifest);
         }
 
+        public static Skin CreateFromName(string name)
+        {
+            foreach (Skin s in Skinning.GetAllSkins())
+            {
+                if (s.Name == name)
+                    return s;
+            }
+
+            return null;
+        }
         public bool OverridesTemplates()
         {
             return (System.IO.Directory.GetFiles(IO.IOHelper.MapPath(SkinFolder), "*.master").Count() > 0);

@@ -44,8 +44,9 @@
                    <span><%# ((Skin)Container.DataItem).Text %></span>
 
                    <br />
+                    
                        
-                    <asp:Button ID="Button1" runat="server" Text="Install" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>" OnClick="SelectStarterKitDesign"/>
+                    <asp:Button ID="Button1" runat="server" Text="Install" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>" OnClick="SelectStarterKitDesign" CommandName="<%# ((Skin)Container.DataItem).Text %>"/>
                 </li>
             </ItemTemplate>
             
@@ -56,7 +57,12 @@
 
     </div>
 
-    <p runat="server" id="pCustomizeSkin">... or <a href="#" onclick="jQuery('#changeSkin').hide();jQuery('#costumizeSkin').show();">customize</a> current skin</p>
+
+    <p runat="server" id="pCustomizeSkin">
+    
+  
+
+    ... or <a href="#" onclick="jQuery('#changeSkin').hide();jQuery('#costumizeSkin').show();">customize</a> current skin</p>
 
     <button type="button" class="modalbuton" id="cancelSkinInstall">Cancel</button>
 
