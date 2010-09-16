@@ -140,7 +140,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
                     Control ctrl = d.DependencyType.Editor;
 
-                    lbl.AssociatedControlID = ctrl.ID;
+                    //lbl.AssociatedControlID = ctrl.ID;
 
                     ph_dependencies.Controls.Add(lbl);
 
