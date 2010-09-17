@@ -80,7 +80,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>XCOPY "C:\Users\hartvig\Documents\Visual Studio 2008\Projects\SQLCE4Umbraco\SQLCE4Umbraco\bin\Debug\SQLCE4Umbraco.*" "C:\Websites\Umbraco 4.5.2\1.0.3891.20292\build\bin" /Y</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
