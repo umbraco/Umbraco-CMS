@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="StartupDashboard.ascx.cs" Inherits="dashboardUtilities.StartupDashboard" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="StartupDeveloperDashboard.ascx.cs" Inherits="dashboardUtilities.StartupDeveloperDashboard" %>
 <script type="text/javascript" src="/umbraco/dashboard/scripts/jquery.jfeed.pack.js"></script>
 <link href="/umbraco_client/propertypane/style.css" rel="stylesheet" />
 <style type="text/css">
@@ -87,7 +87,7 @@
 
         jQuery.ajax({
             type: 'GET',
-            url: 'dashboard/feedproxy.aspx?url=http://umbraco.org/documentation/videos/getting-started/feed',
+            url: 'dashboard/feedproxy.aspx?url=http://umbraco.org/documentation/videos/for-developers/foundation/feed',
             dataType: 'xml',
             success: function (xml) {
 
@@ -125,9 +125,9 @@
 <div class="propertypane">
 <div class="guiDialogNormal" style="margin: 10px">
         <h2>Start here</h2>
-        <h3>Thank you for choosing Umbraco!</h3>
+        <h3>This section contains the tools to add advanced features to your Umbraco site</h3>
         <p>
-        We think this could be the beginning of something beautiful.  You have made a great choice, to help you get started here are some links to addtional information:
+        From here you can explore and install packages, create macros, add data types, and much more.  Start by exploring the below links or videos.
         </p>
         <ul>
         <li>Find the answers to your Umbraco questions on our <a href="http://our.umbraco.org/wiki" target="_blank">Community Wiki</a></li>
@@ -141,32 +141,12 @@
 </div>
 </asp:Panel>
 
-<asp:Panel ID="skinPanel" runat="server">
-<div class="propertypane">
-<div class="guiDialogNormal" style="margin: 10px">
-    <h2>Make it look great</h2>
-    <h3>Install a Starter Site and Skin</h3>
-        <p>
-        If you haven't already installed one of our Starter Kits, we think you should do that now.  This is one of the best ways to start working with Umbraco.
-        After you install a Starter Kit, you can select a skin to make it look great and customize the kit to your liking.  
-        </p>
-        <h4>Starter Kits</h4>
-        <ul>
-        <li><strong><a href="/install/?installStep=skinning" target="_blank">Runway Starter Kit</a></strong> a bare-bones website that introduces you to a set of well-defined conventions for building an Umbraco website</li>
-        <li><strong><a href="/install/?installStep=skinning" target="_blank">Blog 4 Umbraco Starter Kit</a></strong> a powerful blog kit with all the bells and whistles</li>
-        <li><strong><a href="/install/?installStep=skinning" target="_blank">Business Starter Kit</a></strong> a basic business kit to get you up and running today</li>
-        <li><strong><a href="/install/?installStep=skinning" target="_blank">Personal Starter Kit</a></strong> a basic personal kit for your own space on the web</li>
-        </ul>
-</div>
-</div>
-</asp:Panel>
-
 <asp:Panel ID="learnPanel" runat="server">
 <div class="propertypane">
   <div class="guiDialogNormal" style="margin: 10px">
     <h2>Watch and learn</h2>
         <p>
-            Want to master Umbraco? Spend a couple of minutes learning some best practices
+            Want to master Umbraco Macros and more? Spend a couple of minutes learning some best practices
             by watching one of these videos about using Umbraco. And visit <a href="http://umbraco.tv"
                 target="_blank">umbraco.tv</a> for even more Umbraco videos</p>
     <div id="latestformvids">
@@ -180,7 +160,7 @@
 <div class="propertypane">
 <div class="guiDialogNormal" style="margin: 10px">
         <p>
-        Check here to hide this dashboard in the future <asp:CheckBox ID="hideCheckBox" 
+                Check here to hide this dashboard in the future <asp:CheckBox ID="hideCheckBox" 
                 runat="server" oncheckedchanged="hideCheckBox_CheckedChanged"></asp:CheckBox>
         </p>
 </div>

@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="StartupDashboard.ascx.cs" Inherits="dashboardUtilities.StartupDashboard" %>
+﻿<%@ Control Language="C#" AutoEventWireup="True" CodeBehind="StartupMediaDashboard.ascx.cs" Inherits="dashboardUtilities.StartupMediaDashboard" %>
 <script type="text/javascript" src="/umbraco/dashboard/scripts/jquery.jfeed.pack.js"></script>
 <link href="/umbraco_client/propertypane/style.css" rel="stylesheet" />
 <style type="text/css">
@@ -125,48 +125,30 @@
 <div class="propertypane">
 <div class="guiDialogNormal" style="margin: 10px">
         <h2>Start here</h2>
-        <h3>Thank you for choosing Umbraco!</h3>
+        <h3>Get started with Media right now</h3>
         <p>
-        We think this could be the beginning of something beautiful.  You have made a great choice, to help you get started here are some links to addtional information:
+        Use the tool below to upload a ZIP file of your images or documents to a media folder.
         </p>
         <ul>
-        <li>Find the answers to your Umbraco questions on our <a href="http://our.umbraco.org/wiki" target="_blank">Community Wiki</a></li>
-        <li>Ask a question in the <a href="http://our.umbraco.org/" target="_blank">Community Forum</a></li>
-        <li>Find an add-on <a href="http://our.umbraco.org/projects" target="_blank">package</a> to help you get going quickly</li>
-        <li>Watch our <a href="http://umbraco.tv" target="_blank">tutorial videos</a> (some are free, some require a subscription)</li>
-        <li>Find out about our <a href="http://umbraco.org/products" target="_blank">Pro Tools and Support</a></li>
-        <li>Find out about real-life <a href="http://umbraco.org/training/training-schedule" target="_blank">training and certification</a> opportunities</li>
-        </ul>
+        <li><strong>Follow these steps:</strong></li>
+        <li>Create a media folder by right-clicking on the Media root folder, selecting Create, then give your folder a name, select the Media Type Folder, and click create</li>
+        <li>Select the created folder by click the Choose link</li>
+        <li>Use the Browse button below to select a ZIP file containing your images (you can even organize them into folders and the tool will create these for you)</li>
+        <li>Click the Upload zip file button</li>
+        <li>Refresh the Media section by right-clicking the Media root folder and selecting Reload Nodes</li>
+        </ul>  
 </div>
 </div>
 </asp:Panel>
 
-<asp:Panel ID="skinPanel" runat="server">
-<div class="propertypane">
-<div class="guiDialogNormal" style="margin: 10px">
-    <h2>Make it look great</h2>
-    <h3>Install a Starter Site and Skin</h3>
-        <p>
-        If you haven't already installed one of our Starter Kits, we think you should do that now.  This is one of the best ways to start working with Umbraco.
-        After you install a Starter Kit, you can select a skin to make it look great and customize the kit to your liking.  
-        </p>
-        <h4>Starter Kits</h4>
-        <ul>
-        <li><strong><a href="/install/?installStep=skinning" target="_blank">Runway Starter Kit</a></strong> a bare-bones website that introduces you to a set of well-defined conventions for building an Umbraco website</li>
-        <li><strong><a href="/install/?installStep=skinning" target="_blank">Blog 4 Umbraco Starter Kit</a></strong> a powerful blog kit with all the bells and whistles</li>
-        <li><strong><a href="/install/?installStep=skinning" target="_blank">Business Starter Kit</a></strong> a basic business kit to get you up and running today</li>
-        <li><strong><a href="/install/?installStep=skinning" target="_blank">Personal Starter Kit</a></strong> a basic personal kit for your own space on the web</li>
-        </ul>
-</div>
-</div>
-</asp:Panel>
+<p>...zip upload here...</p>
 
 <asp:Panel ID="learnPanel" runat="server">
 <div class="propertypane">
   <div class="guiDialogNormal" style="margin: 10px">
     <h2>Watch and learn</h2>
         <p>
-            Want to master Umbraco? Spend a couple of minutes learning some best practices
+            Want to master Umbraco Media? Spend a couple of minutes learning some best practices
             by watching one of these videos about using Umbraco. And visit <a href="http://umbraco.tv"
                 target="_blank">umbraco.tv</a> for even more Umbraco videos</p>
     <div id="latestformvids">
@@ -180,9 +162,11 @@
 <div class="propertypane">
 <div class="guiDialogNormal" style="margin: 10px">
         <p>
-        Check here to hide this dashboard in the future <asp:CheckBox ID="hideCheckBox" 
+                Check here to hide this dashboard in the future <asp:CheckBox ID="hideCheckBox" 
                 runat="server" oncheckedchanged="hideCheckBox_CheckedChanged"></asp:CheckBox>
         </p>
 </div>
 </div>
 </asp:Panel>
+
+
