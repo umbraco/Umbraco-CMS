@@ -205,6 +205,11 @@ namespace umbraco.DataLayer
         /// <exception cref="System.IndexOutOfRangeException">No column with the specified name was found.</exception>
         public byte GetByte(string fieldName)
         {
+            // this is needed as SQL CE 4 doesn't support smallint/tinyint as IDENTITY columns. So some columns that are
+            // int16 in SQL Server (smallint/tinyint) will be int32 (int) in SQL CE 4
+            int fieldNo = GetOrdinal(fieldName);
+            Type t = m_DataReader.GetFieldType(fieldNo);
+
             return m_DataReader.GetByte(GetOrdinal(fieldName));
         }
 
@@ -271,7 +276,14 @@ namespace umbraco.DataLayer
         /// <exception cref="System.IndexOutOfRangeException">No column with the specified name was found.</exception>
         public short GetShort(string fieldName)
         {
-            return m_DataReader.GetInt16(GetOrdinal(fieldName));
+            // this is needed as SQL CE 4 doesn't support smallint/tinyint as IDENTITY columns. So some columns that are
+            // int16 in SQL Server (smallint/tinyint) will be int32 (int) in SQL CE 4
+            int fieldNo = GetOrdinal(fieldName);
+            Type t = m_DataReader.GetFieldType(fieldNo);
+            if (t.FullName == "System.Int32")
+                return (short) m_DataReader.GetInt32(fieldNo);
+
+            return m_DataReader.GetInt16(fieldNo);
         }
 
         /// <summary>

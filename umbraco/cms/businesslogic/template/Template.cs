@@ -125,9 +125,9 @@ namespace umbraco.cms.businesslogic.template
             base.setupNode();
 
             IRecordsReader dr = SqlHelper.ExecuteReader("Select alias,design,master from cmsTemplate where nodeId = " + this.Id);
-            if (dr.HasRecords)
+            bool hasRows = dr.Read();
+            if (hasRows)
             {
-                dr.Read();
                 _alias = dr.GetString("alias");
                 _design = dr.GetString("design");
                 //set the master template to zero if it's null

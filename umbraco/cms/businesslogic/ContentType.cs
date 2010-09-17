@@ -848,9 +848,9 @@ namespace umbraco.cms.businesslogic
 
         private void populatePropertyData(PropertyType pt, int contentTypeId)
         {
+            // NH: PropertyTypeId inserted directly into SQL instead of as a parameter for SQL CE 4 compatibility
             SqlHelper.ExecuteNonQuery(
-                                      "insert into cmsPropertyData (contentNodeId, versionId, propertyTypeId) select contentId, versionId, @propertyTypeId from cmsContent inner join cmsContentVersion on cmsContent.nodeId = cmsContentVersion.contentId where contentType = @contentTypeId",
-                                      SqlHelper.CreateParameter("@propertyTypeId", pt.Id),
+                                      "insert into cmsPropertyData (contentNodeId, versionId, propertyTypeId) select contentId, versionId, " + pt.Id + " from cmsContent inner join cmsContentVersion on cmsContent.nodeId = cmsContentVersion.contentId where contentType = @contentTypeId",
                                       SqlHelper.CreateParameter("@contentTypeId", contentTypeId));
         } 
 

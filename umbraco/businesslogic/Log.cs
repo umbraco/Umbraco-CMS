@@ -189,8 +189,8 @@ namespace umbraco.BusinessLogic
             try
             {
                 return ConvertToDataSet(SqlHelper.ExecuteReader(
-                    "select top " + Limit +
-                    " userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
+                    "select top (" + Limit +
+                    ") userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
                     SqlHelper.CreateParameter("@logHeader", Type.ToString()),
                     SqlHelper.CreateParameter("@dateStamp", SinceDate)));
             }
@@ -294,8 +294,8 @@ namespace umbraco.BusinessLogic
             try
             {
                 return ConvertToDataSet(SqlHelper.ExecuteReader(
-                    "select top " + Limit +
-                    " userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
+                    "select top (" + Limit +
+                    ") userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
                     SqlHelper.CreateParameter("@logHeader", Type.ToString()),
                     SqlHelper.CreateParameter("@user", u.Id),
                     SqlHelper.CreateParameter("@dateStamp", SinceDate)));

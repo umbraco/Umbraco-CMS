@@ -35,7 +35,7 @@ namespace umbraco.presentation.umbraco.webservices
                 //if all is correct
                 if (!String.IsNullOrEmpty(group) && !String.IsNullOrEmpty(id))
                 {
-                    sql = @"SELECT TOP 20 tag FROM cmsTags WHERE tag LIKE @prefix AND cmsTags.id not in 
+                    sql = @"SELECT TOP (20) tag FROM cmsTags WHERE tag LIKE @prefix AND cmsTags.id not in 
                         (SELECT tagID FROM cmsTagRelationShip WHERE NodeId = @nodeId) AND cmstags.[group] = @group;";
 
                     rr = SqlHelper.ExecuteReader(sql,
@@ -51,7 +51,7 @@ namespace umbraco.presentation.umbraco.webservices
                 else
                 {
                     //fallback...
-                    sql = "SELECT TOP 20 tag FROM cmsTags WHERE tag LIKE @prefix";
+                    sql = "SELECT TOP (20) tag FROM cmsTags WHERE tag LIKE @prefix";
 
                     rr = SqlHelper.ExecuteReader(sql,
                        SqlHelper.CreateParameter("@count", count),

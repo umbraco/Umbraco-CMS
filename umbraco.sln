@@ -67,8 +67,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{F06D18F6-C
 		foreign dlls\ICSharpCode.SharpZipLib.dll = foreign dlls\ICSharpCode.SharpZipLib.dll
 		foreign dlls\IronMath.dll = foreign dlls\IronMath.dll
 		IronPython License.Rtf = IronPython License.Rtf
-		foreign dlls\IronPython.dll = foreign dlls\IronPython.dll
-		foreign dlls\IronRuby.dll = foreign dlls\IronRuby.dll
 		License.txt = License.txt
 		foreign dlls\Microsoft.ApplicationBlocks.Data.dll = foreign dlls\Microsoft.ApplicationBlocks.Data.dll
 		foreign dlls\MySql.Data.dll = foreign dlls\MySql.Data.dll
@@ -104,6 +102,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.Legacy", "umbraco\umbraco.Legacy\umbraco.Legacy.csproj", "{27A2590E-1313-4A33-89FD-92811540B69C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.Test", "umbraco.Test\umbraco.Test.csproj", "{6277C9FB-3A9A-4537-AA86-82DA9B2527FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{19400916-4F71-45A0-B0E0-F9BE406D7772}"
+	ProjectSection(SolutionItems) = preProject
+		assets\Umbraco.sdf = assets\Umbraco.sdf
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -216,6 +219,7 @@ Global
 		{B8ECDB8B-BF44-462C-B6DA-22421B3EC4D7} = {F0242771-6DE6-4E03-BD3A-7B79BA79105B}
 		{58072405-85D0-45CA-8F5C-EA8928C32A6A} = {F0242771-6DE6-4E03-BD3A-7B79BA79105B}
 		{F06D18F6-C510-4CBA-9514-0F890FD62103} = {F0242771-6DE6-4E03-BD3A-7B79BA79105B}
+		{19400916-4F71-45A0-B0E0-F9BE406D7772} = {F0242771-6DE6-4E03-BD3A-7B79BA79105B}
 		{5BB61485-B480-4A03-A8DD-1636A5AF575C} = {B8ECDB8B-BF44-462C-B6DA-22421B3EC4D7}
 		{05329DB0-5C47-44A1-B7B8-BF377446BCD1} = {B8ECDB8B-BF44-462C-B6DA-22421B3EC4D7}
 		{C5FA9596-B9DC-4DF9-8380-AFC19C1EF51F} = {58072405-85D0-45CA-8F5C-EA8928C32A6A}

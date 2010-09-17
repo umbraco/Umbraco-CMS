@@ -234,10 +234,11 @@ namespace umbraco
                 using (IRecordsReader macroDef = SqlHelper.ExecuteReader("select * from cmsMacro left join cmsMacroProperty property on property.macro = cmsMacro.id left join cmsMacroPropertyType editPropertyType on editPropertyType.id = property.macroPropertyType where cmsMacro.id = @macroID order by property.macroPropertySortOrder",
                                                                         SqlHelper.CreateParameter("@macroID", id)))
                 {
-                    if (!macroDef.HasRecords)
+                    bool hasRecords = macroDef.Read();
+                    if (!hasRecords)
                         HttpContext.Current.Trace.Warn("Macro", "No definition found for id " + id);
 
-                    while (macroDef.Read())
+                    while (hasRecords)
                     {
                         string tmpStr;
                         bool tmpBool;
@@ -278,6 +279,8 @@ namespace umbraco
                             if (TryGetColumnString(macroDef, "macroPropertyTypeBaseType", out baseType) && !propertyDefinitions.ContainsKey(tmpStr))
                                 propertyDefinitions.Add(tmpStr, baseType);
                         }
+
+                        hasRecords = macroDef.Read();
                     }
                 }
                 // add current macro-object to cache

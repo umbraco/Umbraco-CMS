@@ -144,10 +144,11 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Constants and Static members
+        // NH: Modified to support SQL CE 4 (doesn't support nested selects)
         private const string m_SQLOptimizedSingle = @"
                 Select 
-	                (select count(id) from umbracoNode where parentId = @id) as Children, 
-	                (select Count(published) as tmp from cmsDocument where published = 1 And nodeId = @id) as Published,
+                    CASE WHEN (childrenTable.total>0) THEN childrenTable.total ELSE 0 END as Children,
+                    CASE WHEN (publishedTable.publishedTotal>0) THEN publishedTable.publishedTotal ELSE 0 END as Published,
 	                cmsContentVersion.VersionId,
                     cmsContentVersion.versionDate,	                
 	                contentTypeNode.uniqueId as ContentTypeGuid, 
@@ -162,13 +163,20 @@ namespace umbraco.cms.businesslogic.web
                     inner join cmsContentType on cmsContentType.nodeId = cmsContent.ContentType
                     inner join umbracoNode contentTypeNode on contentTypeNode.id = cmsContentType.nodeId
                     left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1 
+                    /* SQL CE support */
+                    left outer join (select count(id) as total, parentId from umbracoNode where parentId = @id group by parentId) as childrenTable on childrenTable.parentId = umbracoNode.id
+                    left outer join (select Count(published) as publishedTotal, nodeId from cmsDocument where published = 1 And nodeId = @id group by nodeId) as publishedTable on publishedTable.nodeId = umbracoNode.id
+                    /* end SQL CE support */
                 where umbracoNode.nodeObjectType = @nodeObjectType AND {0}
                 order by {1}
                 ";
+
+        // NH: Had to modify this for SQL CE 4. Only change is that the "coalesce(publishCheck.published,0) as published" didn't work in SQL CE 4
+        // because there's already a column called published. I've changed it to isPublished and updated the other places
         private const string m_SQLOptimizedMany = @"
                 select count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, 
 	                cmsDocument.documentUser, coalesce(cmsDocument.templateId, cmsDocumentType.templateNodeId) as templateId, 
-	                umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as published, umbracoNode.createDate, 
+	                umbracoNode.path, umbracoNode.sortOrder, coalesce(publishCheck.published,0) as isPublished, umbracoNode.createDate, 
 	                cmsDocument.text, cmsDocument.updateDate, cmsContentVersion.versionDate, cmsContentType.icon, cmsContentType.alias, 
 	                cmsContentType.thumbnail, cmsContentType.description, cmsContentType.masterContentType, cmsContentType.nodeId as contentTypeId,
                     umbracoNode.nodeUser
@@ -463,7 +471,7 @@ namespace umbraco.cms.businesslogic.web
             }
             else
             {
-                return SqlHelper.ExecuteScalar<int>("SELECT COUNT(distinct nodeId) FROM umbracoNode INNER JOIN cmsDocument ON cmsDocument.published = 1 and cmsDocument.nodeId = umbracoNode.id WHERE ','+path+',' LIKE '%," + parentId.ToString() + ",%'");
+                return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM (select distinct umbracoNode.id from umbracoNode INNER JOIN cmsDocument ON cmsDocument.published = 1 and cmsDocument.nodeId = umbracoNode.id WHERE ','+path+',' LIKE '%," + parentId.ToString() + ",%') t");
             }
         }
 
@@ -1589,7 +1597,7 @@ namespace umbraco.cms.businesslogic.web
                 , dr.GetInt("parentId")
                 , dr.GetInt("nodeUser")
                 , dr.GetInt("documentUser")
-                , (dr.GetInt("published") == 1)
+                , (dr.GetInt("isPublished") == 1)
                 , dr.GetString("path")
                 , dr.GetString("text")
                 , dr.GetDateTime("createDate")

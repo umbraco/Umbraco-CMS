@@ -30,7 +30,7 @@ namespace umbraco.cms.presentation.Trees
         public NodeActionsEventArgs(bool isRoot, List<IAction> currActions)
         {
             AllowedActions = currActions;
-            IsRoot = IsRoot;
+            IsRoot = isRoot;
         }
 
         public List<IAction> AllowedActions { get; private set; }
