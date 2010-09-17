@@ -188,12 +188,14 @@
     </Compile>
     <Compile Include="install\steps\chooseStarterKit.ascx.cs">
       <DependentUpon>chooseStarterKit.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="install\steps\chooseStarterKit.ascx.designer.cs">
       <DependentUpon>chooseStarterKit.ascx</DependentUpon>
     </Compile>
     <Compile Include="install\steps\chooseStarterKitDesign.ascx.cs">
       <DependentUpon>chooseStarterKitDesign.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="install\steps\chooseStarterKitDesign.ascx.designer.cs">
       <DependentUpon>chooseStarterKitDesign.ascx</DependentUpon>
@@ -563,12 +565,47 @@
     <Compile Include="umbraco\create\templateTasks.cs" />
     <Compile Include="umbraco\create\userTasks.cs" />
     <Compile Include="umbraco\create\XsltTasks.cs" />
+    <Compile Include="umbraco\dashboard\FeedProxy.aspx.cs">
+      <DependentUpon>FeedProxy.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dashboard\FeedProxy.aspx.designer.cs">
+      <DependentUpon>FeedProxy.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\dashboard\Settings\Applyskin.ascx.cs">
       <DependentUpon>Applyskin.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco\dashboard\Settings\Applyskin.ascx.designer.cs">
       <DependentUpon>Applyskin.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dashboard\StartupDashboard.ascx.cs">
+      <DependentUpon>StartupDashboard.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dashboard\StartupDashboard.ascx.designer.cs">
+      <DependentUpon>StartupDashboard.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dashboard\StartupDeveloperDashboard.ascx.cs">
+      <DependentUpon>StartupDeveloperDashboard.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dashboard\StartupDeveloperDashboard.ascx.designer.cs">
+      <DependentUpon>StartupDeveloperDashboard.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dashboard\StartupMediaDashboard.ascx.cs">
+      <DependentUpon>StartupMediaDashboard.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dashboard\StartupMediaDashboard.ascx.designer.cs">
+      <DependentUpon>StartupMediaDashboard.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dashboard\StartupSettingsDashboard.ascx.cs">
+      <DependentUpon>StartupSettingsDashboard.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dashboard\StartupSettingsDashboard.ascx.designer.cs">
+      <DependentUpon>StartupSettingsDashboard.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\dialogs\Preview.aspx.cs">
       <DependentUpon>Preview.aspx</DependentUpon>
@@ -1594,7 +1631,13 @@
     <Content Include="install\steps\Skinning\loadStarterKitDesigns.ascx" />
     <Content Include="install\steps\Skinning\loadStarterKits.ascx" />
     <Content Include="install\Title.ascx" />
+    <Content Include="umbraco\dashboard\FeedProxy.aspx" />
+    <Content Include="umbraco\dashboard\scripts\jquery.jfeed.pack.js" />
     <Content Include="umbraco\dashboard\Settings\Applyskin.ascx" />
+    <Content Include="umbraco\dashboard\StartupDashboard.ascx" />
+    <Content Include="umbraco\dashboard\StartupDeveloperDashboard.ascx" />
+    <Content Include="umbraco\dashboard\StartupMediaDashboard.ascx" />
+    <Content Include="umbraco\dashboard\StartupSettingsDashboard.ascx" />
     <Content Include="umbraco\dialogs\TemplateSkinning.aspx" />
     <Content Include="umbraco\helpRedirect.aspx" />
     <Content Include="umbraco\images\aboutNew.png" />
