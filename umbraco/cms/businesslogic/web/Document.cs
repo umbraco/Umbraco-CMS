@@ -458,7 +458,15 @@ namespace umbraco.cms.businesslogic.web
             var docs = new List<Document>();
             for (int i = 0; i < topNodeIds.Length; i++)
             {
-                docs.Add(new Document(topNodeIds[i]));
+                try
+                {
+                    docs.Add(new Document(topNodeIds[i]));
+                }
+                catch (Exception ee)
+                {
+                    Log.Add(LogTypes.Error, new CMSNode(topNodeIds[i]).Id, "GetRootDocuments: " +
+                        ee.ToString());
+                }
             }
             return docs.ToArray();
         }
