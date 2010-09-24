@@ -783,8 +783,19 @@ namespace umbraco.cms.businesslogic.packager
         /// <returns>The name of the file in the specified path.</returns>
         private static String getFileName(String path, string fileName)
         {
+            if (path.Contains("[$"))
+            {
+                //this is experimental and undocumented...
+                path = path.Replace("[$UMBRACO]", IO.SystemDirectories.Umbraco);
+                path = path.Replace("[$UMBRACOCLIENT]", IO.SystemDirectories.Umbraco_client);
+                path = path.Replace("[$CONFIG]", IO.SystemDirectories.Config);
+                path = path.Replace("[$DATA]", IO.SystemDirectories.Data);
+            }
+
             //to support virtual dirs we try to lookup the file... 
             path = IOHelper.FindFile(path);
+
+            
 
             Debug.Assert(path != null && path.Length >= 1);
             Debug.Assert(fileName != null && fileName.Length >= 1);

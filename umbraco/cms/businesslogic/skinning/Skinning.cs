@@ -278,7 +278,7 @@ namespace umbraco.cms.businesslogic.skinning
             installed.Load(IO.IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config");
 
             XmlNode starterKit = installed.SelectSingleNode(
-                string.Format("//package [@enableSkins = 'True' and contains(./templates, '{0}')]", template));
+                string.Format("//package [@enableSkins = 'True' and @packageGuid != '' and contains(./templates, '{0}')]", template));
             
             if (starterKit != null)
                 return new Guid(starterKit.Attributes["packageGuid"].Value);
