@@ -250,7 +250,7 @@ namespace umbraco.Linq.Core.Node
 
             foreach (var ancestor in elements)
             {
-                var alias = Casing.SafeAliasWithForcingCheck(ancestor.Name.LocalName);
+                var alias = Casing.SafeAlias(ancestor.Name.LocalName);
                 var t = KnownTypes[alias];
                 var instaceOfT = (DocTypeBase)Activator.CreateInstance(t); //create an instance of the type and down-cast so we can use it
                 this.LoadFromXml(ancestor, instaceOfT);
@@ -276,7 +276,7 @@ namespace umbraco.Linq.Core.Node
                         });
 
                     foreach (var type in types)
-                        this._knownTypes.Add(Casing.SafeAliasWithForcingCheck(type.Key), type.Value);
+                        this._knownTypes.Add(Casing.SafeAlias(type.Key), type.Value);
 
                 }
 
@@ -327,7 +327,7 @@ namespace umbraco.Linq.Core.Node
             {
                 var attr = ReflectionAssistance.GetUmbracoInfoAttribute(p);
 
-                XElement propertyXml = xml.Element(Casing.SafeAliasWithForcingCheck(attr.Alias));
+                XElement propertyXml = xml.Element(Casing.SafeAlias(attr.Alias));
                 string data = null;
                 //if the XML doesn't contain the property it means that the node hasn't been re-published with the property
                 //so then we'll leave the data at null, otherwise let's grab it
