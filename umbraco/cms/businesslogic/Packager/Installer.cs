@@ -783,6 +783,9 @@ namespace umbraco.cms.businesslogic.packager
         /// <returns>The name of the file in the specified path.</returns>
         private static String getFileName(String path, string fileName)
         {
+            // virtual dir support
+            fileName = IOHelper.FindFile(fileName);
+
             if (path.Contains("[$"))
             {
                 //this is experimental and undocumented...
