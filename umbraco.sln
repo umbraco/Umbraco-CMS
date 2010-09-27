@@ -74,7 +74,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{F06D18F6-C
 		foreign dlls\UmbracoExamine.dll = foreign dlls\UmbracoExamine.dll
 		foreign dlls\UrlRewritingNet.UrlRewriter.dll = foreign dlls\UrlRewritingNet.UrlRewriter.dll
 		foreign dlls\VistaDB For Umbraco.dll = foreign dlls\VistaDB For Umbraco.dll
-		foreign dlls\VistaDB.NET20.dll = foreign dlls\VistaDB.NET20.dll
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.presentation", "umbraco\presentation\umbraco.presentation.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"

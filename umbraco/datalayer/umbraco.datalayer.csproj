@@ -75,15 +75,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="VistaDB For Umbraco, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\foreign dlls\VistaDB For Umbraco.dll</HintPath>
-    </Reference>
-    <Reference Include="VistaDB.NET20, Version=3.3.1.57, Culture=neutral, PublicKeyToken=dfc935afe2125461, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\foreign dlls\VistaDB.NET20.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\LinqToUmbraco\src\umbraco.Linq\Solution Items\SolutionInfo.cs">
