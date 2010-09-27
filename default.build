@@ -170,7 +170,7 @@
                 <include name="${build.dir}/**/*.resx" />
                 <include name="${build.dir}/**/*.user" />
                 <include name="${build.dir}/**/*.bak" />
-                <include name="${build.dir}/**/*.pdb" />
+                
                     
                 <include name="${build.dir}/PrecompiledApp.config" />
                 <include name="${build.dir}/web.config.template" />
