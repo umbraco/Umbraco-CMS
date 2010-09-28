@@ -38,6 +38,10 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
         {
             base.CreateChildControls();
 
+
+            Skin ActiveSkin = Skin.CreateFromAlias(Skinning.GetCurrentSkinAlias(nodeFactory.Node.GetCurrent().template));
+
+
             m_SkinModal = new Panel();
             m_SkinModal.ID = "LeSkinModal";
             m_SkinModal.Attributes.Add("style", "display: none");
@@ -48,10 +52,10 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
             m_SkinButton.ID = "LeSkinButton";
             m_SkinButton.CssClass = "button";
-            m_SkinButton.ToolTip = "Customize skin";
+            m_SkinButton.ToolTip = ActiveSkin != null && ActiveSkin.Dependencies.Count > 0 ? "Customize skin" : "Change skin";
             m_SkinButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/SKinModule/skin.png", SystemDirectories.Umbraco);
 
-            string s = (Skin.CreateFromAlias(Skinning.GetCurrentSkinAlias(nodeFactory.Node.GetCurrent().template)) != null ? "setTasksClientScripts();" : "") + "jQuery('#" + m_SkinModal.ClientID + @"').show();" + "jQuery('#" + m_SkinModal.ClientID + @"').ModalWindowShow('" + ui.GetText("skin") + "',true,500,400,50,0, ['.modalbuton'], null);";
+            string s = (ActiveSkin != null && ActiveSkin.Dependencies.Count > 0 ? "setTasksClientScripts();" : "") + "jQuery('#" + m_SkinModal.ClientID + @"').show();" + "jQuery('#" + m_SkinModal.ClientID + @"').ModalWindowShow('" + ui.GetText("skin") + "',true,500,400,50,0, ['.modalbuton'], null);";
 
             m_SkinButton.OnClientClick = s +"return false;";
 

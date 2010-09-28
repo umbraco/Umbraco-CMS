@@ -41,7 +41,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             pnl_connectionerror.Visible = false;
 
             //load dependencies
-            if (ActiveSkin != null)
+            if (ActiveSkin != null && ActiveSkin.Dependencies.Count > 0)
                 LoadDependencies();
             else
             {
