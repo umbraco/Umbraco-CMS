@@ -186,20 +186,6 @@
     <Compile Include="..\..\LinqToUmbraco\src\umbraco.Linq\Solution Items\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="install\steps\chooseStarterKit.ascx.cs">
-      <DependentUpon>chooseStarterKit.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="install\steps\chooseStarterKit.ascx.designer.cs">
-      <DependentUpon>chooseStarterKit.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="install\steps\chooseStarterKitDesign.ascx.cs">
-      <DependentUpon>chooseStarterKitDesign.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="install\steps\chooseStarterKitDesign.ascx.designer.cs">
-      <DependentUpon>chooseStarterKitDesign.ascx</DependentUpon>
-    </Compile>
     <Compile Include="install\steps\database.ascx.cs">
       <DependentUpon>database.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1623,8 +1609,6 @@
     <Content Include="config\splashes\worker.png" />
     <Content Include="install\images\logo_type.png" />
     <Content Include="install\installer.js" />
-    <Content Include="install\steps\chooseStarterKit.ascx" />
-    <Content Include="install\steps\chooseStarterKitDesign.ascx" />
     <Content Include="install\steps\database.ascx" />
     <Content Include="install\steps\renaming.ascx" />
     <Content Include="install\steps\skinning.ascx" />
@@ -1679,6 +1663,21 @@
     <Content Include="umbraco_client\colorpicker\js\colorpicker.js" />
     <Content Include="umbraco_client\colorpicker\js\initcolorpicker.js" />
     <Content Include="umbraco_client\mousewheel\jquery.mousewheel.js" />
+    <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
+    <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
+    <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_flat_10_000000_40x100.png" />
+    <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_glass_100_f6f6f6_1x400.png" />
+    <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_glass_100_fdf5ce_1x400.png" />
+    <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_gloss-wave_35_f6a828_500x100.png" />
+    <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_highlight-soft_100_eeeeee_1x100.png" />
+    <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_highlight-soft_75_ffe45c_1x100.png" />
+    <Content Include="umbraco_client\ui\ui-lightness\images\ui-icons_222222_256x240.png" />
+    <Content Include="umbraco_client\ui\ui-lightness\images\ui-icons_228ef1_256x240.png" />
+    <Content Include="umbraco_client\ui\ui-lightness\images\ui-icons_ef8c08_256x240.png" />
+    <Content Include="umbraco_client\ui\ui-lightness\images\ui-icons_ffd27a_256x240.png" />
+    <Content Include="umbraco_client\ui\ui-lightness\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="umbraco_client\ui\ui-lightness\jquery-ui-1.8.4.custom.css" />
     <Content Include="web.config.Az-VAIO.xslt" />
     <Content Include="umbraco\endPreview.aspx" />
     <Content Include="umbraco\js\UmbracoCasingRules.aspx" />

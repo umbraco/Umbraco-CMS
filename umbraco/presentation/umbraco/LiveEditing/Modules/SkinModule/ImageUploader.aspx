@@ -30,6 +30,8 @@
 
     <cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
 
+    <umb:CssInclude ID="CssInclude1" runat="server" FilePath="ui/ui-lightness/jquery-ui-1.8.4.custom.css"  PathNameAlias="UmbracoClient" />
+
     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient"
         Priority="0" />
     <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient"
@@ -176,7 +178,9 @@
     <a href="#" onclick="ResetToDefault();return false;">Reset</a>&nbsp;
     <asp:LinkButton ID="bt_uploadother" runat="server" onclick="bt_uploadother_Click">upload other image</asp:LinkButton>
 
-    <div id="slidercontainer">
+    <br />
+    Scale image:
+    <div id="slidercontainer" style="width:500px">
 	     <div id="slider"></div>
     </div>
 
