@@ -185,7 +185,7 @@ namespace umbraco.presentation.LiveEditing.Controls
         {
            
             ScriptManager.RegisterClientScriptBlock(Page, GetType(), new Guid().ToString(),
-                                        String.Format("window.location.href='{0}';", SystemDirectories.Umbraco + "/"), true);
+                                        String.Format("window.location.href='{0}';", this.ResolveUrl(SystemDirectories.Umbraco + "/")), true);
         }
 
 
