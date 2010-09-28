@@ -10,6 +10,7 @@ using System.Text;
 using umbraco.interfaces.skinning;
 using umbraco.IO;
 using umbraco.cms.businesslogic.template;
+using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 {
@@ -30,8 +31,12 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
 
         protected void Page_Load(object sender, EventArgs e)
-        {            
-            
+        {
+            if (User.GetCurrent().GetApplications().Find(t => t.alias.ToLower() == "settings") == null)
+            {
+                throw new Exception("The current user can't edit skins as the user doesn't have access to the Settings section!");
+            }
+
 
 
             nodeFactory.Node n = nodeFactory.Node.GetCurrent();

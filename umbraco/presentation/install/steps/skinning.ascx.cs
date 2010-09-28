@@ -51,7 +51,7 @@ namespace umbraco.presentation.install.steps
 
         public void showCustomizeSkin()
         {
-            Response.Redirect(GlobalSettings.Path + "/canvas.aspx?redir=" + this.ResolveUrl("~/") + "&skinning=true");
+            Response.Redirect(GlobalSettings.Path + "/canvas.aspx?redir=" + this.ResolveUrl("~/") + "&umbSkinning=true");
         }
     }
 }

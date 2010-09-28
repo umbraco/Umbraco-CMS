@@ -18,7 +18,7 @@ namespace umbraco.presentation
                     redirUrl = Request.UrlReferrer.AbsolutePath;
 
                 Response.Redirect(redirUrl + 
-                    (string.IsNullOrEmpty(UmbracoContext.Current.Request["skinning"]) ? "" : "?skinning=true") , true);
+                    (string.IsNullOrEmpty(UmbracoContext.Current.Request["umbSkinning"]) ? "" : "?umbSkinning=true") , true);
             }
             else
             {

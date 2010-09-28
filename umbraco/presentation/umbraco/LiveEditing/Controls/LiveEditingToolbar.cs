@@ -16,6 +16,7 @@ using ClientDependency.Core;
 using umbraco.IO;
 using umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule;
 using umbraco.cms.businesslogic.skinning;
+using umbraco.BusinessLogic;
 namespace umbraco.presentation.LiveEditing.Controls
 {
     /// <summary>
@@ -81,13 +82,18 @@ namespace umbraco.presentation.LiveEditing.Controls
             //m_Manager.LiveEditingContext.Menu.Add(new MacroModule(m_Manager));
 
 
-            //only add if there is a skin
-            nodeFactory.Node n = nodeFactory.Node.GetCurrent();
-            
-            if(!string.IsNullOrEmpty(Skinning.GetCurrentSkinAlias(n.template)) || Skinning.HasAvailableSkins(n.template))
+            // SKINNING
+            // verify access to settings area
+            if (User.GetCurrent().GetApplications().Find(t => t.alias.ToLower() == "settings") != null)
             {
-                m_Manager.LiveEditingContext.Menu.Add(new Separator());
-                m_Manager.LiveEditingContext.Menu.Add(new SkinModule(m_Manager));
+                //only add if there is a skin
+                nodeFactory.Node n = nodeFactory.Node.GetCurrent();
+
+                if (!string.IsNullOrEmpty(Skinning.GetCurrentSkinAlias(n.template)) || Skinning.HasAvailableSkins(n.template))
+                {
+                    m_Manager.LiveEditingContext.Menu.Add(new Separator());
+                    m_Manager.LiveEditingContext.Menu.Add(new SkinModule(m_Manager));
+                }
             }
         }
 

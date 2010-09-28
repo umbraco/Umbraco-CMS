@@ -82,7 +82,7 @@
     </div>
     
     </div>
-
+    <p style="text-align: center"><em>The new installer is <strong>work in progress</strong> and will <strong>change</strong> look / feel for final release of JUNO</em></p>
     <input type="hidden" runat="server" value="welcome" id="step">
     
     </form>

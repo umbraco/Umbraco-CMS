@@ -61,7 +61,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
             Controls.Add(m_SkinButton);
 
-            if (!string.IsNullOrEmpty(UmbracoContext.Current.Request["skinning"]))
+            if (!string.IsNullOrEmpty(UmbracoContext.Current.Request["umbSkinning"]))
             {
                 ScriptManager.RegisterClientScriptBlock(
                    this,
