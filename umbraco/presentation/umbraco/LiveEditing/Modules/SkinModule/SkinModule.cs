@@ -67,7 +67,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                    true);
 
 
-                ClientDependencyLoader.Instance.RegisterDependency(500, "LiveEditing/Modules/SkinModule/SkinModuleShowOnStartup.js", "UmbracoRoot", ClientDependencyType.Javascript);
+                ClientDependencyLoader.Instance.RegisterDependency(500, "LiveEditing/Modules/SkinModule/js/SkinModuleShowOnStartup.js", "UmbracoRoot", ClientDependencyType.Javascript);
             }
         }
     }

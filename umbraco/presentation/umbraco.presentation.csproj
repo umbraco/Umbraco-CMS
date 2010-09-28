@@ -1628,7 +1628,7 @@
     <Content Include="umbraco\images\loginBg.png" />
     <Content Include="umbraco\images\umbracoSplash.png" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx" />
-    <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinModuleShowOnStartup.js" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\SkinModuleShowOnStartup.js" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\skin.png" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinModule.js" />
@@ -1661,7 +1661,7 @@
     <Content Include="umbraco_client\colorpicker\images\select2.png" />
     <Content Include="umbraco_client\colorpicker\images\slider.png" />
     <Content Include="umbraco_client\colorpicker\js\colorpicker.js" />
-    <Content Include="umbraco_client\colorpicker\js\initcolorpicker.js" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\initcolorpicker.js" />
     <Content Include="umbraco_client\mousewheel\jquery.mousewheel.js" />
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
