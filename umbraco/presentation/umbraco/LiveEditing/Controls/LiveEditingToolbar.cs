@@ -44,6 +44,7 @@ namespace umbraco.presentation.LiveEditing.Controls
         private readonly LabelButton m_SaveAndPublishButton = new LabelButton();
         private readonly Button m_CloseButton = new Button();
         private readonly Panel m_MenuItemsPanel = new Panel();
+        private readonly Button m_BackToBackendButton = new Button();
 
         #endregion
 
@@ -145,16 +146,30 @@ namespace umbraco.presentation.LiveEditing.Controls
             m_SaveAndPublishButton.Visible = m_SaveButton.Visible
                                              && UmbracoContext.Current.HasPermission(ActionPublish.Instance.Letter);
 
-            
-            // create close button
-            string _btText = "Logout: " + new BasePage().getUser().Name;
-            m_MainPanel.ContentTemplateContainer.Controls.Add(m_CloseButton);
-            m_CloseButton.CssClass = "close";
-            m_CloseButton.ToolTip = _btText;
-            m_CloseButton.Text = _btText;
+
+            if (!string.IsNullOrEmpty(UmbracoContext.Current.Request["skinning"]))
+            {
+                //create back to backend button
+                m_MainPanel.ContentTemplateContainer.Controls.Add(m_BackToBackendButton);
+                m_BackToBackendButton.CssClass = "close";
+                m_BackToBackendButton.ToolTip = "switch to backoffice";
+                m_BackToBackendButton.Text = "switch to backoffice";
+                m_BackToBackendButton.Click += new EventHandler(m_BackToBackendButton_Click);
+
+            }
+            else
+            {
+                // create close button
+                string _btText = "Logout: " + new BasePage().getUser().Name;
+                m_MainPanel.ContentTemplateContainer.Controls.Add(m_CloseButton);
+                m_CloseButton.CssClass = "close";
+                m_CloseButton.ToolTip = _btText;
+                m_CloseButton.Text = _btText;
+                m_CloseButton.Click += new EventHandler(CloseButton_Click);
+            }
 
             //m_CloseButton.ImageUrl = String.Format("{0}/images/editor/Close.gif", GlobalSettings_Path);
-            m_CloseButton.Click += new EventHandler(CloseButton_Click);
+           
 
             // add the custom menu items
             foreach (Control menuItem in m_Manager.LiveEditingContext.Menu)
@@ -165,6 +180,14 @@ namespace umbraco.presentation.LiveEditing.Controls
             // add the client toolbar
             m_MainPanel.ContentTemplateContainer.Controls.Add(new LiteralControl("<div id=\"LiveEditingClientToolbar\"></div>"));
         }
+
+        void m_BackToBackendButton_Click(object sender, EventArgs e)
+        {
+           
+            ScriptManager.RegisterClientScriptBlock(Page, GetType(), new Guid().ToString(),
+                                        String.Format("window.location.href='{0}';", SystemDirectories.Umbraco + "/"), true);
+        }
+
 
         /// <summary>
         /// Sends server control content to a provided <see cref="T:System.Web.UI.HtmlTextWriter"/> object,
