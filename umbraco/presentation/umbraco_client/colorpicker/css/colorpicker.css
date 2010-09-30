@@ -160,3 +160,15 @@
 .colorpicker_slider {
 	background-position: bottom;
 }
+
+
+/*custom adjustments*/
+
+.colorpicker_hsb_h, colorpicker_hsb_s, colorpicker_hsb_b, colorpicker_submit
+{
+    display:none;
+}
+.colorpicker
+{
+    width:282px;
+}
