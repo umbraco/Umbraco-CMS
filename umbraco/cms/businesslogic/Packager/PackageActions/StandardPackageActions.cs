@@ -170,11 +170,13 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions {
 
                 XmlNode section = xmlData.SelectSingleNode("./section");
                 XmlDocument dashboardFile = xmlHelper.OpenAsXmlDocument(dbConfig);
+
                 XmlNode importedSection = dashboardFile.ImportNode(section, true);
+
                 XmlAttribute alias = xmlHelper.addAttribute(dashboardFile, "alias", sectionAlias);
                 importedSection.Attributes.Append(alias);
 
-                dashboardFile.DocumentElement.AppendChild( dashboardFile.ImportNode(section, true) );
+                dashboardFile.DocumentElement.AppendChild(importedSection);
 
                 dashboardFile.Save(IOHelper.MapPath(dbConfig));
 
@@ -198,7 +200,8 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions {
             XmlNode section = dashboardFile.SelectSingleNode("//section [@alias = '" + sectionAlias + "']");
 
             if(section != null){
-                dashboardFile.RemoveChild(section);
+
+                dashboardFile.SelectSingleNode("/dashBoard").RemoveChild(section);
                 dashboardFile.Save(IOHelper.MapPath(dbConfig));
             }
             
