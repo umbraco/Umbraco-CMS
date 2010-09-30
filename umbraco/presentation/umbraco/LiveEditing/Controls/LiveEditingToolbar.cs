@@ -61,10 +61,19 @@ namespace umbraco.presentation.LiveEditing.Controls
                 throw new ArgumentNullException("manager");
 
             m_Manager = manager;
-            AddModules();
+
+            if (!UmbracoContext.Current.LiveEditingContext.InSkinningMode)
+            {
+                AddModules();
+            }
+            else
+            {
+                AddSkinningModules();
+            }
         }
 
         #endregion
+
 
         #region Protected Methods
 
@@ -82,6 +91,10 @@ namespace umbraco.presentation.LiveEditing.Controls
             //m_Manager.LiveEditingContext.Menu.Add(new MacroModule(m_Manager));
 
 
+        }
+
+        protected virtual void AddSkinningModules()
+        {
             // SKINNING
             // verify access to settings area
             if (User.GetCurrent().GetApplications().Find(t => t.alias.ToLower() == "settings") != null)
@@ -95,6 +108,7 @@ namespace umbraco.presentation.LiveEditing.Controls
                     m_Manager.LiveEditingContext.Menu.Add(new SkinModule(m_Manager));
                 }
             }
+
         }
 
         /// <summary>

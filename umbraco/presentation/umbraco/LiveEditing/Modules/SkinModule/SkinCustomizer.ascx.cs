@@ -232,7 +232,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                 Skin s = Skin.CreateFromName(((Button)sender).CommandArgument);
                 Skinning.ActivateAsCurrentSkin(s);
 
-                Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
+                Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())) + "?umbSkinning=true");
             }
             else if (((Button)sender).CommandName == "remove")
             {
@@ -241,7 +241,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                 Template t = new Template(n.template);
                 Skinning.RollbackSkin(t.Id);
 
-                Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
+                Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())) + "?umbSkinning=true");
             }
             else
             {

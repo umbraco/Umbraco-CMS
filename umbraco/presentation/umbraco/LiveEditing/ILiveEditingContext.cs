@@ -15,6 +15,11 @@ namespace umbraco.presentation.LiveEditing
         bool Enabled { get; set;  }
 
         /// <summary>
+        /// Gets or set whether Canvas is in Skinning mode
+        /// </summary>
+        bool InSkinningMode { get; }
+
+        /// <summary>
         /// Gets the Live Editing menu.
         /// </summary>
         /// <value>The Live Editing menu, or <c>null</c> if Live Editing is disabled.</value>

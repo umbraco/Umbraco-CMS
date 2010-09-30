@@ -75,6 +75,13 @@ namespace umbraco.presentation.LiveEditing
             }
         }
 
+        public bool InSkinningMode {
+            get
+            {
+                return HttpContext.Current.Request["umbSkinning"] == "true";
+            }
+        }
+
         /// <summary>
         /// Gets the Live Editing menu, or <c>null</c> if Live Editing is disabled.
         /// </summary>
