@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 
 namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 {
@@ -110,8 +111,21 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             if (!updir.Exists)
                 updir.Create();
 
+            // Copy metadata
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
+            ImageCodecInfo codec = null;
+            for (int i = 0; i < codecs.Length; i++)
+            {
+                if (codecs[i].MimeType.Equals("image/jpeg"))
+                    codec = codecs[i];
+            }
 
-            ((System.Drawing.Image)b).Save(updir.FullName + "/" + FileName.Value);
+            // Set compresion ratio to 90%
+            EncoderParameters ep = new EncoderParameters();
+            ep.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
+
+
+            ((System.Drawing.Image)b).Save(updir.FullName + "/" + FileName.Value, codec, ep);
 
             Image.Value = this.ResolveUrl("~/media/upload/" + id) + "/" + FileName.Value;
             Image1.ImageUrl = Image.Value;
