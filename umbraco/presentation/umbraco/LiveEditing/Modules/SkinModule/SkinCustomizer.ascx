@@ -1,15 +1,13 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SkinCustomizer.ascx.cs" Inherits="umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule.SkinCustomizer" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SkinCustomizer.ascx.cs" Inherits="umbraco.presentation.LiveEditing.Modules.SkinModule.SkinCustomizer" %>
 <%@ Import Namespace="umbraco.cms.businesslogic.packager.repositories"  %>
 
+<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <script type="text/javascript">
-
     function closeCustomizeSkinModal() {
-
-        jQuery('#cancelSkinInstall').trigger('click');
+        //jQuery('#cancelSkinInstall').trigger('click');
         UmbSpeechBubble.ShowMessage("Info", "Skin", "Skin updated...");
     }
-
 </script>
 
 <asp:Panel ID="pnl_connectionerror" runat="server" Visible="false">
@@ -20,38 +18,41 @@
 <div id="costumizeSkin" <asp:Literal ID="ltCustomizeSkinStyle" runat="server" Text=""></asp:Literal>>
 
     <div id="dependencies">
-        <asp:PlaceHolder ID="ph_dependencies" runat="server"></asp:PlaceHolder>
+        <cc1:Pane ID="ph_dependencies" runat="server" />
     </div>
 
-    <p runat="server" id="pChangeSkin">... or <a href="#" onclick="jQuery('#costumizeSkin').hide();jQuery('#changeSkin').show();">change</a> skin</p>
+    <p>
+        <asp:Button ID="btnOk" runat="server" Text=" Ok " CssClass="modalButton" onclick="btnOk_Click" OnClientClick="closeCustomizeSkinModal();"/>
+        <em> or </em> <a href="#" onclick="closeModal();">Cancel</a>
+    </p>
 
-    <asp:Button ID="btnOk" runat="server" Text="Ok" onclick="btnOk_Click" OnClientClick="closeCustomizeSkinModal();"/>
 
-    <button type="button" class="modalbuton" id="cancelSkinCustomization">Cancel</button>
+
+    <p runat="server" id="pChangeSkin">You could also change to another skin <a href="#" onclick="jQuery('#costumizeSkin').hide();jQuery('#changeSkin').show();">change</a> skin</p>
 
 </div>
 
+
+
 <div id="changeSkin" <asp:Literal ID="ltChangeSkinStyle" runat="server" Text="style='display:none;'"></asp:Literal>>
     
+    <p>
+        Choose a skin from your local collection, or download one from the umbraco package repository
+    </p>
+
     <div id="skins">
         <asp:Repeater ID="rep_starterKitDesigns" runat="server" onitemdatabound="rep_starterKitDesigns_ItemDataBound">
             <HeaderTemplate>
                 <ul id="starterKitDesigns">
             </HeaderTemplate>
-            <ItemTemplate>
-                <li>
-                  
-                   <img src="<%# ((Skin)Container.DataItem).Thumbnail %>" alt="<%# ((Skin)Container.DataItem).Text %>" />
-        
-                   <span><%# ((Skin)Container.DataItem).Text %></span>
-
-                   <br />
-                    
-                       
-                    <asp:Button ID="Button1" runat="server" Text="Install" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>" OnClick="SelectStarterKitDesign" CommandName="<%# ((Skin)Container.DataItem).Text %>"/>
-                </li>
-            </ItemTemplate>
-            
+                <ItemTemplate>
+                    <li>
+                       <img src="<%# ((Skin)Container.DataItem).Thumbnail %>" alt="<%# ((Skin)Container.DataItem).Text %>" />
+                       <span><%# ((Skin)Container.DataItem).Text %></span>
+                        <br />
+                        <asp:LinkButton ID="Button1" runat="server" Text="Install" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>" OnClick="SelectStarterKitDesign" CommandName="<%# ((Skin)Container.DataItem).Text %>"/>
+                    </li>
+                </ItemTemplate>            
             <FooterTemplate>
                 </ul>
             </FooterTemplate>
@@ -61,12 +62,8 @@
 
 
     <p runat="server" id="pCustomizeSkin">
-    
-  
-
-    ... or <a href="#" onclick="jQuery('#changeSkin').hide();jQuery('#costumizeSkin').show();">customize</a> current skin</p>
-
-    <button type="button" class="modalbuton" id="cancelSkinInstall">Cancel</button>
+        <button onclick="jQuery('#changeSkin').hide(); jQuery('#costumizeSkin').show();">Cancel</button>
+    </p>
 
 </div>
 

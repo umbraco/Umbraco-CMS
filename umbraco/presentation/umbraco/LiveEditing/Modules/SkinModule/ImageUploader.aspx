@@ -10,20 +10,16 @@
 
     <style type="text/css">
     <!--
-    
-    #cropcontainer
-    {
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
+   
     #cropper {
 	    cursor:move;
 	    overflow:hidden;
 	    width:<%= Request["w"] %>px;
 	    height:<%= Request["h"] %>px;
 	    clear:both;
-	    border:1px solid black;
-	    background:black;
+	    border:1px solid #ccc;
+	    background:#ccc;
+        margin: 5px 0px 15px 5px;
     }
     -->
     </style>
@@ -31,6 +27,7 @@
     <cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
 
     <umb:CssInclude ID="CssInclude1" runat="server" FilePath="ui/ui-lightness/jquery-ui-1.8.4.custom.css"  PathNameAlias="UmbracoClient" />
+    <umb:CssInclude ID="CssInclude2" runat="server" FilePath="ui/default.css" PathNameAlias="UmbracoClient" />
 
     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient"
         Priority="0" />
@@ -88,9 +85,6 @@
             {               
                 $("#cropper").css('width', <%= Request["w"] %> / 2);
                 $("#cropper").css('height', <%= Request["h"] %> / 2);
-
-                $("#workingscale").show();
-
             }
 
 
@@ -142,57 +136,57 @@
 
     <asp:HiddenField ID="Image" runat="server" />
 
-     <asp:HiddenField ID="FileName" runat="server" />
+    <asp:HiddenField ID="FileName" runat="server" />
 
     <asp:HiddenField ID="X" runat="server" Value="0"/>
     <asp:HiddenField ID="Y" runat="server" Value="0"/>
     <asp:HiddenField ID="Scale" runat="server" Value="100"/>
 
+    <cc1:Feedback ID="fb_feedback1" runat="server" />
 
-    <asp:Panel ID="pnl_upload" runat="server">
-   
-    <h1>Upload image</h1>
+    <asp:PlaceHolder  ID="pnl_upload" runat="server">
 
-    <asp:FileUpload ID="FileUpload1" runat="server" /> 
-    <asp:Button ID="bt_upload" runat="server" Text="Upload" 
-        onclick="bt_upload_Click" /><br />
+    <cc1:Pane Text="Upload image file" runat="server">
+    
+    <cc1:PropertyPanel runat="server" Text="Select a image file <br/><small>jpg, gif and png files can be used</small>">
+        <asp:FileUpload ID="FileUpload1" runat="server" />
+    </cc1:PropertyPanel>
+    </cc1:Pane>       
+        <p style="margin-top: 20px;">    
+            <asp:Button ID="bt_upload" runat="server" Text="Upload" onclick="bt_upload_Click" /> <em> or </em> <a href="#" onclick="closeModal();">Cancel</a>
+        </p>     
+    </asp:PlaceHolder>
 
-        <asp:Literal ID="lit_notvalid" runat="server" Text="Please upload a valid image file" Visible="false"></asp:Literal>
 
-     <br />
+    <asp:PlaceHolder ID="pnl_crop" runat="server" Visible="false">
 
-     <button type="button" onclick="closeModal();">Cancel</button>
 
-     </asp:Panel>
-
-    <asp:Panel ID="pnl_crop" runat="server" Visible="false">
-
-    <h1>Crop image</h1>
-    <div id="cropcontainer">
-
-    <span id="workingscale" style="display:none;">Result will be twice the size.</span>
+    <cc1:Pane runat="server" Text="Crop and scale image">
+    
+    <cc1:PropertyPanel runat="server" Text="Crop <br /><small>Drag image with mouse to selct crop area</small>">
     <div id="cropper">
         <asp:Image ID="Image1" runat="server" />
     </div>
+    </cc1:PropertyPanel>
 
-    <a href="#" onclick="ResetToDefault();return false;">Reset</a>&nbsp;
-    <asp:LinkButton ID="bt_uploadother" runat="server" onclick="bt_uploadother_Click">upload other image</asp:LinkButton>
-
-    <br />
-    Scale image:
-    <div id="slidercontainer" style="width:500px">
-	     <div id="slider"></div>
-    </div>
-
-    </div>
-
-    <asp:Button ID="bt_crop" runat="server" Text="OK"  onclick="bt_crop_Click" />
-     <button type="button" onclick="closeModal();">Cancel</button>
-
-    </asp:Panel>
+    <cc1:PropertyPanel runat="server" Text="Scale <br /><small>Drag slider to choose size</small>" >
+         <div id="slidercontainer" style="width: <%= scaleWidth %>">
+	         <div id="slider"></div>
+         </div>
+    </cc1:PropertyPanel>
 
    
-   
+    
+    </div>
+
+    
+    </cc1:Pane>
+
+    <p style="margin-top: 20px;">
+            <asp:Button ID="bt_crop" runat="server" Text="OK"  onclick="bt_crop_Click" /> <em> or </em> <a href="#" onclick="closeModal();">Cancel</a>
+    </p>
+
+    </asp:PlaceHolder>
 
     </form>
 </body>

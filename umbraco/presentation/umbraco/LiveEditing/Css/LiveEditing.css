@@ -226,3 +226,82 @@ html {
 {
 	margin-bottom:10px ! important;
 }
+
+.umbModalBox p{font-size: 11px !Important}
+
+
+#skins ul{list-style: none; padding: 0px; display: block; clear: both; height: 200px;}
+#skins ul li{margin-right: 12px; float: left; border: 1px solid #efefef; padding: 5px; width: 120px; text-align: center; font-weight: normal;}
+
+
+/*****************************************************************
+
+	Umbraco UI Components
+
+/****************************************************************/
+
+.propertypane {
+	position: relative;    
+	display: block;
+	line-height: 1.1;
+	background: #fff url('/umbraco_client/propertypane/images/propertyBackground.gif') top repeat-x !Important;
+	background-image:url(/umbraco_client/propertypane/images/propertyBackground.gif) !Important;
+	padding: 5px;
+	margin:7px 0px 0px 0px;
+	border: 1px solid #d9d7d7;
+	  text-align:left;
+	  clear: both;
+	  float: none;
+	  color: black;
+	  font-size: 11px !Important;
+	}
+ 
+	.propertypane th
+	  {
+	  vertical-align: top;
+	text-align:left;
+		font-weight:bold;
+		font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+		font-size:12px;
+		width: 16%;
+		}
+		
+		.propertypane,.propertypane td
+	  {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+		font-size:12px;
+		}
+				
+		
+		.propertypane small 
+		{
+			font-weight: normal;
+			color: #666;
+		}
+		
+		.propertypane div.propertyItem{
+		  padding-bottom: 5px;
+		  clear: both;
+		  font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+		  font-size:12px;			  
+		}
+		
+		.propertypane div.propertyItem .propertyItemheader{
+		  width: 16%;
+		  padding-right: 1%;
+		  padding-bottom: 10px;
+		  float: left;
+		  clear: left;
+		  font-weight:bold;
+		}
+		
+		.propertypane div.propertyItem .propertyItemContent{
+		  float: left;
+		  padding-bottom: 5px;
+		  clear: right;
+		}
+		
+		h2.propertypaneTitel{font-size: 14px; color: #999;margin: 7px 0px 0px 0px; padding-bottom: 0px; line-height: 14px;}
+		
+		div.propertyPaneFooter{clear: both; height: 1px; overflow: hidden; color: #fff;}
+		

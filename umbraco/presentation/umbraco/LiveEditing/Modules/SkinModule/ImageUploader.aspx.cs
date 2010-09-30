@@ -16,6 +16,8 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
         //max width and height is used to make sure the cropper doesn't grow bigger then the modal window
         public int MaxWidth = 700;
         public int MaxHeight = 480;
+        public string scaleWidth = "500px";
+
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -26,7 +28,6 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
         {
             if (FileUpload1.HasFile)
             {
-                lit_notvalid.Visible = false;
                 
                 Guid g = Guid.NewGuid();
                 DirectoryInfo updir = new DirectoryInfo(IO.IOHelper.MapPath("~/media/upload/" + g));
@@ -46,14 +47,19 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                     if (!string.IsNullOrEmpty(Request["w"]) && !string.IsNullOrEmpty(Request["h"]))
                     {
 
-
                         if (Convert.ToInt32(Request["w"]) > MaxWidth || Convert.ToInt32(Request["h"]) > MaxHeight)
                         {
                             System.Drawing.Image img = System.Drawing.Image.FromFile(IO.IOHelper.MapPath(Image.Value));
 
                             Image1.Width = img.Width / 2;
                             Image1.Height = img.Height / 2;
+
+                            fb_feedback1.Text = "<strong>Notice:</strong> The below exemple is scaled down 50% as the image is quite large, do not worry, it will be the right size on your website";
                         }
+
+                        if (Image1.Width.Value > 250)
+                            scaleWidth = (Image1.Width.Value).ToString() + "px";
+
 
                         pnl_crop.Visible = true;
                         pnl_upload.Visible = false;
@@ -64,7 +70,10 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                     }
                 }
                 else
-                    lit_notvalid.Visible = true;
+                {
+                    fb_feedback1.Text = "Please choose a valid image file";
+                    fb_feedback1.type = uicontrols.Feedback.feedbacktype.error;
+                }
             }
         }
 

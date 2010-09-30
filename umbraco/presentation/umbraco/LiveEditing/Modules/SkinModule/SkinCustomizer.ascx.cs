@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,24 +11,97 @@ using umbraco.interfaces.skinning;
 using umbraco.IO;
 using umbraco.cms.businesslogic.template;
 using umbraco.BusinessLogic;
+using umbraco.presentation.nodeFactory;
+using umbraco.cms.businesslogic.packager;
 
-namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
+namespace umbraco.presentation.LiveEditing.Modules.SkinModule
 {
 
-    public partial class SkinCustomizer : System.Web.UI.UserControl
+    public partial class SkinCustomizer : UserControl
     {
-        private Skin ActiveSkin { get; set; }
+        // Fields
+
+       
+        private cms.businesslogic.packager.repositories.Repository repo;
+        private cms.businesslogic.skinning.Skin ActiveSkin;
+
+        private string repoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
         private List<Dependency> sDependencies = new List<Dependency>();
 
-        private cms.businesslogic.packager.repositories.Repository repo;
-        private string repoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
-
+        // Methods
         public SkinCustomizer()
         {
-            repo = cms.businesslogic.packager.repositories.Repository.getByGuid(repoGuid);
+            this.repo = cms.businesslogic.packager.repositories.Repository.getByGuid(this.repoGuid);
         }
 
+        protected void btnOk_Click(object sender, EventArgs e)
+        {
+            this.ActiveSkin.SaveOutput();
+            foreach (Dependency dependency in this.sDependencies)
+            {
+                if (dependency.DependencyType.Values.Count > 0)
+                {
+                    string output = dependency.DependencyType.Values[0].ToString();
+                    foreach (Task task in dependency.Tasks)
+                    {
+                        TaskExecutionDetails details = task.TaskType.Execute(this.ParsePlaceHolders(task.Value, output));
+                        if (details.TaskExecutionStatus == TaskExecutionStatus.Completed)
+                        {
+                            this.ActiveSkin.AddTaskHistoryNode(task.TaskType.ToXml(details.OriginalValue, details.NewValue));
+                        }
+                    }
+                }
+            }
+        }
+
+        protected void LoadDependencies()
+        {
+            this.ph_dependencies.Controls.Clear();
+            StringBuilder builder = new StringBuilder();
+            builder.Append("\r\n  var hasSetTasksClientScriptsRun = false; \r\n                function setTasksClientScripts(){ \r\n                    if(hasSetTasksClientScriptsRun == false){");
+            
+            foreach (Dependency dependency in this.ActiveSkin.Dependencies)
+            {
+                if (dependency.DependencyType != null)
+                {
+                    this.sDependencies.Add(dependency);
+                    Control editor = dependency.DependencyType.Editor;
+                    this.ph_dependencies.addProperty(dependency.Label, editor);
+                    foreach (Task task in dependency.Tasks)
+                    {
+                        builder.Append(task.TaskType.PreviewClientScript(editor.ClientID, dependency.DependencyType.ClientSidePreviewEventType(), dependency.DependencyType.ClientSideGetValueScript()));
+                    }
+                }
+            }
+            builder.Append("hasSetTasksClientScriptsRun = true; }}");
+            ScriptManager.RegisterClientScriptBlock(this, base.GetType(), "TasksClientScripts", builder.ToString(), true);
+        }
+
+        protected void LoadSkins()
+        {
+            Guid? nullable = Skinning.StarterKitGuid(Node.GetCurrent().template);
+            if (!(nullable.HasValue && Skinning.HasAvailableSkins(Node.GetCurrent().template)))
+            {
+                this.pChangeSkin.Visible = false;
+            }
+            else if (this.repo.HasConnection())
+            {
+                try
+                {
+                    this.rep_starterKitDesigns.DataSource = this.repo.Webservice.Skins(nullable.ToString());
+                    this.rep_starterKitDesigns.DataBind();
+                }
+                catch (Exception exception)
+                {
+                    Log.Add(LogTypes.Debug, -1, exception.ToString());
+                }
+            }
+            else
+            {
+                this.ShowConnectionError();
+            }
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -55,42 +128,14 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                 ltCustomizeSkinStyle.Text = ltChangeSkinStyle.Text;
                 ltChangeSkinStyle.Text = string.Empty;
             }
-       
-           LoadSkins();
+
+            LoadSkins();
         }
 
-        protected void LoadSkins()
+        private string ParsePlaceHolders(string value, string output)
         {
-            Guid? g = Skinning.StarterKitGuid(nodeFactory.Node.GetCurrent().template);
-
-
-            if (g == null || !Skinning.HasAvailableSkins(nodeFactory.Node.GetCurrent().template))
-            {
-                pChangeSkin.Visible = false;
-            }
-            else
-            {
-                if (repo.HasConnection())
-                {
-                    try
-                    {
-                        rep_starterKitDesigns.DataSource = repo.Webservice.Skins(g.ToString());
-                        rep_starterKitDesigns.DataBind();
-                    }
-                    catch (Exception ex)
-                    {
-                        BusinessLogic.Log.Add(BusinessLogic.LogTypes.Debug, -1, ex.ToString());
-
-                        //ShowConnectionError();
-                    }
-                }
-                else
-                {
-                    ShowConnectionError();
-                }
-            }
-
-            
+            value = value.Replace("${Output}", output);
+            return value;
         }
 
         protected void rep_starterKitDesigns_ItemDataBound(object sender, RepeaterItemEventArgs e)
@@ -118,168 +163,47 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             }
 
         }
-       
-        protected void LoadDependencies()
-        {
-            ph_dependencies.Controls.Clear();
-
-            StringBuilder s = new StringBuilder();
-
-            s.Append(@"
-                var hasSetTasksClientScriptsRun = false; 
-                function setTasksClientScripts(){ 
-                    if(hasSetTasksClientScriptsRun == false){");
-
-
-            foreach (Dependency d in ActiveSkin.Dependencies)
-            {
-                if (d.DependencyType != null)
-                {
-                    sDependencies.Add(d);
-
-                    ph_dependencies.Controls.Add(new LiteralControl("<p class=\"dependency\">"));
-
-                    Label lbl = new Label();
-
-                    lbl.Text = d.Label;
-
-                    Control ctrl = d.DependencyType.Editor;
-
-                    //lbl.AssociatedControlID = ctrl.ID;
-
-                    ph_dependencies.Controls.Add(lbl);
-
-                    ph_dependencies.Controls.Add(new LiteralControl("<br/>"));
-
-                    ph_dependencies.Controls.Add(ctrl);
-
-                    ph_dependencies.Controls.Add(new LiteralControl("</p>"));
-
-                   
-
-                    foreach (Task t in d.Tasks)
-                    {                     
-
-                        s.Append(t.TaskType.PreviewClientScript(
-                            ctrl.ClientID,
-                            d.DependencyType.ClientSidePreviewEventType(),
-                            d.DependencyType.ClientSideGetValueScript()));
-                       
-                        //ScriptManager.RegisterClientScriptBlock(
-                        //    this,
-                        //    this.GetType(),
-                        //    d.Label + "_" + t.TaskType.Name,
-                        //    t.TaskType.PreviewClientScript(ctrl.ClientID,d.Properties),
-                        //    true);
-
-                    }
-
-                   
-                }
-
-               
-            }
-
-            s.Append("hasSetTasksClientScriptsRun = true; }}");
-
-            ScriptManager.RegisterClientScriptBlock(
-                this,
-                this.GetType(),
-                "TasksClientScripts",
-                s.ToString(),
-                true);
-
-        }
-
-        protected void btnOk_Click(object sender, EventArgs e)
-        {         
-            ActiveSkin.SaveOutput();
-
-            foreach (Dependency d in sDependencies)
-            {
-                if (d.DependencyType.Values.Count > 0)
-                {
-                    string output = d.DependencyType.Values[0].ToString();
-
-                    foreach (Task t in d.Tasks)
-                    {
-                        TaskExecutionDetails details = t.TaskType.Execute(ParsePlaceHolders(t.Value, output));
-
-                        if (details.TaskExecutionStatus == TaskExecutionStatus.Completed)
-                        {
-                            ActiveSkin.AddTaskHistoryNode(
-                                t.TaskType.ToXml(details.OriginalValue,details.NewValue));
-                        }
-                    }
-                }
-            }
-
-         
-        }
-
-        private string ParsePlaceHolders(string value,string output)
-        {
-            //parse ${Output}
-            value = value.Replace("${Output}", output);
-
-            return value;
-        }
 
         protected void SelectStarterKitDesign(object sender, EventArgs e)
         {
             if (((Button)sender).CommandName == "apply")
             {
-                Skin s = Skin.CreateFromName(((Button)sender).CommandArgument);
-                Skinning.ActivateAsCurrentSkin(s);
-
-                Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())) + "?umbSkinning=true&umbSkinningConfigurator=true");
+                Skinning.ActivateAsCurrentSkin(Skin.CreateFromName(((Button)sender).CommandArgument));
+                this.Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
             }
             else if (((Button)sender).CommandName == "remove")
             {
-                nodeFactory.Node n = nodeFactory.Node.GetCurrent();
-
-                Template t = new Template(n.template);
-                Skinning.RollbackSkin(t.Id);
-
-                Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())) + "?umbSkinning=true");
+                Template template = new Template(Node.GetCurrent().template);
+                Skinning.RollbackSkin(template.Id);
+                this.Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
             }
             else
             {
-                Guid kitGuid = new Guid(((Button)sender).CommandArgument);
-
-                cms.businesslogic.packager.Installer installer = new cms.businesslogic.packager.Installer();
-
-                if (repo.HasConnection())
+                Guid guid = new Guid(((Button)sender).CommandArgument);
+                Installer installer = new Installer();
+                if (this.repo.HasConnection())
                 {
-                    cms.businesslogic.packager.Installer p = new cms.businesslogic.packager.Installer();
-
-                    string tempFile = p.Import(repo.fetch(kitGuid.ToString()));
-                    p.LoadConfig(tempFile);
-                    int pID = p.CreateManifest(tempFile, kitGuid.ToString(), repoGuid);
-
-                    p.InstallFiles(pID, tempFile);
-                    p.InstallBusinessLogic(pID, tempFile);
-                    p.InstallCleanUp(pID, tempFile);
-
+                    Installer installer2 = new Installer();
+                    string tempDir = installer2.Import(this.repo.fetch(guid.ToString()));
+                    installer2.LoadConfig(tempDir);
+                    int packageId = installer2.CreateManifest(tempDir, guid.ToString(), this.repoGuid);
+                    installer2.InstallFiles(packageId, tempDir);
+                    installer2.InstallBusinessLogic(packageId, tempDir);
+                    installer2.InstallCleanUp(packageId, tempDir);
                     library.RefreshContent();
-
-                    Skin s = Skin.CreateFromName(((Button)sender).CommandName);
-                    Skinning.ActivateAsCurrentSkin(s);
-
-                    Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
+                    Skinning.ActivateAsCurrentSkin(Skin.CreateFromName(((Button)sender).CommandName));
+                    this.Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
                 }
                 else
                 {
-                    ShowConnectionError();
+                    this.ShowConnectionError();
                 }
             }
         }
 
-
         private void ShowConnectionError()
         {
-            pnl_connectionerror.Visible = true;
+            this.pnl_connectionerror.Visible = true;
         }
-   
     }
 }

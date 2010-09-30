@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule {
+namespace umbraco.presentation.LiveEditing.Modules.SkinModule {
     
     
     public partial class SkinCustomizer {
@@ -37,16 +37,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder ph_dependencies;
-        
-        /// <summary>
-        /// pChangeSkin control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl pChangeSkin;
+        protected global::umbraco.uicontrols.Pane ph_dependencies;
         
         /// <summary>
         /// btnOk control.
@@ -56,6 +47,15 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnOk;
+        
+        /// <summary>
+        /// pChangeSkin control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl pChangeSkin;
         
         /// <summary>
         /// ltChangeSkinStyle control.
