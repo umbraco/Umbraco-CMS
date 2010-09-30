@@ -232,7 +232,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                 Skin s = Skin.CreateFromName(((Button)sender).CommandArgument);
                 Skinning.ActivateAsCurrentSkin(s);
 
-                Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())) + "?umbSkinning=true");
+                Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())) + "?umbSkinning=true&umbSkinningConfigurator=true");
             }
             else if (((Button)sender).CommandName == "remove")
             {
