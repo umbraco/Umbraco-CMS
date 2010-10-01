@@ -55,7 +55,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             m_SkinButton.ToolTip = ActiveSkin != null && ActiveSkin.Dependencies.Count > 0 ? "Customize skin" : "Change skin";
             m_SkinButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/SKinModule/skin.png", SystemDirectories.Umbraco);
 
-            string s = (ActiveSkin != null && ActiveSkin.Dependencies.Count > 0 ? "setTasksClientScripts();" : "") + "jQuery('#" + m_SkinModal.ClientID + @"').show();" + "jQuery('#" + m_SkinModal.ClientID + @"').ModalWindowShow('" + ui.GetText("skin") + "',true,500,400,50,0, ['.modalbuton'], null);";
+            string s = (ActiveSkin != null && ActiveSkin.Dependencies.Count > 0 ? "setTasksClientScripts();" : "") + "jQuery('#" + m_SkinModal.ClientID + @"').show();" + "jQuery('#" + m_SkinModal.ClientID + @"').ModalWindowShowWithoutBackground('" + ui.GetText("skin") + "',true,500,400,50,0, ['.modalbuton'], null);";
 
             m_SkinButton.OnClientClick = s +"return false;";
 
