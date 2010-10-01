@@ -7,20 +7,25 @@
 
     jQuery(document).ready(function () {
         jQuery('.selectSkin').click(function () {
-            jQuery('#starterKitDesigns').hide();
+            jQuery('#skinselector').hide();
+
+            jQuery('#skinname').html(jQuery('span', this).html());
+
             jQuery('#installingSkin').show();
+
         });
 
     });
 
-</script>   
+</script>
 
 
 <div id="installingSkin" style="display:none;">
-<h2>Installing selected skin, please wait...</h2>
-<h2>You will be transfered to a visual editor to personalize the skin</h2>
+<p>Installing <span id="skinname">selected</span> skin...</p>
+
 </div>
 
+<div id="skinselector">
 <asp:Repeater ID="rep_starterKitDesigns" runat="server">
     <HeaderTemplate>
         <ul id="starterKitDesigns">
@@ -52,6 +57,7 @@
       
     </FooterTemplate>
 </asp:Repeater>
+</div>
 
 <script type="text/javascript">
 

@@ -34,7 +34,7 @@
 
        .declineStarterKits{display: block; text-align: center; font-size: 1.5em; padding: 20px;}
 
-        #starterKitDesc, #starterKitDesignDesc{clear: both; font-size: 1.5em; font-weight: bold; color: #999; padding: 10px; text-align: center;}
+        #starterKitDesc, #starterKitDesignDesc, #installingSkin, #installingStarterKit{clear: both; font-size: 1.5em; font-weight: bold; color: #999; padding: 10px; text-align: center;}
        
        .webpi #buttons input{display: none !Important;}
        

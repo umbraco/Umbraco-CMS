@@ -32,7 +32,8 @@ namespace umbraco.presentation.install.steps
                 errorLiteral.Text = ex.ToString();
             }
 
-            if (cms.businesslogic.packager.InstalledPackage.isPackageInstalled("ae41aad0-1c30-11dd-bd0b-0800200c9a66")) {
+            if (cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
+            {
                 viewSite.Visible = true;
             }
 

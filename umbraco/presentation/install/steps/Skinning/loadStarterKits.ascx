@@ -7,7 +7,10 @@
 
 jQuery(document).ready(function () {
     jQuery('.selectStarterKit').click(function () {
-        jQuery('#starterkits').hide();
+        jQuery('#starterkitsselector').hide();
+
+        jQuery('#starterkitname').html(jQuery('span', this).html());
+
         jQuery('#installingStarterKit').show();
     });
 
@@ -16,9 +19,10 @@ jQuery(document).ready(function () {
 </script>
 
 <div id="installingStarterKit" style="display:none;">
-<h2>Installing selected starter kit, please wait...</h2>
+<p>Installing <span id="starterkitname">selected</span> starter kit...</p>
 </div>
 
+<div id="starterkitsselector">
 <asp:Repeater ID="rep_starterKits" runat="server">
     <HeaderTemplate>
         <ul id="starterkits">
@@ -46,7 +50,7 @@ jQuery(document).ready(function () {
 
     </FooterTemplate>
 </asp:Repeater>
-    
+ </div>   
 
 <script type="text/javascript">
 

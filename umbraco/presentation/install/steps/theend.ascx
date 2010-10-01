@@ -46,13 +46,13 @@ Receive security bulletins and our monthly newsletter with special offers. No sp
 </p>
 </div>
 
-<div style="display: none">
+
 <asp:PlaceHolder ID="viewSite" runat="server" Visible="false">
-<a href="/" target="_blank"><h3>Browse your new site</h3>
+<a href="<%= umbraco.GlobalSettings.Path %>/canvas.aspx?redir=<%= this.ResolveUrl("~/")  %>&umbSkinning=true&umbSkinningConfigurator=true" target="_blank"><h3>Browse and customize your new site</h3>
 You installed a starter package, so why not see what your new website looks like.
 </a>
 </asp:PlaceHolder>
-</div>
+
 
 <a href="<%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/umbraco.aspx"><h3>Launch Umbraco</h3>
 To manage your website, simply open the umbraco back office and start adding content, updating the templates and stylesheets or add new functionality
