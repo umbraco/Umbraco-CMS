@@ -40,3 +40,47 @@
        
 
        #loadingBar{display: none;}
+       
+       
+       .error, .notice, .success
+        {
+            padding: .8em;
+            padding-top: 0em;
+            padding-bottom: 0em;
+            margin-bottom: .5em;
+            border: 2px solid #ddd;
+        }
+        .error
+        {
+            background: #FBE3E4;
+            color: #8a1f11;
+            border-color: #FBC2C4;
+        }
+        .notice
+        {
+            background: #FFF6BF;
+            color: #514721;
+            border-color: #FFD324;
+        }
+        .success
+        {
+            background: #E6EFC2;
+            color: #264409;
+            border-color: #C6D880;
+        }
+        .error a
+        {
+            color: #8a1f11;
+        }
+        .notice a
+        {
+            color: #514721;
+        }
+        .success a
+        {
+            color: #264409;
+        }
+        .errormessage
+        {
+            color: #8a1f11;
+        }
