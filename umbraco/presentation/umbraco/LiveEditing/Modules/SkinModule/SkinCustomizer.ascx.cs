@@ -114,7 +114,7 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
 
             nodeFactory.Node n = nodeFactory.Node.GetCurrent();
 
-            ActiveSkin = Skin.CreateFromAlias(Skinning.GetCurrentSkinAlias(n.template));
+            ActiveSkin = Skin.CreateFromAlias( Skinning.GetCurrentSkinAlias(n.template) );
 
             pnl_connectionerror.Visible = false;
 
@@ -171,7 +171,7 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
             if (((Button)sender).CommandName == "apply")
             {
                 Skinning.ActivateAsCurrentSkin(Skin.CreateFromName(((Button)sender).CommandArgument));
-                this.Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
+                this.Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())) + "?umbSkinning=true");
             }
             else if (((Button)sender).CommandName == "remove")
             {
