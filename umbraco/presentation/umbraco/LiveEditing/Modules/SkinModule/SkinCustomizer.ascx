@@ -5,7 +5,7 @@
 
 <script type="text/javascript">
     function closeCustomizeSkinModal() {
-        //jQuery('#cancelSkinInstall').trigger('click');
+        jQuery('#cancelSkinInstall').trigger('click');
         UmbSpeechBubble.ShowMessage("Info", "Skin", "Skin updated...");
     }
 </script>
@@ -17,18 +17,21 @@
 
 <div id="costumizeSkin" <asp:Literal ID="ltCustomizeSkinStyle" runat="server" Text=""></asp:Literal>>
 
+    <p>
+        Personalize your skin, by defining colors, images and texts
+    </p>
+    
     <div id="dependencies">
         <cc1:Pane ID="ph_dependencies" runat="server" />
     </div>
 
-    <p>
+    <p style="margin-top: 20px;">
         <asp:Button ID="btnOk" runat="server" Text=" Ok " CssClass="modalButton" onclick="btnOk_Click" OnClientClick="closeCustomizeSkinModal();"/>
         <em> or </em> <a href="#" onclick="closeModal();">Cancel</a>
     </p>
 
 
-
-    <p runat="server" id="pChangeSkin">You could also change to another skin <a href="#" onclick="jQuery('#costumizeSkin').hide();jQuery('#changeSkin').show();">change</a> skin</p>
+    <p runat="server" id="pChangeSkin" style="margin-top: 25px; border-top: 1px solid #efefef; padding: 7px">You could also change to another skin: <a href="#" onclick="jQuery('#costumizeSkin').hide();jQuery('#changeSkin').show();">Browse available skins</a></p>
 
 </div>
 
@@ -50,7 +53,7 @@
                        <img src="<%# ((Skin)Container.DataItem).Thumbnail %>" alt="<%# ((Skin)Container.DataItem).Text %>" />
                        <span><%# ((Skin)Container.DataItem).Text %></span>
                         <br />
-                        <asp:LinkButton ID="Button1" runat="server" Text="Install" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>" OnClick="SelectStarterKitDesign" CommandName="<%# ((Skin)Container.DataItem).Text %>"/>
+                        <asp:Button ID="Button1" runat="server" Text="Install" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>" OnClick="SelectStarterKitDesign" CommandName="<%# ((Skin)Container.DataItem).Text %>"/>
                     </li>
                 </ItemTemplate>            
             <FooterTemplate>
@@ -61,8 +64,8 @@
     </div>
 
 
-    <p runat="server" id="pCustomizeSkin">
-        <button onclick="jQuery('#changeSkin').hide(); jQuery('#costumizeSkin').show();">Cancel</button>
+    <p runat="server" id="pCustomizeSkin" style="clear: both; margin-top: 25px; border-top: 1px solid #efefef; padding: 7px" >
+        <a onclick="jQuery('#changeSkin').hide(); jQuery('#costumizeSkin').show();">Go back to your current skin</a>
     </p>
 
 </div>

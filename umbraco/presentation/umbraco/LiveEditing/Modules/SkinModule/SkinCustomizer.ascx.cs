@@ -147,7 +147,7 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                 if (Skinning.IsSkinInstalled(s.RepoGuid))
                 {
                     Button inst = (Button)e.Item.FindControl("Button1");
-                    inst.Text = "Apply (already downloaded)";
+                    inst.Text = "Apply";
                     inst.CommandName = "apply";
                     inst.CommandArgument = s.Text;
 
@@ -156,7 +156,7 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                 if (ActiveSkin.Name == s.Text)
                 {
                     Button inst = (Button)e.Item.FindControl("Button1");
-                    inst.Text = "Rollback (active skin)";
+                    inst.Text = "Rollback";
                     inst.CommandName = "remove";
                     inst.CommandArgument = s.Text;
                 }
@@ -175,7 +175,7 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
             {
                 Template template = new Template(Node.GetCurrent().template);
                 Skinning.RollbackSkin(template.Id);
-                this.Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
+                this.Page.Response.Redirect( library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())) +"?umbSkinning=true" );
             }
             else
             {
@@ -192,7 +192,7 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                     installer2.InstallCleanUp(packageId, tempDir);
                     library.RefreshContent();
                     Skinning.ActivateAsCurrentSkin(Skin.CreateFromName(((Button)sender).CommandName));
-                    this.Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())));
+                    this.Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())) + "?umbSkinning=true");
                 }
                 else
                 {

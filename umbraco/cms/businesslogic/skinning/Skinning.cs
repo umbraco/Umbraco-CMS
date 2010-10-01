@@ -33,13 +33,15 @@ namespace umbraco.cms.businesslogic.skinning
             string currentSkin = GetCurrentSkinAlias(template);
             Skin skin = Skin.CreateFromAlias(currentSkin);
 
-            skin.RollbackDependencies();
+            if (skin != null) {
+              skin.RollbackDependencies();
 
-            if (skin.OverridesTemplates())
+              if (skin.OverridesTemplates())
                 skin.RollbackTemplateFiles();
 
-            //else
-            //    skin.RollbackDependencies();
+              //else
+              //    skin.RollbackDependencies();
+            }
 
             RemoveSkin(template);
             save();
