@@ -3,7 +3,22 @@
 
 <asp:Panel id="pl_loadStarterKitDesigns" runat="server">
 
+<script type="text/javascript">
 
+    jQuery(document).ready(function () {
+        jQuery('.selectSkin').click(function () {
+            jQuery('#starterKitDesigns').hide();
+            jQuery('#installingSkin').show();
+        });
+
+    });
+
+</script>
+
+
+<div id="installingSkin" style="display:none;">
+<p>Installing selected skin...</p>
+</div>
 
 <asp:Repeater ID="rep_starterKitDesigns" runat="server">
     <HeaderTemplate>
@@ -12,7 +27,7 @@
     <ItemTemplate>
         <li>
 
-        <asp:LinkButton ID="bt_selectKit" runat="server" onclick="SelectStarterKitDesign" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>">
+        <asp:LinkButton CssClass="selectSkin" ID="bt_selectKit" runat="server" onclick="SelectStarterKitDesign" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>">
 
          <img src="<%# ((Skin)Container.DataItem).Thumbnail %>" alt="<%# ((Skin)Container.DataItem).Text %>" />
         

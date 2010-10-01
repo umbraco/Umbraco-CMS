@@ -3,6 +3,21 @@
 
 <asp:Panel id="pl_loadStarterKits" runat="server">
 
+<script type="text/javascript">
+
+jQuery(document).ready(function () {
+    jQuery('.selectStarterKit').click(function () {
+        jQuery('#starterkits').hide();
+        jQuery('#installingStarterKit').show();
+    });
+
+});
+
+</script>
+
+<div id="installingStarterKit" style="display:none;">
+<p>Installing selected starter kit...</p>
+</div>
 
 <asp:Repeater ID="rep_starterKits" runat="server">
     <HeaderTemplate>
@@ -10,7 +25,7 @@
     </HeaderTemplate>
     <ItemTemplate>
         <li>
-        <asp:LinkButton ID="bt_selectKit" runat="server" onclick="SelectStarterKit" CommandArgument="<%# ((Package)Container.DataItem).RepoGuid %>">
+        <asp:LinkButton CssClass="selectStarterKit" ID="bt_selectKit" runat="server" onclick="SelectStarterKit" CommandArgument="<%# ((Package)Container.DataItem).RepoGuid %>">
         
         <img src="<%# ((Package)Container.DataItem).Thumbnail %>" alt="<%# ((Package)Container.DataItem).Text %>" />
         
