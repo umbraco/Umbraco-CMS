@@ -106,7 +106,12 @@ namespace umbraco.presentation.install.steps.Skinning
                     pa.GotoNextStep(helper.Request("installStep"));
                 }
 
-                ((skinning)Parent.Parent.Parent).showCustomizeSkin();
+                //((skinning)Parent.Parent.Parent).showCustomizeSkin();
+
+                pl_CustomizeSkin.Visible = true;
+                pl_loadStarterKitDesigns.Visible = false;
+                Page.FindControl("next").Visible = true;
+
             }
             else
             {

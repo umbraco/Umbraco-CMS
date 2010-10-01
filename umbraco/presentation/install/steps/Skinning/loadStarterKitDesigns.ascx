@@ -1,6 +1,13 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="loadStarterKitDesigns.ascx.cs" Inherits="umbraco.presentation.install.steps.Skinning.loadStarterKitDesigns" %>
 <%@ Import Namespace="umbraco.cms.businesslogic.packager.repositories"  %>
 
+<asp:Panel id="pl_CustomizeSkin" runat="server" Visible="false">
+<h3>Starter kit and skin have been installed</h3>
+<p><a target="_blank" href="<%= umbraco.GlobalSettings.Path %>/canvas.aspx?redir=<%= this.ResolveUrl("~/")  %>&umbSkinning=true&umbSkinningConfigurator=true" target="_blank">Browse and customize your new site</a></p>
+
+
+</asp:Panel>
+
 <asp:Panel id="pl_loadStarterKitDesigns" runat="server">
 
 <script type="text/javascript">
