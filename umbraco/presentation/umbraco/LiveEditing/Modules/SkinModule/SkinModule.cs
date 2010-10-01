@@ -16,6 +16,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 {
     [ClientDependency(200, ClientDependencyType.Javascript, "modal/modal.js", "UmbracoClient")]
     [ClientDependency(200, ClientDependencyType.Css, "modal/style.css", "UmbracoClient")]
+    [ClientDependency(800, ClientDependencyType.Javascript, "LiveEditing/Modules/SkinModule/js/disableInstallButtonsOnClick.js", "UmbracoRoot")]
     public class SkinModule : BaseModule
     {
         protected LabelButton m_SkinButton = new LabelButton();

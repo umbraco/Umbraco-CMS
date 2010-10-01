@@ -150,15 +150,17 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                     inst.Text = "Apply";
                     inst.CommandName = "apply";
                     inst.CommandArgument = s.Text;
+                    //inst.ID = s.Text;
 
                 }
 
-                if (ActiveSkin.Name == s.Text)
+                if (ActiveSkin != null && ActiveSkin.Name == s.Text)
                 {
                     Button inst = (Button)e.Item.FindControl("Button1");
                     inst.Text = "Rollback";
                     inst.CommandName = "remove";
                     inst.CommandArgument = s.Text;
+                    //inst.ID = s.Text;
                 }
             }
 

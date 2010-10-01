@@ -1628,6 +1628,7 @@
     <Content Include="umbraco\images\loginBg.png" />
     <Content Include="umbraco\images\umbracoSplash.png" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\disableInstallButtonsOnClick.js" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\SkinModuleShowOnStartup.js" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\skin.png" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />

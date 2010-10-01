@@ -5,8 +5,16 @@
 
 <script type="text/javascript">
     function closeCustomizeSkinModal() {
-        jQuery('#cancelSkinInstall').trigger('click');
+        closeSkinModal();
         UmbSpeechBubble.ShowMessage("Info", "Skin", "Skin updated...");
+    }
+
+    function closeSkinModal() {
+        jQuery('#closeSkinInstall').trigger('click');
+    }
+
+    function cancelSkinCustomization() {
+        jQuery('#cancelSkinCustomization').trigger('click');
     }
 </script>
 
@@ -14,6 +22,11 @@
 <p>Connection to repository failed...</p>
 </asp:Panel>
 
+<!-- Needs to change -->
+<input type="submit" class="modalbuton" id="closeSkinInstall" value=""  style="display:none;"/>
+
+<input type="submit" class="modalbuton" id="cancelSkinCustomization" value="" style="display:none;"/>
+<!-- Using some hidden controls -->
 
 <div id="costumizeSkin" <asp:Literal ID="ltCustomizeSkinStyle" runat="server" Text=""></asp:Literal>>
 
@@ -27,7 +40,7 @@
 
     <p style="margin-top: 20px;">
         <asp:Button ID="btnOk" runat="server" Text=" Ok " CssClass="modalButton" onclick="btnOk_Click" OnClientClick="closeCustomizeSkinModal();"/>
-        <em> or </em> <a href="#" onclick="closeModal();">Cancel</a>
+        <em> or </em> <a href="#" onclick="cancelSkinCustomization();">Cancel</a>
     </p>
 
 
@@ -43,6 +56,9 @@
         Choose a skin from your local collection, or download one from the umbraco package repository
     </p>
 
+    <div id="skinupdateinprogress" style="display:none;">
+    <p>Skin is being updated...</p>
+    </div>
     <div id="skins">
         <asp:Repeater ID="rep_starterKitDesigns" runat="server" onitemdatabound="rep_starterKitDesigns_ItemDataBound">
             <HeaderTemplate>
@@ -53,7 +69,7 @@
                        <img src="<%# ((Skin)Container.DataItem).Thumbnail %>" alt="<%# ((Skin)Container.DataItem).Text %>" />
                        <span><%# ((Skin)Container.DataItem).Text %></span>
                         <br />
-                        <asp:Button ID="Button1" runat="server" Text="Install" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>" OnClick="SelectStarterKitDesign" CommandName="<%# ((Skin)Container.DataItem).Text %>"/>
+                        <asp:Button ID="Button1" CssClass="selectskin" runat="server" Text="Install" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>" OnClick="SelectStarterKitDesign" CommandName="<%# ((Skin)Container.DataItem).Text %>"/>
                     </li>
                 </ItemTemplate>            
             <FooterTemplate>
