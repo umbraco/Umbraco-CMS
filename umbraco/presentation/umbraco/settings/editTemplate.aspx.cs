@@ -131,7 +131,8 @@ namespace umbraco.cms.presentation.settings
                 uicontrols.MenuIconI umbContainer = Panel1.Menu.NewIcon();
                 umbContainer.ImageURL = UmbracoPath + "/images/editor/masterpagePlaceHolder.gif";
                 umbContainer.AltText = ui.Text("template", "modifyTemplateSkin");
-                umbContainer.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/TemplateSkinning.aspx?&id=" + _template.Id.ToString(), ui.Text("template", "modifyTemplateSkin"), 570, 420);
+                //umbContainer.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/TemplateSkinning.aspx?&id=" + _template.Id.ToString(), ui.Text("template", "modifyTemplateSkin"), 570, 420);
+                umbContainer.OnClickCommand = "parent.window.location = '" + GlobalSettings.Path + "/canvas.aspx?redir=" + this.ResolveUrl("~/") + "&umbSkinning=true&umbSkinningConfigurator=true" + "'";
             }
 
 
