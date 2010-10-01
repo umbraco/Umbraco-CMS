@@ -13,11 +13,12 @@
 
     });
 
-</script>
+</script>   
 
 
 <div id="installingSkin" style="display:none;">
-<p>Installing selected skin...</p>
+<h2>Installing selected skin, please wait...</h2>
+<h2>You will be transfered to a visual editor to personalize the skin</h2>
 </div>
 
 <asp:Repeater ID="rep_starterKitDesigns" runat="server">

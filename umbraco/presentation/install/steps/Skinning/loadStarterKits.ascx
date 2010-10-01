@@ -16,7 +16,7 @@ jQuery(document).ready(function () {
 </script>
 
 <div id="installingStarterKit" style="display:none;">
-<p>Installing selected starter kit...</p>
+<h2>Installing selected starter kit, please wait...</h2>
 </div>
 
 <asp:Repeater ID="rep_starterKits" runat="server">
