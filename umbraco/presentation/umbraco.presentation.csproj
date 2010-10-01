@@ -1625,6 +1625,7 @@
     <Content Include="umbraco\dialogs\TemplateSkinning.aspx" />
     <Content Include="umbraco\helpRedirect.aspx" />
     <Content Include="umbraco\images\aboutNew.png" />
+    <Content Include="umbraco\images\editor\skin.gif" />
     <Content Include="umbraco\images\loginBg.png" />
     <Content Include="umbraco\images\umbracoSplash.png" />
     <Content Include="umbraco\images\umbraco\settingSkin.gif" />
