@@ -46,9 +46,15 @@ namespace umbraco.presentation.install.steps.Definitions
         public override bool Completed()
         {
             bool retval = false;
-            IInstallerUtility m_Installer = BusinessLogic.Application.SqlHelper.Utility.CreateInstaller();
-            retval = m_Installer.IsLatestVersion;
-            m_Installer = null;
+            try
+            {
+                IInstallerUtility m_Installer = BusinessLogic.Application.SqlHelper.Utility.CreateInstaller();
+                retval = m_Installer.IsLatestVersion;
+                m_Installer = null;
+            } catch {
+                // this step might fail due to missing connectionstring
+                return false;
+            }
 
             return retval;
         }

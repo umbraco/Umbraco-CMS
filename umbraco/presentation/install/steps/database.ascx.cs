@@ -7,6 +7,8 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.DataLayer;
 using umbraco.DataLayer.Utility.Installer;
+using System.IO;
+using umbraco.IO;
 
 namespace umbraco.presentation.install.steps
 {
@@ -43,8 +45,7 @@ namespace umbraco.presentation.install.steps
         /// </summary>
         protected bool IsEmbeddedDatabase
         {
-            get { return (DatabaseType.SelectedItem.Text.Contains("VistaDB") ||
-                          (DatabaseType.SelectedValue=="SqlServerE")); }
+            get { return DatabaseType.SelectedValue.ToLower().Contains("sqlce"); }
         }
 
         /// <summary>
@@ -77,9 +78,12 @@ namespace umbraco.presentation.install.steps
         /// </summary>
         protected void ShowDatabaseSettings()
         {
+
             // Did the connection string of web.config get loaded?
             if (!Page.IsPostBack)
             {
+
+
                 // Parse the connection string
                 DbConnectionStringBuilder connectionStringBuilder = new DbConnectionStringBuilder();
                 connectionStringBuilder.ConnectionString = GlobalSettings.DbDSN;
@@ -225,9 +229,9 @@ namespace umbraco.presentation.install.steps
                 connectionStringBuilder["user id"] = DatabaseUsername.Text;
                 connectionStringBuilder["password"] = DatabasePassword.Text;
             }
-            else if (DatabaseType.SelectedValue == ("SqlServerE"))
+            else if (DatabaseType.SelectedValue == ("SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco"))
             {
-                connectionStringBuilder.ConnectionString = @"Data Source=.\SQLEXPRESS;AttachDbFilename=|DataDirectory|\umbraco.mdf;Integrated Security=True;User Instance=True;Database=umbraco";
+                connectionStringBuilder.ConnectionString = @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf";
             }
 
             if (!String.IsNullOrEmpty(DatabaseType.SelectedValue) && !DatabaseType.SelectedValue.Contains("SqlServer"))
@@ -256,6 +260,16 @@ namespace umbraco.presentation.install.steps
         /// <param name="e">The event arguments.</param>
         protected void DatabaseType_SelectedIndexChanged(object sender, EventArgs e)
         {
+            // check if sql ce is present
+            if (DatabaseType.SelectedValue == "SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco")
+            {
+                if (!File.Exists(IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Bin), "System.Data.SqlServerCe.dll"))))
+                {
+                    sqlCeNotice.Visible = true;
+                }
+            }
+
+
             DatabaseServerItem.Visible = !ManualConnectionString && !IsEmbeddedDatabase;
             DatabaseUsernameItem.Visible = !ManualConnectionString && !IsEmbeddedDatabase;
             DatabasePasswordItem.Visible = !ManualConnectionString && !IsEmbeddedDatabase;
