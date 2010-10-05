@@ -8,7 +8,7 @@
   </xsl:template>
 
   <xsl:template match="/configuration/appSettings/add[@key='umbracoConfigurationStatus']/@value">
-    <xsl:attribute name="value">4.5.1</xsl:attribute>
+    <xsl:attribute name="value">4.6.0.Alpha</xsl:attribute>
   </xsl:template>
 
   <xsl:template match="/configuration/appSettings/add[@key='umbracoContentXML']/@value">

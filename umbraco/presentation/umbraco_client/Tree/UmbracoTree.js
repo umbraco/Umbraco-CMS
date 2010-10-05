@@ -126,6 +126,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 this._opts.recycleBinId = id;
             },
 
+            //TODO: add public method to clear a specific tree cache
             clearTreeCache: function() {
                 // <summary>This will remove all stored trees in client side cache so that the next time a tree needs loading it will be refreshed</summary>
                 this._debug("clearTreeCache...");
@@ -181,7 +182,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     this.clearTreeCache();
                     this._opts.app = this._opts.app;
                 }
-                else if (this._tree&& (this._opts.app.toLowerCase() == app.toLowerCase())) {
+                else if (this._tree && (this._opts.app.toLowerCase() == app.toLowerCase())) {
                     this._debug("not rebuilding");
                     
                     //don't rebuild if the tree object exists, the app that's being requested to be loaded is 
@@ -201,6 +202,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 //check if we should rebuild from a saved tree
                 var saveData = this._loadedApps["tree_" + app];
+
+                this.setActiveTreeType(app);
 
                 if (saveData != null) {
                     this._debug("rebuildTree: rebuilding from cache: app = " + app);
@@ -228,8 +231,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         };
                         this._debug("rebuildTree: syncing to last selected: " + lastSelected);
                         //add the event handler for the tree sync and sync the tree
-                        this.addEventHandler("syncFound", foundHandler);
-                        this.setActiveTreeType($(saveData.selected[0]).attr("umb:type"));
+                        this.addEventHandler("syncFound", foundHandler);                        
                         this.syncTree(lastSelected);
                     }
 

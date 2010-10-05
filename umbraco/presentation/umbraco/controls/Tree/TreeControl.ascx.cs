@@ -14,6 +14,7 @@ using umbraco.BasePages;
 using System.Web.Services;
 using System.Drawing;
 using umbraco.BusinessLogic;
+using System.Linq;
 
 namespace umbraco.controls.Tree
 {
@@ -217,8 +218,16 @@ namespace umbraco.controls.Tree
             if (!page.ValidateUserApp(GetCurrentApp()))
                 throw new ArgumentException("The current user doesn't have access to this application. Please contact the system administrator.");
 
-            //find all tree definitions that have the current application alias that are ACTIVE
+            //find all tree definitions that have the current application alias that are ACTIVE.
+            //if an explicit tree has been requested, then only load that tree in.
             m_ActiveTreeDefs = TreeDefinitionCollection.Instance.FindActiveTrees(GetCurrentApp());
+            if (!string.IsNullOrEmpty(this.TreeType))
+            {
+                m_ActiveTreeDefs = m_ActiveTreeDefs
+                    .Where(x => x.Tree.Alias == this.TreeType)
+                    .ToList(); //this will only return 1
+            }
+
             //find all tree defs that exists for the current application regardless of if they are active
             List<TreeDefinition> appTreeDefs = TreeDefinitionCollection.Instance.FindTrees(GetCurrentApp());
 
