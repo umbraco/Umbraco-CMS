@@ -10,7 +10,7 @@
 namespace dashboardUtilities {
     
     
-    public partial class StartupMediaDashboard {
+    public partial class StartupMemberDashboard {
         
         /// <summary>
         /// startPanel control.
@@ -22,22 +22,13 @@ namespace dashboardUtilities {
         protected global::System.Web.UI.WebControls.Panel startPanel;
         
         /// <summary>
-        /// zipUploadPanel control.
+        /// memberSearch1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel zipUploadPanel;
-        
-        /// <summary>
-        /// zipupload1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::Nibble.Umb.ZipUpload.zipupload zipupload1;
+        protected global::umbraco.presentation.umbraco.members.MemberSearch memberSearch1;
         
         /// <summary>
         /// learnPanel control.

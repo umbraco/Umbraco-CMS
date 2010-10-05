@@ -161,7 +161,7 @@
 <div class="guiDialogNormal" style="margin: 10px">
         <p>
                 Check here to hide this dashboard in the future <asp:CheckBox ID="hideCheckBox" 
-                runat="server" oncheckedchanged="hideCheckBox_CheckedChanged"></asp:CheckBox>
+                runat="server" oncheckedchanged="hideCheckBox_CheckedChanged" AutoPostBack="true"></asp:CheckBox>
         </p>
 </div>
 </div>

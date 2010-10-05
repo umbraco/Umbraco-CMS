@@ -9,7 +9,7 @@
     using System.Web.UI.WebControls;
     using umbraco.BusinessLogic;
 
-    public partial class StartupDeveloperDashboard : System.Web.UI.UserControl
+    public partial class StartupMemberDashboard : System.Web.UI.UserControl
     {
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -25,13 +25,13 @@
             XmlDocument doc = new XmlDocument();
             doc.LoadXml("<Action runat='uninstall'  " +
                         "alias='addDashboardSection' " +
-                        "dashboardAlias='StartupDeveloperDashboardSection'>" +
-                        "<section alias='StartupDeveloperDashboardSection'>" +
+                        "dashboardAlias='StartupMemberDashboardSection'>" +
+                        "<section alias='StartupMemberDashboardSection'>" +
                         "<areas>" +
-                        "<area>developer</area>" +
+                        "<area>member</area>" +
                         "</areas>" +
                         "<tab caption='Get Started'>" +
-                        "<control>/umbraco/dashboard/startupdeveloperdashboard.ascx</control>" +
+                        "<control>/umbraco/dashboard/startupmemberdashboard.ascx</control>" +
                         "</tab>" +
                         "</section>" +
                         "</Action>");
@@ -44,7 +44,7 @@
                 {
                     case (true):
                         // update dashboard.config to remove dashboard entry
-                        umbraco.cms.businesslogic.packager.PackageAction.UndoPackageAction("StartupDeveloperDashboard", "addDashboardSection", n);
+                        umbraco.cms.businesslogic.packager.PackageAction.UndoPackageAction("StartupMemberDashboard", "addDashboardSection", n);
                         break;
                     default:
                         break;

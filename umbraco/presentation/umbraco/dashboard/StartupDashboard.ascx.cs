@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Xml;
     using System.Web;
     using System.Web.UI;
     using System.Web.UI.WebControls;
@@ -40,17 +41,39 @@
         /// </summary>
         protected void hideCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            switch (hideCheckBox.Checked)
-            {
-                case(true):
-                    // update dashboard.config to remove dashboard entry
-                    break;
-                case(false):
-                    // update dashboard.config to add dashboard entry, should never be hit
-                    break;
-                default:
-                    break;
-            }
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml("<Action runat='uninstall'  " +  
+                            "alias='addDashboardSection' "+
+                            "dashboardAlias='StartupDashboardSection'>" +
+                            "<section alias='StartupDashboardSection'>" +
+                            "<areas>" +
+                            "<area>content</area>" +
+                            "</areas>" +
+                            "<tab caption='Get Started'>" +
+                            "<control>/umbraco/dashboard/StartupDashboard.ascx</control>" +
+                            "</tab>" +
+                            "</section>" +
+                            "</Action>");
+
+                XmlNode n = doc.DocumentElement;
+
+                try
+                {
+                    switch (hideCheckBox.Checked)
+                    {
+                        case (true):
+                            // update dashboard.config to remove dashboard entry
+                            umbraco.cms.businesslogic.packager.PackageAction.UndoPackageAction("StartupDashboard", "addDashboardSection", n);
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Log.Add(LogTypes.Error, 0, "Dashboard Error: " + ex.Message);
+                }
         }
     }
 }

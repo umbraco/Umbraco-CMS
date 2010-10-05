@@ -1,4 +1,5 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="True" CodeBehind="StartupMediaDashboard.ascx.cs" Inherits="dashboardUtilities.StartupMediaDashboard" %>
+<%@ Register src="zipupload.ascx" tagname="zipupload" tagprefix="uc1" %>
 <script type="text/javascript" src="/umbraco/dashboard/scripts/jquery.jfeed.pack.js"></script>
 <link href="/umbraco_client/propertypane/style.css" rel="stylesheet" />
 <style type="text/css">
@@ -141,7 +142,13 @@
 </div>
 </asp:Panel>
 
-<p>...zip upload here...</p>
+<asp:Panel ID="zipUploadPanel" runat="server">
+<div class="propertypane">
+<div class="guiDialogNormal" style="margin: 10px">
+    <uc1:zipupload ID="zipupload1" runat="server" />
+</div>
+</div>
+</asp:Panel>
 
 <asp:Panel ID="learnPanel" runat="server">
 <div class="propertypane">
@@ -163,7 +170,7 @@
 <div class="guiDialogNormal" style="margin: 10px">
         <p>
                 Check here to hide this dashboard in the future <asp:CheckBox ID="hideCheckBox" 
-                runat="server" oncheckedchanged="hideCheckBox_CheckedChanged"></asp:CheckBox>
+                runat="server" oncheckedchanged="hideCheckBox_CheckedChanged" AutoPostBack="true"></asp:CheckBox>
         </p>
 </div>
 </div>

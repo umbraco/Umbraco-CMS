@@ -1,4 +1,5 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="StartupSettingsDashboard.ascx.cs" Inherits="dashboardUtilities.StartupSettingsDashboard" %>
+﻿<%@ Control Language="C#" AutoEventWireup="True" CodeBehind="StartupMemberDashboard.ascx.cs" Inherits="dashboardUtilities.StartupMemberDashboard" %>
+<%@ Register src="/umbraco/members/membersearch.ascx" tagname="membersearch" tagprefix="uc1" %>
 <script type="text/javascript" src="/umbraco/dashboard/scripts/jquery.jfeed.pack.js"></script>
 <link href="/umbraco_client/propertypane/style.css" rel="stylesheet" />
 <style type="text/css">
@@ -87,7 +88,7 @@
 
         jQuery.ajax({
             type: 'GET',
-            url: 'dashboard/feedproxy.aspx?url=http://umbraco.org/documentation/videos/for-site-builders/foundation/feed',
+            url: 'dashboard/feedproxy.aspx?url=http://umbraco.org/documentation/videos/for-site-builders/members/feed',
             dataType: 'xml',
             success: function (xml) {
 
@@ -125,27 +126,26 @@
 <div class="propertypane">
 <div class="guiDialogNormal" style="margin: 10px">
         <h2>Start here</h2>
-        <h3>This section contains the building blocks for your Umbraco site</h3>
+        <h3>Get started with Members right now</h3>
         <p>
-        Follow the below links to find out more about working with the items in the Setings section:
+        Use the tool below to search for an existing member.
         </p>
         <ul>
-        <li>Find the answers to your Umbraco questions on our <a href="http://our.umbraco.org/wiki" target="_blank">Community Wiki</a></li>
-        <li>Ask a question in the <a href="http://our.umbraco.org/" target="_blank">Community Forum</a></li>
-        <li>Watch our <a href="http://umbraco.tv" target="_blank">tutorial videos</a> (some are free, some require a subscription)</li>
-        <li>Find out about our <a href="http://umbraco.org/products" target="_blank">Pro Tools and Support</a></li>
-        <li>Find out about real-life <a href="http://umbraco.org/training/training-schedule" target="_blank">training and certification</a> opportunities</li>
-        </ul>
+        <li><strong>More about members:</strong></li>
+        <li>Learn about how to protect pages of your site from <a href="http://our.umbraco.org/wiki/reference/umbraco-client/context-menus/public-access" target="_blank">this Wiki entry</a></li>
+        </ul>  
 </div>
 </div>
 </asp:Panel>
+
+<uc1:membersearch ID="memberSearch1" runat="server" />
 
 <asp:Panel ID="learnPanel" runat="server">
 <div class="propertypane">
   <div class="guiDialogNormal" style="margin: 10px">
     <h2>Watch and learn</h2>
         <p>
-            Want to master Umbraco? Spend a couple of minutes learning some best practices
+            Want to master Umbraco Members? Spend a couple of minutes learning some best practices
             by watching one of these videos about using Umbraco. And visit <a href="http://umbraco.tv"
                 target="_blank">umbraco.tv</a> for even more Umbraco videos</p>
     <div id="latestformvids">
@@ -165,3 +165,5 @@
 </div>
 </div>
 </asp:Panel>
+
+

@@ -104,6 +104,9 @@
     <Reference Include="Microsoft.Scripting.Core">
       <HintPath>..\..\foreign dlls\DLR 2.0 SP1\Microsoft.Scripting.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Nibble.Umb.ZipUpload">
+      <HintPath>..\..\foreign dlls\Nibble.Umb.ZipUpload.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -551,6 +554,13 @@
     <Compile Include="umbraco\create\templateTasks.cs" />
     <Compile Include="umbraco\create\userTasks.cs" />
     <Compile Include="umbraco\create\XsltTasks.cs" />
+    <Compile Include="umbraco\dashboard\StartupMemberDashboard.ascx.cs">
+      <DependentUpon>StartupMemberDashboard.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dashboard\StartupMemberDashboard.ascx.designer.cs">
+      <DependentUpon>StartupMemberDashboard.ascx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\dashboard\FeedProxy.aspx.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1615,6 +1625,7 @@
     <Content Include="install\steps\Skinning\loadStarterKitDesigns.ascx" />
     <Content Include="install\steps\Skinning\loadStarterKits.ascx" />
     <Content Include="install\Title.ascx" />
+    <Content Include="umbraco\dashboard\StartupMemberDashboard.ascx" />
     <Content Include="umbraco\dashboard\FeedProxy.aspx" />
     <Content Include="umbraco\dashboard\scripts\jquery.jfeed.pack.js" />
     <Content Include="umbraco\dashboard\Settings\Applyskin.ascx" />
@@ -1622,6 +1633,7 @@
     <Content Include="umbraco\dashboard\StartupDeveloperDashboard.ascx" />
     <Content Include="umbraco\dashboard\StartupMediaDashboard.ascx" />
     <Content Include="umbraco\dashboard\StartupSettingsDashboard.ascx" />
+    <Content Include="umbraco\dashboard\zipupload.ascx" />
     <Content Include="umbraco\dialogs\TemplateSkinning.aspx" />
     <Content Include="umbraco\helpRedirect.aspx" />
     <Content Include="umbraco\images\aboutNew.png" />
