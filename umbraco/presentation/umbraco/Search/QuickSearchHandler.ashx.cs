@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using UmbracoExamine;
 using System.Web.Script.Serialization;
 using Examine;
+using Examine.LuceneEngine.SearchCriteria;
 
 namespace umbraco.presentation.umbraco.Search
 {
@@ -30,10 +31,10 @@ namespace umbraco.presentation.umbraco.Search
             var txt = UmbracoContext.Current.Request["q"].ToLower();
 
             //the app can be Content or Media only, otherwise an exception will be thrown
-            var app = "Content";
+            var app = UmbracoExamine.IndexTypes.Content;
             if (!string.IsNullOrEmpty(UmbracoContext.Current.Request["app"]))
             {
-                app = UmbracoContext.Current.Request["app"];
+                app = UmbracoContext.Current.Request["app"].ToLower();
             }
             
             int limit;
@@ -41,24 +42,29 @@ namespace umbraco.presentation.umbraco.Search
             {
                 limit = 100;
             }
-
-
+            
             //if it doesn't start with "*", then search only nodeName and nodeId
             var internalSearcher = (app == "Member")
                 ? UmbracoContext.Current.InternalMemberSearchProvider 
                 : UmbracoContext.Current.InternalSearchProvider;
-            var criteria = internalSearcher.CreateSearchCriteria(app);
+
+            //create some search criteria, make everything combined to be 'And' and only search the current app
+            var criteria = internalSearcher.CreateSearchCriteria(app, Examine.SearchCriteria.BooleanOperation.And);
+
             IEnumerable<SearchResult> results;
             if (txt.StartsWith("*"))
             {
+                //TODO: Why is this here?? i don't understand.
                 results = internalSearcher.Search("*", true);
             }
             else
             {
-                var operation = criteria.NodeName(txt);
+                var operation = criteria.Field("__nodeName", txt.MultipleCharacterWildcard());
+
+                // ensure the user can only find nodes they are allowed to see
                 if (UmbracoContext.Current.UmbracoUser.StartNodeId > 0)
                 {
-                    operation.Or().Id(UmbracoContext.Current.UmbracoUser.StartNodeId);
+                    operation = operation.And().Id(UmbracoContext.Current.UmbracoUser.StartNodeId);
                 }
 
                 results = internalSearcher.Search(operation.Compile());
