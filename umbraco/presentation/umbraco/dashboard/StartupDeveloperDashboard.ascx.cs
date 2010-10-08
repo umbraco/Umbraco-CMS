@@ -11,11 +11,6 @@
 
     public partial class StartupDeveloperDashboard : System.Web.UI.UserControl
     {
-        protected void Page_Load(object sender, EventArgs e)
-        {
-
-        }
-
         /// <summary>
         /// Hides the dashboard when checked
         ///  updates dashboard.config when checked
@@ -26,14 +21,6 @@
             doc.LoadXml("<Action runat='uninstall'  " +
                         "alias='addDashboardSection' " +
                         "dashboardAlias='StartupDeveloperDashboardSection'>" +
-                        "<section alias='StartupDeveloperDashboardSection'>" +
-                        "<areas>" +
-                        "<area>developer</area>" +
-                        "</areas>" +
-                        "<tab caption='Get Started'>" +
-                        "<control>/umbraco/dashboard/startupdeveloperdashboard.ascx</control>" +
-                        "</tab>" +
-                        "</section>" +
                         "</Action>");
 
             XmlNode n = doc.DocumentElement;

@@ -19,7 +19,16 @@ namespace dashboardUtilities {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel startPanel;
+        protected global::umbraco.uicontrols.Pane startPanel;
+        
+        /// <summary>
+        /// startPP control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel startPP;
         
         /// <summary>
         /// skinPanel control.
@@ -28,16 +37,34 @@ namespace dashboardUtilities {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel skinPanel;
+        protected global::umbraco.uicontrols.Pane skinPanel;
         
         /// <summary>
-        /// learnPanel control.
+        /// skinPP control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel learnPanel;
+        protected global::umbraco.uicontrols.PropertyPanel skinPP;
+        
+        /// <summary>
+        /// learn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane learn;
+        
+        /// <summary>
+        /// learnPP control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel learnPP;
         
         /// <summary>
         /// hidePanel control.
@@ -46,7 +73,16 @@ namespace dashboardUtilities {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel hidePanel;
+        protected global::umbraco.uicontrols.Pane hidePanel;
+        
+        /// <summary>
+        /// hidePP control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel hidePP;
         
         /// <summary>
         /// hideCheckBox control.

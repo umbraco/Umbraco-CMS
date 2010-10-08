@@ -1629,6 +1629,10 @@
     <Content Include="install\steps\Skinning\loadStarterKitDesigns.ascx" />
     <Content Include="install\steps\Skinning\loadStarterKits.ascx" />
     <Content Include="install\Title.ascx" />
+    <Content Include="umbraco\dashboard\images\contour-icon.png" />
+    <Content Include="umbraco\dashboard\images\courier-icon.png" />
+    <Content Include="umbraco\dashboard\images\logo.gif" />
+    <Content Include="umbraco\dashboard\images\starterkit-icon.png" />
     <Content Include="umbraco\dashboard\StartupMemberDashboard.ascx" />
     <Content Include="umbraco\dashboard\FeedProxy.aspx" />
     <Content Include="umbraco\dashboard\scripts\jquery.jfeed.pack.js" />

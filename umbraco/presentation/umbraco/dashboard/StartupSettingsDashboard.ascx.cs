@@ -11,11 +11,6 @@
 
     public partial class StartupSettingsDashboard : System.Web.UI.UserControl
     {
-        protected void Page_Load(object sender, EventArgs e)
-        {
-
-        }
-
         /// <summary>
         /// Hides the dashboard when checked
         ///  updates dashboard.config when checked
@@ -26,14 +21,6 @@
             doc.LoadXml("<Action runat='uninstall'  " +
                         "alias='addDashboardSection' " +
                         "dashboardAlias='StartupSettingsDashboardSection'>" +
-                        "<section alias='StartupSettingsDashboardSection'>" +
-                        "<areas>" +
-                        "<area>settings</area>" +
-                        "</areas>" +
-                        "<tab caption='Get Started'>" +
-                        "<control>/umbraco/dashboard/startupsettingsdashboard.ascx</control>" +
-                        "</tab>" +
-                        "</section>" +
                         "</Action>");
 
             XmlNode n = doc.DocumentElement;

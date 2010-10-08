@@ -1,5 +1,6 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="True" CodeBehind="StartupMemberDashboard.ascx.cs" Inherits="dashboardUtilities.StartupMemberDashboard" %>
 <%@ Register src="/umbraco/members/membersearch.ascx" tagname="membersearch" tagprefix="uc1" %>
+<%@ Register Namespace="umbraco.uicontrols" Assembly="controls" TagPrefix="umb" %>
 <script type="text/javascript" src="/umbraco/dashboard/scripts/jquery.jfeed.pack.js"></script>
 <link href="/umbraco_client/propertypane/style.css" rel="stylesheet" />
 <style type="text/css">
@@ -122,27 +123,29 @@
 
 </script>
 
-<asp:Panel ID="startPanel" runat="server">
-<div class="propertypane">
-<div class="guiDialogNormal" style="margin: 10px">
+<umb:Pane runat="server" ID="startPanel">
+<umb:PropertyPanel runat="server" ID="startPP">
         <h2>Start here</h2>
         <h3>Get started with Members right now</h3>
         <p>
         Use the tool below to search for an existing member.
         </p>
-        <ul>
-        <li><strong>More about members:</strong></li>
-        <li>Learn about how to protect pages of your site from <a href="http://our.umbraco.org/wiki/reference/umbraco-client/context-menus/public-access" target="_blank">this Wiki entry</a></li>
-        </ul>  
-</div>
-</div>
-</asp:Panel>
+        <h4>More about members</h4>
+        <div style="float:left; width:5%;">
+            <img src="/umbraco/dashboard/images/logo.gif" alt="Umbraco Start Up!" />
+        </div>
+        <div style="float:right; width:95%;">
+            <ul>
+            <li>Learn about how to protect pages of your site from <a href="http://our.umbraco.org/wiki/reference/umbraco-client/context-menus/public-access" target="_blank">this Wiki entry</a></li>
+            </ul>  
+        </div>
+</umb:PropertyPanel>
+</umb:Pane>
 
 <uc1:membersearch ID="memberSearch1" runat="server" />
 
-<asp:Panel ID="learnPanel" runat="server">
-<div class="propertypane">
-  <div class="guiDialogNormal" style="margin: 10px">
+<umb:Pane runat="server" ID="learn">
+<umb:PropertyPanel runat="server" ID="learnPP">
     <h2>Watch and learn</h2>
         <p>
             Want to master Umbraco Members? Spend a couple of minutes learning some best practices
@@ -151,19 +154,16 @@
     <div id="latestformvids">
             Loading...
     </div>
-  </div>
-</div>
-</asp:Panel>
+</umb:PropertyPanel>
+</umb:Pane>
 
-<asp:Panel ID="hidePanel" runat="server">
-<div class="propertypane">
-<div class="guiDialogNormal" style="margin: 10px">
+<umb:Pane ID="hidePanel" runat="server">
+<umb:PropertyPanel runat="server" ID="hidePP">
         <p>
                 Check here to hide this dashboard in the future <asp:CheckBox ID="hideCheckBox" 
                 runat="server" oncheckedchanged="hideCheckBox_CheckedChanged" AutoPostBack="true"></asp:CheckBox>
         </p>
-</div>
-</div>
-</asp:Panel>
+</umb:PropertyPanel>
+</umb:Pane>
 
 

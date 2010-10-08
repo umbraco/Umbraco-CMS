@@ -42,18 +42,10 @@
         protected void hideCheckBox_CheckedChanged(object sender, EventArgs e)
         {
                 XmlDocument doc = new XmlDocument();
-                doc.LoadXml("<Action runat='uninstall'  " +  
-                            "alias='addDashboardSection' "+
-                            "dashboardAlias='StartupDashboardSection'>" +
-                            "<section alias='StartupDashboardSection'>" +
-                            "<areas>" +
-                            "<area>content</area>" +
-                            "</areas>" +
-                            "<tab caption='Get Started'>" +
-                            "<control>/umbraco/dashboard/StartupDashboard.ascx</control>" +
-                            "</tab>" +
-                            "</section>" +
-                            "</Action>");
+                doc.LoadXml("<Action runat='uninstall'  " +
+                "alias='addDashboardSection' " +
+                "dashboardAlias='StartupDashboardSection'>" +
+                "</Action>");
 
                 XmlNode n = doc.DocumentElement;
 

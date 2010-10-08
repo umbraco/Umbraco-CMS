@@ -11,10 +11,6 @@
 
     public partial class StartupMediaDashboard : System.Web.UI.UserControl
     {
-        protected void Page_Load(object sender, EventArgs e)
-        {
-
-        }
 
         /// <summary>
         /// Hides the dashboard when checked
@@ -26,14 +22,6 @@
             doc.LoadXml("<Action runat='uninstall'  " +
                         "alias='addDashboardSection' " +
                         "dashboardAlias='StartupMediaDashboardSection'>" +
-                        "<section alias='StartupMediaDashboardSection'>" +
-                        "<areas>" +
-                        "<area>media</area>" +
-                        "</areas>" +
-                        "<tab caption='Get Started'>" +
-                        "<control>/umbraco/dashboard/startupmediadashboard.ascx</control>" +
-                        "</tab>" +
-                        "</section>" +
                         "</Action>");
 
             XmlNode n = doc.DocumentElement;

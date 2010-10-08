@@ -11,11 +11,6 @@
 
     public partial class StartupMemberDashboard : System.Web.UI.UserControl
     {
-        protected void Page_Load(object sender, EventArgs e)
-        {
-
-        }
-
         /// <summary>
         /// Hides the dashboard when checked
         ///  updates dashboard.config when checked
@@ -26,14 +21,6 @@
             doc.LoadXml("<Action runat='uninstall'  " +
                         "alias='addDashboardSection' " +
                         "dashboardAlias='StartupMemberDashboardSection'>" +
-                        "<section alias='StartupMemberDashboardSection'>" +
-                        "<areas>" +
-                        "<area>member</area>" +
-                        "</areas>" +
-                        "<tab caption='Get Started'>" +
-                        "<control>/umbraco/dashboard/startupmemberdashboard.ascx</control>" +
-                        "</tab>" +
-                        "</section>" +
                         "</Action>");
 
             XmlNode n = doc.DocumentElement;
