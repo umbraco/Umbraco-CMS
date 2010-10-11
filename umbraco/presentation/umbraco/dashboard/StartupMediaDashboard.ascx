@@ -1,5 +1,5 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="True" CodeBehind="StartupMediaDashboard.ascx.cs" Inherits="dashboardUtilities.StartupMediaDashboard" %>
-<%@ Register src="zipupload.ascx" tagname="zipupload" tagprefix="uc1" %>
+<%--<%@ Register src="zipupload.ascx" tagname="zipupload" tagprefix="uc1" %>--%>
 <%@ Register Namespace="umbraco.uicontrols" Assembly="controls" TagPrefix="umb" %>
 <script type="text/javascript" src="/umbraco/dashboard/scripts/jquery.jfeed.pack.js"></script>
 <link href="/umbraco_client/propertypane/style.css" rel="stylesheet" />
@@ -149,7 +149,7 @@
 <umb:Pane runat="server" ID="zipUploadPanel">
 <umb:PropertyPanel runat="server" ID="zipUploadPP">
     <h2>Upload Files</h2>
-        <uc1:zipupload ID="zipupload1" runat="server" />
+       <%-- <uc1:zipupload ID="zipupload1" runat="server" />--%>
 </umb:PropertyPanel>
 </umb:Pane>
 

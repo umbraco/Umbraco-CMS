@@ -94,6 +94,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\Examine.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.4.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.83.1.0, Culture=neutral, PublicKeyToken=1b03e6acf1164f73">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -650,6 +654,20 @@
     </Compile>
     <Compile Include="umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx.designer.cs">
       <DependentUpon>ImageUploader.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInjectionMacroRenderer.aspx.cs">
+      <DependentUpon>ModuleInjectionMacroRenderer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInjectionMacroRenderer.aspx.designer.cs">
+      <DependentUpon>ModuleInjectionMacroRenderer.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx.cs">
+      <DependentUpon>ModuleInjector.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx.designer.cs">
+      <DependentUpon>ModuleInjector.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx.cs">
       <DependentUpon>SkinCustomizer.ascx</DependentUpon>
@@ -1651,7 +1669,10 @@
     <Content Include="umbraco\images\umbraco\settingSkin.gif" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\disableInstallButtonsOnClick.js" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\ModuleInjection.js" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\SkinModuleShowOnStartup.js" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInjectionMacroRenderer.aspx" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\skin.png" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinModule.js" />

@@ -21,6 +21,10 @@ namespace umbraco.presentation.templateControls {
 //                Hashtable attributes = (Hashtable)ViewState["Attributes"];
                 return m_Attributes;
             }
+            set
+            {
+                m_Attributes = value;
+            }
         }
 
 

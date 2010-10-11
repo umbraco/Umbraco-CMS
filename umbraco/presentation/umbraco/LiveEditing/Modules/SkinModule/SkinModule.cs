@@ -11,11 +11,17 @@ using System.Web.UI;
 using umbraco.cms.businesslogic.skinning;
 using ClientDependency.Core.Controls;
 using umbraco.presentation.umbraco.controls;
+using HtmlAgilityPack;
+using umbraco.cms.businesslogic.template;
+using System.Text;
+using System.IO;
+using System.Collections;
 
 namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 {
     [ClientDependency(200, ClientDependencyType.Javascript, "modal/modal.js", "UmbracoClient")]
     [ClientDependency(200, ClientDependencyType.Css, "modal/style.css", "UmbracoClient")]
+    [ClientDependency(500, ClientDependencyType.Javascript, "LiveEditing/Modules/SkinModule/js/ModuleInjection.js", "UmbracoRoot")]
     [ClientDependency(800, ClientDependencyType.Javascript, "LiveEditing/Modules/SkinModule/js/disableInstallButtonsOnClick.js", "UmbracoRoot")]
     public class SkinModule : BaseModule
     {
@@ -73,6 +79,84 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
 
                 ClientDependencyLoader.Instance.RegisterDependency(500, "LiveEditing/Modules/SkinModule/js/SkinModuleShowOnStartup.js", "UmbracoRoot", ClientDependencyType.Javascript);
+            }
+        }
+
+
+
+        protected override void Manager_MessageReceived(object sender, MesssageReceivedArgs e)
+        {
+            switch (e.Type)
+            {
+                case "injectmodule":
+                    //update template, insert macro tag
+
+                    if (InsertMacroTag(nodeFactory.Node.GetCurrent().template, e.Message.Split(';')[0], e.Message.Split(';')[1], e.Message.Split(';')[2] == "prepend"))
+                    {
+                        //ok
+
+                        //presentation.templateControls.Macro m = new presentation.templateControls.Macro();
+
+                        //Hashtable DataValues = helper.ReturnAttributes(e.Message.Split(';')[1]);
+
+                        //m.Alias = DataValues["alias"].ToString();
+                        //m.MacroAttributes = DataValues;
+
+                        //StringBuilder sb = new StringBuilder();
+                        //StringWriter tw = new StringWriter(sb);
+                        //HtmlTextWriter hw = new HtmlTextWriter(tw);
+
+                        //m.RenderControl(hw);
+
+                        //string macroOutput = sb.ToString();
+
+                        //string placeMacroOutput = string.Format("jQuery('.umbModuleContainerPlaceHolder','#{0}').remove();jQuery('#{0}').{1}(\"{2}\");", e.Message.Split(';')[0], e.Message.Split(';')[2], macroOutput);
+
+
+                        //ScriptManager.RegisterClientScriptBlock(Page, GetType(), new Guid().ToString(), placeMacroOutput, true);
+                        
+                    }
+                    else
+                    {
+                        //not ok
+                    }
+
+                    break;
+            }
+        }
+
+        private bool InsertMacroTag(int template, string targetId, string tag, bool prepend)
+        {
+            Template t = new Template(template);
+
+            string TargetFile = t.MasterPageFile;
+            string TargetID = targetId;
+
+            HtmlDocument doc = new HtmlDocument();
+            doc.Load(TargetFile);
+
+            if (doc.DocumentNode.SelectNodes(string.Format("//*[@id = '{0}']", TargetID)) != null)
+            {
+                foreach (HtmlNode target in doc.DocumentNode.SelectNodes(string.Format("//*[@id = '{0}']", TargetID)))
+                {
+                    HtmlNode macrotag = HtmlNode.CreateNode(tag);
+
+                    if (prepend)
+                        target.PrependChild(macrotag);
+                    else
+                        target.AppendChild(macrotag);
+                }
+                doc.Save(TargetFile);
+
+                return true;
+            }
+            else
+            {
+                //might be on master template
+                if (t.HasMasterTemplate)
+                    return InsertMacroTag(t.MasterTemplate, targetId, tag, prepend);
+                else
+                    return false;
             }
         }
     }
