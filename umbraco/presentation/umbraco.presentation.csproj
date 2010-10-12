@@ -669,6 +669,12 @@
     <Compile Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx.designer.cs">
       <DependentUpon>ModuleInjector.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx.cs">
+      <DependentUpon>ModuleSelector.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx.designer.cs">
+      <DependentUpon>ModuleSelector.ascx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx.cs">
       <DependentUpon>SkinCustomizer.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1673,6 +1679,7 @@
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\SkinModuleShowOnStartup.js" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInjectionMacroRenderer.aspx" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\skin.png" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinModule.js" />
