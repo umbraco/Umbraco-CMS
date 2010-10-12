@@ -308,13 +308,45 @@ namespace umbraco.cms.businesslogic.skinning
 
         public static bool IsSkinInstalled(Guid SkinGuid)
         {
+            
+            return IsPackageInstalled(SkinGuid);
+        }
+
+        public static bool IsPackageInstalled(Guid PackageGuid)
+        {
             XmlDocument installed = new XmlDocument();
             installed.Load(IO.IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config");
 
-            XmlNode skinNode = installed.SelectSingleNode(
-                string.Format("//package [@ packageGuid = '{0}']", SkinGuid.ToString()));
+            XmlNode packageNode = installed.SelectSingleNode(
+                string.Format("//package [@packageGuid = '{0}']", PackageGuid.ToString()));
 
-            return skinNode != null;
+            return packageNode != null;
+        }
+
+        public static bool IsPackageInstalled(string Name)
+        {
+            XmlDocument installed = new XmlDocument();
+            installed.Load(IO.IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config");
+
+            XmlNode packageNode = installed.SelectSingleNode(
+                string.Format("//package [@name = '{0}']", Name));
+
+            return packageNode != null;
+        }
+
+        public static string GetModuleAlias(string Name)
+        {
+            XmlDocument installed = new XmlDocument();
+            installed.Load(IO.IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config");
+
+            XmlNode packageNode = installed.SelectSingleNode(
+                string.Format("//package [@name = '{0}']", Name));
+
+            XmlNode macroNode = packageNode.SelectSingleNode(".//macros");
+
+            cms.businesslogic.macro.Macro m = new cms.businesslogic.macro.Macro(Convert.ToInt32(macroNode.InnerText.Split(',')[0]));
+
+            return m.Alias;
         }
         #region old code
 

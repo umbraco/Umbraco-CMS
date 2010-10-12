@@ -669,8 +669,16 @@
     <Compile Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx.designer.cs">
       <DependentUpon>ModuleInjector.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInstaller.aspx.cs">
+      <DependentUpon>ModuleInstaller.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInstaller.aspx.designer.cs">
+      <DependentUpon>ModuleInstaller.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx.cs">
       <DependentUpon>ModuleSelector.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx.designer.cs">
       <DependentUpon>ModuleSelector.ascx</DependentUpon>
@@ -1674,13 +1682,15 @@
     <Content Include="umbraco\images\umbracoSplash.png" />
     <Content Include="umbraco\images\umbraco\settingSkin.gif" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\module.gif" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\disableInstallButtonsOnClick.js" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\ModuleInjection.js" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\SkinModuleShowOnStartup.js" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInjectionMacroRenderer.aspx" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInjector.aspx" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInstaller.aspx" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx" />
-    <Content Include="umbraco\LiveEditing\Modules\SkinModule\skin.png" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\skin.gif" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinModule.js" />
     <Content Include="umbraco\members\MemberSearch.ascx" />

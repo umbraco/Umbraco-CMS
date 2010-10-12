@@ -305,3 +305,17 @@ html {
 		
 		div.propertyPaneFooter{clear: both; height: 1px; overflow: hidden; color: #fff;}
 		
+#LiveEditingToolbar .ModuleSelector
+{
+    background-color:#FFF !important;
+    position:absolute;
+    top:36px;
+    left:270px;
+    color:#000;
+}
+
+#LiveEditingToolbar #moduleSelectorContainer
+{
+    padding:10px;
+}
+		

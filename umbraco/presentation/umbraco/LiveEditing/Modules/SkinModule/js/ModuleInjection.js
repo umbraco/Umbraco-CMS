@@ -1,4 +1,37 @@
-﻿var umbModuleToInsertAlias = 'CWS_twitter&target'
+﻿var umbModuleToInsertAlias;
+
+function umbInstallModuleAndGetAlias(guid,name) {
+
+    jQuery('#modules').hide();
+    jQuery("#installingModule").show();
+
+    jQuery.post("/umbraco/LiveEditing/Modules/SkinModule/ModuleInstaller.aspx?guid=" + guid + "&name=" + name,
+     function (data) {
+
+         if (data == "error") {
+
+         }
+         else {
+             jQuery("#installingModule").hide();
+             jQuery('#moduleSelect').show();
+             umbShowModuleContainerSelectors();
+             umbModuleToInsertAlias = data;
+         }
+
+
+     });
+
+}
+
+function umbShowModuleSelection() {
+
+    jQuery("#moduleSelect").hide();
+    jQuery("#modules").show();
+
+    jQuery(".ModuleSelector").show();
+
+}
+
 
 function umbShowModuleContainerSelectors() {
 
@@ -14,7 +47,8 @@ function umbShowModuleContainerSelectors() {
 
     jQuery(".umbModuleContainerSelector").click(function () {
 
-        Umbraco.Controls.ModalWindow().open('/umbraco/LiveEditing/Modules/SkinModule/ModuleInjector.aspx?macroAlias='+umbModuleToInsertAlias +'&target=' + jQuery(this).parent().attr('id') + "&type=" + jQuery(this).attr('rel'), 'Insert module', true, 550, 550, 50, 0, ['.modalbuton'], null);
+        jQuery(".ModuleSelector").hide();
+        Umbraco.Controls.ModalWindow().open('/umbraco/LiveEditing/Modules/SkinModule/ModuleInjector.aspx?macroAlias=' + umbModuleToInsertAlias + '&target=' + jQuery(this).parent().attr('id') + "&type=" + jQuery(this).attr('rel'), 'Insert module', true, 550, 550, 50, 0, ['.modalbuton'], null);
 
     });
 }

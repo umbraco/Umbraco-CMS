@@ -28,6 +28,9 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
         protected LabelButton m_SkinButton = new LabelButton();
         protected Panel m_SkinModal;
 
+        protected LabelButton m_ModuleButton = new LabelButton();
+        protected Panel m_ModuleModal;
+        
       
         public SkinModule(LiveEditingManager manager)
             : base(manager)
@@ -60,7 +63,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             m_SkinButton.ID = "LeSkinButton";
             m_SkinButton.CssClass = "button";
             m_SkinButton.ToolTip = ActiveSkin != null && ActiveSkin.Dependencies.Count > 0 ? "Customize skin" : "Change skin";
-            m_SkinButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/SKinModule/skin.png", SystemDirectories.Umbraco);
+            m_SkinButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/SKinModule/skin.gif", SystemDirectories.Umbraco);
 
             string s = (ActiveSkin != null && ActiveSkin.Dependencies.Count > 0 ? "setTasksClientScripts();" : "") + "jQuery('#" + m_SkinModal.ClientID + @"').show();" + "jQuery('#" + m_SkinModal.ClientID + @"').ModalWindowShowWithoutBackground('" + ui.GetText("skin") + "',true,500,400,50,0, ['.modalbuton'], null);";
 
@@ -80,9 +83,49 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
                 ClientDependencyLoader.Instance.RegisterDependency(500, "LiveEditing/Modules/SkinModule/js/SkinModuleShowOnStartup.js", "UmbracoRoot", ClientDependencyType.Javascript);
             }
+
+            // modules
+            if (CanInsertModules(nodeFactory.Node.GetCurrent().template))
+            {
+                m_ModuleModal = new Panel();
+                m_ModuleModal.ID = "LeModuleModal";
+                m_ModuleModal.CssClass = "ModuleSelector";
+                m_ModuleModal.Attributes.Add("style", "display: none");
+
+                m_ModuleModal.Controls.Add(new UserControl().LoadControl(String.Format("{0}/LiveEditing/Modules/SKinModule/ModuleSelector.ascx", SystemDirectories.Umbraco)));
+
+                Controls.Add(m_ModuleModal);
+
+
+                m_ModuleButton.ID = "LeModuleButton";
+                m_ModuleButton.CssClass = "button";
+                m_ModuleButton.ToolTip = "Insert Module";
+                m_ModuleButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/SKinModule/module.gif", SystemDirectories.Umbraco);
+
+                m_ModuleButton.OnClientClick = "umbShowModuleSelection();" + "return false;";
+
+                Controls.Add(m_ModuleButton);
+            }
         }
 
+        private bool CanInsertModules(int template)
+        {
+            Template t = new Template(template);
 
+            HtmlDocument doc = new HtmlDocument();
+            doc.Load(t.MasterPageFile);
+
+            if (doc.DocumentNode.SelectNodes(string.Format("//*[@class = '{0}']", "umbModuleContainer")) != null)
+                return true;
+            else
+            {
+                if (t.HasMasterTemplate)
+                    return CanInsertModules(t.MasterTemplate);
+                else
+                    return false;
+            }
+
+        }
 
         protected override void Manager_MessageReceived(object sender, MesssageReceivedArgs e)
         {
