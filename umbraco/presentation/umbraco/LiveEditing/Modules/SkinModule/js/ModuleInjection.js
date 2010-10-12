@@ -3,7 +3,7 @@
 function umbSelectModule(alias,sender) {
     jQuery('#modules').hide();
     jQuery('#moduleSelect').show();
-    umbShowModuleContainerSelectors();
+    umbShowModuleContainerSelectors(jQuery('span', sender).html());
     umbModuleToInsertAlias = alias;
 
     jQuery('.selectedModule').html(jQuery('span',sender).html());
@@ -24,7 +24,7 @@ function umbInstallModuleAndGetAlias(guid,name,sender) {
          else {
              jQuery("#installingModule").hide();
              jQuery('#moduleSelect').show();
-             umbShowModuleContainerSelectors();
+             umbShowModuleContainerSelectors(jQuery('span', sender).html());
              umbModuleToInsertAlias = data;
 
              jQuery(sender).attr("onclick", "");
@@ -48,7 +48,7 @@ function umbShowModuleSelection() {
 
 }
 
-function umbShowModuleContainerSelectors() {
+function umbShowModuleContainerSelectors(moduleName) {
 
     jQuery(".umbModuleContainer").each(function () {
 
@@ -63,7 +63,7 @@ function umbShowModuleContainerSelectors() {
     jQuery(".umbModuleContainerSelector").click(function () {
 
         jQuery(".ModuleSelector").hide();
-        Umbraco.Controls.ModalWindow().open(umbCurrentUmbracoDir + '/LiveEditing/Modules/SkinModule/ModuleInjector.aspx?macroAlias=' + umbModuleToInsertAlias + '&target=' + jQuery(this).parent().attr('id') + "&type=" + jQuery(this).attr('rel'), 'Insert module', true, 550, 550, 50, 0, ['.modalbuton'], null);
+        Umbraco.Controls.ModalWindow().open(umbCurrentUmbracoDir + '/LiveEditing/Modules/SkinModule/ModuleInjector.aspx?macroAlias=' + umbModuleToInsertAlias + '&target=' + jQuery(this).parent().attr('id') + "&type=" + jQuery(this).attr('rel'), 'Insert ' + moduleName + ' module', true, 550, 550, 50, 0, ['.modalbuton'], null);
 
     });
 }
