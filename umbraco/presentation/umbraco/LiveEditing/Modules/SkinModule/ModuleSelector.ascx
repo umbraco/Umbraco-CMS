@@ -25,10 +25,14 @@
    
 </asp:Repeater>
 
- <p id="installingModule" style="display:none;">Installing module...</p>
+ <p id="installingModule" style="display:none;">
+    <span class="selectedModule"></span><br />
+    <img src="/umbraco/LiveEditing/Modules/SkinModule/images/loader.gif" /> Installing module...
+    
+</p>
 
  <p id="moduleSelect" style="display:none;">
-    <span id="selectedModule"></span><br />
+    <span class="selectedModule"></span><br />
     Select where to place the module
  </p>
 

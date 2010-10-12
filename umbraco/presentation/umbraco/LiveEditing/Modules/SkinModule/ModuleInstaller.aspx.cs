@@ -36,8 +36,6 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                     installer.InstallCleanUp(packageId, tempDir);
                     library.RefreshContent();
 
-
-
                     if (cms.businesslogic.skinning.Skinning.IsPackageInstalled(new Guid(Request["guid"])) ||
                     cms.businesslogic.skinning.Skinning.IsPackageInstalled(Request["name"]))
                     {

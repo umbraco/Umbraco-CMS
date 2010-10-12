@@ -327,5 +327,10 @@ html {
     cursor:pointer;
 }
 
-
+p#installingModule img
+{
+    float:none;
+    margin:0;
+    padding:0;
+}
 		

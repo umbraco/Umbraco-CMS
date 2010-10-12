@@ -6,12 +6,13 @@ function umbSelectModule(alias,sender) {
     umbShowModuleContainerSelectors();
     umbModuleToInsertAlias = alias;
 
-    jQuery('#selectedModule').html(jQuery('span',sender).html());
+    jQuery('.selectedModule').html(jQuery('span',sender).html());
 
 }
-function umbInstallModuleAndGetAlias(guid,name) {
+function umbInstallModuleAndGetAlias(guid,name,sender) {
 
     jQuery('#modules').hide();
+    jQuery('.selectedModule').html(name);
     jQuery("#installingModule").show();
 
     jQuery.post("/umbraco/LiveEditing/Modules/SkinModule/ModuleInstaller.aspx?guid=" + guid + "&name=" + name,
@@ -25,13 +26,19 @@ function umbInstallModuleAndGetAlias(guid,name) {
              jQuery('#moduleSelect').show();
              umbShowModuleContainerSelectors();
              umbModuleToInsertAlias = data;
+
+             jQuery(sender).attr("onclick", "");
+
+             jQuery(sender).click(function () {
+                 umbSelectModule(data, this); 
+                 return false;
+             });
          }
 
 
      });
 
 }
-
 function umbShowModuleSelection() {
 
     jQuery("#moduleSelect").hide();
@@ -40,7 +47,6 @@ function umbShowModuleSelection() {
     jQuery(".ModuleSelector").show();
 
 }
-
 
 function umbShowModuleContainerSelectors() {
 

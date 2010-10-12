@@ -75,7 +75,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                 {
                     link.Attributes.Add(
                         "onclick",
-                        "umbInstallModuleAndGetAlias('" + p.RepoGuid +"','"+p.Text+"');");
+                        "umbInstallModuleAndGetAlias('" + p.RepoGuid +"','"+p.Text+"',this);");
                 }
 
 

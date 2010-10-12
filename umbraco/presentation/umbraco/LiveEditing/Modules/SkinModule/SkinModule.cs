@@ -138,26 +138,6 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                     {
                         //ok
 
-                        //presentation.templateControls.Macro m = new presentation.templateControls.Macro();
-
-                        //Hashtable DataValues = helper.ReturnAttributes(e.Message.Split(';')[1]);
-
-                        //m.Alias = DataValues["alias"].ToString();
-                        //m.MacroAttributes = DataValues;
-
-                        //StringBuilder sb = new StringBuilder();
-                        //StringWriter tw = new StringWriter(sb);
-                        //HtmlTextWriter hw = new HtmlTextWriter(tw);
-
-                        //m.RenderControl(hw);
-
-                        //string macroOutput = sb.ToString();
-
-                        //string placeMacroOutput = string.Format("jQuery('.umbModuleContainerPlaceHolder','#{0}').remove();jQuery('#{0}').{1}(\"{2}\");", e.Message.Split(';')[0], e.Message.Split(';')[2], macroOutput);
-
-
-                        //ScriptManager.RegisterClientScriptBlock(Page, GetType(), new Guid().ToString(), placeMacroOutput, true);
-                        
                     }
                     else
                     {
