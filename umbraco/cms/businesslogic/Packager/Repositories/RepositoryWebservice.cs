@@ -30,6 +30,10 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
         private System.Threading.SendOrPostCallback StarterKitsOperationCompleted;
 
+        private System.Threading.SendOrPostCallback StarterKitModulesCategorizedOperationCompleted;
+
+        private System.Threading.SendOrPostCallback StarterKitModulesOperationCompleted;
+
         private System.Threading.SendOrPostCallback authenticateOperationCompleted;
 
         private System.Threading.SendOrPostCallback fetchPackageByVersionOperationCompleted;
@@ -49,7 +53,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
         /// <remarks/>
         public RepositoryWebservice(string url)
         {
-            this.Url = url; //"http://packages.umbraco.org/umbraco/webservices/api/repository.asmx";
+            this.Url = url;//"http://packages.umbraco.org/umbraco/webservices/api/repository.asmx";
         }
 
         /// <remarks/>
@@ -69,6 +73,12 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
         /// <remarks/>
         public event StarterKitsCompletedEventHandler StarterKitsCompleted;
+
+        /// <remarks/>
+        public event StarterKitModulesCategorizedCompletedEventHandler StarterKitModulesCategorizedCompleted;
+
+        /// <remarks/>
+        public event StarterKitModulesCompletedEventHandler StarterKitModulesCompleted;
 
         /// <remarks/>
         public event authenticateCompletedEventHandler authenticateCompleted;
@@ -376,6 +386,98 @@ namespace umbraco.cms.businesslogic.packager.repositories
             {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.StarterKitsCompleted(this, new StarterKitsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://packages.umbraco.org/webservices/StarterKitModulesCategorized", RequestNamespace = "http://packages.umbraco.org/webservices/", ResponseNamespace = "http://packages.umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public Category[] StarterKitModulesCategorized()
+        {
+            object[] results = this.Invoke("StarterKitModulesCategorized", new object[0]);
+            return ((Category[])(results[0]));
+        }
+
+        /// <remarks/>
+        public System.IAsyncResult BeginStarterKitModulesCategorized(System.AsyncCallback callback, object asyncState)
+        {
+            return this.BeginInvoke("StarterKitModulesCategorized", new object[0], callback, asyncState);
+        }
+
+        /// <remarks/>
+        public Category[] EndStarterKitModulesCategorized(System.IAsyncResult asyncResult)
+        {
+            object[] results = this.EndInvoke(asyncResult);
+            return ((Category[])(results[0]));
+        }
+
+        /// <remarks/>
+        public void StarterKitModulesCategorizedAsync()
+        {
+            this.StarterKitModulesCategorizedAsync(null);
+        }
+
+        /// <remarks/>
+        public void StarterKitModulesCategorizedAsync(object userState)
+        {
+            if ((this.StarterKitModulesCategorizedOperationCompleted == null))
+            {
+                this.StarterKitModulesCategorizedOperationCompleted = new System.Threading.SendOrPostCallback(this.OnStarterKitModulesCategorizedOperationCompleted);
+            }
+            this.InvokeAsync("StarterKitModulesCategorized", new object[0], this.StarterKitModulesCategorizedOperationCompleted, userState);
+        }
+
+        private void OnStarterKitModulesCategorizedOperationCompleted(object arg)
+        {
+            if ((this.StarterKitModulesCategorizedCompleted != null))
+            {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.StarterKitModulesCategorizedCompleted(this, new StarterKitModulesCategorizedCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://packages.umbraco.org/webservices/StarterKitModules", RequestNamespace = "http://packages.umbraco.org/webservices/", ResponseNamespace = "http://packages.umbraco.org/webservices/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public Package[] StarterKitModules()
+        {
+            object[] results = this.Invoke("StarterKitModules", new object[0]);
+            return ((Package[])(results[0]));
+        }
+
+        /// <remarks/>
+        public System.IAsyncResult BeginStarterKitModules(System.AsyncCallback callback, object asyncState)
+        {
+            return this.BeginInvoke("StarterKitModules", new object[0], callback, asyncState);
+        }
+
+        /// <remarks/>
+        public Package[] EndStarterKitModules(System.IAsyncResult asyncResult)
+        {
+            object[] results = this.EndInvoke(asyncResult);
+            return ((Package[])(results[0]));
+        }
+
+        /// <remarks/>
+        public void StarterKitModulesAsync()
+        {
+            this.StarterKitModulesAsync(null);
+        }
+
+        /// <remarks/>
+        public void StarterKitModulesAsync(object userState)
+        {
+            if ((this.StarterKitModulesOperationCompleted == null))
+            {
+                this.StarterKitModulesOperationCompleted = new System.Threading.SendOrPostCallback(this.OnStarterKitModulesOperationCompleted);
+            }
+            this.InvokeAsync("StarterKitModules", new object[0], this.StarterKitModulesOperationCompleted, userState);
+        }
+
+        private void OnStarterKitModulesOperationCompleted(object arg)
+        {
+            if ((this.StarterKitModulesCompleted != null))
+            {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.StarterKitModulesCompleted(this, new StarterKitModulesCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
 
@@ -1492,6 +1594,66 @@ namespace umbraco.cms.businesslogic.packager.repositories
 
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    public delegate void StarterKitModulesCategorizedCompletedEventHandler(object sender, StarterKitModulesCategorizedCompletedEventArgs e);
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class StarterKitModulesCategorizedCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs
+    {
+
+        private object[] results;
+
+        internal StarterKitModulesCategorizedCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) :
+            base(exception, cancelled, userState)
+        {
+            this.results = results;
+        }
+
+        /// <remarks/>
+        public Category[] Result
+        {
+            get
+            {
+                this.RaiseExceptionIfNecessary();
+                return ((Category[])(this.results[0]));
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    public delegate void StarterKitModulesCompletedEventHandler(object sender, StarterKitModulesCompletedEventArgs e);
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class StarterKitModulesCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs
+    {
+
+        private object[] results;
+
+        internal StarterKitModulesCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) :
+            base(exception, cancelled, userState)
+        {
+            this.results = results;
+        }
+
+        /// <remarks/>
+        public Package[] Result
+        {
+            get
+            {
+                this.RaiseExceptionIfNecessary();
+                return ((Package[])(this.results[0]));
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "4.0.30319.1")]
     public delegate void authenticateCompletedEventHandler(object sender, authenticateCompletedEventArgs e);
 
     /// <remarks/>
@@ -1729,5 +1891,4 @@ namespace umbraco.cms.businesslogic.packager.repositories
             }
         }
     }
-
 }
