@@ -333,4 +333,18 @@ p#installingModule img
     margin:0;
     padding:0;
 }
-		
+
+#LiveEditingToolbar  #modules ul
+{
+    list-style-type:none;
+    margin-left:0px;
+    margin-right:0px;
+}
+
+#LiveEditingToolbar  #modules ul li
+{
+    display:block;
+    padding-bottom:5px;
+    padding-top:5px;
+    border-bottom:1px solid #c3c3c3;
+}

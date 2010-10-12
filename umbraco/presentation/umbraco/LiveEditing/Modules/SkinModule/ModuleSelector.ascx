@@ -5,7 +5,9 @@
 <asp:Repeater ID="rep_modules" runat="server" 
     onitemdatabound="rep_modules_ItemDataBound">
     <HeaderTemplate>
-        <ul id="modules">
+    <div id="modules">
+    <p>Please select the module you wish to insert.</p>
+        <ul>
     </HeaderTemplate>
     <ItemTemplate>
         <li>
@@ -20,6 +22,7 @@
     </ItemTemplate>
     <FooterTemplate>
         </ul>
+        </div>
     </FooterTemplate>
 
    
