@@ -41,6 +41,8 @@ function umbInstallModuleAndGetAlias(guid,name,sender) {
 }
 function umbShowModuleSelection() {
 
+    umbRemoveModuleContainerSelectors();
+
     jQuery("#moduleSelect").hide();
     jQuery("#modules").show();
 
