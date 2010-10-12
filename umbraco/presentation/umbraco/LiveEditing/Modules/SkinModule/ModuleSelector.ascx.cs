@@ -52,6 +52,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
         private void ShowConnectionError()
         {
+            
             //this.pnl_connectionerror.Visible = true;
         }
 

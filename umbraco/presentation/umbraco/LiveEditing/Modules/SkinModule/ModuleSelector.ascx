@@ -1,5 +1,13 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ModuleSelector.ascx.cs" Inherits="umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule.ModuleSelector" %>
 <%@ Import Namespace="umbraco.cms.businesslogic.packager.repositories"  %>
+
+<script type="text/javascript">
+
+    var umbCurrentPageId = <%= umbraco.presentation.nodeFactory.Node.GetCurrent().Id %>;
+    var umbCurrentUmbracoDir = '<%= this.ResolveUrl(umbraco.GlobalSettings.Path) %>';
+
+
+</script>
 <div id="moduleSelectorContainer">
 
 <asp:Repeater ID="rep_modules" runat="server" 
@@ -30,7 +38,7 @@
 
  <p id="installingModule" style="display:none;">
     <span class="selectedModule"></span><br />
-    <img src="/umbraco/LiveEditing/Modules/SkinModule/images/loader.gif" /> Installing module...
+    <img src="<%= this.ResolveUrl(umbraco.GlobalSettings.Path) %>/LiveEditing/Modules/SkinModule/images/loader.gif" /> Installing module...
     
 </p>
 

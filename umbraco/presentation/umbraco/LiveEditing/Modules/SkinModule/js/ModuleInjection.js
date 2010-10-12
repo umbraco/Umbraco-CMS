@@ -15,7 +15,7 @@ function umbInstallModuleAndGetAlias(guid,name,sender) {
     jQuery('.selectedModule').html(name);
     jQuery("#installingModule").show();
 
-    jQuery.post("/umbraco/LiveEditing/Modules/SkinModule/ModuleInstaller.aspx?guid=" + guid + "&name=" + name,
+    jQuery.post(umbCurrentUmbracoDir + "/LiveEditing/Modules/SkinModule/ModuleInstaller.aspx?guid=" + guid + "&name=" + name,
      function (data) {
 
          if (data == "error") {
@@ -63,7 +63,7 @@ function umbShowModuleContainerSelectors() {
     jQuery(".umbModuleContainerSelector").click(function () {
 
         jQuery(".ModuleSelector").hide();
-        Umbraco.Controls.ModalWindow().open('/umbraco/LiveEditing/Modules/SkinModule/ModuleInjector.aspx?macroAlias=' + umbModuleToInsertAlias + '&target=' + jQuery(this).parent().attr('id') + "&type=" + jQuery(this).attr('rel'), 'Insert module', true, 550, 550, 50, 0, ['.modalbuton'], null);
+        Umbraco.Controls.ModalWindow().open(umbCurrentUmbracoDir + '/LiveEditing/Modules/SkinModule/ModuleInjector.aspx?macroAlias=' + umbModuleToInsertAlias + '&target=' + jQuery(this).parent().attr('id') + "&type=" + jQuery(this).attr('rel'), 'Insert module', true, 550, 550, 50, 0, ['.modalbuton'], null);
 
     });
 }
@@ -75,7 +75,7 @@ function umbRemoveModuleContainerSelectors() {
 function umbInsertModule(container,macro,type) {
     umbRemoveModuleContainerSelectors();
 
-    var working = "<div class='umbModuleContainerPlaceHolder'><img src='/umbraco/LiveEditing/Modules/SkinModule/images/loader.gif' />Inserting module...</div>";
+    var working = "<div class='umbModuleContainerPlaceHolder'><img src='" + umbCurrentUmbracoDir + "/LiveEditing/Modules/SkinModule/images/loader.gif' />Inserting module...</div>";
     
     if (type == "append") {
         jQuery("#" + container).append(working);
@@ -85,9 +85,9 @@ function umbInsertModule(container,macro,type) {
 
     UmbracoCommunicator.SendClientMessage("injectmodule", container + ";" + macro + ";" + type);
 
-    //need to lose this replace calls + supply current page id;
+    //need to lose these replace calls
 
-    jQuery.post("/umbraco/LiveEditing/Modules/SkinModule/ModuleInjectionMacroRenderer.aspx?tag=" + macro.replace('>','').replace('<','').replace('</umbraco:Macro>',''),
+    jQuery.post(umbCurrentUmbracoDir + "/LiveEditing/Modules/SkinModule/ModuleInjectionMacroRenderer.aspx?tag=" + macro.replace('>', '').replace('<', '').replace('</umbraco:Macro>', '') + "&umbPageID=" + umbCurrentPageId,
      function (data) {
          jQuery(".umbModuleContainerPlaceHolder").html(data);
 
