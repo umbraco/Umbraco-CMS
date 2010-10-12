@@ -63,7 +63,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             m_SkinButton.ID = "LeSkinButton";
             m_SkinButton.CssClass = "button";
             m_SkinButton.ToolTip = ActiveSkin != null && ActiveSkin.Dependencies.Count > 0 ? "Customize skin" : "Change skin";
-            m_SkinButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/SKinModule/skin.gif", SystemDirectories.Umbraco);
+            m_SkinButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/SKinModule/images/skin.gif", SystemDirectories.Umbraco);
 
             string s = (ActiveSkin != null && ActiveSkin.Dependencies.Count > 0 ? "setTasksClientScripts();" : "") + "jQuery('#" + m_SkinModal.ClientID + @"').show();" + "jQuery('#" + m_SkinModal.ClientID + @"').ModalWindowShowWithoutBackground('" + ui.GetText("skin") + "',true,500,400,50,0, ['.modalbuton'], null);";
 
@@ -100,7 +100,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                 m_ModuleButton.ID = "LeModuleButton";
                 m_ModuleButton.CssClass = "button";
                 m_ModuleButton.ToolTip = "Insert Module";
-                m_ModuleButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/SKinModule/module.gif", SystemDirectories.Umbraco);
+                m_ModuleButton.ImageUrl = String.Format("{0}/LiveEditing/Modules/SKinModule/images/module.gif", SystemDirectories.Umbraco);
 
                 m_ModuleButton.OnClientClick = "umbShowModuleSelection();" + "return false;";
 

@@ -1,5 +1,14 @@
 ﻿var umbModuleToInsertAlias;
 
+function umbSelectModule(alias,sender) {
+    jQuery('#modules').hide();
+    jQuery('#moduleSelect').show();
+    umbShowModuleContainerSelectors();
+    umbModuleToInsertAlias = alias;
+
+    jQuery('#selectedModule').html(jQuery('span',sender).html());
+
+}
 function umbInstallModuleAndGetAlias(guid,name) {
 
     jQuery('#modules').hide();
@@ -60,11 +69,12 @@ function umbRemoveModuleContainerSelectors() {
 function umbInsertModule(container,macro,type) {
     umbRemoveModuleContainerSelectors();
 
+    var working = "<div class='umbModuleContainerPlaceHolder'><img src='/umbraco/LiveEditing/Modules/SkinModule/images/loader.gif' />Inserting module...</div>";
     
     if (type == "append") {
-        jQuery("#" + container).append("<div class='umbModuleContainerPlaceHolder'>Working...</div>");
+        jQuery("#" + container).append(working);
     } else {
-        jQuery("#" + container).prepend("<div class='umbModuleContainerPlaceHolder'>Working...</div>");
+        jQuery("#" + container).prepend(working);
     }
 
     UmbracoCommunicator.SendClientMessage("injectmodule", container + ";" + macro + ";" + type);

@@ -68,7 +68,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                 {                  
                     link.Attributes.Add(
                         "onclick",
-                        "jQuery('#modules').hide();jQuery('#moduleSelect').show();umbShowModuleContainerSelectors(); umbModuleToInsertAlias = '" + cms.businesslogic.skinning.Skinning.GetModuleAlias(p.Text) + "';return false;");
+                        "umbSelectModule('" + cms.businesslogic.skinning.Skinning.GetModuleAlias(p.Text) + "',this);return false;");
 
                 }
                 else

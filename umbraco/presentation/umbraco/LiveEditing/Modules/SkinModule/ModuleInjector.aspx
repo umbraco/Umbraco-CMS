@@ -11,6 +11,23 @@
         <umb:JsInclude ID="JsInclude1" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient"
         Priority="0" />
 
+
+        <umb:CssInclude ID="CssInclude1" runat="server" FilePath="ui/default.css" PathNameAlias="UmbracoClient" />
+        <umb:CssInclude ID="CssInclude2" runat="server" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />
+         <umb:CssInclude ID="CssInclude3" runat="server" FilePath="propertypane/style.css" PathNameAlias="UmbracoClient" />
+    
+        <style type="text/css">
+        .propertyItemheader
+        {
+            width: 170px !important;
+        }
+        
+        .guiInputTextStandard
+        {
+            width: 220px;
+        }
+    </style>
+    
     <script type="text/javascript">
 
 
@@ -104,14 +121,20 @@
     <form id="form1" runat="server">
 
     
-
+        <div style="" class="propertypane">
+            <div>
        <div style="height: 420px; overflow: auto;">
                 <asp:PlaceHolder ID="macroProperties" runat="server" />
        </div>
+        <div class="propertyPaneFooter">-</div>
+       </div>
+      
+       </div>
 
+       <p>
        <input type="button" value="<%=umbraco.ui.Text("general", "ok", this.getUser())%>"
                 onclick="updateMacro()" />
-
+        </p>
     </form>
 </body>
 </html>

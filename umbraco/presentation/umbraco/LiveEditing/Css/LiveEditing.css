@@ -312,10 +312,20 @@ html {
     top:36px;
     left:270px;
     color:#000;
+    border-left:5px solid #A3A3A3;
+    border-right:5px solid #A3A3A3;
+    border-bottom:5px solid #A3A3A3;
 }
 
 #LiveEditingToolbar #moduleSelectorContainer
 {
     padding:10px;
 }
+
+.umbModuleContainerSelector
+{
+    cursor:pointer;
+}
+
+
 		

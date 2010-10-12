@@ -27,7 +27,10 @@
 
  <p id="installingModule" style="display:none;">Installing module...</p>
 
- <p id="moduleSelect" style="display:none;">Select where to place the module</p>
+ <p id="moduleSelect" style="display:none;">
+    <span id="selectedModule"></span><br />
+    Select where to place the module
+ </p>
 
  <a href="javascript:void(0);" onclick="jQuery('.ModuleSelector').hide();umbRemoveModuleContainerSelectors();">Cancel</a>
  </div>
