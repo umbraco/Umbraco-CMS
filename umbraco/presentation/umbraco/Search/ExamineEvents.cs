@@ -18,7 +18,7 @@ namespace umbraco.presentation.umbraco.Search
         public ExamineEvents()
             : base()
         {
-            var indexer = ExamineManager.Instance.IndexProviderCollection["InternalIndexer"] as UmbracoExamineIndexer;
+            var indexer = ExamineManager.Instance.IndexProviderCollection["InternalIndexer"] as UmbracoContentIndexer;
             if (indexer != null)
             {
                 indexer.DocumentWriting += new EventHandler<Examine.LuceneEngine.DocumentWritingEventArgs>(indexer_DocumentWriting);
@@ -28,7 +28,7 @@ namespace umbraco.presentation.umbraco.Search
 
         void indexer_DocumentWriting(object sender, Examine.LuceneEngine.DocumentWritingEventArgs e)
         {
-            if (e.Fields[UmbracoExamineIndexer.IndexTypeFieldName] == IndexTypes.Content && e.Fields.Keys.Contains("nodeName"))
+            if (e.Fields[UmbracoContentIndexer.IndexTypeFieldName] == IndexTypes.Content && e.Fields.Keys.Contains("nodeName"))
             {
                 //add the lower cased version
                 e.Document.Add(new Field("__nodeName",
