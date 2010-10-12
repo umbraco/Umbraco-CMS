@@ -1693,7 +1693,6 @@
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\ModuleSelector.ascx" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\images\skin.gif" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
-    <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinModule.js" />
     <Content Include="umbraco\members\MemberSearch.ascx" />
     <Content Include="umbraco_client\colorpicker\css\colorpicker.css" />
     <Content Include="umbraco_client\colorpicker\images\blank.gif" />
