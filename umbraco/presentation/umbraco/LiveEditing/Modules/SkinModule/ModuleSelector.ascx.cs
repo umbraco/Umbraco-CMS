@@ -52,8 +52,8 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
         private void ShowConnectionError()
         {
-            
-            //this.pnl_connectionerror.Visible = true;
+
+            noConnectionToRepo.Visible = true;
         }
 
         protected void rep_modules_ItemDataBound(object sender, RepeaterItemEventArgs e)

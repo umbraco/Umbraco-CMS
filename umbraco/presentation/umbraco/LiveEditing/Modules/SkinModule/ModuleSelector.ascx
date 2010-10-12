@@ -36,6 +36,10 @@
    
 </asp:Repeater>
 
+<p id="noConnectionToRepo" runat="server" visible="false">
+Unable to fetch module, please try again later.
+</p>
+
  <p id="installingModule" style="display:none;">
     <span class="selectedModule"></span><br />
     <img src="<%= this.ResolveUrl(umbraco.GlobalSettings.Path) %>/LiveEditing/Modules/SkinModule/images/loader.gif" /> Installing module...
