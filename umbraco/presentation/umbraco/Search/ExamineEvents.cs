@@ -18,17 +18,27 @@ namespace umbraco.presentation.umbraco.Search
         public ExamineEvents()
             : base()
         {
-            var indexer = ExamineManager.Instance.IndexProviderCollection["InternalIndexer"] as UmbracoContentIndexer;
-            if (indexer != null)
+            var contentIndexer = ExamineManager.Instance.IndexProviderCollection["InternalIndexer"] as UmbracoContentIndexer;
+            if (contentIndexer != null)
             {
-                indexer.DocumentWriting += new EventHandler<Examine.LuceneEngine.DocumentWritingEventArgs>(indexer_DocumentWriting);
+                contentIndexer.DocumentWriting += new EventHandler<Examine.LuceneEngine.DocumentWritingEventArgs>(indexer_DocumentWriting);
             }
-            
+            var memberIndexer = ExamineManager.Instance.IndexProviderCollection["InternalMemberIndexer"] as UmbracoMemberIndexer;
+            if (memberIndexer != null)
+            {
+                memberIndexer.DocumentWriting += new EventHandler<Examine.LuceneEngine.DocumentWritingEventArgs>(indexer_DocumentWriting);
+            }
         }
 
+        /// <summary>
+        /// Event handler to create a lower cased version of the node name, this is so we can support case-insensitive searching and still
+        /// use the Whitespace Analyzer
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void indexer_DocumentWriting(object sender, Examine.LuceneEngine.DocumentWritingEventArgs e)
         {
-            if (e.Fields[UmbracoContentIndexer.IndexTypeFieldName] == IndexTypes.Content && e.Fields.Keys.Contains("nodeName"))
+            if (e.Fields.Keys.Contains("nodeName"))
             {
                 //add the lower cased version
                 e.Document.Add(new Field("__nodeName",
@@ -39,22 +49,6 @@ namespace umbraco.presentation.umbraco.Search
                                         ));
             }
         }
-
-
-        /// <summary>
-        /// Event handler to create a lower cased version of the node name, this is so we can support case-insensitive searching and still
-        /// use the Whitespace Analyzer
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        //void ExamineEvents_GatheringNodeData(object sender, IndexingNodeDataEventArgs e)
-        //{
-        //    if (e.IndexType == UmbracoExamine.IndexTypes.Content && e.Fields.Keys.Contains("nodeName"))
-        //    {
-        //        //add the lower cased version
-        //        e.Fields.Add("__nodeName", e.Fields["nodeName"].ToLower());
-        //    }
-        //}
 
     }
 }

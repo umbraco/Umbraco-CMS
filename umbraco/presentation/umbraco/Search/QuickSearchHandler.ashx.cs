@@ -44,7 +44,7 @@ namespace umbraco.presentation.umbraco.Search
             }
             
             //if it doesn't start with "*", then search only nodeName and nodeId
-            var internalSearcher = (app == "Member")
+            var internalSearcher = (app == "member")
                 ? UmbracoContext.Current.InternalMemberSearchProvider 
                 : UmbracoContext.Current.InternalSearchProvider;
 
@@ -54,8 +54,8 @@ namespace umbraco.presentation.umbraco.Search
             IEnumerable<SearchResult> results;
             if (txt.StartsWith("*"))
             {
-                //TODO: Why is this here?? i don't understand.
-                results = internalSearcher.Search("*", true);
+                //if it starts with * then search all fields
+                results = internalSearcher.Search(txt, true);
             }
             else
             {
