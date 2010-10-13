@@ -46,7 +46,7 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
                     iu.ImageHeight = h;
 
 
-                if (_value.Count > 0)
+                if (_value.Count > 0 && !string.IsNullOrEmpty(_value[0].ToString()))
                     iu.Text = _value[0].ToString();
 
                 return iu;

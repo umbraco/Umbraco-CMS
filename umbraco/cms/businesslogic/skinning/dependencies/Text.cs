@@ -28,7 +28,7 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
                 tb.TextMode = System.Web.UI.WebControls.TextBoxMode.SingleLine;
                 tb.CssClass = "text";
 
-                if (_value.Count > 0)
+                if (_value.Count > 0 && !string.IsNullOrEmpty(_value[0].ToString()))
                     tb.Text = _value[0].ToString();
                
                 return tb;

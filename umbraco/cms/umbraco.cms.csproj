@@ -215,6 +215,7 @@
     <Compile Include="businesslogic\skinning\controls\SliderControl.cs" />
     <Compile Include="businesslogic\skinning\dependencies\Color.cs" />
     <Compile Include="businesslogic\skinning\dependencies\Image.cs" />
+    <Compile Include="businesslogic\skinning\dependencies\Option.cs" />
     <Compile Include="businesslogic\skinning\dependencies\Slider.cs" />
     <Compile Include="businesslogic\skinning\dependencies\Text.cs" />
     <Compile Include="businesslogic\skinning\Dependency.cs" />

@@ -9,6 +9,10 @@
     height:1px !important;
 }
 
+#costumizeSkin input.text, #costumizeSkin input.title, #costumizeSkin textarea, #costumizeSkin select
+{
+    margin:0;
+}
 </style>
 <script type="text/javascript">
     function closeCustomizeSkinModal() {

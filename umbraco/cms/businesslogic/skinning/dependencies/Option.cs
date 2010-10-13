@@ -2,24 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using umbraco.cms.businesslogic.skinning;
-using umbraco.cms.businesslogic.skinning.controls;
 using System.Web.UI.WebControls;
 
 namespace umbraco.cms.businesslogic.skinning.dependencies
 {
-    public class Color : DependencyType
+    public class Option : DependencyType
     {
-        public ColorPicker cp;
+        public DropDownList ddl;
         public List<Object> _value;
 
-        public Color()
+        public string Options { get; set; }
+
+        public Option()
         {
-            this.Name = "Color";
-            this.Description = "Will render a color picker";
+            this.Name = "Option";
+            this.Description = "Will render a dropdown";
 
 
-            cp = new ColorPicker();
+            ddl = new DropDownList();
             _value = new List<object>();
         }
 
@@ -27,13 +27,18 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
         {
             get
             {
-                cp.TextMode = System.Web.UI.WebControls.TextBoxMode.SingleLine;
-                cp.CssClass = "color";
+                ddl.Items.Clear();
 
-                if (_value.Count > 0 && !string.IsNullOrEmpty(_value[0].ToString()))
-                    cp.Text = _value[0].ToString();
 
-                return cp;
+                ddl.Items.Add("");
+                
+                foreach (string option in Options.Split(';'))
+                    ddl.Items.Add(option);
+
+                if (_value.Count > 0)
+                    ddl.SelectedValue = _value[0].ToString();
+
+                return ddl;
             }
             set
             {
@@ -45,10 +50,10 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
         {
             get
             {
-                if (cp.Text != "")
+                if (ddl.SelectedValue != "")
                 {
                     _value.Clear();
-                    _value.Add(cp.Text);
+                    _value.Add(ddl.SelectedValue);
                 }
                 return _value;
             }
@@ -57,6 +62,5 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
                 _value = value;
             }
         }
-
     }
 }
