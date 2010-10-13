@@ -82,15 +82,14 @@ namespace umbraco.cms.presentation
                             {
                                 string control = getFirstText(uc).Trim(' ', '\r', '\n');
                                 string path = IOHelper.FindFile(control);
-                                
+
 
                                 try
                                 {
                                     Control c = LoadControl(path);
-                                
+
                                     //resolving files from dashboard config which probably does not map to a virtual fi
-                                    tab.Controls.Add(AddShowOnceLink(uc));
-                                    tab.Controls.Add(c);
+                                    tab.Controls.Add(AddPanel(uc, c));
                                 }
                                 catch (Exception ee)
                                 {
@@ -136,13 +135,54 @@ namespace umbraco.cms.presentation
             }
         }
 
+        private Control AddPanel(XmlNode node, Control c)
+        {
+            LiteralControl hide = AddShowOnceLink(node);
+            if (node.Attributes.GetNamedItem("addPanel") != null &&
+                node.Attributes.GetNamedItem("addPanel").Value == "true")
+            {
+                Pane p = new Pane();
+                PropertyPanel pp = new PropertyPanel();
+                if (node.Attributes.GetNamedItem("panelCaption") != null &&
+                    !String.IsNullOrEmpty(node.Attributes.GetNamedItem("panelCaption").Value))
+                {
+                    string panelCaption = node.Attributes.GetNamedItem("panelCaption").Value;
+                    if (panelCaption.StartsWith("#"))
+                    {
+                        panelCaption = ui.Text(panelCaption.Substring(1));
+                    }
+                    pp.Text = panelCaption;
+                }
+                // check for hide in the future link
+                if (!String.IsNullOrEmpty(hide.Text))
+                {
+                    pp.Controls.Add(hide);
+                }
+                pp.Controls.Add(c);
+                p.Controls.Add(pp);
+                return p;
+            }
+
+            if (!String.IsNullOrEmpty(hide.Text))
+            {
+                PlaceHolder ph = new PlaceHolder();
+                ph.Controls.Add(hide);
+                ph.Controls.Add(c);
+                return ph;
+            }
+            else
+            {
+                return c;
+            }
+        }
+
         private LiteralControl AddShowOnceLink(XmlNode node)
         {
             LiteralControl onceLink = new LiteralControl();
             if (node.Attributes.GetNamedItem("showOnce") != null &&
                 node.Attributes.GetNamedItem("showOnce").Value.ToLower() == "true")
             {
-                onceLink.Text = "<a class=\"dashboardHideLink\" href=\"javascript:jQuery.cookie('" + generateCookieKey(node) + "','true');\">" + ui.Text("dashboard", "dontShowAgain") + "</a>";
+                onceLink.Text = "<a class=\"dashboardHideLink\" href=\"javascript:jQuery.cookie('" + generateCookieKey(node) + "','true'); alert('Nicer confirmation than this will come for release!');\">" + ui.Text("dashboard", "dontShowAgain") + "</a>";
             }
             return onceLink;
         }
