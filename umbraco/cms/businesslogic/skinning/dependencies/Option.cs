@@ -31,9 +31,14 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
 
 
                 ddl.Items.Add("");
-                
-                foreach (string option in Options.Split(';'))
-                    ddl.Items.Add(option);
+
+                foreach (string option in Options.Split('|'))
+                {
+                    string text = option.Split(';')[0];
+                    string value = option.Split(';').Length == 2 ? option.Split(';')[1] : text;
+
+                    ddl.Items.Add(new ListItem(text,value));
+                }
 
                 if (_value.Count > 0)
                     ddl.SelectedValue = _value[0].ToString();
