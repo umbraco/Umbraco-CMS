@@ -14,6 +14,13 @@ namespace umbraco.cms.businesslogic.skinning.controls
     [ClientDependency(200,ClientDependencyType.Css, "colorpicker/css/colorpicker.css", "UmbracoClient")]
     public class ColorPicker: TextBox
     {
-        
+
+        protected override void Render(HtmlTextWriter writer)
+        {
+            this.TextMode = System.Web.UI.WebControls.TextBoxMode.SingleLine;
+            this.CssClass = "skinningcolorpicker";
+
+            base.Render(writer);
+        }
     }
 }

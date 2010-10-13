@@ -1,6 +1,6 @@
 ﻿var activecolorpicker;
 
-jQuery('input.color').ColorPicker({
+jQuery('input.skinningcolorpicker').ColorPicker({
     onSubmit: function (hsb, hex, rgb, el) {
         jQuery(el).val('#' + hex);
         jQuery(el).ColorPickerHide();

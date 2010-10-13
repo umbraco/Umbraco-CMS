@@ -26,9 +26,7 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
         public override WebControl Editor
         {
             get
-            {
-                cp.TextMode = System.Web.UI.WebControls.TextBoxMode.SingleLine;
-                cp.CssClass = "color";
+            {               
 
                 if (_value.Count > 0 && !string.IsNullOrEmpty(_value[0].ToString()))
                     cp.Text = _value[0].ToString();
