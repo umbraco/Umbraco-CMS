@@ -30,7 +30,7 @@ namespace umbraco.presentation.nodeFactory
         private string _creatorName;
         private int _writerID;
         private int _creatorID;
-
+        private string _urlName;
         private string _path;
         private DateTime _createDate;
         private DateTime _updateDate;
@@ -192,6 +192,16 @@ namespace umbraco.presentation.nodeFactory
                 if (!_initialized)
                     initialize();
                 return _version;
+            }
+        }
+
+        internal string UrlName
+        {
+            get
+            {
+                if (!_initialized)
+                    initialize();
+                return _urlName;
             }
         }
 
@@ -446,6 +456,8 @@ namespace umbraco.presentation.nodeFactory
                         _name = _pageXmlNode.Attributes.GetNamedItem("nodeName").Value;
                     if (_pageXmlNode.Attributes.GetNamedItem("writerName") != null)
                         _writerName = _pageXmlNode.Attributes.GetNamedItem("writerName").Value;
+                    if (_pageXmlNode.Attributes.GetNamedItem("urlName") != null)
+                        _urlName = _pageXmlNode.Attributes.GetNamedItem("urlName").Value;
                     // Creatorname is new in 2.1, so published xml might not have it!
                     try
                     {
