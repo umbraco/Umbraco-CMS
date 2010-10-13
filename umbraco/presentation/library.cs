@@ -421,10 +421,62 @@ namespace umbraco
             return niceUrlCache[nodeID];
         }
 
+        internal static string niceUrlJuno(int nodeId, int startNodeDepth, string currentDomain)
+        {
+            string parentUrl = String.Empty;
+            XmlElement node = UmbracoContext.Current.GetXml().GetElementById(nodeId.ToString());
+            if (node.ParentNode.Name.ToLower() != "root" || UmbracoSettings.UseDomainPrefixes)
+            {
+                if (UmbracoSettings.UseDomainPrefixes)
+                {
+                    Domain[] domains =
+                        Domain.GetDomainsById(nodeId);
+                    // when there's a domain on a url we'll just return the domain rather than the parent path
+                    if (domains.Length > 0)
+                    {
+                        if (currentDomain != String.Empty)
+                        {
+                            foreach (Domain d in domains)
+                            {
+                                // if there's multiple domains we'll prefer to use the same domain as the current request
+                                if (currentDomain == d.Name.ToLower())
+                                    parentUrl = "http://" + d.Name;
+                            }
+                        }
+
+                        if (parentUrl == String.Empty)
+                        {
+                            parentUrl = "http://" + domains[0].Name;
+                        }
+
+                        return parentUrl;
+                    }
+
+                }
+
+                if (parentUrl == String.Empty && (int.Parse(node.Attributes.GetNamedItem("level").Value) > startNodeDepth || UmbracoSettings.UseDomainPrefixes))
+                {
+                    if (node.ParentNode.Name != "root")
+                    {
+                        parentUrl = niceUrlJuno(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value), startNodeDepth, currentDomain);
+                    }
+                }
+            }
+
+            // only return the current node url if we're at the startnodedepth or higher
+            if (int.Parse(node.Attributes.GetNamedItem("level").Value) >= startNodeDepth)
+                return parentUrl + "/" + node.Attributes.GetNamedItem("urlName").Value;
+            else
+                return "/";
+        }
+
         internal static string NiceUrlFetch(int nodeID, int startNodeDepth)
         {
             bool directoryUrls = GlobalSettings.UseDirectoryUrls;
             string baseUrl = SystemDirectories.Root; // SystemDirectories.Umbraco;
+            string junoUrl = niceUrlJuno(nodeID, startNodeDepth, HttpContext.Current.Request.ServerVariables["SERVER_NAME"].ToLower());
+            return appendUrlExtension(baseUrl, directoryUrls, junoUrl);
+
             //baseUrl = baseUrl.Substring(0, baseUrl.LastIndexOf("/"));
 
             bool atDomain = false;

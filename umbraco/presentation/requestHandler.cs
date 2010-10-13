@@ -10,6 +10,7 @@ using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.IO;
+using umbraco.presentation.nodeFactory;
 
 namespace umbraco {
     /// <summary>
@@ -99,11 +100,22 @@ namespace umbraco {
 
             // Check for Domain prefix
             string domainUrl = "";
-            if (checkDomain && Domain.Exists(HttpContext.Current.Request.ServerVariables["SERVER_NAME"])) {
-                domainUrl =
-                    library.NiceUrlFetch(
-                        Domain.GetRootFromDomain(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]), 1); // we use niceUrlFetch because we have to bypass caching
-                // If at domain root
+            if (checkDomain && Domain.Exists(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]))
+            {
+                // we need to get the node based on domain
+                Node n = new Node(Domain.GetRootFromDomain(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]));
+                domainUrl = n.UrlName; // we don't use niceUrlFetch as we need more control
+                if (n.Parent != null)
+                {
+                    while (n.Parent != null)
+                    {
+                        n = n.Parent;
+                        domainUrl = n.UrlName + "/" + domainUrl;
+                    }
+                }
+                domainUrl = "/" + domainUrl;
+
+            // If at domain root
                 if (url == "") {
                     _tempQuery = "";
                     requestRawUrl = domainUrl.Split("/".ToCharArray());
