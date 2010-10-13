@@ -563,3 +563,11 @@ guiEditor {
 	padding:5px;
 	background-color:White;
 }
+
+/* DASHBOARD */
+.dashboardHideLink 
+{
+    float: right;
+    color: #fff;
+    text-decoration: none;
+}

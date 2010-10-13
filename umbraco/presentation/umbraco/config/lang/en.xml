@@ -164,6 +164,7 @@
     <key alias="restart">Restart</key>
     <key alias="browser">Browse your website</key>
     <key alias="visit">Visit</key>
+    <key alias="dontShowAgain">Click to hide this in the future</key>
   </area>
   <area alias="sections">
     <key alias="content">Content</key>

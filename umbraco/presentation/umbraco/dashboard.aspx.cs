@@ -13,6 +13,8 @@ using System.Xml;
 using System.Xml.XPath;
 using umbraco.uicontrols;
 using umbraco.IO;
+using umbraco.cms.helpers;
+using umbraco.BusinessLogic;
 
 namespace umbraco.cms.presentation
 {
@@ -87,6 +89,7 @@ namespace umbraco.cms.presentation
                                     Control c = LoadControl(path);
                                 
                                     //resolving files from dashboard config which probably does not map to a virtual fi
+                                    tab.Controls.Add(AddShowOnceLink(uc));
                                     tab.Controls.Add(c);
                                 }
                                 catch (Exception ee)
@@ -133,6 +136,17 @@ namespace umbraco.cms.presentation
             }
         }
 
+        private LiteralControl AddShowOnceLink(XmlNode node)
+        {
+            LiteralControl onceLink = new LiteralControl();
+            if (node.Attributes.GetNamedItem("showOnce") != null &&
+                node.Attributes.GetNamedItem("showOnce").Value.ToLower() == "true")
+            {
+                onceLink.Text = "<a class=\"dashboardHideLink\" href=\"javascript:jQuery.cookie('" + generateCookieKey(node) + "','true');\">" + ui.Text("dashboard", "dontShowAgain") + "</a>";
+            }
+            return onceLink;
+        }
+
         private string getFirstText(XmlNode node)
         {
             foreach (XmlNode n in node.ChildNodes)
@@ -144,8 +158,30 @@ namespace umbraco.cms.presentation
             return "";
         }
 
+        private string generateCookieKey(XmlNode node)
+        {
+            string key = String.Empty;
+            if (node.Name.ToLower() == "control")
+            {
+                key = node.FirstChild.Value + "_" + generateCookieKey(node.ParentNode);
+            }
+            else if (node.Name.ToLower() == "tab")
+            {
+                key = node.Attributes.GetNamedItem("caption").Value;
+            }
+
+            return Casing.SafeAlias(key.ToLower());
+        }
+
         private bool validateAccess(XmlNode node)
         {
+            // check if this area should be shown at all
+            string onlyOnceValue = StateHelper.GetCookieValue(generateCookieKey(node));
+            if (!String.IsNullOrEmpty(onlyOnceValue))
+            {
+                return false;
+            }
+
             // the root user can always see everything
             if (CurrentUser.IsRoot())
             {
