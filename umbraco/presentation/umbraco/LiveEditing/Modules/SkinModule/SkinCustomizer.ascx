@@ -2,7 +2,14 @@
 <%@ Import Namespace="umbraco.cms.businesslogic.packager.repositories"  %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<style type="text/css">
+.skinningslider
+{
+    width:250px !important;
+    height:1px !important;
+}
 
+</style>
 <script type="text/javascript">
     function closeCustomizeSkinModal() {
         closeSkinModal();

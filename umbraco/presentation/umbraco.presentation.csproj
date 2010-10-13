@@ -1685,6 +1685,7 @@
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\ImageUploader.aspx" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\images\module.gif" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\disableInstallButtonsOnClick.js" />
+    <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\initslider.js" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\ModuleInjection.js" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\SkinModuleShowOnStartup.js" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\ModuleInjectionMacroRenderer.aspx" />
