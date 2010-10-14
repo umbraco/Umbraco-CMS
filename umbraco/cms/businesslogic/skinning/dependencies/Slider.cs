@@ -16,6 +16,8 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
         public string Maximum { get; set; }
         public string Initial { get; set; }
 
+        public string Ratio { get; set; }
+
         public Slider()
         {
             this.Name = "Slider";
@@ -40,6 +42,11 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
 
                 if (int.TryParse(Maximum, out max))
                     sc.MaximumValue = max;
+
+                int ratio;
+
+                if (int.TryParse(Ratio, out ratio))
+                    sc.Ratio = max;
 
                 int init;
 

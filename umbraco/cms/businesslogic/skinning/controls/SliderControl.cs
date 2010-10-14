@@ -16,6 +16,7 @@ namespace umbraco.cms.businesslogic.skinning.controls
         public int MinimumValue { get; set; }
         public int MaximumValue { get; set; }
         public int InitialValue { get; set; }
+        public int Ratio { get; set; }
 
         protected override void Render(System.Web.UI.HtmlTextWriter writer)
         {
@@ -26,7 +27,7 @@ namespace umbraco.cms.businesslogic.skinning.controls
             writer.WriteLine(
                 string.Format(
                 "<div class='skinningslider' rel='{0}'></div>",
-                MinimumValue + "," + MaximumValue + "," + InitialValue + "," + this.ClientID));
+                MinimumValue + "," + MaximumValue + "," + InitialValue + "," +  Ratio +","+this.ClientID));
 
            
         }
