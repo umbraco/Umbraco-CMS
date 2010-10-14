@@ -315,6 +315,7 @@ html {
     border-left:5px solid #A3A3A3;
     border-right:5px solid #A3A3A3;
     border-bottom:5px solid #A3A3A3;
+    z-index:100;
 }
 
 #LiveEditingToolbar #moduleSelectorContainer
