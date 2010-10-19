@@ -3,6 +3,7 @@ using System.Data;
 
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
+using System.Collections.Generic;
 
 
 namespace umbraco.cms.businesslogic.datatype
@@ -113,5 +114,52 @@ namespace umbraco.cms.businesslogic.datatype
                     return "dataNvarchar";
             }
         }
+
+        internal bool HasSettings()
+        {
+            bool hasSettings = false;
+            foreach (System.Reflection.PropertyInfo p in this.GetType().GetProperties())
+            {
+                object[] o = p.GetCustomAttributes(typeof(DataEditorSetting), true);
+
+                if (o.Length > 0)
+                {
+                    hasSettings = true;
+                    break;
+                }
+            }
+
+            return hasSettings;
+        }
+
+        internal Dictionary<string, DataEditorSetting> Settings()
+        {
+            Dictionary<string, DataEditorSetting> s = new Dictionary<string, DataEditorSetting>();
+
+            foreach (System.Reflection.PropertyInfo p in this.GetType().GetProperties())
+            {
+
+                object[] o = p.GetCustomAttributes(typeof(DataEditorSetting), true);
+
+                if (o.Length > 0)
+                    s.Add(p.Name, (DataEditorSetting)o[0]);
+            }
+
+            return s;
+        }
+
+        internal void LoadSettings(List<Setting<string, string>> settings)
+        {
+            foreach (Setting<string, string> setting in settings)
+            {
+                try
+                {
+                    this.GetType().InvokeMember(setting.Key, System.Reflection.BindingFlags.SetProperty, null, this, new object[] { setting.Value });
+
+                }
+                catch (MissingMethodException ex) { }
+            }
+        }
+
 	}
 }

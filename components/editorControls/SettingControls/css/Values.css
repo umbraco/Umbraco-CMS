@@ -1,0 +1,15 @@
+﻿.valuesDataEditorSettingType .value
+{
+    padding-bottom:5px;
+}
+
+.valuesDataEditorSettingType .value .del
+{
+    color:Red;
+    cursor:pointer;
+}
+
+.valuesDataEditorSettingType .value .handle
+{
+    cursor:move;
+}

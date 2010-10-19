@@ -299,6 +299,27 @@
     <Compile Include="relatedlinks\RelatedLinksDataEditor.cs" />
     <Compile Include="relatedlinks\RelatedLinksDataType.cs" />
     <Compile Include="relatedlinks\RelatedLinksPrevalueEditor.cs" />
+    <Compile Include="SettingControls\CheckBox.cs" />
+    <Compile Include="SettingControls\CheckBoxList.cs" />
+    <Compile Include="SettingControls\DropDownList.cs" />
+    <Compile Include="SettingControls\ListBox.cs" />
+    <Compile Include="SettingControls\ListBoxMultiple.cs" />
+    <Compile Include="SettingControls\Password.cs" />
+    <Compile Include="SettingControls\Pickers\BasePicker.cs" />
+    <Compile Include="SettingControls\Pickers\Content.cs" />
+    <Compile Include="SettingControls\Pickers\Date.cs" />
+    <Compile Include="SettingControls\Pickers\DateWithTime.cs" />
+    <Compile Include="SettingControls\Pickers\DocumentType.cs" />
+    <Compile Include="SettingControls\Pickers\Field.cs" />
+    <Compile Include="SettingControls\Pickers\Media.cs" />
+    <Compile Include="SettingControls\Pickers\MediaType.cs" />
+    <Compile Include="SettingControls\Pickers\MemberGroup.cs" />
+    <Compile Include="SettingControls\Pickers\MemberType.cs" />
+    <Compile Include="SettingControls\Pickers\Path.cs" />
+    <Compile Include="SettingControls\RadioButtonList.cs" />
+    <Compile Include="SettingControls\TextArea.cs" />
+    <Compile Include="SettingControls\TextField.cs" />
+    <Compile Include="SettingControls\Values.cs" />
     <Compile Include="simpleEditor\simpleEditor.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -396,7 +417,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="mediapicker\MediaPicker.js" />
+    <EmbeddedResource Include="SettingControls\css\Values.css" />
+    <EmbeddedResource Include="SettingControls\js\Values.js" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

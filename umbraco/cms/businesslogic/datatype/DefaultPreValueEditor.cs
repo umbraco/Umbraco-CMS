@@ -5,6 +5,7 @@ using System.Web.UI.WebControls;
 using umbraco.interfaces;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
+using System.Collections.Generic;
 
 namespace umbraco.cms.businesslogic.datatype
 {
@@ -24,6 +25,10 @@ namespace umbraco.cms.businesslogic.datatype
         private string _prevalue;
         private bool _displayTextBox;
 
+
+        private Dictionary<string, DataEditorSettingType> dtSettings = new Dictionary<string, DataEditorSettingType>();
+
+
         public static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -39,32 +44,49 @@ namespace umbraco.cms.businesslogic.datatype
             // state it knows its datatypedefinitionid
             _displayTextBox = DisplayTextBox;
             _datatype = DataType;
-            setupChildControls();
+            //setupChildControls();
         }
 
 
-        private void setupChildControls()
-        {
-            _dropdownlist = new DropDownList();
-            _dropdownlist.ID = "dbtype";
+        //private void setupChildControls()
+        //{
+        //    DataEditorPropertyPanel pnlType = new DataEditorPropertyPanel();
+        //    pnlType.Text = ui.Text("dataBaseDatatype");
 
-            _textbox = new TextBox();
-            _textbox.ID = "prevalues";
-            _textbox.Visible = _displayTextBox;
+        //    _dropdownlist = new DropDownList();
+        //    _dropdownlist.ID = "dbtype";
 
-            // put the childcontrols in context - ensuring that
-            // the viewstate is persisted etc.
-            Controls.Add(_textbox);
-            Controls.Add(_dropdownlist);
+        //    _dropdownlist.Items.Add(DBTypes.Date.ToString());
+        //    _dropdownlist.Items.Add(DBTypes.Integer.ToString());
+        //    _dropdownlist.Items.Add(DBTypes.Ntext.ToString());
+        //    _dropdownlist.Items.Add(DBTypes.Nvarchar.ToString());
 
-            _dropdownlist.Items.Add(DBTypes.Date.ToString());
-            _dropdownlist.Items.Add(DBTypes.Integer.ToString());
-            _dropdownlist.Items.Add(DBTypes.Ntext.ToString());
-            _dropdownlist.Items.Add(DBTypes.Nvarchar.ToString());
-        }
+        //    DataEditorPropertyPanel pnlPrevalue = new DataEditorPropertyPanel();
+        //    pnlPrevalue.Text = ui.Text("prevalue");
+
+        //    _textbox = new TextBox();
+        //    _textbox.ID = "prevalues";
+        //    _textbox.Visible = _displayTextBox;
+
+        //    // put the childcontrols in context - ensuring that
+        //    // the viewstate is persisted etc.
+
+        //    pnlType.Controls.Add(_dropdownlist);
+        //    Controls.Add(pnlType);
+
+        //    if (_displayTextBox)
+        //    {
+        //        pnlPrevalue.Controls.Add(_textbox);
+        //        Controls.Add(pnlPrevalue);
+        //    }
+
+            
+        //}
 
         protected override void OnLoad(EventArgs e)
         {
+            LoadSettings();
+
             base.OnLoad(e);
             if (!Page.IsPostBack)
             {
@@ -161,35 +183,49 @@ namespace umbraco.cms.businesslogic.datatype
                 // If the prevalue editor has an prevalue textbox - save the textbox value as the prevalue
                 Prevalue = _textbox.Text;
             }
-        }
 
-        protected override void Render(HtmlTextWriter writer)
-        {
-            writer.Write("<div class='propertyItem'><div class='propertyItemheader'>" + ui.Text("dataBaseDatatype") + "</div>");
-            _dropdownlist.RenderControl(writer);
-            writer.Write("<br style='clear: both'/></div>");
+            DataEditorSettingsStorage ss = new DataEditorSettingsStorage();
 
+            ss.ClearSettings(_datatype.DataTypeDefinitionId);
 
-            if (_displayTextBox)
+            int i = 0;
+            foreach (KeyValuePair<string, DataEditorSettingType> k in dtSettings)
             {
-                writer.Write("<div class='propertyItem'><div class='propertyItemheader'>" + ui.Text("prevalue") + "</div>");
-                _textbox.RenderControl(writer);
-                writer.Write("<br style='clear: both'/></div>");
+                ss.InsertSetting(_datatype.DataTypeDefinitionId, k.Key, k.Value.Value, i);
+                i++;
+
             }
 
-            /*
-            writer.WriteLine("<div class='propertyItem'>");
-            writer.WriteLine("<tr><td>Database datatype</td><td>");
-            _dropdownlist.RenderControl(writer);
-            writer.Write("</td></tr>");
-            if (_displayTextBox)
-                writer.WriteLine("<tr><td>Prevalue: </td><td>");
-            _textbox.RenderControl(writer);
-            writer.WriteLine("</td></tr>");
-            writer.Write("</div>");
-             */
-
+            ss.Dispose();      
         }
+
+        //protected override void Render(HtmlTextWriter writer)
+        //{
+        //    writer.Write("<div class='propertyItem'><div class='propertyItemheader'>" + ui.Text("dataBaseDatatype") + "</div>");
+        //    _dropdownlist.RenderControl(writer);
+        //    writer.Write("<br style='clear: both'/></div>");
+
+
+        //    if (_displayTextBox)
+        //    {
+        //        writer.Write("<div class='propertyItem'><div class='propertyItemheader'>" + ui.Text("prevalue") + "</div>");
+        //        _textbox.RenderControl(writer);
+        //        writer.Write("<br style='clear: both'/></div>");
+        //    }
+
+        //    /*
+        //    writer.WriteLine("<div class='propertyItem'>");
+        //    writer.WriteLine("<tr><td>Database datatype</td><td>");
+        //    _dropdownlist.RenderControl(writer);
+        //    writer.Write("</td></tr>");
+        //    if (_displayTextBox)
+        //        writer.WriteLine("<tr><td>Prevalue: </td><td>");
+        //    _textbox.RenderControl(writer);
+        //    writer.WriteLine("</td></tr>");
+        //    writer.Write("</div>");
+        //     */
+
+        //}
 
         [Obsolete("Use the PreValues class for data access instead")]
         public static string GetPrevalueFromId(int Id)
@@ -197,5 +233,127 @@ namespace umbraco.cms.businesslogic.datatype
             return SqlHelper.ExecuteScalar<string>("Select [value] from cmsDataTypePreValues where id = @id",
                                                    SqlHelper.CreateParameter("@id", Id));
         }
+
+
+
+        protected void LoadSettings()
+        {
+            DataEditorPropertyPanel pnlType = new DataEditorPropertyPanel();
+            pnlType.Text = ui.Text("dataBaseDatatype");
+
+            _dropdownlist = new DropDownList();
+            _dropdownlist.ID = "dbtype";
+
+            _dropdownlist.Items.Add(DBTypes.Date.ToString());
+            _dropdownlist.Items.Add(DBTypes.Integer.ToString());
+            _dropdownlist.Items.Add(DBTypes.Ntext.ToString());
+            _dropdownlist.Items.Add(DBTypes.Nvarchar.ToString());
+
+            DataEditorPropertyPanel pnlPrevalue = new DataEditorPropertyPanel();
+            pnlPrevalue.Text = ui.Text("prevalue");
+
+            _textbox = new TextBox();
+            _textbox.ID = "prevalues";
+            _textbox.Visible = _displayTextBox;
+
+            // put the childcontrols in context - ensuring that
+            // the viewstate is persisted etc.
+
+            pnlType.Controls.Add(_dropdownlist);
+            Controls.Add(pnlType);
+
+            if (_displayTextBox)
+            {
+                pnlPrevalue.Controls.Add(_textbox);
+                Controls.Add(pnlPrevalue);
+            }
+
+           
+            foreach (KeyValuePair<string, DataEditorSetting> kv in _datatype.Settings())
+            {
+                DataEditorSettingType dst = kv.Value.GetDataEditorSettingType();
+                dtSettings.Add(kv.Key, dst);
+
+                DataEditorPropertyPanel panel = new DataEditorPropertyPanel();
+                panel.Text = kv.Value.GetName();
+                panel.Text += "<br/><small>" + kv.Value.description + "</small>";
+
+
+                if (_datatype.HasSettings())
+                {
+                    DataEditorSettingsStorage ss = new DataEditorSettingsStorage();
+
+                    List<Setting<string, string>> s = ss.GetSettings(_datatype.DataTypeDefinitionId);
+                    ss.Dispose();
+
+                    if (s.Find(set => set.Key == kv.Key).Value != null)
+                        dst.Value = s.Find(set => set.Key == kv.Key).Value;
+
+                }
+
+                panel.Controls.Add(dst.RenderControl(kv.Value));
+
+                this.Controls.Add(panel);
+            }
+            
+        }
+    }
+
+
+    public class DataEditorPropertyPanel : System.Web.UI.WebControls.Panel
+    {
+        public DataEditorPropertyPanel()
+        {
+
+        }
+
+        private string m_Text = string.Empty;
+        public string Text
+        {
+            get { return m_Text; }
+            set { m_Text = value; }
+        }
+
+
+        protected override void OnLoad(System.EventArgs EventArguments)
+        {
+        }
+
+        protected override void Render(System.Web.UI.HtmlTextWriter writer)
+        {
+
+            this.CreateChildControls();
+            string styleString = "";
+
+            foreach (string key in this.Style.Keys)
+            {
+                styleString += key + ":" + this.Style[key] + ";";
+            }
+
+            writer.WriteLine("<div class=\"propertyItem\" style='" + styleString + "'>");
+            if (m_Text != string.Empty)
+            {
+                writer.WriteLine("<div class=\"propertyItemheader\">" + m_Text + "</div>");
+                writer.WriteLine("<div class=\"propertyItemContent\">");
+            }
+
+            try
+            {
+                this.RenderChildren(writer);
+            }
+            catch (Exception ex)
+            {
+                writer.WriteLine("Error creating control <br />");
+                writer.WriteLine(ex.ToString());
+            }
+
+            if (m_Text != string.Empty)
+                writer.WriteLine("</div>");
+
+            writer.WriteLine("</div>");
+
+
+        }
+
     }
 }
