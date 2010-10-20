@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
 using umbraco.IO;
+using System.Text.RegularExpressions;
 
 namespace umbraco.editorControls
 {
@@ -36,13 +37,22 @@ namespace umbraco.editorControls
             get { return true; }
         }
 
+        public string SafeUrl(string url)
+        {
+            if (!String.IsNullOrEmpty(url))
+                return Regex.Replace(url, @"[^a-zA-Z0-9\-\.\/\:]{1}", "_");
+            else
+                return String.Empty;
+        }
+
         /// <summary>
         /// Internal logic for validation controls to detect whether or not it's valid (has to be public though) 
         /// </summary>
         /// <value>Am I valid?</value>
         public string IsValid
         {
-            get {
+            get
+            {
                 string tempText = Text;
                 bool isEmpty = String.IsNullOrEmpty(this.PostedFile.FileName);
                 // checkbox, if it's used the file will be deleted and we should throw a validation error
@@ -91,11 +101,11 @@ namespace umbraco.editorControls
                     //{
                     //    //delete old file
                     //    deleteFile(_text);
-                       
+
                     //}
 
                     // Find filename
-                    _text = this.PostedFile.FileName;
+                    _text = SafeUrl(this.PostedFile.FileName);
                     string filename;
                     string _fullFilePath;
 
@@ -103,11 +113,11 @@ namespace umbraco.editorControls
 
                     if (umbraco.UmbracoSettings.UploadAllowDirectories)
                     {
-                        filename = _text.Substring(_text.LastIndexOf( IOHelper.DirSepChar ) + 1, _text.Length - _text.LastIndexOf( IOHelper.DirSepChar ) - 1).ToLower();
+                        filename = _text.Substring(_text.LastIndexOf(IOHelper.DirSepChar) + 1, _text.Length - _text.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower();
                         // Create a new folder in the /media folder with the name /media/propertyid
-                        
 
-                        System.IO.Directory.CreateDirectory( IOHelper.MapPath( SystemDirectories.Media + "/" + _data.PropertyId.ToString() ) );
+
+                        System.IO.Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Media + "/" + _data.PropertyId.ToString()));
 
                         _fullFilePath = IOHelper.MapPath(SystemDirectories.Media + "/" + _data.PropertyId.ToString() + "/" + filename);
                         this.PostedFile.SaveAs(_fullFilePath);
@@ -122,7 +132,7 @@ namespace umbraco.editorControls
                     else
                     {
                         //filename = this.
-                        filename = System.IO.Path.GetFileName(this.PostedFile.FileName);
+                        filename = System.IO.Path.GetFileName(SafeUrl(this.PostedFile.FileName));
                         filename = _data.PropertyId + "-" + filename;
                         _fullFilePath = IOHelper.MapPath(SystemDirectories.Media + "/" + filename);
                         this.PostedFile.SaveAs(_fullFilePath);
@@ -188,7 +198,7 @@ namespace umbraco.editorControls
                             //cms.businesslogic.Content.GetContentFromVersion(_data.Version).getProperty("umbracoWidth").Value = fileWidth.ToString();
                             //cms.businesslogic.Content.GetContentFromVersion(_data.Version).getProperty("umbracoHeight").Value = fileHeight.ToString();
                             content.getProperty("umbracoWidth").Value = fileWidth.ToString();
-                            noEdit widthControl = uploadField.FindControlRecursive<noEdit>(this.Page, "umbracoWidth"); 
+                            noEdit widthControl = uploadField.FindControlRecursive<noEdit>(this.Page, "umbracoWidth");
                             if (widthControl != null)
                             {
                                 widthControl.RefreshLabel(content.getProperty("umbracoWidth").Value.ToString());
@@ -211,7 +221,7 @@ namespace umbraco.editorControls
                         {
                             char sep = ';';
 
-                            if(!_thumbnails.Contains(sep.ToString()) && _thumbnails.Contains(","))
+                            if (!_thumbnails.Contains(sep.ToString()) && _thumbnails.Contains(","))
                                 sep = ',';
 
                             string[] thumbnailSizes = _thumbnails.Split(sep);
@@ -387,7 +397,7 @@ namespace umbraco.editorControls
                 }
                 else
                     output.WriteLine("<a href=\"" + IOHelper.FindFile(this.Text) + "\" target=\"_blank\">" + IOHelper.FindFile(this.Text) + "</a><br/>");
-                
+
                 output.WriteLine("<input type=\"checkbox\" id=\"" + this.ClientID + "clear\" name=\"" + this.ClientID + "clear\" value=\"1\"/> <label for=\"" + this.ClientID + "clear\">" + ui.Text("uploadClear") + "</label><br/>");
             }
             base.Render(output);
