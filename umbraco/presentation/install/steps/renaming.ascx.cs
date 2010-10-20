@@ -13,6 +13,7 @@ namespace umbraco.presentation.install.steps
     public partial class renaming : System.Web.UI.UserControl
     {
         private string _oldAccessFilePath = IO.IOHelper.MapPath(IO.SystemDirectories.Data + "/access.xml");
+        private string _newAccessFilePath = IO.IOHelper.MapPath(IO.SystemDirectories.Data + "/access.config");
         private bool _changesNeeded = false;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -39,7 +40,7 @@ namespace umbraco.presentation.install.steps
 
         private string checkAccessFile()
         {
-            if (oldAccessFileExist())
+            if (!newAccessFileExist() && oldAccessFileExist())
             {
                 _changesNeeded = true;
                 return "<li>Access.xml found. Needs to be renamed to access.config</li>";
@@ -53,6 +54,11 @@ namespace umbraco.presentation.install.steps
         private bool oldAccessFileExist()
         {
             return File.Exists(_oldAccessFilePath);
+        }
+
+        private bool newAccessFileExist()
+        {
+            return File.Exists(_newAccessFilePath);
         }
 
         private string checkExtensionPaths(string filename, string extensionName)
