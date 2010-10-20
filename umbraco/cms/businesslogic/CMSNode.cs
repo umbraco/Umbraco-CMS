@@ -105,15 +105,28 @@ namespace umbraco.cms.businesslogic
         }
 
         /// <summary>
-        /// Number of children of the current CMSNode
+        /// Number of ancestors of the current CMSNode
         /// </summary>
         /// <param name="Id">The CMSNode Id</param>
         /// <returns>
-        /// The number of children from the given CMSNode
+        /// The number of ancestors from the given CMSNode
         /// </returns>
         public static int CountSubs(int Id)
         {
             return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE ','+path+',' LIKE '%," + Id.ToString() + ",%'");
+        }
+
+        /// <summary>
+        /// Returns the number of leaf nodes from the parent id for a given object type
+        /// </summary>
+        /// <param name="parentId"></param>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
+        public static int CountLeafNodes(int parentId, Guid objectType)
+        {
+            return SqlHelper.ExecuteScalar<int>("Select count(uniqueID) from umbracoNode where nodeObjectType = @type And parentId = @parentId",
+                SqlHelper.CreateParameter("@type", objectType),
+                SqlHelper.CreateParameter("@parentId", parentId));
         }
 
         /// <summary>
@@ -192,9 +205,6 @@ namespace umbraco.cms.businesslogic
         }
 
 
-        #endregion
-
-        #region Protected static
         /// <summary>
         /// Retrieves the top level nodes in the hierarchy
         /// </summary>
@@ -202,7 +212,7 @@ namespace umbraco.cms.businesslogic
         /// <returns>
         /// A list of all top level nodes given the objecttype
         /// </returns>
-        protected static Guid[] TopMostNodeIds(Guid ObjectType)
+        public static Guid[] TopMostNodeIds(Guid ObjectType)
         {
             IRecordsReader dr = SqlHelper.ExecuteReader("Select uniqueID from umbracoNode where nodeObjectType = @type And parentId = -1 order by sortOrder",
                 SqlHelper.CreateParameter("@type", ObjectType));
@@ -216,6 +226,10 @@ namespace umbraco.cms.businesslogic
             return retval;
         }
 
+        #endregion
+
+        #region Protected static
+      
 
         /// <summary>
         /// Given the protected modifier the CMSNode.MakeNew method can only be accessed by

@@ -11,6 +11,8 @@ using System.Web.UI.HtmlControls;
 using umbraco.BusinessLogic;
 using System.Web.Security;
 using umbraco.IO;
+using umbraco.cms.businesslogic.web;
+using System.Linq;
 
 namespace umbraco.cms.presentation
 {
@@ -85,9 +87,11 @@ namespace umbraco.cms.presentation
                     // If the startnode is -1 (access to all content), we'll redirect to the top root node
                     if (startNode == -1)
                     {
-                        if (umbraco.cms.businesslogic.web.Document.GetRootDocuments().Length > 0)
+                        if (Document.CountLeafNodes(-1, Document._objectType) > 0)
                         {
-                            startNode = umbraco.cms.businesslogic.web.Document.GetRootDocuments()[0].Id;
+                            //get the first document
+                            var firstNodeId = Document.TopMostNodeIds(Document._objectType).First();
+                            startNode = new Document(firstNodeId).Id;
                         }
                         else
                         {

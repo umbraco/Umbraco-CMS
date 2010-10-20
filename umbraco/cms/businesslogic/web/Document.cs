@@ -405,7 +405,7 @@ namespace umbraco.cms.businesslogic.web
             // Update the sortOrder if the parent was the root!
             if (ParentId == -1)
             {
-                newNode.sortOrder = GetRootDocuments().Length + 1;
+                newNode.sortOrder = CountLeafNodes(-1, Document._objectType) + 1;
             }
 
             //read the whole object from the db
