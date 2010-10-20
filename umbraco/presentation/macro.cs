@@ -1485,6 +1485,13 @@ namespace umbraco
                              querystring;
 
                 HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+
+                // propagate the user's context
+                HttpCookie inCookie = HttpContext.Current.Request.Cookies["UserContext"];
+                Cookie cookie = new Cookie(inCookie.Name, inCookie.Value, inCookie.Path, HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
+                myHttpWebRequest.CookieContainer = new CookieContainer();
+                myHttpWebRequest.CookieContainer.Add(cookie);
+
                 // Assign the response object of 'HttpWebRequest' to a 'HttpWebResponse' variable.
                 HttpWebResponse myHttpWebResponse = null;
                 try
@@ -1519,7 +1526,7 @@ namespace umbraco
                     // Release the HttpWebResponse Resource.
                     myHttpWebResponse.Close();
                 }
-                catch
+                catch (Exception ee)
                 {
                     retVal = "<span style=\"color: green\">No macro content available for WYSIWYG editing</span>";
                 }
