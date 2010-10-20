@@ -234,11 +234,10 @@ namespace umbraco
                 using (IRecordsReader macroDef = SqlHelper.ExecuteReader("select * from cmsMacro left join cmsMacroProperty property on property.macro = cmsMacro.id left join cmsMacroPropertyType editPropertyType on editPropertyType.id = property.macroPropertyType where cmsMacro.id = @macroID order by property.macroPropertySortOrder",
                                                                         SqlHelper.CreateParameter("@macroID", id)))
                 {
-                    bool hasRecords = macroDef.Read();
-                    if (!hasRecords)
+                    if (!macroDef.HasRecords)
                         HttpContext.Current.Trace.Warn("Macro", "No definition found for id " + id);
 
-                    while (hasRecords)
+                    while (macroDef.Read())
                     {
                         string tmpStr;
                         bool tmpBool;
@@ -279,8 +278,6 @@ namespace umbraco
                             if (TryGetColumnString(macroDef, "macroPropertyTypeBaseType", out baseType) && !propertyDefinitions.ContainsKey(tmpStr))
                                 propertyDefinitions.Add(tmpStr, baseType);
                         }
-
-                        hasRecords = macroDef.Read();
                     }
                 }
                 // add current macro-object to cache
@@ -379,8 +376,12 @@ namespace umbraco
         private string getCacheGuid(Hashtable attributes, Hashtable pageElements, int pageId)
         {
             string tempGuid = string.Empty;
+
             if (CacheByPage)
+            {
                 tempGuid = pageId + "-";
+            }
+
             if (CacheByPersonalization)
             {
                 if (Member.GetCurrentMember() != null)
@@ -409,22 +410,23 @@ namespace umbraco
 
             StateHelper.SetContextValue(macrosAddedKey, StateHelper.GetContextValue<int>(macrosAddedKey) + 1);
 
-            Control macroHtml = null;
+            String macroHtml = null;
+            Control macroControl = null;
 
             string macroGuid = getCacheGuid(attributes, pageElements, pageId);
 
             if (RefreshRate > 0)
             {
-                if (macroCache["macroHtml_" + macroGuid] != null)
+                macroHtml = macroCache["macroHtml_" + macroGuid] as String;
+
+                if (!String.IsNullOrEmpty(macroHtml))
                 {
-                    MacroCacheContent cacheContent = (MacroCacheContent)macroCache["macroHtml_" + macroGuid];
-                    macroHtml = cacheContent.Content;
-                    macroHtml.ID = cacheContent.ID;
+                    macroHtml = macroCache["macroHtml_" + macroGuid] as String;
                     HttpContext.Current.Trace.Write("renderMacro", "Content loaded from cache ('" + macroGuid + "')...");
                 }
             }
 
-            if (macroHtml == null)
+            if (String.IsNullOrEmpty(macroHtml))
             {
                 switch (MacroType)
                 {
@@ -432,14 +434,14 @@ namespace umbraco
                         try
                         {
                             HttpContext.Current.Trace.Write("umbracoMacro", "Usercontrol added (" + scriptType + ")");
-                            macroHtml = loadUserControl(ScriptType, attributes, pageElements);
+                            macroControl = loadUserControl(ScriptType, attributes, pageElements);
                             break;
                         }
                         catch (Exception e)
                         {
                             HttpContext.Current.Trace.Warn("umbracoMacro",
                                                            "Error loading userControl (" + scriptType + ")", e);
-                            macroHtml = new LiteralControl("Error loading userControl '" + scriptType + "'");
+                            macroControl = new LiteralControl("Error loading userControl '" + scriptType + "'");
                             break;
                         }
                     case (int)eMacroType.CustomControl:
@@ -447,7 +449,7 @@ namespace umbraco
                         {
                             HttpContext.Current.Trace.Write("umbracoMacro", "Custom control added (" + scriptType + ")");
                             HttpContext.Current.Trace.Write("umbracoMacro", "ScriptAssembly (" + scriptAssembly + ")");
-                            macroHtml = loadControl(scriptAssembly, ScriptType, attributes, pageElements);
+                            macroControl = loadControl(scriptAssembly, ScriptType, attributes, pageElements);
                             break;
                         }
                         catch (Exception e)
@@ -455,20 +457,20 @@ namespace umbraco
                             HttpContext.Current.Trace.Warn("umbracoMacro",
                                                            "Error loading customControl (Assembly: " + scriptAssembly +
                                                            ", Type: '" + scriptType + "'", e);
-                            macroHtml =
+                            macroControl =
                                 new LiteralControl("Error loading customControl (Assembly: " + scriptAssembly +
                                                    ", Type: '" +
                                                    scriptType + "'");
                             break;
                         }
                     case (int)eMacroType.XSLT:
-                        macroHtml = loadMacroXSLT(this, attributes, pageElements);
+                        macroControl = loadMacroXSLT(this, attributes, pageElements);
                         break;
                     case (int)eMacroType.Script:
                         try
                         {
                             HttpContext.Current.Trace.Write("umbracoMacro", "DLR Script script added (" + ScriptFile + ")");
-                            macroHtml = loadMacroDLR(this, attributes, pageElements);
+                            macroControl = loadMacroDLR(this, attributes, pageElements);
                             break;
                         }
                         catch (Exception e)
@@ -492,13 +494,13 @@ namespace umbraco
                             result.Text += args;
                             */
 
-                            macroHtml = result;
+                            macroControl = result;
 
                             break;
                         }
                     default:
                         if (GlobalSettings.DebugMode)
-                            macroHtml =
+                            macroControl =
                                 new LiteralControl("&lt;Macro: " + Name + " (" + ScriptAssembly + "," + ScriptType +
                                                    ")&gt;");
                         break;
@@ -509,13 +511,32 @@ namespace umbraco
                 {
                     // do not add to cache if there's no member and it should cache by personalization
                     if (!CacheByPersonalization || (CacheByPersonalization && Member.GetCurrentMember() != null))
-                        if (macroHtml != null)
-                            macroCache.Insert("macroHtml_" + macroGuid, new MacroCacheContent(macroHtml, macroHtml.ID), null,
-                                              DateTime.Now.AddSeconds(RefreshRate), TimeSpan.Zero, CacheItemPriority.Low,
-                                              null);
+                    {
+                        if (macroControl != null)
+                        {
+                            using (StringWriter sw = new StringWriter())
+                            {
+                                HtmlTextWriter hw = new HtmlTextWriter(sw);
+                                macroControl.RenderControl(hw);
+
+                                macroCache.Insert("macroHtml_" + macroGuid,
+                                                    sw.ToString(),
+                                                    null,
+                                                    DateTime.Now.AddSeconds(RefreshRate),
+                                                    TimeSpan.Zero,
+                                                    CacheItemPriority.Low,
+                                                    null);
+                            }
+                        }
+                    }
                 }
             }
-            return macroHtml;
+            else
+            {
+                macroControl = new LiteralControl(macroHtml);
+            }
+
+            return macroControl;
         }
 
         public static XslCompiledTransform getXslt(string XsltFile)
@@ -1464,12 +1485,6 @@ namespace umbraco
                              querystring;
 
                 HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-                HttpCookie inCookie = HttpContext.Current.Request.Cookies["UserContext"]; 
-                string domain = HttpContext.Current.Request.ServerVariables["SERVER_NAME"]; 
-                Cookie cookie = new Cookie(inCookie.Name, inCookie.Value, inCookie.Path, domain); 
-                myHttpWebRequest.CookieContainer = new CookieContainer(); 
-                myHttpWebRequest.CookieContainer.Add(cookie);                
-                
                 // Assign the response object of 'HttpWebRequest' to a 'HttpWebResponse' variable.
                 HttpWebResponse myHttpWebResponse = null;
                 try
@@ -1504,7 +1519,7 @@ namespace umbraco
                     // Release the HttpWebResponse Resource.
                     myHttpWebResponse.Close();
                 }
-                catch (Exception ee)
+                catch
                 {
                     retVal = "<span style=\"color: green\">No macro content available for WYSIWYG editing</span>";
                 }
