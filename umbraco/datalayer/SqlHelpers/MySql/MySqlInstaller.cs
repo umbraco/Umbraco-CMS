@@ -21,12 +21,13 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
         #region Private Constants
 
         /// <summary>The latest database version this installer supports.</summary>
-        private const DatabaseVersion LatestVersionSupported = DatabaseVersion.Version4;
+        private const DatabaseVersion LatestVersionSupported = DatabaseVersion.Version4_1;
 
         /// <summary>The specifications to determine the database version.</summary>
         private static readonly VersionSpecs[] m_VersionSpecs = new VersionSpecs[] {
 					new VersionSpecs("id","umbracoNode", "-21", DatabaseVersion.Version4_1),
                     new VersionSpecs("action","umbracoAppTree",DatabaseVersion.Version4),
+                    new VersionSpecs("description","cmsContentType",DatabaseVersion.Version3),
                     new VersionSpecs("version()","",DatabaseVersion.None) };
 
         #endregion
@@ -40,13 +41,13 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
         /// 	<c>true</c> if the installer can upgrade the data source; otherwise, <c>false</c>.
         /// </value>
         /// <remarks>Empty data sources can't be upgraded, just installed.</remarks>
-		public override bool CanUpgrade
-		{
-			get
-			{
-				return CurrentVersion == DatabaseVersion.Version4;
-			}
-		}
+        public override bool CanUpgrade
+        {
+            get
+            {
+                return CurrentVersion == DatabaseVersion.Version4;
+            }
+        }
 
         #endregion
 
@@ -73,27 +74,27 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
 
         #endregion
 
-        #region DefaultInstaller Members        
+        #region DefaultInstaller Members
 
-		/// <summary>
-		/// Returns the sql to do a full install
-		/// </summary>
-		protected override string FullInstallSql
-		{
-			get { return GetMySqlVersion() >= 5 ? SqlResources.Total : ConvertToMySql4(SqlResources.Total); }
-		}
+        /// <summary>
+        /// Returns the sql to do a full install
+        /// </summary>
+        protected override string FullInstallSql
+        {
+            get { return GetMySqlVersion() >= 5 ? SqlResources.Total : ConvertToMySql4(SqlResources.Total); }
+        }
 
-		/// <summary>
-		/// Returns the sql to do an upgrade
-		/// </summary>
-		protected override string UpgradeSql
-		{
-			get
-			{
-				string upgradeFile = string.Format("{0}_Upgrade", CurrentVersion.ToString());
-				return SqlResources.ResourceManager.GetString(upgradeFile);
-			}
-		}		
+        /// <summary>
+        /// Returns the sql to do an upgrade
+        /// </summary>
+        protected override string UpgradeSql
+        {
+            get
+            {
+                string upgradeFile = string.Format("{0}_Upgrade", CurrentVersion.ToString());
+                return SqlResources.ResourceManager.GetString(upgradeFile);
+            }
+        }
 
         #endregion
 
