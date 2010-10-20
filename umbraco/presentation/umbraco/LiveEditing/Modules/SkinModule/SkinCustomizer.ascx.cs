@@ -53,6 +53,8 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                     }
                 }
             }
+
+            library.RefreshContent();
         }
 
         protected void LoadDependencies()
