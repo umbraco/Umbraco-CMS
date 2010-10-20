@@ -54,7 +54,7 @@ namespace umbraco.editorControls
             get
             {
                 string tempText = Text;
-                bool isEmpty = String.IsNullOrEmpty(this.PostedFile.FileName);
+                bool isEmpty = this.PostedFile == null || String.IsNullOrEmpty(this.PostedFile.FileName);
                 // checkbox, if it's used the file will be deleted and we should throw a validation error
                 if (Page.Request[this.ClientID + "clear"] != null && Page.Request[this.ClientID + "clear"].ToString() != "")
                     return "";
