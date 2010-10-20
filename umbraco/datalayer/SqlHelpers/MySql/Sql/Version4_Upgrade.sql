@@ -4,7 +4,10 @@
  
 	IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
  
-    Database version: 4.1.0.2
+	//CHANGE:Allan Stegelmann Laustsen
+    Database version: 4.1.0.3
+    //CHANGE:End
+    
     
     Please increment this version number if ANY change is made to this script,
     so compatibility with scripts for other database systems can be verified easily.
@@ -46,3 +49,15 @@ CREATE TABLE cmsPreviewXml(
 ALTER TABLE cmsPreviewXml ADD CONSTRAINT PK_cmsContentPreviewXml PRIMARY KEY CLUSTERED (nodeId, versionId) 
 ; 
 
+ALTER TABLE cmscontentversion MODIFY COLUMN id INTEGER NOT NULL AUTO_INCREMENT
+; 
+
+/* Create missing indexes and primary keys */
+CREATE INDEX IX_Icon ON cmsContentType(nodeId, icon)
+;
+
+/* CHANGE:Allan Stegelmann Laustsen */
+/* Create Custom Index to speed up tree loading */
+CREATE INDEX IX_contentid_versiondate ON cmscontentversion(CONTENTID, VERSIONDATE)
+;
+/* CHANGE:End */

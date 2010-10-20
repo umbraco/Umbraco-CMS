@@ -87,6 +87,14 @@ namespace umbraco.presentation.webservices
                         if (helper.Request("app") == "content" | helper.Request("app") == "")
                             isContent = true;
 
+                        //CHANGE:Allan Stegelmann Laustsen, we need to know if the node is in media.
+                        bool isMedia = false;
+                        if (helper.Request("app") == "media")
+                        {
+                            isMedia = true;
+                        }
+                        //CHANGE:End
+
                         for (int i = 0; i < tmp.Length; i++)
                         {
                             if (tmp[i] != "" && tmp[i].Trim() != "")
@@ -103,6 +111,12 @@ namespace umbraco.presentation.webservices
                                         library.UpdateDocumentCache(int.Parse(tmp[i]));
                                     }
                                 }
+                                //CHANGE:Allan Laustsen, to update the sortorder of the media node in the XML, re-save the node....
+                                else if (isMedia)
+                                {
+                                    new cms.businesslogic.media.Media(int.Parse(tmp[i])).Save();
+                                }
+                                //CHANGE:End
                             }
                         }
 
@@ -125,6 +139,7 @@ namespace umbraco.presentation.webservices
                             if (UmbracoSettings.UseDistributedCalls)
                                 library.RefreshContent();
                         }
+                       
 
                         // fire actionhandler, check for content
                         if ((helper.Request("app") == "content" | helper.Request("app") == "") && ParentId > 0)

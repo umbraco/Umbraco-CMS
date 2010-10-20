@@ -125,7 +125,9 @@ namespace umbraco.cms.businesslogic.datatype
                     // Try to set null values if possible
                     try
                     {
-                        if (value == null)
+                        //CHANGE:by Allan Laustsen to fix copy nodes
+                        //if (value == null)
+                        if (value == null || (string.IsNullOrEmpty(value.ToString()) && (this._dataType.DBType == DBTypes.Integer || this._dataType.DBType == DBTypes.Date)))
                             SqlHelper.ExecuteNonQuery("update cmsPropertyData set " + _dataType.DataFieldName + " = NULL where id = " + m_PropertyId);
                         else
                             SqlHelper.ExecuteNonQuery("update cmsPropertyData set " + _dataType.DataFieldName + " = @value where id = " + m_PropertyId, SqlHelper.CreateParameter("@value", value));

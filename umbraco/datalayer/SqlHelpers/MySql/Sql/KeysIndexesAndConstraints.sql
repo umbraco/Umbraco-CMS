@@ -10,3 +10,9 @@ NOT GOING TO BREAK UMBRACO.
 /* Create missing indexes and primary keys */
 CREATE INDEX IX_Icon ON cmsContentType(nodeId, icon)
 ;
+
+/* CHANGE:Allan Stegelmann Laustsen */
+/* Create Custom Index to speed up tree loading */
+CREATE INDEX IX_contentid_versiondate ON cmscontentversion(CONTENTID, VERSIONDATE)
+;
+/* CHANGE:End */
