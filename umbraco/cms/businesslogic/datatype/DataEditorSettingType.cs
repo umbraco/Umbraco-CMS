@@ -16,5 +16,7 @@ namespace umbraco.cms.businesslogic.datatype
             get { return m_prevalues; }
             set { m_prevalues = value; }
         }
+
+        public string DefaultValue { get; set; }
     }
 }

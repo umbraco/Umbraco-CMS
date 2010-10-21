@@ -30,8 +30,8 @@ namespace umbraco.editorControls.SettingControls
             tb.CssClass = "guiInputText guiInputStandardSize";
 
 
-            if (string.IsNullOrEmpty(tb.Text) && Prevalues.Count > 0)
-                tb.Text = Prevalues[0];
+            if (string.IsNullOrEmpty(tb.Text) && !string.IsNullOrEmpty(DefaultValue))
+                tb.Text = DefaultValue;
 
             return tb;
         }

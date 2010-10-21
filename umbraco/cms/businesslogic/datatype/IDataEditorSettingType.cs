@@ -8,6 +8,7 @@ namespace umbraco.cms.businesslogic.datatype
     public interface IDataEditorSettingType
     {
         string Value { get; set; }
+        string DefaultValue { get; set; }
         System.Web.UI.Control RenderControl(DataEditorSetting setting);
     }
 }
