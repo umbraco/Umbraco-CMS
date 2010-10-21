@@ -11,16 +11,15 @@ namespace umbraco.cms.businesslogic.datatype
     {
         string name;
         public string description;
-        public string control;
-        public string assembly;
+        public string type;
         public string prevalues;
 
         public DataEditorSetting(string name)
         {
             this.name = name;
             description = "";
-            control = "umbraco.editorControls.SettingControls.TextField";
-            assembly = "umbraco.editorControls";
+            type = "umbraco.editorControls.SettingControls.TextField, umbraco.editorControls";
+
             prevalues = "";
         }
 
@@ -39,8 +38,13 @@ namespace umbraco.cms.businesslogic.datatype
 
         public DataEditorSettingType GetDataEditorSettingType()
         {
-            Assembly a = string.IsNullOrEmpty(assembly) ? Assembly.GetExecutingAssembly() : Assembly.Load(assembly);
-            DataEditorSettingType dst = (DataEditorSettingType)a.CreateInstance(control);
+            //Assembly a = string.IsNullOrEmpty(assembly) ? Assembly.GetExecutingAssembly() : Assembly.Load(assembly);
+            //DataEditorSettingType dst = (DataEditorSettingType)a.CreateInstance(control);
+
+            Type t = System.Web.Compilation.BuildManager.GetType(type, false);
+            DataEditorSettingType dst = (DataEditorSettingType)System.Activator.CreateInstance(t, true);
+
+          
 
             if (dst != null)
                 dst.Prevalues = GetPrevalues();
