@@ -133,17 +133,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             {
                 case "injectmodule":
                     //update template, insert macro tag
-
-                    if (InsertMacroTag(nodeFactory.Node.GetCurrent().template,e.Message.Split(';')[0], e.Message.Split(';')[1], e.Message.Split(';')[2] == "prepend"))
-                    {
-                        //ok
-
-                    }
-                    else
-                    {
-                        //not ok
-                    }
-
+                    InsertModule(nodeFactory.Node.GetCurrent().template, e.Message.Split(';')[0], e.Message.Split(';')[1], e.Message.Split(';')[2] == "prepend");
                     break;
                 case "movemodule":
 
@@ -157,19 +147,9 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
                     if (module != null)
                     {
-
-                        //if(module.ParentNode.Id ==  e.Message.Split(';')[1])
-                        //{
-                        //    //move within container
-                        //}
-                        //else
-                        //{
-                            //move to different container
-                            FindModule(nodeFactory.Node.GetCurrent().template, moduleId, true);
-                            MoveModule(nodeFactory.Node.GetCurrent().template, module, parentId, index);
-                        //}
+                        FindModule(nodeFactory.Node.GetCurrent().template, moduleId, true);
+                        MoveModule(nodeFactory.Node.GetCurrent().template, module, parentId, index);
                     }
-
 
                     break;
 
@@ -250,7 +230,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                     return null;
             }
         }
-        private bool InsertMacroTag(int template, string targetId, string tag, bool prepend)
+        private bool InsertModule(int template, string targetId, string tag, bool prepend)
         {
             Template t = new Template(template);
 
@@ -279,7 +259,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             {
                 //might be on master template
                 if (t.HasMasterTemplate)
-                    return InsertMacroTag(t.MasterTemplate, targetId, tag, prepend);
+                    return InsertModule(t.MasterTemplate, targetId, tag, prepend);
                 else
                     return false;
             }
