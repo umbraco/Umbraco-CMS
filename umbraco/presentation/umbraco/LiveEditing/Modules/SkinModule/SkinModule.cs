@@ -153,6 +153,12 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
                     break;
 
+                case "removemodule":
+
+                    FindModule(nodeFactory.Node.GetCurrent().template,  e.Message.Split(';')[0], true);
+
+                    break;
+
             }
         }
 
