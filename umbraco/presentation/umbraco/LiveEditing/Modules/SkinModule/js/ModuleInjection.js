@@ -1,5 +1,19 @@
 ﻿var umbModuleToInsertAlias;
 
+
+function umbMakeModulesSortable() {
+
+    jQuery(".umbModuleContainer").sortable({
+        connectWith: '.umbModuleContainer',
+        items: '.umbModule',
+        stop: function (event, ui) {
+
+            UmbracoCommunicator.SendClientMessage("movemodule", ui.item.attr('id') + ";" + ui.item.parent().attr('id') + ";" + jQuery('.umbModule', ui.item.parent()).index(ui.item));
+        }
+    });
+
+}
+
 function umbSelectModule(alias,sender) {
     jQuery('#modules').hide();
     jQuery('#moduleSelect').show();
@@ -85,15 +99,30 @@ function umbInsertModule(container,macro,type) {
         jQuery("#" + container).prepend(working);
     }
 
-    UmbracoCommunicator.SendClientMessage("injectmodule", container + ";" + macro + ";" + type);
+    var moduleguid = guid();
+
+   
+
+    UmbracoCommunicator.SendClientMessage("injectmodule", container + ";" + "<div id='"+ moduleguid +"' class='umbModule'>" + macro + "</div>;" + type);
 
     //need to lose these replace calls
 
     jQuery.post(umbCurrentUmbracoDir + "/LiveEditing/Modules/SkinModule/ModuleInjectionMacroRenderer.aspx?tag=" + macro.replace('>', '').replace('<', '').replace('</umbraco:Macro>', '') + "&umbPageID=" + umbCurrentPageId,
      function (data) {
-         jQuery(".umbModuleContainerPlaceHolder").html(data);
+         jQuery(".umbModuleContainerPlaceHolder").html("<div id='" + moduleguid + "' class='umbModule'>" + data + "</div>;");
 
          UmbSpeechBubble.ShowMessage("Info", "Module", "Module inserted");
     });
 
-}
+ }
+
+
+ function S4() {
+     return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+ }
+ function guid() {
+     return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+ }
+
+ //startup stuff
+ umbMakeModulesSortable();

@@ -134,7 +134,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                 case "injectmodule":
                     //update template, insert macro tag
 
-                    if (InsertMacroTag(nodeFactory.Node.GetCurrent().template, e.Message.Split(';')[0], e.Message.Split(';')[1], e.Message.Split(';')[2] == "prepend"))
+                    if (InsertMacroTag(nodeFactory.Node.GetCurrent().template,e.Message.Split(';')[0], e.Message.Split(';')[1], e.Message.Split(';')[2] == "prepend"))
                     {
                         //ok
 
@@ -145,9 +145,111 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                     }
 
                     break;
+                case "movemodule":
+
+                    string moduleId = e.Message.Split(';')[0];
+                    string parentId = e.Message.Split(';')[1];
+
+                    int index = 0;
+                    int.TryParse(e.Message.Split(';')[2], out index);
+
+                    HtmlNode module = FindModule(nodeFactory.Node.GetCurrent().template, moduleId, false);
+
+                    if (module != null)
+                    {
+
+                        //if(module.ParentNode.Id ==  e.Message.Split(';')[1])
+                        //{
+                        //    //move within container
+                        //}
+                        //else
+                        //{
+                            //move to different container
+                            FindModule(nodeFactory.Node.GetCurrent().template, moduleId, true);
+                            MoveModule(nodeFactory.Node.GetCurrent().template, module, parentId, index);
+                        //}
+                    }
+
+
+                    break;
+
             }
         }
 
+        private bool MoveModule(int template, HtmlNode module, string targetId, int index)
+        {
+            Template t = new Template(template);
+
+            string TargetFile = t.MasterPageFile;
+            string TargetID = targetId;
+
+            HtmlDocument doc = new HtmlDocument();
+            doc.Load(TargetFile);
+
+            if (doc.DocumentNode.SelectNodes(string.Format("//*[@id = '{0}']", TargetID)) != null)
+            {
+                HtmlNode parent = doc.DocumentNode.SelectSingleNode(string.Format("//*[@id = '{0}']", TargetID));
+
+                if (index > 0 && parent.ChildNodes.Count > 0)
+                {
+                    parent.InsertAfter(module, parent.ChildNodes[index - 1]);
+                }
+                else if (index == 0 && parent.ChildNodes.Count > 0)
+                {
+                    parent.InsertBefore(module, parent.ChildNodes[0]);
+                }
+                else
+                {
+                    parent.ChildNodes.Add(module);
+                }
+
+                doc.Save(TargetFile);
+
+                return true;
+
+            }
+            else
+            {
+                //might be on master template
+                if (t.HasMasterTemplate)
+                    return MoveModule(template, module, targetId,index);
+                else
+                    return false;
+            }
+        }
+
+        private HtmlNode FindModule(int template, string id, bool remove)
+        {
+            Template t = new Template(template);
+            string TargetFile = t.MasterPageFile;
+            string TargetID = id;
+
+            HtmlDocument doc = new HtmlDocument();
+            doc.Load(TargetFile);
+
+            if (doc.DocumentNode.SelectSingleNode(string.Format("//*[@id = '{0}']", TargetID)) != null)
+            {
+                if (!remove)
+                    return doc.DocumentNode.SelectSingleNode(string.Format("//*[@id = '{0}']", TargetID));
+                else
+                {
+                    HtmlNode r = doc.DocumentNode.SelectSingleNode(string.Format("//*[@id = '{0}']", TargetID)).Clone();
+
+                    doc.DocumentNode.SelectSingleNode(string.Format("//*[@id = '{0}']", TargetID)).Remove();
+
+                    doc.Save(TargetFile);
+
+                    return r;
+                }
+            }
+            else
+            {
+                if (t.HasMasterTemplate)
+                    return FindModule(template,id,remove);
+                else
+                    return null;
+            }
+        }
         private bool InsertMacroTag(int template, string targetId, string tag, bool prepend)
         {
             Template t = new Template(template);
