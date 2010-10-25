@@ -561,6 +561,13 @@
     <Compile Include="umbraco\create\templateTasks.cs" />
     <Compile Include="umbraco\create\userTasks.cs" />
     <Compile Include="umbraco\create\XsltTasks.cs" />
+    <Compile Include="umbraco\dashboard\ChangePassword.ascx.cs">
+      <DependentUpon>ChangePassword.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dashboard\ChangePassword.ascx.designer.cs">
+      <DependentUpon>ChangePassword.ascx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\dashboard\StartupMemberDashboard.ascx.cs">
       <DependentUpon>StartupMemberDashboard.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1661,6 +1668,7 @@
     <Content Include="install\steps\Skinning\loadStarterKitDesigns.ascx" />
     <Content Include="install\steps\Skinning\loadStarterKits.ascx" />
     <Content Include="install\Title.ascx" />
+    <Content Include="umbraco\dashboard\ChangePassword.ascx" />
     <Content Include="umbraco\dashboard\images\contour-icon.png" />
     <Content Include="umbraco\dashboard\images\courier-icon.png" />
     <Content Include="umbraco\dashboard\images\logo.gif" />

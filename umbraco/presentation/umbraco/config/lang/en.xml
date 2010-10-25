@@ -299,6 +299,16 @@
     <key alias="permissionSelectPages" version="4.0">Select pages to modify their permissions</key>
     <key alias="permissionReplaceChildren" version="4.0">Replace child node permssions</key>
     <key alias="permissionSelectedPages" version="4.0"><![CDATA[You are currently modifying permissions for the pages:]]></key>
+
+
+    <key alias="changePassword" version="4.6">Change Your Password</key>
+    <key alias="changePasswordDescription" version="4.6">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
+    <key alias="passwordEnterNew" version="4.6">Enter your new password</key>
+    <key alias="passwordConfirm" version="4.6">Please confirm the new password</key>
+    <key alias="passwordChanged" version="4.6">Your password has been changed!</key>
+    <key alias="passwordIsDifferent" version="4.6">There was a difference between the new password and the confirmed password. Please try again!</key>
+    <key alias="passwordIsBlank" version="4.6">Your new password cannot be blank!</key>
+    <key alias="passwordMismatch" version="4.6">The confirmed password doesn't match the new password!</key>
   </area>
   <area alias="settings">
     <key alias="nodetype">Nodetype</key>
