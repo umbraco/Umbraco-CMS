@@ -557,8 +557,8 @@ namespace umbraco
             if (!directoryUrls)
             {
                 // append .aspx extension if the url includes other than just the domain name
-                if (tempUrl.ToString() != "" &&
-                    (!tempUrl.StartsWith("http://") || tempUrl.Replace("http://", "").IndexOf("/") > -1))
+                if (!String.IsNullOrEmpty(tempUrl) && tempUrl != "/" && 
+                    (!tempUrl.StartsWith("http://") || tempUrl.LastIndexOf("/") > 7))
                     tempUrl = baseUrl + tempUrl + ".aspx";
             }
             else
