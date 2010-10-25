@@ -230,6 +230,35 @@ namespace umbraco
         }
 
         /// <summary>
+        /// This will add a trailing slash (/) to urls when in directory url mode
+        /// NOTICE: This will always return false if Directory Urls in not active
+        /// </summary>
+        public static bool AddTrailingSlash
+        {
+            get
+            {
+                try
+                {
+                    if (GlobalSettings.UseDirectoryUrls)
+                    {
+                        bool result;
+                        if (bool.TryParse(GetKey("/settings/requestHandler/addTrailingSlash"), out result))
+                            return result;
+                        return false;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether umbraco will use ASP.NET MasterPages for rendering instead of its propriatary templating system.
         /// </summary>
         /// <value><c>true</c> if umbraco will use ASP.NET MasterPages; otherwise, <c>false</c>.</value>

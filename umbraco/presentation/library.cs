@@ -564,6 +564,8 @@ namespace umbraco
             else
             {
                 tempUrl = baseUrl + tempUrl;
+                if (UmbracoSettings.AddTrailingSlash)
+                    tempUrl += "/";
             }
             return tempUrl;
         }
