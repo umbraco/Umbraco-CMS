@@ -378,10 +378,8 @@ namespace umbraco {
 
         public bool Execute(string url) {
             bool _succes = false;
-            string tempUrl = url;
+            string tempUrl = url.Trim('/').Replace(".aspx", string.Empty).ToLower();
             if (tempUrl.Length > 0) {
-                if (tempUrl.Substring(0, 1) == "/")
-                    tempUrl = tempUrl.Substring(1, tempUrl.Length - 1);
                 HttpContext.Current.Trace.Write("urlAlias", "'" + tempUrl + "'");
 
                 // Check for domain
@@ -394,13 +392,13 @@ namespace umbraco {
                 }
 
 
-                string xpath = UmbracoSettings.UseLegacyXmlSchema ? "//node [contains(concat(',',data [@alias = 'umbracoUrlAlias'],','),'," :
-                    "//* [@isDoc and contains(concat(',',umbracoUrlAlias,','),',";
+                // the reason we have almost two identical queries in the xpath is to support scenarios where the user have 
+                // entered "/my-url" instead of "my-url" (ie. added a beginning slash)
+                string xpath = UmbracoSettings.UseLegacyXmlSchema ? "//node [contains(concat(',',translate(data [@alias = 'umbracoUrlAlias'], ' ', ''),','),',{0},') or contains(concat(',',translate(data [@alias = 'umbracoUrlAlias'], ' ', ''),','),',{1},')]" :
+                    "//* [@isDoc and (contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{0},') or contains(concat(',',translate(umbracoUrlAlias, ' ', ''),','),',{1},'))]";
+                string query = String.Format(prefixXPath + xpath, tempUrl, "/" + tempUrl);
                 XmlNode redir =
-                    content.Instance.XmlContent.DocumentElement.SelectSingleNode(
-                        prefixXPath + xpath +
-                        tempUrl.Replace(".aspx", string.Empty).ToLower() +
-                        ",')]");
+                    content.Instance.XmlContent.DocumentElement.SelectSingleNode(query);
                 if (redir != null) {
                     _succes = true;
                     _redirectID = int.Parse(redir.Attributes.GetNamedItem("id").Value);
