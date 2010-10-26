@@ -386,7 +386,8 @@ namespace umbraco.cms.businesslogic.propertytype
             Cache.ClearCacheItem("ContentType_PropertyTypes_Content:" + this._contenttypeid.ToString());
 
             // clear cache in tab
-            ContentType.FlushTabCache(_tabId, ContentTypeId);
+            foreach(umbraco.cms.businesslogic.ContentType.TabI t in new ContentType(ContentTypeId).getVirtualTabs)
+                ContentType.FlushTabCache(t.Id, t.ContentType);
         }
 
 		public static PropertyType GetPropertyType(int id)

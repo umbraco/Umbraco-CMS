@@ -81,6 +81,7 @@ namespace umbraco.controls
             pp_thumbnail.Text = umbraco.ui.Text("editcontenttype", "thumbnail");
 
 
+            // we'll disable this...
             if (!Page.IsPostBack && cType.MasterContentType != 0)
             {
                 string masterName = cms.businesslogic.ContentType.GetContentType(cType.MasterContentType).Text;
@@ -154,7 +155,7 @@ namespace umbraco.controls
                     ListItem li = new ListItem(fileInfo[i].Name + " (deprecated)", fileInfo[i].Name);
                     li.Attributes.Add("title", this.ResolveClientUrl(SystemDirectories.Umbraco + "/images/umbraco/" + fileInfo[i].Name));
 
-                    if (li.Value == cType.IconUrl) 
+                    if (li.Value == cType.IconUrl)
                         li.Selected = true;
                     listOfIcons.Add(li);
                 }
@@ -274,14 +275,14 @@ jQuery(function() { refreshDropDowns(); });
             PropertyTypes.Controls.Clear();
 
             // Remove any tab from list that's from a master content type (shouldn't be able to configure those from a child)
-            System.Collections.Generic.List<cms.businesslogic.ContentType.TabI> localTabs = new System.Collections.Generic.List<umbraco.cms.businesslogic.ContentType.TabI>();
-            foreach (cms.businesslogic.ContentType.TabI t in tabs)
-            {
-                if (t.ContentType == cType.Id)
-                    localTabs.Add(t);
-            }
-            tabs = localTabs.ToArray();
-
+            /*            System.Collections.Generic.List<cms.businesslogic.ContentType.TabI> localTabs = new System.Collections.Generic.List<umbraco.cms.businesslogic.ContentType.TabI>();
+                        foreach (cms.businesslogic.ContentType.TabI t in tabs)
+                        {
+                            if (t.ContentType == cType.Id)
+                                localTabs.Add(t);
+                        }
+                        tabs = localTabs.ToArray();
+            */
             // Add new property
             if (PropertyTypeNew.Controls.Count == 0)
             {
@@ -311,52 +312,51 @@ jQuery(function() { refreshDropDowns(); });
 
             foreach (cms.businesslogic.ContentType.TabI t in tabs)
             {
-                // check if the tab comes from a master content type
-                if (t.ContentType == cType.Id)
+                bool hasProperties = false;
+                string tabCaption = t.ContentType == cType.Id ? t.GetRawCaption() : t.GetRawCaption() + " (inherited from " + new ContentType(t.ContentType).Text + ")";
+                PropertyTypes.Controls.Add(new LiteralControl("<div class='genericPropertyListBox'><h2 class=\"propertypaneTitel\">Tab: " + tabCaption + "</h2>"));
+
+                if (t.PropertyTypes.Length > 0)
                 {
+                    HtmlInputHidden propSort = new HtmlInputHidden();
+                    propSort.ID = "propSort_" + t.Id.ToString() + "_Content";
+                    PropertyTypes.Controls.Add(propSort);
+                    _sortLists.Add(propSort);
+                    PropertyTypes.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"t_" + t.Id.ToString() + "_Contents\">"));
 
-                    PropertyTypes.Controls.Add(new LiteralControl("<div class='genericPropertyListBox'><h2 class=\"propertypaneTitel\">Tab: " + t.GetRawCaption() + "</h2>"));
-
-                    if (t.PropertyTypes.Length > 0)
+                    foreach (cms.businesslogic.propertytype.PropertyType pt in t.PropertyTypes)
                     {
-                        HtmlInputHidden propSort = new HtmlInputHidden();
-						propSort.ID = "propSort_" + t.Id.ToString() + "_Content";
-                        PropertyTypes.Controls.Add(propSort);
-                        _sortLists.Add(propSort);
-                        PropertyTypes.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"t_" + t.Id.ToString() + "_Contents\">"));
-
-                        foreach (cms.businesslogic.propertytype.PropertyType pt in t.PropertyTypes)
+                        if (pt.ContentTypeId == cType.Id)
                         {
-                            if (pt.ContentTypeId == cType.Id)
-                            {
-                                GenericProperties.GenericPropertyWrapper gpw = new umbraco.controls.GenericProperties.GenericPropertyWrapper();
+                            GenericProperties.GenericPropertyWrapper gpw = new umbraco.controls.GenericProperties.GenericPropertyWrapper();
 
-                                // Changed by duckie, was:
-                                // gpw.ID = "gpw_" + editPropertyType.Alias;
-                                // Which is NOT unique!
-                                gpw.ID = "gpw_" + pt.Id;
+                            // Changed by duckie, was:
+                            // gpw.ID = "gpw_" + editPropertyType.Alias;
+                            // Which is NOT unique!
+                            gpw.ID = "gpw_" + pt.Id;
 
-                                gpw.PropertyType = pt;
-                                gpw.Tabs = tabs;
-                                gpw.TabId = t.Id;
-                                gpw.DataTypeDefinitions = dtds;
-                                gpw.Delete += new EventHandler(gpw_Delete);
-                                gpw.FullId = "t_" + t.Id.ToString() + "_Contents_" + +pt.Id;
+                            gpw.PropertyType = pt;
+                            gpw.Tabs = tabs;
+                            gpw.TabId = t.Id;
+                            gpw.DataTypeDefinitions = dtds;
+                            gpw.Delete += new EventHandler(gpw_Delete);
+                            gpw.FullId = "t_" + t.Id.ToString() + "_Contents_" + +pt.Id;
 
-                                PropertyTypes.Controls.Add(gpw);
-                                _genericProperties.Add(gpw);
-                                if (Refresh)
-                                    gpw.GenricPropertyControl.UpdateInterface();
-                                inTab.Add(pt.Id.ToString(), "");
-                                counter++;
-                            }
+                            PropertyTypes.Controls.Add(gpw);
+                            _genericProperties.Add(gpw);
+                            if (Refresh)
+                                gpw.GenricPropertyControl.UpdateInterface();
+                            inTab.Add(pt.Id.ToString(), "");
+                            counter++;
+                            hasProperties = true;
                         }
+                    }
 
 
 
-                        PropertyTypes.Controls.Add(new LiteralControl("</ul></div>"));
+                    PropertyTypes.Controls.Add(new LiteralControl("</ul></div>"));
 
-                        var jsSortable = @"                            
+                    var jsSortable = @"                            
                                 (function($) {
                                     var propSortId = ""#" + propSort.ClientID + @""";
                                     $(document).ready(function() {
@@ -367,13 +367,17 @@ jQuery(function() { refreshDropDowns(); });
                                     });
                                 })(jQuery);";
 
-                        Page.ClientScript.RegisterStartupScript(this.GetType(), propSort.ClientID, jsSortable, true);
+                    Page.ClientScript.RegisterStartupScript(this.GetType(), propSort.ClientID, jsSortable, true);
 
-                    }
-                    else
+                    if (!hasProperties)
                     {
-                        PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div></div>"));
+                        addNoPropertiesDefinedMessage();
                     }
+
+                }
+                else
+                {
+                    addNoPropertiesDefinedMessage();
                 }
             }
 
@@ -448,6 +452,11 @@ jQuery(function() { refreshDropDowns(); });
             else
                 PropertyTypes.Controls.Add(propertiesPH);
 
+        }
+
+        private void addNoPropertiesDefinedMessage()
+        {
+            PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div>"));
         }
 
         protected void gpw_Delete(object sender, System.EventArgs e)
@@ -585,16 +594,16 @@ jQuery(function() { refreshDropDowns(); });
             {
                 if (propSorter.Value.Trim() != "")
                 {
-					string tabId = propSorter.ID;
-					// remove leading "propSort_" and trailing "_Content"
-					tabId = tabId.Substring(9, tabId.Length - 9 - 8);
-					// calc the position of the prop SO i.e. after "t_<tabId>Contents[]="
-					int propSOPosition = "t_".Length + tabId.Length + "Contents[]=".Length + 1;
+                    string tabId = propSorter.ID;
+                    // remove leading "propSort_" and trailing "_Content"
+                    tabId = tabId.Substring(9, tabId.Length - 9 - 8);
+                    // calc the position of the prop SO i.e. after "t_<tabId>Contents[]="
+                    int propSOPosition = "t_".Length + tabId.Length + "Contents[]=".Length + 1;
 
                     string[] tempSO = propSorter.Value.Split("&".ToCharArray());
                     for (int i = 0; i < tempSO.Length; i++)
                     {
-						string propSO = tempSO[i].Substring(propSOPosition);
+                        string propSO = tempSO[i].Substring(propSOPosition);
                         int currentSortOrder = int.Parse(propSO);
                         cms.businesslogic.propertytype.PropertyType.GetPropertyType(currentSortOrder).SortOrder = i;
                     }
@@ -826,7 +835,7 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
 
         #endregion
 
-        
+
 
     }
 }

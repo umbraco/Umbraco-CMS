@@ -817,7 +817,7 @@ namespace umbraco.cms.businesslogic
             {
                 while (dr.Read())
                 {
-                    m_VirtualTabs.Add(new Tab(dr.GetInt("id"), dr.GetString("text"), dr.GetInt("sortOrder"), this));
+                    m_VirtualTabs.Add(new Tab(dr.GetInt("id"), dr.GetString("text"), dr.GetInt("sortOrder"), this, true));
                 }
             }
 
@@ -923,7 +923,7 @@ namespace umbraco.cms.businesslogic
             /// <param name="caption">The caption.</param>
             /// <param name="sortOrder">The sort order.</param>
             /// <param name="cType">Type of the c.</param>
-            public Tab(int id, string caption, int sortOrder, ContentType cType)
+            public Tab(int id, string caption, int sortOrder, ContentType cType, bool loadInheritedProperties)
             {
                 _id = id;
                 _caption = caption;
@@ -936,13 +936,15 @@ namespace umbraco.cms.businesslogic
                     Cache.GetCacheItem<PropertyType[]>(cacheKey, propertyTypesCacheSyncLock, TimeSpan.FromMinutes(10),
                                                        delegate
                                                        {
+                                                           string contentTypeModifier = loadInheritedProperties ? "" : String.Format(" and contentTypeId = {0}", cType.Id);
+
                                                            List<PropertyType> tmp = new List<PropertyType>();
 
                                                            using (
                                                                IRecordsReader dr =
                                                                    SqlHelper.ExecuteReader(string.Format(
-                                                                                               "Select id from cmsPropertyType where tabid = {0} and contentTypeId = {1} order by sortOrder",
-                                                                                               _id, cType.Id)))
+                                                                                               "Select id from cmsPropertyType where tabid = {0}{1} order by sortOrder",
+                                                                                               _id, contentTypeModifier)))
                                                            {
                                                                while (dr.Read())
                                                                {

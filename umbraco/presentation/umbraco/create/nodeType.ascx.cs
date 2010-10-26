@@ -8,6 +8,7 @@ namespace umbraco.cms.presentation.create.controls
 	using System.Web.UI.HtmlControls;
 	using umbraco.cms.helpers;
 	using umbraco.BasePages;
+    using umbraco.cms.businesslogic.web;
 
 	/// <summary>
 	///		Summary description for nodeType.
@@ -21,12 +22,23 @@ namespace umbraco.cms.presentation.create.controls
 			sbmt.Text = ui.Text("create");
             if (!IsPostBack)
             {
-                masterType.Attributes.Add("style", "width: 350px;");
-                masterType.Items.Add(new ListItem(ui.Text("none") + "...", "0"));
-                foreach (cms.businesslogic.web.DocumentType dt in cms.businesslogic.web.DocumentType.GetAllAsList())
+                string nodeId = umbraco.helper.Request("nodeId");
+                if (String.IsNullOrEmpty(nodeId) || nodeId == "init")
                 {
-//                    if (dt.MasterContentType == 0)
+                    masterType.Attributes.Add("style", "width: 350px;");
+                    masterType.Items.Add(new ListItem(ui.Text("none") + "...", "0"));
+                    foreach (cms.businesslogic.web.DocumentType dt in cms.businesslogic.web.DocumentType.GetAllAsList())
+                    {
+                        //                    if (dt.MasterContentType == 0)
                         masterType.Items.Add(new ListItem(dt.Text, dt.Id.ToString()));
+                    }
+                }
+                else
+                {
+                    // there's already a master doctype defined
+                    masterType.Visible = false;
+                    masterTypePreDefined.Visible = true;
+                    masterTypePreDefined.Text = "<h3>" + new DocumentType(int.Parse(nodeId)).Text + "</h3>";
                 }
             }
 		}
@@ -46,9 +58,12 @@ namespace umbraco.cms.presentation.create.controls
 				if (createTemplate.Checked)
 					createTemplateVal = 1;
 
+                // check master type
+                string masterTypeVal = String.IsNullOrEmpty(umbraco.helper.Request("nodeId")) || umbraco.helper.Request("nodeId") == "init" ? masterType.SelectedValue : umbraco.helper.Request("nodeId");
+
 				string returnUrl = umbraco.presentation.create.dialogHandler_temp.Create(
 					umbraco.helper.Request("nodeType"),
-                    int.Parse(masterType.SelectedValue),
+                    int.Parse(masterTypeVal),
 					createTemplateVal,
 					rename.Text);
 

@@ -52,6 +52,8 @@ namespace umbraco
         protected override void CreateAllowedActions(ref List<IAction> actions)
         {
             actions.Clear();
+            actions.Add(ActionNew.Instance);
+            actions.Add(ContextMenuSeperator.Instance);
             actions.Add(ActionCopy.Instance);
             actions.Add(ContextMenuSeperator.Instance);
             actions.Add(ActionExport.Instance);

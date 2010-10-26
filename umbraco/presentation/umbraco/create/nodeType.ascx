@@ -1,7 +1,7 @@
 <%@ Control Language="c#" AutoEventWireup="True" Codebehind="nodeType.ascx.cs" Inherits="umbraco.cms.presentation.create.controls.nodeType" TargetSchema="http://schemas.microsoft.com/intellisense/ie5"%>
-
 <p style="margin: 4px 0;">Master Document Type:<br />
 <asp:ListBox id="masterType" Runat="server" cssClass="bigInput" Rows="1" SelectionMode="Single"></asp:ListBox>
+<asp:Literal ID="masterTypePreDefined" runat="server" Visible="false"></asp:Literal>
 </p>
 
 <div style="MARGIN-TOP: 0px"><%=umbraco.ui.Text("name")%>:

@@ -1,5 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <createUI>
+  <nodeType alias="nodeTypes">
+    <header>Nodetype</header>
+    <usercontrol>/create/nodeType.ascx</usercontrol>
+    <tasks>
+      <create assembly="umbraco" type="nodetypeTasks" />
+    </tasks>
+  </nodeType>
   <nodeType alias="initnodeTypes">
     <header>Nodetype</header>
     <usercontrol>/create/nodeType.ascx</usercontrol>
