@@ -231,7 +231,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         };
                         this._debug("rebuildTree: syncing to last selected: " + lastSelected);
                         //add the event handler for the tree sync and sync the tree
-                        this.addEventHandler("syncFound", foundHandler);                        
+                        this.addEventHandler("syncFound", foundHandler);
+                        this.setActiveTreeType($(saveData.selected[0]).attr("umb:type"));                      
                         this.syncTree(lastSelected);
                     }
 
