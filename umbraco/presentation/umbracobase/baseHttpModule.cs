@@ -27,9 +27,9 @@ namespace umbraco.presentation.umbracobase
 
         public void Init(HttpApplication httpApp)
         {
-            httpApp.PostAuthorizeRequest += new EventHandler(httpApp_PreRequestHandlerExecute);
-            //            httpApp.PostAcquireRequestState += new EventHandler(httpApp_PostAcquireRequestState);
-            //            httpApp.PostMapRequestHandler += new EventHandler(httpApp_PostMapRequestHandler);
+            //            httpApp.PostAuthorizeRequest += new EventHandler(httpApp_PreRequestHandlerExecute);
+            httpApp.PostAcquireRequestState += new EventHandler(httpApp_PostAcquireRequestState);
+            httpApp.PostMapRequestHandler += new EventHandler(httpApp_PostMapRequestHandler);
         }
 
         void httpApp_PostMapRequestHandler(object sender, EventArgs e)
@@ -54,7 +54,7 @@ namespace umbraco.presentation.umbracobase
             }
         }
 
-        void httpApp_PreRequestHandlerExecute(object sender, EventArgs e)
+        void httpApp_PostAcquireRequestState(object sender, EventArgs e)
         {
             HttpApplication httpApp = (HttpApplication)sender;
 
