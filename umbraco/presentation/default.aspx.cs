@@ -145,7 +145,30 @@ namespace umbraco
                 HttpContext.Current.Trace.Write("umbracoPage", "Looking up skin information");
 
                 if (m_umbPage != null)
-                    this.MasterPageFile = template.GetMasterPageName(m_umbPage.Template);
+                {
+                    if (m_umbPage.Template == 0)
+                    {
+                        string custom404 = umbraco.library.GetCurrentNotFoundPageId();
+                        if (!String.IsNullOrEmpty(custom404))
+                        {
+                            XmlNode xmlNodeNotFound = content.Instance.XmlContent.GetElementById(custom404);
+                            if (xmlNodeNotFound != null)
+                            {
+                                m_umbPage = new page(xmlNodeNotFound);
+                            }
+                        }
+                    }
+
+                    if (m_umbPage.Template != 0)
+                    {
+                        this.MasterPageFile = template.GetMasterPageName(m_umbPage.Template);
+                    }
+                    else
+                    {
+                        GenerateNotFoundContent();
+                        Response.End();
+                    }
+                }
 
                 initUmbracoPage();
             }
@@ -247,17 +270,7 @@ namespace umbraco
                         else
                         {
 
-                            Response.StatusCode = 404;
-                            Response.Write("<html><body><h1>Page not found</h1>");
-                            if (m_umbRequest != null)
-                                HttpContext.Current.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(Request.Url.ToString()) + "'</h3><p>umbraco tried this to match it using this xpath query'" + m_umbRequest.PageXPathQuery + "')");
-                            else
-                                HttpContext.Current.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(Request.Url.ToString()) + "'</h3>");
-                            Response.Write("</p>");
-                            Response.Write("<p>This page can be replaced with a custom 404 page by adding the id of the umbraco document to show as 404 page in the /config/umbracoSettings.config file. Just add the id to the '/settings/content/errors/error404' element.</p>");
-                            Response.Write("<p>For more information, visit <a href=\"http://umbraco.org/redir/custom-404\">information about custom 404</a> on the umbraco website.</p>");
-                            Response.Write("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");
-                            Response.Write("</body></html>");
+                            GenerateNotFoundContent();
                         }
                     }
                 }
@@ -268,6 +281,21 @@ namespace umbraco
 
                 FireAfterRequestInit(e);
             }
+        }
+
+        private void GenerateNotFoundContent()
+        {
+            Response.StatusCode = 404;
+            Response.Write("<html><body><h1>Page not found</h1>");
+            if (m_umbRequest != null)
+                HttpContext.Current.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(Request.Url.ToString()) + "'</h3><p>umbraco tried this to match it using this xpath query'" + m_umbRequest.PageXPathQuery + "')");
+            else
+                HttpContext.Current.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(Request.Url.ToString()) + "'</h3>");
+            Response.Write("</p>");
+            Response.Write("<p>This page can be replaced with a custom 404 page by adding the id of the umbraco document to show as 404 page in the /config/umbracoSettings.config file. Just add the id to the '/settings/content/errors/error404' element.</p>");
+            Response.Write("<p>For more information, visit <a href=\"http://umbraco.org/redir/custom-404\">information about custom 404</a> on the umbraco website.</p>");
+            Response.Write("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");
+            Response.Write("</body></html>");
         }
 
         /// <summary>

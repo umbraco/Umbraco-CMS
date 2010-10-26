@@ -273,6 +273,13 @@ namespace umbraco.cms.presentation
             {
                 _document.Template = int.Parse(ddlDefaultTemplate.SelectedValue);
             }
+            else
+            {
+                if (new DocumentType(_document.ContentType.Id).allowedTemplates.Length == 0)
+                {
+                    _document.RemoveTemplate();
+                }
+            }
 
           
 

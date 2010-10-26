@@ -1532,6 +1532,14 @@ namespace umbraco.cms.businesslogic.web
             return GetPreviewXml(xd, Version);
         }
 
+        /// <summary>
+        /// Method to remove an assigned template from a document
+        /// </summary>
+        public void RemoveTemplate()
+        {
+            Template = 0;
+        }
+
         #endregion      
 
         #region Protected Methods

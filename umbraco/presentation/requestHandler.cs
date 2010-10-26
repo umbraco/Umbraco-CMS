@@ -557,24 +557,7 @@ namespace umbraco {
                         url + " (from '" + HttpContext.Current.Request.UrlReferrer + "')");
 
                 // Test if the error404 not child elements
-                string error404 = "";
-                XmlNode error404Node = UmbracoSettings.GetKeyAsNode("/settings/content/errors/error404");
-                if (error404Node.ChildNodes.Count > 0 && error404Node.ChildNodes[0].HasChildNodes) {
-                    // try to get the 404 based on current culture (via domain)
-                    XmlNode cultureErrorNode;
-                    if (Domain.Exists(HttpContext.Current.Request.ServerVariables["SERVER_NAME"])) {
-                        Domain d = Domain.GetDomain(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
-                        // test if a 404 page exists with current culture
-                        cultureErrorNode = error404Node.SelectSingleNode(String.Format("errorPage [@culture = '{0}']", d.Language.CultureAlias));
-                        if (cultureErrorNode != null && cultureErrorNode.FirstChild != null)
-                            error404 = cultureErrorNode.FirstChild.Value;
-                    } else {
-                        cultureErrorNode = error404Node.SelectSingleNode("errorPage [@culture = 'default']");
-                        if (cultureErrorNode != null && cultureErrorNode.FirstChild != null)
-                            error404 = cultureErrorNode.FirstChild.Value;
-                    }
-                } else
-                    error404 = UmbracoSettings.GetKey("/settings/content/errors/error404");
+                string error404 = umbraco.library.GetCurrentNotFoundPageId();
 
 
                 _redirectID = int.Parse(error404);

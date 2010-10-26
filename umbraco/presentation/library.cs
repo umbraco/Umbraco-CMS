@@ -477,79 +477,6 @@ namespace umbraco
             string junoUrl = niceUrlJuno(nodeID, startNodeDepth, HttpContext.Current.Request.ServerVariables["SERVER_NAME"].ToLower());
             return appendUrlExtension(baseUrl, directoryUrls, junoUrl);
 
-            //baseUrl = baseUrl.Substring(0, baseUrl.LastIndexOf("/"));
-
-            bool atDomain = false;
-            string currentDomain = HttpContext.Current.Request.ServerVariables["SERVER_NAME"].ToLower();
-            if (UmbracoSettings.UseDomainPrefixes && Domain.Exists(currentDomain))
-                atDomain = true;
-
-
-            // Find path from nodeID
-            String tempUrl = "";
-            XmlElement node = UmbracoContext.Current.GetXml().GetElementById(nodeID.ToString());
-            String[] splitpath = null;
-            if (node != null)
-            {
-                try
-                {
-                    splitpath =
-                        node.Attributes.GetNamedItem("path").Value.ToString().
-                            Split(",".ToCharArray());
-
-                    int startNode = startNodeDepth;
-
-                    // check root nodes for domains
-                    if (UmbracoSettings.UseDomainPrefixes && startNode > 1)
-                    {
-                        if (node.ParentNode.Name.ToLower() != "root")
-                        {
-                            Domain[] domains =
-                                Domain.GetDomainsById(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value));
-                            if (
-                                domains.Length > 0)
-                            {
-                                tempUrl =
-                                    getUrlByDomain(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value), "",
-                                                   atDomain, currentDomain, true);
-                            }
-                            // test for domains on root nodes, then make the url domain only
-                        }
-                        else if (Domain.GetDomainsById(nodeID).Length > 0)
-                        {
-                            tempUrl = getUrlByDomain(nodeID, "",
-                                                     false, currentDomain, false);
-                            return tempUrl;
-                        }
-                    }
-
-
-                    if (splitpath.Length > startNode)
-                    {
-                        for (int i = startNode; i < splitpath.Length; i++)
-                        {
-                            tempUrl = getUrlByDomain(int.Parse(splitpath[i]), tempUrl, atDomain, currentDomain, false);
-                        }
-                    }
-                    else
-                    {
-                        // check the root node for language
-                        tempUrl += getUrlByDomain(nodeID, "", atDomain, currentDomain, false);
-                    }
-                }
-                catch (Exception e)
-                {
-                    HttpContext.Current.Trace.Warn("library.NiceUrl",
-                                                   string.Format("Error generating nice url for id '{0}'", nodeID), e);
-                    tempUrl = "/" + nodeID;
-                }
-                tempUrl = appendUrlExtension(baseUrl, directoryUrls, tempUrl);
-            }
-            else
-                HttpContext.Current.Trace.Warn("niceurl", string.Format("No node found at '{0}'", nodeID));
-
-            return tempUrl;
-
         }
 
         private static string appendUrlExtension(string baseUrl, bool directoryUrls, string tempUrl)
@@ -567,48 +494,6 @@ namespace umbraco
                 if (UmbracoSettings.AddTrailingSlash)
                     tempUrl += "/";
             }
-            return tempUrl;
-        }
-
-        private static string getUrlByDomain(int DocumentId, string tempUrl, bool atDomain, string currentDomain,
-                                             bool emptyOnSameDomain)
-        {
-            Domain[] domains = Domain.GetDomainsById(DocumentId);
-            if (!UmbracoSettings.UseDomainPrefixes || domains.Length == 0)
-                tempUrl += "/" +
-                           url.FormatUrl(
-                               UmbracoContext.Current.GetXml().GetElementById(DocumentId.ToString()).Attributes.GetNamedItem
-                                   ("urlName").Value);
-            else
-            {
-                // check if one of the domains are the same as the current one
-                if (atDomain)
-                {
-                    bool inDomainRange = false;
-                    foreach (Domain d in domains)
-                        if (d.Name.ToLower() == currentDomain)
-                        {
-                            inDomainRange = true;
-                            break;
-                        }
-
-                    if (inDomainRange)
-                    {
-                        if (emptyOnSameDomain)
-                            return tempUrl;
-                        else
-                            tempUrl = "/" +
-                                      url.FormatUrl(
-                                          UmbracoContext.Current.GetXml().GetElementById(DocumentId.ToString()).Attributes.
-                                              GetNamedItem("urlName").Value);
-                    }
-                    else
-                        tempUrl = "http://" + domains[0].Name;
-                }
-                else
-                    tempUrl = "http://" + domains[0].Name;
-            }
-
             return tempUrl;
         }
 
@@ -2286,6 +2171,36 @@ namespace umbraco
         {
             return cms.helpers.xhtml.TidyHtml(StringToTidy);
         }
+
+        internal static string GetCurrentNotFoundPageId()
+        {
+            string error404 = "";
+            XmlNode error404Node = UmbracoSettings.GetKeyAsNode("/settings/content/errors/error404");
+            if (error404Node.ChildNodes.Count > 0 && error404Node.ChildNodes[0].HasChildNodes)
+            {
+                // try to get the 404 based on current culture (via domain)
+                XmlNode cultureErrorNode;
+                if (Domain.Exists(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]))
+                {
+                    Domain d = Domain.GetDomain(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
+                    // test if a 404 page exists with current culture
+                    cultureErrorNode = error404Node.SelectSingleNode(String.Format("errorPage [@culture = '{0}']", d.Language.CultureAlias));
+                    if (cultureErrorNode != null && cultureErrorNode.FirstChild != null)
+                        error404 = cultureErrorNode.FirstChild.Value;
+                }
+                else
+                {
+                    cultureErrorNode = error404Node.SelectSingleNode("errorPage [@culture = 'default']");
+                    if (cultureErrorNode != null && cultureErrorNode.FirstChild != null)
+                        error404 = cultureErrorNode.FirstChild.Value;
+                }
+            }
+            else
+                error404 = UmbracoSettings.GetKey("/settings/content/errors/error404");
+            return error404;
+        }
+
+
 
         #endregion
 
