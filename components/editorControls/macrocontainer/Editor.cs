@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
 using umbraco.interfaces;
 using umbraco.cms.businesslogic.macro;
 using umbraco.presentation.webservices;
@@ -22,231 +21,231 @@ namespace umbraco.editorControls.macrocontainer
     [ClientDependency(ClientDependencyType.Css, "/macroContainer/macroContainer.css", "UmbracoClient")]
     public class Editor : UpdatePanel, IDataEditor
     {
-         private IData _data;
-         private List<string> _allowedMacros;
-         private int _maxNumber, _preferedHeight, _preferedWidth;
+        private IData _data;
+        private List<string> _allowedMacros;
+        private int _maxNumber, _preferedHeight, _preferedWidth;
 
-         private LinkButton _addMacro;
-         private Literal _limit;
+        private LinkButton _addMacro;
+        private Literal _limit;
 
 
 
-         public Editor(IData data, List<string> allowedMacros, int maxNumber, int preferedHeight, int preferedWidth)
+        public Editor(IData data, List<string> allowedMacros, int maxNumber, int preferedHeight, int preferedWidth)
         {
-             _data = data;
-             _allowedMacros = allowedMacros;
-             _maxNumber = maxNumber;
-             _preferedHeight = preferedHeight;
-             _preferedWidth = preferedWidth;
+            _data = data;
+            _allowedMacros = allowedMacros;
+            _maxNumber = maxNumber;
+            _preferedHeight = preferedHeight;
+            _preferedWidth = preferedWidth;
 
         }
 
-         protected override void OnInit(EventArgs e)
-         {
-             base.OnInit(e);
- 
-             //SD: This is useless as it won't work in live editing anyways whilst using MS Ajax/ScriptManager for ajax calls
-             if (!UmbracoContext.Current.LiveEditingContext.Enabled)
-             {
-                 presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
-                 ScriptManager sm = ScriptManager.GetCurrent(base.Page);
-                 ServiceReference webservicePath = new ServiceReference(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/webservices/MacroContainerService.asmx");
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
 
-                 if (!sm.Services.Contains(webservicePath))
-                     sm.Services.Add(webservicePath);
-             }                 
-             else
-             {
-                 ClientDependencyLoader.Instance.RegisterDependency("webservices/legacyAjaxCalls.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
-                 ClientDependencyLoader.Instance.RegisterDependency("webservices/MacroContainerService.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
-             }
+            //SD: This is useless as it won't work in live editing anyways whilst using MS Ajax/ScriptManager for ajax calls
+            if (!UmbracoContext.Current.LiveEditingContext.Enabled)
+            {
+                presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
+                ScriptManager sm = ScriptManager.GetCurrent(base.Page);
+                ServiceReference webservicePath = new ServiceReference(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/webservices/MacroContainerService.asmx");
 
-             _addMacro = new LinkButton();
-             _addMacro.ID = ID + "_btnaddmacro";
+                if (!sm.Services.Contains(webservicePath))
+                    sm.Services.Add(webservicePath);
+            }
+            else
+            {
+                ClientDependencyLoader.Instance.RegisterDependency("webservices/legacyAjaxCalls.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
+                ClientDependencyLoader.Instance.RegisterDependency("webservices/MacroContainerService.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
+            }
 
-
-             _addMacro.Click += new EventHandler(_addMacro_Click);
-             _addMacro.Text = ui.Text("insertMacro");
-             _addMacro.CssClass = "macroContainerAdd";
-
-             this.ContentTemplateContainer.Controls.Add(_addMacro);
+            _addMacro = new LinkButton();
+            _addMacro.ID = ID + "_btnaddmacro";
 
 
-             _limit = new Literal();
-             _limit.Text = string.Format(" Only {0} macros are allowed", _maxNumber);
-             _limit.ID = ID + "_litlimit";
-             _limit.Visible = false;
+            _addMacro.Click += new EventHandler(_addMacro_Click);
+            _addMacro.Text = ui.Text("insertMacro");
+            _addMacro.CssClass = "macroContainerAdd";
 
-             this.ContentTemplateContainer.Controls.Add(_limit);
-
-             string widthHeight = "";
-             if (_preferedHeight > 0 && _preferedWidth > 0)
-             {
-                 widthHeight = String.Format(" style=\"min-width: {0}px; min-height: {1}px;\"", _preferedWidth, _preferedHeight);
-             }
-
-             this.ContentTemplateContainer.Controls.Add(new LiteralControl(String.Format("<div id=\"" + ID + "container\" class=\"macrocontainer\"{0}>", widthHeight)));
-
-             Regex tagregex = new Regex("<[^>]*(>|$)", RegexOptions.Singleline | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
-             MatchCollection tags = tagregex.Matches(_data.Value.ToString());
-
-             List<int> editornumbers = new List<int>();
-             string sortorder = string.Empty;
+            this.ContentTemplateContainer.Controls.Add(_addMacro);
 
 
-             for (int i = 0; i < _maxNumber; i++)
-             {
-                 if (!editornumbers.Contains(i))
-                 {
-                     string data = string.Empty;
+            _limit = new Literal();
+            _limit.Text = string.Format(" Only {0} macros are allowed", _maxNumber);
+            _limit.ID = ID + "_litlimit";
+            _limit.Visible = false;
 
-                     if (tags.Count > i)
-                         data = tags[i].Value;
+            this.ContentTemplateContainer.Controls.Add(_limit);
 
-                     MacroEditor macroEditor = new MacroEditor(data, _allowedMacros);
-                     macroEditor.ID = ID + "macroeditor_" + i;
+            string widthHeight = "";
+            if (_preferedHeight > 0 && _preferedWidth > 0)
+            {
+                widthHeight = String.Format(" style=\"min-width: {0}px; min-height: {1}px;\"", _preferedWidth, _preferedHeight);
+            }
 
-                     this.ContentTemplateContainer.Controls.Add(macroEditor);
-                 }
+            this.ContentTemplateContainer.Controls.Add(new LiteralControl(String.Format("<div id=\"" + ID + "container\" class=\"macrocontainer\"{0}>", widthHeight)));
 
+            Regex tagregex = new Regex("<[^>]*(>|$)", RegexOptions.Singleline | RegexOptions.ExplicitCapture | RegexOptions.Compiled);
+            MatchCollection tags = tagregex.Matches(_data.Value.ToString());
 
-             }
-
-             this.ContentTemplateContainer.Controls.Add(new LiteralControl("</div>"));
-
-             if (tags.Count == _maxNumber)
-             {
-                 _addMacro.Enabled = false;
-                 _limit.Visible = true;
-             }
+            List<int> editornumbers = new List<int>();
+            string sortorder = string.Empty;
 
 
+            for (int i = 0; i < _maxNumber; i++)
+            {
+                if (!editornumbers.Contains(i))
+                {
+                    string data = string.Empty;
 
-             MacroContainerEvent.Execute += new MacroContainerEvent.ExecuteHandler(MacroContainerEvent_Execute);
-             
-         }
-         private void CheckLimit()
-         {
-             bool allowadd = false;
-             for (int i = 0; i < _maxNumber; i++)
-             {
-                 MacroEditor current = ((MacroEditor)this.ContentTemplateContainer.FindControl(ID + "macroeditor_" + i.ToString()));
+                    if (tags.Count > i)
+                        data = tags[i].Value;
 
-                 if (!current.Visible)
-                 {
-                     allowadd = true;
-                     break;
-                 };
-             }
+                    MacroEditor macroEditor = new MacroEditor(data, _allowedMacros);
+                    macroEditor.ID = ID + "macroeditor_" + i;
 
-             if (!allowadd)
-             {
-                 _addMacro.Enabled = false;
-                 _limit.Visible = true;
-             }
-             else
-             {
-                 _addMacro.Enabled = true;
-                 _limit.Visible = false;
-             }
-         }
+                    this.ContentTemplateContainer.Controls.Add(macroEditor);
+                }
 
-         private void MacroContainerEvent_Execute()
-         {
-             CheckLimit();
-             
-         }
 
-         private void _addMacro_Click(object sender, EventArgs e)
-         {        
+            }
 
-             for (int i = 0; i < _maxNumber; i++)
-             {
-                 MacroEditor current = ((MacroEditor)this.ContentTemplateContainer.FindControl(ID + "macroeditor_" + i.ToString()));
+            this.ContentTemplateContainer.Controls.Add(new LiteralControl("</div>"));
 
-                 if (!current.Visible)
-                 {
-                     current.Visible = true;
-                     MacroContainerEvent.Add();
-                     break;
-                 };
-             }
-         }
+            if (tags.Count == _maxNumber)
+            {
+                _addMacro.Enabled = false;
+                _limit.Visible = true;
+            }
 
 
 
-         protected override void OnLoad(EventArgs e)
-         {
-             base.OnLoad(e);
+            MacroContainerEvent.Execute += new MacroContainerEvent.ExecuteHandler(MacroContainerEvent_Execute);
 
-             // And a reference to the macro container calls 
-             //if (!UmbracoContext.Current.LiveEditingContext.Enabled)
-             //{
-             //    ScriptManager sm = ScriptManager.GetCurrent(base.Page);
-             //    ServiceReference webservicePath = new ServiceReference(SystemDirectories.Webservices + "/MacroContainerService.asmx");
+        }
+        private void CheckLimit()
+        {
+            bool allowadd = false;
+            for (int i = 0; i < _maxNumber; i++)
+            {
+                MacroEditor current = ((MacroEditor)this.ContentTemplateContainer.FindControl(ID + "macroeditor_" + i.ToString()));
 
-             //    if (!sm.Services.Contains(webservicePath))
-             //        sm.Services.Add(webservicePath);
-             //}
-             //else
-             //{
-             //    ClientDependencyLoader.Instance.RegisterDependency("webservices/MacroContainerService.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
-             //}
+                if (!current.Visible)
+                {
+                    allowadd = true;
+                    break;
+                };
+            }
 
+            if (!allowadd)
+            {
+                _addMacro.Enabled = false;
+                _limit.Visible = true;
+            }
+            else
+            {
+                _addMacro.Enabled = true;
+                _limit.Visible = false;
+            }
+        }
 
-            
+        private void MacroContainerEvent_Execute()
+        {
+            CheckLimit();
 
+        }
 
-             string script = "function "+ ID +"makesortable(){   ";
-             script += " jQuery('.macrocontainer').sortable({ update : function () { ";
-             script += " umbraco.presentation.webservices.MacroContainerService.SetSortOrder('" + ID + "',jQuery('.macrocontainer').sortable('serialize'));";
-             script +=" }}); ";
-             script += "  ";
-             script += "}";
+        private void _addMacro_Click(object sender, EventArgs e)
+        {
 
-             ScriptManager.RegisterClientScriptBlock(this, this.GetType(), ID + "macrocontainersortable",
-                 script, true);
+            for (int i = 0; i < _maxNumber; i++)
+            {
+                MacroEditor current = ((MacroEditor)this.ContentTemplateContainer.FindControl(ID + "macroeditor_" + i.ToString()));
 
-             if (!Page.IsPostBack)
-                 HttpContext.Current.Session[ID + "sortorder"] = null;
-
-             ScriptManager.RegisterStartupScript(this, this.GetType(), ID + "initsort", ID + "makesortable();", true);
-
-             string sortscript = string.Empty;
-
-             string sortorder = string.Empty;
-             if (HttpContext.Current.Session[ID + "sortorder"] != null)
-             {
-                 sortorder = HttpContext.Current.Session[ID + "sortorder"].ToString();
-             }
-             if (sortorder != string.Empty)
-             {
-
-                 foreach (string temp in sortorder.Split('&'))
-                 {
-                     string number = temp.Substring(temp.LastIndexOf('=') + 1);
-
-
-                     sortscript += "jQuery('#container"+ID+"macroeditor_" + number + "').appendTo('#"+ID+"container');";
-                 }
-             }
-             if(sortscript != string.Empty)
-                 ScriptManager.RegisterStartupScript(this, this.GetType(), ID + "resort", sortscript, true);
-
-             EnsureChildControls();
-
-         }
+                if (!current.Visible)
+                {
+                    current.Visible = true;
+                    MacroContainerEvent.Add();
+                    break;
+                };
+            }
+        }
 
 
-       
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            // And a reference to the macro container calls 
+            //if (!UmbracoContext.Current.LiveEditingContext.Enabled)
+            //{
+            //    ScriptManager sm = ScriptManager.GetCurrent(base.Page);
+            //    ServiceReference webservicePath = new ServiceReference(SystemDirectories.Webservices + "/MacroContainerService.asmx");
+
+            //    if (!sm.Services.Contains(webservicePath))
+            //        sm.Services.Add(webservicePath);
+            //}
+            //else
+            //{
+            //    ClientDependencyLoader.Instance.RegisterDependency("webservices/MacroContainerService.asmx/js", "UmbracoRoot", ClientDependencyType.Javascript);
+            //}
+
+
+
+
+
+            string script = "function " + ID + "makesortable(){   ";
+            script += " jQuery('#" + ID + "container').sortable({ update : function () { ";
+            script += " umbraco.presentation.webservices.MacroContainerService.SetSortOrder('" + ID + "', jQuery('#" + ID + "container').sortable('serialize'));";
+            script += " }}); ";
+            script += "  ";
+            script += "}";
+
+            ScriptManager.RegisterClientScriptBlock(this, this.GetType(), ID + "macrocontainersortable",
+                script, true);
+
+            if (!Page.IsPostBack)
+                HttpContext.Current.Session[ID + "sortorder"] = null;
+
+            ScriptManager.RegisterStartupScript(this, this.GetType(), ID + "initsort", ID + "makesortable();", true);
+
+            string sortscript = string.Empty;
+
+            string sortorder = string.Empty;
+            if (HttpContext.Current.Session[ID + "sortorder"] != null)
+            {
+                sortorder = HttpContext.Current.Session[ID + "sortorder"].ToString();
+            }
+            if (sortorder != string.Empty)
+            {
+
+                foreach (string temp in sortorder.Split('&'))
+                {
+                    string number = temp.Substring(temp.LastIndexOf('=') + 1);
+
+
+                    sortscript += "jQuery('#container" + ID + "macroeditor_" + number + "').appendTo('#" + ID + "container');";
+                }
+            }
+            if (sortscript != string.Empty)
+                ScriptManager.RegisterStartupScript(this, this.GetType(), ID + "resort", sortscript, true);
+
+            EnsureChildControls();
+
+        }
+
+
+
 
 
         #region IDataEditor Members
 
         public void Save()
         {
-            
-            
+
+
 
             string value = string.Empty;
 
@@ -265,10 +264,10 @@ namespace umbraco.editorControls.macrocontainer
             }
             else
             {
-                for(int i = 0; i< _maxNumber; i++)
+                for (int i = 0; i < _maxNumber; i++)
                 {
                     MacroEditor current = ((MacroEditor)this.ContentTemplateContainer.FindControl(ID + "macroeditor_" + i.ToString()));
-                    if(current.Visible)
+                    if (current.Visible)
                         value += current.MacroTag;
                 }
             }
