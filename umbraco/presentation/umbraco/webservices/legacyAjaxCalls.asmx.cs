@@ -72,13 +72,17 @@ namespace umbraco.presentation.webservices
                 switch (nodeType)
                 {
                     case "media":
-                        new Media(intNodeID).delete();
+                    case "mediaRecycleBin":
+                        new Media(intNodeID).delete(true);
                         break;
                     case "content":
+                    case "contentRecycleBin":
                         new Document(intNodeID).delete(true);
                         break;
-                }
-                new Document(intNodeID).delete(true);
+                    default:
+                        new Document(intNodeID).delete(true);
+                        break;
+                }                
             }
             else
             {
