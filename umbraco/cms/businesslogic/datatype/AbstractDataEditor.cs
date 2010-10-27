@@ -14,8 +14,12 @@ namespace umbraco.cms.businesslogic.datatype
     {
         private interfaces.IData _baseData;
         private interfaces.IDataPrevalue _prevalueeditor;
-        private AbstractDataEditorControl m_editor = new AbstractDataEditorControl();
+        private AbstractDataEditorControl m_editor;
 
+        public AbstractDataEditor()
+        {
+            m_editor = new AbstractDataEditorControl(this);
+        }
         /// <summary>
         /// The data editor control is the 'real' IDataEditor control. Hook into the
         /// OnSave event in your inherited class' constructor and update the
@@ -76,13 +80,15 @@ namespace umbraco.cms.businesslogic.datatype
             get { throw new NotImplementedException(); }
         }
 
-
     }
 
     public class AbstractDataEditorControl : System.Web.UI.WebControls.WebControl, interfaces.IDataEditor
     {
-        public AbstractDataEditorControl()
+        private cms.businesslogic.datatype.BaseDataType _datatype;
+
+        public AbstractDataEditorControl(cms.businesslogic.datatype.BaseDataType DataType)
         {
+            _datatype = DataType;
         }
 
         public System.Web.UI.Control Control
@@ -115,6 +121,17 @@ namespace umbraco.cms.businesslogic.datatype
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
+
+            if (_datatype.HasSettings())
+            {
+                DataEditorSettingsStorage ss = new DataEditorSettingsStorage();
+
+                List<Setting<string, string>> s = ss.GetSettings(_datatype.DataTypeDefinitionId);
+                ss.Dispose();
+
+                _datatype.LoadSettings(s);
+            }
+
             this.Controls.Add(Control);
         }
 
