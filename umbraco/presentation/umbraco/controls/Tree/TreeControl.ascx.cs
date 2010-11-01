@@ -403,7 +403,7 @@ namespace umbraco.controls.Tree
                 XmlTreeNode xNode = XmlTreeNode.CreateRoot(new NullTree(GetCurrentApp()));
                 xNode.Text = ui.Text("sections", GetCurrentApp(), UmbracoEnsuredPage.CurrentUser);
                 xNode.Source = m_TreeService.GetServiceUrl();
-                xNode.Action = ClientTools.Scripts.OpenDashboard(GetCurrentApp());
+                xNode.Action = "javascript:" + ClientTools.Scripts.OpenDashboard(GetCurrentApp());
                 xNode.NodeType = m_TreeService.App.ToLower();
                 xNode.NodeID = "-1";
                 xNode.Icon = ".sprTreeFolder";

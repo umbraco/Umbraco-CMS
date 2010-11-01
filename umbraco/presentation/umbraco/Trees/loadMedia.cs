@@ -58,7 +58,7 @@ namespace umbraco
             if (this.IsDialog)
                 rootNode.Action = "javascript:openMedia(-1);";
             else
-                rootNode.Action = ClientTools.Scripts.OpenDashboard("Media");
+                rootNode.Action = "javascript:" + ClientTools.Scripts.OpenDashboard("Media");
         }
 
         protected override void CreateRootNodeActions(ref List<IAction> actions)
