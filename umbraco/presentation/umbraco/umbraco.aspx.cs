@@ -53,7 +53,7 @@ namespace umbraco.cms.presentation
                     JSEvents.Append(@"jQuery('." + appClass + "').click(function() { appClick.call(this, '" + a.alias + "'); } );");
                     JSEvents.Append(@"jQuery('." + appClass + "').dblclick(function() { appDblClick.call(this, '" + a.alias + "'); } );");
 
-                    string iconElement = String.Format("<li><a class=\"{0}\" title=\"" + ui.Text("sections", a.alias, base.getUser()) + "\" href=\"javascript:void(0);\">", appClass);
+                    string iconElement = String.Format("<li><a class=\"{0}\" title=\"" + ui.Text("sections", a.alias, base.getUser()) + "\" href=\"#" + a.alias.ToLower() + "\">", appClass);
                     if (a.icon.StartsWith("."))
                         iconElement +=
                             "<img src=\"images/nada.gif\" class=\"trayHolder\" alt=\"\" /></a></li>";
