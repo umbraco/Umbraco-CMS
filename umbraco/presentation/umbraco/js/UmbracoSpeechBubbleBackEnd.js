@@ -13,40 +13,47 @@ UmbracoSpeechBubble.prototype.GenerateSpeechBubble = function() {
     var sbHtml = document.getElementById(this.id);
 
     sbHtml.innerHTML = '' +
-	        '<div id="' + this.id + 'Icon" style="left: 10px; position: absolute; top: 16px; width: 30px; height: 30px; background: no-repeat center center url(images/speechbubble/speechBubble/info.png);">&nbsp;' +
+            '<div class="speechBubbleTop"></div>' +
+            '<div class="speechBubbleContent">' +
+	        '<img id="' + this.id + 'Icon" style="float: left; margin: 0px 10px 10px 0;" />' +
+            '                      <img class="speechClose" onClick="UmbSpeechBubble.Hide();" id="' + this.id + 'close" src="/umbraco/images/speechBubble/speechBubble_close.gif" width="18" height="18" border="0" alt="Close"' +
+            '                        onmouseover="this.src = \'/umbraco/images/speechBubble/speechBubble_close_over.gif\';" onmouseout="this.src=\'images/speechBubble/speechBubble_close.gif\';">' +
+            '                  <h3 id="' + this.id + 'Header">The header!</h3>' +
+            '                  <p id="' + this.id + 'Message">Default Text Container!<br /></p>' +
             '</div>' +
-            '    <div id="speechClose" style="left: 208px; position: absolute; top: 6px">' +
-            '          <a href="javascript:UmbSpeechBubble.Hide()">' +
-            '                      <img id="' + this.id + 'close" style="display: none;" src="/umbraco/images/speechBubble/speechBubble_close.gif" width="18" height="18" border="0" alt="Close"' +
-            '                        onmouseover="this.src = \'/umbraco/images/speechBubble/speechBubble_close_over.gif\';" onmouseout="this.src=\'images/speechBubble/speechBubble_close.gif\';"></a></div>' +
-            '                  <div id="' + this.id + 'Header" style="font-family: Segoe UI, Trebuchet MS, Lucida Grande, verdana, arial; font-size: 16px; font-weight: 100; color: #0033aa; left: 50px;' +
-            '                    position: absolute; top: 6px">' +
-            '                    Data gemt!</div>' +
-            '                  <div id="' + this.id + 'Message" style="font-family: Segoe UI, Trebuchet MS, Lucida Grande, verdana, arial; font-size: 11px; font-weight: normal; color: #000; text-align: left; left: 50px; width: 180px; position: absolute;' +
-            '                    top: 28px">' +
-            '                    Default Text Container!</div>' +
-            '                </div>';
+            '<div class="speechBubbleBottom"></div>'
 }
 
-UmbracoSpeechBubble.prototype.ShowMessage = function(icon, header, message, dontAutoHide) {
-    var speechBubble = document.getElementById(this.id);
-    document.getElementById(this.id + "Header").innerHTML = header;
-    document.getElementById(this.id + "Message").innerHTML = message;
-    document.getElementById(this.id + "Icon").style.backgroundImage = "url('images/speechBubble/" + icon + ".png')";
+UmbracoSpeechBubble.prototype.ShowMessage = function (icon, header, message, dontAutoHide) {
+    var speechBubble = jQuery("#" + this.id);
+    jQuery("#" + this.id + "Header").html(header);
+    jQuery("#" + this.id + "Message").html(message);
+    jQuery("#" + this.id + "Icon").attr('src', 'images/speechBubble/' + icon + '.png');
 
-    speechBubble.style.right = "20px";
-    speechBubble.style.bottom = "20px";
-
-    if (!dontAutoHide) {
-        jQuery("#" + this.id).fadeIn("slow").animate({ opacity: 1.0 }, 5000).fadeOut("fast");
+    if (!this.ie) {
+        if (!dontAutoHide) {
+            jQuery("#" + this.id).fadeIn("slow").animate({ opacity: 1.0 }, 5000).fadeOut("fast");
+        } else {
+            speechBubble.jQuery(".speechClose").show();
+            jQuery("#" + this.id).fadeIn("slow");
+        }
     } else {
-        jQuery("#" + this.id + "close").show();
-        jQuery("#" + this.id).fadeIn("slow");
+        // this is special for IE as it handles fades with pngs very ugly
+        jQuery("#" + this.id).show();
+        if (!dontAutoHide) {
+            setTimeout('UmbSpeechBubble.Hide();', 5000);
+        } else {
+            jQuery(".speechClose").show();
+        }
     }
 }
 
-UmbracoSpeechBubble.prototype.Hide = function() {
-    jQuery("#" + this.id).fadeOut("slow");
+UmbracoSpeechBubble.prototype.Hide = function () {
+    if (!this.ie) {
+        jQuery("#" + this.id).fadeOut("slow");
+    } else {
+        jQuery("#" + this.id).hide();
+    }
 }
 
 // Initialize

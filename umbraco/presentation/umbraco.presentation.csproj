@@ -1687,6 +1687,9 @@
     <Content Include="umbraco\images\aboutNew.png" />
     <Content Include="umbraco\images\editor\skin.gif" />
     <Content Include="umbraco\images\loginBg.png" />
+    <Content Include="umbraco\images\speechBubble\speechbubble_body.png" />
+    <Content Include="umbraco\images\speechBubble\speechbubble_bottom.png" />
+    <Content Include="umbraco\images\speechBubble\speechbubble_top.png" />
     <Content Include="umbraco\images\umbracoSplash.png" />
     <Content Include="umbraco\images\umbraco\settingSkin.gif" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\images\loader.gif" />
@@ -1703,6 +1706,7 @@
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\images\skin.gif" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
     <Content Include="umbraco\members\MemberSearch.ascx" />
+    <Content Include="umbraco_client\Application\JQuery\jquery.idle-timer.js" />
     <Content Include="umbraco_client\colorpicker\css\colorpicker.css" />
     <Content Include="umbraco_client\colorpicker\images\blank.gif" />
     <Content Include="umbraco_client\colorpicker\images\colorpicker_background.png" />
