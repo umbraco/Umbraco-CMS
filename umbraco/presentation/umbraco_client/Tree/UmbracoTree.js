@@ -103,6 +103,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     this._opts.appActions.addEventHandler("nodeDeleting", function(E) { _this.onNodeDeleting(E) });
                     this._opts.appActions.addEventHandler("nodeDeleted", function(E) { _this.onNodeDeleted(E) });
                     this._opts.appActions.addEventHandler("nodeRefresh", function(E) { _this.onNodeRefresh(E) });
+                    this._opts.appActions.addEventHandler("publicError", function(E, err) { _this.onPublicError(E, err) });
                 }
 
                 this._containerId = jItem.attr("id");
@@ -548,7 +549,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     .effect("highlight", {}, 1000);
             },
 
-            onNodeDeleted: function(EV) {
+            onNodeDeleted: function (EV) {
                 /// <summary>Event handler for when a tree node is deleted after ajax call</summary>
 
                 this._debug("onNodeDeleted");
@@ -558,9 +559,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 //ensure the branch is closed
                 this._tree.close_branch(nodeToDel);
                 //make the node disapear
-                nodeToDel.hide("drop", { direction: "down" }, 400, function() {
+                nodeToDel.hide("drop", { direction: "down" }, 400, function () {
                     //remove the node from the DOM, do this after 1 second as IE doesn't like it when you try this right away.
-                    setTimeout(function() { nodeToDel.remove(); }, 1000);
+                    setTimeout(function () { nodeToDel.remove(); }, 1000);
                 });
                 this._updateRecycleBin();
             },
@@ -713,6 +714,33 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
             onError: function(ERR, TREE_OBJ) {
                 this._debug("ERROR!!!!! " + ERR);
+            },
+            
+            onPublicError: function(ev, errorObj) {
+                /// <summary>Event handler for when a tree node fails an ajax call</summary>
+
+                this._debug("onPublicError");
+
+                var errorNode = this._actionNode.jsNode;
+
+                // reload parent
+                this.reloadActionNode(false, true, null);
+
+                if (this._isDebug) {
+                    alert('There was an error processing the request\n' +
+                          '=========================================\n\n' +
+                          'Error Message:\n ' +
+                          errorObj.get_message() + '\n\n' +
+                          'Technical information:\n ' +
+                          '=========================================\n\n' +
+                          'Status Code: ' + errorObj.get_statusCode() + '\n\n' +
+                          'Exception Type: ' + errorObj.get_exceptionType() + '\n\n' +
+                          'Timed Out: ' + errorObj.get_timedOut() + '\n\n' +
+                          'Full Stacktrace:\n' + errorObj.get_stackTrace());
+                } else {
+                    this._opts.appActions.showSpeachBubble("error", "Error handling action", errorObj.get_message());
+                }
+
             },
 
             _debug: function(strMsg) {

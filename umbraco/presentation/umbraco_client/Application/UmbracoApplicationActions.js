@@ -354,7 +354,12 @@ Umbraco.Application.Actions = function () {
                             _this._debug("actionDelete: Raising event");
                             //raise nodeDeleted event
                             jQuery(window.top).trigger("nodeDeleted", []);
-                        });
+                        },
+                        function (error) {
+                            _this._debug("actionDelete: Raising public error event");
+                            //raise public error event
+                            jQuery(window.top).trigger("publicError", [error]);
+                        })
                 }
             }
 
