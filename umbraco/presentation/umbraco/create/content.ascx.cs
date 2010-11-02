@@ -41,7 +41,7 @@ namespace umbraco.cms.presentation.create.controls
                     if (dt.Description != null && dt.Description != "")
                         docDescription = dt.Description;
                     docDescription = "<strong>" + dt.Text + "</strong><br/>" + docDescription.Replace(Environment.NewLine, "<br />");
-                    docDescription = docDescription.Replace("'", "\'");
+                    docDescription = docDescription.Replace("'", "\\'");
 
                     string docImage = (dt.Thumbnail != "") ? dt.Thumbnail : "../nada.gif";
                     docImage = IOHelper.ResolveUrl( SystemDirectories.Umbraco ) + "/images/thumbnails/" + docImage;
