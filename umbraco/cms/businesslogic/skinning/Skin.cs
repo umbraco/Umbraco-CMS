@@ -13,7 +13,7 @@ namespace umbraco.cms.businesslogic.skinning
     {
         public Skin()
         {
-            AllowedDocumentTypeAliases = new List<string>();
+            //AllowedDocumentTypeAliases = new List<string>();
             Dependencies = new List<Dependency>();
             //Palettes = new List<Palette>();
         }
@@ -57,11 +57,11 @@ namespace umbraco.cms.businesslogic.skinning
             if(node.SelectSingleNode("/Skin/Description") != null)
                 s.Description = node.SelectSingleNode("/Skin/Description").InnerText;
 
-            if (node.SelectSingleNode("/Skin/AllowedDocumentTypes") != null)
-            {
-                s.AllowedDocumentTypeAliases.AddRange(
-                    node.SelectSingleNode("/Skin/AllowedDocumentTypes").InnerText.Split(','));
-            }
+            //if (node.SelectSingleNode("/Skin/AllowedDocumentTypes") != null)
+            //{
+            //    s.AllowedDocumentTypeAliases.AddRange(
+            //        node.SelectSingleNode("/Skin/AllowedDocumentTypes").InnerText.Split(','));
+            //}
 
             if (node.SelectSingleNode("/Skin/AllowedRootTemplate") != null)
                 s.AllowedRootTemplate = node.SelectSingleNode("/Skin/AllowedRootTemplate").InnerText;
@@ -162,7 +162,7 @@ namespace umbraco.cms.businesslogic.skinning
 
         public string Alias { get; set; }
 
-        public List<string> AllowedDocumentTypeAliases { get; set; }
+        //public List<string> AllowedDocumentTypeAliases { get; set; }
         public string AllowedRootTemplate { get; set; }
 
 
