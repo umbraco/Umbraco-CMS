@@ -42,8 +42,6 @@
         PathNameAlias="UmbracoRoot" />
     <umb:JsInclude ID="JsInclude16" runat="server" FilePath="Application/jQuery/jquery.cookie.js"
         PathNameAlias="UmbracoClient" Priority="1" />
-    <umb:JsInclude ID="JsInclude17" runat="server" FilePath="Application/jQuery/jquery.idle-timer.js"
-        PathNameAlias="UmbracoClient" Priority="1" />
     <script type="text/javascript">
         this.name = 'umbracoMain';
     </script>
@@ -63,6 +61,12 @@
     </asp:ScriptManager>
     </form>
     <div style="position: relative;">
+        <div id="logout-warning" class="notice" style="display: none; text-align: center">
+            <h3 style="margin-bottom: 3px;">
+                You've been idle and logout will automatically occur in <span id="logout-warning-counter">
+                </span> <a href="#" onclick="umbracoRenewSession();">Renew now to save your work</a>.</h3>
+                <p style="margin:0 0 10px 0;">(message above is 'Work In Progress' and needs translation too)</p>
+        </div>
         <div class="topBar" id="topBar">
             <div style="float: left">
                 <button id="buttonCreate" onclick="UmbClientMgr.appActions().launchCreateWizard();"
@@ -76,7 +80,6 @@
                 </div>
             </asp:Panel>
             <div class="topBarButtons">
-                <span id="logout-warning" style="display:none;">You're idle. Logout will happen in <span id="logout-warning-counter"></span>.</span>
                 <button onclick="UmbClientMgr.appActions().launchAbout();" class="topBarButton">
                     <img src="images/aboutNew.png" alt="about" /><span><%=umbraco.ui.Text("general", "about")%></span></button>
                 <button onclick="UmbClientMgr.appActions().launchHelp('<%=this.getUser().Language%>', '<%=this.getUser().UserType.Name%>');"
@@ -112,8 +115,6 @@
     <script type="text/javascript">
     	  <asp:PlaceHolder ID="bubbleText" Runat="server"/>
     </script>
-    <iframe src="keepalive.aspx" style="border: none; width: 1px; height: 1px; position: absolute;">
-    </iframe>
     <div id="defaultSpeechbubble">
     </div>
     <div id="umbModalBox">
@@ -166,25 +167,69 @@
             }
 
 
-            // add idle timer
-            var stimeout = 60000;
-
-            jQuery('#umbracoMainPageBody').bind("idle.idleTimer", function () {
-                jQuery("#logout-warning").show();
-            });
-
-            jQuery('#umbracoMainPageBody').bind("active.idleTimer", function () {
-                jQuery("#logout-warning").hide();
-            });
-
-            jQuery('#umbracoMainPageBody').idleTimer(stimeout);
 
             jQuery("#right").show();
         });
 
 
-        // Handles single vs double click on application item icon buttons...
+        // *** NEW KEEP ALIVE - Should be moved to app manager *** */
 
+        window.setInterval(keepAlive, 10000);
+        function keepAlive() {
+            umbraco.presentation.webservices.legacyAjaxCalls.GetSecondsBeforeUserLogout(validateUserTimeout, umbracoSessionLogout);
+        }
+        function validateUserTimeout(secondsBeforeTimeout) {
+            var logoutElement = jQuery("#logout-warning");
+            // when five minutes left, show warning
+            if (secondsBeforeTimeout < 300) {
+                if (secondsBeforeTimeout <= 0) {
+                    umbracoSessionLogout();
+                } else {
+
+                    logoutElement.fadeIn();
+                    jQuery("#logout-warning-counter").html(secondsBeforeTimeout + ' seconds...');
+
+                    // when two mintutes left make warning RED
+                    if (secondsBeforeTimeout <= 120) {
+                        logoutElement.addClass('error');
+                        logoutElement.removeClass('notice');
+                    }
+                }
+            } else {
+                logoutElement.fadeOut().removeClass('error').addClass('notice');
+            }
+        }
+
+        function umbracoRenewSession() {
+            umbraco.presentation.webservices.legacyAjaxCalls.RenewUmbracoSession(
+                function () { jQuery("#logout-warning").fadeOut().removeClass('error').addClass('notice'); },
+                umbracoSessionLogout);
+
+            }
+
+            function umbracoSessionLogout() {
+                alert('Session has expired on server - can\'t renew. Logging out!');
+                top.document.location.href = 'logout.aspx';
+            }
+
+        function blink($target) {
+            // Set the color the field should blink in 
+            var backgroundColor = '#FBC2C4';
+            var existingBgColor;
+
+            // Load the current background color 
+            existingBgColor = $target.css('background-color');
+
+            // Set the new background color 
+            $target.css('background-color', backgroundColor);
+
+            // Set it back to old color after 500 ms 
+            setTimeout(function () { $target.css('background-color', existingBgColor); }, 500);
+        }
+
+        // *** END *** */
+
+        // Handles single vs double click on application item icon buttons...
         function appItemSingleClick(itemName) {
             UmbClientMgr.historyManager().addHistory(itemName);
             return false;

@@ -19,6 +19,7 @@ using System.Web.UI;
 using umbraco.IO;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
+using umbraco.BasePages;
 
 
 namespace umbraco.presentation.webservices
@@ -125,6 +126,29 @@ namespace umbraco.presentation.webservices
         public string ProgressStatus(string Key)
         {
             return Application[helper.Request("key")].ToString();
+        }
+
+        [WebMethod]
+        [ScriptMethod]
+        public void RenewUmbracoSession()
+        {
+            Authorize();
+
+            BasePage.RenewLoginTimeout();
+
+        }
+
+        [WebMethod]
+        [ScriptMethod]
+        public int GetSecondsBeforeUserLogout()
+        {
+            Authorize();
+            long timeout = BasePage.GetTimeout(true);
+            DateTime timeoutDate = new DateTime(timeout);
+            DateTime currentDate = DateTime.Now;
+            
+            return (int) timeoutDate.Subtract(currentDate).TotalSeconds;
+
         }
 
         [WebMethod]

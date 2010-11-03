@@ -1154,13 +1154,6 @@
     <Compile Include="umbraco\js\language.aspx.designer.cs">
       <DependentUpon>language.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\keepalive.aspx.cs">
-      <DependentUpon>keepalive.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\keepalive.aspx.designer.cs">
-      <DependentUpon>keepalive.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco\LiveEditing\Controls\Communicator.cs" />
     <Compile Include="umbraco\LiveEditing\Modules\BaseModule.cs" />
     <Compile Include="umbraco\LiveEditing\Modules\Separator.cs" />
@@ -2535,9 +2528,6 @@
     <Content Include="umbraco\js\umbracoCheckKeys.js" />
     <Content Include="umbraco\js\xmlextras.js" />
     <Content Include="umbraco\js\xmlRequest.js" />
-    <Content Include="umbraco\keepalive.aspx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="umbraco\login.aspx" />
     <Content Include="umbraco\logout.aspx" />
     <Content Include="umbraco\macroResultWrapper.aspx">

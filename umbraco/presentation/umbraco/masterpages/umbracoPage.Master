@@ -28,8 +28,6 @@
         Priority="10" />
     <umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient"
         Priority="10" />
-    <umb:JsInclude ID="JsInclude10" runat="server" FilePath="Application/jQuery/jquery.idle-timer.js"
-        PathNameAlias="UmbracoClient" Priority="1" />
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
 </head>
@@ -42,19 +40,5 @@
     </form>
     <asp:ContentPlaceHolder ID="footer" runat="server">
     </asp:ContentPlaceHolder>
-    <script type="text/javascript">
-        // add idle timer
-        var stimeout = 60000;
-
-        jQuery('.umbracoPage').bind("idle.idleTimer", function () {
-            UmbClientMgr.mainWindow().jQuery('#umbracoMainPageBody').trigger('idle.idleTimer');
-        });
-
-        jQuery('.umbracoPage').bind("active.idleTimer", function () {
-            UmbClientMgr.mainWindow().jQuery('#umbracoMainPageBody').trigger('active.idleTimer');
-        });
-
-        jQuery('.umbracoPage').idleTimer(stimeout);
-    </script>
 </body>
 </html>
