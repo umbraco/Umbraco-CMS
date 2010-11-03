@@ -40,8 +40,28 @@ body{
 #rightDIV{width: 70%; position: absolute; top: 0px; right: 0px;}
 #uiArea{position: relative; margin: 0px 10px 0px 10px; display: none;}
 
-#defaultSpeechbubble{z-index: 10; display: none; background-image: url(../images/speechBubble/speechbubble.gif); width: 231px; position: absolute; right: 20px; bottom: 20px; height: 84px;}
-				
+#defaultSpeechbubble{z-index: 10; display: none; width: 231px; position: absolute; right: 30px; bottom: 20px; margin: 0px; padding:0;}
+.speechClose {float: right; width: 18px; height: 18px; margin-right: 18px; display: none;}
+.speechBubbleTop {background: url('../images/speechbubble/speechbubble_top.png') no-repeat; width: 235px; height: 6px; margin: 0px 0px 0px 3px; padding:0;}
+.speechBubbleContent {background: url('../images/speechbubble/speechbubble_body.png') no-repeat; width: 235px; margin:0;padding: 10px 20px 10px 10px;}
+.speechBubbleBottom {background: url('../images/speechbubble/speechbubble_bottom.png') no-repeat; width: 235px; height: 30px; margin:0px 0px 0px 1px;padding:0;}
+.speechBubbleContent h3 
+{
+    font-size: 14px;
+    font-weight: bold;
+  	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+    margin: 0;
+    padding: 0;
+    display: block;
+  	width: 220px;
+}
+.speechBubbleContent p 
+{
+    font-size: 11px;
+  	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+  	margin: 0;
+  	width: 220px;
+}
 #tray
 {
 	margin: 0px;

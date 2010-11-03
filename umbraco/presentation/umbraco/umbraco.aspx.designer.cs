@@ -184,6 +184,15 @@ namespace umbraco.cms.presentation {
         protected global::ClientDependency.Core.Controls.JsInclude JsInclude16;
         
         /// <summary>
+        /// JsInclude17 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude17;
+        
+        /// <summary>
         /// Form1 control.
         /// </summary>
         /// <remarks>

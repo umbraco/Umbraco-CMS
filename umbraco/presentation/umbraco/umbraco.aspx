@@ -42,6 +42,8 @@
         PathNameAlias="UmbracoRoot" />
     <umb:JsInclude ID="JsInclude16" runat="server" FilePath="Application/jQuery/jquery.cookie.js"
         PathNameAlias="UmbracoClient" Priority="1" />
+    <umb:JsInclude ID="JsInclude17" runat="server" FilePath="Application/jQuery/jquery.idle-timer.js"
+        PathNameAlias="UmbracoClient" Priority="1" />
     <script type="text/javascript">
         this.name = 'umbracoMain';
     </script>
@@ -74,6 +76,7 @@
                 </div>
             </asp:Panel>
             <div class="topBarButtons">
+                <span id="logout-warning" style="display:none;">You're idle. Logout will happen in <span id="logout-warning-counter"></span>.</span>
                 <button onclick="UmbClientMgr.appActions().launchAbout();" class="topBarButton">
                     <img src="images/aboutNew.png" alt="about" /><span><%=umbraco.ui.Text("general", "about")%></span></button>
                 <button onclick="UmbClientMgr.appActions().launchHelp('<%=this.getUser().Language%>', '<%=this.getUser().UserType.Name%>');"
@@ -163,6 +166,18 @@
             }
 
 
+            // add idle timer
+            var stimeout = 60000;
+
+            jQuery('#umbracoMainPageBody').bind("idle.idleTimer", function () {
+                jQuery("#logout-warning").show();
+            });
+
+            jQuery('#umbracoMainPageBody').bind("active.idleTimer", function () {
+                jQuery("#logout-warning").hide();
+            });
+
+            jQuery('#umbracoMainPageBody').idleTimer(stimeout);
 
             jQuery("#right").show();
         });
