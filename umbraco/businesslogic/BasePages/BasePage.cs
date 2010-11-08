@@ -163,9 +163,7 @@ namespace umbraco.BasePages {
             if (System.Web.HttpRuntime.Cache["UmbracoUserContextTimeout" + umbracoUserContextID] == null) {
                 System.Web.HttpRuntime.Cache.Insert(
                     "UmbracoUserContextTimeout" + umbracoUserContextID,
-                        SqlHelper.ExecuteScalar<long>("select timeout from umbracoUserLogins where contextId=@contextId",
-                                          SqlHelper.CreateParameter("@contextId", new Guid(umbracoUserContextID))
-                        ),
+                        GetTimeout(true),
                     null,
                     DateTime.Now.AddMinutes(_umbracoTimeOutInMinutes / 10), System.Web.Caching.Cache.NoSlidingExpiration);
 
@@ -174,6 +172,18 @@ namespace umbraco.BasePages {
 
             return (long)System.Web.HttpRuntime.Cache["UmbracoUserContextTimeout" + umbracoUserContextID];
 
+        }
+
+        public static long GetTimeout(bool byPassCache)
+        {
+            if (byPassCache)
+            {
+                return SqlHelper.ExecuteScalar<long>("select timeout from umbracoUserLogins where contextId=@contextId",
+                                                          SqlHelper.CreateParameter("@contextId", new Guid(umbracoUserContextID))
+                                        );
+            }
+            else
+                return GetTimeout(umbracoUserContextID);
         }
 
         // Changed to public by NH to help with webservice authentication
@@ -227,13 +237,23 @@ namespace umbraco.BasePages {
             umbracoUserContextID = "";
         }
 
-        private void updateLogin() {
+        private void updateLogin()
+        {
             // only call update if more than 1/10 of the timeout has passed
             if (timeout - (((_ticksPrMinute * _umbracoTimeOutInMinutes) * 0.8)) < DateTime.Now.Ticks)
                 SqlHelper.ExecuteNonQuery(
                     "UPDATE umbracoUserLogins SET timeout = @timeout WHERE contextId = @contextId",
                     SqlHelper.CreateParameter("@timeout", DateTime.Now.Ticks + (_ticksPrMinute * _umbracoTimeOutInMinutes)),
                     SqlHelper.CreateParameter("@contextId", umbracoUserContextID));
+        }
+
+        public static void RenewLoginTimeout()
+        {
+            // only call update if more than 1/10 of the timeout has passed
+            SqlHelper.ExecuteNonQuery(
+                "UPDATE umbracoUserLogins SET timeout = @timeout WHERE contextId = @contextId",
+                SqlHelper.CreateParameter("@timeout", DateTime.Now.Ticks + (_ticksPrMinute * _umbracoTimeOutInMinutes)),
+                SqlHelper.CreateParameter("@contextId", umbracoUserContextID));
         }
 
         /// <summary>
