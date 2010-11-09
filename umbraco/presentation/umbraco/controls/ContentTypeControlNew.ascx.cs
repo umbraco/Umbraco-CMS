@@ -446,7 +446,7 @@ jQuery(function() { refreshDropDowns(); });
 
             if (!propertyTabHasProperties)
             {
-                PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div>"));
+                PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div></div>"));
                 PropertyTypes.Controls.Remove(PropertyTypes.FindControl("propertiesPH"));
             }
             else
@@ -456,7 +456,7 @@ jQuery(function() { refreshDropDowns(); });
 
         private void addNoPropertiesDefinedMessage()
         {
-            PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div>"));
+            PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div></div>"));
         }
 
         protected void gpw_Delete(object sender, System.EventArgs e)
