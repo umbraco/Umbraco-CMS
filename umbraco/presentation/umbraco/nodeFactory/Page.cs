@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using System.Data;
+using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.XPath;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.propertytype;
+using System.Collections.Generic;
 
 namespace umbraco.presentation.nodeFactory
 {
@@ -294,8 +296,22 @@ namespace umbraco.presentation.nodeFactory
             }
             return null;
         }
+        public static Node GetNodeByXpath(string xpath)
+        {
+            XPathNodeIterator xpathNode = library.GetXmlNodeByXPath(xpath);
+            XmlNode n = ((IHasXmlNode) xpathNode.Current).GetNode();
+            if (n != null) {
+                return new Node(n);
+            }
 
+            return null;
 
+        }
+
+        public List<Node> ChildrenAsList
+        {
+            get { return Children.Cast<Node>().ToList(); }
+        }
 
         public DataTable ChildrenAsTable()
         {
@@ -565,6 +581,11 @@ namespace umbraco.presentation.nodeFactory
         public Property()
         {
 
+        }
+
+        public override string ToString()
+        {
+            return Value;
         }
 
         public Property(XmlNode PropertyXmlData)
