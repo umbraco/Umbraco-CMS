@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="StartupDeveloperDashboard.ascx.cs" Inherits="dashboardUtilities.StartupDeveloperDashboard" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" %>
 <%@ Register Namespace="umbraco.uicontrols" Assembly="controls" TagPrefix="umb" %>
 <script type="text/javascript" src="/umbraco/dashboard/scripts/jquery.jfeed.pack.js"></script>
 <link href="/umbraco_client/propertypane/style.css" rel="stylesheet" />
@@ -64,23 +64,6 @@
         margin: auto;
         margin-bottom: 10px;
     }
-    .contourLabel
-    {
-        clear: left;
-        float: left;
-        font-weight: bold;
-        padding-bottom: 10px;
-        padding-right: 10px;
-        width: 130px;
-    }
-    .contourInput
-    {
-        color: #333333;
-        font-family: Trebuchet MS,Lucida Grande,verdana,arial;
-        font-size: 12px;
-        padding: 2px;
-        width: 250px;
-    }
 </style>
 <script type="text/javascript">
 
@@ -88,7 +71,7 @@
 
         jQuery.ajax({
             type: 'GET',
-            url: 'dashboard/feedproxy.aspx?url=http://umbraco.org/documentation/videos/for-developers/foundation/feed',
+            url: 'dashboard/feedproxy.aspx?url=http://umbraco.org/feeds/videos/developer-foundation',
             dataType: 'xml',
             success: function (xml) {
 
@@ -122,48 +105,11 @@
 
 </script>
 
-<umb:Pane runat="server" ID="startPanel">
-<umb:PropertyPanel runat="server" ID="startPP">
-        <h2>Start here</h2>
-        <h3>This section contains the tools to add advanced features to your Umbraco site</h3>
-        <p>
-        From here you can explore and install packages, create macros, add data types, and much more.  Start by exploring the below links or videos.
-        </p>
-        <h4>Find out more</h4>
-        <div style="float:left; width:5%;">
-            <img src="/umbraco/dashboard/images/logo.gif" alt="Umbraco Start Up!" />
-        </div>
-            <div style="float:right; width:95%;">
-            <ul>
-            <li>Find the answers to your Umbraco questions on our <a href="http://our.umbraco.org/wiki" target="_blank">Community Wiki</a></li>
-            <li>Ask a question in the <a href="http://our.umbraco.org/" target="_blank">Community Forum</a></li>
-            <li>Find an add-on <a href="http://our.umbraco.org/projects" target="_blank">package</a> to help you get going quickly</li>
-            <li>Watch our <a href="http://umbraco.tv" target="_blank">tutorial videos</a> (some are free, some require a subscription)</li>
-            <li>Find out about our <a href="http://umbraco.org/products" target="_blank">Pro Tools and Support</a></li>
-            <li>Find out about real-life <a href="http://umbraco.org/training/training-schedule" target="_blank">training and certification</a> opportunities</li>
-            </ul>
-        </div>
-</umb:PropertyPanel>
-</umb:Pane>
-
-<umb:Pane runat="server" ID="learnPanel">
-<umb:PropertyPanel runat="server" ID="learnPP">
     <h2>Watch and learn</h2>
         <p>
             Want to master Umbraco Macros and more? Spend a couple of minutes learning some best practices
             by watching one of these videos about using Umbraco. And visit <a href="http://umbraco.tv"
                 target="_blank">umbraco.tv</a> for even more Umbraco videos</p>
-    <div id="latestformvids">
+     <div id="latestformvids">
             Loading...
-    </div>
-</umb:PropertyPanel>
-</umb:Pane>
-
-<umb:Pane runat="server" ID="hidePanel">
-<umb:PropertyPanel runat="server" ID="hidePP">
-        <p>
-                Check here to hide this dashboard in the future <asp:CheckBox ID="hideCheckBox" 
-                runat="server" oncheckedchanged="hideCheckBox_CheckedChanged" AutoPostBack="true"></asp:CheckBox>
-        </p>
-</umb:PropertyPanel>
-</umb:Pane>
+     </div>

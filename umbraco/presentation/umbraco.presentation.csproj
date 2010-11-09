@@ -568,12 +568,11 @@
     <Compile Include="umbraco\dashboard\ChangePassword.ascx.designer.cs">
       <DependentUpon>ChangePassword.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\dashboard\StartupMemberDashboard.ascx.cs">
-      <DependentUpon>StartupMemberDashboard.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
+    <Compile Include="umbraco\dashboard\DeveloperDashboardIntro.ascx.designer.cs">
+      <DependentUpon>DeveloperDashboardIntro.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\dashboard\StartupMemberDashboard.ascx.designer.cs">
-      <DependentUpon>StartupMemberDashboard.ascx</DependentUpon>
+    <Compile Include="umbraco\dashboard\DeveloperDashboardVideos.ascx.designer.cs">
+      <DependentUpon>DeveloperDashboardVideos.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\dashboard\FeedProxy.aspx.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
@@ -582,6 +581,24 @@
     <Compile Include="umbraco\dashboard\FeedProxy.aspx.designer.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\dashboard\MediaDashboardIntro.ascx.designer.cs">
+      <DependentUpon>MediaDashboardIntro.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dashboard\MediaDashboardVideos.ascx.designer.cs">
+      <DependentUpon>MediaDashboardVideos.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dashboard\MembersDashboardIntro.ascx.designer.cs">
+      <DependentUpon>MembersDashboardIntro.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dashboard\MembersDashboardVideos.ascx.designer.cs">
+      <DependentUpon>MembersDashboardVideos.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dashboard\SettingsDashboardIntro.ascx.designer.cs">
+      <DependentUpon>SettingsDashboardIntro.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dashboard\SettingsDashboardVideos.ascx.designer.cs">
+      <DependentUpon>SettingsDashboardVideos.ascx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\dashboard\Settings\Applyskin.ascx.cs">
       <DependentUpon>Applyskin.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -589,33 +606,14 @@
     <Compile Include="umbraco\dashboard\Settings\Applyskin.ascx.designer.cs">
       <DependentUpon>Applyskin.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\dashboard\StartupDashboard.ascx.cs">
-      <DependentUpon>StartupDashboard.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
+    <Compile Include="umbraco\dashboard\StartupDashboardIntro.ascx.designer.cs">
+      <DependentUpon>StartupDashboardIntro.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\dashboard\StartupDashboard.ascx.designer.cs">
-      <DependentUpon>StartupDashboard.ascx</DependentUpon>
+    <Compile Include="umbraco\dashboard\StartupDashboardKits.ascx.designer.cs">
+      <DependentUpon>StartupDashboardKits.ascx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\dashboard\StartupDeveloperDashboard.ascx.cs">
-      <DependentUpon>StartupDeveloperDashboard.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dashboard\StartupDeveloperDashboard.ascx.designer.cs">
-      <DependentUpon>StartupDeveloperDashboard.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\dashboard\StartupMediaDashboard.ascx.cs">
-      <DependentUpon>StartupMediaDashboard.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dashboard\StartupMediaDashboard.ascx.designer.cs">
-      <DependentUpon>StartupMediaDashboard.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\dashboard\StartupSettingsDashboard.ascx.cs">
-      <DependentUpon>StartupSettingsDashboard.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\dashboard\StartupSettingsDashboard.ascx.designer.cs">
-      <DependentUpon>StartupSettingsDashboard.ascx</DependentUpon>
+    <Compile Include="umbraco\dashboard\StartupDashboardVideos.ascx.designer.cs">
+      <DependentUpon>StartupDashboardVideos.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\dialogs\Preview.aspx.cs">
       <DependentUpon>Preview.aspx</DependentUpon>
@@ -1662,18 +1660,24 @@
     <Content Include="install\steps\Skinning\loadStarterKits.ascx" />
     <Content Include="install\Title.ascx" />
     <Content Include="umbraco\dashboard\ChangePassword.ascx" />
+    <Content Include="umbraco\dashboard\DeveloperDashboardIntro.ascx" />
+    <Content Include="umbraco\dashboard\DeveloperDashboardVideos.ascx" />
     <Content Include="umbraco\dashboard\images\contour-icon.png" />
     <Content Include="umbraco\dashboard\images\courier-icon.png" />
     <Content Include="umbraco\dashboard\images\logo.gif" />
     <Content Include="umbraco\dashboard\images\starterkit-icon.png" />
-    <Content Include="umbraco\dashboard\StartupMemberDashboard.ascx" />
     <Content Include="umbraco\dashboard\FeedProxy.aspx" />
+    <Content Include="umbraco\dashboard\MediaDashboardIntro.ascx" />
+    <Content Include="umbraco\dashboard\MediaDashboardVideos.ascx" />
+    <Content Include="umbraco\dashboard\MembersDashboardIntro.ascx" />
+    <Content Include="umbraco\dashboard\MembersDashboardVideos.ascx" />
     <Content Include="umbraco\dashboard\scripts\jquery.jfeed.pack.js" />
+    <Content Include="umbraco\dashboard\SettingsDashboardIntro.ascx" />
+    <Content Include="umbraco\dashboard\SettingsDashboardVideos.ascx" />
     <Content Include="umbraco\dashboard\Settings\Applyskin.ascx" />
-    <Content Include="umbraco\dashboard\StartupDashboard.ascx" />
-    <Content Include="umbraco\dashboard\StartupDeveloperDashboard.ascx" />
-    <Content Include="umbraco\dashboard\StartupMediaDashboard.ascx" />
-    <Content Include="umbraco\dashboard\StartupSettingsDashboard.ascx" />
+    <Content Include="umbraco\dashboard\StartupDashboardIntro.ascx" />
+    <Content Include="umbraco\dashboard\StartupDashboardKits.ascx" />
+    <Content Include="umbraco\dashboard\StartupDashboardVideos.ascx" />
     <Content Include="umbraco\dashboard\zipupload.ascx" />
     <Content Include="umbraco\dialogs\TemplateSkinning.aspx" />
     <Content Include="umbraco\helpRedirect.aspx" />
