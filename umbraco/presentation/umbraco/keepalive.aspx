@@ -1,1 +1,0 @@
-<%@ Page Language="c#" Codebehind="keepalive.aspx.cs" AutoEventWireup="True" Inherits="umbraco.presentation.keepalive" %>
