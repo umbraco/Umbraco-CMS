@@ -4,15 +4,57 @@ using System.Diagnostics;
 using System.Threading;
 
 using umbraco.DataLayer;
+using System.Collections.Generic;
+using System.Reflection;
+using umbraco.BusinessLogic.Utils;
 
 namespace umbraco.BusinessLogic
 {
-	/// <summary>
-	/// Summary description for Log.
-	/// </summary>
-	public class Log
-	{
-		#region Statics
+    /// <summary>
+    /// Summary description for Log.
+    /// </summary>
+    public class Log
+    {
+        #region Statics
+        private Interfaces.ILog m_externalLogger = null;
+        private bool m_externalLoggerInitiated = false;
+
+        internal Interfaces.ILog ExternalLogger
+        {
+            get
+            {
+                if (!m_externalLoggerInitiated)
+                {
+                    m_externalLoggerInitiated = true;
+                    if (!String.IsNullOrEmpty(UmbracoSettings.ExternalLoggerAssembly)
+                         && !String.IsNullOrEmpty(UmbracoSettings.ExternalLoggerType))
+                    {
+                        try
+                        {
+                            string assemblyPath = IO.IOHelper.MapPath(UmbracoSettings.ExternalLoggerAssembly);
+                            m_externalLogger = Assembly.LoadFrom(assemblyPath).CreateInstance(UmbracoSettings.ExternalLoggerType) as Interfaces.ILog;
+                        }
+                        catch (Exception ee)
+                        {
+                            Log.AddLocally(LogTypes.Error, User.GetUser(0), -1,
+                                "Error loading external logger: " + ee.ToString());
+                        }
+                    }
+                }
+
+                return m_externalLogger;
+            }
+        }
+
+
+        #region Singleton
+
+        public static Log Instance
+        {
+            get { return Singleton<Log>.Instance; }
+        }
+
+        #endregion
 
         private static ISqlHelper SqlHelper
         {
@@ -26,25 +68,82 @@ namespace umbraco.BusinessLogic
         /// <param name="user">The user adding the item.</param>
         /// <param name="nodeId">The affected node id.</param>
         /// <param name="comment">Comment.</param>
-		public static void Add(LogTypes type, User user, int nodeId, string comment)
-		{
-			if(!UmbracoSettings.EnableLogging) return;
+        public static void Add(LogTypes type, User user, int nodeId, string comment)
+        {
+            if (Instance.ExternalLogger != null)
+            {
+                Instance.ExternalLogger.Add(type, user, nodeId, comment);
 
-            if (UmbracoSettings.DisabledLogTypes != null &&
-                UmbracoSettings.DisabledLogTypes.SelectSingleNode(String.Format("//logTypeAlias [. = '{0}']", type.ToString().ToLower())) == null) {
-
-                if (comment.Length > 3999)
-                    comment = comment.Substring(0, 3955) + "...";
-
-                if (UmbracoSettings.EnableAsyncLogging) {
-                    ThreadPool.QueueUserWorkItem(
-                        delegate { AddSynced(type, user == null ? 0 : user.Id, nodeId, comment); });
-                    return;
+                // Audit trail too?
+                if (!UmbracoSettings.ExternalLoggerLogAuditTrail && type.GetType().GetField(type.ToString()).GetCustomAttributes(typeof(AuditTrailLogItem), true) != null)
+                {
+                    AddLocally(type, user, nodeId, comment);
                 }
-
-                AddSynced(type, user == null ? 0 : user.Id, nodeId, comment);
             }
-		}
+            else
+            {
+                if (!UmbracoSettings.EnableLogging) return;
+
+                if (UmbracoSettings.DisabledLogTypes != null &&
+                    UmbracoSettings.DisabledLogTypes.SelectSingleNode(String.Format("//logTypeAlias [. = '{0}']", type.ToString().ToLower())) == null)
+                {
+
+                    if (comment.Length > 3999)
+                        comment = comment.Substring(0, 3955) + "...";
+
+                    if (UmbracoSettings.EnableAsyncLogging)
+                    {
+                        ThreadPool.QueueUserWorkItem(
+                            delegate { AddSynced(type, user == null ? 0 : user.Id, nodeId, comment); });
+                        return;
+                    }
+
+                    AddSynced(type, user == null ? 0 : user.Id, nodeId, comment);
+                }
+            }
+        }
+
+        public void AddException(Exception ee)
+        {
+            if (ExternalLogger != null)
+            {
+                ExternalLogger.Add(ee);
+            }
+            else
+            {
+                Exception ex2 = ee;
+                string error = String.Empty;
+                string errorMessage = string.Empty;
+                while (ex2 != null)
+                {
+                    error += ex2.ToString();
+                    ex2 = ex2.InnerException;
+                }
+                Add(LogTypes.Error, -1, error);
+            }
+        }
+
+        /// <summary>
+        /// Adds the specified log item to the Umbraco log no matter if an external logger has been defined.
+        /// </summary>
+        /// <param name="type">The log type.</param>
+        /// <param name="user">The user adding the item.</param>
+        /// <param name="nodeId">The affected node id.</param>
+        /// <param name="comment">Comment.</param>
+        public static void AddLocally(LogTypes type, User user, int nodeId, string comment)
+        {
+            if (comment.Length > 3999)
+                comment = comment.Substring(0, 3955) + "...";
+
+            if (UmbracoSettings.EnableAsyncLogging)
+            {
+                ThreadPool.QueueUserWorkItem(
+                    delegate { AddSynced(type, user == null ? 0 : user.Id, nodeId, comment); });
+                return;
+            }
+
+            AddSynced(type, user == null ? 0 : user.Id, nodeId, comment);
+        }
 
         /// <summary>
         /// Adds the specified log item to the log without any user information attached.
@@ -52,10 +151,10 @@ namespace umbraco.BusinessLogic
         /// <param name="type">The log type.</param>
         /// <param name="nodeId">The affected node id.</param>
         /// <param name="comment">Comment.</param>
-		public static void Add(LogTypes type, int nodeId, string comment)
-		{
-			Add(type, null, nodeId, comment);
-		}
+        public static void Add(LogTypes type, int nodeId, string comment)
+        {
+            Add(type, null, nodeId, comment);
+        }
 
         /// <summary>
         /// Adds a log item to the log immidiately instead of Queuing it as a work item.
@@ -64,23 +163,99 @@ namespace umbraco.BusinessLogic
         /// <param name="userId">The user id.</param>
         /// <param name="nodeId">The node id.</param>
         /// <param name="comment">The comment.</param>
-		public static void AddSynced(LogTypes type, int userId, int nodeId, string comment)
-		{
-			try
-			{
-				SqlHelper.ExecuteNonQuery(
-					"insert into umbracoLog (userId, nodeId, logHeader, logComment) values (@userId, @nodeId, @logHeader, @comment)",
-					SqlHelper.CreateParameter("@userId", userId),
-					SqlHelper.CreateParameter("@nodeId", nodeId),
-					SqlHelper.CreateParameter("@logHeader", type.ToString()),
-					SqlHelper.CreateParameter("@comment", comment));
-			}
-			catch(Exception e)
-			{
-				Debug.WriteLine(e.ToString(), "Error");
-				Trace.WriteLine(e.ToString());
-			}
-		}
+        public static void AddSynced(LogTypes type, int userId, int nodeId, string comment)
+        {
+            try
+            {
+                SqlHelper.ExecuteNonQuery(
+                    "insert into umbracoLog (userId, nodeId, logHeader, logComment) values (@userId, @nodeId, @logHeader, @comment)",
+                    SqlHelper.CreateParameter("@userId", userId),
+                    SqlHelper.CreateParameter("@nodeId", nodeId),
+                    SqlHelper.CreateParameter("@logHeader", type.ToString()),
+                    SqlHelper.CreateParameter("@comment", comment));
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.ToString(), "Error");
+                Trace.WriteLine(e.ToString());
+            }
+        }
+
+        public List<LogItem> GetAuditLogItems(int NodeId)
+        {
+            if (UmbracoSettings.ExternalLoggerLogAuditTrail && ExternalLogger != null)
+                return ExternalLogger.GetAuditLogReader(NodeId);
+            else
+                return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
+                    "select userId, nodeId, logHeader, DateStamp, logComment from umbracoLog where nodeId = @id and logHeader not in ('open','system') order by DateStamp desc",
+                    SqlHelper.CreateParameter("@id", NodeId)));
+        }
+
+        public List<LogItem> GetLogItems(LogTypes type, DateTime sinceDate)
+        {
+            if (ExternalLogger != null)
+                return ExternalLogger.GetLogItems(type, sinceDate);
+            else
+                return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
+                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
+                SqlHelper.CreateParameter("@logHeader", type),
+                SqlHelper.CreateParameter("@dateStamp", sinceDate)));
+        }
+
+        public List<LogItem> GetLogItems(int nodeId)
+        {
+            if (ExternalLogger != null)
+                return ExternalLogger.GetLogItems(nodeId);
+            else
+                return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
+                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where id = @id order by dateStamp desc",
+                SqlHelper.CreateParameter("@id", nodeId)));
+        }
+
+        public List<LogItem> GetLogItems(User user, DateTime sinceDate)
+        {
+            if (ExternalLogger != null)
+                return ExternalLogger.GetLogItems(user, sinceDate);
+            else
+                return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
+                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and DateStamp >= @dateStamp order by dateStamp desc",
+                SqlHelper.CreateParameter("@user", user.Id),
+                SqlHelper.CreateParameter("@dateStamp", sinceDate)));
+        }
+
+        public List<LogItem> GetLogItems(User user, LogTypes type, DateTime sinceDate)
+        {
+            if (ExternalLogger != null)
+                return ExternalLogger.GetLogItems(user, type, sinceDate);
+            else
+                return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
+                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
+                SqlHelper.CreateParameter("@logHeader", type),
+                SqlHelper.CreateParameter("@user", user.Id),
+                SqlHelper.CreateParameter("@dateStamp", sinceDate)));
+        }
+
+        public static void CleanLogs(int maximumAgeOfLogsInMinutes)
+        {
+            if (Instance.ExternalLogger != null)
+                Instance.ExternalLogger.CleanLogs(maximumAgeOfLogsInMinutes);
+            else
+            {
+                try
+                {
+                    DateTime oldestPermittedLogEntry = DateTime.Now.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));
+                    SqlHelper.ExecuteNonQuery("delete from umbracoLog where datestamp < @oldestPermittedLogEntry and logHeader in ('open','system')",
+                        SqlHelper.CreateParameter("@oldestPermittedLogEntry", oldestPermittedLogEntry));
+                    Add(LogTypes.System, -1, "Log scrubbed.  Removed all items older than " + oldestPermittedLogEntry);
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.ToString(), "Error");
+                    Trace.WriteLine(e.ToString());
+                }
+            }
+        }
+
 
         #region New GetLog methods - DataLayer layer compatible
         /// <summary>
@@ -88,6 +263,7 @@ namespace umbraco.BusinessLogic
         /// </summary>
         /// <param name="NodeId">The node id.</param>
         /// <returns>A reader for the audit log.</returns>
+        [Obsolete("Use the Instance.GetAuditLogItems method which return a list of LogItems instead")]
         public static IRecordsReader GetAuditLogReader(int NodeId)
         {
             return SqlHelper.ExecuteReader(
@@ -101,6 +277,7 @@ namespace umbraco.BusinessLogic
         /// <param name="Type">The type of log message.</param>
         /// <param name="SinceDate">The start date.</param>
         /// <returns>A reader for the log.</returns>
+        [Obsolete("Use the Instance.GetLogItems method which return a list of LogItems instead")]
         public static IRecordsReader GetLogReader(LogTypes Type, DateTime SinceDate)
         {
             return SqlHelper.ExecuteReader(
@@ -114,6 +291,7 @@ namespace umbraco.BusinessLogic
         /// </summary>
         /// <param name="NodeId">The node id.</param>
         /// <returns>A reader for the log.</returns>
+        [Obsolete("Use the Instance.GetLogItems method which return a list of LogItems instead")]
         public static IRecordsReader GetLogReader(int NodeId)
         {
             return SqlHelper.ExecuteReader(
@@ -127,6 +305,7 @@ namespace umbraco.BusinessLogic
         /// <param name="user">The user.</param>
         /// <param name="SinceDate">The start date.</param>
         /// <returns>A reader for the log.</returns>
+        [Obsolete("Use the Instance.GetLogItems method which return a list of LogItems instead")]
         public static IRecordsReader GetLogReader(User user, DateTime SinceDate)
         {
             return SqlHelper.ExecuteReader(
@@ -142,6 +321,7 @@ namespace umbraco.BusinessLogic
         /// <param name="Type">The type of log message.</param>
         /// <param name="SinceDate">The since date.</param>
         /// <returns>A reader for the log.</returns>
+        [Obsolete("Use the Instance.GetLogItems method which return a list of LogItems instead")]
         public static IRecordsReader GetLogReader(User user, LogTypes Type, DateTime SinceDate)
         {
             return SqlHelper.ExecuteReader(
@@ -149,358 +329,205 @@ namespace umbraco.BusinessLogic
                 SqlHelper.CreateParameter("@logHeader", Type.ToString()),
                 SqlHelper.CreateParameter("@user", user.Id),
                 SqlHelper.CreateParameter("@dateStamp", SinceDate));
-        } 
+        }
         #endregion
 
-        #region Old GetLog methods - DataLayer incompatible
-        #pragma warning disable 618 // ConvertToDataSet is obsolete
-
-        /// <summary>
-        /// Gets the log.
-        /// </summary>
-        /// <param name="Type">The type.</param>
-        /// <param name="SinceDate">The start date.</param>
-        /// <returns>The log.</returns>
-        /// <remarks>Only guaranteed to work with SQL Server. Obsolete.</remarks>
-        [Obsolete("Not compatible with the data layer. Use GetLogReader instead.", true)]
-        public static DataSet GetLog(LogTypes Type, DateTime SinceDate)
-        {
-            try
-            {
-                return ConvertToDataSet(GetLogReader(Type, SinceDate));
-            }
-            catch (Exception)
-            {
-                throw new Exception("The GetLog method is not compatible with the data layer.");
-            }
-        }
-
-        /// <summary>
-        /// Returns a dataset of Log items with a specific type since a specific date.
-        /// </summary>
-        /// <param name="Type">The type.</param>
-        /// <param name="SinceDate">The start date.</param>
-        /// <param name="Limit">Maximum number of results.</param>
-        /// <returns>The log.</returns>
-        /// <remarks>Only guaranteed to work with SQL Server. Obsolete.</remarks>
-        [Obsolete("Not compatible with the data layer. Use GetLogReader instead.", true)]
-        public static DataSet GetLog(LogTypes Type, DateTime SinceDate, int Limit)
-        {
-            try
-            {
-                return ConvertToDataSet(SqlHelper.ExecuteReader(
-                    "select top (" + Limit +
-                    ") userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
-                    SqlHelper.CreateParameter("@logHeader", Type.ToString()),
-                    SqlHelper.CreateParameter("@dateStamp", SinceDate)));
-            }
-            catch (Exception)
-            {
-                throw new Exception("The GetLog method is not compatible with the data layer.");
-            }
-        }
-
-        /// <summary>
-        /// Returns a dataset of Log items for a specific node
-        /// </summary>
-        /// <param name="NodeId">The node id.</param>
-        /// <returns>The log.</returns>
-        /// <remarks>Only guaranteed to work with SQL Server. Obsolete.</remarks>
-        [Obsolete("Not compatible with the data layer. Use GetLogReader instead.", true)]
-        public static DataSet GetLog(int NodeId)
-        {
-            try
-            {
-                return ConvertToDataSet(GetLogReader(NodeId));
-            }
-            catch (Exception)
-            {
-                throw new Exception("The GetLog method is not compatible with the data layer.");
-            }
-        }
-
-        /// <summary>
-        /// Returns a dataset of audit Log items for a specific node with more detailed user information
-        /// </summary>
-        /// <param name="NodeId">The node id.</param>
-        /// <returns>The log.</returns>
-        /// <remarks>Only guaranteed to work with SQL Server. Obsolete.</remarks>
-        [Obsolete("Not compatible with the data layer. Use GetAuditLogReader instead.", true)]
-        public static DataSet GetAuditLog(int NodeId)
-        {
-            try
-            {
-                return ConvertToDataSet(GetAuditLogReader(NodeId));
-            }
-            catch (Exception)
-            {
-                throw new Exception("The GetAuditLog method is not compatible with the data layer.");
-            }
-        }
-
-        /// <summary>
-        /// Returns a dataset of Log items for a specific user, since a specific date
-        /// </summary>
-        /// <param name="u">The user.</param>
-        /// <param name="SinceDate">The start date.</param>
-        /// <returns>The log.</returns>
-        /// <remarks>Only guaranteed to work with SQL Server. Obsolete.</remarks>
-        [Obsolete("Not compatible with the data layer. Use GetAuditLogReader instead.", true)]
-        public static DataSet GetLog(User u, DateTime SinceDate)
-        {
-            try
-            {
-                return ConvertToDataSet(GetLogReader(u, SinceDate));
-            }
-            catch (Exception)
-            {
-                throw new Exception("The GetLog method is not compatible with the data layer.");
-            }
-        }
-
-        /// <summary>
-        /// Returns a dataset of Log items for a specific user of a specific type, since a specific date
-        /// </summary>
-        /// <param name="u">The user.</param>
-        /// <param name="Type">The type.</param>
-        /// <param name="SinceDate">The start date.</param>
-        /// <returns>The log.</returns>
-        /// <remarks>Only guaranteed to work with SQL Server. Obsolete.</remarks>
-        [Obsolete("Not compatible with the data layer. Use GetLogReader instead.", true)]
-        public static DataSet GetLog(User u, LogTypes Type, DateTime SinceDate)
-        {
-            try
-            {
-                return ConvertToDataSet(GetLogReader(u, Type, SinceDate));
-            }
-            catch (Exception)
-            {
-                throw new Exception("The GetLog method is not compatible with the data layer.");
-            }
-        }
-
-        /// <summary>
-        /// Returns a dataset of Log items for a specific user of a specific type, since a specific date
-        /// </summary>
-        /// <param name="u">The user.</param>
-        /// <param name="Type">The type.</param>
-        /// <param name="SinceDate">The since date.</param>
-        /// <param name="Limit">The limit.</param>
-        /// <returns>The log.</returns>
-        /// <remarks>Only guaranteed to work with SQL Server. Obsolete.</remarks>
-        [Obsolete("Not compatible with the data layer. Use GetLogReader instead.", true)]
-        public static DataSet GetLog(User u, LogTypes Type, DateTime SinceDate, int Limit)
-        {
-            try
-            {
-                return ConvertToDataSet(SqlHelper.ExecuteReader(
-                    "select top (" + Limit +
-                    ") userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
-                    SqlHelper.CreateParameter("@logHeader", Type.ToString()),
-                    SqlHelper.CreateParameter("@user", u.Id),
-                    SqlHelper.CreateParameter("@dateStamp", SinceDate)));
-            }
-            catch (Exception)
-            {
-                throw new Exception("The GetLog method is not compatible with the data layer.");
-            }
-        }
-
-        /// <summary>
-        /// Converts a records reader to a data set.
-        /// </summary>
-        /// <param name="recordsReader">The records reader.</param>
-        /// <returns>The data set</returns>
-        /// <remarks>Only works with DataLayer.SqlHelpers.SqlServer.SqlServerDataReader.</remarks>
-        /// <exception>When not an DataLayer.SqlHelpers.SqlServer.SqlServerDataReader.</exception>
-        [Obsolete("Temporary workaround for old GetLog methods.", false)]
-        private static DataSet ConvertToDataSet(IRecordsReader recordsReader)
-        {
-            // Get the internal RawDataReader (obsolete)
-            System.Data.SqlClient.SqlDataReader reader
-                = ((DataLayer.SqlHelpers.SqlServer.SqlServerDataReader)recordsReader).RawDataReader;
-            DataSet dataSet = new DataSet();
-            do
-            {
-                DataTable dataTable = new DataTable();
-                DataTable schemaTable = reader.GetSchemaTable();
-
-                if (schemaTable != null)
-                {
-                    // A query returning records was executed
-                    foreach (DataRow dataRow in schemaTable.Rows)
-                    {
-                        // Create a column name that is unique in the data table
-                        string columnName = (string)dataRow["ColumnName"];
-                        // Add the column definition to the data table
-                        DataColumn column = new DataColumn(columnName, (Type)dataRow["DataType"]);
-                        dataTable.Columns.Add(column);
-                    }
-
-                    dataSet.Tables.Add(dataTable);
-
-                    // Fill the data table we just created
-                    while (reader.Read())
-                    {
-                        DataRow dataRow = dataTable.NewRow();
-                        for (int i = 0; i < reader.FieldCount; i++)
-                            dataRow[i] = reader.GetValue(i);
-                        dataTable.Rows.Add(dataRow);
-                    }
-                }
-                else
-                {
-                    // No records were returned, return number of rows affected
-                    dataTable.Columns.Add(new DataColumn("RowsAffected"));
-                    dataSet.Tables.Add(dataTable);
-                    DataRow rowsAffectedRow = dataTable.NewRow();
-                    rowsAffectedRow[0] = reader.RecordsAffected;
-                    dataTable.Rows.Add(rowsAffectedRow);
-                }
-            }
-            // Go trough all result sets
-            while (reader.NextResult());
-
-            // Close the data reader so the underlying connection is closed
-            recordsReader.Close();
-
-            return dataSet;
-        }
-        #pragma warning restore 618
-
-        #endregion
-
-        public static void CleanLogs(int maximumAgeOfLogsInMinutes)
-        {
-            try
-            {
-                DateTime oldestPermittedLogEntry = DateTime.Now.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));
-                SqlHelper.ExecuteNonQuery("delete from umbracoLog where datestamp < @oldestPermittedLogEntry and logHeader in ('open','system')",
-                    SqlHelper.CreateParameter("@oldestPermittedLogEntry", oldestPermittedLogEntry));
-                Add(LogTypes.System, -1, "Log scrubbed.  Removed all items older than " + oldestPermittedLogEntry);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.ToString(), "Error");
-                Trace.WriteLine(e.ToString());
-            }
-        }
-        
         #endregion
     }
 
     /// <summary>
     /// The collection of available log types.
     /// </summary>
-	public enum LogTypes
-	{
+    public enum LogTypes
+    {
         /// <summary>
         /// Used when new nodes are added
         /// </summary>
-		New,
+        [AuditTrailLogItem]
+        New,
         /// <summary>
         /// Used when nodes are saved
         /// </summary>
-		Save,
+        [AuditTrailLogItem]
+        Save,
         /// <summary>
         /// Used when nodes are opened
         /// </summary>
-		Open,
+        [AuditTrailLogItem]
+        Open,
         /// <summary>
         /// Used when nodes are deleted
         /// </summary>
-		Delete,
+        [AuditTrailLogItem]
+        Delete,
         /// <summary>
         /// Used when nodes are published
         /// </summary>
-		Publish,
+        [AuditTrailLogItem]
+        Publish,
         /// <summary>
         /// Used when nodes are send to publishing
         /// </summary>
-		SendToPublish,
+        [AuditTrailLogItem]
+        SendToPublish,
         /// <summary>
         /// Used when nodes are unpublished
         /// </summary>
-		UnPublish,
+        [AuditTrailLogItem]
+        UnPublish,
         /// <summary>
         /// Used when nodes are moved
         /// </summary>
-		Move,
+        [AuditTrailLogItem]
+        Move,
         /// <summary>
         /// Used when nodes are copied
         /// </summary>
-		Copy,
+        [AuditTrailLogItem]
+        Copy,
         /// <summary>
         /// Used when nodes are assígned a domain
         /// </summary>
-		AssignDomain,
+        [AuditTrailLogItem]
+        AssignDomain,
         /// <summary>
         /// Used when public access are changed for a node
         /// </summary>
-		PublicAccess,
+        [AuditTrailLogItem]
+        PublicAccess,
         /// <summary>
         /// Used when nodes are sorted
         /// </summary>
-		Sort,
+        [AuditTrailLogItem]
+        Sort,
         /// <summary>
         /// Used when a notification are send to a user
         /// </summary>
-		Notify,
+        [AuditTrailLogItem]
+        Notify,
         /// <summary>
         /// Used when a user logs into the umbraco back-end
         /// </summary>
-		Login,
+        Login,
         /// <summary>
         /// Used when a user logs out of the umbraco back-end
         /// </summary>
-		Logout,
+        Logout,
         /// <summary>
         /// Used when a user login fails
         /// </summary>
-		LoginFailure,
+        LoginFailure,
         /// <summary>
         /// General system notification
         /// </summary>
-		System,
+        [AuditTrailLogItem]
+        System,
         /// <summary>
         /// System debugging notification
         /// </summary>
-		Debug,
+        Debug,
         /// <summary>
         /// System error notification
         /// </summary>
-		Error,
+        Error,
         /// <summary>
         /// Notfound error notification
         /// </summary>
-		NotFound,
+        NotFound,
         /// <summary>
         /// Used when a node's content is rolled back to a previous version
         /// </summary>
-		RollBack,
+        [AuditTrailLogItem]
+        RollBack,
         /// <summary>
         /// Used when a package is installed
         /// </summary>
-		PackagerInstall,
+        [AuditTrailLogItem]
+        PackagerInstall,
         /// <summary>
         /// Used when a package is uninstalled
         /// </summary>
-		PackagerUninstall,
+        [AuditTrailLogItem]
+        PackagerUninstall,
         /// <summary>
         /// Used when a ping is send to/from the system
         /// </summary>
-		Ping,
+        Ping,
         /// <summary>
         /// Used when a node is send to translation
         /// </summary>
-		SendToTranslate,
+        [AuditTrailLogItem]
+        SendToTranslate,
         /// <summary>
         /// Notification from a Scheduled task.
         /// </summary>
-		ScheduledTask,
+        ScheduledTask,
         /// <summary>
         /// Use this log action for custom log messages that should be shown in the audit trail
         /// </summary>
+        [AuditTrailLogItem]
         Custom
-	}
+    }
+
+    public class LogItem
+    {
+        public int UserId { get; set; }
+        public int NodeId { get; set; }
+        public DateTime Timestamp { get; set; }
+        public LogTypes LogType { get; set; }
+        public string Comment { get; set; }
+
+        public LogItem()
+        {
+
+        }
+
+        public LogItem(int userId, int nodeId, DateTime timestamp, LogTypes logType, string comment)
+        {
+            UserId = userId;
+            NodeId = nodeId;
+            Timestamp = timestamp;
+            LogType = logType;
+            Comment = comment;
+        }
+
+        public static List<LogItem> ConvertIRecordsReader(IRecordsReader reader)
+        {
+            List<LogItem> items = new List<LogItem>();
+            while (reader.Read())
+            {
+                items.Add(new LogItem(
+                    reader.GetInt("userId"),
+                    reader.GetInt("nodeId"),
+                    reader.GetDateTime("DateStamp"),
+                    convertLogHeader(reader.GetString("logHeader")),
+                    reader.GetString("logComment")));
+            }
+
+            return items;
+
+        }
+
+        private static LogTypes convertLogHeader(string logHeader)
+        {
+            try
+            {
+                return (LogTypes)Enum.Parse(typeof(LogTypes), logHeader, true);
+            }
+            catch
+            {
+                return LogTypes.Custom;
+            }
+        }
+    }
+
+    public class AuditTrailLogItem : Attribute
+    {
+        public AuditTrailLogItem()
+        {
+
+        }
+    }
+
+
 }

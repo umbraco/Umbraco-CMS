@@ -530,7 +530,10 @@ guiEditor {
   padding-left:25px;
 }
 
-
+#auditTrailList span 
+{
+    margin-left: 22px;
+}
 
 .umbNitroList{}
 .umbNitroList input{float: left; display: block;}

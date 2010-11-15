@@ -374,7 +374,6 @@
     <Compile Include="showField.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Singleton.cs" />
     <Compile Include="template.cs">
       <SubType>Code</SubType>
     </Compile>

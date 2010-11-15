@@ -147,6 +147,56 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Gets the assembly of an external logger that can be used to store log items in 3rd party systems
+        /// </summary>
+        public static string ExternalLoggerAssembly
+        {
+            get
+            {
+                XmlNode value = GetKeyAsNode("/settings/logging/externalLogger");
+                if (value != null)
+                {
+                    return value.Attributes["assembly"].Value;
+                }
+                return "";
+            }
+        }
+        /// <summary>
+        /// Gets the type of an external logger that can be used to store log items in 3rd party systems
+        /// </summary>
+        public static string ExternalLoggerType
+        {
+            get
+            {
+                XmlNode value = GetKeyAsNode("/settings/logging/externalLogger");
+                if (value != null)
+                {
+                    return value.Attributes["type"].Value;
+                }
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Long Audit Trail to external log too
+        /// </summary>
+        public static bool ExternalLoggerLogAuditTrail
+        {
+            get
+            {
+                XmlNode value = GetKeyAsNode("/settings/logging/externalLogger");
+                if (value != null)
+                {
+                    string logAuditTrail = value.Attributes["logAuditTrail"].Value;
+                    bool result;
+                    if (!string.IsNullOrEmpty(logAuditTrail) && bool.TryParse(logAuditTrail, out result))
+                        return result;
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the logs will be auto cleaned
         /// </summary>
         /// <value><c>true</c> if logs are to be automatically cleaned; otherwise, <c>false</c></value>

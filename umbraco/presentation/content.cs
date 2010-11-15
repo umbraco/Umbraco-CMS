@@ -14,6 +14,7 @@ using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.IO;
+using umbraco.BusinessLogic.Utils;
 
 namespace umbraco
 {

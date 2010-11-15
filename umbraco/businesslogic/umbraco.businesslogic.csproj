@@ -153,6 +153,7 @@
     <Compile Include="IconI.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Interfaces\ILog.cs" />
     <Compile Include="IO\IOHelper.cs" />
     <Compile Include="IO\SystemDirectories.cs" />
     <Compile Include="IO\SystemFiles.cs" />
@@ -181,6 +182,7 @@
     <Compile Include="Utils\fileHelper.cs" />
     <Compile Include="Utils\JSONSerializer.cs" />
     <Compile Include="Utils\SerializableData.cs" />
+    <Compile Include="Utils\Singleton.cs" />
     <Compile Include="Utils\TypeFinder.cs">
       <SubType>Code</SubType>
     </Compile>

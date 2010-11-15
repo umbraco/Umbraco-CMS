@@ -21,7 +21,7 @@ namespace umbraco.presentation.umbraco.dialogs
 		{
 			// Put user code to initialize the page here
 			//nodeName.Text = new cms.businesslogic.CMSNode(int.Parse(helper.Request("nodeID"))).Text;
-			auditLog.DataSource = BusinessLogic.Log.GetAuditLogReader(int.Parse(helper.Request("nodeID")));
+			auditLog.DataSource = BusinessLogic.Log.Instance.GetAuditLogItems(int.Parse(UmbracoContext.Current.Request["nodeID"]));
 			auditLog.DataBind();
 			auditLog.BorderWidth = 0;
 			auditLog.BorderStyle = BorderStyle.None;
@@ -37,9 +37,9 @@ namespace umbraco.presentation.umbraco.dialogs
 			{
                 if (string.Compare(a.Alias, action, true) == 0) {
                     if(a.Icon.StartsWith("."))
-						return "<div class=\"menuSpr " + a.Icon.Trim('.') + "\"></div>";
+						return "<div class=\"menuSpr " + a.Icon.Trim('.') + "\"><span>" + ui.Text(action) + "</span></div>";
                     else
-                        return "<img alt=\"" + ui.Text(a.Alias) + "\" src=\"../images/" + a.Icon + " width=\"16\" height=\"16\"/>";
+                        return "<img alt=\"" + ui.Text(a.Alias) + "\" src=\"../images/" + a.Icon + " width=\"16\" height=\"16\"/> " + ui.Text(action);
                 }
             }
             return	action;		

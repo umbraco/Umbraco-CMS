@@ -15,17 +15,18 @@
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
 <cc1:Pane runat="server">
+<div id="auditTrailList">
  <asp:DataGrid ID="auditLog" runat="server" BorderStyle="None" HeaderStyle-CssClass="gridHeader" ItemStyle-CssClass="gridItem" GridLines="Horizontal" HeaderStyle-Font-Bold="True" AutoGenerateColumns="False"
               width="100%">
               <Columns>
                 <asp:TemplateColumn>
                   <HeaderTemplate>
                     <b>
-                      <%=umbraco.ui.Text("action")%>
+                      <%=umbraco.ui.Text("action")%>&nbsp;&nbsp;
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>
-                    <%# FormatAction(DataBinder.Eval(Container.DataItem, "Action", "{0}")) %>
+                    <%# FormatAction(DataBinder.Eval(Container.DataItem, "LogType", "{0}")) %>
                   </ItemTemplate>
                 </asp:TemplateColumn>
                 <asp:TemplateColumn>
@@ -35,7 +36,7 @@
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>
-                    <%# DataBinder.Eval(Container.DataItem, "User", "{0}") %>
+                    <%# umbraco.BusinessLogic.User.GetUser(int.Parse(DataBinder.Eval(Container.DataItem, "UserId", "{0}"))).Name%>
                   </ItemTemplate>
                 </asp:TemplateColumn>
                 <asp:TemplateColumn>
@@ -45,7 +46,7 @@
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>
-                    <%# DataBinder.Eval(Container.DataItem, "Date", "{0:D} {0:T}") %>
+                    <%# DataBinder.Eval(Container.DataItem, "Timestamp", "{0:D} {0:T}") %>
                   </ItemTemplate>
                 </asp:TemplateColumn>
                 <asp:TemplateColumn>
@@ -60,6 +61,7 @@
                 </asp:TemplateColumn>
               </Columns>
             </asp:DataGrid>
+            </div>
 </cc1:Pane>
 
 </asp:Content>
