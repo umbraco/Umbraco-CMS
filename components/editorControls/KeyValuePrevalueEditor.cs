@@ -5,7 +5,10 @@ using System.Web.UI.WebControls;
 
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
+using System.Collections.Generic;
 
+
+[assembly: System.Web.UI.WebResource("umbraco.editorControls.KeyValuePrevalueEditor.js", "text/js")]
 namespace umbraco.editorControls
 {
 	/// <summary>
@@ -17,6 +20,7 @@ namespace umbraco.editorControls
 		// UI controls
 		public System.Web.UI.WebControls.DropDownList _dropdownlist;
 		public TextBox _textbox;
+        private TextBox _tbhidden;
         public umbraco.uicontrols.PropertyPanel pp1 = new umbraco.uicontrols.PropertyPanel();
         public umbraco.uicontrols.PropertyPanel pp2 = new umbraco.uicontrols.PropertyPanel();
 				
@@ -56,10 +60,15 @@ namespace umbraco.editorControls
 			_textbox = new TextBox();
 			_textbox.ID = "AddValue";
 
+            _tbhidden = new TextBox();
+            _tbhidden.Attributes.Add("style", "display:none;");
+            _tbhidden.CssClass = "valuesHiddenInput";
+
 			// put the childcontrols in context - ensuring that
 			// the viewstate is persisted etc.
 			this.Controls.Add(_dropdownlist);
 			this.Controls.Add(_textbox);
+            this.Controls.Add(_tbhidden);
 
 			_dropdownlist.Items.Add(DBTypes.Date.ToString());
 			_dropdownlist.Items.Add(DBTypes.Integer.ToString());
@@ -69,6 +78,14 @@ namespace umbraco.editorControls
 
         protected override void OnInit(EventArgs e) {
             base.OnInit(e);
+
+
+            System.Web.UI.Page page = (System.Web.UI.Page)System.Web.HttpContext.Current.Handler;
+
+
+            page.ClientScript.RegisterClientScriptInclude(
+                "umbraco.editorControls.KeyValuePrevalueEditor.js",
+                page.ClientScript.GetWebResourceUrl(typeof(KeyValuePrevalueEditor), "umbraco.editorControls.KeyValuePrevalueEditor.js"));
 
         }
 
@@ -96,7 +113,37 @@ namespace umbraco.editorControls
 		public void Save() 
 		{
             _datatype.DBType = (cms.businesslogic.datatype.DBTypes)Enum.Parse(typeof(cms.businesslogic.datatype.DBTypes), _dropdownlist.SelectedValue, true);
-			// If the add new prevalue textbox is filled out - add the value to the collection.
+			
+            //changes in name and sortorder
+            if (!string.IsNullOrEmpty(_tbhidden.Text))
+            {
+                int so = 0;
+                foreach (string row in _tbhidden.Text.Split(';'))
+                {
+                    if (!string.IsNullOrEmpty(row))
+                    {
+                     
+                        int id = 0;
+
+                        if (row.Split('|').Length == 2 &&  int.TryParse(row.Split('|')[0], out id) && row.Split('|')[1].Length > 0)
+                        {
+
+                            IParameter[] SqlParams = new IParameter[] {
+								SqlHelper.CreateParameter("@value",row.Split('|')[1]),
+								SqlHelper.CreateParameter("@sortorder",so),
+                                SqlHelper.CreateParameter("@id",id)};
+                            SqlHelper.ExecuteNonQuery("update cmsDataTypePreValues set [value] = @value, sortorder = @sortorder where id = @id", SqlParams);
+
+                        }
+
+                        so++;
+                    }
+                }
+
+                _tbhidden.Text = "";
+            }
+
+            // If the add new prevalue textbox is filled out - add the value to the collection.
 			if (_textbox.Text != "") 
 			{
 				IParameter[] SqlParams = new IParameter[] {
@@ -115,13 +162,14 @@ namespace umbraco.editorControls
             _dropdownlist.RenderControl(writer);
             writer.Write("<br style='clear: both'/></div>");
 
-            SortedList _prevalues = Prevalues;
+            List<KeyValuePair<int, String>> _prevalues = PrevaluesAsKeyValuePairList;
             if (_prevalues.Count > 0) {
-                writer.Write("<div class='propertyItem'><table style='width: 100%'>");
+                writer.Write("<div class='propertyItem'><table style='width: 100%' id=\"prevalues\">");
                 writer.Write("<tr><th style='width: 15%'>Text</th><td colspan='2'>Value</td></tr>");
 
-                foreach (object key in _prevalues.Keys) {
-                    writer.Write("<tr><td>" + _prevalues[key].ToString() + "</td><td> " + key + "</td><td><a href='?id=" + _datatype.DataTypeDefinitionId + "&delete=" + key.ToString() + "'>" + ui.Text("delete") + "</a></td></tr>");
+                foreach (KeyValuePair<int, String> item in _prevalues)
+                {
+                    writer.Write("<tr class=\"row\"><td class=\"text\">" + item.Value + "</td><td class=\"value\"> " + item.Key.ToString() + "</td><td><a href='?id=" + _datatype.DataTypeDefinitionId + "&delete=" + item.Key.ToString() + "'>" + ui.Text("delete") + "</a> <span class=\"handle\" style=\"cursor:move\">sort<span></td></tr>");
                 }
                 writer.Write("</table><br style='clear: both'/></div>");
             }
@@ -129,14 +177,16 @@ namespace umbraco.editorControls
             writer.Write("<div class='propertyItem'><div class='propertyItemheader'>" + ui.Text("addPrevalue") + "</div>");
             _textbox.RenderControl(writer);
             writer.Write("<br style='clear: both'/></div>");
-            
-            
+
+            _tbhidden.RenderControl(writer);
+
         
         }
 
 		public SortedList Prevalues {
 			get
             {
+                
                 SortedList retval = new SortedList();
 				IRecordsReader dr = SqlHelper.ExecuteReader(
 					"Select id, [value] from cmsDataTypePreValues where DataTypeNodeId = "
@@ -148,5 +198,23 @@ namespace umbraco.editorControls
 				return retval;
 			}
 		}
+
+        public List<KeyValuePair<int, String>> PrevaluesAsKeyValuePairList
+        {
+            get
+            {
+
+                List<KeyValuePair<int, String>> items = new List<KeyValuePair<int, String>>();
+
+                IRecordsReader dr = SqlHelper.ExecuteReader(
+                    "Select id, [value] from cmsDataTypePreValues where DataTypeNodeId = "
+                    + _datatype.DataTypeDefinitionId + " order by sortorder");
+
+                while (dr.Read())
+                    items.Add(new KeyValuePair<int, string>(dr.GetInt("id"), dr.GetString("value")));
+                dr.Close();
+                return items;
+            }
+        }
 	}
 }
