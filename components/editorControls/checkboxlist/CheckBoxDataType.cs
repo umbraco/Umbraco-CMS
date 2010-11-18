@@ -13,7 +13,7 @@ namespace umbraco.editorControls.checkboxlist
 			get
 			{
 				if (_Editor == null) 
-					_Editor = new checkboxlistEditor(Data,((KeyValuePrevalueEditor)PrevalueEditor).Prevalues);
+					_Editor = new checkboxlistEditor(Data,((KeyValuePrevalueEditor)PrevalueEditor).PrevaluesAsKeyValuePairList);
 				return _Editor;
 			}
 		}
