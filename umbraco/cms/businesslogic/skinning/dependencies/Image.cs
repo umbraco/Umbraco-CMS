@@ -24,6 +24,7 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
 
 
             iu = new ImageUploader();
+            
             _value = new List<object>();
         }
         
@@ -33,7 +34,7 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
             {
                 iu.TextMode = System.Web.UI.WebControls.TextBoxMode.SingleLine;
                 iu.CssClass = "image";
-                iu.ID = "imageupload";
+
 
                 int w;
 
@@ -56,6 +57,8 @@ namespace umbraco.cms.businesslogic.skinning.dependencies
                 base.Editor = value;
             }
         }
+
+
 
         public override List<Object> Values
         {

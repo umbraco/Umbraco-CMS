@@ -44,7 +44,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                     Image1.ImageUrl = this.ResolveUrl("~/media/upload/" + g) + "/" + FileUpload1.FileName;
                     Image.Value = Image1.ImageUrl;
 
-                    if (!string.IsNullOrEmpty(Request["w"]) && !string.IsNullOrEmpty(Request["h"]))
+                    if ((!string.IsNullOrEmpty(Request["w"]) && Request["w"].ToString() != "0") && (!string.IsNullOrEmpty(Request["h"]) && Request["h"].ToString() != "0"))
                     {
 
                         if (Convert.ToInt32(Request["w"]) > MaxWidth || Convert.ToInt32(Request["h"]) > MaxHeight)

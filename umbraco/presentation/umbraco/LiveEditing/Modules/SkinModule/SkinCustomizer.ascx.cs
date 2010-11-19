@@ -62,18 +62,22 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
             this.ph_dependencies.Controls.Clear();
             StringBuilder builder = new StringBuilder();
             builder.Append("\r\n  var hasSetTasksClientScriptsRun = false; \r\n                function setTasksClientScripts(){ \r\n                    if(hasSetTasksClientScriptsRun == false){");
-            
+
+            int c = 0;
             foreach (Dependency dependency in this.ActiveSkin.Dependencies)
             {
                 if (dependency.DependencyType != null)
                 {
                     this.sDependencies.Add(dependency);
                     Control editor = dependency.DependencyType.Editor;
+                    editor.ID = "depcontrol" + c;
                     this.ph_dependencies.addProperty(dependency.Label, editor);
                     foreach (Task task in dependency.Tasks)
                     {
                         builder.Append(task.TaskType.PreviewClientScript(editor.ClientID, dependency.DependencyType.ClientSidePreviewEventType(), dependency.DependencyType.ClientSideGetValueScript()));
                     }
+
+                    c++;
                 }
             }
             builder.Append("hasSetTasksClientScriptsRun = true; }}");
