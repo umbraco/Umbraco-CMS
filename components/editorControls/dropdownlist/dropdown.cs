@@ -6,6 +6,7 @@ using System.Collections;
 
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.language;
+using System.Collections.Generic;
 
 namespace umbraco.editorControls
 {
@@ -19,6 +20,15 @@ namespace umbraco.editorControls
 			_data = Data;
 			_prevalues = Prevalues;
 		}
+
+
+        List<KeyValuePair<int, String>> Prevalues;
+        public dropdown(interfaces.IData Data, List<KeyValuePair<int, String>> Prevalues)
+        {
+            _data = Data;
+            this.Prevalues = Prevalues;
+        }
+
 
 		public Control Editor {
 			get {return this;}
@@ -44,10 +54,23 @@ namespace umbraco.editorControls
 		protected override void OnInit(EventArgs e)
 		{
 			base.OnInit (e);
-            foreach (object key in _prevalues.Keys)
+
+            if (_prevalues != null)
             {
-				this.Items.Add(new ListItem(dropdown.DictionaryReplace(_prevalues[key].ToString()), key.ToString()));
-			}
+                foreach (object key in _prevalues.Keys)
+                {
+                    this.Items.Add(new ListItem(dropdown.DictionaryReplace(_prevalues[key].ToString()), key.ToString()));
+                }
+
+            }
+            else if (Prevalues != null)
+            {
+                foreach (KeyValuePair<int, String> item in Prevalues)
+                {
+                    this.Items.Add(new ListItem(dropdown.DictionaryReplace(item.Value), item.Key.ToString()));
+                }
+            }
+
 			base.Items.Insert(0, new ListItem(ui.Text("choose") + "...",""));
 
 			if (_data != null && _data.Value != null)

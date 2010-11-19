@@ -17,7 +17,7 @@ namespace umbraco.editorControls.dropdownlist
 			{
 				if (_Editor == null) 
 				{
-					_Editor = new dropdown(Data,((KeyValuePrevalueEditor)PrevalueEditor).Prevalues);
+					_Editor = new dropdown(Data,((KeyValuePrevalueEditor)PrevalueEditor).PrevaluesAsKeyValuePairList);
 				}
 				return _Editor;
 			}
