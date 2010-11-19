@@ -3,6 +3,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.ComponentModel;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace umbraco.editorControls
 {
@@ -20,6 +21,13 @@ namespace umbraco.editorControls
 			_data = Data;
 			_prevalues = Prevalues;
 		}
+
+        List<KeyValuePair<int, String>> Prevalues;
+        public dropdownMultiple(interfaces.IData Data, List<KeyValuePair<int, String>> Prevalues)
+        {
+            _data = Data;
+            this.Prevalues = Prevalues;
+        }
 
 		public Control Editor { get {return this;}}
 
@@ -69,15 +77,30 @@ namespace umbraco.editorControls
 
 			base.OnInit(e);
 
-            foreach (object key in _prevalues.Keys) 
-			{
-				ListItem li = new ListItem(_prevalues[key].ToString(),key.ToString());
-				
-				if ((","+_text+",").IndexOf(","+li.Value.ToString()+",") > -1)
-					li.Selected = true;
-					
-				Items.Add(li);
-			}
+            if (_prevalues != null)
+            {
+                foreach (object key in _prevalues.Keys)
+                {
+                    ListItem li = new ListItem(_prevalues[key].ToString(), key.ToString());
+
+                    if (("," + _text + ",").IndexOf("," + li.Value.ToString() + ",") > -1)
+                        li.Selected = true;
+
+                    Items.Add(li);
+                }
+            }
+            else if (Prevalues != null)
+            {
+                foreach (KeyValuePair<int, String> item in Prevalues)
+                {
+                    ListItem li = new ListItem(item.Value, item.Key.ToString());
+
+                    if (("," + _text + ",").IndexOf("," + li.Value.ToString() + ",") > -1)
+                        li.Selected = true;
+
+                    Items.Add(li);
+                }
+            }
 		}
 	}
 }

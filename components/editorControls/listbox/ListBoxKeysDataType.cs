@@ -17,7 +17,7 @@ namespace umbraco.editorControls.listbox
 			{
 				if (_Editor == null) 
 				{
-					_Editor = new dropdownMultiple(Data,((KeyValuePrevalueEditor)PrevalueEditor).Prevalues);
+					_Editor = new dropdownMultiple(Data,((KeyValuePrevalueEditor)PrevalueEditor).PrevaluesAsKeyValuePairList);
 				}
 				return _Editor;
 			}
