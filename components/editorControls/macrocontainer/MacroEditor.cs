@@ -37,7 +37,7 @@ namespace umbraco.editorControls.macrocontainer
             _macroSelectDropdown.Items.Add(new ListItem(umbraco.ui.Text("choose"), ""));
             foreach (string item in _allowedMacros)
             {
-                _macroSelectDropdown.Items.Add(new ListItem(Macro.GetByAlias(item).Name, item));
+                _macroSelectDropdown.Items.Add(new ListItem(GetMacroNameFromAlias(item), item));
             }
             _macroSelectDropdown.AutoPostBack = true;
 
@@ -58,6 +58,20 @@ namespace umbraco.editorControls.macrocontainer
             this.Controls.Add(_formTable);
         }
 
+        //using this to solve to eager loading,
+        // replaces _macroSelectDropdown.Items.Add(new ListItem(Macro.GetByAlias(item).Name, item));
+        // with  _macroSelectDropdown.Items.Add(new ListItem(GetMacroNameFromAlias(item), item));
+        private string GetMacroNameFromAlias(string alias)
+        {
+            umbraco.DataLayer.IRecordsReader dr = umbraco.BusinessLogic.Application.SqlHelper.ExecuteReader("select macroName from cmsMacro where macroAlias = @alias",
+                umbraco.BusinessLogic.Application.SqlHelper.CreateParameter("@alias", alias));
+
+            if (dr.Read())
+                return dr.GetString("macroName");
+            else
+                return string.Empty;
+
+        }
         void _delete_Click(object sender, EventArgs e)
         {
             _macroSelectDropdown.SelectedIndex = 0;
