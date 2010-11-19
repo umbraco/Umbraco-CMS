@@ -656,7 +656,7 @@ INSERT INTO [umbracoNode] ([id], [trashed], [parentID], [nodeUser], [level], [pa
 INSERT INTO [umbracoNode] ([id], [trashed], [parentID], [nodeUser], [level], [path], [sortOrder], [uniqueID], [text], [nodeObjectType], [createDate]) VALUES (1039, 0, -1, 0, 1, N'-1,1039', 2, '06f349a9-c949-4b6a-8660-59c10451af42', N'Ultimate Picker', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '20060103 13:07:55.250') 
 INSERT INTO [umbracoNode] ([id], [trashed], [parentID], [nodeUser], [level], [path], [sortOrder], [uniqueID], [text], [nodeObjectType], [createDate]) VALUES (1040, 0, -1, 0, 1, N'-1,1040', 2, '21e798da-e06e-4eda-a511-ed257f78d4fa', N'Related Links', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '20060103 13:07:55.250') 
 INSERT INTO [umbracoNode] ([id], [trashed], [parentID], [nodeUser], [level], [path], [sortOrder], [uniqueID], [text], [nodeObjectType], [createDate]) VALUES (1041, 0, -1, 0, 1, N'-1,1041', 2, 'b6b73142-b9c1-4bf8-a16d-e1c23320b549', N'Tags', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '20060103 13:07:55.250')
-
+INSERT INTO [umbracoNode] ([id], [trashed], [parentID], [nodeUser], [level], [path], [sortOrder], [uniqueID], [text], [nodeObjectType], [createDate]) VALUES (1042, 0, -1, 0, 1, N'-1,1042', 2, '0a452bd5-83f9-4bc3-8403-1286e13fb77e', N'Macro Container', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '20060103 13:07:55.250')
 SET IDENTITY_INSERT [umbracoNode] OFF 
 ;
 SET IDENTITY_INSERT [cmsContentType] ON 
@@ -788,7 +788,8 @@ INSERT INTO [cmsDataType] ([pk], [nodeId], [controlId], [dbType]) VALUES (35, 10
 INSERT INTO [cmsDataType] ([pk], [nodeId], [controlId], [dbType]) VALUES (36, 1039, 'cdbf0b5d-5cb2-445f-bc12-fcaaec07cf2c', 'Ntext') 
 INSERT INTO [cmsDataType] ([pk], [nodeId], [controlId], [dbType]) VALUES (37, 1040, '71b8ad1a-8dc2-425c-b6b8-faa158075e63', 'Ntext')
 INSERT INTO [cmsDataType] ([pk], [nodeId], [controlId], [dbType]) VALUES (38, 1041, '4023e540-92f5-11dd-ad8b-0800200c9a66', 'Ntext')
- 
+INSERT INTO [cmsDataType] ([pk], [nodeId], [controlId], [dbType]) VALUES (39, 1042, '474FCFF8-9D2D-11DE-ABC6-AD7A56D89593', 'Ntext')
+
 SET IDENTITY_INSERT [cmsDataType] OFF 
 ;
 ALTER TABLE [cmsTemplate] ADD CONSTRAINT [FK_cmsTemplate_umbracoNode] FOREIGN KEY ([nodeId]) REFERENCES [umbracoNode] ([id]) 

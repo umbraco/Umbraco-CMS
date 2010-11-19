@@ -514,7 +514,8 @@ INSERT INTO umbracoNode (id, trashed, parentID, nodeUser, level, path, sortOrder
 	(1038, 0, -1, 0, 1, '-1,1038', 2, '1251c96c-185c-4e9b-93f4-b48205573cbd', 'Simple Editor', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2006/01/03 13:07:55.250'),
 	(1039, 0, -1, 0, 1, '-1,1039', 2, '06f349a9-c949-4b6a-8660-59c10451af42', 'Ultimate Picker', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2006/01/03 13:07:55.250'),
 	(1040, 0, -1, 0, 1, '-1,1040', 2, '21e798da-e06e-4eda-a511-ed257f78d4fa', 'Related Links', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2006/01/03 13:07:55.250'),
-	(1041, 0, -1, 0, 1, '-1,1041', 2, 'b6b73142-b9c1-4bf8-a16d-e1c23320b549', 'Tags', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2006/01/03 13:07:55.250') 
+	(1041, 0, -1, 0, 1, '-1,1041', 2, 'b6b73142-b9c1-4bf8-a16d-e1c23320b549', 'Tags', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2006/01/03 13:07:55.250'),
+	(1042, 0, -1, 0, 1, '-1,1042', 2, '0a452bd5-83f9-4bc3-8403-1286e13fb77e', 'Macro Container', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2006/01/03 13:07:55.250')
 ;
 
 INSERT INTO cmsContentType (pk, nodeId, alias, icon) VALUES
@@ -646,7 +647,8 @@ INSERT INTO cmsDataType (pk, nodeId, controlId, dbType) VALUES
 	(35, 1038, '60b7dabf-99cd-41eb-b8e9-4d2e669bbde9', 'Ntext'),
 	(36, 1039, 'cdbf0b5d-5cb2-445f-bc12-fcaaec07cf2c', 'Ntext'),
 	(37, 1040, '71b8ad1a-8dc2-425c-b6b8-faa158075e63', 'Ntext'),
-	(38, 1041, '4023e540-92f5-11dd-ad8b-0800200c9a66', 'Ntext') 
+	(38, 1041, '4023e540-92f5-11dd-ad8b-0800200c9a66', 'Ntext'),
+	(39, 1042, '474FCFF8-9D2D-11DE-ABC6-AD7A56D89593', 'Ntext') 
 ;
 ALTER TABLE umbracoAppTree ADD FOREIGN KEY (appAlias) REFERENCES umbracoApp (appAlias) 
 ; 
