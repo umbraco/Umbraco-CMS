@@ -4,6 +4,7 @@ jQuery(document).ready(function () {
     jQuery("#prevalues .text").valuesInlineEdit();
 
     jQuery("#prevalues tbody").sortable({
+        items: "tr:not(.header)",
         handle: '.handle',
         update: function () {
 
@@ -11,6 +12,9 @@ jQuery(document).ready(function () {
 
         }
     });
+
+
+
 });
 
 

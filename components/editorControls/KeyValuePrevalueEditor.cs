@@ -6,9 +6,11 @@ using System.Web.UI.WebControls;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using System.Collections.Generic;
+using System.Web.UI.HtmlControls;
 
 
 [assembly: System.Web.UI.WebResource("umbraco.editorControls.KeyValuePrevalueEditor.js", "text/js")]
+[assembly: System.Web.UI.WebResource("umbraco.editorControls.KeyValuePrevalueEditor.css", "text/css")]
 namespace umbraco.editorControls
 {
 	/// <summary>
@@ -87,6 +89,14 @@ namespace umbraco.editorControls
                 "umbraco.editorControls.KeyValuePrevalueEditor.js",
                 page.ClientScript.GetWebResourceUrl(typeof(KeyValuePrevalueEditor), "umbraco.editorControls.KeyValuePrevalueEditor.js"));
 
+
+            HtmlHead head = (HtmlHead)page.Header;
+            HtmlLink link = new HtmlLink();
+            link.Attributes.Add("href", page.ClientScript.GetWebResourceUrl(typeof(KeyValuePrevalueEditor), "umbraco.editorControls.KeyValuePrevalueEditor.css"));
+            link.Attributes.Add("type", "text/css");
+            link.Attributes.Add("rel", "stylesheet");
+            head.Controls.Add(link);
+
         }
 
 		protected override void OnLoad(EventArgs e)
@@ -146,10 +156,22 @@ namespace umbraco.editorControls
             // If the add new prevalue textbox is filled out - add the value to the collection.
 			if (_textbox.Text != "") 
 			{
+
+                int so = -1;
+
+                try
+                {
+                    so = SqlHelper.ExecuteScalar<int>("select max(sortorder) from cmsDataTypePreValues where datatypenodeid = @dtdefid",
+                        SqlHelper.CreateParameter("@dtdefid", _datatype.DataTypeDefinitionId));
+                    so++;
+                }
+                catch { }
+
 				IParameter[] SqlParams = new IParameter[] {
 								SqlHelper.CreateParameter("@value",_textbox.Text),
-								SqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
-				SqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",SqlParams);
+								SqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId),
+                                SqlHelper.CreateParameter("@so",so)};
+				SqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,@so,'')",SqlParams);
 				_textbox.Text = "";
 
                 ScriptManager.GetCurrent(Page).SetFocus(_textbox);
@@ -165,7 +187,7 @@ namespace umbraco.editorControls
             List<KeyValuePair<int, String>> _prevalues = PrevaluesAsKeyValuePairList;
             if (_prevalues.Count > 0) {
                 writer.Write("<div class='propertyItem'><table style='width: 100%' id=\"prevalues\">");
-                writer.Write("<tr><th style='width: 15%'>Text</th><td colspan='2'>Value</td></tr>");
+                writer.Write("<tr class='header'><th style='width: 15%'>Text</th><td colspan='2'>Value</td></tr>");
 
                 foreach (KeyValuePair<int, String> item in _prevalues)
                 {
