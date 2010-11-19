@@ -17,7 +17,7 @@ namespace umbraco.editorControls.radiobuttonlist
 			{
 				if (_Editor == null) 
 				{
-					_Editor = new radiobox(Data,((KeyValuePrevalueEditor)PrevalueEditor).Prevalues);
+                    _Editor = new radiobox(Data, ((KeyValuePrevalueEditor)PrevalueEditor).PrevaluesAsKeyValuePairList);
 				}
 				return _Editor;
 			}

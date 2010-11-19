@@ -3,6 +3,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.ComponentModel;
 using System.Collections;
+using System.Collections.Generic;
 namespace umbraco.editorControls
 {
 	public class radiobox : System.Web.UI.WebControls.RadioButtonList, interfaces.IDataEditor
@@ -15,6 +16,13 @@ namespace umbraco.editorControls
 			_data = Data;
 			_prevalues = Prevalues;
 		}
+
+        List<KeyValuePair<int, String>> Prevalues;
+        public radiobox(interfaces.IData Data, List<KeyValuePair<int, String>> Prevalues)
+        {
+            _data = Data;
+            this.Prevalues = Prevalues;
+        }
 
 		public Control Editor 
 		{
@@ -40,11 +48,22 @@ namespace umbraco.editorControls
 		protected override void OnInit(EventArgs e)
 		{
 			base.OnInit (e);
-            foreach (object key in _prevalues.Keys) 
-			{
-				this.Items.Add(new ListItem(_prevalues[key].ToString(),key.ToString()));
-			}
-			
+
+            if (_prevalues != null)
+            {
+                foreach (object key in _prevalues.Keys)
+                {
+                    this.Items.Add(new ListItem(_prevalues[key].ToString(), key.ToString()));
+                }
+            }
+            else if (Prevalues != null)
+            {
+                foreach (KeyValuePair<int, String> item in Prevalues)
+                {
+                    this.Items.Add(new ListItem(item.Value, item.Key.ToString()));
+                }
+            }
+
 			try {
 				if (_data != null && _data.Value != null)
 					this.SelectedValue = _data.Value.ToString();	
