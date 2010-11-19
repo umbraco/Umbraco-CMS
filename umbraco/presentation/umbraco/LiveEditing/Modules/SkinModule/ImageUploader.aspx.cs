@@ -108,6 +108,11 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                 x = x * 2;
                 y = y * 2;
             }
+
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+
+
             g.DrawImage(imgToResize, x, y, destWidth, destHeight);
 
             g.Dispose();
@@ -120,9 +125,13 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             if (!updir.Exists)
                 updir.Create();
 
+            FileInfo img = new FileInfo(IO.IOHelper.MapPath(Image.Value));
             // Copy metadata
             ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
             ImageCodecInfo codec = null;
+
+
+
             for (int i = 0; i < codecs.Length; i++)
             {
                 if (codecs[i].MimeType.Equals("image/jpeg"))
@@ -133,8 +142,10 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             EncoderParameters ep = new EncoderParameters();
             ep.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
 
-
-            ((System.Drawing.Image)b).Save(updir.FullName + "/" + FileName.Value, codec, ep);
+            if(img.Extension.ToLower() == "png")
+                ((System.Drawing.Image)b).Save(updir.FullName + "/" + FileName.Value,ImageFormat.Png);
+            else
+                ((System.Drawing.Image)b).Save(updir.FullName + "/" + FileName.Value, codec, ep);
 
             Image.Value = this.ResolveUrl("~/media/upload/" + id) + "/" + FileName.Value;
             Image1.ImageUrl = Image.Value;
