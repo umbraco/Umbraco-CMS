@@ -21,7 +21,7 @@
         <li>
 
         <asp:HyperLink ID="ModuleSelectLink" runat="server" NavigateUrl="javascript:void(0);">
-            <img width="25px" src="http://our.umbraco.org/<%# ((Package)Container.DataItem).Thumbnail %>" alt="<%# ((Package)Container.DataItem).Text %>" />
+            <img width="25px" src="<%# GetThumbNail(((Package)Container.DataItem).Thumbnail) %>" alt="<%# ((Package)Container.DataItem).Text %>" />
             <span><%# ((Package)Container.DataItem).Text %></span>
         
         </asp:HyperLink>

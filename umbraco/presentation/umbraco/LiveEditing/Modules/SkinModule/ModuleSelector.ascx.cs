@@ -83,6 +83,14 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             }
         }
 
+        public string GetThumbNail(string thumb)
+        {
+            if(string.IsNullOrEmpty(thumb))
+                return "http://our.umbraco.org/css/wiki/package.png";
+            else
+                return "http://our.umbraco.org/" + thumb;
+        }
+
         
     }
 }
