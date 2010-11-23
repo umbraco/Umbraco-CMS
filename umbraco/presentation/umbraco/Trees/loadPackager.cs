@@ -71,8 +71,8 @@ namespace umbraco
         public void Render(ref XmlDocument Tree)
         {
             XmlElement root = Tree.DocumentElement;
-            
-            string[,] items = { { "BrowseRepository.aspx", "Install from repository" }, { "CreatePackage.aspx", "Createdjjj Packages" }, { "installedPackages.aspx", "Installedjj packages" }, { "boost.aspx", "Boost" }, { "installer.aspx", "Install local package" } };
+
+            string[,] items = { { "BrowseRepository.aspx", "Install from repository" }, { "CreatePackage.aspx", "Createdjjj Packages" }, { "installedPackages.aspx", "Installedjj packages" }, { "StarterKits.aspx", "Starter kit" }, { "installer.aspx", "Install local package" } };
 
 
             for (int i = 0; i <= items.GetUpperBound(0); i++)
@@ -161,17 +161,19 @@ namespace umbraco
                         treeElement.SetAttribute("text", ui.Text("treeHeaders", "localPackage"));
                         break;
 
-                    case "boost.aspx":
+                    case "StarterKits.aspx":
                         treeElement.SetAttribute("src", "");
-                        treeElement.SetAttribute("nodeType", "packagesBoost");
+                        treeElement.SetAttribute("nodeType", "starterKits");
                         //treeElement.SetAttribute("menu", "L");
                         treeElement.SetAttribute("action", "javascript:openPackageCategory('" + items[i, 0] + "');");
                         treeElement.SetAttribute("icon", "nitros.gif");
                         treeElement.SetAttribute("openIcon", "nitros.gif");
-                        treeElement.SetAttribute("text", ui.Text("treeHeaders", "runwayModules"));
 
-                        if (!cms.businesslogic.packager.InstalledPackage.isPackageInstalled("ae41aad0-1c30-11dd-bd0b-0800200c9a66"))
-                            treeElement.SetAttribute("text", ui.Text("treeHeaders", "runway"));
+                        treeElement.SetAttribute("text", ui.Text("treeHeaders", "installStarterKit"));
+
+                        if (cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
+                            treeElement.SetAttribute("text", ui.Text("treeHeaders", "installSkin"));
+
                         break;
 
                     default:

@@ -614,6 +614,13 @@
     <Compile Include="umbraco\dashboard\StartupDashboardVideos.ascx.designer.cs">
       <DependentUpon>StartupDashboardVideos.ascx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\developer\Packages\StarterKits.aspx.cs">
+      <DependentUpon>StarterKits.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\developer\Packages\StarterKits.aspx.designer.cs">
+      <DependentUpon>StarterKits.aspx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\dialogs\Preview.aspx.cs">
       <DependentUpon>Preview.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1678,6 +1685,7 @@
     <Content Include="umbraco\dashboard\StartupDashboardKits.ascx" />
     <Content Include="umbraco\dashboard\StartupDashboardVideos.ascx" />
     <Content Include="umbraco\dashboard\zipupload.ascx" />
+    <Content Include="umbraco\developer\Packages\StarterKits.aspx" />
     <Content Include="umbraco\dialogs\TemplateSkinning.aspx" />
     <Content Include="umbraco\helpRedirect.aspx" />
     <Content Include="umbraco\images\aboutNew.png" />
