@@ -23,19 +23,25 @@ namespace umbraco.cms.businesslogic.skinning.tasks
         {
             TaskExecutionDetails d = new TaskExecutionDetails();
 
-            string id = HttpContext.Current.Items["pageID"].ToString();
-
-            Document doc = new Document(Convert.ToInt32(id));
-
-            if (doc.getProperty(PropertyAlias) != null)
+            if (HttpContext.Current != null && HttpContext.Current.Items["pageID"] != null)
             {
-                d.OriginalValue = doc.getProperty(PropertyAlias).Value.ToString();
+                string id = HttpContext.Current.Items["pageID"].ToString();
 
-                doc.getProperty(PropertyAlias).Value = Value;
-                doc.Publish(new BusinessLogic.User(0));
+                Document doc = new Document(Convert.ToInt32(id));
 
-                d.NewValue = Value;
-                d.TaskExecutionStatus = TaskExecutionStatus.Completed;
+                if (doc.getProperty(PropertyAlias) != null)
+                {
+                    d.OriginalValue = doc.getProperty(PropertyAlias).Value.ToString();
+
+                    doc.getProperty(PropertyAlias).Value = Value;
+                    doc.Publish(new BusinessLogic.User(0));
+
+                    d.NewValue = Value;
+                    d.TaskExecutionStatus = TaskExecutionStatus.Completed;
+                }
+                else
+                    d.TaskExecutionStatus = TaskExecutionStatus.Cancelled;
+
             }
             else
                 d.TaskExecutionStatus = TaskExecutionStatus.Cancelled;

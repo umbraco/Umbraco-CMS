@@ -3,7 +3,7 @@
 
 <asp:Panel id="pl_CustomizeSkin" runat="server" Visible="false">
 <h3>Starter kit and skin have been installed</h3>
-<p><a target="_blank" href="<%= umbraco.GlobalSettings.Path %>/canvas.aspx?redir=<%= this.ResolveUrl("~/")  %>&umbSkinning=true&umbSkinningConfigurator=true" target="_blank">Browse and customize your new site</a></p>
+<p id="customizelink"><a target="_blank" href="<%= umbraco.GlobalSettings.Path %>/canvas.aspx?redir=<%= this.ResolveUrl("~/")  %>&umbSkinning=true&umbSkinningConfigurator=true" target="_blank">Browse and customize your new site</a></p>
 
 
 </asp:Panel>

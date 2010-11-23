@@ -110,7 +110,9 @@ namespace umbraco.presentation.install.steps.Skinning
 
                 pl_CustomizeSkin.Visible = true;
                 pl_loadStarterKitDesigns.Visible = false;
-                Page.FindControl("next").Visible = true;
+
+                if(Page.FindControl("next") != null)
+                    Page.FindControl("next").Visible = true;
 
             }
             else

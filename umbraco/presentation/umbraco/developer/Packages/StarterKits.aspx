@@ -20,7 +20,7 @@
     }
 </script>
 <style type="text/css">
-    .declineStarterKits 
+    .declineStarterKits, #customizelink
     {
         display:none;
     }
