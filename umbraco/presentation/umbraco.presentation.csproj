@@ -894,13 +894,6 @@
     <Compile Include="umbraco\developer\Macros\editMacro.aspx.designer.cs">
       <DependentUpon>editMacro.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco\developer\Packages\Boost.aspx.cs">
-      <DependentUpon>Boost.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\developer\Packages\Boost.aspx.designer.cs">
-      <DependentUpon>Boost.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco\developer\Packages\BrowseRepository.aspx.cs">
       <DependentUpon>BrowseRepository.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2136,7 +2129,6 @@
     <Content Include="umbraco\images\umbraco\repository.gif" />
     <Content Include="umbraco\images\umbraco\uploadpackage.gif" />
     <Content Include="umbraco_client\Application\JQuery\jquery.autocomplete.js" />
-    <Content Include="umbraco\developer\Packages\Boost.aspx" />
     <Content Include="umbraco\developer\Packages\BrowseRepository.aspx" />
     <Content Include="umbraco\developer\Packages\directoryBrowser.aspx" />
     <Content Include="umbraco\developer\Packages\editPackage.aspx" />
