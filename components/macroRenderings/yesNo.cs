@@ -38,30 +38,17 @@ namespace umbraco.macroRenderings
 
 		protected override void OnInit(EventArgs e)
 		{
+            if (_value != null)
+            {
+                if (_value == "1")
+                    this.Checked = true;
+                else
+                    this.Checked = false;
+            }
+
 			this.Text = "Yes";
 			base.OnInit (e);
 		}
 
-	
-		/// <summary> 
-		/// Render this control to the output parameter specified.
-		/// </summary>
-		/// <param name="output"> The HTML writer to write out to </param>
-		protected override void Render(HtmlTextWriter output)
-		{
-			if (_value != null) 
-			{
-				if (_value == "1") 
-				{
-					this.Checked = true;
-				} 
-				else 
-				{
-					this.Checked = false;
-				}
-			}
-
-			base.Render(output);
-		}
 	}
 }
