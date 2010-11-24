@@ -131,13 +131,21 @@ namespace umbraco.cms.businesslogic.packager {
                     }
 
                     //Document types..
+                    List<DocumentType> dtl = new List<DocumentType>();
                     XmlNode docTypes = _packageManifest.CreateElement("DocumentTypes");
                     foreach (string dtId in pack.Documenttypes) {
                         if (int.TryParse(dtId, out outInt)) {
                             DocumentType docT = new DocumentType(outInt);
-                            docTypes.AppendChild(docT.ToXml(_packageManifest));
+
+                            AddDocumentType(docT, ref dtl);
+
                         }
                     }
+                    foreach (DocumentType d in dtl)
+                    {
+                        docTypes.AppendChild(d.ToXml(_packageManifest));
+                    }
+
                     appendElement(docTypes);
 
                     //Templates
@@ -267,6 +275,20 @@ namespace umbraco.cms.businesslogic.packager {
             }
         }
 
+        private void AddDocumentType(DocumentType dt, ref List<DocumentType> dtl)
+        {
+            if (dt.MasterContentType != 0)
+            {
+                //first add masters
+                DocumentType mDocT = new DocumentType(dt.MasterContentType);
+
+                AddDocumentType(mDocT, ref dtl);
+
+            }
+
+            if (!dtl.Contains(dt))
+                dtl.Add(dt);
+        }
 
         //EVENTS
         public delegate void SaveEventHandler(CreatedPackage sender, SaveEventArgs e);

@@ -360,19 +360,23 @@ namespace umbraco.cms.businesslogic.web
             XmlElement pts = xd.CreateElement("GenericProperties");
             foreach (PropertyType pt in PropertyTypes)
             {
-                XmlElement ptx = xd.CreateElement("GenericProperty");
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Name", pt.Name));
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Alias", pt.Alias));
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Type", pt.DataTypeDefinition.DataType.Id.ToString()));
+                //only add properties that aren't from master doctype
+                if (pt.ContentTypeId == this.Id)
+                {
+                    XmlElement ptx = xd.CreateElement("GenericProperty");
+                    ptx.AppendChild(xmlHelper.addTextNode(xd, "Name", pt.Name));
+                    ptx.AppendChild(xmlHelper.addTextNode(xd, "Alias", pt.Alias));
+                    ptx.AppendChild(xmlHelper.addTextNode(xd, "Type", pt.DataTypeDefinition.DataType.Id.ToString()));
 
-                //Datatype definition guid was added in v4 to enable datatype imports
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Definition", pt.DataTypeDefinition.UniqueId.ToString()));
+                    //Datatype definition guid was added in v4 to enable datatype imports
+                    ptx.AppendChild(xmlHelper.addTextNode(xd, "Definition", pt.DataTypeDefinition.UniqueId.ToString()));
 
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Tab", Tab.GetCaptionById(pt.TabId)));
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Mandatory", pt.Mandatory.ToString()));
-                ptx.AppendChild(xmlHelper.addTextNode(xd, "Validation", pt.ValidationRegExp));
-                ptx.AppendChild(xmlHelper.addCDataNode(xd, "Description", pt.Description));
-                pts.AppendChild(ptx);
+                    ptx.AppendChild(xmlHelper.addTextNode(xd, "Tab", Tab.GetCaptionById(pt.TabId)));
+                    ptx.AppendChild(xmlHelper.addTextNode(xd, "Mandatory", pt.Mandatory.ToString()));
+                    ptx.AppendChild(xmlHelper.addTextNode(xd, "Validation", pt.ValidationRegExp));
+                    ptx.AppendChild(xmlHelper.addCDataNode(xd, "Description", pt.Description));
+                    pts.AppendChild(ptx);
+                }
             }
             doc.AppendChild(pts);
 
@@ -380,10 +384,14 @@ namespace umbraco.cms.businesslogic.web
             XmlElement tabs = xd.CreateElement("Tabs");
             foreach (TabI t in getVirtualTabs.ToList())
             {
-                XmlElement tabx = xd.CreateElement("Tab");
-                tabx.AppendChild(xmlHelper.addTextNode(xd, "Id", t.Id.ToString()));
-                tabx.AppendChild(xmlHelper.addTextNode(xd, "Caption", t.Caption));
-                tabs.AppendChild(tabx);
+                //only add tabs that aren't from a master doctype
+                if (t.ContentType == this.Id)
+                {
+                    XmlElement tabx = xd.CreateElement("Tab");
+                    tabx.AppendChild(xmlHelper.addTextNode(xd, "Id", t.Id.ToString()));
+                    tabx.AppendChild(xmlHelper.addTextNode(xd, "Caption", t.Caption));
+                    tabs.AppendChild(tabx);
+                }
             }
             doc.AppendChild(tabs);
             return doc;
