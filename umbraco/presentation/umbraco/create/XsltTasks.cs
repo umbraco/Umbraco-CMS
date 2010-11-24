@@ -102,7 +102,10 @@ namespace umbraco
 
             try
             {
-                System.IO.File.Delete(path);
+                if(System.IO.Directory.Exists(path))
+                    System.IO.Directory.Delete(path);
+                else if(System.IO.File.Exists(path))
+                    System.IO.File.Delete(path);                
             }
             catch (Exception ex)
             {

@@ -373,4 +373,12 @@
       <delete assembly="Umbraco.Forms.UI" type="Tasks.PrevalueSourceTasks" />
     </tasks>
   </nodeType>
+
+  <nodeType alias="xsltFolder">
+    <header>Xslt</header>
+    <usercontrol>/create/xslt.ascx</usercontrol>
+    <tasks>
+      <delete assembly="umbraco" type="XsltTasks" />
+    </tasks>
+  </nodeType>
 </createUI>

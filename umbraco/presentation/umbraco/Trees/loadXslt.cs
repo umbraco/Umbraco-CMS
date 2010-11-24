@@ -71,6 +71,12 @@ function openXslt(id) {
             xNode.Icon = "developerXslt.gif";
             xNode.OpenIcon = "developerXslt.gif";
         }
+
+        protected override void OnRenderFolderNode(ref XmlTreeNode xNode)
+        {
+            xNode.Menu = new List<IAction>(new IAction[] { ActionDelete.Instance, ContextMenuSeperator.Instance, ActionRefresh.Instance });
+            xNode.NodeType = "xsltFolder";
+        }
     }
     
 }

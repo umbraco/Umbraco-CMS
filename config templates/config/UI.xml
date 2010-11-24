@@ -50,6 +50,13 @@
       <delete assembly="umbraco" type="XsltTasks" />
     </tasks>
   </nodeType>
+  <nodeType alias="xsltFolder">
+    <header>Xslt</header>
+    <usercontrol>/create/xslt.ascx</usercontrol>
+    <tasks>
+      <delete assembly="umbraco" type="XsltTasks" />
+    </tasks>
+  </nodeType>
   <nodeType alias="content">
     <header>Page</header>
     <usercontrol>/create/content.ascx</usercontrol>
