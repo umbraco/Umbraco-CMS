@@ -295,6 +295,10 @@ namespace umbraco.cms.businesslogic.template
 
         public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
         {
+            //ensure unique alias 
+            if (GetByAlias(Name) != null)
+                Name = EnsureUniqueAlias(Name, 1);
+
             Template t = MakeNew(Name, u);
             t.MasterTemplate = master.Id;
             t.Design = "";
@@ -317,6 +321,10 @@ namespace umbraco.cms.businesslogic.template
 
         public static Template MakeNew(string Name, BusinessLogic.User u)
         {
+            //ensure unique alias 
+            if (GetByAlias(Name) != null)
+                Name = EnsureUniqueAlias(Name, 1);
+
             // CMSNode MakeNew(int parentId, Guid objectType, int userId, int level, string text, Guid uniqueID)
             CMSNode n = CMSNode.MakeNew(-1, _objectType, u.Id, 1, Name, Guid.NewGuid());
             Name = Name.Replace("/", ".").Replace("\\", "");
@@ -336,6 +344,17 @@ namespace umbraco.cms.businesslogic.template
             t.OnNew(e);
 
             return t;
+        }
+
+        private static string EnsureUniqueAlias(string alias, int attempts)
+        {
+            if (GetByAlias(alias + attempts.ToString()) == null)
+                return alias + attempts.ToString();
+            else
+            {
+                attempts++;
+                return EnsureUniqueAlias(alias, attempts);
+            }
         }
 
         public static Template GetByAlias(string Alias)
