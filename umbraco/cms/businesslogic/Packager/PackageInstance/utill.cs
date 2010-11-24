@@ -207,7 +207,7 @@ namespace umbraco.cms.businesslogic.packager {
 
             XmlNode file = doc.CreateElement("file");
             file.AppendChild(_node("guid", newFileName, doc));
-            file.AppendChild(_node("orgPath", orgPath, doc));
+            file.AppendChild(_node("orgPath", orgPath == "" ? "/" : orgPath, doc));
             file.AppendChild(_node("orgName", orgName, doc));
 
             files.AppendChild(file);
