@@ -136,21 +136,28 @@ namespace umbraco.dialogs
                         Hashtable oldNewTabIds = new Hashtable();
                         foreach (cms.businesslogic.web.DocumentType.TabI tab in eDt.getVirtualTabs.ToList())
                         {
-                            int tId = dt.AddVirtualTab(tab.Caption);
-                            oldNewTabIds.Add(tab.Id, tId);
+                            if (tab.ContentType == eDt.Id)
+                            {
+                                int tId = dt.AddVirtualTab(tab.Caption);
+                                oldNewTabIds.Add(tab.Id, tId);
+                            }
                         }
 
                         foreach (cms.businesslogic.propertytype.PropertyType pt in eDt.PropertyTypes) {
 
-                            cms.businesslogic.propertytype.PropertyType nPt = umbraco.cms.businesslogic.propertytype.PropertyType.MakeNew(pt.DataTypeDefinition, dt, pt.Name, pt.Alias);
-                            nPt.ValidationRegExp = pt.ValidationRegExp;
-                            nPt.SortOrder = pt.SortOrder;
-                            nPt.Mandatory = pt.Mandatory;
-                            nPt.Description = pt.Description;
-                            
-                            if(pt.TabId > 0 && oldNewTabIds[pt.TabId] != null){
-                                int newTabId = (int)oldNewTabIds[pt.TabId];
-                                nPt.TabId = newTabId;
+                            if (pt.ContentTypeId == eDt.Id)
+                            {
+                                cms.businesslogic.propertytype.PropertyType nPt = umbraco.cms.businesslogic.propertytype.PropertyType.MakeNew(pt.DataTypeDefinition, dt, pt.Name, pt.Alias);
+                                nPt.ValidationRegExp = pt.ValidationRegExp;
+                                nPt.SortOrder = pt.SortOrder;
+                                nPt.Mandatory = pt.Mandatory;
+                                nPt.Description = pt.Description;
+
+                                if (pt.TabId > 0 && oldNewTabIds[pt.TabId] != null)
+                                {
+                                    int newTabId = (int)oldNewTabIds[pt.TabId];
+                                    nPt.TabId = newTabId;
+                                }
                             }
                         }
 
