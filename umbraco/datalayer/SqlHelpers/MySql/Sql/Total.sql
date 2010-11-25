@@ -606,9 +606,9 @@ INSERT INTO cmsPropertyType (id, dataTypeId, contentTypeId, tabId, Alias, Name, 
 	(7, -92, 1032, 3, 'umbracoWidth', 'Width', NULL, 0, 0, NULL, NULL),
 	(8, -92, 1032, 3, 'umbracoHeight', 'Height', NULL, 0, 0, NULL, NULL),
 	(9, -92, 1032, 3, 'umbracoBytes', 'Size', NULL, 0, 0, NULL, NULL),
-	(10, -92, 1032, 3, 'umbracoExtensio', 'Type', NULL, 0, 0, NULL, NULL),
+	(10, -92, 1032, 3, 'umbracoExtension', 'Type', NULL, 0, 0, NULL, NULL),
 	(24, -90, 1033, 4, 'umbracoFile', 'Upload file', NULL, 0, 0, NULL, NULL),
-	(25, -92, 1033, 4, 'umbracoExtensio', 'Type', NULL, 0, 0, NULL, NULL),
+	(25, -92, 1033, 4, 'umbracoExtension', 'Type', NULL, 0, 0, NULL, NULL),
 	(26, -92, 1033, 4, 'umbracoBytes', 'Size', NULL, 0, 0, NULL, NULL),
 	(27, -38, 1031, 5, 'contents', 'Contents:', NULL, 0, 0, NULL, NULL)
 ;
