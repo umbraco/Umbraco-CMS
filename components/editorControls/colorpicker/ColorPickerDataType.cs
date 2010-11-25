@@ -17,7 +17,7 @@ namespace umbraco.editorControls.colorpicker
 			{
 				if (_Editor == null) 
 				{
-					_Editor = new colorPicker(Data,((KeyValuePrevalueEditor)PrevalueEditor).Prevalues);
+					_Editor = new colorPicker(Data,((KeyValuePrevalueEditor)PrevalueEditor).PrevaluesAsKeyValuePairList);
 				}
 				return _Editor;
 			}

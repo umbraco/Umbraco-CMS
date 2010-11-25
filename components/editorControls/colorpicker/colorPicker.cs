@@ -4,6 +4,7 @@ using System.Web.UI.WebControls;
 using System.ComponentModel;
 using System.Collections;
 using umbraco.IO;
+using System.Collections.Generic;
 
 namespace umbraco.editorControls
 {
@@ -23,6 +24,14 @@ namespace umbraco.editorControls
             _data = Data;
             _prevalues = Prevalues;
         }
+
+        List<KeyValuePair<int, String>> Prevalues;
+        public colorPicker(interfaces.IData Data, List<KeyValuePair<int, String>> Prevalues)
+        {
+            _data = Data;
+            this.Prevalues = Prevalues;
+        }
+
         private ArrayList _colors = new ArrayList();
 
         public Control Editor { get { return this; } }
@@ -56,9 +65,19 @@ namespace umbraco.editorControls
 
             try
             {
-                foreach (string val in _prevalues.Values)
+                if (_prevalues != null)
                 {
-                    _colors.Add(new ListItem(val));
+                    foreach (string val in _prevalues.Values)
+                    {
+                        _colors.Add(new ListItem(val));
+                    }
+                }
+                else if (Prevalues != null)
+                {
+                    foreach (KeyValuePair<int, String> item in Prevalues)
+                    {
+                        _colors.Add(new ListItem(item.Value));
+                    }
                 }
             }
             catch { }
