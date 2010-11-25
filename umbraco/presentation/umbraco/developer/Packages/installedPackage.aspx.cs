@@ -445,23 +445,7 @@ namespace umbraco.presentation.developer.packages
                 }
             }
 
-            //Remove files
-            foreach (ListItem li in files.Items)
-            {
-                if (li.Selected)
-                {
-                    //here we need to try to find the file in question as most packages does not support the tilde char
-
-                    string file = IOHelper.FindFile(li.Value);
-
-                    string filePath = IOHelper.MapPath(file);
-                    if (System.IO.File.Exists(filePath))
-                    {
-                        System.IO.File.Delete(filePath);
-                        pack.Data.Files.Remove(li.Value);
-                    }
-                }
-            }
+           
 
             //Remove Document types
             foreach (ListItem li in documentTypes.Items)
@@ -550,7 +534,27 @@ namespace umbraco.presentation.developer.packages
                 } catch (Exception ex) {
                     BusinessLogic.Log.Add(global::umbraco.BusinessLogic.LogTypes.Debug, -1, ex.ToString());
                 }
-                    
+
+                //moved remove of files here so custom package actions can still undo
+                //Remove files
+                foreach (ListItem li in files.Items)
+                {
+                    if (li.Selected)
+                    {
+                        //here we need to try to find the file in question as most packages does not support the tilde char
+
+                        string file = IOHelper.FindFile(li.Value);
+
+                        string filePath = IOHelper.MapPath(file);
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            System.IO.File.Delete(filePath);
+                            pack.Data.Files.Remove(li.Value);
+                        }
+                    }
+                }
+                pack.Save();
+
                 pack.Delete();
 
                 packageUninstalled.Visible = true;
@@ -585,7 +589,9 @@ namespace umbraco.presentation.developer.packages
 
             List<List<string>> lists = new List<List<string>>();
             lists.Add(pack.Data.Documenttypes);
-            lists.Add(pack.Data.Files);
+            
+            //Not including files, since there might be assemblies that contain package actions
+            //lists.Add(pack.Data.Files);
             lists.Add(pack.Data.Macros);
             lists.Add(pack.Data.Stylesheets);
             lists.Add(pack.Data.Templates);
