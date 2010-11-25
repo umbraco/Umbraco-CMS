@@ -193,7 +193,7 @@ namespace umbraco.editorControls.macrocontainer
                 if (_maxNumber == null)
                 {
                     int output = 0;
-                    if (Configuration.Split('|').Length > 1)
+                    if (Configuration != null && Configuration.Split('|').Length > 1)
                     {                        
                         int.TryParse(Configuration.Split('|')[1], out output);
                         return output;
@@ -216,7 +216,7 @@ namespace umbraco.editorControls.macrocontainer
                 if (_preferedHeight == null)
                 {
                     int output = 0;
-                    if (Configuration.Split('|').Length > 2)
+                    if (Configuration != null && Configuration.Split('|').Length > 2)
                     {
                         int.TryParse(Configuration.Split('|')[2], out output);
                         return output;
@@ -238,7 +238,7 @@ namespace umbraco.editorControls.macrocontainer
                 if (_preferedWidth == null)
                 {
                     int output = 0;
-                    if (Configuration.Split('|').Length > 3)
+                    if (Configuration != null && Configuration.Split('|').Length > 3)
                     {
                         int.TryParse(Configuration.Split('|')[3], out output);
                         return output;
