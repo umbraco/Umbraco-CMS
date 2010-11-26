@@ -233,6 +233,7 @@
     <Compile Include="businesslogic\skinning\tasks\ModifyPageProperty.cs" />
     <Compile Include="businesslogic\skinning\tasks\ModifyTemplate.cs" />
     <Compile Include="businesslogic\skinning\TaskType.cs" />
+    <Compile Include="businesslogic\skinning\utils\CssParser.cs" />
     <Compile Include="businesslogic\Tags\Tag.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
