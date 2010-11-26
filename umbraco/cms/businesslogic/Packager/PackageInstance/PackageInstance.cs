@@ -40,7 +40,9 @@ namespace umbraco.cms.businesslogic.packager
         private string _repoGuid;
         private string _packageGuid;
         private bool _hasUpdate;
-        private bool _enableSkins = false; 
+        private bool _enableSkins = false;
+        private string _skinWebserviceUrl = ""; 
+
         private string _actions;
 
         public int Id
@@ -69,6 +71,13 @@ namespace umbraco.cms.businesslogic.packager
             get { return _enableSkins; }
             set { _enableSkins = value; }
         }
+
+        public String SkinWebserviceUrl
+        {
+            get { return _skinWebserviceUrl; }
+            set { _skinWebserviceUrl = value; }
+        }
+
 
         public String Name
         {

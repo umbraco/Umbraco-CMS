@@ -70,7 +70,6 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                     link.Attributes.Add(
                         "onclick",
                         "umbSelectModule('" + cms.businesslogic.skinning.Skinning.GetModuleAlias(p.Text) + "',this);return false;");
-
                 }
                 else
                 {

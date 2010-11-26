@@ -298,8 +298,13 @@ namespace umbraco.cms.businesslogic.skinning
             {
                 try
                 {
-                    r = cms.businesslogic.packager.repositories.Repository.
-                        getByGuid("65194810-1f85-11dd-bd0b-0800200c9a66").Webservice.Skins(g.ToString()).Length > 0;
+                    string url = umbraco.cms.businesslogic.packager.InstalledPackage.GetByGuid(g.ToString()).Data.SkinWebserviceUrl;
+                    umbraco.cms.businesslogic.packager.repositories.Repository repo = cms.businesslogic.packager.repositories.Repository.getByGuid("65194810-1f85-11dd-bd0b-0800200c9a66");
+                    
+                    if(!string.IsNullOrEmpty(url))
+                        repo.WebserviceUrl = url;
+
+                    r = repo.Webservice.Skins(g.ToString()).Length > 0;
                 }
                 catch { }
             }

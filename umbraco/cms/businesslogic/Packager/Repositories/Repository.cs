@@ -33,6 +33,7 @@ namespace umbraco.cms.businesslogic.packager.repositories {
 
         public string WebserviceUrl {
             get { return m_webserviceUrl; }
+            set { m_webserviceUrl = value; }
         }
 
 

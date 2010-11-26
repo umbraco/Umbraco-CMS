@@ -190,11 +190,15 @@ namespace umbraco.cms.businesslogic.packager
             string _packLicense = xmlHelper.GetNodeValue(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/license "));
 
             bool _enableSkins = false;
+            string _skinWebserviceUrl = "";
 
-            if(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/enableSkins") != null)
-                _enableSkins = bool.Parse(xmlHelper.GetNodeValue(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/enableSkins")));
-
-
+            if (_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/enableSkins") != null)
+            {
+                XmlNode _skinNode = _packageConfig.DocumentElement.SelectSingleNode("/umbPackage/enableSkins");
+                _enableSkins = bool.Parse(xmlHelper.GetNodeValue(_skinNode));
+                if (_skinNode.Attributes["skinWebservicUrl"] != null && !string.IsNullOrEmpty(_skinNode.Attributes["skinWebservicUrl"].Value))
+                    _skinWebserviceUrl = _skinNode.Attributes["skinWebservicUrl"].Value;
+            }
 
             //Create a new package instance to record all the installed package adds - this is the same format as the created packages has.
             //save the package meta data
@@ -204,7 +208,10 @@ namespace umbraco.cms.businesslogic.packager
             insPack.Data.Version = _packVersion;
             insPack.Data.Readme = _packReadme;
             insPack.Data.License = _packLicense;
+
+            //skinning
             insPack.Data.EnableSkins = _enableSkins;
+            insPack.Data.SkinWebserviceUrl = _skinWebserviceUrl;
 
             insPack.Data.PackageGuid = guid; //the package unique key.
             insPack.Data.RepositoryGuid = repoGuid; //the repository unique key, if the package is a file install, the repository will not get logged.

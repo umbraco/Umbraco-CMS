@@ -87,6 +87,13 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
         protected void LoadSkins()
         {
             Guid? nullable = Skinning.StarterKitGuid(Node.GetCurrent().template);
+
+            if(nullable.HasValue){
+                InstalledPackage p = InstalledPackage.GetByGuid(nullable.Value.ToString());
+                if(!string.IsNullOrEmpty(p.Data.SkinWebserviceUrl))
+                    this.repo.WebserviceUrl = p.Data.SkinWebserviceUrl;
+            }
+
             if (!(nullable.HasValue && Skinning.HasAvailableSkins(Node.GetCurrent().template)))
             {
                 this.pChangeSkin.Visible = false;
@@ -115,11 +122,8 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
             {
                 throw new Exception("The current user can't edit skins as the user doesn't have access to the Settings section!");
             }
-
-
-
+            
             nodeFactory.Node n = nodeFactory.Node.GetCurrent();
-
             ActiveSkin = Skin.CreateFromAlias( Skinning.GetCurrentSkinAlias(n.template) );
 
             pnl_connectionerror.Visible = false;
@@ -188,6 +192,12 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
             else
             {
                 Guid guid = new Guid(((Button)sender).CommandArgument);
+
+                InstalledPackage p = InstalledPackage.GetByGuid(guid.ToString());
+                if(!string.IsNullOrEmpty(p.Data.SkinWebserviceUrl))
+                    this.repo.WebserviceUrl = p.Data.SkinWebserviceUrl;
+                
+
                 Installer installer = new Installer();
                 if (this.repo.HasConnection())
                 {
