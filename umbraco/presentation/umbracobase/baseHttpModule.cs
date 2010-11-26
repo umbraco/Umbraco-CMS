@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Configuration;
@@ -157,24 +158,33 @@ namespace umbraco.presentation.umbracobase
                         /*TODO - SOMETHING ALITTLE BETTER THEN ONLY CHECK FOR XPATHNODEITERATOR OR ELSE do ToString() */
                         if (response != null)
                         {
-                            if (myExtension.method.ReturnType.ToString() == "System.Xml.XPath.XPathNodeIterator")
-                                return ((System.Xml.XPath.XPathNodeIterator)response).Current.OuterXml;
-                            else
+                            switch (myExtension.method.ReturnType.ToString())
                             {
-                                string strResponse = ((string)response.ToString());
+                                case "System.Xml.XPath.XPathNodeIterator":
+                                    return ((System.Xml.XPath.XPathNodeIterator)response).Current.OuterXml;
+                                case "System.Xml.Linq.XDocument":
+                                    return response.ToString();
+                                case "System.Xml.XmlDocument":
+                                    XmlDocument xmlDoc = (XmlDocument)response;
+                                    StringWriter sw = new StringWriter();
+                                    XmlTextWriter xw = new XmlTextWriter(sw);
+                                    xmlDoc.WriteTo(xw);
+                                    return sw.ToString();
+                                default:
+                                    string strResponse = ((string)response.ToString());
 
-                                if (myExtension.returnXML)
-                                {
-                                    //do a quick "is this html?" check... if it is add CDATA... 
-                                    if (strResponse.Contains("<") || strResponse.Contains(">"))
-                                        strResponse = "<![CDATA[" + strResponse + "]]>";
-                                    return "<value>" + strResponse + "</value>";
-                                }
-                                else
-                                {
-                                    HttpContext.Current.Response.ContentType = "text/html";
-                                    return strResponse;
-                                }
+                                    if (myExtension.returnXML)
+                                    {
+                                        //do a quick "is this html?" check... if it is add CDATA... 
+                                        if (strResponse.Contains("<") || strResponse.Contains(">"))
+                                            strResponse = "<![CDATA[" + strResponse + "]]>";
+                                        return "<value>" + strResponse + "</value>";
+                                    }
+                                    else
+                                    {
+                                        HttpContext.Current.Response.ContentType = "text/html";
+                                        return strResponse;
+                                    }
                             }
                         }
                         else
