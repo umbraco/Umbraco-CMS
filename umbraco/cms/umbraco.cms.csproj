@@ -217,6 +217,8 @@
     <Compile Include="businesslogic\skinning\controls\ColorPicker.cs" />
     <Compile Include="businesslogic\skinning\controls\ImageUploader.cs" />
     <Compile Include="businesslogic\skinning\controls\SliderControl.cs" />
+    <Compile Include="businesslogic\skinning\CssVariable.cs" />
+    <Compile Include="businesslogic\skinning\CssVariableProperty.cs" />
     <Compile Include="businesslogic\skinning\dependencies\Color.cs" />
     <Compile Include="businesslogic\skinning\dependencies\Image.cs" />
     <Compile Include="businesslogic\skinning\dependencies\Option.cs" />
