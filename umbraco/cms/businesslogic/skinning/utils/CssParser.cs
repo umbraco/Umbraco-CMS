@@ -47,11 +47,6 @@ namespace umbraco.cms.businesslogic.skinning.utils
             }
         }
 
-        private void ProcessStyleSheetContent(string content)
-        {
-
-        }
-
         private void FillStyleClass(string s)
         {
             StyleClass sc = null;
