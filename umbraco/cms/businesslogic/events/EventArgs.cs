@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using umbraco.cms.businesslogic.web;
 
 namespace umbraco.cms.businesslogic {
     //Content Event args
     public class PublishEventArgs : System.ComponentModel.CancelEventArgs { }
     public class MoveEventArgs : System.ComponentModel.CancelEventArgs { }
-    public class CopyEventArgs : System.ComponentModel.CancelEventArgs { }
+    public class CopyEventArgs : System.ComponentModel.CancelEventArgs
+    {
+        public int CopyTo { get; set; }
+        public Document NewDocument { get; set; }
+    }
     
     public class UnPublishEventArgs : System.ComponentModel.CancelEventArgs { }
     public class RollBackEventArgs : System.ComponentModel.CancelEventArgs { }

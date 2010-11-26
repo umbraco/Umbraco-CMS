@@ -1242,47 +1242,56 @@ namespace umbraco.cms.businesslogic.web
         }
 
         /// <summary>
-        /// Creates a new document of the same type and copies all data from the current onto it
+        /// Creates a new document of the same type and copies all data from the current onto it. Due to backwards compatibility we can't return
+        /// the new Document, but it's included in the CopyEventArgs.Document if you subscribe to the AfterCopy event
         /// </summary>
         /// <param name="CopyTo">The parentid where the document should be copied to</param>
         /// <param name="u">The usercontext under which the action are performed</param>
-        public void Copy(int CopyTo, User u)
+        public Document Copy(int CopyTo, User u)
         {
-            Copy(CopyTo, u, false);
+            return Copy(CopyTo, u, false);
         }
 
-        public void Copy(int CopyTo, User u, bool RelateToOrignal)
+        /// <summary>
+        /// Creates a new document of the same type and copies all data from the current onto it. Due to backwards compatibility we can't return
+        /// the new Document, but it's included in the CopyEventArgs.Document if you subscribe to the AfterCopy event
+        /// </summary>
+        /// <param name="CopyTo"></param>
+        /// <param name="u"></param>
+        /// <param name="RelateToOrignal"></param>
+        public Document Copy(int CopyTo, User u, bool RelateToOrignal)
         {
             CopyEventArgs e = new CopyEventArgs();
-
+            e.CopyTo = CopyTo;
             FireBeforeCopy(e);
+            Document newDoc = null;
 
             if (!e.Cancel)
             {
                 // Make the new document
-                Document NewDoc = MakeNew(Text, new DocumentType(ContentType.Id), u, CopyTo);
+                newDoc = MakeNew(Text, new DocumentType(ContentType.Id), u, CopyTo);
 
-                if (NewDoc != null)
+                if (newDoc != null)
                 {
                     // update template if a template is set
                     if (this.Template > 0)
-                        NewDoc.Template = Template;
+                        newDoc.Template = Template;
 
                     //update the trashed property as it could be copied inside the recycle bin
-                    NewDoc.IsTrashed = this.IsTrashed;
+                    newDoc.IsTrashed = this.IsTrashed;
 
                     // Copy the properties of the current document
                     var props = GenericProperties;
                     foreach (Property p in props)
-                        NewDoc.getProperty(p.PropertyType.Alias).Value = p.Value;
+                        newDoc.getProperty(p.PropertyType.Alias).Value = p.Value;
 
                     // Relate?
                     if (RelateToOrignal)
                     {
-                        Relation.MakeNew(Id, NewDoc.Id, RelationType.GetByAlias("relateDocumentOnCopy"), "");
+                        Relation.MakeNew(Id, newDoc.Id, RelationType.GetByAlias("relateDocumentOnCopy"), "");
 
                         // Add to audit trail
-                        Log.Add(LogTypes.Copy, u, NewDoc.Id, "Copied and related from " + Text + " (id: " + Id.ToString() + ")");
+                        Log.Add(LogTypes.Copy, u, newDoc.Id, "Copied and related from " + Text + " (id: " + Id.ToString() + ")");
                     }
 
 
@@ -1290,11 +1299,16 @@ namespace umbraco.cms.businesslogic.web
                     //store children array here because iterating over an Array object is very inneficient.
                     var c = Children;
                     foreach (Document d in c)
-                        d.Copy(NewDoc.Id, u, RelateToOrignal);
+                        d.Copy(newDoc.Id, u, RelateToOrignal);
+
+                    e.NewDocument = newDoc;
                 }
 
                 FireAfterCopy(e);
+
             }
+
+            return newDoc;
         }
 
         /// <summary>
