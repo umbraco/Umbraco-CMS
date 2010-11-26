@@ -50,7 +50,8 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="id">The id of the document</param>
         /// <param name="Version">The version of the document</param>
-        public Document(int id, Guid Version) : base(id)
+        public Document(int id, Guid Version)
+            : base(id)
         {
             this.Version = Version;
         }
@@ -72,7 +73,8 @@ namespace umbraco.cms.businesslogic.web
         /// </summary>
         /// <param name="optimizedMode"></param>
         /// <param name="id"></param>
-        public Document(bool optimizedMode, int id) : base(id, optimizedMode)
+        public Document(bool optimizedMode, int id)
+            : base(id, optimizedMode)
         {
             this._optimizedMode = optimizedMode;
 
@@ -81,7 +83,7 @@ namespace umbraco.cms.businesslogic.web
 
                 using (IRecordsReader dr =
                         SqlHelper.ExecuteReader(string.Format(m_SQLOptimizedSingle.Trim(), "umbracoNode.id = @id", "cmsContentVersion.id desc"),
-                            SqlHelper.CreateParameter("@nodeObjectType", Document._objectType),    
+                            SqlHelper.CreateParameter("@nodeObjectType", Document._objectType),
                             SqlHelper.CreateParameter("@id", id)))
                 {
                     if (dr.Read())
@@ -140,7 +142,7 @@ namespace umbraco.cms.businesslogic.web
                 }
             }
         }
-       
+
         #endregion
 
         #region Constants and Static members
@@ -213,7 +215,7 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Private properties
-        
+
         private DateTime _updated;
         private DateTime _release;
         private DateTime _expire;
@@ -239,7 +241,7 @@ namespace umbraco.cms.businesslogic.web
 
         //private Dictionary<Property, object> _knownProperties = new Dictionary<Property, object>();
         //private Func<KeyValuePair<Property, object>, string, bool> propertyTypeByAlias = (pt, alias) => pt.Key.PropertyType.Alias == alias; 
-        #endregion       
+        #endregion
 
         #region Static Methods
 
@@ -384,17 +386,17 @@ namespace umbraco.cms.businesslogic.web
             CMSNode n = new CMSNode(ParentId);
             int newLevel = n.Level;
             newLevel++;
-            
+
             //create the cms node first
             CMSNode newNode = MakeNew(ParentId, _objectType, u.Id, newLevel, Name, newId);
-            
+
             //we need to create an empty document and set the underlying text property
             Document tmp = new Document(newId, true);
             tmp.SetText(Name);
-            
+
             //create the content data for the new document
             tmp.CreateContent(dct);
-            
+
             //now create the document data
             SqlHelper.ExecuteNonQuery("insert into cmsDocument (newest, nodeId, published, documentUser, versionId, Text) values (1, " +
                                       tmp.Id + ", 0, " +
@@ -437,12 +439,13 @@ namespace umbraco.cms.businesslogic.web
             bool isDoc = false;
             using (IRecordsReader dr =
             SqlHelper.ExecuteReader(string.Format("select nodeId from cmsDocument where nodeId = @id"),
-                SqlHelper.CreateParameter("@id", nodeId))) {
+                SqlHelper.CreateParameter("@id", nodeId)))
+            {
 
-                    if (dr.Read())
-                    {
-                        isDoc = true;
-                    }
+                if (dr.Read())
+                {
+                    isDoc = true;
+                }
             }
 
             return isDoc;
@@ -579,7 +582,7 @@ namespace umbraco.cms.businesslogic.web
                     tmp.Add(d);
                 }
             }
-              
+
             return tmp;
         }
 
@@ -1259,34 +1262,36 @@ namespace umbraco.cms.businesslogic.web
                 // Make the new document
                 Document NewDoc = MakeNew(Text, new DocumentType(ContentType.Id), u, CopyTo);
 
-                // update template if a template is set
-                if (this.Template > 0)
-                    NewDoc.Template = Template;
-
-                //update the trashed property as it could be copied inside the recycle bin
-                NewDoc.IsTrashed = this.IsTrashed;
-
-                // Copy the properties of the current document
-                var props = getProperties;
-                foreach (Property p in props)
-                    NewDoc.getProperty(p.PropertyType.Alias).Value = p.Value;
-
-                // Relate?
-                if (RelateToOrignal)
+                if (NewDoc != null)
                 {
-                    Relation.MakeNew(Id, NewDoc.Id, RelationType.GetByAlias("relateDocumentOnCopy"), "");
+                    // update template if a template is set
+                    if (this.Template > 0)
+                        NewDoc.Template = Template;
 
-                    // Add to audit trail
-                    Log.Add(LogTypes.Copy, u, NewDoc.Id, "Copied and related from " + Text + " (id: " + Id.ToString() + ")");
+                    //update the trashed property as it could be copied inside the recycle bin
+                    NewDoc.IsTrashed = this.IsTrashed;
+
+                    // Copy the properties of the current document
+                    var props = GenericProperties;
+                    foreach (Property p in props)
+                        NewDoc.getProperty(p.PropertyType.Alias).Value = p.Value;
+
+                    // Relate?
+                    if (RelateToOrignal)
+                    {
+                        Relation.MakeNew(Id, NewDoc.Id, RelationType.GetByAlias("relateDocumentOnCopy"), "");
+
+                        // Add to audit trail
+                        Log.Add(LogTypes.Copy, u, NewDoc.Id, "Copied and related from " + Text + " (id: " + Id.ToString() + ")");
+                    }
+
+
+                    // Copy the children
+                    //store children array here because iterating over an Array object is very inneficient.
+                    var c = Children;
+                    foreach (Document d in c)
+                        d.Copy(NewDoc.Id, u, RelateToOrignal);
                 }
-
-
-                // Copy the children
-                //store children array here because iterating over an Array object is very inneficient.
-                var c = Children;
-                foreach (Document d in c)
-                    d.Copy(NewDoc.Id, u, RelateToOrignal);
-
 
                 FireAfterCopy(e);
             }
@@ -1442,7 +1447,7 @@ namespace umbraco.cms.businesslogic.web
                 x.Attributes.Append(addAttribute(xd, "parentID", Parent.Id.ToString()));
             else
                 x.Attributes.Append(addAttribute(xd, "parentID", "-1"));
-            x.Attributes.Append(addAttribute(xd, "level", Level.ToString()));          
+            x.Attributes.Append(addAttribute(xd, "level", Level.ToString()));
             x.Attributes.Append(addAttribute(xd, "writerID", Writer.Id.ToString()));
             x.Attributes.Append(addAttribute(xd, "creatorID", Creator.Id.ToString()));
             if (ContentType != null)
@@ -1540,7 +1545,7 @@ namespace umbraco.cms.businesslogic.web
             Template = 0;
         }
 
-        #endregion      
+        #endregion
 
         #region Protected Methods
         protected override void setupNode()
@@ -1570,7 +1575,7 @@ namespace umbraco.cms.businesslogic.web
                     throw new ArgumentException(string.Format("No Document exists with Version '{0}'", Version));
                 }
             }
-            
+
             _published = HasPublishedVersion();
         }
 
@@ -1702,7 +1707,7 @@ namespace umbraco.cms.businesslogic.web
 
                 // Remove all files
                 DeleteAssociatedMediaFiles();
-                
+
                 //remove any domains associated
                 var domains = Domain.GetDomainsById(this.Id).ToList();
                 domains.ForEach(x => x.Delete());
@@ -1733,7 +1738,7 @@ namespace umbraco.cms.businesslogic.web
             }
             return !e.Cancel;
         }
-        
+
         #endregion
 
         #region Events
@@ -1836,7 +1841,7 @@ namespace umbraco.cms.businesslogic.web
         /// Occurs when [before delete].
         /// </summary>
         public new static event DeleteEventHandler BeforeDelete;
-        
+
         /// <summary>
         /// Raises the <see cref="E:BeforeDelete"/> event.
         /// </summary>
@@ -1851,7 +1856,7 @@ namespace umbraco.cms.businesslogic.web
         /// Occurs when [after delete].
         /// </summary>
         public new static event DeleteEventHandler AfterDelete;
-        
+
         /// <summary>
         /// Raises the <see cref="E:AfterDelete"/> event.
         /// </summary>
@@ -2030,9 +2035,9 @@ namespace umbraco.cms.businesslogic.web
         {
             if (AfterRollBack != null)
                 AfterRollBack(this, e);
-        } 
+        }
         #endregion
 
-       
+
     }
 }
