@@ -10,9 +10,9 @@ namespace umbraco.cms.businesslogic.skinning
         public string Name { get; set; }
         public List<string> Selectors { get; set; }
 
-        public CssVariableProperty(string Name)
+        public CssVariableProperty(string name)
         {
-            this.Name = Name;
+            this.Name = name;
             Selectors = new List<string>();
         }
     }
