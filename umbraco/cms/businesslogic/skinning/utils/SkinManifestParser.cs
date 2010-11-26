@@ -26,7 +26,7 @@ namespace umbraco.cms.businesslogic.skinning.utils
 
             CssParser parser = new CssParser();
             //add stylesheet contents
-            //parser.AddStyleSheet(@"C:\www\contour.local\1.0.3825.19924\build\css\runway.css");
+
 
 
             //build collection of properties and selectors for each variable
