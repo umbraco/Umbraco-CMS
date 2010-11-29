@@ -109,7 +109,7 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                     builder.AppendLine(
                         string.Format("var cssvar{0} = '{1}';",cssVar.Name,cssVar.DefaultValue));
 
-                    varquery += string.Format("+ '&{0}=' + cssvar{0}.replace('#','')", cssVar.Name);
+                    varquery += string.Format("+ '&{0}=' + cssvar{0}.replace('#','%23')", cssVar.Name);
                 }
             }
 

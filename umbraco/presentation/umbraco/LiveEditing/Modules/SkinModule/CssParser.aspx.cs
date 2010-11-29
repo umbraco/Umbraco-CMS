@@ -28,7 +28,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
                     foreach (CssVariable var in ActiveSkin.Css.Variables)
                     {
-                        varValues.Add(var.Name, string.IsNullOrEmpty(Request[var.Name]) ? var.DefaultValue : "#" + Request[var.Name]);
+                        varValues.Add(var.Name, string.IsNullOrEmpty(Request[var.Name]) ? var.DefaultValue : Request[var.Name]);
 
                     }
 
