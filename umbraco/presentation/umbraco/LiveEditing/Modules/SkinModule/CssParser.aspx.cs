@@ -13,6 +13,8 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
         //will be used to parse the global variables in the embedded css of a skin manifest
         protected void Page_Load(object sender, EventArgs e)
         {
+            Response.ContentType = "text/plain";
+
             string skinAlias = Request["skinAlias"];
 
             if (!string.IsNullOrEmpty(skinAlias) && Skin.CreateFromAlias(skinAlias) != null)
@@ -26,7 +28,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
                     foreach (CssVariable var in ActiveSkin.Css.Variables)
                     {
-                        varValues.Add(var.Name, string.IsNullOrEmpty(Request[var.Name]) ? var.DefaultValue : Request[var.Name]);
+                        varValues.Add(var.Name, string.IsNullOrEmpty(Request[var.Name]) ? var.DefaultValue : "#" + Request[var.Name]);
 
                     }
 

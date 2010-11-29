@@ -8,7 +8,7 @@ namespace umbraco.cms.businesslogic.skinning
 {
     public class EmbeddedCss
     {
-        public string Name { get; set; }
+        public string FileName { get; set; }
         public List<CssVariable> Variables { get; set; }
         public string Content { get; set; }
 
@@ -23,8 +23,8 @@ namespace umbraco.cms.businesslogic.skinning
         {
             EmbeddedCss css = new EmbeddedCss();
 
-            if (node.Attributes["name"] != null)
-                css.Name = node.Attributes["name"].Value;
+            if (node.Attributes["filename"] != null)
+                css.FileName = node.Attributes["filename"].Value;
 
             if (node.SelectSingleNode("Content") != null)
                 css.Content = node.SelectSingleNode("Content").InnerText;

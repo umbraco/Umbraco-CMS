@@ -61,6 +61,30 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
         {
             this.ph_dependencies.Controls.Clear();
             StringBuilder builder = new StringBuilder();
+
+            //css vars default value
+            string varquery = "";
+
+            if (this.ActiveSkin.Css != null)
+            {
+              
+                foreach (CssVariable cssVar in this.ActiveSkin.Css.Variables)
+                {
+                    builder.AppendLine(
+                        string.Format("var cssvar{0} = '{1}';",cssVar.Name,cssVar.DefaultValue));
+
+                    varquery += string.Format("+ '&{0}=' + cssvar{0}.replace('#','')", cssVar.Name);
+                }
+            }
+
+            //preview css var change
+
+            builder.Append(string.Format("function PreviewCssVariables(){{ var parsedcsscontent; jQuery.get('/umbraco/LiveEditing/Modules/SkinModule/CssParser.aspx?skinAlias={0}'{1}, function(data){{parsedcsscontent= data; jQuery('head').append('<style>' + parsedcsscontent + '</style>'); }}); }}",
+                this.ActiveSkin.Alias,
+                varquery));
+
+
+
             builder.Append("\r\n  var hasSetTasksClientScriptsRun = false; \r\n                function setTasksClientScripts(){ \r\n                    if(hasSetTasksClientScriptsRun == false){");
 
             int c = 0;
@@ -72,6 +96,14 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                     Control editor = dependency.DependencyType.Editor;
                     editor.ID = "depcontrol" + c;
                     this.ph_dependencies.addProperty(dependency.Label, editor);
+
+                    if(!string.IsNullOrEmpty(dependency.Variable))
+                    {
+                        //this control is setting a css variable
+                        builder.Append(dependency.DependencyType.CssVariablePreviewClientScript(editor.ClientID, "cssvar" + dependency.Variable));
+
+
+                    }
                     foreach (Task task in dependency.Tasks)
                     {
                         builder.Append(task.TaskType.PreviewClientScript(editor.ClientID, dependency.DependencyType.ClientSidePreviewEventType(), dependency.DependencyType.ClientSideGetValueScript()));
