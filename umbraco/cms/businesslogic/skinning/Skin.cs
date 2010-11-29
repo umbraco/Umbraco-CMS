@@ -85,6 +85,9 @@ namespace umbraco.cms.businesslogic.skinning
             //    s.Palettes.Add(Palette.CreateFromXmlNode(palNode));
             //}
 
+            if (node.SelectSingleNode("/Skin/CSS") != null)
+                s.Css = EmbeddedCss.CreateFromXmlNode(node.SelectSingleNode("/Skin/CSS"));
+
             return s;
         }
 
@@ -169,6 +172,9 @@ namespace umbraco.cms.businesslogic.skinning
         public List<Dependency> Dependencies { get; set; }
 
         //public List<Palette> Palettes { get; set; }
+
+
+        public EmbeddedCss Css { get; set; }
 
         public void RollbackDependencies()
         {

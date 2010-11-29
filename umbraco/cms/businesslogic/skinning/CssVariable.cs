@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
 
 namespace umbraco.cms.businesslogic.skinning
 {
@@ -11,6 +12,10 @@ namespace umbraco.cms.businesslogic.skinning
         public string DefaultValue { get; set; }
         public List<CssVariableProperty> Properties { get; set; }
 
+        public CssVariable()
+        {
+            Properties = new List<CssVariableProperty>();
+        }
         public CssVariable(string name)
         {
             this.Name = name;
@@ -23,6 +28,18 @@ namespace umbraco.cms.businesslogic.skinning
             this.DefaultValue = defaultValue;
 
             Properties = new List<CssVariableProperty>();
+        }
+
+        public static CssVariable CreateFromXmlNode(XmlNode node)
+        {
+            CssVariable var = new CssVariable();
+
+            if (node.Attributes["name"] != null)
+                var.Name = node.Attributes["name"].Value;
+
+            var.DefaultValue = node.InnerText;
+
+            return var;
         }
     }
 }

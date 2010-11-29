@@ -226,6 +226,7 @@
     <Compile Include="businesslogic\skinning\dependencies\Text.cs" />
     <Compile Include="businesslogic\skinning\Dependency.cs" />
     <Compile Include="businesslogic\skinning\DependencyType.cs" />
+    <Compile Include="businesslogic\skinning\EmbeddedCss.cs" />
     <Compile Include="businesslogic\skinning\Palette.cs" />
     <Compile Include="businesslogic\ProviderBase.cs" />
     <Compile Include="businesslogic\skinning\Skin.cs" />

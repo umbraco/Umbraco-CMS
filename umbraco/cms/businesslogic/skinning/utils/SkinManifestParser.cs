@@ -20,6 +20,8 @@ namespace umbraco.cms.businesslogic.skinning.utils
         {
             SkinFilePath = path;
 
+            //first check if it needs to be parsed
+
             List<CssVariable> cssVariables = new List<CssVariable>();
             //get all variables
 
