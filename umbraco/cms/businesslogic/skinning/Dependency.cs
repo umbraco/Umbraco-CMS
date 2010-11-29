@@ -97,6 +97,9 @@ namespace umbraco.cms.businesslogic.skinning
                 {
                     d.DependencyType.Values.Add(outputNode.InnerText);
                 }
+
+                if (node.Attributes["variable"] != null)
+                    d.Variable = node.Attributes["variable"].Value;
             }        
 
 
@@ -128,6 +131,6 @@ namespace umbraco.cms.businesslogic.skinning
 
         public List<Task> Tasks { get; set; }
 
-        
+        public string Variable { get; set; }
     }
 }
