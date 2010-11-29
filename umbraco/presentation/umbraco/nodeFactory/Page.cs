@@ -40,6 +40,7 @@ namespace umbraco.presentation.nodeFactory
         private Properties _properties = new Properties();
         private XmlNode _pageXmlNode;
         private int _sortOrder;
+        private int _level;
 
         public Nodes Children
         {
@@ -212,6 +213,16 @@ namespace umbraco.presentation.nodeFactory
             get
             {
                 return library.NiceUrl(_id);
+            }
+        }
+
+        public int Level
+        {
+            get
+            {
+                if (!_initialized)
+                    initialize();
+                return _level;
             }
         }
 
@@ -508,6 +519,9 @@ namespace umbraco.presentation.nodeFactory
                         _createDate = DateTime.Parse(_pageXmlNode.Attributes.GetNamedItem("createDate").Value);
                     if (_pageXmlNode.Attributes.GetNamedItem("updateDate") != null)
                         _updateDate = DateTime.Parse(_pageXmlNode.Attributes.GetNamedItem("updateDate").Value);
+                    if (_pageXmlNode.Attributes.GetNamedItem("level") != null)
+                        _level = int.Parse(_pageXmlNode.Attributes.GetNamedItem("level").Value);
+
                 }
 
                 // load data
@@ -616,7 +630,15 @@ namespace umbraco.presentation.nodeFactory
         {
             get { return (Property)List[Index]; }
         }
+
+        public virtual Property this[string alias]
+        {
+            get
+            {
+                return List.OfType<Property>()
+                    .Where(x => x.Alias.Equals(alias, StringComparison.InvariantCultureIgnoreCase))
+                    .FirstOrDefault();
+            }
+        }
     }
-
-
 }
