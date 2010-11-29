@@ -5,6 +5,9 @@ using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
 using System.Xml.Linq;
 using umbraco.IO;
+using umbraco.presentation.preview;
+using umbraco.BusinessLogic;
+using System.Xml;
 
 namespace umbraco.presentation
 {
@@ -49,6 +52,7 @@ namespace umbraco.presentation
             }
         }
 
+        private readonly string XDocumentCacheKey = "XDocumentCache";
         /// <summary>
         /// Gets the Umbraco XML cache
         /// </summary>
@@ -57,10 +61,35 @@ namespace umbraco.presentation
         {
             get
             {
-                return XDocument.Load(this.MapPath(this.ContentXmlPath));
+                if (UmbracoContext.Current.InPreviewMode)
+                {
+                    PreviewContent pc = new PreviewContent(new Guid(StateHelper.GetCookieValue("PreviewSet")));
+                    pc.LoadPreviewset();
+                    return XmlDocumentToXDocument(pc.XmlContent);
+                }
+                else
+                {
+                    if (HttpContext.Current == null)
+                        return XDocument.Load(ContentXmlPath);
+                    XDocument xml = HttpContext.Current.Items[XDocumentCacheKey] as XDocument;
+                    if (xml == null)
+                    {
+                        xml = XmlDocumentToXDocument(content.Instance.XmlContent);
+                        HttpContext.Current.Items[XDocumentCacheKey] = xml;
+                    }
+                    return xml;
+                }
             }
         }
 
+        private XDocument XmlDocumentToXDocument(XmlDocument xml)
+        {
+            using (var nodeReader = new XmlNodeReader(xml))
+            {
+                nodeReader.MoveToContent();
+                return XDocument.Load(nodeReader);
+            }
+        }
         public string DataFolder
         {
             get
