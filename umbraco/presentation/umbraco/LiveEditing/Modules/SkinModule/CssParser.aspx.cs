@@ -30,7 +30,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
                     }
 
-                    Response.Write(ParseEmbeddedCss(ActiveSkin.Css.Content,varValues);
+                    Response.Write(ParseEmbeddedCss(ActiveSkin.Css.Content,varValues));
                 }
 
             }
