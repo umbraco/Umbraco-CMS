@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.template;
 using umbraco.BusinessLogic;
 using umbraco.presentation.nodeFactory;
 using umbraco.cms.businesslogic.packager;
+using System.IO;
 
 namespace umbraco.presentation.LiveEditing.Modules.SkinModule
 {
@@ -38,6 +39,18 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
         protected void btnOk_Click(object sender, EventArgs e)
         {
             this.ActiveSkin.SaveOutput();
+
+            //css vars
+            SortedList<string, string> cssVars = new SortedList<string, string>();
+            if (this.ActiveSkin.Css != null)
+            {
+                foreach (CssVariable cssVar in this.ActiveSkin.Css.Variables)
+                {
+                    cssVars.Add(cssVar.Name, cssVar.DefaultValue);
+                }
+            }
+
+
             foreach (Dependency dependency in this.sDependencies)
             {
                 if (dependency.DependencyType.Values.Count > 0)
@@ -51,7 +64,30 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                             this.ActiveSkin.AddTaskHistoryNode(task.TaskType.ToXml(details.OriginalValue, details.NewValue));
                         }
                     }
+
+                    //css vars
+                    if (!string.IsNullOrEmpty(dependency.Variable))
+                    {
+                        if(cssVars[dependency.Variable] != null)
+                            cssVars[dependency.Variable] = output;
+                    }
                 }
+            }
+
+            if (this.ActiveSkin.Css != null && !string.IsNullOrEmpty(this.ActiveSkin.Css.Content) && !string.IsNullOrEmpty(this.ActiveSkin.Css.TargetFile))
+            {
+                string content = this.ActiveSkin.Css.Content;
+                //css vars
+                foreach (var var in cssVars)
+                {
+                    content = content.Replace("@" + var.Key, var.Value);
+                }
+
+                //save
+
+                StreamWriter sw = File.AppendText(IO.IOHelper.MapPath(SystemDirectories.Css) + "/" + this.ActiveSkin.Css.TargetFile);
+                sw.Write(content);
+                sw.Close();
             }
 
             library.RefreshContent();
