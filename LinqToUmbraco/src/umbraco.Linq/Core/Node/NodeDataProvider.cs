@@ -331,8 +331,21 @@ namespace umbraco.Linq.Core.Node
                 string data = null;
                 //if the XML doesn't contain the property it means that the node hasn't been re-published with the property
                 //so then we'll leave the data at null, otherwise let's grab it
-                if (propertyXml != null)
-                    data = propertyXml.Value;
+                //Check if the propertyXml and propertyXml.FirstNode aren't null. If they are we don't need to set the value.
+                if (propertyXml != null && propertyXml.FirstNode != null)
+                {
+                    //If the FirstNode is an XElement it means the property contains inner xml and we should return it. Otherwise just return the normal value.
+                    if (propertyXml.FirstNode is XElement)
+                    {
+                        var reader = propertyXml.CreateReader();
+                        reader.MoveToContent();
+                        data = reader.ReadInnerXml();
+                    }
+                    else
+                    {
+                        data = propertyXml.Value;
+                    }
+                }
 
                 if (p.PropertyType.IsValueType && p.PropertyType.GetGenericArguments().Length > 0 && typeof(Nullable<>).IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition()))
                 {
