@@ -10,6 +10,7 @@ using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.propertytype;
+using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 
 [assembly: InternalsVisibleTo("Umbraco.Test")]
@@ -761,6 +762,15 @@ namespace umbraco.cms.businesslogic
             Cache.ClearCacheItem(GetPropertiesCacheKey());
 
             ClearVirtualTabs();
+
+            // clear anything that uses this as master content type
+            if (this.nodeObjectType == DocumentType._objectType)
+            {
+                List<DocumentType> cacheToFlush = DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == Id);
+                foreach(DocumentType dt in cacheToFlush)
+                    FlushFromCache(dt.Id);
+
+            }
         }
 
         protected internal void FlushAllFromCache()

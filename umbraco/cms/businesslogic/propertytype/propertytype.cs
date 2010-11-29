@@ -322,7 +322,8 @@ namespace umbraco.cms.businesslogic.propertytype
             FlushCache();
 
             // clean all properties on inherited document types (if this propertytype is removed from a master)
-            DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == _contenttypeid).ForEach(dt => cleanPropertiesOnDeletion(dt.Id));
+            cleanPropertiesOnDeletion(_contenttypeid);
+//            DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == _contenttypeid).ForEach(dt => cleanPropertiesOnDeletion(dt.Id));
 
             // Delete all properties of propertytype
             cleanPropertiesOnDeletion(_contenttypeid);
@@ -337,6 +338,10 @@ namespace umbraco.cms.businesslogic.propertytype
 
         private void cleanPropertiesOnDeletion(int contentTypeId)
         {
+            // first delete from all master document types
+            DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == contentTypeId).ForEach(dt => cleanPropertiesOnDeletion(dt.Id));
+
+            // then remove from the current doc type
             var objs = Content.getContentOfContentType(new ContentType(contentTypeId));
             foreach (Content c in objs.ToList())
             {

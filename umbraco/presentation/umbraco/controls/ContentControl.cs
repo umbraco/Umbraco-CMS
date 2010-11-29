@@ -270,7 +270,7 @@ namespace umbraco.controls
         private void addControlNew(Property p, TabPage tp, string Caption)
         {
             IDataType dt = p.PropertyType.DataTypeDefinition.DataType;
-            dt.DataEditor.Editor.ID = p.PropertyType.Alias;
+            dt.DataEditor.Editor.ID = string.Format("prop_{0}", p.PropertyType.Alias);
             dt.Data.PropertyId = p.Id;
 
             // check for buttons

@@ -322,11 +322,14 @@ jQuery(function() { refreshDropDowns(); });
                     propSort.ID = "propSort_" + t.Id.ToString() + "_Content";
                     PropertyTypes.Controls.Add(propSort);
                     _sortLists.Add(propSort);
-                    PropertyTypes.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"t_" + t.Id.ToString() + "_Contents\">"));
 
-                    foreach (cms.businesslogic.propertytype.PropertyType pt in t.PropertyTypes)
+                    var pts = t.PropertyTypes.Where(pt => pt.ContentTypeId == cType.Id);
+
+                    if (pts.Count() > 0)
                     {
-                        if (pt.ContentTypeId == cType.Id)
+                        PropertyTypes.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"t_" + t.Id.ToString() + "_Contents\">"));
+
+                        foreach (cms.businesslogic.propertytype.PropertyType pt in pts)
                         {
                             GenericProperties.GenericPropertyWrapper gpw = new umbraco.controls.GenericProperties.GenericPropertyWrapper();
 
@@ -350,11 +353,9 @@ jQuery(function() { refreshDropDowns(); });
                             counter++;
                             hasProperties = true;
                         }
+
+                        PropertyTypes.Controls.Add(new LiteralControl("</ul>"));
                     }
-
-
-
-                    PropertyTypes.Controls.Add(new LiteralControl("</ul></div>"));
 
                     var jsSortable = @"                            
                                 (function($) {
@@ -374,10 +375,12 @@ jQuery(function() { refreshDropDowns(); });
                         addNoPropertiesDefinedMessage();
                     }
 
+                    PropertyTypes.Controls.Add(new LiteralControl("</div>"));
                 }
                 else
                 {
                     addNoPropertiesDefinedMessage();
+                    PropertyTypes.Controls.Add(new LiteralControl("</div>"));
                 }
             }
 
@@ -446,7 +449,7 @@ jQuery(function() { refreshDropDowns(); });
 
             if (!propertyTabHasProperties)
             {
-                PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div></div>"));
+                PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div>"));
                 PropertyTypes.Controls.Remove(PropertyTypes.FindControl("propertiesPH"));
             }
             else
@@ -456,7 +459,7 @@ jQuery(function() { refreshDropDowns(); });
 
         private void addNoPropertiesDefinedMessage()
         {
-            PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div></div>"));
+            PropertyTypes.Controls.Add(new LiteralControl("<div style=\"margin: 10px; padding: 4px; border: 1px solid #ccc;\">No properties defined on this tab. Click on the \"add a new property\" link at the top to create a new property.</div>"));
         }
 
         protected void gpw_Delete(object sender, System.EventArgs e)
