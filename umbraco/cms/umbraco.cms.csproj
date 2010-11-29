@@ -227,7 +227,6 @@
     <Compile Include="businesslogic\skinning\Dependency.cs" />
     <Compile Include="businesslogic\skinning\DependencyType.cs" />
     <Compile Include="businesslogic\skinning\EmbeddedCss.cs" />
-    <Compile Include="businesslogic\skinning\Palette.cs" />
     <Compile Include="businesslogic\ProviderBase.cs" />
     <Compile Include="businesslogic\skinning\Skin.cs" />
     <Compile Include="businesslogic\skinning\Task.cs" />
@@ -236,8 +235,6 @@
     <Compile Include="businesslogic\skinning\tasks\ModifyPageProperty.cs" />
     <Compile Include="businesslogic\skinning\tasks\ModifyTemplate.cs" />
     <Compile Include="businesslogic\skinning\TaskType.cs" />
-    <Compile Include="businesslogic\skinning\utils\CssParser.cs" />
-    <Compile Include="businesslogic\skinning\utils\SkinManifestParser.cs" />
     <Compile Include="businesslogic\Tags\Tag.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />

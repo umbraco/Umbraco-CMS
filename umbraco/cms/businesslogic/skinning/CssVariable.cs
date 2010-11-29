@@ -12,23 +12,7 @@ namespace umbraco.cms.businesslogic.skinning
         public string DefaultValue { get; set; }
         public List<CssVariableProperty> Properties { get; set; }
 
-        public CssVariable()
-        {
-            Properties = new List<CssVariableProperty>();
-        }
-        public CssVariable(string name)
-        {
-            this.Name = name;
-            Properties = new List<CssVariableProperty>();
-        }
-
-        public CssVariable(string name, string defaultValue)
-        {
-            this.Name = name;
-            this.DefaultValue = defaultValue;
-
-            Properties = new List<CssVariableProperty>();
-        }
+      
 
         public static CssVariable CreateFromXmlNode(XmlNode node)
         {

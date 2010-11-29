@@ -13,9 +13,9 @@ namespace umbraco.cms.businesslogic.skinning
     {
         public Skin()
         {
-            //AllowedDocumentTypeAliases = new List<string>();
+          
             Dependencies = new List<Dependency>();
-            //Palettes = new List<Palette>();
+
         }
 
         public static Skin CreateFromFile(string filename)
@@ -57,11 +57,7 @@ namespace umbraco.cms.businesslogic.skinning
             if(node.SelectSingleNode("/Skin/Description") != null)
                 s.Description = node.SelectSingleNode("/Skin/Description").InnerText;
 
-            //if (node.SelectSingleNode("/Skin/AllowedDocumentTypes") != null)
-            //{
-            //    s.AllowedDocumentTypeAliases.AddRange(
-            //        node.SelectSingleNode("/Skin/AllowedDocumentTypes").InnerText.Split(','));
-            //}
+         
 
             if (node.SelectSingleNode("/Skin/AllowedRootTemplate") != null)
                 s.AllowedRootTemplate = node.SelectSingleNode("/Skin/AllowedRootTemplate").InnerText;
@@ -80,10 +76,7 @@ namespace umbraco.cms.businesslogic.skinning
                 }
             }
 
-            //foreach (XmlNode palNode in node.SelectNodes("/Skin//Palette"))
-            //{
-            //    s.Palettes.Add(Palette.CreateFromXmlNode(palNode));
-            //}
+           
 
             if (node.SelectSingleNode("/Skin/CSS") != null)
                 s.Css = EmbeddedCss.CreateFromXmlNode(node.SelectSingleNode("/Skin/CSS"));
@@ -165,13 +158,12 @@ namespace umbraco.cms.businesslogic.skinning
 
         public string Alias { get; set; }
 
-        //public List<string> AllowedDocumentTypeAliases { get; set; }
+     
         public string AllowedRootTemplate { get; set; }
 
 
         public List<Dependency> Dependencies { get; set; }
 
-        //public List<Palette> Palettes { get; set; }
 
 
         public EmbeddedCss Css { get; set; }
