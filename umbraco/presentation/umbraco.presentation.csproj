@@ -1657,6 +1657,7 @@
     <Content Include="install\steps\Skinning\loadStarterKitDesigns.ascx" />
     <Content Include="install\steps\Skinning\loadStarterKits.ascx" />
     <Content Include="install\Title.ascx" />
+    <Content Include="umbraco\config\lang\ko.xml" />
     <Content Include="umbraco\dashboard\ChangePassword.ascx" />
     <Content Include="umbraco\dashboard\DeveloperDashboardIntro.ascx" />
     <Content Include="umbraco\dashboard\DeveloperDashboardVideos.ascx" />
