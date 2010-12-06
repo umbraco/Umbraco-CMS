@@ -55,7 +55,7 @@ namespace umbraco.controls
         {
             base.OnInit(e);
 
-            int docTypeId = int.Parse(Request.QueryString["id"]);
+            int docTypeId = getDocTypeId();
             cType = new cms.businesslogic.ContentType(docTypeId);
 
             setupInfoPane();
@@ -66,6 +66,11 @@ namespace umbraco.controls
             setupGenericPropertiesPane();
             setupTabPane();
 
+        }
+
+        private int getDocTypeId()
+        {
+            return int.Parse(Request.QueryString["id"]);
         }
 
         protected void Page_Load(object sender, System.EventArgs e)
@@ -109,6 +114,9 @@ namespace umbraco.controls
             SaveTabs();
 
             SaveAllowedChildTypes();
+
+            // reload content type (due to caching)
+            cType = new ContentType(cType.Id);
             bindDataGenericProperties(true);
 
             // we need to re-bind the alias as the SafeAlias method can have changed it
@@ -554,8 +562,7 @@ jQuery(function() { refreshDropDowns(); });
                 if (cType.getPropertyType(Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim())) == null)
                 {
                     string[] info = { gpData.Name, gpData.Type.ToString() };
-                    cType.AddPropertyType(cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(gpData.Type), Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim()), gpData.Name);
-                    cms.businesslogic.propertytype.PropertyType pt = cType.getPropertyType(Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim()));
+                    cms.businesslogic.propertytype.PropertyType pt = cType.AddPropertyType(cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(gpData.Type), Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim()), gpData.Name);
                     pt.Mandatory = gpData.Mandatory;
                     pt.ValidationRegExp = gpData.Validation;
                     pt.Description = gpData.Description;
