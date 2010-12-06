@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Xml;
+using umbraco.cms.businesslogic;
 using umbraco.IO;
 using umbraco.presentation;
 using umbraco.BusinessLogic.Actions;
@@ -75,7 +76,7 @@ namespace umbraco.dialogs
 
         private bool CheckCreatePermissions(int nodeId)
         {
-            return UmbracoEnsuredPage.CurrentUser.GetPermissions(new Document(nodeId).Path)
+            return UmbracoEnsuredPage.CurrentUser.GetPermissions(new CMSNode(nodeId).Path)
                 .Contains(ActionNew.Instance.Letter.ToString());
         }
 
