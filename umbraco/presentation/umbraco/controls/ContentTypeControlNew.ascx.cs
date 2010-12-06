@@ -192,7 +192,7 @@ jQuery(function() { refreshDropDowns(); });
 
             txtName.Text = cType.GetRawText();
             txtAlias.Text = cType.Alias;
-            description.Text = cType.Description;
+            description.Text = cType.GetRawDescription();
 
         }
         #endregion

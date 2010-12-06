@@ -215,7 +215,30 @@ namespace umbraco.cms.businesslogic
         /// <value>The description.</value>
         public string Description
         {
-            get { return _description; }
+            get {
+                if (_description != null)
+                {
+                    if (!_description.StartsWith("#"))
+                        return _description;
+                    else
+                    {
+                        Language lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
+                        if (lang != null)
+                        {
+                            if (Dictionary.DictionaryItem.hasKey(_description.Substring(1, _description.Length - 1)))
+                            {
+                                var di =
+                                    new Dictionary.DictionaryItem(_description.Substring(1, _description.Length - 1));
+                                return di.Value(lang.id);
+                            }
+                        }
+                    }
+
+                    return "[" + _description + "]";
+                }
+
+                return _description;
+            }
             set
             {
                 _description = value;
@@ -471,7 +494,10 @@ namespace umbraco.cms.businesslogic
         {
             return base.Text;
         }
-
+        public string GetRawDescription()
+        {
+            return _description;
+        }
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
         /// </summary>

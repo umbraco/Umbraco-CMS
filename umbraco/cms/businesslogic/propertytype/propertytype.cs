@@ -166,8 +166,8 @@ namespace umbraco.cms.businesslogic.propertytype
 
                     return "[" + _description + "]";
                 }
-                else
-                    return _description;
+
+                return _description;
             }
             set
             {
