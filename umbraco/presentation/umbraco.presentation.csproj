@@ -106,12 +106,6 @@
     <Reference Include="Lucene.Net, Version=2.9.2.2, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>C:\Users\Shannon\Documents\Visual Studio 2008\Projects\Umbraco\Branch-4.1\foreign dlls\Lucene.Net.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Scripting">
-      <HintPath>..\..\foreign dlls\DLR 2.0 SP1\Microsoft.Scripting.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Scripting.Core">
-      <HintPath>..\..\foreign dlls\DLR 2.0 SP1\Microsoft.Scripting.Core.dll</HintPath>
-    </Reference>
     <Reference Include="Nibble.Umb.ZipUpload">
       <HintPath>..\..\foreign dlls\Nibble.Umb.ZipUpload.dll</HintPath>
     </Reference>
@@ -711,8 +705,6 @@
       <DependentUpon>MemberSearch.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\preview\Preview.cs" />
-    <Compile Include="umbraco\scripting\MacroScript.cs" />
-    <Compile Include="umbraco\scripting\ScriptEngine.cs" />
     <Compile Include="umbraco\Search\ExamineEvents.cs" />
     <Compile Include="umbraco\Search\QuickSearch.ascx.cs">
       <DependentUpon>QuickSearch.ascx</DependentUpon>

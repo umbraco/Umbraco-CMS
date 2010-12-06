@@ -103,7 +103,7 @@ namespace umbraco {
             if (checkDomain && Domain.Exists(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]))
             {
                 // we need to get the node based on domain
-                Node n = new Node(Domain.GetRootFromDomain(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]));
+                INode n = new Node(Domain.GetRootFromDomain(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]));
                 domainUrl = n.UrlName; // we don't use niceUrlFetch as we need more control
                 if (n.Parent != null)
                 {

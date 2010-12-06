@@ -21,26 +21,27 @@ namespace umbraco.cms.businesslogic.skinning
         static private string _skinningXmlSource = IOHelper.MapPath(SystemFiles.SkinningXml, false);
 
         private const string CACHEKEY = "SkinnableTemplates";
-        
+
         private static void clearCheckPages()
         {
             _checkedPages.Clear();
         }
 
-        
+
         public static void RollbackSkin(int template)
         {
             string currentSkin = GetCurrentSkinAlias(template);
             Skin skin = Skin.CreateFromAlias(currentSkin);
 
-            if (skin != null) {
-              skin.RollbackDependencies();
+            if (skin != null)
+            {
+                skin.RollbackDependencies();
 
-              if (skin.OverridesTemplates())
-                skin.RollbackTemplateFiles();
+                if (skin.OverridesTemplates())
+                    skin.RollbackTemplateFiles();
 
-              //else
-              //    skin.RollbackDependencies();
+                //else
+                //    skin.RollbackDependencies();
             }
 
             RemoveSkin(template);
@@ -57,10 +58,11 @@ namespace umbraco.cms.businesslogic.skinning
         {
             //lookup template in skinning.config
             string currentSkin = GetCurrentSkinAlias(template);
-            
+
             //if different from current, and the template is skinned
-            if(currentSkin != skinAlias){ 
-                
+            if (currentSkin != skinAlias)
+            {
+
                 //this will restore the files to the standard runway, as they looked before the skin was applied
                 if (currentSkin != string.Empty)
                 {
@@ -80,19 +82,19 @@ namespace umbraco.cms.businesslogic.skinning
             }
         }
 
-        
-       
+
+
         private static void save()
         {
-                System.IO.FileStream f = System.IO.File.Open(_skinningXmlSource, FileMode.Create);
-                SkinXml.Save(f);
-                f.Close();
+            System.IO.FileStream f = System.IO.File.Open(_skinningXmlSource, FileMode.Create);
+            SkinXml.Save(f);
+            f.Close();
         }
 
         public static string GetCurrentSkinAlias(int templateID)
         {
             XmlElement x = (XmlElement)getTemplate(templateID);
-            if(x != null && x.HasAttribute("alias") && !string.IsNullOrEmpty(x.Attributes["alias"].Value))
+            if (x != null && x.HasAttribute("alias") && !string.IsNullOrEmpty(x.Attributes["alias"].Value))
                 return x.Attributes["alias"].Value;
 
             return string.Empty;
@@ -146,8 +148,8 @@ namespace umbraco.cms.businesslogic.skinning
                 }
             }
             return skins;
-        }        
-        
+        }
+
 
         private static XmlDocument SkinXml
         {
@@ -254,13 +256,13 @@ namespace umbraco.cms.businesslogic.skinning
 
         public static bool IsStarterKitInstalled()
         {
-           foreach(packager.InstalledPackage p in packager.InstalledPackage.GetAllInstalledPackages())
-           {
-               if (p.Data.EnableSkins)
-                   return true;
-               
-           }
-           return false;
+            foreach (packager.InstalledPackage p in packager.InstalledPackage.GetAllInstalledPackages())
+            {
+                if (p.Data.EnableSkins)
+                    return true;
+
+            }
+            return false;
         }
 
         public static Guid? StarterKitGuid()
@@ -276,16 +278,20 @@ namespace umbraco.cms.businesslogic.skinning
 
         public static Guid? StarterKitGuid(int template)
         {
+            string packageFile = IO.IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config";
             XmlDocument installed = new XmlDocument();
-            installed.Load(IO.IOHelper.MapPath(SystemDirectories.Packages) + "/installed/installedPackages.config");
+            if (File.Exists(packageFile))
+            {
+                installed.Load(packageFile);
 
-            XmlNode starterKit = installed.SelectSingleNode(
-                string.Format("//package [@enableSkins = 'True' and @packageGuid != '' and contains(./templates, '{0}')]", template));
-            
-            if (starterKit != null)
-                return new Guid(starterKit.Attributes["packageGuid"].Value);
-            else
-                return null;
+                XmlNode starterKit = installed.SelectSingleNode(
+                    string.Format("//package [@enableSkins = 'True' and @packageGuid != '' and contains(./templates, '{0}')]", template));
+
+                if (starterKit != null)
+                    return new Guid(starterKit.Attributes["packageGuid"].Value);
+            }
+
+            return null;
         }
 
         public static bool HasAvailableSkins(int template)
@@ -300,8 +306,8 @@ namespace umbraco.cms.businesslogic.skinning
                 {
                     string url = umbraco.cms.businesslogic.packager.InstalledPackage.GetByGuid(g.ToString()).Data.SkinWebserviceUrl;
                     umbraco.cms.businesslogic.packager.repositories.Repository repo = cms.businesslogic.packager.repositories.Repository.getByGuid("65194810-1f85-11dd-bd0b-0800200c9a66");
-                    
-                    if(!string.IsNullOrEmpty(url))
+
+                    if (!string.IsNullOrEmpty(url))
                         repo.WebserviceUrl = url;
 
                     r = repo.Webservice.Skins(g.ToString()).Length > 0;
@@ -313,7 +319,7 @@ namespace umbraco.cms.businesslogic.skinning
 
         public static bool IsSkinInstalled(Guid SkinGuid)
         {
-            
+
             return IsPackageInstalled(SkinGuid);
         }
 

@@ -10,7 +10,6 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Xml.Linq;
-using Microsoft.Scripting.Hosting;
 using umbraco.scripting;
 using umbraco.BasePages;
 
@@ -23,12 +22,12 @@ namespace umbraco.presentation.create
         protected void Page_Load(object sender, System.EventArgs e)
         {
             sbmt.Text = ui.Text("create");
-
+/*
             foreach (LanguageSetup ls in MacroScript.GetAvailableLanguages())
             {
                 filetype.Items.Add( new ListItem( ls.DisplayName,  ls.FileExtensions[0].Trim('.')));
             }
-
+*/
             if(!Page.IsPostBack)
                 filetype.SelectedIndex = 0;
 

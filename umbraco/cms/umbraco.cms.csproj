@@ -208,6 +208,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\ISaveHandlerContents.cs" />
+    <Compile Include="businesslogic\macro\IMacroEngine.cs" />
+    <Compile Include="businesslogic\macro\MacroEngineFactory.cs" />
+    <Compile Include="businesslogic\macro\MacroModel.cs" />
     <Compile Include="businesslogic\Packager\FileResources\PackageFiles.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

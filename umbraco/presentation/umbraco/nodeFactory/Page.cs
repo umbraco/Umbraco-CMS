@@ -8,16 +8,18 @@ using System.Xml.XPath;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.propertytype;
 using System.Collections.Generic;
+using umbraco.interfaces;
 
 namespace umbraco.presentation.nodeFactory
 {
+
     /// <summary>
     /// Summary description for Node.
     /// </summary>
 
     [Serializable]
     [XmlType(Namespace = "http://umbraco.org/webservices/")]
-    public class Node
+    public class Node : INode
     {
         private Hashtable _aliasToNames = new Hashtable();
 
@@ -52,7 +54,7 @@ namespace umbraco.presentation.nodeFactory
             }
         }
 
-        public Node Parent
+        public INode Parent
         {
             get
             {
@@ -198,7 +200,7 @@ namespace umbraco.presentation.nodeFactory
             }
         }
 
-        internal string UrlName
+        public string UrlName
         {
             get
             {
@@ -224,6 +226,11 @@ namespace umbraco.presentation.nodeFactory
                     initialize();
                 return _level;
             }
+        }
+
+        public List<IProperty> PropertiesAsList
+        {
+            get { return Properties.Cast<IProperty>().ToList(); }
         }
 
         public Properties Properties
@@ -298,7 +305,7 @@ namespace umbraco.presentation.nodeFactory
             initialize();
         }
 
-        public Property GetProperty(string Alias)
+        public IProperty GetProperty(string Alias)
         {
             foreach (Property p in Properties)
             {
@@ -319,9 +326,9 @@ namespace umbraco.presentation.nodeFactory
 
         }
 
-        public List<Node> ChildrenAsList
+        public List<INode> ChildrenAsList
         {
-            get { return Children.Cast<Node>().ToList(); }
+            get { return Children.Cast<INode>().ToList(); }
         }
 
         public DataTable ChildrenAsTable()
@@ -571,7 +578,7 @@ namespace umbraco.presentation.nodeFactory
 
     [Serializable]
     [XmlType(Namespace = "http://umbraco.org/webservices/")]
-    public class Property
+    public class Property : IProperty
     {
         private Guid _version;
         private string _alias;

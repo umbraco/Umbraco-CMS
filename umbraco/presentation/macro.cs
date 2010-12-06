@@ -15,11 +15,11 @@ using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.Xsl;
 using umbraco.BusinessLogic;
+using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.member;
 using umbraco.DataLayer;
 using umbraco.interfaces;
 using umbraco.IO;
-using umbraco.Models;
 using umbraco.presentation.nodeFactory;
 using umbraco.presentation.templateControls;
 using umbraco.presentation.xslt.Exslt;
@@ -443,18 +443,18 @@ namespace umbraco
                         try
                         {
                             HttpContext.Current.Trace.Write("umbracoMacro",
-                                                            "DLR Script script added (" + ScriptFile + ")");
-                            MacroModel model = new MacroModel(this, attributes);
+                                                            "MacroEngine script added (" + ScriptFile + ")");
+                            MacroModel model = ConvertToMacroModel(attributes);
                             macroControl = loadMacroDLR(model);
                             break;
                         }
                         catch (Exception e)
                         {
                             HttpContext.Current.Trace.Warn("umbracoMacro",
-                                                           "Error loading python script (file: " + ScriptFile +
+                                                           "Error loading MacroEngine script (file: " + ScriptFile +
                                                            ", Type: '" + scriptType + "'", e);
 
-                            var result = new LiteralControl("Error loading DLR script (file: " + ScriptFile + ")");
+                            var result = new LiteralControl("Error loading MacroEngine script (file: " + ScriptFile + ")");
 
                             /*
                             string args = "<ul>";
@@ -533,6 +533,29 @@ namespace umbraco
                 return macroXSLT;
             }
         }
+
+        public MacroModel ConvertToMacroModel(Hashtable attributes)
+        {
+            MacroModel model = new MacroModel(
+                this.Name,
+                this.Alias,
+                this.ScriptAssembly,
+                this.ScriptType,
+                this.XsltFile,
+                this.ScriptFile,
+                this.RefreshRate,
+                this.CacheByPage,
+                this.CacheByPersonalization
+                );
+
+            foreach (string key in attributes.Keys)
+            {
+                model.Properties.Add(new MacroPropertyModel(key, attributes[key].ToString()));
+            }
+
+            return model;
+        }
+
 
         public static XslCompiledTransform CreateXsltTransform(XmlTextReader xslReader, bool debugMode)
         {
@@ -1097,7 +1120,8 @@ namespace umbraco
             var ret = new LiteralControl();
 
             string path = IOHelper.MapPath(SystemDirectories.Python + "/" + macro.ScriptName);
-//            ret.Text = MacroScript.ExecuteFile(path, args);
+            IMacroEngine engine = MacroEngineFactory.GetByFilename(path);
+            ret.Text = engine.Execute(macro, Node.GetCurrent());
 
             return ret;
         }
@@ -1624,101 +1648,4 @@ namespace umbraco
             return Namespace;
         }
     }
-}
-
-namespace umbraco.Models
-{
-    [Serializable]
-    public class MacroModel
-    {
-        public string Name { get; set; }
-        public string Alias { get; set; }
-
-        public string TypeAssembly { get; set; }
-        public string TypeName { get; set; }
-        public string Xslt { get; set; }
-        public string ScriptName { get; set; }
-        public string ScriptCode { get; set; }
-
-        public int CacheDuration { get; set; }
-        public bool CacheByPage { get; set; }
-        public bool CacheByMember { get; set; }
-
-        public List<MacroPropertyModel> Properties { get; set; }
-
-        public MacroModel()
-        {
-            Properties = new List<MacroPropertyModel>();
-        }
-
-        public MacroModel(string name, string alias, string typeAssembly, string typeName, string xslt, string scriptName, int cacheDuration, bool cacheByPage, bool cacheByMember)
-        {
-            Name = name;
-            Alias = alias;
-            TypeAssembly = typeAssembly;
-            TypeName = typeName;
-            Xslt = xslt;
-            ScriptName = scriptName;
-            CacheDuration = cacheDuration;
-            CacheByPage = cacheByPage;
-            CacheByMember = cacheByMember;
-
-            Properties = new List<MacroPropertyModel>();
-        }
-
-        public MacroModel(macro macro, Hashtable attributes)
-        {
-            Name = macro.Name;
-            Alias = macro.Alias;
-            TypeAssembly = macro.ScriptAssembly;
-            TypeName = macro.ScriptType;
-            Xslt = macro.XsltFile;
-            ScriptName = macro.ScriptFile;
-            CacheDuration = macro.RefreshRate;
-            CacheByPage = macro.CacheByPage;
-            CacheByMember = macro.CacheByPersonalization;
-
-            Properties = new List<MacroPropertyModel>();
-            foreach (string key in attributes.Keys)
-            {
-                Properties.Add(new MacroPropertyModel(key, attributes[key].ToString()));
-            }
-        }
-
-    }
-
-    [Serializable]
-    public class MacroPropertyModel
-    {
-        public string Key { get; set; }
-        public string Value { get; set; }
-
-        public MacroPropertyModel()
-        {
-
-        }
-
-        public MacroPropertyModel(string key, string value)
-        {
-            Key = key;
-            Value = value;
-        }
-    }
-}
-
-namespace umbraco.interfaces {
-    public interface IMacroEngine
-    {
-        string Name
-        {
-            get;
-        }
-        List<string> SupportedExtensions
-        {
-            get;
-        }
-
-        string Execute(MacroModel macro, Node currentPage);
-    }
-
 }

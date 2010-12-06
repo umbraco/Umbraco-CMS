@@ -149,6 +149,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IMenuElement.cs" />
+    <Compile Include="INode.cs" />
     <Compile Include="INotFoundHandler.cs">
       <SubType>Code</SubType>
     </Compile>

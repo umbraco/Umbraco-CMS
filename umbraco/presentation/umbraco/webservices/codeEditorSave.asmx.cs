@@ -251,7 +251,8 @@ namespace umbraco.presentation.webservices
 
                     try
                     {
-                        MacroScript.ExecuteFile(tempFileName, args);
+                        // TODO: Hook the new MacroEngine
+//                        MacroScript.ExecuteFile(tempFileName, args);
                     }
                     catch (Exception err)
                     {
