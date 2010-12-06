@@ -13,6 +13,7 @@ namespace umbraco.editorControls
 	/// </summary>
 	[DefaultProperty("Text"), 
 	ToolboxData("<{0}:dateField runat=server></{0}:dateField>")]
+    [ValidationProperty("Text")]
 	public class dateField : DateTimePicker, interfaces.IDataEditor
 	{
 
