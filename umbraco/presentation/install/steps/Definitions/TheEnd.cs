@@ -15,7 +15,7 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override string Name
         {
-            get { return "Umbraco " + GlobalSettings.CurrentVersion + " is installed and ready for use"; }
+          get { return "You’re Done"; }
         }
 
         public override string UserControl

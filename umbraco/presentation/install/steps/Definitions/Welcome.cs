@@ -6,29 +6,22 @@ using umbraco.cms.businesslogic.installer;
 
 namespace umbraco.presentation.install.steps.Definitions
 {
-    public class License : InstallerStep
+    public class Welcome : InstallerStep
     {
         public override string Alias
         {
-            get { return "license"; }
+            get { return "welcome"; }
         }
 
         public override string Name
         {
-            get { return "License"; }
+            get { return "Welcome"; }
         }
 
-        public override bool HideNextButtonUntillCompleted
-        {
-            get
-            {
-                return false;
-            }
-        }
-
+      
         public override string UserControl
         {
-            get { return IO.SystemDirectories.Install + "/steps/license.ascx"; }
+            get { return IO.SystemDirectories.Install + "/steps/welcome.ascx"; }
         }
 
         public override bool Completed()
@@ -36,12 +29,5 @@ namespace umbraco.presentation.install.steps.Definitions
             return false;
         }
 
-        public override string NextButtonText
-        {
-            get
-            {
-                return "I accept the license";
-            }
-        }
-    }
+     }
 }

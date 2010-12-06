@@ -15,18 +15,10 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override string Name
         {
-            get { return "Configure the administrator password"; }
+          get { return "Create User"; }
         }
 
-        public override bool HideNextButtonUntillCompleted
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string UserControl
+       public override string UserControl
         {
             get { return IO.SystemDirectories.Install + "/steps/defaultuser.ascx"; }
         }

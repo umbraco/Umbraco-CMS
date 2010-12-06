@@ -19,6 +19,12 @@ namespace umbraco.presentation.install.steps.Definitions
             get { return "Hi " + new User(0).Name + " you are running umbraco"; }
         }
 
+        public override bool HideFromNavigation {
+          get {
+            return true;
+          }
+        }
+
         public override string UserControl
         {
             get { return IO.SystemDirectories.Install + "/steps/skinning.ascx"; }

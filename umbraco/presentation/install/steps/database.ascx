@@ -1,10 +1,8 @@
 <%@ Control Language="c#" AutoEventWireup="True" CodeBehind="database.ascx.cs" Inherits="umbraco.presentation.install.steps.detect"
     TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
-<h2>
-    Database configuration</h2>
+
+
 <asp:Panel ID="settings" runat="server" Visible="true">
-    <h2>
-        Database configuration</h2>
     <div runat="server" id="div_info" class="notice">
         <p>
             To complete this step, you must know some information regarding your database server
@@ -31,6 +29,7 @@
                     </p>
                 </div>
             </asp:PlaceHolder>
+
     <ol class="form">
         <li runat="server" id="DatabaseTypeItem">
             <asp:Label runat="server" AssociatedControlID="DatabaseType" ID="DatabaseTypeLabel">Type:</asp:Label>
@@ -89,6 +88,7 @@
             </p>
         </div>
     </asp:PlaceHolder>
+
     <asp:PlaceHolder ID="none" runat="server" Visible="False">
         <div class="notice">
             <p>
@@ -97,7 +97,8 @@
                 database</p>
         </div>
     </asp:PlaceHolder>
-    <asp:Literal ID="error" runat="server" Visible="False">
+
+<asp:Literal ID="error" runat="server" Visible="False">
 <div class="error">
 <p>Database not found! Please check that the information in the "connection string" of the “web.config” file is correct.</p>
 <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "umbracoDbDSN" and save the file. </p>
@@ -106,16 +107,21 @@ Click the <strong>retry</strong> button when
 done.<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
 			More information on editing web.config here.</a></p>
 </div>
-    </asp:Literal>
+</asp:Literal>
+
 </asp:Panel>
+
 <asp:Button ID="upgrade" Text="Upgrade" Visible="False" runat="server" CssClass="button"
     OnClientClick="showProgress(this,'loadingBar'); return true;" OnClick="upgrade_Click">
 </asp:Button>
+
 <asp:Button ID="install" Text="Install" Visible="False" runat="server" CssClass="button"
     OnClientClick="showProgress(this,'loadingBar'); return true;" OnClick="install_Click">
 </asp:Button>
+
 <asp:Button ID="retry" Text="Retry" Visible="False" runat="server" OnClientClick="showProgress(this,'loadingBar'); return true;"
     CssClass="button" />
+
 <asp:Panel ID="confirms" runat="server" Visible="False">
     <asp:PlaceHolder ID="installConfirm" runat="server" Visible="False">
         <div class="success">

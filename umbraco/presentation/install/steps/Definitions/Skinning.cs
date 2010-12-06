@@ -16,17 +16,10 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override string Name
         {
-            get { return "Configure your site"; }
+          get { return "Starter Kit"; }
         }
 
-        public override bool HideNextButtonUntillCompleted
-        {
-            get
-            {
-                return true;
-            }
-        }
-
+     
         public override string UserControl
         {
             get { return IO.SystemDirectories.Install + "/steps/skinning.ascx"; }

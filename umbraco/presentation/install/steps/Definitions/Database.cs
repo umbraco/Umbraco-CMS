@@ -18,7 +18,7 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override string Name
         {
-            get { return "Database configuration"; }
+          get { return "Database"; }
         }
 
         public override string UserControl
@@ -26,13 +26,6 @@ namespace umbraco.presentation.install.steps.Definitions
             get { return SystemDirectories.Install + "/steps/database.ascx"; }
         }
 
-        public override bool HideNextButtonUntillCompleted
-        {
-            get
-            {
-                return false;
-            }
-        }
         
         public override bool MoveToNextStepAutomaticly
         {

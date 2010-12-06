@@ -23,6 +23,12 @@ namespace umbraco.presentation.install.steps.Definitions
             get { return IO.SystemDirectories.Install + "/steps/validatepermissions.ascx"; }
         }
 
+        public override bool HideFromNavigation {
+          get {
+            return true;
+          }
+        }
+        
         public override bool Completed()
         {
             return utills.FilePermissions.RunFilePermissionTestSuite();

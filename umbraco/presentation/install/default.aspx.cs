@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 using System.Collections.Specialized;
 using umbraco.IO;
 using umbraco.cms.businesslogic.installer;
+using System.Collections.Generic;
 
 namespace umbraco.presentation.install
 {
@@ -21,22 +22,20 @@ namespace umbraco.presentation.install
 	{
 
 		private string _installStep = "";
-        public string currentStepClass = "";
+    public string currentStepClass = "";
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-			ClientLoader.DataBind();
-
-			//If user wishes to subscribe to security updates
+      //If user wishes to subscribe to security updates
 			if (!string.IsNullOrEmpty(Request["email"]) && !string.IsNullOrEmpty(Request["name"]))
 				SubscribeToNewsLetter(Request["name"], Request["email"]);
 
 			// use buffer, so content isn't sent until it's ready (minimizing the blank screen experience)
-			Response.Buffer = true;
-			
-			//ScriptManager sm = Page.FindControl("umbracoScriptManager") as ScriptManager;
-			//webservices.ajaxHelpers.EnsureLegacyCalls(Page);
-			//prepareNextButton();
+			//Response.Buffer = true;
+
+      rp_steps.DataSource = InstallerSteps().Values;
+      rp_steps.DataBind();
+
 		}
 
 		private void SubscribeToNewsLetter(string name, string email) {
@@ -57,7 +56,9 @@ namespace umbraco.presentation.install
 			PlaceHolderStep.Controls.Clear();
 			PlaceHolderStep.Controls.Add(new System.Web.UI.UserControl().LoadControl(IOHelper.ResolveUrl( currentStep.UserControl ) ));
 			step.Value = currentStep.Alias;
+      currentStepClass = currentStep.Alias;
 
+      /*
             if (!currentStep.Completed() && currentStep.HideNextButtonUntillCompleted)
                 next.Visible = false;
             else
@@ -70,20 +71,36 @@ namespace umbraco.presentation.install
             
 			lt_header.Text = currentStep.Name;
             currentStepClass = currentStep.Alias;
+       * */
 		}
 
+    int stepCounter = 0;
+    protected void bindStep(object sender, RepeaterItemEventArgs e) {
 
-		protected void onNextCommand(object sender, CommandEventArgs e)
-		{
-            string currentStep = (string)e.CommandArgument;
-            GotoNextStep(currentStep);
-		}
+      if (e.Item.ItemType == ListItemType.AlternatingItem || e.Item.ItemType == ListItemType.Item) {
+        InstallerStep i = (InstallerStep)e.Item.DataItem;
 
-        public void GotoNextStep(string currentStep)
-        {
-            InstallerStep _s = InstallerSteps().GotoNextStep(currentStep);
-            Response.Redirect("?installStep=" + _s.Alias);
-        }
+        if (!i.HideFromNavigation) {
+          Literal _class = (Literal)e.Item.FindControl("lt_class");
+          Literal _name = (Literal)e.Item.FindControl("lt_name");
+
+          if (i.Alias == currentStepClass)
+            _class.Text = "active";
+
+          stepCounter++;
+          _name.Text = (stepCounter).ToString() + " - " + i.Name;
+        } else
+          e.Item.Visible = false;
+
+      }
+    }
+		
+
+    public void GotoNextStep(string currentStep)
+    {
+        InstallerStep _s = InstallerSteps().GotoNextStep(currentStep);
+        Response.Redirect("?installStep=" + _s.Alias);
+    }
 
 
 		#region Web Form Designer generated code
@@ -133,17 +150,19 @@ namespace umbraco.presentation.install
 		}
 		#endregion
 
+    
 
 		private static InstallerStepCollection InstallerSteps()
 		{
 			InstallerStepCollection ics = new InstallerStepCollection();
-			ics.Add(new install.steps.Definitions.License());
+			ics.Add(new install.steps.Definitions.Welcome());
+      ics.Add(new install.steps.Definitions.License());
 			ics.Add(new install.steps.Definitions.FilePermissions());
 			ics.Add(new install.steps.Definitions.Database());
-            ics.Add(new install.steps.Definitions.DefaultUser());
-            ics.Add( new install.steps.Definitions.Skinning() );
-            ics.Add(new install.steps.Definitions.WebPi());
-            ics.Add(new install.steps.Definitions.TheEnd());
+      ics.Add(new install.steps.Definitions.DefaultUser());
+      ics.Add( new install.steps.Definitions.Skinning() );
+      ics.Add(new install.steps.Definitions.WebPi());
+      ics.Add(new install.steps.Definitions.TheEnd());
 			return ics;
 		}
 /*

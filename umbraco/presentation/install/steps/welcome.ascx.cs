@@ -1,6 +1,6 @@
 using umbraco;
 
-namespace presentation.install.steps
+namespace umbraco.presentation.install
 {
 	using System;
 	using System.Data;
@@ -19,15 +19,19 @@ namespace presentation.install.steps
 		{
 
 			// Check for config!
-            if (GlobalSettings.Configured)
-            {
+      if (GlobalSettings.Configured)
+      {
                 Application.Lock();
                 Application["umbracoNeedConfiguration"] = null;
                 Application.UnLock();
                 Response.Redirect(Request.QueryString["url"] ?? "/", true);
-            }
+       }
              
 		}
+
+    protected void gotoNextStep(object sender, EventArgs e) {
+      Helper.RedirectToNextStep(this.Page);
+    }
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)
@@ -48,4 +52,6 @@ namespace presentation.install.steps
 		}
 		#endregion
 	}
+
+
 }

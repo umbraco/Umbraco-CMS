@@ -13,94 +13,13 @@ namespace umbraco.presentation.install {
     public partial class _default {
         
         /// <summary>
-        /// ClientLoader control.
+        /// rp_steps control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.UmbracoClientDependencyLoader ClientLoader;
-        
-        /// <summary>
-        /// CssInclude2 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.CssInclude CssInclude2;
-        
-        /// <summary>
-        /// JsInclude4 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude4;
-        
-        /// <summary>
-        /// JsInclude3 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude3;
-        
-        /// <summary>
-        /// JsInclude1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
-        
-        /// <summary>
-        /// JsInclude2 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude2;
-        
-        /// <summary>
-        /// JsInclude5 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude5;
-        
-        /// <summary>
-        /// Form1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm Form1;
-        
-        /// <summary>
-        /// umbracoScriptManager control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.ScriptManager umbracoScriptManager;
-        
-        /// <summary>
-        /// lt_header control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal lt_header;
+        protected global::System.Web.UI.WebControls.Repeater rp_steps;
         
         /// <summary>
         /// PlaceHolderStep control.
@@ -110,24 +29,6 @@ namespace umbraco.presentation.install {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.PlaceHolder PlaceHolderStep;
-        
-        /// <summary>
-        /// prgbar control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::umbraco.uicontrols.ProgressBar prgbar;
-        
-        /// <summary>
-        /// next control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button next;
         
         /// <summary>
         /// step control.

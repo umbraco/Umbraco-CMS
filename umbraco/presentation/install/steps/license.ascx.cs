@@ -17,5 +17,9 @@ namespace umbraco.presentation.install.steps
         {
 
         }
+
+        protected void gotoNextStep(object sender, EventArgs e) {
+          Helper.RedirectToNextStep(this.Page);
+        }
     }
 }
