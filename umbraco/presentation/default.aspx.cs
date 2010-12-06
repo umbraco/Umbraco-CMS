@@ -206,6 +206,9 @@ namespace umbraco
             if (!UmbracoSettings.UseAspNetMasterPages)
                 initUmbracoPage();
             base.OnInit(e);
+
+            // Add Umbraco header
+            Response.AddHeader("X-Umbraco-Version", string.Format("{0}.{1}", GlobalSettings.VersionMajor, GlobalSettings.VersionMinor));
         }
 
         private void initUmbracoPage()
