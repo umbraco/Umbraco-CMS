@@ -2,19 +2,19 @@
 <!-- licence box -->
 					<div class="tab main-tabinfo">
 						<div class="container">
-							<h1>Licence</h1>
+							<h1>License</h1>
 							<div class="accept-hold">
 								<h2>Accept the licence for Umbraco CMS</h2>
-								<p>By clicking the next button (or modifying the Umbraco Configuration Status in web config), you accept the licence for this software as specidied in the text below.</p>
+								<p>By clicking the accept button (or modify the Umbraco Configuration Status in web.config), you accept the licence for this software as specified in the text below.</p>
 							</div>
-							<h3>The Licence (MIT):</h3>
+							<h3>The License (MIT):</h3>
 							<div class="box-software">
 								<p>Copyright (c) 2002 - <%=DateTime.Now.Year %> Umbraco I/S</p>
 								<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
 								<p>The above copyright and this permisson notice shall be included in all copies or substantial postions of the software.</p>
 								<p><span>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRENTY OF ANY KIND, EPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USER OR OTHER DEALINGS IN THE SOFTWARE.</span></p>
 							</div>
-							<p>That’s all. That didn’t hert did it?</p>
+							<p>That’s all. That didn’t hurt did it?</p>
 						</div>
 						<!-- btn box -->
 						<footer class="btn-box">

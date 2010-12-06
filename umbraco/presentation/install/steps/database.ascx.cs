@@ -48,12 +48,31 @@ namespace umbraco.presentation.install.steps
             get { return DatabaseType.SelectedValue.ToLower().Contains("sqlce"); }
         }
 
+        protected bool IsConfigured
+        {
+            get { return DatabaseType.SelectedValue != ""; }
+        }
+
+        /// <summary>
+        /// Returns whether the selected database is an embedded database.
+        /// </summary>
+        protected bool HasEmbeddedDatabaseFiles
+        {
+            get {
+                // check if sql ce is present
+                    if (!File.Exists(IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Bin), "System.Data.SqlServerCe.dll"))))
+                        return false;
+                    else
+                        return true;
+            }
+        }
+
         /// <summary>
         /// Returns whether the connection string is set by direct text input.
         /// </summary>
         protected bool ManualConnectionString
         {
-            get { return DatabaseType.SelectedItem.Value.Length == 0; }
+            get { return DatabaseType.SelectedItem.Value == "Custom"; }
         }
 
         /// <summary>
@@ -63,9 +82,6 @@ namespace umbraco.presentation.install.steps
         /// <param name="e">The event arguments.</param>
         protected void Page_Load(object sender, System.EventArgs e)
         {
-            // Disable back/forward buttons
-            Page.FindControl("next").Visible = false;
-
             // Does the user have to enter a connection string?
             if (settings.Visible)
                 ShowDatabaseSettings();
@@ -78,12 +94,9 @@ namespace umbraco.presentation.install.steps
         /// </summary>
         protected void ShowDatabaseSettings()
         {
-
             // Did the connection string of web.config get loaded?
             if (!Page.IsPostBack)
             {
-
-
                 // Parse the connection string
                 DbConnectionStringBuilder connectionStringBuilder = new DbConnectionStringBuilder();
                 connectionStringBuilder.ConnectionString = GlobalSettings.DbDSN;
@@ -110,6 +123,15 @@ namespace umbraco.presentation.install.steps
                 DatabaseUsername.Text = GetConnectionStringValue(connectionStringBuilder, "user id");
                 DatabasePassword.Text = GetConnectionStringValue(connectionStringBuilder, "password");
                 if (string.IsNullOrEmpty(DatabasePassword.Text)) DatabasePassword.Text = GetConnectionStringValue(connectionStringBuilder, "pwd");
+
+
+                toggleVisible(DatabaseServerItem, !ManualConnectionString && !IsEmbeddedDatabase);
+                toggleVisible(DatabaseUsernameItem, !ManualConnectionString && !IsEmbeddedDatabase);
+                toggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
+                toggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
+
+                toggleVisible(DatabaseConnectionString, ManualConnectionString);
+
             }
 
             // Make sure ASP.Net displays the password text
@@ -126,36 +148,34 @@ namespace umbraco.presentation.install.steps
             if (Installer.CurrentVersion == DatabaseVersion.None)
             {
                 dbEmpty.Visible = true;
-                dbUpgrade.Visible = false;
+                //dbUpgrade.Visible = false;
             }
             else
             {
-                version.Text = Installer.CurrentVersion.ToString();
+                //version.Text = Installer.CurrentVersion.ToString();
             }
+
             if (Installer.IsLatestVersion)
             {
-
                 settings.Visible = false;
                 installed.Visible = true;
                 // Enable back/forward buttons
-                Page.FindControl("next").Visible = true;
-
             }
             else
             {
                 if (Installer.CanUpgrade)
                 {
-                    upgrade.Visible = true;
+                    //upgrade.Visible = true;
                     other.Visible = true;
                 }
                 else if (Installer.IsEmpty)
                 {
-                    install.Visible = true;
+                    //install.Visible = true;
                     none.Visible = true;
                 }
                 else
                 {
-                    retry.Visible = true;
+                   // retry.Visible = true;
                     error.Visible = true;
                 }
             }
@@ -206,7 +226,7 @@ namespace umbraco.presentation.install.steps
             }
             else
             {
-                DatabaseError.InnerText = String.Format("{0} {1}", error.Message, error.InnerException.Message);
+                //DatabaseError.InnerText = String.Format("{0} {1}", error.Message, error.InnerException.Message);
             }
         }
 
@@ -260,35 +280,30 @@ namespace umbraco.presentation.install.steps
         /// <param name="e">The event arguments.</param>
         protected void DatabaseType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // check if sql ce is present
-            if (DatabaseType.SelectedValue == "SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco")
-            {
-                if (!File.Exists(IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Bin), "System.Data.SqlServerCe.dll"))))
-                {
-                    sqlCeNotice.Visible = true;
-                }
-            }
-
-
-            DatabaseServerItem.Visible = !ManualConnectionString && !IsEmbeddedDatabase;
-            DatabaseUsernameItem.Visible = !ManualConnectionString && !IsEmbeddedDatabase;
-            DatabasePasswordItem.Visible = !ManualConnectionString && !IsEmbeddedDatabase;
-            DatabaseNameItem.Visible = !ManualConnectionString && !IsEmbeddedDatabase;
+            toggleVisible(DatabaseServerItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            toggleVisible(DatabaseUsernameItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            toggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            toggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
             
-            DatabaseConnectionString.Visible = ManualConnectionString;
+            toggleVisible(DatabaseConnectionString, ManualConnectionString);
+        }
+
+        private void toggleVisible(HtmlGenericControl div, bool visible)
+        {
+            if (!visible)
+                div.Attributes["style"] = "display: none;";
+            else
+                div.Attributes["style"] = "display: block;";
         }
 
         protected void upgrade_Click(object sender, System.EventArgs e)
         {
             Installer.Install();
 
-            Response.Redirect("default.aspx?installStep=defaultUser", true);
-
-            ((HtmlInputHidden)Page.FindControl("step")).Value = "upgradeIndex";
             ((Button)Page.FindControl("next")).Visible = true;
 
             settings.Visible = false;
-            upgrade.Visible = false;
+            //upgrade.Visible = false;
             identify.Visible = false;
             confirms.Visible = true;
             upgradeConfirm.Visible = true;
@@ -298,19 +313,21 @@ namespace umbraco.presentation.install.steps
         {
             Installer.Install();
 
-            ((HtmlInputHidden)Page.FindControl("step")).Value = "validatePermissions";
-            ((Button)Page.FindControl("next")).Visible = true;
-
+            
             settings.Visible = false;
-            install.Visible = false;
+            //install.Visible = false;
             identify.Visible = false;
             confirms.Visible = true;
             installConfirm.Visible = true;
 
             //after the database install we will login the default admin user so we can install boost and nitros later on
-
             if (GlobalSettings.ConfigurationStatus.Trim() == "")
                 BasePages.UmbracoEnsuredPage.doLogin(new global::umbraco.BusinessLogic.User(0));
+        }
+
+        protected void gotoNextStep(object sender, EventArgs e)
+        {
+            Helper.RedirectToNextStep(this.Page);
         }
     }
 }

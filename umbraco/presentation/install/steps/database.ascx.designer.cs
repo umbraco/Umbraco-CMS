@@ -19,52 +19,7 @@ namespace umbraco.presentation.install.steps {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel settings;
-        
-        /// <summary>
-        /// div_info control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl div_info;
-        
-        /// <summary>
-        /// DatabaseError control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl DatabaseError;
-        
-        /// <summary>
-        /// sqlCeNotice control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder sqlCeNotice;
-        
-        /// <summary>
-        /// DatabaseTypeItem control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl DatabaseTypeItem;
-        
-        /// <summary>
-        /// DatabaseTypeLabel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label DatabaseTypeLabel;
+        protected global::System.Web.UI.WebControls.PlaceHolder settings;
         
         /// <summary>
         /// DatabaseType control.
@@ -74,6 +29,15 @@ namespace umbraco.presentation.install.steps {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList DatabaseType;
+        
+        /// <summary>
+        /// embeddedFilesMissing control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl embeddedFilesMissing;
         
         /// <summary>
         /// DatabaseServerItem control.
@@ -211,13 +175,13 @@ namespace umbraco.presentation.install.steps {
         protected global::System.Web.UI.WebControls.TextBox ConnectionString;
         
         /// <summary>
-        /// DatabaseConnectButton control.
+        /// jsVars control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button DatabaseConnectButton;
+        protected global::System.Web.UI.WebControls.Literal jsVars;
         
         /// <summary>
         /// identify control.
@@ -238,31 +202,13 @@ namespace umbraco.presentation.install.steps {
         protected global::System.Web.UI.WebControls.Literal dbEmpty;
         
         /// <summary>
-        /// dbUpgrade control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder dbUpgrade;
-        
-        /// <summary>
-        /// version control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal version;
-        
-        /// <summary>
         /// installed control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal installed;
+        protected global::System.Web.UI.WebControls.PlaceHolder installed;
         
         /// <summary>
         /// other control.
@@ -289,34 +235,7 @@ namespace umbraco.presentation.install.steps {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal error;
-        
-        /// <summary>
-        /// upgrade control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button upgrade;
-        
-        /// <summary>
-        /// install control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button install;
-        
-        /// <summary>
-        /// retry control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button retry;
+        protected global::System.Web.UI.WebControls.PlaceHolder error;
         
         /// <summary>
         /// confirms control.

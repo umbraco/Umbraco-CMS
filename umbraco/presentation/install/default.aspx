@@ -31,8 +31,11 @@
 </head>
 
 <body class="<%= currentStepClass %>">
+
+   
 	<form runat="server">
-	<!-- all page -->
+	 <asp:ScriptManager runat="server" />
+    <!-- all page -->
 
 	<section id="wrapper">
 

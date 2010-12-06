@@ -13,13 +13,22 @@ namespace umbraco.presentation.install.steps {
     public partial class skinning {
         
         /// <summary>
+        /// udp control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel udp;
+        
+        /// <summary>
         /// pl_starterKit control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pl_starterKit;
+        protected global::System.Web.UI.WebControls.PlaceHolder pl_starterKit;
         
         /// <summary>
         /// ph_starterKits control.
@@ -37,7 +46,7 @@ namespace umbraco.presentation.install.steps {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pl_starterKitDesign;
+        protected global::System.Web.UI.WebControls.PlaceHolder pl_starterKitDesign;
         
         /// <summary>
         /// ph_starterKitDesigns control.

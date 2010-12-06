@@ -25,11 +25,7 @@ namespace umbraco.presentation.install.steps.Skinning
 
         }
 
-        protected void NextStep(object sender, EventArgs e)
-        {
-            _default p = (_default)this.Page;
-            p.GotoNextStep(helper.Request("installStep"));
-        }
+       
 
         protected override void OnInit(EventArgs e)
         {
@@ -101,26 +97,17 @@ namespace umbraco.presentation.install.steps.Skinning
                     }
                 }
                 catch{
-
                     _default pa = (_default)this.Page;
                     pa.GotoNextStep(helper.Request("installStep"));
                 }
-
-                //((skinning)Parent.Parent.Parent).showCustomizeSkin();
-
-                pl_CustomizeSkin.Visible = true;
-                pl_loadStarterKitDesigns.Visible = false;
-
-                if(Page.FindControl("next") != null)
-                    Page.FindControl("next").Visible = true;
-
+                
+                _default page = (_default)this.Page;
+                page.GotoNextStep(helper.Request("installStep"));
             }
             else
             {
                 ShowConnectionError();
             }
-
-
         }
     }
 }

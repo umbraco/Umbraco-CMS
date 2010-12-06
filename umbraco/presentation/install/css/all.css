@@ -278,6 +278,11 @@ figure{display: block;}
 	color:#fff;
 	font-weight:normal;
 }
+
+/* added by pph */
+.summary li {margin: 0px 0px 20px; display: block}
+.summary li a{color: white; text-decoration: underline}
+.blogs li a{display: block;}
 /* btn box */
 .btn-box{
 	width:100%;
@@ -607,8 +612,8 @@ figure{display: block;}
 }
 .add-nav ul li.add-simple em{left:166px;}
 .add-nav ul li.add-blog em{left:319px;}
-.add-nav ul li.add-personal em{left:471px;}
-.add-nav ul li.add-buisness em{left:624px;}
+.add-nav ul li.add-personalsite em{left:471px;}
+.add-nav ul li.add-businesswebsite em{left:624px;}
 .add-nav ul li.add-thanks em{left:776px;}
 .add-nav ul li:hover em,
 .add-nav ul li.hover em{background:url(../images/bul3.png) no-repeat;}

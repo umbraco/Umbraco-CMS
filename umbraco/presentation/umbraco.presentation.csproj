@@ -223,6 +223,13 @@
     </Compile>
     <Compile Include="install\utills\FilePermissions.cs" />
     <Compile Include="install\utills\Helper.cs" />
+    <Compile Include="install\utills\p.aspx.cs">
+      <DependentUpon>p.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\utills\p.aspx.designer.cs">
+      <DependentUpon>p.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1715,7 +1722,6 @@
     <Content Include="install\images\img11.jpg" />
     <Content Include="install\images\loader.gif" />
     <Content Include="install\images\logo.gif" />
-    <Content Include="install\images\logo_type.png" />
     <Content Include="install\images\none.gif" />
     <Content Include="install\images\pbar-ani.gif" />
     <Content Include="install\images\select-button.png" />
@@ -1737,7 +1743,6 @@
     <Content Include="install\images\ui-icons_ef8c08_256x240.png" />
     <Content Include="install\images\ui-icons_ffd27a_256x240.png" />
     <Content Include="install\images\ui-icons_ffffff_256x240.png" />
-    <Content Include="install\installer.js" />
     <Content Include="install\js\ie-png.js" />
     <Content Include="install\js\jquery.1.4.4.js" />
     <Content Include="install\js\jquery.main.js" />
@@ -1748,6 +1753,7 @@
     <Content Include="install\steps\Skinning\loadStarterKitDesigns.ascx" />
     <Content Include="install\steps\Skinning\loadStarterKits.ascx" />
     <Content Include="install\Title.ascx" />
+    <Content Include="install\utills\p.aspx" />
     <Content Include="umbraco\config\lang\ko.xml" />
     <Content Include="umbraco\dashboard\ChangePassword.ascx" />
     <Content Include="umbraco\dashboard\DeveloperDashboardIntro.ascx" />
@@ -1950,17 +1956,9 @@
       <SubType>Component</SubType>
     </Content>
     <Content Include="install\default.aspx" />
-    <Content Include="install\images\background.png" />
-    <Content Include="install\images\logo.png" />
-    <Content Include="install\images\packagesVid1.png" />
-    <Content Include="install\images\packagesVid2.png" />
-    <Content Include="install\images\permissionsVid1.png" />
-    <Content Include="install\images\welcomeVid1.png" />
-    <Content Include="install\images\welcomeVid2.png" />
     <Content Include="install\steps\boost.ascx" />
     <Content Include="install\steps\license.ascx" />
     <Content Include="install\steps\upgrade.ascx" />
-    <Content Include="install\style.css" />
     <Content Include="umbraco\actions\delete.aspx" />
     <Content Include="umbraco\actions\editContent.aspx" />
     <Content Include="umbraco\actions\preview.aspx" />
@@ -3090,6 +3088,7 @@
     </None>
     <EmbeddedResource Include="install\steps\database.ascx.resx">
       <DependentUpon>database.ascx.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="install\steps\defaultUser.ascx.resx">
       <DependentUpon>defaultUser.ascx.cs</DependentUpon>

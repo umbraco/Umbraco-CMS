@@ -9,7 +9,7 @@ namespace umbraco.presentation.install {
 
     public static void RedirectToNextStep(Page page) {
       _default d = (_default)page;
-      d.GotoNextStep(d.currentStepClass);
+      d.GotoNextStep(d.step.Value);
     }
 
   }

@@ -26,15 +26,14 @@ namespace umbraco.cms.businesslogic.installer
         public InstallerStep GotoNextStep(string key)
         {
           InstallerStep s = this[key];
-          bool found = false;
-          
           foreach(InstallerStep i in this.Values){
-            if (found && !i.Completed()) {
-              return i;
-            }
 
-            if (i.Alias == key)
-              found = true;
+             // System.Web.HttpContext.Current.Response.Write(i.Index.ToString() + i.Alias);
+
+            if (i.Index > s.Index && !i.Completed()) {
+               // System.Web.HttpContext.Current.Response.Write( "FOUND" +  i.Index.ToString() + i.Alias);
+                return i;
+            }
           }
   
           return null;

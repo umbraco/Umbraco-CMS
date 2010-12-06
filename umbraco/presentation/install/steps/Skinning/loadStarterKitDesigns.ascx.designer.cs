@@ -13,6 +13,15 @@ namespace umbraco.presentation.install.steps.Skinning {
     public partial class loadStarterKitDesigns {
         
         /// <summary>
+        /// pl_loadStarterKitDesigns control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder pl_loadStarterKitDesigns;
+        
+        /// <summary>
         /// pl_CustomizeSkin control.
         /// </summary>
         /// <remarks>
@@ -20,15 +29,6 @@ namespace umbraco.presentation.install.steps.Skinning {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel pl_CustomizeSkin;
-        
-        /// <summary>
-        /// pl_loadStarterKitDesigns control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pl_loadStarterKitDesigns;
         
         /// <summary>
         /// rep_starterKitDesigns control.

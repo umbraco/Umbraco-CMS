@@ -84,38 +84,69 @@ function initStep(){
 	})
 }
 function initTabs(){
-	jQuery('.database-hold').each(function(){
-		var _list = $(this);
-		var _links = _list.find('a.database-tab');
-		var _select = _list.find('.sel');
-		_select.each(function(){
-			var select = $(this);
-			var selectVal = select.val()
-			jQuery('#database-step1-2').hide();
-			select.change(function(){
-				selectValNew = jQuery(this).val();
-				if(selectVal != selectValNew ) jQuery('#database-step1-2').show();
-				else jQuery('#database-step1-2').hide();
-			})
-		})
-		_links.each(function() {
-			var _link = $(this);
-			var _href = _link.attr('href');
-			var _tab = jQuery(_href);
-			if(_link.hasClass('active')) _tab.show();
-			else _tab.hide();
-			_link.click(function(){
-				_links.filter('.active').each(function(){
-					jQuery(jQuery(this).removeClass('active').attr('href')).hide();
-				});
-				_link.addClass('active');
-				_tab.show();
-				jQuery('#database-step1-2').hide();
-				return false;
-			});
-		});
-	});
+    jQuery('.database-hold').each(function () {
+        var _list = $(this);
+        var _links = _list.find('a.database-tab');
+        var _select = _list.find('.sel');
+
+       
+
+        _select.each(function () {
+            var select = $(this);
+            var selectVal = select.val()
+
+            jQuery('#database-step1-2').hide();
+
+            if (configured)
+                toggleDatabaseOption(selectVal);
+
+            select.change(function () {
+                selectValNew = jQuery(this).val();
+
+                if (selectVal != selectValNew) jQuery('#database-step1-2').show();
+                else jQuery('#database-step1-2').hide();
+
+                toggleDatabaseOption(selectValNew);
+
+            })
+        })
+        _links.each(function () {
+            var _link = $(this);
+            var _href = _link.attr('href');
+            var _tab = jQuery(_href);
+            if (_link.hasClass('active')) _tab.show();
+            else _tab.hide();
+            _link.click(function () {
+                _links.filter('.active').each(function () {
+                    jQuery(jQuery(this).removeClass('active').attr('href')).hide();
+                });
+                _link.addClass('active');
+                _tab.show();
+                jQuery('#database-step1-2').hide();
+                return false;
+            });
+        });
+    });
 }
+
+function toggleDatabaseOption(selectValNew) {
+    if (selectValNew != '') {
+
+        jQuery('#database-step1').show();
+        jQuery('#database-step1-2').show();
+
+        //hide all db options
+        jQuery('#database-step1-2 .row').hide();
+
+        if (selectValNew == 'SqlServer' || selectValNew == 'MySql')
+            jQuery('#database-step1-2 .sql').show();
+        else if (selectValNew == 'Custom')
+            jQuery('#database-step1-2 .custom').show();
+        else if (selectValNew.indexOf('SQLCE4Umbraco') > -1 && !hasEmbeddedDlls)
+            jQuery('#database-step1-2 .embedded').show();
+    }
+}
+
 function initSingleTab(){
 	jQuery('a.single-tab').each(function(){
 		var _links = jQuery(this);

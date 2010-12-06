@@ -15,26 +15,21 @@ namespace umbraco.presentation.install.steps
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-//            BasePages.BasePage.doLogin(BusinessLogic.User.GetUser(0));
-            
-            // hide next button
-            Page.FindControl("next").Visible = false;
-
             // Update configurationStatus
             try
             {
+                
                 GlobalSettings.ConfigurationStatus = GlobalSettings.CurrentVersion;
                 Application["umbracoNeedConfiguration"] = false;
             }
             catch (Exception ex)
             {
-                updateUmbracoSettingsFailed.Visible = true;
-                errorLiteral.Text = ex.ToString();
+                //errorLiteral.Text = ex.ToString();
             }
 
             if (cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
             {
-                viewSite.Visible = true;
+                ///viewSite.Visible = true;
             }
 
 

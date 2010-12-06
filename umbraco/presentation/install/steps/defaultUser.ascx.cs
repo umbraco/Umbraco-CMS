@@ -6,7 +6,9 @@ using System.Web;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Web.Security;
-using umbraco.BusinessLogic; 
+using umbraco.BusinessLogic;
+using umbraco.providers;
+using System.Collections.Specialized; 
 #endregion
 
 namespace umbraco.presentation.install.steps
@@ -19,23 +21,7 @@ namespace umbraco.presentation.install.steps
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-			BusinessLogic.User u = BusinessLogic.User.GetUser(0);
-
-			if (u.NoConsole || u.Disabled) 
-			{
-				identifyResult.Text = "<div class='success'><p><strong>The Default user has been disabled or has no access to umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.</p></div>";
-				Page.FindControl("next").Visible = true;
-			}
-			else if (u.GetPassword() != "default") 
-			{
-                identifyResult.Text = "<div class='success'><p><strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.</p></div>";
-				Page.FindControl("next").Visible = true;
-			}
-			else 
-			{
-                identifyResult.Text = "<div class='notice'><p><strong>The Default users’ password needs to be changed!</strong></p></div>";
-				changeForm.Visible = true;
-			}
+			
 		}
 
 		#region Web Form Designer generated code
@@ -64,13 +50,61 @@ namespace umbraco.presentation.install.steps
             {
                 User u = User.GetUser(0);
                 MembershipUser user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(0, true);
-                user.ChangePassword(u.GetPassword(), password.Text.Trim());
+                user.ChangePassword(u.GetPassword(), tb_password.Text.Trim());
 
-                passwordChanged.Visible = true;
-                identify.Visible = false;
-                changeForm.Visible = false;
-                Page.FindControl("next").Visible = true;
+                u.LoginName = tb_login.Text;
+
+                // Is it using the default membership provider
+                if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is UsersMembershipProvider)
+                {
+                    // Save user in membership provider
+                    UsersMembershipUser umbracoUser = user as UsersMembershipUser;
+                    umbracoUser.FullName = tb_name.Text.Trim();
+                    Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(umbracoUser);
+
+                    // Save user details
+                    u.Email = tb_email.Text.Trim();
+                }
+                else
+                {
+                    u.Name = tb_name.Text.Trim();
+                    if (!(Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(user);
+                }
+
+                u.Save();
+
+                if (cb_newsletter.Checked)
+                {
+                    try
+                    {
+                        System.Net.WebClient client = new System.Net.WebClient();
+                        NameValueCollection values = new NameValueCollection();
+                        values.Add("name", tb_name.Text);
+                        values.Add("email", tb_email.Text);
+
+                        client.UploadValues("http://umbraco.org/base/Ecom/SubmitEmail/installer.aspx", values);
+
+                    }
+                    catch { /* fail in silence */ }
+                }
+
+                Helper.RedirectToNextStep(this.Page);                
             }
 		}
+
+        private void SubscribeToNewsLetter(string name, string email)
+        {
+            try
+            {
+                System.Net.WebClient client = new System.Net.WebClient();
+                NameValueCollection values = new NameValueCollection();
+                values.Add("name", name);
+                values.Add("email", email);
+
+                client.UploadValues("http://umbraco.org/base/Ecom/SubmitEmail/installer.aspx", values);
+
+            }
+            catch { /* fail in silence */ }
+        }
 	}
 }
