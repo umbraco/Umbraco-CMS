@@ -6,7 +6,31 @@
   <script language="javascript">
     function doSubmit() {
       document.forms.aspnetForm.submit();
-    }
+  }
+
+
+  jQuery(document).ready(function () {
+      jQuery("#macroPropertiesTable tbody").sortable({
+          items: "tr:not(.notSortable)",
+          handle: '.handle',
+          update: function () {
+
+              SetSortOrder();
+          }
+      });
+
+  });
+  function SetSortOrder() {
+      var c = 0;
+
+      jQuery("#macroPropertiesTable tr:not(.notSortable)").each(function () {
+
+          jQuery('.sortOrder', this).val(c);
+
+          c++;
+      });
+  }
+
   </script>
 </asp:Content>
 
@@ -121,8 +145,8 @@
     <cc1:Pane ID="Panel2" runat="server">
       <asp:Repeater ID="macroProperties" runat="server">
         <HeaderTemplate>
-          <table cellspacing="0" cellpadding="2" width="98%" border="0">
-            <tr>
+          <table cellspacing="0" cellpadding="2" width="98%" border="0" id="macroPropertiesTable">
+            <tr class="notSortable">
               <td class="propertyHeader">
                 <%=umbraco.ui.Text("show",this.getUser())%>
               </td>
@@ -139,7 +163,7 @@
             </tr>
         </HeaderTemplate>
         <ItemTemplate>
-          <tr>
+          <tr rel='<%#DataBinder.Eval(Container.DataItem, "id")%>'>
             <td class="propertyContent">
               <asp:CheckBox runat="server" ID="macroPropertyHidden" Checked='<%# macroIsVisible (DataBinder.Eval(Container.DataItem, "Public"))%>' />
             </td>
@@ -160,11 +184,16 @@
             <td class="propertyContent">
               <asp:Button OnClick="deleteMacroProperty" ID="delete" Text="Delete" runat="server"
                 CssClass="guiInputButton" />
+
+                <span style="cursor: move;" class="handle">sort</span>
+
+                <asp:TextBox runat="server" ID="macroPropertySortOrder" CssClass="sortOrder" Text='<%#DataBinder.Eval(Container.DataItem, "SortOrder")%>' style="display:none;"></asp:TextBox>
+               
             </td>
           </tr>
         </ItemTemplate>
         <FooterTemplate>
-          <tr>
+          <tr class="notSortable">
             <td class="propertyContent">
               <asp:CheckBox runat="server" ID="macroPropertyHiddenNew" />
             </td>
@@ -186,5 +215,9 @@
           </table>
         </FooterTemplate>
       </asp:Repeater>
+
+        <asp:HiddenField ID="macroPropertiesSortOrder" runat="server"/>
+
+
     </cc1:Pane>
 </asp:Content>

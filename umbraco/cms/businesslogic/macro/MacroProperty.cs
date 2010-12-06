@@ -159,13 +159,14 @@ namespace umbraco.cms.businesslogic.macro
             }
             else
             {
-                SqlHelper.ExecuteNonQuery("UPDATE cmsMacroProperty set macro = @macro, macroPropertyHidden = @show, macropropertyAlias = @alias, macroPropertyName = @name, macroPropertyType = @type WHERE id = @id",
+                SqlHelper.ExecuteNonQuery("UPDATE cmsMacroProperty set macro = @macro, macroPropertyHidden = @show, macropropertyAlias = @alias, macroPropertyName = @name, macroPropertyType = @type, macroPropertySortOrder = @so WHERE id = @id",
     SqlHelper.CreateParameter("@id", Id),
     SqlHelper.CreateParameter("@macro", Macro.Id),
     SqlHelper.CreateParameter("@show", Public),
     SqlHelper.CreateParameter("@alias", Alias),
     SqlHelper.CreateParameter("@name", Name),
-    SqlHelper.CreateParameter("@type", Type.Id));
+    SqlHelper.CreateParameter("@type", Type.Id),
+    SqlHelper.CreateParameter("@so", SortOrder));
             }
         }
 
