@@ -6,19 +6,13 @@ using System.Collections.Specialized;
 
 namespace umbraco.cms.businesslogic.installer
 {
-    public class InstallerStepCollection : List<KeyValuePair<string,InstallerStep>>
+    public class InstallerStepCollection : Dictionary<string,InstallerStep>
     {
         public void Add(InstallerStep step){
             step.Index = this.Count;
-            KeyValuePair<string, InstallerStep> kv = new KeyValuePair<string, InstallerStep>(step.Alias, step);
-            this.Add(kv);
+            this.Add(step.Alias, step);
         }
-
-        public InstallerStep Get(int index)
-        {
-            return this[index].Value;
-        }
-
+  
         public InstallerStep Get(string key)
         {
             return this.First(item => item.Key == key).Value;
@@ -26,20 +20,24 @@ namespace umbraco.cms.businesslogic.installer
 
         public bool StepExists(string key)
         {
-            return this.Exists(item => item.Key == key);
+            return this.ContainsKey(key);
         }
 
         public InstallerStep GotoNextStep(string key)
         {
-            InstallerStep s = this.Get(key);
-            for (int i = s.Index+1; i < this.Count; i++)
-            {
-                InstallerStep next = this[i].Value;
-                if (!next.Completed())
-                    return next;
+          InstallerStep s = this[key];
+          bool found = false;
+          
+          foreach(InstallerStep i in this.Values){
+            if (found && !i.Completed()) {
+              return i;
             }
 
-            return null;
+            if (i.Alias == key)
+              found = true;
+          }
+  
+          return null;
         }
     
 

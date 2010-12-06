@@ -8,7 +8,6 @@ namespace umbraco.cms.businesslogic.installer
         string Name { get;}
         string UserControl {get;}
 
-        string NextButtonText { get; }
-        string NextButtonClientSideClick { get; }
+        bool HideFromNavigation { get; }
     }
 }

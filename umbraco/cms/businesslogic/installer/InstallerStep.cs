@@ -13,19 +13,14 @@ namespace umbraco.cms.businesslogic.installer
         public virtual int Index { get; set; }
 
         public virtual bool MoveToNextStepAutomaticly { get; set; }
-        public virtual bool HideNextButtonUntillCompleted { get; set; }
 
+        public virtual bool HideFromNavigation {
+          get {
+            return false;
+          }
+        }
         public abstract bool Completed();
 
-        public virtual string NextButtonText
-        {
-            get { return "Next »"; }
-        }
-
-        public virtual string NextButtonClientSideClick
-        {
-            get { return "showProgress(this,'loadingBar'); return true;"; }
-        }
-
+      
     }
 }
