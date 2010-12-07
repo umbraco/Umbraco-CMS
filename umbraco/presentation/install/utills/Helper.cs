@@ -12,14 +12,16 @@ namespace umbraco.presentation.install {
       d.GotoNextStep(d.step.Value);
     }
 
-    public static int Percentage { get; set; }
+    private static int m_Percentage = -1;
+    public static int Percentage { get { return m_Percentage; } set { m_Percentage = value; } }
+    
     public static string Description { get; set; }
     public static string Error { get; set; }
 
 
     public static void clearProgress()
     {
-        Percentage = 0;
+        Percentage = -1;
         Description = string.Empty;
         Error = string.Empty;
     }
@@ -28,7 +30,6 @@ namespace umbraco.presentation.install {
     {
         if (percent > 0)
             Percentage = percent;
-
 
        Description = description;
        Error = error;

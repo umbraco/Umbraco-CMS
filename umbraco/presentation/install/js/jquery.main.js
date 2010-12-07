@@ -17,8 +17,6 @@ function initProgressBar() {
 }
 
 
-
-
 function updateProgressBar(percent) {
     jQuery('.loader').each(function () {
         var set = jQuery(this);

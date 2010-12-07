@@ -6,64 +6,66 @@
 <ContentTemplate>
 
 <script type="text/javascript">
-    var intervalId = 0;
+	var intervalId = 0;
 
-    jQuery(document).ready(function () {
-        jQuery('.zoom-list a.selectStarterKit').click(function () {
-            jQuery('.main-tabinfo').hide();
-            jQuery('#starterkitname').html( jQuery('span', this).html() );
-            
-            jQuery('#single-tab1').show();
-            //fire off the progressbar
-            intervalId = setInterval("progressBarCallback()", 1000);
-            
-            
-            return true;
-        });
-    });
+	jQuery(document).ready(function () {
+		jQuery('.zoom-list a.selectStarterKit').click(function () {
+			jQuery('.main-tabinfo').hide();
+			jQuery('#starterkitname').html( jQuery('span', this).html() );
+			
+			jQuery('#single-tab1').show();
+			//fire off the progressbar
+			intervalId = setInterval("progressBarCallback()", 1000);
+			
+			
+			return true;
+		});
+	});
 
-    function pageLoad(sender, args) {
-        if (args.get_isPartialLoad()) {
+	function pageLoad(sender, args) {
+		if (args.get_isPartialLoad()) {
 
-            jQuery('#single-tab1').hide();
+			jQuery('#single-tab1').hide();
 
-            initZoomList2();
-            initSlide();
+			initZoomList2();
+			initSlide();
 
-            initLightBox();
+			initLightBox();
 
-            jQuery('.btn-install-gal').click(function () {
-                jQuery('#browseSkins').hide();
-                jQuery('#installingSkin').show();
+			jQuery('.btn-install-gal').click(function () {
+				jQuery('#browseSkins').hide();
+				jQuery('#installingSkin').show();
 
-                //fire off the progressbar
-                intervalId = setInterval("progressBarCallback()", 1000);
+				//fire off the progressbar
+				intervalId = setInterval("progressBarCallback()", 1000);
 
-                jQuery('#skinname').html(jQuery('span', this).html());
-                return true;
-            });
-        }
-    }
+				jQuery('#skinname').html(jQuery('span', this).html());
+				return true;
+			});
+		}
+	}
 
 
-    function progressBarCallback() {
-        jQuery.getJSON('utills/p.aspx?feed=progress', function (data) {
+	function progressBarCallback() {
+	    jQuery.getJSON('utills/p.aspx?feed=progress', function (data) {
 
-            updateProgressBar(data.percentage);
-            updateStatusMessage(data.message)
+	        if (data.percentage > 0) {
+	            updateProgressBar(data.percentage);
+	            updateStatusMessage(data.message)
+	        }
 
-            if (data.error != "") {
-                clearInterval(intervalId);
-                updateStatusMessage(data.error);
-            }
+	        if (data.error != "") {
+	            clearInterval(intervalId);
+	            updateStatusMessage(data.error);
+	        }
 
-            if (data.percentage == 100) {
-                clearInterval(intervalId);
-                jQuery(".btn-box").show();
-            }
-        });
-    }
-    </script>
+	        if (data.percentage == 100) {
+	            clearInterval(intervalId);
+	            jQuery(".btn-box").show();
+	        }
+	    });
+	}
+	</script>
 </script>
 
 
@@ -74,7 +76,7 @@
 <div class="container">
 	<h1>Starter kits</h1>
 	<p>To help you get started we have created some basic starter kits each of which has been tailored to meet different requiremejnts.<br />
-    Hover of the thumbnail to find out what each kit contains.</p>
+	Hover of the thumbnail to find out what each kit contains.</p>
 </div>
 <!-- menu -->
 <asp:PlaceHolder ID="ph_starterKits" runat="server" />
@@ -119,7 +121,7 @@
 
 <!-- itstall skin -->
 <div class="tab install-tab" id="installingSkin" style="display: none">
-    <div class="container">
+	<div class="container">
 		<h1>Installing Skin</h1>
 		<h2>Your <strong id="skinname">skin</strong> is installing. </h2>
 
@@ -139,8 +141,8 @@
 	<div class="t">&nbsp;</div>
 	<div class="c">
 		<div class="heading">
-	        <strong class="title">Name of skin</strong>
-            <span class="create">Created by: <a href="#">Cogworks</a></span>
+			<strong class="title">Name of skin</strong>
+			<span class="create">Created by: <a href="#">Cogworks</a></span>
 		</div>
 		<div class="carusel">
 			<ul>
