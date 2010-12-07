@@ -67,7 +67,7 @@
 					<HeaderTemplate><ul></HeaderTemplate>
 					<FooterTemplate></ul></FooterTemplate>
 					<ItemTemplate>
-						<li class="<asp:literal runat='server' ID='lt_class' />"><a href="#"><asp:Literal ID="lt_name" runat="server" /><em>&nbsp;</em></a></li>
+						<li class="<asp:literal runat='server' ID='lt_class' />"><asp:Literal ID="lt_name" runat="server" /><em>&nbsp;</em></li>
 					</ItemTemplate>
 					</asp:Repeater>
 					

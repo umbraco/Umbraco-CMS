@@ -5,7 +5,7 @@
 	background:url(../images/none.gif);
 	filter: progid:dximagetransform.microsoft.alphaimageloader(src='images/sep1.png', sizingmethod='scale');
 }
-.tabset ul li.active a em{
+.tabset ul li.active em{
 	background:url(../images/none.gif);
 	cursor:pointer;
 	filter: progid:dximagetransform.microsoft.alphaimageloader(src='images/bul1.png', sizingmethod='crop');

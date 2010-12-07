@@ -180,22 +180,14 @@ figure{display: block;}
 }
 .tabset ul li{
 	float:left;
-	padding:0 43px 0 0;
+	padding:0 43px 17px 0;
 	font:bold 21px/23px Arial, Helvetica, sans-serif;
 	letter-spacing:-1px;
-}
-.tabset ul li a{
-	float:left;
-	position:relative;
 	color:#f27021;
-	padding:0 0 17px;
+	position:relative;
 }
-.tabset ul li.disable a{color:#c57f73;}
-.tabset ul li a:hover{
-	text-decoration:none;
-	color:#fff;
-}
-.tabset ul li a em{
+.tabset ul li.disable{color:#c57f73;}
+.tabset ul li em{
 	position:absolute;
 	left:13px;
 	bottom:0;
@@ -204,8 +196,8 @@ figure{display: block;}
 	width:14px;
 	height:11px;
 }
-.tabset ul li.active a {color:#fff;}
-.tabset ul li.active a em{background:url(../images/bul1.png) no-repeat;}
+.tabset ul li.active {color:#fff;}
+.tabset ul li.active em{background:url(../images/bul1.png) no-repeat;}
 /* content */
 .content:after {
 	clear: both;
@@ -278,11 +270,6 @@ figure{display: block;}
 	color:#fff;
 	font-weight:normal;
 }
-
-/* added by pph */
-.summary li {margin: 0px 0px 20px; display: block}
-.summary li a{color: white; text-decoration: underline}
-.blogs li a{display: block;}
 /* btn box */
 .btn-box{
 	width:100%;
@@ -595,11 +582,22 @@ figure{display: block;}
 	width:150px;
 	height:212px;
 	position:relative;
+	cursor:pointer;
 }
 .add-nav ul li a img{
 	position:absolute;
 	top: 0;
 	left: 0;
+}
+.add-nav ul li a span{
+	position:absolute;
+	top:-15px;
+	left:-99999px;
+	display:none;
+}
+.add-nav ul li.hover a span{
+	display:block;
+	left:-15px;
 }
 .add-nav ul li em{
 	position:absolute;
@@ -612,8 +610,8 @@ figure{display: block;}
 }
 .add-nav ul li.add-simple em{left:166px;}
 .add-nav ul li.add-blog em{left:319px;}
-.add-nav ul li.add-personalsite em{left:471px;}
-.add-nav ul li.add-businesswebsite em{left:624px;}
+.add-nav ul li.add-personal em{left:471px;}
+.add-nav ul li.add-buisness em{left:624px;}
 .add-nav ul li.add-thanks em{left:776px;}
 .add-nav ul li:hover em,
 .add-nav ul li.hover em{background:url(../images/bul3.png) no-repeat;}
