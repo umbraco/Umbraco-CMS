@@ -74,7 +74,8 @@ namespace umbraco.cms.businesslogic.skinning.tasks
             {
                 return string.Format(
                     @"jQuery('#{0}').bind('{3}', function() {{ 
-                        jQuery('#{1}').html({2}); 
+                        var val = '{5}'; 
+                        jQuery('#{1}').html(val.replace('${{Output}}',{2})); 
                     }});
                 
                     //cancel support
@@ -87,13 +88,15 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                     TargetID,
                     ClientSideGetValueScript,
                     ClientSidePreviewEventType,
-                    Guid.NewGuid().ToString().Replace("-", ""));
+                    Guid.NewGuid().ToString().Replace("-", ""),
+                    Value);
             }
             else
             {
                 return string.Format(
                    @"jQuery('#{0}').bind('{4}', function() {{ 
-                        jQuery('#{1}').attr('{2}',{3}); 
+                        var val = '{6}'; 
+                        jQuery('#{1}').attr('{2}',val.replace('${{Output}}',{3})); 
                     }});
 
 
@@ -108,7 +111,8 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                    TargetAttribute,
                     ClientSideGetValueScript,
                     ClientSidePreviewEventType,
-                    Guid.NewGuid().ToString().Replace("-", ""));
+                    Guid.NewGuid().ToString().Replace("-", ""),
+                    Value);
             }
         }
     }
