@@ -17,7 +17,14 @@ namespace umbraco.presentation.install {
     public static string Error { get; set; }
 
 
-    public static void setSession(string alias, int percent, string description, string error)
+    public static void clearProgress()
+    {
+        Percentage = 0;
+        Description = string.Empty;
+        Error = string.Empty;
+    }
+
+    public static void setProgress(int percent, string description, string error)
     {
         if (percent > 0)
             Percentage = percent;

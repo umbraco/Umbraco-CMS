@@ -36,13 +36,13 @@ namespace umbraco.presentation.install.utills
         [System.Web.Script.Services.ScriptMethod]
         public static string installOrUpgrade()
         {
-            string sesssionAlias = "database";
+            Helper.clearProgress();
 
             IInstallerUtility m_Installer = BusinessLogic.Application.SqlHelper.Utility.CreateInstaller();
 
             // Build the new connection string
             //DbConnectionStringBuilder connectionStringBuilder = CreateConnectionString();
-            Helper.setSession(sesssionAlias, 5, "Connecting...", "");
+            Helper.setProgress( 5, "Connecting...", "");
 
             // Try to connect to the database
             Exception error = null;
@@ -54,12 +54,12 @@ namespace umbraco.presentation.install.utills
                 if (!m_Installer.CanConnect)
                     throw new Exception("The installer cannot connect to the database.");
                 else
-                    Helper.setSession(sesssionAlias, 20, "Connection opened", "");
+                    Helper.setProgress( 20, "Connection opened", "");
             }
             catch (Exception ex)
             {
                 error = new Exception("Database connection initialisation failed.", ex);
-                Helper.setSession(sesssionAlias, -5, "Database connection initialisation failed.", error.Message);
+                Helper.setProgress( -5, "Database connection initialisation failed.", error.Message);
 
                 return error.Message;
             }
@@ -68,16 +68,16 @@ namespace umbraco.presentation.install.utills
             if (m_Installer.CanConnect)
             {
                 if (m_Installer.IsLatestVersion)
-                    Helper.setSession(sesssionAlias, 100, "Database is up-to-date", "");
+                    Helper.setProgress( 100, "Database is up-to-date", "");
                 else
                 {
                     if (m_Installer.IsEmpty)
                     {
-                        Helper.setSession(sesssionAlias, 35, "Installing tables...", "");
+                        Helper.setProgress( 35, "Installing tables...", "");
                         //do install
                         m_Installer.Install();
 
-                        Helper.setSession(sesssionAlias, 100, "Installation completed!", "");
+                        Helper.setProgress( 100, "Installation completed!", "");
 
                         m_Installer = null;
 
@@ -85,10 +85,10 @@ namespace umbraco.presentation.install.utills
                     }
                     else if (m_Installer.CurrentVersion == DatabaseVersion.None || m_Installer.CanUpgrade)
                     {
-                        Helper.setSession(sesssionAlias, 35, "Updating database tables...", "");
+                        Helper.setProgress( 35, "Updating database tables...", "");
                         m_Installer.Install();
 
-                        Helper.setSession(sesssionAlias, 100, "Upgrade completed!", "");
+                        Helper.setProgress( 100, "Upgrade completed!", "");
 
                         m_Installer = null;
 

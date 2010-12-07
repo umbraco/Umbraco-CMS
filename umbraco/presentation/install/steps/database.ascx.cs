@@ -155,7 +155,7 @@ namespace umbraco.presentation.install.steps
             catch (Exception ex)
             {
                 Exception error = new Exception("Could not save the web.config file. Please modify the connection string manually.", ex);
-                Helper.setSession("database", -1, "Could not save the web.config file. Please modify the connection string manually.", error.InnerException.Message);
+                Helper.setProgress(-1, "Could not save the web.config file. Please modify the connection string manually.", error.InnerException.Message);
             }
 
             settings.Visible = false;

@@ -56,23 +56,5 @@ namespace umbraco.presentation.install.steps {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.PlaceHolder ph_starterKitDesigns;
-        
-        /// <summary>
-        /// pl_customizeDesign control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pl_customizeDesign;
-        
-        /// <summary>
-        /// ph_customizeDesig control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder ph_customizeDesig;
     }
 }

@@ -41,12 +41,10 @@ namespace umbraco.presentation.install.steps
             ctrl.ID = "StarterKitDesigns";
 
             ctrl.StarterKitGuid = starterKitGuid;
-
             ph_starterKitDesigns.Controls.Add(ctrl);
 
             pl_starterKit.Visible = false;
             pl_starterKitDesign.Visible = true;
-
         }
 
         public void showCustomizeSkin()
@@ -55,6 +53,11 @@ namespace umbraco.presentation.install.steps
 
             _default p = (_default)this.Page;
             p.GotoNextStep(helper.Request("installStep"));
+        }
+
+        protected void gotoNextStep(object sender, EventArgs e)
+        {
+            Helper.RedirectToNextStep(this.Page);
         }
     }
 }

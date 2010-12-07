@@ -156,7 +156,10 @@
             </div>
         </div>
         <!-- btn box -->
-        <footer class="btn-box">			<div class="t">&nbsp;</div>			 <asp:LinkButton class="btn-step btn btn-continue" runat="server" OnClick="gotoNextStep"><span>Continue</span></asp:LinkButton>		</footer>
+         <footer class="btn-box" style="display: none;">
+			<div class="t">&nbsp;</div>
+			 <asp:LinkButton class="btn-step btn btn-continue" runat="server" OnClick="gotoNextStep"><span>Continue</span></asp:LinkButton>
+		</footer>
     </div>
 
     <script type="text/javascript">

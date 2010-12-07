@@ -68,24 +68,37 @@ namespace umbraco.presentation.install.steps.Skinning
 
         protected void SelectStarterKit(object sender, EventArgs e)
         {
+            Helper.clearProgress();
+
             Guid kitGuid = new Guid(((LinkButton)sender).CommandArgument);
+
+            Helper.setProgress(10, "Connecting to skin repository", "");
 
             cms.businesslogic.packager.Installer installer = new cms.businesslogic.packager.Installer();
 
             if (repo.HasConnection())
             {
+
+                Helper.setProgress(20, "Downloading skin files...", "");
+
                 cms.businesslogic.packager.Installer p = new cms.businesslogic.packager.Installer();
 
                 string tempFile = p.Import(repo.fetch(kitGuid.ToString()));
                 p.LoadConfig(tempFile);
                 int pID = p.CreateManifest(tempFile, kitGuid.ToString(), repoGuid);
 
+                Helper.setProgress(40, "Installing skin files", "");
                 p.InstallFiles(pID, tempFile);
+
+                Helper.setProgress(60, "Installing skin system objects", "");
                 p.InstallBusinessLogic(pID, tempFile);
+
+                Helper.setProgress(80, "Cleaning up after installation", "");
                 p.InstallCleanUp(pID, tempFile);
 
                 library.RefreshContent();
-                
+
+                Helper.setProgress(100, "Skin has been installed", "");
                 ((skinning)Parent.Parent.Parent.Parent.Parent).showStarterKitDesigns(kitGuid);
 
             }

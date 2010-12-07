@@ -181,7 +181,7 @@ figure{display: block;}
 .tabset ul li{
 	float:left;
 	padding:0 43px 17px 0;
-	font:bold 21px/23px Arial, Helvetica, sans-serif;
+	font:bold 22px Arial, Helvetica, sans-serif;
 	letter-spacing:-1px;
 	color:#f27021;
 	position:relative;
@@ -1134,3 +1134,7 @@ figure{display: block;}
 	font-weight:normal !important;
 	border: none !important;
 }
+
+.summary li{margin-bottom: 20px; display: block}
+.summary a{color: White;}
+

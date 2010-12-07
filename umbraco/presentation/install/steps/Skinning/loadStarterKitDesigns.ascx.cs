@@ -65,7 +65,12 @@ namespace umbraco.presentation.install.steps.Skinning
 
         protected void SelectStarterKitDesign(object sender, EventArgs e)
         {
+            Helper.clearProgress();
+
             Guid kitGuid = new Guid(((LinkButton)sender).CommandArgument);
+
+
+            Helper.setProgress(5, "Fetching starting kit from the repository", "");
 
             cms.businesslogic.packager.Installer installer = new cms.businesslogic.packager.Installer();
 
@@ -73,23 +78,36 @@ namespace umbraco.presentation.install.steps.Skinning
             {
                 cms.businesslogic.packager.Installer p = new cms.businesslogic.packager.Installer();
 
+                Helper.setProgress(15, "Connected to repository", "");
+
                 string tempFile = p.Import(repo.fetch(kitGuid.ToString()));
                 p.LoadConfig(tempFile);
                 int pID = p.CreateManifest(tempFile, kitGuid.ToString(), repoGuid);
 
+                Helper.setProgress(30, "Installing starter kit files", "");
                 p.InstallFiles(pID, tempFile);
+
+                Helper.setProgress(50, "Installing starter kit umbraco objects", "");
                 p.InstallBusinessLogic(pID, tempFile);
+
+                Helper.setProgress(60, "Finishing starter kit instatllation", "");
                 p.InstallCleanUp(pID, tempFile);
 
                 library.RefreshContent();
 
+                Helper.setProgress(80, "Retrieving list of skins, compatible with this starter kit", "");
                 if (cms.businesslogic.skinning.Skinning.GetAllSkins().Count > 0)
                 {
                     cms.businesslogic.skinning.Skinning.ActivateAsCurrentSkin(cms.businesslogic.skinning.Skinning.GetAllSkins()[0]);
                 }
 
+
+                Helper.setProgress(100, "Starter kit installation has been completed", "");
+
                 try
                 {
+                    
+
                     if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus))
                     {
                         GlobalSettings.ConfigurationStatus = GlobalSettings.CurrentVersion;
@@ -97,12 +115,10 @@ namespace umbraco.presentation.install.steps.Skinning
                     }
                 }
                 catch{
-                    _default pa = (_default)this.Page;
-                    pa.GotoNextStep(helper.Request("installStep"));
+                    Helper.RedirectToNextStep(Page);
                 }
-                
-                _default page = (_default)this.Page;
-                page.GotoNextStep(helper.Request("installStep"));
+
+                Helper.RedirectToNextStep(Page);
             }
             else
             {
