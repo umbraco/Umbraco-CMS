@@ -35,6 +35,9 @@ namespace umbraco.presentation.install.steps.Skinning
         {
                 base.OnInit(e);
 
+          //clear progressbar cache
+                Helper.clearProgress();
+
                 if (repo.HasConnection())
                 {
                     try
@@ -68,7 +71,7 @@ namespace umbraco.presentation.install.steps.Skinning
 
         protected void SelectStarterKit(object sender, EventArgs e)
         {
-            Helper.clearProgress();
+            
 
             Guid kitGuid = new Guid(((LinkButton)sender).CommandArgument);
 

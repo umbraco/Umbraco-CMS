@@ -6,11 +6,18 @@
 <ContentTemplate>
 
 <script type="text/javascript">
+    var intervalId = 0;
+
     jQuery(document).ready(function () {
         jQuery('.zoom-list a.selectStarterKit').click(function () {
             jQuery('.main-tabinfo').hide();
             jQuery('#starterkitname').html( jQuery('span', this).html() );
+            
             jQuery('#single-tab1').show();
+            //fire off the progressbar
+            intervalId = setInterval("progressBarCallback()", 1000);
+            
+            
             return true;
         });
     });
@@ -29,12 +36,34 @@
                 jQuery('#browseSkins').hide();
                 jQuery('#installingSkin').show();
 
+                //fire off the progressbar
+                intervalId = setInterval("progressBarCallback()", 1000);
+
                 jQuery('#skinname').html(jQuery('span', this).html());
-                
                 return true;
             });
         }
     }
+
+
+    function progressBarCallback() {
+        jQuery.getJSON('utills/p.aspx?feed=progress', function (data) {
+
+            updateProgressBar(data.percentage);
+            updateStatusMessage(data.message)
+
+            if (data.error != "") {
+                clearInterval(intervalId);
+                updateStatusMessage(data.error);
+            }
+
+            if (data.percentage == 100) {
+                clearInterval(intervalId);
+                jQuery(".btn-box").show();
+            }
+        });
+    }
+    </script>
 </script>
 
 
@@ -102,4 +131,28 @@
 			<strong>Starting installation...</strong>
 		</div>
 	</div>	
+</div>
+
+<!-- lightbox -->
+<div class="lightbox" id="lightbox">
+	<a href="#" class="btn-close btn-close-box">close</a>
+	<div class="t">&nbsp;</div>
+	<div class="c">
+		<div class="heading">
+	        <strong class="title">Name of skin</strong>
+            <span class="create">Created by: <a href="#">Cogworks</a></span>
+		</div>
+		<div class="carusel">
+			<ul>
+				<li><img src="images/img09.jpg" alt="image description"></li>
+				<li><img src="images/img10.jpg" alt="image description"></li>
+				<li><img src="images/img11.jpg" alt="image description"></li>
+			</ul>
+		</div>
+
+		<footer class="btn-box" style="display: none;">
+			<a href="#single-tab4" class="single-tab btn-install btn-close-box">Install</a>
+		</footer>
+	</div>
+	<div class="b">&nbsp;</div>
 </div>

@@ -16,6 +16,9 @@ function initProgressBar() {
     updateProgressBar(0);
 }
 
+
+
+
 function updateProgressBar(percent) {
     jQuery('.loader').each(function () {
         var set = jQuery(this);
@@ -31,6 +34,8 @@ function updateProgressBar(percent) {
 function updateStatusMessage(message) {
     jQuery(".loader > strong").text(message);
 }
+
+
 
 function initButtonHover() {
     if (typeof document.body.style.maxHeight == 'undefined') ie6 = true;

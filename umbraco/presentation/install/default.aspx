@@ -84,41 +84,7 @@
 		</div>
 	</section>
 
-	<!-- lightbox -->
-	<div class="lightbox" id="lightbox">
-		<a href="#" class="btn-close btn-close-box">close</a>
-		<div class="t">&nbsp;</div>
-		<div class="c">
-			<div class="heading">
-
-				<strong class="title">Name of skin</strong>
-
-				<span class="create">Created by: <a href="#">Cogworks</a></span>
-
-			</div>
-
-			<div class="carusel">
-
-				<ul>
-					<li><img src="images/img09.jpg" alt="image description"></li>
-
-					<li><img src="images/img10.jpg" alt="image description"></li>
-
-					<li><img src="images/img11.jpg" alt="image description"></li>
-				</ul>
-
-			</div>
-
-			<footer class="btn-box">
-
-				<a href="#single-tab4" class="single-tab btn-install btn-close-box">Install</a>
-
-			</footer>
-
-		</div>
-
-		<div class="b">&nbsp;</div>
-	</div>
+	
 
 	<!-- bg page -->
 	<div class="bg-main">

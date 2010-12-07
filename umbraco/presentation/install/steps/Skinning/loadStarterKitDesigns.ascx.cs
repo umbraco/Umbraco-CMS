@@ -36,6 +36,9 @@ namespace umbraco.presentation.install.steps.Skinning
              {
                  try
                  {
+                   //clear progress bar cache
+                   Helper.clearProgress();
+
                      rep_starterKitDesigns.DataSource = repo.Webservice.Skins(StarterKitGuid.ToString());
                      rep_starterKitDesigns.DataBind();
                  }
