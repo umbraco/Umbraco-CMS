@@ -129,6 +129,7 @@ function initTabs(){
     });
 }
 
+//add by pph
 function toggleDatabaseOption(selectValNew) {
     if (selectValNew != '') {
 
@@ -146,6 +147,13 @@ function toggleDatabaseOption(selectValNew) {
             jQuery('#database-step1-2 .embedded').show();
     }
 }
+
+//add by pph
+function showDatabaseSettings() {
+    jQuery('#database-step1').show();
+    jQuery('#database-step1-2').show();
+}
+
 
 function initSingleTab(){
 	jQuery('a.single-tab').each(function(){
@@ -626,6 +634,11 @@ jQuery.fn.simpleLightbox = function(_options){
 		}
 	});
 }
+
+
+
+
+
 
 function initCustomForms() {
 	jQuery('select.sel').selectmenu();

@@ -31,7 +31,6 @@
     }
 </script>
 
-
 <asp:Placeholder ID="pl_starterKit" Runat="server" Visible="True">
 <!-- starter box -->
 <div class="tab main-tabinfo">

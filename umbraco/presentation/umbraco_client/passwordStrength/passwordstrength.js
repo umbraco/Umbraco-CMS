@@ -30,7 +30,7 @@
 //
 
 
-(function($) {
+(function ($) {
     $.fn.shortPass = 'The password is too short';
     $.fn.badPass = 'The password is weak';
     $.fn.goodPass = 'Good password';
@@ -38,7 +38,7 @@
     $.fn.samePassword = 'User name and Password are identical.';
     $.fn.resultStyle = "";
 
-    $.fn.passStrength = function(options) {
+    $.fn.passStrength = function (options) {
 
         var defaults = {
             shortPass: 'shortPass', //optional
@@ -51,27 +51,28 @@
         };
         var opts = $.extend(defaults, options);
 
-        return this.each(function() {
+        return this.each(function () {
             var obj = $(this);
 
-            $(obj).unbind().keyup(function() {
+            $(obj).unbind().keyup(function () {
 
                 var results = $.fn.teststrength($(this).val(), opts.userid, opts);
+                var fieldSpan = this.parent;
 
                 if (opts.messageloc === 1) {
-                    $(this).next("." + opts.baseStyle).remove();
-                    $(this).after("<span class=\"" + opts.baseStyle + "\"><span></span></span>");
-                    $(this).next("." + opts.baseStyle).addClass($(this).resultStyle).find("span").text(results);
+                    $(this).parent().next("." + opts.baseStyle).remove();
+                    $(this).parent().after("<span class=\"" + opts.baseStyle + "\"><strong></strong></span>");
+                    $(this).parent().next("." + opts.baseStyle).addClass($(this).resultStyle).find("strong").text(results);
                 }
                 else {
                     $(this).prev("." + opts.baseStyle).remove();
-                    $(this).before("<span class=\"" + opts.baseStyle + "\"><span></span></span>");
-                    $(this).prev("." + opts.baseStyle).addClass($(this).resultStyle).find("span").text(results);
+                    $(this).before("<span class=\"" + opts.baseStyle + "\"><strong></strong></span>");
+                    $(this).prev("." + opts.baseStyle).addClass($(this).resultStyle).find("strong").text(results);
                 }
             });
 
             //FUNCTIONS
-            $.fn.teststrength = function(password, username, option) {
+            $.fn.teststrength = function (password, username, option) {
                 var score = 0;
 
                 //password < 4

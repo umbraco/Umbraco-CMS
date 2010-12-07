@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using umbraco.DataLayer.Utility.Installer;
+using umbraco.DataLayer;
 
 namespace umbraco.presentation.install.utills
 {
@@ -15,10 +17,87 @@ namespace umbraco.presentation.install.utills
             string feed = Request.QueryString["feed"];
             string url = "http://our.umbraco.org/html/twitter";
 
-            if (feed == "blogs")
-                url = "http://our.umbraco.org/html/blogs";
+            if (feed == "progress")
+            {
+                Response.ContentType = "application/json";
+                Response.Write(Helper.getProgress());
+            }
+            else
+            {
+                if (feed == "blogs")
+                    url = "http://our.umbraco.org/html/blogs";
 
-            Response.Write(library.GetXmlDocumentByUrl(url).Current.OuterXml);
+                Response.Write(library.GetXmlDocumentByUrl(url).Current.OuterXml);
+            }
+        }
+
+
+        [System.Web.Services.WebMethod]
+        [System.Web.Script.Services.ScriptMethod]
+        public static string installOrUpgrade()
+        {
+            string sesssionAlias = "database";
+
+            IInstallerUtility m_Installer = BusinessLogic.Application.SqlHelper.Utility.CreateInstaller();
+
+            // Build the new connection string
+            //DbConnectionStringBuilder connectionStringBuilder = CreateConnectionString();
+            Helper.setSession(sesssionAlias, 5, "Connecting...", "");
+
+            // Try to connect to the database
+            Exception error = null;
+            try
+            {
+                ISqlHelper sqlHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN);
+                m_Installer = sqlHelper.Utility.CreateInstaller();
+
+                if (!m_Installer.CanConnect)
+                    throw new Exception("The installer cannot connect to the database.");
+                else
+                    Helper.setSession(sesssionAlias, 20, "Connection opened", "");
+            }
+            catch (Exception ex)
+            {
+                error = new Exception("Database connection initialisation failed.", ex);
+                Helper.setSession(sesssionAlias, -5, "Database connection initialisation failed.", error.Message);
+
+                return error.Message;
+            }
+
+
+            if (m_Installer.CanConnect)
+            {
+                if (m_Installer.IsLatestVersion)
+                    Helper.setSession(sesssionAlias, 100, "Database is up-to-date", "");
+                else
+                {
+                    if (m_Installer.IsEmpty)
+                    {
+                        Helper.setSession(sesssionAlias, 35, "Installing tables...", "");
+                        //do install
+                        m_Installer.Install();
+
+                        Helper.setSession(sesssionAlias, 100, "Installation completed!", "");
+
+                        m_Installer = null;
+
+                        return "installed";
+                    }
+                    else if (m_Installer.CurrentVersion == DatabaseVersion.None || m_Installer.CanUpgrade)
+                    {
+                        Helper.setSession(sesssionAlias, 35, "Updating database tables...", "");
+                        m_Installer.Install();
+
+                        Helper.setSession(sesssionAlias, 100, "Upgrade completed!", "");
+
+                        m_Installer = null;
+
+                        return "upgraded";
+                    }
+                }
+            }
+
+            return "no connection;";
         }
     }
 }

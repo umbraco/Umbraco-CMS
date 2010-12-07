@@ -2,44 +2,87 @@
 <asp:Placeholder ID="identify" Runat="server" Visible="True">
 
 <!-- create box -->
-					<div class="tab main-tabinfo">
-						<div class="container">
-							<h1>Create User</h1>
-							<div class="create-hold">								<p>You can now setup a new user to log into Umbraco.  Please make a note of this password.</p>								<p>You will be able to change this once you have set the system up and logged in to the admin interface.</p>							</div>
-						</div>
-						<div class="database-hold">
-							<form action="#">
-								<fieldset>
-									<div class="container">
-										<div class="instruction-hold">
+					<div class="tab main-tabinfo">
+
+						<div class="container">
+
+							<h1>Create User</h1>
+							<div class="create-hold">
+								<p>You can now setup a new user to log into Umbraco.  Please make a note of this password.</p>
+								<p>You will be able to change this once you have set the system up and logged in to the admin interface.</p>
+							</div>
+
+						</div>
+
+						<div class="database-hold">
+
+							<form action="#">
+
+								<fieldset>
+
+									<div class="container">
+
+										<div class="instruction-hold">
+
 											<div class="row">
-                                                <asp:Label AssociatedControlID="tb_name" runat="server">Name:</asp:label>												<span><asp:TextBox ID="tb_name" CssClass="text" type="text" Text="admin" runat="server"  /></span>                                                <strong class="validaing">Validaing text here</strong>											</div>
-											<div class="row">												<asp:Label AssociatedControlID="tb_email" runat="server">Email:</asp:label>												<span><asp:TextBox ID="tb_email" CssClass="text" type="text" Text="admin@domain.com" runat="server"  /></span>												<strong class="validaing">Validaing text here</strong>											</div>
-											<div class="row">												<asp:Label AssociatedControlID="tb_login" runat="server">Username:</asp:label>												<span><asp:TextBox ID="tb_login" CssClass="text" type="text" Text="admin" runat="server"  /></span>												<strong class="validaing">Validaing text here</strong>											</div>
-											<div class="row error">	                                            <asp:Label AssociatedControlID="tb_password" runat="server">Password:</asp:label>												<span><asp:TextBox ID="tb_password" CssClass="text" type="text" Text="admin" runat="server"  /></span>												<strong class="invalidaing">Invalidaing text here</strong>
-											</div>
-											<div class="row">
-												<asp:Label AssociatedControlID="tb_password_confirm" runat="server">Confirm Password:</asp:label>												<span><asp:TextBox ID="tb_password_confirm" CssClass="text" type="text" Text="admin"  runat="server"  /></span>												<strong class="invalidaing">Invalidaing text here</strong>
-											</div>
-											<div class="check-hold">                                            	<asp:CheckBox ID="cb_newsletter" runat="server" Checked="true" />                                                 <asp:Label AssociatedControlID="cb_newsletter" runat="server">Sign up for our monthly newsletter</asp:label>
-											</div>
-										</div>
-									</div>
-									<footer class="btn-box">										<div class="t">&nbsp;</div>                                        <asp:LinkButton CssClass="btn-create" runat="server" onclick="changePassword_Click"><span>Create user</span></asp:linkbutton>									</footer>
-								</fieldset>
-							</form>
-						</div>
-					</div></asp:Placeholder>
+                                                <asp:Label AssociatedControlID="tb_name" runat="server">Name:</asp:label>
+												<span><asp:TextBox ID="tb_name" CssClass="text" type="text" Text="admin" runat="server"  /></span>
+                                                <asp:RequiredFieldValidator CssClass="invalidaing" ControlToValidate="tb_name" runat="server" ErrorMessage="Name is a mandatory field" />
+											</div>
+
+											<div class="row">
+												<asp:Label AssociatedControlID="tb_email" runat="server">Email:</asp:label>
+												<span><asp:TextBox ID="tb_email" CssClass="text" type="text" Text="admin@domain.com" runat="server"  /></span>
+
+                                                <asp:RequiredFieldValidator CssClass="invalidaing" ControlToValidate="tb_email" runat="server" ErrorMessage="Email is a mandatory field" />
+
+												
+											</div>
+
+											<div class="row">
+												<asp:Label AssociatedControlID="tb_login" runat="server">Username:</asp:label>
+												<span><asp:TextBox ID="tb_login" CssClass="text" type="text" Text="admin" runat="server"  /></span>
+												<asp:RequiredFieldValidator CssClass="invalidaing" ControlToValidate="tb_login" runat="server" ErrorMessage="Username is a mandatory field" />
+											</div>
+
+											<div class="row" style="height: 35px; overflow: hidden;">
+	                                            <asp:Label AssociatedControlID="tb_password" runat="server">Password:</asp:label>
+												<span><asp:TextBox ID="tb_password" CssClass="text" TextMode="Password" type="text" Text="" runat="server"  /></span>
+												<asp:RequiredFieldValidator CssClass="invalidaing" ControlToValidate="tb_password" runat="server" ErrorMessage="Username is a mandatory field" />
+											</div>
+
+											<div class="row">
+												<asp:Label AssociatedControlID="tb_password_confirm" runat="server">Confirm Password:</asp:label>
+												<span><asp:TextBox ID="tb_password_confirm" CssClass="text" TextMode="Password" type="text" Text=""  runat="server"  /></span>
+                                                <asp:CompareValidator CssClass="invalidaing" ControlToCompare="tb_password" ControlToValidate="tb_password_confimr" ErrorMessage="The passwords must be identical" />
+												<asp:RequiredFieldValidator CssClass="invalidaing" ControlToValidate="tb_password" runat="server" ErrorMessage="Username is a mandatory field" />
+											</div>
+
+											<div class="check-hold">
+                                            	<asp:CheckBox ID="cb_newsletter" runat="server"  /> 
+                                                <asp:Label AssociatedControlID="cb_newsletter" runat="server">Sign up for our monthly newsletter</asp:label>
+											</div>
+										</div>
+									</div>
+									<footer class="btn-box">
+										<div class="t">&nbsp;</div>
+                                        <asp:LinkButton CssClass="btn-create" runat="server" onclick="changePassword_Click"><span>Create user</span></asp:linkbutton>
+									</footer>
+								</fieldset>
+							</form>
+						</div>
+					</div>
+</asp:Placeholder>
 
 <script type="text/javascript">
   $(document).ready(function() {
                  jQuery("#<%= tb_password.ClientID %>").passStrength({
-					shortPass: 		"error",
-					badPass:		"error",
-					goodPass:		"success",
-					strongPass:		"success",
-					baseStyle:		"passtestresult",
-					userid:			"admin",
+                     shortPass:     "invalidaing",
+                     badPass:       "invalidaing",
+                     goodPass:      "validaing",
+                     strongPass:    "validaing",
+                     baseStyle:     "basevalidaing",
+					userid:         jQuery("#<%= tb_login.ClientID %>").val(),
 					messageloc:		1
 				});
 			});

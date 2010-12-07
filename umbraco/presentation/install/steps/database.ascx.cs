@@ -9,6 +9,7 @@ using umbraco.DataLayer;
 using umbraco.DataLayer.Utility.Installer;
 using System.IO;
 using umbraco.IO;
+using System.Threading;
 
 namespace umbraco.presentation.install.steps
 {
@@ -19,7 +20,7 @@ namespace umbraco.presentation.install.steps
     {
         /// <summary>The installer associated with the chosen connection string.</summary>
         private IInstallerUtility m_Installer;
-
+       
         /// <summary>
         /// The installer associated with the chosen connection string.
         /// Will be initialized if <c>m_Installer</c> is <c>null</c>.
@@ -85,8 +86,7 @@ namespace umbraco.presentation.install.steps
             // Does the user have to enter a connection string?
             if (settings.Visible)
                 ShowDatabaseSettings();
-            else
-                ShowDatabaseInstallation();
+            
         }
 
         /// <summary>
@@ -141,55 +141,42 @@ namespace umbraco.presentation.install.steps
         /// <summary>
         /// Shows the installation/upgrade panel.
         /// </summary>
-        protected void ShowDatabaseInstallation()
+        /// 
+
+        
+
+        protected void saveDBConfig(object sender, EventArgs e)
         {
-            identify.Visible = true;
+            try
+            {
+                DbConnectionStringBuilder connectionStringBuilder = CreateConnectionString();
+                GlobalSettings.DbDSN = connectionStringBuilder.ConnectionString;
+            }
+            catch (Exception ex)
+            {
+                Exception error = new Exception("Could not save the web.config file. Please modify the connection string manually.", ex);
+                Helper.setSession("database", -1, "Could not save the web.config file. Please modify the connection string manually.", error.InnerException.Message);
+            }
 
-            if (Installer.CurrentVersion == DatabaseVersion.None)
-            {
-                dbEmpty.Visible = true;
-                //dbUpgrade.Visible = false;
-            }
-            else
-            {
-                //version.Text = Installer.CurrentVersion.ToString();
-            }
-
-            if (Installer.IsLatestVersion)
-            {
-                settings.Visible = false;
-                installed.Visible = true;
-                // Enable back/forward buttons
-            }
-            else
-            {
-                if (Installer.CanUpgrade)
-                {
-                    //upgrade.Visible = true;
-                    other.Visible = true;
-                }
-                else if (Installer.IsEmpty)
-                {
-                    //install.Visible = true;
-                    none.Visible = true;
-                }
-                else
-                {
-                   // retry.Visible = true;
-                    error.Visible = true;
-                }
-            }
+            settings.Visible = false;
+            installing.Visible = true;
         }
+
 
         /// <summary>
         /// Tries to connect to the database and saves the new connection string if successful.
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The event arguments.</param>
+        /// 
+    
+        /*
         protected void DatabaseConnectButton_Click(object sender, EventArgs e)
         {
+            
             // Build the new connection string
             DbConnectionStringBuilder connectionStringBuilder = CreateConnectionString();
+            Helper.setSession(sesssionAlias, 5, "Connecting...", "");
 
             // Try to connect to the database
             Exception error = null;
@@ -197,12 +184,16 @@ namespace umbraco.presentation.install.steps
             {
                 ISqlHelper sqlHelper = DataLayerHelper.CreateSqlHelper(connectionStringBuilder.ConnectionString);
                 m_Installer = sqlHelper.Utility.CreateInstaller();
+                
                 if (!Installer.CanConnect)
                     throw new Exception("The installer cannot connect to the database.");
+                else
+                    Helper.setSession(sesssionAlias, 20, "Connection opened", "");
             }
             catch (Exception ex)
             {
                 error = new Exception("Database connection initialisation failed.", ex);
+                Helper.setSession(sesssionAlias, -5, "Database connection initialisation failed.", error.Message);
             }
 
             // Save the new connection string
@@ -215,20 +206,24 @@ namespace umbraco.presentation.install.steps
                 catch (Exception ex)
                 {
                     error = new Exception("Could not save the web.config file. Please modify the connection string manually.", ex);
+                    Helper.setSession(sesssionAlias, -1, "Could not save the web.config file. Please modify the connection string manually.", error.Message);
                 }
             }
 
             // Show database installation panel or error message if not successful
             if (error == null)
             {
-                settings.Visible = false;
-                ShowDatabaseInstallation();
+                //ph_dbError.Visible = false;
+                //settings.Visible = false;
+                installOrUpgrade();
             }
             else
             {
-                //DatabaseError.InnerText = String.Format("{0} {1}", error.Message, error.InnerException.Message);
+                ph_dbError.Visible = true;
+                lt_dbError.Text = String.Format("{0} {1}", error.Message, error.InnerException.Message);
             }
         }
+        */ 
 
         /// <summary>
         /// Creates the connection string with the values the user has supplied.
@@ -296,35 +291,7 @@ namespace umbraco.presentation.install.steps
                 div.Attributes["style"] = "display: block;";
         }
 
-        protected void upgrade_Click(object sender, System.EventArgs e)
-        {
-            Installer.Install();
-
-            ((Button)Page.FindControl("next")).Visible = true;
-
-            settings.Visible = false;
-            //upgrade.Visible = false;
-            identify.Visible = false;
-            confirms.Visible = true;
-            upgradeConfirm.Visible = true;
-        }
-
-        protected void install_Click(object sender, System.EventArgs e)
-        {
-            Installer.Install();
-
-            
-            settings.Visible = false;
-            //install.Visible = false;
-            identify.Visible = false;
-            confirms.Visible = true;
-            installConfirm.Visible = true;
-
-            //after the database install we will login the default admin user so we can install boost and nitros later on
-            if (GlobalSettings.ConfigurationStatus.Trim() == "")
-                BasePages.UmbracoEnsuredPage.doLogin(new global::umbraco.BusinessLogic.User(0));
-        }
-
+        
         protected void gotoNextStep(object sender, EventArgs e)
         {
             Helper.RedirectToNextStep(this.Page);

@@ -4,9 +4,7 @@
 <%@ Register Src="~/install/Title.ascx" TagPrefix="umb1" TagName="PageTitle" %>
 
 <!DOCTYPE html>
-
 <html>
-
 <head runat="server">
 
 	<meta charset="utf-8">
@@ -22,6 +20,8 @@
 	<script src="js/jquery.ui.selectmenu.js" type="text/javascript"></script>
 	<script src="js/jquery.main.js" type="text/javascript"></script>
 
+    <script src="../umbraco_client/passwordStrength/passwordstrength.js" type="text/javascript"></script>
+
 	<!--[if lt IE 9]>
 		<link media="all" rel="stylesheet" href="css/lt7.css">
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -34,7 +34,7 @@
 
    
 	<form runat="server">
-	 <asp:ScriptManager runat="server" />
+	<asp:ScriptManager ID="ScriptManager1"  EnablePageMethods="true" runat="server"/>
     <!-- all page -->
 
 	<section id="wrapper">

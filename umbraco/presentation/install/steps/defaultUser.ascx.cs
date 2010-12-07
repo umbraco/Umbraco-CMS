@@ -46,6 +46,8 @@ namespace umbraco.presentation.install.steps
 
 		protected void changePassword_Click(object sender, System.EventArgs e)
 		{
+            Page.Validate();
+
             if (Page.IsValid)
             {
                 User u = User.GetUser(0);
@@ -87,6 +89,10 @@ namespace umbraco.presentation.install.steps
                     }
                     catch { /* fail in silence */ }
                 }
+
+
+                if (GlobalSettings.ConfigurationStatus.Trim() == "")
+                    BasePages.UmbracoEnsuredPage.doLogin(u);
 
                 Helper.RedirectToNextStep(this.Page);                
             }

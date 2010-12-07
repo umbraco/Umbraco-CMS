@@ -542,21 +542,29 @@ figure{display: block;}
 	margin: -42px 0 0;
 }
 .validaing,
-.invalidaing{
-	float:left;
-	display:inline;
-	margin:6px 0 0 10px;
-	padding:0 0 2px 28px;
-	line-height:13px;
-	font-weight:normal;
-	color:#fff;
-	background:url(../images/ico-validaing.png) no-repeat;
+.invalidaing, .basevalidaing{
+	float:left !Important;
+	display:inline !Important;
+	margin:6px 0 0 10px !Important;
+	padding:0 0 2px 28px !Important;
+	line-height:13px !Important;
+	font-weight:normal !Important;
+	color:#fff !Important;
+	background-color: none !Important;
 }
-.invalidaing{
-	margin:6px 0 0 12px;
-	padding:0 0 2px 26px;
-	background:url(../images/ico-invalidaing.png) no-repeat;
+
+.validaing
+{
+    background:url(../images/ico-validaing.png) no-repeat !Important;
 }
+
+.invalidaing{
+	margin:6px 0 0 12px !Important;
+	padding:0 0 2px 26px !Important;
+	background:url(../images/ico-invalidaing.png) no-repeat !Important;
+}
+
+
 /* add navigation */
 .add-nav:after {
 	clear: both;

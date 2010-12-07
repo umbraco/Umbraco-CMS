@@ -40,6 +40,24 @@ namespace umbraco.presentation.install.steps {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl embeddedFilesMissing;
         
         /// <summary>
+        /// ph_dbError control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder ph_dbError;
+        
+        /// <summary>
+        /// lt_dbError control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal lt_dbError;
+        
+        /// <summary>
         /// DatabaseServerItem control.
         /// </summary>
         /// <remarks>
@@ -184,58 +202,13 @@ namespace umbraco.presentation.install.steps {
         protected global::System.Web.UI.WebControls.Literal jsVars;
         
         /// <summary>
-        /// identify control.
+        /// installing control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel identify;
-        
-        /// <summary>
-        /// dbEmpty control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal dbEmpty;
-        
-        /// <summary>
-        /// installed control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder installed;
-        
-        /// <summary>
-        /// other control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder other;
-        
-        /// <summary>
-        /// none control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder none;
-        
-        /// <summary>
-        /// error control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder error;
+        protected global::System.Web.UI.WebControls.PlaceHolder installing;
         
         /// <summary>
         /// confirms control.
