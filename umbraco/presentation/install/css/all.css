@@ -42,8 +42,8 @@ figure{display: block;}
 	position:absolute;
 	top:0;
 	left:0;
-	width:50%;
-	height:1250px;
+	width:1%;
+	height:1050px;
 }
 .bg-main {
 	position:absolute;
@@ -62,7 +62,7 @@ figure{display: block;}
 	top: 0;
 	left: 0;
 	width:100%;
-	height:1250px;
+	height:1050px;
 }
 .bg-main .color1 .bg-r,
 .bg-main .color2 .bg-r,
@@ -73,7 +73,7 @@ figure{display: block;}
 	top: 0;
 	left: 50%;
 	width:50%;
-	height:1250px;
+	height:1050px;
 }
 .bg-main .color1 .bg-c,
 .bg-main .color2 .bg-c,
@@ -84,7 +84,7 @@ figure{display: block;}
 	top: 0;
 	left: 0;
 	width:100%;
-	height:1250px;
+	height:1050px;
 }
 
 /* Color 1 */
@@ -114,7 +114,7 @@ figure{display: block;}
 }
 .wholder{
 	width:100%;
-	min-height:1200px;
+	min-height:1000px;
 	position:relative;
 	padding:0 0 50px;
 }

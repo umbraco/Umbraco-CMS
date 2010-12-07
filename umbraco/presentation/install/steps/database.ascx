@@ -107,7 +107,7 @@
                         <!-- btn box -->
                         <footer class="btn-box">
 	                        <div class="t">&nbsp;</div>
-                                <asp:LinkButton runat="server" class="single-tab submit btn-install" onclick="saveDBConfig"><span>install</span</asp:LinkButton>
+                                <asp:LinkButton runat="server" class="single-tab submit btn-install" onclick="saveDBConfig"><span>install</span>    </asp:LinkButton>
 							</footer>
                     </div>
                 </div>
@@ -152,7 +152,7 @@
                     </div>
                     <span class="progress-bar-value">56%</span>
                 </div>
-                <strong>Installation complete</strong>
+                <strong></strong>
             </div>
         </div>
         <!-- btn box -->
@@ -163,41 +163,37 @@
     </div>
 
     <script type="text/javascript">
+        var intervalId = 0;
 
-    var intervalId = 0;
-    var pBar = jQuery(".progress-bar").progressbar({value: 0});
-
-
-    jQuery(document).ready(function () {
-
-        jQuery(".progress-bar").progressbar("option", "value", 0);
-        intervalId = setInterval("updateProgressBar()", 1000);
-
-
-        jQuery.ajax({
-            type: 'POST',
-            contentType: 'application/json; charset=utf-8',
-            data: '{}',
-            dataType: 'json',
-            url: 'utills/p.aspx/installOrUpgrade',
-            success: function (result) {
-
-                clearInterval(intervalId);
-
-                jQuery(".btn-box").show();
-            }
-        });
-    });
-
-    function updateProgressBar() {
-        jQuery.getJSON('utills/p.aspx?feed=progress', function (data) {
-            alert(data.percentage);
-            jQuery(".progress-bar").progressbar("option", "value", data.percentage);
-            jQuery(".loader strong").text(data.description);
+        jQuery(document).ready(function () {
+            intervalId = setInterval("progressBarCallback()", 1000);
+            jQuery(".btn-box").hide();
+            jQuery.ajax({
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: '{}',
+                dataType: 'json',
+                url: 'utills/p.aspx/installOrUpgrade'
+            });
         });
 
-    }
+        function progressBarCallback() {
+            jQuery.getJSON('utills/p.aspx?feed=progress', function (data) {
 
+                updateProgressBar(data.percentage);
+                updateStatusMessage(data.message)
+
+                if (data.error != "") {
+                    clearInterval(intervalId);
+                    updateStatusMessage(data.error);
+                }
+
+                if (data.percentage == 100) {
+                    clearInterval(intervalId);
+                    jQuery(".btn-box").show();
+                }
+            });
+        }
     </script>
 
 </asp:PlaceHolder>
@@ -214,7 +210,7 @@
     </asp:PlaceHolder>
     <asp:PlaceHolder ID="upgradeConfirm" runat="server" Visible="False">
         <h1>
-            Database upgraded</h2>
+            Database upgraded</h1>
             <div class="success">
                 <p>
                     Your database has been upgraded to the final version
