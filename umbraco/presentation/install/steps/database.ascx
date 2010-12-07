@@ -162,10 +162,14 @@
     <script type="text/javascript">
 
     var intervalId = 0;
+    var pBar = jQuery(".progress-bar").progressbar({value: 0});
 
-    jQuery(document).ready(function(){
 
-        intervalId = setInterval("updateProgressBar()", 500);
+    jQuery(document).ready(function () {
+
+        jQuery(".progress-bar").progressbar("option", "value", 0);
+        intervalId = setInterval("updateProgressBar()", 1000);
+
 
         jQuery.ajax({
             type: 'POST',
@@ -174,24 +178,21 @@
             dataType: 'json',
             url: 'utills/p.aspx/installOrUpgrade',
             success: function (result) {
-                alert(result);
+
                 clearInterval(intervalId);
+
+                jQuery(".btn-box").show();
             }
         });
     });
 
     function updateProgressBar() {
-        jQuery.ajax({
-            type: 'POST',
-            contentType: 'application/json; charset=utf-8',
-            data: '{}',
-            dataType: 'json',
-            url: 'utills/p.aspx?feed=progress',
-            success: function (result) {
-                alert(result.percentage + " " + result.progress.percentage);
-                jQuery("h1").html(result.percentage + " " + result.progress.percentage);
-            }
+        jQuery.getJSON('utills/p.aspx?feed=progress', function (data) {
+            alert(data.percentage);
+            jQuery(".progress-bar").progressbar("option", "value", data.percentage);
+            jQuery(".loader strong").text(data.description);
         });
+
     }
 
     </script>
@@ -220,7 +221,7 @@
             </div>
     </asp:PlaceHolder>
     <!-- btn box -->
-    <footer class="btn-box">
+    <footer class="btn-box" style="display: none;">
 	     <div class="t">&nbsp;</div>
             <asp:LinkButton class="btn-step btn btn-continue" runat="server" OnClick="gotoNextStep"><span>Continue</span></asp:LinkButton>
 	     </footer>

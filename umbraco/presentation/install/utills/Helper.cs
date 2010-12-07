@@ -28,13 +28,12 @@ namespace umbraco.presentation.install {
     }
 
     public static string getProgress(){
-        string json = @"{'progress': {
-                                        'percentage': '%p',
-                                        'message': '%m',
-                                        'error': '%e'
-                                        }   
-                                 }";
-        string retval = json.Replace("%p", Percentage.ToString()).Replace("%m", Description).Replace("%e", Error);
+        string json = @"{
+                            'percentage': '%p',
+                            'message': '%m',
+                            'error': '%e'
+                        }";
+        string retval = json.Replace("%p", Percentage.ToString()).Replace("%m", Description).Replace("%e", Error).Replace("'", "\"");
         return retval;
     }
   }
