@@ -839,7 +839,7 @@ namespace umbraco.cms.businesslogic
         private void EnsureVirtualTabs()
         {
             //optimize, lazy load the data only one time
-            if (m_VirtualTabs == null)
+            if (m_VirtualTabs == null || m_VirtualTabs.Count == 0)
             {
                 InitializeVirtualTabs();
             }
