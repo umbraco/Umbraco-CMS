@@ -22,5 +22,3 @@
                             <asp:LinkButton ID="btnNext" CssClass="btn btn-accept" runat="server" OnClick="gotoNextStep"><span>Accept and Continue</span></asp:LinkButton>
 						</footer>
 					</div>
-
-		  
