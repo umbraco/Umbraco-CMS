@@ -90,6 +90,27 @@
 
     </div>
 
+    <div id="localSkinsContainer" runat="server">
+    <p>Looks like there are also some local skins</p>
+    
+        <asp:Repeater ID="rep_starterKitDesignsLocal" runat="server"  onitemdatabound="rep_starterKitDesignsLocal_ItemDataBound">
+        <HeaderTemplate>
+                <ul id="starterKitDesignsLocal">
+        </HeaderTemplate>
+        <ItemTemplate>
+         <li>
+                <%# ((string)Container.DataItem).ToString() %>
+
+                <asp:Button ID="btnApply" CssClass="selectskin" runat="server" Text="Apply" CommandArgument="<%# ((string)Container.DataItem).ToString() %>" OnClick="SelectLocalStarterKitDesign"  CommandName="apply"/>
+         </li>
+        </ItemTemplate>
+        <FooterTemplate>
+                </ul>
+            </FooterTemplate>
+        </asp:Repeater>
+
+
+    </div>
 
     <p runat="server" id="pCustomizeSkin" style="clear: both; margin-top: 25px; border-top: 1px solid #efefef; padding: 7px" >
         <a onclick="jQuery('#changeSkin').hide(); jQuery('#costumizeSkin').show();">Go back to your current skin</a>

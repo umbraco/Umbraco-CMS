@@ -154,6 +154,8 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
 
         protected void LoadSkins()
         {
+            List<string> skinNames = new List<string>();
+
             Guid? nullable = Skinning.StarterKitGuid(Node.GetCurrent().template);
 
             if(nullable.HasValue){
@@ -170,8 +172,15 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
             {
                 try
                 {
-                    this.rep_starterKitDesigns.DataSource = this.repo.Webservice.Skins(nullable.ToString());
+                    var skins = this.repo.Webservice.Skins(nullable.ToString());
+                    this.rep_starterKitDesigns.DataSource = skins;
                     this.rep_starterKitDesigns.DataBind();
+
+                    foreach (var s in skins)
+                    {
+                        if(!skinNames.Contains(s.Text))
+                            skinNames.Add(s.Text);
+                    }
                 }
                 catch (Exception exception)
                 {
@@ -182,6 +191,37 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
             {
                 this.ShowConnectionError();
             }
+
+            //check for local skins
+
+            List<string> localSkins = new List<string>();
+            DirectoryInfo dirInfo = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages));
+            foreach (DirectoryInfo subDur in dirInfo.GetDirectories())
+            {
+                var skinFile = subDur.GetFiles("skin.xml");
+
+                if (skinFile != null)
+                {
+                    string c = Skin.GetSkinNameFromFile(skinFile[0].FullName);
+
+                    if (!skinNames.Contains(c))
+                        localSkins.Add(c);
+                }
+
+            }
+
+            if (localSkins.Count > 0)
+            {
+                rep_starterKitDesignsLocal.DataSource = localSkins;
+                rep_starterKitDesignsLocal.DataBind();
+            }
+            else
+            {
+                localSkinsContainer.Visible = false;
+            }
+
+
+
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -284,6 +324,37 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                 {
                     this.ShowConnectionError();
                 }
+            }
+        }
+
+
+        protected void rep_starterKitDesignsLocal_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.DataItem != null)
+            {
+
+                if (ActiveSkin != null && ActiveSkin.Name == e.Item.DataItem.ToString())
+                {
+                    Button inst = (Button)e.Item.FindControl("btnApply");
+                    inst.Text = "Rollback";
+                    inst.CommandName = "remove";
+                }
+            }
+
+        }
+
+        protected void SelectLocalStarterKitDesign(object sender, EventArgs e)
+        {
+            if (((Button)sender).CommandName == "apply")
+            {
+                Skinning.ActivateAsCurrentSkin(Skin.CreateFromName(((Button)sender).CommandArgument));
+                this.Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())) + "?umbSkinning=true");
+            }
+            else if (((Button)sender).CommandName == "remove")
+            {
+                Template template = new Template(Node.GetCurrent().template);
+                Skinning.RollbackSkin(template.Id);
+                this.Page.Response.Redirect(library.NiceUrl(int.Parse(UmbracoContext.Current.PageId.ToString())) + "?umbSkinning=true");
             }
         }
 

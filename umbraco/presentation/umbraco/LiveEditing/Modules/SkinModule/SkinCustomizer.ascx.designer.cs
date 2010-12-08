@@ -76,6 +76,24 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule {
         protected global::System.Web.UI.WebControls.Repeater rep_starterKitDesigns;
         
         /// <summary>
+        /// localSkinsContainer control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl localSkinsContainer;
+        
+        /// <summary>
+        /// rep_starterKitDesignsLocal control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rep_starterKitDesignsLocal;
+        
+        /// <summary>
         /// pCustomizeSkin control.
         /// </summary>
         /// <remarks>
