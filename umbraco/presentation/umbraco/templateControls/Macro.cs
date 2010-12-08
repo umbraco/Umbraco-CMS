@@ -7,18 +7,27 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 
 using System.Collections;
+using umbraco.cms.businesslogic.macro;
+using umbraco.presentation.nodeFactory;
 
-namespace umbraco.presentation.templateControls {
+namespace umbraco.presentation.templateControls
+{
 
     [DefaultProperty("Alias")]
     [ToolboxData("<{0}:Macro runat=server></{0}:Macro>")]
-    public class Macro : WebControl {
+    [PersistChildren(false)]
+    [ParseChildren(true, "Text")]
+    public class Macro : WebControl, ITextControl
+    {
 
         private Hashtable m_Attributes = new Hashtable();
+        private string m_Code = String.Empty;
 
-        public Hashtable MacroAttributes {
-            get {
-//                Hashtable attributes = (Hashtable)ViewState["Attributes"];
+        public Hashtable MacroAttributes
+        {
+            get
+            {
+                //                Hashtable attributes = (Hashtable)ViewState["Attributes"];
                 return m_Attributes;
             }
             set
@@ -32,14 +41,35 @@ namespace umbraco.presentation.templateControls {
         [Category("Umbraco")]
         [DefaultValue("")]
         [Localizable(true)]
-        public string Alias {
-            get {
+        public string Alias
+        {
+            get
+            {
                 String s = (String)ViewState["Alias"];
                 return ((s == null) ? String.Empty : s);
             }
 
-            set {
+            set
+            {
                 ViewState["Alias"] = value;
+            }
+        }
+
+        [Bindable(true)]
+        [Category("Umbraco")]
+        [DefaultValue("")]
+        [Localizable(true)]
+        public string Language
+        {
+            get
+            {
+                String s = (String)ViewState["Language"];
+                return ((s == null) ? String.Empty : s);
+            }
+
+            set
+            {
+                ViewState["Language"] = value.ToLower();
             }
         }
 
@@ -61,42 +91,64 @@ namespace umbraco.presentation.templateControls {
         protected override void CreateChildControls()
         {
             // collect all attributes set on the control
-            if (MacroAttributes == null || MacroAttributes.Count == 0) {
+            if (MacroAttributes == null || MacroAttributes.Count == 0)
+            {
                 ICollection keys = Attributes.Keys;
-                foreach(string key in keys) {
+                foreach (string key in keys)
+                {
                     MacroAttributes.Add(key.ToLower(), Attributes[key]);
                 }
             }
             if (!MacroAttributes.ContainsKey("macroalias") && !MacroAttributes.ContainsKey("macroAlias"))
                 MacroAttributes.Add("macroalias", Alias);
-            macro tempMacro = null;
-            tempMacro = macro.ReturnFromAlias(Alias);
 
-            // set pageId to int.MinValue if no pageID was found,
-            // e.g. if the macro was rendered on a custom (non-Umbraco) page
-            int pageId = Context.Items["pageID"] == null ? int.MinValue : int.Parse(Context.Items["pageID"].ToString());
+            if (!String.IsNullOrEmpty(Language) && Text != "")
+            {
+                //TODO: FOR JUNO RC: Move this into the Macro object to ensure caching etc
+                macro m = new macro();
+                MacroModel model = m.ConvertToMacroModel(MacroAttributes);
+                model.ScriptCode = Text;
+                IMacroEngine engine = MacroEngineFactory.GetByExtension(Language);
+                string result = engine.Execute(
+                    model, 
+                    Node.GetCurrent());
+                Controls.Add(new LiteralControl(result));
+            }
+            else
+            {
+                macro tempMacro = null;
+                tempMacro = macro.ReturnFromAlias(Alias);
 
-            if (tempMacro != null) {
+                // set pageId to int.MinValue if no pageID was found,
+                // e.g. if the macro was rendered on a custom (non-Umbraco) page
+                int pageId = Context.Items["pageID"] == null ? int.MinValue : int.Parse(Context.Items["pageID"].ToString());
 
-                try {
-                    Control c = tempMacro.renderMacro(MacroAttributes, (Hashtable)Context.Items["pageElements"], pageId);
-                    if (c != null)
-                        Controls.Add(c);
-                    else
-                        System.Web.HttpContext.Current.Trace.Warn("Template", "Result of macro " + tempMacro.Name + " is null");
+                if (tempMacro != null)
+                {
 
-                } catch (Exception ee) {
-                    System.Web.HttpContext.Current.Trace.Warn("Template", "Error adding macro " + tempMacro.Name, ee);
+                    try
+                    {
+                        Control c = tempMacro.renderMacro(MacroAttributes, (Hashtable)Context.Items["pageElements"], pageId);
+                        if (c != null)
+                            Controls.Add(c);
+                        else
+                            System.Web.HttpContext.Current.Trace.Warn("Template", "Result of macro " + tempMacro.Name + " is null");
+
+                    }
+                    catch (Exception ee)
+                    {
+                        System.Web.HttpContext.Current.Trace.Warn("Template", "Error adding macro " + tempMacro.Name, ee);
+                    }
                 }
             }
-
         }
 
         /// <summary>
         /// Renders the control to the specified HTML writer.
         /// </summary>
         /// <param name="writer">The <see cref="T:System.Web.UI.HtmlTextWriter"/> object that receives the control content.</param>
-        protected override void Render(HtmlTextWriter writer) {
+        protected override void Render(HtmlTextWriter writer)
+        {
             EnsureChildControls();
 
             bool isDebug = GlobalSettings.DebugMode && (helper.Request("umbdebugshowtrace") != "" || helper.Request("umbdebug") != "");
@@ -112,5 +164,10 @@ namespace umbraco.presentation.templateControls {
         }
 
 
+        public string Text
+        {
+            get { return m_Code; }
+            set { m_Code = value; }
+        }
     }
 }

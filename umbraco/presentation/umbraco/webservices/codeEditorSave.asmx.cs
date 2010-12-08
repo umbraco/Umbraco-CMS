@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Xml;
 using System.Xml.Xsl;
 using umbraco.BasePages;
+using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.cache;

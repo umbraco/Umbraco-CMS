@@ -10,6 +10,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Xml.Linq;
+using umbraco.cms.businesslogic.macro;
 using umbraco.scripting;
 using umbraco.BasePages;
 
@@ -22,12 +23,10 @@ namespace umbraco.presentation.create
         protected void Page_Load(object sender, System.EventArgs e)
         {
             sbmt.Text = ui.Text("create");
-/*
-            foreach (LanguageSetup ls in MacroScript.GetAvailableLanguages())
+            foreach(MacroEngineLanguage lang in MacroEngineFactory.GetSupportedLanguages())
             {
-                filetype.Items.Add( new ListItem( ls.DisplayName,  ls.FileExtensions[0].Trim('.')));
+                filetype.Items.Add( new ListItem( string.Format("{0} by {1}", helper.SpaceCamelCasing(lang.Extension), lang.EngineName), lang.Extension));
             }
-*/
             if(!Page.IsPostBack)
                 filetype.SelectedIndex = 0;
 

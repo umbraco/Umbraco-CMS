@@ -49,6 +49,19 @@ namespace umbraco.cms.businesslogic.macro
             }
         }
 
+        public static List<MacroEngineLanguage> GetSupportedLanguages()
+        {
+            List<MacroEngineLanguage> languages = new List<MacroEngineLanguage>();
+            foreach(IMacroEngine engine in GetAll())
+            {
+                foreach(string lang in engine.SupportedExtensions)
+                    if (languages.Find(t => t.Extension == lang) == null)
+                        languages.Add(new MacroEngineLanguage(lang, engine.Name));
+            }
+
+            return languages;
+        }
+
         public static List<IMacroEngine> GetAll()
         {
 
@@ -107,6 +120,22 @@ namespace umbraco.cms.businesslogic.macro
             : base(msg)
         {
 
+        }
+    }
+
+    public class MacroEngineLanguage
+    {
+        public string Extension { get; set; }
+        public string EngineName { get; set; }
+        public MacroEngineLanguage()
+        {
+            
+        }
+
+        public MacroEngineLanguage(string extension, string engineName)
+        {
+            Extension = extension;
+            EngineName = engineName;
         }
     }
 }

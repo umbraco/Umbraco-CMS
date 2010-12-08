@@ -71,7 +71,10 @@ namespace umbraco.MacroEngines.Razor {
             }
 
             var @params = new CompilerParameters();
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
+//            @params.ReferencedAssemblies.Add("System");
+//            @params.ReferencedAssemblies.Add("System.Web");
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
                 if (!assembly.IsDynamic)
                     @params.ReferencedAssemblies.Add(assembly.Location);
             }
