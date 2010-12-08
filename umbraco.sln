@@ -107,8 +107,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCE4Umbraco", "components
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.MacroEngines.Legacy", "umbraco.MacroEngines\umbraco.MacroEngines.Legacy.csproj", "{6AE67079-2C00-476C-81DE-2800D1AC14BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.MacroEngines", "umbraco.MacroEngines.Juno\umbraco.MacroEngines.csproj", "{89C09045-1064-466B-B94A-DB3AFE2A5853}"
-EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 16
@@ -157,7 +155,7 @@ Global
 		SccProjectUniqueName14 = components\\SQLCE4Umbraco\\SqlCE4Umbraco.csproj
 		SccProjectName14 = components/SQLCE4Umbraco
 		SccLocalPath14 = components\\SQLCE4Umbraco
-		SccProjectUniqueName15 = umbraco.MacroEngines\\umbraco.MacroEngines.csproj
+		SccProjectUniqueName15 = umbraco.MacroEngines\\umbraco.MacroEngines.Legacy.csproj
 		SccProjectName15 = umbraco.MacroEngines
 		SccLocalPath15 = umbraco.MacroEngines
 	EndGlobalSection
@@ -225,10 +223,6 @@ Global
 		{6AE67079-2C00-476C-81DE-2800D1AC14BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6AE67079-2C00-476C-81DE-2800D1AC14BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6AE67079-2C00-476C-81DE-2800D1AC14BC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{89C09045-1064-466B-B94A-DB3AFE2A5853}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{89C09045-1064-466B-B94A-DB3AFE2A5853}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{89C09045-1064-466B-B94A-DB3AFE2A5853}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{89C09045-1064-466B-B94A-DB3AFE2A5853}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
