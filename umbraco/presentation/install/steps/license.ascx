@@ -4,8 +4,8 @@
 						<div class="container">
 							<h1>License</h1>
 							<div class="accept-hold">
-								<h2>Accept the licence for Umbraco CMS</h2>
-								<p>By clicking the accept button (or modify the Umbraco Configuration Status in web.config), you accept the licence for this software as specified in the text below.</p>
+								<h2>Accept the license for Umbraco CMS</h2>
+								<p>By clicking the accept button (or modify the Umbraco Configuration Status in web.config), you accept the license for this software as specified in the text below.</p>
 							</div>
 							<h3>The License (MIT):</h3>
 							<div class="box-software">

@@ -35,7 +35,7 @@
 	<img class="zoom-img" src="<%# ((Skin)Container.DataItem).Thumbnail %>" alt="<%# ((Skin)Container.DataItem).Text %>" width="134" height="103">
 			<div class="gal-drop">
 				<a href="#lightbox" class="btn-preview" title="<%# ((Skin)Container.DataItem).Text %>"><span>Preview</span></a>
-				<asp:LinkButton CssClass="single-tab btn-install-gal" ID="bt_selectKit" runat="server" onclick="SelectStarterKitDesign" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>"><span>Install</span></asp:LinkButton>
+				<asp:LinkButton CssClass="single-tab btn-install-gal" ID="bt_selectKit" runat="server" onclick="SelectStarterKitDesign" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>" ToolTip="<%# ((Skin)Container.DataItem).Text %>"><span>Install</span></asp:LinkButton>
 				<div class="gal-desc" style="display: none"><%# ((Skin)Container.DataItem).Description %></div>
                 <div class="gal-owner" style="display: none">Created by: <a href="<%# ((Skin)Container.DataItem).AuthorUrl %>" target="_blank"><%# ((Skin)Container.DataItem).Author %></a></div>
 			</div>

@@ -10,7 +10,7 @@
 	<ItemTemplate>
 
     <li class="add-<%# ((Package)Container.DataItem).Text.Replace(" ","").ToLower() %>">
-        <asp:LinkButton CssClass="single-tab selectStarterKit" ID="bt_selectKit" runat="server" onclick="SelectStarterKit" CommandArgument="<%# ((Package)Container.DataItem).RepoGuid %>">
+        <asp:LinkButton CssClass="single-tab selectStarterKit" ID="bt_selectKit" runat="server" onclick="SelectStarterKit" ToolTip="<%# ((Package)Container.DataItem).Text %>" CommandArgument="<%# ((Package)Container.DataItem).RepoGuid %>">
         <img class="zoom-img" src="<%# ((Package)Container.DataItem).Thumbnail %>" alt="<%# ((Package)Container.DataItem).Text %>" width="150" height="212"></asp:LinkButton>
 	<em>&nbsp;</em>
 	<!-- drop down -->

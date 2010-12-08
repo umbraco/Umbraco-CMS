@@ -11,7 +11,7 @@
 	jQuery(document).ready(function () {
 		jQuery('.zoom-list a.selectStarterKit').click(function () {
 			jQuery('.main-tabinfo').hide();
-			jQuery('#starterkitname').html( jQuery('span', this).html() );
+			jQuery('#starterkitname').html( jQuery(this).attr("title") );
 			
 			jQuery('#single-tab1').show();
 			//fire off the progressbar
@@ -41,9 +41,7 @@
 			    //fire off the progressbar
 			    intervalId = setInterval("progressBarCallback()", 1000);
 
-			    alert(jQuery(this).attr("title"));
-
-			    jQuery('#skinname').html(jQuery(this).attr("title"));
+			    jQuery('#skinname').html( jQuery(this).attr("title") );
 			    return true;
 			});
 		}
