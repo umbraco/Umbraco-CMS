@@ -304,11 +304,16 @@ namespace umbraco.cms.businesslogic.skinning
             {
                 try
                 {
-                    string url = umbraco.cms.businesslogic.packager.InstalledPackage.GetByGuid(g.ToString()).Data.SkinWebserviceUrl;
-                    umbraco.cms.businesslogic.packager.repositories.Repository repo = cms.businesslogic.packager.repositories.Repository.getByGuid("65194810-1f85-11dd-bd0b-0800200c9a66");
+                    string skinRepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
-                    if (!string.IsNullOrEmpty(url))
-                        repo.WebserviceUrl = url;
+                    if (umbraco.cms.businesslogic.packager.InstalledPackage.GetByGuid(g.ToString()).Data.SkinRepoGuid != null &&
+                        umbraco.cms.businesslogic.packager.InstalledPackage.GetByGuid(g.ToString()).Data.SkinRepoGuid != Guid.Empty)
+                    {
+                        skinRepoGuid = umbraco.cms.businesslogic.packager.InstalledPackage.GetByGuid(g.ToString()).Data.SkinRepoGuid.ToString();
+                    }
+
+
+                    umbraco.cms.businesslogic.packager.repositories.Repository repo = cms.businesslogic.packager.repositories.Repository.getByGuid(skinRepoGuid);
 
                     r = repo.Webservice.Skins(g.ToString()).Length > 0;
                 }
