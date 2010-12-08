@@ -116,7 +116,7 @@
                 object tempResult = null;
                 try
                 {
-                    if (Model.GetType().FullName == "RazorControl.DynamicNode")
+                    if (Model.GetType().FullName == "umbraco.MacroEngines.DynamicNode")
                     {
                         isDynamicNode = ((DynamicObject)Model).TryGetMember(binder, out tempResult);
                     }
