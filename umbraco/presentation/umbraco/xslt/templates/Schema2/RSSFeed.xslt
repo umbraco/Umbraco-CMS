@@ -65,7 +65,7 @@
 
   </xsl:template>
 
-  <xsl:template match="node">
+  <xsl:template match="* [@isDoc]">
     <xsl:if test="position() &lt;= $RSSNoItems">
       <item>
         <title>
