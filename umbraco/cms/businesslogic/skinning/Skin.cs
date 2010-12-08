@@ -40,6 +40,21 @@ namespace umbraco.cms.businesslogic.skinning
            
         }
 
+        public static string GetSkinNameFromFile(string filename)
+        {
+            XmlDocument manifest = new XmlDocument();
+
+            FileInfo f = new FileInfo(filename);
+
+            if (f.Exists)
+            {
+                manifest.Load(filename);
+                return manifest.SelectSingleNode("//Skin/Name").InnerText;
+            }
+            else
+                return null;
+        }
+
         public static Skin CreateFromXmlNode(XmlNode node)
         {
             Skin s = new Skin();
