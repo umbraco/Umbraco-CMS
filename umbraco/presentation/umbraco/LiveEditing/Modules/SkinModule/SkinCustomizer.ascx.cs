@@ -160,8 +160,8 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
 
             if(nullable.HasValue){
                 InstalledPackage p = InstalledPackage.GetByGuid(nullable.Value.ToString());
-                if(!string.IsNullOrEmpty(p.Data.SkinWebserviceUrl))
-                    this.repo.WebserviceUrl = p.Data.SkinWebserviceUrl;
+                if(p.Data.SkinRepoGuid != null && p.Data.SkinRepoGuid != Guid.Empty  && p.Data.SkinRepoGuid.ToString() != repoGuid)
+                    this.repo = cms.businesslogic.packager.repositories.Repository.getByGuid(p.Data.SkinRepoGuid.ToString());
             }
 
             if (!(nullable.HasValue && Skinning.HasAvailableSkins(Node.GetCurrent().template)))
@@ -301,8 +301,8 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                 Guid guid = new Guid(((Button)sender).CommandArgument);
 
                 InstalledPackage p = InstalledPackage.GetByGuid(guid.ToString());
-                if(!string.IsNullOrEmpty(p.Data.SkinWebserviceUrl))
-                    this.repo.WebserviceUrl = p.Data.SkinWebserviceUrl;
+                if (p.Data.SkinRepoGuid != null && p.Data.SkinRepoGuid != Guid.Empty && p.Data.SkinRepoGuid.ToString() != repoGuid)
+                    this.repo = cms.businesslogic.packager.repositories.Repository.getByGuid(p.Data.SkinRepoGuid.ToString());
                 
 
                 Installer installer = new Installer();

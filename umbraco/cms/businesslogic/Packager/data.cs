@@ -92,7 +92,7 @@ namespace umbraco.cms.businesslogic.packager
                 instance.Attributes.Append(xmlHelper.addAttribute(Source, "hasUpdate", "false"));
 
                 instance.Attributes.Append(xmlHelper.addAttribute(Source, "enableSkins", "false"));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "skinWebserviceUrl", ""));
+                instance.Attributes.Append(xmlHelper.addAttribute(Source, "skinRepoGuid", ""));
 
                 XmlElement license = Source.CreateElement("license");
                 license.InnerText = "MIT license";
@@ -188,7 +188,7 @@ namespace umbraco.cms.businesslogic.packager
                     bool.TryParse(safeAttribute("enableSkins", n), out _enableSkins);
                     retVal.EnableSkins = _enableSkins;
 
-                    retVal.SkinWebserviceUrl = safeAttribute("skinWebserviceUrl", n);
+                    retVal.SkinRepoGuid = string.IsNullOrEmpty(safeAttribute("skinRepoGuid", n)) ? Guid.Empty : new Guid(safeAttribute("skinRepoGuid", n));
 
                     retVal.License = safeNodeValue(n.SelectSingleNode("license"));
                     retVal.LicenseUrl = n.SelectSingleNode("license").Attributes.GetNamedItem("url").Value;
@@ -264,7 +264,7 @@ namespace umbraco.cms.businesslogic.packager
 
                 _xmlDef.Attributes.GetNamedItem("hasUpdate").Value = package.HasUpdate.ToString();
                 _xmlDef.Attributes.GetNamedItem("enableSkins").Value = package.EnableSkins.ToString();
-                _xmlDef.Attributes.GetNamedItem("skinWebserviceUrl").Value = package.SkinWebserviceUrl;
+                _xmlDef.Attributes.GetNamedItem("skinRepoGuid").Value = package.SkinRepoGuid.ToString();
 
                     
 

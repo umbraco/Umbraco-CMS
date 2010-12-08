@@ -190,14 +190,14 @@ namespace umbraco.cms.businesslogic.packager
             string _packLicense = xmlHelper.GetNodeValue(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/license "));
 
             bool _enableSkins = false;
-            string _skinWebserviceUrl = "";
+            string _skinRepoGuid = "";
 
             if (_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/enableSkins") != null)
             {
                 XmlNode _skinNode = _packageConfig.DocumentElement.SelectSingleNode("/umbPackage/enableSkins");
                 _enableSkins = bool.Parse(xmlHelper.GetNodeValue(_skinNode));
-                if (_skinNode.Attributes["skinWebservicUrl"] != null && !string.IsNullOrEmpty(_skinNode.Attributes["skinWebservicUrl"].Value))
-                    _skinWebserviceUrl = _skinNode.Attributes["skinWebservicUrl"].Value;
+                if (_skinNode.Attributes["repository"] != null && !string.IsNullOrEmpty(_skinNode.Attributes["repository"].Value))
+                    _skinRepoGuid = _skinNode.Attributes["repository"].Value;
             }
 
             //Create a new package instance to record all the installed package adds - this is the same format as the created packages has.
@@ -211,7 +211,7 @@ namespace umbraco.cms.businesslogic.packager
 
             //skinning
             insPack.Data.EnableSkins = _enableSkins;
-            insPack.Data.SkinWebserviceUrl = _skinWebserviceUrl;
+            insPack.Data.SkinRepoGuid = string.IsNullOrEmpty(_skinRepoGuid) ? Guid.Empty : new Guid(_skinRepoGuid);
 
             insPack.Data.PackageGuid = guid; //the package unique key.
             insPack.Data.RepositoryGuid = repoGuid; //the repository unique key, if the package is a file install, the repository will not get logged.
