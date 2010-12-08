@@ -25,6 +25,8 @@
 	function pageLoad(sender, args) {
 		if (args.get_isPartialLoad()) {
 
+		    clearInterval(intervalId);
+
 			jQuery('#single-tab1').hide();
 
 			initZoomList2();
@@ -33,37 +35,39 @@
 			initLightBox();
 
 			jQuery('.btn-install-gal').click(function () {
-				jQuery('#browseSkins').hide();
-				jQuery('#installingSkin').show();
+			    jQuery('#browseSkins').hide();
+			    jQuery('#installingSkin').show();
 
-				//fire off the progressbar
-				intervalId = setInterval("progressBarCallback()", 1000);
+			    //fire off the progressbar
+			    intervalId = setInterval("progressBarCallback()", 1000);
 
-				jQuery('#skinname').html(jQuery('span', this).html());
-				return true;
+			    alert(jQuery(this).attr("title"));
+
+			    jQuery('#skinname').html(jQuery(this).attr("title"));
+			    return true;
 			});
 		}
 	}
 
 
 	function progressBarCallback() {
-	    jQuery.getJSON('utills/p.aspx?feed=progress', function (data) {
+		jQuery.getJSON('utills/p.aspx?feed=progress', function (data) {
 
-	        if (data.percentage > 0) {
-	            updateProgressBar(data.percentage);
-	            updateStatusMessage(data.message)
-	        }
+			if (data.percentage > 0) {
+				updateProgressBar(data.percentage);
+				updateStatusMessage(data.message)
+			}
 
-	        if (data.error != "") {
-	            clearInterval(intervalId);
-	            updateStatusMessage(data.error);
-	        }
+			if (data.error != "") {
+				clearInterval(intervalId);
+				updateStatusMessage(data.error);
+			}
 
-	        if (data.percentage == 100) {
-	            clearInterval(intervalId);
-	            jQuery(".btn-box").show();
-	        }
-	    });
+			if (data.percentage == 100) {
+				clearInterval(intervalId);
+				jQuery(".btn-box").show();
+			}
+		});
 	}
 	</script>
 </script>
@@ -123,7 +127,7 @@
 <div class="tab install-tab" id="installingSkin" style="display: none">
 	<div class="container">
 		<h1>Installing Skin</h1>
-		<h2>Your <strong id="skinname">skin</strong> is installing. </h2>
+		<h2>The <strong id="skinname"></strong> skin is installing. </h2>
 
 		<div class="loader alt">
 			<div class="hold">
@@ -135,26 +139,3 @@
 	</div>	
 </div>
 
-<!-- lightbox -->
-<div class="lightbox" id="lightbox">
-	<a href="#" class="btn-close btn-close-box">close</a>
-	<div class="t">&nbsp;</div>
-	<div class="c">
-		<div class="heading">
-			<strong class="title">Name of skin</strong>
-			<span class="create">Created by: <a href="#">Cogworks</a></span>
-		</div>
-		<div class="carusel">
-			<ul>
-				<li><img src="images/img09.jpg" alt="image description"></li>
-				<li><img src="images/img10.jpg" alt="image description"></li>
-				<li><img src="images/img11.jpg" alt="image description"></li>
-			</ul>
-		</div>
-
-		<footer class="btn-box" style="display: none;">
-			<a href="#single-tab4" class="single-tab btn-install btn-close-box">Install</a>
-		</footer>
-	</div>
-	<div class="b">&nbsp;</div>
-</div>

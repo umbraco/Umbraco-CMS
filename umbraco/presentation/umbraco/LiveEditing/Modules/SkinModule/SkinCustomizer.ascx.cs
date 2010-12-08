@@ -207,7 +207,6 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                     if (!skinNames.Contains(c))
                         localSkins.Add(c);
                 }
-
             }
 
             if (localSkins.Count > 0)

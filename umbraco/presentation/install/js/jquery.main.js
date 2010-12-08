@@ -473,11 +473,29 @@ function initSlide() {
         });
     })
 }
+
 function initLightBox() {
     jQuery('a.btn-preview').simpleLightbox({
         faderOpacity: 0.7,
         faderBackground: '#000000',
-        closeLink: 'a.btn-close-box'
+        closeLink: 'a.btn-close-box',
+        onClick: function () {
+            var link = jQuery(this);
+            var title = link.attr("title");
+            var desc = link.siblings("div.gal-desc").html();
+            var owner = link.siblings("div.gal-owner").html();
+
+            jQuery("#lightbox .title").text(title);
+            jQuery("#lightbox .create").html(owner);
+            jQuery("#lightbox .carusel").html(desc);
+
+            jQuery("#lightbox footer a").click(function () {
+                var installLink = link.siblings("a.btn-install-gal");
+                //this is f'ing nasty, we'll switch to a neater solution then an updatepanel after the beta
+                eval(installLink.attr('href'));
+                installLink.click();
+            });
+        }
     });
 }
 

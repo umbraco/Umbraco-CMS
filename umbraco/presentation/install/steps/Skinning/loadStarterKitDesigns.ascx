@@ -31,14 +31,16 @@
 	<img class="faik-mask" src="images/bg-img.png" alt="image description" width="152" height="129">
 	<img class="faik-mask-ie6" src="images/bg-img-ie.png" alt="image description" width="201" height="178">
 
-		<div class="image">
-		<img class="zoom-img" src="<%# ((Skin)Container.DataItem).Thumbnail %>" alt="<%# ((Skin)Container.DataItem).Text %>" width="134" height="103">
-				<div class="gal-drop">
-					<a href="#lightbox" class="btn-preview"><span>Preview</span></a>
-					<asp:LinkButton CssClass="single-tab btn-install-gal" ID="bt_selectKit" runat="server" onclick="SelectStarterKitDesign" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>"><span>Install</span></asp:LinkButton>
-					<div class="gal-desc" style="display: none"><%# ((Skin)Container.DataItem).Description %></div>
-				</div>
-		</div>
+	<div class="image">
+	<img class="zoom-img" src="<%# ((Skin)Container.DataItem).Thumbnail %>" alt="<%# ((Skin)Container.DataItem).Text %>" width="134" height="103">
+			<div class="gal-drop">
+				<a href="#lightbox" class="btn-preview" title="<%# ((Skin)Container.DataItem).Text %>"><span>Preview</span></a>
+				<asp:LinkButton CssClass="single-tab btn-install-gal" ID="bt_selectKit" runat="server" onclick="SelectStarterKitDesign" CommandArgument="<%# ((Skin)Container.DataItem).RepoGuid %>"><span>Install</span></asp:LinkButton>
+				<div class="gal-desc" style="display: none"><%# ((Skin)Container.DataItem).Description %></div>
+                <div class="gal-owner" style="display: none">Created by: <a href="<%# ((Skin)Container.DataItem).AuthorUrl %>" target="_blank"><%# ((Skin)Container.DataItem).Author %></a></div>
+			</div>
+	</div>
+
 	</div>
 	</li>
 	</ItemTemplate>

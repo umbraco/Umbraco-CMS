@@ -117,13 +117,18 @@
         <copy file="${root.dir}\config templates\config\umbracosettings.config" tofile="${build.dir}\config\umbracosettings.config" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\config templates\config\urlrewriting.config" tofile="${build.dir}\config\urlrewriting.config" failonerror="false" overwrite="true"/>
         
-        <!-- new 4.1 files -->
+        <!-- new 4.5 files -->
         <copy file="${root.dir}\config templates\config\ClientDependency.config" tofile="${build.dir}\config\ClientDependency.config" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\config templates\config\ExamineSettings.config" tofile="${build.dir}\config\ExamineSettings.config" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\config templates\config\ExamineIndex.config" tofile="${build.dir}\config\ExamineIndex.config" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\config templates\config\scripting.config" tofile="${build.dir}\config\scripting.config" failonerror="false" overwrite="true"/>
                 
-      
+        
+        <!-- 4.6 Files -->
+        <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\Debug\umbraco.MacroEngines.dll" tofile="${build.dir}\bin\umbraco.MacroEngines.dll" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\Debug\umbraco.MacroEngines.pdb" tofile="${build.dir}\bin\umbraco.MacroEngines.pdb" failonerror="false" overwrite="true"/>
+
+        
         <!--standard /data/packages files-->
         <mkdir dir="${build.dir}\App_Data" />
         <copy file="${root.dir}\config templates\packages\installedPackages.config" tofile="${build.dir}\app_data\packages\installed\installedPackages.config" failonerror="false" overwrite="true"/>
