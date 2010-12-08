@@ -349,3 +349,13 @@ p#installingModule img
     padding-top:5px;
     border-bottom:1px solid #c3c3c3;
 }
+
+ #LiveEditingToolbar .umbLabelButton a,  #LiveEditingToolbar .umbLabelButton a:hover
+{
+    color:Black !important;
+}   
+
+.umbModalBox a, .umbModalBox a:hover
+{
+    color:#888 !important;
+}
