@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Scripting.Hosting;
 
-namespace umbraco.MacroEngines.Legacy.Scripting
+namespace umbraco.MacroEngines.Scripting
 {
     public class MacroScript
     {

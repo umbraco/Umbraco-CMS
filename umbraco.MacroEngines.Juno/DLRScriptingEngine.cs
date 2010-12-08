@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 using umbraco.IO;
-using umbraco.MacroEngines.Legacy.Scripting;
+using umbraco.MacroEngines.Scripting;
 
-namespace umbraco.MacroEngines.Legacy
+namespace umbraco.MacroEngines
 {
     public class DLRScriptingEngine : IMacroEngine
     {
+        #region IMacroEngine Members
+
         public string Name
         {
             get { return "Umbraco DLR Macro Engine"; }
@@ -40,8 +42,7 @@ namespace umbraco.MacroEngines.Legacy
 
             MacroScriptEngine mse = MacroScriptEngine.LoadEngineByFileExtension(fileEnding);
 
-            SortedDictionary<string, object> vars = new SortedDictionary<string, object>();
-            vars.Add("currentPage", currentPage);
+            var vars = new SortedDictionary<string, object> {{"currentPage", currentPage}};
             foreach (MacroPropertyModel prop in macro.Properties)
             {
                 vars.Add(prop.Key, prop.Value);
@@ -50,5 +51,7 @@ namespace umbraco.MacroEngines.Legacy
 
             return mse.ExecuteFile(IOHelper.MapPath(SystemDirectories.Python + "/" + macro.ScriptName));
         }
+
+        #endregion
     }
 }
