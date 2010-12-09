@@ -1,4 +1,4 @@
-﻿jQuery(document).ready(function () {
+jQuery(document).ready(function () {
     initCustomForms();
     initButtonHover();
     clearInputs();
@@ -241,8 +241,8 @@ function initZoomList() {
 				function () {
 				    zoomImg = jQuery(this).find('.zoom-img');
 				    zoomImg.animate({
-				        width: imgWidth + stepZoom,
-				        height: imgHeight + stepZoom,
+				        width: 202,
+				        height: 275,
 				        top: -stepZoom / 2,
 				        left: -stepZoom / 2
 				    }, { queue: false, duration: _speed });

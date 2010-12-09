@@ -63,7 +63,7 @@
 			</div>
 		</div>
 
-		</div>
+		</div></div></div>
 	</FooterTemplate>
 </asp:Repeater>
 </div>

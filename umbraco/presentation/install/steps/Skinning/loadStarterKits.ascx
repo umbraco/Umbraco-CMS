@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="loadStarterKits.ascx.cs" Inherits="umbraco.presentation.install.steps.Skinning.loadStarterKits" %>
+<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="loadStarterKits.ascx.cs" Inherits="umbraco.presentation.install.steps.Skinning.loadStarterKits" %>
 <%@ Import Namespace="umbraco.cms.businesslogic.packager.repositories"  %>
 
 <asp:PlaceHolder ID="pl_loadStarterKits" runat="server">
@@ -11,7 +11,7 @@
 
     <li class="add-<%# ((Package)Container.DataItem).Text.Replace(" ","").ToLower() %>">
         <asp:LinkButton CssClass="single-tab selectStarterKit" ID="bt_selectKit" runat="server" onclick="SelectStarterKit" ToolTip="<%# ((Package)Container.DataItem).Text %>" CommandArgument="<%# ((Package)Container.DataItem).RepoGuid %>">
-        <img class="zoom-img" src="<%# ((Package)Container.DataItem).Thumbnail %>" alt="<%# ((Package)Container.DataItem).Text %>" width="150" height="212"></asp:LinkButton>
+        <img class="zoom-img" src="<%# ((Package)Container.DataItem).Thumbnail %>" alt="<%# ((Package)Container.DataItem).Text %>" width="150" height="204"></asp:LinkButton>
 	<em>&nbsp;</em>
 	<!-- drop down -->
 	<div class="drop-hold">
@@ -32,7 +32,7 @@
 	
     <li class="add-thanks">
         <asp:LinkButton runat="server" class="single-tab declineStarterKits" ID="declineStarterKits" OnClientClick="return confirm('Are you sure you do not want to install a starter kit?');" OnClick="NextStep">
-            <img class="zoom-img" src="images/btn-no-thanks.png" alt="image description">
+            <img class="zoom-img" src="images/btn-no-thanks.png" alt="image description" width="150" height="204">
         </asp:LinkButton>
 
 		<em>&nbsp;</em>

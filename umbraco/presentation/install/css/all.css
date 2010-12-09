@@ -64,17 +64,6 @@ figure{display: block;}
 	width:100%;
 	height:1050px;
 }
-.bg-main .color1 .bg-r,
-.bg-main .color2 .bg-r,
-.bg-main .color3 .bg-r,
-.bg-main .color4 .bg-r,
-.bg-main .color5 .bg-r {
-	position:absolute;
-	top: 0;
-	left: 50%;
-	width:50%;
-	height:1050px;
-}
 .bg-main .color1 .bg-c,
 .bg-main .color2 .bg-c,
 .bg-main .color3 .bg-c,
@@ -88,24 +77,24 @@ figure{display: block;}
 }
 
 /* Color 1 */
-.bg-main .color1 { background:url(../images/bg-normal-cl.gif) repeat-x;}
-.bg-main .color1 .bg-r { background: url(../images/bg-normal-cr.gif) repeat-x;}
+.bg-main .color1 { background:url(../images/bg-normal-repeat.jpg) repeat-x;}
+
 .bg-main .color1 .bg-c { background:url(../images/bg-normal.jpg) no-repeat 50% 0;}
 /* Color 2 */
-.bg-main .color2 { background:#2e1427 url(../images/bg-simple-cl.gif) repeat-x;}
-.bg-main .color2 .bg-r { background:url(../images/bg-simple-cr.gif) repeat-x;}
+.bg-main .color2 { background:#2e1427 url(../images/bg-simple-repeat.jpg) repeat-x;}
+
 .bg-main .color2 .bg-c { background:url(../images/bg-simple.jpg) no-repeat 50% 0;}
 /* Color 3 */
-.bg-main .color3 { background:#01242d url(../images/bg-blog-cl.gif) repeat-x;}
-.bg-main .color3 .bg-r { background:url(../images/bg-blog-cr.gif) repeat-x;}
+.bg-main .color3 { background:#01242d url(../images/bg-blog-repeat.jpg) repeat-x;}
+
 .bg-main .color3 .bg-c { background:url(../images/bg-blog.jpg) no-repeat 50% 0;}
 /* Color 4 */
-.bg-main .color4 { background:#201c01 url(../images/bg-bhuiness-cl.gif) repeat-x;}
-.bg-main .color4 .bg-r { background:url(../images/bg-bhuiness-cr.gif) repeat-x;}
+.bg-main .color4 { background:#201c01 url(../images/bg-bhuiness-repeat.jpg) repeat-x;}
+
 .bg-main .color4 .bg-c { background:url(../images/bg-bhuiness.jpg) no-repeat 50% 0;}
 /* Color 5 */
-.bg-main .color5 { background:#3b0d03 url(../images/bg-personal-cl.gif) repeat-x;}
-.bg-main .color5 .bg-r { background:url(../images/bg-personal-cr.gif) repeat-x;}
+.bg-main .color5 { background:#3b0d03 url(../images/bg-personal-repeat.jpg) repeat-x;}
+
 .bg-main .color5 .bg-c { background:url(../images/bg-personal.jpg) no-repeat 50% 0;}
 .wholder:after {
 	clear: both;
@@ -298,7 +287,7 @@ figure{display: block;}
 .btn-get{height:59px;}
 .btn-get span{
 	height:118px;
-	width:228px;
+	width:230px;
 	background:url(../images/btn-get.png) no-repeat;
 }
 .btn-get:hover span{margin:-59px 0 0;}
@@ -323,7 +312,7 @@ figure{display: block;}
 .btn-continue{height:42px;}
 .btn-accept span{
 	height:84px;
-	width:213px;
+	width:215px;
 	background:url(../images/btn-accept.png) no-repeat;
 }
 .btn-accept:hover span,
@@ -366,11 +355,11 @@ figure{display: block;}
 	text-indent:-9999px;
 }
 .mini-tabset li.btn-yes a span{
-	width:77px;
+	width:79px;
 	background:url(../images/btn-yes.png) no-repeat;
 }
 .mini-tabset li.btn-no a span{
-	width:71px;
+	width:73px;
 	background:url(../images/btn-no.png) no-repeat;
 }
 .mini-tabset li a:hover span{margin:-42px 0 0;}
@@ -421,14 +410,14 @@ figure{display: block;}
 .btn-box .btn-install {
 	float:left;
 	margin:13px 0 0;
-	width:97px;
+	width:99px;
 	height:42px;
 	position: relative;
 	overflow:hidden;
 }
 .btn-box .btn-install span {
 	display: block;
-	width:97px;
+	width:99px;
 	height:42px;
 	text-indent:-9999px;
 	overflow:hidden;
@@ -483,7 +472,7 @@ figure{display: block;}
 }
 .ui-progressbar-value { background-image: url(../images/pbar-ani.gif) !important; }
 .btn-continue span{
-	width:120px;
+	width:122px;
 	height:84px;
 	background:url(../images/btn-continue.png) no-repeat;
 }
@@ -523,14 +512,14 @@ figure{display: block;}
 .btn-box .btn-create {
 	float:left;
 	margin:13px 0 0;
-	width:143px;
+	width:145px;
 	height:42px;
 	position:relative;
 	overflow:hidden;
 }
 .btn-box .btn-create span {
 	display: block;
-	width:143px;
+	width:145px;
 	height:42px;
 	overflow:hidden;
 	text-indent: -9999px;
@@ -816,7 +805,7 @@ figure{display: block;}
 .gal-drop .btn-preview:hover span{margin:-69px 0 0;}
 .gal-drop .btn-install-gal{height:68px;}
 .gal-drop .btn-install-gal span{
-	height:136px;
+	height:138px;
 	background:url(../images/btn-install-gal.png) no-repeat;
 }
 .gal-drop .btn-install-gal:hover span{margin:-68px 0 0;}
@@ -951,7 +940,7 @@ figure{display: block;}
 .lightbox .btn-box{padding-top:27px;}
 .lightbox .btn-install{
 	display:block;
-	width:97px;
+	width:99px;
 	height:42px;
 	overflow:hidden;
 	text-indent:-99999px;
@@ -995,7 +984,7 @@ figure{display: block;}
 	text-indent:-99999px;
 }
 .btn-web li.btn-set a span{
-	width:246px;
+	width:248px;
 	background:url(../images/btn-set.png) no-repeat;
 }
 .btn-web li.btn-preview-web a span{

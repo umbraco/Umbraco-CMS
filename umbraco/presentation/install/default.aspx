@@ -39,8 +39,6 @@
 
 	<section id="wrapper">
 
-		<div class="bg-l">&nbsp;</div>
-
 		<div class="wholder">
 
 			<!-- header -->
@@ -89,27 +87,27 @@
 	<!-- bg page -->
 	<div class="bg-main">
 		<div class="color2">
-			<div class="bg-r"></div>
+			
 			<div class="bg-c"></div>
 		</div>
 
 		<div class="color3">
-			<div class="bg-r"></div>
+			
 			<div class="bg-c"></div>
 		</div>
 
 		<div class="color1">
-			<div class="bg-r"></div>
+			
 			<div class="bg-c"></div>
 		</div>
 
 		<div class="color4">
-			<div class="bg-r"></div>
+			
 			<div class="bg-c"></div>
 		</div>
 
 		<div class="color5">
-			<div class="bg-r"></div>
+			
 			<div class="bg-c"></div>
 		</div>
 
