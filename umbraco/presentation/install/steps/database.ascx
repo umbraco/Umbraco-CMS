@@ -201,7 +201,7 @@
 					jQuery(".loader .hold").hide();
 
 					jQuery(".btn-continue").hide();
-					jQuery(".btn-back").show();
+					jQuery(".btn-accept").show();
 					jQuery(".btn-box").show();
 				}
 
