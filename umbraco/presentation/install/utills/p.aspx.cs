@@ -36,7 +36,7 @@ namespace umbraco.presentation.install.utills
         [System.Web.Script.Services.ScriptMethod]
         public static string installOrUpgrade()
         {
-            Helper.clearProgress();
+            Helper.setProgress(5, "Opening database connection...", "");
 
             IInstallerUtility m_Installer = BusinessLogic.Application.SqlHelper.Utility.CreateInstaller();
 

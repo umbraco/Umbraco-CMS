@@ -35,8 +35,6 @@
 												<span><asp:TextBox ID="tb_email" CssClass="text" type="text" Text="admin@domain.com" runat="server"  /></span>
 
                                                 <asp:RequiredFieldValidator CssClass="invalidaing" ControlToValidate="tb_email" runat="server" ErrorMessage="Email is a mandatory field" />
-
-												
 											</div>
 
 											<div class="row">
@@ -54,12 +52,13 @@
 											<div class="row">
 												<asp:Label AssociatedControlID="tb_password_confirm" runat="server">Confirm Password:</asp:label>
 												<span><asp:TextBox ID="tb_password_confirm" CssClass="text" TextMode="Password" type="text" Text=""  runat="server"  /></span>
-                                                <asp:CompareValidator CssClass="invalidaing" ControlToCompare="tb_password" ControlToValidate="tb_password_confimr" ErrorMessage="The passwords must be identical" />
+
+                                                <asp:CompareValidator CssClass="invalidaing" ControlToCompare="tb_password" ControlToValidate="tb_password_confirm" ErrorMessage="The passwords must be identical" runat="server" />
 												<asp:RequiredFieldValidator CssClass="invalidaing" ControlToValidate="tb_password" runat="server" ErrorMessage="Username is a mandatory field" />
 											</div>
 
 											<div class="check-hold">
-                                            	<asp:CheckBox ID="cb_newsletter" runat="server"  /> 
+                                            	<asp:CheckBox ID="cb_newsletter" runat="server" Checked="true"  /> 
                                                 <asp:Label AssociatedControlID="cb_newsletter" runat="server">Sign up for our monthly newsletter</asp:label>
 											</div>
 										</div>

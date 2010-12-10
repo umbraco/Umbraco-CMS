@@ -54,17 +54,24 @@
 								<strong>3. Instructions:</strong> Please fill out the below fields to connect to
 								your database.</p>
 							<div class="instruction-hold">
-								<div class="row error text" runat="server" id="embeddedFilesMissing" style="display: none;">
+								<div class="row embeddedError" runat="server" id="embeddedFilesMissing" style="display: none;">
 									<p>
 										<strong>Missing files:</strong> SQL CE 4 requires that you manually add the SQL
 										CE 4 runtime to your Umbraco installation.<br />
 										<a href="http://our.umbraco.org/wiki/install-and-setup/using-sql-ce-4-with-juno"
 											target="_blank">More instructions</a>.
-										<br />
 										You can either follow the instructions above to add SQL CE 4 or choose another database
 										type.
 									</p>
 								</div>
+
+                                <div class="row embedded"  style="display: none;">
+									<p>
+										<strong>Nothing to configure:</strong>SQL CE 4 does not require any configuration
+                                        so simply click the "install" button below to continue.
+									</p>
+								</div>
+
 								<asp:PlaceHolder ID="ph_dbError" runat="server" Visible="false">
 									<div class="row error">
 										<p class="text">
@@ -98,10 +105,12 @@
 								<div class="row custom" runat="server" id="DatabaseConnectionString">
 									<asp:Label runat="server" AssociatedControlID="ConnectionString" ID="ConnectionStringLabel">Connection string:</asp:Label>
 									<span>
-										<asp:TextBox runat="server" CssClass="text" ID="ConnectionString" /></span>
-									<p>
-										<small></small>Example: <tt>datalayer=MySQL;server=192.168.2.8;user id=user;password=***;database=umbraco</tt></p>
+										<asp:TextBox runat="server" TextMode="MultiLine" CssClass="text" ID="ConnectionString" /></span>
 								</div>
+                                <div class="row custom check-hold">
+                                    <p>
+										Example: <tt>datalayer=MySQL;server=192.168.2.8;user id=user;password=***;database=umbraco</tt></p>
+                                </div>
 							</div>
 						</div>
 						<!-- btn box -->
@@ -115,14 +124,13 @@
 				<div class="step" id="database-step2">
 					<div class="container">
 						<p>
-							<strong>2. Nodio dignissimos ducimus qui blanditiis praesentium.</strong><br />
-							Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
-							laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
-							architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas
-							sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione
-							voluptatem sequi nesciunt:
+							<strong>2. Getting a database setup for umbraco.</strong><br />
+							For first time users, we recommend you select "SQL CE 4" in the dropdown box, after clicking the "yes" button.
+                            This will install an easy to use database, that does not require any additional software to use.<br />
+                            Alternatively, you can install Microsoft SQL Server, which will require a bit more work to get up and running.<br />
+                            We have provided a step-by-step guide in the video instructions below.
 						</p>
-						<span class="btn-link"><a href="#">www.link.com</a></span>
+						<span class="btn-link"><a href="http://umbraco.org/redir/InstallerNewDatabase">Open video instructions</a></span>
 					</div>
 				</div>
 			</fieldset>
@@ -134,7 +142,9 @@
 			var currentVersion = '<%=umbraco.GlobalSettings.CurrentVersion%>';
 			var configured = <%= IsConfigured.ToString().ToLower() %>;
 
-			<asp:literal runat="server" id="jsVars" />
+            jQuery(document).ready(function(){
+			    <asp:literal runat="server" id="jsVars" />
+            });
 	</script>
 </asp:PlaceHolder>
 <asp:PlaceHolder ID="installing" runat="server" Visible="false">
@@ -159,6 +169,7 @@
 		 <footer class="btn-box" style="display: none;">
 			<div class="t">&nbsp;</div>
 			 <asp:LinkButton class="btn-step btn btn-continue" runat="server" OnClick="gotoNextStep"><span>Continue</span></asp:LinkButton>
+             <asp:LinkButton class="btn-step btn btn-accept" style="display: none;" runat="server" OnClick="gotoSettings"><span>Back</span></asp:LinkButton>
 		</footer>
 	</div>
 
@@ -186,6 +197,12 @@
 				if (data.error != "") {
 					clearInterval(intervalId);
 					updateStatusMessage(data.error);
+
+					jQuery(".loader .hold").hide();
+
+					jQuery(".btn-continue").hide();
+					jQuery(".btn-back").show();
+					jQuery(".btn-box").show();
 				}
 
 				if (data.percentage == 100) {
@@ -197,6 +214,7 @@
 	</script>
 
 </asp:PlaceHolder>
+
 <asp:Panel ID="confirms" runat="server" Visible="False">
 	<asp:PlaceHolder ID="installConfirm" runat="server" Visible="False">
 		<h1>

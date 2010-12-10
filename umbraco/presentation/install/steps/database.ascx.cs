@@ -84,7 +84,7 @@ namespace umbraco.presentation.install.steps
         protected void Page_Load(object sender, System.EventArgs e)
         {
             // Does the user have to enter a connection string?
-            if (settings.Visible)
+            if (settings.Visible && !Page.IsPostBack)
                 ShowDatabaseSettings();
             
         }
@@ -94,9 +94,6 @@ namespace umbraco.presentation.install.steps
         /// </summary>
         protected void ShowDatabaseSettings()
         {
-            // Did the connection string of web.config get loaded?
-            if (!Page.IsPostBack)
-            {
                 // Parse the connection string
                 DbConnectionStringBuilder connectionStringBuilder = new DbConnectionStringBuilder();
                 connectionStringBuilder.ConnectionString = GlobalSettings.DbDSN;
@@ -104,6 +101,8 @@ namespace umbraco.presentation.install.steps
                 // "Data Source=.\\SQLEXPRESS;Initial Catalog=BB_Umbraco_Sandbox1;integrated security=false;user id=umbraco;pwd=umbraco"
 
                 // Prepare the fields
+                string database = GetConnectionStringValue(connectionStringBuilder, "database");
+                string server = GetConnectionStringValue(connectionStringBuilder, "server"); 
 
                 // Prepare data layer type
                 string datalayerType = GetConnectionStringValue(connectionStringBuilder, "datalayer");
@@ -113,6 +112,9 @@ namespace umbraco.presentation.install.steps
                         if (item.Value != String.Empty && ((string)datalayerType).Contains(item.Value))
                             DatabaseType.SelectedValue = item.Value;
                 }
+                else if (GlobalSettings.DbDSN != "server=.\\SQLEXPRESS;database=DATABASE;user id=USER;password=PASS")
+                    DatabaseType.SelectedValue = "SqlServer";
+                
                 DatabaseType_SelectedIndexChanged(this, new EventArgs());
 
                 // Prepare other fields
@@ -132,8 +134,6 @@ namespace umbraco.presentation.install.steps
 
                 toggleVisible(DatabaseConnectionString, ManualConnectionString);
 
-            }
-
             // Make sure ASP.Net displays the password text
             DatabasePassword.Attributes["value"] = DatabasePassword.Text;
         }
@@ -147,6 +147,8 @@ namespace umbraco.presentation.install.steps
 
         protected void saveDBConfig(object sender, EventArgs e)
         {
+            Helper.setProgress(5, "Saving database connection...", "");
+
             try
             {
                 DbConnectionStringBuilder connectionStringBuilder = CreateConnectionString();
@@ -249,7 +251,7 @@ namespace umbraco.presentation.install.steps
                 connectionStringBuilder.ConnectionString = @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf";
             }
 
-            if (!String.IsNullOrEmpty(DatabaseType.SelectedValue) && !DatabaseType.SelectedValue.Contains("SqlServer"))
+            if (!String.IsNullOrEmpty(DatabaseType.SelectedValue) && !DatabaseType.SelectedValue.Contains("SqlServer") && !DatabaseType.SelectedValue.Contains("Custom"))
                 connectionStringBuilder["datalayer"] = DatabaseType.SelectedValue;
 
             return connectionStringBuilder;
@@ -291,6 +293,15 @@ namespace umbraco.presentation.install.steps
                 div.Attributes["style"] = "display: block;";
         }
 
+        protected void gotoSettings(object sender, EventArgs e)
+        {
+            settings.Visible = true;
+            installing.Visible = false;
+
+            ShowDatabaseSettings();
+
+            jsVars.Text = "showDatabaseSettings();";
+        }
         
         protected void gotoNextStep(object sender, EventArgs e)
         {
