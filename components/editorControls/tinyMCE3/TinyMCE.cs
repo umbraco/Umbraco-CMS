@@ -6,43 +6,38 @@ using System.Web.UI;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
+using umbraco.editorControls.tinymce;
+using umbraco.editorControls.tinyMCE3.webcontrol;
 using umbraco.editorControls.wysiwyg;
 using umbraco.interfaces;
-using umbraco.uicontrols;
-using umbraco.editorControls.tinymce;
 using umbraco.IO;
-
+using umbraco.presentation;
+using umbraco.uicontrols;
 
 namespace umbraco.editorControls.tinyMCE3
 {
-    public class TinyMCE : webcontrol.TinyMCEWebControl, IDataEditor, IMenuElement, ILiveEditingDataEditor
+    public class TinyMCE : TinyMCEWebControl, IDataEditor, IMenuElement, ILiveEditingDataEditor
     {
-        private IData _data;
-        private bool m_isInLiveEditingMode = false;
-        private bool _enableContextMenu = false;
-        private string _editorButtons = "";
-        private string _advancedUsers = "";
-        private bool _fullWidth = false;
-        private int _width = 0;
-        private int _height = 0;
-        private bool _showLabel = false;
+        private readonly string _activateButtons = "";
+        private readonly string _advancedUsers = "";
+        private readonly SortedList _buttons = new SortedList();
+        private readonly IData _data;
+        private readonly string _disableButtons = "help,visualaid,";
+        private readonly string _editorButtons = "";
+        private readonly bool _enableContextMenu;
+        private readonly bool _fullWidth;
+        private readonly int _height;
+        private readonly SortedList _mceButtons = new SortedList();
+        private readonly ArrayList _menuIcons = new ArrayList();
+        private readonly bool _showLabel;
+        private readonly ArrayList _stylesheets = new ArrayList();
+        private readonly int _width;
+
+        private readonly int m_maxImageWidth = 500;
+        private bool _isInitialized;
         private string _plugins = "";
-        private ArrayList _stylesheets = new ArrayList();
+        private bool m_isInLiveEditingMode;
 
-        private ArrayList _menuIcons = new ArrayList();
-        private SortedList _buttons = new SortedList();
-        private SortedList _mceButtons = new SortedList();
-        private bool _isInitialized = false;
-        private string _activateButtons = "";
-        private string _disableButtons = "help,visualaid,";
-        private int m_maxImageWidth = 500;
-
-
-        public virtual string Plugins
-        {
-            get { return _plugins; }
-            set { _plugins = value; }
-        }
 
         public TinyMCE(IData Data, string Configuration)
         {
@@ -89,7 +84,7 @@ namespace umbraco.editorControls.tinyMCE3
                     if (configSettings.Length > 6 && configSettings[6] != "")
                         _showLabel = bool.Parse(configSettings[6]);
                     if (configSettings.Length > 7 && configSettings[7] != "")
-                        m_maxImageWidth = int.Parse(configSettings[7].ToString());
+                        m_maxImageWidth = int.Parse(configSettings[7]);
 
                     // sizing
                     if (!_fullWidth)
@@ -109,7 +104,8 @@ namespace umbraco.editorControls.tinyMCE3
 
                     // If the editor is used in umbraco, use umbraco's own toolbar
                     bool onFront = false;
-                    if (GlobalSettings.RequestIsInUmbracoApplication(HttpContext.Current) || umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled)
+                    if (GlobalSettings.RequestIsInUmbracoApplication(HttpContext.Current) ||
+                        UmbracoContext.Current.LiveEditingContext.Enabled)
                     {
                         config.Add("theme_umbraco_toolbar_location", "external");
                         config.Add("skin", "umbraco");
@@ -122,10 +118,10 @@ namespace umbraco.editorControls.tinyMCE3
                     }
 
                     // load plugins
-                    IDictionaryEnumerator pluginEnum = umbraco.editorControls.tinymce.tinyMCEConfiguration.Plugins.GetEnumerator();
+                    IDictionaryEnumerator pluginEnum = tinyMCEConfiguration.Plugins.GetEnumerator();
                     while (pluginEnum.MoveNext())
                     {
-                        umbraco.editorControls.tinymce.tinyMCEPlugin plugin = (umbraco.editorControls.tinymce.tinyMCEPlugin)pluginEnum.Value;
+                        var plugin = (tinyMCEPlugin) pluginEnum.Value;
                         if (plugin.UseOnFrontend || (!onFront && !plugin.UseOnFrontend))
                             _plugins += "," + plugin.Name;
                     }
@@ -137,7 +133,8 @@ namespace umbraco.editorControls.tinyMCE3
                     config.Add("plugins", _plugins);
 
                     // Check advanced settings
-                    if (("," + _advancedUsers + ",").IndexOf("," + UmbracoEnsuredPage.CurrentUser.UserType.Id + ",") > -1)
+                    if (("," + _advancedUsers + ",").IndexOf("," + UmbracoEnsuredPage.CurrentUser.UserType.Id + ",") >
+                        -1)
                         config.Add("umbraco_advancedMode", "true");
                     else
                         config.Add("umbraco_advancedMode", "false");
@@ -153,7 +150,7 @@ namespace umbraco.editorControls.tinyMCE3
                         if (styleSheetId.Trim() != "")
                             try
                             {
-                                StyleSheet s = new StyleSheet(int.Parse(styleSheetId));
+                                var s = new StyleSheet(int.Parse(styleSheetId));
                                 if (s.nodeObjectType == StyleSheet.ModuleObjectType)
                                 {
                                     cssFiles += IOHelper.ResolveUrl(SystemDirectories.Css + "/" + s.Text + ".css");
@@ -194,10 +191,10 @@ namespace umbraco.editorControls.tinyMCE3
                     config.Add("theme_umbraco_styles", styles);
 
                     // Add buttons
-                    IDictionaryEnumerator ide = umbraco.editorControls.tinymce.tinyMCEConfiguration.Commands.GetEnumerator();
+                    IDictionaryEnumerator ide = tinyMCEConfiguration.Commands.GetEnumerator();
                     while (ide.MoveNext())
                     {
-                        umbraco.editorControls.tinymce.tinyMCECommand cmd = (umbraco.editorControls.tinymce.tinyMCECommand)ide.Value;
+                        var cmd = (tinyMCECommand) ide.Value;
                         if (_editorButtons.IndexOf("," + cmd.Alias + ",") > -1)
                             _activateButtons += cmd.Alias + ",";
                         else
@@ -218,12 +215,12 @@ namespace umbraco.editorControls.tinyMCE3
                     while (ide.MoveNext())
                     {
                         string mceCommand = ide.Value.ToString();
-                        int curPriority = (int)ide.Key;
+                        var curPriority = (int) ide.Key;
 
                         // Check priority
                         if (separatorPriority > 0 &&
-                            Math.Floor(decimal.Parse(curPriority.ToString()) / 10) >
-                            Math.Floor(decimal.Parse(separatorPriority.ToString()) / 10))
+                            Math.Floor(decimal.Parse(curPriority.ToString())/10) >
+                            Math.Floor(decimal.Parse(separatorPriority.ToString())/10))
                             _activateButtons += "separator,";
 
                         _activateButtons += mceCommand + ",";
@@ -246,7 +243,10 @@ namespace umbraco.editorControls.tinyMCE3
                     config.Add("event_elements", "div");
                     config.Add("paste_auto_cleanup_on_paste", "true");
 
-                    config.Add("valid_elements", tinyMCEConfiguration.ValidElements.Substring(1, tinyMCEConfiguration.ValidElements.Length - 2));
+                    config.Add("valid_elements",
+                               tinyMCEConfiguration.ValidElements.Substring(1,
+                                                                            tinyMCEConfiguration.ValidElements.Length -
+                                                                            2));
                     config.Add("invalid_elements", tinyMCEConfiguration.InvalidElements);
 
                     // custom commands
@@ -283,8 +283,6 @@ namespace umbraco.editorControls.tinyMCE3
                 throw new ArgumentException("Incorrect TinyMCE configuration.", "Configuration", ex);
             }
         }
-
-        #region IDataEditor Members
 
         #region TreatAsRichTextEditor
 
@@ -357,7 +355,7 @@ namespace umbraco.editorControls.tinyMCE3
                 parsedString = parsedString.Replace("|||?", "<?").Replace("/|||", "/>").Replace("|*|", "\"");
 
                 // fix images
-                parsedString = umbraco.editorControls.tinymce.tinyMCEImageHelper.cleanImages(parsedString);
+                parsedString = tinyMCEImageHelper.cleanImages(parsedString);
 
                 // parse current domain and instances of slash before anchor (to fix anchor bug)
                 // NH 31-08-2007
@@ -379,40 +377,108 @@ namespace umbraco.editorControls.tinyMCE3
 
         #endregion
 
+        public virtual string Plugins
+        {
+            get { return _plugins; }
+            set { _plugins = value; }
+        }
+
+        public object[] MenuIcons
+        {
+            get
+            {
+                initButtons();
+
+                var tempIcons = new object[_menuIcons.Count];
+                for (int i = 0; i < _menuIcons.Count; i++)
+                    tempIcons[i] = _menuIcons[i];
+                return tempIcons;
+            }
+        }
+
+        #region ILiveEditingDataEditor Members
+
+        public Control LiveEditingControl
+        {
+            get
+            {
+                m_isInLiveEditingMode = true;
+                base.IsInLiveEditingMode = true;
+                return this;
+            }
+        }
+
+        #endregion
+
+        #region IMenuElement Members
+
+        public string ElementName
+        {
+            get { return "div"; }
+        }
+
+        public string ElementIdPreFix
+        {
+            get { return "umbTinymceMenu"; }
+        }
+
+        public string ElementClass
+        {
+            get { return "tinymceMenuBar"; }
+        }
+
+        public int ExtraMenuWidth
+        {
+            get
+            {
+                initButtons();
+                return _buttons.Count*40 + 300;
+            }
+        }
+
+        #endregion
+
         protected override void OnLoad(EventArgs e)
         {
             try
             {
                 // add current page info
-                base.NodeId = ((cms.businesslogic.datatype.DefaultData)_data).NodeId;
-                base.VersionId = ((cms.businesslogic.datatype.DefaultData)_data).Version;
-                config.Add("theme_umbraco_pageId", base.NodeId.ToString());
-                config.Add("theme_umbraco_versionId", base.VersionId.ToString());
-
-                // we'll need to make an extra check for the liveediting as that value is set after the constructor have initialized
-                if (IsInLiveEditingMode)
+                base.NodeId = ((cms.businesslogic.datatype.DefaultData) _data).NodeId;
+                if (NodeId != 0)
                 {
-                    if (config["theme_umbraco_toolbar_location"] == null)
-                        config.Add("theme_umbraco_toolbar_location", "");
-                    config["theme_umbraco_toolbar_location"] = "external";
-                    config.Add("umbraco_toolbar_id",
-                               "LiveEditingClientToolbar");
+                    base.VersionId = ((cms.businesslogic.datatype.DefaultData) _data).Version;
+                    config.Add("theme_umbraco_pageId", base.NodeId.ToString());
+                    config.Add("theme_umbraco_versionId", base.VersionId.ToString());
 
+                    // we'll need to make an extra check for the liveediting as that value is set after the constructor have initialized
+                    if (IsInLiveEditingMode)
+                    {
+                        if (config["theme_umbraco_toolbar_location"] == null)
+                            config.Add("theme_umbraco_toolbar_location", "");
+                        config["theme_umbraco_toolbar_location"] = "external";
+                        config.Add("umbraco_toolbar_id",
+                                   "LiveEditingClientToolbar");
+                    }
+                    else
+                    {
+                        config.Add("umbraco_toolbar_id",
+                                   ElementIdPreFix +
+                                   ((cms.businesslogic.datatype.DefaultData) _data).PropertyId);
+                    }
                 }
                 else
                 {
+                    // this is for use when tinymce is used for non default Umbraco pages
                     config.Add("umbraco_toolbar_id",
-               ElementIdPreFix + ((cms.businesslogic.datatype.DefaultData)_data).PropertyId.ToString());
-
+                               ElementIdPreFix + "_" + this.ClientID);
                 }
             }
             catch
             {
                 // Empty catch as this is caused by the document doesn't exists yet,
-                // like when using this on an autoform
+                // like when using this on an autoform, partly replaced by the if/else check on nodeId above though
             }
             base.OnLoad(e);
-
         }
 
         protected override void OnInit(EventArgs e)
@@ -447,8 +513,8 @@ namespace umbraco.editorControls.tinyMCE3
                     if (orgKey == "umb_macroalias")
                         orgKey = "umb_macroAlias";
 
-                    macroTag += orgKey.Substring(4, orgKey.ToString().Length - 4) + "=|*|" +
- ide.Value.ToString().Replace("\\r\\n", Environment.NewLine) + "|*| ";
+                    macroTag += orgKey.Substring(4, orgKey.Length - 4) + "=|*|" +
+                                ide.Value.ToString().Replace("\\r\\n", Environment.NewLine) + "|*| ";
                 }
             }
             macroTag += "/|||";
@@ -458,13 +524,13 @@ namespace umbraco.editorControls.tinyMCE3
 
         public static Hashtable ReturnAttributes(String tag)
         {
-            Hashtable ht = new Hashtable();
+            var ht = new Hashtable();
             MatchCollection m =
                 Regex.Matches(tag, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",
                               RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
             foreach (Match attributeSet in m)
-                ht.Add(attributeSet.Groups["attributeName"].Value.ToString(),
-                       attributeSet.Groups["attributeValue"].Value.ToString());
+                ht.Add(attributeSet.Groups["attributeName"].Value,
+                       attributeSet.Groups["attributeValue"].Value);
 
             return ht;
         }
@@ -486,7 +552,8 @@ namespace umbraco.editorControls.tinyMCE3
             string find = "<!-- endumbmacro -->";
 
             int endMacroIndex = text.ToLower().IndexOf(find);
-            string tempText = text.ToLower().Substring(endMacroIndex + find.Length, text.Length - endMacroIndex - find.Length);
+            string tempText = text.ToLower().Substring(endMacroIndex + find.Length,
+                                                       text.Length - endMacroIndex - find.Length);
             int finalEndPos = 0;
             while (tempText.Length > 5)
                 if (tempText.Substring(finalEndPos, 6) == "</div>")
@@ -495,23 +562,6 @@ namespace umbraco.editorControls.tinyMCE3
                     finalEndPos++;
 
             return endMacroIndex + find.Length + finalEndPos + 6;
-        }
-
-        #endregion
-
-        #region IDataFieldWithButtons Members
-
-        public object[] MenuIcons
-        {
-            get
-            {
-                initButtons();
-
-                object[] tempIcons = new object[_menuIcons.Count];
-                for (int i = 0; i < _menuIcons.Count; i++)
-                    tempIcons[i] = _menuIcons[i];
-                return tempIcons;
-            }
         }
 
         private void initButtons()
@@ -536,7 +586,7 @@ namespace umbraco.editorControls.tinyMCE3
                     {
                         try
                         {
-                            umbraco.editorControls.tinymce.tinyMCECommand cmd = (umbraco.editorControls.tinymce.tinyMCECommand)umbraco.editorControls.tinymce.tinyMCEConfiguration.Commands[button];
+                            var cmd = (tinyMCECommand) tinyMCEConfiguration.Commands[button];
 
                             string appendValue = "";
                             if (cmd.Value != "")
@@ -550,7 +600,7 @@ namespace umbraco.editorControls.tinyMCE3
                         catch (Exception ee)
                         {
                             Log.Add(LogTypes.Error, User.GetUser(0), -1,
-                                    string.Format("TinyMCE: Error initializing button '{0}': {1}", button, ee.ToString()));
+                                    string.Format("TinyMCE: Error initializing button '{0}': {1}", button, ee));
                         }
                     }
                 }
@@ -561,17 +611,17 @@ namespace umbraco.editorControls.tinyMCE3
                 while (ide.MoveNext())
                 {
                     object buttonObj = ide.Value;
-                    int curPriority = (int)ide.Key;
+                    var curPriority = (int) ide.Key;
 
                     // Check priority
                     if (separatorPriority > 0 &&
-                        Math.Floor(decimal.Parse(curPriority.ToString()) / 10) >
-                        Math.Floor(decimal.Parse(separatorPriority.ToString()) / 10))
+                        Math.Floor(decimal.Parse(curPriority.ToString())/10) >
+                        Math.Floor(decimal.Parse(separatorPriority.ToString())/10))
                         _menuIcons.Add("|");
 
                     try
                     {
-                        editorButton e = (editorButton)buttonObj;
+                        var e = (editorButton) buttonObj;
 
                         MenuIconI menuItem = new MenuIconClass();
 
@@ -589,50 +639,5 @@ namespace umbraco.editorControls.tinyMCE3
                 }
             }
         }
-
-        #endregion
-
-        #region IMenuElement Members
-
-        public string ElementName
-        {
-            get { return "div"; }
-        }
-
-        public string ElementIdPreFix
-        {
-            get { return "umbTinymceMenu"; }
-        }
-
-        public string ElementClass
-        {
-            get { return "tinymceMenuBar"; }
-        }
-
-        public int ExtraMenuWidth
-        {
-            get
-            {
-                initButtons();
-                return _buttons.Count * 40 + 300;
-            }
-        }
-
-        #endregion
-
-        #region ILiveEditingDataEditor Members
-
-        public Control LiveEditingControl
-        {
-            get
-            {
-                m_isInLiveEditingMode = true;
-                base.IsInLiveEditingMode = true;
-                return this;
-
-            }
-        }
-
-        #endregion
     }
 }

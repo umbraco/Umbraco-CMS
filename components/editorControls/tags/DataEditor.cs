@@ -41,8 +41,8 @@ namespace umbraco.editorControls.tags
             int.TryParse(_data.NodeId.ToString(), out _nodeID);
             string allTags = "";
             int tagId = 0;
-            
-            
+
+
             //first clear out all items associated with this ID...
             umbraco.cms.businesslogic.Tags.Tag.RemoveTagsFromNode(_nodeID, _group);
 
@@ -139,18 +139,27 @@ namespace umbraco.editorControls.tags
 
             ClientDependencyLoader.Instance.RegisterDependency("Application/JQuery/jquery.autocomplete.js", "UmbracoClient", ClientDependencyType.Javascript);
             ClientDependencyLoader.Instance.RegisterDependency("css/umbracoGui.css", "UmbracoRoot", ClientDependencyType.Css);
-          
+
             string _alias = ((umbraco.cms.businesslogic.datatype.DefaultData)_data).PropertyId.ToString();
 
             //making sure that we have a ID for context
             string pageId = UmbracoContext.Current.Request["id"];
 
-            if (string.IsNullOrEmpty(pageId.Trim()))
+            if (pageId != null) pageId = pageId.Trim();
+
+            if (string.IsNullOrEmpty(pageId))
             {
-                Node currentNode = Node.GetCurrent();
-                if (currentNode != null)
+                // we need an empty try/catch as Node.GetCurrent() will throw an exception if we're outside of Umbraco Context
+                try
                 {
-                    pageId = currentNode.Id.ToString();
+                    Node currentNode = Node.GetCurrent();
+                    if (currentNode != null)
+                    {
+                        pageId = currentNode.Id.ToString();
+                    }
+                }
+                catch
+                {
                 }
             }
 
@@ -168,13 +177,16 @@ namespace umbraco.editorControls.tags
 
             tagCheckList.ID = "tagCheckList_" + _alias;
 
-            var tags = umbraco.cms.businesslogic.Tags.Tag.GetTags(int.Parse(pageId), _group);
-
-            foreach(var t in tags)
+            if (!String.IsNullOrEmpty(pageId))
             {
-                ListItem li = new ListItem(t.TagCaption, t.Id.ToString());
-                li.Selected = true;
-                tagCheckList.Items.Add(li);
+                var tags = umbraco.cms.businesslogic.Tags.Tag.GetTags(int.Parse(pageId), _group);
+
+                foreach (var t in tags)
+                {
+                    ListItem li = new ListItem(t.TagCaption, t.Id.ToString());
+                    li.Selected = true;
+                    tagCheckList.Items.Add(li);
+                }
             }
 
             this.ContentTemplateContainer.Controls.Add(tagBox);
@@ -186,12 +198,12 @@ namespace umbraco.editorControls.tags
                  + tagBox.ClientID + "\").autocomplete(\""
                  + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)
                  + "/webservices/TagsAutoCompleteHandler.ashx\",{minChars: 2,max: 100, extraParams:{group:\"" + _group + "\",id:\"" + pageId + "\",rnd:\"" + DateTime.Now.Ticks + "\"}}).result(function(e, data){jQuery(\"#" + tagButton.ClientID + "\").trigger('click');});";
-              
-                
+
+
             string tagsAutoCompleteInitScript =
                 "jQuery(document).ready(function(){"
                 + tagsAutoCompleteScript
-                +"});";
+                + "});";
 
             Page.ClientScript.RegisterStartupScript(GetType(), ClientID + "_tagsinit", tagsAutoCompleteInitScript, true);
 
@@ -201,7 +213,7 @@ namespace umbraco.editorControls.tags
 
             }
 
-           
+
         }
 
         #endregion
