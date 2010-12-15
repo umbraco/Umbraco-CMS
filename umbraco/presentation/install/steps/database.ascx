@@ -4,8 +4,7 @@
 	<!-- database box -->
 	<div class="tab main-tabinfo">
 		<div class="container">
-			<h1>
-				Database configuration</h1>
+			<h1>Database configuration</h1>
 			<p>
 				To complete this step, you must know some information regarding your database server
 				(”connection string”). Please contact your ISP if necessary. If you’re installingon
@@ -23,7 +22,7 @@
 						<p>
 							<strong>1. Do you have a blank database already installed?</strong></p>
 						<ul class="mini-tabset">
-							<li class="btn-yes"><a href="#database-step1" class="database-tab"><span>yes</span></a></li>
+							<li class="btn-yes"><a href="#database-sthttps://umbraco.unfuddle.com/svn/umbraco_juno/ep1" class="database-tab"><span>yes</span></a></li>
 							<li class="btn-no"><a href="#database-step2" class="database-tab"><span>no</span></a></li>
 						</ul>
 					</div>
@@ -79,7 +78,7 @@
 												<asp:Literal ID="lt_dbError" runat="server" /></strong></p>
 									</div>
 									<script type="text/javascript">
-										jQuery(document).ready(function () { showDatabaseSettings(); });
+									  jQuery(document).ready(function () { showDatabaseSettings(); });
 									</script>
 								</asp:PlaceHolder>
 								<div class="row sql" runat="server" id="DatabaseServerItem">
@@ -169,48 +168,48 @@
 		 <footer class="btn-box" style="display: none;">
 			<div class="t">&nbsp;</div>
 			 <asp:LinkButton class="btn-step btn btn-continue" runat="server" OnClick="gotoNextStep"><span>Continue</span></asp:LinkButton>
-             <asp:LinkButton class="btn-step btn btn-accept" style="display: none;" runat="server" OnClick="gotoSettings"><span>Back</span></asp:LinkButton>
+             <asp:LinkButton class="btn-step btn btn-back" style="display: none;" runat="server" OnClick="gotoSettings"><span>Back</span></asp:LinkButton>
 		</footer>
 	</div>
 
 	<script type="text/javascript">
-		var intervalId = 0;
+	  var intervalId = 0;
 
-		jQuery(document).ready(function () {
-			intervalId = setInterval("progressBarCallback()", 1000);
-			jQuery(".btn-box").hide();
-			jQuery.ajax({
-				type: 'POST',
-				contentType: 'application/json; charset=utf-8',
-				data: '{}',
-				dataType: 'json',
-				url: 'utills/p.aspx/installOrUpgrade'
-			});
-		});
+	  jQuery(document).ready(function () {
+	    intervalId = setInterval("progressBarCallback()", 1000);
+	    jQuery(".btn-box").hide();
+	    jQuery.ajax({
+	      type: 'POST',
+	      contentType: 'application/json; charset=utf-8',
+	      data: '{}',
+	      dataType: 'json',
+	      url: 'utills/p.aspx/installOrUpgrade'
+	    });
+	  });
 
-		function progressBarCallback() {
-			jQuery.getJSON('utills/p.aspx?feed=progress', function (data) {
+	  function progressBarCallback() {
+	    jQuery.getJSON('utills/p.aspx?feed=progress', function (data) {
 
-				updateProgressBar(data.percentage);
-				updateStatusMessage(data.message)
+	      updateProgressBar(data.percentage);
+	      updateStatusMessage(data.message)
 
-				if (data.error != "") {
-					clearInterval(intervalId);
-					updateStatusMessage(data.error);
+	      if (data.error != "") {
+	        clearInterval(intervalId);
+	        updateStatusMessage(data.error);
 
-					jQuery(".loader .hold").hide();
+	        jQuery(".loader .hold").hide();
 
-					jQuery(".btn-continue").hide();
-					jQuery(".btn-accept").show();
-					jQuery(".btn-box").show();
-				}
+	        jQuery(".btn-continue").hide();
+	        jQuery(".btn-back").show();
+	        jQuery(".btn-box").show();
+	      }
 
-				if (data.percentage == 100) {
-					clearInterval(intervalId);
-					jQuery(".btn-box").show();
-				}
-			});
-		}
+	      if (data.percentage == 100) {
+	        clearInterval(intervalId);
+	        jQuery(".btn-box").show();
+	      }
+	    });
+	  }
 	</script>
 
 </asp:PlaceHolder>
