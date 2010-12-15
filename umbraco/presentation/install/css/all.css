@@ -309,14 +309,23 @@ figure{display: block;}
 	color:#fff;
 }
 .btn-accept,
-.btn-continue{height:42px;}
+.btn-continue,
+.btn-back{height:42px;}
 .btn-accept span{
 	height:84px;
 	width:215px;
 	background:url(../images/btn-accept.png) no-repeat;
 }
+.btn-back span{
+	height:84px;
+	width:90px;
+	background:url(../images/btn-back.png) no-repeat;
+}
+
 .btn-accept:hover span,
-.btn-continue:hover span{margin:-42px 0 0;}
+.btn-continue:hover span,
+.btn-back:hover span{margin:-42px 0 0;}
+
 /* database */
 .database-hold{
 	width:100%;
