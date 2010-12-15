@@ -20,20 +20,15 @@
     }
 </script>
 <style type="text/css">
-    .declineStarterKits, #customizelink
+    .add-thanks
     {
-        display:none;
+        position:absolute;
+        left:-2500;
+        display:none !important;
     }
     
-    #starterKits, #starterKitDesigns {list-style: none; margin: 0; padding: 0px;}
-    #starterKits li, #starterKitDesigns li{float: left; margin: 15px; display: block; width: 130px; padding: 5px; border: 1px solid #efefef; text-align: center;}
-    #starterKits li a, #starterKitDesigns li a{text-decoration: none; color: #999}
-    #starterKits li span, #starterKitDesigns li span{display: block; text-align: center; padding-top: 10px;}
-    #starterKits li div, #starterKitDesigns li div{display: none !Important;}
-    #starterKits li img, #starterKitDesigns li img{border: none;}
-
+    .zoom-list li {float: left; margin: 15px; display: block; width: 180px;}
     
-    #starterKitDesc, #starterKitDesignDesc, #installingSkin, #installingStarterKit{clear: both; font-size: 1.5em; font-weight: bold; color: #999; padding: 10px;}
        
 </style>
 </asp:Content>
@@ -51,8 +46,8 @@
     
     
     <cc1:Pane id="StarterKitNotInstalled" Text="Install starter kit" runat="server">
-        <h3>Starter kit info</h3>
-        <p>Lorem ipsum</p>
+        <h3>Available starter kits</h3>
+        <p>You can choose from the folowing starter kits, each having specific functionality.</p>
          <asp:PlaceHolder ID="ph_starterkits" runat="server"></asp:PlaceHolder>
     </cc1:Pane>
 
