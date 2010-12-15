@@ -29,7 +29,16 @@
     
     .zoom-list li {float: left; margin: 15px; display: block; width: 180px;}
     
+    .btn-prev, .btn-next, .paging, .btn-preview, .faik-mask , .faik-mask-ie6
+    {
+        display:none;
+    }
        
+    .image {float: left; margin: 15px; display: block; width: 140px;}
+    
+    .image .gal-drop{padding-top:10px;}
+    
+    ul{list-style-type: none;}
 </style>
 </asp:Content>
 
@@ -38,8 +47,8 @@
     <cc1:Feedback ID="fb" runat="server" />
     
     <cc1:Pane id="StarterKitInstalled" Text="Install skin" runat="server">
-        <h3>Starter kit already installed</h3>
-        <p>Lorem ipsum</p>
+        <h3>Available skins</h3>
+        <p>You can choose from the following skins.</p>
         <asp:PlaceHolder ID="ph_skins" runat="server"></asp:PlaceHolder>
     </cc1:Pane>
     
@@ -47,7 +56,7 @@
     
     <cc1:Pane id="StarterKitNotInstalled" Text="Install starter kit" runat="server">
         <h3>Available starter kits</h3>
-        <p>You can choose from the folowing starter kits, each having specific functionality.</p>
+        <p>You can choose from the following starter kits, each having specific functionality.</p>
          <asp:PlaceHolder ID="ph_starterkits" runat="server"></asp:PlaceHolder>
     </cc1:Pane>
 
