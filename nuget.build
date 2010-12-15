@@ -3,7 +3,6 @@
 	<description>Build the umbraco 4.6 alpha Application for asp.net 3.5</description>
 
    <property name="nant.settings.currentframework" value="net-2.0" />
-
 	<!-- filenames and directories, generally won't change -->
 
 	<property name="public.dir" value="C:\Users\per\Documents\Projects\NugetServer\packages" />
