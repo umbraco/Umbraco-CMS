@@ -1,8 +1,9 @@
 <?xml version="1.0" ?>
 <project name="umbraco" default="test" basedir=".">
-	<description>Build the umbraco 4.6 alpha Application for asp.net 3.5</description>
+	<description>Build the umbraco 4.6 Application for asp.net 3.5</description>
 
    <property name="nant.settings.currentframework" value="net-2.0" />
+   
 	<!-- filenames and directories, generally won't change -->
 
 	<property name="public.dir" value="C:\Users\per\Documents\Projects\NugetServer\packages" />
@@ -17,7 +18,7 @@
 	<property name="nuget.app" value="C:\Program Files (x86)\nuget\nuget.exe" />
 	<property name="nuget.spec" value="${public.dir}\..\umbraco.nuspec" />
 
-	<property name="build.version" value="4.6.Alpha"/>
+	<property name="build.version" value="4.6.Beta"/>
 
 	<property name="win.dir" value="C:\windows" />
 
