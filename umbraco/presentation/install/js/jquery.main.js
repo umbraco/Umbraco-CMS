@@ -110,15 +110,15 @@ function initTabs() {
             var select = $(this);
             selectVal = select.val();
 
+            jQuery('#database-step1').hide();
             jQuery('#database-step1-2').hide();
+            jQuery('#database-step2').hide();
 
             select.change(function () {
                 selectValNew = jQuery(this).val();
-                if (selectVal != selectValNew) jQuery('#database-step1-2').show();
-                else jQuery('#database-step1-2').hide();
 
                 toggleDatabaseOption(selectValNew);
-            })
+            });
         })
         _links.each(function () {
             var _link = $(this);
@@ -135,7 +135,6 @@ function initTabs() {
                 _link.addClass('active');
                 _tab.show();
 
-                jQuery('#database-step1-2').hide();
                 return false;
             });
         });
@@ -146,33 +145,49 @@ function initTabs() {
 
 //add by pph
 function toggleDatabaseOption(selectValNew) {
-    if (selectValNew != '') {
+    var step1 = '#database-step1';
+
+    //Defensive if else to prevent this being executed on non database pages
+    if (jQuery(step1).length) {
+        var instructionText = jQuery(step1 + ' .instructionText');
+        var buttonBox = jQuery('.btn-box');
+
         //hide instructions
         jQuery('#database-step2').hide();
-       
+        instructionText.hide();
+        buttonBox.hide();
+
         //hide all db options
-        jQuery('#database-step1-2 .row').hide();
+        jQuery(step1 + ' .row').hide();
 
-        jQuery(".btn-box").show();
-
-        if (selectValNew == 'SqlServer' || selectValNew == 'MySql')
-            jQuery('#database-step1-2 .sql').show();
-        else if (selectValNew == 'Custom')
-            jQuery('#database-step1-2 .custom').show();
-        else if (selectValNew.indexOf('SQLCE4Umbraco') > -1 && !hasEmbeddedDlls) {
-            jQuery('#database-step1-2 .embeddedError').show();
-            jQuery(".btn-box").hide();
+        if (selectValNew != '') {
+            if (selectValNew == 'SqlServer' || selectValNew == 'MySql') {
+                jQuery(step1 + ' .sql').show();
+                instructionText.show();
+                buttonBox.show();
+            }
+            else if (selectValNew == 'Custom') {
+                jQuery(step1 + ' .custom').show();
+                instructionText.show();
+                buttonBox.show();
+            }
+            else if (selectValNew.indexOf('SQLCE4Umbraco') > -1 && !hasEmbeddedDlls) {
+                jQuery(step1 + ' .embeddedError').show();
+            }
+            else if (selectValNew.indexOf('SQLCE4Umbraco') > -1) {
+                jQuery(step1 + ' .embedded').show();
+                instructionText.show();
+                buttonBox.show();
+            }
         }
-        else if (selectValNew.indexOf('SQLCE4Umbraco') > -1)
-            jQuery('#database-step1-2 .embedded').show();
-        showDatabaseSettings();
     }
 }
 
 //add by pph
 function showDatabaseSettings() {
-    jQuery('#database-step1').show();
-    jQuery('#database-step1-2').show();
+    var link = jQuery('.btn-yes > a');
+    link.addClass('active');
+    jQuery(link.attr('href')).show();
 }
 
 

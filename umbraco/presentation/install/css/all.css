@@ -479,7 +479,7 @@ figure{display: block;}
 	overflow:hidden;
 	float:left;
 }
-.ui-progressbar-value { background-image: url(../images/pbar-ani.gif) !important; }
+.ui-progressbar-value { background-image: url(../images/pbar-ani.gif) }
 .btn-continue span{
 	width:122px;
 	height:84px;
@@ -542,11 +542,11 @@ figure{display: block;}
 .validaing,
 .invalidaing, .basevalidaing{
 	float:left !Important;
-	display:inline !Important;
+	display:inline;
 	margin:6px 0 0 10px !Important;
 	padding:0 0 2px 28px !Important;
 	line-height:13px !Important;
-	font-weight:normal !Important;
+    font-weight:bold !Important;
 	color:#fff !Important;
 	background-color: none !Important;
 }
