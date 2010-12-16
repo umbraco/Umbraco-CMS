@@ -1,22 +1,9 @@
 using System;
-using System.Data;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
+using System.Linq;
 using System.Reflection;
-using System.Collections.Specialized;
 using System.Xml;
-
-using umbraco;
-using umbraco.cms.businesslogic;
+using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic.member;
-using umbraco.cms.businesslogic.property;
 using umbraco.IO;
 
 namespace umbraco.presentation.umbracobase
@@ -60,7 +47,8 @@ namespace umbraco.presentation.umbracobase
             set { _isAllowed = value; }
         }
 
-        public bool returnXML {
+        public bool returnXML
+        {
             get { return _returnXml; }
             set { _returnXml = value; }
         }
@@ -107,55 +95,59 @@ namespace umbraco.presentation.umbracobase
             {
                 //check for RestExtensionAttribute
 
-                foreach(Type t in BusinessLogic.Utils.TypeFinder.FindClassesMarkedWithAttribute(typeof(RestExtension)))
+                foreach (Type t in TypeFinder.FindClassesMarkedWithAttribute(typeof(RestExtension)))
                 {
-                
-                    var temp = t.GetCustomAttributes(typeof(RestExtension), false);
 
-                    if(((RestExtension)temp[0]).GetAlias() == extensionAlias)
+                    var temp = t.GetCustomAttributes(typeof(RestExtension), false).OfType<RestExtension>();
+
+                    if (temp.Where(x => x.GetAlias() == extensionAlias)
+                        .Any())
                     {
+
                         MethodInfo mi = t.GetMethod(methodName);
 
-                        if (mi == null)
-                        {
-                            //method not found
-                        }
-                        else
+                        if (mi != null)
                         {
                             //check allowed
-                            var attri = mi.GetCustomAttributes(typeof(RestExtensionMethod), false);
+                            var attributes = mi.GetCustomAttributes(typeof(RestExtensionMethod), false).OfType<RestExtensionMethod>();
 
-                            fromFile = false;
-
-                            allowed = ((RestExtensionMethod)attri[0]).allowAll;
-
-                            if (!allowed)
+                            //check to make sure the method was decorated properly
+                            if (attributes.Any())
                             {
-                                //Member Based permissions.. check for group, type and ID... 
-                                Member currentMem = Member.GetCurrentMember();
+                                fromFile = false;
 
-                                //not basic.. and not logged in? - out.. 
-                                if (currentMem == null)
+                                var attribute = attributes.First();
+                                allowed = attribute.allowAll;
+
+                                if (!allowed)
                                 {
-                                    allowed = false;
-                                }
-                                else //do member authentication stuff... 
-                                    allowed = memberAuthentication(((RestExtensionMethod)attri[0]), currentMem);
-                            }
+                                    //Member Based permissions.. check for group, type and ID... 
+                                    Member currentMem = Member.GetCurrentMember();
 
-                            if (allowed)
-                            {
-                                this.isAllowed = true;
-                                this.alias = extensionAlias;
-                                this.assembly = t.Assembly;
-                                this.method = t.GetMethod(methodName);
-                                this.type = t;
+                                    //not basic.. and not logged in? - out.. 
+                                    if (currentMem == null)
+                                    {
+                                        allowed = false;
+                                    }
+                                    else
+                                    {
+                                        //do member authentication stuff... 
+                                        allowed = memberAuthentication(attribute, currentMem);
+                                    }
+                                }
+
+                                if (allowed)
+                                {
+                                    this.isAllowed = true;
+                                    this.alias = extensionAlias;
+                                    this.assembly = t.Assembly;
+                                    this.method = t.GetMethod(methodName);
+                                    this.type = t;
+                                } 
                             }
                         }
-
                     }
                 }
-
             }
 
             if (allowed)
@@ -194,8 +186,8 @@ namespace umbraco.presentation.umbracobase
 
             if (!string.IsNullOrEmpty(baseExt.GetAllowGroup()))
             {
-               
-                    //Groups array
+
+                //Groups array
                 string[] groupArray = baseExt.GetAllowGroup().Split(',');
 
                 foreach (MemberGroup mg in currentMem.Groups.Values)
@@ -206,14 +198,14 @@ namespace umbraco.presentation.umbracobase
                             memberAccess = true;
                     }
                 }
-                
+
             }
 
             //Membertype allowed?
             if (!string.IsNullOrEmpty(baseExt.GetAllowType()) && !memberAccess)
             {
-                
-                    //Types array
+
+                //Types array
                 string[] typeArray = baseExt.GetAllowType().Split(',');
 
                 foreach (string type in typeArray)
@@ -221,17 +213,17 @@ namespace umbraco.presentation.umbracobase
                     if (type == currentMem.ContentType.Alias)
                         memberAccess = true;
                 }
-                
+
             }
 
 
             //Member ID allowed? should this work with loginName instead? 
-            if (!string.IsNullOrEmpty(baseExt.GetAllowMember())&& !memberAccess)
+            if (!string.IsNullOrEmpty(baseExt.GetAllowMember()) && !memberAccess)
             {
 
                 if (int.Parse((string)baseExt.GetAllowMember().Trim()) == currentMem.Id)
                     memberAccess = true;
-               
+
             }
             return memberAccess;
         }
@@ -287,6 +279,6 @@ namespace umbraco.presentation.umbracobase
             }
             return memberAccess;
         }
-        
+
     }
 }
