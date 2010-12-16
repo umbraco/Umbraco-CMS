@@ -15,7 +15,34 @@ namespace umbraco.BusinessLogic.Utils
     public static class TypeFinder
     {
 
+        /// <summary>
+        /// Searches all loaded assemblies for classes marked with the attribute passed in.
+        /// </summary>
+        /// <returns>A list of found types</returns>
+        public static List<Type> FindClassesMarkedWithAttribute(Type attribute)
+        {
+            List<Type> types = new List<Type>();
 
+            bool searchGAC = false;
+
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                //don't check any types if the assembly is part of the GAC
+                if (!searchGAC && assembly.GlobalAssemblyCache)
+                    continue;
+
+                foreach (Type type in assembly.GetTypes())
+                {
+                    if (type.GetCustomAttributes(attribute, true).Length > 0)
+                    {
+                        types.Add(type);
+                    }
+                }
+
+            }
+            return types;
+
+        }
 
         /// <summary>
         /// Searches all loaded assemblies for classes of the type passed in.

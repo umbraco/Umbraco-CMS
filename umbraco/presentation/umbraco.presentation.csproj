@@ -372,6 +372,8 @@
     <Compile Include="template.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="umbracobase\attributes\RestExtension.cs" />
+    <Compile Include="umbracobase\attributes\RestExtensionMethod.cs" />
     <Compile Include="umbracobase\baseHttpModule.cs" />
     <Compile Include="umbracobase\baseLibrary.cs" />
     <Compile Include="umbracobase\restExtension.cs" />

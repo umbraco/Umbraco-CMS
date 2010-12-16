@@ -72,6 +72,7 @@ namespace umbraco.presentation.umbracobase
         public restExtension(string extensionAlias, string methodName)
         {
             bool allowed = false;
+            bool fromFile = true;
 
             XmlDocument baseDoc = new XmlDocument(); //RESTExtension document...
             baseDoc.Load(IOHelper.MapPath(SystemFiles.RestextensionsConfig));
@@ -102,26 +103,83 @@ namespace umbraco.presentation.umbracobase
                         allowed = memberAuthentication(baseExt, currentMem);
                 }
             }
+            else
+            {
+                //check for RestExtensionAttribute
+
+                foreach(Type t in BusinessLogic.Utils.TypeFinder.FindClassesMarkedWithAttribute(typeof(RestExtension)))
+                {
+                
+                    var temp = t.GetCustomAttributes(typeof(RestExtension), false);
+
+                    if(((RestExtension)temp[0]).GetAlias() == extensionAlias)
+                    {
+                        MethodInfo mi = t.GetMethod(methodName);
+
+                        if (mi == null)
+                        {
+                            //method not found
+                        }
+                        else
+                        {
+                            //check allowed
+                            var attri = mi.GetCustomAttributes(typeof(RestExtensionMethod), false);
+
+                            fromFile = false;
+
+                            allowed = ((RestExtensionMethod)attri[0]).allowAll;
+
+                            if (!allowed)
+                            {
+                                //Member Based permissions.. check for group, type and ID... 
+                                Member currentMem = Member.GetCurrentMember();
+
+                                //not basic.. and not logged in? - out.. 
+                                if (currentMem == null)
+                                {
+                                    allowed = false;
+                                }
+                                else //do member authentication stuff... 
+                                    allowed = memberAuthentication(((RestExtensionMethod)attri[0]), currentMem);
+                            }
+
+                            if (allowed)
+                            {
+                                this.isAllowed = true;
+                                this.alias = extensionAlias;
+                                this.assembly = t.Assembly;
+                                this.method = t.GetMethod(methodName);
+                                this.type = t;
+                            }
+                        }
+
+                    }
+                }
+
+            }
 
             if (allowed)
             {
-                XmlNode extNode = baseDoc.SelectSingleNode("/RestExtensions/ext [@alias='" + extensionAlias + "']");
-                string asml = extNode.Attributes["assembly"].Value;
-                string assemblyPath = IOHelper.MapPath(string.Format("{0}/{1}.dll", SystemDirectories.Bin, asml.TrimStart('/')));
-                Assembly returnAssembly = System.Reflection.Assembly.LoadFrom(assemblyPath);
+                if (fromFile)
+                {
+                    XmlNode extNode = baseDoc.SelectSingleNode("/RestExtensions/ext [@alias='" + extensionAlias + "']");
+                    string asml = extNode.Attributes["assembly"].Value;
+                    string assemblyPath = IOHelper.MapPath(string.Format("{0}/{1}.dll", SystemDirectories.Bin, asml.TrimStart('/')));
+                    Assembly returnAssembly = System.Reflection.Assembly.LoadFrom(assemblyPath);
 
-                string returnTypeName = extNode.Attributes["type"].Value;
-                Type returnType = returnAssembly.GetType(returnTypeName);
+                    string returnTypeName = extNode.Attributes["type"].Value;
+                    Type returnType = returnAssembly.GetType(returnTypeName);
 
 
-                if (baseExt.Attributes["returnXml"] != null && baseExt.Attributes["returnXml"].Value.ToLower() == "false")
-                    this.returnXML = false;
-                
-                this.isAllowed = true;
-                this.alias = extensionAlias;
-                this.assembly = returnAssembly;
-                this.method = returnType.GetMethod(methodName);
-                this.type = returnType;
+                    if (baseExt.Attributes["returnXml"] != null && baseExt.Attributes["returnXml"].Value.ToLower() == "false")
+                        this.returnXML = false;
+
+                    this.isAllowed = true;
+                    this.alias = extensionAlias;
+                    this.assembly = returnAssembly;
+                    this.method = returnType.GetMethod(methodName);
+                    this.type = returnType;
+                }
             }
             else
             {
@@ -129,6 +187,54 @@ namespace umbraco.presentation.umbracobase
             }
         }
 
+        private static bool memberAuthentication(RestExtensionMethod baseExt, Member currentMem)
+        {
+            //Check group, type and ID
+            bool memberAccess = false;
+
+            if (!string.IsNullOrEmpty(baseExt.GetAllowGroup()))
+            {
+               
+                    //Groups array
+                string[] groupArray = baseExt.GetAllowGroup().Split(',');
+
+                foreach (MemberGroup mg in currentMem.Groups.Values)
+                {
+                    foreach (string group in groupArray)
+                    {
+                        if (group == mg.Text)
+                            memberAccess = true;
+                    }
+                }
+                
+            }
+
+            //Membertype allowed?
+            if (!string.IsNullOrEmpty(baseExt.GetAllowType()) && !memberAccess)
+            {
+                
+                    //Types array
+                string[] typeArray = baseExt.GetAllowType().Split(',');
+
+                foreach (string type in typeArray)
+                {
+                    if (type == currentMem.ContentType.Alias)
+                        memberAccess = true;
+                }
+                
+            }
+
+
+            //Member ID allowed? should this work with loginName instead? 
+            if (!string.IsNullOrEmpty(baseExt.GetAllowMember())&& !memberAccess)
+            {
+
+                if (int.Parse((string)baseExt.GetAllowMember().Trim()) == currentMem.Id)
+                    memberAccess = true;
+               
+            }
+            return memberAccess;
+        }
 
         private static bool memberAuthentication(XmlNode baseExt, Member currentMem)
         {
