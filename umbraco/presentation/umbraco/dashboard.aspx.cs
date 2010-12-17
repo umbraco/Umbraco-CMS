@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Reflection;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -88,6 +89,27 @@ namespace umbraco.cms.presentation
                                 {
                                     Control c = LoadControl(path);
 
+                                    // set properties
+                                    Type type = c.GetType();
+                                    if (type != null)
+                                    {
+                                        foreach (XmlAttribute att in uc.Attributes)
+                                        {
+                                            string attributeName = att.Name;
+                                            string attributeValue = parseControlValues(att.Value).ToString(); // parse special type of values
+
+
+                                            PropertyInfo prop = type.GetProperty(attributeName);
+                                            if (prop == null)
+                                            {
+                                                continue;
+                                            }
+
+                                            prop.SetValue(c, Convert.ChangeType(attributeValue, prop.PropertyType), null);
+
+                                        }
+                                    }
+
                                     //resolving files from dashboard config which probably does not map to a virtual fi
                                     tab.Controls.Add(AddPanel(uc, c));
                                 }
@@ -133,6 +155,37 @@ namespace umbraco.cms.presentation
                     dashBoardContent.Controls.Add(placeHolder);
                 }
             }
+        }
+
+        private object parseControlValues(string value)
+        {
+            if (!String.IsNullOrEmpty(value))
+            {
+                if (value.StartsWith("[#"))
+                {
+                    value = value.Substring(2, value.Length - 3).ToLower();
+                    switch (value)
+                    {
+                        case "usertype":
+                            return BusinessLogic.User.GetCurrent().UserType.Alias;
+                        case "username":
+                            return BusinessLogic.User.GetCurrent().Name;
+                        case "userlogin":
+                            return BusinessLogic.User.GetCurrent().LoginName;
+                        case "usercontentstartnode":
+                            return BusinessLogic.User.GetCurrent().StartNodeId;
+                            break;
+                        case "usermediastartnode":
+                            return BusinessLogic.User.GetCurrent().StartMediaId;
+                            break;
+                        default:
+                            return value;
+                            break;
+                    }
+                }
+            }
+
+            return value;
         }
 
         private Control AddPanel(XmlNode node, Control c)
