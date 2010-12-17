@@ -25,41 +25,39 @@
 										<div class="instruction-hold">
 
 											<div class="row">
-                                                <asp:Label AssociatedControlID="tb_name" runat="server">Name:</asp:label>
+                                                <asp:label AssociatedControlID="tb_name" runat="server">Name:</asp:label>
 												<span><asp:TextBox ID="tb_name" CssClass="text" type="text" Text="admin" runat="server"  /></span>
-                                                <asp:RequiredFieldValidator CssClass="invalidaing" ControlToValidate="tb_name" runat="server" ErrorMessage="Name is a mandatory field" />
+                                                <asp:RequiredFieldValidator Display="Dynamic" CssClass="invalidaing" ControlToValidate="tb_name" runat="server" ErrorMessage="Name is a mandatory field" />
 											</div>
 
 											<div class="row">
-												<asp:Label AssociatedControlID="tb_email" runat="server">Email:</asp:label>
+												<asp:label AssociatedControlID="tb_email" runat="server">Email:</asp:label>
 												<span><asp:TextBox ID="tb_email" CssClass="text" type="text" Text="admin@domain.com" runat="server"  /></span>
-
-                                                <asp:RequiredFieldValidator CssClass="invalidaing" ControlToValidate="tb_email" runat="server" ErrorMessage="Email is a mandatory field" />
+                                                <asp:RequiredFieldValidator Display="Dynamic" CssClass="invalidaing" ControlToValidate="tb_email" runat="server" ErrorMessage="Email is a mandatory field" />
 											</div>
 
 											<div class="row">
-												<asp:Label AssociatedControlID="tb_login" runat="server">Username:</asp:label>
+												<asp:label AssociatedControlID="tb_login" runat="server">Username:</asp:label>
 												<span><asp:TextBox ID="tb_login" CssClass="text" type="text" Text="admin" runat="server"  /></span>
-												<asp:RequiredFieldValidator CssClass="invalidaing" ControlToValidate="tb_login" runat="server" ErrorMessage="Username is a mandatory field" />
+												<asp:RequiredFieldValidator Display="Dynamic" CssClass="invalidaing" ControlToValidate="tb_login" runat="server" ErrorMessage="Username is a mandatory field" />
 											</div>
 
 											<div class="row" style="height: 35px; overflow: hidden;">
-	                                            <asp:Label AssociatedControlID="tb_password" runat="server">Password:</asp:label>
+	                                            <asp:label AssociatedControlID="tb_password" runat="server">Password:</asp:label>
 												<span><asp:TextBox ID="tb_password" CssClass="text" TextMode="Password" type="text" Text="" runat="server"  /></span>
-												<asp:RequiredFieldValidator CssClass="invalidaing" ControlToValidate="tb_password" runat="server" ErrorMessage="Username is a mandatory field" />
+												<asp:RequiredFieldValidator Display="Dynamic" CssClass="invalidaing" ControlToValidate="tb_password" runat="server" ErrorMessage="Password is a mandatory field" />
 											</div>
 
 											<div class="row">
 												<asp:Label AssociatedControlID="tb_password_confirm" runat="server">Confirm Password:</asp:label>
-												<span><asp:TextBox ID="tb_password_confirm" CssClass="text" TextMode="Password" type="text" Text=""  runat="server"  /></span>
-
-                                                <asp:CompareValidator CssClass="invalidaing" ControlToCompare="tb_password" ControlToValidate="tb_password_confirm" ErrorMessage="The passwords must be identical" runat="server" />
-												<asp:RequiredFieldValidator CssClass="invalidaing" ControlToValidate="tb_password" runat="server" ErrorMessage="Username is a mandatory field" />
+												<span><asp:TextBox ID="tb_password_confirm" CssClass="text" TextMode="Password" type="text" Text="" runat="server"  /></span>
+                                                <asp:RequiredFieldValidator Display="Dynamic" CssClass="invalidaing" ControlToValidate="tb_password_confirm" runat="server" ErrorMessage="Confirm Password is a mandatory field" />
+                                                <asp:CompareValidator Display="Dynamic" CssClass="invalidaing" ControlToCompare="tb_password" ControlToValidate="tb_password_confirm" ErrorMessage="The passwords must be identical" runat="server" />
 											</div>
 
 											<div class="check-hold">
                                             	<asp:CheckBox ID="cb_newsletter" runat="server" Checked="true"  /> 
-                                                <asp:Label AssociatedControlID="cb_newsletter" runat="server">Sign up for our monthly newsletter</asp:label>
+                                                <asp:label AssociatedControlID="cb_newsletter" runat="server">Sign up for our monthly newsletter</asp:label>
 											</div>
 										</div>
 									</div>

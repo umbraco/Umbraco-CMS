@@ -22,7 +22,7 @@
 						<p>
 							<strong>1. Do you have a blank database already installed?</strong></p>
 						<ul class="mini-tabset">
-							<li class="btn-yes"><a href="#database-sthttps://umbraco.unfuddle.com/svn/umbraco_juno/ep1" class="database-tab"><span>yes</span></a></li>
+							<li class="btn-yes"><a href="#database-step1" class="database-tab"><span>yes</span></a></li>
 							<li class="btn-no"><a href="#database-step2" class="database-tab"><span>no</span></a></li>
 						</ul>
 					</div>
@@ -33,7 +33,7 @@
 						<div class="container">
 							<p>
 								<strong>2. Now choose your database type below.</strong></p>
-							<div class="row select">
+							<div class="select">
 								<asp:DropDownList runat="server" ID="DatabaseType" CssClass="sel">
 									<asp:ListItem Value="" Text="Please choose" Selected="True" />
 									<asp:ListItem Value="SqlServer" Text="Microsoft SQL Server" />
@@ -44,12 +44,9 @@
 							</div>
 						</div>
 					</div>
-				</div>
-				<!-- step1-2 -->
-				<div id="database-step1-2">
 					<div class="step">
 						<div class="container">
-							<p>
+							<p class="instructionText">
 								<strong>3. Instructions:</strong> Please fill out the below fields to connect to
 								your database.</p>
 							<div class="instruction-hold">
@@ -159,7 +156,7 @@
 				<div class="hold">
 					<div class="progress-bar">
 					</div>
-					<span class="progress-bar-value">56%</span>
+					<span class="progress-bar-value">0%</span>
 				</div>
 				<strong></strong>
 			</div>
@@ -207,6 +204,7 @@
 	      if (data.percentage == 100) {
 	        clearInterval(intervalId);
 	        jQuery(".btn-box").show();
+	        jQuery('.ui-progressbar-value').css("background-image", "url(images/pbar.gif)");
 	      }
 	    });
 	  }
