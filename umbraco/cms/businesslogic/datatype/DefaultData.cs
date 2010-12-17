@@ -87,6 +87,15 @@ namespace umbraco.cms.businesslogic.datatype
             }
         }
 
+        public int DataTypeDefinitionId
+        {
+            get
+            {
+                return _dataType.DataTypeDefinitionId;
+            }
+        }
+
+
 		#region IData Members
 
         /// <summary>
