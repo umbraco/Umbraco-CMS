@@ -1,0 +1,24 @@
+Hi! Thanks for grabbing the Umbraco sourcecode.
+
+===========================================
+NOTE - DEFAULT BRANCH EMPTY - December 2010
+===========================================
+
+
+- With the help of CodePlex we have migrated much of our previous changesets (as of Dec 13th 2010) from TFS to Mercurial.
+
+- However, not everything could be migrated to our new branching workflow. So for each nominal group of 4.x changes, we've created named branches. For upcoming 5.x changesets, we'll adhere to our new workflow which we'll describe on the Wiki for contributors.
+
+- FOR THE MOMENT, the 'default' branch is empty - pending the addition of the 5.0 changesets
+
+- To switch to the codebase on which you want to work, 'hg update' to the named branch (e.g. "4.6.0") or tag (e.g. "Release-4.5.2") and browse or work from that point.
+
+
+Thanks to Matt Hawley at CodePlex for his help in our migration!
+
+Cheers,
+The Umbraco Team
+
+http://umbraco.org
+http://our.umbraco.org
+http://umbraco.codeplex.com
