@@ -68,7 +68,8 @@ namespace umbraco.editorControls.userControlGrapper
             // populate the usercontrol dropdown
             _dropdownlistUserControl.Items.Add(new ListItem(ui.Text("choose"), ""));
             populateUserControls( IOHelper.MapPath( SystemDirectories.Usercontrols) );
-			
+
+           
 		}
 
         private void populateUserControls(string path)
@@ -117,11 +118,14 @@ namespace umbraco.editorControls.userControlGrapper
                 }
                 _dropdownlist.SelectedValue = _datatype.DBType.ToString();
 
+
+                
             }
 
             //check for settings
-            if(!string.IsNullOrEmpty(Configuration))
+            if (!string.IsNullOrEmpty(Configuration))
                 LoadSetttings(Configuration);
+           
 
         }
 
@@ -228,7 +232,15 @@ namespace umbraco.editorControls.userControlGrapper
 
             }
 
-            ss.Dispose();     
+            ss.Dispose();
+
+            if (dtSettings.Count == 0)
+            {
+                if (!string.IsNullOrEmpty(Configuration))
+                    LoadSetttings(Configuration);
+            }
+
+           
         }
 
         protected override void Render(HtmlTextWriter writer)
