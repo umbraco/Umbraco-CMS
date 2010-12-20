@@ -372,7 +372,7 @@ namespace umbraco.controls
                     switch (UmbracoSettings.PropertyContextHelpOption)
                     {
                         case "icon":
-                            caption += " <img src=\"" + SystemDirectories.Umbraco + "/images/help.png\" class=\"umbPropertyContextHelp\" alt=\"" + p.PropertyType.Description + "\" title=\"" + p.PropertyType.Description + "\" />";
+                            caption += " <img src=\"" + this.ResolveUrl(SystemDirectories.Umbraco) + "/images/help.png\" class=\"umbPropertyContextHelp\" alt=\"" + p.PropertyType.Description + "\" title=\"" + p.PropertyType.Description + "\" />";
                             break;
                         case "text":
                             caption += "<br /><small>" + umbraco.library.ReplaceLineBreaks(p.PropertyType.Description) + "</small>";
