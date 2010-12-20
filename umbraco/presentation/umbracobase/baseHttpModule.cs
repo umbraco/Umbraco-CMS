@@ -89,10 +89,18 @@ namespace umbraco.presentation.umbracobase
 
                     if (myExtension.isAllowed)
                     {
-                        httpApp.Response.Output.Write(invokeMethod(myExtension, urlArray));
+                        string respone = invokeMethod(myExtension, urlArray);
+                        if (respone.Substring(0, 7) == "<error>")
+                        {
+                            httpApp.Response.StatusCode = 500;
+                            httpApp.Response.StatusDescription = "Internal Server Error";
+                        }
+                        httpApp.Response.Output.Write(respone);
                     }
                     else
                     {
+                        httpApp.Response.StatusCode = 500;
+                        httpApp.Response.StatusDescription = "Internal Server Error";
                         //Very static error msg...
                         httpApp.Response.Output.Write("<error>Extension not found or permission denied</error>");
                     }
