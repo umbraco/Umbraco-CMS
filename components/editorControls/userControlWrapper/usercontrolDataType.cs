@@ -31,7 +31,7 @@ namespace umbraco.editorControls.userControlGrapper
             get
             {
                 if (_baseData == null)
-                    _baseData = new umbraco.cms.businesslogic.datatype.DefaultData(this);
+                    _baseData = new usercontrolData(this);
                 return _baseData;
             }
         }

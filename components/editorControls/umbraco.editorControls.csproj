@@ -344,6 +344,7 @@
     <Compile Include="tinymce\TinyMCELegacyControl.cs" />
     <Compile Include="tinymce\tinyMCEImageHelper.cs" />
     <Compile Include="tinymce\tinyMCEPreValueConfigurator.cs" />
+    <Compile Include="userControlWrapper\usercontrolData.cs" />
     <Compile Include="wysiwyg\editorButton.cs" />
     <Compile Include="tinyMCE3\TinyMCE.cs" />
     <Compile Include="tinyMCE3\tinyMCE3dataType.cs" />
