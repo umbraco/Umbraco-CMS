@@ -96,7 +96,7 @@ namespace umbraco.cms.businesslogic.datatype
                
                 var attr = this.Control.GetType().GetCustomAttributes(typeof(ValidationPropertyAttribute), true);
 
-                if (attr.Length > 0)
+                if (attr != null && attr.Length > 0)
                 {
                     //get value of marked property
                     System.Reflection.PropertyInfo info = this.Control.GetType().GetProperty(((ValidationPropertyAttribute)attr[0]).Name);
