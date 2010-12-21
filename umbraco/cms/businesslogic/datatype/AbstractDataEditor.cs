@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Web.UI;
 
 namespace umbraco.cms.businesslogic.datatype
 {
@@ -82,10 +83,35 @@ namespace umbraco.cms.businesslogic.datatype
 
     }
 
+    [ValidationProperty("Value")]
     public class AbstractDataEditorControl : System.Web.UI.WebControls.WebControl, interfaces.IDataEditor
     {
         private cms.businesslogic.datatype.BaseDataType _datatype;
 
+        // property is used as a wrapper around the actual controls ValidationProperty
+        public object Value {
+
+            get
+            {
+               
+                var attr = this.Control.GetType().GetCustomAttributes(typeof(ValidationPropertyAttribute), true);
+
+                if (attr.Length > 0)
+                {
+                    //get value of marked property
+                    System.Reflection.PropertyInfo info = this.Control.GetType().GetProperty(((ValidationPropertyAttribute)attr[0]).Name);
+                    return info.GetValue(this.Control, null);
+                }
+                else
+                {
+                    //not marked so no validation
+                    return "ok";
+                }
+                
+               
+            }
+        
+        }
         public AbstractDataEditorControl(cms.businesslogic.datatype.BaseDataType DataType)
         {
             _datatype = DataType;
