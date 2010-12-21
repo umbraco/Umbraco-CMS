@@ -16,11 +16,19 @@ using umbraco.IO;
 
 namespace umbraco.editorControls.userControlGrapper
 {
+    [ValidationProperty("Value")]
     public class usercontrolDataEditor : System.Web.UI.WebControls.PlaceHolder, umbraco.interfaces.IDataEditor
 	{
 		private umbraco.interfaces.IData _data;
         private string _usercontrolPath;
 
+        public object Value
+        {
+            get
+            {
+                return ((IUsercontrolDataEditor)Controls[0]).value;
+            }
+        }
 
         public usercontrolDataEditor(umbraco.interfaces.IData Data, string UsercontrolPath)
         {
