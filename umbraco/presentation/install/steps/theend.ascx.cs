@@ -27,10 +27,8 @@ namespace umbraco.presentation.install.steps
                 //errorLiteral.Text = ex.ToString();
             }
 
-            if (cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
-            {
-                ///viewSite.Visible = true;
-            }
+            if (!cms.businesslogic.skinning.Skinning.IsStarterKitInstalled())
+                customizeSite.Visible = false;
 
 
         }
