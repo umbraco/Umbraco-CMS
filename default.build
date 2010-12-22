@@ -71,7 +71,14 @@
             <arg value="/p:ToolsVersion=4.0" />
         </exec>
         <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
-    </target>
+    
+		<exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
+            <arg value="${root.dir}\umbraco.MacroEngines.Juno\umbraco.MacroEngines.csproj" />
+            <arg value="/v:n" />
+            <arg value="/p:WarningLevel=0" />
+            <arg value="/p:ToolsVersion=4.0" />
+        </exec>
+	</target>
 
 
     <!-- Directories and files -->
