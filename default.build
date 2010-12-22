@@ -127,7 +127,8 @@
         <!-- 4.6 Files -->
         <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\Debug\umbraco.MacroEngines.dll" tofile="${build.dir}\bin\umbraco.MacroEngines.dll" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\Debug\umbraco.MacroEngines.pdb" tofile="${build.dir}\bin\umbraco.MacroEngines.pdb" failonerror="false" overwrite="true"/>
-
+		
+		<copy file="${root.dir}\foreign dlls\System.Web.Razor.dll" tofile="${build.dir}\bin\System.Web.Razor.dll" failonerror="false" overwrite="true"/>
         
         <!--standard /data/packages files-->
         <mkdir dir="${build.dir}\App_Data" />
@@ -180,7 +181,7 @@
                 <include name="${build.dir}/PrecompiledApp.config" />
                 <include name="${build.dir}/web.config.template" />
                 <include name="${build.dir}/*.xslt" />
-                <include name="${build.dir}/web.STANDARD.config" />
+                <include name="${build.dir}/web.*.config" />
                 <include name="${build.dir}/site.py" />
             </fileset>
         </delete>
