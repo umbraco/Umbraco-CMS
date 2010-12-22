@@ -41,19 +41,34 @@ namespace umbraco.presentation.nodeFactory
         }
 
 
-        /*
+        
         public new List<Property> PropertiesAsList
         {
             get { return Properties.Cast<Property>().ToList(); }
         }
-        */
-     
+        
+
+
+        public new Nodes Children
+        {
+            get
+            {
+                return base.Children as Nodes;
+            }
+        }
+
+        public new List<Node> ChildrenAsList
+        {
+            get { return Children.Cast<Node>().ToList(); }
+        }
+
+
+
         public Node(XmlNode NodeXmlNode) : base(NodeXmlNode){}
 
         public Node(XmlNode NodeXmlNode, bool DisableInitializing) : base(NodeXmlNode, DisableInitializing){}
 
         public Node(int NodeId) : base(NodeId){
-            var p = NodeId;
         }
 
         public Node(int NodeId, bool forcePublishedXml) : base(NodeId, forcePublishedXml) {}
