@@ -33,9 +33,9 @@ namespace umbraco.cms.presentation.settings
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-						MasterTemplate.Attributes.Add("onchange", "changeMasterPageFile()");
+				MasterTemplate.Attributes.Add("onchange", "changeMasterPageFile()");
 
-						if (!IsPostBack) {
+				if (!IsPostBack) {
 							 
 
 				MasterTemplate.Items.Add(new ListItem(ui.Text("none"),"0"));

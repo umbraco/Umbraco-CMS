@@ -10,9 +10,8 @@ using umbraco.cms.businesslogic.propertytype;
 using System.Collections.Generic;
 using umbraco.interfaces;
 
-namespace umbraco.presentation.nodeFactory
+namespace umbraco.nodeFactory
 {
-
     /// <summary>
     /// Summary description for Node.
     /// </summary>
@@ -298,7 +297,7 @@ namespace umbraco.presentation.nodeFactory
                 _pageXmlNode = ((IHasXmlNode)library.GetXmlNodeById(NodeId.ToString()).Current).GetNode();
             else
             {
-                _pageXmlNode = UmbracoContext.Current.GetXml().DocumentElement;
+                _pageXmlNode = umbraco.presentation.UmbracoContext.Current.GetXml().DocumentElement;
 
             }
             initializeStructure();
@@ -314,6 +313,7 @@ namespace umbraco.presentation.nodeFactory
             }
             return null;
         }
+
         public static Node GetNodeByXpath(string xpath)
         {
             XPathNodeIterator xpathNode = library.GetXmlNodeByXPath(xpath);
@@ -323,7 +323,6 @@ namespace umbraco.presentation.nodeFactory
             }
 
             return null;
-
         }
 
         public List<INode> ChildrenAsList
@@ -555,12 +554,18 @@ namespace umbraco.presentation.nodeFactory
 
         public static Node GetCurrent()
         {
+            int id = getCurrentNodeId();
+            return new Node(id);
+        }
+
+        public static int getCurrentNodeId()
+        {
             XmlNode n = ((IHasXmlNode)library.GetXmlNodeCurrent().Current).GetNode();
             if (n.Attributes == null || n.Attributes.GetNamedItem("id") == null)
                 throw new ArgumentException("Current node is null. This might be due to previewing an unpublished node. As the NodeFactory works with published data, macros using the node factory won't work in preview mode.", "Current node is " + System.Web.HttpContext.Current.Items["pageID"].ToString());
 
-            return new Node(int.Parse(n.Attributes.GetNamedItem("id").Value));
-        }
+            return int.Parse(n.Attributes.GetNamedItem("id").Value);
+        } 
     }
 
     public class Nodes : CollectionBase
