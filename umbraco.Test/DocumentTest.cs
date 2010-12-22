@@ -1,4 +1,5 @@
-﻿using umbraco.cms.businesslogic.web;
+﻿using System.Diagnostics;
+using umbraco.cms.businesslogic.web;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using umbraco.BusinessLogic;
@@ -274,6 +275,7 @@ namespace umbraco.Test
             var versions = doc.GetVersions().ToList();
             Assert.AreEqual(versionCount + 1, versions.Count());
 
+            string propertyTypeAlias = prop.PropertyType.Alias;
             prop.Value = "updated!"; //udpate the prop            
             Assert.AreNotEqual(originalPropVal, prop.Value);
 
@@ -281,8 +283,7 @@ namespace umbraco.Test
             doc.RollBack(versions.OrderBy(x => x.Date).Last().Version, m_User);
 
             var rolledBack = new Document(id);
-
-            Assert.AreEqual(originalPropVal, rolledBack.GenericProperties.ToList().Where(x => x.PropertyType.Alias == "headerText").First().Value);
+            Assert.AreEqual(originalPropVal, rolledBack.GenericProperties.ToList().Where(x => x.PropertyType.Alias == propertyTypeAlias).First().Value);
         }
 
         /// <summary>

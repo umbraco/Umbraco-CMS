@@ -71,7 +71,14 @@
             <arg value="/p:ToolsVersion=4.0" />
         </exec>
         <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
-    </target>
+    
+		<exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
+            <arg value="${root.dir}\umbraco.MacroEngines.Juno\umbraco.MacroEngines.csproj" />
+            <arg value="/v:n" />
+            <arg value="/p:WarningLevel=0" />
+            <arg value="/p:ToolsVersion=4.0" />
+        </exec>
+	</target>
 
 
     <!-- Directories and files -->
@@ -127,7 +134,8 @@
         <!-- 4.6 Files -->
         <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\Debug\umbraco.MacroEngines.dll" tofile="${build.dir}\bin\umbraco.MacroEngines.dll" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\Debug\umbraco.MacroEngines.pdb" tofile="${build.dir}\bin\umbraco.MacroEngines.pdb" failonerror="false" overwrite="true"/>
-
+		
+		<copy file="${root.dir}\foreign dlls\System.Web.Razor.dll" tofile="${build.dir}\bin\System.Web.Razor.dll" failonerror="false" overwrite="true"/>
         
         <!--standard /data/packages files-->
         <mkdir dir="${build.dir}\App_Data" />
@@ -180,7 +188,7 @@
                 <include name="${build.dir}/PrecompiledApp.config" />
                 <include name="${build.dir}/web.config.template" />
                 <include name="${build.dir}/*.xslt" />
-                <include name="${build.dir}/web.STANDARD.config" />
+                <include name="${build.dir}/web.*.config" />
                 <include name="${build.dir}/site.py" />
             </fileset>
         </delete>

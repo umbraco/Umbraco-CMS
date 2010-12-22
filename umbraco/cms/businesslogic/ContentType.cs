@@ -595,8 +595,6 @@ namespace umbraco.cms.businesslogic
         [MethodImpl(MethodImplOptions.Synchronized)]
         public int AddVirtualTab(string Caption)
         {
-            // Remove from cache
-            FlushFromCache(Id);
 
             // Get tab count
             int tabCount = SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM cmsTab WHERE contenttypeNodeId = @nodeId",
@@ -607,6 +605,10 @@ namespace umbraco.cms.businesslogic
                     SqlHelper.CreateParameter("@nodeId", Id),
                     SqlHelper.CreateParameter("@text", Caption),
                     SqlHelper.CreateParameter("@sortorder", tabCount + 1));
+
+            // Remove from cache
+            FlushFromCache(Id);
+            
             return SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsTab");
         }
 
@@ -787,7 +789,6 @@ namespace umbraco.cms.businesslogic
             ContentType ct = new ContentType(id);
             Cache.ClearCacheItem(string.Format("UmbracoContentType{0}", id));
             Cache.ClearCacheItem(ct.GetPropertiesCacheKey());
-
             ct.ClearVirtualTabs();
 
 
@@ -858,7 +859,7 @@ namespace umbraco.cms.businesslogic
             {
                 while (dr.Read())
                 {
-                    m_VirtualTabs.Add(new Tab(dr.GetInt("id"), dr.GetString("text"), dr.GetInt("sortOrder"), this, true));
+                    m_VirtualTabs.Add(new Tab(dr.GetInt("id"), dr.GetString("text"), dr.GetInt("sortOrder"), this));
                 }
             }
 
@@ -964,20 +965,39 @@ namespace umbraco.cms.businesslogic
             /// <param name="caption">The caption.</param>
             /// <param name="sortOrder">The sort order.</param>
             /// <param name="cType">Type of the c.</param>
-            public Tab(int id, string caption, int sortOrder, ContentType cType, bool loadInheritedProperties)
+            public Tab(int id, string caption, int sortOrder, ContentType cType)
             {
                 _id = id;
                 _caption = caption;
                 _sortOrder = sortOrder;
                 _contenttype = cType;
+            }
 
-                // NH: the cachekey needs to combine the tab and the content type id, due to master content types enables sharing of tabs between child types
-                string cacheKey = generateCacheKey(id, cType.Id);
-                _propertytypes =
-                    Cache.GetCacheItem<PropertyType[]>(cacheKey, propertyTypesCacheSyncLock, TimeSpan.FromMinutes(10),
+            public static Tab GetTab(int id)
+            {
+                Tab tab = null;
+                using (IRecordsReader dr = SqlHelper.ExecuteReader(
+                                                  string.Format(
+                                                      "Select Id, text, contenttypeNodeId, sortOrder from cmsTab where Id = {0} order by sortOrder",
+                                                      id)))
+                {
+                    if (dr.Read())
+                    {
+                        tab = new Tab(id, dr.GetString("text"), dr.GetInt("sortOrder"), new ContentType(dr.GetInt("contenttypeNodeId")));
+                    }
+                    dr.Close();
+                }
+
+                return tab;
+            }
+
+            private PropertyType[] getPropertyTypes(bool loadInheritedPropertyTypes)
+            {
+                return 
+                    Cache.GetCacheItem<PropertyType[]>(generateCacheKey(Id, ContentType), propertyTypesCacheSyncLock, TimeSpan.FromMinutes(10),
                                                        delegate
                                                        {
-                                                           string contentTypeModifier = loadInheritedProperties ? "" : String.Format(" and contentTypeId = {0}", cType.Id);
+                                                           string contentTypeModifier = loadInheritedPropertyTypes ? "" : String.Format(" and contentTypeId = {0}", ContentType);
 
                                                            List<PropertyType> tmp = new List<PropertyType>();
 
@@ -996,25 +1016,7 @@ namespace umbraco.cms.businesslogic
                                                            }
                                                            return tmp.ToArray();
                                                        });
-            }
-
-            public static Tab GetTab(int id)
-            {
-                Tab tab = null;
-                using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                                  string.Format(
-                                                      "Select Id, text, contenttypeNodeId, sortOrder from cmsTab where Id = {0} order by sortOrder",
-                                                      id)))
-                {
-                    if (dr.Read())
-                    {
-                        tab = new Tab(id, dr.GetString("text"), dr.GetInt("sortOrder"), new ContentType(dr.GetInt("contenttypeNodeId")),
-                                      true);
-                    }
-                    dr.Close();
-                }
-
-                return tab;
+                
             }
 
             /// <summary>
@@ -1037,6 +1039,8 @@ namespace umbraco.cms.businesslogic
             /// </summary>
             public void Delete()
             {
+                SqlHelper.ExecuteNonQuery("update cmsPropertyType set tabId = NULL where tabid = @id",
+                                          SqlHelper.CreateParameter("@id", Id));
                 SqlHelper.ExecuteNonQuery("delete from cmsTab where id = @id",
                                           SqlHelper.CreateParameter("@id", Id));
             }
@@ -1181,7 +1185,7 @@ namespace umbraco.cms.businesslogic
             /// </summary>
             public PropertyType[] PropertyTypes
             {
-                get { return _propertytypes; }
+                get { return getPropertyTypes(true); }
             }
 
             public int ContentType
