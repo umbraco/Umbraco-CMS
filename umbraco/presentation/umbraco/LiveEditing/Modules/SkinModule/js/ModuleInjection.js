@@ -3,14 +3,16 @@
 
 function umbMakeModulesSortable() {
 
-    jQuery(".umbModuleContainer").sortable({
-        connectWith: '.umbModuleContainer',
-        items: '.umbModule',
-        stop: function (event, ui) {
+    if (jQuery('.umbModuleContainer').length > 0) {
+        jQuery('.umbModuleContainer').sortable({
+            connectWith: '.umbModuleContainer',
+            items: '.umbModule',
+            stop: function (event, ui) {
 
-            UmbracoCommunicator.SendClientMessage("movemodule", ui.item.attr('id') + ";" + ui.item.parent().attr('id') + ";" + jQuery('.umbModule', ui.item.parent()).index(ui.item));
-        }
-    });
+                UmbracoCommunicator.SendClientMessage("movemodule", ui.item.attr('id') + ";" + ui.item.parent().attr('id') + ";" + jQuery('.umbModule', ui.item.parent()).index(ui.item));
+            }
+        });
+    }
 
 }
 
