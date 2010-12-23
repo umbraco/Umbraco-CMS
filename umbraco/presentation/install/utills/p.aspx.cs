@@ -27,6 +27,12 @@ namespace umbraco.presentation.install.utills
                 if (feed == "blogs")
                     url = "http://our.umbraco.org/html/blogs";
 
+                if (feed == "sitebuildervids")
+                    url = "http://umbraco.org/feeds/videos/site-builder-foundation-html";
+
+                if (feed == "developervids")
+                    url = "http://umbraco.org/feeds/videos/developer-foundation-html";
+
                 Response.Write(library.GetXmlDocumentByUrl(url).Current.OuterXml);
             }
         }
