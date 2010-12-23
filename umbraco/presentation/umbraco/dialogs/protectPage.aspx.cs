@@ -190,16 +190,20 @@ namespace umbraco.presentation.umbraco.dialogs
                         {
                             try
                             {
-                                cms.businesslogic.member.MemberType.GetByAlias("_umbracoSystemDefaultProtectType");
+                                if (cms.businesslogic.member.MemberType.GetByAlias("_umbracoSystemDefaultProtectType") == null)
+                                {
+                                    cms.businesslogic.member.MemberType.MakeNew(BusinessLogic.User.GetUser(0), "_umbracoSystemDefaultProtectType");
+                                }
                             }
                             catch
                             {
                                 cms.businesslogic.member.MemberType.MakeNew(BusinessLogic.User.GetUser(0), "_umbracoSystemDefaultProtectType");
                             }
                             // create member
-                            cms.businesslogic.member.Member.MakeNew(simpleLogin.Text, "", cms.businesslogic.member.MemberType.GetByAlias("_umbracoSystemDefaultProtectType"), base.getUser());
+                            cms.businesslogic.member.Member mem = cms.businesslogic.member.Member.MakeNew(simpleLogin.Text, "", cms.businesslogic.member.MemberType.GetByAlias("_umbracoSystemDefaultProtectType"), base.getUser());
+                            // working around empty password restriction for Umbraco Member Mode
+                            mem.Password = simplePassword.Text;
                             member = Membership.GetUser(simpleLogin.Text);
-                            member.ChangePassword("", simplePassword.Text);
                         }
                     }
 
