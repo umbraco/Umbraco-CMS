@@ -1,8 +1,5 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="noNodes.aspx.cs" Inherits="umbraco.presentation.config.splashes.noNodes" %>
 
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
-
 <!DOCTYPE html>
 <html>
 <head runat="server">
@@ -12,9 +9,7 @@
     <title>Umbraco
         <%=umbraco.GlobalSettings.CurrentVersion%>
         - no pages found</title>
-    <cc1:UmbracoClientDependencyLoader runat="server" ID="ClientLoader" />
-    <!--<umb:JsInclude ID="JsInclude4" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient"
-        Priority="0" /> -->
+
 
 
     <link media="all" rel="stylesheet" href="../../umbraco_client/installer/css/jquery-ui-1.8.6.custom.css" />
