@@ -1645,7 +1645,6 @@
     </Compile>
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
-    <Content Include="config\splashes\worker.png" />
     <Content Include="umbraco_client\Installer\css\all.css" />
     <Content Include="umbraco_client\Installer\css\form.css" />
     <Content Include="umbraco_client\Installer\css\jquery-ui-1.8.6.custom.css" />
