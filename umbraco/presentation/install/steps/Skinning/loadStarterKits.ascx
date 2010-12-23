@@ -32,7 +32,7 @@
 	
     <li class="add-thanks">
         <asp:LinkButton runat="server" class="single-tab declineStarterKits" ID="declineStarterKits" OnClientClick="return confirm('Are you sure you do not want to install a starter kit?');" OnClick="NextStep">
-            <img class="zoom-img" src="images/btn-no-thanks.png" alt="image description" width="150" height="204">
+            <img class="zoom-img" src="../umbraco_client/installer/images/btn-no-thanks.png" alt="image description" width="150" height="204">
         </asp:LinkButton>
 
 		<em>&nbsp;</em>

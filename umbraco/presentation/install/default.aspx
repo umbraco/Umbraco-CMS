@@ -11,23 +11,23 @@
 
 	<umb1:PageTitle runat="server" />
 
-	<link media="all" rel="stylesheet" href="css/jquery-ui-1.8.6.custom.css">
-	<link media="all" type="text/css" rel="stylesheet" href="css/reset.css" />
-	<link media="all" rel="stylesheet" href="css/all.css">
-	<link media="all" type="text/css" rel="stylesheet" href="css/form.css" />
+	<link media="all" rel="stylesheet" href="../umbraco_client/installer/css/jquery-ui-1.8.6.custom.css">
+	<link media="all" type="text/css" rel="stylesheet" href="../umbraco_client/installer/css/reset.css" />
+	<link media="all" rel="stylesheet" href="../umbraco_client/installer/css/all.css">
+	<link media="all" type="text/css" rel="stylesheet" href="../umbraco_client/installer/css/form.css" />
 
-	<script src="js/jquery.1.4.4.js" type="text/javascript"></script>
-	<script src="js/jquery.ui.selectmenu.js" type="text/javascript"></script>
-	<script src="js/jquery.main.js" type="text/javascript"></script>
+	<script src="../umbraco_client/installer/js/jquery.1.4.4.js" type="text/javascript"></script>
+	<script src="../umbraco_client/installer/js/jquery.ui.selectmenu.js" type="text/javascript"></script>
+	<script src="../umbraco_client/installer/js/jquery.main.js" type="text/javascript"></script>
 
     <script src="../umbraco_client/passwordStrength/passwordstrength.js" type="text/javascript"></script>
 
 	<!--[if lt IE 9]>
-		<link media="all" rel="stylesheet" href="css/lt7.css">
+		<link media="all" rel="stylesheet" href="../umbraco_client/installer/css/lt7.css">
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 
-	<!--[if lt IE 7]><script type="text/javascript" src="js/ie-png.js"></script><![endif]-->
+	<!--[if lt IE 7]><script type="text/javascript" src="../umbraco_client/installer/js/ie-png.js"></script><![endif]-->
 </head>
 
 <body class="<%= currentStepClass %>">
@@ -125,9 +125,9 @@
 		</div>
 		<div class="carusel">
 			<ul>
-				<li><img src="images/img09.jpg" alt="image description"></li>
-				<li><img src="images/img10.jpg" alt="image description"></li>
-				<li><img src="images/img11.jpg" alt="image description"></li>
+				<li><img src="../umbraco_client/installer/images/img09.jpg" alt="image description"></li>
+				<li><img src="../umbraco_client/installer/images/img10.jpg" alt="image description"></li>
+				<li><img src="../umbraco_client/installer/images/img11.jpg" alt="image description"></li>
 			</ul>
 		</div>
 

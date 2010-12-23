@@ -1,7 +1,7 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="upgrade.ascx.cs" Inherits="umbraco.presentation.install.steps.upgrade" %>
 
 <div style="text-align: center; padding: 55px;">
-<img src="images/logo.png" align="middle" title="Umbraco logo" alt="Umbraco logo" />
+<img src="../umbraco_client/installer/images/logo.png" align="middle" title="Umbraco logo" alt="Umbraco logo" />
 <h1>Upgrading Umbraco</h1>
 
 <p>
