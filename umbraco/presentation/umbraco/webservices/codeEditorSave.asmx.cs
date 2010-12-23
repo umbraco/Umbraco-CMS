@@ -16,7 +16,7 @@ using umbraco.presentation.cache;
 using System.Net;
 using umbraco.IO;
 using System.Collections;
-using umbraco.presentation.nodeFactory;
+using umbraco.NodeFactory;
 using umbraco.scripting;
 
 namespace umbraco.presentation.webservices

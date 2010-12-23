@@ -106,7 +106,7 @@ namespace umbraco.presentation.umbraco.dialogs
             }
             else if (((Button)sender).CommandName == "remove")
             {
-                nodeFactory.Node n = nodeFactory.Node.GetCurrent();
+                NodeFactory.Node n = NodeFactory.Node.GetCurrent();
 
                 Template t = new Template(n.template);
                 Skinning.RollbackSkin(t.Id);

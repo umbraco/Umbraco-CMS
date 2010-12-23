@@ -10,7 +10,7 @@ using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.IO;
-using umbraco.presentation.nodeFactory;
+using umbraco.NodeFactory;
 
 namespace umbraco {
     /// <summary>

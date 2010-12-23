@@ -4,7 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 using umbraco.interfaces;
-using umbraco.presentation.nodeFactory;
+using umbraco.NodeFactory;
 
 namespace umbraco.MacroEngines
 {
