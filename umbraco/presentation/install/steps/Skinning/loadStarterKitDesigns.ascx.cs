@@ -89,25 +89,25 @@ namespace umbraco.presentation.install.steps.Skinning
                     p.LoadConfig(tempFile);
                     int pID = p.CreateManifest(tempFile, kitGuid.ToString(), repoGuid);
 
-                    Helper.setProgress(30, "Installing starter kit files", "");
+                    Helper.setProgress(30, "Installing skin files", "");
                     p.InstallFiles(pID, tempFile);
 
-                    Helper.setProgress(50, "Installing starter kit umbraco objects", "");
+                    Helper.setProgress(50, "Installing skin system objects", "");
                     p.InstallBusinessLogic(pID, tempFile);
 
-                    Helper.setProgress(60, "Finishing starter kit instatllation", "");
+                    Helper.setProgress(60, "Finishing skin installation", "");
                     p.InstallCleanUp(pID, tempFile);
 
                     library.RefreshContent();
 
-                    Helper.setProgress(80, "Retrieving list of skins, compatible with this starter kit", "");
+                    Helper.setProgress(80, "Activating skin", "");
                     if (cms.businesslogic.skinning.Skinning.GetAllSkins().Count > 0)
                     {
                         cms.businesslogic.skinning.Skinning.ActivateAsCurrentSkin(cms.businesslogic.skinning.Skinning.GetAllSkins()[0]);
                     }
 
 
-                    Helper.setProgress(100, "Starter kit installation has been completed", "");
+                    Helper.setProgress(100, "Skin installation has been completed", "");
 
                     try
                     {
