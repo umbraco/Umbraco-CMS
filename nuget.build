@@ -6,7 +6,7 @@
    
 	<!-- filenames and directories, generally won't change -->
 
-	<property name="public.dir" value="C:\Users\per\Documents\Projects\NugetServer\packages" />
+	<property name="public.dir" value="C:\Users\per\Documents\Projects\NugetServer\GalleryServer\src\Gallery.Server\App_Data\packages" />
 	
 
 	<property name="root.dir" value="${directory::get-current-directory()}" />
@@ -111,7 +111,7 @@
 				file="${nuget.dir}\umbraco.nuspec"
 				xpath="/package/metadata/version"
 				value="${build.version}" />
-		
+						
 	</target>
 
 	

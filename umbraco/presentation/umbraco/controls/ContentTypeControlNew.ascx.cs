@@ -790,6 +790,7 @@ jQuery(function() { refreshDropDowns(); });
             if (txtNewTab.Text.Trim() != "")
             {
                 cType.AddVirtualTab(txtNewTab.Text);
+                cType = new ContentType(cType.Id);
                 SaveClickEventArgs ea = new SaveClickEventArgs(ui.Text("contentTypeTabCreated"));
                 ea.IconType = umbraco.BasePages.BasePage.speechBubbleIcon.success;
 

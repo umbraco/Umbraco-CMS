@@ -109,7 +109,8 @@ namespace umbraco.Test
             Assert.AreEqual<int>(t.Id, doc.Template);
 
             //now delete, this should throw the exception
-            var hasException = false;
+            // changed by NH as the API will cleanup instead!
+/*            var hasException = false;
             try
             {
                 t.delete();
@@ -119,7 +120,7 @@ namespace umbraco.Test
                 hasException = true;
             }
             Assert.IsTrue(hasException);
-
+            */
             //ok, now that we've proved it can't be removed, we'll remove the data in order
             doc.delete(true);
             Assert.IsFalse(Document.IsNode(doc.Id));
