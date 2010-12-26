@@ -2,7 +2,7 @@
 using System.Web.UI;
 using umbraco.presentation.LiveEditing.Updates;
 using umbraco.presentation.templateControls;
-using umbraco.presentation.nodeFactory;
+using umbraco.NodeFactory;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 

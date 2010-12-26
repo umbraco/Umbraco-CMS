@@ -15,6 +15,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.IO;
 using umbraco.BusinessLogic.Utils;
+using umbraco.presentation.nodeFactory;
 
 namespace umbraco
 {
@@ -298,7 +299,7 @@ namespace umbraco
                 if (updateSitemapProvider && SiteMap.Provider is presentation.nodeFactory.UmbracoSiteMapProvider)
                 {
                     presentation.nodeFactory.UmbracoSiteMapProvider prov = (presentation.nodeFactory.UmbracoSiteMapProvider)SiteMap.Provider;
-                    prov.UpdateNode(new umbraco.presentation.nodeFactory.Node(d.Id, true));
+                    prov.UpdateNode(new umbraco.NodeFactory.Node(d.Id, true));
                 }
             }
         }

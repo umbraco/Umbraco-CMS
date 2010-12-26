@@ -72,60 +72,65 @@ namespace umbraco.presentation.install.steps.Skinning
 
             Guid kitGuid = new Guid(((LinkButton)sender).CommandArgument);
 
-
-            Helper.setProgress(5, "Fetching starting kit from the repository", "");
-
-            cms.businesslogic.packager.Installer installer = new cms.businesslogic.packager.Installer();
-
-            if (repo.HasConnection())
+            if (!cms.businesslogic.skinning.Skinning.IsSkinInstalled(kitGuid))
             {
-                cms.businesslogic.packager.Installer p = new cms.businesslogic.packager.Installer();
 
-                Helper.setProgress(15, "Connected to repository", "");
+                Helper.setProgress(5, "Fetching starting kit from the repository", "");
 
-                string tempFile = p.Import(repo.fetch(kitGuid.ToString()));
-                p.LoadConfig(tempFile);
-                int pID = p.CreateManifest(tempFile, kitGuid.ToString(), repoGuid);
+                cms.businesslogic.packager.Installer installer = new cms.businesslogic.packager.Installer();
 
-                Helper.setProgress(30, "Installing starter kit files", "");
-                p.InstallFiles(pID, tempFile);
-
-                Helper.setProgress(50, "Installing starter kit umbraco objects", "");
-                p.InstallBusinessLogic(pID, tempFile);
-
-                Helper.setProgress(60, "Finishing starter kit instatllation", "");
-                p.InstallCleanUp(pID, tempFile);
-
-                library.RefreshContent();
-
-                Helper.setProgress(80, "Retrieving list of skins, compatible with this starter kit", "");
-                if (cms.businesslogic.skinning.Skinning.GetAllSkins().Count > 0)
+                if (repo.HasConnection())
                 {
-                    cms.businesslogic.skinning.Skinning.ActivateAsCurrentSkin(cms.businesslogic.skinning.Skinning.GetAllSkins()[0]);
-                }
+                    cms.businesslogic.packager.Installer p = new cms.businesslogic.packager.Installer();
 
+                    Helper.setProgress(15, "Connected to repository", "");
 
-                Helper.setProgress(100, "Starter kit installation has been completed", "");
+                    string tempFile = p.Import(repo.fetch(kitGuid.ToString()));
+                    p.LoadConfig(tempFile);
+                    int pID = p.CreateManifest(tempFile, kitGuid.ToString(), repoGuid);
 
-                try
-                {
-                    
+                    Helper.setProgress(30, "Installing skin files", "");
+                    p.InstallFiles(pID, tempFile);
 
-                    if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus))
+                    Helper.setProgress(50, "Installing skin system objects", "");
+                    p.InstallBusinessLogic(pID, tempFile);
+
+                    Helper.setProgress(60, "Finishing skin installation", "");
+                    p.InstallCleanUp(pID, tempFile);
+
+                    library.RefreshContent();
+
+                    Helper.setProgress(80, "Activating skin", "");
+                    if (cms.businesslogic.skinning.Skinning.GetAllSkins().Count > 0)
                     {
-                        GlobalSettings.ConfigurationStatus = GlobalSettings.CurrentVersion;
-                        Application["umbracoNeedConfiguration"] = false;
+                        cms.businesslogic.skinning.Skinning.ActivateAsCurrentSkin(cms.businesslogic.skinning.Skinning.GetAllSkins()[0]);
                     }
-                }
-                catch{
+
+
+                    Helper.setProgress(100, "Skin installation has been completed", "");
+
+                    try
+                    {
+
+
+                        if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus))
+                        {
+                            GlobalSettings.ConfigurationStatus = GlobalSettings.CurrentVersion;
+                            Application["umbracoNeedConfiguration"] = false;
+                        }
+                    }
+                    catch
+                    {
+                        Helper.RedirectToNextStep(Page);
+                    }
+
                     Helper.RedirectToNextStep(Page);
                 }
+                else
+                {
+                    ShowConnectionError();
+                }
 
-                Helper.RedirectToNextStep(Page);
-            }
-            else
-            {
-                ShowConnectionError();
             }
         }
     }

@@ -14,6 +14,12 @@ namespace umbraco.presentation.install.utills
         protected void Page_Load(object sender, EventArgs e)
         {
 
+            // Stop Caching in IE
+            Response.Cache.SetCacheability(System.Web.HttpCacheability.NoCache);
+
+            // Stop Caching in Firefox
+            Response.Cache.SetNoStore();
+
             string feed = Request.QueryString["feed"];
             string url = "http://our.umbraco.org/html/twitter";
 
@@ -26,6 +32,12 @@ namespace umbraco.presentation.install.utills
             {
                 if (feed == "blogs")
                     url = "http://our.umbraco.org/html/blogs";
+
+                if (feed == "sitebuildervids")
+                    url = "http://umbraco.org/feeds/videos/site-builder-foundation-html";
+
+                if (feed == "developervids")
+                    url = "http://umbraco.org/feeds/videos/developer-foundation-html";
 
                 Response.Write(library.GetXmlDocumentByUrl(url).Current.OuterXml);
             }

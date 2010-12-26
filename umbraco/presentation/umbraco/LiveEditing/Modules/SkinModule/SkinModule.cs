@@ -49,7 +49,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             base.CreateChildControls();
 
 
-            Skin ActiveSkin = Skin.CreateFromAlias(Skinning.GetCurrentSkinAlias(nodeFactory.Node.GetCurrent().template));
+            Skin ActiveSkin = Skin.CreateFromAlias(Skinning.GetCurrentSkinAlias(NodeFactory.Node.GetCurrent().template));
 
 
             m_SkinModal = new Panel();
@@ -85,7 +85,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             }
 
             // modules
-            if (CanInsertModules(nodeFactory.Node.GetCurrent().template))
+            if (CanInsertModules(NodeFactory.Node.GetCurrent().template))
             {
                 m_ModuleModal = new Panel();
                 m_ModuleModal.ID = "LeModuleModal";
@@ -133,7 +133,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             {
                 case "injectmodule":
                     //update template, insert macro tag
-                    InsertModule(nodeFactory.Node.GetCurrent().template, e.Message.Split(';')[0], e.Message.Split(';')[1], e.Message.Split(';')[2] == "prepend");
+                    InsertModule(NodeFactory.Node.GetCurrent().template, e.Message.Split(';')[0], e.Message.Split(';')[1], e.Message.Split(';')[2] == "prepend");
                     break;
                 case "movemodule":
 
@@ -143,19 +143,19 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                     int index = 0;
                     int.TryParse(e.Message.Split(';')[2], out index);
 
-                    HtmlNode module = FindModule(nodeFactory.Node.GetCurrent().template, moduleId, false);
+                    HtmlNode module = FindModule(NodeFactory.Node.GetCurrent().template, moduleId, false);
 
                     if (module != null)
                     {
-                        FindModule(nodeFactory.Node.GetCurrent().template, moduleId, true);
-                        MoveModule(nodeFactory.Node.GetCurrent().template, module, parentId, index);
+                        FindModule(NodeFactory.Node.GetCurrent().template, moduleId, true);
+                        MoveModule(NodeFactory.Node.GetCurrent().template, module, parentId, index);
                     }
 
                     break;
 
                 case "removemodule":
 
-                    FindModule(nodeFactory.Node.GetCurrent().template,  e.Message.Split(';')[0], true);
+                    FindModule(NodeFactory.Node.GetCurrent().template,  e.Message.Split(';')[0], true);
 
                     break;
 

@@ -10,7 +10,7 @@ using umbraco.cms.businesslogic.propertytype;
 using System.Collections.Generic;
 using umbraco.interfaces;
 
-namespace umbraco.nodeFactory
+namespace umbraco.NodeFactory
 {
     /// <summary>
     /// Summary description for Node.

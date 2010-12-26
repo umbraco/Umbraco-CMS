@@ -74,7 +74,7 @@ namespace umbraco.presentation.nodeFactory {
             return m_root;
         }
 
-        public void UpdateNode(Node node) {
+        public void UpdateNode(NodeFactory.Node node) {
             lock (this) {
                 // validate sitemap
                 BuildSiteMap();
@@ -115,8 +115,9 @@ namespace umbraco.presentation.nodeFactory {
 
         private void loadNodes(string parentId, SiteMapNode parentNode) {
             lock (this) {
-                Node n = new Node(int.Parse(parentId));
-                foreach (Node child in n.Children) {
+                NodeFactory.Node n = new NodeFactory.Node(int.Parse(parentId));
+                foreach (NodeFactory.Node child in n.Children)
+                {
 
                     string roles = findRoles(child.Id, child.Path);
                     SiteMapNode childNode = createNode(
@@ -222,18 +223,18 @@ namespace umbraco.presentation.nodeFactory {
 
         void Access_AfterRemoveProtection(global::umbraco.cms.businesslogic.web.Document sender, RemoveProtectionEventArgs e)
         {
-            ((UmbracoSiteMapProvider)System.Web.SiteMap.Provider).UpdateNode(new Node(sender.Id));
+            ((UmbracoSiteMapProvider)System.Web.SiteMap.Provider).UpdateNode(new NodeFactory.Node(sender.Id));
         }
 
 
         void Access_AfterRemoveMemberShipRoleToDocument(global::umbraco.cms.businesslogic.web.Document sender, string role, RemoveMemberShipRoleFromDocumentEventArgs e)
         {
-            ((UmbracoSiteMapProvider) System.Web.SiteMap.Provider).UpdateNode(new Node(sender.Id));
+            ((UmbracoSiteMapProvider)System.Web.SiteMap.Provider).UpdateNode(new NodeFactory.Node(sender.Id));
         }
 
         void Access_AfterAddMemberShipRoleToDocument(global::umbraco.cms.businesslogic.web.Document sender, string role, AddMemberShipRoleToDocumentEventArgs e)
         {
-            ((UmbracoSiteMapProvider) System.Web.SiteMap.Provider).UpdateNode(new Node(sender.Id));
+            ((UmbracoSiteMapProvider)System.Web.SiteMap.Provider).UpdateNode(new NodeFactory.Node(sender.Id));
         }
     }
 }

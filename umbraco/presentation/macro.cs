@@ -20,7 +20,7 @@ using umbraco.cms.businesslogic.member;
 using umbraco.DataLayer;
 using umbraco.interfaces;
 using umbraco.IO;
-using umbraco.presentation.nodeFactory;
+using umbraco.NodeFactory;
 using umbraco.presentation.templateControls;
 using umbraco.presentation.xslt.Exslt;
 using umbraco.scripting;

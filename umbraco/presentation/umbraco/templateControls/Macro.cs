@@ -8,7 +8,7 @@ using System.Web.UI.WebControls;
 
 using System.Collections;
 using umbraco.cms.businesslogic.macro;
-using umbraco.presentation.nodeFactory;
+using umbraco.NodeFactory;
 
 namespace umbraco.presentation.templateControls
 {

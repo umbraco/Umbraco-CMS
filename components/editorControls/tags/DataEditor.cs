@@ -5,7 +5,6 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
-using umbraco.presentation.nodeFactory;
 using umbraco.presentation;
 using ClientDependency.Core.Controls;
 using ClientDependency.Core;
@@ -152,7 +151,7 @@ namespace umbraco.editorControls.tags
                 // we need an empty try/catch as Node.GetCurrent() will throw an exception if we're outside of Umbraco Context
                 try
                 {
-                    Node currentNode = Node.GetCurrent();
+                    NodeFactory.Node currentNode = NodeFactory.Node.GetCurrent();
                     if (currentNode != null)
                     {
                         pageId = currentNode.Id.ToString();

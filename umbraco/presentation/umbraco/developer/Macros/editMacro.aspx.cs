@@ -129,23 +129,14 @@ namespace umbraco.cms.presentation.developer
                     CheckBox macroElementShow = (CheckBox)item.FindControl("macroPropertyHidden");
                     DropDownList macroElementType = (DropDownList)item.FindControl("macroPropertyType");
 
-                    TextBox macroElementSortOrder = (TextBox)item.FindControl("macroPropertySortOrder");
-
                     MacroProperty mp = new MacroProperty(int.Parse(macroPropertyID.Value));
                     mp.Public = macroElementShow.Checked;
                     mp.Type = new MacroPropertyType(int.Parse(macroElementType.SelectedValue));
                     mp.Alias = macroElementAlias.Text;
                     mp.Name = macroElementName.Text;
-                    int so = 0;
-                    int.TryParse(macroElementSortOrder.Text, out so);
-                    mp.SortOrder = so;
                     mp.Save();
 
                 }
-
-                m_macro.RefreshProperties();
-                macroPropertyBind();
-
                 // Flush macro from cache!
                 if (UmbracoSettings.UseDistributedCalls)
                     dispatcher.Refresh(
@@ -233,8 +224,6 @@ namespace umbraco.cms.presentation.developer
 
         public void macroPropertyBind()
         {
-            
-
             macroProperties.DataSource = m_macro.Properties;
             macroProperties.DataBind();
         }

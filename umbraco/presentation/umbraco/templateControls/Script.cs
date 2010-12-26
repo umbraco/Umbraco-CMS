@@ -54,7 +54,7 @@ namespace umbraco.presentation.templateControls
             }
 
             Hashtable attr = new Hashtable((Hashtable)Context.Items["pageElements"]);
-            attr.Add("currentPage", nodeFactory.Node.GetCurrent());
+            attr.Add("currentPage", NodeFactory.Node.GetCurrent());
 
             // TODO: Hook the new MacroEngine
             string result = ""; //  MacroScript.Execute(this.Text, this.Language, attr);

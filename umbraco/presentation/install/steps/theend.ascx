@@ -3,14 +3,14 @@
 <script type="text/javascript">
 jQuery(document).ready(function () {
 
-    $.post("utills/p.aspx?feed=twitter",
+    $.post("utills/p.aspx?feed=sitebuildervids",
       function (data) {
-          jQuery("#ajax-twitter").html(data);
+          jQuery("#ajax-sitebuildervids").html(data);
       });
-   
-   $.post("utills/p.aspx?feed=blogs",
+
+      $.post("utills/p.aspx?feed=developervids",
       function (data) {
-          jQuery("#ajax-blogs").html(data);
+          jQuery("#ajax-developervids").html(data);
       });
 });
 
@@ -52,12 +52,12 @@ jQuery(document).ready(function () {
 				</nav>
 			</aside>
 			<aside class="col2">
-				<h2>Community blogs </h2>
-                <div  id="ajax-blogs"><small>Loading...</small></div>
+				<h2>Sitebuilder introduction</h2>
+                <div  id="ajax-sitebuildervids"><small>Loading...</small></div>
 			</aside>
 			<aside class="col3">
-			<h2>Twitter</h2>
-                <div id="ajax-twitter"><small>Loading...</small></div>
+			<h2>Developer introduction</h2>
+                <div id="ajax-developervids"><small>Loading...</small></div>
 			</aside>
 		</div>
 	</div>
