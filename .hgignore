@@ -17,3 +17,5 @@ _ReSharper*/
 [Bb]uild[Ll]og.*
 *.[Pp]ublish.xml
 *.suo
+[sS]ource
+[sS]andbox
