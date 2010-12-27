@@ -11,15 +11,18 @@ namespace umbraco.MacroEngines
         private readonly INode n;
         public DynamicNode(INode n)
         {
-            this.n = n;
+            if (n != null)
+                this.n = n;
+            else
+                throw new ArgumentNullException("n", "A node must be provided to make a dynamic instance");
         }
 
-        public List<DynamicNode> GetChildrenAsList
+        public IEnumerable<DynamicNode> GetChildrenAsList
         {
             get
             {
-                return (from nn in n.ChildrenAsList 
-                        select new DynamicNode(nn)).ToList();
+                return from nn in n.ChildrenAsList
+                       select new DynamicNode(nn);
             }
         }
 
@@ -32,7 +35,7 @@ namespace umbraco.MacroEngines
             {
                 result = GetChildrenAsList;
                 return true;
-            } 
+            }
 
             var data = n.GetProperty(name);
             // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
@@ -46,6 +49,17 @@ namespace umbraco.MacroEngines
                 result = data.Value;
                 return true;
             }
+
+            //check if the alias is that of a child type
+            var typeChildren = n.ChildrenAsList
+                .Where(x => x.NodeTypeAlias == name);
+            if (typeChildren.Any())
+            {
+                result = typeChildren
+                    .Select(x => new DynamicNode(x));
+                return true;
+            }
+
             try
             {
                 result = n.GetType().InvokeMember(binder.Name,
@@ -167,9 +181,9 @@ namespace umbraco.MacroEngines
             get { return n.ChildrenAsList; }
         }
 
-        public IProperty GetProperty(string Alias)
+        public IProperty GetProperty(string alias)
         {
-            return n.GetProperty(Alias);
+            return n.GetProperty(alias);
         }
 
         public System.Data.DataTable ChildrenAsTable()
