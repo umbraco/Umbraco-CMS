@@ -52,7 +52,7 @@ namespace umbraco.MacroEngines
 
             //check if the alias is that of a child type
             var typeChildren = n.ChildrenAsList
-                .Where(x => x.NodeTypeAlias == name);
+                .Where(x => MakePluralName(x.NodeTypeAlias) == name || x.NodeTypeAlias == name);
             if (typeChildren.Any())
             {
                 result = typeChildren
@@ -79,7 +79,47 @@ namespace umbraco.MacroEngines
             }
         }
 
-        #region INode Members
+        //this is from SqlMetal and just makes it a bit of fun to allow pluralisation
+        private static string MakePluralName(string name)
+        {
+            if ((name.EndsWith("x", StringComparison.OrdinalIgnoreCase) || name.EndsWith("ch", StringComparison.OrdinalIgnoreCase)) || (name.EndsWith("ss", StringComparison.OrdinalIgnoreCase) || name.EndsWith("sh", StringComparison.OrdinalIgnoreCase)))
+            {
+                name = name + "es";
+                return name;
+            }
+            if ((name.EndsWith("y", StringComparison.OrdinalIgnoreCase) && (name.Length > 1)) && !IsVowel(name[name.Length - 2]))
+            {
+                name = name.Remove(name.Length - 1, 1);
+                name = name + "ies";
+                return name;
+            }
+            if (!name.EndsWith("s", StringComparison.OrdinalIgnoreCase))
+            {
+                name = name + "s";
+            }
+            return name;
+        }
+
+        private static bool IsVowel(char c)
+        {
+            switch (c)
+            {
+                case 'O':
+                case 'U':
+                case 'Y':
+                case 'A':
+                case 'E':
+                case 'I':
+                case 'o':
+                case 'u':
+                case 'y':
+                case 'a':
+                case 'e':
+                case 'i':
+                    return true;
+            }
+            return false;
+        }
 
         public DynamicNode Parent
         {
@@ -195,7 +235,5 @@ namespace umbraco.MacroEngines
         {
             return n.ChildrenAsTable(nodeTypeAliasFilter);
         }
-
-        #endregion
     }
 }
