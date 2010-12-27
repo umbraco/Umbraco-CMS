@@ -484,7 +484,7 @@
         <key alias="addPrevalue"><![CDATA[Tilføj førværdi]]></key>
         <key alias="dataBaseDatatype"><![CDATA[Database-datatype]]></key>
         <key alias="renderControl"><![CDATA[Visningskontrol]]></key>
-        <key alias="guid"><![CDATA[Data Type GUID]]></key>
+        <key alias="guid"><![CDATA[Data Editor GUID]]></key>
         <key alias="rteButtons"><![CDATA[Knapper]]></key>
         <key alias="rteEnableAdvancedSettings"><![CDATA[Aktiver avancerede indstillinger for]]></key>
         <key alias="rteEnableContextMenu"><![CDATA[Aktiver kontekstmenu]]></key>

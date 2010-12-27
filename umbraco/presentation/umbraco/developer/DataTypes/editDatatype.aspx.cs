@@ -44,13 +44,14 @@ namespace umbraco.cms.presentation.developer
                     datatypes.Add(df.DataTypeName + "|" + Guid.NewGuid().ToString(), df.Id);
 
                 IDictionaryEnumerator ide = datatypes.GetEnumerator();
-                
+
+                string datatTypeId = dt.DataType != null ? dt.DataType.Id.ToString() : String.Empty;
                 while (ide.MoveNext()) {
                     ListItem li = new ListItem();
                     li.Text = ide.Key.ToString().Substring(0, ide.Key.ToString().IndexOf("|"));
                     li.Value = ide.Value.ToString();
                 
-                    if (li.Value.ToString() == dt.DataType.Id.ToString()) li.Selected = true;
+                    if (!String.IsNullOrEmpty(datatTypeId) && li.Value.ToString() == datatTypeId) li.Selected = true;
                         ddlRenderControl.Items.Add(li);
                 }
 
@@ -60,7 +61,8 @@ namespace umbraco.cms.presentation.developer
             
             }
 
-		    litGuid.Text = dt.DataType.Id.ToString();
+            if (dt.DataType != null)
+    		    litGuid.Text = dt.DataType.Id.ToString();
             Panel1.Text = umbraco.ui.Text("edit") + " datatype: " + dt.Text;
 			insertPrevalueEditor();
 		}
