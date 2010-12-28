@@ -121,6 +121,16 @@ namespace umbraco.MacroEngines
             return false;
         }
 
+        public DynamicNode AncestorOrSelf(Func<DynamicNode, bool> func)
+        {
+            var node = this;
+            while (node != null)
+            {
+                if (func(node)) return node;
+                node = node.Parent;
+            }
+        }
+
         public DynamicNode Parent
         {
             get { return new DynamicNode(n.Parent); }

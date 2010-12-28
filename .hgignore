@@ -19,3 +19,4 @@ _ReSharper*/
 *.suo
 [sS]ource
 [sS]andbox
+umbraco.config
