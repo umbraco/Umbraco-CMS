@@ -1283,7 +1283,63 @@ namespace umbraco.cms.businesslogic.web
                     // Copy the properties of the current document
                     var props = GenericProperties;
                     foreach (Property p in props)
-                        newDoc.getProperty(p.PropertyType.Alias).Value = p.Value;
+                    {
+                        //copy file if it's an upload property (so it doesn't get removed when original doc get's deleted)
+
+                        IDataType uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+
+                        if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id
+                        && p.Value.ToString() != ""
+                        && File.Exists(IOHelper.MapPath(p.Value.ToString())))
+                        {
+                           
+                            int propId = newDoc.getProperty(p.PropertyType.Alias).Id;
+
+                            System.IO.Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Media + "/" + propId.ToString()));
+
+                            string fileCopy = IOHelper.MapPath(
+                                SystemDirectories.Media + "/" + 
+                                propId.ToString() + "/" +
+                                new FileInfo(IOHelper.MapPath(p.Value.ToString())).Name);
+
+                            File.Copy(IOHelper.MapPath(p.Value.ToString()), fileCopy);
+
+                            string relFilePath =
+                                SystemDirectories.Media + "/" + 
+                                propId.ToString() + "/" +
+                                new FileInfo(IOHelper.MapPath(p.Value.ToString())).Name;
+
+                            if (SystemDirectories.Root == string.Empty)
+                                relFilePath = relFilePath.TrimStart('~');
+
+                            newDoc.getProperty(p.PropertyType.Alias).Value = relFilePath;
+
+                            //copy thumbs
+                            FileInfo origFile = new FileInfo(IOHelper.MapPath(p.Value.ToString()));
+
+                            foreach(FileInfo thumb in origFile.Directory.GetFiles("*_thumb*"))
+                            {
+                                if (!File.Exists(IOHelper.MapPath(
+                                                     SystemDirectories.Media + "/" +
+                                                     propId.ToString() + "/" +
+                                                     thumb.Name)))
+                                {
+                                    thumb.CopyTo(IOHelper.MapPath(
+                                    SystemDirectories.Media + "/" +
+                                    propId.ToString() + "/" +
+                                    thumb.Name));
+                                }
+                            }
+
+
+                                
+                        }
+                        else
+                        {
+                            newDoc.getProperty(p.PropertyType.Alias).Value = p.Value;
+                        }
+
+                    }
 
                     // Relate?
                     if (RelateToOrignal)
