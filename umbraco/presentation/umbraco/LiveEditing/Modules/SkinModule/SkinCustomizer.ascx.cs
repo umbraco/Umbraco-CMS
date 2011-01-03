@@ -11,7 +11,7 @@ using umbraco.interfaces.skinning;
 using umbraco.IO;
 using umbraco.cms.businesslogic.template;
 using umbraco.BusinessLogic;
-using umbraco.presentation.nodeFactory;
+using umbraco.NodeFactory;
 using umbraco.cms.businesslogic.packager;
 using System.IO;
 
@@ -230,7 +230,7 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
                 throw new Exception("The current user can't edit skins as the user doesn't have access to the Settings section!");
             }
             
-            nodeFactory.Node n = nodeFactory.Node.GetCurrent();
+            NodeFactory.Node n = NodeFactory.Node.GetCurrent();
             ActiveSkin = Skin.CreateFromAlias( Skinning.GetCurrentSkinAlias(n.template) );
 
             pnl_connectionerror.Visible = false;

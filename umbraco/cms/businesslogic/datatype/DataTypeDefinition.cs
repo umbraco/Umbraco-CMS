@@ -49,11 +49,18 @@ namespace umbraco.cms.businesslogic.datatype
         {
             get
             {
-                cms.businesslogic.datatype.controls.Factory f = new cms.businesslogic.datatype.controls.Factory();
-                interfaces.IDataType dt = f.DataType(_controlId);
-                dt.DataTypeDefinitionId = Id;
+                if (_controlId != Guid.Empty)
+                {
+                    cms.businesslogic.datatype.controls.Factory f = new cms.businesslogic.datatype.controls.Factory();
+                    interfaces.IDataType dt = f.DataType(_controlId);
+                    dt.DataTypeDefinitionId = Id;
 
-                return dt;
+                    return dt;
+                }
+                else
+                {
+                    return null;
+                }
             }
             set
             {
@@ -233,7 +240,11 @@ namespace umbraco.cms.businesslogic.datatype
 
             int newId = CMSNode.MakeNew(-1, _objectType, u.Id, 1, Text, UniqueId).Id;
             cms.businesslogic.datatype.controls.Factory f = new cms.businesslogic.datatype.controls.Factory();
-            Guid FirstcontrolId = f.GetAll()[0].Id;
+            
+            // initial control id changed to empty to ensure that it'll always work no matter if 3rd party configurators fail
+            // ref: http://umbraco.codeplex.com/workitem/29788
+            Guid FirstcontrolId = Guid.Empty;
+           
             SqlHelper.ExecuteNonQuery("Insert into cmsDataType (nodeId, controlId, dbType) values (" + newId.ToString() + ",@controlId,'Ntext')",
                 SqlHelper.CreateParameter("@controlId", FirstcontrolId));
 

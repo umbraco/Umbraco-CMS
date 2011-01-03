@@ -54,8 +54,6 @@ namespace umbraco.presentation.install.steps
                 MembershipUser user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(0, true);
                 user.ChangePassword(u.GetPassword(), tb_password.Text.Trim());
 
-                u.LoginName = tb_login.Text;
-
                 // Is it using the default membership provider
                 if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is UsersMembershipProvider)
                 {
@@ -72,6 +70,9 @@ namespace umbraco.presentation.install.steps
                     u.Name = tb_name.Text.Trim();
                     if (!(Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(user);
                 }
+
+                // we need to update the login name here as it's set to the old name when saving the user via the membership provider!
+                u.LoginName = tb_login.Text;
 
                 u.Save();
 

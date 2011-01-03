@@ -100,7 +100,7 @@ namespace umbraco.presentation.LiveEditing.Controls
             if (User.GetCurrent().GetApplications().Find(t => t.alias.ToLower() == "settings") != null)
             {
                 //only add if there is a skin
-                nodeFactory.Node n = nodeFactory.Node.GetCurrent();
+                NodeFactory.Node n = NodeFactory.Node.GetCurrent();
 
                 if (!string.IsNullOrEmpty(Skinning.GetCurrentSkinAlias(n.template)) || Skinning.HasAvailableSkins(n.template))
                 {

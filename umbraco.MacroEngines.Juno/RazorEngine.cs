@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Web;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
@@ -14,7 +12,7 @@ namespace umbraco.MacroEngines
     {
         public string Name
         {
-            get { return "Razor Enggine"; }
+            get { return "Razor Engine"; }
         }
 
         public List<string> SupportedExtensions

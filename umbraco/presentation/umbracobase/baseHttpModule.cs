@@ -89,13 +89,18 @@ namespace umbraco.presentation.umbracobase
 
                     if (myExtension.isAllowed)
                     {
-                        string respone = invokeMethod(myExtension, urlArray);
-                        if (respone.Substring(0, 7) == "<error>")
+                        string response = invokeMethod(myExtension, urlArray);
+                        // since return value is arbitrary (set by implementor), check length before checking for error
+                        if (response.Length >= 7)
                         {
-                            httpApp.Response.StatusCode = 500;
-                            httpApp.Response.StatusDescription = "Internal Server Error";
+                            if (response.Substring(0, 7) == "<error>")
+                            {
+                                httpApp.Response.StatusCode = 500;
+                                httpApp.Response.StatusDescription = "Internal Server Error";
+                            }
                         }
-                        httpApp.Response.Output.Write(respone);
+
+                        httpApp.Response.Output.Write(response);
                     }
                     else
                     {

@@ -17,7 +17,7 @@ using System.IO;
 
 
 using umbraco.cms.businesslogic.web;
-using umbraco.presentation.nodeFactory;
+using umbraco.NodeFactory;
 using umbraco.controls;
 
 namespace umbraco.cms.presentation

@@ -11,38 +11,41 @@ namespace umbraco.MacroEngines
     {
         #region IMacroEngine Members
 
-        public string Name
+        public virtual string Name
         {
             get { return "Umbraco DLR Macro Engine"; }
         }
 
-        public List<string> SupportedExtensions
+        public virtual List<string> SupportedExtensions
         {
             get
             {
-                var exts = new List<string> {"py", "rb"};
+                var exts = new List<string> { "py", "rb" };
                 return exts;
             }
         }
 
-        public Dictionary<string, IMacroGuiRendering> SupportedProperties
+        public virtual Dictionary<string, IMacroGuiRendering> SupportedProperties
         {
             get { throw new NotImplementedException(); }
         }
 
 
-        public bool Validate(string code, INode currentPage, out string errorMessage)
+        public virtual bool Validate(string code, INode currentPage, out string errorMessage)
         {
             throw new NotImplementedException();
         }
 
-        public string Execute(MacroModel macro, INode currentPage)
+        public virtual string Execute(MacroModel macro, INode currentPage)
         {
             string fileEnding = macro.ScriptName.Substring(macro.ScriptName.LastIndexOf('.')).Trim('.');
 
             MacroScriptEngine mse = MacroScriptEngine.LoadEngineByFileExtension(fileEnding);
 
-            var vars = new SortedDictionary<string, object> {{"currentPage", currentPage}};
+            var vars = new SortedDictionary<string, object>
+                           {
+                               {"currentPage", new DynamicNode(currentPage)}
+                           };
             foreach (MacroPropertyModel prop in macro.Properties)
             {
                 vars.Add(prop.Key, prop.Value);
