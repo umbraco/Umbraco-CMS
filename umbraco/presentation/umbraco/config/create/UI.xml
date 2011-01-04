@@ -5,6 +5,7 @@
     <usercontrol>/create/nodeType.ascx</usercontrol>
     <tasks>
       <create assembly="umbraco" type="nodetypeTasks" />
+      <delete assembly="umbraco" type="nodetypeTasks" />
     </tasks>
   </nodeType>
   <nodeType alias="initnodeTypes">
@@ -12,15 +13,10 @@
     <usercontrol>/create/nodeType.ascx</usercontrol>
     <tasks>
       <create assembly="umbraco" type="nodetypeTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="nodeTypes">
-    <header>Nodetype</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
       <delete assembly="umbraco" type="nodetypeTasks" />
     </tasks>
   </nodeType>
+  
   <nodeType alias="templates">
     <header>Template</header>
     <usercontrol>/create/simple.ascx</usercontrol>
