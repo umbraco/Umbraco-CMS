@@ -6,12 +6,11 @@
 		<div class="container">
 			<h1>Database configuration</h1>
 			<p>
-				To complete this step, you must know some information regarding your database server
-				(”connection string”). Please contact your ISP if necessary. If you’re installingon
-				a local machine or server you might need information from your system administrator.</p>
-			<p>
-				<strong>If you do not have any database available,</strong> you can choose the embedded
-				database which does not require any information from you ISP or system administrators.</p>
+				<strong>To complete this step you will either need a blank database or if you do not have a blank database available, you can choose the SQL CE 4 embedded
+				database (This is the recommended approach for first time users or if you are unsure).</strong></p>
+            <p>
+				If you are not using the SQL CE 4 embedded database you will need the connection details for your database, such as the
+				&quot;server name and password&quot;. You may need to contact your system administrator or web host for this information.</p>
 		</div>
 		<!-- database -->
 		<div class="database-hold">
@@ -47,8 +46,7 @@
 					<div class="step">
 						<div class="container">
 							<p class="instructionText">
-								<strong>3. Instructions:</strong> Please fill out the below fields to connect to
-								your database.</p>
+								<strong>3. Instructions:</strong> Please fill out the connection information for your database.</p>
 							<div class="instruction-hold">
 								<div class="row embeddedError" runat="server" id="embeddedFilesMissing" style="display: none;">
 									<p>
@@ -56,15 +54,14 @@
 										CE 4 runtime to your Umbraco installation.<br />
 										<a href="http://our.umbraco.org/wiki/install-and-setup/using-sql-ce-4-with-juno"
 											target="_blank">More instructions</a>.
-										You can either follow the instructions above to add SQL CE 4 or choose another database
-										type.
+										You can either follow the instructions above to add SQL CE 4 or select another database type from the dropdown above.
 									</p>
 								</div>
 
                                 <div class="row embedded"  style="display: none;">
 									<p>
-										<strong>Nothing to configure:</strong>SQL CE 4 does not require any configuration
-                                        so simply click the "install" button below to continue.
+										<strong>Nothing to configure:</strong>SQL CE 4 does not require any configuration,
+                                        simply click the "install" button to continue.
 									</p>
 								</div>
 
@@ -228,7 +225,7 @@
 			Database upgraded</h1>
 			<div class="success">
 				<p>
-					Your database has been upgraded to the final version
+					Your database has been upgraded to version: 
 					<%=umbraco.GlobalSettings.CurrentVersion%>.<br />
 					Press <b>Continue</b> to proceed.
 				</p>
