@@ -45,6 +45,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{05329D
 		config templates\config\umbracoSettings.config = config templates\config\umbracoSettings.config
 		config templates\config\UrlRewriting.config = config templates\config\UrlRewriting.config
 		config templates\config\xsltExtensions.config = config templates\config\xsltExtensions.config
+		config templates\config\zipUpload.config = config templates\config\zipUpload.config
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{58072405-85D0-45CA-8F5C-EA8928C32A6A}"
@@ -110,60 +111,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.MacroEngines", "umbraco.MacroEngines.Juno\umbraco.MacroEngines.csproj", "{89C09045-1064-466B-B94A-DB3AFE2A5853}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 17
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs01
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = umbraco\\presentation\\umbraco.presentation.csproj
-		SccProjectName1 = umbraco/presentation
-		SccLocalPath1 = umbraco\\presentation
-		SccProjectUniqueName2 = umbraco\\businesslogic\\umbraco.businesslogic.csproj
-		SccProjectName2 = umbraco/businesslogic
-		SccLocalPath2 = umbraco\\businesslogic
-		SccProjectUniqueName3 = umbraco\\cms\\umbraco.cms.csproj
-		SccProjectName3 = umbraco/cms
-		SccLocalPath3 = umbraco\\cms
-		SccProjectUniqueName4 = umbraco\\interfaces\\umbraco.interfaces.csproj
-		SccProjectName4 = umbraco/interfaces
-		SccLocalPath4 = umbraco\\interfaces
-		SccProjectUniqueName5 = components\\editorControls\\umbraco.editorControls.csproj
-		SccProjectName5 = components/editorControls
-		SccLocalPath5 = components\\editorControls
-		SccProjectUniqueName6 = components\\macroRenderings\\umbraco.macroRenderings.csproj
-		SccProjectName6 = components/macroRenderings
-		SccLocalPath6 = components\\macroRenderings
-		SccProjectUniqueName7 = umbraco\\providers\\umbraco.providers.csproj
-		SccProjectName7 = umbraco/providers
-		SccLocalPath7 = umbraco\\providers
-		SccProjectUniqueName8 = umbraco\\datalayer\\umbraco.datalayer.csproj
-		SccProjectName8 = umbraco/datalayer
-		SccLocalPath8 = umbraco\\datalayer
-		SccProjectUniqueName9 = components\\umbraco.controls\\umbraco.controls.csproj
-		SccProjectName9 = components/umbraco.controls
-		SccLocalPath9 = components\\umbraco.controls
-		SccProjectUniqueName10 = components\\umbraco.webservices\\umbraco.webservices.csproj
-		SccProjectName10 = components/umbraco.webservices
-		SccLocalPath10 = components\\umbraco.webservices
-		SccProjectUniqueName11 = LinqToUmbraco\\src\\umbraco.Linq\\Core\\umbraco.Linq.Core.csproj
-		SccProjectName11 = LinqToUmbraco/src/umbraco.Linq/Core
-		SccLocalPath11 = LinqToUmbraco\\src\\umbraco.Linq\\Core
-		SccProjectUniqueName12 = umbraco\\umbraco.Legacy\\umbraco.Legacy.csproj
-		SccProjectName12 = umbraco/umbraco.Legacy
-		SccLocalPath12 = umbraco\\umbraco.Legacy
-		SccProjectUniqueName13 = umbraco.Test\\umbraco.Test.csproj
-		SccProjectName13 = umbraco.Test
-		SccLocalPath13 = umbraco.Test
-		SccProjectUniqueName14 = components\\SQLCE4Umbraco\\SqlCE4Umbraco.csproj
-		SccProjectName14 = components/SQLCE4Umbraco
-		SccLocalPath14 = components\\SQLCE4Umbraco
-		SccProjectUniqueName15 = umbraco.MacroEngines\\umbraco.MacroEngines.Legacy.csproj
-		SccProjectName15 = umbraco.MacroEngines
-		SccLocalPath15 = umbraco.MacroEngines
-		SccProjectUniqueName16 = umbraco.MacroEngines.Juno\\umbraco.MacroEngines.csproj
-		SccProjectName16 = umbraco.MacroEngines.Juno
-		SccLocalPath16 = umbraco.MacroEngines.Juno
-	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = umbraco2.vsmdi
 	EndGlobalSection
