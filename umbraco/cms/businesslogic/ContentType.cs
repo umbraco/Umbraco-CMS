@@ -443,6 +443,18 @@ namespace umbraco.cms.businesslogic
             }
         }
 
+
+        /// <summary>
+        /// Clears the locally loaded tabs which forces them to be reloaded next time they requested
+        /// </summary>
+        public void ClearVirtualTabs()
+        {
+            foreach (TabI t in getVirtualTabs)
+                Tab.FlushCache(t.Id, t.ContentType);
+
+            m_VirtualTabs = null;
+        }
+
         /// <summary>
         /// The list of ContentType Id's that defines which Content (by ContentType) can be created as child 
         /// to the Content of this ContentType
@@ -823,16 +835,7 @@ namespace umbraco.cms.businesslogic
             return "ContentType_PropertyTypes_Content:" + this.Id;
         }
 
-        /// <summary>
-        /// Clears the locally loaded tabs which forces them to be reloaded next time they requested
-        /// </summary>
-        private void ClearVirtualTabs()
-        {
-            foreach (TabI t in getVirtualTabs)
-                Tab.FlushCache(t.Id, t.ContentType);
-
-            m_VirtualTabs = null;
-        }
+        
 
         /// <summary>
         /// Checks if we've loaded the virtual tabs into memory and if not gets them from the databse.

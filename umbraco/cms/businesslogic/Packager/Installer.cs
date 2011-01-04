@@ -675,6 +675,8 @@ namespace umbraco.cms.businesslogic.packager
             for (int t = 0; t < tabs.Length; t++)
                 tabNames += tabs[t].Caption + ";";
 
+           
+
             Hashtable ht = new Hashtable();
             foreach (XmlNode t in n.SelectNodes("Tabs/Tab"))
             {
@@ -685,7 +687,7 @@ namespace umbraco.cms.businesslogic.packager
                 }
             }
 
-
+            dt.ClearVirtualTabs();
             // Get all tabs in hashtable
             Hashtable tabList = new Hashtable();
             foreach (cms.businesslogic.ContentType.TabI t in dt.getVirtualTabs.ToList())
