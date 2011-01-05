@@ -6,7 +6,7 @@
 		<h1>
 			Welcome to the Umbraco installation</h1>
 		<h2>
-			Thanks a lot for downloading the Umbraco CMS installer.
+			Thanks for downloading the Umbraco CMS installer.
 		</h2>
 		<p>
 			You are just a few minutes away from getting up and running. The installer will
