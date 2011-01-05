@@ -1920,6 +1920,15 @@
     <Content Include="umbraco_client\tinymce3\plugins\advlist\editor_plugin_src.js" />
     <Content Include="umbraco_client\tinymce3\plugins\autoresize\editor_plugin.js" />
     <Content Include="umbraco_client\tinymce3\plugins\autoresize\editor_plugin_src.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\autosave\langs\en.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\inlinepopups\skins\clearlooks2\img\alert.gif" />
+    <Content Include="umbraco_client\tinymce3\plugins\inlinepopups\skins\clearlooks2\img\button.gif" />
+    <Content Include="umbraco_client\tinymce3\plugins\inlinepopups\skins\clearlooks2\img\buttons.gif" />
+    <Content Include="umbraco_client\tinymce3\plugins\inlinepopups\skins\clearlooks2\img\confirm.gif" />
+    <Content Include="umbraco_client\tinymce3\plugins\inlinepopups\skins\clearlooks2\img\corners.gif" />
+    <Content Include="umbraco_client\tinymce3\plugins\inlinepopups\skins\clearlooks2\img\horizontal.gif" />
+    <Content Include="umbraco_client\tinymce3\plugins\inlinepopups\skins\clearlooks2\img\vertical.gif" />
+    <Content Include="umbraco_client\tinymce3\plugins\inlinepopups\skins\clearlooks2\window.css" />
     <Content Include="umbraco_client\tinymce3\plugins\legacyoutput\editor_plugin.js" />
     <Content Include="umbraco_client\tinymce3\plugins\legacyoutput\editor_plugin_src.js" />
     <Content Include="umbraco_client\tinymce3\plugins\tabfocus\editor_plugin.js" />
