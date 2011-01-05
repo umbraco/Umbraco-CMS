@@ -23,10 +23,10 @@ jQuery(document).ready(function () {
 		<h1>
 			You’re done...now what?</h1>
 		<p>
-			Excellent, you are now ready to start using Umbraco, the worlds most popular open
+			Excellent, you are now ready to start using Umbraco, one of the worlds most popular open
 			source .NET CMS.
 			<br />
-			Now why not get configuring your new installed skin?</p>
+			If you installed a starter kit you can start by configuring your new site, just click &quot;Preview your new website&quot; and follow the instructions. Or to start adding content right away click &quot;Set up your new website&quot; </p>
 		<ul class="btn-web">
 			<li class="btn-preview-web" id="customizeSite" runat="server"><a href="<%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/canvas.aspx?redir=<%= this.ResolveUrl("~/")  %>&umbSkinning=true&umbSkinningConfigurator=true" target="_blank"><span>Set up your new website</span></a></li>
 			<li class="btn-set"><a href="<%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/umbraco.aspx"><span>Launch umbraco</span></a></li>
