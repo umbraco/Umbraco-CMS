@@ -1914,6 +1914,7 @@
     <Content Include="umbraco_client\colorpicker\images\slider.png" />
     <Content Include="umbraco_client\colorpicker\js\colorpicker.js" />
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\initcolorpicker.js" />
+    <Content Include="umbraco_client\MacroContainer\macroContainer.css" />
     <Content Include="umbraco_client\mousewheel\jquery.mousewheel.js" />
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
