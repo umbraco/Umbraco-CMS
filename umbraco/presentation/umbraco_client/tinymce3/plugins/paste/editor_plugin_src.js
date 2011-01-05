@@ -134,11 +134,18 @@
 			function grabContent(e) {
 				var n, or, rng, sel = ed.selection, dom = ed.dom, body = ed.getBody(), posY;
 
+				// Check if browser supports direct plaintext access
+				if (ed.pasteAsPlainText && (e.clipboardData || dom.doc.dataTransfer)) {
+					e.preventDefault();
+					process({content : (e.clipboardData || dom.doc.dataTransfer).getData('Text').replace(/\r?\n/g, '<br />')});
+					return;
+				}
+
 				if (dom.get('_mcePaste'))
 					return;
 
 				// Create container to paste into
-				n = dom.add(body, 'div', {id : '_mcePaste', 'class' : 'mcePaste'}, '\uFEFF');
+				n = dom.add(body, 'div', {id : '_mcePaste', 'class' : 'mcePaste'}, '\uFEFF<br _mce_bogus="1">');
 
 				// If contentEditable mode we need to find out the position of the closest element
 				if (body != ed.getDoc().body)
@@ -202,13 +209,29 @@
 
 						// WebKit will split the div into multiple ones so this will loop through then all and join them to get the whole HTML string
 						each(nl, function(n) {
+							var child = n.firstChild;
+
+							// WebKit inserts a DIV container with lots of odd styles
+							if (child && child.nodeName == 'DIV' && child.style.marginTop && child.style.backgroundColor) {
+								dom.remove(child, 1);
+							}
+
 							// WebKit duplicates the divs so we need to remove them
 							each(dom.select('div.mcePaste', n), function(n) {
 								dom.remove(n, 1);
 							});
 
-							// Contents in WebKit is sometimes wrapped in a apple style span so we need to grab it from that one
-							h += (dom.select('> span.Apple-style-span div', n)[0] || dom.select('> span.Apple-style-span', n)[0] || n).innerHTML;
+							// Remove apply style spans
+							each(dom.select('span.Apple-style-span', n), function(n) {
+								dom.remove(n, 1);
+							});
+
+							// Remove bogus br elements
+							each(dom.select('br[_mce_bogus]', n), function(n) {
+								dom.remove(n);
+							});
+
+							h += n.innerHTML;
 						});
 
 						// Remove the nodes
@@ -288,7 +311,19 @@
 						h = h.replace(v, '');
 					else
 						h = h.replace(v[0], v[1]);
-				});
+	            });
+
+
+	            // UMBRACO SPECIFIC, remove all headers that's not in the style list
+
+	            var umbracoAllowedStyles = this.editor.getParam('theme_umbraco_styles');
+	            for (var i = 1; i < 7; i++) {
+	                if (umbracoAllowedStyles.indexOf("h" + i) == -1) {
+	                    h = h.replace(new RegExp('<h' + i + '>', 'gi'), '<p><b>');
+	                    h = h.replace(new RegExp('</h' + i + '>', 'gi'), '</b></p>');
+	                }
+	            }
+
 			}
 
 			// Detect Word content and process it more aggressive
@@ -666,7 +701,7 @@
 			}
 
 			// Insert a marker for the caret position
-			this._insert('<span id="' + markerId + '">&nbsp;</span>', 1);
+			this._insert('<span id="' + markerId + '"></span>', 1);
 			marker = dom.get(markerId);
 			parentBlock = dom.getParent(marker, 'p,h1,h2,h3,h4,h5,h6,ul,ol,th,td');
 
@@ -707,10 +742,10 @@
 		 * Inserts the specified contents at the caret position.
 		 */
 		_insert : function(h, skip_undo) {
-			var ed = this.editor;
+			var ed = this.editor, r = ed.selection.getRng();
 
-			// First delete the contents seems to work better on WebKit
-			if (!ed.selection.isCollapsed())
+			// First delete the contents seems to work better on WebKit when the selection spans multiple list items or multiple table cells.
+			if (!ed.selection.isCollapsed() && r.startContainer != r.endContainer)
 				ed.getDoc().execCommand('Delete', false, null);
 
 			// It's better to use the insertHTML method on Gecko since it will combine paragraphs correctly before inserting the contents

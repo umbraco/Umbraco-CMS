@@ -129,6 +129,8 @@ namespace umbraco.MacroEngines
                 if (func(node)) return node;
                 node = node.Parent;
             }
+
+            return node;
         }
 
         public DynamicNode Parent

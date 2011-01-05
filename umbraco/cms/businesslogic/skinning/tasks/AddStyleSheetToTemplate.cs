@@ -28,24 +28,25 @@ namespace umbraco.cms.businesslogic.skinning.tasks
             HtmlDocument doc = new HtmlDocument();
             doc.Load(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
 
-            if (doc.DocumentNode.SelectSingleNode(string.Format("//link [@href = '{0}']", Value)) == null)
-            {
+            //if (doc.DocumentNode.SelectSingleNode(string.Format("//link [@href = '{0}']", Value)) == null)
+            //{
 
                 HtmlNode target = doc.DocumentNode.SelectSingleNode(string.IsNullOrEmpty(TargetSelector) ? "//head" : TargetSelector.ToLower());
 
                 if (target != null)
                 {
-                    HtmlNode s = new HtmlNode(HtmlNodeType.Element, doc, 0);
-                    s.Name = "link";
-                    s.Attributes.Add("rel", "stylesheet");
-                    s.Attributes.Add("type", "text/css");
+
+                    HtmlNode s = doc.CreateElement("link");
+                    //s.Name = "link";
+                    s.Attributes.Append("rel", "stylesheet");
+                    s.Attributes.Append("type", "text/css");
 
 
-                    s.Attributes.Add("href", Value);
+                    s.Attributes.Append("href", Value);
 
 
                     if (!string.IsNullOrEmpty(Media))
-                        s.Attributes.Add("media", Media);
+                        s.Attributes.Append("media", Media);
 
                     target.AppendChild(s);
 
@@ -56,9 +57,9 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                 }
                 else
                     d.TaskExecutionStatus = TaskExecutionStatus.Cancelled;   
-            }
-            else
-                d.TaskExecutionStatus = TaskExecutionStatus.Cancelled;
+            //}
+            //else
+            //    d.TaskExecutionStatus = TaskExecutionStatus.Cancelled;
 
             return d;
         }
@@ -72,7 +73,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
 
             if (s != null)
             {
-                s.Remove();
+                s.RemoveAll();
 
                 doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
 

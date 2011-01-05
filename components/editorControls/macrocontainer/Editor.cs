@@ -18,7 +18,7 @@ namespace umbraco.editorControls.macrocontainer
 {
 
     [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Css, "/macroContainer/macroContainer.css", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Css, "macroContainer/macroContainer.css", "UmbracoClient")]
     public class Editor : UpdatePanel, IDataEditor
     {
         private IData _data;

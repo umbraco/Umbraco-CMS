@@ -47,7 +47,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                     {
                         if (target.Attributes[TargetAttribute] == null)
                         {
-                            target.Attributes.Add(TargetAttribute, Value);
+                            target.Attributes.Append(TargetAttribute, Value);
                         }
                         else
                         {
