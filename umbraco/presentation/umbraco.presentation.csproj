@@ -1916,6 +1916,16 @@
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\initcolorpicker.js" />
     <Content Include="umbraco_client\MacroContainer\macroContainer.css" />
     <Content Include="umbraco_client\mousewheel\jquery.mousewheel.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\advlist\editor_plugin.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\advlist\editor_plugin_src.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\autoresize\editor_plugin.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\autoresize\editor_plugin_src.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\legacyoutput\editor_plugin.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\legacyoutput\editor_plugin_src.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\tabfocus\editor_plugin.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\tabfocus\editor_plugin_src.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\wordcount\editor_plugin.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\wordcount\editor_plugin_src.js" />
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_flat_10_000000_40x100.png" />

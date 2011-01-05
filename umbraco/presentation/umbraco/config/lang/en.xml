@@ -10,6 +10,7 @@
     <key alias="tree">Content</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="cut">Cut</key>
     <key alias="link">Link</key>
     <key alias="insertlink">Insert link</key>
     <key alias="insertgraphicheadline">Insert graphic headline</key>
