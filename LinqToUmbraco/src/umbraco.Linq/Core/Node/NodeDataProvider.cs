@@ -352,18 +352,42 @@ namespace umbraco.Linq.Core.Node
                     if (string.IsNullOrEmpty(data))
                     {
                         //non-mandatory structs which have no value will be null
-                        p.SetValue(node, null, null);
+                        try
+                        {
+                            p.SetValue(node, null, null);
+                        }
+                        catch (FormatException ex)
+                        {
+                            throw new FormatException(
+                                string.Format("Unable to cast '{0}' to the appropriate type ({1}) for node `{2}`. The alias of the property being parsed is {3}. Refer to inner exception for more details", data, p.PropertyType.FullName, node.Id, attr.Alias), ex);
+                        }
                     }
                     else
                     {
                         //non-mandatory structs which do have a value have to be cast based on the type of their Nullable<T>, found from the first (well, only) GenericArgument
-                        p.SetValue(node, Convert.ChangeType(data, p.PropertyType.GetGenericArguments()[0]), null);
+                        try
+                        {
+                            p.SetValue(node, Convert.ChangeType(data, p.PropertyType.GetGenericArguments()[0]), null);
+                        }
+                        catch (FormatException ex)
+                        {
+                            throw new FormatException(
+                                string.Format("Unable to cast '{0}' to the appropriate type ({1}) for node `{2}`. The alias of the property being parsed is {3}. Refer to inner exception for more details", data, p.PropertyType.FullName, node.Id, attr.Alias), ex);
+                        }
                     }
                 }
                 else
                 {
                     // TODO: Address how Convert.ChangeType works in globalisation
-                    p.SetValue(node, Convert.ChangeType(data, p.PropertyType), null);
+                    try
+                    {
+                        p.SetValue(node, Convert.ChangeType(data, p.PropertyType), null);
+                    }
+                    catch (FormatException ex)
+                    {
+                        throw new FormatException(
+                            string.Format("Unable to cast '{0}' to the appropriate type ({1}) for node `{2}`. The alias of the property being parsed is {3}. Refer to inner exception for more details", data, p.PropertyType.FullName, node.Id, attr.Alias), ex);
+                    }
                 }
             }
         }
