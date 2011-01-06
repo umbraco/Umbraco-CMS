@@ -41,6 +41,7 @@ jQuery(document).ready(function () {
 				<p>We’ve put together some useful links to help you get started with Umbraco.</p>
 				<nav class="links">
 					<ul>
+                        <li><a href="http://umbraco.codeplex.com/documentation" target="_blank">Getting Started Guide</a></li>
 						<li><a href="http://our.umbraco.org?ref=ourFromInstaller">our.umbraco.org</a></li>
 					</ul>
 
