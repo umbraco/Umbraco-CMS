@@ -31,16 +31,20 @@ namespace umbraco.presentation.install.steps.Skinning
         {
              base.OnInit(e);
 
-            
              if (repo.HasConnection())
              {
                  try
                  {
-                   //clear progress bar cache
-                   Helper.clearProgress();
+                    //clear progress bar cache
+                    Helper.clearProgress();
 
-                     rep_starterKitDesigns.DataSource = repo.Webservice.Skins(StarterKitGuid.ToString());
-                     rep_starterKitDesigns.DataBind();
+                    var skinsCollection = repo.Webservice.Skins(StarterKitGuid.ToString());
+
+                    var numberOfSkins = skinsCollection.Length;
+                    this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "skinCounter", "var numberOfSkins = " + numberOfSkins, true);
+
+                    rep_starterKitDesigns.DataSource = skinsCollection;
+                    rep_starterKitDesigns.DataBind();
                  }
                  catch (Exception ex)
                  {

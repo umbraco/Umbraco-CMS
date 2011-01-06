@@ -474,11 +474,18 @@ function initZoomList2() {
 function initSlide() {
     jQuery('.gallery').each(function () {
         var set = jQuery(this);
-        var btnPrev = set.find('.btn-prev').hide();
-        var btnNext = set.find('.btn-next').hide();
+        var btnPrev = set.find('.btn-prev');
+        var btnNext = set.find('.btn-next');
         var slider = set.find('.gal-box');
         var swicher = set.find('.swicher');
         swicher.empty();
+
+        //numberOfSkins is a global varibale injected into the page by the loadStarterkitDesigns usercontrol
+        if (numberOfSkins < 5) {
+            btnPrev.hide();
+            btnNext.hide();
+        }
+
         slider.cycle({
             fx: 'scrollHorz',
             timeout: 5000,
