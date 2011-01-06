@@ -1203,7 +1203,9 @@ namespace umbraco
                 return new LiteralControl(string.Format("Unable to create control {0} from assembly {1}",
                                                         controlName, asm.FullName));
 
-            /// Properties
+            AddCurrentNodeToControl(control, type);
+
+            // Properties
             foreach (string propertyAlias in properties.Keys)
             {
                 PropertyInfo prop = type.GetProperty(propertyAlias);
@@ -1268,9 +1270,9 @@ namespace umbraco
         /// Loads an usercontrol using reflection into the macro object
         /// </summary>
         /// <param name="fileName">Filename of the usercontrol - ie. ~wulff.ascx</param>
+        /// <param name="attributes">The attributes.</param>
+        /// <param name="pageElements">The page elements.</param>
         /// <returns></returns>
-        /// <param name="attributes"></param>
-        /// <param name="umbPage"></param>
         public Control loadUserControl(string fileName, Hashtable attributes, Hashtable pageElements)
         {
             Debug.Assert(!string.IsNullOrEmpty(fileName), "fileName cannot be empty");
@@ -1304,6 +1306,8 @@ namespace umbraco
                     TraceWarn(loadUserControlKey, "Unable to retrieve control type: " + fileName);
                     return oControl;
                 }
+
+                AddCurrentNodeToControl(oControl, type);
 
                 foreach (string propertyAlias in properties.Keys)
                 {
@@ -1381,6 +1385,20 @@ namespace umbraco
                     string.Format(
                         "<div style=\"color: black; padding: 3px; border: 2px solid red\"><b style=\"color:red\">Error creating control ({0}).</b><br/> Maybe file doesn't exists or the usercontrol has a cache directive, which is not allowed! See the tracestack for more information!</div>",
                         fileName));
+            }
+        }
+
+        private static void AddCurrentNodeToControl(Control control, Type type)
+        {
+            var currentNodeProperty = type.GetProperty("CurrentNode");
+            if (currentNodeProperty != null && currentNodeProperty.CanWrite && currentNodeProperty.PropertyType.IsAssignableFrom(typeof(Node)))
+            {
+                currentNodeProperty.SetValue(control, Node.GetCurrent(), null);
+            }
+            currentNodeProperty = type.GetProperty("currentNode");
+            if (currentNodeProperty != null && currentNodeProperty.CanWrite && currentNodeProperty.PropertyType.IsAssignableFrom(typeof(Node)))
+            {
+                currentNodeProperty.SetValue(control, Node.GetCurrent(), null);
             }
         }
 
