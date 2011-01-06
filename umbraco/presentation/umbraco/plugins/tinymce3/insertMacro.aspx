@@ -41,20 +41,32 @@
     <script type="text/javascript">
         function umbracoEditMacroDo(fieldTag, macroName, renderedContent) {
 
+            tinyMCEPopup.editor.execCommand("mceInsertContent", false, "test");
+
             // is it edit macro?
             if (!tinyMCE.activeEditor.dom.hasClass(elm, 'umbMacroHolder')) {
+
+
                 while (!tinyMCE.activeEditor.dom.hasClass(elm, 'umbMacroHolder') && elm.parentNode) {
                     elm = elm.parentNode;
                 }
             }
 
+
             if (elm.nodeName == "DIV" && tinyMCE.activeEditor.dom.getAttrib(elm, 'class').indexOf('umbMacroHolder') >= 0) {
+
+
                 tinyMCE.activeEditor.dom.setOuterHTML(elm, renderedContent);
             }
             else {
-                tinyMCEPopup.execCommand("mceInsertContent", false, renderedContent);
+
+                tinyMCEPopup.editor.execCommand("mceInsertContent", false, renderedContent);
             }
-            tinyMCEPopup.close();
+
+            //workaround for the chrome issue, seems to work if there is a small delay before the close function call
+            id = window.setTimeout("tinyMCEPopup.close()", 10);
+
+            //tinyMCEPopup.close();
         }
 
         function saveTreepickerValue(appAlias, macroAlias) {
@@ -82,10 +94,9 @@
             tinyMCEPopup.close();
         }
     </script>
-</script>
+
 </head>
 <body>
-    
     <form id="Form1" runat="server">
     <asp:ScriptManager ID="ScriptManager1" runat="server">
     </asp:ScriptManager>
@@ -104,7 +115,7 @@
         <p>
             <asp:Button ID="bt_renderMacro" OnClick="renderMacro_Click" runat="server" Text="ok">
             </asp:Button>
-            <em>or </em><a href="#" style="color: blue" onclick="tinyMCEPopup.close();">
+            <em>or </em><a id="cancelbtn" href="#" style="color: blue" onclick="tinyMCEPopup.close();">
                 <%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
         </p>
     </asp:Panel>
