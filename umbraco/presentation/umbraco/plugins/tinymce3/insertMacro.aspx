@@ -41,8 +41,6 @@
     <script type="text/javascript">
         function umbracoEditMacroDo(fieldTag, macroName, renderedContent) {
 
-            tinyMCEPopup.editor.execCommand("mceInsertContent", false, "test");
-
             // is it edit macro?
             if (!tinyMCE.activeEditor.dom.hasClass(elm, 'umbMacroHolder')) {
 
