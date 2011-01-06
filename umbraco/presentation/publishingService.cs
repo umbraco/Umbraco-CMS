@@ -28,8 +28,8 @@ namespace umbraco.presentation
 				// DO not run publishing if content is re-loading
 				if(!content.Instance.isInitializing)
 				{
-                    var docs = Document.GetDocumentsForRelease();
-					foreach(Document d in docs)
+                   
+                    foreach (Document d in Document.GetDocumentsForRelease())
 					{
 						try
 						{
@@ -39,7 +39,7 @@ namespace umbraco.presentation
 
 							d.Publish(d.User);
 							library.PublishSingleNode(d.Id);
-							
+
 						}
 						catch(Exception ee)
 						{
@@ -54,7 +54,23 @@ namespace umbraco.presentation
 					{
 						//d.HttpContext = (HttpContext)sender;
 						//d.Published = false;
-						library.UnPublishSingleNode(d.Id);
+
+                        try
+                        {
+                            d.ExpireDate = DateTime.MinValue;
+
+                            d.UnPublish();
+                            library.UnPublishSingleNode(d.Id);
+                        }
+                        catch (Exception ee)
+                        {
+                            Log.Add(
+                                LogTypes.Error,
+                                BusinessLogic.User.GetUser(0),
+                                d.Id,
+                                string.Format("Error unpublishing node: {0}", ee));
+                        }
+                       
 					}
 				}
 
