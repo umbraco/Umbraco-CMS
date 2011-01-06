@@ -1,6 +1,6 @@
 body{
 	margin:0;
-	color:#fff3bb;
+	color:#ffffff;
 	font:13px/16px Tahoma, Geneva, sans-serif;
 	background:#3b0d03;
 	min-width:1000px;
@@ -174,6 +174,7 @@ figure{display: block;}
 	letter-spacing:-1px;
 	color:#f27021;
 	position:relative;
+	text-shadow: #000000 1px 1px 1px;
 }
 .tabset ul li.disable{color:#c57f73;}
 .tabset ul li em{
@@ -208,7 +209,8 @@ figure{display: block;}
 	font-size:36px;
 	line-height:40px;
 	font-weight:normal;
-	color:#fff;
+	color:#FFF3BB;
+	text-shadow: #000000 1px 1px 1px;
 }
 .content .container{
 	overflow:hidden;
@@ -219,10 +221,11 @@ figure{display: block;}
 	margin:0 0 11px;
 	font-size:20px;
 	line-height:24px;
-	color:#fff;
+	color:#FFF3BB;
 	font-weight:normal;
+	text-shadow: #000000 1px 1px 1px;
 }
-.content p{margin:0 0 13px;}
+.content p{margin:0 0 13px;text-shadow: #000000 1px 1px 1px;}
 .content p strong{color:#fff;}
 /* text list */
 .text-list{
@@ -237,6 +240,7 @@ figure{display: block;}
 	height:1%;
 	vertical-align:top;
 	padding:0 0 4px;
+	text-shadow: #000000 1px 1px 1px;
 }
 .text-list li strong{
 	float:left;
@@ -258,6 +262,7 @@ figure{display: block;}
 	line-height:24px;
 	color:#fff;
 	font-weight:normal;
+	text-shadow: #000000 1px 1px 1px;
 }
 /* btn box */
 .btn-box{
@@ -306,7 +311,8 @@ figure{display: block;}
 	margin:0 0 18px;
 	font-size:15px;
 	line-height:20px;
-	color:#fff;
+	color:#FFF3BB;
+	text-shadow: #000000 1px 1px 1px;
 }
 .btn-accept,
 .btn-continue,
@@ -394,6 +400,7 @@ figure{display: block;}
 	padding:5px 3px 0 0;
 	font-weight:bold;
 	color:#fff;
+	text-shadow: #000000 1px 1px 1px;
 }
 .instruction-hold .row span{
 	float:left;
@@ -514,7 +521,7 @@ figure{display: block;}
 	float:left;
 	width:auto;
 	line-height:16px;
-	color:#fff3bb;
+	color:#ffffff;
 	font-weight:normal;
 	padding:0;
 }
@@ -670,6 +677,7 @@ figure{display: block;}
 .drop-hold .hold{
 	width:100%;
 	overflow:hidden;
+	color:#3e0e03;
 }
 .drop-hold .box{
 	float:left;
@@ -1024,7 +1032,8 @@ figure{display: block;}
 	font-size:20px;
 	line-height:24px;
 	font-weight:bold;
-	color:#fff;
+	color:#FFF3BB;
+	text-shadow: #000000 1px 1px 1px;
 }
 .col1{
 	float:left;
@@ -1134,6 +1143,10 @@ figure{display: block;}
 	border: none !important;
 }
 
-.summary li{margin-bottom: 20px; display: block}
-.summary a{color: White;}
+.summary li{margin-bottom: 20px; display: block;text-shadow: #000000 1px 1px 1px;}
+.summary a{color: White;display:block;font-weight:bold;}
+.summary a:hover{text-shadow: #000000 0px 0px 0px;}
 
+.error {padding:0 100px 13px 5px}
+.error p{margin:0 0 13px;text-shadow: #000000 1px 1px 1px;padding-right:100px;}
+.error p strong {font-size:14px;display:block;}
