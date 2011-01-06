@@ -78,8 +78,8 @@
 <div class="tab main-tabinfo">
 <div class="container">
 	<h1>Starter kits</h1>
-	<p>To help you get started we have created some basic starter kits each of which has been tailored to meet different requiremejnts.<br />
-	Hover of the thumbnail to find out what each kit contains.</p>
+	<p>To help you get started here are some basic starter kits. They have been tailored to suit common site configurations and install useful functionality such as blogs or image galleries.<br />
+	Hover of the thumbnail to find out what each kit will install.</p>
 </div>
 <!-- menu -->
 <asp:PlaceHolder ID="ph_starterKits" runat="server" />
@@ -93,7 +93,7 @@
 <div class="container">
 <h1>Install a Skin</h1>
 <div class="accept-hold">
-  <p>You can now choose to skin your starter kit with one of our great designs.</p>
+  <p>You can now further enhance your site by choosing one of these great skins. This will apply a default look and feel to all the pages in your site, considerably reducing development time.</p>
 </div>
 </div>
 <!-- skins -->

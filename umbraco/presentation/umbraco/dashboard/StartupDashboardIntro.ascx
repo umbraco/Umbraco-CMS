@@ -13,6 +13,7 @@
         </div>
         <div style="float:right; width:95%;">
             <ul>
+            <li>Download and read the <a href="http://umbraco.codeplex.com/documentation" target="_blank">Umbraco Getting Started Guide</a></li>
             <li>Find the answers to your Umbraco questions on our <a href="http://our.umbraco.org/wiki" target="_blank">Community Wiki</a></li>
             <li>Download the <a href="http://our.umbraco.org/projects/website-utilities/editors-manual" target="_blank">Editors Manual</a> for details on working with the Umbraco UI</li>
             <li>Ask a question in the <a href="http://our.umbraco.org/" target="_blank">Community Forum</a></li>
