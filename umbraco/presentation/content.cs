@@ -433,20 +433,22 @@ namespace umbraco
                 }
 
                 // clear cached field values
-                System.Web.Caching.Cache httpCache = HttpContext.Current.Cache;
-                string cachedFieldKeyStart = String.Format("contentItem{0}_", d.Id);
-                List<string> foundKeys = new List<string>();
-                foreach (DictionaryEntry cacheItem in httpCache)
+                if (HttpContext.Current != null)
                 {
-                    string key = cacheItem.Key.ToString();
-                    if (key.StartsWith(cachedFieldKeyStart))
-                        foundKeys.Add(key);
+                    System.Web.Caching.Cache httpCache = HttpContext.Current.Cache;
+                    string cachedFieldKeyStart = String.Format("contentItem{0}_", d.Id);
+                    List<string> foundKeys = new List<string>();
+                    foreach (DictionaryEntry cacheItem in httpCache)
+                    {
+                        string key = cacheItem.Key.ToString();
+                        if (key.StartsWith(cachedFieldKeyStart))
+                            foundKeys.Add(key);
+                    }
+                    foreach (string foundKey in foundKeys)
+                    {
+                        httpCache.Remove(foundKey);
+                    }
                 }
-                foreach (string foundKey in foundKeys)
-                {
-                    httpCache.Remove(foundKey);
-                }
-
                 umbraco.BusinessLogic.Actions.Action.RunActionHandlers(d, ActionPublish.Instance);
 
                 FireAfterUpdateDocumentCache(d, e);

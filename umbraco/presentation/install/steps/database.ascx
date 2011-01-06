@@ -10,7 +10,7 @@
 				database (This is the recommended approach for first time users or if you are unsure).</strong></p>
             <p>
 				If you are not using the SQL CE 4 embedded database you will need the connection details for your database, such as the
-				&quot;server name and password&quot;. You may need to contact your system administrator or web host for this information.</p>
+				&quot;connection string&quot;. You may need to contact your system administrator or web host for this information.</p>
 		</div>
 		<!-- database -->
 		<div class="database-hold">
@@ -46,7 +46,7 @@
 					<div class="step">
 						<div class="container">
 							<p class="instructionText">
-								<strong>3. Instructions:</strong> Please fill out the connection information for your database.</p>
+								<strong>3. Connection details:</strong> Please fill out the connection information for your database.</p>
 							<div class="instruction-hold">
 								<div class="row embeddedError" runat="server" id="embeddedFilesMissing" style="display: none;">
 									<p>
@@ -147,8 +147,7 @@
 			<h1>
 				Installing Umbraco</h1>
 			<p>
-				The Umbraco database tables are being installed. This process will set-up a default
-				blank Umbraco database into your chosen DB Server.</p>
+				The Umbraco database is being configured. This process populates your chosen database with a blank Umbraco instance.</p>
 			<div class="loader">
 				<div class="hold">
 					<div class="progress-bar">

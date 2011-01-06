@@ -27,7 +27,7 @@
 		 * @param {string} url Absolute URL to where the plugin is located.
 		 */
 		init : function(ed) {
-			var t = this;
+			var t = this, lastRng;
 
 			t.editor = ed;
 
@@ -42,13 +42,33 @@
 
 			ed.onContextMenu.add(function(ed, e) {
 				if (!e.ctrlKey) {
+					// Restore the last selection since it was removed
+					if (lastRng)
+						ed.selection.setRng(lastRng);
+
 					t._getMenu(ed).showMenu(e.clientX, e.clientY);
-					Event.add(ed.getDoc(), 'click', hide);
+					Event.add(ed.getDoc(), 'click', function(e) {
+						hide(ed, e);
+					});
 					Event.cancel(e);
 				}
 			});
 
-			function hide() {
+			ed.onRemove.add(function() {
+				if (t._menu)
+					t._menu.removeAll();
+			});
+
+			function hide(ed, e) {
+				lastRng = null;
+
+				// Since the contextmenu event moves
+				// the selection we need to store it away
+				if (e && e.button == 2) {
+					lastRng = ed.selection.getRng();
+					return;
+				}
+
 				if (t._menu) {
 					t._menu.removeAll();
 					t._menu.destroy();
@@ -95,19 +115,21 @@
 			});
 
 			t._menu = m;
+			
+            var keys = UmbClientMgr.uiKeys();
 
-			m.add({title : 'advanced.cut_desc', icon : 'cut', cmd : 'Cut'}).setDisabled(col);
-			m.add({title : 'advanced.copy_desc', icon : 'copy', cmd : 'Copy'}).setDisabled(col);
-			m.add({title : 'advanced.paste_desc', icon : 'paste', cmd : 'Paste'});
+            m.add({ title: keys['defaultdialogs_cut'], icon: 'cut', cmd: 'Cut' }).setDisabled(col);
+			m.add({ title: keys['general_copy'], icon: 'copy', cmd: 'Copy' }).setDisabled(col);
+			m.add({ title: keys['defaultdialogs_paste'], icon: 'paste', cmd: 'Paste' });
 
 			if ((el.nodeName == 'A' && !ed.dom.getAttrib(el, 'name')) || !col) {
 				m.addSeparator();
-				m.add({title : 'advanced.link_desc', icon : 'link', cmd : ed.plugins.advlink ? 'mceAdvLink' : 'mceLink', ui : true});
-				m.add({title : 'advanced.unlink_desc', icon : 'unlink', cmd : 'UnLink'});
+				m.add({ title: keys['defaultdialogs_insertlink'], icon: 'link', cmd: ed.plugins.advlink ? 'mceAdvLink' : 'mceLink', ui: true });
+				m.add({ title: keys['relatedlinks_removeLink'], icon: 'unlink', cmd: 'UnLink' });
 			}
 
 			m.addSeparator();
-			m.add({title : 'advanced.image_desc', icon : 'image', cmd : ed.plugins.advimage ? 'mceAdvImage' : 'mceImage', ui : true});
+			m.add({ title: keys['defaultdialogs_insertimage'], icon: 'image', cmd: 'mceUmbimage', ui: true });
 
 			m.addSeparator();
 			am = m.addMenu({title : 'contextmenu.align'});

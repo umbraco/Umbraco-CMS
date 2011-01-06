@@ -186,7 +186,8 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                 }
                 else
                 {
-                    parent.ChildNodes.Add(module);
+                    parent.AppendChild(module);
+                    //parent.ChildNodes.Add(module);
                 }
 
                 doc.Save(TargetFile);
@@ -221,7 +222,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
                 {
                     HtmlNode r = doc.DocumentNode.SelectSingleNode(string.Format("//*[@id = '{0}']", TargetID)).Clone();
 
-                    doc.DocumentNode.SelectSingleNode(string.Format("//*[@id = '{0}']", TargetID)).Remove();
+                    doc.DocumentNode.SelectSingleNode(string.Format("//*[@id = '{0}']", TargetID)).RemoveAll();
 
                     doc.Save(TargetFile);
 

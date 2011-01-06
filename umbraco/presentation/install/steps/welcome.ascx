@@ -19,9 +19,7 @@
 			<li><strong>3.</strong><span>Set an Umbraco Admin password</span></li>
 			<li><strong>4.</strong><span>You can then choose to install one of our great starter
 				kits and a skin</span></li>
-			<li><strong>5.</strong><span>But whatever you do don't forget to become part of the
-				Umbraco community, one of the friendliest developer communites you will find. Its
-				what makes Umbraco such a great product and great much fun to use.</span></li>
+			<li><strong>5.</strong><span>But whatever you do don't forget to become part of the Umbraco community, one of the friendliest developer communities you will find. It’s what makes Umbraco such a great product and great much fun to use.</span></li>
 		</ul>
 		<span class="enjoy">Enjoy!</span>
 	</div>

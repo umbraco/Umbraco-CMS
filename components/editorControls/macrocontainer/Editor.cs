@@ -18,7 +18,7 @@ namespace umbraco.editorControls.macrocontainer
 {
 
     [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Css, "/macroContainer/macroContainer.css", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Css, "macroContainer/macroContainer.css", "UmbracoClient")]
     public class Editor : UpdatePanel, IDataEditor
     {
         private IData _data;
@@ -257,18 +257,24 @@ namespace umbraco.editorControls.macrocontainer
                 {
                     string number = temp.Substring(temp.LastIndexOf('=') + 1);
 
-                    MacroEditor current = ((MacroEditor)this.ContentTemplateContainer.FindControl(ID + "macroeditor_" + number));
-                    if (current.Visible)
-                        value += current.MacroTag;
+                    if (this.ContentTemplateContainer.FindControl(ID + "macroeditor_" + number) != null)
+                    {
+                        MacroEditor current = ((MacroEditor)this.ContentTemplateContainer.FindControl(ID + "macroeditor_" + number));
+                        if (current.Visible)
+                            value += current.MacroTag;
+                    }
                 }
             }
             else
             {
                 for (int i = 0; i < _maxNumber; i++)
                 {
-                    MacroEditor current = ((MacroEditor)this.ContentTemplateContainer.FindControl(ID + "macroeditor_" + i.ToString()));
-                    if (current.Visible)
-                        value += current.MacroTag;
+                    if (this.ContentTemplateContainer.FindControl(ID + "macroeditor_" + i.ToString()) != null)
+                    {
+                        MacroEditor current = ((MacroEditor)this.ContentTemplateContainer.FindControl(ID + "macroeditor_" + i.ToString()));
+                        if (current.Visible)
+                            value += current.MacroTag;
+                    }
                 }
             }
             _data.Value = value;
