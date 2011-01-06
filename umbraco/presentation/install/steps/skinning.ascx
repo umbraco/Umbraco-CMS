@@ -79,7 +79,7 @@
 <div class="container">
 	<h1>Starter kits</h1>
 	<p>To help you get started here are some basic starter kits. They have been tailored to suit common site configurations and install useful functionality such as blogs or image galleries.<br />
-	Hover of the thumbnail to find out what each kit will install.</p>
+	Mouse over the icons to learn more about what the starter kits will install.</p>
 </div>
 <!-- menu -->
 <asp:PlaceHolder ID="ph_starterKits" runat="server" />

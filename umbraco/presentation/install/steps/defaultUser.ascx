@@ -10,7 +10,7 @@
 							<div class="create-hold">
 								<p>You can now setup a new admin user to log into Umbraco, we recommend using a stong password for this (a password which is more than 4 characters and contains a mix of letters, numbers and symbols).
                                 Please make a note of the chosen password.</p>
-								<p>The password can be changed once you have completed the installation and logged in to the admin interface.</p>
+								<p>The password can be changed once you have completed the installation and logged into the admin interface.</p>
 							</div>
 
 						</div>

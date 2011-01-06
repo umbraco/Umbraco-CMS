@@ -474,8 +474,8 @@ function initZoomList2() {
 function initSlide() {
     jQuery('.gallery').each(function () {
         var set = jQuery(this);
-        var btnPrev = set.find('.btn-prev');
-        var btnNext = set.find('.btn-next');
+        var btnPrev = set.find('.btn-prev').hide();
+        var btnNext = set.find('.btn-next').hide();
         var slider = set.find('.gal-box');
         var swicher = set.find('.swicher');
         swicher.empty();

@@ -52,9 +52,8 @@
 									<p>
 										<strong>Missing files:</strong> SQL CE 4 requires that you manually add the SQL
 										CE 4 runtime to your Umbraco installation.<br />
-										<a href="http://our.umbraco.org/wiki/install-and-setup/using-sql-ce-4-with-juno"
-											target="_blank">More instructions</a>.
-										You can either follow the instructions above to add SQL CE 4 or select another database type from the dropdown above.
+										You can either use the following <a href="http://our.umbraco.org/wiki/install-and-setup/using-sql-ce-4-with-juno"
+											target="_blank">instructions</a> on how to add SQL CE 4 or select another database type from the dropdown above.
 									</p>
 								</div>
 
