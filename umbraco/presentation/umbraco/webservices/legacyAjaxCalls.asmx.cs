@@ -36,9 +36,19 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public bool ValidateUser(string username, string password)
         {
-           
-            return System.Web.Security.Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(
-                 username, password);
+
+            if (System.Web.Security.Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(
+                 username, password))
+            {
+                BusinessLogic.User u = new BusinessLogic.User(username);
+                BasePage.doLogin(u);
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 
         }
         /// <summary>
