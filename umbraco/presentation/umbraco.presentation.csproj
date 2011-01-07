@@ -304,13 +304,6 @@
     <Compile Include="install\steps\theend.ascx.designer.cs">
       <DependentUpon>theend.ascx</DependentUpon>
     </Compile>
-    <Compile Include="install\steps\upgrade.ascx.cs">
-      <DependentUpon>upgrade.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="install\steps\upgrade.ascx.designer.cs">
-      <DependentUpon>upgrade.ascx</DependentUpon>
-    </Compile>
     <Compile Include="install\steps\validatePermissions.ascx.cs">
       <DependentUpon>validatePermissions.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1977,7 +1970,6 @@
     </Content>
     <Content Include="install\default.aspx" />
     <Content Include="install\steps\license.ascx" />
-    <Content Include="install\steps\upgrade.ascx" />
     <Content Include="umbraco\actions\delete.aspx" />
     <Content Include="umbraco\actions\editContent.aspx" />
     <Content Include="umbraco\actions\preview.aspx" />

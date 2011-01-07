@@ -18,15 +18,23 @@ namespace umbraco.presentation.install
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 
+            if (!String.IsNullOrEmpty(GlobalSettings.ConfigurationStatus.Trim()))
+            {
+                ph_install.Visible = false;
+                ph_upgrade.Visible = true;
+            }
+
 			// Check for config!
-      if (GlobalSettings.Configured)
-      {
-                Application.Lock();
-                Application["umbracoNeedConfiguration"] = null;
-                Application.UnLock();
-                Response.Redirect(Request.QueryString["url"] ?? "/", true);
-       }
-             
+              if (GlobalSettings.Configured)
+              {
+                    Application.Lock();
+                    Application["umbracoNeedConfiguration"] = null;
+                    Application.UnLock();
+                    Response.Redirect(Request.QueryString["url"] ?? "/", true);
+              }
+              
+              
+
 		}
 
     protected void gotoNextStep(object sender, EventArgs e) {

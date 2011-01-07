@@ -145,15 +145,16 @@ namespace umbraco
         {
             if (base.m_id == -1)
             {
-                List<Skin> skins = Skinning.GetAllSkins();
-                foreach (Skin s in skins)
+                foreach (string s in Directory.GetDirectories(IO.IOHelper.MapPath(IO.SystemDirectories.Masterpages)))
                 {
+                    var _s = Path.GetFileNameWithoutExtension(s);
+
                     XmlTreeNode xNode = XmlTreeNode.Create(this);
-                    xNode.NodeID = s.Alias;
-                    xNode.Text = s.Name;
+                    xNode.NodeID = _s;
+                    xNode.Text = _s;
                     xNode.Icon = "folder.gif";
                     xNode.OpenIcon = "folder_o.gif";
-                    xNode.Source = GetTreeServiceUrl(s.Alias) + "&folder=" + s.Alias;
+                    xNode.Source = GetTreeServiceUrl(_s) + "&folder=" + _s;
                     xNode.HasChildren = true;
                     xNode.Menu.Clear();
                     xNode.Menu.Add(ActionRefresh.Instance);

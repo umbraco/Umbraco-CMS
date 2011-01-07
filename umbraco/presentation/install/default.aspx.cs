@@ -58,16 +58,15 @@ namespace umbraco.presentation.install
           _name.Text = (stepCounter).ToString() + " - " + i.Name;
         } else
           e.Item.Visible = false;
-
       }
     }
 		
 
-    public void GotoNextStep(string currentStep)
-    {
-            InstallerStep _s = InstallerSteps().GotoNextStep(currentStep);
-            Response.Redirect("?installStep=" + _s.Alias);
-    }
+        public void GotoNextStep(string currentStep)
+        {
+                InstallerStep _s = InstallerSteps().GotoNextStep(currentStep);
+                Response.Redirect("?installStep=" + _s.Alias);
+        }
 
 
 		#region Web Form Designer generated code
@@ -86,9 +85,10 @@ namespace umbraco.presentation.install
 				} catch {
 					Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl));
 				}
+
 				//set the first step to upgrade.
-				if (string.IsNullOrEmpty(_installStep))
-					_installStep = "upgrade";
+		//		if (string.IsNullOrEmpty(_installStep))
+		//			_installStep = "upgrade";
 			}
 
             if (string.IsNullOrEmpty(_installStep))
