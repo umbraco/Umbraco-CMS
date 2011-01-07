@@ -389,3 +389,16 @@ h3
   	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
   	font-size: 14px;
 }
+
+/* Renew session modal */
+
+#fullmodal-overlay
+{
+    background-color:#ddd;
+}
+#logout-refresh
+{
+    background-color: #eee;
+    border: 5px solid #ccc;
+    padding:10px;
+}

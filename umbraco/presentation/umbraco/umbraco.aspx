@@ -36,6 +36,10 @@
     <umb:JsInclude ID="JsInclude11" runat="server" FilePath="js/language.aspx" PathNameAlias="UmbracoRoot" />
     <umb:JsInclude ID="JsInclude4" runat="server" FilePath="modal/modal.js" PathNameAlias="UmbracoClient"
         Priority="10" />
+
+         <umb:JsInclude ID="JsInclude17" runat="server" FilePath="modal/jquery.simplemodal.1.4.1.custom.js" PathNameAlias="UmbracoClient"
+        Priority="10" />
+
     <umb:JsInclude ID="JsInclude12" runat="server" FilePath="js/UmbracoSpeechBubbleBackend.js"
         PathNameAlias="UmbracoRoot" />
     <umb:JsInclude ID="JsInclude15" runat="server" FilePath="js/UmbracoSpeechBubbleBackend.js"
@@ -125,6 +129,16 @@
             <iframe frameborder="0" id="umbModalBoxIframe" src=""></iframe>
         </div>
     </div>
+
+    <div id="logout-refresh" style="display:none;">
+        <p>Some lorem ipsum</p>
+
+        <div id="sessionrefreshpassword">
+        Your password: <input type="text"/>
+        </div>
+
+        <p><a href="#" onclick="javascript:umbracoSessionRenewCheckPassword();">Renew</a> or <a href="#" onclick="javascript:umbracoSessionLogout();">logout</a></p>
+    </div>
     <script type="text/javascript">
 
         //used for deeplinking to specific content whilst still showing the tree
@@ -176,14 +190,14 @@
 
         window.setInterval(keepAlive, 10000);
         function keepAlive() {
-            umbraco.presentation.webservices.legacyAjaxCalls.GetSecondsBeforeUserLogout(validateUserTimeout, umbracoSessionLogout);
+            umbraco.presentation.webservices.legacyAjaxCalls.GetSecondsBeforeUserLogout(validateUserTimeout, umbracoShowSessionRenewModal);
         }
         function validateUserTimeout(secondsBeforeTimeout) {
             var logoutElement = jQuery("#logout-warning");
             // when five minutes left, show warning
             if (secondsBeforeTimeout < 300) {
                 if (secondsBeforeTimeout <= 0) {
-                    umbracoSessionLogout();
+                    umbracoShowSessionRenewModal();
                 } else {
 
                     logoutElement.fadeIn();
@@ -203,12 +217,56 @@
         function umbracoRenewSession() {
             umbraco.presentation.webservices.legacyAjaxCalls.RenewUmbracoSession(
                 function () { jQuery("#logout-warning").fadeOut().removeClass('error').addClass('notice'); },
-                umbracoSessionLogout);
+                umbracoShowSessionRenewModal);
 
             }
 
+            function umbracoShowSessionRenewModal() {
+
+                jQuery("#logout-warning").fadeOut().removeClass('error').addClass('notice');
+
+                jQuery("#sessionrefreshpassword input").attr("style", "");
+                jQuery("#logout-refresh").fullmodal();
+            }
+
+            function umbracoSessionRenewCheckPassword() {
+
+               
+
+                if (jQuery("#sessionrefreshpassword input").val() != "") {
+                    jQuery.ajax({
+                        type: "POST",
+                        url: "<%=umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/webservices/legacyAjaxCalls.asmx/ValidateUser",
+                        data: "{'username': '<%=this.getUser().LoginName%>', 'password': '" + jQuery("#sessionrefreshpassword input").val() + "'}",
+                        success: function (result) {
+
+                            if (result.d == true) {
+                                // reset seconds
+                                umbraco.presentation.webservices.legacyAjaxCalls.RenewUmbracoSession();
+
+                                jQuery("#sessionrefreshpassword input").val("");
+                                jQuery.fullmodal.close();
+                            }
+                            else {
+                                umbracoSessionRenewCheckPasswordFail();
+                            }
+
+                        }
+                    });
+                }
+                else {
+                    umbracoSessionRenewCheckPasswordFail();
+                }
+            }
+
+            function umbracoSessionRenewCheckPasswordFail() {
+                jQuery("#sessionrefreshpassword").effect("shake", { times: 5, distance: 5 }, 80);
+                jQuery("#sessionrefreshpassword input").attr("style", "border: 2px solid red;");
+
+            }
             function umbracoSessionLogout() {
-                alert('Session has expired on server - can\'t renew. Logging out!');
+
+                //alert('Session has expired on server - can\'t renew. Logging out!');
                 top.document.location.href = 'logout.aspx';
             }
 

@@ -33,7 +33,14 @@ namespace umbraco.presentation.webservices
     [ScriptService]
     public class legacyAjaxCalls : System.Web.Services.WebService
     {
+        [WebMethod]
+        public bool ValidateUser(string username, string password)
+        {
+           
+            return System.Web.Security.Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(
+                 username, password);
 
+        }
         /// <summary>
         /// method to accept a string value for the node id. Used for tree's such as python
         /// and xslt since the file names are the node IDs
