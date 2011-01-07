@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using umbraco.cms.businesslogic.installer;
 using umbraco.cms.businesslogic.packager;
+using umbraco.cms.businesslogic.web;
 
 namespace umbraco.presentation.install.steps.Definitions
 {
@@ -27,10 +28,17 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override bool Completed()
         {
+            if (!String.IsNullOrEmpty(GlobalSettings.ConfigurationStatus.Trim()))
+                return true;
+
             if (InstalledPackage.GetAllInstalledPackages().Count > 0)
                 return true;
-            else
-                return false;
+            
+            if (Document.GetRootDocuments().Count() > 0)
+                return true;
+            
+
+            return false;
         }
     }
 }

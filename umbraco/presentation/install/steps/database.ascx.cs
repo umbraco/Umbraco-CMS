@@ -126,12 +126,11 @@ namespace umbraco.presentation.install.steps
                 DatabasePassword.Text = GetConnectionStringValue(connectionStringBuilder, "password");
                 if (string.IsNullOrEmpty(DatabasePassword.Text)) DatabasePassword.Text = GetConnectionStringValue(connectionStringBuilder, "pwd");
 
-
                 toggleVisible(DatabaseServerItem, !ManualConnectionString && !IsEmbeddedDatabase);
                 toggleVisible(DatabaseUsernameItem, !ManualConnectionString && !IsEmbeddedDatabase);
                 toggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
                 toggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
-
+            
                 toggleVisible(DatabaseConnectionString, ManualConnectionString);
 
             // Make sure ASP.Net displays the password text

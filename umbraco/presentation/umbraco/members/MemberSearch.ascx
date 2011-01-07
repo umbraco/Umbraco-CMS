@@ -1,12 +1,12 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="True" CodeBehind="MemberSearch.ascx.cs" Inherits="umbraco.presentation.umbraco.members.MemberSearch" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-
-	<cc1:Pane ID="pane1" runat="server">
-	<h3>Member Search</h3>
+  <div class="dashboardWrapper">
+    <h2>Member Search</h2>
+    <img src="/umbraco/dashboard/images/membersearch.png" alt="Videos" class="dashboardIcon" />
 <p class="guiDialogNormal">
 	<asp:TextBox id="searchQuery" runat="server"></asp:TextBox>
 	<asp:Button id="ButtonSearch" runat="server" Text="Button" onclick="ButtonSearch_Click"></asp:Button></p>
-   </cc1:Pane>
+
 	<cc1:Pane ID="resultsPane" runat="server" Visible="false">
 	
 	<asp:Repeater ID="rp_members" runat="server">
@@ -36,4 +36,5 @@
 	</table>
 	</FooterTemplate>
 	</asp:Repeater>
-	</cc1:Pane>
+       </cc1:Pane>
+       </div>

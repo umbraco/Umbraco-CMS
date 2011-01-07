@@ -27,14 +27,10 @@
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
     <OldToolsVersion>3.5</OldToolsVersion>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
@@ -303,6 +299,13 @@
     </Compile>
     <Compile Include="install\steps\theend.ascx.designer.cs">
       <DependentUpon>theend.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="install\steps\upgrade.ascx.cs">
+      <DependentUpon>upgrade.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="install\steps\upgrade.ascx.designer.cs">
+      <DependentUpon>upgrade.ascx</DependentUpon>
     </Compile>
     <Compile Include="install\steps\validatePermissions.ascx.cs">
       <DependentUpon>validatePermissions.ascx</DependentUpon>
@@ -1642,8 +1645,94 @@
     </Compile>
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
-    <Content Include="umbraco_client\modal\jquery.simplemodal.1.4.1.custom.js" />
-    <Content Include="web.config.INDIGO64SSD.xslt" />
+    <Content Include="install\images\bg-bhuiness-cl.gif" />
+    <Content Include="install\images\bg-bhuiness-cr.gif" />
+    <Content Include="install\images\bg-bhuiness.jpg" />
+    <Content Include="install\images\bg-blog-cl.gif" />
+    <Content Include="install\images\bg-blog-cr.gif" />
+    <Content Include="install\images\bg-blog.jpg" />
+    <Content Include="install\images\bg-drop-b.png" />
+    <Content Include="install\images\bg-drop-c.gif" />
+    <Content Include="install\images\bg-drop-t.png" />
+    <Content Include="install\images\bg-header.png" />
+    <Content Include="install\images\bg-img-ie.png" />
+    <Content Include="install\images\bg-img.png" />
+    <Content Include="install\images\bg-inp-error.png" />
+    <Content Include="install\images\bg-inp.png" />
+    <Content Include="install\images\bg-lightbox-b.png" />
+    <Content Include="install\images\bg-lightbox-t.png" />
+    <Content Include="install\images\bg-normal-cl.gif" />
+    <Content Include="install\images\bg-normal-cr.gif" />
+    <Content Include="install\images\bg-normal.jpg" />
+    <Content Include="install\images\bg-paging-h.png" />
+    <Content Include="install\images\bg-paging.png" />
+    <Content Include="install\images\bg-personal-cl.gif" />
+    <Content Include="install\images\bg-personal-cr.gif" />
+    <Content Include="install\images\bg-personal.jpg" />
+    <Content Include="install\images\bg-simple-cl.gif" />
+    <Content Include="install\images\bg-simple-cr.gif" />
+    <Content Include="install\images\bg-simple.jpg" />
+    <Content Include="install\images\btn-accept.png" />
+    <Content Include="install\images\btn-blog.png" />
+    <Content Include="install\images\btn-buisness.png" />
+    <Content Include="install\images\btn-close.png" />
+    <Content Include="install\images\btn-continue.png" />
+    <Content Include="install\images\btn-create-hover.png" />
+    <Content Include="install\images\btn-create.png" />
+    <Content Include="install\images\btn-get.png" />
+    <Content Include="install\images\btn-install-gal.png" />
+    <Content Include="install\images\btn-install-hover.png" />
+    <Content Include="install\images\btn-install.png" />
+    <Content Include="install\images\btn-next.png" />
+    <Content Include="install\images\btn-no-thanks.png" />
+    <Content Include="install\images\btn-no.png" />
+    <Content Include="install\images\btn-personal.png" />
+    <Content Include="install\images\btn-prev.png" />
+    <Content Include="install\images\btn-preview-web.png" />
+    <Content Include="install\images\btn-preview.png" />
+    <Content Include="install\images\btn-set.png" />
+    <Content Include="install\images\btn-simple.png" />
+    <Content Include="install\images\btn-yes.png" />
+    <Content Include="install\images\bul1.png" />
+    <Content Include="install\images\bul2.gif" />
+    <Content Include="install\images\bul3.png" />
+    <Content Include="install\images\bul4.gif" />
+    <Content Include="install\images\ico-invalidaing.png" />
+    <Content Include="install\images\ico-validaing.png" />
+    <Content Include="install\images\img01.jpg" />
+    <Content Include="install\images\img02.jpg" />
+    <Content Include="install\images\img03.jpg" />
+    <Content Include="install\images\img04.jpg" />
+    <Content Include="install\images\img05.jpg" />
+    <Content Include="install\images\img06.jpg" />
+    <Content Include="install\images\img07.jpg" />
+    <Content Include="install\images\img08.jpg" />
+    <Content Include="install\images\img09.jpg" />
+    <Content Include="install\images\img10.jpg" />
+    <Content Include="install\images\img11.jpg" />
+    <Content Include="install\images\loader.gif" />
+    <Content Include="install\images\logo.gif" />
+    <Content Include="install\images\none.gif" />
+    <Content Include="install\images\pbar-ani.gif" />
+    <Content Include="install\images\select-button.png" />
+    <Content Include="install\images\select-center.png" />
+    <Content Include="install\images\select-left-2.png" />
+    <Content Include="install\images\select-left.png" />
+    <Content Include="install\images\sep1.png" />
+    <Content Include="install\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
+    <Content Include="install\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
+    <Content Include="install\images\ui-bg_flat_10_000000_40x100.png" />
+    <Content Include="install\images\ui-bg_glass_100_f6f6f6_1x400.png" />
+    <Content Include="install\images\ui-bg_glass_100_fdf5ce_1x400.png" />
+    <Content Include="install\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="install\images\ui-bg_gloss-wave_35_f6a828_500x100.png" />
+    <Content Include="install\images\ui-bg_highlight-soft_100_eeeeee_1x100.png" />
+    <Content Include="install\images\ui-bg_highlight-soft_75_ffe45c_1x100.png" />
+    <Content Include="install\images\ui-icons_222222_256x240.png" />
+    <Content Include="install\images\ui-icons_228ef1_256x240.png" />
+    <Content Include="install\images\ui-icons_ef8c08_256x240.png" />
+    <Content Include="install\images\ui-icons_ffd27a_256x240.png" />
+    <Content Include="install\images\ui-icons_ffffff_256x240.png" />
     <Content Include="umbraco_client\Installer\css\all.css" />
     <Content Include="umbraco_client\Installer\css\form.css" />
     <Content Include="umbraco_client\Installer\css\jquery-ui-1.8.6.custom.css" />
@@ -1971,6 +2060,7 @@
     </Content>
     <Content Include="install\default.aspx" />
     <Content Include="install\steps\license.ascx" />
+    <Content Include="install\steps\upgrade.ascx" />
     <Content Include="umbraco\actions\delete.aspx" />
     <Content Include="umbraco\actions\editContent.aspx" />
     <Content Include="umbraco\actions\preview.aspx" />
@@ -3090,7 +3180,6 @@
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
     <Content Include="web.config.APOWELL-BC-WIN7.xslt" />
     <Content Include="web.config.SONIC.xslt" />
-    <Content Include="web.config.User-VAIO.xslt" />
     <Content Include="web.STANDARD.config" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />
     <None Include="Web References\org.umbraco.update\Reference.map">
@@ -3154,7 +3243,9 @@
       <DependentUpon>umbraco.xsd</DependentUpon>
     </None>
     <Content Include="config\UrlRewriting.config" />
-    <Content Include="web.config" />
+    <Content Include="web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />

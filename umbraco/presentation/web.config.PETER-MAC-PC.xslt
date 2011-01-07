@@ -8,7 +8,7 @@
   </xsl:template>
 
   <xsl:template match="/configuration/appSettings/add[@key='umbracoConfigurationStatus']/@value">
-    <xsl:attribute name="value"></xsl:attribute>
+    <xsl:attribute name="value">4.6.beta</xsl:attribute>
   </xsl:template>
 
   <!-- Default templates to match anything else -->

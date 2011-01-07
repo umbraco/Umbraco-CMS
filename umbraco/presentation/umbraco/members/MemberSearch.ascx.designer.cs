@@ -13,15 +13,6 @@ namespace umbraco.presentation.umbraco.members {
     public partial class MemberSearch {
         
         /// <summary>
-        /// pane1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane1;
-        
-        /// <summary>
         /// searchQuery control.
         /// </summary>
         /// <remarks>

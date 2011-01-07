@@ -235,7 +235,7 @@ namespace umbraco.cms.presentation
             if (node.Attributes.GetNamedItem("showOnce") != null &&
                 node.Attributes.GetNamedItem("showOnce").Value.ToLower() == "true")
             {
-                onceLink.Text = "<a class=\"dashboardHideLink\" href=\"javascript:jQuery.cookie('" + generateCookieKey(node) + "','true'); alert('Nicer confirmation than this will come for release!');\">" + ui.Text("dashboard", "dontShowAgain") + "</a>";
+                onceLink.Text = "<a class=\"dashboardHideLink\" onclick=\"if(confirm('Are you sure you want remove this dashboard item?')){jQuery.cookie('" + generateCookieKey(node) + "','true'); jQuery(this).closest('.propertypane').fadeOut();return false;}\">" + ui.Text("dashboard", "dontShowAgain") + "</a>";
             }
             return onceLink;
         }
