@@ -32,31 +32,40 @@ namespace umbraco.cms.businesslogic.web
 			_checkedPages.Clear();
 		}
 
+        static object _locko = new object();
+
 		public static XmlDocument AccessXml 
 		{
-			get {
-				if (_accessXmlContent == null) 
-				{
-					if (_accessXmlSource == null)
-					{
-						//if we pop it here it'll make for better stack traces ;)
-						_accessXmlSource = IOHelper.MapPath(SystemFiles.AccessXml, false);
-					}
+            get
+            {
+                if (_accessXmlContent == null)
+                {
+                    lock (_locko)
+                    {
+                        if (_accessXmlContent == null)
+                        {
+                            if (_accessXmlSource == null)
+                            {
+                                //if we pop it here it'll make for better stack traces ;)
+                                _accessXmlSource = IOHelper.MapPath(SystemFiles.AccessXml, false);
+                            }
 
-					_accessXmlContent = new XmlDocument();
+                            _accessXmlContent = new XmlDocument();
 
-					if (!System.IO.File.Exists(_accessXmlSource)) 
-					{
-						System.IO.FileStream f = System.IO.File.Open(_accessXmlSource, FileMode.Create);
-						System.IO.StreamWriter sw = new StreamWriter(f);
-						sw.WriteLine("<access/>");
-						sw.Close();
-						f.Close();
-					}
-					_accessXmlContent.Load(_accessXmlSource);
-				}
-				return _accessXmlContent;
-			}
+                            if (!System.IO.File.Exists(_accessXmlSource))
+                            {
+                                System.IO.FileStream f = System.IO.File.Open(_accessXmlSource, FileMode.Create);
+                                System.IO.StreamWriter sw = new StreamWriter(f);
+                                sw.WriteLine("<access/>");
+                                sw.Close();
+                                f.Close();
+                            }
+                            _accessXmlContent.Load(_accessXmlSource);
+                        }
+                    }
+                }
+                return _accessXmlContent;
+            }
 		}
 
 		public static void AddMembershipRoleToDocument(int documentId, string role) {

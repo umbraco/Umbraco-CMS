@@ -105,11 +105,16 @@
 
 </script>
 
+  <div class="dashboardWrapper">
     <h2>Watch and learn</h2>
+    <img src="/umbraco/dashboard/images/tv.png" alt="Videos" class="dashboardIcon" />
+        <h3>Hours of Umbraco training videos are only a click away</h3>
         <p>
             Want to master Umbraco Macros and more? Spend a couple of minutes learning some best practices
             by watching one of these videos about using Umbraco. And visit <a href="http://umbraco.tv"
                 target="_blank">umbraco.tv</a> for even more Umbraco videos</p>
+                <h3>To get you started:</h3>
      <div id="latestformvids">
             Loading...
      </div>
+</div>

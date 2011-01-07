@@ -60,7 +60,9 @@
          <asp:PlaceHolder ID="ph_starterkits" runat="server"></asp:PlaceHolder>
     </cc1:Pane>
 
-
+    <cc1:Pane id="installationCompleted" Text="Installation completed" runat="server" Visible="false">
+        <p>Installation completed succesfully</p>
+    </cc1:Pane>
   </cc1:UmbracoPanel>
 
 
