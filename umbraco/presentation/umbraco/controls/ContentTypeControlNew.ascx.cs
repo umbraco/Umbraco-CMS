@@ -9,9 +9,11 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using umbraco.cms.helpers;
+using umbraco.cms.presentation.Trees;
 using umbraco.IO;
 using umbraco.presentation;
 using umbraco.cms.businesslogic;
+using umbraco.BasePages;
 
 namespace umbraco.controls
 {
@@ -101,6 +103,14 @@ namespace umbraco.controls
 
         protected void save_click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
+            // 2011 01 06 - APN - Modified method to update Xml caches if a doctype alias changed, 
+            // also added calls to update the tree if the name has changed
+            // ---
+
+            // Keep a reference of the original doctype alias and name
+            var originalDocTypeAlias = cType.Alias;
+            var originalDocTypeName = cType.Text;
+
             cType.Text = txtName.Text;
             cType.Alias = txtAlias.Text;
             cType.IconUrl = ddlIcons.SelectedValue;
@@ -117,12 +127,42 @@ namespace umbraco.controls
 
             // reload content type (due to caching)
             cType = new ContentType(cType.Id);
+
+            // Check if the doctype alias has changed as a result of either the user input or
+            // the alias checking performed upon saving
+            var docTypeAliasChanged = (string.Compare(originalDocTypeAlias, cType.Alias, true) != 0);
+            var docTypeNameChanged = (string.Compare(originalDocTypeName, cType.Text, true) != 0);
+
+            // Only if the doctype alias changed, cause a regeneration of the xml cache file since
+            // the xml element names will need to be updated to reflect the new alias
+            if (docTypeAliasChanged)
+                RegenerateXmlCaches();
+
             bindDataGenericProperties(true);
 
             // we need to re-bind the alias as the SafeAlias method can have changed it
             txtAlias.Text = cType.Alias;
 
             RaiseBubbleEvent(new object(), ea);
+
+            if (docTypeNameChanged)
+                UpdateTreeNode();
+        }
+
+        /// <summary>
+        /// Regenerates the XML caches. Used after a document type alias has been changed.
+        /// </summary>
+        private void RegenerateXmlCaches()
+        {
+            umbraco.cms.businesslogic.web.Document.RePublishAll();
+            library.RefreshContent();
+        }
+
+        private void UpdateTreeNode()
+        {
+            var clientTools = new ClientTools(this.Page);
+            clientTools
+                .SyncTree(cType.Path, true);
         }
 
         #region "Info" Pane

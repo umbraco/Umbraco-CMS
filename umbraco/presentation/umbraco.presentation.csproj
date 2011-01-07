@@ -27,10 +27,14 @@
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
     <OldToolsVersion>3.5</OldToolsVersion>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
@@ -1645,6 +1649,7 @@
     </Compile>
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
+    <Content Include="web.config.INDIGO64SSD.xslt" />
     <Content Include="umbraco_client\Installer\css\all.css" />
     <Content Include="umbraco_client\Installer\css\form.css" />
     <Content Include="umbraco_client\Installer\css\jquery-ui-1.8.6.custom.css" />

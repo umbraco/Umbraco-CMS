@@ -414,7 +414,7 @@
     <key alias="fileSavedHeader">File saved</key>
     <key alias="fileSavedText">File saved without any errors</key>
 
-    <key alias="contentTypeSavedHeader">Contenttype saved</key>
+    <key alias="contentTypeSavedHeader">Document Type saved</key>
     <key alias="contentTypeTabCreated">Tab created</key>
     <key alias="contentTypeTabDeleted">Tab deleted</key>
     <key alias="contentTypeTabDeletedText">Tab with id: %0% deleted</key>

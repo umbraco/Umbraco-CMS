@@ -20,3 +20,5 @@ _ReSharper*/
 [sS]ource
 [sS]andbox
 umbraco.config
+*.vs10x
+App_Data\TEMP\*
