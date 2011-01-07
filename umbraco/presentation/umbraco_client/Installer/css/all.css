@@ -174,7 +174,7 @@ figure{display: block;}
 	letter-spacing:-1px;
 	color:#f27021;
 	position:relative;
-	text-shadow: #000000 1px 1px 1px;
+    text-shadow: 0 0 3px #000000;
 }
 .tabset ul li.disable{color:#c57f73;}
 .tabset ul li em{
@@ -210,7 +210,7 @@ figure{display: block;}
 	line-height:40px;
 	font-weight:normal;
 	color:#FFF3BB;
-	text-shadow: #000000 1px 1px 1px;
+    text-shadow: 0 0 10px #000000;
 }
 .content .container{
 	overflow:hidden;
@@ -223,9 +223,8 @@ figure{display: block;}
 	line-height:24px;
 	color:#FFF3BB;
 	font-weight:normal;
-	text-shadow: #000000 1px 1px 1px;
 }
-.content p{margin:0 0 13px;text-shadow: #000000 1px 1px 1px;}
+.content p{margin:0 0 13px;}
 .content p strong{color:#fff;}
 /* text list */
 .text-list{
@@ -240,7 +239,6 @@ figure{display: block;}
 	height:1%;
 	vertical-align:top;
 	padding:0 0 4px;
-	text-shadow: #000000 1px 1px 1px;
 }
 .text-list li strong{
 	float:left;
@@ -262,7 +260,6 @@ figure{display: block;}
 	line-height:24px;
 	color:#fff;
 	font-weight:normal;
-	text-shadow: #000000 1px 1px 1px;
 }
 /* btn box */
 .btn-box{
@@ -312,7 +309,7 @@ figure{display: block;}
 	font-size:15px;
 	line-height:20px;
 	color:#FFF3BB;
-	text-shadow: #000000 1px 1px 1px;
+	font-weight: normal;
 }
 .btn-accept,
 .btn-continue,
@@ -384,6 +381,11 @@ figure{display: block;}
 	height:1%;
 	padding:0 0 8px;
 }
+.instruction-hold a
+{
+    color: #eeffcc;
+    text-decoration: underline;
+}
 .step .sel{
 	width:310px;
 	display:inline;
@@ -400,7 +402,6 @@ figure{display: block;}
 	padding:5px 3px 0 0;
 	font-weight:bold;
 	color:#fff;
-	text-shadow: #000000 1px 1px 1px;
 }
 .instruction-hold .row span{
 	float:left;
@@ -1033,7 +1034,6 @@ figure{display: block;}
 	line-height:24px;
 	font-weight:bold;
 	color:#FFF3BB;
-	text-shadow: #000000 1px 1px 1px;
 }
 .col1{
 	float:left;
@@ -1143,10 +1143,10 @@ figure{display: block;}
 	border: none !important;
 }
 
-.summary li{margin-bottom: 20px; display: block;text-shadow: #000000 1px 1px 1px;}
+.summary li{margin-bottom: 20px; display: block;}
 .summary a{color: White;display:block;font-weight:bold;}
 .summary a:hover{text-shadow: #000000 0px 0px 0px;}
 
 .error {padding:0 100px 13px 5px}
-.error p{margin:0 0 13px;text-shadow: #000000 1px 1px 1px;padding-right:100px;}
+.error p{margin:0 0 13px;padding-right:100px;}
 .error p strong {font-size:14px;display:block;}
