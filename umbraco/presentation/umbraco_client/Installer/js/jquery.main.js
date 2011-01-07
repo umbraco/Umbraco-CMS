@@ -479,6 +479,13 @@ function initSlide() {
         var slider = set.find('.gal-box');
         var swicher = set.find('.swicher');
         swicher.empty();
+
+        //numberOfSkins is a global varibale injected into the page by the loadStarterkitDesigns usercontrol
+        if (numberOfSkins < 5) {
+            btnPrev.hide();
+            btnNext.hide();
+        }
+
         slider.cycle({
             fx: 'scrollHorz',
             timeout: 5000,

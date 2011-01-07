@@ -12,10 +12,14 @@
     <AssemblyName>umbraco.Linq.Core</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
     <umbracoPresentationPath>..\..\..\..\..\umbraco\presentation\bin</umbracoPresentationPath>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
