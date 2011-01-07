@@ -10,8 +10,19 @@ using System.IO;
 
 namespace umbraco.presentation.install.steps.Skinning
 {
+    public delegate void StarterKitInstalledEventHandler();
+
     public partial class loadStarterKits : System.Web.UI.UserControl
     {
+       
+        public event StarterKitInstalledEventHandler StarterKitInstalled;
+
+        protected virtual void OnStarterKitInstalled()
+        {
+            StarterKitInstalled();
+        }
+
+
         private cms.businesslogic.packager.repositories.Repository repo;
         private string repoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
@@ -102,8 +113,15 @@ namespace umbraco.presentation.install.steps.Skinning
                 library.RefreshContent();
 
                 Helper.setProgress(100, "Starter kit has been installed", "");
-                ((skinning)Parent.Parent.Parent.Parent.Parent).showStarterKitDesigns(kitGuid);
 
+                try
+                {
+                    ((skinning)Parent.Parent.Parent.Parent.Parent).showStarterKitDesigns(kitGuid);
+                }
+                catch
+                {
+                    OnStarterKitInstalled();
+                }
             }
             else
             {

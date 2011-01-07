@@ -8,8 +8,18 @@ using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.install.steps.Skinning
 {
+    public delegate void StarterKitDesignInstalledEventHandler();
+
     public partial class loadStarterKitDesigns : System.Web.UI.UserControl
     {
+
+        public event StarterKitDesignInstalledEventHandler StarterKitDesignInstalled;
+
+        protected virtual void OnStarterKitDesignInstalled()
+        {
+            StarterKitDesignInstalled();
+        }
+
         public Guid StarterKitGuid { get; set; }
 
         private cms.businesslogic.packager.repositories.Repository repo;
@@ -121,10 +131,17 @@ namespace umbraco.presentation.install.steps.Skinning
                     }
                     catch
                     {
-                        Helper.RedirectToNextStep(Page);
+                       
                     }
 
-                    Helper.RedirectToNextStep(Page);
+                    try
+                    {
+                        Helper.RedirectToNextStep(Page);
+                    }
+                    catch
+                    {
+                        OnStarterKitDesignInstalled();
+                    }
                 }
                 else
                 {

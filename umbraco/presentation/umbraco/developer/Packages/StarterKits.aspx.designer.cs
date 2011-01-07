@@ -74,5 +74,14 @@ namespace umbraco.presentation.umbraco.developer.Packages {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.PlaceHolder ph_starterkits;
+        
+        /// <summary>
+        /// installationCompleted control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane installationCompleted;
     }
 }
