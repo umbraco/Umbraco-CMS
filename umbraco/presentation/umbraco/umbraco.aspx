@@ -131,13 +131,16 @@
     </div>
 
     <div id="logout-refresh" style="display:none;">
-        <p>Some lorem ipsum</p>
-
+        <p><%= umbraco.ui.Text("general","locked").ToUpper() %></p>
         <div id="sessionrefreshpassword">
-        Your password: <input type="text"/>
+            <label for="sessionpass"><%= umbraco.ui.Text("general","password") %></label><input name="sessionpass" type="password"/>
         </div>
 
-        <p><a href="#" onclick="javascript:umbracoSessionRenewCheckPassword();">Renew</a> or <a href="#" onclick="javascript:umbracoSessionLogout();">logout</a></p>
+        <div id="sessionrefreshbuttons">
+        <button id="renew-session" onclick="javascript:umbracoSessionRenewCheckPassword();"><%= umbraco.ui.Text("general","renew") %></button>
+        <%= umbraco.ui.Text("general","or") %> 
+        <a href="#" onclick="javascript:umbracoSessionLogout();"><%= umbraco.ui.Text("general","logout") %></a>
+        </div>
     </div>
     <script type="text/javascript">
 
@@ -226,6 +229,19 @@
                 jQuery("#logout-warning").fadeOut().removeClass('error').addClass('notice');
 
                 jQuery("#sessionrefreshpassword input").attr("style", "");
+                jQuery("#sessionrefreshpassword label").click(function () { jQuery(this).hide(); jQuery(this).next("input").focus(); });
+                jQuery("#sessionrefreshpassword input").click(function () { jQuery(this).prev("label").hide(); });
+                jQuery("#sessionrefreshpassword input").blur(function () { if (jQuery(this).val() == "") { jQuery(this).prev("label").show(); } });
+
+                jQuery("#sessionrefreshpassword input").keypress(function (e) {
+                    if (jQuery("#sessionrefreshpassword label").is(":visible")) {
+                        jQuery("#sessionrefreshpassword label").hide()
+                    }
+                    code = (e.keyCode ? e.keyCode : e.which);
+                    if (code == 13) jQuery("#renew-session").click();
+
+                });
+
                 jQuery("#logout-refresh").fullmodal();
             }
 
