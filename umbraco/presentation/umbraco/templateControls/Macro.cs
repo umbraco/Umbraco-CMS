@@ -102,26 +102,47 @@ namespace umbraco.presentation.templateControls
             if (!MacroAttributes.ContainsKey("macroalias") && !MacroAttributes.ContainsKey("macroAlias"))
                 MacroAttributes.Add("macroalias", Alias);
 
+            // set pageId to int.MinValue if no pageID was found,
+            // e.g. if the macro was rendered on a custom (non-Umbraco) page
+            int pageId = Context.Items["pageID"] == null ? int.MinValue : int.Parse(Context.Items["pageID"].ToString());
+
             if (!String.IsNullOrEmpty(Language) && Text != "")
             {
-                //TODO: FOR JUNO RC: Move this into the Macro object to ensure caching etc
                 macro m = new macro();
+
                 MacroModel model = m.ConvertToMacroModel(MacroAttributes);
                 model.ScriptCode = Text;
-                IMacroEngine engine = MacroEngineFactory.GetByExtension(Language);
+                model.ScriptLanguage = Language;
+                model.MacroType = MacroTypes.Script;
+                if (!String.IsNullOrEmpty(Attributes["Cache"]))
+                {
+                    int cacheDuration = 0;
+                    if (int.TryParse(Attributes["Cache"], out cacheDuration))
+                    {
+                        model.CacheDuration = cacheDuration;
+                    }
+                    else
+                    {
+                        System.Web.HttpContext.Current.Trace.Warn("Template",
+                                                                  "Cache attribute is in incorect format (should be an integer).");
+                    }
+                }
+                Control c = m.renderMacro(model, (Hashtable)Context.Items["pageElements"], pageId);
+                if (c != null)
+                    Controls.Add(c);
+                else
+                    System.Web.HttpContext.Current.Trace.Warn("Template", "Result of inline macro scripting is null");
+
+                /*IMacroEngine engine = MacroEngineFactory.GetByExtension(Language);
                 string result = engine.Execute(
                     model, 
                     Node.GetCurrent());
-                Controls.Add(new LiteralControl(result));
+                Controls.Add(new LiteralControl(result));*/
             }
             else
             {
                 macro tempMacro = null;
                 tempMacro = macro.ReturnFromAlias(Alias);
-
-                // set pageId to int.MinValue if no pageID was found,
-                // e.g. if the macro was rendered on a custom (non-Umbraco) page
-                int pageId = Context.Items["pageID"] == null ? int.MinValue : int.Parse(Context.Items["pageID"].ToString());
 
                 if (tempMacro != null)
                 {

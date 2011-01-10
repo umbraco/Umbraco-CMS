@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web;
+using RazorEngine;
+using RazorEngine.Templating;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 using umbraco.IO;
+using RE = RazorEngine;
 
 namespace umbraco.MacroEngines
 {
@@ -40,23 +45,44 @@ namespace umbraco.MacroEngines
             string template = !String.IsNullOrEmpty(macro.ScriptCode) ? macro.ScriptCode : loadScript(IOHelper.MapPath(SystemDirectories.Python + "/" + macro.ScriptName));
             try
             {
-                //TODO: Add caching support
-                //                if (CacheTemplate)
-                //                    result = Razor.Parse(template, new DynamicNode(currentPage), this.ID + "_razorTemplate");
-                //                else
-                //                {
-                result = Razor.Razor.Parse(template, new DynamicNode(currentPage));
+                Razor.SetTemplateBaseType(typeof(UmbracoTemplateBase<>));
+                result = Razor.Parse(template, new DynamicNode(currentPage), macro.CacheIdenitifier);
+
             }
-            //            }
+            catch (TemplateException ee)
+            {
+                string error = ee.ToString();
+                if (ee.Errors.Count > 0)
+                {
+                    error += "</p><strong>Detailed errors:</strong><br/><ul style=\"list-style-type: disc; margin: 1em 0;\">";
+                    foreach (var err in ee.Errors)
+                        error += string.Format("<li style=\"display: list-item;\">{0}</li>", err.ToString());
+                    error += "</ul><p>";
+                }
+                result = string.Format(
+                    "<div class=\"error\"><h3>Razor Macro Engine</h3><p><em>An TemplateException occured while parsing the following code:</em></p><p>{0}</p><h4 style=\"font-weight: bold; margin: 0.5em 0 0.3em 0;\">Your Razor template:</h4><code>{1}</code><h4 style=\"font-weight: bold; margin: 0.5em 0 0.3em 0;\">Cache key:</h4><p>{2}</p></div>",
+                    error,
+                    HttpContext.Current.Server.HtmlEncode(template),
+                    friendlyCacheKey(macro.CacheIdenitifier));
+            }
             catch (Exception ee)
             {
                 result = string.Format(
-                    "<div class=\"error\"><h1>Razor Macro Engine</h1><em>An error occured while rendering the following code:</em><br /><p>{0}</p><code>{1}</code></div>",
+                    "<div class=\"error\"><h3>Razor Macro Engine</h3><em>An unknown error occured while rendering the following code:</em><br /><p>{0}</p><h4 style=\"font-weight: bold; margin: 0.5em 0 0.3em 0;\">Your Razor template:</h4><code>{1}</code><h4 style=\"font-weight: bold; margin: 0.5em 0 0.3em 0;\">Cache key:</h4><p>{2}</p></div>",
                     ee.ToString(),
-                    HttpContext.Current.Server.HtmlEncode(template));
+                    HttpContext.Current.Server.HtmlEncode(template),
+                                        friendlyCacheKey(macro.CacheIdenitifier));
             }
 
             return result;
+        }
+
+        private string friendlyCacheKey(string cacheKey)
+        {
+            if (!String.IsNullOrEmpty(cacheKey))
+                return cacheKey;
+            else
+                return "<em>No caching defined</em>";
         }
 
         private string loadScript(string scriptName)
@@ -67,6 +93,29 @@ namespace umbraco.MacroEngines
             }
 
             return String.Empty;
+        }
+
+    }
+
+    public abstract class UmbracoTemplateBase<T> : TemplateBase<T>
+    {
+        private object m_model;
+
+        public override T Model
+        {
+            get
+            {
+                return (T)m_model;
+            }
+            set
+            {
+                m_model = value;
+            }
+        }
+
+        public string ToUpperCase(string name)
+        {
+            return name.ToUpper();
         }
     }
 }

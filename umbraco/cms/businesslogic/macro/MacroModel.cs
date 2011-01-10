@@ -12,16 +12,20 @@ namespace umbraco.cms.businesslogic.macro
     {
         public string Name { get; set; }
         public string Alias { get; set; }
+        public string MacroControlIdentifier { get; set; }
+        public MacroTypes MacroType { get; set; }
 
         public string TypeAssembly { get; set; }
         public string TypeName { get; set; }
         public string Xslt { get; set; }
         public string ScriptName { get; set; }
         public string ScriptCode { get; set; }
+        public string ScriptLanguage { get; set; }
 
         public int CacheDuration { get; set; }
         public bool CacheByPage { get; set; }
         public bool CacheByMember { get; set; }
+        public string CacheIdenitifier { get; set; }
 
         public List<MacroPropertyModel> Properties { get; set; }
 
@@ -43,6 +47,8 @@ namespace umbraco.cms.businesslogic.macro
             CacheByMember = cacheByMember;
 
             Properties = new List<MacroPropertyModel>();
+
+            MacroType = Macro.FindMacroType(Xslt, ScriptName, TypeName, TypeAssembly);
         }
     }
 
@@ -63,4 +69,16 @@ namespace umbraco.cms.businesslogic.macro
             Value = value;
         }
     }
+
+    public enum MacroTypes
+    {
+        XSLT = 1,
+        CustomControl = 2,
+        UserControl = 3,
+        Unknown = 4,
+        Python = 5,
+        Script = 6
+    }
+
+
 }

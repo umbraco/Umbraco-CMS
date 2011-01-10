@@ -1,5 +1,7 @@
 using System;
 using System.Data;
+using System.Security.Cryptography;
+using System.Text;
 using System.Xml;
 using System.Runtime.CompilerServices;
 
@@ -502,6 +504,49 @@ namespace umbraco.cms.businesslogic.macro
 				return null;
 			}
 		}
+
+        public static MacroTypes FindMacroType(string xslt, string scriptFile, string scriptType, string scriptAssembly)
+        {
+            if (!string.IsNullOrEmpty(xslt))
+                return MacroTypes.XSLT;
+            else
+            {
+                if (!string.IsNullOrEmpty(scriptFile))
+                    return MacroTypes.Script;
+                else
+                {
+                    if (!string.IsNullOrEmpty(scriptType) && scriptType.ToLower().IndexOf(".ascx") > -1)
+                    {
+                        return MacroTypes.UserControl;
+                    }
+                    else if (!string.IsNullOrEmpty(scriptType) && !string.IsNullOrEmpty(scriptAssembly))
+                        return MacroTypes.CustomControl;
+                }
+            }
+
+            return MacroTypes.Unknown;
+        }
+
+        public static string GenerateCacheKeyFromCode(string input)
+        {
+            if (String.IsNullOrEmpty(input))
+                throw new ArgumentNullException("input", "An MD5 hash cannot be generated when 'input' parameter is null!");
+
+            // step 1, calculate MD5 hash from input
+            MD5 md5 = System.Security.Cryptography.MD5.Create();
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+            byte[] hash = md5.ComputeHash(inputBytes);
+
+            // step 2, convert byte array to hex string
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+            return sb.ToString();
+        }
+
+
 
         //Macro events
 
