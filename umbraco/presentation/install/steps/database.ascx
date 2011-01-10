@@ -122,7 +122,7 @@
                             Alternatively, you can install Microsoft SQL Server, which will require a bit more work to get up and running.<br />
                             We have provided a step-by-step guide in the video instructions below.
 						</p>
-						<span class="btn-link"><a href="http://umbraco.org/redir/InstallerNewDatabase">Open video instructions</a></span>
+						<span class="btn-link"><a href="http://umbraco.org/getting-started">Open video instructions</a></span>
 					</div>
 				</div>
 			</fieldset>
