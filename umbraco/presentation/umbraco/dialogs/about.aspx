@@ -14,17 +14,17 @@
           umbraco v
           <asp:Literal ID="version" runat="server"></asp:Literal><br />
           <br />
-          Copyright © 2001 -
+          Copyright © 2001 - 
           <asp:Literal ID="thisYear" runat="server"></asp:Literal>
           Umbraco / Niels Hartvig<br />
           Developed by the <a href="http://our.umbraco.org/wiki/about/core-team" target="_blank">Umbraco Core
               Team</a><br />
           <br />
           
-          Umbraco is licensed under <a href="http://umbraco.org/redir/license"
+          Umbraco is licensed under <a href="http://umbraco.org/license"
             target="_blank">the open source license MIT</a><br />
           <br />
-          Visit <a href="http://umbraco.org/redir/from-about" target="_blank">umbraco.org</a>
+          Visit <a href="http://umbraco.org" target="_blank">umbraco.org</a>
           for more information.<br />
           <br />
           Dedicated to Gry, August, Villum and Oliver!<br />
