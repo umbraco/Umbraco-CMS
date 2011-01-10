@@ -92,7 +92,6 @@
             </fileset>
         </copy>
         
-        
         <!-- DLR FILES -->
         <delete>
             <fileset>
@@ -135,8 +134,10 @@
         <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\Debug\umbraco.MacroEngines.dll" tofile="${build.dir}\bin\umbraco.MacroEngines.dll" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\Debug\umbraco.MacroEngines.pdb" tofile="${build.dir}\bin\umbraco.MacroEngines.pdb" failonerror="false" overwrite="true"/>
 		
-		<copy file="${root.dir}\foreign dlls\System.Web.Razor.dll" tofile="${build.dir}\bin\System.Web.Razor.dll" failonerror="false" overwrite="true"/>
-        
+		    <copy file="${root.dir}\foreign dlls\System.Web.Razor.dll" tofile="${build.dir}\bin\System.Web.Razor.dll" failonerror="false" overwrite="true"/>
+      <copy file="${root.dir}\foreign dlls\RazorEngine.Core.dll" tofile="${build.dir}\bin\RazorEngine.Core.dll" failonerror="false" overwrite="true"/>
+      <copy file="${root.dir}\foreign dlls\RazorEngine.Templates.dll" tofile="${build.dir}\bin\RazorEngine.Templates.dll" failonerror="false" overwrite="true"/>
+      
         <!--standard /data/packages files-->
         <mkdir dir="${build.dir}\App_Data" />
         <copy file="${root.dir}\config templates\packages\installedPackages.config" tofile="${build.dir}\app_data\packages\installed\installedPackages.config" failonerror="false" overwrite="true"/>
