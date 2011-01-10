@@ -21,9 +21,8 @@
               Team</a><br />
           <br />
           
-          The umbraco framework is licensed under <a href="http://umbraco.org/redir/license"
-            target="_blank">the open source license MIT</a>, the umbraco UI is licensed under
-          <a href="http://umbraco.org/redir/license" target="_blank">the "umbraco license"</a><br />
+          Umbraco is licensed under <a href="http://umbraco.org/redir/license"
+            target="_blank">the open source license MIT</a><br />
           <br />
           Visit <a href="http://umbraco.org/redir/from-about" target="_blank">umbraco.org</a>
           for more information.<br />
