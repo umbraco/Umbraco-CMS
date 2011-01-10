@@ -160,6 +160,10 @@
       <key alias="renew">Renew</key>
       <key alias="locked">Locked</key>
   </area>
+    <area alias="lockout">
+        <key alias="lockoutWillOccur">You've been idle and logout will automatically occur in</key>
+        <key alias="renewSession">Renew now to save your work</key>
+    </area>
   <area alias="dashboard">
     <key alias="welcome">Welcome</key>
     <key alias="openinnew">has opened in a new window</key>

@@ -67,9 +67,8 @@
     <div style="position: relative;">
         <div id="logout-warning" class="notice" style="display: none; text-align: center">
             <h3 style="margin-bottom: 3px;">
-                You've been idle and logout will automatically occur in <span id="logout-warning-counter">
-                </span> <a href="#" onclick="umbracoRenewSession();">Renew now to save your work</a>.</h3>
-                <p style="margin:0 0 10px 0;">(message above is 'Work In Progress' and needs translation too)</p>
+                <%= umbraco.ui.Text("lockout", "lockoutWillOccur")%> <span id="logout-warning-counter">
+                </span> <a href="#" onclick="umbracoRenewSession();"><%= umbraco.ui.Text("lockout", "renewSession")%></a>.</h3>
         </div>
         <div class="topBar" id="topBar">
             <div style="float: left">
