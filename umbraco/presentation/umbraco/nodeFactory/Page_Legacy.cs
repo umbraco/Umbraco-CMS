@@ -545,7 +545,7 @@ namespace umbraco.presentation.nodeFactory
 
         public string Value
         {
-            get { return _value; }
+            get { return IO.IOHelper.ResolveUrlsFromTextString(_value); }
         }
 
         public Guid Version
