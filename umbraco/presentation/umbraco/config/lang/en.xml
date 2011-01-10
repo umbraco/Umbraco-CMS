@@ -156,8 +156,14 @@
     <key alias="retry" version="4.0">Retry</key>
     <key alias="next" version="4.0">Next</key>
     <key alias="previous" version="4.0">Previous</key>
-    <key alias="search" version="4.0">Search</key>
+      <key alias="search" version="4.0">Search</key>
+      <key alias="renew">Renew</key>
+      <key alias="locked">Locked</key>
   </area>
+    <area alias="lockout">
+        <key alias="lockoutWillOccur">You've been idle and logout will automatically occur in</key>
+        <key alias="renewSession">Renew now to save your work</key>
+    </area>
   <area alias="dashboard">
     <key alias="welcome">Welcome</key>
     <key alias="openinnew">has opened in a new window</key>

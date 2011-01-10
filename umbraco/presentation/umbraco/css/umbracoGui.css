@@ -394,11 +394,62 @@ h3
 
 #fullmodal-overlay
 {
-    background-color:#ddd;
+    background:#000;
 }
 #logout-refresh
 {
-    background-color: #eee;
-    border: 5px solid #ccc;
-    padding:10px;
+    background:#fff url(../images/umbracosplash.png) no-repeat 50% 0%;
+    background-color: #fff;
+    border: 5px solid #a3a3a3;
+    padding:65px 10px 10px 10px;
+    width:230px;
+    height:135px;
+}
+
+#logout-refresh p
+{
+    margin:0 0 10px 0;
+    text-align:center;
+    font-size:2em;
+    font-weight:bold;
+    color:#666;
+}
+
+#sessionrefreshpassword label
+{
+    position:absolute;
+    color:#ccc;
+    font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+    font-size:13px;
+    padding:5px;
+}
+
+
+#sessionrefreshpassword input
+{
+    width:220px;
+    padding:5px;
+    font-size:13px;
+    background:none;
+    border:1px solid #999;
+}
+
+#sessionrefreshbuttons
+{
+    margin-top:10px;
+    text-align:center;  
+    font-size: 11px;
+    font-family: Trebuchet MS, Lucida Grande, verdana, arial; 
+}
+
+#sessionrefreshbuttons a
+{
+    color:blue;
+}
+
+#sessionrefreshbuttons button
+{
+    font-size: 13px;
+    color:#333;
+    font-family: Trebuchet MS, Lucida Grande, verdana, arial; 
 }
