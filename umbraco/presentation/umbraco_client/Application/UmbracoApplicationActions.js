@@ -259,7 +259,7 @@ Umbraco.Application.Actions = function () {
                     UmbClientMgr.openModalWindow("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], true, 600, 425);
                 }
                 else if (actionNode.nodeType == "initmember") {
-                    UmbClientMgr.openModalWindow("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], true, 420, 380);
+                    UmbClientMgr.openModalWindow("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], true, 480, 380);
                 }
                 else if (actionNode.nodeType == "initpython" || actionNode.nodeType == "initdlrscripting") {
                     UmbClientMgr.openModalWindow("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], true, 420, 380);
