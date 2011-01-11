@@ -63,96 +63,105 @@ namespace umbraco.cms.presentation
             dashBoardXml.Load(IOHelper.MapPath(SystemFiles.DashboardConfig));
 
             // test for new tab interface
-            XmlNode section = dashBoardXml.DocumentElement.SelectSingleNode("./section [areas/area = '" + _section.ToLower() + "']");
-            if (section != null && validateAccess(section))
+            foreach (XmlNode section in dashBoardXml.DocumentElement.SelectNodes("//section [areas/area = '" + _section.ToLower() + "']"))
             {
-                Panel2.Visible = false;
-                dashboardTabs.Visible = true;
-
-                foreach (XmlNode entry in section.SelectNodes("./tab"))
+                if (section != null && validateAccess(section))
                 {
-                    if (validateAccess(entry))
+                    Panel2.Visible = false;
+                    dashboardTabs.Visible = true;
+
+                    foreach (XmlNode entry in section.SelectNodes("./tab"))
                     {
-                        TabPage tab = dashboardTabs.NewTabPage(entry.Attributes.GetNamedItem("caption").Value);
-                        tab.HasMenu = true;
-                        tab.Style.Add("padding", "0 10px");
-
-                        foreach (XmlNode uc in entry.SelectNodes("./control"))
+                        if (validateAccess(entry))
                         {
-                            if (validateAccess(uc))
+                            TabPage tab = dashboardTabs.NewTabPage(entry.Attributes.GetNamedItem("caption").Value);
+                            tab.HasMenu = true;
+                            tab.Style.Add("padding", "0 10px");
+
+                            foreach (XmlNode uc in entry.SelectNodes("./control"))
                             {
-                                string control = getFirstText(uc).Trim(' ', '\r', '\n');
-                                string path = IOHelper.FindFile(control);
-
-
-                                try
+                                if (validateAccess(uc))
                                 {
-                                    Control c = LoadControl(path);
+                                    string control = getFirstText(uc).Trim(' ', '\r', '\n');
+                                    string path = IOHelper.FindFile(control);
 
-                                    // set properties
-                                    Type type = c.GetType();
-                                    if (type != null)
+
+                                    try
                                     {
-                                        foreach (XmlAttribute att in uc.Attributes)
+                                        Control c = LoadControl(path);
+
+                                        // set properties
+                                        Type type = c.GetType();
+                                        if (type != null)
                                         {
-                                            string attributeName = att.Name;
-                                            string attributeValue = parseControlValues(att.Value).ToString(); // parse special type of values
-
-
-                                            PropertyInfo prop = type.GetProperty(attributeName);
-                                            if (prop == null)
+                                            foreach (XmlAttribute att in uc.Attributes)
                                             {
-                                                continue;
+                                                string attributeName = att.Name;
+                                                string attributeValue = parseControlValues(att.Value).ToString();
+                                                // parse special type of values
+
+
+                                                PropertyInfo prop = type.GetProperty(attributeName);
+                                                if (prop == null)
+                                                {
+                                                    continue;
+                                                }
+
+                                                prop.SetValue(c, Convert.ChangeType(attributeValue, prop.PropertyType),
+                                                              null);
+
                                             }
-
-                                            prop.SetValue(c, Convert.ChangeType(attributeValue, prop.PropertyType), null);
-
                                         }
-                                    }
 
-                                    //resolving files from dashboard config which probably does not map to a virtual fi
-                                    tab.Controls.Add(AddPanel(uc, c));
-                                }
-                                catch (Exception ee)
-                                {
-                                    tab.Controls.Add(new LiteralControl("<p class=\"umbracoErrorMessage\">Could not load control: '" + path + "'. <br/><span class=\"guiDialogTiny\"><strong>Error message:</strong> " + ee.ToString() + "</span></p>"));
+                                        //resolving files from dashboard config which probably does not map to a virtual fi
+                                        tab.Controls.Add(AddPanel(uc, c));
+                                    }
+                                    catch (Exception ee)
+                                    {
+                                        tab.Controls.Add(
+                                            new LiteralControl(
+                                                "<p class=\"umbracoErrorMessage\">Could not load control: '" + path +
+                                                "'. <br/><span class=\"guiDialogTiny\"><strong>Error message:</strong> " +
+                                                ee.ToString() + "</span></p>"));
+                                    }
                                 }
                             }
                         }
                     }
                 }
-
-            }
-            else
-            {
-
-
-                foreach (XmlNode entry in dashBoardXml.SelectNodes("//entry [@section='" + _section.ToLower() + "']"))
+                else
                 {
-                    PlaceHolder placeHolder = new PlaceHolder();
-                    if (entry == null || entry.FirstChild == null)
-                    {
-                        placeHolder.Controls.Add(CreateDashBoardWrapperControl(new LiteralControl("Error loading DashBoard Content")));
-                    }
-                    else
-                    {
-                        string path = IOHelper.FindFile(entry.FirstChild.Value);
 
-                        try
+
+                    foreach (
+                        XmlNode entry in dashBoardXml.SelectNodes("//entry [@section='" + _section.ToLower() + "']"))
+                    {
+                        PlaceHolder placeHolder = new PlaceHolder();
+                        if (entry == null || entry.FirstChild == null)
                         {
-                            placeHolder.Controls.Add(CreateDashBoardWrapperControl(LoadControl(path)));
+                            placeHolder.Controls.Add(
+                                CreateDashBoardWrapperControl(new LiteralControl("Error loading DashBoard Content")));
                         }
-                        catch (Exception err)
+                        else
                         {
-                            Trace.Warn("Dashboard", string.Format("error loading control '{0}'",
-                                path), err);
-                            placeHolder.Controls.Clear();
-                            placeHolder.Controls.Add(CreateDashBoardWrapperControl(new LiteralControl(string.Format(
-                                "Error loading DashBoard Content '{0}'; {1}", path,
-                                err.Message))));
+                            string path = IOHelper.FindFile(entry.FirstChild.Value);
+
+                            try
+                            {
+                                placeHolder.Controls.Add(CreateDashBoardWrapperControl(LoadControl(path)));
+                            }
+                            catch (Exception err)
+                            {
+                                Trace.Warn("Dashboard", string.Format("error loading control '{0}'",
+                                                                      path), err);
+                                placeHolder.Controls.Clear();
+                                placeHolder.Controls.Add(CreateDashBoardWrapperControl(new LiteralControl(string.Format(
+                                    "Error loading DashBoard Content '{0}'; {1}", path,
+                                    err.Message))));
+                            }
                         }
+                        dashBoardContent.Controls.Add(placeHolder);
                     }
-                    dashBoardContent.Controls.Add(placeHolder);
                 }
             }
         }
