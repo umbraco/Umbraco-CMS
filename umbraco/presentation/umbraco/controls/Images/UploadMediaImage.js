@@ -23,8 +23,27 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     var extension = imageName.substring(imageName.lastIndexOf(".") + 1, imageName.length);
                     if (imageTypes.indexOf(',' + extension.toLowerCase() + ',') > -1) {
                         bt_submit.removeAttr("disabled").css("color", "#000");
-                        if (tb_title.value == "")
-                            tb_title.value = imageName.substring(imageName.lastIndexOf("\\") + 1, imageName.length).replace("." + extension, "");
+                        if (tb_title.value == "") {
+                            var curName = imageName.substring(imageName.lastIndexOf("\\") + 1, imageName.length).replace("." + extension, "");
+                            var curNameLength = curName.length;
+                            var friendlyName = "";
+                            for (var i = 0; i < curNameLength; i++) {
+                                currentChar = curName.substring(i, i + 1);
+                                if (friendlyName.length == 0)
+                                    currentChar = currentChar.toUpperCase();
+
+                                if (i < curNameLength - 1 && friendlyName != '' && curName.substring(i - 1, i) == ' ')
+                                    currentChar = currentChar.toUpperCase();
+                                else if (currentChar != " " && i < curNameLength - 1 && friendlyName != '' 
+                                && curName.substring(i-1, i).toUpperCase() != curName.substring(i-1, i)
+                                && currentChar.toUpperCase() == currentChar)
+                                    friendlyName += " ";
+
+                                friendlyName += currentChar;
+
+                            }
+                            tb_title.value = friendlyName;
+                        }
                     }
                 }
             }

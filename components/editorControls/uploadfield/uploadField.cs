@@ -104,8 +104,9 @@ namespace umbraco.editorControls
 
                     //}
 
-                    // Find filename
-                    _text = SafeUrl(this.PostedFile.FileName);
+                    // Find filename (removed the safe url here as it removes fullpath characters (such as c:\ becomes c:) - the safe url should only be used when saving the
+                    // local filename
+                    _text = this.PostedFile.FileName;
                     string filename;
                     string _fullFilePath;
 
@@ -113,7 +114,8 @@ namespace umbraco.editorControls
 
                     if (umbraco.UmbracoSettings.UploadAllowDirectories)
                     {
-                        filename = _text.Substring(_text.LastIndexOf(IOHelper.DirSepChar) + 1, _text.Length - _text.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower();
+                        // moved the safeUrl call to here as it's the local file name to be stored
+                        filename = SafeUrl(_text.Substring(_text.LastIndexOf(IOHelper.DirSepChar) + 1, _text.Length - _text.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
                         // Create a new folder in the /media folder with the name /media/propertyid
 
 
