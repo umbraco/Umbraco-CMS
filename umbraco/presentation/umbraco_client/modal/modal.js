@@ -24,7 +24,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             }
             else {
                 var modal = Umbraco.Controls.ModalWindow();
-                modal.show(this, name, showHeader, width, height, top, leftOffset, closeTriggrs, onCloseCallback);
+                modal.show(this, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback);
             }
         });
     };
