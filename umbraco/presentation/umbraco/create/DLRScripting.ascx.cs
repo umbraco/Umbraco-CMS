@@ -23,13 +23,14 @@ namespace umbraco.presentation.create
         protected void Page_Load(object sender, System.EventArgs e)
         {
             sbmt.Text = ui.Text("create");
-            foreach(MacroEngineLanguage lang in MacroEngineFactory.GetSupportedLanguages())
+            if (!Page.IsPostBack)
             {
-                filetype.Items.Add( new ListItem( string.Format("{0} by {1}", helper.SpaceCamelCasing(lang.Extension), lang.EngineName), lang.Extension));
-            }
-            if(!Page.IsPostBack)
+                foreach (MacroEngineLanguage lang in MacroEngineFactory.GetSupportedLanguages())
+                {
+                    filetype.Items.Add(new ListItem(string.Format("{0} by {1}", helper.SpaceCamelCasing(lang.Extension), lang.EngineName), lang.Extension));
+                }
                 filetype.SelectedIndex = 0;
-
+            }
             _loadTemplates(template, filetype.SelectedValue);
         }
 
@@ -42,7 +43,7 @@ namespace umbraco.presentation.create
                     createMacroVal = 1;
 
                 string returnUrl = dialogHandler_temp.Create(UmbracoContext.Current.Request["nodeType"],
-                    createMacroVal, template.SelectedValue + "|||" +  rename.Text + "." + filetype.SelectedValue);
+                    createMacroVal, template.SelectedValue + "|||" + rename.Text + "." + filetype.SelectedValue);
 
                 BasePage.Current.ClientTools
                     .ChangeContentFrameUrl(returnUrl)
