@@ -192,7 +192,8 @@
         <p>
           Here you can add custom installer / uninstaller events to perform certain tasks during installation and uninstallation.
         <br />
-          All actions are formed as a xml node, containing data for the action to be performed. <a href="#" target="_blank">Package actions documentation</a>
+          All actions are formed as a xml node, containing data for the action to be performed. <a href="http://our.umbraco.org/wiki/reference/packaging/package-actions
+" target="_blank">Package actions documentation</a>
         </p>
         
       <asp:CustomValidator ID="actionsVal" runat="server" OnServerValidate="validateActions" ControlToValidate="tb_actions" ErrorMessage="Actions XML is malformed, either remove the text in the actions field or make sure it is correctly formed XML" />
