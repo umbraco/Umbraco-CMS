@@ -6,7 +6,7 @@
  */
 
 (function() {
-    tinymce.PluginManager.requireLangPack('umbraco');
+//    tinymce.PluginManager.requireLangPack('umbraco');
 
     tinymce.create('tinymce.plugins.UmbracoImagePlugin', {
         init: function(ed, url) {

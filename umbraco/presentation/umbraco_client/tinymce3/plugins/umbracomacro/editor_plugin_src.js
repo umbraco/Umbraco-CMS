@@ -7,7 +7,7 @@
 
 (function() {
     // Load plugin specific language pack
-    tinymce.PluginManager.requireLangPack('umbraco');
+//    tinymce.PluginManager.requireLangPack('umbraco');
 
     tinymce.create('tinymce.plugins.umbracomacro', {
         /**
