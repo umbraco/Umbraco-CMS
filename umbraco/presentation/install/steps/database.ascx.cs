@@ -61,7 +61,10 @@ namespace umbraco.presentation.install.steps
         {
             get {
                 // check if sql ce is present
-                    if (!File.Exists(IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Bin), "System.Data.SqlServerCe.dll"))))
+                    if (
+                        !File.Exists(IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Bin), "System.Data.SqlServerCe.dll"))) ||
+                        !File.Exists(IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Bin), "SQLCE4Umbraco.dll")))
+                        )
                         return false;
                     else
                         return true;
