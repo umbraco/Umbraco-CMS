@@ -19,7 +19,7 @@
 				<div class="step">
 					<div class="container">
 						<p>
-							<strong>1. Do you have a blank database already installed?</strong></p>
+							<strong>1. Do you have a blank database already installed OR do you want to use a SQL CE 4 embedded database?</strong></p>
 						<ul class="mini-tabset">
 							<li class="btn-yes"><a href="#database-step1" class="database-tab"><span>yes</span></a></li>
 							<li class="btn-no"><a href="#database-step2" class="database-tab"><span>no</span></a></li>
