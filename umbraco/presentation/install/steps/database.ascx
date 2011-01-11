@@ -139,6 +139,7 @@
             });
 	</script>
 </asp:PlaceHolder>
+
 <asp:PlaceHolder ID="installing" runat="server" Visible="false">
 	<!-- installing umbraco -->
 	<div class="tab  install-tab" id="datebase-tab">
