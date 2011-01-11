@@ -126,6 +126,10 @@ namespace umbraco.editorControls.ultimatepicker
 			            SqlHelper.CreateParameter("@value",data),
 						SqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
             SqlHelper.ExecuteNonQuery("delete from cmsDataTypePreValues where datatypenodeid = @dtdefid", SqlParams);
+            // need to unlock the parameters (for SQL CE compat)
+            SqlParams = new IParameter[] {
+										SqlHelper.CreateParameter("@value",data),
+										SqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
             SqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')", SqlParams);
 
 
