@@ -1,5 +1,7 @@
 * html body{width: expression(document.documentElement.clientWidth < 1000 ? "1000px" : "auto");}
-#header{	background:url(../images/none.gif);	filter: progid:dximagetransform.microsoft.alphaimageloader(src='../umbraco_client/installer/images/bg-header.png', sizingmethod='scale');
+#header{
+	background:url(../images/none.gif);
+	filter: progid:dximagetransform.microsoft.alphaimageloader(src='../umbraco_client/installer/images/bg-header.png', sizingmethod='scale');
 }
 .tabset .b{
 	background:url(../images/none.gif);
@@ -62,11 +64,11 @@
 }
 .validaing{
 	background:url(../images/none.gif);
-	filter: progid:dximagetransform.microsoft.alphaimageloader(src='../umbraco_client/installer/images/ico-validaing.png', sizingmethod='crop');
+	filter: progid:dximagetransform.microsoft.alphaimageloader(src='../umbraco_client/installer/images/ico-validaing.png', sizingmethod='crop') !important;
 }
 .invalidaing{
 	background:url(../images/none.gif);
-	filter: progid:dximagetransform.microsoft.alphaimageloader(src='../umbraco_client/installer/images/ico-invalidaing.png', sizingmethod='crop');
+	filter: progid:dximagetransform.microsoft.alphaimageloader(src='../umbraco_client/installer/images/ico-invalidaing.png', sizingmethod='crop') !important;
 }
 .drop-hold .t{
 	background:url(../images/none.gif);
