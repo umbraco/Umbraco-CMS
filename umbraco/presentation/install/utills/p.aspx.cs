@@ -79,8 +79,14 @@ namespace umbraco.presentation.install.utills
 
             if (m_Installer.CanConnect)
             {
-                if (m_Installer.IsLatestVersion)
+                if (m_Installer.IsLatestVersion){
+
+                  Helper.setProgress(90, "Refreshing content cache", "");
+
+                      library.RefreshContent();
+
                     Helper.setProgress( 100, "Database is up-to-date", "");
+                }
                 else
                 {
                     if (m_Installer.IsEmpty)
@@ -93,6 +99,7 @@ namespace umbraco.presentation.install.utills
 
                         m_Installer = null;
 
+                      library.RefreshContent();
                         return "installed";
                     }
                     else if (m_Installer.CurrentVersion == DatabaseVersion.None || m_Installer.CanUpgrade)
@@ -104,6 +111,7 @@ namespace umbraco.presentation.install.utills
 
                         m_Installer = null;
 
+                      library.RefreshContent();
                         return "upgraded";
                     }
                 }
