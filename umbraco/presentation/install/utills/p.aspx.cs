@@ -79,34 +79,40 @@ namespace umbraco.presentation.install.utills
 
             if (m_Installer.CanConnect)
             {
-                if (m_Installer.IsLatestVersion)
-                    Helper.setProgress( 100, "Database is up-to-date", "");
-                else
-                {
-                    if (m_Installer.IsEmpty)
-                    {
-                        Helper.setProgress( 35, "Installing tables...", "");
-                        //do install
-                        m_Installer.Install();
+              if (m_Installer.IsLatestVersion) {
 
-                        Helper.setProgress( 100, "Installation completed!", "");
+                Helper.setProgress(90, "Refreshing content cache", "");
 
-                        m_Installer = null;
+                library.RefreshContent();
 
-                        return "installed";
-                    }
-                    else if (m_Installer.CurrentVersion == DatabaseVersion.None || m_Installer.CanUpgrade)
-                    {
-                        Helper.setProgress( 35, "Updating database tables...", "");
-                        m_Installer.Install();
+                Helper.setProgress(100, "Database is up-to-date", "");
+                
+              } else {
+                if (m_Installer.IsEmpty) {
+                  Helper.setProgress(35, "Installing tables...", "");
+                  //do install
+                  m_Installer.Install();
 
-                        Helper.setProgress( 100, "Upgrade completed!", "");
+                  Helper.setProgress(100, "Installation completed!", "");
 
-                        m_Installer = null;
+                  m_Installer = null;
 
-                        return "upgraded";
-                    }
+                  return "installed";
+                } else if (m_Installer.CurrentVersion == DatabaseVersion.None || m_Installer.CanUpgrade) {
+                  Helper.setProgress(35, "Updating database tables...", "");
+                  m_Installer.Install();
+
+                  Helper.setProgress(100, "Upgrade completed!", "");
+
+                  m_Installer = null;
+
+                  library.RefreshContent();
+                  return "upgraded";
                 }
+              }
+
+                
+                
             }
 
             return "no connection;";
