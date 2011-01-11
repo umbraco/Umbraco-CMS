@@ -198,7 +198,7 @@ namespace umbraco.DataLayer.Utility.Installer
 					if (!String.IsNullOrEmpty(v.Table) && !String.IsNullOrEmpty(v.Field) && !String.IsNullOrEmpty(v.Value))
 					{
 						IRecordsReader reader = SqlHelper.ExecuteReader(string.Format("SELECT {0} FROM {1} WHERE {0}={2}", v.Field, v.Table, v.Value));
-						if (!reader.HasRecords)
+						if (!reader.Read())
 							continue;
 					}
 					else if (String.IsNullOrEmpty(v.Table))
