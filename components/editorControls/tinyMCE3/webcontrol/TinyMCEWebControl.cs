@@ -446,10 +446,12 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
 
             string pattern = @"(<\?UMBRACO_MACRO\W*[^>]*/>)";
             MatchCollection tags =
-                Regex.Matches(content, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+            Regex.Matches(content, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
             // Page for macro rendering
-//            page p = new page(nodeId, versionId);
+//          page p = new page(nodeId, versionId);
+
+
             System.Web.HttpContext.Current.Items["macrosAdded"] = 0;
             System.Web.HttpContext.Current.Items["pageID"] = nodeId.ToString();
 
