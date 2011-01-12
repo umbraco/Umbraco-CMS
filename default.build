@@ -203,6 +203,7 @@
             <delete>
                 <fileset>
                     <include name="${build.dir}/**/*.pdb" />
+					<include name="${build.dir}/bin/*.xml" />
                 </fileset>
             </delete>
         </if>
