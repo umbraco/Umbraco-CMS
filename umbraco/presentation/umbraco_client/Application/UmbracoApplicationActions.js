@@ -329,8 +329,13 @@ Umbraco.Application.Actions = function () {
 
             this._debug("actionDelete");
 
+            // tg: quick workaround for the are you sure you want to delete 'null' confirm message happening when deleting xslt files
+            currrentNodeName = UmbClientMgr.mainTree().getActionNode().nodeName;
+            if (currrentNodeName == null || currrentNodeName == "null") {
+                currrentNodeName = UmbClientMgr.mainTree().getActionNode().nodeId;
+            }
 
-            if (confirm(uiKeys['defaultdialogs_confirmdelete'] + ' "' + UmbClientMgr.mainTree().getActionNode().nodeName + '"?\n\n')) {
+            if (confirm(uiKeys['defaultdialogs_confirmdelete'] + ' "' + currrentNodeName + '"?\n\n')) {
                 //raise nodeDeleting event
                 jQuery(window.top).trigger("nodeDeleting", []);
                 var _this = this;
