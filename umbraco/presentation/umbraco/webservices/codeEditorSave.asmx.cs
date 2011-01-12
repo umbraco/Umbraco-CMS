@@ -253,12 +253,15 @@ namespace umbraco.presentation.webservices
                     try
                     {
                         // TODO: Hook the new MacroEngine
-//                        MacroScript.ExecuteFile(tempFileName, args);
+                        IMacroEngine engine = MacroEngineFactory.GetByFilename(tempFileName);
+                        string tempErrorMessage = "";
+                        string xpath = UmbracoSettings.UseLegacyXmlSchema ? "/root/node" : "/root/*";
+                        if (!engine.Validate(fileContents, Node.GetNodeByXpath(xpath), out tempErrorMessage))
+                            errorMessage = tempErrorMessage;
                     }
                     catch (Exception err)
                     {
                         errorMessage = err.ToString();
-                        errorMessage = errorMessage.Replace("\n", "<br/>\n");
                     }
                 }
 
@@ -291,7 +294,7 @@ namespace umbraco.presentation.webservices
                 File.Delete(tempFileName);
                 
 
-                return errorMessage;
+                return errorMessage.Replace("\n", "<br/>\n");
         }
 
         [WebMethod]

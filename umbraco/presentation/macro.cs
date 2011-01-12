@@ -368,16 +368,16 @@ namespace umbraco
             String macroHtml = null;
             Control macroControl = null;
 
-            model.CacheIdenitifier = getCacheGuid(model, pageElements, pageId);
+            model.CacheIdentifier = getCacheGuid(model, pageElements, pageId);
 
             if (model.CacheDuration > 0)
             {
-                macroHtml = macroCache["macroHtml_" + model.CacheIdenitifier] as String;
+                macroHtml = macroCache["macroHtml_" + model.CacheIdentifier] as String;
 
                 if (!String.IsNullOrEmpty(macroHtml))
                 {
-                    macroHtml = macroCache["macroHtml_" + model.CacheIdenitifier] as String;
-                    HttpContext.Current.Trace.Write("renderMacro", "Content loaded from cache ('" + model.CacheIdenitifier + "')...");
+                    macroHtml = macroCache["macroHtml_" + model.CacheIdentifier] as String;
+                    HttpContext.Current.Trace.Write("renderMacro", "Content loaded from cache ('" + model.CacheIdentifier + "')...");
                 }
             }
 
@@ -476,7 +476,7 @@ namespace umbraco
                                 var hw = new HtmlTextWriter(sw);
                                 macroControl.RenderControl(hw);
 
-                                macroCache.Insert("macroHtml_" + model.CacheIdenitifier,
+                                macroCache.Insert("macroHtml_" + model.CacheIdentifier,
                                                   sw.ToString(),
                                                   null,
                                                   DateTime.Now.AddSeconds(model.CacheDuration),
@@ -594,7 +594,7 @@ namespace umbraco
 
                 foreach (DictionaryEntry macroDef in macro.properties)
                 {
-                    var prop = model.Properties.Find(m => m.Key == (string)macroDef.Key);
+                    var prop = model.Properties.Find(m => m.Key == (string)macroDef.Key.ToString().ToLower());
                     string propValue = prop != null
                                            ? helper.parseAttribute(pageElements, prop.Value)
                                            : helper.parseAttribute(pageElements, "");
@@ -1054,7 +1054,7 @@ namespace umbraco
         {
             TraceInfo("umbracoMacro", "Loading IMacroEngine script");
             var ret = new LiteralControl();
-            if (macro.ScriptCode != String.Empty)
+            if (!String.IsNullOrEmpty(macro.ScriptCode))
             {
                 IMacroEngine engine = MacroEngineFactory.GetByExtension(macro.ScriptLanguage);
                 ret.Text = engine.Execute(
@@ -1143,7 +1143,7 @@ namespace umbraco
                     continue;
                 }
 
-                MacroPropertyModel propModel = model.Properties.Find(m => m.Key == propertyAlias);
+                MacroPropertyModel propModel = model.Properties.Find(m => m.Key == propertyAlias.ToLower());
                 object propValue = propModel != null
                                        ? helper.parseAttribute(pageElements, propModel.Value)
                                        : helper.parseAttribute(pageElements, "");
@@ -1237,12 +1237,12 @@ namespace umbraco
                         continue;
                     }
 
-                    MacroPropertyModel propModel = model.Properties.Find(m => m.Key == propertyAlias);
+                    MacroPropertyModel propModel = model.Properties.Find(m => m.Key == propertyAlias.ToLower());
                     object propValue = propModel != null
                                            ? helper.parseAttribute(pageElements, propModel.Value)
                                            : helper.parseAttribute(pageElements, "");
 
-                    if (propValue != null)
+                    if (propValue == null)
                         continue;
 
                     // Special case for types of webControls.unit

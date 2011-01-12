@@ -25,7 +25,7 @@ namespace umbraco.cms.businesslogic.macro
         public int CacheDuration { get; set; }
         public bool CacheByPage { get; set; }
         public bool CacheByMember { get; set; }
-        public string CacheIdenitifier { get; set; }
+        public string CacheIdentifier { get; set; }
 
         public List<MacroPropertyModel> Properties { get; set; }
 
