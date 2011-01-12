@@ -20,6 +20,8 @@
 
     <property name="build.version" value="4.6.1"/>
 
+    <property name="build.configuration" value="Release"/>
+    
     <property name="docs.dir" value="${root.dir}\docs" />
 
     <property name="win.dir" value="c:\WINDOWS" />
@@ -69,6 +71,7 @@
             <arg value="/v:n" />
             <arg value="/p:WarningLevel=0" />
             <arg value="/p:ToolsVersion=4.0" />
+            <arg value="/p:Configuration=${build.configuration}" />
         </exec>
         <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
     
@@ -77,6 +80,7 @@
             <arg value="/v:n" />
             <arg value="/p:WarningLevel=0" />
             <arg value="/p:ToolsVersion=4.0" />
+            <arg value="/p:Configuration=${build.configuration}" />
         </exec>
 	</target>
 
@@ -131,12 +135,13 @@
                 
         
         <!-- 4.6 Files -->
-        <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\Debug\umbraco.MacroEngines.dll" tofile="${build.dir}\bin\umbraco.MacroEngines.dll" failonerror="false" overwrite="true"/>
-        <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\Debug\umbraco.MacroEngines.pdb" tofile="${build.dir}\bin\umbraco.MacroEngines.pdb" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\${build.configuration}\umbraco.MacroEngines.dll" tofile="${build.dir}\bin\umbraco.MacroEngines.dll" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\${build.configuration}\umbraco.MacroEngines.pdb" tofile="${build.dir}\bin\umbraco.MacroEngines.pdb" failonerror="false" overwrite="true"/>
 		
-		    <copy file="${root.dir}\foreign dlls\System.Web.Razor.dll" tofile="${build.dir}\bin\System.Web.Razor.dll" failonerror="false" overwrite="true"/>
-      <copy file="${root.dir}\foreign dlls\RazorEngine.Core.dll" tofile="${build.dir}\bin\RazorEngine.Core.dll" failonerror="false" overwrite="true"/>
-      <copy file="${root.dir}\foreign dlls\RazorEngine.Templates.dll" tofile="${build.dir}\bin\RazorEngine.Templates.dll" failonerror="false" overwrite="true"/>
+        
+		<copy file="${root.dir}\foreign dlls\System.Web.Razor.dll" tofile="${build.dir}\bin\System.Web.Razor.dll" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\foreign dlls\RazorEngine.Core.dll" tofile="${build.dir}\bin\RazorEngine.Core.dll" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\foreign dlls\RazorEngine.Templates.dll" tofile="${build.dir}\bin\RazorEngine.Templates.dll" failonerror="false" overwrite="true"/>
       
         <!--standard /data/packages files-->
         <mkdir dir="${build.dir}\App_Data" />
@@ -144,7 +149,7 @@
         <copy file="${root.dir}\config templates\packages\createdPackages.config" tofile="${build.dir}\app_data\packages\created\createdPackages.config" failonerror="false" overwrite="true"/>
 
         <!-- Standard access.xml file-->
-        <copy file="${root.dir}\config templates\access.xml" tofile="${build.dir}\app_data\access.xml" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\access.xml" tofile="${build.dir}\app_data\access.config" failonerror="false" overwrite="true"/>
 
         <!-- Standard create UI.xml-->
         <copy file="${root.dir}\config templates\config\UI.xml" tofile="${build.dir}\umbraco\config\create\UI.xml" failonerror="false" overwrite="true"/>
@@ -156,8 +161,8 @@
         <copy file="${build.dir}\umbraco\config\lang\en.xml" tofile="${web.dir}\usercontrols\translation\langs\en.xml" failonerror="false" overwrite="true"/>
 
         <!-- LINQ2UMB dll-->
-        <copy file="${root.dir}\LinqToUmbraco\src\umbraco.Linq\Core\bin\Debug - Fixed Version\umbraco.Linq.Core.dll" tofile="${build.dir}\bin\umbraco.Linq.Core.dll" failonerror="false" overwrite="true"/>
-
+        <copy file="${root.dir}\LinqToUmbraco\src\umbraco.Linq\Core\bin\${build.configuration}\umbraco.Linq.Core.dll" tofile="${build.dir}\bin\umbraco.Linq.Core.dll" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\LinqToUmbraco\src\umbraco.Linq\Core\bin\${build.configuration}\umbraco.Linq.Core.pdb" tofile="${build.dir}\bin\umbraco.Linq.Core.pdb" failonerror="false" overwrite="true"/>
 
         <delete dir="${build.dir}\webservices" />
         <delete dir="${build.dir}\umbracoBase" />
@@ -172,7 +177,6 @@
         <delete dir="${build.dir}\xslt" />
         <delete dir="${build.dir}\usercontrols" />
     
-
         <delete>
             <fileset>
                 <include name="${build.dir}/**/*.build" />
@@ -184,9 +188,8 @@
                 <include name="${build.dir}/**/*.resx" />
                 <include name="${build.dir}/**/*.user" />
                 <include name="${build.dir}/**/*.bak" />
-
-                <include name="${build.dir}/**/*.pdb" />
-              <include name="${build.dir}/**/*.orig" />
+                
+                <include name="${build.dir}/**/*.orig" />
                     
                 <include name="${build.dir}/PrecompiledApp.config" />
                 <include name="${build.dir}/web.config.template" />
@@ -196,6 +199,14 @@
             </fileset>
         </delete>
 
+        <if test="${build.configuration=='Release'}">
+            <delete>
+                <fileset>
+                    <include name="${build.dir}/**/*.pdb" />
+					<include name="${build.dir}/bin/*.xml" />
+                </fileset>
+            </delete>
+        </if>
 
         <!-- standard folders -->
         <mkdir dir="${build.dir}\App_Code" />
