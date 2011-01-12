@@ -18,7 +18,7 @@
     <property name="build.dir" value="${root.dir}\build" />
     <property name="dlls.dir" value="${root.dir}\foreign dlls" />
 
-    <property name="build.version" value="4.6 RC 1"/>
+    <property name="build.version" value="4.6.1"/>
 
     <property name="docs.dir" value="${root.dir}\docs" />
 
