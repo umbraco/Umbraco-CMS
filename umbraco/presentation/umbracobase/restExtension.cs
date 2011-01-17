@@ -143,6 +143,7 @@ namespace umbraco.presentation.umbracobase
                                     this.assembly = t.Assembly;
                                     this.method = t.GetMethod(methodName);
                                     this.type = t;
+                                    this.returnXML = attribute.returnXml;
                                 } 
                             }
                         }
