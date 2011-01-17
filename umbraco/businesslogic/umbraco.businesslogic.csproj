@@ -158,6 +158,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Interfaces\ILog.cs" />
+    <Compile Include="IO\FileMonitor.cs" />
     <Compile Include="IO\IOHelper.cs" />
     <Compile Include="IO\SystemDirectories.cs" />
     <Compile Include="IO\SystemFiles.cs" />
