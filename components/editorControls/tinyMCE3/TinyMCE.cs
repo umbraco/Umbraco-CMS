@@ -185,7 +185,11 @@ namespace umbraco.editorControls.tinyMCE3
                     }
 
                     // language
-                    config.Add("language", User.GetCurrent().Language);
+                    string userLang = User.GetCurrent().Language.Contains("-")
+                                          ? User.GetCurrent().Language.Substring(0,
+                                                                                 User.GetCurrent().Language.IndexOf("-"))
+                                          : User.GetCurrent().Language; 
+                    config.Add("language", userLang);
 
                     config.Add("content_css", cssFiles);
                     config.Add("theme_umbraco_styles", styles);
