@@ -63,7 +63,7 @@
     <Compile Include="IMacroContext.cs" />
     <Compile Include="ParameterDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RazorEngine.cs" />
+    <Compile Include="RazorMacroEngine.cs" />
     <Compile Include="Scripting\MacroScript.cs" />
     <Compile Include="Scripting\ScriptEngine.cs" />
   </ItemGroup>

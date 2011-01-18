@@ -11,16 +11,16 @@ using umbraco.IO;
 
 namespace umbraco.MacroEngines
 {
-    public abstract class RazorEngine : IMacroEngine
-    {
+    public class RazorMacroEngine : IMacroEngine {
+
         #region IMacroEngine Members
 
-        public abstract string Name { get; }
+        public string Name { get { return "Razor Macro Engine"; } }
 
-        public abstract List<string> SupportedExtensions { get; }
+        public List<string> SupportedExtensions { get { return new List<string> {"cshtml", "vbhtml"}; } }
 
         public Dictionary<string, IMacroGuiRendering> SupportedProperties {
-            get { throw new NotImplementedException(); }
+            get { throw new NotSupportedException(); }
         }
 
         public bool Validate(string code, INode currentPage, out string errorMessage) {
@@ -36,16 +36,20 @@ namespace umbraco.MacroEngines
                 sw.Start();
 
             var fileLocation = SystemDirectories.Python + "/" + macro.ScriptName;
+
             //Returns The Compiled System.Type
             var razorType = BuildManager.GetCompiledType(fileLocation);
+
             //Instantiates The Razor Script
             var razorObj = Activator.CreateInstance(razorType);
             var razorWebPage = razorObj as WebPageBase;
             if (razorWebPage == null)
                 throw new InvalidCastException("Razor Template Must Implement System.Web.WebPages.WebPageBase");
+
             //inject http context - for request response
             var httpContext = new HttpContextWrapper(context);
             razorWebPage.Context = httpContext;
+
             //inject macro and parameters
             if (razorObj is IMacroContext)  {
                 var razorMacro = (IMacroContext)razorObj;
@@ -57,8 +61,7 @@ namespace umbraco.MacroEngines
             if (isDebugMode)
                 output.Write(string.Format(@"<div title=""Macro Tag: '{0}'"" style=""border: 1px solid #009;""><div style=""border: 1px solid #CCC;"">", macro.Alias));
             razorWebPage.ExecutePageHierarchy(new WebPageContext(httpContext, razorWebPage, null), output);
-            if (isDebugMode)
-            {
+            if (isDebugMode) {
                 sw.Stop();
                 output.Write(string.Format("<strong>Taken {0}ms<strong>", sw.ElapsedMilliseconds));
                 output.Write("</div>");

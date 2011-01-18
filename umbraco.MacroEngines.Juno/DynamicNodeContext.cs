@@ -1,9 +1,11 @@
-﻿using umbraco.cms.businesslogic.macro;
+﻿using System;
+using System.Web.WebPages;
+using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 
 namespace umbraco.MacroEngines {
 
-    public abstract class DynamicNodeContext : IMacroContext {
+    public abstract class DynamicNodeContext : WebPageBase, IMacroContext {
 
         private MacroModel _macro;
         private DynamicNode _dynamicNode;
@@ -14,6 +16,10 @@ namespace umbraco.MacroEngines {
         public DynamicNode Current { get { return _dynamicNode; } }
 
         public void SetMembers(MacroModel macro, INode node) {
+            if (macro == null)
+                throw new ArgumentNullException("macro");
+            if (node == null)
+                throw new ArgumentNullException("node");
             _macro = macro;
             _dynamicNode = new DynamicNode(node);
             _parameters = new ParameterDictionary(macro.Properties);

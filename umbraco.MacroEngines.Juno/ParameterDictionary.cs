@@ -22,8 +22,7 @@ namespace umbraco.MacroEngines {
 
         public override bool TryGetMember(GetMemberBinder binder, out object result) {
             var model = _parameters.FirstOrDefault(p => p.Key == binder.Name);
-            if (model == null)
-            {
+            if (model == null) {
                 result = string.Empty;
                 return true;
             }
