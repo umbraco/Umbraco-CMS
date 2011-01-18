@@ -42,12 +42,6 @@
     <Reference Include="Microsoft.Scripting">
       <HintPath>..\foreign dlls\DLR 4.0\Microsoft.Scripting.dll</HintPath>
     </Reference>
-    <Reference Include="RazorEngine.Core">
-      <HintPath>..\foreign dlls\RazorEngine.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="RazorEngine.Templates">
-      <HintPath>..\foreign dlls\RazorEngine.Templates.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -56,6 +50,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\foreign dlls\System.Web.Razor.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.WebPages.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
@@ -63,6 +59,9 @@
   <ItemGroup>
     <Compile Include="DLRScriptingEngine.cs" />
     <Compile Include="DynamicNode.cs" />
+    <Compile Include="DynamicNodeContext.cs" />
+    <Compile Include="IMacroContext.cs" />
+    <Compile Include="ParameterDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RazorEngine.cs" />
     <Compile Include="Scripting\MacroScript.cs" />

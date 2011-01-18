@@ -1,161 +1,83 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Web;
-using RazorEngine;
-using RazorEngine.Templating;
+using System.Web.Compilation;
+using System.Web.WebPages;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 using umbraco.IO;
-using RE = RazorEngine;
 
 namespace umbraco.MacroEngines
 {
-    public class RazorEngine : IMacroEngine
+    public abstract class RazorEngine : IMacroEngine
     {
         #region IMacroEngine Members
 
-        public string Name
-        {
-            get { return "Razor Engine"; }
-        }
+        public abstract string Name { get; }
 
-        public List<string> SupportedExtensions
-        {
-            get
-            {
-                var exts = new List<string> {"razor"};
-                return exts;
-            }
-        }
+        public abstract List<string> SupportedExtensions { get; }
 
-        public Dictionary<string, IMacroGuiRendering> SupportedProperties
-        {
+        public Dictionary<string, IMacroGuiRendering> SupportedProperties {
             get { throw new NotImplementedException(); }
         }
 
-        public bool Validate(string code, INode currentPage, out string errorMessage)
-        {
-            try
-            {
-                string parsedResult;
-                if (!GetResult(null, code, currentPage, out parsedResult)) {
-                    errorMessage = parsedResult;
-                    return false;
-                }
-
-            }
-            catch (Exception ee)
-            {
-                errorMessage = ee.ToString();
-                return false;
-            }
-
-            // clear razor compilation cache (a hack - by setting the template base type back/forward as there isn't a clear cache method)
-            Razor.SetTemplateBaseType(typeof (HtmlTemplateBase<>));
-            Razor.SetTemplateBaseType(typeof (UmbracoTemplateBase<>));
-
-
+        public bool Validate(string code, INode currentPage, out string errorMessage) {
             errorMessage = String.Empty;
             return true;
         }
 
-        public string Execute(MacroModel macro, INode currentPage)
-        {
-            string template = !String.IsNullOrEmpty(macro.ScriptCode)
-                                  ? macro.ScriptCode
-                                  : loadScript(IOHelper.MapPath(SystemDirectories.Python + "/" + macro.ScriptName));
-            string parsedResult;
-            GetResult(macro.CacheIdentifier, template, currentPage, out parsedResult);
+        public string ExecuteRazor(MacroModel macro, INode currentPage) {
+            var context = HttpContext.Current;
+            var isDebugMode = GlobalSettings.DebugMode && HttpContext.Current.Request.QueryString["umbDebug"] != null;
+            var sw = new Stopwatch();
+            if (isDebugMode)
+                sw.Start();
 
-            // if it's a file we'll monitor changes to ensure that any updates to the file clears the cache
-            if (String.IsNullOrEmpty(macro.ScriptCode)) {
-                FileMonitor.Listen(SystemDirectories.Python + "/" + macro.ScriptName, action => RazorEngine.ClearRazorCompilationCache());
+            var fileLocation = SystemDirectories.Python + "/" + macro.ScriptName;
+            //Returns The Compiled System.Type
+            var razorType = BuildManager.GetCompiledType(fileLocation);
+            //Instantiates The Razor Script
+            var razorObj = Activator.CreateInstance(razorType);
+            var razorWebPage = razorObj as WebPageBase;
+            if (razorWebPage == null)
+                throw new InvalidCastException("Razor Template Must Implement System.Web.WebPages.WebPageBase");
+            //inject http context - for request response
+            var httpContext = new HttpContextWrapper(context);
+            razorWebPage.Context = httpContext;
+            //inject macro and parameters
+            if (razorObj is IMacroContext)  {
+                var razorMacro = (IMacroContext)razorObj;
+                razorMacro.SetMembers(macro, currentPage);
             }
 
-            return parsedResult;
+            //output template
+            var output = new StringWriter();
+            if (isDebugMode)
+                output.Write(string.Format(@"<div title=""Macro Tag: '{0}'"" style=""border: 1px solid #009;""><div style=""border: 1px solid #CCC;"">", macro.Alias));
+            razorWebPage.ExecutePageHierarchy(new WebPageContext(httpContext, razorWebPage, null), output);
+            if (isDebugMode)
+            {
+                sw.Stop();
+                output.Write(string.Format("<strong>Taken {0}ms<strong>", sw.ElapsedMilliseconds));
+                output.Write("</div>");
+            }
+            return output.ToString();
         }
 
+        public string Execute(MacroModel macro, INode currentPage) {
+            try {
+                return ExecuteRazor(macro, currentPage);
+            } catch (Exception exception) {
+                HttpContext.Current.Trace.Write("Macro", string.Format("Error loading Razor Script (file: {0}) {1}", macro.Name, exception.Message));
+                var loading = string.Format("<div>Error loading Razor Script (file: {0})</br/>", macro.ScriptName);
+                if (GlobalSettings.DebugMode)
+                    loading = loading + exception.Message;
+                loading = loading + "</div>";
+                return loading;
+            }
+        }
         #endregion
-
-        /// <summary>
-        /// This clears all compiled razor scripts, thus ensures that changes made to files or scripts causes a recompilation
-        /// </summary>
-        public static void ClearRazorCompilationCache()
-        {
-            Razor.SetTemplateBaseType(typeof(HtmlTemplateBase<>));
-            Razor.SetTemplateBaseType(typeof(UmbracoTemplateBase<>));
-        }
-
-        private bool GetResult(string cacheIdentifier, string template, INode currentPage, out string result)
-        {
-            try
-            {
-                Razor.SetTemplateBaseType(typeof (UmbracoTemplateBase<>));
-                result = Razor.Parse(template, new DynamicNode(currentPage), cacheIdentifier);
-                return true;
-            }
-            catch (TemplateException ee)
-            {
-                string error = ee.ToString();
-                if (ee.Errors.Count > 0)
-                {
-                    error +=
-                        "</p><strong>Detailed errors:</strong><br/><ul style=\"list-style-type: disc; margin: 1em 0;\">";
-                    foreach (CompilerError err in ee.Errors)
-                        error += string.Format("<li style=\"display: list-item;\">{0}</li>", err);
-                    error += "</ul><p>";
-                }
-                result = string.Format(
-                    "<div class=\"error\"><h3>Razor Macro Engine</h3><p><em>An TemplateException occured while parsing the following code:</em></p><p>{0}</p><h4 style=\"font-weight: bold; margin: 0.5em 0 0.3em 0;\">Your Razor template:</h4><code>{1}</code><h4 style=\"font-weight: bold; margin: 0.5em 0 0.3em 0;\">Cache key:</h4><p>{2}</p></div>",
-                    error,
-                    HttpContext.Current.Server.HtmlEncode(template),
-                    friendlyCacheKey(cacheIdentifier));
-            }
-            catch (Exception ee)
-            {
-                result = string.Format(
-                    "<div class=\"error\"><h3>Razor Macro Engine</h3><em>An unknown error occured while rendering the following code:</em><br /><p>{0}</p><h4 style=\"font-weight: bold; margin: 0.5em 0 0.3em 0;\">Your Razor template:</h4><code>{1}</code><h4 style=\"font-weight: bold; margin: 0.5em 0 0.3em 0;\">Cache key:</h4><p>{2}</p></div>",
-                    ee,
-                    HttpContext.Current.Server.HtmlEncode(template),
-                    friendlyCacheKey(cacheIdentifier));
-            }
-            return false;
-        }
-
-        private string friendlyCacheKey(string cacheKey)
-        {
-            if (!String.IsNullOrEmpty(cacheKey))
-                return cacheKey;
-
-            return "<em>No caching defined</em>";
-        }
-
-        private string loadScript(string scriptName)
-        {
-            if (File.Exists(scriptName))
-            {
-                return File.ReadAllText(scriptName);
-            }
-
-            return String.Empty;
-        }
-    }
-
-    public abstract class UmbracoTemplateBase<T> : TemplateBase<T>
-    {
-        private object m_model;
-
-        public override T Model
-        {
-            get { return (T) m_model; }
-            set { m_model = value; }
-        }
-
-        public string ToUpperCase(string name)
-        {
-            return name.ToUpper();
-        }
     }
 }
