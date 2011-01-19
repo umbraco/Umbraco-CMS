@@ -40,7 +40,7 @@ namespace umbraco.MacroEngines
             try
             {
                 string parsedResult;
-                if (!GetResult("RazorValidation", code, currentPage, out parsedResult)) {
+                if (!GetResult(null, code, currentPage, out parsedResult)) {
                     errorMessage = parsedResult;
                     return false;
                 }
@@ -68,10 +68,25 @@ namespace umbraco.MacroEngines
                                   : loadScript(IOHelper.MapPath(SystemDirectories.Python + "/" + macro.ScriptName));
             string parsedResult;
             GetResult(macro.CacheIdentifier, template, currentPage, out parsedResult);
+
+            // if it's a file we'll monitor changes to ensure that any updates to the file clears the cache
+            if (String.IsNullOrEmpty(macro.ScriptCode)) {
+                FileMonitor.Listen(SystemDirectories.Python + "/" + macro.ScriptName, action => RazorEngine.ClearRazorCompilationCache());
+            }
+
             return parsedResult;
         }
 
         #endregion
+
+        /// <summary>
+        /// This clears all compiled razor scripts, thus ensures that changes made to files or scripts causes a recompilation
+        /// </summary>
+        public static void ClearRazorCompilationCache()
+        {
+            Razor.SetTemplateBaseType(typeof(HtmlTemplateBase<>));
+            Razor.SetTemplateBaseType(typeof(UmbracoTemplateBase<>));
+        }
 
         private bool GetResult(string cacheIdentifier, string template, INode currentPage, out string result)
         {
