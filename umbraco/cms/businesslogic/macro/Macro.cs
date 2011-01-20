@@ -474,17 +474,11 @@ namespace umbraco.cms.businesslogic.macro
 		/// <returns>A list of all macroes</returns>
 		public static Macro[] GetAll() 
 		{
-			int total = SqlHelper.ExecuteScalar<int>("select count(*) from cmsMacro");
-			int count = 0;
+			// zb-00001 #29927 : refactor
 			IRecordsReader dr = SqlHelper.ExecuteReader("select id from cmsMacro order by macroName");
-			Macro[] retval = new Macro[total];
-			while (dr.Read()) 
-			{
-				retval[count] =  new Macro(dr.GetInt("id"));
-				count++;
-			}
-			dr.Close();
-			return retval;
+			var list = new System.Collections.Generic.List<Macro>();
+			while (dr.Read()) list.Add(new Macro(dr.GetInt("id")));
+			return list.ToArray();
 		}
 
 		/// <summary>
