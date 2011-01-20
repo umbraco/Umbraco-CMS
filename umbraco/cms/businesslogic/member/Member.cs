@@ -32,9 +32,8 @@ namespace umbraco.cms.businesslogic.member
         public static readonly Guid _objectType = new Guid("39eb0f98-b348-42a1-8662-e7eb18487560");
 
         private static readonly object m_Locker = new object();
-        private static readonly string UmbracoMemberIdCookieKey = "umbracoMemberId";
-        private static readonly string UmbracoMemberGuidCookieKey = "umbracoMemberGuid";
-        private static readonly string UmbracoMemberLoginCookieKey = "umbracoMemberLogin";
+		// zb-00035 #29931 : cleanup member state management
+        private static readonly string UmbracoMemberCookieKey = "umbracoMember";
 
         private const string m_SQLOptimizedMany = @"	
 			select 
@@ -738,6 +737,81 @@ namespace umbraco.cms.businesslogic.member
             return string.Format("MemberCacheItem_{0}", id);
         }
 
+		// zb-00035 #29931 : helper class to handle member state
+		class MemberState
+		{
+			public int MemberId { get; set; }
+			public Guid MemberGuid { get; set; }
+			public string MemberLogin { get; set; }
+
+			public MemberState(int memberId, Guid memberGuid, string memberLogin)
+			{
+				MemberId = memberId;
+				MemberGuid = memberGuid;
+				MemberLogin = memberLogin;
+			}
+		}
+
+		// zb-00035 #29931 : helper methods to handle member state
+		
+		static void SetMemberState(Member member)
+		{
+			SetMemberState(member.Id, member.UniqueId, member.LoginName);
+		}
+	
+		static void SetMemberState(int memberId, Guid memberGuid, string memberLogin)
+		{
+			string value = string.Format("{0}+{1}+{2}", memberId, memberGuid, memberLogin);
+			StateHelper.SetCookieValue(UmbracoMemberCookieKey, value);
+		}
+
+		static void SetMemberState(Member member, bool useSession, double cookieDays)
+		{
+			SetMemberState(member.Id, member.UniqueId, member.LoginName, useSession, cookieDays);
+		}
+
+		static void SetMemberState(int memberId, Guid memberGuid, string memberLogin, bool useSession, double cookieDays)
+		{
+			string value = string.Format("{0}+{1}+{2}", memberId, memberGuid, memberLogin);
+
+			if (useSession)
+				HttpContext.Current.Session[UmbracoMemberCookieKey] = value;
+			else
+				StateHelper.SetCookieValue(UmbracoMemberCookieKey, value, cookieDays);
+		}
+
+		static void ClearMemberState()
+		{
+			StateHelper.ClearCookie(UmbracoMemberCookieKey);
+		}
+
+		static MemberState GetMemberState()
+		{
+			string value = StateHelper.GetCookieValue(UmbracoMemberCookieKey);
+			if (value == null)
+				return null;
+			string[] parts = value.Split(new char[] { '+' });
+			if (parts.Length != 3)
+				return null;
+
+			int memberId;
+			if (!Int32.TryParse(parts[0], out memberId))
+				return null;
+			Guid memberGuid;
+			try
+			{
+				// Guid.TryParse is in .NET 4 only
+				// using try...catch for .NET 3.5 compatibility
+				memberGuid = new Guid(parts[1]);
+			}
+			catch
+			{
+				return null;
+			}
+
+			MemberState ms = new MemberState(memberId, memberGuid, parts[2]);
+			return ms;
+		}
 
         #endregion
 
@@ -763,14 +837,9 @@ namespace umbraco.cms.businesslogic.member
 
                 if (!e.Cancel)
                 {
-                    
-                    StateHelper.ClearCookie("umbracoMemberId");
-
                     // Add cookie with member-id, guid and loginname
-                    
-                    StateHelper.SetCookieValue("umbracoMemberId", m.Id.ToString());
-                    StateHelper.SetCookieValue("umbracoMemberGuid", m.UniqueId.ToString());
-                    StateHelper.SetCookieValue("umbracoMemberLogin", m.LoginName);
+					// zb-00035 #29931 : cleanup member state management
+					SetMemberState(m);
 
                     //cache the member
                     var cachedMember = Cache.GetCacheItem<Member>(GetCacheKey(m.Id), m_Locker,
@@ -793,65 +862,7 @@ namespace umbraco.cms.businesslogic.member
 
         }
 
-
-        #region cookieHelperMethods
-
-/*
-        private static void removeCookie(string Name)
-        {
-            HttpCookie c = HttpContext.Current.Request.Cookies[Name];
-            if (c != null)
-            {
-                c.Expires = DateTime.Now.AddDays(-1);
-                HttpContext.Current.Response.Cookies.Add(c);
-            }
-        }
-
-        private static void addCookie(string Name, object Value, int NumberOfDaysToLast)
-        {
-            HttpCookie c = new HttpCookie(Name, Value.ToString());
-            c.Value = Value.ToString();
-            c.Expires = DateTime.Now.AddDays(NumberOfDaysToLast);
-            HttpContext.Current.Response.Cookies.Add(c);
-        }
-
-        private static void addCookie(string Name, object Value, TimeSpan timeout)
-        {
-            HttpCookie c = new HttpCookie(Name, Value.ToString());
-            c.Value = Value.ToString();
-            c.Expires = DateTime.Now.Add(timeout);
-            HttpContext.Current.Response.Cookies.Add(c);
-        }
-
-        private static string getCookieValue(string Name)
-        {
-            string tempValue = "";
-
-            if (HttpContext.Current.Session[Name] != null)
-                if (HttpContext.Current.Session[Name].ToString() != "0")
-                    tempValue = HttpContext.Current.Session[Name].ToString();
-
-            if (tempValue == "")
-            {
-                if (Array.IndexOf(HttpContext.Current.Response.Cookies.AllKeys, Name) == -1)
-                {
-                    if (HttpContext.Current.Request.Cookies[Name] != null)
-                        if (HttpContext.Current.Request.Cookies[Name].Value != "")
-                        {
-                            tempValue = HttpContext.Current.Request.Cookies[Name].Value;
-                        }
-                }
-                else
-                {
-                    tempValue = HttpContext.Current.Response.Cookies[Name].Value;
-                }
-            }
-
-            return tempValue;
-        }
-*/
-        #endregion
-
+		// zb-00035 #29931 : remove old cookie code
         /// <summary>
         /// Method is used when logging a member in.
         /// 
@@ -873,22 +884,8 @@ namespace umbraco.cms.businesslogic.member
 
                 if (!e.Cancel)
                 {
-
-                    if (!UseSession)
-                    {
-                        StateHelper.ClearCookie("umbracoMemberId");
-
-                        // Add cookie with member-id
-                        StateHelper.SetCookieValue("umbracoMemberId", m.Id.ToString(), TimespanForCookie.TotalDays);
-                        StateHelper.SetCookieValue("umbracoMemberGuid", m.UniqueId.ToString(), TimespanForCookie.TotalDays);
-                        StateHelper.SetCookieValue("umbracoMemberLogin", m.LoginName, TimespanForCookie.TotalDays);
-                    }
-                    else
-                    {
-                        HttpContext.Current.Session["umbracoMemberId"] = m.Id.ToString();
-                        HttpContext.Current.Session["umbracoMemberGuid"] = m.UniqueId.ToString();
-                        HttpContext.Current.Session["umbracoMemberLogin"] = m.LoginName;
-                    }
+					// zb-00035 #29931 : cleanup member state management
+					SetMemberState(m, UseSession, TimespanForCookie.TotalDays);
 
                     //cache the member
                     var cachedMember = Cache.GetCacheItem<Member>(GetCacheKey(m.Id), m_Locker,
@@ -950,9 +947,8 @@ namespace umbraco.cms.businesslogic.member
             else
             {
                 // If the member doesn't exists as an object, we'll just make sure that cookies are cleared
-                StateHelper.ClearCookie("umbracoMemberId");
-                StateHelper.ClearCookie("umbracoMemberGuid");
-                StateHelper.ClearCookie("umbracoMemberLogin");
+				// zb-00035 #29931 : cleanup member state management
+				ClearMemberState();
             }
 
             FormsAuthentication.SignOut();
@@ -966,11 +962,8 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="NodeId">The Node id of the member to clear</param>
         public static void ClearMemberFromClient(int NodeId)
         {
-
-            StateHelper.ClearCookie("umbracoMemberId");
-            StateHelper.ClearCookie("umbracoMemberGuid");
-            StateHelper.ClearCookie("umbracoMemberLogin");
-
+			// zb-00035 #29931 : cleanup member state management
+			ClearMemberState();
             RemoveMemberFromCache(NodeId);
 
 
@@ -1066,29 +1059,25 @@ namespace umbraco.cms.businesslogic.member
         public static int CurrentMemberId()
         {
             int _currentMemberId = 0;
-            string _currentGuid = "";
 
             // For backwards compatibility between umbraco members and .net membership
             if (HttpContext.Current.User.Identity.IsAuthenticated)
             {
                 int.TryParse(Membership.GetUser().ProviderUserKey.ToString(), out _currentMemberId);
             }
-            else if (StateHelper.HasCookieValue(UmbracoMemberIdCookieKey) &&
-               StateHelper.HasCookieValue(UmbracoMemberGuidCookieKey) &&
-               StateHelper.HasCookieValue(UmbracoMemberLoginCookieKey))
-            {
-                int.TryParse(StateHelper.GetCookieValue(UmbracoMemberIdCookieKey), out _currentMemberId);
-                _currentGuid = StateHelper.GetCookieValue(UmbracoMemberGuidCookieKey);
-            }
+			else
+			{
+				// zb-00035 #29931 : cleanup member state management
+				MemberState ms = GetMemberState();
+				if (ms != null)
+					_currentMemberId = ms.MemberId;
+			}
 
             if (_currentMemberId > 0 && !memberExists(_currentMemberId))
             {
                 _currentMemberId = 0;
-
-                StateHelper.ClearCookie(UmbracoMemberGuidCookieKey);
-                StateHelper.ClearCookie(UmbracoMemberLoginCookieKey);
-                StateHelper.ClearCookie(UmbracoMemberIdCookieKey);
-
+				// zb-00035 #29931 : cleanup member state management
+				ClearMemberState();
             }
 
             return _currentMemberId;
@@ -1102,22 +1091,21 @@ namespace umbraco.cms.businesslogic.member
         {
             try
             {
-                int _currentMemberId = CurrentMemberId();
-                if (_currentMemberId != 0)
-                {
-                    // return member from cache
-                    Member m = GetMemberFromCache(_currentMemberId);
-                    if (m == null)
-                        m = new Member(_currentMemberId);
+				// zb-00035 #29931 : cleanup member state management
+				MemberState ms = GetMemberState();
 
-                    if (HttpContext.Current.User.Identity.IsAuthenticated || (m.UniqueId == new Guid(StateHelper.GetCookieValue("umbracoMemberGuid")) &&
-                       m.LoginName == StateHelper.GetCookieValue("umbracoMemberLogin")))
-                        return m;
+				if (ms == null || ms.MemberId == 0)
+					return null;
 
-                    return null;
-                }
-                else
-                    return null;
+                // return member from cache
+				Member member = GetMemberFromCache(ms.MemberId);
+                if (member == null)
+					member = new Member(ms.MemberId);
+
+                if (HttpContext.Current.User.Identity.IsAuthenticated || (member.UniqueId == ms.MemberGuid && member.LoginName == ms.MemberLogin))
+                    return member;
+				else
+	                return null;
             }
             catch
             {
