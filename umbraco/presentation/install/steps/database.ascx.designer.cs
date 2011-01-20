@@ -31,15 +31,6 @@ namespace umbraco.presentation.install.steps {
         protected global::System.Web.UI.WebControls.DropDownList DatabaseType;
         
         /// <summary>
-        /// embeddedFilesMissing control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl embeddedFilesMissing;
-        
-        /// <summary>
         /// ph_dbError control.
         /// </summary>
         /// <remarks>
@@ -164,6 +155,15 @@ namespace umbraco.presentation.install.steps {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox DatabasePassword;
+        
+        /// <summary>
+        /// embeddedFilesMissing control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl embeddedFilesMissing;
         
         /// <summary>
         /// DatabaseConnectionString control.

@@ -46,7 +46,7 @@ namespace umbraco.presentation.install.steps
         /// </summary>
         protected bool IsEmbeddedDatabase
         {
-            get { return DatabaseType.SelectedValue.ToLower().Contains("sqlce"); }
+            get { return Request["database"] == "embedded"; }
         }
 
         protected bool IsConfigured
@@ -76,7 +76,7 @@ namespace umbraco.presentation.install.steps
         /// </summary>
         protected bool ManualConnectionString
         {
-            get { return DatabaseType.SelectedItem.Value == "Custom"; }
+            get { return Request["database"] == "advanced"; }
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace umbraco.presentation.install.steps
                 toggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
                 toggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
             
-                toggleVisible(DatabaseConnectionString, ManualConnectionString);
+                //toggleVisible(DatabaseConnectionString, ManualConnectionString);
 
             // Make sure ASP.Net displays the password text
             DatabasePassword.Attributes["value"] = DatabasePassword.Text;
@@ -248,13 +248,19 @@ namespace umbraco.presentation.install.steps
                 connectionStringBuilder["user id"] = DatabaseUsername.Text;
                 connectionStringBuilder["password"] = DatabasePassword.Text;
             }
-            else if (DatabaseType.SelectedValue == ("SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco"))
+            else if (Request["database"] == "embedded")
             {
                 connectionStringBuilder.ConnectionString = @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf";
             }
 
-            if (!String.IsNullOrEmpty(DatabaseType.SelectedValue) && !DatabaseType.SelectedValue.Contains("SqlServer") && !DatabaseType.SelectedValue.Contains("Custom"))
+            if (!String.IsNullOrEmpty(Request["database"]) && !String.IsNullOrEmpty(DatabaseType.SelectedValue) && !DatabaseType.SelectedValue.Contains("SqlServer")
+                && Request["database"] != "advanced")
+            {
                 connectionStringBuilder["datalayer"] = DatabaseType.SelectedValue;
+            }
+
+            //if (!String.IsNullOrEmpty(DatabaseType.SelectedValue) && !DatabaseType.SelectedValue.Contains("SqlServer") && !DatabaseType.SelectedValue.Contains("Custom"))
+            //    connectionStringBuilder["datalayer"] = DatabaseType.SelectedValue;
 
             return connectionStringBuilder;
         }
@@ -284,7 +290,7 @@ namespace umbraco.presentation.install.steps
             toggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
             toggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
             
-            toggleVisible(DatabaseConnectionString, ManualConnectionString);
+            //toggleVisible(DatabaseConnectionString, ManualConnectionString);
         }
 
         private void toggleVisible(HtmlGenericControl div, bool visible)
