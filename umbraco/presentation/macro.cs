@@ -487,6 +487,11 @@ namespace umbraco
                                                   TimeSpan.Zero,
                                                   CacheItemPriority.Low,
                                                   null);
+
+                                // zb-00003 #29470 : replace by text if not already text
+								// otherwise it is rendered twice
+                                if (!(macroControl is LiteralControl))
+                                    macroControl = new LiteralControl(sw.ToString());
                             }
                         }
                     }
