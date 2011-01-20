@@ -46,7 +46,7 @@ namespace umbraco.presentation.install.steps
         /// </summary>
         protected bool IsEmbeddedDatabase
         {
-            get { return Request["database"] == "embedded"; }
+            get { return Request["database"] == "embedded" || GlobalSettings.DbDSN.ToLower().Contains("SQLCE4Umbraco.SqlCEHelper".ToLower()); }
         }
 
         protected bool IsConfigured
@@ -133,7 +133,14 @@ namespace umbraco.presentation.install.steps
                 toggleVisible(DatabaseUsernameItem, !ManualConnectionString && !IsEmbeddedDatabase);
                 toggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
                 toggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
-            
+
+
+                if (IsEmbeddedDatabase)
+                    dbinit.Text = "$('#databaseOptionEmbedded').click();$('#databaseOptionEmbedded').change();";
+                else if(ManualConnectionString)
+                    dbinit.Text = "$('#databaseOptionAdvanced').click();$('#databaseOptionAdvanced').change();";
+                else if(DatabaseType.SelectedValue == "SqlServer")
+                    dbinit.Text = "$('#databaseOptionBlank').click();$('#databaseOptionBlank').change();";
                 //toggleVisible(DatabaseConnectionString, ManualConnectionString);
 
             // Make sure ASP.Net displays the password text

@@ -247,6 +247,7 @@
 
                 });
 
+                <asp:Literal id="dbinit" runat="server"></asp:Literal>
 
             });
     </script>

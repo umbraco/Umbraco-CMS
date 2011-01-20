@@ -202,6 +202,15 @@ namespace umbraco.presentation.install.steps {
         protected global::System.Web.UI.WebControls.Literal jsVars;
         
         /// <summary>
+        /// dbinit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal dbinit;
+        
+        /// <summary>
         /// installing control.
         /// </summary>
         /// <remarks>
