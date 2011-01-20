@@ -121,10 +121,12 @@ namespace umbraco.presentation
 
             if (GlobalSettings.UseDirectoryUrls)
             {
+				// zb-00017 #29930 : do not change url casing when rewriting
+				string requestPath = context.Request.Path; // not lowercased
                 int asmxPos = path.IndexOf(".asmx/");
                 if (asmxPos >= 0)
                     context.RewritePath(path.Substring(0, asmxPos + 5),
-                                        path.Substring(asmxPos + 5),
+										requestPath.Substring(asmxPos + 5),
                                         context.Request.QueryString.ToString());
             }
 
@@ -228,15 +230,20 @@ namespace umbraco.presentation
                     if (GlobalSettings.Configured)
                     {
                         // log the error
+						// zb-00017 #29930 : could have been cleared, though: take care, .GetLastError() may return null
+						Exception ex = mApp.Server.GetLastError();
+						if (ex != null)
+							ex = ex.InnerException;
+
                         string error;
                         if (mApp.Context.Request != null)
                             error = string.Format("At {0} (Referred by: {1}): {2}",
                                                   mApp.Context.Request.RawUrl,
                                                   mApp.Context.Request.UrlReferrer,
-                                                  mApp.Server.GetLastError().InnerException);
+												  ex);
                         else
                             error = "No Context available -> "
-                                    + mApp.Context.Server.GetLastError().InnerException;
+									+ ex;
 
                         // Hide error if getting the user throws an error (e.g. corrupt / blank db)
                         User staticUser = null;
