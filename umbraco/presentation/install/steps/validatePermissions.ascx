@@ -94,3 +94,8 @@ In order to run umbraco, you'll need to update your permission settings.
         </div>
     </div>
 </asp:Panel>
+
+<footer class="btn-box">
+		<div class="t">&nbsp;</div>
+        <asp:LinkButton ID="btnNext" CssClass="btn btn-accept" runat="server" OnClick="gotoNextStep"><span>Continue anyway</span></asp:LinkButton>
+	</footer>
