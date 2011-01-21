@@ -8,7 +8,6 @@
     -->
     <property name="nant.settings.currentframework" value="net-4.0" />,
 
-
     <!-- filenames and directories, generally won't change -->
 
     <property name="web.dir" value="D:\inetpub\wwwroot\v4.umbraco.org" />
@@ -18,6 +17,9 @@
     <property name="build.dir" value="${root.dir}\build" />
     <property name="dlls.dir" value="${root.dir}\foreign dlls" />
 
+    <property name="WebPiAssets.dir" value="${root.dir}\config templates\WebPi" />
+    
+    
     <property name="build.version" value="4.6.1"/>
 
     <property name="build.configuration" value="Release"/>
@@ -355,7 +357,7 @@
     </target>
 
     <target name="webPIRelease" depends="release,webPiFile">
-        <copy file="${root.dir}\webPi_sha.txt" tofile="${public.dir}\${build.version}\webPi_sha.txt" />
+        <copy file="${root.dir}\webPi_sha.txt" tofile="${public.dir}\${build.version}\Umbraco_${build.version}_WebDeploy_sha.txt" />
         <copy file="${root.dir}\Umbraco_${build.version}_WebDeploy.zip" tofile="${public.dir}\${build.version}\Umbraco_${build.version}_WebDeploy.zip" />
     </target>
 
@@ -370,15 +372,24 @@
         <mkdir dir="${webpi.dir}\umbraco" />
 
         <copy todir="${webpi.dir}\umbraco" includeemptydirs="true" >
-            <fileset basedir="${root.dir}">
-                <include name="build/*" />
-                <include name="build/**/*" />
+            <fileset basedir="${root.dir}\build">
+                <include name="*" />
+                <include name="**/*" />
             </fileset>
         </copy>
 
-        <copy file="d:\webpiAssets\installSQL.sql" tofile="${webpi.dir}\installSQL.sql" failonerror="false"/>
-        <copy file="d:\webpiAssets\manifest.xml" tofile="${webpi.dir}\manifest.xml" failonerror="false"/>
-        <copy file="d:\webpiAssets\parameters.xml" tofile="${webpi.dir}\parameters.xml" failonerror="false"/>
+        <copy todir="${webpi.dir}\umbraco\bin" includeemptydirs="true" >
+            <fileset basedir="${dlls.dir}\SQLCE4">
+                <include name="*" />
+                <include name="**/*" />
+            </fileset>
+        </copy>
+
+        <copy file="${root.dir}\components\SQLCE4Umbraco\bin\${build.configuration}\SQLCE4Umbraco.dll" tofile="${webpi.dir}\umbraco\bin\SQLCE4Umbraco.dll" failonerror="false" overwrite="true"/>
+        
+        <copy file="${WebPiAssets.dir}\installSQL.sql" tofile="${webpi.dir}\installSQL.sql" failonerror="false"/>
+        <copy file="${WebPiAssets.dir}\manifest.xml" tofile="${webpi.dir}\manifest.xml" failonerror="false"/>
+        <copy file="${WebPiAssets.dir}\parameters.xml" tofile="${webpi.dir}\parameters.xml" failonerror="false"/>
 
         <property name="webpi.filename" value="${root.dir}\Umbraco_${build.version}_WebDeploy.zip" />
         <zip zipfile="${webpi.filename}" includeemptydirs="true" >
