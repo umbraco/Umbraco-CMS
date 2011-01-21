@@ -356,7 +356,7 @@
 
     </target>
 
-    <target name="webPIRelease" depends="release,webPiFile">
+    <target name="webPIRelease" depends="webPiFile">
         <copy file="${root.dir}\webPi_sha.txt" tofile="${public.dir}\${build.version}\Umbraco_${build.version}_WebDeploy_sha.txt" />
         <copy file="${root.dir}\Umbraco_${build.version}_WebDeploy.zip" tofile="${public.dir}\${build.version}\Umbraco_${build.version}_WebDeploy.zip" />
     </target>
@@ -404,7 +404,6 @@
             <arg value="/stext &quot;${root.dir}\webPi_sha.txt&quot;" />
         </exec>
     </target>
-
 
     <target name="init" description="init tasks for the build">
 
