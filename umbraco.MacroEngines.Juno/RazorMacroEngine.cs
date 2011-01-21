@@ -75,7 +75,10 @@ namespace umbraco.MacroEngines
                 throw new ArgumentException("Null Razor Compile Type Returned From The ASP.NET Compilation Engine");
 
             //Instantiates The Razor Script
-            var razorObj = Activator.CreateInstance(razorType);
+            var factory = BuildManager.GetObjectFactory(virtualPath, false);
+            if (factory == null)
+                throw new Exception("Factory Not Found");
+            var razorObj = factory.CreateInstance();
             var razorWebPage = razorObj as WebPageBase;
             if (razorWebPage == null)
                 throw new InvalidCastException("Razor Context Must Implement System.Web.WebPages.WebPageBase, System.Web.WebPages");
