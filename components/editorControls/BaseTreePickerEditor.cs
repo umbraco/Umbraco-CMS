@@ -39,6 +39,11 @@ namespace umbraco.editorControls
         {
             StoreItemId(_data);
 
+            // zb-00024 #299260 : see the loooong comments in OnLoad
+            // setting the value here seems OK but use this.Value to ensure
+            // that the hidden control exists
+            this.Value = StoredItemId != -1 ? StoredItemId.ToString() : "";
+
             base.OnInit(e);
         }
 
@@ -53,6 +58,33 @@ namespace umbraco.editorControls
             {
                 ItemIdValue.Value = StoredItemId != -1 ? StoredItemId.ToString() : "";
             }
+
+            // zb-00024 #299260 : support postback
+            // on postback ItemIdValue.Value is restored by LoadPostData
+            // on non-postback it is initialized by the code above
+            // w/RCC when clicking on 'edit' it is not initialized
+
+            // StoredItemId is initialized in OnInit with whatever comes from the
+            // database, or from what the RCC decides we need to display--but when
+            // we changes something in the web page, it is handled by LoadPostData
+
+            // RCC 'edit':
+            // ItemIdValue.Value has no value, or a wrong value, which we should ignore
+            // StoredItemId is initialized with the right value in RCC code
+            // so we'd need to set ItemIdValue.Value from it
+
+            // but if we do it in prerender then we copy over the /old/ StoredItemIt
+            // value which was the one before we saved... because we don't refresh it
+            // when we update
+
+            // and if we refresh it here we are in trouble because we overwrite what
+            // comes from the form and we can't actually change the value anymore
+
+            // so we should change it /once/ the ItemIdValue.Value changes have been
+            // akn
+
+            // the viewed image ID is set in mediaChoose onPreRender from
+            // ItemIdValue.Value so we really want it to have a value!
         }
 
         #region IDataField Members

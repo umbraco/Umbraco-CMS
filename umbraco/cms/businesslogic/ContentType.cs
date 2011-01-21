@@ -631,11 +631,11 @@ namespace umbraco.cms.businesslogic
         public void DeleteVirtualTab(int id)
         {
             //set each property on the tab to have a tab id of zero
+			// zb-00036 #29889 : fix property types getter
             this.getVirtualTabs.ToList()
                 .Where(x => x.Id == id)
                 .Single()
-                .PropertyTypes
-                .ToList()
+                .GetAllPropertyTypes()
                 .ForEach(x =>
                 {
                     x.TabId = 0;
@@ -922,10 +922,29 @@ namespace umbraco.cms.businesslogic
             /// </summary>
             int SortOrder { get; }
 
-            /// <summary>
-            /// A list of all PropertyTypes on the Tab
-            /// </summary>
-            PropertyType[] PropertyTypes { get; }
+			// zb-00036 #29889 : removed PropertyTypes property (not making sense), replaced with methods
+
+			/// <summary>
+			/// Gets a list of all PropertyTypes on the Tab for a given ContentType.
+			/// </summary>
+			/// <remarks>This includes properties inherited from master content types.</remarks>
+			/// <param name="contentTypeId">The unique identifier of the ContentType.</param>
+			/// <returns>An array of PropertyType.</returns>
+			PropertyType[] GetPropertyTypes(int contentTypeId);
+
+			/// <summary>
+			/// Gets a list of all PropertyTypes on the Tab for a given ContentType.
+			/// </summary>
+			/// <param name="contentTypeId">The unique identifier of the ContentType.</param>
+			/// <param name="includeInheritedProperties">Indicates whether properties inherited from master content types should be included.</param>
+			/// <returns>An array of PropertyType.</returns>
+			PropertyType[] GetPropertyTypes(int contentTypeId, bool includeInheritedProperties);
+
+			/// <summary>
+			/// Gets a list if all PropertyTypes on the Tab for all ContentTypes.
+			/// </summary>
+			/// <returns>An IEnumerable of all the PropertyTypes.</returns>
+			List<PropertyType> GetAllPropertyTypes();
 
             /// <summary>
             /// The contenttype
@@ -994,33 +1013,80 @@ namespace umbraco.cms.businesslogic
                 return tab;
             }
 
-            private PropertyType[] getPropertyTypes(bool loadInheritedPropertyTypes)
-            {
-                return 
-                    Cache.GetCacheItem<PropertyType[]>(generateCacheKey(Id, ContentType), propertyTypesCacheSyncLock, TimeSpan.FromMinutes(10),
-                                                       delegate
-                                                       {
-                                                           string contentTypeModifier = loadInheritedPropertyTypes ? "" : String.Format(" and contentTypeId = {0}", ContentType);
+			// zb-00036 #29889 : Fix content tab properties.
+			public PropertyType[] GetPropertyTypes(int contentTypeId)
+			{
+				return GetPropertyTypes(contentTypeId, true);
+			}
 
-                                                           List<PropertyType> tmp = new List<PropertyType>();
+			// zb-00036 #29889 : Fix content tab properties. Replaces getPropertyTypes, which was
+			// loading all properties for the tab, causing exceptions here and there... we want
+			// the properties for the tab for a given content type, and we want them in the right order.
+			// Also this is public now because we removed the PropertyTypes property (not making sense).
+			public PropertyType[] GetPropertyTypes(int contentTypeId, bool includeInheritedProperties)
+			{
+				return Cache.GetCacheItem<PropertyType[]>(
+					generateCacheKey(Id, contentTypeId), propertyTypesCacheSyncLock, TimeSpan.FromMinutes(10),
+					delegate
+					{
+						var tmp = new List<PropertyType>();
 
-                                                           using (
-                                                               IRecordsReader dr =
-                                                                   SqlHelper.ExecuteReader(string.Format(
-                                                                                               "Select id from cmsPropertyType where tabid = {0}{1} order by sortOrder",
-                                                                                               _id, contentTypeModifier)))
-                                                           {
-                                                               while (dr.Read())
-                                                               {
-                                                                   tmp.Add(
-                                                                       PropertyType.GetPropertyType(
-                                                                           dr.GetInt("id")));
-                                                               }
-                                                           }
-                                                           return tmp.ToArray();
-                                                       });
-                
-            }
+						if (includeInheritedProperties)
+						{
+							var tmp1 = new List<PropertyType>();
+
+							using(IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
+								@"select id from cmsPropertyType where tabId = {0}
+								order by sortOrder", _id)))
+							{
+								while (dr.Read())
+									tmp1.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
+							}
+
+							var ctypes = new List<int>();
+
+							// start from contentTypeId and list all ctypes, going up
+							int c = contentTypeId;
+							while (c != 0)
+							{
+								ctypes.Add(c);
+								c = umbraco.cms.businesslogic.ContentType.GetContentType(c).MasterContentType;
+							}
+							ctypes.Reverse(); // order from the top
+
+							// then reorder
+							foreach (var ctype in ctypes)
+								tmp.AddRange(tmp1.Where(p => p.ContentTypeId == ctype));
+						}
+						else
+						{
+							using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
+								@"select id from cmsPropertyType where tabId = {0} and contentTypeId = {1}
+								order by sortOrder", _id, contentTypeId)))
+							{
+								while (dr.Read())
+									tmp.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
+							}
+						}
+
+						return tmp.ToArray();
+					});
+			}
+
+			// zb-00036 #29889 : yet we may want to be able to get *all* property types
+			public List<PropertyType> GetAllPropertyTypes()
+			{
+				var tmp = new List<PropertyType>();
+
+				using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
+					@"select id from cmsPropertyType where tabId = {0}", _id)))
+				{
+					while (dr.Read())
+						tmp.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
+				}
+
+				return tmp;
+			}
 
             /// <summary>
             /// Flushes the cache.
@@ -1181,15 +1247,8 @@ namespace umbraco.cms.businesslogic
                 get { return _id; }
             }
 
-            private PropertyType[] _propertytypes;
-
-            /// <summary>
-            /// A list of PropertyTypes on the Tab
-            /// </summary>
-            public PropertyType[] PropertyTypes
-            {
-                get { return getPropertyTypes(true); }
-            }
+			// zb-00036 #29889 : removed unused field
+			// zb-00036 #29889 : removed PropertyTypes property (not making sense)
 
             public int ContentType
             {
