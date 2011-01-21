@@ -63,6 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseContext.cs" />
     <Compile Include="CultureDictionary.cs" />
     <Compile Include="DLRScriptingEngine.cs" />
     <Compile Include="DynamicNode.cs" />
