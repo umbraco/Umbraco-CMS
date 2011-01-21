@@ -63,10 +63,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CultureDictionary.cs" />
     <Compile Include="DLRScriptingEngine.cs" />
     <Compile Include="DynamicNode.cs" />
     <Compile Include="DynamicNodeContext.cs" />
     <Compile Include="IMacroContext.cs" />
+    <Compile Include="DynamicLambdaDictionary.cs" />
     <Compile Include="ParameterDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RazorBuildProvider.cs" />

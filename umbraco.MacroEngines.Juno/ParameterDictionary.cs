@@ -1,34 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
+using System.Collections.Generic;
 using umbraco.cms.businesslogic.macro;
 
 namespace umbraco.MacroEngines {
-
-    public class ParameterDictionary : DynamicObject {
-
-        private readonly IEnumerable<MacroPropertyModel> _parameters;
-
-        public ParameterDictionary(IEnumerable<MacroPropertyModel> parameters) {
-            if (parameters == null)
-                throw new ArgumentNullException("parameters");
-            _parameters = parameters;
+    public class ParameterDictionary : DynamicLambdaDictionary<string> {
+        public ParameterDictionary(IEnumerable<MacroPropertyModel> properties) {
+            RequestLambda = new Func<string, string>(key => {
+                    var model = properties.FirstOrDefault(p => p.Key == key);
+                    if (model == null)
+                        return string.Empty;
+                    return model.Value;
+            });
         }
 
-        public override IEnumerable<string> GetDynamicMemberNames() {
-            return _parameters.Select(p => p.Key);
-        }
-
-        public override bool TryGetMember(GetMemberBinder binder, out object result) {
-            var model = _parameters.FirstOrDefault(p => p.Key == binder.Name);
-            if (model == null) {
-                result = string.Empty;
-                return true;
-            }
-            result = model.Value;
-            return true;
-        }
-
+        public ParameterDictionary(Func<string, string> request) : base(request) {}
     }
 }
