@@ -13,19 +13,13 @@ namespace umbraco.MacroEngines
 {
     public class RazorMacroEngine : IMacroEngine {
 
-        #region IMacroEngine Members
+        public const string RazorTempDirectory = "~/App_Data/TEMP/Razor/";
 
-        public string Name { get { return "Razor Macro Engine"; } }
-
-        public List<string> SupportedExtensions { get { return new List<string> {"cshtml", "vbhtml"}; } }
-
-        public Dictionary<string, IMacroGuiRendering> SupportedProperties {
-            get { throw new NotSupportedException(); }
-        }
-
-        public bool Validate(string code, INode currentPage, out string errorMessage) {
-            errorMessage = String.Empty;
-            return true;
+        public string GetVirtualPathFromPhysicalPath(string physicalPath) {
+            string rootpath = HttpContext.Current.Server.MapPath("~/");
+            physicalPath = physicalPath.Replace(rootpath, "");
+            physicalPath = physicalPath.Replace("\\", "/");
+            return "~/" + physicalPath;
         }
 
         public string GetMd5(string text) {
@@ -39,26 +33,53 @@ namespace umbraco.MacroEngines
             return s.ToString();
         }
 
-        public string CreateInlineRazorFile(string razorSyntax, string scriptLanguage) {
+        /// <summary>
+        /// Creates A Temporary Razor File
+        /// </summary>
+        public string CreateTemporaryRazorFile(string razorSyntax, string fileName, bool skipIfFileExists) {
             if (razorSyntax == null)
                 throw new ArgumentNullException("razorSyntax");
-            if (scriptLanguage == null)
-                throw new AbandonedMutexException("scriptLanguage");
-            var syntaxMd5 = GetMd5(razorSyntax);
-            var relativePath = "~/App_Data/inlinerazor-" + syntaxMd5 + "." + scriptLanguage;
-            var physicalPath = IOHelper.MapPath(relativePath);
+            if (fileName == null)
+                throw new AbandonedMutexException("fileName");
 
-            if (File.Exists(physicalPath)) {
-                var created = File.GetCreationTime(physicalPath);
-                if (created <= DateTime.Today.AddMinutes(-10))
-                    File.Delete(physicalPath);
-                else
-                    return relativePath;
-            }
-            using (var file = new StreamWriter(physicalPath)) {
+            var relativePath = RazorTempDirectory + fileName;
+            var physicalPath = IOHelper.MapPath(relativePath);
+            var physicalDirectoryPath = IOHelper.MapPath(RazorTempDirectory);
+
+            if (skipIfFileExists && File.Exists(physicalPath))
+                return relativePath;
+            if (File.Exists(physicalPath))
+                File.Delete(physicalPath);
+            if (!Directory.Exists(physicalDirectoryPath))
+                Directory.CreateDirectory(physicalDirectoryPath);
+            using (var file = new StreamWriter(physicalPath))
+            {
                 file.Write(razorSyntax);
             }
             return relativePath;
+        }
+
+        public WebPageBase CompileAndInstantiate(string virtualPath) {
+            if (virtualPath.StartsWith("~/") == false)
+                throw new Exception("Only Relative Paths Are Supported");
+
+            var physicalPath = IOHelper.MapPath(virtualPath);
+            if (File.Exists(physicalPath) == false)
+                throw new FileNotFoundException(string.Format("Razor Script File Not Found, {0}", virtualPath));
+
+            //Compile Razor - We Will Leave This To ASP.NET Compilation Engine
+            //Security in medium trust is strict around here, so we can only pass a relative file path
+            //ASP.NET Compilation Engine caches returned types
+            var razorType = BuildManager.GetCompiledType(virtualPath);
+            if (razorType == null)
+                throw new ArgumentException("Null Razor Compile Type Returned From The ASP.NET Compilation Engine");
+
+            //Instantiates The Razor Script
+            var razorObj = Activator.CreateInstance(razorType);
+            var razorWebPage = razorObj as WebPageBase;
+            if (razorWebPage == null)
+                throw new InvalidCastException("Razor Context Must Implement System.Web.WebPages.WebPageBase, System.Web.WebPages");
+            return razorWebPage;
         }
 
         public string ExecuteRazor(MacroModel macro, INode currentPage) {
@@ -66,10 +87,13 @@ namespace umbraco.MacroEngines
             var contextWrapper = new HttpContextWrapper(context);
 
             string fileLocation = null;
-            if (!string.IsNullOrEmpty(macro.ScriptName)) {
+            if (!string.IsNullOrEmpty(macro.ScriptName))
+            {
                 //Razor Is Already Contained In A File
                 fileLocation = SystemDirectories.Python + "/" + macro.ScriptName;
-            } else if (!string.IsNullOrEmpty(macro.ScriptCode) && !string.IsNullOrEmpty(macro.ScriptLanguage)) {
+            }
+            else if (!string.IsNullOrEmpty(macro.ScriptCode) && !string.IsNullOrEmpty(macro.ScriptLanguage))
+            {
                 //Inline Razor Syntax
                 fileLocation = CreateInlineRazorFile(macro.ScriptCode, macro.ScriptLanguage);
             }
@@ -77,32 +101,15 @@ namespace umbraco.MacroEngines
             if (string.IsNullOrEmpty(fileLocation))
                 return String.Empty; //No File Location
 
-            if (fileLocation.StartsWith("~/") == false)
-                throw new Exception("Only Relative Paths Are Supported");
-
-            var physicalPath = IOHelper.MapPath(fileLocation);
-            if (File.Exists(physicalPath) == false)
-                throw new FileNotFoundException(string.Format("Razor Script Not Found At Location, {0}", fileLocation));
-
-            //Compile Razor - We Will Leave This To ASP.NET Compilation Engine
-            //Security in medium trust is strict around here, so we can only pass a relative file path
-            //ASP.NET Compilation Engine caches returned types
-            var razorType = BuildManager.GetCompiledType(fileLocation);
-            if (razorType == null)
-                throw new ArgumentException("Null Razor Compile Type Returned From The ASP.NET Compilation Engine");
-            
-            //Instantiates The Razor Script
-            var razorObj = Activator.CreateInstance(razorType);
-            var razorWebPage = razorObj as WebPageBase;
-            if (razorWebPage == null)
-                throw new InvalidCastException("Razor Context Must Implement System.Web.WebPages.WebPageBase, System.Web.WebPages");
+            var razorWebPage = CompileAndInstantiate(fileLocation);
 
             //inject http context - for request response
             razorWebPage.Context = contextWrapper;
 
             //Inject Macro Model And Parameters
-            if (razorObj is IMacroContext)  {
-                var razorMacro = (IMacroContext)razorObj;
+            if (razorWebPage is IMacroContext)
+            {
+                var razorMacro = (IMacroContext)razorWebPage;
                 razorMacro.SetMembers(macro, currentPage);
             }
 
@@ -110,6 +117,48 @@ namespace umbraco.MacroEngines
             var output = new StringWriter();
             razorWebPage.ExecutePageHierarchy(new WebPageContext(contextWrapper, razorWebPage, null), output);
             return output.ToString();
+        }
+
+        /// <summary>
+        /// Creates Inline Razor File
+        /// </summary>
+        public string CreateInlineRazorFile(string razorSyntax, string scriptLanguage) {
+            if (razorSyntax == null)
+                throw new ArgumentNullException("razorSyntax");
+            if (scriptLanguage == null)
+                throw new AbandonedMutexException("scriptLanguage");
+
+            //Get Rid Of Whitespace From Start/End
+            razorSyntax = razorSyntax.Trim();
+            //Set inherits directive if not set
+            if (!razorSyntax.StartsWith("@inheirts"))
+                razorSyntax = "@inherits umbraco.MacroEngines.DynamicNodeContext" + Environment.NewLine + razorSyntax;
+            //Use MD5 as a cache key
+            var syntaxMd5 = GetMd5(razorSyntax);
+            var fileName = "inline-" + syntaxMd5 + "." + scriptLanguage;
+            return CreateTemporaryRazorFile(razorSyntax, fileName, true);
+        }
+
+        #region IMacroEngine Members
+
+        public string Name { get { return "Razor Macro Engine"; } }
+
+        public List<string> SupportedExtensions { get { return new List<string> {"cshtml", "vbhtml"}; } }
+
+        public Dictionary<string, IMacroGuiRendering> SupportedProperties {
+            get { throw new NotSupportedException(); }
+        }
+
+        public bool Validate(string code, string tempFilePath, INode currentPage, out string errorMessage) {
+            var temp = GetVirtualPathFromPhysicalPath(tempFilePath);
+            try {
+                CompileAndInstantiate(temp);
+            } catch (Exception exception) {
+                errorMessage = exception.Message;
+                return false;
+            }
+            errorMessage = String.Empty;
+            return true;
         }
 
         public string Execute(MacroModel macro, INode currentPage) {
@@ -126,5 +175,6 @@ namespace umbraco.MacroEngines
         }
 
         #endregion
+
     }
 }

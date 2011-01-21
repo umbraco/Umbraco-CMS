@@ -21,7 +21,7 @@ namespace umbraco.cms.businesslogic.macro
             get;
         }
 
-        bool Validate(string code, INode currentPage, out string errorMessage);
+        bool Validate(string code, string tempFileName, INode currentPage, out string errorMessage);
         string Execute(MacroModel macro, INode currentPage);
     }
 }

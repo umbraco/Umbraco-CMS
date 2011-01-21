@@ -9,10 +9,10 @@ namespace umbraco.MacroEngines {
 
         private MacroModel _macro;
         private DynamicNode _dynamicNode;
-        private DynamicLambdaDictionary<string> _parameters;
+        private DynamicLambdaDictionary<string> _parameter;
         private DynamicLambdaDictionary<string> _culture;
 
-        public dynamic Parameters { get { return _parameters; } }
+        public dynamic Parameter { get { return _parameter; } }
         public dynamic Dictionary { get { return _culture; } }
 
         public MacroModel Macro { get { return _macro; } }
@@ -26,7 +26,7 @@ namespace umbraco.MacroEngines {
                 throw new ArgumentNullException("node");
             _macro = macro;
             _dynamicNode = new DynamicNode(node);
-            _parameters = new ParameterDictionary(macro.Properties);
+            _parameter = new ParameterDictionary(macro.Properties);
             _culture = new CultureDictionary();
         }
 

@@ -31,9 +31,9 @@ namespace umbraco.MacroEngines
         }
 
 
-        public virtual bool Validate(string code, INode currentPage, out string errorMessage)
-        {
-            throw new NotImplementedException();
+        public virtual bool Validate(string code, string filePath, INode currentPage, out string errorMessage) {
+            errorMessage = string.Empty;
+            return true;
         }
 
         public virtual string Execute(MacroModel macro, INode currentPage)
