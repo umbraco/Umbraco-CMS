@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Web;
 using System.Web.UI;
@@ -56,6 +57,9 @@ namespace umbraco.controls
         {
         }
 
+		// zb-00036 #29889 : load it only once
+		List<ContentType.TabI> virtualTabs;
+
 		/// <summary>
 		/// Constructor to set default properties.
 		/// </summary>
@@ -81,7 +85,11 @@ namespace umbraco.controls
 			Save += new EventHandler(standardSaveAndPublishHandler);
 			prntpage = (UmbracoEnsuredPage)Page;
 
-            foreach (ContentType.TabI t in _content.ContentType.getVirtualTabs.ToList())
+			// zb-00036 #29889 : load it only once
+			if (virtualTabs == null)
+				virtualTabs = _content.ContentType.getVirtualTabs.ToList();
+
+            foreach (ContentType.TabI t in virtualTabs)
             {
                 TabPage tp = NewTabPage(t.Caption);
                 addSaveAndPublishButtons(ref tp);
@@ -101,7 +109,11 @@ namespace umbraco.controls
             int i = 0;
             var inTab = new Hashtable();
 
-            foreach (ContentType.TabI t in _content.ContentType.getVirtualTabs.ToList())
+			// zb-00036 #29889 : load it only once
+			if (virtualTabs == null)
+				virtualTabs = _content.ContentType.getVirtualTabs.ToList();
+
+            foreach (ContentType.TabI t in virtualTabs)
 			{
                 var tp = this.Panels[i] as TabPage;
                 if (tp == null)
@@ -115,7 +127,8 @@ namespace umbraco.controls
 
 
 				// Iterate through the property types and add them to the tab
-				foreach (PropertyType pt in t.PropertyTypes)
+				// zb-00036 #29889 : fix property types getter to get the right set of properties
+				foreach (PropertyType pt in t.GetPropertyTypes(_content.ContentType.Id))
 				{
 					// table.Rows.Add(addControl(_content.getProperty(editPropertyType.Alias), tp));
 					addControlNew(_content.getProperty(pt), tp, t.Caption);

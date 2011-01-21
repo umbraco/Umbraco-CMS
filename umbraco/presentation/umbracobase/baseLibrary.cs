@@ -22,51 +22,14 @@ namespace umbraco.presentation.umbracobase.library
     {
         public static Member GetCurrentMember()
         {
-            try
-            {
-                if (CurrentMemberId() != 0)
-                {
-                    // return member from cache
-                    Member m = Member.GetMemberFromCache(CurrentMemberId());
-                    if (m == null)
-                        m = new Member(CurrentMemberId());
-
-                    if (m != null)
-                        if (m.UniqueId == new Guid(getCookieValue("umbracoMemberGuid")) && m.LoginName == getCookieValue("umbracoMemberLogin"))
-                            return m;
-
-                    return null;
-                }
-                else
-                    return null;
-            }
-            catch
-            {
-                return null;
-            }
-
+			// zb-00035 #29931 : remove duplicate code?
+			return Member.GetCurrentMember();
         }
 
         public static int CurrentMemberId()
         {
-            int _currentMemberId = 0;
-
-            if (getCookieValue("umbracoMemberId") != "" && getCookieValue("umbracoMemberGuid") != "" && getCookieValue("umbracoMemberLogin") != "")
-                _currentMemberId = int.Parse(getCookieValue("umbracoMemberId"));
-
-            return _currentMemberId;
-        }
-
-        private static string getCookieValue(string Name)
-        {
-            string tempValue = "";
-            if (System.Web.HttpContext.Current.Request.Cookies[Name] != null)
-                if (System.Web.HttpContext.Current.Request.Cookies[Name].Value != "")
-                {
-                    tempValue = System.Web.HttpContext.Current.Request.Cookies[Name].Value;
-                }
-
-            return tempValue;
+			// zb-00035 #29931 : remove duplicate code?
+			return Member.CurrentMemberId();
         }
     }
 

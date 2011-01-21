@@ -368,6 +368,10 @@ namespace umbraco
             String macroHtml = null;
             Control macroControl = null;
 
+			// zb-00037 #29875 : parse attributes here (and before anything else)
+			foreach (var prop in model.Properties)
+				prop.Value = helper.parseAttribute(pageElements, prop.Value);
+
             model.CacheIdentifier = getCacheGuid(model, pageElements, pageId);
 
             if (model.CacheDuration > 0)
@@ -483,6 +487,11 @@ namespace umbraco
                                                   TimeSpan.Zero,
                                                   CacheItemPriority.Low,
                                                   null);
+
+                                // zb-00003 #29470 : replace by text if not already text
+								// otherwise it is rendered twice
+                                if (!(macroControl is LiteralControl))
+                                    macroControl = new LiteralControl(sw.ToString());
                             }
                         }
                     }
@@ -595,9 +604,8 @@ namespace umbraco
                 foreach (DictionaryEntry macroDef in macro.properties)
                 {
                     var prop = model.Properties.Find(m => m.Key == (string)macroDef.Key.ToString().ToLower());
-                    string propValue = prop != null
-                                           ? helper.parseAttribute(pageElements, prop.Value)
-                                           : helper.parseAttribute(pageElements, "");
+					// zb-00037 #29875 : values have already been parsed + no need to parse ""
+                    string propValue = prop != null ? prop.Value : "";
                     if (!String.IsNullOrEmpty(propValue))
                     {
                         if (propValue != string.Empty)
@@ -1144,9 +1152,8 @@ namespace umbraco
                 }
 
                 MacroPropertyModel propModel = model.Properties.Find(m => m.Key == propertyAlias.ToLower());
-                object propValue = propModel != null
-                                       ? helper.parseAttribute(pageElements, propModel.Value)
-                                       : helper.parseAttribute(pageElements, "");
+				// zb-00037 #29875 : values have already been parsed + no need to parse ""
+				object propValue = prop != null ? propModel.Value : "";
                 // Special case for types of webControls.unit
                 if (prop.PropertyType == typeof(Unit))
                     propValue = Unit.Parse(propValue.ToString());
@@ -1238,9 +1245,8 @@ namespace umbraco
                     }
 
                     MacroPropertyModel propModel = model.Properties.Find(m => m.Key == propertyAlias.ToLower());
-                    object propValue = propModel != null
-                                           ? helper.parseAttribute(pageElements, propModel.Value)
-                                           : helper.parseAttribute(pageElements, "");
+					// zb-00037 #29875 : values have already been parsed + no need to parse ""
+					object propValue = prop != null ? propModel.Value : "";
 
                     if (propValue == null)
                         continue;

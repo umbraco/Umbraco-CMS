@@ -143,42 +143,49 @@ function initTabs() {
     });
 }
 
-//add by pph
+//add by pph, updated by tg for db step refactor
 function toggleDatabaseOption(selectValNew) {
-    var step1 = '#database-step1';
+
+  
+
+    var step1 = '#database-options';
 
     //Defensive if else to prevent this being executed on non database pages
     if (jQuery(step1).length) {
+
+       
+
         var instructionText = jQuery(step1 + ' .instructionText');
-        var buttonBox = jQuery('.btn-box');
+        var buttonBox = jQuery('.installbtn');
+       
 
         //hide instructions
-        jQuery('#database-step2').hide();
-        instructionText.hide();
+        jQuery('#database-blank-inputs').hide();
+        //instructionText.hide();
         buttonBox.hide();
 
         //hide all db options
-        jQuery(step1 + ' .row').hide();
+        //jQuery(step1 + ' .row').hide();
 
         if (selectValNew != '') {
             if (selectValNew == 'SqlServer' || selectValNew == 'MySql') {
-                jQuery(step1 + ' .sql').show();
-                instructionText.show();
+                jQuery('#database-blank-inputs').show();
+                //instructionText.show();
                 buttonBox.show();
             }
-            else if (selectValNew == 'Custom') {
-                jQuery(step1 + ' .custom').show();
-                instructionText.show();
-                buttonBox.show();
-            }
-            else if (selectValNew.indexOf('SQLCE4Umbraco') > -1 && !hasEmbeddedDlls) {
-                jQuery(step1 + ' .embeddedError').show();
-            }
-            else if (selectValNew.indexOf('SQLCE4Umbraco') > -1) {
-                jQuery(step1 + ' .embedded').show();
-                instructionText.show();
-                buttonBox.show();
-            }
+//            else if (selectValNew == 'Custom') {
+//                jQuery(step1 + ' .custom').show();
+//                instructionText.show();
+//                buttonBox.show();
+//            }
+//            else if (selectValNew.indexOf('SQLCE4Umbraco') > -1 && !hasEmbeddedDlls) {
+//                jQuery(step1 + ' .embeddedError').show();
+//            }
+//            else if (selectValNew.indexOf('SQLCE4Umbraco') > -1) {
+//                jQuery(step1 + ' .embedded').show();
+//                instructionText.show();
+//                buttonBox.show();
+//            }
         }
     }
 }

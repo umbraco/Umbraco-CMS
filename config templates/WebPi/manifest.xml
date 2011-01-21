@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<msdeploy.iisApp>
+<iisApp path="umbraco" />
+  <!-- managedRuntimeVersion="v4.0" /> -->
+ <!-- 
+ 	this Acl can be removed after successful installation 
+ 	** begin remove **
+ -->
+  <setAcl path="umbraco"
+ 		setAclAccess="Read, Write, Modify" /> 
+ <!-- 
+ 	** end remove ** 
+ -->
+
+ <setAcl path="umbraco\app_code"
+ 		setAclAccess="ReadandExecute" />
+ <setAcl path="umbraco\app_browsers"
+ 		setAclAccess="ReadandExecute" />
+ <setAcl path="umbraco\app_data"
+ 		setAclAccess="Read, Write, Modify" />  		
+ <setAcl path="umbraco\bin"
+ 		setAclAccess="Read" />
+ <setAcl path="umbraco\config"
+ 		setAclAccess="Read, Write, Modify" />
+ <setAcl path="umbraco\css"
+ 		setAclAccess="Read, Write, Modify" />
+ <setAcl path="umbraco\data"
+ 		setAclAccess="Read, Write, Modify" /> 	 			
+ <setAcl path="umbraco\masterpages"
+ 		setAclAccess="Read, Write, Modify" />
+ <setAcl path="umbraco\media"
+ 		setAclAccess="Read, Write, Modify" />
+ <setAcl path="umbraco\python"
+ 		setAclAccess="Read, Write, Modify" /> 		
+ <setAcl path="umbraco\scripts"
+ 		setAclAccess="Read, Write, Modify" />
+ <setAcl path="umbraco\umbraco"
+ 		setAclAccess="Read" /> 		
+ <setAcl path="umbraco\usercontrols"
+ 		setAclAccess="Read" />
+ <setAcl path="umbraco\xslt"
+ 		setAclAccess="Read, Write, Modify" />
+ <setAcl path="umbraco\web.config"
+ 		setAclResourceType="File"
+ 		setAclAccess="Read, Write, Modify" />
+
+  <!-- Runs SQL script to create login and assign permissions, requires transacted="false" 
+	This script runs as the database administrator provided in parameters.xml 
+  -->
+  <dbfullsql path="installSQL.sql" transacted="false" />
+
+</msdeploy.iisApp>

@@ -364,20 +364,23 @@ jQuery(function() { refreshDropDowns(); });
                 string tabCaption = t.ContentType == cType.Id ? t.GetRawCaption() : t.GetRawCaption() + " (inherited from " + new ContentType(t.ContentType).Text + ")";
                 PropertyTypes.Controls.Add(new LiteralControl("<div class='genericPropertyListBox'><h2 class=\"propertypaneTitel\">Tab: " + tabCaption + "</h2>"));
 
-                if (t.PropertyTypes.Length > 0)
+				// zb-00036 #29889 : fix property types getter
+				var propertyTypes = t.GetPropertyTypes(cType.Id, false);
+
+				if (propertyTypes.Length > 0)
                 {
                     HtmlInputHidden propSort = new HtmlInputHidden();
                     propSort.ID = "propSort_" + t.Id.ToString() + "_Content";
                     PropertyTypes.Controls.Add(propSort);
                     _sortLists.Add(propSort);
 
-                    var pts = t.PropertyTypes.Where(pt => pt.ContentTypeId == cType.Id);
+					// zb-00036 #29889 : remove filter, not needed anymore
 
-                    if (pts.Count() > 0)
+					if (propertyTypes.Count() > 0)
                     {
                         PropertyTypes.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"t_" + t.Id.ToString() + "_Contents\">"));
 
-                        foreach (cms.businesslogic.propertytype.PropertyType pt in pts)
+						foreach (cms.businesslogic.propertytype.PropertyType pt in propertyTypes)
                         {
                             GenericProperties.GenericPropertyWrapper gpw = new umbraco.controls.GenericProperties.GenericPropertyWrapper();
 
@@ -553,7 +556,8 @@ jQuery(function() { refreshDropDowns(); });
                 dr["tabid"] = tb.Id;
                 dtT.Rows.Add(dr);
 
-                foreach (cms.businesslogic.propertytype.PropertyType pt in tb.PropertyTypes)
+				// zb-00036 #29889 : fix property types getter
+                foreach (cms.businesslogic.propertytype.PropertyType pt in tb.GetPropertyTypes(cType.Id))
                 {
                     DataRow dr1 = dtP.NewRow();
                     dr1["alias"] = pt.Alias;

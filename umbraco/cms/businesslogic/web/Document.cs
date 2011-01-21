@@ -175,6 +175,10 @@ namespace umbraco.cms.businesslogic.web
 
         // NH: Had to modify this for SQL CE 4. Only change is that the "coalesce(publishCheck.published,0) as published" didn't work in SQL CE 4
         // because there's already a column called published. I've changed it to isPublished and updated the other places
+        //
+        // zb-00010 #29443 : removed the following lines + added constraint on cmsDocument.newest in where clause (equivalent + handles duplicate dates)
+        //            inner join (select contentId, max(versionDate) as versionDate from cmsContentVersion group by contentId) temp
+        //                on cmsContentVersion.contentId = temp.contentId and cmsContentVersion.versionDate = temp.versionDate
         private const string m_SQLOptimizedMany = @"
                 select count(children.id) as children, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, 
 	                cmsDocument.documentUser, coalesce(cmsDocument.templateId, cmsDocumentType.templateNodeId) as templateId, 
@@ -187,12 +191,10 @@ namespace umbraco.cms.businesslogic.web
                     inner join cmsContent on cmsContent.nodeId = umbracoNode.id
                     inner join cmsContentType on cmsContentType.nodeId = cmsContent.contentType
                     inner join cmsContentVersion on cmsContentVersion.contentId = umbracoNode.id
-                    inner join (select contentId, max(versionDate) as versionDate from cmsContentVersion group by contentId) temp
-	                    on cmsContentVersion.contentId = temp.contentId and cmsContentVersion.versionDate = temp.versionDate
                     inner join cmsDocument on cmsDocument.versionId = cmsContentversion.versionId
                     left join cmsDocument publishCheck on publishCheck.nodeId = cmsContent.nodeID and publishCheck.published = 1
                     left join cmsDocumentType on cmsDocumentType.contentTypeNodeId = cmsContent.contentType and cmsDocumentType.IsDefault = 1
-                where umbracoNode.nodeObjectType = @nodeObjectType AND {0}
+                where umbracoNode.nodeObjectType = @nodeObjectType AND cmsDocument.newest = 1 AND {0}
                 group by 
 	                umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, cmsDocument.documentUser, 
 	                cmsDocument.templateId, cmsDocumentType.templateNodeId, umbracoNode.path, umbracoNode.sortOrder, 

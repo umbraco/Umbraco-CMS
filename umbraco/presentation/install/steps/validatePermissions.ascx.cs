@@ -184,6 +184,11 @@ namespace umbraco.presentation.install.steps
             return true;
         }
 
+        protected void gotoNextStep(object sender, EventArgs e)
+        {
+            Helper.RedirectToNextStep(this.Page);
+        }
+
         #region Web Form Designer generated code
 
         protected override void OnInit(EventArgs e)

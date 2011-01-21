@@ -1150,3 +1150,13 @@ figure{display: block;}
 .error {padding:0 100px 13px 5px}
 .error p{margin:0 0 13px;padding-right:100px;}
 .error p strong {font-size:14px;display:block;}
+
+/* db step refactor */
+.database-option, footer.installbtn
+{
+    display:none;
+}
+.custom
+{
+    display:
+}
