@@ -19,50 +19,62 @@
 				<div class="step">
 					<div class="container">
 						<p>
-							<strong>1. Do you have a blank database already installed OR do you want to use a SQL CE 4 embedded database?</strong></p>
-						<ul class="mini-tabset">
-							<li class="btn-yes"><a href="#database-step1" class="database-tab"><span>yes</span></a></li>
-							<li class="btn-no"><a href="#database-step2" class="database-tab"><span>no</span></a></li>
-						</ul>
+							<strong>1. Select which database option best fits you:</strong></p>
+
+                            <ul>
+                            <li>
+                                <input type="radio" id="databaseOptionBlank" name="database" value="blank" />
+                                <label for="databaseOptionBlank">I already have a blank SQL Server or MySQL database</label>
+
+                            </li>
+                            <li>
+                                <input type="radio" id="databaseOptionEmbedded" name="database" value="embedded" />
+                                <label for="databaseOptionEmbedded">I want to use a quick-and-simple file-based database</label>
+
+                            </li>
+                            <li>
+                                 <input type="radio" id="databaseOptionAdvanced" name="database" value="advanced" />
+                                 <label for="databaseOptionAdvanced">I'm an advanced user, let me put in the connection string</label>
+
+                            </li>
+                            <li>
+                                 <input type="radio" id="databaseOptionHelp" name="database" value="help" />
+                                 <label for="databaseOptionHelp">I need help</label>
+
+                            </li>
+                            </ul>
+						
 					</div>
 				</div>
-				<!-- step1 -->
-				<div id="database-step1">
-					<div class="step">
-						<div class="container">
-							<p>
-								<strong>2. Now choose your database type below.</strong></p>
-							<div class="select">
-								<asp:DropDownList runat="server" ID="DatabaseType" CssClass="sel">
-									<asp:ListItem Value="" Text="Please choose" Selected="True" />
-									<asp:ListItem Value="SqlServer" Text="Microsoft SQL Server" />
-									<asp:ListItem Value="MySql" Text="MySQL" />
-									<asp:ListItem Value="Custom" Text="Custom connection" />
-									<asp:ListItem Value="SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco" Text="SQL CE 4 (beta)" />
-								</asp:DropDownList>
-							</div>
-						</div>
-					</div>
-					<div class="step">
+				<!-- database options -->
+                <div id="database-options">
+
+
+                    <!-- blank option -->
+                    <div id="database-blank" class="database-option">
+                        
+                        <div class="step">
+						    <div class="container">
+							    <p>
+								    <strong>2. Now choose your database type below.</strong></p>
+							    <div class="select">
+								    <asp:DropDownList runat="server" ID="DatabaseType" CssClass="sel">
+									    <asp:ListItem Value="" Text="Please choose" Selected="True" />
+									    <asp:ListItem Value="SqlServer" Text="Microsoft SQL Server" />
+									    <asp:ListItem Value="MySql" Text="MySQL" />
+									  
+								    </asp:DropDownList>
+							    </div>
+						    </div>
+					    </div>
+                    
+
+                    <div class="step" id="database-blank-inputs">
 						<div class="container">
 							<p class="instructionText">
 								<strong>3. Connection details:</strong> Please fill out the connection information for your database.</p>
 							<div class="instruction-hold">
-								<div class="row embeddedError" runat="server" id="embeddedFilesMissing" style="display: none;">
-									<p>
-										<strong>Missing files:</strong> SQL CE 4 requires that you manually add the SQL
-										CE 4 runtime to your Umbraco installation.<br />
-										You can either use the following <a href="http://our.umbraco.org/wiki/install-and-setup/using-sql-ce-4-with-juno"
-											target="_blank">instructions</a> on how to add SQL CE 4 or select another database type from the dropdown above.
-									</p>
-								</div>
-
-                                <div class="row embedded"  style="display: none;">
-									<p>
-										<strong>Nothing to configure:</strong>SQL CE 4 does not require any configuration,
-                                        simply click the "install" button to continue.
-									</p>
-								</div>
+								
 
 								<asp:PlaceHolder ID="ph_dbError" runat="server" Visible="false">
 									<div class="row error">
@@ -71,7 +83,7 @@
 												<asp:Literal ID="lt_dbError" runat="server" /></strong></p>
 									</div>
 									<script type="text/javascript">
-									  jQuery(document).ready(function () { showDatabaseSettings(); });
+									    jQuery(document).ready(function () { showDatabaseSettings(); });
 									</script>
 								</asp:PlaceHolder>
 								<div class="row sql" runat="server" id="DatabaseServerItem">
@@ -94,7 +106,52 @@
 									<span>
 										<asp:TextBox runat="server" ID="DatabasePassword" CssClass="text" TextMode="Password" /></span>
 								</div>
-								<div class="row custom" runat="server" id="DatabaseConnectionString">
+								
+							</div>
+						</div>
+						<!-- btn box -->
+						
+					</div>
+                    </div>
+
+                    <!-- embedded option -->
+                    <div id="database-embedded" class="database-option">
+                        <div class="step">
+                            <div class="container">
+
+                            <p class="instructionText">
+								<strong>2. Simple file-based database:</strong></p>
+							<div class="instruction-hold">
+                            <div class="row embeddedError" runat="server" id="embeddedFilesMissing" style="display: none;">
+									<p>
+										<strong>Missing files:</strong> SQL CE 4 requires that you manually add the SQL
+										CE 4 runtime to your Umbraco installation.<br />
+										You can either use the following <a href="http://our.umbraco.org/wiki/install-and-setup/using-sql-ce-4-with-juno"
+											target="_blank">instructions</a> on how to add SQL CE 4 or select another database type from the dropdown above.
+									</p>
+								</div>
+
+                                <div class="row embedded"  style="display: none;">
+									<p>
+										<strong>Nothing to configure:</strong>SQL CE 4 does not require any configuration,
+                                        simply click the "install" button to continue.
+									</p>
+								</div>
+
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- advanced option -->
+                    <div id="database-advanced" class="database-option">
+				        <div class="step">
+					        <div class="container">
+                            <p>
+							        <strong>2. Connection details:</strong> Please fill out the connection information for your database.</strong></p>
+
+                            <div class="instruction-hold">
+ 
+ 						       <div class="row custom" runat="server" id="DatabaseConnectionString">
 									<asp:Label runat="server" AssociatedControlID="ConnectionString" ID="ConnectionStringLabel">Connection string:</asp:Label>
 									<span>
 										<asp:TextBox runat="server" TextMode="MultiLine" CssClass="text" ID="ConnectionString" /></span>
@@ -102,29 +159,40 @@
                                 <div class="row custom check-hold">
                                     <p>
 										Example: <tt>datalayer=MySQL;server=192.168.2.8;user id=user;password=***;database=umbraco</tt></p>
-                                </div>
-							</div>
-						</div>
-						<!-- btn box -->
-						<footer class="btn-box">
+                                </div>                         
+
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+
+                     <!-- help option -->
+                    <div id="database-help" class="database-option">
+                        <div class="step">
+                            <div class="container">
+                                <p>
+                                    <strong>2. Getting a database setup for umbraco.</strong><br />
+                                    For first time users, we recommend you select "quick-and-simple file-based database".
+                                    This will install an easy to use database, that does
+                                    not require any additional software to use.<br />
+                                    Alternatively, you can install Microsoft SQL Server, which will require a bit more
+                                    work to get up and running.<br />
+                                    We have provided a step-by-step guide in the video instructions below.
+                                </p>
+                                <span class="btn-link"><a href="http://umbraco.org/getting-started" target="_blank">Open video instructions</a></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="btn-box installbtn">
 							<div class="t">&nbsp;</div>
 								<asp:LinkButton runat="server" class="single-tab submit btn-install" onclick="saveDBConfig"><span>install</span>    </asp:LinkButton>
 							</footer>
-					</div>
-				</div>
-				<!-- step2 -->
-				<div class="step" id="database-step2">
-					<div class="container">
-						<p>
-							<strong>2. Getting a database setup for umbraco.</strong><br />
-							For first time users, we recommend you select "SQL CE 4" in the dropdown box, after clicking the "yes" button.
-                            This will install an easy to use database, that does not require any additional software to use.<br />
-                            Alternatively, you can install Microsoft SQL Server, which will require a bit more work to get up and running.<br />
-                            We have provided a step-by-step guide in the video instructions below.
-						</p>
-						<span class="btn-link"><a href="http://umbraco.org/getting-started">Open video instructions</a></span>
-					</div>
-				</div>
+
+                </div>
+
+
+				
 			</fieldset>
 			</form>
 		</div>
@@ -136,8 +204,53 @@
 
             jQuery(document).ready(function(){
 			    <asp:literal runat="server" id="jsVars" />
+
+
+
+                $("input[name='database']").change(function()
+                {
+
+                    switch($(this).val())
+                    {
+                    case "blank":
+
+	                    $(".database-option").hide();
+	                    $("#database-blank").show();
+	                   
+                      break;
+                    case "embedded":
+	                    $(".database-option").hide();
+	                    $("#database-embedded").show();
+
+                         if (!hasEmbeddedDlls) {
+                            $('.embeddedError').show();
+                            $(".installbtn").hide();
+                         }
+                         else {
+                            $('.embedded').show();
+                            $(".installbtn").show();
+                         }
+	                    
+                      break;
+                    case "advanced":
+	                    $(".database-option").hide();
+	                    $("#database-advanced").show();
+	                    $(".installbtn").show();
+                      break;
+                    case "help":
+	                    $(".database-option").hide();
+    	                $("#database-help").show();
+	                    $(".installbtn").hide();
+                      break;
+                    }
+
+
+                });
+
+                <asp:Literal id="dbinit" runat="server"></asp:Literal>
+
             });
-	</script>
+    </script>
 </asp:PlaceHolder>
 
 <asp:PlaceHolder ID="installing" runat="server" Visible="false">
