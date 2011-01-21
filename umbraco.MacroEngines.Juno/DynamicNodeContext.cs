@@ -5,7 +5,7 @@ using umbraco.interfaces;
 
 namespace umbraco.MacroEngines {
 
-    public abstract class DynamicNodeContext : WebPageBase, IMacroContext {
+    public abstract class DynamicNodeContext : WebPage, IMacroContext {
 
         private MacroModel _macro;
         private DynamicNode _dynamicNode;
