@@ -59,30 +59,30 @@ namespace umbraco.MacroEngines
             return relativePath;
         }
 
-        public WebPageBase CompileAndInstantiate(string virtualPath) {
-            if (virtualPath.StartsWith("~/") == false)
-                throw new Exception("Only Relative Paths Are Supported");
-
-            var physicalPath = IOHelper.MapPath(virtualPath);
-            if (File.Exists(physicalPath) == false)
-                throw new FileNotFoundException(string.Format("Razor Script File Not Found, {0}", virtualPath));
-
-            //Compile Razor - We Will Leave This To ASP.NET Compilation Engine
-            //Security in medium trust is strict around here, so we can only pass a relative file path
+        public static WebPage CompileAndInstantiate(string virtualPath) {
+            //Compile Razor - We Will Leave This To ASP.NET Compilation Engine & ASP.NET WebPages
+            //Security in medium trust is strict around here, so we can only pass a virtual file path
             //ASP.NET Compilation Engine caches returned types
-            var razorType = BuildManager.GetCompiledType(virtualPath);
-            if (razorType == null)
-                throw new ArgumentException("Null Razor Compile Type Returned From The ASP.NET Compilation Engine");
+            //Changed From BuildManager As Other Properties Are Attached Like Context Path/
+            var webPageBase = WebPageBase.CreateInstanceFromVirtualPath(virtualPath);
+            var webPage = webPageBase as WebPage;
+            if (webPage == null)
+                throw new InvalidCastException("Context Must Implement System.Web.WebPages.WebPage");
+            return webPage;
+        }
 
-            //Instantiates The Razor Script
-            var factory = BuildManager.GetObjectFactory(virtualPath, false);
-            if (factory == null)
-                throw new Exception("Factory Not Found");
-            var razorObj = factory.CreateInstance();
-            var razorWebPage = razorObj as WebPageBase;
-            if (razorWebPage == null)
-                throw new InvalidCastException("Razor Context Must Implement System.Web.WebPages.WebPageBase, System.Web.WebPages");
-            return razorWebPage;
+        public static void InjectContext(WebPage razorWebPage, MacroModel macro, INode currentPage) {
+            var context = HttpContext.Current;
+            var contextWrapper = new HttpContextWrapper(context);
+
+            //inject http context - for request response
+            razorWebPage.Context = contextWrapper;
+
+            //Inject Macro Model And Parameters
+            if (razorWebPage is IMacroContext) {
+                var razorMacro = (IMacroContext)razorWebPage;
+                razorMacro.SetMembers(macro, currentPage);
+            }
         }
 
         public string ExecuteRazor(MacroModel macro, INode currentPage) {
@@ -90,13 +90,10 @@ namespace umbraco.MacroEngines
             var contextWrapper = new HttpContextWrapper(context);
 
             string fileLocation = null;
-            if (!string.IsNullOrEmpty(macro.ScriptName))
-            {
+            if (!string.IsNullOrEmpty(macro.ScriptName)) {
                 //Razor Is Already Contained In A File
                 fileLocation = SystemDirectories.Python + "/" + macro.ScriptName;
-            }
-            else if (!string.IsNullOrEmpty(macro.ScriptCode) && !string.IsNullOrEmpty(macro.ScriptLanguage))
-            {
+            } else if (!string.IsNullOrEmpty(macro.ScriptCode) && !string.IsNullOrEmpty(macro.ScriptLanguage)) {
                 //Inline Razor Syntax
                 fileLocation = CreateInlineRazorFile(macro.ScriptCode, macro.ScriptLanguage);
             }
@@ -105,16 +102,7 @@ namespace umbraco.MacroEngines
                 return String.Empty; //No File Location
 
             var razorWebPage = CompileAndInstantiate(fileLocation);
-
-            //inject http context - for request response
-            razorWebPage.Context = contextWrapper;
-
-            //Inject Macro Model And Parameters
-            if (razorWebPage is IMacroContext)
-            {
-                var razorMacro = (IMacroContext)razorWebPage;
-                razorMacro.SetMembers(macro, currentPage);
-            }
+            InjectContext(razorWebPage, macro, currentPage);
 
             //Output Razor To String
             var output = new StringWriter();
