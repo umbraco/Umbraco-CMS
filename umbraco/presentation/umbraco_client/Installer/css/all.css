@@ -410,6 +410,12 @@ figure{display: block;}
 	padding:0 6px;
 	background:url(../images/bg-inp.png) no-repeat;
 }
+
+.instruction-hold .row span.textarea
+{
+    height:108px;
+    background:url(../images/bg-inp-big.png) no-repeat;
+}
 .instruction-hold .error span{background:url(../images/bg-inp-error.png) no-repeat;}
 .instruction-hold .text{
 	float:left;
@@ -423,6 +429,10 @@ figure{display: block;}
 	height:16px;
 	padding:5px 0 6px;
 	position:relative;
+}
+.instruction-hold .textarea
+{
+    height:95px;
 }
 .btn-box .btn-install {
 	float:left;
@@ -1150,3 +1160,13 @@ figure{display: block;}
 .error {padding:0 100px 13px 5px}
 .error p{margin:0 0 13px;padding-right:100px;}
 .error p strong {font-size:14px;display:block;}
+
+/* db step refactor */
+.database-option, footer.installbtn
+{
+    display:none;
+}
+.custom
+{
+    display:
+}

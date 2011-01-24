@@ -35,7 +35,7 @@
                         to help you get going quickly</li>
                     <li>Learn to extend Umbraco at <a href="http://umbraco.tv" target="_blank">Umbraco TV</a>
                         (some videos are free, some require a subscription)</li>
-                    <li>Read the API documentation on our <a href="http://umbraco.org/products" target="_blank">
+                    <li>Read the API documentation on our <a href="http://our.umbraco.org/wiki/recommendations/recommended-reading-for-net-developers" target="_blank">
                         Community Wiki</a></li>
                     <li>Become a <a href="http://umbraco.org/training/training-schedule" target="_blank">
                         Certified Umbraco Developer</a> and learn from the source</li>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<language alias="en" intName="English (uk)" localName="English" lcid="" culture="en-GB">
+<language alias="en" intName="English (us)" localName="English" lcid="1033" culture="en-US">
   <creator>
     <name>umbraco</name>
     <link>http://umbraco.org</link>

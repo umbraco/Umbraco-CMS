@@ -359,3 +359,11 @@ p#installingModule img
 {
     color:#888 !important;
 }
+
+/* skin customize dialog */
+#costumizeSkin #dependencies .propertypane
+{
+    height:205px;
+    overflow:scroll;
+    overflow-x: hidden;
+}

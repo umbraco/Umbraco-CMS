@@ -780,10 +780,10 @@ namespace umbraco
                 HttpContext.Current.Items.Remove(XmlContextContentItemKey);
         }
 
-        [Obsolete("This method is obsolete in version 4.1 and above, please use DeleteXmlCache", true)]
         /// <summary>
         /// Invalidates the disk content cache file. Effectively just deletes it.
         /// </summary>
+        [Obsolete("This method is obsolete in version 4.1 and above, please use DeleteXmlCache", true)]
         private void ClearDiskCacheAsync()
         {
             // Queue file deletion
@@ -841,12 +841,12 @@ namespace umbraco
             }
         }
 
-        private void InitContentDocumentBase(XmlDocument xmlDoc)
+        private static void InitContentDocument(XmlDocument xmlDoc, string dtd)
         {
-            // Create id -1 attribute
-            xmlDoc.LoadXml(String.Format("<?xml version=\"1.0\" encoding=\"utf-8\" ?>" + Environment.NewLine +
-                "{0}" + Environment.NewLine +
-                "<root id=\"-1\"/>", DocumentType.GenerateDtd()));
+            // Prime the xml document with an inline dtd and a root element
+            xmlDoc.LoadXml(String.Format("<?xml version=\"1.0\" encoding=\"utf-8\" ?>{0}{1}{0}<root id=\"-1\"/>",
+                                         Environment.NewLine,
+                                         dtd));
         }
 
         /// <summary>
@@ -854,8 +854,6 @@ namespace umbraco
         /// </summary>
         private XmlDocument LoadContentFromDatabase()
         {
-            XmlDocument xmlDoc = new XmlDocument();
-
             // Alex N - 2010 06 - Very generic try-catch simply because at the moment, unfortunately, this method gets called inside a ThreadPool thread
             // and we need to guarantee it won't tear down the app pool by throwing an unhandled exception
             try
@@ -876,14 +874,20 @@ namespace umbraco
                 // Try to log to the DB
                 Log.Add(LogTypes.System, staticUser, -1, "Loading content from database...");
 
-                // Moved this to after the logging since the 2010 schema accesses the DB just to generate the DTD
-                InitContentDocumentBase(xmlDoc);
+                var hierarchy = new Dictionary<int, List<int>>();
+                var nodeIndex = new Dictionary<int, XmlNode>();
 
-                Hashtable nodes = new Hashtable();
-                Hashtable parents = new Hashtable();
                 try
                 {
                     Log.Add(LogTypes.Debug, staticUser, -1, "Republishing starting");
+
+                    // Lets cache the DTD to save on the DB hit on the subsequent use
+                    var dtd = DocumentType.GenerateDtd();
+
+                    // Prepare an XmlDocument with an appropriate inline DTD to match
+                    // the expected content
+                    var xmlDoc = new XmlDocument();
+                    InitContentDocument(xmlDoc, dtd);
 
                     // Esben Carlsen: At some point we really need to put all data access into to a tier of its own.
                     string sql =
@@ -895,37 +899,48 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                     {
                         using (IRecordsReader dr = SqlHelper.ExecuteReader(sql, SqlHelper.CreateParameter("@type", new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"))))
                         {
+
                             while (dr.Read())
                             {
                                 int currentId = dr.GetInt("id");
                                 int parentId = dr.GetInt("parentId");
 
+                                // Retrieve the xml content from the database
+                                // and parse it into a DOM node
                                 xmlDoc.LoadXml(dr.GetString("xml"));
-                                nodes.Add(currentId, xmlDoc.FirstChild);
+                                nodeIndex.Add(currentId, xmlDoc.FirstChild);
 
-                                if (parents.ContainsKey(parentId))
-                                    ((ArrayList)parents[parentId]).Add(currentId);
-                                else
+                                // Build the content hierarchy
+                                List<int> children;
+                                if (!hierarchy.TryGetValue(parentId, out children))
                                 {
-                                    ArrayList a = new ArrayList();
-                                    a.Add(currentId);
-                                    parents.Add(parentId, a);
+                                    // No children for this parent, so add one
+                                    children = new List<int>();
+                                    hierarchy.Add(parentId, children);
                                 }
+                                children.Add(currentId);
                             }
                         }
                     }
 
                     Log.Add(LogTypes.Debug, staticUser, -1, "Xml Pages loaded");
 
-                    // TODO: Why is the following line here, it should have already been generated? Alex N 20100212
-                    // Reset
-                    InitContentDocumentBase(xmlDoc);
-
                     try
                     {
-                        GenerateXmlDocument(parents, nodes, -1, xmlDoc.DocumentElement);
+                        // If we got to here we must have successfully retrieved the content from the DB so
+                        // we can safely initialise and compose the final content DOM. 
+                        // Note: We are reusing the XmlDocument used to create the xml nodes above so 
+                        // we don't have to import them into a new XmlDocument
+
+                        // Initialise the document ready for the final composition of content
+                        InitContentDocument(xmlDoc, dtd);
+
+                        // Start building the content tree recursively from the root (-1) node
+                        GenerateXmlDocument(hierarchy, nodeIndex, -1, xmlDoc.DocumentElement);
 
                         Log.Add(LogTypes.Debug, staticUser, -1, "Done republishing Xml Index");
+
+                        return xmlDoc;
                     }
                     catch (Exception ee)
                     {
@@ -937,7 +952,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                 {
                     Log.Add(LogTypes.Error, staticUser, -1,
                             string.Format("Error Republishing: Out Of Memory. Parents: {0}, Nodes: {1}",
-                                          parents.Count, nodes.Count));
+                                          hierarchy.Count, nodeIndex.Count));
                 }
                 catch (Exception ee)
                 {
@@ -949,18 +964,20 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                 Log.Add(LogTypes.Error, -1, string.Format("Error Republishing: {0}", ee));
             }
 
-            return xmlDoc;
+            // An error of some sort must have stopped us from successfully generating
+            // the content tree, so lets return null signifying there is no content available
+            return null;
         }
 
-        private void GenerateXmlDocument(Hashtable parents, Hashtable nodes, int parentId, XmlNode parentNode)
+        private static void GenerateXmlDocument(IDictionary<int, List<int>> hierarchy, IDictionary<int, XmlNode> nodeIndex, int parentId, XmlNode parentNode)
         {
-            if (parents.ContainsKey(parentId))
+            List<int> children;
+
+            if (hierarchy.TryGetValue(parentId, out children))
             {
-                ArrayList children = (ArrayList)parents[parentId];
                 XmlNode childContainer = UmbracoSettings.UseLegacyXmlSchema || String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME)
                                              ? parentNode
-                                             : parentNode.SelectSingleNode(
-                                                   UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME);
+                                             : parentNode.SelectSingleNode(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME);
 
                 if (!UmbracoSettings.UseLegacyXmlSchema && !String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
                 {
@@ -970,9 +987,11 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                         parentNode.AppendChild(childContainer);
                     }
                 }
-                foreach (int i in children)
+
+                foreach (int childId in children)
                 {
-                    XmlNode childNode = (XmlNode)nodes[i];
+                    var childNode = nodeIndex[childId];
+
                     if (UmbracoSettings.UseLegacyXmlSchema || String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
                     {
                         parentNode.AppendChild(childNode);
@@ -981,7 +1000,9 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                     {
                         childContainer.AppendChild(childNode);
                     }
-                    GenerateXmlDocument(parents, nodes, i, childNode);
+
+                    // Recursively build the content tree under the current child
+                    GenerateXmlDocument(hierarchy, nodeIndex, childId, childNode);
                 }
             }
         }
@@ -1130,8 +1151,10 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         /// </summary>
         /// <param name="xmlDoc"></param>
         /// <returns></returns>
-        private XmlDocument CloneXmlDoc(XmlDocument xmlDoc)
+        private static XmlDocument CloneXmlDoc(XmlDocument xmlDoc)
         {
+            if (xmlDoc == null) return null;
+
             Log.Add(LogTypes.Debug, -1, "Cloning...");
             // Save copy of content
             XmlDocument xmlCopy = new XmlDocument();
