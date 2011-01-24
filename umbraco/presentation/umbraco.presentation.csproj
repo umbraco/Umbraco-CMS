@@ -1642,6 +1642,7 @@
     </Compile>
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
+    <Content Include="umbraco_client\Installer\images\bg-inp-big.png" />
     <Content Include="umbraco_client\modal\jquery.simplemodal.1.4.1.custom.js" />
     <Content Include="web.config.INDIGO64SSD.xslt" />
     <Content Include="umbraco_client\Installer\css\all.css" />
