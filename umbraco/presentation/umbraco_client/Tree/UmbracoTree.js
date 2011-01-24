@@ -181,7 +181,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 //if app is null, then we will rebuild the current app which also means clearing the cache.
                 if (!app) {                                        
                     this.clearTreeCache();
-                    this._opts.app = this._opts.app;
+                    app = this._opts.app; // zb-00011 #29447 : bugfix assignment
                 }
                 else if (this._tree && (this._opts.app.toLowerCase() == app.toLowerCase())) {
                     this._debug("not rebuilding");

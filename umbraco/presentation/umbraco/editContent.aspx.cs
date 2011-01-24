@@ -361,9 +361,9 @@ namespace umbraco.cms.presentation
         {
             if (_documentHasPublishedVersion)
             {
-                l.Text = "<a href=\"" + library.NiceUrl(_document.Id) + "\" target=\"_blank\">" + library.NiceUrl(_document.Id) + "</a>";
-
+                // zb-00007 #29928 : refactor
                 string currentLink = library.NiceUrl(_document.Id);
+                l.Text = "<a href=\"" + currentLink + "\" target=\"_blank\">" + currentLink + "</a>";
 
                 // domains
                 domainText.Text = "";

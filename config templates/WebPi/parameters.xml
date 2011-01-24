@@ -1,0 +1,142 @@
+<parameters>
+
+	<!-- Prompts where to copy the content files and takes a web site path (such as "contoso.com/app"). -->
+	<parameter name="Application Path" description="It is recommended that Umbraco be installed as a web site root. Leave this parameter empty." tags="iisapp">
+    <parameterValidation type="AllowEmpty" />
+		<parameterEntry type="ProviderPath" scope="iisapp" match="^umbraco$" />
+	</parameter>
+
+	<!-- This is the parameter that is used to set ACLs on the root site folder -->
+	<parameter name="SetAclParameter1" description="Sets the ACL on the root site folder" defaultValue="{Application Path}" tags="Hidden">
+		<parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco$" />
+	</parameter>
+
+  <!-- This is the parameter that is used to set ACLs on the app_code folder -->
+  <parameter name="SetAclParameter2" description="Sets the ACL on the app_code folder" defaultValue="{Application Path}/app_code" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco\\app_code$" />
+  </parameter>
+  
+    <!-- This is the parameter that is used to set ACLs on the app_browsers folder -->
+  <parameter name="SetAclParameter15" description="Sets the ACL on the app_code folder" defaultValue="{Application Path}/app_browsers" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco\\app_browsers$" />
+  </parameter>
+
+  <!-- This is the parameter that is used to set ACLs on the app_data folder -->
+  <parameter name="SetAclParameter16" description="Sets the ACL on the app_code folder" defaultValue="{Application Path}/app_data" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco\\app_data$" />
+  </parameter>
+
+  <!-- This is the parameter that is used to set ACLs, on the bin folder -->
+  <parameter name="SetAclParameter3" description="Sets the ACL on the bin folder" defaultValue="{Application Path}/bin" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco\\bin$" />
+  </parameter>
+  
+  <!-- This is the parameter that is used to set ACLs on the config folder -->
+  <parameter name="SetAclParameter4" description="Sets the ACL on the config folder" defaultValue="{Application Path}/config" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco\\config$" />
+  </parameter>
+  
+  <!-- This is the parameter that is used to set ACLs on the css folder -->
+  <parameter name="SetAclParameter5" description="Sets the ACL on the css folder" defaultValue="{Application Path}/css" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="umbraco\\css$" />
+  </parameter>
+  
+  <!-- This is the parameter that is used to set ACLs on the data folder -->
+  <parameter name="SetAclParameter6" description="Sets the ACL on the data folder" defaultValue="{Application Path}/data" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco\\data$" />
+  </parameter>
+  
+  <!-- This is the parameter that is used to set ACLs on the masterpages folder -->
+  <parameter name="SetAclParameter7" description="Sets the ACL on the masterpages folder" defaultValue="{Application Path}/masterpages" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco\\masterpages$" />
+  </parameter>
+  
+  <!-- This is the parameter that is used to set ACLs on the media folder -->
+  <parameter name="SetAclParameter8" description="Sets the ACL on the media folder" defaultValue="{Application Path}/media" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco\\media$" />
+  </parameter>
+  
+  <!-- This is the parameter that is used to set ACLs on the python folder -->
+  <parameter name="SetAclParameter9" description="Sets the ACL on the python folder" defaultValue="{Application Path}/python" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco\\python$" />
+  </parameter>
+  
+  <!-- This is the parameter that is used to set ACLs on the scripts folder -->
+  <parameter name="SetAclParameter10" description="Sets the ACL on the scripts folder" defaultValue="{Application Path}/scripts" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco\\scripts$" />
+  </parameter>
+  
+  <!-- This is the parameter that is used to set ACLs on the umbraco folder -->
+  <parameter name="SetAclParameter11" description="Sets the ACL on the umbraco folder" defaultValue="{Application Path}/umbraco" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco\\umbraco$" />
+  </parameter>
+  
+  <!-- This is the parameter that is used to set ACLs, it's set to the application path filled in by the user -->
+  <parameter name="SetAclParameter12" description="Sets the ACL on the usercontrols folder" defaultValue="{Application Path}/usercontrols" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco\\usercontrols$" />
+  </parameter>
+  
+  <!-- This is the parameter that is used to set ACLs, it's set to the application path filled in by the user -->
+  <parameter name="SetAclParameter13" description="Sets the ACL on the xslt folder" defaultValue="{Application Path}/xslt" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco\\xslt$" />
+  </parameter>
+
+  <!-- This is the parameter that is used to set ACLs, it's set to the application path filled in by the user -->
+  <parameter name="SetAclParameter14" description="Sets the ACL on the web.config file" defaultValue="{Application Path}/web.config" tags="Hidden">
+    <parameterEntry type="ProviderPath" scope="setAcl" match="^umbraco\\web.config$" />
+  </parameter>
+
+  <!-- Prompts for database server name, this is used in the connection string parameter later -->
+  <parameter name="Database Server" description="Location of your database server." defaultValue=".\sqlexpress" tags="DBServer, SQL">
+  </parameter>
+
+  <!-- Prompts for the database name and fills it into the database scripts -->
+  <parameter name="Database Name" description="Name of the database for your application." defaultValue="umbraco" tags="DBName, SQL">
+    <parameterEntry type="TextFile" scope="installSQL.sql" match="PlaceHolderForDb" />
+  </parameter>
+
+  <!-- Prompts for the database username and fills it into the database scripts.
+	The SQL tag indicates it is a parameter required for SQL, the DbUsername tag indicates this is a Db username -->
+  <parameter name="Database Username" description="User name to access you application database." defaultValue="umbracouser" tags="SQL, DbUsername">
+    <parameterEntry type="TextFile" scope="installSQL.sql" match="PlaceHolderForUser" />
+  </parameter>
+
+  <!-- Prompts for the database password and fills it into the database scripts.
+	The SQL tag indicates it is a parameter required for SQL, the DbUserPassword tag indicates this is a Db password -->
+  <parameter name="Database Password" description="Password for the Database Username." tags="New, Password, SQL, DbUserPassword">
+    <parameterEntry type="TextFile" scope="installSQL.sql" match="PlaceHolderForPassword" />
+  </parameter>
+
+  <!-- Prompts for the admin creds and uses it for the administrator connection string. 
+	This is used to create a login and assign permissions. The SQL tag indicates it is a parameter required for SQL. 
+	The DbAdminUsername tag indicates it should be used when the user is creating a new database. 
+	If they're not, it can be filled in with the DbUsername value. -->
+  <parameter name="Database Administrator" description="Administrator username for your database." defaultValue="sa" tags="SQL, DbAdminUsername">
+  </parameter>
+
+  <!-- Prompts for the admin password and uses it for the administrator connection string. 
+	This is used to create a login and assign permissions. The SQL tags indicates it is a parameter required for SQL. 
+	The DbAdminPassword tag indicates it should be used when the user is creating a new database. 
+	If they're not, it can be filled in with the DbUserPassword value. -->
+  <parameter name="Database Administrator Password" description="Password that is associated with the database administrator account." tags="Password, SQL, DbAdminPassword">
+  </parameter>
+
+
+  <!-- This is the hidden admin connection string used to run the database scripts -->
+  <parameter name="Connection String" description="Automatically sets the connection string for the connection request." defaultValue="Server={Database Server};Database={Database Name};uid={Database Administrator};Pwd={Database Administrator Password};" tags="Hidden,SQLConnectionString,Validate">
+    <parameterEntry type="ProviderPath" scope="dbfullsql" match="installSQL.sql" />
+  </parameter>
+
+  <!-- This is the hidden connection string with the newly created db account that is used in the web.config -->
+  <parameter name="Connection String for Config" description="Connection string to enter into config" defaultValue="datalayer=SqlServer;server={Database Server};database={Database Name};user id={Database Username};password={Database Password}" tags="Hidden, SQL">
+    <!-- scope=”web.config” will look for all web.config files under the root directory . Using scope=”\\web.config$” will select only the root web.config -->
+    <parameterEntry type="XmlFile" scope="\\web.config$" match="//appSettings/add[@key='umbracoDbDSN']/@value" />
+  </parameter>
+
+  <parameter name="SQLCE Database Location" defaultValue="datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf" 
+             tags="SQLCE, Hidden">
+    <parameterEntry type="XmlFile" scope="\\web.config$" match="//appSettings/add[@key='umbracoDbDSN']/@value" />
+  </parameter>
+
+</parameters>
+

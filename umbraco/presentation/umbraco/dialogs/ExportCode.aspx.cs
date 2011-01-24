@@ -286,8 +286,9 @@ namespace {0} {{
 		{
 			var sb = new StringBuilder();
 
+			// zb-00036 #29889 : fix property types getter
             foreach (var pt in 
-                dt.getVirtualTabs.Where(x => x.ContentType == dt.Id).SelectMany(x => x.PropertyTypes)
+                dt.getVirtualTabs.Where(x => x.ContentType == dt.Id).SelectMany(x => x.GetPropertyTypes(dt.Id))
                 .Concat(dt.PropertyTypes.Where(x => x.ContentTypeId == dt.Id && x.TabId == 0))
                 )
 			{
@@ -375,8 +376,9 @@ namespace {0} {{
 		private object GenerateProperties(DocumentType dt)
 		{
 			var sb = new StringBuilder();
+			// zb-00036 #29889 : fix property types getter
 			foreach (var pt in 
-                dt.getVirtualTabs.Where(x => x.ContentType == dt.Id).SelectMany(x => x.PropertyTypes)
+                dt.getVirtualTabs.Where(x => x.ContentType == dt.Id).SelectMany(x => x.GetPropertyTypes(dt.Id))
                 .Concat(dt.PropertyTypes.Where(x => x.ContentTypeId == dt.Id && x.TabId == 0))
                 )
 			{

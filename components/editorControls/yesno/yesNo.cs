@@ -56,7 +56,8 @@ namespace umbraco.editorControls
 		/// <param name="output"> The HTML writer to write out to </param>
 		protected override void Render(HtmlTextWriter output)
 		{
-            if (!Page.IsPostBack && _data != null && _data.Value != null)
+            // zb-00024 #299260 : always render, postback or not postback
+            if (_data != null && _data.Value != null)
             {
                 if (_data.Value.ToString() == "1")
                     this.Checked = true;
