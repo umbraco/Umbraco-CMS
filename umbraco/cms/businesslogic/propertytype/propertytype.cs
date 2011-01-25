@@ -421,8 +421,9 @@ namespace umbraco.cms.businesslogic.propertytype
             Cache.ClearCacheItem("ContentType_PropertyTypes_Content:" + _contenttypeid);
 
             // clear cache in tab
+			// zb-00040 #29889 : clear the right cache! t.ContentType is the ctype which _defines_ the tab, not the current one.
             foreach (ContentType.TabI t in new ContentType(ContentTypeId).getVirtualTabs)
-                ContentType.FlushTabCache(t.Id, t.ContentType);
+				ContentType.FlushTabCache(t.Id, ContentTypeId);
         }
 
         public static PropertyType GetPropertyType(int id)
