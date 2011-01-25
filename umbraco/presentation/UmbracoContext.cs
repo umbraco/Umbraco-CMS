@@ -90,8 +90,11 @@ namespace umbraco.presentation
             get
             {
                 string currentUrl = Request.Url.AbsolutePath;
-                return !String.IsNullOrEmpty(StateHelper.GetCookieValue("PreviewSet")) &&
-                       UmbracoUser != null && !currentUrl.StartsWith(IO.IOHelper.ResolveUrl(IO.SystemDirectories.Umbraco));
+				// zb-00004 #29956 : refactor cookies names & handling
+				return
+					StateHelper.Cookies.Preview.HasValue // has preview cookie
+					&& UmbracoUser != null // has user
+					&& !currentUrl.StartsWith(IO.IOHelper.ResolveUrl(IO.SystemDirectories.Umbraco)); // is not in admin UI
             }
         }
 
@@ -99,7 +102,8 @@ namespace umbraco.presentation
         {
             if (InPreviewMode)
             {
-                PreviewContent pc = new PreviewContent(new Guid(StateHelper.GetCookieValue("PreviewSet")));
+				// zb-00004 #29956 : refactor cookies names & handling
+                PreviewContent pc = new PreviewContent(new Guid(StateHelper.Cookies.Preview.GetValue()));
                 pc.LoadPreviewset();
                 return pc.XmlContent;
             }
