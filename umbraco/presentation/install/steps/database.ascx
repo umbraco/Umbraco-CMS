@@ -216,6 +216,7 @@
 
 	                    $(".database-option").hide();
 	                    $("#database-blank").show();
+                        $(".installbtn").show();
 	                   
                       break;
                     case "embedded":
