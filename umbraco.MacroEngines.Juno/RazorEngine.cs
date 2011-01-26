@@ -25,7 +25,7 @@ namespace umbraco.MacroEngines
         {
             get
             {
-                var exts = new List<string> {"razor"};
+                var exts = new List<string> { "razor" };
                 return exts;
             }
         }
@@ -40,7 +40,8 @@ namespace umbraco.MacroEngines
             try
             {
                 string parsedResult;
-                if (!GetResult(null, code, currentPage, out parsedResult)) {
+                if (!GetResult(null, code, currentPage, out parsedResult))
+                {
                     errorMessage = parsedResult;
                     return false;
                 }
@@ -53,8 +54,8 @@ namespace umbraco.MacroEngines
             }
 
             // clear razor compilation cache (a hack - by setting the template base type back/forward as there isn't a clear cache method)
-            Razor.SetTemplateBaseType(typeof (HtmlTemplateBase<>));
-            Razor.SetTemplateBaseType(typeof (UmbracoTemplateBase<>));
+            Razor.SetTemplateBaseType(typeof(HtmlTemplateBase<>));
+            Razor.SetTemplateBaseType(typeof(UmbracoTemplateBase<>));
 
 
             errorMessage = String.Empty;
@@ -70,7 +71,8 @@ namespace umbraco.MacroEngines
             GetResult(macro.CacheIdentifier, template, currentPage, out parsedResult);
 
             // if it's a file we'll monitor changes to ensure that any updates to the file clears the cache
-            if (String.IsNullOrEmpty(macro.ScriptCode)) {
+            if (String.IsNullOrEmpty(macro.ScriptCode))
+            {
                 FileMonitor.Listen(SystemDirectories.Python + "/" + macro.ScriptName, action => RazorEngine.ClearRazorCompilationCache());
             }
 
@@ -92,7 +94,7 @@ namespace umbraco.MacroEngines
         {
             try
             {
-                Razor.SetTemplateBaseType(typeof (UmbracoTemplateBase<>));
+                Razor.SetTemplateBaseType(typeof(UmbracoTemplateBase<>));
                 result = Razor.Parse(template, new DynamicNode(currentPage), cacheIdentifier);
                 return true;
             }
@@ -149,7 +151,7 @@ namespace umbraco.MacroEngines
 
         public override T Model
         {
-            get { return (T) m_model; }
+            get { return (T)m_model; }
             set { m_model = value; }
         }
 

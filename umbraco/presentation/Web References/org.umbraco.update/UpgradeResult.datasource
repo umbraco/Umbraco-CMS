@@ -6,5 +6,5 @@
     cause the file to be unrecognizable by the program.
 -->
 <GenericObjectDataSource DisplayName="UpgradeResult" Version="1.0" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
-   <TypeInfo>umbraco.presentation.org.umbraco.update.UpgradeResult</TypeInfo>
+   <TypeInfo>umbraco.presentation.org.umbraco.update.UpgradeResult, Web References.org.umbraco.update.Reference.cs, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null</TypeInfo>
 </GenericObjectDataSource>
