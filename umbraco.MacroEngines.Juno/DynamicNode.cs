@@ -10,6 +10,8 @@ namespace umbraco.MacroEngines
 {
     public class DynamicNode : DynamicObject, IEnumerable
     {
+        private DynamicDictionary _properties;
+
         private readonly INode n;
         public DynamicNode(INode n)
         {
@@ -22,7 +24,10 @@ namespace umbraco.MacroEngines
         {
             //Empty constructor for a special case with Generic Methods
         }
-
+        public void InitializeProperties(Dictionary<string, object> dict)
+        {
+            _properties = new DynamicDictionary(dict);
+        }
         IEnumerable<INode> _children;
         public DynamicNode(IEnumerable<INode> children)
         {
@@ -373,6 +378,16 @@ namespace umbraco.MacroEngines
             return n.ChildrenAsTable(nodeTypeAliasFilter);
         }
 
-
+        public DynamicDictionary Parameters
+        {
+            get
+            {
+                return _properties;
+            }
+            set
+            {
+                _properties = value;
+            }
+        }
     }
 }

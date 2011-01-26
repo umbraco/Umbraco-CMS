@@ -40,7 +40,7 @@ namespace umbraco.MacroEngines
             try
             {
                 string parsedResult;
-                if (!GetResult(null, code, currentPage, out parsedResult))
+                if (!GetResult(null, code, currentPage, null, out parsedResult))
                 {
                     errorMessage = parsedResult;
                     return false;
@@ -68,7 +68,7 @@ namespace umbraco.MacroEngines
                                   ? macro.ScriptCode
                                   : loadScript(IOHelper.MapPath(SystemDirectories.Python + "/" + macro.ScriptName));
             string parsedResult;
-            GetResult(macro.CacheIdentifier, template, currentPage, out parsedResult);
+            GetResult(macro.CacheIdentifier, template, currentPage, macro, out parsedResult);
 
             // if it's a file we'll monitor changes to ensure that any updates to the file clears the cache
             if (String.IsNullOrEmpty(macro.ScriptCode))
@@ -90,12 +90,23 @@ namespace umbraco.MacroEngines
             Razor.SetTemplateBaseType(typeof(UmbracoTemplateBase<>));
         }
 
-        private bool GetResult(string cacheIdentifier, string template, INode currentPage, out string result)
+        private bool GetResult(string cacheIdentifier, string template, INode currentPage, MacroModel macroModel, out string result)
         {
             try
             {
                 Razor.SetTemplateBaseType(typeof(UmbracoTemplateBase<>));
-                result = Razor.Parse(template, new DynamicNode(currentPage), cacheIdentifier);
+                DynamicNode Model = new DynamicNode(currentPage);
+                if (macroModel != null)
+                {
+                    Dictionary<string, object> Properties = new Dictionary<string, object>();
+                    macroModel.Properties.ForEach(prop => Properties.Add(prop.Key, prop.Value));
+                    Model.InitializeProperties(Properties);
+                }
+                else
+                {
+                    Model.InitializeProperties(new Dictionary<string, object>());
+                }
+                result = Razor.Parse(template, Model, cacheIdentifier);
                 return true;
             }
             catch (TemplateException ee)
