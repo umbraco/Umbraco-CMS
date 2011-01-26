@@ -84,14 +84,33 @@ namespace umbraco.MacroEngines
                         Type t = tObject.GetGenericArguments()[0];
                         Type tIEnumerable = typeof(IEnumerable<>).MakeGenericType(t);
 
+                        var methods = typeof(Enumerable)
+                            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                            .Where(m => m.Name == name && m.IsGenericMethod && m.GetParameters().Length == args.Length + 1)
+                            .ToList();
+
+                        if (methods.Count == 0)
+                        {
+                            throw new MissingMethodException();
+                        }
+
+
                         MethodInfo enumerableMethod =
-                            typeof(Enumerable)
-                            .GetMethod(name)
+                            methods
+                            .First()
                             .MakeGenericMethod(t);
 
                         var genericArgs = (new[] { _children }).Concat(args);
-                        result = enumerableMethod.Invoke(null, genericArgs.ToArray());
 
+                        result = enumerableMethod.Invoke(null, genericArgs.ToArray());
+                        if (result is IEnumerable<INode>)
+                        {
+                            result = new DynamicNode((IEnumerable<INode>)result);
+                        }
+                        if (result is INode)
+                        {
+                            result = new DynamicNode((INode)result);
+                        }
                         return true;
                     }
                     catch (TargetInvocationException)
