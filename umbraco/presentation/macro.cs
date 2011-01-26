@@ -761,14 +761,36 @@ namespace umbraco
         /// Gets a collection of all XSLT extensions for macros, including predefined extensions.
         /// </summary>
         /// <returns>A dictionary of name/extension instance pairs.</returns>
-        public static Dictionary<string, object> GetXsltExtensions()
+		public static Dictionary<string, object> GetXsltExtensions()
+		{
+			// zb-00041 #29966 : cache the extensions
+
+			// We could cache the extensions in a static variable but then the cache
+			// would not be refreshed when the .config file is modified. An application
+			// restart would be required. Better use the cache and add a dependency.
+
+			return umbraco.cms.businesslogic.cache.Cache.GetCacheItem(
+				_xsltExtensionsCacheKey, _xsltExtensionsSyncLock,
+				CacheItemPriority.Normal, // normal priority
+				null, // no refresh action
+				new CacheDependency(_xsltExtensionsConfig), // depends on the .config file
+				TimeSpan.FromDays(1), // expires in 1 day (?)
+				() => { return GetXsltExtensionsImpl(); });
+		}
+
+		// zb-00041 #29966 : cache the extensions
+		const string _xsltExtensionsCacheKey = "UmbracoXsltExtensions";
+		static string _xsltExtensionsConfig = IOHelper.MapPath(SystemDirectories.Config + "/xsltExtensions.config");
+		static object _xsltExtensionsSyncLock = new object();
+
+        static Dictionary<string, object> GetXsltExtensionsImpl()
         {
             // fill a dictionary with the predefined extensions
             var extensions = new Dictionary<string, object>(GetPredefinedXsltExtensions());
 
             // Load the XSLT extensions configuration
             var xsltExt = new XmlDocument();
-            xsltExt.Load(IOHelper.MapPath(SystemDirectories.Config + "/xsltExtensions.config"));
+			xsltExt.Load(_xsltExtensionsConfig);
 
             // add all descendants of the XsltExtensions element
             foreach (XmlNode xsltEx in xsltExt.SelectSingleNode("/XsltExtensions"))
