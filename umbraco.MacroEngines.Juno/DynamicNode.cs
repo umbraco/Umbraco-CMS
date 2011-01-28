@@ -20,6 +20,10 @@ namespace umbraco.MacroEngines
             else
                 throw new ArgumentNullException("n", "A node must be provided to make a dynamic instance");
         }
+        public DynamicNode(int NodeId)
+        {
+            this.n = new NodeFactory.Node(NodeId);
+        }
         public DynamicNode()
         {
             //Empty constructor for a special case with Generic Methods
