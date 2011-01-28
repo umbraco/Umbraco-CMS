@@ -5,6 +5,9 @@ using System.Linq;
 using umbraco.interfaces;
 using System.Collections;
 using System.Reflection;
+using umbraco.cms.businesslogic.web;
+using umbraco.cms.businesslogic.propertytype;
+using umbraco.cms.businesslogic.property;
 
 namespace umbraco.MacroEngines
 {
@@ -174,6 +177,42 @@ namespace umbraco.MacroEngines
                 if (data != null)
                 {
                     result = data.Value;
+                    //special casing for true/false properties
+                    //so they can be used like this:
+                    //if(@Model.shouldBeVisible)
+                    //first check string value
+                    if (data.Value == "1" || data.Value == "0")
+                    {
+                        //I'm aware this code is pretty heavy, which is why it's inside the string check
+                        //I think it's important to check the property type because otherwise if you have a field which stores 0 or 1
+                        //but isn't a True/False property then DynamicNode would return it as a boolean anyway
+                        //The property type is not on IProperty (it's not stored in NodeFactory)
+                        Document d = new Document(this.n.Id);
+                        if (d != null)
+                        {
+                            // Get Property Alias from Macro
+                            Property prop = d.getProperty(data.Alias);
+                            if (prop != null)
+                            {
+
+                                PropertyType propType = prop.PropertyType;
+                                if (propType != null)
+                                {
+                                    if (propType.ContentTypeId == 1047) //is there a better way than checking this?
+                                    {
+
+                                        bool parseResult;
+                                        if (Boolean.TryParse(result.ToString().Replace("1", "true").Replace("0", "false"), out parseResult))
+                                        {
+                                            result = parseResult;
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     return true;
                 }
 
