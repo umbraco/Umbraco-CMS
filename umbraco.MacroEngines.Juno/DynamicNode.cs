@@ -249,28 +249,7 @@ namespace umbraco.MacroEngines
         }
         public DynamicNode AncestorOrSelf()
         {
-            var node = this;
-            while (node != null)
-            {
-                DynamicNode parent = node.Parent;
-                if (parent != null)
-                {
-                    if (this != parent)
-                    {
-                        node = parent;
-                    }
-                    else
-                    {
-                        return node;
-                    }
-                }
-                else
-                {
-                    return node;
-                }
-            }
-
-            return node;
+            return AncestorOrSelf(node => node.Level == 1);
         }
         public DynamicNode AncestorOrSelf(Func<DynamicNode, bool> func)
         {
