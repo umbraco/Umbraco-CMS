@@ -271,6 +271,10 @@ namespace umbraco.MacroEngines
             if (n != null)
             {
                 IProperty prop = n.GetProperty(propertyAlias);
+                if (prop == null && propertyAlias.Substring(0, 1).ToUpper() == propertyAlias.Substring(0, 1))
+                {
+                    prop = n.GetProperty(propertyAlias.Substring(0, 1).ToLower() + propertyAlias.Substring((1)));
+                }
                 if (prop != null)
                 {
                     int mediaNodeId;
@@ -280,6 +284,11 @@ namespace umbraco.MacroEngines
                         if (media != null)
                         {
                             Property mprop = media.getProperty(mediaPropertyAlias);
+                            // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
+                            if (prop == null && mediaPropertyAlias.Substring(0, 1).ToUpper() == mediaPropertyAlias.Substring(0, 1))
+                            {
+                                mprop = media.getProperty(mediaPropertyAlias.Substring(0, 1).ToLower() + mediaPropertyAlias.Substring((1)));
+                            }
                             if (mprop != null)
                             {
                                 return string.Format("{0}", mprop.Value);

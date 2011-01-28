@@ -38,6 +38,11 @@ namespace umbraco.MacroEngines
             if (_media != null)
             {
                 Property prop = _media.getProperty(name);
+                // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
+                if (prop == null && name.Substring(0, 1).ToUpper() == name.Substring(0, 1))
+                {
+                    prop = _media.getProperty(name.Substring(0, 1).ToLower() + name.Substring((1)));
+                }
                 if (prop != null)
                 {
                     result = prop.Value;
@@ -47,6 +52,7 @@ namespace umbraco.MacroEngines
                     }
                     return true;
                 }
+
                 //return false because we have a media item now but the property doesn't exist
                 result = null;
                 return false;
