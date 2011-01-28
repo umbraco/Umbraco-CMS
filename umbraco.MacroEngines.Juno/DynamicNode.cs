@@ -297,7 +297,10 @@ namespace umbraco.MacroEngines
                 return this;
             }
         }
-
+        public DynamicNode NodeById(int Id)
+        {
+            return new DynamicNode(Id);
+        }
         public int Id
         {
             get { if (n == null) return 0; return n.Id; }
