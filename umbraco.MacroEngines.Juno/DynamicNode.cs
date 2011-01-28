@@ -247,14 +247,53 @@ namespace umbraco.MacroEngines
             }
             return false;
         }
+        public DynamicNode AncestorOrSelf()
+        {
+            var node = this;
+            while (node != null)
+            {
+                DynamicNode parent = node.Parent;
+                if (parent != null)
+                {
+                    if (this != parent)
+                    {
+                        node = parent;
+                    }
+                    else
+                    {
+                        return node;
+                    }
+                }
+                else
+                {
+                    return node;
+                }
+            }
 
+            return node;
+        }
         public DynamicNode AncestorOrSelf(Func<DynamicNode, bool> func)
         {
             var node = this;
             while (node != null)
             {
                 if (func(node)) return node;
-                node = node.Parent;
+                DynamicNode parent = node.Parent;
+                if (parent != null)
+                {
+                    if (this != parent)
+                    {
+                        node = parent;
+                    }
+                    else
+                    {
+                        return node;
+                    }
+                }
+                else
+                {
+                    return node;
+                }
             }
 
             return node;
@@ -262,7 +301,18 @@ namespace umbraco.MacroEngines
 
         public DynamicNode Parent
         {
-            get { if (n == null) return null; return new DynamicNode(n.Parent); }
+            get
+            {
+                if (n == null)
+                {
+                    return null;
+                }
+                if (n.Parent != null)
+                {
+                    return new DynamicNode(n.Parent);
+                }
+                return this;
+            }
         }
 
         public int Id
