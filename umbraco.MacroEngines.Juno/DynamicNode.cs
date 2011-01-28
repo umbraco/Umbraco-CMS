@@ -249,6 +249,48 @@ namespace umbraco.MacroEngines
             return false;
         }
 
+        public DynamicMedia Media(string propertyAlias)
+        {
+            if (n != null)
+            {
+                IProperty prop = n.GetProperty(propertyAlias);
+                if (prop != null)
+                {
+                    int mediaNodeId;
+                    if (int.TryParse(prop.Value, out mediaNodeId))
+                    {
+                        return new DynamicMedia(mediaNodeId);
+                    }
+                }
+                return null;
+            }
+            return null;
+        }
+        public string Media(string propertyAlias, string mediaPropertyAlias)
+        {
+            if (n != null)
+            {
+                IProperty prop = n.GetProperty(propertyAlias);
+                if (prop != null)
+                {
+                    int mediaNodeId;
+                    if (int.TryParse(prop.Value, out mediaNodeId))
+                    {
+                        umbraco.cms.businesslogic.media.Media media = new cms.businesslogic.media.Media(mediaNodeId);
+                        if (media != null)
+                        {
+                            Property mprop = media.getProperty(mediaPropertyAlias);
+                            if (mprop != null)
+                            {
+                                return string.Format("{0}", mprop.Value);
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
         //this is from SqlMetal and just makes it a bit of fun to allow pluralisation
         private static string MakePluralName(string name)
         {
