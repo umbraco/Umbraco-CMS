@@ -9,11 +9,13 @@ using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.property;
 
+
 namespace umbraco.MacroEngines
 {
     public class DynamicNode : DynamicObject, IEnumerable
     {
         private DynamicDictionary _properties;
+        private Dictionary<string, IDataType> _propertyTypeCache = new Dictionary<string, IDataType>();
 
         private readonly INode n;
         public DynamicNode(INode n)
@@ -187,6 +189,21 @@ namespace umbraco.MacroEngines
                         //I think it's important to check the property type because otherwise if you have a field which stores 0 or 1
                         //but isn't a True/False property then DynamicNode would return it as a boolean anyway
                         //The property type is not on IProperty (it's not stored in NodeFactory)
+
+                        //first check the cache
+                        if (_propertyTypeCache != null && _propertyTypeCache.ContainsKey(name))
+                        {
+                            if (_propertyTypeCache[name] is umbraco.editorControls.yesno.YesNoDataType)
+                            {
+                                bool parseResult;
+                                if (Boolean.TryParse(result.ToString().Replace("1", "true").Replace("0", "false"), out parseResult))
+                                {
+                                    result = parseResult;
+                                }
+                                return true;
+                            }
+                        }
+
                         Document d = new Document(this.n.Id);
                         if (d != null)
                         {
@@ -198,7 +215,8 @@ namespace umbraco.MacroEngines
                                 PropertyType propType = prop.PropertyType;
                                 if (propType != null)
                                 {
-                                    if (propType.ContentTypeId == 1047) //is there a better way than checking this?
+                                    _propertyTypeCache.Add(name, propType.DataTypeDefinition.DataType);
+                                    if (propType.DataTypeDefinition.DataType is umbraco.editorControls.yesno.YesNoDataType)
                                     {
 
                                         bool parseResult;
