@@ -69,7 +69,7 @@
     <Compile Include="DynamicNode.cs" />
     <Compile Include="DynamicNodeContext.cs" />
     <Compile Include="IMacroContext.cs" />
-    <Compile Include="DynamicLambdaDictionary.cs" />
+    <Compile Include="LambdaDictionary.cs" />
     <Compile Include="ParameterDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RazorBuildProvider.cs" />

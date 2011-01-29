@@ -10,11 +10,11 @@ namespace umbraco.MacroEngines
         private MacroModel _macro;
         private INode _node;
         protected T CurrentModel;
-        protected DynamicLambdaDictionary<string> ParameterDictionary;
-        protected DynamicLambdaDictionary<string> CultureDictionary;
+        protected ParameterDictionary ParameterDictionary;
+        protected CultureDictionary CultureDictionary;
 
-        public dynamic Parameter { get { return ParameterDictionary; } }
-        public dynamic Dictionary { get { return CultureDictionary; } }
+        public ParameterDictionary Parameter { get { return ParameterDictionary; } }
+        public CultureDictionary Dictionary { get { return CultureDictionary; } }
 
         public MacroModel Macro { get { return _macro; } }
         public INode Node { get { return _node; } }
