@@ -554,6 +554,13 @@
     <Compile Include="umbraco\dashboard\ChangePassword.ascx.designer.cs">
       <DependentUpon>ChangePassword.ascx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\dashboard\DesktopMediaUploader.ascx.cs">
+      <DependentUpon>DesktopMediaUploader.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dashboard\DesktopMediaUploader.ascx.designer.cs">
+      <DependentUpon>DesktopMediaUploader.ascx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\dashboard\DeveloperDashboardIntro.ascx.designer.cs">
       <DependentUpon>DeveloperDashboardIntro.ascx</DependentUpon>
     </Compile>
@@ -1645,6 +1652,7 @@
     </Compile>
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
+    <Content Include="umbraco\dashboard\DesktopMediaUploader.ascx" />
     <Content Include="umbraco_client\Installer\images\bg-inp-big.png" />
     <Content Include="umbraco_client\modal\jquery.simplemodal.1.4.1.custom.js" />
     <Content Include="web.config.INDIGO64SSD.xslt" />
@@ -3187,6 +3195,7 @@
     <Folder Include="media\" />
     <Folder Include="python\" />
     <Folder Include="scripts\" />
+    <Folder Include="umbraco\dashboard\swfs\" />
     <Folder Include="umbraco\imaging\" />
     <Folder Include="umbraco\library\" />
     <Folder Include="umbraco\webservices\api\" />
