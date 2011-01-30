@@ -1400,6 +1400,9 @@
       <DependentUpon>MacroContainerService.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="umbraco\webservices\MediaUploader.ashx.cs">
+      <DependentUpon>MediaUploader.ashx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\webservices\TagsAutoCompleteHandler.ashx.cs">
       <DependentUpon>TagsAutoCompleteHandler.ashx</DependentUpon>
     </Compile>
@@ -3087,6 +3090,7 @@
     </None>
     <Content Include="umbraco\webservices\TagsAutoCompleteHandler.ashx" />
     <Content Include="umbraco\webservices\UltimatePickerAutoCompleteHandler.ashx" />
+    <Content Include="umbraco\webservices\MediaUploader.ashx" />
     <None Include="umbraco_client\CodeMirror\LICENSE" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
     <Content Include="web.config.APOWELL-BC-WIN7.xslt" />
