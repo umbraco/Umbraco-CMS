@@ -383,7 +383,7 @@ namespace umbraco.cms.presentation
                                     if (library.NiceUrl(int.Parse(s)) == "")
                                         tempLink = "<em>N/A</em>";
                                     else if (int.Parse(s) != _document.Id)
-                                        tempLink = "http://" + domains[i].Name + currentLink.Replace(library.NiceUrl(int.Parse(s)).Replace(".aspx", ""), "");
+                                        tempLink = "http://" + domains[i].Name + "/" + currentLink.Replace(library.NiceUrl(int.Parse(s)).Replace(".aspx", ""), "").Substring(1);
                                     else
                                         tempLink = "http://" + domains[i].Name;
 
