@@ -15,7 +15,7 @@ namespace umbraco.MacroEngines
     public class DynamicNode : DynamicObject, IEnumerable
     {
         private DynamicDictionary _properties;
-        private Dictionary<string, IDataType> _propertyTypeCache = new Dictionary<string, IDataType>();
+        private Dictionary<string, Guid> _propertyTypeCache = new Dictionary<string, Guid>();
 
         private readonly INode n;
         public DynamicNode(INode n)
@@ -183,53 +183,69 @@ namespace umbraco.MacroEngines
                     //so they can be used like this:
                     //if(@Model.shouldBeVisible)
                     //first check string value
-                    if (data.Value == "1" || data.Value == "0")
+                    //if (data.Value == "1" || data.Value == "0")
+                    //{
+                    //I'm aware this code is pretty heavy
+                    //but I cant see another way to do it
+                    //I was originally checking the string value of data.Value == "0" || data.value == "1" before the property
+                    //type check, but this failed when a new True/False property was added to a node after the content was created
+                    //sometimes the data.Value was "" for the boolean. Not sure under what case this applies but needless to say, 
+                    //the razor template would crash because now an empty string was returned instead of (bool)false.
+                    //The type gets checked and cached, which is not going to be very good for performance, but i'm not sure how much
+                    //of a difference it will make.
+                    //the easiest fix for this (if you want to keep the nice boolean casting stuff) is to get the type into IProperty
+                    //I think it's important to check the property type because otherwise if you have a field which stores 0 or 1
+                    //but isn't a True/False property then DynamicNode would return it as a boolean anyway
+                    //The property type is not on IProperty (it's not stored in NodeFactory)
+                    umbraco.editorControls.yesno.YesNoDataType yesnoType = new editorControls.yesno.YesNoDataType();
+                    //first check the cache
+                    if (_propertyTypeCache != null && _propertyTypeCache.ContainsKey(name))
                     {
-                        //I'm aware this code is pretty heavy, which is why it's inside the string check
-                        //I think it's important to check the property type because otherwise if you have a field which stores 0 or 1
-                        //but isn't a True/False property then DynamicNode would return it as a boolean anyway
-                        //The property type is not on IProperty (it's not stored in NodeFactory)
-
-                        //first check the cache
-                        if (_propertyTypeCache != null && _propertyTypeCache.ContainsKey(name))
+                        if (_propertyTypeCache[name] == yesnoType.Id)
                         {
-                            if (_propertyTypeCache[name] is umbraco.editorControls.yesno.YesNoDataType)
+                            bool parseResult;
+                            if (result.ToString() == "") result = "0";
+                            if (Boolean.TryParse(result.ToString().Replace("1", "true").Replace("0", "false"), out parseResult))
                             {
-                                bool parseResult;
-                                if (Boolean.TryParse(result.ToString().Replace("1", "true").Replace("0", "false"), out parseResult))
-                                {
-                                    result = parseResult;
-                                }
-                                return true;
+                                result = parseResult;
                             }
+                            return true;
                         }
-
-                        Document d = new Document(this.n.Id);
-                        if (d != null)
+                        else
                         {
-                            // Get Property Alias from Macro
-                            Property prop = d.getProperty(data.Alias);
-                            if (prop != null)
+                            //property type already cached and not boolean
+                            return true;
+                        }
+                    }
+                    //find the type of the property
+                    //heavy :(
+                    Document d = new Document(this.n.Id);
+                    if (d != null)
+                    {
+                        // Get Property Alias from Macro
+                        Property prop = d.getProperty(data.Alias);
+                        if (prop != null)
+                        {
+                            //get type from property
+                            PropertyType propType = prop.PropertyType;
+                            if (propType != null)
                             {
-
-                                PropertyType propType = prop.PropertyType;
-                                if (propType != null)
+                                //got type, add to cache
+                                _propertyTypeCache.Add(name, propType.DataTypeDefinition.DataType.Id);
+                                if (propType.DataTypeDefinition.DataType.Id == yesnoType.Id)
                                 {
-                                    _propertyTypeCache.Add(name, propType.DataTypeDefinition.DataType);
-                                    if (propType.DataTypeDefinition.DataType is umbraco.editorControls.yesno.YesNoDataType)
+                                    bool parseResult;
+                                    if (result.ToString() == "") result = "0";
+                                    if (Boolean.TryParse(result.ToString().Replace("1", "true").Replace("0", "false"), out parseResult))
                                     {
-
-                                        bool parseResult;
-                                        if (Boolean.TryParse(result.ToString().Replace("1", "true").Replace("0", "false"), out parseResult))
-                                        {
-                                            result = parseResult;
-                                        }
-
+                                        result = parseResult;
                                     }
+
                                 }
                             }
                         }
                     }
+                    //}
 
                     return true;
                 }
