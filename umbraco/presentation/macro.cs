@@ -834,78 +834,16 @@ namespace umbraco
 
             //also get types marked with XsltExtension attribute
 
-            try
+			// zb-00042 #29949 : do not hide errors, refactor
+            foreach (Type xsltType in BusinessLogic.Utils.TypeFinder.FindClassesMarkedWithAttribute(typeof(XsltExtensionAttribute)))
             {
-                foreach (Type xsltType in BusinessLogic.Utils.TypeFinder.FindClassesMarkedWithAttribute(typeof(XsltExtensionAttribute)))
+                object[] tpAttributes = xsltType.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
+                foreach (XsltExtensionAttribute tpAttribute in tpAttributes)
                 {
-                    object[] tpAttributes = xsltType.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
-                    foreach (XsltExtensionAttribute tpAttribute in tpAttributes)
-                    {
-                        if (tpAttribute.Namespace != String.Empty)
-                        {
-                            extensions.Add(tpAttribute.Namespace, Activator.CreateInstance(xsltType));
-                        }
-                        else
-                        {
-                            extensions.Add(xsltType.FullName, Activator.CreateInstance(xsltType));
-                        }
-                    }
+					string ns = !string.IsNullOrEmpty(tpAttribute.Namespace) ? tpAttribute.Namespace : xsltType.FullName;
+					extensions.Add(ns, Activator.CreateInstance(xsltType));
                 }
             }
-            catch { }
-
-            //Assembly appCodeAssembly;
-            //try
-            //{
-            //    if (Directory.Exists(GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "App_Code"))
-            //    {
-            //        if (Directory.GetFiles(GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "App_Code",
-            //                               "*.*",
-            //                               SearchOption.AllDirectories).Length > 0)
-            //        {
-            //            appCodeAssembly = Assembly.Load("__code");
-            //            Type[] appCodeType = appCodeAssembly.GetExportedTypes();
-            //            if (appCodeType.Length == 0)
-            //            {
-            //                Log.Add(LogTypes.System, Node.GetCurrent().Id,
-            //                        String.Format(
-            //                            "Could not load types in App_Code ({0}) for XSLT extensions. Ensure you have used the public keyword to ensure class and method exposure.",
-            //                            appCodeAssembly.FullName));
-            //            }
-            //            else
-            //            {
-            //                // create an instance and add it to the extensions list
-            //                foreach (Type tp in appCodeType)
-            //                {
-            //                    object[] tpAttributes = tp.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
-            //                    foreach (XsltExtensionAttribute tpAttribute in tpAttributes)
-            //                    {
-            //                        if (tpAttribute.Namespace != String.Empty)
-            //                        {
-            //                            extensions.Add(tpAttribute.Namespace, Activator.CreateInstance(tp));
-            //                        }
-            //                        else
-            //                        {
-            //                            extensions.Add(tp.FullName, Activator.CreateInstance(tp));
-            //                        }
-            //                    }
-            //                }
-            //            }
-            //        }
-            //    }
-            //    else
-            //    {
-            //        Directory.CreateDirectory(GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "App_Code");
-            //    }
-            //}
-            //catch (FileNotFoundException)
-            //{
-            //    //Do nothing - just means there's nothing to load.
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw new Exception("Could not load App_Code classes for XSLT extensions.", ex);
-            //}
 
             return extensions;
         }
