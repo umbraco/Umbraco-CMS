@@ -7,6 +7,7 @@ using umbraco.interfaces;
 using System.Collections;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Web.Compilation;
 
 namespace umbraco.MacroEngines
 {
@@ -98,7 +99,7 @@ namespace umbraco.MacroEngines
         {
             //get extension methods from runtime
             var candidates = (
-                from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                from assembly in BuildManager.GetReferencedAssemblies().Cast<Assembly>()
                 where assembly.IsDefined(typeof(ExtensionAttribute), false)
                 from type in assembly.GetTypes()
                 where (type.IsDefined(typeof(ExtensionAttribute), false)
