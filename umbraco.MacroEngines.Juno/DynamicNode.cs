@@ -12,7 +12,7 @@ using umbraco.cms.businesslogic.property;
 
 namespace umbraco.MacroEngines
 {
-    public class DynamicNode : DynamicObject, IEnumerable
+    public class DynamicNode : DynamicObject
     {
         private DynamicDictionary _properties;
         private Dictionary<string, Guid> _propertyTypeCache = new Dictionary<string, Guid>();
@@ -37,124 +37,14 @@ namespace umbraco.MacroEngines
         {
             _properties = new DynamicDictionary(dict);
         }
-        IEnumerable<INode> _children;
-        public DynamicNode(IEnumerable<INode> children)
-        {
-            _children = new List<INode>(children);
-        }
-        public IEnumerator GetEnumerator()
-        {
-            return _children.Select(x => new DynamicNode(x)).GetEnumerator();
-        }
 
-
-        public DynamicNode GetChildrenAsList
+        public DynamicNodeList GetChildrenAsList
         {
             get
             {
-                return new DynamicNode(n.ChildrenAsList);
+                return new DynamicNodeList(n.ChildrenAsList);
             }
         }
-
-        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
-        {
-            var name = binder.Name;
-
-            try
-            {
-                //Property?
-                result = _children.GetType().InvokeMember(binder.Name,
-                                                  System.Reflection.BindingFlags.Instance |
-                                                  System.Reflection.BindingFlags.Public |
-                                                  System.Reflection.BindingFlags.NonPublic |
-                                                  System.Reflection.BindingFlags.GetProperty,
-                                                  null,
-                                                  _children,
-                                                  args);
-                return true;
-            }
-            catch (MissingMethodException)
-            {
-                try
-                {
-                    //Static or Instance Method?
-                    result = _children.GetType().InvokeMember(binder.Name,
-                                                  System.Reflection.BindingFlags.Instance |
-                                                  System.Reflection.BindingFlags.Public |
-                                                  System.Reflection.BindingFlags.NonPublic |
-                                                  System.Reflection.BindingFlags.Static |
-                                                  System.Reflection.BindingFlags.InvokeMethod,
-                                                  null,
-                                                  _children,
-                                                  args);
-                    return true;
-                }
-                catch (MissingMethodException)
-                {
-                    try
-                    {
-                        //Extension method
-                        Type tObject = _children.GetType();
-                        Type t = tObject.GetGenericArguments()[0];
-                        Type tIEnumerable = typeof(IEnumerable<>).MakeGenericType(t);
-
-                        var methods = typeof(Enumerable)
-                            .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                            .Where(m => m.Name == name && m.IsGenericMethod && m.GetParameters().Length == args.Length + 1)
-                            .ToList();
-
-                        if (methods.Count == 0)
-                        {
-                            throw new MissingMethodException();
-                        }
-
-
-                        MethodInfo enumerableMethod =
-                            methods
-                            .First()
-                            .MakeGenericMethod(t);
-
-                        var genericArgs = (new[] { _children }).Concat(args);
-
-                        result = enumerableMethod.Invoke(null, genericArgs.ToArray());
-                        if (result is IEnumerable<INode>)
-                        {
-                            result = new DynamicNode((IEnumerable<INode>)result);
-                        }
-                        if (result is INode)
-                        {
-                            result = new DynamicNode((INode)result);
-                        }
-                        return true;
-                    }
-                    catch (TargetInvocationException)
-                    {
-                        //We do this to enable error checking of Razor Syntax when a method e.g. ElementAt(2) is used.
-                        //When the Script is tested, there's no INode which means no children which means ElementAt(2) is invalid (IndexOutOfRange)
-                        //Instead, we are going to return an empty DynamicNode.
-                        //This could be improved by checking return type of generic method above
-                        //So we could support Generic Methods that return IEnumerable as well as Singular
-                        result = new DynamicNode();
-                        return true;
-                    }
-                    catch
-                    {
-                        result = null;
-                        return false;
-                    }
-
-                }
-
-
-            }
-            catch
-            {
-                result = null;
-                return false;
-            }
-
-        }
-
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
@@ -255,7 +145,7 @@ namespace umbraco.MacroEngines
                     .Where(x => MakePluralName(x.NodeTypeAlias) == name || x.NodeTypeAlias == name);
                 if (typeChildren.Any())
                 {
-                    result = new DynamicNode(typeChildren);
+                    result = new DynamicNodeList(typeChildren);
                     return true;
                 }
 

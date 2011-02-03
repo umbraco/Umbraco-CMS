@@ -65,6 +65,7 @@
     <Compile Include="DynamicDictionary.cs" />
     <Compile Include="DynamicMedia.cs" />
     <Compile Include="DynamicNode.cs" />
+    <Compile Include="DynamicNodeList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RazorEngine.cs" />
     <Compile Include="Scripting\MacroScript.cs" />
