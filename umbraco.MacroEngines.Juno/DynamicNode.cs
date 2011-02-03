@@ -29,6 +29,22 @@ namespace umbraco.MacroEngines
         {
             this.n = new NodeFactory.Node(NodeId);
         }
+        public DynamicNode(string NodeId)
+        {
+            int iNodeId = 0;
+            if (int.TryParse(NodeId, out iNodeId))
+            {
+                this.n = new NodeFactory.Node(iNodeId);
+            }
+        }
+        public DynamicNode(object NodeId)
+        {
+            int iNodeId = 0;
+            if (int.TryParse(string.Format("{0}", NodeId), out iNodeId))
+            {
+                this.n = new NodeFactory.Node(iNodeId);
+            }
+        }
         public DynamicNode()
         {
             //Empty constructor for a special case with Generic Methods
@@ -314,6 +330,26 @@ namespace umbraco.MacroEngines
         public DynamicNode NodeById(int Id)
         {
             return new DynamicNode(Id);
+        }
+        public DynamicNode NodeById(string Id)
+        {
+            return new DynamicNode(Id);
+        }
+        public DynamicNode NodeById(object Id)
+        {
+            return new DynamicNode(Id);
+        }
+        public DynamicMedia MediaById(int Id)
+        {
+            return new DynamicMedia(Id);
+        }
+        public DynamicMedia MediaById(string Id)
+        {
+            return new DynamicMedia(Id);
+        }
+        public DynamicMedia MediaById(object Id)
+        {
+            return new DynamicMedia(Id);
         }
         public int Id
         {

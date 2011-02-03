@@ -22,6 +22,24 @@ namespace umbraco.MacroEngines
             _media = media;
             _propertyCache = new Dictionary<string, string>();
         }
+        public DynamicMedia(string mediaId)
+        {
+            int iMediaId = 0;
+            if (int.TryParse(mediaId, out iMediaId))
+            {
+                _media = new Media(iMediaId);
+                _propertyCache = new Dictionary<string, string>();
+            }
+        }
+        public DynamicMedia(object mediaId)
+        {
+            int iMediaId = 0;
+            if (int.TryParse(string.Format("{0}", mediaId), out iMediaId))
+            {
+                _media = new Media(iMediaId);
+                _propertyCache = new Dictionary<string, string>();
+            }
+        }
         public DynamicMedia()
         {
 
