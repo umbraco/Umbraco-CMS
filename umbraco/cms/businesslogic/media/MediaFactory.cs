@@ -56,7 +56,7 @@ namespace umbraco.cms.businesslogic.media
             if (ext == null)
                 return null;
 
-            var factories = Factories.Where(mf => mf.Extensions.Contains(ext.TrimStart('.'))).ToList();
+            var factories = Factories.Where(mf => mf.Extensions.Contains(ext.ToLower().TrimStart('.'))).ToList();
 
             if (factories.Count == 0)
                 factories = Factories.Where(mf => mf.Extensions.Contains("*")).ToList();

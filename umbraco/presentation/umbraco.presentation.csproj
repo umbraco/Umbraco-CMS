@@ -110,9 +110,6 @@
     <Reference Include="Lucene.Net, Version=2.9.2.2, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>C:\Users\Shannon\Documents\Visual Studio 2008\Projects\Umbraco\Branch-4.1\foreign dlls\Lucene.Net.dll</HintPath>
     </Reference>
-    <Reference Include="Nibble.Umb.ZipUpload">
-      <HintPath>..\..\foreign dlls\Nibble.Umb.ZipUpload.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -1653,6 +1650,15 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="umbraco\dashboard\DesktopMediaUploader.ascx" />
+    <Content Include="umbraco\dashboard\images\dmu-badge.jpg" />
+    <Content Include="umbraco\dashboard\images\dmu.png" />
+    <Content Include="umbraco\dashboard\images\logo32x32.png" />
+    <Content Include="umbraco\dashboard\images\membersearch.png" />
+    <Content Include="umbraco\dashboard\images\starterkit32x32.png" />
+    <Content Include="umbraco\dashboard\images\TV.png" />
+    <Content Include="umbraco\dashboard\images\ZipFile.png" />
+    <Content Include="umbraco\dashboard\swfs\AIRInstallBadge.swf" />
+    <Content Include="umbraco\dashboard\swfs\expressinstall.swf" />
     <Content Include="umbraco_client\Installer\images\bg-inp-big.png" />
     <Content Include="umbraco_client\modal\jquery.simplemodal.1.4.1.custom.js" />
     <Content Include="web.config.INDIGO64SSD.xslt" />
@@ -2376,6 +2382,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
     </None>
+    <None Include="umbraco\dashboard\air\DesktopMediaUploader.air" />
     <None Include="umbraco\LiveEditing\LiveEditing.cd" />
     <Content Include="umbraco\masterpages\umbracoPage.Master" />
     <Content Include="umbraco\masterpages\umbracoDialog.Master" />
@@ -3195,7 +3202,6 @@
     <Folder Include="media\" />
     <Folder Include="python\" />
     <Folder Include="scripts\" />
-    <Folder Include="umbraco\dashboard\swfs\" />
     <Folder Include="umbraco\imaging\" />
     <Folder Include="umbraco\library\" />
     <Folder Include="umbraco\webservices\api\" />
