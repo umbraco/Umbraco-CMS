@@ -30,7 +30,8 @@
                             airversion: "2.0"
                         };
                         var params = {
-                            menu: "false"
+                            menu: "false",
+                            wmode: "opaque"
                         };
                         var attributes = {
                             style: "margin-bottom:10px;"
