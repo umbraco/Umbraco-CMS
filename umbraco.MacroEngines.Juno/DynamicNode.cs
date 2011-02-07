@@ -370,7 +370,11 @@ namespace umbraco.MacroEngines
         {
             get { if (n == null) return null; return n.Name; }
         }
-
+        public bool Visible
+        {
+            get;
+            set;
+        }
         public string Url
         {
             get { if (n == null) return null; return n.Url; }

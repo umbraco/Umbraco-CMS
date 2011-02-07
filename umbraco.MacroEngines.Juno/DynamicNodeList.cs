@@ -8,7 +8,8 @@ using System.Collections;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Web.Compilation;
-
+using System.Linq.Expressions;
+using System.Linq.Dynamic;
 namespace umbraco.MacroEngines
 {
     public class DynamicNodeList : DynamicObject, IEnumerable
@@ -31,6 +32,13 @@ namespace umbraco.MacroEngines
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
             var name = binder.Name;
+            if (name == "Where")
+            {
+                string predicate = args.First().ToString();
+                var values = args.Skip(1).ToArray();
+                result = new DynamicNodeList(this.Where<DynamicNode>(predicate, values).ToList());
+                return true;
+            }
 
             try
             {
@@ -208,6 +216,11 @@ namespace umbraco.MacroEngines
         public IEnumerator GetEnumerator()
         {
             return Items.GetEnumerator();
+        }
+
+        public IQueryable<T> Where<T>(string predicate, params object[] values)
+        {
+            return ((IQueryable<T>)Items.AsQueryable()).Where(predicate, values);
         }
     }
 }

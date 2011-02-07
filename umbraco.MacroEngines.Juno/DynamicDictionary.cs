@@ -15,7 +15,14 @@ namespace umbraco.MacroEngines
         }
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            _dictionary[binder.Name] = value;
+            if (_dictionary.ContainsKey(binder.Name))
+            {
+                _dictionary[binder.Name.ToLower()] = value;
+            }
+            else
+            {
+                _dictionary.Add(binder.Name.ToLower(), value);
+            }
             return true;
         }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
