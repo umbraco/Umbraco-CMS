@@ -36,14 +36,18 @@ namespace System.Linq.Dynamic
                     object value = -1;
                     //value = func(node);
                     //I can't figure out why this is double func<>'d
-                    var firstFunc = func(node);
-                    if (firstFunc is Func<DynamicNode, object>)
+                    var firstFuncResult = func(node);
+                    if (firstFuncResult is Func<DynamicNode, object>)
                     {
-                        value = (func(node) as Func<DynamicNode, object>)(node);
+                        value = (firstFuncResult as Func<DynamicNode, object>)(node);
                     }
-                    if (firstFunc is Func<DynamicNode, bool>)
+                    if (firstFuncResult is Func<DynamicNode, bool>)
                     {
-                        value = (func(node) as Func<DynamicNode, bool>)(node);
+                        value = (firstFuncResult as Func<DynamicNode, bool>)(node);
+                    }
+                    if (firstFuncResult is bool)
+                    {
+                        return (bool)firstFuncResult;
                     }
                     if (value is bool)
                     {
@@ -1957,36 +1961,50 @@ namespace System.Linq.Dynamic
 
         Expression GenerateEqual(Expression left, Expression right)
         {
+            return HandleDynamicNodeLambdas(ExpressionType.Equal, left, right);
+        }
+
+        private static Expression HandleDynamicNodeLambdas(ExpressionType expressionType, Expression left, Expression right)
+        {
+            Expression innerLeft = null;
+            Expression innerRight = null;
+            ParameterExpression[] parameters = null;
             if (left is LambdaExpression && typeof(Func<DynamicNode, object>).IsAssignableFrom(((LambdaExpression)left).Type))
             {
                 LambdaExpression leftLambda = (LambdaExpression)left;
                 var invokedExpr = Expression.Invoke(left, leftLambda.Parameters.Cast<Expression>());
-                return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.Equal(Expression.Convert(invokedExpr, typeof(bool)), right), leftLambda.Parameters));
+                innerLeft = Expression.Convert(invokedExpr, typeof(bool));
+                parameters = new ParameterExpression[leftLambda.Parameters.Count];
+                leftLambda.Parameters.CopyTo(parameters, 0);
             }
-            else if (right is LambdaExpression && typeof(Func<DynamicNode, object>).IsAssignableFrom(((LambdaExpression)right).Type))
+            if (right is LambdaExpression && typeof(Func<DynamicNode, object>).IsAssignableFrom(((LambdaExpression)right).Type))
             {
                 LambdaExpression rightLambda = (LambdaExpression)right;
                 var invokedExpr = Expression.Invoke(right, rightLambda.Parameters.Cast<Expression>());
-                return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.Equal(Expression.Convert(invokedExpr, typeof(bool)), left), rightLambda.Parameters));
+                innerRight = Expression.Convert(invokedExpr, typeof(bool));
+                parameters = new ParameterExpression[rightLambda.Parameters.Count];
+                rightLambda.Parameters.CopyTo(parameters, 0);
             }
-            else if (right is LambdaExpression && typeof(Func<DynamicNode, object>).IsAssignableFrom(((LambdaExpression)right).Type)
-                && left is LambdaExpression && typeof(Func<DynamicNode, object>).IsAssignableFrom(((LambdaExpression)left).Type))
+
+            //For some reason, this update doesn't actually update the expression even when left/right are clearly different
+            //to what the initialization left & right were
+            //it seemed to work for Expression.Equal but not Expression.NotEqual
+            //binaryExpr.Update(innerLeft ?? left, binaryExpr.Conversion, innerRight ?? right);
+            switch (expressionType)
             {
-                LambdaExpression leftLambda = (LambdaExpression)left;
-                var invokedLeftExpr = Expression.Invoke(left, leftLambda.Parameters.Cast<Expression>());
-                LambdaExpression rightLambda = (LambdaExpression)right;
-                var invokedRightExpr = Expression.Invoke(right, rightLambda.Parameters.Cast<Expression>());
-                return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.Equal(Expression.Convert(invokedLeftExpr, typeof(bool)), Expression.Convert(invokedRightExpr, typeof(bool))), leftLambda.Parameters));
+                case ExpressionType.Equal:
+                    return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.Equal(innerLeft ?? left, innerRight ?? right), parameters));
+                case ExpressionType.NotEqual:
+                    return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.NotEqual(innerLeft ?? left, innerRight ?? right), parameters));
+                default:
+                    return Expression.Equal(left, right);
             }
-            else
-            {
-                return Expression.Equal(left, right);
-            }
+
         }
 
         Expression GenerateNotEqual(Expression left, Expression right)
         {
-            return Expression.NotEqual(left, right);
+            return HandleDynamicNodeLambdas(ExpressionType.NotEqual, left, right);
         }
 
         Expression GenerateGreaterThan(Expression left, Expression right)
