@@ -86,6 +86,10 @@
       <Project>{CCD75EC3-63DB-4184-B49D-51C1DD337230}</Project>
       <Name>umbraco.cms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\umbraco\datalayer\umbraco.datalayer.csproj">
+      <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
+      <Name>umbraco.datalayer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\umbraco\interfaces\umbraco.interfaces.csproj">
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Name>umbraco.interfaces</Name>
