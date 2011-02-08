@@ -780,7 +780,7 @@ namespace System.Linq.Dynamic
                 NextToken();
                 Expression right = ParseLogicalAnd();
                 CheckAndPromoteOperands(typeof(ILogicalSignatures), op.text, ref left, ref right, op.pos);
-                left = Expression.OrElse(left, right);
+                left = HandleDynamicNodeLambdas(ExpressionType.OrElse, left, right);
             }
             return left;
         }
@@ -795,7 +795,7 @@ namespace System.Linq.Dynamic
                 NextToken();
                 Expression right = ParseComparison();
                 CheckAndPromoteOperands(typeof(ILogicalSignatures), op.text, ref left, ref right, op.pos);
-                left = Expression.AndAlso(left, right);
+                left = HandleDynamicNodeLambdas(ExpressionType.AndAlso, left, right);
             }
             return left;
         }
@@ -825,6 +825,10 @@ namespace System.Linq.Dynamic
                         else if (right.Type.IsAssignableFrom(left.Type))
                         {
                             left = Expression.Convert(left, right.Type);
+                        }
+                        else if (left is LambdaExpression || right is LambdaExpression)
+                        {
+                            //do nothing here (but further down we'll handle the lambdaexpression)
                         }
                         else
                         {
@@ -1969,12 +1973,16 @@ namespace System.Linq.Dynamic
             Expression innerLeft = null;
             Expression innerRight = null;
             ParameterExpression[] parameters = null;
+            bool bothLambdas = false;
+            Type usualLambdaExpressionT = typeof(Func<DynamicNode, Boolean>);
             if (left is LambdaExpression
-                && 
+                &&
                 (
                     (typeof(Func<DynamicNode, object>).IsAssignableFrom(((LambdaExpression)left).Type))
                     ||
                     (typeof(Func<DynamicNode, int>).IsAssignableFrom(((LambdaExpression)left).Type))
+                    ||
+                    (typeof(Func<DynamicNode, bool>).IsAssignableFrom(((LambdaExpression)left).Type))
                     ))
             {
                 LambdaExpression leftLambda = (LambdaExpression)left;
@@ -1988,6 +1996,7 @@ namespace System.Linq.Dynamic
                     if (right is LambdaExpression)
                     {
                         //If the left hand side is also lambda, we'll have to use a switching expression tree for the conversion
+                        //handled in the check for right, because it occurs second
                     }
                 }
                 parameters = new ParameterExpression[leftLambda.Parameters.Count];
@@ -1999,6 +2008,8 @@ namespace System.Linq.Dynamic
                     (typeof(Func<DynamicNode, object>).IsAssignableFrom(((LambdaExpression)right).Type))
                     ||
                     (typeof(Func<DynamicNode, int>).IsAssignableFrom(((LambdaExpression)right).Type))
+                    ||
+                    (typeof(Func<DynamicNode, bool>).IsAssignableFrom(((LambdaExpression)right).Type))
                     ))
             {
                 LambdaExpression rightLambda = (LambdaExpression)right;
@@ -2006,16 +2017,46 @@ namespace System.Linq.Dynamic
                 if (left is ConstantExpression)
                 {
                     innerRight = Expression.Convert(invokedExpr, (left as ConstantExpression).Type);
+                    parameters = new ParameterExpression[rightLambda.Parameters.Count];
+                    rightLambda.Parameters.CopyTo(parameters, 0);
                 }
                 else
                 {
                     if (left is LambdaExpression)
                     {
-                        //If the left hand side is also lambda, we'll have to use a switching expression tree for the conversion
+                        //both are lambda expressions
+                        if (((LambdaExpression)left).Type.IsAssignableFrom(((LambdaExpression)right).Type))
+                        {
+                            //if both are Func<DynamicNode,bool> or Func<DynamicNode,object> or Func<DynamicNode,int>
+                            //get the TOut from the Func
+                            Type leftType = ((LambdaExpression)left).Type;
+                            Type rightType = ((LambdaExpression)right).Type;
+                            Type[] leftTypeGenericArguments = leftType.GetGenericArguments();
+                            Type[] rightTypeGenericArguments = rightType.GetGenericArguments();
+                            if (leftTypeGenericArguments.SequenceEqual(rightTypeGenericArguments))
+                            {
+                                //both Lambdas should reduce down the same
+                                if (leftTypeGenericArguments.Length == 2)
+                                {
+                                    //get TOut (debugging - should be bool)
+                                    Type TOut = leftTypeGenericArguments[1];
+
+                                    if (expressionType == ExpressionType.AndAlso)
+                                    {
+                                        return PredicateBuilder.And<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, right as Expression<Func<DynamicNode, bool>>);
+                                    }
+                                    if (expressionType == ExpressionType.OrElse)
+                                    {
+                                        return PredicateBuilder.Or<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, right as Expression<Func<DynamicNode, bool>>);
+                                    }
+
+                                    bothLambdas = true;
+                                }
+                            }
+                        }
                     }
                 }
-                parameters = new ParameterExpression[rightLambda.Parameters.Count];
-                rightLambda.Parameters.CopyTo(parameters, 0);
+
             }
 
             //For some reason, this update doesn't actually update the expression even when left/right are clearly different
@@ -2038,6 +2079,28 @@ namespace System.Linq.Dynamic
                     return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.LessThanOrEqual(innerLeft ?? left, innerRight ?? right), parameters));
                 case ExpressionType.Modulo:
                     return (Expression.Lambda<Func<DynamicNode, int>>(Expression.Modulo(innerLeft ?? left, innerRight ?? right), parameters));
+                case ExpressionType.AndAlso:
+                    if (bothLambdas)
+                    {
+                        return Expression.Equal(left, right);
+                        //return PredicateBuilder.And<DynamicNode>(innerLeft as Expression<Func<DynamicNode, bool>>, innerRight as Expression<Func<DynamicNode, bool>>);
+                    }
+                    else
+                    {
+                        return (Expression.Lambda<Func<DynamicNode, DynamicNode, Boolean>>(Expression.AndAlso(innerLeft ?? left, innerRight ?? right), parameters));
+                    }
+                //break;
+                case ExpressionType.OrElse:
+                    if (bothLambdas)
+                    {
+                        return Expression.Equal(left, right);
+                        //return PredicateBuilder.Or<DynamicNode>(innerLeft as Expression<Func<DynamicNode, bool>>, innerRight as Expression<Func<DynamicNode, bool>>);
+                    }
+                    else
+                    {
+                        return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.OrElse(innerLeft ?? left, innerRight ?? right), parameters));
+                    }
+                //break;
                 default:
                     return Expression.Equal(left, right);
             }
@@ -2441,5 +2504,27 @@ namespace System.Linq.Dynamic
         public const string OpenBracketExpected = "'[' expected";
         public const string CloseBracketOrCommaExpected = "']' or ',' expected";
         public const string IdentifierExpected = "Identifier expected";
+    }
+
+    public static class PredicateBuilder
+    {
+        public static Expression<Func<T, bool>> True<T>() { return f => true; }
+        public static Expression<Func<T, bool>> False<T>() { return f => false; }
+
+        public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> expr1,
+                                                            Expression<Func<T, bool>> expr2)
+        {
+            var invokedExpr = Expression.Invoke(expr2, expr1.Parameters.Cast<Expression>());
+            return Expression.Lambda<Func<T, bool>>
+                  (Expression.OrElse(expr1.Body, invokedExpr), expr1.Parameters);
+        }
+
+        public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> expr1,
+                                                             Expression<Func<T, bool>> expr2)
+        {
+            var invokedExpr = Expression.Invoke(expr2, expr1.Parameters.Cast<Expression>());
+            return Expression.Lambda<Func<T, bool>>
+                  (Expression.AndAlso(expr1.Body, invokedExpr), expr1.Parameters);
+        }
     }
 }
