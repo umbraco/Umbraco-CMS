@@ -8,6 +8,8 @@ using System.Reflection;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.property;
+using umbraco.BusinessLogic;
+using umbraco.DataLayer;
 
 
 namespace umbraco.MacroEngines
@@ -86,50 +88,38 @@ namespace umbraco.MacroEngines
                 {
                     result = data.Value;
                     //special casing for true/false properties
-                    //so they can be used like this:
-                    //if(@Model.shouldBeVisible)
-                    //first check string value
-                    //if (data.Value == "1" || data.Value == "0")
-                    //{
-                    //I'm aware this code is pretty heavy
-                    //but I cant see another way to do it
-                    //I was originally checking the string value of data.Value == "0" || data.value == "1" before the property
-                    //type check, but this failed when a new True/False property was added to a node after the content was created
-                    //sometimes the data.Value was "" for the boolean. Not sure under what case this applies but needless to say, 
-                    //the razor template would crash because now an empty string was returned instead of (bool)false.
-                    //The type gets checked and cached, which is not going to be very good for performance, but i'm not sure how much
-                    //of a difference it will make.
-                    //the easiest fix for this (if you want to keep the nice boolean casting stuff) is to get the type into IProperty
-                    //I think it's important to check the property type because otherwise if you have a field which stores 0 or 1
-                    //but isn't a True/False property then DynamicNode would return it as a boolean anyway
+                    //int/decimal are handled by ConvertPropertyValueByDataType
+                    //fallback is string
+
                     //The property type is not on IProperty (it's not stored in NodeFactory)
                     //first check the cache
                     if (_propertyTypeCache != null && _propertyTypeCache.ContainsKey(name))
                     {
                         return ConvertPropertyValueByDataType(ref result, name);
                     }
-                    //find the type of the property
-                    //heavy :(
-                    Document d = new Document(this.n.Id);
-                    if (d != null)
-                    {
-                        // Get Property Alias from Macro
-                        Property prop = d.getProperty(data.Alias);
-                        if (prop != null)
-                        {
-                            //get type from property
-                            PropertyType propType = prop.PropertyType;
-                            if (propType != null)
-                            {
-                                //got type, add to cache
-                                _propertyTypeCache.Add(name, propType.DataTypeDefinition.DataType.Id);
-                                return ConvertPropertyValueByDataType(ref result, name);
-                            }
-                        }
-                    }
-                    //}
 
-                    return true;
+                    //Instead of going via API, run this query to find the control type
+                    //by-passes a lot of queries just to determine if this is a true/false data type
+                    string sql = "select " +
+                        "cmsDataType.controlId " +
+                        "from " +
+                        " cmsContent " +
+                        "inner join cmsDocument on (cmsDocument.nodeId = cmsContent.nodeId) " +
+                        "inner join cmsContentType on (cmsContent.contentType = cmsContentType.nodeid) " +
+                        "inner join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId) " +
+                        "inner join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) " +
+                        " where cmsContent.nodeId = @nodeId and published = 1 and cmsPropertyType.Alias = @propertyAlias";
+                    //grab the controlid
+                    Guid controlId = Application.SqlHelper.ExecuteScalar<Guid>(sql,
+                        Application.SqlHelper.CreateParameter("@nodeId", n.Id),
+                        Application.SqlHelper.CreateParameter("@propertyAlias", data.Alias)
+                        );
+                    //add to cache
+                    _propertyTypeCache.Add(name, controlId);
+
+                    //convert the string value to a known type
+                    return ConvertPropertyValueByDataType(ref result, name);
+
                 }
 
                 //check if the alias is that of a child type
@@ -210,7 +200,7 @@ namespace umbraco.MacroEngines
                 return false;
             }
 
-            return false;
+            return true;
         }
 
         public DynamicMedia Media(string propertyAlias)
