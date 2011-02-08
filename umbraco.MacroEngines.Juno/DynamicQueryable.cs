@@ -860,23 +860,23 @@ namespace System.Linq.Dynamic
                 {
                     case TokenId.Equal:
                     case TokenId.DoubleEqual:
-                        left = GenerateEqual(left, right);
+                        left = HandleDynamicNodeLambdas(ExpressionType.Equal, left, right);
                         break;
                     case TokenId.ExclamationEqual:
                     case TokenId.LessGreater:
-                        left = GenerateNotEqual(left, right);
+                        left = HandleDynamicNodeLambdas(ExpressionType.NotEqual, left, right);
                         break;
                     case TokenId.GreaterThan:
-                        left = GenerateGreaterThan(left, right);
+                        left = HandleDynamicNodeLambdas(ExpressionType.GreaterThan, left, right);
                         break;
                     case TokenId.GreaterThanEqual:
-                        left = GenerateGreaterThanEqual(left, right);
+                        left = HandleDynamicNodeLambdas(ExpressionType.GreaterThanOrEqual, left, right);
                         break;
                     case TokenId.LessThan:
-                        left = GenerateLessThan(left, right);
+                        left = HandleDynamicNodeLambdas(ExpressionType.LessThan, left, right);
                         break;
                     case TokenId.LessThanEqual:
-                        left = GenerateLessThanEqual(left, right);
+                        left = HandleDynamicNodeLambdas(ExpressionType.LessThanOrEqual, left, right);
                         break;
                 }
             }
@@ -934,7 +934,7 @@ namespace System.Linq.Dynamic
                         break;
                     case TokenId.Percent:
                     case TokenId.Identifier:
-                        left = Expression.Modulo(left, right);
+                        left = HandleDynamicNodeLambdas(ExpressionType.Modulo, left, right);
                         break;
                 }
             }
@@ -1969,19 +1969,51 @@ namespace System.Linq.Dynamic
             Expression innerLeft = null;
             Expression innerRight = null;
             ParameterExpression[] parameters = null;
-            if (left is LambdaExpression && typeof(Func<DynamicNode, object>).IsAssignableFrom(((LambdaExpression)left).Type))
+            if (left is LambdaExpression
+                && 
+                (
+                    (typeof(Func<DynamicNode, object>).IsAssignableFrom(((LambdaExpression)left).Type))
+                    ||
+                    (typeof(Func<DynamicNode, int>).IsAssignableFrom(((LambdaExpression)left).Type))
+                    ))
             {
                 LambdaExpression leftLambda = (LambdaExpression)left;
                 var invokedExpr = Expression.Invoke(left, leftLambda.Parameters.Cast<Expression>());
-                innerLeft = Expression.Convert(invokedExpr, typeof(bool));
+                if (right is ConstantExpression)
+                {
+                    innerLeft = Expression.Convert(invokedExpr, (right as ConstantExpression).Type);
+                }
+                else
+                {
+                    if (right is LambdaExpression)
+                    {
+                        //If the left hand side is also lambda, we'll have to use a switching expression tree for the conversion
+                    }
+                }
                 parameters = new ParameterExpression[leftLambda.Parameters.Count];
                 leftLambda.Parameters.CopyTo(parameters, 0);
             }
-            if (right is LambdaExpression && typeof(Func<DynamicNode, object>).IsAssignableFrom(((LambdaExpression)right).Type))
+            if (right is LambdaExpression
+                &&
+                (
+                    (typeof(Func<DynamicNode, object>).IsAssignableFrom(((LambdaExpression)right).Type))
+                    ||
+                    (typeof(Func<DynamicNode, int>).IsAssignableFrom(((LambdaExpression)right).Type))
+                    ))
             {
                 LambdaExpression rightLambda = (LambdaExpression)right;
                 var invokedExpr = Expression.Invoke(right, rightLambda.Parameters.Cast<Expression>());
-                innerRight = Expression.Convert(invokedExpr, typeof(bool));
+                if (left is ConstantExpression)
+                {
+                    innerRight = Expression.Convert(invokedExpr, (left as ConstantExpression).Type);
+                }
+                else
+                {
+                    if (left is LambdaExpression)
+                    {
+                        //If the left hand side is also lambda, we'll have to use a switching expression tree for the conversion
+                    }
+                }
                 parameters = new ParameterExpression[rightLambda.Parameters.Count];
                 rightLambda.Parameters.CopyTo(parameters, 0);
             }
@@ -1996,6 +2028,16 @@ namespace System.Linq.Dynamic
                     return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.Equal(innerLeft ?? left, innerRight ?? right), parameters));
                 case ExpressionType.NotEqual:
                     return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.NotEqual(innerLeft ?? left, innerRight ?? right), parameters));
+                case ExpressionType.GreaterThan:
+                    return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.GreaterThan(innerLeft ?? left, innerRight ?? right), parameters));
+                case ExpressionType.LessThan:
+                    return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.LessThan(innerLeft ?? left, innerRight ?? right), parameters));
+                case ExpressionType.GreaterThanOrEqual:
+                    return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.GreaterThanOrEqual(innerLeft ?? left, innerRight ?? right), parameters));
+                case ExpressionType.LessThanOrEqual:
+                    return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.LessThanOrEqual(innerLeft ?? left, innerRight ?? right), parameters));
+                case ExpressionType.Modulo:
+                    return (Expression.Lambda<Func<DynamicNode, int>>(Expression.Modulo(innerLeft ?? left, innerRight ?? right), parameters));
                 default:
                     return Expression.Equal(left, right);
             }
@@ -2016,7 +2058,7 @@ namespace System.Linq.Dynamic
                     Expression.Constant(0)
                 );
             }
-            return Expression.GreaterThan(left, right);
+            return HandleDynamicNodeLambdas(ExpressionType.GreaterThan, left, right);
         }
 
         Expression GenerateGreaterThanEqual(Expression left, Expression right)
@@ -2028,7 +2070,7 @@ namespace System.Linq.Dynamic
                     Expression.Constant(0)
                 );
             }
-            return Expression.GreaterThanOrEqual(left, right);
+            return HandleDynamicNodeLambdas(ExpressionType.GreaterThanOrEqual, left, right);
         }
 
         Expression GenerateLessThan(Expression left, Expression right)
@@ -2040,7 +2082,7 @@ namespace System.Linq.Dynamic
                     Expression.Constant(0)
                 );
             }
-            return Expression.LessThan(left, right);
+            return HandleDynamicNodeLambdas(ExpressionType.LessThan, left, right);
         }
 
         Expression GenerateLessThanEqual(Expression left, Expression right)
@@ -2052,7 +2094,7 @@ namespace System.Linq.Dynamic
                     Expression.Constant(0)
                 );
             }
-            return Expression.LessThanOrEqual(left, right);
+            return HandleDynamicNodeLambdas(ExpressionType.LessThanOrEqual, left, right);
         }
 
         Expression GenerateAdd(Expression left, Expression right)

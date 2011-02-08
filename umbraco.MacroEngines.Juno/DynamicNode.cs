@@ -103,25 +103,10 @@ namespace umbraco.MacroEngines
                     //I think it's important to check the property type because otherwise if you have a field which stores 0 or 1
                     //but isn't a True/False property then DynamicNode would return it as a boolean anyway
                     //The property type is not on IProperty (it's not stored in NodeFactory)
-                    umbraco.editorControls.yesno.YesNoDataType yesnoType = new editorControls.yesno.YesNoDataType();
                     //first check the cache
                     if (_propertyTypeCache != null && _propertyTypeCache.ContainsKey(name))
                     {
-                        if (_propertyTypeCache[name] == yesnoType.Id)
-                        {
-                            bool parseResult;
-                            if (result.ToString() == "") result = "0";
-                            if (Boolean.TryParse(result.ToString().Replace("1", "true").Replace("0", "false"), out parseResult))
-                            {
-                                result = parseResult;
-                            }
-                            return true;
-                        }
-                        else
-                        {
-                            //property type already cached and not boolean
-                            return true;
-                        }
+                        return ConvertPropertyValueByDataType(ref result, name);
                     }
                     //find the type of the property
                     //heavy :(
@@ -138,16 +123,7 @@ namespace umbraco.MacroEngines
                             {
                                 //got type, add to cache
                                 _propertyTypeCache.Add(name, propType.DataTypeDefinition.DataType.Id);
-                                if (propType.DataTypeDefinition.DataType.Id == yesnoType.Id)
-                                {
-                                    bool parseResult;
-                                    if (result.ToString() == "") result = "0";
-                                    if (Boolean.TryParse(result.ToString().Replace("1", "true").Replace("0", "false"), out parseResult))
-                                    {
-                                        result = parseResult;
-                                    }
-
-                                }
+                                return ConvertPropertyValueByDataType(ref result, name);
                             }
                         }
                     }
@@ -186,6 +162,54 @@ namespace umbraco.MacroEngines
 
 
             result = null;
+            return false;
+        }
+
+        private bool ConvertPropertyValueByDataType(ref object result, string name)
+        {
+            //the resulting property is a string, but to support some of the nice linq stuff in .Where
+            //we should really check some more types
+            umbraco.editorControls.yesno.YesNoDataType yesnoType = new editorControls.yesno.YesNoDataType();
+
+            //boolean
+            if (_propertyTypeCache[name] == yesnoType.Id)
+            {
+                bool parseResult;
+                if (result.ToString() == "") result = "0";
+                if (Boolean.TryParse(result.ToString().Replace("1", "true").Replace("0", "false"), out parseResult))
+                {
+                    result = parseResult;
+                }
+                return true;
+            }
+
+            //integer
+            int iResult = 0;
+            if (int.TryParse(string.Format("{0}", result), out iResult))
+            {
+                result = iResult;
+                return true;
+            }
+
+            //decimal
+            decimal dResult = 0;
+            if (decimal.TryParse(string.Format("{0}", result), out dResult))
+            {
+                result = dResult;
+                return true;
+            }
+
+            if (string.Equals("true", string.Format("{0}", result), StringComparison.CurrentCultureIgnoreCase))
+            {
+                result = true;
+                return true;
+            }
+            if (string.Equals("false", string.Format("{0}", result), StringComparison.CurrentCultureIgnoreCase))
+            {
+                result = false;
+                return false;
+            }
+
             return false;
         }
 
