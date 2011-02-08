@@ -136,23 +136,60 @@ namespace umbraco.MacroEngines
 
             var methodsWhereArgZeroIsTargetType = (from method in withGenericParameterType
                                                    where
-                                                   method.t != null &&
-                                                   (
-                                                       // is it defined on me?
-                                                           genericParameterTypeList.Any(gt => gt == method.t) ||
-
-                                                           // or on any of my interfaces?
-                                                           genericParameterTypeList.Any(gt => gt.GetInterfaces().Contains(method.t)) ||
-
-                                                           // or on any of my base types?
-                                                           genericParameterTypeList.Any(gt => gt.IsSubclassOf(method.t)) ||
-
-                                                           //share a common interface (e.g. IEnumerable)
-                                                           method.t.GetInterfaces().All(i => genericParameterTypeList.Any(gt => gt.GetInterfaces().Contains(i)))
-                                                       )
+                                                   method.t != null && methodArgZeroHasCorrectTargetType(method.m, method.t, genericParameterTypeList)
                                                    select method);
 
             return methodsWhereArgZeroIsTargetType.Select(mt => mt.m).ToList();
+        }
+        private bool methodArgZeroHasCorrectTargetType(MethodInfo method, Type firstArgumentType, Type[] genericParameterTypeList)
+        {
+            //This is done with seperate method calls because you can't debug/watch lamdas - if you're trying to figure
+            //out why the wrong method is returned, it helps to be able to see each boolean result
+
+            return
+
+            // is it defined on me?
+            methodArgZeroHasCorrectTargetType_TypeMatchesExactly(method, firstArgumentType, genericParameterTypeList) ||
+
+            // or on any of my interfaces?
+           methodArgZeroHasCorrectTargetType_AnInterfaceMatches(method, firstArgumentType, genericParameterTypeList) ||
+
+            // or on any of my base types?
+            methodArgZeroHasCorrectTargetType_IsASubclassOf(method, firstArgumentType, genericParameterTypeList) ||
+
+           //share a common interface (e.g. IEnumerable)
+            methodArgZeroHasCorrectTargetType_ShareACommonInterface(method, firstArgumentType, genericParameterTypeList);
+
+
+        }
+
+        private static bool methodArgZeroHasCorrectTargetType_ShareACommonInterface(MethodInfo method, Type firstArgumentType, Type[] genericParameterTypeList)
+        {
+            Type[] interfaces = firstArgumentType.GetInterfaces();
+            if (interfaces.Length == 0)
+            {
+                return false;
+            }
+            bool result = interfaces.All(i => genericParameterTypeList.Any(gt => gt.GetInterfaces().Contains(i)));
+            return result;
+        }
+
+        private static bool methodArgZeroHasCorrectTargetType_IsASubclassOf(MethodInfo method, Type firstArgumentType, Type[] genericParameterTypeList)
+        {
+            bool result = genericParameterTypeList.Any(gt => gt.IsSubclassOf(firstArgumentType));
+            return result;
+        }
+
+        private static bool methodArgZeroHasCorrectTargetType_AnInterfaceMatches(MethodInfo method, Type firstArgumentType, Type[] genericParameterTypeList)
+        {
+            bool result = genericParameterTypeList.Any(gt => gt.GetInterfaces().Contains(firstArgumentType));
+            return result;
+        }
+
+        private static bool methodArgZeroHasCorrectTargetType_TypeMatchesExactly(MethodInfo method, Type firstArgumentType, Type[] genericParameterTypeList)
+        {
+            bool result = genericParameterTypeList.Any(gt => gt == firstArgumentType);
+            return result;
         }
         private Type firstParameterType(MethodInfo m)
         {
