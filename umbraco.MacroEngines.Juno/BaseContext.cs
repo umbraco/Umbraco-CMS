@@ -10,11 +10,11 @@ namespace umbraco.MacroEngines
         private MacroModel _macro;
         private INode _node;
         protected T CurrentModel;
-        protected ParameterDictionary ParameterDictionary;
-        protected CultureDictionary CultureDictionary;
+        protected IParameterDictionary ParameterDictionary;
+        protected ICultureDictionary CultureDictionary;
 
-        public ParameterDictionary Parameter { get { return ParameterDictionary; } }
-        public CultureDictionary Dictionary { get { return CultureDictionary; } }
+        public IParameterDictionary Parameter { get { return ParameterDictionary; } }
+        public ICultureDictionary Dictionary { get { return CultureDictionary; } }
 
         public MacroModel Macro { get { return _macro; } }
         public INode Node { get { return _node; } }
@@ -28,8 +28,8 @@ namespace umbraco.MacroEngines
             if (node == null)
                 throw new ArgumentNullException("node");
             _macro = macro;
-            ParameterDictionary = new ParameterDictionary(macro.Properties);
-            CultureDictionary = new CultureDictionary();
+            ParameterDictionary = new UmbracoParameterDictionary(macro.Properties);
+            CultureDictionary = new UmbracoCultureDictionary();
             _node = node;
         }
 
