@@ -64,13 +64,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseContext.cs" />
-    <Compile Include="CultureDictionary.cs" />
+    <Compile Include="UmbracoCultureDictionary.cs" />
     <Compile Include="DLRScriptingEngine.cs" />
     <Compile Include="DynamicNode.cs" />
     <Compile Include="DynamicNodeContext.cs" />
+    <Compile Include="ICultureDictionary.cs" />
     <Compile Include="IMacroContext.cs" />
-    <Compile Include="LambdaDictionary.cs" />
-    <Compile Include="ParameterDictionary.cs" />
+    <Compile Include="IParameterDictionary.cs" />
+    <Compile Include="UmbracoParameterDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RazorBuildProvider.cs" />
     <Compile Include="RazorMacroEngine.cs" />
@@ -96,7 +97,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.Config" />
+    <None Include="App.Config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

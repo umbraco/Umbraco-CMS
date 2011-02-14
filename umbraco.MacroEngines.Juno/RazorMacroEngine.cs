@@ -122,7 +122,7 @@ namespace umbraco.MacroEngines
             //Get Rid Of Whitespace From Start/End
             razorSyntax = razorSyntax.Trim();
             //Set inherits directive if not set
-            if (!razorSyntax.StartsWith("@inheirts"))
+            if (!razorSyntax.StartsWith("@inherits"))
                 razorSyntax = "@inherits umbraco.MacroEngines.DynamicNodeContext" + Environment.NewLine + razorSyntax;
             //Use MD5 as a cache key
             var syntaxMd5 = GetMd5(razorSyntax);
