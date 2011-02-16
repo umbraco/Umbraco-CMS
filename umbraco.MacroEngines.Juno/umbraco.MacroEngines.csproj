@@ -64,6 +64,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseContext.cs" />
+    <Compile Include="RazorUmbracoFactory.cs" />
+    <Compile Include="RazorUmbracoHost.cs" />
     <Compile Include="UmbracoCultureDictionary.cs" />
     <Compile Include="DLRScriptingEngine.cs" />
     <Compile Include="DynamicNode.cs" />

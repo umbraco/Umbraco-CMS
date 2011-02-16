@@ -134,7 +134,7 @@ namespace umbraco.MacroEngines
 
         public string Name { get { return "Razor Macro Engine"; } }
 
-        public List<string> SupportedExtensions { get { return new List<string> {"cshtml", "vbhtml"}; } }
+        public List<string> SupportedExtensions { get { return new List<string> {"cshtml", "vbhtml", "razor"}; } }
 
         public Dictionary<string, IMacroGuiRendering> SupportedProperties {
             get { throw new NotSupportedException(); }
