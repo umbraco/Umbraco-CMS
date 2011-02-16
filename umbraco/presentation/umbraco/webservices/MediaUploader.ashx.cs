@@ -115,6 +115,9 @@ namespace umbraco.presentation.umbraco.webservices
                         parentNodeId = parentNode.Id;
                     }
 
+                    // Check whether to replace existing
+                    bool replaceExisting = (context.Request["replaceExisting"] == "1");
+
                     // loop through uploaded files
                     for (var j = 0; j < context.Request.Files.Count; j++)
                     {
@@ -135,8 +138,8 @@ namespace umbraco.presentation.umbraco.webservices
                             // Get concrete MediaFactory
                             var factory = MediaFactory.GetMediaFactory(parentNodeId, postedMediaFile, AuthenticatedUser);
 
-                            // Create media Item
-                            var media = factory.CreateMedia(parentNodeId, postedMediaFile, AuthenticatedUser);
+                            // Handle media Item
+                            var media = factory.HandleMedia(parentNodeId, postedMediaFile, AuthenticatedUser, replaceExisting);
                         }
                     }
 

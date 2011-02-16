@@ -25,7 +25,7 @@ namespace umbraco.cms.businesslogic.media
             get { return new List<string> { "jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif" }; }
         }
 
-        public override void HandleMedia(Media media, PostedMediaFile postedFile, BusinessLogic.User user)
+        public override void DoHandleMedia(Media media, PostedMediaFile postedFile, BusinessLogic.User user)
         {
             // Get Image object, width and height
             var image = System.Drawing.Image.FromStream(postedFile.InputStream);
@@ -49,7 +49,12 @@ namespace umbraco.cms.businesslogic.media
             media.getProperty("umbracoWidth").Value = fileWidth;
             media.getProperty("umbracoHeight").Value = fileHeight;
             media.getProperty("umbracoBytes").Value = postedFile.ContentLength;
-            media.getProperty("umbracoExtension").Value = ext;
+
+            if (media.getProperty("umbracoExtension") != null)
+                media.getProperty("umbracoExtension").Value = ext;
+
+            if (media.getProperty("umbracoExtensio") != null)
+                media.getProperty("umbracoExtensio").Value = ext;
 
             // Create directory
             if (UmbracoSettings.UploadAllowDirectories)
@@ -78,22 +83,32 @@ namespace umbraco.cms.businesslogic.media
         {
             var uploadFieldDataTypeId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
 
-            // Get DataTypeDefinition of upload field
-            var dataTypeDef = DataTypeDefinition.GetByDataTypeId(uploadFieldDataTypeId);
+            DataTypeDefinition dataTypeDef = null;
 
-            // Get PreValues
-            var preValues = PreValues.GetPreValues(dataTypeDef.Id);
-
-            var thumbnails = "";
-            if (preValues.Count > 0)
-                thumbnails = ((PreValue)preValues[0]).Value;
-
-            if (thumbnails != "")
+            try
             {
-                var thumbnailSizes = thumbnails.Split(";".ToCharArray());
-                foreach (var thumb in thumbnailSizes.Where(thumb => thumb != ""))
+                // Get DataTypeDefinition of upload field
+                dataTypeDef = DataTypeDefinition.GetByDataTypeId(uploadFieldDataTypeId);
+            }
+            catch { }
+
+            if (dataTypeDef != null)
+            {
+                // Get PreValues
+                var preValues = PreValues.GetPreValues(dataTypeDef.Id);
+
+                var thumbnails = "";
+                if (preValues.Count > 0)
+                    thumbnails = ((PreValue)preValues[0]).Value;
+
+                if (thumbnails != "")
                 {
-                    GenerateThumbnail(image, int.Parse(thumb), fileWidth, fileHeight, destFilePath + "_" + thumb + ".jpg");
+                    var thumbnailSizes = thumbnails.Split(";".ToCharArray());
+                    foreach (var thumb in thumbnailSizes.Where(thumb => thumb != ""))
+                    {
+                        GenerateThumbnail(image, int.Parse(thumb), fileWidth, fileHeight,
+                                          destFilePath + "_" + thumb + ".jpg");
+                    }
                 }
             }
         }

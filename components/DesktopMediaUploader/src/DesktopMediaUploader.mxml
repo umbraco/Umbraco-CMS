@@ -3,7 +3,7 @@
 					   xmlns:s="library://ns.adobe.com/flex/spark" 
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
 					   skinClass="org.umbraco.desktopmediauploader.skins.ApplicationSkin" 
-					   width="300" height="550" showStatusBar="false" 
+					   width="330" height="600" showStatusBar="false" 
 					   xmlns:views="org.umbraco.desktopmediauploader.views.*"
 					   windowComplete="init();" >
 	

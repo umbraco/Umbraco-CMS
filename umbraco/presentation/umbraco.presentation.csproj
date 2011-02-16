@@ -1786,7 +1786,6 @@
     <Content Include="umbraco\dashboard\StartupDashboardIntro.ascx" />
     <Content Include="umbraco\dashboard\StartupDashboardKits.ascx" />
     <Content Include="umbraco\dashboard\StartupDashboardVideos.ascx" />
-    <Content Include="umbraco\dashboard\zipupload.ascx" />
     <Content Include="umbraco\developer\Packages\StarterKits.aspx" />
     <Content Include="umbraco\dialogs\TemplateSkinning.aspx" />
     <Content Include="umbraco\helpRedirect.aspx" />

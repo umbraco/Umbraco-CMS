@@ -20,7 +20,7 @@ namespace umbraco.cms.businesslogic.media
             get { return new List<string> { "*" }; }
         }
 
-        public override void HandleMedia(Media media, PostedMediaFile uploadedFile, User user)
+        public override void DoHandleMedia(Media media, PostedMediaFile uploadedFile, User user)
         {
             // Get umbracoFile property
             var propertyId = media.getProperty("umbracoFile").Id;
@@ -37,7 +37,12 @@ namespace umbraco.cms.businesslogic.media
             // Set media properties
             media.getProperty("umbracoFile").Value = destFilePath;
             media.getProperty("umbracoBytes").Value = uploadedFile.ContentLength;
-            media.getProperty("umbracoExtension").Value = ext;
+
+            if (media.getProperty("umbracoExtension") != null)
+                media.getProperty("umbracoExtension").Value = ext;
+
+            if (media.getProperty("umbracoExtensio") != null)
+                media.getProperty("umbracoExtensio").Value = ext;
 
             // Create directory
             if (UmbracoSettings.UploadAllowDirectories)

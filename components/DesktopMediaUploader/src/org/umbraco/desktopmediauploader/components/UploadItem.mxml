@@ -92,6 +92,7 @@
 				
 				var vars:URLVariables = new URLVariables();
 				vars.parentNodeId = Model.folderId;
+				vars.replaceExisting = Model.replaceExisting ? "1" : "0";
 				vars.path = path;
 					
 				var req:URLRequest = DmuRequest.getRequest(DmuRequestAction.UPLOAD, vars);

@@ -16,5 +16,6 @@ package
 		[Bindable] public static var folderId:Number = 0;
 		[Bindable] public static var folderName:String = "";
 		[Bindable] public static var folderPath:String = "";
+		[Bindable] public static var replaceExisting:Boolean = false;
 	}
 }

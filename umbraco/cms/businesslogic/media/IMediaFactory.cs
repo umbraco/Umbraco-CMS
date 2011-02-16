@@ -11,7 +11,9 @@ namespace umbraco.cms.businesslogic.media
         List<string> Extensions { get; }
         int Priority { get; }
 
-        bool CanCreateMedia(int parentNodeId, PostedMediaFile postedFile, User user);
-        Media CreateMedia(int parentNodeId, PostedMediaFile postedFile, User user);
+        bool CanHandleMedia(int parentNodeId, PostedMediaFile postedFile, User user);
+
+        Media HandleMedia(int parentNodeId, PostedMediaFile postedFile, User user);
+        Media HandleMedia(int parentNodeId, PostedMediaFile postedFile, User user, bool replaceExisting);
     }
 }

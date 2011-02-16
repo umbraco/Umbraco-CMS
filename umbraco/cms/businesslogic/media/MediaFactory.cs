@@ -62,7 +62,7 @@ namespace umbraco.cms.businesslogic.media
                 factories = Factories.Where(mf => mf.Extensions.Contains("*")).ToList();
 
             if (factories.Count > 0)
-                return factories.FirstOrDefault(factory => factory.CanCreateMedia(parentId, postedFile, user));
+                return factories.FirstOrDefault(factory => factory.CanHandleMedia(parentId, postedFile, user));
 
             return null;
         }

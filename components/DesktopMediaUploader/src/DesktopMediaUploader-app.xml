@@ -25,7 +25,7 @@
 	<name>Desktop Media Uploader</name>
 
 	<!-- An application version designator (such as "v1", "2.5", or "Alpha 1"). Required. -->
-	<version>v2.0.4</version>
+	<version>v2.1.0</version>
 
 	<!-- Description, displayed in the AIR application installer.
 	     May have multiple values for each language. See samples or xsd schema file. Optional. -->

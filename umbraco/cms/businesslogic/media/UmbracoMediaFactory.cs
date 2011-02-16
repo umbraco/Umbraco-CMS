@@ -14,7 +14,7 @@ namespace umbraco.cms.businesslogic.media
         public virtual int Priority { get { return 1000; } }
         public abstract string MediaTypeAlias { get; }
 
-        public virtual bool CanCreateMedia(int parentNodeId, PostedMediaFile postedFile, User user)
+        public virtual bool CanHandleMedia(int parentNodeId, PostedMediaFile postedFile, User user)
         {
             try
             {
@@ -30,22 +30,37 @@ namespace umbraco.cms.businesslogic.media
             }
         }
 
-        public Media CreateMedia(int parentNodeId, PostedMediaFile postedFile, User user)
+        public Media HandleMedia(int parentNodeId, PostedMediaFile postedFile, User user)
         {
-            var media = Media.MakeNew(postedFile.FileName,
-                MediaType.GetByAlias(MediaTypeAlias),
-                user,
-                parentNodeId);
+            return HandleMedia(parentNodeId, postedFile, user, false);
+        }
+
+        public Media HandleMedia(int parentNodeId, PostedMediaFile postedFile, User user, bool replaceExisting)
+        {
+            // Check to see if a file exists
+            Media media;
+
+            if(replaceExisting && TryFindExistingMedia(parentNodeId, postedFile.FileName, out media))
+            {
+                // Do nothing as existing media is returned
+            }
+            else
+            {
+                media = Media.MakeNew(postedFile.FileName,
+                    MediaType.GetByAlias(MediaTypeAlias),
+                    user,
+                    parentNodeId);
+            }
 
             if (postedFile.ContentLength > 0)
-                HandleMedia(media, postedFile, user);
+                DoHandleMedia(media, postedFile, user);
 
             media.XmlGenerate(new XmlDocument());
 
             return media;
         }
 
-        public abstract void HandleMedia(Media media, PostedMediaFile uploadedFile, User user);
+        public abstract void DoHandleMedia(Media media, PostedMediaFile uploadedFile, User user);
 
         #region Helper Methods
 
@@ -67,6 +82,33 @@ namespace umbraco.cms.businesslogic.media
                 return filename;
 
             return propertyId + "-" + filename;
+        }
+
+        public bool TryFindExistingMedia(int parentNodeId, string fileName, out Media existingMedia)
+        {
+            var children = parentNodeId == -1 ? Media.GetRootMedias() : new Media(parentNodeId).Children;
+            foreach (var childMedia in children)
+            {
+                if (childMedia.ContentType.Alias == MediaTypeAlias)
+                {
+                    var prop = childMedia.getProperty("umbracoFile");
+                    if (prop != null)
+                    {
+                        var destFileName = ConstructDestFileName(prop.Id, fileName);
+                        var destPath = ConstructDestPath(prop.Id);
+                        var destFilePath = VirtualPathUtility.Combine(destPath, destFileName);
+
+                        if (prop.Value.ToString() == destFilePath)
+                        {
+                            existingMedia = childMedia;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            existingMedia = null;
+            return false;
         }
 
         #endregion

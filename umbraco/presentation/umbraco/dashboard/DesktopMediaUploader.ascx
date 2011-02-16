@@ -23,10 +23,10 @@
                         var flashvars = {
                             appid: "org.umbraco.DesktopMediaUploader",
                             appname: "Desktop Media Uploader",
-                            appversion: "v2.0.4",
+                            appversion: "v2.1.0",
                             appurl: "<%= FullyQualifiedAppPath %>umbraco/dashboard/air/desktopmediauploader.air",
                             applauncharg: "<%= AppLaunchArg %>",
-                            image: "/umbraco/dashboard/images/dmu-badge.jpg?v=2.0.4",
+                            image: "/umbraco/dashboard/images/dmu-badge.jpg?2.1.0",
                             airversion: "2.0"
                         };
                         var params = {
