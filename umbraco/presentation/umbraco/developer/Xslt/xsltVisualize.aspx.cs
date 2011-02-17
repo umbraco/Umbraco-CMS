@@ -13,17 +13,18 @@ namespace umbraco.presentation.umbraco.developer.Xslt
 {
     public partial class xsltVisualize : BasePages.UmbracoEnsuredPage
     {
+		// zb-00004 #29956 : refactor cookies names & handling
+		static global::umbraco.BusinessLogic.StateHelper.Cookies.Cookie cookie
+			= new global::umbraco.BusinessLogic.StateHelper.Cookies.Cookie("UMB_XSLTVISPG", TimeSpan.FromMinutes(20)); // was "XSLTVisualizerPage"
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                HttpCookie cookie = Request.Cookies.Get("XSLTVisualizerPage");
-
                 // Check if cookie exists in the current request.
-                if (cookie != null)
-                {
-                    contentPicker.Text = cookie.Value;
-                }
+				// zb-00004 #29956 : refactor cookies names & handling
+				if (cookie.HasValue)
+                    contentPicker.Text = cookie.GetValue();
             }            
 
         }
@@ -85,17 +86,8 @@ namespace umbraco.presentation.umbraco.developer.Xslt
 
 
             // add cookie with current page
-            HttpCookie cookie = Request.Cookies.Get("XSLTVisualizerPage");
-
-            // Check if cookie exists in the current request.
-            if (cookie == null)
-            {
-                cookie = new HttpCookie("XSLTVisualizerPage");
-            }
-            cookie.Value = contentPicker.Text;
-            cookie.Expires = DateTime.Now.AddMinutes(20d);
-            Response.Cookies.Add(cookie);
-
+			// zb-00004 #29956 : refactor cookies names & handling
+			cookie.SetValue(contentPicker.Text);
         }
 
     }

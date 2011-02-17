@@ -145,5 +145,69 @@ namespace umbraco.BusinessLogic.Utils
 
             return result.ToArray();
         }
-    }
+
+		// zb-00044 #29989 : helper method to help injecting services (poor man's ioc)
+		/// <summary>
+		/// Creates an instance of the type indicated by <paramref name="fullName"/> and ensures
+		/// it implements the interface indicated by <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">The type of the service interface.</typeparam>
+		/// <param name="service">The name of the service we're trying to implement.</param>
+		/// <param name="fullName">The full name of the type implementing the service.</param>
+		/// <returns>A class implementing <typeparamref name="T"/>.</returns>
+		public static T CreateInstance<T>(string service, string fullName)
+			where T : class
+		{
+			// try to get the assembly and type names
+			var parts = fullName.Split(',');
+			if (parts.Length != 2)
+				throw new Exception(string.Format("Can not create instance for '{0}': '{1}' is not a valid type full name.", service, fullName));
+
+			string typeName = parts[0];
+			string assemblyName = parts[1];
+			T impl;
+			Assembly assembly;
+			Type type;
+
+			// try to load the assembly
+			try
+			{
+				assembly = Assembly.Load(assemblyName);
+			}
+			catch (Exception e)
+			{
+				throw new Exception(string.Format("Can not create instance for '{0}', failed to load assembly '{1}': {2} was thrown ({3}).", service, assemblyName, e.GetType().FullName, e.Message));
+			}
+
+			// try to get the type
+			try
+			{
+				type = assembly.GetType(typeName);
+			}
+			catch (Exception e)
+			{
+				throw new Exception(string.Format("Can not create instance for '{0}': failed to get type '{1}' in assembly '{2}': {3} was thrown ({4}).", service, typeName, assemblyName, e.GetType().FullName, e.Message));
+			}
+
+			if (type == null)
+				throw new Exception(string.Format("Can not create instance for '{0}': failed to get type '{1}' in assembly '{2}'.", service, typeName, assemblyName));
+
+			// try to instanciate the type
+			try
+			{
+				impl = Activator.CreateInstance(type) as T;
+			}
+			catch (Exception e)
+			{
+				throw new Exception(string.Format("Can not create instance for '{0}': failed to instanciate: {1} was thrown ({2}).", service, e.GetType().FullName, e.Message));
+			}
+
+			// ensure it implements the requested type
+			if (impl == null)
+				throw new Exception(string.Format("Can not create instance for '{0}': type '{1}' does not implement '{2}'.", service, fullName, typeof(T).FullName));
+
+			return impl;
+		}
+
+	}
 }

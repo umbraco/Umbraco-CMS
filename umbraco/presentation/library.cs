@@ -1966,10 +1966,9 @@ namespace umbraco
         /// <returns>A string with the value of the cookie</returns>
         public static string RequestCookies(string key)
         {
-            if (HttpContext.Current.Request.Cookies[key] != null)
-                return HttpContext.Current.Request.Cookies[key].Value;
-            else
-                return string.Empty;
+			// zb-00004 #29956 : refactor cookies handling
+			var value = StateHelper.GetCookieValue(key);
+			return value ?? "";
         }
 
         /// <summary>
