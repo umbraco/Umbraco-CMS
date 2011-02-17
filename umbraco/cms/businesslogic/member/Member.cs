@@ -32,8 +32,8 @@ namespace umbraco.cms.businesslogic.member
         public static readonly Guid _objectType = new Guid("39eb0f98-b348-42a1-8662-e7eb18487560");
 
         private static readonly object m_Locker = new object();
-		// zb-00035 #29931 : cleanup member state management
-        private static readonly string UmbracoMemberCookieKey = "umbracoMember";
+
+		// zb-00004 #29956 : refactor cookies names & handling
 
         private const string m_SQLOptimizedMany = @"	
 			select 
@@ -762,7 +762,8 @@ namespace umbraco.cms.businesslogic.member
 		static void SetMemberState(int memberId, Guid memberGuid, string memberLogin)
 		{
 			string value = string.Format("{0}+{1}+{2}", memberId, memberGuid, memberLogin);
-			StateHelper.SetCookieValue(UmbracoMemberCookieKey, value);
+			// zb-00004 #29956 : refactor cookies names & handling
+			StateHelper.Cookies.Member.SetValue(value);
 		}
 
 		static void SetMemberState(Member member, bool useSession, double cookieDays)
@@ -774,22 +775,41 @@ namespace umbraco.cms.businesslogic.member
 		{
 			string value = string.Format("{0}+{1}+{2}", memberId, memberGuid, memberLogin);
 
+			// zb-00004 #29956 : refactor cookies names & handling
 			if (useSession)
-				HttpContext.Current.Session[UmbracoMemberCookieKey] = value;
+				HttpContext.Current.Session[StateHelper.Cookies.Member.Key] = value;
 			else
-				StateHelper.SetCookieValue(UmbracoMemberCookieKey, value, cookieDays);
+				StateHelper.Cookies.Member.SetValue(value, cookieDays);
 		}
 
 		static void ClearMemberState()
 		{
-			StateHelper.ClearCookie(UmbracoMemberCookieKey);
+			// zb-00004 #29956 : refactor cookies names & handling
+			StateHelper.Cookies.Member.Clear();
 		}
 
 		static MemberState GetMemberState()
 		{
-			string value = StateHelper.GetCookieValue(UmbracoMemberCookieKey);
+			// zb-00004 #29956 : refactor cookies names & handling + bring session-related stuff here
+			string value = null;
+			if (StateHelper.Cookies.Member.HasValue)
+			{
+				value = StateHelper.Cookies.Member.GetValue();
+			}
+			else
+			{
+				var context = HttpContext.Current;
+				if (context != null && context.Session != null && context.Session[StateHelper.Cookies.Member.Key] != null)
+				{
+					string v = context.Session[StateHelper.Cookies.Member.Key].ToString();
+					if (v != "0")
+						value = v;
+				}
+			}
+
 			if (value == null)
 				return null;
+
 			string[] parts = value.Split(new char[] { '+' });
 			if (parts.Length != 3)
 				return null;

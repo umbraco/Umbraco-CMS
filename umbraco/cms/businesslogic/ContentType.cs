@@ -449,8 +449,9 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         public void ClearVirtualTabs()
         {
+			// zb-00040 #29889 : clear the right cache! t.contentType is the ctype which _defines_ the tab, not the current one.
             foreach (TabI t in getVirtualTabs)
-                Tab.FlushCache(t.Id, t.ContentType);
+                Tab.FlushCache(t.Id, Id);
 
             m_VirtualTabs = null;
         }
@@ -1025,52 +1026,53 @@ namespace umbraco.cms.businesslogic
 			// Also this is public now because we removed the PropertyTypes property (not making sense).
 			public PropertyType[] GetPropertyTypes(int contentTypeId, bool includeInheritedProperties)
 			{
-				return Cache.GetCacheItem<PropertyType[]>(
-					generateCacheKey(Id, contentTypeId), propertyTypesCacheSyncLock, TimeSpan.FromMinutes(10),
-					delegate
-					{
-						var tmp = new List<PropertyType>();
+				// zb-00040 #29889 : fix cache key issues!
+				// now maintaining a cache of local properties per contentTypeId, then merging when required
+				// another way would be to maintain a cache of *all* properties, then filter when required
+				// however it makes it more difficult to figure out what to clear (ie needs to find all children...)
 
-						if (includeInheritedProperties)
+				var tmp = new List<PropertyType>();
+				var ctypes = new List<int>();
+
+				if (includeInheritedProperties)
+				{
+					// start from contentTypeId and list all ctypes, going up
+					int c = contentTypeId;
+					while (c != 0)
+					{
+						ctypes.Add(c);
+						c = umbraco.cms.businesslogic.ContentType.GetContentType(c).MasterContentType;
+					}
+					ctypes.Reverse(); // order from the top
+				}
+				else
+				{
+					// just that one
+					ctypes.Add(contentTypeId);
+				}
+
+				foreach (var ctype in ctypes)
+				{
+					var ptypes = Cache.GetCacheItem<List<PropertyType>>(
+						generateCacheKey(Id, ctype), propertyTypesCacheSyncLock, TimeSpan.FromMinutes(10),
+						delegate
 						{
 							var tmp1 = new List<PropertyType>();
 
-							using(IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
-								@"select id from cmsPropertyType where tabId = {0}
-								order by sortOrder", _id)))
+							using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
+								@"select id from cmsPropertyType where tabId = {0} and contentTypeId = {1}
+									order by sortOrder", _id, ctype)))
 							{
 								while (dr.Read())
 									tmp1.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
 							}
+							return tmp1;
+						});
 
-							var ctypes = new List<int>();
+					tmp.AddRange(ptypes);
+				}
 
-							// start from contentTypeId and list all ctypes, going up
-							int c = contentTypeId;
-							while (c != 0)
-							{
-								ctypes.Add(c);
-								c = umbraco.cms.businesslogic.ContentType.GetContentType(c).MasterContentType;
-							}
-							ctypes.Reverse(); // order from the top
-
-							// then reorder
-							foreach (var ctype in ctypes)
-								tmp.AddRange(tmp1.Where(p => p.ContentTypeId == ctype));
-						}
-						else
-						{
-							using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
-								@"select id from cmsPropertyType where tabId = {0} and contentTypeId = {1}
-								order by sortOrder", _id, contentTypeId)))
-							{
-								while (dr.Read())
-									tmp.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
-							}
-						}
-
-						return tmp.ToArray();
-					});
+				return tmp.ToArray();
 			}
 
 			// zb-00036 #29889 : yet we may want to be able to get *all* property types

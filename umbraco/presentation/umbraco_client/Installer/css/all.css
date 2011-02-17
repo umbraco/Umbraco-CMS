@@ -410,6 +410,12 @@ figure{display: block;}
 	padding:0 6px;
 	background:url(../images/bg-inp.png) no-repeat;
 }
+
+.instruction-hold .row span.textarea
+{
+    height:108px;
+    background:url(../images/bg-inp-big.png) no-repeat;
+}
 .instruction-hold .error span{background:url(../images/bg-inp-error.png) no-repeat;}
 .instruction-hold .text{
 	float:left;
@@ -423,6 +429,10 @@ figure{display: block;}
 	height:16px;
 	padding:5px 0 6px;
 	position:relative;
+}
+.instruction-hold .textarea
+{
+    height:95px;
 }
 .btn-box .btn-install {
 	float:left;

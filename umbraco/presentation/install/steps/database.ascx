@@ -153,8 +153,8 @@
  
  						       <div class="row custom" runat="server" id="DatabaseConnectionString">
 									<asp:Label runat="server" AssociatedControlID="ConnectionString" ID="ConnectionStringLabel">Connection string:</asp:Label>
-									<span>
-										<asp:TextBox runat="server" TextMode="MultiLine" CssClass="text" ID="ConnectionString" /></span>
+									<span class="textarea">
+										<asp:TextBox runat="server" TextMode="MultiLine" CssClass="text textarea" ID="ConnectionString" /></span>
 								</div>
                                 <div class="row custom check-hold">
                                     <p>
@@ -216,6 +216,7 @@
 
 	                    $(".database-option").hide();
 	                    $("#database-blank").show();
+                        $(".installbtn").show();
 	                   
                       break;
                     case "embedded":
