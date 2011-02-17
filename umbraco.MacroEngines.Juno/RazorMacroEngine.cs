@@ -117,7 +117,7 @@ namespace umbraco.MacroEngines
             if (razorSyntax == null)
                 throw new ArgumentNullException("razorSyntax");
             if (scriptLanguage == null)
-                throw new AbandonedMutexException("scriptLanguage");
+                throw new ArgumentNullException("scriptLanguage");
 
             //Get Rid Of Whitespace From Start/End
             razorSyntax = razorSyntax.Trim();
