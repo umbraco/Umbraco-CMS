@@ -20,6 +20,14 @@ namespace umbraco.IO
             }
         }
 
+        public static string Base
+        {
+            get
+            {
+                return IOHelper.returnPath("umbracoBaseDirectory", "~/base");
+            }
+        }
+
         public static string Config
         {
             get
@@ -27,7 +35,7 @@ namespace umbraco.IO
                 return IOHelper.returnPath("umbracoConfigDirectory", "~/config");
             }
         }
-
+                
         public static string Css
         {
             get

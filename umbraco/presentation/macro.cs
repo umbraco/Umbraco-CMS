@@ -1400,7 +1400,8 @@ namespace umbraco
                 var myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
 
                 // propagate the user's context
-                HttpCookie inCookie = HttpContext.Current.Request.Cookies["UserContext"];
+				// zb-00004 #29956 : refactor cookies names & handling
+				HttpCookie inCookie = StateHelper.Cookies.UserContext.RequestCookie;
                 var cookie = new Cookie(inCookie.Name, inCookie.Value, inCookie.Path,
                                         HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
                 myHttpWebRequest.CookieContainer = new CookieContainer();

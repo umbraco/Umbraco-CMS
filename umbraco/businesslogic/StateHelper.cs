@@ -198,51 +198,16 @@ namespace umbraco.BusinessLogic
 		#region Cookie Helpers
 
         /// <summary>
-        /// Determines whether a cookie has a value with a specified key.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <returns>
-        /// 	<c>true</c> if the cookie has a  value  with the specified key; otherwise, <c>false</c>.
-        /// </returns>
-		public static bool HasCookieValue(string key)
-		{
-			return !string.IsNullOrEmpty(GetCookieValue(HttpContext.Current, key));
-		}
-
-        /// <summary>
         /// Gets the cookie value.
         /// </summary>
         /// <param name="key">The key.</param>
         /// <returns></returns>
 		public static string GetCookieValue(string key)
 		{
-			return GetCookieValue(HttpContext.Current, key);
-		}
-
-        /// <summary>
-        /// Gets the cookie value.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="key">The key.</param>
-        /// <returns></returns>
-		public static string GetCookieValue(HttpContext context, string key)
-		{
-            // Updated by NH to check against session values as well, which is an optional switch used by members
-		    string tempValue = null;
-			if (context == null || context.Request == null)
+			if (!Cookies.HasCookies)
 				return null;
-			
-            HttpCookie cookie = context.Request.Cookies[key];
-            if (cookie == null) {
-                // Check for session
-                if (context.Session != null && context.Session[key] != null)
-                    if (context.Session[key].ToString() != "0")
-                        tempValue = context.Session[key].ToString();
-            }
-            else
-                tempValue = cookie.Value;
-
-			return tempValue;
+			var cookie = HttpContext.Current.Request.Cookies[key];
+			return cookie == null ? null : cookie.Value;
 		}
 
         /// <summary>
@@ -252,7 +217,7 @@ namespace umbraco.BusinessLogic
         /// <param name="value">The value.</param>
         public static void SetCookieValue(string key, string value)
         {
-            SetCookieValue(HttpContext.Current, key, value);
+			SetCookieValue(key, value, 30d); // default Umbraco expires is 30 days
         }
 
         /// <summary>
@@ -263,52 +228,191 @@ namespace umbraco.BusinessLogic
         /// <param name="daysToPersist">How long the cookie should be present in the browser</param>
         public static void SetCookieValue(string key, string value, double daysToPersist)
         {
-            SetCookieValue(HttpContext.Current, key, value, daysToPersist);
-        }
+			if (!Cookies.HasCookies)
+				return;
+			var context = HttpContext.Current;
 
-        public static void ClearCookie(string key)
-        {
-            HttpContext ctx = HttpContext.Current;
+			HttpCookie cookie = new HttpCookie(key, value);
+			cookie.Expires = DateTime.Now.AddDays(daysToPersist);
+			context.Response.Cookies.Set(cookie);
 
-            if (ctx.Request.Cookies[key] != null)
-                ctx.Response.Cookies[key].Expires = DateTime.Now;
-        }
+			cookie = context.Request.Cookies[key];
+			if (cookie != null)
+				cookie.Value = value;
+		}
 
-        /// <summary>
-        /// Sets the cookie value.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="key">The key.</param>
-        /// <param name="value">The value.</param>
-        public static void SetCookieValue(HttpContext context, string key, string value)
-        {
-            SetCookieValue(context, key, value, 30);
-        }
+		// zb-00004 #29956 : refactor cookies names & handling
+		public static class Cookies
+		{
+			/*
+			 * helper class to manage cookies
+			 * 
+			 * beware! SetValue(string value) does _not_ set expires, unless the cookie has been
+			 * configured to have one. This allows us to have cookies w/out an expires timespan.
+			 * However, default behavior in Umbraco was to set expires to 30days by default. This
+			 * must now be managed in the Cookie constructor or by using an overriden SetValue(...).
+			 * 
+			 * we currently reproduce this by configuring each cookie with a 30d expires, but does
+			 * that actually make sense? shouldn't some cookie have _no_ expires?
+			 */
+			static readonly Cookie _preview = new Cookie("UMB_PREVIEW", 30d); // was "PreviewSet"
+			static readonly Cookie _userContext = new Cookie("UMB_UCONTEXT", 30d); // was "UserContext"
+			static readonly Cookie _member = new Cookie("UMB_MEMBER", 30d); // was "umbracoMember"
 
-        /// <summary>
-        /// Sets the cookie value including the number of days to persist the cookie
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="key">The key.</param>
-        /// <param name="value">The value.</param>
-        /// <param name="daysToPersist">How long the cookie should be present in the browser</param>
-        public static void SetCookieValue(HttpContext context, string key, string value, double daysToPersist)
-        {
-            if (context == null || context.Request == null)
-                return;
-            HttpCookie cookie = context.Request.Cookies[key];
+			public static Cookie Preview { get { return _preview; } }
+			public static Cookie UserContext { get { return _userContext; } }
+			public static Cookie Member { get { return _member; } }
 
-            if (cookie == null)
-                cookie = new HttpCookie(key);
+			public static bool HasCookies
+			{
+				get
+				{
+					System.Web.HttpContext context = HttpContext.Current;
+					// although just checking context should be enough?!
+					// but in some (replaced) umbraco code, everything is checked...
+					return context != null 
+						&& context.Request != null & context.Request.Cookies != null 
+						&& context.Response != null && context.Response.Cookies != null;
+				}
+			}
 
-            cookie.Value = value;
+			public static void ClearAll()
+			{
+				HttpContext.Current.Response.Cookies.Clear();
+			}
 
-            // add default exp on a month
-            cookie.Expires = DateTime.Now.AddDays(daysToPersist);
+			public class Cookie
+			{
+				const string cookiesExtensionConfigKey = "umbracoCookiesExtension";
 
-            // if cookie exists, remove
-            context.Response.Cookies.Add(cookie);
-        }
+				static readonly string _ext;
+				TimeSpan _expires;
+				string _key;
+
+				static Cookie()
+				{
+					var appSettings = System.Configuration.ConfigurationManager.AppSettings;
+					_ext = appSettings[cookiesExtensionConfigKey] == null ? "" : "_" + (string)appSettings[cookiesExtensionConfigKey];
+				}
+
+				public Cookie(string key)
+					: this(key, TimeSpan.Zero, true)
+				{ }
+
+				public Cookie(string key, double days)
+					: this(key, TimeSpan.FromDays(days), true)
+				{ }
+
+				public Cookie(string key, TimeSpan expires)
+					: this(key, expires, true)
+				{ }
+
+				public Cookie(string key, bool appendExtension)
+					: this(key, TimeSpan.Zero, appendExtension)
+				{ }
+
+				public Cookie(string key, double days, bool appendExtension)
+					: this(key, TimeSpan.FromDays(days), appendExtension)
+				{ }
+
+				public Cookie(string key, TimeSpan expires, bool appendExtension)
+				{
+					_key = appendExtension ? key + _ext : key;
+					_expires = expires;
+				}
+
+				public string Key
+				{
+					get { return _key; }
+				}
+
+				public bool HasValue
+				{
+					get { return RequestCookie != null; }
+				}
+
+				public string GetValue()
+				{
+					return RequestCookie == null ? null : RequestCookie.Value;
+				}
+
+				public void SetValue(string value)
+				{
+					HttpCookie cookie = new HttpCookie(_key, value);
+					if (!TimeSpan.Zero.Equals(_expires))
+						cookie.Expires = DateTime.Now + _expires;
+					ResponseCookie = cookie;
+
+					// original Umbraco code also does this
+					// so we can GetValue() back what we previously set
+					cookie = RequestCookie;
+					if (cookie != null)
+						cookie.Value = value;
+				}
+
+				public void SetValue(string value, double days)
+				{
+					SetValue(value, DateTime.Now.AddDays(days));
+				}
+
+				public void SetValue(string value, TimeSpan expires)
+				{
+					SetValue(value, DateTime.Now + expires);
+				}
+
+				public void SetValue(string value, DateTime expires)
+				{
+					HttpCookie cookie = new HttpCookie(_key, value);
+					cookie.Expires = expires;
+					ResponseCookie = cookie;
+
+					// original Umbraco code also does this
+					// so we can GetValue() back what we previously set
+					cookie = RequestCookie;
+					if (cookie != null)
+						cookie.Value = value;
+				}
+
+				public void Clear()
+				{
+					if (RequestCookie != null || ResponseCookie != null)
+					{
+						HttpCookie cookie = new HttpCookie(_key);
+						cookie.Expires = DateTime.Now.AddDays(-1);
+						ResponseCookie = cookie;
+					}
+				}
+
+				public void Remove()
+				{
+					// beware! will not clear browser's cookie
+					// you probably want to use .Clear()
+					HttpContext.Current.Response.Cookies.Remove(_key);
+				}
+
+				public HttpCookie RequestCookie
+				{
+					get
+					{
+						return HttpContext.Current.Request.Cookies[_key];
+					}
+				}
+
+				public HttpCookie ResponseCookie
+				{
+					get
+					{
+						return HttpContext.Current.Response.Cookies[_key];
+					}
+					set
+					{
+						// .Set() ensures the uniqueness of cookies in the cookie collection
+						// ie it is the same as .Remove() + .Add() -- .Add() allows duplicates
+						HttpContext.Current.Response.Cookies.Set(value);
+					}
+				}
+			}
+		}
 
         #endregion
 	}
