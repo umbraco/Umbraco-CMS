@@ -210,10 +210,8 @@ namespace umbraco.cms.presentation
                 return;
 
             // clear preview cookie
-            if (!String.IsNullOrEmpty(StateHelper.GetCookieValue(PreviewContent.PREVIEW_COOKIE_KEY)))
-            {
-                PreviewContent.ClearPreviewCookie();
-            }
+			// zb-00004 #29956 : refactor cookies names & handling
+			StateHelper.Cookies.Preview.Clear();
 
             if (!IsPostBack)
             {

@@ -63,7 +63,7 @@ namespace umbraco.presentation
             {
                 if (UmbracoContext.Current.InPreviewMode)
                 {
-                    PreviewContent pc = new PreviewContent(new Guid(StateHelper.GetCookieValue("PreviewSet")));
+                    PreviewContent pc = new PreviewContent(new Guid(StateHelper.Cookies.Preview.GetValue()));
                     pc.LoadPreviewset();
                     return XmlDocumentToXDocument(pc.XmlContent);
                 }

@@ -26,23 +26,26 @@ namespace umbraco.uicontrols
 
         }
 
+		// do NOT append extension to cookie name, because it is used in umbraco/presentation/umbraco_client/Panel/javascript.js
+		static umbraco.BusinessLogic.StateHelper.Cookies.Cookie panelCookie = new StateHelper.Cookies.Cookie("UMB_PANEL", false); // was umbPanel_pWidth _pHeight
+
         protected override void OnInit(EventArgs e)
         {
             // We can grab the cached window size from cookie values
             if (AutoResize)
             {
-                if (!String.IsNullOrEmpty(StateHelper.GetCookieValue("umbPanel_pWidth")))
+				// zb-00004 #29956 : refactor cookies names & handling
+				if (panelCookie.HasValue)
                 {
                     int pWidth = 0;
                     int pHeight = 0;
-                    if (int.TryParse(StateHelper.GetCookieValue("umbPanel_pWidth"), out pWidth))
-                    {
+					string[] wh = panelCookie.GetValue().Split('x');
+
+					if (wh.Length > 0 && int.TryParse(wh[0], out pWidth))
                         Width = Unit.Pixel(pWidth);
-                    }
-                    if (int.TryParse(StateHelper.GetCookieValue("umbPanel_pHeight"), out pHeight))
-                    {
+
+					if (wh.Length > 1 && int.TryParse(wh[1], out pHeight))
                         Height = Unit.Pixel(pHeight);
-                    }
                 }
             }
 

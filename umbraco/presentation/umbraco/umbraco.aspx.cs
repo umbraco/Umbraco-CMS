@@ -91,11 +91,10 @@ namespace umbraco.cms.presentation
 
             // Version check goes here!
 
-            string updateCheckCookie = "";
-            if (Request.Cookies["updateCheck"] != null)
-            {
-                updateCheckCookie = Request.Cookies["updateCheck"].Value.ToString();
-            }
+			// zb-00004 #29956 : refactor cookies names & handling
+			var updChkCookie = new umbraco.BusinessLogic.StateHelper.Cookies.Cookie("UMB_UPDCHK", GlobalSettings.VersionCheckPeriod); // was "updateCheck"
+            string updateCheckCookie = updChkCookie.HasValue ? updChkCookie.GetValue() : "";
+
             if (GlobalSettings.VersionCheckPeriod > 0 && String.IsNullOrEmpty(updateCheckCookie) && base.getUser().UserType.Alias == "admin")
             {
 
@@ -106,8 +105,7 @@ namespace umbraco.cms.presentation
 
                 Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "upgradeChecker", "jQuery(document).ready(function() {umbraco.presentation.webservices.CheckForUpgrade.CallUpgradeService(umbracoCheckUpgrade);});", true);
 
-                Response.Cookies["updateCheck"].Value = "1";
-                Response.Cookies["updateCheck"].Expires = DateTime.Now.AddDays(GlobalSettings.VersionCheckPeriod);
+				updChkCookie.SetValue("1");
             }
             DataBind();
         }

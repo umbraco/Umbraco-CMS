@@ -42,29 +42,41 @@
     <Reference Include="Microsoft.Scripting">
       <HintPath>..\foreign dlls\DLR 4.0\Microsoft.Scripting.dll</HintPath>
     </Reference>
-    <Reference Include="RazorEngine.Core">
-      <HintPath>..\foreign dlls\RazorEngine.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="RazorEngine.Templates">
-      <HintPath>..\foreign dlls\RazorEngine.Templates.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\foreign dlls\System.Web.Razor.dll</HintPath>
+      <HintPath>..\foreign dlls\WebPages\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\foreign dlls\WebPages\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\foreign dlls\WebPages\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseContext.cs" />
+    <Compile Include="RazorUmbracoFactory.cs" />
+    <Compile Include="RazorUmbracoHost.cs" />
+    <Compile Include="UmbracoCultureDictionary.cs" />
     <Compile Include="DLRScriptingEngine.cs" />
     <Compile Include="DynamicNode.cs" />
+    <Compile Include="DynamicNodeContext.cs" />
+    <Compile Include="ICultureDictionary.cs" />
+    <Compile Include="IMacroContext.cs" />
+    <Compile Include="IParameterDictionary.cs" />
+    <Compile Include="UmbracoParameterDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RazorEngine.cs" />
+    <Compile Include="RazorBuildProvider.cs" />
+    <Compile Include="RazorMacroEngine.cs" />
     <Compile Include="Scripting\MacroScript.cs" />
     <Compile Include="Scripting\ScriptEngine.cs" />
   </ItemGroup>
@@ -85,6 +97,11 @@
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>umbraco.presentation</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.Config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
