@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using umbraco.cms.businesslogic.macro;
 using System.Linq;
 
 namespace umbraco.MacroEngines {
 
-    public class UmbracoParameterDictionary : IParameterDictionary {
+    public class UmbracoParameterDictionary : DynamicObject, IParameterDictionary {
 
         private readonly IEnumerable<MacroPropertyModel> _paramsKeyValue;
 
@@ -28,6 +29,10 @@ namespace umbraco.MacroEngines {
             get { return _paramsKeyValue.Where(p => p.Key == alias).Select(p => p.Value).FirstOrDefault(); }
         }
 
+        public override bool TryGetMember(GetMemberBinder binder, out object result) {
+            result = this[binder.Name];
+            return true;
+        }
     }
 
 }

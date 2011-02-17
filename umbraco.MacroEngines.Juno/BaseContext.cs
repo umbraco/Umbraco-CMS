@@ -13,8 +13,8 @@ namespace umbraco.MacroEngines
         protected IParameterDictionary ParameterDictionary;
         protected ICultureDictionary CultureDictionary;
 
-        public IParameterDictionary Parameter { get { return ParameterDictionary; } }
-        public ICultureDictionary Dictionary { get { return CultureDictionary; } }
+        public dynamic Parameter { get { return ParameterDictionary; } }
+        public dynamic Dictionary { get { return CultureDictionary; } }
 
         public MacroModel Macro { get { return _macro; } }
         public INode Node { get { return _node; } }
@@ -41,6 +41,14 @@ namespace umbraco.MacroEngines
                 var macroContext = (IMacroContext)parentPage;
                 SetMembers(macroContext.Macro, macroContext.Node);
             }
+        }
+
+        public string GetParameter(string alias) {
+            return ParameterDictionary[alias];
+        }
+
+        public string GetDictionary(string key) {
+            return CultureDictionary[key];
         }
     }
 }
