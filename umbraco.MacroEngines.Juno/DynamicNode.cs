@@ -10,6 +10,7 @@ using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.property;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
+using umbraco.cms.businesslogic;
 
 
 namespace umbraco.MacroEngines
@@ -17,7 +18,6 @@ namespace umbraco.MacroEngines
     public class DynamicNode : DynamicObject
     {
         private DynamicDictionary _properties;
-        private Dictionary<string, Guid> _propertyTypeCache = new Dictionary<string, Guid>();
 
         private readonly INode n;
         public DynamicNode(INode n)
@@ -89,36 +89,12 @@ namespace umbraco.MacroEngines
                     result = data.Value;
                     //special casing for true/false properties
                     //int/decimal are handled by ConvertPropertyValueByDataType
-                    //fallback is string
+                    //fallback is stringT
 
-                    //The property type is not on IProperty (it's not stored in NodeFactory)
-                    //first check the cache
-                    if (_propertyTypeCache != null && _propertyTypeCache.ContainsKey(name))
-                    {
-                        return ConvertPropertyValueByDataType(ref result, name);
-                    }
-
-                    //Instead of going via API, run this query to find the control type
-                    //by-passes a lot of queries just to determine if this is a true/false data type
-                    string sql = "select " +
-                        "cmsDataType.controlId " +
-                        "from " +
-                        " cmsContent " +
-                        "inner join cmsDocument on (cmsDocument.nodeId = cmsContent.nodeId) " +
-                        "inner join cmsContentType on (cmsContent.contentType = cmsContentType.nodeid) " +
-                        "inner join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId) " +
-                        "inner join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) " +
-                        " where cmsContent.nodeId = @nodeId and published = 1 and cmsPropertyType.Alias = @propertyAlias";
-                    //grab the controlid
-                    Guid controlId = Application.SqlHelper.ExecuteScalar<Guid>(sql,
-                        Application.SqlHelper.CreateParameter("@nodeId", n.Id),
-                        Application.SqlHelper.CreateParameter("@propertyAlias", data.Alias)
-                        );
-                    //add to cache
-                    _propertyTypeCache.Add(name, controlId);
+                    Guid dataType = ContentType.GetDataType(n.NodeTypeAlias, data.Alias);
 
                     //convert the string value to a known type
-                    return ConvertPropertyValueByDataType(ref result, name);
+                    return ConvertPropertyValueByDataType(ref result, name, dataType);
 
                 }
 
@@ -155,14 +131,14 @@ namespace umbraco.MacroEngines
             return false;
         }
 
-        private bool ConvertPropertyValueByDataType(ref object result, string name)
+        private bool ConvertPropertyValueByDataType(ref object result, string name, Guid dataType)
         {
             //the resulting property is a string, but to support some of the nice linq stuff in .Where
             //we should really check some more types
             umbraco.editorControls.yesno.YesNoDataType yesnoType = new editorControls.yesno.YesNoDataType();
 
             //boolean
-            if (_propertyTypeCache[name] == yesnoType.Id)
+            if (dataType == yesnoType.Id)
             {
                 bool parseResult;
                 if (result.ToString() == "") result = "0";

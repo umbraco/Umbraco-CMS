@@ -244,6 +244,7 @@
     <Compile Include="businesslogic\skinning\TaskType.cs" />
     <Compile Include="businesslogic\Tags\Tag.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
+    <Compile Include="businesslogic\Tuple.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
     <Compile Include="businesslogic\skinning\Skinning.cs" />
     <Compile Include="helpers\Casing.cs" />

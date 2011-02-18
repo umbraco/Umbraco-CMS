@@ -12,6 +12,7 @@ using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
+using umbraco.BusinessLogic;
 
 [assembly: InternalsVisibleTo("Umbraco.Test")]
 
@@ -103,6 +104,62 @@ namespace umbraco.cms.businesslogic
         #endregion
 
         #region Static Methods
+
+        private static Dictionary<Tuple<string, string>, Guid> _propertyTypeCache = new Dictionary<Tuple<string, string>, Guid>();
+        public static void RemoveFromDataTypeCache(string contentTypeAlias)
+        {
+            lock (_propertyTypeCache)
+            {
+                List<Tuple<string, string>> toDelete = new List<Tuple<string, string>>();
+                foreach (Tuple<string, string> key in _propertyTypeCache.Keys)
+                {
+                    if (string.Equals(key.first, contentTypeAlias))
+                    {
+                        toDelete.Add(key);
+                    }
+                }
+                foreach (Tuple<string, string> key in toDelete)
+                {
+                    _propertyTypeCache.Remove(key);
+                }
+            }
+        }
+        public static Guid GetDataType(string contentTypeAlias, string propertyTypeAlias)
+        {
+            Tuple<string, string> key = new Tuple<string, string>()
+            {
+                first = contentTypeAlias,
+                second = propertyTypeAlias
+            };
+            //The property type is not on IProperty (it's not stored in NodeFactory)
+            //first check the cache
+            if (_propertyTypeCache != null && _propertyTypeCache.ContainsKey(key))
+            {
+                return _propertyTypeCache[key];
+            }
+
+            //Instead of going via API, run this query to find the control type
+            //by-passes a lot of queries just to determine if this is a true/false data type
+
+            string sql = "select " +
+                "cmsDataType.controlId " +
+                "from " +
+                " cmsContentType " +
+                "inner join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId) " +
+                "inner join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) " +
+                " where cmsContentType.alias = @contentTypeAlias and cmsPropertyType.Alias = @propertyAlias";
+            //grab the controlid
+            Guid controlId = Application.SqlHelper.ExecuteScalar<Guid>(sql,
+                Application.SqlHelper.CreateParameter("@contentTypeAlias", contentTypeAlias),
+                Application.SqlHelper.CreateParameter("@propertyAlias", propertyTypeAlias)
+                );
+            //add to cache
+            _propertyTypeCache.Add(key, controlId);
+
+            return controlId;
+
+        }
+
 
         /// <summary>
         /// Gets the type of the content.
@@ -215,7 +272,8 @@ namespace umbraco.cms.businesslogic
         /// <value>The description.</value>
         public string Description
         {
-            get {
+            get
+            {
                 if (_description != null)
                 {
                     if (!_description.StartsWith("#"))
@@ -449,7 +507,7 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         public void ClearVirtualTabs()
         {
-			// zb-00040 #29889 : clear the right cache! t.contentType is the ctype which _defines_ the tab, not the current one.
+            // zb-00040 #29889 : clear the right cache! t.contentType is the ctype which _defines_ the tab, not the current one.
             foreach (TabI t in getVirtualTabs)
                 Tab.FlushCache(t.Id, Id);
 
@@ -621,7 +679,7 @@ namespace umbraco.cms.businesslogic
 
             // Remove from cache
             FlushFromCache(Id);
-            
+
             return SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsTab");
         }
 
@@ -632,7 +690,7 @@ namespace umbraco.cms.businesslogic
         public void DeleteVirtualTab(int id)
         {
             //set each property on the tab to have a tab id of zero
-			// zb-00036 #29889 : fix property types getter
+            // zb-00036 #29889 : fix property types getter
             this.getVirtualTabs.ToList()
                 .Where(x => x.Id == id)
                 .Single()
@@ -804,6 +862,8 @@ namespace umbraco.cms.businesslogic
             Cache.ClearCacheItem(ct.GetPropertiesCacheKey());
             ct.ClearVirtualTabs();
 
+            //clear the content type from the property datatype cache used by razor
+            RemoveFromDataTypeCache(ct.Alias);
 
             // clear anything that uses this as master content type
             if (ct.nodeObjectType == DocumentType._objectType)
@@ -819,6 +879,9 @@ namespace umbraco.cms.businesslogic
         {
             Cache.ClearCacheByKeySearch("UmbracoContentType");
             Cache.ClearCacheByKeySearch("ContentType_PropertyTypes_Content");
+
+            //clear the property datatype cache used by razor
+            _propertyTypeCache = new Dictionary<Tuple<string, string>, Guid>();
 
             ClearVirtualTabs();
         }
@@ -836,7 +899,7 @@ namespace umbraco.cms.businesslogic
             return "ContentType_PropertyTypes_Content:" + this.Id;
         }
 
-        
+
 
         /// <summary>
         /// Checks if we've loaded the virtual tabs into memory and if not gets them from the databse.
@@ -923,29 +986,29 @@ namespace umbraco.cms.businesslogic
             /// </summary>
             int SortOrder { get; }
 
-			// zb-00036 #29889 : removed PropertyTypes property (not making sense), replaced with methods
+            // zb-00036 #29889 : removed PropertyTypes property (not making sense), replaced with methods
 
-			/// <summary>
-			/// Gets a list of all PropertyTypes on the Tab for a given ContentType.
-			/// </summary>
-			/// <remarks>This includes properties inherited from master content types.</remarks>
-			/// <param name="contentTypeId">The unique identifier of the ContentType.</param>
-			/// <returns>An array of PropertyType.</returns>
-			PropertyType[] GetPropertyTypes(int contentTypeId);
+            /// <summary>
+            /// Gets a list of all PropertyTypes on the Tab for a given ContentType.
+            /// </summary>
+            /// <remarks>This includes properties inherited from master content types.</remarks>
+            /// <param name="contentTypeId">The unique identifier of the ContentType.</param>
+            /// <returns>An array of PropertyType.</returns>
+            PropertyType[] GetPropertyTypes(int contentTypeId);
 
-			/// <summary>
-			/// Gets a list of all PropertyTypes on the Tab for a given ContentType.
-			/// </summary>
-			/// <param name="contentTypeId">The unique identifier of the ContentType.</param>
-			/// <param name="includeInheritedProperties">Indicates whether properties inherited from master content types should be included.</param>
-			/// <returns>An array of PropertyType.</returns>
-			PropertyType[] GetPropertyTypes(int contentTypeId, bool includeInheritedProperties);
+            /// <summary>
+            /// Gets a list of all PropertyTypes on the Tab for a given ContentType.
+            /// </summary>
+            /// <param name="contentTypeId">The unique identifier of the ContentType.</param>
+            /// <param name="includeInheritedProperties">Indicates whether properties inherited from master content types should be included.</param>
+            /// <returns>An array of PropertyType.</returns>
+            PropertyType[] GetPropertyTypes(int contentTypeId, bool includeInheritedProperties);
 
-			/// <summary>
-			/// Gets a list if all PropertyTypes on the Tab for all ContentTypes.
-			/// </summary>
-			/// <returns>An IEnumerable of all the PropertyTypes.</returns>
-			List<PropertyType> GetAllPropertyTypes();
+            /// <summary>
+            /// Gets a list if all PropertyTypes on the Tab for all ContentTypes.
+            /// </summary>
+            /// <returns>An IEnumerable of all the PropertyTypes.</returns>
+            List<PropertyType> GetAllPropertyTypes();
 
             /// <summary>
             /// The contenttype
@@ -1014,81 +1077,81 @@ namespace umbraco.cms.businesslogic
                 return tab;
             }
 
-			// zb-00036 #29889 : Fix content tab properties.
-			public PropertyType[] GetPropertyTypes(int contentTypeId)
-			{
-				return GetPropertyTypes(contentTypeId, true);
-			}
+            // zb-00036 #29889 : Fix content tab properties.
+            public PropertyType[] GetPropertyTypes(int contentTypeId)
+            {
+                return GetPropertyTypes(contentTypeId, true);
+            }
 
-			// zb-00036 #29889 : Fix content tab properties. Replaces getPropertyTypes, which was
-			// loading all properties for the tab, causing exceptions here and there... we want
-			// the properties for the tab for a given content type, and we want them in the right order.
-			// Also this is public now because we removed the PropertyTypes property (not making sense).
-			public PropertyType[] GetPropertyTypes(int contentTypeId, bool includeInheritedProperties)
-			{
-				// zb-00040 #29889 : fix cache key issues!
-				// now maintaining a cache of local properties per contentTypeId, then merging when required
-				// another way would be to maintain a cache of *all* properties, then filter when required
-				// however it makes it more difficult to figure out what to clear (ie needs to find all children...)
+            // zb-00036 #29889 : Fix content tab properties. Replaces getPropertyTypes, which was
+            // loading all properties for the tab, causing exceptions here and there... we want
+            // the properties for the tab for a given content type, and we want them in the right order.
+            // Also this is public now because we removed the PropertyTypes property (not making sense).
+            public PropertyType[] GetPropertyTypes(int contentTypeId, bool includeInheritedProperties)
+            {
+                // zb-00040 #29889 : fix cache key issues!
+                // now maintaining a cache of local properties per contentTypeId, then merging when required
+                // another way would be to maintain a cache of *all* properties, then filter when required
+                // however it makes it more difficult to figure out what to clear (ie needs to find all children...)
 
-				var tmp = new List<PropertyType>();
-				var ctypes = new List<int>();
+                var tmp = new List<PropertyType>();
+                var ctypes = new List<int>();
 
-				if (includeInheritedProperties)
-				{
-					// start from contentTypeId and list all ctypes, going up
-					int c = contentTypeId;
-					while (c != 0)
-					{
-						ctypes.Add(c);
-						c = umbraco.cms.businesslogic.ContentType.GetContentType(c).MasterContentType;
-					}
-					ctypes.Reverse(); // order from the top
-				}
-				else
-				{
-					// just that one
-					ctypes.Add(contentTypeId);
-				}
+                if (includeInheritedProperties)
+                {
+                    // start from contentTypeId and list all ctypes, going up
+                    int c = contentTypeId;
+                    while (c != 0)
+                    {
+                        ctypes.Add(c);
+                        c = umbraco.cms.businesslogic.ContentType.GetContentType(c).MasterContentType;
+                    }
+                    ctypes.Reverse(); // order from the top
+                }
+                else
+                {
+                    // just that one
+                    ctypes.Add(contentTypeId);
+                }
 
-				foreach (var ctype in ctypes)
-				{
-					var ptypes = Cache.GetCacheItem<List<PropertyType>>(
-						generateCacheKey(Id, ctype), propertyTypesCacheSyncLock, TimeSpan.FromMinutes(10),
-						delegate
-						{
-							var tmp1 = new List<PropertyType>();
+                foreach (var ctype in ctypes)
+                {
+                    var ptypes = Cache.GetCacheItem<List<PropertyType>>(
+                        generateCacheKey(Id, ctype), propertyTypesCacheSyncLock, TimeSpan.FromMinutes(10),
+                        delegate
+                        {
+                            var tmp1 = new List<PropertyType>();
 
-							using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
-								@"select id from cmsPropertyType where tabId = {0} and contentTypeId = {1}
+                            using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
+                                @"select id from cmsPropertyType where tabId = {0} and contentTypeId = {1}
 									order by sortOrder", _id, ctype)))
-							{
-								while (dr.Read())
-									tmp1.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
-							}
-							return tmp1;
-						});
+                            {
+                                while (dr.Read())
+                                    tmp1.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
+                            }
+                            return tmp1;
+                        });
 
-					tmp.AddRange(ptypes);
-				}
+                    tmp.AddRange(ptypes);
+                }
 
-				return tmp.ToArray();
-			}
+                return tmp.ToArray();
+            }
 
-			// zb-00036 #29889 : yet we may want to be able to get *all* property types
-			public List<PropertyType> GetAllPropertyTypes()
-			{
-				var tmp = new List<PropertyType>();
+            // zb-00036 #29889 : yet we may want to be able to get *all* property types
+            public List<PropertyType> GetAllPropertyTypes()
+            {
+                var tmp = new List<PropertyType>();
 
-				using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
-					@"select id from cmsPropertyType where tabId = {0}", _id)))
-				{
-					while (dr.Read())
-						tmp.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
-				}
+                using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(
+                    @"select id from cmsPropertyType where tabId = {0}", _id)))
+                {
+                    while (dr.Read())
+                        tmp.Add(PropertyType.GetPropertyType(dr.GetInt("id")));
+                }
 
-				return tmp;
-			}
+                return tmp;
+            }
 
             /// <summary>
             /// Flushes the cache.
@@ -1249,8 +1312,8 @@ namespace umbraco.cms.businesslogic
                 get { return _id; }
             }
 
-			// zb-00036 #29889 : removed unused field
-			// zb-00036 #29889 : removed PropertyTypes property (not making sense)
+            // zb-00036 #29889 : removed unused field
+            // zb-00036 #29889 : removed PropertyTypes property (not making sense)
 
             public int ContentType
             {
