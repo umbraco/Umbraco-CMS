@@ -219,6 +219,10 @@ namespace umbraco.MacroEngines
             }
 
             MethodInfo firstMethod = methods.First();
+            // NH: this is to ensure that it's always the correct one being chosen when using the LINQ extension methods
+            if (methods.Count > 1)
+                firstMethod = methods.First(x => x.IsGenericMethodDefinition);
+
             MethodInfo methodToExecute = null;
             if (firstMethod.IsGenericMethodDefinition)
             {
