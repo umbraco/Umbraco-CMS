@@ -84,45 +84,73 @@ namespace System.Linq.Dynamic
 
         public static IQueryable OrderBy(this IQueryable source, string ordering, params object[] values)
         {
-            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(bool), ordering, values);
-            if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
+            if (source == null) throw new ArgumentNullException("source");
+            if (ordering == null) throw new ArgumentNullException("ordering");
+
+            IQueryable<DynamicNode> typedSource = source as IQueryable<DynamicNode>;
+            if (!ordering.Contains(","))
             {
-                //source list is DynamicNode and the lambda returns a Func<object>
-                IQueryable<DynamicNode> typedSource = source as IQueryable<DynamicNode>;
-                Func<DynamicNode, object> func = (Func<DynamicNode, object>)lambda.Compile();
-                return typedSource.OrderBy(delegate(DynamicNode node)
+                LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(bool), ordering, values);
+                if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
                 {
-                    object value = -1;
-                    var firstFuncResult = func(node);
-                    if (firstFuncResult is Func<DynamicNode, object>)
+                    //source list is DynamicNode and the lambda returns a Func<object>
+                    Func<DynamicNode, object> func = (Func<DynamicNode, object>)lambda.Compile();
+                    return typedSource.OrderBy(delegate(DynamicNode node)
                     {
-                        value = (firstFuncResult as Func<DynamicNode, object>)(node);
-                    }
-                    return value;
-                }).AsQueryable();
+                        object value = -1;
+                        var firstFuncResult = func(node);
+                        if (firstFuncResult is Func<DynamicNode, object>)
+                        {
+                            value = (firstFuncResult as Func<DynamicNode, object>)(node);
+                        }
+                        return value;
+                    }).AsQueryable();
+                }
             }
-            else
+
+            bool isDynamicNodeList = false;
+            if (typedSource != null)
             {
-                if (source == null) throw new ArgumentNullException("source");
-                if (ordering == null) throw new ArgumentNullException("ordering");
-                ParameterExpression[] parameters = new ParameterExpression[] {
+                isDynamicNodeList = true;
+            }
+
+            ParameterExpression[] parameters = new ParameterExpression[] {
                 Expression.Parameter(source.ElementType, "") };
-                ExpressionParser parser = new ExpressionParser(parameters, ordering, values);
-                IEnumerable<DynamicOrdering> orderings = parser.ParseOrdering();
-                Expression queryExpr = source.Expression;
-                string methodAsc = "OrderBy";
-                string methodDesc = "OrderByDescending";
-                foreach (DynamicOrdering o in orderings)
+            ExpressionParser parser = new ExpressionParser(parameters, ordering, values);
+            IEnumerable<DynamicOrdering> orderings = parser.ParseOrdering();
+            Expression queryExpr = source.Expression;
+            string methodAsc = "OrderBy";
+            string methodDesc = "OrderByDescending";
+            foreach (DynamicOrdering o in orderings)
+            {
+                if (!isDynamicNodeList)
                 {
                     queryExpr = Expression.Call(
                         typeof(Queryable), o.Ascending ? methodAsc : methodDesc,
                         new Type[] { source.ElementType, o.Selector.Type },
                         queryExpr, Expression.Quote(Expression.Lambda(o.Selector, parameters)));
-                    methodAsc = "ThenBy";
-                    methodDesc = "ThenByDescending";
                 }
-                return source.Provider.CreateQuery(queryExpr);
+                else
+                {
+                    //reroute each stacked Expression.Call into our own methods that know how to deal
+                    //with DynamicNode
+                    queryExpr = Expression.Call(
+                            typeof(DynamicNodeListOrdering),
+                            o.Ascending ? methodAsc : methodDesc,
+                            null,
+                            queryExpr,
+                            Expression.Quote(Expression.Lambda(o.Selector, parameters))
+                        );
+                }
+                methodAsc = "ThenBy";
+                methodDesc = "ThenByDescending";
             }
+            if (isDynamicNodeList)
+            {
+                return typedSource.Provider.CreateQuery(queryExpr);
+            }
+            return source.Provider.CreateQuery(queryExpr);
+
         }
 
         public static IQueryable Take(this IQueryable source, int count)

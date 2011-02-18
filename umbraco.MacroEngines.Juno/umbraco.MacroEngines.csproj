@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="DLRScriptingEngine.cs" />
     <Compile Include="DynamicDictionary.cs" />
+    <Compile Include="DynamicNodeListOrdering.cs" />
     <Compile Include="DynamicQueryableBinders.cs" />
     <Compile Include="DynamicMedia.cs" />
     <Compile Include="DynamicNode.cs" />
