@@ -20,7 +20,7 @@
     <property name="WebPiAssets.dir" value="${root.dir}\config templates\WebPi" />
     
     
-    <property name="build.version" value="4.6.1"/>
+    <property name="build.version" value="4.6.2 Beta"/>
 
     <property name="build.configuration" value="Release"/>
     
