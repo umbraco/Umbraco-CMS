@@ -120,7 +120,13 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\debug\umbraco.MacroEngines.*" "$(ProjectDir)..\umbraco\presentation\bin\" /Y/F</PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Debug goto :debug
+
+goto :exit
+
+:debug
+xcopy "$(ProjectDir)bin\debug\umbraco.MacroEngines.*" "$(ProjectDir)..\umbraco\presentation\bin\" /Y/F
+:exit</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
