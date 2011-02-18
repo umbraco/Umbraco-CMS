@@ -32,22 +32,19 @@ namespace umbraco.MacroEngines
 
         public string this[string alias]
         {
-            get { return _paramsKeyValue.Where(p => p.Key == alias).Select(p => p.Value).FirstOrDefault(); }
+            get
+            {
+                return _paramsKeyValue.Where(p => p.Key.ToLower() == alias.ToLower()).Select(p => p.Value).FirstOrDefault();
+            }
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             result = this[binder.Name];
 
-            // we'll check if parameters no matter the casing (due to the macro parser lower case all parameter aliases)
-            if (result == null || String.IsNullOrEmpty(result.ToString()))
-            {
-
-                if (this.Any(x => x.Key.ToLower() == binder.Name.ToLower()))
-                    result = this.First(x => x.Key.ToLower() == binder.Name.ToLower()).Value;
-            }
             return true;
         }
+
     }
 
 }
