@@ -39,7 +39,11 @@ namespace umbraco.MacroEngines
                 result = new DynamicNodeList(this.Where<DynamicNode>(predicate, values).ToList());
                 return true;
             }
-
+            if (name == "OrderBy")
+            {
+                result = new DynamicNodeList(this.OrderBy<DynamicNode>(args.First().ToString()).ToList());
+                return true;
+            }
             try
             {
                 //Property?
@@ -258,6 +262,10 @@ namespace umbraco.MacroEngines
         public IQueryable<T> Where<T>(string predicate, params object[] values)
         {
             return ((IQueryable<T>)Items.AsQueryable()).Where(predicate, values);
+        }
+        public IQueryable<T> OrderBy<T>(string key)
+        {
+            return ((IQueryable<T>)Items.AsQueryable()).OrderBy(key);
         }
     }
 }

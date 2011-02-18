@@ -25,7 +25,6 @@ namespace System.Linq.Dynamic
             if (source == null) throw new ArgumentNullException("source");
             if (predicate == null) throw new ArgumentNullException("predicate");
             LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(bool), predicate, values);
-            //if (source.ElementType == typeof(DynamicNode) && typeof(Func<DynamicNode, object>).IsAssignableFrom(lambda.ReturnType))
             if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
             {
                 //source list is DynamicNode and the lambda returns a Func<object>
@@ -85,25 +84,45 @@ namespace System.Linq.Dynamic
 
         public static IQueryable OrderBy(this IQueryable source, string ordering, params object[] values)
         {
-            if (source == null) throw new ArgumentNullException("source");
-            if (ordering == null) throw new ArgumentNullException("ordering");
-            ParameterExpression[] parameters = new ParameterExpression[] {
-                Expression.Parameter(source.ElementType, "") };
-            ExpressionParser parser = new ExpressionParser(parameters, ordering, values);
-            IEnumerable<DynamicOrdering> orderings = parser.ParseOrdering();
-            Expression queryExpr = source.Expression;
-            string methodAsc = "OrderBy";
-            string methodDesc = "OrderByDescending";
-            foreach (DynamicOrdering o in orderings)
+            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(bool), ordering, values);
+            if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
             {
-                queryExpr = Expression.Call(
-                    typeof(Queryable), o.Ascending ? methodAsc : methodDesc,
-                    new Type[] { source.ElementType, o.Selector.Type },
-                    queryExpr, Expression.Quote(Expression.Lambda(o.Selector, parameters)));
-                methodAsc = "ThenBy";
-                methodDesc = "ThenByDescending";
+                //source list is DynamicNode and the lambda returns a Func<object>
+                IQueryable<DynamicNode> typedSource = source as IQueryable<DynamicNode>;
+                Func<DynamicNode, object> func = (Func<DynamicNode, object>)lambda.Compile();
+                return typedSource.OrderBy(delegate(DynamicNode node)
+                {
+                    object value = -1;
+                    var firstFuncResult = func(node);
+                    if (firstFuncResult is Func<DynamicNode, object>)
+                    {
+                        value = (firstFuncResult as Func<DynamicNode, object>)(node);
+                    }
+                    return value;
+                }).AsQueryable();
             }
-            return source.Provider.CreateQuery(queryExpr);
+            else
+            {
+                if (source == null) throw new ArgumentNullException("source");
+                if (ordering == null) throw new ArgumentNullException("ordering");
+                ParameterExpression[] parameters = new ParameterExpression[] {
+                Expression.Parameter(source.ElementType, "") };
+                ExpressionParser parser = new ExpressionParser(parameters, ordering, values);
+                IEnumerable<DynamicOrdering> orderings = parser.ParseOrdering();
+                Expression queryExpr = source.Expression;
+                string methodAsc = "OrderBy";
+                string methodDesc = "OrderByDescending";
+                foreach (DynamicOrdering o in orderings)
+                {
+                    queryExpr = Expression.Call(
+                        typeof(Queryable), o.Ascending ? methodAsc : methodDesc,
+                        new Type[] { source.ElementType, o.Selector.Type },
+                        queryExpr, Expression.Quote(Expression.Lambda(o.Selector, parameters)));
+                    methodAsc = "ThenBy";
+                    methodDesc = "ThenByDescending";
+                }
+                return source.Provider.CreateQuery(queryExpr);
+            }
         }
 
         public static IQueryable Take(this IQueryable source, int count)
