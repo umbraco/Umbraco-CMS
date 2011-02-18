@@ -216,15 +216,16 @@ function openContent(id) {
             else if (this.DialogMode == TreeDialogModes.locallink)
             {
                 string nodeLink = string.Format("{{localLink:{0}}}", dd.Id);
+                string nodeText = dd.Text.Replace("'", "\\'");
                 // try to make a niceurl too
-                string niceUrl = umbraco.library.NiceUrl(dd.Id);
+                string niceUrl = umbraco.library.NiceUrl(dd.Id).Replace("'", "\\'"); ;
                 if (niceUrl != "#" || niceUrl != "") {
-                    nodeLink += "|" + niceUrl + "|" + HttpContext.Current.Server.HtmlEncode(dd.Text);
+                    nodeLink += "|" + niceUrl + "|" + HttpContext.Current.Server.HtmlEncode(nodeText);
                 } else {
-                    nodeLink += "||" + HttpContext.Current.Server.HtmlEncode(dd.Text);
+                    nodeLink += "||" + HttpContext.Current.Server.HtmlEncode(nodeText);
                 }
                 
-                treeElement.Action = String.Format("javascript:openContent('{0}');", nodeLink.Replace("'","\\'"));
+                treeElement.Action = String.Format("javascript:openContent('{0}');", nodeLink);
             }
             else if (this.DialogMode == TreeDialogModes.id || this.DialogMode == TreeDialogModes.none)
             {

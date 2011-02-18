@@ -11,7 +11,7 @@ namespace umbraco.presentation
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            preview.PreviewContent.ClearPreviewCookie();
+			preview.PreviewContent.ClearPreviewCookie();
             Response.Redirect(helper.Request("redir"), true);
         }
     }

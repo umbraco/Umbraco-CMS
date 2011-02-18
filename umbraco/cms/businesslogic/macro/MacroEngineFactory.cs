@@ -49,16 +49,23 @@ namespace umbraco.cms.businesslogic.macro
             }
         }
 
-        public static List<MacroEngineLanguage> GetSupportedLanguages()
-        {
-            List<MacroEngineLanguage> languages = new List<MacroEngineLanguage>();
-            foreach(IMacroEngine engine in GetAll())
-            {
+        public static IEnumerable<MacroEngineLanguage> GetSupportedLanguages() {
+            var languages = new List<MacroEngineLanguage>();
+            foreach(var engine in GetAll()) {
                 foreach(string lang in engine.SupportedExtensions)
                     if (languages.Find(t => t.Extension == lang) == null)
                         languages.Add(new MacroEngineLanguage(lang, engine.Name));
             }
+            return languages;
+        }
 
+        public static IEnumerable<MacroEngineLanguage> GetSupportedUILanguages() {
+            var languages = new List<MacroEngineLanguage>();
+            foreach (var engine in GetAll()) {
+                foreach (string lang in engine.SupportedUIExtensions)
+                    if (languages.Find(t => t.Extension == lang) == null)
+                        languages.Add(new MacroEngineLanguage(lang, engine.Name));
+            }
             return languages;
         }
 
@@ -68,8 +75,7 @@ namespace umbraco.cms.businesslogic.macro
             if (m_allEngines.Count == 0)
             {
                 Initialize();
-                foreach (string name in m_engines.Keys)
-                {
+                foreach (string name in m_engines.Keys) {
                     m_allEngines.Add(GetEngine(name));
                 }
             }

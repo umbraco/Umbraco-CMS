@@ -66,6 +66,10 @@ namespace umbraco.controls.Images
 
         protected void SubmitButton_Click(object sender, EventArgs e)
         {
+            int parent = int.Parse(MediaPickerControl.Text);
+            if (BusinessLogic.User.GetCurrent().StartMediaId != -1 && parent == -1)
+                parent = BusinessLogic.User.GetCurrent().StartNodeId;
+
             Media m = Media.MakeNew(TextBoxTitle.Text, cms.businesslogic.media.MediaType.GetByAlias("image"), BasePage.Current.getUser(), int.Parse(MediaPickerControl.Text));
             var props = m.getProperties;
             foreach (cms.businesslogic.property.Property p in props)

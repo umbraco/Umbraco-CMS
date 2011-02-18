@@ -256,7 +256,7 @@ namespace umbraco.presentation.webservices
                         IMacroEngine engine = MacroEngineFactory.GetByFilename(tempFileName);
                         string tempErrorMessage = "";
                         string xpath = UmbracoSettings.UseLegacyXmlSchema ? "/root/node" : "/root/*";
-                        if (!engine.Validate(fileContents, Node.GetNodeByXpath(xpath), out tempErrorMessage))
+                        if (!engine.Validate(fileContents, tempFileName, Node.GetNodeByXpath(xpath), out tempErrorMessage))
                             errorMessage = tempErrorMessage;
                     }
                     catch (Exception err)

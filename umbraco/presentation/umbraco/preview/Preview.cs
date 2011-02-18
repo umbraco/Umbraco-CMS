@@ -19,11 +19,13 @@ namespace umbraco.presentation.preview
 {
     public class PreviewContent
     {
-        public const string PREVIEW_COOKIE_KEY = "PreviewSet";
+		// zb-00004 #29956 : refactor cookies names & handling
+
         public XmlDocument XmlContent { get; set; }
         public Guid PreviewSet { get; set; }
         public string PreviewsetPath { get; set; }
         private int m_userId = 0;
+
         public PreviewContent(User user)
         {
             m_userId = user.Id;
@@ -93,12 +95,13 @@ namespace umbraco.presentation.preview
         }
 
         public void ActivatePreviewCookie() {
-            StateHelper.SetCookieValue(PREVIEW_COOKIE_KEY, PreviewSet.ToString());
+			// zb-00004 #29956 : refactor cookies names & handling
+			StateHelper.Cookies.Preview.SetValue(PreviewSet.ToString());
         }
 
         public static void ClearPreviewCookie() {
-            StateHelper.ClearCookie(PREVIEW_COOKIE_KEY);
+			// zb-00004 #29956 : refactor cookies names & handling
+			StateHelper.Cookies.Preview.Clear();
         }
-
     }
 }

@@ -36,7 +36,7 @@
     <SccProvider>
     </SccProvider>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -110,9 +110,6 @@
     <Reference Include="Lucene.Net, Version=2.9.2.2, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>C:\Users\Shannon\Documents\Visual Studio 2008\Projects\Umbraco\Branch-4.1\foreign dlls\Lucene.Net.dll</HintPath>
     </Reference>
-    <Reference Include="Nibble.Umb.ZipUpload">
-      <HintPath>..\..\foreign dlls\Nibble.Umb.ZipUpload.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -132,7 +129,6 @@
     <Reference Include="System.Web.Abstractions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.Extensions" />
@@ -554,6 +550,13 @@
     </Compile>
     <Compile Include="umbraco\dashboard\ChangePassword.ascx.designer.cs">
       <DependentUpon>ChangePassword.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\dashboard\DesktopMediaUploader.ascx.cs">
+      <DependentUpon>DesktopMediaUploader.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\dashboard\DesktopMediaUploader.ascx.designer.cs">
+      <DependentUpon>DesktopMediaUploader.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\dashboard\DeveloperDashboardIntro.ascx.designer.cs">
       <DependentUpon>DeveloperDashboardIntro.ascx</DependentUpon>
@@ -1401,6 +1404,9 @@
       <DependentUpon>MacroContainerService.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="umbraco\webservices\MediaUploader.ashx.cs">
+      <DependentUpon>MediaUploader.ashx</DependentUpon>
+    </Compile>
     <Compile Include="umbraco\webservices\TagsAutoCompleteHandler.ashx.cs">
       <DependentUpon>TagsAutoCompleteHandler.ashx</DependentUpon>
     </Compile>
@@ -1643,7 +1649,16 @@
     </Compile>
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
-    <Content Include="web.config.ssaolap01.xslt" />
+    <Content Include="umbraco\dashboard\DesktopMediaUploader.ascx" />
+    <Content Include="umbraco\dashboard\images\dmu-badge.jpg" />
+    <Content Include="umbraco\dashboard\images\dmu.png" />
+    <Content Include="umbraco\dashboard\images\logo32x32.png" />
+    <Content Include="umbraco\dashboard\images\membersearch.png" />
+    <Content Include="umbraco\dashboard\images\starterkit32x32.png" />
+    <Content Include="umbraco\dashboard\images\TV.png" />
+    <Content Include="umbraco\dashboard\images\ZipFile.png" />
+    <Content Include="umbraco\dashboard\swfs\AIRInstallBadge.swf" />
+    <Content Include="umbraco\dashboard\swfs\expressinstall.swf" />
     <Content Include="umbraco_client\Installer\images\bg-inp-big.png" />
     <Content Include="umbraco_client\modal\jquery.simplemodal.1.4.1.custom.js" />
     <Content Include="web.config.INDIGO64SSD.xslt" />
@@ -1771,7 +1786,6 @@
     <Content Include="umbraco\dashboard\StartupDashboardIntro.ascx" />
     <Content Include="umbraco\dashboard\StartupDashboardKits.ascx" />
     <Content Include="umbraco\dashboard\StartupDashboardVideos.ascx" />
-    <Content Include="umbraco\dashboard\zipupload.ascx" />
     <Content Include="umbraco\developer\Packages\StarterKits.aspx" />
     <Content Include="umbraco\dialogs\TemplateSkinning.aspx" />
     <Content Include="umbraco\helpRedirect.aspx" />
@@ -2367,6 +2381,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
     </None>
+    <None Include="umbraco\dashboard\air\DesktopMediaUploader.air" />
     <None Include="umbraco\LiveEditing\LiveEditing.cd" />
     <Content Include="umbraco\masterpages\umbracoPage.Master" />
     <Content Include="umbraco\masterpages\umbracoDialog.Master" />
@@ -3089,6 +3104,7 @@
     </None>
     <Content Include="umbraco\webservices\TagsAutoCompleteHandler.ashx" />
     <Content Include="umbraco\webservices\UltimatePickerAutoCompleteHandler.ashx" />
+    <Content Include="umbraco\webservices\MediaUploader.ashx" />
     <None Include="umbraco_client\CodeMirror\LICENSE" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
     <Content Include="web.config.APOWELL-BC-WIN7.xslt" />
