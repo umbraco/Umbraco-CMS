@@ -12,6 +12,7 @@ using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic;
 using System.Xml;
+using System.Xml.Linq;
 
 
 namespace umbraco.MacroEngines
@@ -80,8 +81,8 @@ namespace umbraco.MacroEngines
                     //in test mode, n.Id is 0, let this always succeed
                     if (n.Id == 0)
                     {
-                        List<DynamicNode> emptyList = new List<DynamicNode>();
-                        return new DynamicNodeList(emptyList);
+                        List<DynamicNode> selfList = new List<DynamicNode>() { this };
+                        return new DynamicNodeList(selfList);
                     }
                     XmlNode node = doc.SelectSingleNode(string.Format("//*[@id='{0}']", n.Id));
                     if (node != null)
@@ -189,7 +190,8 @@ namespace umbraco.MacroEngines
 
 
             result = null;
-            return false;
+            //changed this to a return true because it breaks testing when using .Children().Random().propertyName
+            return true;
         }
 
         private bool ConvertPropertyValueByDataType(ref object result, string name, Guid dataType)
@@ -234,7 +236,22 @@ namespace umbraco.MacroEngines
             if (string.Equals("false", string.Format("{0}", result), StringComparison.CurrentCultureIgnoreCase))
             {
                 result = false;
-                return false;
+                return true;
+            }
+
+            if (result != null)
+            {
+                string sResult = string.Format("{0}", result).Trim();
+                //a really rough check to see if this may be valid xml
+                if (sResult.StartsWith("<") && sResult.EndsWith(">") && sResult.Contains("/"))
+                {
+                    XElement e = XElement.Parse(sResult, LoadOptions.None);
+                    if (e != null)
+                    {
+                        result = new DynamicXml(e);
+                        return true;
+                    }
+                }
             }
 
             return true;
