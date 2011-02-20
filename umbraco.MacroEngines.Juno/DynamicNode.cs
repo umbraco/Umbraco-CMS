@@ -11,6 +11,7 @@ using umbraco.cms.businesslogic.property;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic;
+using System.Xml;
 
 
 namespace umbraco.MacroEngines
@@ -61,6 +62,66 @@ namespace umbraco.MacroEngines
             get
             {
                 return new DynamicNodeList(n.ChildrenAsList);
+            }
+        }
+        public DynamicNodeList XPath(string xPath)
+        {
+            //if this DN was initialized with an underlying NodeFactory.Node
+            if (n != null)
+            {
+                //get the underlying xml content
+                XmlDocument doc = umbraco.content.Instance.XmlContent;
+                if (doc != null)
+                {
+                    //get n as a XmlNode (to be used as the context point for the xpath)
+                    //rather than just applying the xPath to the root node, this lets us use .. etc from the DynamicNode point
+
+
+                    //in test mode, n.Id is 0, let this always succeed
+                    if (n.Id == 0)
+                    {
+                        List<DynamicNode> emptyList = new List<DynamicNode>();
+                        return new DynamicNodeList(emptyList);
+                    }
+                    XmlNode node = doc.SelectSingleNode(string.Format("//*[@id='{0}']", n.Id));
+                    if (node != null)
+                    {
+                        //got the current node (within the XmlContent instance)
+                        XmlNodeList nodes = node.SelectNodes(xPath);
+                        if (nodes.Count > 0)
+                        {
+                            //we got some resulting nodes
+                            List<NodeFactory.Node> nodeFactoryNodeList = new List<NodeFactory.Node>();
+                            //attempt to convert each node in the set to a NodeFactory.Node
+                            foreach (XmlNode nodeXmlNode in nodes)
+                            {
+                                try
+                                {
+                                    nodeFactoryNodeList.Add(new NodeFactory.Node(nodeXmlNode));
+                                }
+                                catch (Exception) { } //swallow the exceptions - the returned nodes might not be full nodes, e.g. property
+                            }
+                            //convert the NodeFactory nodelist to IEnumerable<DynamicNode> and return it as a DynamicNodeList
+                            return new DynamicNodeList(nodeFactoryNodeList.ConvertAll(nfNode => new DynamicNode(nfNode)));
+                        }
+                        else
+                        {
+                            throw new NullReferenceException("XPath returned no nodes");
+                        }
+                    }
+                    else
+                    {
+                        throw new NullReferenceException("Couldn't locate the DynamicNode within the XmlContent");
+                    }
+                }
+                else
+                {
+                    throw new NullReferenceException("umbraco.content.Instance.XmlContent is null");
+                }
+            }
+            else
+            {
+                throw new NullReferenceException("DynamicNode wasn't initialized with an underlying NodeFactory.Node");
             }
         }
 

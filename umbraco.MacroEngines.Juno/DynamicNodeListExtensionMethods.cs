@@ -21,5 +21,10 @@ namespace umbraco.MacroEngines
             //Randomly order the items in the set by a Guid, Take the correct number, and return this wrapped in a new DynamicNodeList
             return new DynamicNodeList(all.Items.OrderBy(x => Guid.NewGuid()).Take(Max));
         }
+
+        public static DynamicNode Random(this DynamicNodeList all)
+        {
+            return all.Items.OrderBy(x => Guid.NewGuid()).First();
+        }
     }
 }
