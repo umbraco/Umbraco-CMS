@@ -6,7 +6,7 @@
 		<div class="container">
 			<h1>Database configuration</h1>
 			<p>
-				<strong>To complete this step you will either need a blank database or if you do not have a blank database available, you can choose the SQL CE 4 embedded
+				<strong>To complete this step you will either need a blank database or, if you do not have a blank database available, choose the SQL CE 4 embedded
 				database (This is the recommended approach for first time users or if you are unsure).</strong></p>
             <p>
 				If you are not using the SQL CE 4 embedded database you will need the connection details for your database, such as the
@@ -29,7 +29,7 @@
                             </li>
                             <li>
                                 <input type="radio" id="databaseOptionEmbedded" name="database" value="embedded" />
-                                <label for="databaseOptionEmbedded">I want to use a quick-and-simple file-based database</label>
+                                <label for="databaseOptionEmbedded">I want to use SQL CE 4, a free, quick-and-simple embedded database</label>
 
                             </li>
                             <li>
