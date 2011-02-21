@@ -205,6 +205,7 @@
                 <include name="${build.dir}/*.xslt" />
                 <include name="${build.dir}/web.*.config" />
                 <include name="${build.dir}/site.py" />
+                <include name="${build.dir}/bin/umbraco.MacroEngines.Legacy.*" />
             </fileset>
         </delete>
 
