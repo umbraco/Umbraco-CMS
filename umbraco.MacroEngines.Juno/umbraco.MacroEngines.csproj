@@ -66,6 +66,7 @@
     <Compile Include="BaseContext.cs" />
     <Compile Include="DynamicNodeList.cs" />
     <Compile Include="DynamicQueryable.cs" />
+    <Compile Include="DynamicXml.cs" />
     <Compile Include="RazorUmbracoFactory.cs" />
     <Compile Include="RazorUmbracoHost.cs" />
     <Compile Include="UmbracoCultureDictionary.cs" />
