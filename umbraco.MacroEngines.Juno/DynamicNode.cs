@@ -62,6 +62,12 @@ namespace umbraco.MacroEngines
         {
             get
             {
+                List<INode> children = n.ChildrenAsList;
+                //testing
+                if (children.Count == 0 && n.Id == 0)
+                {
+                    return new DynamicNodeList(new List<INode> { this.n });
+                }
                 return new DynamicNodeList(n.ChildrenAsList);
             }
         }
@@ -102,6 +108,16 @@ namespace umbraco.MacroEngines
                                 }
                                 catch (Exception) { } //swallow the exceptions - the returned nodes might not be full nodes, e.g. property
                             }
+                            //Wanted to do this, but because we return DynamicNodeList here, the only
+                            //common parent class is DynamicObject
+                            //maybe some future refactoring will solve this?
+                            //if (nodeFactoryNodeList.Count == 0)
+                            //{
+                            //    //if the xpath resulted in a node set, but none of them could be converted to NodeFactory.Node
+                            //    XElement xElement = XElement.Parse(node.OuterXml);
+                            //    //return 
+                            //    return new DynamicXml(xElement);
+                            //}
                             //convert the NodeFactory nodelist to IEnumerable<DynamicNode> and return it as a DynamicNodeList
                             return new DynamicNodeList(nodeFactoryNodeList.ConvertAll(nfNode => new DynamicNode(nfNode)));
                         }
@@ -245,12 +261,33 @@ namespace umbraco.MacroEngines
                 //a really rough check to see if this may be valid xml
                 if (sResult.StartsWith("<") && sResult.EndsWith(">") && sResult.Contains("/"))
                 {
-                    XElement e = XElement.Parse(sResult, LoadOptions.None);
-                    if (e != null)
+                    try
                     {
-                        result = new DynamicXml(e);
+                        XElement e = XElement.Parse(sResult, LoadOptions.None);
+                        if (e != null)
+                        {
+                            //check that the document element is not one of the disallowed elements
+                            //allows RTE to still return as html if it's valid xhtml
+                            string documentElement = e.Name.LocalName;
+                            if (!UmbracoSettings.NotDynamicXmlDocumentElements.Any(tag =>
+                                string.Equals(tag, documentElement, StringComparison.CurrentCultureIgnoreCase)))
+                            {
+                                result = new DynamicXml(e);
+                                return true;
+                            }
+                            else
+                            {
+                                //we will just return this as a string
+                                return true;
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        //we will just return this as a string
                         return true;
                     }
+
                 }
             }
 
