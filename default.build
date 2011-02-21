@@ -20,7 +20,7 @@
     <property name="WebPiAssets.dir" value="${root.dir}\config templates\WebPi" />
     
     
-    <property name="build.version" value="4.6.1"/>
+    <property name="build.version" value="4.6.2 Beta"/>
 
     <property name="build.configuration" value="Release"/>
     
@@ -136,15 +136,22 @@
         <copy file="${root.dir}\config templates\config\scripting.config" tofile="${build.dir}\config\scripting.config" failonerror="false" overwrite="true"/>
                 
         
-        <!-- 4.6 Files -->
+        <!-- Macro engines files + razor Files -->
         <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\${build.configuration}\umbraco.MacroEngines.dll" tofile="${build.dir}\bin\umbraco.MacroEngines.dll" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\${build.configuration}\umbraco.MacroEngines.pdb" tofile="${build.dir}\bin\umbraco.MacroEngines.pdb" failonerror="false" overwrite="true"/>
-		
+		<copy todir="${build.dir}\bin" overwrite="true">
+            <fileset basedir="${dlls.dir}\WebPages">
+                <include name="*.dll" />
+            </fileset>
+        </copy>
+               
         
+        <!--
 		<copy file="${root.dir}\foreign dlls\System.Web.Razor.dll" tofile="${build.dir}\bin\System.Web.Razor.dll" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\foreign dlls\RazorEngine.Core.dll" tofile="${build.dir}\bin\RazorEngine.Core.dll" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\foreign dlls\RazorEngine.Templates.dll" tofile="${build.dir}\bin\RazorEngine.Templates.dll" failonerror="false" overwrite="true"/>
-      
+        -->
+        
         <!--standard /data/packages files-->
         <mkdir dir="${build.dir}\App_Data" />
         <copy file="${root.dir}\config templates\packages\installedPackages.config" tofile="${build.dir}\app_data\packages\installed\installedPackages.config" failonerror="false" overwrite="true"/>
@@ -198,6 +205,7 @@
                 <include name="${build.dir}/*.xslt" />
                 <include name="${build.dir}/web.*.config" />
                 <include name="${build.dir}/site.py" />
+                <include name="${build.dir}/bin/umbraco.MacroEngines.Legacy.*" />
             </fileset>
         </delete>
 

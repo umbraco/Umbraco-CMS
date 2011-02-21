@@ -39,7 +39,16 @@ namespace umbraco.presentation.install.utills
                 if (feed == "developervids")
                     url = "http://umbraco.org/feeds/videos/developer-foundation-html";
 
-                Response.Write(library.GetXmlDocumentByUrl(url).Current.OuterXml);
+                string XmlResponse = library.GetXmlDocumentByUrl(url).Current.OuterXml;
+
+                if(!XmlResponse.Contains("System.Net.WebException"))
+                {
+                    Response.Write(library.GetXmlDocumentByUrl(url).Current.OuterXml);
+                }
+                else
+                {
+                    Response.Write("We can't connect to umbraco.org right now.  Click 'Set up your new website' above to continue.");
+                }
             }
         }
 

@@ -194,37 +194,22 @@ namespace umbraco.BasePages {
         public static string umbracoUserContextID {
             get
             {
-                if (HttpContext.Current != null)
-                    if (HttpContext.Current.Request != null)
-                        if (HttpContext.Current.Request.Cookies != null)
-                        {
-                            HttpCookie userContext = HttpContext.Current.Request.Cookies.Get("UserContext");
-                            if (userContext != null)
-                                return userContext.Value;
-                        }
-                return "";
+				// zb-00004 #29956 : refactor cookies names & handling
+				if (StateHelper.Cookies.HasCookies && StateHelper.Cookies.UserContext.HasValue)
+					return StateHelper.Cookies.UserContext.GetValue();
+				else
+	                return "";
             }
             set {
-                if (HttpContext.Current != null)
-                {
-                    // Clearing all old cookies before setting a new one.
-                    try
-                    {
-                        if (HttpContext.Current.Request != null)
-                            if (HttpContext.Current.Request.Cookies["UserContext"] != null)
-                            {
-                                HttpContext.Current.Response.Cookies.Clear();
-                            }
-                    }
-                    catch
-                    {
-                    }
+				// zb-00004 #29956 : refactor cookies names & handling
+                if (StateHelper.Cookies.HasCookies)
+				{
+					// Clearing all old cookies before setting a new one.
+					if (StateHelper.Cookies.UserContext.HasValue)
+						StateHelper.Cookies.ClearAll();
+
                     // Create new cookie.
-                    var c = new HttpCookie("UserContext");
-                    c.Name = "UserContext";
-                    c.Value = value;
-                    c.Expires = DateTime.Now.AddDays(1);
-                    HttpContext.Current.Response.Cookies.Add(c);
+					StateHelper.Cookies.UserContext.SetValue(value, 1);
                 }
             }
         }
