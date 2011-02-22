@@ -425,6 +425,17 @@ namespace umbraco
         {
             string parentUrl = String.Empty;
             XmlElement node = UmbracoContext.Current.GetXml().GetElementById(nodeId.ToString());
+            
+            if (node == null)
+            {
+                ArgumentException arEx =
+                    new ArgumentException(
+                        string.Format(
+                            "Couldn't find any page with the nodeId = {0}. This is most likely caused by the page isn't published!",
+                            nodeId), "nodeId");
+                Log.Add(LogTypes.Error, nodeId, arEx.Message);
+                throw arEx;
+            }
             if (node.ParentNode.Name.ToLower() != "root" || UmbracoSettings.UseDomainPrefixes)
             {
                 if (UmbracoSettings.UseDomainPrefixes)
