@@ -154,7 +154,7 @@ body
     background: url('../images/speechbubble/speechbubble_body.png') no-repeat;
     width: 235px;
     margin: 0;
-    padding: 10px 20px 10px 10px;
+    padding: 5px 20px 5px 10px;
 }
 .speechBubbleBottom
 {
@@ -179,7 +179,7 @@ body
     font-size: 11px;
     font-family: Trebuchet MS, Lucida Grande, verdana, arial;
     margin: 0;
-    width: 220px;
+    width: 180px;
 }
 #tray
 {
