@@ -13,7 +13,7 @@ namespace umbraco.MacroEngines
         protected IParameterDictionary ParameterDictionary;
         protected ICultureDictionary CultureDictionary;
 
-        public dynamic MacroParameters { get { return ParameterDictionary; } }
+        public dynamic Parameter { get { return ParameterDictionary; } }
         public dynamic Dictionary { get { return CultureDictionary; } }
 
         public MacroModel Macro { get { return _macro; } }
