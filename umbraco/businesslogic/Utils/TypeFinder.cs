@@ -21,7 +21,7 @@ namespace umbraco.BusinessLogic.Utils
         /// Searches all loaded assemblies for classes marked with the attribute passed in.
         /// </summary>
         /// <returns>A list of found types</returns>
-        public static List<Type> FindClassesMarkedWithAttribute(Type attribute)
+        public static IEnumerable<Type> FindClassesMarkedWithAttribute(Type attribute)
         {
             List<Type> types = new List<Type>();
             bool searchGAC = false;
@@ -42,7 +42,7 @@ namespace umbraco.BusinessLogic.Utils
                 types.AddRange(FindClassesMarkedWithAttribute(Assembly.Load("App_Code"), attribute));
             }
 
-            return types;
+            return types.Distinct();
         }
 
 		static IEnumerable<Type> FindClassesMarkedWithAttribute(Assembly assembly, Type attribute)
