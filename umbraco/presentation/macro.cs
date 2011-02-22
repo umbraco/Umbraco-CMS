@@ -1143,7 +1143,7 @@ namespace umbraco
 
                 MacroPropertyModel propModel = model.Properties.Find(m => m.Key == propertyAlias.ToLower());
                 // zb-00037 #29875 : values have already been parsed + no need to parse ""
-                object propValue = prop != null ? propModel.Value : "";
+                object propValue = propModel != null && prop != null ? propModel.Value : "";
                 // Special case for types of webControls.unit
                 if (prop.PropertyType == typeof(Unit))
                     propValue = Unit.Parse(propValue.ToString());
