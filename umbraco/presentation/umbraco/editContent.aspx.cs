@@ -382,7 +382,9 @@ namespace umbraco.cms.presentation
                                         tempLink = "<em>N/A</em>";
                                     else if (int.Parse(s) != _document.Id)
                                     {
-                                        string niceUrl = currentLink.Replace(library.NiceUrl(int.Parse(s)).Replace(".aspx", ""), "");
+                                        string tempNiceUrl = library.NiceUrl(int.Parse(s));
+
+                                        string niceUrl = tempNiceUrl != "/" ? currentLink.Replace(tempNiceUrl.Replace(".aspx", ""), "") : currentLink;
                                         if (!niceUrl.StartsWith("/"))
                                             niceUrl = "/" + niceUrl;
 
