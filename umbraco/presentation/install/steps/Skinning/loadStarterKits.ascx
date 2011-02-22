@@ -53,3 +53,11 @@
 	</FooterTemplate>
 </asp:Repeater>
 </asp:PlaceHolder>
+
+<asp:PlaceHolder ID="pl_starterKitsConnectionError" runat="server" Visible="false">
+	<!-- btn box -->
+	<footer class="btn-box">
+         <div class="t">&nbsp;</div>
+         <asp:LinkButton ID="LinkButton1" class="btn-step btn btn-continue" runat="server" onclick="gotoLastStep"><span>Continue</span></asp:LinkButton>
+    </footer>
+</asp:PlaceHolder>

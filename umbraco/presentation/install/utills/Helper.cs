@@ -12,6 +12,13 @@ namespace umbraco.presentation.install {
       d.GotoNextStep(d.step.Value);
     }
 
+    public static void RedirectToLastStep(Page page)
+    {
+        _default d = (_default)page;
+        d.GotoLastStep();
+    }
+
+
     private static int m_Percentage = -1;
     public static int Percentage { get { return m_Percentage; } set { m_Percentage = value; } }
     
