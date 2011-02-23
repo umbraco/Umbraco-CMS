@@ -9,9 +9,9 @@ using System.Web.UI;
 
 namespace umbraco
 {
-	/// <summary>
-	/// Summary description for helper.
-	/// </summary>
+    /// <summary>
+    /// Summary description for helper.
+    /// </summary>
     public class helper
     {
         public static bool IsNumeric(string Number)
@@ -25,7 +25,7 @@ namespace umbraco
             return umbraco.BasePages.UmbracoEnsuredPage.CurrentUser;
         }
 
-        [Obsolete("Use umbraco.Presentation.UmbracoContext.Current.Request[key]",false)]
+        [Obsolete("Use umbraco.Presentation.UmbracoContext.Current.Request[key]", false)]
         public static string Request(string text)
         {
             string temp = string.Empty;
@@ -99,7 +99,7 @@ namespace umbraco
                                     attributeValue = "";
                                 break;
                             case "$":
-                                if (pageElements[keyName] != null)
+                                if (pageElements[keyName] != null && pageElements[keyName].ToString() != string.Empty)
                                 {
                                     attributeValue = pageElements[keyName].ToString();
                                 }
@@ -113,7 +113,7 @@ namespace umbraco
                                         XmlNode element = umbracoXML.GetElementById(splitpath[splitpath.Length - i - 1].ToString());
                                         if (element == null)
                                             continue;
-                                        string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data [@alias = '{0}']" : "{0}"; 
+                                        string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data [@alias = '{0}']" : "{0}";
                                         XmlNode currentNode = element.SelectSingleNode(string.Format(xpath,
                                             keyName));
                                         if (currentNode != null && currentNode.FirstChild != null &&
@@ -148,19 +148,22 @@ namespace umbraco
         {
             string s = text;
 
-            if (2 > s.Length) {
+            if (2 > s.Length)
+            {
                 return s;
             }
-            
-            
+
+
             var sb = new System.Text.StringBuilder();
             var ca = s.ToCharArray();
             ca[0] = char.ToUpper(ca[0]);
 
             sb.Append(ca[0]);
-            for (int i = 1; i < ca.Length - 1; i++) {
+            for (int i = 1; i < ca.Length - 1; i++)
+            {
                 char c = ca[i];
-                if (char.IsUpper(c) && (char.IsLower(ca[i + 1]) || char.IsLower(ca[i - 1]))) {
+                if (char.IsUpper(c) && (char.IsLower(ca[i + 1]) || char.IsLower(ca[i - 1])))
+                {
                     sb.Append(' ');
                 }
                 sb.Append(c);
@@ -283,7 +286,7 @@ namespace umbraco
         /// </returns>
         public ICollection Keys
         {
-            get { return m_Collection.Keys;  }
+            get { return m_Collection.Keys; }
         }
 
         /// <summary>

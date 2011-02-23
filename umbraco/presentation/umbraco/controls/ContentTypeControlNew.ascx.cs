@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
+using umbraco.controls.GenericProperties;
 using umbraco.IO;
 using umbraco.presentation;
 using umbraco.cms.businesslogic;
@@ -603,7 +604,7 @@ jQuery(function() { refreshDropDowns(); });
             GenericProperties.GenericProperty gpData = gp.GenricPropertyControl;
             if (gpData.Name.Trim() != "" && gpData.Alias.Trim() != "")
             {
-                if (cType.getPropertyType(Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim())) == null)
+                if (doesPropertyTypeAliasExist(gpData))
                 {
                     string[] info = { gpData.Name, gpData.Type.ToString() };
                     cms.businesslogic.propertytype.PropertyType pt = cType.AddPropertyType(cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(gpData.Type), Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim()), gpData.Name);
@@ -663,6 +664,18 @@ jQuery(function() { refreshDropDowns(); });
                     }
                 }
             }
+        }
+
+        private bool doesPropertyTypeAliasExist(GenericProperty gpData)
+        {
+            bool hasAlias = cType.getPropertyType(Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim())) != null;
+            ContentType ct = cType;
+            while (ct.MasterContentType > 0)
+            {
+                ct = new ContentType(ct.MasterContentType);
+                hasAlias = ct.getPropertyType(Casing.SafeAliasWithForcingCheck(gpData.Alias.Trim())) != null;
+            }
+            return !hasAlias;
         }
 
         public bool HasRows(System.Data.DataView dv)

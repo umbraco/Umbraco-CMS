@@ -63,15 +63,11 @@ namespace umbraco.editorControls.macrocontainer
         // with  _macroSelectDropdown.Items.Add(new ListItem(GetMacroNameFromAlias(item), item));
         private string GetMacroNameFromAlias(string alias)
         {
-            umbraco.DataLayer.IRecordsReader dr = umbraco.BusinessLogic.Application.SqlHelper.ExecuteReader("select macroName from cmsMacro where macroAlias = @alias",
-                umbraco.BusinessLogic.Application.SqlHelper.CreateParameter("@alias", alias));
+            var macro = umbraco.macro.ReturnFromAlias(alias);
 
-            if (dr.Read())
-                return dr.GetString("macroName");
-            else
-                return string.Empty;
-
+            return macro == null ? string.Empty : macro.Name;
         }
+        
         void _delete_Click(object sender, EventArgs e)
         {
             _macroSelectDropdown.SelectedIndex = 0;

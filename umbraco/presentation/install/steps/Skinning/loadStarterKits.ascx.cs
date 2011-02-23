@@ -75,10 +75,16 @@ namespace umbraco.presentation.install.steps.Skinning
             uicontrols.Feedback fb = new global::umbraco.uicontrols.Feedback();
             fb.type = global::umbraco.uicontrols.Feedback.feedbacktype.error;
             fb.Text = "<strong>No connection to repository.</strong> Starter Kits could not be fetched from the repository as there was no connection to: '" + repo.RepositoryUrl + "'";
-            
-            pl_loadStarterKits.Controls.Clear();
-            pl_loadStarterKits.Controls.Add(fb);
+
+            pl_starterKitsConnectionError.Controls.Add(fb);
+            pl_starterKitsConnectionError.Visible = true;
         }
+
+        protected void gotoLastStep(object sender, EventArgs e)
+        {
+            Helper.RedirectToLastStep(this.Page);
+        }
+
 
         protected void SelectStarterKit(object sender, EventArgs e)
         {

@@ -68,6 +68,12 @@ namespace umbraco.presentation.install
                 Response.Redirect("?installStep=" + _s.Alias);
         }
 
+        public void GotoLastStep()
+        {
+            InstallerStep _s = InstallerSteps().Get("theend");
+            Response.Redirect("?installStep=" + _s.Alias);
+        }
+
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)

@@ -8,6 +8,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.businesslogic.web;
+using umbraco.IO;
 
 namespace umbraco.presentation.actions
 {
@@ -21,7 +22,7 @@ namespace umbraco.presentation.actions
         protected void Page_Load(object sender, EventArgs e)
         {
             Document doc = new Document(int.Parse(helper.Request("id")));       
-            Response.Redirect(string.Format("~/{0}.aspx?umbVersion={1}", doc.Id, doc.Version.ToString()));
+            Response.Redirect(IOHelper.ResolveUrl(string.Format("{0}/dialogs/preview.aspx?id= {1}", IO.SystemDirectories.Umbraco, doc.Id)));
         }
     }
 }

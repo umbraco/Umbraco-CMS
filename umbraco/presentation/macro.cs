@@ -368,24 +368,38 @@ namespace umbraco
             String macroHtml = null;
             Control macroControl = null;
 
-			// zb-00037 #29875 : parse attributes here (and before anything else)
-			foreach (var prop in model.Properties)
-				prop.Value = helper.parseAttribute(pageElements, prop.Value);
+            // zb-00037 #29875 : parse attributes here (and before anything else)
+            foreach (var prop in model.Properties)
+                prop.Value = helper.parseAttribute(pageElements, prop.Value);
 
             model.CacheIdentifier = getCacheGuid(model, pageElements, pageId);
 
             if (model.CacheDuration > 0)
             {
-                macroHtml = macroCache["macroHtml_" + model.CacheIdentifier] as String;
-
-                if (!String.IsNullOrEmpty(macroHtml))
+                if (cacheMacroAsString(model))
                 {
                     macroHtml = macroCache["macroHtml_" + model.CacheIdentifier] as String;
-                    HttpContext.Current.Trace.Write("renderMacro", "Content loaded from cache ('" + model.CacheIdentifier + "')...");
+
+                    if (!String.IsNullOrEmpty(macroHtml))
+                    {
+                        macroHtml = macroCache["macroHtml_" + model.CacheIdentifier] as String;
+                        HttpContext.Current.Trace.Write("renderMacro", "Macro Content loaded from cache ('" + model.CacheIdentifier + "')...");
+                    }
+                }
+                else
+                {
+                    if (macroCache["macroControl_" + model.CacheIdentifier] != null)
+                    {
+                        MacroCacheContent cacheContent = (MacroCacheContent)macroCache["macroControl_" + model.CacheIdentifier];
+                        macroControl = cacheContent.Content;
+                        macroControl.ID = cacheContent.ID;
+                        HttpContext.Current.Trace.Write("renderMacro", "Macro Control loaded from cache ('" + model.CacheIdentifier + "')...");
+                    }
+
                 }
             }
 
-            if (String.IsNullOrEmpty(macroHtml))
+            if (String.IsNullOrEmpty(macroHtml) && macroControl == null)
             {
                 int macroType = model.MacroType != MacroTypes.Unknown ? (int)model.MacroType : MacroType;
                 switch (macroType)
@@ -475,34 +489,50 @@ namespace umbraco
                     {
                         if (macroControl != null)
                         {
-                            using (var sw = new StringWriter())
+                            // NH: Scripts and XSLT can be generated as strings, but not controls as page events wouldn't be hit (such as Page_Load, etc)
+                            if (cacheMacroAsString(model))
                             {
-                                var hw = new HtmlTextWriter(sw);
-                                macroControl.RenderControl(hw);
+                                using (var sw = new StringWriter())
+                                {
+                                    var hw = new HtmlTextWriter(sw);
+                                    macroControl.RenderControl(hw);
 
-                                macroCache.Insert("macroHtml_" + model.CacheIdentifier,
-                                                  sw.ToString(),
-                                                  null,
-                                                  DateTime.Now.AddSeconds(model.CacheDuration),
-                                                  TimeSpan.Zero,
-                                                  CacheItemPriority.Low,
-                                                  null);
+                                    macroCache.Insert("macroHtml_" + model.CacheIdentifier,
+                                                      sw.ToString(),
+                                                      null,
+                                                      DateTime.Now.AddSeconds(model.CacheDuration),
+                                                      TimeSpan.Zero,
+                                                      CacheItemPriority.Low,
+                                                      null);
 
-                                // zb-00003 #29470 : replace by text if not already text
-								// otherwise it is rendered twice
-                                if (!(macroControl is LiteralControl))
-                                    macroControl = new LiteralControl(sw.ToString());
+                                    // zb-00003 #29470 : replace by text if not already text
+                                    // otherwise it is rendered twice
+                                    if (!(macroControl is LiteralControl))
+                                        macroControl = new LiteralControl(sw.ToString());
+                                }
+                            }
+                            else
+                            {
+                                macroCache.Insert("macroControl_" + model.CacheIdentifier, new MacroCacheContent(macroControl, macroControl.ID), null,
+                  DateTime.Now.AddSeconds(model.CacheDuration), TimeSpan.Zero, CacheItemPriority.Low,
+                  null);
+
                             }
                         }
                     }
                 }
             }
-            else
+            else if (macroControl == null)
             {
                 macroControl = new LiteralControl(macroHtml);
             }
 
             return macroControl;
+        }
+
+        private bool cacheMacroAsString(MacroModel model)
+        {
+            return model.MacroType == MacroTypes.XSLT || model.MacroType == MacroTypes.Python;
         }
 
         public static XslCompiledTransform getXslt(string XsltFile)
@@ -604,7 +634,7 @@ namespace umbraco
                 foreach (DictionaryEntry macroDef in macro.properties)
                 {
                     var prop = model.Properties.Find(m => m.Key == (string)macroDef.Key.ToString().ToLower());
-					// zb-00037 #29875 : values have already been parsed + no need to parse ""
+                    // zb-00037 #29875 : values have already been parsed + no need to parse ""
                     string propValue = prop != null ? prop.Value : "";
                     if (!String.IsNullOrEmpty(propValue))
                     {
@@ -763,12 +793,34 @@ namespace umbraco
         /// <returns>A dictionary of name/extension instance pairs.</returns>
         public static Dictionary<string, object> GetXsltExtensions()
         {
+            // zb-00041 #29966 : cache the extensions
+
+            // We could cache the extensions in a static variable but then the cache
+            // would not be refreshed when the .config file is modified. An application
+            // restart would be required. Better use the cache and add a dependency.
+
+            return umbraco.cms.businesslogic.cache.Cache.GetCacheItem(
+                _xsltExtensionsCacheKey, _xsltExtensionsSyncLock,
+                CacheItemPriority.Normal, // normal priority
+                null, // no refresh action
+                new CacheDependency(_xsltExtensionsConfig), // depends on the .config file
+                TimeSpan.FromDays(1), // expires in 1 day (?)
+                () => { return GetXsltExtensionsImpl(); });
+        }
+
+        // zb-00041 #29966 : cache the extensions
+        const string _xsltExtensionsCacheKey = "UmbracoXsltExtensions";
+        static string _xsltExtensionsConfig = IOHelper.MapPath(SystemDirectories.Config + "/xsltExtensions.config");
+        static object _xsltExtensionsSyncLock = new object();
+
+        static Dictionary<string, object> GetXsltExtensionsImpl()
+        {
             // fill a dictionary with the predefined extensions
             var extensions = new Dictionary<string, object>(GetPredefinedXsltExtensions());
 
             // Load the XSLT extensions configuration
             var xsltExt = new XmlDocument();
-            xsltExt.Load(IOHelper.MapPath(SystemDirectories.Config + "/xsltExtensions.config"));
+            xsltExt.Load(_xsltExtensionsConfig);
 
             // add all descendants of the XsltExtensions element
             foreach (XmlNode xsltEx in xsltExt.SelectSingleNode("/XsltExtensions"))
@@ -812,78 +864,16 @@ namespace umbraco
 
             //also get types marked with XsltExtension attribute
 
-            try
+            // zb-00042 #29949 : do not hide errors, refactor
+            foreach (Type xsltType in BusinessLogic.Utils.TypeFinder.FindClassesMarkedWithAttribute(typeof(XsltExtensionAttribute)))
             {
-                foreach (Type xsltType in BusinessLogic.Utils.TypeFinder.FindClassesMarkedWithAttribute(typeof(XsltExtensionAttribute)))
+                object[] tpAttributes = xsltType.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
+                foreach (XsltExtensionAttribute tpAttribute in tpAttributes)
                 {
-                    object[] tpAttributes = xsltType.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
-                    foreach (XsltExtensionAttribute tpAttribute in tpAttributes)
-                    {
-                        if (tpAttribute.Namespace != String.Empty)
-                        {
-                            extensions.Add(tpAttribute.Namespace, Activator.CreateInstance(xsltType));
-                        }
-                        else
-                        {
-                            extensions.Add(xsltType.FullName, Activator.CreateInstance(xsltType));
-                        }
-                    }
+                    string ns = !string.IsNullOrEmpty(tpAttribute.Namespace) ? tpAttribute.Namespace : xsltType.FullName;
+                    extensions.Add(ns, Activator.CreateInstance(xsltType));
                 }
             }
-            catch { }
-
-            //Assembly appCodeAssembly;
-            //try
-            //{
-            //    if (Directory.Exists(GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "App_Code"))
-            //    {
-            //        if (Directory.GetFiles(GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "App_Code",
-            //                               "*.*",
-            //                               SearchOption.AllDirectories).Length > 0)
-            //        {
-            //            appCodeAssembly = Assembly.Load("__code");
-            //            Type[] appCodeType = appCodeAssembly.GetExportedTypes();
-            //            if (appCodeType.Length == 0)
-            //            {
-            //                Log.Add(LogTypes.System, Node.GetCurrent().Id,
-            //                        String.Format(
-            //                            "Could not load types in App_Code ({0}) for XSLT extensions. Ensure you have used the public keyword to ensure class and method exposure.",
-            //                            appCodeAssembly.FullName));
-            //            }
-            //            else
-            //            {
-            //                // create an instance and add it to the extensions list
-            //                foreach (Type tp in appCodeType)
-            //                {
-            //                    object[] tpAttributes = tp.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
-            //                    foreach (XsltExtensionAttribute tpAttribute in tpAttributes)
-            //                    {
-            //                        if (tpAttribute.Namespace != String.Empty)
-            //                        {
-            //                            extensions.Add(tpAttribute.Namespace, Activator.CreateInstance(tp));
-            //                        }
-            //                        else
-            //                        {
-            //                            extensions.Add(tp.FullName, Activator.CreateInstance(tp));
-            //                        }
-            //                    }
-            //                }
-            //            }
-            //        }
-            //    }
-            //    else
-            //    {
-            //        Directory.CreateDirectory(GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "App_Code");
-            //    }
-            //}
-            //catch (FileNotFoundException)
-            //{
-            //    //Do nothing - just means there's nothing to load.
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw new Exception("Could not load App_Code classes for XSLT extensions.", ex);
-            //}
 
             return extensions;
         }
@@ -1152,8 +1142,8 @@ namespace umbraco
                 }
 
                 MacroPropertyModel propModel = model.Properties.Find(m => m.Key == propertyAlias.ToLower());
-				// zb-00037 #29875 : values have already been parsed + no need to parse ""
-				object propValue = prop != null ? propModel.Value : "";
+                // zb-00037 #29875 : values have already been parsed + no need to parse ""
+                object propValue = propModel != null && prop != null ? propModel.Value : "";
                 // Special case for types of webControls.unit
                 if (prop.PropertyType == typeof(Unit))
                     propValue = Unit.Parse(propValue.ToString());
@@ -1245,8 +1235,8 @@ namespace umbraco
                     }
 
                     MacroPropertyModel propModel = model.Properties.Find(m => m.Key == propertyAlias.ToLower());
-					// zb-00037 #29875 : values have already been parsed + no need to parse ""
-					object propValue = prop != null ? propModel.Value : "";
+                    // zb-00037 #29875 : values have already been parsed + no need to parse ""
+                    object propValue = propModel != null && prop != null ? propModel.Value : null;
 
                     if (propValue == null)
                         continue;
@@ -1440,7 +1430,8 @@ namespace umbraco
                 var myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
 
                 // propagate the user's context
-                HttpCookie inCookie = HttpContext.Current.Request.Cookies["UserContext"];
+                // zb-00004 #29956 : refactor cookies names & handling
+                HttpCookie inCookie = StateHelper.Cookies.UserContext.RequestCookie;
                 var cookie = new Cookie(inCookie.Name, inCookie.Value, inCookie.Path,
                                         HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
                 myHttpWebRequest.CookieContainer = new CookieContainer();

@@ -45,6 +45,5 @@ function resizePanelTo(PanelName, hasMenu, pWidth, pHeight) {
     }
 
     // set cookies
-    jQuery.cookie('umbPanel_pWidth', pWidth);
-    jQuery.cookie('umbPanel_pHeight', pHeight);
+    jQuery.cookie('UMB_PANEL', '' + pWidth + 'x' + pHeight);
 }

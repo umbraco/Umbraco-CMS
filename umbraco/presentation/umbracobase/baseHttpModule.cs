@@ -28,7 +28,7 @@ namespace umbraco.presentation.umbracobase
 
         public void Init(HttpApplication httpApp)
         {
-            //            httpApp.PostAuthorizeRequest += new EventHandler(httpApp_PreRequestHandlerExecute);
+            //httpApp.PostAuthorizeRequest += new EventHandler(httpApp_PreRequestHandlerExecute);
             httpApp.PostAcquireRequestState += new EventHandler(httpApp_PostAcquireRequestState);
             httpApp.PostMapRequestHandler += new EventHandler(httpApp_PostMapRequestHandler);
         }
@@ -39,10 +39,10 @@ namespace umbraco.presentation.umbracobase
             HttpApplication httpApp = (HttpApplication)sender;
             string url = httpApp.Context.Request.RawUrl;
 
+            string urlStart = IO.IOHelper.ResolveUrl( IO.SystemDirectories.Base ).TrimEnd('/').ToLower() + "/";
 
-            if (url.ToLower().StartsWith("/base/"))
+            if (url.ToLower().StartsWith(urlStart))
             {
-
                 if (httpApp.Context.Handler is IReadOnlySessionState || httpApp.Context.Handler is IRequiresSessionState)
                 {
                     // no need to replace the current handler
@@ -51,7 +51,6 @@ namespace umbraco.presentation.umbracobase
 
                 // swap the current handler
                 httpApp.Context.Handler = new MyHttpHandler(httpApp.Context.Handler);
-
             }
         }
 
@@ -61,10 +60,10 @@ namespace umbraco.presentation.umbracobase
 
             //remove extension and split the url
             string url = httpApp.Context.Request.RawUrl;
+            string urlStart = IO.IOHelper.ResolveUrl(IO.SystemDirectories.Base).TrimEnd('/').ToLower() + "/";
 
-
-            if (url.ToLower().StartsWith("/base/"))
-            {
+            if (url.ToLower().StartsWith(urlStart))
+            {                
                 MyHttpHandler resourceHttpHandler = HttpContext.Current.Handler as MyHttpHandler;
 
                 if (resourceHttpHandler != null)
@@ -72,6 +71,11 @@ namespace umbraco.presentation.umbracobase
                     // set the original handler back
                     HttpContext.Current.Handler = resourceHttpHandler.OriginalHandler;
                 }
+
+                string basedir = "/" + IO.SystemDirectories.Base.TrimStart('~').Trim('/') + "/";
+                int indexOfBase = url.ToLower().IndexOf(basedir);
+                url = url.Substring(indexOfBase);
+
 
                 if (url.ToLower().Contains(".aspx"))
                     url = url.Substring(0, url.IndexOf(".aspx"));

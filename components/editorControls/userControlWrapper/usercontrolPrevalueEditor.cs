@@ -215,6 +215,10 @@ namespace umbraco.editorControls.userControlGrapper
 			            SqlHelper.CreateParameter("@value",data),
 						SqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
             SqlHelper.ExecuteNonQuery("delete from cmsDataTypePreValues where datatypenodeid = @dtdefid", SqlParams);
+            // we need to populate the parameters again due to an issue with SQL CE
+            SqlParams = new IParameter[] {
+			            SqlHelper.CreateParameter("@value",data),
+						SqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
             SqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')", SqlParams);
 
 

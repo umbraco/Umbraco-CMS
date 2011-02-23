@@ -425,6 +425,17 @@ namespace umbraco
         {
             string parentUrl = String.Empty;
             XmlElement node = UmbracoContext.Current.GetXml().GetElementById(nodeId.ToString());
+            
+            if (node == null)
+            {
+                ArgumentException arEx =
+                    new ArgumentException(
+                        string.Format(
+                            "Couldn't find any page with the nodeId = {0}. This is most likely caused by the page isn't published!",
+                            nodeId), "nodeId");
+                Log.Add(LogTypes.Error, nodeId, arEx.Message);
+                throw arEx;
+            }
             if (node.ParentNode.Name.ToLower() != "root" || UmbracoSettings.UseDomainPrefixes)
             {
                 if (UmbracoSettings.UseDomainPrefixes)
@@ -466,6 +477,8 @@ namespace umbraco
             // only return the current node url if we're at the startnodedepth or higher
             if (int.Parse(node.Attributes.GetNamedItem("level").Value) >= startNodeDepth)
                 return parentUrl + "/" + node.Attributes.GetNamedItem("urlName").Value;
+            else if (node.PreviousSibling != null)
+                return "/" + node.Attributes.GetNamedItem("urlName").Value;
             else
                 return "/";
         }
@@ -484,14 +497,14 @@ namespace umbraco
             if (!directoryUrls)
             {
                 // append .aspx extension if the url includes other than just the domain name
-                if (!String.IsNullOrEmpty(tempUrl) && tempUrl != "/" && 
+                if (!String.IsNullOrEmpty(tempUrl) && tempUrl != "/" &&
                     (!tempUrl.StartsWith("http://") || tempUrl.LastIndexOf("/") > 7))
                     tempUrl = baseUrl + tempUrl + ".aspx";
             }
             else
             {
                 tempUrl = baseUrl + tempUrl;
-                if (UmbracoSettings.AddTrailingSlash)
+                if (tempUrl != "/" && UmbracoSettings.AddTrailingSlash)
                     tempUrl += "/";
             }
             return tempUrl;
@@ -1966,10 +1979,9 @@ namespace umbraco
         /// <returns>A string with the value of the cookie</returns>
         public static string RequestCookies(string key)
         {
-            if (HttpContext.Current.Request.Cookies[key] != null)
-                return HttpContext.Current.Request.Cookies[key].Value;
-            else
-                return string.Empty;
+            // zb-00004 #29956 : refactor cookies handling
+            var value = StateHelper.GetCookieValue(key);
+            return value ?? "";
         }
 
         /// <summary>

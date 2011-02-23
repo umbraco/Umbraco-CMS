@@ -35,7 +35,7 @@ namespace umbraco.presentation.org.umbraco.update {
         
         /// <remarks/>
         public CheckForUpgrade() {
-            this.Url = "http://update.umbraco.org/checkforupgrade.asmx";
+            this.Url = global::umbraco.presentation.Properties.Settings.Default.umbraco_org_umbraco_update_CheckForUpgrade;
             if ((this.IsLocalFileSystemWebService(this.Url) == true)) {
                 this.UseDefaultCredentials = true;
                 this.useDefaultCredentialsSetExplicitly = false;

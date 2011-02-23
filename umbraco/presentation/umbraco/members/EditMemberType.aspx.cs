@@ -52,7 +52,7 @@ namespace umbraco.cms.presentation.members
 				else 
 				{
                     ClientTools
-                        .ShowSpeechBubble(speechBubbleIcon.save, e.Message, "")
+                        .ShowSpeechBubble(e.IconType, e.Message, "")
                         .SyncTree(dt.Id.ToString(), true);
                     
 				}

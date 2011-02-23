@@ -37,7 +37,7 @@ namespace umbraco.cms.presentation
         controls.ContentControl cControl;
 
         DropDownList ddlDefaultTemplate = new DropDownList();
-        
+
         uicontrols.Pane publishProps = new uicontrols.Pane();
         uicontrols.Pane linkProps = new uicontrols.Pane();
 
@@ -133,8 +133,8 @@ namespace umbraco.cms.presentation
             cms.businesslogic.web.DocumentType DocumentType = new cms.businesslogic.web.DocumentType(_document.ContentType.Id);
             cControl.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(DocumentType.Text));
 
-           
-           
+
+
 
             //template picker
             cControl.PropertiesPane.addProperty(ui.Text("template"), template);
@@ -210,10 +210,8 @@ namespace umbraco.cms.presentation
                 return;
 
             // clear preview cookie
-            if (!String.IsNullOrEmpty(StateHelper.GetCookieValue(PreviewContent.PREVIEW_COOKIE_KEY)))
-            {
-                PreviewContent.ClearPreviewCookie();
-            }
+			// zb-00004 #29956 : refactor cookies names & handling
+			StateHelper.Cookies.Preview.Clear();
 
             if (!IsPostBack)
             {
@@ -281,7 +279,7 @@ namespace umbraco.cms.presentation
                 }
             }
 
-          
+
 
 
             // Run Handler				
@@ -316,7 +314,7 @@ namespace umbraco.cms.presentation
 
                     if (_document.PublishWithResult(base.getUser()))
                     {
-                        
+
                         ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
                         library.UpdateDocumentCache(_document.Id);
 
@@ -383,7 +381,15 @@ namespace umbraco.cms.presentation
                                     if (library.NiceUrl(int.Parse(s)) == "")
                                         tempLink = "<em>N/A</em>";
                                     else if (int.Parse(s) != _document.Id)
-                                        tempLink = "http://" + domains[i].Name + currentLink.Replace(library.NiceUrl(int.Parse(s)).Replace(".aspx", ""), "");
+                                    {
+                                        string tempNiceUrl = library.NiceUrl(int.Parse(s));
+
+                                        string niceUrl = tempNiceUrl != "/" ? currentLink.Replace(tempNiceUrl.Replace(".aspx", ""), "") : currentLink;
+                                        if (!niceUrl.StartsWith("/"))
+                                            niceUrl = "/" + niceUrl;
+
+                                        tempLink = "http://" + domains[i].Name + niceUrl;
+                                    }
                                     else
                                         tempLink = "http://" + domains[i].Name;
 

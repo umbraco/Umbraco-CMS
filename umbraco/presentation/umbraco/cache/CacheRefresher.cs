@@ -30,7 +30,9 @@ namespace umbraco.presentation.cache {
 
         /// <remarks/>
         public CacheRefresher() {
-            this.Url = "http://" + System.Web.HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/cacheRefresher.asmx";
+            // only set the url if the httpcontext is present, else it's set by the cache dispatcher methods (when using distributed calls)
+            if (System.Web.HttpContext.Current != null)
+                this.Url = "http://" + System.Web.HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/cacheRefresher.asmx";
             
         }
 

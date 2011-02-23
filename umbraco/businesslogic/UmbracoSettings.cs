@@ -4,6 +4,7 @@ using System.Web;
 using System.Web.Caching;
 using System.Xml;
 using umbraco.BusinessLogic;
+using System.Collections.Generic;
 
 namespace umbraco
 {
@@ -349,6 +350,30 @@ namespace umbraco
                 catch
                 {
                     return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// razor DynamicNode typecasting detects XML and returns DynamicXml - Root elements that won't convert to DynamicXml
+        /// </summary>
+        public static List<string> NotDynamicXmlDocumentElements
+        {
+            get
+            {
+                try
+                {
+                    List<string> items = new List<string>();
+                    XmlNode root = GetKeyAsNode("/settings/scripting/razor/notDynamicXmlDocumentElements");
+                    foreach (XmlNode element in root.SelectNodes(".//element"))
+                    {
+                        items.Add(element.InnerText);
+                    }
+                    return items;
+                }
+                catch
+                {
+                    return new List<string>() { "p", "div" };
                 }
             }
         }

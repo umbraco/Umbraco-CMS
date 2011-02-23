@@ -15,11 +15,11 @@ UmbracoSpeechBubble.prototype.GenerateSpeechBubble = function() {
     sbHtml.innerHTML = '' +
             '<div class="speechBubbleTop"></div>' +
             '<div class="speechBubbleContent">' +
-	        '<img id="' + this.id + 'Icon" style="float: left; margin: 0px 10px 10px 0;" />' +
+	        '<img id="' + this.id + 'Icon" style="float: left; margin: 0px 5px 10px 3px;" />' +
             '                      <img class="speechClose" onClick="UmbSpeechBubble.Hide();" id="' + this.id + 'close" src="/umbraco/images/speechBubble/speechBubble_close.gif" width="18" height="18" border="0" alt="Close"' +
             '                        onmouseover="this.src = \'/umbraco/images/speechBubble/speechBubble_close_over.gif\';" onmouseout="this.src=\'images/speechBubble/speechBubble_close.gif\';">' +
-            '                  <h3 id="' + this.id + 'Header">The header!</h3>' +
-            '                  <p id="' + this.id + 'Message">Default Text Container!<br /></p>' +
+            '                  <div style="float: right; width: 186px; margin-right: 10px;"><h3 id="' + this.id + 'Header">The header!</h3>' +
+            '                  <p style="width: 185px" id="' + this.id + 'Message">Default Text Container!<br /></p></div><br style="clear: both" />' +
             '</div>' +
             '<div class="speechBubbleBottom"></div>'
 }

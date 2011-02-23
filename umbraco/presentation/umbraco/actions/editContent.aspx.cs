@@ -19,7 +19,7 @@ namespace umbraco.presentation.actions
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            Response.Redirect("../umbraco.aspx?app=content&rightAction=editContent&id=" + helper.Request("id"), true);
+            Response.Redirect("../umbraco.aspx?app=content&rightAction=editContent&id=" + helper.Request("id") + "#content", true);
         }
     }
 }

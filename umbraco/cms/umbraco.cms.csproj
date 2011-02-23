@@ -122,6 +122,7 @@
     <Reference Include="System.Data">
       <Name>System.Data</Name>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Security">
       <Name>System.Security</Name>
     </Reference>
@@ -215,6 +216,11 @@
     <Compile Include="businesslogic\macro\IMacroEngine.cs" />
     <Compile Include="businesslogic\macro\MacroEngineFactory.cs" />
     <Compile Include="businesslogic\macro\MacroModel.cs" />
+    <Compile Include="businesslogic\media\IMediaFactory.cs" />
+    <Compile Include="businesslogic\media\MediaFactory.cs" />
+    <Compile Include="businesslogic\media\UmbracoFileMediaFactory.cs" />
+    <Compile Include="businesslogic\media\UmbracoImageMediaFactory.cs" />
+    <Compile Include="businesslogic\media\UmbracoMediaFactory.cs" />
     <Compile Include="businesslogic\Packager\FileResources\PackageFiles.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -244,6 +250,7 @@
     <Compile Include="businesslogic\skinning\TaskType.cs" />
     <Compile Include="businesslogic\Tags\Tag.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
+    <Compile Include="businesslogic\Tuple.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
     <Compile Include="businesslogic\skinning\Skinning.cs" />
     <Compile Include="helpers\Casing.cs" />

@@ -188,7 +188,7 @@ namespace umbraco.cms.presentation.developer
 
         private void getPythonFilesFromDir(string orgPath, string path, ArrayList files)
         {
-            DirectoryInfo dirInfo = new DirectoryInfo(path);
+            var dirInfo = new DirectoryInfo(path);
             if (!dirInfo.Exists)
                 return;
 
@@ -197,9 +197,9 @@ namespace umbraco.cms.presentation.developer
                 files.Add(path.Replace(orgPath, string.Empty) + file.Name);
 
             // Populate subdirectories
-            DirectoryInfo[] dirInfos = dirInfo.GetDirectories();
-            foreach (DirectoryInfo dir in dirInfos)
-                getPythonFilesFromDir(orgPath, path + "/" + dir.Name, files);
+            var dirInfos = dirInfo.GetDirectories();
+            foreach (var dir in dirInfos)
+                getPythonFilesFromDir(orgPath, path + "/" + dir.Name + "/", files);
         }
 
         private void populatePythonFiles()
@@ -209,7 +209,7 @@ namespace umbraco.cms.presentation.developer
             getPythonFilesFromDir(pythonDir, pythonDir, pythons);
             pythonFiles.DataSource = pythons;
             pythonFiles.DataBind();
-            pythonFiles.Items.Insert(0, new ListItem("Browse python files on server...", string.Empty));
+            pythonFiles.Items.Insert(0, new ListItem("Browse scripting files on server...", string.Empty));
             pythonFiles.Attributes.Add("onChange",
                 "document.getElementById('" + macroPython.ClientID + "').value = this[this.selectedIndex].value; document.getElementById('" + macroXslt.ClientID + "').value = ''");
         }

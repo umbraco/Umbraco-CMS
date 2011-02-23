@@ -23,10 +23,8 @@ namespace umbraco.presentation.create
         protected void Page_Load(object sender, System.EventArgs e)
         {
             sbmt.Text = ui.Text("create");
-            if (!Page.IsPostBack)
-            {
-                foreach (MacroEngineLanguage lang in MacroEngineFactory.GetSupportedLanguages())
-                {
+            if (!Page.IsPostBack) {
+                foreach (MacroEngineLanguage lang in MacroEngineFactory.GetSupportedUILanguages()) {
                     filetype.Items.Add(new ListItem(string.Format("{0} by {1}", helper.SpaceCamelCasing(lang.Extension), lang.EngineName), lang.Extension));
                 }
                 filetype.SelectedIndex = 0;
