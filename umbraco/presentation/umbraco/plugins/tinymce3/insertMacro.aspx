@@ -58,6 +58,8 @@
             }
             else {
 
+                tinyMCEPopup.restoreSelection();
+
                 tinyMCEPopup.editor.execCommand("mceInsertContent", false, renderedContent);
             }
 
