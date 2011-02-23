@@ -417,6 +417,37 @@ namespace umbraco.MacroEngines
             return node;
         }
 
+        public DynamicNodeList Ancestors
+        {
+            get
+            {
+                List<DynamicNode> ancestorList = new List<DynamicNode>();
+                var node = this;
+                while (node != null)
+                {
+                    if (node.Level == 1) break;
+                    DynamicNode parent = node.Parent;
+                    if (parent != null)
+                    {
+                        if (this != parent)
+                        {
+                            node = parent;
+                            ancestorList.Add(node);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                ancestorList.Reverse();
+                return new DynamicNodeList(ancestorList);
+            }
+        }
         public DynamicNode Parent
         {
             get
@@ -429,9 +460,14 @@ namespace umbraco.MacroEngines
                 {
                     return new DynamicNode(n.Parent);
                 }
-                return this;
+                if (n != null && n.Id == 0)
+                {
+                    return this;
+                }
+                return null;
             }
         }
+        
         public DynamicNode NodeById(int Id)
         {
             return new DynamicNode(Id);
