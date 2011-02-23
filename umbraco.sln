@@ -66,6 +66,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{F06D18F6-C
 		IronPython License.Rtf = IronPython License.Rtf
 		License.txt = License.txt
 		foreign dlls\Microsoft.ApplicationBlocks.Data.dll = foreign dlls\Microsoft.ApplicationBlocks.Data.dll
+		foreign dlls\WebPages\Microsoft.Web.Infrastructure.dll = foreign dlls\WebPages\Microsoft.Web.Infrastructure.dll
 		foreign dlls\MySql.Data.dll = foreign dlls\MySql.Data.dll
 		foreign dlls\TidyNet.dll = foreign dlls\TidyNet.dll
 		foreign dlls\UmbracoExamine.dll = foreign dlls\UmbracoExamine.dll
