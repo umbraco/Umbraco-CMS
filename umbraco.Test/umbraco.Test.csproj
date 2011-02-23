@@ -61,6 +61,9 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="businesslogic_Accessor">
+      <HintPath>obj\Debug\businesslogic_Accessor.dll</HintPath>
+    </Reference>
     <Reference Include="ClientDependency.Core, Version=1.0.0.39694, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\foreign dlls\ClientDependency.Core.dll</HintPath>
@@ -114,6 +117,9 @@
     <Reference Include="UmbracoExamine, Version=0.9.1.0, Culture=en-AU, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\foreign dlls\UmbracoExamine.dll</HintPath>
+    </Reference>
+    <Reference Include="umbraco_Accessor">
+      <HintPath>obj\Debug\umbraco_Accessor.dll</HintPath>
     </Reference>
     <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.60829.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
