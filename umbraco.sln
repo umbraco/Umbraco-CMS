@@ -45,7 +45,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{05329D
 		config templates\config\umbracoSettings.config = config templates\config\umbracoSettings.config
 		config templates\config\UrlRewriting.config = config templates\config\UrlRewriting.config
 		config templates\config\xsltExtensions.config = config templates\config\xsltExtensions.config
-		config templates\config\zipUpload.config = config templates\config\zipUpload.config
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{58072405-85D0-45CA-8F5C-EA8928C32A6A}"
