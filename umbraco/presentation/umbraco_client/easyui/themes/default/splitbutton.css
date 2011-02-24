@@ -1,0 +1,29 @@
+.s-btn-downarrow{
+	display:inline-block;
+	width:16px;
+	background:url('images/menu_downarrow.png') no-repeat 9px center;
+}
+
+a.s-btn-active{
+	background-position: bottom right;
+}
+a.s-btn-active span.l-btn-left{
+	background-position: bottom left;
+}
+a.s-btn-active .s-btn-downarrow{
+	background:url('images/menu_split_downarrow.png') no-repeat 4px -18px;
+}
+a:hover.l-btn .s-btn-downarrow{
+	background:url('images/menu_split_downarrow.png') no-repeat 4px -18px;
+}
+
+a.s-btn-plain-active{
+	background:transparent;
+	border:1px solid #7eabcd;
+	_padding:0px 5px 0px 0px;
+	-moz-border-radius:3px;
+	-webkit-border-radius: 3px;
+}
+a.s-btn-plain-active .s-btn-downarrow{
+	background:url('images/menu_split_downarrow.png') no-repeat 4px -18px;
+}

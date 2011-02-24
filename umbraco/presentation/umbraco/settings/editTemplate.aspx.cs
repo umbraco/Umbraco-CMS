@@ -12,6 +12,7 @@ using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
 using umbraco.IO;
 using umbraco.cms.businesslogic.skinning;
+using System.Collections.Generic;
 
 
 namespace umbraco.cms.presentation.settings
@@ -67,6 +68,9 @@ namespace umbraco.cms.presentation.settings
 				ClientTools
 					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadTemplates>().Tree.Alias)
 					.SyncTree(_template.Id.ToString(), false);
+
+                LoadScriptingTemplates();
+
 							}			
 		}
 
@@ -135,6 +139,10 @@ namespace umbraco.cms.presentation.settings
 								umbContainer.OnClickCommand = "window.open('" + GlobalSettings.Path + "/canvas.aspx?redir=" + this.ResolveUrl("~/") + "&umbSkinning=true&umbSkinningConfigurator=true" + "','canvas')";
 						}
 
+            //Spit button
+            Panel1.Menu.InsertSplitter();
+            Panel1.Menu.NewElement("div", "splitButtonPlaceHolder", "", 60);
+           
 
 			// Help
 			Panel1.Menu.InsertSplitter();
@@ -144,7 +152,37 @@ namespace umbraco.cms.presentation.settings
 			helpIcon.ImageURL = UmbracoPath + "/images/editor/help.png";
 						helpIcon.AltText = ui.Text("template", "quickGuide");
 		}
-		
+
+
+        private void LoadScriptingTemplates()
+        {
+
+            string path = IO.SystemDirectories.Umbraco + "/scripting/templates/py/";
+            string abPath = IO.IOHelper.MapPath(path);
+
+            List<KeyValuePair<string, string>> files= new List<KeyValuePair<string, string>>();
+
+            if (System.IO.Directory.Exists(abPath))
+            {
+                string extension = ".cshtml";
+
+                foreach (System.IO.FileInfo fi in new System.IO.DirectoryInfo(abPath).GetFiles("*" + extension))
+                {
+                    string filename = System.IO.Path.GetFileName(fi.FullName);
+
+                    files.Add(new KeyValuePair<string, string>(
+                        filename,
+                        helper.SpaceCamelCasing(filename.Replace(extension, ""))
+                       ));
+
+                   
+                }
+            }
+
+            rpt_codeTemplates.DataSource = files;
+            rpt_codeTemplates.DataBind();
+            
+        }
 		/// <summary>
 		/// Required method for Designer support - do not modify
 		/// the contents of this method with the code editor.

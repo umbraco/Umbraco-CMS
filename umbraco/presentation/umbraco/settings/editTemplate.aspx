@@ -1,9 +1,49 @@
 <%@ Page MasterPageFile="../masterpages/umbracoPage.Master" Language="c#" Codebehind="editTemplate.aspx.cs" ValidateRequest="false"
   AutoEventWireup="True" Inherits="umbraco.cms.presentation.settings.editTemplate" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
+
+   <umb:CssInclude ID="CssInclude1" runat="server" FilePath="easyui/themes/default/easyui.css" PathNameAlias="UmbracoClient" />
+
+  <umb:JsInclude ID="JsInclude" runat="server" FilePath="easyui/jquery.easyui.min.js" PathNameAlias="UmbracoClient"
+        Priority="1" />
+
+
+    <style type="text/css">
+    
+    #splitButtonPlaceHolder
+    {
+        display:inline;
+        width:90px;
+        height:23px;
+        vertical-align:top;
+    }
+    </style>
   <script language="javascript" type="text/javascript">
+
+
+        jQuery(document).ready(function() {
+
+           
+
+            jQuery('#sb').splitbutton({menu:'#codeTemplateMenu'});
+
+             jQuery("#splitButton").appendTo("#splitButtonPlaceHolder");
+
+
+            jQuery(".codeTemplate").click(function(){
+                
+                insertCodeBlockFromTemplate(jQuery(this).attr("rel"));
+            });
+
+         
+
+
+
+        });
+
         function doSubmit() {
             var codeVal = UmbEditor.GetCode();
             umbraco.presentation.webservices.codeEditorSave.SaveTemplate(jQuery('#<%= NameTxt.ClientID %>').val(), jQuery('#<%= AliasTxt.ClientID %>').val(), codeVal, '<%= Request.QueryString["templateID"] %>', jQuery('#<%= MasterTemplate.ClientID %>').val(), submitSucces, submitFailure);
@@ -79,6 +119,34 @@
         UmbEditor.Insert('\n<' + cp, '\n</asp:ContentPlaceHolder' + '>\n', '<%= editorSource.ClientID %>');
        }
         
+       function insertCodeBlock()
+       {
+             var cp = 'umbraco:Macro  runat="server" language="cshtml"';
+
+             UmbEditor.Insert('\n<' + cp +'>\n','\n</umbraco:Macro' + '>\n', '<%= editorSource.ClientID %>');
+       }
+
+       function insertCodeBlockFromTemplate(templateId)
+       {
+            
+            
+        jQuery.ajax({
+            type: "POST",
+            url: "../webservices/templates.asmx/GetCodeSnippet",
+            data: "{templateId: '" + templateId + "'}",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function(msg) {
+
+            var cp = 'umbraco:Macro  runat="server" language="cshtml"';
+            UmbEditor.Insert('\n<' + cp +'>\n'  + msg.d,'\n</umbraco:Macro' + '>\n', '<%= editorSource.ClientID %>');
+
+                    }
+           });
+
+            
+       }
+
   </script>
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">
@@ -99,6 +167,32 @@
         </cc1:PropertyPanel>
       </cc1:Pane>
     </cc1:UmbracoPanel>
+
+
+    <div id="splitButton" style="display:inline;height:23px;">
+        <a href="javascript:insertCodeBlock();" id="sb" icon="icon-edit">Insert code</a>
+      
+    </div>
+
+
+    <div id="codeTemplateMenu" style="width:150px;">
+
+        <asp:Repeater ID="rpt_codeTemplates" runat="server">
+            <ItemTemplate>
+                    <div class="codeTemplate" rel="<%# DataBinder.Eval(Container, "DataItem.Key") %>">
+                          <%# DataBinder.Eval(Container, "DataItem.Value") %>
+                    </div>                         
+            </ItemTemplate>
+        </asp:Repeater>
+       
+    </div>
+
+
+    <div style="height:50px">
+    
+    
+    </div>
+
 </asp:Content>
 
     

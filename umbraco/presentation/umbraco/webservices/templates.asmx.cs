@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Web;
 using System.Web.Services;
 using System.Xml;
+using System.Web.Script.Services;
 
 namespace umbraco.webservices
 {
@@ -13,6 +14,7 @@ namespace umbraco.webservices
 	/// Summary description for templates.
 	/// </summary>
 	[WebService(Namespace="http://umbraco.org/webservices/")]
+    [ScriptService]
 	public class templates : System.Web.Services.WebService
 	{
 		public templates()
@@ -75,6 +77,20 @@ namespace umbraco.webservices
 			} else
 				return false;
 		}
+
+        [WebMethod]
+        [ScriptMethod]
+        public string GetCodeSnippet(object templateId)
+        {
+            string content = string.Empty;
+
+            System.IO.StreamReader templateFile = 
+                System.IO.File.OpenText(umbraco.IO.IOHelper.MapPath(IO.SystemDirectories.Umbraco + "/scripting/templates/py/" + templateId.ToString()));
+            content = templateFile.ReadToEnd();
+            templateFile.Close();
+
+            return content;
+        }
 		#region Component Designer generated code
 		
 		//Required by the Web Services Designer 

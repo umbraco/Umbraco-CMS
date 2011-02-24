@@ -1,0 +1,30 @@
+.datebox .combo-arrow{
+	background:url('images/datebox_arrow.png') no-repeat center center;
+}
+.datebox-calendar-inner{
+	height:180px;
+}
+.datebox-button{
+	height:18px;
+	padding:2px 5px;
+	font-size:12px;
+	background-color:#fafafa;
+	text-align:center;
+}
+.datebox-current,.datebox-close{
+	float:left;
+	color:#888;
+	text-decoration:none;
+	font-weight:bold;
+}
+.datebox-close{
+	float:right;
+}
+.datebox-ok{
+	color:#888;
+	text-decoration:none;
+	font-weight:bold;
+}
+.datebox-button-hover{
+	color:#A4BED4;
+}
