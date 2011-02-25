@@ -1,0 +1,7 @@
+<em>DynamicNode:</em>
+<ul>
+@foreach (var item in @Model.ChildItem.Where("ShouldBeVisible"))
+{
+        <li><a href="@item.Url">@item.Name</a></li>
+}
+</ul>

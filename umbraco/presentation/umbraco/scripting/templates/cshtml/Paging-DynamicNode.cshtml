@@ -1,0 +1,27 @@
+<em>DynamicNode:</em><br/>
+<a name="paging"></a>
+@{
+var itemsPerPage = 4;
+var numberOfItems = @Model.Children.Count();
+int currentPage = 1;
+int.TryParse(HttpContext.Current.Request.QueryString["Page"], out currentPage);
+currentPage--;
+var numberOfPages = Math.Ceiling((decimal)(@numberOfItems / @itemsPerPage));
+<text>Total Items: </text>@numberOfItems<br/>
+<text>Items per Page:</text>@itemsPerPage<br/>
+<text>Pages:</text>@numberOfPages;<br/>
+<text>Current Page:</text>@(currentPage + 1);<br/>
+<text>Items:</text>
+<ul>
+@foreach(var item in @Model.Children.Skip(currentPage*itemsPerPage).Take(itemsPerPage))
+{
+	<li>@item.Name</li>
+}
+</ul>
+<text>Jump to Page:</text>
+var Pages = Enumerable.Range(1, (int)numberOfPages);
+foreach(var number in Pages) {
+      <a href="?page=@number#paging">@number</a><text>&nbsp;&nbsp;</text>
+}
+
+}
