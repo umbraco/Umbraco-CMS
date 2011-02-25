@@ -170,12 +170,13 @@
 
 
     <div id="splitButton" style="display:inline;height:23px;">
-        <a href="javascript:insertCodeBlock();" id="sb" icon="icon-edit">Insert code</a>
-      
+        <a href="javascript:insertCodeBlock();" id="sb">
+            <img alt="Insert Inline Razor Macro" src="../images/editor/insRazorMacro.png" title="Insert Inline Razor Macro" style="vertical-align:top;">
+        </a>
     </div>
 
 
-    <div id="codeTemplateMenu" style="width:150px;">
+    <div id="codeTemplateMenu" style="width:200px;">
 
         <asp:Repeater ID="rpt_codeTemplates" runat="server">
             <ItemTemplate>

@@ -98,7 +98,7 @@
 .calendar-body th{
 	background:#fafafa;
 	color:#888;
-	border-bottom1:1px solid #ccc;
+	
 }
 .calendar-day{
 	color:#222;
@@ -283,7 +283,7 @@
 }
 .datagrid-title{
 	background:url('images/datagrid_title_bg.png') repeat-x;
-	border-bottom:1px solid #8DB2E3;
+	
 	border-top:1px solid #fff;
 	position:relative;
 	padding:5px 0px;
@@ -316,7 +316,7 @@
 	height:28px;
 	background:#efefef;
 	padding:1px 2px;
-	border-bottom:1px solid #ccc;
+	
 }
 .datagrid-btn-separator{
 	float:left;
@@ -334,7 +334,7 @@
 .datagrid-header{
 	overflow:hidden;
 	background:#fafafa url('images/datagrid_header_bg.gif') repeat-x left bottom;
-	border-bottom:1px solid #ccc;
+	
 	margin-bottom:1px;
 }
 .datagrid-header-inner{
@@ -347,7 +347,7 @@
 	font-size:12px;
 	font-weight:normal;
 	background:#fafafa url('images/datagrid_header_bg.gif') repeat-x left bottom;
-	border-bottom:1px dotted #ccc;
+	
 	border-top:1px dotted #fff;
 }
 .datagrid-header td.datagrid-header-over{
@@ -407,7 +407,7 @@
 .datagrid-body td,.datagrid-footer td{
 	font-size:12px;
 	border-right:1px dotted #ccc;
-	border-bottom:1px dotted #ccc;
+
 	overflow:hidden;
 	padding:0;
 	margin:0;
@@ -518,7 +518,7 @@
 .dialog-toolbar{
 	background:#fafafa;
 	padding:2px 5px;
-	border-bottom:1px solid #eee;
+	
 }
 .dialog-tool-separator{
 	float:left;
@@ -576,7 +576,7 @@
 }
 .layout-expand .panel-header{
 	background:transparent;
-	border-bottom-width:0px;
+
 }
 .layout-expand .panel-header .panel-tool{
 	top: 5px;
@@ -610,7 +610,7 @@
 	z-index:5;
 }
 .layout-split-north{
-	border-bottom:5px solid #D2E0F2;
+	
 }
 .layout-split-south{
 	border-top:5px solid #D2E0F2;
@@ -681,13 +681,11 @@ a:hover.l-btn{
 	background-position: bottom right;
 	outline:none;
 }
-a:hover.l-btn span.l-btn-left{
-	background-position: bottom left;
-}
+
 
 a:hover.l-btn-plain{
-	border:1px solid #7eabcd;
-	background:url('images/button_plain_hover.png') repeat-x left bottom;
+	border:1px solid #4b4b6f;
+	background:url('images/button_plain_hover_custom.png') repeat-x left bottom;
 	_padding:0px 5px 0px 0px;
 }
 a:hover.l-btn-disabled{
@@ -868,7 +866,7 @@ a.m-btn-plain-active{
 }
 .panel-header-noborder{
 	border-width:0px;
-	border-bottom:1px solid #99BBE8;
+	
 }
 .panel-body{
 	overflow:auto;
@@ -1006,7 +1004,7 @@ a.s-btn-plain-active .s-btn-downarrow{
 .tabs-header{
 	border:1px solid #8DB2E3;
 	background:#E0ECFF;
-	border-bottom:0px;
+
 	position:relative;
 	overflow:hidden;
 	padding:0px;
@@ -1091,7 +1089,7 @@ a.s-btn-plain-active .s-btn-downarrow{
 	padding-left:4px;
 	font-size:12px;
 	width:5000px;
-	border-bottom:1px solid #8DB2E3;
+	
 }
 .tabs li{
 	float:left;
@@ -1128,7 +1126,7 @@ a.s-btn-plain-active .s-btn-downarrow{
 }
 .tabs li.tabs-selected{
 	border:1px solid #8DB2E3;
-	border-bottom:1px solid #fff;
+	
 	border-top1:2px solid #8DB2E3;
 }
 .tabs li.tabs-selected a{
@@ -1300,7 +1298,7 @@ a.s-btn-plain-active .s-btn-downarrow{
 	border-top:1px dotted red;
 }
 .tree-node-bottom{
-	border-bottom:1px dotted red;
+	
 }
 .tree-node-append .tree-title{
 	border:1px dotted red;

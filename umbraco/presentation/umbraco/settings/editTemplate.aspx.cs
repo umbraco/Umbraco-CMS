@@ -141,7 +141,7 @@ namespace umbraco.cms.presentation.settings
 
             //Spit button
             Panel1.Menu.InsertSplitter();
-            Panel1.Menu.NewElement("div", "splitButtonPlaceHolder", "", 60);
+            Panel1.Menu.NewElement("div", "splitButtonPlaceHolder", "", 40);
            
 
 			// Help
