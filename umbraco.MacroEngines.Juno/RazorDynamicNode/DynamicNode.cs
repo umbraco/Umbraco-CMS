@@ -19,8 +19,9 @@ namespace umbraco.MacroEngines
 {
     public class DynamicNode : DynamicObject
     {
+        internal DynamicNodeList ownerList;
 
-        private readonly INode n;
+        internal readonly INode n;
         public DynamicNode(INode n)
         {
             if (n != null)
@@ -51,6 +52,39 @@ namespace umbraco.MacroEngines
         public DynamicNode()
         {
             //Empty constructor for a special case with Generic Methods
+        }
+
+        public DynamicNode Up()
+        {
+            return DynamicNodeWalker.Up(this);
+        }
+        public DynamicNode Up(int number)
+        {
+            return DynamicNodeWalker.Up(this, number);
+        }
+        public DynamicNode Down()
+        {
+            return DynamicNodeWalker.Down(this);
+        }
+        public DynamicNode Down(int number)
+        {
+            return DynamicNodeWalker.Down(this, number);
+        }
+        public DynamicNode Next()
+        {
+            return DynamicNodeWalker.Next(this);
+        }
+        public DynamicNode Next(int number)
+        {
+            return DynamicNodeWalker.Next(this, number);
+        }
+        public DynamicNode Previous()
+        {
+            return DynamicNodeWalker.Previous(this);
+        }
+        public DynamicNode Previous(int number)
+        {
+            return DynamicNodeWalker.Previous(this, number);
         }
 
         public DynamicNodeList GetChildrenAsList
