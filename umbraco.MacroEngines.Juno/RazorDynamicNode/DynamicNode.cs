@@ -170,7 +170,30 @@ namespace umbraco.MacroEngines
                 throw new NullReferenceException("DynamicNode wasn't initialized with an underlying NodeFactory.Node");
             }
         }
-
+        public bool HasProperty(string name)
+        {
+            if (n != null)
+            {
+                try
+                {
+                    IProperty prop = n.GetProperty(name);
+                    if (prop == null)
+                    {
+                        // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
+                        if (prop == null && name.Substring(0, 1).ToUpper() == name.Substring(0, 1))
+                        {
+                            prop = n.GetProperty(name.Substring(0, 1).ToLower() + name.Substring((1)));
+                        }
+                    }
+                    return (prop != null);
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
 
