@@ -19,9 +19,9 @@ namespace umbraco.MacroEngines
 {
     public class DynamicNode : DynamicObject
     {
-        private DynamicDictionary _properties;
+        internal DynamicNodeList ownerList;
 
-        private readonly INode n;
+        internal readonly INode n;
         public DynamicNode(INode n)
         {
             if (n != null)
@@ -53,9 +53,38 @@ namespace umbraco.MacroEngines
         {
             //Empty constructor for a special case with Generic Methods
         }
-        public void InitializeProperties(Dictionary<string, object> dict)
+
+        public DynamicNode Up()
         {
-            _properties = new DynamicDictionary(dict);
+            return DynamicNodeWalker.Up(this);
+        }
+        public DynamicNode Up(int number)
+        {
+            return DynamicNodeWalker.Up(this, number);
+        }
+        public DynamicNode Down()
+        {
+            return DynamicNodeWalker.Down(this);
+        }
+        public DynamicNode Down(int number)
+        {
+            return DynamicNodeWalker.Down(this, number);
+        }
+        public DynamicNode Next()
+        {
+            return DynamicNodeWalker.Next(this);
+        }
+        public DynamicNode Next(int number)
+        {
+            return DynamicNodeWalker.Next(this, number);
+        }
+        public DynamicNode Previous()
+        {
+            return DynamicNodeWalker.Previous(this);
+        }
+        public DynamicNode Previous(int number)
+        {
+            return DynamicNodeWalker.Previous(this, number);
         }
 
         public DynamicNodeList GetChildrenAsList
@@ -199,13 +228,16 @@ namespace umbraco.MacroEngines
                 }
                 catch
                 {
-                    result = null;
-                    return false;
+                    //result = null;
+                    //return false;
                 }
             }
 
-
-            result = null;
+            //if property access, type lookup and member invoke all failed
+            //at this point, we're going to return null
+            //instead, we return an empty list
+            //this will let things like Model.ChildItem work and return nothing instead of crashing
+            result = new DynamicNodeList(new List<INode>());
             //changed this to a return true because it breaks testing when using .Children().Random().propertyName
             return true;
         }
@@ -241,6 +273,14 @@ namespace umbraco.MacroEngines
             if (decimal.TryParse(string.Format("{0}", result), out dResult))
             {
                 result = dResult;
+                return true;
+            }
+
+            //date
+            DateTime dtResult = DateTime.MinValue;
+            if (DateTime.TryParse(string.Format("{0}", result), out dtResult))
+            {
+                result = dtResult;
                 return true;
             }
 
@@ -311,6 +351,23 @@ namespace umbraco.MacroEngines
             }
             return null;
         }
+        public bool IsProtected()
+        {
+            if (n != null)
+            {
+                return umbraco.library.IsProtected(n.Id, n.Path);
+            }
+            return false;
+        }
+        public bool HasAccess()
+        {
+            if (n != null)
+            {
+                return umbraco.library.HasAccess(n.Id, n.Path);
+            }
+            return true;
+        }
+
         public string Media(string propertyAlias, string mediaPropertyAlias)
         {
             if (n != null)
@@ -416,13 +473,13 @@ namespace umbraco.MacroEngines
 
             return node;
         }
-
-        public DynamicNodeList Ancestors
+        public DynamicNodeList AncestorsOrSelf
         {
             get
             {
                 List<DynamicNode> ancestorList = new List<DynamicNode>();
                 var node = this;
+                ancestorList.Add(node);
                 while (node != null)
                 {
                     if (node.Level == 1) break;
@@ -448,6 +505,39 @@ namespace umbraco.MacroEngines
                 return new DynamicNodeList(ancestorList);
             }
         }
+        public DynamicNodeList Descendants
+        {
+            get
+            {
+                var flattenedNodes = this.n.ChildrenAsList.Map(p => true, (INode n) => { return n.ChildrenAsList; });
+                return new DynamicNodeList(flattenedNodes.ToList().ConvertAll(iNode => new DynamicNode(iNode)));
+            }
+        }
+        public DynamicNodeList DescendantsOrSelf
+        {
+            get
+            {
+
+                if (this.n != null)
+                {
+                    var thisNode = new List<INode>();
+                    thisNode.Add(this.n);
+                    var flattenedNodes = this.n.ChildrenAsList.Map(p => true, (INode n) => { return n.ChildrenAsList; });
+                    return new DynamicNodeList(thisNode.Concat(flattenedNodes).ToList().ConvertAll(iNode => new DynamicNode(iNode)));
+                }
+                return new DynamicNodeList(new List<INode>());
+            }
+        }
+
+
+        public DynamicNodeList Ancestors
+        {
+            get
+            {
+                DynamicNodeList innerList = AncestorsOrSelf;
+                return new DynamicNodeList(innerList.Items.Skip(1));
+            }
+        }
         public DynamicNode Parent
         {
             get
@@ -467,7 +557,6 @@ namespace umbraco.MacroEngines
                 return null;
             }
         }
-        
         public DynamicNode NodeById(int Id)
         {
             return new DynamicNode(Id);
@@ -609,16 +698,5 @@ namespace umbraco.MacroEngines
             return n.ChildrenAsTable(nodeTypeAliasFilter);
         }
 
-        public DynamicDictionary Parameters
-        {
-            get
-            {
-                return _properties;
-            }
-            set
-            {
-                _properties = value;
-            }
-        }
     }
 }

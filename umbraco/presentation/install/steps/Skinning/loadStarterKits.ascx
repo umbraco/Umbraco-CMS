@@ -55,7 +55,17 @@
 </asp:PlaceHolder>
 
 <asp:PlaceHolder ID="pl_starterKitsConnectionError" runat="server" Visible="false">
-	<!-- btn box -->
+	
+        <div style="padding: 0 100px 13px 5px;">
+            <h2>Oops...the installer can't connect to the repository</h2> 
+            Starter Kits could not be fetched from the repository as there was no connection - which can occur if you are using a proxy server or firewall with certain configurations,
+            or if you are not currently connected to the internet.
+            <br />
+            Click <strong>Continue</strong> to complete the installation then navigate to the Developer section of your Umbraco installation
+            where you will find the Starter Kits listed in the Packages tree.
+        </div>
+    
+    <!-- btn box -->
 	<footer class="btn-box">
          <div class="t">&nbsp;</div>
          <asp:LinkButton ID="LinkButton1" class="btn-step btn btn-continue" runat="server" onclick="gotoLastStep"><span>Continue</span></asp:LinkButton>

@@ -22,11 +22,15 @@ namespace umbraco.MacroEngines
         }
         public DynamicNodeList(IEnumerable<DynamicNode> items)
         {
-            Items = items.ToList();
+            List<DynamicNode> list = items.ToList();
+            list.ForEach(node => node.ownerList = this);
+            Items = list;
         }
         public DynamicNodeList(IEnumerable<INode> items)
         {
-            Items = items.Select(x => new DynamicNode(x)).ToList();
+            List<DynamicNode> list = items.Select(x => new DynamicNode(x)).ToList();
+            list.ForEach(node => node.ownerList = this);
+            Items = list;
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)

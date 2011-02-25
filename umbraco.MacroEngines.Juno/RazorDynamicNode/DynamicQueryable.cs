@@ -90,21 +90,49 @@ namespace System.Linq.Dynamic
             IQueryable<DynamicNode> typedSource = source as IQueryable<DynamicNode>;
             if (!ordering.Contains(","))
             {
-                LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(bool), ordering, values);
+                bool descending = false;
+                if (ordering.IndexOf(" descending", StringComparison.CurrentCultureIgnoreCase) >= 0)
+                {
+                    ordering = ordering.Replace(" descending", "");
+                    descending = true;
+                }
+                if (ordering.IndexOf(" desc", StringComparison.CurrentCultureIgnoreCase) >= 0)
+                {
+                    ordering = ordering.Replace(" desc", "");
+                    descending = true;
+                }
+
+                LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(object), ordering, values);
                 if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
                 {
                     //source list is DynamicNode and the lambda returns a Func<object>
                     Func<DynamicNode, object> func = (Func<DynamicNode, object>)lambda.Compile();
-                    return typedSource.OrderBy(delegate(DynamicNode node)
+                    if (!descending)
                     {
-                        object value = -1;
-                        var firstFuncResult = func(node);
-                        if (firstFuncResult is Func<DynamicNode, object>)
+                        return typedSource.OrderBy(delegate(DynamicNode node)
                         {
-                            value = (firstFuncResult as Func<DynamicNode, object>)(node);
-                        }
-                        return value;
-                    }).AsQueryable();
+                            object value = -1;
+                            var firstFuncResult = func(node);
+                            if (firstFuncResult is Func<DynamicNode, object>)
+                            {
+                                value = (firstFuncResult as Func<DynamicNode, object>)(node);
+                            }
+                            return value;
+                        }).AsQueryable();
+                    }
+                    else
+                    {
+                        return typedSource.OrderByDescending(delegate(DynamicNode node)
+                        {
+                            object value = -1;
+                            var firstFuncResult = func(node);
+                            if (firstFuncResult is Func<DynamicNode, object>)
+                            {
+                                value = (firstFuncResult as Func<DynamicNode, object>)(node);
+                            }
+                            return value;
+                        }).AsQueryable();
+                    }
                 }
             }
 

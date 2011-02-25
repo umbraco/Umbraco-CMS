@@ -1,0 +1,12 @@
+@inherits umbraco.MacroEngines.DynamicNodeContext
+
+<em>DynamicNode:</em><br/>
+<ul>
+
+@foreach(var level in @Model.Ancestors.Where("ShouldBeVisible"))
+{
+	<li><a href="@level.Url">@level.Name</a></li>
+}
+<li>@Model.Name</li>
+</ul>
+

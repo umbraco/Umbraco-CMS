@@ -47,7 +47,7 @@ namespace umbraco.presentation.install.utills
                 }
                 else
                 {
-                    Response.Write("We can't connect to umbraco.org right now.  Click 'Set up your new website' above to continue.");
+                    Response.Write("We can't connect to umbraco.tv right now.  Click <strong>Set up your new website</strong> above to continue.");
                 }
             }
         }

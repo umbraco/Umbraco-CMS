@@ -1,0 +1,22 @@
+@inherits umbraco.MacroEngines.DynamicNodeContext
+
+<em>DynamicNode:</em><br/>
+@helper traverse(dynamic node){
+var maxLevelForSitemap = 4;
+
+var values = new Dictionary<string,object>();
+values.Add("maxLevelForSitemap", maxLevelForSitemap) ;
+
+   var items = node.Children.Where("ShouldBeVisible == true && Level <= maxLevelForSitemap", values);
+   <ul>
+            @foreach (var item in items) {
+                <li><a href="@item.Url">@item.Name</a>
+		@traverse(item)
+                </li>
+            }
+   </ul>
+}
+<div id="sitemap"> 
+    @traverse(@Model.AncestorOrSelf())
+</div>
+

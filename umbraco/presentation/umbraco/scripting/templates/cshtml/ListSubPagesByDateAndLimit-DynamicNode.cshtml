@@ -1,0 +1,8 @@
+@inherits umbraco.MacroEngines.DynamicNodeContext
+
+@{ var numberOfItems = 10; }
+<ul>
+    @foreach (var item in @Model.Children.Where("ShouldBeVisible").Take(numberOfItems).OrderBy("UpdateDate")) {
+        <li><a href="@item.Url">@item.Name</a></li>
+    }
+</ul>
