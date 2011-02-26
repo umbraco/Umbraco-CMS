@@ -2100,6 +2100,7 @@ namespace System.Linq.Dynamic
                     innerRight = Expression.Convert(invokedExpr, (left as MemberExpression).Type);
                 }
             }
+            bool sequenceEqual = false;
             if (leftIsLambda && rightIsLambda)
             {
                 {
@@ -2109,6 +2110,7 @@ namespace System.Linq.Dynamic
                     Type[] rightTypeGenericArguments = rightType.GetGenericArguments();
                     if (leftTypeGenericArguments.SequenceEqual(rightTypeGenericArguments))
                     {
+                        sequenceEqual = true;
                         if (leftTypeGenericArguments.Length == 2)
                         {
                             Type TOut = leftTypeGenericArguments[1];
@@ -2124,6 +2126,84 @@ namespace System.Linq.Dynamic
 
                         }
                     }
+                    else
+                    {
+                        if (leftTypeGenericArguments.Length == 2)
+                        {
+                            //sequence not equal - could be Func<DynamicNode,object> && Func<DynamicNode,bool>
+                            if (leftTypeGenericArguments.First() == rightTypeGenericArguments.First())
+                            {
+                                bool leftIsObject = leftTypeGenericArguments.ElementAt(1) == typeof(object);
+                                bool rightIsObject = rightTypeGenericArguments.ElementAt(1) == typeof(object);
+                                //if one is an object but not the other
+                                if (leftIsObject ^ rightIsObject)
+                                {
+                                    if (leftIsObject)
+                                    {
+                                        //left side is object
+                                        if (innerLeft == null)
+                                        {
+                                            parameters = new ParameterExpression[(left as LambdaExpression).Parameters.Count];
+                                            (left as LambdaExpression).Parameters.CopyTo(parameters, 0);
+                                            innerLeft = Expression.Invoke(left, parameters);
+                                        }
+                                        unboxedLeft = Expression.Unbox(innerLeft, rightTypeGenericArguments.ElementAt(1));
+
+                                        //left is invoked and unboxed to right's TOut, right was not boxed
+                                        if (expressionType == ExpressionType.AndAlso)
+                                        {
+                                            return PredicateBuilder.And<DynamicNode>(right as Expression<Func<DynamicNode, bool>>, Expression.Lambda<Func<DynamicNode, bool>>(unboxedLeft, parameters) as Expression<Func<DynamicNode, bool>>);
+                                        }
+                                        if (expressionType == ExpressionType.OrElse)
+                                        {
+                                            return PredicateBuilder.And<DynamicNode>(right as Expression<Func<DynamicNode, bool>>, Expression.Lambda<Func<DynamicNode, bool>>(unboxedLeft, parameters) as Expression<Func<DynamicNode, bool>>);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //right side is object
+                                        if (innerRight == null)
+                                        {
+                                            parameters = new ParameterExpression[(right as LambdaExpression).Parameters.Count];
+                                            (right as LambdaExpression).Parameters.CopyTo(parameters, 0);
+                                            innerRight = Expression.Invoke(right, parameters);
+                                        }
+                                        unboxedRight = Expression.Unbox(innerRight, leftTypeGenericArguments.ElementAt(1));
+
+                                        //right is invoked and unboxed to left's TOut, left was not boxed
+                                        if (expressionType == ExpressionType.AndAlso)
+                                        {
+                                            return PredicateBuilder.And<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, Expression.Lambda<Func<DynamicNode, bool>>(unboxedRight, parameters) as Expression<Func<DynamicNode, bool>>);
+                                        }
+                                        if (expressionType == ExpressionType.OrElse)
+                                        {
+                                            return PredicateBuilder.And<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, Expression.Lambda<Func<DynamicNode, bool>>(unboxedRight, parameters) as Expression<Func<DynamicNode, bool>>);
+                                        }
+                                    }
+
+
+                                    ////if op is and/or
+                                    //leftType = ((LambdaExpression)innerLeft ?? left).Type;
+                                    //rightType = ((LambdaExpression)innerRight ?? right).Type;
+                                    //leftTypeGenericArguments = leftType.GetGenericArguments();
+                                    //rightTypeGenericArguments = rightType.GetGenericArguments();
+                                    //Type leftTOut = leftTypeGenericArguments[1];
+                                    //Type rightTOut = leftTypeGenericArguments[1];
+
+                                    //if (expressionType == ExpressionType.AndAlso)
+                                    //{
+                                    //    return PredicateBuilder.And<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, right as Expression<Func<DynamicNode, bool>>);
+                                    //}
+                                    //if (expressionType == ExpressionType.OrElse)
+                                    //{
+                                    //    return PredicateBuilder.Or<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, right as Expression<Func<DynamicNode, bool>>);
+                                    //}
+
+
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -2132,6 +2212,11 @@ namespace System.Linq.Dynamic
                 //left is a lambda, but the right was an unhandled expression type
                 //!ConstantExpression, !MemberExpression
                 //make sure the left gets invoked
+                if (parameters == null)
+                {
+                    parameters = new ParameterExpression[(left as LambdaExpression).Parameters.Count];
+                    (left as LambdaExpression).Parameters.CopyTo(parameters, 0);
+                }
                 innerLeft = Expression.Invoke(left, parameters);
             }
             if (rightIsLambda && innerRight == null)
@@ -2139,6 +2224,11 @@ namespace System.Linq.Dynamic
                 //right is a lambda, but the left was an unhandled expression type
                 //!ConstantExpression, !MemberExpression
                 //make sure the right gets invoked
+                if (parameters == null)
+                {
+                    parameters = new ParameterExpression[(right as LambdaExpression).Parameters.Count];
+                    (right as LambdaExpression).Parameters.CopyTo(parameters, 0);
+                }
                 innerRight = Expression.Invoke(right, parameters);
             }
             if (leftIsLambda && !rightIsLambda && innerLeft != null && !(innerLeft is UnaryExpression) && innerLeft.Type is object)
@@ -2179,7 +2269,7 @@ namespace System.Linq.Dynamic
                     binaryExpression = Expression.Modulo(finalLeft, finalRight);
                     return (Expression.Lambda<Func<DynamicNode, int>>(binaryExpression, parameters));
                 case ExpressionType.AndAlso:
-                    if (leftIsLambda && rightIsLambda)
+                    if (leftIsLambda && rightIsLambda && sequenceEqual)
                     {
                         return Expression.Equal(left, right);
                     }
@@ -2188,7 +2278,7 @@ namespace System.Linq.Dynamic
                         return (Expression.Lambda<Func<DynamicNode, DynamicNode, Boolean>>(Expression.AndAlso(finalLeft, finalRight), parameters));
                     }
                 case ExpressionType.OrElse:
-                    if (leftIsLambda && rightIsLambda)
+                    if (leftIsLambda && rightIsLambda && sequenceEqual)
                     {
                         return Expression.Equal(left, right);
                     }
