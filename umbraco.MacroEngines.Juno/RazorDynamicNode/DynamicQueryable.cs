@@ -1387,6 +1387,28 @@ namespace System.Linq.Dynamic
                 }
                 Expression[] args = ParseArgumentList();
                 MethodBase mb;
+                LambdaExpression instanceAsString = null;
+                ParameterExpression instanceExpression = Expression.Parameter(typeof(DynamicNode), "instance");
+                if (type.IsGenericType)
+                {
+                    var typeArgs = type.GetGenericArguments();
+                    if (typeArgs[0] == typeof(DynamicNode))
+                    {
+                        if (instance != null && instance is LambdaExpression)
+                        {
+                            if (typeArgs[1] == typeof(object))
+                            {
+                                instanceAsString = StringFormat(instance as LambdaExpression, instanceExpression);
+                                type = typeof(string);
+                            }
+                            if (typeArgs[1] == typeof(string))
+                            {
+                                instanceAsString = instance as LambdaExpression;
+                                type = typeof(string);
+                            }
+                        }
+                    }
+                }
                 switch (FindMethod(type, id, instance == null, args, out mb))
                 {
                     case 0:
@@ -1399,6 +1421,47 @@ namespace System.Linq.Dynamic
                         if (method.ReturnType == typeof(void))
                             throw ParseError(errorPos, Res.MethodIsVoid,
                                 id, GetTypeName(method.DeclaringType));
+                        if (instanceAsString != null)
+                        {
+                            ConstantExpression defaultReturnValue = Expression.Constant(null, typeof(object));
+                            Type methodReturnType = method.ReturnType;
+                            switch (methodReturnType.Name)
+                            {
+                                case "String":
+                                    defaultReturnValue = Expression.Constant(null, typeof(string));
+                                    break;
+                                case "Int32":
+                                    defaultReturnValue = Expression.Constant(0, typeof(int));
+                                    break;
+                                case "Boolean":
+                                    defaultReturnValue = Expression.Constant(false, typeof(bool));
+                                    break;
+                            }
+                            ParameterExpression result = Expression.Parameter(method.ReturnType, "result");
+                            LabelTarget blockReturnLabel = Expression.Label(method.ReturnType);
+                            BlockExpression block = Expression.Block(
+                             method.ReturnType,
+                             new[] { result },
+                                Expression.Assign(result,
+                                        Expression.Call(
+                                            Expression.Invoke(instanceAsString, instanceExpression),
+                                            method,
+                                            args)
+                                    ),
+                             Expression.Return(blockReturnLabel, result),
+                             Expression.Label(blockReturnLabel, defaultReturnValue)
+                             );
+
+                            switch (methodReturnType.Name)
+                            {
+                                case "String":
+                                    return Expression.Lambda<Func<DynamicNode, string>>(block, instanceExpression);
+                                case "Int32":
+                                    return Expression.Lambda<Func<DynamicNode, int>>(block, instanceExpression);
+                                case "Boolean":
+                                    return Expression.Lambda<Func<DynamicNode, bool>>(block, instanceExpression);
+                            }
+                        }
                         return Expression.Call(instance, (MethodInfo)method, args);
                     default:
                         throw ParseError(errorPos, Res.AmbiguousMethodInvocation,
@@ -1465,7 +1528,27 @@ namespace System.Linq.Dynamic
             }
             return null;
         }
+        LambdaExpression StringFormat(LambdaExpression lax, ParameterExpression instanceExpression)
+        {
+            ParameterExpression cresult = Expression.Parameter(typeof(string), "cresult");
+            ParameterExpression temp = Expression.Parameter(typeof(object), "temp");
+            ParameterExpression stemp = Expression.Parameter(typeof(string), "string");
+            LabelTarget cblockReturnLabel = Expression.Label(typeof(string));
 
+            MethodInfo stringFormat = typeof(string).GetMethod("Format", new Type[] { typeof(string), typeof(object) });
+            BlockExpression cblock = Expression.Block(
+                    typeof(string),
+                    new[] { cresult, temp },
+                    Expression.Assign(temp, Expression.Invoke(lax, instanceExpression)),
+                    Expression.Assign(cresult, Expression.Call(stringFormat, Expression.Constant("{0}"), temp)),
+                    Expression.Return(cblockReturnLabel, cresult),
+                    Expression.Label(cblockReturnLabel, Expression.Constant(null, typeof(string))));
+
+            LambdaExpression lax2 = Expression.Lambda<Func<DynamicNode, string>>(cblock, instanceExpression);
+            var expression = Expression.Lambda<Func<DynamicNode, string>>(cblock, instanceExpression);
+            return expression;
+
+        }
         Expression ParseAggregate(Expression instance, Type elementType, string methodName, int errorPos)
         {
             ParameterExpression outerIt = it;
@@ -2180,25 +2263,6 @@ namespace System.Linq.Dynamic
                                             return PredicateBuilder.And<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, Expression.Lambda<Func<DynamicNode, bool>>(unboxedRight, parameters) as Expression<Func<DynamicNode, bool>>);
                                         }
                                     }
-
-
-                                    ////if op is and/or
-                                    //leftType = ((LambdaExpression)innerLeft ?? left).Type;
-                                    //rightType = ((LambdaExpression)innerRight ?? right).Type;
-                                    //leftTypeGenericArguments = leftType.GetGenericArguments();
-                                    //rightTypeGenericArguments = rightType.GetGenericArguments();
-                                    //Type leftTOut = leftTypeGenericArguments[1];
-                                    //Type rightTOut = leftTypeGenericArguments[1];
-
-                                    //if (expressionType == ExpressionType.AndAlso)
-                                    //{
-                                    //    return PredicateBuilder.And<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, right as Expression<Func<DynamicNode, bool>>);
-                                    //}
-                                    //if (expressionType == ExpressionType.OrElse)
-                                    //{
-                                    //    return PredicateBuilder.Or<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, right as Expression<Func<DynamicNode, bool>>);
-                                    //}
-
 
                                 }
                             }
