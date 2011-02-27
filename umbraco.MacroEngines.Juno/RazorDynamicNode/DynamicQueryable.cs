@@ -1389,7 +1389,7 @@ namespace System.Linq.Dynamic
                 MethodBase mb;
                 LambdaExpression instanceAsString = null;
                 ParameterExpression instanceExpression = Expression.Parameter(typeof(DynamicNode), "instance");
-                if (type.IsGenericType)
+                if (type.IsGenericType && type != typeof(string))
                 {
                     var typeArgs = type.GetGenericArguments();
                     if (typeArgs[0] == typeof(DynamicNode))
@@ -1409,6 +1409,16 @@ namespace System.Linq.Dynamic
                         }
                     }
                 }
+                if (id == "ContainsAny" && type == typeof(string) && instanceAsString != null)
+                {
+                    //stringProperty.ContainsAny(List<string>)
+                    Expression[] newArgs = (new List<Expression>() { Expression.Invoke(instanceAsString, instanceExpression) }).Concat(args).ToArray();
+                    int findMethodResult = FindMethod(typeof(DynamicNodeWhereHelpers), id, true, newArgs, out mb);
+                    if (findMethodResult == 1)
+                    {
+                        return CallMethodOnDynamicNode(instance, newArgs, instanceAsString, instanceExpression, (MethodInfo)mb, true);
+                    }
+                }
                 switch (FindMethod(type, id, instance == null, args, out mb))
                 {
                     case 0:
@@ -1423,44 +1433,7 @@ namespace System.Linq.Dynamic
                                 id, GetTypeName(method.DeclaringType));
                         if (instanceAsString != null)
                         {
-                            ConstantExpression defaultReturnValue = Expression.Constant(null, typeof(object));
-                            Type methodReturnType = method.ReturnType;
-                            switch (methodReturnType.Name)
-                            {
-                                case "String":
-                                    defaultReturnValue = Expression.Constant(null, typeof(string));
-                                    break;
-                                case "Int32":
-                                    defaultReturnValue = Expression.Constant(0, typeof(int));
-                                    break;
-                                case "Boolean":
-                                    defaultReturnValue = Expression.Constant(false, typeof(bool));
-                                    break;
-                            }
-                            ParameterExpression result = Expression.Parameter(method.ReturnType, "result");
-                            LabelTarget blockReturnLabel = Expression.Label(method.ReturnType);
-                            BlockExpression block = Expression.Block(
-                             method.ReturnType,
-                             new[] { result },
-                                Expression.Assign(result,
-                                        Expression.Call(
-                                            Expression.Invoke(instanceAsString, instanceExpression),
-                                            method,
-                                            args)
-                                    ),
-                             Expression.Return(blockReturnLabel, result),
-                             Expression.Label(blockReturnLabel, defaultReturnValue)
-                             );
-
-                            switch (methodReturnType.Name)
-                            {
-                                case "String":
-                                    return Expression.Lambda<Func<DynamicNode, string>>(block, instanceExpression);
-                                case "Int32":
-                                    return Expression.Lambda<Func<DynamicNode, int>>(block, instanceExpression);
-                                case "Boolean":
-                                    return Expression.Lambda<Func<DynamicNode, bool>>(block, instanceExpression);
-                            }
+                            return CallMethodOnDynamicNode(instance, args, instanceAsString, instanceExpression, method, false);
                         }
                         return Expression.Call(instance, (MethodInfo)method, args);
                     default:
@@ -1509,6 +1482,49 @@ namespace System.Linq.Dynamic
                     Expression.Property(instance, (PropertyInfo)member) :
                     Expression.Field(instance, (FieldInfo)member);
             }
+        }
+
+        private static Expression CallMethodOnDynamicNode(Expression instance, Expression[] args, LambdaExpression instanceAsString, ParameterExpression instanceExpression, MethodInfo method, bool isStatic)
+        {
+            ConstantExpression defaultReturnValue = Expression.Constant(null, typeof(object));
+            Type methodReturnType = method.ReturnType;
+            switch (methodReturnType.Name)
+            {
+                case "String":
+                    defaultReturnValue = Expression.Constant(null, typeof(string));
+                    break;
+                case "Int32":
+                    defaultReturnValue = Expression.Constant(0, typeof(int));
+                    break;
+                case "Boolean":
+                    defaultReturnValue = Expression.Constant(false, typeof(bool));
+                    break;
+            }
+            ParameterExpression result = Expression.Parameter(method.ReturnType, "result");
+            LabelTarget blockReturnLabel = Expression.Label(method.ReturnType);
+            BlockExpression block = Expression.Block(
+             method.ReturnType,
+             new[] { result },
+                Expression.Assign(result,
+                        Expression.Call(
+                            isStatic ? null : Expression.Invoke(instanceAsString, instanceExpression),
+                            method,
+                            args)
+                    ),
+             Expression.Return(blockReturnLabel, result),
+             Expression.Label(blockReturnLabel, defaultReturnValue)
+             );
+
+            switch (methodReturnType.Name)
+            {
+                case "String":
+                    return Expression.Lambda<Func<DynamicNode, string>>(block, instanceExpression);
+                case "Int32":
+                    return Expression.Lambda<Func<DynamicNode, int>>(block, instanceExpression);
+                case "Boolean":
+                    return Expression.Lambda<Func<DynamicNode, bool>>(block, instanceExpression);
+            }
+            return Expression.Call(instance, (MethodInfo)method, args);
         }
 
         static Type FindGenericType(Type generic, Type type)
