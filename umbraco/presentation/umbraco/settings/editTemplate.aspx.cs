@@ -157,7 +157,7 @@ namespace umbraco.cms.presentation.settings
         private void LoadScriptingTemplates()
         {
 
-            string path = IO.SystemDirectories.Umbraco + "/scripting/templates/py/";
+            string path = IO.SystemDirectories.Umbraco + "/scripting/templates/cshtml/";
             string abPath = IO.IOHelper.MapPath(path);
 
             List<KeyValuePair<string, string>> files= new List<KeyValuePair<string, string>>();
