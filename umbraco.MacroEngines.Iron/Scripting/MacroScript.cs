@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Scripting.Hosting;
 
-namespace umbraco.MacroEngines.Scripting
+namespace umbraco.MacroEngines.Iron.Scripting
 {
     public class MacroScript {
 

@@ -7,7 +7,7 @@ using System.Text;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 
-namespace umbraco.MacroEngines.Scripting
+namespace umbraco.MacroEngines.Iron.Scripting
 {
     internal class MacroScriptEngine
     {

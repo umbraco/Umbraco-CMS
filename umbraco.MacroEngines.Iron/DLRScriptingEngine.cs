@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 using umbraco.IO;
-using umbraco.MacroEngines.Scripting;
+using umbraco.MacroEngines.Iron.Scripting;
 
-namespace umbraco.MacroEngines
+namespace umbraco.MacroEngines.Iron
 {
     public class DLRScriptingEngine : IMacroEngine
     {
