@@ -1409,19 +1409,19 @@ namespace System.Linq.Dynamic
                         }
                     }
                 }
-                if (id == "ContainsAny" && type == typeof(string) && instanceAsString != null)
-                {
-                    //stringProperty.ContainsAny(List<string>)
-                    Expression[] newArgs = (new List<Expression>() { Expression.Invoke(instanceAsString, instanceExpression) }).Concat(args).ToArray();
-                    int findMethodResult = FindMethod(typeof(DynamicNodeWhereHelpers), id, true, newArgs, out mb);
-                    if (findMethodResult == 1)
-                    {
-                        return CallMethodOnDynamicNode(instance, newArgs, instanceAsString, instanceExpression, (MethodInfo)mb, true);
-                    }
-                }
                 switch (FindMethod(type, id, instance == null, args, out mb))
                 {
                     case 0:
+                        //not found
+                        if (type == typeof(string) && instanceAsString != null)
+                        {
+                            Expression[] newArgs = (new List<Expression>() { Expression.Invoke(instanceAsString, instanceExpression) }).Concat(args).ToArray();
+                            mb = ExtensionMethodFinder.FindExtensionMethod(typeof(string), newArgs, id);
+                            if (mb != null)
+                            {
+                                return CallMethodOnDynamicNode(instance, newArgs, instanceAsString, instanceExpression, (MethodInfo)mb, true);
+                            }
+                        }
                         throw ParseError(errorPos, Res.NoApplicableMethod,
                             id, GetTypeName(type));
                     case 1:

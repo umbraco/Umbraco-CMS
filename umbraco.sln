@@ -112,6 +112,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.MacroEngines", "umb
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebPi", "WebPi", "{AA6839DD-07D5-4277-915D-8C9290A36D5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.MacroEngines.Iron", "umbraco.MacroEngines.Iron\umbraco.MacroEngines.Iron.csproj", "{98CBA7E2-1B62-497C-8AA3-B868704068D7}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = umbraco2.vsmdi
@@ -179,6 +181,9 @@ Global
 		{89C09045-1064-466B-B94A-DB3AFE2A5853}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89C09045-1064-466B-B94A-DB3AFE2A5853}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89C09045-1064-466B-B94A-DB3AFE2A5853}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98CBA7E2-1B62-497C-8AA3-B868704068D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98CBA7E2-1B62-497C-8AA3-B868704068D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98CBA7E2-1B62-497C-8AA3-B868704068D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
