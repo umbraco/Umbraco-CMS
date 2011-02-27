@@ -92,7 +92,10 @@ namespace umbraco.MacroEngines
             string fileLocation = null;
             if (!string.IsNullOrEmpty(macro.ScriptName)) {
                 //Razor Is Already Contained In A File
-                fileLocation = SystemDirectories.Python + "/" + macro.ScriptName;
+                if (!macro.ScriptName.StartsWith("~"))
+                    fileLocation = macro.ScriptName;
+                else
+                    fileLocation = SystemDirectories.Python + "/" + macro.ScriptName;
             } else if (!string.IsNullOrEmpty(macro.ScriptCode) && !string.IsNullOrEmpty(macro.ScriptLanguage)) {
                 //Inline Razor Syntax
                 fileLocation = CreateInlineRazorFile(macro.ScriptCode, macro.ScriptLanguage);
