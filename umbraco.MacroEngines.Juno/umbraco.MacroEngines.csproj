@@ -66,6 +66,7 @@
     <Compile Include="RazorCore\BaseContext.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeList.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeWalker.cs" />
+    <Compile Include="RazorDynamicNode\DynamicNodeWhereHelpers.cs" />
     <Compile Include="RazorDynamicNode\DynamicQueryable.cs" />
     <Compile Include="RazorDynamicNode\DynamicXml.cs" />
     <Compile Include="RazorDynamicNode\ExtensionMethods.cs" />
