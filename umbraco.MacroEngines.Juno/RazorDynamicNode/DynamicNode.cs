@@ -470,6 +470,14 @@ namespace umbraco.MacroEngines
         {
             return AncestorOrSelf(node => node.Level == 1);
         }
+        public DynamicNode AncestorOrSelf(int level)
+        {
+            return AncestorOrSelf(node => node.Level == level);
+        }
+        public DynamicNode AncestorOrSelf(string nodeTypeAlias)
+        {
+            return AncestorOrSelf(node => node.NodeTypeAlias == nodeTypeAlias);
+        }
         public DynamicNode AncestorOrSelf(Func<DynamicNode, bool> func)
         {
             var node = this;
@@ -496,27 +504,23 @@ namespace umbraco.MacroEngines
 
             return node;
         }
-        public DynamicNodeList AncestorsOrSelf
+        public DynamicNodeList AncestorsOrSelf(Func<DynamicNode, bool> func)
         {
-            get
+            List<DynamicNode> ancestorList = new List<DynamicNode>();
+            var node = this;
+            ancestorList.Add(node);
+            while (node != null)
             {
-                List<DynamicNode> ancestorList = new List<DynamicNode>();
-                var node = this;
-                ancestorList.Add(node);
-                while (node != null)
+                if (node.Level == 1) break;
+                DynamicNode parent = node.Parent;
+                if (parent != null)
                 {
-                    if (node.Level == 1) break;
-                    DynamicNode parent = node.Parent;
-                    if (parent != null)
+                    if (this != parent)
                     {
-                        if (this != parent)
+                        node = parent;
+                        if (func(node))
                         {
-                            node = parent;
                             ancestorList.Add(node);
-                        }
-                        else
-                        {
-                            break;
                         }
                     }
                     else
@@ -524,42 +528,111 @@ namespace umbraco.MacroEngines
                         break;
                     }
                 }
-                ancestorList.Reverse();
-                return new DynamicNodeList(ancestorList);
-            }
-        }
-        public DynamicNodeList Descendants
-        {
-            get
-            {
-                var flattenedNodes = this.n.ChildrenAsList.Map(p => true, (INode n) => { return n.ChildrenAsList; });
-                return new DynamicNodeList(flattenedNodes.ToList().ConvertAll(iNode => new DynamicNode(iNode)));
-            }
-        }
-        public DynamicNodeList DescendantsOrSelf
-        {
-            get
-            {
-
-                if (this.n != null)
+                else
                 {
-                    var thisNode = new List<INode>();
-                    thisNode.Add(this.n);
-                    var flattenedNodes = this.n.ChildrenAsList.Map(p => true, (INode n) => { return n.ChildrenAsList; });
-                    return new DynamicNodeList(thisNode.Concat(flattenedNodes).ToList().ConvertAll(iNode => new DynamicNode(iNode)));
+                    break;
                 }
-                return new DynamicNodeList(new List<INode>());
             }
+            ancestorList.Reverse();
+            return new DynamicNodeList(ancestorList);
         }
-
-
-        public DynamicNodeList Ancestors
+        public DynamicNodeList AncestorsOrSelf()
         {
-            get
+            return AncestorsOrSelf(n => true);
+        }
+        public DynamicNodeList AncestorsOrSelf(string nodeTypeAlias)
+        {
+            return AncestorsOrSelf(n => n.NodeTypeAlias == nodeTypeAlias);
+        }
+        public DynamicNodeList AncestorsOrSelf(int level)
+        {
+            return AncestorsOrSelf(n => n.Level <= level);
+        }
+        public DynamicNodeList Descendants(string nodeTypeAlias)
+        {
+            return Descendants(p => p.NodeTypeAlias == nodeTypeAlias);
+        }
+        public DynamicNodeList Descendants(int level)
+        {
+            return Descendants(p => p.Level >= level);
+        }
+        public DynamicNodeList Descendants()
+        {
+            return Descendants(n => true);
+        }
+        public DynamicNodeList Descendants(Func<INode, bool> func)
+        {
+            var flattenedNodes = this.n.ChildrenAsList.Map(func, (INode n) => { return n.ChildrenAsList; });
+            return new DynamicNodeList(flattenedNodes.ToList().ConvertAll(iNode => new DynamicNode(iNode)));
+        }
+        public DynamicNodeList DescendantsOrSelf(int level)
+        {
+            return DescendantsOrSelf(p => p.Level >= level);
+        }
+        public DynamicNodeList DescendantsOrSelf(string nodeTypeAlias)
+        {
+            return DescendantsOrSelf(p => p.NodeTypeAlias == nodeTypeAlias);
+        }
+        public DynamicNodeList DescendantsOrSelf()
+        {
+            return DescendantsOrSelf(p => true);
+        }
+        public DynamicNodeList DescendantsOrSelf(Func<INode, bool> func)
+        {
+            if (this.n != null)
             {
-                DynamicNodeList innerList = AncestorsOrSelf;
-                return new DynamicNodeList(innerList.Items.Skip(1));
+                var thisNode = new List<INode>();
+                if (func(this.n))
+                {
+                    thisNode.Add(this.n);
+                }
+                var flattenedNodes = this.n.ChildrenAsList.Map(func, (INode n) => { return n.ChildrenAsList; });
+                return new DynamicNodeList(thisNode.Concat(flattenedNodes).ToList().ConvertAll(iNode => new DynamicNode(iNode)));
             }
+            return new DynamicNodeList(new List<INode>());
+        }
+        public DynamicNodeList Ancestors(int level)
+        {
+            return Ancestors(n => n.Level == level);
+        }
+        public DynamicNodeList Ancestors(string nodeTypeAlias)
+        {
+            return Ancestors(n => n.NodeTypeAlias == nodeTypeAlias);
+        }
+        public DynamicNodeList Ancestors()
+        {
+            return Ancestors(n => true);
+        }
+        public DynamicNodeList Ancestors(Func<DynamicNode, bool> func)
+        {
+            List<DynamicNode> ancestorList = new List<DynamicNode>();
+            var node = this;
+            while (node != null)
+            {
+                if (node.Level == 1) break;
+                DynamicNode parent = node.Parent;
+                if (parent != null)
+                {
+                    if (this != parent)
+                    {
+                        node = parent;
+                        if (func(node))
+                        {
+                            ancestorList.Add(node);
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+            ancestorList.Reverse();
+            return new DynamicNodeList(ancestorList);
         }
         public DynamicNode Parent
         {
