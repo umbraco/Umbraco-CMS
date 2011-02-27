@@ -111,153 +111,47 @@ namespace umbraco.MacroEngines
             }
 
         }
-        List<MethodInfo> GetAllExtensionMethods(Type[] genericParameterTypeList, Type explicitTypeToSearch, string name, int argumentCount)
-        {
-            //get extension methods from runtime
-            var candidates = (
-                from assembly in BuildManager.GetReferencedAssemblies().Cast<Assembly>()
-                where assembly.IsDefined(typeof(ExtensionAttribute), false)
-                from type in assembly.GetTypes()
-                where (type.IsDefined(typeof(ExtensionAttribute), false)
-                    && type.IsSealed && !type.IsGenericType && !type.IsNested)
-                from method in type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
-                // this filters extension methods
-                where method.IsDefined(typeof(ExtensionAttribute), false)
-                select method
-                );
 
-            //search an explicit type (e.g. Enumerable, where most of the Linq methods are defined)
-            if (explicitTypeToSearch != null)
-            {
-                candidates = candidates.Concat(explicitTypeToSearch.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
-            }
-
-            //filter by name
-            var methodsByName = candidates.Where(m => m.Name == name);
-
-            var isGenericAndRightParamCount = methodsByName.Where(m => m.GetParameters().Length == argumentCount + 1);
-
-            //find the right overload that can take genericParameterType
-            //which will be either DynamicNodeList or List<DynamicNode> which is IEnumerable`
-
-            var withGenericParameterType = isGenericAndRightParamCount.Select(m => new { m, t = firstParameterType(m) });
-
-            var methodsWhereArgZeroIsTargetType = (from method in withGenericParameterType
-                                                   where
-                                                   method.t != null && methodArgZeroHasCorrectTargetType(method.m, method.t, genericParameterTypeList)
-                                                   select method);
-
-            return methodsWhereArgZeroIsTargetType.Select(mt => mt.m).ToList();
-        }
-        private bool methodArgZeroHasCorrectTargetType(MethodInfo method, Type firstArgumentType, Type[] genericParameterTypeList)
-        {
-            //This is done with seperate method calls because you can't debug/watch lamdas - if you're trying to figure
-            //out why the wrong method is returned, it helps to be able to see each boolean result
-
-            return
-
-            // is it defined on me?
-            methodArgZeroHasCorrectTargetType_TypeMatchesExactly(method, firstArgumentType, genericParameterTypeList) ||
-
-            // or on any of my interfaces?
-           methodArgZeroHasCorrectTargetType_AnInterfaceMatches(method, firstArgumentType, genericParameterTypeList) ||
-
-            // or on any of my base types?
-            methodArgZeroHasCorrectTargetType_IsASubclassOf(method, firstArgumentType, genericParameterTypeList) ||
-
-           //share a common interface (e.g. IEnumerable)
-            methodArgZeroHasCorrectTargetType_ShareACommonInterface(method, firstArgumentType, genericParameterTypeList);
-
-
-        }
-
-        private static bool methodArgZeroHasCorrectTargetType_ShareACommonInterface(MethodInfo method, Type firstArgumentType, Type[] genericParameterTypeList)
-        {
-            Type[] interfaces = firstArgumentType.GetInterfaces();
-            if (interfaces.Length == 0)
-            {
-                return false;
-            }
-            bool result = interfaces.All(i => genericParameterTypeList.Any(gt => gt.GetInterfaces().Contains(i)));
-            return result;
-        }
-
-        private static bool methodArgZeroHasCorrectTargetType_IsASubclassOf(MethodInfo method, Type firstArgumentType, Type[] genericParameterTypeList)
-        {
-            bool result = genericParameterTypeList.Any(gt => gt.IsSubclassOf(firstArgumentType));
-            return result;
-        }
-
-        private static bool methodArgZeroHasCorrectTargetType_AnInterfaceMatches(MethodInfo method, Type firstArgumentType, Type[] genericParameterTypeList)
-        {
-            bool result = genericParameterTypeList.Any(gt => gt.GetInterfaces().Contains(firstArgumentType));
-            return result;
-        }
-
-        private static bool methodArgZeroHasCorrectTargetType_TypeMatchesExactly(MethodInfo method, Type firstArgumentType, Type[] genericParameterTypeList)
-        {
-            bool result = genericParameterTypeList.Any(gt => gt == firstArgumentType);
-            return result;
-        }
-        private Type firstParameterType(MethodInfo m)
-        {
-            ParameterInfo[] p = m.GetParameters();
-            if (p.Count() > 0)
-            {
-                return p.First().ParameterType;
-            }
-            return null;
-        }
         private object ExecuteExtensionMethod(object[] args, string name)
         {
-            object result;
-            //Extension method
-            Type tObject = Items.GetType();
-            Type t = tObject.GetGenericArguments()[0];
+            object result = null;
 
-            var methods = GetAllExtensionMethods(new Type[] { typeof(DynamicNodeList), tObject }, typeof(Enumerable), name, args.Length);
-
-            if (methods.Count == 0)
+            MethodInfo methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(IEnumerable<DynamicNode>), args, name);
+            if (methodToExecute == null)
+            {
+                methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(DynamicNodeList), args, name);
+            }
+            if (methodToExecute != null)
+            {
+                if (methodToExecute.GetParameters().First().ParameterType == typeof(DynamicNodeList))
+                {
+                    var genericArgs = (new[] { this }).Concat(args);
+                    result = methodToExecute.Invoke(null, genericArgs.ToArray());
+                }
+                else
+                {
+                    var genericArgs = (new[] { Items }).Concat(args);
+                    result = methodToExecute.Invoke(null, genericArgs.ToArray());
+                }
+            }
+            else
             {
                 throw new MissingMethodException();
             }
-
-            MethodInfo firstMethod = methods.First();
-            // NH: this is to ensure that it's always the correct one being chosen when using the LINQ extension methods
-            if (methods.Count > 1)
-                firstMethod = methods.First(x => x.IsGenericMethodDefinition);
-
-            MethodInfo methodToExecute = null;
-            if (firstMethod.IsGenericMethodDefinition)
+            if (result != null)
             {
-                methodToExecute = firstMethod.MakeGenericMethod(t);
-            }
-            else
-            {
-                methodToExecute = firstMethod;
-            }
-            if (methodToExecute.GetParameters().First().ParameterType == typeof(DynamicNodeList))
-            {
-                var genericArgs = (new[] { this }).Concat(args);
-                result = methodToExecute.Invoke(null, genericArgs.ToArray());
-            }
-            else
-            {
-                var genericArgs = (new[] { Items }).Concat(args);
-                result = methodToExecute.Invoke(null, genericArgs.ToArray());
-            }
-
-            if (result is IEnumerable<INode>)
-            {
-                result = new DynamicNodeList((IEnumerable<INode>)result);
-            }
-            if (result is IEnumerable<DynamicNode>)
-            {
-                result = new DynamicNodeList((IEnumerable<DynamicNode>)result);
-            }
-            if (result is INode)
-            {
-                result = new DynamicNode((INode)result);
+                if (result is IEnumerable<INode>)
+                {
+                    result = new DynamicNodeList((IEnumerable<INode>)result);
+                }
+                if (result is IEnumerable<DynamicNode>)
+                {
+                    result = new DynamicNodeList((IEnumerable<DynamicNode>)result);
+                }
+                if (result is INode)
+                {
+                    result = new DynamicNode((INode)result);
+                }
             }
             return result;
         }
