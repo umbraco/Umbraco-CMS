@@ -1154,6 +1154,17 @@ namespace umbraco.cms.businesslogic
             }
 
             /// <summary>
+            /// A list of PropertyTypes on the Tab
+            /// </summary>
+            [Obsolete("Please use GetPropertyTypes() instead", false)]
+            public PropertyType[] PropertyTypes
+            {
+                get { return GetPropertyTypes(this.ContentType, true); }
+            }
+
+
+
+            /// <summary>
             /// Flushes the cache.
             /// </summary>
             /// <param name="id">The id.</param>
