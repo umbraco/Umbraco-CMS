@@ -266,7 +266,7 @@ namespace umbraco.presentation.webservices
                     }
                 }
 
-                if (errorMessage == "")
+                if (errorMessage ==  "")
                 {
                     //Hardcoded security-check... only allow saving files in xslt directory... 
                     string savePath = IOHelper.MapPath(SystemDirectories.Python + "/" + fileName);
