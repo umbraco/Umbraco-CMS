@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Web;
 using umbraco.interfaces;
 using System.Collections;
 using System.Reflection;
@@ -19,6 +20,12 @@ namespace umbraco.MacroEngines
 {
     public class DynamicNode : DynamicObject
     {
+        #region consts
+        // these are private readonlys as const can't be Guids
+        private readonly Guid DATATYPE_YESNO_GUID = new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a");
+        private readonly Guid DATATYPE_TINYMCE_GUID = new Guid("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
+        #endregion
+
         internal DynamicNodeList ownerList;
 
         internal readonly INode n;
@@ -269,10 +276,9 @@ namespace umbraco.MacroEngines
         {
             //the resulting property is a string, but to support some of the nice linq stuff in .Where
             //we should really check some more types
-            umbraco.editorControls.yesno.YesNoDataType yesnoType = new editorControls.yesno.YesNoDataType();
 
             //boolean
-            if (dataType == yesnoType.Id)
+            if (dataType == DATATYPE_YESNO_GUID)
             {
                 bool parseResult;
                 if (result.ToString() == "") result = "0";
@@ -306,6 +312,13 @@ namespace umbraco.MacroEngines
                 result = dtResult;
                 return true;
             }
+
+            // Rich text editor (return IHtmlString so devs doesn't need to decode html
+            if (dataType == DATATYPE_TINYMCE_GUID)
+            {
+                result = new HtmlString(result.ToString());
+            }
+
 
             if (string.Equals("true", string.Format("{0}", result), StringComparison.CurrentCultureIgnoreCase))
             {
