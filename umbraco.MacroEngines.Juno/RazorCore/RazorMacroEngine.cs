@@ -92,7 +92,7 @@ namespace umbraco.MacroEngines
             string fileLocation = null;
             if (!string.IsNullOrEmpty(macro.ScriptName)) {
                 //Razor Is Already Contained In A File
-                if (!macro.ScriptName.StartsWith("~"))
+                if (macro.ScriptName.StartsWith("~"))
                     fileLocation = macro.ScriptName;
                 else
                     fileLocation = SystemDirectories.Python + "/" + macro.ScriptName;
