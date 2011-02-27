@@ -12,6 +12,8 @@ namespace umbraco.MacroEngines
     {
         private Dictionary<string, string> _propertyCache;
         private Media _media;
+        internal DynamicMediaList ownerList;
+
         public DynamicMedia(int mediaId)
         {
             _media = new Media(mediaId);
@@ -55,6 +57,7 @@ namespace umbraco.MacroEngines
             }
             if (_media != null)
             {
+                Properties props = _media.GenericProperties;
                 Property prop = _media.getProperty(name);
                 // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
                 if (prop == null && name.Substring(0, 1).ToUpper() == name.Substring(0, 1))

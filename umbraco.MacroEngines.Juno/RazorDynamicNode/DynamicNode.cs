@@ -592,6 +592,17 @@ namespace umbraco.MacroEngines
         {
             return new DynamicNode(Id);
         }
+        public DynamicNodeList NodeById(List<object> Ids)
+        {
+            List<DynamicNode> nodes = new List<DynamicNode>();
+            foreach (object eachId in Ids)
+                nodes.Add(new DynamicNode(eachId));
+            return new DynamicNodeList(nodes);
+        }
+        public DynamicNodeList NodeById(params object[] Ids)
+        {
+            return NodeById(Ids.ToList());
+        }
         public DynamicMedia MediaById(int Id)
         {
             return new DynamicMedia(Id);
@@ -603,6 +614,17 @@ namespace umbraco.MacroEngines
         public DynamicMedia MediaById(object Id)
         {
             return new DynamicMedia(Id);
+        }
+        public DynamicMediaList MediaById(List<object> Ids)
+        {
+            List<DynamicMedia> nodes = new List<DynamicMedia>();
+            foreach (object eachId in Ids)
+                nodes.Add(new DynamicMedia(eachId));
+            return new DynamicMediaList(nodes);
+        }
+        public DynamicMediaList MediaById(params object[] Ids)
+        {
+            return MediaById(Ids.ToList());
         }
         public int Id
         {

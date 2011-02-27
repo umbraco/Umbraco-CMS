@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RazorCore\BaseContext.cs" />
+    <Compile Include="RazorDynamicNode\DynamicMediaList.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeList.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeWalker.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeWhereHelpers.cs" />
