@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Script.Services;
@@ -237,7 +238,7 @@ namespace umbraco.presentation.webservices
             
     
 			//SW = File.CreateText(tempFileName);
-            SW = new System.IO.StreamWriter(tempFileName, false, new System.Text.UTF8Encoding(false));
+            SW = new System.IO.StreamWriter(tempFileName, false, Encoding.UTF8);
             SW.Write(fileContents);
 			SW.Close();
                 
@@ -272,7 +273,7 @@ namespace umbraco.presentation.webservices
 
                     if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Python + "/")))
                     {
-                        SW = File.CreateText(savePath);
+                        SW = new System.IO.StreamWriter(savePath, false, Encoding.UTF8);
                         SW.Write(fileContents);
                         SW.Close();
                         errorMessage = "true";
