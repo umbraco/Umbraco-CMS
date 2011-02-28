@@ -79,6 +79,8 @@
         <arg value="/p:ToolsVersion=4.0" />
         <arg value="/p:Configuration=${build.configuration}" />
       </exec>
+      <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\${build.configuration}\umbraco.MacroEngines.dll" tofile="${source.dir}\bin\umbraco.MacroEngines.dll" failonerror="false" overwrite="true"/>
+
 
       <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
             <arg value="${root.dir}\umbraco.sln" />
