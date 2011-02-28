@@ -972,7 +972,7 @@ a.m-btn-plain-active{
 }.s-btn-downarrow{
 	display:inline-block;
 	width:16px;
-	background:url('images/menu_downarrow.png') no-repeat 9px center;
+	background:url('images/menu_split_downarrow.png') no-repeat 4px -18px;
 }
 
 a.s-btn-active{
