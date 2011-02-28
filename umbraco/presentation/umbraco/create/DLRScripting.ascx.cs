@@ -61,6 +61,9 @@ namespace umbraco.presentation.create
             string abPath = IO.IOHelper.MapPath(path);
             list.Items.Clear();
 
+            // always add the option of an empty one
+            list.Items.Add(new ListItem("Empty template", ""));
+
             if (System.IO.Directory.Exists(abPath))
             {
                 string extension = "." + scriptType;
@@ -71,10 +74,6 @@ namespace umbraco.presentation.create
 
                     list.Items.Add(new ListItem(helper.SpaceCamelCasing(filename.Replace(extension, "")), scriptType + "/" + filename));
                 }
-            }
-            else
-            {
-                list.Items.Add(new ListItem("Empty template", ""));
             }
         }
     }
