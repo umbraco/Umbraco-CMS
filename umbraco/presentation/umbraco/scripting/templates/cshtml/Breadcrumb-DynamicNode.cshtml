@@ -3,7 +3,7 @@
 <em>DynamicNode:</em><br/>
 <ul>
 
-@foreach(var level in @Model.Ancestors.Where("ShouldBeVisible"))
+@foreach(var level in @Model.Ancestors.Where("umbracoNaviHide != true"))
 {
 	<li><a href="@level.Url">@level.Name</a></li>
 }
