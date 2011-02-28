@@ -314,6 +314,20 @@ namespace umbraco.NodeFactory
             return null;
         }
 
+        public IProperty GetProperty(string Alias, out bool propertyExists)
+        {
+            foreach (Property p in Properties)
+            {
+                if (p.Alias == Alias)
+                {
+                    propertyExists = true;
+                    return p;
+                }
+            }
+            propertyExists = false;
+            return null;
+        }
+
         public static Node GetNodeByXpath(string xpath)
         {
             XPathNodeIterator xpathNode = library.GetXmlNodeByXPath(xpath);
