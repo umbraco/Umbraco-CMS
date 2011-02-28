@@ -234,7 +234,7 @@ namespace umbraco.presentation.webservices
         public string SaveDLRScript(string fileName, string oldName, string fileContents, bool ignoreDebugging)
         {
             StreamWriter SW;
-            string tempFileName = IOHelper.MapPath(SystemDirectories.Python + "/" + System.DateTime.Now.Ticks.ToString() + "_" + fileName);
+            string tempFileName = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + System.DateTime.Now.Ticks.ToString() + "_" + fileName);
             
     
 			//SW = File.CreateText(tempFileName);
@@ -269,9 +269,9 @@ namespace umbraco.presentation.webservices
                 if (errorMessage ==  "")
                 {
                     //Hardcoded security-check... only allow saving files in xslt directory... 
-                    string savePath = IOHelper.MapPath(SystemDirectories.Python + "/" + fileName);
+                    string savePath = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + fileName);
 
-                    if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Python + "/")))
+                    if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.MacroScripts + "/")))
                     {
                         SW = new System.IO.StreamWriter(savePath, false, Encoding.UTF8);
                         SW.Write(fileContents);
@@ -281,7 +281,7 @@ namespace umbraco.presentation.webservices
                         //deletes the old xslt file
                         if (fileName != oldName)
                         {
-                            string p = IOHelper.MapPath(SystemDirectories.Python + "/" + oldName);
+                            string p = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + oldName);
                             if (System.IO.File.Exists(p))
                                 System.IO.File.Delete(p);
                         }

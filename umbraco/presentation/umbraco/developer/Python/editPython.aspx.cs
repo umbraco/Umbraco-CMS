@@ -51,7 +51,7 @@ namespace umbraco.cms.presentation.developer
 
             StreamReader SR;
             string S;
-            SR = File.OpenText( IOHelper.MapPath(SystemDirectories.Python + "/" + file));
+            SR = File.OpenText(IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + file));
             S = SR.ReadToEnd();
             SR.Close();
             pythonSource.Text = S;

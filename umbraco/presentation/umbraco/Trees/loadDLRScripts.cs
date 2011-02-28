@@ -54,7 +54,7 @@ namespace umbraco
         {
             get
             {
-                return SystemDirectories.Python + "/";
+                return SystemDirectories.MacroScripts + "/";
             }
         }
 
