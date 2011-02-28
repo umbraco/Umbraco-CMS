@@ -265,9 +265,9 @@ namespace umbraco.MacroEngines
 
             //if property access, type lookup and member invoke all failed
             //at this point, we're going to return null
-            //instead, we return an empty list
+            //instead, we return a DynamicNull - see comments in that file
             //this will let things like Model.ChildItem work and return nothing instead of crashing
-            result = new DynamicNodeList(new List<INode>());
+            result = new DynamicNull();
             //changed this to a return true because it breaks testing when using .Children().Random().propertyName
             return true;
         }
@@ -281,7 +281,7 @@ namespace umbraco.MacroEngines
             if (dataType == DATATYPE_YESNO_GUID)
             {
                 bool parseResult;
-                if (result.ToString() == "") result = "0";
+                if (string.Format("{0}", result) == "") result = "0";
                 if (Boolean.TryParse(result.ToString().Replace("1", "true").Replace("0", "false"), out parseResult))
                 {
                     result = parseResult;

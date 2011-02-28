@@ -54,6 +54,7 @@ namespace System.Linq.Dynamic
                         {
                             return (bool)value;
                         }
+
                         return false;
                     }
                     catch (Exception)
@@ -1467,6 +1468,12 @@ namespace System.Linq.Dynamic
                      Expression.Assign(result, Expression.Constant(null)),
                      Expression.IfThen(Expression.NotEqual(Expression.Constant(null), instanceExpression),
                         Expression.Call(instanceExpression, method, binder, result)),
+                     Expression.IfThen(
+                        Expression.TypeEqual(result, typeof(DynamicNull)),
+                        Expression.Assign(result,
+                            Expression.Constant(true, typeof(object))
+                        )
+                     ),
                      Expression.Return(blockReturnLabel, result),
                      Expression.Label(blockReturnLabel, Expression.Constant(-2, typeof(object)))
                      );
