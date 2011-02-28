@@ -71,7 +71,16 @@
             </fileset>
         </delete>
 
-        <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
+
+      <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
+        <arg value="${root.dir}\umbraco.MacroEngines.Juno\umbraco.MacroEngines.csproj" />
+        <arg value="/v:n" />
+        <arg value="/p:WarningLevel=0" />
+        <arg value="/p:ToolsVersion=4.0" />
+        <arg value="/p:Configuration=${build.configuration}" />
+      </exec>
+
+      <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
             <arg value="${root.dir}\umbraco.sln" />
             <arg value="/v:n" />
             <arg value="/p:WarningLevel=0" />
@@ -80,14 +89,7 @@
         </exec>
         <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
     
-		<exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
-            <arg value="${root.dir}\umbraco.MacroEngines.Juno\umbraco.MacroEngines.csproj" />
-            <arg value="/v:n" />
-            <arg value="/p:WarningLevel=0" />
-            <arg value="/p:ToolsVersion=4.0" />
-            <arg value="/p:Configuration=${build.configuration}" />
-        </exec>
-
+		    
       <call target="buildMacroEnginesIron" />
 
       <call target="buildSymbolFiles" />
@@ -131,7 +133,6 @@
     </copy>
     
   </target>  
-  
   
   
 
@@ -283,8 +284,7 @@
         <mkdir dir="${build.dir}\usercontrols" />
     </target>
 
-    
-
+   
 
     <!-- Documentation -->
     <target name="documentation" depends="directories">
