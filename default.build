@@ -353,7 +353,7 @@
 
 
     <!-- do the full release with docs, minify and nightly file distribution -->
-    <target name="release" depends="zip,minify">
+    <target name="release" depends="zip">
         <property name="assembly.name" value="${ assemblyname::get-version( assemblyname::get-assembly-name('umbraco/presentation/bin/umbraco.dll') ) }"/>
         <property name="release.filename" value="${root.dir}\build_${build.version}_${assembly.name}.zip" />
 
