@@ -8,10 +8,14 @@
     -->
     <property name="nant.settings.currentframework" value="net-4.0" />,
 
-    <!-- filenames and directories, generally won't change -->
+    <property name="build.version" value="4.7 RC"/>
+    <property name="build.configuration" value="Release"/>
+
+
+  <!-- filenames and directories, generally won't change -->
 
     <property name="web.dir" value="D:\inetpub\wwwroot\v4.umbraco.org" />
-    <property name="public.dir" value="D:\inetpub\wwwroot\nightlies\umbraco 4.6" />
+    <property name="public.dir" value="D:\inetpub\wwwroot\nightlies\umbraco 4.7" />
     <property name="root.dir" value="${directory::get-current-directory()}" />
     <property name="source.dir" value="${root.dir}\umbraco\presentation" />
     
@@ -24,9 +28,6 @@
     <property name="WebPiAssets.dir" value="${root.dir}\config templates\WebPi" />
     
     
-    <property name="build.version" value="4.7 RC"/>
-
-    <property name="build.configuration" value="Release"/>
     
     <property name="docs.dir" value="${root.dir}\docs" />
 
