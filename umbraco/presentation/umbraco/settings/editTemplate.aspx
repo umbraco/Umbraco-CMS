@@ -38,6 +38,8 @@
 
             jQuery("#splitButtonMacro").appendTo("#splitButtonMacroPlaceHolder");
 
+            
+
 
             jQuery(".macro").click(function(){
             
@@ -53,6 +55,69 @@
                 }
             });
 
+            //hack for the dropdown scrill
+            jQuery("<div id='mcontainer'><div id='innerc' style='position:relative;'><div></div>").appendTo("#macroMenu");
+
+            jQuery(".macro").each(function(){
+
+                jQuery("#innerc").append(this);
+            });
+
+
+           //only needed when we need to add scroll to macro menu
+           var maxHeight = 500;
+           var menu = jQuery("#macroMenu");
+           var container = jQuery("#mcontainer");
+           var menuHeight = menu.height();
+
+     
+
+           if (menuHeight > maxHeight) {
+
+                jQuery("<div id='showmore' style='clear:both;text-align: center;cursor:pointer;'>More</div>").appendTo("#macroMenu");
+                
+                menu.css({
+                    height: maxHeight,
+                    overflow: "hidden"
+                })
+
+                container.css({
+                     height: maxHeight - 20,
+                     overflow: "hidden"
+                });
+
+                var interval;
+                jQuery("#showmore").hover(function(e) {
+                    
+                   
+
+                    interval = setInterval(function() {
+                        
+                        var offset = jQuery("#innerc").offset();
+                        var currentTop = jQuery("#innerc").css("top").replace("px","");
+                     
+
+                        if(Number(currentTop) > -(menuHeight - 40))
+                        {
+                           
+                            
+
+                            jQuery("#innerc").css("top", currentTop -20);
+                        }
+                    }, 125);
+
+                }, function() {
+
+                    clearInterval(interval);
+
+                });
+
+
+                jQuery("#splitButtonMacro").hover(function(e) {
+                    jQuery("#innerc").css("top", 0)
+                });
+
+           }
 
             //razor macro split button
             jQuery('#sb').splitbutton({menu:'#codeTemplateMenu'});
@@ -217,7 +282,7 @@
 
 
     <div id="codeTemplateMenu" style="width:220px;">
-
+       
         <asp:Repeater ID="rpt_codeTemplates" runat="server">
             <ItemTemplate>
                     <div class="codeTemplate" rel="<%# DataBinder.Eval(Container, "DataItem.Key") %>">
@@ -225,7 +290,7 @@
                     </div>                         
             </ItemTemplate>
         </asp:Repeater>
-       
+
     </div>
 
     <div id="splitButtonMacro" style="display:inline;height:23px;vertical-align:top;">
@@ -235,6 +300,7 @@
     </div>
 
     <div id="macroMenu" style="width:220px">
+       
          <asp:Repeater ID="rpt_macros" runat="server">
             <ItemTemplate>
                 <div class="macro" rel="<%# DataBinder.Eval(Container, "DataItem.macroAlias")%>" params="<%#  DoesMacroHaveSettings(DataBinder.Eval(Container, "DataItem.id").ToString()) %>">
@@ -242,6 +308,7 @@
                 </div>
             </ItemTemplate>
          </asp:Repeater>
+        
     </div>
 </asp:Content>
 
