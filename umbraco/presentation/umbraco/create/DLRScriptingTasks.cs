@@ -81,7 +81,7 @@ namespace umbraco
             if (fileName.Contains("/")) //if there's a / create the folder structure for it
             {
                 string[] folders = fileName.Split("/".ToCharArray());
-                string basePath = IOHelper.MapPath(SystemDirectories.Python);
+                string basePath = IOHelper.MapPath(SystemDirectories.MacroScripts);
                 for (int i = 0; i < folders.Length - 1; i++)
                 {
                     basePath = System.IO.Path.Combine(basePath, folders[i]);
@@ -89,7 +89,7 @@ namespace umbraco
                 }
             }
 
-            string abFileName = IOHelper.MapPath(SystemDirectories.Python + "/" + fileName);
+            string abFileName = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + fileName);
 
             System.IO.StreamWriter scriptWriter = System.IO.File.CreateText(abFileName);
             scriptWriter.Write(scriptContent);
@@ -111,7 +111,7 @@ namespace umbraco
         public bool Delete()
         {
 
-            string path = IOHelper.MapPath(SystemDirectories.Python + "/" + Alias.TrimStart('/'));
+            string path = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + Alias.TrimStart('/'));
 
             System.Web.HttpContext.Current.Trace.Warn("", "*" + path + "*");
             try

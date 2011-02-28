@@ -1062,7 +1062,7 @@ namespace umbraco
             }
             else
             {
-                string path = IOHelper.MapPath(SystemDirectories.Python + "/" + macro.ScriptName);
+                string path = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + macro.ScriptName);
                 IMacroEngine engine = MacroEngineFactory.GetByFilename(path);
                 ret.Text = engine.Execute(macro, Node.GetCurrent());
             }

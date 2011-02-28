@@ -205,7 +205,7 @@ namespace umbraco.cms.presentation.developer
         private void populatePythonFiles()
         {
             ArrayList pythons = new ArrayList();
-            string pythonDir = IOHelper.MapPath(SystemDirectories.Python + "/");
+            string pythonDir = IOHelper.MapPath(SystemDirectories.MacroScripts + "/");
             getPythonFilesFromDir(pythonDir, pythonDir, pythons);
             pythonFiles.DataSource = pythons;
             pythonFiles.DataBind();

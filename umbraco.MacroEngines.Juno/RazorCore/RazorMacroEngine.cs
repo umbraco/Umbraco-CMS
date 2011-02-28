@@ -96,7 +96,7 @@ namespace umbraco.MacroEngines
                 if (macro.ScriptName.StartsWith("~"))
                     fileLocation = macro.ScriptName;
                 else
-                    fileLocation = SystemDirectories.Python + "/" + macro.ScriptName;
+                    fileLocation = SystemDirectories.MacroScripts + "/" + macro.ScriptName;
             } else if (!string.IsNullOrEmpty(macro.ScriptCode) && !string.IsNullOrEmpty(macro.ScriptLanguage)) {
                 //Inline Razor Syntax
                 fileLocation = CreateInlineRazorFile(macro.ScriptCode, macro.ScriptLanguage);
