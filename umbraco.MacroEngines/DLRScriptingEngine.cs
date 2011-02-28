@@ -40,7 +40,7 @@ namespace umbraco.MacroEngines.Legacy
             }
             mse.ScriptVariables = vars;
 
-            return mse.ExecuteFile(IOHelper.MapPath(SystemDirectories.Python + "/" + macro.ScriptName));
+            return mse.ExecuteFile(IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + macro.ScriptName));
         }
     }
 }
