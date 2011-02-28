@@ -205,20 +205,21 @@ namespace umbraco.MacroEngines
         {
 
             var name = binder.Name;
+            result = null; //this will never be returned
 
             if (name == "ChildrenAsList" || name == "Children")
             {
                 result = GetChildrenAsList;
                 return true;
             }
-
+            bool propertyExists = false;
             if (n != null)
             {
-                var data = n.GetProperty(name);
+                var data = n.GetProperty(name, out propertyExists);
                 // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
-                if (data == null && name.Substring(0, 1).ToUpper() == name.Substring(0, 1))
+                if (data == null && name.Substring(0, 1).ToUpper() == name.Substring(0, 1) && !propertyExists)
                 {
-                    data = n.GetProperty(name.Substring(0, 1).ToLower() + name.Substring((1)));
+                    data = n.GetProperty(name.Substring(0, 1).ToLower() + name.Substring((1)), out propertyExists);
                 }
 
                 if (data != null)
@@ -265,10 +266,17 @@ namespace umbraco.MacroEngines
 
             //if property access, type lookup and member invoke all failed
             //at this point, we're going to return null
-            //instead, we return an empty list
+            //instead, we return a DynamicNull - see comments in that file
             //this will let things like Model.ChildItem work and return nothing instead of crashing
-            result = new DynamicNodeList(new List<INode>());
-            //changed this to a return true because it breaks testing when using .Children().Random().propertyName
+            if (!propertyExists && result == null)
+            {
+                //.Where explictly checks for this type
+                //and will make it false
+                //which means backwards equality (&& property != true) will pass
+                //forwwards equality (&& property or && property == true) will fail
+                result = new DynamicNull();
+                return true;
+            }
             return true;
         }
 
@@ -281,7 +289,7 @@ namespace umbraco.MacroEngines
             if (dataType == DATATYPE_YESNO_GUID)
             {
                 bool parseResult;
-                if (result.ToString() == "") result = "0";
+                if (string.Format("{0}", result) == "") result = "0";
                 if (Boolean.TryParse(result.ToString().Replace("1", "true").Replace("0", "false"), out parseResult))
                 {
                     result = parseResult;

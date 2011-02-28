@@ -22,7 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StandardConfig", "StandardC
 		config templates\umbraco.config = config templates\umbraco.config
 		config templates\config\umbracoSettings.config = config templates\config\umbracoSettings.config
 		config templates\config\UrlRewriting.config = config templates\config\UrlRewriting.config
-		config templates\web.config = config templates\web.config
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Packages", "Packages", "{5BB61485-B480-4A03-A8DD-1636A5AF575C}"
