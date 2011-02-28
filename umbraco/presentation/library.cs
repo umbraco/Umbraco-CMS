@@ -121,7 +121,7 @@ namespace umbraco
         {
             try
             {
-                string path = IOHelper.MapPath(SystemDirectories.Python + "/" + file);
+                string path = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + file);
                 object res = python.executeFile(path);
                 return res.ToString();
             }

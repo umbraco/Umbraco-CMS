@@ -77,11 +77,24 @@ namespace umbraco.IO
             }
         }
 
+        [Obsolete("Please use MacroScripts instead!", true)]
         public static string Python
         {
             get
             {
-                return IOHelper.returnPath("umbracoPythonPath", "~/python");
+                return MacroScripts;
+            }
+        }
+
+        public static string MacroScripts
+        {
+            get
+            {
+                // for legacy we test for the python path first, but else we use the new default location
+                string tempPath = IOHelper.returnPath("umbracoPythonPath", "") == String.Empty
+                                      ? IOHelper.returnPath("umbracoMacroScriptPath", "~/macroScripts")
+                                      : IOHelper.returnPath("umbracoPythonPath", "~/python");
+                return tempPath;
             }
         }
 

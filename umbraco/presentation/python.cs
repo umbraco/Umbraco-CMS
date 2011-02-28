@@ -43,7 +43,7 @@ namespace umbraco.scripting
             Engine.AddToPath(path);
 
 			// Add umbracos python folder to python's path
-            path = IOHelper.MapPath(SystemDirectories.Python);
+            path = IOHelper.MapPath(SystemDirectories.MacroScripts);
 			Engine.AddToPath(path);
 
             // execute the site.py to do all the initial stuff
@@ -58,7 +58,7 @@ namespace umbraco.scripting
 		private static void loadScripts()
 		{
 			scripts = new System.Collections.Hashtable();
-            string path = IOHelper.MapPath(SystemDirectories.Python);
+            string path = IOHelper.MapPath(SystemDirectories.MacroScripts);
 			System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(path);
 			foreach (System.IO.FileInfo f in dir.GetFiles("*.py"))
 			{
