@@ -1471,7 +1471,7 @@ namespace System.Linq.Dynamic
                      Expression.IfThen(
                         Expression.TypeEqual(result, typeof(DynamicNull)),
                         Expression.Assign(result,
-                            Expression.Constant(true, typeof(object))
+                            Expression.Constant(false, typeof(object))
                         )
                      ),
                      Expression.Return(blockReturnLabel, result),
