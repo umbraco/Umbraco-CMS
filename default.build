@@ -24,7 +24,7 @@
     <property name="WebPiAssets.dir" value="${root.dir}\config templates\WebPi" />
     
     
-    <property name="build.version" value="4.6.2 Beta"/>
+    <property name="build.version" value="4.7 RC"/>
 
     <property name="build.configuration" value="Release"/>
     
@@ -129,14 +129,20 @@
     <!-- setup symbol files -->
     <mkdir dir="${build.symbolFiles.dir}" />
 
-    <copy todir="${build.symbolFiles.dir}">
+    <copy todir="${build.symbolFiles.dir}" flatten="true">
       <fileset basedir="${build.dir}\bin">
         <include name="*.xml" />
         <include name="*.pdb" />
       </fileset>
     </copy>
 
-    <copy todir="${build.symbolFiles.dir}">
+    <copy todir="${build.symbolFiles.dir}" flatten="true">
+      <fileset basedir="${root.dir}\umbraco" >
+        <include name="**/*.pdb" />
+      </fileset>
+    </copy>
+    
+    <copy todir="${build.symbolFiles.dir}" flatten="true">
       <fileset basedir="${docs.dir}">
         <include name="*.xml" />
       </fileset>
