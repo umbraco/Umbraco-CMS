@@ -64,6 +64,7 @@
     <Compile Include="RazorDynamicNode\DynamicMediaList.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeList.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeWalker.cs" />
+    <Compile Include="RazorDynamicNode\DynamicNull.cs" />
     <Compile Include="RazorDynamicNode\DynamicQueryable.cs" />
     <Compile Include="RazorDynamicNode\DynamicXml.cs" />
     <Compile Include="RazorDynamicNode\ExtensionMethodFinder.cs" />

@@ -1921,6 +1921,7 @@
     <Content Include="umbraco\xslt\templates\Schema2\RSSFeed.xslt" />
     <Content Include="umbraco\xslt\templates\Schema2\Sitemap.xslt" />
     <Content Include="umbraco\xslt\templates\Schema2\TablePrototype.xslt" />
+    <Content Include="web.config.ssaolap01.xslt" />
     <Content Include="web.config.UMBRACOELISE.xslt">
       <SubType>Designer</SubType>
     </Content>
