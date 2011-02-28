@@ -14,7 +14,11 @@
     <property name="public.dir" value="D:\inetpub\wwwroot\nightlies\umbraco 4.6" />
     <property name="root.dir" value="${directory::get-current-directory()}" />
     <property name="source.dir" value="${root.dir}\umbraco\presentation" />
+    
     <property name="build.dir" value="${root.dir}\build" />
+    <property name="build.symbolFiles.dir" value="${root.dir}\SymbolFiles" />
+    <property name="build.macroEnginesIron.dir" value="${root.dir}\umbraco.macroEngines.Iron_build" />
+  
     <property name="dlls.dir" value="${root.dir}\foreign dlls" />
 
     <property name="WebPiAssets.dir" value="${root.dir}\config templates\WebPi" />
@@ -41,8 +45,7 @@
 
     <!-- YUI -->
     <property name="YUICompressor.dir" value="D:\inetpub\wwwroot\ccnet\buildTools\YUI" />
-
-
+  
     <!-- Build source -->
     <target name="build" depends="init">
 
@@ -84,8 +87,53 @@
             <arg value="/p:ToolsVersion=4.0" />
             <arg value="/p:Configuration=${build.configuration}" />
         </exec>
+
+      <call target="buildMacroEnginesIron" />
+
+      <call target="buildSymbolFiles" />
+      
 	</target>
 
+
+  <target name="buildMacroEnginesIron">
+
+    <mkdir dir="${build.macroEnginesIron.dir}" />
+    <mkdir dir="${build.macroEnginesIron.dir}\bin" />
+
+    <copy todir="${build.macroEnginesIron.dir}\bin" overwrite="true">
+      <fileset basedir="${dlls.dir}\DLR 4.0">
+        <include name="*.dll" />
+        <exclude name="Microsoft.Scripting.ExtensionAttribute.dll" />
+      </fileset>
+    </copy>
+
+    <copy file="${root.dir}\umbraco.MacroEngines.Iron\bin\${build.configuration}\umbraco.MacroEngines.Iron.dll" tofile="${build.macroEnginesIron.dir}\bin\umbraco.MacroEngines.Iron.dll" failonerror="false" overwrite="true"/>
+    
+  </target>
+
+
+  <target name="buildSymbolFiles">
+
+    <!-- setup symbol files -->
+    <mkdir dir="${build.symbolFiles.dir}" />
+
+    <copy todir="${build.symbolFiles.dir}">
+      <fileset basedir="${build.dir}\bin">
+        <include name="*.xml" />
+        <include name="*.pdb" />
+      </fileset>
+    </copy>
+
+    <copy todir="${build.symbolFiles.dir}">
+      <fileset basedir="${docs.dir}">
+        <include name="*.xml" />
+      </fileset>
+    </copy>
+    
+  </target>  
+  
+  
+  
 
     <!-- Directories and files -->
     <target name="directories" depends="build">
@@ -108,13 +156,15 @@
             </fileset>
         </delete>
                 
+      <!--
         <copy todir="${build.dir}\bin" overwrite="true">
             <fileset basedir="${dlls.dir}\DLR 4.0">
                 <include name="*.dll" />
                 <exclude name="Microsoft.Scripting.ExtensionAttribute.dll" />
             </fileset>
         </copy>
-        
+        -->
+      
         <!--standard web.config-->
         <copy file="${root.dir}\config templates\web.config" tofile="${build.dir}\web.config" failonerror="false" overwrite="true"/>
 
@@ -133,13 +183,14 @@
         <copy file="${root.dir}\config templates\config\ClientDependency.config" tofile="${build.dir}\config\ClientDependency.config" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\config templates\config\ExamineSettings.config" tofile="${build.dir}\config\ExamineSettings.config" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\config templates\config\ExamineIndex.config" tofile="${build.dir}\config\ExamineIndex.config" failonerror="false" overwrite="true"/>
+        
         <copy file="${root.dir}\config templates\config\scripting.config" tofile="${build.dir}\config\scripting.config" failonerror="false" overwrite="true"/>
                 
         
         <!-- Macro engines files + razor Files -->
         <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\${build.configuration}\umbraco.MacroEngines.dll" tofile="${build.dir}\bin\umbraco.MacroEngines.dll" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\${build.configuration}\umbraco.MacroEngines.pdb" tofile="${build.dir}\bin\umbraco.MacroEngines.pdb" failonerror="false" overwrite="true"/>
-		<copy todir="${build.dir}\bin" overwrite="true">
+		    <copy todir="${build.dir}\bin" overwrite="true">
             <fileset basedir="${dlls.dir}\WebPages">
                 <include name="*.dll" />
             </fileset>
@@ -234,33 +285,6 @@
 
     
 
-    <!-- Minify -->
-    <target name="minify" description="minify JS files" depends="directories">
-        <fileset basedir="${build.dir}" id="jsFileSet">
-            <include name="umbraco/css/*.css"/>
-            <include name="umbraco/js/**/*.js"/>
-
-            <include name="umbraco_client/**/*.js"/>
-            <include name="umbraco_client/**/*.css"/>
-        </fileset>
-
-        <property name="js_files" value=""/>
-        <foreach item="File" property="file">
-            <in>
-                <items refid="jsFileSet"/>
-            </in>
-            <do>
-                <exec program="java" workingdir="${YUICompressor.dir}" failonerror="false">
-                    <arg value="-jar" />
-                    <arg value="yuicompressor.jar" />
-                    <arg value="-o" />
-                    <arg value="${file}.min" />
-                    <arg value="${file}" />
-                </exec>
-                <move file="${file}.min" tofile="${file}" overwrite="true" failonerror="false"/>
-            </do>
-        </foreach>
-    </target>
 
     <!-- Documentation -->
     <target name="documentation" depends="directories">
@@ -348,15 +372,34 @@
                 <include name="build/**/*" />
             </fileset>
         </zip>
+
+      <zip zipfile="${root.dir}\SymbolFiles.zip" includeemptydirs="true" >
+        <fileset basedir="${root.dir}">
+          <include name="SymbolFiles/*" />
+          <include name="SymbolFiles/**/*" />
+        </fileset>
+      </zip>
+
+      <zip zipfile="${root.dir}\Umbraco.MacroEngines.Iron.zip" includeemptydirs="true" >
+        <fileset basedir="${root.dir}">
+          <include name="umbraco.macroEngines.Iron_build/*" />
+          <include name="umbraco.macroEngines.Iron_build/**/*" />
+        </fileset>
+      </zip>
     </target>
 
+  
     <!-- do a nightly build without the minification and docs -->
     <target name="nightly" depends="zip">
         <property name="assembly.name" value="${ assemblyname::get-version( assemblyname::get-assembly-name('umbraco/presentation/bin/umbraco.dll') ) }"/>
         <property name="release.filename" value="${root.dir}\build_${build.version}_${assembly.name}.zip" />
 
         <mkdir dir="${public.dir}\${build.version}" />
+        
         <copy file="${release.filename}" tofile="${public.dir}\${build.version}\${assembly.name}.zip" />
+        <copy file="${root.dir}\Umbraco.MacroEngines.Iron.zip" tofile="${public.dir}\${build.version}\Umbraco.MacroEngines.Iron.zip" />
+        <copy file="${root.dir}\SymbolFiles.zip" tofile="${public.dir}\${build.version}\SymbolFiles.zip" />
+      
     </target>
 
     <!-- will produce the a clean /build folder and nothing else-->
