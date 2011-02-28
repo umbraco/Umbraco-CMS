@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Web;
 using umbraco.interfaces;
 using System.Collections;
 using System.Reflection;
@@ -19,6 +20,12 @@ namespace umbraco.MacroEngines
 {
     public class DynamicNode : DynamicObject
     {
+        #region consts
+        // these are private readonlys as const can't be Guids
+        private readonly Guid DATATYPE_YESNO_GUID = new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a");
+        private readonly Guid DATATYPE_TINYMCE_GUID = new Guid("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
+        #endregion
+
         internal DynamicNodeList ownerList;
 
         internal readonly INode n;
@@ -170,7 +177,30 @@ namespace umbraco.MacroEngines
                 throw new NullReferenceException("DynamicNode wasn't initialized with an underlying NodeFactory.Node");
             }
         }
-
+        public bool HasProperty(string name)
+        {
+            if (n != null)
+            {
+                try
+                {
+                    IProperty prop = n.GetProperty(name);
+                    if (prop == null)
+                    {
+                        // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
+                        if (prop == null && name.Substring(0, 1).ToUpper() == name.Substring(0, 1))
+                        {
+                            prop = n.GetProperty(name.Substring(0, 1).ToLower() + name.Substring((1)));
+                        }
+                    }
+                    return (prop != null);
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
 
@@ -246,10 +276,9 @@ namespace umbraco.MacroEngines
         {
             //the resulting property is a string, but to support some of the nice linq stuff in .Where
             //we should really check some more types
-            umbraco.editorControls.yesno.YesNoDataType yesnoType = new editorControls.yesno.YesNoDataType();
 
             //boolean
-            if (dataType == yesnoType.Id)
+            if (dataType == DATATYPE_YESNO_GUID)
             {
                 bool parseResult;
                 if (result.ToString() == "") result = "0";
@@ -283,6 +312,13 @@ namespace umbraco.MacroEngines
                 result = dtResult;
                 return true;
             }
+
+            // Rich text editor (return IHtmlString so devs doesn't need to decode html
+            if (dataType == DATATYPE_TINYMCE_GUID)
+            {
+                result = new HtmlString(result.ToString());
+            }
+
 
             if (string.Equals("true", string.Format("{0}", result), StringComparison.CurrentCultureIgnoreCase))
             {
@@ -447,6 +483,14 @@ namespace umbraco.MacroEngines
         {
             return AncestorOrSelf(node => node.Level == 1);
         }
+        public DynamicNode AncestorOrSelf(int level)
+        {
+            return AncestorOrSelf(node => node.Level == level);
+        }
+        public DynamicNode AncestorOrSelf(string nodeTypeAlias)
+        {
+            return AncestorOrSelf(node => node.NodeTypeAlias == nodeTypeAlias);
+        }
         public DynamicNode AncestorOrSelf(Func<DynamicNode, bool> func)
         {
             var node = this;
@@ -473,27 +517,23 @@ namespace umbraco.MacroEngines
 
             return node;
         }
-        public DynamicNodeList AncestorsOrSelf
+        public DynamicNodeList AncestorsOrSelf(Func<DynamicNode, bool> func)
         {
-            get
+            List<DynamicNode> ancestorList = new List<DynamicNode>();
+            var node = this;
+            ancestorList.Add(node);
+            while (node != null)
             {
-                List<DynamicNode> ancestorList = new List<DynamicNode>();
-                var node = this;
-                ancestorList.Add(node);
-                while (node != null)
+                if (node.Level == 1) break;
+                DynamicNode parent = node.Parent;
+                if (parent != null)
                 {
-                    if (node.Level == 1) break;
-                    DynamicNode parent = node.Parent;
-                    if (parent != null)
+                    if (this != parent)
                     {
-                        if (this != parent)
+                        node = parent;
+                        if (func(node))
                         {
-                            node = parent;
                             ancestorList.Add(node);
-                        }
-                        else
-                        {
-                            break;
                         }
                     }
                     else
@@ -501,42 +541,111 @@ namespace umbraco.MacroEngines
                         break;
                     }
                 }
-                ancestorList.Reverse();
-                return new DynamicNodeList(ancestorList);
-            }
-        }
-        public DynamicNodeList Descendants
-        {
-            get
-            {
-                var flattenedNodes = this.n.ChildrenAsList.Map(p => true, (INode n) => { return n.ChildrenAsList; });
-                return new DynamicNodeList(flattenedNodes.ToList().ConvertAll(iNode => new DynamicNode(iNode)));
-            }
-        }
-        public DynamicNodeList DescendantsOrSelf
-        {
-            get
-            {
-
-                if (this.n != null)
+                else
                 {
-                    var thisNode = new List<INode>();
-                    thisNode.Add(this.n);
-                    var flattenedNodes = this.n.ChildrenAsList.Map(p => true, (INode n) => { return n.ChildrenAsList; });
-                    return new DynamicNodeList(thisNode.Concat(flattenedNodes).ToList().ConvertAll(iNode => new DynamicNode(iNode)));
+                    break;
                 }
-                return new DynamicNodeList(new List<INode>());
             }
+            ancestorList.Reverse();
+            return new DynamicNodeList(ancestorList);
         }
-
-
-        public DynamicNodeList Ancestors
+        public DynamicNodeList AncestorsOrSelf()
         {
-            get
+            return AncestorsOrSelf(n => true);
+        }
+        public DynamicNodeList AncestorsOrSelf(string nodeTypeAlias)
+        {
+            return AncestorsOrSelf(n => n.NodeTypeAlias == nodeTypeAlias);
+        }
+        public DynamicNodeList AncestorsOrSelf(int level)
+        {
+            return AncestorsOrSelf(n => n.Level <= level);
+        }
+        public DynamicNodeList Descendants(string nodeTypeAlias)
+        {
+            return Descendants(p => p.NodeTypeAlias == nodeTypeAlias);
+        }
+        public DynamicNodeList Descendants(int level)
+        {
+            return Descendants(p => p.Level >= level);
+        }
+        public DynamicNodeList Descendants()
+        {
+            return Descendants(n => true);
+        }
+        public DynamicNodeList Descendants(Func<INode, bool> func)
+        {
+            var flattenedNodes = this.n.ChildrenAsList.Map(func, (INode n) => { return n.ChildrenAsList; });
+            return new DynamicNodeList(flattenedNodes.ToList().ConvertAll(iNode => new DynamicNode(iNode)));
+        }
+        public DynamicNodeList DescendantsOrSelf(int level)
+        {
+            return DescendantsOrSelf(p => p.Level >= level);
+        }
+        public DynamicNodeList DescendantsOrSelf(string nodeTypeAlias)
+        {
+            return DescendantsOrSelf(p => p.NodeTypeAlias == nodeTypeAlias);
+        }
+        public DynamicNodeList DescendantsOrSelf()
+        {
+            return DescendantsOrSelf(p => true);
+        }
+        public DynamicNodeList DescendantsOrSelf(Func<INode, bool> func)
+        {
+            if (this.n != null)
             {
-                DynamicNodeList innerList = AncestorsOrSelf;
-                return new DynamicNodeList(innerList.Items.Skip(1));
+                var thisNode = new List<INode>();
+                if (func(this.n))
+                {
+                    thisNode.Add(this.n);
+                }
+                var flattenedNodes = this.n.ChildrenAsList.Map(func, (INode n) => { return n.ChildrenAsList; });
+                return new DynamicNodeList(thisNode.Concat(flattenedNodes).ToList().ConvertAll(iNode => new DynamicNode(iNode)));
             }
+            return new DynamicNodeList(new List<INode>());
+        }
+        public DynamicNodeList Ancestors(int level)
+        {
+            return Ancestors(n => n.Level == level);
+        }
+        public DynamicNodeList Ancestors(string nodeTypeAlias)
+        {
+            return Ancestors(n => n.NodeTypeAlias == nodeTypeAlias);
+        }
+        public DynamicNodeList Ancestors()
+        {
+            return Ancestors(n => true);
+        }
+        public DynamicNodeList Ancestors(Func<DynamicNode, bool> func)
+        {
+            List<DynamicNode> ancestorList = new List<DynamicNode>();
+            var node = this;
+            while (node != null)
+            {
+                if (node.Level == 1) break;
+                DynamicNode parent = node.Parent;
+                if (parent != null)
+                {
+                    if (this != parent)
+                    {
+                        node = parent;
+                        if (func(node))
+                        {
+                            ancestorList.Add(node);
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+            ancestorList.Reverse();
+            return new DynamicNodeList(ancestorList);
         }
         public DynamicNode Parent
         {
@@ -569,6 +678,17 @@ namespace umbraco.MacroEngines
         {
             return new DynamicNode(Id);
         }
+        public DynamicNodeList NodeById(List<object> Ids)
+        {
+            List<DynamicNode> nodes = new List<DynamicNode>();
+            foreach (object eachId in Ids)
+                nodes.Add(new DynamicNode(eachId));
+            return new DynamicNodeList(nodes);
+        }
+        public DynamicNodeList NodeById(params object[] Ids)
+        {
+            return NodeById(Ids.ToList());
+        }
         public DynamicMedia MediaById(int Id)
         {
             return new DynamicMedia(Id);
@@ -580,6 +700,17 @@ namespace umbraco.MacroEngines
         public DynamicMedia MediaById(object Id)
         {
             return new DynamicMedia(Id);
+        }
+        public DynamicMediaList MediaById(List<object> Ids)
+        {
+            List<DynamicMedia> nodes = new List<DynamicMedia>();
+            foreach (object eachId in Ids)
+                nodes.Add(new DynamicMedia(eachId));
+            return new DynamicMediaList(nodes);
+        }
+        public DynamicMediaList MediaById(params object[] Ids)
+        {
+            return MediaById(Ids.ToList());
         }
         public int Id
         {

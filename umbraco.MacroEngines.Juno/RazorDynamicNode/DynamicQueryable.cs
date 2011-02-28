@@ -35,24 +35,31 @@ namespace System.Linq.Dynamic
                     object value = -1;
                     //value = func(node);
                     //I can't figure out why this is double func<>'d
-                    var firstFuncResult = func(node);
-                    if (firstFuncResult is Func<DynamicNode, object>)
+                    try
                     {
-                        value = (firstFuncResult as Func<DynamicNode, object>)(node);
+                        var firstFuncResult = func(node);
+                        if (firstFuncResult is Func<DynamicNode, object>)
+                        {
+                            value = (firstFuncResult as Func<DynamicNode, object>)(node);
+                        }
+                        if (firstFuncResult is Func<DynamicNode, bool>)
+                        {
+                            value = (firstFuncResult as Func<DynamicNode, bool>)(node);
+                        }
+                        if (firstFuncResult is bool)
+                        {
+                            return (bool)firstFuncResult;
+                        }
+                        if (value is bool)
+                        {
+                            return (bool)value;
+                        }
+                        return false;
                     }
-                    if (firstFuncResult is Func<DynamicNode, bool>)
+                    catch (Exception)
                     {
-                        value = (firstFuncResult as Func<DynamicNode, bool>)(node);
+                        return false;
                     }
-                    if (firstFuncResult is bool)
-                    {
-                        return (bool)firstFuncResult;
-                    }
-                    if (value is bool)
-                    {
-                        return (bool)value;
-                    }
-                    return false;
                 }).AsQueryable();
             }
             else
@@ -1380,9 +1387,41 @@ namespace System.Linq.Dynamic
                 }
                 Expression[] args = ParseArgumentList();
                 MethodBase mb;
+                LambdaExpression instanceAsString = null;
+                ParameterExpression instanceExpression = Expression.Parameter(typeof(DynamicNode), "instance");
+                if (type.IsGenericType && type != typeof(string))
+                {
+                    var typeArgs = type.GetGenericArguments();
+                    if (typeArgs[0] == typeof(DynamicNode))
+                    {
+                        if (instance != null && instance is LambdaExpression)
+                        {
+                            if (typeArgs[1] == typeof(object))
+                            {
+                                instanceAsString = StringFormat(instance as LambdaExpression, instanceExpression);
+                                type = typeof(string);
+                            }
+                            if (typeArgs[1] == typeof(string))
+                            {
+                                instanceAsString = instance as LambdaExpression;
+                                type = typeof(string);
+                            }
+                        }
+                    }
+                }
                 switch (FindMethod(type, id, instance == null, args, out mb))
                 {
                     case 0:
+                        //not found
+                        if (type == typeof(string) && instanceAsString != null)
+                        {
+                            Expression[] newArgs = (new List<Expression>() { Expression.Invoke(instanceAsString, instanceExpression) }).Concat(args).ToArray();
+                            mb = ExtensionMethodFinder.FindExtensionMethod(typeof(string), newArgs, id);
+                            if (mb != null)
+                            {
+                                return CallMethodOnDynamicNode(instance, newArgs, instanceAsString, instanceExpression, (MethodInfo)mb, true);
+                            }
+                        }
                         throw ParseError(errorPos, Res.NoApplicableMethod,
                             id, GetTypeName(type));
                     case 1:
@@ -1392,6 +1431,10 @@ namespace System.Linq.Dynamic
                         if (method.ReturnType == typeof(void))
                             throw ParseError(errorPos, Res.MethodIsVoid,
                                 id, GetTypeName(method.DeclaringType));
+                        if (instanceAsString != null)
+                        {
+                            return CallMethodOnDynamicNode(instance, args, instanceAsString, instanceExpression, method, false);
+                        }
                         return Expression.Call(instance, (MethodInfo)method, args);
                     default:
                         throw ParseError(errorPos, Res.AmbiguousMethodInvocation,
@@ -1441,6 +1484,49 @@ namespace System.Linq.Dynamic
             }
         }
 
+        private static Expression CallMethodOnDynamicNode(Expression instance, Expression[] args, LambdaExpression instanceAsString, ParameterExpression instanceExpression, MethodInfo method, bool isStatic)
+        {
+            ConstantExpression defaultReturnValue = Expression.Constant(null, typeof(object));
+            Type methodReturnType = method.ReturnType;
+            switch (methodReturnType.Name)
+            {
+                case "String":
+                    defaultReturnValue = Expression.Constant(null, typeof(string));
+                    break;
+                case "Int32":
+                    defaultReturnValue = Expression.Constant(0, typeof(int));
+                    break;
+                case "Boolean":
+                    defaultReturnValue = Expression.Constant(false, typeof(bool));
+                    break;
+            }
+            ParameterExpression result = Expression.Parameter(method.ReturnType, "result");
+            LabelTarget blockReturnLabel = Expression.Label(method.ReturnType);
+            BlockExpression block = Expression.Block(
+             method.ReturnType,
+             new[] { result },
+                Expression.Assign(result,
+                        Expression.Call(
+                            isStatic ? null : Expression.Invoke(instanceAsString, instanceExpression),
+                            method,
+                            args)
+                    ),
+             Expression.Return(blockReturnLabel, result),
+             Expression.Label(blockReturnLabel, defaultReturnValue)
+             );
+
+            switch (methodReturnType.Name)
+            {
+                case "String":
+                    return Expression.Lambda<Func<DynamicNode, string>>(block, instanceExpression);
+                case "Int32":
+                    return Expression.Lambda<Func<DynamicNode, int>>(block, instanceExpression);
+                case "Boolean":
+                    return Expression.Lambda<Func<DynamicNode, bool>>(block, instanceExpression);
+            }
+            return Expression.Call(instance, (MethodInfo)method, args);
+        }
+
         static Type FindGenericType(Type generic, Type type)
         {
             while (type != null && type != typeof(object))
@@ -1458,7 +1544,27 @@ namespace System.Linq.Dynamic
             }
             return null;
         }
+        LambdaExpression StringFormat(LambdaExpression lax, ParameterExpression instanceExpression)
+        {
+            ParameterExpression cresult = Expression.Parameter(typeof(string), "cresult");
+            ParameterExpression temp = Expression.Parameter(typeof(object), "temp");
+            ParameterExpression stemp = Expression.Parameter(typeof(string), "string");
+            LabelTarget cblockReturnLabel = Expression.Label(typeof(string));
 
+            MethodInfo stringFormat = typeof(string).GetMethod("Format", new Type[] { typeof(string), typeof(object) });
+            BlockExpression cblock = Expression.Block(
+                    typeof(string),
+                    new[] { cresult, temp },
+                    Expression.Assign(temp, Expression.Invoke(lax, instanceExpression)),
+                    Expression.Assign(cresult, Expression.Call(stringFormat, Expression.Constant("{0}"), temp)),
+                    Expression.Return(cblockReturnLabel, cresult),
+                    Expression.Label(cblockReturnLabel, Expression.Constant(null, typeof(string))));
+
+            LambdaExpression lax2 = Expression.Lambda<Func<DynamicNode, string>>(cblock, instanceExpression);
+            var expression = Expression.Lambda<Func<DynamicNode, string>>(cblock, instanceExpression);
+            return expression;
+
+        }
         Expression ParseAggregate(Expression instance, Type elementType, string methodName, int errorPos)
         {
             ParameterExpression outerIt = it;
@@ -2045,140 +2151,228 @@ namespace System.Linq.Dynamic
 
         private static Expression HandleDynamicNodeLambdas(ExpressionType expressionType, Expression left, Expression right)
         {
+            bool leftIsLambda = false, rightIsLambda = false;
             Expression innerLeft = null;
             Expression innerRight = null;
+            UnaryExpression unboxedLeft = null, unboxedRight = null;
             ParameterExpression[] parameters = null;
-            bool bothLambdas = false;
-            Type usualLambdaExpressionT = typeof(Func<DynamicNode, Boolean>);
-            if (left is LambdaExpression
-                &&
-                (
-                    (typeof(Func<DynamicNode, object>).IsAssignableFrom(((LambdaExpression)left).Type))
-                    ||
-                    (typeof(Func<DynamicNode, int>).IsAssignableFrom(((LambdaExpression)left).Type))
-                    ||
-                    (typeof(Func<DynamicNode, bool>).IsAssignableFrom(((LambdaExpression)left).Type))
-                    ))
+
+            if (left is LambdaExpression && (left as LambdaExpression).Type.GetGenericArguments().First() == typeof(DynamicNode))
             {
-                LambdaExpression leftLambda = (LambdaExpression)left;
-                var invokedExpr = Expression.Invoke(left, leftLambda.Parameters.Cast<Expression>());
+                leftIsLambda = true;
+            }
+
+            if (right is LambdaExpression && (right as LambdaExpression).Type.GetGenericArguments().First() == typeof(DynamicNode))
+            {
+                rightIsLambda = true;
+            }
+
+            if (leftIsLambda && !rightIsLambda)
+            {
+                parameters = new ParameterExpression[(left as LambdaExpression).Parameters.Count];
+                (left as LambdaExpression).Parameters.CopyTo(parameters, 0);
                 if (right is ConstantExpression)
                 {
+                    //left lambda, right constant
+                    var invokedExpr = Expression.Invoke(left, (left as LambdaExpression).Parameters.Cast<Expression>());
                     innerLeft = Expression.Convert(invokedExpr, (right as ConstantExpression).Type);
                 }
-                else
+                if (leftIsLambda && !rightIsLambda && right is MemberExpression)
                 {
-                    if (right is LambdaExpression)
-                    {
-                        //If the left hand side is also lambda, we'll have to use a switching expression tree for the conversion
-                        //handled in the check for right, because it occurs second
-                    }
+                    var invokedExpr = Expression.Invoke(left, (left as LambdaExpression).Parameters.Cast<Expression>());
+                    innerLeft = Expression.Convert(invokedExpr, (right as MemberExpression).Type);
                 }
-                parameters = new ParameterExpression[leftLambda.Parameters.Count];
-                leftLambda.Parameters.CopyTo(parameters, 0);
             }
-            if (right is LambdaExpression
-                &&
-                (
-                    (typeof(Func<DynamicNode, object>).IsAssignableFrom(((LambdaExpression)right).Type))
-                    ||
-                    (typeof(Func<DynamicNode, int>).IsAssignableFrom(((LambdaExpression)right).Type))
-                    ||
-                    (typeof(Func<DynamicNode, bool>).IsAssignableFrom(((LambdaExpression)right).Type))
-                    ))
+            if (rightIsLambda && !leftIsLambda)
             {
-                LambdaExpression rightLambda = (LambdaExpression)right;
-                var invokedExpr = Expression.Invoke(right, rightLambda.Parameters.Cast<Expression>());
+                parameters = new ParameterExpression[(right as LambdaExpression).Parameters.Count];
+                (right as LambdaExpression).Parameters.CopyTo(parameters, 0);
                 if (left is ConstantExpression)
                 {
+                    //right lambda, left constant
+                    var invokedExpr = Expression.Invoke(right, (right as LambdaExpression).Parameters.Cast<Expression>());
                     innerRight = Expression.Convert(invokedExpr, (left as ConstantExpression).Type);
-                    parameters = new ParameterExpression[rightLambda.Parameters.Count];
-                    rightLambda.Parameters.CopyTo(parameters, 0);
                 }
-                else
+                if (right is MemberExpression)
                 {
-                    if (left is LambdaExpression)
+                    var invokedExpr = Expression.Invoke(right, (right as LambdaExpression).Parameters.Cast<Expression>());
+                    innerRight = Expression.Convert(invokedExpr, (left as MemberExpression).Type);
+                }
+            }
+            bool sequenceEqual = false;
+            if (leftIsLambda && rightIsLambda)
+            {
+                {
+                    Type leftType = ((LambdaExpression)left).Type;
+                    Type rightType = ((LambdaExpression)right).Type;
+                    Type[] leftTypeGenericArguments = leftType.GetGenericArguments();
+                    Type[] rightTypeGenericArguments = rightType.GetGenericArguments();
+                    if (leftTypeGenericArguments.SequenceEqual(rightTypeGenericArguments))
                     {
-                        //both are lambda expressions
-                        if (((LambdaExpression)left).Type.IsAssignableFrom(((LambdaExpression)right).Type))
+                        sequenceEqual = true;
+                        if (leftTypeGenericArguments.Length == 2)
                         {
-                            //if both are Func<DynamicNode,bool> or Func<DynamicNode,object> or Func<DynamicNode,int>
-                            //get the TOut from the Func
-                            Type leftType = ((LambdaExpression)left).Type;
-                            Type rightType = ((LambdaExpression)right).Type;
-                            Type[] leftTypeGenericArguments = leftType.GetGenericArguments();
-                            Type[] rightTypeGenericArguments = rightType.GetGenericArguments();
-                            if (leftTypeGenericArguments.SequenceEqual(rightTypeGenericArguments))
+                            Type TOut = leftTypeGenericArguments[1];
+
+                            if (expressionType == ExpressionType.AndAlso)
                             {
-                                //both Lambdas should reduce down the same
-                                if (leftTypeGenericArguments.Length == 2)
+                                return PredicateBuilder.And<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, right as Expression<Func<DynamicNode, bool>>);
+                            }
+                            if (expressionType == ExpressionType.OrElse)
+                            {
+                                return PredicateBuilder.Or<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, right as Expression<Func<DynamicNode, bool>>);
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        if (leftTypeGenericArguments.Length == 2)
+                        {
+                            //sequence not equal - could be Func<DynamicNode,object> && Func<DynamicNode,bool>
+                            if (leftTypeGenericArguments.First() == rightTypeGenericArguments.First())
+                            {
+                                bool leftIsObject = leftTypeGenericArguments.ElementAt(1) == typeof(object);
+                                bool rightIsObject = rightTypeGenericArguments.ElementAt(1) == typeof(object);
+                                //if one is an object but not the other
+                                if (leftIsObject ^ rightIsObject)
                                 {
-                                    //get TOut (debugging - should be bool)
-                                    Type TOut = leftTypeGenericArguments[1];
-
-                                    if (expressionType == ExpressionType.AndAlso)
+                                    if (leftIsObject)
                                     {
-                                        return PredicateBuilder.And<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, right as Expression<Func<DynamicNode, bool>>);
+                                        //left side is object
+                                        if (innerLeft == null)
+                                        {
+                                            parameters = new ParameterExpression[(left as LambdaExpression).Parameters.Count];
+                                            (left as LambdaExpression).Parameters.CopyTo(parameters, 0);
+                                            innerLeft = Expression.Invoke(left, parameters);
+                                        }
+                                        unboxedLeft = Expression.Unbox(innerLeft, rightTypeGenericArguments.ElementAt(1));
+
+                                        //left is invoked and unboxed to right's TOut, right was not boxed
+                                        if (expressionType == ExpressionType.AndAlso)
+                                        {
+                                            return PredicateBuilder.And<DynamicNode>(right as Expression<Func<DynamicNode, bool>>, Expression.Lambda<Func<DynamicNode, bool>>(unboxedLeft, parameters) as Expression<Func<DynamicNode, bool>>);
+                                        }
+                                        if (expressionType == ExpressionType.OrElse)
+                                        {
+                                            return PredicateBuilder.And<DynamicNode>(right as Expression<Func<DynamicNode, bool>>, Expression.Lambda<Func<DynamicNode, bool>>(unboxedLeft, parameters) as Expression<Func<DynamicNode, bool>>);
+                                        }
                                     }
-                                    if (expressionType == ExpressionType.OrElse)
+                                    else
                                     {
-                                        return PredicateBuilder.Or<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, right as Expression<Func<DynamicNode, bool>>);
+                                        //right side is object
+                                        if (innerRight == null)
+                                        {
+                                            parameters = new ParameterExpression[(right as LambdaExpression).Parameters.Count];
+                                            (right as LambdaExpression).Parameters.CopyTo(parameters, 0);
+                                            innerRight = Expression.Invoke(right, parameters);
+                                        }
+                                        unboxedRight = Expression.Unbox(innerRight, leftTypeGenericArguments.ElementAt(1));
+
+                                        //right is invoked and unboxed to left's TOut, left was not boxed
+                                        if (expressionType == ExpressionType.AndAlso)
+                                        {
+                                            return PredicateBuilder.And<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, Expression.Lambda<Func<DynamicNode, bool>>(unboxedRight, parameters) as Expression<Func<DynamicNode, bool>>);
+                                        }
+                                        if (expressionType == ExpressionType.OrElse)
+                                        {
+                                            return PredicateBuilder.And<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, Expression.Lambda<Func<DynamicNode, bool>>(unboxedRight, parameters) as Expression<Func<DynamicNode, bool>>);
+                                        }
                                     }
 
-                                    bothLambdas = true;
                                 }
                             }
                         }
                     }
                 }
-
             }
 
-            //For some reason, this update doesn't actually update the expression even when left/right are clearly different
-            //to what the initialization left & right were
-            //it seemed to work for Expression.Equal but not Expression.NotEqual
-            //binaryExpr.Update(innerLeft ?? left, binaryExpr.Conversion, innerRight ?? right);
+            if (leftIsLambda && innerLeft == null)
+            {
+                //left is a lambda, but the right was an unhandled expression type
+                //!ConstantExpression, !MemberExpression
+                //make sure the left gets invoked
+                if (parameters == null)
+                {
+                    parameters = new ParameterExpression[(left as LambdaExpression).Parameters.Count];
+                    (left as LambdaExpression).Parameters.CopyTo(parameters, 0);
+                }
+                innerLeft = Expression.Invoke(left, parameters);
+            }
+            if (rightIsLambda && innerRight == null)
+            {
+                //right is a lambda, but the left was an unhandled expression type
+                //!ConstantExpression, !MemberExpression
+                //make sure the right gets invoked
+                if (parameters == null)
+                {
+                    parameters = new ParameterExpression[(right as LambdaExpression).Parameters.Count];
+                    (right as LambdaExpression).Parameters.CopyTo(parameters, 0);
+                }
+                innerRight = Expression.Invoke(right, parameters);
+            }
+            if (leftIsLambda && !rightIsLambda && innerLeft != null && !(innerLeft is UnaryExpression) && innerLeft.Type is object)
+            {
+                //innerLeft is an invoke
+                unboxedLeft = Expression.Unbox(innerLeft, right.Type);
+            }
+            if (rightIsLambda && !leftIsLambda && innerRight != null && !(innerRight is UnaryExpression) && innerRight.Type is object)
+            {
+                //innerRight is an invoke
+                unboxedRight = Expression.Unbox(innerRight, left.Type);
+            }
+
+            BinaryExpression binaryExpression = null;
+            var finalLeft = unboxedLeft ?? innerLeft ?? left;
+            var finalRight = unboxedRight ?? innerRight ?? right;
             switch (expressionType)
             {
                 case ExpressionType.Equal:
-                    return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.Equal(innerLeft ?? left, innerRight ?? right), parameters));
+                    binaryExpression = Expression.Equal(finalLeft, finalRight);
+                    break;
                 case ExpressionType.NotEqual:
-                    return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.NotEqual(innerLeft ?? left, innerRight ?? right), parameters));
+                    binaryExpression = Expression.NotEqual(finalLeft, finalRight);
+                    break;
                 case ExpressionType.GreaterThan:
-                    return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.GreaterThan(innerLeft ?? left, innerRight ?? right), parameters));
+                    binaryExpression = Expression.GreaterThan(finalLeft, finalRight);
+                    break;
                 case ExpressionType.LessThan:
-                    return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.LessThan(innerLeft ?? left, innerRight ?? right), parameters));
+                    binaryExpression = Expression.LessThan(finalLeft, finalRight);
+                    break;
                 case ExpressionType.GreaterThanOrEqual:
-                    return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.GreaterThanOrEqual(innerLeft ?? left, innerRight ?? right), parameters));
+                    binaryExpression = Expression.GreaterThanOrEqual(finalLeft, finalRight);
+                    break;
                 case ExpressionType.LessThanOrEqual:
-                    return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.LessThanOrEqual(innerLeft ?? left, innerRight ?? right), parameters));
+                    binaryExpression = Expression.LessThanOrEqual(finalLeft, finalRight);
+                    break;
                 case ExpressionType.Modulo:
-                    return (Expression.Lambda<Func<DynamicNode, int>>(Expression.Modulo(innerLeft ?? left, innerRight ?? right), parameters));
+                    binaryExpression = Expression.Modulo(finalLeft, finalRight);
+                    return (Expression.Lambda<Func<DynamicNode, int>>(binaryExpression, parameters));
                 case ExpressionType.AndAlso:
-                    if (bothLambdas)
+                    if (leftIsLambda && rightIsLambda && sequenceEqual)
                     {
                         return Expression.Equal(left, right);
-                        //return PredicateBuilder.And<DynamicNode>(innerLeft as Expression<Func<DynamicNode, bool>>, innerRight as Expression<Func<DynamicNode, bool>>);
                     }
                     else
                     {
-                        return (Expression.Lambda<Func<DynamicNode, DynamicNode, Boolean>>(Expression.AndAlso(innerLeft ?? left, innerRight ?? right), parameters));
+                        return (Expression.Lambda<Func<DynamicNode, DynamicNode, Boolean>>(Expression.AndAlso(finalLeft, finalRight), parameters));
                     }
-                //break;
                 case ExpressionType.OrElse:
-                    if (bothLambdas)
+                    if (leftIsLambda && rightIsLambda && sequenceEqual)
                     {
                         return Expression.Equal(left, right);
-                        //return PredicateBuilder.Or<DynamicNode>(innerLeft as Expression<Func<DynamicNode, bool>>, innerRight as Expression<Func<DynamicNode, bool>>);
                     }
                     else
                     {
-                        return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.OrElse(innerLeft ?? left, innerRight ?? right), parameters));
+                        return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.OrElse(finalLeft, finalRight), parameters));
                     }
-                //break;
                 default:
                     return Expression.Equal(left, right);
             }
+
+            var body = Expression.Condition(Expression.TypeEqual(innerLeft, right.Type), binaryExpression, Expression.Constant(false));
+            return Expression.Lambda<Func<DynamicNode, bool>>(body, parameters);
+
 
         }
 

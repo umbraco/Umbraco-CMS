@@ -39,9 +39,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Scripting">
-      <HintPath>..\foreign dlls\DLR 4.0\Microsoft.Scripting.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -64,17 +61,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RazorCore\BaseContext.cs" />
+    <Compile Include="RazorDynamicNode\DynamicMediaList.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeList.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeWalker.cs" />
     <Compile Include="RazorDynamicNode\DynamicQueryable.cs" />
     <Compile Include="RazorDynamicNode\DynamicXml.cs" />
+    <Compile Include="RazorDynamicNode\ExtensionMethodFinder.cs" />
     <Compile Include="RazorDynamicNode\ExtensionMethods.cs" />
     <Compile Include="RazorCore\RazorUmbracoFactory.cs" />
     <Compile Include="RazorCore\RazorUmbracoHost.cs" />
     <Compile Include="RazorCore\UmbracoCultureDictionary.cs" />
-    <Compile Include="DLRScriptingEngine.cs" />
     <Compile Include="RazorDynamicNode\DynamicDictionary.cs" />
-    <Compile Include="RazorDynamicNode\DynamicNodeListExtensionMethods.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeListOrdering.cs" />
     <Compile Include="RazorDynamicNode\DynamicQueryableBinders.cs" />
     <Compile Include="RazorDynamicNode\DynamicMedia.cs" />
@@ -87,8 +84,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RazorCore\RazorBuildProvider.cs" />
     <Compile Include="RazorCore\RazorMacroEngine.cs" />
-    <Compile Include="Scripting\MacroScript.cs" />
-    <Compile Include="Scripting\ScriptEngine.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\components\editorControls\umbraco.editorControls.csproj">

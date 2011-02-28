@@ -9,41 +9,33 @@ namespace umbraco.MacroEngines.Legacy
 {
     public class DLRScriptingEngine : IMacroEngine
     {
-        public string Name
-        {
+        public string Name {
             get { return "Umbraco DLR Macro Engine"; }
         }
 
-        public List<string> SupportedExtensions
-        {
-            get
-            {
-                var exts = new List<string> {"py", "rb"};
-                return exts;
-            }
+        IEnumerable<string> IMacroEngine.SupportedExtensions {
+            get { return new[] { "py", "rb" }; }
         }
 
-        public Dictionary<string, IMacroGuiRendering> SupportedProperties
-        {
+        public IEnumerable<string> SupportedUIExtensions {
+            get { return new[] { "py", "rb" }; }
+        }
+
+        public Dictionary<string, IMacroGuiRendering> SupportedProperties {
             get { throw new NotImplementedException(); }
         }
 
-
-        public bool Validate(string code, INode currentPage, out string errorMessage)
-        {
+        public bool Validate(string code, string tempFileName, INode currentPage, out string errorMessage) {
             throw new NotImplementedException();
         }
 
-        public string Execute(MacroModel macro, INode currentPage)
-        {
-            string fileEnding = macro.ScriptName.Substring(macro.ScriptName.LastIndexOf('.')).Trim('.');
+        public string Execute(MacroModel macro, INode currentPage) {
+            var fileEnding = macro.ScriptName.Substring(macro.ScriptName.LastIndexOf('.')).Trim('.');
+            var mse = MacroScriptEngine.LoadEngineByFileExtension(fileEnding);
 
-            MacroScriptEngine mse = MacroScriptEngine.LoadEngineByFileExtension(fileEnding);
-
-            SortedDictionary<string, object> vars = new SortedDictionary<string, object>();
+            var vars = new SortedDictionary<string, object>();
             vars.Add("currentPage", currentPage);
-            foreach (MacroPropertyModel prop in macro.Properties)
-            {
+            foreach (MacroPropertyModel prop in macro.Properties) {
                 vars.Add(prop.Key, prop.Value);
             }
             mse.ScriptVariables = vars;

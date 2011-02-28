@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
 using System.Collections;
 using umbraco.cms.businesslogic.macro;
-using umbraco.NodeFactory;
 
 namespace umbraco.presentation.templateControls
 {
@@ -59,17 +55,27 @@ namespace umbraco.presentation.templateControls
         [Category("Umbraco")]
         [DefaultValue("")]
         [Localizable(true)]
-        public string Language
-        {
-            get
-            {
-                String s = (String)ViewState["Language"];
-                return ((s == null) ? String.Empty : s);
+        public string Language {
+            get {
+                var s = (String)ViewState["Language"];
+                return (s ?? String.Empty);
             }
-
-            set
-            {
+            set {
                 ViewState["Language"] = value.ToLower();
+            }
+        }
+
+        [Bindable(true)]
+        [Category("Umbraco")]
+        [DefaultValue("")]
+        [Localizable(true)]
+        public string FileLocation {
+            get {
+                var s = (String)ViewState["FileLocation"];
+                return (s ?? String.Empty);
+            }
+            set {
+                ViewState["FileLocation"] = value.ToLower();
             }
         }
 
@@ -77,8 +83,7 @@ namespace umbraco.presentation.templateControls
         /// Raises the <see cref="E:System.Web.UI.Control.Init"/> event.
         /// </summary>
         /// <param name="e">An <see cref="T:System.EventArgs"/> object that contains the event data.</param>
-        protected override void OnInit(EventArgs e)
-        {
+        protected override void OnInit(EventArgs e) {
             base.OnInit(e);
 
             // Make sure child controls are in place to receive postback data.
@@ -88,17 +93,12 @@ namespace umbraco.presentation.templateControls
         /// <summary>
         /// Called by the ASP.NET page framework to notify server controls that use composition-based implementation to create any child controls they contain in preparation for posting back or rendering.
         /// </summary>
-        protected override void CreateChildControls()
-        {
+        protected override void CreateChildControls() {
             // collect all attributes set on the control
-            if (MacroAttributes == null || MacroAttributes.Count == 0)
-            {
-                ICollection keys = Attributes.Keys;
-                foreach (string key in keys)
-                {
-                    MacroAttributes.Add(key.ToLower(), Attributes[key]);
-                }
-            }
+            var keys = Attributes.Keys;
+            foreach (string key in keys)
+                MacroAttributes.Add(key.ToLower(), Attributes[key]);
+
             if (!MacroAttributes.ContainsKey("macroalias") && !MacroAttributes.ContainsKey("macroAlias"))
                 MacroAttributes.Add("macroalias", Alias);
 
@@ -106,58 +106,39 @@ namespace umbraco.presentation.templateControls
             // e.g. if the macro was rendered on a custom (non-Umbraco) page
             int pageId = Context.Items["pageID"] == null ? int.MinValue : int.Parse(Context.Items["pageID"].ToString());
 
-            if (!String.IsNullOrEmpty(Language) && Text != "")
-            {
-                macro m = new macro();
-
-                MacroModel model = m.ConvertToMacroModel(MacroAttributes);
-                model.ScriptCode = Text;
-                model.ScriptLanguage = Language;
-                model.MacroType = MacroTypes.Script;
-                if (!String.IsNullOrEmpty(Attributes["Cache"]))
-                {
-                    int cacheDuration = 0;
-                    if (int.TryParse(Attributes["Cache"], out cacheDuration))
-                    {
-                        model.CacheDuration = cacheDuration;
-                    }
-                    else
-                    {
-                        System.Web.HttpContext.Current.Trace.Warn("Template",
-                                                                  "Cache attribute is in incorect format (should be an integer).");
-                    }
+            if ((!String.IsNullOrEmpty(Language) && Text != "") || !string.IsNullOrEmpty(FileLocation)) {
+                var tempMacro = new macro();
+                var model = tempMacro.ConvertToMacroModel(MacroAttributes);
+                if (string.IsNullOrEmpty(FileLocation)) {
+                    model.ScriptCode = Text;
+                    model.ScriptLanguage = Language;
+                } else {
+                    model.ScriptName = FileLocation;
                 }
-                Control c = m.renderMacro(model, (Hashtable)Context.Items["pageElements"], pageId);
+                model.MacroType = MacroTypes.Script;
+                if (!String.IsNullOrEmpty(Attributes["Cache"])) {
+                    var cacheDuration = 0;
+                    if (int.TryParse(Attributes["Cache"], out cacheDuration))
+                        model.CacheDuration = cacheDuration;
+                    else
+                        System.Web.HttpContext.Current.Trace.Warn("Template", "Cache attribute is in incorect format (should be an integer).");
+                }
+                var c = tempMacro.renderMacro(model, (Hashtable)Context.Items["pageElements"], pageId);
                 if (c != null)
                     Controls.Add(c);
                 else
                     System.Web.HttpContext.Current.Trace.Warn("Template", "Result of inline macro scripting is null");
-
-                /*IMacroEngine engine = MacroEngineFactory.GetByExtension(Language);
-                string result = engine.Execute(
-                    model, 
-                    Node.GetCurrent());
-                Controls.Add(new LiteralControl(result));*/
-            }
-            else
-            {
-                macro tempMacro = null;
-                tempMacro = macro.ReturnFromAlias(Alias);
-
-                if (tempMacro != null)
-                {
-
-                    try
-                    {
-                        Control c = tempMacro.renderMacro(MacroAttributes, (Hashtable)Context.Items["pageElements"], pageId);
+            
+            } else {
+                var tempMacro = macro.ReturnFromAlias(Alias);
+                if (tempMacro != null) {
+                    try {
+                        var c = tempMacro.renderMacro(MacroAttributes, (Hashtable)Context.Items["pageElements"], pageId);
                         if (c != null)
                             Controls.Add(c);
                         else
                             System.Web.HttpContext.Current.Trace.Warn("Template", "Result of macro " + tempMacro.Name + " is null");
-
-                    }
-                    catch (Exception ee)
-                    {
+                    } catch (Exception ee) {
                         System.Web.HttpContext.Current.Trace.Warn("Template", "Error adding macro " + tempMacro.Name, ee);
                     }
                 }

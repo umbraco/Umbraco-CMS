@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Web;
 using System.Web.Compilation;
@@ -52,7 +53,7 @@ namespace umbraco.MacroEngines
                 File.Delete(physicalPath);
             if (!Directory.Exists(physicalDirectoryPath))
                 Directory.CreateDirectory(physicalDirectoryPath);
-            using (var file = new StreamWriter(physicalPath))
+            using (var file = new StreamWriter(physicalPath, false, Encoding.UTF8))
             {
                 file.Write(razorSyntax);
             }
@@ -92,7 +93,10 @@ namespace umbraco.MacroEngines
             string fileLocation = null;
             if (!string.IsNullOrEmpty(macro.ScriptName)) {
                 //Razor Is Already Contained In A File
-                fileLocation = SystemDirectories.Python + "/" + macro.ScriptName;
+                if (macro.ScriptName.StartsWith("~"))
+                    fileLocation = macro.ScriptName;
+                else
+                    fileLocation = SystemDirectories.Python + "/" + macro.ScriptName;
             } else if (!string.IsNullOrEmpty(macro.ScriptCode) && !string.IsNullOrEmpty(macro.ScriptLanguage)) {
                 //Inline Razor Syntax
                 fileLocation = CreateInlineRazorFile(macro.ScriptCode, macro.ScriptLanguage);

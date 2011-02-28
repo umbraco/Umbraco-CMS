@@ -36,10 +36,8 @@
     <umb:JsInclude ID="JsInclude11" runat="server" FilePath="js/language.aspx" PathNameAlias="UmbracoRoot" />
     <umb:JsInclude ID="JsInclude4" runat="server" FilePath="modal/modal.js" PathNameAlias="UmbracoClient"
         Priority="10" />
-
-         <umb:JsInclude ID="JsInclude17" runat="server" FilePath="modal/jquery.simplemodal.1.4.1.custom.js" PathNameAlias="UmbracoClient"
-        Priority="10" />
-
+    <umb:JsInclude ID="JsInclude17" runat="server" FilePath="modal/jquery.simplemodal.1.4.1.custom.js"
+        PathNameAlias="UmbracoClient" Priority="10" />
     <umb:JsInclude ID="JsInclude12" runat="server" FilePath="js/UmbracoSpeechBubbleBackend.js"
         PathNameAlias="UmbracoRoot" />
     <umb:JsInclude ID="JsInclude15" runat="server" FilePath="js/UmbracoSpeechBubbleBackend.js"
@@ -67,8 +65,9 @@
     <div style="position: relative;">
         <div id="logout-warning" class="notice" style="display: none; text-align: center">
             <h3 style="margin-bottom: 3px;">
-                <%= umbraco.ui.Text("lockout", "lockoutWillOccur")%> <span id="logout-warning-counter">
-                </span> <a href="#" onclick="umbracoRenewSession();"><%= umbraco.ui.Text("lockout", "renewSession")%></a>.</h3>
+                <%= umbraco.ui.Text("lockout", "lockoutWillOccur")%>
+                <span id="logout-warning-counter"></span><a href="#" onclick="umbracoRenewSession();">
+                    <%= umbraco.ui.Text("lockout", "renewSession")%></a>.</h3>
         </div>
         <div class="topBar" id="topBar">
             <div style="float: left">
@@ -128,17 +127,19 @@
             <iframe frameborder="0" id="umbModalBoxIframe" src=""></iframe>
         </div>
     </div>
-
-    <div id="logout-refresh" style="display:none;">
-        <p><%= umbraco.ui.Text("general","locked").ToUpper() %></p>
+    <div id="logout-refresh" style="display: none;">
+        <p>
+            <%= umbraco.ui.Text("general","locked").ToUpper() %></p>
         <div id="sessionrefreshpassword">
-            <label for="sessionpass"><%= umbraco.ui.Text("general","password") %></label><input name="sessionpass" type="password"/>
+            <label for="sessionpass">
+                <%= umbraco.ui.Text("general","password") %></label><input name="sessionpass" type="password" />
         </div>
-
         <div id="sessionrefreshbuttons">
-        <button id="renew-session" onclick="javascript:umbracoSessionRenewCheckPassword();"><%= umbraco.ui.Text("general","renew") %></button>
-        <%= umbraco.ui.Text("general","or") %> 
-        <a href="#" onclick="javascript:umbracoSessionLogout();"><%= umbraco.ui.Text("general","logout") %></a>
+            <button id="renew-session" onclick="javascript:umbracoSessionRenewCheckPassword();">
+                <%= umbraco.ui.Text("general","renew") %></button>
+            <%= umbraco.ui.Text("general","or") %>
+            <a href="#" onclick="javascript:umbracoSessionLogout();">
+                <%= umbraco.ui.Text("general","logout") %></a>
         </div>
     </div>
     <script type="text/javascript">
@@ -189,12 +190,15 @@
 
 
         // *** NEW KEEP ALIVE - Should be moved to app manager *** */
-
+        var failedAttempts = 0;
         window.setInterval(keepAlive, 10000);
         function keepAlive() {
-            umbraco.presentation.webservices.legacyAjaxCalls.GetSecondsBeforeUserLogout(validateUserTimeout, umbracoShowSessionRenewModal);
+            umbraco.presentation.webservices.legacyAjaxCalls.GetSecondsBeforeUserLogout(validateUserTimeout, keepAliveError);
         }
+
         function validateUserTimeout(secondsBeforeTimeout) {
+            // at succesful attempts we'll always reset the failedAttempts variable
+            failedAttempts = 0;
             var logoutElement = jQuery("#logout-warning");
             // when five minutes left, show warning
             if (secondsBeforeTimeout < 300) {
@@ -216,74 +220,83 @@
             }
         }
 
+        // We add one failed attempt as tolerance level as a re-compilation could cause a timeout or an error with webservices not ready
+        function keepAliveError(err) {
+            if (failedAttempts == 0)
+                failedAttempts++;
+            else {
+                umbracoShowSessionRenewModal();
+            }
+        }
+
         function umbracoRenewSession() {
             umbraco.presentation.webservices.legacyAjaxCalls.RenewUmbracoSession(
                 function () { jQuery("#logout-warning").fadeOut().removeClass('error').addClass('notice'); },
                 umbracoShowSessionRenewModal);
 
-            }
+        }
 
-            function umbracoShowSessionRenewModal() {
+        function umbracoShowSessionRenewModal() {
 
-                jQuery("#logout-warning").fadeOut().removeClass('error').addClass('notice');
+            jQuery("#logout-warning").fadeOut().removeClass('error').addClass('notice');
 
-                jQuery("#sessionrefreshpassword input").attr("style", "");
-                jQuery("#sessionrefreshpassword label").click(function () { jQuery(this).hide(); jQuery(this).next("input").focus(); });
-                jQuery("#sessionrefreshpassword input").click(function () { jQuery(this).prev("label").hide(); });
-                jQuery("#sessionrefreshpassword input").blur(function () { if (jQuery(this).val() == "") { jQuery(this).prev("label").show(); } });
+            jQuery("#sessionrefreshpassword input").attr("style", "");
+            jQuery("#sessionrefreshpassword label").click(function () { jQuery(this).hide(); jQuery(this).next("input").focus(); });
+            jQuery("#sessionrefreshpassword input").click(function () { jQuery(this).prev("label").hide(); });
+            jQuery("#sessionrefreshpassword input").blur(function () { if (jQuery(this).val() == "") { jQuery(this).prev("label").show(); } });
 
-                jQuery("#sessionrefreshpassword input").keypress(function (e) {
-                    if (jQuery("#sessionrefreshpassword label").is(":visible")) {
-                        jQuery("#sessionrefreshpassword label").hide()
-                    }
-                    code = (e.keyCode ? e.keyCode : e.which);
-                    if (code == 13) jQuery("#renew-session").click();
+            jQuery("#sessionrefreshpassword input").keypress(function (e) {
+                if (jQuery("#sessionrefreshpassword label").is(":visible")) {
+                    jQuery("#sessionrefreshpassword label").hide()
+                }
+                code = (e.keyCode ? e.keyCode : e.which);
+                if (code == 13) jQuery("#renew-session").click();
 
-                });
+            });
 
-                jQuery("#logout-refresh").fullmodal();
-            }
+            jQuery("#logout-refresh").fullmodal();
+        }
 
-            function umbracoSessionRenewCheckPassword() {
+        function umbracoSessionRenewCheckPassword() {
 
-               
 
-                if (jQuery("#sessionrefreshpassword input").val() != "") {
-                    jQuery.ajax({
-                        type: "POST",
-                        url: "<%=umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/webservices/legacyAjaxCalls.asmx/ValidateUser",
-                        data: "{'username': '<%=this.getUser().LoginName%>', 'password': '" + jQuery("#sessionrefreshpassword input").val() + "'}",
-                        success: function (result) {
 
-                            if (result.d == true) {
-                                // reset seconds
-                                umbraco.presentation.webservices.legacyAjaxCalls.RenewUmbracoSession();
+            if (jQuery("#sessionrefreshpassword input").val() != "") {
+                jQuery.ajax({
+                    type: "POST",
+                    url: "<%=umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/webservices/legacyAjaxCalls.asmx/ValidateUser",
+                    data: "{'username': '<%=this.getUser().LoginName%>', 'password': '" + jQuery("#sessionrefreshpassword input").val() + "'}",
+                    success: function (result) {
 
-                                jQuery("#sessionrefreshpassword input").val("");
-                                jQuery.fullmodal.close();
-                            }
-                            else {
-                                umbracoSessionRenewCheckPasswordFail();
-                            }
+                        if (result.d == true) {
+                            // reset seconds
+                            umbraco.presentation.webservices.legacyAjaxCalls.RenewUmbracoSession();
 
+                            jQuery("#sessionrefreshpassword input").val("");
+                            jQuery.fullmodal.close();
                         }
-                    });
-                }
-                else {
-                    umbracoSessionRenewCheckPasswordFail();
-                }
-            }
+                        else {
+                            umbracoSessionRenewCheckPasswordFail();
+                        }
 
-            function umbracoSessionRenewCheckPasswordFail() {
-                jQuery("#sessionrefreshpassword").effect("shake", { times: 5, distance: 5 }, 80);
-                jQuery("#sessionrefreshpassword input").attr("style", "border: 2px solid red;");
-
+                    }
+                });
             }
-            function umbracoSessionLogout() {
-
-                //alert('Session has expired on server - can\'t renew. Logging out!');
-                top.document.location.href = 'logout.aspx';
+            else {
+                umbracoSessionRenewCheckPasswordFail();
             }
+        }
+
+        function umbracoSessionRenewCheckPasswordFail() {
+            jQuery("#sessionrefreshpassword").effect("shake", { times: 5, distance: 5 }, 80);
+            jQuery("#sessionrefreshpassword input").attr("style", "border: 2px solid red;");
+
+        }
+        function umbracoSessionLogout() {
+
+            //alert('Session has expired on server - can\'t renew. Logging out!');
+            top.document.location.href = 'logout.aspx';
+        }
 
         function blink($target) {
             // Set the color the field should blink in 
