@@ -7,7 +7,7 @@ var maxLevelForSitemap = 4;
 var values = new Dictionary<string,object>();
 values.Add("maxLevelForSitemap", maxLevelForSitemap) ;
 
-   var items = node.Children.Where("ShouldBeVisible == true && Level <= maxLevelForSitemap", values);
+   var items = node.Children.Where("umbracoNaviHide != true && Level <= maxLevelForSitemap", values);
    <ul>
             @foreach (var item in items) {
                 <li><a href="@item.Url">@item.Name</a>
