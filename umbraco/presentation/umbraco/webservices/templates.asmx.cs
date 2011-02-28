@@ -85,7 +85,7 @@ namespace umbraco.webservices
             string content = string.Empty;
 
             System.IO.StreamReader templateFile = 
-                System.IO.File.OpenText(umbraco.IO.IOHelper.MapPath(IO.SystemDirectories.Umbraco + "/scripting/templates/py/" + templateId.ToString()));
+                System.IO.File.OpenText(umbraco.IO.IOHelper.MapPath(IO.SystemDirectories.Umbraco + "/scripting/templates/cshtml/" + templateId.ToString()));
             content = templateFile.ReadToEnd();
             templateFile.Close();
 
