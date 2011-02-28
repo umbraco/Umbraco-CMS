@@ -373,7 +373,7 @@
 
     <!-- do the full release with docs, minify and nightly file distribution -->
     <target name="zip" depends="directories">
-        <property name="assembly.name" value="${ assemblyname::get-version( assemblyname::get-assembly-name('umbraco/presentation/bin/umbraco.dll') ) }"/>
+        <property name="assembly.name" value="${build.number}"/>
         <property name="release.filename" value="${root.dir}\build_${build.version}_${assembly.name}.zip" />
 
         <zip zipfile="${release.filename}" includeemptydirs="true" >
@@ -401,7 +401,7 @@
   
     <!-- do a nightly build without the minification and docs -->
     <target name="nightly" depends="zip">
-        <property name="assembly.name" value="${ assemblyname::get-version( assemblyname::get-assembly-name('umbraco/presentation/bin/umbraco.dll') ) }"/>
+        <property name="assembly.name" value="${build.number}"/>
         <property name="release.filename" value="${root.dir}\build_${build.version}_${assembly.name}.zip" />
 
         <mkdir dir="${public.dir}\${build.version}" />
