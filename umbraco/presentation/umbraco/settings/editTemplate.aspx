@@ -20,6 +20,11 @@
         height:23px;
         vertical-align:top;
     }
+    
+    #sb
+    {
+         vertical-align:top;
+    }
     </style>
   <script language="javascript" type="text/javascript">
 
@@ -169,7 +174,7 @@
     </cc1:UmbracoPanel>
 
 
-    <div id="splitButton" style="display:inline;height:23px;">
+    <div id="splitButton" style="display:inline;height:23px;vertical-align:top;">
         <a href="javascript:insertCodeBlock();" id="sb">
             <img alt="Insert Inline Razor Macro" src="../images/editor/insRazorMacro.png" title="Insert Inline Razor Macro" style="vertical-align:top;">
         </a>
