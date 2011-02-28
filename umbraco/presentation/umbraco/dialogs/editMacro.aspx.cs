@@ -32,87 +32,110 @@ namespace umbraco.dialogs
 
         protected void renderProperties(object sender, EventArgs e) {
             if (umb_macroAlias.SelectedValue != "") {
-                pl_edit.Visible = true;
-                pl_insert.Visible = false;
-
-                m = cms.businesslogic.macro.Macro.GetByAlias(umb_macroAlias.SelectedValue);
-
-                String macroAssembly = "";
-				String macroType = "";
-
-                _macroAlias = m.Alias;
-                
-
-                //If no properties, we will exit now...
-                if (m.Properties.Length == 0) {
-                    Literal noProps = new Literal();
-                    noProps.Text = "<script type='text/javascript'>updateMacro()</script>";
-                    macroProperties.Controls.Add(noProps);
-                } else {
-                    //if we have properties, we'll render the controls for them...
-                    foreach (cms.businesslogic.macro.MacroProperty mp in m.Properties) {
-                        macroAssembly = mp.Type.Assembly;
-                        macroType = mp.Type.Type;
-                        try {
-
-                            Assembly assembly = Assembly.LoadFrom(IOHelper.MapPath(SystemDirectories.Bin + "/" + macroAssembly + ".dll"));
-
-                            Type type = assembly.GetType(macroAssembly + "." + macroType);
-                            interfaces.IMacroGuiRendering typeInstance = Activator.CreateInstance(type) as interfaces.IMacroGuiRendering;
-                            if (typeInstance != null) {
-                                Control control = Activator.CreateInstance(type) as Control;
-                                control.ID = mp.Alias;
-                                
-                                if (!IsPostBack) {
-                                    if (Request["umb_" + mp.Alias] != null) {
-                                        if (Request["umb_" + mp.Alias] != "") {
-                                            type.GetProperty("Value").SetValue(control, Convert.ChangeType(Request["umb_" + mp.Alias], type.GetProperty("Value").PropertyType), null);
-                                        }
-                                    }
-                                }
-
-                                // register alias
-                                umbraco.uicontrols.PropertyPanel pp = new umbraco.uicontrols.PropertyPanel();
-                                pp.Text = mp.Name;
-                                pp.Controls.Add(control);
-                                macroProperties.Controls.Add(pp);
-
-                                pp.Controls.Add(new LiteralControl("<script type=\"text/javascript\"> registerAlias('" + control.ClientID + "','" + mp.Alias + "'); </script>\n"));
-                                
-
-
-                            } else {
-                                Trace.Warn("umbEditContent", "Type doesn't exist or is not umbraco.interfaces.DataFieldI ('" + macroAssembly + "." + macroType + "')");
-                            }
-
-                        } catch (Exception fieldException) {
-                            Trace.Warn("umbEditContent", "Error creating type '" + macroAssembly + "." + macroType + "'", fieldException);
-                        }
-                    }
-                } 
+                askForProperties(umb_macroAlias.SelectedValue);
             }else {
                 pl_insert.Visible = true;
                 pl_edit.Visible = false;
             }
         }
 
+        private void askForProperties(string alias)
+        {
+            pl_edit.Visible = true;
+            pl_insert.Visible = false;
 
+            m = cms.businesslogic.macro.Macro.GetByAlias(alias);
+
+            String macroAssembly = "";
+            String macroType = "";
+
+            _macroAlias = m.Alias;
+
+
+            //If no properties, we will exit now...
+            if (m.Properties.Length == 0)
+            {
+                Literal noProps = new Literal();
+                noProps.Text = "<script type='text/javascript'>updateMacro()</script>";
+                macroProperties.Controls.Add(noProps);
+            }
+            else
+            {
+                //if we have properties, we'll render the controls for them...
+                foreach (cms.businesslogic.macro.MacroProperty mp in m.Properties)
+                {
+                    macroAssembly = mp.Type.Assembly;
+                    macroType = mp.Type.Type;
+                    try
+                    {
+
+                        Assembly assembly = Assembly.LoadFrom(IOHelper.MapPath(SystemDirectories.Bin + "/" + macroAssembly + ".dll"));
+
+                        Type type = assembly.GetType(macroAssembly + "." + macroType);
+                        interfaces.IMacroGuiRendering typeInstance = Activator.CreateInstance(type) as interfaces.IMacroGuiRendering;
+                        if (typeInstance != null)
+                        {
+                            Control control = Activator.CreateInstance(type) as Control;
+                            control.ID = mp.Alias;
+
+                            if (!IsPostBack)
+                            {
+                                if (Request["umb_" + mp.Alias] != null)
+                                {
+                                    if (Request["umb_" + mp.Alias] != "")
+                                    {
+                                        type.GetProperty("Value").SetValue(control, Convert.ChangeType(Request["umb_" + mp.Alias], type.GetProperty("Value").PropertyType), null);
+                                    }
+                                }
+                            }
+
+                            // register alias
+                            umbraco.uicontrols.PropertyPanel pp = new umbraco.uicontrols.PropertyPanel();
+                            pp.Text = mp.Name;
+                            pp.Controls.Add(control);
+                            macroProperties.Controls.Add(pp);
+
+                            pp.Controls.Add(new LiteralControl("<script type=\"text/javascript\"> registerAlias('" + control.ClientID + "','" + mp.Alias + "'); </script>\n"));
+
+
+
+                        }
+                        else
+                        {
+                            Trace.Warn("umbEditContent", "Type doesn't exist or is not umbraco.interfaces.DataFieldI ('" + macroAssembly + "." + macroType + "')");
+                        }
+
+                    }
+                    catch (Exception fieldException)
+                    {
+                        Trace.Warn("umbEditContent", "Error creating type '" + macroAssembly + "." + macroType + "'", fieldException);
+                    }
+                }
+            } 
+        }
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 
             if (!Page.IsPostBack)
             {
-                IRecordsReader macroRenderings;
-                if (helper.Request("editor") != "")
-                    macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName");
+                if (!string.IsNullOrEmpty(presentation.UmbracoContext.Current.Request["alias"]))
+                {
+                    askForProperties(presentation.UmbracoContext.Current.Request["alias"]);
+                }
                 else
-                    macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro order by macroName");
+                {
+                    IRecordsReader macroRenderings;
+                    if (helper.Request("editor") != "")
+                        macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName");
+                    else
+                        macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro order by macroName");
 
-                umb_macroAlias.DataSource = macroRenderings;
-                umb_macroAlias.DataValueField = "macroAlias";
-                umb_macroAlias.DataTextField = "macroName";
-                umb_macroAlias.DataBind();
-                macroRenderings.Close();
+                    umb_macroAlias.DataSource = macroRenderings;
+                    umb_macroAlias.DataValueField = "macroAlias";
+                    umb_macroAlias.DataTextField = "macroName";
+                    umb_macroAlias.DataBind();
+                    macroRenderings.Close();
+                }
             }
             else
             {

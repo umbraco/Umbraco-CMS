@@ -1660,6 +1660,7 @@
     <Content Include="umbraco\dashboard\images\ZipFile.png" />
     <Content Include="umbraco\dashboard\swfs\AIRInstallBadge.swf" />
     <Content Include="umbraco\dashboard\swfs\expressinstall.swf" />
+    <Content Include="umbraco\images\editor\insMacroSB.png" />
     <Content Include="umbraco\images\editor\insRazorMacro.png" />
     <Content Include="umbraco_client\easyui\jquery.easyui.min.js" />
     <Content Include="umbraco_client\easyui\themes\default\easyui.css" />

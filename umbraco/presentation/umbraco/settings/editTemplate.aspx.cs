@@ -13,6 +13,7 @@ using umbraco.cms.presentation.Trees;
 using umbraco.IO;
 using umbraco.cms.businesslogic.skinning;
 using System.Collections.Generic;
+using umbraco.DataLayer;
 
 
 namespace umbraco.cms.presentation.settings
@@ -70,6 +71,7 @@ namespace umbraco.cms.presentation.settings
 					.SyncTree(_template.Id.ToString(), false);
 
                 LoadScriptingTemplates();
+                LoadMacros();
 
 							}			
 		}
@@ -109,10 +111,13 @@ namespace umbraco.cms.presentation.settings
 						umbDictionary.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY", ui.Text("template", "insertDictionaryItem"), 640, 550);
 						umbDictionary.AltText = "Insert umbraco dictionary item";
 						
-						uicontrols.MenuIconI umbMacro = Panel1.Menu.NewIcon();
-						umbMacro.ImageURL = UmbracoPath + "/images/editor/insMacro.gif";
-						umbMacro.AltText = ui.Text("template", "insertMacro");
-						umbMacro.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/editMacro.aspx?objectId=" + editorSource.ClientID, ui.Text("template", "insertMacro"), 470, 530);
+                        //uicontrols.MenuIconI umbMacro = Panel1.Menu.NewIcon();
+                        //umbMacro.ImageURL = UmbracoPath + "/images/editor/insMacro.gif";
+                        //umbMacro.AltText = ui.Text("template", "insertMacro");
+                        //umbMacro.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/editMacro.aspx?objectId=" + editorSource.ClientID, ui.Text("template", "insertMacro"), 470, 530);
+
+                        Panel1.Menu.NewElement("div", "splitButtonMacroPlaceHolder", "", 40);
+
 
 						if (UmbracoSettings.UseAspNetMasterPages) {
 
@@ -182,6 +187,27 @@ namespace umbraco.cms.presentation.settings
             rpt_codeTemplates.DataSource = files;
             rpt_codeTemplates.DataBind();
             
+        }
+
+        private void LoadMacros()
+        {
+          
+            IRecordsReader macroRenderings = SqlHelper.ExecuteReader("select id, macroAlias, macroName from cmsMacro order by macroName");
+
+            rpt_macros.DataSource = macroRenderings;
+            rpt_macros.DataBind();
+           
+            macroRenderings.Close();
+
+        }
+
+        public string DoesMacroHaveSettings(string macroId)
+        {
+            if (SqlHelper.ExecuteScalar<int>(string.Format("select 1 from cmsMacroProperty where macro = {0}", macroId)) == 1)
+                return "1";
+            else
+                return "0";
+
         }
 		/// <summary>
 		/// Required method for Designer support - do not modify

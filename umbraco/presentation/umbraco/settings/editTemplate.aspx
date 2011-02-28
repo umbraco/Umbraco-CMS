@@ -13,7 +13,7 @@
 
     <style type="text/css">
     
-    #splitButtonPlaceHolder
+    #splitButtonPlaceHolder, #splitButtonMacroPlaceHolder
     {
         display:inline;
         width:90px;
@@ -21,31 +21,49 @@
         vertical-align:top;
     }
     
-    #sb
+    #sb, #sbMacro
     {
          vertical-align:top;
     }
+    
     </style>
+
   <script language="javascript" type="text/javascript">
 
 
         jQuery(document).ready(function() {
 
-           
+            //macro split button
+             jQuery('#sbMacro').splitbutton({menu:'#macroMenu'});
 
+            jQuery("#splitButtonMacro").appendTo("#splitButtonMacroPlaceHolder");
+
+
+            jQuery(".macro").click(function(){
+            
+                var alias = jQuery(this).attr("rel");
+
+                if(jQuery(this).attr("params") == "1")
+                {
+                    openMacroModal(alias);
+                }
+                else
+                {
+                    insertMacro(alias);
+                }
+            });
+
+
+            //razor macro split button
             jQuery('#sb').splitbutton({menu:'#codeTemplateMenu'});
 
-             jQuery("#splitButton").appendTo("#splitButtonPlaceHolder");
+            jQuery("#splitButton").appendTo("#splitButtonPlaceHolder");
 
 
             jQuery(".codeTemplate").click(function(){
                 
                 insertCodeBlockFromTemplate(jQuery(this).attr("rel"));
             });
-
-         
-
-
 
         });
 
@@ -127,13 +145,11 @@
        function insertCodeBlock()
        {
              var cp = 'umbraco:Macro  runat="server" language="cshtml"';
-
              UmbEditor.Insert('\n<' + cp +'>\n','\n</umbraco:Macro' + '>\n', '<%= editorSource.ClientID %>');
        }
 
        function insertCodeBlockFromTemplate(templateId)
        {
-            
             
         jQuery.ajax({
             type: "POST",
@@ -149,7 +165,26 @@
                     }
            });
 
-            
+       }
+
+       function insertMacro(alias)
+       {
+            <%if (umbraco.UmbracoSettings.UseAspNetMasterPages) { %>
+			var macroElement = "umbraco:Macro";
+			<%}else{ %>
+			var macroElement = "?UMBRACO_MACRO";
+			<%}%>
+
+             var cp = macroElement + ' Alias="'+ alias +'" runat="server"';
+             UmbEditor.Insert('<' + cp +'>','</'+ macroElement + '>', '<%= editorSource.ClientID %>');
+       }
+       function openMacroModal(alias)
+       {
+            var t = "";
+            if(alias != null && alias != ""){
+                t = "&alias="+alias;
+            }
+            UmbClientMgr.openModalWindow('<%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/dialogs/editMacro.aspx?objectId=body_editorSource' + t, 'Insert Macro', true, 470, 530, 0, 0, '', '');
        }
 
   </script>
@@ -181,7 +216,7 @@
     </div>
 
 
-    <div id="codeTemplateMenu" style="width:200px;">
+    <div id="codeTemplateMenu" style="width:220px;">
 
         <asp:Repeater ID="rpt_codeTemplates" runat="server">
             <ItemTemplate>
@@ -193,12 +228,21 @@
        
     </div>
 
-
-    <div style="height:50px">
-    
-    
+    <div id="splitButtonMacro" style="display:inline;height:23px;vertical-align:top;">
+        <a href="javascript:openMacroModal();" id="sbMacro">
+            <img alt="Insert Macro" src="../images/editor/insMacroSB.png" title="Insert Macro" style="vertical-align:top;">
+        </a>
     </div>
 
+    <div id="macroMenu" style="width:220px">
+         <asp:Repeater ID="rpt_macros" runat="server">
+            <ItemTemplate>
+                <div class="macro" rel="<%# DataBinder.Eval(Container, "DataItem.macroAlias")%>" params="<%#  DoesMacroHaveSettings(DataBinder.Eval(Container, "DataItem.id").ToString()) %>">
+                     <%# DataBinder.Eval(Container, "DataItem.macroName")%> 
+                </div>
+            </ItemTemplate>
+         </asp:Repeater>
+    </div>
 </asp:Content>
 
     
