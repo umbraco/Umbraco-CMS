@@ -264,7 +264,7 @@
     </div>
 
 
-    <div id="codeTemplateMenu" style="width:220px;">
+    <div id="codeTemplateMenu" style="width:270px;">
        
         <asp:Repeater ID="rpt_codeTemplates" runat="server">
             <ItemTemplate>
@@ -282,7 +282,7 @@
         </a>
     </div>
 
-    <div id="macroMenu" style="width:220px">
+    <div id="macroMenu" style="width:270px">
        
          <asp:Repeater ID="rpt_macros" runat="server">
             <ItemTemplate>
