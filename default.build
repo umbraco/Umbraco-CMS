@@ -252,6 +252,7 @@
         <delete dir="${build.dir}\masterpages" />
         <delete dir="${build.dir}\scripts" />
         <delete dir="${build.dir}\python" />
+        <delete dir="${build.dir}\macroScripts" />
         <delete dir="${build.dir}\xslt" />
         <delete dir="${build.dir}\usercontrols" />
     
@@ -296,7 +297,7 @@
         <mkdir dir="${build.dir}\masterpages" />
         <mkdir dir="${build.dir}\scripts" />
         <mkdir dir="${build.dir}\css" />
-        <mkdir dir="${build.dir}\python" />
+        <mkdir dir="${build.dir}\macroScripts" />
         <mkdir dir="${build.dir}\xslt" />
         <mkdir dir="${build.dir}\usercontrols" />
     </target>
