@@ -57,7 +57,7 @@
 
            if (menuHeight > maxHeight) {
 
-                jQuery("<div id='showmore' style='clear:both;text-align: center;cursor:pointer;'>More</div>").appendTo("#macroMenu");
+                jQuery("<div id='showmore' class='menudown'><span>&nbsp;&nbsp;&nbsp;&nbsp;</span></div>").appendTo("#macroMenu");
                 
                 menu.css({
                     height: maxHeight,

@@ -11,6 +11,24 @@
     vertical-align:top;
 }
 
+.menudown
+{
+    
+    clear:both;
+    text-align: center;
+    cursor:pointer;
+   
+}
+
+.menudown span
+{
+     background:url('images/splitbutton_downarrow.png') no-repeat 0px 0px;
+   
+}
+.menudown:hover
+{
+    background-color:#DDD;
+}
 a.l-btn{
 	color:#444;
 	font-size:12px;
@@ -30,12 +48,7 @@ a.l-btn-plain{
 	_padding:1px 6px 1px 1px;
 }
 
-a.l-btn-disabled{
-	color:#ccc;
-	opacity:0.5;
-	filter:alpha(opacity=50);
-	cursor:default;
-}
+
 a.l-btn span.l-btn-left{
 	display:block;
 	padding:4px 0px 4px 18px;
@@ -79,7 +92,7 @@ a:hover.l-btn-disabled span.l-btn-left{
 	background:#f0f0f0 url('images/splitbutton_menu.gif') repeat-y;
 	margin:0;
 	padding:2px;
-	border:1px solid #ccc;
+	border: 1px solid #979797;
 	overflow:hidden;
 }
 .menu-item{
@@ -109,20 +122,12 @@ a:hover.l-btn-disabled span.l-btn-left{
 
 
 .menu-active{
-	border:1px solid #7eabcd;
-	background:#fafafa;
+	border: 1px solid #a8d8eb;
+	background: #dcecf3;	
 	-moz-border-radius:3px;
 	-webkit-border-radius: 3px;
 }
-.menu-shadow{
-	position:absolute;
-	background:#ddd;
-	-moz-border-radius:5px;
-	-webkit-border-radius: 5px;
-	-moz-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2);
-	-webkit-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2);
-	filter: progid:DXImageTransform.Microsoft.Blur(pixelRadius=2,MakeShadow=false,ShadowOpacity=0.2);
-}
+
 
 .s-btn-downarrow{
 	display:inline-block;
@@ -145,10 +150,9 @@ a:hover.l-btn .s-btn-downarrow{
 
 a.s-btn-plain-active{
 	background:transparent;
-	border:1px solid #7eabcd;
+	border:1px solid #8f8f8f;
 	_padding:0px 5px 0px 0px;
-	-moz-border-radius:3px;
-	-webkit-border-radius: 3px;
+
 }
 a.s-btn-plain-active .s-btn-downarrow{
 	background:url('images/splitbutton_downarrow.png') no-repeat 4px -18px;
