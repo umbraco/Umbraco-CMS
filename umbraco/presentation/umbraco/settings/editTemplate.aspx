@@ -5,28 +5,11 @@
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
-   <umb:CssInclude ID="CssInclude1" runat="server" FilePath="easyui/themes/default/easyui.css" PathNameAlias="UmbracoClient" />
+   <umb:CssInclude ID="CssInclude1" runat="server" FilePath="splitbutton/splitbutton.css" PathNameAlias="UmbracoClient" />
 
-  <umb:JsInclude ID="JsInclude" runat="server" FilePath="easyui/jquery.easyui.min.js" PathNameAlias="UmbracoClient"
+   <umb:JsInclude ID="JsInclude" runat="server" FilePath="splitbutton/jquery.splitbutton.js" PathNameAlias="UmbracoClient"
         Priority="1" />
 
-
-    <style type="text/css">
-    
-    #splitButtonPlaceHolder, #splitButtonMacroPlaceHolder
-    {
-        display:inline;
-        width:90px;
-        height:23px;
-        vertical-align:top;
-    }
-    
-    #sb, #sbMacro
-    {
-         vertical-align:top;
-    }
-    
-    </style>
 
   <script language="javascript" type="text/javascript">
 
@@ -275,7 +258,7 @@
 
 
     <div id="splitButton" style="display:inline;height:23px;vertical-align:top;">
-        <a href="javascript:insertCodeBlock();" id="sb">
+        <a href="javascript:insertCodeBlock();" id="sb" class="sbLink">
             <img alt="Insert Inline Razor Macro" src="../images/editor/insRazorMacro.png" title="Insert Inline Razor Macro" style="vertical-align:top;">
         </a>
     </div>
@@ -294,7 +277,7 @@
     </div>
 
     <div id="splitButtonMacro" style="display:inline;height:23px;vertical-align:top;">
-        <a href="javascript:openMacroModal();" id="sbMacro">
+        <a href="javascript:openMacroModal();" id="sbMacro" class="sbLink">
             <img alt="Insert Macro" src="../images/editor/insMacroSB.png" title="Insert Macro" style="vertical-align:top;">
         </a>
     </div>

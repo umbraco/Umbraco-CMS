@@ -116,7 +116,7 @@ namespace umbraco.cms.presentation.settings
                         //umbMacro.AltText = ui.Text("template", "insertMacro");
                         //umbMacro.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/editMacro.aspx?objectId=" + editorSource.ClientID, ui.Text("template", "insertMacro"), 470, 530);
 
-                        Panel1.Menu.NewElement("div", "splitButtonMacroPlaceHolder", "", 40);
+                        Panel1.Menu.NewElement("div", "splitButtonMacroPlaceHolder", "sbPlaceHolder", 40);
 
 
 						if (UmbracoSettings.UseAspNetMasterPages) {
@@ -146,7 +146,7 @@ namespace umbraco.cms.presentation.settings
 
             //Spit button
             Panel1.Menu.InsertSplitter();
-            Panel1.Menu.NewElement("div", "splitButtonPlaceHolder", "", 40);
+            Panel1.Menu.NewElement("div", "splitButtonPlaceHolder", "sbPlaceHolder", 40);
            
 
 			// Help
