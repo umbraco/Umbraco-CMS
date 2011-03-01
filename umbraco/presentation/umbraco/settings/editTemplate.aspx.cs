@@ -134,6 +134,11 @@ namespace umbraco.cms.presentation.settings
 								umbContent.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/insertMasterpageContent.aspx?id=" + _template.Id.ToString(), ui.Text("template", "insertContentArea"), 470, 300);
 						}
 
+
+                        //Spit button
+                        Panel1.Menu.InsertSplitter();
+                        Panel1.Menu.NewElement("div", "splitButtonPlaceHolder", "sbPlaceHolder", 40);
+
 						if (Skinning.StarterKitGuid(_template.Id).HasValue)
 						{
 								Panel1.Menu.InsertSplitter();
@@ -144,9 +149,7 @@ namespace umbraco.cms.presentation.settings
 								umbContainer.OnClickCommand = "window.open('" + GlobalSettings.Path + "/canvas.aspx?redir=" + this.ResolveUrl("~/") + "&umbSkinning=true&umbSkinningConfigurator=true" + "','canvas')";
 						}
 
-            //Spit button
-            Panel1.Menu.InsertSplitter();
-            Panel1.Menu.NewElement("div", "splitButtonPlaceHolder", "sbPlaceHolder", 40);
+           
            
 
 			// Help
