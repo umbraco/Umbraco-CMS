@@ -1664,7 +1664,6 @@
     <Content Include="umbraco\images\editor\insRazorMacro.png" />
     <Content Include="umbraco_client\splitbutton\jquery.splitbutton.js" />
     <Content Include="umbraco_client\splitbutton\images\splitbutton_hover.png" />
-    <Content Include="umbraco_client\splitbutton\images\splitbutton_menu.gif" />
     <Content Include="umbraco_client\splitbutton\images\splitbutton_downarrow.png" />
     <Content Include="umbraco_client\splitbutton\splitbutton.css" />
     <Content Include="umbraco_client\Installer\images\bg-inp-big.png" />

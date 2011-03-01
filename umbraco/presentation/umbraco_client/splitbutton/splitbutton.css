@@ -89,7 +89,7 @@ a:hover.l-btn-disabled span.l-btn-left{
 
 .menu{
 	position:absolute;
-	background:#f0f0f0 url('images/splitbutton_menu.gif') repeat-y;
+	background-color:#f0f0f0;
 	margin:0;
 	padding:2px;
 	border: 1px solid #979797;
@@ -109,7 +109,7 @@ a:hover.l-btn-disabled span.l-btn-left{
 }
 .menu-text{
 	position:absolute;
-	left:28px;
+	left:2px;
 	top:0px;
 }
 .menu-icon{
@@ -124,8 +124,6 @@ a:hover.l-btn-disabled span.l-btn-left{
 .menu-active{
 	border: 1px solid #a8d8eb;
 	background: #dcecf3;	
-	-moz-border-radius:3px;
-	-webkit-border-radius: 3px;
 }
 
 
