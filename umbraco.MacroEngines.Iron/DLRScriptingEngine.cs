@@ -43,7 +43,7 @@ namespace umbraco.MacroEngines.Iron
                 vars.Add(prop.Key, prop.Value);
             }
             mse.ScriptVariables = vars;
-            return mse.ExecuteFile(IOHelper.MapPath(SystemDirectories.Python + "/" + macro.ScriptName));
+            return mse.ExecuteFile(IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + macro.ScriptName));
         }
 
         #endregion
