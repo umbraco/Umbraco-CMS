@@ -996,6 +996,9 @@ namespace umbraco.cms.businesslogic
             /// <returns>An array of PropertyType.</returns>
             PropertyType[] GetPropertyTypes(int contentTypeId);
 
+            [Obsolete("Please use GetPropertyTypes() instead", false)]
+            PropertyType[] PropertyTypes { get; }
+
             /// <summary>
             /// Gets a list of all PropertyTypes on the Tab for a given ContentType.
             /// </summary>
