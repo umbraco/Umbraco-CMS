@@ -38,8 +38,6 @@ namespace umbraco.presentation.webservices
             return "Not implemented";
         }
 
-        #region methods from savefile.aspx
-
         [WebMethod]
         public string SaveCss(string fileName, string oldName, string fileContents, int fileID)
         {
@@ -231,63 +229,58 @@ namespace umbraco.presentation.webservices
         }
 
         [WebMethod]
-        public string SaveDLRScript(string fileName, string oldName, string fileContents, bool ignoreDebugging)
-        {
+        public string SaveDLRScript(string fileName, string oldName, string fileContents, bool ignoreDebugging) {
+
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentNullException("fileName");
+
             StreamWriter SW;
-            string tempFileName = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + System.DateTime.Now.Ticks.ToString() + "_" + fileName);
+
+            //As Files Can Be Stored In Sub Directories, So We Need To Get The Exeuction Directory Correct
+            var lastOccurance = fileName.LastIndexOf('/') + 1;
+            var directory = fileName.Substring(0, lastOccurance);
+            var fileNameWithExt = fileName.Substring(lastOccurance);
+            var tempFileName = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + directory + DateTime.Now.Ticks + "_" + fileNameWithExt);
             
-    
 			//SW = File.CreateText(tempFileName);
-            SW = new System.IO.StreamWriter(tempFileName, false, Encoding.UTF8);
+            SW = new StreamWriter(tempFileName, false, Encoding.UTF8);
             SW.Write(fileContents);
 			SW.Close();
                 
-				string errorMessage = "";
-
-                if (!ignoreDebugging)
-                {
-                    Hashtable args = new Hashtable();
-
-                    Node n = new Node(Document.GetRootDocuments()[0].Id);
+				var errorMessage = "";
+                if (!ignoreDebugging) {
+                    var args = new Hashtable();
+                    var n = new Node(Document.GetRootDocuments()[0].Id);
                     args.Add("currentPage", n);
 
-                    try
-                    {
-                        // TODO: Hook the new MacroEngine
-                        IMacroEngine engine = MacroEngineFactory.GetByFilename(tempFileName);
-                        string tempErrorMessage = "";
-                        string xpath = UmbracoSettings.UseLegacyXmlSchema ? "/root/node" : "/root/*";
+                    try {
+                        var engine = MacroEngineFactory.GetByFilename(tempFileName);
+                        var tempErrorMessage = "";
+                        var xpath = UmbracoSettings.UseLegacyXmlSchema ? "/root/node" : "/root/*";
                         if (!engine.Validate(fileContents, tempFileName, Node.GetNodeByXpath(xpath), out tempErrorMessage))
                             errorMessage = tempErrorMessage;
-                    }
-                    catch (Exception err)
-                    {
+                    } catch (Exception err) {
                         errorMessage = err.ToString();
                     }
                 }
 
-                if (errorMessage ==  "")
-                {
+                if (errorMessage ==  "") {
                     //Hardcoded security-check... only allow saving files in xslt directory... 
-                    string savePath = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + fileName);
+                    var savePath = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + fileName);
 
-                    if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.MacroScripts + "/")))
-                    {
-                        SW = new System.IO.StreamWriter(savePath, false, Encoding.UTF8);
+                    if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.MacroScripts + "/"))) {
+                        SW = new StreamWriter(savePath, false, Encoding.UTF8);
                         SW.Write(fileContents);
                         SW.Close();
                         errorMessage = "true";
 
                         //deletes the old xslt file
-                        if (fileName != oldName)
-                        {
-                            string p = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + oldName);
-                            if (System.IO.File.Exists(p))
-                                System.IO.File.Delete(p);
+                        if (fileName != oldName) {
+                            var p = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + oldName);
+                            if (File.Exists(p))
+                                File.Delete(p);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         errorMessage = "Illegal path";
                     }
                 }
@@ -354,11 +347,9 @@ namespace umbraco.presentation.webservices
         }
 
         [WebMethod]
-        public string SaveTemplate(string templateName, string templateAlias, string templateContents, int templateID, int masterTemplateID)
-        {
-            if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
-            {
-                Template _template = new Template(templateID);
+        public string SaveTemplate(string templateName, string templateAlias, string templateContents, int templateID, int masterTemplateID) {
+            if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID)) {
+                var _template = new Template(templateID);
                 string retVal = "false";
 
                 if (_template != null)
@@ -377,15 +368,10 @@ namespace umbraco.presentation.webservices
                     else
                         template.ClearCachedTemplate(_template.Id);
                 }
-                else
-                    return "false";
-
-
                 return retVal;
             }
             return "false";
         }
 
-        #endregion
     }
 }
