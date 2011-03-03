@@ -43,7 +43,7 @@ namespace umbraco.BusinessLogic.Utils
                     allowedExt.Add(x.Value);
 
             DirectoryInfo appCodeFolder = new DirectoryInfo(IOHelper.MapPath(IOHelper.ResolveUrl("~/App_code")));
-            if (appCodeFolder.Exists && appCodeFolder.GetFilesByExtensions(allowedExt.ToArray()).Count() > 0)
+            if (appCodeFolder.Exists && appCodeFolder.GetFilesByExtensions(true, allowedExt.ToArray()).Count() > 0)
             {
                 types.AddRange(FindClassesMarkedWithAttribute(Assembly.Load("App_Code"), attribute));
             }
@@ -178,10 +178,18 @@ namespace umbraco.BusinessLogic.Utils
             return t => (type.IsAssignableFrom(t) && (onlyConcreteClasses ? (t.IsClass && !t.IsAbstract) : true));
         }
 
-        public static IEnumerable<FileInfo> GetFilesByExtensions(this DirectoryInfo dir, params string[] extensions)
+        public static IEnumerable<FileInfo> GetFilesByExtensions(this DirectoryInfo dir, bool searchSubdirs, params string[] extensions)
         {
             var allowedExtensions = new HashSet<string>(extensions, StringComparer.OrdinalIgnoreCase);
-            return dir.GetFiles().Where(f => allowedExtensions.Contains(f.Extension));
+            IEnumerable<FileInfo> returnedFiles; 
+            returnedFiles = dir.GetFiles().Where(f => allowedExtensions.Contains(f.Extension));
+            if (searchSubdirs)
+            {
+                foreach(DirectoryInfo di in dir.GetDirectories())
+                    returnedFiles.Concat(di.GetFilesByExtensions(true, extensions));
+            }
+
+            return returnedFiles;
         }
     }
 }
