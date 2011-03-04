@@ -138,8 +138,9 @@
     </copy>
 
     <copy todir="${build.symbolFiles.dir}" flatten="true">
-      <fileset basedir="${root.dir}\umbraco" >
+      <fileset basedir="${root.dir}" >
         <include name="**/*.pdb" />
+          <include name="**/bin/*.xml" />
       </fileset>
     </copy>
     
