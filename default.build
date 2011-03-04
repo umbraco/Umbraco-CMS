@@ -9,7 +9,7 @@
     <property name="nant.settings.currentframework" value="net-4.0" />,
 
     <property name="build.version" value="4.7 RC"/>
-    <property name="build.configuration" value="Release"/>
+    <property name="build.configuration" value="Debug"/>
 
 
   <!-- filenames and directories, generally won't change -->
