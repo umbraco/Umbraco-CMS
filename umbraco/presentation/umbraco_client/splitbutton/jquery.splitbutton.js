@@ -424,12 +424,14 @@
                 return false;
             });
             var _c = null;
-            _a.bind("mouseenter.splitbutton", function () {
-                _c = setTimeout(function () {
-                    _b();
-                }, _8.duration);
-                return false;
-            }).bind("mouseleave.splitbutton", function () {
+//            _a.bind("mouseenter.splitbutton", function () {
+//                _c = setTimeout(function () {
+//                    _b();
+//                }, _8.duration);
+//                return false;
+//            })
+            
+            _a.bind("mouseleave.splitbutton", function () {
                 if (_c) {
                     clearTimeout(_c);
                 }

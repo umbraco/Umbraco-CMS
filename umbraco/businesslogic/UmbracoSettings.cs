@@ -860,6 +860,24 @@ namespace umbraco
             }
         }
 
+        public static XmlNode AppCodeFileExtensions
+        {
+            get
+            {
+                XmlNode value = GetKeyAsNode("/settings/developer/appCodeFileExtensions");
+                if (value != null)
+                {
+                    return value;
+                }
+
+                // default is .cs and .vb
+                value = _umbracoSettings.CreateElement("appCodeFileExtensions");
+                value.AppendChild(xmlHelper.addTextNode(_umbracoSettings, "ext", "cs"));
+                value.AppendChild(xmlHelper.addTextNode(_umbracoSettings, "ext", "vb"));
+                return value;
+            }
+        }
+
         /// <summary>
         /// Tells us whether the Xml to always update disk cache, when changes are made to content
         /// Default is enabled

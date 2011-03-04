@@ -198,6 +198,21 @@ namespace umbraco.BusinessLogic
 		#region Cookie Helpers
 
         /// <summary>
+        /// Determines whether a cookie has a value with a specified key.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns>
+        /// 	<c>true</c> if the cookie has a  value  with the specified key; otherwise, <c>false</c>.
+        /// </returns>
+        [Obsolete("Use !string.IsNullOrEmpty(GetCookieValue(key))", false)]
+        public static bool HasCookieValue(string key)
+        {
+            return !string.IsNullOrEmpty(GetCookieValue(key));
+        }
+
+
+
+        /// <summary>
         /// Gets the cookie value.
         /// </summary>
         /// <param name="key">The key.</param>
