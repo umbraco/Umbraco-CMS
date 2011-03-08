@@ -135,6 +135,8 @@ namespace umbraco.cms.businesslogic.packager {
             if (appendFile) {
                 if (!string.IsNullOrEmpty(mcr.Xslt))
                     AppendFileToManifest(IOHelper.ResolveUrl(SystemDirectories.Xslt) + "/" + mcr.Xslt, packageDirectory, doc);
+                if (!string.IsNullOrEmpty(mcr.ScriptingFile))
+                    AppendFileToManifest(IOHelper.ResolveUrl(SystemDirectories.MacroScripts) + "/" + mcr.ScriptingFile, packageDirectory, doc);
 
                 if (!string.IsNullOrEmpty(mcr.Type))
                     AppendFileToManifest(mcr.Type, packageDirectory, doc);
