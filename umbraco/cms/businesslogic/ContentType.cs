@@ -142,17 +142,30 @@ namespace umbraco.cms.businesslogic
             //by-passes a lot of queries just to determine if this is a true/false data type
 
             string sql = "select " +
-                "cmsDataType.controlId " +
+                "cmsDataType.controlId, masterContentType.alias as masterAlias " +
                 "from " +
-                " cmsContentType " +
+                "cmsContentType " +
                 "inner join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId) " +
-                "inner join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) " +
-                " where cmsContentType.alias = @contentTypeAlias and cmsPropertyType.Alias = @propertyAlias";
-            //grab the controlid
-            Guid controlId = Application.SqlHelper.ExecuteScalar<Guid>(sql,
+                "left join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) and cmsPropertyType.Alias = @propertyAlias " +
+                "left join cmsContentType masterContentType on masterContentType.nodeid = cmsContentType.masterContentType " +
+                "where cmsContentType.alias = @contentTypeAlias";
+            //grab the controlid or test for parent
+            Guid controlId = Guid.Empty;
+            var reader = Application.SqlHelper.ExecuteReader(sql,
                 Application.SqlHelper.CreateParameter("@contentTypeAlias", contentTypeAlias),
                 Application.SqlHelper.CreateParameter("@propertyAlias", propertyTypeAlias)
                 );
+            if (reader.Read())
+            {
+                if (!reader.IsNull("controlId"))
+                    controlId = reader.GetGuid("controlId");
+                else if (!reader.IsNull("masterAlias") && !String.IsNullOrEmpty(reader.GetString("masterAlias")))
+                {
+                    controlId = GetDataType(reader.GetString("masterAlias"), propertyTypeAlias);
+                }
+            }
+            reader.Close();
+
             //add to cache
             _propertyTypeCache.Add(key, controlId);
 
