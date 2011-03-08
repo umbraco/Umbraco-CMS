@@ -10,7 +10,7 @@ namespace umbraco.presentation.install.steps
     /// </summary>
     public partial class validatePermissions : UserControl
     {
-        private string[] permissionDirs = {SystemDirectories.Css, SystemDirectories.Config, SystemDirectories.Data, SystemDirectories.Media, SystemDirectories.Masterpages, SystemDirectories.Xslt, SystemDirectories.Usercontrols, SystemDirectories.Preview};
+        private string[] permissionDirs = {SystemDirectories.Css, SystemDirectories.Config, SystemDirectories.Data, SystemDirectories.Media, SystemDirectories.Masterpages, SystemDirectories.MacroScripts, SystemDirectories.Xslt, SystemDirectories.Usercontrols, SystemDirectories.Preview};
         private string[] permissionFiles = { };
         private string[] packagesPermissionsDirs = {SystemDirectories.Bin, SystemDirectories.Umbraco, SystemDirectories.Usercontrols, SystemDirectories.Packages};
 
