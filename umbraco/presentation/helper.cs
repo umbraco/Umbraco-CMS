@@ -105,6 +105,8 @@ namespace umbraco
                                 }
                                 else
                                 {
+                                    // reset attribute value in case no value has been found on parents
+                                    attributeValue = String.Empty;
                                     XmlDocument umbracoXML = presentation.UmbracoContext.Current.GetXml();
 
                                     String[] splitpath = (String[])pageElements["splitpath"];
