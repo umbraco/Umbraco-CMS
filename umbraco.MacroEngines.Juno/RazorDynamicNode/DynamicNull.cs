@@ -30,5 +30,10 @@ namespace umbraco.MacroEngines
         {
             return string.Empty;
         }
+        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        {
+            result = this;
+            return true;
+        }
     }
 }

@@ -5,16 +5,24 @@ using System.Text;
 using System.Dynamic;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using System.Collections;
 
 namespace umbraco.MacroEngines
 {
-    public class DynamicXml : DynamicObject
+    public class DynamicXml : DynamicObject, IEnumerable
     {
         public XElement BaseElement { get; set; }
 
         public DynamicXml(XElement baseElement)
         {
             this.BaseElement = baseElement;
+        }
+        public string InnerText
+        {
+            get
+            {
+                return BaseElement.Value;
+            }
         }
         public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
         {
@@ -44,6 +52,7 @@ namespace umbraco.MacroEngines
         }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
+
             //Go ahead and try to fetch all of the elements matching the member name, and wrap them
             var elements = BaseElement.Elements(binder.Name);
 
@@ -113,6 +122,11 @@ namespace umbraco.MacroEngines
             }
             result = null;
             return false;
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            return this.BaseElement.Elements().Select(e => new DynamicXml(e)).GetEnumerator();
         }
     }
 }

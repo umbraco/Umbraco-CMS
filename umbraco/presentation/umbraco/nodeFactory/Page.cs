@@ -330,12 +330,16 @@ namespace umbraco.NodeFactory
 
         public static Node GetNodeByXpath(string xpath)
         {
-            XPathNodeIterator xpathNode = library.GetXmlNodeByXPath(xpath);
-            XmlNode n = ((IHasXmlNode) xpathNode.Current).GetNode();
-            if (n != null) {
-                return new Node(n);
+            XPathNodeIterator itNode = library.GetXmlNodeByXPath(xpath);
+            XmlNode nodeXmlNode = null;
+            if (itNode.MoveNext())
+            {
+                nodeXmlNode = ((IHasXmlNode)itNode.Current).GetNode();
             }
-
+            if (nodeXmlNode != null)
+            {
+                return new Node(nodeXmlNode);
+            }
             return null;
         }
 

@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Web;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using umbraco.IO;
 
 namespace umbraco.BusinessLogic.Utils
@@ -36,8 +37,13 @@ namespace umbraco.BusinessLogic.Utils
             }
 
             // also add types from app_code, if any
+            List<string> allowedExt = new List<string>();
+            foreach (XmlNode x in UmbracoSettings.AppCodeFileExtensions)
+                if (!String.IsNullOrEmpty(x.Value))
+                    allowedExt.Add(x.Value);
+
             DirectoryInfo appCodeFolder = new DirectoryInfo(IOHelper.MapPath(IOHelper.ResolveUrl("~/App_code")));
-            if (appCodeFolder.Exists && appCodeFolder.GetFiles().Length > 0)
+            if (appCodeFolder.Exists && appCodeFolder.GetFilesByExtensions(true, allowedExt.ToArray()).Count() > 0)
             {
                 types.AddRange(FindClassesMarkedWithAttribute(Assembly.Load("App_Code"), attribute));
             }
@@ -45,29 +51,29 @@ namespace umbraco.BusinessLogic.Utils
             return types.Distinct();
         }
 
-		static IEnumerable<Type> FindClassesMarkedWithAttribute(Assembly assembly, Type attribute)
-		{
-			try
-			{
-				return assembly.GetTypes().Where(type => type.GetCustomAttributes(attribute, true).Length > 0);
-			}
-			catch (ReflectionTypeLoadException ex)
-			{
-				if (GlobalSettings.DebugMode)
-				{
-					StringBuilder sb = new StringBuilder();
-					sb.AppendFormat("Unable to load one or more of the types in assembly '{0}'. Exceptions were thrown:", assembly.FullName);
-					foreach (Exception e in ex.LoaderExceptions)
-						sb.AppendFormat("\n{0}: {1}", e.GetType().FullName, e.Message);
-					throw new Exception(sb.ToString());
-				}
-				else
-				{
-					// return the types that were loaded, ignore those that could not be loaded
-					return ex.Types;
-				}
-			}
-		}
+        static IEnumerable<Type> FindClassesMarkedWithAttribute(Assembly assembly, Type attribute)
+        {
+            try
+            {
+                return assembly.GetTypes().Where(type => type.GetCustomAttributes(attribute, true).Length > 0);
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                if (GlobalSettings.DebugMode)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendFormat("Unable to load one or more of the types in assembly '{0}'. Exceptions were thrown:", assembly.FullName);
+                    foreach (Exception e in ex.LoaderExceptions)
+                        sb.AppendFormat("\n{0}: {1}", e.GetType().FullName, e.Message);
+                    throw new Exception(sb.ToString());
+                }
+                else
+                {
+                    // return the types that were loaded, ignore those that could not be loaded
+                    return ex.Types;
+                }
+            }
+        }
 
         /// <summary>
         /// Searches all loaded assemblies for classes of the type passed in.
@@ -104,7 +110,7 @@ namespace umbraco.BusinessLogic.Utils
                 string binFolder = Path.Combine(IO.IOHelper.MapPath("/", false), "bin");
                 string[] strTypes = TypeResolver.GetAssignablesFromType<T>(binFolder, "*.dll");
 
-               
+
 
 
                 List<Type> types = new List<Type>();
@@ -170,6 +176,20 @@ namespace umbraco.BusinessLogic.Utils
         private static Predicate<Type> OnlyConcreteClasses(Type type, bool onlyConcreteClasses)
         {
             return t => (type.IsAssignableFrom(t) && (onlyConcreteClasses ? (t.IsClass && !t.IsAbstract) : true));
+        }
+
+        public static IEnumerable<FileInfo> GetFilesByExtensions(this DirectoryInfo dir, bool searchSubdirs, params string[] extensions)
+        {
+            var allowedExtensions = new HashSet<string>(extensions, StringComparer.OrdinalIgnoreCase);
+            IEnumerable<FileInfo> returnedFiles; 
+            returnedFiles = dir.GetFiles().Where(f => allowedExtensions.Contains(f.Extension));
+            if (searchSubdirs)
+            {
+                foreach(DirectoryInfo di in dir.GetDirectories())
+                    returnedFiles.Concat(di.GetFilesByExtensions(true, extensions));
+            }
+
+            return returnedFiles;
         }
     }
 }

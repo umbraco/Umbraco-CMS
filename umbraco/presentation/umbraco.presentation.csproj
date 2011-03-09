@@ -3217,9 +3217,9 @@
     <Folder Include="css\" />
     <Folder Include="data\previews\" />
     <Folder Include="data\preview\" />
+    <Folder Include="macroScripts\" />
     <Folder Include="masterpages\" />
     <Folder Include="media\" />
-    <Folder Include="python\" />
     <Folder Include="umbraco\ActionHandlers\scripts\" />
     <Folder Include="umbraco\imaging\" />
     <Folder Include="umbraco\library\" />

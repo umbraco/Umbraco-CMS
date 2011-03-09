@@ -69,6 +69,10 @@ namespace umbraco.MacroEngines
         {
             return DynamicNodeWalker.Up(this, number);
         }
+        public DynamicNode Up(string nodeTypeAlias)
+        {
+            return DynamicNodeWalker.Up(this, nodeTypeAlias);
+        }
         public DynamicNode Down()
         {
             return DynamicNodeWalker.Down(this);
@@ -76,6 +80,10 @@ namespace umbraco.MacroEngines
         public DynamicNode Down(int number)
         {
             return DynamicNodeWalker.Down(this, number);
+        }
+        public DynamicNode Down(string nodeTypeAlias)
+        {
+            return DynamicNodeWalker.Down(this, nodeTypeAlias);
         }
         public DynamicNode Next()
         {
@@ -85,6 +93,11 @@ namespace umbraco.MacroEngines
         {
             return DynamicNodeWalker.Next(this, number);
         }
+        public DynamicNode Next(string nodeTypeAlias)
+        {
+            return DynamicNodeWalker.Next(this, nodeTypeAlias);
+        }
+
         public DynamicNode Previous()
         {
             return DynamicNodeWalker.Previous(this);
@@ -93,7 +106,18 @@ namespace umbraco.MacroEngines
         {
             return DynamicNodeWalker.Previous(this, number);
         }
-
+        public DynamicNode Previous(string nodeTypeAlias)
+        {
+            return DynamicNodeWalker.Previous(this, nodeTypeAlias);
+        }
+        public DynamicNode Sibling(int number)
+        {
+            return DynamicNodeWalker.Sibling(this, number);
+        }
+        public DynamicNode Sibling(string nodeTypeAlias)
+        {
+            return DynamicNodeWalker.Sibling(this, nodeTypeAlias);
+        }
         public DynamicNodeList GetChildrenAsList
         {
             get
@@ -395,21 +419,27 @@ namespace umbraco.MacroEngines
             }
             return null;
         }
-        public bool IsProtected()
+        public bool IsProtected
         {
-            if (n != null)
+            get
             {
-                return umbraco.library.IsProtected(n.Id, n.Path);
+                if (n != null)
+                {
+                    return umbraco.library.IsProtected(n.Id, n.Path);
+                }
+                return false;
             }
-            return false;
         }
-        public bool HasAccess()
+        public bool HasAccess
         {
-            if (n != null)
+            get
             {
-                return umbraco.library.HasAccess(n.Id, n.Path);
+                if (n != null)
+                {
+                    return umbraco.library.HasAccess(n.Id, n.Path);
+                }
+                return true;
             }
-            return true;
         }
 
         public string Media(string propertyAlias, string mediaPropertyAlias)
@@ -614,7 +644,7 @@ namespace umbraco.MacroEngines
         }
         public DynamicNodeList Ancestors(int level)
         {
-            return Ancestors(n => n.Level == level);
+            return Ancestors(n => n.Level <= level);
         }
         public DynamicNodeList Ancestors(string nodeTypeAlias)
         {
@@ -741,8 +771,16 @@ namespace umbraco.MacroEngines
         }
         public bool Visible
         {
-            get;
-            set;
+            get
+            {
+                if (n == null) return true;
+                IProperty umbracoNaviHide = n.GetProperty("umbracoNaviHide");
+                if (umbracoNaviHide != null)
+                {
+                    return umbracoNaviHide.Value != "1";
+                }
+                return true;
+            }
         }
         public string Url
         {

@@ -72,7 +72,7 @@ body
 }
 #PlaceHolderAppIcons_content
 {
-    overflow: hidden;
+    overflow: auto;
 }
 
 #control_overlay
