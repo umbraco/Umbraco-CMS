@@ -741,8 +741,16 @@ namespace umbraco.MacroEngines
         }
         public bool Visible
         {
-            get;
-            set;
+            get
+            {
+                if (n == null) return true;
+                IProperty umbracoNaviHide = n.GetProperty("umbracoNaviHide");
+                if (umbracoNaviHide != null)
+                {
+                    return umbracoNaviHide.Value != "1";
+                }
+                return true;
+            }
         }
         public string Url
         {
