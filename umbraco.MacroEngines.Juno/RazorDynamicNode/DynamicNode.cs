@@ -69,6 +69,10 @@ namespace umbraco.MacroEngines
         {
             return DynamicNodeWalker.Up(this, number);
         }
+        public DynamicNode Up(string nodeTypeAlias)
+        {
+            return DynamicNodeWalker.Up(this, nodeTypeAlias);
+        }
         public DynamicNode Down()
         {
             return DynamicNodeWalker.Down(this);
@@ -76,6 +80,10 @@ namespace umbraco.MacroEngines
         public DynamicNode Down(int number)
         {
             return DynamicNodeWalker.Down(this, number);
+        }
+        public DynamicNode Down(string nodeTypeAlias)
+        {
+            return DynamicNodeWalker.Down(this, nodeTypeAlias);
         }
         public DynamicNode Next()
         {
@@ -85,6 +93,11 @@ namespace umbraco.MacroEngines
         {
             return DynamicNodeWalker.Next(this, number);
         }
+        public DynamicNode Next(string nodeTypeAlias)
+        {
+            return DynamicNodeWalker.Next(this, nodeTypeAlias);
+        }
+
         public DynamicNode Previous()
         {
             return DynamicNodeWalker.Previous(this);
@@ -93,7 +106,10 @@ namespace umbraco.MacroEngines
         {
             return DynamicNodeWalker.Previous(this, number);
         }
-
+        public DynamicNode Previous(string nodeTypeAlias)
+        {
+            return DynamicNodeWalker.Previous(this, nodeTypeAlias);
+        }
         public DynamicNodeList GetChildrenAsList
         {
             get
