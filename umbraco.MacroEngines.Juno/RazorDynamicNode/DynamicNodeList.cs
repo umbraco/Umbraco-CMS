@@ -14,7 +14,7 @@ namespace umbraco.MacroEngines
 {
     public class DynamicNodeList : DynamicObject, IEnumerable
     {
-        public IEnumerable<DynamicNode> Items { get; set; }
+        public List<DynamicNode> Items { get; set; }
 
         public DynamicNodeList()
         {
@@ -168,6 +168,20 @@ namespace umbraco.MacroEngines
         public IQueryable<T> OrderBy<T>(string key)
         {
             return ((IQueryable<T>)Items.AsQueryable()).OrderBy(key);
+        }
+
+        public void Add(DynamicNode node)
+        {
+            node.ownerList = this;
+            this.Items.Add(node);
+        }
+        public void Remove(DynamicNode node)
+        {
+            if (this.Items.Contains(node))
+            {
+                node.ownerList = null;
+                this.Items.Remove(node);
+            }
         }
     }
 }
