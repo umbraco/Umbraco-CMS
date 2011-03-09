@@ -149,22 +149,38 @@ namespace umbraco.cms.businesslogic
                 "left join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) and cmsPropertyType.Alias = @propertyAlias " +
                 "left join cmsContentType masterContentType on masterContentType.nodeid = cmsContentType.masterContentType " +
                 "where cmsContentType.alias = @contentTypeAlias";
+
+            //Ensure that getdatatype doesn't throw an exception
+            //http://our.umbraco.org/forum/developers/razor/18085-Access-custom-node-properties-with-Razor
+
             //grab the controlid or test for parent
             Guid controlId = Guid.Empty;
-            var reader = Application.SqlHelper.ExecuteReader(sql,
-                Application.SqlHelper.CreateParameter("@contentTypeAlias", contentTypeAlias),
-                Application.SqlHelper.CreateParameter("@propertyAlias", propertyTypeAlias)
-                );
-            if (reader.Read())
+            IRecordsReader reader = null;
+            try
             {
-                if (!reader.IsNull("controlId"))
-                    controlId = reader.GetGuid("controlId");
-                else if (!reader.IsNull("masterAlias") && !String.IsNullOrEmpty(reader.GetString("masterAlias")))
+                reader = Application.SqlHelper.ExecuteReader(sql,
+                    Application.SqlHelper.CreateParameter("@contentTypeAlias", contentTypeAlias),
+                    Application.SqlHelper.CreateParameter("@propertyAlias", propertyTypeAlias)
+                    );
+                if (reader.Read())
                 {
-                    controlId = GetDataType(reader.GetString("masterAlias"), propertyTypeAlias);
+                    if (!reader.IsNull("controlId"))
+                        controlId = reader.GetGuid("controlId");
+                    else if (!reader.IsNull("masterAlias") && !String.IsNullOrEmpty(reader.GetString("masterAlias")))
+                    {
+                        controlId = GetDataType(reader.GetString("masterAlias"), propertyTypeAlias);
+                    }
+
                 }
             }
-            reader.Close();
+            catch (UmbracoException)
+            {
+                _propertyTypeCache.Add(key, controlId);
+            }
+            finally
+            {
+                reader.Close();
+            }
 
             //add to cache
             _propertyTypeCache.Add(key, controlId);
