@@ -2396,10 +2396,15 @@ namespace System.Linq.Dynamic
                 default:
                     return Expression.Equal(left, right);
             }
-
-            var body = Expression.Condition(Expression.TypeEqual(innerLeft, right.Type), binaryExpression, Expression.Constant(false));
-            return Expression.Lambda<Func<DynamicNode, bool>>(body, parameters);
-
+            if (leftIsLambda || rightIsLambda)
+            {
+                var body = Expression.Condition(Expression.TypeEqual(innerLeft, right.Type), binaryExpression, Expression.Constant(false));
+                return Expression.Lambda<Func<DynamicNode, bool>>(body, parameters);
+            }
+            else
+            {
+                return binaryExpression;
+            }
 
         }
 
