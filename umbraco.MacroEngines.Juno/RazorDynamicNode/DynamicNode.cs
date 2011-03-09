@@ -620,7 +620,7 @@ namespace umbraco.MacroEngines
         }
         public DynamicNodeList Ancestors(int level)
         {
-            return Ancestors(n => n.Level == level);
+            return Ancestors(n => n.Level <= level);
         }
         public DynamicNodeList Ancestors(string nodeTypeAlias)
         {
