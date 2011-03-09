@@ -52,10 +52,15 @@ namespace umbraco.MacroEngines
         }
         public static DynamicNode Next(this DynamicNode context, int number)
         {
+            if (context.ownerList == null && context.Parent != null)
+            {
+                var list = context.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
+                context.ownerList = new DynamicNodeList(list);
+            }
             if (context.ownerList != null)
             {
                 List<DynamicNode> container = context.ownerList.Items.ToList();
-                int currentIndex = container.IndexOf(context);
+                int currentIndex = container.FindIndex(n => n.Id == context.Id);
                 if (currentIndex != -1)
                 {
                     return container.ElementAtOrDefault(currentIndex + (number + 1));
@@ -76,10 +81,15 @@ namespace umbraco.MacroEngines
         }
         public static DynamicNode Previous(this DynamicNode context, int number)
         {
+            if (context.ownerList == null && context.Parent != null)
+            {
+                var list = context.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
+                context.ownerList = new DynamicNodeList(list);
+            }
             if (context.ownerList != null)
             {
                 List<DynamicNode> container = context.ownerList.Items.ToList();
-                int currentIndex = container.IndexOf(context);
+                int currentIndex = container.FindIndex(n => n.Id == context.Id);
                 if (currentIndex != -1)
                 {
                     return container.ElementAtOrDefault(currentIndex + (number - 1));
