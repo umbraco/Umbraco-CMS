@@ -26,6 +26,10 @@ namespace umbraco.MacroEngines
         {
             return this;
         }
+        public int Count()
+        {
+            return 0;
+        }
         public override string ToString()
         {
             return string.Empty;
@@ -34,6 +38,20 @@ namespace umbraco.MacroEngines
         {
             result = this;
             return true;
+        }
+        public bool IsNull
+        {
+            get
+            {
+                return true;
+            }
+        }
+        public bool HasValue
+        {
+            get
+            {
+                return false;
+            }
         }
     }
 }
