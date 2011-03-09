@@ -29,7 +29,17 @@ namespace System.Linq.Dynamic
             {
                 //source list is DynamicNode and the lambda returns a Func<object>
                 IQueryable<DynamicNode> typedSource = source as IQueryable<DynamicNode>;
-                Func<DynamicNode, object> func = (Func<DynamicNode, object>)lambda.Compile();
+                var compiledFunc = lambda.Compile();
+                Func<DynamicNode, object> func = null;
+                Func<DynamicNode, bool> boolFunc = null;
+                if (compiledFunc is Func<DynamicNode, object>)
+                {
+                    func = (Func<DynamicNode, object>)compiledFunc;
+                }
+                if (compiledFunc is Func<DynamicNode, bool>)
+                {
+                    boolFunc = (Func<DynamicNode, bool>)compiledFunc;
+                }
                 return typedSource.Where(delegate(DynamicNode node)
                 {
                     object value = -1;
@@ -37,24 +47,30 @@ namespace System.Linq.Dynamic
                     //I can't figure out why this is double func<>'d
                     try
                     {
-                        var firstFuncResult = func(node);
-                        if (firstFuncResult is Func<DynamicNode, object>)
+                        if (func != null)
                         {
-                            value = (firstFuncResult as Func<DynamicNode, object>)(node);
+                            var firstFuncResult = func(node);
+                            if (firstFuncResult is Func<DynamicNode, object>)
+                            {
+                                value = (firstFuncResult as Func<DynamicNode, object>)(node);
+                            }
+                            if (firstFuncResult is Func<DynamicNode, bool>)
+                            {
+                                value = (firstFuncResult as Func<DynamicNode, bool>)(node);
+                            }
+                            if (firstFuncResult is bool)
+                            {
+                                return (bool)firstFuncResult;
+                            }
+                            if (value is bool)
+                            {
+                                return (bool)value;
+                            }
                         }
-                        if (firstFuncResult is Func<DynamicNode, bool>)
+                        if (boolFunc != null)
                         {
-                            value = (firstFuncResult as Func<DynamicNode, bool>)(node);
+                            return boolFunc(node);
                         }
-                        if (firstFuncResult is bool)
-                        {
-                            return (bool)firstFuncResult;
-                        }
-                        if (value is bool)
-                        {
-                            return (bool)value;
-                        }
-
                         return false;
                     }
                     catch (Exception)
@@ -1444,50 +1460,54 @@ namespace System.Linq.Dynamic
             }
             else
             {
-                //hack to bypass property existance checks
-                //Gareth Evans, twitter @agrath 
-                if (typeof(DynamicObject).IsAssignableFrom(type))
-                {
-                    //We are going to generate a dynamic method by hand coding the expression tree
-                    //this will invoke TryGetMember (but wrapped in an expression tree)
-                    //so that when it's evaluated, DynamicNode should be supported
-
-                    ParameterExpression instanceExpression = Expression.Parameter(typeof(DynamicNode), "instance");
-                    ParameterExpression result = Expression.Parameter(typeof(object), "result");
-                    ParameterExpression binder = Expression.Variable(typeof(DynamicQueryableGetMemberBinder), "binder");
-                    ParameterExpression ignoreCase = Expression.Variable(typeof(bool), "ignoreCase");
-                    ConstructorInfo getMemberBinderConstructor = typeof(DynamicQueryableGetMemberBinder).GetConstructor(new Type[] { typeof(string), typeof(bool) });
-                    LabelTarget blockReturnLabel = Expression.Label(typeof(object));
-                    MethodInfo method = typeof(DynamicNode).GetMethod("TryGetMember");
-
-                    BlockExpression block = Expression.Block(
-                     typeof(object),
-                     new[] { ignoreCase, binder, result },
-                     Expression.Assign(ignoreCase, Expression.Constant(false, typeof(bool))),
-                     Expression.Assign(binder, Expression.New(getMemberBinderConstructor, Expression.Constant(id, typeof(string)), ignoreCase)),
-                     Expression.Assign(result, Expression.Constant(null)),
-                     Expression.IfThen(Expression.NotEqual(Expression.Constant(null), instanceExpression),
-                        Expression.Call(instanceExpression, method, binder, result)),
-                     Expression.IfThen(
-                        Expression.TypeEqual(result, typeof(DynamicNull)),
-                        Expression.Assign(result,
-                            Expression.Constant(false, typeof(object))
-                        )
-                     ),
-                     Expression.Return(blockReturnLabel, result),
-                     Expression.Label(blockReturnLabel, Expression.Constant(-2, typeof(object)))
-                     );
-                    LambdaExpression lax = Expression.Lambda<Func<DynamicNode, object>>(block, instanceExpression);
-                    return lax;
-                }
                 //Looks for a member on the type, but above, we're rerouting that into TryGetMember
                 MemberInfo member = FindPropertyOrField(type, id, instance == null);
                 if (member == null)
-                    throw ParseError(errorPos, Res.UnknownPropertyOrField,
-                        id, GetTypeName(type));
-                return member is PropertyInfo ?
-                    Expression.Property(instance, (PropertyInfo)member) :
-                    Expression.Field(instance, (FieldInfo)member);
+                {
+                    if (typeof(DynamicObject).IsAssignableFrom(type))
+                    {
+                        //We are going to generate a dynamic method by hand coding the expression tree
+                        //this will invoke TryGetMember (but wrapped in an expression tree)
+                        //so that when it's evaluated, DynamicNode should be supported
+
+                        ParameterExpression instanceExpression = Expression.Parameter(typeof(DynamicNode), "instance");
+                        ParameterExpression result = Expression.Parameter(typeof(object), "result");
+                        ParameterExpression binder = Expression.Variable(typeof(DynamicQueryableGetMemberBinder), "binder");
+                        ParameterExpression ignoreCase = Expression.Variable(typeof(bool), "ignoreCase");
+                        ConstructorInfo getMemberBinderConstructor = typeof(DynamicQueryableGetMemberBinder).GetConstructor(new Type[] { typeof(string), typeof(bool) });
+                        LabelTarget blockReturnLabel = Expression.Label(typeof(object));
+                        MethodInfo method = typeof(DynamicNode).GetMethod("TryGetMember");
+
+                        BlockExpression block = Expression.Block(
+                         typeof(object),
+                         new[] { ignoreCase, binder, result },
+                         Expression.Assign(ignoreCase, Expression.Constant(false, typeof(bool))),
+                         Expression.Assign(binder, Expression.New(getMemberBinderConstructor, Expression.Constant(id, typeof(string)), ignoreCase)),
+                         Expression.Assign(result, Expression.Constant(null)),
+                         Expression.IfThen(Expression.NotEqual(Expression.Constant(null), instanceExpression),
+                            Expression.Call(instanceExpression, method, binder, result)),
+                         Expression.IfThen(
+                            Expression.TypeEqual(result, typeof(DynamicNull)),
+                            Expression.Assign(result,
+                                Expression.Constant(false, typeof(object))
+                            )
+                         ),
+                         Expression.Return(blockReturnLabel, result),
+                         Expression.Label(blockReturnLabel, Expression.Constant(-2, typeof(object)))
+                         );
+                        LambdaExpression lax = Expression.Lambda<Func<DynamicNode, object>>(block, instanceExpression);
+                        return lax;
+                    }
+                }
+                else
+                {
+                    return member is PropertyInfo ?
+                   Expression.Property(instance, (PropertyInfo)member) :
+                   Expression.Field(instance, (FieldInfo)member);
+                }
+                throw ParseError(errorPos, Res.UnknownPropertyOrField,
+                    id, GetTypeName(type));
+
             }
         }
 

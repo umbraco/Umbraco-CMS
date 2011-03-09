@@ -395,21 +395,27 @@ namespace umbraco.MacroEngines
             }
             return null;
         }
-        public bool IsProtected()
+        public bool IsProtected
         {
-            if (n != null)
+            get
             {
-                return umbraco.library.IsProtected(n.Id, n.Path);
+                if (n != null)
+                {
+                    return umbraco.library.IsProtected(n.Id, n.Path);
+                }
+                return false;
             }
-            return false;
         }
-        public bool HasAccess()
+        public bool HasAccess
         {
-            if (n != null)
+            get
             {
-                return umbraco.library.HasAccess(n.Id, n.Path);
+                if (n != null)
+                {
+                    return umbraco.library.HasAccess(n.Id, n.Path);
+                }
+                return true;
             }
-            return true;
         }
 
         public string Media(string propertyAlias, string mediaPropertyAlias)
