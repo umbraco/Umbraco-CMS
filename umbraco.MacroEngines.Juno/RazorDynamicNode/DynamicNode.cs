@@ -110,6 +110,14 @@ namespace umbraco.MacroEngines
         {
             return DynamicNodeWalker.Previous(this, nodeTypeAlias);
         }
+        public DynamicNode Sibling(int number)
+        {
+            return DynamicNodeWalker.Sibling(this, number);
+        }
+        public DynamicNode Sibling(string nodeTypeAlias)
+        {
+            return DynamicNodeWalker.Sibling(this, nodeTypeAlias);
+        }
         public DynamicNodeList GetChildrenAsList
         {
             get

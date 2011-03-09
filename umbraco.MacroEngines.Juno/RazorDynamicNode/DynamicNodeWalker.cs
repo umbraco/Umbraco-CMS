@@ -101,6 +101,70 @@ namespace umbraco.MacroEngines
                 throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicNodeList", context.Id));
             }
         }
+        public static DynamicNode Sibling(this DynamicNode context, int number)
+        {
+            if (context.ownerList == null && context.Parent != null)
+            {
+                var list = context.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
+                context.ownerList = new DynamicNodeList(list);
+            }
+            if (context.ownerList != null)
+            {
+                List<DynamicNode> container = context.ownerList.Items.ToList();
+                int currentIndex = container.FindIndex(n => n.Id == context.Id);
+                if (currentIndex != -1)
+                {
+                    return container.ElementAtOrDefault(currentIndex + number);
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicNodeList but could not retrieve the index for it's position in the list", context.Id));
+                }
+            }
+            else
+            {
+                throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicNodeList", context.Id));
+            }
+        }
+        public static DynamicNode Sibling(this DynamicNode context, string nodeTypeAlias)
+        {
+            if (context.ownerList == null && context.Parent != null)
+            {
+                var list = context.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
+                context.ownerList = new DynamicNodeList(list);
+            }
+            if (context.ownerList != null)
+            {
+                List<DynamicNode> container = context.ownerList.Items.ToList();
+                int currentIndex = container.FindIndex(n => n.Id == context.Id);
+                if (currentIndex != -1)
+                {
+                    int workingIndex = currentIndex + 1;
+                    while (workingIndex != currentIndex)
+                    {
+                        var working = container.ElementAtOrDefault(workingIndex);
+                        if (working != null && working.NodeTypeAlias == nodeTypeAlias)
+                        {
+                            return working;
+                        }
+                        workingIndex++;
+                        if (workingIndex > container.Count)
+                        {
+                            workingIndex = 0;
+                        }
+                    }
+                    return null;
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicNodeList but could not retrieve the index for it's position in the list", context.Id));
+                }
+            }
+            else
+            {
+                throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicNodeList", context.Id));
+            }
+        }
         public static DynamicNode Next(this DynamicNode context, string nodeTypeAlias)
         {
             if (context.ownerList == null && context.Parent != null)
