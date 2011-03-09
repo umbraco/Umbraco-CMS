@@ -8,6 +8,13 @@ function resizeTextArea(textEditor, offsetX, offsetY) {
     }
 }
 
+function UmbracoCodeSnippet() {
+    this.BeginTag = "";
+    this.EndTag = "";
+    this.TargetId = "";
+    this.CursorPos = 0;
+}
+
 
 // Ctrl + S support
 var ctrlDown = false;
@@ -27,6 +34,21 @@ function shortcutCheckKeysDown(e) {
             e.preventDefault();
         } else
             return false;
+    }
+
+    //snippet
+    if (ctrlDown && keycode == 77) {
+        if (window.umbracoInsertSnippet) {
+            var snippetCode = umbracoInsertSnippet();
+            if (window.UmbEditor) {
+                UmbEditor.Insert(snippetCode.BeginTag, snippetCode.EndTag, snippetCode.TargetId);
+                if (window.addEventListener) {
+                    e.preventDefault();
+                } else
+                    return false;
+            }
+        }
+
     }
 
     //load the insert value dialog: ctrl + g
@@ -66,14 +88,14 @@ var tab = {
     tosp: true,
     watching: {},
     results: {},
-    $: function(id) {
+    $: function (id) {
         return document.getElementById(id);
     },
 
-    watch: function(obj) {
+    watch: function (obj) {
         if (obj && this.$(obj)) {
             this.watching["_" + obj] = this.$(obj);
-            this.addEvent(this.$(obj), "keydown", function(evt) {
+            this.addEvent(this.$(obj), "keydown", function (evt) {
                 var sct = tab.$(obj).scrollTop;
                 var l = tab.$(obj).value.length;
                 var evt = (evt) ? evt : ((window.event) ? event : null);
@@ -118,9 +140,9 @@ var tab = {
         }
     },
 
-    click: function(obj, fn) {
+    click: function (obj, fn) {
         if (obj && this.$(obj)) {
-            this.addEvent(this.$(obj), "click", function() {
+            this.addEvent(this.$(obj), "click", function () {
                 tab.results["_" + this.id.split("_")[1]] = tab.parse(tab.watching["_" + this.id.split("_")[1]].value);
 
                 if (fn && fn.constructor == Function) {
@@ -130,13 +152,13 @@ var tab = {
         }
     },
 
-    get: function(obj) {
+    get: function (obj) {
         if (obj && this.$(obj)) {
             return this.results["_" + obj];
         }
     },
 
-    parse: function(str) {
+    parse: function (str) {
         var str = (str) ? str : "";
 
         if (str.length) {
@@ -152,10 +174,10 @@ var tab = {
         return str;
     },
 
-    addEvent: function(obj, type, fn) {
+    addEvent: function (obj, type, fn) {
         if (obj.attachEvent) {
             obj["e" + type + fn] = fn;
-            obj[type + fn] = function() {
+            obj[type + fn] = function () {
                 obj["e" + type + fn](window.event);
             }
 

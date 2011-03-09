@@ -1,17 +1,14 @@
-<%@ Page MasterPageFile="../masterpages/umbracoPage.Master" Language="c#" Codebehind="editTemplate.aspx.cs" ValidateRequest="false"
-  AutoEventWireup="True" Inherits="umbraco.cms.presentation.settings.editTemplate" %>
+<%@ Page MasterPageFile="../masterpages/umbracoPage.Master" Language="c#" CodeBehind="editTemplate.aspx.cs"
+    ValidateRequest="false" AutoEventWireup="True" Inherits="umbraco.cms.presentation.settings.editTemplate" %>
+
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
-
 <asp:Content ContentPlaceHolderID="head" runat="server">
-
-   <umb:CssInclude ID="CssInclude1" runat="server" FilePath="splitbutton/splitbutton.css" PathNameAlias="UmbracoClient" />
-
-   <umb:JsInclude ID="JsInclude" runat="server" FilePath="splitbutton/jquery.splitbutton.js" PathNameAlias="UmbracoClient"
-        Priority="1" />
-
-
-  <script language="javascript" type="text/javascript">
+    <umb:CssInclude ID="CssInclude1" runat="server" FilePath="splitbutton/splitbutton.css"
+        PathNameAlias="UmbracoClient" />
+    <umb:JsInclude ID="JsInclude" runat="server" FilePath="splitbutton/jquery.splitbutton.js"
+        PathNameAlias="UmbracoClient" Priority="1" />
+    <script language="javascript" type="text/javascript">
 
 
         jQuery(document).ready(function() {
@@ -192,8 +189,17 @@
         
        function insertCodeBlock()
        {
-             var cp = 'umbraco:Macro  runat="server" language="cshtml"';
-             UmbEditor.Insert('\n<' + cp +'>\n','\n</umbraco:Macro' + '>\n', '<%= editorSource.ClientID %>');
+            var snip = umbracoInsertSnippet();
+            UmbEditor.Insert(snip.BeginTag, snip.EndTag, '<%= editorSource.ClientID %>');
+       }
+
+       function umbracoInsertSnippet() {
+            var snip = new UmbracoCodeSnippet();
+            var cp = 'umbraco:Macro runat="server" language="cshtml"';
+            snip.BeginTag = '\n<' + cp + '>\n';
+            snip.EndTag = '\n<' + '/umbraco:Macro' + '>\n';
+            snip.TargetId = "<%= editorSource.ClientID %>";
+            return snip;
        }
 
        function insertCodeBlockFromTemplate(templateId)
@@ -235,64 +241,55 @@
             UmbClientMgr.openModalWindow('<%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>/dialogs/editMacro.aspx?objectId=<%= editorSource.ClientID %>' + t, 'Insert Macro', true, 470, 530, 0, 0, '', '');
        }
 
-  </script>
+    </script>
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">
-
-<cc1:UmbracoPanel ID="Panel1" runat="server" Width="608px" Height="336px" hasMenu="true">
-      <cc1:Pane ID="Pane7" runat="server" Height="44px" Width="528px">
-        <cc1:PropertyPanel ID="pp_name" runat="server">
-            <asp:TextBox ID="NameTxt" Width="350px" runat="server"></asp:TextBox>
-        </cc1:PropertyPanel>
-        <cc1:PropertyPanel id="pp_alias" runat="server">
-            <asp:TextBox ID="AliasTxt" Width="350px" runat="server"></asp:TextBox>
-        </cc1:PropertyPanel>
-        <cc1:PropertyPanel ID="pp_masterTemplate" runat="server">
-            <asp:DropDownList ID="MasterTemplate" Width="350px" runat="server" />
-        </cc1:PropertyPanel>
-        <cc1:PropertyPanel id="pp_source" runat="server">
-            <cc1:CodeArea ID="editorSource" runat="server" CodeBase="HTML" ClientSaveMethod="doSubmit" AutoResize="true" OffSetX="37" OffSetY="54" CssClass="codepress html" />
-        </cc1:PropertyPanel>
-      </cc1:Pane>
+    <cc1:UmbracoPanel ID="Panel1" runat="server" Width="608px" Height="336px" hasMenu="true">
+        <cc1:Pane ID="Pane7" runat="server" Height="44px" Width="528px">
+            <cc1:PropertyPanel ID="pp_name" runat="server">
+                <asp:TextBox ID="NameTxt" Width="350px" runat="server"></asp:TextBox>
+            </cc1:PropertyPanel>
+            <cc1:PropertyPanel ID="pp_alias" runat="server">
+                <asp:TextBox ID="AliasTxt" Width="350px" runat="server"></asp:TextBox>
+            </cc1:PropertyPanel>
+            <cc1:PropertyPanel ID="pp_masterTemplate" runat="server">
+                <asp:DropDownList ID="MasterTemplate" Width="350px" runat="server" />
+            </cc1:PropertyPanel>
+            <cc1:PropertyPanel ID="pp_source" runat="server">
+                <cc1:CodeArea ID="editorSource" runat="server" CodeBase="HTML" ClientSaveMethod="doSubmit"
+                    AutoResize="true" OffSetX="37" OffSetY="54" CssClass="codepress html" />
+            </cc1:PropertyPanel>
+        </cc1:Pane>
     </cc1:UmbracoPanel>
-
-
-    <div id="splitButton" style="display:inline;height:23px;vertical-align:top;">
+    <div id="splitButton" style="display: inline; height: 23px; vertical-align: top;">
         <a href="javascript:insertCodeBlock();" id="sb" class="sbLink">
-            <img alt="Insert Inline Razor Macro" src="../images/editor/insRazorMacro.png" title="Insert Inline Razor Macro" style="vertical-align:top;">
+            <img alt="Insert Inline Razor Macro" src="../images/editor/insRazorMacro.png" title="Insert Inline Razor Macro"
+                style="vertical-align: top;">
         </a>
     </div>
-
-
-    <div id="codeTemplateMenu" style="width:285px;">
-       
+    <div id="codeTemplateMenu" style="width: 285px;">
         <asp:Repeater ID="rpt_codeTemplates" runat="server">
             <ItemTemplate>
-                    <div class="codeTemplate" rel="<%# DataBinder.Eval(Container, "DataItem.Key") %>">
-                          <%# DataBinder.Eval(Container, "DataItem.Value") %>
-                    </div>                         
-            </ItemTemplate>
-        </asp:Repeater>
-
-    </div>
-
-    <div id="splitButtonMacro" style="display:inline;height:23px;vertical-align:top;">
-        <a href="javascript:openMacroModal();" id="sbMacro" class="sbLink">
-            <img alt="Insert Macro" src="../images/editor/insMacroSB.png" title="Insert Macro" style="vertical-align:top;">
-        </a>
-    </div>
-
-    <div id="macroMenu" style="width:285px">
-       
-         <asp:Repeater ID="rpt_macros" runat="server">
-            <ItemTemplate>
-                <div class="macro" rel="<%# DataBinder.Eval(Container, "DataItem.macroAlias")%>" params="<%#  DoesMacroHaveSettings(DataBinder.Eval(Container, "DataItem.id").ToString()) %>">
-                     <%# DataBinder.Eval(Container, "DataItem.macroName")%> 
+                <div class="codeTemplate" rel="<%# DataBinder.Eval(Container, "DataItem.Key") %>">
+                    <%# DataBinder.Eval(Container, "DataItem.Value") %>
                 </div>
             </ItemTemplate>
-         </asp:Repeater>
-        
+        </asp:Repeater>
+    </div>
+    <div id="splitButtonMacro" style="display: inline; height: 23px; vertical-align: top;">
+        <a href="javascript:openMacroModal();" id="sbMacro" class="sbLink">
+            <img alt="Insert Macro" src="../images/editor/insMacroSB.png" title="Insert Macro"
+                style="vertical-align: top;">
+        </a>
+    </div>
+    <div id="macroMenu" style="width: 285px">
+        <asp:Repeater ID="rpt_macros" runat="server">
+            <ItemTemplate>
+                <div class="macro" rel="<%# DataBinder.Eval(Container, "DataItem.macroAlias")%>"
+                    params="<%#  DoesMacroHaveSettings(DataBinder.Eval(Container, "DataItem.id").ToString()) %>">
+                    <%# DataBinder.Eval(Container, "DataItem.macroName")%>
+                </div>
+            </ItemTemplate>
+        </asp:Repeater>
     </div>
 </asp:Content>
-
-    

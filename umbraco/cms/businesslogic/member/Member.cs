@@ -796,6 +796,25 @@ namespace umbraco.cms.businesslogic.member
 			{
 				value = StateHelper.Cookies.Member.GetValue();
 			}
+            // compatibility with .NET Memberships
+            else if (HttpContext.Current.User.Identity.IsAuthenticated)
+            {
+                int _currentMemberId = 0;
+                if (int.TryParse(Membership.GetUser().ProviderUserKey.ToString(), out _currentMemberId))
+                {
+                    if (memberExists(_currentMemberId))
+                    {
+                        // current member is always in the cache, else add it!
+                        Member m = GetMemberFromCache(_currentMemberId);
+                        if (m == null)
+                        {
+                            m = new Member(_currentMemberId);
+                            AddMemberToCache(m);
+                        }
+                        return new MemberState(m.Id, m.UniqueId, m.LoginName);
+                    }
+                }
+            }
 			else
 			{
 				var context = HttpContext.Current;
