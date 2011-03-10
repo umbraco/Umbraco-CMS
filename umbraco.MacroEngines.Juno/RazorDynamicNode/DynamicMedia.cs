@@ -47,6 +47,25 @@ namespace umbraco.MacroEngines
 
         }
 
+        private DynamicMediaList _children;
+        public DynamicMediaList Children
+        {
+            get
+            {
+                if (_children == null)
+                {
+                    List<DynamicMedia> nodes = new List<DynamicMedia>();
+                    foreach (var mSub in _media.Children)
+                        nodes.Add(new DynamicMedia(mSub));
+                    _children = new DynamicMediaList(nodes);
+
+                }
+
+                return _children;
+            }
+        }
+
+
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             string name = binder.Name;
@@ -57,7 +76,12 @@ namespace umbraco.MacroEngines
             }
             if (_media != null)
             {
-                Properties props = _media.GenericProperties;
+                if (binder.Name.ToLower() == "name")
+                {
+                    result = _media.Text;
+                    return true;
+                }
+
                 Property prop = _media.getProperty(name);
                 // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
                 if (prop == null && name.Substring(0, 1).ToUpper() == name.Substring(0, 1))
@@ -73,6 +97,24 @@ namespace umbraco.MacroEngines
                     }
                     return true;
                 }
+
+                // failback to default properties
+                try
+                {
+                    result = _media.GetType().InvokeMember(binder.Name,
+                                                      System.Reflection.BindingFlags.GetProperty |
+                                                      System.Reflection.BindingFlags.Instance |
+                                                      System.Reflection.BindingFlags.Public |
+                                                      System.Reflection.BindingFlags.NonPublic,
+                                                      null,
+                                                      _media,
+                                                      null);
+                    return true;
+                }
+                catch
+                {
+                }
+
 
                 //return false because we have a media item now but the property doesn't exist
                 result = null;
