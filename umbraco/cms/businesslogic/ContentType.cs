@@ -141,14 +141,28 @@ namespace umbraco.cms.businesslogic
             //Instead of going via API, run this query to find the control type
             //by-passes a lot of queries just to determine if this is a true/false data type
 
-            string sql = "select " +
-                "cmsDataType.controlId, masterContentType.alias as masterAlias " +
-                "from " +
-                "cmsContentType " +
-                "inner join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId) " +
-                "left join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) and cmsPropertyType.Alias = @propertyAlias " +
-                "left join cmsContentType masterContentType on masterContentType.nodeid = cmsContentType.masterContentType " +
-                "where cmsContentType.alias = @contentTypeAlias";
+            //This SQL returns a larger recordset than intended 
+            //causing controlId to sometimes be null instead of correct
+            //because all properties for the type are returned
+            //side effect of changing inner join to left join when adding masterContentType
+            //string sql = "select " +
+            //    "cmsDataType.controlId, masterContentType.alias as masterAlias " +
+            //    "from " +
+            //    "cmsContentType " +
+            //    "inner join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId) " +
+            //    "left join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) and cmsPropertyType.Alias = @propertyAlias " +
+            //    "left join cmsContentType masterContentType on masterContentType.nodeid = cmsContentType.masterContentType " +
+            //    "where cmsContentType.alias = @contentTypeAlias";
+
+            //this SQL correctly returns a single row when the property exists, but still returns masterAlias if it doesn't
+            string sql = "select  cmsDataType.controlId, masterContentType.alias as masterAlias  " +
+                "from  " +
+                "cmsContentType  " +
+                "left join cmsPropertyType on (cmsContentType.nodeId = cmsPropertyType.contentTypeId and cmsPropertyType.Alias = @propertyAlias)  " +
+                "left join cmsDataType on (cmsPropertyType.dataTypeId = cmsDataType.nodeId) " +
+                "left join cmsContentType masterContentType on masterContentType.nodeid = cmsContentType.masterContentType  " +
+                "where  " +
+                "cmsContentType.alias = @contentTypeAlias";
 
             //Ensure that getdatatype doesn't throw an exception
             //http://our.umbraco.org/forum/developers/razor/18085-Access-custom-node-properties-with-Razor
