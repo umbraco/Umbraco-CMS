@@ -24,6 +24,7 @@ namespace umbraco.MacroEngines
         // these are private readonlys as const can't be Guids
         private readonly Guid DATATYPE_YESNO_GUID = new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a");
         private readonly Guid DATATYPE_TINYMCE_GUID = new Guid("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
+        private readonly Guid DATATYPE_UCOMPONENTS_MNTP_GUID = new Guid("c2d6894b-e788-4425-bcf2-308568e3d38b");
         #endregion
 
         internal DynamicNodeList ownerList;
@@ -327,6 +328,18 @@ namespace umbraco.MacroEngines
             {
                 result = iResult;
                 return true;
+            }
+
+            //MNTP List<int>
+            if (dataType == DATATYPE_UCOMPONENTS_MNTP_GUID)
+            {
+                string sResult = string.Format("{0}", result);
+                //csv mode
+                if (!sResult.Contains("<"))
+                {
+                    result = sResult.Split(',').Select(id => int.Parse(id)).ToList();
+                    return true;
+                }
             }
 
             //decimal
@@ -723,6 +736,13 @@ namespace umbraco.MacroEngines
                 nodes.Add(new DynamicNode(eachId));
             return new DynamicNodeList(nodes);
         }
+        public DynamicNodeList NodeById(List<int> Ids)
+        {
+            List<DynamicNode> nodes = new List<DynamicNode>();
+            foreach (int eachId in Ids)
+                nodes.Add(new DynamicNode(eachId));
+            return new DynamicNodeList(nodes);
+        }
         public DynamicNodeList NodeById(params object[] Ids)
         {
             return NodeById(Ids.ToList());
@@ -743,6 +763,13 @@ namespace umbraco.MacroEngines
         {
             List<DynamicMedia> nodes = new List<DynamicMedia>();
             foreach (object eachId in Ids)
+                nodes.Add(new DynamicMedia(eachId));
+            return new DynamicMediaList(nodes);
+        }
+        public DynamicMediaList MediaById(List<int> Ids)
+        {
+            List<DynamicMedia> nodes = new List<DynamicMedia>();
+            foreach (int eachId in Ids)
                 nodes.Add(new DynamicMedia(eachId));
             return new DynamicMediaList(nodes);
         }
