@@ -89,16 +89,41 @@ namespace System.Linq.Dynamic
             }
         }
 
-        public static IQueryable Select(this IQueryable source, string selector, params object[] values)
+        public static IQueryable Select(this IQueryable<DynamicNode> source, string selector, params object[] values)
         {
             if (source == null) throw new ArgumentNullException("source");
             if (selector == null) throw new ArgumentNullException("selector");
-            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, null, selector, values);
-            return source.Provider.CreateQuery(
-                Expression.Call(
-                    typeof(Queryable), "Select",
-                    new Type[] { source.ElementType, lambda.Body.Type },
-                    source.Expression, Expression.Quote(lambda)));
+            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(object), selector, values);
+            if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
+            {
+                //source list is DynamicNode and the lambda returns a Func<object>
+                IQueryable<DynamicNode> typedSource = source as IQueryable<DynamicNode>;
+                var compiledFunc = lambda.Compile();
+                Func<DynamicNode, object> func = null;
+                if (compiledFunc is Func<DynamicNode, object>)
+                {
+                    func = (Func<DynamicNode, object>)compiledFunc;
+                }
+                return typedSource.Select(delegate(DynamicNode node)
+                {
+                    object value = null;
+                    value = func(node);
+                    if (value is Func<DynamicNode, object>)
+                    {
+                        var innerValue = (value as Func<DynamicNode, object>)(node);
+                        return innerValue;
+                    }
+                    return value;
+                }).AsQueryable();
+            }
+            else
+            {
+                return source.Provider.CreateQuery(
+                    Expression.Call(
+                        typeof(Queryable), "Select",
+                        new Type[] { source.ElementType, lambda.Body.Type },
+                        source.Expression, Expression.Quote(lambda)));
+            }
         }
 
         public static IQueryable<T> OrderBy<T>(this IQueryable<T> source, string ordering, params object[] values)
