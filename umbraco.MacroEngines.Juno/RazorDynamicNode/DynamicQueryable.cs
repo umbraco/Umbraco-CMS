@@ -1068,7 +1068,16 @@ namespace System.Linq.Dynamic
                 else
                 {
                     CheckAndPromoteOperand(typeof(INotSignatures), op.text, ref expr, op.pos);
-                    expr = Expression.Not(expr);
+                    if (expr is LambdaExpression)
+                    {
+                        ParameterExpression[] parameters = new ParameterExpression[(expr as LambdaExpression).Parameters.Count];
+                        (expr as LambdaExpression).Parameters.CopyTo(parameters, 0);
+                        expr = Expression.Lambda<Func<DynamicNode, bool>>(Expression.Not(Expression.Invoke(expr, parameters)), parameters);
+                    }
+                    else
+                    {
+                        expr = Expression.Not(expr);
+                    }
                 }
                 return expr;
             }
@@ -1433,7 +1442,7 @@ namespace System.Linq.Dynamic
                         if (type == typeof(string) && instanceAsString != null)
                         {
                             Expression[] newArgs = (new List<Expression>() { Expression.Invoke(instanceAsString, instanceExpression) }).Concat(args).ToArray();
-                            mb = ExtensionMethodFinder.FindExtensionMethod(typeof(string), newArgs, id);
+                            mb = ExtensionMethodFinder.FindExtensionMethod(typeof(string), newArgs, id, true);
                             if (mb != null)
                             {
                                 return CallMethodOnDynamicNode(instance, newArgs, instanceAsString, instanceExpression, (MethodInfo)mb, true);
@@ -2338,12 +2347,12 @@ namespace System.Linq.Dynamic
                 }
                 innerRight = Expression.Invoke(right, parameters);
             }
-            if (leftIsLambda && !rightIsLambda && innerLeft != null && !(innerLeft is UnaryExpression) && innerLeft.Type is object)
+            if (leftIsLambda && !rightIsLambda && innerLeft != null && !(innerLeft is UnaryExpression) && innerLeft.Type == typeof(object))
             {
                 //innerLeft is an invoke
                 unboxedLeft = Expression.Unbox(innerLeft, right.Type);
             }
-            if (rightIsLambda && !leftIsLambda && innerRight != null && !(innerRight is UnaryExpression) && innerRight.Type is object)
+            if (rightIsLambda && !leftIsLambda && innerRight != null && !(innerRight is UnaryExpression) && innerRight.Type == typeof(object))
             {
                 //innerRight is an invoke
                 unboxedRight = Expression.Unbox(innerRight, left.Type);

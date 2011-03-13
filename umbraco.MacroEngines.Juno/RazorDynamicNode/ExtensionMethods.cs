@@ -92,5 +92,9 @@ namespace umbraco.MacroEngines
             }
             return false;
         }
+        public static bool ContainsInsensitive(this string haystack, string needle)
+        {
+            return haystack.IndexOf(needle, StringComparison.CurrentCultureIgnoreCase) >= 0;
+        }
     }
 }

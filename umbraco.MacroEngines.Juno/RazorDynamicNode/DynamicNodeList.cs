@@ -82,7 +82,7 @@ namespace umbraco.MacroEngines
 
                     try
                     {
-                        result = ExecuteExtensionMethod(args, name);
+                        result = ExecuteExtensionMethod(args, name, false);
                         return true;
                     }
                     catch (TargetInvocationException)
@@ -112,14 +112,14 @@ namespace umbraco.MacroEngines
 
         }
 
-        private object ExecuteExtensionMethod(object[] args, string name)
+        private object ExecuteExtensionMethod(object[] args, string name, bool argsContainsThis)
         {
             object result = null;
 
-            MethodInfo methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(IEnumerable<DynamicNode>), args, name);
+            MethodInfo methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(IEnumerable<DynamicNode>), args, name, false);
             if (methodToExecute == null)
             {
-                methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(DynamicNodeList), args, name);
+                methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(DynamicNodeList), args, name, false);
             }
             if (methodToExecute != null)
             {

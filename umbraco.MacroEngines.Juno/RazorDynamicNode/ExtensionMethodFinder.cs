@@ -11,7 +11,7 @@ namespace umbraco.MacroEngines
 {
     public static class ExtensionMethodFinder
     {
-        private static List<MethodInfo> GetAllExtensionMethods(Type thisType, string name, int argumentCount)
+        private static List<MethodInfo> GetAllExtensionMethods(Type thisType, string name, int argumentCount, bool argsContainsThis)
         {
             //get extension methods from runtime
             var candidates = (
@@ -35,7 +35,7 @@ namespace umbraco.MacroEngines
             //filter by name
             var methodsByName = candidates.Where(m => m.Name == name);
 
-            var isGenericAndRightParamCount = methodsByName.Where(m => m.GetParameters().Length == argumentCount + 1);
+            var isGenericAndRightParamCount = methodsByName.Where(m => m.GetParameters().Length == argumentCount + (argsContainsThis ? 0 : 1));
 
             //find the right overload that can take genericParameterType
             //which will be either DynamicNodeList or List<DynamicNode> which is IEnumerable`
@@ -109,7 +109,7 @@ namespace umbraco.MacroEngines
             return null;
         }
 
-        public static MethodInfo FindExtensionMethod(Type thisType, object[] args, string name)
+        public static MethodInfo FindExtensionMethod(Type thisType, object[] args, string name, bool argsContainsThis)
         {
             Type genericType = null;
             if (thisType.IsGenericType)
@@ -117,7 +117,7 @@ namespace umbraco.MacroEngines
                 genericType = thisType.GetGenericArguments()[0];
             }
 
-            var methods = GetAllExtensionMethods(thisType, name, args.Length);
+            var methods = GetAllExtensionMethods(thisType, name, args.Length, argsContainsThis);
 
             if (methods.Count == 0)
             {
