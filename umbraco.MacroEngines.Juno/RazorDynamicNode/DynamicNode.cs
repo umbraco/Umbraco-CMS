@@ -331,7 +331,7 @@ namespace umbraco.MacroEngines
 
             //decimal
             decimal dResult = 0;
-            if (decimal.TryParse(string.Format("{0}", result), out dResult))
+            if (decimal.TryParse(string.Format("{0}", result).Replace(",", "."), out dResult))
             {
                 result = dResult;
                 return true;
