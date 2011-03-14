@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -21,13 +22,13 @@ using System.Text.RegularExpressions;
 
 namespace umbraco.cms.presentation
 {
-	/// <summary>
-	/// Summary description for _default.
-	/// </summary>
- 	public partial class _umbraco : UmbracoEnsuredPage
-	{
-		protected umbWindow UmbWindow1;
-		protected System.Web.UI.WebControls.PlaceHolder bubbleText;
+    /// <summary>
+    /// Summary description for _default.
+    /// </summary>
+    public partial class _umbraco : UmbracoEnsuredPage
+    {
+        protected umbWindow UmbWindow1;
+        protected System.Web.UI.WebControls.PlaceHolder bubbleText;
 
         public string DefaultApp { get; private set; }
 
@@ -48,7 +49,7 @@ namespace umbraco.cms.presentation
                 {
 
                     string appClass = a.icon.StartsWith(".") ? a.icon.Substring(1, a.icon.Length - 1) : a.alias;
-                    
+
                     //adds client side event handlers to the icon buttons
                     JSEvents.Append(@"jQuery('." + appClass + "').click(function() { appClick.call(this, '" + a.alias + "'); } );");
                     JSEvents.Append(@"jQuery('." + appClass + "').dblclick(function() { appDblClick.call(this, '" + a.alias + "'); } );");
@@ -91,8 +92,8 @@ namespace umbraco.cms.presentation
 
             // Version check goes here!
 
-			// zb-00004 #29956 : refactor cookies names & handling
-			var updChkCookie = new umbraco.BusinessLogic.StateHelper.Cookies.Cookie("UMB_UPDCHK", GlobalSettings.VersionCheckPeriod); // was "updateCheck"
+            // zb-00004 #29956 : refactor cookies names & handling
+            var updChkCookie = new umbraco.BusinessLogic.StateHelper.Cookies.Cookie("UMB_UPDCHK", GlobalSettings.VersionCheckPeriod); // was "updateCheck"
             string updateCheckCookie = updChkCookie.HasValue ? updChkCookie.GetValue() : "";
 
             if (GlobalSettings.VersionCheckPeriod > 0 && String.IsNullOrEmpty(updateCheckCookie) && base.getUser().UserType.Alias == "admin")
@@ -105,16 +106,55 @@ namespace umbraco.cms.presentation
 
                 Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "upgradeChecker", "jQuery(document).ready(function() {umbraco.presentation.webservices.CheckForUpgrade.CallUpgradeService(umbracoCheckUpgrade);});", true);
 
-				updChkCookie.SetValue("1");
+                updChkCookie.SetValue("1");
             }
             DataBind();
+
+            AddIe9Meta();
+        }
+
+        private void AddIe9Meta()
+        {
+            if (Request.Browser.Browser == "IE" && Request.Browser.MajorVersion == 9)
+            {
+                StringBuilder metadata = new StringBuilder();
+                metadata.AppendFormat(
+    @"<link rel='icon' href='{0}' type='image/x-icon'>
+                <link rel='shortcut icon' href='{0}' type='image/x-icon'> 
+                <meta name='application-name' content='Umbraco CMS - {1}' />
+                <meta name='msapplication-tooltip' content='Umbraco CMS - {1}' />
+                <meta name='msapplication-navbutton-color' content='#f36f21' />
+                <meta name='msapplication-starturl' content='./umbraco.aspx' />",
+    IOHelper.ResolveUrl(SystemDirectories.Umbraco + "/images/pinnedIcons/umb.ico"),
+    HttpContext.Current.Request.Url.Host.ToLower().Replace("www.", ""));
+
+                var user = base.getUser();
+                if (user != null && user.Applications != null && user.Applications.Length > 0)
+                {
+                    foreach (var app in user.Applications)
+                    {
+                        metadata.AppendFormat(
+                            @"<meta name='msapplication-task' content='name={0}; action-uri={1}; icon-uri={2}' />",
+                            ui.Text("sections", app.alias, user),
+                            IOHelper.ResolveUrl(string.Format("{0}/umbraco.aspx#{1}", SystemDirectories.Umbraco, app.alias)),
+                            File.Exists(
+                                IOHelper.MapPath(
+                                    IOHelper.ResolveUrl(
+                                        string.Format("{0}/images/pinnedIcons/task_{1}.ico", SystemDirectories.Umbraco, app.alias))))
+                                ? "/umbraco/images/pinnedIcons/task_" + app.alias + ".ico"
+                                : "/umbraco/images/pinnedIcons/task_default.ico");
+                    }
+                }
+
+                this.Header.Controls.Add(new LiteralControl(metadata.ToString()));
+            }
         }
 
         /// <summary>
         /// Renders out all JavaScript references that have bee declared in IActions
         /// </summary>
         private void RenderActionJS()
-        {            
+        {
             var item = 0;
             foreach (var jsFile in umbraco.BusinessLogic.Actions.Action.GetJavaScriptFileReferences())
             {
@@ -125,7 +165,7 @@ namespace umbraco.cms.presentation
                 {
                     var jsUrl = new Uri(jsFile, UriKind.RelativeOrAbsolute);
                     //ok it validates, but so does alert('hello'); ! so we need to do more checks
-                    
+
                     //here are the valid chars in a url without escaping
                     if (Regex.IsMatch(jsFile, @"[^a-zA-Z0-9-._~:/?#\[\]@!$&'\(\)*\+,%;=]"))
                         isValid = false;
@@ -145,7 +185,7 @@ namespace umbraco.cms.presentation
                     {
                         //add to page
                         Page.ClientScript.RegisterClientScriptInclude(this.GetType(), item.ToString(), jsFile);
-                    }                    
+                    }
                 }
                 catch (UriFormatException)
                 {
@@ -163,5 +203,5 @@ namespace umbraco.cms.presentation
             }
         }
 
-	}
+    }
 }
