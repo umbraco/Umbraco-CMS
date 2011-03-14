@@ -10,7 +10,7 @@ namespace umbraco.editorControls.userControlGrapper
     {
         public static object ValueFromXmlString(object value, Type type)
         {
-            XmlSerializer ser = new XmlSerializer(value.GetType());
+            XmlSerializer ser = new XmlSerializer(type);
             StringReader strRdr = new StringReader(value.ToString());
             XmlTextReader xmlRdr = new XmlTextReader(strRdr);
             object obj = ser.Deserialize(xmlRdr);
