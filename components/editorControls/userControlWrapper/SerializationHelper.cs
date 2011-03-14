@@ -4,7 +4,7 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Xml;
 
-namespace umbraco.editorControls.userControlWrapper
+namespace umbraco.editorControls.userControlGrapper
 {
     public class SerializationHelper
     {
