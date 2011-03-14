@@ -89,16 +89,41 @@ namespace System.Linq.Dynamic
             }
         }
 
-        public static IQueryable Select(this IQueryable source, string selector, params object[] values)
+        public static IQueryable Select(this IQueryable<DynamicNode> source, string selector, params object[] values)
         {
             if (source == null) throw new ArgumentNullException("source");
             if (selector == null) throw new ArgumentNullException("selector");
-            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, null, selector, values);
-            return source.Provider.CreateQuery(
-                Expression.Call(
-                    typeof(Queryable), "Select",
-                    new Type[] { source.ElementType, lambda.Body.Type },
-                    source.Expression, Expression.Quote(lambda)));
+            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(object), selector, values);
+            if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
+            {
+                //source list is DynamicNode and the lambda returns a Func<object>
+                IQueryable<DynamicNode> typedSource = source as IQueryable<DynamicNode>;
+                var compiledFunc = lambda.Compile();
+                Func<DynamicNode, object> func = null;
+                if (compiledFunc is Func<DynamicNode, object>)
+                {
+                    func = (Func<DynamicNode, object>)compiledFunc;
+                }
+                return typedSource.Select(delegate(DynamicNode node)
+                {
+                    object value = null;
+                    value = func(node);
+                    if (value is Func<DynamicNode, object>)
+                    {
+                        var innerValue = (value as Func<DynamicNode, object>)(node);
+                        return innerValue;
+                    }
+                    return value;
+                }).AsQueryable();
+            }
+            else
+            {
+                return source.Provider.CreateQuery(
+                    Expression.Call(
+                        typeof(Queryable), "Select",
+                        new Type[] { source.ElementType, lambda.Body.Type },
+                        source.Expression, Expression.Quote(lambda)));
+            }
         }
 
         public static IQueryable<T> OrderBy<T>(this IQueryable<T> source, string ordering, params object[] values)
@@ -1068,7 +1093,16 @@ namespace System.Linq.Dynamic
                 else
                 {
                     CheckAndPromoteOperand(typeof(INotSignatures), op.text, ref expr, op.pos);
-                    expr = Expression.Not(expr);
+                    if (expr is LambdaExpression)
+                    {
+                        ParameterExpression[] parameters = new ParameterExpression[(expr as LambdaExpression).Parameters.Count];
+                        (expr as LambdaExpression).Parameters.CopyTo(parameters, 0);
+                        expr = Expression.Lambda<Func<DynamicNode, bool>>(Expression.Not(Expression.Invoke(expr, parameters)), parameters);
+                    }
+                    else
+                    {
+                        expr = Expression.Not(expr);
+                    }
                 }
                 return expr;
             }
@@ -1433,7 +1467,7 @@ namespace System.Linq.Dynamic
                         if (type == typeof(string) && instanceAsString != null)
                         {
                             Expression[] newArgs = (new List<Expression>() { Expression.Invoke(instanceAsString, instanceExpression) }).Concat(args).ToArray();
-                            mb = ExtensionMethodFinder.FindExtensionMethod(typeof(string), newArgs, id);
+                            mb = ExtensionMethodFinder.FindExtensionMethod(typeof(string), newArgs, id, true);
                             if (mb != null)
                             {
                                 return CallMethodOnDynamicNode(instance, newArgs, instanceAsString, instanceExpression, (MethodInfo)mb, true);
@@ -2338,12 +2372,12 @@ namespace System.Linq.Dynamic
                 }
                 innerRight = Expression.Invoke(right, parameters);
             }
-            if (leftIsLambda && !rightIsLambda && innerLeft != null && !(innerLeft is UnaryExpression) && innerLeft.Type is object)
+            if (leftIsLambda && !rightIsLambda && innerLeft != null && !(innerLeft is UnaryExpression) && innerLeft.Type == typeof(object))
             {
                 //innerLeft is an invoke
                 unboxedLeft = Expression.Unbox(innerLeft, right.Type);
             }
-            if (rightIsLambda && !leftIsLambda && innerRight != null && !(innerRight is UnaryExpression) && innerRight.Type is object)
+            if (rightIsLambda && !leftIsLambda && innerRight != null && !(innerRight is UnaryExpression) && innerRight.Type == typeof(object))
             {
                 //innerRight is an invoke
                 unboxedRight = Expression.Unbox(innerRight, left.Type);
@@ -2396,10 +2430,15 @@ namespace System.Linq.Dynamic
                 default:
                     return Expression.Equal(left, right);
             }
-
-            var body = Expression.Condition(Expression.TypeEqual(innerLeft, right.Type), binaryExpression, Expression.Constant(false));
-            return Expression.Lambda<Func<DynamicNode, bool>>(body, parameters);
-
+            if (leftIsLambda || rightIsLambda)
+            {
+                var body = Expression.Condition(Expression.TypeEqual(innerLeft, right.Type), binaryExpression, Expression.Constant(false));
+                return Expression.Lambda<Func<DynamicNode, bool>>(body, parameters);
+            }
+            else
+            {
+                return binaryExpression;
+            }
 
         }
 

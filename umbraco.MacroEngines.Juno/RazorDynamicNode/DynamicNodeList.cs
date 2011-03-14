@@ -48,6 +48,54 @@ namespace umbraco.MacroEngines
                 result = new DynamicNodeList(this.OrderBy<DynamicNode>(args.First().ToString()).ToList());
                 return true;
             }
+            if (name == "Pluck" || name == "Select")
+            {
+                string predicate = args.First().ToString();
+                var values = args.Skip(1).ToArray();
+                var query = (IQueryable<object>)this.Select(predicate, values);
+                object firstItem = query.FirstOrDefault();
+                if (firstItem == null)
+                {
+                    result = new DynamicNull();
+                }
+                else
+                {
+                    var types = from i in query
+                                group i by i.GetType() into g
+                                orderby g.Count() descending
+                                select new { g, Instances = g.Count() };
+                    var dominantType = types.First().g.Key;
+                    //remove items that are not the dominant type
+                    //e.g. string,string,string,string,false[DynamicNull],string
+                    var itemsOfDominantTypeOnly = query.ToList();
+                    itemsOfDominantTypeOnly.RemoveAll(item => !item.GetType().IsAssignableFrom(dominantType));
+                    if (dominantType == typeof(string))
+                    {
+                        result = (List<string>)itemsOfDominantTypeOnly.Cast<string>().ToList();
+                    }
+                    else if (dominantType == typeof(int))
+                    {
+                        result = (List<int>)itemsOfDominantTypeOnly.Cast<int>().ToList();
+                    }
+                    else if (dominantType == typeof(decimal))
+                    {
+                        result = (List<decimal>)itemsOfDominantTypeOnly.Cast<decimal>().ToList();
+                    }
+                    else if (dominantType == typeof(bool))
+                    {
+                        result = (List<bool>)itemsOfDominantTypeOnly.Cast<bool>().ToList();
+                    }
+                    else if (dominantType == typeof(DateTime))
+                    {
+                        result = (List<DateTime>)itemsOfDominantTypeOnly.Cast<DateTime>().ToList();
+                    }
+                    else
+                    {
+                        result = query.ToList();
+                    }
+                }
+                return true;
+            }
             try
             {
                 //Property?
@@ -82,7 +130,7 @@ namespace umbraco.MacroEngines
 
                     try
                     {
-                        result = ExecuteExtensionMethod(args, name);
+                        result = ExecuteExtensionMethod(args, name, false);
                         return true;
                     }
                     catch (TargetInvocationException)
@@ -112,14 +160,14 @@ namespace umbraco.MacroEngines
 
         }
 
-        private object ExecuteExtensionMethod(object[] args, string name)
+        private object ExecuteExtensionMethod(object[] args, string name, bool argsContainsThis)
         {
             object result = null;
 
-            MethodInfo methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(IEnumerable<DynamicNode>), args, name);
+            MethodInfo methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(IEnumerable<DynamicNode>), args, name, false);
             if (methodToExecute == null)
             {
-                methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(DynamicNodeList), args, name);
+                methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(DynamicNodeList), args, name, false);
             }
             if (methodToExecute != null)
             {
@@ -161,13 +209,17 @@ namespace umbraco.MacroEngines
             return Items.GetEnumerator();
         }
 
-        public IQueryable<T> Where<T>(string predicate, params object[] values)
+        private IQueryable<T> Where<T>(string predicate, params object[] values)
         {
             return ((IQueryable<T>)Items.AsQueryable()).Where(predicate, values);
         }
-        public IQueryable<T> OrderBy<T>(string key)
+        private IQueryable<T> OrderBy<T>(string key)
         {
             return ((IQueryable<T>)Items.AsQueryable()).OrderBy(key);
+        }
+        private IQueryable Select(string predicate, params object[] values)
+        {
+            return DynamicQueryable.Select(Items.AsQueryable(), predicate, values);
         }
 
         public void Add(DynamicNode node)
