@@ -35,4 +35,32 @@ Image:
 
 5. Update the advlink.js to make sure that it doesn't check for the loads of tabs in the traditional tiny link dialog (check old version)
 
-6.forced_root_block : false  (to avoid macro inserts being wrapped with p)
+
+6. Fix for macro div being inserted with surrounding p
+
+if (s.forced_root_block) {
+				//ed.onInit.add(t.forceRoots, t);
+				//ed.onSetContent.add(t.forceRoots, t);
+				//ed.onBeforeGetContent.add(t.forceRoots, t);
+			}
+		},
+
+		setup : function() {
+			var t = this, ed = t.editor, s = ed.settings, dom = ed.dom, selection = ed.selection;
+
+			// Force root blocks when typing and when getting output
+			if (s.forced_root_block) {
+				//ed.onBeforeExecCommand.add(t.forceRoots, t);
+				ed.onKeyUp.add(t.forceRoots, t);
+				ed.onPreProcess.add(t.forceRoots, t);
+			}
+
+7. Don't forget plugins/inlinepopups/skins/umbraco
+
+8. Update plugins/contextmenu (language stuff)
+
+ var keys = UmbClientMgr.uiKeys();
+
+            m.add({ title: keys['defaultdialogs_cut'], icon: 'cut', cmd: 'Cut' }).setDisabled(col);
+            m.add({ title: keys['general_copy'], icon: 'copy', cmd: 'Copy' }).setDisabled(col);
+            m.add({ title: keys['defaultdialogs_paste'], icon: 'paste', cmd: 'Paste' });
