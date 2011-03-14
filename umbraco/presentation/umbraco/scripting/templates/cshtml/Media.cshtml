@@ -1,0 +1,34 @@
+@*
+USING MEDIA
+=================================
+This snippet shows two ways of working with referenced media. Media is referenced from a page using a property with
+the type of 'MediaPicker' (or similar for instance MultiNodePicker in uComponents).
+
+How it works:
+- First we check that there's a property on the current page called 'relatedMedia' and that it has a selected value
+- In the first example we simply needs the path of the media which is stored in the property 'umbracoFile' and the 
+  media is referenced in the property with the alias of 'relatedMedia'. One line is all it takes!
+- In the second example we store the referenced media in a variable as we'd like to get not just the path but also
+  the name of the media for the friendly alt attribute.
+  
+NOTE: It is safe to remove this comment (anything between @ * * @), the code that generates the list is only the below!
+*@
+
+@inherits umbraco.MacroEngines.DynamicNodeContext
+@if (Model.HasProperty("relatedMedia") && Model.RelatedMedia != 0) {
+	<p>Simple: <br />
+		<img src='@Model.Media("relatedMedia", "umbracoFile")' />
+	</p>
+
+	<p>Advanced: <br />
+		@{
+			var image = @Model.Media("relatedMedia");
+		}
+		<img src='@image.UmbracoFile' alt='@image.Name' />
+	</p>
+} else {
+	<p>
+		This page doesn't contain a MediaPicker property with the alias of 'RelatedMedia' 
+		or No image is selected on this page
+	</p>
+}

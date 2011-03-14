@@ -34,14 +34,14 @@ var indentUnit = 2;
   }
 
   window.highlightText = function(string, callback, parser) {
-    var parser = (parser || Editor.Parser).make(stringStream(normaliseString(string)));
+    parser = (parser || Editor.Parser).make(stringStream(normaliseString(string)));
     var line = [];
     if (callback.nodeType == 1) {
       var node = callback;
       callback = function(line) {
         for (var i = 0; i < line.length; i++)
           node.appendChild(line[i]);
-        node.appendChild(document.createElement("BR"));
+        node.appendChild(document.createElement("br"));
       };
     }
 
@@ -53,7 +53,7 @@ var indentUnit = 2;
           line = [];
         }
         else {
-          var span = document.createElement("SPAN");
+          var span = document.createElement("span");
           span.className = token.style;
           span.appendChild(document.createTextNode(token.value));
           line.push(span);

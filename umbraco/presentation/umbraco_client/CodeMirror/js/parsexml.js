@@ -1,3 +1,11 @@
+/* This file defines an XML parser, with a few kludges to make it
+ * useable for HTML. autoSelfClosers defines a set of tag names that
+ * are expected to not have a closing tag, and doNotIndent specifies
+ * the tags inside of which no indentation should happen (see Config
+ * object). These can be disabled by passing the editor an object like
+ * {useHTMLKludges: false} as parserConfig option.
+ */
+
 var XMLParser = Editor.Parser = (function() {
   var Kludges = {
     autoSelfClosers: {"br": true, "img": true, "hr": true, "link": true, "input": true,
@@ -8,6 +16,9 @@ var XMLParser = Editor.Parser = (function() {
   var UseKludges = Kludges;
   var alignCDATA = false;
 
+  // Simple stateful tokenizer for XML documents. Returns a
+  // MochiKit-style iterator, with a state property that contains a
+  // function encapsulating the current state. See tokenize.js.
   var tokenizeXML = (function() {
     function inText(source, setState) {
       var ch = source.next();
@@ -26,6 +37,11 @@ var XMLParser = Editor.Parser = (function() {
           else if (source.lookAhead("--", true)) {
             setState(inBlock("xml-comment", "-->"));
             return null;
+          }
+          else if (source.lookAhead("DOCTYPE", true)) {
+            source.nextWhileMatches(/[\w\._\-]/);
+            setState(inBlock("xml-doctype", ">"));
+            return "xml-doctype";
           }
           else {
             return "xml-text";
@@ -114,11 +130,11 @@ var XMLParser = Editor.Parser = (function() {
   // parseJavaScript in parsejavascript.js (there is actually a bit more
   // shared code than I'd like), but it is quite a bit simpler.
   function parseXML(source) {
-    var tokens = tokenizeXML(source);
+    var tokens = tokenizeXML(source), token;
     var cc = [base];
     var tokenNr = 0, indented = 0;
     var currentTag = null, context = null;
-    var consume, marked;
+    var consume;
     
     function push(fs) {
       for (var i = fs.length - 1; i >= 0; i--)
@@ -133,13 +149,13 @@ var XMLParser = Editor.Parser = (function() {
       consume = false;
     }
 
-    function mark(style) {
-      marked = style;
+    function markErr() {
+      token.style += " xml-error";
     }
     function expect(text) {
       return function(style, content) {
         if (content == text) cont();
-        else mark("xml-error") || cont(arguments.callee);
+        else {markErr(); cont(arguments.callee);}
       };
     }
 
@@ -171,7 +187,7 @@ var XMLParser = Editor.Parser = (function() {
     function base() {
       return pass(element, base);
     }
-    var harmlessTokens = {"xml-text": true, "xml-entity": true, "xml-comment": true, "xml-processing": true};
+    var harmlessTokens = {"xml-text": true, "xml-entity": true, "xml-comment": true, "xml-processing": true, "xml-doctype": true};
     function element(style, content) {
       if (content == "<") cont(tagname, attributes, endtag(tokenNr == 1));
       else if (content == "</") cont(closetagname, expect(">"));
@@ -181,12 +197,12 @@ var XMLParser = Editor.Parser = (function() {
         cont();
       }
       else if (harmlessTokens.hasOwnProperty(style)) cont();
-      else mark("xml-error") || cont();
+      else {markErr(); cont();}
     }
     function tagname(style, content) {
       if (style == "xml-name") {
         currentTag = content.toLowerCase();
-        mark("xml-tagname");
+        token.style = "xml-tagname";
         cont();
       }
       else {
@@ -195,24 +211,22 @@ var XMLParser = Editor.Parser = (function() {
       }
     }
     function closetagname(style, content) {
-      if (style == "xml-name" && context && content.toLowerCase() == context.name) {
-        popContext();
-        mark("xml-tagname");
-      }
-      else {
-        mark("xml-error");
+      if (style == "xml-name") {
+        token.style = "xml-tagname";
+        if (context && content.toLowerCase() == context.name) popContext();
+        else markErr();
       }
       cont();
     }
     function endtag(startOfLine) {
       return function(style, content) {
         if (content == "/>" || (content == ">" && UseKludges.autoSelfClosers.hasOwnProperty(currentTag))) cont();
-        else if (content == ">") pushContext(currentTag, startOfLine) || cont();
-        else mark("xml-error") || cont(arguments.callee);
+        else if (content == ">") {pushContext(currentTag, startOfLine); cont();}
+        else {markErr(); cont(arguments.callee);}
       };
     }
     function attributes(style) {
-      if (style == "xml-name") mark("xml-attname") || cont(attribute, attributes);
+      if (style == "xml-name") {token.style = "xml-attname"; cont(attribute, attributes);}
       else pass();
     }
     function attribute(style, content) {
@@ -229,7 +243,7 @@ var XMLParser = Editor.Parser = (function() {
       indentation: function() {return indented;},
 
       next: function(){
-        var token = tokens.next();
+        token = tokens.next();
         if (token.style == "whitespace" && tokenNr == 0)
           indented = token.value.length;
         else
@@ -243,13 +257,9 @@ var XMLParser = Editor.Parser = (function() {
           return token;
 
         while(true){
-          consume = marked = false;
+          consume = false;
           cc.pop()(token.style, token.content);
-          if (consume){
-            if (marked)
-              token.style = marked;
-            return token;
-          }
+          if (consume) return token;
         }
       },
 

@@ -562,10 +562,9 @@ namespace umbraco.MacroEngines
                 }
                 else
                 {
-                    return node;
+                    return null;
                 }
             }
-
             return node;
         }
         public DynamicNodeList AncestorsOrSelf(Func<DynamicNode, bool> func)

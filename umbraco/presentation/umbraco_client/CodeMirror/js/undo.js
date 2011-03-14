@@ -9,7 +9,7 @@
  * complexity and hackery.
  *
  * In short, the editor 'touches' BR elements as it parses them, and
- * the History stores these. When nothing is touched in commitDelay
+ * the UndoHistory stores these. When nothing is touched in commitDelay
  * milliseconds, the changes are committed: It goes over all touched
  * nodes, throws out the ones that did not change since last commit or
  * are no longer in the document, and assembles the rest into zero or
@@ -26,11 +26,10 @@
 // delay (of no input) after which it commits a set of changes, and,
 // unfortunately, the 'parent' window -- a window that is not in
 // designMode, and on which setTimeout works in every browser.
-function History(container, maxDepth, commitDelay, editor, onChange) {
+function UndoHistory(container, maxDepth, commitDelay, editor) {
   this.container = container;
   this.maxDepth = maxDepth; this.commitDelay = commitDelay;
-  this.editor = editor; this.parent = editor.parent;
-  this.onChange = onChange;
+  this.editor = editor;
   // This line object represents the initial, empty editor.
   var initial = {text: "", from: null, to: null};
   // As the borders between lines are represented by BR elements, the
@@ -45,16 +44,16 @@ function History(container, maxDepth, commitDelay, editor, onChange) {
   this.firstTouched = false;
   // History is the set of committed changes, touched is the set of
   // nodes touched since the last commit.
-  this.history = []; this.redoHistory = []; this.touched = [];
+  this.history = []; this.redoHistory = []; this.touched = []; this.lostundo = 0;
 }
 
-History.prototype = {
+UndoHistory.prototype = {
   // Schedule a commit (if no other touches come in for commitDelay
   // milliseconds).
   scheduleCommit: function() {
     var self = this;
-    this.parent.clearTimeout(this.commitTimeout);
-    this.commitTimeout = this.parent.setTimeout(function(){self.tryCommit();}, this.commitDelay);
+    parent.clearTimeout(this.commitTimeout);
+    this.commitTimeout = parent.setTimeout(function(){self.tryCommit();}, this.commitDelay);
   },
 
   // Mark a node as touched. Null is a valid argument.
@@ -73,7 +72,7 @@ History.prototype = {
       // shadow in the redo history.
       var item = this.history.pop();
       this.redoHistory.push(this.updateTo(item, "applyChain"));
-      if (this.onChange) this.onChange();
+      this.notifyEnvironment();
       return this.chainNode(item);
     }
   },
@@ -85,7 +84,7 @@ History.prototype = {
       // The inverse of undo, basically.
       var item = this.redoHistory.pop();
       this.addUndoLevel(this.updateTo(item, "applyChain"));
-      if (this.onChange) this.onChange();
+      this.notifyEnvironment();
       return this.chainNode(item);
     }
   },
@@ -93,22 +92,24 @@ History.prototype = {
   clear: function() {
     this.history = [];
     this.redoHistory = [];
+    this.lostundo = 0;
   },
 
   // Ask for the size of the un/redo histories.
   historySize: function() {
-    return {undo: this.history.length, redo: this.redoHistory.length};
+    return {undo: this.history.length, redo: this.redoHistory.length, lostundo: this.lostundo};
   },
 
   // Push a changeset into the document.
   push: function(from, to, lines) {
     var chain = [];
     for (var i = 0; i < lines.length; i++) {
-      var end = (i == lines.length - 1) ? to : this.container.ownerDocument.createElement("BR");
+      var end = (i == lines.length - 1) ? to : document.createElement("br");
       chain.push({from: from, to: end, text: cleanText(lines[i])});
       from = end;
     }
     this.pushChains([chain], from == null && to == null);
+    this.notifyEnvironment();
   },
 
   pushChains: function(chains, doNotHighlight) {
@@ -128,7 +129,7 @@ History.prototype = {
   // Clear the undo history, make the current document the start
   // position.
   reset: function() {
-    this.history = []; this.redoHistory = [];
+    this.history = []; this.redoHistory = []; this.lostundo = 0;
   },
 
   textAfter: function(br) {
@@ -145,7 +146,7 @@ History.prototype = {
 
   // Commit unless there are pending dirty nodes.
   tryCommit: function() {
-    if (!window.History) return; // Stop when frame has been unloaded
+    if (!window || !window.parent || !window.UndoHistory) return; // Stop when frame has been unloaded
     if (this.editor.highlightDirty()) this.commit(true);
     else this.scheduleCommit();
   },
@@ -153,7 +154,7 @@ History.prototype = {
   // Check whether the touched nodes hold any changes, if so, commit
   // them.
   commit: function(doNotHighlight) {
-    this.parent.clearTimeout(this.commitTimeout);
+    parent.clearTimeout(this.commitTimeout);
     // Make sure there are no pending dirty nodes.
     if (!doNotHighlight) this.editor.highlightDirty(true);
     // Build set of chains.
@@ -162,7 +163,7 @@ History.prototype = {
     if (chains.length) {
       this.addUndoLevel(this.updateTo(chains, "linkChain"));
       this.redoHistory = [];
-      if (this.onChange) this.onChange();
+      this.notifyEnvironment();
     }
   },
 
@@ -189,6 +190,13 @@ History.prototype = {
   notifyDirty: function(nodes) {
     forEach(nodes, method(this.editor, "addDirtyNode"))
     this.editor.scheduleHighlight();
+  },
+
+  notifyEnvironment: function() {
+    if (this.onChange) this.onChange(this.editor);
+    // Used by the line-wrapping line-numbering code.
+    if (window.frameElement && window.frameElement.CodeMirror.updateNumbers)
+      window.frameElement.CodeMirror.updateNumbers();
   },
 
   // Link a chain into the DOM nodes (or the first/last links for null
@@ -228,8 +236,10 @@ History.prototype = {
   // it than allowed.
   addUndoLevel: function(diffs) {
     this.history.push(diffs);
-    if (this.history.length > this.maxDepth)
+    if (this.history.length > this.maxDepth) {
       this.history.shift();
+      lostundo += 1;
+    }
   },
 
   // Build chains from a set of touched nodes.
@@ -250,8 +260,8 @@ History.prototype = {
     function buildLine(node) {
       var text = [];
       for (var cur = node ? node.nextSibling : self.container.firstChild;
-           cur && cur.nodeName != "BR"; cur = cur.nextSibling)
-        if (cur.currentText) text.push(cur.currentText);
+           cur && (!isBR(cur) || cur.hackBR); cur = cur.nextSibling)
+        if (!cur.hackBR && cur.currentText) text.push(cur.currentText);
       return {from: node, to: cur, text: cleanText(text.join(""))};
     }
 
@@ -260,7 +270,7 @@ History.prototype = {
     var lines = [];
     if (self.firstTouched) self.touched.push(null);
     forEach(self.touched, function(node) {
-      if (node && node.parentNode != self.container) return;
+      if (node && (node.parentNode != self.container || node.hackBR)) return;
 
       if (node) node.historyTouched = false;
       else self.firstTouched = false;
@@ -275,7 +285,7 @@ History.prototype = {
     // Get the BR element after/before the given node.
     function nextBR(node, dir) {
       var link = dir + "Sibling", search = node[link];
-      while (search && search.nodeName != "BR")
+      while (search && !isBR(search))
         search = search[link];
       return search;
     }
@@ -373,7 +383,7 @@ History.prototype = {
         self.container.insertBefore(line.from, end);
 
       // Add the text.
-      var node = makePartSpan(fixSpaces(line.text), this.container.ownerDocument);
+      var node = makePartSpan(fixSpaces(line.text));
       self.container.insertBefore(node, end);
       // See if the cursor was on this line. Put it back, adjusting
       // for changed line length, if it was.
@@ -384,7 +394,7 @@ History.prototype = {
           // Only adjust if the cursor is after the unchanged part of
           // the line.
           for (var match = 0; match < cursor.offset &&
-               line.text.charAt(match) == prev.text.charAt(match); match++);
+               line.text.charAt(match) == prev.text.charAt(match); match++){}
           if (cursor.offset > match)
             cursordiff = line.text.length - prev.text.length;
         }
