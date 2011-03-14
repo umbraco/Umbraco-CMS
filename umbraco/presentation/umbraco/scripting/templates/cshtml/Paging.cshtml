@@ -1,0 +1,51 @@
+@*
+HOW TO DO PAGING
+=================================
+Intro
+
+How to customize:
+-
+
+How it works:
+- 
+
+NOTE: It is safe to remove this comment (anything between @ * * @), the code that generates the list is only the below!
+*@
+
+@inherits umbraco.MacroEngines.DynamicNodeContext
+@{
+	var pagesToList = @Model.Children;
+	var itemsPerPage = 3;
+	var numberOfItems = pagesToList.Count();
+	int currentPage = 1;
+	if (!int.TryParse(HttpContext.Current.Request.QueryString["Page"], out currentPage)) {
+		currentPage = 1;
+	}
+	currentPage--;
+	// THERE'S A BUG IN THIS COUNTER!
+	var numberOfPages = Math.Ceiling((decimal)(@numberOfItems / @itemsPerPage)); 
+
+	<p>
+		Total Items: @numberOfItems <br />
+		Items per Page: @itemsPerPage<br />
+		Pages: @numberOfPages;<br />
+		Current Page: @(currentPage)
+	</p>
+
+	<ul>
+		@foreach(var item in pagesToList.Skip(currentPage*itemsPerPage).Take(itemsPerPage))
+		{
+			<li>@item.Name</li>
+		}
+	</ul>
+
+	var Pages = Enumerable.Range(1, (int)numberOfPages);
+	foreach(var number in Pages) {
+		if (number-1 != currentPage) {
+		  <a href="?page=@number">@number</a>
+		} else {
+		  @number
+		}
+		@Html.Raw("&nbsp&nbsp");
+	}
+}

@@ -14,7 +14,7 @@
 // Make a stringstream stream out of an iterator that returns strings.
 // This is applied to the result of traverseDOM (see codemirror.js),
 // and the resulting stream is fed to the parser.
-window.stringStream = function(source){
+var stringStream = function(source){
   // String that's currently being iterated over.
   var current = "";
   // Position in that string.
@@ -39,11 +39,13 @@ window.stringStream = function(source){
   }
 
   return {
+    // peek: -> character
     // Return the next character in the stream.
     peek: function() {
       if (!ensureChars()) return null;
       return current.charAt(pos);
     },
+    // next: -> character
     // Get the next character, throw StopIteration if at end, check
     // for unused content.
     next: function() {
@@ -55,6 +57,7 @@ window.stringStream = function(source){
       }
       return current.charAt(pos++);
     },
+    // get(): -> string
     // Return the characters iterated over since the last call to
     // .get().
     get: function() {
@@ -89,7 +92,7 @@ window.stringStream = function(source){
         else if (str.slice(0, left) == cased(current.slice(pos))) {
           accum += current; current = "";
           try {current = source.next();}
-          catch (e) {break;}
+          catch (e) {if (e != StopIteration) throw e; break;}
           pos = 0;
           str = str.slice(left);
         }
@@ -106,8 +109,24 @@ window.stringStream = function(source){
 
       return found;
     },
+    // Wont't match past end of line.
+    lookAheadRegex: function(regex, consume) {
+      if (regex.source.charAt(0) != "^")
+        throw new Error("Regexps passed to lookAheadRegex must start with ^");
+
+      // Fetch the rest of the line
+      while (current.indexOf("\n", pos) == -1) {
+        try {current += source.next();}
+        catch (e) {if (e != StopIteration) throw e; break;}
+      }
+      var matched = current.slice(pos).match(regex);
+      if (matched && consume) pos += matched[0].length;
+      return matched;
+    },
 
     // Utils built on top of the above
+    // more: -> boolean
+    // Produce true if the stream isn't empty.
     more: function() {
       return this.peek() !== null;
     },

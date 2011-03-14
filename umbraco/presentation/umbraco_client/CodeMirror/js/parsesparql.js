@@ -6,7 +6,7 @@ var SparqlParser = Editor.Parser = (function() {
                         "isblank", "isliteral", "union", "a"]);
   var keywords = wordRegexp(["base", "prefix", "select", "distinct", "reduced", "construct", "describe",
                              "ask", "from", "named", "where", "order", "limit", "offset", "filter", "optional",
-                             "graph", "by", "asc", "desc", ]);
+                             "graph", "by", "asc", "desc"]);
   var operatorChars = /[*+\-<>=&|]/;
 
   var tokenizeSparql = (function() {

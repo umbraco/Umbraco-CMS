@@ -10,6 +10,8 @@
 var JSParser = Editor.Parser = (function() {
   // Token types that can be considered to be atoms.
   var atomicTypes = {"atom": true, "number": true, "variable": true, "string": true, "regexp": true};
+  // Setting that can be used to have JSON data indent properly.
+  var json = false;
   // Constructor for the lexical context objects.
   function JSLexical(indented, column, type, align, prev, info) {
     // indentation at start of this line
@@ -58,7 +60,7 @@ var JSParser = Editor.Parser = (function() {
     // semicolon. Actions at the end of the stack go first. It is
     // initialized with an infinitely looping action that consumes
     // whole statements.
-    var cc = [statements];
+    var cc = [json ? expressions : statements];
     // Context contains information about the current local scope, the
     // variables defined in that, and the scopes above it.
     var context = null;
@@ -204,6 +206,8 @@ var JSParser = Editor.Parser = (function() {
     }
     // Pop off the current lexical context.
     function poplex(){
+      if (lexical.type == ")")
+        indented = lexical.indented;
       lexical = lexical.prev;
     }
     poplex.lex = true;
@@ -216,6 +220,7 @@ var JSParser = Editor.Parser = (function() {
     function expect(wanted){
       return function expecting(type){
         if (type == wanted) cont();
+        else if (wanted == ";") pass();
         else cont(arguments.callee);
       };
     }
@@ -224,6 +229,9 @@ var JSParser = Editor.Parser = (function() {
     function statements(type){
       return pass(statement, statements);
     }
+    function expressions(type){
+      return pass(expression, expressions);
+    }
     // Dispatches various types of statements based on the type of the
     // current token.
     function statement(type){
@@ -231,6 +239,7 @@ var JSParser = Editor.Parser = (function() {
       else if (type == "keyword a") cont(pushlex("form"), expression, statement, poplex);
       else if (type == "keyword b") cont(pushlex("form"), statement, poplex);
       else if (type == "{") cont(pushlex("}"), block, poplex);
+      else if (type == ";") cont();
       else if (type == "function") cont(functiondef);
       else if (type == "for") cont(pushlex("form"), expect("("), pushlex(")"), forspec1, expect(")"), poplex, statement, poplex);
       else if (type == "variable") cont(pushlex("stat"), maybelabel);
@@ -249,13 +258,16 @@ var JSParser = Editor.Parser = (function() {
       else if (type == "operator") cont(expression);
       else if (type == "[") cont(pushlex("]"), commasep(expression, "]"), poplex, maybeoperator);
       else if (type == "{") cont(pushlex("}"), commasep(objprop, "}"), poplex, maybeoperator);
+      else cont();
     }
     // Called for places where operators, function calls, or
     // subscripts are valid. Will skip on to the next action if none
     // is found.
-    function maybeoperator(type){
-      if (type == "operator") cont(expression);
-      else if (type == "(") cont(pushlex(")"), expression, commasep(expression, ")"), poplex, maybeoperator);
+    function maybeoperator(type, value){
+      if (type == "operator" && /\+\+|--/.test(value)) cont(maybeoperator);
+      else if (type == "operator") cont(expression);
+      else if (type == ";") pass();
+      else if (type == "(") cont(pushlex(")"), commasep(expression, ")"), poplex, maybeoperator);
       else if (type == ".") cont(property, maybeoperator);
       else if (type == "[") cont(pushlex("]"), expression, expect("]"), poplex, maybeoperator);
     }
@@ -282,7 +294,7 @@ var JSParser = Editor.Parser = (function() {
         if (type == ",") cont(what, proceed);
         else if (type == end) cont();
         else cont(expect(end));
-      };
+      }
       return function commaSeparated(type) {
         if (type == end) cont();
         else pass(what, proceed);
@@ -337,5 +349,11 @@ var JSParser = Editor.Parser = (function() {
     return parser;
   }
 
-  return {make: parseJS, electricChars: "{}:"};
+  return {
+    make: parseJS,
+    electricChars: "{}:",
+    configure: function(obj) {
+      if (obj.json != null) json = obj.json;
+    }
+  };
 })();

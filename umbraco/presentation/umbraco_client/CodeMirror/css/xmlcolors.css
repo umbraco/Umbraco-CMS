@@ -1,3 +1,7 @@
+html {
+  cursor: text;
+}
+
 .editbox {
   margin: .4em;
   padding: 0;
@@ -43,7 +47,7 @@ span.xml-entity {
 }
 
 span.xml-error {
-  color: #F00;
+ color: #F00 !important;
 }
 
 span.xml-text {

@@ -1,3 +1,7 @@
+html {
+  cursor: text;
+}
+
 .editbox {
   margin: .4em;
   padding: 0;
@@ -7,7 +11,7 @@
 }
 
 pre.code, .editbox {
-  color: #666666;
+  color: #666;
 }
 
 .editbox p {
@@ -15,33 +19,37 @@ pre.code, .editbox {
 }
 
 span.css-at {
-  color: #770088;
+  color: #708;
 }
 
 span.css-unit {
-  color: #228811;
+  color: #281;
 }
 
 span.css-value {
-  color: #770088;
+  color: #708;
 }
 
 span.css-identifier {
   color: black;
 }
 
+span.css-selector {
+  color: #11B;
+}
+
 span.css-important {
-  color: #0000FF;
+  color: #00F;
 }
 
 span.css-colorcode {
-  color: #004499;
+  color: #299;
 }
 
 span.css-comment {
-  color: #AA7700;
+  color: #A70;
 }
 
 span.css-string {
-  color: #AA2222;
+  color: #A22;
 }

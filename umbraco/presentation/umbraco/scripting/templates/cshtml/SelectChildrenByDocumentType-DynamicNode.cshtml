@@ -1,7 +1,0 @@
-<em>DynamicNode:</em>
-<ul>
-    @foreach (var item in @Model.ChildItem.Where("umbracoNaviHide != true"))
-    {
-    <li><a href="@item.Url">@item.Name</a></li>
-}
-</ul>

@@ -1,9 +1,5 @@
 /* A few useful utility functions. */
 
-var internetExplorer = document.selection && window.ActiveXObject && /MSIE/.test(navigator.userAgent);
-var webkit = /AppleWebKit/.test(navigator.userAgent);
-var safari = /Apple Computers, Inc/.test(navigator.vendor);
-
 // Capture a method on an object.
 function method(obj, name) {
   return function() {obj[name].apply(obj, arguments);};
@@ -38,11 +34,14 @@ function matcher(regexp){
   return function(value){return regexp.test(value);};
 }
 
-// Test whether a DOM node has a certain CSS class. Much faster than
-// the MochiKit equivalent, for some reason.
-function hasClass(element, className){
+// Test whether a DOM node has a certain CSS class.
+function hasClass(element, className) {
   var classes = element.className;
   return classes && new RegExp("(^| )" + className + "($| )").test(classes);
+}
+function removeClass(element, className) {
+  element.className = element.className.replace(new RegExp(" " + className + "\\b", "g"), "");
+  return element;
 }
 
 // Insert a DOM node after another node.
@@ -112,7 +111,7 @@ function addEventHandler(node, type, handler, removeFunc) {
 }
 
 function nodeText(node) {
-  return node.innerText || node.textContent || node.nodeValue || "";
+  return node.textContent || node.innerText || node.nodeValue || "";
 }
 
 function nodeTop(node) {
@@ -122,4 +121,13 @@ function nodeTop(node) {
     node = node.offsetParent;
   }
   return top;
+}
+
+function isBR(node) {
+  var nn = node.nodeName;
+  return nn == "BR" || nn == "br";
+}
+function isSpan(node) {
+  var nn = node.nodeName;
+  return nn == "SPAN" || nn == "span";
 }
