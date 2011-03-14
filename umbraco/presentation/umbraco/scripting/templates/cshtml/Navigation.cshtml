@@ -20,17 +20,17 @@ NOTE: It is safe to remove this comment (anything between @ * * @), the code tha
 
 @inherits umbraco.MacroEngines.DynamicNodeContext
 @{ 
-var level = String.IsNullOrEmpty(Parameter.Level) ? 1 : int.Parse(Parameter.Level); 
-var ulClass = String.IsNullOrEmpty(Parameter.UlClass) ? "" : String.Format(" class=\"{0}\"", Parameter.UlClass); 
-var parent = @Model.AncestorOrSelf(level);
-if (parent != null) {
-	<ul@Html.Raw(ulClass)>
-	@foreach (var item in parent.Children.Where("Visible")) {
-		var selected = Array.IndexOf(Model.Path.Split(','), item.Id.ToString()) >= 0 ? " class=\"selected\"" : "";
-		<li@Html.Raw(selected)>
-			<a href="@item.Url">@item.Name (@item.Id)</a>
-		</li>
-    	}
-	</ul>
-}
+	var level = String.IsNullOrEmpty(Parameter.Level) ? 1 : int.Parse(Parameter.Level); 
+	var ulClass = String.IsNullOrEmpty(Parameter.UlClass) ? "" : String.Format(" class=\"{0}\"", Parameter.UlClass); 
+	var parent = @Model.AncestorOrSelf(level);
+	if (parent != null) {
+		<ul@Html.Raw(ulClass)>
+		@foreach (var item in parent.Children.Where("Visible")) {
+			var selected = Array.IndexOf(Model.Path.Split(','), item.Id.ToString()) >= 0 ? " class=\"selected\"" : "";
+			<li@Html.Raw(selected)>
+				<a href="@item.Url">@item.Name</a>
+			</li>
+			}
+		</ul>
+	}
 }
