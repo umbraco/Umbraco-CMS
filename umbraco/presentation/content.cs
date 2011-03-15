@@ -1040,10 +1040,11 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                         DeleteXmlCache();
 
                         // Try to create directory for cache path if it doesn't yet exist
-                        if (!File.Exists(UmbracoXmlDiskCacheFileName) && !Directory.Exists(Path.GetDirectoryName(UmbracoXmlDiskCacheFileName)))
+                        var directoryName = Path.GetDirectoryName(UmbracoXmlDiskCacheFileName);
+                        if (!File.Exists(UmbracoXmlDiskCacheFileName) && !Directory.Exists(directoryName))
                         {
                             // We're already in a try-catch and saving will fail if this does, so don't need another
-                            Directory.CreateDirectory(UmbracoXmlDiskCacheFileName);
+                            Directory.CreateDirectory(directoryName);
                         }
 
                         xmlDoc.Save(UmbracoXmlDiskCacheFileName);
