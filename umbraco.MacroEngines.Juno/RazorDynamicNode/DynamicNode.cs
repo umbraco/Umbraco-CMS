@@ -1007,5 +1007,169 @@ namespace umbraco.MacroEngines
         {
             return true;
         }
+        public int Position()
+        {
+            return this.Index();
+        }
+        public int Index()
+        {
+            if (this.ownerList == null && this.Parent != null)
+            {
+                var list = this.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
+                this.ownerList = new DynamicNodeList(list);
+            }
+            if (this.ownerList != null)
+            {
+                List<DynamicNode> container = this.ownerList.Items.ToList();
+                int currentIndex = container.FindIndex(n => n.Id == this.Id);
+                if (currentIndex != -1)
+                {
+                    return currentIndex;
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicNodeList but could not retrieve the index for it's position in the list", this.Id));
+                }
+            }
+            else
+            {
+                throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicNodeList", this.Id));
+            }
+        }
+        public bool IsFirst()
+        {
+            return IsHelper(n => n.Index() == 0);
+        }
+        public string IsFirst(string valueIfTrue)
+        {
+            return IsHelper(n => n.Index() == 0, valueIfTrue);
+        }
+        public string IsFirst(string valueIfTrue, string valueIfFalse)
+        {
+            return IsHelper(n => n.Index() == 0, valueIfTrue, valueIfFalse);
+        }
+        public bool IsLast()
+        {
+            int count = this.Parent.ChildrenAsList.Count;
+            return IsHelper(n => n.Index() == count - 1);
+        }
+        public string IsLast(string valueIfTrue)
+        {
+            int count = this.Parent.ChildrenAsList.Count;
+            return IsHelper(n => n.Index() == count - 1, valueIfTrue);
+        }
+        public string IsLast(string valueIfTrue, string valueIfFalse)
+        {
+            int count = this.Parent.ChildrenAsList.Count;
+            return IsHelper(n => n.Index() == count - 1, valueIfTrue, valueIfFalse);
+        }
+        public bool IsEven()
+        {
+            return IsHelper(n => n.Index() % 2 == 0);
+        }
+        public string IsEven(string valueIfTrue)
+        {
+            return IsHelper(n => n.Index() % 2 == 0, valueIfTrue);
+        }
+        public string IsEven(string valueIfTrue, string valueIfFalse)
+        {
+            return IsHelper(n => n.Index() % 2 == 0, valueIfTrue, valueIfFalse);
+        }
+        public bool IsOdd()
+        {
+            return IsHelper(n => n.Index() % 2 == 1);
+        }
+        public string IsOdd(string valueIfTrue)
+        {
+            return IsHelper(n => n.Index() % 2 == 1, valueIfTrue);
+        }
+        public string IsOdd(string valueIfTrue, string valueIfFalse)
+        {
+            return IsHelper(n => n.Index() % 2 == 1, valueIfTrue, valueIfFalse);
+        }
+        public bool IsEqual(DynamicNode other)
+        {
+            return IsHelper(n => n.Id == other.Id);
+        }
+        public string IsEqual(DynamicNode other, string valueIfTrue)
+        {
+            return IsHelper(n => n.Id == other.Id, valueIfTrue);
+        }
+        public string IsEqual(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        {
+            return IsHelper(n => n.Id == other.Id, valueIfTrue, valueIfFalse);
+        }
+        public bool IsDescendant(DynamicNode other)
+        {
+            var ancestors = this.Ancestors();
+            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null);
+        }
+        public string IsDescendant(DynamicNode other, string valueIfTrue)
+        {
+            var ancestors = this.Ancestors();
+            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue);
+        }
+        public string IsDescendant(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        {
+            var ancestors = this.Ancestors();
+            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue, valueIfFalse);
+        }
+        public bool IsDescendantOrSelf(DynamicNode other)
+        {
+            var ancestors = this.AncestorsOrSelf();
+            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null);
+        }
+        public string IsDescendantOrSelf(DynamicNode other, string valueIfTrue)
+        {
+            var ancestors = this.AncestorsOrSelf();
+            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue);
+        }
+        public string IsDescendantOrSelf(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        {
+            var ancestors = this.AncestorsOrSelf();
+            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue, valueIfFalse);
+        }
+        public bool IsAncestor(DynamicNode other)
+        {
+            var descendants = this.Descendants();
+            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null);
+        }
+        public string IsAncestor(DynamicNode other, string valueIfTrue)
+        {
+            var descendants = this.Descendants();
+            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue);
+        }
+        public string IsAncestor(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        {
+            var descendants = this.Descendants();
+            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
+        }
+        public bool IsAncestorOrSelf(DynamicNode other)
+        {
+            var descendants = this.DescendantsOrSelf();
+            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null);
+        }
+        public string IsAncestorOrSelf(DynamicNode other, string valueIfTrue)
+        {
+            var descendants = this.DescendantsOrSelf();
+            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue);
+        }
+        public string IsAncestorOrSelf(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        {
+            var descendants = this.DescendantsOrSelf();
+            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
+        }
+        public bool IsHelper(Func<DynamicNode, bool> test)
+        {
+            return test(this);
+        }
+        public string IsHelper(Func<DynamicNode, bool> test, string valueIfTrue)
+        {
+            return IsHelper(test, valueIfTrue, null);
+        }
+        public string IsHelper(Func<DynamicNode, bool> test, string valueIfTrue, string valueIfFalse)
+        {
+            return test(this) ? valueIfTrue : valueIfFalse;
+        }
     }
 }
