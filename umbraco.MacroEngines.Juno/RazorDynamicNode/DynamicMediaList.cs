@@ -34,5 +34,13 @@ namespace umbraco.MacroEngines
             return Items.GetEnumerator();
         }
 
+        public bool IsNull()
+        {
+            return false;
+        }
+        public bool HasValue()
+        {
+            return true;
+        }
     }
 }

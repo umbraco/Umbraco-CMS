@@ -124,5 +124,14 @@ namespace umbraco.MacroEngines
             //return true because the _media is likely null, meaning we're in test mode
             return true;
         }
+
+        public bool IsNull()
+        {
+            return false;
+        }
+        public bool HasValue()
+        {
+            return true;
+        }
     }
 }

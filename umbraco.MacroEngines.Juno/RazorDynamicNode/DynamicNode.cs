@@ -226,6 +226,104 @@ namespace umbraco.MacroEngines
             }
             return false;
         }
+        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
+        {
+            try
+            {
+                //Property?
+                result = typeof(DynamicNode).InvokeMember(binder.Name,
+                                                  System.Reflection.BindingFlags.Instance |
+                                                  System.Reflection.BindingFlags.Public |
+                                                  System.Reflection.BindingFlags.NonPublic |
+                                                  System.Reflection.BindingFlags.GetProperty,
+                                                  null,
+                                                  this,
+                                                  args);
+                return true;
+            }
+            catch (MissingMethodException)
+            {
+                try
+                {
+                    //Static or Instance Method?
+                    result = typeof(DynamicNode).InvokeMember(binder.Name,
+                                                  System.Reflection.BindingFlags.Instance |
+                                                  System.Reflection.BindingFlags.Public |
+                                                  System.Reflection.BindingFlags.NonPublic |
+                                                  System.Reflection.BindingFlags.Static |
+                                                  System.Reflection.BindingFlags.InvokeMethod,
+                                                  null,
+                                                  this,
+                                                  args);
+                    return true;
+                }
+                catch (MissingMethodException)
+                {
+                    try
+                    {
+                        result = ExecuteExtensionMethod(args, binder.Name, false);
+                        return true;
+                    }
+                    catch (TargetInvocationException)
+                    {
+                        result = new DynamicNull();
+                        return true;
+                    }
+
+                    catch
+                    {
+                        result = null;
+                        return false;
+                    }
+
+                }
+
+
+            }
+            catch
+            {
+                result = null;
+                return false;
+            }
+
+        }
+
+        private object ExecuteExtensionMethod(object[] args, string name, bool argsContainsThis)
+        {
+            object result = null;
+
+            MethodInfo methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(IEnumerable<DynamicNode>), args, name, false);
+            if (methodToExecute == null)
+            {
+                methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(DynamicNodeList), args, name, false);
+            }
+            if (methodToExecute != null)
+            {
+                var genericArgs = (new[] { this }).Concat(args);
+                result = methodToExecute.Invoke(null, genericArgs.ToArray());
+            }
+            else
+            {
+                throw new MissingMethodException();
+            }
+            if (result != null)
+            {
+                if (result is IEnumerable<INode>)
+                {
+                    result = new DynamicNodeList((IEnumerable<INode>)result);
+                }
+                if (result is IEnumerable<DynamicNode>)
+                {
+                    result = new DynamicNodeList((IEnumerable<DynamicNode>)result);
+                }
+                if (result is INode)
+                {
+                    result = new DynamicNode((INode)result);
+                }
+            }
+            return result;
+        }
+
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
 
@@ -901,5 +999,13 @@ namespace umbraco.MacroEngines
             return n.ChildrenAsTable(nodeTypeAliasFilter);
         }
 
+        public bool IsNull()
+        {
+            return false;
+        }
+        public bool HasValue()
+        {
+            return true;
+        }
     }
 }

@@ -39,19 +39,13 @@ namespace umbraco.MacroEngines
             result = this;
             return true;
         }
-        public bool IsNull
+        public bool IsNull()
         {
-            get
-            {
-                return true;
-            }
+            return true;
         }
-        public bool HasValue
+        public bool HasValue()
         {
-            get
-            {
-                return false;
-            }
+            return false;
         }
     }
 }

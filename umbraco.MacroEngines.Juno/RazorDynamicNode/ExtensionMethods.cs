@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
 
 namespace umbraco.MacroEngines
 {
-    public static class ExtensionMethods
+    public static class PrivateExtensionMethods
     {
         public static IEnumerable<TSource> Map<TSource>(
             this IEnumerable<TSource> source,
@@ -96,5 +97,8 @@ namespace umbraco.MacroEngines
         {
             return haystack.IndexOf(needle, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
+
+
+        
     }
 }

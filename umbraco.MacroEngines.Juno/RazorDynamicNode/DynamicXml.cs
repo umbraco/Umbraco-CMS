@@ -128,5 +128,14 @@ namespace umbraco.MacroEngines
         {
             return this.BaseElement.Elements().Select(e => new DynamicXml(e)).GetEnumerator();
         }
+
+        public bool IsNull()
+        {
+            return false;
+        }
+        public bool HasValue()
+        {
+            return true;
+        }
     }
 }

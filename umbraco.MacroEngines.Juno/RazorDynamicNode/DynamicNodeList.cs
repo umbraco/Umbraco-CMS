@@ -235,5 +235,13 @@ namespace umbraco.MacroEngines
                 this.Items.Remove(node);
             }
         }
+        public bool IsNull()
+        {
+            return false;
+        }
+        public bool HasValue()
+        {
+            return true;
+        }
     }
 }
