@@ -986,6 +986,36 @@ namespace umbraco.MacroEngines
             if (n == null) return null;
             return n.GetProperty(alias);
         }
+        public IProperty GetProperty(string alias, bool recursive)
+        {
+            if (!recursive) return GetProperty(alias);
+            if (n == null) return null;
+            INode context = this.n;
+            IProperty prop = n.GetProperty(alias);
+            while (prop == null)
+            {
+                context = context.Parent;
+                prop = context.GetProperty(alias);
+                if (context == null) break;
+            }
+            if (prop != null)
+            {
+                return prop;
+            }
+            return null;
+        }
+        public string GetPropertyValue(string alias)
+        {
+            var prop = GetProperty(alias);
+            if (prop != null) return prop.Value;
+            return null;
+        }
+        public string GetPropertyValue(string alias, bool recursive)
+        {
+            var prop = GetProperty(alias, recursive);
+            if (prop != null) return prop.Value;
+            return null;
+        }
 
         public System.Data.DataTable ChildrenAsTable()
         {
