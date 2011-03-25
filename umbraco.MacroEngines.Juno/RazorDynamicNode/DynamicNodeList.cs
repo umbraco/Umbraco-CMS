@@ -209,15 +209,15 @@ namespace umbraco.MacroEngines
             return Items.GetEnumerator();
         }
 
-        private IQueryable<T> Where<T>(string predicate, params object[] values)
+        public IQueryable<T> Where<T>(string predicate, params object[] values)
         {
             return ((IQueryable<T>)Items.AsQueryable()).Where(predicate, values);
         }
-        private IQueryable<T> OrderBy<T>(string key)
+        public IQueryable<T> OrderBy<T>(string key)
         {
             return ((IQueryable<T>)Items.AsQueryable()).OrderBy(key);
         }
-        private IQueryable Select(string predicate, params object[] values)
+        public IQueryable Select(string predicate, params object[] values)
         {
             return DynamicQueryable.Select(Items.AsQueryable(), predicate, values);
         }
