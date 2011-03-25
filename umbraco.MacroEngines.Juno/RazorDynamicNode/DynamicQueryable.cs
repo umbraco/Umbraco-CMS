@@ -1097,7 +1097,14 @@ namespace System.Linq.Dynamic
                     {
                         ParameterExpression[] parameters = new ParameterExpression[(expr as LambdaExpression).Parameters.Count];
                         (expr as LambdaExpression).Parameters.CopyTo(parameters, 0);
-                        expr = Expression.Lambda<Func<DynamicNode, bool>>(Expression.Not(Expression.Invoke(expr, parameters)), parameters);
+                        var invokedExpr = Expression.Invoke(expr, parameters);
+                        var not = Expression.Not(Expression.TypeAs(invokedExpr, typeof(Nullable<bool>)));
+                        expr = Expression.Lambda<Func<DynamicNode, bool>>(
+                            Expression.Condition(
+                                 Expression.Property(not, "HasValue"), 
+                                 Expression.Property(not, "Value"), 
+                                 Expression.Constant(false, typeof(bool))
+                            ), parameters);
                     }
                     else
                     {
@@ -2416,7 +2423,7 @@ namespace System.Linq.Dynamic
                     }
                     else
                     {
-                        return (Expression.Lambda<Func<DynamicNode, DynamicNode, Boolean>>(Expression.AndAlso(finalLeft, finalRight), parameters));
+                        return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.AndAlso(finalLeft, finalRight), parameters));
                     }
                 case ExpressionType.OrElse:
                     if (leftIsLambda && rightIsLambda && sequenceEqual)
