@@ -460,6 +460,7 @@ namespace umbraco.MacroEngines
             if (dataType == DATATYPE_TINYMCE_GUID)
             {
                 result = new HtmlString(result.ToString());
+                return true;
             }
 
 
