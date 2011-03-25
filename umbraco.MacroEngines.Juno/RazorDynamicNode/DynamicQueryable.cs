@@ -166,6 +166,10 @@ namespace System.Linq.Dynamic
                             {
                                 value = (firstFuncResult as Func<DynamicNode, object>)(node);
                             }
+                            if (firstFuncResult.GetType().IsValueType)
+                            {
+                                value = firstFuncResult;
+                            }
                             return value;
                         }).AsQueryable();
                     }
@@ -178,6 +182,10 @@ namespace System.Linq.Dynamic
                             if (firstFuncResult is Func<DynamicNode, object>)
                             {
                                 value = (firstFuncResult as Func<DynamicNode, object>)(node);
+                            }
+                            if (firstFuncResult.GetType().IsValueType)
+                            {
+                                value = firstFuncResult;
                             }
                             return value;
                         }).AsQueryable();
@@ -1101,8 +1109,8 @@ namespace System.Linq.Dynamic
                         var not = Expression.Not(Expression.TypeAs(invokedExpr, typeof(Nullable<bool>)));
                         expr = Expression.Lambda<Func<DynamicNode, bool>>(
                             Expression.Condition(
-                                 Expression.Property(not, "HasValue"), 
-                                 Expression.Property(not, "Value"), 
+                                 Expression.Property(not, "HasValue"),
+                                 Expression.Property(not, "Value"),
                                  Expression.Constant(false, typeof(bool))
                             ), parameters);
                     }
