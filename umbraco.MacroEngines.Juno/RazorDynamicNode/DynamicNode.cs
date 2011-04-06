@@ -412,12 +412,16 @@ namespace umbraco.MacroEngines
             if (dataType == DATATYPE_YESNO_GUID)
             {
                 bool parseResult;
-                if (string.Format("{0}", result) == "") result = "0";
+                if (string.IsNullOrEmpty(string.Format("{0}", result)))
+                {
+                    result = false;
+                    return true;
+                }
                 if (Boolean.TryParse(result.ToString().Replace("1", "true").Replace("0", "false"), out parseResult))
                 {
                     result = parseResult;
+                    return true;
                 }
-                return true;
             }
 
             //integer
