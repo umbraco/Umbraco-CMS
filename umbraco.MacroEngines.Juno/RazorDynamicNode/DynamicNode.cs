@@ -1085,17 +1085,29 @@ namespace umbraco.MacroEngines
         }
         public bool IsLast()
         {
-            int count = this.Parent.ChildrenAsList.Count;
+            if (this.ownerList == null)
+            {
+                return false;
+            }
+            int count = this.ownerList.Items.Count;
             return IsHelper(n => n.Index() == count - 1);
         }
         public string IsLast(string valueIfTrue)
         {
-            int count = this.Parent.ChildrenAsList.Count;
+            if (this.ownerList == null)
+            {
+                return string.Empty;
+            }
+            int count = this.ownerList.Items.Count;
             return IsHelper(n => n.Index() == count - 1, valueIfTrue);
         }
         public string IsLast(string valueIfTrue, string valueIfFalse)
         {
-            int count = this.Parent.ChildrenAsList.Count;
+            if (this.ownerList == null)
+            {
+                return valueIfFalse;
+            }
+            int count = this.ownerList.Items.Count;
             return IsHelper(n => n.Index() == count - 1, valueIfTrue, valueIfFalse);
         }
         public bool IsEven()
@@ -1200,7 +1212,7 @@ namespace umbraco.MacroEngines
         }
         public string IsHelper(Func<DynamicNode, bool> test, string valueIfTrue)
         {
-            return IsHelper(test, valueIfTrue, null);
+            return IsHelper(test, valueIfTrue, string.Empty);
         }
         public string IsHelper(Func<DynamicNode, bool> test, string valueIfTrue, string valueIfFalse)
         {
