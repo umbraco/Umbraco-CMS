@@ -15,6 +15,11 @@ namespace umbraco.cms.presentation.developer
 {
 	public partial class editDatatype : BasePages.UmbracoEnsuredPage
 	{
+	    public editDatatype()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+
+	    }
 		protected ImageButton save;	
 		private cms.businesslogic.datatype.DataTypeDefinition dt;
 		cms.businesslogic.datatype.controls.Factory f;

@@ -19,6 +19,11 @@ namespace umbraco.presentation.dialogs
 	/// </summary>
 	public partial class rollBack : UmbracoEnsuredPage
 	{
+	    public rollBack()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+
+	    }
         private Document currentDoc = new Document(int.Parse(helper.Request("nodeId")));
         
         protected void version_load(object sender, EventArgs e) {

@@ -25,6 +25,11 @@ namespace umbraco.cms.presentation.user
 
 	public partial class PermissionEditor : UmbracoEnsuredPage
     {
+	    public PermissionEditor()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.users.ToString();
+
+	    }
 
 		protected override void OnInit(EventArgs e)
 		{

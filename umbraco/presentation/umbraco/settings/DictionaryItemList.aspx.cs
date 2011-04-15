@@ -11,6 +11,11 @@ using System.Web.UI.HtmlControls;
 
 namespace umbraco.presentation.settings {
     public partial class DictionaryItemList : BasePages.UmbracoEnsuredPage {
+        public DictionaryItemList()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+
+        }
 
         private cms.businesslogic.language.Language[] languages = cms.businesslogic.language.Language.getAll;
         private cms.businesslogic.Dictionary.DictionaryItem[] topItems = cms.businesslogic.Dictionary.getTopMostItems;

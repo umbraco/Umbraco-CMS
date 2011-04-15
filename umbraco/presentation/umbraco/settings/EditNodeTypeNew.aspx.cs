@@ -15,6 +15,12 @@ namespace umbraco.settings
 {
 	public partial class EditContentTypeNew : BasePages.UmbracoEnsuredPage
 	{
+	    public EditContentTypeNew()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+
+	    }
+
 		protected controls.ContentTypeControlNew ContentTypeControlNew1;
 		cms.businesslogic.web.DocumentType dt;
 	

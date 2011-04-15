@@ -8,7 +8,11 @@ namespace umbraco.cms.presentation
 	/// </summary>
     public partial class cacheBrowser : UmbracoEnsuredPage
 	{
-	
+	    public cacheBrowser()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+
+	    }
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			// Cache removal checks

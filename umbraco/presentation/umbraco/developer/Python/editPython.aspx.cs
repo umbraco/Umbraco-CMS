@@ -19,6 +19,11 @@ namespace umbraco.cms.presentation.developer
 {
     public partial class editPython : BasePages.UmbracoEnsuredPage
     {
+        public editPython()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+
+        }
 
         protected PlaceHolder buttons;
         protected uicontrols.CodeArea CodeArea1;

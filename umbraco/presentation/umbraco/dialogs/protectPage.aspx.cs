@@ -14,6 +14,12 @@ namespace umbraco.presentation.umbraco.dialogs
     /// </summary>
     public partial class protectPage : UmbracoEnsuredPage
     {
+        public protectPage()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+
+        }
+
         protected System.Web.UI.WebControls.Literal jsShowWindow;
         protected DualSelectbox _memberGroups = new DualSelectbox();
         protected ContentPicker loginPagePicker = new ContentPicker();

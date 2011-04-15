@@ -9,7 +9,11 @@ namespace umbraco.presentation.plugins.tinymce3
     public partial class insertLink : BasePages.UmbracoEnsuredPage
     {
         //protected uicontrols.TabView tbv = new uicontrols.TabView();
+        public insertLink()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
 
+        }
         protected void Page_Load(object sender, System.EventArgs e)
         {
 			ClientLoader.DataBind();

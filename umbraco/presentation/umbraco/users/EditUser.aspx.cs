@@ -26,6 +26,10 @@ namespace umbraco.cms.presentation.user
     /// </summary>
     public partial class EditUser : UmbracoEnsuredPage
     {
+        public EditUser()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.users.ToString();
+        }
         protected HtmlTable macroProperties;
         protected TextBox uname = new TextBox();
         protected TextBox lname = new TextBox();

@@ -16,6 +16,11 @@ namespace umbraco.presentation.umbraco.dialogs
 	/// </summary>
 	public partial class viewAuditTrail : BasePages.UmbracoEnsuredPage
 	{
+	    public viewAuditTrail()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+
+	    }
 	
 		protected void Page_Load(object sender, System.EventArgs e)
 		{

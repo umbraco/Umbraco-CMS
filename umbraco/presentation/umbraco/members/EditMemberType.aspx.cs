@@ -14,6 +14,12 @@ namespace umbraco.cms.presentation.members
 {
 	public partial class EditMemberType : BasePages.UmbracoEnsuredPage
 	{
+
+	    public EditMemberType()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.member.ToString();
+
+	    }
 		protected System.Web.UI.WebControls.PlaceHolder plc;
 		private cms.businesslogic.member.MemberType dt;
 

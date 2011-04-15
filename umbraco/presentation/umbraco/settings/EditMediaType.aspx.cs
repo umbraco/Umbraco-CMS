@@ -17,8 +17,12 @@ namespace umbraco.cms.presentation.settings
 	/// </summary>
 	public partial class EditMediaType : BasePages.UmbracoEnsuredPage
 	{
-        
-	
+
+	    public EditMediaType()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+
+	    }	
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			if (!IsPostBack)

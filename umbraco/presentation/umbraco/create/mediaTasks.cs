@@ -66,8 +66,7 @@ namespace umbraco
             cms.businesslogic.media.Media d = new cms.businesslogic.media.Media(ParentID);
 
             // Log
-            BasePages.UmbracoEnsuredPage bp = new BasePages.UmbracoEnsuredPage();
-            BusinessLogic.Log.Add(BusinessLogic.LogTypes.Delete, bp.getUser(), d.Id, "");
+            BusinessLogic.Log.Add(BusinessLogic.LogTypes.Delete, User.GetCurrent(), d.Id, "");
 
             d.delete();
             return true;

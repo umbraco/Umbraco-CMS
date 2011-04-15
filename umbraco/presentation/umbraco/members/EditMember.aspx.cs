@@ -20,6 +20,10 @@ namespace umbraco.cms.presentation.members
 	/// </summary>
 	public partial class EditMember : BasePages.UmbracoEnsuredPage
 	{
+	    public EditMember()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.member.ToString();
+        }
 		protected uicontrols.TabView TabView1;
 		protected System.Web.UI.WebControls.TextBox documentName;
 		private cms.businesslogic.member.Member _document;

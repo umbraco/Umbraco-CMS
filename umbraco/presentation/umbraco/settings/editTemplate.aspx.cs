@@ -23,6 +23,11 @@ namespace umbraco.cms.presentation.settings
 	/// </summary>
 	public partial class editTemplate : BasePages.UmbracoEnsuredPage
 	{
+	    public editTemplate()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+
+	    }
 		private cms.businesslogic.template.Template _template;
 
 				protected override void OnPreRender(EventArgs e) {

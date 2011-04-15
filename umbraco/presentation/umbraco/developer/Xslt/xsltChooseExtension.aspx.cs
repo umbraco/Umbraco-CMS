@@ -13,7 +13,11 @@ namespace umbraco.developer
     /// </summary>
 	public partial class xsltChooseExtension : BasePages.UmbracoEnsuredPage
 	{
+        public xsltChooseExtension()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
 
+        }
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{

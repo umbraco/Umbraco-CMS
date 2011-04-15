@@ -16,6 +16,11 @@ namespace umbraco.cms.presentation.settings.scripts
 {
     public partial class editScript : BasePages.UmbracoEnsuredPage
     {
+        public editScript()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+
+        }
         protected System.Web.UI.HtmlControls.HtmlForm Form1;
         protected uicontrols.UmbracoPanel Panel1;
         protected System.Web.UI.WebControls.TextBox NameTxt;

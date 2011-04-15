@@ -21,6 +21,10 @@ namespace umbraco.cms.presentation.user
 {
     public partial class EditUserType : UmbracoEnsuredPage
     {
+        public EditUserType()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.users.ToString();
+        }
         protected void Page_Load(object sender, EventArgs e)
         {
             pnlUmbraco.Text = umbraco.ui.Text("usertype", base.getUser());

@@ -16,6 +16,13 @@ namespace umbraco.dialogs
 	/// </summary>
 	public partial class cruds : BasePages.UmbracoEnsuredPage
 	{
+
+	    public cruds()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+
+	    }
+
 		private ArrayList permissions = new ArrayList();
 		private cms.businesslogic.CMSNode node;
 

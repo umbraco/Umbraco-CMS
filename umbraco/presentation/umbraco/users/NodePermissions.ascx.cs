@@ -27,9 +27,7 @@ namespace umbraco.cms.presentation.user
         protected override void OnInit(EventArgs e) {
             base.OnInit(e);
 
-            BasePages.UmbracoEnsuredPage uep = new UmbracoEnsuredPage();
-            
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(ui.Culture(uep.getUser()));
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(ui.Culture(User.GetCurrent()));
             System.Threading.Thread.CurrentThread.CurrentUICulture = System.Threading.Thread.CurrentThread.CurrentCulture;
         }
 

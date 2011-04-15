@@ -19,6 +19,11 @@ namespace umbraco.cms.presentation.settings.stylesheet
 	/// </summary>
 	public partial class editstylesheet : BasePages.UmbracoEnsuredPage
 	{
+	    public editstylesheet()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+
+	    }
 		private cms.businesslogic.web.StyleSheet stylesheet;
 
 		protected void Page_Load(object sender, System.EventArgs e)

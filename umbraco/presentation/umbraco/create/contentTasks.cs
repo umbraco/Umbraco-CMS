@@ -74,8 +74,7 @@ namespace umbraco
             cms.businesslogic.web.Document d = new cms.businesslogic.web.Document(ParentID);
 
             // Log
-            BasePages.UmbracoEnsuredPage bp = new BasePages.UmbracoEnsuredPage();
-            BusinessLogic.Log.Add(BusinessLogic.LogTypes.Delete, bp.getUser(), d.Id, "");
+            BusinessLogic.Log.Add(BusinessLogic.LogTypes.Delete, User.GetCurrent(), d.Id, "");
 
             library.UnPublishSingleNode(d.Id);
 

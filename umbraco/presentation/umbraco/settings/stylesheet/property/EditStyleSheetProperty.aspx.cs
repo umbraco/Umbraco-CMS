@@ -17,6 +17,11 @@ namespace umbraco.cms.presentation.settings.stylesheet
 	/// </summary>
 	public partial class EditStyleSheetProperty : BasePages.UmbracoEnsuredPage
 	{
+	    public EditStyleSheetProperty()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+	        
+	    }
 
 		private cms.businesslogic.web.StylesheetProperty stylesheetproperty;
 		private DropDownList ddl = new DropDownList();

@@ -13,6 +13,12 @@ namespace umbraco.presentation.umbraco.dialogs
 {
 	public partial class ExportCode : BasePages.UmbracoEnsuredPage
 	{
+
+	    public ExportCode()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+
+	    }
 		private Dictionary<Guid, Type> dataTypeMapping = new Dictionary<Guid, Type>();
 		private const string EXPORT_FOLDER = "/exported-doctypes/";
 

@@ -14,6 +14,12 @@ namespace umbraco.presentation.actions
 {
     public partial class preview : BasePages.UmbracoEnsuredPage
     {
+
+        public preview()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+
+        }
         /// <summary>
         /// Handles the Load event of the Page control.
         /// </summary>

@@ -21,6 +21,12 @@ namespace umbraco.presentation.umbraco.dialogs
 	/// </summary>
 	public class importDocumentType : BasePages.UmbracoEnsuredPage
 	{
+	    public importDocumentType()
+	    {
+
+            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+
+	    }
 		protected System.Web.UI.WebControls.Literal FeedBackMessage;
 		protected System.Web.UI.WebControls.Literal jsShowWindow;
 		protected System.Web.UI.WebControls.Panel Wizard;

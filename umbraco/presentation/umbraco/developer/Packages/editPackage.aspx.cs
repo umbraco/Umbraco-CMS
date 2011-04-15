@@ -17,6 +17,12 @@ namespace umbraco.presentation.developer.packages
 {
     public partial class _Default : BasePages.UmbracoEnsuredPage
     {
+
+        public _Default()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+
+        }
         public uicontrols.TabPage packageInfo;
         public uicontrols.TabPage packageContents;
         public uicontrols.TabPage packageFiles;

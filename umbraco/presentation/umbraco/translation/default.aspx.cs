@@ -23,6 +23,11 @@ namespace umbraco.presentation.translation
 {
     public partial class _default : UmbracoEnsuredPage
     {
+        public _default()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.translation.ToString();
+
+        }
         protected void Page_Load(object sender, EventArgs e)
         {
                 DataTable tasks = new DataTable();

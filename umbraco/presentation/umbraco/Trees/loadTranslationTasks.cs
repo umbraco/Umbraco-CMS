@@ -53,8 +53,7 @@ namespace umbraco {
         }
 
         private User currentUser() {
-            UmbracoEnsuredPage page = new UmbracoEnsuredPage();
-            return page.getUser();
+            return User.GetCurrent();
         }
         public override void Render(ref XmlTree tree) {
             foreach (Task t in Task.GetTasks(currentUser(), false)) {
@@ -103,9 +102,9 @@ namespace umbraco {
                     }");
         }
 
-        private User currentUser() {
-            UmbracoEnsuredPage page = new UmbracoEnsuredPage();
-            return page.getUser();
+        private User currentUser()
+        {
+            return User.GetCurrent();
         }
 
         public override void Render(ref XmlTree tree) {

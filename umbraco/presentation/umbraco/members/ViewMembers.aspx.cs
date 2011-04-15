@@ -6,6 +6,12 @@ using System.Web.UI.WebControls;
 
 namespace umbraco.presentation.members {
     public partial class ViewMembers : BasePages.UmbracoEnsuredPage {
+
+        public ViewMembers()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.member.ToString();
+        }
+
         protected void Page_Load(object sender, EventArgs e) {
             panel1.Text = ui.Text("member");
             bindRp();

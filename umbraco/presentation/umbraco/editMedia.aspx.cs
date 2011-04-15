@@ -19,6 +19,10 @@ namespace umbraco.cms.presentation
 	/// </summary>
 	public partial class editMedia : BasePages.UmbracoEnsuredPage
 	{
+	    public editMedia()
+	    {
+	        CurrentApp = BusinessLogic.DefaultApps.media.ToString();
+	    }
 		protected uicontrols.TabView TabView1;
 		protected System.Web.UI.WebControls.TextBox documentName;
 		private cms.businesslogic.media.Media _media;

@@ -315,8 +315,7 @@ namespace umbraco.cms.businesslogic.packager
             User u = new User(0);
             if (!string.IsNullOrEmpty(BasePages.UmbracoEnsuredPage.umbracoUserContextID)) {
                 if (BasePages.UmbracoEnsuredPage.ValidateUserContextID(BasePages.UmbracoEnsuredPage.umbracoUserContextID)) {
-                    BasePages.UmbracoEnsuredPage uep = new umbraco.BasePages.UmbracoEnsuredPage();
-                    u = uep.getUser();
+                    u = User.GetCurrent();
                 }
             }
 
@@ -501,8 +500,7 @@ namespace umbraco.cms.businesslogic.packager
 
 
             // Get current user
-            BasePages.UmbracoEnsuredPage uep = new umbraco.BasePages.UmbracoEnsuredPage();
-            BusinessLogic.User u = uep.getUser();
+            BusinessLogic.User u = User.GetCurrent();
 
             // Add Templates
             foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Templates/Template"))

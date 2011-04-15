@@ -158,8 +158,7 @@ namespace umbraco.cms.businesslogic.datatype
             )
             {
 
-                BasePages.UmbracoEnsuredPage uep = new umbraco.BasePages.UmbracoEnsuredPage();
-                BusinessLogic.User u = uep.getUser();
+                BusinessLogic.User u = umbraco.BusinessLogic.User.GetCurrent();
 
                 if (u == null)
                     u = BusinessLogic.User.GetUser(0);

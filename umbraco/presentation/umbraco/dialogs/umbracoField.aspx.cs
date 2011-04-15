@@ -21,6 +21,11 @@ namespace umbraco.dialogs
         string[] preValuesSource = { "@createDate", "@creatorName", "@level", "@nodeType", "@nodeTypeAlias", "@pageID", "@pageName", "@parentID", "@path", "@template", "@updateDate", "@writerID", "@writerName" };
         bool m_IsDictionaryMode = false;
 
+	    public umbracoField()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+	    }
+
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 

@@ -22,6 +22,12 @@ namespace umbraco.cms.presentation.developer
     /// </summary>
     public partial class editMacro : UmbracoEnsuredPage
     {
+        public editMacro()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+
+        }
+
         protected PlaceHolder buttons;
         protected Table macroElements;
         protected Macro m_macro;

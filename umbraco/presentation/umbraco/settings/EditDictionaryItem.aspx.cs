@@ -18,6 +18,11 @@ namespace umbraco.settings
 	/// </summary>
 	public partial class EditDictionaryItem : BasePages.UmbracoEnsuredPage
 	{
+	    public EditDictionaryItem()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+
+	    }
 		protected LiteralControl keyTxt = new LiteralControl();
 		protected uicontrols.TabView tbv = new uicontrols.TabView();
 		private System.Collections.ArrayList languageFields = new System.Collections.ArrayList();

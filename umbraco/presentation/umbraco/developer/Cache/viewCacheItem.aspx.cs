@@ -9,6 +9,11 @@ namespace umbraco.cms.presentation.developer
     /// </summary>
     public partial class viewCacheItem : UmbracoEnsuredPage
     {
+        public viewCacheItem()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+
+        }
         protected void Page_Load(object sender, EventArgs e)
         {
             // Put user code to initialize the page here

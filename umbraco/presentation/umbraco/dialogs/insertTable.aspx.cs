@@ -16,6 +16,12 @@ namespace umbraco.dialogs
 	/// </summary>
 	public partial class insertTable : BasePages.UmbracoEnsuredPage
 	{
+	    public insertTable()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+
+	    }
+
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			// Put user code to initialize the page here

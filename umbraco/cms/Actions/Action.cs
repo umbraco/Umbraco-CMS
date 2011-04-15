@@ -141,7 +141,7 @@ namespace umbraco.BusinessLogic.Actions
             User u;
             try
             {
-                u = new UmbracoEnsuredPage().getUser();
+                u = User.GetCurrent();
             }
             catch
             {

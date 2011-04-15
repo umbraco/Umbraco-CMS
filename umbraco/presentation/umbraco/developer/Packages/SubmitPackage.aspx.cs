@@ -14,6 +14,11 @@ using System.Web.UI.HtmlControls;
 namespace umbraco.presentation.developer.packages {
     public partial class SubmitPackage : BasePages.UmbracoEnsuredPage {
 
+        public SubmitPackage()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+
+        }
         private cms.businesslogic.packager.PackageInstance pack;
         private cms.businesslogic.packager.CreatedPackage createdPackage;
 

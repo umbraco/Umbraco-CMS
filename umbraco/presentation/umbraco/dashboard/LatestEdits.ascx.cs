@@ -1,3 +1,5 @@
+using umbraco.BusinessLogic;
+
 namespace dashboardUtilities
 {
 	using System;
@@ -16,7 +18,6 @@ namespace dashboardUtilities
 	{
 
 		// Find current user
-		public umbraco.BasePages.UmbracoEnsuredPage bp = new umbraco.BasePages.UmbracoEnsuredPage();
 		private System.Collections.ArrayList printedIds = new System.Collections.ArrayList();
 		private int count = 0;
 		private int maxRecords = 5;
@@ -25,7 +26,7 @@ namespace dashboardUtilities
 		{
 
 			// Put user code to initialize the page here
-			Repeater1.DataSource = umbraco.BusinessLogic.Log.GetLogReader(bp.getUser(), umbraco.BusinessLogic.LogTypes.Save, DateTime.Now.Subtract(new System.TimeSpan(7,0,0,0,0)));
+			Repeater1.DataSource = umbraco.BusinessLogic.Log.GetLogReader(User.GetCurrent(), umbraco.BusinessLogic.LogTypes.Save, DateTime.Now.Subtract(new System.TimeSpan(7,0,0,0,0)));
 			Repeater1.DataBind();
 		}
 
@@ -39,7 +40,7 @@ namespace dashboardUtilities
                     Document d = new Document(int.Parse(NodeId.ToString()));										
 					count++;
 					return
-                        "<a href=\"editContent.aspx?id=" + NodeId.ToString() + "\" style=\"text-decoration: none\"><img src=\"" + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/images/forward.png\" align=\"absmiddle\" border=\"0\"/> " + d.Text + "</a>. " + umbraco.ui.Text("general", "edited", bp.getUser()) + " " + umbraco.library.ShortDateWithTimeAndGlobal(DateTime.Parse(Date.ToString()).ToString(), umbraco.ui.Culture(bp.getUser())) + "<br/>";
+                        "<a href=\"editContent.aspx?id=" + NodeId.ToString() + "\" style=\"text-decoration: none\"><img src=\"" + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/images/forward.png\" align=\"absmiddle\" border=\"0\"/> " + d.Text + "</a>. " + umbraco.ui.Text("general", "edited", User.GetCurrent()) + " " + umbraco.library.ShortDateWithTimeAndGlobal(DateTime.Parse(Date.ToString()).ToString(), umbraco.ui.Culture(User.GetCurrent())) + "<br/>";
 				}
 				catch {
 					return "";

@@ -17,6 +17,11 @@ namespace umbraco.dialogs
         private ArrayList actions = new ArrayList();
         private CMSNode node;
 
+        public notifications()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {

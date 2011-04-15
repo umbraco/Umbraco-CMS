@@ -19,6 +19,11 @@ namespace umbraco.cms.presentation.developer
     /// </summary>
     public partial class editXslt : UmbracoEnsuredPage
     {
+        public editXslt()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+
+        }
         protected PlaceHolder buttons;
   
 

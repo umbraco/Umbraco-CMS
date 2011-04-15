@@ -13,6 +13,12 @@ namespace umbraco.presentation.dialogs {
     public partial class RegexWs : BasePages.UmbracoEnsuredPage {
         private DataSet ds = new DataSet();
 
+        public RegexWs()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+
+        }
+
         protected void Page_Load(object sender, EventArgs e) {
             pp_search.Text = ui.Text("general", "search");
             bt_search.Text = ui.Text("general", "search");

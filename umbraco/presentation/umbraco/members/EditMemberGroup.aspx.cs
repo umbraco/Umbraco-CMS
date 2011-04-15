@@ -20,6 +20,12 @@ namespace umbraco.presentation.members
 	/// </summary>
 	public partial class EditMemberGroup : BasePages.UmbracoEnsuredPage
 	{
+	    public EditMemberGroup()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.member.ToString();
+
+	    }
+
         private MemberGroup _memberGroup = null;
         protected ImageButton save = null;
         string _memberGroupId = String.Empty;

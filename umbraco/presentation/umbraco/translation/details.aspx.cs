@@ -23,6 +23,11 @@ using ICSharpCode.SharpZipLib.GZip;
 namespace umbraco.presentation.umbraco.translation {
     public partial class details : BasePages.UmbracoEnsuredPage {
 
+        public details()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.translation.ToString();
+
+        }
         protected void closeTask(object sender, EventArgs e) {
             int translationId = int.Parse(Request["id"]);
             Task t = new Task(translationId);

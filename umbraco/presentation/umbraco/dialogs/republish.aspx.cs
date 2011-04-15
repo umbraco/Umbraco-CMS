@@ -16,6 +16,11 @@ namespace umbraco.cms.presentation
 	/// </summary>
 	public partial class republish : BasePages.UmbracoEnsuredPage
 	{
+	    public republish()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+
+	    }
         protected void go(object sender, EventArgs e) {
             // re-create xml
             if (helper.Request("xml") != "")

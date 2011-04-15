@@ -19,6 +19,11 @@ namespace umbraco.presentation.dialogs
 	/// </summary>
 	public class exportDocumenttype : BasePages.UmbracoEnsuredPage
 	{
+	    public exportDocumenttype()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+
+	    }
 		private void Page_Load(object sender, System.EventArgs e)
 		{
 			int documentTypeId = int.Parse(helper.Request("nodeID"));

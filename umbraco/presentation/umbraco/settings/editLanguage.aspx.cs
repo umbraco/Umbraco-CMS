@@ -18,6 +18,11 @@ namespace umbraco.settings
 	/// </summary>
 	public partial class editLanguage : BasePages.UmbracoEnsuredPage
 	{
+	    public editLanguage()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+
+	    }
 		protected System.Web.UI.WebControls.TextBox NameTxt;
 		protected System.Web.UI.WebControls.Literal DisplayName;
 		cms.businesslogic.language.Language currentLanguage;

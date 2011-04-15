@@ -14,6 +14,13 @@ using umbraco.IO;
 
 namespace umbraco.presentation.developer.packages {
     public partial class BrowseRepository : BasePages.UmbracoEnsuredPage {
+
+        public BrowseRepository()
+        {
+            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+
+        }
+
         protected void Page_Load(object sender, System.EventArgs e) {
 
             Exception ex = new Exception();

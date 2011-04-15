@@ -16,6 +16,11 @@ namespace umbraco.cms.presentation
 	/// </summary>
 	public partial class publishStatus : BasePages.UmbracoEnsuredPage
 	{
+	    public publishStatus()
+	    {
+            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+
+	    }
 	
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
