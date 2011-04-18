@@ -1782,9 +1782,17 @@
     <Content Include="umbraco_client\tinymce3\plugins\layer\editor_plugin_src.js" />
     <Content Include="umbraco_client\tinymce3\plugins\legacyoutput\editor_plugin.js" />
     <Content Include="umbraco_client\tinymce3\plugins\legacyoutput\editor_plugin_src.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\media\css\content.css" />
     <Content Include="umbraco_client\tinymce3\plugins\media\css\media.css" />
     <Content Include="umbraco_client\tinymce3\plugins\media\editor_plugin.js" />
     <Content Include="umbraco_client\tinymce3\plugins\media\editor_plugin_src.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\media\img\flash.gif" />
+    <Content Include="umbraco_client\tinymce3\plugins\media\img\flv_player.swf" />
+    <Content Include="umbraco_client\tinymce3\plugins\media\img\quicktime.gif" />
+    <Content Include="umbraco_client\tinymce3\plugins\media\img\realmedia.gif" />
+    <Content Include="umbraco_client\tinymce3\plugins\media\img\shockwave.gif" />
+    <Content Include="umbraco_client\tinymce3\plugins\media\img\trans.gif" />
+    <Content Include="umbraco_client\tinymce3\plugins\media\img\windowsmedia.gif" />
     <Content Include="umbraco_client\tinymce3\plugins\media\js\embed.js" />
     <Content Include="umbraco_client\tinymce3\plugins\media\js\media.js" />
     <Content Include="umbraco_client\tinymce3\plugins\media\langs\da_dlg.js" />
@@ -1798,7 +1806,6 @@
     <Content Include="umbraco_client\tinymce3\plugins\media\langs\no_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\media\langs\sv_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\media\media.htm" />
-    <Content Include="umbraco_client\tinymce3\plugins\media\moxieplayer.swf" />
     <Content Include="umbraco_client\tinymce3\plugins\nonbreaking\editor_plugin.js" />
     <Content Include="umbraco_client\tinymce3\plugins\nonbreaking\editor_plugin_src.js" />
     <Content Include="umbraco_client\tinymce3\plugins\noneditable\editor_plugin.js" />
