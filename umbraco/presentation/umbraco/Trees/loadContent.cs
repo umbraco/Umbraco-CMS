@@ -78,10 +78,17 @@ namespace umbraco
             }
             else
             {
-                ///add the default actions to the content tree
-                actions.Add(ActionNew.Instance);
-                actions.Add(ActionSort.Instance);
-                actions.Add(ContextMenuSeperator.Instance);
+                // we need to get the default permissions as you can't set permissions on the very root node
+                List<IAction> nodeActions = Action.FromString(CurrentUser.GetPermissions("-1"));
+                List<IAction> allowedRootActions = new List<IAction>();
+                allowedRootActions.Add(ActionNew.Instance);
+                allowedRootActions.Add(ActionSort.Instance);
+                List<IAction> allowedMenu = GetUserAllowedActions(allowedRootActions, nodeActions);
+                actions.AddRange(allowedMenu);
+                if (allowedMenu.Count > 0 )
+                    actions.Add(ContextMenuSeperator.Instance);
+
+                // default actions for all users
                 actions.Add(ActionRePublish.Instance);
                 actions.Add(ContextMenuSeperator.Instance);
                 actions.Add(ActionRefresh.Instance);
