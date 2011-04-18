@@ -10713,13 +10713,15 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 
 			t.iframeHTML += '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />';
 
-			// Firefox 2 doesn't load stylesheets correctly this way
-			if (!isGecko || !/Firefox\/2/.test(navigator.userAgent)) {
-				for (i = 0; i < t.contentCSS.length; i++)
-					t.iframeHTML += '<link type="text/css" rel="stylesheet" href="' + t.contentCSS[i] + '" />';
+            //tg commenting this out, otherwise the content_css isn't last issue #30184
 
-				t.contentCSS = [];
-			}
+//			// Firefox 2 doesn't load stylesheets correctly this way
+//			if (!isGecko || !/Firefox\/2/.test(navigator.userAgent)) {
+//				for (i = 0; i < t.contentCSS.length; i++)
+//					t.iframeHTML += '<link type="text/css" rel="stylesheet" href="' + t.contentCSS[i] + '" />';
+
+//				t.contentCSS = [];
+//			}
 
 			bi = s.body_id || 'tinymce';
 			if (bi.indexOf('=') != -1) {
@@ -11178,6 +11180,8 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 				each(t.contentCSS, function(u) {
 					t.dom.loadCSS(u);
 				});
+
+    
 
 				// Handle auto focus
 				if (s.auto_focus) {
