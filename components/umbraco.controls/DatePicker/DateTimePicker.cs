@@ -13,6 +13,7 @@ namespace umbraco.uicontrols.DatePicker
 
     [ClientDependency(ClientDependencyType.Css, "DateTimePicker/datetimepicker.css", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Javascript, "MaskedInput/jquery.maskedinput-1.3.min.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "DateTimePicker/timepicker.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "DateTimePicker/umbDateTimePicker.js", "UmbracoClient")]
@@ -112,7 +113,9 @@ jQuery(document).ready(function() {
                + this.ShowTime.ToString().ToLower() + ",'" 
                + ui.Text("choose") + " " + ui.Text("date") + "','"
                + ui.Text("noDate") + "','"
-               + ui.Text("removeDate") + "') });";
+               + ui.Text("removeDate") + "');"
+               + "jQuery('#" + m_DateTextBox.ClientID + "').mask('"+ (this.ShowTime ? "9999-99-99 99:99" : "9999-99-99")  +"');" 
+               + "});";
     
             try
             {
