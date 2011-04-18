@@ -19,7 +19,8 @@ namespace umbraco.presentation.plugins.tinymce3
             pp_title.Text = ui.Text("name");
             pp_dimensions.Text = ui.Text("dimensions");
 
-            lt_constrainLabel.Text = ui.Text("constrainProportions");
+            pane_src.Style.Add("height", "105px");
+            
             lt_heightLabel.Text = ui.Text("height");
             lt_widthLabel.Text = ui.Text("width");
 

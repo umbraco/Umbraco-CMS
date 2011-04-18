@@ -161,11 +161,10 @@
       <ui:PropertyPanel id="pp_title" runat="server" Text="Title">
            <input type="text" id="alt" style="width: 300px"/>
       </ui:PropertyPanel>
-      <ui:PropertyPanel id="pp_dimensions" runat="server" Text="Dimensions">
+      <ui:PropertyPanel id="pp_dimensions" runat="server" Text="Dimensions" s>
             <asp:Literal ID="lt_widthLabel" runat="server" />:  <input name="width" type="text" id="width" value="" size="5" maxlength="5" class="size" onchange="changeDimensions('width');" />
             <asp:Literal ID="lt_heightLabel" runat="server" />:   <input name="height" type="text" id="height" value="" size="5" maxlength="5" class="size" onchange="changeDimensions('height');" />
-            <br /> 
-            <input id="constrain" type="checkbox" name="constrain" class="checkbox" /> <asp:Literal ID="lt_constrainLabel" runat="server" />
+           
       </ui:PropertyPanel>
     </ui:Pane>
     

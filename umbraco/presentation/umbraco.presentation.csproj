@@ -928,8 +928,8 @@
       <DependentUpon>LoadNitros.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\developer\Packages\SubmitPackage.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
       <DependentUpon>SubmitPackage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco\developer\Packages\SubmitPackage.aspx.designer.cs">
       <DependentUpon>SubmitPackage.aspx</DependentUpon>

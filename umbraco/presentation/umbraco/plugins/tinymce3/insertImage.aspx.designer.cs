@@ -184,15 +184,6 @@ namespace umbraco.presentation.plugins.tinymce3 {
         protected global::System.Web.UI.WebControls.Literal lt_heightLabel;
         
         /// <summary>
-        /// lt_constrainLabel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal lt_constrainLabel;
-        
-        /// <summary>
         /// tv_options control.
         /// </summary>
         /// <remarks>
