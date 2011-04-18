@@ -151,6 +151,8 @@ namespace umbraco.BasePages {
                 if (timeout > DateTime.Now.Ticks) {
                     return true;
                 } else {
+                    // clear the usercontext id to prevent continuous logout entries
+                    BasePage.umbracoUserContextID = String.Empty;
                     BusinessLogic.Log.Add(BusinessLogic.LogTypes.Logout, BusinessLogic.User.GetUser(uid), -1, "");
 
                     return false;
