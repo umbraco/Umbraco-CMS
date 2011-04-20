@@ -91,6 +91,27 @@ namespace umbraco.editorControls
                 // set filename in db to nothing
                 _text = "";
                 _data.Value = _text;
+
+                //also clear umbracoWidth, umbracoHeight, umbracoExtension, umbracoBytes
+
+                cms.businesslogic.Content content = cms.businesslogic.Content.GetContentFromVersion(this._data.Version);
+
+                foreach (string prop in "umbracoExtension,umbracoBytes,umbracoWidth,umbracoHeight".Split(','))
+                {
+                    try
+                    {
+                        content.getProperty(prop).Value = string.Empty;
+                        noEdit bytesControl = uploadField.FindControlRecursive<noEdit>(this.Page, prop);
+                        if (bytesControl != null)
+                        {
+                            bytesControl.RefreshLabel(string.Empty);
+                        }
+                    }
+                    catch {
+                        //if first one fails we can assume that props don't exist
+                        break;
+                    }
+                }
             }
 
             if (this.PostedFile != null)
