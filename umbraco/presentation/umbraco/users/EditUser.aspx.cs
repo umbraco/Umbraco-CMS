@@ -418,12 +418,37 @@ namespace umbraco.cms.presentation.user
 
                     u.LoginName = lname.Text;
                     //u.StartNodeId = int.Parse(startNode.Value);
-                    u.StartNodeId = int.Parse(contentPicker.Text);
+
+                   
+                    int startNode;
+                    if(!int.TryParse(contentPicker.Text, out startNode))
+                    {
+                         //set to default if nothing is choosen
+                        if (u.StartNodeId > 0)
+                            startNode = u.StartNodeId;
+                        else
+                            startNode = -1;
+                    }
+                    u.StartNodeId = startNode;
+
+
                     u.Disabled = Disabled.Checked;
                     u.DefaultToLiveEditing = DefaultToLiveEditing.Checked;
                     u.NoConsole = NoConsole.Checked;
                     //u.StartMediaId = int.Parse(mediaStartNode.Value);
-                    u.StartMediaId = int.Parse(mediaPicker.Text);
+
+
+                    int mstartNode;
+                    if (!int.TryParse(mediaPicker.Text, out mstartNode))
+                    {
+                        //set to default if nothing is choosen
+                        if (u.StartMediaId > 0)
+                            mstartNode = u.StartMediaId;
+                        else
+                            mstartNode = -1;
+                    }
+                    u.StartMediaId = mstartNode;
+
                     u.clearApplications();
 
                     foreach (ListItem li in lapps.Items) {
