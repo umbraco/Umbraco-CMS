@@ -7,6 +7,7 @@ using System.Configuration;
 using System.Web;
 using umbraco.BusinessLogic;
 using System.Text.RegularExpressions;
+using umbraco.businesslogic.Exceptions;
 
 namespace umbraco.IO
 {
@@ -120,6 +121,40 @@ namespace umbraco.IO
             return returnPath(settingsKey, standardPath, false);
 
         }
+
+
+        /// <summary>
+        /// Validates if the current filepath matches a directory where the user is allowed to edit a file
+        /// </summary>
+        /// <param name="filePath">filepath </param>
+        /// <param name="validDir"></param>
+        /// <returns>true if valid, throws a FileSecurityException if not</returns>
+        public static bool ValidateEditPath(string filePath, string validDir)
+        {
+            if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
+                filePath = MapPath(filePath);
+            if (!validDir.StartsWith(MapPath(SystemDirectories.Root)))
+                validDir = MapPath(validDir);
+
+            if (!filePath.StartsWith(validDir))
+                throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
+
+            return true;
+        }
+
+        public static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
+        {
+            if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
+                filePath = MapPath(filePath);
+            FileInfo f = new FileInfo(filePath);
+
+
+            if (!validFileExtensions.Contains(f.Extension.Substring(1)))
+                throw new FileSecurityException(String.Format("The extension for the current file '{0}' is not of an allowed type for this editor. This is typically controlled from either the installed MacroEngines or based on configuration in /config/umbracoSettings.config", filePath.Replace(MapPath(SystemDirectories.Root), "")));
+
+            return true;
+        } 
+
 
         /// <summary>
         /// Returns the path to the root of the application, by getting the path to where the assembly where this

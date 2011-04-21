@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -49,18 +50,19 @@ namespace umbraco.cms.presentation.settings.scripts
             
             
             lttPath.Text = "<a target='_blank' href='" + path + "'>" + path + "</a>";
-			
-            //security check... only allow script files
-            if (path.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Scripts) + "/") || path.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Masterpages) + "/"))
-            {
-                StreamReader SR;
-                string S;
-                SR = File.OpenText( IOHelper.MapPath( path ));
-                S = SR.ReadToEnd();
-                SR.Close();
+
+            // validate file
+            IOHelper.ValidateEditPath(IOHelper.MapPath(path), SystemDirectories.Scripts);
+            // validate extension
+            IOHelper.ValidateFileExtension(IOHelper.MapPath(path), new List<string>() { "js" });
+
+            StreamReader SR;
+            string S;
+            SR = File.OpenText( IOHelper.MapPath( path ));
+            S = SR.ReadToEnd();
+            SR.Close();
                 
-                editorSource.Text = S;
-            }
+            editorSource.Text = S;
             
             Panel1.Text = ui.Text("editscript", base.getUser());
             pp_name.Text = ui.Text("name", base.getUser());

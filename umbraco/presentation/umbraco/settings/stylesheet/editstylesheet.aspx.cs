@@ -60,7 +60,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 			
 
 			if (!IsPostBack) 
-			{
+			{   
 				NameTxt.Text = stylesheet.Text;
                 editorSource.Text = stylesheet.Content;
 			}
