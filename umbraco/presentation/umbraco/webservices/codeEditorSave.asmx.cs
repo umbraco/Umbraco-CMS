@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
@@ -58,9 +59,10 @@ namespace umbraco.presentation.webservices
 
 
                         //deletes the old css file if the name was changed... 
-                        if (fileName != oldName) {
+                        if (fileName != oldName)
+                        {
                             string p = IOHelper.MapPath(SystemDirectories.Css + "/" + oldName + ".css");
-                            if (System.IO.File.Exists( p ))
+                            if (System.IO.File.Exists(p))
                                 System.IO.File.Delete(p);
                         }
 
@@ -82,6 +84,15 @@ namespace umbraco.presentation.webservices
         {
             if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
             {
+
+                // validate file
+                IOHelper.ValidateEditPath(IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName),
+                                          SystemDirectories.Xslt);
+                // validate extension
+                IOHelper.ValidateFileExtension(IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName),
+                                               new List<string>() { "xsl", "xslt" });
+
+
                 StreamWriter SW;
                 string tempFileName = IOHelper.MapPath(SystemDirectories.Xslt + "/" + DateTime.Now.Ticks + "_temp.xslt");
                 SW = File.CreateText(tempFileName);
@@ -209,7 +220,8 @@ namespace umbraco.presentation.webservices
                         errorMessage = "true";
 
                         //deletes the old xslt file
-                        if (fileName != oldName) {
+                        if (fileName != oldName)
+                        {
                             string p = IOHelper.MapPath(SystemDirectories.Xslt + "/" + oldName);
                             if (System.IO.File.Exists(p))
                                 System.IO.File.Delete(p);
@@ -229,66 +241,93 @@ namespace umbraco.presentation.webservices
         }
 
         [WebMethod]
-        public string SaveDLRScript(string fileName, string oldName, string fileContents, bool ignoreDebugging) {
+        public string SaveDLRScript(string fileName, string oldName, string fileContents, bool ignoreDebugging)
+        {
 
-            if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException("fileName");
+            if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
+            {
+                if (string.IsNullOrEmpty(fileName))
+                    throw new ArgumentNullException("fileName");
 
-            StreamWriter SW;
+                List<string> allowedExtensions = new List<string>();
+                foreach (MacroEngineLanguage lang in MacroEngineFactory.GetSupportedUILanguages())
+                {
+                    if (!allowedExtensions.Contains(lang.Extension))
+                        allowedExtensions.Add(lang.Extension);
+                }
 
-            //As Files Can Be Stored In Sub Directories, So We Need To Get The Exeuction Directory Correct
-            var lastOccurance = fileName.LastIndexOf('/') + 1;
-            var directory = fileName.Substring(0, lastOccurance);
-            var fileNameWithExt = fileName.Substring(lastOccurance);
-            var tempFileName = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + directory + DateTime.Now.Ticks + "_" + fileNameWithExt);
-            
-			//SW = File.CreateText(tempFileName);
-            SW = new StreamWriter(tempFileName, false, Encoding.UTF8);
-            SW.Write(fileContents);
-			SW.Close();
-                
-				var errorMessage = "";
-                if (!ignoreDebugging) {
+
+                // validate file
+                IOHelper.ValidateEditPath(IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + fileName),
+                                          SystemDirectories.MacroScripts);
+                // validate extension
+                IOHelper.ValidateFileExtension(IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + fileName),
+                                               allowedExtensions);
+
+
+                StreamWriter SW;
+
+                //As Files Can Be Stored In Sub Directories, So We Need To Get The Exeuction Directory Correct
+                var lastOccurance = fileName.LastIndexOf('/') + 1;
+                var directory = fileName.Substring(0, lastOccurance);
+                var fileNameWithExt = fileName.Substring(lastOccurance);
+                var tempFileName =
+                    IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + directory + DateTime.Now.Ticks + "_" +
+                                     fileNameWithExt);
+
+                //SW = File.CreateText(tempFileName);
+                SW = new StreamWriter(tempFileName, false, Encoding.UTF8);
+                SW.Write(fileContents);
+                SW.Close();
+
+                var errorMessage = "";
+                if (!ignoreDebugging)
+                {
                     var args = new Hashtable();
                     var n = new Node(Document.GetRootDocuments()[0].Id);
                     args.Add("currentPage", n);
 
-                    try {
+                    try
+                    {
                         var engine = MacroEngineFactory.GetByFilename(tempFileName);
                         var tempErrorMessage = "";
                         var xpath = UmbracoSettings.UseLegacyXmlSchema ? "/root/node" : "/root/*";
-                        if (!engine.Validate(fileContents, tempFileName, Node.GetNodeByXpath(xpath), out tempErrorMessage))
+                        if (
+                            !engine.Validate(fileContents, tempFileName, Node.GetNodeByXpath(xpath),
+                                             out tempErrorMessage))
                             errorMessage = tempErrorMessage;
-                    } catch (Exception err) {
+                    }
+                    catch (Exception err)
+                    {
                         errorMessage = err.ToString();
                     }
                 }
 
-                if (errorMessage ==  "") {
-                    //Hardcoded security-check... only allow saving files in xslt directory... 
+                if (errorMessage == "")
+                {
                     var savePath = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + fileName);
 
-                    if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.MacroScripts + "/"))) {
-                        SW = new StreamWriter(savePath, false, Encoding.UTF8);
-                        SW.Write(fileContents);
-                        SW.Close();
-                        errorMessage = "true";
+                    SW = new StreamWriter(savePath, false, Encoding.UTF8);
+                    SW.Write(fileContents);
+                    SW.Close();
+                    errorMessage = "true";
 
-                        //deletes the old xslt file
-                        if (fileName != oldName) {
-                            var p = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + oldName);
-                            if (File.Exists(p))
-                                File.Delete(p);
-                        }
-                    } else {
-                        errorMessage = "Illegal path";
+                    //deletes the old xslt file
+                    if (fileName != oldName)
+                    {
+                        var p = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + oldName);
+                        if (File.Exists(p))
+                            File.Delete(p);
                     }
                 }
 
                 File.Delete(tempFileName);
-                
+
 
                 return errorMessage.Replace("\n", "<br/>\n");
+            }
+
+            return "false";
         }
 
         [WebMethod]
@@ -296,6 +335,15 @@ namespace umbraco.presentation.webservices
         {
             if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
             {
+
+                // validate file
+                IOHelper.ValidateEditPath(IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename),
+                                          SystemDirectories.Scripts);
+                // validate extension
+                IOHelper.ValidateFileExtension(IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename),
+                                               new List<string>() { "js" });
+
+
                 string val = contents;
                 string returnValue = "false";
                 try
@@ -347,8 +395,10 @@ namespace umbraco.presentation.webservices
         }
 
         [WebMethod]
-        public string SaveTemplate(string templateName, string templateAlias, string templateContents, int templateID, int masterTemplateID) {
-            if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID)) {
+        public string SaveTemplate(string templateName, string templateAlias, string templateContents, int templateID, int masterTemplateID)
+        {
+            if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
+            {
                 var _template = new Template(templateID);
                 string retVal = "false";
 
@@ -364,7 +414,7 @@ namespace umbraco.presentation.webservices
 
                     // Clear cache in rutime
                     if (UmbracoSettings.UseDistributedCalls)
-                        dispatcher.Refresh(new Guid("dd12b6a0-14b9-46e8-8800-c154f74047c8"),_template.Id);
+                        dispatcher.Refresh(new Guid("dd12b6a0-14b9-46e8-8800-c154f74047c8"), _template.Id);
                     else
                         template.ClearCachedTemplate(_template.Id);
                 }

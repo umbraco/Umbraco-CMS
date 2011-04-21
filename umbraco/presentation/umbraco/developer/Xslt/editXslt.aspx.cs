@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -25,19 +26,19 @@ namespace umbraco.cms.presentation.developer
 
         }
         protected PlaceHolder buttons;
-  
+
 
 
         protected void Page_Load(object sender, EventArgs e)
         {
-			if (!IsPostBack)
-			{
-				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadXslt>().Tree.Alias)
-					.SyncTree(Request.QueryString["file"], false);
-			}
+            if (!IsPostBack)
+            {
+                ClientTools
+                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadXslt>().Tree.Alias)
+                    .SyncTree(Request.QueryString["file"], false);
+            }
 
-           
+
 
         }
 
@@ -58,11 +59,11 @@ namespace umbraco.cms.presentation.developer
             save.AltText = "Save Xslt File";
 
             UmbracoPanel1.Menu.InsertSplitter();
-           
+
             uicontrols.MenuIconI tmp = UmbracoPanel1.Menu.NewIcon();
             tmp.ImageURL = umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/images/editor/insField.GIF";
             tmp.OnClickCommand = ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/developer/xslt/xsltinsertvalueof.aspx?objectId=" + editorSource.ClientID, "Insert value", 750, 250);
-                //"umbracoInsertField(document.getElementById('editorSource'), 'xsltInsertValueOf', '','felt', 750, 230, '');";
+            //"umbracoInsertField(document.getElementById('editorSource'), 'xsltInsertValueOf', '','felt', 750, 230, '');";
             tmp.AltText = "Insert xslt:value-of";
 
             UmbracoPanel1.Menu.InsertSplitter();
@@ -100,31 +101,33 @@ namespace umbraco.cms.presentation.developer
 
 
             // Add source and filename
-            String file = Request.QueryString["file"];
+            String file = IOHelper.MapPath(SystemDirectories.Xslt + "/" + Request.QueryString["file"]);
 
-            //Hardcoded Fix/Hack, form can only open and edit xslt files.. PPH
-            if (file.ToLower().EndsWith(".xslt"))
-            {
-                xsltFileName.Text = file;
+            // validate file
+            IOHelper.ValidateEditPath(file, SystemDirectories.Xslt);
+            // validate extension
+            IOHelper.ValidateFileExtension(file, new List<string>() { "xslt", "xsl" });
 
-                StreamReader SR;
-                string S;
-                SR = File.OpenText( IOHelper.MapPath(SystemDirectories.Xslt +"/" + file) );
 
-                S = SR.ReadToEnd();
-                SR.Close();
+            xsltFileName.Text = file.Replace(IOHelper.MapPath(SystemDirectories.Xslt), "").Substring(1);
 
-                editorSource.Text = S;
-                //editorSource.Attributes.Add("onKeyDown", "AllowTabCharacter();");
-            }
+            StreamReader SR;
+            string S;
+            SR = File.OpenText(file);
+
+            S = SR.ReadToEnd();
+            SR.Close();
+
+            editorSource.Text = S;
         }
 
 
-        protected override void OnPreRender(EventArgs e) {
+        protected override void OnPreRender(EventArgs e)
+        {
             base.OnPreRender(e);
 
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference( IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/codeEditorSave.asmx"));
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference( IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/legacyAjaxCalls.asmx"));
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/codeEditorSave.asmx"));
+            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.Webservices) + "/legacyAjaxCalls.asmx"));
         }
 
         /// <summary>

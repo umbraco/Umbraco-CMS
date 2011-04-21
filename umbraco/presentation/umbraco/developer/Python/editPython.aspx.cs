@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -12,6 +13,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Xsl;
 using System.Text.RegularExpressions;
+using umbraco.cms.businesslogic.macro;
 using umbraco.cms.presentation.Trees;
 using umbraco.IO;
 
@@ -25,6 +27,7 @@ namespace umbraco.cms.presentation.developer
 
         }
 
+        private List<string> allowedExtensions = new List<string>();
         protected PlaceHolder buttons;
         protected uicontrols.CodeArea CodeArea1;
 
@@ -32,12 +35,26 @@ namespace umbraco.cms.presentation.developer
         {
             UmbracoPanel1.hasMenu = true;
 
-			if (!IsPostBack)
-			{
-				ClientTools
+            if (!IsPostBack)
+            {
+                ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadPython>().Tree.Alias)
-					.SyncTree(Request.QueryString["file"], false);
-			}
+                    .SyncTree(Request.QueryString["file"], false);
+            }
+        }
+
+        private List<string> validScriptingExtensions()
+        {
+            if (allowedExtensions.Count == 0)
+            {
+                foreach (MacroEngineLanguage lang in MacroEngineFactory.GetSupportedUILanguages())
+                {
+                    if (!allowedExtensions.Contains(lang.Extension))
+                        allowedExtensions.Add(lang.Extension);
+                }
+            }
+
+            return allowedExtensions;
         }
 
         protected override void OnInit(EventArgs e)
@@ -51,12 +68,19 @@ namespace umbraco.cms.presentation.developer
             save.AltText = "Save scripting File";
 
             // Add source and filename
-            String file = Request.QueryString["file"];
-            pythonFileName.Text = file;
+            String file = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + Request.QueryString["file"]);
+
+            // validate file
+            IOHelper.ValidateEditPath(file, SystemDirectories.MacroScripts);
+            // validate extension
+            IOHelper.ValidateFileExtension(file, validScriptingExtensions());
+
+            // we need to move the full path and then the preceeding slash
+            pythonFileName.Text = file.Replace(IOHelper.MapPath(SystemDirectories.MacroScripts), "").Substring(1);
 
             StreamReader SR;
             string S;
-            SR = File.OpenText(IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + file));
+            SR = File.OpenText(file);
             S = SR.ReadToEnd();
             SR.Close();
             pythonSource.Text = S;

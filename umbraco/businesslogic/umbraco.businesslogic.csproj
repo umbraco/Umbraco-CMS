@@ -151,6 +151,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="CacheHelper.cs" />
+    <Compile Include="Exceptions\FileSecurityException.cs" />
     <Compile Include="Exceptions\UserAuthorizationException.cs" />
     <Compile Include="GlobalSettings.cs">
       <SubType>Code</SubType>
