@@ -101,7 +101,7 @@ namespace umbraco.editorControls
                     try
                     {
                         content.getProperty(prop).Value = string.Empty;
-                        noEdit bytesControl = uploadField.FindControlRecursive<noEdit>(this.Page, prop);
+                        noEdit bytesControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_" + prop);
                         if (bytesControl != null)
                         {
                             bytesControl.RefreshLabel(string.Empty);
@@ -179,7 +179,7 @@ namespace umbraco.editorControls
                     {
                         //cms.businesslogic.Content.GetContentFromVersion(_data.Version).getProperty("umbracoExtension").Value = ext;
                         content.getProperty("umbracoExtension").Value = ext;
-                        noEdit extensionControl = uploadField.FindControlRecursive<noEdit>(this.Page, "umbracoExtension");
+                        noEdit extensionControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoExtension");
                         if (extensionControl != null)
                         {
                             extensionControl.RefreshLabel(content.getProperty("umbracoExtension").Value.ToString());
@@ -195,7 +195,7 @@ namespace umbraco.editorControls
                         System.IO.FileInfo fi = new FileInfo(_fullFilePath);
                         //cms.businesslogic.Content.GetContentFromVersion(_data.Version).getProperty("umbracoBytes").Value = fi.Length.ToString();
                         content.getProperty("umbracoBytes").Value = fi.Length.ToString();
-                        noEdit bytesControl = uploadField.FindControlRecursive<noEdit>(this.Page, "umbracoBytes");
+                        noEdit bytesControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoBytes");
                         if (bytesControl != null)
                         {
                             bytesControl.RefreshLabel(content.getProperty("umbracoBytes").Value.ToString());
@@ -221,13 +221,13 @@ namespace umbraco.editorControls
                             //cms.businesslogic.Content.GetContentFromVersion(_data.Version).getProperty("umbracoWidth").Value = fileWidth.ToString();
                             //cms.businesslogic.Content.GetContentFromVersion(_data.Version).getProperty("umbracoHeight").Value = fileHeight.ToString();
                             content.getProperty("umbracoWidth").Value = fileWidth.ToString();
-                            noEdit widthControl = uploadField.FindControlRecursive<noEdit>(this.Page, "umbracoWidth");
+                            noEdit widthControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoWidth");
                             if (widthControl != null)
                             {
                                 widthControl.RefreshLabel(content.getProperty("umbracoWidth").Value.ToString());
                             }
                             content.getProperty("umbracoHeight").Value = fileHeight.ToString();
-                            noEdit heightControl = uploadField.FindControlRecursive<noEdit>(this.Page, "umbracoHeight");
+                            noEdit heightControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoHeight");
                             if (heightControl != null)
                             {
                                 heightControl.RefreshLabel(content.getProperty("umbracoHeight").Value.ToString());
