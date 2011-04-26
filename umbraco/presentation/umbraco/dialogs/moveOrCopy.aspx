@@ -22,15 +22,22 @@
 			  }
 			}
 			
+            var actionIsValid = true;
+
 			function updateName(result) {
-				jQuery("#pageNameContent").html("'<strong>" + result + "</strong>' <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %>");
-				jQuery("#pageNameHolder").attr("class","success");
+                if(actionIsValid)
+                {
+				    jQuery("#pageNameContent").html("'<strong>" + result + "</strong>' <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %>");
+				    jQuery("#pageNameHolder").attr("class","success");
+                }
 			}
 
+           
             function notValid()
             {
                 jQuery("#pageNameHolder").attr("class", "error");
                 jQuery("#pageNameContent").html("<%= umbraco.ui.Text("moveOrCopy","notValid") %>");
+                actionIsValid = false;
             }
 	
 	</script>
