@@ -15,6 +15,9 @@ using umbraco.cms.businesslogic.media;
 using umbraco.IO;
 using System.Linq;
 using umbraco.cms.businesslogic;
+using umbraco.cms.presentation.user;
+using umbraco.interfaces;
+using System.Collections.Generic;
 
 namespace umbraco.dialogs
 {
@@ -84,6 +87,15 @@ namespace umbraco.dialogs
                             currentPath += "/" + new CMSNode(int.Parse(s)).Text;
                     }
 
+                    //
+
+                    bool validAction = true;
+                    if (d.HasChildren)
+                    {
+                        validAction = ValidAction(helper.Request("mode") == "cut" ? 'M' : 'O');
+                    }
+
+
                     if (helper.Request("mode") == "cut") {
                         pane_form.Text = ui.Text("moveOrCopy", "moveTo", d.Text, base.getUser());
                         pp_relate.Visible = false;
@@ -91,10 +103,41 @@ namespace umbraco.dialogs
                         pane_form.Text = ui.Text("moveOrCopy", "copyTo", d.Text, base.getUser());
                         pp_relate.Visible = true;
                     }
+
+                    if (!validAction)
+                    {
+                        ScriptManager.RegisterStartupScript(this, this.GetType(), "notvalid", "notValid();", true);
+
+                    }
                 }
             }
 			
 		}
+
+        private bool ValidAction(char actionLetter)
+        {
+            CMSNode d = new CMSNode(int.Parse(helper.Request("id")));
+            IAction currentAction = umbraco.BusinessLogic.Actions.Action.GetPermissionAssignable().Where(a => a.Letter == actionLetter).First();
+            return CheckPermissions(d, currentAction,actionLetter);
+           
+        }
+
+        private bool CheckPermissions(CMSNode node, IAction currentAction, char actionLetter)
+        {
+                       
+            UserPermissions currUserPermissions = new UserPermissions(UmbracoEnsuredPage.CurrentUser);
+            List<IAction> lstCurrUserActions = currUserPermissions.GetExistingNodePermission(node.Id);
+
+            if (!lstCurrUserActions.Contains(currentAction))
+                return false;
+            if (node.HasChildren)
+            {
+                foreach (CMSNode c in node.Children)
+                    if (!CheckPermissions(c,currentAction,actionLetter))
+                        return false;
+            }
+            return true;
+        }
         //PPH moving multiple nodes and publishing them aswell.
         private void handleChildNodes(cms.businesslogic.web.Document d) {
             //store children array here because iterating over an Array object is very inneficient.

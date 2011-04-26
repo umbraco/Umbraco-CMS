@@ -499,6 +499,7 @@
     </key>
   </area>
   <area alias="moveOrCopy">
+    <key alias="notValid">The action isn't allowed since you have insufficient permissions on 1 or more child documents.</key>
     <key alias="moveTo">Select where the document %0% should be moved to below</key>
     <key alias="copyTo">Select where the document %0% should be copied to below</key>
     <key alias="noNodeSelected">No node selected yet, please select a node in the list above before clicking 'ok'</key>
