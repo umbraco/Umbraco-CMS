@@ -2,11 +2,12 @@ using System;
 using System.Collections;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
+using ClientDependency.Core;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using System.Collections.Generic;
 using System.Web.UI.HtmlControls;
+
 
 
 [assembly: System.Web.UI.WebResource("umbraco.editorControls.KeyValuePrevalueEditor.js", "text/js")]
@@ -16,6 +17,8 @@ namespace umbraco.editorControls
 	/// <summary>
 	/// Summary description for KeyValuePrevalueEditor.
 	/// </summary>
+
+    [ClientDependency(ClientDependencyType.Javascript, "Jeditable/jquery.jeditable.js", "UmbracoClient")]
 	public class KeyValuePrevalueEditor : System.Web.UI.WebControls.PlaceHolder, interfaces.IDataPrevalue
 	{
 	

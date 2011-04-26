@@ -1778,6 +1778,7 @@
     <Content Include="umbraco_client\tinymce3\plugins\inlinepopups\template.htm" />
     <Content Include="umbraco_client\tinymce3\plugins\insertdatetime\editor_plugin.js" />
     <Content Include="umbraco_client\tinymce3\plugins\insertdatetime\editor_plugin_src.js" />
+    <Content Include="umbraco_client\Jeditable\jquery.jeditable.js" />
     <Content Include="umbraco_client\tinymce3\plugins\layer\editor_plugin.js" />
     <Content Include="umbraco_client\tinymce3\plugins\layer\editor_plugin_src.js" />
     <Content Include="umbraco_client\tinymce3\plugins\legacyoutput\editor_plugin.js" />

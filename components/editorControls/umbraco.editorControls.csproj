@@ -424,6 +424,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="KeyValuePrevalueEditor.js" />
+    <EmbeddedResource Include="KeyValuePrevalueEditor.css" />
     <Content Include="mediapicker\MediaPicker.js" />
     <EmbeddedResource Include="SettingControls\css\Values.css" />
     <EmbeddedResource Include="SettingControls\js\Values.js" />
