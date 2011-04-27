@@ -5,7 +5,7 @@
 	<HeaderTemplate>
     <div class="propertypane">
         <div class="guiDialogNormal" style="margin: 10px">
-        <h2><%=umbraco.ui.Text("defaultdialogs", "lastEdited", bp.getUser())%>:</h2>
+        <h2><%=umbraco.ui.Text("defaultdialogs", "lastEdited")%>:</h2>
 	</HeaderTemplate>
              
 	<ItemTemplate>
