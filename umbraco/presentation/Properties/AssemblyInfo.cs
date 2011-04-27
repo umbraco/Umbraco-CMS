@@ -11,6 +11,10 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyProduct("")]
 
+//tg forcing .NET 2.0 security rules, since otherwise it wasn't possible to run in medium trust
+//(got an inheritance security rules violated by type error)
+[assembly: System.Security.SecurityRules(System.Security.SecurityRuleSet.Level1)]
+
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 
 // Microsoft .NET Framework documentation for more information on assembly signing.
