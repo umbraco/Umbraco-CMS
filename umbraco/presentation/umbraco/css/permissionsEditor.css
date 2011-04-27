@@ -14,10 +14,18 @@
 	border-left: 1px solid #D9D7D7;
 	margin-left: 20px;
 	padding-left: 20px;
+	
+	position: relative;
+	z-index: 100;
 }
 #nodepermissionsList
 {
 	list-style: none;
+}
+
+#nodepermissionsList li
+{
+    background-color:white;
 }
 
 /* new clearfix */
@@ -31,3 +39,5 @@
 	}
 * html .clearfix             { zoom: 1; } /* IE6 */
 *:first-child+html .clearfix { zoom: 1; } /* IE7 */
+
+
