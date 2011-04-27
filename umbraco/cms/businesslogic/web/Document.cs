@@ -1061,12 +1061,24 @@ namespace umbraco.cms.businesslogic.web
             if (!e.Cancel)
             {
                 Guid newVersion = createNewVersion();
-                SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, Text, TemplateId) values (" +
-                                          Id +
-                                          ", 0, " + u.Id + ", @versionId, @text, " +
-                                          _template + ")",
-                                          SqlHelper.CreateParameter("@versionId", newVersion),
-                                          SqlHelper.CreateParameter("@text", Text));
+
+                if (_template != 0)
+                {
+                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, Text, TemplateId) values (" +
+                                              Id +
+                                              ", 0, " + u.Id + ", @versionId, @text, " +
+                                              _template + ")",
+                                              SqlHelper.CreateParameter("@versionId", newVersion),
+                                              SqlHelper.CreateParameter("@text", Text));
+                }
+                else
+                {
+                    SqlHelper.ExecuteNonQuery("insert into cmsDocument (nodeId, published, documentUser, versionId, Text) values (" +
+                                             Id +
+                                             ", 0, " + u.Id + ", @versionId, @text )",
+                                             SqlHelper.CreateParameter("@versionId", newVersion),
+                                             SqlHelper.CreateParameter("@text", Text));
+                }
 
                 // Get new version
                 Document dNew = new Document(Id, newVersion);
