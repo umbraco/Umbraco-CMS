@@ -15,18 +15,18 @@
    <li>
     <asp:Label runat="server" AssociatedControlID="password" ID="passwordLabel"><%=umbraco.ui.Text("passwordEnterNew") %>:</asp:Label>
     <asp:TextBox id="password" TextMode="password" CssClass="textfield" Runat="server"></asp:TextBox>
-    <asp:RequiredFieldValidator runat="server" ControlToValidate="password" ID="passwordvalidator">*</asp:RequiredFieldValidator>
+    <asp:RequiredFieldValidator runat="server" ControlToValidate="password" ID="passwordvalidator" ValidationGroup="changepass">*</asp:RequiredFieldValidator>
     </li>
    <li>
     <asp:Label runat="server" AssociatedControlID="confirmpassword" ID="confirmpasswordlabel"><%=umbraco.ui.Text("passwordConfirm") %>:</asp:Label>
     <asp:TextBox id="confirmpassword" TextMode="password" CssClass="textfield" Runat="server"></asp:TextBox>
-    <asp:RequiredFieldValidator runat="server" ControlToValidate="confirmpassword" ID="confirmpasswordvalidator">*</asp:RequiredFieldValidator>
-    <asp:CompareValidator ID="CompareValidator1" runat="server" ControlToValidate="confirmpassword" ControlToCompare="password"><%=umbraco.ui.Text("passwordMismatch") %></asp:CompareValidator>
+    <asp:RequiredFieldValidator runat="server" ControlToValidate="confirmpassword" ID="confirmpasswordvalidator" ValidationGroup="changepass">*</asp:RequiredFieldValidator>
+    <asp:CompareValidator ID="CompareValidator1" runat="server" ControlToValidate="confirmpassword" ControlToCompare="password" ValidationGroup="changepass"><%=umbraco.ui.Text("passwordMismatch") %></asp:CompareValidator>
     </li>
 </ol>
         
 <p>
-<asp:Button id="changePassword" Runat="server" Text="Change Password" OnClientClick="showProgress(this,'loadingBar'); return true;" onclick="changePassword_Click"></asp:Button>
+<asp:Button id="changePassword" Runat="server" Text="Change Password" OnClientClick="showProgress(this,'loadingBar'); return true;" onclick="changePassword_Click" ValidationGroup="changepass"></asp:Button>
 </p>
 <script type="text/javascript">
     jQuery(document).ready(function () {
