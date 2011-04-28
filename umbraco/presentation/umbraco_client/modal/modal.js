@@ -339,7 +339,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             ajax: F,
             ajaxText: '',
             target: F,
-            modal: F,
+            modal: true,
             toTop: F,
             onShow: F,
             onHide: F,
