@@ -389,6 +389,8 @@ namespace umbraco.cms.businesslogic.template
 
         public static int GetTemplateIdFromAlias(string alias)
         {
+            alias = alias.ToLower();
+
             initTemplateAliases();
             if (TemplateAliases.ContainsKey(alias))
                 return (int)TemplateAliases[alias];
