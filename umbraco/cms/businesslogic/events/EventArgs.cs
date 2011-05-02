@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.web;
 
 namespace umbraco.cms.businesslogic {
@@ -28,11 +29,14 @@ namespace umbraco.cms.businesslogic {
     public class NewEventArgs : System.ComponentModel.CancelEventArgs { }
     
     //Special Members Event args
-    public class AddToCacheEventArgs : System.ComponentModel.CancelEventArgs { }
-    public class RemoveFromCacheEventArgs : System.ComponentModel.CancelEventArgs { }
-    public class AddGroupEventArgs : System.ComponentModel.CancelEventArgs { }
-    public class RemoveGroupEventArgs : System.ComponentModel.CancelEventArgs { }
-
+    public class AddToCacheEventArgs : GroupEventArgs { }
+    public class RemoveFromCacheEventArgs : GroupEventArgs { }
+    public class AddGroupEventArgs : GroupEventArgs { }
+    public class RemoveGroupEventArgs : GroupEventArgs { }
+    public class GroupEventArgs : System.ComponentModel.CancelEventArgs
+    {
+        public int GroupId{ get; set; }
+    }
     //Tree node event args
     public class NodeRenderEventArgs : System.ComponentModel.CancelEventArgs { }
 

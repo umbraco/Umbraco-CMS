@@ -27,6 +27,7 @@ var values = new Dictionary<string,object>();
 values.Add("maxLevelForSitemap", maxLevelForSitemap) ;
 
    var items = node.Children.Where("Visible").Where("Level <= maxLevelForSitemap", values);
+   if (items.Count() > 0) { 
    <ul>
             @foreach (var item in items) {
                 <li>
@@ -35,6 +36,7 @@ values.Add("maxLevelForSitemap", maxLevelForSitemap) ;
                 </li>
             }
    </ul>
+    }
 }
 <div class="sitemap"> 
     @traverse(@Model.AncestorOrSelf())
