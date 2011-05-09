@@ -648,6 +648,7 @@ namespace umbraco.cms.businesslogic.member
         public void AddGroup(int GroupId)
         {
             AddGroupEventArgs e = new AddGroupEventArgs();
+            e.GroupId = GroupId;
             FireBeforeAddGroup(e);
 
             if (!e.Cancel)
@@ -673,6 +674,7 @@ namespace umbraco.cms.businesslogic.member
         public void RemoveGroup(int GroupId)
         {
             RemoveGroupEventArgs e = new RemoveGroupEventArgs();
+            e.GroupId = GroupId;
             FireBeforeRemoveGroup(e);
 
             if (!e.Cancel)

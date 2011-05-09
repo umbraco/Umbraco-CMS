@@ -143,22 +143,20 @@ namespace umbraco.BasePages {
         /// </summary>
         /// <param name="umbracoUserContextID">The umbraco user context ID.</param>
         /// <returns></returns>
-        public static bool ValidateUserContextID(string umbracoUserContextID) {
-            if ((umbracoUserContextID != "")) {
-                int uid = GetUserId(umbracoUserContextID);
-                long timeout = GetTimeout(umbracoUserContextID);
+        public static bool ValidateUserContextID(string currentUmbracoUserContextID) {
+            if ((currentUmbracoUserContextID != ""))
+            {
+                int uid = GetUserId(currentUmbracoUserContextID);
+                long timeout = GetTimeout(currentUmbracoUserContextID);
 
-                if (timeout > DateTime.Now.Ticks) {
+                if (timeout > DateTime.Now.Ticks)
+                {
                     return true;
-                } else {
-                    // clear the usercontext id to prevent continuous logout entries
-                    BasePage.umbracoUserContextID = String.Empty;
-                    BusinessLogic.Log.Add(BusinessLogic.LogTypes.Logout, BusinessLogic.User.GetUser(uid), -1, "");
-
-                    return false;
                 }
-            } else
-                return false;
+             
+                BusinessLogic.Log.Add(BusinessLogic.LogTypes.Logout, BusinessLogic.User.GetUser(uid), -1, "");
+            }
+            return false;
         }
 
         private static long GetTimeout(string umbracoUserContextID) {

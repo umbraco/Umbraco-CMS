@@ -191,7 +191,16 @@
 
         // *** NEW KEEP ALIVE - Should be moved to app manager *** */
         var failedAttempts = 0;
-        window.setInterval(keepAlive, 10000);
+        var keepAliveInterval; 
+        beginKeepAlive();
+
+        function beginKeepAlive() {
+            keepAliveInterval = window.setInterval(keepAlive, 10000);
+        }
+        function pauseKeepAlive() {
+            clearInterval(keepAliveInterval);
+        }
+
         function keepAlive() {
             umbraco.presentation.webservices.legacyAjaxCalls.GetSecondsBeforeUserLogout(validateUserTimeout, keepAliveError);
         }
@@ -231,13 +240,16 @@
 
         function umbracoRenewSession() {
             umbraco.presentation.webservices.legacyAjaxCalls.RenewUmbracoSession(
-                function () { jQuery("#logout-warning").fadeOut().removeClass('error').addClass('notice'); },
+                function () {
+                    jQuery("#logout-warning").fadeOut().removeClass('error').addClass('notice'); 
+                    },
                 umbracoShowSessionRenewModal);
 
         }
 
         function umbracoShowSessionRenewModal() {
 
+            pauseKeepAlive();
             jQuery("#logout-warning").fadeOut().removeClass('error').addClass('notice');
 
             jQuery("#sessionrefreshpassword input").attr("style", "");
@@ -274,6 +286,7 @@
 
                             jQuery("#sessionrefreshpassword input").val("");
                             jQuery.fullmodal.close();
+                            beginKeepAlive();
                         }
                         else {
                             umbracoSessionRenewCheckPasswordFail();

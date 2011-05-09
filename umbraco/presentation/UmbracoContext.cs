@@ -22,6 +22,7 @@ namespace umbraco.presentation
         private UmbracoResponse m_Response;
         private HttpContext m_HttpContext;
         private XmlDocument previewDocument;
+        private PreviewContent _previewContent;
 
         /// <summary>
         /// Creates a new Umbraco context.
@@ -102,10 +103,12 @@ namespace umbraco.presentation
         {
             if (InPreviewMode)
             {
-				// zb-00004 #29956 : refactor cookies names & handling
-                PreviewContent pc = new PreviewContent(new Guid(StateHelper.Cookies.Preview.GetValue()));
-                pc.LoadPreviewset();
-                return pc.XmlContent;
+                if (_previewContent == null)
+                {
+                    _previewContent = new PreviewContent(new Guid(StateHelper.Cookies.Preview.GetValue()));
+                    _previewContent.LoadPreviewset();
+                }
+                return _previewContent.XmlContent;
             }
             else
             {
