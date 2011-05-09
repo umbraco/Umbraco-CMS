@@ -108,13 +108,13 @@ namespace umbraco.presentation.install.utills
 
                       library.RefreshContent();
                   return "installed";
-                } else if (m_Installer.CurrentVersion == DatabaseVersion.None || m_Installer.CanUpgrade) {
-                  Helper.setProgress(35, "Updating database tables...", "");
-                  m_Installer.Install();
+                } //else if (m_Installer.CurrentVersion == DatabaseVersion.None || m_Installer.CanUpgrade) {
+                  //Helper.setProgress(35, "Updating database tables...", "");
+                  //m_Installer.Install();
                   
-                        library.RefreshContent();
-                        return "installed";
-                    }
+                  //      library.RefreshContent();
+                  //      return "installed";
+                  //  }
                     else if (m_Installer.CurrentVersion == DatabaseVersion.None || m_Installer.CanUpgrade)
                     {
                         Helper.setProgress( 35, "Updating database tables...", "");
