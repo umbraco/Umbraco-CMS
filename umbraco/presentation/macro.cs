@@ -1,11 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Security;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -1412,7 +1415,8 @@ namespace umbraco
             string tempAlias = (attributes["macroalias"] != null)
                                    ? attributes["macroalias"].ToString()
                                    : attributes["macroAlias"].ToString();
-            if (!ReturnFromAlias(tempAlias).DontRenderInEditor)
+            macro currentMacro = ReturnFromAlias(tempAlias);
+            if (!currentMacro.DontRenderInEditor)
             {
                 string querystring = "umbPageId=" + PageID + "&umbVersionId=" + PageVersion;
                 IDictionaryEnumerator ide = attributes.GetEnumerator();
@@ -1421,13 +1425,13 @@ namespace umbraco
 
                 // Create a new 'HttpWebRequest' Object to the mentioned URL.
                 string retVal = string.Empty;
-                string url = "http://" + HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" +
-                             HttpContext.Current.Request.ServerVariables["SERVER_PORT"] +
-                             IOHelper.ResolveUrl(SystemDirectories.Umbraco) +
-                             "/macroResultWrapper.aspx?" +
-                             querystring;
+                string protocol = GlobalSettings.UseSSL ? "https" : "http";
+                string url = string.Format("{0}://{1}:{2}{3}/macroResultWrapper.aspx?{4}", protocol, HttpContext.Current.Request.ServerVariables["SERVER_NAME"], HttpContext.Current.Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco), querystring);
 
                 var myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+
+                // allows for validation of SSL conversations (to bypass SSL errors in debug mode!)
+                ServicePointManager.ServerCertificateValidationCallback += ValidateRemoteCertificate;
 
                 // propagate the user's context
                 // zb-00004 #29956 : refactor cookies names & handling
@@ -1466,14 +1470,14 @@ namespace umbraco
                         retVal = retVal.Substring(grabStartPos, grabEndPos);
                     }
                     else
-                        retVal = "<span style=\"color: green\">No macro content available for WYSIWYG editing</span>";
+                        retVal = showNoMacroContent(currentMacro);
 
                     // Release the HttpWebResponse Resource.
                     myHttpWebResponse.Close();
                 }
                 catch (Exception ee)
                 {
-                    retVal = "<span style=\"color: green\">No macro content available for WYSIWYG editing</span>";
+                    retVal = showNoMacroContent(currentMacro);
                 }
                 finally
                 {
@@ -1484,8 +1488,31 @@ namespace umbraco
 
                 return retVal.Replace("\n", string.Empty).Replace("\r", string.Empty);
             }
+
+            return showNoMacroContent(currentMacro);
+        }
+
+        private static string showNoMacroContent(macro currentMacro)
+        {
+            return "<span style=\"color: green\"><strong>" + currentMacro.Name + "</strong><br />No macro content available for WYSIWYG editing</span>";
+        }
+
+        private static bool ValidateRemoteCertificate(
+object sender,
+    X509Certificate certificate,
+    X509Chain chain,
+    SslPolicyErrors policyErrors
+)
+        {
+            if (GlobalSettings.DebugMode)
+            {
+                // allow any old dodgy certificate...
+                return true;
+            }
             else
-                return "<span style=\"color: green\">This macro does not provides rendering in WYSIWYG editor</span>";
+            {
+                return policyErrors == SslPolicyErrors.None;
+            }
         }
 
         /// <summary>

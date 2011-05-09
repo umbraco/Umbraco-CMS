@@ -2179,7 +2179,9 @@
     <Content Include="umbraco_client\DateTimePicker\images\ui-icons_666666_256x240.png" />
     <Content Include="umbraco_client\DateTimePicker\images\ui-icons_999999_256x240.png" />
     <Content Include="umbraco_client\DateTimePicker\umbDateTimePicker.js" />
-    <Content Include="web.config.UMBRACOHUMMER.xslt" />
+    <Content Include="web.config.UMBRACOHUMMER.xslt">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="umbraco\controls\passwordChanger.ascx" />
     <Content Include="umbraco\controls\ProgressBar.ascx" />
     <Content Include="umbraco_client\DateTimePicker\datetimepicker.css" />

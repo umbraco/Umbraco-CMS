@@ -9,6 +9,7 @@ using System.Web.Configuration;
 using System.Web.Security;
 using System.Xml;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.media;
 
 namespace umbraco.presentation.umbraco.webservices
@@ -163,6 +164,10 @@ namespace umbraco.presentation.umbraco.webservices
 
         private bool IsValidRequest(HttpContext context, XmlTextWriter xmlTextWriter)
         {
+            // check for secure connection
+            if (GlobalSettings.UseSSL && !context.Request.IsSecureConnection)
+                throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
+
             string username = context.Request["username"];
             string password = context.Request["password"];
             string ticket = context.Request["ticket"];

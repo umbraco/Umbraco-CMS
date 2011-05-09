@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.Net;
 using System.Web.UI;
+using umbraco.businesslogic.Exceptions;
 using umbraco.IO;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
@@ -441,6 +442,11 @@ namespace umbraco.presentation.webservices
 
         public static void Authorize()
         {
+
+            // check for secure connection
+            if (GlobalSettings.UseSSL && !HttpContext.Current.Request.IsSecureConnection)
+                throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
+
             if (!BasePages.BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
                 throw new Exception("Client authorization failed. User is not logged in");
 

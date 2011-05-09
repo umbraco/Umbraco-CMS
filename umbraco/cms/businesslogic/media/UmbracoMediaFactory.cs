@@ -39,14 +39,15 @@ namespace umbraco.cms.businesslogic.media
         {
             // Check to see if a file exists
             Media media;
+            string mediaName = extractTitleFromFileName(postedFile.FileName);
 
-            if(replaceExisting && TryFindExistingMedia(parentNodeId, postedFile.FileName, out media))
+            if (replaceExisting && TryFindExistingMedia(parentNodeId, postedFile.FileName, out media))
             {
                 // Do nothing as existing media is returned
             }
             else
             {
-                media = Media.MakeNew(postedFile.FileName,
+                media = Media.MakeNew(mediaName,
                     MediaType.GetByAlias(MediaTypeAlias),
                     user,
                     parentNodeId);
@@ -109,6 +110,33 @@ namespace umbraco.cms.businesslogic.media
 
             existingMedia = null;
             return false;
+        }
+
+        private string extractTitleFromFileName(string fileName)
+        {
+            // change the name
+            string currentChar = String.Empty;
+            string curName = fileName.Substring(0, fileName.LastIndexOf("."));
+            int curNameLength = curName.Length;
+            string friendlyName = String.Empty;
+            for (int i = 0; i < curNameLength; i++)
+            {
+                currentChar = curName.Substring(i, 1);
+                if (friendlyName.Length == 0)
+                    currentChar = currentChar.ToUpper();
+
+                if (i < curNameLength - 1 && friendlyName != "" && curName.Substring(i - 1, 1) == " ")
+                    currentChar = currentChar.ToUpper();
+                else if (currentChar != " " && i < curNameLength - 1 && friendlyName != ""
+                && curName.Substring(i - 1, 1).ToUpper() != curName.Substring(i - 1, 1)
+                && currentChar.ToUpper() == currentChar)
+                    friendlyName += " ";
+
+                friendlyName += currentChar;
+
+            }
+
+            return friendlyName;
         }
 
         #endregion

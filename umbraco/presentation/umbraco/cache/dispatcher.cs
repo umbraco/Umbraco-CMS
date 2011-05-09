@@ -221,7 +221,8 @@ namespace umbraco.presentation.cache
         /// <param name="n">The XmlNode.</param>
         private static void SetWebServiceUrlFromNode(CacheRefresher cr, XmlNode n)
         {
-            cr.Url = "http://" + xmlHelper.GetNodeValue(n) + _webServicesUrl + "/cacheRefresher.asmx";
+            string protocol = GlobalSettings.UseSSL ? "https" : "http";
+            cr.Url = string.Format("{0}://{1}{2}/cacheRefresher.asmx", protocol, xmlHelper.GetNodeValue(n), _webServicesUrl);
         }
 
         private static string GetFactoryObjectName(Guid uniqueIdentifier)

@@ -170,7 +170,11 @@ namespace umbraco.BasePages {
 
             }
 
-            return (long)System.Web.HttpRuntime.Cache["UmbracoUserContextTimeout" + umbracoUserContextID];
+            object timeout = HttpRuntime.Cache["UmbracoUserContextTimeout" + umbracoUserContextID];
+            if(timeout != null)
+                return (long) timeout;
+
+            return 0;
 
         }
 

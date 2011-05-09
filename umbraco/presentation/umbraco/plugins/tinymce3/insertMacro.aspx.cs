@@ -188,7 +188,7 @@ namespace umbraco.presentation.tinymce3
                 try
                 {
                     IMacroGuiRendering ic = (IMacroGuiRendering)c;
-                    attributes.Add(c.ID, ic.Value);
+                    attributes.Add(c.ID.ToLower(), ic.Value);
                     macroAttributes += " " + c.ID + "=\"" +
                                        ic.Value.Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "\\r") + "\"";
                 }
