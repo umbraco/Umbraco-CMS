@@ -61,8 +61,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RazorCore\BaseContext.cs" />
+    <Compile Include="RazorCore\IRazorLibrary.cs" />
+    <Compile Include="RazorCore\RazorLibraryImpl.cs" />
     <Compile Include="RazorDynamicNode\DynamicMediaList.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeList.cs" />
+    <Compile Include="RazorDynamicNode\RazorLibraryCore.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeWalker.cs" />
     <Compile Include="RazorDynamicNode\DynamicNull.cs" />
     <Compile Include="RazorDynamicNode\DynamicQueryable.cs" />

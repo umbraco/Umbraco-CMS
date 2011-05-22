@@ -16,6 +16,7 @@ using System.Xml;
 using System.Xml.Linq;
 
 
+
 namespace umbraco.MacroEngines
 {
     public class DynamicNode : DynamicObject
@@ -323,7 +324,25 @@ namespace umbraco.MacroEngines
             }
             return result;
         }
-
+        private List<string> GetAncestorOrSelfNodeTypeAlias(INode node)
+        {
+            List<string> list = new List<string>();
+            if (node != null)
+            {
+                
+                //find the doctype node, so we can walk it's parent's tree- not the working.parent content tree
+                CMSNode working = ContentType.GetByAlias(node.NodeTypeAlias);
+                while (working != null)
+                {
+                    if((working as ContentType) != null)
+                    {
+                        list.Add((working as ContentType).Alias);
+                    }
+                    working = working.Parent;
+                }
+            }
+            return list;
+        }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
 
@@ -360,8 +379,13 @@ namespace umbraco.MacroEngines
                 }
 
                 //check if the alias is that of a child type
+
                 var typeChildren = n.ChildrenAsList
-                    .Where(x => MakePluralName(x.NodeTypeAlias) == name || x.NodeTypeAlias == name);
+                    .Where(x =>
+                    {
+                        List<string> ancestorAliases = GetAncestorOrSelfNodeTypeAlias(x);
+                        return ancestorAliases.Any(alias => alias == name || MakePluralName(alias) == name);
+                    });
                 if (typeChildren.Any())
                 {
                     result = new DynamicNodeList(typeChildren);

@@ -5,7 +5,8 @@ using umbraco.interfaces;
 
 namespace umbraco.MacroEngines
 {
-    public abstract class BaseContext<T> : WebPage, IMacroContext {
+    public abstract class BaseContext<T> : WebPage, IMacroContext
+    {
 
         private MacroModel _macro;
         private INode _node;
@@ -22,7 +23,8 @@ namespace umbraco.MacroEngines
         public T Current { get { return CurrentModel; } }
         public new dynamic Model { get { return CurrentModel; } }
 
-        public virtual void SetMembers(MacroModel macro, INode node) {
+        public virtual void SetMembers(MacroModel macro, INode node)
+        {
             if (macro == null)
                 throw new ArgumentNullException("macro");
             if (node == null)
@@ -33,22 +35,36 @@ namespace umbraco.MacroEngines
             _node = node;
         }
 
-        protected override void ConfigurePage(WebPageBase parentPage) {
+        protected override void ConfigurePage(WebPageBase parentPage)
+        {
             if (parentPage == null)
                 return;
             //Inject SetMembers Into New Context
-            if (parentPage is IMacroContext) {
+            if (parentPage is IMacroContext)
+            {
                 var macroContext = (IMacroContext)parentPage;
                 SetMembers(macroContext.Macro, macroContext.Node);
             }
         }
 
-        public string GetParameter(string alias) {
+        public string GetParameter(string alias)
+        {
             return ParameterDictionary[alias];
         }
 
-        public string GetDictionary(string key) {
+        public string GetDictionary(string key)
+        {
             return CultureDictionary[key];
         }
+
+        public IRazorLibrary Library
+        {
+            get
+            {
+                return new RazorLibraryImpl(_node);
+            }
+        }
+
+
     }
 }

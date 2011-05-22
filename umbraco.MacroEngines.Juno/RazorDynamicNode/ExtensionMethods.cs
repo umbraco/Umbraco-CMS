@@ -6,7 +6,7 @@ using System.Web;
 
 namespace umbraco.MacroEngines
 {
-    public static class PrivateExtensionMethods
+    public static class ExtensionMethods
     {
         public static IEnumerable<TSource> Map<TSource>(
             this IEnumerable<TSource> source,
