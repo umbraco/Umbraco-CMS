@@ -19,7 +19,7 @@ using System.Xml.Linq;
 
 namespace umbraco.MacroEngines
 {
-    public class DynamicNode : DynamicObject
+    public class DynamicNode : DynamicBase
     {
         #region consts
         // these are private readonlys as const can't be Guids
@@ -329,12 +329,12 @@ namespace umbraco.MacroEngines
             List<string> list = new List<string>();
             if (node != null)
             {
-                
+
                 //find the doctype node, so we can walk it's parent's tree- not the working.parent content tree
                 CMSNode working = ContentType.GetByAlias(node.NodeTypeAlias);
                 while (working != null)
                 {
-                    if((working as ContentType) != null)
+                    if ((working as ContentType) != null)
                     {
                         list.Add((working as ContentType).Alias);
                     }

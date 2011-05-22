@@ -8,7 +8,7 @@ using umbraco.cms.businesslogic.property;
 
 namespace umbraco.MacroEngines
 {
-    public class DynamicMedia : DynamicObject
+    public class DynamicMedia : DynamicBase
     {
         private Dictionary<string, string> _propertyCache;
         private Media _media;
