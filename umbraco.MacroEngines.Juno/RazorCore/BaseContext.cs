@@ -2,6 +2,7 @@
 using System.Web.WebPages;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
+using umbraco.MacroEngines.Library;
 
 namespace umbraco.MacroEngines
 {
@@ -57,11 +58,11 @@ namespace umbraco.MacroEngines
             return CultureDictionary[key];
         }
 
-        public IRazorLibrary Library
+        public RazorLibraryCore Library
         {
             get
             {
-                return new RazorLibraryImpl(_node);
+                return new RazorLibraryCore(this._node);
             }
         }
 

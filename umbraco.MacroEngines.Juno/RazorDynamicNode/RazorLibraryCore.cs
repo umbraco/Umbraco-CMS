@@ -2,14 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using umbraco.interfaces;
 
 namespace umbraco.MacroEngines.Library
 {
-    public static class RazorLibraryCore
+    public class RazorLibraryCore
     {
-        //public static string Helper1(this IRazorLibrary library, string defaultParam1 = "")
-        //{
-        //    return defaultParam1;
-        //}
+        private INode _node;
+        public INode Node
+        {
+            get { return _node; }
+        }
+        public RazorLibraryCore(INode node)
+        {
+            this._node = node;
+        }
+
+
+
+        public string Helper1(string defaultParam1 = "")
+        {
+            return defaultParam1;
+        }
+
+
     }
 }
