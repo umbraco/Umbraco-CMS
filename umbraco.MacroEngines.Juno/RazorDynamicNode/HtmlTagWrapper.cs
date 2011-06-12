@@ -13,6 +13,22 @@ namespace umbraco.MacroEngines
         public HtmlTagWrapper Parent;
         public List<HtmlTagWrapperBase> Children;
         public List<KeyValuePair<string, string>> Attributes;
+        public void ReflectAttributesFromAnonymousType(object anonymousAttributes)
+        {
+            Attributes.AddRange(
+                anonymousAttributes
+                    .GetType()
+                    .GetProperties()
+                    .Where(prop => !string.IsNullOrWhiteSpace(string.Format("{0}", prop.GetValue(anonymousAttributes, null))))
+                    .ToList()
+                    .ConvertAll(prop =>
+                        new KeyValuePair<string, string>(
+                            prop.Name,
+                            string.Format("{0}", prop.GetValue(anonymousAttributes, null))
+                        )
+                    )
+              );
+        }
         public List<string> CssClasses;
         public string Tag;
 
@@ -43,7 +59,7 @@ namespace umbraco.MacroEngines
         }
         public override string ToString()
         {
-            return "Use @<your-HtmlTagWrapper>.Write() to emit the HTML rather than @<your-HtmlTagWrapper>";
+            return "Use @item.Write() to emit the HTML rather than @item";
         }
 
         public void WriteToHtmlTextWriter(HtmlTextWriter html)
@@ -64,6 +80,32 @@ namespace umbraco.MacroEngines
                 child.WriteToHtmlTextWriter(html);
             }
             html.WriteEndTag(Tag);
+        }
+
+        public HtmlTagWrapper AddClassName(string className)
+        {
+            className = className.Trim();
+            if (!this.CssClasses.Contains(className))
+            {
+                this.CssClasses.Add(className);
+            }
+            return this;
+        }
+
+        public HtmlTagWrapper RemoveClassName(string className)
+        {
+            className = className.Trim();
+            if (this.CssClasses.Contains(className))
+            {
+                this.CssClasses.Remove(className);
+            }
+            return this;
+        }
+
+        public bool HasClassName(string className)
+        {
+            className = className.Trim();
+            return (this.CssClasses.Contains(className));
         }
     }
 

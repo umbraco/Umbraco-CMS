@@ -167,7 +167,15 @@ namespace umbraco.MacroEngines.Library
 
         public HtmlTagWrapper Wrap(string tag, string innerText)
         {
+            return Wrap(tag, innerText);
+        }
+        public HtmlTagWrapper Wrap(string tag, string innerText, object anonymousAttributes)
+        {
             HtmlTagWrapper wrap = new HtmlTagWrapper(tag);
+            if (anonymousAttributes != null)
+            {
+                wrap.ReflectAttributesFromAnonymousType(anonymousAttributes);
+            }
             wrap.Children.Add(new HtmlTagWrapperTextNode(innerText));
             return wrap;
         }
