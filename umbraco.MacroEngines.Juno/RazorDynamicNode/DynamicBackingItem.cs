@@ -51,7 +51,7 @@ namespace umbraco.MacroEngines
 
         public bool IsNull()
         {
-            return ((Type == DynamicBackingItemType.Content && content == null) || media == null);
+            return (content == null && media == null);
         }
         public List<DynamicBackingItem> ChildrenAsList
         {
@@ -81,7 +81,23 @@ namespace umbraco.MacroEngines
         public IProperty GetProperty(string alias)
         {
             if (IsNull()) return null;
-            return Type == DynamicBackingItemType.Content ? new PropertyResult(content.GetProperty(alias)) : new PropertyResult(media.GetProperty(alias));
+            if (Type == DynamicBackingItemType.Content)
+            {
+                var prop = content.GetProperty(alias);
+                if (prop != null)
+                {
+                    return new PropertyResult(prop);
+                }
+            }
+            else
+            {
+                var prop = media.GetProperty(alias);
+                if (prop != null)
+                {
+                    return new PropertyResult(prop);
+                }
+            }
+            return null;
         }
         public IProperty GetProperty(string alias, out bool propertyExists)
         {

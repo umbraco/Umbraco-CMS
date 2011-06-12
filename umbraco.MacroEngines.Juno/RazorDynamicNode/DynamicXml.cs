@@ -86,9 +86,16 @@ namespace umbraco.MacroEngines
             int count = elements.Count();
             if (count > 0)
             {
-                if (count > 1)
+                var firstElement = elements.FirstOrDefault();
+                //we have a single element, does it have any children?
+                if (firstElement != null && firstElement.Elements().Count() == 0 && !firstElement.HasAttributes)
                 {
-                    //result = elements; 
+                    //no, return the text
+                    result = firstElement.Value;
+                    return true;
+                }
+                else
+                {
                     //We have more than one matching element, so let's return the collection
                     //elements is IEnumerable<DynamicXml>
                     //but we want to be able to re-enter this code
@@ -100,25 +107,6 @@ namespace umbraco.MacroEngines
                     //or you use [] indexing and you end up with a single element
                     return true;
                 }
-                else
-                {
-                    var firstElement = elements.FirstOrDefault();
-                    //we have a single element, does it have any children?
-                    if (firstElement.Elements().Count() == 0)
-                    {
-                        //no, return the text
-                        result = firstElement.Value;
-                        return true;
-                    }
-                    else
-                    {
-                        //yes return this element wrapped in DynamicXml
-                        result = new DynamicXml(firstElement);
-                        //There is only one matching element, so let's just return it
-                        return true;
-                    }
-                }
-                return true; //return true cuz we matched
             }
             result = null;
             return false;

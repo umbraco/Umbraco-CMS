@@ -389,8 +389,10 @@ namespace umbraco.MacroEngines
 
                 //check if the alias is that of a child type
 
-                var typeChildren = n.ChildrenAsList
-                    .Where(x =>
+                var typeChildren = n.ChildrenAsList;
+                if (typeChildren != null)
+                {
+                    var filteredTypeChildren = typeChildren.Where(x =>
                     {
                         List<string> ancestorAliases = GetAncestorOrSelfNodeTypeAlias(x);
                         if (ancestorAliases == null)
@@ -399,10 +401,12 @@ namespace umbraco.MacroEngines
                         }
                         return ancestorAliases.Any(alias => alias == name || MakePluralName(alias) == name);
                     });
-                if (typeChildren.Any())
-                {
-                    result = new DynamicNodeList(typeChildren);
-                    return true;
+                    if (filteredTypeChildren.Any())
+                    {
+                        result = new DynamicNodeList(filteredTypeChildren);
+                        return true;
+                    }
+
                 }
 
                 try
@@ -1042,8 +1046,8 @@ namespace umbraco.MacroEngines
             while (prop == null)
             {
                 context = context.Parent;
-                prop = context.GetProperty(alias);
                 if (context == null) break;
+                prop = context.GetProperty(alias);
             }
             if (prop != null)
             {
@@ -1075,14 +1079,25 @@ namespace umbraco.MacroEngines
             if (n == null) return null;
             return n.ChildrenAsTable(nodeTypeAliasFilter);
         }
-
-        public bool IsNull()
+        public bool IsNull(string alias, bool recursive)
         {
-            return false;
+            var prop = GetProperty(alias);
+            if (prop == null) return true;
+            return (prop as PropertyResult).IsNull();
         }
-        public bool HasValue()
+        public bool IsNull(string alias)
         {
-            return true;
+            return IsNull(alias, false);
+        }
+        public bool HasValue(string alias)
+        {
+            return HasValue(alias, false);
+        }
+        public bool HasValue(string alias, bool recursive)
+        {
+            var prop = GetProperty(alias);
+            if (prop == null) return false;
+            return (prop as PropertyResult).HasValue();
         }
         public int Position()
         {
