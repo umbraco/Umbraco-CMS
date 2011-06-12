@@ -167,7 +167,25 @@ namespace umbraco.MacroEngines.Library
 
         public HtmlTagWrapper Wrap(string tag, string innerText)
         {
-            return Wrap(tag, innerText);
+            return Wrap(tag, innerText, null);
+        }
+        public HtmlTagWrapper Wrap(string tag, object inner, object anonymousAttributes)
+        {
+            string innerText = null;
+            if (inner.GetType() != typeof(DynamicNull) && inner != null)
+            {
+                innerText = string.Format("{0}", inner);
+            }
+            return Wrap(tag, innerText, anonymousAttributes);
+        }
+        public HtmlTagWrapper Wrap(string tag, object inner)
+        {
+            string innerText = null;
+            if (inner.GetType() != typeof(DynamicNull) && inner != null)
+            {
+                innerText = string.Format("{0}", inner);
+            }
+            return Wrap(tag, innerText, null);
         }
         public HtmlTagWrapper Wrap(string tag, string innerText, object anonymousAttributes)
         {
@@ -176,7 +194,10 @@ namespace umbraco.MacroEngines.Library
             {
                 wrap.ReflectAttributesFromAnonymousType(anonymousAttributes);
             }
-            wrap.Children.Add(new HtmlTagWrapperTextNode(innerText));
+            if (!string.IsNullOrWhiteSpace(innerText))
+            {
+                wrap.Children.Add(new HtmlTagWrapperTextNode(innerText));
+            }
             return wrap;
         }
     }
