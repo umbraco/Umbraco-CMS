@@ -14,7 +14,7 @@ namespace umbraco.MacroEngines
 {
     public class DynamicNodeList : DynamicObject, IEnumerable
     {
-        public List<DynamicNode> Items { get; set; }
+        public List<DynamicNode> Items;
 
         public DynamicNodeList()
         {
@@ -26,6 +26,13 @@ namespace umbraco.MacroEngines
             list.ForEach(node => node.ownerList = this);
             Items = list;
         }
+        public DynamicNodeList(IEnumerable<DynamicBackingItem> items)
+        {
+            List<DynamicNode> list = items.ToList().ConvertAll(n => new DynamicNode(n));
+            list.ForEach(node => node.ownerList = this);
+            Items = list;
+        }
+
         public DynamicNodeList(IEnumerable<INode> items)
         {
             List<DynamicNode> list = items.Select(x => new DynamicNode(x)).ToList();

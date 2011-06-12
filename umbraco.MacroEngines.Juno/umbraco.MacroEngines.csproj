@@ -39,7 +39,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Examine, Version=0.10.0.292, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\foreign dlls\Examine.dll</HintPath>
+    </Reference>
+    <Reference Include="Lucene.Net, Version=2.9.2.2, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\foreign dlls\Lucene.Net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Web" />
@@ -58,12 +65,23 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
+    <Reference Include="UmbracoExamine, Version=0.10.0.292, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\foreign dlls\UmbracoExamine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RazorCore\BaseContext.cs" />
-    <Compile Include="RazorDynamicNode\DynamicBase.cs" />
-    <Compile Include="RazorDynamicNode\DynamicMediaList.cs" />
+    <Compile Include="RazorDynamicNode\DynamicBackingItem.cs" />
+    <Compile Include="RazorDynamicNode\DynamicBackingItemType.cs" />
+    <Compile Include="RazorDynamicNode\DynamicMedia.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RazorDynamicNode\DynamicMediaList.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="RazorDynamicNode\DynamicNodeList.cs" />
+    <Compile Include="RazorDynamicNode\ExamineBackedMedia.cs" />
+    <Compile Include="RazorDynamicNode\PropertyResult.cs" />
     <Compile Include="RazorDynamicNode\RazorLibraryCore.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeWalker.cs" />
     <Compile Include="RazorDynamicNode\DynamicNull.cs" />
@@ -77,7 +95,6 @@
     <Compile Include="RazorDynamicNode\DynamicDictionary.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeListOrdering.cs" />
     <Compile Include="RazorDynamicNode\DynamicQueryableBinders.cs" />
-    <Compile Include="RazorDynamicNode\DynamicMedia.cs" />
     <Compile Include="RazorDynamicNode\DynamicNode.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeContext.cs" />
     <Compile Include="RazorCore\ICultureDictionary.cs" />

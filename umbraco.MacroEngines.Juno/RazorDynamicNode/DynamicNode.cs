@@ -14,12 +14,13 @@ using umbraco.DataLayer;
 using umbraco.cms.businesslogic;
 using System.Xml;
 using System.Xml.Linq;
+using umbraco.cms.businesslogic.media;
 
 
 
 namespace umbraco.MacroEngines
 {
-    public class DynamicNode : DynamicBase
+    public class DynamicNode : DynamicObject
     {
         #region consts
         // these are private readonlys as const can't be Guids
@@ -28,10 +29,11 @@ namespace umbraco.MacroEngines
         private readonly Guid DATATYPE_UCOMPONENTS_MNTP_GUID = new Guid("c2d6894b-e788-4425-bcf2-308568e3d38b");
         #endregion
 
-        internal DynamicNodeList ownerList;
+        internal readonly DynamicBackingItem n;
 
-        internal readonly INode n;
-        public DynamicNode(INode n)
+        public DynamicNodeList ownerList;
+
+        public DynamicNode(DynamicBackingItem n)
         {
             if (n != null)
                 this.n = n;
@@ -40,22 +42,22 @@ namespace umbraco.MacroEngines
         }
         public DynamicNode(int NodeId)
         {
-            this.n = new NodeFactory.Node(NodeId);
+            this.n = new DynamicBackingItem(NodeId);
         }
         public DynamicNode(string NodeId)
         {
-            int iNodeId = 0;
-            if (int.TryParse(NodeId, out iNodeId))
+            int DynamicBackingItemId = 0;
+            if (int.TryParse(NodeId, out DynamicBackingItemId))
             {
-                this.n = new NodeFactory.Node(iNodeId);
+                this.n = new DynamicBackingItem(DynamicBackingItemId);
             }
         }
         public DynamicNode(object NodeId)
         {
-            int iNodeId = 0;
-            if (int.TryParse(string.Format("{0}", NodeId), out iNodeId))
+            int DynamicBackingItemId = 0;
+            if (int.TryParse(string.Format("{0}", NodeId), out DynamicBackingItemId))
             {
-                this.n = new NodeFactory.Node(iNodeId);
+                this.n = new DynamicBackingItem(DynamicBackingItemId);
             }
         }
         public DynamicNode()
@@ -124,11 +126,11 @@ namespace umbraco.MacroEngines
         {
             get
             {
-                List<INode> children = n.ChildrenAsList;
+                List<DynamicBackingItem> children = n.ChildrenAsList;
                 //testing
                 if (children.Count == 0 && n.Id == 0)
                 {
-                    return new DynamicNodeList(new List<INode> { this.n });
+                    return new DynamicNodeList(new List<DynamicBackingItem> { this.n });
                 }
                 return new DynamicNodeList(n.ChildrenAsList);
             }
@@ -309,22 +311,22 @@ namespace umbraco.MacroEngines
             }
             if (result != null)
             {
-                if (result is IEnumerable<INode>)
+                if (result is IEnumerable<DynamicBackingItem>)
                 {
-                    result = new DynamicNodeList((IEnumerable<INode>)result);
+                    result = new DynamicNodeList((IEnumerable<DynamicBackingItem>)result);
                 }
                 if (result is IEnumerable<DynamicNode>)
                 {
                     result = new DynamicNodeList((IEnumerable<DynamicNode>)result);
                 }
-                if (result is INode)
+                if (result is DynamicBackingItem)
                 {
-                    result = new DynamicNode((INode)result);
+                    result = new DynamicNode((DynamicBackingItem)result);
                 }
             }
             return result;
         }
-        private List<string> GetAncestorOrSelfNodeTypeAlias(INode node)
+        private List<string> GetAncestorOrSelfNodeTypeAlias(DynamicBackingItem node)
         {
             List<string> list = new List<string>();
             if (node != null)
@@ -542,7 +544,7 @@ namespace umbraco.MacroEngines
             return true;
         }
 
-        public DynamicMedia Media(string propertyAlias)
+        public DynamicNode Media(string propertyAlias)
         {
             if (n != null)
             {
@@ -552,7 +554,7 @@ namespace umbraco.MacroEngines
                     int mediaNodeId;
                     if (int.TryParse(prop.Value, out mediaNodeId))
                     {
-                        return new DynamicMedia(mediaNodeId);
+                        return MediaById(mediaNodeId);
                     }
                 }
                 return null;
@@ -750,10 +752,10 @@ namespace umbraco.MacroEngines
         {
             return Descendants(n => true);
         }
-        public DynamicNodeList Descendants(Func<INode, bool> func)
+        public DynamicNodeList Descendants(Func<DynamicBackingItem, bool> func)
         {
-            var flattenedNodes = this.n.ChildrenAsList.Map(func, (INode n) => { return n.ChildrenAsList; });
-            return new DynamicNodeList(flattenedNodes.ToList().ConvertAll(iNode => new DynamicNode(iNode)));
+            var flattenedNodes = this.n.ChildrenAsList.Map(func, (DynamicBackingItem n) => { return n.ChildrenAsList; });
+            return new DynamicNodeList(flattenedNodes.ToList().ConvertAll(DynamicBackingItem => new DynamicNode(DynamicBackingItem)));
         }
         public DynamicNodeList DescendantsOrSelf(int level)
         {
@@ -767,19 +769,19 @@ namespace umbraco.MacroEngines
         {
             return DescendantsOrSelf(p => true);
         }
-        public DynamicNodeList DescendantsOrSelf(Func<INode, bool> func)
+        public DynamicNodeList DescendantsOrSelf(Func<DynamicBackingItem, bool> func)
         {
             if (this.n != null)
             {
-                var thisNode = new List<INode>();
+                var thisNode = new List<DynamicBackingItem>();
                 if (func(this.n))
                 {
                     thisNode.Add(this.n);
                 }
-                var flattenedNodes = this.n.ChildrenAsList.Map(func, (INode n) => { return n.ChildrenAsList; });
-                return new DynamicNodeList(thisNode.Concat(flattenedNodes).ToList().ConvertAll(iNode => new DynamicNode(iNode)));
+                var flattenedNodes = this.n.ChildrenAsList.Map(func, (DynamicBackingItem n) => { return n.ChildrenAsList; });
+                return new DynamicNodeList(thisNode.Concat(flattenedNodes).ToList().ConvertAll(DynamicBackingItem => new DynamicNode(DynamicBackingItem)));
             }
-            return new DynamicNodeList(new List<INode>());
+            return new DynamicNodeList(new List<DynamicBackingItem>());
         }
         public DynamicNodeList Ancestors(int level)
         {
@@ -843,6 +845,7 @@ namespace umbraco.MacroEngines
                 return null;
             }
         }
+
         public DynamicNode NodeById(int Id)
         {
             return new DynamicNode(Id);
@@ -873,39 +876,45 @@ namespace umbraco.MacroEngines
         {
             return NodeById(Ids.ToList());
         }
-        public DynamicMedia MediaById(int Id)
+        public DynamicNode MediaById(int Id)
         {
-            return new DynamicMedia(Id);
+            return new DynamicNode(new DynamicBackingItem(new Media(Id)));
         }
-        public DynamicMedia MediaById(string Id)
+        public DynamicNode MediaById(string Id)
         {
-            return new DynamicMedia(Id);
+            int mediaId = 0;
+            if (int.TryParse(Id, out mediaId))
+            {
+                return MediaById(mediaId);
+            }
+            return null;
         }
-        public DynamicMedia MediaById(object Id)
+        public DynamicNode MediaById(object Id)
         {
-            return new DynamicMedia(Id);
+            int mediaId = 0;
+            if (int.TryParse(string.Format("{0}", Id), out mediaId))
+            {
+                return MediaById(mediaId);
+            }
+            return null;
         }
-        public DynamicMediaList MediaById(List<object> Ids)
+        public DynamicNodeList MediaById(List<object> Ids)
         {
-            List<DynamicMedia> nodes = new List<DynamicMedia>();
+            List<DynamicNode> nodes = new List<DynamicNode>();
             foreach (object eachId in Ids)
-                nodes.Add(new DynamicMedia(eachId));
-            return new DynamicMediaList(nodes);
+                nodes.Add(MediaById(eachId));
+            return new DynamicNodeList(nodes);
         }
-        public DynamicMediaList MediaById(List<int> Ids)
+        public DynamicNodeList MediaById(List<int> Ids)
         {
-            List<DynamicMedia> nodes = new List<DynamicMedia>();
+            List<DynamicNode> nodes = new List<DynamicNode>();
             foreach (int eachId in Ids)
-                nodes.Add(new DynamicMedia(eachId));
-            return new DynamicMediaList(nodes);
+                nodes.Add(MediaById(eachId));
+            return new DynamicNodeList(nodes);
         }
-        public DynamicMediaList MediaById(params object[] Ids)
+        public DynamicNodeList MediaById(params object[] Ids)
         {
             return MediaById(Ids.ToList());
-        }
-        public int Id
-        {
-            get { if (n == null) return 0; return n.Id; }
         }
 
         public int template
@@ -979,6 +988,10 @@ namespace umbraco.MacroEngines
         {
             get { if (n == null) return DateTime.MinValue; return n.CreateDate; }
         }
+        public int Id
+        {
+            get { if (n == null) return 0; return n.Id; }
+        }
 
         public DateTime UpdateDate
         {
@@ -1005,7 +1018,7 @@ namespace umbraco.MacroEngines
             get { if (n == null) return null; return n.PropertiesAsList; }
         }
 
-        public List<INode> ChildrenAsList
+        public List<DynamicBackingItem> ChildrenAsList
         {
             get { if (n == null) return null; return n.ChildrenAsList; }
         }
@@ -1019,7 +1032,7 @@ namespace umbraco.MacroEngines
         {
             if (!recursive) return GetProperty(alias);
             if (n == null) return null;
-            INode context = this.n;
+            DynamicBackingItem context = this.n;
             IProperty prop = n.GetProperty(alias);
             while (prop == null)
             {
@@ -1058,189 +1071,7 @@ namespace umbraco.MacroEngines
             return n.ChildrenAsTable(nodeTypeAliasFilter);
         }
 
-        public bool IsNull()
-        {
-            return false;
-        }
-        public bool HasValue()
-        {
-            return true;
-        }
-        public int Position()
-        {
-            return this.Index();
-        }
-        public int Index()
-        {
-            if (this.ownerList == null && this.Parent != null)
-            {
-                var list = this.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
-                this.ownerList = new DynamicNodeList(list);
-            }
-            if (this.ownerList != null)
-            {
-                List<DynamicNode> container = this.ownerList.Items.ToList();
-                int currentIndex = container.FindIndex(n => n.Id == this.Id);
-                if (currentIndex != -1)
-                {
-                    return currentIndex;
-                }
-                else
-                {
-                    throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicNodeList but could not retrieve the index for it's position in the list", this.Id));
-                }
-            }
-            else
-            {
-                throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicNodeList", this.Id));
-            }
-        }
-        public bool IsFirst()
-        {
-            return IsHelper(n => n.Index() == 0);
-        }
-        public string IsFirst(string valueIfTrue)
-        {
-            return IsHelper(n => n.Index() == 0, valueIfTrue);
-        }
-        public string IsFirst(string valueIfTrue, string valueIfFalse)
-        {
-            return IsHelper(n => n.Index() == 0, valueIfTrue, valueIfFalse);
-        }
-        public bool IsLast()
-        {
-            if (this.ownerList == null)
-            {
-                return false;
-            }
-            int count = this.ownerList.Items.Count;
-            return IsHelper(n => n.Index() == count - 1);
-        }
-        public string IsLast(string valueIfTrue)
-        {
-            if (this.ownerList == null)
-            {
-                return string.Empty;
-            }
-            int count = this.ownerList.Items.Count;
-            return IsHelper(n => n.Index() == count - 1, valueIfTrue);
-        }
-        public string IsLast(string valueIfTrue, string valueIfFalse)
-        {
-            if (this.ownerList == null)
-            {
-                return valueIfFalse;
-            }
-            int count = this.ownerList.Items.Count;
-            return IsHelper(n => n.Index() == count - 1, valueIfTrue, valueIfFalse);
-        }
-        public bool IsEven()
-        {
-            return IsHelper(n => n.Index() % 2 == 0);
-        }
-        public string IsEven(string valueIfTrue)
-        {
-            return IsHelper(n => n.Index() % 2 == 0, valueIfTrue);
-        }
-        public string IsEven(string valueIfTrue, string valueIfFalse)
-        {
-            return IsHelper(n => n.Index() % 2 == 0, valueIfTrue, valueIfFalse);
-        }
-        public bool IsOdd()
-        {
-            return IsHelper(n => n.Index() % 2 == 1);
-        }
-        public string IsOdd(string valueIfTrue)
-        {
-            return IsHelper(n => n.Index() % 2 == 1, valueIfTrue);
-        }
-        public string IsOdd(string valueIfTrue, string valueIfFalse)
-        {
-            return IsHelper(n => n.Index() % 2 == 1, valueIfTrue, valueIfFalse);
-        }
-        public bool IsEqual(DynamicNode other)
-        {
-            return IsHelper(n => n.Id == other.Id);
-        }
-        public string IsEqual(DynamicNode other, string valueIfTrue)
-        {
-            return IsHelper(n => n.Id == other.Id, valueIfTrue);
-        }
-        public string IsEqual(DynamicNode other, string valueIfTrue, string valueIfFalse)
-        {
-            return IsHelper(n => n.Id == other.Id, valueIfTrue, valueIfFalse);
-        }
-        public bool IsDescendant(DynamicNode other)
-        {
-            var ancestors = this.Ancestors();
-            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null);
-        }
-        public string IsDescendant(DynamicNode other, string valueIfTrue)
-        {
-            var ancestors = this.Ancestors();
-            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue);
-        }
-        public string IsDescendant(DynamicNode other, string valueIfTrue, string valueIfFalse)
-        {
-            var ancestors = this.Ancestors();
-            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue, valueIfFalse);
-        }
-        public bool IsDescendantOrSelf(DynamicNode other)
-        {
-            var ancestors = this.AncestorsOrSelf();
-            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null);
-        }
-        public string IsDescendantOrSelf(DynamicNode other, string valueIfTrue)
-        {
-            var ancestors = this.AncestorsOrSelf();
-            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue);
-        }
-        public string IsDescendantOrSelf(DynamicNode other, string valueIfTrue, string valueIfFalse)
-        {
-            var ancestors = this.AncestorsOrSelf();
-            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue, valueIfFalse);
-        }
-        public bool IsAncestor(DynamicNode other)
-        {
-            var descendants = this.Descendants();
-            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null);
-        }
-        public string IsAncestor(DynamicNode other, string valueIfTrue)
-        {
-            var descendants = this.Descendants();
-            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue);
-        }
-        public string IsAncestor(DynamicNode other, string valueIfTrue, string valueIfFalse)
-        {
-            var descendants = this.Descendants();
-            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
-        }
-        public bool IsAncestorOrSelf(DynamicNode other)
-        {
-            var descendants = this.DescendantsOrSelf();
-            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null);
-        }
-        public string IsAncestorOrSelf(DynamicNode other, string valueIfTrue)
-        {
-            var descendants = this.DescendantsOrSelf();
-            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue);
-        }
-        public string IsAncestorOrSelf(DynamicNode other, string valueIfTrue, string valueIfFalse)
-        {
-            var descendants = this.DescendantsOrSelf();
-            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
-        }
-        public bool IsHelper(Func<DynamicNode, bool> test)
-        {
-            return test(this);
-        }
-        public string IsHelper(Func<DynamicNode, bool> test, string valueIfTrue)
-        {
-            return IsHelper(test, valueIfTrue, string.Empty);
-        }
-        public string IsHelper(Func<DynamicNode, bool> test, string valueIfTrue, string valueIfFalse)
-        {
-            return test(this) ? valueIfTrue : valueIfFalse;
-        }
+
+
     }
 }

@@ -5,8 +5,9 @@ using System.Text;
 
 namespace umbraco.MacroEngines
 {
-    //for backwards compatibility only
-    public class DynamicMediaList : DynamicNodeList
+    public enum DynamicBackingItemType
     {
+        Content,
+        Media
     }
 }
