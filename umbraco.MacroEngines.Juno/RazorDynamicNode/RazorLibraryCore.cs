@@ -117,5 +117,38 @@ namespace umbraco.MacroEngines.Library
             }
             return string.Empty;
         }
+
+        public string Concatenate(params object[] args)
+        {
+            StringBuilder result = new StringBuilder();
+            foreach (var arg in args)
+            {
+                if (arg != null && arg.GetType() != typeof(DynamicNull))
+                {
+                    var sArg = string.Format("{0}", arg);
+                    if (!string.IsNullOrWhiteSpace(sArg))
+                    {
+                        result.Append(sArg);
+                    }
+                }
+            }
+            return result.ToString();
+        }
+        public string Join(string seperator, params object[] args)
+        {
+            List<string> results = new List<string>();
+            foreach (var arg in args)
+            {
+                if (arg != null && arg.GetType() != typeof(DynamicNull))
+                {
+                    var sArg = string.Format("{0}", arg);
+                    if (!string.IsNullOrWhiteSpace(sArg))
+                    {
+                        results.Add(sArg);
+                    }
+                }
+            }
+            return string.Join(seperator, results);
+        }
     }
 }
