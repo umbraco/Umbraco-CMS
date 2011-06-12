@@ -15,6 +15,7 @@ using umbraco.cms.businesslogic;
 using System.Xml;
 using System.Xml.Linq;
 using umbraco.cms.businesslogic.media;
+using umbraco.MacroEngines.Library;
 
 
 
@@ -856,75 +857,69 @@ namespace umbraco.MacroEngines
             }
         }
 
+        private Lazy<RazorLibraryCore> razorLibrary = new Lazy<RazorLibraryCore>(() =>
+        {
+            return new RazorLibraryCore(null);
+        });
+        [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
         public DynamicNode NodeById(int Id)
         {
-            return new DynamicNode(Id);
+            return razorLibrary.Value.NodeById(Id);
         }
+        [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
         public DynamicNode NodeById(string Id)
         {
-            return new DynamicNode(Id);
+            return razorLibrary.Value.NodeById(Id);
         }
+        [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
         public DynamicNode NodeById(object Id)
         {
-            return new DynamicNode(Id);
+            return razorLibrary.Value.NodeById(Id);
         }
+        [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
         public DynamicNodeList NodeById(List<object> Ids)
         {
-            List<DynamicNode> nodes = new List<DynamicNode>();
-            foreach (object eachId in Ids)
-                nodes.Add(new DynamicNode(eachId));
-            return new DynamicNodeList(nodes);
+            return razorLibrary.Value.NodeById(Ids);
         }
+        [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
         public DynamicNodeList NodeById(List<int> Ids)
         {
-            List<DynamicNode> nodes = new List<DynamicNode>();
-            foreach (int eachId in Ids)
-                nodes.Add(new DynamicNode(eachId));
-            return new DynamicNodeList(nodes);
+            return razorLibrary.Value.NodeById(Ids);
         }
+        [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
         public DynamicNodeList NodeById(params object[] Ids)
         {
-            return NodeById(Ids.ToList());
+            return razorLibrary.Value.NodeById(Ids);
         }
+        [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNode MediaById(int Id)
         {
-            return new DynamicNode(new DynamicBackingItem(ExamineBackedMedia.GetUmbracoMedia(Id)));
+            return razorLibrary.Value.MediaById(Id);
         }
+        [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNode MediaById(string Id)
         {
-            int mediaId = 0;
-            if (int.TryParse(Id, out mediaId))
-            {
-                return MediaById(mediaId);
-            }
-            return null;
+            return razorLibrary.Value.MediaById(Id);
         }
+        [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNode MediaById(object Id)
         {
-            int mediaId = 0;
-            if (int.TryParse(string.Format("{0}", Id), out mediaId))
-            {
-                return MediaById(mediaId);
-            }
-            return null;
+            return razorLibrary.Value.MediaById(Id);
         }
+        [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNodeList MediaById(List<object> Ids)
         {
-            List<DynamicNode> nodes = new List<DynamicNode>();
-            foreach (object eachId in Ids)
-                nodes.Add(MediaById(eachId));
-            return new DynamicNodeList(nodes);
+            return razorLibrary.Value.MediaById(Ids);
         }
+        [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNodeList MediaById(List<int> Ids)
         {
-            List<DynamicNode> nodes = new List<DynamicNode>();
-            foreach (int eachId in Ids)
-                nodes.Add(MediaById(eachId));
-            return new DynamicNodeList(nodes);
+            return razorLibrary.Value.MediaById(Ids);
         }
+        [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNodeList MediaById(params object[] Ids)
         {
-            return MediaById(Ids.ToList());
+            return razorLibrary.Value.MediaById(Ids);
         }
 
         public int template
@@ -1081,7 +1076,326 @@ namespace umbraco.MacroEngines
             return n.ChildrenAsTable(nodeTypeAliasFilter);
         }
 
+        public bool IsNull()
+        {
+            return false;
+        }
+        public bool HasValue()
+        {
+            return true;
+        }
+        public int Position()
+        {
+            return this.Index();
+        }
+        public int Index()
+        {
+            if (this.ownerList == null && this.Parent != null)
+            {
+                var list = this.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
+                this.ownerList = new DynamicNodeList(list);
+            }
+            if (this.ownerList != null)
+            {
+                List<DynamicNode> container = this.ownerList.Items.ToList();
+                int currentIndex = container.FindIndex(n => n.Id == this.Id);
+                if (currentIndex != -1)
+                {
+                    return currentIndex;
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicNodeList but could not retrieve the index for it's position in the list", this.Id));
+                }
+            }
+            else
+            {
+                throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicNodeList", this.Id));
+            }
+        }
+        public bool IsFirst()
+        {
+            return IsHelper(n => n.Index() == 0);
+        }
+        public string IsFirst(string valueIfTrue)
+        {
+            return IsHelper(n => n.Index() == 0, valueIfTrue);
+        }
+        public string IsFirst(string valueIfTrue, string valueIfFalse)
+        {
+            return IsHelper(n => n.Index() == 0, valueIfTrue, valueIfFalse);
+        }
+        public bool IsNotFirst()
+        {
+            return !IsHelper(n => n.Index() == 0);
+        }
+        public string IsNotFirst(string valueIfTrue)
+        {
+            return IsHelper(n => n.Index() != 0, valueIfTrue);
+        }
+        public string IsNotFirst(string valueIfTrue, string valueIfFalse)
+        {
+            return IsHelper(n => n.Index() != 0, valueIfTrue, valueIfFalse);
+        }
+        public bool IsPosition(int index)
+        {
+            if (this.ownerList == null)
+            {
+                return false;
+            }
+            return IsHelper(n => n.Index() == index);
+        }
+        public string IsPosition(int index, string valueIfTrue)
+        {
+            if (this.ownerList == null)
+            {
+                return string.Empty;
+            }
+            return IsHelper(n => n.Index() == index, valueIfTrue);
+        }
+        public string IsPosition(int index, string valueIfTrue, string valueIfFalse)
+        {
+            if (this.ownerList == null)
+            {
+                return valueIfFalse;
+            }
+            return IsHelper(n => n.Index() == index, valueIfTrue, valueIfFalse);
+        }
+        public bool IsModZero(int modulus)
+        {
+            if (this.ownerList == null)
+            {
+                return false;
+            }
+            return IsHelper(n => n.Index() % modulus == 0);
+        }
+        public string IsModZero(int modulus, string valueIfTrue)
+        {
+            if (this.ownerList == null)
+            {
+                return string.Empty;
+            }
+            return IsHelper(n => n.Index() % modulus == 0, valueIfTrue);
+        }
+        public string IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
+        {
+            if (this.ownerList == null)
+            {
+                return valueIfFalse;
+            }
+            return IsHelper(n => n.Index() % modulus == 0, valueIfTrue, valueIfFalse);
+        }
 
+        public bool IsNotModZero(int modulus)
+        {
+            if (this.ownerList == null)
+            {
+                return false;
+            }
+            return IsHelper(n => n.Index() % modulus != 0);
+        }
+        public string IsNotModZero(int modulus, string valueIfTrue)
+        {
+            if (this.ownerList == null)
+            {
+                return string.Empty;
+            }
+            return IsHelper(n => n.Index() % modulus != 0, valueIfTrue);
+        }
+        public string IsNotModZero(int modulus, string valueIfTrue, string valueIfFalse)
+        {
+            if (this.ownerList == null)
+            {
+                return valueIfFalse;
+            }
+            return IsHelper(n => n.Index() % modulus != 0, valueIfTrue, valueIfFalse);
+        }
+        public bool IsNotPosition(int index)
+        {
+            if (this.ownerList == null)
+            {
+                return false;
+            }
+            return !IsHelper(n => n.Index() == index);
+        }
+        public string IsNotPosition(int index, string valueIfTrue)
+        {
+            if (this.ownerList == null)
+            {
+                return string.Empty;
+            }
+            return IsHelper(n => n.Index() != index, valueIfTrue);
+        }
+        public string IsNotPosition(int index, string valueIfTrue, string valueIfFalse)
+        {
+            if (this.ownerList == null)
+            {
+                return valueIfFalse;
+            }
+            return IsHelper(n => n.Index() != index, valueIfTrue, valueIfFalse);
+        }
+        public bool IsLast()
+        {
+            if (this.ownerList == null)
+            {
+                return false;
+            }
+            int count = this.ownerList.Items.Count;
+            return IsHelper(n => n.Index() == count - 1);
+        }
+        public string IsLast(string valueIfTrue)
+        {
+            if (this.ownerList == null)
+            {
+                return string.Empty;
+            }
+            int count = this.ownerList.Items.Count;
+            return IsHelper(n => n.Index() == count - 1, valueIfTrue);
+        }
+        public string IsLast(string valueIfTrue, string valueIfFalse)
+        {
+            if (this.ownerList == null)
+            {
+                return valueIfFalse;
+            }
+            int count = this.ownerList.Items.Count;
+            return IsHelper(n => n.Index() == count - 1, valueIfTrue, valueIfFalse);
+        }
+        public bool IsNotLast()
+        {
+            if (this.ownerList == null)
+            {
+                return false;
+            }
+            int count = this.ownerList.Items.Count;
+            return !IsHelper(n => n.Index() == count - 1);
+        }
+        public string IsNotLast(string valueIfTrue)
+        {
+            if (this.ownerList == null)
+            {
+                return string.Empty;
+            }
+            int count = this.ownerList.Items.Count;
+            return IsHelper(n => n.Index() != count - 1, valueIfTrue);
+        }
+        public string IsNotLast(string valueIfTrue, string valueIfFalse)
+        {
+            if (this.ownerList == null)
+            {
+                return valueIfFalse;
+            }
+            int count = this.ownerList.Items.Count;
+            return IsHelper(n => n.Index() != count - 1, valueIfTrue, valueIfFalse);
+        }
+        public bool IsEven()
+        {
+            return IsHelper(n => n.Index() % 2 == 0);
+        }
+        public string IsEven(string valueIfTrue)
+        {
+            return IsHelper(n => n.Index() % 2 == 0, valueIfTrue);
+        }
+        public string IsEven(string valueIfTrue, string valueIfFalse)
+        {
+            return IsHelper(n => n.Index() % 2 == 0, valueIfTrue, valueIfFalse);
+        }
+        public bool IsOdd()
+        {
+            return IsHelper(n => n.Index() % 2 == 1);
+        }
+        public string IsOdd(string valueIfTrue)
+        {
+            return IsHelper(n => n.Index() % 2 == 1, valueIfTrue);
+        }
+        public string IsOdd(string valueIfTrue, string valueIfFalse)
+        {
+            return IsHelper(n => n.Index() % 2 == 1, valueIfTrue, valueIfFalse);
+        }
+        public bool IsEqual(DynamicNode other)
+        {
+            return IsHelper(n => n.Id == other.Id);
+        }
+        public string IsEqual(DynamicNode other, string valueIfTrue)
+        {
+            return IsHelper(n => n.Id == other.Id, valueIfTrue);
+        }
+        public string IsEqual(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        {
+            return IsHelper(n => n.Id == other.Id, valueIfTrue, valueIfFalse);
+        }
+        public bool IsDescendant(DynamicNode other)
+        {
+            var ancestors = this.Ancestors();
+            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null);
+        }
+        public string IsDescendant(DynamicNode other, string valueIfTrue)
+        {
+            var ancestors = this.Ancestors();
+            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue);
+        }
+        public string IsDescendant(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        {
+            var ancestors = this.Ancestors();
+            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue, valueIfFalse);
+        }
+        public bool IsDescendantOrSelf(DynamicNode other)
+        {
+            var ancestors = this.AncestorsOrSelf();
+            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null);
+        }
+        public string IsDescendantOrSelf(DynamicNode other, string valueIfTrue)
+        {
+            var ancestors = this.AncestorsOrSelf();
+            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue);
+        }
+        public string IsDescendantOrSelf(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        {
+            var ancestors = this.AncestorsOrSelf();
+            return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue, valueIfFalse);
+        }
+        public bool IsAncestor(DynamicNode other)
+        {
+            var descendants = this.Descendants();
+            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null);
+        }
+        public string IsAncestor(DynamicNode other, string valueIfTrue)
+        {
+            var descendants = this.Descendants();
+            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue);
+        }
+        public string IsAncestor(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        {
+            var descendants = this.Descendants();
+            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
+        }
+        public bool IsAncestorOrSelf(DynamicNode other)
+        {
+            var descendants = this.DescendantsOrSelf();
+            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null);
+        }
+        public string IsAncestorOrSelf(DynamicNode other, string valueIfTrue)
+        {
+            var descendants = this.DescendantsOrSelf();
+            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue);
+        }
+        public string IsAncestorOrSelf(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        {
+            var descendants = this.DescendantsOrSelf();
+            return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
+        }
+        public bool IsHelper(Func<DynamicNode, bool> test)
+        {
+            return test(this);
+        }
+        public string IsHelper(Func<DynamicNode, bool> test, string valueIfTrue)
+        {
+            return IsHelper(test, valueIfTrue, string.Empty);
+        }
+        public string IsHelper(Func<DynamicNode, bool> test, string valueIfTrue, string valueIfFalse)
+        {
+            return test(this) ? valueIfTrue : valueIfFalse;
+        }
 
     }
 }

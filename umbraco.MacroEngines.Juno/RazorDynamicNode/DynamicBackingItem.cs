@@ -240,12 +240,12 @@ namespace umbraco.MacroEngines
 
         public string Url
         {
-            get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? content.Url : null; }
+            get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? content.Url : media.Url; }
         }
 
         public string NiceUrl
         {
-            get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? content.NiceUrl : null; }
+            get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? content.NiceUrl : media.NiceUrl; }
         }
 
         public string UrlName

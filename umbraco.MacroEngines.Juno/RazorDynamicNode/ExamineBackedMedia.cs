@@ -314,7 +314,7 @@ namespace umbraco.MacroEngines
                 {
                     if (children.MoveNext())
                     {
-                        if (children.Current.Name != "current")
+                        if (children.Current.Name != "contents")
                         {
                             mediaList.Add(new ExamineBackedMedia(children.Current));
                         }
