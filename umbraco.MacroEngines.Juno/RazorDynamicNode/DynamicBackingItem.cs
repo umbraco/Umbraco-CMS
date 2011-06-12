@@ -68,7 +68,7 @@ namespace umbraco.MacroEngines
                 }
                 else
                 {
-                    var children = media.ChildrenAsList;
+                    var children = media.ChildrenAsList.Value;
                     if (children != null)
                     {
                         return children.ToList().ConvertAll(m => new DynamicBackingItem(m));
@@ -194,9 +194,25 @@ namespace umbraco.MacroEngines
             get
             {
                 if (IsNull()) return null;
-                return Type == DynamicBackingItemType.Content ?
-                    new DynamicBackingItem(content.Parent) :
-                    new DynamicBackingItem(media.Parent);
+                if (Type == DynamicBackingItemType.Content)
+                {
+                    var parent = content.Parent;
+                    if (parent != null)
+                    {
+
+                        return new DynamicBackingItem(parent);
+                    }
+
+                }
+                else
+                {
+                    var parent = media.Parent;
+                    if (parent != null && parent.Value != null)
+                    {
+                        return new DynamicBackingItem(parent.Value);
+                    }
+                }
+                return null;
             }
         }
         public DateTime CreateDate
@@ -284,7 +300,7 @@ namespace umbraco.MacroEngines
                 }
                 else
                 {
-                    List<INode> children = media.ChildrenAsList;
+                    List<ExamineBackedMedia> children = media.ChildrenAsList.Value;
                     //testing
                     if (children.Count == 0 && content.Id == 0)
                     {

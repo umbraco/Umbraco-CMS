@@ -12,7 +12,7 @@ using umbraco.interfaces;
 namespace umbraco.MacroEngines
 {
 
-    public class ExamineBackedMedia : INode
+    public class ExamineBackedMedia
     {
         public static ExamineBackedMedia GetUmbracoMedia(int id)
         {
@@ -27,10 +27,10 @@ namespace umbraco.MacroEngines
                 .Search(filter.Compile());
             if (results.Any())
             {
-                return new ExamineBackedMedia(results.First());
+              return new ExamineBackedMedia(results.First());
             }
 
-            var media = umbraco.library.GetMedia(id, false);
+            var media = umbraco.library.GetMedia(id, true);
             if (media != null && media.Current != null)
             {
                 media.MoveNext();
@@ -39,18 +39,33 @@ namespace umbraco.MacroEngines
 
             return null;
         }
+
         public ExamineBackedMedia(XPathNavigator xpath)
         {
             if (xpath == null) throw new ArgumentNullException("xpath");
             Name = xpath.GetAttribute("nodeName", "");
             Values = new Dictionary<string, string>();
             var result = xpath.SelectChildren(XPathNodeType.Element);
+            //add the attributes e.g. id, parentId etc
+            if (result.Current.HasAttributes)
+            {
+                if (result.Current.MoveToFirstAttribute())
+                {
+                    Values.Add(result.Current.Name, result.Current.Value);
+                    while (result.Current.MoveToNextAttribute())
+                    {
+                        Values.Add(result.Current.Name, result.Current.Value);
+                    }
+                    result.Current.MoveToParent();
+                }
+            }
             while (result.MoveNext())
             {
                 if (result.Current != null && !result.Current.HasAttributes)
                 {
                     Values.Add(result.Current.Name, result.Current.Value);
                 }
+
             }
         }
 
@@ -65,30 +80,70 @@ namespace umbraco.MacroEngines
         public string Name { get; private set; }
         private IDictionary<string, string> Values { get; set; }
 
-        //make this one lazy
-        public INode Parent
+        public Lazy<ExamineBackedMedia> Parent
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                int parentId = 0;
+                string value = null;
+                if (Values.TryGetValue("parentID", out value))
+                {
+                    if (int.TryParse(value, out parentId))
+                    {
+                        return new Lazy<ExamineBackedMedia>(() => { return ExamineBackedMedia.GetUmbracoMedia(parentId); });
+                    }
+                }
+                return null;
+            }
         }
-
+        public int ParentId
+        {
+            get
+            {
+                int parentId = 0;
+                if (int.TryParse(Values["parentID"], out parentId))
+                {
+                    return parentId;
+                }
+                return 0;
+            }
+        }
         public int Id
         {
-            get { throw new NotImplementedException(); }
-        }
-
-        public int template
-        {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                int id = 0;
+                string value = null;
+                if (Values.TryGetValue("id", out value))
+                {
+                    if (int.TryParse(value, out id))
+                    {
+                        return id;
+                    }
+                }
+                return 0;
+            }
         }
 
         public int SortOrder
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public string Url
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                string value = null;
+                if (Values.TryGetValue("umbracoFile", out value))
+                {
+                    return value;
+                }
+                return null;
+            }
         }
 
         public string UrlName
@@ -98,12 +153,28 @@ namespace umbraco.MacroEngines
 
         public string NodeTypeAlias
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                string value = null;
+                if (Values.TryGetValue("__NodeTypeAlias", out value))
+                {
+                    return value;
+                }
+                return null;
+            }
         }
 
         public string WriterName
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                string value = null;
+                if (Values.TryGetValue("writerName", out value))
+                {
+                    return value;
+                }
+                return null;
+            }
         }
 
         public string CreatorName
@@ -123,7 +194,15 @@ namespace umbraco.MacroEngines
 
         public string Path
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                string value = null;
+                if (Values.TryGetValue("__Path", out value))
+                {
+                    return value;
+                }
+                return null;
+            }
         }
 
         public DateTime CreateDate
@@ -133,44 +212,122 @@ namespace umbraco.MacroEngines
 
         public DateTime UpdateDate
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                DateTime dt = DateTime.MinValue;
+                string value = null;
+                if (Values.TryGetValue("UpdateDate", out value))
+                {
+                    if (DateTime.TryParse(value, out dt))
+                    {
+                        return dt;
+                    }
+                }
+                return DateTime.Now;
+            }
         }
 
         public Guid Version
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public string NiceUrl
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                string value = null;
+                if (Values.TryGetValue("umbracoFile", out value))
+                {
+                    return value;
+                }
+                return null;
+            }
         }
 
         public int Level
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                string value = null;
+                if (Values.TryGetValue("__Path", out value))
+                {
+                    return value.Split(',').Length;
+                }
+                return 0;
+            }
         }
 
         public List<IProperty> PropertiesAsList
         {
-            get { throw new NotImplementedException(); }
-        }
-        //make this one lazy
-        public List<INode> ChildrenAsList
-        {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                string[] internalProperties = new string[] {
+                    "id", "nodeName", "updateDate", "writerName", "path", "nodeTypeAlias",
+                    "parentID", "__NodeId", "__IndexType", "__Path", "__NodeTypeAlias", 
+                    "__nodeName"
+                };
+                return Values
+                    .Where(kvp => !internalProperties.Contains(kvp.Key))
+                    .ToList()
+                    .ConvertAll(kvp => new PropertyResult(kvp.Key, kvp.Value, Guid.Empty))
+                    .Cast<IProperty>()
+                    .ToList();
+            }
         }
 
-        //make this one lazy
-        public System.Data.DataTable ChildrenAsTable()
+        public Lazy<List<ExamineBackedMedia>> ChildrenAsList
         {
-            throw new NotImplementedException();
+            get
+            {
+                return new Lazy<List<ExamineBackedMedia>>(() =>
+                {
+                    return GetChildrenMedia(this.Id);
+                });
+            }
         }
-
-        //make this one lazy
-        public System.Data.DataTable ChildrenAsTable(string nodeTypeAliasFilter)
+        private static List<ExamineBackedMedia> GetChildrenMedia(int ParentId)
         {
-            throw new NotImplementedException();
+            //first check in Examine as this is WAY faster
+            var criteria = ExamineManager.Instance
+                .SearchProviderCollection["InternalSearcher"]
+                .CreateSearchCriteria("media");
+            var filter = criteria.ParentId(ParentId);
+            var results = ExamineManager
+                .Instance.SearchProviderCollection["InternalSearcher"]
+                .Search(filter.Compile());
+            if (results.Any())
+            {
+                return results.ToList().ConvertAll(result => new ExamineBackedMedia(result));
+            }
+
+            var media = umbraco.library.GetMedia(ParentId, true);
+            if (media != null && media.Current != null)
+            {
+                media.MoveNext();
+                var children = media.Current.SelectChildren(XPathNodeType.Element);
+                List<ExamineBackedMedia> mediaList = new List<ExamineBackedMedia>();
+                while (children != null && children.Current != null)
+                {
+                    if (children.MoveNext())
+                    {
+                        if (children.Current.Name != "current")
+                        {
+                            mediaList.Add(new ExamineBackedMedia(children.Current));
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                return mediaList;
+            }
+
+            return null;
         }
 
         public IProperty GetProperty(string Alias)

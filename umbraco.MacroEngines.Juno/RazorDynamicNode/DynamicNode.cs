@@ -331,16 +331,22 @@ namespace umbraco.MacroEngines
             List<string> list = new List<string>();
             if (node != null)
             {
-
-                //find the doctype node, so we can walk it's parent's tree- not the working.parent content tree
-                CMSNode working = ContentType.GetByAlias(node.NodeTypeAlias);
-                while (working != null)
+                if (node.Type == DynamicBackingItemType.Content)
                 {
-                    if ((working as ContentType) != null)
+                    //find the doctype node, so we can walk it's parent's tree- not the working.parent content tree
+                    CMSNode working = ContentType.GetByAlias(node.NodeTypeAlias);
+                    while (working != null)
                     {
-                        list.Add((working as ContentType).Alias);
+                        if ((working as ContentType) != null)
+                        {
+                            list.Add((working as ContentType).Alias);
+                        }
+                        working = working.Parent;
                     }
-                    working = working.Parent;
+                }
+                else
+                {
+                    return null;
                 }
             }
             return list;
@@ -386,6 +392,10 @@ namespace umbraco.MacroEngines
                     .Where(x =>
                     {
                         List<string> ancestorAliases = GetAncestorOrSelfNodeTypeAlias(x);
+                        if (ancestorAliases == null)
+                        {
+                            return false;
+                        }
                         return ancestorAliases.Any(alias => alias == name || MakePluralName(alias) == name);
                     });
                 if (typeChildren.Any())
@@ -878,7 +888,7 @@ namespace umbraco.MacroEngines
         }
         public DynamicNode MediaById(int Id)
         {
-            return new DynamicNode(new DynamicBackingItem(new Media(Id)));
+            return new DynamicNode(new DynamicBackingItem(ExamineBackedMedia.GetUmbracoMedia(Id)));
         }
         public DynamicNode MediaById(string Id)
         {
