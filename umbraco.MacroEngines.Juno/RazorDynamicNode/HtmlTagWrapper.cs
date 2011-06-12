@@ -13,6 +13,17 @@ namespace umbraco.MacroEngines
         public HtmlTagWrapper Parent;
         public List<HtmlTagWrapperBase> Children;
         public List<KeyValuePair<string, string>> Attributes;
+        public void ReflectAttributesFromAnonymousType(List<KeyValuePair<string, string>> newAttributes)
+        {
+            List<KeyValuePair<string, string>> mergedAttributes =
+             newAttributes
+             .Concat(Attributes)
+             .GroupBy(kvp => kvp.Key, kvp => kvp.Value)
+             .Select(g => new KeyValuePair<string, string>(g.Key, string.Join(" ", g.ToArray())))
+             .ToList();
+
+            Attributes = mergedAttributes;
+        }
         public void ReflectAttributesFromAnonymousType(object anonymousAttributes)
         {
             var newAttributes =
@@ -27,29 +38,9 @@ namespace umbraco.MacroEngines
                             string.Format("{0}", prop.GetValue(anonymousAttributes, null))
                         )
                     );
-            List<KeyValuePair<string, string>> mergedAttributes =
-                newAttributes
-                .Concat(Attributes)
-                .GroupBy(kvp => kvp.Key, kvp => kvp.Value)
-                .Select(g => new KeyValuePair<string, string>(g.Key, string.Join(" ", g.ToArray())))
-                .ToList();
-
-            Attributes = mergedAttributes;
+            ReflectAttributesFromAnonymousType(newAttributes);
 
         }
-
-        //class DistinctKeysComparer : IEqualityComparer<KeyValuePair<string, string>>
-        //{
-        //    public bool Equals(KeyValuePair<string, string> x, KeyValuePair<string, string> y)
-        //    {
-        //        return x.Value == y.Value;
-        //    }
-
-        //    public int GetHashCode(KeyValuePair obj)
-        //    {
-        //        return obj.Value.GetHashCode();
-        //    }
-        //}
 
         public List<string> CssClasses;
         public string Tag;
