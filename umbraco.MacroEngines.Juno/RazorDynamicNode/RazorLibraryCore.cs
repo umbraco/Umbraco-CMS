@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using umbraco.interfaces;
+using System.Xml.Linq;
 
 namespace umbraco.MacroEngines.Library
 {
@@ -89,5 +90,16 @@ namespace umbraco.MacroEngines.Library
             return MediaById(Ids.ToList());
         }
 
+        public T As<T>() where T : class
+        {
+            return (this as T);
+        }
+
+        public DynamicXml ToDynamicXml(string xml)
+        {
+            if (string.IsNullOrWhiteSpace(xml)) return null;
+            var xElement = XElement.Parse(xml);
+            return new umbraco.MacroEngines.DynamicXml(xElement);
+        }
     }
 }
