@@ -8,6 +8,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using System.Xml;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
 using umbraco.presentation;
@@ -312,6 +313,8 @@ namespace umbraco.dialogs
                         {
                             Media m = new Media(int.Parse(UmbracoContext.Current.Request["id"]));
                             m.Move(int.Parse(UmbracoContext.Current.Request["copyTo"]));
+                            m.XmlGenerate(new XmlDocument());
+                            library.ClearLibraryCacheForMedia(m.Id);
                         }                                 
 
                         feedback.Text = ui.Text("moveOrCopy", "moveDone", nodes, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
