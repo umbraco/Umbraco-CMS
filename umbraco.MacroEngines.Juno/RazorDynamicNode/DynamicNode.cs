@@ -51,7 +51,9 @@ namespace umbraco.MacroEngines
             if (int.TryParse(NodeId, out DynamicBackingItemId))
             {
                 this.n = new DynamicBackingItem(DynamicBackingItemId);
+                return;
             }
+            throw new ArgumentException("Cannot instantiate a DynamicNode without an id");
         }
         public DynamicNode(object NodeId)
         {
@@ -59,7 +61,9 @@ namespace umbraco.MacroEngines
             if (int.TryParse(string.Format("{0}", NodeId), out DynamicBackingItemId))
             {
                 this.n = new DynamicBackingItem(DynamicBackingItemId);
+                return;
             }
+            throw new ArgumentException("Cannot instantiate a DynamicNode without an id");
         }
         public DynamicNode()
         {

@@ -60,6 +60,7 @@ namespace umbraco.MacroEngines.Library
             {
                 return MediaById(mediaId);
             }
+            throw new ArgumentException("Cannot get MediaById without an id");
             return null;
         }
         public DynamicNode MediaById(object Id)
