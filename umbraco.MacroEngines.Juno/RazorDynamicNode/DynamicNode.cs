@@ -1057,17 +1057,24 @@ namespace umbraco.MacroEngines
         }
         public string GetPropertyValue(string alias)
         {
+            return GetPropertyValue(alias, null);
+        }
+        public string GetPropertyValue(string alias, string fallback)
+        {
             var prop = GetProperty(alias);
             if (prop != null) return prop.Value;
-            return null;
+            return fallback;
         }
         public string GetPropertyValue(string alias, bool recursive)
         {
+            return GetPropertyValue(alias, recursive, null);
+        }
+        public string GetPropertyValue(string alias, bool recursive, string fallback)
+        {
             var prop = GetProperty(alias, recursive);
             if (prop != null) return prop.Value;
-            return null;
+            return fallback;
         }
-
         public System.Data.DataTable ChildrenAsTable()
         {
             if (n == null) return null;
