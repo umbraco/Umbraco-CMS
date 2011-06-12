@@ -81,6 +81,9 @@
     </Compile>
     <Compile Include="RazorDynamicNode\DynamicNodeList.cs" />
     <Compile Include="RazorDynamicNode\ExamineBackedMedia.cs" />
+    <Compile Include="RazorDynamicNode\HtmlTagWrapper.cs" />
+    <Compile Include="RazorDynamicNode\HtmlTagWrapperBase.cs" />
+    <Compile Include="RazorDynamicNode\HtmlTagWrapperTextNode.cs" />
     <Compile Include="RazorDynamicNode\PropertyResult.cs" />
     <Compile Include="RazorDynamicNode\RazorLibraryCore.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeWalker.cs" />

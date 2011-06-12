@@ -164,5 +164,12 @@ namespace umbraco.MacroEngines.Library
             return test ? valueIfTrue : valueIfFalse;
         }
 
+
+        public HtmlTagWrapper Wrap(string tag, string innerText)
+        {
+            HtmlTagWrapper wrap = new HtmlTagWrapper(tag);
+            wrap.Children.Add(new HtmlTagWrapperTextNode(innerText));
+            return wrap;
+        }
     }
 }
