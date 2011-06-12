@@ -101,5 +101,21 @@ namespace umbraco.MacroEngines.Library
             var xElement = XElement.Parse(xml);
             return new umbraco.MacroEngines.DynamicXml(xElement);
         }
+
+        public string Coalesce(params object[] args)
+        {
+            foreach (var arg in args)
+            {
+                if (arg != null && arg.GetType() != typeof(DynamicNull))
+                {
+                    var sArg = string.Format("{0}", arg);
+                    if (!string.IsNullOrWhiteSpace(sArg))
+                    {
+                        return sArg;
+                    }
+                }
+            }
+            return string.Empty;
+        }
     }
 }
