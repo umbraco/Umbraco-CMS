@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using umbraco.interfaces;
 using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace umbraco.MacroEngines.Library
 {
@@ -61,7 +62,6 @@ namespace umbraco.MacroEngines.Library
                 return MediaById(mediaId);
             }
             throw new ArgumentException("Cannot get MediaById without an id");
-            return null;
         }
         public DynamicNode MediaById(object Id)
         {
@@ -102,7 +102,14 @@ namespace umbraco.MacroEngines.Library
             var xElement = XElement.Parse(xml);
             return new umbraco.MacroEngines.DynamicXml(xElement);
         }
-
+        public DynamicXml ToDynamicXml(XElement xElement)
+        {
+            return new DynamicXml(xElement);
+        }
+        public DynamicXml ToDynamicXml(XPathNodeIterator xpni)
+        {
+            return new DynamicXml(xpni);
+        }
         public string Coalesce(params object[] args)
         {
             foreach (var arg in args)
@@ -151,5 +158,11 @@ namespace umbraco.MacroEngines.Library
             }
             return string.Join(seperator, results);
         }
+
+        public string If(bool test, string valueIfTrue, string valueIfFalse)
+        {
+            return test ? valueIfTrue : valueIfFalse;
+        }
+
     }
 }

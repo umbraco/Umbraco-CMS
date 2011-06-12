@@ -346,7 +346,14 @@ namespace umbraco.MacroEngines
                         {
                             list.Add((working as ContentType).Alias);
                         }
-                        working = working.Parent;
+                        try
+                        {
+                            working = working.Parent;
+                        }
+                        catch (ArgumentException)
+                        {
+                            break;
+                        }
                     }
                 }
                 else
@@ -1421,6 +1428,23 @@ namespace umbraco.MacroEngines
         public string IsHelper(Func<DynamicNode, bool> test, string valueIfTrue, string valueIfFalse)
         {
             return test(this) ? valueIfTrue : valueIfFalse;
+        }
+        public string Where(string predicate, string valueIfTrue)
+        {
+            return Where(predicate, valueIfTrue, string.Empty);
+        }
+        public string Where(string predicate, string valueIfTrue, string valueIfFalse)
+        {
+            //Totally gonna cheat here
+            var dynamicNodeList = new DynamicNodeList();
+            dynamicNodeList.Add(this);
+            var filtered = dynamicNodeList.Where<DynamicNode>(predicate);
+            if (filtered.Count() == 1)
+            {
+                //this node matches the predicate
+                return valueIfTrue;
+            }
+            return valueIfFalse;
         }
 
     }

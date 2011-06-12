@@ -17,12 +17,33 @@ namespace umbraco.MacroEngines
         {
             this.BaseElement = baseElement;
         }
+        public DynamicXml(string xml)
+        {
+            var baseElement = XElement.Parse(xml);
+            this.BaseElement = baseElement;
+        }
+        public DynamicXml(XPathNodeIterator xpni)
+        {
+            if (xpni != null)
+            {
+                if (xpni.Current != null)
+                {
+                    var xml = xpni.Current.OuterXml;
+                    var baseElement = XElement.Parse(xml);
+                    this.BaseElement = baseElement;
+                }
+            }
+        }
         public string InnerText
         {
             get
             {
                 return BaseElement.Value;
             }
+        }
+        public string ToXml()
+        {
+            return BaseElement.ToString(SaveOptions.DisableFormatting);
         }
         public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
         {
@@ -52,7 +73,11 @@ namespace umbraco.MacroEngines
         }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-
+            if (BaseElement == null || binder == null)
+            {
+                result = null;
+                return false;
+            }
             //Go ahead and try to fetch all of the elements matching the member name, and wrap them
             var elements = BaseElement.Elements(binder.Name);
 
