@@ -60,7 +60,7 @@ namespace umbraco.MacroEngines
                 int groupSize = 0;
                 if (int.TryParse(args.First().ToString(), out groupSize))
                 {
-                    result = new DynamicNodeList(this.InGroupsOf<DynamicNode>(groupSize).ToList());
+                    result = this.InGroupsOf<DynamicNode>(groupSize);
                     return true;
                 }
                 result = new DynamicNull();
@@ -71,7 +71,7 @@ namespace umbraco.MacroEngines
                 int groupCount = 0;
                 if (int.TryParse(args.First().ToString(), out groupCount))
                 {
-                    result = new DynamicNodeList(this.GroupedInto<DynamicNode>(groupCount).ToList());
+                    result = this.GroupedInto<DynamicNode>(groupCount);
                     return true;
                 }
                 result = new DynamicNull();
@@ -79,7 +79,7 @@ namespace umbraco.MacroEngines
             }
             if (name == "GroupBy")
             {
-                result = new DynamicNodeList(this.GroupBy<DynamicNode>(args.First().ToString()).ToList());
+                result = this.GroupBy<DynamicNode>(args.First().ToString());
                 return true;
             }
 
@@ -252,20 +252,38 @@ namespace umbraco.MacroEngines
         {
             return ((IQueryable<T>)Items.AsQueryable()).OrderBy(key);
         }
-        public IQueryable<T> GroupBy<T>(string key)
+        public DynamicGrouping GroupBy<T>(string key)
         {
-            //return ((IQueryable<T>)Items.AsQueryable()).OrderBy(key);
-            return null;
+            DynamicGrouping group = new DynamicGrouping(this, key);
+            return group;
         }
-        public IQueryable<T> GroupedInto<T>(int groupCount)
+        public DynamicGrouping GroupedInto<T>(int groupCount)
         {
-            //return ((IQueryable<T>)Items.AsQueryable()).OrderBy(key);
-            return null;
+            int groupSize = (int)Math.Ceiling(((decimal)Items.Count / groupCount));
+            return new DynamicGrouping(
+               this
+               .Items
+               .Select((node, index) => new KeyValuePair<int, DynamicNode>(index, node))
+               .GroupBy(kv => (object)(kv.Key / groupSize))
+               .Select(item => new Grouping<object, DynamicNode>()
+               {
+                   Key = item.Key,
+                   Elements = item.Select(inner => inner.Value)
+               }));
         }
-        public IQueryable<T> InGroupsOf<T>(int groupSize)
+        public DynamicGrouping InGroupsOf<T>(int groupSize)
         {
-            //return ((IQueryable<T>)Items.AsQueryable()).OrderBy(key);
-            return null;
+            return new DynamicGrouping(
+                this
+                .Items
+                .Select((node, index) => new KeyValuePair<int, DynamicNode>(index, node))
+                .GroupBy(kv => (object)(kv.Key / groupSize))
+                .Select(item => new Grouping<object, DynamicNode>()
+                {
+                    Key = item.Key,
+                    Elements = item.Select(inner => inner.Value)
+                }));
+
         }
 
         public IQueryable Select(string predicate, params object[] values)

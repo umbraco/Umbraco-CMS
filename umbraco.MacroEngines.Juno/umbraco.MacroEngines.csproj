@@ -73,6 +73,7 @@
     <Compile Include="RazorCore\BaseContext.cs" />
     <Compile Include="RazorDynamicNode\DynamicBackingItem.cs" />
     <Compile Include="RazorDynamicNode\DynamicBackingItemType.cs" />
+    <Compile Include="RazorDynamicNode\DynamicGrouping.cs" />
     <Compile Include="RazorDynamicNode\DynamicMedia.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -81,6 +82,7 @@
     </Compile>
     <Compile Include="RazorDynamicNode\DynamicNodeList.cs" />
     <Compile Include="RazorDynamicNode\ExamineBackedMedia.cs" />
+    <Compile Include="RazorDynamicNode\Grouping.cs" />
     <Compile Include="RazorDynamicNode\HtmlTagWrapper.cs" />
     <Compile Include="RazorDynamicNode\HtmlTagWrapperBase.cs" />
     <Compile Include="RazorDynamicNode\HtmlTagWrapperTextNode.cs" />
