@@ -6,6 +6,7 @@ using System.Dynamic;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Collections;
+using System.IO;
 
 namespace umbraco.MacroEngines
 {
@@ -567,6 +568,56 @@ namespace umbraco.MacroEngines
         public string IsHelper(Func<DynamicXml, bool> test, string valueIfTrue, string valueIfFalse)
         {
             return test(this) ? valueIfTrue : valueIfFalse;
+        }
+
+        public static string StripDashesInElementOrAttributeNames(string xml)
+        {
+            using (MemoryStream outputms = new MemoryStream())
+            {
+                using (TextWriter outputtw = new StreamWriter(outputms))
+                {
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        using (TextWriter tw = new StreamWriter(ms))
+                        {
+                            tw.Write(xml);
+                            tw.Flush();
+                            ms.Position = 0;
+                            using (TextReader tr = new StreamReader(ms))
+                            {
+                                bool IsInsideElement = false, IsInsideQuotes = false;
+                                int ic = 0;
+                                while ((ic = tr.Read()) != -1)
+                                {
+                                    if (ic == (int)'<' && !IsInsideQuotes)
+                                    {
+                                        IsInsideElement = true;
+                                    }
+                                    if (ic == (int)'>' && !IsInsideQuotes)
+                                    {
+                                        IsInsideElement = false;
+                                    }
+                                    if (ic == (int)'"')
+                                    {
+                                        IsInsideQuotes = !IsInsideQuotes;
+                                    }
+                                    if (!IsInsideElement || ic != (int)'-' || IsInsideQuotes)
+                                    {
+                                        outputtw.Write((char)ic);
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                    outputtw.Flush();
+                    outputms.Position = 0;
+                    using (TextReader outputtr = new StreamReader(outputms))
+                    {
+                        return outputtr.ReadToEnd();
+                    }
+                }
+            }
         }
     }
 }

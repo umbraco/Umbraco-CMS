@@ -539,7 +539,7 @@ namespace umbraco.MacroEngines
                 {
                     try
                     {
-                        XElement e = XElement.Parse(sResult, LoadOptions.None);
+                        XElement e = XElement.Parse(DynamicXml.StripDashesInElementOrAttributeNames(sResult), LoadOptions.None);
                         if (e != null)
                         {
                             //check that the document element is not one of the disallowed elements
@@ -892,19 +892,19 @@ namespace umbraco.MacroEngines
             return razorLibrary.Value.NodeById(Id);
         }
         [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
-        public DynamicNodeList NodeById(List<object> Ids)
+        public DynamicNodeList NodesById(List<object> Ids)
         {
-            return razorLibrary.Value.NodeById(Ids);
+            return razorLibrary.Value.NodesById(Ids);
         }
         [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
-        public DynamicNodeList NodeById(List<int> Ids)
+        public DynamicNodeList NodesById(List<int> Ids)
         {
-            return razorLibrary.Value.NodeById(Ids);
+            return razorLibrary.Value.NodesById(Ids);
         }
         [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
-        public DynamicNodeList NodeById(params object[] Ids)
+        public DynamicNodeList NodesById(params object[] Ids)
         {
-            return razorLibrary.Value.NodeById(Ids);
+            return razorLibrary.Value.NodesById(Ids);
         }
         [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNode MediaById(int Id)

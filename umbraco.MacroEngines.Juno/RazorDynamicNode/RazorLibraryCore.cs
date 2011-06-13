@@ -48,7 +48,7 @@ namespace umbraco.MacroEngines.Library
         }
         public DynamicNodeList NodesById(params object[] Ids)
         {
-            return NodeById(Ids.ToList());
+            return NodesById(Ids.ToList());
         }
 
         public DynamicNode MediaById(int Id)
