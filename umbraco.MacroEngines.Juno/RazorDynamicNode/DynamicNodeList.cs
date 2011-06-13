@@ -55,6 +55,34 @@ namespace umbraco.MacroEngines
                 result = new DynamicNodeList(this.OrderBy<DynamicNode>(args.First().ToString()).ToList());
                 return true;
             }
+            if (name == "InGroupsOf")
+            {
+                int groupSize = 0;
+                if (int.TryParse(args.First().ToString(), out groupSize))
+                {
+                    result = new DynamicNodeList(this.InGroupsOf<DynamicNode>(groupSize).ToList());
+                    return true;
+                }
+                result = new DynamicNull();
+                return true;
+            }
+            if (name == "GroupedInto")
+            {
+                int groupCount = 0;
+                if (int.TryParse(args.First().ToString(), out groupCount))
+                {
+                    result = new DynamicNodeList(this.GroupedInto<DynamicNode>(groupCount).ToList());
+                    return true;
+                }
+                result = new DynamicNull();
+                return true;
+            }
+            if (name == "GroupBy")
+            {
+                result = new DynamicNodeList(this.GroupBy<DynamicNode>(args.First().ToString()).ToList());
+                return true;
+            }
+
             if (name == "Pluck" || name == "Select")
             {
                 string predicate = args.First().ToString();
@@ -224,6 +252,22 @@ namespace umbraco.MacroEngines
         {
             return ((IQueryable<T>)Items.AsQueryable()).OrderBy(key);
         }
+        public IQueryable<T> GroupBy<T>(string key)
+        {
+            //return ((IQueryable<T>)Items.AsQueryable()).OrderBy(key);
+            return null;
+        }
+        public IQueryable<T> GroupedInto<T>(int groupCount)
+        {
+            //return ((IQueryable<T>)Items.AsQueryable()).OrderBy(key);
+            return null;
+        }
+        public IQueryable<T> InGroupsOf<T>(int groupSize)
+        {
+            //return ((IQueryable<T>)Items.AsQueryable()).OrderBy(key);
+            return null;
+        }
+
         public IQueryable Select(string predicate, params object[] values)
         {
             return DynamicQueryable.Select(Items.AsQueryable(), predicate, values);

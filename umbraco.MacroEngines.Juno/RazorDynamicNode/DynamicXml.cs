@@ -136,6 +136,27 @@ namespace umbraco.MacroEngines
             result = null;
             return false;
         }
+        public DynamicXml XPath(string expression)
+        {
+            var matched = this.BaseElement.XPathSelectElements(expression);
+            DynamicXml root = new DynamicXml("<results/>");
+            foreach (var element in matched)
+            {
+                root.BaseElement.Add(element);
+            }
+            return root;
+        }
+
+        public DynamicXml Find(string expression)
+        {
+            return new DynamicXml(this.BaseElement.XPathSelectElements(expression).FirstOrDefault());
+        }
+
+        public DynamicXml Find(string attributeName, object value)
+        {
+            string expression = string.Format("//*[{0}='{1}']", attributeName, value);
+            return new DynamicXml(this.BaseElement.XPathSelectElements(expression).FirstOrDefault());
+        }
 
         public IEnumerator GetEnumerator()
         {
