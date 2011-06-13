@@ -315,6 +315,10 @@ namespace umbraco.MacroEngines
         {
             get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? content.Name : media.Name; }
         }
+        public string nodeName
+        {
+            get { return Name; }
+        }
         public Guid Version
         {
             get { if (IsNull()) return Guid.Empty; return Type == DynamicBackingItemType.Content ? content.Version : media.Version; }
