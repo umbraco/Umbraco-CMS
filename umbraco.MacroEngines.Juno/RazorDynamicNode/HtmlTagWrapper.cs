@@ -145,6 +145,40 @@ namespace umbraco.MacroEngines
             }
             return this;
         }
+
+        public HtmlTagWrapper AddChild(HtmlTagWrapperBase newChild)
+        {
+            Children.Add(newChild);
+            return this;
+        }
+        public HtmlTagWrapper AddChild(string text)
+        {
+            Children.Add(new HtmlTagWrapperTextNode(text));
+            return this;
+        }
+        public HtmlTagWrapper AddChildAt(int index, HtmlTagWrapperBase newChild)
+        {
+            Children.Insert(index, newChild);
+            return this;
+        }
+        public HtmlTagWrapper AddChildAt(int index, string text)
+        {
+            Children.Insert(index, new HtmlTagWrapperTextNode(text));
+            return this;
+        }
+        public HtmlTagWrapper RemoveChildAt(int index)
+        {
+            return this;
+        }
+        public int CountChildren()
+        {
+            return this.Children.Count;
+        }
+        public HtmlTagWrapper ClearChildren()
+        {
+            return this;
+        }
+
     }
 
 }

@@ -1435,6 +1435,14 @@ namespace umbraco.MacroEngines
         }
         public string Where(string predicate, string valueIfTrue, string valueIfFalse)
         {
+            if (Where(predicate))
+            {
+                return valueIfTrue;
+            }
+            return valueIfFalse;
+        }
+        public bool Where(string predicate)
+        {
             //Totally gonna cheat here
             var dynamicNodeList = new DynamicNodeList();
             dynamicNodeList.Add(this);
@@ -1442,10 +1450,9 @@ namespace umbraco.MacroEngines
             if (filtered.Count() == 1)
             {
                 //this node matches the predicate
-                return valueIfTrue;
+                return true;
             }
-            return valueIfFalse;
+            return false;
         }
-
     }
 }
