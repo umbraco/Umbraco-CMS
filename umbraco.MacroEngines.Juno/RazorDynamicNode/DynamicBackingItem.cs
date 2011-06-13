@@ -83,18 +83,84 @@ namespace umbraco.MacroEngines
             if (IsNull()) return null;
             if (Type == DynamicBackingItemType.Content)
             {
-                var prop = content.GetProperty(alias);
-                if (prop != null)
-                {
-                    return new PropertyResult(prop);
-                }
+                return GetPropertyInternal(alias, content);
             }
             else
             {
-                var prop = media.GetProperty(alias);
-                if (prop != null)
+                return GetPropertyInternal(alias, media);
+            }
+        }
+
+        private IProperty GetPropertyInternal(string alias, INode content)
+        {
+            bool propertyExists = false;
+            var prop = content.GetProperty(alias, out propertyExists);
+            if (prop != null)
+            {
+                return new PropertyResult(prop);
+            }
+            else
+            {
+                if (alias.Substring(0, 1).ToUpper() == alias.Substring(0, 1) && !propertyExists)
                 {
-                    return new PropertyResult(prop);
+                    prop = content.GetProperty(alias.Substring(0, 1).ToLower() + alias.Substring((1)), out propertyExists);
+                    if (prop != null)
+                    {
+                        return new PropertyResult(prop);
+                    }
+                    else
+                    {
+                        //reflect
+                        var result = content.GetType().InvokeMember(alias,
+                                                  System.Reflection.BindingFlags.GetProperty |
+                                                  System.Reflection.BindingFlags.Instance |
+                                                  System.Reflection.BindingFlags.Public |
+                                                  System.Reflection.BindingFlags.NonPublic,
+                                                  null,
+                                                  content,
+                                                  null);
+                        if (result != null)
+                        {
+                            return new PropertyResult(alias, string.Format("{0}", result), Guid.Empty);
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+        private IProperty GetPropertyInternal(string alias, ExamineBackedMedia content)
+        {
+            bool propertyExists = false;
+            var prop = content.GetProperty(alias, out propertyExists);
+            if (prop != null)
+            {
+                return new PropertyResult(prop);
+            }
+            else
+            {
+                if (alias.Substring(0, 1).ToUpper() == alias.Substring(0, 1) && !propertyExists)
+                {
+                    prop = content.GetProperty(alias.Substring(0, 1).ToLower() + alias.Substring((1)), out propertyExists);
+                    if (prop != null)
+                    {
+                        return new PropertyResult(prop);
+                    }
+                    else
+                    {
+                        //reflect
+                        var result = content.GetType().InvokeMember(alias,
+                                                  System.Reflection.BindingFlags.GetProperty |
+                                                  System.Reflection.BindingFlags.Instance |
+                                                  System.Reflection.BindingFlags.Public |
+                                                  System.Reflection.BindingFlags.NonPublic,
+                                                  null,
+                                                  content,
+                                                  null);
+                        if (result != null)
+                        {
+                            return new PropertyResult(alias, string.Format("{0}", result), Guid.Empty);
+                        }
+                    }
                 }
             }
             return null;
