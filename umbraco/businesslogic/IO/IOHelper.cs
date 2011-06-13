@@ -49,14 +49,15 @@ namespace umbraco.IO
         public static string ResolveUrlsFromTextString(string text)
         {
             // find all relative urls (ie. urls that contain ~)
-            string pattern = "(\\S+)=[\"']?(\\W?\\~(?:.(?![\"']?\\s+(?:\\S+)=|[>\"']))+.)[\"']?";
+//            string pattern = "(\\S+)=[\"']?(\\W?\\~(?:.(?![\"']?\\s+(?:\\S+)=|[>\"']))+.)[\"']?";
+            string pattern = "<.*?\\\"(\\~.*?)\\\"";   
             MatchCollection tags =
                 Regex.Matches(text, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
             foreach (Match tag in tags)
             {
                 string url = "";
-                if (tag.Groups[2].Success)
-                    url = tag.Groups[2].Value;
+                if (tag.Groups[1].Success)
+                    url = tag.Groups[1].Value;
 
                 // The richtext editor inserts a slash in front of the url. That's why we need this little fix
 //                if (url.StartsWith("/"))

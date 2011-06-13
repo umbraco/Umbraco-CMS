@@ -230,7 +230,7 @@
 			<%}%>
 
              var cp = macroElement + ' Alias="'+ alias +'" runat="server"';
-             UmbEditor.Insert('<' + cp +'>','</'+ macroElement + '>', '<%= editorSource.ClientID %>');
+             UmbEditor.Insert('<' + cp +' />','', '<%= editorSource.ClientID %>');
        }
        function openMacroModal(alias)
        {
