@@ -166,7 +166,7 @@ namespace umbraco.MacroEngines.Library
 
         public HtmlTagWrapper Wrap(string tag, string innerText, params HtmlTagWrapperBase[] Children)
         {
-            var item = Wrap(tag, innerText, null);
+            var item = Wrap(tag, innerText, (object)null);
             foreach (var child in Children)
             {
                 item.AddChild(child);
@@ -175,7 +175,7 @@ namespace umbraco.MacroEngines.Library
         }
         public HtmlTagWrapper Wrap(string tag, string innerText)
         {
-            return Wrap(tag, innerText, null);
+            return Wrap(tag, innerText, (object)null);
         }
         public HtmlTagWrapper Wrap(string tag, object inner, object anonymousAttributes)
         {
