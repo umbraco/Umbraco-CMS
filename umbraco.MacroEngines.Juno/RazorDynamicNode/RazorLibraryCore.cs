@@ -32,24 +32,25 @@ namespace umbraco.MacroEngines.Library
         {
             return new DynamicNode(Id);
         }
-        public DynamicNodeList NodeById(List<object> Ids)
+        public DynamicNodeList NodesById(List<object> Ids)
         {
             List<DynamicNode> nodes = new List<DynamicNode>();
             foreach (object eachId in Ids)
                 nodes.Add(new DynamicNode(eachId));
             return new DynamicNodeList(nodes);
         }
-        public DynamicNodeList NodeById(List<int> Ids)
+        public DynamicNodeList NodesById(List<int> Ids)
         {
             List<DynamicNode> nodes = new List<DynamicNode>();
             foreach (int eachId in Ids)
                 nodes.Add(new DynamicNode(eachId));
             return new DynamicNodeList(nodes);
         }
-        public DynamicNodeList NodeById(params object[] Ids)
+        public DynamicNodeList NodesById(params object[] Ids)
         {
             return NodeById(Ids.ToList());
         }
+
         public DynamicNode MediaById(int Id)
         {
             return new DynamicNode(new DynamicBackingItem(ExamineBackedMedia.GetUmbracoMedia(Id)));
