@@ -78,7 +78,10 @@ namespace umbraco.MacroEngines
         {
             return "Use @item.Write() to emit the HTML rather than @item";
         }
-
+        public IHtmlString ToHtml()
+        {
+            return this.Write();
+        }
         public void WriteToHtmlTextWriter(HtmlTextWriter html)
         {
             html.WriteBeginTag(Tag);
