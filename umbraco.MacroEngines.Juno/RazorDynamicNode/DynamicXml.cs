@@ -395,6 +395,18 @@ namespace umbraco.MacroEngines
         {
             return IsHelper(n => n.BaseElement == other.BaseElement, valueIfTrue, valueIfFalse);
         }
+        public bool IsNotEqual(DynamicXml other)
+        {
+            return IsHelper(n => n.BaseElement != other.BaseElement);
+        }
+        public string IsNotEqual(DynamicXml other, string valueIfTrue)
+        {
+            return IsHelper(n => n.BaseElement != other.BaseElement, valueIfTrue);
+        }
+        public string IsNotEqual(DynamicXml other, string valueIfTrue, string valueIfFalse)
+        {
+            return IsHelper(n => n.BaseElement != other.BaseElement, valueIfTrue, valueIfFalse);
+        }
         public bool IsDescendant(DynamicXml other)
         {
             var ancestors = this.Ancestors();
