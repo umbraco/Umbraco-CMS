@@ -154,6 +154,11 @@ namespace umbraco.MacroEngines
             Children.Add(newChild);
             return this;
         }
+        public HtmlTagWrapper AddChildren(params HtmlTagWrapperBase[] collection)
+        {
+            Children.AddRange(collection);
+            return this;
+        }
         public HtmlTagWrapper AddChild(string text)
         {
             Children.Add(new HtmlTagWrapperTextNode(text));
@@ -167,6 +172,11 @@ namespace umbraco.MacroEngines
         public HtmlTagWrapper AddChildAt(int index, string text)
         {
             Children.Insert(index, new HtmlTagWrapperTextNode(text));
+            return this;
+        }
+        public HtmlTagWrapper AddChildrenAt(int index, params HtmlTagWrapperBase[] collection)
+        {
+            Children.InsertRange(index, collection);
             return this;
         }
         public HtmlTagWrapper RemoveChildAt(int index)
