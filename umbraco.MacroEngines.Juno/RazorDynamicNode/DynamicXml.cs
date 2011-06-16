@@ -82,7 +82,10 @@ namespace umbraco.MacroEngines
             }
             //Go ahead and try to fetch all of the elements matching the member name, and wrap them
             var elements = BaseElement.Elements(binder.Name);
-
+            if (elements.Count() == 0 && BaseElement.Name == "root" && BaseElement.Elements().Count() == 1)
+            {
+                elements = BaseElement.Elements().ElementAt(0).Elements(binder.Name);
+            }
             if (HandleIEnumerableXElement(elements, out result))
             {
                 return true;
