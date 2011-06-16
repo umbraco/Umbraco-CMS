@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Collections;
 using System.IO;
+using System.Web;
 
 namespace umbraco.MacroEngines
 {
@@ -147,7 +148,10 @@ namespace umbraco.MacroEngines
             }
             return root;
         }
-
+        public IHtmlString ToHtml()
+        {
+            return new HtmlString(this.ToXml());
+        }
         public DynamicXml Find(string expression)
         {
             return new DynamicXml(this.BaseElement.XPathSelectElements(expression).FirstOrDefault());
