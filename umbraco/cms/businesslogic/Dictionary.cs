@@ -48,13 +48,16 @@ namespace umbraco.cms.businesslogic
                                     dr.GetGuid("id"),
                                     dr.GetGuid("parent"));
 
-                                DictionaryItems.Add(item.key, item);
+                                if (!DictionaryItems.ContainsKey(item.key))
+                                {
+                                    DictionaryItems.Add(item.key, item);
+                                }
                             }
                         }
 
                         cacheIsEnsured = true;
                     }
-                }                
+                }
             }
         }
 
@@ -79,7 +82,7 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         public class DictionaryItem
         {
-            
+
             private string _key;
 
             internal Guid UniqueId { get; private set; }
@@ -105,7 +108,7 @@ namespace umbraco.cms.businesslogic
                 ensureCache();
 
                 var item = DictionaryItems.Values.Cast<DictionaryItem>()
-                    .Where(x => x.key == key)                    
+                    .Where(x => x.key == key)
                     .SingleOrDefault();
 
                 if (item == null)
@@ -154,7 +157,7 @@ namespace umbraco.cms.businesslogic
                 this.id = item.id;
                 this._key = item.key;
                 this.ParentId = item.ParentId;
-                this.UniqueId = item.UniqueId;                               
+                this.UniqueId = item.UniqueId;
             }
 
             private DictionaryItem _parent;
@@ -244,7 +247,7 @@ namespace umbraco.cms.businesslogic
                         {
                             SqlHelper.ExecuteNonQuery("Update cmsDictionary set [key] = @key WHERE pk = @Id", SqlHelper.CreateParameter("@key", value),
                                 SqlHelper.CreateParameter("@Id", id));
-                            
+
                             //remove the cached item since the key is different
                             DictionaryItems.Remove(key);
 
@@ -260,16 +263,16 @@ namespace umbraco.cms.businesslogic
                                         dr.GetGuid("id"),
                                         dr.GetGuid("parent"));
 
-                                    DictionaryItems.Add(item.key, item);                                    
+                                    DictionaryItems.Add(item.key, item);
                                 }
                                 else
                                 {
                                     throw new DataException("Could not load updated created dictionary item with id " + id.ToString());
                                 }
-                            }                                
-                            
+                            }
+
                             //finally update this objects value
-                            this._key = value; 
+                            this._key = value;
                         }
                     }
                     else
@@ -449,7 +452,7 @@ namespace umbraco.cms.businesslogic
                                               SqlHelper.CreateParameter("@parentId", parentId),
                                               SqlHelper.CreateParameter("@dictionaryKey", key));
 
-                    using (IRecordsReader dr = 
+                    using (IRecordsReader dr =
                         SqlHelper.ExecuteReader("Select pk, id, [key], parent from cmsDictionary where id=@id",
                             SqlHelper.CreateParameter("@id", newId)))
                     {
@@ -473,8 +476,8 @@ namespace umbraco.cms.businesslogic
                         {
                             throw new DataException("Could not load newly created dictionary item with id " + newId.ToString());
                         }
-                    }                    
-                    
+                    }
+
                 }
                 else
                 {
@@ -506,7 +509,7 @@ namespace umbraco.cms.businesslogic
             {
                 if (Deleting != null)
                     Deleting(this, e);
-            } 
+            }
             #endregion
         }
     }
