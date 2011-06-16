@@ -54,7 +54,7 @@ namespace umbraco.MacroEngines
         }
         public HtmlString Write()
         {
-            if (Children.Count > 0 || Attributes.Count > 0)
+            if (Children.Count > 0 || Attributes.Count > 0 || CssClasses.Count > 0)
             {
                 using (MemoryStream ms = new MemoryStream())
                 {
