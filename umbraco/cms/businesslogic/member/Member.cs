@@ -803,7 +803,7 @@ namespace umbraco.cms.businesslogic.member
                 if (!String.IsNullOrEmpty(value))
                 {
                     string validateMemberId = value.Substring(0, value.IndexOf("+"));
-                    if (validateMemberId != Membership.GetUser().ProviderUserKey.ToString())
+                    if (Membership.GetUser() == null || validateMemberId != Membership.GetUser().ProviderUserKey.ToString())
                     {
                         Member.RemoveMemberFromCache(int.Parse(validateMemberId));
                         value = String.Empty;

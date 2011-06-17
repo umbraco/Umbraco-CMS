@@ -305,7 +305,7 @@ namespace umbraco.cms.presentation.user
 
             if (!IsPostBack)
             {
-                MembershipUser user = Membership.GetUser(u.LoginName, true);
+                MembershipUser user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(u.LoginName, true);
                 uname.Text = u.Name;
                 lname.Text = (user == null) ? u.LoginName : user.UserName;
                 email.Text = (user == null) ? u.Email : user.Email;
