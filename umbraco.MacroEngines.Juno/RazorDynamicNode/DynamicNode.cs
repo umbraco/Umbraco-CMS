@@ -143,7 +143,7 @@ namespace umbraco.MacroEngines
         public DynamicNodeList XPath(string xPath)
         {
             //if this DN was initialized with an underlying NodeFactory.Node
-            if (n != null)
+            if (n != null && n.Type == DynamicBackingItemType.Content)
             {
                 //get the underlying xml content
                 XmlDocument doc = umbraco.content.Instance.XmlContent;
@@ -580,7 +580,7 @@ namespace umbraco.MacroEngines
                     int mediaNodeId;
                     if (int.TryParse(prop.Value, out mediaNodeId))
                     {
-                        return MediaById(mediaNodeId);
+                        return razorLibrary.Value.MediaById(mediaNodeId);
                     }
                 }
                 return null;
