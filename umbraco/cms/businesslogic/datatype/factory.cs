@@ -58,7 +58,7 @@ namespace umbraco.cms.businesslogic.datatype.controls
             }
             else
             {
-                throw new ArgumentException("Could not find a IDataType control matching DataEditorId " + DataEditorId.ToString() + " in the controls collection. To correct this, check the data type definition in the settings section or ensure that the package/control is installed correctly.");
+                throw new ArgumentException("Could not find a IDataType control matching DataEditorId " + DataEditorId.ToString() + " in the controls collection. To correct this, check the data type definition in the developer section or ensure that the package/control is installed correctly.");
             }
         }
 
