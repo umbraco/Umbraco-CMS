@@ -16,6 +16,7 @@ using System.Xml;
 using System.Xml.Linq;
 using umbraco.cms.businesslogic.media;
 using umbraco.MacroEngines.Library;
+using umbraco.BusinessLogic.Utils;
 
 
 
@@ -363,6 +364,7 @@ namespace umbraco.MacroEngines
             }
             return list;
         }
+        static Dictionary<Guid, Type> RazorDataTypeModelTypes = null;
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
 
@@ -392,6 +394,35 @@ namespace umbraco.MacroEngines
                     //fallback is stringT
 
                     Guid dataType = ContentType.GetDataType(n.NodeTypeAlias, data.Alias);
+
+                    if (RazorDataTypeModelTypes == null)
+                    {
+                        RazorDataTypeModelTypes = new Dictionary<Guid, Type>();
+
+                        TypeFinder.FindClassesMarkedWithAttribute(typeof(RazorDataTypeModel))
+                        .ToList()
+                        .FindAll(type => typeof(IRazorDataTypeModel).IsAssignableFrom(type))
+                        .ConvertAll(type =>
+                        {
+                            RazorDataTypeModel RazorDataTypeModelAttribute = (RazorDataTypeModel)Attribute.GetCustomAttribute(type, typeof(RazorDataTypeModel));
+                            Guid g = RazorDataTypeModelAttribute.DataTypeEditorId;
+                            return new KeyValuePair<Guid, Type>(g, type);
+                        })
+                        .ForEach(item => RazorDataTypeModelTypes.Add(item.Key, item.Value));
+                    }
+                    if (RazorDataTypeModelTypes.ContainsKey(dataType))
+                    {
+                        Type dataTypeType = RazorDataTypeModelTypes[dataType];
+                        IRazorDataTypeModel razorDataTypeModel = Activator.CreateInstance(dataTypeType, false) as IRazorDataTypeModel;
+                        if (razorDataTypeModel != null)
+                        {
+                            if (razorDataTypeModel.Init(n.Id, result))
+                            {
+                                result = razorDataTypeModel;
+                                return true;
+                            }
+                        }
+                    }
 
                     //convert the string value to a known type
                     return ConvertPropertyValueByDataType(ref result, name, dataType);
