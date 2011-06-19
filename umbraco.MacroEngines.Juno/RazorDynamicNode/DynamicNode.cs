@@ -515,18 +515,6 @@ namespace umbraco.MacroEngines
                 return true;
             }
 
-            //MNTP List<int>
-            if (dataType == DATATYPE_UCOMPONENTS_MNTP_GUID)
-            {
-                string sResult = string.Format("{0}", result);
-                //csv mode
-                if (!sResult.Contains("<"))
-                {
-                    result = sResult.Split(',').Select(id => int.Parse(id)).ToList();
-                    return true;
-                }
-            }
-
             //decimal
             decimal dResult = 0;
             if (decimal.TryParse(string.Format("{0}", result).Replace(",", "."), out dResult))
