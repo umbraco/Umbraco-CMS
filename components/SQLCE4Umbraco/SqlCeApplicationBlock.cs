@@ -5,6 +5,7 @@ using System.Text;
 using System.Data.SqlServerCe;
 using System.Data;
 using System.Diagnostics;
+using SQLCE4Umbraco;
 
 namespace SqlCE4Umbraco
 {
@@ -29,10 +30,8 @@ namespace SqlCE4Umbraco
 
             try
             {
-                using (SqlCeConnection conn = new SqlCeConnection())
+                using (SqlCeConnection conn = SqlCeContextGuardian.Open(connectionString))
                 {
-                    conn.ConnectionString = connectionString;
-                    conn.Open();
                     using (SqlCeCommand cmd = new SqlCeCommand(commandText, conn))
                     {
                         AttachParameters(cmd, commandParameters);
@@ -68,7 +67,7 @@ namespace SqlCE4Umbraco
             try
             {
                 int rowsAffected;
-                using (SqlCeConnection conn = new SqlCeConnection())
+                using (SqlCeConnection conn = SqlCeContextGuardian.Open(connectionString))
                 {
                     // this is for multiple queries in the installer
                     if (commandText.Trim().StartsWith("!!!"))
@@ -76,8 +75,6 @@ namespace SqlCE4Umbraco
                         commandText = commandText.Trim().Trim('!');
                         string[] commands = commandText.Split('|');
                         string currentCmd = String.Empty;
-                        conn.ConnectionString = connectionString;
-                        conn.Open();
 
                         foreach (string cmd in commands)
                         {
@@ -142,9 +139,8 @@ namespace SqlCE4Umbraco
                 Debug.WriteLine(commandText);
                 Debug.WriteLine("----------------------------------------------------------------------------");
                 SqlCeDataReader reader;
-                SqlCeConnection conn = new SqlCeConnection();
-                conn.ConnectionString = connectionString;
-                conn.Open();
+                SqlCeConnection conn = SqlCeContextGuardian.Open(connectionString);
+
                 try
                 {
                     SqlCeCommand cmd = new SqlCeCommand(commandText, conn);
@@ -168,7 +164,7 @@ namespace SqlCE4Umbraco
         public static bool VerifyConnection(string connectionString)
         {
             bool isConnected = false;
-            using (SqlCeConnection conn = new SqlCeConnection())
+            using (SqlCeConnection conn = SqlCeContextGuardian.Open(connectionString))
             {
                 conn.ConnectionString = connectionString;
                 conn.Open();
