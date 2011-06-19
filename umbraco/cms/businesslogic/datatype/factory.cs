@@ -51,8 +51,15 @@ namespace umbraco.cms.businesslogic.datatype.controls
             {
                 throw new ArgumentException("DataEditorId is empty. This usually means that no data editor was defined for the data type. To correct this update the entry in the cmsDataType table to ensure it matches a Guid from an installed data editor.");
             }
-            IDataType newObject = Activator.CreateInstance(_controls[DataEditorId]) as IDataType;
+            if (_controls.ContainsKey(DataEditorId))
+            {
+                IDataType newObject = Activator.CreateInstance(_controls[DataEditorId]) as IDataType;
                 return newObject;
+            }
+            else
+            {
+                throw new ArgumentException("Could not find a IDataType control matching DataEditorId " + DataEditorId.ToString() + " in the controls collection. To correct this, check the data type definition in the settings section or ensure that the package/control is installed correctly.");
+            }
         }
 
         /// <summary>
