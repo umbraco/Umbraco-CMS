@@ -4,7 +4,7 @@
 
   <!-- Set up a local connection string -->
   <xsl:template match="/configuration/appSettings/add[@key='umbracoDbDSN']/@value">
-    <xsl:attribute name="value">server=ssaolap01;database=umbracodev;integrated security=false;user id=dev;pwd=dev</xsl:attribute>
+    <xsl:attribute name="value">server=ssaolap01;database=udev;integrated security=false;user id=dev;pwd=dev</xsl:attribute>
   </xsl:template>
 
   <xsl:template match="/configuration/appSettings/add[@key='umbracoConfigurationStatus']/@value">
