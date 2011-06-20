@@ -8,7 +8,7 @@ using System.Web;
 
 namespace umbraco.MacroEngines
 {
-    public class HtmlTagWrapper : HtmlTagWrapperBase
+    public class HtmlTagWrapper : HtmlTagWrapperBase, IHtmlString
     {
         public HtmlTagWrapper Parent;
         public List<HtmlTagWrapperBase> Children;
@@ -192,6 +192,10 @@ namespace umbraco.MacroEngines
             return this;
         }
 
+        public string ToHtmlString()
+        {
+            return this.Write().ToHtmlString();
+        }
     }
 
 }
