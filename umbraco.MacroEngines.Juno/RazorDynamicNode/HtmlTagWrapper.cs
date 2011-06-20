@@ -44,6 +44,7 @@ namespace umbraco.MacroEngines
 
         public List<string> CssClasses;
         public string Tag;
+        public bool Visible;
 
         public HtmlTagWrapper(string Tag)
         {
@@ -51,10 +52,11 @@ namespace umbraco.MacroEngines
             this.Children = new List<HtmlTagWrapperBase>();
             this.CssClasses = new List<string>();
             this.Attributes = new List<KeyValuePair<string, string>>();
+            this.Visible = true;
         }
         public HtmlString Write()
         {
-            if (Children.Count > 0 || Attributes.Count > 0 || CssClasses.Count > 0)
+            if ((Children.Count > 0 || Attributes.Count > 0 || CssClasses.Count > 0) && Visible)
             {
                 using (MemoryStream ms = new MemoryStream())
                 {

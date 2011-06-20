@@ -242,26 +242,21 @@ namespace umbraco.MacroEngines.Library
             return wrap;
         }
 
-        public HtmlTagWrapper Wrap(bool predicate, string tag, string innerText, object anonymousAttributes)
+        public HtmlTagWrapper Wrap(bool visible, string tag, string innerText, object anonymousAttributes)
         {
-            if (predicate)
-            {
-                return Wrap(tag, innerText, anonymousAttributes);
-            }
-            return null;
+            var item = Wrap(tag, innerText, anonymousAttributes);
+            item.Visible = visible;
+            return item;
         }
-        public HtmlTagWrapper Wrap(bool predicate, string tag, string innerText, object anonymousAttributes, params HtmlTagWrapperBase[] Children)
+        public HtmlTagWrapper Wrap(bool visible, string tag, string innerText, object anonymousAttributes, params HtmlTagWrapperBase[] Children)
         {
-            if (predicate)
+            var item = Wrap(tag, innerText, anonymousAttributes, Children);
+            item.Visible = visible;
+            foreach (var child in Children)
             {
-                var item = Wrap(tag, innerText, anonymousAttributes, Children);
-                foreach (var child in Children)
-                {
-                    item.AddChild(child);
-                }
-                return item;
+                item.AddChild(child);
             }
-            return null;
+            return item;
         }
     }
 }
