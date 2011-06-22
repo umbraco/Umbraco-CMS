@@ -32,7 +32,11 @@ namespace umbraco.MacroEngines
             {
                 return default(TOut);
             }
-            return value;
+            if (value.GetType() == typeof(string) && string.IsNullOrEmpty((value as string)))
+            {
+                return default(TOut);
+            }
+            return (TOut)value;
         }
         public static IOrderedQueryable<DynamicNode> OrderBy(object source, object key)
         {
