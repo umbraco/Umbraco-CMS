@@ -5,6 +5,8 @@ using System.Text;
 using umbraco.interfaces;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using System.Web;
+using System.IO;
 
 namespace umbraco.MacroEngines.Library
 {
@@ -258,5 +260,71 @@ namespace umbraco.MacroEngines.Library
             }
             return item;
         }
+
+
+        public string StripHtml(IHtmlString html)
+        {
+            return StripHtml(html.ToHtmlString());
+        }
+        public string StripHtml(string html)
+        {
+            return StripHtmlTags(html);
+        }
+
+        //ge: this method won't deal with <script> or <style> tags as they could have nested < or >
+        private string StripHtmlTags(string html)
+        {
+            using (MemoryStream outputms = new MemoryStream())
+            {
+                using (TextWriter outputtw = new StreamWriter(outputms))
+                {
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        using (TextWriter tw = new StreamWriter(ms))
+                        {
+                            tw.Write(html);
+                            tw.Flush();
+                            ms.Position = 0;
+                            using (TextReader tr = new StreamReader(ms))
+                            {
+                                bool IsInsideElement = false, IsInsideQuotes = false;
+                                int ic = 0;
+                                while ((ic = tr.Read()) != -1)
+                                {
+                                    if (ic == (int)'<' && !IsInsideQuotes)
+                                    {
+                                        IsInsideElement = true;
+                                    }
+                                    if (ic == (int)'>' && !IsInsideQuotes)
+                                    {
+                                        IsInsideElement = false;
+                                        outputtw.Write(' ');
+                                        continue;
+                                    }
+                                    if (ic == (int)'"')
+                                    {
+                                        IsInsideQuotes = !IsInsideQuotes;
+                                    }
+                                    if (!IsInsideElement)
+                                    {
+                                        outputtw.Write((char)ic);
+                                    }
+
+                                }
+
+                            }
+                        }
+                    }
+                    outputtw.Flush();
+                    outputms.Position = 0;
+                    using (TextReader outputtr = new StreamReader(outputms))
+                    {
+                        return outputtr.ReadToEnd().Replace("  ", " ").Trim();
+                    }
+                }
+            }
+        }
+
+
     }
 }
