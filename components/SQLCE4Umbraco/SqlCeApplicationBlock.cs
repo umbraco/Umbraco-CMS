@@ -166,8 +166,6 @@ namespace SqlCE4Umbraco
             bool isConnected = false;
             using (SqlCeConnection conn = SqlCeContextGuardian.Open(connectionString))
             {
-                conn.ConnectionString = connectionString;
-                conn.Open();
                 isConnected = conn.State == ConnectionState.Open;
             }
 
