@@ -260,6 +260,149 @@ namespace umbraco.MacroEngines.Library
             }
             return item;
         }
+        public IHtmlString Truncate(IHtmlString html, int length)
+        {
+            return Truncate(html.ToHtmlString(), length, true, false);
+        }
+        public IHtmlString Truncate(IHtmlString html, int length, bool addElipsis)
+        {
+            return Truncate(html.ToHtmlString(), length, addElipsis, false);
+        }
+        public IHtmlString Truncate(IHtmlString html, int length, bool addElipsis, bool treatTagsAsContent)
+        {
+            return Truncate(html.ToHtmlString(), length, addElipsis, treatTagsAsContent);
+        }
+        public IHtmlString Truncate(string html, int length)
+        {
+            return Truncate(html, length, true, false);
+        }
+        public IHtmlString Truncate(string html, int length, bool addElipsis)
+        {
+            return Truncate(html, length, addElipsis, false);
+        }
+        public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
+        {
+            using (MemoryStream outputms = new MemoryStream())
+            {
+                using (TextWriter outputtw = new StreamWriter(outputms))
+                {
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        using (TextWriter tw = new StreamWriter(ms))
+                        {
+                            tw.Write(html);
+                            tw.Flush();
+                            ms.Position = 0;
+                            Stack<string> tagStack = new Stack<string>();
+                            using (TextReader tr = new StreamReader(ms))
+                            {
+                                bool IsInsideElement = false;
+                                bool lengthReached = false;
+                                int ic = 0;
+                                int currentLength = 0, currentTextLength = 0;
+                                string currentTag = string.Empty;
+                                bool insideTagSpaceEncountered = false;
+                                bool isTagClose = false;
+                                while ((ic = tr.Read()) != -1)
+                                {
+                                    bool write = true;
+
+                                    if (ic == (int)'<')
+                                    {
+                                        IsInsideElement = true;
+                                        insideTagSpaceEncountered = false;
+                                        currentTag = string.Empty;
+                                        isTagClose = false;
+                                        if (tr.Peek() == (int)'/')
+                                        {
+                                            isTagClose = true;
+                                        }
+                                    }
+                                    else if (ic == (int)'>')
+                                    {
+                                        IsInsideElement = false;
+                                        //if (write)
+                                        //{
+                                        //  outputtw.Write('>');
+                                        //}
+                                        currentTextLength++;
+                                        if (isTagClose && tagStack.Count > 0)
+                                        {
+                                            string thisTag = tagStack.Pop();
+                                            outputtw.Write("</" + thisTag + ">");
+                                        }
+                                        if (!isTagClose && currentTag.Length > 0)
+                                        {
+                                            if (!lengthReached)
+                                            {
+                                                tagStack.Push(currentTag);
+                                                outputtw.Write("<" + currentTag);
+                                                if (tr.Peek() != (int)' ')
+                                                {
+                                                    outputtw.Write(">");
+                                                }
+                                            }
+                                        }
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        if (IsInsideElement)
+                                        {
+                                            if (ic == (int)' ')
+                                            {
+                                                insideTagSpaceEncountered = true;
+                                                if (!isTagClose)
+                                                {
+                                                    tagStack.Push(currentTag);
+                                                }
+                                            }
+                                            if (!insideTagSpaceEncountered)
+                                            {
+                                                currentTag += (char)ic;
+                                            }
+                                        }
+                                    }
+                                    if (IsInsideElement && !insideTagSpaceEncountered)
+                                    {
+                                        write = false;
+                                    }
+                                    if (!IsInsideElement || treatTagsAsContent)
+                                    {
+                                        currentTextLength++;
+                                    }
+                                    currentLength++;
+                                    if (currentTextLength <= length || (lengthReached && IsInsideElement))
+                                    {
+                                        if (write)
+                                        {
+                                            outputtw.Write((char)ic);
+                                        }
+                                    }
+                                    if (!lengthReached && currentTextLength >= length)
+                                    {
+                                        //reached truncate point
+                                        if (addElipsis)
+                                        {
+                                            outputtw.Write("&hellip;");
+                                        }
+                                        lengthReached = true;
+                                    }
+
+                                }
+
+                            }
+                        }
+                    }
+                    outputtw.Flush();
+                    outputms.Position = 0;
+                    using (TextReader outputtr = new StreamReader(outputms))
+                    {
+                        return new HtmlString(outputtr.ReadToEnd().Replace("  ", " ").Trim());
+                    }
+                }
+            }
+        }
 
 
         public string StripHtml(IHtmlString html)
@@ -287,23 +430,19 @@ namespace umbraco.MacroEngines.Library
                             ms.Position = 0;
                             using (TextReader tr = new StreamReader(ms))
                             {
-                                bool IsInsideElement = false, IsInsideQuotes = false;
+                                bool IsInsideElement = false;
                                 int ic = 0;
                                 while ((ic = tr.Read()) != -1)
                                 {
-                                    if (ic == (int)'<' && !IsInsideQuotes)
+                                    if (ic == (int)'<')
                                     {
                                         IsInsideElement = true;
                                     }
-                                    if (ic == (int)'>' && !IsInsideQuotes)
+                                    if (ic == (int)'>')
                                     {
                                         IsInsideElement = false;
                                         outputtw.Write(' ');
                                         continue;
-                                    }
-                                    if (ic == (int)'"')
-                                    {
-                                        IsInsideQuotes = !IsInsideQuotes;
                                     }
                                     if (!IsInsideElement)
                                     {
