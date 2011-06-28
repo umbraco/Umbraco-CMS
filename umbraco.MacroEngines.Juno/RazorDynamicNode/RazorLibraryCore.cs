@@ -272,6 +272,18 @@ namespace umbraco.MacroEngines.Library
         {
             return Truncate(html.ToHtmlString(), length, addElipsis, treatTagsAsContent);
         }
+        public IHtmlString Truncate(DynamicNull html, int length)
+        {
+            return new HtmlString(string.Empty);
+        }
+        public IHtmlString Truncate(DynamicNull html, int length, bool addElipsis)
+        {
+            return new HtmlString(string.Empty);
+        }
+        public IHtmlString Truncate(DynamicNull html, int length, bool addElipsis, bool treatTagsAsContent)
+        {
+            return new HtmlString(string.Empty);
+        }
         public IHtmlString Truncate(string html, int length)
         {
             return Truncate(html, length, true, false);
@@ -408,6 +420,10 @@ namespace umbraco.MacroEngines.Library
         public string StripHtml(IHtmlString html)
         {
             return StripHtml(html.ToHtmlString());
+        }
+        public string StripHtml(DynamicNull html)
+        {
+            return string.Empty;
         }
         public string StripHtml(string html)
         {
