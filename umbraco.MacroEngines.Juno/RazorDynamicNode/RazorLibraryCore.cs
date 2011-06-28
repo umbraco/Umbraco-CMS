@@ -22,42 +22,42 @@ namespace umbraco.MacroEngines.Library
             this._node = node;
         }
 
-        public DynamicNode NodeById(int Id)
+        public dynamic NodeById(int Id)
         {
             return new DynamicNode(Id);
         }
-        public DynamicNode NodeById(string Id)
+        public dynamic NodeById(string Id)
         {
             return new DynamicNode(Id);
         }
-        public DynamicNode NodeById(object Id)
+        public dynamic NodeById(object Id)
         {
             return new DynamicNode(Id);
         }
-        public DynamicNodeList NodesById(List<object> Ids)
+        public dynamic NodesById(List<object> Ids)
         {
             List<DynamicNode> nodes = new List<DynamicNode>();
             foreach (object eachId in Ids)
                 nodes.Add(new DynamicNode(eachId));
             return new DynamicNodeList(nodes);
         }
-        public DynamicNodeList NodesById(List<int> Ids)
+        public dynamic NodesById(List<int> Ids)
         {
             List<DynamicNode> nodes = new List<DynamicNode>();
             foreach (int eachId in Ids)
                 nodes.Add(new DynamicNode(eachId));
             return new DynamicNodeList(nodes);
         }
-        public DynamicNodeList NodesById(params object[] Ids)
+        public dynamic NodesById(params object[] Ids)
         {
             return NodesById(Ids.ToList());
         }
 
-        public DynamicNode MediaById(int Id)
+        public dynamic MediaById(int Id)
         {
             return new DynamicNode(new DynamicBackingItem(ExamineBackedMedia.GetUmbracoMedia(Id)));
         }
-        public DynamicNode MediaById(string Id)
+        public dynamic MediaById(string Id)
         {
             int mediaId = 0;
             if (int.TryParse(Id, out mediaId))
@@ -66,7 +66,7 @@ namespace umbraco.MacroEngines.Library
             }
             throw new ArgumentException("Cannot get MediaById without an id");
         }
-        public DynamicNode MediaById(object Id)
+        public dynamic MediaById(object Id)
         {
             int mediaId = 0;
             if (int.TryParse(string.Format("{0}", Id), out mediaId))
@@ -75,21 +75,21 @@ namespace umbraco.MacroEngines.Library
             }
             return null;
         }
-        public DynamicNodeList MediaById(List<object> Ids)
+        public dynamic MediaById(List<object> Ids)
         {
             List<DynamicNode> nodes = new List<DynamicNode>();
             foreach (object eachId in Ids)
                 nodes.Add(MediaById(eachId));
             return new DynamicNodeList(nodes);
         }
-        public DynamicNodeList MediaById(List<int> Ids)
+        public dynamic MediaById(List<int> Ids)
         {
             List<DynamicNode> nodes = new List<DynamicNode>();
             foreach (int eachId in Ids)
                 nodes.Add(MediaById(eachId));
             return new DynamicNodeList(nodes);
         }
-        public DynamicNodeList MediaById(params object[] Ids)
+        public dynamic MediaById(params object[] Ids)
         {
             return MediaById(Ids.ToList());
         }
@@ -99,17 +99,17 @@ namespace umbraco.MacroEngines.Library
             return (this as T);
         }
 
-        public DynamicXml ToDynamicXml(string xml)
+        public dynamic ToDynamicXml(string xml)
         {
             if (string.IsNullOrWhiteSpace(xml)) return null;
             var xElement = XElement.Parse(xml);
             return new umbraco.MacroEngines.DynamicXml(xElement);
         }
-        public DynamicXml ToDynamicXml(XElement xElement)
+        public dynamic ToDynamicXml(XElement xElement)
         {
             return new DynamicXml(xElement);
         }
-        public DynamicXml ToDynamicXml(XPathNodeIterator xpni)
+        public dynamic ToDynamicXml(XPathNodeIterator xpni)
         {
             return new DynamicXml(xpni);
         }
