@@ -166,6 +166,10 @@ namespace umbraco.MacroEngines.Library
         {
             return test ? valueIfTrue : valueIfFalse;
         }
+        public string If(bool test, string valueIfTrue)
+        {
+            return test ? valueIfTrue : string.Empty;
+        }
 
         public HtmlTagWrapper Wrap(string tag, string innerText, params HtmlTagWrapperBase[] Children)
         {
