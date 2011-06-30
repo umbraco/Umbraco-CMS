@@ -56,6 +56,10 @@ namespace umbraco.MacroEngines
             }
             throw new ArgumentException("Cannot instantiate a DynamicNode without an id");
         }
+        public DynamicNode(INode Node)
+        {
+            this.n = new DynamicBackingItem(Node);
+        }
         public DynamicNode(object NodeId)
         {
             int DynamicBackingItemId = 0;
@@ -189,7 +193,7 @@ namespace umbraco.MacroEngines
                             //    return new DynamicXml(xElement);
                             //}
                             //convert the NodeFactory nodelist to IEnumerable<DynamicNode> and return it as a DynamicNodeList
-                            return new DynamicNodeList(nodeFactoryNodeList.ConvertAll(nfNode => new DynamicNode(nfNode)));
+                            return new DynamicNodeList(nodeFactoryNodeList.ConvertAll(nfNode => new DynamicNode((INode)nfNode)));
                         }
                         else
                         {
