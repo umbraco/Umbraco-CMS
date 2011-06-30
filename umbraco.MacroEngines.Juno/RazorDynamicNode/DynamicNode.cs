@@ -423,9 +423,10 @@ namespace umbraco.MacroEngines
                         IRazorDataTypeModel razorDataTypeModel = Activator.CreateInstance(dataTypeType, false) as IRazorDataTypeModel;
                         if (razorDataTypeModel != null)
                         {
-                            if (razorDataTypeModel.Init(n.Id, result))
+                            object instance = null;
+                            if (razorDataTypeModel.Init(n.Id, data.Value, out instance))
                             {
-                                result = razorDataTypeModel;
+                                result = instance;
                                 return true;
                             }
                         }

@@ -7,6 +7,6 @@ namespace umbraco.MacroEngines
 {
     public interface IRazorDataTypeModel
     {
-        bool Init(int CurrentNodeId, object PropertyData);
+        bool Init(int CurrentNodeId, string PropertyData, out object instance);
     }
 }
