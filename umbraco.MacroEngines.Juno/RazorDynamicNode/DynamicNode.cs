@@ -517,7 +517,7 @@ namespace umbraco.MacroEngines
 
             //integer
             int iResult = 0;
-            if (int.TryParse(string.Format("{0}", result), out iResult))
+            if (int.TryParse(string.Format("{0}", result), System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture,  out iResult))
             {
                 result = iResult;
                 return true;
@@ -525,7 +525,7 @@ namespace umbraco.MacroEngines
 
             //decimal
             decimal dResult = 0;
-            if (decimal.TryParse(string.Format("{0}", result).Replace(",", "."), out dResult))
+            if (decimal.TryParse(string.Format("{0}", result), System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out dResult))
             {
                 result = dResult;
                 return true;
