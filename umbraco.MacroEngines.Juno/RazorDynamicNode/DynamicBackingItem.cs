@@ -111,14 +111,22 @@ namespace umbraco.MacroEngines
                     else
                     {
                         //reflect
-                        var result = content.GetType().InvokeMember(alias,
-                                                  System.Reflection.BindingFlags.GetProperty |
-                                                  System.Reflection.BindingFlags.Instance |
-                                                  System.Reflection.BindingFlags.Public |
-                                                  System.Reflection.BindingFlags.NonPublic,
-                                                  null,
-                                                  content,
-                                                  null);
+                        object result = null;
+                        try
+                        {
+                            result = content.GetType().InvokeMember(alias,
+                                                      System.Reflection.BindingFlags.GetProperty |
+                                                      System.Reflection.BindingFlags.Instance |
+                                                      System.Reflection.BindingFlags.Public |
+                                                      System.Reflection.BindingFlags.NonPublic,
+                                                      null,
+                                                      content,
+                                                      null);
+                        }
+                        catch (MissingMethodException)
+                        {
+
+                        }
                         if (result != null)
                         {
                             return new PropertyResult(alias, string.Format("{0}", result), Guid.Empty);
@@ -147,15 +155,21 @@ namespace umbraco.MacroEngines
                     }
                     else
                     {
-                        //reflect
-                        var result = content.GetType().InvokeMember(alias,
-                                                  System.Reflection.BindingFlags.GetProperty |
-                                                  System.Reflection.BindingFlags.Instance |
-                                                  System.Reflection.BindingFlags.Public |
-                                                  System.Reflection.BindingFlags.NonPublic,
-                                                  null,
-                                                  content,
-                                                  null);
+                        object result = null;
+                        try
+                        {
+                            result = content.GetType().InvokeMember(alias,
+                                                      System.Reflection.BindingFlags.GetProperty |
+                                                      System.Reflection.BindingFlags.Instance |
+                                                      System.Reflection.BindingFlags.Public |
+                                                      System.Reflection.BindingFlags.NonPublic,
+                                                      null,
+                                                      content,
+                                                      null);
+                        }
+                        catch (MissingMethodException)
+                        {
+                        }
                         if (result != null)
                         {
                             return new PropertyResult(alias, string.Format("{0}", result), Guid.Empty);
