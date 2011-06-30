@@ -193,12 +193,17 @@ namespace umbraco.cms.businesslogic
             }
             finally
             {
-                reader.Close();
+                if (reader != null)
+                {
+                    reader.Close();
+                }
             }
 
             //add to cache
-            _propertyTypeCache.Add(key, controlId);
-
+            if (!_propertyTypeCache.ContainsKey(key))
+            {
+                _propertyTypeCache.Add(key, controlId);
+            }
             return controlId;
 
         }

@@ -396,7 +396,10 @@ namespace umbraco.MacroEngines
                     //special casing for true/false properties
                     //int/decimal are handled by ConvertPropertyValueByDataType
                     //fallback is stringT
-
+                    if (n.NodeTypeAlias == null && data.Alias == null)
+                    {
+                        throw new ArgumentNullException("No node alias or property alias available. Unable to look up the datatype of the property you are trying to fetch.");
+                    }
                     Guid dataType = ContentType.GetDataType(n.NodeTypeAlias, data.Alias);
 
                     if (RazorDataTypeModelTypes == null)
