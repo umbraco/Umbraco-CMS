@@ -84,6 +84,7 @@ namespace umbraco.MacroEngines
             var elements = BaseElement.Elements(binder.Name);
             if (elements.Count() == 0 && BaseElement.Name == "root" && BaseElement.Elements().Count() == 1)
             {
+                //no elements matched, lets try first child
                 elements = BaseElement.Elements().ElementAt(0).Elements(binder.Name);
             }
             if (HandleIEnumerableXElement(elements, out result))
@@ -94,7 +95,7 @@ namespace umbraco.MacroEngines
             {
 
                 //Ok, so no elements matched, so lets try attributes
-                var attributes = BaseElement.Attributes(binder.Name).Select(attr => attr.Value);
+                IEnumerable<string> attributes = BaseElement.Attributes(binder.Name).Select(attr => attr.Value);
                 int count = attributes.Count();
 
                 if (count > 0)
@@ -105,6 +106,21 @@ namespace umbraco.MacroEngines
                         result = attributes.FirstOrDefault(); //only one attribute matched, lets just return it
 
                     return true; // return true because we matched
+                }
+                else
+                {
+                    //no attributes matched, lets try first child
+                    if (BaseElement.Name == "root" && BaseElement.Elements().Count() == 1)
+                    {
+                        attributes = BaseElement.Elements().ElementAt(0).Attributes(binder.Name).Select(attr => attr.Value);
+                        count = attributes.Count();
+                        if (count > 1)
+                            result = attributes; //more than one attribute matched, lets return the collection
+                        else
+                            result = attributes.FirstOrDefault(); //only one attribute matched, lets just return it
+
+                        return true; // return true because we matched
+                    }
                 }
             }
             return base.TryGetMember(binder, out result);
