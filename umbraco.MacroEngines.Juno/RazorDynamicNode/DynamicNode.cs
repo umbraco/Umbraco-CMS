@@ -406,7 +406,9 @@ namespace umbraco.MacroEngines
                     {
                         throw new ArgumentNullException("No node alias or property alias available. Unable to look up the datatype of the property you are trying to fetch.");
                     }
-                    Guid dataType = ContentType.GetDataType(n.NodeTypeAlias, data.Alias);
+
+                    //contextAlias is the node which the property data was returned from
+                    Guid dataType = ContentType.GetDataType(data.ContextAlias, data.Alias);
 
                     if (RazorDataTypeModelTypes == null)
                     {
@@ -421,7 +423,12 @@ namespace umbraco.MacroEngines
                             Guid g = RazorDataTypeModelAttribute.DataTypeEditorId;
                             return new KeyValuePair<Guid, Type>(g, type);
                         })
-                        .ForEach(item => RazorDataTypeModelTypes.Add(item.Key, item.Value));
+                        .ForEach(item => {
+                            if(!RazorDataTypeModelTypes.ContainsKey(item.Key))
+                            {
+                                RazorDataTypeModelTypes.Add(item.Key, item.Value);
+                            }
+                        });
                     }
                     if (RazorDataTypeModelTypes.ContainsKey(dataType))
                     {

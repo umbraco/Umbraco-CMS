@@ -57,5 +57,8 @@ namespace umbraco.MacroEngines
         {
             return !string.IsNullOrWhiteSpace(Value);
         }
+
+        public int ContextId { get; set; }
+        public string ContextAlias { get; set; }
     }
 }

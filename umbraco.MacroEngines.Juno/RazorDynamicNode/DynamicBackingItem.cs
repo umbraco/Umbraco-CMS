@@ -78,7 +78,7 @@ namespace umbraco.MacroEngines
             }
         }
 
-        public IProperty GetProperty(string alias)
+        public PropertyResult GetProperty(string alias)
         {
             if (IsNull()) return null;
             if (Type == DynamicBackingItemType.Content)
@@ -91,13 +91,13 @@ namespace umbraco.MacroEngines
             }
         }
 
-        private IProperty GetPropertyInternal(string alias, INode content)
+        private PropertyResult GetPropertyInternal(string alias, INode content)
         {
             bool propertyExists = false;
             var prop = content.GetProperty(alias, out propertyExists);
             if (prop != null)
             {
-                return new PropertyResult(prop);
+                return new PropertyResult(prop) { ContextAlias = content.NodeTypeAlias, ContextId = content.Id };
             }
             else
             {
@@ -106,7 +106,7 @@ namespace umbraco.MacroEngines
                     prop = content.GetProperty(alias.Substring(0, 1).ToLower() + alias.Substring((1)), out propertyExists);
                     if (prop != null)
                     {
-                        return new PropertyResult(prop);
+                        return new PropertyResult(prop) { ContextAlias = content.NodeTypeAlias, ContextId = content.Id };
                     }
                     else
                     {
@@ -129,20 +129,20 @@ namespace umbraco.MacroEngines
                         }
                         if (result != null)
                         {
-                            return new PropertyResult(alias, string.Format("{0}", result), Guid.Empty);
+                            return new PropertyResult(alias, string.Format("{0}", result), Guid.Empty) { ContextAlias = content.NodeTypeAlias, ContextId = content.Id };
                         }
                     }
                 }
             }
             return null;
         }
-        private IProperty GetPropertyInternal(string alias, ExamineBackedMedia content)
+        private PropertyResult GetPropertyInternal(string alias, ExamineBackedMedia content)
         {
             bool propertyExists = false;
             var prop = content.GetProperty(alias, out propertyExists);
             if (prop != null)
             {
-                return new PropertyResult(prop);
+                return new PropertyResult(prop) { ContextAlias = content.NodeTypeAlias, ContextId = content.Id };
             }
             else
             {
@@ -151,7 +151,7 @@ namespace umbraco.MacroEngines
                     prop = content.GetProperty(alias.Substring(0, 1).ToLower() + alias.Substring((1)), out propertyExists);
                     if (prop != null)
                     {
-                        return new PropertyResult(prop);
+                        return new PropertyResult(prop) { ContextAlias = content.NodeTypeAlias, ContextId = content.Id };
                     }
                     else
                     {
@@ -172,36 +172,51 @@ namespace umbraco.MacroEngines
                         }
                         if (result != null)
                         {
-                            return new PropertyResult(alias, string.Format("{0}", result), Guid.Empty);
+                            return new PropertyResult(alias, string.Format("{0}", result), Guid.Empty) { ContextAlias = content.NodeTypeAlias, ContextId = content.Id };
                         }
                     }
                 }
             }
             return null;
         }
-        public IProperty GetProperty(string alias, out bool propertyExists)
+        public PropertyResult GetProperty(string alias, out bool propertyExists)
         {
             if (IsNull())
             {
                 propertyExists = false;
                 return null;
             }
+            PropertyResult property = null;
+            IProperty innerProperty = null;
             if (Type == DynamicBackingItemType.Content)
             {
-                return content.GetProperty(alias, out propertyExists);
+                innerProperty = content.GetProperty(alias, out propertyExists);
+                if (innerProperty != null)
+                {
+                    property = new PropertyResult(innerProperty);
+                    property.ContextAlias = content.NodeTypeAlias;
+                    property.ContextId = content.Id;
+                }
             }
             else
             {
-                return media.GetProperty(alias, out propertyExists);
+                innerProperty = media.GetProperty(alias, out propertyExists);
+                if (innerProperty != null)
+                {
+                    property = new PropertyResult(innerProperty);
+                    property.ContextAlias = media.NodeTypeAlias;
+                    property.ContextId = media.Id;
+                }
             }
+            return property;
         }
 
-        public IProperty GetProperty(string alias, bool recursive)
+        public PropertyResult GetProperty(string alias, bool recursive)
         {
             bool propertyExists = false;
             return GetProperty(alias, recursive, out propertyExists);
         }
-        public IProperty GetProperty(string alias, bool recursive, out bool propertyExists)
+        public PropertyResult GetProperty(string alias, bool recursive, out bool propertyExists)
         {
             if (!recursive)
             {
@@ -213,7 +228,7 @@ namespace umbraco.MacroEngines
                 return null;
             }
             DynamicBackingItem context = this;
-            IProperty prop = this.GetProperty(alias, out propertyExists);
+            PropertyResult prop = this.GetProperty(alias, out propertyExists);
             while (prop == null || string.IsNullOrEmpty(prop.Value))
             {
                 context = context.Parent;
