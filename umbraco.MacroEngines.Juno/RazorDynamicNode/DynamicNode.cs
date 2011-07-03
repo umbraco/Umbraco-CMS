@@ -423,8 +423,9 @@ namespace umbraco.MacroEngines
                             Guid g = RazorDataTypeModelAttribute.DataTypeEditorId;
                             return new KeyValuePair<Guid, Type>(g, type);
                         })
-                        .ForEach(item => {
-                            if(!RazorDataTypeModelTypes.ContainsKey(item.Key))
+                        .ForEach(item =>
+                        {
+                            if (!RazorDataTypeModelTypes.ContainsKey(item.Key))
                             {
                                 RazorDataTypeModelTypes.Add(item.Key, item.Value);
                             }
