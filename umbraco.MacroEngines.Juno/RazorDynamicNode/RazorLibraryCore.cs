@@ -162,13 +162,13 @@ namespace umbraco.MacroEngines.Library
             return string.Join(seperator, results);
         }
 
-        public string If(bool test, string valueIfTrue, string valueIfFalse)
+        public HtmlString If(bool test, string valueIfTrue, string valueIfFalse)
         {
-            return test ? valueIfTrue : valueIfFalse;
+            return test ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
         }
-        public string If(bool test, string valueIfTrue)
+        public HtmlString If(bool test, string valueIfTrue)
         {
-            return test ? valueIfTrue : string.Empty;
+            return test ? new HtmlString(valueIfTrue) : new HtmlString(string.Empty);
         }
 
         public HtmlTagWrapper Wrap(string tag, string innerText, params HtmlTagWrapperBase[] Children)
