@@ -198,15 +198,27 @@ namespace umbraco.MacroEngines
 
         public IProperty GetProperty(string alias, bool recursive)
         {
-            if (!recursive) return GetProperty(alias);
-            if (IsNull()) return null;
+            bool propertyExists = false;
+            return GetProperty(alias, recursive, out propertyExists);
+        }
+        public IProperty GetProperty(string alias, bool recursive, out bool propertyExists)
+        {
+            if (!recursive)
+            {
+                return GetProperty(alias, out propertyExists);
+            }
+            if (IsNull())
+            {
+                propertyExists = false;
+                return null;
+            }
             DynamicBackingItem context = this;
-            IProperty prop = this.GetProperty(alias);
-            while (prop == null)
+            IProperty prop = this.GetProperty(alias, out propertyExists);
+            while (prop == null || string.IsNullOrEmpty(prop.Value))
             {
                 context = context.Parent;
-                prop = context.GetProperty(alias);
                 if (context == null) break;
+                prop = context.GetProperty(alias, out propertyExists);
             }
             if (prop != null)
             {

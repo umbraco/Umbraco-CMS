@@ -383,11 +383,17 @@ namespace umbraco.MacroEngines
             bool propertyExists = false;
             if (n != null)
             {
-                var data = n.GetProperty(name, out propertyExists);
+                bool recursive = false;
+                if (name.StartsWith("_"))
+                {
+                    name = name.Substring(1, name.Length - 1);
+                    recursive = true;
+                }
+                var data = n.GetProperty(name, recursive, out propertyExists);
                 // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
                 if (data == null && name.Substring(0, 1).ToUpper() == name.Substring(0, 1) && !propertyExists)
                 {
-                    data = n.GetProperty(name.Substring(0, 1).ToLower() + name.Substring((1)), out propertyExists);
+                    data = n.GetProperty(name.Substring(0, 1).ToLower() + name.Substring((1)), recursive, out propertyExists);
                 }
 
                 if (data != null)
@@ -517,7 +523,7 @@ namespace umbraco.MacroEngines
 
             //integer
             int iResult = 0;
-            if (int.TryParse(string.Format("{0}", result), System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture,  out iResult))
+            if (int.TryParse(string.Format("{0}", result), System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out iResult))
             {
                 result = iResult;
                 return true;
