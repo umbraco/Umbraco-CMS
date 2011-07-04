@@ -27,7 +27,7 @@ namespace umbraco.MacroEngines
                 .Search(filter.Compile());
             if (results.Any())
             {
-              return new ExamineBackedMedia(results.First());
+                return new ExamineBackedMedia(results.First());
             }
 
             var media = umbraco.library.GetMedia(id, true);
@@ -156,7 +156,7 @@ namespace umbraco.MacroEngines
             get
             {
                 string value = null;
-                if (Values.TryGetValue("__NodeTypeAlias", out value))
+                if (Values.TryGetValue("nodeTypeAlias", out value))
                 {
                     return value;
                 }
