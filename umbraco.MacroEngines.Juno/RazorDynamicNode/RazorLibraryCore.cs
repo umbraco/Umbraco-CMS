@@ -32,6 +32,10 @@ namespace umbraco.MacroEngines.Library
         }
         public dynamic NodeById(object Id)
         {
+            if (Id.GetType() == typeof(DynamicNull))
+            {
+                return Id;
+            }
             return new DynamicNode(Id);
         }
         public dynamic NodesById(List<object> Ids)
@@ -68,6 +72,10 @@ namespace umbraco.MacroEngines.Library
         }
         public dynamic MediaById(object Id)
         {
+            if (Id.GetType() == typeof(DynamicNull))
+            {
+                return Id;
+            }
             int mediaId = 0;
             if (int.TryParse(string.Format("{0}", Id), out mediaId))
             {
