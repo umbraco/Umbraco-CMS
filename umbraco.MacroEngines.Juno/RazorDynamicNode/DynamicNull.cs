@@ -47,5 +47,9 @@ namespace umbraco.MacroEngines
         {
             return false;
         }
+        public static implicit operator bool(DynamicNull n)
+        {
+            return false;
+        }
     }
 }
