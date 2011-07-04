@@ -1191,11 +1191,11 @@ namespace umbraco.MacroEngines
         {
             return IsHelper(n => n.Index() == 0);
         }
-        public string IsFirst(string valueIfTrue)
+        public HtmlString IsFirst(string valueIfTrue)
         {
             return IsHelper(n => n.Index() == 0, valueIfTrue);
         }
-        public string IsFirst(string valueIfTrue, string valueIfFalse)
+        public HtmlString IsFirst(string valueIfTrue, string valueIfFalse)
         {
             return IsHelper(n => n.Index() == 0, valueIfTrue, valueIfFalse);
         }
@@ -1203,11 +1203,11 @@ namespace umbraco.MacroEngines
         {
             return !IsHelper(n => n.Index() == 0);
         }
-        public string IsNotFirst(string valueIfTrue)
+        public HtmlString IsNotFirst(string valueIfTrue)
         {
             return IsHelper(n => n.Index() != 0, valueIfTrue);
         }
-        public string IsNotFirst(string valueIfTrue, string valueIfFalse)
+        public HtmlString IsNotFirst(string valueIfTrue, string valueIfFalse)
         {
             return IsHelper(n => n.Index() != 0, valueIfTrue, valueIfFalse);
         }
@@ -1219,19 +1219,19 @@ namespace umbraco.MacroEngines
             }
             return IsHelper(n => n.Index() == index);
         }
-        public string IsPosition(int index, string valueIfTrue)
+        public HtmlString IsPosition(int index, string valueIfTrue)
         {
             if (this.ownerList == null)
             {
-                return string.Empty;
+                return new HtmlString(string.Empty);
             }
             return IsHelper(n => n.Index() == index, valueIfTrue);
         }
-        public string IsPosition(int index, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsPosition(int index, string valueIfTrue, string valueIfFalse)
         {
             if (this.ownerList == null)
             {
-                return valueIfFalse;
+                return new HtmlString(valueIfFalse);
             }
             return IsHelper(n => n.Index() == index, valueIfTrue, valueIfFalse);
         }
@@ -1243,19 +1243,19 @@ namespace umbraco.MacroEngines
             }
             return IsHelper(n => n.Index() % modulus == 0);
         }
-        public string IsModZero(int modulus, string valueIfTrue)
+        public HtmlString IsModZero(int modulus, string valueIfTrue)
         {
             if (this.ownerList == null)
             {
-                return string.Empty;
+                return new HtmlString(string.Empty);
             }
             return IsHelper(n => n.Index() % modulus == 0, valueIfTrue);
         }
-        public string IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
             if (this.ownerList == null)
             {
-                return valueIfFalse;
+                return new HtmlString(valueIfFalse);
             }
             return IsHelper(n => n.Index() % modulus == 0, valueIfTrue, valueIfFalse);
         }
@@ -1268,19 +1268,19 @@ namespace umbraco.MacroEngines
             }
             return IsHelper(n => n.Index() % modulus != 0);
         }
-        public string IsNotModZero(int modulus, string valueIfTrue)
+        public HtmlString IsNotModZero(int modulus, string valueIfTrue)
         {
             if (this.ownerList == null)
             {
-                return string.Empty;
+                return new HtmlString(string.Empty);
             }
             return IsHelper(n => n.Index() % modulus != 0, valueIfTrue);
         }
-        public string IsNotModZero(int modulus, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsNotModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
             if (this.ownerList == null)
             {
-                return valueIfFalse;
+                return new HtmlString(valueIfFalse);
             }
             return IsHelper(n => n.Index() % modulus != 0, valueIfTrue, valueIfFalse);
         }
@@ -1292,19 +1292,19 @@ namespace umbraco.MacroEngines
             }
             return !IsHelper(n => n.Index() == index);
         }
-        public string IsNotPosition(int index, string valueIfTrue)
+        public HtmlString IsNotPosition(int index, string valueIfTrue)
         {
             if (this.ownerList == null)
             {
-                return string.Empty;
+                return new HtmlString(string.Empty);
             }
             return IsHelper(n => n.Index() != index, valueIfTrue);
         }
-        public string IsNotPosition(int index, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsNotPosition(int index, string valueIfTrue, string valueIfFalse)
         {
             if (this.ownerList == null)
             {
-                return valueIfFalse;
+                return new HtmlString(valueIfFalse);
             }
             return IsHelper(n => n.Index() != index, valueIfTrue, valueIfFalse);
         }
@@ -1317,20 +1317,20 @@ namespace umbraco.MacroEngines
             int count = this.ownerList.Items.Count;
             return IsHelper(n => n.Index() == count - 1);
         }
-        public string IsLast(string valueIfTrue)
+        public HtmlString IsLast(string valueIfTrue)
         {
             if (this.ownerList == null)
             {
-                return string.Empty;
+                return new HtmlString(string.Empty);
             }
             int count = this.ownerList.Items.Count;
             return IsHelper(n => n.Index() == count - 1, valueIfTrue);
         }
-        public string IsLast(string valueIfTrue, string valueIfFalse)
+        public HtmlString IsLast(string valueIfTrue, string valueIfFalse)
         {
             if (this.ownerList == null)
             {
-                return valueIfFalse;
+                return new HtmlString(valueIfFalse);
             }
             int count = this.ownerList.Items.Count;
             return IsHelper(n => n.Index() == count - 1, valueIfTrue, valueIfFalse);
@@ -1344,20 +1344,20 @@ namespace umbraco.MacroEngines
             int count = this.ownerList.Items.Count;
             return !IsHelper(n => n.Index() == count - 1);
         }
-        public string IsNotLast(string valueIfTrue)
+        public HtmlString IsNotLast(string valueIfTrue)
         {
             if (this.ownerList == null)
             {
-                return string.Empty;
+                return new HtmlString(string.Empty);
             }
             int count = this.ownerList.Items.Count;
             return IsHelper(n => n.Index() != count - 1, valueIfTrue);
         }
-        public string IsNotLast(string valueIfTrue, string valueIfFalse)
+        public HtmlString IsNotLast(string valueIfTrue, string valueIfFalse)
         {
             if (this.ownerList == null)
             {
-                return valueIfFalse;
+                return new HtmlString(valueIfFalse);
             }
             int count = this.ownerList.Items.Count;
             return IsHelper(n => n.Index() != count - 1, valueIfTrue, valueIfFalse);
@@ -1366,11 +1366,11 @@ namespace umbraco.MacroEngines
         {
             return IsHelper(n => n.Index() % 2 == 0);
         }
-        public string IsEven(string valueIfTrue)
+        public HtmlString IsEven(string valueIfTrue)
         {
             return IsHelper(n => n.Index() % 2 == 0, valueIfTrue);
         }
-        public string IsEven(string valueIfTrue, string valueIfFalse)
+        public HtmlString IsEven(string valueIfTrue, string valueIfFalse)
         {
             return IsHelper(n => n.Index() % 2 == 0, valueIfTrue, valueIfFalse);
         }
@@ -1378,11 +1378,11 @@ namespace umbraco.MacroEngines
         {
             return IsHelper(n => n.Index() % 2 == 1);
         }
-        public string IsOdd(string valueIfTrue)
+        public HtmlString IsOdd(string valueIfTrue)
         {
             return IsHelper(n => n.Index() % 2 == 1, valueIfTrue);
         }
-        public string IsOdd(string valueIfTrue, string valueIfFalse)
+        public HtmlString IsOdd(string valueIfTrue, string valueIfFalse)
         {
             return IsHelper(n => n.Index() % 2 == 1, valueIfTrue, valueIfFalse);
         }
@@ -1390,11 +1390,11 @@ namespace umbraco.MacroEngines
         {
             return IsHelper(n => n.Id == other.Id);
         }
-        public string IsEqual(DynamicNode other, string valueIfTrue)
+        public HtmlString IsEqual(DynamicNode other, string valueIfTrue)
         {
             return IsHelper(n => n.Id == other.Id, valueIfTrue);
         }
-        public string IsEqual(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsEqual(DynamicNode other, string valueIfTrue, string valueIfFalse)
         {
             return IsHelper(n => n.Id == other.Id, valueIfTrue, valueIfFalse);
         }
@@ -1402,11 +1402,11 @@ namespace umbraco.MacroEngines
         {
             return IsHelper(n => n.Id != other.Id);
         }
-        public string IsNotEqual(DynamicNode other, string valueIfTrue)
+        public HtmlString IsNotEqual(DynamicNode other, string valueIfTrue)
         {
             return IsHelper(n => n.Id != other.Id, valueIfTrue);
         }
-        public string IsNotEqual(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsNotEqual(DynamicNode other, string valueIfTrue, string valueIfFalse)
         {
             return IsHelper(n => n.Id != other.Id, valueIfTrue, valueIfFalse);
         }
@@ -1415,12 +1415,12 @@ namespace umbraco.MacroEngines
             var ancestors = this.Ancestors();
             return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null);
         }
-        public string IsDescendant(DynamicNode other, string valueIfTrue)
+        public HtmlString IsDescendant(DynamicNode other, string valueIfTrue)
         {
             var ancestors = this.Ancestors();
             return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue);
         }
-        public string IsDescendant(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsDescendant(DynamicNode other, string valueIfTrue, string valueIfFalse)
         {
             var ancestors = this.Ancestors();
             return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue, valueIfFalse);
@@ -1430,12 +1430,12 @@ namespace umbraco.MacroEngines
             var ancestors = this.AncestorsOrSelf();
             return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null);
         }
-        public string IsDescendantOrSelf(DynamicNode other, string valueIfTrue)
+        public HtmlString IsDescendantOrSelf(DynamicNode other, string valueIfTrue)
         {
             var ancestors = this.AncestorsOrSelf();
             return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue);
         }
-        public string IsDescendantOrSelf(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsDescendantOrSelf(DynamicNode other, string valueIfTrue, string valueIfFalse)
         {
             var ancestors = this.AncestorsOrSelf();
             return IsHelper(n => ancestors.Items.Find(ancestor => ancestor.Id == other.Id) != null, valueIfTrue, valueIfFalse);
@@ -1445,12 +1445,12 @@ namespace umbraco.MacroEngines
             var descendants = this.Descendants();
             return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null);
         }
-        public string IsAncestor(DynamicNode other, string valueIfTrue)
+        public HtmlString IsAncestor(DynamicNode other, string valueIfTrue)
         {
             var descendants = this.Descendants();
             return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue);
         }
-        public string IsAncestor(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsAncestor(DynamicNode other, string valueIfTrue, string valueIfFalse)
         {
             var descendants = this.Descendants();
             return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
@@ -1460,12 +1460,12 @@ namespace umbraco.MacroEngines
             var descendants = this.DescendantsOrSelf();
             return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null);
         }
-        public string IsAncestorOrSelf(DynamicNode other, string valueIfTrue)
+        public HtmlString IsAncestorOrSelf(DynamicNode other, string valueIfTrue)
         {
             var descendants = this.DescendantsOrSelf();
             return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue);
         }
-        public string IsAncestorOrSelf(DynamicNode other, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsAncestorOrSelf(DynamicNode other, string valueIfTrue, string valueIfFalse)
         {
             var descendants = this.DescendantsOrSelf();
             return IsHelper(n => descendants.Items.Find(descendant => descendant.Id == other.Id) != null, valueIfTrue, valueIfFalse);
@@ -1474,25 +1474,25 @@ namespace umbraco.MacroEngines
         {
             return test(this);
         }
-        public string IsHelper(Func<DynamicNode, bool> test, string valueIfTrue)
+        public HtmlString IsHelper(Func<DynamicNode, bool> test, string valueIfTrue)
         {
             return IsHelper(test, valueIfTrue, string.Empty);
         }
-        public string IsHelper(Func<DynamicNode, bool> test, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsHelper(Func<DynamicNode, bool> test, string valueIfTrue, string valueIfFalse)
         {
-            return test(this) ? valueIfTrue : valueIfFalse;
+            return test(this) ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
         }
-        public string Where(string predicate, string valueIfTrue)
+        public HtmlString Where(string predicate, string valueIfTrue)
         {
             return Where(predicate, valueIfTrue, string.Empty);
         }
-        public string Where(string predicate, string valueIfTrue, string valueIfFalse)
+        public HtmlString Where(string predicate, string valueIfTrue, string valueIfFalse)
         {
             if (Where(predicate))
             {
-                return valueIfTrue;
+                return new HtmlString(valueIfTrue);
             }
-            return valueIfFalse;
+            return new HtmlString(valueIfFalse);
         }
         public bool Where(string predicate)
         {

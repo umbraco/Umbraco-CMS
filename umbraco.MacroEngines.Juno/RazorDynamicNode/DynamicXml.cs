@@ -204,11 +204,11 @@ namespace umbraco.MacroEngines
         {
             return IsHelper(n => n.Index() == 0);
         }
-        public string IsFirst(string valueIfTrue)
+        public HtmlString IsFirst(string valueIfTrue)
         {
             return IsHelper(n => n.Index() == 0, valueIfTrue);
         }
-        public string IsFirst(string valueIfTrue, string valueIfFalse)
+        public HtmlString IsFirst(string valueIfTrue, string valueIfFalse)
         {
             return IsHelper(n => n.Index() == 0, valueIfTrue, valueIfFalse);
         }
@@ -216,11 +216,11 @@ namespace umbraco.MacroEngines
         {
             return !IsHelper(n => n.Index() == 0);
         }
-        public string IsNotFirst(string valueIfTrue)
+        public HtmlString IsNotFirst(string valueIfTrue)
         {
             return IsHelper(n => n.Index() != 0, valueIfTrue);
         }
-        public string IsNotFirst(string valueIfTrue, string valueIfFalse)
+        public HtmlString IsNotFirst(string valueIfTrue, string valueIfFalse)
         {
             return IsHelper(n => n.Index() != 0, valueIfTrue, valueIfFalse);
         }
@@ -232,19 +232,19 @@ namespace umbraco.MacroEngines
             }
             return IsHelper(n => n.Index() == index);
         }
-        public string IsPosition(int index, string valueIfTrue)
+        public HtmlString IsPosition(int index, string valueIfTrue)
         {
             if (this.BaseElement == null || this.BaseElement.Parent == null)
             {
-                return string.Empty;
+                return new HtmlString(string.Empty);
             }
             return IsHelper(n => n.Index() == index, valueIfTrue);
         }
-        public string IsPosition(int index, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsPosition(int index, string valueIfTrue, string valueIfFalse)
         {
             if (this.BaseElement == null || this.BaseElement.Parent == null)
             {
-                return valueIfFalse;
+                return new HtmlString(valueIfFalse);
             }
             return IsHelper(n => n.Index() == index, valueIfTrue, valueIfFalse);
         }
@@ -256,19 +256,19 @@ namespace umbraco.MacroEngines
             }
             return IsHelper(n => n.Index() % modulus == 0);
         }
-        public string IsModZero(int modulus, string valueIfTrue)
+        public HtmlString IsModZero(int modulus, string valueIfTrue)
         {
             if (this.BaseElement == null || this.BaseElement.Parent == null)
             {
-                return string.Empty;
+                return new HtmlString(string.Empty);
             }
             return IsHelper(n => n.Index() % modulus == 0, valueIfTrue);
         }
-        public string IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
             if (this.BaseElement == null || this.BaseElement.Parent == null)
             {
-                return valueIfFalse;
+                return new HtmlString(valueIfFalse);
             }
             return IsHelper(n => n.Index() % modulus == 0, valueIfTrue, valueIfFalse);
         }
@@ -281,19 +281,19 @@ namespace umbraco.MacroEngines
             }
             return IsHelper(n => n.Index() % modulus != 0);
         }
-        public string IsNotModZero(int modulus, string valueIfTrue)
+        public HtmlString IsNotModZero(int modulus, string valueIfTrue)
         {
             if (this.BaseElement == null || this.BaseElement.Parent == null)
             {
-                return string.Empty;
+                return new HtmlString(string.Empty);
             }
             return IsHelper(n => n.Index() % modulus != 0, valueIfTrue);
         }
-        public string IsNotModZero(int modulus, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsNotModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
             if (this.BaseElement == null || this.BaseElement.Parent == null)
             {
-                return valueIfFalse;
+                return new HtmlString(valueIfFalse);
             }
             return IsHelper(n => n.Index() % modulus != 0, valueIfTrue, valueIfFalse);
         }
@@ -305,19 +305,19 @@ namespace umbraco.MacroEngines
             }
             return !IsHelper(n => n.Index() == index);
         }
-        public string IsNotPosition(int index, string valueIfTrue)
+        public HtmlString IsNotPosition(int index, string valueIfTrue)
         {
             if (this.BaseElement == null || this.BaseElement.Parent == null)
             {
-                return string.Empty;
+                return new HtmlString(string.Empty);
             }
             return IsHelper(n => n.Index() != index, valueIfTrue);
         }
-        public string IsNotPosition(int index, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsNotPosition(int index, string valueIfTrue, string valueIfFalse)
         {
             if (this.BaseElement == null || this.BaseElement.Parent == null)
             {
-                return valueIfFalse;
+                return new HtmlString(valueIfFalse);
             }
             return IsHelper(n => n.Index() != index, valueIfTrue, valueIfFalse);
         }
@@ -330,20 +330,20 @@ namespace umbraco.MacroEngines
             int count = this.BaseElement.Parent.Elements().Count();
             return IsHelper(n => n.Index() == count - 1);
         }
-        public string IsLast(string valueIfTrue)
+        public HtmlString IsLast(string valueIfTrue)
         {
             if (this.BaseElement == null || this.BaseElement.Parent == null)
             {
-                return string.Empty;
+                return new HtmlString(string.Empty);
             }
             int count = this.BaseElement.Parent.Elements().Count();
             return IsHelper(n => n.Index() == count - 1, valueIfTrue);
         }
-        public string IsLast(string valueIfTrue, string valueIfFalse)
+        public HtmlString IsLast(string valueIfTrue, string valueIfFalse)
         {
             if (this.BaseElement == null || this.BaseElement.Parent == null)
             {
-                return valueIfFalse;
+                return new HtmlString(valueIfFalse);
             }
             int count = this.BaseElement.Parent.Elements().Count();
             return IsHelper(n => n.Index() == count - 1, valueIfTrue, valueIfFalse);
@@ -357,20 +357,20 @@ namespace umbraco.MacroEngines
             int count = this.BaseElement.Parent.Elements().Count();
             return !IsHelper(n => n.Index() == count - 1);
         }
-        public string IsNotLast(string valueIfTrue)
+        public HtmlString IsNotLast(string valueIfTrue)
         {
             if (this.BaseElement == null || this.BaseElement.Parent == null)
             {
-                return string.Empty;
+                return new HtmlString(string.Empty);
             }
             int count = this.BaseElement.Parent.Elements().Count();
             return IsHelper(n => n.Index() != count - 1, valueIfTrue);
         }
-        public string IsNotLast(string valueIfTrue, string valueIfFalse)
+        public HtmlString IsNotLast(string valueIfTrue, string valueIfFalse)
         {
             if (this.BaseElement == null || this.BaseElement.Parent == null)
             {
-                return valueIfFalse;
+                return new HtmlString(valueIfFalse);
             }
             int count = this.BaseElement.Parent.Elements().Count();
             return IsHelper(n => n.Index() != count - 1, valueIfTrue, valueIfFalse);
@@ -379,11 +379,11 @@ namespace umbraco.MacroEngines
         {
             return IsHelper(n => n.Index() % 2 == 0);
         }
-        public string IsEven(string valueIfTrue)
+        public HtmlString IsEven(string valueIfTrue)
         {
             return IsHelper(n => n.Index() % 2 == 0, valueIfTrue);
         }
-        public string IsEven(string valueIfTrue, string valueIfFalse)
+        public HtmlString IsEven(string valueIfTrue, string valueIfFalse)
         {
             return IsHelper(n => n.Index() % 2 == 0, valueIfTrue, valueIfFalse);
         }
@@ -391,11 +391,11 @@ namespace umbraco.MacroEngines
         {
             return IsHelper(n => n.Index() % 2 == 1);
         }
-        public string IsOdd(string valueIfTrue)
+        public HtmlString IsOdd(string valueIfTrue)
         {
             return IsHelper(n => n.Index() % 2 == 1, valueIfTrue);
         }
-        public string IsOdd(string valueIfTrue, string valueIfFalse)
+        public HtmlString IsOdd(string valueIfTrue, string valueIfFalse)
         {
             return IsHelper(n => n.Index() % 2 == 1, valueIfTrue, valueIfFalse);
         }
@@ -403,11 +403,11 @@ namespace umbraco.MacroEngines
         {
             return IsHelper(n => n.BaseElement == other.BaseElement);
         }
-        public string IsEqual(DynamicXml other, string valueIfTrue)
+        public HtmlString IsEqual(DynamicXml other, string valueIfTrue)
         {
             return IsHelper(n => n.BaseElement == other.BaseElement, valueIfTrue);
         }
-        public string IsEqual(DynamicXml other, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsEqual(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
             return IsHelper(n => n.BaseElement == other.BaseElement, valueIfTrue, valueIfFalse);
         }
@@ -415,11 +415,11 @@ namespace umbraco.MacroEngines
         {
             return IsHelper(n => n.BaseElement != other.BaseElement);
         }
-        public string IsNotEqual(DynamicXml other, string valueIfTrue)
+        public HtmlString IsNotEqual(DynamicXml other, string valueIfTrue)
         {
             return IsHelper(n => n.BaseElement != other.BaseElement, valueIfTrue);
         }
-        public string IsNotEqual(DynamicXml other, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsNotEqual(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
             return IsHelper(n => n.BaseElement != other.BaseElement, valueIfTrue, valueIfFalse);
         }
@@ -428,12 +428,12 @@ namespace umbraco.MacroEngines
             var ancestors = this.Ancestors();
             return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null);
         }
-        public string IsDescendant(DynamicXml other, string valueIfTrue)
+        public HtmlString IsDescendant(DynamicXml other, string valueIfTrue)
         {
             var ancestors = this.Ancestors();
             return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue);
         }
-        public string IsDescendant(DynamicXml other, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsDescendant(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
             var ancestors = this.Ancestors();
             return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
@@ -443,12 +443,12 @@ namespace umbraco.MacroEngines
             var ancestors = this.AncestorsOrSelf();
             return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null);
         }
-        public string IsDescendantOrSelf(DynamicXml other, string valueIfTrue)
+        public HtmlString IsDescendantOrSelf(DynamicXml other, string valueIfTrue)
         {
             var ancestors = this.AncestorsOrSelf();
             return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue);
         }
-        public string IsDescendantOrSelf(DynamicXml other, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsDescendantOrSelf(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
             var ancestors = this.AncestorsOrSelf();
             return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
@@ -458,12 +458,12 @@ namespace umbraco.MacroEngines
             var descendants = this.Descendants();
             return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null);
         }
-        public string IsAncestor(DynamicXml other, string valueIfTrue)
+        public HtmlString IsAncestor(DynamicXml other, string valueIfTrue)
         {
             var descendants = this.Descendants();
             return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue);
         }
-        public string IsAncestor(DynamicXml other, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsAncestor(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
             var descendants = this.Descendants();
             return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
@@ -473,12 +473,12 @@ namespace umbraco.MacroEngines
             var descendants = this.DescendantsOrSelf();
             return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null);
         }
-        public string IsAncestorOrSelf(DynamicXml other, string valueIfTrue)
+        public HtmlString IsAncestorOrSelf(DynamicXml other, string valueIfTrue)
         {
             var descendants = this.DescendantsOrSelf();
             return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue);
         }
-        public string IsAncestorOrSelf(DynamicXml other, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsAncestorOrSelf(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
             var descendants = this.DescendantsOrSelf();
             return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
@@ -596,13 +596,13 @@ namespace umbraco.MacroEngines
         {
             return test(this);
         }
-        public string IsHelper(Func<DynamicXml, bool> test, string valueIfTrue)
+        public HtmlString IsHelper(Func<DynamicXml, bool> test, string valueIfTrue)
         {
             return IsHelper(test, valueIfTrue, string.Empty);
         }
-        public string IsHelper(Func<DynamicXml, bool> test, string valueIfTrue, string valueIfFalse)
+        public HtmlString IsHelper(Func<DynamicXml, bool> test, string valueIfTrue, string valueIfFalse)
         {
-            return test(this) ? valueIfTrue : valueIfFalse;
+            return test(this) ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
         }
 
         public static string StripDashesInElementOrAttributeNames(string xml)
