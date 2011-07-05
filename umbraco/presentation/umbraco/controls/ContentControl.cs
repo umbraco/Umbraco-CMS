@@ -33,7 +33,7 @@ namespace umbraco.controls
         public event EventHandler Save;
         private publishModes CanPublish = publishModes.NoPublish;
         public TabPage tpProp;
-        public bool DoesPublish = false;        
+        public bool DoesPublish = false;
         public TextBox NameTxt = new TextBox();
         public PlaceHolder NameTxtHolder = new PlaceHolder();
         public RequiredFieldValidator NameTxtValidator = new RequiredFieldValidator();
@@ -57,21 +57,21 @@ namespace umbraco.controls
         {
         }
 
-		// zb-00036 #29889 : load it only once
-		List<ContentType.TabI> virtualTabs;
+        // zb-00036 #29889 : load it only once
+        List<ContentType.TabI> virtualTabs;
 
-		/// <summary>
-		/// Constructor to set default properties.
-		/// </summary>
-		/// <param name="c"></param>
-		/// <param name="CanPublish"></param>
-		/// <param name="Id"></param>
-		/// <remarks>
-		/// This method used to create all of the child controls too which is BAD since
-		/// the page hasn't started initializing yet. Control IDs were not being named
-		/// correctly, etc... I've moved the child control setup/creation to the CreateChildControls
-		/// method where they are suposed to be.
-		/// </remarks>
+        /// <summary>
+        /// Constructor to set default properties.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="CanPublish"></param>
+        /// <param name="Id"></param>
+        /// <remarks>
+        /// This method used to create all of the child controls too which is BAD since
+        /// the page hasn't started initializing yet. Control IDs were not being named
+        /// correctly, etc... I've moved the child control setup/creation to the CreateChildControls
+        /// method where they are suposed to be.
+        /// </remarks>
         public ContentControl(Content c, publishModes CanPublish, string Id)
         {
             ID = Id;
@@ -82,12 +82,12 @@ namespace umbraco.controls
             Height = 350;
 
             SaveAndPublish += new EventHandler(standardSaveAndPublishHandler);
-			Save += new EventHandler(standardSaveAndPublishHandler);
-			prntpage = (UmbracoEnsuredPage)Page;
+            Save += new EventHandler(standardSaveAndPublishHandler);
+            prntpage = (UmbracoEnsuredPage)Page;
 
-			// zb-00036 #29889 : load it only once
-			if (virtualTabs == null)
-				virtualTabs = _content.ContentType.getVirtualTabs.ToList();
+            // zb-00036 #29889 : load it only once
+            if (virtualTabs == null)
+                virtualTabs = _content.ContentType.getVirtualTabs.ToList();
 
             foreach (ContentType.TabI t in virtualTabs)
             {
@@ -103,47 +103,56 @@ namespace umbraco.controls
         {
             base.CreateChildControls();
 
-			SaveAndPublish += new EventHandler(standardSaveAndPublishHandler);
-			Save += new EventHandler(standardSaveAndPublishHandler);
-			prntpage = (UmbracoEnsuredPage)Page;
+            SaveAndPublish += new EventHandler(standardSaveAndPublishHandler);
+            Save += new EventHandler(standardSaveAndPublishHandler);
+            prntpage = (UmbracoEnsuredPage)Page;
             int i = 0;
             var inTab = new Hashtable();
 
-			// zb-00036 #29889 : load it only once
-			if (virtualTabs == null)
-				virtualTabs = _content.ContentType.getVirtualTabs.ToList();
+            // zb-00036 #29889 : load it only once
+            if (virtualTabs == null)
+                virtualTabs = _content.ContentType.getVirtualTabs.ToList();
 
-            foreach (ContentType.TabI t in virtualTabs)
-			{
-                var tp = this.Panels[i] as TabPage;
-                if (tp == null)
+            foreach (ContentType.TabI tab in virtualTabs)
+            {
+                var tabPage = this.Panels[i] as TabPage;
+                if (tabPage == null)
                 {
-                    throw new ArgumentException("Unable to load tab \"" + t.Caption + "\"");
+                    throw new ArgumentException("Unable to load tab \"" + tab.Caption + "\"");
                 }
-				//TabPage tp = NewTabPage(t.Caption);
-				//addSaveAndPublishButtons(ref tp);
+                //TabPage tp = NewTabPage(t.Caption);
+                //addSaveAndPublishButtons(ref tp);
 
-				tp.Style.Add("text-align", "center");
+                tabPage.Style.Add("text-align", "center");
 
 
-				// Iterate through the property types and add them to the tab
-				// zb-00036 #29889 : fix property types getter to get the right set of properties
-				foreach (PropertyType pt in t.GetPropertyTypes(_content.ContentType.Id))
-				{
-					// table.Rows.Add(addControl(_content.getProperty(editPropertyType.Alias), tp));
-					addControlNew(_content.getProperty(pt), tp, t.Caption);
-					inTab.Add(pt.Id.ToString(), true);
-				}
+                // Iterate through the property types and add them to the tab
+                // zb-00036 #29889 : fix property types getter to get the right set of properties
+                // ge : had a bit of a corrupt db and got weird NRE errors so rewrote this to catch the error and rethrow with detail
+                foreach (PropertyType propertyType in tab.GetPropertyTypes(_content.ContentType.Id))
+                {
+                    // table.Rows.Add(addControl(_content.getProperty(editPropertyType.Alias), tp));
+                    var property = _content.getProperty(propertyType);
+                    if (property != null && tabPage != null)
+                    {
+                        addControlNew(property, tabPage, tab.Caption);
+                        inTab.Add(propertyType.Id.ToString(), true);
+                    }
+                    else
+                    {
+                        throw new ArgumentNullException(string.Format("Property {0} ({1}) on Content Type {2} could not be retrieved for Document {3} on Tab Page {4}. To fix this problem, delete the property and recreate it.", propertyType.Alias, propertyType.Id, _content.ContentType.Alias, _content.Id, tab.Caption));
+                    }
+                }
 
                 i++;
-			}
+            }
 
-			// Add property pane
-			tpProp = NewTabPage(ui.Text("general", "properties", null));
-			addSaveAndPublishButtons(ref tpProp);
-			tpProp.Controls.Add(
-				new LiteralControl("<div id=\"errorPane_" + tpProp.ClientID +
-								   "\" style=\"display: none; text-align: left; color: red;width: 100%; border: 1px solid red; background-color: #FCDEDE\"><div><b>There were errors - data has not been saved!</b><br/></div></div>"));
+            // Add property pane
+            tpProp = NewTabPage(ui.Text("general", "properties", null));
+            addSaveAndPublishButtons(ref tpProp);
+            tpProp.Controls.Add(
+                new LiteralControl("<div id=\"errorPane_" + tpProp.ClientID +
+                                   "\" style=\"display: none; text-align: left; color: red;width: 100%; border: 1px solid red; background-color: #FCDEDE\"><div><b>There were errors - data has not been saved!</b><br/></div></div>"));
 
             //if the property is not in a tab, add it to the general tab
             var props = _content.GenericProperties;
@@ -153,17 +162,17 @@ namespace umbraco.controls
                     addControlNew(p, tpProp, ui.Text("general", "properties", null));
             }
 
-		}
+        }
 
-		/// <summary>
-		/// Initializes the control and ensures child controls are setup
-		/// </summary>
-		/// <param name="e"></param>
+        /// <summary>
+        /// Initializes the control and ensures child controls are setup
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
 
-			EnsureChildControls();
+            EnsureChildControls();
 
             // Add extras for the property tabpage. .
             ContentControlLoadEventArgs contentcontrolEvent = new ContentControlLoadEventArgs();
@@ -207,7 +216,7 @@ namespace umbraco.controls
         }
 
         protected override void OnLoad(EventArgs e)
-        {   
+        {
             base.OnLoad(e);
 
             ContentControlLoadEventArgs contentcontrolEvent = new ContentControlLoadEventArgs();
