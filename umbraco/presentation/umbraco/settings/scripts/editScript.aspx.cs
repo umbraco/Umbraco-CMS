@@ -94,6 +94,7 @@ namespace umbraco.cms.presentation.settings.scripts
             save.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
             save.OnClickCommand = "doSubmit()";
             save.AltText = "Save File";
+            save.ID = "save";
 
             if (editorSource.CodeBase == uicontrols.CodeArea.EditorType.HTML)
             {

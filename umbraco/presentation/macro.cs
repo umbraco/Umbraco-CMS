@@ -1475,7 +1475,7 @@ namespace umbraco
                     // Release the HttpWebResponse Resource.
                     myHttpWebResponse.Close();
                 }
-                catch (Exception ee)
+                catch (Exception)
                 {
                     retVal = showNoMacroContent(currentMacro);
                 }

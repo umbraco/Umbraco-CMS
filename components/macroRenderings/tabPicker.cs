@@ -19,7 +19,6 @@ namespace umbraco.macroRenderings
 	{
 		string _value = "";
 		bool _multiple = false;
-        private static ISqlHelper _sqlHelper;
 
 		public bool ShowCaption 
 		{

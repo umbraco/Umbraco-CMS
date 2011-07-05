@@ -81,6 +81,7 @@ namespace umbraco.settings
 			save.ImageUrl =  UmbracoPath + "/images/editor/save.gif";
 			save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
 			save.AlternateText = ui.Text("save");
+		    save.ID = "save";
 	
 			Panel1.Text = ui.Text("language", "editLanguage");
 

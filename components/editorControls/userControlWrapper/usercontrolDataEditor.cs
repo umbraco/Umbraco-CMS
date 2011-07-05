@@ -78,7 +78,7 @@ namespace umbraco.editorControls.userControlGrapper
                         }
 
                     }
-                    catch (MissingMethodException ex) { }
+                    catch (MissingMethodException) { }
                 }
                 
             }

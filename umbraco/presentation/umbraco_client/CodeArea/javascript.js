@@ -28,6 +28,8 @@ function shortcutCheckKeysDown(e) {
     keycode = e.keyCode;
 
     //save
+    // uncommented by NH 07-05-11 as it's been replaced by a native bindShortcutkey() method in the ClientManager
+/*
     if (ctrlDown && keycode == 83) {
         doSubmit();
         if (window.addEventListener) {
@@ -35,7 +37,7 @@ function shortcutCheckKeysDown(e) {
         } else
             return false;
     }
-
+    */
     //snippet
     if (ctrlDown && keycode == 77) {
         if (window.umbracoInsertSnippet) {

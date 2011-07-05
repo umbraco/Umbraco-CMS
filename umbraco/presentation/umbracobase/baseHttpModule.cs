@@ -18,7 +18,6 @@ namespace umbraco.presentation.umbracobase
 {
     public class requestModule : IHttpModule
     {
-        private HttpApplication mApp;
 
         #region IHttpModule Members
 

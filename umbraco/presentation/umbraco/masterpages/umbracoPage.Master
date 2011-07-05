@@ -28,6 +28,8 @@
         Priority="10" />
     <umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient"
         Priority="10" />
+    <umb:JsInclude ID="JsIncludeHotkeys" runat="server" FilePath="Application/jQuery/jquery.hotkeys.js" PathNameAlias="UmbracoClient"
+        Priority="10" />
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
 </head>

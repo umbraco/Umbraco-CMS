@@ -21,6 +21,7 @@ Umbraco.Application.Actions = function () {
         _isDebug: false, //set to true to enable alert debugging
         _windowTitle: " - Umbraco CMS - ",
         _currApp: "",
+        _isSaving: "",
 
         addEventHandler: function (fnName, fn) {
             /// <summary>Adds an event listener to the event name event</summary>
@@ -83,6 +84,21 @@ Umbraco.Application.Actions = function () {
                 document.location.href = 'logout.aspx';
             }
             return false;
+        },
+
+        submitDefaultWindow: function () {
+            if (!this._isSaving) {
+                this._isSaving = true;
+                jQuery(".editorIcon[id*=save]:first, .editorIcon:input:image[id*=Save]:first").click();
+            }
+            this._isSaving = false;
+            return false;
+        },
+
+        bindSaveShortCut: function () {
+            jQuery(document).bind('keydown', 'ctrl+s', function (evt) { UmbClientMgr.appActions().submitDefaultWindow(); return false; });
+            jQuery(":input").bind('keydown', 'ctrl+s', function (evt) { UmbClientMgr.appActions().submitDefaultWindow(); return false; });
+            jQuery(document).bind('UMBRACO_TINYMCE_SAVE', function (evt, orgEvent) { UmbClientMgr.appActions().submitDefaultWindow(); return false; });
         },
 
         shiftApp: function (whichApp, appName) {

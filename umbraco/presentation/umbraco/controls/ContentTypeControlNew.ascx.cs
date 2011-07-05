@@ -181,6 +181,7 @@ namespace umbraco.controls
 
             Save.ImageUrl = UmbracoPath + "/images/editor/save.gif";
             Save.AlternateText = ui.Text("save");
+            Save.ID = "save";
             var listOfIcons = new List<ListItem>();
             // Get icons
             // nh css file update, add support for css sprites

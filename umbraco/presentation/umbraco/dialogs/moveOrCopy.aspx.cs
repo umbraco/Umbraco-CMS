@@ -148,7 +148,7 @@ namespace umbraco.dialogs
                 if (cd.Published) {
                     cd.Publish(new umbraco.BusinessLogic.User(0));
                     //using library.publish to support load balancing.
-                    umbraco.library.PublishSingleNode(cd.Id);
+                    umbraco.library.UpdateDocumentCache(cd.Id);
 
 
                     if (cd.HasChildren) {

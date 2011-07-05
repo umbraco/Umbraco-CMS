@@ -6,6 +6,7 @@ using System.Web;
 using umbraco.BusinessLogic;
 using System.Xml;
 using System.Web.UI;
+using umbraco.presentation;
 
 namespace umbraco
 {
@@ -25,14 +26,14 @@ namespace umbraco
             return umbraco.BasePages.UmbracoEnsuredPage.CurrentUser;
         }
 
-        [Obsolete("Use umbraco.Presentation.UmbracoContext.Current.Request[key]", false)]
         public static string Request(string text)
         {
-            string temp = string.Empty;
-            if (HttpContext.Current.Request[text.ToLower()] != null)
-                if (HttpContext.Current.Request[text] != string.Empty)
-                    temp = HttpContext.Current.Request[text];
-            return temp;
+            
+            if (UmbracoContext.Current.Request[text.ToLower()] != null)
+                if (UmbracoContext.Current.Request[text] != string.Empty)
+                    return UmbracoContext.Current.Request[text];
+            
+            return String.Empty;
         }
 
         public static Hashtable ReturnAttributes(String tag)

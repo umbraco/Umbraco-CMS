@@ -132,7 +132,7 @@ namespace umbraco.presentation.LiveEditing.Modules.CreateModule
                     DocumentType typeToCreate = new DocumentType(Convert.ToInt32(m_AllowedDocTypesDropdown.SelectedValue));
                     Document newDoc = Document.MakeNew(m_NameTextBox.Text, typeToCreate, new global::umbraco.BusinessLogic.User(userid), (int)UmbracoContext.Current.PageId);
                     newDoc.Publish(new global::umbraco.BusinessLogic.User(userid));
-                    library.PublishSingleNode(newDoc.Id);
+                    library.UpdateDocumentCache(newDoc.Id);
                     Page.Response.Redirect(library.NiceUrl(newDoc.Id), false);
                     break;
             }

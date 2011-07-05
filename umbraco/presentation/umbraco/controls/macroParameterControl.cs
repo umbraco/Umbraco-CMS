@@ -154,7 +154,7 @@ namespace umbraco.controls
                         Controls.Add(new LiteralControl("</td></tr>"));
                     }
                 }
-                catch (Exception fieldException)
+                catch (Exception)
                 {
                 }
             }

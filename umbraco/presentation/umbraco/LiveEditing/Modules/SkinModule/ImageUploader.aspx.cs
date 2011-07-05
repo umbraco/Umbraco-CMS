@@ -163,7 +163,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             {
                 System.Drawing.Image newImage = System.Drawing.Image.FromFile(filename);
             }
-            catch (OutOfMemoryException ex)
+            catch (OutOfMemoryException)
             {
                 // Image.FromFile will throw this if file is invalid.
 

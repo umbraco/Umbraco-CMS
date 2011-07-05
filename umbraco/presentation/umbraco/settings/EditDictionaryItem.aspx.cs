@@ -42,6 +42,7 @@ namespace umbraco.settings
 			save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
 			save.AlternateText = ui.Text("save");
             save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
+		    save.ID = "save";
 
             Literal txt = new Literal();
             txt.Text = "<p>" + ui.Text("dictionaryItem", "description", currentItem.key, base.getUser()) + "</p><br/>";

@@ -19,8 +19,8 @@ namespace umbraco.presentation.masterpages
 	public partial class umbracoPage : System.Web.UI.MasterPage
 	{
 
-		public static event MasterPageLoadHandler Load;
-        public static event MasterPageLoadHandler Init;
+		public new static event MasterPageLoadHandler Load;
+        public new static event MasterPageLoadHandler Init;
 
 		protected void Page_Load(object sender, EventArgs e)
 		{

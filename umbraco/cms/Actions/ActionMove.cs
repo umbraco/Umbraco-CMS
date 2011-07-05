@@ -10,7 +10,9 @@ namespace umbraco.BusinessLogic.Actions
 	public class ActionMove : IAction
 	{
 		//create singleton
+#pragma warning disable 612,618
 		private static readonly ActionMove m_instance = new ActionMove();
+#pragma warning restore 612,618
 
 		/// <summary>
 		/// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.

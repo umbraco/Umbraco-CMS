@@ -486,7 +486,6 @@ namespace umbraco.cms.businesslogic.macro
 		/// </summary>
 		/// <param name="Alias">The alias of the macro</param>
 		/// <returns>If the macro with the given alias exists, it returns the macro, else null</returns>
-		[Obsolete("Use the alias constructor")]
         public static Macro GetByAlias(string Alias) 
 		{
 			try 

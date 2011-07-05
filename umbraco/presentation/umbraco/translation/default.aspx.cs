@@ -30,53 +30,56 @@ namespace umbraco.presentation.translation
         }
         protected void Page_Load(object sender, EventArgs e)
         {
-                DataTable tasks = new DataTable();
-                tasks.Columns.Add("Id");
-                tasks.Columns.Add("Date");
-                tasks.Columns.Add("NodeId");
-                tasks.Columns.Add("NodeName");
-                tasks.Columns.Add("ReferingUser");
-                tasks.Columns.Add("Language");
+            DataTable tasks = new DataTable();
+            tasks.Columns.Add("Id");
+            tasks.Columns.Add("Date");
+            tasks.Columns.Add("NodeId");
+            tasks.Columns.Add("NodeName");
+            tasks.Columns.Add("ReferingUser");
+            tasks.Columns.Add("Language");
 
-                taskList.Columns[0].HeaderText = ui.Text("nodeName");
-                taskList.Columns[1].HeaderText = ui.Text("translation", "taskAssignedBy");
-                taskList.Columns[2].HeaderText = ui.Text("date");
+            taskList.Columns[0].HeaderText = ui.Text("nodeName");
+            taskList.Columns[1].HeaderText = ui.Text("translation", "taskAssignedBy");
+            taskList.Columns[2].HeaderText = ui.Text("date");
 
-                ((System.Web.UI.WebControls.HyperLinkField)taskList.Columns[3]).Text = ui.Text("translation","details");
-                ((System.Web.UI.WebControls.HyperLinkField)taskList.Columns[4]).Text = ui.Text("translation", "downloadTaskAsXml");
+            ((System.Web.UI.WebControls.HyperLinkField)taskList.Columns[3]).Text = ui.Text("translation", "details");
+            ((System.Web.UI.WebControls.HyperLinkField)taskList.Columns[4]).Text = ui.Text("translation", "downloadTaskAsXml");
 
-                Tasks ts = new Tasks();
-                if (Request["mode"] == "owned") {
-                    ts = Task.GetOwnedTasks(base.getUser(), false);
-                    pane_tasks.Text = ui.Text("translation", "ownedTasks");
-                    Panel2.Text = ui.Text("translation", "ownedTasks");
-                } else {
-                    ts = Task.GetTasks(base.getUser(), false);
-                    pane_tasks.Text = ui.Text("translation", "assignedTasks");
-                    Panel2.Text = ui.Text("translation", "assignedTasks");
-                }
+            Tasks ts = new Tasks();
+            if (Request["mode"] == "owned")
+            {
+                ts = Task.GetOwnedTasks(base.getUser(), false);
+                pane_tasks.Text = ui.Text("translation", "ownedTasks");
+                Panel2.Text = ui.Text("translation", "ownedTasks");
+            }
+            else
+            {
+                ts = Task.GetTasks(base.getUser(), false);
+                pane_tasks.Text = ui.Text("translation", "assignedTasks");
+                Panel2.Text = ui.Text("translation", "assignedTasks");
+            }
 
-                uploadFile.Text = ui.Text("upload");
-                pane_uploadFile.Text = ui.Text("translation", "uploadTranslationXml");
+            uploadFile.Text = ui.Text("upload");
+            pane_uploadFile.Text = ui.Text("translation", "uploadTranslationXml");
 
-                foreach (Task t in ts)
+            foreach (Task t in ts)
+            {
+                if (t.Type.Alias == "toTranslate")
                 {
-                    if (t.Type.Alias == "toTranslate")
-                    {
-                        DataRow task = tasks.NewRow();
-                        task["Id"] = t.Id;
-                        task["Date"] = t.Date;
-                        task["NodeId"] = t.Node.Id;
-                        task["NodeName"] = t.Node.Text;
-                        task["ReferingUser"] = t.ParentUser.Name;
-                        tasks.Rows.Add(task);
-                    }
+                    DataRow task = tasks.NewRow();
+                    task["Id"] = t.Id;
+                    task["Date"] = t.Date;
+                    task["NodeId"] = t.Node.Id;
+                    task["NodeName"] = t.Node.Text;
+                    task["ReferingUser"] = t.ParentUser.Name;
+                    tasks.Rows.Add(task);
                 }
-                
+            }
+
             taskList.DataSource = tasks;
             taskList.DataBind();
             feedback.Style.Add("margin-top", "10px");
-            
+
         }
 
         protected void uploadFile_Click(object sender, EventArgs e)
@@ -155,14 +158,15 @@ namespace umbraco.presentation.translation
                         feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
                         feedback.Text = "<h3>" + ui.Text("translation", "MultipleTranslationDone") + "</h3><p>" + ui.Text("translation", "translationDoneHelp") + "</p><ul>" + sb.ToString() + "</ul>";
                     }
-                 }
+                }
 
                 // clean up
                 File.Delete(tempFileName);
             }
         }
 
-        private void hideAll() {
+        private void hideAll()
+        {
             pane_uploadFile.Visible = false;
             pane_tasks.Visible = false;
         }
@@ -180,28 +184,31 @@ namespace umbraco.presentation.translation
                 // Get task xml node
                 XmlNodeList tasks = tf.SelectNodes("//task");
 
-                foreach (XmlNode taskXml in tasks) {
+                foreach (XmlNode taskXml in tasks)
+                {
                     string xpath = UmbracoSettings.UseLegacyXmlSchema ? "node" : "* [@isDoc]";
                     XmlNode taskNode = taskXml.SelectSingleNode(xpath);
 
                     // validate file
                     Task t = new Task(int.Parse(taskXml.Attributes.GetNamedItem("Id").Value));
-                    if (t != null) {
+                    if (t != null)
+                    {
                         //user auth and content node validation
-                        if (t.Node.Id == int.Parse(taskNode.Attributes.GetNamedItem("id").Value) &&  (t.User.Id == base.getUser().Id || t.ParentUser.Id == base.getUser().Id ) ) {
-                            
+                        if (t.Node.Id == int.Parse(taskNode.Attributes.GetNamedItem("id").Value) && (t.User.Id == base.getUser().Id || t.ParentUser.Id == base.getUser().Id))
+                        {
+
                             // update node contents
                             Document d = new Document(t.Node.Id);
                             Document.Import(d.ParentId, getUser(), (XmlElement)taskNode);
-/*                            d.Text = taskNode.Attributes.GetNamedItem("nodeName").Value.Trim();
+                            /*                            d.Text = taskNode.Attributes.GetNamedItem("nodeName").Value.Trim();
 
-                            // update data elements
-                            foreach (XmlNode data in taskNode.SelectNodes("data"))
-                                if (data.FirstChild != null)
-                                    d.getProperty(data.Attributes.GetNamedItem("alias").Value).Value = data.FirstChild.Value;
-                                else
-                                    d.getProperty(data.Attributes.GetNamedItem("alias").Value).Value = "";
-                            */
+                                                        // update data elements
+                                                        foreach (XmlNode data in taskNode.SelectNodes("data"))
+                                                            if (data.FirstChild != null)
+                                                                d.getProperty(data.Attributes.GetNamedItem("alias").Value).Value = data.FirstChild.Value;
+                                                            else
+                                                                d.getProperty(data.Attributes.GetNamedItem("alias").Value).Value = "";
+                                                        */
 
                             t.Closed = true;
                             t.Save();
@@ -218,8 +225,6 @@ namespace umbraco.presentation.translation
             {
                 throw new Exception("Error importing translation file '" + tempFileName + "': " + ee.ToString());
             }
-
-            return null;
         }
-        }
+    }
 }

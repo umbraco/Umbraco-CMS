@@ -292,4 +292,9 @@
             </ItemTemplate>
         </asp:Repeater>
     </div>
+            <script type="text/javascript">
+                jQuery(document).ready(function () {
+                    UmbClientMgr.appActions().bindSaveShortCut();
+                });
+    </script>
 </asp:Content>

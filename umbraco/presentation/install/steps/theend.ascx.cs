@@ -22,7 +22,7 @@ namespace umbraco.presentation.install.steps
                 GlobalSettings.ConfigurationStatus = GlobalSettings.CurrentVersion;
                 Application["umbracoNeedConfiguration"] = false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //errorLiteral.Text = ex.ToString();
             }

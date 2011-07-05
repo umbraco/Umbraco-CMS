@@ -10,7 +10,9 @@ namespace umbraco.BusinessLogic.Actions
 	public class ActionCopy : IAction
 	{
 		//create singleton
+#pragma warning disable 612,618
 		private static readonly ActionCopy m_instance = new ActionCopy();
+#pragma warning restore 612,618
 
 		/// <summary>
 		/// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.

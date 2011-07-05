@@ -184,12 +184,12 @@ namespace umbraco.cms.businesslogic.web
         /// <summary>
         /// Occurs when [new].
         /// </summary>
-        new public static event NewEventHandler New;
+        public static event NewEventHandler New;
         /// <summary>
         /// Raises the <see cref="E:New"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        new protected virtual void OnNew(NewEventArgs e) {
+        protected virtual void OnNew(NewEventArgs e) {
             if (New != null)
                 New(this, e);
         }

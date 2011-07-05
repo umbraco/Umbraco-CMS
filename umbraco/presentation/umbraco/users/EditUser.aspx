@@ -5,4 +5,10 @@
 <%@ Import Namespace="umbraco.cms.presentation.Trees" %>
 <asp:Content ContentPlaceHolderID="body" runat="server">
       <cc1:TabView ID="UserTabs" Width="400px" Visible="true" runat="server" />
+
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            UmbClientMgr.appActions().bindSaveShortCut();
+        });
+    </script>
 </asp:Content>

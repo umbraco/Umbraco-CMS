@@ -16,7 +16,6 @@
       <delete assembly="umbraco" type="nodetypeTasks" />
     </tasks>
   </nodeType>
-  
   <nodeType alias="templates">
     <header>Template</header>
     <usercontrol>/create/simple.ascx</usercontrol>
@@ -369,12 +368,19 @@
       <delete assembly="Umbraco.Forms.UI" type="Tasks.PrevalueSourceTasks" />
     </tasks>
   </nodeType>
-
   <nodeType alias="xsltFolder">
     <header>Xslt</header>
     <usercontrol>/create/xslt.ascx</usercontrol>
     <tasks>
       <delete assembly="umbraco" type="XsltTasks" />
+    </tasks>
+  </nodeType>
+  <nodeType alias="revisions">
+    <header>Revisions</header>
+    <usercontrol>/create/simple.ascx</usercontrol>
+    <tasks>
+      <create assembly="Umbraco.Courier.UI" type="Tasks.RevisionTasks" />
+      <delete assembly="Umbraco.Courier.UI" type="Tasks.RevisionTasks" />
     </tasks>
   </nodeType>
 </createUI>

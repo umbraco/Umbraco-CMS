@@ -381,12 +381,14 @@ namespace umbraco.presentation.developer.packages
             packageActions = TabView1.NewTabPage("Package Actions");
             packageActions.Controls.Add(Pane4);
 
+            int count = 1;
             foreach (uicontrols.TabPage tp in TabView1.GetPanels()) {
                 ImageButton saves = tp.Menu.NewImageButton();
                 saves.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
                 saves.CommandName = "save";
                 saves.AlternateText = "Save package";
                 saves.Command += new CommandEventHandler(saveOrPublish);
+                saves.ID = "save_" + count;
                 
                 tp.BorderStyle = BorderStyle.None;
                 tp.Style["background"] = "none !Important"; 
@@ -396,6 +398,7 @@ namespace umbraco.presentation.developer.packages
                 publishes.CommandName = "publish";
                 publishes.Command += new CommandEventHandler(saveOrPublish);
                 publishes.AlternateText = "Save and publish the package as a .umb file";
+                count++;
             }
 
             

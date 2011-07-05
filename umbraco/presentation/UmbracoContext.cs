@@ -21,7 +21,6 @@ namespace umbraco.presentation
         private UmbracoRequest m_Request;
         private UmbracoResponse m_Response;
         private HttpContext m_HttpContext;
-        private XmlDocument previewDocument;
         private PreviewContent _previewContent;
 
         /// <summary>

@@ -79,13 +79,10 @@ namespace umbraco.presentation.umbraco.dialogs
                         Document loginPageObj = new Document(loginPage);
                         if (loginPageObj != null)
                         {
-                            loginPagePicker.Text = loginPage.ToString();
+                            loginPagePicker.Value = loginPage.ToString();
                         }
                         Document errorPageObj = new Document(errorPage);
-                        if (errorPageObj != null)
-                        {
-                            errorPagePicker.Text = errorPage.ToString();
-                        }
+                        errorPagePicker.Value = errorPage.ToString();
                     }
                     catch
                     {
@@ -168,10 +165,10 @@ namespace umbraco.presentation.umbraco.dialogs
 
         protected void protect_Click(object sender, CommandEventArgs e)
         {
-            if (string.IsNullOrEmpty(errorPagePicker.Text))
+            if (string.IsNullOrEmpty(errorPagePicker.Value))
                 cv_errorPage.IsValid = false;
 
-            if (string.IsNullOrEmpty(loginPagePicker.Text))
+            if (string.IsNullOrEmpty(loginPagePicker.Value))
                 cv_loginPage.IsValid = false;
 
 
@@ -224,13 +221,13 @@ namespace umbraco.presentation.umbraco.dialogs
                         Roles.AddUserToRole(member.UserName, simpleRoleName);
                     }
 
-                    Access.ProtectPage(true, pageId, int.Parse(loginPagePicker.Text), int.Parse(errorPagePicker.Text));
+                    Access.ProtectPage(true, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
                     Access.AddMembershipRoleToDocument(pageId, simpleRoleName);
                     Access.AddMembershipUserToDocument(pageId, member.UserName);
                 }
                 else if (e.CommandName == "advanced")
                 {
-                    cms.businesslogic.web.Access.ProtectPage(false, pageId, int.Parse(loginPagePicker.Text), int.Parse(errorPagePicker.Text));
+                    cms.businesslogic.web.Access.ProtectPage(false, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
 
                     foreach (ListItem li in _memberGroups.Items)
                         if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",") > -1)
@@ -241,7 +238,7 @@ namespace umbraco.presentation.umbraco.dialogs
 
                 feedback.Text = ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text, null) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
 
-				ClientTools.ReloadActionNode(true, false);
+                ClientTools.ReloadActionNode(true, false);
 
                 feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
             }
@@ -257,11 +254,11 @@ namespace umbraco.presentation.umbraco.dialogs
 
             Access.RemoveProtection(pageId);
 
-			feedback.Text = ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text, null) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
-			
-			ClientTools.ReloadActionNode(true, false);
-            
-			feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
+            feedback.Text = ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text, null) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+
+            ClientTools.ReloadActionNode(true, false);
+
+            feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
         }
     }
 }
