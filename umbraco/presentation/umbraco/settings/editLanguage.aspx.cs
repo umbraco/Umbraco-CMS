@@ -33,10 +33,10 @@ namespace umbraco.settings
            
 
 			// Put user code to initialize the page here
-			if (!IsPostBack) 
+            Panel1.Text = ui.Text("editlanguage");
+            pp_language.Text = ui.Text("language", "displayName", base.getUser());
+            if (!IsPostBack) 
 			{
-				Panel1.Text = ui.Text("editlanguage");
-                pp_language.Text = ui.Text("language", "displayName", base.getUser());
 				updateCultureList();
 
 				ClientTools
@@ -68,6 +68,7 @@ namespace umbraco.settings
 		private void save_click(object sender, System.Web.UI.ImageClickEventArgs e) 
 		{
 			currentLanguage.CultureAlias = Cultures.SelectedValue;
+		    currentLanguage.Save();
 			updateCultureList();
 
             speechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "languageSaved"), "");	
