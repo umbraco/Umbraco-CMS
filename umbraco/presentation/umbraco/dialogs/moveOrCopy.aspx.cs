@@ -91,7 +91,8 @@ namespace umbraco.dialogs
                     //
 
                     bool validAction = true;
-                    if (d.HasChildren)
+                    // only validate permissions in content
+                    if (app == "content" && d.HasChildren)
                     {
                         validAction = ValidAction(helper.Request("mode") == "cut" ? 'M' : 'O');
                     }
