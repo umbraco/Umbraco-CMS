@@ -186,12 +186,14 @@
 
 
             jQuery("#right").show();
+
+
         });
 
 
         // *** NEW KEEP ALIVE - Should be moved to app manager *** */
         var failedAttempts = 0;
-        var keepAliveInterval; 
+        var keepAliveInterval;
         beginKeepAlive();
 
         function beginKeepAlive() {
@@ -241,8 +243,8 @@
         function umbracoRenewSession() {
             umbraco.presentation.webservices.legacyAjaxCalls.RenewUmbracoSession(
                 function () {
-                    jQuery("#logout-warning").fadeOut().removeClass('error').addClass('notice'); 
-                    },
+                    jQuery("#logout-warning").fadeOut().removeClass('error').addClass('notice');
+                },
                 umbracoShowSessionRenewModal);
 
         }
@@ -262,7 +264,11 @@
                     jQuery("#sessionrefreshpassword label").hide()
                 }
                 code = (e.keyCode ? e.keyCode : e.which);
-                if (code == 13) jQuery("#renew-session").click();
+                if (code == 13) {
+                    jQuery("#renew-session").click();
+                    e.preventDefault();
+                    return false;
+                }
 
             });
 
