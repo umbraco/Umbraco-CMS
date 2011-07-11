@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using umbraco.interfaces;
 using umbraco.cms.businesslogic.property;
+using System.Web;
 
 namespace umbraco.MacroEngines
 {
-    public class PropertyResult : IProperty
+    public class PropertyResult : IProperty, IHtmlString
     {
         private string _alias;
         private string _value;
@@ -60,5 +61,11 @@ namespace umbraco.MacroEngines
 
         public int ContextId { get; set; }
         public string ContextAlias { get; set; }
+
+        public string ToHtmlString()
+        {
+            //Like a boss
+            return Value;
+        }
     }
 }
