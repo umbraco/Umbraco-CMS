@@ -59,7 +59,7 @@ namespace umbraco.MacroEngines.Library
 
         public dynamic MediaById(int Id)
         {
-            return new DynamicNode(new DynamicBackingItem(ExamineBackedMedia.GetUmbracoMedia(Id)));
+            return new DynamicMedia(new DynamicBackingItem(ExamineBackedMedia.GetUmbracoMedia(Id)));
         }
         public dynamic MediaById(string Id)
         {
