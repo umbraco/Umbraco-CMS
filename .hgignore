@@ -22,6 +22,7 @@ _ReSharper*/
 umbraco.config
 *.vs10x
 App_Data\TEMP\*
+umbraco\presentation\umbraco\plugins\*
 
 glob:*App_Data\*
 glob:*media\*
