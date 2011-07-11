@@ -1158,6 +1158,22 @@ namespace umbraco.MacroEngines
             if (prop == null) return false;
             return (prop as PropertyResult).HasValue();
         }
+        public IHtmlString HasValue(string alias, string valueIfTrue, string valueIfFalse)
+        {
+            return HasValue(alias, false) ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
+        }
+        public IHtmlString HasValue(string alias, bool recursive, string valueIfTrue, string valueIfFalse)
+        {
+            return HasValue(alias, recursive) ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
+        }
+        public IHtmlString HasValue(string alias, string valueIfTrue)
+        {
+            return HasValue(alias, false) ? new HtmlString(valueIfTrue) : new HtmlString(string.Empty);
+        }
+        public IHtmlString HasValue(string alias, bool recursive, string valueIfTrue)
+        {
+            return HasValue(alias, recursive) ? new HtmlString(valueIfTrue) : new HtmlString(string.Empty);
+        }
         public int Position()
         {
             return this.Index();
