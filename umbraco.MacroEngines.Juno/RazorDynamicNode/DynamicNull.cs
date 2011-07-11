@@ -39,6 +39,16 @@ namespace umbraco.MacroEngines
             result = this;
             return true;
         }
+        public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
+        {
+            result = this;
+            return true;
+        }
+        public override bool TryInvoke(InvokeBinder binder, object[] args, out object result)
+        {
+            result = this;
+            return true;
+        }
         public bool IsNull()
         {
             return true;
