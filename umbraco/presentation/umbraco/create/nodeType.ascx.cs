@@ -54,8 +54,7 @@ namespace umbraco.cms.presentation.create.controls
 			if (Page.IsValid) 
 			{
 				int createTemplateVal = 0;
-				int nodeId = -1;
-				if (createTemplate.Checked)
+			    if (createTemplate.Checked)
 					createTemplateVal = 1;
 
                 // check master type

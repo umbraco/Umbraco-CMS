@@ -57,4 +57,9 @@
       </table>
     </cc1:Pane>
   </cc1:UmbracoPanel>
+          <script type="text/javascript">
+              jQuery(document).ready(function () {
+                  UmbClientMgr.appActions().bindSaveShortCut();
+              });
+    </script>
 </asp:Content>

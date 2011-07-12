@@ -5,7 +5,6 @@
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
-
 </asp:Content>
 <asp:Content ID="Content1" ContentPlaceHolderID="body" runat="server">
     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/umbracoCheckKeys.js" PathNameAlias="UmbracoRoot" />
@@ -13,8 +12,8 @@
         Priority="0" />
     <umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient"
         Priority="1" />
-
-    <table style="height: 38px; width: 371px; border: none 0px;" cellspacing="0" cellpadding="0" id="__controls">
+    <table style="height: 38px; width: 371px; border: none 0px;" cellspacing="0" cellpadding="0"
+        id="__controls">
         <tr valign="top">
             <td height="20">
             </td>
@@ -25,7 +24,6 @@
     </table>
     <input id="doSave" type="hidden" name="doSave" runat="server" />
     <input id="doPublish" type="hidden" name="doPublish" runat="server" />
-    
     <script type="text/javascript">
 		// Save handlers for IDataFields		
 		var saveHandlers = new Array();
@@ -37,7 +35,6 @@
 		var isDialog = true;
 		var functionsFrame = this;
 		var disableEnterSubmit = true;
-	
 		
 		function addSaveHandler(handler) {
 			saveHandlers[saveHandlers.length] = handler;
@@ -49,11 +46,6 @@
 			}
 		}
 		
-		function doSubmit() {
-			invokeSaveHandlers();
-			document.getElementById("TabView1_tab01layer_save").click();
-		}
-		
 		jQuery(function() {
 		    var inputs = $('#__controls input:not(.editorIcon), #__controls textarea');
 		    //Sys.Debug.traceDump(inputs);
@@ -62,6 +54,9 @@
 		    });
 		    jQuery('input.editorIcon').click(function() { UmbClientMgr.set_isDirty(false); });
 		});
+
+        jQuery(document).ready(function () {
+            UmbClientMgr.appActions().bindSaveShortCut();
+        });
     </script>
-    
 </asp:Content>

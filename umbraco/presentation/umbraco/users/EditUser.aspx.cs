@@ -117,9 +117,9 @@ namespace umbraco.cms.presentation.user
             mediaPicker.TreeAlias = "media";
 
             if (u.StartMediaId > 0)
-                mediaPicker.Text = u.StartMediaId.ToString();
+                mediaPicker.Value = u.StartMediaId.ToString();
             else
-                mediaPicker.Text = "-1";
+                mediaPicker.Value = "-1";
 
             medias.Controls.Add(mediaPicker);
 
@@ -128,9 +128,9 @@ namespace umbraco.cms.presentation.user
             contentPicker.TreeAlias = "content";
 
             if (u.StartNodeId > 0)
-                contentPicker.Text = u.StartNodeId.ToString();
+                contentPicker.Value = u.StartNodeId.ToString();
             else
-                contentPicker.Text = "-1";
+                contentPicker.Value = "-1";
 
             content.Controls.Add(contentPicker);
 
@@ -244,9 +244,9 @@ namespace umbraco.cms.presentation.user
             cMediaPicker.TreeAlias = "media";
 
             if (userChannel.MediaFolder > 0)
-                cMediaPicker.Text = userChannel.MediaFolder.ToString();
+                cMediaPicker.Value = userChannel.MediaFolder.ToString();
             else
-                cMediaPicker.Text = "-1";
+                cMediaPicker.Value = "-1";
 
             medias.Controls.Add(cMediaPicker);
 
@@ -255,9 +255,9 @@ namespace umbraco.cms.presentation.user
             cContentPicker.TreeAlias = "content";
 
             if (userChannel.StartNode > 0)
-                cContentPicker.Text = userChannel.StartNode.ToString();
+                cContentPicker.Value = userChannel.StartNode.ToString();
             else
-                cContentPicker.Text = "-1";
+                cContentPicker.Value = "-1";
 
             content.Controls.Add(cContentPicker);
 
@@ -285,7 +285,7 @@ namespace umbraco.cms.presentation.user
             ImageButton save = channelInfo.Menu.NewImageButton();
             save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
             save.Click += new ImageClickEventHandler(saveUser_Click);
-
+            save.ID = "save";
             if (!IsPostBack)
             {
                 cName.Text = userChannel.Name;
@@ -322,8 +322,8 @@ namespace umbraco.cms.presentation.user
                     passw.Visible = false;
                 }
 
-                contentPicker.Text = u.StartNodeId.ToString();
-                mediaPicker.Text = u.StartMediaId.ToString();
+                contentPicker.Value = u.StartNodeId.ToString();
+                mediaPicker.Value = u.StartMediaId.ToString();
 
                 // get the current users applications
                 string currentUserApps = ";";
@@ -421,7 +421,7 @@ namespace umbraco.cms.presentation.user
 
                    
                     int startNode;
-                    if(!int.TryParse(contentPicker.Text, out startNode))
+                    if(!int.TryParse(contentPicker.Value, out startNode))
                     {
                          //set to default if nothing is choosen
                         if (u.StartNodeId > 0)
@@ -439,7 +439,7 @@ namespace umbraco.cms.presentation.user
 
 
                     int mstartNode;
-                    if (!int.TryParse(mediaPicker.Text, out mstartNode))
+                    if (!int.TryParse(mediaPicker.Value, out mstartNode))
                     {
                         //set to default if nothing is choosen
                         if (u.StartMediaId > 0)
@@ -469,8 +469,8 @@ namespace umbraco.cms.presentation.user
 
                         c.Name = cName.Text;
                         c.FullTree = cFulltree.Checked;
-                        c.StartNode = int.Parse(cContentPicker.Text);
-                        c.MediaFolder = int.Parse(cMediaPicker.Text);
+                        c.StartNode = int.Parse(cContentPicker.Value);
+                        c.MediaFolder = int.Parse(cMediaPicker.Value);
                         c.FieldCategoriesAlias = cCategories.SelectedValue;
                         c.FieldDescriptionAlias = cDescription.SelectedValue;
                         c.FieldExcerptAlias = cExcerpt.SelectedValue;

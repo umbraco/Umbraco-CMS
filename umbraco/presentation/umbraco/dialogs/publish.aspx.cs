@@ -82,7 +82,7 @@ namespace umbraco.dialogs
                     {
                         if (doc.Published)
                         {
-                            library.PublishSingleNode(doc.Id);
+                            library.UpdateDocumentCache(doc.Id);
                         }
                     }
 
@@ -106,7 +106,7 @@ namespace umbraco.dialogs
                 {
                     if (d.PublishWithResult(base.getUser()))
                     {
-                        library.PublishSingleNode(d.Id);
+                        library.UpdateDocumentCache(d.Id);
                         feedbackMsg.type = umbraco.uicontrols.Feedback.feedbacktype.success;
 						feedbackMsg.Text = ui.Text("publish", "nodePublish", d.Text, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";						
                     }

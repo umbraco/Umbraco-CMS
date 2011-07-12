@@ -14,7 +14,7 @@ namespace umbraco
         /// <summary>
         /// The new event handler
         /// </summary>
-        new public delegate void NewUIMemberEventHandler(Member sender, string unencryptedPassword, NewMemberUIEventArgs e);
+        public delegate void NewUIMemberEventHandler(Member sender, string unencryptedPassword, NewMemberUIEventArgs e);
 
         public static event NewUIMemberEventHandler NewMember;
         new protected virtual void OnNewMember(NewMemberUIEventArgs e, string unencryptedPassword, Member m)

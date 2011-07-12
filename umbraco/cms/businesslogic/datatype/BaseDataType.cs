@@ -157,7 +157,7 @@ namespace umbraco.cms.businesslogic.datatype
                     this.GetType().InvokeMember(setting.Key, System.Reflection.BindingFlags.SetProperty, null, this, new object[] { setting.Value });
 
                 }
-                catch (MissingMethodException ex) { }
+                catch (MissingMethodException) { }
             }
         }
 

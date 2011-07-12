@@ -10,7 +10,9 @@ namespace umbraco.BusinessLogic.Actions
 	public class ActionUpdate : IAction
 	{
 		//create singleton
+#pragma warning disable 612,618
 		private static readonly ActionUpdate m_instance = new ActionUpdate();
+#pragma warning restore 612,618
 
 		/// <summary>
 		/// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.

@@ -46,6 +46,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 			bt.Click += new System.Web.UI.ImageClickEventHandler(save_click);
 			bt.ImageUrl = UmbracoPath +"/images/editor/save.gif";
 			bt.AlternateText = ui.Text("save");
+		    bt.ID = "save";
 			setupPreView();
 		}
 

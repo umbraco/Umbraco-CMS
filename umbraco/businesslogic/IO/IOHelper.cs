@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -14,6 +15,8 @@ namespace umbraco.IO
     public static class IOHelper
     {
         private static string m_rootDir = "";
+        // static compiled regex for faster performance
+        private readonly static Regex _resolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
         public static char DirSepChar
         {
@@ -46,31 +49,47 @@ namespace umbraco.IO
                 return VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root);
         }
 
+
         public static string ResolveUrlsFromTextString(string text)
         {
-            // find all relative urls (ie. urls that contain ~)
-//            string pattern = "(\\S+)=[\"']?(\\W?\\~(?:.(?![\"']?\\s+(?:\\S+)=|[>\"']))+.)[\"']?";
-            string pattern = "<.*?\\\"(\\~.*?)\\\"";   
-            MatchCollection tags =
-                Regex.Matches(text, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-            foreach (Match tag in tags)
+            if (UmbracoSettings.ResolveUrlsFromTextString)
             {
-                string url = "";
-                if (tag.Groups[1].Success)
-                    url = tag.Groups[1].Value;
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                Debug.WriteLine("Start: " + sw.ElapsedMilliseconds);
 
-                // The richtext editor inserts a slash in front of the url. That's why we need this little fix
-//                if (url.StartsWith("/"))
-//                    text = text.Replace(url, ResolveUrl(url.Substring(1)));
-//                else
-                if (!String.IsNullOrEmpty(url))
+                // find all relative urls (ie. urls that contain ~)
+                MatchCollection tags =
+                    _resolveUrlPattern.Matches(text);
+                Debug.WriteLine("After regex: " + sw.ElapsedMilliseconds);
+                foreach (Match tag in tags)
                 {
-                    string resolvedUrl = (url.Substring(0,1) == "/") ? ResolveUrl(url.Substring(1)) : ResolveUrl(url);
-                    text = text.Replace(url, resolvedUrl);
+                    Debug.WriteLine("-- inside regex: " + sw.ElapsedMilliseconds);
+                    string url = "";
+                    if (tag.Groups[1].Success)
+                        url = tag.Groups[1].Value;
+
+                    // The richtext editor inserts a slash in front of the url. That's why we need this little fix
+                    //                if (url.StartsWith("/"))
+                    //                    text = text.Replace(url, ResolveUrl(url.Substring(1)));
+                    //                else
+                    if (!String.IsNullOrEmpty(url))
+                    {
+                        Debug.WriteLine("---- before resolve: " + sw.ElapsedMilliseconds);
+                        string resolvedUrl = (url.Substring(0, 1) == "/") ? ResolveUrl(url.Substring(1)) : ResolveUrl(url);
+                        Debug.WriteLine("---- after resolve: " + sw.ElapsedMilliseconds);
+                        Debug.WriteLine("---- before replace: " + sw.ElapsedMilliseconds);
+                        text = text.Replace(url, resolvedUrl);
+                        Debug.WriteLine("---- after replace: " + sw.ElapsedMilliseconds);
+                    }
+
                 }
 
-            }
+                Debug.WriteLine("total: " + sw.ElapsedMilliseconds);
+                sw.Stop();
+                System.Web.HttpContext.Current.Trace.Write("Resolve Urls", sw.ElapsedMilliseconds.ToString());
 
+            }
             return text;
         }
 
@@ -154,7 +173,7 @@ namespace umbraco.IO
                 throw new FileSecurityException(String.Format("The extension for the current file '{0}' is not of an allowed type for this editor. This is typically controlled from either the installed MacroEngines or based on configuration in /config/umbracoSettings.config", filePath.Replace(MapPath(SystemDirectories.Root), "")));
 
             return true;
-        } 
+        }
 
 
         /// <summary>

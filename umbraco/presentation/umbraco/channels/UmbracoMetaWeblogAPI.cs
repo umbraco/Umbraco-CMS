@@ -76,7 +76,7 @@ namespace umbraco.presentation.channels
                 if (publish)
                 {
                     doc.Publish(new User(username));
-                    library.PublishSingleNode(doc.Id);
+                    library.UpdateDocumentCache(doc.Id);
                 }
                 return true;
             }
@@ -381,7 +381,7 @@ namespace umbraco.presentation.channels
                 if (publish)
                 {
                     doc.Publish(new User(username));
-                    library.PublishSingleNode(doc.Id);
+                    library.UpdateDocumentCache(doc.Id);
                 }
                 return doc.Id.ToString();
             }

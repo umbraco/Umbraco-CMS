@@ -295,9 +295,6 @@ namespace umbraco.cms.businesslogic.template
 
         public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
         {
-            //ensure unique alias 
-            if (GetByAlias(Name) != null)
-                Name = EnsureUniqueAlias(Name, 1);
 
             Template t = MakeNew(Name, u);
             t.MasterTemplate = master.Id;
@@ -319,23 +316,25 @@ namespace umbraco.cms.businesslogic.template
             return t;
         }
 
-        public static Template MakeNew(string Name, BusinessLogic.User u)
+        public static Template MakeNew(string name, BusinessLogic.User u)
         {
-            //ensure unique alias 
-            if (GetByAlias(Name) != null)
-                Name = EnsureUniqueAlias(Name, 1);
 
             // CMSNode MakeNew(int parentId, Guid objectType, int userId, int level, string text, Guid uniqueID)
-            CMSNode n = CMSNode.MakeNew(-1, _objectType, u.Id, 1, Name, Guid.NewGuid());
-            Name = Name.Replace("/", ".").Replace("\\", "");
+            CMSNode n = CMSNode.MakeNew(-1, _objectType, u.Id, 1, name, Guid.NewGuid());
 
-            if (Name.Length > 100)
-                Name = Name.Substring(0, 95) + "...";
+            //ensure unique alias 
+            name = helpers.Casing.SafeAlias(name);
+            if (GetByAlias(name) != null)
+                name = EnsureUniqueAlias(name, 1);
+            name = name.Replace("/", ".").Replace("\\", "");
+
+            if (name.Length > 100)
+                name = name.Substring(0, 95) + "...";
 
 
             SqlHelper.ExecuteNonQuery("INSERT INTO cmsTemplate (NodeId, Alias, design, master) VALUES (@nodeId, @alias, @design, @master)",
                                       SqlHelper.CreateParameter("@nodeId", n.Id),
-                                      SqlHelper.CreateParameter("@alias", Name),
+                                      SqlHelper.CreateParameter("@alias", name),
                                       SqlHelper.CreateParameter("@design", ' '),
                                       SqlHelper.CreateParameter("@master", DBNull.Value));
 

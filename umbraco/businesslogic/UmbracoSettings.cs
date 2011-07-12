@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Web;
 using System.Web.Caching;
@@ -13,7 +14,6 @@ namespace umbraco
     /// </summary>
     public class UmbracoSettings
     {
-        // TODO: Remove for launch
         public const string TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME = ""; // "children";
 
         /// <summary>
@@ -925,6 +925,34 @@ namespace umbraco
                 {
                     return false;
                 }
+            }
+        }
+
+        private static bool? _resolveUrlsFromTextString;
+        public static bool ResolveUrlsFromTextString
+        {
+            get
+            {
+                if (_resolveUrlsFromTextString == null)
+                {
+                    try
+                    {
+                        bool enableDictionaryFallBack;
+                        var value = GetKey("/settings/content/ResolveUrlsFromTextString");
+                        if (value != null)
+                            if (bool.TryParse(value, out enableDictionaryFallBack))
+                                _resolveUrlsFromTextString = enableDictionaryFallBack;
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine("Could not load /settings/content/ResolveUrlsFromTextString from umbracosettings.config:\r\n {0}",
+                                ex.Message);
+                        
+                        // set url resolving to true (default (legacy) behavior) to ensure we don't keep writing to trace
+                        _resolveUrlsFromTextString = true;
+                    }
+                }
+                return _resolveUrlsFromTextString == true;
             }
         }
 

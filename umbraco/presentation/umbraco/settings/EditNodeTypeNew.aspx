@@ -17,4 +17,9 @@
                 runat="server" />
         </cc1:PropertyPanel>
     </cc1:Pane>
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            UmbClientMgr.appActions().bindSaveShortCut();
+        });
+    </script>
 </asp:Content>

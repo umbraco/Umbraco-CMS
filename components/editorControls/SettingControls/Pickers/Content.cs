@@ -159,7 +159,7 @@ namespace umbraco.editorControls.SettingControls.Pickers
                 if (_showXPath && tb.Text != string.Empty)
                     return tb.Text;
                 else
-                    return cc.Text;
+                    return cc.Value;
             }
             set
             {
@@ -170,7 +170,7 @@ namespace umbraco.editorControls.SettingControls.Pickers
                     int nodeId;
 
                     if (int.TryParse(_val, out nodeId))
-                        cc.Text = _val;
+                        cc.Value = _val;
                     else if (ShowXPath)
                         tb.Text = _val;
                 }

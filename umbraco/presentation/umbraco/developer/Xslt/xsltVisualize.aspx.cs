@@ -29,7 +29,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt
                 // Check if cookie exists in the current request.
 				// zb-00004 #29956 : refactor cookies names & handling
 				if (cookie.HasValue)
-                    contentPicker.Text = cookie.GetValue();
+                    contentPicker.Value = cookie.GetValue();
             }            
 
         }
@@ -62,7 +62,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt
             }
 
             Dictionary<string, object> parameters = new Dictionary<string, object>(1);
-            parameters.Add("currentPage", library.GetXmlNodeById(contentPicker.Text));
+            parameters.Add("currentPage", library.GetXmlNodeById(contentPicker.Value));
 
 
             // apply the XSLT transformation
@@ -92,7 +92,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt
 
             // add cookie with current page
 			// zb-00004 #29956 : refactor cookies names & handling
-			cookie.SetValue(contentPicker.Text);
+			cookie.SetValue(contentPicker.Value);
         }
 
     }

@@ -60,9 +60,9 @@ namespace umbraco.controls
             string tempTitle = "";
             try
             {
-                if (this.Text != "" && this.Text != "-1")
+                if (Value != "" && Value != "-1")
                 {
-                    tempTitle = new cms.businesslogic.CMSNode(int.Parse(this.Text)).Text;
+                    tempTitle = new cms.businesslogic.CMSNode(int.Parse(Value)).Text;
                 }
                 else
                 {

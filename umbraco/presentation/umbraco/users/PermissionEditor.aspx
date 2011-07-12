@@ -37,5 +37,10 @@
     
 		</ui:Pane>
 	</ui:UmbracoPanel>
-	
+	    <script type="text/javascript">
+	        jQuery(document).ready(function () {
+	            UmbClientMgr.appActions().bindSaveShortCut();
+	        });
+    </script>
+
 </asp:Content>

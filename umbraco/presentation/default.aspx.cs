@@ -237,7 +237,7 @@ namespace umbraco
                             System.Web.HttpContext.Current.Items.Add("pageElements", m_umbPage.Elements);
 
                         }
-                        catch (ArgumentException aex)
+                        catch (ArgumentException)
                         {
 
                             System.Web.HttpContext.Current.Items.Remove("pageElements");

@@ -11,7 +11,7 @@ namespace umbraco.MacroEngines {
             get {
                 try {
                     return new Dictionary.DictionaryItem(key).Value(Language.id);
-                } catch (Exception errDictionary) { }
+                } catch (Exception) { }
                 return string.Empty;
             }
         }

@@ -38,7 +38,7 @@ namespace umbraco.presentation
                             d.ReleaseDate = DateTime.MinValue; //new DateTime(1, 1, 1); // Causes release date to be null
 
 							d.Publish(d.User);
-							library.PublishSingleNode(d.Id);
+							library.UpdateDocumentCache(d.Id);
 
 						}
 						catch(Exception ee)

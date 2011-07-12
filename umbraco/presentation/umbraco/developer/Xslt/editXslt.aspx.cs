@@ -57,6 +57,7 @@ namespace umbraco.cms.presentation.developer
             save.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
             save.OnClickCommand = "doSubmit()";
             save.AltText = "Save Xslt File";
+            save.ID = "save";
 
             UmbracoPanel1.Menu.InsertSplitter();
 

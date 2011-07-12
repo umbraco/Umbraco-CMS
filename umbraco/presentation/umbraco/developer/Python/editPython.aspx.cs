@@ -66,6 +66,7 @@ namespace umbraco.cms.presentation.developer
             save.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
             save.OnClickCommand = "doSubmit()";
             save.AltText = "Save scripting File";
+            save.ID = "save";
 
             // Add source and filename
             String file = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + Request.QueryString["file"]);

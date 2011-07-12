@@ -18,7 +18,6 @@ namespace umbraco.presentation.nodeFactory {
     public sealed class UmbracoSiteMapProvider : System.Web.StaticSiteMapProvider {
 
         private SiteMapNode m_root;
-        private int m_indexID, m_indexTitle, m_indexUrl, m_indexDesc, m_indexRoles, m_indexParent;
         private Dictionary<string, SiteMapNode> m_nodes = new Dictionary<string, SiteMapNode>(16);
         private string m_defaultDescriptionAlias = "";
         private bool m_enableSecurityTrimming;

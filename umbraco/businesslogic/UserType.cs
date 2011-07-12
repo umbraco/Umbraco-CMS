@@ -151,7 +151,7 @@ namespace umbraco.BusinessLogic
         public void Save()
         {
             //ensure that this object has an ID specified (it exists in the database)
-            if (m_id == null || m_id <= 0)
+            if (m_id <= 0)
                 throw new Exception("The current UserType object does not exist in the database. New UserTypes should be created with the MakeNew method");
 
             SqlHelper.ExecuteNonQuery(@"
@@ -173,7 +173,7 @@ namespace umbraco.BusinessLogic
         public void Delete()
         {
             //ensure that this object has an ID specified (it exists in the database)
-            if (m_id == null || m_id <= 0)
+            if (m_id <= 0)
                 throw new Exception("The current UserType object does not exist in the database. New UserTypes should be created with the MakeNew method");
 
             SqlHelper.ExecuteNonQuery(@"

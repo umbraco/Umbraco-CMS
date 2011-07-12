@@ -183,13 +183,10 @@ namespace umbraco.cms.presentation
                             return BusinessLogic.User.GetCurrent().LoginName;
                         case "usercontentstartnode":
                             return BusinessLogic.User.GetCurrent().StartNodeId;
-                            break;
                         case "usermediastartnode":
                             return BusinessLogic.User.GetCurrent().StartMediaId;
-                            break;
                         default:
                             return value;
-                            break;
                     }
                 }
             }

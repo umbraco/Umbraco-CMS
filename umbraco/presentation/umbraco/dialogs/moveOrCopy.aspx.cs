@@ -91,7 +91,8 @@ namespace umbraco.dialogs
                     //
 
                     bool validAction = true;
-                    if (d.HasChildren)
+                    // only validate permissions in content
+                    if (app == "content" && d.HasChildren)
                     {
                         validAction = ValidAction(helper.Request("mode") == "cut" ? 'M' : 'O');
                     }
@@ -148,7 +149,7 @@ namespace umbraco.dialogs
                 if (cd.Published) {
                     cd.Publish(new umbraco.BusinessLogic.User(0));
                     //using library.publish to support load balancing.
-                    umbraco.library.PublishSingleNode(cd.Id);
+                    umbraco.library.UpdateDocumentCache(cd.Id);
 
 
                     if (cd.HasChildren) {

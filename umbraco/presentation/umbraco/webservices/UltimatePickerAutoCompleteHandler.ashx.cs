@@ -32,38 +32,37 @@ namespace umbraco.presentation.umbraco.webservices
 
             string documentAliasFilter = context.Request.QueryString["filter"];
             string[] documentAliasFilters = documentAliasFilter.Split(",".ToCharArray());
-            
-            
+
+
             CMSNode parent = new CMSNode(parentNodeId);
             if (!showGrandChildren)
             {
-                    nodeCount = 0;
+                nodeCount = 0;
 
-                    //store children array here because iterating over an Array property object is very inneficient.
-                    var children = parent.Children;
-                    foreach (CMSNode child in children)
-                    {
-                     
-                       
-                        nodeChildrenCount(child, false,documentAliasFilters);
-                        
-                    }
-                  
-                    output = new string[nodeCount];
+                //store children array here because iterating over an Array property object is very inneficient.
+                var children = parent.Children;
+                foreach (CMSNode child in children)
+                {
 
-                    int i = 0;
-                    Counter = 0;
-                    int level = 1;
 
-                    //why is there a 2nd iteration of the same thing here?
-                    foreach (CMSNode child in children)
-                    {
-                        
-                        addNode(child, level, showGrandChildren,documentAliasFilters);
-                    }
+                    nodeChildrenCount(child, false, documentAliasFilters);
 
-                  
                 }
+
+                output = new string[nodeCount];
+
+                Counter = 0;
+                int level = 1;
+
+                //why is there a 2nd iteration of the same thing here?
+                foreach (CMSNode child in children)
+                {
+
+                    addNode(child, level, showGrandChildren, documentAliasFilters);
+                }
+
+
+            }
             else
             {
                 nodeCount = 0;
@@ -72,7 +71,7 @@ namespace umbraco.presentation.umbraco.webservices
                 var children = parent.Children;
                 foreach (CMSNode child in children)
                 {
-                    nodeChildrenCount(child, true,documentAliasFilters);
+                    nodeChildrenCount(child, true, documentAliasFilters);
                 }
 
                 output = new string[nodeCount];
@@ -81,10 +80,10 @@ namespace umbraco.presentation.umbraco.webservices
 
                 foreach (CMSNode child in children)
                 {
-                    addNode(child, level, showGrandChildren,documentAliasFilters);
+                    addNode(child, level, showGrandChildren, documentAliasFilters);
                 }
 
-               
+
 
             }
 

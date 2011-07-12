@@ -93,6 +93,11 @@
                 AutoResize="true" OffSetX="47" OffSetY="55" />
         </cc1:Pane>
     </cc1:UmbracoPanel>
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            UmbClientMgr.appActions().bindSaveShortCut();
+        });
+    </script>
 </asp:Content>
 <asp:Content ContentPlaceHolderID="footer" runat="server">
     <asp:Literal ID="editorJs" runat="server"></asp:Literal>

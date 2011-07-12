@@ -300,7 +300,7 @@ namespace umbraco.presentation.templateControls
         /// </value>
         protected virtual bool FieldSupportsLiveEditing()
         {
-            return !(FieldIsRercursive() || FieldIsDictionaryItem() || FieldIsApiLookup());
+            return !(FieldIsRercursive() || FieldIsDictionaryItem());
         }
 
         /// <summary>
@@ -326,10 +326,11 @@ namespace umbraco.presentation.templateControls
         /// (if a NodeId attribute is specified and is different from the current page id).
         /// </summary>
         /// <returns><c>true</c> if API lookup is used; otherwise, <c>false</c>.</returns>
+        [Obsolete("Method never implemented", true)]
         protected virtual bool FieldIsApiLookup()
         {
             // TODO: remove false and add security
-            return false && GetParsedNodeId().Value != int.Parse(PageElements["pageID"].ToString());
+            return false;
         }
 
         /// <summary>

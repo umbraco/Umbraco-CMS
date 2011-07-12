@@ -77,7 +77,6 @@ namespace umbraco.editorControls.ultimatepicker
                         break;
                     case "dropdownlist":
                         return dropdownlistNodes.SelectedValue;
-                        break;
                     case "listbox":
                         foreach (ListItem item in listboxNodes.Items)
                         {

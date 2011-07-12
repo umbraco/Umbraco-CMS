@@ -76,7 +76,7 @@ namespace umbraco.uicontrols.TreePicker
                 {
                     return new CMSNode(int.Parse(ItemIdValue.Value)).Text;
                 }
-                catch (ArgumentException ex) { /*the node does not exist! we will ignore*/ }
+                catch (ArgumentException) { /*the node does not exist! we will ignore*/ }
             }
             return "";
         }

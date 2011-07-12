@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <language alias="en" intName="English (uk)" localName="English" lcid="" culture="en-GB">
   <creator>
     <name>umbraco</name>
@@ -50,21 +50,13 @@
     <key alias="removeMacro" version="4.5">Remove Macro</key>
     <key alias="insertMacro" version="4.5">Click to add a Macro</key>
     <key alias="macroContainerSettings" version="4.5">Macro Settings</key>
-    <key alias="templateContentAreaHelp" version="4.0">
-      <![CDATA[<strong>Set a placeholder id</strong> by setting an ID on your placeholder you can inject content into this template from child templates,
-      by refering this ID using a <code>&lt;asp:content /&gt;</code> element.]]>
-    </key>
-
-    <key alias="templateContentPlaceHolderHelp" version="4.0">
-      <![CDATA[<strong>Select a placeholder id</strong> from the list below. You can only
-      choose Id's from the current template's master.]]>
-    </key>
+    <key alias="templateContentAreaHelp" version="4.0"><![CDATA[<strong>Set a placeholder id</strong> by setting an ID on your placeholder you can inject content into this template from child templates,
+      by refering this ID using a <code>&lt;asp:content /&gt;</code> element.]]></key>
+    <key alias="templateContentPlaceHolderHelp" version="4.0"><![CDATA[<strong>Select a placeholder id</strong> from the list below. You can only
+      choose Id's from the current template's master.]]></key>
     <key alias="regexSearchHelp" version="4.0">Search for a regular expression to add validation to a form field. Exemple: 'email, 'zip-code' 'url'</key>
     <key alias="regexSearchError" version="4.0"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>
-
-    <key alias="macroDoesNotHaveProperties" version="4.0">
-      <![CDATA[This macro does not contain any properties you can edit]]>
-    </key>
+    <key alias="macroDoesNotHaveProperties" version="4.0"><![CDATA[This macro does not contain any properties you can edit]]></key>
   </area>
   <area alias="general">
     <key alias="properties">Properties</key>
@@ -156,14 +148,14 @@
     <key alias="retry" version="4.0">Retry</key>
     <key alias="next" version="4.0">Next</key>
     <key alias="previous" version="4.0">Previous</key>
-      <key alias="search" version="4.0">Search</key>
-      <key alias="renew">Renew</key>
-      <key alias="locked">Locked</key>
+    <key alias="search" version="4.0">Search</key>
+    <key alias="renew">Renew</key>
+    <key alias="locked">Locked</key>
   </area>
-    <area alias="lockout">
-        <key alias="lockoutWillOccur">You've been idle and logout will automatically occur in</key>
-        <key alias="renewSession">Renew now to save your work</key>
-    </area>
+  <area alias="lockout">
+    <key alias="lockoutWillOccur">You've been idle and logout will automatically occur in</key>
+    <key alias="renewSession">Renew now to save your work</key>
+  </area>
   <area alias="dashboard">
     <key alias="welcome">Welcome</key>
     <key alias="openinnew">has opened in a new window</key>
@@ -282,11 +274,9 @@
     <key alias="username">Username</key>
     <key alias="loginname">Login</key>
     <key alias="password">Password</key>
-
     <key alias="usertype">User type</key>
     <key alias="userPermissions">User permissions</key>
     <key alias="userTypes">User types</key>
-    
     <key alias="language">Language</key>
     <key alias="startnode">Start Node in Content</key>
     <key alias="mediastartnode">Start Node in Media Library</key>
@@ -298,18 +288,14 @@
     <key alias="disabled">Disable User</key>
     <key alias="defaultToLiveEditing" version="4.0">Redirect to canvas on login</key>
     <key alias="searchAllChildren" version="4.0">Search all children</key>
-
     <key alias="descriptionField" version="4.0">Description field</key>
     <key alias="categoryField" version="4.0">Category field</key>
     <key alias="excerptField" version="4.0">Excerpt field</key>
     <key alias="documentType" version="4.0">Document Type</key>
     <key alias="contentChannel" version="4.0">Content Channel</key>
-
     <key alias="permissionSelectPages" version="4.0">Select pages to modify their permissions</key>
     <key alias="permissionReplaceChildren" version="4.0">Replace child node permssions</key>
     <key alias="permissionSelectedPages" version="4.0"><![CDATA[You are currently modifying permissions for the pages:]]></key>
-
-
     <key alias="changePassword" version="4.6">Change Your Password</key>
     <key alias="changePasswordDescription" version="4.6">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
     <key alias="passwordEnterNew" version="4.6">Enter your new password</key>
@@ -400,26 +386,21 @@
     <key alias="xsltErrorHeader">Xslt not saved</key>
     <key alias="xsltPermissionErrorText">Xslt could not be saved, check file permissions</key>
     <key alias="xsltErrorText">Xslt contained an error</key>
-
     <key alias="pythonSavedHeader">Python script saved</key>
     <key alias="pythonSavedText">No errors in python script</key>
     <key alias="pythonErrorHeader">Python script not saved</key>
     <key alias="pythonErrorText">Python script could not be saved due to error</key>
-
     <key alias="templateSavedHeader">Template saved</key>
     <key alias="templateSavedText">Template saved without any errors!</key>
     <key alias="templateErrorHeader">Template not saved</key>
     <key alias="templateErrorText">Please make sure that you do not have 2 templates with the same alias</key>
-
     <key alias="cssSavedHeader">Stylesheet saved</key>
     <key alias="cssSavedText">Stylesheet saved without any errors</key>
     <key alias="cssErrorHeader">Stylesheet not saved</key>
-
     <key alias="fileErrorHeader">File not saved</key>
     <key alias="fileErrorText">file could not be saved. Please check file permissions</key>
     <key alias="fileSavedHeader">File saved</key>
     <key alias="fileSavedText">File saved without any errors</key>
-
     <key alias="contentTypeSavedHeader">Document Type saved</key>
     <key alias="contentTypeTabCreated">Tab created</key>
     <key alias="contentTypeTabDeleted">Tab deleted</key>
@@ -443,7 +424,6 @@
     <key alias="editUserError">Error saving user (check log)</key>
     <key alias="editContentSendToPublish">Sent For Approval</key>
     <key alias="editContentSendToPublishText">Changes have been sent for approval</key>
-
     <key alias="dictionaryItemSaved">Dictionary item saved</key>
     <key alias="languageSaved">Language saved</key>
   </area>
@@ -471,9 +451,7 @@
     <key alias="rollbackTo">Rollback to</key>
     <key alias="view">View</key>
     <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
-    <key alias="htmlHelp">
-      <![CDATA[This displays the selected version as html, if you wish to see the difference between 2 versions at the same time, use the diff view]]>
-    </key>
+    <key alias="htmlHelp"><![CDATA[This displays the selected version as html, if you wish to see the difference between 2 versions at the same time, use the diff view]]></key>
     <key alias="selectVersion">Select version</key>
     <key alias="documentRolledBack">Document has been rolled back</key>
   </area>
@@ -489,11 +467,9 @@
     <key alias="inProgress">Publishing in progress - please wait...</key>
     <key alias="inProgressCounter">%0% out of %1% pages have been published...</key>
     <key alias="includeUnpublished">Include unpublished child pages</key>
-    <key alias="publishHelp" version="4.0">
-      <![CDATA[Click <em>ok</em> to publish <strong>%0%</strong> and thereby making it's content publicly available.<br/><br />
+    <key alias="publishHelp" version="4.0"><![CDATA[Click <em>ok</em> to publish <strong>%0%</strong> and thereby making it's content publicly available.<br/><br />
       You can publish this page and all it's sub-pages by checking <em>publish all children</em> below.
-      ]]>
-    </key>
+      ]]></key>
     <key alias="contentPublishedFailedByEvent" version="4.0">
       %0% could not be published, due to a 3rd party extension cancelling the action.
     </key>
@@ -559,11 +535,9 @@
     <key alias="insertPageField" version="4.0">Insert umbraco page field</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description">
-      <![CDATA[
+    <key alias="description"><![CDATA[
       Edit the different language versions for the dictionary item '<em>%0%</em>' below<br/>You can add additional languages under the 'languages' in the menu on the left
-   ]]>
-   </key>
+   ]]></key>
     <key alias="displayName">Culture Name</key>
   </area>
   <area alias="language">
@@ -617,24 +591,18 @@
   </area>
   <area alias="publicAccess" version="2.1">
     <key alias="paHowWould" version="2.1">Choose how to restict access to this page</key>
-
     <key alias="paSimple" version="2.1">Single user protection</key>
     <key alias="paSimpleHelp" version="4.0">If you just want to setup simple protection using a single login and password</key>
-
     <key alias="paAdvanced" version="2.1">Role based protection</key>
     <key alias="paAdvancedHelp" version="2.1"><![CDATA[If you wish to control access to the page using role-based authentication,<br /> using umbraco's member groups.]]></key>
     <key alias="paAdvancedNoGroups" version="4.0"><![CDATA[You need to create a membergroup before you can use <br />role-based authentication.]]></key>
-
     <key alias="paLoginPage" version="2.1">Login Page</key>
     <key alias="paErrorPage" version="2.1">Error Page</key>
-
     <key alias="paSelectPages" version="4.0">Select the pages that contain login form and error messages</key>
     <key alias="paLoginPageHelp" version="2.1">Choose the page that has the login formular</key>
     <key alias="paErrorPageHelp" version="2.1">Used when people are logged on, but do not have access</key>
-
     <key alias="paSelectRoles" version="4.0">Pick the roles who have access to this page</key>
     <key alias="paSetLogin" version="4.0">Set the login and password for this page</key>
-
     <key alias="paIsProtected" version="2.1">%0% is now protected</key>
     <key alias="paIsRemoved" version="2.1">Protection removed from %0%</key>
     <key alias="paRemoveProtection" version="2.1">Remove Protection</key>
@@ -659,8 +627,7 @@
 
       Cheers from the umbraco robot
     </key>
-    <key alias="mailBodyHtml" version="3.0">
-      <![CDATA[<p>Hi %0%</p>
+    <key alias="mailBodyHtml" version="3.0"><![CDATA[<p>Hi %0%</p>
 
 		  <p>This is an automated mail to inform you that the task <strong>'%1%'</strong> 
 		  has been performed on the page <a href="%7%"><strong>'%2%'</strong></a>
@@ -690,8 +657,7 @@
 
 		  <p>Have a nice day!<br /><br />
 			  Cheers from the umbraco robot
-		  </p>]]>
-    </key>
+		  </p>]]></key>
   </area>
   <area alias="translation" version="3.0">
     <key alias="pageHasBeenSendToTranslation" version="4.0">The page '%0%' has been send to translation</key>
@@ -717,27 +683,20 @@
       Cheers from the umbraco robot
     </key>
     <key alias="assignedTasks" version="4.0">Tasks assigned to you</key>
-    <key alias="assignedTasksHelp" version="4.0">
-      <![CDATA[ The list below shows translation tasks <strong>assigned to you</strong>. To see a detailed view including comments, click on "Details" or just the page name. 
+    <key alias="assignedTasksHelp" version="4.0"><![CDATA[ The list below shows translation tasks <strong>assigned to you</strong>. To see a detailed view including comments, click on "Details" or just the page name. 
      You can also download the page as XML directly by clicking the "Download Xml" link. <br/>
      To close a translation task, please go to the Details view and click the "Close" button.
-    ]]>
-    </key>
+    ]]></key>
     <key alias="ownedTasks" version="4.0">Tasks created by you</key>
-    <key alias="ownedTasksHelp" version="4.0">
-      <![CDATA[ The list below shows pages <strong>created by you</strong>. To see a detailed view including comments, 
+    <key alias="ownedTasksHelp" version="4.0"><![CDATA[ The list below shows pages <strong>created by you</strong>. To see a detailed view including comments, 
      click on "Details" or just the page name. You can also download the page as XML directly by clicking the "Download Xml" link. 
      To close a translation task, please go to the Details view and click the "Close" button.
-    ]]>
-    </key>
-
+    ]]></key>
     <key alias="downloadTaskAsXml" version="4.0">Download xml</key>
     <key alias="downloadAllAsXml" version="4.0">Download all translation tasks as xml</key>
-    
     <key alias="DownloadXmlDTD" version="4.0">Download xml DTD</key>
     <key alias="closeTask" version="4.0">close task</key>
     <key alias="uploadTranslationXml" version="4.0">Upload translation xml</key>
-
     <key alias="taskOpened" version="4.0">Task opened</key>
     <key alias="taskAssignedBy" version="4.0">Assigned by</key>
     <key alias="totalWords" version="4.0">Total words</key>
@@ -753,41 +712,31 @@
     <key alias="packageName" version="4.0">Package name</key>
     <key alias="packageVersion" version="4.0">Package version</key>
     <key alias="packageAuthor" version="4.0">Author</key>
-
     <key alias="packageDocumentation" version="4.0">Documentation</key>
     <key alias="packageDemonstration" version="4.0">Demonstration</key>
     <key alias="packageRepository" version="4.0">Package repository</key>
-
     <key alias="packageReadme" version="4.0">Package readme</key>
     <key alias="packageOptions" version="4.0">Package options</key>
     <key alias="viewPackageWebsite" version="4.0">View package website</key>
     <key alias="packageUninstallHeader" version="4.0">Uninstall package</key>
-    <key alias="packageUninstallText" version="4.0">
-      <![CDATA[You can unselect items you do not wish to remove, at this time, below. When you click "confirm uninstall" all checked-off items will be removed.<br />
+    <key alias="packageUninstallText" version="4.0"><![CDATA[You can unselect items you do not wish to remove, at this time, below. When you click "confirm uninstall" all checked-off items will be removed.<br />
       <span style="color: Red; font-weight: bold;">Notice:</span> any documents, media etc depending on the items you remove, will stop working, and could lead to system instability,
-      so uninstall with caution. If in doubt, contact the package author.]]>
-    </key>
+      so uninstall with caution. If in doubt, contact the package author.]]></key>
     <key alias="packageUninstallConfirm" version="4.0">Confirm uninstall</key>
     <key alias="packageUninstalledHeader" version="4.0">Package was uninstalled</key>
     <key alias="packageUninstalledText" version="4.0">The package was successfully uninstalled</key>
-
     <key alias="packageNoItemsHeader" version="4.0">Package doesn't contain any items</key>
-    <key alias="packageNoItemsText" version="4.0">
-      <![CDATA[This package file doesn't contain any items to uninstall.<br/><br/>
-      You can safely remove this from the system by clicking "uninstall package" below.]]>
-    </key>
-
+    <key alias="packageNoItemsText" version="4.0"><![CDATA[This package file doesn't contain any items to uninstall.<br/><br/>
+      You can safely remove this from the system by clicking "uninstall package" below.]]></key>
     <key alias="packageUpgradeHeader" version="4.0">Upgrade package</key>
     <key alias="packageUpgradeText" version="4.0"> There's an upgrade available for this package. You can download it directly from the umbraco package repository.</key>
     <key alias="packageNoUpgrades" version="4.0">No upgrades available</key>
     <key alias="packageUpgradeInstructions" version="4.0">Upgrade instructions</key>
     <key alias="packageUpgradeDownload" version="4.0">Download update from the repository</key>
-    <key alias="chooseLocalPackageText" version="4.0">
-      <![CDATA[
+    <key alias="chooseLocalPackageText" version="4.0"><![CDATA[
       Choose Package from your machine, by clicking the Browse<br />
          button and locating the package. umbraco packages usually have a ".umb" or ".zip" extension.
-      ]]>      
-    </key>
+      ]]></key>
   </area>
   <area alias="installer" version="4.0">
     <key alias="thankYou">Thank you for choosing umbraco</key>
@@ -795,95 +744,67 @@
                                 <br /><br />
                                 Press <strong>"next"</strong> to start the wizard.]]></key>
     <key alias="greatStart">Get a great start, watch our introduction videos</key>
-   
     <key alias="watch">Watch</key>
-
     <key alias="step1">Step 1/5 Accept license</key>
     <key alias="licenseText">By clicking the next button (or modifying the umbracoConfigurationStatus in web.config), you accept the license for this software as specified in the box below. Notice that this umbraco distribution consists of two different licenses, the open source MIT license for the framework and the umbraco freeware license that covers the UI.</key>
-
     <key alias="step2">Step 2/5: Database configuration</key>
     <key alias="databaseHeader">Database configuration</key>
-    <key alias="databaseText">
-      <![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
+    <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
-        If you're installing on a local machine or server you might need information from your system administrator.]]>
-    </key>
+        If you're installing on a local machine or server you might need information from your system administrator.]]></key>
     <key alias="databaseFound">Your database has been found and is identified as</key>
     <key alias="databaseUpToDate"><![CDATA[Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard]]></key>
-    <key alias="databaseUpgrade">
-      <![CDATA[
+    <key alias="databaseUpgrade"><![CDATA[
       <p>
       Press the <strong>upgrade</strong> button to upgrade your database to Umbraco %0%</p>
       <p>
       Don't worry - no content will be deleted and everything will continue working afterwards!
       </p>    
-      ]]>
-    </key>
-    <key alias="databaseInstall">
-      <![CDATA[
+      ]]></key>
+    <key alias="databaseInstall"><![CDATA[
       Press the <strong>install</strong> button to install the Umbraco %0% database
-    ]]>
-    </key>
-    <key alias="databaseNotFound">
-      <![CDATA[<p>Database not found! Please check that the information in the "connection string" of the “web.config” file is correct.</p>
+    ]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the “web.config” file is correct.</p>
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "umbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when 
               done.<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
-			              More information on editing web.config here.</a></p>]]>
-    </key>
+			              More information on editing web.config here.</a></p>]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.]]></key>
-    <key alias="databaseUpgradeDone">
-      <![CDATA[Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to 
-      proceed. ]]>
-    </key>
+    <key alias="databaseUpgradeDone"><![CDATA[Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to 
+      proceed. ]]></key>
     <key alias="databaseErrorCannotConnect">The installer cannot connect to the database.</key>
     <key alias="databaseErrorWebConfig">Could not save the web.config file. Please modify the connection string manually.</key>
     <key alias="Unavailable">Connection to database failed.</key>
     <key alias="None">Not installed yet.</key>
     <key alias="Version3">Umbraco Version 3</key>
     <key alias="Version4">Umbraco Version 4</key>
-
     <key alias="step3">Step 3/5: Validating File Permissions</key>
     <key alias="permissionsText">
       umbraco needs write/modify access to certain directories in order to store files like pictures and PDF's.
       It also stores temporary data (aka: cache) for enhancing the performance of your website.
     </key>
-    <key alias="permissionsPerfect">
-      <![CDATA[<strong>Your permission settings are perfect!</strong><br /><br />
-              You are ready to run umbraco and install packages!]]>
-    </key>
-    <key alias="permissionsAlmostPerfect">
-      <![CDATA[<strong>Your permission settings are almost perfect!</strong><br /><br />
-        You can run umbraco without problems, but you will not be able to install packages which are recommended to take full advantage of umbraco.]]>
-    </key>
-    <key alias="permissionsNotReady">
-      <![CDATA[<strong>Your permission settings are not ready for umbraco!</strong>
+    <key alias="permissionsPerfect"><![CDATA[<strong>Your permission settings are perfect!</strong><br /><br />
+              You are ready to run umbraco and install packages!]]></key>
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Your permission settings are almost perfect!</strong><br /><br />
+        You can run umbraco without problems, but you will not be able to install packages which are recommended to take full advantage of umbraco.]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Your permission settings are not ready for umbraco!</strong>
           <br /><br />
-          In order to run umbraco, you'll need to update your permission settings.]]>
-    </key>
-    <key alias="permissionsMaybeAnIssue">
-      <![CDATA[<strong>Your permission settings might be an issue!</strong>
+          In order to run umbraco, you'll need to update your permission settings.]]></key>
+    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Your permission settings might be an issue!</strong>
       <br/><br />
-      You can run umbraco without problems, but you will not be able to create folders or install packages which are recommended to take full advantage of umbraco.]]>
-    </key>
-
+      You can run umbraco without problems, but you will not be able to create folders or install packages which are recommended to take full advantage of umbraco.]]></key>
     <key alias="permissionsHowtoResolve">How to Resolve</key>
     <key alias="permissionsHowtoResolveText"><![CDATA[Watch our <strong>video tutorial</strong> on setting up folder permissions for umbraco or read the text version.]]></key>
     <key alias="permissionsHowtoResolveLink">Click here to read the text version</key>
-    
     <key alias="permissionsSettingUpPermissions">Setting up folder permissions</key>
     <key alias="permissionsAffectedFolders">Affected files and folders</key>
     <key alias="permissionsAffectedFoldersText">You need to grant ASP.NET modify permissions to the following files/folders</key>
     <key alias="permissionsAffectedFoldersMoreInfo">More information on setting up permissions for umbraco here</key>
-    
     <key alias="permissionsResolveFolderIssues">Resolving folder issue</key>
     <key alias="permissionsResolveFolderIssuesLink">Follow this link for more information on problems with ASP.NET and creating folders</key>
-
-
     <key alias="step4">Step 4/5: Check umbraco security</key>
-    <key alias="defaultUserText">
-      <![CDATA[
+    <key alias="defaultUserText"><![CDATA[
         <p>
           umbraco creates a default user with a login <strong>('admin')</strong> and password <strong>('default')</strong>. It's <strong>important</strong> that the password is 
           changed to something unique.
@@ -891,19 +812,16 @@
         <p>
           This step will check the default user's password and suggest if it needs to be changed.
         </p>
-      ]]>
-    </key>
+      ]]></key>
     <key alias="defaultUserPasswordChanged">The password is changed!</key>
     <key alias="defaultUserDisabled"><![CDATA[<strong>The Default user has been disabled or has no access to umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>The Default users’ password needs to be changed!</strong>]]></key>
-
     <key alias="step5">Step 5/5: Umbraco is ready to get you started</key>
     <key alias="runwayHeader">You’ve just set up a clean Umbraco platform. What do you want to do next?</key>
     <key alias="runwaySimpleSite">I want to start with a simple website</key>
     <key alias="runwayFromScratch">I want to start from scratch</key>
-    <key alias="runwaySimpleSiteText">
-      <![CDATA[
+    <key alias="runwaySimpleSiteText"><![CDATA[
       <p>
       "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically, 
         but you can easily edit, extend or remove it. It’s not necessary and you can perfectly use Umbraco without it. However, 
@@ -914,74 +832,43 @@
         <em>Included with Runway:</em> Home page, Getting Started page, Installing Modules page.<br />
         <em>Optional Modules:</em> Top Navigation, Sitemap, Contact, Gallery.
         </small>
-      ]]>
-    </key>
-    <key alias="runwayFromScratchText">
-      <![CDATA[
+      ]]></key>
+    <key alias="runwayFromScratchText"><![CDATA[
         Your website is completely empty at the moment, so that’s perfect if you want to start from scratch and create your own document types and templates. 
         (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
-      ]]>
-    </key>
-
+      ]]></key>
     <key alias="runwayWhatIsRunway">What is Runway</key>
     <key alias="runwayInstalled">Runway is installed</key>
-    <key alias="runwayInstalledText">
-      <![CDATA[
+    <key alias="runwayInstalledText"><![CDATA[
       You have the foundation in place. Select what modules you wish to install on top of it.<br />
       This is our list of recommended modules, check off the ones you would like to install, or view the <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">full list of modules</a>
-      ]]>
-    </key>
+      ]]></key>
     <key alias="runwayOnlyProUsers">Only recommended for experienced users</key>
-
     <key alias="theEndHeader">Umbraco %0% is installed and ready for use</key>
-    <key alias="theEndInstallFailed">
-      <![CDATA[To finish the installation, you'll need to 
+    <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to 
         manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>umbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
-    <key alias="theEndInstallSuccess">
-      <![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to umbraco</strong>, 
+    <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to umbraco</strong>, 
 you can find plenty of resources on our getting started pages.]]></key>
-    <key alias="theEndBrowseSite">
-      <![CDATA[<h3>Browse your new site</h3>
+    <key alias="theEndBrowseSite"><![CDATA[<h3>Browse your new site</h3>
 You installed Runway, so why not see how your new website looks.]]></key>
-    <key alias="theEndFurtherHelp">
-      <![CDATA[<h3>Further help and information</h3>
+    <key alias="theEndFurtherHelp"><![CDATA[<h3>Further help and information</h3>
 Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the umbraco terminology]]></key>
-    <key alias="theEndOpenUmbraco">
-      <![CDATA[<h3>Launch Umbraco</h3>
-To manage your website, simply open the umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]>
-    </key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
+To manage your website, simply open the umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]></key>
   </area>
   <area alias="relatedlinks">
-    <key alias="modeUp">
-      <![CDATA[Move Up]]>
-    </key>
-    <key alias="modeDown">
-      <![CDATA[Move Down]]>
-    </key>
-    <key alias="removeLink">
-      <![CDATA[Remove link]]>
-    </key>
-    <key alias="newWindow">
-      <![CDATA[Open in new window]]>
-    </key>
-    <key alias="addInternal">
-      <![CDATA[Add internal link]]>
-    </key>
-    <key alias="addExternal">
-      <![CDATA[Add external link]]>
-    </key>
-    <key alias="caption">
-      <![CDATA[Caption]]>
-    </key>
-    <key alias="linkurl">
-      <![CDATA[URL]]>
-    </key>
-    <key alias="internalPage">
-      <![CDATA[Internal page]]>
-    </key>
-    <key alias="addlink">
-      <![CDATA[Add]]>
-    </key>
+    <key alias="modeUp"><![CDATA[Move Up]]></key>
+    <key alias="modeDown"><![CDATA[Move Down]]></key>
+    <key alias="removeLink"><![CDATA[Remove link]]></key>
+    <key alias="newWindow"><![CDATA[Open in new window]]></key>
+    <key alias="addInternal"><![CDATA[Add internal link]]></key>
+    <key alias="addExternal"><![CDATA[Add external link]]></key>
+    <key alias="caption"><![CDATA[Caption]]></key>
+    <key alias="linkurl"><![CDATA[URL]]></key>
+    <key alias="internalPage"><![CDATA[Internal page]]></key>
+    <key alias="addlink"><![CDATA[Add]]></key>
   </area>
+  <key alias="transferCourierRevision">Transfer</key>
+  <key alias="transferCourierItem">Transfer</key>
 </language>

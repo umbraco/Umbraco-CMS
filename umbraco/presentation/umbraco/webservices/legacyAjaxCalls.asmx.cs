@@ -188,19 +188,14 @@ namespace umbraco.presentation.webservices
             {
                 case "xslt":
                     return saveXslt(fileName, fileContents, ignoreDebug);
-                    break;
                 case "python":
                     return "true";
-                    break;
                 case "css":
                     return saveCss(fileName, fileContents, fileID);
-                    break;
                 case "script":
                     return saveScript(fileName, fileContents);
-                    break;
                 case "template":
                     return saveTemplate(fileName, fileAlias, fileContents, fileID, masterID);
-                    break;
                 default:
                     throw new ArgumentException(String.Format("Invalid fileType passed: '{0}'", fileType));
             }

@@ -345,6 +345,7 @@ namespace umbraco.cms.presentation.developer
 
             ImageButton save = InfoTabPage.Menu.NewImageButton();
             save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
+            save.ID = "save";
 
             ImageButton save2 = Parameters.Menu.NewImageButton();
             save2.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
