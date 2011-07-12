@@ -82,53 +82,14 @@ namespace umbraco.MacroEngines
                 result = this.GroupBy<DynamicNode>(args.First().ToString());
                 return true;
             }
-
+            if (name == "Average" || name == "Min" || name == "Max" || name == "Sum")
+            {
+                result = Aggregate(args, name);
+                return true;
+            }
             if (name == "Pluck" || name == "Select")
             {
-                string predicate = args.First().ToString();
-                var values = args.Skip(1).ToArray();
-                var query = (IQueryable<object>)this.Select(predicate, values);
-                object firstItem = query.FirstOrDefault();
-                if (firstItem == null)
-                {
-                    result = new DynamicNull();
-                }
-                else
-                {
-                    var types = from i in query
-                                group i by i.GetType() into g
-                                orderby g.Count() descending
-                                select new { g, Instances = g.Count() };
-                    var dominantType = types.First().g.Key;
-                    //remove items that are not the dominant type
-                    //e.g. string,string,string,string,false[DynamicNull],string
-                    var itemsOfDominantTypeOnly = query.ToList();
-                    itemsOfDominantTypeOnly.RemoveAll(item => !item.GetType().IsAssignableFrom(dominantType));
-                    if (dominantType == typeof(string))
-                    {
-                        result = (List<string>)itemsOfDominantTypeOnly.Cast<string>().ToList();
-                    }
-                    else if (dominantType == typeof(int))
-                    {
-                        result = (List<int>)itemsOfDominantTypeOnly.Cast<int>().ToList();
-                    }
-                    else if (dominantType == typeof(decimal))
-                    {
-                        result = (List<decimal>)itemsOfDominantTypeOnly.Cast<decimal>().ToList();
-                    }
-                    else if (dominantType == typeof(bool))
-                    {
-                        result = (List<bool>)itemsOfDominantTypeOnly.Cast<bool>().ToList();
-                    }
-                    else if (dominantType == typeof(DateTime))
-                    {
-                        result = (List<DateTime>)itemsOfDominantTypeOnly.Cast<DateTime>().ToList();
-                    }
-                    else
-                    {
-                        result = query.ToList();
-                    }
-                }
+                result = Pluck(args);
                 return true;
             }
             try
@@ -193,6 +154,142 @@ namespace umbraco.MacroEngines
                 return false;
             }
 
+        }
+        private T Aggregate<T>(List<T> data, string name) where T : struct
+        {
+            switch (name)
+            {
+                case "Min":
+                    return data.Min<T>();
+                case "Max":
+                    return data.Max<T>();
+                case "Average":
+                    if (typeof(T) == typeof(int))
+                    {
+                        return (T)Convert.ChangeType((data as List<int>).Average(), typeof(T));
+                    }
+                    if (typeof(T) == typeof(decimal))
+                    {
+                        return (T)Convert.ChangeType((data as List<decimal>).Average(), typeof(T));
+                    }
+                    break;
+                case "Sum":
+                    if (typeof(T) == typeof(int))
+                    {
+                        return (T)Convert.ChangeType((data as List<int>).Sum(), typeof(T));
+                    }
+                    if (typeof(T) == typeof(decimal))
+                    {
+                        return (T)Convert.ChangeType((data as List<decimal>).Sum(), typeof(T));
+                    }
+                    break;
+            }
+            return default(T);
+        }
+        private object Aggregate(object[] args, string name)
+        {
+            object result;
+            string predicate = args.First().ToString();
+            var values = args.Skip(1).ToArray();
+            var query = (IQueryable<object>)this.Select(predicate, values);
+            object firstItem = query.FirstOrDefault();
+            if (firstItem == null)
+            {
+                result = new DynamicNull();
+            }
+            else
+            {
+                var types = from i in query
+                            group i by i.GetType() into g
+                            orderby g.Count() descending
+                            select new { g, Instances = g.Count() };
+                var dominantType = types.First().g.Key;
+                //remove items that are not the dominant type
+                //e.g. string,string,string,string,false[DynamicNull],string
+                var itemsOfDominantTypeOnly = query.ToList();
+                itemsOfDominantTypeOnly.RemoveAll(item => !item.GetType().IsAssignableFrom(dominantType));
+                if (dominantType == typeof(string))
+                {
+                    throw new ArgumentException("Can only use aggregate methods on properties which are numeric");
+                }
+                else if (dominantType == typeof(int))
+                {
+                    List<int> data = (List<int>)itemsOfDominantTypeOnly.Cast<int>().ToList();
+                    return Aggregate<int>(data, name);
+                }
+                else if (dominantType == typeof(decimal))
+                {
+                    List<decimal> data = (List<decimal>)itemsOfDominantTypeOnly.Cast<decimal>().ToList();
+                    return Aggregate<decimal>(data, name);
+                }
+                else if (dominantType == typeof(bool))
+                {
+                    throw new ArgumentException("Can only use aggregate methods on properties which are numeric or datetime");
+                }
+                else if (dominantType == typeof(DateTime))
+                {
+                    if (name != "Min" || name != "Max")
+                    {
+                        throw new ArgumentException("Can only use aggregate min or max methods on properties which are datetime");
+                    }
+                    List<DateTime> data = (List<DateTime>)itemsOfDominantTypeOnly.Cast<DateTime>().ToList();
+                    return Aggregate<DateTime>(data, name);
+                }
+                else
+                {
+                    result = query.ToList();
+                }
+            }
+            return result;
+        }
+        private object Pluck(object[] args)
+        {
+            object result;
+            string predicate = args.First().ToString();
+            var values = args.Skip(1).ToArray();
+            var query = (IQueryable<object>)this.Select(predicate, values);
+            object firstItem = query.FirstOrDefault();
+            if (firstItem == null)
+            {
+                result = new DynamicNull();
+            }
+            else
+            {
+                var types = from i in query
+                            group i by i.GetType() into g
+                            orderby g.Count() descending
+                            select new { g, Instances = g.Count() };
+                var dominantType = types.First().g.Key;
+                //remove items that are not the dominant type
+                //e.g. string,string,string,string,false[DynamicNull],string
+                var itemsOfDominantTypeOnly = query.ToList();
+                itemsOfDominantTypeOnly.RemoveAll(item => !item.GetType().IsAssignableFrom(dominantType));
+                if (dominantType == typeof(string))
+                {
+                    result = (List<string>)itemsOfDominantTypeOnly.Cast<string>().ToList();
+                }
+                else if (dominantType == typeof(int))
+                {
+                    result = (List<int>)itemsOfDominantTypeOnly.Cast<int>().ToList();
+                }
+                else if (dominantType == typeof(decimal))
+                {
+                    result = (List<decimal>)itemsOfDominantTypeOnly.Cast<decimal>().ToList();
+                }
+                else if (dominantType == typeof(bool))
+                {
+                    result = (List<bool>)itemsOfDominantTypeOnly.Cast<bool>().ToList();
+                }
+                else if (dominantType == typeof(DateTime))
+                {
+                    result = (List<DateTime>)itemsOfDominantTypeOnly.Cast<DateTime>().ToList();
+                }
+                else
+                {
+                    result = query.ToList();
+                }
+            }
+            return result;
         }
 
         private object ExecuteExtensionMethod(object[] args, string name, bool argsContainsThis)
