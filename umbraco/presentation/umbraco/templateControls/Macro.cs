@@ -79,16 +79,53 @@ namespace umbraco.presentation.templateControls
             }
         }
 
-        /// <summary>
+		[Bindable(true)]
+		[Category("Umbraco")]
+		[DefaultValue(RenderEvents.Init)]
+		[Localizable(true)]
+		public RenderEvents RenderEvent
+		{
+			get
+			{
+				RenderEvents renderEvent = RenderEvents.Init;
+				if (ViewState["RenderEvent"] != null)
+					renderEvent = (RenderEvents)ViewState["RenderEvent"];
+				return renderEvent;
+			}
+			set
+			{
+				ViewState["RenderEvent"] = value;
+			}
+		}
+
+		// Indicates where to run EnsureChildControls and effectively render the macro
+		public enum RenderEvents
+		{
+			Init,
+			PreRender,
+			Render
+		}
+
+		/// <summary>
         /// Raises the <see cref="E:System.Web.UI.Control.Init"/> event.
         /// </summary>
         /// <param name="e">An <see cref="T:System.EventArgs"/> object that contains the event data.</param>
         protected override void OnInit(EventArgs e) {
             base.OnInit(e);
 
-            // Make sure child controls are in place to receive postback data.
-            EnsureChildControls();
+            // Create child controls when told to - this is the default
+			if (this.RenderEvent == RenderEvents.Init)
+	            EnsureChildControls();
         }
+
+		// Create child controls when told to - new option to render at PreRender
+		protected override void OnPreRender(EventArgs e)
+		{
+			base.OnPreRender(e);
+
+			if (this.RenderEvent == RenderEvents.PreRender)
+				EnsureChildControls();
+		}
 
         /// <summary>
         /// Called by the ASP.NET page framework to notify server controls that use composition-based implementation to create any child controls they contain in preparation for posting back or rendering.
@@ -151,6 +188,7 @@ namespace umbraco.presentation.templateControls
         /// <param name="writer">The <see cref="T:System.Web.UI.HtmlTextWriter"/> object that receives the control content.</param>
         protected override void Render(HtmlTextWriter writer)
         {
+			// Create child controls when told to - do it here anyway as it has to be done
             EnsureChildControls();
 
             bool isDebug = GlobalSettings.DebugMode && (helper.Request("umbdebugshowtrace") != "" || helper.Request("umbdebug") != "");
