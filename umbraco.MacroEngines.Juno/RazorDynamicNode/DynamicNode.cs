@@ -197,8 +197,9 @@ namespace umbraco.MacroEngines
                         }
                         else
                         {
-                            throw new NullReferenceException("XPath returned no nodes");
-                        }
+                            // XPath returned no nodes, return an empty DynamicNodeList
+							return new DynamicNodeList(); 
+						}
                     }
                     else
                     {
