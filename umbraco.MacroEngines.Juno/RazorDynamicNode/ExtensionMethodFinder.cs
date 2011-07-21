@@ -125,26 +125,30 @@ namespace umbraco.MacroEngines
                 return null;
             }
             MethodInfo methodToExecute = null;
-            //Given the args, lets get the types and compare the type sequence to try and find the correct overload
-            var argTypes = args.ToList().ConvertAll(o =>
+            if (methods.Count > 1)
             {
-                Expression oe = (o as Expression);
-                if (oe != null)
+                //Given the args, lets get the types and compare the type sequence to try and find the correct overload
+                var argTypes = args.ToList().ConvertAll(o =>
                 {
-                    return oe.Type.FullName;
+                    Expression oe = (o as Expression);
+                    if (oe != null)
+                    {
+                        return oe.Type.FullName;
+                    }
+                    return o.GetType().FullName;
+                });
+                var methodsWithArgTypes = methods.ConvertAll(method => new { method = method, types = method.GetParameters().ToList().ConvertAll(pi => pi.ParameterType.FullName) });
+                var firstMatchingOverload = methodsWithArgTypes.FirstOrDefault(m =>
+                {
+                    return m.types.SequenceEqual(argTypes);
+                });
+                if (firstMatchingOverload != null)
+                {
+                    methodToExecute = firstMatchingOverload.method;
                 }
-                return o.GetType().FullName;
-            });
-            var methodsWithArgTypes = methods.ConvertAll(method => new { method = method, types = method.GetParameters().ToList().ConvertAll(pi => pi.ParameterType.FullName) });
-            var firstMatchingOverload = methodsWithArgTypes.FirstOrDefault(m =>
-            {
-                return m.types.SequenceEqual(argTypes);
-            });
-            if (firstMatchingOverload != null)
-            {
-                methodToExecute = firstMatchingOverload.method;
             }
-            else
+
+            if (methodToExecute == null)
             {
                 MethodInfo firstMethod = methods.FirstOrDefault();
                 // NH: this is to ensure that it's always the correct one being chosen when using the LINQ extension methods
