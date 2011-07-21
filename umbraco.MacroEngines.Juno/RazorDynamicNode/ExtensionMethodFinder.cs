@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Web.Compilation;
 using System.Runtime.CompilerServices;
 using System.Collections;
+using System.Linq.Expressions;
 
 namespace umbraco.MacroEngines
 {
@@ -123,23 +124,53 @@ namespace umbraco.MacroEngines
             {
                 return null;
             }
-
-            MethodInfo firstMethod = methods.First();
-            // NH: this is to ensure that it's always the correct one being chosen when using the LINQ extension methods
-            if (methods.Count > 1)
-                firstMethod = methods.First(x => x.IsGenericMethodDefinition);
-
             MethodInfo methodToExecute = null;
-            if (firstMethod.IsGenericMethodDefinition)
+            //Given the args, lets get the types and compare the type sequence to try and find the correct overload
+            var argTypes = args.ToList().ConvertAll(o =>
             {
-                if (genericType != null)
+                Expression oe = (o as Expression);
+                if (oe != null)
                 {
-                    methodToExecute = firstMethod.MakeGenericMethod(genericType);
+                    return oe.Type.FullName;
                 }
+                return o.GetType().FullName;
+            });
+            var methodsWithArgTypes = methods.ConvertAll(method => new { method = method, types = method.GetParameters().ToList().ConvertAll(pi => pi.ParameterType.FullName) });
+            var firstMatchingOverload = methodsWithArgTypes.FirstOrDefault(m =>
+            {
+                return m.types.SequenceEqual(argTypes);
+            });
+            if (firstMatchingOverload != null)
+            {
+                methodToExecute = firstMatchingOverload.method;
             }
             else
             {
-                methodToExecute = firstMethod;
+                MethodInfo firstMethod = methods.FirstOrDefault();
+                // NH: this is to ensure that it's always the correct one being chosen when using the LINQ extension methods
+                if (methods.Count > 1)
+                {
+                    var firstGenericMethod = methods.FirstOrDefault(x => x.IsGenericMethodDefinition);
+                    if (firstGenericMethod != null)
+                    {
+                        firstMethod = firstGenericMethod;
+                    }
+                }
+
+                if (firstMethod != null)
+                {
+                    if (firstMethod.IsGenericMethodDefinition)
+                    {
+                        if (genericType != null)
+                        {
+                            methodToExecute = firstMethod.MakeGenericMethod(genericType);
+                        }
+                    }
+                    else
+                    {
+                        methodToExecute = firstMethod;
+                    }
+                }
             }
             return methodToExecute;
         }
