@@ -844,26 +844,30 @@ namespace umbraco.cms.businesslogic.member
             if (value == null)
                 return null;
 
-            string[] parts = value.Split(new char[] { '+' });
-            if (parts.Length != 3)
-                return null;
+			// #30350 - do not use Split as memberLogin could contain '+'
+			int pos1 = value.IndexOf('+');
+			if (pos1 < 0)
+				return null;
+			int pos2 = value.IndexOf('+', pos1 + 1);
+			if (pos2 < 0)
+				return null;
 
             int memberId;
-            if (!Int32.TryParse(parts[0], out memberId))
+			if (!Int32.TryParse(value.Substring(0, pos1), out memberId))
                 return null;
             Guid memberGuid;
             try
             {
                 // Guid.TryParse is in .NET 4 only
                 // using try...catch for .NET 3.5 compatibility
-                memberGuid = new Guid(parts[1]);
+				memberGuid = new Guid(value.Substring(pos1 + 1, pos2 - pos1 - 1));
             }
             catch
             {
                 return null;
             }
 
-            MemberState ms = new MemberState(memberId, memberGuid, parts[2]);
+			MemberState ms = new MemberState(memberId, memberGuid, value.Substring(pos2 + 1));
             return ms;
         }
 
