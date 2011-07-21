@@ -1475,6 +1475,10 @@ namespace System.Linq.Dynamic
                         }
                     }
                 }
+                else if (type == typeof(string))
+                {
+
+                }
                 switch (FindMethod(type, id, instance == null, args, out mb))
                 {
                     case 0:
@@ -1488,6 +1492,16 @@ namespace System.Linq.Dynamic
                                 return CallMethodOnDynamicNode(instance, newArgs, instanceAsString, instanceExpression, (MethodInfo)mb, true);
                             }
                         }
+                        if (type == typeof(string) && instanceAsString == null && instance is MemberExpression)
+                        {
+                            Expression[] newArgs = (new List<Expression>() { instance }).Concat(args).ToArray();
+                            mb = ExtensionMethodFinder.FindExtensionMethod(typeof(string), newArgs, id, true);
+                            if (mb != null)
+                            {
+                                return Expression.Call(null, (MethodInfo)mb, newArgs);
+                            }
+                        }
+
                         throw ParseError(errorPos, Res.NoApplicableMethod,
                             id, GetTypeName(type));
                     case 1:
