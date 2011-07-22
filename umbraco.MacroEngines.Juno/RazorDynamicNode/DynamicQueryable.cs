@@ -1475,10 +1475,6 @@ namespace System.Linq.Dynamic
                         }
                     }
                 }
-                else if (type == typeof(string))
-                {
-
-                }
                 switch (FindMethod(type, id, instance == null, args, out mb))
                 {
                     case 0:

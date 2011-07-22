@@ -98,7 +98,10 @@ namespace umbraco.MacroEngines
             return haystack.IndexOf(needle, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
 
+        public static bool HasValue(this string s)
+        {
+            return !string.IsNullOrWhiteSpace(s);
+        }
 
-        
     }
 }

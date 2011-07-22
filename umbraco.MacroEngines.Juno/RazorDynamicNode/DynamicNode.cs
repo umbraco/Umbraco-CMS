@@ -565,7 +565,7 @@ namespace umbraco.MacroEngines
             // Rich text editor (return IHtmlString so devs doesn't need to decode html
             if (dataType == DATATYPE_TINYMCE_GUID)
             {
-                result = new HtmlString(result.ToString());
+                result = new InternalHtmlString(result.ToString());
                 return true;
             }
 
