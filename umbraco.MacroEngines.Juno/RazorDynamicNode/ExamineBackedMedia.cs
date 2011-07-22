@@ -7,6 +7,7 @@ using Examine;
 using UmbracoExamine;
 using Lucene.Net.Documents;
 using umbraco.interfaces;
+using System.IO;
 
 
 namespace umbraco.MacroEngines
@@ -17,17 +18,27 @@ namespace umbraco.MacroEngines
         public static ExamineBackedMedia GetUmbracoMedia(int id)
         {
 
-            //first check in Examine as this is WAY faster
-            var criteria = ExamineManager.Instance
-                .SearchProviderCollection["InternalSearcher"]
-                .CreateSearchCriteria("media");
-            var filter = criteria.Id(id);
-            var results = ExamineManager
-                .Instance.SearchProviderCollection["InternalSearcher"]
-                .Search(filter.Compile());
-            if (results.Any())
+            try
             {
-                return new ExamineBackedMedia(results.First());
+                //first check in Examine as this is WAY faster
+                var criteria = ExamineManager.Instance
+                    .SearchProviderCollection["InternalSearcher"]
+                    .CreateSearchCriteria("media");
+                var filter = criteria.Id(id);
+                var results = ExamineManager
+                    .Instance.SearchProviderCollection["InternalSearcher"]
+                    .Search(filter.Compile());
+                if (results.Any())
+                {
+                    return new ExamineBackedMedia(results.First());
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                //Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+                //See this thread: http://examine.cdodeplex.com/discussions/264341
+                //Catch the exception here for the time being, and just fallback to GetMedia
+
             }
 
             var media = umbraco.library.GetMedia(id, true);
