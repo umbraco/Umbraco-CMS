@@ -61,5 +61,10 @@ namespace umbraco.MacroEngines
         {
             return false;
         }
+        public static implicit operator DateTime(DynamicNull n)
+        {
+            return DateTime.MinValue;
+        }
+
     }
 }
