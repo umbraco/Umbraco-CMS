@@ -28,7 +28,8 @@ namespace umbraco.MacroEngines
         // these are private readonlys as const can't be Guids
         private readonly Guid DATATYPE_YESNO_GUID = new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a");
         private readonly Guid DATATYPE_TINYMCE_GUID = new Guid("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
-        private readonly Guid DATATYPE_UCOMPONENTS_MNTP_GUID = new Guid("c2d6894b-e788-4425-bcf2-308568e3d38b");
+        //private readonly Guid DATATYPE_UCOMPONENTS_MNTP_GUID = new Guid("c2d6894b-e788-4425-bcf2-308568e3d38b");
+        private readonly Guid DATATYPE_DATETIMEPICKER_GUID = new Guid("b6fb1622-afa5-4bbf-a3cc-d9672a442222");
         #endregion
 
         internal readonly DynamicBackingItem n;
@@ -198,8 +199,8 @@ namespace umbraco.MacroEngines
                         else
                         {
                             // XPath returned no nodes, return an empty DynamicNodeList
-							return new DynamicNodeList(); 
-						}
+                            return new DynamicNodeList();
+                        }
                     }
                     else
                     {
@@ -545,13 +546,20 @@ namespace umbraco.MacroEngines
                 result = dResult;
                 return true;
             }
-
-            //date
-            DateTime dtResult = DateTime.MinValue;
-            if (DateTime.TryParse(string.Format("{0}", result), out dtResult))
+            if (dataType == DATATYPE_DATETIMEPICKER_GUID)
             {
-                result = dtResult;
-                return true;
+                //date
+                DateTime dtResult = DateTime.MinValue;
+                if (DateTime.TryParse(string.Format("{0}", result), out dtResult))
+                {
+                    result = dtResult;
+                    return true;
+                }
+                else
+                {
+                    result = new DynamicNull();
+                    return true;
+                }
             }
 
             // Rich text editor (return IHtmlString so devs doesn't need to decode html
