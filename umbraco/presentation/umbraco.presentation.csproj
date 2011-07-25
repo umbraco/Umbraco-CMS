@@ -1650,6 +1650,7 @@
     </Compile>
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
+    <Content Include="web.config.ssaodsk01.xslt" />
     <Content Include="umbraco\dashboard\DesktopMediaUploader.ascx" />
     <Content Include="umbraco\dashboard\images\dmu-badge.jpg" />
     <Content Include="umbraco\dashboard\images\dmu.png" />
