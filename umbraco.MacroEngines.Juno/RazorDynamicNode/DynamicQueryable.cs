@@ -2435,7 +2435,7 @@ namespace System.Linq.Dynamic
                     binaryExpression = Expression.Modulo(finalLeft, finalRight);
                     return (Expression.Lambda<Func<DynamicNode, int>>(binaryExpression, parameters));
                 case ExpressionType.AndAlso:
-                    if (leftIsLambda && rightIsLambda && sequenceEqual)
+                    if ((leftIsLambda && rightIsLambda && sequenceEqual) || (!leftIsLambda && !rightIsLambda))
                     {
                         return Expression.Equal(left, right);
                     }
