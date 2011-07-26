@@ -10,5 +10,10 @@ namespace umbraco.cms.businesslogic.datatype
         string Value { get; set; }
         string DefaultValue { get; set; }
         System.Web.UI.Control RenderControl(DataEditorSetting setting);
+
+        bool IsRequired { get; set; }
+        string RegexValidationStatement { get; set; }
+
+        DataEditorSettingValidationResult Validate();
     }
 }

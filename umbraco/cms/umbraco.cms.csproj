@@ -204,6 +204,7 @@
     <Compile Include="businesslogic\datatype\DataEditorSetting.cs" />
     <Compile Include="businesslogic\datatype\DataEditorSettingsStorage.cs" />
     <Compile Include="businesslogic\datatype\DataEditorSettingType.cs" />
+    <Compile Include="businesslogic\datatype\DataEditorSettingValidationResult.cs" />
     <Compile Include="businesslogic\datatype\DBTypes.cs" />
     <Compile Include="businesslogic\datatype\IDataEditorSettingType.cs" />
     <Compile Include="businesslogic\datatype\PreValue.cs" />

@@ -14,6 +14,8 @@ namespace umbraco.cms.businesslogic.datatype
         public Type type;
         public string prevalues;
         public object defaultValue;
+        public bool isRequired;
+        public string regexValidationStatement;
 
         public DataEditorSetting(string name)
         {
@@ -21,6 +23,8 @@ namespace umbraco.cms.businesslogic.datatype
             description = "";
             type = System.Web.Compilation.BuildManager.GetType("umbraco.editorControls.SettingControls.TextField, umbraco.editorControls",false);
             prevalues = "";
+            isRequired = false;
+            regexValidationStatement = "";
         }
 
         public string GetName()
@@ -49,6 +53,10 @@ namespace umbraco.cms.businesslogic.datatype
 
             if (dst != null)
                 dst.Prevalues = GetPrevalues();
+
+            dst.IsRequired = isRequired;
+            dst.RegexValidationStatement = regexValidationStatement;
+
 
             return dst;
         }

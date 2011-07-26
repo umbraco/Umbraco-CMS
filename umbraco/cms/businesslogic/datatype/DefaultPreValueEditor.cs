@@ -171,32 +171,57 @@ namespace umbraco.cms.businesslogic.datatype
 
         public void Save()
         {
-            // save the prevalue data and get on with you life ;)
-            if (_datatype != null)
-                _datatype.DBType = (cms.businesslogic.datatype.DBTypes)Enum.Parse(typeof(cms.businesslogic.datatype.DBTypes), _dropdownlist.SelectedValue, true);
-            else if (_datatypeOld != null)
-                _datatypeOld.DBType = (DBTypes)Enum.Parse(typeof(DBTypes), _dropdownlist.SelectedValue, true);
-
-
-            if (_displayTextBox)
-            {
-                // If the prevalue editor has an prevalue textbox - save the textbox value as the prevalue
-                Prevalue = _textbox.Text;
-            }
-
-            DataEditorSettingsStorage ss = new DataEditorSettingsStorage();
-
-            ss.ClearSettings(_datatype.DataTypeDefinitionId);
-
-            int i = 0;
+            bool hasErrors = false;
             foreach (KeyValuePair<string, DataEditorSettingType> k in dtSettings)
             {
-                ss.InsertSetting(_datatype.DataTypeDefinitionId, k.Key, k.Value.Value, i);
-                i++;
+                var result = k.Value.Validate();
+                Label lbl = FindControlRecursive<Label>(this, "lbl" + k.Key);
+                if (result == null && lbl != null)
+                {
+                    if (lbl != null)
+                        lbl.Text = string.Empty;
+                }
+                else
+                {
+                    if (hasErrors == false)
+                        hasErrors = true;
 
+                    if (lbl != null)
+                        lbl.Text = " " + result.ErrorMessage;
+                }
             }
 
-            ss.Dispose();      
+            if (!hasErrors)
+            {
+                // save the prevalue data and get on with you life ;)
+                if (_datatype != null)
+                    _datatype.DBType =
+                        (cms.businesslogic.datatype.DBTypes)
+                        Enum.Parse(typeof (cms.businesslogic.datatype.DBTypes), _dropdownlist.SelectedValue, true);
+                else if (_datatypeOld != null)
+                    _datatypeOld.DBType = (DBTypes) Enum.Parse(typeof (DBTypes), _dropdownlist.SelectedValue, true);
+
+
+                if (_displayTextBox)
+                {
+                    // If the prevalue editor has an prevalue textbox - save the textbox value as the prevalue
+                    Prevalue = _textbox.Text;
+                }
+
+                DataEditorSettingsStorage ss = new DataEditorSettingsStorage();
+
+                ss.ClearSettings(_datatype.DataTypeDefinitionId);
+
+                int i = 0;
+                foreach (KeyValuePair<string, DataEditorSettingType> k in dtSettings)
+                {
+                    ss.InsertSetting(_datatype.DataTypeDefinitionId, k.Key, k.Value.Value, i);
+                    i++;
+
+                }
+
+                ss.Dispose();
+            }
         }
 
         //protected override void Render(HtmlTextWriter writer)
@@ -293,9 +318,32 @@ namespace umbraco.cms.businesslogic.datatype
 
                 panel.Controls.Add(dst.RenderControl(kv.Value));
 
+                Label invalid = new Label();
+                invalid.Attributes.Add("style", "color:#8A1F11");
+                invalid.ID = "lbl" + kv.Key;
+                panel.Controls.Add(invalid);
+
                 this.Controls.Add(panel);
             }
             
+        }
+
+        private static T FindControlRecursive<T>(Control parent, string id) where T : Control
+        {
+            if ((parent is T) && (parent.ID == id))
+            {
+                return (T)parent;
+            }
+
+            foreach (Control control in parent.Controls)
+            {
+                T foundControl = FindControlRecursive<T>(control, id);
+                if (foundControl != null)
+                {
+                    return foundControl;
+                }
+            }
+            return default(T);
         }
     }
 

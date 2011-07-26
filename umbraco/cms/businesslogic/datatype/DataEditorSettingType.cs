@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace umbraco.cms.businesslogic.datatype
 {
@@ -18,5 +19,18 @@ namespace umbraco.cms.businesslogic.datatype
         }
 
         public string DefaultValue { get; set; }
+
+        public bool IsRequired { get; set; }
+        public string RegexValidationStatement { get; set; }
+
+        public virtual DataEditorSettingValidationResult Validate()
+        {
+            if (IsRequired && string.IsNullOrEmpty(Value))
+                return new DataEditorSettingValidationResult("Value is required");
+            else if (!string.IsNullOrEmpty(RegexValidationStatement) && !Regex.IsMatch(Value, RegexValidationStatement))
+                return new DataEditorSettingValidationResult("Value does not match the required pattern");
+            else
+                return null;
+        }
     }
 }
