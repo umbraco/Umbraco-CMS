@@ -57,8 +57,10 @@ namespace umbraco.editorControls.SettingControls.Pickers
             ddl.Items.Insert(0, li);
 
 
-
-            ddl.SelectedValue = _val;
+            if (string.IsNullOrEmpty(_val) && !string.IsNullOrEmpty(DefaultValue))
+                ddl.SelectedValue = DefaultValue;
+            else
+                ddl.SelectedValue = _val;
 
             return ddl;
         }
