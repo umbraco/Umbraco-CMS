@@ -51,6 +51,8 @@ namespace umbraco.editorControls.SettingControls
 
             }
 
+            if (string.IsNullOrEmpty(_val) && !string.IsNullOrEmpty(DefaultValue))
+                cbl.SelectedValue = DefaultValue;
 
 
             return cbl;
