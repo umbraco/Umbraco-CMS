@@ -32,6 +32,9 @@ namespace umbraco.editorControls.SettingControls
 
             if (string.IsNullOrEmpty(tb.Text) && this.Prevalues.Count > 0)
                 tb.Text = this.Prevalues[0];
+            else if (string.IsNullOrEmpty(tb.Text) && !string.IsNullOrEmpty(DefaultValue))
+                tb.Text = DefaultValue;
+
 
             return tb;
         }
