@@ -45,14 +45,13 @@ namespace umbraco.editorControls.SettingControls
 
                 if (_val.Contains(s + ";"))
                     item.Selected = true;
-
+                
                 lb.Items.Add(item);
-
-
 
             }
 
-
+            if (string.IsNullOrEmpty(_val) && !string.IsNullOrEmpty(DefaultValue))
+                lb.SelectedValue = DefaultValue;
 
             return lb;
         }
