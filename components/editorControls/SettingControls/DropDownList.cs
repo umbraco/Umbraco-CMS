@@ -35,7 +35,10 @@ namespace umbraco.editorControls.SettingControls
                 ddl.Items.Add(s);
             }
 
-            ddl.SelectedValue = _val;
+            if (string.IsNullOrEmpty(_val) && !string.IsNullOrEmpty(DefaultValue))
+                ddl.SelectedValue = DefaultValue;
+            else
+                ddl.SelectedValue = _val;
 
             return ddl;
         }
