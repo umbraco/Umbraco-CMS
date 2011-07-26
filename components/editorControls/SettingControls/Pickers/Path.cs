@@ -32,7 +32,11 @@ namespace umbraco.editorControls.SettingControls.Pickers
             
             pp.ID = sender.GetName().Replace(" ", "_");
 
-            pp.Value = _val;
+            if (string.IsNullOrEmpty(_val) && !string.IsNullOrEmpty(DefaultValue))
+                pp.Value = DefaultValue;
+            else
+                pp.Value = _val;
+
             return pp;
         }
     }
