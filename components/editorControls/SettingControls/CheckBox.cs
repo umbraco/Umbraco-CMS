@@ -10,6 +10,8 @@ namespace umbraco.editorControls.SettingControls
     {
         private System.Web.UI.WebControls.CheckBox cb = new System.Web.UI.WebControls.CheckBox();
 
+        private string _val = string.Empty;
+
         public override string Value
         {
             get
@@ -18,14 +20,20 @@ namespace umbraco.editorControls.SettingControls
             }
             set
             {
-                if (value == true.ToString())
-                    cb.Checked = true;
+                if (!string.IsNullOrEmpty(value))
+                    _val = value;
             }
         }
 
         public override System.Web.UI.Control RenderControl(DataEditorSetting sender)
         {
             cb.ID = sender.GetName();
+
+            if (string.IsNullOrEmpty(_val) && !string.IsNullOrEmpty(DefaultValue) && DefaultValue == true.ToString())
+                cb.Checked = true;
+            else if(_val == true.ToString())
+                cb.Checked = true;
+
             return cb;
         }
     }
