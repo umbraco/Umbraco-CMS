@@ -31,6 +31,10 @@ namespace umbraco.editorControls.SettingControls
 
             tb.TextMode = TextBoxMode.Password;
             tb.CssClass = "guiInputText guiInputStandardSize";
+
+            if (string.IsNullOrEmpty(tb.Text) && !string.IsNullOrEmpty(DefaultValue))
+                tb.Text = DefaultValue;
+
             return tb;
         }
     }
