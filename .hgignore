@@ -23,11 +23,16 @@ umbraco.config
 *.vs10x
 App_Data\TEMP\*
 umbraco\presentation\umbraco\plugins\*
-
+umbraco\presentation\usercontrols\*
+umbraco\presentation\scripts\*
+umbraco\presentation\fonts\*
+umbraco\presentation\css\*
+glob:*App_Code\*
 glob:*App_Data\*
 glob:*media\*
 glob:*masterpages\*
 glob:*macroScripts\*
+glob:*xslt\*
 
 umbraco\presentation\umbraco\plugins\uComponents\uComponentsInstaller.ascx
 umbraco\presentation\packages\uComponents\MultiNodePicker\CustomTreeService.asmx
