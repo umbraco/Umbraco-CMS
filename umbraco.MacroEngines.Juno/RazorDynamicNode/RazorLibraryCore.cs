@@ -333,7 +333,10 @@ namespace umbraco.MacroEngines.Library
 
                                     if (ic == (int)'<')
                                     {
-                                        IsInsideElement = true;
+                                        if (!lengthReached)
+                                        {
+                                            IsInsideElement = true;
+                                        }
                                         insideTagSpaceEncountered = false;
                                         currentTag = string.Empty;
                                         isTagClose = false;
@@ -344,26 +347,29 @@ namespace umbraco.MacroEngines.Library
                                     }
                                     else if (ic == (int)'>')
                                     {
-                                        IsInsideElement = false;
-                                        //if (write)
-                                        //{
-                                        //  outputtw.Write('>');
-                                        //}
-                                        currentTextLength++;
-                                        if (isTagClose && tagStack.Count > 0)
+                                        if (IsInsideElement)
                                         {
-                                            string thisTag = tagStack.Pop();
-                                            outputtw.Write("</" + thisTag + ">");
-                                        }
-                                        if (!isTagClose && currentTag.Length > 0)
-                                        {
-                                            if (!lengthReached)
+                                            IsInsideElement = false;
+                                            //if (write)
+                                            //{
+                                            //  outputtw.Write('>');
+                                            //}
+                                            currentTextLength++;
+                                            if (isTagClose && tagStack.Count > 0)
                                             {
-                                                tagStack.Push(currentTag);
-                                                outputtw.Write("<" + currentTag);
-                                                if (tr.Peek() != (int)' ')
+                                                string thisTag = tagStack.Pop();
+                                                outputtw.Write("</" + thisTag + ">");
+                                            }
+                                            if (!isTagClose && currentTag.Length > 0)
+                                            {
+                                                if (!lengthReached)
                                                 {
-                                                    outputtw.Write(">");
+                                                    tagStack.Push(currentTag);
+                                                    outputtw.Write("<" + currentTag);
+                                                    if (tr.Peek() != (int)' ')
+                                                    {
+                                                        outputtw.Write(">");
+                                                    }
                                                 }
                                             }
                                         }
