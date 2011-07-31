@@ -86,7 +86,6 @@
     <Compile Include="RazorDynamicNode\HtmlTagWrapper.cs" />
     <Compile Include="RazorDynamicNode\HtmlTagWrapperBase.cs" />
     <Compile Include="RazorDynamicNode\HtmlTagWrapperTextNode.cs" />
-    <Compile Include="RazorDynamicNode\InternalHtmlString.cs" />
     <Compile Include="RazorDynamicNode\IRazorDataTypeModel.cs" />
     <Compile Include="RazorDynamicNode\PropertyResult.cs" />
     <Compile Include="RazorDynamicNode\RazorDataTypeModel.cs" />
