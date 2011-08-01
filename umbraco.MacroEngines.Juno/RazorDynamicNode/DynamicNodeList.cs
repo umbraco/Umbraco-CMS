@@ -39,7 +39,20 @@ namespace umbraco.MacroEngines
             list.ForEach(node => node.ownerList = this);
             Items = list;
         }
-
+        public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
+        {
+            int index = (int)indexes[0];
+            try
+            {
+                result = this.Items.ElementAt(index);
+                return true;
+            }
+            catch (IndexOutOfRangeException)
+            {
+                result = new DynamicNull();
+                return true;
+            }
+        }
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
             var name = binder.Name;
