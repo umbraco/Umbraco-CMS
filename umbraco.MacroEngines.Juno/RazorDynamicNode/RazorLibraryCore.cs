@@ -325,6 +325,7 @@ namespace umbraco.MacroEngines.Library
                                 int ic = 0;
                                 int currentLength = 0, currentTextLength = 0;
                                 string currentTag = string.Empty;
+                                string tagContents = string.Empty;
                                 bool insideTagSpaceEncountered = false;
                                 bool isTagClose = false;
                                 while ((ic = tr.Read()) != -1)
@@ -339,6 +340,7 @@ namespace umbraco.MacroEngines.Library
                                         }
                                         insideTagSpaceEncountered = false;
                                         currentTag = string.Empty;
+                                        tagContents = string.Empty;
                                         isTagClose = false;
                                         if (tr.Peek() == (int)'/')
                                         {
@@ -347,32 +349,41 @@ namespace umbraco.MacroEngines.Library
                                     }
                                     else if (ic == (int)'>')
                                     {
-                                        if (IsInsideElement)
+                                        //if (IsInsideElement)
+                                        //{
+                                        IsInsideElement = false;
+                                        //if (write)
+                                        //{
+                                        //  outputtw.Write('>');
+                                        //}
+                                        currentTextLength++;
+                                        if (isTagClose && tagStack.Count > 0)
                                         {
-                                            IsInsideElement = false;
-                                            //if (write)
-                                            //{
-                                            //  outputtw.Write('>');
-                                            //}
-                                            currentTextLength++;
-                                            if (isTagClose && tagStack.Count > 0)
+                                            string thisTag = tagStack.Pop();
+                                            outputtw.Write("</" + thisTag + ">");
+                                        }
+                                        if (!isTagClose && currentTag.Length > 0)
+                                        {
+                                            if (!lengthReached)
                                             {
-                                                string thisTag = tagStack.Pop();
-                                                outputtw.Write("</" + thisTag + ">");
-                                            }
-                                            if (!isTagClose && currentTag.Length > 0)
-                                            {
-                                                if (!lengthReached)
+                                                tagStack.Push(currentTag);
+                                                outputtw.Write("<" + currentTag);
+                                                if (tr.Peek() != (int)' ')
                                                 {
-                                                    tagStack.Push(currentTag);
-                                                    outputtw.Write("<" + currentTag);
-                                                    if (tr.Peek() != (int)' ')
+                                                    if (!string.IsNullOrEmpty(tagContents))
                                                     {
-                                                        outputtw.Write(">");
+                                                        if (tagContents.EndsWith("/"))
+                                                        {
+                                                            //short close
+                                                            tagStack.Pop();
+                                                        }
+                                                        outputtw.Write(tagContents);
                                                     }
+                                                    outputtw.Write(">");
                                                 }
                                             }
                                         }
+                                        //}
                                         continue;
                                     }
                                     else
@@ -381,10 +392,13 @@ namespace umbraco.MacroEngines.Library
                                         {
                                             if (ic == (int)' ')
                                             {
-                                                insideTagSpaceEncountered = true;
-                                                if (!isTagClose)
+                                                if (!insideTagSpaceEncountered)
                                                 {
-                                                    tagStack.Push(currentTag);
+                                                    insideTagSpaceEncountered = true;
+                                                    //if (!isTagClose)
+                                                    //{
+                                                       // tagStack.Push(currentTag);
+                                                    //}
                                                 }
                                             }
                                             if (!insideTagSpaceEncountered)
@@ -393,9 +407,13 @@ namespace umbraco.MacroEngines.Library
                                             }
                                         }
                                     }
-                                    if (IsInsideElement && !insideTagSpaceEncountered)
+                                    if (IsInsideElement || insideTagSpaceEncountered)
                                     {
                                         write = false;
+                                        if (insideTagSpaceEncountered)
+                                        {
+                                            tagContents += (char)ic;
+                                        }
                                     }
                                     if (!IsInsideElement || treatTagsAsContent)
                                     {
