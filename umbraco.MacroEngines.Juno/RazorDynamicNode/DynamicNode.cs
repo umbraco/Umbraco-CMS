@@ -514,6 +514,7 @@ namespace umbraco.MacroEngines
         {
             //the resulting property is a string, but to support some of the nice linq stuff in .Where
             //we should really check some more types
+            string sResult = string.Format("{0}", result).Trim();
 
             //boolean
             if (dataType == DATATYPE_YESNO_GUID)
@@ -524,7 +525,7 @@ namespace umbraco.MacroEngines
                     result = false;
                     return true;
                 }
-                if (Boolean.TryParse(result.ToString().Replace("1", "true").Replace("0", "false"), out parseResult))
+                if (Boolean.TryParse(sResult.Replace("1", "true").Replace("0", "false"), out parseResult))
                 {
                     result = parseResult;
                     return true;
@@ -533,18 +534,22 @@ namespace umbraco.MacroEngines
 
             //integer
             int iResult = 0;
-            if (int.TryParse(string.Format("{0}", result), System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out iResult))
+            if (int.TryParse(sResult, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out iResult))
             {
                 result = iResult;
                 return true;
             }
 
-            //decimal
-            decimal dResult = 0;
-            if (decimal.TryParse(string.Format("{0}", result), System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out dResult))
+            //this will eat csv strings, so only do it if the decimal also includes a decimal seperator (according to the current culture)
+            if (sResult.Contains(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator))
             {
-                result = dResult;
-                return true;
+                //decimal
+                decimal dResult = 0;
+                if (decimal.TryParse(sResult, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out dResult))
+                {
+                    result = dResult;
+                    return true;
+                }
             }
             if (dataType == DATATYPE_DATETIMEPICKER_GUID || dataType == DATATYPE_DATEPICKER_GUID)
             {
@@ -570,12 +575,12 @@ namespace umbraco.MacroEngines
             }
 
 
-            if (string.Equals("true", string.Format("{0}", result), StringComparison.CurrentCultureIgnoreCase))
+            if (string.Equals("true", sResult, StringComparison.CurrentCultureIgnoreCase))
             {
                 result = true;
                 return true;
             }
-            if (string.Equals("false", string.Format("{0}", result), StringComparison.CurrentCultureIgnoreCase))
+            if (string.Equals("false", sResult, StringComparison.CurrentCultureIgnoreCase))
             {
                 result = false;
                 return true;
@@ -583,7 +588,6 @@ namespace umbraco.MacroEngines
 
             if (result != null)
             {
-                string sResult = string.Format("{0}", result).Trim();
                 //a really rough check to see if this may be valid xml
                 if (sResult.StartsWith("<") && sResult.EndsWith(">") && sResult.Contains("/"))
                 {
