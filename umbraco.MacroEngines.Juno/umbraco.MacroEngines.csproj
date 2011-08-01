@@ -80,6 +80,7 @@
     <Compile Include="RazorDynamicNode\DynamicMediaList.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="RazorDynamicNode\DynamicNodeIdEqualityComparer.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeList.cs" />
     <Compile Include="RazorDynamicNode\ExamineBackedMedia.cs" />
     <Compile Include="RazorDynamicNode\Grouping.cs" />
