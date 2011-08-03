@@ -13,7 +13,8 @@ using System.Linq;
 using ClientDependency.Core.Controls;
 using umbraco.IO;
 
-namespace umbraco.uicontrols {
+namespace umbraco.uicontrols
+{
 
     [ClientDependency(ClientDependencyType.Javascript, "CodeArea/javascript.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "CodeArea/UmbracoEditor.js", "UmbracoClient")]
@@ -29,7 +30,7 @@ namespace umbraco.uicontrols {
 
         protected TextBox CodeTextBox;
 
-        public bool AutoResize { get; set ; }
+        public bool AutoResize { get; set; }
         public int OffSetX { get; set; }
         public int OffSetY { get; set; }
         public string Text
@@ -68,7 +69,7 @@ namespace umbraco.uicontrols {
             {
                 ClientDependencyLoader.Instance.RegisterDependency("CodeMirror/js/codemirror.js", "UmbracoClient", ClientDependencyType.Javascript);
                 ClientDependencyLoader.Instance.RegisterDependency("CodeArea/styles.css", "UmbracoClient", ClientDependencyType.Css);
-            }        
+            }
         }
 
         protected override void CreateChildControls()
@@ -82,7 +83,7 @@ namespace umbraco.uicontrols {
                 CodeTextBox.Attributes.Add("class", "codepress");
                 CodeTextBox.Attributes.Add("wrap", "off");
             }
-            
+
             CodeTextBox.TextMode = TextBoxMode.MultiLine;
 
             this.CssClass = "codepress";
@@ -105,7 +106,7 @@ namespace umbraco.uicontrols {
             }
         }
 
-        protected override void Render(HtmlTextWriter writer) 
+        protected override void Render(HtmlTextWriter writer)
         {
             EnsureChildControls();
 
@@ -116,18 +117,18 @@ namespace umbraco.uicontrols {
                 jsEventCode = RenderBasicEditor();
             }
             else
-            {                
+            {
                 writer.WriteBeginTag("div");
                 writer.WriteAttribute("id", this.ClientID);
                 writer.WriteAttribute("class", this.CssClass);
                 this.ControlStyle.AddAttributesToRender(writer);
-                writer.Write(HtmlTextWriter.TagRightChar);            
+                writer.Write(HtmlTextWriter.TagRightChar);
                 CodeTextBox.RenderControl(writer);
                 writer.WriteEndTag("div");
 
                 jsEventCode = RenderCodeEditor();
             }
-                
+
 
 
             if (this.AutoResize)
@@ -153,7 +154,7 @@ namespace umbraco.uicontrols {
 
                 if (!UmbracoSettings.ScriptDisableEditor && HttpContext.Current.Request.Browser.Browser == "IE")
                 {
-                    jsEventCode += "jQuery('<p style=\"color:#999\">" + ui.Text("codemirroriewarning").Replace("'", "\\'") +"</p>').insertAfter('#" + this.ClientID + "');";
+                    jsEventCode += "jQuery('<p style=\"color:#999\">" + ui.Text("codemirroriewarning").Replace("'", "\\'") + "</p>').insertAfter('#" + this.ClientID + "');";
                 }
 
             }
@@ -199,7 +200,7 @@ namespace umbraco.uicontrols {
                     break;
                 case EditorType.HTML:
                     parserFiles = new string[] { "parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js" };
-                    cssFile = new string[] { "xmlcolors.css", "jscolors.css", "csscolors", "umbracoCustom.css" };
+                    cssFile = new string[] { "xmlcolors.css", "jscolors.css", "csscolors.css", "umbracoCustom.css" };
                     break;
             }
 
@@ -221,9 +222,9 @@ namespace umbraco.uicontrols {
                                 stylesheet: [" + string.Join(",",
 
                                                cssFile
-                                                    .Select(x => string.Format(@"""{0}""", IOHelper.ResolveUrl( SystemDirectories.Umbraco_client ) + @"/CodeMirror/css/" + x))
+                                                    .Select(x => string.Format(@"""{0}""", IOHelper.ResolveUrl(SystemDirectories.Umbraco_client) + @"/CodeMirror/css/" + x))
                                                     .ToArray()) + @"],
-                                path: """ + IOHelper.ResolveUrl( SystemDirectories.Umbraco_client) + @"/CodeMirror/js/"",
+                                path: """ + IOHelper.ResolveUrl(SystemDirectories.Umbraco_client) + @"/CodeMirror/js/"",
                                 content: textarea.value,             
                                 autoMatchParens: false,"
                                     + (string.IsNullOrEmpty(ClientSaveMethod) ? "" : @"saveFunction: " + ClientSaveMethod + ",") + @"

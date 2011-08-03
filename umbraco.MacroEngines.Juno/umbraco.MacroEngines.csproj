@@ -80,13 +80,13 @@
     <Compile Include="RazorDynamicNode\DynamicMediaList.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="RazorDynamicNode\DynamicNodeIdEqualityComparer.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeList.cs" />
     <Compile Include="RazorDynamicNode\ExamineBackedMedia.cs" />
     <Compile Include="RazorDynamicNode\Grouping.cs" />
     <Compile Include="RazorDynamicNode\HtmlTagWrapper.cs" />
     <Compile Include="RazorDynamicNode\HtmlTagWrapperBase.cs" />
     <Compile Include="RazorDynamicNode\HtmlTagWrapperTextNode.cs" />
-    <Compile Include="RazorDynamicNode\InternalHtmlString.cs" />
     <Compile Include="RazorDynamicNode\IRazorDataTypeModel.cs" />
     <Compile Include="RazorDynamicNode\PropertyResult.cs" />
     <Compile Include="RazorDynamicNode\RazorDataTypeModel.cs" />

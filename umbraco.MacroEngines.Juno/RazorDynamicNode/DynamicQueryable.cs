@@ -2444,9 +2444,9 @@ namespace System.Linq.Dynamic
                         return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.AndAlso(finalLeft, finalRight), parameters));
                     }
                 case ExpressionType.OrElse:
-                    if (leftIsLambda && rightIsLambda && sequenceEqual)
+                    if (leftIsLambda && rightIsLambda && sequenceEqual || (!leftIsLambda && !rightIsLambda))
                     {
-                        return Expression.Equal(left, right);
+                        return Expression.OrElse(left, right);
                     }
                     else
                     {

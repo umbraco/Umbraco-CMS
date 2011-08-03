@@ -29,6 +29,7 @@ using umbraco.presentation;
 using System.Collections;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic.cache;
+using umbraco.NodeFactory;
 
 namespace umbraco
 {
@@ -368,7 +369,7 @@ namespace umbraco
                 if (GlobalSettings.HideTopLevelNodeFromPath)
                     startNode = 2;
 
-                return niceUrlDo(nodeID, startNode);
+                return niceUrlDo(nodeID, startNode, false);
             }
             catch
             {
@@ -384,8 +385,19 @@ namespace umbraco
         /// <returns>String with a friendly url from a node</returns>
         public static string NiceUrlFullPath(int nodeID)
         {
-            return niceUrlDo(nodeID, 1);
+            return niceUrlDo(nodeID, 1, false);
         }
+
+        /// <summary>
+        /// This method will always add the domain to the path. 
+        /// </summary>
+        /// <param name="nodeID">Identifier for the node that should be returned</param>
+        /// <returns>String with a friendly url with full domain from a node</returns>
+        public static string NiceUrlWithDomain(int nodeID)
+        {
+            return niceUrlDo(nodeID, 1, true);
+        }
+
 
         public static string ResolveVirtualPath(string path)
         {
@@ -401,31 +413,32 @@ namespace umbraco
         /// <param name="startNodeDepth"></param>
         /// <param name="byPassCache"></param>
         /// <returns></returns>
-        private static string niceUrlDo(int nodeID, int startNodeDepth)
+        private static string niceUrlDo(int nodeID, int startNodeDepth, bool forceDomain)
         {
-            if (!niceUrlCache.ContainsKey(nodeID))
+            int key = nodeID + (forceDomain ? 9999999 : 0);
+            if (!niceUrlCache.ContainsKey(key))
             {
                 lock (locker)
                 {
-                    if (!niceUrlCache.ContainsKey(nodeID))
+                    if (!niceUrlCache.ContainsKey(key))
                     {
-                        string tempUrl = NiceUrlFetch(nodeID, startNodeDepth);
+                        string tempUrl = NiceUrlFetch(nodeID, startNodeDepth, forceDomain);
                         if (!String.IsNullOrEmpty(tempUrl))
                         {
-                            niceUrlCache.Add(nodeID, tempUrl);
+                            niceUrlCache.Add(key, tempUrl);
                         }
                     }
                 }
             }
 
-            return niceUrlCache[nodeID];
+            return niceUrlCache[key];
         }
 
-        internal static string niceUrlJuno(int nodeId, int startNodeDepth, string currentDomain)
+        internal static string niceUrlJuno(int nodeId, int startNodeDepth, string currentDomain, bool forceDomain)
         {
             string parentUrl = String.Empty;
             XmlElement node = UmbracoContext.Current.GetXml().GetElementById(nodeId.ToString());
-            
+
             if (node == null)
             {
                 ArgumentException arEx =
@@ -436,40 +449,24 @@ namespace umbraco
                 Log.Add(LogTypes.Error, nodeId, arEx.Message);
                 throw arEx;
             }
-            if (node.ParentNode.Name.ToLower() != "root" || UmbracoSettings.UseDomainPrefixes)
+            if (node.ParentNode.Name.ToLower() != "root" || UmbracoSettings.UseDomainPrefixes || forceDomain)
             {
-                if (UmbracoSettings.UseDomainPrefixes)
+                if (UmbracoSettings.UseDomainPrefixes || forceDomain)
                 {
                     Domain[] domains =
                         Domain.GetDomainsById(nodeId);
                     // when there's a domain on a url we'll just return the domain rather than the parent path
                     if (domains.Length > 0)
                     {
-                        if (currentDomain != String.Empty)
-                        {
-                            foreach (Domain d in domains)
-                            {
-                                // if there's multiple domains we'll prefer to use the same domain as the current request
-                                if (currentDomain == d.Name.ToLower())
-                                    parentUrl = "http://" + d.Name;
-                            }
-                        }
-
-                        if (parentUrl == String.Empty)
-                        {
-                            parentUrl = "http://" + domains[0].Name;
-                        }
-
-                        return parentUrl;
+                        return GetDomainIfExists(currentDomain, nodeId);
                     }
-
                 }
 
-                if (parentUrl == String.Empty && (int.Parse(node.Attributes.GetNamedItem("level").Value) > startNodeDepth || UmbracoSettings.UseDomainPrefixes))
+                if (parentUrl == String.Empty && (int.Parse(node.Attributes.GetNamedItem("level").Value) > startNodeDepth || UmbracoSettings.UseDomainPrefixes || forceDomain))
                 {
                     if (node.ParentNode.Name != "root")
                     {
-                        parentUrl = niceUrlJuno(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value), startNodeDepth, currentDomain);
+                        parentUrl = niceUrlJuno(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value), startNodeDepth, currentDomain, forceDomain);
                     }
                 }
             }
@@ -483,11 +480,47 @@ namespace umbraco
                 return "/";
         }
 
-        internal static string NiceUrlFetch(int nodeID, int startNodeDepth)
+        private static string GetDomainIfExists(string currentDomain, int nodeId)
+        {
+            Domain[] domains = Domain.GetDomainsById(nodeId);
+            if (domains.Length > 0)
+            {
+                if (currentDomain != String.Empty)
+                {
+                    foreach (Domain d in domains)
+                    {
+                        // if there's multiple domains we'll prefer to use the same domain as the current request
+                        if (currentDomain == d.Name.ToLower() || d.Name.EndsWith(currentDomain, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            if (d.Name.StartsWith("http", StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                return d.Name;
+                            }
+                            else
+                            {
+                                return "http://" + d.Name;
+                            }
+                        }
+                    }
+                }
+
+                if (domains[0].Name.StartsWith("http", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    return domains[0].Name;
+                }
+                else
+                {
+                    return "http://" + domains[0].Name;
+                }
+            }
+            return null;
+        }
+
+        internal static string NiceUrlFetch(int nodeID, int startNodeDepth, bool forceDomain)
         {
             bool directoryUrls = GlobalSettings.UseDirectoryUrls;
             string baseUrl = SystemDirectories.Root; // SystemDirectories.Umbraco;
-            string junoUrl = niceUrlJuno(nodeID, startNodeDepth, HttpContext.Current.Request.ServerVariables["SERVER_NAME"].ToLower());
+            string junoUrl = niceUrlJuno(nodeID, startNodeDepth, HttpContext.Current.Request.ServerVariables["SERVER_NAME"].ToLower(), forceDomain);
             return appendUrlExtension(baseUrl, directoryUrls, junoUrl);
 
         }

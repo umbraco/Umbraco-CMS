@@ -39,7 +39,20 @@ namespace umbraco.MacroEngines
             list.ForEach(node => node.ownerList = this);
             Items = list;
         }
-
+        public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
+        {
+            int index = (int)indexes[0];
+            try
+            {
+                result = this.Items.ElementAt(index);
+                return true;
+            }
+            catch (IndexOutOfRangeException)
+            {
+                result = new DynamicNull();
+                return true;
+            }
+        }
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
             var name = binder.Name;
@@ -85,6 +98,50 @@ namespace umbraco.MacroEngines
             if (name == "Average" || name == "Min" || name == "Max" || name == "Sum")
             {
                 result = Aggregate(args, name);
+                return true;
+            }
+            if (name == "Union")
+            {
+                if ((args.First() as IEnumerable<DynamicNode>) != null)
+                {
+                    result = new DynamicNodeList(this.Items.Union(args.First() as IEnumerable<DynamicNode>));
+                    return true;
+                }
+                if ((args.First() as DynamicNodeList) != null)
+                {
+                    result = new DynamicNodeList(this.Items.Union((args.First() as DynamicNodeList).Items));
+                    return true;
+                }
+            }
+            if (name == "Except")
+            {
+                if ((args.First() as IEnumerable<DynamicNode>) != null)
+                {
+                    result = new DynamicNodeList(this.Items.Except(args.First() as IEnumerable<DynamicNode>, new DynamicNodeIdEqualityComparer()));
+                    return true;
+                }
+                if ((args.First() as DynamicNodeList) != null)
+                {
+                    result = new DynamicNodeList(this.Items.Except((args.First() as DynamicNodeList).Items, new DynamicNodeIdEqualityComparer()));
+                    return true;
+                }
+            }
+            if (name == "Intersect")
+            {
+                if ((args.First() as IEnumerable<DynamicNode>) != null)
+                {
+                    result = new DynamicNodeList(this.Items.Intersect(args.First() as IEnumerable<DynamicNode>, new DynamicNodeIdEqualityComparer()));
+                    return true;
+                }
+                if ((args.First() as DynamicNodeList) != null)
+                {
+                    result = new DynamicNodeList(this.Items.Intersect((args.First() as DynamicNodeList).Items, new DynamicNodeIdEqualityComparer()));
+                    return true;
+                }
+            }
+            if (name == "Distinct")
+            {
+                result = new DynamicNodeList(this.Items.Distinct(new DynamicNodeIdEqualityComparer()));
                 return true;
             }
             if (name == "Pluck" || name == "Select")

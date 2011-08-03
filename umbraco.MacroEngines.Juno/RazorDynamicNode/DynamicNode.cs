@@ -28,8 +28,8 @@ namespace umbraco.MacroEngines
         // these are private readonlys as const can't be Guids
         private readonly Guid DATATYPE_YESNO_GUID = new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a");
         private readonly Guid DATATYPE_TINYMCE_GUID = new Guid("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
-        //private readonly Guid DATATYPE_UCOMPONENTS_MNTP_GUID = new Guid("c2d6894b-e788-4425-bcf2-308568e3d38b");
         private readonly Guid DATATYPE_DATETIMEPICKER_GUID = new Guid("b6fb1622-afa5-4bbf-a3cc-d9672a442222");
+        private readonly Guid DATATYPE_DATEPICKER_GUID = new Guid("23e93522-3200-44e2-9f29-e61a6fcbb79a");
         #endregion
 
         internal readonly DynamicBackingItem n;
@@ -514,6 +514,7 @@ namespace umbraco.MacroEngines
         {
             //the resulting property is a string, but to support some of the nice linq stuff in .Where
             //we should really check some more types
+            string sResult = string.Format("{0}", result).Trim();
 
             //boolean
             if (dataType == DATATYPE_YESNO_GUID)
@@ -524,7 +525,7 @@ namespace umbraco.MacroEngines
                     result = false;
                     return true;
                 }
-                if (Boolean.TryParse(result.ToString().Replace("1", "true").Replace("0", "false"), out parseResult))
+                if (Boolean.TryParse(sResult.Replace("1", "true").Replace("0", "false"), out parseResult))
                 {
                     result = parseResult;
                     return true;
@@ -533,20 +534,24 @@ namespace umbraco.MacroEngines
 
             //integer
             int iResult = 0;
-            if (int.TryParse(string.Format("{0}", result), System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out iResult))
+            if (int.TryParse(sResult, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out iResult))
             {
                 result = iResult;
                 return true;
             }
 
-            //decimal
-            decimal dResult = 0;
-            if (decimal.TryParse(string.Format("{0}", result), System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out dResult))
+            //this will eat csv strings, so only do it if the decimal also includes a decimal seperator (according to the current culture)
+            if (sResult.Contains(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator))
             {
-                result = dResult;
-                return true;
+                //decimal
+                decimal dResult = 0;
+                if (decimal.TryParse(sResult, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out dResult))
+                {
+                    result = dResult;
+                    return true;
+                }
             }
-            if (dataType == DATATYPE_DATETIMEPICKER_GUID)
+            if (dataType == DATATYPE_DATETIMEPICKER_GUID || dataType == DATATYPE_DATEPICKER_GUID)
             {
                 //date
                 DateTime dtResult = DateTime.MinValue;
@@ -565,17 +570,17 @@ namespace umbraco.MacroEngines
             // Rich text editor (return IHtmlString so devs doesn't need to decode html
             if (dataType == DATATYPE_TINYMCE_GUID)
             {
-                result = new InternalHtmlString(result.ToString());
+                result = new HtmlString(result.ToString());
                 return true;
             }
 
 
-            if (string.Equals("true", string.Format("{0}", result), StringComparison.CurrentCultureIgnoreCase))
+            if (string.Equals("true", sResult, StringComparison.CurrentCultureIgnoreCase))
             {
                 result = true;
                 return true;
             }
-            if (string.Equals("false", string.Format("{0}", result), StringComparison.CurrentCultureIgnoreCase))
+            if (string.Equals("false", sResult, StringComparison.CurrentCultureIgnoreCase))
             {
                 result = false;
                 return true;
@@ -583,7 +588,6 @@ namespace umbraco.MacroEngines
 
             if (result != null)
             {
-                string sResult = string.Format("{0}", result).Trim();
                 //a really rough check to see if this may be valid xml
                 if (sResult.StartsWith("<") && sResult.EndsWith(">") && sResult.Contains("/"))
                 {
