@@ -241,7 +241,9 @@ namespace umbraco.controls
             {
                 df.Save();
             }
-            _content.Text = NameTxt.Text;
+
+            if(!string.IsNullOrEmpty(NameTxt.Text))
+                _content.Text = NameTxt.Text;
 
             Save(this, new EventArgs());
         }
