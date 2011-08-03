@@ -214,18 +214,21 @@ namespace umbraco.presentation.webservices
 
                     if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Xslt + "/")))
                     {
+                        //deletes the old xslt file
+                        if (fileName != oldName)
+                        {
+
+                            string p = IOHelper.MapPath(SystemDirectories.Xslt + "/" + oldName);
+                            if (System.IO.File.Exists(p))
+                                System.IO.File.Delete(p);
+                        }
+
                         SW = File.CreateText(savePath);
                         SW.Write(fileContents);
                         SW.Close();
                         errorMessage = "true";
 
-                        //deletes the old xslt file
-                        if (fileName != oldName)
-                        {
-                            string p = IOHelper.MapPath(SystemDirectories.Xslt + "/" + oldName);
-                            if (System.IO.File.Exists(p))
-                                System.IO.File.Delete(p);
-                        }
+                       
                     }
                     else
                     {
@@ -307,18 +310,20 @@ namespace umbraco.presentation.webservices
                 {
                     var savePath = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + fileName);
 
-                    SW = new StreamWriter(savePath, false, Encoding.UTF8);
-                    SW.Write(fileContents);
-                    SW.Close();
-                    errorMessage = "true";
-
-                    //deletes the old xslt file
+                    //deletes the file
                     if (fileName != oldName)
                     {
                         var p = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + oldName);
                         if (File.Exists(p))
                             File.Delete(p);
                     }
+
+                    SW = new StreamWriter(savePath, false, Encoding.UTF8);
+                    SW.Write(fileContents);
+                    SW.Close();
+                    errorMessage = "true";
+
+                    
                 }
 
                 File.Delete(tempFileName);
@@ -364,17 +369,17 @@ namespace umbraco.presentation.webservices
                     //Directory check.. only allow files in script dir and below to be edited
                     if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Scripts + "/")) || savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Masterpages + "/")))
                     {
-                        StreamWriter SW;
-                        SW = File.CreateText(savePath);
-                        SW.Write(val);
-                        SW.Close();
-
                         //deletes the old file
                         if (savePath != saveOldPath)
                         {
                             if (System.IO.File.Exists(saveOldPath))
                                 System.IO.File.Delete(saveOldPath);
                         }
+
+                        StreamWriter SW;
+                        SW = File.CreateText(savePath);
+                        SW.Write(val);
+                        SW.Close();
 
                         returnValue = "true";
                     }
