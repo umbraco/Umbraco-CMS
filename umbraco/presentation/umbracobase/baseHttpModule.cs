@@ -92,6 +92,8 @@ namespace umbraco.presentation.umbracobase
 
                     if (myExtension.isAllowed)
                     {
+                        TrySetCulture();
+
                         string response = invokeMethod(myExtension, urlArray);
                         // since return value is arbitrary (set by implementor), check length before checking for error
                         if (response.Length >= 7)
@@ -223,6 +225,23 @@ namespace umbraco.presentation.umbracobase
                 return "<error><![CDATA[MESSAGE:\n" + ex.Message + "\n\nSTACKTRACE:\n" + ex.StackTrace + "\n\nINNEREXCEPTION:\n" + ex.InnerException + "]]></error>";
             }
 
+        }
+
+        private static void TrySetCulture()
+        {
+            string domain = HttpContext.Current.Request.Url.Host; //Host only
+            if (TrySetCulture(domain)) return;
+
+            domain = HttpContext.Current.Request.Url.Authority; //Host with port
+            if (TrySetCulture(domain)) return;
+        }
+
+        private static bool TrySetCulture(string domain)
+        {
+            var uDomain = cms.businesslogic.web.Domain.GetDomain(domain);
+            if (uDomain == null) return false;
+            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(uDomain.Language.CultureAlias);
+            return true;
         }
 
 
