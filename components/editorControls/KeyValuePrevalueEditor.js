@@ -35,3 +35,6 @@ function ResetValues() {
     jQuery(".valuesHiddenInput").val(val);
 }
 
+function ConfirmPrevalueDelete() {
+    return confirm("Are you sure you want to delete");
+}
