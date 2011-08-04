@@ -54,6 +54,7 @@ namespace umbraco.cms.businesslogic.member
 
 			ContentType.Create(n.Id, Text,"");
 	        MemberType mt = new MemberType(n.Id);
+		    mt.IconUrl = "member.gif";
             NewEventArgs e = new NewEventArgs();
             mt.OnNew(e);
 
