@@ -10,6 +10,7 @@ using System.Reflection.Emit;
 using System.Threading;
 using System.Dynamic;
 using umbraco.MacroEngines;
+using System.Diagnostics;
 
 namespace System.Linq.Dynamic
 {
@@ -73,8 +74,9 @@ namespace System.Linq.Dynamic
                         }
                         return false;
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
+                        Trace.WriteLine(ex.Message);
                         return false;
                     }
                 }).AsQueryable();
