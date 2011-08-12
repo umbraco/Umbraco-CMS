@@ -144,8 +144,8 @@ function openContentItem(id) {
                             treeElement.SetAttribute("text", m.Text);
                             treeElement.SetAttribute("action", "javascript:openMember('" + m.Id + "');");
                             treeElement.SetAttribute("menu", "D");
-                            treeElement.SetAttribute("icon", "member.gif");
-                            treeElement.SetAttribute("openIcon", "member.gif");
+                            treeElement.SetAttribute("icon", string.IsNullOrEmpty(m.ContentType.IconUrl) ? "member.gif" : m.ContentType.IconUrl);
+                            treeElement.SetAttribute("openIcon", string.IsNullOrEmpty(m.ContentType.IconUrl) ? "member.gif" : m.ContentType.IconUrl);
                             treeElement.SetAttribute("nodeType", "member");
                             treeElement.SetAttribute("hasChildren", "true");
                             root.AppendChild(treeElement);
@@ -163,8 +163,8 @@ function openContentItem(id) {
                                 treeElement.SetAttribute("text", m.Text);
                                 treeElement.SetAttribute("action", "javascript:openMember('" + m.Id + "');");
                                 treeElement.SetAttribute("menu", "D");
-                                treeElement.SetAttribute("icon", "member.gif");
-                                treeElement.SetAttribute("openIcon", "member.gif");
+                                treeElement.SetAttribute("icon", string.IsNullOrEmpty(m.ContentType.IconUrl) ? "member.gif" : m.ContentType.IconUrl);
+                                treeElement.SetAttribute("openIcon", string.IsNullOrEmpty(m.ContentType.IconUrl) ? "member.gif" : m.ContentType.IconUrl);
                                 treeElement.SetAttribute("nodeType", "member");
                                 treeElement.SetAttribute("hasChildren", "true");
                                 root.AppendChild(treeElement);

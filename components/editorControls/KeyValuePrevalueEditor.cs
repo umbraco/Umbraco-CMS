@@ -194,7 +194,7 @@ namespace umbraco.editorControls
 
                 foreach (KeyValuePair<int, String> item in _prevalues)
                 {
-                    writer.Write("<tr class=\"row\"><td class=\"text\">" + item.Value + "</td><td class=\"value\"> " + item.Key.ToString() + "</td><td><a href='?id=" + _datatype.DataTypeDefinitionId + "&delete=" + item.Key.ToString() + "'>" + ui.Text("delete") + "</a> <span class=\"handle\" style=\"cursor:move\">sort<span></td></tr>");
+                    writer.Write("<tr class=\"row\"><td class=\"text\">" + item.Value + "</td><td class=\"value\"> " + item.Key.ToString() + "</td><td><a onclick='javascript:return ConfirmPrevalueDelete();' href='?id=" + _datatype.DataTypeDefinitionId + "&delete=" + item.Key.ToString() + "'>" + ui.Text("delete") + "</a> <span class=\"handle\" style=\"cursor:move\">sort<span></td></tr>");
                 }
                 writer.Write("</table><br style='clear: both'/></div>");
             }
