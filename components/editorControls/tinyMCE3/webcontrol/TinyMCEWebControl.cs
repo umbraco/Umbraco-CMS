@@ -70,7 +70,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
             base.Attributes.Add("style", "visibility: hidden");
             config.Add("mode", "exact");
             config.Add("theme", "umbraco");
-            config.Add("umbraco_path", IOHelper.ResolveUrl( SystemDirectories.Umbraco ));
+            config.Add("umbraco_path", IOHelper.ResolveUrl(SystemDirectories.Umbraco));
             CssClass = "tinymceContainer";
             plugin.ConfigSection configSection = (plugin.ConfigSection)System.Web.HttpContext.Current.GetSection("TinyMCE");
 
@@ -117,89 +117,89 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
         }
 
         protected override void OnLoad(EventArgs args)
-		{
-			if (!IsInLiveEditingMode)
-				this.config["elements"] = this.ClientID;
+        {
+            if (!IsInLiveEditingMode)
+                this.config["elements"] = this.ClientID;
 
-			bool first = true;
+            bool first = true;
 
-			// Render HTML for TinyMCE instance
-			// in the liveediting mode we're always preloading tinymce script
-			if (!IsInLiveEditingMode)
-			{
-				//TinyMCE uses it's own compressor so leave it up to ScriptManager to render
-				ScriptManager.RegisterClientScriptInclude(this, this.GetType(), _versionId.ToString(), this.ScriptURI);
-			}
-			else 
-			{
-				//We're in live edit mode so add the base js file to the dependency list
-				ClientDependencyLoader.Instance.RegisterDependency("tinymce3/tiny_mce_src.js", 
-					"UmbracoClient", ClientDependencyType.Javascript);
-			}
+            // Render HTML for TinyMCE instance
+            // in the liveediting mode we're always preloading tinymce script
+            if (!IsInLiveEditingMode)
+            {
+                //TinyMCE uses it's own compressor so leave it up to ScriptManager to render
+                ScriptManager.RegisterClientScriptInclude(this, this.GetType(), _versionId.ToString(), this.ScriptURI);
+            }
+            else
+            {
+                //We're in live edit mode so add the base js file to the dependency list
+                ClientDependencyLoader.Instance.RegisterDependency("tinymce3/tiny_mce_src.js",
+                    "UmbracoClient", ClientDependencyType.Javascript);
+            }
 
-			// Write script tag start
-			m_scriptInitBlock.Append(HtmlTextWriter.TagLeftChar.ToString());
-			m_scriptInitBlock.Append("script");
-			m_scriptInitBlock.Append(" type=\"text/javascript\"");
-			m_scriptInitBlock.Append(HtmlTextWriter.TagRightChar.ToString());
-			m_scriptInitBlock.Append("\n");
+            // Write script tag start
+            m_scriptInitBlock.Append(HtmlTextWriter.TagLeftChar.ToString());
+            m_scriptInitBlock.Append("script");
+            m_scriptInitBlock.Append(" type=\"text/javascript\"");
+            m_scriptInitBlock.Append(HtmlTextWriter.TagRightChar.ToString());
+            m_scriptInitBlock.Append("\n");
 
-			m_scriptInitBlock.Append("tinyMCE.init({\n");
+            m_scriptInitBlock.Append("tinyMCE.init({\n");
 
-			// Write options
-			foreach (string key in this.config.Keys)
-			{
-				//TODO: This is a hack to test if we can prevent tinymce from automatically download languages
-				if (!IsInLiveEditingMode || (key != "language"))
-				{
-					string val = this.config[key];
+            // Write options
+            foreach (string key in this.config.Keys)
+            {
+                //TODO: This is a hack to test if we can prevent tinymce from automatically download languages
+                if (!IsInLiveEditingMode || (key != "language"))
+                {
+                    string val = this.config[key];
 
-					if (!first)
-						m_scriptInitBlock.Append(",\n");
-					else
-						first = false;
+                    if (!first)
+                        m_scriptInitBlock.Append(",\n");
+                    else
+                        first = false;
 
-					// Is boolean state or string
-					if (val == "true" || val == "false")
-						m_scriptInitBlock.Append(key + ":" + this.config[key]);
-					else
-						m_scriptInitBlock.Append(key + ":'" + this.config[key] + "'");
-				}
-			}
+                    // Is boolean state or string
+                    if (val == "true" || val == "false")
+                        m_scriptInitBlock.Append(key + ":" + this.config[key]);
+                    else
+                        m_scriptInitBlock.Append(key + ":'" + this.config[key] + "'");
+                }
+            }
 
-			m_scriptInitBlock.Append("\n});\n");
-			// we're wrapping the tinymce init call in a load function when in live editing,
-			// so we'll need to close that function declaration
-			if (IsInLiveEditingMode)
-			{
-				m_scriptInitBlock.Append(@"(function() { var f =
+            m_scriptInitBlock.Append("\n});\n");
+            // we're wrapping the tinymce init call in a load function when in live editing,
+            // so we'll need to close that function declaration
+            if (IsInLiveEditingMode)
+            {
+                m_scriptInitBlock.Append(@"(function() { var f =
                     function() {
                         if(document.getElementById('__umbraco_tinyMCE'))
                             tinyMCE.execCommand('mceAddControl',false,'").Append(ClientID).Append(@"'); 
                         ItemEditing.remove_startEdit(f);
                     }
                     ItemEditing.add_startEdit(f);})();");
-				m_scriptInitBlock.Append(@"(function() { var f =
+                m_scriptInitBlock.Append(@"(function() { var f =
                     function() {
                         tinyMCE.execCommand('mceRemoveControl',false,'").Append(ClientID).Append(@"');
                         ItemEditing.remove_stopEdit(f);
                     }
                     ItemEditing.add_stopEdit(f);})();");
-			}
+            }
 
-			// Write script tag end
-			m_scriptInitBlock.Append(HtmlTextWriter.EndTagLeftChars);
-			m_scriptInitBlock.Append("script");
-			m_scriptInitBlock.Append(HtmlTextWriter.TagRightChar.ToString());
+            // Write script tag end
+            m_scriptInitBlock.Append(HtmlTextWriter.EndTagLeftChars);
+            m_scriptInitBlock.Append("script");
+            m_scriptInitBlock.Append(HtmlTextWriter.TagRightChar.ToString());
 
-			// add to script manager
-			if (IsInLiveEditingMode)
-			{
-				ScriptManager.RegisterClientScriptBlock(this, this.GetType(), new Guid().ToString(),
-											m_scriptInitBlock.ToString(), false);
-			}
+            // add to script manager
+            if (IsInLiveEditingMode)
+            {
+                ScriptManager.RegisterClientScriptBlock(this, this.GetType(), new Guid().ToString(),
+                                            m_scriptInitBlock.ToString(), false);
+            }
 
-		}
+        }
 
 
         string ScriptURI
@@ -306,11 +306,17 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                         Regex.Matches(tag.Value.Replace(">", " >"),
                                       "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"|(?<attributeName>\\S*)=(?<attributeValue>[^\"|\\s]*)\\s",
                                       RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
+                    //GE: Add ContainsKey check and expand the ifs for readability
                     foreach (Match attributeSet in m)
                     {
                         if (attributeSet.Groups["attributeName"].Value.ToString().ToLower() != "src")
-                            ht.Add(attributeSet.Groups["attributeName"].Value.ToString(),
-                                   attributeSet.Groups["attributeValue"].Value.ToString());
+                        {
+                            if (!ht.ContainsKey(attributeSet.Groups["attributeName"].Value.ToString()))
+                            {
+                                ht.Add(attributeSet.Groups["attributeName"].Value.ToString(), attributeSet.Groups["attributeValue"].Value.ToString());
+                            }
+                        }
                     }
 
                     // build the element
@@ -429,7 +435,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
         {
             string[] umbracoPathSplit = IOHelper.ResolveUrl(SystemDirectories.Umbraco).Split('/');
             string umbracoPath = "";
-            
+
             for (int i = 0; i < umbracoPathSplit.Length - 1; i++)
                 umbracoPath += umbracoPathSplit[i] + "/";
 
@@ -449,7 +455,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
             Regex.Matches(content, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
             // Page for macro rendering
-//          page p = new page(nodeId, versionId);
+            //          page p = new page(nodeId, versionId);
 
 
             System.Web.HttpContext.Current.Items["macrosAdded"] = 0;
