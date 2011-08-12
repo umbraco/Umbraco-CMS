@@ -40,7 +40,7 @@ namespace umbraco.dialogs
 			{
                 int nodeId = int.Parse(helper.Request("nodeId"));
                 //ensure they have access to create under this node!!
-                if (CheckCreatePermissions(nodeId))
+                if (helper.Request("app") == "media" || CheckCreatePermissions(nodeId))
                 {
                     //pane_chooseName.Text = ui.Text("create", "updateData", this.getUser());
                     cms.businesslogic.CMSNode c = new cms.businesslogic.CMSNode(nodeId);
