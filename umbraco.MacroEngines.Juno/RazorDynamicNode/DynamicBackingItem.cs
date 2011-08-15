@@ -42,6 +42,20 @@ namespace umbraco.MacroEngines
                 this.Type = DynamicBackingItemType.Content;
             }
         }
+        public DynamicBackingItem(int Id, DynamicBackingItemType Type)
+        {
+            NodeFactory.Node baseNode = new NodeFactory.Node(Id);
+            if (Type == DynamicBackingItemType.Media)
+            {
+                this.media = ExamineBackedMedia.GetUmbracoMedia(Id);
+                this.Type = Type;
+            }
+            else
+            {
+                this.content = baseNode;
+                this.Type = Type;
+            }
+        }
 
         public DynamicBackingItem(CMSNode node)
         {

@@ -52,6 +52,13 @@ namespace umbraco.MacroEngines.Library
                 nodes.Add(new DynamicNode(eachId));
             return new DynamicNodeList(nodes);
         }
+        public dynamic NodesById(List<int> Ids, DynamicBackingItemType ItemType)
+        {
+            List<DynamicNode> nodes = new List<DynamicNode>();
+            foreach (int eachId in Ids)
+                nodes.Add(new DynamicNode(eachId, ItemType));
+            return new DynamicNodeList(nodes);
+        }
         public dynamic NodesById(params object[] Ids)
         {
             return NodesById(Ids.ToList());
