@@ -30,17 +30,19 @@ namespace umbraco.MacroEngines
         public DynamicBackingItem(int Id)
         {
             NodeFactory.Node baseNode = new NodeFactory.Node(Id);
-            //todo: trace this with media
-            if (baseNode == null)
+            this.content = baseNode;
+            this.Type = DynamicBackingItemType.Content;
+            if (baseNode.Id == 0 && Id != 0)
             {
                 this.media = ExamineBackedMedia.GetUmbracoMedia(Id);
                 this.Type = DynamicBackingItemType.Media;
+                if (this.media == null)
+                {
+                    this.Type = DynamicBackingItemType.Content;
+                }
+                return;
             }
-            else
-            {
-                this.content = baseNode;
-                this.Type = DynamicBackingItemType.Content;
-            }
+
         }
         public DynamicBackingItem(int Id, DynamicBackingItemType Type)
         {
