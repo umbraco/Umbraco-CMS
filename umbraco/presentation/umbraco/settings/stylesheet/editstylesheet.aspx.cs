@@ -51,7 +51,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
             if (appPath == "/")
                 appPath = "";
             lttPath.Text = "<a target='_blank' href='" + appPath + "/css/" + stylesheet.Text + ".css'>" + appPath +
-                           "/css/" + stylesheet.Text + ".css</a>";
+                            IO.SystemDirectories.Css + "/" + stylesheet.Text + ".css</a>";
 
 
             if (!IsPostBack)
