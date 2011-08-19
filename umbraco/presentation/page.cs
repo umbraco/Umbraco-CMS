@@ -196,17 +196,16 @@ namespace umbraco
             {
             }
 
-            HttpContext.Current.Trace.Write("umbracoPage", "testing altTemplate");
             // Check for alternative template
             if (HttpContext.Current.Items["altTemplate"] != null &&
-                HttpContext.Current.Items["altTemplate"].ToString() != "")
+                HttpContext.Current.Items["altTemplate"].ToString() != String.Empty)
             {
                 template =
                     umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(
                         HttpContext.Current.Items["altTemplate"].ToString());
                 elements.Add("template", template.ToString());
             }
-            else if (helper.Request("altTemplate") != "")
+            else if (helper.Request("altTemplate") != String.Empty)
             {
                 template =
                     umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(helper.Request("altTemplate").ToLower());
