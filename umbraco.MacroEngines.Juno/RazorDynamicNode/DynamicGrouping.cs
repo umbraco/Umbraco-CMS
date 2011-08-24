@@ -20,16 +20,24 @@ namespace umbraco.MacroEngines
             Inner =
               list
               .Items
-              .GroupBy(item =>
-              {
-                  object result = null;
-                  item.TryGetMember(new DynamicQueryableGetMemberBinder(groupBy, false), out result);
-                  return result;
-              })
+              .Select(node =>
+                {
+                    string predicate = groupBy;
+                    var internalList = new DynamicNodeList(new DynamicNode[] { node });
+                    var query = (IQueryable<object>)internalList.Select(predicate, new object[] { });
+                    var key = query.FirstOrDefault();
+                    return new
+                    {
+                        Key = key,
+                        Node = node
+                    };
+                })
+              .Where(item => item.Key != null)
+              .GroupBy(item => item.Key)
               .Select(item => new Grouping<object, DynamicNode>()
               {
                   Key = item.Key,
-                  Elements = item.Select(inner => inner)
+                  Elements = item.Select(inner => inner.Node)
               });
         }
         public DynamicGrouping(IEnumerable<Grouping<object, DynamicNode>> source)

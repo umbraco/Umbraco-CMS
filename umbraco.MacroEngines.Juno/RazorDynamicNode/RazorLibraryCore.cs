@@ -52,6 +52,13 @@ namespace umbraco.MacroEngines.Library
                 nodes.Add(new DynamicNode(eachId));
             return new DynamicNodeList(nodes);
         }
+        public dynamic NodesById(List<int> Ids, DynamicBackingItemType ItemType)
+        {
+            List<DynamicNode> nodes = new List<DynamicNode>();
+            foreach (int eachId in Ids)
+                nodes.Add(new DynamicNode(eachId, ItemType));
+            return new DynamicNodeList(nodes);
+        }
         public dynamic NodesById(params object[] Ids)
         {
             return NodesById(Ids.ToList());
@@ -397,7 +404,7 @@ namespace umbraco.MacroEngines.Library
                                                     insideTagSpaceEncountered = true;
                                                     //if (!isTagClose)
                                                     //{
-                                                       // tagStack.Push(currentTag);
+                                                    // tagStack.Push(currentTag);
                                                     //}
                                                 }
                                             }
@@ -453,22 +460,52 @@ namespace umbraco.MacroEngines.Library
         }
 
 
-        public string StripHtml(IHtmlString html)
+        public HtmlString StripHtml(IHtmlString html)
         {
-            return StripHtml(html.ToHtmlString());
+            return StripHtml(html.ToHtmlString(), (List<string>)null);
         }
-        public string StripHtml(DynamicNull html)
+        public HtmlString StripHtml(DynamicNull html)
         {
-            return string.Empty;
+            return new HtmlString(string.Empty);
         }
-        public string StripHtml(string html)
+        public HtmlString StripHtml(string html)
         {
-            return StripHtmlTags(html);
+            return StripHtmlTags(html, (List<string>)null);
+        }
+
+        public HtmlString StripHtml(IHtmlString html, List<string> tags)
+        {
+            return StripHtml(html.ToHtmlString(), tags);
+        }
+        public HtmlString StripHtml(DynamicNull html, List<string> tags)
+        {
+            return new HtmlString(string.Empty);
+        }
+        public HtmlString StripHtml(string html, List<string> tags)
+        {
+            return StripHtmlTags(html, tags);
+        }
+
+        public HtmlString StripHtml(IHtmlString html, params string[] tags)
+        {
+            return StripHtml(html.ToHtmlString(), tags.ToList());
+        }
+        public HtmlString StripHtml(DynamicNull html, params string[] tags)
+        {
+            return new HtmlString(string.Empty);
+        }
+        public HtmlString StripHtml(string html, params string[] tags)
+        {
+            return StripHtmlTags(html, tags.ToList());
         }
 
         //ge: this method won't deal with <script> or <style> tags as they could have nested < or >
-        private string StripHtmlTags(string html)
+        private HtmlString StripHtmlTags(string html, List<string> tags)
         {
+            if (tags == null)
+            {
+                tags = new List<string>();
+            }
             using (MemoryStream outputms = new MemoryStream())
             {
                 using (TextWriter outputtw = new StreamWriter(outputms))
@@ -482,13 +519,24 @@ namespace umbraco.MacroEngines.Library
                             ms.Position = 0;
                             using (TextReader tr = new StreamReader(ms))
                             {
-                                bool IsInsideElement = false;
+                                bool IsInsideElement = false, InsideTagSpaceEncountered = false, DeniedTag = false;
+                                string currentTag = string.Empty;
+                                bool isTagClose = false;
                                 int ic = 0;
                                 while ((ic = tr.Read()) != -1)
                                 {
                                     if (ic == (int)'<')
                                     {
                                         IsInsideElement = true;
+                                        InsideTagSpaceEncountered = false;
+                                        currentTag = string.Empty;
+                                        isTagClose = false;
+                                        DeniedTag = false;
+                                        if (tr.Peek() == (int)'/')
+                                        {
+                                            isTagClose = true;
+                                            DeniedTag = true;
+                                        }
                                     }
                                     if (ic == (int)'>')
                                     {
@@ -496,9 +544,27 @@ namespace umbraco.MacroEngines.Library
                                         outputtw.Write(' ');
                                         continue;
                                     }
-                                    if (!IsInsideElement)
+                                    if (ic == (int)' ' && IsInsideElement)
+                                    {
+                                        InsideTagSpaceEncountered = true;
+                                    }
+                                    if (!IsInsideElement && !DeniedTag)
                                     {
                                         outputtw.Write((char)ic);
+                                    }
+                                    if (IsInsideElement)
+                                    {
+                                        currentTag += ic;
+                                        if (!InsideTagSpaceEncountered)
+                                        {
+                                            InsideTagSpaceEncountered = true;
+                                            //space on open
+                                            if (tags.Any(tag => tag.Equals(currentTag, StringComparison.CurrentCultureIgnoreCase)))
+                                            {
+                                                DeniedTag = true;
+                                                outputtw.Write("<" + currentTag + " ");
+                                            }
+                                        }
                                     }
 
                                 }
@@ -510,7 +576,7 @@ namespace umbraco.MacroEngines.Library
                     outputms.Position = 0;
                     using (TextReader outputtr = new StreamReader(outputms))
                     {
-                        return outputtr.ReadToEnd().Replace("  ", " ").Trim();
+                        return new HtmlString(outputtr.ReadToEnd().Replace("  ", " ").Trim());
                     }
                 }
             }

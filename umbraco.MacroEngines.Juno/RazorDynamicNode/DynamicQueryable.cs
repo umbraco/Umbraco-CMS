@@ -10,6 +10,7 @@ using System.Reflection.Emit;
 using System.Threading;
 using System.Dynamic;
 using umbraco.MacroEngines;
+using System.Diagnostics;
 
 namespace System.Linq.Dynamic
 {
@@ -73,8 +74,9 @@ namespace System.Linq.Dynamic
                         }
                         return false;
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
+                        Trace.WriteLine(ex.Message);
                         return false;
                     }
                 }).AsQueryable();
@@ -1557,6 +1559,36 @@ namespace System.Linq.Dynamic
                         LambdaExpression lax = Expression.Lambda<Func<DynamicNode, object>>(block, instanceExpression);
                         return lax;
                     }
+                    if (typeof(Func<DynamicNode, object>).IsAssignableFrom(type))
+                    {
+                        //accessing a property off an already resolved DynamicNode TryGetMember call
+                        //e.g. uBlogsyPostDate.Date
+                        MethodInfo ReflectPropertyValue = this.GetType().GetMethod("ReflectPropertyValue", BindingFlags.NonPublic | BindingFlags.Static);
+
+                        ParameterExpression result = Expression.Parameter(typeof(object), "result");
+                        ParameterExpression idParam = Expression.Parameter(typeof(string), "id");
+                        ParameterExpression lambdaResult = Expression.Parameter(typeof(object), "lambdaResult");
+                        ParameterExpression lambdaInstanceExpression = Expression.Parameter(typeof(DynamicNode), "lambdaInstanceExpression");
+                        ParameterExpression instanceExpression = Expression.Parameter(typeof(Func<DynamicNode, object>), "instance");
+                        LabelTarget blockReturnLabel = Expression.Label(typeof(object));
+
+                        BlockExpression block = Expression.Block(
+                         typeof(object),
+                         new[] { lambdaResult, result, idParam },
+                         Expression.Assign(lambdaResult, Expression.Invoke(instance, lambdaInstanceExpression)),
+                         Expression.Assign(result, Expression.Call(ReflectPropertyValue, lambdaResult, Expression.Constant(id))),
+                         Expression.IfThen(
+                            Expression.TypeEqual(result, typeof(DynamicNull)),
+                            Expression.Assign(result,
+                                Expression.Constant(false, typeof(object))
+                            )
+                         ),
+                         Expression.Return(blockReturnLabel, result),
+                         Expression.Label(blockReturnLabel, Expression.Constant(-2, typeof(object)))
+                         );
+                        LambdaExpression lax = Expression.Lambda<Func<DynamicNode, object>>(block, lambdaInstanceExpression);
+                        return lax;
+                    }
                 }
                 else
                 {
@@ -1569,7 +1601,16 @@ namespace System.Linq.Dynamic
 
             }
         }
-
+        static object ReflectPropertyValue(object o, string name)
+        {
+            PropertyInfo propertyInfo = o.GetType().GetProperty(name);
+            if (propertyInfo != null)
+            {
+                object result = propertyInfo.GetValue(o, null);
+                return result;
+            }
+            return null;
+        }
         private static Expression CallMethodOnDynamicNode(Expression instance, Expression[] args, LambdaExpression instanceAsString, ParameterExpression instanceExpression, MethodInfo method, bool isStatic)
         {
             ConstantExpression defaultReturnValue = Expression.Constant(null, typeof(object));

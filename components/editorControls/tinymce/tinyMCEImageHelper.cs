@@ -67,7 +67,8 @@ namespace umbraco.editorControls.tinymce
                                 Log.Add(LogTypes.Error, User.GetUser(0), -1,
                                         "Error resizing image in editor: " + err.ToString());
                             }
-                        } else
+                        }
+                        else
                         {
                             cleanTag = StripSrc(cleanTag, ht);
 
@@ -76,7 +77,7 @@ namespace umbraco.editorControls.tinymce
                                 cleanTag += " width=\"" + helper.FindAttribute(ht, "width") + "\"";
                                 cleanTag += " height=\"" + helper.FindAttribute(ht, "height") + "\"";
                             }
-                            
+
                         }
                     }
                     else
@@ -142,13 +143,13 @@ namespace umbraco.editorControls.tinymce
             if (orgHeight > 0 && orgWidth > 0 && resizeDim != "" && orgSrc != "")
             {
                 // Check dimensions
-                if (Math.Abs(orgWidth/newWidth) > Math.Abs(orgHeight/newHeight))
+                if (Math.Abs(orgWidth / newWidth) > Math.Abs(orgHeight / newHeight))
                 {
-                    newHeight = (int) Math.Round((float) newWidth*(orgHeight/orgWidth));
+                    newHeight = (int)Math.Round((float)newWidth * (orgHeight / orgWidth));
                 }
                 else
                 {
-                    newWidth = (int) Math.Round((float) newHeight*(orgWidth/orgHeight));
+                    newWidth = (int)Math.Round((float)newHeight * (orgWidth / orgHeight));
                 }
 
                 // update orgSrc to remove umbraco reference
@@ -156,6 +157,7 @@ namespace umbraco.editorControls.tinymce
                 if (IOHelper.ResolveUrl(orgSrc).IndexOf(resolvedMedia) > -1)
                 {
                     orgSrc = SystemDirectories.Media + orgSrc.Substring(orgSrc.IndexOf(resolvedMedia) + resolvedMedia.Length); //, orgSrc.Length - orgSrc.IndexOf(String.Format("/media/", SystemDirectories.Media)));
+
                 }
                 string ext = orgSrc.Substring(orgSrc.LastIndexOf(".") + 1, orgSrc.Length - orgSrc.LastIndexOf(".") - 1);
                 newSrc = orgSrc.Replace("." + ext, "_" + newWidth.ToString() + "x" + newHeight.ToString() + ".jpg");
@@ -199,8 +201,13 @@ namespace umbraco.editorControls.tinymce
             finalWidth = newWidth;
             finalHeight = newHeight;
 
+            //GE: When the SystemDirectories.Media contains a ~, newSrc will also contain this and hasn't been resolved.
+            //This causes the editor to save content which contains a virtual url, and thus the image doesn't serve
+            //the admin editor successfully displays the image because the HTML is rewritten, but when you get the RTE content in the template
+            //it hasn't been replaced
+            //2011-08-12 added a IOHelper.ResolveUrl call around newSrc
             return
-                " src=\"" + newSrc + "\"  width=\"" + newWidth.ToString() + "\"  height=\"" + newHeight.ToString() +
+                " src=\"" + IOHelper.ResolveUrl(newSrc) + "\"  width=\"" + newWidth.ToString() + "\"  height=\"" + newHeight.ToString() +
                 "\"";
         }
     }

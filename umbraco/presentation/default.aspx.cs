@@ -208,7 +208,8 @@ namespace umbraco
             base.OnInit(e);
 
             // Add Umbraco header
-            Response.AddHeader("X-Umbraco-Version", string.Format("{0}.{1}", GlobalSettings.VersionMajor, GlobalSettings.VersionMinor));
+            if (!UmbracoSettings.RemoveUmbracoVersionHeader)
+                Response.AddHeader("X-Umbraco-Version", string.Format("{0}.{1}", GlobalSettings.VersionMajor, GlobalSettings.VersionMinor));
         }
 
         private void initUmbracoPage()

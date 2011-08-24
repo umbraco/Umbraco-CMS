@@ -19,7 +19,6 @@ using umbraco.MacroEngines.Library;
 using umbraco.BusinessLogic.Utils;
 
 
-
 namespace umbraco.MacroEngines
 {
     public class DynamicNode : DynamicObject
@@ -46,6 +45,10 @@ namespace umbraco.MacroEngines
         public DynamicNode(int NodeId)
         {
             this.n = new DynamicBackingItem(NodeId);
+        }
+        public DynamicNode(int NodeId, DynamicBackingItemType ItemType)
+        {
+            this.n = new DynamicBackingItem(NodeId, ItemType);
         }
         public DynamicNode(string NodeId)
         {
@@ -411,41 +414,99 @@ namespace umbraco.MacroEngines
 
                     //contextAlias is the node which the property data was returned from
                     Guid dataType = ContentType.GetDataType(data.ContextAlias, data.Alias);
-
+                    HttpContext.Current.Trace.Write(string.Format("RazorDynamicNode got datatype {0} for {1} on {2}", dataType, data.Alias, data.ContextAlias));
                     if (RazorDataTypeModelTypes == null)
                     {
-                        RazorDataTypeModelTypes = new Dictionary<Guid, Type>();
+                        HttpContext.Current.Trace.Write("RazorDataTypeModelTypes cache is empty, populating cache using TypeFinder...");
+                        try
+                        {
+                            RazorDataTypeModelTypes = new Dictionary<Guid, Type>();
 
-                        TypeFinder.FindClassesMarkedWithAttribute(typeof(RazorDataTypeModel))
-                        .ToList()
-                        .FindAll(type => typeof(IRazorDataTypeModel).IsAssignableFrom(type))
-                        .ConvertAll(type =>
-                        {
-                            RazorDataTypeModel RazorDataTypeModelAttribute = (RazorDataTypeModel)Attribute.GetCustomAttribute(type, typeof(RazorDataTypeModel));
-                            Guid g = RazorDataTypeModelAttribute.DataTypeEditorId;
-                            return new KeyValuePair<Guid, Type>(g, type);
-                        })
-                        .ForEach(item =>
-                        {
-                            if (!RazorDataTypeModelTypes.ContainsKey(item.Key))
+                            TypeFinder.FindClassesMarkedWithAttribute(typeof(RazorDataTypeModel))
+                            .ToList()
+                            .FindAll(type => typeof(IRazorDataTypeModel).IsAssignableFrom(type))
+                            .ConvertAll(type =>
                             {
-                                RazorDataTypeModelTypes.Add(item.Key, item.Value);
+                                RazorDataTypeModel RazorDataTypeModelAttribute = (RazorDataTypeModel)Attribute.GetCustomAttribute(type, typeof(RazorDataTypeModel));
+                                Guid g = RazorDataTypeModelAttribute.DataTypeEditorId;
+                                return new KeyValuePair<Guid, Type>(g, type);
+                            })
+                            .ForEach(item =>
+                            {
+                                if (!RazorDataTypeModelTypes.ContainsKey(item.Key))
+                                {
+                                    RazorDataTypeModelTypes.Add(item.Key, item.Value);
+                                }
+                            });
+                            HttpContext.Current.Trace.Write(string.Format("{0} items added to cache...", RazorDataTypeModelTypes.Count));
+                            int i = 1;
+                            foreach (KeyValuePair<Guid, Type> item in RazorDataTypeModelTypes)
+                            {
+                                HttpContext.Current.Trace.Write(string.Format("{0}/{1}: {2} => {3}", i, RazorDataTypeModelTypes.Count, item.Key, item.Value.FullName));
+                                i++;
                             }
-                        });
+                        }
+                        catch (Exception ex)
+                        {
+                            HttpContext.Current.Trace.Warn("Exception occurred while populating cache, Will set RazorDataTypeModelTypes to null so that this error remains visible and you don't end up with an empty cache with silent failure.");
+                            HttpContext.Current.Trace.Warn(string.Format("The exception was {0} and the message was {1}. {2}", ex.GetType().FullName, ex.Message, ex.StackTrace));
+                            RazorDataTypeModelTypes = null;
+                        }
                     }
-                    if (RazorDataTypeModelTypes.ContainsKey(dataType))
+                    HttpContext.Current.Trace.Write(string.Format("Checking the RazorDataTypeModelTypes cache to see if the GUID {0} has a Model...", dataType));
+                    if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.ContainsKey(dataType))
                     {
                         Type dataTypeType = RazorDataTypeModelTypes[dataType];
+                        HttpContext.Current.Trace.Write(string.Format("Found dataType {0} for GUID {1}", dataTypeType.FullName, dataType));
                         IRazorDataTypeModel razorDataTypeModel = Activator.CreateInstance(dataTypeType, false) as IRazorDataTypeModel;
+                        HttpContext.Current.Trace.Write(string.Format("Instantiating {0}...", dataTypeType.FullName));
                         if (razorDataTypeModel != null)
                         {
+                            HttpContext.Current.Trace.Write("Success");
                             object instance = null;
+                            HttpContext.Current.Trace.Write("Calling Init on razorDataTypeModel");
                             if (razorDataTypeModel.Init(n.Id, data.Value, out instance))
                             {
+                                if (instance != null)
+                                {
+                                    HttpContext.Current.Trace.Write(string.Format("razorDataTypeModel successfully instantiated and returned a valid instance of type {0}", instance.GetType().FullName));
+                                }
+                                else
+                                {
+                                    HttpContext.Current.Trace.Warn("razorDataTypeModel successfully instantiated but returned null for instance");
+                                }
                                 result = instance;
                                 return true;
                             }
+                            else
+                            {
+                                if (instance != null)
+                                {
+                                    HttpContext.Current.Trace.Write(string.Format("razorDataTypeModel returned false but returned a valid instance of type {0}", instance.GetType().FullName));
+                                }
+                                else
+                                {
+                                    HttpContext.Current.Trace.Warn("razorDataTypeModel successfully instantiated but returned null for instance");
+                                }
+                            }
                         }
+                        else
+                        {
+                            HttpContext.Current.Trace.Write("Failed");
+                            HttpContext.Current.Trace.Warn(string.Format("DataTypeModel {0} failed to instantiate, perhaps it is lacking a parameterless constructor or doesn't implement IRazorDataTypeModel?", dataTypeType.FullName));
+                        }
+                    }
+                    else
+                    {
+                        if (RazorDataTypeModelTypes == null)
+                        {
+                            HttpContext.Current.Trace.Write(string.Format("RazorDataTypeModelTypes is null, probably an exception while building the cache, falling back to ConvertPropertyValueByDataType", dataType));
+                        }
+                        else
+                        {
+                            HttpContext.Current.Trace.Write(string.Format("GUID {0} does not have a DataTypeModel, falling back to ConvertPropertyValueByDataType", dataType));
+                        }
+
                     }
 
                     //convert the string value to a known type
