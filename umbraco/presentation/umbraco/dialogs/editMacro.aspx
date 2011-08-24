@@ -38,7 +38,7 @@
 				  
 					
                 var control = jQuery("#" + controlId); 
-                if (control == null || (!control.is('input') && !control.is('select'))) {
+                if (control == null || (!control.is('input') && !control.is('select') && !control.is('textarea'))) {
                     // hack for tree based macro parameter types
                     var picker = Umbraco.Controls.TreePicker.GetPickerById(controlId);
                     if (picker != undefined) {
