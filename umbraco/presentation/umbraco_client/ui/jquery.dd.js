@@ -42,6 +42,15 @@
         ddList = ($(this).attr("size") > 0 || $(this).attr("multiple") == true) ? true : false;
         if (ddList) { options.visibleRows = $(this).attr("size"); };
         var a_array = {}; //stores id, html & value etc
+
+        var cacheElement = {};
+        var getElement = function(ele) {
+		    if(typeof(cacheElement[ele])=="undefined") {
+			    cacheElement[ele] = document.getElementById(ele);
+		    }
+		    return cacheElement[ele];
+	    };
+
         //create wrapper
         createDropDown();
 
@@ -104,7 +113,11 @@
 
                 } else {
                     var aid = aidfix + "_" + (current);
-                    var arrow = $(currentOption).attr("title");
+                    // custom update by tg, needed after jquery and jquery ui update
+                    var arrow ="";
+                    arrow = $(currentOption).prop("title");
+                    // old line was: 
+                    //var arrow = $(currentOption).attr("title");
                     arrow = (arrow.length == 0) ? "" : '<img src="' + arrow + '" align="left" /> ';
                     var sText = $(currentOption).text();
                     var sValue = $(currentOption).val();
@@ -146,7 +159,12 @@
             var titletextid = getPostID("postTitleTextID");
             var inputhidden = getPostID("postInputhidden");
             var sText = $("#" + elementid + " option:selected").text();
-            var arrow = $("#" + elementid + " option:selected").attr("title");
+            //custom update by tg, needed after jquery, jquery ui update
+            var arrow = "";
+            if(getElement(elementid).options.length>0) {
+                arrow = $("#"+elementid+" option:selected").prop("title");
+            }
+            //var arrow = $("#" + elementid + " option:selected").attr("title");
             arrow = (arrow.length == 0 || arrow == undefined || options.showIcon == false) ? "" : '<img src="' + arrow + '" align="left" /> ';
             var sDiv = '<div id="' + titleid + '" class="' + styles.ddTitle + '"';
             sDiv += '>';
