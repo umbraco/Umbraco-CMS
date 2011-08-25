@@ -272,10 +272,10 @@ namespace umbraco.cms.businesslogic.language
         {
             
 
-            if (this.id == DefaultLanguageId)
-            {
-                throw new InvalidOperationException("You cannot delete the default language: en-US");
-            }
+            //if (this.id == DefaultLanguageId)
+            //{
+            //    throw new InvalidOperationException("You cannot delete the default language: en-US");
+            //}
 
 
             if (SqlHelper.ExecuteScalar<int>("SELECT count(id) FROM umbracoDomains where domainDefaultLanguage = @id",
