@@ -57,7 +57,7 @@
 	<input type="hidden" id="copyTo" name="copyTo" />
 	<cc1:Feedback ID="feedback" runat="server" />
 	<cc1:Pane ID="pane_form" runat="server" Visible="false">
-		<cc1:PropertyPanel runat="server" Style="overflow: auto; height: 220px;">
+		<cc1:PropertyPanel runat="server" Style="overflow: auto; height: 220px;position: relative;">
 			<umbraco:TreeControl runat="server" ID="JTree" App='<%#umbraco.helper.Request("app") %>'
                 IsDialog="true" DialogMode="id" ShowContextMenu="false" FunctionToCall="dialogHandler"
                 Height="200"></umbraco:TreeControl>
