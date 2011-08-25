@@ -15,7 +15,8 @@ NOTE: It is safe to remove this comment (anything between @ * * @), the code tha
 
 @{ var numberOfItems = 10; }
 <ul>
-    @foreach (var item in @Model.Children.Where("Visible").Take(numberOfItems).OrderBy("UpdateDate")) {
+    @foreach (var item in @Model.Children.Where("Visible").OrderBy("UpdateDate").Take(numberOfItems))
+    {
         <li><a href="@item.Url">@item.Name</a></li>
     }
 </ul>
