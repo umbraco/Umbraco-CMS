@@ -103,6 +103,9 @@ namespace umbraco.cms.presentation.developer
             
 			dt.DataType = f.DataType(new Guid(ddlRenderControl.SelectedValue));
 
+
+            System.Web.HttpRuntime.Cache.Remove(string.Format("UmbracoDataTypeDefinition{0}", dt.UniqueId));
+
             this.speechBubble(BasePages.BasePage.speechBubbleIcon.save, ui.Text("speechBubbles", "dataTypeSaved", null), "");
 
             //Response.Redirect("editDataType.aspx?id=" + _id);
