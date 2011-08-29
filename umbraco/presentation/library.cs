@@ -556,6 +556,8 @@ namespace umbraco
         {
             XmlDocument umbracoXML = UmbracoContext.Current.GetXml();
 
+            string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data [@alias='{0}']" : "./{0}";
+
             if (umbracoXML.GetElementById(nodeID.ToString()) != null)
                 if (
                     ",id,version,parentID,level,writerID,editDataType,template,sortOrder,createDate,updateDate,nodeName,writerName,path,"
@@ -563,11 +565,10 @@ namespace umbraco
                         IndexOf("," + alias + ",") > -1)
                     return umbracoXML.GetElementById(nodeID.ToString()).Attributes.GetNamedItem(alias).Value;
                 else if (
-                    umbracoXML.GetElementById(nodeID.ToString()).SelectSingleNode("./data [@alias='" + alias + "']") !=
+                    umbracoXML.GetElementById(nodeID.ToString()).SelectSingleNode(string.Format(xpath,alias)) !=
                     null)
                     return
-                        umbracoXML.GetElementById(nodeID.ToString()).SelectSingleNode("./data [@alias = '" + alias +
-                                                                                      "']").ChildNodes[0].
+                        umbracoXML.GetElementById(nodeID.ToString()).SelectSingleNode(string.Format(xpath, alias)).ChildNodes[0].
                             Value; //.Value + "*";
                 else
                     return string.Empty;

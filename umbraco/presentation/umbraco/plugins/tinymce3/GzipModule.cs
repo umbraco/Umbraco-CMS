@@ -14,47 +14,49 @@ using umbraco.IO;
 namespace umbraco.presentation.plugins.tinymce3
 {
     /// <summary>
-	/// Description of HttpHandler.
-	/// </summary>
-	public class GzipModule : IModule {
-		/// <summary></summary>
-		/// <param name="context">Request context.</param>
-		public void ProcessRequest(HttpContext context) {
-			HttpRequest request = context.Request;
-			HttpResponse response = context.Response;
-			HttpServerUtility server = context.Server;
-			GzipCompressor gzipCompressor = new GzipCompressor();
+    /// Description of HttpHandler.
+    /// </summary>
+    public class GzipModule : IModule
+    {
+        /// <summary></summary>
+        /// <param name="context">Request context.</param>
+        public void ProcessRequest(HttpContext context)
+        {
+            HttpRequest request = context.Request;
+            HttpResponse response = context.Response;
+            HttpServerUtility server = context.Server;
+            GzipCompressor gzipCompressor = new GzipCompressor();
             System.Collections.Specialized.NameValueCollection configSection = new System.Collections.Specialized.NameValueCollection();
-			string suffix = "_src", enc;
-			string[] languages = request.QueryString["languages"].Split(',');
-			bool supportsGzip;
+            string suffix = "_src", enc;
+            string[] languages = request.QueryString["languages"].Split(',');
+            bool supportsGzip;
 
-			// Set response headers
-			response.ContentType = "text/javascript";
-			response.Charset = "UTF-8";
-			response.Buffer = false;
+            // Set response headers
+            response.ContentType = "text/javascript";
+            response.Charset = "UTF-8";
+            response.Buffer = false;
 
             // UMBRACO: Populate the configsection if it's empty
             configSection.Add("GzipEnabled", "true");
-            configSection.Add("InstallPath", IOHelper.ResolveUrl( SystemDirectories.Umbraco_client ) + "/tinymce3");
+            configSection.Add("InstallPath", IOHelper.ResolveUrl(SystemDirectories.Umbraco_client) + "/tinymce3");
             configSection.Add("GzipExpiresOffset", TimeSpan.FromDays(10).Ticks.ToString());
 
-			// Setup cache
-			response.Cache.SetExpires(DateTime.Now.AddTicks(long.Parse(configSection["GzipExpiresOffset"])));
-			response.Cache.SetCacheability(HttpCacheability.Public);
-			response.Cache.SetValidUntilExpires(false);
+            // Setup cache
+            response.Cache.SetExpires(DateTime.Now.AddTicks(long.Parse(configSection["GzipExpiresOffset"])));
+            response.Cache.SetCacheability(HttpCacheability.Public);
+            response.Cache.SetValidUntilExpires(false);
 
-			// Check if it supports gzip
-			enc = Regex.Replace("" + request.Headers["Accept-Encoding"], @"\s+", "").ToLower();
-			supportsGzip = enc.IndexOf("gzip") != -1 || request.Headers["---------------"] != null;
-			enc = enc.IndexOf("x-gzip") != -1 ? "x-gzip" : "gzip";
+            // Check if it supports gzip
+            enc = Regex.Replace("" + request.Headers["Accept-Encoding"], @"\s+", "").ToLower();
+            supportsGzip = enc.IndexOf("gzip") != -1 || request.Headers["---------------"] != null;
+            enc = enc.IndexOf("x-gzip") != -1 ? "x-gzip" : "gzip";
 
-			gzipCompressor.AddData("var tinyMCEPreInit = {base : '" + new Uri(request.Url, configSection["InstallPath"]).ToString() + "', suffix : '" + suffix + "'};");
+            gzipCompressor.AddData("var tinyMCEPreInit = {base : '" + configSection["InstallPath"] + "', suffix : '" + suffix + "'};");
 
-			// Add core
-			gzipCompressor.AddFile( IOHelper.MapPath(configSection["InstallPath"] + "/tiny_mce" + suffix + ".js"));
+            // Add core
+            gzipCompressor.AddFile(IOHelper.MapPath(configSection["InstallPath"] + "/tiny_mce" + suffix + ".js"));
 
-			// Add core languages
+            // Add core languages
             foreach (string lang in languages)
             {
                 if (File.Exists(IOHelper.MapPath(configSection["InstallPath"] + "/langs/" + lang + ".js")))
@@ -63,58 +65,64 @@ namespace umbraco.presentation.plugins.tinymce3
                 }
                 else
                 {
-                    BusinessLogic.Log.Add(global::umbraco.BusinessLogic.LogTypes.Error, -1, 
+                    BusinessLogic.Log.Add(global::umbraco.BusinessLogic.LogTypes.Error, -1,
                         String.Format("TinyMCE: Error loading language '{0}'. Please download language pack from tinymce.moxiecode.com", lang));
                 }
             }
-			// Add themes
-			if (request.QueryString["themes"] != null) {
-				foreach (string theme in request.QueryString["themes"].Split(',')) {
-                    gzipCompressor.AddFile( IOHelper.MapPath(configSection["InstallPath"] + "/themes/" + theme + "/editor_template" + suffix + ".js"));
+            // Add themes
+            if (request.QueryString["themes"] != null)
+            {
+                foreach (string theme in request.QueryString["themes"].Split(','))
+                {
+                    gzipCompressor.AddFile(IOHelper.MapPath(configSection["InstallPath"] + "/themes/" + theme + "/editor_template" + suffix + ".js"));
 
-					// Add theme languages
-					foreach (string lang in languages) {
+                    // Add theme languages
+                    foreach (string lang in languages)
+                    {
                         string path = IOHelper.MapPath(configSection["InstallPath"] + "/themes/" + theme + "/langs/" + lang + ".js");
 
-						if (File.Exists(path))
-							gzipCompressor.AddFile(path);
-					}
+                        if (File.Exists(path))
+                            gzipCompressor.AddFile(path);
+                    }
 
-					gzipCompressor.AddData("tinymce.ThemeManager.urls['" + theme + "'] = tinymce.baseURL+'/themes/" + theme + "';");
-				}
-			}
+                    gzipCompressor.AddData("tinymce.ThemeManager.urls['" + theme + "'] = tinymce.baseURL+'/themes/" + theme + "';");
+                }
+            }
 
-			// Add plugins
-			if (request.QueryString["plugins"] != null) {
-				foreach (string plugin in request.QueryString["plugins"].Split(',')) {
+            // Add plugins
+            if (request.QueryString["plugins"] != null)
+            {
+                foreach (string plugin in request.QueryString["plugins"].Split(','))
+                {
                     gzipCompressor.AddFile(IOHelper.MapPath(configSection["InstallPath"] + "/plugins/" + plugin + "/editor_plugin" + suffix + ".js"));
 
-					// Add plugin languages
-					foreach (string lang in languages) {
-						string path = IOHelper.MapPath(configSection["InstallPath"] + "/plugins/" + plugin + "/langs/" + lang + ".js");
+                    // Add plugin languages
+                    foreach (string lang in languages)
+                    {
+                        string path = IOHelper.MapPath(configSection["InstallPath"] + "/plugins/" + plugin + "/langs/" + lang + ".js");
 
-						if (File.Exists(path))
-							gzipCompressor.AddFile(path);
-					}
+                        if (File.Exists(path))
+                            gzipCompressor.AddFile(path);
+                    }
 
-					gzipCompressor.AddData("tinymce.ThemeManager.urls['" + plugin + "'] = tinymce.baseURL+'/plugins/" + plugin + "';");
-				}
-			}
+                    gzipCompressor.AddData("tinymce.ThemeManager.urls['" + plugin + "'] = tinymce.baseURL+'/plugins/" + plugin + "';");
+                }
+            }
 
             // Add ASP.NET AJAX Script Notification 
             gzipCompressor.AddData("if (typeof (Sys) !== 'undefined') {\nSys.Application.notifyScriptLoaded();\n}");
 
-			// Output compressed file
-			gzipCompressor.NoCompression = !supportsGzip || (!String.IsNullOrEmpty(configSection["GzipNoCompression"]) && bool.Parse(configSection["GzipNoCompression"]));
+            // Output compressed file
+            gzipCompressor.NoCompression = !supportsGzip || (!String.IsNullOrEmpty(configSection["GzipNoCompression"]) && bool.Parse(configSection["GzipNoCompression"]));
 
             if (!gzipCompressor.NoCompression)
-				response.AppendHeader("Content-Encoding", enc);
+                response.AppendHeader("Content-Encoding", enc);
 
 
-            gzipCompressor.DiskCache = !String.IsNullOrEmpty(configSection["GzipDiskCache"]) ? bool.Parse(configSection["GzipDiskCache"]) : false ;
-			gzipCompressor.CachePath = configSection["GzipCachePath"];
+            gzipCompressor.DiskCache = !String.IsNullOrEmpty(configSection["GzipDiskCache"]) ? bool.Parse(configSection["GzipDiskCache"]) : false;
+            gzipCompressor.CachePath = configSection["GzipCachePath"];
 
-			gzipCompressor.Compress(response.OutputStream);
-		}
-	}
+            gzipCompressor.Compress(response.OutputStream);
+        }
+    }
 }
