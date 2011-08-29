@@ -121,7 +121,7 @@ namespace umbraco.editorControls.tinyMCE3
                     IDictionaryEnumerator pluginEnum = tinyMCEConfiguration.Plugins.GetEnumerator();
                     while (pluginEnum.MoveNext())
                     {
-                        var plugin = (tinyMCEPlugin) pluginEnum.Value;
+                        var plugin = (tinyMCEPlugin)pluginEnum.Value;
                         if (plugin.UseOnFrontend || (!onFront && !plugin.UseOnFrontend))
                             _plugins += "," + plugin.Name;
                     }
@@ -133,7 +133,7 @@ namespace umbraco.editorControls.tinyMCE3
                     config.Add("plugins", _plugins);
 
                     // Check advanced settings
-                    if (("," + _advancedUsers + ",").IndexOf("," + UmbracoEnsuredPage.CurrentUser.UserType.Id + ",") >
+                    if (UmbracoEnsuredPage.CurrentUser != null && ("," + _advancedUsers + ",").IndexOf("," + UmbracoEnsuredPage.CurrentUser.UserType.Id + ",") >
                         -1)
                         config.Add("umbraco_advancedMode", "true");
                     else
@@ -185,10 +185,10 @@ namespace umbraco.editorControls.tinyMCE3
                     }
 
                     // language
-                    string userLang = User.GetCurrent().Language.Contains("-")
-                                          ? User.GetCurrent().Language.Substring(0,
-                                                                                 User.GetCurrent().Language.IndexOf("-"))
-                                          : User.GetCurrent().Language; 
+                    string userLang = (UmbracoEnsuredPage.CurrentUser != null) ?
+                        (User.GetCurrent().Language.Contains("-") ?
+                            User.GetCurrent().Language.Substring(0, User.GetCurrent().Language.IndexOf("-")) : User.GetCurrent().Language)
+                        : "en";
                     config.Add("language", userLang);
 
                     config.Add("content_css", cssFiles);
@@ -198,7 +198,7 @@ namespace umbraco.editorControls.tinyMCE3
                     IDictionaryEnumerator ide = tinyMCEConfiguration.Commands.GetEnumerator();
                     while (ide.MoveNext())
                     {
-                        var cmd = (tinyMCECommand) ide.Value;
+                        var cmd = (tinyMCECommand)ide.Value;
                         if (_editorButtons.IndexOf("," + cmd.Alias + ",") > -1)
                             _activateButtons += cmd.Alias + ",";
                         else
@@ -219,12 +219,12 @@ namespace umbraco.editorControls.tinyMCE3
                     while (ide.MoveNext())
                     {
                         string mceCommand = ide.Value.ToString();
-                        var curPriority = (int) ide.Key;
+                        var curPriority = (int)ide.Key;
 
                         // Check priority
                         if (separatorPriority > 0 &&
-                            Math.Floor(decimal.Parse(curPriority.ToString())/10) >
-                            Math.Floor(decimal.Parse(separatorPriority.ToString())/10))
+                            Math.Floor(decimal.Parse(curPriority.ToString()) / 10) >
+                            Math.Floor(decimal.Parse(separatorPriority.ToString()) / 10))
                             _activateButtons += "separator,";
 
                         _activateButtons += mceCommand + ",";
@@ -436,7 +436,7 @@ namespace umbraco.editorControls.tinyMCE3
             get
             {
                 initButtons();
-                return _buttons.Count*40 + 300;
+                return _buttons.Count * 40 + 300;
             }
         }
 
@@ -447,10 +447,10 @@ namespace umbraco.editorControls.tinyMCE3
             try
             {
                 // add current page info
-                base.NodeId = ((cms.businesslogic.datatype.DefaultData) _data).NodeId;
+                base.NodeId = ((cms.businesslogic.datatype.DefaultData)_data).NodeId;
                 if (NodeId != 0)
                 {
-                    base.VersionId = ((cms.businesslogic.datatype.DefaultData) _data).Version;
+                    base.VersionId = ((cms.businesslogic.datatype.DefaultData)_data).Version;
                     config.Add("theme_umbraco_pageId", base.NodeId.ToString());
                     config.Add("theme_umbraco_versionId", base.VersionId.ToString());
 
@@ -467,7 +467,7 @@ namespace umbraco.editorControls.tinyMCE3
                     {
                         config.Add("umbraco_toolbar_id",
                                    ElementIdPreFix +
-                                   ((cms.businesslogic.datatype.DefaultData) _data).PropertyId);
+                                   ((cms.businesslogic.datatype.DefaultData)_data).PropertyId);
                     }
                 }
                 else
@@ -590,7 +590,7 @@ namespace umbraco.editorControls.tinyMCE3
                     {
                         try
                         {
-                            var cmd = (tinyMCECommand) tinyMCEConfiguration.Commands[button];
+                            var cmd = (tinyMCECommand)tinyMCEConfiguration.Commands[button];
 
                             string appendValue = "";
                             if (cmd.Value != "")
@@ -615,17 +615,17 @@ namespace umbraco.editorControls.tinyMCE3
                 while (ide.MoveNext())
                 {
                     object buttonObj = ide.Value;
-                    var curPriority = (int) ide.Key;
+                    var curPriority = (int)ide.Key;
 
                     // Check priority
                     if (separatorPriority > 0 &&
-                        Math.Floor(decimal.Parse(curPriority.ToString())/10) >
-                        Math.Floor(decimal.Parse(separatorPriority.ToString())/10))
+                        Math.Floor(decimal.Parse(curPriority.ToString()) / 10) >
+                        Math.Floor(decimal.Parse(separatorPriority.ToString()) / 10))
                         _menuIcons.Add("|");
 
                     try
                     {
-                        var e = (editorButton) buttonObj;
+                        var e = (editorButton)buttonObj;
 
                         MenuIconI menuItem = new MenuIconClass();
 
