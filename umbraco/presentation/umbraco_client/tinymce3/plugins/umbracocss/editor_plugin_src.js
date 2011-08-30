@@ -7,7 +7,7 @@
 
 (function () {
     // Load plugin specific language pack
-//    tinymce.PluginManager.requireLangPack('umbraco');
+    //    tinymce.PluginManager.requireLangPack('umbraco');
 
     tinymce.create('tinymce.plugins.umbracocss', {
         /**
@@ -96,15 +96,16 @@
                         if (v == '') {
                             if (styles.selectedValue.indexOf('.') == 0) {
                                 // remove style
-                                var styleObj = tinymce.activeEditor.formatter.get('umb' + v.substring(1, v.length));
+                                var selectedStyle = styles.selectedValue;
+                                var styleObj = tinymce.activeEditor.formatter.get('umb' + selectedStyle.substring(1, selectedStyle.length));
                                 if (styleObj == undefined) {
-                                    tinymce.activeEditor.formatter.register('umb' + v.substring(1, v.length), {
+                                    tinymce.activeEditor.formatter.register('umb' + selectedStyle.substring(1, selectedStyle.length), {
                                         inline: 'span',
-                                        selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img',
-                                        classes: v.substring(1, v.length)
+                                        selector: '*',
+                                        classes: selectedStyle.substring(1, selectedStyle.length)
                                     });
                                 }
-                                tinyMCE.activeEditor.formatter.remove('umb' + v.substring(1, v.length));
+                                tinyMCE.activeEditor.formatter.remove('umb' + selectedStyle.substring(1, selectedStyle.length));
 
                                 //                                tinymce.activeEditor.execCommand('mceSetStyleInfo', 0, { command: 'removeformat' });
                             } else {
@@ -116,10 +117,10 @@
                             tinymce.activeEditor.execCommand('FormatBlock', false, v);
                         } else {
                             // use new formatting engine
-                            if (tinymce.activeEditor.formatter.get(v.substring(1, v.length)) == undefined) {
+                            if (tinymce.activeEditor.formatter.get('umb' + v.substring(1, v.length)) == undefined) {
                                 tinymce.activeEditor.formatter.register('umb' + v.substring(1, v.length), {
                                     inline: 'span',
-                                    selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img',
+                                    selector: '*',
                                     classes: v.substring(1, v.length)
                                 });
                             }
