@@ -441,7 +441,8 @@ namespace umbraco.presentation.channels
                         fileObject.Value = SystemDirectories.Media + "/" + filename;
                     }
 
-                    fileUrl.url = "http://" + HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + IOHelper.ResolveUrl(fileObject.Value.ToString());
+                    string protocol = GlobalSettings.UseSSL ? "https" : "http";
+                    fileUrl.url = protocol + "://" + HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + IOHelper.ResolveUrl(fileObject.Value.ToString());
 
                     File.WriteAllBytes(_fullFilePath, file.bits);
 

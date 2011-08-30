@@ -91,7 +91,8 @@ namespace umbraco.presentation.translation
             xTask.SetAttributeNode(xmlHelper.addAttribute(xd, "NodeId", t.Node.Id.ToString()));
             xTask.SetAttributeNode(xmlHelper.addAttribute(xd, "TotalWords", cms.businesslogic.translation.Translation.CountWords(d.Id).ToString()));
             xTask.AppendChild(xmlHelper.addCDataNode(xd, "Comment", t.Comment));
-            xTask.AppendChild(xmlHelper.addTextNode(xd, "PreviewUrl", "http://" + Request.ServerVariables["SERVER_NAME"] + SystemDirectories.Umbraco + "/translation/preview.aspx?id=" + t.Id.ToString()));
+            string protocol = GlobalSettings.UseSSL ? "https" : "http";
+            xTask.AppendChild(xmlHelper.addTextNode(xd, "PreviewUrl", protocol + "://" + Request.ServerVariables["SERVER_NAME"] + SystemDirectories.Umbraco + "/translation/preview.aspx?id=" + t.Id.ToString()));
             //            d.XmlPopulate(xd, ref x, false);
             xTask.AppendChild(x);
 
