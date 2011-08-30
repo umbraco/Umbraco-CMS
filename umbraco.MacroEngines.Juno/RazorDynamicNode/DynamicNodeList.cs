@@ -258,6 +258,7 @@ namespace umbraco.MacroEngines
             {
                 var types = from i in query
                             group i by i.GetType() into g
+                            where g.Key != typeof(DynamicNull)
                             orderby g.Count() descending
                             select new { g, Instances = g.Count() };
                 var dominantType = types.First().g.Key;
@@ -314,6 +315,7 @@ namespace umbraco.MacroEngines
             {
                 var types = from i in query
                             group i by i.GetType() into g
+                            where g.Key != typeof(DynamicNull)
                             orderby g.Count() descending
                             select new { g, Instances = g.Count() };
                 var dominantType = types.First().g.Key;

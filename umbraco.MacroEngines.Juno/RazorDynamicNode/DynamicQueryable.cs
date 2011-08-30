@@ -25,7 +25,7 @@ namespace System.Linq.Dynamic
         {
             if (source == null) throw new ArgumentNullException("source");
             if (predicate == null) throw new ArgumentNullException("predicate");
-            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(bool), predicate, values);
+            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(bool), predicate, true, values);
             if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
             {
                 //source list is DynamicNode and the lambda returns a Func<object>
@@ -95,7 +95,7 @@ namespace System.Linq.Dynamic
         {
             if (source == null) throw new ArgumentNullException("source");
             if (selector == null) throw new ArgumentNullException("selector");
-            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(object), selector, values);
+            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(object), selector, false, values);
             if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
             {
                 //source list is DynamicNode and the lambda returns a Func<object>
@@ -153,44 +153,27 @@ namespace System.Linq.Dynamic
                     descending = true;
                 }
 
-                LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(object), ordering, values);
+                LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(object), ordering, false, values);
                 if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
                 {
                     //source list is DynamicNode and the lambda returns a Func<object>
                     Func<DynamicNode, object> func = (Func<DynamicNode, object>)lambda.Compile();
+                    //get the values out
+                    var query = typedSource.ToList().ConvertAll(item => new { node = item, key = EvaluateDynamicNodeFunc(item, func) });
+                    var types = from i in query
+                                group i by i.key.GetType() into g
+                                where g.Key != typeof(DynamicNull)
+                                orderby g.Count() descending
+                                select new { g, Instances = g.Count() };
+                    var dominantType = types.First().g.Key;
+
                     if (!descending)
                     {
-                        return typedSource.OrderBy(delegate(DynamicNode node)
-                        {
-                            object value = -1;
-                            var firstFuncResult = func(node);
-                            if (firstFuncResult is Func<DynamicNode, object>)
-                            {
-                                value = (firstFuncResult as Func<DynamicNode, object>)(node);
-                            }
-                            if (firstFuncResult.GetType().IsValueType)
-                            {
-                                value = firstFuncResult;
-                            }
-                            return value;
-                        }).AsQueryable();
+                        return query.OrderBy(item => GetObjectAsTypeOrDefault(item.key, dominantType)).Select(item => item.node).AsQueryable();
                     }
                     else
                     {
-                        return typedSource.OrderByDescending(delegate(DynamicNode node)
-                        {
-                            object value = -1;
-                            var firstFuncResult = func(node);
-                            if (firstFuncResult is Func<DynamicNode, object>)
-                            {
-                                value = (firstFuncResult as Func<DynamicNode, object>)(node);
-                            }
-                            if (firstFuncResult.GetType().IsValueType)
-                            {
-                                value = firstFuncResult;
-                            }
-                            return value;
-                        }).AsQueryable();
+                        return query.OrderByDescending(item => GetObjectAsTypeOrDefault(item.key, dominantType)).Select(item => item.node).AsQueryable();
                     }
                 }
             }
@@ -239,7 +222,35 @@ namespace System.Linq.Dynamic
             return source.Provider.CreateQuery(queryExpr);
 
         }
-
+        private static object GetObjectAsTypeOrDefault(object value, Type type)
+        {
+            if (type.IsAssignableFrom(value.GetType()))
+            {
+                return (object)Convert.ChangeType(value, type);
+            }
+            else
+            {
+                if (type.IsValueType)
+                {
+                    return Activator.CreateInstance(type);
+                }
+                return null;
+            }
+        }
+        private static object EvaluateDynamicNodeFunc(DynamicNode node, Func<DynamicNode, object> func)
+        {
+            object value = -1;
+            var firstFuncResult = func(node);
+            if (firstFuncResult is Func<DynamicNode, object>)
+            {
+                value = (firstFuncResult as Func<DynamicNode, object>)(node);
+            }
+            if (firstFuncResult.GetType().IsValueType)
+            {
+                value = firstFuncResult;
+            }
+            return value;
+        }
         public static IQueryable Take(this IQueryable source, int count)
         {
             if (source == null) throw new ArgumentNullException("source");
@@ -265,8 +276,8 @@ namespace System.Linq.Dynamic
             if (source == null) throw new ArgumentNullException("source");
             if (keySelector == null) throw new ArgumentNullException("keySelector");
             if (elementSelector == null) throw new ArgumentNullException("elementSelector");
-            LambdaExpression keyLambda = DynamicExpression.ParseLambda(source.ElementType, null, keySelector, values);
-            LambdaExpression elementLambda = DynamicExpression.ParseLambda(source.ElementType, null, elementSelector, values);
+            LambdaExpression keyLambda = DynamicExpression.ParseLambda(source.ElementType, null, keySelector, true, values);
+            LambdaExpression elementLambda = DynamicExpression.ParseLambda(source.ElementType, null, elementSelector, true, values);
             return source.Provider.CreateQuery(
                 Expression.Call(
                     typeof(Queryable), "GroupBy",
@@ -338,26 +349,29 @@ namespace System.Linq.Dynamic
 
     public static class DynamicExpression
     {
-        public static Expression Parse(Type resultType, string expression, params object[] values)
+        public static bool ConvertDynamicNullToBooleanFalse = false;
+        public static Expression Parse(Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
         {
+            ConvertDynamicNullToBooleanFalse = convertDynamicNullToBooleanFalse;
             ExpressionParser parser = new ExpressionParser(null, expression, values);
             return parser.Parse(resultType);
         }
 
-        public static LambdaExpression ParseLambda(Type itType, Type resultType, string expression, params object[] values)
+        public static LambdaExpression ParseLambda(Type itType, Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
         {
-            return ParseLambda(new ParameterExpression[] { Expression.Parameter(itType, "") }, resultType, expression, values);
+            return ParseLambda(new ParameterExpression[] { Expression.Parameter(itType, "") }, resultType, expression, convertDynamicNullToBooleanFalse, values);
         }
 
-        public static LambdaExpression ParseLambda(ParameterExpression[] parameters, Type resultType, string expression, params object[] values)
+        public static LambdaExpression ParseLambda(ParameterExpression[] parameters, Type resultType, string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
         {
+            ConvertDynamicNullToBooleanFalse = convertDynamicNullToBooleanFalse;
             ExpressionParser parser = new ExpressionParser(parameters, expression, values);
             return Expression.Lambda(parser.Parse(resultType), parameters);
         }
 
-        public static Expression<Func<T, S>> ParseLambda<T, S>(string expression, params object[] values)
+        public static Expression<Func<T, S>> ParseLambda<T, S>(string expression, bool convertDynamicNullToBooleanFalse, params object[] values)
         {
-            return (Expression<Func<T, S>>)ParseLambda(typeof(T), typeof(S), expression, values);
+            return (Expression<Func<T, S>>)ParseLambda(typeof(T), typeof(S), expression, convertDynamicNullToBooleanFalse, values);
         }
 
         public static Type CreateClass(params DynamicProperty[] properties)
@@ -1532,6 +1546,7 @@ namespace System.Linq.Dynamic
                         //so that when it's evaluated, DynamicNode should be supported
 
                         ParameterExpression instanceExpression = Expression.Parameter(typeof(DynamicNode), "instance");
+                        ParameterExpression convertDynamicNullToBooleanFalse = Expression.Parameter(typeof(bool), "convertDynamicNullToBooleanFalse");
                         ParameterExpression result = Expression.Parameter(typeof(object), "result");
                         ParameterExpression binder = Expression.Variable(typeof(DynamicQueryableGetMemberBinder), "binder");
                         ParameterExpression ignoreCase = Expression.Variable(typeof(bool), "ignoreCase");
@@ -1541,17 +1556,19 @@ namespace System.Linq.Dynamic
 
                         BlockExpression block = Expression.Block(
                          typeof(object),
-                         new[] { ignoreCase, binder, result },
+                         new[] { ignoreCase, binder, result, convertDynamicNullToBooleanFalse },
+                         Expression.Assign(convertDynamicNullToBooleanFalse, Expression.Constant(DynamicExpression.ConvertDynamicNullToBooleanFalse, typeof(bool))),
                          Expression.Assign(ignoreCase, Expression.Constant(false, typeof(bool))),
                          Expression.Assign(binder, Expression.New(getMemberBinderConstructor, Expression.Constant(id, typeof(string)), ignoreCase)),
                          Expression.Assign(result, Expression.Constant(null)),
                          Expression.IfThen(Expression.NotEqual(Expression.Constant(null), instanceExpression),
                             Expression.Call(instanceExpression, method, binder, result)),
                          Expression.IfThen(
-                            Expression.TypeEqual(result, typeof(DynamicNull)),
-                            Expression.Assign(result,
-                                Expression.Constant(false, typeof(object))
-                            )
+                            Expression.AndAlso(
+                                Expression.TypeEqual(result, typeof(DynamicNull)),
+                                Expression.Equal(convertDynamicNullToBooleanFalse, Expression.Constant(true, typeof(bool)))
+                            ),
+                            Expression.Assign(result, Expression.Constant(false, typeof(object)))
                          ),
                          Expression.Return(blockReturnLabel, result),
                          Expression.Label(blockReturnLabel, Expression.Constant(-2, typeof(object)))
@@ -1564,7 +1581,7 @@ namespace System.Linq.Dynamic
                         //accessing a property off an already resolved DynamicNode TryGetMember call
                         //e.g. uBlogsyPostDate.Date
                         MethodInfo ReflectPropertyValue = this.GetType().GetMethod("ReflectPropertyValue", BindingFlags.NonPublic | BindingFlags.Static);
-
+                        ParameterExpression convertDynamicNullToBooleanFalse = Expression.Parameter(typeof(bool), "convertDynamicNullToBooleanFalse");
                         ParameterExpression result = Expression.Parameter(typeof(object), "result");
                         ParameterExpression idParam = Expression.Parameter(typeof(string), "id");
                         ParameterExpression lambdaResult = Expression.Parameter(typeof(object), "lambdaResult");
@@ -1574,14 +1591,16 @@ namespace System.Linq.Dynamic
 
                         BlockExpression block = Expression.Block(
                          typeof(object),
-                         new[] { lambdaResult, result, idParam },
+                         new[] { lambdaResult, result, idParam, convertDynamicNullToBooleanFalse },
+                         Expression.Assign(convertDynamicNullToBooleanFalse, Expression.Constant(DynamicExpression.ConvertDynamicNullToBooleanFalse, typeof(bool))),
                          Expression.Assign(lambdaResult, Expression.Invoke(instance, lambdaInstanceExpression)),
                          Expression.Assign(result, Expression.Call(ReflectPropertyValue, lambdaResult, Expression.Constant(id))),
                          Expression.IfThen(
-                            Expression.TypeEqual(result, typeof(DynamicNull)),
-                            Expression.Assign(result,
-                                Expression.Constant(false, typeof(object))
-                            )
+                            Expression.AndAlso(
+                                Expression.TypeEqual(result, typeof(DynamicNull)),
+                                Expression.Equal(convertDynamicNullToBooleanFalse, Expression.Constant(true, typeof(bool)))
+                            ),
+                            Expression.Assign(result, Expression.Constant(false, typeof(object)))
                          ),
                          Expression.Return(blockReturnLabel, result),
                          Expression.Label(blockReturnLabel, Expression.Constant(-2, typeof(object)))
