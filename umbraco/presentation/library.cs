@@ -498,7 +498,7 @@ namespace umbraco
                             }
                             else
                             {
-                                return "http://" + d.Name;
+                                return string.Format("{0}://{1}", UmbracoContext.Current.Request.Url.Scheme, d.Name);
                             }
                         }
                     }
@@ -510,7 +510,7 @@ namespace umbraco
                 }
                 else
                 {
-                    return "http://" + domains[0].Name;
+                    return string.Format("{0}://{1}", UmbracoContext.Current.Request.Url.Scheme, domains[0].Name);
                 }
             }
             return null;
