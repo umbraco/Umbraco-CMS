@@ -309,7 +309,7 @@ namespace umbraco.MacroEngines
             object firstItem = query.FirstOrDefault();
             if (firstItem == null)
             {
-                result = new DynamicNull();
+                result = new List<object>();
             }
             else
             {
