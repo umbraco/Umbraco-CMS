@@ -160,6 +160,10 @@ namespace System.Linq.Dynamic
                     Func<DynamicNode, object> func = (Func<DynamicNode, object>)lambda.Compile();
                     //get the values out
                     var query = typedSource.ToList().ConvertAll(item => new { node = item, key = EvaluateDynamicNodeFunc(item, func) });
+                    if (query.Count == 0)
+                    {
+                        return source;
+                    }
                     var types = from i in query
                                 group i by i.key.GetType() into g
                                 where g.Key != typeof(DynamicNull)
