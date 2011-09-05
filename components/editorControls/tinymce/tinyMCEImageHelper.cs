@@ -36,9 +36,9 @@ namespace umbraco.editorControls.tinymce
                         ht.Add(attributeSet.Groups["attributeName"].Value.ToString().ToLower(),
                                attributeSet.Groups["attributeValue"].Value.ToString());
                         if (attributeSet.Groups["attributeName"].Value.ToString().ToLower() == "width")
-                            orgWidth = int.Parse(attributeSet.Groups["attributeValue"].Value.ToString());
+                            int.TryParse(attributeSet.Groups["attributeValue"].Value.ToString(), out orgWidth);
                         else if (attributeSet.Groups["attributeName"].Value.ToString().ToLower() == "height")
-                            orgHeight = int.Parse(attributeSet.Groups["attributeValue"].Value.ToString());
+                            int.TryParse(attributeSet.Groups["attributeValue"].Value.ToString(), out orgHeight);
                     }
 
                     // If rel attribute exists and if it's different from current sizing we should resize the image!
