@@ -307,7 +307,7 @@
         }
 
         function umbracoSessionRenewCheckPasswordFail() {
-            jQuery("#sessionrefreshpassword").effect("shake", { times: 5, distance: 5 }, 80);
+            jQuery("#sessionrefreshpassword").effect("shake", { times: 5, distance: 5 }, 80).focus();
             jQuery("#sessionrefreshpassword input").attr("style", "border: 2px solid red;");
 
         }
