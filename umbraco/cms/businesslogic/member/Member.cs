@@ -480,6 +480,8 @@ namespace umbraco.cms.businesslogic.member
             }
             set
             {
+                if (value.Contains(","))
+                    throw new ArgumentException("The parameter 'LoginName' must not contain commas.");
                 SqlHelper.ExecuteNonQuery(
                     "update cmsMember set LoginName = @loginName where nodeId =  @id",
                     SqlHelper.CreateParameter("@loginName", value),

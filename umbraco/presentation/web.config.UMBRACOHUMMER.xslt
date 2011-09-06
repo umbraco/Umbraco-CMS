@@ -7,15 +7,11 @@
     <xsl:attribute name="value">server=.\sqlexpress;database=v47;integrated security=false;user id=DBUSER;password=DBPASSWORD</xsl:attribute>
   </xsl:template>
 
-    <xsl:template match="/configuration/appSettings/add[@key='umbracoConfigurationStatus']/@value">
-        <xsl:attribute name="value">4.7.0</xsl:attribute>
-    </xsl:template>
+  <xsl:template match="/configuration/appSettings/add[@key='umbracoConfigurationStatus']/@value">
+    <xsl:attribute name="value">4.7.0</xsl:attribute>
+  </xsl:template>
 
-    <xsl:template match="/configuration/appSettings/add[@key='umbracoTimeOutInMinutes']/@value">
-        <xsl:attribute name="value">20</xsl:attribute>
-    </xsl:template>
-
-    <!-- Default templates to match anything else -->
+  <!-- Default templates to match anything else -->
   <xsl:template match="@*">
     <xsl:copy/>
   </xsl:template>
