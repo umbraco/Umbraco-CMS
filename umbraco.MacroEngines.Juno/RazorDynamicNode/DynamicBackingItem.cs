@@ -216,12 +216,32 @@ namespace umbraco.MacroEngines
             }
             else
             {
-                innerProperty = media.GetProperty(alias, out propertyExists);
-                if (innerProperty != null)
+                string[] internalProperties = new string[] {
+                    "id", "nodeName", "updateDate", "writerName", "path", "nodeTypeAlias",
+                    "parentID", "__NodeId", "__IndexType", "__Path", "__NodeTypeAlias", 
+                    "__nodeName", "umbracoBytes","umbracoExtension","umbracoFile","umbracoWidth",
+                    "umbracoHeight"
+                };
+                if (media.WasLoadedFromExamine && !internalProperties.Contains(alias) && !media.Values.ContainsKey(alias))
                 {
-                    property = new PropertyResult(innerProperty);
-                    property.ContextAlias = media.NodeTypeAlias;
-                    property.ContextId = media.Id;
+                    //examine doesn't load custom properties
+                    innerProperty = media.LoadCustomPropertyNotFoundInExamine(alias, out propertyExists);
+                    if (innerProperty != null)
+                    {
+                        property = new PropertyResult(innerProperty);
+                        property.ContextAlias = media.NodeTypeAlias;
+                        property.ContextId = media.Id;
+                    }
+                }
+                else
+                {
+                    innerProperty = media.GetProperty(alias, out propertyExists);
+                    if (innerProperty != null)
+                    {
+                        property = new PropertyResult(innerProperty);
+                        property.ContextAlias = media.NodeTypeAlias;
+                        property.ContextId = media.Id;
+                    }
                 }
             }
             return property;
