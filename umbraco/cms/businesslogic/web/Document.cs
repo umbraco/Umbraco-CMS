@@ -592,7 +592,15 @@ namespace umbraco.cms.businesslogic.web
         public static void RePublishAll()
         {
             XmlDocument xd = new XmlDocument();
-            SqlHelper.ExecuteNonQuery("truncate table cmsContentXml");
+
+            if (!DataLayerHelper.IsEmbeddedDatabase(SqlHelper.ConnectionString))
+            {
+                SqlHelper.ExecuteNonQuery("truncate table cmsContentXml");
+            }
+            else
+            {
+                SqlHelper.ExecuteNonQuery("delete from cmsContentXml");
+            }
             IRecordsReader dr = SqlHelper.ExecuteReader("select nodeId from cmsDocument where published = 1");
 
             while (dr.Read())
@@ -1306,20 +1314,20 @@ namespace umbraco.cms.businesslogic.web
                         && p.Value.ToString() != ""
                         && File.Exists(IOHelper.MapPath(p.Value.ToString())))
                         {
-                           
+
                             int propId = newDoc.getProperty(p.PropertyType.Alias).Id;
 
                             System.IO.Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Media + "/" + propId.ToString()));
 
                             string fileCopy = IOHelper.MapPath(
-                                SystemDirectories.Media + "/" + 
+                                SystemDirectories.Media + "/" +
                                 propId.ToString() + "/" +
                                 new FileInfo(IOHelper.MapPath(p.Value.ToString())).Name);
 
                             File.Copy(IOHelper.MapPath(p.Value.ToString()), fileCopy);
 
                             string relFilePath =
-                                SystemDirectories.Media + "/" + 
+                                SystemDirectories.Media + "/" +
                                 propId.ToString() + "/" +
                                 new FileInfo(IOHelper.MapPath(p.Value.ToString())).Name;
 
@@ -1331,7 +1339,7 @@ namespace umbraco.cms.businesslogic.web
                             //copy thumbs
                             FileInfo origFile = new FileInfo(IOHelper.MapPath(p.Value.ToString()));
 
-                            foreach(FileInfo thumb in origFile.Directory.GetFiles("*_thumb*"))
+                            foreach (FileInfo thumb in origFile.Directory.GetFiles("*_thumb*"))
                             {
                                 if (!File.Exists(IOHelper.MapPath(
                                                      SystemDirectories.Media + "/" +
@@ -1346,7 +1354,7 @@ namespace umbraco.cms.businesslogic.web
                             }
 
 
-                                
+
                         }
                         else
                         {
