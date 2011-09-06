@@ -8,27 +8,27 @@
     -->
     <property name="nant.settings.currentframework" value="net-4.0" />,
 
-    <property name="build.version" value="4.7 RC"/>
+    <property name="build.version" value="4.7.1"/>
     <property name="build.configuration" value="Debug"/>
 
 
-  <!-- filenames and directories, generally won't change -->
+    <!-- filenames and directories, generally won't change -->
 
     <property name="web.dir" value="D:\inetpub\wwwroot\v4.umbraco.org" />
-    <property name="public.dir" value="D:\inetpub\wwwroot\nightlies\umbraco 4.7" />
+    <property name="public.dir" value="C:\inetpub\wwwroot\_Live Sites\nightly.umbraco.org\umbraco 4.7.1" />
     <property name="root.dir" value="${directory::get-current-directory()}" />
     <property name="source.dir" value="${root.dir}\umbraco\presentation" />
-    
+
     <property name="build.dir" value="${root.dir}\build" />
     <property name="build.symbolFiles.dir" value="${root.dir}\SymbolFiles" />
     <property name="build.macroEnginesIron.dir" value="${root.dir}\umbraco.macroEngines.Iron_build" />
-  
+
     <property name="dlls.dir" value="${root.dir}\foreign dlls" />
 
     <property name="WebPiAssets.dir" value="${root.dir}\config templates\WebPi" />
-    
-    
-    
+
+
+
     <property name="docs.dir" value="${root.dir}\docs" />
 
     <property name="win.dir" value="c:\WINDOWS" />
@@ -46,7 +46,7 @@
 
     <!-- YUI -->
     <property name="YUICompressor.dir" value="D:\inetpub\wwwroot\ccnet\buildTools\YUI" />
-  
+
     <!-- Build source -->
     <target name="build" depends="init">
 
@@ -73,25 +73,25 @@
         </delete>
 
 
-      <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
-        <arg value="${root.dir}\umbraco.MacroEngines.Juno\umbraco.MacroEngines.csproj" />
-        <arg value="/v:n" />
-        <arg value="/p:WarningLevel=0" />
-        <arg value="/p:ToolsVersion=4.0" />
-        <arg value="/p:Configuration=${build.configuration}" />
-      </exec>
-      
-      
-      <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\${build.configuration}\umbraco.MacroEngines.dll" tofile="${source.dir}\bin\umbraco.MacroEngines.dll" failonerror="false" overwrite="true"/>
+        <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
+            <arg value="${root.dir}\umbraco.MacroEngines.Juno\umbraco.MacroEngines.csproj" />
+            <arg value="/v:n" />
+            <arg value="/p:WarningLevel=0" />
+            <arg value="/p:ToolsVersion=4.0" />
+            <arg value="/p:Configuration=${build.configuration}" />
+        </exec>
 
-      <copy todir="${source.dir}\bin" overwrite="true">
-        <fileset basedir="${dlls.dir}\WebPages">
-          <include name="*.dll" />
-        </fileset>
-      </copy>
-      
 
-      <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
+        <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\${build.configuration}\umbraco.MacroEngines.dll" tofile="${source.dir}\bin\umbraco.MacroEngines.dll" failonerror="false" overwrite="true"/>
+
+        <copy todir="${source.dir}\bin" overwrite="true">
+            <fileset basedir="${dlls.dir}\WebPages">
+                <include name="*.dll" />
+            </fileset>
+        </copy>
+
+
+        <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
             <arg value="${root.dir}\umbraco.sln" />
             <arg value="/v:n" />
             <arg value="/p:WarningLevel=0" />
@@ -99,60 +99,60 @@
             <arg value="/p:Configuration=${build.configuration}" />
         </exec>
         <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
-    
-		    
-      <call target="buildMacroEnginesIron" />
-
-      <call target="buildSymbolFiles" />
-      
-	</target>
 
 
-  <target name="buildMacroEnginesIron">
+        <call target="buildMacroEnginesIron" />
 
-    <mkdir dir="${build.macroEnginesIron.dir}" />
-    <mkdir dir="${build.macroEnginesIron.dir}\bin" />
+        <call target="buildSymbolFiles" />
 
-    <copy todir="${build.macroEnginesIron.dir}\bin" overwrite="true">
-      <fileset basedir="${dlls.dir}\DLR 4.0">
-        <include name="*.dll" />
-        <exclude name="Microsoft.Scripting.ExtensionAttribute.dll" />
-      </fileset>
-    </copy>
-
-    <copy file="${root.dir}\umbraco.MacroEngines.Iron\bin\${build.configuration}\umbraco.MacroEngines.Iron.dll" tofile="${build.macroEnginesIron.dir}\bin\umbraco.MacroEngines.Iron.dll" failonerror="false" overwrite="true"/>
-    
-  </target>
+    </target>
 
 
-  <target name="buildSymbolFiles">
+    <target name="buildMacroEnginesIron">
 
-    <!-- setup symbol files -->
-    <mkdir dir="${build.symbolFiles.dir}" />
+        <mkdir dir="${build.macroEnginesIron.dir}" />
+        <mkdir dir="${build.macroEnginesIron.dir}\bin" />
 
-    <copy todir="${build.symbolFiles.dir}" flatten="true">
-      <fileset basedir="${build.dir}\bin">
-        <include name="*.xml" />
-        <include name="*.pdb" />
-      </fileset>
-    </copy>
+        <copy todir="${build.macroEnginesIron.dir}\bin" overwrite="true">
+            <fileset basedir="${dlls.dir}\DLR 4.0">
+                <include name="*.dll" />
+                <exclude name="Microsoft.Scripting.ExtensionAttribute.dll" />
+            </fileset>
+        </copy>
 
-    <copy todir="${build.symbolFiles.dir}" flatten="true">
-      <fileset basedir="${root.dir}" >
-        <include name="**/*.pdb" />
-          <include name="**/bin/*.xml" />
-      </fileset>
-    </copy>
-    
-    <copy todir="${build.symbolFiles.dir}" flatten="true">
-      <fileset basedir="${docs.dir}">
-        <include name="*.xml" />
-      </fileset>
-    </copy>
-    
-  </target>  
-  
-  
+        <copy file="${root.dir}\umbraco.MacroEngines.Iron\bin\${build.configuration}\umbraco.MacroEngines.Iron.dll" tofile="${build.macroEnginesIron.dir}\bin\umbraco.MacroEngines.Iron.dll" failonerror="false" overwrite="true"/>
+
+    </target>
+
+
+    <target name="buildSymbolFiles">
+
+        <!-- setup symbol files -->
+        <mkdir dir="${build.symbolFiles.dir}" />
+
+        <copy todir="${build.symbolFiles.dir}" flatten="true">
+            <fileset basedir="${build.dir}\bin">
+                <include name="*.xml" />
+                <include name="*.pdb" />
+            </fileset>
+        </copy>
+
+        <copy todir="${build.symbolFiles.dir}" flatten="true">
+            <fileset basedir="${root.dir}" >
+                <include name="**/*.pdb" />
+                <include name="**/bin/*.xml" />
+            </fileset>
+        </copy>
+
+        <copy todir="${build.symbolFiles.dir}" flatten="true">
+            <fileset basedir="${docs.dir}">
+                <include name="*.xml" />
+            </fileset>
+        </copy>
+
+    </target>
+
+
 
     <!-- Directories and files -->
     <target name="directories" depends="build">
@@ -164,7 +164,7 @@
                 <include name="*.xml" />
             </fileset>
         </copy>
-        
+
         <!-- DLR FILES -->
         <delete>
             <fileset>
@@ -174,8 +174,8 @@
                 <include name="${build.dir}\bin\IronRuby.*" />
             </fileset>
         </delete>
-                
-      <!--
+
+        <!--
         <copy todir="${build.dir}\bin" overwrite="true">
             <fileset basedir="${dlls.dir}\DLR 4.0">
                 <include name="*.dll" />
@@ -183,7 +183,7 @@
             </fileset>
         </copy>
         -->
-      
+
         <!--standard web.config-->
         <copy file="${root.dir}\config templates\web.config" tofile="${build.dir}\web.config" failonerror="false" overwrite="true"/>
 
@@ -197,31 +197,31 @@
         <copy file="${root.dir}\config templates\config\tinymceconfig.config" tofile="${build.dir}\config\tinymceconfig.config" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\config templates\config\umbracosettings.config" tofile="${build.dir}\config\umbracosettings.config" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\config templates\config\urlrewriting.config" tofile="${build.dir}\config\urlrewriting.config" failonerror="false" overwrite="true"/>
-        
+
         <!-- new 4.5 files -->
         <copy file="${root.dir}\config templates\config\ClientDependency.config" tofile="${build.dir}\config\ClientDependency.config" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\config templates\config\ExamineSettings.config" tofile="${build.dir}\config\ExamineSettings.config" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\config templates\config\ExamineIndex.config" tofile="${build.dir}\config\ExamineIndex.config" failonerror="false" overwrite="true"/>
-        
+
         <copy file="${root.dir}\config templates\config\scripting.config" tofile="${build.dir}\config\scripting.config" failonerror="false" overwrite="true"/>
-                
-        
+
+
         <!-- Macro engines files + razor Files -->
         <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\${build.configuration}\umbraco.MacroEngines.dll" tofile="${build.dir}\bin\umbraco.MacroEngines.dll" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\${build.configuration}\umbraco.MacroEngines.pdb" tofile="${build.dir}\bin\umbraco.MacroEngines.pdb" failonerror="false" overwrite="true"/>
-		    <copy todir="${build.dir}\bin" overwrite="true">
+        <copy todir="${build.dir}\bin" overwrite="true">
             <fileset basedir="${dlls.dir}\WebPages">
                 <include name="*.dll" />
             </fileset>
         </copy>
-               
-        
+
+
         <!--
 		<copy file="${root.dir}\foreign dlls\System.Web.Razor.dll" tofile="${build.dir}\bin\System.Web.Razor.dll" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\foreign dlls\RazorEngine.Core.dll" tofile="${build.dir}\bin\RazorEngine.Core.dll" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\foreign dlls\RazorEngine.Templates.dll" tofile="${build.dir}\bin\RazorEngine.Templates.dll" failonerror="false" overwrite="true"/>
         -->
-        
+
         <!--standard /data/packages files-->
         <mkdir dir="${build.dir}\App_Data" />
         <copy file="${root.dir}\config templates\packages\installedPackages.config" tofile="${build.dir}\app_data\packages\installed\installedPackages.config" failonerror="false" overwrite="true"/>
@@ -256,7 +256,7 @@
         <delete dir="${build.dir}\macroScripts" />
         <delete dir="${build.dir}\xslt" />
         <delete dir="${build.dir}\usercontrols" />
-    
+
         <delete>
             <fileset>
                 <include name="${build.dir}/**/*.build" />
@@ -268,9 +268,9 @@
                 <include name="${build.dir}/**/*.resx" />
                 <include name="${build.dir}/**/*.user" />
                 <include name="${build.dir}/**/*.bak" />
-                
+
                 <include name="${build.dir}/**/*.orig" />
-                    
+
                 <include name="${build.dir}/PrecompiledApp.config" />
                 <include name="${build.dir}/web.config.template" />
                 <include name="${build.dir}/*.xslt" />
@@ -284,7 +284,7 @@
             <delete>
                 <fileset>
                     <include name="${build.dir}/**/*.pdb" />
-					<include name="${build.dir}/bin/*.xml" />
+                    <include name="${build.dir}/bin/*.xml" />
                 </fileset>
             </delete>
         </if>
@@ -303,7 +303,7 @@
         <mkdir dir="${build.dir}\usercontrols" />
     </target>
 
-   
+
 
     <!-- Documentation -->
     <target name="documentation" depends="directories">
@@ -392,33 +392,33 @@
             </fileset>
         </zip>
 
-      <zip zipfile="${root.dir}\SymbolFiles.zip" includeemptydirs="true" >
-        <fileset basedir="${root.dir}">
-          <include name="SymbolFiles/*" />
-          <include name="SymbolFiles/**/*" />
-        </fileset>
-      </zip>
+        <zip zipfile="${root.dir}\SymbolFiles.zip" includeemptydirs="true" >
+            <fileset basedir="${root.dir}">
+                <include name="SymbolFiles/*" />
+                <include name="SymbolFiles/**/*" />
+            </fileset>
+        </zip>
 
-      <zip zipfile="${root.dir}\Umbraco.MacroEngines.Iron.zip" includeemptydirs="true" >
-        <fileset basedir="${root.dir}">
-          <include name="umbraco.macroEngines.Iron_build/*" />
-          <include name="umbraco.macroEngines.Iron_build/**/*" />
-        </fileset>
-      </zip>
+        <zip zipfile="${root.dir}\Umbraco.MacroEngines.Iron.zip" includeemptydirs="true" >
+            <fileset basedir="${root.dir}">
+                <include name="umbraco.macroEngines.Iron_build/*" />
+                <include name="umbraco.macroEngines.Iron_build/**/*" />
+            </fileset>
+        </zip>
     </target>
 
-  
+
     <!-- do a nightly build without the minification and docs -->
     <target name="nightly" depends="zip">
         <property name="assembly.name" value="${build.number}"/>
         <property name="release.filename" value="${root.dir}\build_${build.version}_${assembly.name}.zip" />
 
         <mkdir dir="${public.dir}\${build.version}" />
-        
+
         <copy file="${release.filename}" tofile="${public.dir}\${build.version}\${assembly.name}.zip" />
         <copy file="${root.dir}\Umbraco.MacroEngines.Iron.zip" tofile="${public.dir}\${build.version}\Umbraco.MacroEngines.Iron.zip" />
         <copy file="${root.dir}\SymbolFiles.zip" tofile="${public.dir}\${build.version}\SymbolFiles.zip" />
-      
+
     </target>
 
     <!-- will produce the a clean /build folder and nothing else-->
@@ -456,7 +456,7 @@
         </copy>
 
         <copy file="${root.dir}\components\SQLCE4Umbraco\bin\${build.configuration}\SQLCE4Umbraco.dll" tofile="${webpi.dir}\umbraco\bin\SQLCE4Umbraco.dll" failonerror="false" overwrite="true"/>
-        
+
         <copy file="${WebPiAssets.dir}\installSQL.sql" tofile="${webpi.dir}\installSQL.sql" failonerror="false"/>
         <copy file="${WebPiAssets.dir}\manifest.xml" tofile="${webpi.dir}\manifest.xml" failonerror="false"/>
         <copy file="${WebPiAssets.dir}\parameters.xml" tofile="${webpi.dir}\parameters.xml" failonerror="false"/>
