@@ -454,7 +454,7 @@ namespace umbraco.MacroEngines
                         }
                     }
                     HttpContext.Current.Trace.Write(string.Format("Checking the RazorDataTypeModelTypes cache to see if the GUID {0} has a Model...", dataType));
-                    if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.ContainsKey(dataType))
+                    if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.ContainsKey(dataType) && dataType != Guid.Empty)
                     {
                         Type dataTypeType = RazorDataTypeModelTypes[dataType];
                         HttpContext.Current.Trace.Write(string.Format("Found dataType {0} for GUID {1}", dataTypeType.FullName, dataType));
