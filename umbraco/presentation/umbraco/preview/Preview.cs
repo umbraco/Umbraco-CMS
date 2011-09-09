@@ -24,6 +24,9 @@ namespace umbraco.presentation.preview
         public XmlDocument XmlContent { get; set; }
         public Guid PreviewSet { get; set; }
         public string PreviewsetPath { get; set; }
+
+        public bool ValidPreviewSet { get; set; }
+        
         private int m_userId = 0;
 
         public PreviewContent(User user)
@@ -54,15 +57,43 @@ namespace umbraco.presentation.preview
 
         public PreviewContent(Guid previewSet)
         {
-            updatePreviewPaths(previewSet);
+            ValidPreviewSet = updatePreviewPaths(previewSet);
         }
 
-        private void updatePreviewPaths(Guid previewSet)
+        private bool updatePreviewPaths(Guid previewSet)
         {
             PreviewSet = previewSet;
             PreviewsetPath = IO.IOHelper.MapPath(
                 Path.Combine(IO.SystemDirectories.Preview, m_userId.ToString() + "_" + PreviewSet + ".config"));
+
+            if (!ValidatePreviewPath())
+            {
+                // preview cookie failed so we'll log the error and clear the cookie
+                Log.Add(LogTypes.Error, User.GetUser(m_userId), -1, string.Format("Preview failed for preview set {0}", previewSet));
+                PreviewSet = Guid.Empty;
+                PreviewsetPath = String.Empty;
+
+                ClearPreviewCookie();
+
+                return false;
+            }
+
+            return true;
         }
+
+        /// <summary>
+        /// Checks a preview file exist based on preview cookie
+        /// </summary>
+        /// <returns></returns>
+        public bool ValidatePreviewPath()
+        {
+            if (!File.Exists(PreviewsetPath))
+                return false;
+
+            return true;
+        }
+
+
 
         public void LoadPreviewset()
         {
