@@ -19,20 +19,31 @@ namespace umbraco.presentation.preview
 {
     public class PreviewContent
     {
-		// zb-00004 #29956 : refactor cookies names & handling
+        // zb-00004 #29956 : refactor cookies names & handling
 
         public XmlDocument XmlContent { get; set; }
         public Guid PreviewSet { get; set; }
         public string PreviewsetPath { get; set; }
 
         public bool ValidPreviewSet { get; set; }
-        
-        private int m_userId = 0;
+
+        private int m_userId = -1;
 
         public PreviewContent(User user)
         {
             m_userId = user.Id;
         }
+
+        public PreviewContent(Guid previewSet)
+        {
+            ValidPreviewSet = updatePreviewPaths(previewSet, true);
+        }
+        public PreviewContent(User user, Guid previewSet, bool validate)
+        {
+            m_userId = user.Id;
+            updatePreviewPaths(previewSet, validate);
+        }
+
 
         public void PrepareDocument(User user, Document documentObject, bool includeSubs)
         {
@@ -55,18 +66,17 @@ namespace umbraco.presentation.preview
 
         }
 
-        public PreviewContent(Guid previewSet)
+        private bool updatePreviewPaths(Guid previewSet, bool validate)
         {
-            ValidPreviewSet = updatePreviewPaths(previewSet);
-        }
+            if (m_userId == -1)
+            {
+                throw new ArgumentException("No current Umbraco User registered in Preview", "m_userId");
+            }
 
-        private bool updatePreviewPaths(Guid previewSet)
-        {
             PreviewSet = previewSet;
-            PreviewsetPath = IO.IOHelper.MapPath(
-                Path.Combine(IO.SystemDirectories.Preview, m_userId.ToString() + "_" + PreviewSet + ".config"));
+            PreviewsetPath = GetPreviewsetPath(m_userId, previewSet);
 
-            if (!ValidatePreviewPath())
+            if (validate && !ValidatePreviewPath())
             {
                 // preview cookie failed so we'll log the error and clear the cookie
                 Log.Add(LogTypes.Error, User.GetUser(m_userId), -1, string.Format("Preview failed for preview set {0}", previewSet));
@@ -79,6 +89,12 @@ namespace umbraco.presentation.preview
             }
 
             return true;
+        }
+
+        private static string GetPreviewsetPath(int userId, Guid previewSet)
+        {
+            return IO.IOHelper.MapPath(
+                Path.Combine(IO.SystemDirectories.Preview, userId + "_" + previewSet + ".config"));
         }
 
         /// <summary>
@@ -111,28 +127,59 @@ namespace umbraco.presentation.preview
             }
 
             // check for old preview sets and try to clean
-            foreach (FileInfo file in dir.GetFiles(m_userId + "_*.config"))
-            {
-                try
-                {
-                    file.Delete();
-                }
-                catch {
-                    Log.Add(LogTypes.Error, User.GetUser(m_userId), -1, String.Format("Couldn't delete preview set: {0}", file.Name));
-                }
-            }
+            CleanPreviewDirectory(m_userId, dir);
 
             XmlContent.Save(PreviewsetPath);
         }
 
-        public void ActivatePreviewCookie() {
-			// zb-00004 #29956 : refactor cookies names & handling
-			StateHelper.Cookies.Preview.SetValue(PreviewSet.ToString());
+        private static void CleanPreviewDirectory(int userId, DirectoryInfo dir)
+        {
+            foreach (FileInfo file in dir.GetFiles(userId + "_*.config"))
+            {
+                deletePreviewFile(userId, file);
+            }
+            // also delete any files accessed more than one hour ago
+            foreach (FileInfo file in dir.GetFiles("*.config"))
+            {
+                if ((DateTime.Now - file.LastAccessTime).TotalMinutes > 1)
+                    deletePreviewFile(userId, file);
+            }
         }
 
-        public static void ClearPreviewCookie() {
-			// zb-00004 #29956 : refactor cookies names & handling
-			StateHelper.Cookies.Preview.Clear();
+        private static void deletePreviewFile(int userId, FileInfo file)
+        {
+            try
+            {
+                file.Delete();
+            }
+            catch
+            {
+                Log.Add(LogTypes.Error, User.GetUser(userId), -1, String.Format("Couldn't delete preview set: {0}", file.Name));
+            }
+        }
+
+        public void ActivatePreviewCookie()
+        {
+            // zb-00004 #29956 : refactor cookies names & handling
+            StateHelper.Cookies.Preview.SetValue(PreviewSet.ToString());
+        }
+
+        public static void ClearPreviewCookie()
+        {
+            // zb-00004 #29956 : refactor cookies names & handling
+            if (UmbracoContext.Current.UmbracoUser != null)
+            {
+                if (StateHelper.Cookies.Preview.HasValue)
+                {
+
+                    deletePreviewFile(
+                        UmbracoContext.Current.UmbracoUser.Id,
+                        new FileInfo(GetPreviewsetPath(
+                            UmbracoContext.Current.UmbracoUser.Id,
+                            new Guid(StateHelper.Cookies.Preview.GetValue()))));
+                }
+            }
+            StateHelper.Cookies.Preview.Clear();
         }
     }
 }

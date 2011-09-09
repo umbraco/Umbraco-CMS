@@ -104,7 +104,7 @@ namespace umbraco.presentation
             {
                 if (_previewContent == null)
                 {
-                    _previewContent = new PreviewContent(new Guid(StateHelper.Cookies.Preview.GetValue()));
+                    _previewContent = new PreviewContent(UmbracoUser, new Guid(StateHelper.Cookies.Preview.GetValue()), true);
                     if (_previewContent.ValidPreviewSet)
                         _previewContent.LoadPreviewset();
                 }
