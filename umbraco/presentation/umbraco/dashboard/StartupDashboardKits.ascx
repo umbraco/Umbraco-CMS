@@ -3,7 +3,7 @@
 <link href="/umbraco_client/propertypane/style.css" rel="stylesheet" />
 <div class="dashboardWrapper">
     <h2>Make it look great</h2>
-    <img src="./images/starterkit32x32.png" alt="Umbraco Starter Kits Rock!" class="dashboardIcon" />
+    <img src="./dashboard/images/starterkit32x32.png" alt="Umbraco Starter Kits Rock!" class="dashboardIcon" />
     <h3>Install a Starter Site and Skin</h3>
         <p>
         If you haven't already installed one of our Starter Kits, we think you should do that now.  This is one of the best ways to start working with Umbraco.

@@ -2,7 +2,7 @@
 <script type="text/javascript" src="/umbraco/dashboard/scripts/swfobject.js"></script>
 <div class="dashboardWrapper">
     <h2>Desktop Media Uploader</h2>
-    <img src="./images/dmu.png" alt="Umbraco" class="dashboardIcon" />
+    <img src="./dashboard/images/dmu.png" alt="Umbraco" class="dashboardIcon" />
     <p><strong>Desktop Media Uploader</strong> is a small desktop application that you can install on your computer which allows you to easily upload media items directly to the media section.</p>
     <p>The badge below will auto configure itself based upon whether you already have <strong>Desktop Media Uploader</strong> installed or not.</p>
     <p>Just click the <strong>Install Now / Upgrade Now / Launch Now</strong> link to perform that action.</p>
