@@ -1260,8 +1260,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             Log.Add(LogTypes.Debug, -1, "Cloning...");
             // Save copy of content
-            XmlDocument xmlCopy = new XmlDocument();
-            xmlCopy.LoadXml(xmlDoc.OuterXml);
+            XmlDocument xmlCopy = (XmlDocument)xmlDoc.CloneNode(true);
             Log.Add(LogTypes.Debug, -1, "Cloning ended...");
             return xmlCopy;
         }
