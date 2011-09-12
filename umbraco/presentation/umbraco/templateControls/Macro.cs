@@ -78,7 +78,6 @@ namespace umbraco.presentation.templateControls
                 ViewState["FileLocation"] = value.ToLower();
             }
         }
-
 		[Bindable(true)]
 		[Category("Umbraco")]
 		[DefaultValue(RenderEvents.Init)]
@@ -105,6 +104,8 @@ namespace umbraco.presentation.templateControls
 			PreRender,
 			Render
 		}
+
+        public IList<Exception> Exceptions = new List<Exception>();
 
 		/// <summary>
         /// Raises the <see cref="E:System.Web.UI.Control.Init"/> event.
@@ -162,7 +163,11 @@ namespace umbraco.presentation.templateControls
                 }
                 var c = tempMacro.renderMacro(model, (Hashtable)Context.Items["pageElements"], pageId);
                 if (c != null)
+                {
+                    Exceptions = tempMacro.Exceptions;
+
                     Controls.Add(c);
+                }
                 else
                     System.Web.HttpContext.Current.Trace.Warn("Template", "Result of inline macro scripting is null");
             

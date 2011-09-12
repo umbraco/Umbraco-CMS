@@ -4,7 +4,7 @@
 <div class="dashboardWrapper">
     <h2>
         Start here</h2>
-    <img src="/umbraco/dashboard/images/logo32x32.png" alt="Umbraco" class="dashboardIcon" />
+    <img src="./images/logo32x32.png" alt="Umbraco" class="dashboardIcon" />
     <h3>
         Get started with Members right now</h3>
     <p>

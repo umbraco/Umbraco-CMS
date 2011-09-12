@@ -10,6 +10,7 @@ using System.Xml.XPath;
 
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
+using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
@@ -743,6 +744,88 @@ namespace umbraco
         }
 
 
+        /// <summary>
+        /// Occurs when [after loading the xml string from the database and creating the xml node].
+        /// </summary>
+        public delegate void ContentCacheLoadNodeEventHandler(XmlNode xmlNode, cms.businesslogic.ContentCacheLoadNodeEventArgs e);
+
+        /// <summary>
+        /// Occurs when [after loading the xml string from the database].
+        /// </summary>
+        public delegate void ContentCacheDatabaseLoadXmlStringEventHandler(ref string xml, cms.businesslogic.ContentCacheLoadNodeEventArgs e);
+
+        /// <summary>
+        /// Occurs when [after loading the xml string from the database].
+        /// </summary>
+        public static event ContentCacheDatabaseLoadXmlStringEventHandler AfterContentCacheDatabaseLoadXmlString;
+
+        /// <summary>
+        /// Fires the before when creating the document cache from database
+        /// </summary>
+        /// <param name="node">The sender.</param>
+        /// <param name="e">The <see cref="umbraco.cms.businesslogic.ContentCacheLoadNodeEventArgs"/> instance containing the event data.</param>
+        internal static void FireAfterContentCacheDatabaseLoadXmlString(ref string xml, cms.businesslogic.ContentCacheLoadNodeEventArgs e)
+        {
+            if (AfterContentCacheDatabaseLoadXmlString != null)
+            {
+                AfterContentCacheDatabaseLoadXmlString(ref xml, e);
+            }
+        }
+
+        /// <summary>
+        /// Occurs when [before when creating the document cache from database].
+        /// </summary>
+        public static event ContentCacheLoadNodeEventHandler BeforeContentCacheLoadNode;
+
+        /// <summary>
+        /// Fires the before when creating the document cache from database
+        /// </summary>
+        /// <param name="node">The sender.</param>
+        /// <param name="e">The <see cref="umbraco.cms.businesslogic.ContentCacheLoadNodeEventArgs"/> instance containing the event data.</param>
+        internal static void FireBeforeContentCacheLoadNode(XmlNode node, cms.businesslogic.ContentCacheLoadNodeEventArgs e)
+        {
+            if (BeforeContentCacheLoadNode != null)
+            {
+                BeforeContentCacheLoadNode(node, e);
+            }
+        }
+
+        /// <summary>
+        /// Occurs when [after loading document cache xml node from database].
+        /// </summary>
+        public static event ContentCacheLoadNodeEventHandler AfterContentCacheLoadNodeFromDatabase;
+
+        /// <summary>
+        /// Fires the after loading document cache xml node from database
+        /// </summary>
+        /// <param name="node">The sender.</param>
+        /// <param name="e">The <see cref="umbraco.cms.businesslogic.ContentCacheLoadNodeEventArgs"/> instance containing the event data.</param>
+        internal static void FireAfterContentCacheLoadNodeFromDatabase(XmlNode node, cms.businesslogic.ContentCacheLoadNodeEventArgs e)
+        {
+            if (AfterContentCacheLoadNodeFromDatabase != null)
+            {
+                AfterContentCacheLoadNodeFromDatabase(node, e);
+            }
+        }
+
+        /// <summary>
+        /// Occurs when [before a publish action updates the content cache].
+        /// </summary>
+        public static event ContentCacheLoadNodeEventHandler BeforePublishNodeToContentCache;
+
+        /// <summary>
+        /// Fires the before a publish action updates the content cache
+        /// </summary>
+        /// <param name="node">The sender.</param>
+        /// <param name="e">The <see cref="umbraco.cms.businesslogic.ContentCacheLoadNodeEventArgs"/> instance containing the event data.</param>
+        public static void FireBeforePublishNodeToContentCache(XmlNode node, cms.businesslogic.ContentCacheLoadNodeEventArgs e)
+        {
+            if (BeforePublishNodeToContentCache != null)
+            {
+                BeforePublishNodeToContentCache(node, e);
+            }
+        }
+
 
         #endregion
 
@@ -904,21 +987,40 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                             {
                                 int currentId = dr.GetInt("id");
                                 int parentId = dr.GetInt("parentId");
+                                var xml = dr.GetString("xml");
 
-                                // Retrieve the xml content from the database
-                                // and parse it into a DOM node
-                                xmlDoc.LoadXml(dr.GetString("xml"));
-                                nodeIndex.Add(currentId, xmlDoc.FirstChild);
-
-                                // Build the content hierarchy
-                                List<int> children;
-                                if (!hierarchy.TryGetValue(parentId, out children))
+                                // Call the eventhandler to allow modification of the string
+                                var e1 = new ContentCacheLoadNodeEventArgs();
+                                FireAfterContentCacheDatabaseLoadXmlString(ref xml, e1);
+                                // check if a listener has canceled the event
+                                if (!e1.Cancel)
                                 {
-                                    // No children for this parent, so add one
-                                    children = new List<int>();
-                                    hierarchy.Add(parentId, children);
+                                    // and parse it into a DOM node
+                                    xmlDoc.LoadXml(xml);
+                                    var node = xmlDoc.FirstChild;
+                                    // same event handler loader form the xml node
+                                    var e2 = new ContentCacheLoadNodeEventArgs();
+                                    FireAfterContentCacheLoadNodeFromDatabase(node, e2);
+                                    // and checking if it was canceled again
+                                    if (!e1.Cancel)
+                                    {
+                                        nodeIndex.Add(currentId, node);
+
+                                        // verify if either of the handlers canceled the children to load
+                                        if (!e1.CancelChildren && !e2.CancelChildren)
+                                        {
+                                            // Build the content hierarchy
+                                            List<int> children;
+                                            if (!hierarchy.TryGetValue(parentId, out children))
+                                            {
+                                                // No children for this parent, so add one
+                                                children = new List<int>();
+                                                hierarchy.Add(parentId, children);
+                                            }
+                                            children.Add(currentId);
+                                        }
+                                    }
                                 }
-                                children.Add(currentId);
                             }
                         }
                     }

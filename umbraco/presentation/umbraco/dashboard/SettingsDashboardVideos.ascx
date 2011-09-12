@@ -106,7 +106,7 @@
 </script>
 <div class="dashboardWrapper">
     <h2>Watch and learn</h2>
-    <img src="/umbraco/dashboard/images/tv.png" alt="Videos" class="dashboardIcon" />
+    <img src="./images/tv.png" alt="Videos" class="dashboardIcon" />
         <h3>Hours of Umbraco training videos are only a click away</h3>
         <p>
             Want to master Umbraco? Spend a couple of minutes learning some best practices
