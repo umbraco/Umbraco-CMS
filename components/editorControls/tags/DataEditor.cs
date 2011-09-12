@@ -53,9 +53,12 @@ namespace umbraco.editorControls.tags
 
                     if (li.Value == "0")
                     {
-                        tagId = umbraco.cms.businesslogic.Tags.Tag.AddTag(li.Text, _group);
+                        // NH 4.7.1 if a tag doesn't have an id associated we'll do a 2nd check in case the XHR request went wrong
+                        // from Codeplex 30151
+                        tagId = cms.businesslogic.Tags.Tag.GetTagId(li.Text, _group);
+                        if (tagId == 0)
+                            tagId = cms.businesslogic.Tags.Tag.AddTag(li.Text, _group);
                         li.Value = tagId.ToString();
-
                     }
                     else
                     {
