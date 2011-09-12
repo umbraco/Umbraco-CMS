@@ -1248,7 +1248,7 @@ namespace umbraco
 
 
                         Context.Server.Execute(
-                            string.Format("/default.aspx?umbPageID={0}&alttemplate={1}{2}",
+                            string.Format("~/default.aspx?umbPageID={0}&alttemplate={1}{2}",
                             PageId, new template(TemplateId).TemplateAlias, queryString), sw);
 
                         // update the local page items again
