@@ -41,7 +41,7 @@ namespace umbraco.presentation.developer.packages {
             if (!string.IsNullOrEmpty(category))
                 category = "&category=" + category;
 
-            iframeGen.Text = "<iframe id=\"repoFrame\" frameborder=\"1\" style=\"border: none; display: block\" src=\"" + url + "?repoGuid=" + repoGuid + category + "&callback=" + Request.ServerVariables["SERVER_NAME"] + ":" + Request.ServerVariables["SERVER_PORT"] + IOHelper.ResolveUrl( SystemDirectories.Umbraco ) + "/developer/packages/proxy.htm?/" + IOHelper.ResolveUrl(SystemDirectories.Umbraco).Trim('/') + "/developer/packages/installer.aspx?repoGuid=" + repoGuid + "&version=v45&useLegacySchema=" + UmbracoSettings.UseLegacyXmlSchema.ToString() +  "\"></iframe>";
+            iframeGen.Text = string.Format("<iframe id=\"repoFrame\" frameborder=\"1\" style=\"border: none; display: block\" src=\"{0}?repoGuid={1}{2}&callback={3}:{4}{5}/developer/packages/proxy.htm?/{6}/developer/packages/installer.aspx?repoGuid={7}&version=v45&fullVersion={8}.{9}.{10}&useLegacySchema={11}&dotnetVersion={12}&trustLevel={13}\"></iframe>", url, repoGuid, category, Request.ServerVariables["SERVER_NAME"], Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl( SystemDirectories.Umbraco ), IOHelper.ResolveUrl(SystemDirectories.Umbraco).Trim('/'), repoGuid, GlobalSettings.VersionMajor, GlobalSettings.VersionMinor, GlobalSettings.VersionPatch, UmbracoSettings.UseLegacyXmlSchema.ToString(), Environment.Version, BusinessLogic.Utils.TypeFinder.GetCurrentTrustLevel() );
         }
 
         #region Web Form Designer generated code
