@@ -149,6 +149,8 @@ namespace umbraco
                 {
                     // Clear macro cache
                     Cache.ClearCacheObjectTypes("umbraco.MacroCacheContent");
+                    Cache.ClearCacheByKeySearch("macroHtml_");
+
                     // Clear library cache
                     if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
                     {
