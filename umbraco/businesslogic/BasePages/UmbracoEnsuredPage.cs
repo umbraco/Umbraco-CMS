@@ -61,7 +61,7 @@ namespace umbraco.BasePages
             if (permissions.IndexOf(Action) > -1 && (Path.Contains("-20") || ("," + Path + ",").Contains("," + getUser().StartNodeId.ToString() + ",")))
                 return true;
 
-            Log.Add(LogTypes.LoginFailure, getUser(), -1, "Insufient permissions in UmbracoEnsuredPage: '" + Path + "', '" + permissions + "', '" + Action + "'");
+            Log.Add(LogTypes.LoginFailure, getUser(), -1, "Insufficient permissions in UmbracoEnsuredPage: '" + Path + "', '" + permissions + "', '" + Action + "'");
             return false;
         }
 

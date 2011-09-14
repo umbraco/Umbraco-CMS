@@ -177,7 +177,7 @@ namespace umbraco.cms.businesslogic.datatype
 
                     XmlAttribute val = xmlPv.Attributes["Value"];
 
-                    if (val != null && !string.IsNullOrEmpty(val.Value))
+                    if (val != null &&)
                     {
                         PreValue p = new PreValue(0, 0, val.Value);
                         p.DataTypeId = dtd.Id;
