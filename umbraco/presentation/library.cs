@@ -1499,7 +1499,7 @@ namespace umbraco
         {
             if (String.IsNullOrEmpty(text))
                 return "";
-            text = text.Trim().Replace("\n", string.Empty).Replace("\r", string.Empty);
+
             if (text.Length > 5)
             {
                 if (text.ToUpper().Substring(0, 3) == "<P>")
