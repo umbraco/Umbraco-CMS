@@ -297,7 +297,15 @@ namespace umbraco.NodeFactory
                 _pageXmlNode = ((IHasXmlNode)library.GetXmlNodeById(NodeId.ToString()).Current).GetNode();
             else
             {
-                _pageXmlNode = umbraco.presentation.UmbracoContext.Current.GetXml().DocumentElement;
+                if (presentation.UmbracoContext.Current != null)
+                {
+                    _pageXmlNode = umbraco.presentation.UmbracoContext.Current.GetXml().DocumentElement;
+                }
+                else
+                {
+                    _pageXmlNode = content.Instance.XmlContent.DocumentElement;
+                }
+
 
             }
             initializeStructure();
@@ -566,8 +574,8 @@ namespace umbraco.NodeFactory
                         );
                 }
             }
-//            else
-//                throw new ArgumentNullException("Node xml source is null");
+            //            else
+            //                throw new ArgumentNullException("Node xml source is null");
         }
 
         public static Node GetCurrent()
@@ -583,7 +591,7 @@ namespace umbraco.NodeFactory
                 throw new ArgumentException("Current node is null. This might be due to previewing an unpublished node. As the NodeFactory works with published data, macros using the node factory won't work in preview mode.", "Current node is " + System.Web.HttpContext.Current.Items["pageID"].ToString());
 
             return int.Parse(n.Attributes.GetNamedItem("id").Value);
-        } 
+        }
     }
 
     public class Nodes : CollectionBase

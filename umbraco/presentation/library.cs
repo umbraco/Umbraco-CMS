@@ -1696,9 +1696,12 @@ namespace umbraco
         /// <returns>Returns the node with the specified id as xml in the form of a XPathNodeIterator</returns>
         public static XPathNodeIterator GetXmlNodeById(string id)
         {
-            if (UmbracoContext.Current.GetXml().GetElementById(id) != null)
+            // 4.7.1 UmbracoContext is null if we're running in publishing thread which we need to support
+            XmlDocument xmlDoc = GetThreadsafeXmlDocument();
+
+            if (xmlDoc.GetElementById(id) != null)
             {
-                XPathNavigator xp = UmbracoContext.Current.GetXml().CreateNavigator();
+                XPathNavigator xp = xmlDoc.CreateNavigator();
                 xp.MoveToId(id);
                 return xp.Select(".");
             }
@@ -1710,6 +1713,13 @@ namespace umbraco
             }
         }
 
+        private static XmlDocument GetThreadsafeXmlDocument()
+        {
+            return UmbracoContext.Current != null
+                       ? UmbracoContext.Current.GetXml()
+                       : content.Instance.XmlContent;
+        }
+
         /// <summary>
         /// Queries the umbraco Xml cache with the specified Xpath query
         /// </summary>
@@ -1717,7 +1727,7 @@ namespace umbraco
         /// <returns>Returns nodes matching the xpath query as a XpathNodeIterator</returns>
         public static XPathNodeIterator GetXmlNodeByXPath(string xpathQuery)
         {
-            XPathNavigator xp = content.Instance.XmlContent.CreateNavigator();
+            XPathNavigator xp = GetThreadsafeXmlDocument().CreateNavigator();
 
             return xp.Select(xpathQuery);
         }
@@ -1728,7 +1738,7 @@ namespace umbraco
         /// <returns>Returns the entire umbraco Xml cache as a XPathNodeIterator</returns>
         public static XPathNodeIterator GetXmlAll()
         {
-            XPathNavigator xp = UmbracoContext.Current.GetXml().CreateNavigator();
+            XPathNavigator xp = GetThreadsafeXmlDocument().CreateNavigator();
             return xp.Select("/root");
         }
 

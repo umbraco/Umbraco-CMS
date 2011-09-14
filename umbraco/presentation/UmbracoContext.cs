@@ -39,7 +39,10 @@ namespace umbraco.presentation
         {
             get
             {
-                return (UmbracoContext)HttpContext.Current.Items["UmbracoContext"];
+                if (HttpContext.Current != null)
+                    return (UmbracoContext)HttpContext.Current.Items["UmbracoContext"];
+
+                return null;
             }
 
             set

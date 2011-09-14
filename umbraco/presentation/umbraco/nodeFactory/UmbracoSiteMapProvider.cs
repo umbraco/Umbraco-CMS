@@ -131,7 +131,7 @@ namespace umbraco.presentation.nodeFactory {
                         BusinessLogic.Log.Add(
                             LogTypes.Error,
                             child.Id,
-                            String.Format("Error adding to SiteMapProvider: {0}", ex));
+                            String.Format("Error adding to SiteMapProvider in loadNodes(): {0}", ex));
                     }
                     loadNodes(child.Id.ToString(), childNode);
                 }
@@ -177,7 +177,6 @@ namespace umbraco.presentation.nodeFactory {
             lock (this) {
                 if (m_nodes.ContainsKey(id))
                     throw new ProviderException(String.Format("A node with id '{0}' already exists", id));
-
                 // Get title, URL, description, and roles from the DataReader
 
                 // If roles were specified, turn the list into a string array

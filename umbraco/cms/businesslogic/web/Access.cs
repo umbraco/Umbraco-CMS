@@ -520,10 +520,12 @@ namespace umbraco.cms.businesslogic.web
 				}
 
 				// Add thread safe updating to the hashtable
-				System.Web.HttpContext.Current.Application.Lock();
+                if (System.Web.HttpContext.Current != null)
+    				System.Web.HttpContext.Current.Application.Lock();
 				if (!_checkedPages.ContainsKey(DocumentId))
 					_checkedPages.Add(DocumentId, isProtected);
-				System.Web.HttpContext.Current.Application.UnLock();
+                if (System.Web.HttpContext.Current != null)
+                    System.Web.HttpContext.Current.Application.UnLock();
 			}
 			else
 				isProtected = (bool) _checkedPages[DocumentId];

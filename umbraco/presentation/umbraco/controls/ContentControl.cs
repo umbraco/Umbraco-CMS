@@ -483,7 +483,7 @@ namespace umbraco.controls
             else
             {
                 Panel ph = new Panel();
-                ph.Attributes.Add("style", "padding: 0; position: relative; z-index: 1;"); // NH 4.7.1, latest styles added to support CP item: 30363
+                ph.Attributes.Add("style", "padding: 0; position: relative;"); // NH 4.7.1, latest styles added to support CP item: 30363
                 ph.Controls.Add(pp);
 
                 tp.Controls.Add(ph);
