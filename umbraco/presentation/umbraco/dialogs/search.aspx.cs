@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using UmbracoExamine;
 using System.Xml;
 using Examine;
+using Examine.LuceneEngine.SearchCriteria;
 using System.Linq;
 
 
@@ -35,40 +36,56 @@ namespace umbraco.presentation.dialogs
         private void doSearch()
         {
 
+            var txt = keyword.Text.ToLower();
+
+            //the app can be Content or Media only, otherwise an exception will be thrown
+            var app = UmbracoExamine.IndexTypes.Content;
+            if (!string.IsNullOrEmpty(UmbracoContext.Current.Request["app"]))
+            {
+                app = UmbracoContext.Current.Request["app"].ToLower();
+            }
+
             int limit;
             if (!int.TryParse(UmbracoContext.Current.Request["limit"], out limit))
             {
                 limit = 100;
             }
 
-            string query = keyword.Text.ToLower();
-
-            //the app can be Content or Media only, otherwise an exception will be thrown
-            var app = "Content";
-            if (!string.IsNullOrEmpty(UmbracoContext.Current.Request["app"]))
-            {
-                app = UmbracoContext.Current.Request["app"];
-            }
-            
             //if it doesn't start with "*", then search only nodeName and nodeId
-            var internalSearcher = (app == "Member")
+            var internalSearcher = (app == "member")
                 ? UmbracoContext.Current.InternalMemberSearchProvider
                 : UmbracoContext.Current.InternalSearchProvider;
-            var criteria = internalSearcher.CreateSearchCriteria(app);
+
+            //create some search criteria, make everything combined to be 'And' and only search the current app
+            var criteria = internalSearcher.CreateSearchCriteria(app, Examine.SearchCriteria.BooleanOperation.And);
+
             IEnumerable<SearchResult> results;
-            if (query.StartsWith("*"))
+            if (txt.StartsWith("*"))
             {
-                results = internalSearcher.Search("*", true);
+                //if it starts with * then search all fields
+                results = internalSearcher.Search(txt.Substring(1), true);
             }
             else
             {
-                var operation = criteria.NodeName(query);
+                var operation = criteria.Field("__nodeName", txt.MultipleCharacterWildcard());
+
+                // ensure the user can only find nodes they are allowed to see
                 if (UmbracoContext.Current.UmbracoUser.StartNodeId > 0)
                 {
-                    operation.Or().Id(UmbracoContext.Current.UmbracoUser.StartNodeId);
+                    operation = operation.And().Id(UmbracoContext.Current.UmbracoUser.StartNodeId);
                 }
 
-                results = internalSearcher.Search(operation.Compile()).Take(limit);
+                results = internalSearcher.Search(operation.Compile());
+
+            }
+
+            if (results.Count() == 0)
+            {
+                nothingFound.Visible = true;
+            }
+            else
+            {
+                nothingFound.Visible = false;
             }
 
             searchResult.XPathNavigator = ResultsAsXml(results).CreateNavigator();

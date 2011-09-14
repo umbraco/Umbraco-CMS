@@ -36,11 +36,13 @@
         <asp:TextBox ID="keyword" runat="server" Width="500" CssClass="bigInput"></asp:TextBox> 
             <asp:Button ID="searchButton" runat="server" Text="Search" onclick="search_Click" /><br />
         </p>
+        <asp:Panel ID="nothingFound" runat="server" Visible="false">
+        <p class="error">No results match</p></asp:Panel>
         <asp:Xml ID="searchResult" runat="server" TransformSource="../xslt/searchResult.xslt"></asp:Xml>
     </cc1:Pane>
 </asp:Content>
 <asp:Content ID="footer1" ContentPlaceHolderID="footer" runat="server">
 <script type="text/javascript">
-    document.getElementById("ctl00_body_keyword").focus();
+    jQuery(".bigInput").focus();
 </script>
 </asp:Content>
