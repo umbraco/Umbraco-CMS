@@ -102,8 +102,6 @@ namespace SqlCE4Umbraco
                         Debug.WriteLine("----------------------------------------------------------------------------");
                         Debug.WriteLine(commandText);
                         Debug.WriteLine("----------------------------------------------------------------------------");
-                        conn.ConnectionString = connectionString;
-                        conn.Open();
                         SqlCeCommand cmd = new SqlCeCommand(commandText, conn);
                         AttachParameters(cmd, commandParameters);
                         rowsAffected = cmd.ExecuteNonQuery();
