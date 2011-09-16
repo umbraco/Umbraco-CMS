@@ -53,6 +53,11 @@ namespace umbraco.BusinessLogic.Utils
 
         static IEnumerable<Type> FindClassesMarkedWithAttribute(Assembly assembly, Type attribute)
         {
+            // DF: Fix Codeplex #30479 - Dynamic assemblies in Umbraco cause XSLTs to break - TypeFinder.cs
+            // Just return if the assembly is dynamic.
+            if (assembly.ManifestModule.GetType().Namespace == "System.Reflection.Emit") return new List<Type>();
+
+
             try
             {
                 return assembly.GetTypes().Where(type => type.GetCustomAttributes(attribute, true).Length > 0);
