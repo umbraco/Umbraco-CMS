@@ -101,11 +101,14 @@ namespace umbraco.BasePages
             }
             catch
             {
+                // Clear content as .NET transfers rendered content.
+                Response.Clear();
+
                 // Some umbraco pages should not be loaded on timeout, but instead reload the main application in the top window. Like the treeview for instance
                 if (RedirectToUmbraco)
-                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?");
+                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?", true);
                 else
-                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl));
+                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl), true);
             }
 
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(ui.Culture(this.getUser()));
