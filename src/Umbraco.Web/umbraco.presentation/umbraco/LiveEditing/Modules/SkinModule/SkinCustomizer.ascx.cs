@@ -200,7 +200,7 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
             {
                 var skinFile = subDur.GetFiles("skin.xml");
 
-                if (skinFile != null)
+                if (skinFile.Length > 0)
                 {
                     string c = Skin.GetSkinNameFromFile(skinFile[0].FullName);
 
