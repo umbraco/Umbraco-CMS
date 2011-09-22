@@ -29,6 +29,7 @@ namespace umbraco.MacroEngines
         private readonly Guid DATATYPE_TINYMCE_GUID = new Guid("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
         private readonly Guid DATATYPE_DATETIMEPICKER_GUID = new Guid("b6fb1622-afa5-4bbf-a3cc-d9672a442222");
         private readonly Guid DATATYPE_DATEPICKER_GUID = new Guid("23e93522-3200-44e2-9f29-e61a6fcbb79a");
+        private readonly Guid DATATYPE_INTEGER_GUID = new Guid("1413afcb-d19a-4173-8e9a-68288d2a73b8");
         #endregion
 
         internal readonly DynamicBackingItem n;
@@ -594,11 +595,15 @@ namespace umbraco.MacroEngines
             }
 
             //integer
-            int iResult = 0;
-            if (int.TryParse(sResult, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out iResult))
+            //this will eat csv strings, so only do it if the decimal also includes a decimal seperator (according to the current culture)
+            if (dataType == DATATYPE_INTEGER_GUID)
             {
-                result = iResult;
-                return true;
+                int iResult = 0;
+                if (int.TryParse(sResult, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out iResult))
+                {
+                    result = iResult;
+                    return true;
+                }
             }
 
             //this will eat csv strings, so only do it if the decimal also includes a decimal seperator (according to the current culture)
