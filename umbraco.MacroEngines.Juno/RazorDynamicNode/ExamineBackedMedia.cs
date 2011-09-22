@@ -80,7 +80,10 @@ namespace umbraco.MacroEngines
                     string value = result.Current.Value;
                     if (string.IsNullOrEmpty(value))
                     {
-                        value = result.Current.OuterXml;
+                        if (result.Current.HasAttributes || result.Current.SelectChildren(XPathNodeType.Element).Count > 0)
+                        {
+                            value = result.Current.OuterXml;
+                        }
                     }
                     Values.Add(result.Current.Name, value);
                 }
@@ -376,8 +379,8 @@ namespace umbraco.MacroEngines
                         if (children.Current.Name != "contents")
                         {
                             //make sure it's actually a node, not a property 
-                            if(!string.IsNullOrEmpty(children.Current.GetAttribute("path", "")) && 
-                                !string.IsNullOrEmpty(children.Current.GetAttribute("id", ""))  && 
+                            if (!string.IsNullOrEmpty(children.Current.GetAttribute("path", "")) &&
+                                !string.IsNullOrEmpty(children.Current.GetAttribute("id", "")) &&
                                 !string.IsNullOrEmpty(children.Current.GetAttribute("version", "")))
                             {
                                 mediaList.Add(new ExamineBackedMedia(children.Current));
