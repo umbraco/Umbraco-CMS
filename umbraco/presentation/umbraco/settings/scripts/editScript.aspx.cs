@@ -12,6 +12,7 @@ using System.Web.UI.HtmlControls;
 using System.IO;
 using umbraco.cms.presentation.Trees;
 using umbraco.IO;
+using System.Linq;
 
 namespace umbraco.cms.presentation.settings.scripts
 {
@@ -54,7 +55,7 @@ namespace umbraco.cms.presentation.settings.scripts
             // validate file
             IOHelper.ValidateEditPath(IOHelper.MapPath(path), SystemDirectories.Scripts);
             // validate extension
-            IOHelper.ValidateFileExtension(IOHelper.MapPath(path), new List<string>() { "js" });
+            IOHelper.ValidateFileExtension(IOHelper.MapPath(path), UmbracoSettings.ScriptFileTypes.Split(',').ToList());
 
             StreamReader SR;
             string S;
