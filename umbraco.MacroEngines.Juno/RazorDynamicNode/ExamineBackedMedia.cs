@@ -375,7 +375,13 @@ namespace umbraco.MacroEngines
                     {
                         if (children.Current.Name != "contents")
                         {
-                            mediaList.Add(new ExamineBackedMedia(children.Current));
+                            //make sure it's actually a node, not a property 
+                            if(!string.IsNullOrEmpty(children.Current.GetAttribute("path", "")) && 
+                                !string.IsNullOrEmpty(children.Current.GetAttribute("id", ""))  && 
+                                !string.IsNullOrEmpty(children.Current.GetAttribute("version", "")))
+                            {
+                                mediaList.Add(new ExamineBackedMedia(children.Current));
+                            }
                         }
                     }
                     else
