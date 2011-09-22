@@ -633,12 +633,19 @@ namespace umbraco.BusinessLogic
             if (!_crudsInitialized)
                 initCruds();
 
-            foreach (string nodeId in Path.Split(','))
+            // NH 4.7.1 changing default permission behavior to default to User Type permissions IF no specific permissions has been
+            // set for the current node
+            int nodeId = Path.Contains(",") ? int.Parse(Path.Substring(Path.LastIndexOf(",")+1)) : int.Parse(Path);
+            if (_cruds.ContainsKey(nodeId))
             {
-                if (_cruds.ContainsKey(int.Parse(nodeId)))
-                    cruds = _cruds[int.Parse(nodeId)].ToString();
+                return _cruds[int.Parse(Path.Substring(Path.LastIndexOf(",")+1))].ToString();
             }
 
+            // exception to everything. If default cruds is empty and we're on root node; allow browse of root node
+            if (String.IsNullOrEmpty(cruds) && Path == "-1")
+                cruds = "F";
+
+            // else return default user type cruds
             return cruds;
         }
 
@@ -854,7 +861,7 @@ namespace umbraco.BusinessLogic
         /// <summary>
         /// Flushes the user from cache.
         /// </summary>
-        protected void FlushFromCache()
+        public void FlushFromCache()
         {
             OnFlushingFromCache(EventArgs.Empty);
 

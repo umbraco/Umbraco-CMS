@@ -38,7 +38,7 @@ namespace umbraco.cms.presentation.Trees
 			Dictionary<string, string> p = new Dictionary<string, string>();
 			foreach (string key in HttpContext.Current.Request.QueryString.Keys)
 			{
-				p.Add(key, HttpContext.Current.Request.QueryString[key]);
+                p.Add(key, HttpUtility.HtmlEncode(HttpContext.Current.Request.QueryString[key]));
 				//p.Add(item.Key.ToString(), item.Value.ToString());
 			}
 			return FromDictionary(p);

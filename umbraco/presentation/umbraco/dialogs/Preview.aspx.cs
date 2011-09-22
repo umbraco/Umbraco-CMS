@@ -21,9 +21,8 @@ namespace umbraco.presentation.dialogs
         protected void Page_Load(object sender, EventArgs e)
         {
             Document d = new Document(int.Parse(helper.Request("id")));
-            bool includeChildren = true; //  !String.IsNullOrEmpty(UmbracoContext.Current.Request["children"]) ? true : false;
-            PreviewContent pc = new PreviewContent(Guid.NewGuid());
-            pc.PrepareDocument(base.getUser(), d, includeChildren);
+            PreviewContent pc = new PreviewContent(base.getUser(), Guid.NewGuid(), false);
+            pc.PrepareDocument(base.getUser(), d, true);
             pc.SavePreviewSet();
             docLit.Text = d.Text;
             changeSetUrl.Text = pc.PreviewsetPath;

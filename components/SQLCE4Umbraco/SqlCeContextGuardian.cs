@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Data.SqlServerCe;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace SQLCE4Umbraco
 {
     public static class SqlCeContextGuardian
     {
-        private static SqlCeConnection _conn;
+        private static SqlCeConnection _constantOpenConnection;
         private static object objLock = new object();
 
         // Awesome SQL CE 4 speed improvement by Erik Ejskov Jensen - SQL CE 4 MVP
@@ -27,15 +28,28 @@ namespace SQLCE4Umbraco
             }
             connectionStringBuilder.Remove("datalayer");
 
+            // SQL CE 4 performs better when there's always a connection open in the background
+            ensureOpenBackgroundConnection(connectionStringBuilder.ConnectionString);
+
+            SqlCeConnection conn = new SqlCeConnection(connectionStringBuilder.ConnectionString);
+            conn.Open();
+
+            return conn;
+
+        }
+
+        private static void ensureOpenBackgroundConnection(string connectionString)
+        {
             lock (objLock)
             {
-                if (_conn != null)
-                    throw new InvalidOperationException("Already opened");
-                _conn = new SqlCeConnection(connectionStringBuilder.ConnectionString);
-                _conn.Open();
+                if (_constantOpenConnection == null)
+                {
+                    _constantOpenConnection = new SqlCeConnection(connectionString);
+                    _constantOpenConnection.Open();
+                }
+                else if (_constantOpenConnection.State != ConnectionState.Open)
+                    _constantOpenConnection.Open();
             }
-
-            return _conn;
         }
     }
 }

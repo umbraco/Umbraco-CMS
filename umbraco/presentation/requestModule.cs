@@ -381,7 +381,7 @@ namespace umbraco.presentation
 				pingTimer = new Timer(new TimerCallback(keepAliveService.PingUmbraco), HttpApp.Context, 60000, 300000);
 
 				// Start publishingservice
-				publishingTimer = new Timer(new TimerCallback(publishingService.CheckPublishing), HttpApp.Context, 600000, 60000);
+				publishingTimer = new Timer(new TimerCallback(publishingService.CheckPublishing), HttpApp.Context, 30000, 60000);
 
 				//Find Applications and event handlers and hook-up the events
 				//BusinessLogic.Application.RegisterIApplications();

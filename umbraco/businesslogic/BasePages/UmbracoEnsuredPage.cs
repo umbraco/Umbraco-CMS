@@ -61,7 +61,7 @@ namespace umbraco.BasePages
             if (permissions.IndexOf(Action) > -1 && (Path.Contains("-20") || ("," + Path + ",").Contains("," + getUser().StartNodeId.ToString() + ",")))
                 return true;
 
-            Log.Add(LogTypes.LoginFailure, getUser(), -1, "Insufient permissions in UmbracoEnsuredPage: '" + Path + "', '" + permissions + "', '" + Action + "'");
+            Log.Add(LogTypes.LoginFailure, getUser(), -1, "Insufficient permissions in UmbracoEnsuredPage: '" + Path + "', '" + permissions + "', '" + Action + "'");
             return false;
         }
 
@@ -101,11 +101,14 @@ namespace umbraco.BasePages
             }
             catch
             {
+                // Clear content as .NET transfers rendered content.
+                Response.Clear();
+
                 // Some umbraco pages should not be loaded on timeout, but instead reload the main application in the top window. Like the treeview for instance
                 if (RedirectToUmbraco)
-                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?");
+                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?", true);
                 else
-                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl));
+                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl), true);
             }
 
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(ui.Culture(this.getUser()));

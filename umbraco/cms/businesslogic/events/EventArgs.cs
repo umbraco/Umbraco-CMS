@@ -57,5 +57,9 @@ namespace umbraco.cms.businesslogic {
         public int ParentId { get; internal set; }
     }
 
+    public class ContentCacheLoadNodeEventArgs : System.ComponentModel.CancelEventArgs
+    {
+        public bool CancelChildren { get; set; }
+    }
     
 }

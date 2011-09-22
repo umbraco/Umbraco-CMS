@@ -273,8 +273,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                             ui.helper.css("z-index", 20000);
                         },
                         stop: function(event, ui) {
-                            _this._obj.css("top", ui.absolutePosition.top);
-                            _this._obj.css("left", ui.absolutePosition.left);
+                            _this._obj.css("top", ui.position.top);
+                            _this._obj.css("left", ui.position.left);
                         }
                     });
                 }

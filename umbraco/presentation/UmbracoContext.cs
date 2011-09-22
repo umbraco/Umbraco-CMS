@@ -39,7 +39,10 @@ namespace umbraco.presentation
         {
             get
             {
-                return (UmbracoContext)HttpContext.Current.Items["UmbracoContext"];
+                if (HttpContext.Current != null)
+                    return (UmbracoContext)HttpContext.Current.Items["UmbracoContext"];
+
+                return null;
             }
 
             set
@@ -90,11 +93,11 @@ namespace umbraco.presentation
             get
             {
                 string currentUrl = Request.Url.AbsolutePath;
-				// zb-00004 #29956 : refactor cookies names & handling
-				return
-					StateHelper.Cookies.Preview.HasValue // has preview cookie
-					&& UmbracoUser != null // has user
-					&& !currentUrl.StartsWith(IO.IOHelper.ResolveUrl(IO.SystemDirectories.Umbraco)); // is not in admin UI
+                // zb-00004 #29956 : refactor cookies names & handling
+                return
+                    StateHelper.Cookies.Preview.HasValue // has preview cookie
+                    && UmbracoUser != null // has user
+                    && !currentUrl.StartsWith(IO.IOHelper.ResolveUrl(IO.SystemDirectories.Umbraco)); // is not in admin UI
             }
         }
 
@@ -104,15 +107,15 @@ namespace umbraco.presentation
             {
                 if (_previewContent == null)
                 {
-                    _previewContent = new PreviewContent(new Guid(StateHelper.Cookies.Preview.GetValue()));
-                    _previewContent.LoadPreviewset();
+                    _previewContent = new PreviewContent(UmbracoUser, new Guid(StateHelper.Cookies.Preview.GetValue()), true);
+                    if (_previewContent.ValidPreviewSet)
+                        _previewContent.LoadPreviewset();
                 }
-                return _previewContent.XmlContent;
+                if (_previewContent.ValidPreviewSet)
+                    return _previewContent.XmlContent;
             }
-            else
-            {
-                return content.Instance.XmlContent;
-            }
+            return content.Instance.XmlContent;
+
         }
 
         /// <summary>

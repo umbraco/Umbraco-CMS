@@ -42,6 +42,9 @@ namespace umbraco
 
         private static Hashtable _macroAlias = new Hashtable();
 
+        public IList<Exception> Exceptions = new List<Exception>();
+        private readonly Dictionary<string, macro> macroObjectCache = new Dictionary<string, macro>();
+
         /// <summary>Cache for <see cref="GetPredefinedXsltExtensions"/>.</summary>
         private static Dictionary<string, object> m_PredefinedExtensions;
 
@@ -148,9 +151,9 @@ namespace umbraco
         {
             macroID = id;
 
-            if (macroCache[macroCacheIdentifier + id] != null)
+            if (macroObjectCache.ContainsKey(macroCacheIdentifier + id))
             {
-                var tempMacro = (macro)macroCache[macroCacheIdentifier + id];
+                var tempMacro = macroObjectCache[macroCacheIdentifier + id];
                 Name = tempMacro.Name;
                 Alias = tempMacro.Alias;
                 ScriptType = tempMacro.ScriptType;
@@ -226,7 +229,8 @@ namespace umbraco
                     }
                 }
                 // add current macro-object to cache
-                macroCache.Insert(macroCacheIdentifier + id, this);
+                if (!macroObjectCache.ContainsKey(macroCacheIdentifier + id))
+                    macroObjectCache.Add(macroCacheIdentifier + id, this);
             }
 
             macroType = (int)Macro.FindMacroType(XsltFile, ScriptFile, ScriptType, ScriptAssembly);
@@ -313,16 +317,16 @@ namespace umbraco
             ClearAliasCache();
             if (macroID > 0)
             {
-                if (macroCache[macroCacheIdentifier + macroID] != null)
+                if (macroObjectCache.ContainsKey(macroCacheIdentifier + macroID))
                 {
-                    macroCache.Remove(macroCacheIdentifier + macroID);
+                    macroObjectCache.Remove(macroCacheIdentifier + macroID);
                     return true;
                 }
-                else
-                    return false;
-            }
-            else
                 return false;
+
+            }
+            return false;
+
         }
 
         private string getCacheGuid(MacroModel model, Hashtable pageElements, int pageId)
@@ -416,6 +420,7 @@ namespace umbraco
                         }
                         catch (Exception e)
                         {
+                            Exceptions.Add(e);
                             HttpContext.Current.Trace.Warn("umbracoMacro",
                                                            "Error loading userControl (" + scriptType + ")", e);
                             macroControl = new LiteralControl("Error loading userControl '" + scriptType + "'");
@@ -431,6 +436,7 @@ namespace umbraco
                         }
                         catch (Exception e)
                         {
+                            Exceptions.Add(e);
                             HttpContext.Current.Trace.Warn("umbracoMacro",
                                                            "Error loading customControl (Assembly: " + scriptAssembly +
                                                            ", Type: '" + scriptType + "'", e);
@@ -453,6 +459,7 @@ namespace umbraco
                         }
                         catch (Exception e)
                         {
+                            Exceptions.Add(e);
                             HttpContext.Current.Trace.Warn("umbracoMacro",
                                                            "Error loading MacroEngine script (file: " + ScriptFile +
                                                            ", Type: '" + scriptType + "'", e);
@@ -673,6 +680,8 @@ namespace umbraco
                         }
                         catch (Exception e)
                         {
+                            Exceptions.Add(e);
+
                             // inner exception code by Daniel Lindström from SBBS.se
                             Exception ie = e;
                             while (ie != null)
@@ -685,6 +694,7 @@ namespace umbraco
                     }
                     catch (Exception e)
                     {
+                        Exceptions.Add(e);
                         HttpContext.Current.Trace.Warn("umbracoMacro", "Error loading XSLT " + xsltFile, e);
                         return new LiteralControl("Error reading XSLT file: \\xslt\\" + XsltFile);
                     }
@@ -804,7 +814,7 @@ namespace umbraco
 
             return umbraco.cms.businesslogic.cache.Cache.GetCacheItem(
                 _xsltExtensionsCacheKey, _xsltExtensionsSyncLock,
-                CacheItemPriority.Normal, // normal priority
+                CacheItemPriority.NotRemovable, // NH 4.7.1, Changing to NotRemovable
                 null, // no refresh action
                 new CacheDependency(_xsltExtensionsConfig), // depends on the .config file
                 TimeSpan.FromDays(1), // expires in 1 day (?)

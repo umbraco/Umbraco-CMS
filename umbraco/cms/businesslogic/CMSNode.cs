@@ -55,7 +55,7 @@ namespace umbraco.cms.businesslogic
         #endregion
 
         #region Private static
-        
+
         private static readonly string m_DefaultIconCssFile = IOHelper.MapPath(SystemDirectories.Umbraco_client + "/Tree/treeIcons.css");
         private static List<string> m_DefaultIconClasses = new List<string>();
         private static void initializeIconClasses()
@@ -229,7 +229,7 @@ namespace umbraco.cms.businesslogic
         #endregion
 
         #region Protected static
-      
+
 
         /// <summary>
         /// Given the protected modifier the CMSNode.MakeNew method can only be accessed by
@@ -244,7 +244,7 @@ namespace umbraco.cms.businesslogic
         /// <returns></returns>
         protected static CMSNode MakeNew(int parentId, Guid objectType, int userId, int level, string text, Guid uniqueID)
         {
-            CMSNode parent;
+            CMSNode parent = null;
             string path = "";
             int sortOrder = 0;
 
@@ -275,6 +275,17 @@ namespace umbraco.cms.businesslogic
 
             CMSNode retVal = new CMSNode(uniqueID);
             retVal.Path = path + "," + retVal.Id.ToString();
+
+            // NH 4.7.1 duplicate permissions because of refactor
+            if (parent != null)
+            {
+                IEnumerable<Permission> permissions = Permission.GetNodePermissions(parent);
+                foreach (Permission p in permissions)
+                {
+                    Permission.MakeNew(User.GetUser(p.UserId), retVal, p.PermissionId);
+                }
+
+            }
 
             //event
             NewEventArgs e = new NewEventArgs();
@@ -311,7 +322,7 @@ namespace umbraco.cms.businesslogic
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
-        } 
+        }
         #endregion
 
         #region Constructors
@@ -361,7 +372,7 @@ namespace umbraco.cms.businesslogic
         public CMSNode(Guid uniqueID, bool noSetup)
         {
             _id = SqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE uniqueID = @uniqueId", SqlHelper.CreateParameter("@uniqueId", uniqueID));
-            
+
             if (!noSetup)
                 setupNode();
         }
@@ -370,8 +381,8 @@ namespace umbraco.cms.businesslogic
         {
             _id = reader.GetInt("id");
             PopulateCMSNodeFromReader(reader);
-        } 
-        
+        }
+
         #endregion
 
         #region Public Methods
@@ -468,9 +479,9 @@ order by level,sortOrder";
             }
 
             return base.ToString();
-        }      
+        }
 
-        private void Move(CMSNode parent) 
+        private void Move(CMSNode parent)
         {
             MoveEventArgs e = new MoveEventArgs();
             FireBeforeMove(e);
@@ -624,7 +635,7 @@ order by level,sortOrder";
                     var node = new CMSNode(dr.GetInt("id"), true);
                     node.PopulateCMSNodeFromReader(dr);
                     descendants.Add(node);
-                }                
+                }
             }
             return descendants;
         }
@@ -809,7 +820,7 @@ order by level,sortOrder";
             {
                 System.Collections.ArrayList tmp = new System.Collections.ArrayList();
                 using (IRecordsReader dr = SqlHelper.ExecuteReader("SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE ParentID = @ParentID AND nodeObjectType = @type order by sortOrder",
-                    SqlHelper.CreateParameter("@type", this.nodeObjectType), 
+                    SqlHelper.CreateParameter("@type", this.nodeObjectType),
                     SqlHelper.CreateParameter("ParentID", this.Id)))
                 {
                     while (dr.Read())
@@ -817,7 +828,7 @@ order by level,sortOrder";
                         tmp.Add(new CMSNode(dr));
                     }
                 }
-                
+
                 CMSNode[] retval = new CMSNode[tmp.Count];
 
                 for (int i = 0; i < tmp.Count; i++)
@@ -937,7 +948,7 @@ order by level,sortOrder";
         protected virtual void setupNode()
         {
             using (IRecordsReader dr = SqlHelper.ExecuteReader(m_SQLSingle,
-                    SqlHelper.CreateParameter("@id",this.Id)))                
+                    SqlHelper.CreateParameter("@id", this.Id)))
             {
                 if (dr.Read())
                 {
@@ -996,7 +1007,7 @@ order by level,sortOrder";
             {
                 xmlDoc.Load(xmlRdr);
             }
-            
+
             return xd.ImportNode(xmlDoc.FirstChild, true);
         }
 
@@ -1192,6 +1203,6 @@ order by level,sortOrder";
         }
 
         #endregion
-        
+
     }
 }

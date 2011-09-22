@@ -55,7 +55,7 @@ namespace umbraco.presentation.umbraco.Search
             if (txt.StartsWith("*"))
             {
                 //if it starts with * then search all fields
-                results = internalSearcher.Search(txt, true);
+                results = internalSearcher.Search(txt.Substring(1), true);
             }
             else
             {
