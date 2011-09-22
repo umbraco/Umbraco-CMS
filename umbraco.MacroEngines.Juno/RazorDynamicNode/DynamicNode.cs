@@ -1214,7 +1214,7 @@ namespace umbraco.MacroEngines
         }
         public bool IsNull(string alias, bool recursive)
         {
-            var prop = GetProperty(alias);
+            var prop = GetProperty(alias, recursive);
             if (prop == null) return true;
             return (prop as PropertyResult).IsNull();
         }
@@ -1228,7 +1228,7 @@ namespace umbraco.MacroEngines
         }
         public bool HasValue(string alias, bool recursive)
         {
-            var prop = GetProperty(alias);
+            var prop = GetProperty(alias, recursive);
             if (prop == null) return false;
             return (prop as PropertyResult).HasValue();
         }
