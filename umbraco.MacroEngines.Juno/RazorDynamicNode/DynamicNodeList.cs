@@ -15,6 +15,10 @@ namespace umbraco.MacroEngines
     public class DynamicNodeList : DynamicObject, IEnumerable
     {
         public List<DynamicNode> Items;
+        public List<DynamicNode> get_Items()
+        {
+            return Items;
+        }
 
         public DynamicNodeList()
         {
