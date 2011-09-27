@@ -215,6 +215,10 @@ namespace umbraco.cms.businesslogic.member
         public static Member MakeNew(string Name, string LoginName, string Email, MemberType mbt, User u)
         {
             var loginName = (!String.IsNullOrEmpty(LoginName)) ? LoginName : Name;
+
+            if (String.IsNullOrEmpty(loginName))
+                throw new ArgumentException("The loginname must be different from an empty string", "loginName");
+
             // Test for e-mail
             if (Email != "" && Member.GetMemberFromEmail(Email) != null)
                 throw new Exception(String.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
@@ -482,6 +486,8 @@ namespace umbraco.cms.businesslogic.member
             }
             set
             {
+                if (String.IsNullOrEmpty(value))
+                    throw new ArgumentException("The loginname must be different from an empty string", "LoginName");
                 if (value.Contains(","))
                     throw new ArgumentException("The parameter 'LoginName' must not contain commas.");
                 SqlHelper.ExecuteNonQuery(
