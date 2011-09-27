@@ -262,6 +262,8 @@ namespace umbraco.cms.businesslogic.member
         [Obsolete("Use System.Web.Security.Membership.GetUser")]
         public static Member GetMemberFromLoginName(string loginName)
         {
+            if (String.IsNullOrEmpty(loginName))
+                throw new ArgumentException("The username of a Member must be different from an emptry string", "loginName");
             if (IsMember(loginName))
             {
                 object o = SqlHelper.ExecuteScalar<object>(

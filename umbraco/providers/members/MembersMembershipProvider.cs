@@ -578,6 +578,8 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUser GetUser(string username, bool userIsOnline)
         {
+            if (String.IsNullOrEmpty(username))
+                return null;
             Member m = Member.GetMemberFromLoginName(username);
             if (m == null) return null;
             else return ConvertToMembershipUser(m);
@@ -593,6 +595,8 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
         {
+            if (String.IsNullOrEmpty(providerUserKey.ToString()))
+                return null;
             Member m = new Member(Convert.ToInt32(providerUserKey));
             if (m == null) return null;
             else return ConvertToMembershipUser(m);
