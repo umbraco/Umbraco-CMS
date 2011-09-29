@@ -24,15 +24,15 @@ namespace umbraco.cms.businesslogic
             Media = -21
         }
 
-        private const string m_ChildCountSQL = @"select count(id) from umbracoNode where nodeObjectType = @nodeObjectType and parentId = @parentId";
+        private const string m_ChildCountSQL = @"select count(id) from umbracoNode where nodeObjectType = @nodeObjectType and path like '%,{0},%'";
         private const string m_ChildSQL = @"SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode where ParentID = @parentId And nodeObjectType = @type order by sortOrder";
-        private static object m_Locker = new object(); 
+        private static object m_Locker = new object();
 
         #region Private variables
 
         private Guid _nodeObjectType;
         private RecycleBinType m_BinType;
-        
+
         #endregion
 
         #region Constructors
@@ -77,7 +77,7 @@ namespace umbraco.cms.businesslogic
         /// <param name="nodeObjectType"></param>
         [Obsolete("Use the simple constructor that has the RecycleBinType only parameter")]
         public RecycleBin(Guid nodeObjectType)
-            : this(nodeObjectType, RecycleBinType.Content) { } 
+            : this(nodeObjectType, RecycleBinType.Content) { }
         #endregion
 
         #region Static methods
@@ -88,12 +88,7 @@ namespace umbraco.cms.businesslogic
         [Obsolete("Create a RecycleBin object to get the count per recycle bin type", true)]
         public static int Count()
         {
-            Guid objectType = Document._objectType;
-
-            return SqlHelper.ExecuteScalar<int>(
-                    RecycleBin.m_ChildCountSQL,
-                    SqlHelper.CreateParameter("@parentId", (int)RecycleBinType.Content),
-                    SqlHelper.CreateParameter("@nodeObjectType", objectType));            
+            return Count(RecycleBinType.Content);
         }
 
         public static int Count(RecycleBinType type)
@@ -108,12 +103,14 @@ namespace umbraco.cms.businesslogic
                 case RecycleBinType.Media:
                     objectType = Media._objectType;
                     break;
-            }            
+            }
+
+            string sql = String.Format(RecycleBin.m_ChildCountSQL,
+                        (int) type);
 
             return SqlHelper.ExecuteScalar<int>(
-                    RecycleBin.m_ChildCountSQL,
-                    SqlHelper.CreateParameter("@parentId", (int)type),
-                    SqlHelper.CreateParameter("@nodeObjectType", objectType));            
+                    sql,
+                    SqlHelper.CreateParameter("@nodeObjectType", objectType));
         }
         #endregion
 
@@ -185,7 +182,7 @@ namespace umbraco.cms.businesslogic
                 }
                 return retval;
             }
-        } 
+        }
         #endregion
 
     }

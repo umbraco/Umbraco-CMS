@@ -458,7 +458,7 @@ namespace umbraco.cms.presentation.Trees
             {
                 ApplicationTree tree = ApplicationTree.getByAlias(alias);
                 if (tree != null)
-                    return tree.Title;
+                    return helper.SpaceCamelCasing(tree.Title);
             }
             return treeCaption;
         }
