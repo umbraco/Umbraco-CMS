@@ -209,8 +209,10 @@ namespace umbraco.DataLayer
             // int16 in SQL Server (smallint/tinyint) will be int32 (int) in SQL CE 4
             int fieldNo = GetOrdinal(fieldName);
             Type t = m_DataReader.GetFieldType(fieldNo);
+            if (t.FullName.ToLower() == "system.int32") // SQL CE4 behavior
+                return Byte.Parse(m_DataReader.GetInt32(fieldNo).ToString());
 
-            return m_DataReader.GetByte(GetOrdinal(fieldName));
+            return m_DataReader.GetByte(fieldNo);
         }
 
         /// <summary>

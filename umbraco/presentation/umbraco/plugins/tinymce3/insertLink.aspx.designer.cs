@@ -146,14 +146,5 @@ namespace umbraco.presentation.plugins.tinymce3 {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.controls.Tree.TreeControl TreeControl1;
-        
-        /// <summary>
-        /// umbracoLink control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder umbracoLink;
     }
 }

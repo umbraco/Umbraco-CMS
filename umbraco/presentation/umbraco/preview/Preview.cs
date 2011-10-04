@@ -41,7 +41,7 @@ namespace umbraco.presentation.preview
         public PreviewContent(User user, Guid previewSet, bool validate)
         {
             m_userId = user.Id;
-            updatePreviewPaths(previewSet, validate);
+            ValidPreviewSet = updatePreviewPaths(previewSet, validate);
         }
 
 

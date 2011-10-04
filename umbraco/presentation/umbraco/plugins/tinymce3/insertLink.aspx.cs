@@ -16,18 +16,22 @@ namespace umbraco.presentation.plugins.tinymce3
         }
         protected void Page_Load(object sender, System.EventArgs e)
         {
-			ClientLoader.DataBind();
+            ClientLoader.DataBind();
 
             uicontrols.TabPage tp = tv_options.NewTabPage(ui.Text("content"));
             tp.HasMenu = false;
             tp.Controls.Add(pane_content);
 
 
-            
-            uicontrols.TabPage tp2 = tv_options.NewTabPage(ui.Text("media"));
-            tp2.HasMenu = false;
-            tp2.Controls.Add(pane_media);
-
+            if (CurrentUser.GetApplications().Find(t => t.alias == "media") != null)
+            {
+                uicontrols.TabPage tp2 = tv_options.NewTabPage(ui.Text("media"));
+                tp2.HasMenu = false;
+                tp2.Controls.Add(pane_media);
+            } else
+            {
+                pane_media.Visible = false;
+            }
 
 
         }
@@ -36,10 +40,10 @@ namespace umbraco.presentation.plugins.tinymce3
         {
             // clear form action
             Page.Form.Attributes.Add("onsubmit", "insertAction();return false;");
-//            Page.Form.Action = "#";
+            //            Page.Form.Action = "#";
             // this context item is needed to prevent the urlrewriterformwriter class to change the action
-  //          HttpContext.Current.Items["UrlRewriterFormWriterDisableAction"] = "true";
-    //        HttpContext.Current.Items["ActionAlreadyWritten"] = "true";
+            //          HttpContext.Current.Items["UrlRewriterFormWriterDisableAction"] = "true";
+            //        HttpContext.Current.Items["ActionAlreadyWritten"] = "true";
 
             base.Render(writer);
         }
@@ -61,6 +65,6 @@ namespace umbraco.presentation.plugins.tinymce3
 
             base.OnInit(e);
         }
-		
+
     }
 }
