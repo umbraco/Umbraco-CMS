@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Web;
 using System.IO;
+using HtmlAgilityPack;
 
 namespace umbraco.MacroEngines.Library
 {
@@ -499,86 +500,32 @@ namespace umbraco.MacroEngines.Library
             return StripHtmlTags(html, tags.ToList());
         }
 
-        //ge: this method won't deal with <script> or <style> tags as they could have nested < or >
         private HtmlString StripHtmlTags(string html, List<string> tags)
         {
-            if (tags == null)
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml("<p>" + html + "</p>");
+            using (MemoryStream ms = new MemoryStream())
             {
-                tags = new List<string>();
-            }
-            using (MemoryStream outputms = new MemoryStream())
-            {
-                using (TextWriter outputtw = new StreamWriter(outputms))
+                List<HtmlNode> targets = new List<HtmlNode>();
+                foreach (var node in doc.DocumentNode.FirstChild.SelectNodes(".//*"))
                 {
-                    using (MemoryStream ms = new MemoryStream())
+                    //is element
+                    if (node.NodeType == HtmlNodeType.Element)
                     {
-                        using (TextWriter tw = new StreamWriter(ms))
+                        bool filterAllTags = (tags == null || tags.Count == 0);
+                        if (filterAllTags || tags.Any(tag => string.Equals(tag, node.Name, StringComparison.CurrentCultureIgnoreCase)))
                         {
-                            tw.Write(html);
-                            tw.Flush();
-                            ms.Position = 0;
-                            using (TextReader tr = new StreamReader(ms))
-                            {
-                                bool IsInsideElement = false, InsideTagSpaceEncountered = false, DeniedTag = false;
-                                string currentTag = string.Empty;
-                                bool isTagClose = false;
-                                int ic = 0;
-                                while ((ic = tr.Read()) != -1)
-                                {
-                                    if (ic == (int)'<')
-                                    {
-                                        IsInsideElement = true;
-                                        InsideTagSpaceEncountered = false;
-                                        currentTag = string.Empty;
-                                        isTagClose = false;
-                                        DeniedTag = false;
-                                        if (tr.Peek() == (int)'/')
-                                        {
-                                            isTagClose = true;
-                                            DeniedTag = true;
-                                        }
-                                    }
-                                    if (ic == (int)'>')
-                                    {
-                                        IsInsideElement = false;
-                                        outputtw.Write(' ');
-                                        continue;
-                                    }
-                                    if (ic == (int)' ' && IsInsideElement)
-                                    {
-                                        InsideTagSpaceEncountered = true;
-                                    }
-                                    if (!IsInsideElement && !DeniedTag)
-                                    {
-                                        outputtw.Write((char)ic);
-                                    }
-                                    if (IsInsideElement)
-                                    {
-                                        currentTag += ic;
-                                        if (!InsideTagSpaceEncountered)
-                                        {
-                                            InsideTagSpaceEncountered = true;
-                                            //space on open
-                                            if (tags.Any(tag => tag.Equals(currentTag, StringComparison.CurrentCultureIgnoreCase)))
-                                            {
-                                                DeniedTag = true;
-                                                outputtw.Write("<" + currentTag + " ");
-                                            }
-                                        }
-                                    }
-
-                                }
-
-                            }
+                            targets.Add(node);
                         }
                     }
-                    outputtw.Flush();
-                    outputms.Position = 0;
-                    using (TextReader outputtr = new StreamReader(outputms))
-                    {
-                        return new HtmlString(outputtr.ReadToEnd().Replace("  ", " ").Trim());
-                    }
                 }
+                foreach (var target in targets)
+                {
+                    HtmlNode content = doc.CreateTextNode(target.InnerText);
+                    target.ParentNode.ReplaceChild(content, target);
+                }
+
+                return new HtmlString(doc.DocumentNode.FirstChild.InnerHtml);
             }
         }
 
