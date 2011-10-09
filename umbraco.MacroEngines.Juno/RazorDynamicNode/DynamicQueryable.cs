@@ -249,7 +249,7 @@ namespace System.Linq.Dynamic
             {
                 value = (firstFuncResult as Func<DynamicNode, object>)(node);
             }
-            if (firstFuncResult.GetType().IsValueType)
+            if (firstFuncResult.GetType().IsValueType || firstFuncResult is string)
             {
                 value = firstFuncResult;
             }
