@@ -25,19 +25,25 @@ namespace umbraco.MacroEngines.Library
 
         public dynamic NodeById(int Id)
         {
-            return new DynamicNode(Id);
+            var node = new DynamicNode(Id);
+            if (node != null && node.Id == 0) return new DynamicNull();
+            return node;
         }
         public dynamic NodeById(string Id)
         {
-            return new DynamicNode(Id);
+            var node = new DynamicNode(Id);
+            if (node != null && node.Id == 0) return new DynamicNull();
+            return node;
         }
         public dynamic NodeById(object Id)
         {
             if (Id.GetType() == typeof(DynamicNull))
             {
-                return Id;
+                return new DynamicNull();
             }
-            return new DynamicNode(Id);
+            var node = new DynamicNode(Id);
+            if (node != null && node.Id == 0) return new DynamicNull();
+            return node;
         }
         public dynamic NodesById(List<object> Ids)
         {
@@ -67,7 +73,12 @@ namespace umbraco.MacroEngines.Library
 
         public dynamic MediaById(int Id)
         {
-            return new DynamicMedia(new DynamicBackingItem(ExamineBackedMedia.GetUmbracoMedia(Id)));
+            var ebm = ExamineBackedMedia.GetUmbracoMedia(Id);
+            if (ebm != null && ebm.Id == 0)
+            {
+                return new DynamicNull();
+            }
+            return new DynamicMedia(new DynamicBackingItem(ebm));
         }
         public dynamic MediaById(string Id)
         {
@@ -76,13 +87,13 @@ namespace umbraco.MacroEngines.Library
             {
                 return MediaById(mediaId);
             }
-            throw new ArgumentException("Cannot get MediaById without an id");
+            return new DynamicNull();
         }
         public dynamic MediaById(object Id)
         {
             if (Id.GetType() == typeof(DynamicNull))
             {
-                return Id;
+                return new DynamicNull();
             }
             int mediaId = 0;
             if (int.TryParse(string.Format("{0}", Id), out mediaId))
