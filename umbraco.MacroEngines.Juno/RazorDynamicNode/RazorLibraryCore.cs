@@ -507,24 +507,33 @@ namespace umbraco.MacroEngines.Library
             using (MemoryStream ms = new MemoryStream())
             {
                 List<HtmlNode> targets = new List<HtmlNode>();
-                foreach (var node in doc.DocumentNode.FirstChild.SelectNodes(".//*"))
+
+                var nodes = doc.DocumentNode.FirstChild.SelectNodes(".//*");
+                if (nodes != null)
                 {
-                    //is element
-                    if (node.NodeType == HtmlNodeType.Element)
+                    foreach (var node in nodes)
                     {
-                        bool filterAllTags = (tags == null || tags.Count == 0);
-                        if (filterAllTags || tags.Any(tag => string.Equals(tag, node.Name, StringComparison.CurrentCultureIgnoreCase)))
+                        //is element
+                        if (node.NodeType == HtmlNodeType.Element)
                         {
-                            targets.Add(node);
+                            bool filterAllTags = (tags == null || tags.Count == 0);
+                            if (filterAllTags || tags.Any(tag => string.Equals(tag, node.Name, StringComparison.CurrentCultureIgnoreCase)))
+                            {
+                                targets.Add(node);
+                            }
                         }
                     }
-                }
-                foreach (var target in targets)
-                {
-                    HtmlNode content = doc.CreateTextNode(target.InnerText);
-                    target.ParentNode.ReplaceChild(content, target);
-                }
+                    foreach (var target in targets)
+                    {
+                        HtmlNode content = doc.CreateTextNode(target.InnerText);
+                        target.ParentNode.ReplaceChild(content, target);
+                    }
 
+                }
+                else
+                {
+                    return new HtmlString(html);
+                }
                 return new HtmlString(doc.DocumentNode.FirstChild.InnerHtml);
             }
         }
