@@ -999,17 +999,32 @@ namespace umbraco.MacroEngines
         [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
         public DynamicNode NodeById(int Id)
         {
-            return razorLibrary.Value.NodeById(Id);
+            var node = razorLibrary.Value.NodeById(Id);
+            if (node is DynamicNull)
+            {
+                return new DynamicNode(0);
+            }
+            return node;
         }
         [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
         public DynamicNode NodeById(string Id)
         {
-            return razorLibrary.Value.NodeById(Id);
+            var node = razorLibrary.Value.NodeById(Id);
+            if (node is DynamicNull)
+            {
+                return new DynamicNode(0);
+            }
+            return node;
         }
         [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
         public DynamicNode NodeById(object Id)
         {
-            return razorLibrary.Value.NodeById(Id);
+            var node = razorLibrary.Value.NodeById(Id);
+            if (node is DynamicNull)
+            {
+                return new DynamicNode(0);
+            }
+            return node;
         }
         [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
         public DynamicNodeList NodesById(List<object> Ids)
@@ -1029,17 +1044,32 @@ namespace umbraco.MacroEngines
         [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNode MediaById(int Id)
         {
-            return razorLibrary.Value.MediaById(Id);
+            var media = razorLibrary.Value.MediaById(Id);
+            if (media is DynamicNull)
+            {
+                return new DynamicNode(0);
+            }
+            return media;
         }
         [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNode MediaById(string Id)
         {
-            return razorLibrary.Value.MediaById(Id);
+            var media = razorLibrary.Value.MediaById(Id);
+            if (media is DynamicNull)
+            {
+                return new DynamicNode(0);
+            }
+            return media;
         }
         [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNode MediaById(object Id)
         {
-            return razorLibrary.Value.MediaById(Id);
+            var media = razorLibrary.Value.MediaById(Id);
+            if (media is DynamicNull)
+            {
+                return new DynamicNode(0);
+            }
+            return media;
         }
         [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNodeList MediaById(List<object> Ids)

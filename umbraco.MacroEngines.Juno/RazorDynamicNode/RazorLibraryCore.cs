@@ -35,6 +35,10 @@ namespace umbraco.MacroEngines.Library
             if (node != null && node.Id == 0) return new DynamicNull();
             return node;
         }
+        public dynamic NodeById(DynamicNull Id)
+        {
+            return new DynamicNull();
+        }
         public dynamic NodeById(object Id)
         {
             if (Id.GetType() == typeof(DynamicNull))
@@ -70,7 +74,10 @@ namespace umbraco.MacroEngines.Library
         {
             return NodesById(Ids.ToList());
         }
-
+        public dynamic MediaById(DynamicNull Id)
+        {
+            return new DynamicNull();
+        }
         public dynamic MediaById(int Id)
         {
             var ebm = ExamineBackedMedia.GetUmbracoMedia(Id);
