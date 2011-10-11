@@ -324,28 +324,26 @@ namespace umbraco.editorControls.tinyMCE3
             {
                 parsedString = replaceMacroTags(parsedString).Trim();
 
-                // clean macros and add paragraph element for tidy
-                bool removeParagraphs = false;
-                if (parsedString.Length > 16 && parsedString.ToLower().Substring(0, 17) == "|||?umbraco_macro")
-                {
-                    removeParagraphs = true;
-                    parsedString = "<p>" + parsedString + "</p>";
-                }
-
-                // tidy html
-
+                // tidy html - refactored, see #30534
                 if (UmbracoSettings.TidyEditorContent)
                 {
-                    string tidyTxt = library.Tidy(parsedString, false);
+					// always wrap in a <div> - using <p> was a bad idea
+					parsedString = "<div>" + parsedString + "</div>";
+					
+					string tidyTxt = library.Tidy(parsedString, false);
                     if (tidyTxt != "[error]")
                     {
-                        // compensate for breaking macro tags by tidy
-                        parsedString = tidyTxt.Replace("/?>", "/>");
-                        if (removeParagraphs)
-                        {
-                            if (parsedString.Length - parsedString.Replace("<", "").Length == 2)
-                                parsedString = parsedString.Replace("<p>", "").Replace("</p>", "");
-                        }
+						parsedString = tidyTxt;
+
+						// remove pesky \r\n, and other empty chars
+						parsedString = parsedString.Trim(new char[] { '\r', '\n', '\t', ' ' });
+
+                        // compensate for breaking macro tags by tidy (?)
+                        parsedString = parsedString.Replace("/?>", "/>");
+
+						// remove the wrapping <div> - safer to check that it is still here
+						if (parsedString.StartsWith("<div>") && parsedString.EndsWith("</div>"))
+							parsedString = parsedString.Substring("<div>".Length, parsedString.Length - "<div></div>".Length);
                     }
                     else
                     {
