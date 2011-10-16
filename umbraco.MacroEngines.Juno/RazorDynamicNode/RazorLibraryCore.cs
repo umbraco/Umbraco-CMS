@@ -231,7 +231,7 @@ namespace umbraco.MacroEngines.Library
         public HtmlTagWrapper Wrap(string tag, object inner, object anonymousAttributes, params HtmlTagWrapperBase[] Children)
         {
             string innerText = null;
-            if (inner.GetType() != typeof(DynamicNull) && inner != null)
+            if (inner != null && inner.GetType() != typeof(DynamicNull))
             {
                 innerText = string.Format("{0}", inner);
             }
@@ -245,7 +245,7 @@ namespace umbraco.MacroEngines.Library
         public HtmlTagWrapper Wrap(string tag, object inner)
         {
             string innerText = null;
-            if (inner.GetType() != typeof(DynamicNull) && inner != null)
+            if (inner != null && inner.GetType() != typeof(DynamicNull))
             {
                 innerText = string.Format("{0}", inner);
             }
