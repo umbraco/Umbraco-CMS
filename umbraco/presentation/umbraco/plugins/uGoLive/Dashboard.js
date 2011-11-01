@@ -8,82 +8,126 @@ Our.Umbraco.uGoLive = Our.Umbraco.uGoLive || {};
 
         var checks = [];
         var currentCheckIndex = -1;
-		var basePath = "/base";
-		var umbracoPath = "/umbraco";
+		var opts = {
+			basePath: "/base",
+			umbracoPath: "/umbraco"
+		};
         
         function performNextCheck() {
+			
+			// Get the current check id
             var checkId = checks[currentCheckIndex];
+			
+			// Trigger check
             performCheck(checkId, function(data) {
-				// Re-enable the check button
-				$("a.check[data-check-id=" + checkId + "]").removeClass("disabled");
+				
 				// Trigger next check, or finish
                 if(currentCheckIndex + 1 == checks.length) {
+					
                     // Re-enable the "Run All Checks" button
                     var $btn = $("#btnRunChecks");
                     $btn.text("Re-Run All Checks");
                     $btn.removeClass("disabled");
-                    $("a.check").removeAttr("disabled");
+					
                 } else {
+					
                     // Run the next check
                     currentCheckIndex++;
                     performNextCheck();
+					
                 }
             });
         }
         
         function performCheck(checkId, callBack) {
-            $("span.status[data-check-id=" + checkId + "]").html("<img src='" + umbracoPath + "/plugins/uGoLive/throbber.gif' alt='Checking...' /> Checking...");
-            $.getJSON(basePath + '/uGoLive/Check/'+ checkId +'.aspx', function(data) {
+			
+			// Get references
+			var $checkEl = $("span.status[data-check-id=" + checkId + "]");
+			var $checkButton = $("a.check[data-check-id=" + checkId + "]");
+			var $rectifyButton = $("a.rectify[data-check-id=" + checkId + "][data-check-can-rectify='true']");
+			
+			// Disable buttons
+			$checkButton.addClass("disabled");
+			$rectifyButton.addClass("disabled");
+			
+			// Display throbber
+            $checkEl.html("<img src='" + opts.umbracoPath + "/plugins/uGoLive/throbber.gif' alt='Checking...' /> Checking...");
+            
+			// Perform check
+			$.getJSON(opts.basePath + '/uGoLive/Check/'+ checkId +'.aspx', function(data) {
 
-                var $checkEl = $("span.status[data-check-id=" + checkId + "]");
-
+				// Remove throbber
                 $checkEl.empty();
                 
+				// Display icon & enable / disable rectify button
                 switch(data.Status.Value) {
                     case "Passed":
-                        $checkEl.append("<img src='" + umbracoPath + "/plugins/uGoLive/tick.png' alt='Passed' />");
-                        $("a.rectify[data-check-id=" + checkId + "][data-check-can-rectify='true']").addClass("disabled");
+                        $checkEl.append("<img src='" + opts.umbracoPath + "/plugins/uGoLive/tick.png' alt='Passed' />");
+                        $rectifyButton.addClass("disabled");
                         break;
                     case "Indeterminate":
-                        $checkEl.append("<img src='" + umbracoPath + "/plugins/uGoLive/error.png' alt='Indeterminate' />");
-                        $("a.rectify[data-check-id=" + checkId + "][data-check-can-rectify='true']").removeClass("disabled");
+                        $checkEl.append("<img src='" + opts.umbracoPath + "/plugins/uGoLive/error.png' alt='Indeterminate' />");
+                        $rectifyButton.removeClass("disabled");
                         break;
                     case "Failed":
-                        $checkEl.append("<img src='" + umbracoPath + "/plugins/uGoLive/cross.png' alt='Failed' />");
-                        $("a.rectify[data-check-id=" + checkId + "][data-check-can-rectify='true']").removeClass("disabled");
+                        $checkEl.append("<img src='" + opts.umbracoPath + "/plugins/uGoLive/cross.png' alt='Failed' />");
+                        $rectifyButton.removeClass("disabled");
                         break;
                 }
                 
+				// Display message
                 if($.trim(data.Message) != "")
                     $checkEl.append(data.Message);
 
+				// Re-enable check button
+				$checkButton.removeClass("disabled");
+
+				// Execute callback
                 if(callBack != undefined)
                     callBack(data);
             });
         }
         
         function performRectify(checkId, callBack) {
-            $("span.status[data-check-id=" + checkId + "]").html("<img src='" + umbracoPath + "/plugins/uGoLive/throbber.gif' alt='Rectifying...' /> Rectifying...");
-            $.getJSON(basePath + '/uGoLive/Rectify/'+ checkId +'.aspx', function(data) {
+			
+			// Get references
+			var $checkEl = $("span.status[data-check-id=" + checkId + "]");
+			var $checkButton = $("a.check[data-check-id=" + checkId + "]");
+			var $rectifyButton = $("a.rectify[data-check-id=" + checkId + "][data-check-can-rectify='true']");
 
-                var $checkEl = $("span.status[data-check-id=" + checkId + "]");
+			// Disable buttons
+			$checkButton.addClass("disabled");
+			$rectifyButton.addClass("disabled");
+			
+			// Display throbber
+            $checkEl.html("<img src='" + opts.umbracoPath + "/plugins/uGoLive/throbber.gif' alt='Rectifying...' /> Rectifying...");
+            
+			// Perform rectify
+			$.getJSON(opts.basePath + '/uGoLive/Rectify/'+ checkId +'.aspx', function(data) {
 
+				// Remove throbber
                 $checkEl.empty();
                 
+				// Display icon & enable / disable rectify button
                 switch(data.Status.Value) {
                     case "Success":
-                        $checkEl.append("<img src='" + umbracoPath + "/plugins/uGoLive/tick.png' alt='Passed' />");
-                        $("a.rectify[data-check-id=" + checkId + "][data-check-can-rectify='true']").addClass("disabled");
+                        $checkEl.append("<img src='" + opts.umbracoPath + "/plugins/uGoLive/tick.png' alt='Passed' />");
+                        $rectifyButton.addClass("disabled");
                         break;
                     case "Failed":
-                        $checkEl.append("<img src='" + umbracoPath + "/plugins/uGoLive/cross.png' alt='Failed' />");
-                        $("a.rectify[data-check-id=" + checkId + "][data-check-can-rectify='true']").removeClass("disabled");
+                        $checkEl.append("<img src='" + opts.umbracoPath + "/plugins/uGoLive/cross.png' alt='Failed' />");
+                        $rectifyButton.removeClass("disabled");
                         break;
                 }
                 
+				// Display message
                 if($.trim(data.Message) != "")
                     $checkEl.append(data.Message);
 
+				// Re-enable check button
+				$checkButton.removeClass("disabled");
+
+				// Execute callback
                 if(callBack != undefined)
                     callBack(data);
             });
@@ -93,15 +137,11 @@ Our.Umbraco.uGoLive = Our.Umbraco.uGoLive || {};
             
             init: function (o) {
 				
-				// Set the paths
-				if (typeof(o.umbracoPath) != 'undefined')
-					umbracoPath = o.umbracoPath;
-				if (typeof(o.basePath) != 'undefined')
-					basePath = o.basePath;
+				// Merge options
+				opts = $.extend(opts, o);
 
                 // Parse all checks
-                $("span.status").each(function (idx, el)
-                {
+                $("span.status").each(function (idx, el) {
                     checks.push($(el).attr("data-check-id"));
                 });
                 
@@ -116,12 +156,14 @@ Our.Umbraco.uGoLive = Our.Umbraco.uGoLive || {};
                         
                         // Clear out previous checks
                         $("span.status").empty();
-
-                        // Update buttons
-                        $this.text("Running checks...");
-                        $this.addClass("disabled");
+						
+						// Disable check/rectify buttons
                         $("a.check").addClass("disabled");
                         $("a.rectify").addClass("disabled");
+
+                        // Update run checks button
+                        $this.text("Running checks...");
+                        $this.addClass("disabled");
 
                         // Start checks
                         currentCheckIndex = 0;
@@ -138,14 +180,7 @@ Our.Umbraco.uGoLive = Our.Umbraco.uGoLive || {};
                     var $this = $(this);
                     
                     if(!$this.hasClass("disabled")) {
-                        
-                        $this.addClass("disabled");
-                        var checkId = $this.attr("data-check-id");
-                        $("a.rectify[data-check-id="+ checkId +"]").addClass("disabled");
-                        performCheck(checkId, function(data) {
-                            $this.removeClass("disabled");
-                        });
-                        
+                        performCheck($this.attr("data-check-id"));
                     }
                 });
                 
@@ -157,13 +192,7 @@ Our.Umbraco.uGoLive = Our.Umbraco.uGoLive || {};
                     var $this = $(this);
                     
                     if(!$this.hasClass("disabled")) {
-                        
-                        $this.addClass("disabled");
-                        var checkId = $this.attr("data-check-id");
-                        performRectify(checkId, function(data) {
-                            //$this.removeAttr("disabled");
-                        });
-                        
+                        performRectify($this.attr("data-check-id")); 
                     }
                 });
             }
