@@ -14,6 +14,9 @@ Our.Umbraco.uGoLive = Our.Umbraco.uGoLive || {};
         function performNextCheck() {
             var checkId = checks[currentCheckIndex];
             performCheck(checkId, function(data) {
+				// Re-enable the check button
+				$("a.check[data-check-id=" + checkId + "]").removeClass("disabled");
+				// Trigger next check, or finish
                 if(currentCheckIndex + 1 == checks.length) {
                     // Re-enable the "Run All Checks" button
                     var $btn = $("#btnRunChecks");
@@ -114,10 +117,11 @@ Our.Umbraco.uGoLive = Our.Umbraco.uGoLive || {};
                         // Clear out previous checks
                         $("span.status").empty();
 
-                        // Update button
+                        // Update buttons
                         $this.text("Running checks...");
                         $this.addClass("disabled");
-                        $("a.check").attr("disabled", "disabled");
+                        $("a.check").addClass("disabled");
+                        $("a.rectify").addClass("disabled");
 
                         // Start checks
                         currentCheckIndex = 0;
@@ -137,6 +141,7 @@ Our.Umbraco.uGoLive = Our.Umbraco.uGoLive || {};
                         
                         $this.addClass("disabled");
                         var checkId = $this.attr("data-check-id");
+                        $("a.rectify[data-check-id="+ checkId +"]").addClass("disabled");
                         performCheck(checkId, function(data) {
                             $this.removeClass("disabled");
                         });
