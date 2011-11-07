@@ -395,9 +395,10 @@ namespace umbraco
                 }
                 else
                 {
-                    if (macroCache["macroControl_" + model.CacheIdentifier] != null)
+                    object macroCacheContent = macroCache["macroControl_" + model.CacheIdentifier];
+                    if (macroCacheContent != null)
                     {
-                        MacroCacheContent cacheContent = (MacroCacheContent)macroCache["macroControl_" + model.CacheIdentifier];
+                        MacroCacheContent cacheContent = (MacroCacheContent) macroCacheContent;
                         macroControl = cacheContent.Content;
                         macroControl.ID = cacheContent.ID;
                         HttpContext.Current.Trace.Write("renderMacro", "Macro Control loaded from cache ('" + model.CacheIdentifier + "')...");
