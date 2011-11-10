@@ -12,6 +12,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Web;
 using System.Web.Caching;
 using System.Web.UI;
@@ -25,6 +26,7 @@ using umbraco.DataLayer;
 using umbraco.interfaces;
 using umbraco.IO;
 using umbraco.NodeFactory;
+using umbraco.presentation;
 using umbraco.presentation.templateControls;
 using umbraco.presentation.xslt.Exslt;
 using umbraco.scripting;
@@ -389,7 +391,6 @@ namespace umbraco
 
                     if (!String.IsNullOrEmpty(macroHtml))
                     {
-                        macroHtml = macroCache["macroHtml_" + model.CacheIdentifier] as String;
                         HttpContext.Current.Trace.Write("renderMacro", "Macro Content loaded from cache ('" + model.CacheIdentifier + "')...");
                     }
                 }
@@ -409,6 +410,7 @@ namespace umbraco
 
             if (String.IsNullOrEmpty(macroHtml) && macroControl == null)
             {
+                bool renderFailed = false;
                 int macroType = model.MacroType != MacroTypes.Unknown ? (int)model.MacroType : MacroType;
                 switch (macroType)
                 {
@@ -421,6 +423,7 @@ namespace umbraco
                         }
                         catch (Exception e)
                         {
+                            renderFailed = true;
                             Exceptions.Add(e);
                             HttpContext.Current.Trace.Warn("umbracoMacro",
                                                            "Error loading userControl (" + scriptType + ")", e);
@@ -437,6 +440,7 @@ namespace umbraco
                         }
                         catch (Exception e)
                         {
+                            renderFailed = true;
                             Exceptions.Add(e);
                             HttpContext.Current.Trace.Warn("umbracoMacro",
                                                            "Error loading customControl (Assembly: " + scriptAssembly +
@@ -455,11 +459,21 @@ namespace umbraco
                         {
                             HttpContext.Current.Trace.Write("umbracoMacro",
                                                             "MacroEngine script added (" + ScriptFile + ")");
-                            macroControl = loadMacroDLR(model);
+                            DLRMacroResult result = loadMacroDLR(model);
+                            macroControl = result.Control;
+                            if (result.ResultException != null)
+                            {
+                                // we'll throw the error if we run in release mode, show details if we're in release mode!
+                                renderFailed = true;
+                                if (HttpContext.Current != null && !HttpContext.Current.IsDebuggingEnabled)
+                                    throw result.ResultException;
+                                
+                            }
                             break;
                         }
                         catch (Exception e)
                         {
+                            renderFailed = true;
                             Exceptions.Add(e);
                             HttpContext.Current.Trace.Warn("umbracoMacro",
                                                            "Error loading MacroEngine script (file: " + ScriptFile +
@@ -492,8 +506,8 @@ namespace umbraco
                         break;
                 }
 
-                // Add result to cache
-                if (model.CacheDuration > 0)
+                // Add result to cache if successful
+                if (!renderFailed && model.CacheDuration > 0)
                 {
                     // do not add to cache if there's no member and it should cache by personalization
                     if (!model.CacheByMember || (model.CacheByMember && Member.GetCurrentMember() != null))
@@ -1062,26 +1076,38 @@ namespace umbraco
                 return string.Empty;
         }
 
-        public Control loadMacroDLR(MacroModel macro)
+        public DLRMacroResult loadMacroDLR(MacroModel macro)
         {
+            DLRMacroResult retVal = new DLRMacroResult();   
             TraceInfo("umbracoMacro", "Loading IMacroEngine script");
             var ret = new LiteralControl();
+            IMacroEngine engine = null;
             if (!String.IsNullOrEmpty(macro.ScriptCode))
             {
-                IMacroEngine engine = MacroEngineFactory.GetByExtension(macro.ScriptLanguage);
+                engine = MacroEngineFactory.GetByExtension(macro.ScriptLanguage);
                 ret.Text = engine.Execute(
                     macro,
                     Node.GetCurrent());
-
             }
             else
             {
                 string path = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + macro.ScriptName);
-                IMacroEngine engine = MacroEngineFactory.GetByFilename(path);
+                engine = MacroEngineFactory.GetByFilename(path);
                 ret.Text = engine.Execute(macro, Node.GetCurrent());
             }
+
+            // if the macro engine supports success reporting and executing failed, then return an empty control so it's not cached
+            if (engine is IMacroEngineResultStatus)
+            {
+                var result = engine as IMacroEngineResultStatus;
+                if (!result.Success)
+                {
+                    retVal.ResultException = result.ResultException;
+                }
+            }
             TraceInfo("umbracoMacro", "Loading IMacroEngine script [done]");
-            return ret;
+            retVal.Control = ret;
+            return retVal;
         }
 
         /// <summary>
@@ -1549,6 +1575,26 @@ object sender,
             return xslt;
         }
 
+        #region Macro Init refactor
+
+        // add some caching object here
+
+        public macro GetMacro(string Alias)
+        {
+
+            // load it via API
+            Macro m = Macro.GetByAlias(Alias);
+
+            return convertAPIMacroToLegacyRuntimeFormat(m);
+        }
+
+        private macro convertAPIMacroToLegacyRuntimeFormat(Macro m)
+        {
+            throw new NotImplementedException("not implemented");
+        }
+
+        #endregion
+
     }
 
     public class MacroCacheContent
@@ -1643,6 +1689,23 @@ object sender,
         public override string ToString()
         {
             return Namespace;
+        }
+    }
+
+    public class DLRMacroResult
+    {
+        public Control Control { get; set; }
+        public Exception ResultException { get; set; }
+
+        public DLRMacroResult()
+        {
+            
+        }
+
+        public DLRMacroResult(Control control, Exception resultException)
+        {
+            this.Control = control;
+            this.ResultException = resultException;
         }
     }
 }
