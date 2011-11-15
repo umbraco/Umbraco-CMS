@@ -29,6 +29,7 @@ namespace umbraco.MacroEngines
         private readonly Guid DATATYPE_TINYMCE_GUID = new Guid("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
         private readonly Guid DATATYPE_DATETIMEPICKER_GUID = new Guid("b6fb1622-afa5-4bbf-a3cc-d9672a442222");
         private readonly Guid DATATYPE_DATEPICKER_GUID = new Guid("23e93522-3200-44e2-9f29-e61a6fcbb79a");
+        private readonly Guid DATATYPE_INTEGER_GUID = new Guid("1413afcb-d19a-4173-8e9a-68288d2a73b8");
         #endregion
 
         internal readonly DynamicBackingItem n;
@@ -454,7 +455,7 @@ namespace umbraco.MacroEngines
                         }
                     }
                     HttpContext.Current.Trace.Write(string.Format("Checking the RazorDataTypeModelTypes cache to see if the GUID {0} has a Model...", dataType));
-                    if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.ContainsKey(dataType))
+                    if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.ContainsKey(dataType) && dataType != Guid.Empty)
                     {
                         Type dataTypeType = RazorDataTypeModelTypes[dataType];
                         HttpContext.Current.Trace.Write(string.Format("Found dataType {0} for GUID {1}", dataTypeType.FullName, dataType));
@@ -594,11 +595,15 @@ namespace umbraco.MacroEngines
             }
 
             //integer
-            int iResult = 0;
-            if (int.TryParse(sResult, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out iResult))
+            //this will eat csv strings, so only do it if the decimal also includes a decimal seperator (according to the current culture)
+            if (dataType == DATATYPE_INTEGER_GUID)
             {
-                result = iResult;
-                return true;
+                int iResult = 0;
+                if (int.TryParse(sResult, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out iResult))
+                {
+                    result = iResult;
+                    return true;
+                }
             }
 
             //this will eat csv strings, so only do it if the decimal also includes a decimal seperator (according to the current culture)
@@ -994,17 +999,32 @@ namespace umbraco.MacroEngines
         [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
         public DynamicNode NodeById(int Id)
         {
-            return razorLibrary.Value.NodeById(Id);
+            var node = razorLibrary.Value.NodeById(Id);
+            if (node is DynamicNull)
+            {
+                return new DynamicNode(0);
+            }
+            return node;
         }
         [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
         public DynamicNode NodeById(string Id)
         {
-            return razorLibrary.Value.NodeById(Id);
+            var node = razorLibrary.Value.NodeById(Id);
+            if (node is DynamicNull)
+            {
+                return new DynamicNode(0);
+            }
+            return node;
         }
         [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
         public DynamicNode NodeById(object Id)
         {
-            return razorLibrary.Value.NodeById(Id);
+            var node = razorLibrary.Value.NodeById(Id);
+            if (node is DynamicNull)
+            {
+                return new DynamicNode(0);
+            }
+            return node;
         }
         [Obsolete("@Model.NodeById is obsolute, use @Library.NodeById")]
         public DynamicNodeList NodesById(List<object> Ids)
@@ -1024,17 +1044,32 @@ namespace umbraco.MacroEngines
         [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNode MediaById(int Id)
         {
-            return razorLibrary.Value.MediaById(Id);
+            var media = razorLibrary.Value.MediaById(Id);
+            if (media is DynamicNull)
+            {
+                return new DynamicNode(0);
+            }
+            return media;
         }
         [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNode MediaById(string Id)
         {
-            return razorLibrary.Value.MediaById(Id);
+            var media = razorLibrary.Value.MediaById(Id);
+            if (media is DynamicNull)
+            {
+                return new DynamicNode(0);
+            }
+            return media;
         }
         [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNode MediaById(object Id)
         {
-            return razorLibrary.Value.MediaById(Id);
+            var media = razorLibrary.Value.MediaById(Id);
+            if (media is DynamicNull)
+            {
+                return new DynamicNode(0);
+            }
+            return media;
         }
         [Obsolete("@Model.MediaById is obsolute, use @Library.MediaById")]
         public DynamicNodeList MediaById(List<object> Ids)
@@ -1214,7 +1249,7 @@ namespace umbraco.MacroEngines
         }
         public bool IsNull(string alias, bool recursive)
         {
-            var prop = GetProperty(alias);
+            var prop = GetProperty(alias, recursive);
             if (prop == null) return true;
             return (prop as PropertyResult).IsNull();
         }
@@ -1228,7 +1263,7 @@ namespace umbraco.MacroEngines
         }
         public bool HasValue(string alias, bool recursive)
         {
-            var prop = GetProperty(alias);
+            var prop = GetProperty(alias, recursive);
             if (prop == null) return false;
             return (prop as PropertyResult).HasValue();
         }

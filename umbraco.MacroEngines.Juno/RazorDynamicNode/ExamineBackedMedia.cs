@@ -15,6 +15,9 @@ namespace umbraco.MacroEngines
 
     public class ExamineBackedMedia
     {
+        //Custom properties won't be available
+        public bool WasLoadedFromExamine;
+
         public static ExamineBackedMedia GetUmbracoMedia(int id)
         {
 
@@ -74,10 +77,19 @@ namespace umbraco.MacroEngines
             {
                 if (result.Current != null && !result.Current.HasAttributes)
                 {
-                    Values.Add(result.Current.Name, result.Current.Value);
+                    string value = result.Current.Value;
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        if (result.Current.HasAttributes || result.Current.SelectChildren(XPathNodeType.Element).Count > 0)
+                        {
+                            value = result.Current.OuterXml;
+                        }
+                    }
+                    Values.Add(result.Current.Name, value);
                 }
 
             }
+            WasLoadedFromExamine = false;
         }
 
         public ExamineBackedMedia(SearchResult result)
@@ -85,11 +97,41 @@ namespace umbraco.MacroEngines
             if (result == null) throw new ArgumentNullException("result");
             Name = result.Fields["nodeName"];
             Values = result.Fields;
-
+            WasLoadedFromExamine = true;
         }
-
+        public IProperty LoadCustomPropertyNotFoundInExamine(string alias, out bool propertyExists)
+        {
+            //custom property, not loaded from examine
+            //have to do a getmedia and get it that way, but then add it to the cache
+            var media = umbraco.library.GetMedia(this.Id, true);
+            if (media != null && media.Current != null)
+            {
+                media.MoveNext();
+                XPathNavigator xpath = media.Current;
+                var result = xpath.SelectChildren(XPathNodeType.Element);
+                while (result.MoveNext())
+                {
+                    if (result.Current != null && !result.Current.HasAttributes)
+                    {
+                        if (string.Equals(result.Current.Name, alias))
+                        {
+                            string value = result.Current.Value;
+                            if (string.IsNullOrEmpty(value))
+                            {
+                                value = result.Current.OuterXml;
+                            }
+                            Values.Add(result.Current.Name, value);
+                            propertyExists = true;
+                            return new PropertyResult(alias, value, Guid.Empty);
+                        }
+                    }
+                }
+            }
+            propertyExists = false;
+            return null;
+        }
         public string Name { get; private set; }
-        private IDictionary<string, string> Values { get; set; }
+        internal IDictionary<string, string> Values { get; set; }
 
         public Lazy<ExamineBackedMedia> Parent
         {
@@ -336,7 +378,13 @@ namespace umbraco.MacroEngines
                     {
                         if (children.Current.Name != "contents")
                         {
-                            mediaList.Add(new ExamineBackedMedia(children.Current));
+                            //make sure it's actually a node, not a property 
+                            if (!string.IsNullOrEmpty(children.Current.GetAttribute("path", "")) &&
+                                !string.IsNullOrEmpty(children.Current.GetAttribute("id", "")) &&
+                                !string.IsNullOrEmpty(children.Current.GetAttribute("version", "")))
+                            {
+                                mediaList.Add(new ExamineBackedMedia(children.Current));
+                            }
                         }
                     }
                     else

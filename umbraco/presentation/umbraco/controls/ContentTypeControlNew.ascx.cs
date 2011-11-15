@@ -224,14 +224,17 @@ namespace umbraco.controls
                 ddlThumbnails.Items.Add(li);
             }
 
-            Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", @"
+                Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", @"
 function refreshDropDowns() {
-    jQuery('#" + ddlIcons.ClientID + @"').msDropDown({ showIcon: true, style: 'width:250px;' });
+    if (jQuery('#" + ddlIcons.ClientID + @" option').length <= 100)
+        jQuery('#" + ddlIcons.ClientID + @"').msDropDown({ showIcon: true, style: 'width:250px;' });
+    else {
+        jQuery('#" + ddlIcons.ClientID + @"').before('<div class=\'notice\'><p>For performance reasons, icons will not be displayed when there are more than 100 items in the dropdown.</p></div');
+    }
     jQuery('#" + ddlThumbnails.ClientID + @"').msDropDown({ showIcon: false, rowHeight: '130', visibleRows: '2', style: 'width:250px;' });
 }
 jQuery(function() { refreshDropDowns(); });
 ", true);
-
             txtName.Text = cType.GetRawText();
             txtAlias.Text = cType.Alias;
             description.Text = cType.GetRawDescription();
@@ -366,23 +369,23 @@ jQuery(function() { refreshDropDowns(); });
                 string tabCaption = t.ContentType == cType.Id ? t.GetRawCaption() : t.GetRawCaption() + " (inherited from " + new ContentType(t.ContentType).Text + ")";
                 PropertyTypes.Controls.Add(new LiteralControl("<div class='genericPropertyListBox'><h2 class=\"propertypaneTitel\">Tab: " + tabCaption + "</h2>"));
 
-				// zb-00036 #29889 : fix property types getter
-				var propertyTypes = t.GetPropertyTypes(cType.Id, false);
+                // zb-00036 #29889 : fix property types getter
+                var propertyTypes = t.GetPropertyTypes(cType.Id, false);
 
-				if (propertyTypes.Length > 0)
+                if (propertyTypes.Length > 0)
                 {
                     HtmlInputHidden propSort = new HtmlInputHidden();
                     propSort.ID = "propSort_" + t.Id.ToString() + "_Content";
                     PropertyTypes.Controls.Add(propSort);
                     _sortLists.Add(propSort);
 
-					// zb-00036 #29889 : remove filter, not needed anymore
+                    // zb-00036 #29889 : remove filter, not needed anymore
 
-					if (propertyTypes.Count() > 0)
+                    if (propertyTypes.Count() > 0)
                     {
                         PropertyTypes.Controls.Add(new LiteralControl("<ul class='genericPropertyList' id=\"t_" + t.Id.ToString() + "_Contents\">"));
 
-						foreach (cms.businesslogic.propertytype.PropertyType pt in propertyTypes)
+                        foreach (cms.businesslogic.propertytype.PropertyType pt in propertyTypes)
                         {
                             GenericProperties.GenericPropertyWrapper gpw = new umbraco.controls.GenericProperties.GenericPropertyWrapper();
 
@@ -558,7 +561,7 @@ jQuery(function() { refreshDropDowns(); });
                 dr["tabid"] = tb.Id;
                 dtT.Rows.Add(dr);
 
-				// zb-00036 #29889 : fix property types getter
+                // zb-00036 #29889 : fix property types getter
                 foreach (cms.businesslogic.propertytype.PropertyType pt in tb.GetPropertyTypes(cType.Id))
                 {
                     DataRow dr1 = dtP.NewRow();

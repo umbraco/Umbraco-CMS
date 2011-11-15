@@ -3,7 +3,7 @@
 <link href="/umbraco_client/propertypane/style.css" rel="stylesheet" />
 <div class="dashboardWrapper">
     <h2>Start Here</h2>
-    <img src="/umbraco/dashboard/images/logo32x32.png" alt="Umbraco" class="dashboardIcon" />
+    <img src="./dashboard/images/logo32x32.png" alt="Umbraco" class="dashboardIcon" />
     <h3>Thank you for choosing Umbraco!</h3>
     <p>
         We think this could be the beginning of something beautiful. You have made a great

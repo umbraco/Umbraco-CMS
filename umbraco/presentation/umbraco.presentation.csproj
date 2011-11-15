@@ -110,6 +110,15 @@
     <Reference Include="Lucene.Net, Version=2.9.2.2, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>C:\Users\Shannon\Documents\Visual Studio 2008\Projects\Umbraco\Branch-4.1\foreign dlls\Lucene.Net.dll</HintPath>
     </Reference>
+    <Reference Include="Our.Umbraco.uGoLive">
+      <HintPath>..\..\foreign dlls\Our.Umbraco.uGoLive.dll</HintPath>
+    </Reference>
+    <Reference Include="Our.Umbraco.uGoLive.47x">
+      <HintPath>..\..\foreign dlls\Our.Umbraco.uGoLive.47x.dll</HintPath>
+    </Reference>
+    <Reference Include="Our.Umbraco.uGoLive.Checks">
+      <HintPath>..\..\foreign dlls\Our.Umbraco.uGoLive.Checks.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>

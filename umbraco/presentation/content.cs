@@ -7,15 +7,17 @@ using System.Threading;
 using System.Web;
 using System.Xml;
 using System.Xml.XPath;
-
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
+using umbraco.BusinessLogic.Utils;
+using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.IO;
-using umbraco.BusinessLogic.Utils;
 using umbraco.presentation.nodeFactory;
+using Action = umbraco.BusinessLogic.Actions.Action;
+using Node = umbraco.NodeFactory.Node;
 
 namespace umbraco
 {
@@ -26,7 +28,17 @@ namespace umbraco
     {
         #region Declarations
 
+        // Sync access to disk file
+        private static readonly object _readerWriterSyncLock = new object();
+
+        // Sync access to internal cache
+        private static readonly object _xmlContentInternalSyncLock = new object();
+
+        // Sync database access
+        private static readonly object _dbReadSyncLock = new object();
+        private readonly string XmlContextContentItemKey = "UmbracoXmlContextContent";
         private string _umbracoXmlDiskCacheFileName = string.Empty;
+        private volatile XmlDocument _xmlContent;
 
         /// <summary>
         /// Gets the path of the umbraco XML disk cache file.
@@ -42,34 +54,12 @@ namespace umbraco
                 }
                 return _umbracoXmlDiskCacheFileName;
             }
-            set
-            {
-                _umbracoXmlDiskCacheFileName = value;
-            }
+            set { _umbracoXmlDiskCacheFileName = value; }
         }
-
-        private readonly string XmlContextContentItemKey = "UmbracoXmlContextContent";
-
-        // Current content
-        private volatile XmlDocument _xmlContent = null;
-
-        // Sync access to disk file
-        private static object _readerWriterSyncLock = new object();
-
-        // Sync access to internal cache
-        private static object _xmlContentInternalSyncLock = new object();
-
-        // Sync database access
-        private static object _dbReadSyncLock = new object();
 
         #endregion
 
         #region Constructors
-
-        public content()
-        {
-            ;
-        }
 
         static content()
         {
@@ -83,6 +73,11 @@ namespace umbraco
 
             Trace.WriteLine("Checking for xml content initialisation...");
             Instance.CheckXmlContentPopulation();
+        }
+
+        public content()
+        {
+            ;
         }
 
         #endregion
@@ -110,7 +105,7 @@ namespace umbraco
             {
                 if (HttpContext.Current == null)
                     return XmlContentInternal;
-                XmlDocument content = HttpContext.Current.Items[XmlContextContentItemKey] as XmlDocument;
+                var content = HttpContext.Current.Items[XmlContextContentItemKey] as XmlDocument;
                 if (content == null)
                 {
                     content = XmlContentInternal;
@@ -148,6 +143,8 @@ namespace umbraco
                 {
                     // Clear macro cache
                     Cache.ClearCacheObjectTypes("umbraco.MacroCacheContent");
+                    Cache.ClearCacheByKeySearch("macroHtml_");
+
                     // Clear library cache
                     if (UmbracoSettings.UmbracoLibraryCacheDuration > 0)
                     {
@@ -177,7 +174,8 @@ namespace umbraco
                 {
                     if (isInitializing)
                     {
-                        Trace.WriteLine(string.Format("Initializing content on thread '{0}' (Threadpool? {1})", Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread.ToString()));
+                        Trace.WriteLine(string.Format("Initializing content on thread '{0}' (Threadpool? {1})",
+                                                      Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread));
                         _xmlContent = LoadContent();
                         Trace.WriteLine("Content initialized (loaded)");
 
@@ -218,21 +216,40 @@ namespace umbraco
             }
             XmlDocumentType docType = xmlDoc.CreateDocumentType("root", null, null, dtd);
             xmlDoc.InsertAfter(docType, xmlDoc.FirstChild);
-
         }
 
         protected static void ValidateSchema(string docTypeAlias, XmlDocument xmlDoc)
         {
             // if doctype is not defined i)n schema, then regenerate it
-            if (!xmlDoc.DocumentType.InternalSubset.Contains(String.Format("<!ATTLIST {0} id ID #REQUIRED>", docTypeAlias)))
+            if (
+                !xmlDoc.DocumentType.InternalSubset.Contains(String.Format("<!ATTLIST {0} id ID #REQUIRED>",
+                                                                           docTypeAlias)))
             {
                 // we need to re-load the content, else the dtd changes won't be picked up by the XmlDocument
-                content.Instance.XmlContentInternal = content.Instance.LoadContentFromDatabase();
+                Instance.XmlContentInternal = Instance.LoadContentFromDatabase();
             }
         }
 
-
         #region Public Methods
+
+        #region Delegates
+
+        /// <summary>
+        /// Occurs when [after loading the xml string from the database].
+        /// </summary>
+        public delegate void ContentCacheDatabaseLoadXmlStringEventHandler(
+            ref string xml, ContentCacheLoadNodeEventArgs e);
+
+        /// <summary>
+        /// Occurs when [after loading the xml string from the database and creating the xml node].
+        /// </summary>
+        public delegate void ContentCacheLoadNodeEventHandler(XmlNode xmlNode, ContentCacheLoadNodeEventArgs e);
+
+        public delegate void DocumentCacheEventHandler(Document sender, DocumentCacheEventArgs e);
+
+        public delegate void RefreshContentEventHandler(Document sender, RefreshContentEventArgs e);
+
+        #endregion
 
         /// <summary>
         /// Load content from database in a background thread
@@ -240,7 +257,7 @@ namespace umbraco
         /// </summary>
         public virtual void RefreshContentFromDatabaseAsync()
         {
-            cms.businesslogic.RefreshContentEventArgs e = new umbraco.cms.businesslogic.RefreshContentEventArgs();
+            var e = new RefreshContentEventArgs();
             FireBeforeRefreshContent(e);
 
             if (!e.Cancel)
@@ -255,7 +272,8 @@ namespace umbraco
                         // queues this up, because this delegate is executing on a different thread and may complete
                         // after the request which invoked it (which would normally persist the file on completion)
                         // So we are responsible for ensuring the content is persisted in this case.
-                        if (!UmbracoSettings.isXmlContentCacheDisabled && UmbracoSettings.continouslyUpdateXmlDiskCache)
+                        if (!UmbracoSettings.isXmlContentCacheDisabled &&
+                            UmbracoSettings.continouslyUpdateXmlDiskCache)
                             PersistXmlToFile(xmlDoc);
                     });
 
@@ -293,13 +311,27 @@ namespace umbraco
             if (d.Published)
             {
                 int parentId = d.Level == 1 ? -1 : d.Parent.Id;
-                AppendDocumentXml(d.Id, d.Level, parentId, getPreviewOrPublishedNode(d, xmlContentCopy, false), xmlContentCopy);
+                AppendDocumentXml(d.Id, d.Level, parentId, getPreviewOrPublishedNode(d, xmlContentCopy, false),
+                                  xmlContentCopy);
 
                 // update sitemapprovider
-                if (updateSitemapProvider && SiteMap.Provider is presentation.nodeFactory.UmbracoSiteMapProvider)
+                if (updateSitemapProvider && SiteMap.Provider is UmbracoSiteMapProvider)
                 {
-                    presentation.nodeFactory.UmbracoSiteMapProvider prov = (presentation.nodeFactory.UmbracoSiteMapProvider)SiteMap.Provider;
-                    prov.UpdateNode(new umbraco.NodeFactory.Node(d.Id, true));
+                    try
+                    {
+                        var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
+                        Node n = new Node(d.Id, true);
+                        if (!String.IsNullOrEmpty(n.Url) && n.Url != "/#")
+                           prov.UpdateNode(n);
+                        else
+                        {
+                            Log.Add(LogTypes.Error, d.Id, "Can't update Sitemap Provider due to empty Url in node");
+                        }
+                    }
+                    catch (Exception ee)
+                    {
+                        Log.Add(LogTypes.Error, d.Id, string.Format("Error adding node to Sitemap Provider in PublishNodeDo(): {0}", ee));
+                    }
                 }
             }
         }
@@ -339,7 +371,8 @@ namespace umbraco
                 // Maybe sort the nodes if the added node has a lower sortorder than the last
                 if (childNodes.Count > 0)
                 {
-                    int siblingSortOrder = int.Parse(childNodes[childNodes.Count - 1].Attributes.GetNamedItem("sortOrder").Value);
+                    int siblingSortOrder =
+                        int.Parse(childNodes[childNodes.Count - 1].Attributes.GetNamedItem("sortOrder").Value);
                     int currentSortOrder = int.Parse(x.Attributes.GetNamedItem("sortOrder").Value);
                     if (childNodes.Count > 1 && siblingSortOrder > currentSortOrder)
                     {
@@ -391,7 +424,7 @@ namespace umbraco
         /// <param name="pageId">The page id.</param>
         public virtual void UpdateDocumentCache(int pageId)
         {
-            Document d = new Document(pageId);
+            var d = new Document(pageId);
             UpdateDocumentCache(d);
         }
 
@@ -402,13 +435,11 @@ namespace umbraco
         /// <param name="d">The d.</param>
         public virtual void UpdateDocumentCache(Document d)
         {
-
-            cms.businesslogic.DocumentCacheEventArgs e = new umbraco.cms.businesslogic.DocumentCacheEventArgs();
+            var e = new DocumentCacheEventArgs();
             FireBeforeUpdateDocumentCache(d, e);
 
             if (!e.Cancel)
             {
-
                 // We need to lock content cache here, because we cannot allow other threads
                 // making changes at the same time, they need to be queued
                 // Adding log entry before locking the xmlfile
@@ -437,7 +468,7 @@ namespace umbraco
                 {
                     System.Web.Caching.Cache httpCache = HttpContext.Current.Cache;
                     string cachedFieldKeyStart = String.Format("contentItem{0}_", d.Id);
-                    List<string> foundKeys = new List<string>();
+                    var foundKeys = new List<string>();
                     foreach (DictionaryEntry cacheItem in httpCache)
                     {
                         string key = cacheItem.Key.ToString();
@@ -449,7 +480,7 @@ namespace umbraco
                         httpCache.Remove(foundKey);
                     }
                 }
-                umbraco.BusinessLogic.Actions.Action.RunActionHandlers(d, ActionPublish.Instance);
+                Action.RunActionHandlers(d, ActionPublish.Instance);
 
                 FireAfterUpdateDocumentCache(d, e);
             }
@@ -480,7 +511,7 @@ namespace umbraco
 
             foreach (Document d in Documents)
             {
-                umbraco.BusinessLogic.Actions.Action.RunActionHandlers(d, ActionPublish.Instance);
+                Action.RunActionHandlers(d, ActionPublish.Instance);
             }
         }
 
@@ -493,7 +524,6 @@ namespace umbraco
         {
             ThreadPool.QueueUserWorkItem(delegate { UpdateDocumentCache(documentId); });
         }
-
 
 
         [Obsolete("Method obsolete in version 4.1 and later, please use ClearDocumentCache", true)]
@@ -514,11 +544,10 @@ namespace umbraco
         /// <param name="documentId">The document id.</param>
         public virtual void ClearDocumentCache(int documentId)
         {
-
             // Get the document
-            Document d = new Document(documentId);
+            var d = new Document(documentId);
 
-            cms.businesslogic.DocumentCacheEventArgs e = new umbraco.cms.businesslogic.DocumentCacheEventArgs();
+            var e = new DocumentCacheEventArgs();
             FireBeforeClearDocumentCache(d, e);
 
             if (!e.Cancel)
@@ -555,13 +584,13 @@ namespace umbraco
                 if (x != null)
                 {
                     // Run Handler				
-                    umbraco.BusinessLogic.Actions.Action.RunActionHandlers(d, ActionUnPublish.Instance);
+                    Action.RunActionHandlers(d, ActionUnPublish.Instance);
                 }
 
                 // update sitemapprovider
-                if (SiteMap.Provider is presentation.nodeFactory.UmbracoSiteMapProvider)
+                if (SiteMap.Provider is UmbracoSiteMapProvider)
                 {
-                    presentation.nodeFactory.UmbracoSiteMapProvider prov = (presentation.nodeFactory.UmbracoSiteMapProvider)SiteMap.Provider;
+                    var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
                     prov.RemoveNode(d.Id);
                 }
 
@@ -598,7 +627,7 @@ namespace umbraco
         public virtual void PublishNode(int documentId)
         {
             // Get the document
-            Document d = new Document(documentId);
+            var d = new Document(documentId);
             PublishNode(d);
         }
 
@@ -633,9 +662,6 @@ namespace umbraco
             UpdateDocumentCache(d);
         }
 
-        public delegate void DocumentCacheEventHandler(Document sender, cms.businesslogic.DocumentCacheEventArgs e);
-        public delegate void RefreshContentEventHandler(Document sender, cms.businesslogic.RefreshContentEventArgs e);
-
         /// <summary>
         /// Occurs when [before document cache update].
         /// </summary>
@@ -646,7 +672,7 @@ namespace umbraco
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="umbraco.cms.businesslogic.DocumentCacheEventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeUpdateDocumentCache(Document sender, cms.businesslogic.DocumentCacheEventArgs e)
+        protected virtual void FireBeforeUpdateDocumentCache(Document sender, DocumentCacheEventArgs e)
         {
             if (BeforeUpdateDocumentCache != null)
             {
@@ -665,7 +691,7 @@ namespace umbraco
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="umbraco.cms.businesslogic.DocumentCacheEventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterUpdateDocumentCache(Document sender, cms.businesslogic.DocumentCacheEventArgs e)
+        protected virtual void FireAfterUpdateDocumentCache(Document sender, DocumentCacheEventArgs e)
         {
             if (AfterUpdateDocumentCache != null)
             {
@@ -683,7 +709,7 @@ namespace umbraco
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="umbraco.cms.businesslogic.DocumentCacheEventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeClearDocumentCache(Document sender, cms.businesslogic.DocumentCacheEventArgs e)
+        protected virtual void FireBeforeClearDocumentCache(Document sender, DocumentCacheEventArgs e)
         {
             if (BeforeClearDocumentCache != null)
             {
@@ -698,7 +724,7 @@ namespace umbraco
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="umbraco.cms.businesslogic.DocumentCacheEventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterClearDocumentCache(Document sender, cms.businesslogic.DocumentCacheEventArgs e)
+        protected virtual void FireAfterClearDocumentCache(Document sender, DocumentCacheEventArgs e)
         {
             if (AfterClearDocumentCache != null)
             {
@@ -716,7 +742,7 @@ namespace umbraco
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="umbraco.cms.businesslogic.RefreshContentEventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeRefreshContent(cms.businesslogic.RefreshContentEventArgs e)
+        protected virtual void FireBeforeRefreshContent(RefreshContentEventArgs e)
         {
             if (BeforeRefreshContent != null)
             {
@@ -734,7 +760,7 @@ namespace umbraco
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="umbraco.cms.businesslogic.RefreshContentEventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterRefreshContent(cms.businesslogic.RefreshContentEventArgs e)
+        protected virtual void FireAfterRefreshContent(RefreshContentEventArgs e)
         {
             if (AfterRefreshContent != null)
             {
@@ -743,10 +769,117 @@ namespace umbraco
         }
 
 
+        /// <summary>
+        /// Occurs when [after loading the xml string from the database].
+        /// </summary>
+        public static event ContentCacheDatabaseLoadXmlStringEventHandler AfterContentCacheDatabaseLoadXmlString;
+
+        /// <summary>
+        /// Fires the before when creating the document cache from database
+        /// </summary>
+        /// <param name="node">The sender.</param>
+        /// <param name="e">The <see cref="umbraco.cms.businesslogic.ContentCacheLoadNodeEventArgs"/> instance containing the event data.</param>
+        internal static void FireAfterContentCacheDatabaseLoadXmlString(ref string xml, ContentCacheLoadNodeEventArgs e)
+        {
+            if (AfterContentCacheDatabaseLoadXmlString != null)
+            {
+                AfterContentCacheDatabaseLoadXmlString(ref xml, e);
+            }
+        }
+
+        /// <summary>
+        /// Occurs when [before when creating the document cache from database].
+        /// </summary>
+        public static event ContentCacheLoadNodeEventHandler BeforeContentCacheLoadNode;
+
+        /// <summary>
+        /// Fires the before when creating the document cache from database
+        /// </summary>
+        /// <param name="node">The sender.</param>
+        /// <param name="e">The <see cref="umbraco.cms.businesslogic.ContentCacheLoadNodeEventArgs"/> instance containing the event data.</param>
+        internal static void FireBeforeContentCacheLoadNode(XmlNode node, ContentCacheLoadNodeEventArgs e)
+        {
+            if (BeforeContentCacheLoadNode != null)
+            {
+                BeforeContentCacheLoadNode(node, e);
+            }
+        }
+
+        /// <summary>
+        /// Occurs when [after loading document cache xml node from database].
+        /// </summary>
+        public static event ContentCacheLoadNodeEventHandler AfterContentCacheLoadNodeFromDatabase;
+
+        /// <summary>
+        /// Fires the after loading document cache xml node from database
+        /// </summary>
+        /// <param name="node">The sender.</param>
+        /// <param name="e">The <see cref="umbraco.cms.businesslogic.ContentCacheLoadNodeEventArgs"/> instance containing the event data.</param>
+        internal static void FireAfterContentCacheLoadNodeFromDatabase(XmlNode node, ContentCacheLoadNodeEventArgs e)
+        {
+            if (AfterContentCacheLoadNodeFromDatabase != null)
+            {
+                AfterContentCacheLoadNodeFromDatabase(node, e);
+            }
+        }
+
+        /// <summary>
+        /// Occurs when [before a publish action updates the content cache].
+        /// </summary>
+        public static event ContentCacheLoadNodeEventHandler BeforePublishNodeToContentCache;
+
+        /// <summary>
+        /// Fires the before a publish action updates the content cache
+        /// </summary>
+        /// <param name="node">The sender.</param>
+        /// <param name="e">The <see cref="umbraco.cms.businesslogic.ContentCacheLoadNodeEventArgs"/> instance containing the event data.</param>
+        public static void FireBeforePublishNodeToContentCache(XmlNode node, ContentCacheLoadNodeEventArgs e)
+        {
+            if (BeforePublishNodeToContentCache != null)
+            {
+                BeforePublishNodeToContentCache(node, e);
+            }
+        }
 
         #endregion
 
         #region Protected & Private methods
+
+        internal const string PersistenceFlagContextKey = "vnc38ykjnkjdnk2jt98ygkxjng";
+
+        internal bool IsXmlQueuedForPersistenceToFile
+        {
+            get
+            {
+                if (HttpContext.Current != null)
+                {
+                    bool val = HttpContext.Current.Application[PersistenceFlagContextKey] != null;
+                    if (val)
+                    {
+                        DateTime persistenceTime = DateTime.MinValue;
+                        try
+                        {
+                            persistenceTime = (DateTime)HttpContext.Current.Application[PersistenceFlagContextKey];
+                            if (persistenceTime > GetCacheFileUpdateTime())
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                HttpContext.Current.Application.Lock();
+                                HttpContext.Current.Application[PersistenceFlagContextKey] = null;
+                                HttpContext.Current.Application.UnLock();
+                            }
+                        }
+                        catch
+                        {
+                            // Nothing to catch here - we'll just persist
+                        }
+                    }
+                }
+                return false;
+            }
+        }
 
         /// <summary>
         /// Invalidates the disk content cache file. Effectively just deletes it.
@@ -834,7 +967,7 @@ namespace umbraco
         {
             lock (_readerWriterSyncLock)
             {
-                XmlDocument xmlDoc = new XmlDocument();
+                var xmlDoc = new XmlDocument();
                 Log.Add(LogTypes.System, User.GetUser(0), -1, "Loading content from disk cache...");
                 xmlDoc.Load(UmbracoXmlDiskCacheFileName);
                 return xmlDoc;
@@ -858,13 +991,12 @@ namespace umbraco
             // and we need to guarantee it won't tear down the app pool by throwing an unhandled exception
             try
             {
-
                 // Moved User to a local variable - why are we causing user 0 to load from the DB though?
                 // Alex N 20100212
                 User staticUser = null;
                 try
                 {
-                    staticUser = User.GetCurrent();  //User.GetUser(0);
+                    staticUser = User.GetCurrent(); //User.GetUser(0);
                 }
                 catch
                 {
@@ -882,7 +1014,7 @@ namespace umbraco
                     Log.Add(LogTypes.Debug, staticUser, -1, "Republishing starting");
 
                     // Lets cache the DTD to save on the DB hit on the subsequent use
-                    var dtd = DocumentType.GenerateDtd();
+                    string dtd = DocumentType.GenerateDtd();
 
                     // Prepare an XmlDocument with an appropriate inline DTD to match
                     // the expected content
@@ -897,28 +1029,51 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
                     lock (_dbReadSyncLock)
                     {
-                        using (IRecordsReader dr = SqlHelper.ExecuteReader(sql, SqlHelper.CreateParameter("@type", new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"))))
+                        using (
+                            IRecordsReader dr = SqlHelper.ExecuteReader(sql,
+                                                                        SqlHelper.CreateParameter("@type",
+                                                                                                  new Guid(
+                                                                                                      "C66BA18E-EAF3-4CFF-8A22-41B16D66A972")))
+                            )
                         {
-
                             while (dr.Read())
                             {
                                 int currentId = dr.GetInt("id");
                                 int parentId = dr.GetInt("parentId");
+                                string xml = dr.GetString("xml");
 
-                                // Retrieve the xml content from the database
-                                // and parse it into a DOM node
-                                xmlDoc.LoadXml(dr.GetString("xml"));
-                                nodeIndex.Add(currentId, xmlDoc.FirstChild);
-
-                                // Build the content hierarchy
-                                List<int> children;
-                                if (!hierarchy.TryGetValue(parentId, out children))
+                                // Call the eventhandler to allow modification of the string
+                                var e1 = new ContentCacheLoadNodeEventArgs();
+                                FireAfterContentCacheDatabaseLoadXmlString(ref xml, e1);
+                                // check if a listener has canceled the event
+                                if (!e1.Cancel)
                                 {
-                                    // No children for this parent, so add one
-                                    children = new List<int>();
-                                    hierarchy.Add(parentId, children);
+                                    // and parse it into a DOM node
+                                    xmlDoc.LoadXml(xml);
+                                    XmlNode node = xmlDoc.FirstChild;
+                                    // same event handler loader form the xml node
+                                    var e2 = new ContentCacheLoadNodeEventArgs();
+                                    FireAfterContentCacheLoadNodeFromDatabase(node, e2);
+                                    // and checking if it was canceled again
+                                    if (!e1.Cancel)
+                                    {
+                                        nodeIndex.Add(currentId, node);
+
+                                        // verify if either of the handlers canceled the children to load
+                                        if (!e1.CancelChildren && !e2.CancelChildren)
+                                        {
+                                            // Build the content hierarchy
+                                            List<int> children;
+                                            if (!hierarchy.TryGetValue(parentId, out children))
+                                            {
+                                                // No children for this parent, so add one
+                                                children = new List<int>();
+                                                hierarchy.Add(parentId, children);
+                                            }
+                                            children.Add(currentId);
+                                        }
+                                    }
                                 }
-                                children.Add(currentId);
                             }
                         }
                     }
@@ -969,30 +1124,37 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             return null;
         }
 
-        private static void GenerateXmlDocument(IDictionary<int, List<int>> hierarchy, IDictionary<int, XmlNode> nodeIndex, int parentId, XmlNode parentNode)
+        private static void GenerateXmlDocument(IDictionary<int, List<int>> hierarchy,
+                                                IDictionary<int, XmlNode> nodeIndex, int parentId, XmlNode parentNode)
         {
             List<int> children;
 
             if (hierarchy.TryGetValue(parentId, out children))
             {
-                XmlNode childContainer = UmbracoSettings.UseLegacyXmlSchema || String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME)
+                XmlNode childContainer = UmbracoSettings.UseLegacyXmlSchema ||
+                                         String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME)
                                              ? parentNode
-                                             : parentNode.SelectSingleNode(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME);
+                                             : parentNode.SelectSingleNode(
+                                                 UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME);
 
-                if (!UmbracoSettings.UseLegacyXmlSchema && !String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
+                if (!UmbracoSettings.UseLegacyXmlSchema &&
+                    !String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
                 {
                     if (childContainer == null)
                     {
-                        childContainer = xmlHelper.addTextNode(parentNode.OwnerDocument, UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME, "");
+                        childContainer = xmlHelper.addTextNode(parentNode.OwnerDocument,
+                                                               UmbracoSettings.
+                                                                   TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME, "");
                         parentNode.AppendChild(childContainer);
                     }
                 }
 
                 foreach (int childId in children)
                 {
-                    var childNode = nodeIndex[childId];
+                    XmlNode childNode = nodeIndex[childId];
 
-                    if (UmbracoSettings.UseLegacyXmlSchema || String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
+                    if (UmbracoSettings.UseLegacyXmlSchema ||
+                        String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
                     {
                         parentNode.AppendChild(childNode);
                     }
@@ -1022,7 +1184,8 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             {
                 if (xmlDoc != null)
                 {
-                    Trace.Write(string.Format("Saving content to disk on thread '{0}' (Threadpool? {1})", Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread.ToString()));
+                    Trace.Write(string.Format("Saving content to disk on thread '{0}' (Threadpool? {1})",
+                                              Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread));
 
                     // Moved the user into a variable and avoided it throwing an error if one can't be loaded (e.g. empty / corrupt db on initial install)
                     User staticUser = null;
@@ -1031,7 +1194,8 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                         staticUser = User.GetCurrent();
                     }
                     catch
-                    { }
+                    {
+                    }
 
                     try
                     {
@@ -1040,7 +1204,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                         DeleteXmlCache();
 
                         // Try to create directory for cache path if it doesn't yet exist
-                        var directoryName = Path.GetDirectoryName(UmbracoXmlDiskCacheFileName);
+                        string directoryName = Path.GetDirectoryName(UmbracoXmlDiskCacheFileName);
                         if (!File.Exists(UmbracoXmlDiskCacheFileName) && !Directory.Exists(directoryName))
                         {
                             // We're already in a try-catch and saving will fail if this does, so don't need another
@@ -1049,7 +1213,9 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
                         xmlDoc.Save(UmbracoXmlDiskCacheFileName);
 
-                        Trace.Write(string.Format("Saved content on thread '{0}' in {1} (Threadpool? {2})", Thread.CurrentThread.Name, stopWatch.Elapsed, Thread.CurrentThread.IsThreadPoolThread.ToString()));
+                        Trace.Write(string.Format("Saved content on thread '{0}' in {1} (Threadpool? {2})",
+                                                  Thread.CurrentThread.Name, stopWatch.Elapsed,
+                                                  Thread.CurrentThread.IsThreadPoolThread));
 
                         Log.Add(LogTypes.Debug, staticUser, -1, string.Format("Xml saved in {0}", stopWatch.Elapsed));
                     }
@@ -1058,14 +1224,15 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                         // If for whatever reason something goes wrong here, invalidate disk cache
                         DeleteXmlCache();
 
-                        Trace.Write(string.Format("Error saving content on thread '{0}' due to '{1}' (Threadpool? {2})", Thread.CurrentThread.Name, ee.Message, Thread.CurrentThread.IsThreadPoolThread.ToString()));
+                        Trace.Write(string.Format(
+                            "Error saving content on thread '{0}' due to '{1}' (Threadpool? {2})",
+                            Thread.CurrentThread.Name, ee.Message, Thread.CurrentThread.IsThreadPoolThread));
                         Log.Add(LogTypes.Error, staticUser, -1, string.Format("Xml wasn't saved: {0}", ee));
                     }
                 }
             }
         }
 
-        internal const string PersistenceFlagContextKey = "vnc38ykjnkjdnk2jt98ygkxjng";
         /// <summary>
         /// Marks a flag in the HttpContext so that, upon page execution completion, the Xml cache will
         /// get persisted to disk. Ensure this method is only called from a thread executing a page request
@@ -1087,7 +1254,6 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             }
             else
             {
-
                 //// Save copy of content
                 if (UmbracoSettings.CloneXmlCacheOnPublish)
                 {
@@ -1095,7 +1261,6 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
                     ThreadPool.QueueUserWorkItem(
                         delegate { PersistXmlToFile(xmlContentCopy); });
-
                 }
                 else
                     ThreadPool.QueueUserWorkItem(
@@ -1103,43 +1268,9 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             }
         }
 
-        internal bool IsXmlQueuedForPersistenceToFile
-        {
-            get
-            {
-                if (HttpContext.Current != null)
-                {
-                    var val = HttpContext.Current.Application[PersistenceFlagContextKey] != null;
-                    if (val != false)
-                    {
-                        DateTime persistenceTime = DateTime.MinValue;
-                        try
-                        {
-                            persistenceTime = (DateTime)HttpContext.Current.Application[PersistenceFlagContextKey];
-                            if (persistenceTime > GetCacheFileUpdateTime())
-                            {
-                                return true;
-                            }
-                            else
-                            {
-                                HttpContext.Current.Application.Lock();
-                                HttpContext.Current.Application[PersistenceFlagContextKey] = null;
-                                HttpContext.Current.Application.UnLock();
-                            }
-                        }
-                        catch
-                        {
-                            // Nothing to catch here - we'll just persist
-                        }
-                    }
-                }
-                return false;
-            }
-        }
-
         internal DateTime GetCacheFileUpdateTime()
         {
-            if (System.IO.File.Exists(UmbracoXmlDiskCacheFileName))
+            if (File.Exists(UmbracoXmlDiskCacheFileName))
             {
                 return new FileInfo(UmbracoXmlDiskCacheFileName).LastWriteTime;
             }
@@ -1158,8 +1289,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             Log.Add(LogTypes.Debug, -1, "Cloning...");
             // Save copy of content
-            XmlDocument xmlCopy = new XmlDocument();
-            xmlCopy.LoadXml(xmlDoc.OuterXml);
+            var xmlCopy = (XmlDocument)xmlDoc.CloneNode(true);
             Log.Add(LogTypes.Debug, -1, "Cloning ended...");
             return xmlCopy;
         }

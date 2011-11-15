@@ -40,9 +40,12 @@ namespace umbraco.BusinessLogic
             // Method is synchronized so exists remains consistent (avoiding race condition)
             bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(userId) FROM umbracoUser2nodePermission WHERE userId = @userId AND nodeId = @nodeId AND permission = @permission",
                                                        parameters) > 0;
-            if (!exists)
+            if (!exists) {
                 SqlHelper.ExecuteNonQuery("INSERT INTO umbracoUser2nodePermission (userId, nodeId, permission) VALUES (@userId, @nodeId, @permission)",
                                           parameters);
+                // clear user cache to ensure permissions are re-loaded
+                User.GetUser(User.Id).FlushFromCache();
+            }
 		}
 
         /// <summary>

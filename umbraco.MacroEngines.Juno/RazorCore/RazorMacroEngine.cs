@@ -12,7 +12,7 @@ using umbraco.IO;
 
 namespace umbraco.MacroEngines
 {
-    public class RazorMacroEngine : IMacroEngine {
+    public class RazorMacroEngine : IMacroEngine, IMacroEngineResultStatus {
 
         public const string RazorTempDirectory = "~/App_Data/TEMP/Razor/";
 
@@ -156,9 +156,14 @@ namespace umbraco.MacroEngines
         }
 
         public string Execute(MacroModel macro, INode currentPage) {
-            try {
+            try
+            {
+                Success = true;
                 return ExecuteRazor(macro, currentPage);
-            } catch (Exception exception) {
+            } catch (Exception exception)
+            {
+                Success = false;
+                ResultException = exception;
                 HttpContext.Current.Trace.Warn("umbracoMacro", string.Format("Error Loading Razor Script (file: {0}) {1} {2}", macro.Name, exception.Message, exception.StackTrace));
                 var loading = string.Format("<div style=\"border: 1px solid #990000\">Error loading Razor Script {0}</br/>", macro.ScriptName);
                 if (GlobalSettings.DebugMode)
@@ -170,5 +175,13 @@ namespace umbraco.MacroEngines
 
         #endregion
 
+
+        #region IMacroEngineResultStatus Members
+
+        public bool Success { get; set; }
+
+        public Exception ResultException { get; set; }
+
+        #endregion
     }
 }

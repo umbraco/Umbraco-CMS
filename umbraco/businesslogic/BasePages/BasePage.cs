@@ -180,6 +180,9 @@ namespace umbraco.BasePages {
 
         public static long GetTimeout(bool byPassCache)
         {
+            if (UmbracoSettings.KeepUserLoggedIn)
+                RenewLoginTimeout();
+
             if (byPassCache)
             {
                 return SqlHelper.ExecuteScalar<long>("select timeout from umbracoUserLogins where contextId=@contextId",

@@ -413,8 +413,8 @@ $.Jcrop = function(obj,opt)
 		drawBorders:		true,
 		dragEdges:			true,
 
-		boxWidth:			0,
-		boxHeight:			0,
+		boxWidth:			(jQuery(window).width()*0.85),
+		boxHeight:			(jQuery(window).height()*0.85),
 
 		boundary:			8,
 		animationDelay:		20,

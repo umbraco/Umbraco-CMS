@@ -215,10 +215,14 @@ namespace umbraco.cms.businesslogic.member
         public static Member MakeNew(string Name, string LoginName, string Email, MemberType mbt, User u)
         {
             var loginName = (!String.IsNullOrEmpty(LoginName)) ? LoginName : Name;
+
+            if (String.IsNullOrEmpty(loginName))
+                throw new ArgumentException("The loginname must be different from an empty string", "loginName");
+
             // Test for e-mail
             if (Email != "" && Member.GetMemberFromEmail(Email) != null)
                 throw new Exception(String.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
-            else if (Member.GetMemberFromLoginName(LoginName) != null)
+            else if (Member.GetMemberFromLoginName(loginName) != null)
                 throw new Exception(String.Format("Duplicate User name! A member with the user name {0} already exists", Name));
 
             Guid newId = Guid.NewGuid();
@@ -262,6 +266,8 @@ namespace umbraco.cms.businesslogic.member
         [Obsolete("Use System.Web.Security.Membership.GetUser")]
         public static Member GetMemberFromLoginName(string loginName)
         {
+            if (String.IsNullOrEmpty(loginName))
+                throw new ArgumentException("The username of a Member must be different from an emptry string", "loginName");
             if (IsMember(loginName))
             {
                 object o = SqlHelper.ExecuteScalar<object>(
@@ -480,6 +486,10 @@ namespace umbraco.cms.businesslogic.member
             }
             set
             {
+                if (String.IsNullOrEmpty(value))
+                    throw new ArgumentException("The loginname must be different from an empty string", "LoginName");
+                if (value.Contains(","))
+                    throw new ArgumentException("The parameter 'LoginName' must not contain commas.");
                 SqlHelper.ExecuteNonQuery(
                     "update cmsMember set LoginName = @loginName where nodeId =  @id",
                     SqlHelper.CreateParameter("@loginName", value),
@@ -756,11 +766,13 @@ namespace umbraco.cms.businesslogic.member
 
         // zb-00035 #29931 : helper methods to handle member state
 
+        [Obsolete("Only use .NET Membership APIs to handle state now", true)]
         static void SetMemberState(Member member)
         {
             SetMemberState(member.Id, member.UniqueId, member.LoginName);
         }
 
+        [Obsolete("Only use .NET Membership APIs to handle state now", true)]
         static void SetMemberState(int memberId, Guid memberGuid, string memberLogin)
         {
             string value = string.Format("{0}+{1}+{2}", memberId, memberGuid, memberLogin);
@@ -768,11 +780,13 @@ namespace umbraco.cms.businesslogic.member
             StateHelper.Cookies.Member.SetValue(value);
         }
 
+        [Obsolete("Only use .NET Membership APIs to handle state now", true)]
         static void SetMemberState(Member member, bool useSession, double cookieDays)
         {
             SetMemberState(member.Id, member.UniqueId, member.LoginName, useSession, cookieDays);
         }
 
+        [Obsolete("Only use .NET Membership APIs to handle state now", true)]
         static void SetMemberState(int memberId, Guid memberGuid, string memberLogin, bool useSession, double cookieDays)
         {
             string value = string.Format("{0}+{1}+{2}", memberId, memberGuid, memberLogin);
@@ -784,6 +798,7 @@ namespace umbraco.cms.businesslogic.member
                 StateHelper.Cookies.Member.SetValue(value, cookieDays);
         }
 
+        [Obsolete("Only use .NET Membership APIs to handle state now", true)]
         static void ClearMemberState()
         {
             // zb-00004 #29956 : refactor cookies names & handling
@@ -791,6 +806,7 @@ namespace umbraco.cms.businesslogic.member
             FormsAuthentication.SignOut();
         }
 
+        [Obsolete("Only use .NET Membership APIs to handle state now", true)]
         static MemberState GetMemberState()
         {
             // NH: Refactor to fix issue 30171, where auth using pure .NET Members doesn't clear old Umbraco cookie, thus this method gets the previous
@@ -897,7 +913,10 @@ namespace umbraco.cms.businesslogic.member
                 {
                     // Add cookie with member-id, guid and loginname
                     // zb-00035 #29931 : cleanup member state management
-                    SetMemberState(m);
+                    // NH 4.7.1: We'll no longer use legacy cookies to handle Umbraco Members
+                    //SetMemberState(m);
+
+                    FormsAuthentication.SetAuthCookie(m.LoginName, true);
 
                     //cache the member
                     var cachedMember = Cache.GetCacheItem<Member>(GetCacheKey(m.Id), m_Locker,
@@ -911,8 +930,6 @@ namespace umbraco.cms.businesslogic.member
 
                             return m;
                         });
-
-                    FormsAuthentication.SetAuthCookie(m.LoginName, true);
 
                     m.FireAfterAddToCache(e);
                 }
@@ -943,7 +960,10 @@ namespace umbraco.cms.businesslogic.member
                 if (!e.Cancel)
                 {
                     // zb-00035 #29931 : cleanup member state management
-                    SetMemberState(m, UseSession, TimespanForCookie.TotalDays);
+                    // NH 4.7.1: We'll no longer use Umbraco legacy cookies to handle members
+                    //SetMemberState(m, UseSession, TimespanForCookie.TotalDays);
+
+                    FormsAuthentication.SetAuthCookie(m.LoginName, !UseSession);
 
                     //cache the member
                     var cachedMember = Cache.GetCacheItem<Member>(GetCacheKey(m.Id), m_Locker,
@@ -959,7 +979,6 @@ namespace umbraco.cms.businesslogic.member
                         });
 
 
-                    FormsAuthentication.SetAuthCookie(m.LoginName, false);
 
                     m.FireAfterAddToCache(e);
                 }
@@ -1021,11 +1040,13 @@ namespace umbraco.cms.businesslogic.member
         public static void ClearMemberFromClient(int NodeId)
         {
             // zb-00035 #29931 : cleanup member state management
-            ClearMemberState();
-            RemoveMemberFromCache(NodeId);
-
+            // NH 4.7.1: We'll no longer use legacy Umbraco cookies to handle members
+            // ClearMemberState();
 
             FormsAuthentication.SignOut();
+
+            RemoveMemberFromCache(NodeId);
+
         }
 
         /// <summary>
@@ -1123,6 +1144,9 @@ namespace umbraco.cms.businesslogic.member
             {
                 int.TryParse(Membership.GetUser().ProviderUserKey.ToString(), out _currentMemberId);
             }
+
+            // NH 4.7.1: We'll no longer use legacy Umbraco cookies to handle members
+                /*
             else
             {
                 // zb-00035 #29931 : cleanup member state management
@@ -1137,7 +1161,7 @@ namespace umbraco.cms.businesslogic.member
                 // zb-00035 #29931 : cleanup member state management
                 ClearMemberState();
             }
-
+            */
             return _currentMemberId;
         }
 
@@ -1152,7 +1176,7 @@ namespace umbraco.cms.businesslogic.member
                 if (HttpContext.Current.User.Identity.IsAuthenticated)
                 {
                     // zb-00035 #29931 : cleanup member state management
-                    MemberState ms = GetMemberState();
+                    /*MemberState ms = GetMemberState();
 
                     if (ms == null || ms.MemberId == 0)
                         return null;
@@ -1161,9 +1185,14 @@ namespace umbraco.cms.businesslogic.member
                     Member member = GetMemberFromCache(ms.MemberId);
                     if (member == null)
                         member = new Member(ms.MemberId);
+                    */
 
-                    if (HttpContext.Current.User.Identity.IsAuthenticated || (member.UniqueId == ms.MemberGuid && member.LoginName == ms.MemberLogin))
-                        return member;
+                    int _currentMemberId = 0;
+                    if (int.TryParse(Membership.GetUser().ProviderUserKey.ToString(), out _currentMemberId))
+                    {
+                        Member m = new Member(_currentMemberId);
+                        return m;
+                    }
                 }
             }
             catch

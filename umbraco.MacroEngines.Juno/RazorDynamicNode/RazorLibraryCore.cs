@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Web;
 using System.IO;
+using HtmlAgilityPack;
 
 namespace umbraco.MacroEngines.Library
 {
@@ -24,19 +25,29 @@ namespace umbraco.MacroEngines.Library
 
         public dynamic NodeById(int Id)
         {
-            return new DynamicNode(Id);
+            var node = new DynamicNode(Id);
+            if (node != null && node.Id == 0) return new DynamicNull();
+            return node;
         }
         public dynamic NodeById(string Id)
         {
-            return new DynamicNode(Id);
+            var node = new DynamicNode(Id);
+            if (node != null && node.Id == 0) return new DynamicNull();
+            return node;
+        }
+        public dynamic NodeById(DynamicNull Id)
+        {
+            return new DynamicNull();
         }
         public dynamic NodeById(object Id)
         {
             if (Id.GetType() == typeof(DynamicNull))
             {
-                return Id;
+                return new DynamicNull();
             }
-            return new DynamicNode(Id);
+            var node = new DynamicNode(Id);
+            if (node != null && node.Id == 0) return new DynamicNull();
+            return node;
         }
         public dynamic NodesById(List<object> Ids)
         {
@@ -63,10 +74,18 @@ namespace umbraco.MacroEngines.Library
         {
             return NodesById(Ids.ToList());
         }
-
+        public dynamic MediaById(DynamicNull Id)
+        {
+            return new DynamicNull();
+        }
         public dynamic MediaById(int Id)
         {
-            return new DynamicMedia(new DynamicBackingItem(ExamineBackedMedia.GetUmbracoMedia(Id)));
+            var ebm = ExamineBackedMedia.GetUmbracoMedia(Id);
+            if (ebm != null && ebm.Id == 0)
+            {
+                return new DynamicNull();
+            }
+            return new DynamicMedia(new DynamicBackingItem(ebm));
         }
         public dynamic MediaById(string Id)
         {
@@ -75,13 +94,13 @@ namespace umbraco.MacroEngines.Library
             {
                 return MediaById(mediaId);
             }
-            throw new ArgumentException("Cannot get MediaById without an id");
+            return new DynamicNull();
         }
         public dynamic MediaById(object Id)
         {
             if (Id.GetType() == typeof(DynamicNull))
             {
-                return Id;
+                return new DynamicNull();
             }
             int mediaId = 0;
             if (int.TryParse(string.Format("{0}", Id), out mediaId))
@@ -202,7 +221,7 @@ namespace umbraco.MacroEngines.Library
         public HtmlTagWrapper Wrap(string tag, object inner, object anonymousAttributes)
         {
             string innerText = null;
-            if (inner.GetType() != typeof(DynamicNull) && inner != null)
+            if (inner != null && inner.GetType() != typeof(DynamicNull))
             {
                 innerText = string.Format("{0}", inner);
             }
@@ -212,7 +231,7 @@ namespace umbraco.MacroEngines.Library
         public HtmlTagWrapper Wrap(string tag, object inner, object anonymousAttributes, params HtmlTagWrapperBase[] Children)
         {
             string innerText = null;
-            if (inner.GetType() != typeof(DynamicNull) && inner != null)
+            if (inner != null && inner.GetType() != typeof(DynamicNull))
             {
                 innerText = string.Format("{0}", inner);
             }
@@ -226,7 +245,7 @@ namespace umbraco.MacroEngines.Library
         public HtmlTagWrapper Wrap(string tag, object inner)
         {
             string innerText = null;
-            if (inner.GetType() != typeof(DynamicNull) && inner != null)
+            if (inner != null && inner.GetType() != typeof(DynamicNull))
             {
                 innerText = string.Format("{0}", inner);
             }
@@ -499,86 +518,41 @@ namespace umbraco.MacroEngines.Library
             return StripHtmlTags(html, tags.ToList());
         }
 
-        //ge: this method won't deal with <script> or <style> tags as they could have nested < or >
         private HtmlString StripHtmlTags(string html, List<string> tags)
         {
-            if (tags == null)
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml("<p>" + html + "</p>");
+            using (MemoryStream ms = new MemoryStream())
             {
-                tags = new List<string>();
-            }
-            using (MemoryStream outputms = new MemoryStream())
-            {
-                using (TextWriter outputtw = new StreamWriter(outputms))
+                List<HtmlNode> targets = new List<HtmlNode>();
+
+                var nodes = doc.DocumentNode.FirstChild.SelectNodes(".//*");
+                if (nodes != null)
                 {
-                    using (MemoryStream ms = new MemoryStream())
+                    foreach (var node in nodes)
                     {
-                        using (TextWriter tw = new StreamWriter(ms))
+                        //is element
+                        if (node.NodeType == HtmlNodeType.Element)
                         {
-                            tw.Write(html);
-                            tw.Flush();
-                            ms.Position = 0;
-                            using (TextReader tr = new StreamReader(ms))
+                            bool filterAllTags = (tags == null || tags.Count == 0);
+                            if (filterAllTags || tags.Any(tag => string.Equals(tag, node.Name, StringComparison.CurrentCultureIgnoreCase)))
                             {
-                                bool IsInsideElement = false, InsideTagSpaceEncountered = false, DeniedTag = false;
-                                string currentTag = string.Empty;
-                                bool isTagClose = false;
-                                int ic = 0;
-                                while ((ic = tr.Read()) != -1)
-                                {
-                                    if (ic == (int)'<')
-                                    {
-                                        IsInsideElement = true;
-                                        InsideTagSpaceEncountered = false;
-                                        currentTag = string.Empty;
-                                        isTagClose = false;
-                                        DeniedTag = false;
-                                        if (tr.Peek() == (int)'/')
-                                        {
-                                            isTagClose = true;
-                                            DeniedTag = true;
-                                        }
-                                    }
-                                    if (ic == (int)'>')
-                                    {
-                                        IsInsideElement = false;
-                                        outputtw.Write(' ');
-                                        continue;
-                                    }
-                                    if (ic == (int)' ' && IsInsideElement)
-                                    {
-                                        InsideTagSpaceEncountered = true;
-                                    }
-                                    if (!IsInsideElement && !DeniedTag)
-                                    {
-                                        outputtw.Write((char)ic);
-                                    }
-                                    if (IsInsideElement)
-                                    {
-                                        currentTag += ic;
-                                        if (!InsideTagSpaceEncountered)
-                                        {
-                                            InsideTagSpaceEncountered = true;
-                                            //space on open
-                                            if (tags.Any(tag => tag.Equals(currentTag, StringComparison.CurrentCultureIgnoreCase)))
-                                            {
-                                                DeniedTag = true;
-                                                outputtw.Write("<" + currentTag + " ");
-                                            }
-                                        }
-                                    }
-
-                                }
-
+                                targets.Add(node);
                             }
                         }
                     }
-                    outputtw.Flush();
-                    outputms.Position = 0;
-                    using (TextReader outputtr = new StreamReader(outputms))
+                    foreach (var target in targets)
                     {
-                        return new HtmlString(outputtr.ReadToEnd().Replace("  ", " ").Trim());
+                        HtmlNode content = doc.CreateTextNode(target.InnerText);
+                        target.ParentNode.ReplaceChild(content, target);
                     }
+
                 }
+                else
+                {
+                    return new HtmlString(html);
+                }
+                return new HtmlString(doc.DocumentNode.FirstChild.InnerHtml);
             }
         }
 

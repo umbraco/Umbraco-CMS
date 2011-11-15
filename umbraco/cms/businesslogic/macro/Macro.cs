@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Runtime.CompilerServices;
-
+using umbraco.cms.businesslogic.cache;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Linq;
@@ -24,6 +24,8 @@ namespace umbraco.cms.businesslogic.macro
 	/// </summary>
 	public class Macro		
 	{
+        private static readonly object macroCacheSyncLock = new object();
+        private static readonly string umbracoMacroCacheKey = "UmbracoMacroCache";
 
 		int _id;
 		bool _useInEditor;
@@ -250,13 +252,12 @@ namespace umbraco.cms.businesslogic.macro
         /// <param name="alias">The alias.</param>
         public Macro(string alias)
         {
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select macroUseInEditor, macroRefreshRate, macroAlias, macroName, macroScriptType, macroScriptAssembly, macroXSLT, macroPython, macroDontRender, macroCacheByPage, macroCachePersonalized, id from cmsMacro where macroAlias = @alias", SqlHelper.CreateParameter("@alias", alias)))
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("select id from cmsMacro where macroAlias = @alias", SqlHelper.CreateParameter("@alias", alias)))
             {
                 if (dr.Read())
                 {
-                    PopulateMacroInfo(dr);
-
-                    this.LoadProperties();
+                    _id = dr.GetInt("id");
+                    setup();
                 }
                 else
                 {
@@ -274,7 +275,7 @@ namespace umbraco.cms.businesslogic.macro
             SaveEventArgs e = new SaveEventArgs();
             FireBeforeSave(e);
 
-            //Stub for now.. 
+            InvalidateCache();
 
             if (!e.Cancel) {
                 FireAfterSave(e);
@@ -486,16 +487,22 @@ namespace umbraco.cms.businesslogic.macro
 		/// </summary>
 		/// <param name="Alias">The alias of the macro</param>
 		/// <returns>If the macro with the given alias exists, it returns the macro, else null</returns>
+        
         public static Macro GetByAlias(string Alias) 
 		{
-			try 
-			{
-				return new Macro(Alias);
-			} 
-			catch 
-			{
-				return null;
-			}
+            return Cache.GetCacheItem(GetCacheKey(Alias), macroCacheSyncLock,
+                          TimeSpan.FromMinutes(30),
+                          delegate
+                          {
+                              try
+                              {
+                                  return new Macro(Alias);
+                              }
+                              catch
+                              {
+                                  return null;
+                              }
+                          });
 		}
 
         public static MacroTypes FindMacroType(string xslt, string scriptFile, string scriptType, string scriptAssembly)
@@ -539,6 +546,20 @@ namespace umbraco.cms.businesslogic.macro
             return sb.ToString();
         }
 
+        #region Macro Refactor
+
+        private void InvalidateCache()
+        {
+            Cache.ClearCacheItem(GetCacheKey(this.Alias));
+        }
+
+        private static string GetCacheKey(string alias)
+        {
+            return umbracoMacroCacheKey + alias;
+        }
+
+
+        #endregion
 
 
         //Macro events

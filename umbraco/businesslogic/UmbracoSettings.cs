@@ -198,6 +198,21 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Keep user alive as long as they have their browser open? Default is true
+        /// </summary>
+        public static bool KeepUserLoggedIn
+        {
+            get
+            {
+                string value = GetKey("/settings/security/keepUserLoggedIn");
+                bool result;
+                if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
+                    return result;
+                return true;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the logs will be auto cleaned
         /// </summary>
         /// <value><c>true</c> if logs are to be automatically cleaned; otherwise, <c>false</c></value>

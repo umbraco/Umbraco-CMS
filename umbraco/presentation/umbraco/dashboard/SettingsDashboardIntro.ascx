@@ -4,7 +4,7 @@
 <div class="dashboardWrapper">
     <h2>
         Start here</h2>
-    <img src="/umbraco/dashboard/images/logo32x32.png" alt="Umbraco" class="dashboardIcon" />
+    <img src="./dashboard/images/logo32x32.png" alt="Umbraco" class="dashboardIcon" />
     <h3>
         This section contains the building blocks for your Umbraco site</h3>
     <p>

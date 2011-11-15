@@ -42,6 +42,9 @@
     <Reference Include="Examine, Version=0.10.0.292, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\foreign dlls\Examine.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.3.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\foreign dlls\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="Lucene.Net, Version=2.9.2.2, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\foreign dlls\Lucene.Net.dll</HintPath>
     </Reference>

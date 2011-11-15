@@ -21,7 +21,7 @@ namespace umbraco.cms.businesslogic.Tags
             TagCaption = tag;
             Group = group;
             NodeCount = nodeCount;
-        } 
+        }
         #endregion
 
         #region Public Properties
@@ -47,7 +47,7 @@ namespace umbraco.cms.businesslogic.Tags
             set;
         }
 
-        #endregion 
+        #endregion
         #endregion
 
 
@@ -69,12 +69,74 @@ namespace umbraco.cms.businesslogic.Tags
                 if (id == 0)
                     id = AddTag(allTags[i], group);
 
-                SqlHelper.ExecuteNonQuery("if not exists(select nodeId from cmsTagRelationShip where nodeId = @nodeId and tagId = @tagId) INSERT INTO cmsTagRelationShip(nodeId,tagId) VALUES (@nodeId, @tagId)",
-                        SqlHelper.CreateParameter("@nodeId", nodeId),
-                        SqlHelper.CreateParameter("@tagId", id)
-                    );
+                //GE 2011-10-31
+                //if not exists is not supported on SQLCE
+                //SqlHelper.ExecuteNonQuery("if not exists(select nodeId from cmsTagRelationShip where nodeId = @nodeId and tagId = @tagId) INSERT INTO cmsTagRelationShip(nodeId,tagId) VALUES (@nodeId, @tagId)",
+                //        SqlHelper.CreateParameter("@nodeId", nodeId),
+                //        SqlHelper.CreateParameter("@tagId", id)
+                //    );
+
+                //Perform a subselect insert into cmsTagRelationship using a left outer join to perform the if not exists check
+                string sql = "insert into cmsTagRelationship (nodeId,tagId) select " + string.Format("{0}", nodeId) + ", " + string.Format("{0}", id) + " from cmsTags ";
+                //sorry, gotta do this, @params not supported in join clause
+                sql += "left outer join cmsTagRelationship on (cmsTags.id = cmsTagRelationship.TagId and cmsTagRelatifonship.nodeId = " + string.Format("{0}", nodeId) + ") ";
+                sql += "where cmsTagRelationship.tagId is null and cmsTags.id = " + string.Format("{0}", id);
+
+                SqlHelper.ExecuteNonQuery(sql);
+
 
             }
+
+        }
+
+        public static void MergeTagsToNode(int nodeId, string tags, string group)
+        {
+            //GE 2011-11-01
+            //When you have a new CSV list of tags (e.g. from control) and want to push those to the DB, the only way to do this
+            //is delete all the existing tags and add the new ones. 
+            //On a lot of tags, or a very full cmsTagRelationship table, this will perform too slowly
+
+            string sql = null;
+            string TagSet = GetSqlSet(tags, group);
+
+            //deletes any tags not found in csv
+            sql = "delete from cmsTagRelationship where nodeId = " + string.Format("{0}", nodeId) + " ";
+            sql += " and tagId in ( ";
+            sql += "     select cmsTagRelationship.tagId ";
+            sql += " from ";
+            sql += " cmsTagRelationship ";
+            sql += " left outer join ";
+            sql += " (";
+            sql += " select NewTags.Id from ";
+            sql += " " + TagSet + " ";
+            sql += " inner join cmsTags as NewTags on (TagSet.Tag = NewTags.Tag and TagSet.[Group] = TagSet.[Group]) ";
+            sql += " ) as NewTagsSet ";
+            sql += " on (cmsTagRelationship.TagId = NewTagsSet.Id and cmsTagRelationship.NodeId = " + string.Format("{0}", nodeId) + ") ";
+            sql += " inner join  cmsTags as OldTags on (cmsTagRelationship.tagId = OldTags.Id) ";
+            sql += " where NewTagsSet.Id is null ";
+            sql += " )";
+            SqlHelper.ExecuteNonQuery(sql);
+
+            //adds any tags found in csv that aren't in cmsTag for that group
+            sql = "insert into cmsTags (Tag,[Group]) ";
+            sql += " select TagSet.[Tag], TagSet.[Group] from ";
+            sql += " " + TagSet + " ";
+            sql += " left outer join cmsTags on (TagSet.Tag = cmsTags.Tag and TagSet.[Group] = cmsTags.[Group])";
+            sql += " where cmsTags.Id is null ";
+            SqlHelper.ExecuteNonQuery(sql);
+
+            //adds any tags found in csv that aren't in tagrelationships
+            sql = "insert into cmsTagRelationship (TagId,NodeId) ";
+            sql += "select NewTagsSet.Id, " + string.Format("{0}", nodeId) + " from  ";
+            sql += "( ";
+            sql += "select NewTags.Id from  ";
+            sql += " " + TagSet + " ";
+            sql += "inner join cmsTags as NewTags on (TagSet.Tag = NewTags.Tag and TagSet.[Group] = TagSet.[Group]) ";
+            sql += ") as NewTagsSet ";
+            sql += "left outer join cmsTagRelationship ";
+            sql += "on (cmsTagRelationship.TagId = NewTagsSet.Id and cmsTagRelationship.NodeId = " + string.Format("{0}", nodeId) + ") ";
+            sql += "where cmsTagRelationship.tagId is null ";
+            SqlHelper.ExecuteNonQuery(sql);
 
         }
 
@@ -158,7 +220,7 @@ namespace umbraco.cms.businesslogic.Tags
                   WHERE cmsTags.[group] = @group AND cmsTagRelationship.nodeid = @nodeid
                   GROUP BY cmsTags.id, cmsTags.tag, cmsTags.[group]";
 
-            return ConvertSqlToTags(sql, 
+            return ConvertSqlToTags(sql,
                 SqlHelper.CreateParameter("@group", group),
                 SqlHelper.CreateParameter("@nodeid", nodeId));
 
@@ -241,7 +303,7 @@ namespace umbraco.cms.businesslogic.Tags
         public static IEnumerable<CMSNode> GetNodesWithTags(string tags)
         {
             var nodes = new List<CMSNode>();
-            
+
             string sql = @"SELECT DISTINCT cmsTagRelationShip.nodeid from cmsTagRelationShip
                             INNER JOIN cmsTags ON cmsTagRelationShip.tagid = cmsTags.id WHERE (cmsTags.tag IN (" + GetSqlStringArray(tags) + "))";
             using (IRecordsReader rr = SqlHelper.ExecuteReader(sql))
@@ -253,7 +315,12 @@ namespace umbraco.cms.businesslogic.Tags
             }
             return nodes;
         }
-
+        private static string GetSqlSet(string commaSeparatedArray, string group)
+        {
+            // create array
+            var array = commaSeparatedArray.Trim().Split(',').ToList().ConvertAll(tag => string.Format("select '{0}' as Tag, '{1}' as [Group]", tag.Replace("'", ""), group)).ToArray();
+            return "(" + string.Join(" union ", array).Replace("  ", " ") + ") as TagSet";
+        }
         private static string GetSqlStringArray(string commaSeparatedArray)
         {
             // create array
@@ -291,7 +358,7 @@ namespace umbraco.cms.businesslogic.Tags
                 }
             }
 
-            
+
             return tags;
         }
 

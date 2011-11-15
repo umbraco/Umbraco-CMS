@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -346,7 +347,7 @@ namespace umbraco.presentation.webservices
                                           SystemDirectories.Scripts);
                 // validate extension
                 IOHelper.ValidateFileExtension(IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename),
-                                               new List<string>() { "js" });
+                                               UmbracoSettings.ScriptFileTypes.Split(',').ToList());
 
 
                 string val = contents;

@@ -15,6 +15,10 @@ namespace umbraco.MacroEngines
     public class DynamicNodeList : DynamicObject, IEnumerable
     {
         public List<DynamicNode> Items;
+        public List<DynamicNode> get_Items()
+        {
+            return Items;
+        }
 
         public DynamicNodeList()
         {
@@ -309,7 +313,7 @@ namespace umbraco.MacroEngines
             object firstItem = query.FirstOrDefault();
             if (firstItem == null)
             {
-                result = new DynamicNull();
+                result = new List<object>();
             }
             else
             {

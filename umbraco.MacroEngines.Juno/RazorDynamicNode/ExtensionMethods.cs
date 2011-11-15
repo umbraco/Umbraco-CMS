@@ -13,13 +13,22 @@ namespace umbraco.MacroEngines
             Func<TSource, bool> selectorFunction,
             Func<TSource, IEnumerable<TSource>> getChildrenFunction)
         {
+            if (source.Count() == 0)
+            {
+                return source;
+            }
             // Add what we have to the stack   
             var flattenedList = source.Where(selectorFunction);
             // Go through the input enumerable looking for children,   
             // and add those if we have them   
             foreach (TSource element in source)
             {
-                flattenedList = flattenedList.Concat(getChildrenFunction(element).Map(selectorFunction, getChildrenFunction));
+                var secondInner = getChildrenFunction(element);
+                if (secondInner.Count() > 0)
+                {
+                    secondInner = secondInner.Map(selectorFunction, getChildrenFunction);
+                }
+                flattenedList = flattenedList.Concat(secondInner);
             }
             return flattenedList;
         }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 using System.Dynamic;
+using System.Web;
 
 namespace umbraco.MacroEngines
 {
@@ -12,7 +13,7 @@ namespace umbraco.MacroEngines
     //Because it's IEnumerable, if the user is actually trying @Model.TextPages or similar
     //it will still return an enumerable object (assuming the call actually failed because there were no children of that type)
     //but in .Where, if they use a property that doesn't exist, the lambda will bypass this and return false
-    public class DynamicNull : DynamicObject, IEnumerable
+    public class DynamicNull : DynamicObject, IEnumerable, IHtmlString
     {
         public IEnumerator GetEnumerator()
         {
@@ -57,6 +58,21 @@ namespace umbraco.MacroEngines
         {
             return false;
         }
+        public string Name
+        {
+            get
+            {
+                return string.Empty;
+            }
+        }
+        public int Id
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
         public static implicit operator bool(DynamicNull n)
         {
             return false;
@@ -64,6 +80,19 @@ namespace umbraco.MacroEngines
         public static implicit operator DateTime(DynamicNull n)
         {
             return DateTime.MinValue;
+        }
+        public static implicit operator int(DynamicNull n)
+        {
+            return 0;
+        }
+        public static implicit operator string(DynamicNull n)
+        {
+            return string.Empty;
+        }
+
+        public string ToHtmlString()
+        {
+            return string.Empty;
         }
 
     }

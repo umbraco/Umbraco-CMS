@@ -45,7 +45,8 @@ namespace umbraco.BusinessLogic.Utils
 
             AppDomain sandbox = AppDomain.CurrentDomain;
 
-            if ((!GlobalSettings.UseMediumTrust) && (GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium))
+            if (TypeFinder.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted
+                )
             {
                 AppDomainSetup domainSetup = new AppDomainSetup();
                 domainSetup.ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
@@ -78,7 +79,7 @@ namespace umbraco.BusinessLogic.Utils
             }
             finally
             {
-                if ((!GlobalSettings.UseMediumTrust) && (GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium))
+                if (TypeFinder.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
                 {
                     AppDomain.Unload(sandbox);
                 }
