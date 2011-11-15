@@ -1659,6 +1659,15 @@
     </Compile>
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
+    <Content Include="umbraco_client\tinymce3\plugins\media\moxieplayer.swf" />
+    <Content Include="umbraco_client\tinymce3\themes\umbraco\img\flash.gif" />
+    <Content Include="umbraco_client\tinymce3\themes\umbraco\img\iframe.gif" />
+    <Content Include="umbraco_client\tinymce3\themes\umbraco\img\quicktime.gif" />
+    <Content Include="umbraco_client\tinymce3\themes\umbraco\img\realmedia.gif" />
+    <Content Include="umbraco_client\tinymce3\themes\umbraco\img\shockwave.gif" />
+    <Content Include="umbraco_client\tinymce3\themes\umbraco\img\trans.gif" />
+    <Content Include="umbraco_client\tinymce3\themes\umbraco\img\video.gif" />
+    <Content Include="umbraco_client\tinymce3\themes\umbraco\img\windowsmedia.gif" />
     <Content Include="web.config.ssaodsk01.xslt" />
     <Content Include="umbraco\dashboard\DesktopMediaUploader.ascx" />
     <Content Include="umbraco\dashboard\images\dmu-badge.jpg" />
@@ -1794,17 +1803,9 @@
     <Content Include="umbraco_client\tinymce3\plugins\layer\editor_plugin_src.js" />
     <Content Include="umbraco_client\tinymce3\plugins\legacyoutput\editor_plugin.js" />
     <Content Include="umbraco_client\tinymce3\plugins\legacyoutput\editor_plugin_src.js" />
-    <Content Include="umbraco_client\tinymce3\plugins\media\css\content.css" />
     <Content Include="umbraco_client\tinymce3\plugins\media\css\media.css" />
     <Content Include="umbraco_client\tinymce3\plugins\media\editor_plugin.js" />
     <Content Include="umbraco_client\tinymce3\plugins\media\editor_plugin_src.js" />
-    <Content Include="umbraco_client\tinymce3\plugins\media\img\flash.gif" />
-    <Content Include="umbraco_client\tinymce3\plugins\media\img\flv_player.swf" />
-    <Content Include="umbraco_client\tinymce3\plugins\media\img\quicktime.gif" />
-    <Content Include="umbraco_client\tinymce3\plugins\media\img\realmedia.gif" />
-    <Content Include="umbraco_client\tinymce3\plugins\media\img\shockwave.gif" />
-    <Content Include="umbraco_client\tinymce3\plugins\media\img\trans.gif" />
-    <Content Include="umbraco_client\tinymce3\plugins\media\img\windowsmedia.gif" />
     <Content Include="umbraco_client\tinymce3\plugins\media\js\embed.js" />
     <Content Include="umbraco_client\tinymce3\plugins\media\js\media.js" />
     <Content Include="umbraco_client\tinymce3\plugins\media\langs\da_dlg.js" />
