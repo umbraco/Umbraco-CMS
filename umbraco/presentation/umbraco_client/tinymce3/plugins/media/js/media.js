@@ -125,9 +125,7 @@
         },
 
         preview: function () {
-            //preview currently disabled because of js error
-
-            //get('prev').innerHTML = this.editor.plugins.media.dataToHtml(this.data, true);
+            get('prev').innerHTML = this.editor.plugins.media.dataToHtml(this.data, true);
         },
 
         moveStates: function (to_form, field) {
@@ -302,8 +300,8 @@
                     data.width = 425;
                     data.height = 350;
                     data.params.frameborder = '0';
-                     data.type = 'flash';
-                    src = 'http://www.youtube.com/v/' + src.match(/youtu.be\/([a-z1-9.-_]+)/)[1];
+                    data.type = 'iframe';
+                    src = 'http://www.youtube.com/embed/' + src.match(/youtu.be\/([a-z1-9.-_]+)/)[1];
                     setVal('src', src);
                     setVal('media_type', data.type);
                 }
@@ -313,8 +311,8 @@
                     data.width = 425;
                     data.height = 350;
                     data.params.frameborder = '0';
-                    data.type = 'flash';
-                    src = 'http://www.youtube.com/v/' + src.match(/v=([^&]+)/)[1];
+                    data.type = 'iframe';
+                    src = 'http://www.youtube.com/embed/' + src.match(/v=([^&]+)/)[1];
                     setVal('src', src);
                     setVal('media_type', data.type);
                 }
