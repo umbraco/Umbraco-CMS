@@ -63,7 +63,7 @@ namespace umbraco.editorControls.macrocontainer
         // with  _macroSelectDropdown.Items.Add(new ListItem(GetMacroNameFromAlias(item), item));
         private string GetMacroNameFromAlias(string alias)
         {
-            var macro = umbraco.macro.ReturnFromAlias(alias);
+            var macro = umbraco.macro.GetMacro(alias);
 
             return macro == null ? string.Empty : macro.Name;
         }

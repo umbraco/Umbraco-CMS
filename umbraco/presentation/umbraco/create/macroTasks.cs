@@ -56,15 +56,8 @@ namespace umbraco
 
         public bool Delete()
         {
-            // Release cache
-            System.Web.Caching.Cache macroCache = System.Web.HttpRuntime.Cache;
-            if (macroCache["umbMacro" + ParentID.ToString()] != null)
-            {
-                macroCache.Remove("umbMacro" + ParentID.ToString());
-            }
-
             // Clear cache!
-            macro.ClearAliasCache();
+            macro.GetMacro(ParentID).removeFromCache();
             new cms.businesslogic.macro.Macro(ParentID).Delete();
             return true;
         }

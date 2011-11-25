@@ -341,9 +341,7 @@
     <Compile Include="library.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="macro.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="macro.cs" />
     <Compile Include="page.cs">
       <SubType>Code</SubType>
     </Compile>

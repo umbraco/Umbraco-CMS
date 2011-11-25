@@ -179,6 +179,14 @@ namespace umbraco.presentation
             }
         }
 
+        public virtual TraceContext Trace
+        {
+            get
+            {
+                return this.m_HttpContext.Trace;
+            }
+        }
+
         /// <summary>
         /// Gets the request for the current context
         /// </summary>
