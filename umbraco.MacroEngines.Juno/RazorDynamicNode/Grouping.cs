@@ -14,14 +14,15 @@ namespace umbraco.MacroEngines
 
         public IEnumerator<T> GetEnumerator()
         {
-            return Elements.GetEnumerator();
+            DynamicNodeList temp = new DynamicNodeList(Elements.Cast<DynamicNode>());
+            return (IEnumerator<T>)temp.GetEnumerator();
         }
         IEnumerator IEnumerable.GetEnumerator()
         {
             return (IEnumerator)GetEnumerator();
         }
 
-        public IOrderedEnumerable<T> OrderBy(string ordering)
+        public DynamicNodeList OrderBy(string ordering)
         {
             bool descending = false;
             if (ordering.IndexOf(" descending", StringComparison.CurrentCultureIgnoreCase) >= 0)
@@ -37,21 +38,21 @@ namespace umbraco.MacroEngines
 
             if (!descending)
             {
-                return Elements.OrderBy(item =>
+                return new DynamicNodeList(Elements.OrderBy(item =>
                 {
                     object key = null;
                     (item as DynamicObject).TryGetMember(new DynamicQueryableGetMemberBinder(ordering, false), out key);
                     return key;
-                });
+                }).Cast<DynamicNode>());
             }
             else
             {
-                return Elements.OrderByDescending(item =>
+                return new DynamicNodeList(Elements.OrderByDescending(item =>
                 {
                     object key = null;
                     (item as DynamicObject).TryGetMember(new DynamicQueryableGetMemberBinder(ordering, false), out key);
                     return key;
-                });
+                }).Cast<DynamicNode>());
             }
         }
     }

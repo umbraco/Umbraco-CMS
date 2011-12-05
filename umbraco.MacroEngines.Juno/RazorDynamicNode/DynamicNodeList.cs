@@ -30,6 +30,12 @@ namespace umbraco.MacroEngines
             list.ForEach(node => node.ownerList = this);
             Items = list;
         }
+        public DynamicNodeList(IOrderedEnumerable<DynamicNode> items)
+        {
+            List<DynamicNode> list = items.ToList();
+            list.ForEach(node => node.ownerList = this);
+            Items = list;
+        }
         public DynamicNodeList(IEnumerable<DynamicBackingItem> items)
         {
             List<DynamicNode> list = items.ToList().ConvertAll(n => new DynamicNode(n));
