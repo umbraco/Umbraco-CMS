@@ -146,22 +146,22 @@ namespace umbraco.presentation.templateControls
 
             if ((!String.IsNullOrEmpty(Language) && Text != "") || !string.IsNullOrEmpty(FileLocation)) {
                 var tempMacro = new macro();
-                var model = tempMacro.ConvertToMacroModel(MacroAttributes);
+                tempMacro.GenerateMacroModelPropertiesFromAttributes(MacroAttributes);
                 if (string.IsNullOrEmpty(FileLocation)) {
-                    model.ScriptCode = Text;
-                    model.ScriptLanguage = Language;
+                    tempMacro.Model.ScriptCode = Text;
+                    tempMacro.Model.ScriptLanguage = Language;
                 } else {
-                    model.ScriptName = FileLocation;
+                    tempMacro.Model.ScriptName = FileLocation;
                 }
-                model.MacroType = MacroTypes.Script;
+                tempMacro.Model.MacroType = MacroTypes.Script;
                 if (!String.IsNullOrEmpty(Attributes["Cache"])) {
                     var cacheDuration = 0;
                     if (int.TryParse(Attributes["Cache"], out cacheDuration))
-                        model.CacheDuration = cacheDuration;
+                        tempMacro.Model.CacheDuration = cacheDuration;
                     else
                         System.Web.HttpContext.Current.Trace.Warn("Template", "Cache attribute is in incorect format (should be an integer).");
                 }
-                var c = tempMacro.renderMacro(model, (Hashtable)Context.Items["pageElements"], pageId);
+                var c = tempMacro.renderMacro((Hashtable)Context.Items["pageElements"], pageId);
                 if (c != null)
                 {
                     Exceptions = tempMacro.Exceptions;
@@ -172,7 +172,7 @@ namespace umbraco.presentation.templateControls
                     System.Web.HttpContext.Current.Trace.Warn("Template", "Result of inline macro scripting is null");
             
             } else {
-                var tempMacro = macro.ReturnFromAlias(Alias);
+                var tempMacro = macro.GetMacro(Alias);
                 if (tempMacro != null) {
                     try {
                         var c = tempMacro.renderMacro(MacroAttributes, (Hashtable)Context.Items["pageElements"], pageId);

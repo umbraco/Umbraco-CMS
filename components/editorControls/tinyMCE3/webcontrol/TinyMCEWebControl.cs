@@ -472,7 +472,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                     // Insert macro contents here...
                     macro m;
                     if (helper.FindAttribute(attributes, "macroID") != "")
-                        m = new macro(int.Parse(helper.FindAttribute(attributes, "macroID")));
+                        m = macro.GetMacro(int.Parse(helper.FindAttribute(attributes, "macroID")));
                     else
                     {
                         // legacy: Check if the macroAlias is typed in lowercasing
@@ -485,7 +485,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                         }
 
                         if (macroAlias != "")
-                            m = new macro(Macro.GetByAlias(macroAlias).Id);
+                            m = macro.GetMacro(macroAlias);
                         else
                             throw new ArgumentException("umbraco is unable to identify the macro. No id or macroalias was provided for the macro in the macro tag.", tag.Groups[1].Value);
                     }

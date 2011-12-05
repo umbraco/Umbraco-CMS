@@ -279,7 +279,7 @@ namespace umbraco
                             if (macroID != String.Empty)
                                 tempMacro = getMacro(macroID);
                             else
-                                tempMacro = macro.ReturnFromAlias(helper.FindAttribute(attributes, "macroalias"));
+                                tempMacro = macro.GetMacro(helper.FindAttribute(attributes, "macroalias"));
 
                             if (tempMacro != null)
                             {
@@ -460,7 +460,7 @@ namespace umbraco
         private macro getMacro(String macroID)
         {
             System.Web.HttpContext.Current.Trace.Write("umbracoTemplate", "Starting macro (" + macroID.ToString() + ")");
-            return new macro(Convert.ToInt16(macroID));
+            return macro.GetMacro(Convert.ToInt16(macroID));
         }
 
         private String FindAttribute(Hashtable attributes, String key)

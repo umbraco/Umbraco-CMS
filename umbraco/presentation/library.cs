@@ -2244,6 +2244,12 @@ namespace umbraco
                     if (cultureErrorNode != null && cultureErrorNode.FirstChild != null)
                         error404 = cultureErrorNode.FirstChild.Value;
                 }
+                else if(error404Node.SelectSingleNode(string.Format("errorPage [@culture = '{0}']",System.Threading.Thread.CurrentThread.CurrentUICulture.Name)) != null)
+                {
+                    cultureErrorNode = error404Node.SelectSingleNode(string.Format("errorPage [@culture = '{0}']", System.Threading.Thread.CurrentThread.CurrentUICulture.Name));
+                    if(cultureErrorNode.FirstChild != null)
+                        error404 = cultureErrorNode.FirstChild.Value;
+                }
                 else
                 {
                     cultureErrorNode = error404Node.SelectSingleNode("errorPage [@culture = 'default']");

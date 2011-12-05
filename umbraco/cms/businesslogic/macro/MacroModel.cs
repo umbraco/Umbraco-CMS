@@ -10,6 +10,7 @@ namespace umbraco.cms.businesslogic.macro
     [Serializable]
     public class MacroModel
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Alias { get; set; }
         public string MacroControlIdentifier { get; set; }
@@ -25,6 +26,9 @@ namespace umbraco.cms.businesslogic.macro
         public int CacheDuration { get; set; }
         public bool CacheByPage { get; set; }
         public bool CacheByMember { get; set; }
+
+        public bool RenderInEditor { get; set; }
+
         public string CacheIdentifier { get; set; }
 
         public List<MacroPropertyModel> Properties { get; set; }
@@ -32,6 +36,32 @@ namespace umbraco.cms.businesslogic.macro
         public MacroModel()
         {
             Properties = new List<MacroPropertyModel>();
+        }
+
+        public MacroModel(Macro m)
+        {
+            Id = m.Id;
+            Name = m.Name;
+            Alias = m.Alias;
+            TypeAssembly = m.Assembly;
+            TypeName = m.Type;
+            Xslt = m.Xslt;
+            ScriptName = m.ScriptingFile;
+            CacheDuration = m.RefreshRate;
+            CacheByPage = m.CacheByPage;
+            CacheByMember = m.CachePersonalized;
+            RenderInEditor = m.RenderContent;
+
+            Properties = new List<MacroPropertyModel>();
+
+            foreach (MacroProperty mp in m.Properties)
+            {
+                Properties.Add(
+                    new MacroPropertyModel(mp.Alias, string.Empty, mp.Type.Alias, mp.Type.BaseType));
+            }
+
+            MacroType = Macro.FindMacroType(Xslt, ScriptName, TypeName, TypeAssembly);
+            
         }
 
         public MacroModel(string name, string alias, string typeAssembly, string typeName, string xslt, string scriptName, int cacheDuration, bool cacheByPage, bool cacheByMember)
@@ -57,7 +87,8 @@ namespace umbraco.cms.businesslogic.macro
     {
         public string Key { get; set; }
         public string Value { get; set; }
-
+        public string Type { get; set; }
+        public string CLRType { get; set; }
         public MacroPropertyModel()
         {
 
@@ -67,6 +98,14 @@ namespace umbraco.cms.businesslogic.macro
         {
             Key = key;
             Value = value;
+        }
+
+        public MacroPropertyModel(string key, string value, string type, string clrType)
+        {
+            Key = key;
+            Value = value;
+            Type = type;
+            CLRType = clrType;
         }
     }
 

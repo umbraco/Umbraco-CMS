@@ -182,7 +182,7 @@ namespace umbraco.presentation.tinymce3
             Hashtable attributes = new Hashtable();
             attributes.Add("macroAlias", m.Alias);
 
-            macro mRender = new macro(m.Id);
+            macro mRender = macro.GetMacro(m.Id);
             foreach (Control c in _dataFields)
             {
                 try

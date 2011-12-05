@@ -14,4 +14,10 @@ namespace umbraco.cms.businesslogic.macro
         bool Validate(string code, string tempFileName, INode currentPage, out string errorMessage);
         string Execute(MacroModel macro, INode currentPage);
     }
+
+    public interface IMacroEngineResultStatus
+    {
+        bool Success { get; }
+        Exception ResultException { get; }
+    }
 }

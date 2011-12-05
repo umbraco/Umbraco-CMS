@@ -149,7 +149,7 @@ namespace umbraco.cms.presentation.developer
                         new Guid("7B1E683C-5F34-43dd-803D-9699EA1E98CA"),
                         macroID);
                 else
-                    new macro(macroID).removeFromCache();
+                    macro.GetMacro(macroID).removeFromCache();
 
                 // Check for assemblyBrowser
                 if (tempMacroType.IndexOf(".ascx") > 0)
