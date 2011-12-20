@@ -119,7 +119,7 @@ namespace umbraco
 
         public int MacroType
         {
-            get { return (int) Model.MacroType; }
+            get { return (int)Model.MacroType; }
         }
 
         public String MacroContent
@@ -302,7 +302,7 @@ namespace umbraco
                     object macroCacheContent = macroCache["macroControl_" + Model.CacheIdentifier];
                     if (macroCacheContent != null)
                     {
-                        var cacheContent = (MacroCacheContent) macroCacheContent;
+                        var cacheContent = (MacroCacheContent)macroCacheContent;
                         macroControl = cacheContent.Content;
                         macroControl.ID = cacheContent.ID;
                         UmbracoContext.Current.Trace.Write("renderMacro",
@@ -315,10 +315,10 @@ namespace umbraco
             if (String.IsNullOrEmpty(macroHtml) && macroControl == null)
             {
                 bool renderFailed = false;
-                int macroType = Model.MacroType != MacroTypes.Unknown ? (int) Model.MacroType : MacroType;
+                int macroType = Model.MacroType != MacroTypes.Unknown ? (int)Model.MacroType : MacroType;
                 switch (macroType)
                 {
-                    case (int) MacroTypes.UserControl:
+                    case (int)MacroTypes.UserControl:
                         try
                         {
                             UmbracoContext.Current.Trace.Write("umbracoMacro",
@@ -335,7 +335,7 @@ namespace umbraco
                             macroControl = new LiteralControl("Error loading userControl '" + Model.TypeName + "'");
                             break;
                         }
-                    case (int) MacroTypes.CustomControl:
+                    case (int)MacroTypes.CustomControl:
                         try
                         {
                             UmbracoContext.Current.Trace.Write("umbracoMacro",
@@ -359,10 +359,10 @@ namespace umbraco
                                                    Model.TypeName + "'");
                             break;
                         }
-                    case (int) MacroTypes.XSLT:
+                    case (int)MacroTypes.XSLT:
                         macroControl = loadMacroXSLT(this, Model, pageElements);
                         break;
-                    case (int) MacroTypes.Script:
+                    case (int)MacroTypes.Script:
                         try
                         {
                             UmbracoContext.Current.Trace.Write("umbracoMacro",
@@ -473,7 +473,7 @@ namespace umbraco
         {
             if (HttpRuntime.Cache["macroXslt_" + XsltFile] != null)
             {
-                return (XslCompiledTransform) HttpRuntime.Cache["macroXslt_" + XsltFile];
+                return (XslCompiledTransform)HttpRuntime.Cache["macroXslt_" + XsltFile];
             }
             else
             {
@@ -786,9 +786,9 @@ namespace umbraco
             //also get types marked with XsltExtension attribute
 
             // zb-00042 #29949 : do not hide errors, refactor
-            foreach (Type xsltType in TypeFinder.FindClassesMarkedWithAttribute(typeof (XsltExtensionAttribute)))
+            foreach (Type xsltType in TypeFinder.FindClassesMarkedWithAttribute(typeof(XsltExtensionAttribute)))
             {
-                object[] tpAttributes = xsltType.GetCustomAttributes(typeof (XsltExtensionAttribute), true);
+                object[] tpAttributes = xsltType.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
                 foreach (XsltExtensionAttribute tpAttribute in tpAttributes)
                 {
                     string ns = !string.IsNullOrEmpty(tpAttribute.Namespace) ? tpAttribute.Namespace : xsltType.FullName;
@@ -856,7 +856,7 @@ namespace umbraco
             // If no value is passed, then use the current pageID as value
             if (macroPropertyValue == string.Empty)
             {
-                var umbPage = (page) HttpContext.Current.Items["umbPageObject"];
+                var umbPage = (page)HttpContext.Current.Items["umbPageObject"];
                 if (umbPage == null)
                     return;
                 currentID = umbPage.PageID;
@@ -1083,7 +1083,7 @@ namespace umbraco
 
                 object propValue = mp.Value;
                 // Special case for types of webControls.unit
-                if (prop.PropertyType == typeof (Unit))
+                if (prop.PropertyType == typeof(Unit))
                     propValue = Unit.Parse(propValue.ToString());
                 else
                 {
@@ -1091,10 +1091,10 @@ namespace umbraco
                     {
                         if (mp.CLRType == null)
                             continue;
-                        var st = (TypeCode) Enum.Parse(typeof (TypeCode), mp.CLRType, true);
+                        var st = (TypeCode)Enum.Parse(typeof(TypeCode), mp.CLRType, true);
 
                         // Special case for booleans
-                        if (prop.PropertyType == typeof (bool))
+                        if (prop.PropertyType == typeof(bool))
                         {
                             bool parseResult;
                             if (
@@ -1106,7 +1106,35 @@ namespace umbraco
                                 propValue = false;
                         }
                         else
-                            propValue = Convert.ChangeType(propValue, st);
+                        {
+                            string sPropValue = string.Format("{0}", propValue);
+                            Type propType = prop.PropertyType;
+                            if (!string.IsNullOrWhiteSpace(sPropValue))
+                            {
+                                try
+                                {
+                                    propValue = Convert.ChangeType(propValue, st);
+                                }
+                                catch (FormatException)
+                                {
+                                    propValue = Convert.ChangeType(propValue, propType);
+                                }
+                            }
+                            else
+                            {
+                                if (propType != null)
+                                {
+                                    if (propType.IsValueType)
+                                    {
+                                        propValue = Activator.CreateInstance(propType);
+                                    }
+                                    else
+                                    {
+                                        propValue = null;
+                                    }
+                                }
+                            }
+                        }
 
                         if (GlobalSettings.DebugMode)
                             UmbracoContext.Current.Trace.Write("macro.loadControlProperties",
@@ -1149,7 +1177,7 @@ namespace umbraco
                 if (!File.Exists(IOHelper.MapPath(userControlPath)))
                     return new LiteralControl(string.Format("UserControl {0} does not exist.", fileName));
 
-                var oControl = (UserControl) new UserControl().LoadControl(userControlPath);
+                var oControl = (UserControl)new UserControl().LoadControl(userControlPath);
 
                 int slashIndex = fileName.LastIndexOf("/") + 1;
                 if (slashIndex < 0)
@@ -1190,13 +1218,13 @@ namespace umbraco
         {
             PropertyInfo currentNodeProperty = type.GetProperty("CurrentNode");
             if (currentNodeProperty != null && currentNodeProperty.CanWrite &&
-                currentNodeProperty.PropertyType.IsAssignableFrom(typeof (Node)))
+                currentNodeProperty.PropertyType.IsAssignableFrom(typeof(Node)))
             {
                 currentNodeProperty.SetValue(control, Node.GetCurrent(), null);
             }
             currentNodeProperty = type.GetProperty("currentNode");
             if (currentNodeProperty != null && currentNodeProperty.CanWrite &&
-                currentNodeProperty.PropertyType.IsAssignableFrom(typeof (Node)))
+                currentNodeProperty.PropertyType.IsAssignableFrom(typeof(Node)))
             {
                 currentNodeProperty.SetValue(control, Node.GetCurrent(), null);
             }
@@ -1294,7 +1322,7 @@ namespace umbraco
                                            HttpContext.Current.Request.ServerVariables["SERVER_PORT"],
                                            IOHelper.ResolveUrl(SystemDirectories.Umbraco), querystring);
 
-                var myHttpWebRequest = (HttpWebRequest) WebRequest.Create(url);
+                var myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
 
                 // allows for validation of SSL conversations (to bypass SSL errors in debug mode!)
                 ServicePointManager.ServerCertificateValidationCallback += ValidateRemoteCertificate;
@@ -1311,7 +1339,7 @@ namespace umbraco
                 HttpWebResponse myHttpWebResponse = null;
                 try
                 {
-                    myHttpWebResponse = (HttpWebResponse) myHttpWebRequest.GetResponse();
+                    myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
                     if (myHttpWebResponse.StatusCode == HttpStatusCode.OK)
                     {
                         Stream streamResponse = myHttpWebResponse.GetResponseStream();
