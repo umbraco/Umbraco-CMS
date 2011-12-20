@@ -230,33 +230,31 @@ namespace umbraco
             return false;
         }
 
-        private string getCacheGuid(MacroModel model, Hashtable pageElements, int pageId)
+        string GetCacheIdentifier(MacroModel model, Hashtable pageElements, int pageId)
         {
-            string tempGuid = !String.IsNullOrEmpty(model.ScriptCode)
-                                  ? Macro.GenerateCacheKeyFromCode(model.ScriptCode) + "-"
-                                  : model.Alias + "-";
+			StringBuilder id = new StringBuilder();
+
+			var alias = string.IsNullOrEmpty(model.ScriptCode) ? model.Alias : Macro.GenerateCacheKeyFromCode(model.ScriptCode);
+			id.AppendFormat("{0}-", alias);
 
             if (CacheByPage)
             {
-                tempGuid = pageId + "-";
+				id.AppendFormat("{0}-", pageId);
             }
 
             if (CacheByPersonalization)
             {
-                if (Member.GetCurrentMember() != null)
-                    tempGuid += "m" + Member.GetCurrentMember().Id + "-";
-                else
-                    tempGuid += "m";
+				var currentMember = Member.GetCurrentMember();
+				id.AppendFormat("m{0}-", currentMember == null ? 0 : currentMember.Id);
             }
-            foreach (MacroPropertyModel prop in model.Properties)
+
+			foreach (MacroPropertyModel prop in model.Properties)
             {
-                string attValue = prop.Value;
-                if (attValue.Length > 255)
-                    tempGuid += attValue.Remove(255, attValue.Length - 255) + "-";
-                else
-                    tempGuid += attValue + "-";
+                var propValue = prop.Value;
+				id.AppendFormat("{0}-", propValue.Length <= 255 ? propValue : propValue.Substring(0, 255));
             }
-            return tempGuid;
+
+			return id.ToString();
         }
 
         public Control renderMacro(Hashtable attributes, Hashtable pageElements, int pageId)
@@ -282,7 +280,7 @@ namespace umbraco
             foreach (MacroPropertyModel prop in Model.Properties)
                 prop.Value = helper.parseAttribute(pageElements, prop.Value);
 
-            Model.CacheIdentifier = getCacheGuid(Model, pageElements, pageId);
+            Model.CacheIdentifier = GetCacheIdentifier(Model, pageElements, pageId);
 
             if (Model.CacheDuration > 0)
             {
@@ -293,21 +291,20 @@ namespace umbraco
                     if (!String.IsNullOrEmpty(macroHtml))
                     {
                         UmbracoContext.Current.Trace.Write("renderMacro",
-                                                           "Macro Content loaded from cache ('" + Model.CacheIdentifier +
-                                                           "')...");
+							string.Format("Macro Content loaded from cache '{0}'.", Model.CacheIdentifier));
                     }
                 }
                 else
                 {
-                    object macroCacheContent = macroCache["macroControl_" + Model.CacheIdentifier];
-                    if (macroCacheContent != null)
+					var cacheContent = macroCache["macroControl_" + Model.CacheIdentifier] as MacroCacheContent;
+
+					if (cacheContent != null)
                     {
-                        var cacheContent = (MacroCacheContent)macroCacheContent;
                         macroControl = cacheContent.Content;
                         macroControl.ID = cacheContent.ID;
+
                         UmbracoContext.Current.Trace.Write("renderMacro",
-                                                           "Macro Control loaded from cache ('" + Model.CacheIdentifier +
-                                                           "')...");
+							string.Format("Macro Control loaded from cache '{0}'.", Model.CacheIdentifier));
                     }
                 }
             }
@@ -442,7 +439,10 @@ namespace umbraco
                                     // otherwise it is rendered twice
                                     if (!(macroControl is LiteralControl))
                                         macroControl = new LiteralControl(sw.ToString());
-                                }
+
+									UmbracoContext.Current.Trace.Write("renderMacro",
+										string.Format("Macro Content saved to cache '{0}'.", Model.CacheIdentifier));
+								}
                             }
                             else
                             {
@@ -451,7 +451,10 @@ namespace umbraco
                                                   DateTime.Now.AddSeconds(Model.CacheDuration), TimeSpan.Zero,
                                                   CacheItemPriority.Low,
                                                   null);
-                            }
+
+								UmbracoContext.Current.Trace.Write("renderMacro",
+									string.Format("Macro Control saved to cache '{0}'.", Model.CacheIdentifier));
+							}
                         }
                     }
                 }
