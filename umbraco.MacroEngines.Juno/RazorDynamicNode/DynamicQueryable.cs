@@ -2501,7 +2501,7 @@ namespace System.Linq.Dynamic
                 case ExpressionType.AndAlso:
                     if ((leftIsLambda && rightIsLambda && sequenceEqual) || (!leftIsLambda && !rightIsLambda))
                     {
-                        return Expression.Equal(left, right);
+                        return Expression.AndAlso(left, right);
                     }
                     else
                     {
