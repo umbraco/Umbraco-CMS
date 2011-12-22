@@ -124,8 +124,6 @@ namespace umbraco.editorControls.imagecropper
                     int xml_x2 = Convert.ToInt32(xmlNode.Attributes["x2"].Value);
                     int xml_y2 = Convert.ToInt32(xmlNode.Attributes["y2"].Value);
 
-                    DateTime fileDate = Convert.ToDateTime(_xml.DocumentElement.Attributes["date"].Value);
-
                     // only use xml values if image is the same and different from defaults (document is stored inbetween image upload and cropping)
                     //if (xml_x2 - xml_x != preset.TargetWidth || xml_y2 - xml_y != preset.TargetHeight)
                     //fileDate == imageInfo.DateStamp && (

@@ -26,9 +26,6 @@ namespace umbraco.cms.presentation.user
 
         protected override void OnInit(EventArgs e) {
             base.OnInit(e);
-
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(ui.Culture(User.GetCurrent()));
-            System.Threading.Thread.CurrentThread.CurrentUICulture = System.Threading.Thread.CurrentThread.CurrentCulture;
         }
 
         protected void Page_Load(object sender, EventArgs e)
