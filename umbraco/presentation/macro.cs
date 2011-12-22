@@ -364,8 +364,8 @@ namespace umbraco
                         {
                             UmbracoContext.Current.Trace.Write("umbracoMacro",
                                                                "MacroEngine script added (" + ScriptFile + ")");
-                            DLRMacroResult result = loadMacroDLR(Model);
-                            macroControl = result.Control;
+                            ScriptingMacroResult result = loadMacroScript(Model);
+                            macroControl = new LiteralControl(result.Result);
                             if (result.ResultException != null)
                             {
                                 // we'll throw the error if we run in release mode, show details if we're in release mode!
@@ -972,6 +972,43 @@ namespace umbraco
                 return string.Empty;
         }
 
+        public ScriptingMacroResult loadMacroScript(MacroModel macro)
+        {
+            var retVal = new ScriptingMacroResult();
+            TraceInfo("umbracoMacro", "Loading IMacroEngine script");
+            string ret = String.Empty;
+            IMacroEngine engine = null;
+            if (!String.IsNullOrEmpty(macro.ScriptCode))
+            {
+                engine = MacroEngineFactory.GetByExtension(macro.ScriptLanguage);
+                ret = engine.Execute(
+                    macro,
+                    Node.GetCurrent());
+            }
+            else
+            {
+                string path = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + macro.ScriptName);
+                engine = MacroEngineFactory.GetByFilename(path);
+                ret = engine.Execute(macro, Node.GetCurrent());
+            }
+
+            // if the macro engine supports success reporting and executing failed, then return an empty control so it's not cached
+            if (engine is IMacroEngineResultStatus)
+            {
+                var result = engine as IMacroEngineResultStatus;
+                if (!result.Success)
+                {
+                    retVal.ResultException = result.ResultException;
+                }
+            }
+            TraceInfo("umbracoMacro", "Loading IMacroEngine script [done]");
+            retVal.Result = ret;
+            return retVal;
+        }
+
+
+
+        [Obsolete("Replaced with loadMacroScript", true)]
         public DLRMacroResult loadMacroDLR(MacroModel macro)
         {
             var retVal = new DLRMacroResult();
@@ -1435,6 +1472,45 @@ namespace umbraco
             xslt = xslt.Replace("{1}", namespaceList.ToString());
             return xslt;
         }
+
+        [Obsolete("Please stop using these as they'll be removed in v4.8")]
+        public static bool TryGetColumnString(IRecordsReader reader, string columnName, out string value)
+        {
+            if (reader.ContainsField(columnName) && !reader.IsNull(columnName))
+            {
+                value = reader.GetString(columnName);
+                return true;
+            }
+            
+            value = string.Empty;
+            return false;
+        }
+
+        [Obsolete("Please stop using these as they'll be removed in v4.8")]
+        public static bool TryGetColumnInt32(IRecordsReader reader, string columnName, out int value)
+        {
+            if (reader.ContainsField(columnName) && !reader.IsNull(columnName))
+            {
+                value = reader.GetInt(columnName);
+                return true;
+            }
+            
+            value = -1;
+            return false;
+        }
+
+        [Obsolete("Please stop using these as they'll be removed in v4.8")]
+        public static bool TryGetColumnBool(IRecordsReader reader, string columnName, out bool value)
+        {
+            if (reader.ContainsField(columnName) && !reader.IsNull(columnName))
+            {
+                value = reader.GetBoolean(columnName);
+                return true;
+            }
+            
+            value = false;
+            return false;
+        }
     }
 
 
@@ -1532,6 +1608,23 @@ namespace umbraco
         }
     }
 
+    public class ScriptingMacroResult
+    {
+        public ScriptingMacroResult()
+        {
+        }
+
+        public ScriptingMacroResult(string result, Exception resultException)
+        {
+            Result = result;
+            ResultException = resultException;
+        }
+
+        public string Result { get; set; }
+        public Exception ResultException { get; set; }
+    }
+
+    [Obsolete("This has been replaced with ScriptingMacroResult instead")]
     public class DLRMacroResult
     {
         public DLRMacroResult()
