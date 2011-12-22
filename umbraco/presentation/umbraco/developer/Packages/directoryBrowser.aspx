@@ -32,8 +32,6 @@
     }
 </script>
 
- <link href="<%=umbraco.IO.SystemDirectories.Umbraco%>/css/umbracoGui.css" type="text/css" rel="stylesheet"/>
-    
     <style type="text/css">
 
 a{color:#3C6B96;}
