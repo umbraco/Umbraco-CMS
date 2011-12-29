@@ -79,8 +79,9 @@ namespace umbraco.cms.presentation.developer
             // validate extension
             IOHelper.ValidateFileExtension(file, validScriptingExtensions());
 
-            // we need to move the full path and then the preceeding slash
-            pythonFileName.Text = file.Replace(IOHelper.MapPath(SystemDirectories.MacroScripts), "").Substring(1);
+            //// we need to move the full path and then the preceeding slash
+            // The textbox only needs to show the requested file (and parentfolders)
+            pythonFileName.Text = Request.QueryString["file"];
 
             StreamReader SR;
             string S;
