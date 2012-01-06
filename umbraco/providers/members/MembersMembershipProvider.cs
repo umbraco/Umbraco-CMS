@@ -65,7 +65,7 @@ namespace umbraco.providers.members
                 if (string.IsNullOrEmpty(value))
                     throw new ProviderException("ApplicationName cannot be empty.");
 
-                if (value.Length > 0)
+                if (value.Length > 0x100)
                     throw new ProviderException("Provider application name too long.");
 
                 m_ApplicationName = value;
