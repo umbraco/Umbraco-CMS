@@ -497,7 +497,13 @@ namespace umbraco
             foreach (MacroPropertyModel mp in Model.Properties)
             {
                 if (attributes.ContainsKey(mp.Key.ToLower()))
+                {
                     mp.Value = attributes[mp.Key.ToLower()].ToString();
+                }
+                else
+                {
+                    mp.Value = string.Empty;
+                }
             }
         }
 
