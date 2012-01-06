@@ -232,29 +232,29 @@ namespace umbraco
 
         string GetCacheIdentifier(MacroModel model, Hashtable pageElements, int pageId)
         {
-			StringBuilder id = new StringBuilder();
+            StringBuilder id = new StringBuilder();
 
-			var alias = string.IsNullOrEmpty(model.ScriptCode) ? model.Alias : Macro.GenerateCacheKeyFromCode(model.ScriptCode);
-			id.AppendFormat("{0}-", alias);
+            var alias = string.IsNullOrEmpty(model.ScriptCode) ? model.Alias : Macro.GenerateCacheKeyFromCode(model.ScriptCode);
+            id.AppendFormat("{0}-", alias);
 
             if (CacheByPage)
             {
-				id.AppendFormat("{0}-", pageId);
+                id.AppendFormat("{0}-", pageId);
             }
 
             if (CacheByPersonalization)
             {
-				var currentMember = Member.GetCurrentMember();
-				id.AppendFormat("m{0}-", currentMember == null ? 0 : currentMember.Id);
+                var currentMember = Member.GetCurrentMember();
+                id.AppendFormat("m{0}-", currentMember == null ? 0 : currentMember.Id);
             }
 
-			foreach (MacroPropertyModel prop in model.Properties)
+            foreach (MacroPropertyModel prop in model.Properties)
             {
                 var propValue = prop.Value;
-				id.AppendFormat("{0}-", propValue.Length <= 255 ? propValue : propValue.Substring(0, 255));
+                id.AppendFormat("{0}-", propValue.Length <= 255 ? propValue : propValue.Substring(0, 255));
             }
 
-			return id.ToString();
+            return id.ToString();
         }
 
         public Control renderMacro(Hashtable attributes, Hashtable pageElements, int pageId)
@@ -291,20 +291,20 @@ namespace umbraco
                     if (!String.IsNullOrEmpty(macroHtml))
                     {
                         UmbracoContext.Current.Trace.Write("renderMacro",
-							string.Format("Macro Content loaded from cache '{0}'.", Model.CacheIdentifier));
+                            string.Format("Macro Content loaded from cache '{0}'.", Model.CacheIdentifier));
                     }
                 }
                 else
                 {
-					var cacheContent = macroCache["macroControl_" + Model.CacheIdentifier] as MacroCacheContent;
+                    var cacheContent = macroCache["macroControl_" + Model.CacheIdentifier] as MacroCacheContent;
 
-					if (cacheContent != null)
+                    if (cacheContent != null)
                     {
                         macroControl = cacheContent.Content;
                         macroControl.ID = cacheContent.ID;
 
                         UmbracoContext.Current.Trace.Write("renderMacro",
-							string.Format("Macro Control loaded from cache '{0}'.", Model.CacheIdentifier));
+                            string.Format("Macro Control loaded from cache '{0}'.", Model.CacheIdentifier));
                     }
                 }
             }
@@ -440,9 +440,9 @@ namespace umbraco
                                     if (!(macroControl is LiteralControl))
                                         macroControl = new LiteralControl(sw.ToString());
 
-									UmbracoContext.Current.Trace.Write("renderMacro",
-										string.Format("Macro Content saved to cache '{0}'.", Model.CacheIdentifier));
-								}
+                                    UmbracoContext.Current.Trace.Write("renderMacro",
+                                        string.Format("Macro Content saved to cache '{0}'.", Model.CacheIdentifier));
+                                }
                             }
                             else
                             {
@@ -452,9 +452,9 @@ namespace umbraco
                                                   CacheItemPriority.Low,
                                                   null);
 
-								UmbracoContext.Current.Trace.Write("renderMacro",
-									string.Format("Macro Control saved to cache '{0}'.", Model.CacheIdentifier));
-							}
+                                UmbracoContext.Current.Trace.Write("renderMacro",
+                                    string.Format("Macro Control saved to cache '{0}'.", Model.CacheIdentifier));
+                            }
                         }
                     }
                 }
@@ -1122,9 +1122,13 @@ namespace umbraco
                 }
 
                 object propValue = mp.Value;
+                bool propValueSet = false;
                 // Special case for types of webControls.unit
                 if (prop.PropertyType == typeof(Unit))
+                {
                     propValue = Unit.Parse(propValue.ToString());
+                    propValueSet = true;
+                }
                 else
                 {
                     try
@@ -1144,6 +1148,8 @@ namespace umbraco
                                 propValue = parseResult;
                             else
                                 propValue = false;
+                            propValueSet = true;
+
                         }
                         else
                         {
@@ -1154,26 +1160,29 @@ namespace umbraco
                                 try
                                 {
                                     propValue = Convert.ChangeType(propValue, st);
+                                    propValueSet = true;
                                 }
                                 catch (FormatException)
                                 {
                                     propValue = Convert.ChangeType(propValue, propType);
+                                    propValueSet = true;
                                 }
                             }
-                            else
+                            /* NH 06-01-2012: Remove the lines below as they would only get activated if the values are empty
+                        else
+                        {
+                            if (propType != null)
                             {
-                                if (propType != null)
+                                if (propType.IsValueType)
                                 {
-                                    if (propType.IsValueType)
-                                    {
-                                        propValue = Activator.CreateInstance(propType);
-                                    }
-                                    else
-                                    {
-                                        propValue = null;
-                                    }
+                                    propValue = Activator.CreateInstance(propType);
+                                }
+                                else
+                                {
+                                    propValue = null;
                                 }
                             }
+                        }*/
                         }
 
                         if (GlobalSettings.DebugMode)
@@ -1194,7 +1203,9 @@ namespace umbraco
                     }
                 }
 
-                prop.SetValue(control, Convert.ChangeType(propValue, prop.PropertyType), null);
+                // NH 06-01-2012: Only set value if it has content
+                if (propValueSet)
+                    prop.SetValue(control, Convert.ChangeType(propValue, prop.PropertyType), null);
             }
         }
 
@@ -1481,7 +1492,7 @@ namespace umbraco
                 value = reader.GetString(columnName);
                 return true;
             }
-            
+
             value = string.Empty;
             return false;
         }
@@ -1494,7 +1505,7 @@ namespace umbraco
                 value = reader.GetInt(columnName);
                 return true;
             }
-            
+
             value = -1;
             return false;
         }
@@ -1507,7 +1518,7 @@ namespace umbraco
                 value = reader.GetBoolean(columnName);
                 return true;
             }
-            
+
             value = false;
             return false;
         }
