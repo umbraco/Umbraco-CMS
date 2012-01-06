@@ -92,6 +92,8 @@ namespace umbraco
                                 break;
                             case "%":
                                 attributeValue = StateHelper.GetSessionValue<string>(keyName);
+                                if (String.IsNullOrEmpty(attributeValue))
+                                    attributeValue = StateHelper.GetCookieValue(keyName);
                                 break;
                             case "#":
                                 if (pageElements[keyName] != null)
