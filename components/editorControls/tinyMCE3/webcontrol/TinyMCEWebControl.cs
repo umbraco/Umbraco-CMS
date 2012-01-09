@@ -288,7 +288,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
             string localMediaPath = IOHelper.ResolveUrl(SystemDirectories.Media);
 
             // Find all media images
-            string pattern = String.Format("<img [^>]*src=\"(?<mediaString>{0}[^\"]*)\" [^>]*>", SystemDirectories.Media);
+            string pattern = String.Format("<img [^>]*src=\"(?<mediaString>{0}[^\"]*)\" [^>]*>", localMediaPath);
 
             MatchCollection tags =
                 Regex.Matches(html, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
