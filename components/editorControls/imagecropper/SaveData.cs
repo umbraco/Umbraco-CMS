@@ -16,7 +16,7 @@ namespace umbraco.editorControls.imagecropper
             if (root == null) return null;
 
             XmlNode dateStampNode = doc.CreateNode(XmlNodeType.Attribute, "date", null);
-            dateStampNode.Value = imageInfo.DateStamp.ToString();
+            dateStampNode.Value = imageInfo.DateStamp.ToString("s");
             root.Attributes.SetNamedItem(dateStampNode);
 
             for (int i = 0; i < data.Count; i++)
