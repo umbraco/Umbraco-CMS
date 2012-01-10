@@ -74,6 +74,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RazorCore\BaseContext.cs" />
+    <Compile Include="RazorDataTypeModels\HtmlStringDataTypeModel.cs" />
+    <Compile Include="RazorDataTypeModels\IntegerDataTypeModel.cs" />
     <Compile Include="RazorDynamicNode\DynamicBackingItem.cs" />
     <Compile Include="RazorDynamicNode\DynamicBackingItemType.cs" />
     <Compile Include="RazorDynamicNode\DynamicGrouping.cs" />
