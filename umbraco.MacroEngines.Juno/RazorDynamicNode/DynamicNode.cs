@@ -461,50 +461,58 @@ namespace umbraco.MacroEngines
                             RazorDataTypeModelTypes = null;
                         }
                     }
-                    HttpContext.Current.Trace.Write(string.Format("Checking the RazorDataTypeModelTypes cache to see if the GUID {0} has a Model...", dataType));
+                    HttpContext.Current.Trace.Write(string.Format("Checking for a RazorDataTypeModel for data type guid {0}...", dataType));
+                    HttpContext.Current.Trace.Write("Checking the RazorDataTypeModelTypes static mappings to see if there is a static mapping...");
+
+                    RazorDataTypeModelStaticMappingItem staticMapping = UmbracoSettings.RazorDataTypeModelStaticMapping.FirstOrDefault(mapping =>
+                    {
+                        return mapping.Applies(dataType, data.ContextAlias, data.Alias);
+                    });
+                    if (staticMapping != null)
+                    {
+                        HttpContext.Current.Trace.Write(string.Format("Found a staticMapping defined {0}, instantiating type and attempting to apply model...", staticMapping.Raw));
+                        Type dataTypeType = Type.GetType(staticMapping.TypeName);
+                        if (dataTypeType != null)
+                        {
+                            object instance = null;
+                            if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
+                            {
+                                result = instance;
+                                return true;
+                            }
+                            else
+                            {
+                                HttpContext.Current.Trace.Write("Failed");
+                                HttpContext.Current.Trace.Warn(string.Format("Failed to create the instance of the model binder"));
+                            }
+                        }
+                        else
+                        {
+                            HttpContext.Current.Trace.Warn(string.Format("staticMapping type name {0} came back as null from Type.GetType; check the casing, assembly presence, assembly framework version, namespace", staticMapping.TypeName));
+                        }
+                    }
+                    else
+                    {
+                        HttpContext.Current.Trace.Write(string.Format("There isn't a staticMapping defined so checking the RazorDataTypeModelTypes cache..."));
+                    }
+
+
                     if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.Where(model => model.Key.Item1 == dataType).Any() && dataType != Guid.Empty)
                     {
                         var razorDataTypeModelDefinition = RazorDataTypeModelTypes.Where(model => model.Key.Item1 == dataType).OrderByDescending(model => model.Key.Item2).FirstOrDefault();
                         if (!(razorDataTypeModelDefinition.Equals(default(KeyValuePair<System.Tuple<Guid, int>, Type>))))
                         {
                             Type dataTypeType = razorDataTypeModelDefinition.Value;
-                            HttpContext.Current.Trace.Write(string.Format("Found dataType {0} for GUID {1}", dataTypeType.FullName, dataType));
-                            IRazorDataTypeModel razorDataTypeModel = Activator.CreateInstance(dataTypeType, false) as IRazorDataTypeModel;
-                            HttpContext.Current.Trace.Write(string.Format("Instantiating {0}...", dataTypeType.FullName));
-                            if (razorDataTypeModel != null)
+                            object instance = null;
+                            if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
                             {
-                                HttpContext.Current.Trace.Write("Success");
-                                object instance = null;
-                                HttpContext.Current.Trace.Write("Calling Init on razorDataTypeModel");
-                                if (razorDataTypeModel.Init(n.Id, data.Value, out instance))
-                                {
-                                    if (instance != null)
-                                    {
-                                        HttpContext.Current.Trace.Write(string.Format("razorDataTypeModel successfully instantiated and returned a valid instance of type {0}", instance.GetType().FullName));
-                                    }
-                                    else
-                                    {
-                                        HttpContext.Current.Trace.Warn("razorDataTypeModel successfully instantiated but returned null for instance");
-                                    }
-                                    result = instance;
-                                    return true;
-                                }
-                                else
-                                {
-                                    if (instance != null)
-                                    {
-                                        HttpContext.Current.Trace.Write(string.Format("razorDataTypeModel returned false but returned a valid instance of type {0}", instance.GetType().FullName));
-                                    }
-                                    else
-                                    {
-                                        HttpContext.Current.Trace.Warn("razorDataTypeModel successfully instantiated but returned null for instance");
-                                    }
-                                }
+                                result = instance;
+                                return true;
                             }
                             else
                             {
                                 HttpContext.Current.Trace.Write("Failed");
-                                HttpContext.Current.Trace.Warn(string.Format("DataTypeModel {0} failed to instantiate, perhaps it is lacking a parameterless constructor or doesn't implement IRazorDataTypeModel?", dataTypeType.FullName));
+                                HttpContext.Current.Trace.Warn(string.Format("Failed to create the instance of the model binder"));
                             }
                         }
                         else
@@ -587,7 +595,49 @@ namespace umbraco.MacroEngines
             }
             return true;
         }
-
+        private bool TryCreateInstanceRazorDataTypeModel(Guid dataType, Type dataTypeType, string value, out object result)
+        {
+            HttpContext.Current.Trace.Write(string.Format("Found dataType {0} for GUID {1}", dataTypeType.FullName, dataType));
+            IRazorDataTypeModel razorDataTypeModel = Activator.CreateInstance(dataTypeType, false) as IRazorDataTypeModel;
+            HttpContext.Current.Trace.Write(string.Format("Instantiating {0}...", dataTypeType.FullName));
+            if (razorDataTypeModel != null)
+            {
+                HttpContext.Current.Trace.Write("Success");
+                object instance = null;
+                HttpContext.Current.Trace.Write("Calling Init on razorDataTypeModel");
+                if (razorDataTypeModel.Init(n.Id, value, out instance))
+                {
+                    if (instance != null)
+                    {
+                        HttpContext.Current.Trace.Write(string.Format("razorDataTypeModel successfully instantiated and returned a valid instance of type {0}", instance.GetType().FullName));
+                    }
+                    else
+                    {
+                        HttpContext.Current.Trace.Warn("razorDataTypeModel successfully instantiated but returned null for instance");
+                    }
+                    result = instance;
+                    return true;
+                }
+                else
+                {
+                    if (instance != null)
+                    {
+                        HttpContext.Current.Trace.Write(string.Format("razorDataTypeModel returned false but returned a valid instance of type {0}", instance.GetType().FullName));
+                    }
+                    else
+                    {
+                        HttpContext.Current.Trace.Warn("razorDataTypeModel successfully instantiated but returned null for instance");
+                    }
+                }
+            }
+            else
+            {
+                HttpContext.Current.Trace.Write("Failed");
+                HttpContext.Current.Trace.Warn(string.Format("DataTypeModel {0} failed to instantiate, perhaps it is lacking a parameterless constructor or doesn't implement IRazorDataTypeModel?", dataTypeType.FullName));
+            }
+            result = null;
+            return false;
+        }
         private bool ConvertPropertyValueByDataType(ref object result, string name, Guid dataType)
         {
             //the resulting property is a string, but to support some of the nice linq stuff in .Where

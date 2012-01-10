@@ -6,6 +6,7 @@ using System.Web.Caching;
 using System.Xml;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
+using umbraco.MacroEngines;
 
 namespace umbraco
 {
@@ -412,6 +413,62 @@ namespace umbraco
                 {
                     return new List<string>() { "p", "div" };
                 }
+            }
+        }
+
+        public static List<RazorDataTypeModelStaticMappingItem> RazorDataTypeModelStaticMapping
+        {
+            get
+            {
+                if (HttpContext.Current != null && HttpContext.Current.Cache != null && HttpContext.Current.Cache["settings.scripting.razor.dataTypeModelStaticMappings"] != null)
+                {
+                    return HttpContext.Current.Cache["settings.scripting.razor.dataTypeModelStaticMappings"] as List<RazorDataTypeModelStaticMappingItem>;
+                }
+                /*
+                <dataTypeModelStaticMappings>
+                    <mapping dataTypeGuid="ef94c406-9e83-4058-a780-0375624ba7ca">DigibizAdvancedMediaPicker.RazorModel.ModelBinder</mapping>
+                    <mapping documentTypeAlias="RoomPage" nodeTypeAlias="teaser">DigibizAdvancedMediaPicker.RazorModel.ModelBinder</mapping>
+                </dataTypeModelStaticMappings>
+                 */
+                List<RazorDataTypeModelStaticMappingItem> items = new List<RazorDataTypeModelStaticMappingItem>();
+                XmlNode root = GetKeyAsNode("/settings/scripting/razor/dataTypeModelStaticMappings");
+                if (root != null)
+                {
+                    foreach (XmlNode element in root.SelectNodes(".//mapping"))
+                    {
+                        string propertyTypeAlias = null, nodeTypeAlias = null;
+                        Guid? dataTypeGuid = null;
+                        if (!string.IsNullOrEmpty(element.InnerText))
+                        {
+                            if (element.Attributes["dataTypeGuid"] != null)
+                            {
+                                dataTypeGuid = (Guid?)new Guid(element.Attributes["dataTypeGuid"].Value);
+                            }
+                            if (element.Attributes["propertyTypeAlias"] != null && !string.IsNullOrEmpty(element.Attributes["propertyTypeAlias"].Value))
+                            {
+                                propertyTypeAlias = element.Attributes["propertyTypeAlias"].Value;
+                            }
+                            if (element.Attributes["nodeTypeAlias"] != null && !string.IsNullOrEmpty(element.Attributes["nodeTypeAlias"].Value))
+                            {
+                                nodeTypeAlias = element.Attributes["nodeTypeAlias"].Value;
+                            }
+                            items.Add(new RazorDataTypeModelStaticMappingItem()
+                            {
+                                DataTypeGuid = dataTypeGuid,
+                                PropertyTypeAlias = propertyTypeAlias,
+                                NodeTypeAlias = nodeTypeAlias,
+                                TypeName = element.InnerText,
+                                Raw = element.OuterXml
+                            });
+                        }
+                    }
+                }
+                if (HttpContext.Current != null && HttpContext.Current.Cache != null)
+                {
+                    HttpContext.Current.Cache.Add("settings.scripting.razor.dataTypeModelStaticMappings", items, null, Cache.NoAbsoluteExpiration, new TimeSpan(0, 20, 0), CacheItemPriority.AboveNormal, null);
+                }
+                return items;
+
             }
         }
 
@@ -984,7 +1041,7 @@ namespace umbraco
                     {
                         Trace.WriteLine("Could not load /settings/content/ResolveUrlsFromTextString from umbracosettings.config:\r\n {0}",
                                 ex.Message);
-                        
+
                         // set url resolving to true (default (legacy) behavior) to ensure we don't keep writing to trace
                         _resolveUrlsFromTextString = true;
                     }

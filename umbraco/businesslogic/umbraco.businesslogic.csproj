@@ -170,6 +170,7 @@
     <Compile Include="MenuItemI.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Razor\RazorDataTypeModelStaticMappingItem.cs" />
     <Compile Include="StateHelper.cs" />
     <Compile Include="ui.cs">
       <SubType>Code</SubType>
