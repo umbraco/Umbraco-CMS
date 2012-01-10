@@ -31,14 +31,18 @@ namespace umbraco.cms.businesslogic.cache
 		/// <summary>
 		/// Clears the item in umbraco's runtime cache with the given key 
 		/// </summary>
-		/// <param name="Key">Key</param>
-		public static void ClearCacheItem(string Key) 
+		/// <param name="key">Key</param>
+		public static void ClearCacheItem(string key) 
 		{
-			if (System.Web.HttpRuntime.Cache[Key] != null) 
-			{               
-                HttpRuntime.Cache.Remove(Key);
-                HttpContext.Current.Trace.Warn("Cache", "Item " + Key + " removed from cache");       			
-			}
+            // NH 10 jan 2012
+            // Patch by the always wonderful Stéphane Gay to avoid cache null refs
+            var cache = HttpRuntime.Cache;
+            if (cache[key] != null)
+            {
+                var context = HttpContext.Current;
+                if (context != null)
+                    context.Trace.Warn("Cache", "Item " + key + " removed from cache");
+            }
 		}
 		
 		
