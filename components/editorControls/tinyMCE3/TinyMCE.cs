@@ -327,23 +327,23 @@ namespace umbraco.editorControls.tinyMCE3
                 // tidy html - refactored, see #30534
                 if (UmbracoSettings.TidyEditorContent)
                 {
-					// always wrap in a <div> - using <p> was a bad idea
-					parsedString = "<div>" + parsedString + "</div>";
-					
-					string tidyTxt = library.Tidy(parsedString, false);
+                    // always wrap in a <div> - using <p> was a bad idea
+                    parsedString = "<div>" + parsedString + "</div>";
+
+                    string tidyTxt = library.Tidy(parsedString, false);
                     if (tidyTxt != "[error]")
                     {
-						parsedString = tidyTxt;
+                        parsedString = tidyTxt;
 
-						// remove pesky \r\n, and other empty chars
-						parsedString = parsedString.Trim(new char[] { '\r', '\n', '\t', ' ' });
+                        // remove pesky \r\n, and other empty chars
+                        parsedString = parsedString.Trim(new char[] { '\r', '\n', '\t', ' ' });
 
                         // compensate for breaking macro tags by tidy (?)
                         parsedString = parsedString.Replace("/?>", "/>");
 
-						// remove the wrapping <div> - safer to check that it is still here
-						if (parsedString.StartsWith("<div>") && parsedString.EndsWith("</div>"))
-							parsedString = parsedString.Substring("<div>".Length, parsedString.Length - "<div></div>".Length);
+                        // remove the wrapping <div> - safer to check that it is still here
+                        if (parsedString.StartsWith("<div>") && parsedString.EndsWith("</div>"))
+                            parsedString = parsedString.Substring("<div>".Length, parsedString.Length - "<div></div>".Length);
                     }
                     else
                     {
@@ -366,6 +366,10 @@ namespace umbraco.editorControls.tinyMCE3
                     parsedString = parsedString.Replace(helper.GetBaseUrl(HttpContext.Current) + "/#", "#");
                     parsedString = parsedString.Replace(helper.GetBaseUrl(HttpContext.Current), "");
                 }
+
+                //Allow CDATA nested into RTE without exceptions
+                // GE 2012-01-18
+                parsedString = parsedString.Replace("<![CDATA[", "<!--CDATAOPENTAG-->").Replace("]]>", "<!--CDATACLOSETAG-->");
 
                 // if text is an empty parargraph, make it all empty
                 if (parsedString.ToLower() == "<p></p>")
@@ -486,8 +490,10 @@ namespace umbraco.editorControls.tinyMCE3
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
+            //Allow CDATA nested into RTE without exceptions
+            // GE 2012-01-18
             if (_data != null && _data.Value != null)
-                base.Text = _data.Value.ToString();
+                base.Text = _data.Value.ToString().Replace("<!--CDATAOPENTAG-->", "<![CDATA[").Replace("<!--CDATACLOSETAG-->", "]]>");
         }
 
         private string replaceMacroTags(string text)
