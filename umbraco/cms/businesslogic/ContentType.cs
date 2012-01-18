@@ -790,7 +790,7 @@ namespace umbraco.cms.businesslogic
         public PropertyType getPropertyType(string alias)
         {
             // NH 22-08-08, Get from the property type stack to ensure support of master document types
-            object o = this.PropertyTypes.Find(delegate(PropertyType pt) { return pt.Alias == alias; });
+            object o = this.PropertyTypes.Find(pt => pt.Alias == alias);
 
             //object o = SqlHelper.ExecuteScalar<object>(
             //    "Select id from cmsPropertyType where contentTypeId=@contentTypeId And Alias=@alias",
