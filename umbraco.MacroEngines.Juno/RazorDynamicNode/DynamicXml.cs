@@ -626,7 +626,10 @@ namespace umbraco.MacroEngines
                                 {
                                     if (ic == (int)'<' && !IsInsideQuotes)
                                     {
-                                        IsInsideElement = true;
+                                        if (tr.Peek() != (int)'!')
+                                        {
+                                            IsInsideElement = true;
+                                        }
                                     }
                                     if (ic == (int)'>' && !IsInsideQuotes)
                                     {
