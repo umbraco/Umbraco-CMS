@@ -11,6 +11,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.BusinessLogic;
 using System.Web.Security;
+using umbraco.businesslogic.Exceptions;
 using umbraco.IO;
 using umbraco.cms.businesslogic.web;
 using System.Linq;
@@ -135,7 +136,7 @@ namespace umbraco.cms.presentation
             if (!isUrlLocalToHost(url))
             {
                 Log.Add(LogTypes.Error, -1, String.Format("Security warning: Login redirect was attempted to a site at another domain: '{0}'", url));
-                throw new SecurityException(
+                throw new UserAuthorizationException(
                     String.Format(@"There was attempt to redirect to '{0}' which is another domain than where you've logged in. If you clicked a link to reach this login
                     screen, please double check that the link came from someone you trust. You *might* have been exposed to an *attempt* to breach the security of your website. Nothing 
                     have been compromised, though!", url));
