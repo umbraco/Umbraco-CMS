@@ -532,7 +532,9 @@ namespace umbraco
                     }
                 }
             }
-            checkForMaster(templateID);
+            // Only check for master on legacy templates - can show error when using master pages.
+            if(!UmbracoSettings.UseAspNetMasterPages)
+                checkForMaster(templateID);
         }
 
         private void checkForMaster(int templateID) {
