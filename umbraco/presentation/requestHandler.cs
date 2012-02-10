@@ -40,7 +40,10 @@ namespace umbraco {
         private bool _doNotCache = false;
 
         public static void ClearProcessedRequests() {
-            _processedRequests.Clear();
+            lock (locker)
+            {
+                _processedRequests.Clear();
+            }
         }
 
         public static string cleanUrl() {
