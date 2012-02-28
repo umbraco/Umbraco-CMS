@@ -27,7 +27,7 @@ namespace umbraco.BusinessLogic.Actions
     /// </summary>
     public class Action
     {
-        private static List<IAction> _actions = new List<IAction>();        
+        private static List<IAction> _actions = new List<IAction>();
         private static List<IActionHandler> _actionHandlers = new List<IActionHandler>();
 
         private static readonly List<string> _actionJSReference = new List<string>();
@@ -52,7 +52,7 @@ namespace umbraco.BusinessLogic.Actions
                 _actions.Clear();
                 _actionHandlers.Clear();
                 RegisterIActions();
-                RegisterIActionHandlers(); 
+                RegisterIActionHandlers();
             }
         }
 
@@ -145,6 +145,14 @@ namespace umbraco.BusinessLogic.Actions
             }
             catch
             {
+                u = User.GetUser(0);
+            }
+            if (u == null)
+            {
+                //GE 2012-02-29
+                //user will be null when using distributed calls
+                //can't easily get the real publishing user to bubble all the way through the distributed call framework
+                //so just check for it and set it to admin, so at least the notification gets sent
                 u = User.GetUser(0);
             }
             Notification.GetNotifications(d, u, action);
