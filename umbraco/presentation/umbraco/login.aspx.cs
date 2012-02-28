@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Security;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -10,6 +11,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.BusinessLogic;
 using System.Web.Security;
+using umbraco.businesslogic.Exceptions;
 using umbraco.IO;
 using umbraco.cms.businesslogic.web;
 using System.Linq;
@@ -27,6 +29,13 @@ namespace umbraco.cms.presentation
 		{
 			base.OnLoad(e);
 			ClientLoader.DataBind();
+
+            // validate redirect url
+		    string redirUrl = Request["redir"];
+            if (!String.IsNullOrEmpty(redirUrl))
+            {
+                validateRedirectUrl(redirUrl);
+            }
 		}
 
 
@@ -108,14 +117,52 @@ namespace umbraco.cms.presentation
                     Session["windowWidth"] = hf_width.Value;
                 }
 
-                if (string.IsNullOrEmpty(Request["redir"]))
+                string redirUrl = Request["redir"];
+
+                if (string.IsNullOrEmpty(redirUrl))
                     Response.Redirect("umbraco.aspx");
-                else
-                    Response.Redirect(Request["redir"]);
+                else if (validateRedirectUrl(redirUrl))
+                {
+                    Response.Redirect(redirUrl, true);
+                }
             }
             else {
                 loginError.Visible = true;
             }
+        }
+
+        private bool validateRedirectUrl(string url)
+        {
+            if (!isUrlLocalToHost(url))
+            {
+                Log.Add(LogTypes.Error, -1, String.Format("Security warning: Login redirect was attempted to a site at another domain: '{0}'", url));
+                throw new UserAuthorizationException(
+                    String.Format(@"There was attempt to redirect to '{0}' which is another domain than where you've logged in. If you clicked a link to reach this login
+                    screen, please double check that the link came from someone you trust. You *might* have been exposed to an *attempt* to breach the security of your website. Nothing 
+                    have been compromised, though!", url));
+            }
+
+            return true;
+        }
+
+        private bool isUrlLocalToHost(string url)
+        {
+            if (String.IsNullOrEmpty(url))
+            {
+                return false;
+            }
+
+            Uri absoluteUri;
+            if (Uri.TryCreate(url, UriKind.Absolute, out absoluteUri))
+            {
+                return String.Equals(HttpContext.Current.Request.Url.Host, absoluteUri.Host,
+                            StringComparison.OrdinalIgnoreCase);
+            }
+            
+            bool isLocal = !url.StartsWith("http:", StringComparison.OrdinalIgnoreCase)
+                           && !url.StartsWith("https:", StringComparison.OrdinalIgnoreCase)
+                           && Uri.IsWellFormedUriString(url, UriKind.Relative);
+            return isLocal;
         }
 
         /// <summary>

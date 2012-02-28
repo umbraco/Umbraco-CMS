@@ -79,7 +79,7 @@ namespace umbraco.cms.businesslogic.Tags
                 //Perform a subselect insert into cmsTagRelationship using a left outer join to perform the if not exists check
                 string sql = "insert into cmsTagRelationship (nodeId,tagId) select " + string.Format("{0}", nodeId) + ", " + string.Format("{0}", id) + " from cmsTags ";
                 //sorry, gotta do this, @params not supported in join clause
-                sql += "left outer join cmsTagRelationship on (cmsTags.id = cmsTagRelationship.TagId and cmsTagRelatifonship.nodeId = " + string.Format("{0}", nodeId) + ") ";
+                sql += "left outer join cmsTagRelationship on (cmsTags.id = cmsTagRelationship.TagId and cmsTagRelationship.nodeId = " + string.Format("{0}", nodeId) + ") ";
                 sql += "where cmsTagRelationship.tagId is null and cmsTags.id = " + string.Format("{0}", id);
 
                 SqlHelper.ExecuteNonQuery(sql);

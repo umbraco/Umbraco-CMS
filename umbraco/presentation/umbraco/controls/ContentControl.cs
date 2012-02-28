@@ -136,7 +136,10 @@ namespace umbraco.controls
                     if (property != null && tabPage != null)
                     {
                         addControlNew(property, tabPage, tab.Caption);
-                        inTab.Add(propertyType.Id.ToString(), true);
+
+                        // adding this check, as we occasionally get an already in dictionary error, though not sure why
+                        if (!inTab.ContainsKey(propertyType.Id.ToString()))
+                            inTab.Add(propertyType.Id.ToString(), true);
                     }
                     else
                     {
