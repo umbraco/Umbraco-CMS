@@ -14,20 +14,23 @@
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            Uri u = new Uri(Request["url"]);
-            if (u.Host == "umbraco.com" || u.Host == "umbraco.org")
+            if (Request["url"] != null)
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Request["url"]);
-                request.Method = WebRequestMethods.Http.Get;
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                StreamReader reader = new StreamReader(response.GetResponseStream());
-                string tmp = reader.ReadToEnd();
-                response.Close();
+                var requestUri = new Uri(Request["url"]);
+                if (requestUri != null)
+                {
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestUri);
+                    request.Method = WebRequestMethods.Http.Get;
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    StreamReader reader = new StreamReader(response.GetResponseStream());
+                    string tmp = reader.ReadToEnd();
+                    response.Close();
 
-                Response.Clear();
-                Response.ContentType = "text/xml";
+                    Response.Clear();
+                    Response.ContentType = "text/xml";
 
-                Response.Write(tmp);
+                    Response.Write(tmp);
+                }
             }
         }
     }
