@@ -28,6 +28,9 @@ namespace umbraco {
         #endregion
 
         private static Hashtable _processedRequests = new Hashtable();
+        private static object locker = new object();
+
+
         private static string pageXPathQueryStart = "/root";
         private static string _urlName = string.Empty;
         private static bool _urlNameInitialized = false;
@@ -37,7 +40,10 @@ namespace umbraco {
         private bool _doNotCache = false;
 
         public static void ClearProcessedRequests() {
-            _processedRequests.Clear();
+            lock (locker)
+            {
+                _processedRequests.Clear();
+            }
         }
 
         public static string cleanUrl() {
@@ -53,11 +59,14 @@ namespace umbraco {
                 tmp = tmp.Substring(root.Length);
             }
 
+            // Remove the Trailing slash.  
+            tmp = tmp.TrimEnd('/');
+
             if (tmp == "/default.aspx")
                 tmp = string.Empty;
-            else if (tmp == "/")
-                tmp = string.Empty;
-            else if (tmp == SystemDirectories.Root.ToLower())
+//            else if (tmp == "/")
+//                tmp = string.Empty;
+            else if (tmp == root)
                 tmp = string.Empty;
 
             return tmp;
@@ -254,9 +263,14 @@ namespace umbraco {
                         prefixUrl = currentDomain;
                     if (url.Substring(0, 1) != "/")
                         url = "/" + url;
-                    if (_processedRequests.ContainsKey(prefixUrl + url))
-                        _processedRequests.Remove(prefixUrl + url);
-                    _processedRequests.Add(prefixUrl + url, currentPage.Attributes.GetNamedItem("id").Value);
+
+                    lock (locker)
+                    {
+                        if (!_processedRequests.ContainsKey(prefixUrl + url))
+                            _processedRequests.Add(prefixUrl + url, currentPage.Attributes.GetNamedItem("id").Value);
+                    }
+
+
                     HttpContext.Current.Trace.Write("umbracoRequestHandler",
                                                     "Adding to cache... ('" + prefixUrl + url + "')");
                 }
@@ -306,7 +320,20 @@ namespace umbraco {
                                 if (typeInstance.CacheUrl) {
                                     if (url.Substring(0, 1) != "/")
                                         url = "/" + url;
-                                    _processedRequests.Add(url, redirectID.ToString());
+
+                                    string prefixUrl = string.Empty;
+
+                                    if (Domain.Exists(currentDomain))
+                                        prefixUrl = currentDomain;
+                                    if (url.Substring(0, 1) != "/")
+                                        url = "/" + url;
+
+                                    lock (locker)
+                                    {
+                                        if (!_processedRequests.ContainsKey(prefixUrl + url))
+                                            _processedRequests.Add(prefixUrl + url, currentPage.Attributes.GetNamedItem("id").Value);
+                                    }
+
                                     HttpContext.Current.Trace.Write("notFoundHandler",
                                                                     string.Format("Added to cache '{0}', '{1}'...", url,
                                                                                   redirectID));
