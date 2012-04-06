@@ -2572,6 +2572,7 @@
     <Content Include="config\ExamineIndex.config" />
     <Content Include="config\scripting.config" />
     <Content Include="config\Skinning.config" />
+    <Content Include="config\feedProxy.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings1.Designer.cs</LastGenOutput>

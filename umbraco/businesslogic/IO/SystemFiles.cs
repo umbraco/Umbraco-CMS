@@ -84,6 +84,14 @@ namespace umbraco.IO
             }
         }
 
+        public static string FeedProxyConfig
+        {
+            get
+            {
+                return string.Concat(SystemDirectories.Config, "/feedProxy.config");
+            }
+        }
+
         public static string ContentCacheXml
         {
             get
