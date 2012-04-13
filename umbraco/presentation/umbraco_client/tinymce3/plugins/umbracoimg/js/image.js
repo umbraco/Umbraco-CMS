@@ -24,7 +24,7 @@
         }
 
         // If option enabled default contrain proportions to checked
-        if (ed.getParam("advimage_constrain_proportions", true))
+        if ((ed.getParam("advimage_constrain_proportions", true)) && f.constrain)
             f.constrain.checked = true;
 
         this.changeAppearance();

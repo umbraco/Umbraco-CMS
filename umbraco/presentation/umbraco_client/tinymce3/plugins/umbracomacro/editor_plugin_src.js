@@ -77,19 +77,6 @@
                 var macroElement = ed.dom.getParent(ed.selection.getStart(), 'div.umbMacroHolder');
 
                 if (macroElement) {
-                    // move selection to top element to ensure we can't edit this
-                    ed.selection.select(macroElement);
-
-                    // check if the current selection *is* the div (ie bug)
-                    var currentSelection = ed.selection.getStart();
-                    if (tinymce.isIE) {
-                        if (!ed.dom.hasClass(currentSelection, 'umbMacroHolder')) {
-                            while (!ed.dom.hasClass(currentSelection, 'umbMacroHolder') && currentSelection.parentNode) {
-                                currentSelection = currentSelection.parentNode;
-                            }
-                            ed.selection.select(currentSelection);
-                        }
-                    }
 
                     // mark button if it's a macro
                     cm.setActive('umbracomacro', ed.dom.hasClass(currentSelection, 'umbMacroHolder') || ed.dom.hasClass(macroElement, 'umbMacroHolder'));

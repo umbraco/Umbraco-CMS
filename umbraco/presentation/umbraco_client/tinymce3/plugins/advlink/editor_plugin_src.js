@@ -22,6 +22,7 @@
 					return;
 
 				ed.windowManager.open({
+					/* UMBRACO SPECIFIC: Load Umbraco modal window */
  					file: tinyMCE.activeEditor.getParam('umbraco_path') + '/plugins/tinymce3/insertLink.aspx',
 					width : 480 + parseInt(ed.getLang('advlink.delta_width', 0)),
 					height : 510 + parseInt(ed.getLang('advlink.delta_height', 0)),
