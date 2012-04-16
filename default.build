@@ -8,14 +8,14 @@
     -->
     <property name="nant.settings.currentframework" value="net-4.0" />,
 
-    <property name="build.version" value="4.7.1"/>
+    <property name="build.version" value="4.7.2"/>
     <property name="build.configuration" value="Debug"/>
 
 
     <!-- filenames and directories, generally won't change -->
 
     <property name="web.dir" value="D:\inetpub\wwwroot\v4.umbraco.org" />
-    <property name="public.dir" value="C:\inetpub\wwwroot\_Live Sites\nightly.umbraco.org\umbraco 4.7.1" />
+    <property name="public.dir" value="C:\inetpub\wwwroot\_Live Sites\nightly.umbraco.org\umbraco 4.7.2" />
     <property name="root.dir" value="${directory::get-current-directory()}" />
     <property name="source.dir" value="${root.dir}\umbraco\presentation" />
 
