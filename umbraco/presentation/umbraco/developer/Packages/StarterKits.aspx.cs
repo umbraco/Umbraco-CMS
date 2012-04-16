@@ -4,11 +4,12 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using umbraco.BasePages;
 using umbraco.IO;
 
 namespace umbraco.presentation.umbraco.developer.Packages
 {
-    public partial class StarterKits : System.Web.UI.Page
+    public partial class StarterKits : UmbracoEnsuredPage
     {
         protected void Page_Load(object sender, EventArgs e)
         {
