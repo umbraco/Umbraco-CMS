@@ -119,9 +119,14 @@ namespace umbraco.editorControls.tinymce
         private static string StripSrc(string cleanTag, Hashtable ht)
         {
             string src = helper.FindAttribute(ht, "src");
+            //get the media folder, minus the starting '~'
+            string mediaRoot = SystemDirectories.Media.Replace("~", string.Empty);
+
             // update orgSrc to remove umbraco reference
-            if (src.IndexOf("/media/") > -1)
-                src = src.Substring(src.IndexOf("/media/"), src.Length - src.IndexOf("/media/"));
+            int mediaRootIndex = src.IndexOf(mediaRoot);
+            if (mediaRootIndex > -1)
+
+                src = src.Substring(mediaRootIndex, src.Length - mediaRootIndex);
 
             cleanTag += " src=\"" + src + "\"";
             return cleanTag;
