@@ -206,12 +206,14 @@ namespace umbraco.presentation.cache
 
         private static void LogDispatchNodeError(WebException ex)
         {
+            string url = (ex.Response != null) ? ex.Response.ResponseUri.ToString() : "invalid url (responseUri null)";
+
             Log.Add(
                        LogTypes.Error,
                        User.GetUser(0),
                        -1,
                        string.Format("Error refreshing a node in the distributed list: '{0}', URI attempted: {1}", ex,
-                                     ex.Response.ResponseUri));
+                                     url));
         }
 
         /// <summary>
@@ -222,7 +224,13 @@ namespace umbraco.presentation.cache
         private static void SetWebServiceUrlFromNode(CacheRefresher cr, XmlNode n)
         {
             string protocol = GlobalSettings.UseSSL ? "https" : "http";
-            cr.Url = string.Format("{0}://{1}{2}/cacheRefresher.asmx", protocol, xmlHelper.GetNodeValue(n), _webServicesUrl);
+            if (n.Attributes.GetNamedItem("forceProtocol") != null && !String.IsNullOrEmpty(n.Attributes.GetNamedItem("forceProtocol").Value))
+                protocol = n.Attributes.GetNamedItem("forceProtocol").Value;
+            string domain = xmlHelper.GetNodeValue(n);
+            if (n.Attributes.GetNamedItem("forcePortnumber") != null && !String.IsNullOrEmpty(n.Attributes.GetNamedItem("forcePortnumber").Value))
+                domain += string.Format(":{0}", n.Attributes.GetNamedItem("forcePortnumber").Value);
+
+            cr.Url = string.Format("{0}://{1}{2}/cacheRefresher.asmx", protocol, domain, _webServicesUrl);
         }
 
         private static string GetFactoryObjectName(Guid uniqueIdentifier)
