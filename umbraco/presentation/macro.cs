@@ -152,37 +152,65 @@ namespace umbraco
 
         public static macro GetMacro(string alias)
         {
+            // FlorisRobbemont: issue #27610 -> Presentation macro not supposed to be cached.
+            return new macro(alias);
 
-            return cms.businesslogic.cache.Cache.GetCacheItem(GetCacheKey(alias), macroRuntimeCacheSyncLock,
-                          TimeSpan.FromMinutes(60),
-                          delegate
-                          {
-                              try
-                              {
-                                  return new macro(alias);
-                              }
-                              catch
-                              {
-                                  return null;
-                              }
-                          });
+            //return cms.businesslogic.cache.Cache.GetCacheItem(GetCacheKey(alias), macroRuntimeCacheSyncLock,
+            //              TimeSpan.FromMinutes(60),
+            //              delegate
+            //              {
+            //                  try
+            //                  {
+            //                      return new macro(alias);
+            //                  }
+            //                  catch
+            //                  {
+            //                      return null;
+            //                  }
+            //              });
+
+
+
+
+
         }
+
+
+
+
+
+
 
         public static macro GetMacro(int id)
         {
-            return cms.businesslogic.cache.Cache.GetCacheItem(GetCacheKey(string.Format("by_id_{0}", id)), macroRuntimeCacheSyncLock,
-                          TimeSpan.FromMinutes(60),
-                          delegate
-                          {
-                              try
-                              {
-                                  return new macro(id);
-                              }
-                              catch
-                              {
-                                  return null;
-                              }
-                          });
+            // FlorisRobbemont: issue #27610 -> Presentation macro not supposed to be cached.
+
+
+
+
+
+
+            return new macro(id);
+
+            //return cms.businesslogic.cache.Cache.GetCacheItem(GetCacheKey(string.Format("by_id_{0}", id)), macroRuntimeCacheSyncLock,
+            //              TimeSpan.FromMinutes(60),
+            //              delegate
+            //              {
+            //                  try
+            //                  {
+            //                      return new macro(id);
+            //                  }
+            //                  catch
+            //                  {
+            //                      return null;
+            //                  }
+            //              });
+
+
+
+
+
+
         }
 
         #endregion
@@ -288,7 +316,11 @@ namespace umbraco
                 {
                     macroHtml = macroCache["macroHtml_" + Model.CacheIdentifier] as String;
 
-                    if (!String.IsNullOrEmpty(macroHtml))
+                    // FlorisRobbemont: 
+                    // An empty string means: macroHtml has been cached before, but didn't had any output (Macro doesn't need to be rendered again)
+                    // An empty reference (null) means: macroHtml has NOT been cached before
+                    if (macroHtml != null)
+
                     {
                         UmbracoContext.Current.Trace.Write("renderMacro",
                             string.Format("Macro Content loaded from cache '{0}'.", Model.CacheIdentifier));
@@ -309,7 +341,8 @@ namespace umbraco
                 }
             }
 
-            if (String.IsNullOrEmpty(macroHtml) && macroControl == null)
+            // FlorisRobbemont: Empty macroHtml (not null, but "") doesn't mean a re-render is necessary
+            if (macroHtml == null && macroControl == null)
             {
                 bool renderFailed = false;
                 int macroType = Model.MacroType != MacroTypes.Unknown ? (int)Model.MacroType : MacroType;
@@ -422,35 +455,46 @@ namespace umbraco
                             // NH: Scripts and XSLT can be generated as strings, but not controls as page events wouldn't be hit (such as Page_Load, etc)
                             if (cacheMacroAsString(Model))
                             {
+                                string outputCacheString = "";
+
                                 using (var sw = new StringWriter())
                                 {
                                     var hw = new HtmlTextWriter(sw);
                                     macroControl.RenderControl(hw);
 
-                                    macroCache.Insert("macroHtml_" + Model.CacheIdentifier,
-                                                      sw.ToString(),
-                                                      null,
-                                                      DateTime.Now.AddSeconds(Model.CacheDuration),
-                                                      TimeSpan.Zero,
-                                                      CacheItemPriority.Low,
-                                                      null);
-
-                                    // zb-00003 #29470 : replace by text if not already text
-                                    // otherwise it is rendered twice
-                                    if (!(macroControl is LiteralControl))
-                                        macroControl = new LiteralControl(sw.ToString());
-
-                                    UmbracoContext.Current.Trace.Write("renderMacro",
-                                        string.Format("Macro Content saved to cache '{0}'.", Model.CacheIdentifier));
+                                    outputCacheString = sw.ToString();
                                 }
+
+                                macroCache.Insert("macroHtml_" + Model.CacheIdentifier,
+                                                outputCacheString,
+
+                                                null,
+                                                DateTime.Now.AddSeconds(Model.CacheDuration),
+                                                TimeSpan.Zero,
+                                                CacheItemPriority.NotRemovable, //FlorisRobbemont: issue #27610 -> Macro output cache should not be removable
+
+                                                null);
+
+
+
+                                // zb-00003 #29470 : replace by text if not already text
+                                // otherwise it is rendered twice
+                                if (!(macroControl is LiteralControl))
+                                    macroControl = new LiteralControl(outputCacheString);
+
+                                UmbracoContext.Current.Trace.Write("renderMacro",
+                                    string.Format("Macro Content saved to cache '{0}'.", Model.CacheIdentifier));
+
                             }
+
                             else
                             {
                                 macroCache.Insert("macroControl_" + Model.CacheIdentifier,
-                                                  new MacroCacheContent(macroControl, macroControl.ID), null,
-                                                  DateTime.Now.AddSeconds(Model.CacheDuration), TimeSpan.Zero,
-                                                  CacheItemPriority.Low,
-                                                  null);
+                                                new MacroCacheContent(macroControl, macroControl.ID), null,
+                                                DateTime.Now.AddSeconds(Model.CacheDuration), TimeSpan.Zero,
+                                                CacheItemPriority.NotRemovable, //FlorisRobbemont: issue #27610 -> Macro output cache should not be removable
+
+                                                null);
 
                                 UmbracoContext.Current.Trace.Write("renderMacro",
                                     string.Format("Macro Control saved to cache '{0}'.", Model.CacheIdentifier));
@@ -461,7 +505,8 @@ namespace umbraco
             }
             else if (macroControl == null)
             {
-                macroControl = new LiteralControl(macroHtml);
+                // FlorisRobbemont: Extra check to see if the macroHtml is not null
+                macroControl = new LiteralControl(macroHtml == null ? "" : macroHtml);
             }
 
             return macroControl;
@@ -469,7 +514,8 @@ namespace umbraco
 
         private bool cacheMacroAsString(MacroModel model)
         {
-            return model.MacroType == MacroTypes.XSLT || model.MacroType == MacroTypes.Python;
+            //FlorisRobbemont: issue #27610 -> Changed this to include Razor scripts files as String caching 
+            return model.MacroType == MacroTypes.XSLT || model.MacroType == MacroTypes.Python || model.MacroType == MacroTypes.Script;
         }
 
         public static XslCompiledTransform getXslt(string XsltFile)
@@ -601,7 +647,7 @@ namespace umbraco
                         {
                             Exceptions.Add(e);
 
-                            // inner exception code by Daniel Lindström from SBBS.se
+                            // inner exception code by Daniel Lindstr?m from SBBS.se
                             Exception ie = e;
                             while (ie != null)
                             {

@@ -3194,7 +3194,9 @@
     <Content Include="config\metablogConfig.config" />
     <Content Include="config\restExtensions.config" />
     <Content Include="config\tinyMceConfig.config" />
-    <Content Include="config\umbracoSettings.config" />
+    <Content Include="config\umbracoSettings.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="config\xsltExtensions.config" />
     <None Include="umbraco\schemas\package.xsd">
       <SubType>

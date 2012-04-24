@@ -4,11 +4,11 @@
 
   <!-- Set up a local connection string -->
   <xsl:template match="/configuration/appSettings/add[@key='umbracoDbDSN']/@value">
-    <xsl:attribute name="value">server=.\sqlexpress;database=v47;integrated security=false;user id=DBUSER;password=DBPASSWORD</xsl:attribute>
+    <xsl:attribute name="value">server=.\mojosqlserver;database=v472;integrated security=false;user id=DBUSER;password=DBPASSWORD</xsl:attribute>
   </xsl:template>
 
   <xsl:template match="/configuration/appSettings/add[@key='umbracoConfigurationStatus']/@value">
-    <xsl:attribute name="value">4.7.1</xsl:attribute>
+    <xsl:attribute name="value">4.7.2</xsl:attribute>
   </xsl:template>
 
   <!-- Default templates to match anything else -->
