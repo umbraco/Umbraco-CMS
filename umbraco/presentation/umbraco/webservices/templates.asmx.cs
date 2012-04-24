@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Services;
 using System.Xml;
 using System.Web.Script.Services;
+using umbraco.presentation.webservices;
 
 namespace umbraco.webservices
 {
@@ -82,6 +83,9 @@ namespace umbraco.webservices
         [ScriptMethod]
         public string GetCodeSnippet(object templateId)
         {
+            legacyAjaxCalls.Authorize();
+
+
             string content = string.Empty;
 
             System.IO.StreamReader templateFile = 

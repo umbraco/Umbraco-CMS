@@ -225,8 +225,17 @@ namespace umbraco.BasePages {
         /// <summary>
         /// Clears the login.
         /// </summary>
-        public void ClearLogin() {
+        public void ClearLogin()
+        {
+            deleteLogin();
             umbracoUserContextID = "";
+        }
+
+        private void deleteLogin()
+        {
+            SqlHelper.ExecuteNonQuery(
+                "DELETE umbracoUserLogins WHERE contextId = @contextId",
+                SqlHelper.CreateParameter("@contextId", umbracoUserContextID));            
         }
 
         private void updateLogin()

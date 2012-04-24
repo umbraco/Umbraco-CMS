@@ -8,6 +8,7 @@ using System.Web.Services;
 using System.Xml;
 using System.IO;
 using umbraco.IO;
+using umbraco.presentation.webservices;
 
 namespace umbraco.developer
 {
@@ -27,6 +28,8 @@ namespace umbraco.developer
 		[WebMethod]
 		public XmlDocument FilesFromDirectory(string dir) 
 		{
+            legacyAjaxCalls.Authorize();
+
 			XmlDocument xd = new XmlDocument();
 			xd.LoadXml("<files/>");
 			foreach (string file in System.IO.Directory.GetFiles(IOHelper.MapPath(SystemDirectories.Umbraco + "/xslt/" + dir), "*.xsl*"))
