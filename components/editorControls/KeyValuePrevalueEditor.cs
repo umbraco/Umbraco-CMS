@@ -131,7 +131,7 @@ namespace umbraco.editorControls
             if (!string.IsNullOrEmpty(_tbhidden.Text))
             {
                 int so = 0;
-                foreach (string row in _tbhidden.Text.Split(';'))
+                foreach (string row in _tbhidden.Text.Split('¶'))
                 {
                     if (!string.IsNullOrEmpty(row))
                     {

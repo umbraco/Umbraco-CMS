@@ -28,7 +28,7 @@ function ResetValues() {
         var value = jQuery(".value", this).html();
 
 
-        val += value + "|" + text + ";";
+        val += value + "|" + text + "¶";
 
     });
 
