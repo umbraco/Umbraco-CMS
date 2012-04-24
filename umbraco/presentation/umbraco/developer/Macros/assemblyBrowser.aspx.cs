@@ -41,6 +41,9 @@ namespace umbraco.developer
                     isUserControl = true;
                     string fileName = Request.QueryString["fileName"];
 
+                    IOHelper.ValidateEditPath(fileName, SystemDirectories.Usercontrols);
+
+
                     if (System.IO.File.Exists(IOHelper.MapPath("~/" + fileName)))
                     {
                         UserControl oControl = (UserControl)LoadControl(@"~/" + fileName);
