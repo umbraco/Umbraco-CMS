@@ -519,9 +519,14 @@ namespace umbraco.cms.businesslogic.member
         {
             get
             {
-                return SqlHelper.ExecuteScalar<string>(
-                    "select Email from cmsMember where nodeId = @id",
-                    SqlHelper.CreateParameter("@id", Id));
+                if (String.IsNullOrEmpty(m_Email))
+                {
+                    m_Email = SqlHelper.ExecuteScalar<string>(
+                       "select Email from cmsMember where nodeId = @id",
+                       SqlHelper.CreateParameter("@id", Id));
+                }
+
+                return m_Email;
             }
             set
             {
@@ -860,30 +865,30 @@ namespace umbraco.cms.businesslogic.member
             if (value == null)
                 return null;
 
-			// #30350 - do not use Split as memberLogin could contain '+'
-			int pos1 = value.IndexOf('+');
-			if (pos1 < 0)
-				return null;
-			int pos2 = value.IndexOf('+', pos1 + 1);
-			if (pos2 < 0)
-				return null;
+            // #30350 - do not use Split as memberLogin could contain '+'
+            int pos1 = value.IndexOf('+');
+            if (pos1 < 0)
+                return null;
+            int pos2 = value.IndexOf('+', pos1 + 1);
+            if (pos2 < 0)
+                return null;
 
             int memberId;
-			if (!Int32.TryParse(value.Substring(0, pos1), out memberId))
+            if (!Int32.TryParse(value.Substring(0, pos1), out memberId))
                 return null;
             Guid memberGuid;
             try
             {
                 // Guid.TryParse is in .NET 4 only
                 // using try...catch for .NET 3.5 compatibility
-				memberGuid = new Guid(value.Substring(pos1 + 1, pos2 - pos1 - 1));
+                memberGuid = new Guid(value.Substring(pos1 + 1, pos2 - pos1 - 1));
             }
             catch
             {
                 return null;
             }
 
-			MemberState ms = new MemberState(memberId, memberGuid, value.Substring(pos2 + 1));
+            MemberState ms = new MemberState(memberId, memberGuid, value.Substring(pos2 + 1));
             return ms;
         }
 
@@ -1146,22 +1151,22 @@ namespace umbraco.cms.businesslogic.member
             }
 
             // NH 4.7.1: We'll no longer use legacy Umbraco cookies to handle members
-                /*
-            else
-            {
-                // zb-00035 #29931 : cleanup member state management
-                MemberState ms = GetMemberState();
-                if (ms != null)
-                    _currentMemberId = ms.MemberId;
-            }
+            /*
+        else
+        {
+            // zb-00035 #29931 : cleanup member state management
+            MemberState ms = GetMemberState();
+            if (ms != null)
+                _currentMemberId = ms.MemberId;
+        }
 
-            if (_currentMemberId > 0 && !memberExists(_currentMemberId))
-            {
-                _currentMemberId = 0;
-                // zb-00035 #29931 : cleanup member state management
-                ClearMemberState();
-            }
-            */
+        if (_currentMemberId > 0 && !memberExists(_currentMemberId))
+        {
+            _currentMemberId = 0;
+            // zb-00035 #29931 : cleanup member state management
+            ClearMemberState();
+        }
+        */
             return _currentMemberId;
         }
 
