@@ -34,11 +34,16 @@ namespace umbraco
         // Sync access to internal cache
         private static readonly object _xmlContentInternalSyncLock = new object();
 
+        // Sync access to timestamps
+        private static readonly object _timestampSyncLock = new object();
+
         // Sync database access
         private static readonly object _dbReadSyncLock = new object();
         private readonly string XmlContextContentItemKey = "UmbracoXmlContextContent";
         private string _umbracoXmlDiskCacheFileName = string.Empty;
         private volatile XmlDocument _xmlContent;
+        private DateTime _lastDiskCacheReadTime = DateTime.MinValue;
+        private DateTime _lastDiskCacheCheckTime = DateTime.MinValue;
 
         /// <summary>
         /// Gets the path of the umbraco XML disk cache file.
@@ -163,11 +168,43 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Checks if the disk cache file has been updated and if so, clears the in-memory cache to force the file to be read.
+        /// </summary>
+        /// <remarks>
+        /// Added to trigger updates of the in-memory cache when the disk cache file is updated.
+        /// </remarks>
+        private void CheckDiskCacheForUpdate()
+        {
+            if (UmbracoSettings.isXmlContentCacheDisabled)
+                return;
+
+            lock (_timestampSyncLock)
+            {
+                if (_lastDiskCacheCheckTime > DateTime.UtcNow.AddSeconds(-1.0))
+                    return;
+
+                _lastDiskCacheCheckTime = DateTime.UtcNow;
+
+                lock (_xmlContentInternalSyncLock)
+                {
+
+                    if (GetCacheFileUpdateTime() <= _lastDiskCacheReadTime)
+                        return;
+
+                    _xmlContent = null;
+                }
+            }
+        }
+
+        /// <summary>
         /// Triggers the XML content population if necessary.
         /// </summary>
         /// <returns></returns>
         private bool CheckXmlContentPopulation()
         {
+            if (UmbracoSettings.XmlContentCheckForDiskChanges)
+                CheckDiskCacheForUpdate();
+
             if (isInitializing)
             {
                 lock (_xmlContentInternalSyncLock)
@@ -178,6 +215,8 @@ namespace umbraco
                                                       Thread.CurrentThread.Name, Thread.CurrentThread.IsThreadPoolThread));
                         _xmlContent = LoadContent();
                         Trace.WriteLine("Content initialized (loaded)");
+
+                        FireAfterRefreshContent(new RefreshContentEventArgs());
 
                         // Only save new XML cache to disk if we just repopulated it
                         // TODO: Re-architect this so that a call to this method doesn't invoke a new thread for saving disk cache
@@ -322,7 +361,7 @@ namespace umbraco
                         var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
                         Node n = new Node(d.Id, true);
                         if (!String.IsNullOrEmpty(n.Url) && n.Url != "/#")
-                           prov.UpdateNode(n);
+                            prov.UpdateNode(n);
                         else
                         {
                             Log.Add(LogTypes.Error, d.Id, "Can't update Sitemap Provider due to empty Url in node");
@@ -609,58 +648,68 @@ namespace umbraco
             ClearDocumentCache(documentId);
         }
 
-        /// <summary>
-        /// Uns the publish node async.
-        /// </summary>
-        /// <param name="documentId">The document id.</param>
-        [Obsolete("Please use: umbraco.content.ClearDocumentCacheAsync", true)]
-        public virtual void UnPublishNodeAsync(int documentId)
-        {
-            ThreadPool.QueueUserWorkItem(delegate { ClearDocumentCache(documentId); });
-        }
+        ///// <summary>
+        ///// Uns the publish node async.
+        ///// </summary>
+        ///// <param name="documentId">The document id.</param>
+        //[Obsolete("Please use: umbraco.content.ClearDocumentCacheAsync", true)]
+        //public virtual void UnPublishNodeAsync(int documentId)
+        //{
 
-        /// <summary>
-        /// Legacy method - you should use the overloaded publishnode(document d) method whenever possible
-        /// </summary>
-        /// <param name="documentId"></param>
-        [Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
-        public virtual void PublishNode(int documentId)
-        {
-            // Get the document
-            var d = new Document(documentId);
-            PublishNode(d);
-        }
-
-        /// <summary>
-        /// Publishes the node async.
-        /// </summary>
-        /// <param name="documentId">The document id.</param>
-        [Obsolete("Please use: umbraco.content.UpdateDocumentCacheAsync", true)]
-        public virtual void PublishNodeAsync(int documentId)
-        {
-            UpdateDocumentCacheAsync(documentId);
-        }
-
-        /// <summary>
-        /// Publishes the node.
-        /// </summary>
-        /// <param name="Documents">The documents.</param>
-        [Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
-        public virtual void PublishNode(List<Document> Documents)
-        {
-            UpdateDocumentCache(Documents);
-        }
+        //    ThreadPool.QueueUserWorkItem(delegate { ClearDocumentCache(documentId); });
+        //}
 
 
-        /// <summary>
-        /// Publishes the node.
-        /// </summary>
-        /// <param name="d">The document.</param>
-        [Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
-        public virtual void PublishNode(Document d)
-        {
-            UpdateDocumentCache(d);
-        }
+        ///// <summary>
+        ///// Legacy method - you should use the overloaded publishnode(document d) method whenever possible
+        ///// </summary>
+        ///// <param name="documentId"></param>
+        //[Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
+        //public virtual void PublishNode(int documentId)
+        //{
+
+        //    // Get the document
+        //    var d = new Document(documentId);
+        //    PublishNode(d);
+        //}
+
+
+        ///// <summary>
+        ///// Publishes the node async.
+        ///// </summary>
+        ///// <param name="documentId">The document id.</param>
+        //[Obsolete("Please use: umbraco.content.UpdateDocumentCacheAsync", true)]
+        //public virtual void PublishNodeAsync(int documentId)
+        //{
+
+        //    UpdateDocumentCacheAsync(documentId);
+        //}
+
+
+        ///// <summary>
+        ///// Publishes the node.
+        ///// </summary>
+        ///// <param name="Documents">The documents.</param>
+        //[Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
+        //public virtual void PublishNode(List<Document> Documents)
+        //{
+
+        //    UpdateDocumentCache(Documents);
+        //}
+
+
+
+        ///// <summary>
+        ///// Publishes the node.
+        ///// </summary>
+        ///// <param name="d">The document.</param>
+        //[Obsolete("Please use: umbraco.content.UpdateDocumentCache", true)]
+        //public virtual void PublishNode(Document d)
+        //{
+
+        //    UpdateDocumentCache(d);
+        //}
+
 
         /// <summary>
         /// Occurs when [before document cache update].
@@ -970,6 +1019,7 @@ namespace umbraco
                 var xmlDoc = new XmlDocument();
                 Log.Add(LogTypes.System, User.GetUser(0), -1, "Loading content from disk cache...");
                 xmlDoc.Load(UmbracoXmlDiskCacheFileName);
+                _lastDiskCacheReadTime = DateTime.UtcNow;
                 return xmlDoc;
             }
         }
@@ -1249,7 +1299,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                 HttpContext.Current.Application.Lock();
                 if (HttpContext.Current.Application[PersistenceFlagContextKey] != null)
                     HttpContext.Current.Application.Add(PersistenceFlagContextKey, null);
-                HttpContext.Current.Application[PersistenceFlagContextKey] = DateTime.Now;
+                HttpContext.Current.Application[PersistenceFlagContextKey] = DateTime.UtcNow;
                 HttpContext.Current.Application.UnLock();
             }
             else
@@ -1272,7 +1322,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         {
             if (File.Exists(UmbracoXmlDiskCacheFileName))
             {
-                return new FileInfo(UmbracoXmlDiskCacheFileName).LastWriteTime;
+                return new FileInfo(UmbracoXmlDiskCacheFileName).LastWriteTimeUtc;
             }
 
             return DateTime.MinValue;

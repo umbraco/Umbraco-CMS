@@ -912,6 +912,31 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Check if there's changes to the umbraco.config xml file cache on disk on each request
+        /// Makes it possible to updates environments by syncing the umbraco.config file across instances
+        /// Relates to http://umbraco.codeplex.com/workitem/30722
+        /// </summary>
+        public static bool XmlContentCheckForDiskChanges
+        {
+            get
+            {
+                try
+                {
+                    bool checkForDiskChanges;
+                    string value = GetKey("/settings/content/XmlContentCheckForDiskChanges");
+                    if (bool.TryParse(value, out checkForDiskChanges))
+                        return checkForDiskChanges;
+                    // Return default
+                    return false;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
         /// If this is enabled, all Umbraco objects will generate data in the preview table (cmsPreviewXml).
         /// If disabled, only documents will generate data.
         /// This feature is useful if anyone would like to see how data looked at a given time
