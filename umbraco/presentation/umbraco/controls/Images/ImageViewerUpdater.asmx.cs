@@ -10,6 +10,7 @@ using umbraco.controls.Images;
 using System.IO;
 using System.Web.Script.Serialization;
 using umbraco.businesslogic.Utils;
+using umbraco.presentation.webservices;
 
 namespace umbraco.controls.Images
 {
@@ -36,6 +37,9 @@ namespace umbraco.controls.Images
 		[WebMethod]
         public Dictionary<string, string> UpdateImage(int mediaId, string style, string linkTarget)
 		{
+            legacyAjaxCalls.Authorize();
+
+
 			//load the control with the specified properties and render the output as a string and return it
 			Page page = new Page();
 			string path = umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/controls/Images/ImageViewer.ascx";

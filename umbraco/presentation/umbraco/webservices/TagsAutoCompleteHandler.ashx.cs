@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Services;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
+using umbraco.presentation.webservices;
 
 namespace umbraco.presentation.umbraco.webservices
 {
@@ -18,6 +19,7 @@ namespace umbraco.presentation.umbraco.webservices
 
         public void ProcessRequest(HttpContext context)
         {
+            legacyAjaxCalls.Authorize();
 
             context.Response.ContentType = "text/plain";
 

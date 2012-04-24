@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Services;
 
 using System.Xml;
+using umbraco.presentation.webservices;
 
 namespace umbraco.webservices
 {
@@ -25,6 +26,8 @@ namespace umbraco.webservices
 		[WebMethod]
 		public string BootStrapTidy(string html, string ContextID) 
 		{
+            legacyAjaxCalls.Authorize();
+
 			return cms.helpers.xhtml.BootstrapTidy(html);
 		}
 

@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Web.Services;
 using System.Web.Script.Services;
+using umbraco.presentation.webservices;
 
 namespace umbraco.webservices
 {
@@ -22,6 +23,8 @@ namespace umbraco.webservices
         [ScriptMethod]
 		public int GetPublicationStatus(string key) 
 		{
+            legacyAjaxCalls.Authorize();
+
 			try 
 			{
 				return int.Parse(Application["publishDone" + key].ToString());
@@ -36,6 +39,8 @@ namespace umbraco.webservices
         [ScriptMethod]
         public int GetPublicationStatusMax(string key)
         {
+            legacyAjaxCalls.Authorize();
+
             try
             {
                 return int.Parse(Application["publishTotal" + key].ToString());
@@ -68,6 +73,8 @@ namespace umbraco.webservices
         [WebMethod]
         public void SaveXmlCacheToDisk()
         {
+            legacyAjaxCalls.Authorize();
+
             content.Instance.PersistXmlToFile();
         }
 
