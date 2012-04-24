@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Linq;
 using System.Linq.Expressions;
@@ -171,13 +172,23 @@ namespace System.Linq.Dynamic
                                 select new { g, Instances = g.Count() };
                     var dominantType = types.First().g.Key;
 
+                    // NH - add culture dependencies
+                    StringComparer comp = StringComparer.Create(CultureInfo.CurrentCulture, true);
+
                     if (!descending)
                     {
-                        return query.OrderBy(item => GetObjectAsTypeOrDefault(item.key, dominantType)).Select(item => item.node).AsQueryable();
+                        // if the dominant type is a string we'll ensure that strings are sorted based on culture settings on node
+                        if (dominantType.FullName == "System.String") 
+                            return query.OrderBy(item => item.key.ToString(), comp).Select(item => item.node).AsQueryable();
+                        else
+                            return query.OrderBy(item => GetObjectAsTypeOrDefault(item.key, dominantType)).Select(item => item.node).AsQueryable();
                     }
                     else
                     {
-                        return query.OrderByDescending(item => GetObjectAsTypeOrDefault(item.key, dominantType)).Select(item => item.node).AsQueryable();
+                        if (dominantType.FullName == "System.String")
+                            return query.OrderByDescending(item => item.key.ToString(), comp).Select(item => item.node).AsQueryable();
+                        else
+                            return query.OrderByDescending(item => GetObjectAsTypeOrDefault(item.key, dominantType)).Select(item => item.node).AsQueryable();
                     }
                 }
             }
