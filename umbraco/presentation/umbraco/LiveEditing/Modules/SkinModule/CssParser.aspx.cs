@@ -8,7 +8,7 @@ using umbraco.cms.businesslogic.skinning;
 
 namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 {
-    public partial class CssParser : System.Web.UI.Page
+    public partial class CssParser : BasePages.UmbracoEnsuredPage
     {
         //will be used to parse the global variables in the embedded css of a skin manifest
         protected void Page_Load(object sender, EventArgs e)

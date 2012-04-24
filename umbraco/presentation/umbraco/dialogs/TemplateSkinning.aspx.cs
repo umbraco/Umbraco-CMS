@@ -10,7 +10,7 @@ using umbraco.cms.businesslogic;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
-    public partial class TemplateSkinning : System.Web.UI.Page
+    public partial class TemplateSkinning : BasePages.UmbracoEnsuredPage
     {
         private int templateID = 0;
 

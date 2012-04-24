@@ -31,6 +31,7 @@ namespace umbraco.presentation.webservices
 
         private string getNodeName(int NodeId)
         {
+            legacyAjaxCalls.Authorize();
             cms.businesslogic.CMSNode n = new cms.businesslogic.CMSNode(NodeId);
             return n.Text;
         }
