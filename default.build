@@ -8,7 +8,7 @@
     -->
     <property name="nant.settings.currentframework" value="net-4.0" />,
 
-    <property name="build.version" value="4.7.2"/>
+    <property name="build.version" value="4.8.0"/>
     <property name="build.configuration" value="Debug"/>
 
 
