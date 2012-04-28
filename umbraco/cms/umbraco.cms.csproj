@@ -200,7 +200,11 @@
     </Compile>
     <Compile Include="Actions\IActionHandler.cs" />
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
+    <Compile Include="businesslogic\datatype\AbstractJsonPrevalueEditor.cs" />
+    <Compile Include="businesslogic\datatype\AbstractOptions.cs" />
+    <Compile Include="businesslogic\datatype\AbstractPrevalueEditor.cs" />
     <Compile Include="businesslogic\datatype\ClientDependencyAttribute.cs" />
+    <Compile Include="businesslogic\datatype\CsvToXmlData.cs" />
     <Compile Include="businesslogic\datatype\DataEditorSetting.cs" />
     <Compile Include="businesslogic\datatype\DataEditorSettingsStorage.cs" />
     <Compile Include="businesslogic\datatype\DataEditorSettingType.cs" />
@@ -208,6 +212,9 @@
     <Compile Include="businesslogic\datatype\DBTypes.cs" />
     <Compile Include="businesslogic\datatype\IDataEditorSettingType.cs" />
     <Compile Include="businesslogic\datatype\PreValue.cs" />
+    <Compile Include="businesslogic\datatype\PrevalueEditorExtensions.cs" />
+    <Compile Include="businesslogic\datatype\ResourceExtensions.cs" />
+    <Compile Include="businesslogic\datatype\XmlData.cs" />
     <Compile Include="businesslogic\installer\IInstallerStep.cs" />
     <Compile Include="businesslogic\installer\InstallerStep.cs" />
     <Compile Include="businesslogic\installer\InstallStepCollection.cs">
