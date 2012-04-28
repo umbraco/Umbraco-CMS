@@ -133,9 +133,6 @@
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
-    <Reference Include="System.Xml">
-      <Name>System.XML</Name>
-    </Reference>
     <ProjectReference Include="..\..\umbraco\businesslogic\umbraco.businesslogic.csproj">
       <Name>umbraco.businesslogic</Name>
       <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
@@ -163,6 +160,8 @@
       <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
       <Name>umbraco.controls</Name>
     </ProjectReference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\LinqToUmbraco\src\umbraco.Linq\Solution Items\SolutionInfo.cs">
@@ -187,6 +186,7 @@
     <Compile Include="colorpicker\ColorPickerDataType.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataTypeGuids.cs" />
     <Compile Include="datefieldmultiple\DataTypeDatefieldMultiple.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -278,6 +278,24 @@
     <Compile Include="memberpicker\MemberPickerDataType.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MultiNodeTreePicker\BaseTreeExtensions.cs" />
+    <Compile Include="MultiNodeTreePicker\FilteredContentTree.cs" />
+    <Compile Include="MultiNodeTreePicker\FilteredMediaTree.cs" />
+    <Compile Include="MultiNodeTreePicker\HttpCookieExtensions.cs" />
+    <Compile Include="MultiNodeTreePicker\MNTPResources.Designer.cs" />
+    <Compile Include="MultiNodeTreePicker\MNTP_DataEditor.cs" />
+    <Compile Include="MultiNodeTreePicker\MNTP_DataType.cs" />
+    <Compile Include="MultiNodeTreePicker\MNTP_PrevalueEditor.cs" />
+    <Compile Include="MultiNodeTreePicker\MultiNodeTreePickerExtensions.cs" />
+    <Compile Include="MultiNodeTreePicker\NodeSelectionType.cs" />
+    <Compile Include="MultiNodeTreePicker\SelectedItemsTemplate.cs" />
+    <Compile Include="MultiNodeTreePicker\XmlTreeNodeExtensions.cs" />
+    <Compile Include="MultiNodeTreePicker\XPathExpressionType.cs" />
+    <Compile Include="MultiNodeTreePicker\XPathFilterType.cs" />
+    <Compile Include="MultipleTextstring\MultipleTextstringControl.cs" />
+    <Compile Include="MultipleTextstring\MultipleTextstringDataType.cs" />
+    <Compile Include="MultipleTextstring\MultipleTextstringOptions.cs" />
+    <Compile Include="MultipleTextstring\MultipleTextstringPrevalueEditor.cs" />
     <Compile Include="numberfield\DataInteger.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -331,6 +349,10 @@
     <Compile Include="simpleEditor\simpleEditorDataType.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Slider\SliderControl.cs" />
+    <Compile Include="Slider\SliderDataType.cs" />
+    <Compile Include="Slider\SliderOptions.cs" />
+    <Compile Include="Slider\SliderPrevalueEditor.cs" />
     <Compile Include="tags\DataEditor.cs" />
     <Compile Include="tags\DataType.cs" />
     <Compile Include="tags\library.cs" />
@@ -376,6 +398,14 @@
     <Compile Include="userControlWrapper\usercontrolDataEditor.cs" />
     <Compile Include="userControlWrapper\usercontrolDataType.cs" />
     <Compile Include="userControlWrapper\usercontrolPrevalueEditor.cs" />
+    <Compile Include="XPathCheckBoxList\XPathCheckBoxListDataEditor.cs" />
+    <Compile Include="XPathCheckBoxList\XPathCheckBoxListDataType.cs" />
+    <Compile Include="XPathCheckBoxList\XPathCheckBoxListOptions.cs" />
+    <Compile Include="XPathCheckBoxList\XPathCheckBoxListPreValueEditor.cs" />
+    <Compile Include="XPathDropDownList\XPathDropDownListDataEditor.cs" />
+    <Compile Include="XPathDropDownList\XPathDropDownListDataType.cs" />
+    <Compile Include="XPathDropDownList\XPathDropDownListOptions.cs" />
+    <Compile Include="XPathDropDownList\XPathDropDownListPreValueEditor.cs" />
     <Compile Include="yesno\yesNo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -390,6 +420,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>MediaChooserScripts.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="MultiNodeTreePicker\MNTPResources.resx" />
     <EmbeddedResource Include="textfield\textFieldDataEditor.resx">
       <DependentUpon>textFieldDataEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -423,6 +454,11 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="MultiNodeTreePicker\jquery.tooltip.min.js" />
+    <Content Include="MultiNodeTreePicker\MultiNodePickerScripts.js" />
+    <Content Include="MultiNodeTreePicker\MultiNodePickerStyles.css" />
+    <Content Include="MultipleTextstring\MultipleTextstring.css" />
+    <Content Include="MultipleTextstring\MultipleTextstring.js" />
     <EmbeddedResource Include="KeyValuePrevalueEditor.js" />
     <EmbeddedResource Include="KeyValuePrevalueEditor.css" />
     <Content Include="mediapicker\MediaPicker.js" />
