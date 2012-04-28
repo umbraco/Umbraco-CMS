@@ -1408,6 +1408,15 @@
     <Compile Include="umbraco\Trees\NodeActionsEventArgs.cs" />
     <Compile Include="umbraco\Trees\TreeEventArgs.cs" />
     <Compile Include="umbraco\Trees\TreeRequestParams.cs" />
+    <Compile Include="umbraco\uQuery\ContentExtensions.cs" />
+    <Compile Include="umbraco\uQuery\ContentTypeExtensions.cs" />
+    <Compile Include="umbraco\uQuery\DocumentExtensions.cs" />
+    <Compile Include="umbraco\uQuery\MediaExtensions.cs" />
+    <Compile Include="umbraco\uQuery\MemberExtensions.cs" />
+    <Compile Include="umbraco\uQuery\NodeExtensions.cs" />
+    <Compile Include="umbraco\uQuery\PreValueExtensions.cs" />
+    <Compile Include="umbraco\uQuery\RelationTypeExtensions.cs" />
+    <Compile Include="umbraco\uQuery\UmbracoObjectTypeExtensions.cs" />
     <Compile Include="umbraco\webservices\MacroContainerService.asmx.cs">
       <DependentUpon>MacroContainerService.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -1649,6 +1658,31 @@
     <Compile Include="umbraco_client\tinymce3\plugins\spellchecker\SpellChecker.cs" />
     <Compile Include="umbraco_client\tinymce3\plugins\spellchecker\SpellCheckerInput.cs" />
     <Compile Include="umbraco_client\tinymce3\plugins\spellchecker\SpellCheckerResult.cs" />
+    <Compile Include="umbraco\uQuery\uQuery.cs" />
+    <Compile Include="umbraco\uQuery\uQuery-DataTypes.cs">
+      <DependentUpon>uQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\uQuery\uQuery-Dictionary.cs">
+      <DependentUpon>uQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\uQuery\uQuery-Document.cs">
+      <DependentUpon>uQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\uQuery\uQuery-Media.cs">
+      <DependentUpon>uQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\uQuery\uQuery-Members.cs">
+      <DependentUpon>uQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\uQuery\uQuery-Nodes.cs">
+      <DependentUpon>uQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\uQuery\uQuery-PreValues.cs">
+      <DependentUpon>uQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\uQuery\uQuery-UmbracoObjectType.cs">
+      <DependentUpon>uQuery.cs</DependentUpon>
+    </Compile>
     <Compile Include="viewstateMoverModule.cs" />
     <Compile Include="Web References\org.umbraco.update\Reference.cs">
       <AutoGen>True</AutoGen>
