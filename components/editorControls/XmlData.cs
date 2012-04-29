@@ -1,18 +1,18 @@
 ﻿using System.Xml;
 using umbraco.cms.businesslogic.datatype;
 
-namespace umbraco.cms.businesslogic.datatype
+namespace umbraco.editorControls
 {
     /// <summary>
     /// Overrides the <see cref="umbraco.cms.businesslogic.datatype.DefaultData"/> object to return the value as XML.
     /// </summary>
-    public class XmlData : DefaultData
+    public class XmlData : umbraco.cms.businesslogic.datatype.DefaultData
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="XmlData"/> class.
         /// </summary>
         /// <param name="dataType">Type of the data.</param>
-        public XmlData(BaseDataType dataType)
+        public XmlData(umbraco.cms.businesslogic.datatype.BaseDataType dataType)
             : base(dataType)
         {
         }

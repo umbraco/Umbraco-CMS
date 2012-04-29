@@ -2,12 +2,12 @@
 using umbraco;
 using umbraco.cms.businesslogic.datatype;
 
-namespace umbraco.cms.businesslogic.datatype
+namespace umbraco.editorControls
 {
     /// <summary>
     /// Overrides the <see cref="umbraco.cms.businesslogic.datatype.DefaultData"/> object to return the value as XML.
     /// </summary>
-    public class CsvToXmlData : DefaultData
+    public class CsvToXmlData : umbraco.cms.businesslogic.datatype.DefaultData
     {
         /// <summary>
         /// The separators to split the delimited string.
@@ -28,7 +28,7 @@ namespace umbraco.cms.businesslogic.datatype
         /// Initializes a new instance of the <see cref="CsvToXmlData"/> class.
         /// </summary>
         /// <param name="dataType">Type of the data.</param>
-        public CsvToXmlData(BaseDataType dataType)
+        public CsvToXmlData(umbraco.cms.businesslogic.datatype.BaseDataType dataType)
             : this(dataType, "values")
         {
         }
@@ -38,7 +38,7 @@ namespace umbraco.cms.businesslogic.datatype
         /// </summary>
         /// <param name="dataType">Type of the data.</param>
         /// <param name="rootName">Name of the root.</param>
-        public CsvToXmlData(BaseDataType dataType, string rootName)
+        public CsvToXmlData(umbraco.cms.businesslogic.datatype.BaseDataType dataType, string rootName)
             : this(dataType, rootName, "value")
         {
         }
@@ -50,7 +50,7 @@ namespace umbraco.cms.businesslogic.datatype
         /// <param name="dataType">Type of the data.</param>
         /// <param name="rootName">Name of the root.</param>
         /// <param name="elementName">Name of the element.</param>
-        public CsvToXmlData(BaseDataType dataType, string rootName, string elementName)
+        public CsvToXmlData(umbraco.cms.businesslogic.datatype.BaseDataType dataType, string rootName, string elementName)
             : this(dataType, rootName, elementName, new[] { "," })
         {
         }
@@ -62,7 +62,7 @@ namespace umbraco.cms.businesslogic.datatype
         /// <param name="rootName">Name of the root.</param>
         /// <param name="elementName">Name of the element.</param>
         /// <param name="separator">The separator.</param>
-        public CsvToXmlData(BaseDataType dataType, string rootName, string elementName, string[] separator)
+        public CsvToXmlData(umbraco.cms.businesslogic.datatype.BaseDataType dataType, string rootName, string elementName, string[] separator)
             : base(dataType)
         {
             this.rootName = rootName;

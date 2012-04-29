@@ -167,6 +167,9 @@
     <Compile Include="..\..\LinqToUmbraco\src\umbraco.Linq\Solution Items\SolutionInfo.cs">
       <Link>SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="AbstractJsonPrevalueEditor.cs" />
+    <Compile Include="AbstractOptions.cs" />
+    <Compile Include="AbstractPrevalueEditor.cs" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -186,6 +189,7 @@
     <Compile Include="colorpicker\ColorPickerDataType.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CsvToXmlData.cs" />
     <Compile Include="DataTypeGuids.cs" />
     <Compile Include="datefieldmultiple\DataTypeDatefieldMultiple.cs">
       <SubType>Code</SubType>
@@ -311,6 +315,7 @@
     <Compile Include="pagepicker\PagePickerDataType.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="PrevalueEditorExtensions.cs" />
     <Compile Include="radiobuttonlist\radiobox.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -322,6 +327,7 @@
     <Compile Include="relatedlinks\RelatedLinksDataEditor.cs" />
     <Compile Include="relatedlinks\RelatedLinksDataType.cs" />
     <Compile Include="relatedlinks\RelatedLinksPrevalueEditor.cs" />
+    <Compile Include="ResourceExtensions.cs" />
     <Compile Include="SettingControls\CheckBox.cs" />
     <Compile Include="SettingControls\CheckBoxList.cs" />
     <Compile Include="SettingControls\DropDownList.cs" />
@@ -398,6 +404,7 @@
     <Compile Include="userControlWrapper\usercontrolDataEditor.cs" />
     <Compile Include="userControlWrapper\usercontrolDataType.cs" />
     <Compile Include="userControlWrapper\usercontrolPrevalueEditor.cs" />
+    <Compile Include="XmlData.cs" />
     <Compile Include="XPathCheckBoxList\XPathCheckBoxListDataEditor.cs" />
     <Compile Include="XPathCheckBoxList\XPathCheckBoxListDataType.cs" />
     <Compile Include="XPathCheckBoxList\XPathCheckBoxListOptions.cs" />
@@ -459,6 +466,7 @@
     <Content Include="MultiNodeTreePicker\MultiNodePickerStyles.css" />
     <Content Include="MultipleTextstring\MultipleTextstring.css" />
     <Content Include="MultipleTextstring\MultipleTextstring.js" />
+    <EmbeddedResource Include="PrevalueEditor.css" />
     <EmbeddedResource Include="KeyValuePrevalueEditor.js" />
     <EmbeddedResource Include="KeyValuePrevalueEditor.css" />
     <Content Include="mediapicker\MediaPicker.js" />
