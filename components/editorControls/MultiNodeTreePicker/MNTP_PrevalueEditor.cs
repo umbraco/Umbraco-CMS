@@ -3,8 +3,6 @@ using System.Collections;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-// using uComponents.Core;
-// using uComponents.DataTypes.Shared.Extensions;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.interfaces;
 using umbraco.uicontrols.TreePicker;
@@ -506,7 +504,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             {
                 var desc = new HtmlGenericControl("div");
                 var descSpan = new HtmlGenericControl("span");
-                descSpan.InnerText = description;
+                descSpan.InnerHtml = description;
                 desc.Attributes.Add("class", "description");
                 desc.Controls.Add(descSpan);
                 div.Controls.Add(desc);
@@ -577,12 +575,12 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         /// <param name="writer">The <see cref="T:System.Web.UI.HtmlTextWriter"/> object that receives the server control content.</param>
         protected override void Render(HtmlTextWriter writer)
         {
-            writer.AddAttribute(HtmlTextWriterAttribute.Class, "uComponents");
-            writer.RenderBeginTag(HtmlTextWriterTag.Div); //start 'uComponents'
+            writer.AddAttribute(HtmlTextWriterAttribute.Class, "PrevalueEditor");
+            writer.RenderBeginTag(HtmlTextWriterTag.Div); //start 'PrevalueEditor'
 
             base.Render(writer);
 
-            writer.RenderEndTag(); //end 'uComponents'           
+            writer.RenderEndTag(); //end 'PrevalueEditor'
 
         }
 

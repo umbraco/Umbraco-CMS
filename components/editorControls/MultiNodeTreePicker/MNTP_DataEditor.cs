@@ -12,6 +12,9 @@ using umbraco.controls.Images;
 using umbraco.controls.Tree;
 using umbraco.IO;
 
+[assembly: WebResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerStyles.css", "text/css")]
+[assembly: WebResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerScripts.js", "application/x-javascript")]
+
 namespace umbraco.editorControls.MultiNodeTreePicker
 {
     /// <summary>
@@ -53,8 +56,8 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                                 contentTree.Tree.Title,
                                 contentTree.Tree.IconClosed,
                                 contentTree.Tree.IconOpened,
-                                "uComponents.Core",
-                                "DataTypes.MultiNodeTreePicker.FilteredContentTree",
+                                "umbraco.editorControls",
+                                "MultiNodeTreePicker.FilteredContentTree",
                                 contentTree.Tree.Action),
                             contentTree.App);
 
@@ -67,8 +70,8 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                                 contentTree.Tree.Title,
                                 contentTree.Tree.IconClosed,
                                 contentTree.Tree.IconOpened,
-                                "uComponents.Core",
-                                "DataTypes.MultiNodeTreePicker.FilteredMediaTree",
+                                "umbraco.editorControls",
+                                "MultiNodeTreePicker.FilteredMediaTree",
                                 contentTree.Tree.Action),
                             contentTree.App);
 
@@ -561,7 +564,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 
             writer.RenderEndTag(); //end multiNodePicker div
 
-            var tooltipAjaxUrl = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + @"/plugins/MultiNodePicker/CustomTreeService.asmx/GetNodeInfo";
+            var tooltipAjaxUrl = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + @"/controls/Tree/CustomTreeService.asmx/GetNodeInfo";
 
             //add jquery window load event to create the js tree picker
             var jsMethod = string.Format("jQuery('#{0}').MultiNodeTreePicker('{1}', {2}, '{3}', {4}, {5}, '{6}', '{7}');",

@@ -74,9 +74,9 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                         case NodeSelectionType.Picker:
                             //if it is a picker, then find the start node id
                             var definedId = this.GetPersistedCookieValue(
-								x => x.MntpGetStartNodeId(this.GetDataTypeId()), uQuery.RootNodeId);
+                                x => x.MntpGetStartNodeId(this.GetDataTypeId()), uQuery.RootNodeId);
                             //return a document with id -1 (don't set this up as it will exception!)
-							m_DefinedStartNodeDoc = (definedId > 0) ? new Document(definedId) : new Document(uQuery.RootNodeId, true);
+                            m_DefinedStartNodeDoc = (definedId > 0) ? new Document(definedId) : new Document(uQuery.RootNodeId, true);
                             break;
                         case NodeSelectionType.XPathExpression:
                             //if it is an expression, then we need to find the start node based on the xpression type, etc...
@@ -106,7 +106,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                                     //if it's a FromCurrent expression, then we need to run the xpath from this node and below
                                     var currId =
                                         this.GetPersistedCookieValue(
-											x => x.MntpGetCurrentEditingNode(this.GetDataTypeId()), uQuery.RootNodeId);
+                                            x => x.MntpGetCurrentEditingNode(this.GetDataTypeId()), uQuery.RootNodeId);
                                     var currNode = umbraco.library.GetXmlNodeById(currId.ToString());
                                     if (currNode.MoveNext())
                                     {
@@ -177,7 +177,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                     var startNode = new Document(StartNodeID);
                     rootNode.Text = startNode.Text;
                     rootNode.Icon = startNode.ContentTypeIcon;
-                }                
+                }
             }
         }
 
@@ -190,12 +190,12 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         {
             base.OnRenderNode(ref xNode, doc);
 
-			var dataTypeId = this.GetDataTypeId();
-			var xpath = this.GetXPathFromCookie(dataTypeId);
-			var xPathType = this.GetXPathFilterTypeFromCookie(dataTypeId);
+            var dataTypeId = this.GetDataTypeId();
+            var xpath = this.GetXPathFromCookie(dataTypeId);
+            var xPathType = this.GetXPathFilterTypeFromCookie(dataTypeId);
 
-			// resolves any Umbraco params in the XPath
-			xpath = uQuery.ResolveXPath(xpath);
+            // resolves any Umbraco params in the XPath
+            xpath = uQuery.ResolveXPath(xpath);
 
             var xDoc = new XmlDocument();
             XmlNode xmlDoc;
@@ -214,8 +214,8 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             xNode.DetermineClickable(xpath, xPathType, xml);
 
             //ensure that the NodeKey is passed through
-			xNode.Source = this.GetTreeServiceUrlWithParams(int.Parse(xNode.NodeID), dataTypeId);
-        } 
+            xNode.Source = this.GetTreeServiceUrlWithParams(int.Parse(xNode.NodeID), dataTypeId);
+        }
         #endregion
     }
 }

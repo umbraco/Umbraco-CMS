@@ -520,7 +520,6 @@
     <Compile Include="umbraco\controls\Tree\CustomTreeService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="umbraco\controls\Tree\CustomTreeServiceResource.Designer.cs" />
     <Compile Include="umbraco\controls\Tree\JTreeContextMenu.cs" />
     <Compile Include="umbraco\controls\Tree\JTreeContextMenuItem.cs" />
     <Compile Include="umbraco\controls\Tree\NodeInfo.cs">
@@ -1702,6 +1701,8 @@
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="umbraco\controls\Tree\CustomTreeService.asmx" />
+    <Content Include="umbraco\images\delete.gif" />
+    <Content Include="umbraco\images\information.png" />
     <Content Include="umbraco_client\tinymce3\plugins\media\moxieplayer.swf" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\img\flash.gif" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\img\iframe.gif" />
@@ -3224,7 +3225,6 @@
       <DependentUpon>welcome.ascx.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="umbraco\controls\Tree\CustomTreeServiceResource.resx" />
     <EmbeddedResource Include="umbraco\js\language.aspx.resx">
       <DependentUpon>language.aspx.cs</DependentUpon>
       <SubType>Designer</SubType>

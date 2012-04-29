@@ -5,9 +5,9 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco.editorControls.MultiNodeTreePicker
 {
-	/// <summary>
-	/// XmlTreeNode extensions for the MultiNodeTreePicker.
-	/// </summary>
+    /// <summary>
+    /// XmlTreeNode extensions for the MultiNodeTreePicker.
+    /// </summary>
     public static class XmlTreeNodeExtensions
     {
         //public static void DetermineSelected(this XmlTreeNode node)
@@ -52,12 +52,12 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                         {
                             //ensure the individual node is the correct color
                             node.Style.AddCustom("uc-treenode-noclick");
-                        }                        
+                        }
                     }
                 }
                 catch (XPathException)
                 {
-                    node.Text = "uComponents: XPath Error!";
+                    node.Text = "umbraco.editorControls: MNTP: XPath Error!";
                 }
             }
             else
@@ -71,7 +71,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                 {
                     //ensure the individual node is the correct color
                     node.Style.AddCustom("uc-treenode-noclick");
-                } 
+                }
             }
         }
     }

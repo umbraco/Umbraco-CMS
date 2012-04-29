@@ -12,7 +12,6 @@ namespace umbraco.editorControls.MultiNodeTreePicker
     /// </summary>
     internal class SelectedItemsTemplate : ITemplate
     {
-
         #region ITemplate Members
 
         /// <summary>

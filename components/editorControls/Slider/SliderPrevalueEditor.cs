@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-// using uComponents.DataTypes.Shared.Extensions;
-// using uComponents.DataTypes.Shared.PrevalueEditors;
 using umbraco.cms.businesslogic.datatype;
 
 namespace umbraco.editorControls.Slider

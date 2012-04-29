@@ -93,7 +93,7 @@ namespace umbraco.editorControls
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, "description");
                 writer.RenderBeginTag(HtmlTextWriterTag.Div); // start 'description'
 
-                Label desc = new Label() { Text = description };
+                var desc = new Literal() { Text = description };
                 desc.RenderControl(writer);
 
                 writer.RenderEndTag(); // end 'description'

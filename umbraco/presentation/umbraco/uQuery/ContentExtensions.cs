@@ -71,9 +71,7 @@ namespace umbraco
 		/// <returns>
 		/// empty string, or property value as string
 		/// </returns>
-		// TODO: [LK] Move to uComponents.Legacy project
-		[Obsolete("Use .GetProperty<string>(propertyAlias) instead.", false)]
-		public static string GetPropertyAsString(this Content item, string propertyAlias)
+		internal static string GetPropertyAsString(this Content item, string propertyAlias)
 		{
 			var propertyValue = string.Empty;
 			var property = item.getProperty(propertyAlias);
@@ -94,9 +92,7 @@ namespace umbraco
 		/// <returns>
 		/// true if can cast value, else false for all other circumstances
 		/// </returns>
-		// TODO: [LK] Move to uComponents.Legacy project
-		[Obsolete("Use .GetProperty<bool>(propertyAlias) instead.", false)]
-		public static bool GetPropertyAsBoolean(this Content item, string propertyAlias)
+		internal static bool GetPropertyAsBoolean(this Content item, string propertyAlias)
 		{
 			var propertyValue = false;
 			var property = item.getProperty(propertyAlias);
@@ -112,52 +108,6 @@ namespace umbraco
 				{
 					bool.TryParse(Convert.ToString(property.Value), out propertyValue);
 				}
-			}
-
-			return propertyValue;
-		}
-
-		/// <summary>
-		/// Get a DateTime value from a content item's property.
-		/// </summary>
-		/// <param name="item">The content item.</param>
-		/// <param name="propertyAlias">alias of propety to get</param>
-		/// <returns>
-		/// DateTime value or DateTime.MinValue for all other circumstances
-		/// </returns>
-		// TODO: [LK] Move to uComponents.Legacy project
-		[Obsolete("Use .GetProperty<DateTime>(propertyAlias) instead.", false)]
-		public static DateTime GetPropertyAsDateTime(this Content item, string propertyAlias)
-		{
-			var propertyValue = DateTime.MinValue;
-			var property = item.getProperty(propertyAlias);
-
-			if (property != null && property.Value != null)
-			{
-				DateTime.TryParse(Convert.ToString(property.Value), out propertyValue);
-			}
-
-			return propertyValue;
-		}
-
-		/// <summary>
-		/// Get an int value from a content item's property.
-		/// </summary>
-		/// <param name="item">The content item.</param>
-		/// <param name="propertyAlias">alias of propety to get</param>
-		/// <returns>
-		/// int value of property or int.MinValue for all other circumstances
-		/// </returns>
-		// TODO: [LK] Move to uComponents.Legacy project
-		[Obsolete("Use .GetProperty<int>(propertyAlias) instead.", false)]
-		public static int GetPropertyAsInt(this Content item, string propertyAlias)
-		{
-			var propertyValue = int.MinValue;
-			var property = item.getProperty(propertyAlias);
-
-			if (property != null && property.Value != null)
-			{
-				int.TryParse(Convert.ToString(property.Value), out propertyValue);
 			}
 
 			return propertyValue;

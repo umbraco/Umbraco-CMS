@@ -6,29 +6,29 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco.editorControls.MultiNodeTreePicker
 {
-	/// <summary>
-	/// FilteredMediaTree for the MultiNodeTreePicker.
-	/// </summary>
+    /// <summary>
+    /// FilteredMediaTree for the MultiNodeTreePicker.
+    /// </summary>
     public class FilteredMediaTree : BaseMediaTree
     {
-		/// <summary>
-		/// Initializes a new instance of the <see cref="FilteredMediaTree"/> class.
-		/// </summary>
-		/// <param name="app">The app.</param>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FilteredMediaTree"/> class.
+        /// </summary>
+        /// <param name="app">The app.</param>
         public FilteredMediaTree(string app)
             : base(app)
         {
         }
 
-		/// <summary>
-		/// 
-		/// </summary>
+        /// <summary>
+        /// 
+        /// </summary>
         private Media m_UserStartNodeMedia;
 
-		/// <summary>
-		/// 
-		/// </summary>
-		private Media m_DefinedStartNodeMedia;
+        /// <summary>
+        /// 
+        /// </summary>
+        private Media m_DefinedStartNodeMedia;
 
         /// <summary>
         /// Returns the Media object of the starting node for the current User. This ensures
@@ -112,7 +112,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                     var startNode = new Media(StartNodeID);
                     rootNode.Text = startNode.Text;
                     rootNode.Icon = startNode.ContentTypeIcon;
-                }                   
+                }
             }
         }
 
@@ -140,7 +140,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             node.Source = this.GetTreeServiceUrlWithParams(int.Parse(node.NodeID), this.GetDataTypeId());
 
             base.OnBeforeNodeRender(ref sender, ref node, e);
-        } 
+        }
         #endregion
     }
 }

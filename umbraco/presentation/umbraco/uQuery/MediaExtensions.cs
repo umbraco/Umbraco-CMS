@@ -130,7 +130,6 @@ namespace umbraco
 		/// </summary>
 		/// <param name="media">an umbraco.cms.businesslogic.media.Media object</param>
 		/// <returns>an int representing the depth of the Media object in the tree</returns>
-		// TODO: [LK] Move to uComponents.Legacy project
 		[Obsolete("Use .Level instead")]
 		public static int GetDepth(this Media media)
 		{

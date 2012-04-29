@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Desc_MaxItemsAllowed" xml:space="preserve">
     <value>The maximum number of items that are allowed to be selected by a content editor. If an unlimited number of node selections should be allowed, then enter -1 as the value</value>
@@ -124,7 +124,7 @@
     <value>The minimum number of items that are allowed to be selected by a content editor.</value>
   </data>
   <data name="Desc_NodeSelectionType" xml:space="preserve">
-    <value>Nodes can be selected from a parent node (Node Picker) or by an XPath expression. NOTE:When using an XPath expression, only published nodes can be shown.</value>
+    <value>Nodes can be selected from a parent node (Node Picker) or by an XPath expression. NOTE: When using an XPath expression, only published nodes can be shown.</value>
   </data>
   <data name="Desc_ShowThumbnails" xml:space="preserve">
     <value>If enabled and 'media' is selected as the tree type then a thumbnail will be rendered for each item selected.</value>
@@ -139,13 +139,13 @@
     <value>You can specify to store the data in Umbraco as comma seperated or as XML. By default it is stored as XML which makes it easier to use the saved value in XSLT, however, storing it as comma seperated makes it easier to work with the data using the API such as Node factory.</value>
   </data>
   <data name="Desc_XPathExpression" xml:space="preserve">
-    <value>This XPath expression is used to select a starting node and depends on the XPath expression type chosen (global or from current). IMPORTANT: This XPath expression should be written to match ONE node, if the expression matches more than one node, then the first node matched will be used as the start node.</value>
+    <value>This XPath expression is used to select a starting node and depends on the XPath expression type chosen (global or from current). &lt;u&gt;IMPORTANT&lt;/u&gt;: This XPath expression should be written to match &lt;b&gt;ONE&lt;/b&gt; node, if the expression matches more than one node, then the first node matched will be used as the start node.</value>
   </data>
   <data name="Desc_XPathExpressionType" xml:space="preserve">
     <value>The XPath expression that is evaluated to match a start node can be evaluated at a global tree level, or matched from the current node being edited.</value>
   </data>
   <data name="Desc_XPathFilter" xml:space="preserve">
-    <value>An xpath filter to match nodes that will be either enabled or disabled from being clicked (depending on what is selected for the XPath filter type). This XPath filter is for one node only so it should be formatted to select only one node. The XML to XPath against is the same as the Umbraco XML for one node.&lt;br/&gt;&lt;br/&gt;Example: /*[name()='myNodeType' or name()='yourNodeType'] &lt;br/&gt;&lt;br/&gt;The above would make all nodes of types: myNodeType or yourNodeType not selectable in the tree</value>
+    <value>An xpath filter to match nodes that will be either enabled or disabled from being clicked (depending on what is selected for the XPath filter type). This XPath filter is for one node only so it should be formatted to select only one node. The XML to XPath against is the same as the Umbraco XML for one node.&lt;br/&gt;&lt;br/&gt;Example: &lt;code&gt;/*[self::'myNodeType or self::yourNodeType]&lt;/code&gt;&lt;br/&gt;&lt;br/&gt;The above would make all nodes of types: myNodeType or yourNodeType not selectable in the tree</value>
   </data>
   <data name="Desc_XPathFilterType" xml:space="preserve">
     <value>Should the XPath filter match nodes to enable nodes or disable nodes. If Enable is selected, this means that only nodes that match the XPath filter will be allowed to be selected in the tree picker and vise versa for Disabled</value>

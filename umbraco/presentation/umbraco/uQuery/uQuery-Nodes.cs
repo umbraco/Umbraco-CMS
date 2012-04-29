@@ -166,7 +166,6 @@ namespace umbraco
 		/// </summary>
 		/// <param name="url">url to search for</param>
 		/// <returns>null or node matching supplied url</returns>
-		/// <remarks>Uses <c>uComponents.Core.XsltExtensions.Nodes.GetNodeIdByUrl</c></remarks>
 		public static Node GetNodeByUrl(string url)
 		{
 			return uQuery.GetNode(uQuery.GetNodeIdByUrl(url));
