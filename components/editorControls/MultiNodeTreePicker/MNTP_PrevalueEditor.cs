@@ -316,7 +316,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             base.OnInit(e);
             this.EnsureChildControls();
 
-            this.AddResourceToClientDependency("uComponents.DataTypes.Shared.Resources.Styles.PrevalueEditor.css", ClientDependency.Core.ClientDependencyType.Css);
+            this.RegisterEmbeddedClientResource("umbraco.editorControls.PrevalueEditor.css", ClientDependencyType.Css);
         }
 
         /// <summary>
@@ -329,7 +329,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             base.OnLoad(e);
 
             //add the css required
-            this.AddCssMNTPClientDependencies();
+            //// this.AddCssMNTPClientDependencies();
 
             //let view state handle the rest
             if (!Page.IsPostBack)

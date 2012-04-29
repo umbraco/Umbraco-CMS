@@ -290,7 +290,6 @@
     <Compile Include="MultiNodeTreePicker\MNTP_DataEditor.cs" />
     <Compile Include="MultiNodeTreePicker\MNTP_DataType.cs" />
     <Compile Include="MultiNodeTreePicker\MNTP_PrevalueEditor.cs" />
-    <Compile Include="MultiNodeTreePicker\MultiNodeTreePickerExtensions.cs" />
     <Compile Include="MultiNodeTreePicker\NodeSelectionType.cs" />
     <Compile Include="MultiNodeTreePicker\SelectedItemsTemplate.cs" />
     <Compile Include="MultiNodeTreePicker\XmlTreeNodeExtensions.cs" />
@@ -461,11 +460,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="MultiNodeTreePicker\jquery.tooltip.min.js" />
-    <Content Include="MultiNodeTreePicker\MultiNodePickerScripts.js" />
-    <Content Include="MultiNodeTreePicker\MultiNodePickerStyles.css" />
-    <Content Include="MultipleTextstring\MultipleTextstring.css" />
-    <Content Include="MultipleTextstring\MultipleTextstring.js" />
+    <EmbeddedResource Include="MultiNodeTreePicker\MultiNodePickerScripts.js" />
+    <EmbeddedResource Include="MultiNodeTreePicker\MultiNodePickerStyles.css" />
+    <EmbeddedResource Include="MultipleTextstring\MultipleTextstring.css" />
+    <EmbeddedResource Include="MultipleTextstring\MultipleTextstring.js" />
     <EmbeddedResource Include="PrevalueEditor.css" />
     <EmbeddedResource Include="KeyValuePrevalueEditor.js" />
     <EmbeddedResource Include="KeyValuePrevalueEditor.css" />

@@ -14,17 +14,16 @@ using umbraco.IO;
 
 namespace umbraco.editorControls.MultiNodeTreePicker
 {
-
-	/// <summary>
-	/// The user interface to display to the content editor
-	/// </summary>
-    [ClientDependency( ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
+    /// <summary>
+    /// The user interface to display to the content editor
+    /// </summary>
+    [ClientDependency(ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Javascript, "ui/jquery.tooltip.min.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "controls/Images/ImageViewer.js", "UmbracoRoot")]
     public class MNTP_DataEditor : Control, INamingContainer
     {
-
         #region Static Constructor
-        
+
         /// <summary>
         /// This adds our filtered tree definition to the TreeDefinitionCollection at runtime
         /// instead of having to declare it in the database 
@@ -79,13 +78,13 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                     }
                 }
             }
-        } 
+        }
 
         #endregion
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="MNTP_DataEditor"/> class.
-		/// </summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MNTP_DataEditor"/> class.
+        /// </summary>
         public MNTP_DataEditor()
         {
             this.MediaTypesWithThumbnails = new string[] { "image" };
@@ -93,7 +92,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             TreeToRender = "content";
             MaxNodeCount = -1;
             MinNodeCount = 0;
-			StartNodeId = uQuery.RootNodeId;
+            StartNodeId = uQuery.RootNodeId;
             ShowToolTips = true;
             ControlHeight = 200;
         }
@@ -102,35 +101,35 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         /// <summary>
         /// Used for locking code blocks
         /// </summary>
-        private static readonly object m_Locker = new object(); 
+        private static readonly object m_Locker = new object();
         #endregion
 
         #region Protected members
 
-		/// <summary>
-		/// 
-		/// </summary>
+        /// <summary>
+        /// 
+        /// </summary>
         protected CustomValidator MinItemsValidator;
 
-		/// <summary>
-		/// 
-		/// </summary>
+        /// <summary>
+        /// 
+        /// </summary>
         protected CustomTreeControl TreePickerControl;
 
-		/// <summary>
-		/// 
-		/// </summary>
-		protected Repeater SelectedValues;
+        /// <summary>
+        /// 
+        /// </summary>
+        protected Repeater SelectedValues;
 
-		/// <summary>
-		/// 
-		/// </summary>
-		protected HiddenField PickedValue;
+        /// <summary>
+        /// 
+        /// </summary>
+        protected HiddenField PickedValue;
 
-		/// <summary>
-		/// 
-		/// </summary>
-		protected HtmlGenericControl RightColumn; 
+        /// <summary>
+        /// 
+        /// </summary>
+        protected HtmlGenericControl RightColumn;
         #endregion
 
         #region public Properties
@@ -191,7 +190,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                     var nodes = value.Descendants("nodeId");
                     SelectedValues.DataSource = nodes;
                     PickedValue.Value = string.Join(",", nodes.Select(x => x.Value).ToArray());
-                }                
+                }
             }
         }
 
@@ -240,11 +239,11 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         /// </summary>
         public string StartNodeXPathExpression { get; set; }
 
-		/// <summary>
-		/// Gets or sets a value indicating whether [show tool tips].
-		/// </summary>
-		/// <value><c>true</c> if [show tool tips]; otherwise, <c>false</c>.</value>
-		/// <remarks>Shows/Hides the tooltip info bubble.</remarks>
+        /// <summary>
+        /// Gets or sets a value indicating whether [show tool tips].
+        /// </summary>
+        /// <value><c>true</c> if [show tool tips]; otherwise, <c>false</c>.</value>
+        /// <remarks>Shows/Hides the tooltip info bubble.</remarks>
         public bool ShowToolTips { get; set; }
 
         /// <summary>
@@ -252,13 +251,13 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         /// </summary>
         public XPathFilterType XPathFilterMatchType { get; set; }
 
-		/// <summary>
-		/// Gets or sets a value indicating whether [show thumbnails for media].
-		/// </summary>
-		/// <value>
-		/// 	<c>true</c> if [show thumbnails for media]; otherwise, <c>false</c>.
-		/// </value>
-		/// <remarks>Whether or not to show thumbnails for media</remarks>
+        /// <summary>
+        /// Gets or sets a value indicating whether [show thumbnails for media].
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if [show thumbnails for media]; otherwise, <c>false</c>.
+        /// </value>
+        /// <remarks>Whether or not to show thumbnails for media</remarks>
         public bool ShowThumbnailsForMedia { get; set; }
 
         /// <summary>
@@ -279,10 +278,10 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 
         #endregion
 
-		/// <summary>
-		/// Initialize the control, make sure children are created
-		/// </summary>
-		/// <param name="e">An <see cref="T:System.EventArgs"/> object that contains the event data.</param>
+        /// <summary>
+        /// Initialize the control, make sure children are created
+        /// </summary>
+        /// <param name="e">An <see cref="T:System.EventArgs"/> object that contains the event data.</param>
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -299,7 +298,8 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             base.OnLoad(e);
 
             //add the js/css required
-            this.AddAllMNTPClientDependencies();
+            this.RegisterEmbeddedClientResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerStyles.css", umbraco.cms.businesslogic.datatype.ClientDependencyType.Css);
+            this.RegisterEmbeddedClientResource("umbraco.editorControls.MultiNodeTreePicker.MultiNodePickerScripts.js", umbraco.cms.businesslogic.datatype.ClientDependencyType.Javascript);
 
             //update the tree type (we need to do this each time because i don't think view state works with these controls)
             switch (TreeToRender)
@@ -320,13 +320,13 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                 //since it is a post back, bind the data source to the view state values
                 XmlValue = ConvertToXDocument(SelectedIds);
             }
-           
+
             //bind the repeater if theres a data source, or if there's no datasource but this is a postback (i.e. nodes deleted)
             if (SelectedValues.DataSource != null || Page.IsPostBack)
             {
                 SelectedValues.DataBind();
             }
-   
+
         }
 
         /// <summary>
@@ -355,7 +355,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             //create the right column
             RightColumn = new HtmlGenericControl("div") { ID = "RightColumn" };
             RightColumn.Attributes.Add("class", "right propertypane");
-            
+
             //create the repeater
             SelectedValues = new Repeater
                 {
@@ -384,13 +384,13 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             this.Controls.Add(RightColumn);
         }
 
-        
-        
+
+
         /// <summary>
         /// Ensure the repeater is data bound
         /// </summary>
         public override void DataBind()
-        {            
+        {
             base.DataBind();
             SelectedValues.DataBind();
         }
@@ -428,7 +428,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             if (int.TryParse(thisNode.Value, out thisNodeId))
             {
                 umbraco.cms.businesslogic.Content loadedNode;
-                
+
                 try
                 {
                     loadedNode = new umbraco.cms.businesslogic.Content(thisNodeId);
@@ -465,7 +465,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                             var imgPreview = (ImageViewer)e.Item.FindControl("ImgPreview");
                             //show the thubmnail controls
                             imgPreview.Visible = true;
-                            
+
                             //add the item class
                             var item = (HtmlGenericControl)e.Item.FindControl("Item");
                             item.Attributes["class"] += " thumb-item";
@@ -482,7 +482,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                                 imgPreview.MediaId = thisNodeId;
                                 imgPreview.DataBind();
                             }
-                        }            
+                        }
                     }
 
                 }
@@ -490,8 +490,8 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                 {
                     //the node no longer exists, so we display a msg
                     litSelectNodeName.Text = "<i>NODE NO LONGER EXISTS</i>";
-                }                
-            }          
+                }
+            }
         }
 
         /// <summary>
@@ -511,13 +511,13 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             SavePersistentValuesForTree(XPathFilter);
         }
 
-		/// <summary>
-		/// Override render to control the exact output of what is rendered this includes instantiating the jquery plugin
-		/// </summary>
-		/// <param name="writer">The <see cref="T:System.Web.UI.HtmlTextWriter"/> object that receives the server control content.</param>
-		/// <remarks>
-		/// Generally i don't like to do this but there's a few div's, etc... to render so this makes more sense.
-		/// </remarks>
+        /// <summary>
+        /// Override render to control the exact output of what is rendered this includes instantiating the jquery plugin
+        /// </summary>
+        /// <param name="writer">The <see cref="T:System.Web.UI.HtmlTextWriter"/> object that receives the server control content.</param>
+        /// <remarks>
+        /// Generally i don't like to do this but there's a few div's, etc... to render so this makes more sense.
+        /// </remarks>
         protected override void Render(HtmlTextWriter writer)
         {
             //<div class="multiTreePicker">
@@ -536,7 +536,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 
             RenderTooltip(writer);
 
-            writer.AddAttribute("class",  (!MinItemsValidator.IsValid ? "error " : "") + "multiNodePicker clearfix");
+            writer.AddAttribute("class", (!MinItemsValidator.IsValid ? "error " : "") + "multiNodePicker clearfix");
             writer.AddAttribute("id", this.ClientID);
             writer.RenderBeginTag(HtmlTextWriterTag.Div);
 
@@ -548,20 +548,20 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             writer.RenderEndTag();
 
             writer.AddAttribute("class", "left propertypane");
-            writer.AddStyleAttribute( HtmlTextWriterStyle.Height, ((ControlHeight + 10).ToString() + "px"));
+            writer.AddStyleAttribute(HtmlTextWriterStyle.Height, ((ControlHeight + 10).ToString() + "px"));
             writer.RenderBeginTag(HtmlTextWriterTag.Div);
             //add the tree control here
             TreePickerControl.RenderControl(writer);
             writer.RenderEndTag();
 
-            RightColumn.RenderControl(writer);            
+            RightColumn.RenderControl(writer);
 
             //render the hidden field
             PickedValue.RenderControl(writer);
 
             writer.RenderEndTag(); //end multiNodePicker div
 
-			var tooltipAjaxUrl = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + @"/plugins/MultiNodePicker/CustomTreeService.asmx/GetNodeInfo";
+            var tooltipAjaxUrl = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + @"/plugins/MultiNodePicker/CustomTreeService.asmx/GetNodeInfo";
 
             //add jquery window load event to create the js tree picker
             var jsMethod = string.Format("jQuery('#{0}').MultiNodeTreePicker('{1}', {2}, '{3}', {4}, {5}, '{6}', '{7}');",
@@ -574,23 +574,23 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                 IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                 TreeToRender);
             var js = "jQuery(window).load(function() { " + jsMethod + " });";
-                
+
             writer.WriteLine("<script type='text/javascript'>" + js + "</script>");
 
         }
 
-		/// <summary>
-		/// converts a list of Ids to the XDocument structure
-		/// </summary>
-		/// <param name="val">The value.</param>
-		/// <returns></returns>
+        /// <summary>
+        /// converts a list of Ids to the XDocument structure
+        /// </summary>
+        /// <param name="val">The value.</param>
+        /// <returns></returns>
         private XDocument ConvertToXDocument(IEnumerable<string> val)
         {
             if (val.Count() > 0)
             {
                 return new XDocument(new XElement("MultiNodePicker",
                     new XAttribute("type", TreeToRender),
-                    val.Select(x => new XElement("nodeId", x.ToString()))));               
+                    val.Select(x => new XElement("nodeId", x.ToString()))));
             }
             else
             {
@@ -633,18 +633,18 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             this.Page.Items.Add("MNTPTooltip", true);
         }
 
-		/// <summary>
-		/// This will update the multi-node tree picker data which is used to store
-		/// the xpath data and xpath match type for this control id.
-		/// </summary>
-		/// <param name="xpath">The xpath.</param>
-		/// <remarks>
-		/// This will save the data into a cookie and also into the request cookie. It must save
-		/// it to both locations in case the request cookie has been changed and the request cookie
-		/// is different than the response cookie.
-		/// </remarks>
+        /// <summary>
+        /// This will update the multi-node tree picker data which is used to store
+        /// the xpath data and xpath match type for this control id.
+        /// </summary>
+        /// <param name="xpath">The xpath.</param>
+        /// <remarks>
+        /// This will save the data into a cookie and also into the request cookie. It must save
+        /// it to both locations in case the request cookie has been changed and the request cookie
+        /// is different than the response cookie.
+        /// </remarks>
         private void SavePersistentValuesForTree(string xpath)
-        {          
+        {
 
             //create the output cookie with all of the values of the request cookie
 
@@ -668,7 +668,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                 var id = 0;
                 if (int.TryParse(HttpContext.Current.Request["id"], out id))
                 {
-                    newCookie.MntpAddCurrentEditingNode(this.DataTypeDefinitionId, id);        
+                    newCookie.MntpAddCurrentEditingNode(this.DataTypeDefinitionId, id);
                 }
             }
 
@@ -681,7 +681,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                 HttpContext.Current.Request.Cookies.Remove(MNTP_DataType.PersistenceCookieName);
             }
             HttpContext.Current.Request.Cookies.Add(newCookie);
-            
+
         }
 
         /// <summary>
