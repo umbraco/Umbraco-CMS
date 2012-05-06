@@ -40,13 +40,23 @@ namespace umbraco.developer
                 {
                     isUserControl = true;
                     string fileName = Request.QueryString["fileName"];
-
+                    if (!fileName.StartsWith("~"))
+                    {
+                        if (fileName.StartsWith("/"))
+                        {
+                            fileName = "~" + fileName;
+                        }
+                        else
+                        {
+                            fileName = "~/" + fileName;
+                        }
+                    }
                     IOHelper.ValidateEditPath(fileName, SystemDirectories.Usercontrols);
 
 
-                    if (System.IO.File.Exists(IOHelper.MapPath("~/" + fileName)))
+                    if (System.IO.File.Exists(IOHelper.MapPath(fileName)))
                     {
-                        UserControl oControl = (UserControl)LoadControl(@"~/" + fileName);
+                        UserControl oControl = (UserControl)LoadControl(fileName);
 
                         type = oControl.GetType();
                     }
@@ -164,14 +174,19 @@ namespace umbraco.developer
                     string _macroPropertyTypeAlias = findMacroType(macroPropertyTypes, li.Value);
                     if (_macroPropertyTypeAlias == "")
                         _macroPropertyTypeAlias = "text";
-
-                    int macroPropertyTypeId = int.Parse(macroPropertyIds[_macroPropertyTypeAlias].ToString());
-
-                    MacroProperty.MakeNew(macroObject,
-                        true,
-                        li.Text.Substring(0, li.Text.IndexOf(" ")),
-                        spaceCamelCasing(li.Text),
-                        macroPropTypes.Find(delegate(MacroPropertyType mpt) { return mpt.Id == macroPropertyTypeId; }));
+                    object propertyId = macroPropertyIds[_macroPropertyTypeAlias];
+                    if (propertyId != null)
+                    {
+                        int macroPropertyTypeId = 0;
+                        if(int.TryParse(string.Format("{0}", propertyId), out macroPropertyTypeId))
+                        {
+                            MacroProperty.MakeNew(macroObject,
+                                true,
+                                li.Text.Substring(0, li.Text.IndexOf(" ")),
+                                spaceCamelCasing(li.Text),
+                                macroPropTypes.Find(delegate(MacroPropertyType mpt) { return mpt.Id == macroPropertyTypeId; }));
+                        }
+                    }
                 }
                 else if (li.Selected)
                     result += "<li>Skipped: " + spaceCamelCasing(li.Text) + " (already exists as a parameter)</li>";
