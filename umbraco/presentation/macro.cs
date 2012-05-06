@@ -320,7 +320,6 @@ namespace umbraco
                     // An empty string means: macroHtml has been cached before, but didn't had any output (Macro doesn't need to be rendered again)
                     // An empty reference (null) means: macroHtml has NOT been cached before
                     if (macroHtml != null)
-
                     {
                         UmbracoContext.Current.Trace.Write("renderMacro",
                             string.Format("Macro Content loaded from cache '{0}'.", Model.CacheIdentifier));
@@ -1257,7 +1256,52 @@ namespace umbraco
 
                 // NH 06-01-2012: Only set value if it has content
                 if (propValueSet)
-                    prop.SetValue(control, Convert.ChangeType(propValue, prop.PropertyType), null);
+                {
+                    //GE 06-05-2012: Handle Nullable<T> properties
+                    if (prop.PropertyType.IsGenericType && prop.PropertyType.Name == "Nullable`1")
+                    {
+                        Type underlyingType = Nullable.GetUnderlyingType(prop.PropertyType);
+                        if (underlyingType != null)
+                        {
+                            object safeValue = null;
+                            if (propValue != null)
+                            {
+                                if (!(underlyingType == typeof(Guid)))
+                                {
+                                    prop.SetValue(control, Convert.ChangeType(propValue, underlyingType), null);
+                                }
+                                else
+                                {
+                                    Guid g = Guid.Empty;
+                                    if (Guid.TryParse(string.Format("{0}", propValue), out g))
+                                    {
+                                        prop.SetValue(control, g, null);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                prop.SetValue(control, safeValue, null);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //GE 06-05-2012: Handle Guid properties as Convert.ChangeType throws on string->Guid
+                        if (!(prop.PropertyType == typeof(Guid)))
+                        {
+                            prop.SetValue(control, Convert.ChangeType(propValue, prop.PropertyType), null);
+                        }
+                        else
+                        {
+                            Guid g = Guid.Empty;
+                            if (Guid.TryParse(string.Format("{0}", propValue), out g))
+                            {
+                                prop.SetValue(control, g, null);
+                            }
+                        }
+                    }
+                }
             }
         }
 
