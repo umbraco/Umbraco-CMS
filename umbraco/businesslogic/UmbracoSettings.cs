@@ -214,6 +214,21 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Show disabled users in the tree in the Users section in the backoffice
+        /// </summary>
+        public static bool HideDisabledUsersInBackoffice
+        {
+            get
+            {
+                string value = GetKey("/settings/security/hideDisabledUsersInBackoffice");
+                bool result;
+                if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
+                    return result;
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the logs will be auto cleaned
         /// </summary>
         /// <value><c>true</c> if logs are to be automatically cleaned; otherwise, <c>false</c></value>

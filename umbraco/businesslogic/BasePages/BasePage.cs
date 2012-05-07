@@ -92,7 +92,7 @@ namespace umbraco.BasePages {
                     _user = BusinessLogic.User.GetUser(uid);
 
                     // Check for console access
-                    if (_user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(HttpContext.Current) && !GlobalSettings.RequestIsLiveEditRedirector(HttpContext.Current))
+                    if (_user.Disabled || (_user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(HttpContext.Current) && !GlobalSettings.RequestIsLiveEditRedirector(HttpContext.Current)))
                     {
                         throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
                     } 

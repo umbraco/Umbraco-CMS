@@ -23,6 +23,7 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
+using System.Linq;
 
 
 namespace umbraco
@@ -60,16 +61,14 @@ function openUser(id) {
 
         public override void Render(ref XmlTree tree)
         {
-            User[] users = User.getAll();
+            var users = new List<User>(User.getAll());
 
             User currUser = UmbracoEnsuredPage.CurrentUser;
 
             bool currUserIsAdmin = currUser.IsAdmin();
-            foreach (User u in users)
+            foreach (User u in users.OrderBy(x => x.Disabled))
             {
-
-
-                if (!u.Disabled)
+                if (!UmbracoSettings.HideDisabledUsersInBackoffice || (UmbracoSettings.HideDisabledUsersInBackoffice && !u.Disabled))
                 {
 
                     XmlTreeNode xNode = XmlTreeNode.Create(this);
@@ -100,6 +99,10 @@ function openUser(id) {
                     xNode.Action = "javascript:openUser(" + u.Id + ");";
                     xNode.Icon = "user.gif";
                     xNode.OpenIcon = "user.gif";
+
+                    if (u.Disabled) {
+                        xNode.Style.DimNode();
+                    }
 
                     OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
                     if (xNode != null)
