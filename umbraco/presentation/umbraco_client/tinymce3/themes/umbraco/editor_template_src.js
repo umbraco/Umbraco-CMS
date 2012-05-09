@@ -731,9 +731,9 @@
 		getInfo : function() {
 			return {
 				longname : 'Umbraco theme',
-				author : 'Umbraco, based on Moxiecode Systems AB Advanced theme',
-				authorurl : 'http://umbraco.org',
-				version : tinymce.majorVersion + "." + tinymce.minorVersion
+                		author : 'Umbraco, based on the advanced theme by Moxiecode Systems AB',
+		                authorurl : 'http://umbraco.org',
+		                version : tinymce.majorVersion + "." + tinymce.minorVersion
 			}
 		},
 
@@ -802,10 +802,8 @@
 			// Create external toolbar
 			/* UMBRACO MODIFIED */
 			if (lo == 'external') {
-				n = c = DOM.create('div', {style : 'position:relative'});
-				n = DOM.add(n, 'div', {id : ed.id + '_external', 'class' : 'mceExternalToolbar umbracoSkin'}); /* UMBRACO: Added add. class */
-				DOM.add(n, 'a', {id : ed.id + '_external_close', href : 'javascript:;', 'class' : 'mceExternalClose'});
-				n = DOM.add(n, 'table', {id : ed.id + '_tblext', cellSpacing : 0, cellPadding : 0});
+				n = c = DOM.create('div', { id: ed.id + '_external', 'class': 'mceToolbarExternal umbracoSkin' });
+				n = DOM.add(n, 'table', { id: ed.id + '_tblext', cellSpacing: 0, cellPadding: 0, style: 'margin-left: 10px' });
 				etb = DOM.add(n, 'tbody');
 
 				/* UMBRACO: Custom toolbar injection 
@@ -816,8 +814,9 @@
 				*/
 				document.getElementById(ed.getParam("umbraco_toolbar_id", "*")).appendChild(c);
 				
-				/* UMBRACO : Custom toolbar handling				
-				t._addToolbars(etb, o);				
+				/* UMBRACO: Custom toolbar handling
+				
+				t._addToolbars(etb, o);
 
 				ed.onMouseUp.add(function() {
 					var e = DOM.get(ed.id + '_external');
@@ -852,6 +851,7 @@
 							emptyDiv.hide();
 						}
 					}
+
 					t._addToolbars(etb, o);
 					DOM.show(DOM.get(ed.id + '_external'));
 				} else {
@@ -865,8 +865,6 @@
 					jQuery(".tinymceMenuBar").hide();
 					jQuery("#" + ed.id + "_external").parent().show();
 				});
-				/* UMBRACO MODIFIED */
-				
 			}
 
 			if (sl == 'top')
@@ -997,7 +995,7 @@
 			}
 			// Handle case when there are no toolbar buttons and ensure editor height is adjusted accordingly
 			if (!toolbarsExist)
-				o.deltaHeight -= s.theme_umbraco_row_height;
+				o.deltaHeight -= s.theme_advanced_row_height;
 			h.push(toolbarGroup.renderHTML());
 			h.push(DOM.createHTML('a', {href : '#', accesskey : 'z', title : ed.getLang("umbraco.toolbar_focus"), onfocus : 'tinyMCE.getInstanceById(\'' + ed.id + '\').focus();'}, '<!-- IE -->'));
 			DOM.setHTML(n, h.join(''));
@@ -1507,5 +1505,5 @@
 		}
 	});
 
-	tinymce.ThemeManager.add('umbraco', tinymce.themes.umbracoTheme);
+	tinymce.ThemeManager.add('umbraco', tinymce.themes.UmbracoTheme);
 }(tinymce));

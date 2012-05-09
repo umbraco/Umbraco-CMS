@@ -69,6 +69,12 @@ The following instruction appear to be obsolete
 4. EXTRA NOTES BY SGAY - MIGRATING TOWARDS 3.5
 Migration performed by merging TinyMCE changes into Umbraco + TinyMCE-3.4.7.
 
-All compressed .js files removed, since they are not used anyway, to keep things clean. Umbraco expressely uses _src.js files, see the modified compressor code.
+All compressed .js files removed, since they are not used anyway, to keep things clean.
+Umbraco expressely uses _src.js files, see the modified compressor code.
 
 Only tiny_mce_popup.js remains compressed, because that is how it is used, plus the original Umbraco Code used the stock 3.4 version so Umbraco does not seem to patch it. In any case, source is in TinyMCE dev package, under "classes", Popup.js.
+
+Currently at TinyMCE 3.5
+Still some work needs to be done on the Umbraco template, ui.css and editor_template.js
+Especially to fix the external toolbar, to get it closer to the 'avanced' theme
+The idea being to have as little differences as possible with 'advanced'
