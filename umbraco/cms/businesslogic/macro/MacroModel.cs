@@ -40,28 +40,27 @@ namespace umbraco.cms.businesslogic.macro
 
         public MacroModel(Macro m)
         {
-            Id = m.Id;
-            Name = m.Name;
-            Alias = m.Alias;
-            TypeAssembly = m.Assembly;
-            TypeName = m.Type;
-            Xslt = m.Xslt;
-            ScriptName = m.ScriptingFile;
-            CacheDuration = m.RefreshRate;
-            CacheByPage = m.CacheByPage;
-            CacheByMember = m.CachePersonalized;
-            RenderInEditor = m.RenderContent;
-
             Properties = new List<MacroPropertyModel>();
-
-            foreach (MacroProperty mp in m.Properties)
+            if (m != null)
             {
-                Properties.Add(
-                    new MacroPropertyModel(mp.Alias, string.Empty, mp.Type.Alias, mp.Type.BaseType));
+                Id = m.Id;
+                Name = m.Name;
+                Alias = m.Alias;
+                TypeAssembly = m.Assembly;
+                TypeName = m.Type;
+                Xslt = m.Xslt;
+                ScriptName = m.ScriptingFile;
+                CacheDuration = m.RefreshRate;
+                CacheByPage = m.CacheByPage;
+                CacheByMember = m.CachePersonalized;
+                RenderInEditor = m.RenderContent;
+                foreach (MacroProperty mp in m.Properties)
+                {
+                    Properties.Add(
+                        new MacroPropertyModel(mp.Alias, string.Empty, mp.Type.Alias, mp.Type.BaseType));
+                }
+                MacroType = Macro.FindMacroType(Xslt, ScriptName, TypeName, TypeAssembly);
             }
-
-            MacroType = Macro.FindMacroType(Xslt, ScriptName, TypeName, TypeAssembly);
-            
         }
 
         public MacroModel(string name, string alias, string typeAssembly, string typeName, string xslt, string scriptName, int cacheDuration, bool cacheByPage, bool cacheByMember)
