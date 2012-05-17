@@ -438,6 +438,7 @@
         var length = 0;
 
         function matchSubset(s, sub) {
+            s = s.toString(); // FR: This forces the value to be a string, otherwise the indexOf() method fails on anything other but a string
             if (!options.matchCase)
                 s = s.toLowerCase();
             var i = s.indexOf(sub);
