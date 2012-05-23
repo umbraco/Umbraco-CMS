@@ -114,7 +114,7 @@ namespace umbraco.cms.businesslogic.workflow
                 {
                     summary.Append("<tr>");
                     summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'>" + p.PropertyType.Name + "</th>");
-                    summary.Append("<style='text-align: left; vertical-align: top;'>" + p.Value.ToString() + "</td>");
+                    summary.Append("<td style='text-align: left; vertical-align: top;'>" + p.Value.ToString() + "</td>");
                     summary.Append("</tr>");
                 }
                 summary.Append("<tr><td colspan=\"2\" style=\"border-bottom: 1px solid #CCC; font-size: 2px;\">&nbsp;</td></tr>");
