@@ -1415,6 +1415,29 @@
     </Compile>
     <Compile Include="umbraco\Trees\MediaRecycleBin.cs" />
     <Compile Include="umbraco\Trees\NodeActionsEventArgs.cs" />
+    <Compile Include="umbraco\Trees\RelationTypes\EditRelationType.aspx.cs">
+      <DependentUpon>EditRelationType.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\Trees\RelationTypes\EditRelationType.aspx.designer.cs">
+      <DependentUpon>EditRelationType.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\Trees\RelationTypes\NewRelationType.aspx.cs">
+      <DependentUpon>NewRelationType.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\Trees\RelationTypes\NewRelationType.aspx.designer.cs">
+      <DependentUpon>NewRelationType.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\Trees\RelationTypes\ReadOnlyRelation.cs" />
+    <Compile Include="umbraco\Trees\RelationTypes\RegisterRelationTypeTree.cs" />
+    <Compile Include="umbraco\Trees\RelationTypes\RelationTypesWebService.asmx.cs">
+      <DependentUpon>RelationTypesWebService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="umbraco\Trees\RelationTypes\RelationTypeTree.cs" />
+    <Compile Include="umbraco\Trees\RelationTypes\TreeMenu\ActionDeleteRelationType.cs" />
+    <Compile Include="umbraco\Trees\RelationTypes\TreeMenu\ActionNewRelationType.cs" />
     <Compile Include="umbraco\Trees\TreeEventArgs.cs" />
     <Compile Include="umbraco\Trees\TreeRequestParams.cs" />
     <Compile Include="umbraco\uQuery\ContentExtensions.cs" />
@@ -1703,6 +1726,14 @@
     <Content Include="umbraco\controls\Tree\CustomTreeService.asmx" />
     <Content Include="umbraco\images\delete.gif" />
     <Content Include="umbraco\images\information.png" />
+    <Content Include="umbraco\Trees\RelationTypes\EditRelationType.aspx" />
+    <Content Include="umbraco\Trees\RelationTypes\Images\Bidirectional.png" />
+    <Content Include="umbraco\Trees\RelationTypes\Images\ParentToChild.png" />
+    <Content Include="umbraco\Trees\RelationTypes\Images\Refresh.gif" />
+    <Content Include="umbraco\Trees\RelationTypes\NewRelationType.aspx" />
+    <Content Include="umbraco\Trees\RelationTypes\RelationTypesWebService.asmx" />
+    <Content Include="umbraco\Trees\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
+    <Content Include="umbraco\Trees\RelationTypes\TreeMenu\ActionNewRelationType.js" />
     <Content Include="umbraco_client\tinymce3\plugins\media\moxieplayer.swf" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\img\flash.gif" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\img\iframe.gif" />
