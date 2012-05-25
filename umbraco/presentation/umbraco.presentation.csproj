@@ -1712,6 +1712,7 @@
     <Content Include="umbraco_client\tinymce3\themes\umbraco\img\trans.gif" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\img\video.gif" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\img\windowsmedia.gif" />
+    <Content Include="web.config.Blueberry.xslt" />
     <Content Include="web.config.ssaodsk01.xslt" />
     <Content Include="umbraco\dashboard\DesktopMediaUploader.ascx" />
     <Content Include="umbraco\dashboard\images\dmu-badge.jpg" />
