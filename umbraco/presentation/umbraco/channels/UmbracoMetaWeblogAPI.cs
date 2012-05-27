@@ -14,7 +14,7 @@ using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.channels.businesslogic;
-using Post=CookComputing.MetaWeblog.Post;
+using Post = CookComputing.MetaWeblog.Post;
 
 using System.Collections.Generic;
 using System.Web.Security;
@@ -26,7 +26,7 @@ namespace umbraco.presentation.channels
     {
         [XmlRpcMethod("blogger.deletePost",
             Description = "Deletes a post.")]
-        [return : XmlRpcReturnValue(Description = "Always returns true.")]
+        [return: XmlRpcReturnValue(Description = "Always returns true.")]
         public bool deletePost(
             string appKey,
             string postid,
@@ -103,7 +103,14 @@ namespace umbraco.presentation.channels
                     {
                         tags.AddTagToNode(doc.Id, categories[i]);
                     }
+                    //If the IUseTags provider manually set the property value to something on the IData interface then we should persist this
+                    //code commented as for some reason, even though the IUseTags control is setting IData.Value it is null here
+                    //could be a cache issue, or maybe it's a different instance of the IData or something, rather odd
+                    //doc.getProperty(userChannel.FieldCategoriesAlias).Value = categoryType.DataTypeDefinition.DataType.Data.Value;
 
+                    //Instead, set the document property to CSV of the tags - this WILL break custom editors for tags which don't adhere to the
+                    //pseudo standard that the .Value of the property contains CSV tags. 
+                    doc.getProperty(userChannel.FieldCategoriesAlias).Value = string.Join(",", categories);
                 }
                 else
                 {
@@ -112,11 +119,11 @@ namespace umbraco.presentation.channels
                         PreValue pv = new PreValue(categoryType.DataTypeDefinition.Id, categories[i]);
                         categoryValue += pv.Id + ",";
                     }
-                }
-                if (categoryValue.Length > 0)
-                    categoryValue = categoryValue.Substring(0, categoryValue.Length - 1);
+                    if (categoryValue.Length > 0)
+                        categoryValue = categoryValue.Substring(0, categoryValue.Length - 1);
 
-                doc.getProperty(userChannel.FieldCategoriesAlias).Value = categoryValue;
+                    doc.getProperty(userChannel.FieldCategoriesAlias).Value = categoryValue;
+                }
             }
         }
 
@@ -140,18 +147,25 @@ namespace umbraco.presentation.channels
                     if (tags != null)
                     {
                         List<interfaces.ITag> alltags = tags.GetAllTags();
-                        returnedCategories = new CategoryInfo[alltags.Count];
-                        int counter = 0;
-                        foreach (interfaces.ITag t in alltags)
+                        if (alltags != null)
                         {
-                            CategoryInfo ci = new CategoryInfo();
-                            ci.title = t.TagCaption;
-                            ci.categoryid = t.Id.ToString();
-                            ci.description = "";
-                            ci.rssUrl = "";
-                            ci.htmlUrl = "";
-                            returnedCategories[counter] = ci;
-                            counter++;
+                            returnedCategories = new CategoryInfo[alltags.Count];
+                            int counter = 0;
+                            foreach (interfaces.ITag t in alltags)
+                            {
+                                CategoryInfo ci = new CategoryInfo();
+                                ci.title = t.TagCaption;
+                                ci.categoryid = t.Id.ToString();
+                                ci.description = "";
+                                ci.rssUrl = "";
+                                ci.htmlUrl = "";
+                                returnedCategories[counter] = ci;
+                                counter++;
+                            }
+                        }
+                        else
+                        {
+                            returnedCategories = new CategoryInfo[0];
                         }
                     }
                     else
@@ -215,7 +229,7 @@ namespace umbraco.presentation.channels
                     d.getProperty(userChannel.FieldCategoriesAlias).Value.ToString() != "")
                 {
                     String categories = d.getProperty(userChannel.FieldCategoriesAlias).Value.ToString();
-                    char[] splitter = {','};
+                    char[] splitter = { ',' };
                     String[] categoryIds = categories.Split(splitter);
                     p.categories = categoryIds;
                 }
@@ -273,7 +287,7 @@ namespace umbraco.presentation.channels
 
                 foreach (Object o in blogPosts)
                 {
-                    Document d = (Document) o;
+                    Document d = (Document)o;
                     Post p = new Post();
                     p.dateCreated = d.CreateDateTime;
                     p.userid = username;
@@ -289,7 +303,7 @@ namespace umbraco.presentation.channels
                         d.getProperty(userChannel.FieldCategoriesAlias).Value.ToString() != "")
                     {
                         String categories = d.getProperty(userChannel.FieldCategoriesAlias).Value.ToString();
-                        char[] splitter = {','};
+                        char[] splitter = { ',' };
                         String[] categoryIds = categories.Split(splitter);
                         p.categories = categoryIds;
                     }
@@ -303,7 +317,7 @@ namespace umbraco.presentation.channels
                 }
 
 
-                return (Post[]) blogPostsObjects.ToArray(typeof (Post));
+                return (Post[])blogPostsObjects.ToArray(typeof(Post));
             }
             else
             {
@@ -429,9 +443,9 @@ namespace umbraco.presentation.channels
                     if (UmbracoSettings.UploadAllowDirectories)
                     {
                         // Create a new folder in the /media folder with the name /media/propertyid
-                        Directory.CreateDirectory( IOHelper.MapPath( SystemDirectories.Media + "/" + fileObject.Id));
+                        Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Media + "/" + fileObject.Id));
 
-                        _fullFilePath = IOHelper.MapPath( SystemDirectories.Media + "/" + fileObject.Id + "/" + filename);
+                        _fullFilePath = IOHelper.MapPath(SystemDirectories.Media + "/" + fileObject.Id + "/" + filename);
                         fileObject.Value = SystemDirectories.Media + "/" + fileObject.Id + "/" + filename;
                     }
                     else
@@ -536,7 +550,8 @@ namespace umbraco.presentation.channels
             throw new ArgumentException(string.Format("No data found for user with username: '{0}'", username));
         }
 
-        private string removeLeftUrl(string text) {
+        private string removeLeftUrl(string text)
+        {
             return
                 text.Replace(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority), "");
         }
