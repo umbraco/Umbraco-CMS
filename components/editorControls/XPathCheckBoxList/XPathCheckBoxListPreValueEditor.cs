@@ -85,10 +85,6 @@ namespace umbraco.editorControls.XPathCheckBoxList
 		/// </summary>
 		protected override void CreateChildControls()
 		{
-			this.dbTypeDropDownList.ID = "dbTypeDropDownList";
-			this.dbTypeDropDownList.Items.Add(new ListItem(DBTypes.Nvarchar.ToString()));
-			this.dbTypeDropDownList.Items.Add(new ListItem(DBTypes.Ntext.ToString()));
-
 			this.xPathTextBox.ID = "xPathTextBox";
 			this.xPathTextBox.CssClass = "umbEditorTextField";
 
@@ -126,7 +122,6 @@ namespace umbraco.editorControls.XPathCheckBoxList
 			base.OnLoad(e);
 
 			// Read in stored configuration values
-			this.dbTypeDropDownList.SelectedValue = base.m_DataType.DBType.ToString();
 			this.xPathTextBox.Text = this.Options.XPath;
 			this.storageTypeRadioButtonList.SelectedValue = this.Options.UseXml.ToString();
 			this.valueTypeDropDownList.SelectedValue = this.Options.UseIds.ToString();
@@ -164,7 +159,8 @@ namespace umbraco.editorControls.XPathCheckBoxList
 		{
 			if (this.Page.IsValid)
 			{
-                base.m_DataType.DBType = (umbraco.cms.businesslogic.datatype.DBTypes)Enum.Parse(typeof(umbraco.cms.businesslogic.datatype.DBTypes), this.dbTypeDropDownList.SelectedValue, true);
+                // always use NText
+                base.m_DataType.DBType = cms.businesslogic.datatype.DBTypes.Ntext;
 
 				this.Options.XPath = this.xPathTextBox.Text;
 				this.Options.UseXml = bool.Parse(this.storageTypeRadioButtonList.SelectedValue);
@@ -180,7 +176,7 @@ namespace umbraco.editorControls.XPathCheckBoxList
 		/// <param name="writer"></param>
 		protected override void RenderContents(HtmlTextWriter writer)
 		{
-			writer.AddPrevalueRow("Database Type", this.dbTypeDropDownList);
+			//writer.AddPrevalueRow("Database Type", this.dbTypeDropDownList);
 			writer.AddPrevalueRow("XPath Expression", this.xPathTextBox, this.xPathRequiredFieldValidator, this.xPathCustomValidator);
 			writer.AddPrevalueRow("Storage Type", this.storageTypeRadioButtonList);
 			writer.AddPrevalueRow("Values", this.valueTypeDropDownList);
