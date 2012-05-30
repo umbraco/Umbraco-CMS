@@ -15,6 +15,11 @@
 		/// </summary>
 		public const string MultipleTextstringId = "5359AD0B-06CC-4182-92BD-0A9117448D3F";
 
+        /// <summary>
+        /// Guid for the PickerRelations (previoulsy uComponents: MultiPickerRelations)
+        /// </summary>
+        public const string PickerRelationsId = "83396FF2-2E39-4A90-9066-17F5F3989374";
+
 		/// <summary>
 		/// Guid for the Slider data-type.
 		/// </summary>
