@@ -65,7 +65,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\foreign dlls\ClientDependency.Core.dll</HintPath>
     </Reference>
-    <Reference Include="CookComputing.XmlRpcV2, Version=2.2.0.4, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="CookComputing.XmlRpcV2">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\foreign dlls\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
