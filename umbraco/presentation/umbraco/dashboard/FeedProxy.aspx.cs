@@ -4,11 +4,10 @@
     using System.Linq;
     using System.Net;
     using System.Net.Mime;
-    using System.Xml;
+    using umbraco;
     using umbraco.BasePages;
     using umbraco.BusinessLogic;
     using umbraco.IO;
-    using umbraco;
 
     public partial class FeedProxy : UmbracoEnsuredPage
     {
@@ -36,12 +35,12 @@
                                         Response.Clear();
                                         Response.ContentType = Request.QueryString["type"] ?? MediaTypeNames.Text.Xml;
                                         Response.Write(response);
-                                        Response.End();
                                     }
                                 }
-                            } else
+                            }
+                            else
                             {
-                                Log.Add(LogTypes.Error, -1, string.Format("Access to unallowed feedproxy attempted: {0}", requestUri));                                
+                                Log.Add(LogTypes.Error, -1, string.Format("Access to unallowed feedproxy attempted: {0}", requestUri));
                             }
                         }
                     }
