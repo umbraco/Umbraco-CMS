@@ -26,7 +26,7 @@
 
     <cc1:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
 
-    <umb:CssInclude ID="CssInclude1" runat="server" FilePath="ui/ui-lightness/jquery-ui-1.8.4.custom.css"  PathNameAlias="UmbracoClient" />
+    <umb:CssInclude ID="CssInclude1" runat="server" FilePath="ui/ui-lightness/jquery-ui.custom.css"  PathNameAlias="UmbracoClient" />
     <umb:CssInclude ID="CssInclude2" runat="server" FilePath="ui/default.css" PathNameAlias="UmbracoClient" />
 
     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient"

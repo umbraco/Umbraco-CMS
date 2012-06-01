@@ -10,7 +10,7 @@ namespace umbraco.cms.businesslogic.skinning.controls
 {
     [ClientDependency(430, ClientDependencyType.Javascript, "ui/jqueryui.js", "UmbracoClient")]
     [ClientDependency(440, ClientDependencyType.Javascript, "LiveEditing/Modules/SkinModule/js/initslider.js", "UmbracoRoot")]
-    [ClientDependency(ClientDependencyType.Css, "ui/ui-lightness/jquery-ui-1.8.4.custom.css", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Css, "ui/ui-lightness/jquery-ui.custom.css", "UmbracoClient")]
     public class SliderControl: TextBox
     {
         public int MinimumValue { get; set; }
