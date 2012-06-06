@@ -456,7 +456,7 @@ namespace umbraco
         /// <returns>
         /// Returns a random node from a collection of nodes.
         /// </returns>
-        public static Node GetRandom(this List<Node> nodes)
+        public static Node GetRandom(this IList<Node> nodes)
         {
             var random = umbraco.library.GetRandom();
             return nodes[random.Next(0, (nodes.Count - 1))];
@@ -470,7 +470,7 @@ namespace umbraco
         /// <returns>
         /// Returns the specified number of random nodes from a collection of nodes.
         /// </returns>
-        public static IEnumerable<Node> GetRandom(this List<Node> nodes, int numberOfItems)
+        public static IEnumerable<Node> GetRandom(this IList<Node> nodes, int numberOfItems)
         {
             var output = new List<Node>(numberOfItems);
 
