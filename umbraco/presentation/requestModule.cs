@@ -389,6 +389,10 @@ namespace umbraco.presentation
 				//define the base settings for the dependency loader to use the global path settings
 				//if (!CompositeDependencyHandler.HandlerFileName.StartsWith(GlobalSettings_Path))
 				//    CompositeDependencyHandler.HandlerFileName = GlobalSettings_Path + "/" + CompositeDependencyHandler.HandlerFileName;
+				
+				// Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
+				ClientDependency.Core.CompositeFiles.Providers.XmlFileMapper.FileMapVirtualFolder = "~/App_Data/TEMP/ClientDependency";
+				ClientDependency.Core.CompositeFiles.Providers.BaseCompositeFileProcessingProvider.UrlTypeDefault = ClientDependency.Core.CompositeFiles.Providers.CompositeUrlType.Base64QueryStrings;
 
 				// init done... 
 				s_InitializedAlready = true;
