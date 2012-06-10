@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.datatype;
+using System.Xml;
 
 namespace umbraco
 {
@@ -26,7 +27,6 @@ namespace umbraco
 			return (property != null);
 		}
 
-#pragma warning disable 0618
 		/// <summary>
 		/// Get a value (of specified type) from a content item's property.
 		/// </summary>
@@ -35,33 +35,56 @@ namespace umbraco
 		/// <param name="propertyAlias">alias of property to get</param>
 		/// <returns>default(T) or property value cast to (T)</returns>
 		public static T GetProperty<T>(this Content item, string propertyAlias)
-		{
-			var typeConverter = TypeDescriptor.GetConverter(typeof(T));
+        {
+            var typeConverter = TypeDescriptor.GetConverter(typeof(T));
 
-			if (typeConverter != null)
-			{
-				if (typeof(T) == typeof(bool))
-				{
-					return (T)typeConverter.ConvertFrom(item.GetPropertyAsBoolean(propertyAlias).ToString());
-					// TODO: [LK -> HR] Maybe set 'GetPropertyAsBoolean' as a private/internal method?
-				}
+            if (typeConverter != null)
+            {
+                // Boolean
+                if (typeof(T) == typeof(bool))
+                {
+                    return (T)typeConverter.ConvertFrom(item.GetPropertyAsBoolean(propertyAlias).ToString());
+                }
 
-				try
-				{
-					return (T)typeConverter.ConvertFromString(item.GetPropertyAsString(propertyAlias));
-					// TODO: [LK -> HR] Maybe set 'GetPropertyAsString' as a private/internal method?
-				}
-				catch
-				{
-					return default(T);
-				}
-			}
-			else
-			{
-				return default(T);
-			}
-		}
-#pragma warning restore 0618
+                // XmlDocument
+                else if (typeof(T) == typeof(XmlDocument))
+                {
+                    var xmlDocument = new XmlDocument();
+
+                    try
+                    {
+                        xmlDocument.Load(item.GetPropertyAsString(propertyAlias));
+                    }
+                    catch
+                    {
+                    }
+
+                    return (T)((object)xmlDocument);
+                }
+
+//                // umbraco.MacroEngines.DynamicXml
+//                else if (typeof(T) == typeof(DynamicXml))
+//                {
+//                    try
+//                    {
+//                        return (T)((object)new DynamicXml(item.GetPropertyAsString(propertyAlias)));
+//                    }
+//                    catch
+//                    {
+//                    }
+//                }
+
+                try
+                {
+                    return (T)typeConverter.ConvertFromString(item.GetPropertyAsString(propertyAlias));
+                }
+                catch
+                {
+                }
+            }
+
+            return default(T);
+        }
 
 		/// <summary>
 		/// Get a string value from a content item's property.
@@ -71,7 +94,7 @@ namespace umbraco
 		/// <returns>
 		/// empty string, or property value as string
 		/// </returns>
-		internal static string GetPropertyAsString(this Content item, string propertyAlias)
+		private static string GetPropertyAsString(this Content item, string propertyAlias)
 		{
 			var propertyValue = string.Empty;
 			var property = item.getProperty(propertyAlias);
@@ -92,7 +115,7 @@ namespace umbraco
 		/// <returns>
 		/// true if can cast value, else false for all other circumstances
 		/// </returns>
-		internal static bool GetPropertyAsBoolean(this Content item, string propertyAlias)
+        private static bool GetPropertyAsBoolean(this Content item, string propertyAlias)
 		{
 			var propertyValue = false;
 			var property = item.getProperty(propertyAlias);

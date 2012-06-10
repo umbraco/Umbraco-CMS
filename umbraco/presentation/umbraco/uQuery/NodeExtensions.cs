@@ -261,7 +261,6 @@ namespace umbraco
             return (property != null);
         }
 
-#pragma warning disable 0618
         /// <summary>
         /// Get a value of type T from a property
         /// </summary>
@@ -275,27 +274,55 @@ namespace umbraco
 
             if (typeConverter != null)
             {
+                // Boolean
                 if (typeof(T) == typeof(bool))
                 {
                     // Use the GetPropertyAsBoolean method, as this handles true also being stored as "1"
                     return (T)typeConverter.ConvertFrom(node.GetPropertyAsBoolean(propertyAlias).ToString());
                 }
 
-                try
+                // XmlDocument
+                else if (typeof(T) == typeof(XmlDocument))
                 {
-                    return (T)typeConverter.ConvertFromString(node.GetPropertyAsString(propertyAlias));
+                    var xmlDocument = new XmlDocument();
+
+                    try
+                    {
+                        xmlDocument.Load(node.GetPropertyAsString(propertyAlias));
+                    }
+                    catch
+                    {
+                        // xml probably invalid
+                    }
+
+                    return (T)((object)xmlDocument);
                 }
-                catch
+
+//                // umbraco.MacroEngines DynamicXml
+//                else if (typeof(T) == typeof(DynamicXml))
+//                {
+//                    try
+//                    {
+//                        return (T)((object)new DynamicXml(node.GetPropertyAsString(propertyAlias)));
+//                    }
+//                    catch
+//                    {
+//                    }
+//                }
+                else
                 {
-                    return default(T);
+                    try
+                    {
+                        return (T)typeConverter.ConvertFromString(node.GetPropertyAsString(propertyAlias));
+                    }
+                    catch
+                    {
+                    }
                 }
             }
-            else
-            {
-                return default(T);
-            }
+
+            return default(T);
         }
-#pragma warning restore 0618
 
         /// <summary>
         /// Get a string value for the supplied property alias
@@ -303,7 +330,7 @@ namespace umbraco
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <param name="propertyAlias">alias of propety to get</param>
         /// <returns>empty string, or property value as string</returns>
-        internal static string GetPropertyAsString(this Node node, string propertyAlias)
+        private static string GetPropertyAsString(this Node node, string propertyAlias)
         {
             var propertyValue = string.Empty;
             var property = node.GetProperty(propertyAlias);
@@ -322,7 +349,7 @@ namespace umbraco
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <param name="propertyAlias">alias of propety to get</param>
         /// <returns>true if can cast value, else false for all other circumstances</returns>
-        internal static bool GetPropertyAsBoolean(this Node node, string propertyAlias)
+        private static bool GetPropertyAsBoolean(this Node node, string propertyAlias)
         {
             var propertyValue = false;
             var property = node.GetProperty(propertyAlias);
@@ -341,18 +368,6 @@ namespace umbraco
             }
 
             return propertyValue;
-        }
-
-        /// <summary>
-        /// Extension method on Node obj to get it's depth
-        /// taken from: http://our.umbraco.org/wiki/how-tos/useful-helper-extension-methods-%28linq-null-safe-access%29
-        /// </summary>
-        /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
-        /// <returns>int for depth, starts at 1</returns>
-        [Obsolete("Use .Level instead")]
-        public static int GetDepth(this Node node)
-        {
-            return node.Path.Split(',').ToList().Count;
         }
 
         /// <summary>
