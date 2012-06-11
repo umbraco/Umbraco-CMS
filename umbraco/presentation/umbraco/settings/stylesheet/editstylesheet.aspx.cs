@@ -34,7 +34,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
                 ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadStylesheets>().Tree.Alias)
-                    .SyncTree(helper.Request("id"), false);
+                    .SyncTree("-1,init," + helper.Request("id"), false);
             }
 
             MenuIconI save = Panel1.Menu.NewIcon();
