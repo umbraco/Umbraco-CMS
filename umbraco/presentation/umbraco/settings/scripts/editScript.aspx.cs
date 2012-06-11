@@ -13,6 +13,7 @@ using System.IO;
 using umbraco.cms.presentation.Trees;
 using umbraco.IO;
 using System.Linq;
+using umbraco.cms.helpers;
 
 namespace umbraco.cms.presentation.settings.scripts
 {
@@ -41,15 +42,15 @@ namespace umbraco.cms.presentation.settings.scripts
 
             NameTxt.Text = file;
 
-            
+
 
             string path = "";
             if (file.StartsWith("~/"))
                 path = IOHelper.ResolveUrl(file);
             else
                 path = IOHelper.ResolveUrl(SystemDirectories.Scripts + "/" + file);
-            
-            
+
+
             lttPath.Text = "<a target='_blank' href='" + path + "'>" + path + "</a>";
 
             // validate file
@@ -59,25 +60,26 @@ namespace umbraco.cms.presentation.settings.scripts
 
             StreamReader SR;
             string S;
-            SR = File.OpenText( IOHelper.MapPath( path ));
+            SR = File.OpenText(IOHelper.MapPath(path));
             S = SR.ReadToEnd();
             SR.Close();
-                
+
             editorSource.Text = S;
-            
+
             Panel1.Text = ui.Text("editscript", base.getUser());
             pp_name.Text = ui.Text("name", base.getUser());
             pp_path.Text = ui.Text("path", base.getUser());
 
-			if (!IsPostBack)
-			{
-				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadScripts>().Tree.Alias)
-					.SyncTree(file, false);
-			}
+            if (!IsPostBack)
+            {
+                string sPath = DeepLink.GetTreePathFromFilePath(file);
+                ClientTools
+                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadScripts>().Tree.Alias)
+                    .SyncTree(sPath, false);
+            }
         }
 
-       
+
 
         #region Web Form Designer generated code
         override protected void OnInit(EventArgs e)
@@ -121,7 +123,7 @@ namespace umbraco.cms.presentation.settings.scripts
                 Panel1.Menu.InsertSplitter();
 
                 uicontrols.MenuIconI helpIcon = Panel1.Menu.NewIcon();
-                helpIcon.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/settings/modals/showumbracotags.aspx?alias=" , ui.Text("template", "quickGuide"), 600, 580);
+                helpIcon.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/settings/modals/showumbracotags.aspx?alias=", ui.Text("template", "quickGuide"), 600, 580);
                 helpIcon.ImageURL = UmbracoPath + "/images/editor/help.png";
                 helpIcon.AltText = ui.Text("template", "quickGuide");
 
@@ -145,7 +147,8 @@ namespace umbraco.cms.presentation.settings.scripts
 
 
 
-          protected override void OnPreRender(EventArgs e) {
+        protected override void OnPreRender(EventArgs e)
+        {
             base.OnPreRender(e);
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/codeEditorSave.asmx"));
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
