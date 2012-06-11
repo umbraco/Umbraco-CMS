@@ -148,7 +148,13 @@
         var initApp = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["app"]%>';
         var rightAction = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["rightAction"]%>';
         var rightActionId = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["id"]%>';
-
+        var base = '<%=string.Format("{0}/", umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco))%>';
+        var url = ''
+        if (rightActionId && rightActionId != '') {
+            url = base + rightAction + ".aspx?id=" + rightActionId
+        } else {
+            url = base + rightAction;
+        }
         jQuery(document).ready(function () {
 
             UmbClientMgr.setUmbracoPath("<%=umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>");
@@ -175,7 +181,13 @@
                 UmbClientMgr.historyManager().addHistory(initApp != "" ? initApp :
                                                         UmbClientMgr.historyManager().getCurrent() != "" ? UmbClientMgr.historyManager().getCurrent() :
                                                         "<%=DefaultApp%>", true);
-                UmbClientMgr.contentFrame(rightAction + ".aspx?id=" + rightActionId);
+
+                //use a small timeout to handle load delays
+                //ref: http://our.umbraco.org/forum/developers/api-questions/32249-Direct-link-to-back-office-page
+                var timer = setTimeout(function () {
+                    UmbClientMgr.contentFrame(url);
+                }, 200);
+                
             }
             else {
                 UmbClientMgr.historyManager().addHistory(initApp != "" ? initApp :

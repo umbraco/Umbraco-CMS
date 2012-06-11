@@ -10,7 +10,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="xPath">XPath expression</param>
 		/// <returns>collection or empty collection</returns>
-		public static List<Media> GetMediaByXPath(string xPath)
+		public static IEnumerable<Media> GetMediaByXPath(string xPath)
 		{
 			var media = new List<Media>();
 			var xmlDocument = uQuery.GetPublishedXml(UmbracoObjectType.Media);
@@ -34,7 +34,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="csv">string csv of IDs</param>
 		/// <returns>collection or emtpy collection</returns>
-		public static List<Media> GetMediaByCsv(string csv)
+		public static IEnumerable<Media> GetMediaByCsv(string csv)
 		{
 			var media = new List<Media>();
 			var ids = uQuery.GetCsvIds(csv);
@@ -59,7 +59,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="xml">The XML.</param>
 		/// <returns></returns>
-		public static List<Media> GetMediaByXml(string xml)
+		public static IEnumerable<Media> GetMediaByXml(string xml)
 		{
 			var media = new List<Media>();
 			var ids = uQuery.GetXmlIds(xml);
@@ -84,7 +84,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="name">name of node to look for</param>
 		/// <returns>list of nodes, or empty list</returns>
-		public static List<Media> GetMediaByName(string name)
+		public static IEnumerable<Media> GetMediaByName(string name)
 		{
 			return uQuery.GetMediaByXPath(string.Concat("descendant::*[@nodeName='", name, "']"));
 		}
@@ -94,7 +94,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="mediaTypeAlias">The media type alias</param>
 		/// <returns>list of media, or empty list</returns>
-		public static List<Media> GetMediaByType(string mediaTypeAlias)
+		public static IEnumerable<Media> GetMediaByType(string mediaTypeAlias)
 		{
 			// Both XML schema versions have this attribute
 			return uQuery.GetMediaByXPath(string.Concat("descendant::*[@nodeTypeAlias='", mediaTypeAlias, "']"));
@@ -143,7 +143,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="media">generic list of Media objects</param>
 		/// <returns>a collection of mediaIDs and their text fields</returns>
-		public static Dictionary<int, string> ToNameIds(this List<Media> media)
+		public static Dictionary<int, string> ToNameIds(this IEnumerable<Media> media)
 		{
 			var dictionary = new Dictionary<int, string>();
 

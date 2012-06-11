@@ -125,16 +125,16 @@ namespace umbraco
 			}
 		}
 
-		/// <summary>
-		/// Extension method on Meia obj to get it's depth
-		/// </summary>
-		/// <param name="media">an umbraco.cms.businesslogic.media.Media object</param>
-		/// <returns>an int representing the depth of the Media object in the tree</returns>
-		[Obsolete("Use .Level instead")]
-		public static int GetDepth(this Media media)
-		{
-			return media.Path.Split(',').ToList().Count;
-		}
+        /////// <summary>
+        /////// Extension method on Meia obj to get it's depth
+        /////// </summary>
+        /////// <param name="media">an umbraco.cms.businesslogic.media.Media object</param>
+        /////// <returns>an int representing the depth of the Media object in the tree</returns>
+        ////[Obsolete("Use .Level instead")]
+        ////public static int GetDepth(this Media media)
+        ////{
+        ////    return media.Path.Split(',').ToList().Count;
+        ////}
 
 		/// <summary>
 		/// Tell me the level of this node (0 = root)

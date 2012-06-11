@@ -3,6 +3,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml.XPath;
 using umbraco.cms.businesslogic.datatype;
+using System.Linq;
 
 namespace umbraco.editorControls.XPathCheckBoxList
 {
@@ -139,7 +140,7 @@ namespace umbraco.editorControls.XPathCheckBoxList
 
 			try
 			{
-				if (uQuery.GetNodesByXPath(xPath).Count >= 0)
+				if (uQuery.GetNodesByXPath(xPath).Count() >= 0)
 				{
 					isValid = true;
 				}

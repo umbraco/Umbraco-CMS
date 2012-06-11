@@ -255,6 +255,42 @@ namespace umbraco.cms.businesslogic.web
                 }
             }
         }
+
+        public new string Path
+        {
+            get
+            {
+                List<int> path = new List<int>();
+                DocumentType working = this;
+                while (working != null)
+                {
+                    path.Add(working.Id);
+                    try
+                    {
+                        if (working.MasterContentType != 0)
+                        {
+                            working = new DocumentType(working.MasterContentType);
+                        }
+                        else
+                        {
+                            working = null;
+                        }
+                    }
+                    catch (ArgumentException)
+                    {
+                        working = null;
+                    }
+                }
+                path.Add(-1);
+                path.Reverse();
+                string sPath = string.Join(",", path.ConvertAll(item => item.ToString()).ToArray());
+                return sPath;
+            }
+            set
+            {
+                base.Path = value;
+            }
+        }
         #endregion
 
         #region Public Methods
