@@ -56,28 +56,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Upgrade 4.1", "Upgrade 4.1"
 		UpgradeReadme.txt = UpgradeReadme.txt
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLLs", "DLLs", "{F06D18F6-C510-4CBA-9514-0F890FD62103}"
-	ProjectSection(SolutionItems) = preProject
-		foreign dlls\ClientDependency.Core.dll = foreign dlls\ClientDependency.Core.dll
-		foreign dlls\CookComputing.XmlRpcV2.dll = foreign dlls\CookComputing.XmlRpcV2.dll
-		foreign dlls\Examine.dll = foreign dlls\Examine.dll
-		foreign dlls\HtmlAgilityPack.dll = foreign dlls\HtmlAgilityPack.dll
-		foreign dlls\ICSharpCode.SharpZipLib.dll = foreign dlls\ICSharpCode.SharpZipLib.dll
-		foreign dlls\IronMath.dll = foreign dlls\IronMath.dll
-		IronPython License.Rtf = IronPython License.Rtf
-		License.txt = License.txt
-		foreign dlls\Microsoft.ApplicationBlocks.Data.dll = foreign dlls\Microsoft.ApplicationBlocks.Data.dll
-		foreign dlls\WebPages\Microsoft.Web.Infrastructure.dll = foreign dlls\WebPages\Microsoft.Web.Infrastructure.dll
-		foreign dlls\MySql.Data.dll = foreign dlls\MySql.Data.dll
-		foreign dlls\Our.Umbraco.uGoLive.47x.dll = foreign dlls\Our.Umbraco.uGoLive.47x.dll
-		foreign dlls\Our.Umbraco.uGoLive.Checks.dll = foreign dlls\Our.Umbraco.uGoLive.Checks.dll
-		foreign dlls\Our.Umbraco.uGoLive.dll = foreign dlls\Our.Umbraco.uGoLive.dll
-		foreign dlls\TidyNet.dll = foreign dlls\TidyNet.dll
-		foreign dlls\UmbracoExamine.dll = foreign dlls\UmbracoExamine.dll
-		foreign dlls\UrlRewritingNet.UrlRewriter.dll = foreign dlls\UrlRewritingNet.UrlRewriter.dll
-		foreign dlls\VistaDB For Umbraco.dll = foreign dlls\VistaDB For Umbraco.dll
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.presentation", "umbraco\presentation\umbraco.presentation.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.businesslogic", "umbraco\businesslogic\umbraco.businesslogic.csproj", "{E469A9CE-1BEC-423F-AC44-713CD72457EA}"
@@ -196,7 +174,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{B8ECDB8B-BF44-462C-B6DA-22421B3EC4D7} = {F0242771-6DE6-4E03-BD3A-7B79BA79105B}
 		{58072405-85D0-45CA-8F5C-EA8928C32A6A} = {F0242771-6DE6-4E03-BD3A-7B79BA79105B}
-		{F06D18F6-C510-4CBA-9514-0F890FD62103} = {F0242771-6DE6-4E03-BD3A-7B79BA79105B}
 		{19400916-4F71-45A0-B0E0-F9BE406D7772} = {F0242771-6DE6-4E03-BD3A-7B79BA79105B}
 		{AA6839DD-07D5-4277-915D-8C9290A36D5B} = {F0242771-6DE6-4E03-BD3A-7B79BA79105B}
 		{5BB61485-B480-4A03-A8DD-1636A5AF575C} = {B8ECDB8B-BF44-462C-B6DA-22421B3EC4D7}

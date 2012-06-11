@@ -39,7 +39,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Examine, Version=0.10.0.292, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine">
       <HintPath>..\foreign dlls\Examine.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.3.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
@@ -68,7 +68,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
-    <Reference Include="UmbracoExamine, Version=0.10.0.292, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="UmbracoExamine">
       <HintPath>..\foreign dlls\UmbracoExamine.dll</HintPath>
     </Reference>
   </ItemGroup>
