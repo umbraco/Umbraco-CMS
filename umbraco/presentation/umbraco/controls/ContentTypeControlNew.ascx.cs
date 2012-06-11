@@ -224,7 +224,7 @@ namespace umbraco.controls
                 ddlThumbnails.Items.Add(li);
             }
 
-                Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", @"
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", @"
 function refreshDropDowns() {
     if (jQuery('#" + ddlIcons.ClientID + @" option').length <= 100)
         jQuery('#" + ddlIcons.ClientID + @"').msDropDown({ showIcon: true, style: 'width:250px;' });
@@ -263,7 +263,8 @@ jQuery(function() { refreshDropDowns(); });
                 ContentType[] contentTypes = cType.GetAll();
                 foreach (cms.businesslogic.ContentType ct in contentTypes.OrderBy(x => x.Text))
                 {
-                    ListItem li = new ListItem(ct.Text, ct.Id.ToString());
+                    string text = string.Format("{0} {1}", ct.Text, umbraco.cms.helpers.DeepLink.GetAnchor(DeepLinkType.DocumentType, ct.Id.ToString(), true));
+                    ListItem li = new ListItem(text, ct.Id.ToString());
                     dualAllowedContentTypes.Items.Add(li);
                     lstAllowedContentTypes.Items.Add(li);
                     foreach (int i in allowedIds)
