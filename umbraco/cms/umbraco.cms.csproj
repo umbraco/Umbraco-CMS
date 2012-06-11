@@ -255,6 +255,8 @@
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
     <Compile Include="businesslogic\skinning\Skinning.cs" />
     <Compile Include="helpers\Casing.cs" />
+    <Compile Include="helpers\DeepLink.cs" />
+    <Compile Include="helpers\DeepLinkType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
