@@ -121,13 +121,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     }
 
                     this._debug("contentFrame: parsed location: " + strLocation);
-
-                    if (typeof this.mainWindow().right != "undefined") {
-                        this.mainWindow().right.location.href = strLocation;
-                    }
-                    else {
-                        this.mainWindow().location.href = strLocation; //set the current windows location if the right frame doesn't exist int he current context
-                    }
+                    window.setTimeout(function(){
+                        if (typeof this.mainWindow().right != "undefined") {
+                            this.mainWindow().right.location.href = strLocation;
+                        }
+                        else {
+                            this.mainWindow().location.href = strLocation; //set the current windows location if the right frame doesn't exist int he current context
+                        }
+                    },200);
                 }
             },
             openModalWindow: function(url, name, showHeader, width, height, top, leftOffset, closeTriggers, onCloseCallback) {
