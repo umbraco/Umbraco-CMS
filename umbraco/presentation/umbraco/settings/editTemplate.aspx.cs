@@ -73,7 +73,7 @@ namespace umbraco.cms.presentation.settings
 
                 ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadTemplates>().Tree.Alias)
-                    .SyncTree(_template.Id.ToString(), false);
+                    .SyncTree("-1,init," + _template.Path.Replace("-1,", ""), false);
 
                 LoadScriptingTemplates();
                 LoadMacros();
