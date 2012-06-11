@@ -30,11 +30,11 @@ namespace umbraco.cms.helpers
             {
                 if (!useJavascript)
                 {
-                    return string.Format("<a href=\"{1}\" target=\"_blank\">Edit&nbsp;&gt;</a>", url);
+                    return string.Format("<a href=\"{0}\" target=\"_blank\">{1}&nbsp;&gt;</a>", url, ui.GetText("general", "edit"));
                 }
                 else
                 {
-                    return string.Format("<a href=\"{0}\">Edit&nbsp;&gt;</a>", url);
+                    return string.Format("<a href=\"{0}\">{1}&nbsp;&gt;</a>", url, ui.GetText("general", "edit"));
                 }
             }
             return null;
