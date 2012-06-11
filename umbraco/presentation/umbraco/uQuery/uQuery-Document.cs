@@ -10,7 +10,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="csv">string csv of IDs</param>
 		/// <returns>collection or emtpy collection</returns>
-		public static List<Document> GetDocumentsByCsv(string csv)
+		public static IEnumerable<Document> GetDocumentsByCsv(string csv)
 		{
 			var documents = new List<Document>();
 			var ids = uQuery.GetCsvIds(csv);
@@ -35,7 +35,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="xml">The XML.</param>
 		/// <returns></returns>
-		public static List<Document> GetDocumentsByXml(string xml)
+		public static IEnumerable<Document> GetDocumentsByXml(string xml)
 		{
 			var documents = new List<Document>();
 			var ids = uQuery.GetXmlIds(xml);
@@ -130,7 +130,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="documents">generic list of Document objects</param>
 		/// <returns>a collection of document IDs and their text fields</returns>
-		public static Dictionary<int, string> ToNameIds(this List<Document> documents)
+		public static Dictionary<int, string> ToNameIds(this IEnumerable<Document> documents)
 		{
 			var dictionary = new Dictionary<int, string>();
 

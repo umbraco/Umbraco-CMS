@@ -23,7 +23,7 @@ namespace umbraco
 		/// <param name="xpath">XPath expression to get Nodes, can use $ancestorOrSelf which will use the current Node if published, else it'll use the nearest published parent
 		/// $currentPage will be depreciated</param>
 		/// <returns>an empty collection or a collection of nodes</returns>
-		public static List<Node> GetNodesByXPath(string xpath)
+		public static IEnumerable<Node> GetNodesByXPath(string xpath)
 		{
 			var nodes = new List<Node>();
 
@@ -72,7 +72,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="csv">string csv of Ids</param>
 		/// <returns>an empty collection or a collection or Nodes</returns>
-		public static List<Node> GetNodesByCsv(string csv)
+		public static IEnumerable<Node> GetNodesByCsv(string csv)
 		{
 			var nodes = new List<Node>();
 			var ids = uQuery.GetCsvIds(csv);
@@ -104,7 +104,7 @@ namespace umbraco
 		///  </MultiNodePicker>"
 		/// </param>
 		/// <returns>an empty list or a list of nodes</returns>
-		public static List<Node> GetNodesByXml(string xml)
+		public static IEnumerable<Node> GetNodesByXml(string xml)
 		{
 			var nodes = new List<Node>();
 			var ids = uQuery.GetXmlIds(xml);
@@ -129,7 +129,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="name">name of node to look for</param>
 		/// <returns>list of nodes, or empty list</returns>
-		public static List<Node> GetNodesByName(string name)
+		public static IEnumerable<Node> GetNodesByName(string name)
 		{
 			return uQuery.GetNodesByXPath(string.Concat("descendant::*[@nodeName='", name, "']"));
 		}
@@ -139,7 +139,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="documentTypeAlias">The document type alias</param>
 		/// <returns>list of nodes, or empty list</returns>
-		public static List<Node> GetNodesByType(string documentTypeAlias)
+		public static IEnumerable<Node> GetNodesByType(string documentTypeAlias)
 		{
 			if (uQuery.IsLegacyXmlSchema())
 			{
@@ -156,7 +156,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="documentTypeId">The document type id.</param>
 		/// <returns></returns>
-		public static List<Node> GetNodesByType(int documentTypeId)
+		public static IEnumerable<Node> GetNodesByType(int documentTypeId)
 		{
 			return uQuery.GetNodesByXPath(string.Concat("descendant::*[@nodeType='", documentTypeId, "']"));
 		}
@@ -346,7 +346,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="nodes">generic list of node objects</param>
 		/// <returns>a collection of nodeIDs and their names</returns>
-		public static Dictionary<int, string> ToNameIds(this List<Node> nodes)
+		public static Dictionary<int, string> ToNameIds(this IEnumerable<Node> nodes)
 		{
 			var dictionary = new Dictionary<int, string>();
 

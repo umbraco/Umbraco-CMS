@@ -576,18 +576,6 @@ namespace umbraco
             return node.NiceUrl.Replace(library.RequestServerVariables("HTTP_HOST"), string.Concat((ssl ? "https://" : "http://"), domain.Name));
         }
 
-        /// <summary>
-        /// Determines whether [the specified node] [is hidden from navigation].
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>
-        ///   <c>true</c> if [the specified node] [is hidden from navigation]; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsHiddenFromNavigation(this Node node)
-        {
-            // TODO: [OA] Document on Codeplex. Is this one really necessary? - [HR] this one could be confusing as depends on default naming convention
-            return node.GetProperty<bool>("umbracoNaviHide");
-        }
 
 #pragma warning disable 0618
         /// <summary>
