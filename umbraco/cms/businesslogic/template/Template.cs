@@ -326,7 +326,10 @@ namespace umbraco.cms.businesslogic.template
             }
         }
 
-
+        public IEnumerable<DocumentType> GetDocumentTypes()
+        {
+            return DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id));
+        }
 
         public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
         {
