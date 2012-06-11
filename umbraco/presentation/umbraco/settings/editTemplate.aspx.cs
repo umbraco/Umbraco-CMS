@@ -11,6 +11,7 @@ using umbraco.cms.presentation.Trees;
 using umbraco.DataLayer;
 using umbraco.IO;
 using umbraco.uicontrols;
+using System.Linq;
 
 namespace umbraco.cms.presentation.settings
 {
@@ -77,6 +78,7 @@ namespace umbraco.cms.presentation.settings
 
                 LoadScriptingTemplates();
                 LoadMacros();
+                LoadDocTypes();
             }
         }
 
@@ -129,7 +131,6 @@ namespace umbraco.cms.presentation.settings
 
             Panel1.Menu.NewElement("div", "splitButtonMacroPlaceHolder", "sbPlaceHolder", 40);
 
-
             if (UmbracoSettings.UseAspNetMasterPages)
             {
                 Panel1.Menu.InsertSplitter();
@@ -169,6 +170,8 @@ namespace umbraco.cms.presentation.settings
                                               "','canvas')";
             }
 
+            Panel1.Menu.InsertSplitter();
+            Panel1.Menu.NewElement("div", "splitButtonDocTypePlaceHolder", "sbPlaceHolder", 40);
 
             // Help
             Panel1.Menu.InsertSplitter();
@@ -218,6 +221,14 @@ namespace umbraco.cms.presentation.settings
             rpt_macros.DataBind();
 
             macroRenderings.Close();
+        }
+
+        private void LoadDocTypes()
+        {
+            var data = _template.GetDocumentTypes();
+            splitButtonDocumentTypesRepeater.DataSource = data;
+            splitButtonDocumentTypesRepeater.DataBind();
+            uxNoDocumentTypes.Visible = !data.Any();
         }
 
         public string DoesMacroHaveSettings(string macroId)

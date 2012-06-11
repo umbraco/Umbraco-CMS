@@ -13,6 +13,8 @@
 
         jQuery(document).ready(function() {
 
+
+          
             //macro split button
              jQuery('#sbMacro').splitbutton({menu:'#macroMenu'});
 
@@ -98,6 +100,9 @@
                 });
 
            }
+            //document types split button
+            jQuery('#sbDocType').splitbutton({menu:'#docTypeMenu'});
+            jQuery("#splitButtonDocType").appendTo("#splitButtonDocTypePlaceHolder");
 
             //razor macro split button
             jQuery('#sb').splitbutton({menu:'#codeTemplateMenu'});
@@ -109,6 +114,8 @@
                 
                 insertCodeBlockFromTemplate(jQuery(this).attr("rel"));
             });
+
+         
 
         });
 
@@ -288,6 +295,29 @@
                 <div class="macro" rel="<%# DataBinder.Eval(Container, "DataItem.macroAlias")%>"
                     params="<%#  DoesMacroHaveSettings(DataBinder.Eval(Container, "DataItem.id").ToString()) %>">
                     <%# DataBinder.Eval(Container, "DataItem.macroName")%>
+                </div>
+            </ItemTemplate>
+        </asp:Repeater>
+    </div>
+    <div id="splitButtonDocType" style="display: inline; height: 23px; vertical-align: top;">
+        <a href="#" onclick="return false;" id="sbDocType" class="sbLink">
+            <img alt="Document Types that Use this Template" src="../images/editor/documentType.gif" title="Document Types that Use this Template"
+                style="vertical-align: top;">
+        </a>
+    </div>
+    <div id="docTypeMenu" style="width: 285px">
+      <div class="documenttype">
+              <strong>Document Types that Use this Template</strong>
+        </div>
+        <div class="documenttype" runat="server" id="uxNoDocumentTypes">
+              None
+        </div>
+        <asp:Repeater ID="splitButtonDocumentTypesRepeater" runat="server">
+            <ItemTemplate>
+                <div class="documenttype">
+                    <%# DataBinder.Eval(Container, "DataItem.Text")%>
+                    &nbsp;
+                    <%#umbraco.cms.helpers.DeepLink.GetAnchor(umbraco.cms.helpers.DeepLinkType.DocumentType, string.Format("{0}",DataBinder.Eval(Container,"DataItem.Id")), true)%>
                 </div>
             </ItemTemplate>
         </asp:Repeater>
