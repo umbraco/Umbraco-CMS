@@ -43,8 +43,8 @@ namespace umbraco.cms.presentation.developer
             {
 
                 ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMacros>().Tree.Alias)
-					.SyncTree(m_macro.Id.ToString(), false);
+                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMacros>().Tree.Alias)
+                    .SyncTree("-1,init," + m_macro.Id.ToString(), false);
 
                 macroName.Text = m_macro.Name;
                 macroAlias.Text = m_macro.Alias;
@@ -92,7 +92,7 @@ namespace umbraco.cms.presentation.developer
                 populatePythonFiles();
 
                 // Load usercontrols
-                populateUserControls(IOHelper.MapPath(SystemDirectories.Usercontrols) );
+                populateUserControls(IOHelper.MapPath(SystemDirectories.Usercontrols));
                 userControlList.Items.Insert(0, new ListItem("Browse usercontrols on server...", string.Empty));
                 userControlList.Attributes.Add("onChange",
                     "document.getElementById('" + macroUserControl.ClientID + "').value = this[this.selectedIndex].value;");
@@ -307,12 +307,12 @@ namespace umbraco.cms.presentation.developer
         {
             DirectoryInfo di = new DirectoryInfo(path);
 
-            string rootDir = IOHelper.MapPath( SystemDirectories.Root );
-            
+            string rootDir = IOHelper.MapPath(SystemDirectories.Root);
+
             foreach (FileInfo uc in di.GetFiles("*.ascx"))
             {
                 userControlList.Items.Add(
-                    new ListItem( 
+                    new ListItem(
                             uc.FullName.Substring(rootDir.Length).Replace(IOHelper.DirSepChar, '/')));
                 /*
                                         uc.FullName.IndexOf(usercontrolsDir), 
@@ -363,5 +363,5 @@ namespace umbraco.cms.presentation.developer
 
         #endregion
     }
- 
+
 }
