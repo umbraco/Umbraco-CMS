@@ -23,7 +23,23 @@ namespace umbraco.cms.helpers
             string sPath = string.Join(",", treePath.ToArray());
             return sPath;
         }
-        public static string Get(DeepLinkType type, string idOrFilePath)
+        public static string GetAnchor(DeepLinkType type, string idOrFilePath, bool useJavascript)
+        {
+            string url = GetUrl(type, idOrFilePath, useJavascript);
+            if (!string.IsNullOrEmpty(url))
+            {
+                if (!useJavascript)
+                {
+                    return string.Format("<a href=\"{1}\" target=\"_blank\">Edit&nbsp;&gt;</a>", url);
+                }
+                else
+                {
+                    return string.Format("<a href=\"{0}\">Edit&nbsp;&gt;</a>", url);
+                }
+            }
+            return null;
+        }
+        public static string GetUrl(DeepLinkType type, string idOrFilePath, bool useJavascript)
         {
             string basePath = "/umbraco/umbraco.aspx";
 
@@ -98,7 +114,15 @@ namespace umbraco.cms.helpers
                     if (currentUser.Applications.Any(app => app.alias == section))
                     {
                         string rightAction = string.Format("{0}?{1}={2}", editorUrl, idKey, idOrFilePath);
-                        return string.Format("{0}?app={1}&rightAction={2}#{1}", basePath, section, HttpContext.Current.Server.UrlEncode(rightAction));
+                        if (!useJavascript)
+                        {
+                            string rightActionEncoded = HttpContext.Current.Server.UrlEncode(rightAction);
+                            return string.Format("{0}?app={1}&rightAction={2}#{1}", basePath, section, rightActionEncoded);
+                        }
+                        else
+                        {
+                            return string.Format("javascript:UmbClientMgr.contentFrameAndSection('{0}','{1}');", section, rightAction);
+                        }
                     }
                 }
             }
