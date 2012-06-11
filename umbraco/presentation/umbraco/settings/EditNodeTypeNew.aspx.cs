@@ -91,9 +91,11 @@ namespace umbraco.settings
                 ListItem li = new ListItem();
                 li.Text = item.Name;
                 li.Value = item.Id.ToString();
-                li.Selected = item.Selected;
                 return li;
             }).ToArray());
+
+            var ddlTemplatesSelect = ddlTemplates.Items.FindByValue(dt.DefaultTemplate.ToString());
+            if (ddlTemplatesSelect != null) ddlTemplatesSelect.Selected = true;
 
         }
 
