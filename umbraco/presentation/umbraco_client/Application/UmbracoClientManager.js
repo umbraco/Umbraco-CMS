@@ -94,6 +94,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             //    windowMgr: function() 
             //        return null;
             //    },
+            contentFrameAndSection: function(app, rightFrameUrl){
+                this.appActions().shiftApp(app, this.uiKeys()['sections_' + app]);
+                this.contentFrame(rightFrameUrl);
+            },
             contentFrame: function(strLocation) {
                 /// <summary>
                 /// This will return the reference to the right content frame if strLocation is null or empty,
@@ -101,6 +105,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 /// </summary>
 
                 this._debug("contentFrame: " + strLocation);
+
                 if (strLocation == null || strLocation == "") {
                     if (typeof this.mainWindow().right != "undefined") {
                         return this.mainWindow().right;
@@ -121,12 +126,13 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     }
 
                     this._debug("contentFrame: parsed location: " + strLocation);
+                    var self = this;
                     window.setTimeout(function(){
-                        if (typeof this.mainWindow().right != "undefined") {
-                            this.mainWindow().right.location.href = strLocation;
+                        if (typeof self.mainWindow().right != "undefined") {
+                            self.mainWindow().right.location.href = strLocation;
                         }
                         else {
-                            this.mainWindow().location.href = strLocation; //set the current windows location if the right frame doesn't exist int he current context
+                            self.mainWindow().location.href = strLocation; //set the current windows location if the right frame doesn't exist int he current context
                         }
                     },200);
                 }
