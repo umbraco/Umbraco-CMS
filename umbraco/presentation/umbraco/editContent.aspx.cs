@@ -36,7 +36,8 @@ namespace umbraco.cms.presentation
 
         controls.ContentControl cControl;
 
-        DropDownList ddlDefaultTemplate = new DropDownList();
+        RadioButtonList rblDefaultTemplate = new RadioButtonList();
+        HtmlGenericControl rblDefaultTemplateScrollingPanel = new HtmlGenericControl("div");
 
         uicontrols.Pane publishProps = new uicontrols.Pane();
         uicontrols.Pane linkProps = new uicontrols.Pane();
@@ -131,7 +132,7 @@ namespace umbraco.cms.presentation
             // Template
             PlaceHolder template = new PlaceHolder();
             cms.businesslogic.web.DocumentType DocumentType = new cms.businesslogic.web.DocumentType(_document.ContentType.Id);
-            cControl.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(DocumentType.Text));
+            cControl.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(string.Format("{0} {1}", DocumentType.Text, umbraco.cms.helpers.DeepLink.GetAnchor(DeepLinkType.DocumentType, _document.ContentType.Id.ToString(), true))));
 
 
 
@@ -153,15 +154,7 @@ namespace umbraco.cms.presentation
             }
             else
             {
-                ddlDefaultTemplate.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
-                foreach (cms.businesslogic.template.Template t in DocumentType.allowedTemplates)
-                {
-                    ListItem tTemp = new ListItem(t.Text, t.Id.ToString());
-                    if (t.Id == defaultTemplate)
-                        tTemp.Selected = true;
-                    ddlDefaultTemplate.Items.Add(tTemp);
-                }
-                template.Controls.Add(ddlDefaultTemplate);
+                AddDefaultTemplateControl(defaultTemplate, ref template, ref  DocumentType);
             }
 
 
@@ -210,8 +203,8 @@ namespace umbraco.cms.presentation
                 return;
 
             // clear preview cookie
-			// zb-00004 #29956 : refactor cookies names & handling
-			StateHelper.Cookies.Preview.Clear();
+            // zb-00004 #29956 : refactor cookies names & handling
+            StateHelper.Cookies.Preview.Clear();
 
             if (!IsPostBack)
             {
@@ -267,9 +260,9 @@ namespace umbraco.cms.presentation
                 _document.ExpireDate = new DateTime(1, 1, 1, 0, 0, 0);
 
             // Update default template
-            if (ddlDefaultTemplate.SelectedIndex > 0)
+            if (rblDefaultTemplate.SelectedIndex > 0)
             {
-                _document.Template = int.Parse(ddlDefaultTemplate.SelectedValue);
+                _document.Template = int.Parse(rblDefaultTemplate.SelectedValue);
             }
             else
             {
@@ -450,23 +443,24 @@ namespace umbraco.cms.presentation
         /// <param name="defaultTemplate"></param>
         /// <param name="template"></param>
         /// <param name="DocumentType"></param>
-        private void AddTemplateDropDown(int defaultTemplate, ref PlaceHolder template, ref cms.businesslogic.web.DocumentType DocumentType)
+        private void AddDefaultTemplateControl(int defaultTemplate, ref PlaceHolder template, ref cms.businesslogic.web.DocumentType documentType)
         {
             string permissions = this.getUser().GetPermissions(_document.Path);
 
             if (permissions.IndexOf(ActionUpdate.Instance.Letter) >= 0)
             {
-                ddlDefaultTemplate.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
-                foreach (cms.businesslogic.template.Template t in DocumentType.allowedTemplates)
-                {
-                    ListItem tTemp = new ListItem(t.Text, t.Id.ToString());
-                    if (t.Id == defaultTemplate)
-                        tTemp.Selected = true;
-                    ddlDefaultTemplate.Items.Add(tTemp);
-                }
+                rblDefaultTemplateScrollingPanel = new HtmlGenericControl("div");
+                rblDefaultTemplateScrollingPanel.Style.Add(HtmlTextWriterStyle.Overflow, "auto");
+                rblDefaultTemplateScrollingPanel.Style.Add("min-height", "15px");
+                rblDefaultTemplateScrollingPanel.Style.Add("max-height", "50px");
+                rblDefaultTemplateScrollingPanel.Style.Add("width", "300px");
+                rblDefaultTemplateScrollingPanel.Style.Add("display", "inline-block");
+                rblDefaultTemplate.RepeatDirection = RepeatDirection.Horizontal;
+                rblDefaultTemplate.RepeatColumns = 3;
+                rblDefaultTemplateScrollingPanel.Controls.Add(rblDefaultTemplate);
+                template.Controls.Add(rblDefaultTemplateScrollingPanel);
 
-
-                template.Controls.Add(ddlDefaultTemplate);
+                BindTemplateControl(defaultTemplate, ref documentType);
             }
             else
             {
@@ -477,7 +471,25 @@ namespace umbraco.cms.presentation
             }
         }
 
-
+        private void BindTemplateControl(int defaultTemplate, ref cms.businesslogic.web.DocumentType documentType)
+        {
+            rblDefaultTemplate.Items.Add(new ListItem("None", ""));
+            bool selected = false;
+            foreach (cms.businesslogic.template.Template t in documentType.allowedTemplates)
+            {
+                ListItem tTemp = new ListItem(string.Format("{0} {1}", t.Text, umbraco.cms.helpers.DeepLink.GetAnchor(DeepLinkType.Template, t.Id.ToString(), true), t.Id.ToString()));
+                if (t.Id == defaultTemplate)
+                {
+                    tTemp.Selected = true;
+                    selected = true;
+                }
+                rblDefaultTemplate.Items.Add(tTemp);
+            }
+            if (!selected)
+            {
+                rblDefaultTemplate.SelectedIndex = 0;
+            }
+        }
         private void addPreviewButton(uicontrols.ScrollingMenu menu, int id)
         {
             menu.InsertSplitter(2);
