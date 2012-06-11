@@ -10,6 +10,8 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
 using umbraco.cms.businesslogic.web;
+using System.Linq;
+using umbraco.cms.helpers;
 
 namespace umbraco.settings
 {
@@ -49,58 +51,51 @@ namespace umbraco.settings
 
         }
 
+
         private void bindTemplates()
         {
-            cms.businesslogic.template.Template[] selectedTemplates = dt.allowedTemplates;
-
-            DataTable dtAllowedTemplates = new DataTable();
-            dtTemplates.Columns.Add("name");
-            dtTemplates.Columns.Add("id");
-            dtTemplates.Columns.Add("selected");
-
-
-            ddlTemplates.Items.Add(new ListItem("Ingen template", "0"));
-            foreach (cms.businesslogic.template.Template t in cms.businesslogic.template.Template.GetAllAsList())
-            {
-                DataRow dr = dtTemplates.NewRow();
-                dr["name"] = t.Text;
-                dr["id"] = t.Id;
-                dr["selected"] = false;
-                foreach (cms.businesslogic.template.Template t1 in selectedTemplates)
-                    if (t1 != null && t1.Id == t.Id)
-                        dr["selected"] = true;
-
-                dtTemplates.Rows.Add(dr);
-
-            }
+            var templates = (from t in cms.businesslogic.template.Template.GetAllAsList()
+                             join at in dt.allowedTemplates on t.Id equals at.Id into at_l
+                             from at in at_l.DefaultIfEmpty()
+                             select new
+                             {
+                                 Id = t.Id,
+                                 Name = t.Text,
+                                 Selected = at != null
+                             }).ToList();
 
             templateList.Items.Clear();
-
-            foreach (DataRow dr in dtTemplates.Rows)
+            templateList.Items.AddRange(templates.ConvertAll(item =>
             {
-                ListItem li = new ListItem(dr["name"].ToString(), dr["id"].ToString());
-                if (bool.Parse(dr["selected"].ToString()))
-                    li.Selected = true;
-                templateList.Items.Add(li);
-            }
+                string anchor = DeepLink.GetAnchor(DeepLinkType.Template, item.Id.ToString(), true);
+                ListItem li = new ListItem();
+                if (!string.IsNullOrEmpty(anchor))
+                {
+                    li.Text = string.Format("{0} {1}", item.Name, anchor);
+                }
+                else
+                {
+                    li.Text = item.Name;
+                }
+                li.Value = item.Id.ToString();
+                li.Selected = item.Selected;
+                return li;
+            }).ToArray());
 
+
+            ddlTemplates.Enabled = templates.Any();
             ddlTemplates.Items.Clear();
-            foreach (DataRow dr in dtTemplates.Rows)
-            {
-                ListItem li = new ListItem(dr["name"].ToString(), dr["id"].ToString());
-                if (li.Value == dt.DefaultTemplate.ToString())
-                    li.Selected = true;
-                if (bool.Parse(dr["selected"].ToString()))
-                    ddlTemplates.Items.Add(li);
-            }
-            if (ddlTemplates.Items.Count > 0) ddlTemplates.Enabled = true;
-            else ddlTemplates.Enabled = false;
-
-            // Add choose to ddlTemplates
             ddlTemplates.Items.Insert(0, new ListItem(ui.Text("choose") + "...", "0"));
+            ddlTemplates.Items.AddRange(templates.ConvertAll(item =>
+            {
+                ListItem li = new ListItem();
+                li.Text = item.Name;
+                li.Value = item.Id.ToString();
+                li.Selected = item.Selected;
+                return li;
+            }).ToArray());
 
         }
-
 
         protected override bool OnBubbleEvent(object source, EventArgs args)
         {
