@@ -10,7 +10,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="xPath">XPath expression</param>
 		/// <returns>collection or empty collection</returns>
-		public static List<Member> GetMembersByXPath(string xPath)
+		public static IEnumerable<Member> GetMembersByXPath(string xPath)
 		{
 			var members = new List<Member>();
 			var xmlDocument = uQuery.GetPublishedXml(UmbracoObjectType.Member);
@@ -34,7 +34,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="csv">string csv of IDs</param>
 		/// <returns>collection or emtpy collection</returns>
-		public static List<Member> GetMembersByCsv(string csv)
+		public static IEnumerable<Member> GetMembersByCsv(string csv)
 		{
 			var members = new List<Member>();
 			var ids = uQuery.GetCsvIds(csv);
@@ -59,7 +59,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="xml">The XML.</param>
 		/// <returns></returns>
-		public static List<Member> GetMembersByXml(string xml)
+		public static IEnumerable<Member> GetMembersByXml(string xml)
 		{
 			var members = new List<Member>();
 			var ids = uQuery.GetXmlIds(xml);
@@ -81,7 +81,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="memberTypeAlias">The member type alias</param>
 		/// <returns>list of members, or empty list</returns>
-		public static List<Member> GetMembersByType(string memberTypeAlias)
+		public static IEnumerable<Member> GetMembersByType(string memberTypeAlias)
 		{
 			// Both XML schema versions have this attribute
 			return uQuery.GetMembersByXPath(string.Concat("descendant::*[@nodeTypeAlias='", memberTypeAlias, "']"));
@@ -131,7 +131,7 @@ namespace umbraco
 		/// </summary>
 		/// <param name="members">generic list of Member objects</param>
 		/// <returns>a collection of memberIDs and their login names</returns>
-		public static Dictionary<int, string> ToNameIds(this List<Member> members)
+		public static Dictionary<int, string> ToNameIds(this IEnumerable<Member> members)
 		{
 			var dictionary = new Dictionary<int, string>();
 
