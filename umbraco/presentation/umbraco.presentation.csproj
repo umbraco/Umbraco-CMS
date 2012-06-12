@@ -1725,6 +1725,7 @@
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="umbraco\controls\Tree\CustomTreeService.asmx" />
     <Content Include="umbraco\images\delete.gif" />
+    <Content Include="umbraco\images\editor\doc.gif" />
     <Content Include="umbraco\images\editor\documentType.gif" />
     <Content Include="umbraco\images\information.png" />
     <Content Include="umbraco\Trees\RelationTypes\EditRelationType.aspx" />
