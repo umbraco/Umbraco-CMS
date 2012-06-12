@@ -331,14 +331,20 @@ namespace umbraco.cms.businesslogic.template
         {
             return DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id));
         }
-        public IEnumerable<object> GetContent()
+        public IEnumerable<System.Tuple<int, string>> GetContent()
         {
             List<System.Tuple<int, string>> list = new List<System.Tuple<int, string>>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("Select nodeid, text from cmsDocument where templateId = " + this.Id))
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("Select nodeid, text from cmsDocument where published = 1 and templateId = " + this.Id))
             {
+                int i = 0;
                 while (dr.Read())
                 {
                     list.Add(new System.Tuple<int, string>(dr.GetInt("nodeid"), dr.GetString("text")));
+                    i++;
+                    if (i >= 100)
+                    {
+                        break;
+                    }
                 }
                 dr.Close();
             }
