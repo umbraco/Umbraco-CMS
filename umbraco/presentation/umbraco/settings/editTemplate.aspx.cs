@@ -93,10 +93,25 @@ namespace umbraco.cms.presentation.settings
                     Literal uxName = e.Item.FindControl("uxName") as Literal;
                     PlaceHolder uxLink = e.Item.FindControl("uxLink") as PlaceHolder;
                     uxName.Text = item.Item2;
+                    uxLink.Controls.Add(new LiteralControl(umbraco.cms.helpers.DeepLink.GetAnchor(helpers.DeepLinkType.DocumentType, item.Item1.ToString(), true)));
+                }
+            }
+        }
+        protected void splitButtonContentRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
+            {
+                Tuple<int, string> item = e.Item.DataItem as Tuple<int, string>;
+                if (item != null)
+                {
+                    Literal uxName = e.Item.FindControl("uxName") as Literal;
+                    PlaceHolder uxLink = e.Item.FindControl("uxLink") as PlaceHolder;
+                    uxName.Text = item.Item2;
                     uxLink.Controls.Add(new LiteralControl(umbraco.cms.helpers.DeepLink.GetAnchor(helpers.DeepLinkType.Content, item.Item1.ToString(), true)));
                 }
             }
         }
+
         protected override void OnInit(EventArgs e)
         {
             _template = new Template(int.Parse(Request.QueryString["templateID"]));

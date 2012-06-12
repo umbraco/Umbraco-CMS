@@ -9,25 +9,13 @@
     <umb:JsInclude ID="JsInclude" runat="server" FilePath="splitbutton/jquery.splitbutton.js"
         PathNameAlias="UmbracoClient" Priority="1" />
     <script language="javascript" type="text/javascript">
-
-
         jQuery(document).ready(function() {
-
-
-          
             //macro split button
-             jQuery('#sbMacro').splitbutton({menu:'#macroMenu'});
-
+            jQuery('#sbMacro').splitbutton({menu:'#macroMenu'});
             jQuery("#splitButtonMacro").appendTo("#splitButtonMacroPlaceHolder");
-
-            
-
-
             jQuery(".macro").click(function(){
-            
                 var alias = jQuery(this).attr("rel");
-
-                if(jQuery(this).attr("params") == "1")
+               if(jQuery(this).attr("params") == "1")
                 {
                     openMacroModal(alias);
                 }
@@ -36,94 +24,73 @@
                     insertMacro(alias);
                 }
             });
-
-            //hack for the dropdown scrill
-            jQuery("<div id='mcontainer'><div id='innerc' style='position:relative;'><div></div>").appendTo("#macroMenu");
-
-            jQuery(".macro").each(function(){
-
-                jQuery("#innerc").append(this);
-            });
-
-
-           //only needed when we need to add scroll to macro menu
-           var maxHeight = 500;
-           var menu = jQuery("#macroMenu");
-           var container = jQuery("#mcontainer");
-           var menuHeight = menu.height();
-
-     
-
-           if (menuHeight > maxHeight) {
-
-                jQuery("<div id='showmore' class='menudown'><span>&nbsp;&nbsp;&nbsp;&nbsp;</span></div>").appendTo("#macroMenu");
-                
-                menu.css({
-                    height: maxHeight,
-                    overflow: "hidden"
-                })
-
-                container.css({
-                     height: maxHeight - 20,
-                     overflow: "hidden"
-                });
-
-                var interval;
-                jQuery("#showmore").hover(function(e) {
-                    
-                   
-
-                    interval = setInterval(function() {
-                        
-                        var offset = jQuery("#innerc").offset();
-                        var currentTop = jQuery("#innerc").css("top").replace("px","");
-                     
-
-                        if(Number(currentTop) > -(menuHeight - 40))
-                        {
-                           
-                            
-
-                            jQuery("#innerc").css("top", currentTop -20);
-                        }
-                    }, 125);
-
-                }, function() {
-
-                    clearInterval(interval);
-
-                });
-
-
-                jQuery("#splitButtonMacro").hover(function(e) {
-                    jQuery("#innerc").css("top", 0)
-                });
-
-           }
+            applySplitButtonOverflow('mcontainer','innerc','macroMenu','.macro', 'showMoreMacros');
+            
             //document types split button
             jQuery('#sbDocType').splitbutton({menu:'#docTypeMenu'});
             jQuery("#splitButtonDocType").appendTo("#splitButtonDocTypePlaceHolder");
+            applySplitButtonOverflow('docTypesReferencingContainer','innerdocTypesReferencingContainer','docTypeMenu','.documenttype', 'showMoreDocTypes');
 
             //content split button
             jQuery('#sbContent').splitbutton({menu:'#contentMenu'});
             jQuery("#splitButtonContent").appendTo("#splitButtonContentPlaceHolder");
-
+            applySplitButtonOverflow('contentUsedContainer','innerContentUsedContainer','contentMenu','.contentitem', 'showMoreContent');
 
             //razor macro split button
             jQuery('#sb').splitbutton({menu:'#codeTemplateMenu'});
-
             jQuery("#splitButton").appendTo("#splitButtonPlaceHolder");
 
-
-            jQuery(".codeTemplate").click(function(){
-                
+            jQuery(".codeTemplate").click(function(){              
                 insertCodeBlockFromTemplate(jQuery(this).attr("rel"));
             });
 
          
 
         });
+        function applySplitButtonOverflow(containerId, innerId, menuId, itemCssSelector, buttonId)
+        {
+        //hack for the dropdown scrill
+            jQuery("<div id='"+containerId+"'><div id='"+innerId+"' style='position:relative;'></div></div>").appendTo("#"+menuId);
+            jQuery(itemCssSelector).each(function(){
+                jQuery("#"+ innerId).append(this);
+            });
 
+           //only needed when we need to add scroll to macro menu
+           var maxHeight = 500;
+           var menu = jQuery("#"+menuId);
+           var container = jQuery("#"+ containerId);
+           var menuHeight = menu.height();
+     
+           if (menuHeight > maxHeight) {
+                jQuery("<div id='"+buttonId+"' class='menudown'><span>&nbsp;&nbsp;&nbsp;&nbsp;</span></div>").appendTo("#"+menuId);               
+                menu.css({
+                    height: maxHeight,
+                    overflow: "hidden"
+                })
+                container.css({
+                     height: maxHeight - 20,
+                     overflow: "hidden"
+                });
+                var interval;
+                jQuery("#"+buttonId).hover(function(e) {
+                   interval = setInterval(function() {
+                        var offset = jQuery("#" +innerId).offset();
+                        var currentTop = jQuery("#"+innerId).css("top").replace("px","");
+                        if(Number(currentTop) > -(menuHeight - 40))
+                        {
+                            jQuery("#"+innerId).css("top", currentTop -20);
+                        }
+                    }, 125);
+                }, function() {
+                    clearInterval(interval);
+                });
+
+                jQuery("#"+buttonId).hover(function(e) {
+                    jQuery("#"+innerId).css("top", 0)
+                });
+           }
+
+        }
         function doSubmit() {
             var codeVal = UmbEditor.GetCode();
             umbraco.presentation.webservices.codeEditorSave.SaveTemplate(jQuery('#<%= NameTxt.ClientID %>').val(), jQuery('#<%= AliasTxt.ClientID %>').val(), codeVal, '<%= Request.QueryString["templateID"] %>', jQuery('#<%= MasterTemplate.ClientID %>').val(), submitSucces, submitFailure);
@@ -341,9 +308,9 @@
         <div class="contentitem" runat="server" id="uxNoContent">
               None
         </div>
-        <asp:Repeater ID="splitButtonContentRepeater" runat="server" OnItemDataBound="splitButtonDocumentTypesRepeater_ItemDataBound">
+        <asp:Repeater ID="splitButtonContentRepeater" runat="server" OnItemDataBound="splitButtonContentRepeater_ItemDataBound">
             <ItemTemplate>
-                <div class="documenttype">
+                <div class="contentitem">
                     <asp:Literal runat="server" ID="uxName"></asp:Literal>
                     &nbsp;
                     <asp:PlaceHolder runat="server" ID="uxLink"></asp:PlaceHolder>
