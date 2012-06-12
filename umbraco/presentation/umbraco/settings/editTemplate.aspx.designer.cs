@@ -155,5 +155,23 @@ namespace umbraco.cms.presentation.settings {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater splitButtonDocumentTypesRepeater;
+        
+        /// <summary>
+        /// uxNoContent control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl uxNoContent;
+        
+        /// <summary>
+        /// splitButtonContentRepeater control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater splitButtonContentRepeater;
     }
 }

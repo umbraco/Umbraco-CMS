@@ -79,10 +79,24 @@ namespace umbraco.cms.presentation.settings
                 LoadScriptingTemplates();
                 LoadMacros();
                 LoadDocTypes();
+                LoadContent();
             }
         }
 
-
+        protected void splitButtonDocumentTypesRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
+            {
+                Tuple<int, string> item = e.Item.DataItem as Tuple<int, string>;
+                if (item != null)
+                {
+                    Literal uxName = e.Item.FindControl("uxName") as Literal;
+                    PlaceHolder uxLink = e.Item.FindControl("uxLink") as PlaceHolder;
+                    uxName.Text = item.Item2;
+                    uxLink.Controls.Add(new LiteralControl(umbraco.cms.helpers.DeepLink.GetAnchor(helpers.DeepLinkType.Content, item.Item1.ToString(), true)));
+                }
+            }
+        }
         protected override void OnInit(EventArgs e)
         {
             _template = new Template(int.Parse(Request.QueryString["templateID"]));
@@ -173,6 +187,9 @@ namespace umbraco.cms.presentation.settings
             Panel1.Menu.InsertSplitter();
             Panel1.Menu.NewElement("div", "splitButtonDocTypePlaceHolder", "sbPlaceHolder", 40);
 
+            Panel1.Menu.InsertSplitter();
+            Panel1.Menu.NewElement("div", "splitButtonContentPlaceHolder", "sbPlaceHolder", 40);
+
             // Help
             Panel1.Menu.InsertSplitter();
 
@@ -230,7 +247,13 @@ namespace umbraco.cms.presentation.settings
             splitButtonDocumentTypesRepeater.DataBind();
             uxNoDocumentTypes.Visible = !data.Any();
         }
-
+        private void LoadContent()
+        {
+            var data = _template.GetContent();
+            splitButtonContentRepeater.DataSource = data;
+            splitButtonContentRepeater.DataBind();
+            uxNoContent.Visible = !data.Any();
+        }
         public string DoesMacroHaveSettings(string macroId)
         {
             if (
