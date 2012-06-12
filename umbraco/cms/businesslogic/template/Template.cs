@@ -12,6 +12,7 @@ using umbraco.BusinessLogic;
 using umbraco.IO;
 using System.Web;
 using umbraco.cms.businesslogic.web;
+using Tuple = System.Tuple;
 
 namespace umbraco.cms.businesslogic.template
 {
@@ -330,7 +331,19 @@ namespace umbraco.cms.businesslogic.template
         {
             return DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id));
         }
-
+        public IEnumerable<object> GetContent()
+        {
+            List<System.Tuple<int, string>> list = new List<System.Tuple<int, string>>();
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("Select nodeid, text from cmsDocument where templateId = " + this.Id))
+            {
+                while (dr.Read())
+                {
+                    list.Add(new System.Tuple<int, string>(dr.GetInt("nodeid"), dr.GetString("text")));
+                }
+                dr.Close();
+            }
+            return list;
+        }
         public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
         {
 
