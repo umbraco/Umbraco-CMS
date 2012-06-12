@@ -12,6 +12,7 @@ using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
+using Tuple = System.Tuple;
 using umbraco.BusinessLogic;
 
 [assembly: InternalsVisibleTo("Umbraco.Test")]
