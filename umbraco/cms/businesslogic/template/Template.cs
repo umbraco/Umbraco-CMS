@@ -13,6 +13,7 @@ using umbraco.IO;
 using System.Web;
 using umbraco.cms.businesslogic.web;
 using Tuple = System.Tuple;
+using umbraco.DataLayer.SqlHelpers.MySql;
 
 namespace umbraco.cms.businesslogic.template
 {
@@ -334,7 +335,17 @@ namespace umbraco.cms.businesslogic.template
         public IEnumerable<System.Tuple<int, string>> GetContent()
         {
             List<System.Tuple<int, string>> list = new List<System.Tuple<int, string>>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("Select nodeid, text from cmsDocument where published = 1 and templateId = " + this.Id))
+            bool mySQL = (SqlHelper.GetType() == typeof(MySqlHelper));
+            string sql = string.Empty;
+            if (!mySQL)
+            {
+                sql = "Select top (100) nodeid, text from cmsDocument where published = 1 and templateId = " + this.Id;
+            }
+            else
+            {
+                sql = "Select nodeid, text from cmsDocument where published = 1 and templateId = " + this.Id + " limit 0,100";
+            }
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(sql))
             {
                 int i = 0;
                 while (dr.Read())
