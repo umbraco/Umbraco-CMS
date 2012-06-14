@@ -44,53 +44,8 @@
                 insertCodeBlockFromTemplate(jQuery(this).attr("rel"));
             });
 
-         
-
         });
-        function applySplitButtonOverflow(containerId, innerId, menuId, itemCssSelector, buttonId)
-        {
-        //hack for the dropdown scrill
-            jQuery("<div id='"+containerId+"'><div id='"+innerId+"' style='position:relative;'></div></div>").appendTo("#"+menuId);
-            jQuery(itemCssSelector).each(function(){
-                jQuery("#"+ innerId).append(this);
-            });
-
-           //only needed when we need to add scroll to macro menu
-           var maxHeight = 500;
-           var menu = jQuery("#"+menuId);
-           var container = jQuery("#"+ containerId);
-           var menuHeight = menu.height();
-     
-           if (menuHeight > maxHeight) {
-                jQuery("<div id='"+buttonId+"' class='menudown'><span>&nbsp;&nbsp;&nbsp;&nbsp;</span></div>").appendTo("#"+menuId);               
-                menu.css({
-                    height: maxHeight,
-                    overflow: "hidden"
-                })
-                container.css({
-                     height: maxHeight - 20,
-                     overflow: "hidden"
-                });
-                var interval;
-                jQuery("#"+buttonId).hover(function(e) {
-                   interval = setInterval(function() {
-                        var offset = jQuery("#" +innerId).offset();
-                        var currentTop = jQuery("#"+innerId).css("top").replace("px","");
-                        if(Number(currentTop) > -(menuHeight - 40))
-                        {
-                            jQuery("#"+innerId).css("top", currentTop -20);
-                        }
-                    }, 125);
-                }, function() {
-                    clearInterval(interval);
-                });
-
-                jQuery("#"+buttonId).hover(function(e) {
-                    jQuery("#"+innerId).css("top", 0)
-                });
-           }
-
-        }
+        
         function doSubmit() {
             var codeVal = UmbEditor.GetCode();
             umbraco.presentation.webservices.codeEditorSave.SaveTemplate(jQuery('#<%= NameTxt.ClientID %>').val(), jQuery('#<%= AliasTxt.ClientID %>').val(), codeVal, '<%= Request.QueryString["templateID"] %>', jQuery('#<%= MasterTemplate.ClientID %>').val(), submitSucces, submitFailure);
