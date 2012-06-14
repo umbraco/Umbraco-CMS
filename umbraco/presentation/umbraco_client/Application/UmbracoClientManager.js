@@ -95,8 +95,12 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             //        return null;
             //    },
             contentFrameAndSection: function(app, rightFrameUrl){
-                this.appActions().shiftApp(app, this.uiKeys()['sections_' + app]);
-                this.contentFrame(rightFrameUrl);
+                //this.appActions().shiftApp(app, this.uiKeys()['sections_' + app]);
+                var self = this;
+                self.mainWindow().UmbClientMgr.historyManager().addHistory(app,true);
+                window.setTimeout(function(){
+                    self.mainWindow().UmbClientMgr.contentFrame(rightFrameUrl);
+                },200);
             },
             contentFrame: function(strLocation) {
                 /// <summary>
