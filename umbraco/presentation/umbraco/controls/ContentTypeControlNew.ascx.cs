@@ -15,6 +15,7 @@ using umbraco.IO;
 using umbraco.presentation;
 using umbraco.cms.businesslogic;
 using umbraco.BasePages;
+using Tuple = System.Tuple;
 
 namespace umbraco.controls
 {
@@ -100,8 +101,16 @@ namespace umbraco.controls
             }
 
             theClientId.Text = this.ClientID;
-        }
 
+            LoadContent();
+        }
+        private void LoadContent()
+        {
+            var data = cType.GetContent();
+            splitButtonContentRepeater.DataSource = data;
+            splitButtonContentRepeater.DataBind();
+            uxNoContent.Visible = !data.Any();
+        }
         protected void save_click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
             // 2011 01 06 - APN - Modified method to update Xml caches if a doctype alias changed, 
@@ -238,6 +247,9 @@ jQuery(function() { refreshDropDowns(); });
             txtName.Text = cType.GetRawText();
             txtAlias.Text = cType.Alias;
             description.Text = cType.GetRawDescription();
+
+            InfoTabPage.Menu.InsertSplitter();
+            InfoTabPage.Menu.NewElement("div", "splitButtonContentPlaceHolder", "sbPlaceHolder", 40);
 
         }
         #endregion
@@ -908,6 +920,20 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
 
         #endregion
 
+        protected void splitButtonContentRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
+            {
+                System.Tuple<int, string> item = e.Item.DataItem as System.Tuple<int, string>;
+                if (item != null)
+                {
+                    Literal uxName = e.Item.FindControl("uxName") as Literal;
+                    PlaceHolder uxLink = e.Item.FindControl("uxLink") as PlaceHolder;
+                    uxName.Text = item.Item2;
+                    uxLink.Controls.Add(new LiteralControl(umbraco.cms.helpers.DeepLink.GetAnchor(umbraco.cms.helpers.DeepLinkType.Content, item.Item1.ToString(), true)));
+                }
+            }
+        }
 
 
     }
