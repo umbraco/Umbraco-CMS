@@ -288,7 +288,7 @@ namespace umbraco
 
                     try
                     {
-                        xmlDocument.Load(node.GetPropertyAsString(propertyAlias));
+                        xmlDocument.LoadXml(node.GetPropertyAsString(propertyAlias));
                     }
                     catch
                     {
