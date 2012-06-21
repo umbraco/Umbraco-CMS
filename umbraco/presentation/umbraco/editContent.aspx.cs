@@ -477,7 +477,7 @@ namespace umbraco.cms.presentation
             bool selected = false;
             foreach (cms.businesslogic.template.Template t in documentType.allowedTemplates)
             {
-                ListItem tTemp = new ListItem(string.Format("{0} {1}", t.Text, umbraco.cms.helpers.DeepLink.GetAnchor(DeepLinkType.Template, t.Id.ToString(), true), t.Id.ToString()));
+                ListItem tTemp = new ListItem(string.Format("{0} {1}", t.Text, umbraco.cms.helpers.DeepLink.GetAnchor(DeepLinkType.Template, t.Id.ToString(), true)), t.Id.ToString());
                 if (t.Id == defaultTemplate)
                 {
                     tTemp.Selected = true;
