@@ -89,36 +89,36 @@
   <ItemGroup>
     <Reference Include="ClientDependency.Core, Version=1.5.0.0, Culture=neutral, PublicKeyToken=7a99a55a05d191a8, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\ClientDependency.Core.dll</HintPath>
+      <HintPath>..\..\lib\ClientDependency.Core.dll</HintPath>
     </Reference>
     <Reference Include="CookComputing.XmlRpcV2, Version=2.5.0.0, Culture=neutral, PublicKeyToken=a7d6e17aa302004d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\CookComputing.XmlRpcV2.dll</HintPath>
+      <HintPath>..\..\lib\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
     <Reference Include="Examine, Version=0.9.0.0, Culture=en-AU, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\Examine.dll</HintPath>
+      <HintPath>..\..\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\HtmlAgilityPack.dll</HintPath>
+      <HintPath>..\..\lib\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.83.1.0, Culture=neutral, PublicKeyToken=1b03e6acf1164f73">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\ICSharpCode.SharpZipLib.dll</HintPath>
+      <HintPath>..\..\lib\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Lucene.Net, Version=2.9.4.1, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\Lucene.Net.dll</HintPath>
+      <HintPath>..\..\lib\Lucene.Net.dll</HintPath>
     </Reference>
     <Reference Include="Our.Umbraco.uGoLive">
-      <HintPath>..\..\dlls\Our.Umbraco.uGoLive.dll</HintPath>
+      <HintPath>..\..\lib\Our.Umbraco.uGoLive.dll</HintPath>
     </Reference>
     <Reference Include="Our.Umbraco.uGoLive.47x">
-      <HintPath>..\..\dlls\Our.Umbraco.uGoLive.47x.dll</HintPath>
+      <HintPath>..\..\lib\Our.Umbraco.uGoLive.47x.dll</HintPath>
     </Reference>
     <Reference Include="Our.Umbraco.uGoLive.Checks">
-      <HintPath>..\..\dlls\Our.Umbraco.uGoLive.Checks.dll</HintPath>
+      <HintPath>..\..\lib\Our.Umbraco.uGoLive.Checks.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -153,11 +153,11 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UmbracoExamine, Version=0.9.0.0, Culture=en-AU, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\UmbracoExamine.dll</HintPath>
+      <HintPath>..\..\lib\UmbracoExamine.dll</HintPath>
     </Reference>
     <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.60829.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\UrlRewritingNet.UrlRewriter.dll</HintPath>
+      <HintPath>..\..\lib\UrlRewritingNet.UrlRewriter.dll</HintPath>
     </Reference>
     <ProjectReference Include="..\umbraco.macroRenderings\umbraco.macroRenderings.csproj">
       <Project>{52AB8F1F-FB76-4E8C-885F-0747B6CE71EC}</Project>
@@ -3393,6 +3393,6 @@
   <Import Project="$(MSBuildStartupDirectory)\src\umbraco.presentation.targets" Condition="$(BuildingInsideVisualStudio) != true" />
   <Import Project="$(SolutionDir)umbraco.presentation.targets" Condition="$(BuildingInsideVisualStudio) == true" />
   <PropertyGroup>
-    <!--<PostBuildEvent>xcopy "$(ProjectDir)..\..\dlls\*.dll" "$(TargetDir)*.dll" /Y</PostBuildEvent>-->
+    <!--<PostBuildEvent>xcopy "$(ProjectDir)..\..\lib\*.dll" "$(TargetDir)*.dll" /Y</PostBuildEvent>-->
   </PropertyGroup>
 </Project>

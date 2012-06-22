@@ -104,11 +104,11 @@
   <ItemGroup>
     <Reference Include="ClientDependency.Core, Version=1.5.0.0, Culture=neutral, PublicKeyToken=7a99a55a05d191a8, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\ClientDependency.Core.dll</HintPath>
+      <HintPath>..\..\lib\ClientDependency.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ApplicationBlocks.Data">
       <Name>Microsoft.ApplicationBlocks.Data</Name>
-      <HintPath>..\..\dlls\Microsoft.ApplicationBlocks.Data.dll</HintPath>
+      <HintPath>..\..\lib\Microsoft.ApplicationBlocks.Data.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>

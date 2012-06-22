@@ -40,14 +40,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Examine">
-      <HintPath>..\dlls\Examine.dll</HintPath>
+      <HintPath>..\lib\Examine.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.3.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\dlls\HtmlAgilityPack.dll</HintPath>
+      <HintPath>..\lib\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="Lucene.Net">
-      <HintPath>..\dlls\Lucene.Net.dll</HintPath>
+      <HintPath>..\lib\Lucene.Net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -56,21 +56,21 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\dlls\WebPages\System.Web.Razor.dll</HintPath>
+      <HintPath>..\lib\WebPages\System.Web.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\dlls\WebPages\System.Web.WebPages.dll</HintPath>
+      <HintPath>..\lib\WebPages\System.Web.WebPages.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.WebPages.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\dlls\WebPages\System.Web.WebPages.Razor.dll</HintPath>
+      <HintPath>..\lib\WebPages\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
     <Reference Include="UmbracoExamine">
-      <HintPath>..\dlls\UmbracoExamine.dll</HintPath>
+      <HintPath>..\lib\UmbracoExamine.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
   </ItemGroup>

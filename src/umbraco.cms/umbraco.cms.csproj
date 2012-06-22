@@ -104,14 +104,14 @@
   <ItemGroup>
     <Reference Include="ClientDependency.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\ClientDependency.Core.dll</HintPath>
+      <HintPath>..\..\lib\ClientDependency.Core.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\HtmlAgilityPack.dll</HintPath>
+      <HintPath>..\..\lib\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>..\..\dlls\ICSharpCode.SharpZipLib.dll</HintPath>
+      <HintPath>..\..\lib\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -140,7 +140,7 @@
     </Reference>
     <Reference Include="TidyNet, Version=1.0.0.0, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\TidyNet.dll</HintPath>
+      <HintPath>..\..\lib\TidyNet.dll</HintPath>
     </Reference>
     <ProjectReference Include="..\umbraco.businesslogic\umbraco.businesslogic.csproj">
       <Name>umbraco.businesslogic</Name>
