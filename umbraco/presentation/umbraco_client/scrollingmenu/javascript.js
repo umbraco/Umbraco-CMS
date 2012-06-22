@@ -81,9 +81,12 @@
 		
 		function scrollL(elId, elHid, InnerWidth) {
 			doScroll = true;
-	 		el = document.getElementById(elId);
-	 		FromLeftMax = (InnerWidth - document.getElementById(elHid).offsetWidth)*-1;
-	 		scrollHorisontal(0);
+			el = document.getElementById(elId);
+			var hiddenEl = document.getElementById(elHid);
+			if (hiddenEl) {
+			    FromLeftMax = (InnerWidth - hiddenEl.offsetWidth) * -1;
+			    scrollHorisontal(0);
+			}
 		}
 		
 		function scrollStop() {

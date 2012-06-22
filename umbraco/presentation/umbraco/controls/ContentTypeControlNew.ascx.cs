@@ -15,6 +15,7 @@ using umbraco.IO;
 using umbraco.presentation;
 using umbraco.cms.businesslogic;
 using umbraco.BasePages;
+using Tuple = System.Tuple;
 
 namespace umbraco.controls
 {
@@ -100,8 +101,16 @@ namespace umbraco.controls
             }
 
             theClientId.Text = this.ClientID;
-        }
 
+            LoadContent();
+        }
+        private void LoadContent()
+        {
+            var data = cType.GetContent();
+            splitButtonContentRepeater.DataSource = data;
+            splitButtonContentRepeater.DataBind();
+            uxNoContent.Visible = !data.Any();
+        }
         protected void save_click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
             // 2011 01 06 - APN - Modified method to update Xml caches if a doctype alias changed, 
@@ -224,7 +233,7 @@ namespace umbraco.controls
                 ddlThumbnails.Items.Add(li);
             }
 
-                Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", @"
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", @"
 function refreshDropDowns() {
     if (jQuery('#" + ddlIcons.ClientID + @" option').length <= 100)
         jQuery('#" + ddlIcons.ClientID + @"').msDropDown({ showIcon: true, style: 'width:250px;' });
@@ -238,6 +247,9 @@ jQuery(function() { refreshDropDowns(); });
             txtName.Text = cType.GetRawText();
             txtAlias.Text = cType.Alias;
             description.Text = cType.GetRawDescription();
+
+            InfoTabPage.Menu.InsertSplitter();
+            InfoTabPage.Menu.NewElement("div", "splitButtonContentPlaceHolder", "sbPlaceHolder", 40);
 
         }
         #endregion
@@ -263,7 +275,8 @@ jQuery(function() { refreshDropDowns(); });
                 ContentType[] contentTypes = cType.GetAll();
                 foreach (cms.businesslogic.ContentType ct in contentTypes.OrderBy(x => x.Text))
                 {
-                    ListItem li = new ListItem(ct.Text, ct.Id.ToString());
+                    string text = string.Format("{0} {1}", ct.Text, umbraco.cms.helpers.DeepLink.GetAnchor(DeepLinkType.DocumentType, ct.Id.ToString(), true));
+                    ListItem li = new ListItem(text, ct.Id.ToString());
                     dualAllowedContentTypes.Items.Add(li);
                     lstAllowedContentTypes.Items.Add(li);
                     foreach (int i in allowedIds)
@@ -907,6 +920,20 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
 
         #endregion
 
+        protected void splitButtonContentRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
+            {
+                System.Tuple<int, string> item = e.Item.DataItem as System.Tuple<int, string>;
+                if (item != null)
+                {
+                    Literal uxName = e.Item.FindControl("uxName") as Literal;
+                    PlaceHolder uxLink = e.Item.FindControl("uxLink") as PlaceHolder;
+                    uxName.Text = item.Item2;
+                    uxLink.Controls.Add(new LiteralControl(umbraco.cms.helpers.DeepLink.GetAnchor(umbraco.cms.helpers.DeepLinkType.Content, item.Item1.ToString(), true)));
+                }
+            }
+        }
 
 
     }

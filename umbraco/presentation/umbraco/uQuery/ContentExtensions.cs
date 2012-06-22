@@ -53,7 +53,7 @@ namespace umbraco
 
                     try
                     {
-                        xmlDocument.Load(item.GetPropertyAsString(propertyAlias));
+                        xmlDocument.LoadXml(item.GetPropertyAsString(propertyAlias));
                     }
                     catch
                     {

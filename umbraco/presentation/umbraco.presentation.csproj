@@ -107,8 +107,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\foreign dlls\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="Lucene.Net, Version=2.9.2.2, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>C:\Users\Shannon\Documents\Visual Studio 2008\Projects\Umbraco\Branch-4.1\foreign dlls\Lucene.Net.dll</HintPath>
+    <Reference Include="Lucene.Net, Version=2.9.4.1, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\foreign dlls\Lucene.Net.dll</HintPath>
     </Reference>
     <Reference Include="Our.Umbraco.uGoLive">
       <HintPath>..\..\foreign dlls\Our.Umbraco.uGoLive.dll</HintPath>
@@ -1721,10 +1722,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Content Include="App_Data\Umbraco.sdf" />
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
     <Content Include="umbraco\controls\Tree\CustomTreeService.asmx" />
     <Content Include="umbraco\images\delete.gif" />
+    <Content Include="umbraco\images\editor\doc.gif" />
+    <Content Include="umbraco\images\editor\documentType.gif" />
     <Content Include="umbraco\images\information.png" />
     <Content Include="umbraco\Trees\RelationTypes\EditRelationType.aspx" />
     <Content Include="umbraco\Trees\RelationTypes\Images\Bidirectional.png" />
@@ -3315,7 +3319,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Code\" />
-    <Folder Include="App_Data\" />
     <Folder Include="css\" />
     <Folder Include="data\previews\" />
     <Folder Include="data\preview\" />

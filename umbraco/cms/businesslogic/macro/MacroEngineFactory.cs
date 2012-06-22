@@ -11,6 +11,8 @@ namespace umbraco.cms.businesslogic.macro
     {
         private static readonly Dictionary<string, Type> m_engines = new Dictionary<string, Type>();
         private static readonly List<IMacroEngine> m_allEngines = new List<IMacroEngine>();
+        private static object locker = new object();
+
         public MacroEngineFactory()
         {
             Initialize();
@@ -39,7 +41,11 @@ namespace umbraco.cms.businesslogic.macro
                 {
                     try
                     {
-                        m_engines.Add(typeInstance.Name, t);
+                        lock (locker)
+                        {
+                            if (!m_engines.ContainsKey(typeInstance.Name))
+                                m_engines.Add(typeInstance.Name, t);
+                        }
                     }
                     catch (Exception ee)
                     {

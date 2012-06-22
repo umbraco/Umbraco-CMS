@@ -6,6 +6,7 @@ using System.Collections;
 
 namespace umbraco.cms.businesslogic
 {
+    [Obsolete("umbraco.cms.businesslogic.Tuple<T,T2> is Obsolete, use System.Tuple instead")]
     public class Tuple<T, T2> : IEquatable<Tuple<T, T2>>
     {
         public T first { get; set; }
