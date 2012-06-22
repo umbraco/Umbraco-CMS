@@ -161,7 +161,7 @@
 goto :exit
 
 :debug
-xcopy "$(ProjectDir)bin\debug\umbraco.MacroEngines.*" "$(ProjectDir)..\umbraco\presentation\bin\" /Y/F
+xcopy "$(ProjectDir)bin\debug\umbraco.MacroEngines.*" "$(ProjectDir)..\umbraco.presentation\bin\" /Y/F
 :exit</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
