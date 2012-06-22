@@ -38,23 +38,29 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.MacroEngines.Iron",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
 	ProjectSection(SolutionItems) = preProject
-		build\aspnet35.build = build\aspnet35.build
-		build\aspnet35.config = build\aspnet35.config
-		build\build.xml = build\build.xml
-		build\default.build = build\default.build
-		build\nuget.build = build\nuget.build
-		build\umbraco weekly.build = build\umbraco weekly.build
-		build\umbraco.build = build\umbraco.build
+		..\build\Build.bat = ..\build\Build.bat
+		..\build\Build.proj = ..\build\Build.proj
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
 	ProjectSection(SolutionItems) = preProject
-		docs\4.5-changelog.docx = docs\4.5-changelog.docx
-		docs\GettingStarted.txt = docs\GettingStarted.txt
-		docs\IronPython License.Rtf = docs\IronPython License.Rtf
-		docs\License.txt = docs\License.txt
-		docs\README.txt = docs\README.txt
-		docs\ReleaseNotes.txt = docs\ReleaseNotes.txt
+		..\docs\4.5-changelog.docx = ..\docs\4.5-changelog.docx
+		..\docs\GettingStarted.txt = ..\docs\GettingStarted.txt
+		..\docs\IronPython License.Rtf = ..\docs\IronPython License.Rtf
+		..\docs\License.txt = ..\docs\License.txt
+		..\docs\README.txt = ..\docs\README.txt
+		..\docs\ReleaseNotes.txt = ..\docs\ReleaseNotes.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nant", "Nant", "{17E547B1-D89B-4C76-AB9C-F05888397FA4}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\Nant\aspnet35.build = ..\build\Nant\aspnet35.build
+		..\build\Nant\aspnet35.config = ..\build\Nant\aspnet35.config
+		..\build\Nant\build.xml = ..\build\Nant\build.xml
+		..\build\Nant\default.build = ..\build\Nant\default.build
+		..\build\Nant\nuget.build = ..\build\Nant\nuget.build
+		..\build\Nant\umbraco weekly.build = ..\build\Nant\umbraco weekly.build
+		..\build\Nant\umbraco.build = ..\build\Nant\umbraco.build
 	EndProjectSection
 EndProject
 Global
@@ -120,5 +126,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{17E547B1-D89B-4C76-AB9C-F05888397FA4} = {2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}
 	EndGlobalSection
 EndGlobal
