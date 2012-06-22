@@ -1,61 +1,61 @@
 <Project InitialTargets="Build" DefaultTargets="AfterBuild" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<PropertyGroup>
-		<MSBuildCommunityTasksPath>..\MSBuildCommunityTasks</MSBuildCommunityTasksPath>
-		<UmbracoMSBuildTasksPath>..\UmbracoMSBuildTasks</UmbracoMSBuildTasksPath>
-	</PropertyGroup>
-	<!--<Import Project="..\lib\References\Umbraco\UmbracoMSBuildTasks\Umbraco.MSBuild.Tasks.Targets" />-->
-	<Import Project="..\lib\MSBuild\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
-	<PropertyGroup>
-		<BuildFolder>_BuildOutput\</BuildFolder>
-		<BuildZipFileName>UmbracoWebApp.zip</BuildZipFileName>
-		<BuildZipFileNameBin>UmbracoAllBinaries.zip</BuildZipFileNameBin>
-		<IncludeSymbols>False</IncludeSymbols>
-		<BuildFolderRelativeToProjects>..\..\$(BuildFolder)</BuildFolderRelativeToProjects>
-		<SolutionBinFolder>$(BuildFolder)bin\</SolutionBinFolder>
-		<WebAppFolder>$(BuildFolder)WebApp\</WebAppFolder>
-		<SolutionBinFolderRelativeToProjects>$(BuildFolderRelativeToProjects)bin\</SolutionBinFolderRelativeToProjects>
-		<SolutionBinBuildFolderWildcard>$(SolutionBinFolder)**\*.*</SolutionBinBuildFolderWildcard>
-		<SolutionBinBuildFolderExclusionWildcard>$(SolutionBinFolder)**\Web.Template.*;$(SolutionBinFolder)**\*.pdb</SolutionBinBuildFolderExclusionWildcard>
-		<WebAppFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebApp\</WebAppFolderRelativeToProjects>
-		<WebBuildFolderWildcard>$(WebAppFolder)**\*.*</WebBuildFolderWildcard>
-		<WebBuildFolderExclusionWildcard>$(WebAppFolder)**\Web.Template.*;$(WebAppFolder)**\*.pdb</WebBuildFolderExclusionWildcard>
-		<!--<WebProjectPluginFolder>Web Apps\Umbraco.Cms.Web.UI\App_Plugins\</WebProjectPluginFolder>
+  <PropertyGroup>
+    <MSBuildCommunityTasksPath>..\MSBuildCommunityTasks</MSBuildCommunityTasksPath>
+    <UmbracoMSBuildTasksPath>..\UmbracoMSBuildTasks</UmbracoMSBuildTasksPath>
+  </PropertyGroup>
+  <!--<Import Project="..\lib\References\Umbraco\UmbracoMSBuildTasks\Umbraco.MSBuild.Tasks.Targets" />-->
+  <Import Project="..\lib\MSBuild\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+  <PropertyGroup>
+    <BuildFolder>build\_BuildOutput\</BuildFolder>
+    <BuildZipFileName>UmbracoWebApp.zip</BuildZipFileName>
+    <BuildZipFileNameBin>UmbracoAllBinaries.zip</BuildZipFileNameBin>
+    <IncludeSymbols>False</IncludeSymbols>
+    <BuildFolderRelativeToProjects>..\..\$(BuildFolder)</BuildFolderRelativeToProjects>
+    <SolutionBinFolder>$(BuildFolder)bin\</SolutionBinFolder>
+    <WebAppFolder>$(BuildFolder)WebApp\</WebAppFolder>
+    <SolutionBinFolderRelativeToProjects>$(BuildFolderRelativeToProjects)bin\</SolutionBinFolderRelativeToProjects>
+    <SolutionBinBuildFolderWildcard>$(SolutionBinFolder)**\*.*</SolutionBinBuildFolderWildcard>
+    <SolutionBinBuildFolderExclusionWildcard>$(SolutionBinFolder)**\Web.Template.*;$(SolutionBinFolder)**\*.pdb</SolutionBinBuildFolderExclusionWildcard>
+    <WebAppFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebApp\</WebAppFolderRelativeToProjects>
+    <WebBuildFolderWildcard>$(WebAppFolder)**\*.*</WebBuildFolderWildcard>
+    <WebBuildFolderExclusionWildcard>$(WebAppFolder)**\Web.Template.*;$(WebAppFolder)**\*.pdb</WebBuildFolderExclusionWildcard>
+    <!--<WebProjectPluginFolder>Web Apps\Umbraco.Cms.Web.UI\App_Plugins\</WebProjectPluginFolder>
 		<WebProjectPluginFolderWildcard>$(WebProjectPluginFolder)**\*.*</WebProjectPluginFolderWildcard>
 		<WebProjectPluginFolderExclusionWildcard>$(WebProjectPluginFolder)Packages\DevDataset\**\*.*;$(WebProjectPluginFolder)Packages\uGoLive\**\*.*</WebProjectPluginFolderExclusionWildcard>-->
-	</PropertyGroup>
-	<Target Name="Build" DependsOnTargets="ZipWebApp">
-		<Message Text="Build finished" />
-	</Target>
-	<Target Name="CleanUp" DependsOnTargets="ZipWebApp">
-		<Message Text="Deleting $(BuildFolder)" Importance="high" />
-		<RemoveDir Directories="$(BuildFolder)" />
-		<Message Text="Finished deleting $(BuildFolder)" Importance="high" />
-	</Target>
-	<!--<Target Name="ZipWebApp" DependsOnTargets="OffsetTimestamps">-->
-  <Target Name="ZipWebApp" DependsOnTargets="CompileWeb">
-		<Time Format="yyyyMMdd-HHmm">
-		  <Output TaskParameter="FormattedTime" PropertyName="buildDate" />
-		</Time>
-		<CreateItem Include="$(WebBuildFolderWildcard)" Exclude="$(WebBuildFolderExclusionWildcard)">
-			<Output TaskParameter="Include" ItemName="WebFilesToZip" />
-        </CreateItem>
-		<CreateItem Include="$(SolutionBinBuildFolderWildcard)" Exclude="$(SolutionBinBuildFolderExclusionWildcard)">
-			<Output TaskParameter="Include" ItemName="BinFilesToZip" />
-        </CreateItem>
-		<Message Text="Starting to zip to $(buildDate)-$(BuildZipFileName)" Importance="high" />
-		<MSBuild.Community.Tasks.Zip Files="@(BinFilesToZip)" ZipFileName="$(buildDate)-$(BuildZipFileNameBin)" WorkingDirectory="$(SolutionBinFolder)" />
-		<MSBuild.Community.Tasks.Zip Files="@(WebFilesToZip)" ZipFileName="$(buildDate)-$(BuildZipFileName)" WorkingDirectory="$(WebAppFolder)" />
-		<Message Text="Finished zipping to $(buildDate)-$(BuildZipFileName)" Importance="high" />
-	</Target>
-	<Target Name="CompileWeb">
-    
-		<Message Text="Compiling web project to $(BuildFolder)" Importance="high" />
-		<!-- For UseWPP_CopyWebApplication=True see http://stackoverflow.com/questions/1983575/copywebapplication-with-web-config-transformations -->
-		<MSBuild Projects="..\src\umbraco.sln" Properties="Configuration=Debug;UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderRelativeToProjects);WebProjectOutputDir=$(WebAppFolderRelativeToProjects)" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
-		</MSBuild>
-		<Message Text="Finished compiling web project to $(BuildFolder)" Importance="high" />
-	</Target>
-	<!--<Target Name="CopyDefaultPlugins" DependsOnTargets="CompileWeb">
+  </PropertyGroup>
+  <Target Name="Build" DependsOnTargets="ZipWebApp">
+    <Message Text="Build finished" />
+  </Target>
+  <Target Name="CleanUp" DependsOnTargets="ZipWebApp">
+    <Message Text="Deleting $(BuildFolder)" Importance="high" />
+    <RemoveDir Directories="$(BuildFolder)" />
+    <Message Text="Finished deleting $(BuildFolder)" Importance="high" />
+  </Target>
+  <!--<Target Name="ZipWebApp" DependsOnTargets="OffsetTimestamps">-->
+  <Target Name="ZipWebApp" >
+    <Time Format="yyyyMMdd-HHmm">
+      <Output TaskParameter="FormattedTime" PropertyName="buildDate" />
+    </Time>
+    <CreateItem Include="$(WebBuildFolderWildcard)" Exclude="$(WebBuildFolderExclusionWildcard)">
+      <Output TaskParameter="Include" ItemName="WebFilesToZip" />
+    </CreateItem>
+    <CreateItem Include="$(SolutionBinBuildFolderWildcard)" Exclude="$(SolutionBinBuildFolderExclusionWildcard)">
+      <Output TaskParameter="Include" ItemName="BinFilesToZip" />
+    </CreateItem>
+    <Message Text="Starting to zip to $(buildDate)-$(BuildZipFileName)" Importance="high" />
+    <MSBuild.Community.Tasks.Zip Files="@(BinFilesToZip)" ZipFileName="$(buildDate)-$(BuildZipFileNameBin)" WorkingDirectory="$(SolutionBinFolder)" />
+    <MSBuild.Community.Tasks.Zip Files="@(WebFilesToZip)" ZipFileName="$(buildDate)-$(BuildZipFileName)" WorkingDirectory="$(WebAppFolder)" />
+    <Message Text="Finished zipping to $(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
+  </Target>
+  <Target Name="CompileWeb">
+
+    <Message Text="Compiling web project to $(BuildFolder)" Importance="high" />
+    <!-- For UseWPP_CopyWebApplication=True see http://stackoverflow.com/questions/1983575/copywebapplication-with-web-config-transformations -->
+    <MSBuild Projects="..\src\umbraco.sln" Properties="Configuration=Debug;UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderRelativeToProjects);WebProjectOutputDir=$(WebAppFolderRelativeToProjects)" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
+    </MSBuild>
+    <Message Text="Finished compiling web project to $(BuildFolder)" Importance="high" />
+  </Target>
+  <!--<Target Name="CopyDefaultPlugins" DependsOnTargets="CompileWeb">
 		<Message Text="Copying default plugins using $(WebProjectPluginFolderWildcard)" Importance="high" />
 		<CreateItem Include="$(WebProjectPluginFolderWildcard)" Exclude="$(WebProjectPluginFolderExclusionWildcard)">
 			<Output TaskParameter="Include" ItemName="TargetFiles" />
@@ -71,7 +71,7 @@
 		<Umbraco.MSBuild.Tasks.TimestampOffset Files="@(FilesToOffsetTimestamp)" Offset="-11" />
 		<Message Text="Finished offsetting timestamps" Importance="high" />
 	</Target>-->
-	<Target Name="AfterBuild">
-		<Message Text="Hi" />
-	</Target>
+  <Target Name="AfterBuild">
+    <Message Text="Hi" />
+  </Target>
 </Project>
