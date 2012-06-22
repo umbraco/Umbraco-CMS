@@ -160,6 +160,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)*.asmx" "$(ProjectDir)..\..\umbraco\presentation\umbraco\webservices\api\" /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)*.asmx" "$(ProjectDir)..\umbraco.presentation\umbraco\webservices\api\" /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>
