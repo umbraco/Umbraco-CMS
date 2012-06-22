@@ -191,7 +191,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\SolutionInfo.cs">
+    <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="install\steps\database.ascx.cs">
@@ -1747,8 +1747,6 @@
     <Content Include="umbraco_client\tinymce3\themes\umbraco\img\trans.gif" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\img\video.gif" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\img\windowsmedia.gif" />
-    <Content Include="web.config.Blueberry.xslt" />
-    <Content Include="web.config.ssaodsk01.xslt" />
     <Content Include="umbraco\dashboard\DesktopMediaUploader.ascx" />
     <Content Include="umbraco\dashboard\images\dmu-badge.jpg" />
     <Content Include="umbraco\dashboard\images\dmu.png" />
@@ -2033,7 +2031,6 @@
     <Content Include="umbraco_client\tinymce3\plugins\xhtmlxtras\langs\nl_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\xhtmlxtras\langs\no_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\xhtmlxtras\langs\sv_dlg.js" />
-    <Content Include="web.config.INDIGO64SSD.xslt" />
     <Content Include="umbraco_client\Installer\css\all.css" />
     <Content Include="umbraco_client\Installer\css\form.css" />
     <Content Include="umbraco_client\Installer\css\jquery-ui-1.8.6.custom.css" />
@@ -2231,8 +2228,6 @@
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-icons_ffd27a_256x240.png" />
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-icons_ffffff_256x240.png" />
     <Content Include="umbraco_client\ui\ui-lightness\jquery-ui-1.8.4.custom.css" />
-    <Content Include="web.config.13INCHER.xslt" />
-    <Content Include="web.config.slacebox.xslt" />
     <Content Include="umbraco\endPreview.aspx" />
     <Content Include="umbraco\js\UmbracoCasingRules.aspx" />
     <Content Include="umbraco_client\Application\HistoryManager.js" />
@@ -2243,11 +2238,6 @@
     <Content Include="umbraco_client\ui\dd.css" />
     <Content Include="umbraco_client\ui\dd_arrow.gif" />
     <Content Include="umbraco_client\ui\jquery.dd.js" />
-    <Content Include="web.config.EQUIUM-SAT1.xslt" />
-    <Content Include="web.config.INDIGO64.xslt" />
-    <Content Include="web.config.NIBBLE-LAPTOP.xslt" />
-    <Content Include="web.config.PETER-MAC-PC.xslt" />
-    <Content Include="web.config.PETER-PC.xslt" />
     <Content Include="umbraco\xslt\templates\Schema2\Breadcrumb.xslt" />
     <Content Include="umbraco\xslt\templates\Schema2\Clean.xslt" />
     <Content Include="umbraco\xslt\templates\Schema2\ListSubPagesAsThumbnails.xslt" />
@@ -2263,24 +2253,15 @@
     <Content Include="umbraco\xslt\templates\Schema2\RSSFeed.xslt" />
     <Content Include="umbraco\xslt\templates\Schema2\Sitemap.xslt" />
     <Content Include="umbraco\xslt\templates\Schema2\TablePrototype.xslt" />
-    <Content Include="web.config.ssaolap01.xslt" />
-    <Content Include="web.config.UMBRACOELISE.xslt">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="umbraco\dialogs\Preview.aspx" />
     <Content Include="umbraco_client\DateTimePicker\images\calSprite.png" />
     <Content Include="umbraco_client\DateTimePicker\images\ui-icons_666666_256x240.png" />
     <Content Include="umbraco_client\DateTimePicker\images\ui-icons_999999_256x240.png" />
     <Content Include="umbraco_client\DateTimePicker\umbDateTimePicker.js" />
-    <Content Include="web.config.UMBRACOHUMMER.xslt">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="umbraco\controls\passwordChanger.ascx" />
     <Content Include="umbraco\controls\ProgressBar.ascx" />
     <Content Include="umbraco_client\DateTimePicker\datetimepicker.css" />
     <Content Include="umbraco_client\DateTimePicker\timepicker.js" />
-    <Content Include="web.config.SHOCKING.xslt" />
-    <Content Include="web.config.UMBRACOTOSH.xslt" />
     <Content Include="umbraco\controls\ContentTypeControlNew.ascx" />
     <Content Include="umbraco\controls\GenericProperties\GenericProperty.ascx" />
     <Content Include="umbraco\create\DLRScripting.ascx" />
@@ -2339,7 +2320,6 @@
     <Content Include="umbraco_client\Tree\Themes\default\dot_for_ie.gif" />
     <Content Include="umbraco_client\Tree\Themes\default\icons.png" />
     <Content Include="umbraco_client\Tree\Themes\umbraco\icons.png" />
-    <Content Include="web.config.SHANDEMVAIO.xslt" />
     <Content Include="default.aspx" />
     <Content Include="Global.asax">
       <SubType>Component</SubType>
@@ -2655,6 +2635,18 @@
     <Content Include="config\scripting.config" />
     <Content Include="config\Skinning.config" />
     <Content Include="config\feedProxy.config" />
+    <Content Include="web.Template.ShandemVaio.Debug.config">
+      <DependentUpon>Web.Template.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="web.Template.Debug.config">
+      <DependentUpon>Web.Template.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="web.Template.Release.config">
+      <DependentUpon>Web.Template.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
@@ -3227,10 +3219,7 @@
     <Content Include="umbraco\webservices\MediaUploader.ashx" />
     <None Include="umbraco_client\CodeMirror\LICENSE" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
-    <Content Include="web.config.APOWELL-BC-WIN7.xslt" />
-    <Content Include="web.config.SONIC.xslt" />
-    <Content Include="web.config.User-VAIO.xslt" />
-    <Content Include="web.STANDARD.config">
+    <Content Include="web.Template.config">
       <SubType>Designer</SubType>
     </Content>
     <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />
@@ -3300,6 +3289,57 @@
     <Content Include="web.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="web.Template.User-VAIO.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.UMBRACOTOSH.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.UMBRACOHUMMER.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.UMBRACOELISE.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.ssaolap01.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.ssaodsk01.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.SONIC.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.PETER-PC.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.PETER-MAC.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.slacebox.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.NIBBLE-LAPTOP.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.INDIGO64SSD.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.INDIGO64.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.EQUIUM-SAT1.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.Blueberry.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.APOWELL-BC-WIN7.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
+    <Content Include="web.Template.13INCHER.Debug.config" >
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
@@ -3334,12 +3374,6 @@
     <Folder Include="xslt\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(ProjectDir)..\..\dlls\MSBuild\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
-  <Target Name="AfterBuild">
-    <Copy SourceFiles="web.STANDARD.config" DestinationFiles="web.config" />
-    <Xslt RootTag="" Inputs="web.config" Output="Web.$(COMPUTERNAME).config" Xsl="web.config.$(COMPUTERNAME).xslt" Condition="Exists('web.config.$(COMPUTERNAME).xslt')" />
-    <Copy Condition="Exists('web.$(COMPUTERNAME).config')" SourceFiles="web.$(COMPUTERNAME).config" DestinationFiles="web.config" SkipUnchangedFiles="true" />
-  </Target>
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
@@ -3356,6 +3390,8 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
+  <Import Project="$(MSBuildStartupDirectory)\src\umbraco.presentation.targets" Condition="$(BuildingInsideVisualStudio) != true" />
+  <Import Project="$(SolutionDir)umbraco.presentation.targets" Condition="$(BuildingInsideVisualStudio) == true" />
   <PropertyGroup>
     <!--<PostBuildEvent>xcopy "$(ProjectDir)..\..\dlls\*.dll" "$(TargetDir)*.dll" /Y</PostBuildEvent>-->
   </PropertyGroup>

@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="$(BuildingInsideVisualStudio) != true">
+    <!-- note: this means that msbuild should be run from the location of the sln file -->
+    <SolutionRootFolder>$(MSBuildStartupDirectory)</SolutionRootFolder>
+    <ConfigEnvironment></ConfigEnvironment>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(BuildingInsideVisualStudio) == true">
+    <SolutionRootFolder>$(SolutionDir)</SolutionRootFolder>
+    <ConfigEnvironment>$(Computername).</ConfigEnvironment>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <WebConfigSource>web.Template.$(ConfigEnvironment)$(Configuration).config</WebConfigSource>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="!Exists('$(MSBuildProjectDirectory)\$(WebConfigSource)')">
+    <WebConfigSource>web.Template.$(Configuration).config</WebConfigSource>
+  </PropertyGroup>
+  
+  <UsingTask
+     TaskName="TransformXml"
+     AssemblyFile="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll"
+        />
+
+  <!-- Make sure web.config will be there even for package/publish -->
+  <Target Name="CopyWebConfig" BeforeTargets="Build;Rebuild">
+    <Copy
+        SourceFiles="Web.Template.config"
+        DestinationFiles="Web.config"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false"
+            />
+  </Target>
+
+  <Target Name="CustomTarget" AfterTargets="CopyWebConfig">
+    <Message Text="Building in VS? $(BuildingInsideVisualStudio)" Importance="high" />
+    <Message Text="Transforming: $(WebConfigSource), running MSBuild on project $(MSBuildProjectDirectory)" Importance="high" />
+    <TransformXml Source="web.Template.config" Transform="$(WebConfigSource)" Destination="web.config" />
+    
+  </Target>
+</Project>
