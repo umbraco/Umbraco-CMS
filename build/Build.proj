@@ -58,8 +58,24 @@
 
     <Message Text="Compiling web project to build\$(BuildFolder)" Importance="high" />
     <!-- For UseWPP_CopyWebApplication=True see http://stackoverflow.com/questions/1983575/copywebapplication-with-web-config-transformations -->
-    <MSBuild Projects="..\src\umbraco.sln" Properties="Configuration=Debug;UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderRelativeToProjects);WebProjectOutputDir=$(WebAppFolderRelativeToProjects)" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
+    <MSBuild Projects="..\src\umbraco.sln" Properties="Configuration=Release;UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderRelativeToProjects);WebProjectOutputDir=$(WebAppFolderRelativeToProjects)" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
     </MSBuild>
+    <!-- 
+    
+    TODO:
+    
+    Now, because of all the circular dependencies we need to build those projects and have them dump their DLLs/assets out to the same folder. Really wish this wasn't the case! 
+    These are:
+    umbraco.editorControls
+    umbraco.webservices
+    umbraco.MacroEngines
+    
+    each of these projects has a post build to put their stuff in the correct location based on the solution, but we may have to create a special build 
+    configuration for each of these to get them to put their files in our build folder or something like that
+    
+    -->
+    
+    
     <Message Text="Finished compiling web project to build\$(BuildFolder)" Importance="high" />
   </Target>
   <!--<Target Name="CopyDefaultPlugins" DependsOnTargets="CompileWeb">

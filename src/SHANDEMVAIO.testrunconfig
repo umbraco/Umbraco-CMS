@@ -4,7 +4,7 @@
   <Execution>
     <Hosts type="ASP.NET" skipUnhostableTests="false">
       <AspNet name="ASP.NET" executionType="WebDev" urlToTest="http://localhost:59454/">
-        <DevelopmentServer pathToWebSite="C:\Users\Shannon\Documents\Visual Studio 2008\Projects\Umbraco\Branch-4.1\umbraco\presentation" webApplicationRoot="/" />
+        <DevelopmentServer pathToWebSite="C:\Users\shannon\Documents\~Jobs\Umbraco4\src\umbraco.presentation" webApplicationRoot="/" />
       </AspNet>
     </Hosts>
     <TestTypeSpecific>

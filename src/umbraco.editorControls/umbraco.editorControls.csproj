@@ -55,7 +55,7 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\..\umbraco\presentation\bin\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <BaseAddress>285212672</BaseAddress>
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
@@ -79,7 +79,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\..\umbraco\presentation\bin\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <BaseAddress>285212672</BaseAddress>
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
@@ -134,14 +134,16 @@
       <Name>System.Windows.Forms</Name>
     </Reference>
     <ProjectReference Include="..\umbraco.businesslogic\umbraco.businesslogic.csproj">
-      <Name>umbraco.businesslogic</Name>
       <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+      <Name>umbraco.businesslogic</Name>
     </ProjectReference>
     <ProjectReference Include="..\umbraco.cms\umbraco.cms.csproj">
-      <Name>umbraco.cms</Name>
       <Project>{CCD75EC3-63DB-4184-B49D-51C1DD337230}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+      <Name>umbraco.cms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\umbraco.controls\umbraco.controls.csproj">
+      <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
+      <Name>umbraco.controls</Name>
     </ProjectReference>
     <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
       <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
@@ -159,10 +161,6 @@
     <ProjectReference Include="..\umbraco.macroRenderings\umbraco.macroRenderings.csproj">
       <Project>{52AB8F1F-FB76-4E8C-885F-0747B6CE71EC}</Project>
       <Name>umbraco.macroRenderings</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.controls\umbraco.controls.csproj">
-      <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
-      <Name>umbraco.controls</Name>
     </ProjectReference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
@@ -485,7 +483,6 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)\umbraco.presentation\bin\" /Y /F</PostBuildEvent>
   </PropertyGroup>
 </Project>
