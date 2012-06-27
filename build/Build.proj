@@ -31,14 +31,9 @@
   <Target Name="ZipWebApp" DependsOnTargets="OffsetTimestamps" >
     <Time Format="yyyyMMdd-HHmm">
       <Output TaskParameter="FormattedTime" PropertyName="buildDate" />
-    </Time>
-
-    <!--<Message Text=" Here I Am  " />
-    <Exec Command="dir ." />
-    <Message Text=" " />
-    <Message Text="FOLDER = $(WebBuildFolderWildcard)" Importance="high" />-->
-
-    <!--<CreateItem Include="$(WebBuildFolderWildcard)" Exclude="$(WebBuildFolderExclusionWildcard)">
+    </Time>    
+    
+    <CreateItem Include="$(WebBuildFolderWildcard)" Exclude="$(WebBuildFolderExclusionWildcard)">
       <Output TaskParameter="Include" ItemName="WebFilesToZip" />
     </CreateItem>
 
@@ -48,7 +43,7 @@
     <Message Text="Starting to zip to $(buildDate)-$(BuildZipFileName)" Importance="high" />
     <MSBuild.Community.Tasks.Zip Files="@(BinFilesToZip)" ZipFileName="$(buildDate)-$(BuildZipFileNameBin)" WorkingDirectory="$(SolutionBinFolder)" />
     <MSBuild.Community.Tasks.Zip Files="@(WebFilesToZip)" ZipFileName="$(buildDate)-$(BuildZipFileName)" WorkingDirectory="$(WebAppFolder)" />
-    <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />-->
+    <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
   </Target>
   <Target Name="CompileProjects">
 
