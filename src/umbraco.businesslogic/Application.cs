@@ -3,8 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
+using System.Linq;
 using System.Web;
+using System.Xml.Linq;
 using umbraco.DataLayer;
+using umbraco.IO;
 using umbraco.interfaces;
 using umbraco.BusinessLogic.Utils;
 using System.Runtime.CompilerServices;
@@ -46,6 +50,7 @@ namespace umbraco.BusinessLogic
         private string _name;
         private string _alias;
         private string _icon;
+        private int _sortOrder;
 
 
         /// <summary>
@@ -90,10 +95,22 @@ namespace umbraco.BusinessLogic
         /// <param name="alias">The application alias.</param>
         /// <param name="icon">The application icon.</param>
         public Application(string name, string alias, string icon)
+            : this(name, alias, icon, 0)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="alias">The alias.</param>
+        /// <param name="icon">The icon.</param>
+        /// <param name="sortOrder">The sort order.</param>
+        public Application(string name, string alias, string icon, int sortOrder)
         {
             this.name = name;
             this.alias = alias;
             this.icon = icon;
+            this.sortOrder = sortOrder;
         }
 
         /// <summary>
@@ -124,7 +141,19 @@ namespace umbraco.BusinessLogic
         {
             get { return _icon; }
             set { _icon = value; }
-        }        
+        }
+
+        /// <summary>
+        /// Gets or sets the sort order.
+        /// </summary>
+        /// <value>
+        /// The sort order.
+        /// </value>
+        public int sortOrder
+        {
+            get { return _sortOrder; }
+            set { _sortOrder = value; }
+        } 
 
         /// <summary>
         /// Creates a new applcation if no application with the specified alias is found.
@@ -135,6 +164,19 @@ namespace umbraco.BusinessLogic
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static void MakeNew(string name, string alias, string icon)
         {
+            MakeNew(name, alias, icon, (1 + SqlHelper.ExecuteScalar<int>("SELECT MAX(sortOrder) FROM umbracoApp")));
+        }
+
+        /// <summary>
+        /// Makes the new.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="alias">The alias.</param>
+        /// <param name="icon">The icon.</param>
+        /// <param name="sortOrder">The sort order.</param>
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public static void MakeNew(string name, string alias, string icon, int sortOrder)
+        {
             bool exist = false;
             foreach (Application app in getAll())
             {
@@ -144,8 +186,6 @@ namespace umbraco.BusinessLogic
 
             if (!exist)
             {
-                int sortOrder = (1 + SqlHelper.ExecuteScalar<int>("SELECT MAX(sortOrder) FROM umbracoApp"));
-
                 SqlHelper.ExecuteNonQuery(@"
 				insert into umbracoApp 
 				(appAlias,appIcon,appName, sortOrder) 
@@ -157,7 +197,6 @@ namespace umbraco.BusinessLogic
 
                 ReCache();
             }
-
         }
 
 
@@ -265,12 +304,30 @@ namespace umbraco.BusinessLogic
             {
                 List<Application> tmp = new List<Application>();
 
-                using (IRecordsReader dr =
-                    SqlHelper.ExecuteReader("Select appAlias, appIcon, appName from umbracoApp"))
+                //using (IRecordsReader dr =
+                //    SqlHelper.ExecuteReader("Select appAlias, appIcon, appName from umbracoApp"))
+                //{
+                //    while (dr.Read())
+                //    {
+                //        tmp.Add(new Application(dr.GetString("appName"), dr.GetString("appAlias"), dr.GetString("appIcon")));
+                //    }
+                //}
+
+                var configPath = IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Config), "applications.config"));
+                var config = XDocument.Load(configPath);
+                if (config.Root != null)
                 {
-                    while (dr.Read())
+                    foreach (var addElement in config.Root.Elements("add").OrderBy(x =>
+                        {
+                            var sortOrderAttr = x.Attribute("sortOrder");
+                            return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
+                        }))
                     {
-                        tmp.Add(new Application(dr.GetString("appName"), dr.GetString("appAlias"), dr.GetString("appIcon")));
+                        var sortOrderAttr = addElement.Attribute("sortOrder");
+                        tmp.Add(new Application(addElement.Attribute("name").Value,
+                            addElement.Attribute("alias").Value,
+                            addElement.Attribute("icon").Value,
+                            sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0));
                     }
                 }
 
