@@ -29,6 +29,11 @@ namespace umbraco.BusinessLogic
 
         private const string CACHE_KEY = "ApplicationCache";
 
+        private static readonly string _appConfig =
+            IOHelper.MapPath(SystemDirectories.Config + "/applications.config");
+
+        private static readonly object _appSyncLock = new object();
+
         /// <summary>
         /// The cache storage for all applications
         /// </summary>
@@ -164,7 +169,7 @@ namespace umbraco.BusinessLogic
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static void MakeNew(string name, string alias, string icon)
         {
-            MakeNew(name, alias, icon, (1 + SqlHelper.ExecuteScalar<int>("SELECT MAX(sortOrder) FROM umbracoApp")));
+            MakeNew(name, alias, icon, Apps.Max(x => x.sortOrder) + 1);
         }
 
         /// <summary>
@@ -186,14 +191,28 @@ namespace umbraco.BusinessLogic
 
             if (!exist)
             {
-                SqlHelper.ExecuteNonQuery(@"
-				insert into umbracoApp 
-				(appAlias,appIcon,appName, sortOrder) 
-				values (@alias,@icon,@name,@sortOrder)",
-                SqlHelper.CreateParameter("@alias", alias),
-                SqlHelper.CreateParameter("@icon", icon),
-                SqlHelper.CreateParameter("@name", name),
-                SqlHelper.CreateParameter("@sortOrder", sortOrder));
+//                SqlHelper.ExecuteNonQuery(@"
+//				insert into umbracoApp 
+//				(appAlias,appIcon,appName, sortOrder) 
+//				values (@alias,@icon,@name,@sortOrder)",
+//                SqlHelper.CreateParameter("@alias", alias),
+//                SqlHelper.CreateParameter("@icon", icon),
+//                SqlHelper.CreateParameter("@name", name),
+//                SqlHelper.CreateParameter("@sortOrder", sortOrder));
+
+                lock (_appSyncLock)
+                {
+                    var doc = XDocument.Load(_appConfig);
+                    if (doc.Root != null)
+                    {
+                        doc.Root.Add(new XElement("add",
+                            new XAttribute("alias", alias),
+                            new XAttribute("name", name),
+                            new XAttribute("icon", icon),
+                            new XAttribute("sortOrder", sortOrder)));
+                    }
+                    doc.Save(_appConfig);
+                }
 
                 ReCache();
             }
@@ -239,8 +258,18 @@ namespace umbraco.BusinessLogic
                 t.Delete();
             }
 
-            SqlHelper.ExecuteNonQuery("delete from umbracoApp where appAlias = @appAlias",
-                SqlHelper.CreateParameter("@appAlias", this._alias));
+            //SqlHelper.ExecuteNonQuery("delete from umbracoApp where appAlias = @appAlias",
+            //    SqlHelper.CreateParameter("@appAlias", this._alias));
+
+            lock (_appSyncLock)
+            {
+                var doc = XDocument.Load(_appConfig);
+                if(doc.Root != null)
+                {
+                    doc.Root.Elements("add").Where(x => x.Attribute("alias") != null && x.Attribute("alias").Value == this.alias).Remove();
+                }
+                doc.Save(_appConfig);
+            }
 
             ReCache();
         }
@@ -313,8 +342,7 @@ namespace umbraco.BusinessLogic
                 //    }
                 //}
 
-                var configPath = IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Config), "applications.config"));
-                var config = XDocument.Load(configPath);
+                var config = XDocument.Load(_appConfig);
                 if (config.Root != null)
                 {
                     foreach (var addElement in config.Root.Elements("add").OrderBy(x =>
