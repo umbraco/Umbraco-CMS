@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{89C09045-1064-466B-B94A-DB3AFE2A5853}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>umbraco.MacroEngines</RootNamespace>
+    <AssemblyName>umbraco.MacroEngines</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+<<<<<<< local
+    <Reference Include="Examine">
+=======
+    <Reference Include="Examine, Version=0.1.41.2941, Culture=neutral, processorArchitecture=MSIL">
+>>>>>>> other
+      <HintPath>..\foreign dlls\Examine.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.3.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\foreign dlls\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Lucene.Net">
+      <HintPath>..\foreign dlls\Lucene.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\foreign dlls\WebPages\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\foreign dlls\WebPages\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\foreign dlls\WebPages\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Xml" />
+<<<<<<< local
+    <Reference Include="UmbracoExamine">
+=======
+    <Reference Include="UmbracoExamine, Version=0.1.41.2941, Culture=neutral, processorArchitecture=MSIL">
+>>>>>>> other
+      <HintPath>..\foreign dlls\UmbracoExamine.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="RazorCore\BaseContext.cs" />
+    <Compile Include="RazorDataTypeModels\HtmlStringDataTypeModel.cs" />
+    <Compile Include="RazorDataTypeModels\IntegerDataTypeModel.cs" />
+    <Compile Include="RazorDynamicNode\DynamicBackingItem.cs" />
+    <Compile Include="RazorDynamicNode\DynamicBackingItemType.cs" />
+    <Compile Include="RazorDynamicNode\DynamicGrouping.cs" />
+    <Compile Include="RazorDynamicNode\DynamicMedia.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RazorDynamicNode\DynamicMediaList.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RazorDynamicNode\DynamicNodeIdEqualityComparer.cs" />
+    <Compile Include="RazorDynamicNode\DynamicNodeList.cs" />
+    <Compile Include="RazorDynamicNode\ExamineBackedMedia.cs" />
+    <Compile Include="RazorDynamicNode\Grouping.cs" />
+    <Compile Include="RazorDynamicNode\HtmlTagWrapper.cs" />
+    <Compile Include="RazorDynamicNode\HtmlTagWrapperBase.cs" />
+    <Compile Include="RazorDynamicNode\HtmlTagWrapperTextNode.cs" />
+    <Compile Include="RazorDynamicNode\IRazorDataTypeModel.cs" />
+    <Compile Include="RazorDynamicNode\PropertyResult.cs" />
+    <Compile Include="RazorDynamicNode\RazorDataTypeModel.cs" />
+    <Compile Include="RazorDynamicNode\RazorLibraryCore.cs" />
+    <Compile Include="RazorDynamicNode\DynamicNodeWalker.cs" />
+    <Compile Include="RazorDynamicNode\DynamicNull.cs" />
+    <Compile Include="RazorDynamicNode\DynamicQueryable.cs" />
+    <Compile Include="RazorDynamicNode\DynamicXml.cs" />
+    <Compile Include="RazorDynamicNode\ExtensionMethodFinder.cs" />
+    <Compile Include="RazorDynamicNode\ExtensionMethods.cs" />
+    <Compile Include="RazorCore\RazorUmbracoFactory.cs" />
+    <Compile Include="RazorCore\RazorUmbracoHost.cs" />
+    <Compile Include="RazorCore\UmbracoCultureDictionary.cs" />
+    <Compile Include="RazorDynamicNode\DynamicDictionary.cs" />
+    <Compile Include="RazorDynamicNode\DynamicNodeListOrdering.cs" />
+    <Compile Include="RazorDynamicNode\DynamicQueryableBinders.cs" />
+    <Compile Include="RazorDynamicNode\DynamicNode.cs" />
+    <Compile Include="RazorDynamicNode\DynamicNodeContext.cs" />
+    <Compile Include="RazorCore\ICultureDictionary.cs" />
+    <Compile Include="RazorCore\IMacroContext.cs" />
+    <Compile Include="RazorCore\IParameterDictionary.cs" />
+    <Compile Include="RazorCore\UmbracoParameterDictionary.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RazorCore\RazorBuildProvider.cs" />
+    <Compile Include="RazorCore\RazorMacroEngine.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\components\editorControls\umbraco.editorControls.csproj">
+      <Project>{255F5DF1-4E43-4758-AC05-7A0B68EB021B}</Project>
+      <Name>umbraco.editorControls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\umbraco\businesslogic\umbraco.businesslogic.csproj">
+      <Project>{E469A9CE-1BEC-423F-AC44-713CD72457EA}</Project>
+      <Name>umbraco.businesslogic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\umbraco\cms\umbraco.cms.csproj">
+      <Project>{CCD75EC3-63DB-4184-B49D-51C1DD337230}</Project>
+      <Name>umbraco.cms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\umbraco\datalayer\umbraco.datalayer.csproj">
+      <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
+      <Name>umbraco.datalayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\umbraco\interfaces\umbraco.interfaces.csproj">
+      <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
+      <Name>umbraco.interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\umbraco\presentation\umbraco.presentation.csproj">
+      <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
+      <Name>umbraco.presentation</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.Config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if $(ConfigurationName) == Debug goto :debug
+
+goto :exit
+
+:debug
+xcopy "$(ProjectDir)bin\debug\umbraco.MacroEngines.*" "$(ProjectDir)..\umbraco\presentation\bin\" /Y/F
+:exit</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

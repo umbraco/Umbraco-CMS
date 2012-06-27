@@ -36,3 +36,5 @@ glob:*xslt\*
 
 umbraco\presentation\umbraco\plugins\uComponents\uComponentsInstaller.ascx
 umbraco\presentation\packages\uComponents\MultiNodePicker\CustomTreeService.asmx
+_BuildOutput/*
+*.ncrunchsolution
