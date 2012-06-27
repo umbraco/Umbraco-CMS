@@ -232,22 +232,43 @@ namespace umbraco.BusinessLogic
         public static void MakeNew(bool silent, bool initialize, byte sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string assemblyName, string type, string action)
         {
 
-            SqlHelper.ExecuteNonQuery(@"insert into umbracoAppTree(treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, 
-                                        treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType, action) 
-                                        values(@treeSilent, @treeInitialize, @treeSortOrder, @appAlias, @treeAlias, @treeTitle, @treeIconClosed, @treeIconOpen, @treeHandlerAssembly, @treeHandlerType, @action)"
-                                        ,
-                SqlHelper.CreateParameter("@treeSilent", silent),
-                SqlHelper.CreateParameter("@treeInitialize", initialize),
-                SqlHelper.CreateParameter("@treeSortOrder", sortOrder),
-                SqlHelper.CreateParameter("@treeAlias", alias),
-                SqlHelper.CreateParameter("@appAlias", applicationAlias),
-                SqlHelper.CreateParameter("@treeTitle", title),
-                SqlHelper.CreateParameter("@treeIconClosed", iconClosed),
-                SqlHelper.CreateParameter("@treeIconOpen", iconOpened),
-                SqlHelper.CreateParameter("@treeHandlerAssembly", assemblyName),
-                SqlHelper.CreateParameter("@treeHandlerType", type),
-                SqlHelper.CreateParameter("@action", action)
-                );
+//            SqlHelper.ExecuteNonQuery(@"insert into umbracoAppTree(treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, 
+//                                        treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType, action) 
+//                                        values(@treeSilent, @treeInitialize, @treeSortOrder, @appAlias, @treeAlias, @treeTitle, @treeIconClosed, @treeIconOpen, @treeHandlerAssembly, @treeHandlerType, @action)"
+//                                        ,
+//                SqlHelper.CreateParameter("@treeSilent", silent),
+//                SqlHelper.CreateParameter("@treeInitialize", initialize),
+//                SqlHelper.CreateParameter("@treeSortOrder", sortOrder),
+//                SqlHelper.CreateParameter("@treeAlias", alias),
+//                SqlHelper.CreateParameter("@appAlias", applicationAlias),
+//                SqlHelper.CreateParameter("@treeTitle", title),
+//                SqlHelper.CreateParameter("@treeIconClosed", iconClosed),
+//                SqlHelper.CreateParameter("@treeIconOpen", iconOpened),
+//                SqlHelper.CreateParameter("@treeHandlerAssembly", assemblyName),
+//                SqlHelper.CreateParameter("@treeHandlerType", type),
+//                SqlHelper.CreateParameter("@action", action)
+//                );
+
+            lock (m_Locker)
+            {
+                var doc = XDocument.Load(_appTreeConfig);
+                if (doc.Root != null)
+                {
+                    doc.Root.Add(new XElement("add",
+                        new XAttribute("silent", silent),
+                        new XAttribute("initialize", initialize),
+                        new XAttribute("sortOrder", sortOrder),
+                        new XAttribute("alias", alias),
+                        new XAttribute("application", applicationAlias),
+                        new XAttribute("title", title),
+                        new XAttribute("iconClosed", iconClosed),
+                        new XAttribute("iconOpen", iconOpened),
+                        new XAttribute("assembly", assemblyName),
+                        new XAttribute("type", type),
+                        new XAttribute("action", action)));
+                }
+                doc.Save(_appTreeConfig);
+            }
 
             ReCache();
         }
@@ -257,23 +278,25 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public void Save()
         {
-            SqlHelper.ExecuteNonQuery(@"Update umbracoAppTree set treeSilent = @treeSilent, treeInitialize = @treeInitialize, treeSortOrder = @treeSortOrder, treeTitle = @treeTitle, 
-                                        treeIconClosed = @treeIconClosed, treeIconOpen = @treeIconOpen, treeHandlerAssembly = @treeHandlerAssembly, treeHandlerType = @treeHandlerType, action = @action 
-                                        where treeAlias = @treeAlias AND appAlias = @appAlias",
-                SqlHelper.CreateParameter("@treeSilent", this.Silent),
-                SqlHelper.CreateParameter("@treeInitialize", this.Initialize),
-                SqlHelper.CreateParameter("@treeSortOrder", this.SortOrder),
-                SqlHelper.CreateParameter("@treeTitle", this.Title),
-                SqlHelper.CreateParameter("@treeIconClosed", this.IconClosed),
-                SqlHelper.CreateParameter("@treeIconOpen", this.IconOpened),
-                SqlHelper.CreateParameter("@treeHandlerAssembly", this.AssemblyName),
-                SqlHelper.CreateParameter("@treeHandlerType", this.Type),
-                SqlHelper.CreateParameter("@treeAlias", this.Alias),
-                SqlHelper.CreateParameter("@appAlias", this.ApplicationAlias),
-                SqlHelper.CreateParameter("@action", this.Action)
-                );
+//            SqlHelper.ExecuteNonQuery(@"Update umbracoAppTree set treeSilent = @treeSilent, treeInitialize = @treeInitialize, treeSortOrder = @treeSortOrder, treeTitle = @treeTitle, 
+//                                        treeIconClosed = @treeIconClosed, treeIconOpen = @treeIconOpen, treeHandlerAssembly = @treeHandlerAssembly, treeHandlerType = @treeHandlerType, action = @action 
+//                                        where treeAlias = @treeAlias AND appAlias = @appAlias",
+//                SqlHelper.CreateParameter("@treeSilent", this.Silent),
+//                SqlHelper.CreateParameter("@treeInitialize", this.Initialize),
+//                SqlHelper.CreateParameter("@treeSortOrder", this.SortOrder),
+//                SqlHelper.CreateParameter("@treeTitle", this.Title),
+//                SqlHelper.CreateParameter("@treeIconClosed", this.IconClosed),
+//                SqlHelper.CreateParameter("@treeIconOpen", this.IconOpened),
+//                SqlHelper.CreateParameter("@treeHandlerAssembly", this.AssemblyName),
+//                SqlHelper.CreateParameter("@treeHandlerType", this.Type),
+//                SqlHelper.CreateParameter("@treeAlias", this.Alias),
+//                SqlHelper.CreateParameter("@appAlias", this.ApplicationAlias),
+//                SqlHelper.CreateParameter("@action", this.Action)
+//                );
 
-            ReCache();
+            Delete(false);
+
+            MakeNew(this.Silent, this.Initialize, this.SortOrder, this.ApplicationAlias, this.Alias, this.Title, this.IconClosed, this.IconOpened, this.AssemblyName, this.Type, this.Action);
         }
 
         /// <summary>
@@ -281,10 +304,30 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public void Delete()
         {
-            SqlHelper.ExecuteNonQuery("delete from umbracoAppTree where appAlias = @appAlias AND treeAlias = @treeAlias",
-                SqlHelper.CreateParameter("@appAlias", this.ApplicationAlias), SqlHelper.CreateParameter("@treeAlias", this.Alias));
+            Delete(true);
+        }
 
-            ReCache();
+        /// <summary>
+        /// Deletes this instance.
+        /// </summary>
+        internal void Delete(bool recache)
+        {
+            //SqlHelper.ExecuteNonQuery("delete from umbracoAppTree where appAlias = @appAlias AND treeAlias = @treeAlias",
+            //    SqlHelper.CreateParameter("@appAlias", this.ApplicationAlias), SqlHelper.CreateParameter("@treeAlias", this.Alias));
+
+            lock(m_Locker)
+            {
+                var doc = XDocument.Load(_appTreeConfig);
+                if (doc.Root != null)
+                {
+                    doc.Root.Elements("add").Where(x => x.Attribute("application") != null && x.Attribute("application").Value == this.ApplicationAlias && 
+                        x.Attribute("alias") != null && x.Attribute("alias").Value == this.Alias).Remove();
+                }
+                doc.Save(_appTreeConfig);
+            }
+
+            if (recache)
+                ReCache();
         }
 
 
@@ -398,7 +441,6 @@ namespace umbraco.BusinessLogic
                                 return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
                             }))
                             {
-                                var sortOrderAttr = addElement.Attribute("sortOrder");
                                 list.Add(new ApplicationTree(
                                     addElement.Attribute("silent") != null ? Convert.ToBoolean(addElement.Attribute("silent").Value) : false,
                                     addElement.Attribute("initialize") != null ? Convert.ToBoolean(addElement.Attribute("initialize").Value) : true,
