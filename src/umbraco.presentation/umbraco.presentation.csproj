@@ -3222,6 +3222,9 @@
     <Content Include="web.Template.13INCHER.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
     </Content>
+    <Content Include="web.Template.MBP-PC.Debug.config">
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
