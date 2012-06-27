@@ -18,7 +18,7 @@ namespace umbraco.cms.presentation.Trees.RelationTypes
         {
             Application developerSection = Application.getByAlias("developer");
 
-            ApplicationTree relationTypesApplicationTree = new ApplicationTree(false, true, 3, "developer", "relationTypesTree", "Relation Types", ".sprTreeFolder", ".sprTreeFolder_0", "umbraco", "cms.presentation.Trees.RelationTypes.RelationTypeTree", null);
+            ApplicationTree relationTypesApplicationTree = new ApplicationTree(false, true, 100, "developer", "relationTypesTree", "Relation Types", ".sprTreeFolder", ".sprTreeFolder_0", "umbraco", "cms.presentation.Trees.RelationTypes.RelationTypeTree", null);
 
             TreeDefinition relationTypesTreeDefinition = new TreeDefinition(typeof(umbraco.cms.presentation.Trees.RelationTypes.RelationTypeTree), relationTypesApplicationTree, developerSection);
 

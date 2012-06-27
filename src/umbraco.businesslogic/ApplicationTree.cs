@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Web;
+using System.Xml.Linq;
 using umbraco.DataLayer;
+using umbraco.IO;
 
 namespace umbraco.BusinessLogic
 {
@@ -15,6 +18,9 @@ namespace umbraco.BusinessLogic
     {
 
         private const string CACHE_KEY = "ApplicationTreeCache";
+
+        private static readonly string _appTreeConfig =
+            IOHelper.MapPath(SystemDirectories.Config + "/trees.config");
         
         private static readonly object m_Locker = new object();
 
@@ -266,6 +272,7 @@ namespace umbraco.BusinessLogic
                 SqlHelper.CreateParameter("@appAlias", this.ApplicationAlias),
                 SqlHelper.CreateParameter("@action", this.Action)
                 );
+
             ReCache();
         }
 
@@ -276,6 +283,7 @@ namespace umbraco.BusinessLogic
         {
             SqlHelper.ExecuteNonQuery("delete from umbracoAppTree where appAlias = @appAlias AND treeAlias = @treeAlias",
                 SqlHelper.CreateParameter("@appAlias", this.ApplicationAlias), SqlHelper.CreateParameter("@treeAlias", this.Alias));
+
             ReCache();
         }
 
@@ -302,7 +310,7 @@ namespace umbraco.BusinessLogic
         /// <returns>Returns a ApplicationTree Array</returns>
         public static ApplicationTree[] getAll()
         {
-            return AppTrees.ToArray();
+            return AppTrees.OrderBy(x => x.SortOrder).ToArray();
         }
 
         /// <summary>
@@ -333,7 +341,7 @@ namespace umbraco.BusinessLogic
                 }
             );
 
-            return list.ToArray();
+            return list.OrderBy(x => x.SortOrder).ToArray();
         }
 
         /// <summary>
@@ -359,25 +367,50 @@ namespace umbraco.BusinessLogic
                     {
                         List<ApplicationTree> list = new List<ApplicationTree>();
 
-                        using (IRecordsReader dr = SqlHelper.ExecuteReader(@"Select treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, 
-                                                                treeIconOpen, treeHandlerAssembly, treeHandlerType, action from umbracoAppTree order by treeSortOrder"))
+//                        using (IRecordsReader dr = SqlHelper.ExecuteReader(@"Select treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, 
+//                                                                treeIconOpen, treeHandlerAssembly, treeHandlerType, action from umbracoAppTree order by treeSortOrder"))
+//                        {
+//                            while (dr.Read())
+//                            {
+
+//                                list.Add(new ApplicationTree(
+//                                    dr.GetBoolean("treeSilent"),
+//                                    dr.GetBoolean("treeInitialize"),
+//                                    dr.GetByte("treeSortOrder"),
+//                                    dr.GetString("appAlias"),
+//                                    dr.GetString("treeAlias"),
+//                                    dr.GetString("treeTitle"),
+//                                    dr.GetString("treeIconClosed"),
+//                                    dr.GetString("treeIconOpen"),
+//                                    dr.GetString("treeHandlerAssembly"),
+//                                    dr.GetString("treeHandlerType"),
+//                                    dr.GetString("action")));
+
+//                            }
+//                        }
+
+                        var config = XDocument.Load(_appTreeConfig);
+                        if (config.Root != null)
                         {
-                            while (dr.Read())
+                            foreach (var addElement in config.Root.Elements("add").OrderBy(x =>
                             {
-
+                                var sortOrderAttr = x.Attribute("sortOrder");
+                                return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
+                            }))
+                            {
+                                var sortOrderAttr = addElement.Attribute("sortOrder");
                                 list.Add(new ApplicationTree(
-                                    dr.GetBoolean("treeSilent"),
-                                    dr.GetBoolean("treeInitialize"),
-                                    dr.GetByte("treeSortOrder"),
-                                    dr.GetString("appAlias"),
-                                    dr.GetString("treeAlias"),
-                                    dr.GetString("treeTitle"),
-                                    dr.GetString("treeIconClosed"),
-                                    dr.GetString("treeIconOpen"),
-                                    dr.GetString("treeHandlerAssembly"),
-                                    dr.GetString("treeHandlerType"),
-                                    dr.GetString("action")));
-
+                                    addElement.Attribute("silent") != null ? Convert.ToBoolean(addElement.Attribute("silent").Value) : false,
+                                    addElement.Attribute("initialize") != null ? Convert.ToBoolean(addElement.Attribute("initialize").Value) : true,
+                                    addElement.Attribute("sortOrder") != null ? Convert.ToByte(addElement.Attribute("sortOrder").Value) : (byte)0,
+                                    addElement.Attribute("application").Value,
+                                    addElement.Attribute("alias").Value,
+                                    addElement.Attribute("title").Value,
+                                    addElement.Attribute("iconClosed").Value,
+                                    addElement.Attribute("iconOpen").Value,
+                                    addElement.Attribute("assembly").Value,
+                                    addElement.Attribute("type").Value,
+                                    addElement.Attribute("action") != null ? addElement.Attribute("action").Value : ""));
                             }
                         }
 
