@@ -80,7 +80,8 @@
         <p>
         <asp:CheckBox runat="server" ID="PublishAll"></asp:CheckBox>
             <div style="margin-left: 16px; margin-top: 2px;">
-                <asp:CheckBox runat="server" ID="PublishUnpublishedItems" Checked="false" /> <%= umbraco.ui.Text("publish", "includeUnpublished")%> 
+                <asp:CheckBox runat="server" ID="PublishUnpublishedItems" Checked="false" />
+                <asp:Label runat="server" AssociatedControlID="PublishUnpublishedItems"><%= umbraco.ui.Text("publish", "includeUnpublished")%> </asp:Label>
             </div>
         </p>
         </div>
