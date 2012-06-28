@@ -31,7 +31,7 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of each individual cache items into the application tree under the cache application 
 	/// </summary>
-    [ApplicationTree("developer", "CacheItem", "Cache Item", initialize: false)]
+    [Tree("developer", "CacheItem", "Cache Item", initialize: false)]
     public class loadCacheItem : BaseTree
 	{
         public loadCacheItem(string application) : base(application) { }

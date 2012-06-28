@@ -28,7 +28,7 @@ namespace umbraco
     /// <summary>
     /// Handles loading of the packager application into the developer application tree
     /// </summary>
-    [ApplicationTree("developer", "packager", "Packages", sortOrder: 3)]
+    [Tree("developer", "packager", "Packages", sortOrder: 3)]
     public class loadPackager : ITree
     {
         #region TreeI Members

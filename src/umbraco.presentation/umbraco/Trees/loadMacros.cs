@@ -31,7 +31,7 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of the cache application into the developer application tree
 	/// </summary>
-    [ApplicationTree("developer", "macros", "Macros", sortOrder: 2)]
+    [Tree("developer", "macros", "Macros", sortOrder: 2)]
     public class loadMacros : BaseTree
 	{
 

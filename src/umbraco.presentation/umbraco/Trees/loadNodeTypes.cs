@@ -28,7 +28,7 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco
 {
-    [ApplicationTree("settings", "nodeTypes", "Document Types", sortOrder: 6)]
+    [Tree("settings", "nodeTypes", "Document Types", sortOrder: 6)]
     public class loadNodeTypes : BaseTree
     {
 

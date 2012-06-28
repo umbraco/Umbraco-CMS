@@ -27,7 +27,7 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco
 {
-    [ApplicationTree("settings", "stylesheetProperty", "Stylesheet Property", "", "", initialize: false)]
+    [Tree("settings", "stylesheetProperty", "Stylesheet Property", "", "", initialize: false)]
 	public class loadStylesheetProperty : BaseTree
 	{
         public loadStylesheetProperty(string application) : base(application) { }

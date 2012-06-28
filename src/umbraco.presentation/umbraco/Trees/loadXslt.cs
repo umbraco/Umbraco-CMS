@@ -31,7 +31,7 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of the xslt files into the application tree
 	/// </summary>
-    [ApplicationTree("developer", "xslt", "XSLT Files", sortOrder: 5)]
+    [Tree("developer", "xslt", "XSLT Files", sortOrder: 5)]
     public class loadXslt : FileSystemTree
 	{
 

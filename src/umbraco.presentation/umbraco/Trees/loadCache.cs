@@ -31,7 +31,7 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of the cache application into the developer application tree
 	/// </summary>
-    [ApplicationTree("developer", "cacheBrowser", "Cache Browser")]
+    [Tree("developer", "cacheBrowser", "Cache Browser")]
     public class loadCache : BaseTree
 	{
         public loadCache(string application) : base(application) { }

@@ -31,7 +31,7 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of python items into the developer application tree
 	/// </summary>
-    [ApplicationTree("developer", "python", "Python Files", sortOrder: 4)]
+    [Tree("developer", "python", "Python Files", sortOrder: 4)]
     public class loadPython : loadDLRScripts
 	{
         public loadPython(string application) : base(application) { }

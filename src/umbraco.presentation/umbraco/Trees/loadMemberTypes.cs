@@ -30,7 +30,7 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of the member types into the application tree
 	/// </summary>
-    [ApplicationTree("member", "memberType", "Member Types", sortOrder: 2)]
+    [Tree("member", "memberType", "Member Types", sortOrder: 2)]
     public class loadMemberTypes : BaseTree
 	{
         public loadMemberTypes(string application) : base(application) { }

@@ -26,7 +26,7 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco
 {
-    [ApplicationTree("settings", "mediaTypes", "Media Types", sortOrder: 5)]
+    [Tree("settings", "mediaTypes", "Media Types", sortOrder: 5)]
     public class loadMediaTypes : BaseTree
     {
         public loadMediaTypes(string application) : base(application) { }

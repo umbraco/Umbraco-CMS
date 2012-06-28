@@ -28,7 +28,7 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco
 {
-    [ApplicationTree("media", "media", "Media")]
+    [Tree("media", "media", "Media")]
     public class loadMedia : BaseMediaTree
     {
 

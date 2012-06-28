@@ -10,7 +10,7 @@ namespace umbraco
     /// <summary>
     /// Handles loading the content tree into umbraco's application tree
     /// </summary>
-    [ApplicationTree("content", "content", "Content", silent: true)]
+    [Tree("content", "content", "Content", silent: true)]
     public class loadContent : BaseContentTree
     {
 

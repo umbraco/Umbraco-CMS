@@ -26,7 +26,7 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco
 {
-    [ApplicationTree("developer", "packagerPackages", "Packager Packages", initialize: false, sortOrder: 1)]
+    [Tree("developer", "packagerPackages", "Packager Packages", initialize: false, sortOrder: 1)]
     public class loadPackages : BaseTree
     {
 

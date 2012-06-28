@@ -13,7 +13,7 @@ using umbraco.businesslogic;
 
 namespace umbraco.cms.presentation.Trees
 {
-    [ApplicationTree("users", "userTypes", "User Types", sortOrder: 1)]
+    [Tree("users", "userTypes", "User Types", sortOrder: 1)]
     public class UserTypes : BaseTree
     {
 

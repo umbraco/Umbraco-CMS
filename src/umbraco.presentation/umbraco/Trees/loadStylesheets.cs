@@ -28,7 +28,7 @@ using umbraco.BusinessLogic.Actions;
 
 namespace umbraco
 {
-    [ApplicationTree("settings", "stylesheets", "Stylesheets")]
+    [Tree("settings", "stylesheets", "Stylesheets")]
 	public class loadStylesheets : BaseTree
 	{
         public loadStylesheets(string application) : base(application) { }

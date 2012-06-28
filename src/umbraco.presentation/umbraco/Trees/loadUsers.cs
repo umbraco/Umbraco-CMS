@@ -32,7 +32,7 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of all umbraco users into the users application tree
 	/// </summary>
-    [ApplicationTree("users", "users", "Users")]
+    [Tree("users", "users", "Users")]
     public class loadUsers : BaseTree
 	{
         public loadUsers(string application) : base(application) { }

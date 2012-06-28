@@ -508,10 +508,10 @@ namespace umbraco.BusinessLogic
         {
             // Load all Applications by attribute and add them to the XML config
             var types = TypeFinder.FindClassesOfType<ITree>()
-                .Where(x => x.GetCustomAttributes(typeof(ApplicationTreeAttribute), false).Any());
+                .Where(x => x.GetCustomAttributes(typeof(TreeAttribute), false).Any());
 
-            var items = types.Select(x => new Tuple<Type, ApplicationTreeAttribute>(x,
-                (ApplicationTreeAttribute)x.GetCustomAttributes(typeof(ApplicationTreeAttribute), false).Single()))
+            var items = types.Select(x => new Tuple<Type, TreeAttribute>(x,
+                (TreeAttribute)x.GetCustomAttributes(typeof(TreeAttribute), false).Single()))
                 .Where(x => ApplicationTree.getByAlias(x.Item2.Alias) == null);
 
             var allAliases = ApplicationTree.getAll().Select(x => x.Alias).Concat(items.Select(x => x.Item2.Alias));

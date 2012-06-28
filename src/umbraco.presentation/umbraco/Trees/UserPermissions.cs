@@ -16,7 +16,7 @@ using umbraco.BusinessLogic.Actions;
 
 namespace umbraco.cms.presentation.Trees
 {
-    [ApplicationTree("users", "userPermissions", "User Permissions", sortOrder: 2)]
+    [Tree("users", "userPermissions", "User Permissions", sortOrder: 2)]
     public class UserPermissions : BaseTree
     {
 

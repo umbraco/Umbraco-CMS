@@ -28,7 +28,7 @@ using umbraco.BusinessLogic.Actions;
 
 namespace umbraco
 {
-    [ApplicationTree("settings", "languages", "Languages", sortOrder: 4)]
+    [Tree("settings", "languages", "Languages", sortOrder: 4)]
     public class loadLanguages : BaseTree
 	{
         public loadLanguages(string application) : base(application) { }

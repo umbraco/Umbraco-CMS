@@ -9,10 +9,10 @@ namespace umbraco.businesslogic
     /// Identifies an application tree
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class ApplicationTreeAttribute : Attribute
+    public class TreeAttribute : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ApplicationTreeAttribute"/> class.
+        /// Initializes a new instance of the <see cref="TreeAttribute"/> class.
         /// </summary>
         /// <param name="appAlias">The app alias.</param>
         /// <param name="alias">The alias.</param>
@@ -23,7 +23,7 @@ namespace umbraco.businesslogic
         /// <param name="silent">if set to <c>true</c> [silent].</param>
         /// <param name="initialize">if set to <c>true</c> [initialize].</param>
         /// <param name="sortOrder">The sort order.</param>
-        public ApplicationTreeAttribute(string appAlias,
+        public TreeAttribute(string appAlias,
             string alias,
             string title,
             string iconClosed = ".sprTreeFolder",

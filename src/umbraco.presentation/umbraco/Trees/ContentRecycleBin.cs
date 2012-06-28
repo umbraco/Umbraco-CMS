@@ -29,7 +29,7 @@ namespace umbraco.cms.presentation.Trees
     /// <summary>
     /// Handles loading the content tree into umbraco's application tree
     /// </summary>
-    [ApplicationTree("content", "contentRecycleBin", "Recycle Bin", "folder.gif", "folder_o.gif", initialize: false)]
+    [Tree("content", "contentRecycleBin", "Recycle Bin", "folder.gif", "folder_o.gif", initialize: false)]
     public class ContentRecycleBin : BaseContentTree
     {
 

@@ -29,7 +29,7 @@ using umbraco.IO;
 
 namespace umbraco
 {
-    [ApplicationTree("settings", "scripts", "Scripts", "folder.gif", "folder_o.gif", sortOrder: 2)]
+    [Tree("settings", "scripts", "Scripts", "folder.gif", "folder_o.gif", sortOrder: 2)]
     public class loadScripts : FileSystemTree
 	{
         public loadScripts(string application) : base(application) { }
