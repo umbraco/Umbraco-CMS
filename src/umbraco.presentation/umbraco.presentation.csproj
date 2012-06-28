@@ -2590,18 +2590,18 @@
     <Content Include="config\Skinning.config" />
     <Content Include="config\feedProxy.config" />
     <Content Include="umbraco_client\ui\ui-lightness\jquery-ui.custom.css" />
-    <Content Include="web.Template.ShandemVaio.Debug.config">
+    <None Include="web.Template.ShandemVaio.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
-    </Content>
-    <Content Include="web.Template.Debug.config">
+    </None>
+    <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
-    </Content>
-    <Content Include="web.Template.Release.config">
+    </None>
+    <None Include="web.Template.Release.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
-    </Content>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
@@ -3101,9 +3101,9 @@
     <Content Include="umbraco\webservices\MediaUploader.ashx" />
     <None Include="umbraco_client\CodeMirror\LICENSE" />
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
-    <Content Include="web.Template.config">
+    <None Include="web.Template.config">
       <SubType>Designer</SubType>
-    </Content>
+    </None>
     <None Include="Web References\org.umbraco.update\checkforupgrade.wsdl" />
     <None Include="Web References\org.umbraco.update\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
@@ -3171,60 +3171,60 @@
     <Content Include="web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="web.Template.User-VAIO.Debug.config">
+    <None Include="web.Template.User-VAIO.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.UMBRACOTOSH.Debug.config">
+    </None>
+    <None Include="web.Template.UMBRACOTOSH.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.UMBRACOHUMMER.Debug.config">
+    </None>
+    <None Include="web.Template.UMBRACOHUMMER.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.UMBRACOELISE.Debug.config">
+    </None>
+    <None Include="web.Template.UMBRACOELISE.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.ssaolap01.Debug.config">
+    </None>
+    <None Include="web.Template.ssaolap01.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.ssaodsk01.Debug.config">
+    </None>
+    <None Include="web.Template.ssaodsk01.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.SONIC.Debug.config">
+    </None>
+    <None Include="web.Template.SONIC.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.PETER-PC.Debug.config">
+    </None>
+    <None Include="web.Template.PETER-PC.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.PETER-MAC.Debug.config">
+    </None>
+    <None Include="web.Template.PETER-MAC.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.slacebox.Debug.config">
+    </None>
+    <None Include="web.Template.slacebox.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.NIBBLE-LAPTOP.Debug.config">
+    </None>
+    <None Include="web.Template.NIBBLE-LAPTOP.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.INDIGO64SSD.Debug.config">
+    </None>
+    <None Include="web.Template.INDIGO64SSD.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.INDIGO64.Debug.config">
+    </None>
+    <None Include="web.Template.INDIGO64.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.EQUIUM-SAT1.Debug.config">
+    </None>
+    <None Include="web.Template.EQUIUM-SAT1.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.Blueberry.Debug.config">
+    </None>
+    <None Include="web.Template.Blueberry.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.APOWELL-BC-WIN7.Debug.config">
+    </None>
+    <None Include="web.Template.APOWELL-BC-WIN7.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.13INCHER.Debug.config">
+    </None>
+    <None Include="web.Template.13INCHER.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
-    <Content Include="web.Template.MBP-PC.Debug.config">
+    </None>
+    <None Include="web.Template.MBP-PC.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
-    </Content>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
