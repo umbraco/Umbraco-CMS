@@ -7,6 +7,7 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
+using umbraco.businesslogic;
 using umbraco.interfaces;
 using System.Xml;
 using System.Collections.Generic;
@@ -15,8 +16,7 @@ using umbraco.BusinessLogic.Actions;
 
 namespace umbraco.cms.presentation.Trees
 {
-
-
+    [ApplicationTree("users", "userPermissions", "User Permissions", sortOrder: 2)]
     public class UserPermissions : BaseTree
     {
 

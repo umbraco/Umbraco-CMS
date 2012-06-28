@@ -4,8 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Xml.Linq;
+using umbraco.BusinessLogic.Utils;
 using umbraco.DataLayer;
 using umbraco.IO;
+using umbraco.businesslogic;
+using umbraco.interfaces;
 
 namespace umbraco.BusinessLogic
 {
@@ -463,5 +466,35 @@ namespace umbraco.BusinessLogic
             
         }
 
+        internal static void RegisterApplicationTrees()
+        {
+            if (!GlobalSettings.Configured) 
+                return;
+
+            var types = TypeFinder.FindClassesOfType<ITree>();
+
+            foreach (var t in types.Where(x => x.GetCustomAttributes(typeof(ApplicationTreeAttribute), false).Any()))
+            {
+                var appTreeAttr = (ApplicationTreeAttribute)t.GetCustomAttributes(typeof(ApplicationTreeAttribute), false).Single();
+
+                //try
+                //{
+                //    var typeInstance = Activator.CreateInstance(t) as ITree;
+                //    if (typeInstance != null)
+                //    {
+
+
+                //        //_applications.Add(typeInstance);
+
+                //        //if (HttpContext.Current != null)
+                //        //    HttpContext.Current.Trace.Write("registerIapplications", " + Adding application '" + typeInstance.Alias);
+                //    }
+                //}
+                //catch (Exception ee)
+                //{
+                //    Log.Add(LogTypes.Error, -1, "Error loading IApplication: " + ee.ToString());
+                //}
+            }
+        }
     }
 }

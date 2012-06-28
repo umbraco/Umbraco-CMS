@@ -10,6 +10,7 @@ using System.Linq;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.contentitem;
@@ -28,6 +29,7 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco.cms.presentation.Trees
 {
+    [ApplicationTree("media", "mediaRecycleBin", "Recycle Bin", "folder.gif", "folder_o.gif")]
 	public class MediaRecycleBin : BaseMediaTree
 	{
 		public MediaRecycleBin(string application)

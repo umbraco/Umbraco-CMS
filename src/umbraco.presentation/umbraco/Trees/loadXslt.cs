@@ -9,6 +9,7 @@ using System.Xml;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.contentitem;
@@ -30,6 +31,7 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of the xslt files into the application tree
 	/// </summary>
+    [ApplicationTree("developer", "xslt", "XSLT Files", sortOrder: 5)]
     public class loadXslt : FileSystemTree
 	{
 

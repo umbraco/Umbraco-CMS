@@ -9,6 +9,7 @@ using System.Xml;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.contentitem;
@@ -28,6 +29,7 @@ namespace umbraco.cms.presentation.Trees
     /// <summary>
     /// Handles loading the content tree into umbraco's application tree
     /// </summary>
+    [ApplicationTree("content", "contentRecycleBin", "Recycle Bin", "folder.gif", "folder_o.gif", initialize: false)]
     public class ContentRecycleBin : BaseContentTree
     {
 

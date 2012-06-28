@@ -9,6 +9,7 @@ using System.Xml;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.contentitem;
@@ -25,7 +26,9 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco
 {
-    public class loadPackages : BaseTree {
+    [ApplicationTree("developer", "packagerPackages", "Packager Packages", initialize: false, sortOrder: 1)]
+    public class loadPackages : BaseTree
+    {
 
         public const string PACKAGE_TREE_PREFIX = "package_";
 

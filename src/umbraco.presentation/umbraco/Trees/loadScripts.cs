@@ -9,6 +9,7 @@ using System.Xml;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.contentitem;
@@ -28,7 +29,8 @@ using umbraco.IO;
 
 namespace umbraco
 {
-	public class loadScripts : FileSystemTree
+    [ApplicationTree("settings", "scripts", "Scripts", "folder.gif", "folder_o.gif", sortOrder: 2)]
+    public class loadScripts : FileSystemTree
 	{
         public loadScripts(string application) : base(application) { }
 

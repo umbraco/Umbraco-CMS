@@ -9,6 +9,7 @@ using System.Xml;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.contentitem;
@@ -27,7 +28,8 @@ using umbraco.BusinessLogic.Actions;
 
 namespace umbraco
 {
-	public class loadDictionary : BaseTree
+    [ApplicationTree("settings", "dictionary", "Dictionary", action: "openDictionary()", sortOrder: 3)]
+    public class loadDictionary : BaseTree
 	{
         public loadDictionary(string application) : base(application) { }
 

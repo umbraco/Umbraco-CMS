@@ -12,6 +12,7 @@ using umbraco.IO;
 using umbraco.interfaces;
 using umbraco.BusinessLogic.Utils;
 using System.Runtime.CompilerServices;
+using umbraco.businesslogic;
 
 namespace umbraco.BusinessLogic
 {
@@ -20,11 +21,6 @@ namespace umbraco.BusinessLogic
     /// </summary>
     public class Application
     {
-        /// <summary>
-        /// Applications found through reflection
-        /// </summary>
-        private static readonly List<IApplication> _applications = new List<IApplication>();
-        
         private static ISqlHelper _sqlHelper;               
 
         private const string CACHE_KEY = "ApplicationCache";
@@ -286,29 +282,10 @@ namespace umbraco.BusinessLogic
         /// <summary>
         /// Stores all references to classes that are of type IApplication
         /// </summary>
+        [Obsolete("RegisterIApplications has been depricated. Please use ApplicationStartupHandler.RegisterHandlers() instead.")]
         public static void RegisterIApplications()
         {
-            if (GlobalSettings.Configured) {
-                
-                List<Type> types = TypeFinder.FindClassesOfType<IApplication>();
-                
-                foreach (Type t in types) {
-                    try
-                    {
-                        IApplication typeInstance = Activator.CreateInstance(t) as IApplication;
-                        if (typeInstance != null)
-                        {
-                            _applications.Add(typeInstance);
-
-                            if (HttpContext.Current != null)
-                                HttpContext.Current.Trace.Write("registerIapplications", " + Adding application '" + typeInstance.Alias);
-                        }
-                    }
-                    catch (Exception ee) {
-                        Log.Add(LogTypes.Error, -1, "Error loading IApplication: " + ee.ToString());
-                    }
-                }
-            }
+            ApplicationStartupHandler.RegisterHandlers();
         }
 
         /// <summary>

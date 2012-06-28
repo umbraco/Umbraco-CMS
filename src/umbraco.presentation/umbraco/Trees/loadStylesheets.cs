@@ -9,6 +9,7 @@ using System.Xml;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.contentitem;
@@ -27,6 +28,7 @@ using umbraco.BusinessLogic.Actions;
 
 namespace umbraco
 {
+    [ApplicationTree("settings", "stylesheets", "Stylesheets")]
 	public class loadStylesheets : BaseTree
 	{
         public loadStylesheets(string application) : base(application) { }
