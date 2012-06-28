@@ -18,7 +18,7 @@ namespace umbraco.businesslogic
     {
         private static readonly IList<IApplicationStartupHandler> _handlers = new List<IApplicationStartupHandler>(); 
 
-        public static void RegisterHandlers()
+        static ApplicationStartupHandler()
         {
             if (!GlobalSettings.Configured)
                 return;
@@ -45,6 +45,12 @@ namespace umbraco.businesslogic
                     Log.Add(LogTypes.Error, -1, "Error loading application startup handler: " + ee.ToString());
                 }
             }
+        }
+
+        public static void RegisterHandlers()
+        {
+            // We don't actually do anything in this method, it's just a handle to force the static constructor to fire.
+            // this ensures that the registration code only occurs once.
         }
     }
 
