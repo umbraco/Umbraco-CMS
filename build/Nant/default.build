@@ -197,8 +197,10 @@
         <copy file="${root.dir}\config templates\config\tinymceconfig.config" tofile="${build.dir}\config\tinymceconfig.config" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\config templates\config\umbracosettings.config" tofile="${build.dir}\config\umbracosettings.config" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\config templates\config\urlrewriting.config" tofile="${build.dir}\config\urlrewriting.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\config\applications.config" tofile="${build.dir}\config\applications.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\config\trees.config" tofile="${build.dir}\config\trees.config" failonerror="false" overwrite="true"/>
 
-        <!-- new 4.5 files -->
+      <!-- new 4.5 files -->
         <copy file="${root.dir}\config templates\config\ClientDependency.config" tofile="${build.dir}\config\ClientDependency.config" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\config templates\config\ExamineSettings.config" tofile="${build.dir}\config\ExamineSettings.config" failonerror="false" overwrite="true"/>
         <copy file="${root.dir}\config templates\config\ExamineIndex.config" tofile="${build.dir}\config\ExamineIndex.config" failonerror="false" overwrite="true"/>

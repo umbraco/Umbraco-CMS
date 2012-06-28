@@ -142,7 +142,7 @@
     <Compile Include="ApplicationDefinitions.cs" />
     <Compile Include="ApplicationStartupHandler.cs" />
     <Compile Include="ApplicationTree.cs" />
-    <Compile Include="ApplicationTreeAttribute.cs" />
+    <Compile Include="TreeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
