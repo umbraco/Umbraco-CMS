@@ -8,7 +8,7 @@ using umbraco.cms.businesslogic.relation;
 using umbraco.cms.presentation.Trees;
 using umbraco.DataLayer;
 using umbraco.interfaces;
-using Umbraco.RelationTypes.TreeMenu;
+using umbraco.cms.presentation.developer.RelationTypes.TreeMenu;
 using umbraco.businesslogic;
 
 namespace umbraco
@@ -36,7 +36,7 @@ namespace umbraco
 		{
 			javascript.Append(@"
 				function openRelationType(id) {
-					UmbClientMgr.contentFrame('Trees/RelationTypes/EditRelationType.aspx?id=' + id);
+					UmbClientMgr.contentFrame('developer/RelationTypes/EditRelationType.aspx?id=' + id);
 				}");
 		}
 
@@ -54,7 +54,7 @@ namespace umbraco
 				node.NodeID = relationType.Id.ToString();
 				node.Text = relationType.Name;
 				node.Icon = "settingAgent.gif";
-				node.Action = "javascript:openRelationType('" + node.NodeID + "');";
+				node.Action = string.Concat("javascript:openRelationType('", node.NodeID, "');");
 
 				tree.Add(node);
 			}

@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="NewRelationType.aspx.cs" Inherits="umbraco.cms.presentation.Trees.RelationTypes.NewRelationType" MasterPageFile="/umbraco/masterpages/umbracoPage.Master"%>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="NewRelationType.aspx.cs" Inherits="umbraco.cms.presentation.developer.RelationTypes.NewRelationType" MasterPageFile="/umbraco/masterpages/umbracoPage.Master"%>
 <%@ Register TagPrefix="umb" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 
