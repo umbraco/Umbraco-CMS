@@ -2590,6 +2590,8 @@
     <Content Include="config\Skinning.config" />
     <Content Include="config\feedProxy.config" />
     <Content Include="umbraco_client\ui\ui-lightness\jquery-ui.custom.css" />
+    <Content Include="config\applications.config" />
+    <Content Include="config\trees.config" />
     <None Include="web.Template.ShandemVaio.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>

@@ -45,7 +45,7 @@ namespace umbraco.cms.presentation
 
                 PlaceHolderAppIcons.Text = ui.Text("main", "sections", base.getUser());
                 plcIcons.Text = "";
-                foreach (BusinessLogic.Application a in apps)
+                foreach (BusinessLogic.Application a in apps.OrderBy(x => x.sortOrder))
                 {
 
                     string appClass = a.icon.StartsWith(".") ? a.icon.Substring(1, a.icon.Length - 1) : a.alias;

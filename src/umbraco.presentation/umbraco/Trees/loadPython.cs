@@ -9,6 +9,7 @@ using System.Xml;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.contentitem;
@@ -30,7 +31,8 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of python items into the developer application tree
 	/// </summary>
-	public class loadPython : loadDLRScripts
+    [Tree("developer", "python", "Python Files", sortOrder: 4)]
+    public class loadPython : loadDLRScripts
 	{
         public loadPython(string application) : base(application) { }
     }

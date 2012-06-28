@@ -6,13 +6,14 @@ using umbraco.BusinessLogic;
 using Examine;
 using UmbracoExamine;
 using Lucene.Net.Documents;
+using umbraco.businesslogic;
 
 namespace umbraco.presentation.umbraco.Search
 {
     /// <summary>
     /// Used to wire up events for Examine
     /// </summary>
-    public class ExamineEvents : ApplicationBase
+    public class ExamineEvents : ApplicationStartupHandler
     {
 
         public ExamineEvents()

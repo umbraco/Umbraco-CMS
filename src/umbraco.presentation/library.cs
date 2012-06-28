@@ -12,6 +12,7 @@ using System.Xml.XPath;
 
 
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.member;
@@ -2320,7 +2321,7 @@ namespace umbraco
     /// <summary>
     /// Special class made to listen to save events on objects where umbraco.library caches some of their objects
     /// </summary>
-    public class LibraryCacheRefresher : ApplicationBase
+    public class LibraryCacheRefresher : ApplicationStartupHandler
     {
         public LibraryCacheRefresher()
         {

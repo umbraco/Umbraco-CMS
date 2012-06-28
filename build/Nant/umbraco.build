@@ -156,7 +156,9 @@
     <copy file="${root.dir}\config templates\config\tinymceconfig.config" tofile="${build.dir}\config\tinymceconfig.config" failonerror="false" overwrite="true"/>
     <copy file="${root.dir}\config templates\config\umbracosettings.config" tofile="${build.dir}\config\umbracosettings.config" failonerror="false" overwrite="true"/>
     <copy file="${root.dir}\config templates\config\urlrewriting.config" tofile="${build.dir}\config\urlrewriting.config" failonerror="false" overwrite="true"/>
-
+    <copy file="${root.dir}\config templates\config\applications.config" tofile="${build.dir}\config\applications.config" failonerror="false" overwrite="true"/>
+    <copy file="${root.dir}\config templates\config\trees.config" tofile="${build.dir}\config\trees.config" failonerror="false" overwrite="true"/>
+    
     <!--standard /data/packages files-->
     <copy file="${root.dir}\config templates\packages\installedPackages.config" tofile="${build.dir}\data\packages\installed\installedPackages.config" failonerror="false" overwrite="true"/>
     <copy file="${root.dir}\config templates\packages\createdPackages.config" tofile="${build.dir}\data\packages\created\createdPackages.config" failonerror="false" overwrite="true"/>

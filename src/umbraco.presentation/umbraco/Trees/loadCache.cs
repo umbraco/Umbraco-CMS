@@ -9,6 +9,7 @@ using System.Xml;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.contentitem;
@@ -30,7 +31,8 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of the cache application into the developer application tree
 	/// </summary>
-	public class loadCache : BaseTree
+    [Tree("developer", "cacheBrowser", "Cache Browser")]
+    public class loadCache : BaseTree
 	{
         public loadCache(string application) : base(application) { }
 

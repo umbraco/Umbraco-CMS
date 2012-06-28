@@ -137,8 +137,12 @@
     <Compile Include="Application.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ApplicationAttribute.cs" />
     <Compile Include="ApplicationBase.cs" />
+    <Compile Include="ApplicationDefinitions.cs" />
+    <Compile Include="ApplicationStartupHandler.cs" />
     <Compile Include="ApplicationTree.cs" />
+    <Compile Include="TreeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

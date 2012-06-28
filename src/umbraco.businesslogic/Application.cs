@@ -3,11 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
+using System.Linq;
 using System.Web;
+using System.Xml.Linq;
 using umbraco.DataLayer;
+using umbraco.IO;
 using umbraco.interfaces;
 using umbraco.BusinessLogic.Utils;
 using System.Runtime.CompilerServices;
+using umbraco.businesslogic;
 
 namespace umbraco.BusinessLogic
 {
@@ -16,14 +21,14 @@ namespace umbraco.BusinessLogic
     /// </summary>
     public class Application
     {
-        /// <summary>
-        /// Applications found through reflection
-        /// </summary>
-        private static readonly List<IApplication> _applications = new List<IApplication>();
-        
         private static ISqlHelper _sqlHelper;               
 
         private const string CACHE_KEY = "ApplicationCache";
+
+        private static readonly string _appConfig =
+            IOHelper.MapPath(SystemDirectories.Config + "/applications.config");
+
+        private static readonly object m_Locker = new object();
 
         /// <summary>
         /// The cache storage for all applications
@@ -46,6 +51,7 @@ namespace umbraco.BusinessLogic
         private string _name;
         private string _alias;
         private string _icon;
+        private int _sortOrder;
 
 
         /// <summary>
@@ -73,7 +79,7 @@ namespace umbraco.BusinessLogic
         /// </summary>
         static Application()
         {
-            RegisterIApplications();
+            //RegisterIApplications();
             Cache();
         }
 
@@ -90,10 +96,22 @@ namespace umbraco.BusinessLogic
         /// <param name="alias">The application alias.</param>
         /// <param name="icon">The application icon.</param>
         public Application(string name, string alias, string icon)
+            : this(name, alias, icon, 0)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="alias">The alias.</param>
+        /// <param name="icon">The icon.</param>
+        /// <param name="sortOrder">The sort order.</param>
+        public Application(string name, string alias, string icon, int sortOrder)
         {
             this.name = name;
             this.alias = alias;
             this.icon = icon;
+            this.sortOrder = sortOrder;
         }
 
         /// <summary>
@@ -124,7 +142,19 @@ namespace umbraco.BusinessLogic
         {
             get { return _icon; }
             set { _icon = value; }
-        }        
+        }
+
+        /// <summary>
+        /// Gets or sets the sort order.
+        /// </summary>
+        /// <value>
+        /// The sort order.
+        /// </value>
+        public int sortOrder
+        {
+            get { return _sortOrder; }
+            set { _sortOrder = value; }
+        } 
 
         /// <summary>
         /// Creates a new applcation if no application with the specified alias is found.
@@ -135,6 +165,19 @@ namespace umbraco.BusinessLogic
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static void MakeNew(string name, string alias, string icon)
         {
+            MakeNew(name, alias, icon, Apps.Max(x => x.sortOrder) + 1);
+        }
+
+        /// <summary>
+        /// Makes the new.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="alias">The alias.</param>
+        /// <param name="icon">The icon.</param>
+        /// <param name="sortOrder">The sort order.</param>
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public static void MakeNew(string name, string alias, string icon, int sortOrder)
+        {
             bool exist = false;
             foreach (Application app in getAll())
             {
@@ -144,22 +187,25 @@ namespace umbraco.BusinessLogic
 
             if (!exist)
             {
-                int sortOrder = (1 + SqlHelper.ExecuteScalar<int>("SELECT MAX(sortOrder) FROM umbracoApp"));
+//                SqlHelper.ExecuteNonQuery(@"
+//				insert into umbracoApp 
+//				(appAlias,appIcon,appName, sortOrder) 
+//				values (@alias,@icon,@name,@sortOrder)",
+//                SqlHelper.CreateParameter("@alias", alias),
+//                SqlHelper.CreateParameter("@icon", icon),
+//                SqlHelper.CreateParameter("@name", name),
+//                SqlHelper.CreateParameter("@sortOrder", sortOrder));
 
-                SqlHelper.ExecuteNonQuery(@"
-				insert into umbracoApp 
-				(appAlias,appIcon,appName, sortOrder) 
-				values (@alias,@icon,@name,@sortOrder)",
-                SqlHelper.CreateParameter("@alias", alias),
-                SqlHelper.CreateParameter("@icon", icon),
-                SqlHelper.CreateParameter("@name", name),
-                SqlHelper.CreateParameter("@sortOrder", sortOrder));
-
-                ReCache();
+                LoadXml(doc =>
+                {
+                    doc.Root.Add(new XElement("add",
+                        new XAttribute("alias", alias),
+                        new XAttribute("name", name),
+                        new XAttribute("icon", icon),
+                        new XAttribute("sortOrder", sortOrder)));
+                }, true);
             }
-
         }
-
 
         //public static void MakeNew(IApplication Iapp, bool installAppTrees) {
 
@@ -177,12 +223,7 @@ namespace umbraco.BusinessLogic
         /// <param name="appAlias">The application alias.</param>
         /// <returns></returns>
         public static Application getByAlias(string appAlias) {
-            return Apps.Find(
-                delegate(Application t) {
-                    return (t.alias == appAlias);
-                }
-            );
-
+            return Apps.Find(t => t.alias == appAlias);
         }
 
         /// <summary>
@@ -200,10 +241,13 @@ namespace umbraco.BusinessLogic
                 t.Delete();
             }
 
-            SqlHelper.ExecuteNonQuery("delete from umbracoApp where appAlias = @appAlias",
-                SqlHelper.CreateParameter("@appAlias", this._alias));
+            //SqlHelper.ExecuteNonQuery("delete from umbracoApp where appAlias = @appAlias",
+            //    SqlHelper.CreateParameter("@appAlias", this._alias));
 
-            ReCache();
+            LoadXml(doc =>
+            {
+                doc.Root.Elements("add").Where(x => x.Attribute("alias") != null && x.Attribute("alias").Value == this.alias).Remove();
+            }, true);
         }
 
         /// <summary>
@@ -218,29 +262,10 @@ namespace umbraco.BusinessLogic
         /// <summary>
         /// Stores all references to classes that are of type IApplication
         /// </summary>
+        [Obsolete("RegisterIApplications has been depricated. Please use ApplicationStartupHandler.RegisterHandlers() instead.")]
         public static void RegisterIApplications()
         {
-            if (GlobalSettings.Configured) {
-                
-                List<Type> types = TypeFinder.FindClassesOfType<IApplication>();
-                
-                foreach (Type t in types) {
-                    try
-                    {
-                        IApplication typeInstance = Activator.CreateInstance(t) as IApplication;
-                        if (typeInstance != null)
-                        {
-                            _applications.Add(typeInstance);
-
-                            if (HttpContext.Current != null)
-                                HttpContext.Current.Trace.Write("registerIapplications", " + Adding application '" + typeInstance.Alias);
-                        }
-                    }
-                    catch (Exception ee) {
-                        Log.Add(LogTypes.Error, -1, "Error loading IApplication: " + ee.ToString());
-                    }
-                }
-            }
+            ApplicationStartupHandler.RegisterHandlers();
         }
 
         /// <summary>
@@ -265,14 +290,31 @@ namespace umbraco.BusinessLogic
             {
                 List<Application> tmp = new List<Application>();
 
-                using (IRecordsReader dr =
-                    SqlHelper.ExecuteReader("Select appAlias, appIcon, appName from umbracoApp"))
-                {
-                    while (dr.Read())
+                //using (IRecordsReader dr =
+                //    SqlHelper.ExecuteReader("Select appAlias, appIcon, appName from umbracoApp"))
+                //{
+                //    while (dr.Read())
+                //    {
+                //        tmp.Add(new Application(dr.GetString("appName"), dr.GetString("appAlias"), dr.GetString("appIcon")));
+                //    }
+                //}
+
+                LoadXml(doc => {
+
+                    foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
+                        {
+                            var sortOrderAttr = x.Attribute("sortOrder");
+                            return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
+                        }))
                     {
-                        tmp.Add(new Application(dr.GetString("appName"), dr.GetString("appAlias"), dr.GetString("appIcon")));
+                        var sortOrderAttr = addElement.Attribute("sortOrder");
+                        tmp.Add(new Application(addElement.Attribute("name").Value,
+                            addElement.Attribute("alias").Value,
+                            addElement.Attribute("icon").Value,
+                            sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0));
                     }
-                }
+
+                }, false);
 
                 Apps = tmp;
             }
@@ -285,6 +327,28 @@ namespace umbraco.BusinessLogic
             }
 
         }
+
+        internal static void LoadXml(Action<XDocument> callback, bool saveAfterCallback)
+        {
+            lock (m_Locker)
+            {
+                var doc = File.Exists(_appConfig)
+                    ? XDocument.Load(_appConfig)
+                    : XDocument.Parse("<?xml version=\"1.0\"?><applications />");
+
+                if (doc.Root != null)
+                {
+                    callback.Invoke(doc);
+
+                    if (saveAfterCallback)
+                    {
+                        doc.Save(_appConfig);
+
+                        ReCache();
+                    }
+                }
+            }
+        }
     }
 
     public enum DefaultApps
@@ -296,5 +360,63 @@ namespace umbraco.BusinessLogic
         developer,
         member,
         translation
+    }
+
+    public class ApplicationRegistrar : ApplicationStartupHandler
+    {
+        private ISqlHelper _sqlHelper;
+        protected ISqlHelper SqlHelper
+        {
+            get
+            {
+                if (_sqlHelper == null)
+                {
+                    try
+                    {
+                        _sqlHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN);
+                    }
+                    catch { }
+                }
+                return _sqlHelper;
+            }
+        }
+
+        public ApplicationRegistrar()
+        {
+            // Load all Applications by attribute and add them to the XML config
+            var types = TypeFinder.FindClassesOfType<IApplication>()
+                .Where(x => x.GetCustomAttributes(typeof(ApplicationAttribute), false).Any());
+
+            var attrs = types.Select(x => (ApplicationAttribute)x.GetCustomAttributes(typeof(ApplicationAttribute), false).Single())
+                .Where(x => Application.getByAlias(x.Alias) == null);
+
+            var allAliases = Application.getAll().Select(x => x.alias).Concat(attrs.Select(x => x.Alias));
+            var inString = "'" + string.Join("','", allAliases) + "'";
+
+            Application.LoadXml(doc =>
+            {
+                foreach (var attr in attrs)
+                {
+                    doc.Root.Add(new XElement("add",
+                        new XAttribute("alias", attr.Alias),
+                        new XAttribute("name", attr.Name),
+                        new XAttribute("icon", attr.Icon),
+                        new XAttribute("sortOrder", attr.SortOrder)));
+                }
+
+                var dbApps = SqlHelper.ExecuteReader("SELECT * FROM umbracoApp WHERE appAlias NOT IN ("+ inString +")");
+                while (dbApps.Read())
+                {
+                    doc.Root.Add(new XElement("add",
+                        new XAttribute("alias", dbApps.GetString("appAlias")),
+                        new XAttribute("name", dbApps.GetString("appName")),
+                        new XAttribute("icon", dbApps.GetString("appIcon")),
+                        new XAttribute("sortOrder", dbApps.GetByte("sortOrder"))));
+                }
+
+            }, true);
+
+            //SqlHelper.ExecuteNonQuery("DELETE FROM umbracoApp");
+        }
     }
 }

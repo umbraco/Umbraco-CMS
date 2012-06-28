@@ -256,17 +256,16 @@ namespace umbraco.BusinessLogic
             if (!_isInitialized)
                 setupUser(_id);
 
+            var allApps = Application.getAll();
             var apps = new List<Application>();
 
-            using (IRecordsReader appIcons = SqlHelper.ExecuteReader("select appAlias, appIcon, appname from umbracoApp app join umbracoUser2app u2a on u2a.app = app.appAlias and u2a.[user] = @userID order by app.sortOrder", SqlHelper.CreateParameter("@userID", this.Id)))
+            using (IRecordsReader appIcons = SqlHelper.ExecuteReader("select app from umbracoUser2app where [user] = @userID", SqlHelper.CreateParameter("@userID", this.Id)))
             {
                 while (appIcons.Read())
                 {
-                    Application tmp = new Application();
-                    tmp.name = appIcons.GetString("appName");
-                    tmp.icon = appIcons.GetString("appIcon");
-                    tmp.alias = appIcons.GetString("appAlias");
-                    apps.Add(tmp);
+                    var app = allApps.SingleOrDefault(x => x.alias == appIcons.GetString("app"));
+                    if(app != null)
+                        apps.Add(app);
                 }
             }
 

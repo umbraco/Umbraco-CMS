@@ -9,6 +9,7 @@ using System.Xml;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.contentitem;
@@ -30,7 +31,8 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of all datatypes into the developer application tree
 	/// </summary>
-	public class loadDataTypes : BaseTree
+    [Tree("developer", "datatype", "Data Types", sortOrder: 1)]
+    public class loadDataTypes : BaseTree
 	{
         public loadDataTypes(string application) : base(application) { }
 

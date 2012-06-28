@@ -163,7 +163,7 @@ namespace umbraco.cms.presentation.Trees
                         return (string.Format("{0}.{1}", tree.AssemblyName, tree.Type) == type.FullName);
                     }
                 );
-
+                 
 				if (appTreesForType != null)
                 {
 					foreach (ApplicationTree appTree in appTreesForType)

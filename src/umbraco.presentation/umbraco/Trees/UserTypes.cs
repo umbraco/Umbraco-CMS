@@ -9,9 +9,11 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
+using umbraco.businesslogic;
 
 namespace umbraco.cms.presentation.Trees
 {
+    [Tree("users", "userTypes", "User Types", sortOrder: 1)]
     public class UserTypes : BaseTree
     {
 

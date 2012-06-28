@@ -6,9 +6,12 @@ using System.Web;
 
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
+using umbraco.BusinessLogic.Utils;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using System.Web.Caching;
 using umbraco.IO;
+using umbraco.interfaces;
 
 
 namespace umbraco.presentation
@@ -23,6 +26,8 @@ namespace umbraco.presentation
 
 		private HttpApplication mApp;
 		private IContainer components = null;
+
+	    private readonly IList<IApplicationStartupHandler> startupHandlers = new List<IApplicationStartupHandler>(); 
 
 		/// <summary>True if the module is currently handling an error.</summary>
 		private static object handlingError = false;
@@ -351,7 +356,7 @@ namespace umbraco.presentation
 
 				try
 				{
-					Log.Add(LogTypes.System, User.GetUser(0), -1, "Application started at " + DateTime.Now);
+					Log.Add(LogTypes.System, -1, "Application started at " + DateTime.Now);
 					if (UmbracoSettings.AutoCleanLogs)
 					{
 						AddTask(LOG_SCRUBBER_TASK_NAME, GetLogScrubbingInterval());
@@ -361,7 +366,10 @@ namespace umbraco.presentation
 				{
 				}
 
-				// Check for configured key, checking for currentversion to ensure that a request with
+                // Trigger startup handlers
+			    ApplicationStartupHandler.RegisterHandlers();
+
+			    // Check for configured key, checking for currentversion to ensure that a request with
 				// no httpcontext don't set the whole app in configure mode
 				if (GlobalSettings.CurrentVersion != null && !GlobalSettings.Configured)
 				{

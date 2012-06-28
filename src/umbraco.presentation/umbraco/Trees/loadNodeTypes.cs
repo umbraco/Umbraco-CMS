@@ -9,6 +9,7 @@ using System.Xml;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.contentitem;
@@ -27,6 +28,7 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco
 {
+    [Tree("settings", "nodeTypes", "Document Types", sortOrder: 6)]
     public class loadNodeTypes : BaseTree
     {
 

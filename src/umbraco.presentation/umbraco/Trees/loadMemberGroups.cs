@@ -9,6 +9,7 @@ using System.Xml;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.contentitem;
@@ -29,7 +30,8 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of the member groups into the application tree
 	/// </summary>
-	public class loadMemberGroups : BaseTree
+    [Tree("member", "memberGroup", "Member Groups", sortOrder: 1)]
+    public class loadMemberGroups : BaseTree
 	{
         public loadMemberGroups(string application) : base(application) { }
 

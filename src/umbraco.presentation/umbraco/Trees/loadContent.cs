@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using umbraco.BusinessLogic.Actions;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation.Trees;
 using umbraco.interfaces;
@@ -9,6 +10,7 @@ namespace umbraco
     /// <summary>
     /// Handles loading the content tree into umbraco's application tree
     /// </summary>
+    [Tree("content", "content", "Content", silent: true)]
     public class loadContent : BaseContentTree
     {
 

@@ -9,6 +9,7 @@ using System.Xml;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.contentitem;
@@ -27,7 +28,8 @@ using umbraco.BusinessLogic.Actions;
 
 namespace umbraco
 {
-	public class loadLanguages : BaseTree
+    [Tree("settings", "languages", "Languages", sortOrder: 4)]
+    public class loadLanguages : BaseTree
 	{
         public loadLanguages(string application) : base(application) { }
 

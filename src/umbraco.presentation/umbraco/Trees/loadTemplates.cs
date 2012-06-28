@@ -9,6 +9,7 @@ using System.Xml;
 using System.Configuration;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.contentitem;
@@ -28,6 +29,7 @@ using umbraco.cms.businesslogic.skinning;
 
 namespace umbraco
 {
+    [Tree("settings", "templates", "Templates", sortOrder: 1)]
     public class loadTemplates : BaseTree
     {
         public loadTemplates(string application) : base(application) { }
