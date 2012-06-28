@@ -1414,6 +1414,7 @@
     <Compile Include="umbraco\Trees\ITreeService.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="umbraco\Trees\loadRelationTypes.cs" />
     <Compile Include="umbraco\Trees\MediaRecycleBin.cs" />
     <Compile Include="umbraco\Trees\NodeActionsEventArgs.cs" />
     <Compile Include="umbraco\Trees\RelationTypes\EditRelationType.aspx.cs">
@@ -1431,12 +1432,10 @@
       <DependentUpon>NewRelationType.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco\Trees\RelationTypes\ReadOnlyRelation.cs" />
-    <Compile Include="umbraco\Trees\RelationTypes\RegisterRelationTypeTree.cs" />
     <Compile Include="umbraco\Trees\RelationTypes\RelationTypesWebService.asmx.cs">
       <DependentUpon>RelationTypesWebService.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="umbraco\Trees\RelationTypes\RelationTypeTree.cs" />
     <Compile Include="umbraco\Trees\RelationTypes\TreeMenu\ActionDeleteRelationType.cs" />
     <Compile Include="umbraco\Trees\RelationTypes\TreeMenu\ActionNewRelationType.cs" />
     <Compile Include="umbraco\Trees\TreeEventArgs.cs" />
