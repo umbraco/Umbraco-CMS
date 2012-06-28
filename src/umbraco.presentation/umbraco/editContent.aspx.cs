@@ -322,11 +322,11 @@ namespace umbraco.cms.presentation
                     }
                     else
                     {
-                        ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("error"), ui.Text("contentPublishedFailedByEvent"));
+                        ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.Text("publish"), ui.Text("contentPublishedFailedByEvent"));
                     }
                 }
                 else
-                    ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("error"), ui.Text("speechBubbles", "editContentPublishedFailedByParent"));
+                    ClientTools.ShowSpeechBubble(speechBubbleIcon.warning, ui.Text("publish"), ui.Text("speechBubbles", "editContentPublishedFailedByParent"));
 
                 // page cache disabled...
                 //			cms.businesslogic.cache.Cache.ClearCacheObjectTypes("umbraco.page");
