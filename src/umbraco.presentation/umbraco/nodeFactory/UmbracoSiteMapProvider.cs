@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using System.Web.Util;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using System.Collections;
 #endregion
@@ -205,7 +206,7 @@ namespace umbraco.presentation.nodeFactory {
         }
     }
 
-    public class UmbracoSiteMapProviderAccessUpdate : BusinessLogic.ApplicationBase
+    public class UmbracoSiteMapProviderAccessUpdate : ApplicationStartupHandler
     {
         public UmbracoSiteMapProviderAccessUpdate()
         {

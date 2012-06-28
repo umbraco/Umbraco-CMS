@@ -1,4 +1,5 @@
 ﻿using umbraco.BusinessLogic;
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation.Trees; // TreeDefinitionCollection
@@ -9,7 +10,7 @@ namespace umbraco.cms.presentation.Trees.RelationTypes
     /// This class will dynamically register a tree without having to populate the umbracoAppTree table (RegisterRelationTypeTree.sql)
     /// http://www.shazwazza.com/post/Dynamically-registering-custom-trees-without-writing-to-UmbracoAppTree.aspx
     /// </summary>
-    public class AddRelationTypeTree : ApplicationBase
+    public class AddRelationTypeTree : ApplicationStartupHandler
     {
         /// <summary>
         /// Initializes a new instance of the AddRelationTypeTree class. 

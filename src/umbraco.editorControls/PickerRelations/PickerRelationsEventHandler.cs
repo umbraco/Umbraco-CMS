@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using umbraco.BusinessLogic; // ApplicationBase
+using umbraco.businesslogic;
 using umbraco.cms.businesslogic; // SaveEventArgs
 using umbraco.cms.businesslogic.media; // Media
 using umbraco.cms.businesslogic.member; // Member
@@ -17,7 +18,7 @@ namespace umbraco.editorControls.PickerRelations
 	/// <summary>
 	/// Event handler that will convert a CSV into Relations
 	/// </summary>
-	public class PickerRelationsEventHandler : ApplicationBase
+	public class PickerRelationsEventHandler : ApplicationStartupHandler
 	{
         private enum PickerStorageFormat
         {
