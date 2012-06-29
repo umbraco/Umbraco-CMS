@@ -1,10 +1,13 @@
 <Project InitialTargets="Build" DefaultTargets="AfterBuild" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  
   <PropertyGroup>
     <MSBuildCommunityTasksPath>..\MSBuildCommunityTasks</MSBuildCommunityTasksPath>
     <UmbracoMSBuildTasksPath>..\UmbracoMSBuildTasks</UmbracoMSBuildTasksPath>
   </PropertyGroup>
+  
   <Import Project="..\lib\Umbraco\UmbracoMSBuildTasks\Umbraco.MSBuild.Tasks.Targets" />
   <Import Project="..\lib\MSBuild\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+  
   <PropertyGroup>
     <BuildFolder>_BuildOutput\</BuildFolder>
     <BuildZipFileName>UmbracoWebApp.zip</BuildZipFileName>
@@ -20,14 +23,17 @@
     <WebBuildFolderWildcard>$(WebAppFolder)**\*.*</WebBuildFolderWildcard>
     <WebBuildFolderExclusionWildcard>$(WebAppFolder)**\Web.Template.*;$(WebAppFolder)**\*.pdb</WebBuildFolderExclusionWildcard>
   </PropertyGroup>
+  
   <Target Name="Build" DependsOnTargets="ZipWebApp">
     <Message Text="Build finished" />
   </Target>
+  
   <Target Name="CleanUp" DependsOnTargets="ZipWebApp">
     <Message Text="Deleting $(BuildFolder)" Importance="high" />
     <RemoveDir Directories="build\$(BuildFolder)" />
     <Message Text="Finished deleting $(BuildFolder)" Importance="high" />
   </Target>
+  
   <Target Name="ZipWebApp" DependsOnTargets="OffsetTimestamps" >
     <Time Format="yyyyMMdd-HHmm">
       <Output TaskParameter="FormattedTime" PropertyName="buildDate" />
@@ -45,6 +51,7 @@
     <MSBuild.Community.Tasks.Zip Files="@(WebFilesToZip)" ZipFileName="$(buildDate)-$(BuildZipFileName)" WorkingDirectory="$(WebAppFolder)" />
     <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
   </Target>
+  
   <Target Name="CompileProjects">
 
     <Message Text="Compiling web project to build\$(BuildFolder)" Importance="high" />
@@ -109,7 +116,9 @@
     <Umbraco.MSBuild.Tasks.TimestampOffset Files="@(FilesToOffsetTimestamp)" Offset="-11" />
     <Message Text="Finished offsetting timestamps" Importance="high" />
   </Target>
+  
   <Target Name="AfterBuild">
     <Message Text="Hi" />
   </Target>
+  
 </Project>
