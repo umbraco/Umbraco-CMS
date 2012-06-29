@@ -116,7 +116,6 @@
     <!-- Copy SQL CE -->
     <ItemGroup>
       <SQLCE4Files Include="..\lib\SQLCE4\**\*.*" />
-      <SQLCE4UmbracoFiles Include="..\src\SQLCE4Umbraco\bin\$(BuildConfiguration)\SQLCE4Umbraco.dll" />
     </ItemGroup>
 
     <Copy SourceFiles="@(SQLCE4Files)"
@@ -125,15 +124,6 @@
         SkipUnchangedFiles="false" />
     <Copy SourceFiles="@(SQLCE4Files)"
         DestinationFiles="@(SQLCE4Files->'$(WebAppFolder)bin\%(RecursiveDir)%(Filename)%(Extension)')"
-        OverwriteReadOnlyFiles="true"
-        SkipUnchangedFiles="false" />
-
-    <Copy SourceFiles="@(SQLCE4UmbracoFiles)"
-        DestinationFolder="$(SolutionBinFolder)"
-        OverwriteReadOnlyFiles="true"
-        SkipUnchangedFiles="false" />
-    <Copy SourceFiles="@(SQLCE4UmbracoFiles)"
-        DestinationFolder="$(WebAppFolder)bin\"
         OverwriteReadOnlyFiles="true"
         SkipUnchangedFiles="false" />
     
@@ -204,6 +194,18 @@
           DestinationFolder="$(WebAppFolder)\bin" OverwriteReadOnlyFiles="True"/>
     <Copy SourceFiles="@(WebServicesASMX)"
             DestinationFolder="$(WebAppFolder)\umbraco\webservices\api" OverwriteReadOnlyFiles="True"/>
+
+    <!-- SQLCE4UMBRACO -->
+    <Message Text="Compiling SQLCE4Umbraco project" Importance="high" />
+    <MSBuild Projects="..\src\SQLCE4Umbraco\SQLCE4Umbraco.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
+    </MSBuild>
+    <ItemGroup>
+      <SQLCE4UmbracoDll Include="..\src\SQLCE4Umbraco\bin\$(BuildConfiguration)\SQLCE4Umbraco.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SQLCE4UmbracoDll)"
+          DestinationFolder="$(SolutionBinFolder)" OverwriteReadOnlyFiles="True"/>
+    <Copy SourceFiles="@(SQLCE4UmbracoDll)"
+          DestinationFolder="$(WebAppFolder)\bin" OverwriteReadOnlyFiles="True"/>
 
     <!-- DONE -->
     <Message Text="Finished compiling projects" Importance="high" />
