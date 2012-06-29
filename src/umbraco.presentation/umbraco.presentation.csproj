@@ -3292,9 +3292,6 @@
     <None Include="web.Template.MBP-PC.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
     </None>
-    <None Include="web.Template.VERTINO-01.Debug.config">
-      <DependentUpon>Web.Template.config</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
