@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="EditRelationType.aspx.cs" Inherits="umbraco.cms.presentation.Trees.RelationTypes.EditRelationType" MasterPageFile="/umbraco/masterpages/umbracoPage.Master" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="EditRelationType.aspx.cs" Inherits="umbraco.cms.presentation.developer.RelationTypes.EditRelationType" MasterPageFile="/umbraco/masterpages/umbracoPage.Master" %>
 <%@ Register TagPrefix="umb" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <asp:Content ID="headContent" ContentPlaceHolderID="head" runat="server">
@@ -28,8 +28,8 @@
         table.relations td.DataType {}
                 
         /* direction icons */
-        table.relations td.parentToChild { background-image: url('/umbraco/Trees/RelationTypes/Images/ParentToChild.png'); }
-        table.relations td.bidirectional { background-image: url('/umbraco/Trees/RelationTypes/Images/Bidirectional.png');}        
+        table.relations td.parentToChild { background-image: url('/umbraco/developer/RelationTypes/Images/ParentToChild.png'); }
+        table.relations td.bidirectional { background-image: url('/umbraco/developer/RelationTypes/Images/Bidirectional.png'); }
     </style>  
   
     <script type="text/javascript">

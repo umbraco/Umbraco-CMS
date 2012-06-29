@@ -111,7 +111,7 @@ namespace umbraco.dialogs
 						feedbackMsg.Text = ui.Text("publish", "nodePublish", d.Text, base.getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";						
                     }
                     else {
-                        feedbackMsg.type = umbraco.uicontrols.Feedback.feedbacktype.error;
+                        feedbackMsg.type = umbraco.uicontrols.Feedback.feedbacktype.notice;
 						feedbackMsg.Text = ui.Text("publish", "contentPublishedFailedByEvent", d.Text, base.getUser()) + "</p><p><a href='#' onClick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
                     }
 					ClientTools.ReloadActionNode(true, false);

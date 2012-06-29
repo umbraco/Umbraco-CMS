@@ -630,6 +630,27 @@
     <Compile Include="umbraco\developer\Packages\StarterKits.aspx.designer.cs">
       <DependentUpon>StarterKits.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco\developer\RelationTypes\EditRelationType.aspx.cs">
+      <DependentUpon>EditRelationType.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\developer\RelationTypes\EditRelationType.aspx.designer.cs">
+      <DependentUpon>EditRelationType.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\developer\RelationTypes\NewRelationType.aspx.cs">
+      <DependentUpon>NewRelationType.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco\developer\RelationTypes\NewRelationType.aspx.designer.cs">
+      <DependentUpon>NewRelationType.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco\developer\RelationTypes\ReadOnlyRelation.cs" />
+    <Compile Include="umbraco\developer\RelationTypes\RelationTypesWebService.asmx.cs">
+      <DependentUpon>RelationTypesWebService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="umbraco\developer\RelationTypes\TreeMenu\ActionDeleteRelationType.cs" />
+    <Compile Include="umbraco\developer\RelationTypes\TreeMenu\ActionNewRelationType.cs" />
     <Compile Include="umbraco\dialogs\Preview.aspx.cs">
       <DependentUpon>Preview.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1414,31 +1435,9 @@
     <Compile Include="umbraco\Trees\ITreeService.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="umbraco\Trees\loadRelationTypes.cs" />
     <Compile Include="umbraco\Trees\MediaRecycleBin.cs" />
     <Compile Include="umbraco\Trees\NodeActionsEventArgs.cs" />
-    <Compile Include="umbraco\Trees\RelationTypes\EditRelationType.aspx.cs">
-      <DependentUpon>EditRelationType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\Trees\RelationTypes\EditRelationType.aspx.designer.cs">
-      <DependentUpon>EditRelationType.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\Trees\RelationTypes\NewRelationType.aspx.cs">
-      <DependentUpon>NewRelationType.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco\Trees\RelationTypes\NewRelationType.aspx.designer.cs">
-      <DependentUpon>NewRelationType.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco\Trees\RelationTypes\ReadOnlyRelation.cs" />
-    <Compile Include="umbraco\Trees\RelationTypes\RegisterRelationTypeTree.cs" />
-    <Compile Include="umbraco\Trees\RelationTypes\RelationTypesWebService.asmx.cs">
-      <DependentUpon>RelationTypesWebService.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="umbraco\Trees\RelationTypes\RelationTypeTree.cs" />
-    <Compile Include="umbraco\Trees\RelationTypes\TreeMenu\ActionDeleteRelationType.cs" />
-    <Compile Include="umbraco\Trees\RelationTypes\TreeMenu\ActionNewRelationType.cs" />
     <Compile Include="umbraco\Trees\TreeEventArgs.cs" />
     <Compile Include="umbraco\Trees\TreeRequestParams.cs" />
     <Compile Include="umbraco\uQuery\ContentExtensions.cs" />
@@ -1781,18 +1780,18 @@
     <Content Include="umbraco\config\lang\pt.xml" />
     <Content Include="umbraco\config\lang\se.xml" />
     <Content Include="umbraco\controls\Tree\CustomTreeService.asmx" />
+    <Content Include="umbraco\developer\RelationTypes\EditRelationType.aspx" />
+    <Content Include="umbraco\developer\RelationTypes\Images\Bidirectional.png" />
+    <Content Include="umbraco\developer\RelationTypes\Images\ParentToChild.png" />
+    <Content Include="umbraco\developer\RelationTypes\Images\Refresh.gif" />
+    <Content Include="umbraco\developer\RelationTypes\NewRelationType.aspx" />
+    <Content Include="umbraco\developer\RelationTypes\RelationTypesWebService.asmx" />
+    <Content Include="umbraco\developer\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
+    <Content Include="umbraco\developer\RelationTypes\TreeMenu\ActionNewRelationType.js" />
     <Content Include="umbraco\images\delete.gif" />
     <Content Include="umbraco\images\editor\doc.gif" />
     <Content Include="umbraco\images\editor\documentType.gif" />
     <Content Include="umbraco\images\information.png" />
-    <Content Include="umbraco\Trees\RelationTypes\EditRelationType.aspx" />
-    <Content Include="umbraco\Trees\RelationTypes\Images\Bidirectional.png" />
-    <Content Include="umbraco\Trees\RelationTypes\Images\ParentToChild.png" />
-    <Content Include="umbraco\Trees\RelationTypes\Images\Refresh.gif" />
-    <Content Include="umbraco\Trees\RelationTypes\NewRelationType.aspx" />
-    <Content Include="umbraco\Trees\RelationTypes\RelationTypesWebService.asmx" />
-    <Content Include="umbraco\Trees\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
-    <Content Include="umbraco\Trees\RelationTypes\TreeMenu\ActionNewRelationType.js" />
     <Content Include="umbraco_client\tinymce3\plugins\autolink\editor_plugin_src.js" />
     <Content Include="umbraco_client\tinymce3\plugins\example_dependency\editor_plugin_src.js" />
     <Content Include="umbraco_client\tinymce3\plugins\lists\editor_plugin_src.js" />
@@ -2651,10 +2650,6 @@
       <DependentUpon>applications.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <None Include="web.Template.ShandemVaio.Debug.config">
-      <DependentUpon>Web.Template.config</DependentUpon>
-      <SubType>Designer</SubType>
-    </None>
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -3232,6 +3227,18 @@
     <Content Include="web.config">
       <SubType>Designer</SubType>
     </Content>
+    <None Include="web.Template.BODENKO-04.Debug.config">
+        <DependentUpon>Web.Template.config</DependentUpon>
+        <SubType>Designer</SubType>
+    </None>
+    <None Include="web.Template.VERTINO-01.Debug.config">
+        <DependentUpon>Web.Template.config</DependentUpon>
+        <SubType>Designer</SubType>
+    </None>
+    <None Include="web.Template.ShandemVaio.Debug.config">
+      <DependentUpon>Web.Template.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
     <None Include="web.Template.User-VAIO.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
     </None>
@@ -3284,6 +3291,9 @@
       <DependentUpon>Web.Template.config</DependentUpon>
     </None>
     <None Include="web.Template.MBP-PC.Debug.config">
+      <DependentUpon>Web.Template.config</DependentUpon>
+    </None>
+    <None Include="web.Template.VERTINO-01.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
     </None>
   </ItemGroup>
