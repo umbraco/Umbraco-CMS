@@ -1,5 +1,11 @@
 <Project InitialTargets="Build" DefaultTargets="AfterBuild" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  
+
+  <!-- 
+  ****************************************************
+  INCLUDES 
+  *****************************************************
+  -->
+
   <PropertyGroup>
     <MSBuildCommunityTasksPath>..\MSBuildCommunityTasks</MSBuildCommunityTasksPath>
     <UmbracoMSBuildTasksPath>..\UmbracoMSBuildTasks</UmbracoMSBuildTasksPath>
@@ -7,34 +13,87 @@
   
   <Import Project="..\lib\Umbraco\UmbracoMSBuildTasks\Umbraco.MSBuild.Tasks.Targets" />
   <Import Project="..\lib\MSBuild\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
-  
+
+  <!-- 
+  ****************************************************
+  VARIABLES 
+  *****************************************************
+  -->
+
   <PropertyGroup>
+    <BuildConfiguration>Release</BuildConfiguration>
     <BuildFolder>_BuildOutput\</BuildFolder>
     <BuildZipFileName>UmbracoWebApp.zip</BuildZipFileName>
     <BuildZipFileNameBin>UmbracoAllBinaries.zip</BuildZipFileNameBin>
+    <BuildZipFileNameWebPi>UmbracoWebPi.zip</BuildZipFileNameWebPi>
     <IncludeSymbols>False</IncludeSymbols>
     <BuildFolderRelativeToProjects>..\..\build\$(BuildFolder)</BuildFolderRelativeToProjects>
     <SolutionBinFolder>$(BuildFolder)bin\</SolutionBinFolder>
     <WebAppFolder>$(BuildFolder)WebApp\</WebAppFolder>
+    <WebPiFolder>$(BuildFolder)WebPi\</WebPiFolder>
     <SolutionBinFolderRelativeToProjects>$(BuildFolderRelativeToProjects)bin\</SolutionBinFolderRelativeToProjects>
     <SolutionBinBuildFolderWildcard>$(SolutionBinFolder)**\*.*</SolutionBinBuildFolderWildcard>
     <SolutionBinBuildFolderExclusionWildcard>$(SolutionBinFolder)**\Web.Template.*;$(SolutionBinFolder)**\*.pdb</SolutionBinBuildFolderExclusionWildcard>
     <WebAppFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebApp\</WebAppFolderRelativeToProjects>
+    <WebPiFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebPi\</WebPiFolderRelativeToProjects>
     <WebBuildFolderWildcard>$(WebAppFolder)**\*.*</WebBuildFolderWildcard>
     <WebBuildFolderExclusionWildcard>$(WebAppFolder)**\Web.Template.*;$(WebAppFolder)**\*.pdb</WebBuildFolderExclusionWildcard>
   </PropertyGroup>
-  
-  <Target Name="Build" DependsOnTargets="ZipWebApp">
+
+  <!-- 
+  ****************************************************
+  TARGETS 
+  *****************************************************
+  -->
+
+  <Target Name="Build" DependsOnTargets="ZipWebPiApp">
     <Message Text="Build finished" />
   </Target>
   
-  <Target Name="CleanUp" DependsOnTargets="ZipWebApp">
+  <Target Name="CleanUp" DependsOnTargets="ZipWebPiApp">
     <Message Text="Deleting $(BuildFolder)" Importance="high" />
-    <RemoveDir Directories="build\$(BuildFolder)" />
+    <RemoveDir Directories="$(BuildFolder)" />
     <Message Text="Finished deleting $(BuildFolder)" Importance="high" />
   </Target>
+
+  <Target Name="ZipWebPiApp" DependsOnTargets="ZipWebApp" >
+
+    <Time Format="yyyyMMdd-HHmm">
+      <Output TaskParameter="FormattedTime" PropertyName="buildDate" />
+    </Time>
+
+    <!-- Clean folders -->
+    <RemoveDir Directories="$(WebPiFolder)" />
+    <MakeDir Directories="$(WebPiFolder)" />
+    <MakeDir Directories="$(WebPiFolder)umbraco" />
+
+    <!-- Copy fresh built umbraco files -->
+    <ItemGroup>
+      <WebAppFiles Include="$(WebAppFolder)\**\*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(WebAppFiles)"
+        DestinationFiles="@(WebAppFiles->'$(WebPiFolder)umbraco\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+    <!-- Copy Web Pi template files -->
+    <ItemGroup>
+      <WebPiFiles Include="..\src\WebPi\**\*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(WebPiFiles)"
+        DestinationFiles="@(WebPiFiles->'$(WebPiFolder)%(RecursiveDir)%(Filename)%(Extension)')" />
+
+    <!-- Zip the files -->
+    <ItemGroup>
+      <WebPiFilesToZip Include="$(WebPiFolder)**\*.*" />
+    </ItemGroup>
+    
+    <MSBuild.Community.Tasks.Zip Files="@(WebPiFilesToZip)" ZipFileName="$(buildDate)-$(BuildZipFileNameWebPi)" WorkingDirectory="$(WebPiFolder)" />
+
+  </Target>
   
-  <Target Name="ZipWebApp" DependsOnTargets="OffsetTimestamps" >
+  <Target Name="ZipWebApp" DependsOnTargets="CopySqlCe" >
+    
     <Time Format="yyyyMMdd-HHmm">
       <Output TaskParameter="FormattedTime" PropertyName="buildDate" />
     </Time>    
@@ -51,12 +110,50 @@
     <MSBuild.Community.Tasks.Zip Files="@(WebFilesToZip)" ZipFileName="$(buildDate)-$(BuildZipFileName)" WorkingDirectory="$(WebAppFolder)" />
     <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
   </Target>
+
+  <Target Name="CopySqlCe" DependsOnTargets="OffsetTimestamps" >
+
+    <!-- Copy SQL CE -->
+    <ItemGroup>
+      <SQLCE4Files Include="..\lib\SQLCE4\**\*.*" />
+      <SQLCE4UmbracoFiles Include="..\src\SQLCE4Umbraco\bin\$(BuildConfiguration)\SQLCE4Umbraco.dll" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(SQLCE4Files)"
+        DestinationFiles="@(SQLCE4Files->'$(SolutionBinFolder)%(RecursiveDir)%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(SQLCE4Files)"
+        DestinationFiles="@(SQLCE4Files->'$(WebAppFolder)bin\%(RecursiveDir)%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false" />
+
+    <Copy SourceFiles="@(SQLCE4UmbracoFiles)"
+        DestinationFolder="$(SolutionBinFolder)"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(SQLCE4UmbracoFiles)"
+        DestinationFolder="$(WebAppFolder)bin\"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false" />
+    
+  </Target>
+
+  <!-- Offset the modified timestamps on all umbraco dlls, as WebResources break if date is in the future, which, due to timezone offsets can happen. -->
+  <Target Name="OffsetTimestamps" DependsOnTargets="CompileProjects">
+    <CreateItem Include="$(BuildFolder)**\umbraco.*.dll">
+      <Output TaskParameter="Include" ItemName="FilesToOffsetTimestamp" />
+    </CreateItem>
+    <Message Text="Starting to offset timestamps" Importance="high" />
+    <Umbraco.MSBuild.Tasks.TimestampOffset Files="@(FilesToOffsetTimestamp)" Offset="-11" />
+    <Message Text="Finished offsetting timestamps" Importance="high" />
+  </Target>
   
   <Target Name="CompileProjects">
 
     <Message Text="Compiling web project to build\$(BuildFolder)" Importance="high" />
     <!-- For UseWPP_CopyWebApplication=True see http://stackoverflow.com/questions/1983575/copywebapplication-with-web-config-transformations -->
-    <MSBuild Projects="..\src\umbraco.presentation\umbraco.presentation.csproj" Properties="WarningLevel=0;Configuration=Release;UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderRelativeToProjects);WebProjectOutputDir=$(WebAppFolderRelativeToProjects)" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
+    <MSBuild Projects="..\src\umbraco.presentation\umbraco.presentation.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderRelativeToProjects);WebProjectOutputDir=$(WebAppFolderRelativeToProjects)" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
     </MSBuild>
 
     <!--     
@@ -69,33 +166,36 @@
     so we need to just build the project 'in-place' then copy its output to the SolutionBinFolder    
     -->
 
+    <!-- MACRO ENGINES -->
     <Message Text="Compiling MacroEngines project" Importance="high" />
-    <MSBuild Projects="..\src\umbraco.MacroEngines\umbraco.MacroEngines.csproj" Properties="WarningLevel=0;Configuration=Release;" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
+    <MSBuild Projects="..\src\umbraco.MacroEngines\umbraco.MacroEngines.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
     </MSBuild>
     <ItemGroup>
-      <MacroEngineDll Include="..\src\umbraco.MacroEngines\bin\Release\umbraco.MacroEngines.dll"/>
+      <MacroEngineDll Include="..\src\umbraco.MacroEngines\bin\$(BuildConfiguration)\umbraco.MacroEngines.dll"/>
     </ItemGroup>
     <Copy SourceFiles="@(MacroEngineDll)"
           DestinationFolder="$(SolutionBinFolder)" OverwriteReadOnlyFiles="True"/>
     <Copy SourceFiles="@(MacroEngineDll)"
             DestinationFolder="$(WebAppFolder)\bin" OverwriteReadOnlyFiles="True"/>
 
+    <!-- EDITOR CONTROLS -->
     <Message Text="Compiling editorControls project" Importance="high" />
-    <MSBuild Projects="..\src\umbraco.editorControls\umbraco.editorControls.csproj" Properties="WarningLevel=0;Configuration=Release;" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
+    <MSBuild Projects="..\src\umbraco.editorControls\umbraco.editorControls.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
     </MSBuild>
     <ItemGroup>
-      <EditorControlsDll Include="..\src\umbraco.editorControls\bin\Release\umbraco.editorControls.dll"/>
+      <EditorControlsDll Include="..\src\umbraco.editorControls\bin\$(BuildConfiguration)\umbraco.editorControls.dll"/>
     </ItemGroup>
     <Copy SourceFiles="@(EditorControlsDll)"
           DestinationFolder="$(SolutionBinFolder)" OverwriteReadOnlyFiles="True"/>
     <Copy SourceFiles="@(EditorControlsDll)"
             DestinationFolder="$(WebAppFolder)\bin" OverwriteReadOnlyFiles="True"/>
 
+    <!-- WEBSERVICES -->
     <Message Text="Compiling webservices project" Importance="high" />
-    <MSBuild Projects="..\src\umbraco.webservices\umbraco.webservices.csproj" Properties="WarningLevel=0;Configuration=Release;" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
+    <MSBuild Projects="..\src\umbraco.webservices\umbraco.webservices.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
     </MSBuild>
     <ItemGroup>
-      <WebServicesDll Include="..\src\umbraco.webservices\bin\Release\umbraco.webservices.dll"/>
+      <WebServicesDll Include="..\src\umbraco.webservices\bin\$(BuildConfiguration)\umbraco.webservices.dll"/>
       <WebServicesASMX Include="..\src\umbraco.webservices\*.asmx"/>
     </ItemGroup>
     <Copy SourceFiles="@(WebServicesDll)"
@@ -105,16 +205,8 @@
     <Copy SourceFiles="@(WebServicesASMX)"
             DestinationFolder="$(WebAppFolder)\umbraco\webservices\api" OverwriteReadOnlyFiles="True"/>
 
+    <!-- DONE -->
     <Message Text="Finished compiling projects" Importance="high" />
-  </Target>
-
-  <Target Name="OffsetTimestamps" DependsOnTargets="CompileProjects">
-    <CreateItem Include="$(BuildFolder)**\umbraco.*.dll">
-      <Output TaskParameter="Include" ItemName="FilesToOffsetTimestamp" />
-    </CreateItem>
-    <Message Text="Starting to offset timestamps" Importance="high" />
-    <Umbraco.MSBuild.Tasks.TimestampOffset Files="@(FilesToOffsetTimestamp)" Offset="-11" />
-    <Message Text="Finished offsetting timestamps" Importance="high" />
   </Target>
   
   <Target Name="AfterBuild">
