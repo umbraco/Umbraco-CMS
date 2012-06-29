@@ -1725,6 +1725,61 @@
     <Content Include="App_Data\Umbraco.sdf" />
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
+    <None Include="config\404handlers.Release.config">
+      <DependentUpon>404handlers.config</DependentUpon>
+    </None>
+    <None Include="config\ClientDependency.Release.config">
+      <DependentUpon>ClientDependency.config</DependentUpon>
+    </None>
+    <None Include="config\xsltExtensions.Release.config">
+      <DependentUpon>xsltExtensions.config</DependentUpon>
+    </None>
+    <None Include="config\UrlRewriting.Release.config">
+      <DependentUpon>UrlRewriting.config</DependentUpon>
+    </None>
+    <None Include="config\umbracoSettings.Release.config">
+      <SubType>Designer</SubType>
+      <DependentUpon>umbracoSettings.config</DependentUpon>
+    </None>
+    <None Include="config\trees.Release.config">
+      <DependentUpon>trees.config</DependentUpon>
+    </None>
+    <None Include="config\tinyMceConfig.Release.config">
+      <DependentUpon>tinyMceConfig.config</DependentUpon>
+    </None>
+    <None Include="config\Skinning.Release.config">
+      <DependentUpon>Skinning.config</DependentUpon>
+    </None>
+    <None Include="config\scripting.Release.config">
+      <DependentUpon>scripting.config</DependentUpon>
+    </None>
+    <None Include="config\restExtensions.Release.config">
+      <DependentUpon>restExtensions.config</DependentUpon>
+    </None>
+    <None Include="config\metablogConfig.Release.config">
+      <DependentUpon>metablogConfig.config</DependentUpon>
+    </None>
+    <None Include="config\ExamineSettings.Release.config">
+      <DependentUpon>ExamineSettings.config</DependentUpon>
+    </None>
+    <None Include="config\feedProxy.Release.config">
+      <DependentUpon>feedProxy.config</DependentUpon>
+    </None>
+    <None Include="config\formHandlers.Release.config">
+      <DependentUpon>formHandlers.config</DependentUpon>
+    </None>
+    <None Include="config\ExamineIndex.Release.config">
+      <DependentUpon>ExamineIndex.config</DependentUpon>
+    </None>
+    <None Include="config\Dashboard.Release.config">
+      <DependentUpon>Dashboard.config</DependentUpon>
+    </None>
+    <None Include="umbraco\config\create\UI.Release.xml">
+      <DependentUpon>UI.xml</DependentUpon>
+    </None>
+    <Content Include="umbraco\config\lang\pl.xml" />
+    <Content Include="umbraco\config\lang\pt.xml" />
+    <Content Include="umbraco\config\lang\se.xml" />
     <Content Include="umbraco\controls\Tree\CustomTreeService.asmx" />
     <Content Include="umbraco\images\delete.gif" />
     <Content Include="umbraco\images\editor\doc.gif" />
@@ -2592,6 +2647,10 @@
     <Content Include="umbraco_client\ui\ui-lightness\jquery-ui.custom.css" />
     <Content Include="config\applications.config" />
     <Content Include="config\trees.config" />
+    <None Include="config\applications.Release.config">
+      <DependentUpon>applications.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
     <None Include="web.Template.ShandemVaio.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>

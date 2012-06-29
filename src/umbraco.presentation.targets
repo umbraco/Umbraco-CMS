@@ -1,8 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- 
+  ****************************************************
+  VARIABLES 
+  *****************************************************
+  -->
+  
   <PropertyGroup Condition="$(BuildingInsideVisualStudio) != true">
-    <!-- note: this means that msbuild should be run from the location of the sln file -->
-    <SolutionRootFolder>$(MSBuildStartupDirectory)</SolutionRootFolder>
+    <SolutionRootFolder>$(MSBuildStartupDirectory)\..\src\</SolutionRootFolder>
     <ConfigEnvironment></ConfigEnvironment>
   </PropertyGroup>
 
@@ -12,17 +18,40 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <ProjDir>$(SolutionRootFolder)umbraco.presentation\</ProjDir>
+    <ProjOutputDir>$(WebProjectOutputDir)</ProjOutputDir>
     <WebConfigSource>web.Template.$(ConfigEnvironment)$(Configuration).config</WebConfigSource>
   </PropertyGroup>
 
   <PropertyGroup Condition="!Exists('$(MSBuildProjectDirectory)\$(WebConfigSource)')">
     <WebConfigSource>web.Template.$(Configuration).config</WebConfigSource>
   </PropertyGroup>
-  
+
+  <PropertyGroup Condition="'$(ProjOutputDir)'==''">
+    <ProjOutputDir>$(ProjDir)</ProjOutputDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ConfigFiles Include="$(ProjDir)**\*.config" Exclude="$(ProjDir)web.config;$(ProjDir)web.*.config" />
+    <ConfigFiles Include="$(ProjDir)umbraco\config\create\UI.xml"  />
+  </ItemGroup>
+
+  <!-- 
+  ****************************************************
+  INCLUDES 
+  *****************************************************
+  -->
+
   <UsingTask
      TaskName="TransformXml"
      AssemblyFile="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\Web\Microsoft.Web.Publishing.Tasks.dll"
         />
+
+  <!-- 
+  ****************************************************
+  TARGETS 
+  *****************************************************
+  -->
 
   <!-- Make sure web.config will be there even for package/publish -->
   <Target Name="CopyWebConfig" BeforeTargets="Build;Rebuild">
@@ -38,6 +67,25 @@
     <Message Text="Building in VS? $(BuildingInsideVisualStudio)" Importance="high" />
     <Message Text="Transforming: $(WebConfigSource), running MSBuild on project $(MSBuildProjectDirectory)" Importance="high" />
     <TransformXml Source="web.Template.config" Transform="$(WebConfigSource)" Destination="web.config" />
+  </Target>
+
+  <Target Name="ResetConfigFiles" Condition="$(BuildingInsideVisualStudio) != true" BeforeTargets="Build;Rebuild" Inputs="@(ConfigFiles)" Outputs="%(Identity).Dummy">
+
+    <PropertyGroup>
+      <OriginalFileName>@(ConfigFiles)</OriginalFileName>
+      <ModifiedFileName>$(OriginalFileName.Replace("%(ConfigFiles.Extension)",".$(Configuration)%(ConfigFiles.Extension)"))</ModifiedFileName>
+      <OutputFileName>$(OriginalFileName.Replace("$(ProjDir)", "$(ProjOutputDir)"))</OutputFileName>
+    </PropertyGroup>
+
+    <Message Text="$(OriginalFileName)" Importance="high" />
+    <Message Text="$(ModifiedFileName)" Importance="high" />
+
+    <Copy SourceFiles="$(ModifiedFileName)"
+      DestinationFiles="$(OutputFileName)"
+      OverwriteReadOnlyFiles="true"
+      SkipUnchangedFiles="false"
+      Condition="Exists('$(ModifiedFileName)')"/>
     
   </Target>
+  
 </Project>

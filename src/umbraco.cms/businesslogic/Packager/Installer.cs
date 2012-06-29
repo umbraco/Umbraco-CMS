@@ -317,7 +317,7 @@ namespace umbraco.cms.businesslogic.packager
                 if (BasePages.UmbracoEnsuredPage.ValidateUserContextID(BasePages.UmbracoEnsuredPage.umbracoUserContextID)) {
                     u = User.GetCurrent();
                 }
-            }
+            } 
 
 
             // Add Templates

@@ -63,27 +63,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nant", "Nant", "{17E547B1-D
 		..\build\Nant\umbraco.build = ..\build\Nant\umbraco.build
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config Templates", "Config Templates", "{BF7C59D8-3C53-4257-B055-DAC4EED705DA}"
-	ProjectSection(SolutionItems) = preProject
-		..\config templates\config\404handlers.config = ..\config templates\config\404handlers.config
-		..\config templates\config\applications.config = ..\config templates\config\applications.config
-		..\config templates\config\ClientDependency.config = ..\config templates\config\ClientDependency.config
-		..\config templates\config\Dashboard.config = ..\config templates\config\Dashboard.config
-		..\config templates\config\ExamineIndex.config = ..\config templates\config\ExamineIndex.config
-		..\config templates\config\ExamineSettings.config = ..\config templates\config\ExamineSettings.config
-		..\config templates\config\feedProxy.config = ..\config templates\config\feedProxy.config
-		..\config templates\config\formHandlers.config = ..\config templates\config\formHandlers.config
-		..\config templates\config\metablogConfig.config = ..\config templates\config\metablogConfig.config
-		..\config templates\config\restExtensions.config = ..\config templates\config\restExtensions.config
-		..\config templates\config\scripting.config = ..\config templates\config\scripting.config
-		..\config templates\config\tinyMceConfig.config = ..\config templates\config\tinyMceConfig.config
-		..\config templates\config\trees.config = ..\config templates\config\trees.config
-		..\config templates\config\umbracoSettings.config = ..\config templates\config\umbracoSettings.config
-		..\config templates\config\UrlRewriting.config = ..\config templates\config\UrlRewriting.config
-		..\config templates\web.config = ..\config templates\web.config
-		..\config templates\config\xsltExtensions.config = ..\config templates\config\xsltExtensions.config
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = umbraco2.vsmdi
