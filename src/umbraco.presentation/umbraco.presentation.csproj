@@ -2591,10 +2591,6 @@
     <Content Include="umbraco_client\ui\ui-lightness\jquery-ui.custom.css" />
     <Content Include="config\applications.config" />
     <Content Include="config\trees.config" />
-    <None Include="web.Template.ShandemVaio.Debug.config">
-      <DependentUpon>Web.Template.config</DependentUpon>
-      <SubType>Designer</SubType>
-    </None>
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -3172,6 +3168,18 @@
     <Content Include="web.config">
       <SubType>Designer</SubType>
     </Content>
+    <None Include="web.Template.BODENKO-04.Debug.config">
+        <DependentUpon>Web.Template.config</DependentUpon>
+        <SubType>Designer</SubType>
+    </None>
+    <None Include="web.Template.VERTINO-01.Debug.config">
+        <DependentUpon>Web.Template.config</DependentUpon>
+        <SubType>Designer</SubType>
+    </None>
+    <None Include="web.Template.ShandemVaio.Debug.config">
+      <DependentUpon>Web.Template.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
     <None Include="web.Template.User-VAIO.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
     </None>
