@@ -774,8 +774,9 @@ namespace umbraco.cms.businesslogic
         /// <param name="Caption">The new Caption</param>
         public void SetTabName(int tabId, string Caption)
         {
-            SqlHelper.ExecuteNonQuery(
-                                      "Update  cmsTab set text = '" + Caption + "' where id = " + tabId);
+            SqlHelper.ExecuteNonQuery("Update cmsTab set text = @text where id = @id",
+            SqlHelper.CreateParameter("@text", Caption),
+            SqlHelper.CreateParameter("@id", tabId));
 
             // Remove from cache
             FlushFromCache(Id);
