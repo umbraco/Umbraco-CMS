@@ -2605,7 +2605,6 @@
     <Content Include="install\steps\welcome.ascx">
       <SubType>UserControl</SubType>
     </Content>
-    <Content Include="site.py" />
     <Content Include="umbraco\cacheBrowser.aspx" />
     <Content Include="umbraco\config\create\UI.xml" />
     <Content Include="umbraco\config\lang\en.xml" />
