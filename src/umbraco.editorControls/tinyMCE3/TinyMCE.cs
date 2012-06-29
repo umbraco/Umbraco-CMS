@@ -150,7 +150,8 @@ namespace umbraco.editorControls.tinyMCE3
                         if (styleSheetId.Trim() != "")
                             try
                             {
-                                var s = new StyleSheet(int.Parse(styleSheetId));
+                                var s = StyleSheet.GetStyleSheet(int.Parse(styleSheetId), false, false);
+
                                 if (s.nodeObjectType == StyleSheet.ModuleObjectType)
                                 {
                                     cssFiles += IOHelper.ResolveUrl(SystemDirectories.Css + "/" + s.Text + ".css");
