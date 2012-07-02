@@ -1,4 +1,4 @@
-﻿When upgrading TinyMCE be aware of the following Umbraco specific things:
+﻿When upgrading TinyMCE be aware of the following Umbraco specific things: 
 
 0. General
 - Start by unpacking the tinymce update to /umbraco_client/tinymce3/
