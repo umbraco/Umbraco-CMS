@@ -1711,10 +1711,10 @@
     <Compile Include="umbraco\uQuery\uQuery-UmbracoObjectType.cs">
       <DependentUpon>uQuery.cs</DependentUpon>
     </Compile>
-    <Compile Include="umbraco_client\tinymce3\plugins\spellchecker\GoogleSpellChecker.cs" />
-    <Compile Include="umbraco_client\tinymce3\plugins\spellchecker\SpellChecker.cs" />
-    <Compile Include="umbraco_client\tinymce3\plugins\spellchecker\SpellCheckerInput.cs" />
-    <Compile Include="umbraco_client\tinymce3\plugins\spellchecker\SpellCheckerResult.cs" />
+    <Compile Include="umbraco\plugins\tinymce3\GoogleSpellChecker.cs" />
+    <Compile Include="umbraco\plugins\tinymce3\SpellChecker.cs" />
+    <Compile Include="umbraco\plugins\tinymce3\SpellCheckerInput.cs" />
+    <Compile Include="umbraco\plugins\tinymce3\SpellCheckerResult.cs" />
     <Compile Include="viewstateMoverModule.cs" />
     <Compile Include="Web References\org.umbraco.update\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -1978,6 +1978,8 @@
     <Content Include="umbraco_client\tinymce3\plugins\umbracoimg\js\image.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoimg\langs\en_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracolink\editor_plugin_src.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracolink\js\umbracolink.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracolink\langs\en_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracomacro\dialog.htm" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracomacro\editor_plugin_src.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracomacro\img\insMacro.gif" />
@@ -2065,7 +2067,6 @@
     <Content Include="umbraco_client\tinymce3\themes\umbraco\anchor.htm" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\charmap.htm" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\color_picker.htm" />
-    <Content Include="umbraco_client\tinymce3\themes\umbraco\editor_template.js" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\editor_template_src.js" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\image.htm" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\img\colorpicker.jpg" />
@@ -2121,6 +2122,7 @@
     <Content Include="umbraco_client\tinymce3\tiny_mce.js" />
     <Content Include="umbraco_client\tinymce3\tiny_mce_popup.js" />
     <Content Include="umbraco_client\tinymce3\tiny_mce_src.js" />
+    <Content Include="umbraco_client\tinymce3\umbraco-implementation-notes.txt" />
     <Content Include="umbraco_client\tinymce3\utils\editable_selects.js" />
     <Content Include="umbraco_client\tinymce3\utils\form_utils.js" />
     <Content Include="umbraco_client\tinymce3\utils\mctabs.js" />
