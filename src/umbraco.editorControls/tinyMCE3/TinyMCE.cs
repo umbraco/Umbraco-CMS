@@ -83,6 +83,9 @@ namespace umbraco.editorControls.tinyMCE3
 
                     if (configSettings.Length > 6 && configSettings[6] != "")
                         _showLabel = bool.Parse(configSettings[6]);
+                    else
+                        _showLabel = true;
+
                     if (configSettings.Length > 7 && configSettings[7] != "")
                         m_maxImageWidth = int.Parse(configSettings[7]);
 
