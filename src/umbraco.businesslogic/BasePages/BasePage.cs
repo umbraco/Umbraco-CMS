@@ -234,8 +234,8 @@ namespace umbraco.BasePages {
         private void deleteLogin()
         {
             SqlHelper.ExecuteNonQuery(
-                "DELETE umbracoUserLogins WHERE contextId = @contextId",
-                SqlHelper.CreateParameter("@contextId", umbracoUserContextID));            
+                "DELETE FROM umbracoUserLogins WHERE contextId = @contextId",
+                SqlHelper.CreateParameter("@contextId", umbracoUserContextID));
         }
 
         private void updateLogin()
