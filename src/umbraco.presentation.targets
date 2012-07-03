@@ -19,7 +19,7 @@
 
   <PropertyGroup>
     <ProjDir>$(SolutionRootFolder)umbraco.presentation\</ProjDir>
-    <ProjOutputDir>$(WebProjectOutputDir)</ProjOutputDir>
+    <ProjOutputDir>$(WebProjectOutputDir)\</ProjOutputDir>
     <WebConfigSource>web.Template.$(ConfigEnvironment)$(Configuration).config</WebConfigSource>
   </PropertyGroup>
 
