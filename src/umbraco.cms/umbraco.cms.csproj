@@ -208,8 +208,12 @@
     <Compile Include="businesslogic\datatype\DataEditorSettingType.cs" />
     <Compile Include="businesslogic\datatype\DataEditorSettingValidationResult.cs" />
     <Compile Include="businesslogic\datatype\DBTypes.cs" />
+    <Compile Include="businesslogic\datatype\FileHandlerData.cs" />
     <Compile Include="businesslogic\datatype\IDataEditorSettingType.cs" />
     <Compile Include="businesslogic\datatype\PreValue.cs" />
+    <Compile Include="businesslogic\Files\IFile.cs" />
+    <Compile Include="businesslogic\Files\NotAnImageException.cs" />
+    <Compile Include="businesslogic\Files\UmbracoFile.cs" />
     <Compile Include="businesslogic\installer\IInstallerStep.cs" />
     <Compile Include="businesslogic\installer\InstallerStep.cs" />
     <Compile Include="businesslogic\installer\InstallStepCollection.cs">
