@@ -590,7 +590,7 @@ namespace umbraco
         /// <value>The allowed image file types.</value>
         public static string ImageFileTypes
         {
-            get { return GetKey("/settings/content/imaging/imageFileTypes"); }
+            get { return GetKey("/settings/content/imaging/imageFileTypes").ToLowerInvariant(); }
         }
 
         /// <summary>
