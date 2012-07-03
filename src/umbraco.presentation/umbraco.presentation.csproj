@@ -2100,15 +2100,6 @@
     <Content Include="umbraco_client\tinymce3\themes\umbraco\skins\umbraco\img\progress.gif" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\skins\umbraco\img\tabs.gif" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\skins\umbraco\ui.css" />
-    <Content Include="umbraco_client\tinymce3\themes\umbraco\skins\default\content.css" />
-    <Content Include="umbraco_client\tinymce3\themes\umbraco\skins\default\dialog.css" />
-    <Content Include="umbraco_client\tinymce3\themes\umbraco\skins\default\img\buttons.png" />
-    <Content Include="umbraco_client\tinymce3\themes\umbraco\skins\default\img\items.gif" />
-    <Content Include="umbraco_client\tinymce3\themes\umbraco\skins\default\img\menu_arrow.gif" />
-    <Content Include="umbraco_client\tinymce3\themes\umbraco\skins\default\img\menu_check.gif" />
-    <Content Include="umbraco_client\tinymce3\themes\umbraco\skins\default\img\progress.gif" />
-    <Content Include="umbraco_client\tinymce3\themes\umbraco\skins\default\img\tabs.gif" />
-    <Content Include="umbraco_client\tinymce3\themes\umbraco\skins\default\ui.css" />
     <Content Include="umbraco_client\tinymce3\themes\umbraco\source_editor.htm" />
     <Content Include="umbraco_client\tinymce3\themes\simple\editor_template.js" />
     <Content Include="umbraco_client\tinymce3\themes\simple\editor_template_src.js" />
