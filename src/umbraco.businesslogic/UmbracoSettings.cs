@@ -718,6 +718,11 @@ namespace umbraco
             get { return GetKey("/settings/content/imaging/allowedAttributes"); }
         }
 
+        public static XmlNode ImageAutoFillImageProperties
+        {
+            get { return GetKeyAsNode("/settings/content/imaging/autoFillImageProperties"); }
+        }
+
         /// <summary>
         /// Gets the scheduled tasks as XML
         /// </summary>

@@ -124,16 +124,12 @@ namespace umbraco.editorControls
                 if (_data.Value != DBNull.Value && !string.IsNullOrEmpty(_data.Value.ToString()))
                 {
                     var fullFilePath = IO.IOHelper.MapPath(_data.Value.ToString());
-                    UmbracoFile uf = new UmbracoFile(fullFilePath);
 
                     cms.businesslogic.Content content = cms.businesslogic.Content.GetContentFromVersion(this._data.Version);
 
-                    // Save extension
-                    string orgExt = uf.Extension.ToLower();
+                    // update extension in UI
                     try
                     {
-                        //cms.businesslogic.Content.GetContentFromVersion(_data.Version).getProperty("umbracoExtension").Value = ext;
-                        content.getProperty("umbracoExtension").Value = orgExt;
                         noEdit extensionControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoExtension");
                         if (extensionControl != null)
                         {
@@ -144,11 +140,9 @@ namespace umbraco.editorControls
 
 
 
-                    // Save file size
+                    // update file size in UI
                     try
                     {
-                        //cms.businesslogic.Content.GetContentFromVersion(_data.Version).getProperty("umbracoBytes").Value = fi.Length.ToString();
-                        content.getProperty("umbracoBytes").Value = uf.Length.ToString();
                         noEdit bytesControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoBytes");
                         if (bytesControl != null)
                         {
@@ -157,35 +151,21 @@ namespace umbraco.editorControls
                     }
                     catch { }
 
-                    // Check if image and then get sizes, make thumb and update database
-                    if (uf.SupportsResizing)
+                    try
                     {
-                        System.Tuple<int, int> dimensions = uf.GetDimensions();
-                        int fileWidth = dimensions.Item1;
-                        int fileHeight = dimensions.Item2;
-
-                        
-                        try
+                        noEdit widthControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoWidth");
+                        if (widthControl != null)
                         {
-                            //cms.businesslogic.Content.GetContentFromVersion(_data.Version).getProperty("umbracoWidth").Value = fileWidth.ToString();
-                            //cms.businesslogic.Content.GetContentFromVersion(_data.Version).getProperty("umbracoHeight").Value = fileHeight.ToString();
-                            content.getProperty("umbracoWidth").Value = fileWidth.ToString();
-                            noEdit widthControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoWidth");
-                            if (widthControl != null)
-                            {
-                                widthControl.RefreshLabel(content.getProperty("umbracoWidth").Value.ToString());
-                            }
-                            content.getProperty("umbracoHeight").Value = fileHeight.ToString();
-                            noEdit heightControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoHeight");
-                            if (heightControl != null)
-                            {
-                                heightControl.RefreshLabel(content.getProperty("umbracoHeight").Value.ToString());
-                            }
+                            widthControl.RefreshLabel(content.getProperty("umbracoWidth").Value.ToString());
                         }
-                        catch { }
-
-
+                        noEdit heightControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoHeight");
+                        if (heightControl != null)
+                        {
+                            heightControl.RefreshLabel(content.getProperty("umbracoHeight").Value.ToString());
+                        }
                     }
+                    catch { }
+
                 }
                 this.Text = _data.Value.ToString();
             }
@@ -240,52 +220,6 @@ namespace umbraco.editorControls
             }
         }
 
-        private void generateThumbnail(System.Drawing.Image image, int maxWidthHeight, int fileWidth, int fileHeight, string fullFilePath, string ext, string thumbnailFileName)
-        {
-            // Generate thumbnail
-            float fx = (float)fileWidth / (float)maxWidthHeight;
-            float fy = (float)fileHeight / (float)maxWidthHeight;
-            // must fit in thumbnail size
-            float f = Math.Max(fx, fy); //if (f < 1) f = 1;
-            int widthTh = (int)Math.Round((float)fileWidth / f); int heightTh = (int)Math.Round((float)fileHeight / f);
-
-            // fixes for empty width or height
-            if (widthTh == 0)
-                widthTh = 1;
-            if (heightTh == 0)
-                heightTh = 1;
-
-            // Create new image with best quality settings
-            Bitmap bp = new Bitmap(widthTh, heightTh);
-            Graphics g = Graphics.FromImage(bp);
-            g.SmoothingMode = SmoothingMode.HighQuality;
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-            // Copy the old image to the new and resized
-            Rectangle rect = new Rectangle(0, 0, widthTh, heightTh);
-            g.DrawImage(image, rect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
-
-            // Copy metadata
-            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
-            ImageCodecInfo codec = null;
-            for (int i = 0; i < codecs.Length; i++)
-            {
-                if (codecs[i].MimeType.Equals("image/jpeg"))
-                    codec = codecs[i];
-            }
-
-            // Set compresion ratio to 90%
-            EncoderParameters ep = new EncoderParameters();
-            ep.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
-
-            // Save the new image
-            bp.Save(thumbnailFileName, codec, ep);
-            bp.Dispose();
-            g.Dispose();
-
-        }
-
         /// <summary>
         /// Recursively finds a control with the specified identifier.
         /// </summary>
@@ -326,7 +260,7 @@ namespace umbraco.editorControls
         /// <param name="output"> The HTML writer to write out to </param>
         protected override void Render(HtmlTextWriter output)
         {
-            if (this.Text != null && this.Text != "")
+            if (!string.IsNullOrEmpty(this.Text))
             {
                 string ext = _text.Substring(_text.LastIndexOf(".") + 1, _text.Length - _text.LastIndexOf(".") - 1);
                 string fileNameThumb = _text.Replace("." + ext, "_thumb.jpg");
@@ -334,6 +268,12 @@ namespace umbraco.editorControls
                 try
                 {
                     hasThumb = File.Exists(IOHelper.MapPath(IOHelper.FindFile(fileNameThumb)));
+                    // 4.8.0 added support for png thumbnails
+                    if (!hasThumb && (ext == "gif" || ext == "png"))
+                    {
+                        fileNameThumb = _text.Replace("." + ext, "_thumb.png");
+                        hasThumb = File.Exists(IOHelper.MapPath(IOHelper.FindFile(fileNameThumb)));
+                    }
                 }
                 catch { }
                 if (hasThumb)
