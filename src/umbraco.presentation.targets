@@ -18,8 +18,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <ProjDir>$(SolutionRootFolder)umbraco.presentation\</ProjDir>
-    <ProjOutputDir>$(WebProjectOutputDir)\</ProjOutputDir>
+    <ProjDir>$(ProjectDir)</ProjDir>
+    <ProjOutputDir>$(WebProjectOutputDir)</ProjOutputDir>
     <WebConfigSource>web.Template.$(ConfigEnvironment)$(Configuration).config</WebConfigSource>
   </PropertyGroup>
 
@@ -29,6 +29,10 @@
 
   <PropertyGroup Condition="'$(ProjOutputDir)'==''">
     <ProjOutputDir>$(ProjDir)</ProjOutputDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="!HasTrailingSlash('$(ProjOutputDir)')">
+    <ProjOutputDir>$(ProjOutputDir)\</ProjOutputDir>
   </PropertyGroup>
 
   <ItemGroup>
@@ -69,8 +73,11 @@
     <TransformXml Source="web.Template.config" Transform="$(WebConfigSource)" Destination="web.config" />
   </Target>
 
-  <Target Name="ResetConfigFiles" Condition="$(BuildingInsideVisualStudio) != true" BeforeTargets="Build;Rebuild" Inputs="@(ConfigFiles)" Outputs="%(Identity).Dummy">
+  <Target Name="ResetConfigFiles" Condition="$(ProjDir) != $(ProjOutputDir)" BeforeTargets="Build;Rebuild" Inputs="@(ConfigFiles)" Outputs="%(Identity).Dummy">
 
+    <Message Text="$(ProjDir)" Importance="high" />
+    <Message Text="$(ProjOutputDir)" Importance="high" />
+    
     <PropertyGroup>
       <OriginalFileName>@(ConfigFiles)</OriginalFileName>
       <ModifiedFileName>$(OriginalFileName.Replace("%(ConfigFiles.Extension)",".$(Configuration)%(ConfigFiles.Extension)"))</ModifiedFileName>
