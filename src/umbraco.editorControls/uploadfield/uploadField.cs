@@ -6,6 +6,7 @@ using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
+using umbraco.cms.businesslogic.Files;
 using umbraco.IO;
 using System.Text.RegularExpressions;
 
@@ -107,7 +108,8 @@ namespace umbraco.editorControls
                             bytesControl.RefreshLabel(string.Empty);
                         }
                     }
-                    catch {
+                    catch
+                    {
                         //if first one fails we can assume that props don't exist
                         break;
                     }
@@ -116,69 +118,22 @@ namespace umbraco.editorControls
 
             if (this.PostedFile != null)
             {
-                if (this.PostedFile.FileName != "")
+                _data.Value = this.PostedFile;
+
+                // we update additional properties post image upload
+                if (_data.Value != DBNull.Value && !string.IsNullOrEmpty(_data.Value.ToString()))
                 {
-                    //if (_text.Length > 0 && helper.Request(this.ClientID + "clear") != "1")
-                    //{
-                    //    //delete old file
-                    //    deleteFile(_text);
-
-                    //}
-
-                    // Find filename (removed the safe url here as it removes fullpath characters (such as c:\ becomes c:) - the safe url should only be used when saving the
-                    // local filename
-                    _text = this.PostedFile.FileName;
-                    string filename;
-                    string _fullFilePath;
+                    var fullFilePath = IO.IOHelper.MapPath(_data.Value.ToString());
+                    UmbracoFile uf = new UmbracoFile(fullFilePath);
 
                     cms.businesslogic.Content content = cms.businesslogic.Content.GetContentFromVersion(this._data.Version);
 
-                    if (umbraco.UmbracoSettings.UploadAllowDirectories)
-                    {
-                        // moved the safeUrl call to here as it's the local file name to be stored
-                        filename = SafeUrl(_text.Substring(_text.LastIndexOf(IOHelper.DirSepChar) + 1, _text.Length - _text.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
-                        // Create a new folder in the /media folder with the name /media/propertyid
-
-
-                        System.IO.Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Media + "/" + _data.PropertyId.ToString()));
-
-                        _fullFilePath = IOHelper.MapPath(SystemDirectories.Media + "/" + _data.PropertyId.ToString() + "/" + filename);
-                        this.PostedFile.SaveAs(_fullFilePath);
-
-                        //if we are not in a virtual dir, just save without the ~
-                        string _relFilePath = SystemDirectories.Media + "/" + _data.PropertyId + "/" + filename;
-                        if (SystemDirectories.Root == string.Empty)
-                            _relFilePath = _relFilePath.TrimStart('~');
-
-                        _data.Value = _relFilePath;
-                    }
-                    else
-                    {
-                        //filename = this.
-                        filename = System.IO.Path.GetFileName(SafeUrl(this.PostedFile.FileName));
-                        filename = _data.PropertyId + "-" + filename;
-                        _fullFilePath = IOHelper.MapPath(SystemDirectories.Media + "/" + filename);
-                        this.PostedFile.SaveAs(_fullFilePath);
-
-                        //if we are not in a virtual dir, just save without the ~
-                        string _relFilePath = SystemDirectories.Media + "/" + filename;
-                        if (SystemDirectories.Root == string.Empty)
-                            _relFilePath = _relFilePath.TrimStart('~');
-
-                        _data.Value = _relFilePath;
-                    }
-
-                    // hack to find master page prefix client id
-                    string masterpagePrefix = this.ClientID.Substring(0, this.ClientID.LastIndexOf("_") + 1);
-
                     // Save extension
-                    string orgExt = ((string)_text.Substring(_text.LastIndexOf(".") + 1, _text.Length - _text.LastIndexOf(".") - 1));
-                    orgExt = orgExt.ToLower();
-                    string ext = orgExt.ToLower();
+                    string orgExt = uf.Extension.ToLower();
                     try
                     {
                         //cms.businesslogic.Content.GetContentFromVersion(_data.Version).getProperty("umbracoExtension").Value = ext;
-                        content.getProperty("umbracoExtension").Value = ext;
+                        content.getProperty("umbracoExtension").Value = orgExt;
                         noEdit extensionControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoExtension");
                         if (extensionControl != null)
                         {
@@ -192,9 +147,8 @@ namespace umbraco.editorControls
                     // Save file size
                     try
                     {
-                        System.IO.FileInfo fi = new FileInfo(_fullFilePath);
                         //cms.businesslogic.Content.GetContentFromVersion(_data.Version).getProperty("umbracoBytes").Value = fi.Length.ToString();
-                        content.getProperty("umbracoBytes").Value = fi.Length.ToString();
+                        content.getProperty("umbracoBytes").Value = uf.Length.ToString();
                         noEdit bytesControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoBytes");
                         if (bytesControl != null)
                         {
@@ -204,18 +158,13 @@ namespace umbraco.editorControls
                     catch { }
 
                     // Check if image and then get sizes, make thumb and update database
-                    if (",jpeg,jpg,gif,bmp,png,tiff,tif,".IndexOf("," + ext + ",") > -1)
+                    if (uf.SupportsResizing)
                     {
-                        int fileWidth;
-                        int fileHeight;
+                        System.Tuple<int, int> dimensions = uf.GetDimensions();
+                        int fileWidth = dimensions.Item1;
+                        int fileHeight = dimensions.Item2;
 
-                        FileStream fs = new FileStream(_fullFilePath,
-                            FileMode.Open, FileAccess.Read, FileShare.Read);
-
-                        System.Drawing.Image image = System.Drawing.Image.FromStream(fs);
-                        fileWidth = image.Width;
-                        fileHeight = image.Height;
-                        fs.Close();
+                        
                         try
                         {
                             //cms.businesslogic.Content.GetContentFromVersion(_data.Version).getProperty("umbracoWidth").Value = fileWidth.ToString();
@@ -236,27 +185,6 @@ namespace umbraco.editorControls
                         catch { }
 
 
-                        // Generate thumbnails
-                        string fileNameThumb = _fullFilePath.Replace("." + orgExt, "_thumb");
-                        generateThumbnail(image, 100, fileWidth, fileHeight, _fullFilePath, ext, fileNameThumb + _thumbnailext);
-
-                        if (_thumbnails != "")
-                        {
-                            char sep = ';';
-
-                            if (!_thumbnails.Contains(sep.ToString()) && _thumbnails.Contains(","))
-                                sep = ',';
-
-                            string[] thumbnailSizes = _thumbnails.Split(sep);
-                            foreach (string thumb in thumbnailSizes)
-                            {
-                                int _thum = 0;
-                                if (thumb != "" && int.TryParse(thumb, out _thum))
-                                    generateThumbnail(image, _thum, fileWidth, fileHeight, _fullFilePath, ext, fileNameThumb + "_" + thumb + _thumbnailext);
-                            }
-                        }
-
-                        image.Dispose();
                     }
                 }
                 this.Text = _data.Value.ToString();

@@ -26,7 +26,7 @@ namespace umbraco.editorControls.uploadfield
 			get 
 			{
 				if (_baseData == null)
-					_baseData = new cms.businesslogic.datatype.DefaultData(this);
+                    _baseData = new cms.businesslogic.datatype.FileHandlerData(this, ((uploadFieldPreValue)PrevalueEditor).Configuration);
 				return _baseData;
 			}
 		}

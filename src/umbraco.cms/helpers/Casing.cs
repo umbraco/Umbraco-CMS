@@ -59,5 +59,34 @@ namespace umbraco.cms.helpers
                 return alias;
             }
         }
+
+        public static string SpaceCamelCasing(string text)
+        {
+            string s = text;
+
+            if (2 > s.Length)
+            {
+                return s;
+            }
+
+
+            var sb = new System.Text.StringBuilder();
+            var ca = s.ToCharArray();
+            ca[0] = char.ToUpper(ca[0]);
+
+            sb.Append(ca[0]);
+            for (int i = 1; i < ca.Length - 1; i++)
+            {
+                char c = ca[i];
+                if (char.IsUpper(c) && (char.IsLower(ca[i + 1]) || char.IsLower(ca[i - 1])))
+                {
+                    sb.Append(' ');
+                }
+                sb.Append(c);
+            }
+            sb.Append(ca[ca.Length - 1]);
+            return sb.ToString();
+
+        }
     }
 }
