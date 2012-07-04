@@ -92,31 +92,7 @@
             <asp:PlaceHolder ID="PropertyTypes" runat="server"></asp:PlaceHolder>
       </div>
     </cc2:Pane>
-
 </asp:Panel>
-<div id="splitButtonContent" style="display: inline; height: 23px; vertical-align: top;">
-    <a href="#" onclick="return false;" id="sbContent" class="sbLink">
-        <img alt="Content that Uses this Template" src="../images/editor/doc.gif" title="Content that Uses this Template"
-            style="vertical-align: top;">
-    </a>
-</div>
-<div id="contentMenu" style="width: 285px">
-    <div class="contentitem">
-            <strong>Content that Uses this Document Type</strong>
-    </div>
-    <div class="contentitem" runat="server" id="uxNoContent">
-            None
-    </div>
-    <asp:Repeater ID="splitButtonContentRepeater" runat="server" OnItemDataBound="splitButtonContentRepeater_ItemDataBound">
-        <ItemTemplate>
-            <div class="contentitem">
-                <asp:Literal runat="server" ID="uxName"></asp:Literal>
-                &nbsp;
-                <asp:PlaceHolder runat="server" ID="uxLink"></asp:PlaceHolder>
-            </div>
-        </ItemTemplate>
-    </asp:Repeater>
-</div>
 <script type="text/javascript">
     $(function () {
         var mailControlId = '<asp:Literal id="theClientId" runat="server"/>';

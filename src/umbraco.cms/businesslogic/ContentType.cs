@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Threading;
-using System.Web;
 using System.Runtime.CompilerServices;
 using System.Linq;
 using umbraco.cms.businesslogic.cache;
@@ -12,9 +9,7 @@ using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
-using Tuple = System.Tuple;
 using umbraco.BusinessLogic;
-using umbraco.DataLayer.SqlHelpers.MySql;
 
 [assembly: InternalsVisibleTo("Umbraco.Test")]
 
@@ -851,30 +846,6 @@ namespace umbraco.cms.businesslogic
 
             // delete CMSNode entrance
             base.delete();
-        }
-
-        public IEnumerable<System.Tuple<int, string>> GetContent()
-        {
-            List<System.Tuple<int, string>> list = new List<System.Tuple<int, string>>();
-            bool mySQL = (SqlHelper.GetType() == typeof(MySqlHelper));
-            string sql = string.Empty;
-            if (!mySQL)
-            {
-                sql = "Select top (100) cmsContent.nodeid, cmsDocument.text from cmsContent join cmsDocument on cmsDocument.nodeId = cmsContent.nodeid where cmsdocument.published = 1 and cmscontent.contentType = " + this.Id;
-            }
-            else
-            {
-                sql = "Select cmsContent.nodeid, cmsDocument.text from cmsContent join cmsDocument on cmsDocument.nodeId = cmsContent.nodeid where cmsdocument.published = 1 and cmscontent.contentType = " + this.Id + " limit 0,100";
-            }
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(sql))
-            {
-                while (dr.Read())
-                {
-                    list.Add(new System.Tuple<int, string>(dr.GetInt("nodeid"), dr.GetString("text")));
-                }
-                dr.Close();
-            }
-            return list;
         }
 
         #endregion

@@ -3,21 +3,6 @@
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="uc1" TagName="ContentTypeControlNew" Src="../controls/ContentTypeControlNew.ascx" %>
-<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
-<asp:Content ContentPlaceHolderID="head" runat="server">
-    <umb:CssInclude ID="CssInclude1" runat="server" FilePath="splitbutton/splitbutton.css"
-        PathNameAlias="UmbracoClient" />
-    <umb:JsInclude ID="JsInclude" runat="server" FilePath="splitbutton/jquery.splitbutton.js"
-        PathNameAlias="UmbracoClient" Priority="1" />
-    <script type="text/javascript">
-        jQuery(document).ready(function () {
-            //content split button
-            jQuery('#sbContent').splitbutton({ menu: '#contentMenu' });
-            jQuery("#splitButtonContent").appendTo("#splitButtonContentPlaceHolder");
-            applySplitButtonOverflow('contentUsedContainer', 'innerContentUsedContainer', 'contentMenu', '.contentitem', 'showMoreContent');
-        });
-    </script>
-</asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">
     <uc1:ContentTypeControlNew ID="ContentTypeControlNew1" runat="server"></uc1:ContentTypeControlNew>
     <cc1:Pane ID="tmpPane" runat="server">

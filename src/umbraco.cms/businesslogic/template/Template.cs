@@ -1,5 +1,4 @@
 using System;
-using System.Data;
 using System.Linq;
 using System.Collections;
 using System.Xml;
@@ -10,10 +9,7 @@ using System.Collections.Generic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.BusinessLogic;
 using umbraco.IO;
-using System.Web;
 using umbraco.cms.businesslogic.web;
-using Tuple = System.Tuple;
-using umbraco.DataLayer.SqlHelpers.MySql;
 
 namespace umbraco.cms.businesslogic.template
 {
@@ -332,35 +328,7 @@ namespace umbraco.cms.businesslogic.template
         {
             return DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id));
         }
-        public IEnumerable<System.Tuple<int, string>> GetContent()
-        {
-            List<System.Tuple<int, string>> list = new List<System.Tuple<int, string>>();
-            bool mySQL = (SqlHelper.GetType() == typeof(MySqlHelper));
-            string sql = string.Empty;
-            if (!mySQL)
-            {
-                sql = "Select top (100) nodeid, text from cmsDocument where published = 1 and templateId = " + this.Id;
-            }
-            else
-            {
-                sql = "Select nodeid, text from cmsDocument where published = 1 and templateId = " + this.Id + " limit 0,100";
-            }
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(sql))
-            {
-                int i = 0;
-                while (dr.Read())
-                {
-                    list.Add(new System.Tuple<int, string>(dr.GetInt("nodeid"), dr.GetString("text")));
-                    i++;
-                    if (i >= 100)
-                    {
-                        break;
-                    }
-                }
-                dr.Close();
-            }
-            return list;
-        }
+
         public static Template MakeNew(string Name, BusinessLogic.User u, Template master)
         {
 

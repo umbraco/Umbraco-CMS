@@ -26,16 +26,6 @@
             });
             applySplitButtonOverflow('mcontainer','innerc','macroMenu','.macro', 'showMoreMacros');
             
-            //document types split button
-            jQuery('#sbDocType').splitbutton({menu:'#docTypeMenu'});
-            jQuery("#splitButtonDocType").appendTo("#splitButtonDocTypePlaceHolder");
-            applySplitButtonOverflow('docTypesReferencingContainer','innerdocTypesReferencingContainer','docTypeMenu','.documenttype', 'showMoreDocTypes');
-
-            //content split button
-            jQuery('#sbContent').splitbutton({menu:'#contentMenu'});
-            jQuery("#splitButtonContent").appendTo("#splitButtonContentPlaceHolder");
-            applySplitButtonOverflow('contentUsedContainer','innerContentUsedContainer','contentMenu','.contentitem', 'showMoreContent');
-
             //razor macro split button
             jQuery('#sb').splitbutton({menu:'#codeTemplateMenu'});
             jQuery("#splitButton").appendTo("#splitButtonPlaceHolder");
@@ -222,53 +212,6 @@
                 <div class="macro" rel="<%# DataBinder.Eval(Container, "DataItem.macroAlias")%>"
                     params="<%#  DoesMacroHaveSettings(DataBinder.Eval(Container, "DataItem.id").ToString()) %>">
                     <%# DataBinder.Eval(Container, "DataItem.macroName")%>
-                </div>
-            </ItemTemplate>
-        </asp:Repeater>
-    </div>
-    <div id="splitButtonDocType" style="display: inline; height: 23px; vertical-align: top;">
-        <a href="#" onclick="return false;" id="sbDocType" class="sbLink">
-            <img alt="Document Types that Use this Template" src="../images/editor/documentType.gif" title="Document Types that Use this Template"
-                style="vertical-align: top;">
-        </a>
-    </div>
-    <div id="docTypeMenu" style="width: 285px">
-      <div class="documenttype">
-              <strong>Document Types that Use this Template</strong>
-        </div>
-        <div class="documenttype" runat="server" id="uxNoDocumentTypes">
-              None
-        </div>
-        <asp:Repeater ID="splitButtonDocumentTypesRepeater" runat="server">
-            <ItemTemplate>
-                <div class="documenttype">
-                    <%# DataBinder.Eval(Container, "DataItem.Text")%>
-                    &nbsp;
-                    <%#umbraco.cms.helpers.DeepLink.GetAnchor(umbraco.cms.helpers.DeepLinkType.DocumentType, string.Format("{0}",DataBinder.Eval(Container,"DataItem.Id")), true)%>
-                </div>
-            </ItemTemplate>
-        </asp:Repeater>
-    </div>
-
-     <div id="splitButtonContent" style="display: inline; height: 23px; vertical-align: top;">
-        <a href="#" onclick="return false;" id="sbContent" class="sbLink">
-            <img alt="Content that Uses this Template" src="../images/editor/doc.gif" title="Content that Uses this Template"
-                style="vertical-align: top;">
-        </a>
-    </div>
-    <div id="contentMenu" style="width: 285px">
-      <div class="contentitem">
-              <strong>Content that Uses this Template</strong>
-        </div>
-        <div class="contentitem" runat="server" id="uxNoContent">
-              None
-        </div>
-        <asp:Repeater ID="splitButtonContentRepeater" runat="server" OnItemDataBound="splitButtonContentRepeater_ItemDataBound">
-            <ItemTemplate>
-                <div class="contentitem">
-                    <asp:Literal runat="server" ID="uxName"></asp:Literal>
-                    &nbsp;
-                    <asp:PlaceHolder runat="server" ID="uxLink"></asp:PlaceHolder>
                 </div>
             </ItemTemplate>
         </asp:Repeater>
