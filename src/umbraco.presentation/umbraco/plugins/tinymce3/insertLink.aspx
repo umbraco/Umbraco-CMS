@@ -16,7 +16,7 @@
 	
 	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
 	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="tinymce3/tiny_mce_popup.js" PathNameAlias="UmbracoClient" Priority="100" />
-	<umb:JsInclude ID="JsInclude3" runat="server" FilePath="tinymce3/plugins/advlink/js/advlink.js" PathNameAlias="UmbracoClient" Priority="101" />
+	<umb:JsInclude ID="JsInclude3" runat="server" FilePath="tinymce3/plugins/umbracolink/js/umbracolink.js" PathNameAlias="UmbracoClient" Priority="101" />
 	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="tinymce3/utils/form_utils.js" PathNameAlias="UmbracoClient" Priority="102" />
 
    

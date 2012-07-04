@@ -10,7 +10,7 @@
  
 IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
  
-    Database version: 4.1.0.3
+    Database version: 4.8.0.4
     
     Please increment this version number if ANY change is made to this script,
     so compatibility with scripts for other database systems can be verified easily.
@@ -727,7 +727,7 @@ alter TABLE cmsContentType add description nvarchar(1500) NULL
 alter TABLE cmsContentType add masterContentType int NULL
 ;
 insert into cmsDataTypePreValues (id, dataTypeNodeId, value, sortorder, alias) values 
-(3,-87,',code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,mcecharmap,|1|1,2,3,|0|500,400|1049,|', 0, ''),
+(3,-87,',code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|', 0, ''),
 (4,1041,'default', 0, 'group')
 ;
 

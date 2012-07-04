@@ -83,6 +83,7 @@ namespace umbraco.editorControls.tinyMCE3
 
                     if (configSettings.Length > 6 && configSettings[6] != "")
                         _showLabel = bool.Parse(configSettings[6]);
+
                     if (configSettings.Length > 7 && configSettings[7] != "")
                         m_maxImageWidth = int.Parse(configSettings[7]);
 
@@ -125,6 +126,13 @@ namespace umbraco.editorControls.tinyMCE3
                         if (plugin.UseOnFrontend || (!onFront && !plugin.UseOnFrontend))
                             _plugins += "," + plugin.Name;
                     }
+
+                    // add the umbraco overrides to the end
+                    // NB: It is !!REALLY IMPORTANT!! that these plugins are added at the end
+                    // as they make runtime modifications to default plugins, so require
+                    // those plugins to be loaded first.
+                    _plugins += ",umbracopaste,umbracolink,umbracocontextmenu";
+
                     if (_plugins.StartsWith(","))
                         _plugins = _plugins.Substring(1, _plugins.Length - 1);
                     if (_plugins.EndsWith(","))

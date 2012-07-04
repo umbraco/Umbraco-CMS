@@ -154,6 +154,7 @@ namespace umbraco.editorControls.tinymce
                             _stylesheets = config[5];
                         if (config.Length > 6 && config[6] != "")
                             _showLabel.Checked = bool.Parse(config[6]);
+
                         if (config.Length > 7 && config[7] != "")
                             _maxImageWidth.Text = config[7];
                         else
