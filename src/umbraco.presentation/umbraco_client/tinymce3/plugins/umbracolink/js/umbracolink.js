@@ -28,28 +28,28 @@ function init() {
 	var action = "insert";
 	var html;
 
-	/* UMBRACO SPECIFIC
+	/* UMBRACO SPECIFIC */
 	
-	document.getElementById('hrefbrowsercontainer').innerHTML = getBrowserHTML('hrefbrowser','href','file','advlink');
-	document.getElementById('popupurlbrowsercontainer').innerHTML = getBrowserHTML('popupurlbrowser','popupurl','file','advlink');
+	//document.getElementById('hrefbrowsercontainer').innerHTML = getBrowserHTML('hrefbrowser','href','file','advlink');
+	//document.getElementById('popupurlbrowsercontainer').innerHTML = getBrowserHTML('popupurlbrowser','popupurl','file','advlink');
 	document.getElementById('targetlistcontainer').innerHTML = getTargetListHTML('targetlist','target');
 
 	// Link list
-	html = getLinkListHTML('linklisthref','href');
-	if (html == "")
-		document.getElementById("linklisthrefrow").style.display = 'none';
-	else
-		document.getElementById("linklisthrefcontainer").innerHTML = html;
+//	html = getLinkListHTML('linklisthref','href');
+//	if (html == "")
+//		document.getElementById("linklisthrefrow").style.display = 'none';
+//	else
+//		document.getElementById("linklisthrefcontainer").innerHTML = html;
 
 	// Anchor list
 	html = getAnchorListHTML('anchorlist','href');
 	if (html == "")
 		document.getElementById("anchorlistrow").style.display = 'none';
 	else
-		document.getElementById("anchorlistcontainer").innerHTML = html;
+	    document.getElementById("anchorlistcontainer").innerHTML = html;
 
 	// Resize some elements
-	if (isVisible('hrefbrowser'))
+	/*if (isVisible('hrefbrowser'))
 		document.getElementById('href').style.width = '260px';
 
 	if (isVisible('popupurlbrowser'))
@@ -72,6 +72,9 @@ function init() {
 		
 	* EO UMBRACO SPECIFIC 
 	*/
+
+	if (elm != null && elm.nodeName == "A")
+	    action = "update";
 
 	if (action == "update") {
 		/* UMBRACO SPECIFIC: check local links */
