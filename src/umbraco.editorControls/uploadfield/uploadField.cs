@@ -268,7 +268,7 @@ namespace umbraco.editorControls
                 try
                 {
                     hasThumb = File.Exists(IOHelper.MapPath(IOHelper.FindFile(fileNameThumb)));
-                    // 4.8.0 added support for png thumbnails
+                    // 4.8.0 added support for png thumbnails (but for legacy it might have been jpg - hence the check before)
                     if (!hasThumb && (ext == "gif" || ext == "png"))
                     {
                         fileNameThumb = _text.Replace("." + ext, "_thumb.png");
