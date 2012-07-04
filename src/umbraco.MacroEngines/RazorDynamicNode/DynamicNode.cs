@@ -224,15 +224,18 @@ namespace umbraco.MacroEngines
                 throw new NullReferenceException("DynamicNode wasn't initialized with an underlying NodeFactory.Node");
             }
         }
-
-        
+                
         public DynamicNodeList Search(string term, bool useWildCards = true, string searchProvider = null)
         {
             var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
             if(!string.IsNullOrEmpty(searchProvider))
                 searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
-            
-            string luceneQuery = "+parentID:" + this.Id.ToString() + " +" + term.MultipleCharacterWildcard().Value;
+
+            var t = term.Escape().Value;
+            if (useWildCards)
+                t = term.MultipleCharacterWildcard().Value;
+
+            string luceneQuery = "+parentID:" + this.Id.ToString() + " +" + t;
             var crit = searcher.CreateSearchCriteria().RawQuery(luceneQuery);
 
             return Search(crit, searcher);
