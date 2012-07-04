@@ -67,16 +67,8 @@ namespace umbraco.settings
             templateList.Items.Clear();
             templateList.Items.AddRange(templates.ConvertAll(item =>
             {
-                string anchor = DeepLink.GetAnchor(DeepLinkType.Template, item.Id.ToString(), true);
                 ListItem li = new ListItem();
-                if (!string.IsNullOrEmpty(anchor))
-                {
-                    li.Text = string.Format("{0} {1}", item.Name, anchor);
-                }
-                else
-                {
-                    li.Text = item.Name;
-                }
+                li.Text = item.Name;
                 li.Value = item.Id.ToString();
                 li.Selected = item.Selected;
                 return li;

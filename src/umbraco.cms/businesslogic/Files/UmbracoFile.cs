@@ -66,7 +66,7 @@ namespace umbraco.cms.businesslogic.Files
             _fileName = fi.Name;
             _length = fi.Length;
             _directoryName = fi.DirectoryName;
-            _extension = fi.Extension.Substring(1);
+            _extension = fi.Extension.Substring(1).ToLowerInvariant();
             _localName =
                 "/" + fi.FullName.Substring(IO.IOHelper.MapPath(IO.SystemDirectories.Root).Length).Replace(
                     Path.DirectorySeparatorChar.ToString(), "/");
@@ -156,8 +156,8 @@ namespace umbraco.cms.businesslogic.Files
             fs.Close();
 
             string fileNameThumb = String.IsNullOrEmpty(fileNameAddition) ?
-                string.Format("{0}_UMBRACOSYSTHUMBNAIL.{1}", _fullFilePath.Substring(0, _fullFilePath.LastIndexOf(".")), _extension) :
-                string.Format("{0}_{1}.{2}", _fullFilePath.Substring(0, _fullFilePath.LastIndexOf(".")), fileNameAddition, _extension);
+                string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", _fullFilePath.Substring(0, _fullFilePath.LastIndexOf("."))) :
+                string.Format("{0}_{1}.jpg", _fullFilePath.Substring(0, _fullFilePath.LastIndexOf(".")), fileNameAddition);
             generateThumbnail(
                 image,
                 maxWidthHeight,
@@ -215,13 +215,13 @@ namespace umbraco.cms.businesslogic.Files
             g.DrawImage(image, rect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
 
             // Copy metadata
-            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
+            var imageEncoders = ImageCodecInfo.GetImageEncoders();
             ImageCodecInfo codec = null;
-            for (int i = 0; i < codecs.Length; i++)
-            {
-                if (codecs[i].MimeType.Equals("image/jpeg"))
-                    codec = codecs[i];
-            }
+            if (Extension == "png" || Extension == ".gif")
+                codec = imageEncoders.Single(t => t.MimeType.Equals("image/png"));
+            else
+                codec = imageEncoders.Single(t => t.MimeType.Equals("image/jpeg"));
+
 
             // Set compresion ratio to 90%
             var ep = new EncoderParameters();

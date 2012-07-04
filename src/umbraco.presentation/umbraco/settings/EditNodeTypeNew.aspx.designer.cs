@@ -13,24 +13,6 @@ namespace umbraco.settings {
     public partial class EditContentTypeNew {
         
         /// <summary>
-        /// CssInclude1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.CssInclude CssInclude1;
-        
-        /// <summary>
-        /// JsInclude control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude;
-        
-        /// <summary>
         /// tmpPane control.
         /// </summary>
         /// <remarks>
