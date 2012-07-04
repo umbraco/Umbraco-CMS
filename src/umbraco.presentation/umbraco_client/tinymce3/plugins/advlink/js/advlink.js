@@ -28,8 +28,6 @@ function init() {
 	var action = "insert";
 	var html;
 
-	/* UMBRACO SPECIFIC
-	
 	document.getElementById('hrefbrowsercontainer').innerHTML = getBrowserHTML('hrefbrowser','href','file','advlink');
 	document.getElementById('popupurlbrowsercontainer').innerHTML = getBrowserHTML('popupurlbrowser','popupurl','file','advlink');
 	document.getElementById('targetlistcontainer').innerHTML = getTargetListHTML('targetlist','target');
@@ -69,21 +67,14 @@ function init() {
 	formObj.insert.value = tinyMCEPopup.getLang(action, 'Insert', true); 
 
 	setPopupControlsDisabled(true);
-		
-	* EO UMBRACO SPECIFIC 
-	*/
 
 	if (action == "update") {
-		/* UMBRACO SPECIFIC: check local links */
-        var href = validateUmbracoLink(inst.dom.getAttrib(elm, 'href'));
+		var href = inst.dom.getAttrib(elm, 'href');
 		var onclick = inst.dom.getAttrib(elm, 'onclick');
 
 		// Setup form data
 		setFormValue('href', href);
 		setFormValue('title', inst.dom.getAttrib(elm, 'title'));
-		
-	/* UMBRACO SPECIFIC
-		
 		setFormValue('id', inst.dom.getAttrib(elm, 'id'));
 		setFormValue('style', inst.dom.getAttrib(elm, "style"));
 		setFormValue('rel', inst.dom.getAttrib(elm, 'rel'));
@@ -109,8 +100,6 @@ function init() {
 		setFormValue('onkeyup', inst.dom.getAttrib(elm, 'onkeyup'));
 		setFormValue('target', inst.dom.getAttrib(elm, 'target'));
 		setFormValue('classes', inst.dom.getAttrib(elm, 'class'));
-		
-		
 
 		// Parse onclick data
 		if (onclick != null && onclick.indexOf('window.open') != -1)
@@ -123,31 +112,21 @@ function init() {
 		selectByValue(formObj, 'rel', inst.dom.getAttrib(elm, 'rel'));
 		selectByValue(formObj, 'rev', inst.dom.getAttrib(elm, 'rev'));
 		selectByValue(formObj, 'linklisthref', href);
-		*/
+
 		if (href.charAt(0) == '#')
 			selectByValue(formObj, 'anchorlist', href);
-		/*
+
 		addClassesToList('classlist', 'advlink_styles');
 
 		selectByValue(formObj, 'classlist', inst.dom.getAttrib(elm, 'class'), true);
-		*/
 		selectByValue(formObj, 'targetlist', inst.dom.getAttrib(elm, 'target'), true);
-		/*
 	} else
 		addClassesToList('classlist', 'advlink_styles');
-	*/
-	}
-	/*	
-	* EO UMBRACO SPECIFIC
-	*/	
 }
 
 function checkPrefix(n) {
-	/* UMBRACO SPECIFIC
 	if (n.value && Validator.isEmail(n) && !/^\s*mailto:/i.test(n.value) && confirm(tinyMCEPopup.getLang('advlink_dlg.is_email')))
 		n.value = 'mailto:' + n.value;
-	* EO UMBRACO SPECIFIC
-	*/	
 
 	if (/^\s*www\./i.test(n.value) && confirm(tinyMCEPopup.getLang('advlink_dlg.is_external')))
 		n.value = 'http://' + n.value;
@@ -416,12 +395,6 @@ function getAnchorListHTML(id, target) {
 function insertAction() {
 	var inst = tinyMCEPopup.editor;
 	var elm, elementArray, i;
-	
-	/* UMBRACO SPECIFIC - if there's a locallink, we'll grap that */
-    if (document.forms[0].localUrl.value) {
-        document.forms[0].href.value = document.forms[0].localUrl.value;
-    }
-	/* EO UMBRACO SPECIFIC */
 
 	elm = inst.selection.getNode();
 	checkPrefix(document.forms[0].href);

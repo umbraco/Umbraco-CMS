@@ -79,6 +79,7 @@
 
     <Message Text="$(OriginalFileName)" Importance="high" />
     <Message Text="$(ModifiedFileName)" Importance="high" />
+    <Message Text="$(OutputFileName)" Importance="high" />
 
     <Copy SourceFiles="$(ModifiedFileName)"
       DestinationFiles="$(OutputFileName)"

@@ -27,7 +27,7 @@
 		 * @param {string} url Absolute URL to where the plugin is located.
 		 */
 		init : function(ed) {
-			var t = this, showMenu, contextmenuNeverUseNative, realCtrlKey;
+			var t = this, showMenu, contextmenuNeverUseNative, realCtrlKey, hideMenu;
 
 			t.editor = ed;
 
@@ -42,6 +42,10 @@
 			 */
 			t.onContextMenu = new tinymce.util.Dispatcher(this);
 
+			hideMenu = function(e) {
+				hide(ed, e);
+			};
+
 			showMenu = ed.onContextMenu.add(function(ed, e) {
 				// Block TinyMCE menu on ctrlKey and work around Safari issue
 				if ((realCtrlKey !== 0 ? realCtrlKey : e.ctrlKey) && !contextmenuNeverUseNative)
@@ -54,13 +58,11 @@
 					ed.selection.select(e.target);
 
 				t._getMenu(ed).showMenu(e.clientX || e.pageX, e.clientY || e.pageY);
-				Event.add(ed.getDoc(), 'click', function(e) {
-					hide(ed, e);
-				});
+				Event.add(ed.getDoc(), 'click', hideMenu);
 
 				ed.nodeChanged();
 			});
-
+			
 			ed.onRemove.add(function() {
 				if (t._menu)
 					t._menu.removeAll();
@@ -78,8 +80,8 @@
 
 				if (t._menu) {
 					t._menu.removeAll();
-					t._menu.destroy();
-					Event.remove(ed.getDoc(), 'click', hide);
+					 t._menu.destroy();
+					Event.remove(ed.getDoc(), 'click', hideMenu);
 					t._menu = null;
 				}
 			};
@@ -128,25 +130,21 @@
 				keyboard_focus: true
 			});
 
-            t._menu = m;
+			t._menu = m;
 
-			/* UMBRACO SPECIFIC: Load Keys + Replace title of menuitems with Umbraco-specific key */
-            var keys = UmbClientMgr.uiKeys();
-
-            m.add({ title: keys['defaultdialogs_cut'], icon: 'cut', cmd: 'Cut' }).setDisabled(col);
-            m.add({ title: keys['general_copy'], icon: 'copy', cmd: 'Copy' }).setDisabled(col);
-            m.add({ title: keys['defaultdialogs_paste'], icon: 'paste', cmd: 'Paste' });
+			m.add({title : 'advanced.cut_desc', icon : 'cut', cmd : 'Cut'}).setDisabled(col);
+			m.add({title : 'advanced.copy_desc', icon : 'copy', cmd : 'Copy'}).setDisabled(col);
+			m.add({title : 'advanced.paste_desc', icon : 'paste', cmd : 'Paste'});
 
 			if ((el.nodeName == 'A' && !ed.dom.getAttrib(el, 'name')) || !col) {
 				m.addSeparator();
-				m.add({ title: keys['defaultdialogs_insertlink'], icon: 'link', cmd: ed.plugins.advlink ? 'mceAdvLink' : 'mceLink', ui: true });
-				m.add({ title: keys['relatedlinks_removeLink'], icon: 'unlink', cmd: 'UnLink' });
+				m.add({title : 'advanced.link_desc', icon : 'link', cmd : ed.plugins.advlink ? 'mceAdvLink' : 'mceLink', ui : true});
+				m.add({title : 'advanced.unlink_desc', icon : 'unlink', cmd : 'UnLink'});
 			}
 
 			m.addSeparator();
-			m.add({ title: keys['defaultdialogs_insertimage'], icon: 'image', cmd: 'mceUmbimage', ui: true });
-			/* EO UMBRACO SPECIFIC */
-			
+			m.add({title : 'advanced.image_desc', icon : 'image', cmd : ed.plugins.advimage ? 'mceAdvImage' : 'mceImage', ui : true});
+
 			m.addSeparator();
 			am = m.addMenu({title : 'contextmenu.align'});
 			am.add({title : 'contextmenu.left', icon : 'justifyleft', cmd : 'JustifyLeft'});

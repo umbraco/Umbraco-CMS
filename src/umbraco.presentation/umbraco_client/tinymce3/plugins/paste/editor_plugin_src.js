@@ -354,16 +354,6 @@
 				});
 			}
 			
-			/* UMBRACO SPECIFIC, remove all headers that's not in the style list */
-			var umbracoAllowedStyles = ed.getParam('theme_umbraco_styles');
-			for (var i = 1; i < 7; i++) {
-				if (umbracoAllowedStyles.indexOf("h" + i) == -1) {
-					h = h.replace(new RegExp('<h' + i + '>', 'gi'), '<p><b>');
-					h = h.replace(new RegExp('</h' + i + '>', 'gi'), '</b></p>');
-				}
-			}
-			/* EO UMBRACO SPECIFIC */
-			
 			if (ed.settings.paste_enable_default_filters == false) {
 				return;
 			}

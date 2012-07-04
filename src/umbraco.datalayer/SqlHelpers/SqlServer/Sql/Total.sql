@@ -10,7 +10,7 @@
  
 IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
  
-    Database version: 4.8.0.0
+    Database version: 4.8.0.1
     
     Please increment this version number if ANY change is made to this script,
     so compatibility with scripts for other database systems can be verified easily.
@@ -880,7 +880,7 @@ ALTER TABLE umbracoLog ALTER COLUMN logComment NVARCHAR(4000) NULL
 ;
 SET IDENTITY_INSERT [cmsDataTypePreValues] ON 
 insert into cmsDataTypePreValues (id, dataTypeNodeId, [value], sortorder, alias)
-values (3,-87,',code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,mcecharmap,' + char(124) + '1' + char(124) + '1,2,3,' + char(124) + '0' + char(124) + '500,400' + char(124) + '1049,' + char(124) + '', 0, '')
+values (3,-87,',code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,mcecharmap,' + char(124) + '1' + char(124) + '1,2,3,' + char(124) + '0' + char(124) + '500,400' + char(124) + '1049,' + char(124) + 'true' + char(124) + '', 0, '')
 
 insert into cmsDataTypePreValues (id, dataTypeNodeId, [value], sortorder, alias)
 values (4,1041,'default', 0, 'group')

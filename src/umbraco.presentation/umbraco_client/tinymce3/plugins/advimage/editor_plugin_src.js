@@ -18,10 +18,9 @@
 					return;
 
 				ed.windowManager.open({
-					/* UMBRACO SPECIFIC: Load Umbraco modal window */
-					file: tinyMCE.activeEditor.getParam('umbraco_path') + '/plugins/tinymce3/insertImage.aspx',
-					width: 575 + ed.getLang('umbracoimg.delta_width', 0),
-                    height: 505 + ed.getLang('umbracoimg.delta_height', 0),
+					file : url + '/image.htm',
+					width : 480 + parseInt(ed.getLang('advimage.delta_width', 0)),
+					height : 385 + parseInt(ed.getLang('advimage.delta_height', 0)),
 					inline : 1
 				}, {
 					plugin_url : url

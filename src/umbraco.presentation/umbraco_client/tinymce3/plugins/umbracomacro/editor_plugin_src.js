@@ -76,12 +76,8 @@
 
                 var macroElement = ed.dom.getParent(ed.selection.getStart(), 'div.umbMacroHolder');
 
-                if (macroElement) {
-
-                    // mark button if it's a macro
-                    cm.setActive('umbracomacro', ed.dom.hasClass(currentSelection, 'umbMacroHolder') || ed.dom.hasClass(macroElement, 'umbMacroHolder'));
-                }
-
+                // mark button if it's a macro
+                cm.setActive('umbracomacro', macroElement && ed.dom.hasClass(macroElement, 'umbMacroHolder'));
 
             });
         },
