@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using System.Web;
 using umbraco.BusinessLogic;
+using umbraco.cms.businesslogic.Files;
 using umbraco.IO;
 
 namespace umbraco.editorControls.tinymce
@@ -164,12 +165,13 @@ namespace umbraco.editorControls.tinymce
                     orgSrc = SystemDirectories.Media + orgSrc.Substring(orgSrc.IndexOf(resolvedMedia) + resolvedMedia.Length); //, orgSrc.Length - orgSrc.IndexOf(String.Format("/media/", SystemDirectories.Media)));
 
                 }
-                string ext = orgSrc.Substring(orgSrc.LastIndexOf(".") + 1, orgSrc.Length - orgSrc.LastIndexOf(".") - 1);
-                newSrc = orgSrc.Replace("." + ext, "_" + newWidth.ToString() + "x" + newHeight.ToString() + ".jpg");
 
                 string fullSrc = IOHelper.MapPath(orgSrc);
-                string fullSrcNew = IOHelper.MapPath(newSrc);
 
+                UmbracoFile uf = new UmbracoFile(fullSrc);
+                newSrc = uf.Resize(newWidth, newHeight);
+
+                /*
                 // Load original image
                 Image image = Image.FromFile(fullSrc);
 
@@ -200,6 +202,7 @@ namespace umbraco.editorControls.tinymce
 
                 // Save the new image
                 bp.Save(fullSrcNew, codec, ep);
+                 * */
             }
 
             // return the new width and height
