@@ -93,11 +93,11 @@
       <WebPiFilesToZip Include="$(WebPiFolder)**\*.*" />
     </ItemGroup>
     
-    <MSBuild.Community.Tasks.Zip Files="@(WebPiFilesToZip)" ZipFileName="$(BuildZipFileNameWebPi)" WorkingDirectory="$(WebPiFolder)" />
+    <MSBuild.Community.Tasks.Zip Files="@(WebPiFilesToZip)" ZipFileName="$(BuildZipFileNameWebPi)" WorkingDirectory="$(WebPiFolder)"  />
 
   </Target>
   
-  <Target Name="ZipWebApp" DependsOnTargets="CopySqlCe" >
+  <Target Name="ZipWebApp" DependsOnTargets="CopyLibraries" >
     
     <CreateItem Include="$(WebBuildFolderWildcard)" Exclude="$(WebBuildFolderExclusionWildcard)">
       <Output TaskParameter="Include" ItemName="WebFilesToZip" />
@@ -112,7 +112,7 @@
     <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
   </Target>
 
-  <Target Name="CopySqlCe" DependsOnTargets="OffsetTimestamps" >
+  <Target Name="CopyLibraries" DependsOnTargets="OffsetTimestamps" >
 
     <!-- Copy SQL CE -->
     <ItemGroup>
@@ -125,6 +125,20 @@
         SkipUnchangedFiles="false" />
     <Copy SourceFiles="@(SQLCE4Files)"
         DestinationFiles="@(SQLCE4Files->'$(WebAppFolder)bin\%(RecursiveDir)%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false" />
+
+    <!-- Copy WebPages -->
+    <ItemGroup>
+      <WebPageFiles Include="..\lib\WebPages\*.dll" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(WebPageFiles)"
+        DestinationFiles="@(WebPageFiles->'$(SolutionBinFolder)%(RecursiveDir)%(Filename)%(Extension)')"
+        OverwriteReadOnlyFiles="true"
+        SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(WebPageFiles)"
+        DestinationFiles="@(WebPageFiles->'$(WebAppFolder)bin\%(RecursiveDir)%(Filename)%(Extension)')"
         OverwriteReadOnlyFiles="true"
         SkipUnchangedFiles="false" />
     
