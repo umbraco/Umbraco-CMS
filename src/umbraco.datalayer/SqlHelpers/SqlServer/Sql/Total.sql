@@ -10,7 +10,7 @@
  
 IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
  
-    Database version: 4.8.0.1
+    Database version: 4.8.0.2
     
     Please increment this version number if ANY change is made to this script,
     so compatibility with scripts for other database systems can be verified easily.
@@ -551,9 +551,9 @@ CREATE TABLE [umbracoUserLogins]
 ;
 CREATE CLUSTERED INDEX umbracoUserLogins_Index ON umbracoUserLogins (contextID)
 ; 
-ALTER TABLE [umbracoAppTree] ADD 
-CONSTRAINT [FK_umbracoAppTree_umbracoApp] FOREIGN KEY ([appAlias]) REFERENCES [umbracoApp] ([appAlias]) 
-; 
+--ALTER TABLE [umbracoAppTree] ADD 
+--CONSTRAINT [FK_umbracoAppTree_umbracoApp] FOREIGN KEY ([appAlias]) REFERENCES [umbracoApp] ([appAlias]) 
+--; 
 ALTER TABLE [cmsPropertyData] ADD 
 CONSTRAINT [FK_cmsPropertyData_umbracoNode] FOREIGN KEY ([contentNodeId]) REFERENCES [umbracoNode] ([id]) 
 ; 
@@ -591,8 +591,7 @@ CONSTRAINT [FK_cmsPropertyType_cmsTab] FOREIGN KEY ([tabId]) REFERENCES [cmsTab]
 ALTER TABLE [cmsContent] ADD 
 CONSTRAINT [FK_cmsContent_umbracoNode] FOREIGN KEY ([nodeId]) REFERENCES [umbracoNode] ([id]) 
 ; 
-ALTER TABLE [umbracoUser2app] ADD 
-CONSTRAINT [FK_umbracoUser2app_umbracoApp] FOREIGN KEY ([app]) REFERENCES [umbracoApp] ([appAlias]), 
+ALTER TABLE [umbracoUser2app] ADD  
 CONSTRAINT [FK_umbracoUser2app_umbracoUser] FOREIGN KEY ([user]) REFERENCES [umbracoUser] ([id]) 
 ; 
  
@@ -604,10 +603,10 @@ ALTER TABLE [cmsContent] DROP CONSTRAINT [FK_cmsContent_umbracoNode]
 ; 
 ALTER TABLE [cmsMacroProperty] DROP CONSTRAINT [FK_umbracoMacroProperty_umbracoMacroPropertyType] 
 ; 
-ALTER TABLE [umbracoAppTree] DROP CONSTRAINT [FK_umbracoAppTree_umbracoApp] 
-; 
-ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoApp] 
-; 
+--ALTER TABLE [umbracoAppTree] DROP CONSTRAINT [FK_umbracoAppTree_umbracoApp] 
+--; 
+--ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoApp] 
+--; 
 ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser] 
 ; 
 ALTER TABLE [cmsPropertyData] DROP CONSTRAINT [FK_cmsPropertyData_umbracoNode] 
@@ -685,34 +684,34 @@ INSERT INTO [umbracoUser2app] ([user], [app]) VALUES (0, N'member')
 INSERT INTO [umbracoUser2app] ([user], [app]) VALUES (0, N'settings') 
 INSERT INTO [umbracoUser2app] ([user], [app]) VALUES (0, N'users') 
 
-INSERT INTO [umbracoApp] ([appAlias], [sortOrder], [appIcon], [appName], [appInitWithTreeAlias]) VALUES (N'content', 0, N'.traycontent', N'Indhold', N'content') 
-INSERT INTO [umbracoApp] ([appAlias], [sortOrder], [appIcon], [appName], [appInitWithTreeAlias]) VALUES (N'developer', 7, N'.traydeveloper', N'Developer', NULL) 
-INSERT INTO [umbracoApp] ([appAlias], [sortOrder], [appIcon], [appName], [appInitWithTreeAlias]) VALUES (N'media', 1, N'.traymedia', N'Mediearkiv', NULL) 
-INSERT INTO [umbracoApp] ([appAlias], [sortOrder], [appIcon], [appName], [appInitWithTreeAlias]) VALUES (N'member', 8, N'.traymember', N'Medlemmer', NULL) 
-INSERT INTO [umbracoApp] ([appAlias], [sortOrder], [appIcon], [appName], [appInitWithTreeAlias]) VALUES (N'settings', 6, N'.traysettings', N'Indstillinger', NULL) 
-INSERT INTO [umbracoApp] ([appAlias], [sortOrder], [appIcon], [appName], [appInitWithTreeAlias]) VALUES (N'users', 5, N'.trayusers', N'Brugere', NULL)
+--INSERT INTO [umbracoApp] ([appAlias], [sortOrder], [appIcon], [appName], [appInitWithTreeAlias]) VALUES (N'content', 0, N'.traycontent', N'Indhold', N'content') 
+--INSERT INTO [umbracoApp] ([appAlias], [sortOrder], [appIcon], [appName], [appInitWithTreeAlias]) VALUES (N'developer', 7, N'.traydeveloper', N'Developer', NULL) 
+--INSERT INTO [umbracoApp] ([appAlias], [sortOrder], [appIcon], [appName], [appInitWithTreeAlias]) VALUES (N'media', 1, N'.traymedia', N'Mediearkiv', NULL) 
+--INSERT INTO [umbracoApp] ([appAlias], [sortOrder], [appIcon], [appName], [appInitWithTreeAlias]) VALUES (N'member', 8, N'.traymember', N'Medlemmer', NULL) 
+--INSERT INTO [umbracoApp] ([appAlias], [sortOrder], [appIcon], [appName], [appInitWithTreeAlias]) VALUES (N'settings', 6, N'.traysettings', N'Indstillinger', NULL) 
+--INSERT INTO [umbracoApp] ([appAlias], [sortOrder], [appIcon], [appName], [appInitWithTreeAlias]) VALUES (N'users', 5, N'.trayusers', N'Brugere', NULL)
  
  
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'content', N'content', 1, 1, 0, N'Indhold', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadContent') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'cacheBrowser', 0, 1, 0, N'CacheBrowser', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadCache') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'CacheItem', 0, 0, 0, N'Cachebrowser', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadCacheItem') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'datatype', 0, 1, 1, N'Datatyper', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadDataTypes') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'macros', 0, 1, 2, N'Macros', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadMacros') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'xslt', 0, 1, 5, N'XSLT Files', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadXslt') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'content', N'content', 1, 1, 0, N'Indhold', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadContent') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'cacheBrowser', 0, 1, 0, N'CacheBrowser', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadCache') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'CacheItem', 0, 0, 0, N'Cachebrowser', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadCacheItem') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'datatype', 0, 1, 1, N'Datatyper', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadDataTypes') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'macros', 0, 1, 2, N'Macros', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadMacros') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'xslt', 0, 1, 5, N'XSLT Files', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadXslt') 
 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'media', N'media', 0, 1, 0, N'Medier', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadMedia') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'member', N'member', 0, 1, 0, N'Medlemmer', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadMembers') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'member', N'memberGroup', 0, 1, 1, N'MemberGroups', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadMemberGroups') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'member', N'memberType', 0, 1, 2, N'Medlemstyper', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadMemberTypes') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType], [action]) VALUES (N'settings', N'dictionary', 0, 1, 3, N'Dictionary', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadDictionary', N'openDictionary()') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'settings', N'languages', 0, 1, 4, N'Languages', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadLanguages') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'settings', N'mediaTypes', 0, 1, 5, N'Medietyper', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadMediaTypes') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'settings', N'nodeTypes', 0, 1, 6, N'Dokumenttyper', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadNodeTypes') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'settings', N'stylesheetProperty', 0, 0, 0, N'Stylesheet Property', N'', N'', N'umbraco', N'loadStylesheetProperty') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'settings', N'stylesheets', 0, 1, 0, N'Stylesheets', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadStylesheets') 
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'settings', N'templates', 0, 1, 1, N'Templates', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadTemplates')
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'media', N'media', 0, 1, 0, N'Medier', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadMedia') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'member', N'member', 0, 1, 0, N'Medlemmer', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadMembers') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'member', N'memberGroup', 0, 1, 1, N'MemberGroups', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadMemberGroups') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'member', N'memberType', 0, 1, 2, N'Medlemstyper', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadMemberTypes') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType], [action]) VALUES (N'settings', N'dictionary', 0, 1, 3, N'Dictionary', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadDictionary', N'openDictionary()') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'settings', N'languages', 0, 1, 4, N'Languages', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadLanguages') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'settings', N'mediaTypes', 0, 1, 5, N'Medietyper', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadMediaTypes') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'settings', N'nodeTypes', 0, 1, 6, N'Dokumenttyper', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadNodeTypes') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'settings', N'stylesheetProperty', 0, 0, 0, N'Stylesheet Property', N'', N'', N'umbraco', N'loadStylesheetProperty') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'settings', N'stylesheets', 0, 1, 0, N'Stylesheets', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadStylesheets') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'settings', N'templates', 0, 1, 1, N'Templates', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadTemplates')
  
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'users', N'users', 0, 1, 0, N'Brugere', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadUsers') 
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'users', N'users', 0, 1, 0, N'Brugere', N'.sprTreeFolder', N'.sprTreeFolder_o', N'umbraco', N'loadUsers') 
 
 SET IDENTITY_INSERT [cmsMacroPropertyType] ON 
 INSERT INTO [cmsMacroPropertyType] ([id], [macroPropertyTypeAlias], [macroPropertyTypeRenderAssembly], [macroPropertyTypeRenderType], [macroPropertyTypeBaseType]) VALUES (3, N'mediaCurrent', N'umbraco.macroRenderings', N'media', N'Int32') 
@@ -800,8 +799,8 @@ ALTER TABLE [cmsTemplate] ADD CONSTRAINT [FK_cmsTemplate_umbracoNode] FOREIGN KE
 ALTER TABLE [cmsPropertyType] ADD CONSTRAINT [FK_cmsPropertyType_cmsTab] FOREIGN KEY ([tabId]) REFERENCES [cmsTab] ([id]) 
 ALTER TABLE [cmsContent] ADD CONSTRAINT [FK_cmsContent_umbracoNode] FOREIGN KEY ([nodeId]) REFERENCES [umbracoNode] ([id]) 
 ALTER TABLE [cmsMacroProperty] ADD CONSTRAINT [FK_umbracoMacroProperty_umbracoMacroPropertyType] FOREIGN KEY ([macroPropertyType]) REFERENCES [cmsMacroPropertyType] ([id]) 
-ALTER TABLE [umbracoAppTree] ADD CONSTRAINT [FK_umbracoAppTree_umbracoApp] FOREIGN KEY ([appAlias]) REFERENCES [umbracoApp] ([appAlias]) 
-ALTER TABLE [umbracoUser2app] ADD CONSTRAINT [FK_umbracoUser2app_umbracoApp] FOREIGN KEY ([app]) REFERENCES [umbracoApp] ([appAlias]) 
+--ALTER TABLE [umbracoAppTree] ADD CONSTRAINT [FK_umbracoAppTree_umbracoApp] FOREIGN KEY ([appAlias]) REFERENCES [umbracoApp] ([appAlias]) 
+--ALTER TABLE [umbracoUser2app] ADD CONSTRAINT [FK_umbracoUser2app_umbracoApp] FOREIGN KEY ([app]) REFERENCES [umbracoApp] ([appAlias]) 
 ALTER TABLE [umbracoUser2app] ADD CONSTRAINT [FK_umbracoUser2app_umbracoUser] FOREIGN KEY ([user]) REFERENCES [umbracoUser] ([id]) 
 ALTER TABLE [cmsPropertyData] ADD CONSTRAINT [FK_cmsPropertyData_umbracoNode] FOREIGN KEY ([contentNodeId]) REFERENCES [umbracoNode] ([id]) 
 
@@ -865,10 +864,10 @@ insert into umbracoRelationType (dual, parentObjectType, childObjectType, name, 
 ALTER TABLE cmsMacro ADD macroPython nvarchar(255)
 ;
 
-INSERT INTO [umbracoAppTree]([treeSilent], [treeInitialize], [treeSortOrder], [appAlias], [treeAlias], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES(0, 1, 4, 'developer', 'python', 'Python Files', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadPython') 
-;
-INSERT INTO [umbracoAppTree]([treeSilent], [treeInitialize], [treeSortOrder], [appAlias], [treeAlias], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES(0, 1, 2, 'settings', 'scripts', 'Scripts', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadScripts') 
-;
+--INSERT INTO [umbracoAppTree]([treeSilent], [treeInitialize], [treeSortOrder], [appAlias], [treeAlias], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES(0, 1, 4, 'developer', 'python', 'Python Files', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadPython') 
+--;
+--INSERT INTO [umbracoAppTree]([treeSilent], [treeInitialize], [treeSortOrder], [appAlias], [treeAlias], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES(0, 1, 2, 'settings', 'scripts', 'Scripts', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadScripts') 
+--;
 alter TABLE [cmsContentType]
 add [thumbnail] nvarchar(255) NOT NULL CONSTRAINT
 [DF_cmsContentType_thumbnail] DEFAULT ('folder.png')
@@ -888,9 +887,9 @@ values (4,1041,'default', 0, 'group')
 SET IDENTITY_INSERT [cmsDataTypePreValues] OFF
 ;
 /* 3.1 SQL changes */
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'packager', 0, 1, 3, N'Packages', N'folder.gif', N'folder_o.gif', N'umbraco', N'loadPackager') 
-;
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'packagerPackages', 0, 0, 1, N'Packager Packages', N'folder.gif', N'folder_o.gif', N'umbraco', N'loadPackages');
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'packager', 0, 1, 3, N'Packages', N'folder.gif', N'folder_o.gif', N'umbraco', N'loadPackager') 
+--;
+--INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'packagerPackages', 0, 0, 1, N'Packager Packages', N'folder.gif', N'folder_o.gif', N'umbraco', N'loadPackages');
 
 
 /* Add ActionBrowse as a default permission to all user types that have ActionUpdate */
@@ -913,27 +912,27 @@ SELECT DISTINCT userID, nodeId, 'H' FROM umbracoUser2NodePermission WHERE userId
 (SELECT umbracoUser.id FROM umbracoUserType INNER JOIN umbracoUser ON umbracoUserType.id = umbracoUser.userType WHERE (umbracoUserType.userTypeAlias = 'writer'))
 ;
 /* Add the contentRecycleBin tree type */
-IF NOT EXISTS (SELECT treeAlias FROM umbracoAppTree WHERE treeAlias='contentRecycleBin')
-INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
-VALUES (0, 0, 0, 'content', 'contentRecycleBin', 'RecycleBin', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.ContentRecycleBin')
-;
+--IF NOT EXISTS (SELECT treeAlias FROM umbracoAppTree WHERE treeAlias='contentRecycleBin')
+--INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
+--VALUES (0, 0, 0, 'content', 'contentRecycleBin', 'RecycleBin', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.ContentRecycleBin')
+--;
 /* Add the UserType tree type */
-IF NOT EXISTS (SELECT treeAlias FROM umbracoAppTree WHERE treeAlias='userTypes')
-INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
-VALUES (0, 1, 1, 'users', 'userTypes', 'User Types', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.UserTypes')
-;
+--IF NOT EXISTS (SELECT treeAlias FROM umbracoAppTree WHERE treeAlias='userTypes')
+--INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
+--VALUES (0, 1, 1, 'users', 'userTypes', 'User Types', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.UserTypes')
+--;
 /* Add the User Permission tree type */
-IF NOT EXISTS (SELECT treeAlias FROM umbracoAppTree WHERE treeAlias='userPermissions')
-INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
-VALUES (0, 1, 2, 'users', 'userPermissions', 'User Permissions', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.UserPermissions');
+--IF NOT EXISTS (SELECT treeAlias FROM umbracoAppTree WHERE treeAlias='userPermissions')
+--INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
+--VALUES (0, 1, 2, 'users', 'userPermissions', 'User Permissions', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.UserPermissions');
  
  
 /* TRANSLATION RELATED SQL */
-INSERT INTO [umbracoApp] ([appAlias], [sortOrder], [appIcon], [appName], [appInitWithTreeAlias]) VALUES (N'translation', 5, N'.traytranslation', N'Translation', NULL)
-INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
-VALUES (0, 1, 1, 'translation','openTasks', 'Tasks assigned to you', '.sprTreeFolder', '.sprTreeFolder_o', 'umbraco', 'loadOpenTasks');
-INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
-VALUES (0, 1, 2, 'translation','yourTasks', 'Tasks created by you', '.sprTreeFolder', '.sprTreeFolder_o', 'umbraco', 'loadYourTasks');
+--INSERT INTO [umbracoApp] ([appAlias], [sortOrder], [appIcon], [appName], [appInitWithTreeAlias]) VALUES (N'translation', 5, N'.traytranslation', N'Translation', NULL)
+--INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
+--VALUES (0, 1, 1, 'translation','openTasks', 'Tasks assigned to you', '.sprTreeFolder', '.sprTreeFolder_o', 'umbraco', 'loadOpenTasks');
+--INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
+--VALUES (0, 1, 2, 'translation','yourTasks', 'Tasks created by you', '.sprTreeFolder', '.sprTreeFolder_o', 'umbraco', 'loadYourTasks');
  
  
 alter TABLE [cmsContentType]
@@ -991,10 +990,10 @@ VALUES (-21, 0, -1, 0, 0, '-1,-21', 0, 'BF7C7CBC-952F-4518-97A2-69E9C7B33842', '
 SET IDENTITY_INSERT [umbracoNode] OFF
 ;
 /* Add the mediaRecycleBin tree type */
-IF NOT EXISTS (SELECT treeAlias FROM umbracoAppTree WHERE treeAlias='mediaRecycleBin')
-INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
-VALUES (0, 0, 0, 'media', 'mediaRecycleBin', 'RecycleBin', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.MediaRecycleBin')
-;
+--IF NOT EXISTS (SELECT treeAlias FROM umbracoAppTree WHERE treeAlias='mediaRecycleBin')
+--INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
+--VALUES (0, 0, 0, 'media', 'mediaRecycleBin', 'RecycleBin', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.MediaRecycleBin')
+--;
 
 /* PREVIEW */
 CREATE TABLE [cmsPreviewXml](
