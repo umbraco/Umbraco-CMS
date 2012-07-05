@@ -194,6 +194,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="EnsureSystemPathsApplicationStartupHandler.cs" />
     <Compile Include="install\steps\database.ascx.cs">
       <DependentUpon>database.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1721,15 +1722,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
-    <Content Include="App_Code\empty.txt" />
     <Content Include="App_Data\Umbraco.sdf" />
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
-    <Content Include="css\empty.txt" />
-    <Content Include="macroScripts\empty.txt" />
-    <Content Include="masterpages\empty.txt" />
-    <Content Include="media\empty.txt" />
-    <Content Include="xslt\empty.txt" />
     <None Include="config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
@@ -3199,7 +3194,6 @@
       <DependentUpon>umbraco.xsd</DependentUpon>
     </None>
     <Content Include="config\UrlRewriting.config" />
-    <Content Include="usercontrols\empty.txt" />
     <Content Include="web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -3287,13 +3281,20 @@
     </WebReferenceUrl>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="App_Code\" />
+    <Folder Include="css\" />
     <Folder Include="data\previews\" />
     <Folder Include="data\preview\" />
+    <Folder Include="macroScripts\" />
+    <Folder Include="masterpages\" />
+    <Folder Include="media\" />
     <Folder Include="umbraco\ActionHandlers\scripts\" />
     <Folder Include="umbraco\imaging\" />
     <Folder Include="umbraco\library\" />
     <Folder Include="umbraco\webservices\api\" />
     <Folder Include="umbraco_client\tagging\" />
+    <Folder Include="usercontrols\" />
+    <Folder Include="xslt\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
