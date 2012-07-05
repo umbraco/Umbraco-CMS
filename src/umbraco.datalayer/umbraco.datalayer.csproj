@@ -160,7 +160,7 @@
     <None Include="SqlHelpers\MySql\Sql\Version4_Upgrade.sql" />
     <None Include="SqlHelpers\SqlServer\Sql\KeysIndexesAndConstraints.sql" />
     <None Include="SqlHelpers\SqlServer\Sql\Version3_Upgrade.sql" />
-    <None Include="SqlHelpers\SqlServer\Sql\Version4_Upgrade.sql" />
+    <None Include="SqlHelpers\SqlServer\Sql\Version4_1_Upgrade.sql" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -180,7 +180,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SqlHelpers\SqlServer\Sql\Version4_1_Upgrade.sql" />
+    <None Include="SqlHelpers\SqlServer\Sql\Version4_Upgrade.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SqlHelpers\MySql\Sql\Version4_1_Upgrade.sql" />
