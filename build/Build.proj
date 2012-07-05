@@ -20,12 +20,17 @@
   *****************************************************
   -->
 
+  <!-- NB: BUILD_NUMBER is passed in by the build server -->
+  <PropertyGroup Condition="'$(BUILD_NUMBER)'!=''">
+    <BUILD_NUMBER>.$(BUILD_NUMBER)</BUILD_NUMBER>
+  </PropertyGroup>
+  
   <PropertyGroup>
     <BuildConfiguration>Release</BuildConfiguration>
     <BuildFolder>_BuildOutput\</BuildFolder>
-    <BuildZipFileName>UmbracoCms.zip</BuildZipFileName>
-    <BuildZipFileNameBin>UmbracoCms.AllBinaries.zip</BuildZipFileNameBin>
-    <BuildZipFileNameWebPi>UmbracoCms.WebPI.zip</BuildZipFileNameWebPi>
+    <BuildZipFileName>UmbracoCms$(BUILD_NUMBER).zip</BuildZipFileName>
+    <BuildZipFileNameBin>UmbracoCms.AllBinaries$(BUILD_NUMBER).zip</BuildZipFileNameBin>
+    <BuildZipFileNameWebPi>UmbracoCms.WebPI$(BUILD_NUMBER).zip</BuildZipFileNameWebPi>
     <IncludeSymbols>False</IncludeSymbols>
     <BuildFolderRelativeToProjects>..\..\build\$(BuildFolder)</BuildFolderRelativeToProjects>
     <BuildFolderAbsolutePath>$(MSBuildProjectDirectory)\$(BuildFolder)</BuildFolderAbsolutePath>
