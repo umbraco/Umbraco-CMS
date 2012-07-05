@@ -22,15 +22,15 @@
 
   <!-- NB: BUILD_NUMBER is passed in by the build server -->
   <PropertyGroup Condition="'$(BUILD_NUMBER)'!=''">
-    <BUILD_NUMBER>.$(BUILD_NUMBER)</BUILD_NUMBER>
+    <DECIMAL_BUILD_NUMBER>.$(BUILD_NUMBER)</DECIMAL_BUILD_NUMBER>
   </PropertyGroup>
   
   <PropertyGroup>
     <BuildConfiguration>Release</BuildConfiguration>
     <BuildFolder>_BuildOutput\</BuildFolder>
-    <BuildZipFileName>UmbracoCms$(BUILD_NUMBER).zip</BuildZipFileName>
-    <BuildZipFileNameBin>UmbracoCms.AllBinaries$(BUILD_NUMBER).zip</BuildZipFileNameBin>
-    <BuildZipFileNameWebPi>UmbracoCms.WebPI$(BUILD_NUMBER).zip</BuildZipFileNameWebPi>
+    <BuildZipFileName>UmbracoCms$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileName>
+    <BuildZipFileNameBin>UmbracoCms.AllBinaries$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameBin>
+    <BuildZipFileNameWebPi>UmbracoCms.WebPI$(DECIMAL_BUILD_NUMBER).zip</BuildZipFileNameWebPi>
     <IncludeSymbols>False</IncludeSymbols>
     <BuildFolderRelativeToProjects>..\..\build\$(BuildFolder)</BuildFolderRelativeToProjects>
     <BuildFolderAbsolutePath>$(MSBuildProjectDirectory)\$(BuildFolder)</BuildFolderAbsolutePath>
