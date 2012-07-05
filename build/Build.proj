@@ -23,9 +23,9 @@
   <PropertyGroup>
     <BuildConfiguration>Release</BuildConfiguration>
     <BuildFolder>_BuildOutput\</BuildFolder>
-    <BuildZipFileName>UmbracoWebApp.zip</BuildZipFileName>
-    <BuildZipFileNameBin>UmbracoAllBinaries.zip</BuildZipFileNameBin>
-    <BuildZipFileNameWebPi>UmbracoWebPi.zip</BuildZipFileNameWebPi>
+    <BuildZipFileName>UmbracoCms.zip</BuildZipFileName>
+    <BuildZipFileNameBin>UmbracoCms.AllBinaries.zip</BuildZipFileNameBin>
+    <BuildZipFileNameWebPi>UmbracoCms.WebPI.zip</BuildZipFileNameWebPi>
     <IncludeSymbols>False</IncludeSymbols>
     <BuildFolderRelativeToProjects>..\..\build\$(BuildFolder)</BuildFolderRelativeToProjects>
     <BuildFolderAbsolutePath>$(MSBuildProjectDirectory)\$(BuildFolder)</BuildFolderAbsolutePath>
@@ -62,10 +62,6 @@
 
   <Target Name="ZipWebPiApp" DependsOnTargets="ZipWebApp" >
 
-    <Time Format="yyyyMMdd-HHmm">
-      <Output TaskParameter="FormattedTime" PropertyName="buildDate" />
-    </Time>
-
     <!-- Clean folders -->
     <RemoveDir Directories="$(WebPiFolder)" />
     <MakeDir Directories="$(WebPiFolder)" />
@@ -92,15 +88,11 @@
       <WebPiFilesToZip Include="$(WebPiFolder)**\*.*" />
     </ItemGroup>
     
-    <MSBuild.Community.Tasks.Zip Files="@(WebPiFilesToZip)" ZipFileName="$(buildDate)-$(BuildZipFileNameWebPi)" WorkingDirectory="$(WebPiFolder)" />
+    <MSBuild.Community.Tasks.Zip Files="@(WebPiFilesToZip)" ZipFileName="$(BuildZipFileNameWebPi)" WorkingDirectory="$(WebPiFolder)" />
 
   </Target>
   
   <Target Name="ZipWebApp" DependsOnTargets="CopySqlCe" >
-    
-    <Time Format="yyyyMMdd-HHmm">
-      <Output TaskParameter="FormattedTime" PropertyName="buildDate" />
-    </Time>    
     
     <CreateItem Include="$(WebBuildFolderWildcard)" Exclude="$(WebBuildFolderExclusionWildcard)">
       <Output TaskParameter="Include" ItemName="WebFilesToZip" />
@@ -110,8 +102,8 @@
       <Output TaskParameter="Include" ItemName="BinFilesToZip" />
     </CreateItem>
     <Message Text="Starting to zip to $(buildDate)-$(BuildZipFileName)" Importance="high" />
-    <MSBuild.Community.Tasks.Zip Files="@(BinFilesToZip)" ZipFileName="$(buildDate)-$(BuildZipFileNameBin)" WorkingDirectory="$(SolutionBinFolder)" />
-    <MSBuild.Community.Tasks.Zip Files="@(WebFilesToZip)" ZipFileName="$(buildDate)-$(BuildZipFileName)" WorkingDirectory="$(WebAppFolder)" />
+    <MSBuild.Community.Tasks.Zip Files="@(BinFilesToZip)" ZipFileName="$(BuildZipFileNameBin)" WorkingDirectory="$(SolutionBinFolder)" />
+    <MSBuild.Community.Tasks.Zip Files="@(WebFilesToZip)" ZipFileName="$(BuildZipFileName)" WorkingDirectory="$(WebAppFolder)" />
     <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
   </Target>
 
