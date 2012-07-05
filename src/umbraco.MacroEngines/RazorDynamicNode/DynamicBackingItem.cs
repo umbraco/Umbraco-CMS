@@ -30,6 +30,7 @@ namespace umbraco.MacroEngines
         public DynamicBackingItem(int Id)
         {
             NodeFactory.Node baseNode = new NodeFactory.Node(Id);
+           
             this.content = baseNode;
             this.Type = DynamicBackingItemType.Content;
             if (baseNode.Id == 0 && Id != 0)

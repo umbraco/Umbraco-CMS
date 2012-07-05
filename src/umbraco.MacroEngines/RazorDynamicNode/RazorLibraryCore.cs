@@ -128,6 +128,28 @@ namespace umbraco.MacroEngines.Library
             return MediaById(Ids.ToList());
         }
 
+
+        public dynamic Search(string term, bool useWildCards = true, string searchProvider = null)
+        {
+            var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
+            if (!string.IsNullOrEmpty(searchProvider))
+                searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
+
+            var results = searcher.Search(term, useWildCards);
+            return ExamineSearchUtill.convertSearchResultToDynamicNode(results);
+        }
+
+        public dynamic Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        {
+            var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
+            if (searchProvider != null)
+                s = searchProvider;
+
+            var results = s.Search(criteria);
+            return ExamineSearchUtill.convertSearchResultToDynamicNode(results);
+        }
+
+
         public T As<T>() where T : class
         {
             return (this as T);

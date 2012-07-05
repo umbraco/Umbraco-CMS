@@ -18,6 +18,9 @@ using umbraco.cms.businesslogic.media;
 using umbraco.MacroEngines.Library;
 using umbraco.BusinessLogic.Utils;
 
+using Examine;
+using Examine.SearchCriteria;
+using Examine.LuceneEngine.SearchCriteria;
 
 namespace umbraco.MacroEngines
 {
@@ -221,6 +224,36 @@ namespace umbraco.MacroEngines
                 throw new NullReferenceException("DynamicNode wasn't initialized with an underlying NodeFactory.Node");
             }
         }
+                
+        public DynamicNodeList Search(string term, bool useWildCards = true, string searchProvider = null)
+        {
+            var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
+            if(!string.IsNullOrEmpty(searchProvider))
+                searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
+
+            var t = term.Escape().Value;
+            if (useWildCards)
+                t = term.MultipleCharacterWildcard().Value;
+
+            string luceneQuery = "+parentID:" + this.Id.ToString() + " +" + t;
+            var crit = searcher.CreateSearchCriteria().RawQuery(luceneQuery);
+
+            return Search(crit, searcher);
+        }
+        
+        public DynamicNodeList Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        {
+            var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
+            if (searchProvider != null)
+                s = searchProvider;
+            
+            var results = s.Search(criteria);
+            return ExamineSearchUtill.convertSearchResultToDynamicNode(results);
+        }
+
+
+        
+
         public bool HasProperty(string name)
         {
             if (n != null)

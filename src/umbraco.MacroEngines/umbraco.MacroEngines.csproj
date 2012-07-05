@@ -91,6 +91,7 @@
     <Compile Include="RazorDynamicNode\DynamicNodeIdEqualityComparer.cs" />
     <Compile Include="RazorDynamicNode\DynamicNodeList.cs" />
     <Compile Include="RazorDynamicNode\ExamineBackedMedia.cs" />
+    <Compile Include="RazorDynamicNode\ExamineSearchUtill.cs" />
     <Compile Include="RazorDynamicNode\Grouping.cs" />
     <Compile Include="RazorDynamicNode\HtmlTagWrapper.cs" />
     <Compile Include="RazorDynamicNode\HtmlTagWrapperBase.cs" />
