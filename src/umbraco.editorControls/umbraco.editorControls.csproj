@@ -316,11 +316,6 @@
     <Compile Include="pagepicker\PagePickerDataType.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="PickerRelations\PickerRelationsDataEditor.cs" />
-    <Compile Include="PickerRelations\PickerRelationsDataType.cs" />
-    <Compile Include="PickerRelations\PickerRelationsEventHandler.cs" />
-    <Compile Include="PickerRelations\PickerRelationsOptions.cs" />
-    <Compile Include="PickerRelations\PickerRelationsPreValueEditor.cs" />
     <Compile Include="PrevalueEditorExtensions.cs" />
     <Compile Include="radiobuttonlist\radiobox.cs">
       <SubType>Code</SubType>
