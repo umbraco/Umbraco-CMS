@@ -298,10 +298,6 @@
     <Compile Include="default.aspx.designer.cs">
       <DependentUpon>default.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Global.asax.cs">
-      <DependentUpon>Global.asax</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="helper.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -2471,9 +2467,6 @@
     <Content Include="umbraco_client\Tree\Themes\default\icons.png" />
     <Content Include="umbraco_client\Tree\Themes\umbraco\icons.png" />
     <Content Include="default.aspx" />
-    <Content Include="Global.asax">
-      <SubType>Component</SubType>
-    </Content>
     <Content Include="install\default.aspx" />
     <Content Include="install\steps\license.ascx" />
     <Content Include="umbraco\actions\delete.aspx" />
