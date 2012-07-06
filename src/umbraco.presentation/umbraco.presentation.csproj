@@ -1800,6 +1800,7 @@
     <None Include="umbraco\config\create\UI.Release.xml">
       <DependentUpon>UI.xml</DependentUpon>
     </None>
+    <Content Include="umbraco\config\lang\he.xml" />
     <Content Include="umbraco\config\lang\pl.xml" />
     <Content Include="umbraco\config\lang\pt.xml" />
     <Content Include="umbraco\config\lang\se.xml" />
