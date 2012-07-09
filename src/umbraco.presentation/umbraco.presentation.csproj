@@ -2731,7 +2731,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
     </None>
-    <None Include="umbraco\dashboard\air\DesktopMediaUploader.air" />
+    <Content Include="umbraco\dashboard\air\DesktopMediaUploader.air" />
     <None Include="umbraco\LiveEditing\LiveEditing.cd" />
     <Content Include="umbraco\masterpages\umbracoPage.Master" />
     <Content Include="umbraco\masterpages\umbracoDialog.Master" />
