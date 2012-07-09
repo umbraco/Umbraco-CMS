@@ -178,6 +178,7 @@ namespace umbraco.cms.presentation.user
             sectionValidator.ServerValidate += new ServerValidateEventHandler(sectionValidator_ServerValidate);
             sectionValidator.ControlToValidate = lapps.ID;
             sectionValidator.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", ui.Text("user", "modules", base.getUser()), base.getUser());
+            sectionValidator.CssClass = "error";
 
             setupForm();
             setupChannel();
