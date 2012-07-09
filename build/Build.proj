@@ -11,8 +11,8 @@
     <UmbracoMSBuildTasksPath>..\UmbracoMSBuildTasks</UmbracoMSBuildTasksPath>
   </PropertyGroup>
   
-  <Import Project="..\lib\Umbraco\UmbracoMSBuildTasks\Umbraco.MSBuild.Tasks.Targets" />
-  <Import Project="..\lib\MSBuild\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+  <Import Project="..\tools\UmbracoMSBuildTasks\Umbraco.MSBuild.Tasks.Targets" />
+  <Import Project="..\tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
 
   <!-- 
   ****************************************************
@@ -39,15 +39,25 @@
     <WebPiFolder>$(BuildFolder)WebPi\</WebPiFolder>
     <SolutionBinFolderRelativeToProjects>$(BuildFolderRelativeToProjects)bin\</SolutionBinFolderRelativeToProjects>
     <SolutionBinFolderAbsolutePath>$(BuildFolderAbsolutePath)bin\</SolutionBinFolderAbsolutePath>
-    <SolutionBinBuildFolderWildcard>$(SolutionBinFolder)**\*.*</SolutionBinBuildFolderWildcard>
-    <SolutionBinBuildFolderExclusionWildcard>$(SolutionBinFolder)**\Web.Template.*;$(SolutionBinFolder)**\*.pdb</SolutionBinBuildFolderExclusionWildcard>
     <WebAppFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebApp\</WebAppFolderRelativeToProjects>
     <WebAppFolderAbsolutePath>$(BuildFolderAbsolutePath)WebApp\</WebAppFolderAbsolutePath>
     <WebPiFolderRelativeToProjects>$(BuildFolderRelativeToProjects)WebPi\</WebPiFolderRelativeToProjects>
     <WebPiFolderAbsolutePath>$(BuildFolderAbsolutePath)WebPi\</WebPiFolderAbsolutePath>
-    <WebBuildFolderWildcard>$(WebAppFolder)**\*.*</WebBuildFolderWildcard>
-    <WebBuildFolderExclusionWildcard>$(WebAppFolder)**\Web.Template.*;$(WebAppFolder)**\*.pdb</WebBuildFolderExclusionWildcard>
   </PropertyGroup>
+
+  <ItemGroup>
+    <SystemFolders Include="$(WebAppFolder)App_Code" />
+    <SystemFolders Include="$(WebAppFolder)App_Data" />
+    <SystemFolders Include="$(WebAppFolder)App_Data\ClientDependency" />
+    <SystemFolders Include="$(WebAppFolder)App_Data\ExamineIndexes" />
+    <SystemFolders Include="$(WebAppFolder)media" />
+    <SystemFolders Include="$(WebAppFolder)masterpages" />
+    <SystemFolders Include="$(WebAppFolder)scripts" />
+    <SystemFolders Include="$(WebAppFolder)css" />
+    <SystemFolders Include="$(WebAppFolder)macroScripts" />
+    <SystemFolders Include="$(WebAppFolder)xslt" />
+    <SystemFolders Include="$(WebAppFolder)usercontrols" />
+  </ItemGroup>
 
   <!-- 
   ****************************************************
@@ -73,12 +83,14 @@
     <MakeDir Directories="$(WebPiFolder)umbraco" />
 
     <!-- Copy fresh built umbraco files -->
-    <ItemGroup>
+    <Exec Command="xcopy %22$(WebAppFolderAbsolutePath)*%22 %22$(WebPiFolderAbsolutePath)umbraco%22 /S /E /Y /I" />
+    
+    <!--<ItemGroup>
       <WebAppFiles Include="$(WebAppFolder)\**\*.*" />
     </ItemGroup>
 
     <Copy SourceFiles="@(WebAppFiles)"
-        DestinationFiles="@(WebAppFiles->'$(WebPiFolder)umbraco\%(RecursiveDir)%(Filename)%(Extension)')" />
+        DestinationFiles="@(WebAppFiles->'$(WebPiFolder)umbraco\%(RecursiveDir)%(Filename)%(Extension)')" />-->
 
     <!-- Copy Web Pi template files -->
     <ItemGroup>
@@ -89,27 +101,22 @@
         DestinationFiles="@(WebPiFiles->'$(WebPiFolder)%(RecursiveDir)%(Filename)%(Extension)')" />
 
     <!-- Zip the files -->
-    <ItemGroup>
-      <WebPiFilesToZip Include="$(WebPiFolder)**\*.*" />
-    </ItemGroup>
-    
-    <MSBuild.Community.Tasks.Zip Files="@(WebPiFilesToZip)" ZipFileName="$(BuildZipFileNameWebPi)" WorkingDirectory="$(WebPiFolder)"  />
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameWebPi)%22 %22$(WebPiFolderAbsolutePath)*%22" />
 
   </Target>
   
-  <Target Name="ZipWebApp" DependsOnTargets="CopyLibraries" >
+  <Target Name="ZipWebApp" DependsOnTargets="CreateSystemFolders" >
     
-    <CreateItem Include="$(WebBuildFolderWildcard)" Exclude="$(WebBuildFolderExclusionWildcard)">
-      <Output TaskParameter="Include" ItemName="WebFilesToZip" />
-    </CreateItem>
-
-    <CreateItem Include="$(SolutionBinBuildFolderWildcard)" Exclude="$(SolutionBinBuildFolderExclusionWildcard)">
-      <Output TaskParameter="Include" ItemName="BinFilesToZip" />
-    </CreateItem>
     <Message Text="Starting to zip to $(buildDate)-$(BuildZipFileName)" Importance="high" />
-    <MSBuild.Community.Tasks.Zip Files="@(BinFilesToZip)" ZipFileName="$(BuildZipFileNameBin)" WorkingDirectory="$(SolutionBinFolder)" />
-    <MSBuild.Community.Tasks.Zip Files="@(WebFilesToZip)" ZipFileName="$(BuildZipFileName)" WorkingDirectory="$(WebAppFolder)" />
+
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameBin)%22 %22$(SolutionBinFolderAbsolutePath)*%22" />
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileName)%22 %22$(WebAppFolderAbsolutePath)*%22" />
+    
     <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
+  </Target>
+
+  <Target Name="CreateSystemFolders" DependsOnTargets="CopyLibraries" Inputs="@(SystemFolders)" Outputs="%(Identity).Dummy">
+    <MakeDir Directories="@(SystemFolders)" />
   </Target>
 
   <Target Name="CopyLibraries" DependsOnTargets="OffsetTimestamps" >
