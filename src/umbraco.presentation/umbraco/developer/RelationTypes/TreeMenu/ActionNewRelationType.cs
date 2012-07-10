@@ -1,6 +1,4 @@
-﻿using System;
-using umbraco;
-using umbraco.interfaces;
+﻿using umbraco.interfaces;
 
 namespace umbraco.cms.presentation.developer.RelationTypes.TreeMenu
 {

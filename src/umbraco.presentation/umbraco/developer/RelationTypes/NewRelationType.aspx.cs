@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Web;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.relation;
 
@@ -51,16 +46,18 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		{
 			if (this.Page.IsValid)
 			{
-				int newRelationTypeId = uQuery.SqlHelper.ExecuteScalar<int>(
-					string.Format(
-						"INSERT INTO umbracoRelationType (dual, parentObjectType, childObjectType, name, alias) VALUES ({0}, '{1}', '{2}', '{3}', '{4}')",
-						this.dualRadioButtonList.SelectedValue,
-					// UmbracoHelper.GetGuid(UmbracoHelper.GetUmbracoObjectType(this.parentDropDownList.SelectedValue)).ToString(),
-					// UmbracoHelper.GetGuid(UmbracoHelper.GetUmbracoObjectType(this.childDropDownList.SelectedValue)).ToString(),
-						uQuery.GetUmbracoObjectType(this.parentDropDownList.SelectedValue).GetGuid().ToString(),
-						uQuery.GetUmbracoObjectType(this.childDropDownList.SelectedValue).GetGuid().ToString(),
-						this.descriptionTextBox.Text,
-						this.aliasTextBox.Text.Trim()) + "; SELECT MAX (id) FROM umbracoRelationType");
+                uQuery.SqlHelper.ExecuteNonQuery(
+                    string.Format("INSERT INTO umbracoRelationType ([dual], parentObjectType, childObjectType, name, alias) VALUES ({0}, '{1}', '{2}', '{3}', '{4}')",
+                        this.dualRadioButtonList.SelectedValue,
+                        uQuery.GetUmbracoObjectType(this.parentDropDownList.SelectedValue).GetGuid().ToString(),
+                        uQuery.GetUmbracoObjectType(this.childDropDownList.SelectedValue).GetGuid().ToString(),
+                        this.descriptionTextBox.Text,
+                        this.aliasTextBox.Text.Trim()));
+
+                int newRelationTypeId = uQuery.SqlHelper.ExecuteScalar<int>("SELECT MAX (id) FROM umbracoRelationType");
+
+                // TODO: there's a (very small) possibility that if multiple admins create new relation types at the same time, then this could potentially redirect to the wrong relation type !
+                // fix by checking the database type in use, so can use the appropriate vendor specific SQL: SCOPE_IDENTITY(),  LAST_INSERT_ID() within a single SQL call.
 
 				// base.speechBubble(BasePage.speechBubbleIcon.success, "New Relation Type", "relation type created");
 
@@ -74,22 +71,6 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		/// <param name="dropDownList">control for which to add the Umbraco object types</param>
 		private void AppendUmbracoObjectTypes(DropDownList dropDownList)
 		{
-			// dropDownList.Items.Add(new ListItem(UmbracoHelper.GetFriendlyName(UmbracoHelper.UmbracoObjectType.Document), UmbracoHelper.GetName(UmbracoHelper.UmbracoObjectType.Document)));
-			// dropDownList.Items.Add(new ListItem(UmbracoHelper.GetFriendlyName(UmbracoHelper.UmbracoObjectType.Media), UmbracoHelper.GetName(UmbracoHelper.UmbracoObjectType.Media)));
-			// dropDownList.Items.Add(new ListItem(UmbracoHelper.GetFriendlyName(UmbracoHelper.UmbracoObjectType.Member), UmbracoHelper.GetName(UmbracoHelper.UmbracoObjectType.Member)));
-			// ////dropDownList.Items.Add(new ListItem("---", "---"));
-			// dropDownList.Items.Add(new ListItem(UmbracoHelper.GetFriendlyName(UmbracoHelper.UmbracoObjectType.MemberGroup), UmbracoHelper.GetName(UmbracoHelper.UmbracoObjectType.MemberGroup)));
-			// dropDownList.Items.Add(new ListItem(UmbracoHelper.GetFriendlyName(UmbracoHelper.UmbracoObjectType.MemberType), UmbracoHelper.GetName(UmbracoHelper.UmbracoObjectType.MemberType)));
-			// dropDownList.Items.Add(new ListItem(UmbracoHelper.GetFriendlyName(UmbracoHelper.UmbracoObjectType.DocumentType), UmbracoHelper.GetName(UmbracoHelper.UmbracoObjectType.DocumentType)));
-			// dropDownList.Items.Add(new ListItem(UmbracoHelper.GetFriendlyName(UmbracoHelper.UmbracoObjectType.MediaType), UmbracoHelper.GetName(UmbracoHelper.UmbracoObjectType.MediaType)));
-			// dropDownList.Items.Add(new ListItem(UmbracoHelper.GetFriendlyName(UmbracoHelper.UmbracoObjectType.ContentItem), UmbracoHelper.GetName(UmbracoHelper.UmbracoObjectType.ContentItem)));
-			// dropDownList.Items.Add(new ListItem(UmbracoHelper.GetFriendlyName(UmbracoHelper.UmbracoObjectType.ContentItemType), UmbracoHelper.GetName(UmbracoHelper.UmbracoObjectType.ContentItemType)));
-			// dropDownList.Items.Add(new ListItem(UmbracoHelper.GetFriendlyName(UmbracoHelper.UmbracoObjectType.DataType), UmbracoHelper.GetName(UmbracoHelper.UmbracoObjectType.DataType)));
-			// dropDownList.Items.Add(new ListItem(UmbracoHelper.GetFriendlyName(UmbracoHelper.UmbracoObjectType.RecycleBin), UmbracoHelper.GetName(UmbracoHelper.UmbracoObjectType.RecycleBin)));
-			// dropDownList.Items.Add(new ListItem(UmbracoHelper.GetFriendlyName(UmbracoHelper.UmbracoObjectType.ROOT), UmbracoHelper.GetName(UmbracoHelper.UmbracoObjectType.ROOT)));
-			// dropDownList.Items.Add(new ListItem(UmbracoHelper.GetFriendlyName(UmbracoHelper.UmbracoObjectType.Stylesheet), UmbracoHelper.GetName(UmbracoHelper.UmbracoObjectType.Stylesheet)));
-			// dropDownList.Items.Add(new ListItem(UmbracoHelper.GetFriendlyName(UmbracoHelper.UmbracoObjectType.Template), UmbracoHelper.GetName(UmbracoHelper.UmbracoObjectType.Template)));
-
 			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.Document.GetFriendlyName(), uQuery.UmbracoObjectType.Document.GetName()));
 			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.Media.GetFriendlyName(), uQuery.UmbracoObjectType.Media.GetName()));
 			dropDownList.Items.Add(new ListItem(uQuery.UmbracoObjectType.Member.GetFriendlyName(), uQuery.UmbracoObjectType.Member.GetName()));
