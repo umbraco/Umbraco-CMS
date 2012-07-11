@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
-using umbraco;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.relation;
-using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
-using umbraco.DataLayer.SqlHelpers.SqlServer;
 using umbraco.uicontrols;
 
 namespace umbraco.cms.presentation.developer.RelationTypes
@@ -91,9 +84,9 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 					using (IRecordsReader reader = uQuery.SqlHelper.ExecuteReader(@"
                         SELECT  A.id, 
                                 A.parentId,
-		                        B.[text] AS 'parentText',
+		                        B.[text] AS parentText,
 		                        A.childId,
-		                        C.[text] AS 'childText',
+		                        C.[text] AS childText,
                                 A.relType,
 		                        A.[datetime], 
 		                        A.comment
