@@ -522,7 +522,7 @@ INSERT INTO umbracoNode (id, trashed, parentID, nodeUser, level, path, sortOrder
 INSERT INTO cmsContentType (pk, nodeId, alias, icon) VALUES
 	(532, 1031, 'Folder', 'folder.gif'),
 	(533, 1032, 'Image', 'mediaPhoto.gif'),
-	(534, 1033, 'File', 'mediaMulti.gif')
+	(534, 1033, 'File', 'mediaFile.gif')
 ;
 INSERT INTO umbracoUserType (id, userTypeAlias, userTypeName, userTypeDefaultPermissions) VALUES
 	(1, 'admin', 'Administrators', 'CADMOSKTPIURZ5:'),
