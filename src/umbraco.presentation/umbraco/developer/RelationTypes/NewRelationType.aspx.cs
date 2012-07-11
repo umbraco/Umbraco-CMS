@@ -38,7 +38,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		}
 
 		/// <summary>
-		/// Add a new relation type
+		/// Add a new relation type into the database, and redirects to it's editing page.
 		/// </summary>
 		/// <param name="sender">expects the addButton control</param>
 		/// <param name="e">expects EventArgs for addButton</param>
@@ -46,18 +46,17 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 		{
 			if (this.Page.IsValid)
 			{
+                string newRelationTypeAlias = this.aliasTextBox.Text.Trim();
+
                 uQuery.SqlHelper.ExecuteNonQuery(
                     string.Format("INSERT INTO umbracoRelationType ([dual], parentObjectType, childObjectType, name, alias) VALUES ({0}, '{1}', '{2}', '{3}', '{4}')",
                         this.dualRadioButtonList.SelectedValue,
                         uQuery.GetUmbracoObjectType(this.parentDropDownList.SelectedValue).GetGuid().ToString(),
                         uQuery.GetUmbracoObjectType(this.childDropDownList.SelectedValue).GetGuid().ToString(),
                         this.descriptionTextBox.Text,
-                        this.aliasTextBox.Text.Trim()));
+                        newRelationTypeAlias));
 
-                int newRelationTypeId = uQuery.SqlHelper.ExecuteScalar<int>("SELECT MAX (id) FROM umbracoRelationType");
-
-                // TODO: there's a (very small) possibility that if multiple admins create new relation types at the same time, then this could potentially redirect to the wrong relation type !
-                // fix by checking the database type in use, so can use the appropriate vendor specific SQL: SCOPE_IDENTITY(),  LAST_INSERT_ID() within a single SQL call.
+                int newRelationTypeId = uQuery.SqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoRelationType WHERE alias = '" + newRelationTypeAlias + "'");
 
 				// base.speechBubble(BasePage.speechBubbleIcon.success, "New Relation Type", "relation type created");
 
