@@ -248,17 +248,5 @@ namespace umbraco.editorControls.PickerRelations
 
             return isContextObjectTypeValid;
         }
-
-        ///// <summary>
-        ///// Insted of rendering the current name of this property, use a consistant label
-        ///// </summary>
-        ///// <param name="writer"></param>
-        //protected override void Render(HtmlTextWriter writer)
-        //{
-        //    writer.WriteLine("<div class='propertyItemheader'>MultiNode Relations</div>");
-        //    writer.WriteLine("<div class='propertyItemContent'>");
-        //    base.Render(writer);
-        //    writer.WriteLine("</div>");
-        //}
     }        
 }

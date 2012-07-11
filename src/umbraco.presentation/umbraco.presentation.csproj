@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
@@ -35,7 +36,7 @@
     </SccAuxPath>
     <SccProvider>
     </SccProvider>
-    <OldToolsVersion>3.5</OldToolsVersion>
+    <OldToolsVersion>4.0</OldToolsVersion>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -111,6 +112,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Lucene.Net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Web.Helpers">
+      <HintPath>..\..\lib\WebPages\Microsoft.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\WebPages\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
     <Reference Include="Our.Umbraco.uGoLive">
       <HintPath>..\..\lib\Our.Umbraco.uGoLive.dll</HintPath>
     </Reference>
@@ -144,8 +152,28 @@
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Extensions.Design" />
+    <Reference Include="System.Web.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\WebPages\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\WebPages\System.Web.Razor.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.Services">
       <Name>System.Web.Services</Name>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\WebPages\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\WebPages\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\WebPages\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
@@ -194,6 +222,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="EnsureSystemPathsApplicationStartupHandler.cs" />
     <Compile Include="install\steps\database.ascx.cs">
       <DependentUpon>database.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -269,10 +298,6 @@
     </Compile>
     <Compile Include="default.aspx.designer.cs">
       <DependentUpon>default.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Global.asax.cs">
-      <DependentUpon>Global.asax</DependentUpon>
-      <SubType>Code</SubType>
     </Compile>
     <Compile Include="helper.cs">
       <SubType>Code</SubType>
@@ -1792,6 +1817,19 @@
     <Content Include="umbraco\images\editor\doc.gif" />
     <Content Include="umbraco\images\editor\documentType.gif" />
     <Content Include="umbraco\images\information.png" />
+    <Content Include="umbraco\plugins\uGoLive\cog.png" />
+    <Content Include="umbraco\plugins\uGoLive\cross.png" />
+    <Content Include="umbraco\plugins\uGoLive\Dashboard.ascx" />
+    <Content Include="umbraco\plugins\uGoLive\Dashboard.css" />
+    <Content Include="umbraco\plugins\uGoLive\Dashboard.js" />
+    <Content Include="umbraco\plugins\uGoLive\error.png" />
+    <Content Include="umbraco\plugins\uGoLive\help.png" />
+    <Content Include="umbraco\plugins\uGoLive\icon.png" />
+    <Content Include="umbraco\plugins\uGoLive\jquery.tmpl.js" />
+    <Content Include="umbraco\plugins\uGoLive\knockout-1.2.1.js" />
+    <Content Include="umbraco\plugins\uGoLive\run.png" />
+    <Content Include="umbraco\plugins\uGoLive\throbber.gif" />
+    <Content Include="umbraco\plugins\uGoLive\tick.png" />
     <Content Include="umbraco_client\tinymce3\langs\en.js" />
     <Content Include="umbraco_client\tinymce3\license.txt" />
     <Content Include="umbraco_client\tinymce3\plugins\advhr\css\advhr.css" />
@@ -2430,9 +2468,6 @@
     <Content Include="umbraco_client\Tree\Themes\default\icons.png" />
     <Content Include="umbraco_client\Tree\Themes\umbraco\icons.png" />
     <Content Include="default.aspx" />
-    <Content Include="Global.asax">
-      <SubType>Component</SubType>
-    </Content>
     <Content Include="install\default.aspx" />
     <Content Include="install\steps\license.ascx" />
     <Content Include="umbraco\actions\delete.aspx" />
@@ -2697,7 +2732,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
     </None>
-    <None Include="umbraco\dashboard\air\DesktopMediaUploader.air" />
+    <Content Include="umbraco\dashboard\air\DesktopMediaUploader.air" />
     <None Include="umbraco\LiveEditing\LiveEditing.cd" />
     <Content Include="umbraco\masterpages\umbracoPage.Master" />
     <Content Include="umbraco\masterpages\umbracoDialog.Master" />
@@ -3259,7 +3294,7 @@
     <None Include="web.Template.13INCHER.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
     </None>
-    <None Include="web.Template.MBP-PC.Debug.config">
+    <None Include="web.Template.MBP13-PC.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
     </None>
   </ItemGroup>
@@ -3295,6 +3330,10 @@
     <Folder Include="usercontrols\" />
     <Folder Include="xslt\" />
   </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
@@ -3302,7 +3341,8 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
   <ProjectExtensions>
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">

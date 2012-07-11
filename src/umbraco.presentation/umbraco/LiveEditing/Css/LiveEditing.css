@@ -166,6 +166,7 @@ html {
 #LiveEditingClientToolbar .mceToolbarExternal table {
 	display: inline !important;
 	background: none !important;
+    margin: 0 !important;
 }
 
 #LiveEditingClientToolbar .mceToolbarExternal {

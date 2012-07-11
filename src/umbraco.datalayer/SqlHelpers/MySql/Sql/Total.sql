@@ -10,7 +10,7 @@
  
 IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
  
-    Database version: 4.8.0.4
+    Database version: 4.8.0.5
     
     Please increment this version number if ANY change is made to this script,
     so compatibility with scripts for other database systems can be verified easily.
@@ -522,7 +522,7 @@ INSERT INTO umbracoNode (id, trashed, parentID, nodeUser, level, path, sortOrder
 INSERT INTO cmsContentType (pk, nodeId, alias, icon) VALUES
 	(532, 1031, 'Folder', 'folder.gif'),
 	(533, 1032, 'Image', 'mediaPhoto.gif'),
-	(534, 1033, 'File', 'mediaMulti.gif')
+	(534, 1033, 'File', 'mediaFile.gif')
 ;
 INSERT INTO umbracoUserType (id, userTypeAlias, userTypeName, userTypeDefaultPermissions) VALUES
 	(1, 'admin', 'Administrators', 'CADMOSKTPIURZ5:'),
@@ -534,6 +534,7 @@ INSERT INTO umbracoUser (id, userDisabled, userNoConsole, userType, startStructu
 ;
 UPDATE umbracoUser SET id=0 WHERE id=1 AND userLogin='admin'
 ;
+/*
 INSERT INTO umbracoApp (appAlias, sortOrder, appIcon, appName, appInitWithTreeAlias) VALUES
 	('content', 0, '.traycontent', 'Indhold', 'content'),
 	('developer', 7, '.traydeveloper', 'Developer', NULL),
@@ -542,6 +543,7 @@ INSERT INTO umbracoApp (appAlias, sortOrder, appIcon, appName, appInitWithTreeAl
 	('settings', 6, '.traysettings', 'Indstillinger', NULL),
 	('users', 5, '.trayusers', 'Brugere', NULL)
 ;
+*/
 INSERT INTO umbracoUser2app (user, app) VALUES
 	(0, 'content'),
 	(0, 'developer'),
@@ -550,6 +552,7 @@ INSERT INTO umbracoUser2app (user, app) VALUES
 	(0, 'settings'),
 	(0, 'users')
 ;
+/*
 INSERT INTO umbracoAppTree (appAlias, treeAlias, treeSilent, treeInitialize, treeSortOrder, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType) VALUES
 	('content', 'content', 1, 1, 0, 'Indhold', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadContent'),
 	('developer', 'cacheBrowser', 0, 1, 0, 'CacheBrowser', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadCache'),
@@ -577,7 +580,8 @@ INSERT INTO umbracoAppTree (appAlias, treeAlias, treeSilent, treeInitialize, tre
 INSERT INTO umbracoAppTree (appAlias, treeAlias, treeSilent, treeInitialize, treeSortOrder, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType, action) VALUES
 	('settings', 'dictionary', 0, 1, 3, 'Dictionary', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadDictionary','openDictionary()')
 ;
-	
+*/
+
 INSERT INTO cmsMacroPropertyType (id, macroPropertyTypeAlias, macroPropertyTypeRenderAssembly, macroPropertyTypeRenderType, macroPropertyTypeBaseType) VALUES
 	(3, 'mediaCurrent', 'umbraco.macroRenderings', 'media', 'Int32'),
 	(4, 'contentSubs', 'umbraco.macroRenderings', 'content', 'Int32'),
@@ -652,8 +656,10 @@ INSERT INTO cmsDataType (pk, nodeId, controlId, dbType) VALUES
 	(39, 1042, '474FCFF8-9D2D-11DE-ABC6-AD7A56D89593', 'Ntext'),
 	(40, 1043, '7A2D436C-34C2-410F-898F-4A23B3D79F54', 'Ntext')  
 ;
+/*
 ALTER TABLE umbracoAppTree ADD FOREIGN KEY (appAlias) REFERENCES umbracoApp (appAlias) 
 ; 
+*/
 ALTER TABLE cmsPropertyData ADD FOREIGN KEY (contentNodeId) REFERENCES umbracoNode (id) 
 ; 
 
@@ -682,8 +688,10 @@ ALTER TABLE cmsPropertyType ADD FOREIGN KEY (tabId) REFERENCES cmsTab (id)
 ; 
 ALTER TABLE cmsContent ADD FOREIGN KEY (nodeId) REFERENCES umbracoNode (id) 
 ; 
+/*
 ALTER TABLE umbracoUser2app ADD FOREIGN KEY (app) REFERENCES umbracoApp (appAlias)
 ;
+*/
 
 /* TABLE IS NEVER USED, REMOVED FOR 4.1
 
@@ -716,10 +724,12 @@ insert into umbracoRelationType (`dual`, parentObjectType, childObjectType, name
 ;
 ALTER TABLE cmsMacro ADD macroPython nvarchar(255)
 ;
+/*
 INSERT INTO umbracoAppTree(treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType) VALUES(0, 1, 4, 'developer', 'python', 'Python Files', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadPython') 
 ;
 INSERT INTO umbracoAppTree(treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType) VALUES(0, 1, 2, 'settings', 'scripts', 'Scripts', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadScripts') 
 ;
+*/
 alter TABLE cmsContentType add thumbnail nvarchar(255) NOT NULL DEFAULT 'folder.png'
 ;
 alter TABLE cmsContentType add description nvarchar(1500) NULL
@@ -748,6 +758,7 @@ SELECT DISTINCT userID, nodeId, 'H' FROM umbracoUser2NodePermission WHERE userId
 (SELECT umbracoUser.id FROM umbracoUserType INNER JOIN umbracoUser ON umbracoUserType.id = umbracoUser.userType WHERE (umbracoUserType.userTypeAlias = 'writer'))
 ;
 
+/*
 INSERT IGNORE INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
 VALUES (0, 0, 0, 'content', 'contentRecycleBin', 'RecycleBin', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.ContentRecycleBin')
 ;
@@ -759,6 +770,7 @@ VALUES (0, 1, 1, 'users', 'userTypes', 'User Types', 'folder.gif', 'folder_o.gif
 INSERT IGNORE INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
 VALUES (0, 1, 2, 'users', 'userPermissions', 'User Permissions', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.UserPermissions')
 ;
+*/
 
 CREATE TABLE cmsTagRelationship
 (
@@ -784,6 +796,7 @@ REFERENCES cmsTags (id)
 ON DELETE CASCADE;
 
 /* TRANSLATION RELATED SQL */
+/*
 INSERT INTO umbracoApp (appAlias, sortOrder, appIcon, appName, appInitWithTreeAlias) 
 VALUES ('translation', 5, '.traytranslation', 'Translation', NULL)
 ;
@@ -793,6 +806,7 @@ VALUES (0, 1, 1, 'translation','openTasks', 'Tasks assigned to you', '.sprTreeFo
 INSERT INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
 VALUES (0, 1, 2, 'translation','yourTasks', 'Tasks created by you', '.sprTreeFolder', '.sprTreeFolder_o', 'umbraco', 'loadYourTasks')
 ;
+*/
 
 ALTER TABLE umbraconode MODIFY COLUMN id INTEGER NOT NULL AUTO_INCREMENT; /* fix for MySQL bug 36411 */
 
@@ -805,9 +819,11 @@ VALUES (-21, 0, -1, 0, 0, '-1,-21', 0, 'BF7C7CBC-952F-4518-97A2-69E9C7B33842', '
 /* re-add auto increment */
 ALTER TABLE umbraconode MODIFY COLUMN id INTEGER NOT NULL AUTO_INCREMENT; 
 /* Add the mediaRecycleBin tree type */
+/*
 INSERT IGNORE INTO umbracoAppTree (treeSilent, treeInitialize, treeSortOrder, appAlias, treeAlias, treeTitle, treeIconClosed, treeIconOpen, treeHandlerAssembly, treeHandlerType)
 VALUES (0, 0, 0, 'media', 'mediaRecycleBin', 'RecycleBin', 'folder.gif', 'folder_o.gif', 'umbraco', 'cms.presentation.Trees.MediaRecycleBin')
 ;
+*/
 
 CREATE TABLE cmsPreviewXml(
 	nodeId int NOT NULL,

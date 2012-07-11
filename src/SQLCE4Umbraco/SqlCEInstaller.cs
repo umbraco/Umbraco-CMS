@@ -8,6 +8,7 @@
 
 using System;
 using System.Resources;
+using SQLCE4Umbraco;
 using umbraco.DataLayer.Utility.Installer;
 using System.Diagnostics;
 

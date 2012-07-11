@@ -178,16 +178,14 @@ namespace umbraco.cms.presentation.user
             sectionValidator.ServerValidate += new ServerValidateEventHandler(sectionValidator_ServerValidate);
             sectionValidator.ControlToValidate = lapps.ID;
             sectionValidator.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", ui.Text("user", "modules", base.getUser()), base.getUser());
+            sectionValidator.CssClass = "error";
 
             setupForm();
             setupChannel();
 
-			if (!IsPostBack)
-			{
-				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadUsers>().Tree.Alias)
-					.SyncTree(UID.ToString(), false);
-			}
+			ClientTools
+			    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadUsers>().Tree.Alias)
+                .SyncTree(UID.ToString(), IsPostBack);
         }
 
 
