@@ -24,18 +24,35 @@ namespace umbraco.cms.businesslogic.datatype
             set
             {
                 UmbracoFile um = null;
-                if (value is HttpPostedFile)
+                if (value is HttpPostedFile || value is HttpPostedFileBase)
                 {
+                    string name = string.Empty;
+                    Stream fileStream = null;
+
+                    if (value is HttpPostedFile)
+                    {
+                        var file = value as HttpPostedFile;
+                        name = file.FileName;
+                        fileStream = file.InputStream;
+                    }
+                    else if (value is HttpPostedFileBase)
+                    {
+                        var file = value as HttpPostedFileBase;
+                        name = file.FileName;
+                        fileStream = file.InputStream;
+                    }
+
+
                     // handle upload
-                    var file = value as HttpPostedFile;
-                    if (file.FileName != String.Empty)
+
+                    if (name != String.Empty)
                     {
                         string fileName = UmbracoSettings.UploadAllowDirectories
-                                              ? Path.Combine(PropertyId.ToString(), file.FileName)
-                                              : PropertyId + "-" + file.FileName;
+                                              ? Path.Combine(PropertyId.ToString(), name)
+                                              : PropertyId + "-" + name;
 
                         fileName = Path.Combine(SystemDirectories.Media, fileName);
-                        um = UmbracoFile.Save(file, fileName);
+                        um = UmbracoFile.Save(fileStream, fileName);
 
                         if (um.SupportsResizing)
                         {
