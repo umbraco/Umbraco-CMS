@@ -16,12 +16,12 @@
     <umb:Pane ID="nameAliasPane" runat="server" Text="">
         	
 		<umb:PropertyPanel runat="server" ID="nameProperyPanel" Text="Name">			
-                <asp:TextBox ID="descriptionTextBox" runat="server" Columns="40" AutoCompleteType="Disabled" />
+                <asp:TextBox ID="descriptionTextBox" runat="server" Columns="40" AutoCompleteType="Disabled" style="width:200px;" />
                 <asp:RequiredFieldValidator ID="descriptionRequiredFieldValidator" runat="server" ControlToValidate="descriptionTextBox" ValidationGroup="NewRelationType" ErrorMessage="Name Required" Display="Dynamic" />
 		</umb:PropertyPanel>
         			
 		<umb:PropertyPanel runat="server" id="aliasPropertyPanel" Text="Alias">
-                <asp:TextBox ID="aliasTextBox" runat="server" Columns="40" AutoCompleteType="Disabled"/>
+                <asp:TextBox ID="aliasTextBox" runat="server" Columns="40" AutoCompleteType="Disabled" style="width:200px;" />
                 <asp:RequiredFieldValidator ID="aliasRequiredFieldValidator" runat="server" ControlToValidate="aliasTextBox" ValidationGroup="NewRelationType" ErrorMessage="Alias Required" Display="Dynamic" />
                 <asp:CustomValidator ID="aliasCustomValidator" runat="server" ControlToValidate="aliasTextBox" ValidationGroup="NewRelationType" onservervalidate="AliasCustomValidator_ServerValidate" ErrorMessage="Duplicate Alias" Display="Dynamic" />
 		</umb:PropertyPanel>
