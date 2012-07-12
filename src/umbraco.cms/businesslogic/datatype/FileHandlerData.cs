@@ -113,12 +113,34 @@ namespace umbraco.cms.businesslogic.datatype
                     {
                         // if no file is uploaded, we reset the value
                         base.Value = String.Empty;
+
+                        // also reset values of related fields
+                        clearRelatedValues();
                     }
                 }
                 else
                 {
                     base.Value = value;
+                    clearRelatedValues();
                 }
+            }
+        }
+
+        private void clearRelatedValues()
+        {
+            string propertyTypeAlias = new Property(PropertyId).PropertyType.Alias;
+            XmlNode uploadFieldConfigNode =
+                UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
+                    string.Format("uploadField [@alias = \"{0}\"]", propertyTypeAlias));
+            if (uploadFieldConfigNode != null)
+            {
+                // get the current document
+                Content content = Content.GetContentFromVersion(Version);
+                // only add dimensions to web images
+                updateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", String.Empty);
+                updateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", String.Empty);
+                updateContentProperty(uploadFieldConfigNode, content, "lengthFieldAlias", String.Empty);
+                updateContentProperty(uploadFieldConfigNode, content, "extensionFieldAlias", String.Empty);
             }
         }
 
