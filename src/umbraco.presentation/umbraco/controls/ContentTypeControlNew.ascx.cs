@@ -203,7 +203,7 @@ namespace umbraco.controls
                 // NH: don't show the sprite file
                 if (fileInfo[i].Name != "sprites.png" && fileInfo[i].Name != "sprites_ie6.gif")
                 {
-                    ListItem li = new ListItem(fileInfo[i].Name + " (deprecated)", fileInfo[i].Name);
+                    ListItem li = new ListItem(fileInfo[i].Name, fileInfo[i].Name);
                     li.Attributes.Add("title", this.ResolveClientUrl(SystemDirectories.Umbraco + "/images/umbraco/" + fileInfo[i].Name));
 
                     if (li.Value == cType.IconUrl)
@@ -225,17 +225,13 @@ namespace umbraco.controls
                 ddlThumbnails.Items.Add(li);
             }
 
-            Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", @"
-function refreshDropDowns() {
-    if (jQuery('#" + ddlIcons.ClientID + @" option').length <= 100)
-        jQuery('#" + ddlIcons.ClientID + @"').msDropDown({ showIcon: true, style: 'width:250px;' });
-    else {
-        jQuery('#" + ddlIcons.ClientID + @"').before('<div class=\'notice\'><p>For performance reasons, icons will not be displayed when there are more than 100 items in the dropdown.</p></div');
-    }
-    jQuery('#" + ddlThumbnails.ClientID + @"').msDropDown({ showIcon: false, rowHeight: '130', visibleRows: '2', style: 'width:250px;' });
-}
-jQuery(function() { refreshDropDowns(); });
-", true);
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "thumbnailsDropDown", string.Format(@"
+function refreshDropDowns() {{
+    jQuery('#{1}').msDropDown({{ showIcon: true, style: 'width:250px;' }});
+    jQuery('#{3}').msDropDown({{ showIcon: false, rowHeight: '130', visibleRows: '2', style: 'width:250px;' }});
+}}
+jQuery(document).ready(function() {{ refreshDropDowns(); }});
+", ddlIcons.ClientID, ddlIcons.ClientID, ddlIcons.ClientID, ddlThumbnails.ClientID, 500), true);
             txtName.Text = cType.GetRawText();
             txtAlias.Text = cType.Alias;
             description.Text = cType.GetRawDescription();
