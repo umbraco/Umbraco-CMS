@@ -1,49 +1,27 @@
 using System;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.ComponentModel;
 using System.IO;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Drawing.Drawing2D;
-using umbraco.cms.businesslogic.Files;
-using umbraco.IO;
 using System.Text.RegularExpressions;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using umbraco.interfaces;
+using umbraco.IO;
+using Content = umbraco.cms.businesslogic.Content;
 
 namespace umbraco.editorControls
 {
     [ValidationProperty("IsValid")]
-    public class uploadField : System.Web.UI.HtmlControls.HtmlInputFile, interfaces.IDataEditor
+    public class uploadField : HtmlInputFile, IDataEditor
     {
+        private const String _thumbnailext = ".jpg";
+        private readonly cms.businesslogic.datatype.DefaultData _data;
+        private readonly String _thumbnails;
         private String _text;
-        private cms.businesslogic.datatype.DefaultData _data;
-        private String _thumbnails;
 
-        const String _thumbnailext = ".jpg";
-
-        public uploadField(interfaces.IData Data, string ThumbnailSizes)
+        public uploadField(IData Data, string ThumbnailSizes)
         {
-            _data = (cms.businesslogic.datatype.DefaultData)Data;
+            _data = (cms.businesslogic.datatype.DefaultData) Data;
             _thumbnails = ThumbnailSizes;
-        }
-
-        public Control Editor { get { return this; } }
-
-        public virtual bool TreatAsRichTextEditor
-        {
-            get { return false; }
-        }
-        public bool ShowLabel
-        {
-            get { return true; }
-        }
-
-        public string SafeUrl(string url)
-        {
-            if (!String.IsNullOrEmpty(url))
-                return Regex.Replace(url, @"[^a-zA-Z0-9\-\.\/\:]{1}", "_");
-            else
-                return String.Empty;
         }
 
         /// <summary>
@@ -55,12 +33,12 @@ namespace umbraco.editorControls
             get
             {
                 string tempText = Text;
-                bool isEmpty = this.PostedFile == null || String.IsNullOrEmpty(this.PostedFile.FileName);
+                bool isEmpty = PostedFile == null || String.IsNullOrEmpty(PostedFile.FileName);
                 // checkbox, if it's used the file will be deleted and we should throw a validation error
-                if (Page.Request[this.ClientID + "clear"] != null && Page.Request[this.ClientID + "clear"].ToString() != "")
+                if (Page.Request[ClientID + "clear"] != null && Page.Request[ClientID + "clear"] != "")
                     return "";
                 else if (!isEmpty)
-                    return this.PostedFile.FileName;
+                    return PostedFile.FileName;
                 else if (!String.IsNullOrEmpty(tempText))
                     return tempText;
                 else
@@ -74,17 +52,27 @@ namespace umbraco.editorControls
             set { _text = value; }
         }
 
-        protected override void OnInit(EventArgs e)
+        #region IDataEditor Members
+
+        public Control Editor
         {
-            base.OnInit(e);
-            if (_data != null && _data.Value != null)
-                this.Text = _data.Value.ToString();
+            get { return this; }
+        }
+
+        public virtual bool TreatAsRichTextEditor
+        {
+            get { return false; }
+        }
+
+        public bool ShowLabel
+        {
+            get { return true; }
         }
 
         public void Save()
         {
             // Clear data
-            if (helper.Request(this.ClientID + "clear") == "1")
+            if (helper.Request(ClientID + "clear") == "1")
             {
                 // delete file
                 deleteFile(_text);
@@ -93,16 +81,12 @@ namespace umbraco.editorControls
                 _text = "";
                 _data.Value = _text;
 
-                //also clear umbracoWidth, umbracoHeight, umbracoExtension, umbracoBytes
-
-                cms.businesslogic.Content content = cms.businesslogic.Content.GetContentFromVersion(this._data.Version);
 
                 foreach (string prop in "umbracoExtension,umbracoBytes,umbracoWidth,umbracoHeight".Split(','))
                 {
                     try
                     {
-                        content.getProperty(prop).Value = string.Empty;
-                        noEdit bytesControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_" + prop);
+                        var bytesControl = FindControlRecursive<noEdit>(Page, "prop_" + prop);
                         if (bytesControl != null)
                         {
                             bytesControl.RefreshLabel(string.Empty);
@@ -116,59 +100,80 @@ namespace umbraco.editorControls
                 }
             }
 
-            if (this.PostedFile != null)
+            if (PostedFile != null && PostedFile.FileName != String.Empty)
             {
-                _data.Value = this.PostedFile;
+                _data.Value = PostedFile;
 
                 // we update additional properties post image upload
                 if (_data.Value != DBNull.Value && !string.IsNullOrEmpty(_data.Value.ToString()))
                 {
-                    var fullFilePath = IO.IOHelper.MapPath(_data.Value.ToString());
+                    string fullFilePath = IOHelper.MapPath(_data.Value.ToString());
 
-                    cms.businesslogic.Content content = cms.businesslogic.Content.GetContentFromVersion(this._data.Version);
+                    Content content = Content.GetContentFromVersion(_data.Version);
 
                     // update extension in UI
                     try
                     {
-                        noEdit extensionControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoExtension");
+                        var extensionControl = FindControlRecursive<noEdit>(Page, "prop_umbracoExtension");
                         if (extensionControl != null)
                         {
                             extensionControl.RefreshLabel(content.getProperty("umbracoExtension").Value.ToString());
                         }
                     }
-                    catch { }
-
+                    catch
+                    {
+                    }
 
 
                     // update file size in UI
                     try
                     {
-                        noEdit bytesControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoBytes");
+                        var bytesControl = FindControlRecursive<noEdit>(Page, "prop_umbracoBytes");
                         if (bytesControl != null)
                         {
                             bytesControl.RefreshLabel(content.getProperty("umbracoBytes").Value.ToString());
                         }
                     }
-                    catch { }
+                    catch
+                    {
+                    }
 
                     try
                     {
-                        noEdit widthControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoWidth");
+                        var widthControl = FindControlRecursive<noEdit>(Page, "prop_umbracoWidth");
                         if (widthControl != null)
                         {
                             widthControl.RefreshLabel(content.getProperty("umbracoWidth").Value.ToString());
                         }
-                        noEdit heightControl = uploadField.FindControlRecursive<noEdit>(this.Page, "prop_umbracoHeight");
+                        var heightControl = FindControlRecursive<noEdit>(Page, "prop_umbracoHeight");
                         if (heightControl != null)
                         {
                             heightControl.RefreshLabel(content.getProperty("umbracoHeight").Value.ToString());
                         }
                     }
-                    catch { }
-
+                    catch
+                    {
+                    }
                 }
-                this.Text = _data.Value.ToString();
+                Text = _data.Value.ToString();
             }
+        }
+
+        #endregion
+
+        public string SafeUrl(string url)
+        {
+            if (!String.IsNullOrEmpty(url))
+                return Regex.Replace(url, @"[^a-zA-Z0-9\-\.\/\:]{1}", "_");
+            else
+                return String.Empty;
+        }
+
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+            if (_data != null && _data.Value != null)
+                Text = _data.Value.ToString();
         }
 
         private void deleteFile(string file)
@@ -176,26 +181,26 @@ namespace umbraco.editorControls
             if (file.Length > 0)
             {
                 // delete old file
-                if (System.IO.File.Exists(IOHelper.MapPath(file)))
-                    System.IO.File.Delete(IOHelper.MapPath(file));
+                if (File.Exists(IOHelper.MapPath(file)))
+                    File.Delete(IOHelper.MapPath(file));
 
-                string extension = ((string)file.Substring(file.LastIndexOf(".") + 1, file.Length - file.LastIndexOf(".") - 1));
+                string extension = (file.Substring(file.LastIndexOf(".") + 1, file.Length - file.LastIndexOf(".") - 1));
                 extension = extension.ToLower();
 
                 //check for thumbnails
                 if (",jpeg,jpg,gif,bmp,png,tiff,tif,".IndexOf("," + extension + ",") > -1)
                 {
-
-
                     //delete thumbnails
                     string thumbnailfile = file.Replace("." + extension, "_thumb");
 
                     try
                     {
-                        if (System.IO.File.Exists(IOHelper.MapPath(thumbnailfile + _thumbnailext)))
-                            System.IO.File.Delete(IOHelper.MapPath(thumbnailfile + _thumbnailext));
+                        if (File.Exists(IOHelper.MapPath(thumbnailfile + _thumbnailext)))
+                            File.Delete(IOHelper.MapPath(thumbnailfile + _thumbnailext));
                     }
-                    catch { }
+                    catch
+                    {
+                    }
 
                     if (_thumbnails != "")
                     {
@@ -208,13 +213,14 @@ namespace umbraco.editorControls
 
                                 try
                                 {
-                                    if (System.IO.File.Exists(IOHelper.MapPath(thumbnailextra)))
-                                        System.IO.File.Delete(IOHelper.MapPath(thumbnailextra));
+                                    if (File.Exists(IOHelper.MapPath(thumbnailextra)))
+                                        File.Delete(IOHelper.MapPath(thumbnailextra));
                                 }
-                                catch { }
+                                catch
+                                {
+                                }
                             }
                         }
-
                     }
                 }
             }
@@ -240,12 +246,12 @@ namespace umbraco.editorControls
         {
             if ((parent is T) && (parent.ID == id))
             {
-                return (T)parent;
+                return (T) parent;
             }
 
             foreach (Control control in parent.Controls)
             {
-                T foundControl = uploadField.FindControlRecursive<T>(control, id);
+                var foundControl = FindControlRecursive<T>(control, id);
                 if (foundControl != null)
                 {
                     return foundControl;
@@ -260,7 +266,7 @@ namespace umbraco.editorControls
         /// <param name="output"> The HTML writer to write out to </param>
         protected override void Render(HtmlTextWriter output)
         {
-            if (!string.IsNullOrEmpty(this.Text))
+            if (!string.IsNullOrEmpty(Text))
             {
                 string ext = _text.Substring(_text.LastIndexOf(".") + 1, _text.Length - _text.LastIndexOf(".") - 1);
                 string fileNameThumb = _text.Replace("." + ext, "_thumb.jpg");
@@ -275,10 +281,12 @@ namespace umbraco.editorControls
                         hasThumb = File.Exists(IOHelper.MapPath(IOHelper.FindFile(fileNameThumb)));
                     }
                 }
-                catch { }
+                catch
+                {
+                }
                 if (hasThumb)
                 {
-                    System.Web.UI.WebControls.Image thumb = new System.Web.UI.WebControls.Image();
+                    var thumb = new Image();
                     thumb.ImageUrl = fileNameThumb;
                     thumb.BorderStyle = BorderStyle.None;
 
@@ -287,9 +295,12 @@ namespace umbraco.editorControls
                     output.WriteLine("</a><br/>");
                 }
                 else
-                    output.WriteLine("<a href=\"" + IOHelper.FindFile(this.Text) + "\" target=\"_blank\">" + IOHelper.FindFile(this.Text) + "</a><br/>");
+                    output.WriteLine("<a href=\"" + IOHelper.FindFile(Text) + "\" target=\"_blank\">" +
+                                     IOHelper.FindFile(Text) + "</a><br/>");
 
-                output.WriteLine("<input type=\"checkbox\" id=\"" + this.ClientID + "clear\" name=\"" + this.ClientID + "clear\" value=\"1\"/> <label for=\"" + this.ClientID + "clear\">" + ui.Text("uploadClear") + "</label><br/>");
+                output.WriteLine("<input type=\"checkbox\" id=\"" + ClientID + "clear\" name=\"" + ClientID +
+                                 "clear\" value=\"1\"/> <label for=\"" + ClientID + "clear\">" + ui.Text("uploadClear") +
+                                 "</label><br/>");
             }
             base.Render(output);
         }
