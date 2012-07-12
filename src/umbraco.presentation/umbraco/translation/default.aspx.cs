@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.translation;
@@ -200,6 +201,8 @@ namespace umbraco.presentation.translation
                             // update node contents
                             Document d = new Document(t.Node.Id);
                             Document.Import(d.ParentId, getUser(), (XmlElement)taskNode);
+                            BusinessLogic.Actions.Action.RunActionHandlers(d, ActionTranslate.Instance);
+
                             /*                            d.Text = taskNode.Attributes.GetNamedItem("nodeName").Value.Trim();
 
                                                         // update data elements
