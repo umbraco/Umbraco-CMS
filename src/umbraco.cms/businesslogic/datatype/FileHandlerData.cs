@@ -24,7 +24,7 @@ namespace umbraco.cms.businesslogic.datatype
             set
             {
                 UmbracoFile um = null;
-                if (value is HttpPostedFile || value is HttpPostedFileBase)
+                if (value is HttpPostedFile || value is HttpPostedFileBase || value is HttpPostedFileWrapper)
                 {
                     string name = string.Empty;
                     Stream fileStream = null;
@@ -38,6 +38,12 @@ namespace umbraco.cms.businesslogic.datatype
                     else if (value is HttpPostedFileBase)
                     {
                         var file = value as HttpPostedFileBase;
+                        name = file.FileName;
+                        fileStream = file.InputStream;
+                    }
+                    else if (value is HttpPostedFileWrapper)
+                    {
+                        var file = value as HttpPostedFileWrapper;
                         name = file.FileName;
                         fileStream = file.InputStream;
                     }
