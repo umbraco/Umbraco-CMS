@@ -168,7 +168,7 @@ function toggleDatabaseOption(selectValNew) {
         //jQuery(step1 + ' .row').hide();
 
         if (selectValNew != '') {
-            if (selectValNew == 'SqlServer' || selectValNew == 'MySql') {
+            if (selectValNew == 'SqlServer' || selectValNew == 'SqlAzure' || selectValNew == 'MySql') {
                 jQuery('#database-blank-inputs').show();
                 //instructionText.show();
                 buttonBox.show();

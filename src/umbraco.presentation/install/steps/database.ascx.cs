@@ -1,15 +1,11 @@
 using System;
-using System.Data;
 using System.Data.Common;
-using System.Drawing;
-using System.Web;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.DataLayer;
 using umbraco.DataLayer.Utility.Installer;
 using System.IO;
 using umbraco.IO;
-using System.Threading;
 
 namespace umbraco.presentation.install.steps
 {
@@ -141,6 +137,8 @@ namespace umbraco.presentation.install.steps
                     dbinit.Text = "$('#databaseOptionAdvanced').click();$('#databaseOptionAdvanced').change();";
                 else if(DatabaseType.SelectedValue == "SqlServer")
                     dbinit.Text = "$('#databaseOptionBlank').click();$('#databaseOptionBlank').change();";
+                else if (DatabaseType.SelectedValue == "SqlAzure")
+                    dbinit.Text = "$('#databaseOptionBlank').click();$('#databaseOptionBlank').change();";
                 //toggleVisible(DatabaseConnectionString, ManualConnectionString);
 
             // Make sure ASP.Net displays the password text
@@ -150,10 +148,6 @@ namespace umbraco.presentation.install.steps
         /// <summary>
         /// Shows the installation/upgrade panel.
         /// </summary>
-        /// 
-
-        
-
         protected void saveDBConfig(object sender, EventArgs e)
         {
             Helper.setProgress(5, "Saving database connection...", "");
@@ -173,69 +167,6 @@ namespace umbraco.presentation.install.steps
             installing.Visible = true;
         }
 
-
-        /// <summary>
-        /// Tries to connect to the database and saves the new connection string if successful.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The event arguments.</param>
-        /// 
-    
-        /*
-        protected void DatabaseConnectButton_Click(object sender, EventArgs e)
-        {
-            
-            // Build the new connection string
-            DbConnectionStringBuilder connectionStringBuilder = CreateConnectionString();
-            Helper.setSession(sesssionAlias, 5, "Connecting...", "");
-
-            // Try to connect to the database
-            Exception error = null;
-            try
-            {
-                ISqlHelper sqlHelper = DataLayerHelper.CreateSqlHelper(connectionStringBuilder.ConnectionString);
-                m_Installer = sqlHelper.Utility.CreateInstaller();
-                
-                if (!Installer.CanConnect)
-                    throw new Exception("The installer cannot connect to the database.");
-                else
-                    Helper.setSession(sesssionAlias, 20, "Connection opened", "");
-            }
-            catch (Exception ex)
-            {
-                error = new Exception("Database connection initialisation failed.", ex);
-                Helper.setSession(sesssionAlias, -5, "Database connection initialisation failed.", error.Message);
-            }
-
-            // Save the new connection string
-            if (error == null)
-            {
-                try
-                {
-                    GlobalSettings.DbDSN = connectionStringBuilder.ConnectionString;
-                }
-                catch (Exception ex)
-                {
-                    error = new Exception("Could not save the web.config file. Please modify the connection string manually.", ex);
-                    Helper.setSession(sesssionAlias, -1, "Could not save the web.config file. Please modify the connection string manually.", error.Message);
-                }
-            }
-
-            // Show database installation panel or error message if not successful
-            if (error == null)
-            {
-                //ph_dbError.Visible = false;
-                //settings.Visible = false;
-                installOrUpgrade();
-            }
-            else
-            {
-                ph_dbError.Visible = true;
-                lt_dbError.Text = String.Format("{0} {1}", error.Message, error.InnerException.Message);
-            }
-        }
-        */ 
-
         /// <summary>
         /// Creates the connection string with the values the user has supplied.
         /// </summary>
@@ -248,19 +179,27 @@ namespace umbraco.presentation.install.steps
             {
                 connectionStringBuilder.ConnectionString = ConnectionString.Text;
             }
-            else if (!IsEmbeddedDatabase)
+            else if (!IsEmbeddedDatabase && !DatabaseType.SelectedValue.Contains("SqlAzure"))//If database is not embedded or of type Sql Azure
             {
                 connectionStringBuilder["server"] = DatabaseServer.Text;
                 connectionStringBuilder["database"] = DatabaseName.Text;
                 connectionStringBuilder["user id"] = DatabaseUsername.Text;
                 connectionStringBuilder["password"] = DatabasePassword.Text;
             }
+            else if (!IsEmbeddedDatabase && DatabaseType.SelectedValue.Contains("SqlAzure"))//If database is not embedded and of type Sql Azure
+            {
+                connectionStringBuilder.ConnectionString =
+                    string.Format("Server=tcp:{0}.database.windows.net;Database={1};User ID={2}@{0};Password={3}",
+                                  DatabaseServer.Text, DatabaseName.Text, DatabaseUsername.Text, DatabasePassword.Text);
+            }
             else if (Request["database"] == "embedded")
             {
                 connectionStringBuilder.ConnectionString = @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf";
             }
 
-            if (!String.IsNullOrEmpty(Request["database"]) && !String.IsNullOrEmpty(DatabaseType.SelectedValue) && !DatabaseType.SelectedValue.Contains("SqlServer")
+            if (!String.IsNullOrEmpty(Request["database"]) && !String.IsNullOrEmpty(DatabaseType.SelectedValue) 
+                && !DatabaseType.SelectedValue.Contains("SqlServer")
+                && !DatabaseType.SelectedValue.Contains("SqlAzure")
                 && Request["database"] != "advanced")
             {
                 connectionStringBuilder["datalayer"] = DatabaseType.SelectedValue;

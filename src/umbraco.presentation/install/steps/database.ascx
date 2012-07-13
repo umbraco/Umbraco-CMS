@@ -24,7 +24,7 @@
                             <ul>
                             <li>
                                 <input type="radio" id="databaseOptionBlank" name="database" value="blank" />
-                                <label for="databaseOptionBlank">I already have a blank SQL Server or MySQL database</label>
+                                <label for="databaseOptionBlank">I already have a blank SQL Server, SQL Azure or MySQL database</label>
 
                             </li>
                             <li>
@@ -61,6 +61,7 @@
 								    <asp:DropDownList runat="server" ID="DatabaseType" CssClass="sel">
 									    <asp:ListItem Value="" Text="Please choose" Selected="True" />
 									    <asp:ListItem Value="SqlServer" Text="Microsoft SQL Server" />
+									    <asp:ListItem Value="SqlAzure" Text="SQL Azure" />
 									    <asp:ListItem Value="MySql" Text="MySQL" />
 									  
 								    </asp:DropDownList>
