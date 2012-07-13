@@ -97,11 +97,6 @@ namespace umbraco.editorControls.tinyMCE3
                     if (_enableContextMenu)
                         _plugins += ",contextmenu";
 
-                    // safari compatibility
-                    if (HttpContext.Current.Request.Browser.Browser.ToLower().Contains("safari"))
-                    {
-                        _plugins += ",safari";
-                    }
 
                     // If the editor is used in umbraco, use umbraco's own toolbar
                     bool onFront = false;
