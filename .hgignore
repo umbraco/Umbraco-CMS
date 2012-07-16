@@ -42,3 +42,4 @@ build/UmbracoCms.AllBinaries.zip
 build/UmbracoCms.WebPI.zip
 build/UmbracoCms.zip
 src/Umbraco.Tests/config/applications.config
+src/Umbraco.Tests/config/trees.config

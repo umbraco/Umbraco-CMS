@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BusinessLogic\ApplicationTest.cs" />
+    <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
     <Compile Include="BusinessLogic\BaseTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

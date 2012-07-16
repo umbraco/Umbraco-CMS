@@ -471,8 +471,8 @@ namespace umbraco.BusinessLogic
         {
             lock (Locker)
             {
-                var doc = File.Exists(TreeConfigFileName)
-                    ? XDocument.Load(TreeConfigFileName)
+                var doc = File.Exists(TreeConfigFilePath)
+                    ? XDocument.Load(TreeConfigFilePath)
                     : XDocument.Parse("<?xml version=\"1.0\"?><trees />");
                 if (doc.Root != null)
                 {
@@ -480,7 +480,7 @@ namespace umbraco.BusinessLogic
 
                     if (saveAfterCallback)
                     {
-                        doc.Save(TreeConfigFileName);
+                        doc.Save(TreeConfigFilePath);
 
                         ReCache();
                     }

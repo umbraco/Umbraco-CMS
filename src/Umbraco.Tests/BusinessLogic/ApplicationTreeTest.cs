@@ -1,9 +1,9 @@
-﻿using umbraco.BusinessLogic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
+using umbraco.BusinessLogic;
 using System;
 using System.Linq;
 
-namespace Umbraco.LegacyTests
+namespace Umbraco.Tests.BusinessLogic
 {
     
     
@@ -11,8 +11,8 @@ namespace Umbraco.LegacyTests
     ///This is a test class for ApplicationTreeTest and is intended
     ///to contain all ApplicationTreeTest Unit Tests
     ///</summary>
-    [TestClass()]
-    public class ApplicationTreeTest
+    [TestFixture()]
+    public class ApplicationTreeTest :  BaseTest
     {
 
 
@@ -20,7 +20,7 @@ namespace Umbraco.LegacyTests
         /// <summary>
         /// Creates a new app tree linked to an application, then delete the application and make sure the tree is gone as well
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void ApplicationTree_Make_New_Then_Delete_App()
         {
             //create new app
@@ -40,7 +40,7 @@ namespace Umbraco.LegacyTests
             app.Delete();
 
             //check that the tree is gone
-            Assert.AreEqual<int>(0, ApplicationTree.getApplicationTree(name).Count());
+            Assert.AreEqual(0, ApplicationTree.getApplicationTree(name).Count());
         }
 
 
