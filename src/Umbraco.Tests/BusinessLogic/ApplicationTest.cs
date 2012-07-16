@@ -1,49 +1,22 @@
-﻿using System.Collections.Generic;
-using System.Configuration;
-using umbraco;
+﻿using NUnit.Framework;
 using umbraco.BusinessLogic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using umbraco.DataLayer;
 using System.Linq;
 
-namespace Umbraco.LegacyTests
+namespace Umbraco.Tests.BusinessLogic
 {
-    [TestClass()]
-    public abstract class BaseTest
-    {
-        [TestInitialize]
-        public void Initialize()
-        {
-            ConfigurationManager.AppSettings.Set("umbracoDbDSN", @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf");
-
-            var dataHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN);
-            var installer = dataHelper.Utility.CreateInstaller();
-            if (installer.CanConnect)
-            {
-                installer.Install();   
-            }   
-         
-            Application.Apps = new List<Application>()
-                {
-                    new Application("content", "content", "content", 0)
-                };
-        }
-    }
-
-
-/// <summary>
+    /// <summary>
     ///This is a test class for ApplicationTest and is intended
     ///to contain all ApplicationTest Unit Tests
     ///</summary>
-    [TestClass()]
+    [TestFixture()]
     public class ApplicationTest : BaseTest
     {
 
         /// <summary>
         /// Create a new application and delete it
         ///</summary>
-        [TestMethod()]
+        [Test()]
         public void Application_Make_New()
         {
             var name = Guid.NewGuid().ToString("N");
@@ -62,7 +35,7 @@ namespace Umbraco.LegacyTests
         /// Creates a new user, assigns the user to existing application, 
         /// then deletes the user
         /// </summary>
-        [TestMethod()]
+        [Test()]
         public void Application_Create_New_User_Assign_Application_And_Delete_User()
         {
             var name = Guid.NewGuid().ToString("N");
@@ -89,7 +62,7 @@ namespace Umbraco.LegacyTests
         /// <summary>
         /// create a new application and assigne an new user and deletes the application making sure the assignments are removed
         /// </summary>
-        [TestMethod()]
+        [Test()]
         public void Application_Make_New_Assign_User_And_Delete()
         {
             var name = Guid.NewGuid().ToString("N");
@@ -107,13 +80,13 @@ namespace Umbraco.LegacyTests
             //assign the app
             user.addApplication(app.alias);
             //ensure it's added
-            Assert.AreEqual<int>(1, user.Applications.Where(x => x.alias == app.alias).Count());
+            Assert.AreEqual(1, user.Applications.Count(x => x.alias == app.alias));
 
             //delete the app
             app.Delete();
 
             //make sure the assigned applications are gone
-            Assert.AreEqual<int>(0, user.Applications.Where(x => x.alias == name).Count());
+            Assert.AreEqual(0, user.Applications.Count(x => x.alias == name));
         }
 
         #region Tests to write

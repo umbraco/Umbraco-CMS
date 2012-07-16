@@ -121,7 +121,6 @@
     <Compile Include="..\..\src\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="ApplicationTest.cs" />
     <Compile Include="ApplicationTreeTest.cs" />
     <Compile Include="DataTypeDefinitionTest.cs" />
     <Compile Include="DictionaryTest.cs" />
