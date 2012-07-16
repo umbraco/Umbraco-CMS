@@ -2,13 +2,11 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
-using umbraco.interfaces;
 using umbraco.cms.businesslogic.web;
 using System.Linq;
 using umbraco.BusinessLogic.Actions;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
     
     

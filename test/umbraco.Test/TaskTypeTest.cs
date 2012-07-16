@@ -1,13 +1,12 @@
 ﻿using umbraco.cms.businesslogic.task;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using System.Linq;
 using umbraco.DataLayer;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
     
     

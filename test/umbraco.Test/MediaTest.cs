@@ -4,13 +4,12 @@ using System;
 using System.Collections.Generic;
 using umbraco.BusinessLogic;
 using System.Linq;
-using umbraco.editorControls.textfield;
 using umbraco.editorControls.label;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.property;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
     
     

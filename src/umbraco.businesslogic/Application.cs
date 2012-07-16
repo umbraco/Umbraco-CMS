@@ -33,7 +33,7 @@ namespace umbraco.BusinessLogic
         /// <summary>
         /// The cache storage for all applications
         /// </summary>
-        private static List<Application> Apps
+        internal static List<Application> Apps
         {
             get
             {                

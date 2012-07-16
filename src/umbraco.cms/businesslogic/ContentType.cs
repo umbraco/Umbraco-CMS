@@ -11,8 +11,6 @@ using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 
-[assembly: InternalsVisibleTo("Umbraco.Test")]
-
 namespace umbraco.cms.businesslogic
 {
     /// <summary>

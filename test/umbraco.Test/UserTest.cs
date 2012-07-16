@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using umbraco.DataLayer;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
     
     

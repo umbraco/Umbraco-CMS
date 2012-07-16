@@ -1,13 +1,11 @@
 ﻿using umbraco.cms.businesslogic.propertytype;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using umbraco.interfaces;
 using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic;
 using System.Linq;
 using umbraco.cms.businesslogic.web;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
 
 

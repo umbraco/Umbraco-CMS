@@ -3,11 +3,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.propertytype;
-using System.Xml;
 using umbraco.cms.businesslogic.datatype;
 using System.Linq;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
     
     

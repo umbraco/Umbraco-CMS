@@ -5,21 +5,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{5BA5425F-27A7-4677-865E-82246498AA2E}</ProjectGuid>
+    <ProjectGuid>{5D3B8245-ADA6-453F-A008-50ED04BFE770}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SQLCE4Umbraco</RootNamespace>
-    <AssemblyName>SQLCE4Umbraco</AssemblyName>
+    <RootNamespace>Umbraco.Tests</RootNamespace>
+    <AssemblyName>Umbraco.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,10 +33,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\SQLCE4\System.Data.SqlServerCe.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -52,46 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SolutionInfo.cs">
-      <Link>Properties\SolutionInfo.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlCeApplicationBlock.cs" />
-    <Compile Include="SqlCeContextGuardian.cs" />
-    <Compile Include="SqlCEDataReader.cs" />
-    <Compile Include="SqlCEHelper.cs" />
-    <Compile Include="SqlCEInstaller.cs" />
-    <Compile Include="SqlCEParameter.cs" />
-    <Compile Include="SqlCeProviderException.cs" />
-    <Compile Include="SqlCEResources1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>SqlCEResources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="SqlCETableUtility.cs" />
-    <Compile Include="SqlCEUtility.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Sql\Total.sql" />
-    <None Include="Sql\Version4_1_Upgrade.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="SqlCEResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>SqlCEResources1.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
-      <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
-      <Name>umbraco.datalayer</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

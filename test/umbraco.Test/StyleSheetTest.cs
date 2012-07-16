@@ -2,9 +2,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using umbraco.BusinessLogic;
-using System.Xml;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
     
     

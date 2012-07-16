@@ -5,7 +5,7 @@ using umbraco.BusinessLogic;
 using System.Collections;
 using System.Linq;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
     
     

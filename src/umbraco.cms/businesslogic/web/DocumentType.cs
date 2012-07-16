@@ -10,7 +10,6 @@ using umbraco.DataLayer;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Umbraco.Test")]
 
 namespace umbraco.cms.businesslogic.web
 {

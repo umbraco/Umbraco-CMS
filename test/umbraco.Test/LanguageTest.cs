@@ -6,12 +6,11 @@ using umbraco.BusinessLogic;
 using System.Linq;
 using System;
 using System.Globalization;
-using System.Data.SqlClient;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic.web;
 using System.Data;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
     
     
