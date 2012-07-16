@@ -149,6 +149,10 @@
     <Shadow Include="Test References\umbraco.accessor" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\SQLCE4Umbraco\SqlCE4Umbraco.csproj">
+      <Project>{5BA5425F-27A7-4677-865E-82246498AA2E}</Project>
+      <Name>SqlCE4Umbraco</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\umbraco.editorControls\umbraco.editorControls.csproj">
       <Project>{255F5DF1-4E43-4758-AC05-7A0B68EB021B}</Project>
       <Name>umbraco.editorControls</Name>

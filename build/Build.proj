@@ -218,7 +218,7 @@
             DestinationFolder="$(WebAppFolder)\umbraco\webservices\api" OverwriteReadOnlyFiles="True"/>
 
     <!-- SQLCE4UMBRACO -->
-    <Message Text="Compiling SQLCE4Umbraco project" Importance="high" />
+    <!--<Message Text="Compiling SQLCE4Umbraco project" Importance="high" />
     <MSBuild Projects="..\src\SQLCE4Umbraco\SQLCE4Umbraco.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
     </MSBuild>
     <ItemGroup>
@@ -227,7 +227,7 @@
     <Copy SourceFiles="@(SQLCE4UmbracoDll)"
           DestinationFolder="$(SolutionBinFolder)" OverwriteReadOnlyFiles="True"/>
     <Copy SourceFiles="@(SQLCE4UmbracoDll)"
-          DestinationFolder="$(WebAppFolder)\bin" OverwriteReadOnlyFiles="True"/>
+          DestinationFolder="$(WebAppFolder)\bin" OverwriteReadOnlyFiles="True"/>-->
 
     <!-- DONE -->
     <Message Text="Finished compiling projects" Importance="high" />
