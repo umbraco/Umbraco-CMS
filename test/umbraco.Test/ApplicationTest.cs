@@ -1,21 +1,43 @@
-﻿using umbraco.BusinessLogic;
+﻿using System.Collections.Generic;
+using System.Configuration;
+using umbraco;
+using umbraco.BusinessLogic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using umbraco.interfaces;
-using System.Collections.Generic;
 using umbraco.DataLayer;
 using System.Linq;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
-    
-    
-    /// <summary>
+    [TestClass()]
+    public abstract class BaseTest
+    {
+        [TestInitialize]
+        public void Initialize()
+        {
+            ConfigurationManager.AppSettings.Set("umbracoDbDSN", @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf");
+
+            var dataHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN);
+            var installer = dataHelper.Utility.CreateInstaller();
+            if (installer.CanConnect)
+            {
+                installer.Install();   
+            }   
+         
+            Application.Apps = new List<Application>()
+                {
+                    new Application("content", "content", "content", 0)
+                };
+        }
+    }
+
+
+/// <summary>
     ///This is a test class for ApplicationTest and is intended
     ///to contain all ApplicationTest Unit Tests
     ///</summary>
     [TestClass()]
-    public class ApplicationTest
+    public class ApplicationTest : BaseTest
     {
 
         /// <summary>
@@ -50,18 +72,18 @@ namespace umbraco.Test
             var user = User.MakeNew(name, name, name, ut);
 
             //get application
-            var app = Application.getAll().First();
+            //var app = Application.getAll().First();
 
             //assign the app
-            user.addApplication(app.alias);
+            user.addApplication("content");
             //ensure it's added
-            Assert.AreEqual<int>(1, user.Applications.Where(x => x.alias == app.alias).Count());
+            Assert.AreEqual(1, user.Applications.Count(x => x.alias == "content"));
 
             //delete the user
             user.delete();
 
             //make sure the assigned applications are gone
-            Assert.AreEqual<int>(0, user.Applications.Where(x => x.alias == name).Count());
+            Assert.AreEqual(0, user.Applications.Count(x => x.alias == name));
         }
 
         /// <summary>
