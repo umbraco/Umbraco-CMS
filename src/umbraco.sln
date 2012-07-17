@@ -73,6 +73,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests", "Umbraco.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web", "Umbraco.Web\Umbraco.Web.csproj", "{455E899F-C234-497B-BDA4-038D52626FFB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{4C4C194C-B5E4-4991-8F87-4373E24CC19F}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = umbraco2.vsmdi
@@ -150,6 +152,10 @@ Global
 		{455E899F-C234-497B-BDA4-038D52626FFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{455E899F-C234-497B-BDA4-038D52626FFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{455E899F-C234-497B-BDA4-038D52626FFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C4C194C-B5E4-4991-8F87-4373E24CC19F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C4C194C-B5E4-4991-8F87-4373E24CC19F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C4C194C-B5E4-4991-8F87-4373E24CC19F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C4C194C-B5E4-4991-8F87-4373E24CC19F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

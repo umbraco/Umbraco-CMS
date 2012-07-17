@@ -1,0 +1,22 @@
+@*
+LIST SUBPAGES BY LIMIT AND DATETIME
+===================================
+This snippet shows how easy it is to combine different queries. It lists the children of the currentpage which is
+visible and then grabs a specified number of items sorted by the day they're updated.
+
+How it works:
+- It uses the Take() method to specify a maximum number of items to output
+- It adds a OrderBy() to sort the items. You can even combine this, for instance OrderBy("UpdateDate, Name desc")
+  
+NOTE: It is safe to remove this comment (anything between @ * * @), the code that generates the list is only the below!
+*@
+
+@inherits umbraco.MacroEngines.DynamicNodeContext
+
+@{ var numberOfItems = 10; }
+<ul>
+    @foreach (var item in @Model.Children.Where("Visible").OrderBy("UpdateDate").Take(numberOfItems))
+    {
+        <li><a href="@item.Url">@item.Name</a></li>
+    }
+</ul>

@@ -1,0 +1,83 @@
+@*
+HOW TO DO PAGING
+=================================
+This an example of how to do paging of content including a Google style page navigation. You likely want to
+modify the query (first line, assigned to the 'pagesToList' variable) and the output made within the foreach 
+loop (<li> ... </li>)
+
+How to Customize for re-use (only applies to Macros, not if you insert this snippet directly in a template):
+- You can customize the number of items per page by adding a Macro Parameter with the alias of "ItemsPerPage"
+- You can customize the labels of previous/next by adding Macro Parameters with the alias of "PreviousLabel" and
+  "NextLabel"
+
+How it works:
+- The pages to display is added to the variable 'pagesToList'. To change what pages to list, simply update the query
+- The next part assigns the number of items and the previous/next labels using either default values or Macro Parameters
+- Then it's using a bit of math to calculate how many pages and what should currently be displayed
+- In the first <p /> element, a summary is printed. This could likely be removed
+- In the <ul /> the magic happens. Notice how it's using Skip() and Take() to jump to the relevant items and iterate
+  over the number of items to display
+- In the end it added a Google style page navigation (<<Previous 1 2 3 4 Next >>)
+
+  NOTE: It is safe to remove this comment (anything between @ * * @), the code that generates the list is only the below!
+*@
+
+@inherits umbraco.MacroEngines.DynamicNodeContext
+@{
+  var pagesToList = @Model.Children;
+
+  // configuration
+  var itemsPerPage = String.IsNullOrEmpty(Parameter.ItemsPerPage) ? 3 : int.Parse(Parameter.ItemsPerPage);
+  var previousLabel = String.IsNullOrEmpty(Parameter.PreviousLabel) ? "Previous" : Parameter.PreviousLabel;
+  var nextLabel = String.IsNullOrEmpty(Parameter.NextLabel) ? "Next" : Parameter.NextLabel;
+
+  // paging calculations
+  var numberOfItems = pagesToList.Count();
+  int currentPage = 1;
+  if (!int.TryParse(HttpContext.Current.Request.QueryString["Page"], out currentPage)) {
+    currentPage = 1;
+  }
+  currentPage--;
+  var numberOfPages = numberOfItems % itemsPerPage == 0 ? Math.Ceiling((decimal)(numberOfItems / itemsPerPage)) : Math.Ceiling((decimal)(numberOfItems / itemsPerPage))+1; 
+
+  <p>
+    Total Items: @numberOfItems <br />
+    Items per Page: @itemsPerPage<br />
+    Pages: @numberOfPages;<br />
+    Current Page: @(currentPage)
+  </p>
+
+  <ul>
+    @foreach(var item in pagesToList.Skip(currentPage*itemsPerPage).Take(itemsPerPage))
+    {
+      <li>@item.Name</li>
+    }
+  </ul>
+
+  <p class="pagingPages">
+    @{
+	// Google style paging links
+    if (currentPage > 0) {
+      <a href="?page=@(currentPage)">&laquo; @previousLabel</a>
+    } else {
+      <span class="pagingDisabled">&laquo; @previousLabel</span>
+    }
+    
+    var Pages = Enumerable.Range(1, (int)numberOfPages);
+    foreach(var number in Pages) {
+      if (number-1 != currentPage) {
+      <a href="?page=@number">@number</a>
+      } else {
+      @number
+      }
+      @Html.Raw("&nbsp&nbsp");
+    }
+
+    if (currentPage < Pages.Count()-1) {
+      <a href="?page=@(currentPage+2)">@nextLabel &raquo;</a>
+    } else {
+      <span class="pagingDisabled">@nextLabel &raquo;</span>
+    }
+  }
+  </p>
+}

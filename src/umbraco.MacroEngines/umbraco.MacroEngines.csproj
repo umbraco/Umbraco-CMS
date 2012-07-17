@@ -157,6 +157,9 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(TargetPath)" "$(ProjectDir)..\umbraco.presentation\bin\" /Y /F
+
+xcopy "$(TargetPath)" "$(ProjectDir)..\Umbraco.Web.UI\bin\" /Y /F
+
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

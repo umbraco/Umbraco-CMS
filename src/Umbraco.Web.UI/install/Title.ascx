@@ -1,0 +1,2 @@
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="Title.ascx.cs" Inherits="umbraco.presentation.install.Title" %>
+<title>Umbraco <%=umbraco.GlobalSettings.CurrentVersion%> Configuration Wizard</title>

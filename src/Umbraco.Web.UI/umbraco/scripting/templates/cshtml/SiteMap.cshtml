@@ -1,0 +1,44 @@
+@*
+SITEMAP
+=================================
+This snippet generates a complete sitemap of all pages that are published and visible (it'll filter out any 
+pages with a property named "umbracoNaviHide" that's set to 'true'). It's also a great example on how to make
+helper methods in Razor and how to pass values to your '.Where' filters.
+
+How to Customize for re-use (only applies to Macros, not if you insert this snippet directly in a template):
+- If you add a Macro Parameter with the alias of "MaxLevelForSitemap" which specifies how deep in the hierarchy to traverse 
+
+How it works:
+- The first line (var maxLevelForSitemap) assigns default values if none is specified via Macro Parameters
+- Next is a helper method 'traverse' which uses recursion to keep making new lists for each level in the sitemap
+- Inside the the 'traverse' method there's an example of using a 'Dictionary' to pass the 'maxLevelForSitemap' to
+  the .Where filter
+- Finally the 'traverse' method is called taking the very top node of the website by calling AncesterOrSelf()
+
+NOTE: It is safe to remove this comment (anything between @ * * @), the code that generates the list is only the below!
+*@
+
+@inherits umbraco.MacroEngines.DynamicNodeContext
+
+@helper traverse(dynamic node){
+var maxLevelForSitemap = String.IsNullOrEmpty(Parameter.MaxLevelForSitemap) ? 4 : int.Parse(Parameter.MaxLevelForSitemap); 
+
+var values = new Dictionary<string,object>();
+values.Add("maxLevelForSitemap", maxLevelForSitemap) ;
+
+   var items = node.Children.Where("Visible").Where("Level <= maxLevelForSitemap", values);
+   if (items.Count() > 0) { 
+   <ul>
+            @foreach (var item in items) {
+                <li>
+					<a href="@item.Url">@item.Name</a>
+					@traverse(item)
+                </li>
+            }
+   </ul>
+    }
+}
+<div class="sitemap"> 
+    @traverse(@Model.AncestorOrSelf())
+</div>
+
