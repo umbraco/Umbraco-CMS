@@ -17,19 +17,29 @@ namespace umbraco.presentation
     /// </summary>
     public class UmbracoContext
     {
-        private UmbracoServerUtility m_Server;
-        private UmbracoRequest m_Request;
-        private UmbracoResponse m_Response;
-        private HttpContext m_HttpContext;
+        private UmbracoServerUtility _server;
+        private UmbracoRequest _request;
+        private UmbracoResponse _response;
+        private readonly HttpContextBase _httpContext;
         private PreviewContent _previewContent;
 
         /// <summary>
         /// Creates a new Umbraco context.
         /// </summary>
+        /// <param name="httpContext"></param>
+        public UmbracoContext(HttpContextBase httpContext)
+        {
+            _httpContext = httpContext;
+        }
+
+        /// <summary>
+        /// Creates a new Umbraco context.
+        /// </summary>
         /// <param name="httpContext">The HTTP context on which the Umbraco context operates.</param>
+        [Obsolete("Use the contructor accepting an HttpContextBase object instead")]
         public UmbracoContext(HttpContext httpContext)
         {
-            m_HttpContext = httpContext;
+            _httpContext = new HttpContextWrapper(httpContext);
         }
 
         /// <summary>
@@ -63,7 +73,7 @@ namespace umbraco.presentation
             {
                 try
                 {
-                    return int.Parse(m_HttpContext.Items["pageID"].ToString());
+                    return int.Parse(_httpContext.Items["pageID"].ToString());
                 }
                 catch
                 {
@@ -149,7 +159,7 @@ namespace umbraco.presentation
         {
             get
             {
-                ILiveEditingContext value = (ILiveEditingContext)m_HttpContext.Items["LiveEditingContext"];
+                ILiveEditingContext value = (ILiveEditingContext)_httpContext.Items["LiveEditingContext"];
                 if (value == null)
                 {
                     LiveEditingContext = value = new DefaultLiveEditingContext();
@@ -159,7 +169,7 @@ namespace umbraco.presentation
 
             set
             {
-                m_HttpContext.Items["LiveEditingContext"] = value;
+                _httpContext.Items["LiveEditingContext"] = value;
             }
         }
 
@@ -171,11 +181,11 @@ namespace umbraco.presentation
         {
             get
             {
-                if (m_Response == null)
+                if (_response == null)
                 {
-                    m_Response = new UmbracoResponse(this.m_HttpContext.Response);
+                    _response = new UmbracoResponse(this._httpContext.Response);
                 }
-                return m_Response;
+                return _response;
             }
         }
 
@@ -183,7 +193,7 @@ namespace umbraco.presentation
         {
             get
             {
-                return this.m_HttpContext.Trace;
+                return this._httpContext.Trace;
             }
         }
 
@@ -195,11 +205,11 @@ namespace umbraco.presentation
         {
             get
             {
-                if (m_Request == null)
+                if (_request == null)
                 {
-                    m_Request = new UmbracoRequest(this.m_HttpContext.Request);
+                    _request = new UmbracoRequest(this._httpContext.Request);
                 }
-                return m_Request;
+                return _request;
             }
         }
 
@@ -216,11 +226,11 @@ namespace umbraco.presentation
         {
             get
             {
-                if (m_Server == null)
+                if (_server == null)
                 {
-                    m_Server = new UmbracoServerUtility(this.m_HttpContext.Server);
+                    _server = new UmbracoServerUtility(this._httpContext.Server);
                 }
-                return m_Server;
+                return _server;
             }
         }
 
