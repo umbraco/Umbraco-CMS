@@ -17,7 +17,8 @@ namespace umbraco.presentation.install.steps.Skinning
 
         protected virtual void OnStarterKitDesignInstalled()
         {
-            StarterKitDesignInstalled();
+            if (StarterKitDesignInstalled != null)
+                StarterKitDesignInstalled();
         }
 
         public Guid StarterKitGuid { get; set; }
