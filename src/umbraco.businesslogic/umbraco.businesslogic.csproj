@@ -140,8 +140,11 @@
     <Compile Include="ApplicationAttribute.cs" />
     <Compile Include="ApplicationBase.cs" />
     <Compile Include="ApplicationDefinitions.cs" />
+    <Compile Include="ApplicationRegistrar.cs" />
     <Compile Include="ApplicationStartupHandler.cs" />
     <Compile Include="ApplicationTree.cs" />
+    <Compile Include="ApplicationTreeRegistrar.cs" />
+    <Compile Include="DefaultApps.cs" />
     <Compile Include="TreeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
