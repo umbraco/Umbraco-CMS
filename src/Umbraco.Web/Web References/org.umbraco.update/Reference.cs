@@ -13,7 +13,8 @@
 // 
 #pragma warning disable 1591
 
-namespace Umbraco.Web.org.umbraco.update {
+namespace umbraco.presentation.org.umbraco.update
+{
     using System;
     using System.Web.Services;
     using System.Diagnostics;

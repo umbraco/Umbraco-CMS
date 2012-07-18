@@ -6,10 +6,10 @@ using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Xml;
+using Umbraco.Web.umbraco.templateControls;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
-using umbraco.presentation.umbraco.templateControls;
 using umbraco.IO;
 
 namespace umbraco.presentation.templateControls
