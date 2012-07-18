@@ -480,11 +480,13 @@ namespace umbraco.BusinessLogic
 
                     if (saveAfterCallback)
                     {
-                        doc.Save(TreeConfigFilePath);
+                        Directory.CreateDirectory(Path.GetDirectoryName(TreeConfigFilePath));
 
                         doc.Save(TreeConfigFilePath);
+
                         ReCache();
                     }
+                }
             }
         }
     }
