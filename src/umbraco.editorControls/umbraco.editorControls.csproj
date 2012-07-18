@@ -478,8 +478,6 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>xcopy "$(TargetPath)" "$(ProjectDir)..\umbraco.presentation\bin\" /Y /F
-
-xcopy "$(TargetPath)" "$(ProjectDir)..\Umbraco.Web.UI\bin\" /Y /F</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetPath)" "$(ProjectDir)..\Umbraco.Web.UI\bin\" /Y /F</PostBuildEvent>
   </PropertyGroup>
 </Project>
