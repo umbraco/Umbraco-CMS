@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Xml.Linq;
 using umbraco.BusinessLogic.Utils;
 using umbraco.DataLayer;

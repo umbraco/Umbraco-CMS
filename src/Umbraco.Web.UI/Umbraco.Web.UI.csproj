@@ -296,6 +296,7 @@
     <Content Include="umbraco\config\lang\pl.xml" />
     <Content Include="umbraco\config\lang\pt.xml" />
     <Content Include="umbraco\config\lang\se.xml" />
+	<Content Include="umbraco\config\lang\zh.xml" />
     <Content Include="umbraco\controls\Tree\CustomTreeService.asmx" />
     <Content Include="umbraco\developer\RelationTypes\EditRelationType.aspx" />
     <Content Include="umbraco\developer\RelationTypes\Images\Bidirectional.png" />
