@@ -106,9 +106,12 @@
       <ui:PropertyPanel ID="PropertyPanel2" runat="server" Text="Target">
           <div id="targetlistcontainer"></div>
       </ui:PropertyPanel>
+        
+      <div id="anchorlistrow">
       <ui:PropertyPanel ID="PropertyPanel3" runat="server" Text="Anchor">
           <div id="anchorlistcontainer"></div>
       </ui:PropertyPanel>
+      </div>
     </ui:Pane>
     
     <br /> 

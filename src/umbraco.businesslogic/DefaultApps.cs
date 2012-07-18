@@ -1,4 +1,4 @@
-namespace umbraco.BusinessLogic
+﻿namespace umbraco.BusinessLogic
 {
     public enum DefaultApps
     {

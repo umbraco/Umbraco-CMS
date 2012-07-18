@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Xml.Linq;
 using umbraco.BusinessLogic.Utils;
@@ -41,50 +41,50 @@ namespace umbraco.BusinessLogic
             var inString = "'" + string.Join("','", allAliases) + "'";
 
             ApplicationTree.LoadXml(doc =>
+            {
+                foreach (var tuple in items)
                 {
-                    foreach (var tuple in items)
-                    {
-                        var type = tuple.Item1;
-                        var attr = tuple.Item2;
+                    var type = tuple.Item1;
+                    var attr = tuple.Item2;
 
-                        var typeParts = type.AssemblyQualifiedName.Split(',');
-                        var assemblyName = typeParts[1].Trim();
-                        var typeName = typeParts[0].Substring(assemblyName.Length + 1).Trim();
+                    var typeParts = type.AssemblyQualifiedName.Split(',');
+                    var assemblyName = typeParts[1].Trim();
+                    var typeName = typeParts[0].Substring(assemblyName.Length + 1).Trim();
 
-                        doc.Root.Add(new XElement("add",
-                                                  new XAttribute("silent", attr.Silent),
-                                                  new XAttribute("initialize", attr.Initialize),
-                                                  new XAttribute("sortOrder", attr.SortOrder),
-                                                  new XAttribute("alias", attr.Alias),
-                                                  new XAttribute("application", attr.ApplicationAlias),
-                                                  new XAttribute("title", attr.Title),
-                                                  new XAttribute("iconClosed", attr.IconClosed),
-                                                  new XAttribute("iconOpen", attr.IconOpen),
-                                                  new XAttribute("assembly", assemblyName),
-                                                  new XAttribute("type", typeName),
-                                                  new XAttribute("action", attr.Action)));
-                    }
+                    doc.Root.Add(new XElement("add",
+                                              new XAttribute("silent", attr.Silent),
+                                              new XAttribute("initialize", attr.Initialize),
+                                              new XAttribute("sortOrder", attr.SortOrder),
+                                              new XAttribute("alias", attr.Alias),
+                                              new XAttribute("application", attr.ApplicationAlias),
+                                              new XAttribute("title", attr.Title),
+                                              new XAttribute("iconClosed", attr.IconClosed),
+                                              new XAttribute("iconOpen", attr.IconOpen),
+                                              new XAttribute("assembly", assemblyName),
+                                              new XAttribute("type", typeName),
+                                              new XAttribute("action", attr.Action)));
+                }
 
-                    var dbTrees = SqlHelper.ExecuteReader("SELECT * FROM umbracoAppTree WHERE treeAlias NOT IN (" + inString + ")");
-                    while(dbTrees.Read())
-                    {
-                        var action = dbTrees.GetString("action");
+                var dbTrees = SqlHelper.ExecuteReader("SELECT * FROM umbracoAppTree WHERE treeAlias NOT IN (" + inString + ")");
+                while (dbTrees.Read())
+                {
+                    var action = dbTrees.GetString("action");
 
-                        doc.Root.Add(new XElement("add",
-                                                  new XAttribute("silent", dbTrees.GetBoolean("treeSilent")),
-                                                  new XAttribute("initialize", dbTrees.GetBoolean("treeInitialize")),
-                                                  new XAttribute("sortOrder", dbTrees.GetByte("treeSortOrder")),
-                                                  new XAttribute("alias", dbTrees.GetString("treeAlias")),
-                                                  new XAttribute("application", dbTrees.GetString("appAlias")),
-                                                  new XAttribute("title", dbTrees.GetString("treeTitle")),
-                                                  new XAttribute("iconClosed", dbTrees.GetString("treeIconClosed")),
-                                                  new XAttribute("iconOpen", dbTrees.GetString("treeIconOpen")),
-                                                  new XAttribute("assembly", dbTrees.GetString("treeHandlerAssembly")),
-                                                  new XAttribute("type", dbTrees.GetString("treeHandlerType")),
-                                                  new XAttribute("action", string.IsNullOrEmpty(action) ? "" : action)));
-                    }
+                    doc.Root.Add(new XElement("add",
+                                              new XAttribute("silent", dbTrees.GetBoolean("treeSilent")),
+                                              new XAttribute("initialize", dbTrees.GetBoolean("treeInitialize")),
+                                              new XAttribute("sortOrder", dbTrees.GetByte("treeSortOrder")),
+                                              new XAttribute("alias", dbTrees.GetString("treeAlias")),
+                                              new XAttribute("application", dbTrees.GetString("appAlias")),
+                                              new XAttribute("title", dbTrees.GetString("treeTitle")),
+                                              new XAttribute("iconClosed", dbTrees.GetString("treeIconClosed")),
+                                              new XAttribute("iconOpen", dbTrees.GetString("treeIconOpen")),
+                                              new XAttribute("assembly", dbTrees.GetString("treeHandlerAssembly")),
+                                              new XAttribute("type", dbTrees.GetString("treeHandlerType")),
+                                              new XAttribute("action", string.IsNullOrEmpty(action) ? "" : action)));
+                }
 
-                }, true);
+            }, true);
 
             //SqlHelper.ExecuteNonQuery("DELETE FROM umbracoAppTree");
         }
