@@ -1,19 +1,16 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
+//
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Umbraco.Web")]
+//
+[assembly: AssemblyTitle("umbraco.presentation")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("Umbraco.Web")]
+[assembly: AssemblyProduct("")]
 
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
-
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("ce9d3539-299e-40d3-b605-42ac423e24fa")]
+//tg forcing .NET 2.0 security rules, since otherwise it wasn't possible to run in medium trust
+//(got an inheritance security rules violated by type error)
+[assembly: System.Security.SecurityRules(System.Security.SecurityRuleSet.Level1)]
