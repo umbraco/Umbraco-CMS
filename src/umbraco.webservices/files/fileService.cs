@@ -1,14 +1,8 @@
 using System;
-using System.Data;
-using System.Web;
-using System.Collections;
-using System.Web.Services;
-using System.Web.Services.Protocols;
-using System.ComponentModel;
 using System.Collections.Generic;
-using umbraco.cms.businesslogic.web;
-using umbraco.cms;
+using System.ComponentModel;
 using System.IO;
+using System.Web.Services;
 
 namespace umbraco.webservices.files
 {
@@ -32,17 +26,17 @@ namespace umbraco.webservices.files
         [WebMethod]
         public void DeleteFile(String folderName, string fileName, string username, string password)
         {
-            
+
             Authenticate(username, password);
-            
+
             // Check if folder is accessible
             if (FileIO.FolderAccess(folderName))
-            {   
+            {
                 // Check if the filename is valid
                 if (!FileIO.ValidFileName(fileName))
                     throw new ArgumentException(String.Format("Filename {0} not valid", fileName));
 
-                 // Check if the file exists. If it does, we delete it
+                // Check if the file exists. If it does, we delete it
                 if (System.IO.File.Exists(FileIO.GetFilePath(folderName, fileName)))
                 {
                     System.IO.File.Delete(FileIO.GetFilePath(folderName, fileName));
@@ -93,7 +87,7 @@ namespace umbraco.webservices.files
         [WebMethod]
         public void UploadFile(Byte[] docbinaryarray, String folderName, string fileName, string username, string password, bool deleteOld)
         {
-            Authenticate( username,  password);
+            Authenticate(username, password);
 
             // Check if folder is accessible
             if (FileIO.FolderAccess(folderName))
@@ -174,10 +168,10 @@ namespace umbraco.webservices.files
             if (FileIO.FolderAccess(folderName))
             {
                 string fullPath = FileIO.GetFolderPath(folderName);
-                                
+
                 DirectoryInfo folder = new DirectoryInfo(fullPath);
                 FileInfo[] files = folder.GetFiles();
-                List<string> shortNames = new List<string> (  );
+                List<string> shortNames = new List<string>();
 
                 foreach (FileInfo file in files)
                 {

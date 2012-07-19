@@ -1,21 +1,12 @@
 using System;
-using System.Data;
-using System.Web;
 using System.Collections;
-using System.Web.Services;
-using System.Web.Services.Protocols;
-using System.ComponentModel;
 using System.Collections.Generic;
-using umbraco.cms.businesslogic.web;
-using umbraco.cms;
-using System.Xml.Serialization;
-using System.Xml;
+using System.ComponentModel;
+using System.Web.Services;
 using umbraco.cms.businesslogic.member;
-
 
 namespace umbraco.webservices.members
 {
-
     [WebService(Namespace = "http://umbraco.org/webservices/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [ToolboxItem(false)]
@@ -38,8 +29,8 @@ namespace umbraco.webservices.members
         [WebMethod]
         public memberCarrier readByLogin(string memberLoginName, string memberPassword, string username, string password)
         {
-            Authenticate (username, password);
-            
+            Authenticate(username, password);
+
             umbraco.cms.businesslogic.member.Member foundMember = umbraco.cms.businesslogic.member.Member.GetMemberFromLoginNameAndPassword(memberLoginName, memberPassword);
             if (foundMember == null)
                 return null;
@@ -171,7 +162,7 @@ namespace umbraco.webservices.members
         {
 
             Authenticate(username, password);
-            
+
             // We load the member
             umbraco.cms.businesslogic.member.Member deleteMember;
             try
@@ -246,145 +237,4 @@ namespace umbraco.webservices.members
         }
 
     }
-
-    [Serializable]
-    public class memberGroup
-    {
-        int groupID;
-        string groupName;
-
-        public memberGroup()
-        {
-        }
-
-        public memberGroup(int groupID, string groupName)
-        {
-            GroupID = groupID;
-            GroupName = groupName;
-        }
-
-        public int GroupID
-        {
-            get { return groupID; }
-            set { groupID = value; }
-        }
-
-        public string GroupName
-        {
-            get { return groupName; }
-            set { groupName = value; }
-        }
-
-    }
-
-    [Serializable]
-    [XmlType(Namespace = "http://umbraco.org/webservices/")]
-    public class memberCarrier
-    {
-
-        public memberCarrier()
-        {
-            memberProperties = new List<memberProperty>();
-            groups = new List<memberGroup>();
-        }
-
-        #region Fields
-        private int id;
-
-        private string password;
-        private string email;
-        private string displayedName;
-        private string loginName;
-
-        private int membertypeId;
-        private string membertypeName;
-
-        private List<memberGroup> groups;
-        private List<memberProperty> memberProperties;
-        #endregion
-
-        #region Properties
-
-        public int Id
-        {
-            get { return id; }
-            set { id = value; }
-        }
-
-        public string DisplayedName
-        {
-            get { return displayedName; }
-            set { displayedName = value; }
-        }
-
-        public string Password
-        {
-            get { return password; }
-            set { password = value; }
-        }
-
-        public string Email
-        {
-            get { return email; }
-            set { email = value; }
-        }
-
-        public string LoginName
-        {
-            get { return loginName; }
-            set { loginName = value; }
-        }
-
-        public int MembertypeId
-        {
-            get { return membertypeId; }
-            set { membertypeId = value; }
-        }
-
-
-        public string MembertypeName
-        {
-            get { return membertypeName; }
-            set { membertypeName = value; }
-        }
-
-        public List<memberGroup> Groups
-        {
-            get { return groups; }
-            set { groups = value; }
-        }
-
-        public List<memberProperty> MemberProperties
-        {
-            get { return memberProperties; }
-            set { memberProperties = value; }
-        }
-
-        #endregion
-    }
-
-    [Serializable]
-    [XmlType(Namespace = "http://umbraco.org/webservices/")]
-    public class memberProperty
-    {
-        private string key;
-        private object propertyValue;
-
-        public memberProperty()
-        {
-        }
-
-        public object PropertyValue
-        {
-            get { return propertyValue; }
-            set { propertyValue = value; }
-        }
-
-        public string Key
-        {
-            get { return key; }
-            set { key = value; }
-        }
-    }
-
 }

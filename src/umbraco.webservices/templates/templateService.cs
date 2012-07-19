@@ -1,15 +1,7 @@
 using System;
-using System.Data;
-using System.Web;
-using System.Collections;
-using System.Web.Services;
-using System.Web.Services.Protocols;
-using System.ComponentModel;
 using System.Collections.Generic;
-using umbraco.cms.businesslogic.web;
-using umbraco.cms;
-using umbraco;
-
+using System.ComponentModel;
+using System.Web.Services;
 
 namespace umbraco.webservices.templates
 {
@@ -29,25 +21,25 @@ namespace umbraco.webservices.templates
                 return Services.TemplateService;
             }
         }
-        
+
         [WebMethod]
-        public int readIdFromAlias(string alias ,string username, string password)
+        public int readIdFromAlias(string alias, string username, string password)
         {
             Authenticate(username, password);
-           
-            cms.businesslogic.template.Template template ;
+
+            cms.businesslogic.template.Template template;
 
             try
             {
-               template = cms.businesslogic.template.Template.GetByAlias(alias);
+                template = cms.businesslogic.template.Template.GetByAlias(alias);
             }
-            catch ( Exception  )
+            catch (Exception)
             {
-                 throw new Exception( "Could not load template from alias: " + alias);
+                throw new Exception("Could not load template from alias: " + alias);
             }
             if (template == null)
             {
-                 throw new Exception( "Could not load template from alias: " + alias);
+                throw new Exception("Could not load template from alias: " + alias);
             }
 
             return template.Id;
@@ -85,7 +77,7 @@ namespace umbraco.webservices.templates
         public int create(templateCarrier carrier, string username, string password)
         {
             Authenticate(username, password);
-            
+
             if (carrier.Id != 0) throw new Exception("ID may not be specified when creating");
             if (carrier == null) throw new Exception("No carrier specified");
 
@@ -94,7 +86,7 @@ namespace umbraco.webservices.templates
 
             // Create template
             cms.businesslogic.template.Template template = cms.businesslogic.template.Template.MakeNew(carrier.Name, user);
-               
+
             template.MasterTemplate = carrier.MastertemplateId;
             template.Alias = carrier.Alias;
             template.Text = carrier.Name;
@@ -122,11 +114,11 @@ namespace umbraco.webservices.templates
 
             template.MasterTemplate = carrier.MastertemplateId;
             template.Alias = carrier.Alias;
-            template.Text = carrier.Name ;
+            template.Text = carrier.Name;
             template.Design = carrier.Design;
             template.Save();
 
-        
+
             clearCachedTemplate(template);
         }
 
@@ -134,7 +126,7 @@ namespace umbraco.webservices.templates
         public templateCarrier read(int id, string username, string password)
         {
             Authenticate(username, password);
-                        
+
             cms.businesslogic.template.Template template;
             try
             {
@@ -186,7 +178,8 @@ namespace umbraco.webservices.templates
                 set { mastertemplateId = value; }
             }
 
-            public string MasterPageFile {
+            public string MasterPageFile
+            {
                 get { return masterPageFile; }
                 set { masterPageFile = value; }
             }

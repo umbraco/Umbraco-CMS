@@ -1,14 +1,8 @@
 using System;
-using System.Data;
-using System.Web;
-using System.Collections;
-using System.Web.Services;
-using System.Web.Services.Protocols;
-using System.ComponentModel;
-using umbraco.cms.businesslogic.web;
-using umbraco.cms;
-using umbraco;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Web.Services;
+using umbraco.cms.businesslogic.web;
 
 namespace umbraco.webservices.stylesheets
 {
@@ -29,14 +23,14 @@ namespace umbraco.webservices.stylesheets
             }
         }
 
-        
+
         [WebMethod]
         public int create(stylesheetCarrier carrier, string username, string password)
         {
             Authenticate(username, password);
             umbraco.BusinessLogic.User user = GetUser(username, password);
 
-            StyleSheet stylesheet = StyleSheet.MakeNew(user, carrier.Name, (carrier.Name + ".css"), carrier.Content );
+            StyleSheet stylesheet = StyleSheet.MakeNew(user, carrier.Name, (carrier.Name + ".css"), carrier.Content);
             stylesheet.saveCssToFile();
 
             return stylesheet.Id;
@@ -69,9 +63,9 @@ namespace umbraco.webservices.stylesheets
         public List<stylesheetCarrier> readList(string username, string password)
         {
             Authenticate(username, password);
-            
+
             List<stylesheetCarrier> stylesheets = new List<stylesheetCarrier>();
-                        
+
             StyleSheet[] foundstylesheets = StyleSheet.GetAll();
 
             foreach (StyleSheet stylesheet in foundstylesheets)
@@ -94,10 +88,10 @@ namespace umbraco.webservices.stylesheets
                 stylesheet = new StyleSheet(carrier.Id);
             }
             catch
-            {}
+            { }
 
             if (stylesheet == null)
-                throw new Exception("Could not load stylesheet with id: " + carrier.Id );
+                throw new Exception("Could not load stylesheet with id: " + carrier.Id);
 
             stylesheet.Content = carrier.Content;
             stylesheet.saveCssToFile();

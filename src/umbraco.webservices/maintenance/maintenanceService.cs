@@ -1,14 +1,9 @@
 using System;
-using System.Data;
-using System.Web;
-using System.Collections;
-using System.Web.Services;
-using System.Web.Services.Protocols;
 using System.ComponentModel;
+using System.Web.Services;
 
 namespace umbraco.webservices.maintenance
 {
-
     [WebService(Namespace = "http://umbraco.org/webservices/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [ToolboxItem(false)]
@@ -28,7 +23,7 @@ namespace umbraco.webservices.maintenance
         {
             // We check if services are enabled and user has access
             Authenticate(username, password);
-            
+
             Version thisVersion = new Version(0, 9);
             return Convert.ToString(thisVersion);
         }
