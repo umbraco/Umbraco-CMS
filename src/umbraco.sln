@@ -37,7 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nant", "Nant", "{17E547B1-D
 		..\build\Nant\umbraco.build = ..\build\Nant\umbraco.build
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.presentation", "umbraco.presentation\umbraco.presentation.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web", "Umbraco.Web\Umbraco.Web.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.businesslogic", "umbraco.businesslogic\umbraco.businesslogic.csproj", "{E469A9CE-1BEC-423F-AC44-713CD72457EA}"
 EndProject
@@ -71,7 +71,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Core", "Umbraco.Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests", "Umbraco.Tests\Umbraco.Tests.csproj", "{5D3B8245-ADA6-453F-A008-50ED04BFE770}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web", "Umbraco.Web\Umbraco.Web.csproj", "{455E899F-C234-497B-BDA4-038D52626FFB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{4C4C194C-B5E4-4991-8F87-4373E24CC19F}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
@@ -146,10 +146,10 @@ Global
 		{5D3B8245-ADA6-453F-A008-50ED04BFE770}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D3B8245-ADA6-453F-A008-50ED04BFE770}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D3B8245-ADA6-453F-A008-50ED04BFE770}.Release|Any CPU.Build.0 = Release|Any CPU
-		{455E899F-C234-497B-BDA4-038D52626FFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{455E899F-C234-497B-BDA4-038D52626FFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{455E899F-C234-497B-BDA4-038D52626FFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{455E899F-C234-497B-BDA4-038D52626FFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C4C194C-B5E4-4991-8F87-4373E24CC19F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C4C194C-B5E4-4991-8F87-4373E24CC19F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C4C194C-B5E4-4991-8F87-4373E24CC19F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C4C194C-B5E4-4991-8F87-4373E24CC19F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

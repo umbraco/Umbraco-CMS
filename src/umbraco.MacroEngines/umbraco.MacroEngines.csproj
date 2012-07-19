@@ -144,7 +144,7 @@
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Name>umbraco.interfaces</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.presentation\umbraco.presentation.csproj">
+    <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>umbraco.presentation</Name>
     </ProjectReference>
@@ -156,7 +156,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)" "$(ProjectDir)..\umbraco.presentation\bin\" /Y /F
+    <PostBuildEvent>xcopy "$(TargetPath)" "$(ProjectDir)..\Umbraco.Web.UI\bin\" /Y /F
+
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
