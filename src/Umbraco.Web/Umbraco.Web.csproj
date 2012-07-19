@@ -233,7 +233,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="EnsureSystemPathsApplicationStartupHandler.cs" />
+    <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
     <Compile Include="umbraco.presentation\install\steps\database.ascx.cs">
       <DependentUpon>database.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -285,18 +285,18 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="BasePageExtensions.cs" />
-    <Compile Include="content.cs">
+    <Compile Include="umbraco.presentation\BasePageExtensions.cs" />
+    <Compile Include="umbraco.presentation\content.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="default.aspx.cs">
+    <Compile Include="umbraco.presentation\default.aspx.cs">
       <DependentUpon>default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="default.aspx.designer.cs">
+    <Compile Include="umbraco.presentation\default.aspx.designer.cs">
       <DependentUpon>default.aspx</DependentUpon>
     </Compile>
-    <Compile Include="helper.cs">
+    <Compile Include="umbraco.presentation\helper.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\install\default.aspx.cs">
@@ -355,17 +355,17 @@
     <Compile Include="umbraco.presentation\install\Title.ascx.designer.cs">
       <DependentUpon>Title.ascx</DependentUpon>
     </Compile>
-    <Compile Include="item.cs">
+    <Compile Include="umbraco.presentation\item.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="keepAliveService.cs">
+    <Compile Include="umbraco.presentation\keepAliveService.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="library.cs">
+    <Compile Include="umbraco.presentation\library.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="macro.cs" />
-    <Compile Include="page.cs">
+    <Compile Include="umbraco.presentation\macro.cs" />
+    <Compile Include="umbraco.presentation\page.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\Settings1.Designer.cs">
@@ -373,21 +373,21 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="publishingService.cs">
+    <Compile Include="umbraco.presentation\publishingService.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="PublishQueue.cs" />
-    <Compile Include="python.cs" />
-    <Compile Include="requestHandler.cs">
+    <Compile Include="umbraco.presentation\PublishQueue.cs" />
+    <Compile Include="umbraco.presentation\python.cs" />
+    <Compile Include="umbraco.presentation\requestHandler.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="requestModule.cs">
+    <Compile Include="umbraco.presentation\requestModule.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="showField.cs">
+    <Compile Include="umbraco.presentation\showField.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="template.cs">
+    <Compile Include="umbraco.presentation\template.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbracobase\attributes\RestExtension.cs" />
@@ -395,20 +395,20 @@
     <Compile Include="umbraco.presentation\umbracobase\baseHttpModule.cs" />
     <Compile Include="umbraco.presentation\umbracobase\baseLibrary.cs" />
     <Compile Include="umbraco.presentation\umbracobase\restExtension.cs" />
-    <Compile Include="UmbracoContext.cs" />
-    <Compile Include="UmbracoPage.cs">
+    <Compile Include="umbraco.presentation\UmbracoContext.cs" />
+    <Compile Include="umbraco.presentation\UmbracoPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbracoPageHolder.cs">
+    <Compile Include="umbraco.presentation\umbracoPageHolder.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UmbracoRequest.cs">
+    <Compile Include="umbraco.presentation\UmbracoRequest.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UmbracoResponse.cs">
+    <Compile Include="umbraco.presentation\UmbracoResponse.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UmbracoServerUtility.cs" />
+    <Compile Include="umbraco.presentation\UmbracoServerUtility.cs" />
     <Compile Include="umbraco.presentation\umbraco\ActionHandlers\umbEnsureUniqueName.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1737,7 +1737,7 @@
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\SpellChecker.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\SpellCheckerInput.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\SpellCheckerResult.cs" />
-    <Compile Include="viewstateMoverModule.cs" />
+    <Compile Include="umbraco.presentation\viewstateMoverModule.cs" />
     <Compile Include="Web References\org.umbraco.update\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1793,7 +1793,7 @@
     <Content Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx" />
     <Content Include="umbraco.presentation\umbraco\Search\QuickSearch.ascx" />
-    <Content Include="default.aspx" />
+    <Content Include="umbraco.presentation\default.aspx" />
     <Content Include="umbraco.presentation\install\default.aspx" />
     <Content Include="umbraco.presentation\install\steps\license.ascx" />
     <Content Include="umbraco.presentation\umbraco\actions\delete.aspx" />
