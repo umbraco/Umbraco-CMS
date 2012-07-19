@@ -24,6 +24,7 @@ namespace umbraco.presentation
     /// 
     /// This now needs to exist only because of backwards compatibility
     /// </remarks>
+    [Obsolete("This class is no longer used, for the overridden MapPath methods and custom methods use IOHelper")]
     public class UmbracoServerUtility : HttpServerUtilityBase
     {
         private readonly HttpServerUtilityBase _server;

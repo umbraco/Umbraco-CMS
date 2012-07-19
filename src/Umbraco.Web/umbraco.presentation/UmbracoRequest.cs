@@ -19,6 +19,7 @@ namespace umbraco.presentation
     /// 
     /// This now needs to exist only because of backwards compatibility
     /// </remarks>
+    [Obsolete("This class is no longer used, for the IsDebug method use Umbraco.Web.UmbracoContext.IsDebug")]
     public class UmbracoRequest : HttpRequestBase
     {
         private readonly HttpRequestBase _request;

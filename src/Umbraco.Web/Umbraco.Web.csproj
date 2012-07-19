@@ -198,6 +198,10 @@
       <Project>{5BA5425F-27A7-4677-865E-82246498AA2E}</Project>
       <Name>SqlCE4Umbraco</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\umbraco.macroRenderings\umbraco.macroRenderings.csproj">
       <Project>{52AB8F1F-FB76-4E8C-885F-0747B6CE71EC}</Project>
       <Name>umbraco.macroRenderings</Name>
@@ -233,6 +237,23 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ContentStore.cs" />
+    <Compile Include="LegacyRequestInitializer.cs" />
+    <Compile Include="Mvc\ControllerExtensions.cs" />
+    <Compile Include="NiceUrls.cs" />
+    <Compile Include="PluginResolverExtensions.cs" />
+    <Compile Include="Routing\DocumentRequest.cs" />
+    <Compile Include="Routing\ILookup.cs" />
+    <Compile Include="Routing\ILookupNotFound.cs" />
+    <Compile Include="Routing\LookupByAlias.cs" />
+    <Compile Include="Routing\LookupById.cs" />
+    <Compile Include="Routing\LookupByPath.cs" />
+    <Compile Include="Routing\LookupByPathWithTemplate.cs" />
+    <Compile Include="Routing\LookupByProfile.cs" />
+    <Compile Include="Routing\LookupFor404.cs" />
+    <Compile Include="Routing\LookupWeightAttribute.cs" />
+    <Compile Include="Routing\RoutesCache.cs" />
+    <Compile Include="Routing\RoutingEnvironment.cs" />
     <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
     <Compile Include="umbraco.presentation\install\steps\database.ascx.cs">
       <DependentUpon>database.ascx</DependentUpon>
@@ -1738,6 +1759,9 @@
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\SpellCheckerInput.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\SpellCheckerResult.cs" />
     <Compile Include="umbraco.presentation\viewstateMoverModule.cs" />
+    <Compile Include="UmbracoContext.cs" />
+    <Compile Include="UmbracoModule.cs" />
+    <Compile Include="UrlUtility.cs" />
     <Compile Include="Web References\org.umbraco.update\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
