@@ -1768,6 +1768,7 @@
     <Folder Include="macroScripts\" />
     <Folder Include="masterpages\" />
     <Folder Include="media\" />
+    <Folder Include="scripts\" />
     <Folder Include="usercontrols\" />
     <Folder Include="xslt\" />
   </ItemGroup>
