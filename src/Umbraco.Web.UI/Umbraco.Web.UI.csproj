@@ -200,6 +200,14 @@
       <Project>{5BA5425F-27A7-4677-865E-82246498AA2E}</Project>
       <Name>SqlCE4Umbraco</Name>
     </ProjectReference>
+    <ProjectReference Include="..\umbraco.editorControls\umbraco.editorControls.csproj">
+      <Project>{255F5DF1-4E43-4758-AC05-7A0B68EB021B}</Project>
+      <Name>umbraco.editorControls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\umbraco.MacroEngines\umbraco.MacroEngines.csproj">
+      <Project>{89C09045-1064-466B-B94A-DB3AFE2A5853}</Project>
+      <Name>umbraco.MacroEngines</Name>
+    </ProjectReference>
     <ProjectReference Include="..\umbraco.macroRenderings\umbraco.macroRenderings.csproj">
       <Project>{52AB8F1F-FB76-4E8C-885F-0747B6CE71EC}</Project>
       <Name>umbraco.macroRenderings</Name>

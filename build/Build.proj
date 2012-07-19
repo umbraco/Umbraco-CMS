@@ -168,67 +168,6 @@
     <MSBuild Projects="..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);UseWPP_CopyWebApplication=True;PipelineDependsOnBuild=False;OutDir=$(SolutionBinFolderAbsolutePath);WebProjectOutputDir=$(WebAppFolderAbsolutePath)" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
     </MSBuild>
 
-    <!--     
-    Now, because of all the circular dependencies we need to build those projects and have them dump their DLLs/assets out to the same folder. Really wish this wasn't the case! 
-    These are:    umbraco.editorControls    umbraco.webservices    umbraco.MacroEngines
-    
-    Each of these projects has a post build to put their stuff in the correct location based on the solution and unfortunately for us each 
-    of these projects references the web application! So if we specify an OutDir parameter it will also trigger a web deploy and chuck another
-    website output in bin/_PublishedWebSites folder. we cannot disable this: http://social.msdn.microsoft.com/forums/en-US/tfsbuild/thread/3ec642ad-2e6d-424c-891a-62f6409da62a/
-    so we need to just build the project 'in-place' then copy its output to the SolutionBinFolder    
-    -->
-
-    <!-- MACRO ENGINES -->
-    <Message Text="Compiling MacroEngines project" Importance="high" />
-    <MSBuild Projects="..\src\umbraco.MacroEngines\umbraco.MacroEngines.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
-    </MSBuild>
-    <ItemGroup>
-      <MacroEngineDll Include="..\src\umbraco.MacroEngines\bin\$(BuildConfiguration)\umbraco.MacroEngines.dll"/>
-    </ItemGroup>
-    <Copy SourceFiles="@(MacroEngineDll)"
-          DestinationFolder="$(SolutionBinFolder)" OverwriteReadOnlyFiles="True"/>
-    <Copy SourceFiles="@(MacroEngineDll)"
-            DestinationFolder="$(WebAppFolder)\bin" OverwriteReadOnlyFiles="True"/>
-
-    <!-- EDITOR CONTROLS -->
-    <Message Text="Compiling editorControls project" Importance="high" />
-    <MSBuild Projects="..\src\umbraco.editorControls\umbraco.editorControls.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
-    </MSBuild>
-    <ItemGroup>
-      <EditorControlsDll Include="..\src\umbraco.editorControls\bin\$(BuildConfiguration)\umbraco.editorControls.dll"/>
-    </ItemGroup>
-    <Copy SourceFiles="@(EditorControlsDll)"
-          DestinationFolder="$(SolutionBinFolder)" OverwriteReadOnlyFiles="True"/>
-    <Copy SourceFiles="@(EditorControlsDll)"
-            DestinationFolder="$(WebAppFolder)\bin" OverwriteReadOnlyFiles="True"/>
-
-    <!-- WEBSERVICES -->
-    <Message Text="Compiling webservices project" Importance="high" />
-    <MSBuild Projects="..\src\umbraco.webservices\umbraco.webservices.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
-    </MSBuild>
-    <ItemGroup>
-      <WebServicesDll Include="..\src\umbraco.webservices\bin\$(BuildConfiguration)\umbraco.webservices.dll"/>
-      <WebServicesASMX Include="..\src\umbraco.webservices\*.asmx"/>
-    </ItemGroup>
-    <Copy SourceFiles="@(WebServicesDll)"
-          DestinationFolder="$(SolutionBinFolder)" OverwriteReadOnlyFiles="True"/>
-    <Copy SourceFiles="@(WebServicesDll)"
-          DestinationFolder="$(WebAppFolder)\bin" OverwriteReadOnlyFiles="True"/>
-    <Copy SourceFiles="@(WebServicesASMX)"
-            DestinationFolder="$(WebAppFolder)\umbraco\webservices\api" OverwriteReadOnlyFiles="True"/>
-
-    <!-- SQLCE4UMBRACO -->
-    <!--<Message Text="Compiling SQLCE4Umbraco project" Importance="high" />
-    <MSBuild Projects="..\src\SQLCE4Umbraco\SQLCE4Umbraco.csproj" Properties="WarningLevel=0;Configuration=$(BuildConfiguration);" Targets="Clean;Build;" BuildInParallel="False" ToolsVersion="4.0" UnloadProjectsOnCompletion="False">
-    </MSBuild>
-    <ItemGroup>
-      <SQLCE4UmbracoDll Include="..\src\SQLCE4Umbraco\bin\$(BuildConfiguration)\SQLCE4Umbraco.dll" />
-    </ItemGroup>
-    <Copy SourceFiles="@(SQLCE4UmbracoDll)"
-          DestinationFolder="$(SolutionBinFolder)" OverwriteReadOnlyFiles="True"/>
-    <Copy SourceFiles="@(SQLCE4UmbracoDll)"
-          DestinationFolder="$(WebAppFolder)\bin" OverwriteReadOnlyFiles="True"/>-->
-
     <!-- DONE -->
     <Message Text="Finished compiling projects" Importance="high" />
   </Target>
