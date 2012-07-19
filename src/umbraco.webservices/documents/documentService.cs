@@ -1,15 +1,10 @@
-using System;
-using System.Data;
-using System.Web;
-using System.Collections;
-using System.Web.Services;
-using System.Web.Services.Protocols;
-using System.ComponentModel;
-using System.Xml.Serialization;
+﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Web.Services;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms;
-using umbraco;
 
 namespace umbraco.webservices.documents
 {
@@ -71,7 +66,7 @@ namespace umbraco.webservices.documents
             // We return the ID of the document..65
             return newDoc.Id;
         }
-        
+
         [WebMethod]
         public documentCarrier read(int id, string username, string password)
         {
@@ -84,11 +79,11 @@ namespace umbraco.webservices.documents
                 doc = new umbraco.cms.businesslogic.web.Document(id);
             }
             catch
-            {}
+            { }
 
             if (doc == null)
                 throw new Exception("Could not load Document with ID: " + id);
-            
+
             documentCarrier carrier = createCarrier(doc);
             return carrier;
         }
@@ -100,7 +95,7 @@ namespace umbraco.webservices.documents
             Authenticate(username, password);
 
             umbraco.cms.businesslogic.web.Document[] docList;
-            umbraco.cms.businesslogic.web.Document doc = null ;
+            umbraco.cms.businesslogic.web.Document doc = null;
             List<documentCarrier> carriers = new List<documentCarrier>();
 
             if (parentid == 0)
@@ -114,16 +109,16 @@ namespace umbraco.webservices.documents
                     doc = new umbraco.cms.businesslogic.web.Document(parentid);
                 }
                 catch
-                {}
+                { }
 
                 if (doc == null)
                     throw new Exception("Parent document with ID " + parentid + " not found");
-                
+
                 try
                 {
                     if (!doc.HasChildren)
                         return carriers;
-                    
+
                     docList = doc.Children;
                 }
                 catch (Exception exception)
@@ -154,15 +149,15 @@ namespace umbraco.webservices.documents
             Document doc = null;
             try
             {
-                 doc = new Document(carrier.Id);
+                doc = new Document(carrier.Id);
             }
-            catch {}
-            if (doc == null )
-                
+            catch { }
+            if (doc == null)
 
 
-            // We assign the new values:
-            doc.ReleaseDate = carrier.ReleaseDate;
+
+                // We assign the new values:
+                doc.ReleaseDate = carrier.ReleaseDate;
             doc.ExpireDate = carrier.ExpireDate;
             if (carrier.ParentID != 0)
             {
@@ -212,7 +207,7 @@ namespace umbraco.webservices.documents
                 doc = new Document(id);
             }
             catch
-            {}
+            { }
 
             if (doc == null)
                 throw new Exception("Document not found");
@@ -233,25 +228,29 @@ namespace umbraco.webservices.documents
             switch (carrier.PublishAction)
             {
                 case documentCarrier.EPublishAction.Publish:
-                    if (doc.PublishWithResult(user)) {
+                    if (doc.PublishWithResult(user))
+                    {
                         umbraco.library.UpdateDocumentCache(doc.Id);
                     }
                     break;
                 case documentCarrier.EPublishAction.Unpublish:
-                    if (doc.PublishWithResult(user)) {
+                    if (doc.PublishWithResult(user))
+                    {
                         umbraco.library.UnPublishSingleNode(doc.Id);
                     }
                     break;
                 case documentCarrier.EPublishAction.Ignore:
                     if (doc.Published)
                     {
-                        if (doc.PublishWithResult(user)) {
+                        if (doc.PublishWithResult(user))
+                        {
                             umbraco.library.UpdateDocumentCache(doc.Id);
                         }
                     }
                     else
                     {
-                        if (doc.PublishWithResult(user)) {
+                        if (doc.PublishWithResult(user))
+                        {
                             umbraco.library.UpdateDocumentCache(doc.Id);
                         }
                     }
@@ -300,130 +299,4 @@ namespace umbraco.webservices.documents
         }
 
     }
-
-    [Serializable]
-    [XmlType(Namespace = "http://umbraco.org/webservices/")]
-    public class documentCarrier
-    {
-
-        public enum EPublishAction
-        {
-            Ignore,
-            Publish,
-            Unpublish
-        };
-
-        public enum EPublishStatus
-        {
-            Published,
-            NotPublished
-        };
-
-        public documentCarrier()
-        {
-            DocumentProperties = new List<documentProperty>();
-        }
-
-        private int id;
-        private string name;
-        private List<documentProperty> documentProperties;
-        private int documentTypeID;
-        private int parentID;
-        private bool hasChildren;
-
-        private EPublishAction publishAction;
-        private bool published;
-        private DateTime releaseDate;
-        private DateTime expireDate;
-
-        public int Id
-        {
-            get { return id; }
-            set { id = value; }
-        }
-
-        public string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
-
-        public List<documentProperty> DocumentProperties
-        {
-            get { return documentProperties; }
-            set { documentProperties = value; }
-        }
-
-        public int DocumentTypeID
-        {
-            get { return documentTypeID; }
-            set { documentTypeID = value; }
-        }
-
-        public int ParentID
-        {
-            get { return parentID; }
-            set { parentID = value; }
-        }
-
-        public bool HasChildren
-        {
-            get { return hasChildren; }
-            set { hasChildren = value; }
-        }
-
-        public EPublishAction PublishAction
-        {
-            get { return publishAction; }
-            set { publishAction = value; }
-        }
-
-        public bool Published
-        {
-            get { return published; }
-            set { published = value; }
-        }
-
-        public DateTime ReleaseDate
-        {
-            get { return releaseDate; }
-            set { releaseDate = value; }
-        }
-
-        public DateTime ExpireDate
-        {
-            get { return expireDate; }
-            set { expireDate = value; }
-        }
-
-
-
-    }
-
-    [Serializable]
-    [XmlType(Namespace = "http://umbraco.org/webservices/")]
-    public class documentProperty
-    {
-        private string key;
-        private object propertyValue;
-
-        public documentProperty()
-        {
-        }
-
-        public object PropertyValue
-        {
-            get { return propertyValue; }
-            set { propertyValue = value; }
-        }
-
-        public string Key
-        {
-            get { return key; }
-            set { key = value; }
-        }
-    }
-
 }
-
-

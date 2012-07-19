@@ -226,6 +226,10 @@
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
     </ProjectReference>
+    <ProjectReference Include="..\umbraco.webservices\umbraco.webservices.csproj">
+      <Project>{CBDB56AC-FF02-4421-9FD4-ED82E339D8E2}</Project>
+      <Name>umbraco.webservices</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>umbraco.presentation</Name>
@@ -326,6 +330,13 @@
     <Content Include="umbraco\plugins\uGoLive\run.png" />
     <Content Include="umbraco\plugins\uGoLive\throbber.gif" />
     <Content Include="umbraco\plugins\uGoLive\tick.png" />
+    <Content Include="umbraco\webservices\api\DocumentService.asmx" />
+    <Content Include="umbraco\webservices\api\FileService.asmx" />
+    <Content Include="umbraco\webservices\api\MaintanceService.asmx" />
+    <Content Include="umbraco\webservices\api\MediaService.asmx" />
+    <Content Include="umbraco\webservices\api\MemberService.asmx" />
+    <Content Include="umbraco\webservices\api\StylesheetService.asmx" />
+    <Content Include="umbraco\webservices\api\TemplateService.asmx" />
     <Content Include="umbraco_client\tinymce3\langs\en.js" />
     <Content Include="umbraco_client\tinymce3\langs\he.js" />
     <Content Include="umbraco_client\tinymce3\langs\ja.js" />

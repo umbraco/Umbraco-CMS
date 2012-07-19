@@ -1,25 +1,14 @@
 using System;
-using System.Data;
-using System.Web;
-using System.Collections;
-using System.Web.Services;
-using System.Web.Services.Protocols;
-using System.ComponentModel;
 using System.Collections.Generic;
-using System.Xml.Serialization;
-using System.Xml;
-using umbraco.cms.businesslogic.web;
-using umbraco.cms;
-using umbraco.cms.businesslogic.member;
-using umbraco.cms.businesslogic.media;
+using System.ComponentModel;
 using System.IO;
-using umbraco.cms.businesslogic.property;
+using System.Web.Services;
 using umbraco.IO;
-using System.Text.RegularExpressions;
+using umbraco.cms.businesslogic.media;
+using umbraco.cms.businesslogic.property;
 
 namespace umbraco.webservices.media
 {
-
     [WebService(Namespace = "http://umbraco.org/webservices/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [ToolboxItem(false)]
@@ -35,14 +24,15 @@ namespace umbraco.webservices.media
         }
 
         [WebMethod]
-        public void update(mediaCarrier carrier, string username, string password) {
-            
+        public void update(mediaCarrier carrier, string username, string password)
+        {
+
             Authenticate(username, password);
-            
+
             if (carrier == null) throw new Exception("No carrier specified");
-            
+
             Media m = new Media(carrier.Id);
-            
+
             if (carrier.MediaProperties != null)
             {
                 foreach (mediaProperty updatedproperty in carrier.MediaProperties)
@@ -70,7 +60,7 @@ namespace umbraco.webservices.media
             if (carrier.ParentId == 0) throw new Exception("Media needs a parent");
             if (carrier.TypeId == 0) throw new Exception("Type must be specified");
             if (carrier.Text == null || carrier.Text.Length == 0) carrier.Text = "unnamed";
-            
+
             umbraco.BusinessLogic.User user = GetUser(username, password);
 
 
@@ -82,9 +72,10 @@ namespace umbraco.webservices.media
             {
                 foreach (mediaProperty updatedproperty in carrier.MediaProperties)
                 {
-                    if(!(updatedproperty.Key.ToLower().Equals("umbracofile"))) {
+                    if (!(updatedproperty.Key.ToLower().Equals("umbracofile")))
+                    {
                         Property property = m.getProperty(updatedproperty.Key);
-                        if (property == null) 
+                        if (property == null)
                             throw new Exception("property " + updatedproperty.Key + " was not found");
                         property.Value = updatedproperty.PropertyValue;
                     }
@@ -98,7 +89,7 @@ namespace umbraco.webservices.media
         public void delete(int id, string username, string password)
         {
             Authenticate(username, password);
-            
+
             Media m = new Media(id);
 
             if (m.HasChildren)
@@ -119,7 +110,7 @@ namespace umbraco.webservices.media
             }
 
             m.delete();
-            
+
         }
 
         [WebMethod]
@@ -130,18 +121,18 @@ namespace umbraco.webservices.media
             filename = filename.Replace("/", IOHelper.DirSepChar.ToString());
             filename = filename.Replace(@"\", IOHelper.DirSepChar.ToString());
             filename = filename.Substring(filename.LastIndexOf(IOHelper.DirSepChar) + 1, filename.Length - filename.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower();
-            
+
             Media m = new Media(id);
 
 
-            System.IO.Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Media + "/" + m.getProperty("umbracoFile").Id ));
+            System.IO.Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Media + "/" + m.getProperty("umbracoFile").Id));
             string fullFilePath = IOHelper.MapPath(SystemDirectories.Media + "/" + m.getProperty("umbracoFile").Id + "/" + filename);
 
             File.WriteAllBytes(fullFilePath, contents);
-            
+
             FileInfo f = new FileInfo(fullFilePath);
             m.getProperty("umbracoFile").Value = SystemDirectories.Media + "/" + filename;
-            m.getProperty("umbracoExtension").Value = f.Extension.Replace(".","");
+            m.getProperty("umbracoExtension").Value = f.Extension.Replace(".", "");
             m.getProperty("umbracoBytes").Value = f.Length.ToString();
 
 
@@ -152,10 +143,10 @@ namespace umbraco.webservices.media
         {
             Authenticate(username, password);
 
-            
+
             Media m = new Media(id);
-            
-            
+
+
             return createCarrier(m);
         }
 
@@ -184,7 +175,7 @@ namespace umbraco.webservices.media
 
             return carriers;
         }
-        
+
         private mediaCarrier createCarrier(Media m)
         {
             mediaCarrier carrier = new mediaCarrier();
@@ -210,8 +201,9 @@ namespace umbraco.webservices.media
                 carrier.ParentId = -1;
             }
 
-            foreach(Property p in m.getProperties) {
-                
+            foreach (Property p in m.getProperties)
+            {
+
                 mediaProperty carrierprop = new mediaProperty();
 
                 if (p.Value == System.DBNull.Value)
@@ -232,106 +224,4 @@ namespace umbraco.webservices.media
         }
 
     }
-    
-    
-
-    [Serializable]
-    [XmlType(Namespace = "http://umbraco.org/webservices/")]
-    public class mediaCarrier
-    {
-        
-        public int Id
-        {
-            get;
-            set;
-        }
-        public string Text
-        {
-            get;
-            set;
-
-        }
-
-        public string TypeAlias
-        {
-            get;
-            set;
-        }
-
-        public int TypeId
-        {
-            get;
-            set;
-        }
-
-        public DateTime CreateDateTime
-        {
-            get;
-            set;
-        }
-
-        public Boolean HasChildren
-        {
-            get;
-            set;
-        }
-
-        public int Level
-        {
-            get;
-            set;
-        }
-
-        public int ParentId
-        {
-            get;
-            set;
-
-        }
-
-        public string Path
-        {
-            get;
-            set;
-        }
-
-        public int SortOrder
-        {
-            get;
-            set;
-        }
-
-        public List<mediaProperty> MediaProperties
-        {
-            get;
-            set;
-        }
-
-        public mediaCarrier()
-        {
-            MediaProperties = new List<mediaProperty>();
-        }
-    }
-
-    [XmlType(Namespace = "http://umbraco.org/webservices/")]
-    public class mediaProperty
-    {
-        public mediaProperty()
-        {
-        }
-
-        public object PropertyValue
-        {
-            get;
-            set;
-        }
-
-        public string Key
-        {
-            get;
-            set;
-        }
-    }
-
-
 }
