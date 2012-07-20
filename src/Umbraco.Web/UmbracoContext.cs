@@ -49,6 +49,9 @@ namespace Umbraco.Web
             HttpContext = httpContext;            
             Application = applicationContext;
         	RoutesCache = routesCache;
+
+			//set the original url
+			OriginalUrl = httpContext.Request.Url;
         }
 
         /// <summary>

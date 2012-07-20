@@ -1,359 +1,230 @@
 using System;
+using System.Threading;
 using System.Web;
+using System.Web.Routing;
 using System.Web.UI;
 using System.IO;
 using System.Xml;
 using System.Text.RegularExpressions;
-using umbraco.presentation;
+using Umbraco.Web;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic;
 
 namespace umbraco
 {
-    /// <summary>
-    /// Summary description for WebForm1.
-    /// </summary>
-    /// 
-    public partial class UmbracoDefault : Page
-    {
+	/// <summary>
+	/// Summary description for WebForm1.
+	/// </summary>
+	/// 
+	public partial class UmbracoDefault : Page
+	{
+		page _upage = null;
 
-        private Guid m_version = Guid.Empty;
-        private string m_tmp = requestHandler.cleanUrl();
-        private page m_umbPage = null;
-        private requestHandler m_umbRequest = null;
+		bool _validateRequest = true;
 
-        private bool m_validateRequest = true;
+		const string TraceCategory = "UmbracoDefault";
 
-        /// <summary>
-        /// To turn off request validation set this to false before the PageLoad event. This equelevant to the validateRequest page directive
-        /// and has nothing to do with "normal" validation controls. Default value is true.
-        /// </summary>
-        public bool ValidateRequest
-        {
-            get { return m_validateRequest; }
-            set { m_validateRequest = value; }
-        }
+		/// <summary>
+		/// To turn off request validation set this to false before the PageLoad event. This equivalent to the validateRequest page directive
+		/// and has nothing to do with "normal" validation controls. Default value is true.
+		/// </summary>
+		public bool ValidateRequest
+		{
+			get { return _validateRequest; }
+			set { _validateRequest = value; }
+		}
 
-        protected override void Render(HtmlTextWriter output)
-        {
+		// fixme - switch over to OnPreInit override
+		void Page_PreInit(Object sender, EventArgs e)
+		{
+			Trace.Write(TraceCategory, "Begin PreInit");
 
-            // Get content
-            TextWriter tempWriter = new StringWriter();
-            base.Render(new HtmlTextWriter(tempWriter));
-            string pageContents = tempWriter.ToString();
+			// moved into LegacyRequestInitializer
+			// initialize the UmbracoContext instance
+			//if (UmbracoContext.Current == null)
+			//    UmbracoContext.Current = new UmbracoContext(HttpContext.Current);
 
-            pageContents = template.ParseInternalLinks(pageContents);
+			// get the document request
+			var docreq = UmbracoContext.Current.DocumentRequest;
 
-            // preview
-            if (UmbracoContext.Current.InPreviewMode)
-            {
-                Trace.Write("Runtime Engine", "Umbraco is running in preview mode.");
+			// load request parameters
+			// any reason other than liveEditing why we want to do this?!
+			Guid requestVersion;
+			if (!Guid.TryParse(Request["umbVersion"], out requestVersion))
+				requestVersion = Guid.Empty;
+			int requestId;
+			if (!int.TryParse(Request["umbPageID"], out requestId))
+				requestId = -1;
 
-                int bodyPos = pageContents.ToLower().IndexOf("</body>");
-                if (bodyPos > -1)
-                {
-                    string htmlBadge =
-                        String.Format(UmbracoSettings.PreviewBadge, 
-                        umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco),
-                        umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco_client),
-                        Server.UrlEncode(UmbracoContext.Current.Request.Path)
-                        );
+			if (requestId <= 0)
+			{
+				// asking for a different version of the default document
+				if (requestVersion != Guid.Empty)
+				{
+					// security check
+					var bp = new BasePages.UmbracoEnsuredPage();
+					bp.ensureContext();
+					requestId = docreq.NodeId;
+				}
+			}
+			else
+			{
+				// asking for a specific document (and maybe a specific version)
+				// security check
+				var bp = new BasePages.UmbracoEnsuredPage();
+				bp.ensureContext();
+			}
 
-                    // inject badge
-                    pageContents =
-                        pageContents.Substring(0, bodyPos) +
-                        htmlBadge + pageContents.Substring(bodyPos, pageContents.Length - bodyPos);
-                }
-            }
+			if (requestId <= 0)
+			{
+				// use the DocumentRequest if it has resolved
+				// else it means that no lookup could find a document to render
+				// or that the document to render has no template... 
+				if (docreq.HasNode && docreq.HasTemplate)
+				{
+					_upage = new page(docreq);
+					UmbracoContext.Current.HttpContext.Items["pageID"] = docreq.NodeId; // legacy - fixme
+					var templatePath = umbraco.IO.SystemDirectories.Masterpages + "/" + docreq.Template.Alias.Replace(" ", "") + ".master"; // fixme - should be in .Template!
+					this.MasterPageFile = templatePath; // set the template
+				}
+				else
+				{
+					// if we know we're 404, display the ugly message, else a blank page
+					if (docreq.Is404)
+						RenderNotFound();
+					Response.End();
+					return;
+				}
+			}
+			else
+			{
+				// override the document = ignore the DocumentRequest
+				// fixme - what if it fails?
+				var document = requestVersion == Guid.Empty ? new Document(requestId) : new Document(requestId, requestVersion);
+				_upage = new page(document);
+				UmbracoContext.Current.HttpContext.Items["pageID"] = requestId; // legacy - fixme
 
-            output.Write(pageContents);
+				// must fall back to old code
+				OnPreInitLegacy();
+			}
 
-        }
+			// reset the friendly path so it's used by forms, etc.
+			Trace.Write(TraceCategory, string.Format("Reset url to \"{0}\"", UmbracoContext.Current.OriginalUrl));
+			Context.RewritePath(UmbracoContext.Current.OriginalUrl.PathAndQuery);
 
-        void Page_PreInit(Object sender, EventArgs e)
-        {
-            Trace.Write("umbracoInit", "handling request");
+			Context.Items.Add("pageElements", _upage.Elements); // legacy - fixme
 
-            if (UmbracoContext.Current == null)
-                UmbracoContext.Current = new UmbracoContext(HttpContext.Current);
+			Trace.Write(TraceCategory, "End PreInit");
+		}
 
-            bool editMode = UmbracoContext.Current.LiveEditingContext.Enabled;
+		void OnPreInitLegacy()
+		{
+			if (_upage.Template == 0)
+			{
+				string custom404 = umbraco.library.GetCurrentNotFoundPageId();
+				if (!String.IsNullOrEmpty(custom404))
+				{
+					XmlNode xmlNodeNotFound = content.Instance.XmlContent.GetElementById(custom404);
+					if (xmlNodeNotFound != null)
+					{
+						_upage = new page(xmlNodeNotFound);
+					}
+				}
+			}
 
-            if (editMode)
-                ValidateRequest = false;
+			if (_upage.Template != 0)
+			{
+				this.MasterPageFile = template.GetMasterPageName(_upage.Template);
 
-            if (m_tmp != "" && Request["umbPageID"] == null)
-            {
-                // Check numeric
-                string tryIntParse = m_tmp.Replace("/", "").Replace(".aspx", string.Empty);
-                int result;
-                if (int.TryParse(tryIntParse, out result))
-                {
-                    m_tmp = m_tmp.Replace(".aspx", string.Empty);
+				//TODO: The culture stuff needs to all be set in the module
 
-                    // Check for request
-                    if (!string.IsNullOrEmpty(Request["umbVersion"]))
-                    {
-                        // Security check
-                        BasePages.UmbracoEnsuredPage bp = new BasePages.UmbracoEnsuredPage();
-                        bp.ensureContext();
-                        m_version = new Guid(Request["umbVersion"]);
-                    }
-                }
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(Request["umbPageID"]))
-                {
-                    int result;
-                    if (int.TryParse(Request["umbPageID"], out result))
-                    {
-                        m_tmp = Request["umbPageID"];
-                    }
-                }
-            }
+				string cultureAlias = null;
+				for (int i = _upage.SplitPath.Length - 1; i > 0; i--)
+				{
+					var domains = Domain.GetDomainsById(int.Parse(_upage.SplitPath[i]));
+					if (domains.Length > 0)
+					{
+						cultureAlias = domains[0].Language.CultureAlias;
+						break;
+					}
+				}
 
-            if (m_version != Guid.Empty)
-            {
-                HttpContext.Current.Items["pageID"] = m_tmp.Replace("/", "");
-                m_umbPage = new page(int.Parse(m_tmp.Replace("/", "")), m_version);
-            }
-            else
-            {
-                m_umbRequest = new requestHandler(UmbracoContext.Current.GetXml(), m_tmp);
-                Trace.Write("umbracoInit", "Done handling request");
-                if (m_umbRequest.currentPage != null)
-                {
-                    HttpContext.Current.Items["pageID"] = m_umbRequest.currentPage.Attributes.GetNamedItem("id").Value;
+				if (cultureAlias != null)
+				{
+					UmbracoContext.Current.HttpContext.Trace.Write("default.aspx", "Culture changed to " + cultureAlias);
+					var culture = new System.Globalization.CultureInfo(cultureAlias);
+					Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = culture;
+				}
+			}
+			else
+			{
+				Response.StatusCode = 404;
+				RenderNotFound();
+				Response.End();
+			}
+		}
 
-                    // Handle edit
-                    if (editMode)
-                    {
-                        Document d = new Document(int.Parse(m_umbRequest.currentPage.Attributes.GetNamedItem("id").Value));
-                        m_umbPage = new page(d.Id, d.Version);
-                    }
-                    else
-                        m_umbPage = new page(m_umbRequest.currentPage);
-                }
-            }
+		//
+		protected override void OnLoad(EventArgs e)
+		{
+			base.OnLoad(e);
 
-            // set the friendly path so it's used by forms
-            HttpContext.Current.RewritePath(HttpContext.Current.Items[requestModule.ORIGINAL_URL_CXT_KEY].ToString());
+			if (ValidateRequest)
+				Request.ValidateInput();
 
-            if (UmbracoSettings.UseAspNetMasterPages)
-            {
-                HttpContext.Current.Trace.Write("umbracoPage", "Looking up skin information");
+			// handle the infamous umbDebugShowTrace, etc
+			Page.Trace.IsEnabled &= GlobalSettings.DebugMode && !String.IsNullOrWhiteSpace(Request["umbDebugShowTrace"]);
+		}
 
-                if (m_umbPage != null)
-                {
-                    if (m_umbPage.Template == 0)
-                    {
-                        string custom404 = umbraco.library.GetCurrentNotFoundPageId();
-                        if (!String.IsNullOrEmpty(custom404))
-                        {
-                            XmlNode xmlNodeNotFound = content.Instance.XmlContent.GetElementById(custom404);
-                            if (xmlNodeNotFound != null)
-                            {
-                                m_umbPage = new page(xmlNodeNotFound);
-                            }
-                        }
-                    }
+		//
+		protected override void Render(HtmlTextWriter writer)
+		{
+			// do the original rendering
+			TextWriter sw = new StringWriter();
+			base.Render(new HtmlTextWriter(sw));
+			string text = sw.ToString();
 
-                    if (m_umbPage.Template != 0)
-                    {
-                        this.MasterPageFile = template.GetMasterPageName(m_umbPage.Template);
-                    }
-                    else
-                    {
-                        GenerateNotFoundContent();
-                        Response.End();
-                    }
-                }
+			// filter / parse internal links - although this should be done elsewhere!
+			text = template.ParseInternalLinks(text);
 
-                initUmbracoPage();
-            }
-        }
+			// filter / add preview banner
+			if (UmbracoContext.Current.InPreviewMode)
+			{
+				Trace.Write("Runtime Engine", "Umbraco is running in preview mode.");
 
-        public Control pageContent = new Control();
+				if (Response.ContentType == "text/HTML") // ASP.NET default value
+				{
+					int pos = text.ToLower().IndexOf("</body>");
+					if (pos > -1)
+					{
+						string htmlBadge =
+							String.Format(UmbracoSettings.PreviewBadge,
+								umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco),
+								umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco_client),
+								Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));
 
-        protected void Page_Load(object sender, EventArgs e)
-        {
+						text = text.Substring(0, pos) + htmlBadge + text.Substring(pos, text.Length - pos);
+					}
+				}
+			}
 
-            if (ValidateRequest)
-                Request.ValidateInput();
+			// render
+			writer.Write(text);
+		}
 
-            if (!String.IsNullOrEmpty(Request["umbDebugShowTrace"]))
-            {
-                if (!GlobalSettings.DebugMode)
-                {
-                    Page.Trace.IsEnabled = false;
-                }
-            }
-            else
-                Page.Trace.IsEnabled = false;
-        }
+		//
+		void RenderNotFound()
+		{
+			// UmbracoModule has already set Response.Status to 404
 
+			Response.Write("<html><body><h1>Page not found</h1>");
+			UmbracoContext.Current.HttpContext.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(Request.Url.ToString()) + "'.</h3>");
 
-        #region Web Form Designer generated code
+			// fixme - should try to get infos from the DocumentRequest?
 
-        protected override void OnInit(EventArgs e)
-        {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
-
-            if (!UmbracoSettings.UseAspNetMasterPages)
-                initUmbracoPage();
-            base.OnInit(e);
-
-            // Add Umbraco header
-            if (!UmbracoSettings.RemoveUmbracoVersionHeader)
-                Response.AddHeader("X-Umbraco-Version", string.Format("{0}.{1}", GlobalSettings.VersionMajor, GlobalSettings.VersionMinor));
-        }
-
-        private void initUmbracoPage()
-        {
-
-            RequestInitEventArgs e = new RequestInitEventArgs();
-            e.Page = m_umbPage;
-
-            if(m_umbPage != null)
-                e.PageId = m_umbPage.PageID;
-            
-            e.Context = System.Web.HttpContext.Current;
-            
-            FireBeforeRequestInit(e);
-            if (!e.Cancel)
-            {
-                if (!UmbracoSettings.EnableSplashWhileLoading || !content.Instance.isInitializing)
-                {
-
-                    if (m_umbPage != null)
-                    {
-                        // Add page elements to global items
-                        try
-                        {
-
-                            System.Web.HttpContext.Current.Items.Add("pageElements", m_umbPage.Elements);
-
-                        }
-                        catch (ArgumentException)
-                        {
-
-                            System.Web.HttpContext.Current.Items.Remove("pageElements");
-                            System.Web.HttpContext.Current.Items.Add("pageElements", m_umbPage.Elements);
-                        }
-
-                        string tempCulture = m_umbPage.GetCulture();
-                        if (tempCulture != "")
-                        {
-                            System.Web.HttpContext.Current.Trace.Write("default.aspx", "Culture changed to " + tempCulture);
-                            System.Threading.Thread.CurrentThread.CurrentCulture =
-                                System.Globalization.CultureInfo.CreateSpecificCulture(tempCulture);
-                            System.Threading.Thread.CurrentThread.CurrentUICulture = System.Threading.Thread.CurrentThread.CurrentCulture;
-                        }
-
-                        if (!UmbracoSettings.UseAspNetMasterPages)
-                        {
-                            layoutControls.umbracoPageHolder pageHolder = new umbraco.layoutControls.umbracoPageHolder();
-                            pageHolder.ID = "umbPageHolder";
-                            Page.Controls.Add(pageHolder);
-                            m_umbPage.RenderPage(m_umbPage.Template);
-                            layoutControls.umbracoPageHolder umbPageHolder =
-                                (layoutControls.umbracoPageHolder)Page.FindControl("umbPageHolder");
-                            umbPageHolder.Populate(m_umbPage);
-                        }
-
-                    }
-                    else
-                    {
-                        // If there's no published content, show friendly error
-                        if (umbraco.content.Instance.XmlContent.SelectSingleNode("/root/*") == null)
-                            Response.Redirect(IO.SystemDirectories.Config + "/splashes/noNodes.aspx");
-                        else
-                        {
-
-                            GenerateNotFoundContent();
-                        }
-                    }
-                }
-                else
-                {
-                    Response.Redirect(IO.SystemDirectories.Config + "/splashes/booting.aspx?orgUrl=" + Request.Url);
-                }
-
-                FireAfterRequestInit(e);
-            }
-        }
-
-        private void GenerateNotFoundContent()
-        {
-            Response.StatusCode = 404;
-            Response.Write("<html><body><h1>Page not found</h1>");
-            if (m_umbRequest != null)
-                HttpContext.Current.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(Request.Url.ToString()) + "'</h3><p>umbraco tried this to match it using this xpath query'" + m_umbRequest.PageXPathQuery + "')");
-            else
-                HttpContext.Current.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(Request.Url.ToString()) + "'</h3>");
-            Response.Write("</p>");
-            Response.Write("<p>This page can be replaced with a custom 404 page by adding the id of the umbraco document to show as 404 page in the /config/umbracoSettings.config file. Just add the id to the '/settings/content/errors/error404' element.</p>");
-            Response.Write("<p>For more information, visit <a href=\"http://umbraco.org/redir/custom-404\">information about custom 404</a> on the umbraco website.</p>");
-            Response.Write("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");
-            Response.Write("</body></html>");
-        }
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-        }
-
-        #endregion
-
-
-
-        /// <summary>
-        /// The preinit event handler
-        /// </summary>
-        public delegate void RequestInitEventHandler(object sender, RequestInitEventArgs e);
-        /// <summary>
-        /// occurs before the umbraco page is initialized for rendering.
-        /// </summary>
-        public static event RequestInitEventHandler BeforeRequestInit;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeRequestInit"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected internal new virtual void FireBeforeRequestInit(RequestInitEventArgs e)
-        {
-            if (BeforeRequestInit != null)
-                BeforeRequestInit(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after save].
-        /// </summary>
-        public static event RequestInitEventHandler AfterRequestInit;
-        /// <summary>
-        /// Raises the <see cref="E:AfterRequestInit"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterRequestInit(RequestInitEventArgs e)
-        {
-            if (AfterRequestInit != null)
-                AfterRequestInit(this, e);
-            
-        }        
-    }
-
-        //Request Init Events Arguments
-        public class RequestInitEventArgs : System.ComponentModel.CancelEventArgs
-        {
-            public page Page { get; internal set; }
-            public HttpContext Context { get; internal set; }
-            public string Url { get; internal set; }
-            public int PageId { get; internal set; }
-        }
+			Response.Write("<p>This page can be replaced with a custom 404. Check the documentation for \"custom 404\".</p>");
+			Response.Write("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");
+			Response.Write("</body></html>");
+		}
+	}
 }
