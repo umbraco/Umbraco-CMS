@@ -247,21 +247,7 @@ namespace Umbraco.Web.Routing
             // some lookups may implement caching
             Trace.TraceInformation("{0}Begin lookup", tracePrefix);
 			var lookups = RoutingContext.RouteLookups.GetLookups();
-			lookups.Any(lookup =>
-				{
-					//create the instance
-					try
-					{
-						var instance = (ILookup)Activator.CreateInstance(lookup);
-						return instance.LookupDocument(this);						
-					}
-					catch (Exception ex)
-					{
-						Log.Add(LogTypes.Error, -1, "Error loading ILookup: " + ex.ToString());
-						return false;
-					}					
-				});
-
+        	lookups.Any(lookup => lookup.LookupDocument(this));
             Trace.TraceInformation("{0}End lookup, {1}", tracePrefix, (this.HasNode ? "a document was found" : "no document was found"));
 
             // fixme - not handling umbracoRedirect
