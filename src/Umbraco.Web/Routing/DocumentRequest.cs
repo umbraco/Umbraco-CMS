@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Diagnostics;
 
 // legacy
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.member;
@@ -16,12 +17,9 @@ namespace Umbraco.Web.Routing
     {
         static readonly TraceSource Trace = new TraceSource("DocumentRequest");
 
-        public DocumentRequest(Uri uri, RoutingEnvironment lookups, UmbracoContext umbracoContext, NiceUrlResolver niceUrlResolver)
+        public DocumentRequest(Uri uri, RoutingContext routingContext)
         {
-            // register lookups
-            _environment = lookups;
-            UmbracoContext = umbracoContext;
-            _niceUrlResolver = niceUrlResolver;
+			RoutingContext = routingContext;
 
             // prepare the host
             var host = uri.Host;
@@ -55,9 +53,6 @@ namespace Umbraco.Web.Routing
             this.QueryString = uri.Query.TrimStart('?');
         }
 
-		readonly RoutingEnvironment _environment;
-		private readonly NiceUrlResolver _niceUrlResolver;
-
 		/// <summary>
 		/// the id of the requested node, if any, else zero.
 		/// </summary>
@@ -71,9 +66,9 @@ namespace Umbraco.Web.Routing
         #region Properties
 
 		/// <summary>
-		/// Returns the current UmbracoContext
+		/// Returns the current RoutingContext
 		/// </summary>
-		public UmbracoContext UmbracoContext { get; private set; }
+		public RoutingContext RoutingContext { get; private set; }
 
         /// <summary>
         /// Gets the request host name.
@@ -128,7 +123,7 @@ namespace Umbraco.Web.Routing
                 _node = value;
                 this.Template = null;
                 if (_node != null)
-                    _nodeId = int.Parse(_environment.ContentStore.GetNodeProperty(_node, "@id"));
+					_nodeId = int.Parse(RoutingContext.ContentStore.GetNodeProperty(_node, "@id"));
                 else
                     _nodeId = 0;
             }
@@ -251,8 +246,22 @@ namespace Umbraco.Web.Routing
             // the first successful lookup, if any, will set this.Node, and may also set this.Template
             // some lookups may implement caching
             Trace.TraceInformation("{0}Begin lookup", tracePrefix);
-        	var lookups = _environment.RouteLookups.GetLookups();
-			lookups.Any(lookup => lookup.LookupDocument(this));
+			var lookups = RoutingContext.RouteLookups.GetLookups();
+			lookups.Any(lookup =>
+				{
+					//create the instance
+					try
+					{
+						var instance = (ILookup)Activator.CreateInstance(lookup);
+						return instance.LookupDocument(this);						
+					}
+					catch (Exception ex)
+					{
+						Log.Add(LogTypes.Error, -1, "Error loading ILookup: " + ex.ToString());
+						return false;
+					}					
+				});
+
             Trace.TraceInformation("{0}End lookup, {1}", tracePrefix, (this.HasNode ? "a document was found" : "no document was found"));
 
             // fixme - not handling umbracoRedirect
@@ -292,7 +301,7 @@ namespace Umbraco.Web.Routing
                     Trace.TraceInformation("{0}No document, try notFound lookup", tracePrefix);
 
                     // if it fails then give up, there isn't much more that we can do
-                    if (_environment.LookupNotFound == null || !_environment.LookupNotFound.LookupDocument(this))
+					if (RoutingContext.LookupNotFound == null || !RoutingContext.LookupNotFound.LookupDocument(this))
                     {
                         Trace.TraceInformation("{0}Failed to find a document, give up", tracePrefix);
                         break;
@@ -344,7 +353,7 @@ namespace Umbraco.Web.Routing
                 throw new InvalidOperationException("There is no node.");
 
             bool redirect = false;
-            string internalRedirect = _environment.ContentStore.GetNodeProperty(this.Node, "umbracoInternalRedirectId");
+			string internalRedirect = RoutingContext.ContentStore.GetNodeProperty(this.Node, "umbracoInternalRedirectId");
 
             if (!string.IsNullOrWhiteSpace(internalRedirect))
             {
@@ -368,7 +377,7 @@ namespace Umbraco.Web.Routing
                 else
                 {
                     // redirect to another page
-                    var node = _environment.ContentStore.GetNodeById(internalRedirectId);
+					var node = RoutingContext.ContentStore.GetNodeById(internalRedirectId);
                     this.Node = node;
                     if (node != null)
                     {
@@ -396,7 +405,7 @@ namespace Umbraco.Web.Routing
             if (this.Node == null)
                 throw new InvalidOperationException("There is no node.");
 
-            var path = _environment.ContentStore.GetNodeProperty(this.Node, "@path");
+			var path = RoutingContext.ContentStore.GetNodeProperty(this.Node, "@path");
 
             if (Access.IsProtected(this.NodeId, path))
             {
@@ -409,14 +418,14 @@ namespace Umbraco.Web.Routing
                     Trace.TraceInformation("{0}Not logged in, redirect to login page", tracePrefix);
                     var loginPageId = Access.GetLoginPage(path);
                     if (loginPageId != this.NodeId)
-                        this.Node = _environment.ContentStore.GetNodeById(loginPageId);
+						this.Node = RoutingContext.ContentStore.GetNodeById(loginPageId);
                 }
                 else if (!Access.HasAccces(this.NodeId, user.ProviderUserKey))
                 {
                     Trace.TraceInformation("{0}Current member has not access, redirect to error page", tracePrefix);
                     var errorPageId = Access.GetErrorPage(path);
                     if (errorPageId != this.NodeId)
-                        this.Node = _environment.ContentStore.GetNodeById(errorPageId);
+						this.Node = RoutingContext.ContentStore.GetNodeById(errorPageId);
                 }
                 else
                 {
@@ -439,9 +448,9 @@ namespace Umbraco.Web.Routing
             if (this.Node == null)
                 throw new InvalidOperationException("There is no node.");
 
-            var templateAlias = UmbracoContext.HttpContext.Request.QueryString["altTemplate"];
+			var templateAlias = RoutingContext.UmbracoContext.HttpContext.Request.QueryString["altTemplate"];
             if (string.IsNullOrWhiteSpace(templateAlias))
-                templateAlias = UmbracoContext.HttpContext.Request.Form["altTemplate"];
+				templateAlias = RoutingContext.UmbracoContext.HttpContext.Request.Form["altTemplate"];
 
             // fixme - we might want to support cookies?!? NO but provide a hook to change the template
 
@@ -449,7 +458,7 @@ namespace Umbraco.Web.Routing
             {
                 if (string.IsNullOrWhiteSpace(templateAlias))
                 {
-                    templateAlias = _environment.ContentStore.GetNodeProperty(this.Node, "@template");
+					templateAlias = RoutingContext.ContentStore.GetNodeProperty(this.Node, "@template");
                     Trace.TraceInformation("{0}Look for template id={1}", tracePrefix, templateAlias);
                     int templateId;
                     if (!int.TryParse(templateAlias, out templateId))
@@ -491,11 +500,11 @@ namespace Umbraco.Web.Routing
             if (this.HasNode)
             {
                 int redirectId;
-                if (!int.TryParse(_environment.ContentStore.GetNodeProperty(this.Node, "umbracoRedirect"), out redirectId))
+				if (!int.TryParse(RoutingContext.ContentStore.GetNodeProperty(this.Node, "umbracoRedirect"), out redirectId))
                     redirectId = -1;
                 string redirectUrl = "#";
                 if (redirectId > 0)
-                    redirectUrl = _niceUrlResolver.GetNiceUrl(redirectId);
+					redirectUrl = RoutingContext.NiceUrlResolver.GetNiceUrl(redirectId);
                 if (redirectUrl != "#")
                     this.RedirectUrl = redirectUrl;
             }

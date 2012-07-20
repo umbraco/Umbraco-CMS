@@ -256,7 +256,7 @@
     <Compile Include="Routing\LookupWeightAttribute.cs" />
     <Compile Include="Routing\DefaultRoutesCache.cs" />
     <Compile Include="Routing\RoutesCache.cs" />
-    <Compile Include="Routing\RoutingEnvironment.cs" />
+    <Compile Include="Routing\RoutingContext.cs" />
     <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
     <Compile Include="umbraco.presentation\install\steps\database.ascx.cs">
       <DependentUpon>database.ascx</DependentUpon>

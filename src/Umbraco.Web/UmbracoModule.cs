@@ -33,29 +33,28 @@ namespace Umbraco.Web
                 httpContext.Response.AddHeader("X-Umbraco-Version", string.Format("{0}.{1}", GlobalSettings.VersionMajor, GlobalSettings.VersionMinor));
 
             //create the UmbracoContext singleton, one per request!!
-            var umbracoContext = new UmbracoContext(new HttpContextWrapper(httpContext), ApplicationContext.Current);
+            var umbracoContext = new UmbracoContext(
+				new HttpContextWrapper(httpContext), 
+				ApplicationContext.Current,
+				 RoutesCache.Current.GetProvider());
             UmbracoContext.Current = umbracoContext;
 
             //create a content store
             var contentStore = new ContentStore(umbracoContext);            
             //create the nice urls
-            var niceUrls = new NiceUrlResolver(contentStore, umbracoContext, RoutesCache.Current.GetProvider());
-            //create the RoutingEnvironment (one per http request as it relies on the umbraco context!)
-            var routingEnvironment = new RoutingEnvironment(
-							RouteLookups.Current,
-                            new LookupFor404(contentStore),
-                            contentStore);
+            var niceUrls = new NiceUrlResolver(contentStore, umbracoContext);
+            //create the RoutingContext (one per http request)
+        	var routingContext = new RoutingContext(
+        		umbracoContext,
+        		RouteLookups.Current,
+        		new LookupFor404(),
+        		contentStore,
+        		niceUrls);
             // create the new document request which will cleanup the uri once and for all
-            var docreq = new DocumentRequest(uri, routingEnvironment, umbracoContext, niceUrls);
+            var docreq = new DocumentRequest(uri, routingContext);
 
-			//NOTE: we are putting these objects on the UmbracoContext because these might be handy for developers in the future to 
-			// access if we make them public.
-			// initialize the DocumentRequest on the UmbracoContext (this is circular dependency!!!)
+			// initialize the DocumentRequest on the UmbracoContext (this is circular dependency but i think in this case is ok)
             umbracoContext.DocumentRequest = docreq;
-			// initialize the RoutingEnvironment on the UmbracoContext (this is circular dependency!!!)
-        	umbracoContext.RoutingEnvironment = routingEnvironment;
-			// initialize the RoutingEnvironment on the UmbracoContext (this is circular dependency!!!)
-        	umbracoContext.NiceUrlResolver = niceUrls;
 
             //create the LegacyRequestInitializer (one per http request as it relies on the umbraco context!)
             var legacyRequestInitializer = new LegacyRequestInitializer(umbracoContext);

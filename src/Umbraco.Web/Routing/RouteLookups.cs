@@ -7,11 +7,11 @@ using Umbraco.Core;
 namespace Umbraco.Web.Routing
 {
 	/// <summary>
-	/// Represents a collection of ILookups used for routing that are registered in the application
+	/// Represents a collection of ILookup types used for routing that are registered in the application
 	/// </summary>
 	internal class RouteLookups
 	{
-		private static readonly List<ILookup> Lookups = new List<ILookup>();
+		private static readonly List<Type> Lookups = new List<Type>();
 		private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
 
 		/// <summary>
@@ -19,7 +19,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		public static RouteLookups Current { get; internal set; }
 
-		internal RouteLookups(IEnumerable<ILookup> lookups)
+		internal RouteLookups(IEnumerable<Type> lookups)
 		{
 			Lookups.AddRange(SortByWeight(lookups));
 		}
@@ -28,7 +28,7 @@ namespace Umbraco.Web.Routing
 		/// Returns all of the lookups
 		/// </summary>
 		/// <returns></returns>
-		public IEnumerable<ILookup> GetLookups()
+		public IEnumerable<Type> GetLookups()
 		{
 			return Lookups;
 		} 
@@ -49,11 +49,24 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Adds a new lookup to the end of the list
 		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		public void AddLookup<T>()
+			where T : ILookup
+		{
+			AddLookup(typeof (T));
+		}
+
+		/// <summary>
+		/// Adds a new lookup to the end of the list
+		/// </summary>
 		/// <param name="lookup"></param>
-		public void AddLookup(ILookup lookup)
-		{			
+		public void AddLookup(Type lookup)
+		{
+			if (!typeof(ILookup).IsAssignableFrom(lookup))
+				throw new InvalidOperationException("The type specified is not of type " + typeof (ILookup));
+
 			if (CheckExists(lookup)) 
-				throw new InvalidOperationException("The lookup type " + lookup.GetType() + " already exists in the lookup collection");
+				throw new InvalidOperationException("The lookup type " + lookup + " already exists in the lookup collection");
 
 			using (new WriteLock(Lock))
 			{
@@ -66,10 +79,10 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <param name="index"></param>
 		/// <param name="lookup"></param>
-		public void InsertLookup(int index, ILookup lookup)
+		public void InsertLookup(int index, Type lookup)
 		{
 			if (CheckExists(lookup))
-				throw new InvalidOperationException("The lookup type " + lookup.GetType() + " already exists in the lookup collection");
+				throw new InvalidOperationException("The lookup type " + lookup + " already exists in the lookup collection");
 			
 			using (new WriteLock(Lock))
 			{
@@ -82,9 +95,9 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <param name="lookup"></param>
 		/// <returns></returns>
-		private static bool CheckExists(ILookup lookup)
+		private static bool CheckExists(Type lookup)
 		{
-			return Lookups.Any(x => x.GetType() == lookup.GetType());
+			return Lookups.Any(x => x == lookup);
 		}
 
 		/// <summary>
@@ -92,11 +105,11 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <param name="lookups"></param>
 		/// <returns></returns>
-		private static IEnumerable<ILookup> SortByWeight(IEnumerable<ILookup> lookups)
+		private static IEnumerable<Type> SortByWeight(IEnumerable<Type> lookups)
 		{
 			return lookups.OrderBy(x =>
 				{
-					var attribute = x.GetType().GetCustomAttributes(true).OfType<LookupWeightAttribute>().SingleOrDefault();
+					var attribute = x.GetCustomAttributes(true).OfType<LookupWeightAttribute>().SingleOrDefault();
 					return attribute == null ? LookupWeightAttribute.DefaultWeight : attribute.Weight;
 				}).ToList();
 		}

@@ -11,12 +11,7 @@ namespace Umbraco.Web.Routing
     [LookupWeight(30)]
     internal class LookupByPathWithTemplate : LookupByPath, ILookup
     {
-        static readonly TraceSource Trace = new TraceSource("LookupByPathWithTemplate");
-
-		public LookupByPathWithTemplate(ContentStore contentStore, IRoutesCache routesCache)
-            : base(contentStore, routesCache)
-        {
-        }
+        static readonly TraceSource Trace = new TraceSource("LookupByPathWithTemplate");		
 
         public override bool LookupDocument(DocumentRequest docreq)
         {

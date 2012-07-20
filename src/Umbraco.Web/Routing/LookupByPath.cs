@@ -9,16 +9,8 @@ namespace Umbraco.Web.Routing
     [LookupWeight(10)]
     internal class LookupByPath : ILookup
     {
-        public LookupByPath(ContentStore contentStore, IRoutesCache routesCache)
-        {
-            ContentStore = contentStore;
-            RoutesCache = routesCache;
-        }
-
+       
         static readonly TraceSource Trace = new TraceSource("LookupByPath");
-
-        protected ContentStore ContentStore;
-		protected IRoutesCache RoutesCache;
 
         public virtual bool LookupDocument(DocumentRequest docreq)
         {
@@ -32,15 +24,15 @@ namespace Umbraco.Web.Routing
             Trace.TraceInformation("Test route \"{0}\"", route);
 
 			//return '0' if in preview mode!
-        	var nodeId = !docreq.UmbracoContext.InPreviewMode
-        	             	? RoutesCache.GetNodeId(route)
+        	var nodeId = !docreq.RoutingContext.UmbracoContext.InPreviewMode
+							? docreq.RoutingContext.UmbracoContext.RoutesCache.GetNodeId(route)
         	             	: 0;
 
 
             XmlNode node = null;
             if (nodeId > 0)
             {
-                node = ContentStore.GetNodeById(nodeId);
+				node = docreq.RoutingContext.ContentStore.GetNodeById(nodeId);
                 if (node != null)
                 {
                     docreq.Node = node;
@@ -48,22 +40,22 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    RoutesCache.ClearNode(nodeId);
+                    docreq.RoutingContext.UmbracoContext.RoutesCache.ClearNode(nodeId);
                 }
             }
 
             if (node == null)
             {
                 Trace.TraceInformation("Cache miss, query");
-                node = ContentStore.GetNodeByRoute(route);
+				node = docreq.RoutingContext.ContentStore.GetNodeByRoute(route);
                 if (node != null)
                 {
                     docreq.Node = node;
                     Trace.TraceInformation("Query matches, id={0}", docreq.NodeId);
 
-					if (!docreq.UmbracoContext.InPreviewMode)
+					if (!docreq.RoutingContext.UmbracoContext.InPreviewMode)
 					{
-						RoutesCache.Store(docreq.NodeId, route); // will not write if previewing	
+						docreq.RoutingContext.UmbracoContext.RoutesCache.Store(docreq.NodeId, route); // will not write if previewing	
 					} 
                     
                 }

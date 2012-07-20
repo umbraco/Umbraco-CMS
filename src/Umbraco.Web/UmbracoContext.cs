@@ -32,18 +32,23 @@ namespace Umbraco.Web
         /// </summary>
         private static UmbracoContext _umbracoContext;
 
-        /// <summary>
-        /// Creates a new Umbraco context.
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="applicationContext"> </param>
-        internal UmbracoContext(HttpContextBase httpContext, ApplicationContext applicationContext)
+    	/// <summary>
+    	/// Creates a new Umbraco context.
+    	/// </summary>
+    	/// <param name="httpContext"></param>
+    	/// <param name="applicationContext"> </param>
+    	/// <param name="routesCache"> </param>
+    	internal UmbracoContext(
+			HttpContextBase httpContext, 
+			ApplicationContext applicationContext,
+			IRoutesCache routesCache)
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
 
             HttpContext = httpContext;            
             Application = applicationContext;
+        	RoutesCache = routesCache;
         }
 
         /// <summary>
@@ -91,7 +96,9 @@ namespace Umbraco.Web
         /// </summary>
         public ApplicationContext Application { get; private set; }
 
-        /// <summary>
+		internal IRoutesCache RoutesCache { get; private set; }
+
+    	/// <summary>
         /// Gets/sets the original URL of the request
         /// </summary>
         internal Uri OriginalUrl { get; set; }
@@ -124,17 +131,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets/sets the DocumentRequest object
         /// </summary>
-        internal DocumentRequest DocumentRequest { get; set; }
-
-		/// <summary>
-		/// Gets/sets the NiceUrlResolver object
-		/// </summary>
-		internal NiceUrlResolver NiceUrlResolver { get; set; }
-
-		/// <summary>
-		/// Gets/sets the RoutingEnvironment object
-		/// </summary>
-		internal RoutingEnvironment RoutingEnvironment { get; set; }
+        internal DocumentRequest DocumentRequest { get; set; }	
 
         /// <summary>
         /// Exposes the HttpContext for the current request

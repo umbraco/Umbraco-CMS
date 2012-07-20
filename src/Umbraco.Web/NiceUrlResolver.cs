@@ -12,16 +12,14 @@ namespace Umbraco.Web
 	/// </summary>
     internal class NiceUrlResolver
     {
-		public NiceUrlResolver(ContentStore contentStore, UmbracoContext umbracoContext, IRoutesCache routesCache)
+		public NiceUrlResolver(ContentStore contentStore, UmbracoContext umbracoContext)
         {
             _umbracoContext = umbracoContext;
             _contentStore = contentStore;
-            _routesCache = routesCache;
         }
 
         private readonly UmbracoContext _umbracoContext;
         private readonly ContentStore _contentStore;
-		private readonly IRoutesCache _routesCache;
 
         // note: this could be a parameter...
         const string UrlNameProperty = "@urlName";
@@ -41,7 +39,7 @@ namespace Umbraco.Web
 
 			// will not read cache if previewing!
         	var route = !_umbracoContext.InPreviewMode
-        	            	? _routesCache.GetRoute(nodeId)
+							? _umbracoContext.RoutesCache.GetRoute(nodeId)
         	            	: null;
 
             if (route != null)
@@ -94,7 +92,7 @@ namespace Umbraco.Web
 
 			if (!_umbracoContext.InPreviewMode)
 			{
-				_routesCache.Store(nodeId, route); // will not write if previewing	
+				_umbracoContext.RoutesCache.Store(nodeId, route); // will not write if previewing	
 			}            
 
             return FormatUrl(domain, path);
