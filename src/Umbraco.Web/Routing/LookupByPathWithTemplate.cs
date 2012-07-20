@@ -21,12 +21,15 @@ namespace Umbraco.Web.Routing
         public override bool LookupDocument(DocumentRequest docreq)
         {
             XmlNode node = null;
+			string path = docreq.Uri.AbsolutePath;
 
-            if (docreq.Path != "/") // no template if "/"
+			if (docreq.HasDomain)
+				path = Domains.PathRelativeToDomain(docreq.DomainUri, path);
+			if (path != "/") // no template if "/"
             {
-                var pos = docreq.Path.LastIndexOf('/');
-                var templateAlias = docreq.Path.Substring(pos + 1);
-                var path = docreq.Path.Substring(0, pos);
+				var pos = docreq.Uri.AbsolutePath.LastIndexOf('/');
+				var templateAlias = docreq.Uri.AbsolutePath.Substring(pos + 1);
+				path = path.Substring(0, pos);
 
                 var template = Template.GetByAlias(templateAlias);
                 if (template != null)

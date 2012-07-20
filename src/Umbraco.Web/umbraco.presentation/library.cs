@@ -43,15 +43,6 @@ namespace umbraco
     /// </summary>
     public class library
     {
-        internal static void ClearNiceUrlCache()
-        {
-            lock (locker)
-            {
-                niceUrlCache.Clear();
-            }
-        }
-
-        private static object locker = new object();
 
         #region Declarations
 
@@ -364,18 +355,7 @@ namespace umbraco
         /// <returns>String with a friendly url from a node</returns>
         public static string NiceUrl(int nodeID)
         {
-            try
-            {
-                int startNode = 1;
-                if (GlobalSettings.HideTopLevelNodeFromPath)
-                    startNode = 2;
-
-                return niceUrlDo(nodeID, startNode, false);
-            }
-            catch
-            {
-                return "#";
-            }
+			return Umbraco.Core.UmbracoContainer.Get<Umbraco.Web.Routing.NiceUrls>().GetNiceUrl(nodeID);
         }
 
         /// <summary>
@@ -384,9 +364,10 @@ namespace umbraco
         /// </summary>
         /// <param name="nodeID">Identifier for the node that should be returned</param>
         /// <returns>String with a friendly url from a node</returns>
+		[Obsolete]
         public static string NiceUrlFullPath(int nodeID)
         {
-            return niceUrlDo(nodeID, 1, false);
+			throw new NotImplementedException("It was broken anyway...");
         }
 
         /// <summary>
@@ -396,7 +377,7 @@ namespace umbraco
         /// <returns>String with a friendly url with full domain from a node</returns>
         public static string NiceUrlWithDomain(int nodeID)
         {
-            return niceUrlDo(nodeID, 1, true);
+			return Umbraco.Core.UmbracoContainer.Get<Umbraco.Web.Routing.NiceUrls>().GetNiceUrl(nodeID, Umbraco.Web.RequestContext.Current.UmbracoUrl, true);
         }
 
 
@@ -405,144 +386,6 @@ namespace umbraco
             return IOHelper.ResolveUrl(path);
         }
 
-        private static IDictionary<int, string> niceUrlCache = new Dictionary<int, string>();
-
-        /// <summary>
-        /// This is used in the requesthandler for domain lookups to ensure that we don't use the cache 
-        /// </summary>
-        /// <param name="nodeID"></param>
-        /// <param name="startNodeDepth"></param>
-        /// <param name="byPassCache"></param>
-        /// <returns></returns>
-        private static string niceUrlDo(int nodeID, int startNodeDepth, bool forceDomain)
-        {
-            int key = nodeID + (forceDomain ? 9999999 : 0);
-            if (!niceUrlCache.ContainsKey(key))
-            {
-                lock (locker)
-                {
-                    if (!niceUrlCache.ContainsKey(key))
-                    {
-                        string tempUrl = NiceUrlFetch(nodeID, startNodeDepth, forceDomain);
-                        if (!String.IsNullOrEmpty(tempUrl))
-                        {
-                            niceUrlCache.Add(key, tempUrl);
-                        }
-                    }
-                }
-            }
-
-            return niceUrlCache[key];
-        }
-
-        internal static string niceUrlJuno(int nodeId, int startNodeDepth, string currentDomain, bool forceDomain)
-        {
-            string parentUrl = String.Empty;
-            XmlElement node = UmbracoContext.Current.GetXml().GetElementById(nodeId.ToString());
-
-            if (node == null)
-            {
-                ArgumentException arEx =
-                    new ArgumentException(
-                        string.Format(
-                            "Couldn't find any page with the nodeId = {0}. This is most likely caused by the page isn't published!",
-                            nodeId), "nodeId");
-                Log.Add(LogTypes.Error, nodeId, arEx.Message);
-                throw arEx;
-            }
-            if (node.ParentNode.Name.ToLower() != "root" || UmbracoSettings.UseDomainPrefixes || forceDomain)
-            {
-                if (UmbracoSettings.UseDomainPrefixes || forceDomain)
-                {
-                    Domain[] domains =
-                        Domain.GetDomainsById(nodeId);
-                    // when there's a domain on a url we'll just return the domain rather than the parent path
-                    if (domains.Length > 0)
-                    {
-                        return GetDomainIfExists(currentDomain, nodeId);
-                    }
-                }
-
-                if (parentUrl == String.Empty && (int.Parse(node.Attributes.GetNamedItem("level").Value) > startNodeDepth || UmbracoSettings.UseDomainPrefixes || forceDomain))
-                {
-                    if (node.ParentNode.Name != "root")
-                    {
-                        parentUrl = niceUrlJuno(int.Parse(node.ParentNode.Attributes.GetNamedItem("id").Value), startNodeDepth, currentDomain, forceDomain);
-                    }
-                }
-            }
-
-            // only return the current node url if we're at the startnodedepth or higher
-            if (int.Parse(node.Attributes.GetNamedItem("level").Value) >= startNodeDepth)
-                return parentUrl + "/" + node.Attributes.GetNamedItem("urlName").Value;
-            else if (node.PreviousSibling != null)
-                return "/" + node.Attributes.GetNamedItem("urlName").Value;
-            else
-                return "/";
-        }
-
-        private static string GetDomainIfExists(string currentDomain, int nodeId)
-        {
-            Domain[] domains = Domain.GetDomainsById(nodeId);
-            if (domains.Length > 0)
-            {
-                if (currentDomain != String.Empty)
-                {
-                    foreach (Domain d in domains)
-                    {
-                        // if there's multiple domains we'll prefer to use the same domain as the current request
-                        if (currentDomain == d.Name.ToLower() || d.Name.EndsWith(currentDomain, StringComparison.CurrentCultureIgnoreCase))
-                        {
-                            if (d.Name.StartsWith("http", StringComparison.CurrentCultureIgnoreCase))
-                            {
-                                return d.Name;
-                            }
-                            else
-                            {
-                                return string.Format("{0}://{1}", UmbracoContext.Current.Request.Url.Scheme, d.Name);
-                            }
-                        }
-                    }
-                }
-
-                if (domains[0].Name.StartsWith("http", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return domains[0].Name;
-                }
-                else
-                {
-                    return string.Format("{0}://{1}", UmbracoContext.Current.Request.Url.Scheme, domains[0].Name);
-                }
-            }
-            return null;
-        }
-
-        internal static string NiceUrlFetch(int nodeID, int startNodeDepth, bool forceDomain)
-        {
-            bool directoryUrls = GlobalSettings.UseDirectoryUrls;
-            string baseUrl = SystemDirectories.Root; // SystemDirectories.Umbraco;
-            string junoUrl = niceUrlJuno(nodeID, startNodeDepth, HttpContext.Current.Request.ServerVariables["SERVER_NAME"].ToLower(), forceDomain);
-            return appendUrlExtension(baseUrl, directoryUrls, junoUrl);
-
-        }
-
-        private static string appendUrlExtension(string baseUrl, bool directoryUrls, string tempUrl)
-        {
-            if (!directoryUrls)
-            {
-                // append .aspx extension if the url includes other than just the domain name
-                if (!String.IsNullOrEmpty(tempUrl) && tempUrl != "/" &&
-                    (!tempUrl.StartsWith("http://") || tempUrl.LastIndexOf("/") > 7))
-                    tempUrl = baseUrl + tempUrl + ".aspx";
-            }
-            else
-            {
-                tempUrl = baseUrl + tempUrl;
-                if (tempUrl != "/" && UmbracoSettings.AddTrailingSlash)
-                    tempUrl += "/";
-            }
-            return tempUrl;
-        }
 
         /// <summary>
         /// Returns a string with the data from the given element of a node. Both elements (data-fields)

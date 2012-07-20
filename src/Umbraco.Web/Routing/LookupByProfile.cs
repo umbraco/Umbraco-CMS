@@ -29,11 +29,11 @@ namespace Umbraco.Web.Routing
             XmlNode node = null;
 
             bool isProfile = false;
-            var pos = docreq.Path.LastIndexOf('/');
+			var pos = docreq.Uri.AbsolutePath.LastIndexOf('/');
             if (pos > 0)
             {
-                var memberLogin = docreq.Path.Substring(pos + 1);
-                var path = docreq.Path.Substring(0, pos);
+				var memberLogin = docreq.Uri.AbsolutePath.Substring(pos + 1);
+				var path = docreq.Uri.AbsolutePath.Substring(0, pos);
 
                 if (path == GlobalSettings.ProfileUrl)
                 {

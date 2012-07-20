@@ -12,47 +12,19 @@ using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.language;
 namespace Umbraco.Web.Routing
 {
+	// represents a request for one specified Umbraco document to be rendered
+	// by one specified template, using one particular culture.
+	//
     internal class DocumentRequest
     {
         static readonly TraceSource Trace = new TraceSource("DocumentRequest");
 
         public DocumentRequest(Uri uri, RoutingEnvironment lookups, UmbracoContext umbracoContext, NiceUrls niceUrls)
         {
-            // register lookups
+			this.Uri = uri;
             _environment = lookups;
             _umbracoContext = umbracoContext;
             _niceUrls = niceUrls;
-
-            // prepare the host
-            var host = uri.Host;
-
-            // fixme
-            //var serverVarHost = httpContext.Request.ServerVariables["X_UMBRACO_HOST"];
-            //if (!string.IsNullOrWhiteSpace(serverVarHost))
-            //{
-            //    host = serverVarHost;
-            //    RequestContext.Current.Trace.Write(TraceCategory, "Domain='" + host + "' (X_UMBRACO_HOST)");
-            //}
-
-            // initialize the host
-            this.Host = host;
-
-            // prepare the path
-            var path = uri.AbsolutePath;
-            path = path.Substring(UrlUtility.AppVirtualPathPrefix.Length); // remove virtual directory
-            path = path.TrimEnd('/'); // remove trailing /
-            if (!path.StartsWith("/")) // ensure it starts with /
-                path = "/" + path;
-            path = path.ToLower(); // make it all lowercase
-            //url = url.Replace('\'', '_'); // make it xpath compatible !! was in legacy, should be handled in xpath query, not here
-            if (path.EndsWith(".aspx")) // remove trailing .aspx
-                path = path.Substring(0, path.Length - ".aspx".Length);
-
-            // initialize the path
-            this.Path = path;
-
-            // initialize the query
-            this.QueryString = uri.Query.TrimStart('?');
         }
 
         #region Properties
@@ -63,28 +35,14 @@ namespace Umbraco.Web.Routing
         // the requested node, if any, else null.
         XmlNode _node = null;
 
-        /// <summary>
-        /// Gets the request host name.
-        /// </summary>
-        /// <remarks>This is the original uri's host, unless modified (fixme).</remarks>
-        public string Host { get; private set; }
-
-        /// <summary>
-        /// Gets the request path.
-        /// </summary>
-        /// <remarks>This is the original uri's path, cleaned up, without vdir, without .aspx, etc.</remarks>
-        public string Path { get; private set; }
-
-        /// <summary>
-        /// Gets the request query string.
-        /// </summary>
-        /// <remarks>This is the original uri's querystring, without the initial '?'.</remarks>
-        public string QueryString { get; private set; }
+		public Uri Uri { get; private set; }
 
         /// <summary>
         /// Gets or sets the document request's domain.
         /// </summary>
         public Domain Domain { get; private set; }
+
+		public Uri DomainUri { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the document request has a domain.
@@ -186,38 +144,35 @@ namespace Umbraco.Web.Routing
         /// <param name="host">The host name part of the http request, eg. <c>www.example.com</c>.</param>
         /// <param name="url">The url part of the http request, starting with a slash, eg. <c>/foo/bar</c>.</param>
         /// <returns>A value indicating whether a domain was found.</returns>
-        public bool ResolveSiteRoot()
+		public bool ResolveDomain()
         {
-            const string tracePrefix = "ResolveSiteRoot: ";
+            const string tracePrefix = "ResolveDomain: ";
 
             // note - we are not handling schemes nor ports here.
 
-            Trace.TraceInformation("{0}Host=\"{1}\"", tracePrefix, this.Host);
-
-            Domain domain = null;
-
-            // get domains, those with a slash coming first, so that 'foo.com/en' takes precedence over 'foo.com'.
-            // domains should NOT begin with 'http://'.
-            var domains = Domain.GetDomains().OrderByDescending(od => od.Name.IndexOf('/'));
+            Trace.TraceInformation("{0}Uri=\"{1}\"", tracePrefix, this.Uri);
 
             // try to find a domain matching the current request
-            string urlWithDomain = UrlUtility.EnsureScheme(this.Host + this.Path, "http"); // FIXME-NICEURL - current Uri?!
-            domain = domains.FirstOrDefault(d => UrlUtility.IsBaseOf(d.Name, urlWithDomain));
+			var domainAndUri = Domains.ApplicableDomains(Domain.GetDomains(), RequestContext.Current.UmbracoUrl, false);
 
             // handle domain
-            if (domain != null)
+			if (domainAndUri != null)
             {
                 // matching an existing domain
                 Trace.TraceInformation("{0}Matches domain=\"{1}\", rootId={2}, culture=\"{3}\"",
                                        tracePrefix,
-                                       domain.Name, domain.RootNodeId, domain.Language.CultureAlias);
+					domainAndUri.Domain.Name, domainAndUri.Domain.RootNodeId, domainAndUri.Domain.Language.CultureAlias);
 
-                this.Domain = domain;
-                this.Culture = new CultureInfo(domain.Language.CultureAlias);
+				this.Domain = domainAndUri.Domain;
+				this.DomainUri = domainAndUri.Uri;
+				this.Culture = new CultureInfo(domainAndUri.Domain.Language.CultureAlias);
 
-                // canonical?
-                // FIXME - NOT IMPLEMENTED AT THE MOMENT + THEN WE WOULD RETURN THE CANONICAL DOMAIN AND ASK FOR REDIRECT
-                // but then how do I translate if domain is bar.com/en ? will depend on how we handle domains
+				// canonical? not implemented at the moment
+				// if (...)
+				// {
+				//  this.RedirectUrl = "...";
+				//  return true;
+				// }
             }
             else
             {
@@ -239,7 +194,7 @@ namespace Umbraco.Web.Routing
         public bool ResolveDocument()
         {
             const string tracePrefix = "ResolveDocument: ";
-            Trace.TraceInformation("{0}Path=\"{1}\"", tracePrefix, this.Path);
+            Trace.TraceInformation("{0}Path=\"{1}\"", tracePrefix, this.Uri.AbsolutePath);
 
             // look for the document
             // the first successful lookup, if any, will set this.Node, and may also set this.Template

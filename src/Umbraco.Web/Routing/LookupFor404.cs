@@ -22,7 +22,7 @@ namespace Umbraco.Web.Routing
 
         public bool LookupDocument(DocumentRequest docRequest)
         {
-            docRequest.Node = HandlePageNotFound(docRequest.Path);
+			docRequest.Node = HandlePageNotFound(docRequest.Uri.AbsolutePath);
             return docRequest.HasNode;
         }
 

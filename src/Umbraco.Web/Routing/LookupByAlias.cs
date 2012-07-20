@@ -26,12 +26,12 @@ namespace Umbraco.Web.Routing
         {
             XmlNode node = null;
 
-            if (docreq.Path != "/") // no alias if "/"
+			if (docreq.Uri.AbsolutePath != "/") // no alias if "/"
             {
-                node = _contentStore.GetNodeByUrlAlias(docreq.HasDomain ? docreq.Domain.RootNodeId : 0, docreq.Path);
+				node = _contentStore.GetNodeByUrlAlias(docreq.HasDomain ? docreq.Domain.RootNodeId : 0, docreq.Uri.AbsolutePath);
                 if (node != null)
                 {
-                    Trace.TraceInformation("Path \"{0}\" is an alias for id={1}", docreq.Path, docreq.NodeId);
+                    Trace.TraceInformation("Path \"{0}\" is an alias for id={1}", docreq.Uri.AbsolutePath, docreq.NodeId);
                     docreq.Node = node;
                 }
             }

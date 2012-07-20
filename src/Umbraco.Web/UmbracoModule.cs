@@ -36,6 +36,9 @@ namespace Umbraco.Web
             var umbracoContext = new UmbracoContext(new HttpContextWrapper(httpContext), ApplicationContext.Current);
             UmbracoContext.Current = umbracoContext;
 
+			// NO!
+			// these are application-wide singletons!
+
             //create a content store
             var contentStore = new ContentStore(umbracoContext);
             //create the routes cache
@@ -47,7 +50,10 @@ namespace Umbraco.Web
                             ApplicationContext.Current.Plugins.ResolveLookups().ToArray(),
                             new LookupFor404(contentStore),
                             contentStore);
-            // create the new document request which will cleanup the uri once and for all
+            
+			// NOT HERE BUT SEE **THERE** BELOW
+			
+			// create the new document request which will cleanup the uri once and for all
             var docreq = new DocumentRequest(uri, routingEnvironment, umbracoContext, niceUrls);
             
             // initialize the document request on the UmbracoContext (this is circular dependency!!!)
@@ -88,7 +94,9 @@ namespace Umbraco.Web
             // legacy - no idea what this is
             LegacyCleanUmbPageFromQueryString(ref uri, ref lpath);
 
-            docreq.ResolveSiteRoot();
+			//**THERE** we should create the doc request
+			// before, we're not sure we handling a doc request
+			docreq.ResolveDomain();
             if (docreq.IsRedirect)
                 httpContext.Response.Redirect(docreq.RedirectUrl, true);
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = docreq.Culture;
@@ -99,9 +107,8 @@ namespace Umbraco.Web
             if (docreq.Is404)
                 httpContext.Response.StatusCode = 404;
 
-            // fixme - should use an IComponent here, so that we could hand the request over to MVC
             Trace.TraceInformation("Transfer to UmbracoDefault (default.aspx)");
-            TransferRequest("~/default.aspx?" + docreq.QueryString);
+			TransferRequest("~/default.aspx" + docreq.Uri.Query);
 
             // it is up to default.aspx to figure out what to display in case
             // there is no document (ugly 404 page?) or no template (blank page?)
@@ -163,7 +170,7 @@ namespace Umbraco.Web
                 string bootUrl = null;
                 if (UmbracoSettings.EnableSplashWhileLoading) // legacy - should go
                 {
-                    string configPath = UrlUtility.ToAbsolute(SystemDirectories.Config);
+					string configPath = UriUtility.ToAbsolute(SystemDirectories.Config);
                     bootUrl = string.Format("{0}/splashes/booting.aspx?url={1}", configPath, HttpUtility.UrlEncode(uri.ToString()));
                     // fixme ?orgurl=... ?retry=...
                 }
@@ -171,14 +178,14 @@ namespace Umbraco.Web
                 //TODO: I like the idea of this new setting, but lets get this in to the core at a later time, for now lets just get the basics working.
                 //else if (!string.IsNullOrWhiteSpace(Settings.BootSplashPage))
                 //{
-                //    bootUrl = UrlUtility.ToAbsolute(Settings.BootSplashPage);
+                //    bootUrl = UriUtility.ToAbsolute(Settings.BootSplashPage);
                 //}
 
                 else
                 {
                     // fixme - default.aspx has to be ready for RequestContext.DocumentRequest==null
                     // fixme - in fact we should transfer to an empty html page...
-                    bootUrl = UrlUtility.ToAbsolute("~/default.aspx");
+					bootUrl = UriUtility.ToAbsolute("~/default.aspx");
                 }
                 TransferRequest(bootUrl);
                 return false;
@@ -195,7 +202,7 @@ namespace Umbraco.Web
             if (!ApplicationContext.Current.IsConfigured)
             {
                 Trace.TraceEvent(TraceEventType.Warning, 0, "Umbraco is not configured");
-                string installPath = UrlUtility.ToAbsolute(SystemDirectories.Install);
+				string installPath = UriUtility.ToAbsolute(SystemDirectories.Install);
                 string installUrl = string.Format("{0}/default.aspx?redir=true&url={1}", installPath, HttpUtility.UrlEncode(uri.ToString()));
                 httpContext.Response.Redirect(installUrl, true);
                 return false;
@@ -213,7 +220,7 @@ namespace Umbraco.Web
             // by clean WebAPI.
 
             // fixme - do it once when initializing the module
-            string baseUrl = UrlUtility.ToAbsolute(SystemDirectories.Base).ToLower();
+            string baseUrl = UriUtility.ToAbsolute(SystemDirectories.Base).ToLower();
             if (!baseUrl.EndsWith("/"))
                 baseUrl += "/";
             if (lpath.StartsWith(baseUrl))
@@ -291,8 +298,6 @@ namespace Umbraco.Web
                 //}
             }
         }
-
-        
 
         #endregion
 

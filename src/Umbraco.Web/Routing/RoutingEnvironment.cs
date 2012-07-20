@@ -3,10 +3,6 @@ using System.Linq;
 
 namespace Umbraco.Web.Routing
 {
-    // represents a request for one specified Umbraco document to be rendered
-    // by one specified template, using one particular culture.
-    //
-
     internal class RoutingEnvironment
     {
         public RoutingEnvironment(

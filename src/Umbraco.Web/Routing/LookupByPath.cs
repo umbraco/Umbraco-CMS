@@ -22,7 +22,12 @@ namespace Umbraco.Web.Routing
 
         public virtual bool LookupDocument(DocumentRequest docreq)
         {
-            var route = docreq.HasDomain ? (docreq.Domain.RootNodeId.ToString() + docreq.Path) : docreq.Path;
+			string route;
+			if (docreq.HasDomain)
+				route = docreq.Domain.RootNodeId.ToString() + Domains.PathRelativeToDomain(docreq.DomainUri, docreq.Uri.AbsolutePath);
+			else
+				route = docreq.Uri.AbsolutePath;
+
             var node = LookupDocumentNode(docreq, route);
             return node != null;
         }

@@ -4,24 +4,27 @@ using System.Web;
 
 namespace Umbraco.Web
 {
-    static class UrlUtility
+    static class UriUtility
     {
         static readonly string _appVirtualPath;
         static readonly string _appVirtualPathPrefix;
 
-        static UrlUtility()
+        static UriUtility()
         {
+			// Virtual path
             _appVirtualPath = HttpRuntime.AppDomainAppVirtualPath ?? "/";
             _appVirtualPathPrefix = _appVirtualPath;
             if (_appVirtualPathPrefix == "/")
                 _appVirtualPathPrefix = string.Empty;
         }
 
+		// will be "/" or "/foo"
         public static string AppVirtualPath
         {
             get { return _appVirtualPath; }
         }
 
+		// will be "" or "/foo"
         public static string AppVirtualPathPrefix
         {
             get { return _appVirtualPathPrefix; }
@@ -104,42 +107,53 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Utilities
+		#region Uri string utilities
 
-        public static bool HasScheme(string uri)
-        {
-            return uri.StartsWith("http://", StringComparison.CurrentCultureIgnoreCase)
-                   || uri.StartsWith("https://", StringComparison.CurrentCultureIgnoreCase);
-        }
+		public static bool HasScheme(string uri)
+		{
+			return uri.IndexOf("://") > 0;
+		}
 
-        public static string EnsureScheme(string uri, string scheme)
-        {
-            return HasScheme(uri) ? uri : string.Format("{0}://{1}", scheme, uri);
-        }
+		public static string StartWithScheme(string uri)
+		{
+			return StartWithScheme(uri, null);
+		}
 
-        public static string WithTrailingSlash(string uri)
-        {
-            return uri.EndsWith("/") ? uri : uri + "/";
-        }
+		public static string StartWithScheme(string uri, string scheme)
+		{
+			return HasScheme(uri) ? uri : string.Format("{0}://{1}", scheme ?? Uri.UriSchemeHttp, uri);
+		}
 
-        // indicates whether uri2 is within uri1
-        public static bool IsBaseOf(string uri1, string uri2)
-        {
-            uri2 = WithTrailingSlash(uri2);
-            Uri testUri2 = new Uri(uri2);
+		public static string EndPathWithSlash(string uri)
+		{
+			var pos1 = Math.Max(0, uri.IndexOf('?'));
+			var pos2 = Math.Max(0, uri.IndexOf('#'));
+			var pos = Math.Min(pos1, pos2);
 
-            uri1 = WithTrailingSlash(uri1);
-            uri1 = EnsureScheme(uri1, testUri2.Scheme);
-            Uri testUri1 = new Uri(uri1);
+			var path = pos > 0 ? uri.Substring(0, pos) : uri;
+			path = path.AtEnd('/');
 
-            return testUri1.IsBaseOf(testUri2);
-        }
+			if (pos > 0)
+				path += uri.Substring(pos);
 
-        public static bool IsBaseOf(string uri1, Uri uri2)
-        {
-            return IsBaseOf(uri1, uri2.ToString());
-        }
+			return path;
+		}
 
-        #endregion
+		public static string TrimPathEndSlash(string uri)
+		{
+			var pos1 = Math.Max(0, uri.IndexOf('?'));
+			var pos2 = Math.Max(0, uri.IndexOf('#'));
+			var pos = Math.Min(pos1, pos2);
+
+			var path = pos > 0 ? uri.Substring(0, pos) : uri;
+			path = path.TrimEnd('/');
+
+			if (pos > 0)
+				path += uri.Substring(pos);
+
+			return path;
+		}
+
+		#endregion
     }
 }
