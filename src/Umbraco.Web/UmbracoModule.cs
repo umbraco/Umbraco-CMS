@@ -37,6 +37,10 @@ namespace Umbraco.Web
             if (!UmbracoSettings.RemoveUmbracoVersionHeader)
                 httpContext.Response.AddHeader("X-Umbraco-Version", string.Format("{0}.{1}", GlobalSettings.VersionMajor, GlobalSettings.VersionMinor));
 
+			//create the legacy UmbracoContext
+			global::umbraco.presentation.UmbracoContext.Current 
+				= new global::umbraco.presentation.UmbracoContext(new HttpContextWrapper(httpContext));
+
             //create the UmbracoContext singleton, one per request!!
             var umbracoContext = new UmbracoContext(
 				new HttpContextWrapper(httpContext), 
