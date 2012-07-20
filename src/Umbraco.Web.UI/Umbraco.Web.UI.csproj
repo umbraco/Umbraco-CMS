@@ -306,6 +306,7 @@
     <None Include="umbraco\config\create\UI.Release.xml">
       <DependentUpon>UI.xml</DependentUpon>
     </None>
+    <Content Include="Global.asax" />
     <Content Include="umbraco\config\lang\he.xml" />
     <Content Include="umbraco\config\lang\ja.xml" />
     <Content Include="umbraco\config\lang\pl.xml" />

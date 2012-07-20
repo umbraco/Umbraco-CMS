@@ -12,11 +12,7 @@ namespace Umbraco.Core
     /// </remarks>
     public class ApplicationContext
     {
-
-        private static ApplicationContext _instance;
-        private static readonly object Locker = new object();
-
-        /// <summary>
+    	/// <summary>
         /// Constructor
         /// </summary>
         /// <param name="pluginResolver"></param>
@@ -25,25 +21,12 @@ namespace Umbraco.Core
             Plugins = pluginResolver;
         }
 
-        /// <summary>
-        /// Singleton accessor
-        /// </summary>
-        public static ApplicationContext Current
-        {
-            get
-            {
-                return _instance;
-            }
-            set
-            {
-                lock (Locker)
-                {
-                    _instance = value;
-                }
-            }
-        }
+    	/// <summary>
+    	/// Singleton accessor
+    	/// </summary>
+    	public static ApplicationContext Current { get; internal set; }
 
-        // IsReady is set to true by the boot manager once it has successfully booted
+    	// IsReady is set to true by the boot manager once it has successfully booted
         // note - the original umbraco module checks on content.Instance in umbraco.dll
         //   now, the boot task that setup the content store ensures that it is ready
         bool _isReady = false;

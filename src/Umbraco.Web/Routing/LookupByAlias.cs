@@ -13,14 +13,9 @@ namespace Umbraco.Web.Routing
     [LookupWeight(50)]
     internal class LookupByAlias : ILookup
     {
-        public LookupByAlias(ContentStore contentStore)
-        {
-            _contentStore = contentStore;
-        }
-
+    
         static readonly TraceSource Trace = new TraceSource("LookupByAlias");
 
-        readonly ContentStore _contentStore;
 
         public bool LookupDocument(DocumentRequest docreq)
         {
@@ -28,7 +23,7 @@ namespace Umbraco.Web.Routing
 
 			if (docreq.Uri.AbsolutePath != "/") // no alias if "/"
             {
-				node = _contentStore.GetNodeByUrlAlias(docreq.HasDomain ? docreq.Domain.RootNodeId : 0, docreq.Uri.AbsolutePath);
+                node = docreq.RoutingContext.ContentStore.GetNodeByUrlAlias(docreq.HasDomain ? docreq.Domain.RootNodeId : 0, docreq.Uri.AbsolutePath);
                 if (node != null)
                 {
                     Trace.TraceInformation("Path \"{0}\" is an alias for id={1}", docreq.Uri.AbsolutePath, docreq.NodeId);

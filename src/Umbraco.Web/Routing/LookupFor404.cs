@@ -11,18 +11,12 @@ namespace Umbraco.Web.Routing
 {
     internal class LookupFor404 : ILookupNotFound
     {
-        public LookupFor404(ContentStore contentStore)
-        {
-            _contentStore = contentStore;
-        }
-
+     
         static TraceSource _trace = new TraceSource("LookupByAlias");
-
-        private readonly ContentStore _contentStore;
 
         public bool LookupDocument(DocumentRequest docRequest)
         {
-			docRequest.Node = HandlePageNotFound(docRequest.Uri.AbsolutePath);
+			docRequest.Node = HandlePageNotFound(docRequest);
             return docRequest.HasNode;
         }
 
@@ -30,17 +24,17 @@ namespace Umbraco.Web.Routing
 
         // copied from presentation/requestHandler
         // temporary!!
-        XmlNode HandlePageNotFound(string url)
+		XmlNode HandlePageNotFound(DocumentRequest docRequest)
         {
-            HttpContext.Current.Trace.Write("NotFoundHandler", string.Format("Running for url='{0}'.", url));
+			HttpContext.Current.Trace.Write("NotFoundHandler", string.Format("Running for url='{0}'.", docRequest.Uri.AbsolutePath));
             XmlNode currentPage = null;
 
             foreach (var handler in GetNotFoundHandlers())
             {
-                if (handler.Execute(url) && handler.redirectID > 0)
+				if (handler.Execute(docRequest.Uri.AbsolutePath) && handler.redirectID > 0)
                 {
                     //currentPage = umbracoContent.GetElementById(handler.redirectID.ToString());
-                    currentPage = _contentStore.GetNodeById(handler.redirectID);
+					currentPage = docRequest.RoutingContext.ContentStore.GetNodeById(handler.redirectID);
 
                     // FIXME - could it be null?
 

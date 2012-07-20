@@ -25,6 +25,11 @@ namespace Umbraco.Web
         {
             Trace.TraceInformation("Process request");
 
+			//TODO: We need to ensure the below only executes for real requests (i.e. not css, favicon, etc...)
+			// I'm pretty sure we need to bind to the PostHandlerAssigned (or whatever event) and follow the same 
+			// practices that is in umbraMVCo
+
+
             var uri = httpContext.Request.Url;
             var lpath = uri.AbsolutePath.ToLower();
 
@@ -32,31 +37,37 @@ namespace Umbraco.Web
             if (!UmbracoSettings.RemoveUmbracoVersionHeader)
                 httpContext.Response.AddHeader("X-Umbraco-Version", string.Format("{0}.{1}", GlobalSettings.VersionMajor, GlobalSettings.VersionMinor));
 
+			//create the legacy UmbracoContext
+			global::umbraco.presentation.UmbracoContext.Current 
+				= new global::umbraco.presentation.UmbracoContext(new HttpContextWrapper(httpContext));
+
             //create the UmbracoContext singleton, one per request!!
-            var umbracoContext = new UmbracoContext(new HttpContextWrapper(httpContext), ApplicationContext.Current);
+            var umbracoContext = new UmbracoContext(
+				new HttpContextWrapper(httpContext), 
+				ApplicationContext.Current,
+				 RoutesCache.Current.GetProvider());
             UmbracoContext.Current = umbracoContext;
 
 			// NO!
 			// these are application-wide singletons!
 
             //create a content store
-            var contentStore = new ContentStore(umbracoContext);
-            //create the routes cache
-            var routesCache = new RoutesCache(umbracoContext);
+            var contentStore = new ContentStore(umbracoContext);            
             //create the nice urls
-            var niceUrls = new NiceUrls(contentStore, umbracoContext, routesCache);
-            //create the RoutingEnvironment (one per http request as it relies on the umbraco context!)
-            var routingEnvironment = new RoutingEnvironment(
-                            ApplicationContext.Current.Plugins.ResolveLookups().ToArray(),
-                            new LookupFor404(contentStore),
-                            contentStore);
-            
+            var niceUrls = new NiceUrlResolver(contentStore, umbracoContext);
+            //create the RoutingContext (one per http request)
+        	var routingContext = new RoutingContext(
+        		umbracoContext,
+        		RouteLookups.Current,
+        		new LookupFor404(),
+        		contentStore,
+        		niceUrls);
 			// NOT HERE BUT SEE **THERE** BELOW
 			
 			// create the new document request which will cleanup the uri once and for all
-            var docreq = new DocumentRequest(uri, routingEnvironment, umbracoContext, niceUrls);
-            
-            // initialize the document request on the UmbracoContext (this is circular dependency!!!)
+            var docreq = new DocumentRequest(uri, routingContext);
+
+			// initialize the DocumentRequest on the UmbracoContext (this is circular dependency but i think in this case is ok)
             umbracoContext.DocumentRequest = docreq;
 
             //create the LegacyRequestInitializer (one per http request as it relies on the umbraco context!)
@@ -307,7 +318,16 @@ namespace Umbraco.Web
         // and there may be more than 1 application per application domain
         public void Init(HttpApplication app)
         {
-            InitializeApplication(app);
+			// used to be done in PostAuthorizeRequest but then it disabled OutputCaching due
+			// to rewriting happening too early in the chain (Alex Norcliffe 2010-02).
+			app.PostResolveRequestCache += (sender, e) =>
+			{
+				HttpContext httpContext = ((HttpApplication)sender).Context;
+				ProcessRequest(httpContext);
+			};
+
+			// todo: initialize request errors handler
+			// todo: initialize XML cache flush
         }
 
         public void Dispose()
@@ -315,62 +335,5 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Initialize
-
-        private static volatile bool _appDomainInitialized = false;
-        static readonly object AppDomainLock = new object();
-
-        /// <summary>
-        /// Initializes the application one time only
-        /// </summary>
-        void InitializeDomain()
-        {
-            if (!_appDomainInitialized)
-            {
-                lock (AppDomainLock)
-                {
-                    if (!_appDomainInitialized)
-                    {
-                        Trace.TraceInformation("Initialize AppDomain");
-
-                        //create the ApplicationContext
-                        ApplicationContext.Current = new ApplicationContext(new PluginResolver());
-                        
-                        //TODO: Why is this necessary? if the ApplicationContext is null, then its not ready
-                        ApplicationContext.Current.IsReady = true; // fixme
-
-                        // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
-                        ClientDependency.Core.CompositeFiles.Providers.XmlFileMapper.FileMapVirtualFolder = "~/App_Data/TEMP/ClientDependency";
-                        ClientDependency.Core.CompositeFiles.Providers.BaseCompositeFileProcessingProvider.UrlTypeDefault = ClientDependency.Core.CompositeFiles.Providers.CompositeUrlType.Base64QueryStrings;
-
-                        _appDomainInitialized = true;
-                    }
-                    Trace.TraceInformation("AppDomain is initialized");
-                }
-            }            
-        }
-
-        void InitializeApplication(HttpApplication app)
-        {
-            // we can't do in in module.Init because we need HttpContext.
-            app.BeginRequest += (sender, e) =>
-            {
-                Trace.TraceInformation("Welcome to Umbraco!");
-                InitializeDomain();
-            };
-
-            // used to be done in PostAuthorizeRequest but then it disabled OutputCaching due
-            // to rewriting happening too early in the chain (Alex Norcliffe 2010-02).
-            app.PostResolveRequestCache += (sender, e) =>
-            {
-                HttpContext httpContext = ((HttpApplication)sender).Context;
-                ProcessRequest(httpContext);
-            };
-
-            // todo: initialize request errors handler
-            // todo: initialize XML cache flush
-        }
-
-        #endregion
     }
 }

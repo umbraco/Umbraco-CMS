@@ -240,11 +240,13 @@
     <Compile Include="ContentStore.cs" />
     <Compile Include="LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
-    <Compile Include="NiceUrls.cs" />
+    <Compile Include="NiceUrlResolver.cs" />
     <Compile Include="PluginResolverExtensions.cs" />
+    <Compile Include="Routing\RouteLookups.cs" />
     <Compile Include="Routing\DocumentRequest.cs" />
     <Compile Include="Routing\ILookup.cs" />
     <Compile Include="Routing\ILookupNotFound.cs" />
+    <Compile Include="Routing\IRoutesCache.cs" />
     <Compile Include="Routing\LookupByAlias.cs" />
     <Compile Include="Routing\LookupById.cs" />
     <Compile Include="Routing\LookupByPath.cs" />
@@ -252,8 +254,9 @@
     <Compile Include="Routing\LookupByProfile.cs" />
     <Compile Include="Routing\LookupFor404.cs" />
     <Compile Include="Routing\LookupWeightAttribute.cs" />
+    <Compile Include="Routing\DefaultRoutesCache.cs" />
     <Compile Include="Routing\RoutesCache.cs" />
-    <Compile Include="Routing\RoutingEnvironment.cs" />
+    <Compile Include="Routing\RoutingContext.cs" />
     <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
     <Compile Include="umbraco.presentation\install\steps\database.ascx.cs">
       <DependentUpon>database.ascx</DependentUpon>
@@ -1759,6 +1762,7 @@
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\SpellCheckerInput.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\SpellCheckerResult.cs" />
     <Compile Include="umbraco.presentation\viewstateMoverModule.cs" />
+    <Compile Include="UmbracoApplication.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoModule.cs" />
     <Compile Include="UrlUtility.cs" />

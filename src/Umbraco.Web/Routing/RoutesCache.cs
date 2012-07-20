@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 
 namespace Umbraco.Web.Routing
 {
@@ -8,82 +8,54 @@ namespace Umbraco.Web.Routing
 	//
 	// a route is [rootId]/path/to/node
 	// where rootId is the id of the "site root" node
-	// if missing then the "site root" is the content root
 	//
-    internal class RoutesCache
-    {
-        private readonly object _lock = new object();
-        private Dictionary<int, string> _routes;
-        private Dictionary<string, int> _nodeIds;
+	internal class RoutesCache
+	{
+		private static readonly RoutesCache Instance = new RoutesCache();
+		private static IRoutesCache _provider;
 
-        private readonly UmbracoContext _umbracoContext;
+		/// <summary>
+		/// public contructor assigns the DefaultRoutesCache as the default provider
+		/// </summary>
+		public RoutesCache()
+			:this(null)
+		{			
+		}
 
-        public RoutesCache(UmbracoContext umbracoContext)
-        {
-            _umbracoContext = umbracoContext;
+		/// <summary>
+		/// Constructor sets a custom provider if specified
+		/// </summary>
+		/// <param name="provider"></param>
+		internal RoutesCache(IRoutesCache provider)
+		{
+			_provider = provider ?? new DefaultRoutesCache();
+		}
 
-            Clear();
+		/// <summary>
+		/// Set the routes cache provider
+		/// </summary>
+		/// <param name="provider"></param>
+		public static void SetProvider(IRoutesCache provider)
+		{
+			if (provider == null) throw new ArgumentNullException("provider");
+			_provider = provider;
+		}
 
-            // here we should register handlers to clear the cache when content changes
-            // at the moment this is done by library, which clears everything when content changed
-            //
-            // but really, we should do some partial refreshes!
-            // otherwise, we could even cache 404 errors...
-        }
+		/// <summary>
+		/// Singleton accessor
+		/// </summary>
+		public static RoutesCache Current
+		{
+			get { return Instance; }
+		}
 
-        public void Store(int nodeId, string route)
-        {
-            if (_umbracoContext.InPreviewMode)
-                return;
-
-            lock (_lock)
-            {
-                _routes[nodeId] = route;
-                _nodeIds[route] = nodeId;
-            }
-        }
-
-        public string GetRoute(int nodeId)
-        {
-            if (_umbracoContext.InPreviewMode)
-                return null;
-
-            lock (_lock)
-            {
-                return _routes.ContainsKey(nodeId) ? _routes[nodeId] : null;
-            }
-        }
-
-        public int GetNodeId(string route)
-        {
-            if (_umbracoContext.InPreviewMode)
-                return 0;
-
-            lock (_lock)
-            {
-                return _nodeIds.ContainsKey(route) ? _nodeIds[route] : 0;
-            }
-        }
-
-        public void ClearNode(int nodeId)
-        {
-            lock (_lock)
-            {
-                if (_routes.ContainsKey(nodeId))
-                {
-                    _nodeIds.Remove(_routes[nodeId]);
-                    _routes.Remove(nodeId);
-                }
-            }
-        }
-
-        public void Clear()
-        {
-            lock (_lock)
-            {
-                _routes = new Dictionary<int, string>();
-                _nodeIds = new Dictionary<string, int>();
-            }
-        }
-    }
+		/// <summary>
+		/// Get the current provider
+		/// </summary>
+		/// <returns></returns>
+		public IRoutesCache GetProvider()
+		{
+			return _provider;
+		}
+	}
 }

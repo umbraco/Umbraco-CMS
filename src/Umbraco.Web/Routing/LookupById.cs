@@ -10,23 +10,8 @@ namespace Umbraco.Web.Routing
     [LookupWeight(20)]
     internal class LookupById : ILookup
     {
-        public LookupById(ContentStore contentStore)
-        {
-            _contentStore = contentStore;
-        }
-
+        
         static readonly TraceSource Trace = new TraceSource("LookupById");
-
-        readonly ContentStore _contentStore;
-
-        ////[Import]
-        //IContentStore ContentStoreImport
-        //{
-        //    set { _contentStore = value; }
-        //}
-
-        //public LookupById()
-        //{ }
 
         public bool LookupDocument(DocumentRequest docreq)
         {
@@ -43,7 +28,7 @@ namespace Umbraco.Web.Routing
                 if (nodeId > 0)
                 {
                     Trace.TraceInformation("Id={0}", nodeId);
-                    node = _contentStore.GetNodeById(nodeId);
+					node = docreq.RoutingContext.ContentStore.GetNodeById(nodeId);
                     if (node != null)
                     {
                         docreq.Node = node;

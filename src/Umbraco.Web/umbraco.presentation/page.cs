@@ -5,386 +5,372 @@ using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Xml;
-
+using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
 
 namespace umbraco
 {
-    /// <summary>
-    /// Summary description for page.
-    /// </summary>
-    public class page
-    {
-        #region private members and properties
+	/// <summary>
+	/// Summary description for page.
+	/// </summary>
+	public class page
+	{
+		const string TraceCategory = "UmbracoPage";
 
-        private String pageName;
-        private int parentId;
-        private String writerName;
-        private String creatorName;
-        private String path;
-        private int nodeType;
-        private String nodeTypeAlias;
-        private String[] splitpath;
-        private DateTime createDate;
-        private DateTime updateDate;
-        private int pageID;
-        private Guid pageVersion;
-        private int template;
+		#region Private members and properties
 
-       
-        private Hashtable elements = new Hashtable();
-        private StringBuilder pageContent = new StringBuilder();
-        private Control pageContentControl = new Control();
+		string pageName;
+		int parentId;
+		string writerName;
+		string creatorName;
+		string path;
+		int nodeType;
+		string nodeTypeAlias;
+		string[] splitpath;
+		DateTime createDate;
+		DateTime updateDate;
+		int pageID;
+		Guid pageVersion;
+		int template;
 
-        #endregion
+		Hashtable elements = new Hashtable();
+		StringBuilder pageContent = new StringBuilder();
+		Control pageContentControl = new Control();
 
-        #region init
+		#endregion
 
-        /// <summary>
-        /// Constructor for creating a page in view mode (with viable content that's not yet published)
-        /// </summary>
-        /// <param name="Id">The identifier of the page</param>
-        /// <param name="Version">The version to be displayed</param>
-        public page(int Id, Guid Version)
-        {
-            pageID = Id;
+		#region Constructors
 
-            // create document object
-            Document d = new Document(Id, Version);
+		/// <summary>
+		/// Initializes a new instance of the <see cref="page"/> class for a yet unpublished document, identified by its <c>id</c> and <c>version</c>.
+		/// </summary>
+		/// <param name="id">The identifier of the document.</param>
+		/// <param name="version">The version to be displayed.</param>
+		public page(int id, Guid version)
+			: this(new Document(id, version))
+		{ }
 
-            int tmpParentId = -1;
-            try
-            {
-                tmpParentId = d.Parent.Id;
-            }
-            catch
-            {
-            }
-            // create page
-            populatePageData(Id, d.Text, d.ContentType.Id, d.ContentType.Alias, d.User.Name, d.Creator.Name, d.CreateDateTime,
-                             d.UpdateDate, d.Path, d.Version, tmpParentId);
+		/// <summary>
+		/// Initializes a new instance of the <see cref="page"/> class for a yet unpublished document.
+		/// </summary>
+		/// <param name="document">The document.</param>
+		public page(Document document)
+		{
+			HttpContext.Current.Trace.Write(TraceCategory, "Ctor(document)");
 
-            // update page elements
-            var props = d.getProperties;
-            foreach (Property p in props)
-            {
-                string sValue = p.Value!=null ? p.Value.ToString() : String.Empty;
-                elements.Add(p.PropertyType.Alias, sValue);
-            }
+			var parent = document.Parent;
 
-            template = d.Template;
+			populatePageData(document.Id,
+				document.Text, document.ContentType.Id, document.ContentType.Alias,
+				document.User.Name, document.Creator.Name, document.CreateDateTime, document.UpdateDate,
+				document.Path, document.Version, parent == null ? -1 : parent.Id);
 
+			foreach (Property prop in document.GenericProperties)
+			{
+				string value = prop.Value != null ? prop.Value.ToString() : String.Empty;
+				elements.Add(prop.PropertyType.Alias, value);
+			}
 
-            HttpContext.Current.Trace.Write("umbracoPage",
-                                            "Pagedata loaded for " + pageName + " (ID: " + pageID.ToString() +
-                                            ", Version: " + pageVersion.ToString() + ")");
-            //RenderPage(template);
-        }
+			template = document.Template;
 
-        private void populatePageData(int pageID, string pageName, int nodeType, string nodeTypeAlias, string writerName, string creatorName,
-                                      DateTime createDate, DateTime updateDate, string path, Guid pageVersion,
-                                      int parentId)
-        {
-            this.pageID = pageID;
-            this.pageName = pageName;
-            this.nodeType = nodeType;
-            this.nodeTypeAlias = nodeTypeAlias;
-            this.writerName = writerName;
-            this.creatorName = creatorName;
-            this.createDate = createDate;
-            this.updateDate = updateDate;
-            this.parentId = parentId;
-            this.path = path;
-            splitpath = path.Split(',');
-            this.pageVersion = pageVersion;
+			HttpContext.Current.Trace.Write(TraceCategory, string.Format("Loaded \"{0}\" (id={1}, version={2})",
+				this.PageName, this.pageID, this.pageVersion));
+		}
 
-            // Update the elements hashtable
-            elements.Add("pageID", pageID);
-            elements.Add("parentID", parentId);
-            elements.Add("pageName", pageName);
-            elements.Add("nodeType", nodeType);
-            elements.Add("nodeTypeAlias", nodeTypeAlias);
-            elements.Add("writerName", writerName);
-            elements.Add("creatorName", creatorName);
-            elements.Add("createDate", createDate);
-            elements.Add("updateDate", updateDate);
-            elements.Add("path", path);
-            elements.Add("splitpath", splitpath);
-            elements.Add("pageVersion", pageVersion);
-        }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="page"/> class for a published document.
+		/// </summary>
+		/// <param name="docreq">The <see cref="DocumentRequest"/> pointing to the document.</param>
+		internal page(DocumentRequest docreq)
+		{
+			HttpContext.Current.Trace.Write(TraceCategory, "Ctor(documentRequest)");
 
-        public page(XmlNode xmlNode)
-        {
-            pageID = Convert.ToInt32(xmlNode.Attributes.GetNamedItem("id").Value);
-            elements.Add("pageID", pageID);
-            try
-            {
-                pageName = xmlNode.Attributes.GetNamedItem("nodeName").Value;
-                elements.Add("pageName", pageName);
-            }
-            catch
-            {
-            }
-            try
-            {
-                parentId = int.Parse(xmlNode.Attributes.GetNamedItem("parentID").Value);
-                elements.Add("parentID", parentId);
-            }
-            catch
-            {
-            }
+			if (!docreq.HasNode)
+				throw new ArgumentException("Document request has no node.", "docreq");
 
-            try
-            {
-                nodeType = Convert.ToInt32(xmlNode.Attributes.GetNamedItem("nodeType").Value);
-                nodeTypeAlias = UmbracoSettings.UseLegacyXmlSchema ? xmlNode.Attributes.GetNamedItem("nodeTypeAlias").Value : xmlNode.Name;
-                elements.Add("nodeType", nodeType);
-                elements.Add("nodeTypeAlias", nodeTypeAlias);
-            }
-            catch
-            {
-            }
-            try
-            {
-                writerName = xmlNode.Attributes.GetNamedItem("writerName").Value;
-                elements.Add("writerName", writerName);
-            }
-            catch
-            {
-            }
-            try
-            {
-                creatorName = xmlNode.Attributes.GetNamedItem("creatorName").Value;
-                elements.Add("creatorName", creatorName);
-            }
-            catch
-            {
-            }
-            try
-            {
-                createDate = Convert.ToDateTime(xmlNode.Attributes.GetNamedItem("createDate").Value);
-                elements.Add("createDate", createDate);
-            }
-            catch
-            {
-            }
-            try
-            {
-                updateDate = Convert.ToDateTime(xmlNode.Attributes.GetNamedItem("updateDate").Value);
-                elements.Add("updateDate", updateDate);
-            }
-            catch
-            {
-            }
-            try
-            {
-                pageVersion = new Guid(xmlNode.Attributes.GetNamedItem("version").Value);
-                elements.Add("pageVersion", pageVersion);
-            }
-            catch
-            {
-            }
-            try
-            {
-                path = xmlNode.Attributes.GetNamedItem("path").Value;
-                elements.Add("path", path);
-                splitpath = path.Split(',');
-                elements.Add("splitpath", splitpath);
-            }
-            catch
-            {
-            }
+			populatePageData(docreq.Node);
 
-            // Check for alternative template
-            if (HttpContext.Current.Items["altTemplate"] != null &&
-                HttpContext.Current.Items["altTemplate"].ToString() != String.Empty)
-            {
-                template =
-                    umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(
-                        HttpContext.Current.Items["altTemplate"].ToString());
-                elements.Add("template", template.ToString());
-            }
-            else if (helper.Request("altTemplate") != String.Empty)
-            {
-                template =
-                    umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(helper.Request("altTemplate").ToLower());
-                elements.Add("template", template.ToString());
-            }
-            if (template == 0)
-            {
-                try
-                {
-                    template = Convert.ToInt32(xmlNode.Attributes.GetNamedItem("template").Value);
-                    elements.Add("template", xmlNode.Attributes.GetNamedItem("template").Value);
-                }
-                catch
-                {
-                    HttpContext.Current.Trace.Warn("umbracoPage", "No template defined");
-                }
-            }
-                        
-            
-            // Load all page elements
-            string xpath = UmbracoSettings.UseLegacyXmlSchema ? "./data" : "./* [not(@id)]";
-            foreach (XmlNode dataNode in xmlNode.SelectNodes(xpath))
-            {
-                if (dataNode == null)
-                    continue;
-                // Only add those data-elements who has content (ie. a childnode)
-                if (dataNode.FirstChild != null)
-                {
-                    string currentAlias = UmbracoSettings.UseLegacyXmlSchema
-                                              ? dataNode.Attributes.GetNamedItem("alias").Value
-                                              : dataNode.Name;
+			if (docreq.HasTemplate)
+			{
+				this.template = docreq.Template.Id;
+				elements["template"] = this.template.ToString();
+			}
 
-                    // Check for redirects
-                    if (helper.IsNumeric(dataNode.FirstChild.Value) &&
-                        currentAlias == "umbracoRedirect" &&
-                        int.Parse(dataNode.FirstChild.Value) > 0)
-                    {
-                        HttpContext.Current.Response.Redirect(library.NiceUrl(int.Parse(dataNode.FirstChild.Value)),
-                                                              true);
-                    }
-                    else
-                    {
-                        if (elements.ContainsKey(currentAlias))
-                            HttpContext.Current.Trace.Warn("umbracoPage",
-                                                           "Aliases must be unique, an element with alias '" +
-                                                           currentAlias +
-                                                           "' has already been loaded!");
-                        else
-                        {
-                            elements.Add(currentAlias,
-                                         dataNode.FirstChild.Value
-                                );
-                            HttpContext.Current.Trace.Write("umbracoPage",
-                                                            "Element loaded: " +
-                                                            currentAlias);
-                        }
-                    }
-                }
-            }
+			populateElementData(docreq.Node);
 
-            HttpContext.Current.Trace.Write("umbracoPage",
-                                            "Pagedata loaded for " + pageName + " (ID: " + pageID.ToString() +
-                                            ")");
+			HttpContext.Current.Trace.Write(TraceCategory, string.Format("Loaded \"{0}\" (id={1}, version={2})",
+				this.PageName, this.pageID, this.pageVersion));
+		}
 
-            // Save to cache
-            //			System.Web.HttpRuntime.Cache.Insert("umbPage" + pageID.ToString(), this);
-        }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="page"/> class for a published document.
+		/// </summary>
+		/// <param name="node">The <c>XmlNode</c> representing the document.</param>
+		public page(XmlNode node)
+		{
+			HttpContext.Current.Trace.Write(TraceCategory, "Ctor(xmlNode)");
 
-        public void RenderPage(int Template)
-        {
-            if (Template != 0)
-            {
-                HttpContext.Current.Trace.Write("umbracoPage", "Loading template (ID: " + Template + ")");
-                template templateDesign = new template(Template);
+			populatePageData(node);
 
-                HttpContext.Current.Trace.Write("page", "Template loaded");
-                HttpContext.Current.Items["umbPageObject"] = this;
+			// Check for alternative template
+			if (HttpContext.Current.Items["altTemplate"] != null &&
+				HttpContext.Current.Items["altTemplate"].ToString() != String.Empty)
+			{
+				template =
+					umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(
+						HttpContext.Current.Items["altTemplate"].ToString());
+				elements.Add("template", template.ToString());
+			}
+			else if (helper.Request("altTemplate") != String.Empty)
+			{
+				template =
+					umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(helper.Request("altTemplate").ToLower());
+				elements.Add("template", template.ToString());
+			}
+			if (template == 0)
+			{
+				try
+				{
+					template = Convert.ToInt32(node.Attributes.GetNamedItem("template").Value);
+					elements.Add("template", node.Attributes.GetNamedItem("template").Value);
+				}
+				catch
+				{
+					HttpContext.Current.Trace.Warn("umbracoPage", "No template defined");
+				}
+			}
 
-                pageContentControl = templateDesign.ParseWithControls(this);
-                pageContent.Append(templateDesign.TemplateContent);
-            }
-            else
-                HttpContext.Current.Trace.Warn("page.RenderPage", "No template defined (value=0)");
-        }
+			populateElementData(node);
 
-        public string GetCulture()
-        {
-            if (Domain.Exists(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]))
-            {
-                Domain d = Domain.GetDomain(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
-                return d.Language.CultureAlias;
-            }
-            else
-            {
-                for (int i = splitpath.Length - 1; i > 0; i--)
-                {
-                    if (Domain.GetDomainsById(int.Parse(splitpath[i])).Length > 0)
-                    {
-                        return Domain.GetDomainsById(int.Parse(splitpath[i]))[0].Language.CultureAlias;
-                    }
-                }
-            }
-            return "";
-        }
+			HttpContext.Current.Trace.Write(TraceCategory, string.Format("Loaded \"{0}\" (id={1}, version={2})",
+				this.PageName, this.pageID, this.pageVersion));
+		}
 
-        #endregion
+		#endregion
 
-        #region public properties
+		#region Initialize
 
-        public Control PageContentControl
-        {
-            get { return pageContentControl; }
-        }
+		void populatePageData(int pageID,
+			string pageName, int nodeType, string nodeTypeAlias,
+			string writerName, string creatorName, DateTime createDate, DateTime updateDate,
+			string path, Guid pageVersion, int parentId)
+		{
+			this.pageID = pageID;
+			this.pageName = pageName;
+			this.nodeType = nodeType;
+			this.nodeTypeAlias = nodeTypeAlias;
+			this.writerName = writerName;
+			this.creatorName = creatorName;
+			this.createDate = createDate;
+			this.updateDate = updateDate;
+			this.parentId = parentId;
+			this.path = path;
+			this.splitpath = path.Split(',');
+			this.pageVersion = pageVersion;
 
-        public String PageName
-        {
-            get { return pageName; }
-        }
+			// Update the elements hashtable
+			elements.Add("pageID", pageID);
+			elements.Add("parentID", parentId);
+			elements.Add("pageName", pageName);
+			elements.Add("nodeType", nodeType);
+			elements.Add("nodeTypeAlias", nodeTypeAlias);
+			elements.Add("writerName", writerName);
+			elements.Add("creatorName", creatorName);
+			elements.Add("createDate", createDate);
+			elements.Add("updateDate", updateDate);
+			elements.Add("path", path);
+			elements.Add("splitpath", splitpath);
+			elements.Add("pageVersion", pageVersion);
+		}
 
-        public int ParentId
-        {
-            get { return parentId; }
-        }
+		void populatePageData(XmlNode node)
+		{
+			String s;
+			DateTime dt;
+			Guid guid;
+			int i;
 
-        public string NodeTypeAlias
-        {
-            get { return nodeTypeAlias; }
-        }
+			if (int.TryParse(attrValue(node, "id"), out i))
+				elements["pageID"] = this.pageID = i;
 
-        public int NodeType
-        {
-            get { return nodeType; }
-        }
+			if ((s = attrValue(node, "nodeName")) != null)
+				elements["pageName"] = this.pageName = s;
 
-        public String WriterName
-        {
-            get { return writerName; }
-        }
+			if (int.TryParse(attrValue(node, "parentId"), out i))
+				elements["parentId"] = this.parentId = i;
 
-        public String CreatorName
-        {
-            get { return creatorName; }
-        }
+			if (int.TryParse(attrValue(node, "nodeType"), out i))
+				elements["nodeType"] = this.nodeType = i;
+			if ((s = attrValue(node, "nodeTypeAlias")) != null)
+				elements["nodeTypeAlias"] = this.nodeTypeAlias = s;
 
-        public DateTime CreateDate
-        {
-            get { return createDate; }
-        }
+			if ((s = attrValue(node, "writerName")) != null)
+				elements["writerName"] = this.writerName = s;
+			if ((s = attrValue(node, "creatorName")) != null)
+				elements["creatorName"] = this.creatorName = s;
 
-        public DateTime UpdateDate
-        {
-            get { return updateDate; }
-        }
+			if (DateTime.TryParse(attrValue(node, "createDate"), out dt))
+				elements["createDate"] = this.createDate = dt;
+			if (DateTime.TryParse(attrValue(node, "updateDate"), out dt))
+				elements["updateDate"] = this.updateDate = dt;
 
-        public int PageID
-        {
-            get { return pageID; }
-        }
+			if (Guid.TryParse(attrValue(node, "pageVersion"), out guid))
+				elements["pageVersion"] = this.pageVersion = guid;
 
-        public int Template
-        {
-            get { return template; }
-        }
+			if ((s = attrValue(node, "path")) != null)
+			{
+				elements["path"] = this.path = s;
+				elements["splitpath"] = this.splitpath = path.Split(',');
+			}
+		}
 
-        public Hashtable Elements
-        {
-            get { return elements; }
-        }
+		string attrValue(XmlNode node, string attributeName)
+		{
+			var attr = node.Attributes.GetNamedItem(attributeName);
+			var value = attr != null ? attr.Value : null;
+			return value;
+		}
 
-        public String PageContent
-        {
-            get { return pageContent.ToString(); }
-        }
+		void populateElementData(XmlNode node)
+		{
+			string xpath = "./* [not(@isDoc)]";
 
-        public override string ToString()
-        {
-            return pageName;
-        }
+			foreach (XmlNode data in node.SelectNodes(xpath))
+			{
+				// ignore empty elements
+				if (data.ChildNodes.Count == 0)
+					continue;
 
-        #endregion
-    }
+				string alias = data.Name;
+				string value = data.FirstChild.Value;
+
+				// moved to DocumentRequest + UmbracoModule
+				//if (alias == "umbracoRedirect")
+				//{
+				//    int i;
+				//    if (int.TryParse(value, out i))
+				//        HttpContext.Current.Response.Redirect(library.NiceUrl(int.Parse(data.FirstChild.Value)), true);
+				//}
+
+				if (elements.ContainsKey(alias))
+				{
+					HttpContext.Current.Trace.Warn(TraceCategory,
+						string.Format("Aliases must be unique, an element with alias \"{0}\" has already been loaded!", alias));
+				}
+				else
+				{
+					elements[alias] = value;
+					HttpContext.Current.Trace.Write(TraceCategory,
+						string.Format("Load element \"{0}\"", alias));
+				}
+			}
+		}
+
+		#endregion
+
+		#region Wtf?
+
+		public void RenderPage(int templateId)
+		{
+			if (templateId != 0)
+			{
+				HttpContext.Current.Trace.Write(TraceCategory, string.Format("RenderPage: loading template (id={0})", templateId));
+				template templateDesign = new template(templateId);
+
+				HttpContext.Current.Trace.Write(TraceCategory, "RenderPage: template loaded");
+				HttpContext.Current.Items["umbPageObject"] = this;
+
+				pageContentControl = templateDesign.ParseWithControls(this);
+				pageContent.Append(templateDesign.TemplateContent);
+			}
+			else
+				HttpContext.Current.Trace.Warn(TraceCategory, "RenderPage: no template (id=0)");
+		}
+
+		#endregion
+
+		#region Public properties
+
+		public Control PageContentControl
+		{
+			get { return pageContentControl; }
+		}
+
+		public string PageName
+		{
+			get { return pageName; }
+		}
+
+		public int ParentId
+		{
+			get { return parentId; }
+		}
+
+		public string NodeTypeAlias
+		{
+			get { return nodeTypeAlias; }
+		}
+
+		public int NodeType
+		{
+			get { return nodeType; }
+		}
+
+		public string WriterName
+		{
+			get { return writerName; }
+		}
+
+		public string CreatorName
+		{
+			get { return creatorName; }
+		}
+
+		public DateTime CreateDate
+		{
+			get { return createDate; }
+		}
+
+		public DateTime UpdateDate
+		{
+			get { return updateDate; }
+		}
+
+		public int PageID
+		{
+			get { return pageID; }
+		}
+
+		public int Template
+		{
+			get { return template; }
+		}
+
+		public Hashtable Elements
+		{
+			get { return elements; }
+		}
+
+		public string PageContent
+		{
+			get { return pageContent.ToString(); }
+		}
+
+		public string[] SplitPath
+		{
+			get { return this.splitpath; }
+		}
+
+		#endregion
+
+		#region ToString
+
+		public override string ToString()
+		{
+			return pageName;
+		}
+
+		#endregion
+	}
 }

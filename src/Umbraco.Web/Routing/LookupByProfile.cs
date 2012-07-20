@@ -14,15 +14,7 @@ namespace Umbraco.Web.Routing
     [LookupWeight(40)]
     internal class LookupByProfile : LookupByPath, ILookup
     {
-        private readonly UmbracoContext _umbracoContext;
-        static readonly TraceSource Trace = new TraceSource("LookupByProfile");
-
-
-        public LookupByProfile(ContentStore contentStore, RoutesCache routesCache, UmbracoContext umbracoContext)
-            : base(contentStore, routesCache)
-        {
-            _umbracoContext = umbracoContext;
-        }
+        static readonly TraceSource Trace = new TraceSource("LookupByProfile");		
 
         public override bool LookupDocument(DocumentRequest docreq)
         {
@@ -44,7 +36,10 @@ namespace Umbraco.Web.Routing
                     node = LookupDocumentNode(docreq, route);
 
                     if (node != null)
-                        _umbracoContext.HttpContext.Items["umbMemberLogin"] = memberLogin;
+                    {
+						//TODO: Should be handled by Context Items class manager (http://issues.umbraco.org/issue/U4-61)
+						docreq.RoutingContext.UmbracoContext.HttpContext.Items["umbMemberLogin"] = memberLogin;	
+                    }                        
                     else
                         Trace.TraceInformation("No document matching profile path?");
                 }

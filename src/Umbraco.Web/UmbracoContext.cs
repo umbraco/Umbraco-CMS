@@ -32,24 +32,32 @@ namespace Umbraco.Web
         /// </summary>
         private static UmbracoContext _umbracoContext;
 
-        /// <summary>
-        /// Creates a new Umbraco context.
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="applicationContext"> </param>
-        internal UmbracoContext(HttpContextBase httpContext, ApplicationContext applicationContext)
+    	/// <summary>
+    	/// Creates a new Umbraco context.
+    	/// </summary>
+    	/// <param name="httpContext"></param>
+    	/// <param name="applicationContext"> </param>
+    	/// <param name="routesCache"> </param>
+    	internal UmbracoContext(
+			HttpContextBase httpContext, 
+			ApplicationContext applicationContext,
+			IRoutesCache routesCache)
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
 
             HttpContext = httpContext;            
             Application = applicationContext;
+        	RoutesCache = routesCache;
+
+			//set the original url
+			OriginalUrl = httpContext.Request.Url;
         }
 
         /// <summary>
         /// Gets the current Umbraco Context.
         /// </summary>
-        public static UmbracoContext Current
+		public static UmbracoContext Current
         {
             get
             {
@@ -91,7 +99,9 @@ namespace Umbraco.Web
         /// </summary>
         public ApplicationContext Application { get; private set; }
 
-        /// <summary>
+		internal IRoutesCache RoutesCache { get; private set; }
+
+    	/// <summary>
         /// Gets/sets the original URL of the request
         /// </summary>
         internal Uri OriginalUrl { get; set; }
@@ -124,7 +134,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets/sets the DocumentRequest object
         /// </summary>
-        internal DocumentRequest DocumentRequest { get; set; }
+        internal DocumentRequest DocumentRequest { get; set; }	
 
         /// <summary>
         /// Exposes the HttpContext for the current request
@@ -193,29 +203,7 @@ namespace Umbraco.Web
                     && !currentUrl.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)); // is not in admin UI
             }
         }   
-
-        /// <summary>
-        /// Gets the current Live Editing Context.
-        /// </summary>
-        public virtual ILiveEditingContext LiveEditingContext
-        {
-            get
-            {
-                //TODO: this should be done with a wrapper: http://issues.umbraco.org/issue/U4-61
-                var value = (ILiveEditingContext)HttpContext.Items["LiveEditingContext"];
-                if (value == null)
-                {
-                    LiveEditingContext = value = new DefaultLiveEditingContext();
-                }
-                return value;
-            }
-
-            set
-            {
-                //TODO: this should be done with a wrapper: http://issues.umbraco.org/issue/U4-61
-                HttpContext.Items["LiveEditingContext"] = value;
-            }
-        }
+        
 
     }
 }
