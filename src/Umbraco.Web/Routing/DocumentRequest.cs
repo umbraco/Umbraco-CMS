@@ -16,12 +16,12 @@ namespace Umbraco.Web.Routing
     {
         static readonly TraceSource Trace = new TraceSource("DocumentRequest");
 
-        public DocumentRequest(Uri uri, RoutingEnvironment lookups, UmbracoContext umbracoContext, NiceUrls niceUrls)
+        public DocumentRequest(Uri uri, RoutingEnvironment lookups, UmbracoContext umbracoContext, NiceUrlResolver niceUrlResolver)
         {
             // register lookups
             _environment = lookups;
-            _umbracoContext = umbracoContext;
-            _niceUrls = niceUrls;
+            UmbracoContext = umbracoContext;
+            _niceUrlResolver = niceUrlResolver;
 
             // prepare the host
             var host = uri.Host;
@@ -55,13 +55,25 @@ namespace Umbraco.Web.Routing
             this.QueryString = uri.Query.TrimStart('?');
         }
 
+		readonly RoutingEnvironment _environment;
+		private readonly NiceUrlResolver _niceUrlResolver;
+
+		/// <summary>
+		/// the id of the requested node, if any, else zero.
+		/// </summary>
+		int _nodeId = 0;
+
+		/// <summary>
+		/// the requested node, if any, else null.
+		/// </summary>
+		XmlNode _node = null;
+
         #region Properties
 
-        // the id of the requested node, if any, else zero.
-        int _nodeId = 0;
-
-        // the requested node, if any, else null.
-        XmlNode _node = null;
+		/// <summary>
+		/// Returns the current UmbracoContext
+		/// </summary>
+		public UmbracoContext UmbracoContext { get; private set; }
 
         /// <summary>
         /// Gets the request host name.
@@ -176,15 +188,9 @@ namespace Umbraco.Web.Routing
 
         #region Resolve
 
-        readonly RoutingEnvironment _environment;
-        private readonly UmbracoContext _umbracoContext;
-        private readonly NiceUrls _niceUrls;
-
         /// <summary>
         /// Determines the site root (if any) matching the http request.
-        /// </summary>
-        /// <param name="host">The host name part of the http request, eg. <c>www.example.com</c>.</param>
-        /// <param name="url">The url part of the http request, starting with a slash, eg. <c>/foo/bar</c>.</param>
+        /// </summary>        
         /// <returns>A value indicating whether a domain was found.</returns>
         public bool ResolveSiteRoot()
         {
@@ -432,9 +438,9 @@ namespace Umbraco.Web.Routing
             if (this.Node == null)
                 throw new InvalidOperationException("There is no node.");
 
-            var templateAlias = _umbracoContext.HttpContext.Request.QueryString["altTemplate"];
+            var templateAlias = UmbracoContext.HttpContext.Request.QueryString["altTemplate"];
             if (string.IsNullOrWhiteSpace(templateAlias))
-                templateAlias = _umbracoContext.HttpContext.Request.Form["altTemplate"];
+                templateAlias = UmbracoContext.HttpContext.Request.Form["altTemplate"];
 
             // fixme - we might want to support cookies?!? NO but provide a hook to change the template
 
@@ -488,7 +494,7 @@ namespace Umbraco.Web.Routing
                     redirectId = -1;
                 string redirectUrl = "#";
                 if (redirectId > 0)
-                    redirectUrl = _niceUrls.GetNiceUrl(redirectId);
+                    redirectUrl = _niceUrlResolver.GetNiceUrl(redirectId);
                 if (redirectUrl != "#")
                     this.RedirectUrl = redirectUrl;
             }

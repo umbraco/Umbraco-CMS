@@ -12,8 +12,15 @@ namespace Umbraco.Web
     /// </summary>
     internal class ContentStore
     {
-        private readonly UmbracoContext _umbracoContext;
+		/// <summary>
+		/// Delegate to return the current UmbracoContext
+		/// </summary>
+		private readonly UmbracoContext _umbracoContext;
 
+		/// <summary>
+		/// Constructor accepting a delegate to resolve the UmbracoContext
+		/// </summary>
+		/// <param name="umbracoContext"></param>
         public ContentStore(UmbracoContext umbracoContext)
         {
             _umbracoContext = umbracoContext;

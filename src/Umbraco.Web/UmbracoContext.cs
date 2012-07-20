@@ -49,7 +49,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the current Umbraco Context.
         /// </summary>
-        public static UmbracoContext Current
+		public static UmbracoContext Current
         {
             get
             {
@@ -126,6 +126,16 @@ namespace Umbraco.Web
         /// </summary>
         internal DocumentRequest DocumentRequest { get; set; }
 
+		/// <summary>
+		/// Gets/sets the NiceUrlResolver object
+		/// </summary>
+		internal NiceUrlResolver NiceUrlResolver { get; set; }
+
+		/// <summary>
+		/// Gets/sets the RoutingEnvironment object
+		/// </summary>
+		internal RoutingEnvironment RoutingEnvironment { get; set; }
+
         /// <summary>
         /// Exposes the HttpContext for the current request
         /// </summary>
@@ -193,29 +203,7 @@ namespace Umbraco.Web
                     && !currentUrl.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)); // is not in admin UI
             }
         }   
-
-        /// <summary>
-        /// Gets the current Live Editing Context.
-        /// </summary>
-        public virtual ILiveEditingContext LiveEditingContext
-        {
-            get
-            {
-                //TODO: this should be done with a wrapper: http://issues.umbraco.org/issue/U4-61
-                var value = (ILiveEditingContext)HttpContext.Items["LiveEditingContext"];
-                if (value == null)
-                {
-                    LiveEditingContext = value = new DefaultLiveEditingContext();
-                }
-                return value;
-            }
-
-            set
-            {
-                //TODO: this should be done with a wrapper: http://issues.umbraco.org/issue/U4-61
-                HttpContext.Items["LiveEditingContext"] = value;
-            }
-        }
+        
 
     }
 }

@@ -9,7 +9,7 @@ namespace Umbraco.Web.Routing
     [LookupWeight(10)]
     internal class LookupByPath : ILookup
     {
-        public LookupByPath(ContentStore contentStore, RoutesCache routesCache)
+        public LookupByPath(ContentStore contentStore, IRoutesCache routesCache)
         {
             ContentStore = contentStore;
             RoutesCache = routesCache;
@@ -18,7 +18,7 @@ namespace Umbraco.Web.Routing
         static readonly TraceSource Trace = new TraceSource("LookupByPath");
 
         protected ContentStore ContentStore;
-        protected RoutesCache RoutesCache;
+		protected IRoutesCache RoutesCache;
 
         public virtual bool LookupDocument(DocumentRequest docreq)
         {
@@ -31,7 +31,12 @@ namespace Umbraco.Web.Routing
         {
             Trace.TraceInformation("Test route \"{0}\"", route);
 
-            var nodeId = RoutesCache.GetNodeId(route);
+			//return '0' if in preview mode!
+        	var nodeId = !docreq.UmbracoContext.InPreviewMode
+        	             	? RoutesCache.GetNodeId(route)
+        	             	: 0;
+
+
             XmlNode node = null;
             if (nodeId > 0)
             {
@@ -55,7 +60,12 @@ namespace Umbraco.Web.Routing
                 {
                     docreq.Node = node;
                     Trace.TraceInformation("Query matches, id={0}", docreq.NodeId);
-                    RoutesCache.Store(docreq.NodeId, route);
+
+					if (!docreq.UmbracoContext.InPreviewMode)
+					{
+						RoutesCache.Store(docreq.NodeId, route); // will not write if previewing	
+					} 
+                    
                 }
                 else
                 {

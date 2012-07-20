@@ -37,11 +37,9 @@ namespace Umbraco.Web
             UmbracoContext.Current = umbracoContext;
 
             //create a content store
-            var contentStore = new ContentStore(umbracoContext);
-            //create the routes cache
-            var routesCache = new RoutesCache(umbracoContext);
+            var contentStore = new ContentStore(umbracoContext);            
             //create the nice urls
-            var niceUrls = new NiceUrls(contentStore, umbracoContext, routesCache);
+            var niceUrls = new NiceUrlResolver(contentStore, umbracoContext, RoutesCache.Current.GetProvider());
             //create the RoutingEnvironment (one per http request as it relies on the umbraco context!)
             var routingEnvironment = new RoutingEnvironment(
                             ApplicationContext.Current.Plugins.ResolveLookups().ToArray(),
@@ -49,9 +47,15 @@ namespace Umbraco.Web
                             contentStore);
             // create the new document request which will cleanup the uri once and for all
             var docreq = new DocumentRequest(uri, routingEnvironment, umbracoContext, niceUrls);
-            
-            // initialize the document request on the UmbracoContext (this is circular dependency!!!)
+
+			//NOTE: we are putting these objects on the UmbracoContext because these might be handy for developers in the future to 
+			// access if we make them public.
+			// initialize the DocumentRequest on the UmbracoContext (this is circular dependency!!!)
             umbracoContext.DocumentRequest = docreq;
+			// initialize the RoutingEnvironment on the UmbracoContext (this is circular dependency!!!)
+        	umbracoContext.RoutingEnvironment = routingEnvironment;
+			// initialize the RoutingEnvironment on the UmbracoContext (this is circular dependency!!!)
+        	umbracoContext.NiceUrlResolver = niceUrls;
 
             //create the LegacyRequestInitializer (one per http request as it relies on the umbraco context!)
             var legacyRequestInitializer = new LegacyRequestInitializer(umbracoContext);

@@ -240,11 +240,12 @@
     <Compile Include="ContentStore.cs" />
     <Compile Include="LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
-    <Compile Include="NiceUrls.cs" />
+    <Compile Include="NiceUrlResolver.cs" />
     <Compile Include="PluginResolverExtensions.cs" />
     <Compile Include="Routing\DocumentRequest.cs" />
     <Compile Include="Routing\ILookup.cs" />
     <Compile Include="Routing\ILookupNotFound.cs" />
+    <Compile Include="Routing\IRoutesCache.cs" />
     <Compile Include="Routing\LookupByAlias.cs" />
     <Compile Include="Routing\LookupById.cs" />
     <Compile Include="Routing\LookupByPath.cs" />
@@ -252,6 +253,7 @@
     <Compile Include="Routing\LookupByProfile.cs" />
     <Compile Include="Routing\LookupFor404.cs" />
     <Compile Include="Routing\LookupWeightAttribute.cs" />
+    <Compile Include="Routing\DefaultRoutesCache.cs" />
     <Compile Include="Routing\RoutesCache.cs" />
     <Compile Include="Routing\RoutingEnvironment.cs" />
     <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />

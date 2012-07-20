@@ -18,7 +18,7 @@ namespace Umbraco.Web.Routing
         static readonly TraceSource Trace = new TraceSource("LookupByProfile");
 
 
-        public LookupByProfile(ContentStore contentStore, RoutesCache routesCache, UmbracoContext umbracoContext)
+		public LookupByProfile(ContentStore contentStore, IRoutesCache routesCache, UmbracoContext umbracoContext)
             : base(contentStore, routesCache)
         {
             _umbracoContext = umbracoContext;

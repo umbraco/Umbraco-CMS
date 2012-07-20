@@ -3,10 +3,11 @@ using System.Linq;
 
 namespace Umbraco.Web.Routing
 {
-    // represents a request for one specified Umbraco document to be rendered
-    // by one specified template, using one particular culture.
-    //
-
+    
+	/// <summary>
+	/// represents a request for one specified Umbraco document to be rendered by one specified template, 
+	/// using one particular culture.
+	/// </summary>
     internal class RoutingEnvironment
     {
         public RoutingEnvironment(
@@ -28,13 +29,9 @@ namespace Umbraco.Web.Routing
                 }).ToList();
         }
 
-        public IEnumerable<ILookup> Lookups
-        {
-            get;
-            private set;
-        }
+    	public IEnumerable<ILookup> Lookups { get; private set; }
 
-        public ILookupNotFound LookupNotFound { get; private set; }
+    	public ILookupNotFound LookupNotFound { get; private set; }
 
         public ContentStore ContentStore { get; private set; }
 

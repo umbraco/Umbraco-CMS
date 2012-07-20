@@ -13,7 +13,7 @@ namespace Umbraco.Web.Routing
     {
         static readonly TraceSource Trace = new TraceSource("LookupByPathWithTemplate");
 
-        public LookupByPathWithTemplate(ContentStore contentStore, RoutesCache routesCache)
+		public LookupByPathWithTemplate(ContentStore contentStore, IRoutesCache routesCache)
             : base(contentStore, routesCache)
         {
         }

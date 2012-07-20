@@ -7,9 +7,12 @@ using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web
 {
-    internal class NiceUrls
+	/// <summary>
+	/// Resolves NiceUrls for a given node id
+	/// </summary>
+    internal class NiceUrlResolver
     {
-        public NiceUrls(ContentStore contentStore, UmbracoContext umbracoContext, RoutesCache routesCache)
+		public NiceUrlResolver(ContentStore contentStore, UmbracoContext umbracoContext, IRoutesCache routesCache)
         {
             _umbracoContext = umbracoContext;
             _contentStore = contentStore;
@@ -18,7 +21,7 @@ namespace Umbraco.Web
 
         private readonly UmbracoContext _umbracoContext;
         private readonly ContentStore _contentStore;
-        private readonly RoutesCache _routesCache;
+		private readonly IRoutesCache _routesCache;
 
         // note: this could be a parameter...
         const string UrlNameProperty = "@urlName";
@@ -34,10 +37,13 @@ namespace Umbraco.Web
 
         public virtual string GetNiceUrl(int nodeId, int startNodeDepth, bool forceDomain)
         {
-            string route;
-            string path;
+        	string path;
 
-            route = _routesCache.GetRoute(nodeId); // will not read cache if previewing
+			// will not read cache if previewing!
+        	var route = !_umbracoContext.InPreviewMode
+        	            	? _routesCache.GetRoute(nodeId)
+        	            	: null;
+
             if (route != null)
             {
                 int pos = route.IndexOf('/');
@@ -85,7 +91,11 @@ namespace Umbraco.Web
             parts.Reverse();
             path = "/" + string.Join("/", parts);
             route = string.Format("{0}{1}", id, path);
-            _routesCache.Store(nodeId, route); // will not write if previewing
+
+			if (!_umbracoContext.InPreviewMode)
+			{
+				_routesCache.Store(nodeId, route); // will not write if previewing	
+			}            
 
             return FormatUrl(domain, path);
         }
