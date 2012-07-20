@@ -1759,6 +1759,7 @@
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\SpellCheckerInput.cs" />
     <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\SpellCheckerResult.cs" />
     <Compile Include="umbraco.presentation\viewstateMoverModule.cs" />
+    <Compile Include="UmbracoApplication.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoModule.cs" />
     <Compile Include="UrlUtility.cs" />

@@ -302,7 +302,16 @@ namespace Umbraco.Web
         // and there may be more than 1 application per application domain
         public void Init(HttpApplication app)
         {
-            InitializeApplication(app);
+			// used to be done in PostAuthorizeRequest but then it disabled OutputCaching due
+			// to rewriting happening too early in the chain (Alex Norcliffe 2010-02).
+			app.PostResolveRequestCache += (sender, e) =>
+			{
+				HttpContext httpContext = ((HttpApplication)sender).Context;
+				ProcessRequest(httpContext);
+			};
+
+			// todo: initialize request errors handler
+			// todo: initialize XML cache flush
         }
 
         public void Dispose()
@@ -310,62 +319,5 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region Initialize
-
-        private static volatile bool _appDomainInitialized = false;
-        static readonly object AppDomainLock = new object();
-
-        /// <summary>
-        /// Initializes the application one time only
-        /// </summary>
-        void InitializeDomain()
-        {
-            if (!_appDomainInitialized)
-            {
-                lock (AppDomainLock)
-                {
-                    if (!_appDomainInitialized)
-                    {
-                        Trace.TraceInformation("Initialize AppDomain");
-
-                        //create the ApplicationContext
-                        ApplicationContext.Current = new ApplicationContext(new PluginResolver());
-                        
-                        //TODO: Why is this necessary? if the ApplicationContext is null, then its not ready
-                        ApplicationContext.Current.IsReady = true; // fixme
-
-                        // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
-                        ClientDependency.Core.CompositeFiles.Providers.XmlFileMapper.FileMapVirtualFolder = "~/App_Data/TEMP/ClientDependency";
-                        ClientDependency.Core.CompositeFiles.Providers.BaseCompositeFileProcessingProvider.UrlTypeDefault = ClientDependency.Core.CompositeFiles.Providers.CompositeUrlType.Base64QueryStrings;
-
-                        _appDomainInitialized = true;
-                    }
-                    Trace.TraceInformation("AppDomain is initialized");
-                }
-            }            
-        }
-
-        void InitializeApplication(HttpApplication app)
-        {
-            // we can't do in in module.Init because we need HttpContext.
-            app.BeginRequest += (sender, e) =>
-            {
-                Trace.TraceInformation("Welcome to Umbraco!");
-                InitializeDomain();
-            };
-
-            // used to be done in PostAuthorizeRequest but then it disabled OutputCaching due
-            // to rewriting happening too early in the chain (Alex Norcliffe 2010-02).
-            app.PostResolveRequestCache += (sender, e) =>
-            {
-                HttpContext httpContext = ((HttpApplication)sender).Context;
-                ProcessRequest(httpContext);
-            };
-
-            // todo: initialize request errors handler
-            // todo: initialize XML cache flush
-        }
-
-        #endregion
     }
 }
