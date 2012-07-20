@@ -25,6 +25,11 @@ namespace Umbraco.Web
         {
             Trace.TraceInformation("Process request");
 
+			//TODO: We need to ensure the below only executes for real requests (i.e. not css, favicon, etc...)
+			// I'm pretty sure we need to bind to the PostHandlerAssigned (or whatever event) and follow the same 
+			// practices that is in umbraMVCo
+
+
             var uri = httpContext.Request.Url;
             var lpath = uri.AbsolutePath.ToLower();
 
