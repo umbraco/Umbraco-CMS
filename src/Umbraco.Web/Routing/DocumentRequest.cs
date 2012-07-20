@@ -251,7 +251,8 @@ namespace Umbraco.Web.Routing
             // the first successful lookup, if any, will set this.Node, and may also set this.Template
             // some lookups may implement caching
             Trace.TraceInformation("{0}Begin lookup", tracePrefix);
-            _environment.Lookups.Any(lookup => lookup.LookupDocument(this));
+        	var lookups = _environment.RouteLookups.GetLookups();
+			lookups.Any(lookup => lookup.LookupDocument(this));
             Trace.TraceInformation("{0}End lookup, {1}", tracePrefix, (this.HasNode ? "a document was found" : "no document was found"));
 
             // fixme - not handling umbracoRedirect

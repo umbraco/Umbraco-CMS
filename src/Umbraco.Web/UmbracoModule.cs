@@ -42,7 +42,7 @@ namespace Umbraco.Web
             var niceUrls = new NiceUrlResolver(contentStore, umbracoContext, RoutesCache.Current.GetProvider());
             //create the RoutingEnvironment (one per http request as it relies on the umbraco context!)
             var routingEnvironment = new RoutingEnvironment(
-                            ApplicationContext.Current.Plugins.ResolveLookups().ToArray(),
+							RouteLookups.Current,
                             new LookupFor404(contentStore),
                             contentStore);
             // create the new document request which will cleanup the uri once and for all

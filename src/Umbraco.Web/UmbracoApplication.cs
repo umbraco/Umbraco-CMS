@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web
 {
@@ -33,6 +34,9 @@ namespace Umbraco.Web
 				{
 					IsReady = true	// fixme
 				};
+
+			//create the route lookups singleton
+			RouteLookups.Current = new RouteLookups(ApplicationContext.Current.Plugins.ResolveLookups());
 
 			Trace.TraceInformation("AppDomain is initialized");
 		}

@@ -242,6 +242,7 @@
     <Compile Include="Mvc\ControllerExtensions.cs" />
     <Compile Include="NiceUrlResolver.cs" />
     <Compile Include="PluginResolverExtensions.cs" />
+    <Compile Include="Routing\RouteLookups.cs" />
     <Compile Include="Routing\DocumentRequest.cs" />
     <Compile Include="Routing\ILookup.cs" />
     <Compile Include="Routing\ILookupNotFound.cs" />

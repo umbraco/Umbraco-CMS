@@ -7,7 +7,7 @@ using umbraco.BusinessLogic.Utils;
 
 namespace Umbraco.Web
 {
-    /// <summary>
+	/// <summary>
     /// Extension methods for the PluginResolver
     /// </summary>
     public static class PluginResolverExtensions

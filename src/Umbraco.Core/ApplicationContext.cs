@@ -24,7 +24,7 @@ namespace Umbraco.Core
     	/// <summary>
     	/// Singleton accessor
     	/// </summary>
-    	public static ApplicationContext Current { get; set; }
+    	public static ApplicationContext Current { get; internal set; }
 
     	// IsReady is set to true by the boot manager once it has successfully booted
         // note - the original umbraco module checks on content.Instance in umbraco.dll
