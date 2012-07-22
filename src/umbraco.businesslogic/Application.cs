@@ -9,8 +9,6 @@ using System.Web;
 using System.Xml.Linq;
 using umbraco.DataLayer;
 using umbraco.IO;
-using umbraco.interfaces;
-using umbraco.BusinessLogic.Utils;
 using System.Runtime.CompilerServices;
 using umbraco.businesslogic;
 
@@ -21,30 +19,47 @@ namespace umbraco.BusinessLogic
     /// </summary>
     public class Application
     {
-        private static ISqlHelper _sqlHelper;               
+        private static ISqlHelper _sqlHelper;
 
-        private const string CACHE_KEY = "ApplicationCache";
+        private const string CacheKey = "ApplicationCache";
+        internal const string AppConfigFileName = "applications.config";
+        private static string _appConfig;
+        private static readonly object Locker = new object();
 
-        private static readonly string _appConfig =
-            IOHelper.MapPath(SystemDirectories.Config + "/applications.config");
-
-        private static readonly object m_Locker = new object();
+        /// <summary>
+        /// gets/sets the application.config file path
+        /// </summary>
+        /// <remarks>
+        /// The setter is generally only going to be used in unit tests, otherwise it will attempt to resolve it using the IOHelper.MapPath
+        /// </remarks>
+        internal static string AppConfigFilePath
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_appConfig))
+                {
+                    _appConfig = IOHelper.MapPath(SystemDirectories.Config + "/" + AppConfigFileName);
+                }
+                return _appConfig;
+            }
+            set { _appConfig = value; }
+        }
 
         /// <summary>
         /// The cache storage for all applications
         /// </summary>
-        private static List<Application> Apps
+        internal static List<Application> Apps
         {
             get
-            {                
-                //ensure cache exists
-                if (HttpRuntime.Cache[CACHE_KEY] == null)
-                    ReCache();
-                return HttpRuntime.Cache[CACHE_KEY] as List<Application>;
+            {
+                //Whenever this is accessed, we need to ensure the cache exists!
+                EnsureCache();
+
+                return HttpRuntime.Cache[CacheKey] as List<Application>;
             }
             set
             {
-                HttpRuntime.Cache.Insert(CACHE_KEY, value);
+                HttpRuntime.Cache.Insert(CacheKey, value);
             }
         }
 
@@ -74,14 +89,7 @@ namespace umbraco.BusinessLogic
             }
         }
 
-        /// <summary>
-        /// A static constructor that will cache all application trees
-        /// </summary>
-        static Application()
-        {
-            //RegisterIApplications();
-            Cache();
-        }
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Application"/> class.
@@ -154,7 +162,7 @@ namespace umbraco.BusinessLogic
         {
             get { return _sortOrder; }
             set { _sortOrder = value; }
-        } 
+        }
 
         /// <summary>
         /// Creates a new applcation if no application with the specified alias is found.
@@ -187,14 +195,14 @@ namespace umbraco.BusinessLogic
 
             if (!exist)
             {
-//                SqlHelper.ExecuteNonQuery(@"
-//				insert into umbracoApp 
-//				(appAlias,appIcon,appName, sortOrder) 
-//				values (@alias,@icon,@name,@sortOrder)",
-//                SqlHelper.CreateParameter("@alias", alias),
-//                SqlHelper.CreateParameter("@icon", icon),
-//                SqlHelper.CreateParameter("@name", name),
-//                SqlHelper.CreateParameter("@sortOrder", sortOrder));
+                //                SqlHelper.ExecuteNonQuery(@"
+                //				insert into umbracoApp 
+                //				(appAlias,appIcon,appName, sortOrder) 
+                //				values (@alias,@icon,@name,@sortOrder)",
+                //                SqlHelper.CreateParameter("@alias", alias),
+                //                SqlHelper.CreateParameter("@icon", icon),
+                //                SqlHelper.CreateParameter("@name", name),
+                //                SqlHelper.CreateParameter("@sortOrder", sortOrder));
 
                 LoadXml(doc =>
                 {
@@ -212,7 +220,7 @@ namespace umbraco.BusinessLogic
         //    MakeNew(Iapp.Name, Iapp.Alias, Iapp.Icon);
 
         //    if (installAppTrees) {
-                
+
         //    }
         //}
 
@@ -222,14 +230,15 @@ namespace umbraco.BusinessLogic
         /// </summary>
         /// <param name="appAlias">The application alias.</param>
         /// <returns></returns>
-        public static Application getByAlias(string appAlias) {
+        public static Application getByAlias(string appAlias)
+        {
             return Apps.Find(t => t.alias == appAlias);
         }
 
         /// <summary>
         /// Deletes this instance.
         /// </summary>
-        public void Delete() 
+        public void Delete()
         {
             //delete the assigned applications
             SqlHelper.ExecuteNonQuery("delete from umbracoUser2App where app = @appAlias", SqlHelper.CreateParameter("@appAlias", this.alias));
@@ -273,22 +282,22 @@ namespace umbraco.BusinessLogic
         /// </summary>
         private static void ReCache()
         {
-            HttpRuntime.Cache.Remove(CACHE_KEY);
-            Cache();
+            HttpRuntime.Cache.Remove(CacheKey);
+            EnsureCache();
         }
 
         /// <summary>
         /// Read all Application data and store it in cache.
         /// </summary>
-        private static void Cache()
+        private static void EnsureCache()
         {
             //don't query the database is the cache is not null
-            if (HttpRuntime.Cache[CACHE_KEY] != null)
+            if (HttpRuntime.Cache[CacheKey] != null)
                 return;
 
             try
             {
-                List<Application> tmp = new List<Application>();
+                var tmp = new List<Application>();
 
                 //using (IRecordsReader dr =
                 //    SqlHelper.ExecuteReader("Select appAlias, appIcon, appName from umbracoApp"))
@@ -299,13 +308,14 @@ namespace umbraco.BusinessLogic
                 //    }
                 //}
 
-                LoadXml(doc => {
+                LoadXml(doc =>
+                {
 
                     foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
-                        {
-                            var sortOrderAttr = x.Attribute("sortOrder");
-                            return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
-                        }))
+                    {
+                        var sortOrderAttr = x.Attribute("sortOrder");
+                        return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
+                    }))
                     {
                         var sortOrderAttr = addElement.Attribute("sortOrder");
                         tmp.Add(new Application(addElement.Attribute("name").Value,
@@ -324,16 +334,18 @@ namespace umbraco.BusinessLogic
                 //installer is run and there is no database or connection string defined.
                 //the reason this method may get called during the installation is that the 
                 //SqlHelper of this class is shared amongst everything "Application" wide.
+
+                //TODO: Perhaps we should log something  here??
             }
 
         }
 
         internal static void LoadXml(Action<XDocument> callback, bool saveAfterCallback)
         {
-            lock (m_Locker)
+            lock (Locker)
             {
-                var doc = File.Exists(_appConfig)
-                    ? XDocument.Load(_appConfig)
+                var doc = File.Exists(AppConfigFilePath)
+                    ? XDocument.Load(AppConfigFilePath)
                     : XDocument.Parse("<?xml version=\"1.0\"?><applications />");
 
                 if (doc.Root != null)
@@ -342,81 +354,15 @@ namespace umbraco.BusinessLogic
 
                     if (saveAfterCallback)
                     {
-                        doc.Save(_appConfig);
+                        //ensure the folder is created!
+                        Directory.CreateDirectory(Path.GetDirectoryName(AppConfigFilePath));
+
+                        doc.Save(AppConfigFilePath);
 
                         ReCache();
                     }
                 }
             }
-        }
-    }
-
-    public enum DefaultApps
-    {
-        content,
-        media,
-        users,
-        settings,
-        developer,
-        member,
-        translation
-    }
-
-    public class ApplicationRegistrar : ApplicationStartupHandler
-    {
-        private ISqlHelper _sqlHelper;
-        protected ISqlHelper SqlHelper
-        {
-            get
-            {
-                if (_sqlHelper == null)
-                {
-                    try
-                    {
-                        _sqlHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN);
-                    }
-                    catch { }
-                }
-                return _sqlHelper;
-            }
-        }
-
-        public ApplicationRegistrar()
-        {
-            // Load all Applications by attribute and add them to the XML config
-            var types = TypeFinder.FindClassesOfType<IApplication>()
-                .Where(x => x.GetCustomAttributes(typeof(ApplicationAttribute), false).Any());
-
-            var attrs = types.Select(x => (ApplicationAttribute)x.GetCustomAttributes(typeof(ApplicationAttribute), false).Single())
-                .Where(x => Application.getByAlias(x.Alias) == null);
-
-            var allAliases = Application.getAll().Select(x => x.alias).Concat(attrs.Select(x => x.Alias));
-            var inString = "'" + string.Join("','", allAliases) + "'";
-
-            Application.LoadXml(doc =>
-            {
-                foreach (var attr in attrs)
-                {
-                    doc.Root.Add(new XElement("add",
-                        new XAttribute("alias", attr.Alias),
-                        new XAttribute("name", attr.Name),
-                        new XAttribute("icon", attr.Icon),
-                        new XAttribute("sortOrder", attr.SortOrder)));
-                }
-
-                var dbApps = SqlHelper.ExecuteReader("SELECT * FROM umbracoApp WHERE appAlias NOT IN ("+ inString +")");
-                while (dbApps.Read())
-                {
-                    doc.Root.Add(new XElement("add",
-                        new XAttribute("alias", dbApps.GetString("appAlias")),
-                        new XAttribute("name", dbApps.GetString("appName")),
-                        new XAttribute("icon", dbApps.GetString("appIcon")),
-                        new XAttribute("sortOrder", dbApps.GetByte("sortOrder"))));
-                }
-
-            }, true);
-
-            //SqlHelper.ExecuteNonQuery("DELETE FROM umbracoApp");
         }
     }
 }

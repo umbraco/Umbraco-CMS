@@ -371,21 +371,23 @@ namespace umbraco {
             // Check access
             HttpContext.Current.Trace.Write("umbracoRequestHandler", "Access checking started");
             if (currentPage != null) {
-                if (
-                    Access.IsProtected(int.Parse(currentPage.Attributes.GetNamedItem("id").Value),
-                                       currentPage.Attributes.GetNamedItem("path").Value)) {
+                int id = int.Parse(currentPage.Attributes.GetNamedItem("id").Value);
+                string path = currentPage.Attributes.GetNamedItem("path").Value;
+
+                if (Access.IsProtected(id, path)) {
                     HttpContext.Current.Trace.Write("umbracoRequestHandler", "Page protected");
 
+                    var user = System.Web.Security.Membership.GetUser();
 
-                    if (System.Web.Security.Membership.GetUser() == null || !library.IsLoggedOn()) {
+                    if (user == null || !library.IsLoggedOn()) {
                         HttpContext.Current.Trace.Write("umbracoRequestHandler", "Not logged in - redirecting to login page...");
-                        currentPage = umbracoContent.GetElementById(Access.GetLoginPage(currentPage.Attributes.GetNamedItem("path").Value).ToString());
+                        currentPage = umbracoContent.GetElementById(Access.GetLoginPage(path).ToString());
                     } else {
 
-                        if (System.Web.Security.Membership.GetUser() != null && !Access.HasAccces(int.Parse(currentPage.Attributes.GetNamedItem("id").Value), System.Web.Security.Membership.GetUser().ProviderUserKey)) {
+                        if (user != null && !Access.HasAccces(id, user.ProviderUserKey)) {
                             
                             HttpContext.Current.Trace.Write("umbracoRequestHandler", "Member has not access - redirecting to error page...");
-                            currentPage = content.Instance.XmlContent.GetElementById(Access.GetErrorPage(currentPage.Attributes.GetNamedItem("path").Value).ToString());
+                            currentPage = content.Instance.XmlContent.GetElementById(Access.GetErrorPage(path).ToString());
                         }
                     }
                 } else

@@ -36,6 +36,18 @@ namespace SqlCE4Umbraco
         #region Public Properties
 
         /// <summary>
+        /// This ensures that the database exists, then runs the base method
+        /// </summary>
+        public override bool CanConnect
+        {
+            get
+            {                
+                SqlHelper.CreateEmptyDatabase();
+                return base.CanConnect;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the installer can upgrade the data source.
         /// </summary>
         /// <value>

@@ -620,10 +620,13 @@
             var childid = getPostID("postChildID");
             if (has_handler('change') == true) {
                 //alert(1);
-                var currentSelectedValue = a_array[$("#" + childid + " a.selected").prop("id")].text;
-                if ($.trim(oldSelectedValue) !== $.trim(currentSelectedValue) && oldSelectedValue !== "") {
-                    $("#" + elementid).trigger("change");
-                };
+                var currentSelected = a_array[$("#" + childid + " a.selected").prop("id")];
+                if(currentSelected != undefined) {
+                    var currentSelectedValue = currentSelected.text;
+                    if ($.trim(oldSelectedValue) !== $.trim(currentSelectedValue) && oldSelectedValue !== "") {
+                        $("#" + elementid).trigger("change");
+                    };
+                }
             };
             if (has_handler('mouseup') == true) {
                 $("#" + elementid).trigger("mouseup");
@@ -782,7 +785,10 @@
                 $("#" + msOldDiv).css({ zIndex: '0' });
             };
             if ($("#" + childid).css("display") == "none") {
-                oldSelectedValue = a_array[$("#" + childid + " a.selected").prop("id")].text;
+                var oldSelected = a_array[$("#" + childid + " a.selected").prop("id")];
+                if(oldSelected != undefined)
+                    oldSelectedValue = oldSelected.text;
+                
                 //keyboard action
                 inputText = "";
                 oldHeight = $("#" + childid).height();
