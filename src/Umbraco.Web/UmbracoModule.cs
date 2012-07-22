@@ -59,7 +59,7 @@ namespace Umbraco.Web
         	var routingContext = new RoutingContext(
         		umbracoContext,
         		RouteLookups.Current,
-        		new LookupFor404(),
+        		new ResolveLastChance(),
         		contentStore,
         		niceUrls);
 			// NOT HERE BUT SEE **THERE** BELOW

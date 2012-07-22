@@ -50,8 +50,20 @@ namespace Umbraco.Web
             Application = applicationContext;
         	RoutesCache = routesCache;
 
-			//set the original url
-			OriginalUrl = httpContext.Request.Url;
+			// set the urls
+			this.RequestUrl = httpContext.Request.Url;
+			this.ClientUrl = httpContext.Request.Url;
+
+			// from IIS Rewrite Module documentation:
+			// "The URL Rewrite Module preserves the original requested URL path in the following server variables:
+			// - HTTP_X_ORIGINAL_URL – this server variable contains the original URL in decoded format;
+			// - UNENCODED_URL – this server variable contains the original URL exactly as it was requested by a Web client, with all original encoding preserved."
+			//
+			// see also http://forums.iis.net/t/1152581.aspx
+			//
+			var iisOrig = httpContext.Request.ServerVariables["HTTP_X_ORIGINAL_URL"];
+			if (!string.IsNullOrWhiteSpace(iisOrig))
+				this.ClientUrl = new Uri(iisOrig); 
         }
 
         /// <summary>
@@ -104,7 +116,31 @@ namespace Umbraco.Web
     	/// <summary>
         /// Gets/sets the original URL of the request
         /// </summary>
-        internal Uri OriginalUrl { get; set; }
+        internal Uri ClientUrl { get; set; }
+
+		private Uri _requestUrl;
+
+		/// <summary>
+		/// Gets the uri that is handled by ASP.NET after server-side rewriting took place.
+		/// </summary>
+		internal Uri RequestUrl
+		{
+			get 
+			{
+				return _requestUrl; 
+			}
+			set
+			{
+				_requestUrl = value;
+				this.UmbracoUrl = NiceUrlResolver.UriToUmbraco(_requestUrl);
+			}
+		}
+
+		/// <summary>
+		/// Gets the cleaned up url that is handled by Umbraco.
+		/// </summary>
+		/// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
+		internal Uri UmbracoUrl { get; set; }
 
         /// <summary>
         /// Returns the XML Cache document

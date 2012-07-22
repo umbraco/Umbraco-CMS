@@ -6,12 +6,15 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Routing
 {
+	// fixme - this class is broken in various ways
+	// + we can't reproduce that sort of code for everything we need to discover
+
 	/// <summary>
 	/// Represents a collection of ILookup used for routing that are registered in the application
 	/// </summary>
 	internal class RouteLookups
 	{
-		private static readonly List<ILookup> Lookups = new List<ILookup>();
+		private static readonly List<IRequestDocumentResolver> Lookups = new List<IRequestDocumentResolver>();
 		private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
 
 		/// <summary>
@@ -19,7 +22,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		public static RouteLookups Current { get; internal set; }
 
-		internal RouteLookups(IEnumerable<ILookup> lookups)
+		internal RouteLookups(IEnumerable<IRequestDocumentResolver> lookups)
 		{
 			Lookups.AddRange(SortByWeight(lookups));
 		}
@@ -28,8 +31,10 @@ namespace Umbraco.Web.Routing
 		/// Returns all of the lookups
 		/// </summary>
 		/// <returns></returns>
-		public IEnumerable<ILookup> GetLookups()
+		public IEnumerable<IRequestDocumentResolver> GetLookups()
 		{
+			// FIXME - and then, we return a non-thread-safe collection ... WTF?
+
 			return Lookups;
 		} 
 
@@ -38,7 +43,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		public void RemoveLookup<T>()
-			where T : ILookup
+			where T : IRequestDocumentResolver
 		{
 			using (new WriteLock(Lock))
 			{
@@ -51,15 +56,15 @@ namespace Umbraco.Web.Routing
 		/// Adds a new lookup to the end of the list
 		/// </summary>
 		/// <param name="lookup"></param>
-		public void AddLookup(ILookup lookup)
+		public void AddLookup(IRequestDocumentResolver lookup)
 		{
-			if (CheckExists(lookup)) 
-				throw new InvalidOperationException("The lookup type " + lookup + " already exists in the lookup collection");
-
-			using (new WriteLock(Lock))
+			using (var l = new UpgradeableReadLock(Lock))
 			{
+				if (CheckExists(lookup))
+					throw new InvalidOperationException(string.Format("The lookup type \"{0}\" already exists in the lookup collection.", lookup));
+				l.UpgradeToWriteLock();
 				Lookups.Add(lookup);
-			}			
+			}
 		}
 
 		/// <summary>
@@ -67,7 +72,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <param name="index"></param>
 		/// <param name="lookup"></param>
-		public void InsertLookup(int index, ILookup lookup)
+		public void InsertLookup(int index, IRequestDocumentResolver lookup)
 		{
 			if (CheckExists(lookup))
 				throw new InvalidOperationException("The lookup type " + lookup + " already exists in the lookup collection");
@@ -83,7 +88,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <param name="lookup"></param>
 		/// <returns></returns>
-		private static bool CheckExists(ILookup lookup)
+		private static bool CheckExists(IRequestDocumentResolver lookup)
 		{
 			return Lookups.Any(x => x.GetType() == lookup.GetType());
 		}
@@ -93,12 +98,12 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <param name="lookups"></param>
 		/// <returns></returns>
-		private static IEnumerable<ILookup> SortByWeight(IEnumerable<ILookup> lookups)
+		private static IEnumerable<IRequestDocumentResolver> SortByWeight(IEnumerable<IRequestDocumentResolver> lookups)
 		{
 			return lookups.OrderBy(x =>
 				{
-					var attribute = x.GetType().GetCustomAttributes(true).OfType<LookupWeightAttribute>().SingleOrDefault();
-					return attribute == null ? LookupWeightAttribute.DefaultWeight : attribute.Weight;
+					var attribute = x.GetType().GetCustomAttributes(true).OfType<RequestDocumentResolverWeightAttribute>().SingleOrDefault();
+					return attribute == null ? RequestDocumentResolverWeightAttribute.DefaultWeight : attribute.Weight;
 				}).ToList();
 		}
 

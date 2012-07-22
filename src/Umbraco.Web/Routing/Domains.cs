@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Umbraco.Core;
 using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web.Routing
@@ -58,7 +59,7 @@ namespace Umbraco.Web.Routing
 
 		public static string PathRelativeToDomain(Uri domainUri, string path)
 		{
-			return path.Substring(domainUri.AbsolutePath.Length).AtStart('/');
+			return path.Substring(domainUri.AbsolutePath.Length).EnsureStartsWith('/');
 		}
 	}
 }

@@ -8,12 +8,12 @@ namespace Umbraco.Web.Routing
     // handles /foo/bar/<template> where <template> is a valid template alias
     // and /foo/bar the nice url of a document
     //
-    [LookupWeight(30)]
-    internal class LookupByPathWithTemplate : LookupByPath, ILookup
+    [RequestDocumentResolverWeight(30)]
+    internal class ResolveByNiceUrlAndTemplate : ResolveByNiceUrl, IRequestDocumentResolver
     {
-        static readonly TraceSource Trace = new TraceSource("LookupByPathWithTemplate");		
+		static readonly TraceSource Trace = new TraceSource("ResolveByNiceUrlAndTemplate");		
 
-        public override bool LookupDocument(DocumentRequest docreq)
+        public override bool TrySetDocument(DocumentRequest docreq)
         {
             XmlNode node = null;
 			string path = docreq.Uri.AbsolutePath;

@@ -11,12 +11,12 @@ namespace Umbraco.Web.Routing
     //
     // we're keeping it here only for backward compatibility.
     //
-    [LookupWeight(40)]
-    internal class LookupByProfile : LookupByPath, ILookup
+    [RequestDocumentResolverWeight(40)]
+    internal class ResolveByProfile : ResolveByNiceUrl, IRequestDocumentResolver
     {
-        static readonly TraceSource Trace = new TraceSource("LookupByProfile");		
+		static readonly TraceSource Trace = new TraceSource("ResolveByProfile");		
 
-        public override bool LookupDocument(DocumentRequest docreq)
+        public override bool TrySetDocument(DocumentRequest docreq)
         {
             XmlNode node = null;
 

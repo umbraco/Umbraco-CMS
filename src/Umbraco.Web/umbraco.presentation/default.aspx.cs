@@ -109,8 +109,8 @@ namespace umbraco
 			}
 
 			// reset the friendly path so it's used by forms, etc.
-			Trace.Write(TraceCategory, string.Format("Reset url to \"{0}\"", UmbracoContext.Current.OriginalUrl));
-			Context.RewritePath(UmbracoContext.Current.OriginalUrl.PathAndQuery);
+			Trace.Write(TraceCategory, string.Format("Reset url to \"{0}\"", UmbracoContext.Current.RequestUrl));
+			Context.RewritePath(UmbracoContext.Current.RequestUrl.PathAndQuery);
 
 			Context.Items.Add("pageElements", _upage.Elements); // legacy - fixme
 

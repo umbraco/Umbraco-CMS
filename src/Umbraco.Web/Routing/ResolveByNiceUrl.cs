@@ -6,13 +6,12 @@ namespace Umbraco.Web.Routing
     // handles "/foo/bar" where "/foo/bar" is the path to a document
     //
 
-    [LookupWeight(10)]
-    internal class LookupByPath : ILookup
+    [RequestDocumentResolverWeight(10)]
+    internal class ResolveByNiceUrl : IRequestDocumentResolver
     {
-       
-        static readonly TraceSource Trace = new TraceSource("LookupByPath");
+		static readonly TraceSource Trace = new TraceSource("ResolveByNiceUrl");
 
-        public virtual bool LookupDocument(DocumentRequest docreq)
+        public virtual bool TrySetDocument(DocumentRequest docreq)
         {
 			string route;
 			if (docreq.HasDomain)

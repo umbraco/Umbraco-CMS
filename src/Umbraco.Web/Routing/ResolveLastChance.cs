@@ -9,12 +9,11 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.Routing
 {
-    internal class LookupFor404 : ILookupNotFound
+    internal class ResolveLastChance : IRequestDocumentLastChanceResolver
     {
-     
-        static TraceSource _trace = new TraceSource("LookupByAlias");
+		static TraceSource _trace = new TraceSource("ResolveLastChance");
 
-        public bool LookupDocument(DocumentRequest docRequest)
+        public bool TrySetDocument(DocumentRequest docRequest)
         {
 			docRequest.Node = HandlePageNotFound(docRequest);
             return docRequest.HasNode;

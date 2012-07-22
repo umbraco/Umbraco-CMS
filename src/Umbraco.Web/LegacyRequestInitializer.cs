@@ -14,7 +14,7 @@ namespace Umbraco.Web
 
         public void InitializeRequest()
         {
-            var uri = _umbracoContext.OriginalUrl;
+            var uri = _umbracoContext.RequestUrl;
 
             // legacy - umbOriginalUrl used by default.aspx to rewritepath so forms are happy
             // legacy - umbOriginalUrl used by presentation/umbraco/urlRewriter/UrlRewriterFormWriter which handles <form action="..."

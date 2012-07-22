@@ -13,7 +13,7 @@ namespace Umbraco.Web
 	public static class PluginResolverExtensions
 	{
 
-		private static volatile IEnumerable<ILookup> _lookups;
+		private static volatile IEnumerable<IRequestDocumentResolver> _lookups;
 		private static readonly object Locker = new object();
 
 		/// <summary>
@@ -21,7 +21,7 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="plugins"></param>
 		/// <returns></returns>
-		internal static IEnumerable<ILookup> ResolveLookups(this PluginResolver plugins)
+		internal static IEnumerable<IRequestDocumentResolver> ResolveLookups(this PluginResolver plugins)
 		{
 			if (_lookups == null)
 			{
@@ -29,13 +29,13 @@ namespace Umbraco.Web
 				{
 					if (_lookups == null)
 					{
-						var lookupTypes = TypeFinder.FindClassesOfType<ILookup>();
-						var lookups = new List<ILookup>();
+						var lookupTypes = TypeFinder.FindClassesOfType<IRequestDocumentResolver>();
+						var lookups = new List<IRequestDocumentResolver>();
 						foreach (var l in lookupTypes)
 						{
 							try
 							{
-								var typeInstance = Activator.CreateInstance(l) as ILookup;
+								var typeInstance = Activator.CreateInstance(l) as IRequestDocumentResolver;
 								lookups.Add(typeInstance);
 							}
 							catch (Exception ex)

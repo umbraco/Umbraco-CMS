@@ -55,6 +55,16 @@ namespace Umbraco.Core
             return toStartWith + input.TrimStart(toStartWith.ToArray()); // Ensure each char is removed first from input, e.g. ~/ plus /Path will equal ~/Path not ~//Path
         }
 
+		public static string EnsureStartsWith(this string input, char value)
+		{
+			return input.StartsWith(value.ToString()) ? input : value + input;
+		}
+
+		public static string EnsureEndsWith(this string input, char value)
+		{
+			return input.EndsWith(value.ToString()) ? input : input + value;
+		}
+
         public static bool IsLowerCase(this char ch)
         {
             return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToLower();

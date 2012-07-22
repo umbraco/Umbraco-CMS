@@ -1,6 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
+
+using Umbraco.Core;
 using Umbraco.Web.Routing;
+
 using umbraco;
 using umbraco.IO;
 using umbraco.cms.businesslogic.web;
@@ -24,136 +29,130 @@ namespace Umbraco.Web
         // note: this could be a parameter...
         const string UrlNameProperty = "@urlName";
 
-        public virtual string GetNiceUrl(int nodeId)
-        {
-            int startNodeDepth = 1;
-            if (GlobalSettings.HideTopLevelNodeFromPath)
-                startNodeDepth = 2;
+		#region GetNiceUrl
 
-            return GetNiceUrl(nodeId, startNodeDepth, false);
-        }
+		public string GetNiceUrl(int nodeId)
+		{
+			return GetNiceUrl(nodeId, _umbracoContext.UmbracoUrl, false);
+		}
 
-        public virtual string GetNiceUrl(int nodeId, int startNodeDepth, bool forceDomain)
+		public string GetNiceUrl(int nodeId, Uri current, bool absolute)
         {
         	string path;
+			Uri domainUri;
 
 			// will not read cache if previewing!
-        	var route = !_umbracoContext.InPreviewMode
-							? _umbracoContext.RoutesCache.GetRoute(nodeId)
-        	            	: null;
+        	var route = _umbracoContext.InPreviewMode
+				? null
+				: _umbracoContext.RoutesCache.GetRoute(nodeId);
 
             if (route != null)
             {
+				// route is <id>/<path> eg "-1/", "-1/foo", "123/", "123/foo/bar"...
                 int pos = route.IndexOf('/');
                 path = route.Substring(pos);
-
-                if (UmbracoSettings.UseDomainPrefixes || forceDomain)
-                {
-                    int rootNodeId = int.Parse(route.Substring(0, pos));
-                    if (rootNodeId > 0)
-                        return DomainAtNode(rootNodeId) + path;
-                }
-
-                return path;
-            }
-
-            // else there was not route in the cache, must build route...
-
-            var node = _contentStore.GetNodeById(nodeId);
-            if (node == null)
-                return "#"; // legacy wrote to the log here...
-
-            var parts = new List<string>();
-            var depth = int.Parse(_contentStore.GetNodeProperty(node, "@level"));
-            var id = nodeId;
-            string domain = null;
-            while (depth >= 1)
-            {
-                // if not hiding that depth, add urlName
-                if (depth >= startNodeDepth)
-                    parts.Add(_contentStore.GetNodeProperty(node, UrlNameProperty));
-
-                var tmp = DomainAtNode(id);
-                if (tmp != null)
-                {
-                    if (UmbracoSettings.UseDomainPrefixes || forceDomain)
-                        domain = tmp;
-                    break; // break to capture the id
-                }
-
-                node = _contentStore.GetNodeParent(node);
-                id = int.Parse(_contentStore.GetNodeProperty(node, "@id"));
-                depth--;
-            }
-
-            parts.Reverse();
-            path = "/" + string.Join("/", parts);
-            route = string.Format("{0}{1}", id, path);
-
-			if (!_umbracoContext.InPreviewMode)
+				int id = int.Parse(route.Substring(0, pos)); // will be -1 or 1234
+				domainUri = id > 0 ? DomainUriAtNode(id, current) : null;
+			}
+			else
 			{
-				_umbracoContext.RoutesCache.Store(nodeId, route); // will not write if previewing	
-			}            
+				var node = _contentStore.GetNodeById(nodeId);
+				if (node == null)
+					return "#"; // legacy wrote to the log here...
 
-            return FormatUrl(domain, path);
-        }
+				var pathParts = new List<string>();
+				int id = nodeId;
+				domainUri = DomainUriAtNode(id, current);
+				while (domainUri == null && id > 0)
+				{
+					pathParts.Add(_contentStore.GetNodeProperty(node, UrlNameProperty));
+					node = _contentStore.GetNodeParent(node);
+					id = int.Parse(_contentStore.GetNodeProperty(node, "@id")); // will be -1 or 1234
+					domainUri = id > 0 ? DomainUriAtNode(id, current) : null;
+	            }
 
-        protected string DomainAtNode(int nodeId)
-        {
-            // be safe
-            if (nodeId <= 0)
-                return null;
+				// no domain, respect HideTopLevelNodeFromPath for legacy purposes
+				if (domainUri == null && global::umbraco.GlobalSettings.HideTopLevelNodeFromPath)
+					pathParts.RemoveAt(pathParts.Count - 1);
 
-            // get domains defined on that node
-            Domain[] domains = Domain.GetDomainsById(nodeId);
+				pathParts.Reverse();
+				path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
+				route = id.ToString() + path;
 
-            // no domain set on that node, return null
-            if (domains.Length == 0)
-                return null;
+				if (!_umbracoContext.InPreviewMode)
+					_umbracoContext.RoutesCache.Store(nodeId, route);
+			}
 
-            // else try to find the first domain that matches the current request
-            // else take the first domain of the list
-            Domain domain = domains.FirstOrDefault(d => UrlUtility.IsBaseOf(d.Name, _umbracoContext.OriginalUrl)) ?? domains[0];
+			return AssembleUrl(domainUri, path, current, absolute).ToString();
+		}
 
-            var domainName = domain.Name.TrimEnd('/');
-            domainName = UrlUtility.EnsureScheme(domainName, _umbracoContext.OriginalUrl.Scheme);
-            var pos = domainName.IndexOf("//");
-            pos = domainName.IndexOf("/", pos + 2);
-            if (pos > 0)
-                domainName = domainName.Substring(0, pos);
+		Uri AssembleUrl(Uri domain, string path, Uri current, bool absolute)
+		{
+			Uri uri;
 
-            // return a scheme + host eg http://example.com with no trailing slash
-            return domainName;
-        }
+			if (domain == null)
+			{
+				// no domain was found : return a relative url,  add vdir if any
+				uri = new Uri(global::umbraco.IO.SystemDirectories.Root + path, UriKind.Relative);
+			}
+			else
+			{
+				// a domain was found : return an absolute or relative url
+				// cannot handle vdir, has to be in domain uri
+				if (!absolute && current != null && domain.GetLeftPart(UriPartial.Authority) == current.GetLeftPart(UriPartial.Authority))
+					uri = new Uri(domain.AbsolutePath.TrimEnd('/') + path, UriKind.Relative); // relative
+				else
+					uri = new Uri(domain.GetLeftPart(UriPartial.Path).TrimEnd('/') + path); // absolute
+			}
 
-        protected string FormatUrl(string domain, string path)
-        {
-            if (domain == null) // else vdir needs to be in the domain
-            {
-                // get the application virtual dir (empty if no vdir)
-                string vdir = SystemDirectories.Root;
-                if (!string.IsNullOrEmpty(vdir))
-                    domain = "/" + vdir;
-            }
+			return UriFromUmbraco(uri);
+		}
 
-            string url = (domain ?? "") + path;
-            if (path != "/")
-            {
-                // not at root
-                if (GlobalSettings.UseDirectoryUrls)
-                {
-                    // add trailing / if required
-                    if (UmbracoSettings.AddTrailingSlash)
-                        url += "/";
-                }
-                else
-                {
-                    // add .aspx
-                    url += ".aspx";
-                }
-            }
+		Uri DomainUriAtNode(int nodeId, Uri current)
+		{
+			// be safe
+			if (nodeId <= 0)
+				return null;
 
-            return url;
-        }
-    }
+			// apply filter on domains defined on that node
+			var domainAndUri = Domains.ApplicableDomains(Domain.GetDomainsById(nodeId), current, true);
+			return domainAndUri == null ? null : domainAndUri.Uri;
+		}
+
+		#endregion
+
+		#region Map public urls to/from umbraco urls
+
+		// fixme - what about vdir?
+		// path = path.Substring(UriUtility.AppVirtualPathPrefix.Length); // remove virtual directory
+
+		public static Uri UriFromUmbraco(Uri uri)
+		{
+			var path = uri.GetSafeAbsolutePath();
+			if (path == "/")
+				return uri;
+
+			if (!global::umbraco.GlobalSettings.UseDirectoryUrls)
+				path += ".aspx";
+			else if (global::umbraco.UmbracoSettings.AddTrailingSlash)
+				path += "/";
+
+			return uri.Rewrite(path);
+		}
+
+		public static Uri UriToUmbraco(Uri uri)
+		{
+			var path = uri.GetSafeAbsolutePath();
+
+			path = path.ToLower();
+			if (path != "/")
+				path = path.TrimEnd('/');
+			if (path.EndsWith(".aspx"))
+				path = path.Substring(0, path.Length - ".aspx".Length);
+
+			return uri.Rewrite(path);
+		}
+
+		#endregion
+	}
 }

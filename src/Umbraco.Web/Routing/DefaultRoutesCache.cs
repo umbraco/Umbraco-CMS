@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Routing
 {
@@ -8,8 +10,8 @@ namespace Umbraco.Web.Routing
 	/// </summary>
 	internal class DefaultRoutesCache : IRoutesCache
 	{
-        private readonly object _lock = new object();
-        private Dictionary<int, string> _routes;
+		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+		private Dictionary<int, string> _routes;
         private Dictionary<string, int> _nodeIds;
 
         public DefaultRoutesCache()
@@ -21,11 +23,17 @@ namespace Umbraco.Web.Routing
             //
             // but really, we should do some partial refreshes!
             // otherwise, we could even cache 404 errors...
+			//
+			// these are the two events used by library in legacy code...
+			// is it enough?
+			//
+			global::umbraco.content.AfterRefreshContent += (sender, e) => Clear();
+			global::umbraco.content.AfterUpdateDocumentCache += (sender, e) => Clear();
         }
 
         public void Store(int nodeId, string route)
         {
-            lock (_lock)
+            using (new WriteLock(_lock))
             {
                 _routes[nodeId] = route;
                 _nodeIds[route] = nodeId;
@@ -34,7 +42,7 @@ namespace Umbraco.Web.Routing
 
         public string GetRoute(int nodeId)
         {
-            lock (_lock)
+            lock (new ReadLock(_lock))
             {
                 return _routes.ContainsKey(nodeId) ? _routes[nodeId] : null;
             }
@@ -42,7 +50,7 @@ namespace Umbraco.Web.Routing
 
         public int GetNodeId(string route)
         {
-            lock (_lock)
+            using (new ReadLock(_lock))
             {
                 return _nodeIds.ContainsKey(route) ? _nodeIds[route] : 0;
             }
@@ -50,10 +58,11 @@ namespace Umbraco.Web.Routing
 
         public void ClearNode(int nodeId)
         {
-            lock (_lock)
+            using (var lck = new UpgradeableReadLock(_lock))
             {
                 if (_routes.ContainsKey(nodeId))
                 {
+					lck.UpgradeToWriteLock();
                     _nodeIds.Remove(_routes[nodeId]);
                     _routes.Remove(nodeId);
                 }
@@ -62,7 +71,7 @@ namespace Umbraco.Web.Routing
 
         public void Clear()
         {
-            lock (_lock)
+            using (new WriteLock(_lock))
             {
                 _routes = new Dictionary<int, string>();
                 _nodeIds = new Dictionary<string, int>();

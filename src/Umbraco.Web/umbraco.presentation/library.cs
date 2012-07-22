@@ -355,6 +355,9 @@ namespace umbraco
         /// <returns>String with a friendly url from a node</returns>
         public static string NiceUrl(int nodeID)
         {
+			// OK, how are we supposed to retrieve the NiceUrlResolver from here,
+			// bearing in mind that we don't want to instanciate a resolver + content store + ...
+			// for every NiceUrl call ?!
 			return Umbraco.Core.UmbracoContainer.Get<Umbraco.Web.Routing.NiceUrls>().GetNiceUrl(nodeID);
         }
 
@@ -377,7 +380,10 @@ namespace umbraco
         /// <returns>String with a friendly url with full domain from a node</returns>
         public static string NiceUrlWithDomain(int nodeID)
         {
-			return Umbraco.Core.UmbracoContainer.Get<Umbraco.Web.Routing.NiceUrls>().GetNiceUrl(nodeID, Umbraco.Web.RequestContext.Current.UmbracoUrl, true);
+			// OK, how are we supposed to retrieve the NiceUrlResolver from here,
+			// bearing in mind that we don't want to instanciate a resolver + content store + ...
+			// for every NiceUrl call ?!
+			return Umbraco.Core.UmbracoContainer.Get<Umbraco.Web.Routing.NiceUrls>().GetNiceUrl(nodeID, Umbraco.Web.UmbracoContext.Current.UmbracoUrl, true);
         }
 
 
@@ -2176,19 +2182,20 @@ namespace umbraco
                 Media.BeforeDelete += new Media.DeleteEventHandler(Media_BeforeDelete);
             }
 
-            content.AfterUpdateDocumentCache += new content.DocumentCacheEventHandler(content_AfterUpdateDocumentCache);
-            content.AfterRefreshContent += new content.RefreshContentEventHandler(content_AfterRefreshContent);
+			// now handled directly by the IRoutesCache implementation
+			//content.AfterUpdateDocumentCache += new content.DocumentCacheEventHandler(content_AfterUpdateDocumentCache);
+			//content.AfterRefreshContent += new content.RefreshContentEventHandler(content_AfterRefreshContent);
         }
 
-        void content_AfterRefreshContent(Document sender, RefreshContentEventArgs e)
-        {
-            library.ClearNiceUrlCache();
-        }
+		//void content_AfterRefreshContent(Document sender, RefreshContentEventArgs e)
+		//{
+		//    library.ClearNiceUrlCache();
+		//}
 
-        void content_AfterUpdateDocumentCache(Document sender, DocumentCacheEventArgs e)
-        {
-            library.ClearNiceUrlCache();
-        }
+		//void content_AfterUpdateDocumentCache(Document sender, DocumentCacheEventArgs e)
+		//{
+		//    library.ClearNiceUrlCache();
+		//}
 
         void Member_BeforeDelete(Member sender, DeleteEventArgs e)
         {

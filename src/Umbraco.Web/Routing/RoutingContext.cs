@@ -13,7 +13,7 @@ namespace Umbraco.Web.Routing
         public RoutingContext(
 			UmbracoContext umbracoContext,
             RouteLookups lookups,
-            ILookupNotFound lookupNotFound,
+            IRequestDocumentLastChanceResolver lookupNotFound,
             ContentStore contentStore,
 			NiceUrlResolver niceUrlResolver)
         {
@@ -26,7 +26,7 @@ namespace Umbraco.Web.Routing
 
 		public UmbracoContext UmbracoContext { get; private set; }
 		public RouteLookups RouteLookups { get; private set; }
-    	public ILookupNotFound LookupNotFound { get; private set; }
+    	public IRequestDocumentLastChanceResolver LookupNotFound { get; private set; }
         public ContentStore ContentStore { get; private set; }
 		public NiceUrlResolver NiceUrlResolver { get; private set; }
     }

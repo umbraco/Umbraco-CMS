@@ -45,6 +45,8 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationContext.cs" />
+    <Compile Include="UpgradeableReadLock.cs" />
+    <Compile Include="ReadLock.cs" />
     <Compile Include="DelegateEqualityComparer.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="IfExtensions.cs" />

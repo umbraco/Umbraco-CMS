@@ -242,18 +242,19 @@
     <Compile Include="Mvc\ControllerExtensions.cs" />
     <Compile Include="NiceUrlResolver.cs" />
     <Compile Include="PluginResolverExtensions.cs" />
+    <Compile Include="Routing\Domains.cs" />
     <Compile Include="Routing\RouteLookups.cs" />
     <Compile Include="Routing\DocumentRequest.cs" />
-    <Compile Include="Routing\ILookup.cs" />
-    <Compile Include="Routing\ILookupNotFound.cs" />
+    <Compile Include="Routing\IRequestDocumentResolver.cs" />
+    <Compile Include="Routing\IRequestDocumentLastChanceResolver.cs" />
     <Compile Include="Routing\IRoutesCache.cs" />
-    <Compile Include="Routing\LookupByAlias.cs" />
-    <Compile Include="Routing\LookupById.cs" />
-    <Compile Include="Routing\LookupByPath.cs" />
-    <Compile Include="Routing\LookupByPathWithTemplate.cs" />
-    <Compile Include="Routing\LookupByProfile.cs" />
-    <Compile Include="Routing\LookupFor404.cs" />
-    <Compile Include="Routing\LookupWeightAttribute.cs" />
+    <Compile Include="Routing\ResolveByAlias.cs" />
+    <Compile Include="Routing\ResolveById.cs" />
+    <Compile Include="Routing\ResolveByNiceUrl.cs" />
+    <Compile Include="Routing\ResolveByNiceUrlAndTemplate.cs" />
+    <Compile Include="Routing\ResolveByProfile.cs" />
+    <Compile Include="Routing\ResolveLastChance.cs" />
+    <Compile Include="Routing\RequestDocumentResolverWeightAttribute.cs" />
     <Compile Include="Routing\DefaultRoutesCache.cs" />
     <Compile Include="Routing\RoutesCache.cs" />
     <Compile Include="Routing\RoutingContext.cs" />
@@ -1765,7 +1766,7 @@
     <Compile Include="UmbracoApplication.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoModule.cs" />
-    <Compile Include="UrlUtility.cs" />
+    <Compile Include="UriUtility.cs" />
     <Compile Include="Web References\org.umbraco.update\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

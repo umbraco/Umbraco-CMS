@@ -7,13 +7,12 @@ namespace Umbraco.Web.Routing
 
     // handles /1234 where 1234 is the id of a document
     //
-    [LookupWeight(20)]
-    internal class LookupById : ILookup
+    [RequestDocumentResolverWeight(20)]
+    internal class ResolveById : IRequestDocumentResolver
     {
-        
-        static readonly TraceSource Trace = new TraceSource("LookupById");
+		static readonly TraceSource Trace = new TraceSource("ResolveById");
 
-        public bool LookupDocument(DocumentRequest docreq)
+        public bool TrySetDocument(DocumentRequest docreq)
         {
             XmlNode node = null;
 

@@ -10,14 +10,13 @@ namespace Umbraco.Web.Routing
     // at the moment aliases are not cleaned up into nice urls
     //
 
-    [LookupWeight(50)]
-    internal class LookupByAlias : ILookup
+    [RequestDocumentResolverWeight(50)]
+    internal class ResolveByAlias : IRequestDocumentResolver
     {
-    
-        static readonly TraceSource Trace = new TraceSource("LookupByAlias");
+		static readonly TraceSource Trace = new TraceSource("ResolveByAlias");
 
 
-        public bool LookupDocument(DocumentRequest docreq)
+        public bool TrySetDocument(DocumentRequest docreq)
         {
             XmlNode node = null;
 

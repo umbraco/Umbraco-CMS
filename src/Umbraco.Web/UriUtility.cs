@@ -2,6 +2,8 @@ using System;
 using System.Text;
 using System.Web;
 
+using Umbraco.Core;
+
 namespace Umbraco.Web
 {
     static class UriUtility
@@ -131,7 +133,7 @@ namespace Umbraco.Web
 			var pos = Math.Min(pos1, pos2);
 
 			var path = pos > 0 ? uri.Substring(0, pos) : uri;
-			path = path.AtEnd('/');
+			path = path.EnsureEndsWith('/');
 
 			if (pos > 0)
 				path += uri.Substring(pos);
