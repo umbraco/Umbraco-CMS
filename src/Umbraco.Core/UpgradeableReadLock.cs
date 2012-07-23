@@ -12,23 +12,34 @@ namespace Umbraco.Core
     /// <remarks>
     /// Intended as an infrastructure class.
     /// </remarks>
-    public class ReadLock : IDisposable
+    public class UpgradeableReadLock : IDisposable
     {
         private readonly ReaderWriterLockSlim _rwLock;
+		private bool _upgraded = false;
 
         /// <summary>
 		/// Initializes a new instance of the <see cref="ReadLock"/> class.
         /// </summary>
-        /// <ReadLock name="rwLock">The rw lock.</param>
-		public ReadLock(ReaderWriterLockSlim rwLock)
+        /// <param name="rwLock">The rw lock.</param>
+		public UpgradeableReadLock(ReaderWriterLockSlim rwLock)
         {
             _rwLock = rwLock;
-            _rwLock.EnterReadLock();
+            _rwLock.EnterUpgradeableReadLock();
         }
+
+		public void UpgradeToWriteLock()
+		{
+			_rwLock.EnterWriteLock();
+			_upgraded = true;
+		}
 
         void IDisposable.Dispose()
         {
-            _rwLock.ExitReadLock();
+			if (_upgraded)
+			{
+				_rwLock.ExitWriteLock();
+			}
+			_rwLock.ExitUpgradeableReadLock();
         }
     }
 }

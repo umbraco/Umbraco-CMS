@@ -33,9 +33,10 @@ namespace Umbraco.Web.Routing
 		/// <returns></returns>
 		public IEnumerable<IRequestDocumentResolver> GetLookups()
 		{
-			// FIXME - and then, we return a non-thread-safe collection ... WTF?
-
-			return Lookups;
+			using(new ReadLock(Lock))
+			{
+				return Lookups;	
+			}			
 		} 
 
 		/// <summary>
@@ -74,11 +75,11 @@ namespace Umbraco.Web.Routing
 		/// <param name="lookup"></param>
 		public void InsertLookup(int index, IRequestDocumentResolver lookup)
 		{
-			if (CheckExists(lookup))
-				throw new InvalidOperationException("The lookup type " + lookup + " already exists in the lookup collection");
-			
-			using (new WriteLock(Lock))
+			using (var l = new UpgradeableReadLock(Lock))
 			{
+				if (CheckExists(lookup))
+					throw new InvalidOperationException("The lookup type " + lookup + " already exists in the lookup collection");
+				l.UpgradeToWriteLock();
 				Lookups.Insert(index, lookup);
 			}			
 		}
