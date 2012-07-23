@@ -317,6 +317,7 @@
     <Content Include="umbraco\config\lang\se.xml" />
     <Content Include="umbraco\config\lang\zh.xml" />
     <Content Include="umbraco\controls\Tree\CustomTreeService.asmx" />
+    <Content Include="umbraco\dashboard\MediaDashboardFolderBrowser.ascx" />
     <Content Include="umbraco\developer\RelationTypes\EditRelationType.aspx" />
     <Content Include="umbraco\developer\RelationTypes\Images\Bidirectional.png" />
     <Content Include="umbraco\developer\RelationTypes\Images\ParentToChild.png" />
@@ -349,6 +350,8 @@
     <Content Include="umbraco\webservices\api\MemberService.asmx" />
     <Content Include="umbraco\webservices\api\StylesheetService.asmx" />
     <Content Include="umbraco\webservices\api\TemplateService.asmx" />
+    <Content Include="umbraco_client\FolderBrowser\Css\folderbrowser.css" />
+    <Content Include="umbraco_client\FolderBrowser\Js\folderbrowser.js" />
     <Content Include="umbraco_client\tags\css\jquery.tagsinput.css" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.js" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.min.js">
@@ -924,6 +927,7 @@
     <Content Include="umbraco\LiveEditing\Modules\SkinModule\js\initcolorpicker.js" />
     <Content Include="umbraco_client\MacroContainer\macroContainer.css" />
     <Content Include="umbraco_client\mousewheel\jquery.mousewheel.js" />
+    <Content Include="umbraco_client\ui\base2.js" />
     <Content Include="umbraco_client\ui\jquery.alphanumeric.js" />
     <Content Include="umbraco_client\ui\jquery.tooltip.min.js" />
     <Content Include="umbraco_client\ui\knockout.js" />
@@ -1799,6 +1803,7 @@
     <Folder Include="masterpages\" />
     <Folder Include="media\" />
     <Folder Include="scripts\" />
+    <Folder Include="umbraco_client\FolderBrowser\Images\" />
     <Folder Include="umbraco_client\tags\images\" />
     <Folder Include="usercontrols\" />
     <Folder Include="xslt\" />

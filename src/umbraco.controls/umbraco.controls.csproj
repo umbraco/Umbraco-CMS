@@ -86,6 +86,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="DatePicker\DateTimePicker.cs" />
+    <Compile Include="FolderBrowser\FolderBrowser.cs" />
     <Compile Include="ProgressBar.cs" />
     <Compile Include="TreePicker\BaseTreePicker.cs" />
     <Compile Include="TreePicker\BaseTreePickerScripts.Designer.cs">
