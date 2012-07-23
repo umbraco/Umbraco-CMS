@@ -40,6 +40,10 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
@@ -345,6 +349,11 @@
     <Content Include="umbraco\webservices\api\MemberService.asmx" />
     <Content Include="umbraco\webservices\api\StylesheetService.asmx" />
     <Content Include="umbraco\webservices\api\TemplateService.asmx" />
+    <Content Include="umbraco_client\tags\css\jquery.tagsinput.css" />
+    <Content Include="umbraco_client\tags\js\jquery.tagsinput.js" />
+    <Content Include="umbraco_client\tags\js\jquery.tagsinput.min.js">
+      <DependentUpon>jquery.tagsinput.js</DependentUpon>
+    </Content>
     <Content Include="umbraco_client\tinymce3\langs\en.js" />
     <Content Include="umbraco_client\tinymce3\langs\he.js" />
     <Content Include="umbraco_client\tinymce3\langs\ja.js" />
@@ -1789,6 +1798,7 @@
     <Folder Include="masterpages\" />
     <Folder Include="media\" />
     <Folder Include="scripts\" />
+    <Folder Include="umbraco_client\tags\images\" />
     <Folder Include="usercontrols\" />
     <Folder Include="xslt\" />
   </ItemGroup>

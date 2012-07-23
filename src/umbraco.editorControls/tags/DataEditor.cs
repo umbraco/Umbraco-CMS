@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.BusinessLogic;
@@ -24,7 +25,6 @@ namespace umbraco.editorControls.tags
                 _group = Prevalues["group"].ToString();
         }
 
-        public CheckBoxList tagCheckList = new CheckBoxList();
         public TextBox tagBox = new TextBox();
 
 
@@ -32,49 +32,32 @@ namespace umbraco.editorControls.tags
 
         public void Save()
         {
-
-            CheckBoxList items = tagCheckList;
             int _nodeID;
             int.TryParse(_data.NodeId.ToString(), out _nodeID);
             string allTags = "";
-            int tagId = 0;
-
 
             //first clear out all items associated with this ID...
             umbraco.cms.businesslogic.Tags.Tag.RemoveTagsFromNode(_nodeID, _group);
 
-            //and now we add them again...
-            foreach (ListItem li in items.Items)
+            var items = tagBox.Text.Trim().Split(',');
+            foreach (var item in items)
             {
-                if (li.Selected)
+                var tagName = item.Trim();
+                if(string.IsNullOrEmpty(tagName))
+                    continue;
+
+                var tagId = cms.businesslogic.Tags.Tag.GetTagId(tagName, _group);
+                if(tagId == 0)
+                    tagId = cms.businesslogic.Tags.Tag.AddTag(tagName, _group);
+
+                if (tagId > 0)
                 {
-
-                    if (li.Value == "0")
-                    {
-                        // NH 4.7.1 if a tag doesn't have an id associated we'll do a 2nd check in case the XHR request went wrong
-                        // from Codeplex 30151
-                        tagId = cms.businesslogic.Tags.Tag.GetTagId(li.Text, _group);
-                        if (tagId == 0)
-                            tagId = cms.businesslogic.Tags.Tag.AddTag(li.Text, _group);
-                        li.Value = tagId.ToString();
-                    }
-                    else
-                    {
-                        int.TryParse(li.Value, out tagId);
-                    }
-
-                    if (tagId > 0)
-                    {
-
-                        umbraco.cms.businesslogic.Tags.Tag.AssociateTagToNode(_nodeID, tagId);
-
-                        tagId = 0;
-                        allTags += "," + li.Text;
-                    }
+                    umbraco.cms.businesslogic.Tags.Tag.AssociateTagToNode(_nodeID, tagId);
                 }
             }
+
             //and just in case, we'll save the tags as plain text on the node itself... 
-            _data.Value = allTags.Trim().Trim(',');
+            _data.Value = tagBox.Text;
         }
 
         public bool ShowLabel
@@ -85,44 +68,6 @@ namespace umbraco.editorControls.tags
         public bool TreatAsRichTextEditor
         {
             get { return false; }
-        }
-
-        public void tagBoxTextChange(object sender, EventArgs e)
-        {
-            try
-            {
-                if (tagBox.Text.Trim().Length > 0)
-                {
-                    CheckBoxList items = tagCheckList;
-
-                    string[] tags = tagBox.Text.Trim().Trim(',').Split(',');
-
-
-                    for (int i = 0; i < tags.Length; i++)
-                    {
-                        //if not found we'll get zero and handle that onsave instead...
-                        int id = getTagId(tags[i], _group);
-
-                        //we don't want 2 of a kind... 
-                        if (items.Items.FindByText(tags[i].Trim()) == null)
-                        {
-                            ListItem li = new ListItem(tags[i], id.ToString());
-                            li.Selected = true;
-                            items.Items.Add(li);
-                        }
-                    }
-
-                    //reset the textbox
-                    tagBox.Text = "";
-
-                    ScriptManager.GetCurrent(Page).SetFocus(tagBox);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Log.Add(LogTypes.Debug, -1, ex.ToString());
-            }
         }
 
 
@@ -137,8 +82,13 @@ namespace umbraco.editorControls.tags
         {
             base.OnInit(e);
 
-            ClientDependencyLoader.Instance.RegisterDependency("Application/JQuery/jquery.autocomplete.js", "UmbracoClient", ClientDependencyType.Javascript);
+            //ClientDependencyLoader.Instance.RegisterDependency("Application/JQuery/jquery.autocomplete.js", "UmbracoClient", ClientDependencyType.Javascript);
+            ClientDependencyLoader.Instance.RegisterDependency("ui/ui-lightness/jquery-ui.custom.css", "UmbracoClient", ClientDependencyType.Css);
             ClientDependencyLoader.Instance.RegisterDependency("css/umbracoGui.css", "UmbracoRoot", ClientDependencyType.Css);
+
+            ClientDependencyLoader.Instance.RegisterDependency("tags/css/jquery.tagsinput.css", "UmbracoClient", ClientDependencyType.Css);
+            ClientDependencyLoader.Instance.RegisterDependency("tags/js/jquery.tagsinput.min.js", "UmbracoClient", ClientDependencyType.Javascript);
+            
 
             string _alias = ((umbraco.cms.businesslogic.datatype.DefaultData)_data).PropertyId.ToString();
 
@@ -163,41 +113,23 @@ namespace umbraco.editorControls.tags
                 }
             }
 
-
-            tagBox.ID = "tagBox_" + _alias;
-            tagBox.AutoPostBack = true;
-            tagBox.AutoCompleteType = AutoCompleteType.Disabled;
-            tagBox.TextChanged += new System.EventHandler(this.tagBoxTextChange);
-            tagBox.CssClass = "umbEditorTextField";
-
-            Button tagButton = new Button();
-            tagButton.Click += new System.EventHandler(this.tagBoxTextChange);
-            tagButton.Text = "tag";
-
-
-            tagCheckList.ID = "tagCheckList_" + _alias;
+            tagBox.ID = "tagBox2_" + _alias;
+            tagBox.CssClass = "umbEditorTextField umbTagBox";
 
             if (!String.IsNullOrEmpty(pageId))
             {
                 var tags = umbraco.cms.businesslogic.Tags.Tag.GetTags(int.Parse(pageId), _group);
 
-                foreach (var t in tags)
-                {
-                    ListItem li = new ListItem(t.TagCaption, t.Id.ToString());
-                    li.Selected = true;
-                    tagCheckList.Items.Add(li);
-                }
+                tagBox.Text = string.Join(",", tags.Select(x => x.TagCaption));
             }
 
             this.ContentTemplateContainer.Controls.Add(tagBox);
-            this.ContentTemplateContainer.Controls.Add(tagButton);
-            this.ContentTemplateContainer.Controls.Add(tagCheckList);
 
             string tagsAutoCompleteScript =
-                 "jQuery(\"#"
-                 + tagBox.ClientID + "\").autocomplete(\""
-                 + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)
-                 + "/webservices/TagsAutoCompleteHandler.ashx\",{minChars: 2,max: 100, extraParams:{group:\"" + _group + "\",id:\"" + pageId + "\",rnd:\"" + DateTime.Now.Ticks + "\"}}).result(function(e, data){jQuery(\"#" + tagButton.ClientID + "\").trigger('click');});";
+                "jQuery('.umbTagBox').tagsInput({ width: '400px', defaultText: 'Add a tag', minChars: 2, autocomplete_url: '" +
+                umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)
+                + "/webservices/TagsAutoCompleteHandler.ashx?group=" + _group + "&id=" + pageId + "&rnd=" +
+                DateTime.Now.Ticks + "&format=json' });";
 
 
             string tagsAutoCompleteInitScript =
@@ -210,9 +142,7 @@ namespace umbraco.editorControls.tags
             if (Page.IsPostBack)
             {
                 ScriptManager.RegisterClientScriptBlock(this, GetType(), ClientID + "_tags", tagsAutoCompleteScript, true);
-
             }
-
 
         }
 

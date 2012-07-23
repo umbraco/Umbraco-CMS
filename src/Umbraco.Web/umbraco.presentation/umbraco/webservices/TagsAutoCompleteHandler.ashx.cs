@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Script.Serialization;
 using System.Web.Services;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
@@ -21,10 +22,17 @@ namespace umbraco.presentation.umbraco.webservices
         {
             legacyAjaxCalls.Authorize();
 
-            context.Response.ContentType = "text/plain";
+            string format = context.Request.QueryString["format"];
+            bool returnJson = format == "json";
+
+            context.Response.ContentType = returnJson ? "application/json" : "text/plain";
 
             int count = 2;
             string prefixText = context.Request.QueryString["q"];
+
+            if (string.IsNullOrEmpty(prefixText))
+                prefixText = context.Request.QueryString["term"];
+
             string group = context.Request.QueryString["group"];
             string id = context.Request.QueryString["id"];
            
@@ -61,13 +69,15 @@ namespace umbraco.presentation.umbraco.webservices
                        );
                 }
 
-
+                var tagList = new List<string>();
                 while (rr.Read())
                 {
-                    context.Response.Write(rr.GetString("tag") + Environment.NewLine);
+                    tagList.Add(rr.GetString("tag"));
                 }
 
-
+                context.Response.Write(returnJson
+                                           ? new JavaScriptSerializer().Serialize(tagList)
+                                           : string.Join(Environment.NewLine, tagList));
             }
             catch (Exception ex)
             {
