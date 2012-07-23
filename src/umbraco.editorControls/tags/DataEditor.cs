@@ -1,13 +1,11 @@
 using System;
-using System.Configuration;
 using System.Collections;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.BusinessLogic;
-using umbraco.DataLayer;
-using umbraco.presentation;
 using ClientDependency.Core.Controls;
 using ClientDependency.Core;
+using umbraco.presentation;
 
 namespace umbraco.editorControls.tags
 {
