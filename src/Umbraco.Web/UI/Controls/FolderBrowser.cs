@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Text;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.media;
 
-namespace umbraco.uicontrols.FolderBrowser
+namespace Umbraco.Web.UI.Controls
 {
     [ClientDependency(ClientDependencyType.Css, "FolderBrowser/css/folderbrowser.css", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Javascript, "ui/base2.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Javascript, "ui/knockout.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Javascript, "FolderBrowser/js/folderbrowser.js", "UmbracoClient")]
+    [ClientDependency(ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient", Priority = 1)]
+    [ClientDependency(ClientDependencyType.Javascript, "ui/base2.js", "UmbracoClient", Priority = 1)]
+    [ClientDependency(ClientDependencyType.Javascript, "ui/knockout.js", "UmbracoClient", Priority = 2)]
+    [ClientDependency(ClientDependencyType.Javascript, "FolderBrowser/js/folderbrowser.js", "UmbracoClient", Priority = 3)]
     [ToolboxData("<{0}:FolderBrowser runat=server></{0}:FolderBrowser>")]
     public class FolderBrowser : WebControl
     {
