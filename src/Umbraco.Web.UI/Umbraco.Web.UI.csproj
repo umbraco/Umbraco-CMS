@@ -931,6 +931,7 @@
     <Content Include="umbraco_client\ui\jquery.alphanumeric.js" />
     <Content Include="umbraco_client\ui\jquery.tooltip.min.js" />
     <Content Include="umbraco_client\ui\knockout.js" />
+    <Content Include="umbraco_client\ui\knockout.mapping.js" />
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_flat_10_000000_40x100.png" />

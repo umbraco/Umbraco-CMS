@@ -5,6 +5,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using umbraco.BasePages;
+using umbraco.IO;
 using umbraco.cms.businesslogic.media;
 
 namespace Umbraco.Web.UI.Controls
@@ -13,7 +14,8 @@ namespace Umbraco.Web.UI.Controls
     [ClientDependency(ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient", Priority = 1)]
     [ClientDependency(ClientDependencyType.Javascript, "ui/base2.js", "UmbracoClient", Priority = 1)]
     [ClientDependency(ClientDependencyType.Javascript, "ui/knockout.js", "UmbracoClient", Priority = 2)]
-    [ClientDependency(ClientDependencyType.Javascript, "FolderBrowser/js/folderbrowser.js", "UmbracoClient", Priority = 3)]
+    [ClientDependency(ClientDependencyType.Javascript, "ui/knockout.mapping.js", "UmbracoClient", Priority = 3)]
+    [ClientDependency(ClientDependencyType.Javascript, "FolderBrowser/js/folderbrowser.js", "UmbracoClient", Priority = 10)]
     [ToolboxData("<{0}:FolderBrowser runat=server></{0}:FolderBrowser>")]
     public class FolderBrowser : WebControl
     {
@@ -41,11 +43,11 @@ namespace Umbraco.Web.UI.Controls
             }
         }
 
-        protected Media ParentNode
+        protected global::umbraco.cms.businesslogic.media.Media ParentNode
         {
             get
             {
-                return new Media(ParentId);
+                return new global::umbraco.cms.businesslogic.media.Media(ParentId);
             }
         }
 
@@ -76,13 +78,13 @@ namespace Umbraco.Web.UI.Controls
             var sb = new StringBuilder();
 
             // Create the breadcrumb
-            var breadCrumb = new List<Media>();
+            var breadCrumb = new List<global::umbraco.cms.businesslogic.media.Media>();
             breadCrumb.Add(ParentNode);
 
             var parent = ParentNode;
             while(parent.Id != -1)
             {
-                parent = new Media(parent.ParentId);
+                parent = new global::umbraco.cms.businesslogic.media.Media(parent.ParentId);
                 breadCrumb.Add(parent);
             }
 
@@ -104,14 +106,24 @@ namespace Umbraco.Web.UI.Controls
             }
             sb.Append("</ul>");
 
+            // Create the filter input
+            sb.Append("<div class='filter'>Filter: <input type='text' data-bind=\"value: filterTerm, valueUpdate: 'afterkeydown'\" /></div>");
+
             // Create thumbnails container
             sb.Append("<ul class='items' data-bind='foreach: items'>" +
-                      "<li><a href='#'><img src='' /><span data-bind='text: name'></span></a></li>" +
+                      "<li><a href='#'><img data-bind='attr: { src: ThumbnailUrl }' /><span data-bind='text: Name'></span></a></li>" +
                       "</ul>");
 
             panel.Controls.Add(new LiteralControl(sb.ToString()));
 
             Controls.Add(panel);
+
+            Page.ClientScript.RegisterStartupScript(typeof(FolderBrowser),
+                "RegisterFolderBrowsers",
+                string.Format("$(function () {{ $(\".umbFolderBrowser\").folderBrowser({{ umbracoPath : '{0}', basePath : '{1}' }}); }});",
+                IOHelper.ResolveUrl(SystemDirectories.Umbraco),
+                IOHelper.ResolveUrl(SystemDirectories.Base)),
+                true);
         }
 
         protected override void Render(HtmlTextWriter writer)

@@ -32,6 +32,17 @@
     margin-right: 5px;
 }
 
+.umbFolderBrowser .filter {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+}
+
+.umbFolderBrowser .filter input {
+    border: solid 1px #ccc;
+    width: 200px;
+}
+
 .umbFolderBrowser .items {
     margin: 5px 15px;
     padding: 0;

@@ -12,6 +12,18 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         _opts: null,
         _viewModel: null,
         
+        _getChildNodes: function () {
+            _this = this;
+            
+            $.getJSON(_this._opts.basePath + "/FolderBrowserService/GetChildNodes/" + _this._parentId + "/" + _this._viewModel.filterTerm(), function(data) {
+                if (data != undefined && data.length > 0) {
+                    ko.mapping.fromJS(data, {}, _this._viewModel.items);
+                } else {
+                    _this._viewModel.items([]);
+                }
+            });
+        },
+        
         // Constructor
         constructor: function (el, opts) {
 
@@ -32,8 +44,12 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             // Setup the viewmode;
             this._viewModel = $.extend({}, {
                 parent: this,
-                panelVisible: ko.observable(true),
-                items: ko.observableArray([]) 
+                filterTerm: ko.observable(''),
+                items: ko.observableArray([])
+            });
+
+            this._viewModel.filterTerm.subscribe(function(newValue) {
+                _this._getChildNodes();
             });
 
             // Inject the upload button into the toolbar
@@ -44,20 +60,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             
             $(".tabpage:first-child .menubar td[id$='tableContainerButtons'] .sl nobr").after(button);
 
-            // Grab children media items
-            this._viewModel.items.push({ name: "test1.jpg" });
-            this._viewModel.items.push({ name: "test2.jpg" });
-            this._viewModel.items.push({ name: "test3.jpg" });
-            this._viewModel.items.push({ name: "test4.jpg" });
-            this._viewModel.items.push({ name: "test5.jpg" });
-            this._viewModel.items.push({ name: "test1.jpg" });
-            this._viewModel.items.push({ name: "test2.jpg" });
-            this._viewModel.items.push({ name: "test3.jpg" });
-            this._viewModel.items.push({ name: "test4.jpg" });
-            this._viewModel.items.push({ name: "test5.jpg" });
-
             // Bind the viewmodel
             ko.applyBindings(this._viewModel, el);
+            
+            // Grab children media items
+            this._getChildNodes();
         }
         
         // Public
@@ -90,9 +97,5 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
         return $(this).data("api");
     };
-
-    $(function () {
-        $(".umbFolderBrowser").folderBrowser();
-    });
 
 })(jQuery, base2.Base)
