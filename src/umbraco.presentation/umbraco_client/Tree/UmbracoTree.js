@@ -554,16 +554,27 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 this._debug("onNodeDeleted");
 
+                var tree = this._tree;
                 var nodeToDel = this._actionNode.jsNode;
+                var parentNode = this._tree.parent(nodeToDel);
 
                 //ensure the branch is closed
                 this._tree.close_branch(nodeToDel);
                 //make the node disapear
                 nodeToDel.hide("drop", { direction: "down" }, 400, function () {
                     //remove the node from the DOM, do this after 1 second as IE doesn't like it when you try this right away.
-                    setTimeout(function () { nodeToDel.remove(); }, 1000);
+                    setTimeout(function () {
+                        nodeToDel.remove();
+                        
+                        if (parentNode != undefined && parentNode != -1) {
+                            tree.open_branch(parentNode);
+                        }
+                        
+                    }, 250);
                 });
+                
                 this._updateRecycleBin();
+                
             },
 
             onNodeRefresh: function(EV) {

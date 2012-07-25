@@ -530,6 +530,10 @@ guiEditor {
   padding-left:25px;
 }
 
+.umbThumbnailDropdownList .ddChild img {
+    width: 90px;
+}
+
 #auditTrailList span 
 {
     margin-left: 22px;

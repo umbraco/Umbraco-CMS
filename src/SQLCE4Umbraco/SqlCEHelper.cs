@@ -32,6 +32,19 @@ namespace SqlCE4Umbraco
         }
 
         /// <summary>
+        /// Checks if the actual database exists, if it doesn't then it will create it
+        /// </summary>
+        internal void CreateEmptyDatabase()
+        {
+            var localConnection = new SqlCeConnection(ConnectionString);
+            if (!System.IO.File.Exists(localConnection.Database))
+            {
+                var sqlCeEngine = new SqlCeEngine(ConnectionString);
+                sqlCeEngine.CreateDatabase();
+            }
+        }
+
+        /// <summary>
         /// Creates a new parameter for use with this specific implementation of ISqlHelper.
         /// </summary>
         /// <param name="parameterName">Name of the parameter.</param>

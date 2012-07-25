@@ -6,6 +6,7 @@
  * 
  ***********************************************************************************/
 
+using umbraco.DataLayer.SqlHelpers.SqlServer;
 using umbraco.DataLayer.Utility;
 using umbraco.DataLayer.Utility.Installer;
 using umbraco.DataLayer.Utility.Table;
