@@ -140,22 +140,22 @@ namespace Umbraco.Web.Routing
 
         #endregion
 
-        #region Resolve
+        #region Lookup
 
         /// <summary>
         /// Determines the site root (if any) matching the http request.
         /// </summary>        
         /// <returns>A value indicating whether a domain was found.</returns>
-		public bool ResolveDomain()
+		public bool LookupDomain()
         {
-            const string tracePrefix = "ResolveDomain: ";
+			const string tracePrefix = "LookupDomain: ";
 
             // note - we are not handling schemes nor ports here.
 
             Trace.TraceInformation("{0}Uri=\"{1}\"", tracePrefix, this.Uri);
 
             // try to find a domain matching the current request
-			var domainAndUri = Domains.ApplicableDomains(Domain.GetDomains(), RoutingContext.UmbracoContext.UmbracoUrl, false);
+			var domainAndUri = Domains.DomainMatch(Domain.GetDomains(), RoutingContext.UmbracoContext.UmbracoUrl, false);
 
             // handle domain
 			if (domainAndUri != null)
@@ -193,17 +193,17 @@ namespace Umbraco.Web.Routing
         /// Determines the Umbraco document (if any) matching the http request.
         /// </summary>
         /// <returns>A value indicating whether a document and template nave been found.</returns>
-        public bool ResolveDocument()
+        public bool LookupDocument()
         {
-            const string tracePrefix = "ResolveDocument: ";
+			const string tracePrefix = "LookupDocument: ";
             Trace.TraceInformation("{0}Path=\"{1}\"", tracePrefix, this.Uri.AbsolutePath);
 
             // look for the document
             // the first successful resolver, if any, will set this.Node, and may also set this.Template
             // some lookups may implement caching
             Trace.TraceInformation("{0}Begin resolvers", tracePrefix);
-			var resolvers = RoutingContext.RouteLookups.GetLookups();
-        	resolvers.Any(resolver => resolver.TrySetDocument(this));
+			var lookups = RoutingContext.DocumentLookupsResolver.DocumentLookups;
+        	lookups.Any(lookup => lookup.TrySetDocument(this));
             Trace.TraceInformation("{0}End resolvers, {1}", tracePrefix, (this.HasNode ? "a document was found" : "no document was found"));
 
             // fixme - not handling umbracoRedirect
@@ -211,7 +211,7 @@ namespace Umbraco.Web.Routing
             // so after ResolveDocument2() => docreq.IsRedirect => handled by the module!
 
             // handle not-found, redirects, access, template
-            ResolveDocument2();
+            LookupDocument2();
 
             // handle umbracoRedirect (moved from umbraco.page)
             FollowRedirect();
@@ -224,9 +224,9 @@ namespace Umbraco.Web.Routing
         /// Performs the document resolution second pass.
         /// </summary>
         /// <remarks>The second pass consists in handling "not found", internal redirects, access validation, and template.</remarks>
-        void ResolveDocument2()
+        void LookupDocument2()
         {
-            const string tracePrefix = "ResolveDocument2: ";
+			const string tracePrefix = "LookupDocument2: ";
 
             // handle "not found", follow internal redirects, validate access, template
             // because these might loop, we have to have some sort of infinite loop detection 
@@ -240,10 +240,11 @@ namespace Umbraco.Web.Routing
                 if (!this.HasNode)
                 {
                     this.Is404 = true;
-                    Trace.TraceInformation("{0}No document, try notFound lookup", tracePrefix);
+                    Trace.TraceInformation("{0}No document, try last chance lookup", tracePrefix);
 
                     // if it fails then give up, there isn't much more that we can do
-					if (RoutingContext.LookupNotFound == null || !RoutingContext.LookupNotFound.TrySetDocument(this))
+					var lastChance = RoutingContext.DocumentLookupsResolver.DocumentLastChanceLookup;
+					if (lastChance == null || !lastChance.TrySetDocument(this))
                     {
                         Trace.TraceInformation("{0}Failed to find a document, give up", tracePrefix);
                         break;
@@ -266,7 +267,7 @@ namespace Umbraco.Web.Routing
 
                 // resolve template
                 if (this.HasNode)
-                    ResolveTemplate();
+                    LookupTemplate();
 
                 // loop while we don't have page, ie the redirect or access
                 // got us to nowhere and now we need to run the notFoundLookup again
@@ -383,9 +384,9 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Resolves a template for the current node.
         /// </summary>
-        void ResolveTemplate()
+        void LookupTemplate()
         {
-            const string tracePrefix = "ResolveTemplate: ";
+			const string tracePrefix = "LookupTemplate: ";
 
             if (this.Node == null)
                 throw new InvalidOperationException("There is no node.");
@@ -446,7 +447,7 @@ namespace Umbraco.Web.Routing
                     redirectId = -1;
                 string redirectUrl = "#";
                 if (redirectId > 0)
-					redirectUrl = RoutingContext.NiceUrlResolver.GetNiceUrl(redirectId);
+					redirectUrl = RoutingContext.NiceUrlProvider.GetNiceUrl(redirectId);
                 if (redirectUrl != "#")
                     this.RedirectUrl = redirectUrl;
             }

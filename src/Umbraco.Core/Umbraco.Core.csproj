@@ -48,6 +48,14 @@
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="LambdaExpressionCacheKey.cs" />
+    <Compile Include="Resolving\ManyWeightedResolved.cs" />
+    <Compile Include="Resolving\ManyWeightedResolverBase.cs" />
+    <Compile Include="Resolving\Resolution.cs" />
+    <Compile Include="Resolving\ResolutionWeightAttribute.cs" />
+    <Compile Include="Resolving\ResolverBase.cs" />
+    <Compile Include="Resolving\SingleResolved.cs" />
+    <Compile Include="Resolving\SingleResolverBase.cs" />
+    <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />
     <Compile Include="SystemUtilities.cs" />
     <Compile Include="TypeExtensions.cs" />

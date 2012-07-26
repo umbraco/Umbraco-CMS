@@ -355,10 +355,8 @@ namespace umbraco
         /// <returns>String with a friendly url from a node</returns>
         public static string NiceUrl(int nodeID)
         {
-        	return Umbraco.Web.UmbracoContext.Current
-				.DocumentRequest
-				.RoutingContext
-				.NiceUrlResolver.GetNiceUrl(nodeID);			
+			var niceUrlsProvider = Umbraco.Web.UmbracoContext.Current.DocumentRequest.RoutingContext.NiceUrlProvider;
+			return niceUrlsProvider.GetNiceUrl(nodeID);
         }
 
         /// <summary>
@@ -380,10 +378,8 @@ namespace umbraco
         /// <returns>String with a friendly url with full domain from a node</returns>
         public static string NiceUrlWithDomain(int nodeID)
         {
-			return Umbraco.Web.UmbracoContext.Current
-				.DocumentRequest
-				.RoutingContext
-				.NiceUrlResolver.GetNiceUrl(nodeID, Umbraco.Web.UmbracoContext.Current.UmbracoUrl, true);
+			var niceUrlsProvider = Umbraco.Web.UmbracoContext.Current.DocumentRequest.RoutingContext.NiceUrlProvider;
+			return niceUrlsProvider.GetNiceUrl(nodeID, Umbraco.Web.UmbracoContext.Current.UmbracoUrl, true);
         }
 
 

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Xml;
+using Umbraco.Core.Resolving;
 
 namespace Umbraco.Web.Routing
 {
@@ -10,7 +11,7 @@ namespace Umbraco.Web.Routing
     // at the moment aliases are not cleaned up into nice urls
     //
 
-    [RequestDocumentResolverWeight(50)]
+    [ResolutionWeight(50)]
     internal class ResolveByAlias : IRequestDocumentResolver
     {
 		static readonly TraceSource Trace = new TraceSource("ResolveByAlias");

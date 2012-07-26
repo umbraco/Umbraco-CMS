@@ -35,8 +35,11 @@ namespace Umbraco.Web
 					IsReady = true	// fixme
 				};
 
-			//create the route lookups singleton
-			RouteLookups.Current = new RouteLookups(ApplicationContext.Current.Plugins.ResolveLookups());
+			// create the resolvers
+			DocumentLookupsResolver.Current = new DocumentLookupsResolver(ApplicationContext.Current.Plugins.ResolveLookups(), new DefaultLastChanceLookup());
+			RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache());
+
+			Umbraco.Core.Resolving.Resolution.Freeze();
 
 			Trace.TraceInformation("AppDomain is initialized");
 		}
