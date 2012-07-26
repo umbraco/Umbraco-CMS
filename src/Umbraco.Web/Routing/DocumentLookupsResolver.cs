@@ -11,9 +11,13 @@ namespace Umbraco.Web.Routing
 {
 	class DocumentLookupsResolver : ResolverBase<DocumentLookupsResolver>
 	{
-		internal DocumentLookupsResolver(IEnumerable<IDocumentLookup> resolvers, IRequestDocumentLastChanceResolver lastChanceResolver)
+		internal DocumentLookupsResolver(IEnumerable<Type> resolvers, IRequestDocumentLastChanceResolver lastChanceResolver)
 		{
-			_resolvers.AddRange(resolvers);
+			//TODO: I've changed this to resolve types but the intances are not created yet!
+			// I've created a method on the PluginTypeResolver to create types: PluginTypesResolver.Current.CreateInstances<T>()
+			
+
+			_resolverTypes.AddRange(resolvers);
 			_lastChanceResolver.Value = lastChanceResolver;
 		}
 
@@ -31,14 +35,16 @@ namespace Umbraco.Web.Routing
 
 		#region Resolvers
 
+		private readonly List<Type> _resolverTypes = new List<Type>(); 
 		readonly ManyWeightedResolved<IDocumentLookup> _resolvers = new ManyWeightedResolved<IDocumentLookup>();
 
-		public IEnumerable<IDocumentLookup> RequestDocumentResolvers
+		public IEnumerable<IDocumentLookup> GetDocumentLookups
 		{
 			get { return _resolvers.Values; }
 		}
 
-		public ManyWeightedResolved<IDocumentLookup> RequestDocumentResolversResolution
+		//why do we have this?
+		public ManyWeightedResolved<IDocumentLookup> GetDocumentLookupResolution
 		{
 			get { return _resolvers; }
 		}

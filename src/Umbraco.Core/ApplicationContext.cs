@@ -17,10 +17,9 @@ namespace Umbraco.Core
     	/// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="pluginResolver"></param>
-        public ApplicationContext(PluginTypeResolver pluginResolver)
+        public ApplicationContext()
         {
-            PluginTypes = pluginResolver;
+         
         }
 
     	/// <summary>
@@ -45,10 +44,6 @@ namespace Umbraco.Core
             }
         }
 
-        /// <summary>
-        /// Gets the plugin resolver for the application
-        /// </summary>
-        public PluginTypeResolver PluginTypes { get; private set; }
 
         // notes
         //   GlobalSettings.ConfigurationStatus returns the value that's in the web.config, so it's the "configured version"

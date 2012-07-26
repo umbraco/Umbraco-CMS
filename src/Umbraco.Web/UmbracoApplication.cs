@@ -34,7 +34,7 @@ namespace Umbraco.Web
 			ClientDependency.Core.CompositeFiles.Providers.BaseCompositeFileProcessingProvider.UrlTypeDefault = ClientDependency.Core.CompositeFiles.Providers.CompositeUrlType.Base64QueryStrings;
 
 			//create the ApplicationContext
-			ApplicationContext.Current = new ApplicationContext(PluginTypeResolver.Current)
+			ApplicationContext.Current = new ApplicationContext()
 				{
 					IsReady = true	// fixme
 				};
@@ -43,7 +43,9 @@ namespace Umbraco.Web
 			ApplicationStartupHandler.RegisterHandlers();
 
 			// create the resolvers
-			DocumentLookupsResolver.Current = new DocumentLookupsResolver(ApplicationContext.Current.PluginTypes.ResolveLookups(), new ResolveLastChance());
+			DocumentLookupsResolver.Current = new DocumentLookupsResolver(
+				PluginTypeResolver.Current.ResolveLookups(), 
+				new ResolveLastChance());
 			RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache());
 
 			OnApplicationStarting(sender, e);

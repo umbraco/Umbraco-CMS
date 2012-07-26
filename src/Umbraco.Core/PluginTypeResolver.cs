@@ -18,7 +18,7 @@ namespace Umbraco.Core
 	/// This class can expose extension methods to resolve custom plugins
 	/// 
 	/// </remarks>
-	public class PluginTypeResolver
+	internal class PluginTypeResolver
 	{
 
 		private PluginTypeResolver()
@@ -49,6 +49,31 @@ namespace Umbraco.Core
 		internal readonly TypeFinder2 TypeFinder = new TypeFinder2();
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		private readonly HashSet<TypeList> _types = new HashSet<TypeList>();
+
+		/// <summary>
+		/// Used to create instances of the specified type based on the resolved/cached plugin types
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		internal IEnumerable<T> CreateInstances<T>()
+		{
+			var types = ResolveTypes<T>();
+			var instances = new List<T>();
+			foreach(var t in types)
+			{
+				try
+				{
+					var typeInstance = (T)Activator.CreateInstance(t);
+					instances.Add(typeInstance);
+				}
+				catch (Exception ex)
+				{
+					//TODO: Need to fix logging so this doesn't bork if no SQL connection
+					//Log.Add(LogTypes.Error, -1, "Error loading ILookup: " + ex.ToString());
+				}
+			}
+			return instances;
+		} 
 
 		/// <summary>
 		/// Generic method to find the specified type and cache the result

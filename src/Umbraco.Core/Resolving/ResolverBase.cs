@@ -6,6 +6,8 @@ namespace Umbraco.Core.Resolving
 	internal abstract class ResolverBase<TResolver> where TResolver : class
 	{
 		static TResolver _resolver;
+
+		//TODO: This is not correct, this will be the same lock for all ResolverBase classes!!
 		static readonly ReaderWriterLockSlim ResolversLock = new ReaderWriterLockSlim();
 
 		public static TResolver Current
