@@ -22,21 +22,15 @@ namespace Umbraco.Core
 	/// </summary>
 	public class TypeFinder2
 	{
-		private static readonly ConcurrentDictionary<Tuple<Type, Type>, bool> TypeCheckCache = new ConcurrentDictionary<Tuple<Type, Type>, bool>();
-		private static readonly ConcurrentDictionary<Type, bool> ValueTypeCache = new ConcurrentDictionary<Type, bool>();
-		private static readonly ConcurrentDictionary<Type, bool> ImplicitValueTypeCache = new ConcurrentDictionary<Type, bool>();
-		//private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache = new ConcurrentDictionary<Type, FieldInfo[]>();
-		//private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
+		
 		private static readonly ConcurrentBag<Assembly> LocalFilteredAssemblyCache = new ConcurrentBag<Assembly>();
 		private static readonly ReaderWriterLockSlim LocalFilteredAssemblyCacheLocker = new ReaderWriterLockSlim();
 		/// <summary>
 		/// Caches attributed assembly information so they don't have to be re-read
 		/// </summary>
 		private readonly AttributedAssemblyList _attributedAssemblies = new AttributedAssemblyList();
-
 		private static ReadOnlyCollection<Assembly> _allAssemblies = null;
 		private static ReadOnlyCollection<Assembly> _binFolderAssemblies = null;
-
 		private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
 		/// <summary>
@@ -57,6 +51,7 @@ namespace Umbraco.Core
 			{
 				using (new WriteLock(Locker))
 				{
+	
 					try
 					{
 						var isHosted = HttpContext.Current != null;
@@ -65,8 +60,7 @@ namespace Umbraco.Core
 						{
 							if (isHosted)
 							{
-								_allAssemblies = new ReadOnlyCollection<Assembly>(
-									BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToList());
+								_allAssemblies = new ReadOnlyCollection<Assembly>(BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToList());
 							}
 						}
 						catch (InvalidOperationException e)
@@ -76,6 +70,9 @@ namespace Umbraco.Core
 						}
 
 						_allAssemblies = _allAssemblies ?? new ReadOnlyCollection<Assembly>(AppDomain.CurrentDomain.GetAssemblies().ToList());
+
+						//here we are getting just the /bin folder assemblies, we may need to use these if we implement the App_Plugins
+						//stuff from v5.
 
 						var codeBase = Assembly.GetExecutingAssembly().CodeBase;
 						var uri = new Uri(codeBase);
@@ -87,95 +84,54 @@ namespace Umbraco.Core
 
 						var binFolderAssemblies = dllFiles.Select(AssemblyName.GetAssemblyName)
 							.Select(assemblyName =>
-								{
-									try
-									{
-										return _allAssemblies.FirstOrDefault(a => 
-											AssemblyName.ReferenceMatchesDefinition(a.GetName(), assemblyName));
-									}
-									catch (SecurityException)
-									{
-										return null;
-									}
-								})
+									_allAssemblies.FirstOrDefault(a =>
+																 AssemblyName.ReferenceMatchesDefinition(a.GetName(), assemblyName)))
 							.Where(locatedAssembly => locatedAssembly != null)
 							.ToList();
 
 						_binFolderAssemblies = new ReadOnlyCollection<Assembly>(binFolderAssemblies);
+
 					}
 					catch (InvalidOperationException e)
 					{
-						if (e.InnerException is SecurityException)
-						{
-							// Cannot scan bin folder in medium trust
-							_binFolderAssemblies = _allAssemblies;
-						}
+						if (!(e.InnerException is SecurityException))
+							throw;
+
+						_binFolderAssemblies = _allAssemblies;
 					}
 				}
 			}
 
 			return _allAssemblies;
-		}
-
+		}		
+		
 		/// <summary>
-		/// Returns all assemblies loaded in the bin folder that are not in GAC
-		/// </summary>
-		/// <returns></returns>
-		internal static IEnumerable<Assembly> GetBinFolderAssemblies()
-		{
-			if (_binFolderAssemblies == null) GetAllAssemblies();
-			return _binFolderAssemblies;
-		}
-
-		/// <summary>
-		/// Return a list of found assemblies for the AppDomain, excluding the GAC, the ones passed in and excluding the exclusion list filter
+		/// Return a list of found local Assemblies excluding the known assemblies we don't want to scan 
+		/// and exluding the ones passed in and excluding the exclusion list filter, the results of this are
+		/// cached for perforance reasons.
 		/// </summary>
 		/// <param name="excludeFromResults"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Assembly> GetFilteredDomainAssemblies(IEnumerable<Assembly> excludeFromResults = null)
-		{
-			if (excludeFromResults == null)
-				excludeFromResults = new List<Assembly>();
-
-			return GetLocalAssembliesWithKnownExclusions().Except(excludeFromResults);
-		}
-		
-		internal static IEnumerable<Assembly> GetLocalAssembliesWithKnownExclusions(IEnumerable<Assembly> excludeFromResults = null)
+		internal static IEnumerable<Assembly> GetAssembliesWithKnownExclusions(
+			IEnumerable<Assembly> excludeFromResults = null)
 		{
 			if (LocalFilteredAssemblyCache.Any()) return LocalFilteredAssemblyCache;
 			using (new WriteLock(LocalFilteredAssemblyCacheLocker))
 			{
-				var assemblies = GetAllAssemblies()
-					.Where(x => !x.GlobalAssemblyCache
-						&& !KnownAssemblyExclusionFilter.Any(f => x.FullName.StartsWith(f)));
+				var assemblies = GetFilteredAssemblies(excludeFromResults, KnownAssemblyExclusionFilter);
 				assemblies.ForEach(LocalFilteredAssemblyCache.Add);
 			}
 			return LocalFilteredAssemblyCache;
-		}
+		}		
 
 		/// <summary>
-		/// Return a list of found local Assemblies in the bin folder exluding the ones passed in and excluding the exclusion list filter
-		/// </summary>
-		/// <param name="excludeFromResults"></param>
-		/// <returns></returns>
-		internal static IEnumerable<Assembly> GetFilteredBinFolderAssemblies(IEnumerable<Assembly> excludeFromResults = null)
-		{
-			if (excludeFromResults == null)
-				excludeFromResults = new List<Assembly>();
-
-			return GetBinFolderAssemblies()
-				.Where(x => !excludeFromResults.Contains(x)
-							&& !x.GlobalAssemblyCache
-							&& !KnownAssemblyExclusionFilter.Any(f => x.FullName.StartsWith(f)));
-		}
-
-		/// <summary>
-		/// Return a list of found local Assemblies including plugins and exluding the ones passed in and excluding the exclusion list filter
+		/// Return a list of found local Assemblies and exluding the ones passed in and excluding the exclusion list filter
 		/// </summary>
 		/// <param name="excludeFromResults"></param>
 		/// <param name="exclusionFilter"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Assembly> GetFilteredLocalAssemblies(IEnumerable<Assembly> excludeFromResults = null,
+		private static IEnumerable<Assembly> GetFilteredAssemblies(
+			IEnumerable<Assembly> excludeFromResults = null, 
 			string[] exclusionFilter = null)
 		{
 			if (excludeFromResults == null)
@@ -232,55 +188,9 @@ namespace Umbraco.Core
                     "Examine."
                 };
 
-		/// <summary>
-		/// Determines whether the type <paramref name="implementation"/> is assignable from the specified implementation <typeparamref name="TContract"/>,
-		/// and caches the result across the application using a <see cref="ConcurrentDictionary{TKey,TValue}"/>.
-		/// </summary>
-		/// <typeparam name="TContract">The type of the contract.</typeparam>
-		/// <param name="implementation">The implementation.</param>
-		public static bool IsTypeAssignableFrom<TContract>(Type implementation)
-		{
-			return IsTypeAssignableFrom(typeof(TContract), implementation);
-		}
+		
 
-		/// <summary>
-		/// Determines whether the type <paramref name="implementation"/> is assignable from the specified implementation <typeparamref name="TContract"/>,
-		/// and caches the result across the application using a <see cref="ConcurrentDictionary{TKey,TValue}"/>.
-		/// </summary>
-		/// <param name="contract">The type of the contract.</param>
-		/// <param name="implementation">The implementation.</param>
-		/// <returns>
-		/// 	<c>true</c> if [is type assignable from] [the specified contract]; otherwise, <c>false</c>.
-		/// </returns>
-		public static bool IsTypeAssignableFrom(Type contract, Type implementation)
-		{
-			// NOTE The use of a Tuple<,> here is because its Equals / GetHashCode implementation is literally 10.5x faster than KeyValuePair<,>
-			return TypeCheckCache.GetOrAdd(new Tuple<Type, Type>(contract, implementation), x => x.Item1.IsAssignableFrom(x.Item2));
-		}
-
-		/// <summary>
-		/// A cached method to determine whether <paramref name="implementation"/> represents a value type.
-		/// </summary>
-		/// <param name="implementation">The implementation.</param>
-		public static bool IsValueType(Type implementation)
-		{
-			return ValueTypeCache.GetOrAdd(implementation, x => x.IsValueType || x.IsPrimitive);
-		}
-
-		/// <summary>
-		/// A cached method to determine whether <paramref name="implementation"/> is an implied value type (<see cref="Type.IsValueType"/>, <see cref="Type.IsEnum"/> or a string).
-		/// </summary>
-		/// <param name="implementation">The implementation.</param>
-		public static bool IsImplicitValueType(Type implementation)
-		{
-			return ImplicitValueTypeCache.GetOrAdd(implementation, x => IsValueType(implementation) || implementation.IsEnum || implementation == typeof(string));
-		}
-
-		public static bool IsTypeAssignableFrom<TContract>(object implementation)
-		{
-			if (implementation == null) throw new ArgumentNullException("implementation");
-			return IsTypeAssignableFrom<TContract>(implementation.GetType());
-		}
+		
 
 
 
@@ -308,7 +218,7 @@ namespace Umbraco.Core
 
 			//We must do a ToList() here because it is required to be serializable when using other app domains.
 			return _attributedAssemblies
-				.Where(x => x.PluginAttributeType.Equals(typeof(T))
+				.Where(x => x.PluginAttributeType == typeof(T)
 					&& assemblies.Select(y => y.FullName).Contains(x.Assembly.FullName))
 				.Select(x => x.Assembly)
 				.ToList();
@@ -349,7 +259,7 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		public IEnumerable<Type> FindClassesOfType<T>()
 		{
-			return FindClassesOfType<T>(GetFilteredLocalAssemblies(), true);
+			return FindClassesOfType<T>(GetAssembliesWithKnownExclusions(), true);
 		}
 
 		/// <summary>
@@ -441,7 +351,7 @@ namespace Umbraco.Core
 		public IEnumerable<Type> FindClassesWithAttribute<T>()
 			where T : Attribute
 		{
-			return FindClassesWithAttribute<T>(GetFilteredLocalAssemblies());
+			return FindClassesWithAttribute<T>(GetAssembliesWithKnownExclusions());
 		}
 
 		#region Internal Methods - For testing
@@ -480,6 +390,10 @@ namespace Umbraco.Core
 		#endregion
 
 		#region Internal Attributed Assembly class
+
+		//These can be removed once we implement the .hash file for caching assemblies that are found containing plugin types.
+		// Once that is done, remove these classes and remove the TypeFinder test: Benchmark_Finding_First_Type_In_Assemblies
+
 		private class AttributedAssembly
 		{
 			internal DirectoryInfo AssemblyFolder { get; set; }
@@ -496,8 +410,8 @@ namespace Umbraco.Core
 			/// <returns></returns>
 			internal bool IsRegistered<T>(DirectoryInfo folder)
 			{
-				return this.Where(x => x.PluginAttributeType == typeof(T)
-											  && x.AssemblyFolder.FullName.ToUpper() == folder.FullName.ToUpper()).Any();
+				return this.Any(x => x.PluginAttributeType == typeof(T)
+				                     && x.AssemblyFolder.FullName.ToUpper() == folder.FullName.ToUpper());
 			}
 
 			/// <summary>
@@ -508,9 +422,8 @@ namespace Umbraco.Core
 			/// <returns></returns>
 			internal bool IsRegistered<T>(Assembly assembly)
 			{
-				return this.Where(x => x.PluginAttributeType == typeof(T)
-									   && x.Assembly.FullName.ToUpper() == assembly.FullName.ToUpper())
-									   .Any();
+				return this.Any(x => x.PluginAttributeType == typeof(T)
+				                     && x.Assembly.FullName.ToUpper() == assembly.FullName.ToUpper());
 			}
 		}
 
@@ -553,7 +466,7 @@ namespace Umbraco.Core
 		{
 			return (from a in assemblies
 					from t in GetTypesWithFormattedException(a)
-					where !t.IsInterface && assignTypeFrom.IsAssignableFrom(t) && (onlyConcreteClasses ? (t.IsClass && !t.IsAbstract) : true)
+					where !t.IsInterface && assignTypeFrom.IsAssignableFrom(t) && (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))
 					select t).ToList();
 		}
 
@@ -591,7 +504,7 @@ namespace Umbraco.Core
 				try
 				{
 					foreach (Type t in
-						assembly.GetExportedTypes().Where(t => !t.IsInterface && assignTypeFrom.IsAssignableFrom(t) && (onlyConcreteClasses ? (t.IsClass && !t.IsAbstract) : true)))
+						assembly.GetExportedTypes().Where(t => !t.IsInterface && assignTypeFrom.IsAssignableFrom(t) && (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))))
 					{
 						//add the full type name and full assembly name                                  
 						result.Add(t.FullName, t.Assembly.FullName);
@@ -607,39 +520,6 @@ namespace Umbraco.Core
 		#endregion
 
 
-		///// <summary>
-		///// Gets (and caches) <see cref="FieldInfo"/> discoverable in the current <see cref="AppDomain"/> for a given <paramref name="type"/>.
-		///// </summary>
-		///// <param name="type">The source.</param>
-		///// <returns></returns>
-		//public static FieldInfo[] CachedDiscoverableFields(Type type)
-		//{
-		//    return GetFieldsCache.GetOrAdd(
-		//        type,
-		//        x => type
-		//                 .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-		//                 .Where(y => !y.IsInitOnly)
-		//                 .ToArray());
-		//}
-
-		///// <summary>
-		///// Gets (and caches) <see cref="PropertyInfo"/> discoverable in the current <see cref="AppDomain"/> for a given <paramref name="type"/>.
-		///// </summary>
-		///// <param name="type">The source.</param>
-		///// <param name="mustRead">true if the properties discovered are readable</param>
-		///// <param name="mustWrite">true if the properties discovered are writable</param>
-		///// <param name="includeIndexed">true if the properties discovered are indexable</param>
-		///// <returns></returns>
-		//public static PropertyInfo[] CachedDiscoverableProperties(Type type, bool mustRead = true, bool mustWrite = true, bool includeIndexed = false)
-		//{
-		//    return GetPropertiesCache.GetOrAdd(
-		//        new Tuple<Type, bool, bool, bool>(type, mustRead, mustWrite, includeIndexed),
-		//        x => type
-		//                 .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-		//                 .Where(y => (!mustRead || y.CanRead)
-		//                     && (!mustWrite || y.CanWrite)
-		//                     && (includeIndexed || !y.GetIndexParameters().Any()))
-		//                 .ToArray());
-		//}
+		
 	}
 }

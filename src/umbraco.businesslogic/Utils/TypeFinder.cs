@@ -218,6 +218,7 @@ namespace umbraco.BusinessLogic.Utils
 			return t => (type.IsAssignableFrom(t) && (onlyConcreteClasses ? (t.IsClass && !t.IsAbstract) : true));
 		}
 
+		[Obsolete("This method is no longer used and will be removed")]
 		public static IEnumerable<FileInfo> GetFilesByExtensions(this DirectoryInfo dir, bool searchSubdirs, params string[] extensions)
 		{
 			var allowedExtensions = new HashSet<string>(extensions, StringComparer.OrdinalIgnoreCase);
@@ -232,30 +233,10 @@ namespace umbraco.BusinessLogic.Utils
 			return returnedFiles;
 		}
 
+		[Obsolete("Use Umbraco.Core.SystemUtilities.GetCurrentTrustLevel() instead")]
 		public static AspNetHostingPermissionLevel GetCurrentTrustLevel()
 		{
-			foreach (AspNetHostingPermissionLevel trustLevel in
-					new AspNetHostingPermissionLevel[] {
-            AspNetHostingPermissionLevel.Unrestricted,
-            AspNetHostingPermissionLevel.High,
-            AspNetHostingPermissionLevel.Medium,
-            AspNetHostingPermissionLevel.Low,
-            AspNetHostingPermissionLevel.Minimal 
-        })
-			{
-				try
-				{
-					new AspNetHostingPermission(trustLevel).Demand();
-				}
-				catch (System.Security.SecurityException)
-				{
-					continue;
-				}
-
-				return trustLevel;
-			}
-
-			return AspNetHostingPermissionLevel.None;
+			return Umbraco.Core.SystemUtilities.GetCurrentTrustLevel();
 		}
 	}
 }

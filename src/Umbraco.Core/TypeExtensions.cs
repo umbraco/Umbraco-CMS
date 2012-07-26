@@ -156,7 +156,7 @@ namespace Umbraco.Core
 		/// </returns>
 		public static bool IsType<T>(this Type actualType)
 		{
-			return TypeFinder2.IsTypeAssignableFrom<T>(actualType);
+			return TypeHelper.IsTypeAssignableFrom<T>(actualType);
 		}
 
 		public static string GetCacheKeyFromParameters(this MemberInfo info)

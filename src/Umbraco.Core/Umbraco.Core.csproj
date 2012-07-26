@@ -49,8 +49,10 @@
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="LambdaExpressionCacheKey.cs" />
     <Compile Include="ReadLock.cs" />
+    <Compile Include="SystemUtilities.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="TypeFinder2.cs" />
+    <Compile Include="TypeHelper.cs" />
     <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="DelegateEqualityComparer.cs" />
     <Compile Include="EnumerableExtensions.cs" />
