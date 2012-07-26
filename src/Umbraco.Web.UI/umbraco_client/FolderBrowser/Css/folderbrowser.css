@@ -6,6 +6,86 @@
     left: 0;
 }
 
+.upload-overlay {
+    position: absolute;
+    top: 0; 
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: transparent url(../../modal/modalBackground.gif);
+    z-index: 1000;
+    display: none;
+}
+
+.upload-panel {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    margin: -200px 0 0 -200px;
+    border: solid 5px #ccc;
+    background: #fff;
+    padding: 20px;
+    width: 400px;
+    height: 400px;
+}
+
+.upload-panel h1 {
+    color: #ccc;
+}
+
+.upload-panel p {
+    color: #aaa;
+}
+
+.upload-panel .queued,
+.upload-panel .queued li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+}
+
+.upload-panel .queued {
+    display: block;
+    margin: 20px 0;
+    height: 220px;
+    overflow: auto;
+    overflow-y: scroll;
+}
+
+.upload-panel .queued li {
+    display: block;
+    background: transparent url(../../../umbraco/images/umbraco/mediaFile.gif) left center no-repeat;
+    padding: 2px 0 2px 20px;
+}
+
+.upload-panel .queued li span.label {
+    display: inline-block;
+    width: 150px;
+    overflow: hidden;
+}
+
+.upload-panel .queued li span.progress {
+    display: inline-block;
+    width: 180px;
+    border: solid 1px #e0e0e0;
+    overflow: hidden;
+    height: 1.5em;
+}
+
+.upload-panel .queued li span.progress span {
+    display: inline-block;
+    background: #6c3;
+    overflow: hidden;
+    height: 1.5em;
+}
+
+.upload-panel .queued li img {
+    margin-left: 5px;
+}
+
 .umbFolderBrowser .breadcrumb {
     margin: 20px 20px 15px;
     padding: 0 0 10px;
@@ -64,8 +144,27 @@
     box-shadow: 2px 2px 2px #e0e0e0;
 }
 
-.umbFolderBrowser .items li img {
+.umbFolderBrowser .img {
+    display: block;
+    background: #e0e0e0;
+    text-align: center;
     width: 100px;
     height: 100px;
     margin: 10px;
+}
+
+.umbFolderBrowser .img:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+}
+
+.umbFolderBrowser .img img {
+    display:inline;
+    display:inline-table;
+    display:inline-block;
+    vertical-align: middle;
+    max-width: 100px;
+    max-height: 100px;
 }

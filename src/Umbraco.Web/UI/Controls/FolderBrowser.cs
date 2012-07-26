@@ -15,6 +15,7 @@ namespace Umbraco.Web.UI.Controls
     [ClientDependency(ClientDependencyType.Javascript, "ui/base2.js", "UmbracoClient", Priority = 1)]
     [ClientDependency(ClientDependencyType.Javascript, "ui/knockout.js", "UmbracoClient", Priority = 2)]
     [ClientDependency(ClientDependencyType.Javascript, "ui/knockout.mapping.js", "UmbracoClient", Priority = 3)]
+    [ClientDependency(ClientDependencyType.Javascript, "FileUploader/js/jquery.fileUploader.js", "UmbracoClient", Priority = 3)]
     [ClientDependency(ClientDependencyType.Javascript, "FolderBrowser/js/folderbrowser.js", "UmbracoClient", Priority = 10)]
     [ToolboxData("<{0}:FolderBrowser runat=server></{0}:FolderBrowser>")]
     public class FolderBrowser : WebControl
@@ -111,7 +112,7 @@ namespace Umbraco.Web.UI.Controls
 
             // Create thumbnails container
             sb.Append("<ul class='items' data-bind='foreach: items'>" +
-                      "<li><a href='#'><img data-bind='attr: { src: ThumbnailUrl }' /><span data-bind='text: Name'></span></a></li>" +
+                      "<li><a data-bind='attr: { href: EditUrl }'><span class='img'><img data-bind='attr: { src: ThumbnailUrl }' /></span><span data-bind='text: Name'></span></a></li>" +
                       "</ul>");
 
             panel.Controls.Add(new LiteralControl(sb.ToString()));

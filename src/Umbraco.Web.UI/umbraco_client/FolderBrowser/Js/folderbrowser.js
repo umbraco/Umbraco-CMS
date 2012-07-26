@@ -45,7 +45,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             this._viewModel = $.extend({}, {
                 parent: this,
                 filterTerm: ko.observable(''),
-                items: ko.observableArray([])
+                items: ko.observableArray([]),
+                queued: ko.observableArray([])
             });
 
             this._viewModel.filterTerm.subscribe(function(newValue) {
@@ -53,15 +54,108 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             });
 
             // Inject the upload button into the toolbar
-            var button = $("<input id='fbUploadToolbarButton' type='image' src='images/editor/save.gif' onmouseover=\"this.className='editorIconOver'\" onmouseout=\"this.className='editorIcon'\" onmouseup=\"this.className='editorIconOver'\" onmousedown=\"this.className='editorIconDown'\" />");
+            var button = $("<input id='fbUploadToolbarButton' type='image' src='images/editor/upload.png' titl='Upload...' onmouseover=\"this.className='editorIconOver'\" onmouseout=\"this.className='editorIcon'\" onmouseup=\"this.className='editorIconOver'\" onmousedown=\"this.className='editorIconDown'\" />");
             button.click(function(e) {
                 e.preventDefault();
+                $(".upload-overlay").show();
             });
             
             $(".tabpage:first-child .menubar td[id$='tableContainerButtons'] .sl nobr").after(button);
 
+            // Inject the upload overlay
+            var instructions = 'draggable' in document.createElement('span')
+                ? "<h1>Drag files here to upload</h1> \
+                   <p>Or, click the button below to chose the items to upload</p>"
+                : "<h1>Click the browse button below to chose the items to upload</h1>";
+            
+            var overlay = $("<div class='upload-overlay'>" +
+                "<div class='upload-panel'>" +
+                instructions +
+                "<form action=\"/base/FolderBrowserService/Upload/" + this._parentId + "\" method=\"post\" enctype=\"multipart/form-data\">" +
+                "<input id='fileupload' type='file' name='file' multiple>" +
+                "</form>" +
+                "<ul class='queued' data-bind='foreach: queued'><li>" +
+                "<span class='label' data-bind='text: name'></span>" +
+                "<span class='progress'><span data-bind=\"style: { width: progress() + '%' }\"></span></span>" +
+                "<a href='' data-bind='click: cancel'><img src='images/delete.png' /></a>" +
+                "</li></ul>" +
+                "<button class='button upload' data-bind='enable: queued().length > 0'>Upload</button>" +
+                "<a href='#' class='cancel'>Cancel</a>" +
+                "</div>" +
+                "</div>");
+
+            $("body").prepend(overlay);
+
+            // Create uploader
+            $("#fileupload").fileUploader({
+                dropTarget: ".upload-overlay",
+                onAdd: function (data) {
+
+                    // Create a bindable version of the data object
+                    var file = {
+                        uploaderId: data.uploaderId,
+                        itemId: data.itemId,
+                        name: data.name,
+                        size: data.size,
+                        progress: ko.observable(data.progress),
+                        cancel: function () {
+                            $("#fileupload").fileUploader("cancelItem", this.itemId);
+                        }
+                    };
+                    
+                    // Store item back in context for easy access later
+                    data.context = file; 
+                    
+                    // Push bindable item into queue
+                    _this._viewModel.queued.push(file);
+                },
+                onDone: function (data) {
+                    switch(data.status) {
+                        case 'success':
+                            //_this._viewModel.queued.remove(data.context);
+                            break;
+                        case 'error':
+                            _this._viewModel.queued.remove(data.context);
+                            break;
+                        case 'canceled':
+                            _this._viewModel.queued.remove(data.context);
+                            break;
+                    }
+                },
+                onProgress: function(data) {
+                    data.context.progress(data.progress);
+                }
+            });
+            
+            // Hook up uploader buttons
+            $(".upload-overlay .upload").click(function(e) {
+                e.preventDefault();
+                $("#fileupload").fileUploader("uploadAll");
+            });
+            
+            $(".upload-overlay .cancel").click(function (e) {
+                e.preventDefault();
+                $("#fileupload").fileUploader("cancelAll");
+            });
+
+            // Listen for drag events
+            $(".umbFolderBrowser").live('dragenter dragover', function (e) {
+                $(".upload-overlay").show();
+            });
+            
+            $(".upload-overlay").live('dragleave dragexit', function (e) {
+                $(this).hide();
+            }).click(function() {
+                $(this).hide();
+            });
+
+            $(".upload-panel").click(function(e) {
+                e.stopPropagation();
+            });
+
             // Bind the viewmodel
             ko.applyBindings(this._viewModel, el);
+            ko.applyBindings(this._viewModel, overlay.get(0));
             
             // Grab children media items
             this._getChildNodes();

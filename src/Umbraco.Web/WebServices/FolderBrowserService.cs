@@ -17,12 +17,6 @@ namespace Umbraco.Web.WebServices
     [RestExtension("FolderBrowserService")]
     public class FolderBrowserService
     {
-        //[RestExtensionMethod(returnXml = false)]
-        //public static string GetChildNodes(int parentId)
-        //{
-        //    return GetChildNodes(parentId, "");
-        //}
-
         [RestExtensionMethod(returnXml = false)]
         public static string GetChildNodes(int parentId, string filterTerm)
         {
@@ -57,6 +51,7 @@ namespace Umbraco.Web.WebServices
                     Id = child.Id,
                     Name = child.Text,
                     MediaTypeAlias = child.ContentType.Alias,
+                    EditUrl = string.Format("editMedia.aspx?id={0}", child.Id),
                     FileUrl = fileUrl,
                     ThumbnailUrl = !string.IsNullOrEmpty(thumbUrl) 
                         ? thumbUrl 
@@ -65,6 +60,14 @@ namespace Umbraco.Web.WebServices
             }
 
             return new JavaScriptSerializer().Serialize(data);
+        }
+
+        [RestExtensionMethod(returnXml = false)]
+        public static string Upload(int parentId)
+        {
+            return new JavaScriptSerializer().Serialize(new {
+                success = true 
+            });
         }
     }
 }
