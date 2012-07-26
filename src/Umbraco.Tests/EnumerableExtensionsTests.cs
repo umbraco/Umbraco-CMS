@@ -4,13 +4,33 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Tests;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Resolving;
 
 namespace Umbraco.Tests
 {
+	[TestFixture]
+	public class MultipleResolverBaseTests
+	{
 
-	#region Used for benchmark test: Benchmark_Finding_First_Type_In_Assemblies
+		internal class MyItemsResolver : MultipleResolverBase<MyItemsResolver, object>
+		{
+			public MyItemsResolver(IEnumerable<object> initItems)
+			{
+				foreach(var i in initItems)
+				{
+					Add(i);
+				}
+			}
 
-	#endregion
+			public IEnumerable<object> MyItems
+			{
+				get { return Values; }
+			}
+		}
+
+
+	}
+
 
 	[TestFixture]
     public class EnumerableExtensionsTests

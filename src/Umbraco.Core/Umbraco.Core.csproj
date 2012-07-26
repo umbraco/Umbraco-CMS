@@ -50,6 +50,7 @@
     <Compile Include="LambdaExpressionCacheKey.cs" />
     <Compile Include="Resolving\ManyWeightedResolved.cs" />
     <Compile Include="Resolving\ManyWeightedResolverBase.cs" />
+    <Compile Include="Resolving\MultipleResolverBase.cs" />
     <Compile Include="Resolving\Resolution.cs" />
     <Compile Include="Resolving\ResolutionWeightAttribute.cs" />
     <Compile Include="Resolving\ResolverBase.cs" />
