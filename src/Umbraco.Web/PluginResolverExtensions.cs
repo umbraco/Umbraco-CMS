@@ -29,7 +29,8 @@ namespace Umbraco.Web
 				{
 					if (_lookups == null)
 					{
-						var lookupTypes = TypeFinder.FindClassesOfType<IRequestDocumentResolver>();
+						var typeFinder = new TypeFinder2();
+						var lookupTypes = typeFinder.FindClassesOfType<IRequestDocumentResolver>();
 						var lookups = new List<IRequestDocumentResolver>();
 						foreach (var l in lookupTypes)
 						{

@@ -143,10 +143,11 @@ namespace umbraco.cms.presentation.Trees
             if (this.Count > 0)
                 return;
 
-            List<Type> foundITrees = TypeFinder.FindClassesOfType<ITree>();
+        	var typeFinder = new Umbraco.Core.TypeFinder2();
+			var foundITrees = typeFinder.FindClassesOfType<ITree>();
 
             ApplicationTree[] objTrees = ApplicationTree.getAll();
-            List<ApplicationTree> appTrees = new List<ApplicationTree>();
+            var appTrees = new List<ApplicationTree>();
             appTrees.AddRange(objTrees);
 
             List<Application> apps = Application.getAll();

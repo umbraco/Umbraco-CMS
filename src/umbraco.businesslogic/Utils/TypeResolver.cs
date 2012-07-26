@@ -107,7 +107,7 @@ namespace umbraco.BusinessLogic.Utils
 
                     if (assembly != null)
                     {
-                        foreach (Type t in assembly.GetTypes())
+                        foreach (Type t in assembly.GetExportedTypes())
                         {
                             if (!t.IsInterface && assignTypeFrom.IsAssignableFrom(t))
                                 result.Add(t.AssemblyQualifiedName);
@@ -130,7 +130,7 @@ namespace umbraco.BusinessLogic.Utils
 
                         Log.Add(LogTypes.Debug, -1, "assembly " + asm.ToString()  );
                         if (asm != null) {
-                            foreach (Type t in asm.GetTypes()) {
+                            foreach (Type t in asm.GetExportedTypes()) {
                                 if (!t.IsInterface && assignTypeFrom.IsAssignableFrom(t))
                                     result.Add(t.AssemblyQualifiedName);
                             }

@@ -22,8 +22,8 @@ namespace umbraco.businesslogic
         {
             if (!GlobalSettings.Configured)
                 return;
-
-            var types = TypeFinder.FindClassesOfType<IApplicationStartupHandler>();
+			var typeFinder = new Umbraco.Core.TypeFinder2();
+			var types = typeFinder.FindClassesOfType<IApplicationStartupHandler>();
 
             foreach (var t in types)
             {

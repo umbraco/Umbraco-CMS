@@ -19,7 +19,8 @@ namespace umbraco.cms.businesslogic.media
 
         private static void Initialize()
         {
-            var types = TypeFinder.FindClassesOfType<IMediaFactory>();
+        	var typeFinder = new Umbraco.Core.TypeFinder2();
+			var types = typeFinder.FindClassesOfType<IMediaFactory>();
 
             foreach (var t in types)
             {

@@ -34,10 +34,11 @@ namespace umbraco.presentation.cache
 
         private static void Initialize()
         {
-            List<Type> types = TypeFinder.FindClassesOfType<ICacheRefresher>();
-            foreach (Type t in types)
+        	var typeFinder = new Umbraco.Core.TypeFinder2();
+			var types = typeFinder.FindClassesOfType<ICacheRefresher>();
+            foreach (var t in types)
             {
-                ICacheRefresher typeInstance = Activator.CreateInstance(t) as ICacheRefresher;
+                var typeInstance = Activator.CreateInstance(t) as ICacheRefresher;
                 if (typeInstance != null)
                     _refreshers.Add(typeInstance.UniqueIdentifier, t);
             }

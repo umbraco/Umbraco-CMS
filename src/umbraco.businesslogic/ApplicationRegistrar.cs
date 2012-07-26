@@ -29,7 +29,8 @@ namespace umbraco.BusinessLogic
         public ApplicationRegistrar()
         {
             // Load all Applications by attribute and add them to the XML config
-            var types = TypeFinder.FindClassesOfType<IApplication>()
+        	var typeFinder = new Umbraco.Core.TypeFinder2();
+			var types = typeFinder.FindClassesOfType<IApplication>()
                 .Where(x => x.GetCustomAttributes(typeof(ApplicationAttribute), false).Any());
 
             var attrs = types.Select(x => (ApplicationAttribute)x.GetCustomAttributes(typeof(ApplicationAttribute), false).Single())

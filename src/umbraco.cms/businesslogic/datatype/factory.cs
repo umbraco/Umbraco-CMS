@@ -83,13 +83,14 @@ namespace umbraco.cms.businesslogic.datatype.controls
         private static void Initialize()
         {
             // Get all datatypes from interface
-            List<Type> types = TypeFinder.FindClassesOfType<IDataType>();
-            getDataTypes(types);
+        	var typeFinder = new Umbraco.Core.TypeFinder2();
+			var types = typeFinder.FindClassesOfType<IDataType>();
+            GetDataTypes(types);
         }
 
-        private static void getDataTypes(List<Type> types)
+        private static void GetDataTypes(IEnumerable<Type> types)
         {
-            foreach (Type t in types)
+            foreach (var t in types)
             {
                 IDataType typeInstance = null;
                 try

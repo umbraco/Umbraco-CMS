@@ -124,6 +124,10 @@
     <Compile Include="RazorCore\RazorMacroEngine.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\umbraco.editorControls\umbraco.editorControls.csproj">
       <Project>{255F5DF1-4E43-4758-AC05-7A0B68EB021B}</Project>
       <Name>umbraco.editorControls</Name>
