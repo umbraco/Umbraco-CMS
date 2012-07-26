@@ -7,7 +7,7 @@ namespace Umbraco.Core.Resolving
 {
 	// notes: nothing in Resolving is thread-safe because everything should happen when the app is starting
 
-	public class Resolution
+	internal class Resolution
 	{
 		public static event EventHandler Freezing;
 		public static event EventHandler Frozen;

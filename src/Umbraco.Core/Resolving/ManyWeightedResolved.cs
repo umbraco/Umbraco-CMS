@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Umbraco.Core.Resolving
 {
-	public class ManyWeightedResolved<TResolved>
+	internal class ManyWeightedResolved<TResolved>
 	{
 		List<TResolved> _resolved = new List<TResolved>();
 		Dictionary<Type, int> _weights = new Dictionary<Type, int>();

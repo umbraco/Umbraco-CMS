@@ -5,9 +5,10 @@ using System.Text;
 
 namespace Umbraco.Core.Resolving
 {
-	public abstract class ManyWeightedResolverBase<TResolver, TResolved> : ResolverBase<TResolver>
+	internal abstract class ManyWeightedResolverBase<TResolver, TResolved> : ResolverBase<TResolver> 
+		where TResolver : class
 	{
-		ManyWeightedResolved<TResolved> _resolved;
+		readonly ManyWeightedResolved<TResolved> _resolved;
 
 		protected ManyWeightedResolverBase()
 		{

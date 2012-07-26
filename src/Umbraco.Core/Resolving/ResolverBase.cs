@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Umbraco.Core.Resolving
 {
-	public abstract class ResolverBase<TResolver>
+	internal abstract class ResolverBase<TResolver> where TResolver : class
 	{
 		static TResolver _resolver;
 		static readonly ReaderWriterLockSlim ResolversLock = new ReaderWriterLockSlim();

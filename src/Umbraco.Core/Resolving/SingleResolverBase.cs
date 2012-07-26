@@ -2,10 +2,11 @@
 
 namespace Umbraco.Core.Resolving
 {
-	public abstract class SingleResolverBase<TResolver, TResolved> : ResolverBase<TResolver>
+	internal abstract class SingleResolverBase<TResolver, TResolved> : ResolverBase<TResolver> 
+		where TResolver : class
 	{
 		TResolved _resolved;
-		bool _canBeNull;
+		readonly bool _canBeNull;
 
 		protected SingleResolverBase()
 			: this(false)

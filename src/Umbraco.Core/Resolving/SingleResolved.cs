@@ -2,10 +2,10 @@
 
 namespace Umbraco.Core.Resolving
 {
-	public class SingleResolved<TResolved>
+	internal class SingleResolved<TResolved> where TResolved : class
 	{
 		TResolved _resolved;
-		bool _canBeNull;
+		readonly bool _canBeNull;
 
 		public SingleResolved()
 			: this(false)
