@@ -20,7 +20,6 @@ using umbraco.uicontrols;
 
 namespace Umbraco.Tests
 {
-
 	/// <summary>
 	/// Full Trust benchmark tests for typefinder and the old typefinder
 	/// </summary>

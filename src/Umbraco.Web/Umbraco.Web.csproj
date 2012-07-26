@@ -243,7 +243,7 @@
     <Compile Include="Routing\IRequestDocumentLastChanceResolver.cs" />
     <Compile Include="Routing\IRequestDocumentResolver.cs" />
     <Compile Include="Routing\NiceUrlProvider.cs" />
-    <Compile Include="PluginResolverExtensions.cs" />
+    <Compile Include="PluginTypeResolverExtensions.cs" />
     <Compile Include="Routing\Domains.cs" />
     <Compile Include="Routing\DocumentLookupsResolver.cs" />
     <Compile Include="Routing\DocumentRequest.cs" />

@@ -149,6 +149,7 @@
     <Compile Include="ApplicationTree.cs" />
     <Compile Include="ApplicationTreeRegistrar.cs" />
     <Compile Include="DefaultApps.cs" />
+    <Compile Include="PluginTypeResolverExtensions.cs" />
     <Compile Include="TreeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

@@ -49,6 +49,8 @@
     <Compile Include="BusinessLogic\ApplicationTest.cs" />
     <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
     <Compile Include="BusinessLogic\BaseTest.cs" />
+    <Compile Include="PluginTypeResolverExtensions.cs" />
+    <Compile Include="PluginTypeResolverTests.cs" />
     <Compile Include="TestHelper.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
     <Compile Include="PartialTrust\AbstractPartialTrustFixture.cs" />
