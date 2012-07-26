@@ -36,7 +36,7 @@ namespace Umbraco.Web
 				};
 
 			// create the resolvers
-			RequestDocumentResolversResolver.Current = new RequestDocumentResolversResolver(ApplicationContext.Current.Plugins.ResolveLookups(), new ResolveLastChance());
+			DocumentLookupsResolver.Current = new DocumentLookupsResolver(ApplicationContext.Current.Plugins.ResolveLookups(), new DefaultLastChanceLookup());
 			RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache());
 
 			Umbraco.Core.Resolving.Resolution.Freeze();
