@@ -155,7 +155,7 @@ namespace Umbraco.Web.Routing
             Trace.TraceInformation("{0}Uri=\"{1}\"", tracePrefix, this.Uri);
 
             // try to find a domain matching the current request
-			var domainAndUri = Domains.ApplicableDomains(Domain.GetDomains(), RoutingContext.UmbracoContext.UmbracoUrl, false);
+			var domainAndUri = Domains.DomainMatch(Domain.GetDomains(), RoutingContext.UmbracoContext.UmbracoUrl, false);
 
             // handle domain
 			if (domainAndUri != null)
