@@ -202,7 +202,7 @@ namespace Umbraco.Web.Routing
             // the first successful resolver, if any, will set this.Node, and may also set this.Template
             // some lookups may implement caching
             Trace.TraceInformation("{0}Begin resolvers", tracePrefix);
-			var resolvers = RoutingContext.RouteLookups.GetLookups();
+			var resolvers = RoutingContext.RequestDocumentResolversResolver.RequestDocumentResolvers;
         	resolvers.Any(resolver => resolver.TrySetDocument(this));
             Trace.TraceInformation("{0}End resolvers, {1}", tracePrefix, (this.HasNode ? "a document was found" : "no document was found"));
 
@@ -243,7 +243,8 @@ namespace Umbraco.Web.Routing
                     Trace.TraceInformation("{0}No document, try notFound lookup", tracePrefix);
 
                     // if it fails then give up, there isn't much more that we can do
-					if (RoutingContext.LookupNotFound == null || !RoutingContext.LookupNotFound.TrySetDocument(this))
+					var lastChance = RoutingContext.RequestDocumentResolversResolver.RequestDocumentLastChanceResolver;
+					if (lastChance == null || !lastChance.TrySetDocument(this))
                     {
                         Trace.TraceInformation("{0}Failed to find a document, give up", tracePrefix);
                         break;
@@ -446,7 +447,7 @@ namespace Umbraco.Web.Routing
                     redirectId = -1;
                 string redirectUrl = "#";
                 if (redirectId > 0)
-					redirectUrl = RoutingContext.NiceUrlResolver.GetNiceUrl(redirectId);
+					redirectUrl = RoutingContext.NiceUrlProvider.GetNiceUrl(redirectId);
                 if (redirectUrl != "#")
                     this.RedirectUrl = redirectUrl;
             }

@@ -45,7 +45,7 @@ namespace Umbraco.Web
             var umbracoContext = new UmbracoContext(
 				new HttpContextWrapper(httpContext), 
 				ApplicationContext.Current,
-				 RoutesCache.Current.GetProvider());
+				 RoutesCacheResolver.Current.RoutesCache);
             UmbracoContext.Current = umbracoContext;
 
 			// NO!
@@ -54,12 +54,11 @@ namespace Umbraco.Web
             //create a content store
             var contentStore = new ContentStore(umbracoContext);            
             //create the nice urls
-            var niceUrls = new NiceUrlResolver(contentStore, umbracoContext);
+            var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
             //create the RoutingContext (one per http request)
         	var routingContext = new RoutingContext(
         		umbracoContext,
-        		RouteLookups.Current,
-        		new ResolveLastChance(),
+        		RequestDocumentResolversResolver.Current,
         		contentStore,
         		niceUrls);
 			// NOT HERE BUT SEE **THERE** BELOW

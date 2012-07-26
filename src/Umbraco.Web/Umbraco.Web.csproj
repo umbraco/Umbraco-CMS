@@ -240,10 +240,10 @@
     <Compile Include="ContentStore.cs" />
     <Compile Include="LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
-    <Compile Include="NiceUrlResolver.cs" />
+    <Compile Include="Routing\NiceUrlProvider.cs" />
     <Compile Include="PluginResolverExtensions.cs" />
     <Compile Include="Routing\Domains.cs" />
-    <Compile Include="Routing\RouteLookups.cs" />
+    <Compile Include="Routing\RequestDocumentResolversResolver.cs" />
     <Compile Include="Routing\DocumentRequest.cs" />
     <Compile Include="Routing\IRequestDocumentResolver.cs" />
     <Compile Include="Routing\IRequestDocumentLastChanceResolver.cs" />
@@ -254,9 +254,8 @@
     <Compile Include="Routing\ResolveByNiceUrlAndTemplate.cs" />
     <Compile Include="Routing\ResolveByProfile.cs" />
     <Compile Include="Routing\ResolveLastChance.cs" />
-    <Compile Include="Routing\RequestDocumentResolverWeightAttribute.cs" />
     <Compile Include="Routing\DefaultRoutesCache.cs" />
-    <Compile Include="Routing\RoutesCache.cs" />
+    <Compile Include="Routing\RoutesCacheResolver.cs" />
     <Compile Include="Routing\RoutingContext.cs" />
     <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
     <Compile Include="umbraco.presentation\install\steps\database.ascx.cs">
@@ -1814,7 +1813,9 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\Preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\controls\passwordChanger.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx" />
-    <Content Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx" />
+    <Content Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\DLRScripting.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\Images\ImageViewer.ascx" />

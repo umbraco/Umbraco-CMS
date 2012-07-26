@@ -12,22 +12,19 @@ namespace Umbraco.Web.Routing
     {
         public RoutingContext(
 			UmbracoContext umbracoContext,
-            RouteLookups lookups,
-            IRequestDocumentLastChanceResolver lookupNotFound,
+			RequestDocumentResolversResolver requestDocumentResolversResolver,
             ContentStore contentStore,
-			NiceUrlResolver niceUrlResolver)
+			NiceUrlProvider niceUrlResolver)
         {
-        	UmbracoContext = umbracoContext;
-        	RouteLookups = lookups;
-            LookupNotFound = lookupNotFound;
-            ContentStore = contentStore;
-        	NiceUrlResolver = niceUrlResolver;
+        	this.UmbracoContext = umbracoContext;
+			this.RequestDocumentResolversResolver = requestDocumentResolversResolver;
+            this.ContentStore = contentStore;
+        	this.NiceUrlProvider = niceUrlResolver;
         }
 
 		public UmbracoContext UmbracoContext { get; private set; }
-		public RouteLookups RouteLookups { get; private set; }
-    	public IRequestDocumentLastChanceResolver LookupNotFound { get; private set; }
+		public RequestDocumentResolversResolver RequestDocumentResolversResolver { get; private set; }
         public ContentStore ContentStore { get; private set; }
-		public NiceUrlResolver NiceUrlResolver { get; private set; }
+		public NiceUrlProvider NiceUrlProvider { get; private set; }
     }
 }

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Xml;
+using Umbraco.Core.Resolving;
 using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Web.Routing
@@ -8,7 +9,7 @@ namespace Umbraco.Web.Routing
     // handles /foo/bar/<template> where <template> is a valid template alias
     // and /foo/bar the nice url of a document
     //
-    [RequestDocumentResolverWeight(30)]
+    [ResolutionWeight(30)]
     internal class ResolveByNiceUrlAndTemplate : ResolveByNiceUrl, IRequestDocumentResolver
     {
 		static readonly TraceSource Trace = new TraceSource("ResolveByNiceUrlAndTemplate");		

@@ -10,14 +10,14 @@ using umbraco;
 using umbraco.IO;
 using umbraco.cms.businesslogic.web;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.Routing
 {
 	/// <summary>
 	/// Resolves NiceUrls for a given node id
 	/// </summary>
-    internal class NiceUrlResolver
+    internal class NiceUrlProvider
     {
-		public NiceUrlResolver(ContentStore contentStore, UmbracoContext umbracoContext)
+		public NiceUrlProvider(ContentStore contentStore, UmbracoContext umbracoContext)
         {
             _umbracoContext = umbracoContext;
             _contentStore = contentStore;
@@ -31,11 +31,25 @@ namespace Umbraco.Web
 
 		#region GetNiceUrl
 
+		/// <summary>
+		/// Gets the nice url of a node.
+		/// </summary>
+		/// <param name="nodeId">The node id.</param>
+		/// <returns>The nice url for the node.</returns>
+		/// <remarks>The url is absolute or relative depending on the current url.</remarks>
 		public string GetNiceUrl(int nodeId)
 		{
 			return GetNiceUrl(nodeId, _umbracoContext.UmbracoUrl, false);
 		}
 
+		/// <summary>
+		/// Gets the nice url of a node.
+		/// </summary>
+		/// <param name="nodeId">The node id.</param>
+		/// <param name="current">The current url.</param>
+		/// <param name="absolute">A value indicating whether the url should be absolute in any case.</param>
+		/// <returns>The nice url for the node.</returns>
+		/// <remarks>The url is absolute or relative depending on the current url, unless absolute is true, and then it is always absolute.</remarks>
 		public string GetNiceUrl(int nodeId, Uri current, bool absolute)
         {
         	string path;
@@ -84,6 +98,19 @@ namespace Umbraco.Web
 			}
 
 			return AssembleUrl(domainUri, path, current, absolute).ToString();
+		}
+
+		/// <summary>
+		/// Gets the nice urls of a node.
+		/// </summary>
+		/// <param name="nodeId">The node id.</param>
+		/// <returns>An enumeration of all valid urls for the node.</returns>
+		/// <remarks>The urls are absolute. A node can have more than one url if more than one domain is defined.</remarks>
+		public IEnumerable<string> GetNiceUrls(int nodeId)
+		{
+			// fixme - to be implemented
+			// this is for editContent.aspx which currently has its own, highly buggy, implementation of NiceUrl...
+			throw new NotImplementedException();
 		}
 
 		Uri AssembleUrl(Uri domain, string path, Uri current, bool absolute)

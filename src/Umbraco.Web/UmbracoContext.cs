@@ -132,7 +132,7 @@ namespace Umbraco.Web
 			set
 			{
 				_requestUrl = value;
-				this.UmbracoUrl = NiceUrlResolver.UriToUmbraco(_requestUrl);
+				this.UmbracoUrl = NiceUrlProvider.UriToUmbraco(_requestUrl);
 			}
 		}
 

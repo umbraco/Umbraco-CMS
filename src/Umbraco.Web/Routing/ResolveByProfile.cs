@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Xml;
+using Umbraco.Core.Resolving;
 using umbraco;
 
 namespace Umbraco.Web.Routing
@@ -11,7 +12,7 @@ namespace Umbraco.Web.Routing
     //
     // we're keeping it here only for backward compatibility.
     //
-    [RequestDocumentResolverWeight(40)]
+    [ResolutionWeight(40)]
     internal class ResolveByProfile : ResolveByNiceUrl, IRequestDocumentResolver
     {
 		static readonly TraceSource Trace = new TraceSource("ResolveByProfile");		

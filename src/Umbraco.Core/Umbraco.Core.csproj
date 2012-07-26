@@ -45,6 +45,14 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationContext.cs" />
+    <Compile Include="Resolving\ManyWeightedResolved.cs" />
+    <Compile Include="Resolving\ManyWeightedResolverBase.cs" />
+    <Compile Include="Resolving\Resolution.cs" />
+    <Compile Include="Resolving\ResolutionWeightAttribute.cs" />
+    <Compile Include="Resolving\ResolverBase.cs" />
+    <Compile Include="Resolving\SingleResolved.cs" />
+    <Compile Include="Resolving\SingleResolverBase.cs" />
+    <Compile Include="TypeExtensions.cs" />
     <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="ReadLock.cs" />
     <Compile Include="DelegateEqualityComparer.cs" />
@@ -63,6 +71,7 @@
       <Name>umbraco.businesslogic</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

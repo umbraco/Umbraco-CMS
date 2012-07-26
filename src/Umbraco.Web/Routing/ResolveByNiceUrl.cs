@@ -1,12 +1,13 @@
 using System.Diagnostics;
 using System.Xml;
+using Umbraco.Core.Resolving;
 
 namespace Umbraco.Web.Routing
 {
     // handles "/foo/bar" where "/foo/bar" is the path to a document
     //
 
-    [RequestDocumentResolverWeight(10)]
+    [ResolutionWeight(10)]
     internal class ResolveByNiceUrl : IRequestDocumentResolver
     {
 		static readonly TraceSource Trace = new TraceSource("ResolveByNiceUrl");

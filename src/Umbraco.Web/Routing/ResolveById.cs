@@ -1,13 +1,14 @@
 using System;
 using System.Diagnostics;
 using System.Xml;
+using Umbraco.Core.Resolving;
 
 namespace Umbraco.Web.Routing
 {
 
     // handles /1234 where 1234 is the id of a document
     //
-    [RequestDocumentResolverWeight(20)]
+    [ResolutionWeight(20)]
     internal class ResolveById : IRequestDocumentResolver
     {
 		static readonly TraceSource Trace = new TraceSource("ResolveById");
