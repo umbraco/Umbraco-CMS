@@ -3,7 +3,8 @@
 namespace Umbraco.Core.Resolving
 {
 	internal abstract class SingleResolverBase<TResolver, TResolved> : ResolverBase<TResolver> 
-		where TResolver : class
+		where TResolver : class 
+		where TResolved : class
 	{
 		TResolved _resolved;
 		readonly bool _canBeNull;
