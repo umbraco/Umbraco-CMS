@@ -30,7 +30,8 @@ namespace umbraco.BusinessLogic
         public ApplicationTreeRegistrar()
         {
             // Load all Applications by attribute and add them to the XML config
-            var types = TypeFinder.FindClassesOfType<ITree>()
+			var typeFinder = new Umbraco.Core.TypeFinder2();
+			var types = typeFinder.FindClassesOfType<ITree>()
                 .Where(x => x.GetCustomAttributes(typeof(TreeAttribute), false).Any());
 
             var items = types.Select(x => new Tuple<Type, TreeAttribute>(x,

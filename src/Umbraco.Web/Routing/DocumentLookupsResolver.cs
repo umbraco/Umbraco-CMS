@@ -19,15 +19,19 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		/// <param name="lookups">The document lookups.</param>
 		/// <param name="lastChanceLookup">The document last chance lookup.</param>
-		internal DocumentLookupsResolver(IEnumerable<IDocumentLookup> lookups, IDocumentLastChanceLookup lastChanceLookup)
+		internal DocumentLookupsResolver(IEnumerable<Type> lookupTypes, IDocumentLastChanceLookup lastChanceLookup)
 		{
-			_lookups.AddRange(lookups);
+			//TODO: I've changed this to resolve types but the intances are not created yet!
+			// I've created a method on the PluginTypeResolver to create types: PluginTypesResolver.Current.CreateInstances<T>()
+			
+
+			_lookupTypes.AddRange(lookupsTypes);
 			_lastChanceLookup.Value = lastChanceLookup;
 		}
 
 		#region LastChanceLookup
 
-		SingleResolved<IDocumentLastChanceLookup> _lastChanceLookup = new SingleResolved<IDocumentLastChanceLookup>(true);
+		readonly SingleResolved<IDocumentLastChanceLookup> _lastChanceLookup = new SingleResolved<IDocumentLastChanceLookup>(true);
 
 		/// <summary>
 		/// Gets or sets the <see cref="IDocumentLastChanceLookup"/> implementation.
@@ -42,16 +46,18 @@ namespace Umbraco.Web.Routing
 
 		#region Lookups
 
-		ManyWeightedResolved<IDocumentLookup> _lookups = new ManyWeightedResolved<IDocumentLookup>();
+		private readonly List<Type> _resolverTypes = new List<Type>(); 
+		readonly ManyWeightedResolved<IDocumentLookup> _lookups = new ManyWeightedResolved<IDocumentLookup>();
 
 		/// <summary>
 		/// Gets the <see cref="IDocumentLookup"/> implementations.
 		/// </summary>
-		public IEnumerable<IDocumentLookup> DocumentLookups
+		public IEnumerable<IDocumentLookup> GetDocumentLookups
 		{
 			get { return _lookups.Values; }
 		}
 
+		//why do we have this?
 		/// <summary>
 		/// Gets the inner <see cref="IDocumentLookup"/> resolution.
 		/// </summary>

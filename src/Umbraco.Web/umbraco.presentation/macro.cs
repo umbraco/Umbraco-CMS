@@ -840,7 +840,8 @@ namespace umbraco
             //also get types marked with XsltExtension attribute
 
             // zb-00042 #29949 : do not hide errors, refactor
-            foreach (Type xsltType in TypeFinder.FindClassesMarkedWithAttribute(typeof(XsltExtensionAttribute)))
+        	var typeFinder = new Umbraco.Core.TypeFinder2();
+			foreach (var xsltType in typeFinder.FindClassesWithAttribute<XsltExtensionAttribute>())
             {
                 object[] tpAttributes = xsltType.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
                 foreach (XsltExtensionAttribute tpAttribute in tpAttributes)

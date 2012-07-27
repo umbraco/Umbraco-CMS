@@ -95,13 +95,13 @@ namespace umbraco.presentation.umbracobase
             {
                 //check for RestExtensionAttribute
 
-                foreach (Type t in TypeFinder.FindClassesMarkedWithAttribute(typeof(RestExtension)))
+            	var typeFinder = new Umbraco.Core.TypeFinder2();
+				foreach (var t in typeFinder.FindClassesWithAttribute<RestExtension>())
                 {
 
                     var temp = t.GetCustomAttributes(typeof(RestExtension), false).OfType<RestExtension>();
 
-                    if (temp.Where(x => x.GetAlias() == extensionAlias)
-                        .Any())
+                    if (temp.Any(x => x.GetAlias() == extensionAlias))
                     {
 
                         MethodInfo mi = t.GetMethod(methodName);

@@ -20,11 +20,12 @@ namespace umbraco.cms.businesslogic.macro
 
         protected static void Initialize()
         {
-            List<Type> types = TypeFinder.FindClassesOfType<IMacroEngine>();
-            getEngines(types);
+        	var typeFinder = new Umbraco.Core.TypeFinder2();
+			var types = typeFinder.FindClassesOfType<IMacroEngine>();
+            GetEngines(types);
         }
 
-        private static void getEngines(List<Type> types)
+        private static void GetEngines(IEnumerable<Type> types)
         {
             foreach (Type t in types)
             {

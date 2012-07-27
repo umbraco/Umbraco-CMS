@@ -1,10 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Configuration;
+using System.Diagnostics;
+
 
 namespace Umbraco.Core
-{
-    /// <summary>
+{	
+
+	/// <summary>
     /// the Umbraco Application context
     /// </summary>
     /// <remarks>
@@ -15,10 +17,9 @@ namespace Umbraco.Core
     	/// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="pluginResolver"></param>
-        public ApplicationContext(PluginResolver pluginResolver)
+        public ApplicationContext()
         {
-            Plugins = pluginResolver;
+         
         }
 
     	/// <summary>
@@ -43,10 +44,6 @@ namespace Umbraco.Core
             }
         }
 
-        /// <summary>
-        /// Gets the plugin resolver for the application
-        /// </summary>
-        public PluginResolver Plugins { get; private set; }
 
         // notes
         //   GlobalSettings.ConfigurationStatus returns the value that's in the web.config, so it's the "configured version"
@@ -59,8 +56,64 @@ namespace Umbraco.Core
         public bool IsConfigured
         {
             // fixme - let's do this for the time being
-            get { return umbraco.GlobalSettings.Configured; }
+            get
+            {
+            	return Configured;
+            }
         }
+
+		//TODO: This is temporary as we cannot reference umbraco.businesslogic as this will give a circular reference
+		// CURRENT UMBRACO VERSION ID
+		private const string _currentVersion = "4.8.0";
+		private string CurrentVersion
+		{
+			get
+			{
+				// change this to be hardcoded in the binary
+				return _currentVersion;
+			}
+		}
+		private bool Configured
+		{
+			get
+			{
+				try
+				{
+					string configStatus = ConfigurationStatus;
+					string currentVersion = CurrentVersion;
+
+
+					if (currentVersion != configStatus)
+					{
+						//Log.Add(LogTypes.Debug, User.GetUser(0), -1,
+						//        "CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus +
+						//        "'");
+					}
+						
+
+					return (configStatus == currentVersion);
+				}
+				catch
+				{
+					return false;
+				}
+			}
+		}
+		private string ConfigurationStatus
+		{
+			get
+			{
+				try
+				{
+					return ConfigurationManager.AppSettings["umbracoConfigurationStatus"];
+				}
+				catch
+				{
+					return String.Empty;
+				}
+			}			
+		}
+
 
         private void AssertIsReady()
         {

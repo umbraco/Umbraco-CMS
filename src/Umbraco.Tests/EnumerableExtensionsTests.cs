@@ -1,12 +1,15 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Tests;
+using umbraco.BusinessLogic;
+using Umbraco.Core.Resolving;
 
 namespace Umbraco.Tests
 {
-    [TestFixture]
+	
+	[TestFixture]
     public class EnumerableExtensionsTests
     {
         [Test]
@@ -33,11 +36,11 @@ namespace Umbraco.Tests
         public void DistinctBy_ReturnsDistinctElements_AndResetsIteratorCorrectly()
         {
             // Arrange
-            var tuple1 = new Tuple<string, string>("fruit", "apple");
-            var tuple2 = new Tuple<string, string>("fruit", "orange");
-            var tuple3 = new Tuple<string, string>("fruit", "banana");
-            var tuple4 = new Tuple<string, string>("fruit", "banana"); // Should be filtered out
-            var list = new List<Tuple<string, string>>()
+            var tuple1 = new System.Tuple<string, string>("fruit", "apple");
+            var tuple2 = new System.Tuple<string, string>("fruit", "orange");
+            var tuple3 = new System.Tuple<string, string>("fruit", "banana");
+            var tuple4 = new System.Tuple<string, string>("fruit", "banana"); // Should be filtered out
+            var list = new List<System.Tuple<string, string>>()
                 {
                     tuple1,
                     tuple2,

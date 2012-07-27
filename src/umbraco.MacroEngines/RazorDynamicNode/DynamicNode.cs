@@ -479,7 +479,9 @@ namespace umbraco.MacroEngines
                         {
                             RazorDataTypeModelTypes = new Dictionary<System.Tuple<Guid, int>, Type>();
 
-                            TypeFinder.FindClassesMarkedWithAttribute(typeof(RazorDataTypeModel))
+                        	var typeFinder = new Umbraco.Core.TypeFinder2();
+
+							typeFinder.FindClassesWithAttribute<RazorDataTypeModel>()
                             .ToList()
                             .FindAll(type => typeof(IRazorDataTypeModel).IsAssignableFrom(type))
                             .ConvertAll(type =>

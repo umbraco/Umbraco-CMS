@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Web;
 using System.Reflection;
+using Umbraco.Core;
 using umbraco.BasePages;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic.web;
@@ -27,14 +28,16 @@ namespace umbraco.BusinessLogic.Actions
     /// </summary>
     public class Action
     {
-        private static List<IAction> _actions = new List<IAction>();
-        private static List<IActionHandler> _actionHandlers = new List<IActionHandler>();
+        private static readonly List<IAction> Actions = new List<IAction>();
+        private static readonly List<IActionHandler> ActionHandlers = new List<IActionHandler>();
 
-        private static readonly List<string> _actionJSReference = new List<string>();
-        private static readonly Dictionary<string, string> _actionJs = new Dictionary<string, string>();
+        private static readonly List<string> ActionJsReference = new List<string>();
+        private static readonly Dictionary<string, string> ActionJs = new Dictionary<string, string>();
 
-        private static readonly object m_Lock = new object();
-        private static readonly object m_LockerReRegister = new object();
+        private static readonly object Lock = new object();
+        private static readonly object LockerReRegister = new object();
+
+    	private static readonly Umbraco.Core.TypeFinder2 TypeFinder = new TypeFinder2();
 
         static Action()
         {
@@ -47,10 +50,10 @@ namespace umbraco.BusinessLogic.Actions
         /// </summary>
         public static void ReRegisterActionsAndHandlers()
         {
-            lock (m_Lock)
+            lock (Lock)
             {
-                _actions.Clear();
-                _actionHandlers.Clear();
+                Actions.Clear();
+                ActionHandlers.Clear();
                 RegisterIActions();
                 RegisterIActionHandlers();
             }
@@ -62,16 +65,15 @@ namespace umbraco.BusinessLogic.Actions
         private static void RegisterIActionHandlers()
         {
 
-            if (_actionHandlers.Count == 0)
+            if (ActionHandlers.Count == 0)
             {
 
-                List<Type> foundIActionHandlers = TypeFinder.FindClassesOfType<IActionHandler>(true);
-                foreach (Type type in foundIActionHandlers)
+				var foundIActionHandlers = TypeFinder.FindClassesOfType<IActionHandler>();
+                foreach (var type in foundIActionHandlers)
                 {
-                    IActionHandler typeInstance;
-                    typeInstance = Activator.CreateInstance(type) as IActionHandler;
-                    if (typeInstance != null)
-                        _actionHandlers.Add(typeInstance);
+                	var typeInstance = Activator.CreateInstance(type) as IActionHandler;
+                	if (typeInstance != null)
+                        ActionHandlers.Add(typeInstance);
                 }
             }
 
@@ -83,10 +85,10 @@ namespace umbraco.BusinessLogic.Actions
         private static void RegisterIActions()
         {
 
-            if (_actions.Count == 0)
+            if (Actions.Count == 0)
             {
-                List<Type> foundIActions = TypeFinder.FindClassesOfType<IAction>(true);
-                foreach (Type type in foundIActions)
+				var foundIActions = TypeFinder.FindClassesOfType<IAction>();
+                foreach (var type in foundIActions)
                 {
                     IAction typeInstance;
                     PropertyInfo instance = type.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
@@ -99,8 +101,8 @@ namespace umbraco.BusinessLogic.Actions
                     if (typeInstance != null)
                     {
                         if (!string.IsNullOrEmpty(typeInstance.JsSource))
-                            _actionJSReference.Add(typeInstance.JsSource);
-                        _actions.Add(typeInstance);
+                            ActionJsReference.Add(typeInstance.JsSource);
+                        Actions.Add(typeInstance);
                     }
                 }
             }
@@ -115,7 +117,7 @@ namespace umbraco.BusinessLogic.Actions
         /// <param name="action">The action triggered</param>
         public static void RunActionHandlers(Document d, IAction action)
         {
-            foreach (IActionHandler ia in _actionHandlers)
+            foreach (IActionHandler ia in ActionHandlers)
             {
                 try
                 {
@@ -175,7 +177,7 @@ namespace umbraco.BusinessLogic.Actions
         /// <returns></returns>
         public static List<string> GetJavaScriptFileReferences()
         {
-            return _actionJSReference;
+            return ActionJsReference;
         }
 
         /// <summary>
@@ -188,11 +190,11 @@ namespace umbraco.BusinessLogic.Actions
         /// <returns></returns>
         private static string findActions(string language)
         {
-            if (!_actionJs.ContainsKey(language))
+            if (!ActionJs.ContainsKey(language))
             {
                 string _actionJsList = "";
 
-                foreach (IAction action in _actions)
+                foreach (IAction action in Actions)
                 {
                     // Adding try/catch so this rutine doesn't fail if one of the actions fail
                     // Add to language JsList
@@ -218,10 +220,10 @@ namespace umbraco.BusinessLogic.Actions
                     _actionJsList = _actionJsList.Substring(2, _actionJsList.Length - 2);
 
                 _actionJsList = "\nvar menuMethods = new Array(\n" + _actionJsList + "\n)\n";
-                _actionJs.Add(language, _actionJsList);
+                ActionJs.Add(language, _actionJsList);
             }
 
-            return _actionJs[language];
+            return ActionJs[language];
 
         }
 
@@ -231,7 +233,7 @@ namespace umbraco.BusinessLogic.Actions
         /// <returns>An arraylist containing all javascript variables for the contextmenu in the tree</returns>
         public static ArrayList GetAll()
         {
-            return new ArrayList(_actions);
+            return new ArrayList(Actions);
         }
 
         /// <summary>
@@ -245,7 +247,7 @@ namespace umbraco.BusinessLogic.Actions
             List<IAction> list = new List<IAction>();
             foreach (char c in actions.ToCharArray())
             {
-                IAction action = _actions.Find(
+                IAction action = Actions.Find(
                     delegate(IAction a)
                     {
                         return a.Letter == c;
@@ -273,7 +275,7 @@ namespace umbraco.BusinessLogic.Actions
         /// <returns></returns>
         public static List<IAction> GetPermissionAssignable()
         {
-            return _actions.FindAll(
+            return Actions.FindAll(
                 delegate(IAction a)
                 {
                     return (a.CanBePermissionAssigned);

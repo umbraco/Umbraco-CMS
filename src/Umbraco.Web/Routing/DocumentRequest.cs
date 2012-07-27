@@ -202,7 +202,7 @@ namespace Umbraco.Web.Routing
             // the first successful resolver, if any, will set this.Node, and may also set this.Template
             // some lookups may implement caching
             Trace.TraceInformation("{0}Begin resolvers", tracePrefix);
-			var lookups = RoutingContext.DocumentLookupsResolver.DocumentLookups;
+			var lookups = RoutingContext.DocumentLookupsResolver.GetDocumentLookups;
         	lookups.Any(lookup => lookup.TrySetDocument(this));
             Trace.TraceInformation("{0}End resolvers, {1}", tracePrefix, (this.HasNode ? "a document was found" : "no document was found"));
 
@@ -243,7 +243,7 @@ namespace Umbraco.Web.Routing
                     Trace.TraceInformation("{0}No document, try last chance lookup", tracePrefix);
 
                     // if it fails then give up, there isn't much more that we can do
-					var lastChance = RoutingContext.DocumentLookupsResolver.DocumentLastChanceLookup;
+					var lastChance = RoutingContext.DocumentLookupsResolver.RequestDocumentLastChanceResolver;
 					if (lastChance == null || !lastChance.TrySetDocument(this))
                     {
                         Trace.TraceInformation("{0}Failed to find a document, give up", tracePrefix);

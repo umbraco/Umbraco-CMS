@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using umbraco.BasePages;
@@ -87,8 +87,15 @@ function openMedia(id) {
                         }
                         else
                         {
-                            xNode.Action = null;
-                            xNode.DimNode();
+                            if (dd.ContentType.Alias.ToLower() == "folder")
+                            {
+                                xNode.Action = "javascript:jQuery('.umbTree #" + dd.Id.ToString() + "').click();";
+                            }
+                            else
+                            {
+                                xNode.Action = null;
+                                xNode.Style.DimNode();
+                            }
                         }
                     }
                     else

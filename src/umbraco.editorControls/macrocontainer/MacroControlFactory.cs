@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.UI;
 using umbraco.BusinessLogic.Utils;
 using umbraco.interfaces;
@@ -56,15 +57,16 @@ namespace umbraco.editorControls.macrocontainer
         /// <summary>
         /// All Possible Macro types
         /// </summary>
-        private static List<Type> MacroControlTypes
+		private static List<Type> MacroControlTypes
         {
             get
             {
-                if (_macroControlTypes == null || _macroControlTypes.Count == 0)
+                if (_macroControlTypes == null || !_macroControlTypes.Any())
                 {
                     //Populate the list with all the types of IMacroGuiRendering
+                	var typeFinder = new Umbraco.Core.TypeFinder2();
                     _macroControlTypes = new List<Type>();
-                    _macroControlTypes = TypeFinder.FindClassesOfType<IMacroGuiRendering>();
+                	_macroControlTypes = typeFinder.FindClassesOfType<IMacroGuiRendering>().ToList();
                 }
 
                 return _macroControlTypes;

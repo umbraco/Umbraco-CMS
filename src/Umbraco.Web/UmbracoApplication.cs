@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core;
 using Umbraco.Web.Routing;
+using umbraco.businesslogic;
 
 namespace Umbraco.Web
 {
@@ -13,6 +14,9 @@ namespace Umbraco.Web
 	/// </summary>
 	public class UmbracoApplication : System.Web.HttpApplication
 	{
+		public static event EventHandler ApplicationStarting;
+		
+		public static event EventHandler ApplicationStarted;
 
 		private static readonly TraceSource Trace = new TraceSource("UmbracoApplication");
 
@@ -21,7 +25,7 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		protected virtual void Application_Start(object sender, EventArgs e)
+		protected void Application_Start(object sender, EventArgs e)
 		{
 			Trace.TraceInformation("Initialize AppDomain");
 
@@ -30,18 +34,50 @@ namespace Umbraco.Web
 			ClientDependency.Core.CompositeFiles.Providers.BaseCompositeFileProcessingProvider.UrlTypeDefault = ClientDependency.Core.CompositeFiles.Providers.CompositeUrlType.Base64QueryStrings;
 
 			//create the ApplicationContext
-			ApplicationContext.Current = new ApplicationContext(new PluginResolver())
+			ApplicationContext.Current = new ApplicationContext()
 				{
 					IsReady = true	// fixme
 				};
 
+			//find and initialize the application startup handlers
+			ApplicationStartupHandler.RegisterHandlers();
+
 			// create the resolvers
-			DocumentLookupsResolver.Current = new DocumentLookupsResolver(ApplicationContext.Current.Plugins.ResolveLookups(), new DefaultLastChanceLookup());
+			DocumentLookupsResolver.Current = new DocumentLookupsResolver(
+				PluginTypeResolver.Current.ResolveLookups(), 
+				new ResolveLastChance());
 			RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache());
 
+			OnApplicationStarting(sender, e);
+
+			//all resolvers are now frozen and cannot be modified
 			Umbraco.Core.Resolving.Resolution.Freeze();
 
+			OnApplicationStarted(sender, e);
+
 			Trace.TraceInformation("AppDomain is initialized");
+		}
+
+		/// <summary>
+		/// Developers can override this method to modify objects on startup
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		protected virtual void OnApplicationStarting(object sender, EventArgs e)
+		{
+			if (ApplicationStarting != null)
+				ApplicationStarting(sender, e);
+		}
+
+		/// <summary>
+		/// Developers can override this method to do anything they need to do once the application startup routine is completed.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		protected virtual void OnApplicationStarted(object sender, EventArgs e)
+		{
+			if (ApplicationStarted != null)
+				ApplicationStarted(sender, e);
 		}
 
 		protected virtual void Application_Error(object sender, EventArgs e)

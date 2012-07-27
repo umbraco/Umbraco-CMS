@@ -40,6 +40,10 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
@@ -346,6 +350,11 @@
     <Content Include="umbraco\webservices\api\MemberService.asmx" />
     <Content Include="umbraco\webservices\api\StylesheetService.asmx" />
     <Content Include="umbraco\webservices\api\TemplateService.asmx" />
+    <Content Include="umbraco_client\tags\css\jquery.tagsinput.css" />
+    <Content Include="umbraco_client\tags\js\jquery.tagsinput.js" />
+    <Content Include="umbraco_client\tags\js\jquery.tagsinput.min.js">
+      <DependentUpon>jquery.tagsinput.js</DependentUpon>
+    </Content>
     <Content Include="umbraco_client\tinymce3\langs\en.js" />
     <Content Include="umbraco_client\tinymce3\langs\he.js" />
     <Content Include="umbraco_client\tinymce3\langs\ja.js" />
@@ -918,6 +927,7 @@
     <Content Include="umbraco_client\mousewheel\jquery.mousewheel.js" />
     <Content Include="umbraco_client\ui\jquery.alphanumeric.js" />
     <Content Include="umbraco_client\ui\jquery.tooltip.min.js" />
+    <Content Include="umbraco_client\ui\knockout.js" />
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
     <Content Include="umbraco_client\ui\ui-lightness\images\ui-bg_flat_10_000000_40x100.png" />
@@ -1790,6 +1800,7 @@
     <Folder Include="masterpages\" />
     <Folder Include="media\" />
     <Folder Include="scripts\" />
+    <Folder Include="umbraco_client\tags\images\" />
     <Folder Include="usercontrols\" />
     <Folder Include="xslt\" />
   </ItemGroup>
@@ -1814,7 +1825,7 @@ xcopy "$(ProjectDir)"..\..\lib\SQLCE4\x86\*.* "$(TargetDir)x86\" /Y /F /E /D</Po
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>61637</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:61637/</IISUrl>
+          <IISUrl>http://localhost:61638/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -6,7 +6,7 @@ using System.Text;
 namespace Umbraco.Core.Resolving
 {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple=false, Inherited=false)]
-	public class ResolutionWeightAttribute : Attribute
+	internal class ResolutionWeightAttribute : Attribute
 	{
 		public const int DefaultWeight = 100;
 

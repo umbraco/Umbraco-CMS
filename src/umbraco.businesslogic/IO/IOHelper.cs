@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.IO;
 using System.Configuration;
@@ -99,7 +100,10 @@ namespace umbraco.IO
             if (path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
                 return path;
 
-            if (useHttpContext)
+			// Check that we even have an HttpContext! otherwise things will fail anyways
+			// http://umbraco.codeplex.com/workitem/30946
+
+            if (useHttpContext && HttpContext.Current != null)
             {
                 //string retval;
                 if (!string.IsNullOrEmpty(path) && (path.StartsWith("~") || path.StartsWith(SystemDirectories.Root)))
@@ -107,16 +111,16 @@ namespace umbraco.IO
                 else
                     return System.Web.Hosting.HostingEnvironment.MapPath("~/" + path.TrimStart('/'));
             }
-            else
-            {
-                string _root = (!String.IsNullOrEmpty(System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath)) ? System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath.TrimEnd(IOHelper.DirSepChar) : getRootDirectorySafe();
 
-                string _path = path.TrimStart('~', '/').Replace('/', IOHelper.DirSepChar);
+			//var root = (!string.IsNullOrEmpty(System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath)) 
+			//    ? System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath.TrimEnd(IOHelper.DirSepChar) 
+			//    : getRootDirectorySafe();
 
-                string retval = _root + IOHelper.DirSepChar.ToString() + _path;
+        	var root = getRootDirectorySafe();
+        	var newPath = path.TrimStart('~', '/').Replace('/', IOHelper.DirSepChar);
+        	var retval = root + IOHelper.DirSepChar.ToString() + newPath;
 
-                return retval;
-            }
+        	return retval;
         }
 
         public static string MapPath(string path)
@@ -189,8 +193,10 @@ namespace umbraco.IO
                 return m_rootDir;
             }
 
-            string baseDirectory =
-                System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase.Substring(8));
+			var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+			var uri = new Uri(codeBase);
+			var path = uri.LocalPath;
+        	var baseDirectory = Path.GetDirectoryName(path);
             m_rootDir = baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin") - 1);
 
             return m_rootDir;

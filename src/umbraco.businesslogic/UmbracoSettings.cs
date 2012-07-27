@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Web.Caching;
 using System.Xml;
@@ -27,17 +28,32 @@ namespace umbraco
             {
                 XmlDocument us = (XmlDocument)HttpRuntime.Cache["umbracoSettingsFile"];
                 if (us == null)
-                    us = ensureSettingsDocument();
+                    us = EnsureSettingsDocument();
                 return us;
             }
         }
 
-        private static string _path = GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "config" +
-                                      Path.DirectorySeparatorChar;
+    	private static string _path;
 
-        private static string _filename = "umbracoSettings.config";
+		/// <summary>
+		/// Gets/sets the settings file path, the setter can be used in unit tests
+		/// </summary>
+		internal static string SettingsFilePath
+    	{
+    		get
+    		{
+    			if (_path == null)
+    			{
+    				_path = GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar;
+    			}
+    			return _path;
+    		}
+			set { _path = value; }
+    	}
 
-        private static XmlDocument ensureSettingsDocument()
+    	private const string Filename = "umbracoSettings.config";
+
+    	private static XmlDocument EnsureSettingsDocument()
         {
             object settingsFile = HttpRuntime.Cache["umbracoSettingsFile"];
 
@@ -45,12 +61,12 @@ namespace umbraco
             if (settingsFile == null)
             {
                 XmlDocument temp = new XmlDocument();
-                XmlTextReader settingsReader = new XmlTextReader(_path + _filename);
+                XmlTextReader settingsReader = new XmlTextReader(SettingsFilePath + Filename);
                 try
                 {
                     temp.Load(settingsReader);
                     HttpRuntime.Cache.Insert("umbracoSettingsFile", temp,
-                                             new CacheDependency(_path + _filename));
+                                             new CacheDependency(SettingsFilePath + Filename));
                 }
                 catch (XmlException e)
                 {
@@ -69,7 +85,7 @@ namespace umbraco
 
         private static void save()
         {
-            _umbracoSettings.Save(_path + _filename);
+            _umbracoSettings.Save(SettingsFilePath + Filename);
         }
 
 
@@ -82,7 +98,7 @@ namespace umbraco
         {
             if (Key == null)
                 throw new ArgumentException("Key cannot be null");
-            ensureSettingsDocument();
+            EnsureSettingsDocument();
             if (_umbracoSettings == null || _umbracoSettings.DocumentElement == null)
                 return null;
             return _umbracoSettings.DocumentElement.SelectSingleNode(Key);
@@ -95,7 +111,7 @@ namespace umbraco
         /// <returns></returns>
         public static string GetKey(string Key)
         {
-            ensureSettingsDocument();
+            EnsureSettingsDocument();
 
             XmlNode node = _umbracoSettings.DocumentElement.SelectSingleNode(Key);
             if (node == null || node.FirstChild == null || node.FirstChild.Value == null)
@@ -999,6 +1015,17 @@ namespace umbraco
             }
         }
 
+    	public static IEnumerable<string> AppCodeFileExtensionsList
+    	{
+    		get
+    		{
+    			return (from XmlNode x in AppCodeFileExtensions 
+						where !String.IsNullOrEmpty(x.InnerText)
+						select x.InnerText).ToList();
+    		}
+    	}
+
+		[Obsolete("Use AppCodeFileExtensionsList instead")]
         public static XmlNode AppCodeFileExtensions
         {
             get
