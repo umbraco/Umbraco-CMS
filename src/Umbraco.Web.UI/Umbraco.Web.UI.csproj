@@ -113,6 +113,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Lucene.Net, Version=2.9.4.1, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Lucene.Net.dll</HintPath>
@@ -264,6 +267,10 @@
     <None Include="config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
     </None>
+    <Content Include="config\log4net.config" />
+    <Content Include="config\log4net.Release.config">
+      <DependentUpon>log4net.config</DependentUpon>
+    </Content>
     <None Include="config\xsltExtensions.Release.config">
       <DependentUpon>xsltExtensions.config</DependentUpon>
     </None>
@@ -307,6 +314,7 @@
     <None Include="config\Dashboard.Release.config">
       <DependentUpon>Dashboard.config</DependentUpon>
     </None>
+    <Content Include="packages.config" />
     <None Include="umbraco\config\create\UI.Release.xml">
       <DependentUpon>UI.xml</DependentUpon>
     </None>

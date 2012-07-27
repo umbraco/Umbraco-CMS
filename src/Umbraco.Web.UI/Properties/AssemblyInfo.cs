@@ -14,3 +14,5 @@ using System.Runtime.CompilerServices;
 //tg forcing .NET 2.0 security rules, since otherwise it wasn't possible to run in medium trust
 //(got an inheritance security rules violated by type error)
 [assembly: System.Security.SecurityRules(System.Security.SecurityRuleSet.Level1)]
+
+[assembly: log4net.Config.XmlConfigurator(Watch = true)]
