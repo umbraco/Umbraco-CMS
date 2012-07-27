@@ -55,5 +55,15 @@ namespace umbraco.cms
 			return resolver.ResolveTypes<IMediaFactory>();
 		}
 
+		/// <summary>
+		/// Returns all available IPackageAction in application
+		/// </summary>
+		/// <param name="resolver"></param>
+		/// <returns></returns>
+		internal static IEnumerable<Type> ResolvePackageActions(this PluginTypeResolver resolver)
+		{
+			return resolver.ResolveTypes<IPackageAction>();
+		}
+
 	}
 }

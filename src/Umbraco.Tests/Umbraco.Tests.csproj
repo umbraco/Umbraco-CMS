@@ -52,6 +52,7 @@
     <Compile Include="DataTypeFactoryTests.cs" />
     <Compile Include="MacroEngineFactoryTests.cs" />
     <Compile Include="MediaFactoryTests.cs" />
+    <Compile Include="PackageActionFactoryTests.cs" />
     <Compile Include="PluginTypeResolverExtensions.cs" />
     <Compile Include="PluginTypeResolverTests.cs" />
     <Compile Include="TestHelper.cs" />
