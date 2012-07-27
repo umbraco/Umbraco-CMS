@@ -49,7 +49,7 @@ namespace Umbraco.Core.Resolving
 			using (new WriteLock(Lock))
 			{
 				_resolved.Add(item);			
-			}					
+			}
 		}
 
 		public void Clear()
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Resolving
 			using (new WriteLock(Lock))
 			{
 				_resolved.Clear();
-			}			
+			}
 		}
 
 		public void Insert(int index, TResolved item)
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Resolving
 			using (new WriteLock(Lock))
 			{
 				_resolved.Insert(index, item);
-			}	
+			}
 		}
 		
 	}

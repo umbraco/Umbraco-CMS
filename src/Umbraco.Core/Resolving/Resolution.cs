@@ -9,7 +9,6 @@ namespace Umbraco.Core.Resolving
 
 	internal class Resolution
 	{
-		public static event EventHandler Freezing;
 		public static event EventHandler Frozen;
 
 		public static bool IsFrozen { get; private set; }
@@ -24,8 +23,7 @@ namespace Umbraco.Core.Resolving
 		{
 			if (Resolution.IsFrozen)
 				throw new InvalidOperationException("Resolution is frozen. It is not possible to freeze it again.");
-			if (Freezing != null)
-				Freezing(null, null);
+			
 			IsFrozen = true;
 			if (Frozen != null)
 				Frozen(null, null);

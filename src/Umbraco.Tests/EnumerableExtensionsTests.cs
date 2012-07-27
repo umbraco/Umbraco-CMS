@@ -8,30 +8,7 @@ using Umbraco.Core.Resolving;
 
 namespace Umbraco.Tests
 {
-	[TestFixture]
-	public class MultipleResolverBaseTests
-	{
-
-		internal class MyItemsResolver : MultipleResolverBase<MyItemsResolver, object>
-		{
-			public MyItemsResolver(IEnumerable<object> initItems)
-			{
-				foreach(var i in initItems)
-				{
-					Add(i);
-				}
-			}
-
-			public IEnumerable<object> MyItems
-			{
-				get { return Values; }
-			}
-		}
-
-
-	}
-
-
+	
 	[TestFixture]
     public class EnumerableExtensionsTests
     {
