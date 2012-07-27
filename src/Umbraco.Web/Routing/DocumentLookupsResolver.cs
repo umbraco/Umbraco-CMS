@@ -23,9 +23,9 @@ namespace Umbraco.Web.Routing
 		{
 			//TODO: I've changed this to resolve types but the intances are not created yet!
 			// I've created a method on the PluginTypeResolver to create types: PluginTypesResolver.Current.FindAndCreateInstances<T>()
-			
 
-			_lookupTypes.AddRange(lookupsTypes);
+
+			_lookupTypes.AddRange(lookupTypes);
 			_lastChanceLookup.Value = lastChanceLookup;
 		}
 
@@ -46,7 +46,7 @@ namespace Umbraco.Web.Routing
 
 		#region Lookups
 
-		private readonly List<Type> _resolverTypes = new List<Type>(); 
+		private readonly List<Type> _lookupTypes = new List<Type>(); 
 		readonly ManyWeightedResolved<IDocumentLookup> _lookups = new ManyWeightedResolved<IDocumentLookup>();
 
 		/// <summary>

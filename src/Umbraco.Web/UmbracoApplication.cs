@@ -45,7 +45,7 @@ namespace Umbraco.Web
 			// create the resolvers
 			DocumentLookupsResolver.Current = new DocumentLookupsResolver(
 				PluginTypeResolver.Current.ResolveLookups(), 
-				new ResolveLastChance());
+				new DefaultLastChanceLookup());
 			RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache());
 
 			OnApplicationStarting(sender, e);

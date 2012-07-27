@@ -13,136 +13,55 @@ using umbraco.businesslogic.Exceptions;
 
 namespace umbraco.IO
 {
+	[Obsolete("Use Umbraco.Core.IO.IOHelper instead")]
     public static class IOHelper
-    {
-        private static string m_rootDir = "";
-        // static compiled regex for faster performance
-        private readonly static Regex _resolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-
+    {        
         public static char DirSepChar
         {
             get
             {
-                return Path.DirectorySeparatorChar;
+                return Umbraco.Core.IO.IOHelper.DirSepChar;
             }
         }
 
         //helper to try and match the old path to a new virtual one
         public static string FindFile(string virtualPath)
         {
-            string retval = virtualPath;
-
-            if (virtualPath.StartsWith("~"))
-                retval = virtualPath.Replace("~", SystemDirectories.Root);
-
-            if (virtualPath.StartsWith("/") && !virtualPath.StartsWith(SystemDirectories.Root))
-                retval = SystemDirectories.Root + "/" + virtualPath.TrimStart('/');
-
-            return retval;
+        	return Umbraco.Core.IO.IOHelper.FindFile(virtualPath);
         }
 
         //Replaces tildes with the root dir
         public static string ResolveUrl(string virtualPath)
         {
-            if (virtualPath.StartsWith("~"))
-                return virtualPath.Replace("~", SystemDirectories.Root).Replace("//", "/");
-            else
-                return VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root);
+			return Umbraco.Core.IO.IOHelper.ResolveUrl(virtualPath); 
         }
 
 
         public static string ResolveUrlsFromTextString(string text)
         {
-            if (UmbracoSettings.ResolveUrlsFromTextString)
-            {
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
-                Debug.WriteLine("Start: " + sw.ElapsedMilliseconds);
-
-                // find all relative urls (ie. urls that contain ~)
-                MatchCollection tags =
-                    _resolveUrlPattern.Matches(text);
-                Debug.WriteLine("After regex: " + sw.ElapsedMilliseconds);
-                foreach (Match tag in tags)
-                {
-                    Debug.WriteLine("-- inside regex: " + sw.ElapsedMilliseconds);
-                    string url = "";
-                    if (tag.Groups[1].Success)
-                        url = tag.Groups[1].Value;
-
-                    // The richtext editor inserts a slash in front of the url. That's why we need this little fix
-                    //                if (url.StartsWith("/"))
-                    //                    text = text.Replace(url, ResolveUrl(url.Substring(1)));
-                    //                else
-                    if (!String.IsNullOrEmpty(url))
-                    {
-                        Debug.WriteLine("---- before resolve: " + sw.ElapsedMilliseconds);
-                        string resolvedUrl = (url.Substring(0, 1) == "/") ? ResolveUrl(url.Substring(1)) : ResolveUrl(url);
-                        Debug.WriteLine("---- after resolve: " + sw.ElapsedMilliseconds);
-                        Debug.WriteLine("---- before replace: " + sw.ElapsedMilliseconds);
-                        text = text.Replace(url, resolvedUrl);
-                        Debug.WriteLine("---- after replace: " + sw.ElapsedMilliseconds);
-                    }
-
-                }
-
-                Debug.WriteLine("total: " + sw.ElapsedMilliseconds);
-                sw.Stop();
-                System.Web.HttpContext.Current.Trace.Write("Resolve Urls", sw.ElapsedMilliseconds.ToString());
-
-            }
-            return text;
+			return Umbraco.Core.IO.IOHelper.ResolveUrlsFromTextString(text); 
         }
 
         public static string MapPath(string path, bool useHttpContext)
         {
-            // Check if the path is already mapped
-            if (path.Length >= 2 && path[1] == Path.VolumeSeparatorChar)
-                return path;
-
-			// Check that we even have an HttpContext! otherwise things will fail anyways
-			// http://umbraco.codeplex.com/workitem/30946
-
-            if (useHttpContext && HttpContext.Current != null)
-            {
-                //string retval;
-                if (!string.IsNullOrEmpty(path) && (path.StartsWith("~") || path.StartsWith(SystemDirectories.Root)))
-                    return System.Web.Hosting.HostingEnvironment.MapPath(path);
-                else
-                    return System.Web.Hosting.HostingEnvironment.MapPath("~/" + path.TrimStart('/'));
-            }
-
-			//var root = (!string.IsNullOrEmpty(System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath)) 
-			//    ? System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath.TrimEnd(IOHelper.DirSepChar) 
-			//    : getRootDirectorySafe();
-
-        	var root = getRootDirectorySafe();
-        	var newPath = path.TrimStart('~', '/').Replace('/', IOHelper.DirSepChar);
-        	var retval = root + IOHelper.DirSepChar.ToString() + newPath;
-
-        	return retval;
+			return Umbraco.Core.IO.IOHelper.MapPath(path, useHttpContext); 
         }
 
         public static string MapPath(string path)
         {
-            return MapPath(path, true);
+			return Umbraco.Core.IO.IOHelper.MapPath(path); 
         }
 
         //use a tilde character instead of the complete path
         public static string returnPath(string settingsKey, string standardPath, bool useTilde)
         {
-            string retval = ConfigurationManager.AppSettings[settingsKey];
-
-            if (string.IsNullOrEmpty(retval))
-                retval = standardPath;
-
-            return retval.TrimEnd('/');
+			return Umbraco.Core.IO.IOHelper.ReturnPath(settingsKey, standardPath, useTilde); 
         }
 
 
         public static string returnPath(string settingsKey, string standardPath)
         {
-            return returnPath(settingsKey, standardPath, false);
+			return Umbraco.Core.IO.IOHelper.ReturnPath(settingsKey, standardPath); 
 
         }
 
@@ -155,28 +74,12 @@ namespace umbraco.IO
         /// <returns>true if valid, throws a FileSecurityException if not</returns>
         public static bool ValidateEditPath(string filePath, string validDir)
         {
-            if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
-                filePath = MapPath(filePath);
-            if (!validDir.StartsWith(MapPath(SystemDirectories.Root)))
-                validDir = MapPath(validDir);
-
-            if (!filePath.StartsWith(validDir))
-                throw new FileSecurityException(String.Format("The filepath '{0}' is not within an allowed directory for this type of files", filePath.Replace(MapPath(SystemDirectories.Root), "")));
-
-            return true;
+			return Umbraco.Core.IO.IOHelper.ValidateEditPath(filePath, validDir); 
         }
 
         public static bool ValidateFileExtension(string filePath, List<string> validFileExtensions)
         {
-            if (!filePath.StartsWith(MapPath(SystemDirectories.Root)))
-                filePath = MapPath(filePath);
-            FileInfo f = new FileInfo(filePath);
-
-
-            if (!validFileExtensions.Contains(f.Extension.Substring(1)))
-                throw new FileSecurityException(String.Format("The extension for the current file '{0}' is not of an allowed type for this editor. This is typically controlled from either the installed MacroEngines or based on configuration in /config/umbracoSettings.config", filePath.Replace(MapPath(SystemDirectories.Root), "")));
-
-            return true;
+			return Umbraco.Core.IO.IOHelper.ValidateFileExtension(filePath, validFileExtensions); 
         }
 
 
@@ -188,19 +91,7 @@ namespace umbraco.IO
         /// <returns></returns>
         private static string getRootDirectorySafe()
         {
-            if (!String.IsNullOrEmpty(m_rootDir))
-            {
-                return m_rootDir;
-            }
-
-			var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-			var uri = new Uri(codeBase);
-			var path = uri.LocalPath;
-        	var baseDirectory = Path.GetDirectoryName(path);
-            m_rootDir = baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin") - 1);
-
-            return m_rootDir;
-
+			return Umbraco.Core.IO.IOHelper.GetRootDirectorySafe(); 
         }
 
     }

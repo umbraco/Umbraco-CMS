@@ -9,170 +9,104 @@ using System.IO;
 
 namespace umbraco.IO
 {
-    //all paths has a starting but no trailing /
+	[Obsolete("Use Umbraco.Core.UI.SystemDirectories instead")]
     public class SystemDirectories
     {
         public static string Bin
         {
-            get
-            {
-                return IOHelper.returnPath("umbracoBinDirectory", "~/bin");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.Bin; }
         }
 
         public static string Base
         {
-            get
-            {
-                return IOHelper.returnPath("umbracoBaseDirectory", "~/base");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.Base; }
         }
 
         public static string Config
         {
-            get
-            {
-                return IOHelper.returnPath("umbracoConfigDirectory", "~/config");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.Config; }
         }
                 
         public static string Css
         {
-            get
-            {
-                return IOHelper.returnPath("umbracoCssDirectory", "~/css");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.Css; }
         }
 
         public static string Data
         {
-            get
-            {
-                return IOHelper.returnPath("umbracoStorageDirectory", "~/App_Data");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.Data; }
         }
 
         public static string Install
         {
-            get
-            {
-                return IOHelper.returnPath("umbracoInstallPath", "~/install");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.Install; }
         }
 
         public static string Masterpages
         {
-            get
-            {
-                return IOHelper.returnPath("umbracoMasterPagesPath", "~/masterpages");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.Masterpages; }
         }
 
        
         public static string Media
         {
-            get
-            {
-                return IOHelper.returnPath("umbracoMediaPath", "~/media");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.Media; }
         }
 
         [Obsolete("Please use MacroScripts instead!", true)]
         public static string Python
         {
-            get
-            {
-                return MacroScripts;
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.MacroScripts; }
         }
 
         public static string MacroScripts
         {
-            get
-            {
-                // for legacy we test for the python path first, but else we use the new default location
-                string tempPath = IOHelper.returnPath("umbracoPythonPath", "") == String.Empty
-                                      ? IOHelper.returnPath("umbracoMacroScriptPath", "~/macroScripts")
-                                      : IOHelper.returnPath("umbracoPythonPath", "~/python");
-                return tempPath;
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.MacroScripts; }
         }
 
         public static string Scripts
         {
-            get
-            {
-                return IOHelper.returnPath("umbracoScriptsPath", "~/scripts");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.Scripts; }
         }
 
         public static string Umbraco
         {
-            get
-            {
-                return IOHelper.returnPath("umbracoPath", "~/umbraco");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.Umbraco; }
         }
 
         public static string Umbraco_client
         {
-            get
-            {
-                return IOHelper.returnPath("umbracoClientPath", "~/umbraco_client");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.UmbracoClient; }
         }
 
         public static string Usercontrols
         {
-            get
-            {
-                return IOHelper.returnPath("umbracoUsercontrolsPath", "~/usercontrols");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.UserControls; }
         }
 
         public static string Webservices
         {
-            get
-            {
-                return IOHelper.returnPath("umbracoWebservicesPath", "~/umbraco/webservices");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.WebServices; }
         }
 
         public static string Xslt
         {
-            get {
-                return IOHelper.returnPath("umbracoXsltPath", "~/xslt");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.Xslt; }
         }
 
         public static string Packages
         {
-            get
-            {
-                //by default the packages folder should exist in the data folder
-                return IOHelper.returnPath("umbracoPackagesPath", Data + IOHelper.DirSepChar + "packages");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.Packages; }
         }
 
         public static string Preview
         {
-            get
-            {
-                //by default the packages folder should exist in the data folder
-                return IOHelper.returnPath("umbracoPreviewPath", Data + IOHelper.DirSepChar + "preview");
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.Preview; }
         }
 
         public static string Root
         {
-            get
-            {
-                string appPath = HttpRuntime.AppDomainAppVirtualPath ?? string.Empty;
-                if (appPath == "/")
-                    appPath = string.Empty;
-
-                return appPath;
-            }
+			get { return global::Umbraco.Core.IO.SystemDirectories.Root; }
         }
     }
 

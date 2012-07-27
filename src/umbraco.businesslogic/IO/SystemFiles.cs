@@ -8,115 +8,70 @@ using System.Web;
 
 namespace umbraco.IO
 {
-    public class SystemFiles
-    {
 
-        public static string AccessXml
-        {
-            get
-            {
-                return SystemDirectories.Data + "/access.config";
-            }
-        }
+	[Obsolete("Use Umbraco.Core.UI.SystemFiles instead")]
+	public class SystemFiles
+	{
 
-        public static string CreateUiXml
-        {
-            get
-            {
-                return SystemDirectories.Umbraco + "/config/create/UI.xml";
-            }
-        }
+		public static string AccessXml
+		{
+			get { return Umbraco.Core.IO.SystemFiles.AccessXml; }
+		}
 
-        public static string TinyMceConfig
-        {
-            get
-            {
-                return SystemDirectories.Config + "/tinyMceConfig.config";
-            }
-        }
+		public static string CreateUiXml
+		{
+			get { return Umbraco.Core.IO.SystemFiles.CreateUiXml; }
+		}
 
-        public static string MetablogConfig
-        {
-            get
-            {
-                return SystemDirectories.Config + "/metablogConfig.config";
-            }
-        }
+		public static string TinyMceConfig
+		{
+			get { return Umbraco.Core.IO.SystemFiles.TinyMceConfig; }
+		}
 
-        public static string DashboardConfig
-        {
-            get
-            {
-                return SystemDirectories.Config + "/dashboard.config";
-            }
-        }
+		public static string MetablogConfig
+		{
+			get { return Umbraco.Core.IO.SystemFiles.MetablogConfig; }
+		}
 
-        public static string XsltextensionsConfig
-        {
-            get
-            {
-                return SystemDirectories.Config + "/xsltextensions.config";
-            }
-        }
+		public static string DashboardConfig
+		{
+			get { return Umbraco.Core.IO.SystemFiles.DashboardConfig; }
+		}
 
-        public static string RestextensionsConfig
-        {
-            get
-            {
-                return SystemDirectories.Config + "/restextensions.config";
-            }
-        }
+		public static string XsltextensionsConfig
+		{
+			get { return Umbraco.Core.IO.SystemFiles.XsltextensionsConfig; }
+		}
+
+		public static string RestextensionsConfig
+		{
+			get { return Umbraco.Core.IO.SystemFiles.RestextensionsConfig; }
+		}
 
 
-        public static string SkinningXml
-        {
-            get
-            {
-                return SystemDirectories.Data + "/skinning.config";
-            }
-        }
+		public static string SkinningXml
+		{
+			get { return Umbraco.Core.IO.SystemFiles.SkinningXml; }
+		}
 
-        public static string NotFoundhandlersConfig
-        {
-            get
-            {
-                return SystemDirectories.Config + "/404handlers.config";
-            }
-        }
+		public static string NotFoundhandlersConfig
+		{
+			get { return Umbraco.Core.IO.SystemFiles.NotFoundhandlersConfig; }
+		}
 
-        public static string FeedProxyConfig
-        {
-            get
-            {
-                return string.Concat(SystemDirectories.Config, "/feedProxy.config");
-            }
-        }
+		public static string FeedProxyConfig
+		{
+			get { return Umbraco.Core.IO.SystemFiles.FeedProxyConfig; }
+		}
 
-        public static string ContentCacheXml
-        {
-            get
-            {
-                if (ContentCacheXmlIsEphemeral)
-                {
-                    return Path.Combine(HttpRuntime.CodegenDir, @"UmbracoData\umbraco.config");
-                }
-                return IOHelper.returnPath("umbracoContentXML", "~/App_Data/umbraco.config");
-            }
-        }
+		public static string ContentCacheXml
+		{
+			get { return Umbraco.Core.IO.SystemFiles.ContentCacheXml; }
+		}
 
-        public static bool ContentCacheXmlIsEphemeral
-        {
-            get
-            {
-                bool returnValue = false;
-                string configSetting = ConfigurationManager.AppSettings["umbracoContentXMLUseLocalTemp"];
-
-                if (!string.IsNullOrEmpty(configSetting))
-                    if(bool.TryParse(configSetting, out returnValue))
-                        return returnValue;
-
-                return false;
-            }
-        }
-    }
+		public static bool ContentCacheXmlIsEphemeral
+		{
+			get { return Umbraco.Core.IO.SystemFiles.ContentCacheXmlIsEphemeral; }
+		}
+	}
 }
