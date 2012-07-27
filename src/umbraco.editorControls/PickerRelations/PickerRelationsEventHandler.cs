@@ -232,15 +232,12 @@ namespace umbraco.editorControls.PickerRelations
 			{
 				//clear data
 				Relation relation;
-				if (relations.HasRecords)
+				while (relations.Read())
 				{
-					while (relations.Read())
-					{
-						relation = new Relation(relations.GetInt("id"));
+					relation = new Relation(relations.GetInt("id"));
 
-						// TODO: [HR] check to see if an instance identifier is used
-						relation.Delete();
-					}
+					// TODO: [HR] check to see if an instance identifier is used
+					relation.Delete();
 				}
 			}
 		}

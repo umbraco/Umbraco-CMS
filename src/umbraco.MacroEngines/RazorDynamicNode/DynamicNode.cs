@@ -224,11 +224,33 @@ namespace umbraco.MacroEngines
                 throw new NullReferenceException("DynamicNode wasn't initialized with an underlying NodeFactory.Node");
             }
         }
-                
+        
+        
         public DynamicNodeList Search(string term, bool useWildCards = true, string searchProvider = null)
         {
             var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
             if(!string.IsNullOrEmpty(searchProvider))
+                searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
+
+            var t = term.Escape().Value;
+            if (useWildCards)
+                t = term.MultipleCharacterWildcard().Value;
+
+            string luceneQuery = "+__Path:(" + this.Path.Replace("-", "\\-") + "*) +" + t;
+            var crit = searcher.CreateSearchCriteria().RawQuery(luceneQuery);
+
+            return Search(crit, searcher);
+        }
+
+        public DynamicNodeList SearchDescendants(string term, bool useWildCards = true, string searchProvider = null)
+        {
+            return Search(term, useWildCards, searchProvider);
+        }
+
+        public DynamicNodeList SearchChildren(string term, bool useWildCards = true, string searchProvider = null)
+        {
+            var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
+            if (!string.IsNullOrEmpty(searchProvider))
                 searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
 
             var t = term.Escape().Value;
@@ -240,7 +262,8 @@ namespace umbraco.MacroEngines
 
             return Search(crit, searcher);
         }
-        
+
+
         public DynamicNodeList Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
         {
             var s = Examine.ExamineManager.Instance.DefaultSearchProvider;

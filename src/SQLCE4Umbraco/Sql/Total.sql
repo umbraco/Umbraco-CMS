@@ -659,7 +659,7 @@ ALTER TABLE [umbracoNode] DROP CONSTRAINT [FK_umbracoNode_umbracoNode]
 !!!SET IDENTITY_INSERT [cmsContentType] ON 
 |INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon]) VALUES (532, 1031, N'Folder', N'folder.gif') 
 |INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon]) VALUES (533, 1032, N'Image', N'mediaPhoto.gif') 
-|INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon]) VALUES (534, 1033, N'File', N'mediaMulti.gif') 
+|INSERT INTO [cmsContentType] ([pk], [nodeId], [alias], [icon]) VALUES (534, 1033, N'File', N'mediaFile.gif') 
 |SET IDENTITY_INSERT [cmsContentType] OFF 
 ;
 !!!SET IDENTITY_INSERT [umbracoUser] ON 

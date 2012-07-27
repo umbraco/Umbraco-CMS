@@ -24,18 +24,41 @@ namespace umbraco.cms.businesslogic.datatype
             set
             {
                 UmbracoFile um = null;
-                if (value is HttpPostedFile)
+                if (value is HttpPostedFile || value is HttpPostedFileBase || value is HttpPostedFileWrapper)
                 {
+                    string name = string.Empty;
+                    Stream fileStream = null;
+
+                    if (value is HttpPostedFile)
+                    {
+                        var file = value as HttpPostedFile;
+                        name = file.FileName;
+                        fileStream = file.InputStream;
+                    }
+                    else if (value is HttpPostedFileBase)
+                    {
+                        var file = value as HttpPostedFileBase;
+                        name = file.FileName;
+                        fileStream = file.InputStream;
+                    }
+                    else if (value is HttpPostedFileWrapper)
+                    {
+                        var file = value as HttpPostedFileWrapper;
+                        name = file.FileName;
+                        fileStream = file.InputStream;
+                    }
+
+
                     // handle upload
-                    var file = value as HttpPostedFile;
-                    if (file.FileName != String.Empty)
+
+                    if (name != String.Empty)
                     {
                         string fileName = UmbracoSettings.UploadAllowDirectories
-                                              ? Path.Combine(PropertyId.ToString(), file.FileName)
-                                              : PropertyId + "-" + file.FileName;
+                                              ? Path.Combine(PropertyId.ToString(), name)
+                                              : PropertyId + "-" + name;
 
                         fileName = Path.Combine(SystemDirectories.Media, fileName);
-                        um = UmbracoFile.Save(file, fileName);
+                        um = UmbracoFile.Save(fileStream, fileName);
 
                         if (um.SupportsResizing)
                         {
@@ -93,12 +116,34 @@ namespace umbraco.cms.businesslogic.datatype
                     {
                         // if no file is uploaded, we reset the value
                         base.Value = String.Empty;
+
+                        // also reset values of related fields
+                        clearRelatedValues();
                     }
                 }
                 else
                 {
                     base.Value = value;
+                    clearRelatedValues();
                 }
+            }
+        }
+
+        private void clearRelatedValues()
+        {
+            string propertyTypeAlias = new Property(PropertyId).PropertyType.Alias;
+            XmlNode uploadFieldConfigNode =
+                UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
+                    string.Format("uploadField [@alias = \"{0}\"]", propertyTypeAlias));
+            if (uploadFieldConfigNode != null)
+            {
+                // get the current document
+                Content content = Content.GetContentFromVersion(Version);
+                // only add dimensions to web images
+                updateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", String.Empty);
+                updateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", String.Empty);
+                updateContentProperty(uploadFieldConfigNode, content, "lengthFieldAlias", String.Empty);
+                updateContentProperty(uploadFieldConfigNode, content, "extensionFieldAlias", String.Empty);
             }
         }
 

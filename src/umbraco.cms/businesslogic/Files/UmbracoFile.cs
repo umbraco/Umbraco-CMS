@@ -32,6 +32,39 @@ namespace umbraco.cms.businesslogic.Files
 
         public static UmbracoFile Save(HttpPostedFile file, string fullFileName)
         {
+            byte[] fileData = null;
+            using (var binaryReader = new BinaryReader(file.InputStream))
+            {
+                fileData = binaryReader.ReadBytes(file.ContentLength);
+            }
+
+            return Save(fileData, fullFileName);
+        }
+
+        public static UmbracoFile Save(HttpPostedFileBase file, string fullFileName)
+        {
+            byte[] fileData = null;
+            using (var binaryReader = new BinaryReader(file.InputStream))
+            {
+                fileData = binaryReader.ReadBytes(file.ContentLength);
+            }
+
+            return Save(fileData, fullFileName);
+        }
+
+        public static UmbracoFile Save(Stream inputStream, string fullFileName){
+           
+            byte[] fileData = null;
+            using (var binaryReader = new BinaryReader(inputStream))
+            {
+                fileData = binaryReader.ReadBytes((int)inputStream.Length);
+            }
+
+            return Save(fileData, fullFileName);
+        }
+
+        public static UmbracoFile Save(byte[] file, string fullFileName)
+        {
             string fullFilePath = IO.IOHelper.MapPath(fullFileName);
 
             // create directories
@@ -50,11 +83,17 @@ namespace umbraco.cms.businesslogic.Files
                 }
             }
 
-            file.SaveAs(fullFilePath);
+            File.WriteAllBytes(fullFilePath, file);
             return new UmbracoFile(fullFilePath);
         }
 
         public static UmbracoFile Save(HttpPostedFile file)
+        {
+            string tempDir = Path.Combine(IO.SystemDirectories.Media, "uploads", Guid.NewGuid().ToString());
+            return Save(file, tempDir);
+        }
+        //filebase overload...
+        public static UmbracoFile Save(HttpPostedFileBase file)
         {
             string tempDir = Path.Combine(IO.SystemDirectories.Media, "uploads", Guid.NewGuid().ToString());
             return Save(file, tempDir);

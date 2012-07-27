@@ -170,13 +170,14 @@ namespace umbraco
 
         /// <summary>
         /// Gets the descendant nodes by document-type.
+        /// Get all descendants, and then return only those that match the requested typeAlias
         /// </summary>
         /// <param name="node">The <c>umbraco.presentation.nodeFactory.Node</c>.</param>
         /// <param name="documentTypeAlias">The document type alias.</param>
         /// <returns>Nodes as IEnumerable</returns>
         public static IEnumerable<Node> GetDescendantNodesByType(this Node node, string documentTypeAlias)
         {
-            return node.GetDescendantNodes(n => n.NodeTypeAlias == documentTypeAlias);
+            return node.GetDescendantNodes().Where(x => x.NodeTypeAlias == documentTypeAlias);
         }
 
         /// <summary>

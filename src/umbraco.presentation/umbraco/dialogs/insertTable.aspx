@@ -284,7 +284,7 @@ function insertTable()
 		</TR></FORM>
 	</TABLE>
 	&nbsp;
-	<input type="button" class="guiInputButton" onClick="if (confirm('<%=umbraco.ui.Text("areyousure")%>')) window.close();" value="<%=umbraco.ui.Text("cancel")%>"> &nbsp; 
+	<input type="button" class="guiInputButton" onClick="if (confirm('<%=umbraco.ui.Text("areyousure").Replace("'", "\\'")%>')) window.close();" value="<%=umbraco.ui.Text("cancel")%>"> &nbsp; 
 	<input type="button" class="guiInputButton" onClick="insertTable()" value="<%=umbraco.ui.Text("insert")%>">
 	</body>
 </HTML>

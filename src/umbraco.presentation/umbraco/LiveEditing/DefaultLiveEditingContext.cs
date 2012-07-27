@@ -165,7 +165,9 @@ namespace umbraco.presentation.LiveEditing
                 MemoryStream deflatedStream = new MemoryStream();
                 DeflaterOutputStream deflater = new DeflaterOutputStream(deflatedStream,
                                                                          new Deflater(Deflater.BEST_COMPRESSION, true));
-                serializer.Serialize(deflater, m_Updates);
+                if (m_Updates != null)
+                    serializer.Serialize(deflater, m_Updates);
+                
                 deflater.Close();
 
                 // get compressed characters
