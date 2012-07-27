@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Xml.Linq;
+using Umbraco.Core;
 using umbraco.BusinessLogic.Utils;
 using umbraco.DataLayer;
 using umbraco.businesslogic;
@@ -29,10 +30,9 @@ namespace umbraco.BusinessLogic
         public ApplicationRegistrar()
         {
             // Load all Applications by attribute and add them to the XML config
-        	var typeFinder = new Umbraco.Core.TypeFinder2();
-			var types = typeFinder.FindClassesOfType<IApplication>()
-                .Where(x => x.GetCustomAttributes(typeof(ApplicationAttribute), false).Any());
+        	var types = PluginTypeResolver.Current.ResolveApplications();
 
+			//we can have multiple attributes so we'll query for them
             var attrs = types.Select(x => (ApplicationAttribute)x.GetCustomAttributes(typeof(ApplicationAttribute), false).Single())
                 .Where(x => Application.getByAlias(x.Alias) == null);
 

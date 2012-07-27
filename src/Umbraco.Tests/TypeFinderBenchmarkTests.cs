@@ -16,16 +16,15 @@ using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.uicontrols;
 
-[assembly: TypeFinderBenchmarkTests.AssemblyContainsPluginsAttribute]
+[assembly: TypeFinderTests.AssemblyContainsPluginsAttribute]
 
 namespace Umbraco.Tests
 {
 	/// <summary>
 	/// Full Trust benchmark tests for typefinder and the old typefinder
 	/// </summary>
-	[TestFixture]
-	[Ignore("This is a benchark test")]
-	public class TypeFinderBenchmarkTests
+	[TestFixture]	
+	public class TypeFinderTests
 	{
 		/// <summary>
 		/// List of assemblies to scan
@@ -73,18 +72,43 @@ namespace Umbraco.Tests
 		{
 		}
 
+		[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+		public class MyTestAttribute : Attribute
+		{
+			
+		}
+
 		public abstract class TestEditor
 		{
 
 		}
 
+		[MyTestAttribute]
 		public class BenchmarkTestEditor : TestEditor
 		{
 
 		}
 
+		[MyTestAttribute]
+		public class MyOtherTestEditor : TestEditor
+		{
+
+		}
+
+		[Test]
+		public void Get_Type_With_Attribute()
+		{
+
+			var finder2 = new Umbraco.Core.TypeFinder2();
+
+			var typesFound = finder2.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies);
+
+			Assert.AreEqual(2, typesFound.Count());
+
+		}
 		
 		[Test]
+		[Ignore("This is a benchark test")]
 		public void Benchmark_Old_TypeFinder_vs_New_TypeFinder_FindClassesWithAttribute()
 		{
 			var timer = new Stopwatch();
@@ -107,6 +131,7 @@ namespace Umbraco.Tests
 		}
 
 		[Test]
+		[Ignore("This is a benchark test")]
 		public void Benchmark_Old_TypeFinder_vs_New_TypeFinder_FindClassesOfType()
 		{
 			var timer = new Stopwatch();			
@@ -133,6 +158,7 @@ namespace Umbraco.Tests
 		/// cache files created instead since this is clearly a TON faster.
 		/// </summary>
 		[Test]
+		[Ignore("This is a benchark test")]
 		public void Benchmark_Finding_First_Type_In_Assemblies()
 		{
 			var timer = new Stopwatch();			

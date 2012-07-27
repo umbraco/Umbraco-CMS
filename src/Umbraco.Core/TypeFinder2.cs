@@ -16,6 +16,9 @@ using System.Web.Hosting;
 
 namespace Umbraco.Core
 {
+
+	//TODO: Get the App_Code stuff in here from the old one
+
 	/// <summary>
 	/// A utility class to find all classes of a certain type by reflection in the current bin folder
 	/// of the web application. 
@@ -252,6 +255,32 @@ namespace Umbraco.Core
 			return FindClassesOfType<T, TAssemblyAttribute>(new[] { assembly });
 		}
 
+		public IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>()
+			where TAttribute : Attribute
+		{
+			return FindClassesOfTypeWithAttribute<T, TAttribute>(GetAssembliesWithKnownExclusions(), true);
+		}
+
+		public IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>(IEnumerable<Assembly> assemblies)
+			where TAttribute : Attribute
+		{
+			return FindClassesOfTypeWithAttribute<T, TAttribute>(assemblies, true);
+		}
+
+		public IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>(IEnumerable<Assembly> assemblies, bool onlyConcreteClasses)
+			where TAttribute : Attribute
+		{
+			if (assemblies == null) throw new ArgumentNullException("assemblies");
+
+			return (from a in assemblies
+					from t in GetTypesWithFormattedException(a)
+					where !t.IsInterface 
+						&& typeof(T).IsAssignableFrom(t)
+						&& t.GetCustomAttributes<TAttribute>(false).Any()
+						&& (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))
+					select t).ToList();
+		}
+
 		/// <summary>
 		/// Searches all filtered local assemblies specified for classes of the type passed in.
 		/// </summary>
@@ -260,32 +289,6 @@ namespace Umbraco.Core
 		public IEnumerable<Type> FindClassesOfType<T>()
 		{
 			return FindClassesOfType<T>(GetAssembliesWithKnownExclusions(), true);
-		}
-
-		/// <summary>
-		/// Searches all assemblies specified for classes of the type passed in.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="assemblyFiles"></param>
-		/// <returns></returns>
-		public IEnumerable<Type> FindClassesOfType<T>(IEnumerable<string> assemblyFiles)
-		{
-			return FindClassesOfType<T>(assemblyFiles, true);
-		}
-
-		/// <summary>
-		/// Searches all assemblies specified for classes of the type passed in.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="assemblyFiles"></param>
-		/// <param name="onlyConcreteClasses">Only resolve concrete classes that can be instantiated</param>
-		/// <returns></returns>
-		public IEnumerable<Type> FindClassesOfType<T>(IEnumerable<string> assemblyFiles, bool onlyConcreteClasses)
-		{
-			if (assemblyFiles == null) throw new ArgumentNullException("assemblyFiles");
-
-			var typeAndAssembly = GetAssignablesFromType<T>(assemblyFiles, onlyConcreteClasses);
-			return GetTypesFromResult(typeAndAssembly);
 		}
 
 		/// <summary>
@@ -354,40 +357,6 @@ namespace Umbraco.Core
 			return FindClassesWithAttribute<T>(GetAssembliesWithKnownExclusions());
 		}
 
-		#region Internal Methods - For testing
-		/// <summary>
-		/// Used to find all types in all assemblies in the specified folder
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="folder"></param>
-		/// <param name="onlyConcreteClasses"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// This has potential cost alot in performance so it is marked internal and should ONLY be used
-		/// where absolutely necessary (i.e. Tests)
-		/// </remarks>
-		internal IEnumerable<Type> FindClassesOfType<T>(DirectoryInfo folder, bool onlyConcreteClasses)
-		{
-			var types = new List<Type>();
-			types.AddRange(FindClassesOfType<T>(folder.GetFiles("*.dll").Select(x => x.FullName)));
-			return types;
-		}
-
-		/// <summary>
-		/// Used to find all types in all assemblies in the specified folder
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="folder"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// This has potential cost alot in performance so it is marked internal and should ONLY be used
-		/// where absolutely necessary (i.e. Tests)
-		/// </remarks>
-		internal IEnumerable<Type> FindClassesOfType<T>(DirectoryInfo folder)
-		{
-			return FindClassesOfType<T>(folder, true);
-		}
-		#endregion
 
 		#region Internal Attributed Assembly class
 

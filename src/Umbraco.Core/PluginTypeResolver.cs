@@ -73,14 +73,9 @@ namespace Umbraco.Core
 				}
 			}
 			return instances;
-		} 
+		}
 
-		/// <summary>
-		/// Generic method to find the specified type and cache the result
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-		internal IEnumerable<Type> ResolveTypes<T>()
+		private IEnumerable<Type> ResolveTypes<T>(Func<IEnumerable<Type>> finder)
 		{
 			using (var readLock = new UpgradeableReadLock(_lock))
 			{
@@ -93,7 +88,7 @@ namespace Umbraco.Core
 
 					typeList = new TypeList<T>();
 
-					foreach (var t in TypeFinder.FindClassesOfType<T>())
+					foreach (var t in finder())
 					{
 						typeList.AddType(t);
 					}
@@ -103,8 +98,28 @@ namespace Umbraco.Core
 				}
 				return typeList.GetTypes();
 			}
+		}
 
+		/// <summary>
+		/// Generic method to find the specified type and cache the result
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		internal IEnumerable<Type> ResolveTypes<T>()
+		{
+			return ResolveTypes<T>(() => TypeFinder.FindClassesOfType<T>());
+		}
 
+		/// <summary>
+		/// Generic method to find the specified type that has an attribute and cache the result
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <typeparam name="TAttribute"></typeparam>
+		/// <returns></returns>
+		internal IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>()
+			where TAttribute : Attribute
+		{
+			return ResolveTypes<T>(() => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>());
 		}
 
 		/// <summary>

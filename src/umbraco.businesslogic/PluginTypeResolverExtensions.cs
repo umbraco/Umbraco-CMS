@@ -20,5 +20,15 @@ namespace umbraco.businesslogic
 			return resolver.ResolveTypes<IApplicationStartupHandler>();
 		}
 
+		/// <summary>
+		/// Returns all available IApplication object
+		/// </summary>
+		/// <param name="resolver"></param>
+		/// <returns></returns>
+		internal static IEnumerable<Type> ResolveApplications(this PluginTypeResolver resolver)
+		{
+			return resolver.ResolveTypesWithAttribute<IApplication, ApplicationAttribute>();
+		}
+
 	}
 }
