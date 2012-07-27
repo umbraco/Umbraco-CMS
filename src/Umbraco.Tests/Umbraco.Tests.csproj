@@ -49,6 +49,11 @@
     <Compile Include="BusinessLogic\ApplicationTest.cs" />
     <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
     <Compile Include="BusinessLogic\BaseTest.cs" />
+    <Compile Include="DataTypeFactoryTests.cs" />
+    <Compile Include="MacroControlFactoryTests.cs" />
+    <Compile Include="MacroEngineFactoryTests.cs" />
+    <Compile Include="MediaFactoryTests.cs" />
+    <Compile Include="PackageActionFactoryTests.cs" />
     <Compile Include="PluginTypeResolverExtensions.cs" />
     <Compile Include="PluginTypeResolverTests.cs" />
     <Compile Include="TestHelper.cs" />
@@ -62,7 +67,7 @@
     <Compile Include="PartialTrust\TestOnlyInFullTrustAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringExtensionsTests.cs" />
-    <Compile Include="TypeFinderBenchmarkTests.cs" />
+    <Compile Include="TypeFinderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -91,6 +96,10 @@
     <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
       <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
       <Name>umbraco.datalayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\umbraco.editorControls\umbraco.editorControls.csproj">
+      <Project>{255F5DF1-4E43-4758-AC05-7A0B68EB021B}</Project>
+      <Name>umbraco.editorControls</Name>
     </ProjectReference>
     <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>

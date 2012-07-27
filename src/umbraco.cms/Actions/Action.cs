@@ -6,6 +6,7 @@ using System.Reflection;
 using Umbraco.Core;
 using umbraco.BasePages;
 using umbraco.BusinessLogic.Utils;
+using umbraco.cms;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.workflow;
 using umbraco.interfaces;
@@ -35,9 +36,6 @@ namespace umbraco.BusinessLogic.Actions
         private static readonly Dictionary<string, string> ActionJs = new Dictionary<string, string>();
 
         private static readonly object Lock = new object();
-        private static readonly object LockerReRegister = new object();
-
-    	private static readonly Umbraco.Core.TypeFinder2 TypeFinder = new TypeFinder2();
 
         static Action()
         {
@@ -64,17 +62,11 @@ namespace umbraco.BusinessLogic.Actions
         /// </summary>
         private static void RegisterIActionHandlers()
         {
-
             if (ActionHandlers.Count == 0)
             {
-
-				var foundIActionHandlers = TypeFinder.FindClassesOfType<IActionHandler>();
-                foreach (var type in foundIActionHandlers)
-                {
-                	var typeInstance = Activator.CreateInstance(type) as IActionHandler;
-                	if (typeInstance != null)
-                        ActionHandlers.Add(typeInstance);
-                }
+            	ActionHandlers.AddRange(
+            		PluginTypeResolver.Current.CreateInstances<IActionHandler>(
+            			PluginTypeResolver.Current.ResolveActions()));                
             }
 
         }

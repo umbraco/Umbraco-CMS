@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
+using System.Linq;
 using System.Web;
-
+using Umbraco.Core;
 using umbraco.BusinessLogic.Utils;
 using umbraco.interfaces;
 using System.Collections.Generic;
@@ -17,7 +19,7 @@ namespace umbraco.cms.businesslogic.datatype.controls
     {
         #region Declarations
 
-        private static readonly Dictionary<Guid, Type> _controls = new Dictionary<Guid, Type>();
+		internal static readonly ConcurrentDictionary<Guid, Type> _controls = new ConcurrentDictionary<Guid, Type>();
 
         #endregion
 
@@ -53,7 +55,7 @@ namespace umbraco.cms.businesslogic.datatype.controls
             }
             if (_controls.ContainsKey(DataEditorId))
             {
-                IDataType newObject = Activator.CreateInstance(_controls[DataEditorId]) as IDataType;
+            	var newObject = PluginTypeResolver.Current.CreateInstance<IDataType>(_controls[DataEditorId]);
                 return newObject;
             }
             else
@@ -68,10 +70,10 @@ namespace umbraco.cms.businesslogic.datatype.controls
         /// <returns>A list of IDataType's</returns>
         public IDataType[] GetAll()
         {
-            IDataType[] retVal = new IDataType[_controls.Count];
-            int c = 0;
+            var retVal = new IDataType[_controls.Count];
+            var c = 0;
 
-            foreach (Guid id in _controls.Keys)
+            foreach (var id in _controls.Keys)
             {
                 retVal[c] = GetNewObject(id);
                 c++;
@@ -80,39 +82,19 @@ namespace umbraco.cms.businesslogic.datatype.controls
             return retVal;
         }
 
-        private static void Initialize()
+        internal static void Initialize()
         {
             // Get all datatypes from interface
-        	var typeFinder = new Umbraco.Core.TypeFinder2();
-			var types = typeFinder.FindClassesOfType<IDataType>();
-            GetDataTypes(types);
+        	var types = PluginTypeResolver.Current.ResolveDataTypes().ToArray();
+			foreach (var t in types)
+			{
+				var instance = PluginTypeResolver.Current.CreateInstance<IDataType>(t);
+				if (instance != null)
+				{
+					_controls.TryAdd(instance.Id, t);				
+				}				
+			}			
         }
-
-        private static void GetDataTypes(IEnumerable<Type> types)
-        {
-            foreach (var t in types)
-            {
-                IDataType typeInstance = null;
-                try
-                {
-                    if (t.IsVisible)
-                    {
-                        typeInstance = Activator.CreateInstance(t) as IDataType;
-                    }
-                }
-                catch { }
-                if (typeInstance != null)
-                {
-                    try
-                    {
-                        _controls.Add(typeInstance.Id, t);
-                    }
-                    catch (Exception ee)
-                    {
-                        BusinessLogic.Log.Add(umbraco.BusinessLogic.LogTypes.Error, -1, "Can't import datatype '" + t.FullName + "': " + ee.ToString());
-                    }
-                }
-            }
-        }
+        
     }
 }

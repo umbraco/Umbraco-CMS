@@ -3,6 +3,9 @@ using System.Threading;
 
 namespace Umbraco.Core.Resolving
 {
+	//NOTE: This class should also support creating instances of the object and managing their lifespan,
+	// for example, some resolvers would want to return new object each time, per request or per application lifetime.
+
 	/// <summary>
 	/// A Resolver which manages an ordered list of objects.
 	/// </summary>

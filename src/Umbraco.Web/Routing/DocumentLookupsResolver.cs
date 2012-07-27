@@ -22,7 +22,7 @@ namespace Umbraco.Web.Routing
 		internal DocumentLookupsResolver(IEnumerable<Type> lookupTypes, IDocumentLastChanceLookup lastChanceLookup)
 		{
 			//TODO: I've changed this to resolve types but the intances are not created yet!
-			// I've created a method on the PluginTypeResolver to create types: PluginTypesResolver.Current.CreateInstances<T>()
+			// I've created a method on the PluginTypeResolver to create types: PluginTypesResolver.Current.FindAndCreateInstances<T>()
 			
 
 			_lookupTypes.AddRange(lookupsTypes);

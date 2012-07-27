@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web.UI;
+using Umbraco.Core;
 using umbraco.BusinessLogic.Utils;
 using umbraco.interfaces;
 using umbraco.editorControls;
@@ -12,14 +14,17 @@ namespace umbraco.editorControls.macrocontainer
 {
     internal class MacroControlFactory
     {
-        #region Private Fields
+        
         /// <summary>
         /// All Possible Macro types
         /// </summary>
         private static List<Type> _macroControlTypes = null;
-        #endregion
+
+    	private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
+
 
         #region Methods
+
         /// <summary>
         /// Create an instance of a Macro control and return it.
         /// Because the macro control uses inline client script whichs is not generated after postback
@@ -27,19 +32,22 @@ namespace umbraco.editorControls.macrocontainer
         /// </summary>
         internal static Control GetMacroRenderControlByType(PersistableMacroProperty prop, string uniqueID)
         {
-            Control macroControl;
-   
-            Type m = MacroControlTypes.FindLast(delegate(Type macroGuiCcontrol) { return macroGuiCcontrol.ToString() == string.Format("{0}.{1}", prop.AssemblyName, prop.TypeName); });
-            IMacroGuiRendering typeInstance;
-            typeInstance = Activator.CreateInstance(m) as IMacroGuiRendering;
-            if (!string.IsNullOrEmpty(prop.Value))
-            {
-                ((IMacroGuiRendering)typeInstance).Value = prop.Value;
-            }
-            macroControl = (Control)typeInstance;
-
-            macroControl.ID = uniqueID;
-            return macroControl;
+        	var m = MacroControlTypes.FindLast(macroGuiCcontrol => macroGuiCcontrol.ToString() == string.Format("{0}.{1}", prop.AssemblyName, prop.TypeName));
+        	var instance = PluginTypeResolver.Current.CreateInstance<IMacroGuiRendering>(m);
+			if (instance != null)
+			{
+				if (!string.IsNullOrEmpty(prop.Value))
+				{
+					instance.Value = prop.Value;
+				}
+				var macroControl = instance as Control;
+				if (macroControl != null)
+				{
+					macroControl.ID = uniqueID;
+					return macroControl;	
+				}
+			}
+        	return null;
         }
 
         /// <summary>
@@ -51,25 +59,29 @@ namespace umbraco.editorControls.macrocontainer
         {
             return ((IMacroGuiRendering)macroControl).Value;
         }
+
         #endregion
 
         #region Properties
         /// <summary>
         /// All Possible Macro types
         /// </summary>
-		private static List<Type> MacroControlTypes
+		internal static List<Type> MacroControlTypes
         {
             get
             {
-                if (_macroControlTypes == null || !_macroControlTypes.Any())
-                {
-                    //Populate the list with all the types of IMacroGuiRendering
-                	var typeFinder = new Umbraco.Core.TypeFinder2();
-                    _macroControlTypes = new List<Type>();
-                	_macroControlTypes = typeFinder.FindClassesOfType<IMacroGuiRendering>().ToList();
-                }
+				using (var readLock = new UpgradeableReadLock(Lock))
+				{
+					if (_macroControlTypes == null || !_macroControlTypes.Any())
+					{
 
-                return _macroControlTypes;
+						readLock.UpgradeToWriteLock();
+
+						_macroControlTypes = new List<Type>(PluginTypeResolver.Current.ResolveMacroRenderings());
+					}
+
+					return _macroControlTypes;
+				}
             }
         }
         #endregion

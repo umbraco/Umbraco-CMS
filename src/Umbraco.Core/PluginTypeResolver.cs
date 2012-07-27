@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 
@@ -9,7 +10,7 @@ namespace Umbraco.Core
 {
 
 	/// <summary>
-	/// Used to resolve all plugin types
+	/// Used to resolve all plugin types and cache them
 	/// </summary>
 	/// <remarks>
 	/// 
@@ -49,17 +50,41 @@ namespace Umbraco.Core
 		internal readonly TypeFinder2 TypeFinder = new TypeFinder2();
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		private readonly HashSet<TypeList> _types = new HashSet<TypeList>();
+		private IEnumerable<Assembly> _assemblies;
+
+		/// <summary>
+		/// Gets/sets which assemblies to scan when type finding, generally used for unit testing, if not explicitly set
+		/// this will search all assemblies known to have plugins and exclude ones known to not have them.
+		/// </summary>
+		internal IEnumerable<Assembly> AssembliesToScan
+		{
+			get { return _assemblies ?? (_assemblies = TypeFinder2.GetAssembliesWithKnownExclusions()); }
+			set { _assemblies = value; }
+		}
+
+		/// <summary>
+		/// Used to resolve and create instances of the specified type based on the resolved/cached plugin types
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="throwException">set to true if an exception is to be thrown if there is an error during instantiation</param>
+		/// <returns></returns>
+		internal IEnumerable<T> FindAndCreateInstances<T>(bool throwException = false)
+		{
+			var types = ResolveTypes<T>();
+			return CreateInstances<T>(types, throwException);
+		}
 
 		/// <summary>
 		/// Used to create instances of the specified type based on the resolved/cached plugin types
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
+		/// <param name="types"></param>
+		/// <param name="throwException">set to true if an exception is to be thrown if there is an error during instantiation</param>
 		/// <returns></returns>
-		internal IEnumerable<T> CreateInstances<T>()
+		internal IEnumerable<T> CreateInstances<T>(IEnumerable<Type> types, bool throwException = false)
 		{
-			var types = ResolveTypes<T>();
 			var instances = new List<T>();
-			foreach(var t in types)
+			foreach (var t in types)
 			{
 				try
 				{
@@ -70,17 +95,29 @@ namespace Umbraco.Core
 				{
 					//TODO: Need to fix logging so this doesn't bork if no SQL connection
 					//Log.Add(LogTypes.Error, -1, "Error loading ILookup: " + ex.ToString());
+					if (throwException)
+					{
+						throw ex;
+					}
 				}
 			}
 			return instances;
-		} 
+		}
 
 		/// <summary>
-		/// Generic method to find the specified type and cache the result
+		/// Used to create an instance of the specified type based on the resolved/cached plugin types
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
+		/// <param name="type"></param>
+		/// <param name="throwException"></param>
 		/// <returns></returns>
-		internal IEnumerable<Type> ResolveTypes<T>()
+		internal T CreateInstance<T>(Type type, bool throwException = false)
+		{
+			var instances = CreateInstances<T>(new[] {type}, throwException);
+			return instances.FirstOrDefault();
+		}
+
+		private IEnumerable<Type> ResolveTypes<T>(Func<IEnumerable<Type>> finder)
 		{
 			using (var readLock = new UpgradeableReadLock(_lock))
 			{
@@ -93,7 +130,7 @@ namespace Umbraco.Core
 
 					typeList = new TypeList<T>();
 
-					foreach (var t in TypeFinder.FindClassesOfType<T>())
+					foreach (var t in finder())
 					{
 						typeList.AddType(t);
 					}
@@ -103,8 +140,28 @@ namespace Umbraco.Core
 				}
 				return typeList.GetTypes();
 			}
+		}
 
+		/// <summary>
+		/// Generic method to find the specified type and cache the result
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		internal IEnumerable<Type> ResolveTypes<T>()
+		{
+			return ResolveTypes<T>(() => TypeFinder.FindClassesOfType<T>(AssembliesToScan));
+		}
 
+		/// <summary>
+		/// Generic method to find the specified type that has an attribute and cache the result
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <typeparam name="TAttribute"></typeparam>
+		/// <returns></returns>
+		internal IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>()
+			where TAttribute : Attribute
+		{
+			return ResolveTypes<T>(() => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>(AssembliesToScan));
 		}
 
 		/// <summary>
@@ -115,6 +172,8 @@ namespace Umbraco.Core
 		{
 			return _types;
 		}
+
+
 
 		#region Private classes
 		internal abstract class TypeList

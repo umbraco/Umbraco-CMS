@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Xml.Linq;
+using Umbraco.Core;
 using umbraco.BusinessLogic.Utils;
 using umbraco.DataLayer;
 using umbraco.businesslogic;
@@ -29,11 +30,12 @@ namespace umbraco.BusinessLogic
         public ApplicationRegistrar()
         {
             // Load all Applications by attribute and add them to the XML config
-        	var typeFinder = new Umbraco.Core.TypeFinder2();
-			var types = typeFinder.FindClassesOfType<IApplication>()
-                .Where(x => x.GetCustomAttributes(typeof(ApplicationAttribute), false).Any());
+        	var types = PluginTypeResolver.Current.ResolveApplications();
 
-            var attrs = types.Select(x => (ApplicationAttribute)x.GetCustomAttributes(typeof(ApplicationAttribute), false).Single())
+			//since applications don't populate their metadata from the attribute and because it is an interface, 
+			//we need to interrogate the attributes for the data. Would be better to have a base class that contains 
+			//metadata populated by the attribute. Oh well i guess.
+			var attrs = types.Select(x => x.GetCustomAttributes<ApplicationAttribute>(false).Single())
                 .Where(x => Application.getByAlias(x.Alias) == null);
 
             var allAliases = Application.getAll().Select(x => x.alias).Concat(attrs.Select(x => x.Alias));
