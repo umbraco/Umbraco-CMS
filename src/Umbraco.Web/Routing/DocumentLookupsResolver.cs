@@ -52,7 +52,7 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Gets the <see cref="IDocumentLookup"/> implementations.
 		/// </summary>
-		public IEnumerable<IDocumentLookup> GetDocumentLookups
+		public IEnumerable<IDocumentLookup> DocumentLookups
 		{
 			get { return _lookups.Values; }
 		}

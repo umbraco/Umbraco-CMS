@@ -4,13 +4,13 @@ using System.Threading;
 namespace Umbraco.Core.Resolving
 {
 	/// <summary>
-	/// A Resolver to return and set a Multiply registered object.
+	/// A Resolver which manages an ordered list of objects.
 	/// </summary>
-	/// <typeparam name="TResolver"></typeparam>
-	/// <typeparam name="TResolved"></typeparam>
+	/// <typeparam name="TResolver">The type of the resolver.</typeparam>
+	/// <typeparam name="TResolved">The type of the resolved objects.</typeparam>
 	/// <remarks>
 	/// Used to resolve multiple types from a collection. The collection can also be modified at runtime/application startup.
-	/// An example of this is MVCs ViewEngines collection
+	/// An example of this is MVCs ViewEngines collection.
 	/// </remarks>
 	internal abstract class MultipleResolverBase<TResolver, TResolved> : ResolverBase<TResolver> 
 		where TResolver : class 
@@ -19,39 +19,60 @@ namespace Umbraco.Core.Resolving
 		readonly List<TResolved> _resolved;
 		protected readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MultipleResolverBase"/> class with an empty list of objects.
+		/// </summary>
 		protected MultipleResolverBase()
 		{
 			_resolved = new List<TResolved>();
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MultipleResolverBase"/> class with an initial list of objects.
+		/// </summary>
+		/// <param name="values">The list of objects.</param>
 		protected MultipleResolverBase(IEnumerable<TResolved> value)
 		{
 			_resolved = new List<TResolved>(value);
-		}		
+		}
 
-		protected IEnumerable<TResolved>  Values
+		/// <summary>
+		/// Gets the list of objects.
+		/// </summary>
+		protected IEnumerable<TResolved> Values
 		{
 			get { return _resolved; }
 		}
 
-		public void Remove(TResolved item)
+		/// <summary>
+		/// Removes an object.
+		/// </summary>
+		/// <param name="value">The object to remove.</param>
+		public void Remove(TResolved value)
 		{
 			Resolution.EnsureNotFrozen();
 			using (new WriteLock(Lock))
 			{							
-				_resolved.Remove(item);
+				_resolved.Remove(value);
 			}
 		}
 
-		public void Add(TResolved item)
+		/// <summary>
+		/// Adds an object to the end of the list.
+		/// </summary>
+		/// <param name="value">The object to be added.</param>
+		public void Add(TResolved value)
 		{
 			Resolution.EnsureNotFrozen();
 			using (new WriteLock(Lock))
 			{
-				_resolved.Add(item);			
+				_resolved.Add(value);			
 			}
 		}
 
+		/// <summary>
+		/// Clears the list.
+		/// </summary>
 		public void Clear()
 		{
 			Resolution.EnsureNotFrozen();
@@ -61,12 +82,17 @@ namespace Umbraco.Core.Resolving
 			}
 		}
 
-		public void Insert(int index, TResolved item)
+		/// <summary>
+		/// Inserts an object at the specified index.
+		/// </summary>
+		/// <param name="index">The zero-based index at which the object should be inserted.</param>
+		/// <param name="value">The object to insert.</param>
+		public void Insert(int index, TResolved value)
 		{
 			Resolution.EnsureNotFrozen();
 			using (new WriteLock(Lock))
 			{
-				_resolved.Insert(index, item);
+				_resolved.Insert(index, value);
 			}
 		}
 		
