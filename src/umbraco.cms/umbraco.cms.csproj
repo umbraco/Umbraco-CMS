@@ -202,6 +202,7 @@
     </Compile>
     <Compile Include="Actions\IActionHandler.cs" />
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
+    <Compile Include="businesslogic\datatype\AbstractDataEditorControl.cs" />
     <Compile Include="businesslogic\datatype\ClientDependencyAttribute.cs" />
     <Compile Include="businesslogic\datatype\DataEditorSetting.cs" />
     <Compile Include="businesslogic\datatype\DataEditorSettingsStorage.cs" />

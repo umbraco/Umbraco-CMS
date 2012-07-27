@@ -36,7 +36,7 @@ namespace umbraco.editorControls.MultipleTextstring
 			this.m_Control.Init += new EventHandler(this.m_Control_Init);
 
 			// assign the save event for the data-type/editor
-			this.DataEditorControl.OnSave += new AbstractDataEditorControl.SaveEventHandler(this.DataEditorControl_OnSave);
+			this.DataEditorControl.OnSave += this.DataEditorControl_OnSave;
 		}
 
 		/// <summary>
@@ -127,7 +127,7 @@ namespace umbraco.editorControls.MultipleTextstring
 		/// Saves the data for the editor control.
 		/// </summary>
 		/// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-		private void DataEditorControl_OnSave(EventArgs e)
+		private void DataEditorControl_OnSave(object sender, EventArgs e)
 		{
 			this.Data.Value = this.m_Control.Values;
 		}

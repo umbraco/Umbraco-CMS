@@ -21,7 +21,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             RenderControl = m_Tree;
             m_Tree.Init += Tree_Init;
             m_Tree.Load += Tree_Load;
-            DataEditorControl.OnSave +=  DataEditorControl_OnSave;
+            DataEditorControl.OnSave += DataEditorControl_OnSave;
 
         }
 
@@ -157,11 +157,12 @@ namespace umbraco.editorControls.MultiNodeTreePicker
            
         }
 
-		/// <summary>
-		/// Handle the saving event, need to give data to Umbraco
-		/// </summary>
-		/// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void DataEditorControl_OnSave(EventArgs e)
+        /// <summary>
+        /// Handle the saving event, need to give data to Umbraco
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs" /> instance containing the event data.</param>
+        void DataEditorControl_OnSave(object sender, EventArgs e)
         {
             string val;
             if (StoreAsCommaDelimited)

@@ -32,7 +32,7 @@ namespace umbraco.editorControls.Slider
 			this.m_Control.Init += new EventHandler(this.m_Control_Init);
 
 			// assign the save event for the data-type/editor
-			this.DataEditorControl.OnSave += new AbstractDataEditorControl.SaveEventHandler(this.DataEditorControl_OnSave);
+			this.DataEditorControl.OnSave += this.DataEditorControl_OnSave;
 		}
 
 		/// <summary>
@@ -115,7 +115,7 @@ namespace umbraco.editorControls.Slider
 		/// Saves the editor control value.
 		/// </summary>
 		/// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-		private void DataEditorControl_OnSave(EventArgs e)
+		private void DataEditorControl_OnSave(object sender, EventArgs e)
 		{
 			// set the values (on PostBack)
 			var value1 = this.m_Control.Options.MinValue;
