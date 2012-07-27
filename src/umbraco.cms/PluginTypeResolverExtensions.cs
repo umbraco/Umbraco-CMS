@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Umbraco.Core;
 using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
+using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 
 namespace umbraco.cms
@@ -21,6 +22,26 @@ namespace umbraco.cms
 		internal static IEnumerable<Type> ResolveActions(this PluginTypeResolver resolver)
 		{
 			return resolver.ResolveTypes<IActionHandler>();
+		}
+
+		/// <summary>
+		/// Returns all available IDataType in application
+		/// </summary>
+		/// <param name="resolver"></param>
+		/// <returns></returns>
+		internal static IEnumerable<Type> ResolveDataTypes(this PluginTypeResolver resolver)
+		{
+			return resolver.ResolveTypes<IDataType>();
+		}
+
+		/// <summary>
+		/// Returns all available IDataType in application
+		/// </summary>
+		/// <param name="resolver"></param>
+		/// <returns></returns>
+		internal static IEnumerable<Type> ResolveMacroEngines(this PluginTypeResolver resolver)
+		{
+			return resolver.ResolveTypes<IMacroEngine>();
 		}
 
 	}

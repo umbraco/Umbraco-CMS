@@ -8,7 +8,6 @@ using Umbraco.Core.Resolving;
 
 namespace Umbraco.Tests
 {
-	
 	[TestFixture]
     public class EnumerableExtensionsTests
     {

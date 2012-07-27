@@ -104,6 +104,19 @@ namespace Umbraco.Core
 			return instances;
 		}
 
+		/// <summary>
+		/// Used to create an instance of the specified type based on the resolved/cached plugin types
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="type"></param>
+		/// <param name="throwException"></param>
+		/// <returns></returns>
+		internal T CreateInstance<T>(Type type, bool throwException = false)
+		{
+			var instances = CreateInstances<T>(new[] {type}, throwException);
+			return instances.FirstOrDefault();
+		}
+
 		private IEnumerable<Type> ResolveTypes<T>(Func<IEnumerable<Type>> finder)
 		{
 			using (var readLock = new UpgradeableReadLock(_lock))

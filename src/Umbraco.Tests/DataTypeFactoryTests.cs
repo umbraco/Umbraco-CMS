@@ -1,4 +1,3 @@
-using System.Linq;
 using NUnit.Framework;
 using SqlCE4Umbraco;
 using Umbraco.Core;
@@ -10,15 +9,13 @@ using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.editorControls;
 using umbraco.uicontrols;
-using umbraco.cms;
+using System.Linq;
 
 namespace Umbraco.Tests
 {
-
 	[TestFixture]
-	public class PluginTypeResolverTests
+	public class DataTypeFactoryTests
 	{
-
 		[SetUp]
 		public void Initialize()
 		{
@@ -42,66 +39,24 @@ namespace Umbraco.Tests
 			        typeof(DLRScriptingEngine).Assembly,
 			        typeof(ICultureDictionary).Assembly,
 					typeof(UmbracoContext).Assembly,
-					typeof(BaseDataType).Assembly
+					typeof(BaseDataType).Assembly,
+
 			    };
 		}
 
 		[Test]
-		public void Ensure_Only_One_Type_List_Created()
+		public void Find_All_DataTypes()
 		{
-			var foundTypes1 = PluginTypeResolver.Current.ResolveFindMeTypes();
-			var foundTypes2 = PluginTypeResolver.Current.ResolveFindMeTypes();
-			Assert.AreEqual(1, PluginTypeResolver.Current.GetTypeLists().Count);
+			umbraco.cms.businesslogic.datatype.controls.Factory.Initialize();
+			Assert.AreEqual(33, umbraco.cms.businesslogic.datatype.controls.Factory._controls.Count);
 		}
 
 		[Test]
-		public void Resolves_Types()
+		public void Get_All_Instances()
 		{
-			var foundTypes1 = PluginTypeResolver.Current.ResolveFindMeTypes();			
-			Assert.AreEqual(2, foundTypes1.Count());
-		}
-
-		[Test]
-		public void Resolves_Trees()
-		{
-			var trees = PluginTypeResolver.Current.ResolveTrees();
-			Assert.AreEqual(26, trees.Count());
-		}
-
-		[Test]
-		public void Resolves_Applications()
-		{
-			var apps = PluginTypeResolver.Current.ResolveApplications();
-			Assert.AreEqual(7, apps.Count());
-		}
-
-		[Test]
-		public void Resolves_Actions()
-		{
-			var types = PluginTypeResolver.Current.ResolveActions();
-			Assert.AreEqual(1, types.Count());
-		}
-
-		[Test]
-		public void Resolves_DataTypes()
-		{
-			var types = PluginTypeResolver.Current.ResolveDataTypes();
-			Assert.AreEqual(33, types.Count());
-		}
-
-		public interface IFindMe
-		{
-
-		}
-
-		public class FindMe1 : IFindMe
-		{
-
-		}
-
-		public class FindMe2 : IFindMe
-		{
-
+			umbraco.cms.businesslogic.datatype.controls.Factory.Initialize();
+			var factory = new umbraco.cms.businesslogic.datatype.controls.Factory();
+			Assert.AreEqual(33, factory.GetAll().Count());
 		}
 
 	}

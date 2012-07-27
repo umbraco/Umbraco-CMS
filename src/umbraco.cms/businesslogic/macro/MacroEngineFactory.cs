@@ -1,59 +1,50 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using Umbraco.Core;
 using umbraco.BusinessLogic.Utils;
 using umbraco.interfaces;
 
 namespace umbraco.cms.businesslogic.macro
 {
+
+	//TODO: This class needs to be changed to use the new MultipleResolverBase
+
     public class MacroEngineFactory
     {
-        private static readonly Dictionary<string, Type> m_engines = new Dictionary<string, Type>();
-        private static readonly List<IMacroEngine> m_allEngines = new List<IMacroEngine>();
-        private static object locker = new object();
+        private static readonly List<IMacroEngine> AllEngines = new List<IMacroEngine>();
+    	private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
+    	private static volatile bool _isInitialized = false;
 
         public MacroEngineFactory()
         {
-            Initialize();
+			EnsureInitialize();
         }
 
+		internal static void EnsureInitialize()
+		{
+			if (_isInitialized)
+				return;
+
+			using (new WriteLock(Lock))
+			{
+				AllEngines.Clear();
+
+				AllEngines.AddRange(
+					PluginTypeResolver.Current.CreateInstances<IMacroEngine>(
+						PluginTypeResolver.Current.ResolveMacroEngines()));
+				
+				_isInitialized = true;
+			}
+		}
+
+		[Obsolete("Use EnsureInitialize method instead")]
         protected static void Initialize()
         {
-        	var typeFinder = new Umbraco.Core.TypeFinder2();
-			var types = typeFinder.FindClassesOfType<IMacroEngine>();
-            GetEngines(types);
-        }
-
-        private static void GetEngines(IEnumerable<Type> types)
-        {
-            foreach (Type t in types)
-            {
-                IMacroEngine typeInstance = null;
-                try
-                {
-                    if (t.IsVisible)
-                    {
-                        typeInstance = Activator.CreateInstance(t) as IMacroEngine;
-                    }
-                }
-                catch { }
-                if (typeInstance != null)
-                {
-                    try
-                    {
-                        lock (locker)
-                        {
-                            if (!m_engines.ContainsKey(typeInstance.Name))
-                                m_engines.Add(typeInstance.Name, t);
-                        }
-                    }
-                    catch (Exception ee)
-                    {
-                        BusinessLogic.Log.Add(umbraco.BusinessLogic.LogTypes.Error, -1, "Can't import MacroEngine '" + t.FullName + "': " + ee);
-                    }
-                }
-            }
+        	EnsureInitialize();
         }
 
         public static IEnumerable<MacroEngineLanguage> GetSupportedLanguages() {
@@ -78,27 +69,15 @@ namespace umbraco.cms.businesslogic.macro
 
         public static List<IMacroEngine> GetAll()
         {
-
-            if (m_allEngines.Count == 0)
-            {
-                Initialize();
-                foreach (string name in m_engines.Keys) {
-                    m_allEngines.Add(GetEngine(name));
-                }
-            }
-
-            return m_allEngines;
+			EnsureInitialize();            
+            return AllEngines;
         }
 
         public static IMacroEngine GetEngine(string name)
         {
-            if (m_engines.ContainsKey(name))
-            {
-                var newObject = Activator.CreateInstance(m_engines[name]) as IMacroEngine;
-                return newObject;
-            }
-
-            return null;
+        	EnsureInitialize();
+        	var engine = AllEngines.FirstOrDefault(x => x.Name == name);
+        	return engine;            
         }
 
         public static IMacroEngine GetByFilename(string filename)
@@ -114,8 +93,7 @@ namespace umbraco.cms.businesslogic.macro
 
         public static IMacroEngine GetByExtension(string extension)
         {
-            IMacroEngine engine =
-                GetAll().Find(t => t.SupportedExtensions.Contains(extension));
+            var engine = GetAll().Find(t => t.SupportedExtensions.Contains(extension));
             if (engine != null)
             {
                 return engine;
