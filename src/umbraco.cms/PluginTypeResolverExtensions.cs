@@ -4,6 +4,7 @@ using Umbraco.Core;
 using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic.macro;
+using umbraco.cms.businesslogic.media;
 using umbraco.interfaces;
 
 namespace umbraco.cms
@@ -42,6 +43,16 @@ namespace umbraco.cms
 		internal static IEnumerable<Type> ResolveMacroEngines(this PluginTypeResolver resolver)
 		{
 			return resolver.ResolveTypes<IMacroEngine>();
+		}
+
+		/// <summary>
+		/// Returns all available IMediaFactory in application
+		/// </summary>
+		/// <param name="resolver"></param>
+		/// <returns></returns>
+		internal static IEnumerable<Type> ResolveMediaFactories(this PluginTypeResolver resolver)
+		{
+			return resolver.ResolveTypes<IMediaFactory>();
 		}
 
 	}
