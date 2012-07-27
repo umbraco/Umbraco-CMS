@@ -9,9 +9,12 @@ using umbraco.MacroEngines.Iron;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.uicontrols;
+using umbraco.cms;
 
 namespace Umbraco.Tests
 {
+
+	[TestFixture]
 	public class PluginTypeResolverTests
 	{
 
@@ -69,6 +72,13 @@ namespace Umbraco.Tests
 		{
 			var apps = PluginTypeResolver.Current.ResolveApplications();
 			Assert.AreEqual(7, apps.Count());
+		}
+
+		[Test]
+		public void Resolves_Actions()
+		{
+			var types = PluginTypeResolver.Current.ResolveActions();
+			Assert.AreEqual(1, types.Count());
 		}
 
 		public interface IFindMe

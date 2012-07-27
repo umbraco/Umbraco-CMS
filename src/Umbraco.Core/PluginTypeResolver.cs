@@ -10,7 +10,7 @@ namespace Umbraco.Core
 {
 
 	/// <summary>
-	/// Used to resolve all plugin types
+	/// Used to resolve all plugin types and cache them
 	/// </summary>
 	/// <remarks>
 	/// 
@@ -63,15 +63,28 @@ namespace Umbraco.Core
 		}
 
 		/// <summary>
+		/// Used to resolve and create instances of the specified type based on the resolved/cached plugin types
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="throwException">set to true if an exception is to be thrown if there is an error during instantiation</param>
+		/// <returns></returns>
+		internal IEnumerable<T> FindAndCreateInstances<T>(bool throwException = false)
+		{
+			var types = ResolveTypes<T>();
+			return CreateInstances<T>(types, throwException);
+		}
+
+		/// <summary>
 		/// Used to create instances of the specified type based on the resolved/cached plugin types
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
+		/// <param name="types"></param>
+		/// <param name="throwException">set to true if an exception is to be thrown if there is an error during instantiation</param>
 		/// <returns></returns>
-		internal IEnumerable<T> CreateInstances<T>()
+		internal IEnumerable<T> CreateInstances<T>(IEnumerable<Type> types, bool throwException = false)
 		{
-			var types = ResolveTypes<T>();
 			var instances = new List<T>();
-			foreach(var t in types)
+			foreach (var t in types)
 			{
 				try
 				{
@@ -82,6 +95,10 @@ namespace Umbraco.Core
 				{
 					//TODO: Need to fix logging so this doesn't bork if no SQL connection
 					//Log.Add(LogTypes.Error, -1, "Error loading ILookup: " + ex.ToString());
+					if (throwException)
+					{
+						throw ex;
+					}
 				}
 			}
 			return instances;
@@ -142,6 +159,8 @@ namespace Umbraco.Core
 		{
 			return _types;
 		}
+
+
 
 		#region Private classes
 		internal abstract class TypeList
