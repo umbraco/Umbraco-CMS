@@ -4,15 +4,23 @@ using Umbraco.Core.Resolving;
 
 namespace Umbraco.Web.Routing
 {
-    // handles "/foo/bar" where "/foo/bar" is the path to a document
-    //
-
-    [ResolutionWeight(10)]
-    internal class ResolveByNiceUrl : IRequestDocumentResolver
+	/// <summary>
+	/// Provides an implementation of <see cref="IDocumentLookup"/> that handles page nice urls.
+	/// </summary>
+	/// <remarks>
+	/// <para>Handles <c>/foo/bar</c> where <c>/foo/bar</c> is the nice url of a document.</para>
+	/// </remarks>
+	[ResolutionWeight(10)]
+    internal class LookupByNiceUrl : IDocumentLookup
     {
-		static readonly TraceSource Trace = new TraceSource("ResolveByNiceUrl");
+		static readonly TraceSource Trace = new TraceSource("LookupByNiceUrl");
 
-        public virtual bool TrySetDocument(DocumentRequest docreq)
+		/// <summary>
+		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
+		/// </summary>
+		/// <param name="docRequest">The <c>DocumentRequest</c>.</param>
+		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
+		public virtual bool TrySetDocument(DocumentRequest docreq)
         {
 			string route;
 			if (docreq.HasDomain)
@@ -24,6 +32,12 @@ namespace Umbraco.Web.Routing
             return node != null;
         }
 
+		/// <summary>
+		/// Tries to find an Umbraco document for a <c>DocumentRequest</c> and a route.
+		/// </summary>
+		/// <param name="docreq">The document request.</param>
+		/// <param name="route">The route.</param>
+		/// <returns>The document node, or null.</returns>
         protected XmlNode LookupDocumentNode(DocumentRequest docreq, string route)
         {
             Trace.TraceInformation("Test route \"{0}\"", route);

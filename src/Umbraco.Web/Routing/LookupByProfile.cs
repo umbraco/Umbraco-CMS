@@ -5,19 +5,25 @@ using umbraco;
 
 namespace Umbraco.Web.Routing
 {
-
-    // lookup /<profile>/<login> where <profile> is the profile page and <login> a login
-    // this is a faily limited way of doing it, it should better be done with a rewriting
-    // rule that would support multiple profile pages for multilingual websites, etc.
-    //
-    // we're keeping it here only for backward compatibility.
-    //
-    [ResolutionWeight(40)]
-    internal class ResolveByProfile : ResolveByNiceUrl, IRequestDocumentResolver
+	/// <summary>
+	/// Provides an implementation of <see cref="IDocumentLookup"/> that handles profiles.
+	/// </summary>
+	/// <remarks>
+	/// <para>Handles <c>/profile/login</c> where <c>/profile</c> is the profile page nice url and <c>login</c> the login of a member.</para>
+	/// <para>This should rather be done with a rewriting rule. There would be multiple profile pages in multi-sites/multi-langs setups.
+	/// We keep it for backward compatility reasons.</para>
+	/// </remarks>
+	[ResolutionWeight(40)]
+    internal class LookupByProfile : LookupByNiceUrl, IDocumentLookup
     {
-		static readonly TraceSource Trace = new TraceSource("ResolveByProfile");		
+		static readonly TraceSource Trace = new TraceSource("LookupByProfile");
 
-        public override bool TrySetDocument(DocumentRequest docreq)
+		/// <summary>
+		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
+		/// </summary>
+		/// <param name="docRequest">The <c>DocumentRequest</c>.</param>
+		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
+		public override bool TrySetDocument(DocumentRequest docreq)
         {
             XmlNode node = null;
 

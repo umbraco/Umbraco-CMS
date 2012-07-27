@@ -9,20 +9,28 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.Routing
 {
-    internal class ResolveLastChance : IRequestDocumentLastChanceResolver
+	/// <summary>
+	/// Provides an implementation of <see cref="IDocumentLastChanceLookup"/> that handles backward compatilibty with legacy <c>INotFoundHandler</c>.
+	/// </summary>
+    internal class DefaultLastChanceLookup : IDocumentLastChanceLookup
     {
-		static TraceSource _trace = new TraceSource("ResolveLastChance");
+		static TraceSource _trace = new TraceSource("DefaultLastChanceLookup");
 
-        public bool TrySetDocument(DocumentRequest docRequest)
+		/// <summary>
+		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
+		/// </summary>
+		/// <param name="docRequest">The <c>DocumentRequest</c>.</param>
+		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
+		public bool TrySetDocument(DocumentRequest docRequest)
         {
 			docRequest.Node = HandlePageNotFound(docRequest);
             return docRequest.HasNode;
         }
 
-        // --------
+		#region Copied over from presentation.requestHandler
 
-        // copied from presentation/requestHandler
-        // temporary!!
+		//FIXME: this is temporary and should be obsoleted
+
 		XmlNode HandlePageNotFound(DocumentRequest docRequest)
         {
 			HttpContext.Current.Trace.Write("NotFoundHandler", string.Format("Running for url='{0}'.", docRequest.Uri.AbsolutePath));
@@ -141,6 +149,8 @@ namespace Umbraco.Web.Routing
             }
 
             return handlers;
-        }
-    }
+		}
+
+		#endregion
+	}
 }

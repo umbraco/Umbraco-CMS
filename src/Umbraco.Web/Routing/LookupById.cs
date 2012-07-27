@@ -5,15 +5,23 @@ using Umbraco.Core.Resolving;
 
 namespace Umbraco.Web.Routing
 {
-
-    // handles /1234 where 1234 is the id of a document
-    //
-    [ResolutionWeight(20)]
-    internal class ResolveById : IRequestDocumentResolver
+	/// <summary>
+	/// Provides an implementation of <see cref="IDocumentLookup"/> that handles page identifiers.
+	/// </summary>
+	/// <remarks>
+	/// <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
+	/// </remarks>
+	[ResolutionWeight(20)]
+    internal class LookupById : IDocumentLookup
     {
-		static readonly TraceSource Trace = new TraceSource("ResolveById");
+		static readonly TraceSource Trace = new TraceSource("LookupById");
 
-        public bool TrySetDocument(DocumentRequest docreq)
+		/// <summary>
+		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
+		/// </summary>
+		/// <param name="docRequest">The <c>DocumentRequest</c>.</param>
+		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
+		public bool TrySetDocument(DocumentRequest docreq)
         {
             XmlNode node = null;
 

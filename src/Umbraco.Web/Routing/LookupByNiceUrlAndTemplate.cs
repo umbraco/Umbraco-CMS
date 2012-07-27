@@ -5,16 +5,25 @@ using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Web.Routing
 {
-
-    // handles /foo/bar/<template> where <template> is a valid template alias
-    // and /foo/bar the nice url of a document
-    //
-    [ResolutionWeight(30)]
-    internal class ResolveByNiceUrlAndTemplate : ResolveByNiceUrl, IRequestDocumentResolver
+	/// <summary>
+	/// Provides an implementation of <see cref="IDocumentLookup"/> that handles page nice urls and a template.
+	/// </summary>
+	/// <remarks>
+	/// <para>Handles <c>/foo/bar/template</c> where <c>/foo/bar</c> is the nice url of a document, and <c>template</c> a template alias.</para>
+	/// <para>If successful, then the template of the document request is also assigned.</para>
+	/// </remarks>
+	[ResolutionWeight(30)]
+    internal class LookupByNiceUrlAndTemplate : LookupByNiceUrl, IDocumentLookup
     {
-		static readonly TraceSource Trace = new TraceSource("ResolveByNiceUrlAndTemplate");		
+		static readonly TraceSource Trace = new TraceSource("LookupByNiceUrlAndTemplate");
 
-        public override bool TrySetDocument(DocumentRequest docreq)
+		/// <summary>
+		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
+		/// </summary>
+		/// <param name="docRequest">The <c>DocumentRequest</c>.</param>
+		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
+		/// <remarks>If successful, also assigns the template.</remarks>
+		public override bool TrySetDocument(DocumentRequest docreq)
         {
             XmlNode node = null;
 			string path = docreq.Uri.AbsolutePath;
