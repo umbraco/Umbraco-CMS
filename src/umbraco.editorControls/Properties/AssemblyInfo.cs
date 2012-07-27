@@ -10,3 +10,5 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyProduct("")]
+
+[assembly: InternalsVisibleTo("Umbraco.Tests")]
