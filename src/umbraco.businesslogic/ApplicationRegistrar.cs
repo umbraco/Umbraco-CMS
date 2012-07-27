@@ -32,8 +32,10 @@ namespace umbraco.BusinessLogic
             // Load all Applications by attribute and add them to the XML config
         	var types = PluginTypeResolver.Current.ResolveApplications();
 
-			//we can have multiple attributes so we'll query for them
-            var attrs = types.Select(x => (ApplicationAttribute)x.GetCustomAttributes(typeof(ApplicationAttribute), false).Single())
+			//since applications don't populate their metadata from the attribute and because it is an interface, 
+			//we need to interrogate the attributes for the data. Would be better to have a base class that contains 
+			//metadata populated by the attribute. Oh well i guess.
+			var attrs = types.Select(x => x.GetCustomAttributes<ApplicationAttribute>(false).Single())
                 .Where(x => Application.getByAlias(x.Alias) == null);
 
             var allAliases = Application.getAll().Select(x => x.alias).Concat(attrs.Select(x => x.Alias));

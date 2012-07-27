@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 
@@ -49,6 +50,17 @@ namespace Umbraco.Core
 		internal readonly TypeFinder2 TypeFinder = new TypeFinder2();
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		private readonly HashSet<TypeList> _types = new HashSet<TypeList>();
+		private IEnumerable<Assembly> _assemblies;
+
+		/// <summary>
+		/// Gets/sets which assemblies to scan when type finding, generally used for unit testing, if not explicitly set
+		/// this will search all assemblies known to have plugins and exclude ones known to not have them.
+		/// </summary>
+		internal IEnumerable<Assembly> AssembliesToScan
+		{
+			get { return _assemblies ?? (_assemblies = TypeFinder2.GetAssembliesWithKnownExclusions()); }
+			set { _assemblies = value; }
+		}
 
 		/// <summary>
 		/// Used to create instances of the specified type based on the resolved/cached plugin types
@@ -107,7 +119,7 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		internal IEnumerable<Type> ResolveTypes<T>()
 		{
-			return ResolveTypes<T>(() => TypeFinder.FindClassesOfType<T>());
+			return ResolveTypes<T>(() => TypeFinder.FindClassesOfType<T>(AssembliesToScan));
 		}
 
 		/// <summary>
@@ -119,7 +131,7 @@ namespace Umbraco.Core
 		internal IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>()
 			where TAttribute : Attribute
 		{
-			return ResolveTypes<T>(() => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>());
+			return ResolveTypes<T>(() => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>(AssembliesToScan));
 		}
 
 		/// <summary>

@@ -36,9 +36,7 @@ namespace Umbraco.Tests
 		{
 			_assemblies = new[]
 			    {
-			        //both contain the type
 			        this.GetType().Assembly, 
-			        //these dont contain the type
 			        typeof(ApplicationStartupHandler).Assembly,
 			        typeof(SqlCEHelper).Assembly,
 			        typeof(CMSNode).Assembly,
