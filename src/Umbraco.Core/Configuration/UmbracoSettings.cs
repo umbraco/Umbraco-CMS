@@ -128,11 +128,29 @@ namespace Umbraco.Core.Configuration
             get { return bool.Parse(GetKey("/settings/content/UploadAllowDirectories")); }
         }
 
+		/// <summary>
+		/// THIS IS TEMPORARY until we fix up settings all together, this setting is actually not 'settable' but is
+		/// here for future purposes since we check for thsi settings in the module.
+		/// </summary>
+    	internal static bool EnableBaseRestHandler
+    	{
+    		get { return true; }
+    	}
+
+		/// <summary>
+		/// THIS IS TEMPORARY until we fix up settings all together, this setting is actually not 'settable' but is
+		/// here for future purposes since we check for thsi settings in the module.
+		/// </summary>
+		internal static string BootSplashPage
+		{
+			get { return "~/default.aspx"; }
+		}
+
         /// <summary>
         /// Gets a value indicating whether logging is enabled in umbracoSettings.config (/settings/logging/enableLogging).
         /// </summary>
         /// <value><c>true</c> if logging is enabled; otherwise, <c>false</c>.</value>
-        public static bool EnableLogging
+		public static bool EnableLogging
         {
             get
             {

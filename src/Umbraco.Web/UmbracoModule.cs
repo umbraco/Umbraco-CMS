@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
-using umbraco;
 using umbraco.IO;
 
 namespace Umbraco.Web
@@ -90,9 +90,8 @@ namespace Umbraco.Web
             // ensure Umbraco is ready to serve documents
             ok = ok && EnsureIsReady(httpContext, uri);
             // ensure Umbraco is properly configured to serve documents
-            ok = ok && EnsureIsConfigured(httpContext, uri);
-            //TODO: I like the idea of this new setting, but lets get this in to the core at a later time, for now lets just get the basics working.
-            //ok = ok && (!Settings.Legacy.EnableBaseRestHandler || EnsureNotBaseRestHandler(httpContext, lpath));
+            ok = ok && EnsureIsConfigured(httpContext, uri);            
+            ok = ok && (!UmbracoSettings.EnableBaseRestHandler || EnsureNotBaseRestHandler(httpContext, lpath));
             ok = ok && (EnsureNotBaseRestHandler(httpContext, lpath));
 
             if (!ok)
@@ -186,26 +185,18 @@ namespace Umbraco.Web
 				LogHelper.Warn<UmbracoModule>("Umbraco is not ready");
                 
                 httpContext.Response.StatusCode = 503;
-                string bootUrl = null;
-                if (UmbracoSettings.EnableSplashWhileLoading) // legacy - should go
+
+				// fixme - default.aspx has to be ready for RequestContext.DocumentRequest==null
+				// fixme - in fact we should transfer to an empty html page...
+            	var bootUrl = UriUtility.ToAbsolute(UmbracoSettings.BootSplashPage);
+                
+				if (UmbracoSettings.EnableSplashWhileLoading) // legacy - should go
                 {
 					var configPath = UriUtility.ToAbsolute(SystemDirectories.Config);
                     bootUrl = string.Format("{0}/splashes/booting.aspx?url={1}", configPath, HttpUtility.UrlEncode(uri.ToString()));
                     // fixme ?orgurl=... ?retry=...
                 }
-
-                //TODO: I like the idea of this new setting, but lets get this in to the core at a later time, for now lets just get the basics working.
-                //else if (!string.IsNullOrWhiteSpace(Settings.BootSplashPage))
-                //{
-                //    bootUrl = UriUtility.ToAbsolute(Settings.BootSplashPage);
-                //}
-
-                else
-                {
-                    // fixme - default.aspx has to be ready for RequestContext.DocumentRequest==null
-                    // fixme - in fact we should transfer to an empty html page...
-					bootUrl = UriUtility.ToAbsolute("~/default.aspx");
-                }
+               
                 TransferRequest(bootUrl);
                 return false;
             }
