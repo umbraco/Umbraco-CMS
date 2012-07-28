@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
+using umbraco;
 using umbraco.IO;
+using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
+using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web
 {
@@ -20,8 +22,11 @@ namespace Umbraco.Web
     public class UmbracoModule : IHttpModule
     {     
 
-        // entry point for a request
-        void ProcessRequest(HttpContext httpContext)
+        /// <summary>
+		/// Entry point for a request
+        /// </summary>
+        /// <param name="httpContext"></param>
+        void ProcessRequest(HttpContextBase httpContext)
         {
 			LogHelper.Debug<UmbracoModule>("Start processing request");        
             
@@ -38,12 +43,12 @@ namespace Umbraco.Web
                 httpContext.Response.AddHeader("X-Umbraco-Version", string.Format("{0}.{1}", GlobalSettings.VersionMajor, GlobalSettings.VersionMinor));
 
 			//create the legacy UmbracoContext
-			global::umbraco.presentation.UmbracoContext.Current 
-				= new global::umbraco.presentation.UmbracoContext(new HttpContextWrapper(httpContext));
+			global::umbraco.presentation.UmbracoContext.Current
+				= new global::umbraco.presentation.UmbracoContext(httpContext);
 
             //create the UmbracoContext singleton, one per request!!
             var umbracoContext = new UmbracoContext(
-				new HttpContextWrapper(httpContext), 
+				httpContext, 
 				ApplicationContext.Current,
 				 RoutesCacheResolver.Current.RoutesCache);
             UmbracoContext.Current = umbracoContext;
@@ -122,6 +127,21 @@ namespace Umbraco.Web
             // there is no document (ugly 404 page?) or no template (blank page?)
         }
 
+		/// <summary>
+		/// Checks if the xml cache file needs to be updated/persisted
+		/// </summary>
+		/// <param name="httpContext"></param>
+		/// <remarks>
+		/// TODO: This needs an overhaul, see the error report created here:
+		///   https://docs.google.com/document/d/1neGE3q3grB4lVJfgID1keWY2v9JYqf-pw75sxUUJiyo/edit		
+		/// </remarks>
+		void PersistXmlCache(HttpContextBase httpContext)
+		{
+			if (content.Instance.IsXmlQueuedForPersistenceToFile)
+			{
+				content.Instance.PersistXmlToFile();
+			}
+		}
         
 		/// <summary>
 		/// Ensures that the request is a document request (i.e. one that the module should handle)
@@ -130,7 +150,7 @@ namespace Umbraco.Web
 		/// <param name="uri"></param>
 		/// <param name="lpath"></param>
 		/// <returns></returns>
-        bool EnsureDocumentRequest(HttpContext httpContext, Uri uri, string lpath)
+        bool EnsureDocumentRequest(HttpContextBase httpContext, Uri uri, string lpath)
         {
             var maybeDoc = true;
 
@@ -177,7 +197,7 @@ namespace Umbraco.Web
         // ensures Umbraco is ready to handle requests
         // if not, set status to 503 and transfer request, and return false
         // if yes, return true
-        bool EnsureIsReady(HttpContext httpContext, Uri uri)
+        bool EnsureIsReady(HttpContextBase httpContext, Uri uri)
         {
             // ensure we are ready
             if (!ApplicationContext.Current.IsReady)
@@ -207,7 +227,7 @@ namespace Umbraco.Web
         // ensures Umbraco is configured
         // if not, redirect to install and return false
         // if yes, return true
-        bool EnsureIsConfigured(HttpContext httpContext, Uri uri)
+        bool EnsureIsConfigured(HttpContextBase httpContext, Uri uri)
         {
             if (!ApplicationContext.Current.IsConfigured)
             {
@@ -223,7 +243,7 @@ namespace Umbraco.Web
 
         // checks if the current request is a /base REST handler request
         // returns false if it is, otherwise true
-        bool EnsureNotBaseRestHandler(HttpContext httpContext, string lpath)
+        bool EnsureNotBaseRestHandler(HttpContextBase httpContext, string lpath)
         {
             // the /base REST handler still lives in umbraco.dll and has
             // not been refactored at the moment. it still is a module,
@@ -267,6 +287,8 @@ namespace Umbraco.Web
             else
                 HttpContext.Current.RewritePath(path);
         }
+
+
 
         #region Legacy
 
@@ -325,12 +347,18 @@ namespace Umbraco.Web
 			// to rewriting happening too early in the chain (Alex Norcliffe 2010-02).
 			app.PostResolveRequestCache += (sender, e) =>
 			{
-				HttpContext httpContext = ((HttpApplication)sender).Context;
-				ProcessRequest(httpContext);
+				var httpContext = ((HttpApplication)sender).Context;
+				ProcessRequest(new HttpContextWrapper(httpContext));
 			};
 
-			// todo: initialize request errors handler
-			// todo: initialize XML cache flush
+			// used to check if the xml cache file needs to be updated/persisted
+        	app.PostRequestHandlerExecute += (sender, e) =>
+        	{
+				var httpContext = ((HttpApplication)sender).Context;
+				PersistXmlCache(new HttpContextWrapper(httpContext));
+        	};
+
+        	// todo: initialize request errors handler
         }
 
         public void Dispose()
