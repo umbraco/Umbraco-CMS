@@ -27,35 +27,36 @@ namespace Umbraco.Web
 		/// <param name="e"></param>
 		protected void Application_Start(object sender, EventArgs e)
 		{
-			Trace.TraceInformation("Initialize AppDomain");
+			using (DisposableTimer.TraceDuration<UmbracoApplication>(
+				"Umbraco application starting", 
+				"Umbraco application startup complete"))
+			{
+				// Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
+				ClientDependency.Core.CompositeFiles.Providers.XmlFileMapper.FileMapVirtualFolder = "~/App_Data/TEMP/ClientDependency";
+				ClientDependency.Core.CompositeFiles.Providers.BaseCompositeFileProcessingProvider.UrlTypeDefault = ClientDependency.Core.CompositeFiles.Providers.CompositeUrlType.Base64QueryStrings;
 
-			// Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
-			ClientDependency.Core.CompositeFiles.Providers.XmlFileMapper.FileMapVirtualFolder = "~/App_Data/TEMP/ClientDependency";
-			ClientDependency.Core.CompositeFiles.Providers.BaseCompositeFileProcessingProvider.UrlTypeDefault = ClientDependency.Core.CompositeFiles.Providers.CompositeUrlType.Base64QueryStrings;
-
-			//create the ApplicationContext
-			ApplicationContext.Current = new ApplicationContext()
+				//create the ApplicationContext
+				ApplicationContext.Current = new ApplicationContext()
 				{
 					IsReady = true	// fixme
 				};
 
-			//find and initialize the application startup handlers
-			ApplicationStartupHandler.RegisterHandlers();
+				//find and initialize the application startup handlers
+				ApplicationStartupHandler.RegisterHandlers();
 
-			// create the resolvers
-			DocumentLookupsResolver.Current = new DocumentLookupsResolver(
-				PluginTypeResolver.Current.ResolveLookups(), 
-				new DefaultLastChanceLookup());
-			RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache());
+				// create the resolvers
+				DocumentLookupsResolver.Current = new DocumentLookupsResolver(
+					PluginTypeResolver.Current.ResolveLookups(),
+					new DefaultLastChanceLookup());
+				RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache());
 
-			OnApplicationStarting(sender, e);
+				OnApplicationStarting(sender, e);
 
-			//all resolvers are now frozen and cannot be modified
-			Umbraco.Core.Resolving.Resolution.Freeze();
+				//all resolvers are now frozen and cannot be modified
+				Umbraco.Core.Resolving.Resolution.Freeze();
 
-			OnApplicationStarted(sender, e);
-
-			Trace.TraceInformation("AppDomain is initialized");
+				OnApplicationStarted(sender, e);
+			}
 		}
 
 		/// <summary>

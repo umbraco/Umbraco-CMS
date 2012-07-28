@@ -4,7 +4,7 @@ using Umbraco.Core.IO;
 
 namespace Umbraco.Core
 {
-    /// <summary>
+	/// <summary>
 	/// The XmlHelper class contains general helper methods for working with xml in umbraco.
     /// </summary>
     internal class XmlHelper

@@ -4,8 +4,7 @@ using System.Diagnostics;
 
 
 namespace Umbraco.Core
-{	
-
+{
 	/// <summary>
     /// the Umbraco Application context
     /// </summary>

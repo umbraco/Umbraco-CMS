@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Utils;
 using umbraco.interfaces;
@@ -41,16 +42,10 @@ namespace umbraco.businesslogic
 														t.FullName);
 				}
 				catch (Exception ee)
-				{
-					//TODO: Fix logging because if this fails here, the app pool wont startup!
-					try
-					{
-						Log.Add(LogTypes.Error, -1, "Error loading application startup handler: " + ee.ToString());
-					}
-					catch
-					{
-						//swallowed... see above comment
-					}
+				{					
+					LogHelper.Error<ApplicationStartupHandler>(
+						string.Format("Error loading application startup handler: {0}", ee.ToString()), 
+						ee);					
 				}
 			}
         }
