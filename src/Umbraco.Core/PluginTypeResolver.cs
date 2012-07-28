@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
 {
@@ -83,25 +84,32 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		internal IEnumerable<T> CreateInstances<T>(IEnumerable<Type> types, bool throwException = false)
 		{
-			var instances = new List<T>();
-			foreach (var t in types)
+			var typesAsArray = types.ToArray();
+			using (DisposableTimer.TraceDuration<PluginTypeResolver>(
+				string.Format("Starting instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName),
+				string.Format("Completed instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName)))
 			{
-				try
+				var instances = new List<T>();
+				foreach (var t in typesAsArray)
 				{
-					var typeInstance = (T)Activator.CreateInstance(t);
-					instances.Add(typeInstance);
-				}
-				catch (Exception ex)
-				{
-					//TODO: Need to fix logging so this doesn't bork if no SQL connection
-					//Log.Add(LogTypes.Error, -1, "Error loading ILookup: " + ex.ToString());
-					if (throwException)
+					try
 					{
-						throw ex;
+						var typeInstance = (T)Activator.CreateInstance(t);
+						instances.Add(typeInstance);
+					}
+					catch (Exception ex)
+					{
+						
+						LogHelper.Error<PluginTypeResolver>(string.Format("Error creating type {0}", t.FullName), ex);
+						
+						if (throwException)
+						{
+							throw ex;
+						}
 					}
 				}
-			}
-			return instances;
+				return instances;	
+			}			
 		}
 
 		/// <summary>
@@ -121,24 +129,29 @@ namespace Umbraco.Core
 		{
 			using (var readLock = new UpgradeableReadLock(_lock))
 			{
-				//check if the TypeList already exists, if so return it, if not we'll create it
-				var typeList = _types.SingleOrDefault(x => x.GetListType().IsType<T>());
-				if (typeList == null)
+				using (DisposableTimer.TraceDuration<PluginTypeResolver>(
+					string.Format("Starting resolution types of {0}", typeof(T).FullName),
+					string.Format("Completed resolution of types of {0}", typeof(T).FullName)))
 				{
-					//upgrade to a write lock since we're adding to the collection
-					readLock.UpgradeToWriteLock();
-
-					typeList = new TypeList<T>();
-
-					foreach (var t in finder())
+					//check if the TypeList already exists, if so return it, if not we'll create it
+					var typeList = _types.SingleOrDefault(x => x.GetListType().IsType<T>());
+					if (typeList == null)
 					{
-						typeList.AddType(t);
-					}
+						//upgrade to a write lock since we're adding to the collection
+						readLock.UpgradeToWriteLock();
 
-					//add the type list to the collection
-					_types.Add(typeList);
-				}
-				return typeList.GetTypes();
+						typeList = new TypeList<T>();
+
+						foreach (var t in finder())
+						{
+							typeList.AddType(t);
+						}
+
+						//add the type list to the collection
+						_types.Add(typeList);
+					}
+					return typeList.GetTypes();	
+				}				
 			}
 		}
 

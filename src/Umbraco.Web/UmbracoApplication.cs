@@ -18,8 +18,6 @@ namespace Umbraco.Web
 		
 		public static event EventHandler ApplicationStarted;
 
-		private static readonly TraceSource Trace = new TraceSource("UmbracoApplication");
-
 		/// <summary>
 		/// Initializes the Umbraco application
 		/// </summary>

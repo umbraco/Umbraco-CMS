@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
 using umbraco;
 using umbraco.IO;
@@ -17,14 +18,13 @@ namespace Umbraco.Web
     // response.Redirect does?! always remap to /vdir?!
 
     public class UmbracoModule : IHttpModule
-    {
-        private static readonly TraceSource Trace = new TraceSource("UmbracoModule");                
+    {     
 
         // entry point for a request
         void ProcessRequest(HttpContext httpContext)
         {
-            Trace.TraceInformation("Process request");
-
+			LogHelper.Debug<UmbracoModule>("Start processing request");        
+            
 			//TODO: We need to ensure the below only executes for real requests (i.e. not css, favicon, etc...)
 			// I'm pretty sure we need to bind to the PostHandlerAssigned (or whatever event) and follow the same 
 			// practices that is in umbraMVCo
@@ -97,7 +97,7 @@ namespace Umbraco.Web
 
             if (!ok)
             {
-                Trace.TraceInformation("End");
+				LogHelper.Debug<UmbracoModule>("End processing request, not transfering to handler");
                 return;
             }
 
@@ -117,18 +117,23 @@ namespace Umbraco.Web
             if (docreq.Is404)
                 httpContext.Response.StatusCode = 404;
 
-            Trace.TraceInformation("Transfer to UmbracoDefault (default.aspx)");
 			TransferRequest("~/default.aspx" + docreq.Uri.Query);
 
             // it is up to default.aspx to figure out what to display in case
             // there is no document (ugly 404 page?) or no template (blank page?)
         }
 
-        // ensures that the request is a document request
-        // ie one that the module should handle
+        
+		/// <summary>
+		/// Ensures that the request is a document request (i.e. one that the module should handle)
+		/// </summary>
+		/// <param name="httpContext"></param>
+		/// <param name="uri"></param>
+		/// <param name="lpath"></param>
+		/// <returns></returns>
         bool EnsureDocumentRequest(HttpContext httpContext, Uri uri, string lpath)
         {
-            bool maybeDoc = true;
+            var maybeDoc = true;
 
             // handle directory-urls used for asmx
             // legacy - what's the point really?
@@ -163,7 +168,10 @@ namespace Umbraco.Web
                 maybeDoc = false;
 
             if (!maybeDoc)
-                Trace.TraceInformation("Not a document");
+			{
+				LogHelper.Warn<UmbracoModule>("Not a document");            	
+            }
+
             return maybeDoc;
         }
 
@@ -175,12 +183,13 @@ namespace Umbraco.Web
             // ensure we are ready
             if (!ApplicationContext.Current.IsReady)
             {
-                Trace.TraceEvent(TraceEventType.Warning, 0, "Umbraco is not ready");
+				LogHelper.Warn<UmbracoModule>("Umbraco is not ready");
+                
                 httpContext.Response.StatusCode = 503;
                 string bootUrl = null;
                 if (UmbracoSettings.EnableSplashWhileLoading) // legacy - should go
                 {
-					string configPath = UriUtility.ToAbsolute(SystemDirectories.Config);
+					var configPath = UriUtility.ToAbsolute(SystemDirectories.Config);
                     bootUrl = string.Format("{0}/splashes/booting.aspx?url={1}", configPath, HttpUtility.UrlEncode(uri.ToString()));
                     // fixme ?orgurl=... ?retry=...
                 }
@@ -211,7 +220,8 @@ namespace Umbraco.Web
         {
             if (!ApplicationContext.Current.IsConfigured)
             {
-                Trace.TraceEvent(TraceEventType.Warning, 0, "Umbraco is not configured");
+				LogHelper.Warn<UmbracoModule>("Umbraco is not configured");
+
 				string installPath = UriUtility.ToAbsolute(SystemDirectories.Install);
                 string installUrl = string.Format("{0}/default.aspx?redir=true&url={1}", installPath, HttpUtility.UrlEncode(uri.ToString()));
                 httpContext.Response.Redirect(installUrl, true);
@@ -235,7 +245,8 @@ namespace Umbraco.Web
                 baseUrl += "/";
             if (lpath.StartsWith(baseUrl))
             {
-                Trace.TraceInformation("Detected /base REST handler");
+				LogHelper.Debug<UmbracoModule>("Detected /base REST handler");
+
                 return false;
             }
             return true;
@@ -244,7 +255,9 @@ namespace Umbraco.Web
         // transfers the request using the fastest method available on the server
         void TransferRequest(string path)
         {
-            bool integrated = HttpRuntime.UsingIntegratedPipeline;
+			LogHelper.Debug<UmbracoModule>("Transfering to " + path);
+
+            var integrated = HttpRuntime.UsingIntegratedPipeline;
 
             // fixme - are we doing this properly?
             // fixme - handle virtual directory?

@@ -13,42 +13,25 @@ using umbraco.interfaces;
 namespace umbraco.businesslogic
 {
 	/// <summary>
-    /// ApplicationStartupHandler provides an easy to use base class to install event handlers in umbraco.
-    /// Class inhiriting from ApplicationStartupHandler are automaticly registered and instantiated by umbraco on application start.
-    /// To use, inhirite the ApplicationStartupHandler Class and add an empty constructor. 
-    /// </summary>
-    public abstract class ApplicationStartupHandler : IApplicationStartupHandler
-    {
+	/// ApplicationStartupHandler provides an easy to use base class to install event handlers in umbraco.
+	/// Class inhiriting from ApplicationStartupHandler are automaticly registered and instantiated by umbraco on application start.
+	/// To use, inhirite the ApplicationStartupHandler Class and add an empty constructor. 
+	/// </summary>
+	public abstract class ApplicationStartupHandler : IApplicationStartupHandler
+	{
 
-        public static void RegisterHandlers()
-        {			
+		public static void RegisterHandlers()
+		{
 			if (ApplicationContext.Current == null || !ApplicationContext.Current.IsConfigured)
 				return;
 
-			var types = PluginTypeResolver.Current.ResolveApplicationStartupHandlers();
+			//now we just create the types... this is kind of silly since these objects don't actually do anything
+			//except run their constructors.
 
-			foreach (var t in types)
-			{
-				try
-				{
-					//this creates the type instance which will trigger the constructor of the object
-					//previously we stored these objects in a list but that just takes up memory for no reason.
+			var instances = PluginTypeResolver.Current.CreateInstances<IApplicationStartupHandler>(
+				PluginTypeResolver.Current.ResolveApplicationStartupHandlers());
 
-					var typeInstance = (IApplicationStartupHandler)Activator.CreateInstance(t);
-					
-					if (HttpContext.Current != null)
-						HttpContext.Current.Trace.Write("registerApplicationStartupHandlers",
-														" + Adding application startup handler '" +
-														t.FullName);
-				}
-				catch (Exception ee)
-				{					
-					LogHelper.Error<ApplicationStartupHandler>(
-						string.Format("Error loading application startup handler: {0}", ee.ToString()), 
-						ee);					
-				}
-			}
-        }
-    }
+		}
+	}
 
 }
