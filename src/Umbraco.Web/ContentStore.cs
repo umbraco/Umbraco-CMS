@@ -120,7 +120,7 @@ namespace Umbraco.Web
                 {
                     // if not in a domain - what is the default page?
                     // let's say it is the first one in the tree, if any
-                    xpath = "/root/*[@isDoc and first]";
+                    xpath = "(/root/*[@isDoc])[1]";
                 }
             }
             else

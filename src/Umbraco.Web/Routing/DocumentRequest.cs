@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Diagnostics;
 
 // legacy
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.template;
@@ -16,9 +18,8 @@ namespace Umbraco.Web.Routing
 	// represents a request for one specified Umbraco document to be rendered
 	// by one specified template, using one particular culture.
 	//
-    internal class DocumentRequest
+    public class DocumentRequest
     {
-        static readonly TraceSource Trace = new TraceSource("DocumentRequest");
 
         public DocumentRequest(Uri uri, RoutingContext routingContext)
         {
@@ -152,7 +153,7 @@ namespace Umbraco.Web.Routing
 
             // note - we are not handling schemes nor ports here.
 
-            Trace.TraceInformation("{0}Uri=\"{1}\"", tracePrefix, this.Uri);
+			LogHelper.Debug<DocumentRequest>("{0}Uri=\"{1}\"", () => tracePrefix, () => this.Uri);
 
             // try to find a domain matching the current request
 			var domainAndUri = Domains.DomainMatch(Domain.GetDomains(), RoutingContext.UmbracoContext.UmbracoUrl, false);
@@ -161,9 +162,11 @@ namespace Umbraco.Web.Routing
 			if (domainAndUri != null)
             {
                 // matching an existing domain
-                Trace.TraceInformation("{0}Matches domain=\"{1}\", rootId={2}, culture=\"{3}\"",
-                                       tracePrefix,
-					domainAndUri.Domain.Name, domainAndUri.Domain.RootNodeId, domainAndUri.Domain.Language.CultureAlias);
+				LogHelper.Debug<DocumentRequest>("{0}Matches domain=\"{1}\", rootId={2}, culture=\"{3}\"",
+					() => tracePrefix,
+					() => domainAndUri.Domain.Name,
+					() => domainAndUri.Domain.RootNodeId,
+					() => domainAndUri.Domain.Language.CultureAlias);
 
 				this.Domain = domainAndUri.Domain;
 				this.DomainUri = domainAndUri.Uri;
@@ -179,13 +182,14 @@ namespace Umbraco.Web.Routing
             else
             {
                 // not matching any existing domain
-                Trace.TraceInformation("{0}Matches no domain", tracePrefix);
+            	LogHelper.Debug<DocumentRequest>("{0}Matches no domain", () => tracePrefix);
 
                 var defaultLanguage = Language.GetAllAsList().FirstOrDefault();
                 this.Culture = defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.CultureAlias);
             }
 
-            Trace.TraceInformation("{0}Culture=\"{1}\"", tracePrefix, this.Culture.Name);
+			LogHelper.Debug<DocumentRequest>("{0}Culture=\"{1}\"", () => tracePrefix, () => this.Culture.Name);
+
             return this.Domain != null;
         }
 
@@ -196,15 +200,19 @@ namespace Umbraco.Web.Routing
         public bool LookupDocument()
         {
 			const string tracePrefix = "LookupDocument: ";
-            Trace.TraceInformation("{0}Path=\"{1}\"", tracePrefix, this.Uri.AbsolutePath);
+			LogHelper.Debug<DocumentRequest>("{0}Path=\"{1}\"", () => tracePrefix, () => this.Uri.AbsolutePath);
 
             // look for the document
             // the first successful resolver, if any, will set this.Node, and may also set this.Template
             // some lookups may implement caching
-            Trace.TraceInformation("{0}Begin resolvers", tracePrefix);
-			var lookups = RoutingContext.DocumentLookupsResolver.DocumentLookups;
-        	lookups.Any(lookup => lookup.TrySetDocument(this));
-            Trace.TraceInformation("{0}End resolvers, {1}", tracePrefix, (this.HasNode ? "a document was found" : "no document was found"));
+            
+			using (DisposableTimer.DebugDuration<PluginTypeResolver>(
+				string.Format("{0}Begin resolvers", tracePrefix),
+				string.Format("{0}End resolvers, {1}", tracePrefix, (this.HasNode ? "a document was found" : "no document was found"))))
+			{
+				var lookups = RoutingContext.DocumentLookupsResolver.DocumentLookups;
+				lookups.Any(lookup => lookup.TrySetDocument(this));	
+			}			
 
             // fixme - not handling umbracoRedirect
             // should come after internal redirects
@@ -234,24 +242,24 @@ namespace Umbraco.Web.Routing
             const int maxLoop = 12;
             do
             {
-                Trace.TraceInformation("{0}{1}", tracePrefix, (i == 0 ? "Begin" : "Loop"));
+				LogHelper.Debug<DocumentRequest>("{0}{1}", () => tracePrefix, () => (i == 0 ? "Begin" : "Loop"));                
 
                 // handle not found
                 if (!this.HasNode)
                 {
                     this.Is404 = true;
-                    Trace.TraceInformation("{0}No document, try last chance lookup", tracePrefix);
+					LogHelper.Debug<DocumentRequest>("{0}No document, try last chance lookup", () => tracePrefix);                    
 
                     // if it fails then give up, there isn't much more that we can do
 					var lastChance = RoutingContext.DocumentLookupsResolver.DocumentLastChanceLookup;
 					if (lastChance == null || !lastChance.TrySetDocument(this))
                     {
-                        Trace.TraceInformation("{0}Failed to find a document, give up", tracePrefix);
+						LogHelper.Debug<DocumentRequest>("{0}Failed to find a document, give up", () => tracePrefix);
                         break;
                     }
                     else
                     {
-                        Trace.TraceInformation("{0}Found a document", tracePrefix);
+						LogHelper.Debug<DocumentRequest>("{0}Found a document", () => tracePrefix);
                     }
                 }
 
@@ -277,10 +285,10 @@ namespace Umbraco.Web.Routing
 
             if (i == maxLoop || j == maxLoop)
             {
-                Trace.TraceInformation("{0}Looks like we're running into an infinite loop, abort", tracePrefix);
+				LogHelper.Debug<DocumentRequest>("{0}Looks like we're running into an infinite loop, abort", () => tracePrefix);
                 this.Node = null;
             }
-            Trace.TraceInformation("{0}End", tracePrefix);
+			LogHelper.Debug<DocumentRequest>("{0}End", () => tracePrefix);
         }
 
         /// <summary>
@@ -300,7 +308,7 @@ namespace Umbraco.Web.Routing
 
             if (!string.IsNullOrWhiteSpace(internalRedirect))
             {
-                Trace.TraceInformation("{0}Found umbracoInternalRedirectId={1}", tracePrefix, internalRedirect);
+				LogHelper.Debug<DocumentRequest>("{0}Found umbracoInternalRedirectId={1}", () => tracePrefix, () => internalRedirect);
 
                 int internalRedirectId;
                 if (!int.TryParse(internalRedirect, out internalRedirectId))
@@ -310,12 +318,12 @@ namespace Umbraco.Web.Routing
                 {
                     // bad redirect
                     this.Node = null;
-                    Trace.TraceInformation("{0}Failed to redirect to id={1}: invalid value", tracePrefix, internalRedirect);
+					LogHelper.Debug<DocumentRequest>("{0}Failed to redirect to id={1}: invalid value", () => tracePrefix, () => internalRedirect);
                 }
                 else if (internalRedirectId == this.NodeId)
                 {
                     // redirect to self
-                    Trace.TraceInformation("{0}Redirecting to self, ignore", tracePrefix);
+					LogHelper.Debug<DocumentRequest>("{0}Redirecting to self, ignore", () => tracePrefix);
                 }
                 else
                 {
@@ -325,11 +333,11 @@ namespace Umbraco.Web.Routing
                     if (node != null)
                     {
                         redirect = true;
-                        Trace.TraceInformation("{0}Redirecting to id={1}", tracePrefix, internalRedirectId);
+						LogHelper.Debug<DocumentRequest>("{0}Redirecting to id={1}", () => tracePrefix, () => internalRedirectId);
                     }
                     else
                     {
-                        Trace.TraceInformation("{0}Failed to redirect to id={1}: no such published document", tracePrefix, internalRedirectId);
+						LogHelper.Debug<DocumentRequest>("{0}Failed to redirect to id={1}: no such published document", () => tracePrefix, () => internalRedirectId);
                     }
                 }
             }
@@ -352,32 +360,32 @@ namespace Umbraco.Web.Routing
 
             if (Access.IsProtected(this.NodeId, path))
             {
-                Trace.TraceInformation("{0}Page is protected, check for access", tracePrefix);
+				LogHelper.Debug<DocumentRequest>("{0}Page is protected, check for access", () => tracePrefix);
 
                 var user = System.Web.Security.Membership.GetUser();
 
                 if (user == null || !Member.IsLoggedOn())
                 {
-                    Trace.TraceInformation("{0}Not logged in, redirect to login page", tracePrefix);
+					LogHelper.Debug<DocumentRequest>("{0}Not logged in, redirect to login page", () => tracePrefix);
                     var loginPageId = Access.GetLoginPage(path);
                     if (loginPageId != this.NodeId)
 						this.Node = RoutingContext.ContentStore.GetNodeById(loginPageId);
                 }
                 else if (!Access.HasAccces(this.NodeId, user.ProviderUserKey))
                 {
-                    Trace.TraceInformation("{0}Current member has not access, redirect to error page", tracePrefix);
+					LogHelper.Debug<DocumentRequest>("{0}Current member has not access, redirect to error page", () => tracePrefix);
                     var errorPageId = Access.GetErrorPage(path);
                     if (errorPageId != this.NodeId)
 						this.Node = RoutingContext.ContentStore.GetNodeById(errorPageId);
                 }
                 else
                 {
-                    Trace.TraceInformation("{0}Current member has access", tracePrefix);
+					LogHelper.Debug<DocumentRequest>("{0}Current member has access", () => tracePrefix);
                 }
             }
             else
             {
-                Trace.TraceInformation("{0}Page is not protected", tracePrefix);
+				LogHelper.Debug<DocumentRequest>("{0}Page is not protected", () => tracePrefix);
             }
         }
 
@@ -402,7 +410,7 @@ namespace Umbraco.Web.Routing
                 if (string.IsNullOrWhiteSpace(templateAlias))
                 {
 					templateAlias = RoutingContext.ContentStore.GetNodeProperty(this.Node, "@template");
-                    Trace.TraceInformation("{0}Look for template id={1}", tracePrefix, templateAlias);
+					LogHelper.Debug<DocumentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateAlias);
                     int templateId;
                     if (!int.TryParse(templateAlias, out templateId))
                         templateId = 0;
@@ -410,19 +418,19 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    Trace.TraceInformation("{0}Look for template alias=\"{1}\" (altTemplate)", tracePrefix, templateAlias);
+					LogHelper.Debug<DocumentRequest>("{0}Look for template alias=\"{1}\" (altTemplate)", () => tracePrefix, () => templateAlias);
                     this.Template = Template.GetByAlias(templateAlias);
                 }
 
                 if (!this.HasTemplate)
                 {
-                    Trace.TraceInformation("{0}No template was found", tracePrefix);
+					LogHelper.Debug<DocumentRequest>("{0}No template was found", () => tracePrefix);
 
                     //TODO: I like the idea of this new setting, but lets get this in to the core at a later time, for now lets just get the basics working.
                     //if (Settings.HandleMissingTemplateAs404)
                     //{
                     //    this.Node = null;
-                    //    Trace.TraceInformation("{0}Assume page not found (404)", tracePrefix);
+                    //    LogHelper.Debug<DocumentRequest>("{0}Assume page not found (404)", tracePrefix);
                     //}
 
                     // else we have no template
@@ -430,7 +438,7 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    Trace.TraceInformation("{0}Found", tracePrefix);
+                    LogHelper.Debug<DocumentRequest>("{0}Found", () => tracePrefix);
                 }
             }
         }

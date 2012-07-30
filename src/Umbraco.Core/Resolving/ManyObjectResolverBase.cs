@@ -15,7 +15,7 @@ namespace Umbraco.Core.Resolving
 	/// Used to resolve multiple types from a collection. The collection can also be modified at runtime/application startup.
 	/// An example of this is MVCs ViewEngines collection.
 	/// </remarks>
-	internal abstract class MultipleResolverBase<TResolver, TResolved> : ResolverBase<TResolver> 
+	internal abstract class ManyObjectResolverBase<TResolver, TResolved> : ResolverBase<TResolver> 
 		where TResolver : class 
 		where TResolved : class
 	{
@@ -23,18 +23,18 @@ namespace Umbraco.Core.Resolving
 		protected readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MultipleResolverBase"/> class with an empty list of objects.
+		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolver,TResolved}"/> class with an empty list of objects.
 		/// </summary>
-		protected MultipleResolverBase()
+		protected ManyObjectResolverBase()
 		{
 			_resolved = new List<TResolved>();
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MultipleResolverBase"/> class with an initial list of objects.
+		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolver,TResolved}"/> class with an initial list of objects.
 		/// </summary>
 		/// <param name="values">The list of objects.</param>
-		protected MultipleResolverBase(IEnumerable<TResolved> value)
+		protected ManyObjectResolverBase(IEnumerable<TResolved> value)
 		{
 			_resolved = new List<TResolved>(value);
 		}

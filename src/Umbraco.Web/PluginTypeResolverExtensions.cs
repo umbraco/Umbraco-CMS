@@ -13,15 +13,15 @@ namespace Umbraco.Web
 	public static class PluginTypeResolverExtensions
 	{
 
-		/// <summary>
-		/// Returns all IDocumentLookup types
-		/// </summary>
-		/// <param name="resolver"></param>
-		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveLookups(this PluginTypeResolver resolver)
-		{
-			return resolver.ResolveTypes<IDocumentLookup>();
-		}
+		///// <summary>
+		///// Returns all IDocumentLookup types
+		///// </summary>
+		///// <param name="resolver"></param>
+		///// <returns></returns>
+		//internal static IEnumerable<Type> ResolveLookups(this PluginTypeResolver resolver)
+		//{
+		//    return resolver.ResolveTypes<IDocumentLookup>();
+		//}
 
 	}
 }

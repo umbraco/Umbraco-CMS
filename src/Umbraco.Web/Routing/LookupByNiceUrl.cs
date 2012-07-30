@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Xml;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Resolving;
 
 namespace Umbraco.Web.Routing
@@ -10,15 +11,14 @@ namespace Umbraco.Web.Routing
 	/// <remarks>
 	/// <para>Handles <c>/foo/bar</c> where <c>/foo/bar</c> is the nice url of a document.</para>
 	/// </remarks>
-	[ResolutionWeight(10)]
+	//[ResolutionWeight(10)]
     internal class LookupByNiceUrl : IDocumentLookup
     {
-		static readonly TraceSource Trace = new TraceSource("LookupByNiceUrl");
-
+		
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
 		/// </summary>
-		/// <param name="docRequest">The <c>DocumentRequest</c>.</param>
+		/// <param name="docreq">The <c>DocumentRequest</c>.</param>
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public virtual bool TrySetDocument(DocumentRequest docreq)
         {
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Routing
 		/// <returns>The document node, or null.</returns>
         protected XmlNode LookupDocumentNode(DocumentRequest docreq, string route)
         {
-            Trace.TraceInformation("Test route \"{0}\"", route);
+			LogHelper.Debug<LookupByNiceUrl>("Test route \"{0}\"", () => route);
 
 			//return '0' if in preview mode!
         	var nodeId = !docreq.RoutingContext.UmbracoContext.InPreviewMode
@@ -55,7 +55,7 @@ namespace Umbraco.Web.Routing
                 if (node != null)
                 {
                     docreq.Node = node;
-                    Trace.TraceInformation("Cache hit, id={0}", nodeId);
+					LogHelper.Debug<LookupByNiceUrl>("Cache hit, id={0}", () => nodeId);
                 }
                 else
                 {
@@ -65,12 +65,12 @@ namespace Umbraco.Web.Routing
 
             if (node == null)
             {
-                Trace.TraceInformation("Cache miss, query");
+				LogHelper.Debug<LookupByNiceUrl>("Cache miss, query");
 				node = docreq.RoutingContext.ContentStore.GetNodeByRoute(route);
                 if (node != null)
                 {
                     docreq.Node = node;
-                    Trace.TraceInformation("Query matches, id={0}", docreq.NodeId);
+					LogHelper.Debug<LookupByNiceUrl>("Query matches, id={0}", () => docreq.NodeId);
 
 					if (!docreq.RoutingContext.UmbracoContext.InPreviewMode)
 					{
@@ -80,7 +80,7 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    Trace.TraceInformation("Query does not match");
+					LogHelper.Debug<LookupByNiceUrl>("Query does not match");
                 }
             }
 

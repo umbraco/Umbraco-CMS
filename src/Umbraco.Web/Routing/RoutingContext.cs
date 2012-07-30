@@ -7,7 +7,7 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// Provides context for the routing of a request.
 	/// </summary>
-    internal class RoutingContext
+    public class RoutingContext
     {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RoutingContext"/> class.
@@ -16,9 +16,9 @@ namespace Umbraco.Web.Routing
 		/// <param name="documentLookupsResolver">The document lookups resolver.</param>
 		/// <param name="contentStore">The content store.</param>
 		/// <param name="niceUrlResolver">The nice urls resolver.</param>
-        public RoutingContext(
+        internal RoutingContext(
 			UmbracoContext umbracoContext,
-			DocumentLookupsResolver documentLookupsResolver,
+			DocumentLookupsResolver2 documentLookupsResolver,
             ContentStore contentStore,
 			NiceUrlProvider niceUrlResolver)
         {
@@ -36,16 +36,16 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Gets the document lookups resolver.
 		/// </summary>
-		public DocumentLookupsResolver DocumentLookupsResolver { get; private set; }
+		internal DocumentLookupsResolver2 DocumentLookupsResolver { get; private set; }
 
 		/// <summary>
 		/// Gets the content store.
 		/// </summary>
-        public ContentStore ContentStore { get; private set; }
+		internal ContentStore ContentStore { get; private set; }
 
 		/// <summary>
 		/// Gets the nice urls provider.
 		/// </summary>
-		public NiceUrlProvider NiceUrlProvider { get; private set; }
+		internal NiceUrlProvider NiceUrlProvider { get; private set; }
     }
 }

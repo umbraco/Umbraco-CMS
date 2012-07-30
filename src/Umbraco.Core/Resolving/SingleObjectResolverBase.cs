@@ -11,29 +11,29 @@ namespace Umbraco.Core.Resolving
 	/// Used for 'singly' registered objects. An example is like the MVC Controller Factory, only one exists application wide and it can
 	/// be get/set.
 	/// </remarks>
-	internal abstract class SingleResolverBase<TResolver, TResolved> : ResolverBase<TResolver> 
+	internal abstract class SingleObjectResolverBase<TResolver, TResolved> : ResolverBase<TResolver> 
 		where TResolver : class 
 		where TResolved : class
 	{
 		TResolved _resolved;
 		readonly bool _canBeNull;
 
-		protected SingleResolverBase()
+		protected SingleObjectResolverBase()
 			: this(false)
 		{ }
 
-		protected SingleResolverBase(TResolved value)
+		protected SingleObjectResolverBase(TResolved value)
 			: this(false)
 		{
 			_resolved = value;
 		}
 
-		protected SingleResolverBase(bool canBeNull)
+		protected SingleObjectResolverBase(bool canBeNull)
 		{
 			_canBeNull = canBeNull;
 		}
 
-		protected SingleResolverBase(TResolved value, bool canBeNull)
+		protected SingleObjectResolverBase(TResolved value, bool canBeNull)
 		{
 			_resolved = value;
 			_canBeNull = canBeNull;

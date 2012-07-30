@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Xml;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Resolving;
 using umbraco.cms.businesslogic.template;
 
@@ -12,15 +13,13 @@ namespace Umbraco.Web.Routing
 	/// <para>Handles <c>/foo/bar/template</c> where <c>/foo/bar</c> is the nice url of a document, and <c>template</c> a template alias.</para>
 	/// <para>If successful, then the template of the document request is also assigned.</para>
 	/// </remarks>
-	[ResolutionWeight(30)]
+	//[ResolutionWeight(30)]
     internal class LookupByNiceUrlAndTemplate : LookupByNiceUrl, IDocumentLookup
     {
-		static readonly TraceSource Trace = new TraceSource("LookupByNiceUrlAndTemplate");
-
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
 		/// </summary>
-		/// <param name="docRequest">The <c>DocumentRequest</c>.</param>
+		/// <param name="docreq">The <c>DocumentRequest</c>.</param>
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		/// <remarks>If successful, also assigns the template.</remarks>
 		public override bool TrySetDocument(DocumentRequest docreq)
@@ -39,7 +38,7 @@ namespace Umbraco.Web.Routing
                 var template = Template.GetByAlias(templateAlias);
                 if (template != null)
                 {
-                    Trace.TraceInformation("Valid template: \"{0}\"", templateAlias);
+					LogHelper.Debug<LookupByNiceUrlAndTemplate>("Valid template: \"{0}\"", () => templateAlias);
 
                     var route = docreq.HasDomain ? (docreq.Domain.RootNodeId.ToString() + path) : path;
                     node = LookupDocumentNode(docreq, route);
@@ -49,12 +48,12 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    Trace.TraceInformation("Not a valid template: \"{0}\"", templateAlias);
+					LogHelper.Debug<LookupByNiceUrlAndTemplate>("Not a valid template: \"{0}\"", () => templateAlias);
                 }
             }
             else
             {
-                Trace.TraceInformation("No template in path \"/\"");
+				LogHelper.Debug<LookupByNiceUrlAndTemplate>("No template in path \"/\"");
             }
 
             return node != null;

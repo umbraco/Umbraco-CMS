@@ -41,15 +41,54 @@ namespace Umbraco.Core
 			return new DisposableTimer(callback);
 		}
 
+		/// <summary>
+		/// Adds a start and end log entry as Info and tracks how long it takes until disposed.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="startMessage"></param>
+		/// <param name="completeMessage"></param>
+		/// <returns></returns>
 		public static DisposableTimer TraceDuration<T>(string startMessage, string completeMessage)
 		{
 			return TraceDuration(typeof(T), startMessage, completeMessage);
 		}
 
+		/// <summary>
+		/// Adds a start and end log entry as Info and tracks how long it takes until disposed.
+		/// </summary>
+		/// <param name="loggerType"></param>
+		/// <param name="startMessage"></param>
+		/// <param name="completeMessage"></param>
+		/// <returns></returns>
 		public static DisposableTimer TraceDuration(Type loggerType, string startMessage, string completeMessage)
 		{
 			LogHelper.Info(loggerType, () => startMessage);
 			return new DisposableTimer(x => LogHelper.Info(loggerType, () => completeMessage + " (took " + x + "ms)"));
+		}
+
+		/// <summary>
+		/// Adds a start and end log entry as Debug and tracks how long it takes until disposed.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="startMessage"></param>
+		/// <param name="completeMessage"></param>
+		/// <returns></returns>
+		public static DisposableTimer DebugDuration<T>(string startMessage, string completeMessage)
+		{
+			return DebugDuration(typeof(T), startMessage, completeMessage);
+		}
+
+		/// <summary>
+		/// Adds a start and end log entry as Debug and tracks how long it takes until disposed.
+		/// </summary>
+		/// <param name="loggerType"></param>
+		/// <param name="startMessage"></param>
+		/// <param name="completeMessage"></param>
+		/// <returns></returns>
+		public static DisposableTimer DebugDuration(Type loggerType, string startMessage, string completeMessage)
+		{
+			LogHelper.Info(loggerType, () => startMessage);
+			return new DisposableTimer(x => LogHelper.Debug(loggerType, () => completeMessage + " (took " + x + "ms)"));
 		}
 
 		/// <summary>

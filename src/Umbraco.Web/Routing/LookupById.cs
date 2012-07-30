@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Xml;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Resolving;
 
 namespace Umbraco.Web.Routing
@@ -11,15 +12,13 @@ namespace Umbraco.Web.Routing
 	/// <remarks>
 	/// <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
 	/// </remarks>
-	[ResolutionWeight(20)]
+	//[ResolutionWeight(20)]
     internal class LookupById : IDocumentLookup
     {
-		static readonly TraceSource Trace = new TraceSource("LookupById");
-
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
 		/// </summary>
-		/// <param name="docRequest">The <c>DocumentRequest</c>.</param>
+		/// <param name="docreq">The <c>DocumentRequest</c>.</param>
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public bool TrySetDocument(DocumentRequest docreq)
         {
@@ -35,12 +34,12 @@ namespace Umbraco.Web.Routing
 
                 if (nodeId > 0)
                 {
-                    Trace.TraceInformation("Id={0}", nodeId);
+					LogHelper.Debug<LookupById>("Id={0}", () => nodeId);
 					node = docreq.RoutingContext.ContentStore.GetNodeById(nodeId);
                     if (node != null)
                     {
                         docreq.Node = node;
-                        Trace.TraceInformation("Found node with id={0}", docreq.NodeId);
+						LogHelper.Debug<LookupById>("Found node with id={0}", () => docreq.NodeId);
                     }
                     else
                     {
@@ -50,7 +49,7 @@ namespace Umbraco.Web.Routing
             }
 
             if (nodeId == -1)
-                Trace.TraceInformation("Not a node id");
+				LogHelper.Debug<LookupById>("Not a node id");
 
             return node != null;
         }

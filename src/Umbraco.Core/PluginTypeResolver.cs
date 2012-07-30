@@ -85,7 +85,7 @@ namespace Umbraco.Core
 		internal IEnumerable<T> CreateInstances<T>(IEnumerable<Type> types, bool throwException = false)
 		{
 			var typesAsArray = types.ToArray();
-			using (DisposableTimer.TraceDuration<PluginTypeResolver>(
+			using (DisposableTimer.DebugDuration<PluginTypeResolver>(
 				string.Format("Starting instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName),
 				string.Format("Completed instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName)))
 			{

@@ -6,7 +6,7 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// Resolves the <see cref="IRoutesCache"/> implementation.
 	/// </summary>
-	class RoutesCacheResolver : SingleResolverBase<RoutesCacheResolver, IRoutesCache>
+	class RoutesCacheResolver : SingleObjectResolverBase<RoutesCacheResolver, IRoutesCache>
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RoutesCacheResolve"/> class with an <see cref="IRoutesCache"/> implementation.
