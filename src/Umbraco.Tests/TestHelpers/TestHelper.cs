@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using log4net.Config;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -35,6 +36,11 @@ namespace Umbraco.Tests.TestHelpers
 				throw new ArgumentException("relativePath must start with '~/'", "relativePath");
 
 			return relativePath.Replace("~/", CurrentAssemblyDirectory + "/");
+		}
+
+		public static void SetupLog4NetForTests()
+		{
+			XmlConfigurator.Configure(new FileInfo(MapPathForTest("~/unit-test-log4net.config")));
 		}
 	}
 }

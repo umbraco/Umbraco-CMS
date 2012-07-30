@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.media;
 
@@ -14,6 +15,11 @@ namespace Umbraco.Tests
 		[SetUp]
 		public void Initialize()
 		{
+			TestHelper.SetupLog4NetForTests();
+
+			//this ensures its reset
+			PluginTypeResolver.Current = new PluginTypeResolver();
+
 			//for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
 			PluginTypeResolver.Current.AssembliesToScan = new[]
 				{

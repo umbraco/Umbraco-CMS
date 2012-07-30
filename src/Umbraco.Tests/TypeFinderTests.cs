@@ -35,6 +35,8 @@ namespace Umbraco.Tests
 		[SetUp]
 		public void Initialize()
 		{
+			TestHelper.SetupLog4NetForTests();
+
 			_assemblies = new[]
 			    {
 			        this.GetType().Assembly, 

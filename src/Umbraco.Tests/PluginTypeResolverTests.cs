@@ -2,6 +2,7 @@ using System.Linq;
 using NUnit.Framework;
 using SqlCE4Umbraco;
 using Umbraco.Core;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using umbraco;
 using umbraco.DataLayer;
@@ -24,6 +25,11 @@ namespace Umbraco.Tests
 		[SetUp]
 		public void Initialize()
 		{
+			TestHelper.SetupLog4NetForTests();
+
+			//this ensures its reset
+			PluginTypeResolver.Current = new PluginTypeResolver();
+
 			//for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
 			PluginTypeResolver.Current.AssembliesToScan = new[]
 			    {
@@ -53,7 +59,9 @@ namespace Umbraco.Tests
 		{
 			var foundTypes1 = PluginTypeResolver.Current.ResolveFindMeTypes();
 			var foundTypes2 = PluginTypeResolver.Current.ResolveFindMeTypes();
-			Assert.AreEqual(1, PluginTypeResolver.Current.GetTypeLists().Count);
+			Assert.AreEqual(1,
+			                PluginTypeResolver.Current.GetTypeLists()
+			                	.Count(x => x.GetListType() == typeof (IFindMe)));
 		}
 
 		[Test]
@@ -74,7 +82,7 @@ namespace Umbraco.Tests
 		public void Resolves_Trees()
 		{
 			var trees = PluginTypeResolver.Current.ResolveTrees();
-			Assert.AreEqual(26, trees.Count());
+			Assert.AreEqual(36, trees.Count());
 		}
 
 		[Test]

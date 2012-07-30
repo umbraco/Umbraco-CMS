@@ -18,6 +18,8 @@ namespace Umbraco.Tests
 		[SetUp]
 		public void SetUp()
 		{
+			TestHelper.SetupLog4NetForTests();
+
 			_httpContextFactory = new FakeHttpContextFactory("~/Home");
 			//ensure the StateHelper is using our custom context
 			StateHelper.HttpContext = _httpContextFactory.HttpContext;

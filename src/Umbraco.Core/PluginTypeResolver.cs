@@ -23,7 +23,7 @@ namespace Umbraco.Core
 	internal class PluginTypeResolver
 	{
 
-		private PluginTypeResolver()
+		internal PluginTypeResolver()
 		{
 		}
 
@@ -33,6 +33,9 @@ namespace Umbraco.Core
 		/// <summary>
 		/// We will ensure that no matter what, only one of these is created, this is to ensure that caching always takes place
 		/// </summary>
+		/// <remarks>
+		/// The setter is generally only used for unit tests
+		/// </remarks>
 		internal static PluginTypeResolver Current
 		{
 			get
@@ -46,6 +49,7 @@ namespace Umbraco.Core
 				}
 				return _resolver;
 			}
+			set { _resolver = value; }
 		}
 
 		internal readonly TypeFinder2 TypeFinder = new TypeFinder2();
