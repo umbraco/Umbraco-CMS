@@ -79,6 +79,13 @@ namespace Umbraco.Tests
 		}
 
 		[Test]
+		public void Resolves_Actions()
+		{
+			var actions = PluginTypeResolver.Current.ResolveActions();
+			Assert.AreEqual(36, actions.Count());
+		}
+
+		[Test]
 		public void Resolves_Trees()
 		{
 			var trees = PluginTypeResolver.Current.ResolveTrees();
@@ -93,9 +100,9 @@ namespace Umbraco.Tests
 		}
 
 		[Test]
-		public void Resolves_Actions()
+		public void Resolves_Action_Handlers()
 		{
-			var types = PluginTypeResolver.Current.ResolveActions();
+			var types = PluginTypeResolver.Current.ResolveActionHandlers();
 			Assert.AreEqual(1, types.Count());
 		}
 
