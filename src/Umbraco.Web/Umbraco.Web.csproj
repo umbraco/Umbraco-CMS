@@ -1817,7 +1817,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx" />
-    <Content Include="umbraco.presentation\umbraco\create\DLRScripting.ascx" />
+    <Content Include="umbraco.presentation\umbraco\create\DLRScripting.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\controls\Images\ImageViewer.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\Images\ImageViewerUpdater.asmx" />
     <Content Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx" />

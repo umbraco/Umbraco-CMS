@@ -77,6 +77,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="PluginTypeResolverExtensions.cs" />
     <Compile Include="RazorCore\BaseContext.cs" />
     <Compile Include="RazorDataTypeModels\HtmlStringDataTypeModel.cs" />
     <Compile Include="RazorDataTypeModels\IntegerDataTypeModel.cs" />

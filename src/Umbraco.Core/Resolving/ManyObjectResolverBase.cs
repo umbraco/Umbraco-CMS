@@ -1,10 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
 namespace Umbraco.Core.Resolving
 {
-	//NOTE: This class should also support creating instances of the object and managing their lifespan,
-	// for example, some resolvers would want to return new object each time, per request or per application lifetime.
 
 	/// <summary>
 	/// A Resolver which manages an ordered list of objects.
@@ -33,7 +32,7 @@ namespace Umbraco.Core.Resolving
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolver,TResolved}"/> class with an initial list of objects.
 		/// </summary>
-		/// <param name="values">The list of objects.</param>
+		/// <param name="value">The list of objects.</param>
 		protected ManyObjectResolverBase(IEnumerable<TResolved> value)
 		{
 			_resolved = new List<TResolved>(value);
@@ -67,9 +66,15 @@ namespace Umbraco.Core.Resolving
 		public void Add(TResolved value)
 		{
 			Resolution.EnsureNotFrozen();
-			using (new WriteLock(Lock))
+			using (var l = new UpgradeableReadLock(Lock))
 			{
-				_resolved.Add(value);			
+				if (_resolved.Contains(value))
+				{
+					throw new InvalidOperationException("The object " + value + " already exists in the collection");
+				};
+				
+				l.UpgradeToWriteLock();
+				_resolved.Add(value);
 			}
 		}
 
@@ -93,8 +98,14 @@ namespace Umbraco.Core.Resolving
 		public void Insert(int index, TResolved value)
 		{
 			Resolution.EnsureNotFrozen();
-			using (new WriteLock(Lock))
+			using (var l = new UpgradeableReadLock(Lock))
 			{
+				if (_resolved.Contains(value))
+				{
+					throw new InvalidOperationException("The object " + value + " already exists in the collection");
+				};
+
+				l.UpgradeToWriteLock();
 				_resolved.Insert(index, value);
 			}
 		}

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Threading;
 using System.Web;
+using Umbraco.Core;
 using umbraco.interfaces;
 using System.Collections;
 using System.Reflection;
@@ -430,7 +432,71 @@ namespace umbraco.MacroEngines
             }
             return list;
         }
-        static Dictionary<System.Tuple<Guid, int>, Type> RazorDataTypeModelTypes = null;
+
+    	private static Dictionary<System.Tuple<Guid, int>, Type> _razorDataTypeModelTypes = null;
+    	private static readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
+
+    	internal static Dictionary<System.Tuple<Guid, int>, Type> RazorDataTypeModelTypes
+    	{
+    		get
+    		{
+    			using (var l = new UpgradeableReadLock(_locker))
+    			{
+    				if (_razorDataTypeModelTypes == null)
+    				{
+    					l.UpgradeToWriteLock();
+
+    					var foundTypes = new Dictionary<System.Tuple<Guid, int>, Type>();
+
+						HttpContext.Current.Trace.Write("RazorDataTypeModelTypes cache is empty, populating cache using PluginTypeResolver...");
+						try
+						{
+							PluginTypeResolver.Current.ResolveRazorDataTypeModels()
+								.ToList()
+								.ConvertAll(type =>
+								{
+									var razorDataTypeModelAttributes = type.GetCustomAttributes<RazorDataTypeModel>(true);
+									return razorDataTypeModelAttributes.ToList().ConvertAll(razorDataTypeModelAttribute =>
+									{
+										var g = razorDataTypeModelAttribute.DataTypeEditorId;
+										var priority = razorDataTypeModelAttribute.Priority;
+										return new KeyValuePair<System.Tuple<Guid, int>, Type>(new System.Tuple<Guid, int>(g, priority), type);
+									});
+								})
+								.SelectMany(item => item)
+								.ToList()
+								.ForEach(item =>
+								{
+									System.Tuple<Guid, int> key = item.Key;
+									if (!foundTypes.ContainsKey(key))
+									{
+										foundTypes.Add(key, item.Value);
+									}
+								});
+							HttpContext.Current.Trace.Write(string.Format("{0} items added to cache...", foundTypes.Count));
+							var i = 1;
+							foreach (var item in foundTypes)
+							{
+								HttpContext.Current.Trace.Write(string.Format("{0}/{1}: {2}@{4} => {3}", i, foundTypes.Count, item.Key.Item1, item.Value.FullName, item.Key.Item2));
+								i++;
+							}
+
+							//there is no error, so set the collection
+							_razorDataTypeModelTypes = foundTypes;
+
+						}
+						catch (Exception ex)
+						{
+							HttpContext.Current.Trace.Warn("Exception occurred while populating cache, will keep RazorDataTypeModelTypes to null so that this error remains visible and you don't end up with an empty cache with silent failure.");
+							HttpContext.Current.Trace.Warn(string.Format("The exception was {0} and the message was {1}. {2}", ex.GetType().FullName, ex.Message, ex.StackTrace));							
+						}
+
+    				}
+					return _razorDataTypeModelTypes;
+    			}
+    		}
+    	}
+
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
 
@@ -472,57 +538,11 @@ namespace umbraco.MacroEngines
                     //contextAlias is the node which the property data was returned from
                     Guid dataType = ContentType.GetDataType(data.ContextAlias, data.Alias);
                     HttpContext.Current.Trace.Write(string.Format("RazorDynamicNode got datatype {0} for {1} on {2}", dataType, data.Alias, data.ContextAlias));
-                    if (RazorDataTypeModelTypes == null)
-                    {
-                        HttpContext.Current.Trace.Write("RazorDataTypeModelTypes cache is empty, populating cache using TypeFinder...");
-                        try
-                        {
-                            RazorDataTypeModelTypes = new Dictionary<System.Tuple<Guid, int>, Type>();
-
-                        	var typeFinder = new Umbraco.Core.TypeFinder2();
-
-							typeFinder.FindClassesWithAttribute<RazorDataTypeModel>()
-                            .ToList()
-                            .FindAll(type => typeof(IRazorDataTypeModel).IsAssignableFrom(type))
-                            .ConvertAll(type =>
-                            {
-                                IEnumerable<RazorDataTypeModel> RazorDataTypeModelAttributes = Attribute.GetCustomAttributes(type, typeof(RazorDataTypeModel)).Cast<RazorDataTypeModel>();
-                                return RazorDataTypeModelAttributes.ToList().ConvertAll(RazorDataTypeModelAttribute =>
-                                {
-                                    Guid g = RazorDataTypeModelAttribute.DataTypeEditorId;
-                                    int priority = RazorDataTypeModelAttribute.Priority;
-                                    return new KeyValuePair<System.Tuple<Guid, int>, Type>(new System.Tuple<Guid, int>(g, priority), type);
-                                });
-                            })
-                            .SelectMany(item => item)
-                            .ToList()
-                            .ForEach(item =>
-                            {
-                                System.Tuple<Guid, int> key = item.Key;
-                                if (!RazorDataTypeModelTypes.ContainsKey(key))
-                                {
-                                    RazorDataTypeModelTypes.Add(key, item.Value);
-                                }
-                            });
-                            HttpContext.Current.Trace.Write(string.Format("{0} items added to cache...", RazorDataTypeModelTypes.Count));
-                            int i = 1;
-                            foreach (KeyValuePair<System.Tuple<Guid, int>, Type> item in RazorDataTypeModelTypes)
-                            {
-                                HttpContext.Current.Trace.Write(string.Format("{0}/{1}: {2}@{4} => {3}", i, RazorDataTypeModelTypes.Count, item.Key.Item1, item.Value.FullName, item.Key.Item2));
-                                i++;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            HttpContext.Current.Trace.Warn("Exception occurred while populating cache, Will set RazorDataTypeModelTypes to null so that this error remains visible and you don't end up with an empty cache with silent failure.");
-                            HttpContext.Current.Trace.Warn(string.Format("The exception was {0} and the message was {1}. {2}", ex.GetType().FullName, ex.Message, ex.StackTrace));
-                            RazorDataTypeModelTypes = null;
-                        }
-                    }
+                    
                     HttpContext.Current.Trace.Write(string.Format("Checking for a RazorDataTypeModel for data type guid {0}...", dataType));
                     HttpContext.Current.Trace.Write("Checking the RazorDataTypeModelTypes static mappings to see if there is a static mapping...");
 
-                    RazorDataTypeModelStaticMappingItem staticMapping = UmbracoSettings.RazorDataTypeModelStaticMapping.FirstOrDefault(mapping =>
+                    var staticMapping = UmbracoSettings.RazorDataTypeModelStaticMapping.FirstOrDefault(mapping =>
                     {
                         return mapping.Applies(dataType, data.ContextAlias, data.Alias);
                     });
@@ -555,7 +575,7 @@ namespace umbraco.MacroEngines
                     }
 
 
-                    if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.Where(model => model.Key.Item1 == dataType).Any() && dataType != Guid.Empty)
+                    if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.Any(model => model.Key.Item1 == dataType) && dataType != Guid.Empty)
                     {
                         var razorDataTypeModelDefinition = RazorDataTypeModelTypes.Where(model => model.Key.Item1 == dataType).OrderByDescending(model => model.Key.Item2).FirstOrDefault();
                         if (!(razorDataTypeModelDefinition.Equals(default(KeyValuePair<System.Tuple<Guid, int>, Type>))))

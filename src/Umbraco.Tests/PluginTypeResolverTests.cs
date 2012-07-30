@@ -42,7 +42,8 @@ namespace Umbraco.Tests
 			        typeof(DLRScriptingEngine).Assembly,
 			        typeof(ICultureDictionary).Assembly,
 					typeof(UmbracoContext).Assembly,
-					typeof(BaseDataType).Assembly
+					typeof(BaseDataType).Assembly,
+					typeof(DynamicNode).Assembly
 			    };
 		}
 
@@ -87,6 +88,13 @@ namespace Umbraco.Tests
 		{
 			var types = PluginTypeResolver.Current.ResolveDataTypes();
 			Assert.AreEqual(33, types.Count());
+		}
+
+		[Test]
+		public void Resolves_RazorDataTypeModels()
+		{
+			var types = PluginTypeResolver.Current.ResolveRazorDataTypeModels();
+			Assert.AreEqual(3, types.Count());
 		}
 
 		public interface IFindMe
