@@ -142,6 +142,40 @@ namespace Umbraco.Web
 		/// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
 		internal Uri UmbracoUrl { get; set; }
 
+    	private Func<XmlDocument> _xmlDelegate; 
+
+		/// <summary>
+		/// Gets/sets the delegate used to retreive the Xml content, generally the setter is only used for unit tests
+		/// and by default if it is not set will use the standard delegate which ONLY works when in the context an Http Request
+		/// </summary>
+		/// <remarks>
+		/// If not defined, we will use the standard delegate which ONLY works when in the context an Http Request
+		/// mostly because the 'content' object heavily relies on HttpContext, SQL connections and a bunch of other stuff
+		/// that when run inside of a unit test fails.
+		/// </remarks>
+    	internal Func<XmlDocument> GetXmlDelegate
+    	{
+    		get
+    		{				
+    			return _xmlDelegate ?? (_xmlDelegate = () =>
+    				{
+    					if (InPreviewMode)
+    					{
+    						if (_previewContent == null)
+    						{
+    							_previewContent = new PreviewContent(UmbracoUser, new Guid(StateHelper.Cookies.Preview.GetValue()), true);
+    							if (_previewContent.ValidPreviewSet)
+    								_previewContent.LoadPreviewset();
+    						}
+    						if (_previewContent.ValidPreviewSet)
+    							return _previewContent.XmlContent;
+    					}
+    					return content.Instance.XmlContent;
+    				});
+    		}
+			set { _xmlDelegate = value; }
+    	} 
+
         /// <summary>
         /// Returns the XML Cache document
         /// </summary>
@@ -152,19 +186,7 @@ namespace Umbraco.Web
         /// </remarks>
         internal XmlDocument GetXml()
         {
-            if (InPreviewMode)
-            {
-                if (_previewContent == null)
-                {
-                    _previewContent = new PreviewContent(UmbracoUser, new Guid(StateHelper.Cookies.Preview.GetValue()), true);
-                    if (_previewContent.ValidPreviewSet)
-                        _previewContent.LoadPreviewset();
-                }
-                if (_previewContent.ValidPreviewSet)
-                    return _previewContent.XmlContent;
-            }
-            return content.Instance.XmlContent;
-
+        	return GetXmlDelegate();
         }
 
         /// <summary>

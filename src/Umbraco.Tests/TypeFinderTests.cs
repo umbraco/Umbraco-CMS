@@ -8,6 +8,7 @@ using SqlCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Tests;
 using Umbraco.Tests.PartialTrust;
+using Umbraco.Tests.TestHelpers;
 using umbraco;
 using umbraco.DataLayer;
 using umbraco.MacroEngines;

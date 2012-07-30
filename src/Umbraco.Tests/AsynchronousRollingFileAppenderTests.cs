@@ -6,6 +6,7 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Tests.TestHelpers;
 using log4net;
 using log4net.Config;
 using log4net.Core;
@@ -15,7 +16,7 @@ using log4net.Repository;
 namespace Umbraco.Tests
 {
 	[TestFixture]
-	public class AsynchronousRollingFileAppenderTest
+	public class AsynchronousRollingFileAppenderTests
 	{
 		private const string ErrorMessage = "TEST ERROR MESSAGE";
 		private string _fileFolderPath = @"c:\LogTesting\";

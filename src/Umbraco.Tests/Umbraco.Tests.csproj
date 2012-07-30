@@ -37,6 +37,9 @@
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.0.12054\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="Rhino.Mocks">
+      <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
@@ -49,10 +52,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsynchronousRollingFileAppenderTest.cs" />
+    <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
     <Compile Include="BusinessLogic\ApplicationTest.cs" />
     <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
     <Compile Include="BusinessLogic\BaseTest.cs" />
+    <Compile Include="ContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
     <Compile Include="MacroControlFactoryTests.cs" />
     <Compile Include="MacroEngineFactoryTests.cs" />
@@ -60,7 +64,7 @@
     <Compile Include="PackageActionFactoryTests.cs" />
     <Compile Include="PluginTypeResolverExtensions.cs" />
     <Compile Include="PluginTypeResolverTests.cs" />
-    <Compile Include="TestHelper.cs" />
+    <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
     <Compile Include="PartialTrust\AbstractPartialTrustFixture.cs" />
     <Compile Include="PartialTrust\IPartialTrustFixture.cs" />
@@ -71,6 +75,7 @@
     <Compile Include="PartialTrust\TestOnlyInFullTrustAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringExtensionsTests.cs" />
+    <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
     <Compile Include="TypeFinderTests.cs" />
   </ItemGroup>
   <ItemGroup>

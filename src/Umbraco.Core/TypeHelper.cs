@@ -9,7 +9,7 @@ namespace Umbraco.Core
 	/// A utility class for type checking, this provides internal caching so that calls to these methods will be faster
 	/// than doing a manual type check in c#
 	/// </summary>
-	public static class TypeHelper
+	internal static class TypeHelper
 	{
 		private static readonly ConcurrentDictionary<Tuple<Type, Type>, bool> TypeCheckCache = new ConcurrentDictionary<Tuple<Type, Type>, bool>();
 		private static readonly ConcurrentDictionary<Type, bool> ValueTypeCache = new ConcurrentDictionary<Type, bool>();

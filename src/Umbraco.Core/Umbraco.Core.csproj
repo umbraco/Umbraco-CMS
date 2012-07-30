@@ -49,8 +49,10 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationContext.cs" />
+    <Compile Include="Attempt.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="Configuration\UmbracoSettings.cs" />
+    <Compile Include="CustomBooleanTypeConverter.cs" />
     <Compile Include="DisposableObject.cs" />
     <Compile Include="DisposableTimer.cs" />
     <Compile Include="ExpressionHelper.cs" />
@@ -63,6 +65,7 @@
     <Compile Include="Logging\AsynchronousRollingFileAppender.cs" />
     <Compile Include="Logging\LoggingTaskExtension.cs" />
     <Compile Include="Logging\LogHelper.cs" />
+    <Compile Include="ObjectExtensions.cs" />
     <Compile Include="RazorDataTypeModelStaticMappingItem.cs" />
     <Compile Include="Resolving\ManyWeightedResolved.cs" />
     <Compile Include="Resolving\ManyWeightedResolverBase.cs" />
@@ -87,6 +90,7 @@
     <Compile Include="StringExtensions.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="WriteLock.cs" />
+    <Compile Include="XmlExtensions.cs" />
     <Compile Include="XmlHelper.cs" />
   </ItemGroup>
   <ItemGroup>

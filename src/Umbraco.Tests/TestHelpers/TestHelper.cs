@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.TestHelpers
 {
 	/// <summary>
 	/// Common helper properties and methods useful to testing

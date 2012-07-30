@@ -17,22 +17,32 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultRoutesCache"/> class.
 		/// </summary>
-        public DefaultRoutesCache()
+        public DefaultRoutesCache() : this(true)
         {
-            Clear();
-
-			//FIXME:
-			//
-            // here we must register handlers to clear the cache when content changes
-			// this was done by presentation.library, which cleared everything when content changed
-            // but really, we should do some partial refreshes
-
-			// these are the two events that were used by presentation.library
-			// are they enough?
-
-			global::umbraco.content.AfterRefreshContent += (sender, e) => Clear();
-			global::umbraco.content.AfterUpdateDocumentCache += (sender, e) => Clear();
+            
         }
+
+		internal DefaultRoutesCache(bool bindToEvents)
+		{
+			Clear();
+
+			if (bindToEvents)
+			{
+				//FIXME:
+				//
+				// here we must register handlers to clear the cache when content changes
+				// this was done by presentation.library, which cleared everything when content changed
+				// but really, we should do some partial refreshes
+
+				// these are the two events that were used by presentation.library
+				// are they enough?
+
+				global::umbraco.content.AfterRefreshContent += (sender, e) => Clear();
+				global::umbraco.content.AfterUpdateDocumentCache += (sender, e) => Clear();
+			}
+
+			
+		}
 
 		/// <summary>
 		/// Stores a route for a node.

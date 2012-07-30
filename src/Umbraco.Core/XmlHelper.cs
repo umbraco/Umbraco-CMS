@@ -9,7 +9,8 @@ namespace Umbraco.Core
     /// </summary>
     internal class XmlHelper
     {
-        /// <summary>
+
+		/// <summary>
         /// Imports a XML node from text.
         /// </summary>
         /// <param name="text">The text.</param>
