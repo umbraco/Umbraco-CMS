@@ -28,11 +28,7 @@ namespace umbraco.cms.presentation.Trees
         private static readonly TreeDefinitionCollection instance = new TreeDefinitionCollection();
 
     	private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
-
-        private TreeDefinitionCollection()
-        {
-            RegisterTrees();
-        }
+	
         public static TreeDefinitionCollection Instance
         {
             get 
@@ -48,6 +44,8 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public TreeDefinition FindTree(ITree tree)
         {
+			EnsureTreesRegistered();
+
             var foundTree = this.Find(
             	t => t.TreeType == tree.GetType()
             	);
@@ -64,6 +62,8 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public TreeDefinition FindTree<T>() where T : ITree
         {
+			EnsureTreesRegistered();
+
             var foundTree = this.Find(
                delegate(TreeDefinition t)
                {
@@ -85,6 +85,8 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public TreeDefinition FindTree(string alias)
         {
+			EnsureTreesRegistered();
+
             var foundTree = this.Find(
             	t => t.Tree.Alias.ToLower() == alias.ToLower()
             	);
@@ -101,6 +103,8 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public List<TreeDefinition> FindTrees(string appAlias)
         {
+			EnsureTreesRegistered();
+
             return this.FindAll(
             	tree => (tree.App != null && tree.App.alias.ToLower() == appAlias.ToLower())
             	);
@@ -113,6 +117,8 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public List<TreeDefinition> FindActiveTrees(string appAlias)
         {
+			EnsureTreesRegistered();
+
             return this.FindAll(
             	tree => (tree.App != null && tree.App.alias.ToLower() == appAlias.ToLower() && tree.Tree.Initialize)
             	);
@@ -120,7 +126,7 @@ namespace umbraco.cms.presentation.Trees
 
         public void ReRegisterTrees()
         {
-            RegisterTrees(true);
+            EnsureTreesRegistered(true);
         }
 
         /// <summary>
@@ -129,7 +135,7 @@ namespace umbraco.cms.presentation.Trees
         /// This will also store an instance of each tree object in the TreeDefinition class which should be 
         /// used when referencing all tree classes.
         /// </summary>
-        private void RegisterTrees(bool clearFirst = false)
+        private void EnsureTreesRegistered(bool clearFirst = false)
         {
 			using (var l = new UpgradeableReadLock(Lock))
 			{
