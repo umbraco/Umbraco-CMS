@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Concurrent;
 using System.Web;
-
+using Umbraco.Core;
+using Umbraco.Web;
 using umbraco.BusinessLogic.Utils;
 using umbraco.interfaces;
 using System.Collections.Generic;
@@ -14,7 +16,7 @@ namespace umbraco.presentation.cache
     {
         #region Declarations
 
-        private static readonly Dictionary<Guid, Type> _refreshers = new Dictionary<Guid, Type>();
+		internal static readonly ConcurrentDictionary<Guid, Type> _refreshers = new ConcurrentDictionary<Guid, Type>();
 
         #endregion
 
@@ -32,16 +34,16 @@ namespace umbraco.presentation.cache
 
         #region Methods
 
-        private static void Initialize()
+        internal static void Initialize()
         {
-        	var typeFinder = new Umbraco.Core.TypeFinder2();
-			var types = typeFinder.FindClassesOfType<ICacheRefresher>();
-            foreach (var t in types)
-            {
-                var typeInstance = Activator.CreateInstance(t) as ICacheRefresher;
-                if (typeInstance != null)
-                    _refreshers.Add(typeInstance.UniqueIdentifier, t);
-            }
+			foreach(var t in PluginTypeResolver.Current.ResolveCacheRefreshers())
+			{
+				var instance = PluginTypeResolver.Current.CreateInstance<ICacheRefresher>(t);
+				if (instance != null)
+				{
+					_refreshers.TryAdd(instance.UniqueIdentifier, t);	
+				}
+			}        	
         }
 
         public ICacheRefresher CacheRefresher(Guid CacheRefresherId)
@@ -56,26 +58,27 @@ namespace umbraco.presentation.cache
         /// <returns></returns>
         public ICacheRefresher GetNewObject(Guid CacheRefresherId)
         {
-            ICacheRefresher newObject = Activator.CreateInstance(_refreshers[CacheRefresherId]) as ICacheRefresher;
-            return newObject;
+        	return !_refreshers.ContainsKey(CacheRefresherId) 
+				? null 
+				: PluginTypeResolver.Current.CreateInstance<ICacheRefresher>(_refreshers[CacheRefresherId]);
         }
 
-        /// <summary>
+    	/// <summary>
         /// Gets all ICacheRefreshers
         /// </summary>
         /// <returns></returns>
         public ICacheRefresher[] GetAll()
         {
-            ICacheRefresher[] retVal = new ICacheRefresher[_refreshers.Count];
-            int c = 0;
+			var retVal = new ICacheRefresher[_refreshers.Count];
+			var c = 0;
 
-            foreach (ICacheRefresher cr in _refreshers.Values)
-            {
-                retVal[c] = GetNewObject(cr.UniqueIdentifier);
-                c++;
-            }
+			foreach (var id in _refreshers.Keys)
+			{
+				retVal[c] = GetNewObject(id);
+				c++;
+			}
 
-            return retVal;
+			return retVal;
         }
 
         #endregion

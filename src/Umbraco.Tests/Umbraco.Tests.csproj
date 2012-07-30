@@ -56,6 +56,7 @@
     <Compile Include="BusinessLogic\ApplicationTest.cs" />
     <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
     <Compile Include="BusinessLogic\BaseTest.cs" />
+    <Compile Include="CacheRefresherFactoryTests.cs" />
     <Compile Include="ContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
     <Compile Include="MacroControlFactoryTests.cs" />
