@@ -31,14 +31,16 @@ namespace umbraco.businesslogic
 		}
 
 		/// <summary>
-		/// Returns all available ITrees in application
+		/// Returns all available ITrees in application that are attribute with TreeAttribute
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveTrees(this PluginTypeResolver resolver)
+		internal static IEnumerable<Type> ResolveAttributedTrees(this PluginTypeResolver resolver)
 		{
 			return resolver.ResolveTypesWithAttribute<ITree, TreeAttribute>();
 		}
+
+		
 
 	}
 }

@@ -178,6 +178,17 @@ namespace Umbraco.Core
 		}
 
 		/// <summary>
+		/// Generic method to find any type that has the specified attribute
+		/// </summary>
+		/// <typeparam name="TAttribute"></typeparam>
+		/// <returns></returns>
+		internal IEnumerable<Type> ResolveAttributedTypes<TAttribute>() 
+			where TAttribute : Attribute
+		{
+			return ResolveTypes<object>(() => TypeFinder.FindClassesWithAttribute<TAttribute>(AssembliesToScan));
+		} 
+
+		/// <summary>
 		/// Used for unit tests
 		/// </summary>
 		/// <returns></returns>

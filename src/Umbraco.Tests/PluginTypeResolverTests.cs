@@ -9,6 +9,7 @@ using umbraco.MacroEngines.Iron;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.editorControls;
+using umbraco.presentation.umbracobase;
 using umbraco.uicontrols;
 using umbraco.cms;
 
@@ -42,8 +43,7 @@ namespace Umbraco.Tests
 			        typeof(DLRScriptingEngine).Assembly,
 			        typeof(ICultureDictionary).Assembly,
 					typeof(UmbracoContext).Assembly,
-					typeof(BaseDataType).Assembly,
-					typeof(DynamicNode).Assembly
+					typeof(BaseDataType).Assembly
 			    };
 		}
 
@@ -60,6 +60,13 @@ namespace Umbraco.Tests
 		{
 			var foundTypes1 = PluginTypeResolver.Current.ResolveFindMeTypes();			
 			Assert.AreEqual(2, foundTypes1.Count());
+		}
+
+		[Test]
+		public void Resolves_Attributed_Trees()
+		{
+			var trees = PluginTypeResolver.Current.ResolveAttributedTrees();
+			Assert.AreEqual(26, trees.Count());
 		}
 
 		[Test]
@@ -87,14 +94,27 @@ namespace Umbraco.Tests
 		public void Resolves_DataTypes()
 		{
 			var types = PluginTypeResolver.Current.ResolveDataTypes();
-			Assert.AreEqual(33, types.Count());
+			Assert.AreEqual(36, types.Count());
 		}
 
 		[Test]
 		public void Resolves_RazorDataTypeModels()
 		{
 			var types = PluginTypeResolver.Current.ResolveRazorDataTypeModels();
-			Assert.AreEqual(3, types.Count());
+			Assert.AreEqual(1, types.Count());
+		}
+
+		[Test]
+		public void Resolves_RestExtensions()
+		{
+			var types = PluginTypeResolver.Current.ResolveRestExtensions();
+			Assert.AreEqual(1, types.Count());
+		}
+
+		[RestExtension("Blah")]
+		public class MyTestExtension
+		{
+			
 		}
 
 		public interface IFindMe

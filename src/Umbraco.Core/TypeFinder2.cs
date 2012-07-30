@@ -269,13 +269,19 @@ namespace Umbraco.Core
 		{
 			if (assemblies == null) throw new ArgumentNullException("assemblies");
 
-			return (from a in assemblies
-					from t in GetTypesWithFormattedException(a)
-					where !t.IsInterface 
-						&& typeof(T).IsAssignableFrom(t)
-						&& t.GetCustomAttributes<TAttribute>(false).Any()
-						&& (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))
-					select t).ToList();
+			var l = new List<Type>();
+			foreach(var a in assemblies)
+			{
+				var types = from t in GetTypesWithFormattedException(a)
+				            where !t.IsInterface
+				                  && typeof (T).IsAssignableFrom(t)
+				                  && t.GetCustomAttributes<TAttribute>(false).Any()
+				                  && (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))
+				            select t;
+				l.AddRange(types);
+			}
+
+			return l;
 		}
 
 		/// <summary>
@@ -325,10 +331,16 @@ namespace Umbraco.Core
 		{
 			if (assemblies == null) throw new ArgumentNullException("assemblies");
 
-			return (from a in assemblies
-					from t in GetTypesWithFormattedException(a)
-					where !t.IsInterface && t.GetCustomAttributes<T>(false).Any() && (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))
-					select t).ToList();
+			var l = new List<Type>();
+			foreach (var a in assemblies)
+			{
+				var types = from t in GetTypesWithFormattedException(a)
+							where !t.IsInterface && t.GetCustomAttributes<T>(false).Any() && (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))
+							select t;
+				l.AddRange(types);
+			}
+
+			return l;
 		}
 
 		/// <summary>
@@ -430,10 +442,15 @@ namespace Umbraco.Core
 
 		private static IEnumerable<Type> GetTypes(Type assignTypeFrom, IEnumerable<Assembly> assemblies, bool onlyConcreteClasses)
 		{
-			return (from a in assemblies
-					from t in GetTypesWithFormattedException(a)
-					where !t.IsInterface && assignTypeFrom.IsAssignableFrom(t) && (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))
-					select t).ToList();
+			var l = new List<Type>();
+			foreach (var a in assemblies)
+			{
+				var types = from t in GetTypesWithFormattedException(a)
+				            where !t.IsInterface && assignTypeFrom.IsAssignableFrom(t) && (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))
+				            select t;
+				l.AddRange(types);
+			}
+			return l;			
 		}
 
 		private static IEnumerable<Type> GetTypesWithFormattedException(Assembly a)

@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using Umbraco.Core;
+using Umbraco.Web;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic.member;
 using umbraco.IO;
@@ -95,8 +97,9 @@ namespace umbraco.presentation.umbracobase
             {
                 //check for RestExtensionAttribute
 
-            	var typeFinder = new Umbraco.Core.TypeFinder2();
-				foreach (var t in typeFinder.FindClassesWithAttribute<RestExtension>())
+            	var restExtensions = PluginTypeResolver.Current.ResolveRestExtensions();
+
+				foreach (var t in restExtensions)
                 {
 
                     var temp = t.GetCustomAttributes(typeof(RestExtension), false).OfType<RestExtension>();
@@ -109,7 +112,9 @@ namespace umbraco.presentation.umbracobase
                         if (mi != null)
                         {
                             //check allowed
-                            var attributes = mi.GetCustomAttributes(typeof(RestExtensionMethod), false).OfType<RestExtensionMethod>();
+                        	var attributes = mi.GetCustomAttributes(typeof (RestExtensionMethod), false)
+                        		.OfType<RestExtensionMethod>()
+                        		.ToArray();
 
                             //check to make sure the method was decorated properly
                             if (attributes.Any())
