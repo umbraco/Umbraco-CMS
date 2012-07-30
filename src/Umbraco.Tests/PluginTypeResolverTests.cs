@@ -3,6 +3,7 @@ using NUnit.Framework;
 using SqlCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Web;
+using umbraco;
 using umbraco.DataLayer;
 using umbraco.MacroEngines;
 using umbraco.MacroEngines.Iron;
@@ -111,8 +112,21 @@ namespace Umbraco.Tests
 			Assert.AreEqual(1, types.Count());
 		}
 
+		[Test]
+		public void Resolves_XsltExtensions()
+		{
+			var types = PluginTypeResolver.Current.ResolveXsltExtensions();
+			Assert.AreEqual(1, types.Count());
+		}
+
+		[XsltExtension("Blah.Blah")]
+		public class MyXsltExtension
+		{
+
+		}
+
 		[RestExtension("Blah")]
-		public class MyTestExtension
+		public class MyRestExtension
 		{
 			
 		}

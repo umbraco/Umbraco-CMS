@@ -16,6 +16,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml;
 using System.Xml.Xsl;
+using Umbraco.Core;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic.macro;
@@ -775,6 +776,10 @@ namespace umbraco
             // We could cache the extensions in a static variable but then the cache
             // would not be refreshed when the .config file is modified. An application
             // restart would be required. Better use the cache and add a dependency.
+			
+			// SD: Not sure what is meant by the above statement? Having these in a static variable would be preferred!
+			//  If you modify a config file, the app restarts and thus all static variables are reset.
+			//  Having this stuff in cache just adds to the gigantic amount of cache data and will cause more cache turnover to happen.
 
             return cms.businesslogic.cache.Cache.GetCacheItem(
                 _xsltExtensionsCacheKey, _xsltExtensionsSyncLock,
@@ -782,7 +787,7 @@ namespace umbraco
                 null, // no refresh action
                 _xsltExtensionsDependency.Value, // depends on the .config file
                 TimeSpan.FromDays(1), // expires in 1 day (?)
-                () => { return GetXsltExtensionsImpl(); });
+                GetXsltExtensionsImpl);
         }
 
         // zb-00041 #29966 : cache the extensions
@@ -840,13 +845,16 @@ namespace umbraco
             //also get types marked with XsltExtension attribute
 
             // zb-00042 #29949 : do not hide errors, refactor
-        	var typeFinder = new Umbraco.Core.TypeFinder2();
-			foreach (var xsltType in typeFinder.FindClassesWithAttribute<XsltExtensionAttribute>())
+        	
+			var foundExtensions = Umbraco.Web.PluginTypeResolverExtensions.ResolveXsltExtensions(PluginTypeResolver.Current);
+			foreach (var xsltType in foundExtensions)
             {
-                object[] tpAttributes = xsltType.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
+                var tpAttributes = xsltType.GetCustomAttributes(typeof(XsltExtensionAttribute), true);
                 foreach (XsltExtensionAttribute tpAttribute in tpAttributes)
                 {
-                    string ns = !string.IsNullOrEmpty(tpAttribute.Namespace) ? tpAttribute.Namespace : xsltType.FullName;
+                    var ns = !string.IsNullOrEmpty(tpAttribute.Namespace) 
+						? tpAttribute.Namespace 
+						: xsltType.FullName;
                     extensions.Add(ns, Activator.CreateInstance(xsltType));
                 }
             }

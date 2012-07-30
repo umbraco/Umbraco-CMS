@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core;
 using Umbraco.Web.Routing;
+using umbraco;
 using umbraco.interfaces;
 using umbraco.presentation.umbracobase;
 
@@ -32,6 +33,16 @@ namespace Umbraco.Web
 		internal static IEnumerable<Type> ResolveRestExtensions(this PluginTypeResolver resolver)
 		{
 			return resolver.ResolveAttributedTypes<RestExtension>();
+		}
+
+		/// <summary>
+		/// Returns all classes attributed with XsltExtensionAttribute attribute
+		/// </summary>
+		/// <param name="resolver"></param>
+		/// <returns></returns>
+		internal static IEnumerable<Type> ResolveXsltExtensions(this PluginTypeResolver resolver)
+		{
+			return resolver.ResolveAttributedTypes<XsltExtensionAttribute>();
 		}
 	}
 }

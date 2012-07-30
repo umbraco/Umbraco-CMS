@@ -125,7 +125,7 @@ namespace Umbraco.Core
 			return instances.FirstOrDefault();
 		}
 
-		private IEnumerable<Type> ResolveTypes<T>(Func<IEnumerable<Type>> finder)
+		private IEnumerable<Type> ResolveTypes<T>(Func<IEnumerable<Type>> finder, bool typeIsAttribute = false)
 		{
 			using (var readLock = new UpgradeableReadLock(_lock))
 			{
@@ -140,7 +140,7 @@ namespace Umbraco.Core
 						//upgrade to a write lock since we're adding to the collection
 						readLock.UpgradeToWriteLock();
 
-						typeList = new TypeList<T>();
+						typeList = new TypeList<T>(typeIsAttribute);
 
 						foreach (var t in finder())
 						{
@@ -185,7 +185,9 @@ namespace Umbraco.Core
 		internal IEnumerable<Type> ResolveAttributedTypes<TAttribute>() 
 			where TAttribute : Attribute
 		{
-			return ResolveTypes<object>(() => TypeFinder.FindClassesWithAttribute<TAttribute>(AssembliesToScan));
+			return ResolveTypes<TAttribute>(
+				() => TypeFinder.FindClassesWithAttribute<TAttribute>(AssembliesToScan), 
+				true);
 		} 
 
 		/// <summary>
@@ -209,11 +211,20 @@ namespace Umbraco.Core
 
 		internal class TypeList<T> : TypeList
 		{
+			private readonly bool _typeIsAttribute;
+
+			public TypeList(bool typeIsAttribute = false)
+			{
+				_typeIsAttribute = typeIsAttribute;
+			}
+
 			private readonly List<Type> _types = new List<Type>();
 
 			public override void AddType(Type t)
 			{
-				if (t.IsType<T>())
+
+				//if the type is an attribute type we won't do the type check
+				if (_typeIsAttribute || t.IsType<T>())
 				{
 					_types.Add(t);
 				}
