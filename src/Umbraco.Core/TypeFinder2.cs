@@ -23,7 +23,7 @@ namespace Umbraco.Core
 	/// A utility class to find all classes of a certain type by reflection in the current bin folder
 	/// of the web application. 
 	/// </summary>
-	public class TypeFinder2
+	public static class TypeFinder2
 	{
 		
 		private static readonly ConcurrentBag<Assembly> LocalFilteredAssemblyCache = new ConcurrentBag<Assembly>();
@@ -31,7 +31,7 @@ namespace Umbraco.Core
 		/// <summary>
 		/// Caches attributed assembly information so they don't have to be re-read
 		/// </summary>
-		private readonly AttributedAssemblyList _attributedAssemblies = new AttributedAssemblyList();
+		private static readonly AttributedAssemblyList AttributedAssemblies = new AttributedAssemblyList();
 		private static ReadOnlyCollection<Assembly> _allAssemblies = null;
 		private static ReadOnlyCollection<Assembly> _binFolderAssemblies = null;
 		private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
@@ -200,24 +200,24 @@ namespace Umbraco.Core
 		/// <typeparam name="T"></typeparam>
 		/// <param name="assemblies">The assemblies to search on</param>
 		/// <returns></returns>
-		internal IEnumerable<Assembly> FindAssembliesWithAttribute<T>(IEnumerable<Assembly> assemblies)
+		internal static IEnumerable<Assembly> FindAssembliesWithAttribute<T>(IEnumerable<Assembly> assemblies)
 			where T : Attribute
 		{
 
 			var foundAssemblies = (from a in assemblies
 								   //if its already registered, then ignore
-								   where !_attributedAssemblies.IsRegistered<T>(a)
+								   where !AttributedAssemblies.IsRegistered<T>(a)
 								   let customAttributes = a.GetCustomAttributes(typeof(T), false)
 								   where customAttributes.Any()
 								   select a).ToList();
 			//now update the cache
 			foreach (var a in foundAssemblies)
 			{
-				_attributedAssemblies.Add(new AttributedAssembly { Assembly = a, PluginAttributeType = typeof(T), AssemblyFolder = null });
+				AttributedAssemblies.Add(new AttributedAssembly { Assembly = a, PluginAttributeType = typeof(T), AssemblyFolder = null });
 			}
 
 			//We must do a ToList() here because it is required to be serializable when using other app domains.
-			return _attributedAssemblies
+			return AttributedAssemblies
 				.Where(x => x.PluginAttributeType == typeof(T)
 					&& assemblies.Select(y => y.FullName).Contains(x.Assembly.FullName))
 				.Select(x => x.Assembly)
@@ -231,7 +231,7 @@ namespace Umbraco.Core
 		/// <typeparam name="TAssemblyAttribute"></typeparam>
 		/// <param name="assemblies">The assemblies to search on</param>
 		/// <returns></returns>
-		internal IEnumerable<Type> FindClassesOfType<T, TAssemblyAttribute>(IEnumerable<Assembly> assemblies)
+		internal static IEnumerable<Type> FindClassesOfType<T, TAssemblyAttribute>(IEnumerable<Assembly> assemblies)
 			where TAssemblyAttribute : Attribute
 		{
 			var found = FindAssembliesWithAttribute<TAssemblyAttribute>(assemblies);
@@ -246,25 +246,25 @@ namespace Umbraco.Core
 		/// <param name="assembly">The assembly.</param>
 		/// <returns></returns>
 		/// <remarks></remarks>
-		internal IEnumerable<Type> FindClassesOfType<T, TAssemblyAttribute>(Assembly assembly)
+		internal static IEnumerable<Type> FindClassesOfType<T, TAssemblyAttribute>(Assembly assembly)
 			where TAssemblyAttribute : Attribute
 		{
 			return FindClassesOfType<T, TAssemblyAttribute>(new[] { assembly });
 		}
 
-		public IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>()
+		public static IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>()
 			where TAttribute : Attribute
 		{
 			return FindClassesOfTypeWithAttribute<T, TAttribute>(GetAssembliesWithKnownExclusions(), true);
 		}
 
-		public IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>(IEnumerable<Assembly> assemblies)
+		public static IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>(IEnumerable<Assembly> assemblies)
 			where TAttribute : Attribute
 		{
 			return FindClassesOfTypeWithAttribute<T, TAttribute>(assemblies, true);
 		}
 
-		public IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>(IEnumerable<Assembly> assemblies, bool onlyConcreteClasses)
+		public static IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>(IEnumerable<Assembly> assemblies, bool onlyConcreteClasses)
 			where TAttribute : Attribute
 		{
 			if (assemblies == null) throw new ArgumentNullException("assemblies");
@@ -289,7 +289,7 @@ namespace Umbraco.Core
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		public IEnumerable<Type> FindClassesOfType<T>()
+		public static IEnumerable<Type> FindClassesOfType<T>()
 		{
 			return FindClassesOfType<T>(GetAssembliesWithKnownExclusions(), true);
 		}
@@ -301,7 +301,7 @@ namespace Umbraco.Core
 		/// <param name="assemblies"></param>
 		/// <param name="onlyConcreteClasses"></param>
 		/// <returns></returns>
-		public IEnumerable<Type> FindClassesOfType<T>(IEnumerable<Assembly> assemblies, bool onlyConcreteClasses)
+		public static IEnumerable<Type> FindClassesOfType<T>(IEnumerable<Assembly> assemblies, bool onlyConcreteClasses)
 		{
 			if (assemblies == null) throw new ArgumentNullException("assemblies");
 
@@ -314,7 +314,7 @@ namespace Umbraco.Core
 		/// <typeparam name="T"></typeparam>
 		/// <param name="assemblies"></param>
 		/// <returns></returns>
-		public IEnumerable<Type> FindClassesOfType<T>(IEnumerable<Assembly> assemblies)
+		public static IEnumerable<Type> FindClassesOfType<T>(IEnumerable<Assembly> assemblies)
 		{
 			return FindClassesOfType<T>(assemblies, true);
 		}
@@ -326,7 +326,7 @@ namespace Umbraco.Core
 		/// <param name="assemblies">The assemblies.</param>
 		/// <param name="onlyConcreteClasses">if set to <c>true</c> only concrete classes.</param>
 		/// <returns></returns>
-		public IEnumerable<Type> FindClassesWithAttribute<T>(IEnumerable<Assembly> assemblies, bool onlyConcreteClasses)
+		public static IEnumerable<Type> FindClassesWithAttribute<T>(IEnumerable<Assembly> assemblies, bool onlyConcreteClasses)
 			where T : Attribute
 		{
 			if (assemblies == null) throw new ArgumentNullException("assemblies");
@@ -349,7 +349,7 @@ namespace Umbraco.Core
 		/// <typeparam name="T"></typeparam>
 		/// <param name="assemblies">The assemblies.</param>
 		/// <returns></returns>
-		public IEnumerable<Type> FindClassesWithAttribute<T>(IEnumerable<Assembly> assemblies)
+		public static IEnumerable<Type> FindClassesWithAttribute<T>(IEnumerable<Assembly> assemblies)
 			where T : Attribute
 		{
 			return FindClassesWithAttribute<T>(assemblies, true);
@@ -360,7 +360,7 @@ namespace Umbraco.Core
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
-		public IEnumerable<Type> FindClassesWithAttribute<T>()
+		public static IEnumerable<Type> FindClassesWithAttribute<T>()
 			where T : Attribute
 		{
 			return FindClassesWithAttribute<T>(GetAssembliesWithKnownExclusions());

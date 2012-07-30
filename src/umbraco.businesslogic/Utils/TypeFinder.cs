@@ -6,6 +6,7 @@ using System.Web;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using Umbraco.Core;
 using umbraco.IO;
 
 namespace umbraco.BusinessLogic.Utils
@@ -50,6 +51,7 @@ namespace umbraco.BusinessLogic.Utils
 		/// <returns>A list of found types</returns>
 		public static IEnumerable<Type> FindClassesMarkedWithAttribute(Type attribute)
 		{
+			
 			return FindClassesMarkedWithAttribute(attribute, AppDomain.CurrentDomain.GetAssemblies());
 		}
 

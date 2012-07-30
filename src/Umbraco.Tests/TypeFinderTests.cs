@@ -100,9 +100,7 @@ namespace Umbraco.Tests
 		public void Get_Type_With_Attribute()
 		{
 
-			var finder2 = new Umbraco.Core.TypeFinder2();
-
-			var typesFound = finder2.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies);
+			var typesFound = TypeFinder2.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies);
 
 			Assert.AreEqual(2, typesFound.Count());
 
@@ -114,10 +112,8 @@ namespace Umbraco.Tests
 		{
 			var timer = new Stopwatch();
 
-			var finder2 = new Umbraco.Core.TypeFinder2();
-
 			timer.Start();
-			var found1 = finder2.FindClassesWithAttribute<XsltExtensionAttribute>(_assemblies);
+			var found1 = TypeFinder2.FindClassesWithAttribute<XsltExtensionAttribute>(_assemblies);
 			timer.Stop();
 
 			Console.WriteLine("Total time to find class with XsltExtensionAttribute (" + found1.Count() + ") in " + _assemblies.Count() + " assemblies using new TypeFinder: " + timer.ElapsedMilliseconds);
@@ -137,10 +133,9 @@ namespace Umbraco.Tests
 		{
 			var timer = new Stopwatch();			
 
-			var finder2 = new Umbraco.Core.TypeFinder2();
 
 			timer.Start();
-			var found1 = finder2.FindClassesOfType<TestEditor>(_assemblies);
+			var found1 = TypeFinder2.FindClassesOfType<TestEditor>(_assemblies);
 			timer.Stop();
 
 			Console.WriteLine("Total time to find TestEditor (" + found1.Count() + ") in " + _assemblies.Count() + " assemblies using new TypeFinder: " + timer.ElapsedMilliseconds);
@@ -164,16 +159,15 @@ namespace Umbraco.Tests
 		{
 			var timer = new Stopwatch();			
 
-			var finder = new Umbraco.Core.TypeFinder2();
 
 			timer.Start();
-			var found1 = finder.FindClassesOfType<TestEditor, AssemblyContainsPluginsAttribute>(_assemblies);
+			var found1 = TypeFinder2.FindClassesOfType<TestEditor, AssemblyContainsPluginsAttribute>(_assemblies);
 			timer.Stop();
 
 			Console.WriteLine("Total time to find TestEditor (" + found1.Count() + ") in " + _assemblies.Count() + " assemblies using AssemblyContainsPluginsAttribute: " + timer.ElapsedMilliseconds);
 
 			timer.Start();
-			var found2 = finder.FindClassesOfType<TestEditor>(_assemblies);
+			var found2 = TypeFinder2.FindClassesOfType<TestEditor>(_assemblies);
 			timer.Stop();
 
 			Console.WriteLine("Total time to find TestEditor (" + found2.Count() + ") in " + _assemblies.Count() + " assemblies without AssemblyContainsPluginsAttribute: " + timer.ElapsedMilliseconds);

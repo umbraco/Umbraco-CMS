@@ -51,8 +51,7 @@ namespace Umbraco.Core
 			}
 			set { _resolver = value; }
 		}
-
-		internal readonly TypeFinder2 TypeFinder = new TypeFinder2();
+		
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		private readonly HashSet<TypeList> _types = new HashSet<TypeList>();
 		private IEnumerable<Assembly> _assemblies;
@@ -166,7 +165,7 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		internal IEnumerable<Type> ResolveTypes<T>()
 		{
-			return ResolveTypes<T>(() => TypeFinder.FindClassesOfType<T>(AssembliesToScan));
+			return ResolveTypes<T>(() => TypeFinder2.FindClassesOfType<T>(AssembliesToScan));
 		}
 
 		/// <summary>
@@ -178,7 +177,7 @@ namespace Umbraco.Core
 		internal IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>()
 			where TAttribute : Attribute
 		{
-			return ResolveTypes<T>(() => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>(AssembliesToScan));
+			return ResolveTypes<T>(() => TypeFinder2.FindClassesOfTypeWithAttribute<T, TAttribute>(AssembliesToScan));
 		}
 
 		/// <summary>
@@ -190,7 +189,7 @@ namespace Umbraco.Core
 			where TAttribute : Attribute
 		{
 			return ResolveTypes<TAttribute>(
-				() => TypeFinder.FindClassesWithAttribute<TAttribute>(AssembliesToScan), 
+				() => TypeFinder2.FindClassesWithAttribute<TAttribute>(AssembliesToScan), 
 				true);
 		} 
 
