@@ -99,7 +99,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         size: data.size,
                         progress: ko.observable(data.progress),
                         cancel: function () {
-                            $("#fileupload").fileUploader("cancelItem", this.itemId);
+                            if(this.progress() < 100)
+                                $("#fileupload").fileUploader("cancelItem", this.itemId);
+                            else
+                                _this._viewModel.queued.remove(this);
                         }
                     };
                     
