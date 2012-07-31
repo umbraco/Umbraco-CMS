@@ -49,6 +49,7 @@ namespace Umbraco.Web.WebServices
                 data.Add(new
                 {
                     Id = child.Id,
+                    Path = child.Path,
                     Name = child.Text,
                     MediaTypeAlias = child.ContentType.Alias,
                     EditUrl = string.Format("editMedia.aspx?id={0}", child.Id),

@@ -350,6 +350,8 @@
     <Content Include="umbraco\webservices\api\MemberService.asmx" />
     <Content Include="umbraco\webservices\api\StylesheetService.asmx" />
     <Content Include="umbraco\webservices\api\TemplateService.asmx" />
+    <Content Include="umbraco_client\ContextMenu\Css\jquery.contextMenu.css" />
+    <Content Include="umbraco_client\ContextMenu\Js\jquery.contextMenu.js" />
     <Content Include="umbraco_client\FileUploader\js\jquery.fileUploader.js" />
     <Content Include="umbraco_client\FolderBrowser\Css\folderbrowser.css" />
     <Content Include="umbraco_client\FolderBrowser\Js\folderbrowser.js" />

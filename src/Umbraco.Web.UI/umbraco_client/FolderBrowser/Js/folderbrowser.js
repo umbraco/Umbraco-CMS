@@ -1,7 +1,7 @@
 ﻿
 Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
-(function ($, Base) {
+(function ($, Base, window, document, undefined) {
 
     Umbraco.Controls.FolderBrowser = Base.extend({
         
@@ -12,62 +12,127 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         _opts: null,
         _viewModel: null,
         
-        _getChildNodes: function () {
-            _this = this;
+        _getChildNodes: function ()
+        {
+            var self = this;
             
-            $.getJSON(_this._opts.basePath + "/FolderBrowserService/GetChildNodes/" + _this._parentId + "/" + _this._viewModel.filterTerm(), function(data) {
+            $.getJSON(self._opts.basePath + "/FolderBrowserService/GetChildNodes/" + self._parentId + "/" + self._viewModel.filterTerm(), function (data) {
                 if (data != undefined && data.length > 0) {
-                    ko.mapping.fromJS(data, {}, _this._viewModel.items);
+                    ko.mapping.fromJS(data, {}, self._viewModel.items);
                 } else {
-                    _this._viewModel.items([]);
+                    self._viewModel.items([]);
                 }
             });
         },
         
-        // Constructor
-        constructor: function (el, opts) {
+        _getItemById: function (id)
+        {
+            var self = this;
+            
+            var results = ko.utils.arrayFilter(self._viewModel.items(), function (item) {
+                return item.Id() === id;
+            });
 
-            _this = this;
+            return results.length == 1 ? results[0] : null;
+        },
+        
+        _deleteItem: function (id)
+        {
+            var self = this;
 
-            // Store el info
-            this._el = el;
-            this._elId = el.id;
+            var item = self._getItemById(id);
+            if (item === null)
+                throw Error("No item found with the id: " + id);
 
-            // Grab parent id from element
-            this._parentId = $(el).data("parentid");
+            if (confirm(window.top.uiKeys['defaultdialogs_confirmdelete'] + ' "' + item.Name() + '"?\n\n'))
+            {
+                $(window.top).trigger("nodeDeleting", []);
 
-            // Merge options with default
-            this._opts = $.extend({
-                // Default options go here
-            }, opts);
+                var safePath = "," + item.Path() + ",";
 
+                if (safePath.indexOf(",-20,") != -1 || safePath.indexOf(",-21,") != -1)
+                {
+                    window.top.umbraco.presentation.webservices.legacyAjaxCalls.DeleteContentPermanently(
+                        item.Id(),
+                        "media",
+                        function () {
+                            //raise nodeDeleted event
+                            $(window.top).trigger("nodeDeleted", []);
+
+                            //TODO: Reload current open node in tree
+
+                            // Reload nodes
+                            self._getChildNodes();
+                        });
+                }
+                else
+                {
+                    window.top.umbraco.presentation.webservices.legacyAjaxCalls.Delete(
+                        item.Id(), "",
+                        "media",
+                        function() {
+                            //raise nodeDeleted event
+                            $(window.top).trigger("nodeDeleted", []);
+
+                            //TODO: Reload current open node in tree
+
+                            // Reload nodes
+                            self._getChildNodes();
+                        },
+                        function(error) {
+                            //raise public error event
+                            $(window.top).trigger("publicError", [error]);
+
+                            //TODO: Reload current open node in tree
+
+                            // Reload nodes
+                            self._getChildNodes();
+                        });
+                }
+            }
+        },
+        
+        _initViewModel: function () 
+        {
+            var self = this;
+            
             // Setup the viewmode;
-            this._viewModel = $.extend({}, {
-                parent: this,
+            self._viewModel = $.extend({}, {
+                parent: self,
                 filterTerm: ko.observable(''),
                 items: ko.observableArray([]),
                 queued: ko.observableArray([])
             });
 
-            this._viewModel.filterTerm.subscribe(function(newValue) {
-                _this._getChildNodes();
+            self._viewModel.filterTerm.subscribe(function (newValue) {
+                self._getChildNodes();
             });
-
+        },
+        
+        _initToolbar: function () 
+        {
+            var self = this;
+            
             // Inject the upload button into the toolbar
             var button = $("<input id='fbUploadToolbarButton' type='image' src='images/editor/upload.png' titl='Upload...' onmouseover=\"this.className='editorIconOver'\" onmouseout=\"this.className='editorIcon'\" onmouseup=\"this.className='editorIconOver'\" onmousedown=\"this.className='editorIconDown'\" />");
-            button.click(function(e) {
+            button.click(function (e) {
                 e.preventDefault();
                 $(".upload-overlay").show();
             });
-            
-            $(".tabpage:first-child .menubar td[id$='tableContainerButtons'] .sl nobr").after(button);
 
+            $(".tabpage:first-child .menubar td[id$='tableContainerButtons'] .sl nobr").after(button);
+        },
+        
+        _initOverlay: function ()
+        {
+            var self = this;
+            
             // Inject the upload overlay
             var instructions = 'draggable' in document.createElement('span')
                 ? "<h1>Drag files here to upload</h1> \
                    <p>Or, click the button below to chose the items to upload</p>"
                 : "<h1>Click the browse button below to chose the items to upload</h1>";
-            
+
             var overlay = $("<div class='upload-overlay'>" +
                 "<div class='upload-panel'>" +
                 instructions +
@@ -85,7 +150,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 "</div>");
 
             $("body").prepend(overlay);
-
+            
             // Create uploader
             $("#fileupload").fileUploader({
                 dropTarget: ".upload-overlay",
@@ -99,43 +164,43 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         size: data.size,
                         progress: ko.observable(data.progress),
                         cancel: function () {
-                            if(this.progress() < 100)
+                            if (this.progress() < 100)
                                 $("#fileupload").fileUploader("cancelItem", this.itemId);
                             else
-                                _this._viewModel.queued.remove(this);
+                                self._viewModel.queued.remove(this);
                         }
                     };
-                    
+
                     // Store item back in context for easy access later
-                    data.context = file; 
-                    
+                    data.context = file;
+
                     // Push bindable item into queue
-                    _this._viewModel.queued.push(file);
+                    self._viewModel.queued.push(file);
                 },
                 onDone: function (data) {
-                    switch(data.status) {
+                    switch (data.status) {
                         case 'success':
-                            //_this._viewModel.queued.remove(data.context);
+                            //self._viewModel.queued.remove(data.context);
                             break;
                         case 'error':
-                            _this._viewModel.queued.remove(data.context);
+                            self._viewModel.queued.remove(data.context);
                             break;
                         case 'canceled':
-                            _this._viewModel.queued.remove(data.context);
+                            self._viewModel.queued.remove(data.context);
                             break;
                     }
                 },
-                onProgress: function(data) {
+                onProgress: function (data) {
                     data.context.progress(data.progress);
                 }
             });
-            
+
             // Hook up uploader buttons
-            $(".upload-overlay .upload").click(function(e) {
+            $(".upload-overlay .upload").click(function (e) {
                 e.preventDefault();
                 $("#fileupload").fileUploader("uploadAll");
             });
-            
+
             $(".upload-overlay .cancel").click(function (e) {
                 e.preventDefault();
                 $("#fileupload").fileUploader("cancelAll");
@@ -145,23 +210,69 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             $(".umbFolderBrowser").live('dragenter dragover', function (e) {
                 $(".upload-overlay").show();
             });
-            
+
             $(".upload-overlay").live('dragleave dragexit', function (e) {
                 $(this).hide();
-            }).click(function() {
+            }).click(function () {
                 $(this).hide();
             });
 
-            $(".upload-panel").click(function(e) {
+            $(".upload-panel").click(function (e) {
                 e.stopPropagation();
             });
+        },
+        
+        _initContextMenu: function () 
+        {
+            var self = this;
+
+            // Setup context menus
+            $.contextMenu({
+                selector: '.umbFolderBrowser .items li',
+                callback: function (key, options) {
+                    var id = options.$trigger.data("id");
+                    switch (key) {
+                        case "delete":
+                            self._deleteItem(id);
+                            break;
+                    }
+                },
+                items: {
+                    "edit": { name: "Edit", icon: "edit" },
+                    "delete": { name: "Delete", icon: "delete" }
+                },
+                animation: { show: "fadeIn", hide: "fadeOut" }
+            });
+        },
+
+        // Constructor
+        constructor: function (el, opts)
+        {
+            var self = this;
+
+            // Store el info
+            self._el = el;
+            self._elId = el.id;
+
+            // Grab parent id from element
+            self._parentId = $(el).data("parentid");
+
+            // Merge options with default
+            self._opts = $.extend({
+                // Default options go here
+            }, opts);
+
+            self._initViewModel();
+            self._initToolbar();
+            self._initOverlay();
+            self._initContextMenu();
 
             // Bind the viewmodel
-            ko.applyBindings(this._viewModel, el);
-            ko.applyBindings(this._viewModel, overlay.get(0));
+            ko.applyBindings(self._viewModel, el);
+            ko.applyBindings(self._viewModel, $(".upload-overlay").get(0));
             
             // Grab children media items
-            this._getChildNodes();
+            self._getChildNodes();
         }
         
         // Public
@@ -195,4 +306,4 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         return $(this).data("api");
     };
 
-})(jQuery, base2.Base)
+})(jQuery, base2.Base, window, document)
