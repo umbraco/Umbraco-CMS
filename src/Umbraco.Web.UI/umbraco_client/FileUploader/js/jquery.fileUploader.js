@@ -13,8 +13,6 @@
         autoUpload: false,
         limit: false,
         allowedExtension: 'jpg|jpeg|gif|png|pdf',
-        timeInterval: [1, 2, 4, 2, 1, 5],
-        percentageInterval: [10, 20, 30, 40, 60, 80],
         dropTarget: null,
 
         //Callbacks
@@ -350,24 +348,58 @@
             var $iframe = $item.find("iframe");
             var data = $item.data('data');
 
-            //startDummyProgress($progressBar, $percentage);
+            self._startDummyProgress(data);
             
             $form.submit();
 
             $iframe.load(function ()
             {
-                // Stop dummy progress
-                //stopDummyProgress();
-                
                 // Read content returned
                 var response = $(this).contents().find('body').html();
 
                 //TODO: Check the response
+                
+                // Stop dummy progress
+                //TODO: Set success flag based upon response?
+                self._stopDummyProgress(data, true);
 
                 self.opts.onDone(data);
 
                 self._afterUpload($item, autoProceed);
             });
+        },
+        
+        _startDummyProgress: function (data, count)
+        {
+            var self = this;
+            
+            if (count === undefined)
+                count = 0;
+            
+            if ($.fileUploader.percentageInterval[count]) {
+                data.progress = $.fileUploader.percentageInterval[count] + Math.floor(Math.random() * 5 + 1);
+                self.opts.onProgress(data);
+            }
+
+            if ($.fileUploader.timeInterval[count]) {
+                self.progressTimeout = setTimeout(function () {
+                    self._startDummyProgress(data, ++count);
+                }, $.fileUploader.timeInterval[count] * 1000);
+            }
+        },
+        
+        _stopDummyProgress: function (data, success)
+        {
+            var self = this;
+            
+            clearTimeout(self.progressTimeout);
+            
+            if (success)
+            {
+                // Force a 100% onProgress event
+                data.progress = 100;
+                self.opts.onProgress(data);
+            }
         },
         
         _afterUpload: function ($item, autoProceed)
@@ -451,7 +483,9 @@
 
 	$.fileUploader = {
 	    version: '1.0',
-	    count: 0
+	    count: 0,
+	    timeInterval: [1, 2, 4, 2, 1, 5, 5, 5, 5],
+        percentageInterval: [10, 20, 30, 40, 60, 80, 85, 90, 95]
 	};
 
 	$.fn.fileUploader = function (o)
