@@ -61,6 +61,8 @@
 
 .context-menu-separator {
     padding-bottom:0;
+    height: 1px;
+    margin: 3px 0 3px 30px;
     border-bottom: 1px solid #DDD;
 }
 
@@ -104,13 +106,9 @@
     .context-menu-item.icon:before {}
  */
 .context-menu-item.icon { min-height: 18px; background-repeat: no-repeat; background-position: 4px 4px; }
-.context-menu-item.icon-edit { background-image: url(../../../umbraco/images/copy.small.png); }
-.context-menu-item.icon-cut { background-image: url(images/cut.png); }
-.context-menu-item.icon-copy { background-image: url(images/page_white_copy.png); }
-.context-menu-item.icon-paste { background-image: url(images/page_white_paste.png); }
+.context-menu-item.icon-edit { background-image: url(../../../umbraco/images/pencil.png); }
 .context-menu-item.icon-delete { background-image: url(../../../umbraco/images/delete.small.png); }
-.context-menu-item.icon-add { background-image: url(images/page_white_add.png); }
-.context-menu-item.icon-quit { background-image: url(images/door.png); }
+.context-menu-item.icon-download { background-image: url(../../../umbraco/images/download.png); }
 
 /* vertically align inside labels */
 .context-menu-input > label > * { vertical-align: top; }

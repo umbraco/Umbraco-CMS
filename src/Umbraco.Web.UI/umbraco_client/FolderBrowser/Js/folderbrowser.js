@@ -36,6 +36,26 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             return results.length == 1 ? results[0] : null;
         },
         
+        _editItem: function (id) {
+            var self = this;
+
+            var item = self._getItemById(id);
+            if (item === null)
+                throw Error("No item found with the id: " + id);
+
+            window.location.href = "editMedia.aspx?id="+ item.Id();
+        },
+        
+        _downloadItem: function (id) {
+            var self = this;
+
+            var item = self._getItemById(id);
+            if (item === null)
+                throw Error("No item found with the id: " + id);
+
+            window.open(item.FileUrl(), "Download");
+        },
+        
         _deleteItem: function (id)
         {
             var self = this;
@@ -232,6 +252,12 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 callback: function (key, options) {
                     var id = options.$trigger.data("id");
                     switch (key) {
+                        case "edit":
+                            self._editItem(id);
+                            break;
+                        case "download":
+                            self._downloadItem(id);
+                            break;
                         case "delete":
                             self._deleteItem(id);
                             break;
@@ -239,6 +265,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 },
                 items: {
                     "edit": { name: "Edit", icon: "edit" },
+                    "download": { name: "Download", icon: "download" },
+                    "separator1": "-----",
                     "delete": { name: "Delete", icon: "delete" }
                 },
                 animation: { show: "fadeIn", hide: "fadeOut" }

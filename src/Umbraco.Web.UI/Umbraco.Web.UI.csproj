@@ -327,9 +327,13 @@
     <Content Include="umbraco\developer\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
     <Content Include="umbraco\developer\RelationTypes\TreeMenu\ActionNewRelationType.js" />
     <Content Include="umbraco\images\delete.gif" />
+    <Content Include="umbraco\images\delete.png" />
+    <Content Include="umbraco\images\download.png" />
     <Content Include="umbraco\images\editor\doc.gif" />
     <Content Include="umbraco\images\editor\documentType.gif" />
     <Content Include="umbraco\images\information.png" />
+    <Content Include="umbraco\images\listItemOrange.gif" />
+    <Content Include="umbraco\images\pencil.png" />
     <Content Include="umbraco\plugins\uGoLive\cog.png" />
     <Content Include="umbraco\plugins\uGoLive\cross.png" />
     <Content Include="umbraco\plugins\uGoLive\Dashboard.ascx" />
