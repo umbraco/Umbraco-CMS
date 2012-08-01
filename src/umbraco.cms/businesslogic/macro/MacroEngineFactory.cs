@@ -11,7 +11,9 @@ using umbraco.interfaces;
 namespace umbraco.cms.businesslogic.macro
 {
 
-	//TODO: This class needs to be changed to use the new MultipleResolverBase
+	//TODO: This class needs to be changed to use the new MultipleResolverBase, doing this will require migrating and cleaning up
+	// a bunch of types so I have left it existing here under legacy code for now. The IMacroEngine interface also requires fixing
+	// considering the new macro types of SurfaceControllers.
 
     public class MacroEngineFactory
     {

@@ -62,7 +62,7 @@
     <Compile Include="MacroFieldEditorsResolverTests.cs" />
     <Compile Include="MacroEngineFactoryTests.cs" />
     <Compile Include="MediaFactoryTests.cs" />
-    <Compile Include="PackageActionFactoryTests.cs" />
+    <Compile Include="PackageActionsResolverTests.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="PluginManagerTests.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />

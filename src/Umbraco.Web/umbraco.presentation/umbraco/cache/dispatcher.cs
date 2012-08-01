@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Resolving;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
 using umbraco.IO;

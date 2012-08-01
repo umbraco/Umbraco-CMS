@@ -3,6 +3,7 @@ using System.Linq;
 using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Resolving;
 using Umbraco.Tests.TestHelpers;
 using umbraco.cms.businesslogic.packager;
 using umbraco.interfaces;
@@ -10,7 +11,7 @@ using umbraco.interfaces;
 namespace Umbraco.Tests
 {
 	[TestFixture]
-	public class PackageActionFactoryTests
+	public class PackageActionsResolverTests
 	{
 		[SetUp]
 		public void Initialize()
@@ -25,6 +26,18 @@ namespace Umbraco.Tests
 				{
 					this.GetType().Assembly
 				};
+
+			PackageActionsResolver.Current = new PackageActionsResolver(
+				PluginManager.Current.ResolvePackageActions());
+
+			Resolution.Freeze();
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+			PackageActionsResolver.Reset();
+			Resolution.IsFrozen = false;
 		}
 
 		/// <summary>
@@ -33,7 +46,7 @@ namespace Umbraco.Tests
 		[Test]
 		public void Find_Package_Actions()
 		{
-			var actions = PackageAction.PackageActions;
+			var actions = PackageActionsResolver.Current.PackageActions;
 			Assert.AreEqual(2, actions.Count());
 		}
 

@@ -86,6 +86,15 @@ namespace Umbraco.Core
 		}
 
 		/// <summary>
+		/// Returns all available IPackageAction in application
+		/// </summary>
+		/// <returns></returns>
+		internal IEnumerable<Type> ResolvePackageActions()
+		{
+			return ResolveTypes<IPackageAction>();
+		}
+
+		/// <summary>
 		/// Gets/sets which assemblies to scan when type finding, generally used for unit testing, if not explicitly set
 		/// this will search all assemblies known to have plugins and exclude ones known to not have them.
 		/// </summary>

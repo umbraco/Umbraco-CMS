@@ -81,6 +81,9 @@ namespace Umbraco.Core
 
 			MacroFieldEditorsResolver.Current = new MacroFieldEditorsResolver(
 				PluginManager.Current.ResolveMacroRenderings());
+
+			PackageActionsResolver.Current = new PackageActionsResolver(
+				PluginManager.Current.ResolvePackageActions());
 		}
 	}
 }

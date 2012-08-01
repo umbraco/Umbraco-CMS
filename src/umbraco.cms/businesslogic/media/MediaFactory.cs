@@ -9,7 +9,9 @@ using umbraco.BusinessLogic.Utils;
 
 namespace umbraco.cms.businesslogic.media
 {
-	//TODO: This class needs to inherit from the new MultipleResolverBase class
+	//TODO: This class needs to be changed to use the new MultipleResolverBase, doing this will require migrating and cleaning up
+	// a bunch of types so I have left it existing here under legacy code for now. 
+
 
     public class MediaFactory
     {

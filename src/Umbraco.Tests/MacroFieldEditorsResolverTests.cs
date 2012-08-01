@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web.UI;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Resolving;
 using Umbraco.Tests.TestHelpers;
 using umbraco.editorControls.macrocontainer;
 using umbraco.interfaces;
@@ -28,6 +29,15 @@ namespace Umbraco.Tests
 
 			MacroFieldEditorsResolver.Current = new MacroFieldEditorsResolver(
 				PluginManager.Current.ResolveMacroRenderings());
+
+			Resolution.Freeze();
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+			MacroFieldEditorsResolver.Reset();
+			Resolution.IsFrozen = false;
 		}
 
 		[Test]

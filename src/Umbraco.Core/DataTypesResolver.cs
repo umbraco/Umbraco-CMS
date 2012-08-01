@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Umbraco.Core.Resolving;
 using umbraco.interfaces;
 
 namespace Umbraco.Core

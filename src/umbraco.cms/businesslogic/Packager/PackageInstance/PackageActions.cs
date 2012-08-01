@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Resolving;
 using umbraco.BasePages;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic.web;
@@ -18,23 +19,7 @@ namespace umbraco.cms.businesslogic.packager
 	/// Package actions are executed on packge install / uninstall.
 	/// </summary>
 	public class PackageAction
-	{
-		internal static readonly List<IPackageAction> PackageActions = new List<IPackageAction>();
-
-		/// <summary>
-		/// Initializes the <see cref="PackageAction"/> class.
-		/// </summary>
-		static PackageAction()
-		{
-			RegisterPackageActions();
-		}
-
-		private static void RegisterPackageActions()
-		{
-			PackageActions.AddRange(
-				PluginManager.Current.CreateInstances<IPackageAction>(
-					PluginManager.Current.ResolvePackageActions()));			
-		}
+	{				
 
 		/// <summary>
 		/// Runs the package action with the specified action alias.
@@ -45,7 +30,7 @@ namespace umbraco.cms.businesslogic.packager
 		public static void RunPackageAction(string packageName, string actionAlias, System.Xml.XmlNode actionXml)
 		{
 
-			foreach (IPackageAction ipa in PackageActions)
+			foreach (var ipa in PackageActionsResolver.Current.PackageActions)
 			{
 				try
 				{
@@ -72,7 +57,7 @@ namespace umbraco.cms.businesslogic.packager
 		public static void UndoPackageAction(string packageName, string actionAlias, System.Xml.XmlNode actionXml)
 		{
 
-			foreach (IPackageAction ipa in PackageActions)
+			foreach (IPackageAction ipa in PackageActionsResolver.Current.PackageActions)
 			{
 				try
 				{

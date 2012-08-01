@@ -51,7 +51,7 @@
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="Attempt.cs" />
     <Compile Include="CoreBootManager.cs" />
-    <Compile Include="CacheRefreshersResolver.cs" />
+    <Compile Include="Resolving\CacheRefreshersResolver.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="Configuration\UmbracoSettings.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />
@@ -66,11 +66,12 @@
     <Compile Include="IO\SystemDirectories.cs" />
     <Compile Include="IO\SystemFiles.cs" />
     <Compile Include="LambdaExpressionCacheKey.cs" />
-    <Compile Include="LegacyTransientObjectsResolver.cs" />
+    <Compile Include="Resolving\PackageActionsResolver.cs" />
+    <Compile Include="Resolving\LegacyTransientObjectsResolver.cs" />
     <Compile Include="Logging\AsynchronousRollingFileAppender.cs" />
     <Compile Include="Logging\LoggingTaskExtension.cs" />
     <Compile Include="Logging\LogHelper.cs" />
-    <Compile Include="MacroFieldEditorsResolver.cs" />
+    <Compile Include="Resolving\MacroFieldEditorsResolver.cs" />
     <Compile Include="Macros\PersistableMacroProperty.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="RazorDataTypeModelStaticMappingItem.cs" />

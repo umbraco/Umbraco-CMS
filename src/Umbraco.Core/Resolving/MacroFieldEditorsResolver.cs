@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Web.UI;
 using Umbraco.Core.Macros;
-using Umbraco.Core.Resolving;
 using umbraco.interfaces;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Resolving
 {
 	/// <summary>
 	/// A resolver to return all IMacroGuiRendering objects
