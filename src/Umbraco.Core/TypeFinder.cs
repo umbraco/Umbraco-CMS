@@ -23,15 +23,11 @@ namespace Umbraco.Core
 	/// A utility class to find all classes of a certain type by reflection in the current bin folder
 	/// of the web application. 
 	/// </summary>
-	public static class TypeFinder2
+	public static class TypeFinder
 	{
 		
 		private static readonly ConcurrentBag<Assembly> LocalFilteredAssemblyCache = new ConcurrentBag<Assembly>();
 		private static readonly ReaderWriterLockSlim LocalFilteredAssemblyCacheLocker = new ReaderWriterLockSlim();
-		/// <summary>
-		/// Caches attributed assembly information so they don't have to be re-read
-		/// </summary>
-		private static readonly AttributedAssemblyList AttributedAssemblies = new AttributedAssemblyList();
 		private static ReadOnlyCollection<Assembly> _allAssemblies = null;
 		private static ReadOnlyCollection<Assembly> _binFolderAssemblies = null;
 		private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
@@ -188,69 +184,6 @@ namespace Umbraco.Core
                     "Examine."
                 };
 
-		
-
-		
-
-
-
-		/// <summary>
-		/// Returns assemblies found in the specified path that the the specified custom attribute type applied to them
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="assemblies">The assemblies to search on</param>
-		/// <returns></returns>
-		internal static IEnumerable<Assembly> FindAssembliesWithAttribute<T>(IEnumerable<Assembly> assemblies)
-			where T : Attribute
-		{
-
-			var foundAssemblies = (from a in assemblies
-								   //if its already registered, then ignore
-								   where !AttributedAssemblies.IsRegistered<T>(a)
-								   let customAttributes = a.GetCustomAttributes(typeof(T), false)
-								   where customAttributes.Any()
-								   select a).ToList();
-			//now update the cache
-			foreach (var a in foundAssemblies)
-			{
-				AttributedAssemblies.Add(new AttributedAssembly { Assembly = a, PluginAttributeType = typeof(T), AssemblyFolder = null });
-			}
-
-			//We must do a ToList() here because it is required to be serializable when using other app domains.
-			return AttributedAssemblies
-				.Where(x => x.PluginAttributeType == typeof(T)
-					&& assemblies.Select(y => y.FullName).Contains(x.Assembly.FullName))
-				.Select(x => x.Assembly)
-				.ToList();
-		}
-
-		/// <summary>
-		/// Returns found types in assemblies attributed with the specifed attribute type
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <typeparam name="TAssemblyAttribute"></typeparam>
-		/// <param name="assemblies">The assemblies to search on</param>
-		/// <returns></returns>
-		internal static IEnumerable<Type> FindClassesOfType<T, TAssemblyAttribute>(IEnumerable<Assembly> assemblies)
-			where TAssemblyAttribute : Attribute
-		{
-			var found = FindAssembliesWithAttribute<TAssemblyAttribute>(assemblies);
-			return GetAssignablesFromType<T>(found, true);
-		}
-
-		/// <summary>
-		/// Returns found types in an assembly attributed with the specifed attribute type
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <typeparam name="TAssemblyAttribute">The type of the assembly attribute.</typeparam>
-		/// <param name="assembly">The assembly.</param>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		internal static IEnumerable<Type> FindClassesOfType<T, TAssemblyAttribute>(Assembly assembly)
-			where TAssemblyAttribute : Attribute
-		{
-			return FindClassesOfType<T, TAssemblyAttribute>(new[] { assembly });
-		}
 
 		public static IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>()
 			where TAttribute : Attribute
@@ -329,13 +262,27 @@ namespace Umbraco.Core
 		public static IEnumerable<Type> FindClassesWithAttribute<T>(IEnumerable<Assembly> assemblies, bool onlyConcreteClasses)
 			where T : Attribute
 		{
+			return FindClassesWithAttribute(typeof(T), assemblies, onlyConcreteClasses);
+		}
+
+		/// <summary>
+		/// Finds the classes with attribute.
+		/// </summary>
+		/// <param name="type">The attribute type </param>
+		/// <param name="assemblies">The assemblies.</param>
+		/// <param name="onlyConcreteClasses">if set to <c>true</c> only concrete classes.</param>
+		/// <returns></returns>
+		public static IEnumerable<Type> FindClassesWithAttribute(Type type, IEnumerable<Assembly> assemblies, bool onlyConcreteClasses)
+		{
 			if (assemblies == null) throw new ArgumentNullException("assemblies");
+			if (!TypeHelper.IsTypeAssignableFrom<Attribute>(type))
+				throw new ArgumentException("The type specified: " + type + " is not an Attribute type");
 
 			var l = new List<Type>();
 			foreach (var a in assemblies)
 			{
 				var types = from t in GetTypesWithFormattedException(a)
-							where !t.IsInterface && t.GetCustomAttributes<T>(false).Any() && (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))
+							where !t.IsInterface && t.GetCustomAttributes(type, false).Any() && (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))
 							select t;
 				l.AddRange(types);
 			}
@@ -367,67 +314,8 @@ namespace Umbraco.Core
 		}
 
 
-		#region Internal Attributed Assembly class
-
-		//These can be removed once we implement the .hash file for caching assemblies that are found containing plugin types.
-		// Once that is done, remove these classes and remove the TypeFinder test: Benchmark_Finding_First_Type_In_Assemblies
-
-		private class AttributedAssembly
-		{
-			internal DirectoryInfo AssemblyFolder { get; set; }
-			internal Assembly Assembly { get; set; }
-			internal Type PluginAttributeType { get; set; }
-		}
-		private class AttributedAssemblyList : List<AttributedAssembly>
-		{
-			/// <summary>
-			/// Determines if  that type has been registered with the folder
-			/// </summary>
-			/// <typeparam name="T"></typeparam>
-			/// <param name="folder"></param>
-			/// <returns></returns>
-			internal bool IsRegistered<T>(DirectoryInfo folder)
-			{
-				return this.Any(x => x.PluginAttributeType == typeof(T)
-				                     && x.AssemblyFolder.FullName.ToUpper() == folder.FullName.ToUpper());
-			}
-
-			/// <summary>
-			/// Determines if the assembly is already registered
-			/// </summary>
-			/// <typeparam name="T"></typeparam>
-			/// <param name="assembly"></param>
-			/// <returns></returns>
-			internal bool IsRegistered<T>(Assembly assembly)
-			{
-				return this.Any(x => x.PluginAttributeType == typeof(T)
-				                     && x.Assembly.FullName.ToUpper() == assembly.FullName.ToUpper());
-			}
-		}
-
-		#endregion
-
 		#region Private methods
-		private static IEnumerable<Type> GetTypesFromResult(Dictionary<string, string> result)
-		{
-			return (from type in result
-					let ass = Assembly.Load(type.Value)
-					where ass != null
-					select ass.GetType(type.Key, false)).ToList();
-		}
-
-		/// <summary>
-		/// Gets a collection of assignables of type T from a collection of files
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="files">The files.</param>
-		/// <param name="onlyConcreteClasses"></param>
-		/// <returns></returns>
-		private static Dictionary<string, string> GetAssignablesFromType<T>(IEnumerable<string> files, bool onlyConcreteClasses)
-		{
-			return GetTypes(typeof(T), files, onlyConcreteClasses);
-		}
-
+		
 		/// <summary>
 		/// Gets a collection of assignables of type T from a collection of assemblies
 		/// </summary>
@@ -471,35 +359,6 @@ namespace Umbraco.Core
 			}
 		}
 
-		/// <summary>
-		/// Returns of a collection of type names from a collection of assembky files.
-		/// </summary>
-		/// <param name="assignTypeFrom">The assign type.</param>
-		/// <param name="assemblyFiles">The assembly files.</param>
-		/// <param name="onlyConcreteClasses"></param>
-		/// <returns></returns>
-		private static Dictionary<string, string> GetTypes(Type assignTypeFrom, IEnumerable<string> assemblyFiles, bool onlyConcreteClasses)
-		{
-			var result = new Dictionary<string, string>();
-			foreach (var assembly in
-				assemblyFiles.Where(File.Exists).Select(Assembly.LoadFile).Where(assembly => assembly != null))
-			{
-				try
-				{
-					foreach (Type t in
-						assembly.GetExportedTypes().Where(t => !t.IsInterface && assignTypeFrom.IsAssignableFrom(t) && (!onlyConcreteClasses || (t.IsClass && !t.IsAbstract))))
-					{
-						//add the full type name and full assembly name                                  
-						result.Add(t.FullName, t.Assembly.FullName);
-					}
-				}
-				catch (ReflectionTypeLoadException ex)
-				{
-					Debug.WriteLine("Error reading assembly " + assembly.FullName + ": " + ex.Message);
-				}
-			}
-			return result;
-		}
 		#endregion
 
 

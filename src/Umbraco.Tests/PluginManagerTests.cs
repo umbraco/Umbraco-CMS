@@ -46,7 +46,7 @@ namespace Umbraco.Tests
 			        typeof(System.Web.SiteMap).Assembly,
 			        typeof(TabPage).Assembly,
 			        typeof(System.Web.Mvc.ActionResult).Assembly,
-			        typeof(TypeFinder2).Assembly,
+			        typeof(TypeFinder).Assembly,
 			        typeof(ISqlHelper).Assembly,
 			        typeof(DLRScriptingEngine).Assembly,
 			        typeof(ICultureDictionary).Assembly,

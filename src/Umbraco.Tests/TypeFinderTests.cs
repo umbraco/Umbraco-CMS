@@ -17,8 +17,6 @@ using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.uicontrols;
 
-[assembly: TypeFinderTests.AssemblyContainsPluginsAttribute]
-
 namespace Umbraco.Tests
 {
 	/// <summary>
@@ -51,28 +49,15 @@ namespace Umbraco.Tests
 			        typeof(System.Web.SiteMap).Assembly,
 			        typeof(TabPage).Assembly,
 			        typeof(System.Web.Mvc.ActionResult).Assembly,
-			        typeof(TypeFinder2).Assembly,
+			        typeof(TypeFinder).Assembly,
 			        typeof(ISqlHelper).Assembly,
 			        typeof(DLRScriptingEngine).Assembly,
 			        typeof(ICultureDictionary).Assembly
 			    };
 
-			//we need to copy the umbracoSettings file to the output folder!
-			File.Copy(
-				Path.Combine(TestHelper.CurrentAssemblyDirectory, "..\\..\\..\\Umbraco.Web.UI\\config\\umbracoSettings.Release.config"),
-				Path.Combine(TestHelper.CurrentAssemblyDirectory, "umbracoSettings.config"), 
-				true);
-			UmbracoSettings.SettingsFilePath = TestHelper.CurrentAssemblyDirectory + "\\";
 		}
 
-		/// <summary>
-		/// Informs the system that the assembly tagged with this attribute contains plugins and the system should scan and load them
-		/// </summary>
-		[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
-		public class AssemblyContainsPluginsAttribute : Attribute
-		{
-		}
-
+		
 		[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 		public class MyTestAttribute : Attribute
 		{
@@ -100,81 +85,12 @@ namespace Umbraco.Tests
 		public void Get_Type_With_Attribute()
 		{
 
-			var typesFound = TypeFinder2.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies);
+			var typesFound = TypeFinder.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies);
 
 			Assert.AreEqual(2, typesFound.Count());
 
 		}
-		
-		[Test]
-		[Ignore("This is a benchark test")]
-		public void Benchmark_Old_TypeFinder_vs_New_TypeFinder_FindClassesWithAttribute()
-		{
-			var timer = new Stopwatch();
-
-			timer.Start();
-			var found1 = TypeFinder2.FindClassesWithAttribute<XsltExtensionAttribute>(_assemblies);
-			timer.Stop();
-
-			Console.WriteLine("Total time to find class with XsltExtensionAttribute (" + found1.Count() + ") in " + _assemblies.Count() + " assemblies using new TypeFinder: " + timer.ElapsedMilliseconds);
-
-			timer.Start();
-			var found2 = umbraco.BusinessLogic.Utils.TypeFinder.FindClassesMarkedWithAttribute(typeof(XsltExtensionAttribute), _assemblies);
-			timer.Stop();
-
-			Console.WriteLine("Total time to find class with XsltExtensionAttribute (" + found2.Count() + ") in " + _assemblies.Count() + " assemblies using old TypeFinder: " + timer.ElapsedMilliseconds);
-
-			Assert.AreEqual(found1.Count(), found2.Count());
-		}
-
-		[Test]
-		[Ignore("This is a benchark test")]
-		public void Benchmark_Old_TypeFinder_vs_New_TypeFinder_FindClassesOfType()
-		{
-			var timer = new Stopwatch();			
-
-
-			timer.Start();
-			var found1 = TypeFinder2.FindClassesOfType<TestEditor>(_assemblies);
-			timer.Stop();
-
-			Console.WriteLine("Total time to find TestEditor (" + found1.Count() + ") in " + _assemblies.Count() + " assemblies using new TypeFinder: " + timer.ElapsedMilliseconds);
-
-			timer.Start();
-			var found2 = umbraco.BusinessLogic.Utils.TypeFinder.FindClassesOfType<TestEditor>(true, true, _assemblies);
-			timer.Stop();
-
-			Console.WriteLine("Total time to find TestEditor (" + found2.Count() + ") in " + _assemblies.Count() + " assemblies using old TypeFinder: " + timer.ElapsedMilliseconds);
-
-			Assert.AreEqual(found1.Count(), found2.Count());
-		}
-
-		/// <summary>
-		/// To indicate why we had the AssemblyContainsPluginsAttribute attribute in v5, now just need to get the .hash and assembly 
-		/// cache files created instead since this is clearly a TON faster.
-		/// </summary>
-		[Test]
-		[Ignore("This is a benchark test")]
-		public void Benchmark_Finding_First_Type_In_Assemblies()
-		{
-			var timer = new Stopwatch();			
-
-
-			timer.Start();
-			var found1 = TypeFinder2.FindClassesOfType<TestEditor, AssemblyContainsPluginsAttribute>(_assemblies);
-			timer.Stop();
-
-			Console.WriteLine("Total time to find TestEditor (" + found1.Count() + ") in " + _assemblies.Count() + " assemblies using AssemblyContainsPluginsAttribute: " + timer.ElapsedMilliseconds);
-
-			timer.Start();
-			var found2 = TypeFinder2.FindClassesOfType<TestEditor>(_assemblies);
-			timer.Stop();
-
-			Console.WriteLine("Total time to find TestEditor (" + found2.Count() + ") in " + _assemblies.Count() + " assemblies without AssemblyContainsPluginsAttribute: " + timer.ElapsedMilliseconds);
-
-			Assert.AreEqual(found1.Count(), found2.Count());
-		}
-
+	
 		
 	}
 }

@@ -19,7 +19,12 @@ namespace Umbraco.Tests
 		[SetUp]
 		public void Initialize()
 		{
-			//reset each test
+			
+		}
+
+		[TearDown]
+		public void TearDown()
+		{		
 			Resolution.IsFrozen = false;
 		}
 

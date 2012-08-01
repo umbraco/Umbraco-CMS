@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.workflow;
 using umbraco.interfaces;
 using System.Text.RegularExpressions;
 using System.Linq;
+using TypeFinder = Umbraco.Core.TypeFinder;
 
 namespace umbraco.BusinessLogic.Actions
 {
@@ -59,7 +60,7 @@ namespace umbraco.BusinessLogic.Actions
 
 				//TODO: Based on the above, this is a big hack as types should all be cleared on package install!
 				ActionsResolver.Current = new ActionsResolver(
-					TypeFinder2.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
+					TypeFinder.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
 
 				RegisterIActionHandlers();
 			}

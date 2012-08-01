@@ -109,7 +109,7 @@ namespace Umbraco.Core
 		/// </summary>
 		internal IEnumerable<Assembly> AssembliesToScan
 		{
-			get { return _assemblies ?? (_assemblies = TypeFinder2.GetAssembliesWithKnownExclusions()); }
+			get { return _assemblies ?? (_assemblies = TypeFinder.GetAssembliesWithKnownExclusions()); }
 			set { _assemblies = value; }
 		}
 
@@ -212,7 +212,7 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		internal IEnumerable<Type> ResolveTypes<T>()
 		{
-			return ResolveTypes<T>(() => TypeFinder2.FindClassesOfType<T>(AssembliesToScan));
+			return ResolveTypes<T>(() => TypeFinder.FindClassesOfType<T>(AssembliesToScan));
 		}
 
 		/// <summary>
@@ -224,7 +224,7 @@ namespace Umbraco.Core
 		internal IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>()
 			where TAttribute : Attribute
 		{
-			return ResolveTypes<T>(() => TypeFinder2.FindClassesOfTypeWithAttribute<T, TAttribute>(AssembliesToScan));
+			return ResolveTypes<T>(() => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>(AssembliesToScan));
 		}
 
 		/// <summary>
@@ -236,7 +236,7 @@ namespace Umbraco.Core
 			where TAttribute : Attribute
 		{
 			return ResolveTypes<TAttribute>(
-				() => TypeFinder2.FindClassesWithAttribute<TAttribute>(AssembliesToScan),
+				() => TypeFinder.FindClassesWithAttribute<TAttribute>(AssembliesToScan),
 				true);
 		}
 
