@@ -14,14 +14,14 @@ namespace Umbraco.Web
 	/// <summary>
 	/// Extension methods for the PluginTypeResolver
 	/// </summary>
-	public static class PluginTypeResolverExtensions
+	public static class PluginManagerExtensions
 	{
 		/// <summary>
 		/// Returns all available ITrees in application
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveTrees(this PluginTypeResolver resolver)
+		internal static IEnumerable<Type> ResolveTrees(this PluginManager resolver)
 		{
 			return resolver.ResolveTypes<ITree>();
 		}
@@ -31,7 +31,7 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveRestExtensions(this PluginTypeResolver resolver)
+		internal static IEnumerable<Type> ResolveRestExtensions(this PluginManager resolver)
 		{
 			return resolver.ResolveAttributedTypes<RestExtension>();
 		}
@@ -41,7 +41,7 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveXsltExtensions(this PluginTypeResolver resolver)
+		internal static IEnumerable<Type> ResolveXsltExtensions(this PluginManager resolver)
 		{
 			return resolver.ResolveAttributedTypes<XsltExtensionAttribute>();
 		}
@@ -51,7 +51,7 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveThumbnailProviders(this PluginTypeResolver resolver)
+		internal static IEnumerable<Type> ResolveThumbnailProviders(this PluginManager resolver)
 		{
 			return resolver.ResolveTypes<IThumbnailProvider>();
 		}

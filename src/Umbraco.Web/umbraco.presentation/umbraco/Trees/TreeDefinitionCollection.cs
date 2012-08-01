@@ -151,7 +151,7 @@ namespace umbraco.cms.presentation.Trees
 				l.UpgradeToWriteLock();
 
 
-				var foundITrees = PluginTypeResolver.Current.ResolveTrees();
+				var foundITrees = PluginManager.Current.ResolveTrees();
 
 				var objTrees = ApplicationTree.getAll();
 				var appTrees = new List<ApplicationTree>();

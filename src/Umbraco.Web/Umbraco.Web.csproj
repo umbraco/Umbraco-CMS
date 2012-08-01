@@ -239,6 +239,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ContentStore.cs" />
+    <Compile Include="WebBootManager.cs" />
     <Compile Include="LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
     <Compile Include="Routing\DefaultLastChanceLookup.cs" />
@@ -256,7 +257,7 @@
     <Compile Include="Routing\LookupByNiceUrlAndTemplate.cs" />
     <Compile Include="Routing\LookupByProfile.cs" />
     <Compile Include="Routing\NiceUrlProvider.cs" />
-    <Compile Include="PluginTypeResolverExtensions.cs" />
+    <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="Routing\Domains.cs" />
     <Compile Include="Routing\DocumentLookupsResolver.cs" />
     <Compile Include="Routing\DocumentRequest.cs" />

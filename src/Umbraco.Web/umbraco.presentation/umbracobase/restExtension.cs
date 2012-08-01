@@ -97,7 +97,7 @@ namespace umbraco.presentation.umbracobase
             {
                 //check for RestExtensionAttribute
 
-            	var restExtensions = PluginTypeResolver.Current.ResolveRestExtensions();
+            	var restExtensions = PluginManager.Current.ResolveRestExtensions();
 
 				foreach (var t in restExtensions)
                 {

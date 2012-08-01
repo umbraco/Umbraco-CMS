@@ -8,14 +8,14 @@ namespace umbraco.businesslogic
 	/// <summary>
 	/// Extension methods for the PluginTypeResolver
 	/// </summary>
-	public static class PluginTypeResolverExtensions
-	{		
+	public static class PluginManagerExtensions
+	{
 		/// <summary>
 		/// Returns all available IApplicationStartupHandler objects
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveApplicationStartupHandlers(this PluginTypeResolver resolver)
+		internal static IEnumerable<Type> ResolveApplicationStartupHandlers(this PluginManager resolver)
 		{
 			return resolver.ResolveTypes<IApplicationStartupHandler>();
 		}
@@ -25,7 +25,7 @@ namespace umbraco.businesslogic
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveApplications(this PluginTypeResolver resolver)
+		internal static IEnumerable<Type> ResolveApplications(this PluginManager resolver)
 		{
 			return resolver.ResolveTypesWithAttribute<IApplication, ApplicationAttribute>();
 		}
@@ -35,12 +35,10 @@ namespace umbraco.businesslogic
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveAttributedTrees(this PluginTypeResolver resolver)
+		internal static IEnumerable<Type> ResolveAttributedTrees(this PluginManager resolver)
 		{
 			return resolver.ResolveTypesWithAttribute<ITree, TreeAttribute>();
 		}
-
 		
-
 	}
 }

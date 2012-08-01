@@ -846,7 +846,7 @@ namespace umbraco
 
             // zb-00042 #29949 : do not hide errors, refactor
         	
-			var foundExtensions = Umbraco.Web.PluginTypeResolverExtensions.ResolveXsltExtensions(PluginTypeResolver.Current);
+			var foundExtensions = Umbraco.Web.PluginManagerExtensions.ResolveXsltExtensions(PluginManager.Current);
 			foreach (var xsltType in foundExtensions)
             {
                 var tpAttributes = xsltType.GetCustomAttributes(typeof(XsltExtensionAttribute), true);

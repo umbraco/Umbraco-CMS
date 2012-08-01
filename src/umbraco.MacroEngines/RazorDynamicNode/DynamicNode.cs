@@ -451,7 +451,7 @@ namespace umbraco.MacroEngines
 						HttpContext.Current.Trace.Write("RazorDataTypeModelTypes cache is empty, populating cache using PluginTypeResolver...");
 						try
 						{
-							PluginTypeResolver.Current.ResolveRazorDataTypeModels()
+							PluginManager.Current.ResolveRazorDataTypeModels()
 								.ToList()
 								.ConvertAll(type =>
 								{

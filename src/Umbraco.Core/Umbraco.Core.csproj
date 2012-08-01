@@ -50,6 +50,7 @@
     </Compile>
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="Attempt.cs" />
+    <Compile Include="CoreBootManager.cs" />
     <Compile Include="CacheRefreshersResolver.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="Configuration\UmbracoSettings.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="DisposableObject.cs" />
     <Compile Include="DisposableTimer.cs" />
     <Compile Include="ExpressionHelper.cs" />
+    <Compile Include="IBootManager.cs" />
     <Compile Include="IntExtensions.cs" />
     <Compile Include="IO\FileSecurityException.cs" />
     <Compile Include="IO\IOHelper.cs" />
@@ -72,6 +74,8 @@
     <Compile Include="RazorDataTypeModelStaticMappingItem.cs" />
     <Compile Include="Resolving\ManyObjectsResolverBase.cs" />
     <Compile Include="Resolving\ObjectLifetimeScope.cs" />
+    <Compile Include="Resolving\Resolution.cs" />
+    <Compile Include="Resolving\ResolverBase.cs" />
     <Compile Include="Resolving\SingleObjectResolverBase.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />
@@ -82,7 +86,7 @@
     <Compile Include="DelegateEqualityComparer.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="IfExtensions.cs" />
-    <Compile Include="PluginTypeResolver.cs" />
+    <Compile Include="PluginManager.cs" />
     <Compile Include="Interfaces\IThumbnailProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringAliasCaseType.cs" />

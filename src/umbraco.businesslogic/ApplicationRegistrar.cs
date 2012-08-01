@@ -30,7 +30,7 @@ namespace umbraco.BusinessLogic
         public ApplicationRegistrar()
         {
             // Load all Applications by attribute and add them to the XML config
-        	var types = PluginTypeResolver.Current.ResolveApplications();
+        	var types = PluginManager.Current.ResolveApplications();
 
 			//since applications don't populate their metadata from the attribute and because it is an interface, 
 			//we need to interrogate the attributes for the data. Would be better to have a base class that contains 

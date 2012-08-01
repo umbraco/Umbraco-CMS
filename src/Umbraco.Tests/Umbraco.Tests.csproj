@@ -63,8 +63,8 @@
     <Compile Include="MacroEngineFactoryTests.cs" />
     <Compile Include="MediaFactoryTests.cs" />
     <Compile Include="PackageActionFactoryTests.cs" />
-    <Compile Include="PluginTypeResolverExtensions.cs" />
-    <Compile Include="PluginTypeResolverTests.cs" />
+    <Compile Include="PluginManagerExtensions.cs" />
+    <Compile Include="PluginManagerTests.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
     <Compile Include="PartialTrust\AbstractPartialTrustFixture.cs" />

@@ -267,7 +267,7 @@
     <Compile Include="helpers\Casing.cs" />
     <Compile Include="helpers\DeepLink.cs" />
     <Compile Include="helpers\DeepLinkType.cs" />
-    <Compile Include="PluginTypeResolverExtensions.cs" />
+    <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

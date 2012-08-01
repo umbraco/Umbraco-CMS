@@ -33,7 +33,7 @@ namespace umbraco.editorControls.macrocontainer
         internal static Control GetMacroRenderControlByType(PersistableMacroProperty prop, string uniqueID)
         {
         	var m = MacroControlTypes.FindLast(macroGuiCcontrol => macroGuiCcontrol.ToString() == string.Format("{0}.{1}", prop.AssemblyName, prop.TypeName));
-        	var instance = PluginTypeResolver.Current.CreateInstance<IMacroGuiRendering>(m);
+        	var instance = PluginManager.Current.CreateInstance<IMacroGuiRendering>(m);
 			if (instance != null)
 			{
 				if (!string.IsNullOrEmpty(prop.Value))
@@ -77,7 +77,7 @@ namespace umbraco.editorControls.macrocontainer
 
 						readLock.UpgradeToWriteLock();
 
-						_macroControlTypes = new List<Type>(PluginTypeResolver.Current.ResolveMacroRenderings());
+						_macroControlTypes = new List<Type>(PluginManager.Current.ResolveMacroRenderings());
 					}
 
 					return _macroControlTypes;

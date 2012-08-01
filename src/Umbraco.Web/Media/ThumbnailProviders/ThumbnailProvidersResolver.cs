@@ -11,23 +11,10 @@ using umbraco.BusinessLogic.Utils;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-	internal sealed class ThumbnailProvidersResolver : ManyObjectsResolverBase<IThumbnailProvider>
+	internal sealed class ThumbnailProvidersResolver : ManyObjectsResolverBase<ThumbnailProvidersResolver, IThumbnailProvider>
     {
 
-		#region Singleton
-
-		private static readonly ThumbnailProvidersResolver Instance = 
-			new ThumbnailProvidersResolver(PluginTypeResolver.Current.ResolveThumbnailProviders());
-
-		public static ThumbnailProvidersResolver Current
-		{
-			get { return Instance; }
-		}
-		#endregion
-
-		#region Constructors
-		static ThumbnailProvidersResolver() { }
-
+	
 		/// <summary>
 		/// Constructor
 		/// </summary>
@@ -37,7 +24,6 @@ namespace Umbraco.Web.Media.ThumbnailProviders
 		{
 
 		}
-		#endregion
 
 		public IEnumerable<IThumbnailProvider> Providers
 		{

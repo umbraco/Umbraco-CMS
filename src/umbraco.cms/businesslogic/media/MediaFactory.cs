@@ -23,8 +23,8 @@ namespace umbraco.cms.businesslogic.media
         private static void Initialize()
         {
         	Factories.AddRange(
-        		PluginTypeResolver.Current.CreateInstances<IMediaFactory>(
-        			PluginTypeResolver.Current.ResolveMediaFactories()));        	
+        		PluginManager.Current.CreateInstances<IMediaFactory>(
+        			PluginManager.Current.ResolveMediaFactories()));        	
          
 			Factories.Sort((f1, f2) => f1.Priority.CompareTo(f2.Priority));
         }

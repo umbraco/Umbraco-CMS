@@ -206,7 +206,7 @@ namespace Umbraco.Web.Routing
             // the first successful resolver, if any, will set this.Node, and may also set this.Template
             // some lookups may implement caching
             
-			using (DisposableTimer.DebugDuration<PluginTypeResolver>(
+			using (DisposableTimer.DebugDuration<PluginManager>(
 				string.Format("{0}Begin resolvers", tracePrefix),
 				string.Format("{0}End resolvers, {1}", tracePrefix, (this.HasNode ? "a document was found" : "no document was found"))))
 			{				

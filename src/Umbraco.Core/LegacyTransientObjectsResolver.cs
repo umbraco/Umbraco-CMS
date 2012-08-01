@@ -9,15 +9,17 @@ namespace Umbraco.Core
 	/// <summary>
 	/// A base resolver used for old legacy factories such as the DataTypeFactory or CacheResolverFactory.
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
+	/// <typeparam name="TResolver"></typeparam>
+	/// <typeparam name="TResolved"> </typeparam>
 	/// <remarks>
 	/// This class contains basic functionality to mimic the functionality in these old factories since they all return 
 	/// transient objects (though this should be changed) and the method GetById needs to lookup a type to an ID and since 
 	/// these old classes don't contain metadata, the objects need to be instantiated first to get their metadata, we then store this
 	/// for use in the GetById method.
 	/// </remarks>
-	internal abstract class LegacyTransientObjectsResolver<T> : ManyObjectsResolverBase<T> 
-		where T : class
+	internal abstract class LegacyTransientObjectsResolver<TResolver, TResolved> : ManyObjectsResolverBase<TResolver, TResolved>
+		where TResolved : class
+		where TResolver : class
 	{
 
 		#region Constructors
@@ -53,19 +55,19 @@ namespace Umbraco.Core
 		/// </summary>
 		/// <param name="obj"></param>
 		/// <returns></returns>
-		protected abstract Guid GetUniqueIdentifier(T obj); 
+		protected abstract Guid GetUniqueIdentifier(TResolved obj); 
 
 		/// <summary>
 		/// Returns a new ICacheRefresher instance by id
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		public T GetById(Guid id)
+		public TResolved GetById(Guid id)
 		{
 			EnsureRefreshersList();
 			return !_trackIdToType.ContainsKey(id)
 			       	? null
-			       	: PluginTypeResolver.Current.CreateInstance<T>(_trackIdToType[id]);
+					: PluginManager.Current.CreateInstance<TResolved>(_trackIdToType[id]);
 		}
 
 		/// <summary>

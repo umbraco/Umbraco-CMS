@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.Routing;
 using umbraco.businesslogic;
@@ -14,9 +15,8 @@ namespace Umbraco.Web
 	/// </summary>
 	public class UmbracoApplication : System.Web.HttpApplication
 	{
-		private readonly IBootManager _bootManager = new WebBootManager();
-
-		public static event EventHandler ApplicationStarting;		
+		public static event EventHandler ApplicationStarting;
+		
 		public static event EventHandler ApplicationStarted;
 
 		/// <summary>
@@ -26,12 +26,31 @@ namespace Umbraco.Web
 		/// <param name="e"></param>
 		protected void Application_Start(object sender, EventArgs e)
 		{
-			//boot up the application
-			_bootManager
-				.Initialize()
-				.Startup(appContext => OnApplicationStarting(sender, e))
-				.Complete(appContext => OnApplicationStarted(sender, e));
-		}
+			using (DisposableTimer.TraceDuration<UmbracoApplication>(
+				"Umbraco application starting", 
+				"Umbraco application startup complete"))
+			{
+				// Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
+				ClientDependency.Core.CompositeFiles.Providers.XmlFileMapper.FileMapVirtualFolder = "~/App_Data/TEMP/ClientDependency";
+				ClientDependency.Core.CompositeFiles.Providers.BaseCompositeFileProcessingProvider.UrlTypeDefault = ClientDependency.Core.CompositeFiles.Providers.CompositeUrlType.Base64QueryStrings;
+
+				//create the ApplicationContext
+				ApplicationContext.Current = new ApplicationContext()
+				{
+					IsReady = true	// fixme
+				};
+
+				//find and initialize the application startup handlers
+				ApplicationStartupHandler.RegisterHandlers();
+
+				OnApplicationStarting(sender, e);
+
+				//all resolvers are now frozen and cannot be modified
+				Umbraco.Core.Resolving.Resolution.Freeze();
+
+				OnApplicationStarted(sender, e);
+			}
+		}		
 
 		/// <summary>
 		/// Developers can override this method to modify objects on startup

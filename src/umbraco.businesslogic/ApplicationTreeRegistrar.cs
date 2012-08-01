@@ -31,7 +31,7 @@ namespace umbraco.BusinessLogic
         public ApplicationTreeRegistrar()
         {
             // Load all Trees by attribute and add them to the XML config
-			var types = PluginTypeResolver.Current.ResolveAttributedTrees();
+			var types = PluginManager.Current.ResolveAttributedTrees();
 
         	var items = types
         		.Select(x =>

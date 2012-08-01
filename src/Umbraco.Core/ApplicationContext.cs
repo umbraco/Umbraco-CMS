@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Configuration;
 using System.Diagnostics;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 
 
 namespace Umbraco.Core
@@ -61,17 +63,6 @@ namespace Umbraco.Core
             }
         }
 
-		//TODO: This is temporary as we cannot reference umbraco.businesslogic as this will give a circular reference
-		// CURRENT UMBRACO VERSION ID
-		private const string _currentVersion = "4.8.0";
-		private string CurrentVersion
-		{
-			get
-			{
-				// change this to be hardcoded in the binary
-				return _currentVersion;
-			}
-		}
 		private bool Configured
 		{
 			get
@@ -79,14 +70,12 @@ namespace Umbraco.Core
 				try
 				{
 					string configStatus = ConfigurationStatus;
-					string currentVersion = CurrentVersion;
+					string currentVersion = GlobalSettings.CurrentVersion;
 
 
 					if (currentVersion != configStatus)
 					{
-						//Log.Add(LogTypes.Debug, User.GetUser(0), -1,
-						//        "CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus +
-						//        "'");
+						LogHelper.Info<ApplicationContext>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
 					}
 						
 

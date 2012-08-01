@@ -5,15 +5,16 @@ using System.Web;
 
 namespace Umbraco.Core.Resolving
 {
-	internal abstract class ManyObjectsResolverBase<TResolved>
-		where TResolved : class
+	internal abstract class ManyObjectsResolverBase<TResolver, TResolved> : ResolverBase<TResolver>
+		where TResolved : class 
+		where TResolver : class
 	{
 		private List<TResolved> _applicationInstances = null;
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		
 		#region Constructors
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolved}"/> class with an empty list of objects.
+		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an empty list of objects.
 		/// </summary>
 		/// <param name="scope">The lifetime scope of instantiated objects, default is per Application</param>
 		protected ManyObjectsResolverBase(ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
@@ -32,7 +33,7 @@ namespace Umbraco.Core.Resolving
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolved}"/> class with an empty list of objects.
+		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an empty list of objects.
 		/// with creation of objects based on an HttpRequest lifetime scope.
 		/// </summary>
 		/// <param name="httpContext"></param>
@@ -44,7 +45,7 @@ namespace Umbraco.Core.Resolving
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolved}"/> class with an initial list of objects.
+		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an initial list of objects.
 		/// </summary>
 		/// <param name="value">The list of objects.</param>
 		/// <param name="scope">If set to true will resolve singleton objects which will be created once for the lifetime of the application</param>
@@ -55,7 +56,7 @@ namespace Umbraco.Core.Resolving
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolved}"/> class with an initial list of objects
+		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an initial list of objects
 		/// with creation of objects based on an HttpRequest lifetime scope.
 		/// </summary>
 		/// <param name="httpContext"></param>
@@ -90,6 +91,10 @@ namespace Umbraco.Core.Resolving
 		{
 			get
 			{				
+				//We cannot return values unless resolution is locked
+				if (!Resolution.IsFrozen)
+					throw new InvalidOperationException("Values cannot be returned until Resolution is frozen");
+
 				switch (LifetimeScope)
 				{
 					case ObjectLifetimeScope.HttpRequest:
@@ -103,7 +108,7 @@ namespace Umbraco.Core.Resolving
 								l.UpgradeToWriteLock();
 								//add the items to the context items (based on full type name)
 								CurrentHttpContext.Items[this.GetType().FullName] = new List<TResolved>(
-									PluginTypeResolver.Current.CreateInstances<TResolved>(InstanceTypes));
+									PluginManager.Current.CreateInstances<TResolved>(InstanceTypes));
 							}
 							return (List<TResolved>)CurrentHttpContext.Items[this.GetType().FullName];
 						}
@@ -115,14 +120,14 @@ namespace Umbraco.Core.Resolving
 							{
 								l.UpgradeToWriteLock();
 								_applicationInstances = new List<TResolved>(
-									PluginTypeResolver.Current.CreateInstances<TResolved>(InstanceTypes));
+									PluginManager.Current.CreateInstances<TResolved>(InstanceTypes));
 							}
 							return _applicationInstances;
 						}
 					case ObjectLifetimeScope.Transient:
 					default:
 						//create new instances each time
-						return PluginTypeResolver.Current.CreateInstances<TResolved>(InstanceTypes);
+						return PluginManager.Current.CreateInstances<TResolved>(InstanceTypes);
 				}				
 			}
 		}

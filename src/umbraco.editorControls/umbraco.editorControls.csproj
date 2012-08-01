@@ -176,7 +176,7 @@
     <Compile Include="AbstractJsonPrevalueEditor.cs" />
     <Compile Include="AbstractOptions.cs" />
     <Compile Include="AbstractPrevalueEditor.cs" />
-    <Compile Include="PluginTypeResolverExtensions.cs" />
+    <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

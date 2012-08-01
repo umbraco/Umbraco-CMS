@@ -11,15 +11,15 @@ namespace umbraco.editorControls
 	/// <summary>
 	/// Extension methods for the PluginTypeResolver
 	/// </summary>
-	public static class PluginTypeResolverExtensions
-	{		
+	public static class PluginManagerExtensions
+	{
 
 		/// <summary>
 		/// Returns all available IMacroGuiRendering in application
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveMacroRenderings(this PluginTypeResolver resolver)
+		internal static IEnumerable<Type> ResolveMacroRenderings(this PluginManager resolver)
 		{
 			return resolver.ResolveTypes<IMacroGuiRendering>();
 		}

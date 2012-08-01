@@ -18,10 +18,10 @@ namespace Umbraco.Tests
 			TestHelper.SetupLog4NetForTests();
 
 			//this ensures its reset
-			PluginTypeResolver.Current = new PluginTypeResolver();
+			PluginManager.Current = new PluginManager();
 
 			//for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-			PluginTypeResolver.Current.AssembliesToScan = new[]
+			PluginManager.Current.AssembliesToScan = new[]
 				{
 					this.GetType().Assembly
 				};

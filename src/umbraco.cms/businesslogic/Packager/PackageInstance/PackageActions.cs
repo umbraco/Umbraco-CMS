@@ -32,8 +32,8 @@ namespace umbraco.cms.businesslogic.packager
 		private static void RegisterPackageActions()
 		{
 			PackageActions.AddRange(
-				PluginTypeResolver.Current.CreateInstances<IPackageAction>(
-					PluginTypeResolver.Current.ResolvePackageActions()));			
+				PluginManager.Current.CreateInstances<IPackageAction>(
+					PluginManager.Current.ResolvePackageActions()));			
 		}
 
 		/// <summary>

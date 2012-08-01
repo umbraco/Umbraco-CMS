@@ -6,24 +6,14 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// A singly registered object resolver to manage the IDocumentLastChanceLookup
 	/// </summary>
-	internal sealed class LastChanceLookupResolver : SingleObjectResolverBase<IDocumentLastChanceLookup>
+	internal sealed class LastChanceLookupResolver : SingleObjectResolverBase<LastChanceLookupResolver, IDocumentLastChanceLookup>
 	{
-		#region Singleton
-		private static readonly LastChanceLookupResolver Instance = new LastChanceLookupResolver(new DefaultLastChanceLookup());
-		public static LastChanceLookupResolver Current
-		{
-			get { return Instance; }
-		} 
-		#endregion
-
-		#region Constructors
-		static LastChanceLookupResolver() { }
+	
 		internal LastChanceLookupResolver(IDocumentLastChanceLookup lastChanceLookup)
 		{
 			Value = lastChanceLookup;
 		} 
-		#endregion
-
+	
 		/// <summary>
 		/// Can be used by developers at runtime to set their DocumentLastChanceLookup at app startup
 		/// </summary>

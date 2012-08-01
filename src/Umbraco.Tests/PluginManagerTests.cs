@@ -19,7 +19,7 @@ namespace Umbraco.Tests
 {
 
 	[TestFixture]
-	public class PluginTypeResolverTests
+	public class PluginManagerTests
 	{
 
 		[SetUp]
@@ -28,11 +28,11 @@ namespace Umbraco.Tests
 			TestHelper.SetupLog4NetForTests();
 
 			//this ensures its reset
-			PluginTypeResolver.Current = new PluginTypeResolver();
+			PluginManager.Current = new PluginManager();
 
 			//for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
 			//TODO: Should probably update this so it only searches this assembly and add custom types to be found
-			PluginTypeResolver.Current.AssembliesToScan = new[]
+			PluginManager.Current.AssembliesToScan = new[]
 			    {
 			        this.GetType().Assembly, 
 			        typeof(ApplicationStartupHandler).Assembly,
@@ -58,80 +58,80 @@ namespace Umbraco.Tests
 		[Test]
 		public void Ensure_Only_One_Type_List_Created()
 		{
-			var foundTypes1 = PluginTypeResolver.Current.ResolveFindMeTypes();
-			var foundTypes2 = PluginTypeResolver.Current.ResolveFindMeTypes();
+			var foundTypes1 = PluginManager.Current.ResolveFindMeTypes();
+			var foundTypes2 = PluginManager.Current.ResolveFindMeTypes();
 			Assert.AreEqual(1,
-			                PluginTypeResolver.Current.GetTypeLists()
+			                PluginManager.Current.GetTypeLists()
 			                	.Count(x => x.GetListType() == typeof (IFindMe)));
 		}
 
 		[Test]
 		public void Resolves_Types()
 		{
-			var foundTypes1 = PluginTypeResolver.Current.ResolveFindMeTypes();			
+			var foundTypes1 = PluginManager.Current.ResolveFindMeTypes();			
 			Assert.AreEqual(2, foundTypes1.Count());
 		}
 
 		[Test]
 		public void Resolves_Attributed_Trees()
 		{
-			var trees = PluginTypeResolver.Current.ResolveAttributedTrees();
+			var trees = PluginManager.Current.ResolveAttributedTrees();
 			Assert.AreEqual(26, trees.Count());
 		}
 
 		[Test]
 		public void Resolves_Actions()
 		{
-			var actions = PluginTypeResolver.Current.ResolveActions();
+			var actions = PluginManager.Current.ResolveActions();
 			Assert.AreEqual(36, actions.Count());
 		}
 
 		[Test]
 		public void Resolves_Trees()
 		{
-			var trees = PluginTypeResolver.Current.ResolveTrees();
+			var trees = PluginManager.Current.ResolveTrees();
 			Assert.AreEqual(36, trees.Count());
 		}
 
 		[Test]
 		public void Resolves_Applications()
 		{
-			var apps = PluginTypeResolver.Current.ResolveApplications();
+			var apps = PluginManager.Current.ResolveApplications();
 			Assert.AreEqual(7, apps.Count());
 		}
 
 		[Test]
 		public void Resolves_Action_Handlers()
 		{
-			var types = PluginTypeResolver.Current.ResolveActionHandlers();
+			var types = PluginManager.Current.ResolveActionHandlers();
 			Assert.AreEqual(1, types.Count());
 		}
 
 		[Test]
 		public void Resolves_DataTypes()
 		{
-			var types = PluginTypeResolver.Current.ResolveDataTypes();
+			var types = PluginManager.Current.ResolveDataTypes();
 			Assert.AreEqual(36, types.Count());
 		}
 
 		[Test]
 		public void Resolves_RazorDataTypeModels()
 		{
-			var types = PluginTypeResolver.Current.ResolveRazorDataTypeModels();
+			var types = PluginManager.Current.ResolveRazorDataTypeModels();
 			Assert.AreEqual(1, types.Count());
 		}
 
 		[Test]
 		public void Resolves_RestExtensions()
 		{
-			var types = PluginTypeResolver.Current.ResolveRestExtensions();
+			var types = PluginManager.Current.ResolveRestExtensions();
 			Assert.AreEqual(2, types.Count());
 		}
 
 		[Test]
 		public void Resolves_XsltExtensions()
 		{
-			var types = PluginTypeResolver.Current.ResolveXsltExtensions();
+			var types = PluginManager.Current.ResolveXsltExtensions();
 			Assert.AreEqual(1, types.Count());
 		}
 

@@ -12,15 +12,15 @@ namespace umbraco.cms
 	/// <summary>
 	/// Extension methods for the PluginTypeResolver
 	/// </summary>
-	public static class PluginTypeResolverExtensions
-	{		
+	public static class PluginManagerExtensions
+	{
 
 		/// <summary>
 		/// Returns all available IActionHandler in application
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveActionHandlers(this PluginTypeResolver resolver)
+		internal static IEnumerable<Type> ResolveActionHandlers(this PluginManager resolver)
 		{
 			return resolver.ResolveTypes<IActionHandler>();
 		}
@@ -30,7 +30,7 @@ namespace umbraco.cms
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveActions(this PluginTypeResolver resolver)
+		internal static IEnumerable<Type> ResolveActions(this PluginManager resolver)
 		{
 			return resolver.ResolveTypes<IAction>();
 		}
@@ -40,7 +40,7 @@ namespace umbraco.cms
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveMacroEngines(this PluginTypeResolver resolver)
+		internal static IEnumerable<Type> ResolveMacroEngines(this PluginManager resolver)
 		{
 			return resolver.ResolveTypes<IMacroEngine>();
 		}
@@ -50,7 +50,7 @@ namespace umbraco.cms
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveMediaFactories(this PluginTypeResolver resolver)
+		internal static IEnumerable<Type> ResolveMediaFactories(this PluginManager resolver)
 		{
 			return resolver.ResolveTypes<IMediaFactory>();
 		}
@@ -60,7 +60,7 @@ namespace umbraco.cms
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolvePackageActions(this PluginTypeResolver resolver)
+		internal static IEnumerable<Type> ResolvePackageActions(this PluginManager resolver)
 		{
 			return resolver.ResolveTypes<IPackageAction>();
 		}

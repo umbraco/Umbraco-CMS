@@ -65,8 +65,8 @@ namespace umbraco.BusinessLogic.Actions
             if (ActionHandlers.Count == 0)
             {
             	ActionHandlers.AddRange(
-            		PluginTypeResolver.Current.CreateInstances<IActionHandler>(
-            			PluginTypeResolver.Current.ResolveActionHandlers()));                
+            		PluginManager.Current.CreateInstances<IActionHandler>(
+            			PluginManager.Current.ResolveActionHandlers()));                
             }
 
         }
@@ -79,14 +79,14 @@ namespace umbraco.BusinessLogic.Actions
 
             if (Actions.Count == 0)
             {
-            	var foundIActions = PluginTypeResolver.Current.ResolveActions();
+            	var foundIActions = PluginManager.Current.ResolveActions();
                 foreach (var type in foundIActions)
                 {
                     IAction typeInstance;
                     var instance = type.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
                     //if the singletone initializer is not found, try simply creating an instance of the IAction if it supports public constructors
 					if (instance == null)
-						typeInstance = PluginTypeResolver.Current.CreateInstance<IAction>(type);
+						typeInstance = PluginManager.Current.CreateInstance<IAction>(type);
 					else
 						typeInstance = instance.GetValue(null, null) as IAction;
 

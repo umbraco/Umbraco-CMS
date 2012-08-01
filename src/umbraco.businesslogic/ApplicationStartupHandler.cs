@@ -28,8 +28,8 @@ namespace umbraco.businesslogic
 			//now we just create the types... this is kind of silly since these objects don't actually do anything
 			//except run their constructors.
 
-			var instances = PluginTypeResolver.Current.CreateInstances<IApplicationStartupHandler>(
-				PluginTypeResolver.Current.ResolveApplicationStartupHandlers());
+			var instances = PluginManager.Current.CreateInstances<IApplicationStartupHandler>(
+				PluginManager.Current.ResolveApplicationStartupHandlers());
 
 		}
 	}

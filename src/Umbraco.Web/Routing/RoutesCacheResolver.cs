@@ -6,20 +6,9 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// Resolves the <see cref="IRoutesCache"/> implementation.
 	/// </summary>
-	internal sealed class RoutesCacheResolver : SingleObjectResolverBase<IRoutesCache>
+	internal sealed class RoutesCacheResolver : SingleObjectResolverBase<RoutesCacheResolver, IRoutesCache>
 	{
-		#region Singleton
-
-		private static readonly RoutesCacheResolver Instance = new RoutesCacheResolver(new DefaultRoutesCache());
-
-		public static RoutesCacheResolver Current
-		{
-			get { return Instance; }
-		}
-		#endregion
-
-		#region Constructors
-		static RoutesCacheResolver() { }
+		
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RoutesCacheResolver"/> class with an <see cref="IRoutesCache"/> implementation.
 		/// </summary>
@@ -27,8 +16,6 @@ namespace Umbraco.Web.Routing
 		internal RoutesCacheResolver(IRoutesCache routesCache)
 			: base(routesCache)
 		{ }
-		#endregion
-
 
 
 		/// <summary>

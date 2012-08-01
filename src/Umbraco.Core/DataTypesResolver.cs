@@ -7,22 +7,10 @@ namespace Umbraco.Core
 	/// <summary>
 	/// A resolver to return all IDataType objects
 	/// </summary>
-	internal sealed class DataTypesResolver : LegacyTransientObjectsResolver<IDataType>
+	internal sealed class DataTypesResolver : LegacyTransientObjectsResolver<DataTypesResolver, IDataType>
 	{
 
-		#region Singleton
-
-		private static readonly DataTypesResolver Instance = new DataTypesResolver(PluginTypeResolver.Current.ResolveDataTypes());
-
-		public static DataTypesResolver Current
-		{
-			get { return Instance; }
-		}
-		#endregion
-
-		#region Constructors
-		static DataTypesResolver() { }
-
+	
 		/// <summary>
 		/// Constructor
 		/// </summary>
@@ -32,7 +20,6 @@ namespace Umbraco.Core
 		{
 
 		}
-		#endregion
 
 		/// <summary>
 		/// Gets the <see cref="ICacheRefresher"/> implementations.

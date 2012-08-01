@@ -34,8 +34,8 @@ namespace umbraco.cms.businesslogic.macro
 				AllEngines.Clear();
 
 				AllEngines.AddRange(
-					PluginTypeResolver.Current.CreateInstances<IMacroEngine>(
-						PluginTypeResolver.Current.ResolveMacroEngines()));
+					PluginManager.Current.CreateInstances<IMacroEngine>(
+						PluginManager.Current.ResolveMacroEngines()));
 				
 				_isInitialized = true;
 			}
