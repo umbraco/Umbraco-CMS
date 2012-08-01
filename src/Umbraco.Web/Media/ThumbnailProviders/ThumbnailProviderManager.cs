@@ -60,10 +60,12 @@ namespace Umbraco.Web.Media.ThumbnailProviders
 
                 try
                 {
-                    if (t.IsVisible)
-                    {
+                    //MB: Remove visible check as we've made ThumbnailProviders internal for the time being
+                    //MB: We should reinstate once we make them public
+                    //if (t.IsVisible)
+                    //{
                         typeInstance = Activator.CreateInstance(t) as IThumbnailProvider;
-                    }
+                    //}
                 }
                 catch { }
 
