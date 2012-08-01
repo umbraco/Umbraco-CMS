@@ -1,0 +1,89 @@
+#MB_overlay {
+	position: absolute;
+	margin: auto;
+	top: 0;	left: 0;
+	width: 100%; height: 100%;
+	z-index: 9999;
+	background-color: #000!important;
+}
+#MB_overlay[id] { position: fixed; }
+
+#MB_window {
+	position: absolute;
+	top: 0;
+	border: 0 solid;
+	text-align: left;
+	z-index: 10000;
+}
+#MB_window[id] { position: fixed!important; }
+
+#MB_frame {
+	position: relative;
+	background-color: #fff;
+	height: 100%;
+}
+
+#MB_header {
+	margin: 0;
+	padding: 0;
+}
+
+#MB_content {
+	padding: 0px;
+	overflow: hidden;
+	height: 100%;
+}
+
+#MB_caption {
+	font: bold 100% "Lucida Grande", Arial, sans-serif;
+	text-shadow: #FFF 0 1px 0;
+	padding: .5em 2em .5em .75em;
+	margin: 0;
+	text-align: left;
+}
+
+#MB_close {
+	display: block;
+	position: absolute;
+	right: 5px; top: 4px;
+	padding: 2px 3px;
+	font-weight: bold;
+	text-decoration: none;
+	font-size: 13px;
+}
+#MB_close:hover {
+	background: transparent;
+}
+
+#MB_loading {
+	padding: 1.5em;
+	text-indent: -10000px;
+	background: transparent url(spinner.gif) 50% 0 no-repeat;
+}
+
+/* Color scheme */
+#MB_frame {
+	padding-bottom: 0px;
+}
+#MB_window {
+	background-color: #EFEFEF;
+	color: #000;
+}
+
+#MB_content {border-top: 1px solid #F9F9F9; }
+
+#MB_header {
+  background: url(../images/modalGradiant.gif) repeat-x bottom #fff;
+  border-bottom: 1px solid #CCC;
+}
+
+#MB_caption { color: #378080 }
+#MB_close { color: #777 }
+#MB_close:hover { color: #000 }
+
+
+/* Alert message */
+.MB_alert {
+	margin: 10px 0;
+	text-align: center;
+}

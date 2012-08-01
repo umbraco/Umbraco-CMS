@@ -1,0 +1,16 @@
+@*
+LIST CHILDREN BY TYPE
+=================================
+This snippet shows how simple it is to fetch only children of a certain Document Type using Razor. Instead of
+calling .Children, simply call .AliasOfDocumentType (even works in plural for readability)! 
+For instance .Textpage or .Textpages (you can find the alias of your Document Type by editing it in the 
+Settings section).
+
+NOTE: It is safe to remove this comment (anything between @ * * @), the code that generates the list is only the below!
+*@
+<ul>
+    @foreach (var item in @Model.Textpages.Where("Visible"))
+    {
+    <li><a href="@item.Url">@item.Name</a></li>
+}
+</ul>

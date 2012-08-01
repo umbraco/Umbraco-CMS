@@ -1,0 +1,379 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Font Name="Tahoma" Size="8.25" />
+  <Class Name="umbraco.cms.businesslogic.CMSNode">
+    <Position X="12" Y="0.5" Width="3.25" />
+    <TypeIdentifier>
+      <FileName>businesslogic\CMSNode.cs</FileName>
+      <HashCode>iAIDQAAAEIwCEBIFAABEYQAARAwAKBgNAAgBGAAAUAI=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_ConnString" Hidden="true" />
+      <Field Name="_createDate" Hidden="true" />
+      <Field Name="_hasChildren" Hidden="true" />
+      <Field Name="_id" Hidden="true" />
+      <Field Name="_level" Hidden="true" />
+      <Field Name="_nodeobjecttype" Hidden="true" />
+      <Field Name="_parentid" Hidden="true" />
+      <Field Name="_path" Hidden="true" />
+      <Field Name="_sortOrder" Hidden="true" />
+      <Field Name="_text" Hidden="true" />
+      <Field Name="_uniqueid" Hidden="true" />
+      <Field Name="_userId" Hidden="true" />
+      <Method Name="getUniquesFromObjectTypeAndFirstLetter" Hidden="true" />
+      <Method Name="MakeNew" Hidden="true" />
+      <Method Name="setupNode" Hidden="true" />
+      <Method Name="TopMostNodeIds" Hidden="true" />
+      <Method Name="UpdateTempPathForTree" Hidden="true" />
+      <Method Name="XmlPopulate" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="umbraco.cms.businesslogic.Content">
+    <Position X="4.75" Y="7.5" Width="2.75" />
+    <TypeIdentifier>
+      <FileName>businesslogic\Content.cs</FileName>
+      <HashCode>IAAAABABAAgAZAAAAAAQAYEBBAgAEAgEAAAQAASADAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_contentTypeIcon" Hidden="true" />
+      <Field Name="_version" Hidden="true" />
+      <Field Name="_versionDate" Hidden="true" />
+      <Field Name="_versionDateInitialized" Hidden="true" />
+      <Field Name="_xml" Hidden="true" />
+      <Method Name="CreateContent" Hidden="true" />
+      <Method Name="createNewVersion" Hidden="true" />
+      <Method Name="delete" Hidden="true" />
+      <Method Name="deleteAllProperties" Hidden="true" />
+      <Method Name="hasVersion" Hidden="true" />
+      <Method Name="importXml" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="umbraco.cms.businesslogic.ContentType">
+    <Position X="15.25" Y="7.5" Width="2.5" />
+    <TypeIdentifier>
+      <FileName>businesslogic\ContentType.cs</FileName>
+      <HashCode>AAAAAAAIAAIAAAAAACAAAQAABhgAAkAIAgAQAAQQCBA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_alias" Hidden="true" />
+      <Field Name="_iconurl" Hidden="true" />
+      <Method Name="Create" Hidden="true" />
+      <Method Name="delete" Hidden="true" />
+      <Method Name="setupContentType" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Interface Name="umbraco.cms.businesslogic.ContentType.TabI" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>businesslogic\ContentType.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Interface>
+      <Class Name="umbraco.cms.businesslogic.ContentType.Tab" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>businesslogic\ContentType.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Class>
+    </NestedTypes>
+  </Class>
+  <Class Name="umbraco.cms.businesslogic.datatype.DataTypeDefinition">
+    <Position X="22.5" Y="7.5" Width="2.75" />
+    <TypeIdentifier>
+      <FileName>businesslogic\datatype\DataType.cs</FileName>
+      <HashCode>AAAAAAAAAAICEEAAAAAAAAAAIAAAAAAAAgAAACAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_controlId" Hidden="true" />
+      <Field Name="_objectType" Hidden="true" />
+      <Method Name="setupDataTypeDefinition" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="umbraco.cms.businesslogic.media.Media">
+    <Position X="1" Y="12.5" Width="2" />
+    <TypeIdentifier>
+      <FileName>businesslogic\media\Media.cs</FileName>
+      <HashCode>AAAAAAAAAAAAEEAAAAAEAQAABAAAAAAAAAQAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_objectType" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="umbraco.cms.businesslogic.media.MediaType">
+    <Position X="12.5" Y="12.75" Width="2" />
+    <TypeIdentifier>
+      <FileName>businesslogic\media\MediaType.cs</FileName>
+      <HashCode>AAAAAAAAAAAAEEAAAAAAAQAAAgAAAAAAAgAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_objectType" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="umbraco.cms.businesslogic.member.Member">
+    <Position X="3.75" Y="12.5" Width="3.5" />
+    <TypeIdentifier>
+      <FileName>businesslogic\member\Member.cs</FileName>
+      <HashCode>AWgCAFAAQCAAEEEAAIAAQYQgBAAgAQguAgICCAFAAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_groups" Hidden="true" />
+      <Field Name="_memberCache" Hidden="true" />
+      <Field Name="_objectType" Hidden="true" />
+      <Field Name="_text" Hidden="true" />
+      <Method Name="addCookie" Hidden="true" />
+      <Method Name="getCookieValue" Hidden="true" />
+      <Method Name="populateGroups" Hidden="true" />
+      <Method Name="removeCookie" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="umbraco.cms.businesslogic.member.MemberGroup">
+    <Position X="19.5" Y="7.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>businesslogic\member\MemberGroup.cs</FileName>
+      <HashCode>AAAAAAAAAAAAEEAAAAAAAAAAAAAAAAAAAgAAAAAAAAg=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_objectType" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="umbraco.cms.businesslogic.member.MemberType">
+    <Position X="15.25" Y="12.75" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>businesslogic\member\MemberType.cs</FileName>
+      <HashCode>AAACAAABAAAAEEAAEAAAAQAAAgAAAAAQAiAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_objectType" Hidden="true" />
+      <Method Name="propertyTypeRegistered" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="umbraco.cms.businesslogic.web.Document">
+    <Position X="8" Y="12.5" Width="3" />
+    <TypeIdentifier>
+      <FileName>businesslogic\web\Document.cs</FileName>
+      <HashCode>AAAEEOAAA8CIEECBOEAECYgABgAAAAgMAAEACiAAQJA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_creator" Hidden="true" />
+      <Field Name="_expire" Hidden="true" />
+      <Field Name="_httpContext" Hidden="true" />
+      <Field Name="_objectType" Hidden="true" />
+      <Field Name="_published" Hidden="true" />
+      <Field Name="_release" Hidden="true" />
+      <Field Name="_template" Hidden="true" />
+      <Field Name="_text" Hidden="true" />
+      <Field Name="_updated" Hidden="true" />
+      <Field Name="_userId" Hidden="true" />
+      <Field Name="_writer" Hidden="true" />
+      <Field Name="_xml" Hidden="true" />
+      <Method Name="addAttribute" Hidden="true" />
+      <Method Name="importXml" Hidden="true" />
+      <Method Name="setupDocument" Hidden="true" />
+      <Method Name="SetupDocumentForTree" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="umbraco.cms.businesslogic.web.DocumentType">
+    <Position X="18.25" Y="12.75" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>businesslogic\web\DocumentType.cs</FileName>
+      <HashCode>AABQACAAAAAAEEAAAgECAQAACgAAAAAEAgAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_defaultTemplate" Hidden="true" />
+      <Field Name="_objectType" Hidden="true" />
+      <Field Name="_templateIds" Hidden="true" />
+      <Method Name="setupDocumentType" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="umbraco.cms.businesslogic.relation.Relation">
+    <Position X="9.25" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <FileName>businesslogic\relation\Relation.cs</FileName>
+      <HashCode>AAACAAAUEAAAEIAAAABAYAAAABECAAAAgIABAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_childNode" Hidden="true" />
+      <Field Name="_comment" Hidden="true" />
+      <Field Name="_datetime" Hidden="true" />
+      <Field Name="_id" Hidden="true" />
+      <Field Name="_parentNode" Hidden="true" />
+      <Field Name="_relType" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="umbraco.cms.businesslogic.relation.RelationType">
+    <Position X="9.25" Y="3.5" Width="2" />
+    <TypeIdentifier>
+      <FileName>businesslogic\relation\RelationType.cs</FileName>
+      <HashCode>EAICYAAAAAIAAAAAAABAAAwAAgAAAAAAAAAAAAAQAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_alias" Hidden="true" />
+      <Field Name="_childObjectType" Hidden="true" />
+      <Field Name="_dual" Hidden="true" />
+      <Field Name="_id" Hidden="true" />
+      <Field Name="_name" Hidden="true" />
+      <Field Name="_parentObjectType" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="umbraco.BusinessLogic.Actions.ActionNew" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="28.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Actions\defaultActions.cs</FileName>
+      <HashCode>AAAAAAAAAIIAAAIAAAAAAAQAQAAAAAAAgAAAAAEAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="umbraco.BusinessLogic.Actions.ActionSave" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="28.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Actions\defaultActions.cs</FileName>
+      <HashCode>AAAAAAAAAIIAAAIAAAAAAAQAQAAAAAAAgAAAAAEAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="umbraco.BusinessLogic.Actions.ActionDelete" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="28.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Actions\defaultActions.cs</FileName>
+      <HashCode>AAAAAAAAAIIAAAIAAAAAAAQAQAAAAAAAgAAAAAEAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="umbraco.BusinessLogic.Actions.ActionMove" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="26.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Actions\defaultActions.cs</FileName>
+      <HashCode>AAAAAAAAAIIAAAIAAAAAAAQAQAAAAAAAgAAAAAEAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="umbraco.BusinessLogic.Actions.ActionCopy" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="26.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Actions\defaultActions.cs</FileName>
+      <HashCode>AAAAAAAAAIIAAAIAAAAAAAQAQAAAAAAAgAAAAAEAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="umbraco.BusinessLogic.Actions.ActionProtect" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="26.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Actions\defaultActions.cs</FileName>
+      <HashCode>AAAAAAAAAIIAAAIAAAAAAAQAQAAAAAAAgAAAAAEAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="umbraco.BusinessLogic.Actions.ActionRollback" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="26.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Actions\defaultActions.cs</FileName>
+      <HashCode>AAAAAAAAAIIAAAIAAAAAAAQAQAAAAAAAgAAAAAEAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="umbraco.BusinessLogic.Actions.ActionUpdate" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="28.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Actions\defaultActions.cs</FileName>
+      <HashCode>AAAAAAAAAIIAAAIAAAAAAAQAQAAAAAAAgAAAAAEAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="umbraco.BusinessLogic.Actions.ActionPublish" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="30" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Actions\defaultActions.cs</FileName>
+      <HashCode>AAAAAAAAAIIAAAIAAAAAAAQAQAAAAAAAgAAAAAEAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="umbraco.BusinessLogic.Actions.ActionToPublish" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="30" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Actions\defaultActions.cs</FileName>
+      <HashCode>AAAAAAAAAIIAAAIAAAAAAAQAQAAAAAAAgAAAAAEAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="umbraco.BusinessLogic.Actions.ActionRePublish" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="30" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Actions\defaultActions.cs</FileName>
+      <HashCode>AAAAAAAAAIIAAAIAAAAAAAQAQAAAAAAAgAAAAAEAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="umbraco.BusinessLogic.Actions.ActionUnPublish" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="30" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Actions\defaultActions.cs</FileName>
+      <HashCode>AAAAAAAAAIIAAAIAAAAAAAQAQAAAAAAAgAAAAAEAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="umbraco.cms.businesslogic.property.Property">
+    <Position X="7.75" Y="7.5" Width="2" />
+    <TypeIdentifier>
+      <FileName>businesslogic\Property\Property.cs</FileName>
+      <HashCode>CAACAAAABAAAEACAAABAAQAAAAAAAAAEAEAiAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_connstring" Hidden="true" />
+      <Field Name="_data" Hidden="true" />
+      <Field Name="_id" Hidden="true" />
+      <Field Name="_pt" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="umbraco.cms.businesslogic.propertytype.PropertyType">
+    <Position X="12.25" Y="7.5" Width="2.75" />
+    <TypeIdentifier>
+      <FileName>businesslogic\propertytype\propertytype.cs</FileName>
+      <HashCode>AAEDNAAAAAIgEQCEACRACQQAAAAAAAAAAgAAAAQQAAE=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_alias" Hidden="true" />
+      <Field Name="_connstring" Hidden="true" />
+      <Field Name="_contenttypeid" Hidden="true" />
+      <Field Name="_DataTypeId" Hidden="true" />
+      <Field Name="_description" Hidden="true" />
+      <Field Name="_id" Hidden="true" />
+      <Field Name="_mandatory" Hidden="true" />
+      <Field Name="_name" Hidden="true" />
+      <Field Name="_sortOrder" Hidden="true" />
+      <Field Name="_tabId" Hidden="true" />
+      <Field Name="_validationRegExp" Hidden="true" />
+    </Members>
+  </Class>
+  <Interface Name="umbraco.interfaces.IData">
+    <Position X="26.5" Y="7" Width="2.25" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="umbraco.interfaces.IDataPrevalue">
+    <Position X="29" Y="9" Width="2.25" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="umbraco.interfaces.IDataType">
+    <Position X="29" Y="7" Width="2.25" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="umbraco.BusinessLogic.Actions.IActionHandler">
+    <Position X="27.75" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>Actions\Action.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAgAAAAAAAAAACAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="umbraco.interfaces.IDataEditor">
+    <Position X="26.5" Y="9" Width="2.25" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="umbraco.interfaces.IDataFieldWithButtons">
+    <Position X="26.5" Y="11" Width="2.25" />
+    <TypeIdentifier />
+  </Interface>
+</ClassDiagram>

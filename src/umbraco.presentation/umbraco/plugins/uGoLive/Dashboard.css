@@ -1,0 +1,16 @@
+﻿.uGoLive .propertyItemContent img { vertical-align: middle; margin-right: 5px; } 
+.uGoLive .propertypane .propertypane { padding: 10px 10px 0px; } 
+.uGoLive .dashboardWrapper { padding: 5px 5px 5px 5px; overflow: hidden; color: #333; }
+.uGoLive .dashboardWrapper h2 { margin-top: 0; padding-bottom: 10px; border-bottom: 1px solid #CCC; padding-left: 37px; line-height: 32px; }
+.uGoLive .dashboardWrapper .dashboardIcon { position: absolute; top: 10px; left: 10px; }
+.uGoLive .dashboardWrapper h3 { margin-bottom: 10px; }
+.uGoLive .dashboardWrapper p { line-height: 1.4em; font-size: 1.1em; margin-top: 0; } 
+.uGoLive #btnRunChecks { color: #fff; background: #f26e20; padding: 10px; border: 0; font-weight: bold; cursor: pointer; outline: 0; }
+.uGoLive #btnRunChecks.disabled { background: #f9b790; }
+.uGoLive a.disabled { cursor: default; opacity:0.3; filter:alpha(opacity=30); }
+.uGoLive span.status { padding-left: 20px; background-position: left center; background-repeat: no-repeat; line-height: 16px; }
+.uGoLive span.status.uglUnchecked { background-image: url('help.png') }
+.uGoLive span.status.uglChecking, .uGoLive span.status.uglQueued { background-image: url('throbber.gif') }
+.uGoLive span.status.uglPassed, .uGoLive span.status.uglSuccess { background-image: url('tick.png') }
+.uGoLive span.status.uglFailed { background-image: url('cross.png') }
+.uGoLive span.status.uglIndeterminate { background-image: url('error.png') }

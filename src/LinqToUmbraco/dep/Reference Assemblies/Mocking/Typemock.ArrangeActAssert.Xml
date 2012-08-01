@@ -1,0 +1,3571 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Typemock.ArrangeActAssert</name>
+    </assembly>
+    <members>
+        <member name="T:TypeMock.ArrangeActAssert.INonPublicMethodBehavior">
+            <summary>
+            Returned by Isolate.NonPublic.<see cref="M:TypeMock.ArrangeActAssert.IIsolateNonPublic.WhenCalled(System.Object,System.String)"/>, and 
+            Isolate.NonPublic.WhenCalled().<see cref="M:TypeMock.ArrangeActAssert.INonPublicMethodHandler.WithGenericArguments(System.Type,System.Type[])"/>. this interface 
+            contains methods for defining behavior for non public methods, as will as a modifier for applying behavior for
+            generic methods
+            </summary>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IVoidActionHandler">
+            <summary>
+            Interface for specifying behavior for a void returning intercepted calls. The interface is returned by <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> method.
+            </summary>
+            <remarks>
+            This interface allow tweaking the behavior of methods which return void.
+            </remarks>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IMethodBehavior">
+            <summary>
+            Interface for specifying behavior for a method call. The interface is extended by <see cref="T:TypeMock.ArrangeActAssert.IVoidActionHandler"/> and <see cref="T:TypeMock.ArrangeActAssert.IReturnValueHandler`1"/>.
+            </summary>
+            <remarks>
+            This interface allow tweaking the behavior of any method by calling its original implementation or throwing an exception from it.
+            </remarks>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IHideObjectMethods">
+            <summary>
+            For internal use only.
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IMethodBehavior.CallOriginal">
+            <summary>
+            Specify that an intercepted call will try to execute the real logic of the intercepted instance.
+            </summary>
+            <remarks>
+            This interface is returned by <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> method.
+            <para>
+            Before using this directive make sure that the intercepted method has a real implementation that can be executed.
+            </para>
+            </remarks>
+            <example>
+            This test shows faking an object to return null values, and overriding one of its methods to call its original
+            implementation:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void CallOriginalOnFakeInstance()
+            {
+                RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.ReturnNulls);
+                
+                // Override the Increment() method to call its original implementation
+                Isolate.WhenCalled(() =&gt; fake.Increment()).CallOriginal();
+            
+                // Make sure Count is reset
+                fake.Count = 0;
+            
+                // This call now redirects to its original implementation - the count should increment
+                fake.Increment();
+                Assert.AreEqual(1, fake.Count);
+            
+                // even though we called the original implementation, we can still verify the call happened
+                Isolate.Verify.WasCalledWithAnyArguments(() =&gt; fake.Increment());
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IMethodBehavior.WillThrow(System.Exception)">
+            <summary>
+            Specify that an intercepted call will throw the given exception.
+            </summary>
+            <remarks>
+            This interface is returned by <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> method.
+            </remarks>
+            <param name="ex"> The exception to throw</param>
+            <example>
+            This test shows faking an object, and overriding one of its methods to throw an exception:
+            <code>
+            [TestMethod]
+            [Isolated]
+            [ExpectedException(typeof(OutOfMemoryException))]
+            public void WillThrowOnFakeInstance()
+            {
+                RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                
+                // Override the Write() method to throw an exception
+                Isolate.WhenCalled(() =&gt; fake.Write("")).WillThrow(new OutOfMemoryException());
+            
+                // This call will now throw an exception when called - this is verified by the
+                // [ExpectedException] decorator
+                fake.Write("Hello");
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IVoidActionHandler.IgnoreCall">
+             <summary>
+             Specify that an intercepted call should be ignored without executing any logic.
+             </summary>
+             <remarks>
+             This interface is returned by <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> method.
+             </remarks>
+             <example>
+             This example shows using IgnoreCall() to stub out a call to a method:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_StubIncrementMethod()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                 
+                 // Increment call will be ignored (stubbed)
+                 Isolate.WhenCalled(() =&gt; fake.Increment()).IgnoreCall();
+             
+                 // Make sure Count is reset
+                 fake.Count = 0;
+             
+                 // This call is faked - count should not increment
+                 fake.Increment();
+            
+                 Assert.AreEqual(0, fake.Count);
+             }
+             </code>
+             </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IVoidActionHandler.DoInstead(System.Action{TypeMock.MethodCallContext})">
+            <summary>
+            Run a custom action instead of the methods in the WhecnCalled block.
+            </summary>
+            <param name="action">The action that will run instead of the faked method</param>
+            <example>
+            This example shows using DoInstead() to run custom code instead of a function:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void FakeAnInstance_DoInstead()
+            {
+                var fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+            
+                // Use DoInstead to replace the called method with custom action
+                Isolate.WhenCalled(() => fake.CallWithArguments("", 0, 0.0))
+                    .DoInstead((callContext) =>
+                            {
+                                // Change the value of a field in the object that called the method
+                                ((RealLogger)callContext.Instance).count = (int)callContext.Parameters[1];
+                            });
+                
+                // Call the method
+                fake.CallWithArguments(100);
+            
+                // Verify the field's value
+                Assert.AreEqual(100, fake.count);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IReturnValueHandler`1">
+            <summary>
+            Interface for specifying behavior for intercepted calls on methods returning values. 
+            The interface is returned by <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/>.
+            </summary>
+            <remarks>
+            This interface allow tweaking the behavior of methods that has return values.
+            </remarks>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IReturnValueHandler`1.WillReturn(`0)">
+            <summary>
+            Specify that the intercepted method will return the given value.
+            The real implementation will not be executed.
+            </summary>
+            <param name="value">The fake value to return when the call is intercepted</param>
+            <example>
+            This example shows using WillReturn() to change the return value for a property call:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void FakeAnInstance_ChangeMethodReturnValue()
+            {
+                RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                
+                // Change the return value for Count property
+                Isolate.WhenCalled(() => fake.Count).WillReturn(10);
+            
+                // fake.Count will return the assigned value
+                Assert.AreEqual(10, fake.Count);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IReturnValueHandler`1.DoInstead(System.Func{TypeMock.MethodCallContext,`0})">
+             <summary>
+             Run a custom dunction instead of the methods in the WhecnCalled block.
+             </summary>
+             <param name="function">The function that will run instead of the faked method</param>
+             <example>
+             This example shows using DoInstead() to run custom code instead of a function:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_DoInstead()
+             {
+                 var fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+            
+                 // Use DoInstead to replace the method called with custom function
+                 Isolate.WhenCalled(() => fake.IntCallWithArgs(0))
+                     .DoInstead((callContext) =>
+                         {
+                             // We can set field on the instance that called the method
+                             ((RealLogger)callContext.Instance).count = (int)callContext.Parameters[0];
+            
+                             // Change the returned value  
+                             return 100;
+                         });
+            
+                 int value = fake.IntCallWithArgs(10);
+             
+                 // Verify
+                 Assert.AreEqual(100, value);
+                 Assert.AreEqual(10, fake.count);
+             </code>
+             </example>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.Isolate">
+            <summary>
+            This is the entry point to all AAA APIs. 
+            Use it to fake, swap, set method behavior and verify calls.
+            The Isolate APIs use fluent interfaces, thus 
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)">
+             <summary>
+             Accepts a method in the form of a Lambda expression, to set a specific behavior on it.
+             </summary>
+             <param name="action">An Action in a form of a Lambda expression (with no parameters) that expresses the method we want to set a behavior on.</param>
+             <returns>A <seealso cref="T:TypeMock.ArrangeActAssert.IVoidActionHandler"/> interface reference.</returns>
+             <remarks>
+             Because of the nature of fluent interface, <c>WhenCalled</c> should be used with its proceeding methods.</remarks>
+             <example>
+             Here is an example how to use WhenCalled in order to ignore (stub) a call:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_StubIncrementMethod()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                 
+                 // Increment call will be ignored (stubbed)
+                 Isolate.WhenCalled(() =&gt; fake.Increment()).IgnoreCall();
+             
+                 // Make sure Count is reset
+                 fake.Count = 0;
+             
+                 // This call is faked - count should not increment
+                 fake.Increment();
+            
+                 Assert.AreEqual(0, fake.Count);
+             }
+             </code>
+             </example>
+             <seealso cref="T:TypeMock.ArrangeActAssert.IPublicVoidActionHandler"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled``1(System.Func{``0})">
+            <summary>
+            Accepts a method in the form of a Lambda expression, to set a specific behavior on it.
+            </summary>
+            
+            <param name="func">A function in the form of a Lambda Expression (with no parameters) that expresses the method we want to set a behavior on.</param>
+            <returns>A <seealso cref="T:TypeMock.ArrangeActAssert.IPublicNonVoidMethodHandler`1"/> interface reference.</returns>
+            <remarks>
+            Because of the nature of fluent interface, <c>WhenCalled</c> should be used with its proceeding methods.</remarks>
+            <example>
+            Here is an example how to use WhenCalled in order to return a value:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void FakeAnInstance_StubIncrementMethod()
+            {
+                RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                
+                // Change the return value of IntCall()
+                Isolate.WhenCalled(() =&gt; fake.IntCall()).WillReturn(10);
+            
+                Assert.AreEqual(10, fake.IntCall());
+            }
+            </code>
+            </example>
+            <seealso cref="T:TypeMock.ArrangeActAssert.IPublicNonVoidMethodHandler`1"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.Isolate.CleanUp">
+            <summary>
+            CleanUp should be called at the end of a test. It can be substituted with the <see cref="T:TypeMock.ArrangeActAssert.IsolatedAttribute"/>.
+            </summary>
+            <example>
+            Here is an example how to use CleanUp. The following test uses CleanUp:
+            <code>
+            [TestMethod]
+            public void FakeAnInstance_StubIncrementMethod()
+            {
+                RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                
+                // Increment call will be ignored (stubbed)
+                Isolate.WhenCalled(() =&gt; fake.IntCall()).WillReturn(10);
+            
+                Assert.AreEqual(10, fake.IntCall());
+                Isolate.CleanUp();
+            }
+            </code>
+            
+            The following test uses IsolatedAttribute and similar in functionality: 
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void FakeAnInstance_StubIncrementMethod()
+            {
+                RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                
+                // Increment call will be ignored (stubbed)
+                Isolate.WhenCalled(() =&gt; fake.IntCall()).WillReturn(10);
+            
+                Assert.AreEqual(10, fake.IntCall());
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.Isolate.TypeMock#ArrangeActAssert#IHideObjectMethods#GetType">
+            <summary>
+            This is the entry point to all AAA APIs. 
+            Use it to fake, swap, set method behavior and verify calls.
+            The Isolate APIs use fluent interfaces, thus 
+            </summary>
+        </member>
+        <member name="P:TypeMock.ArrangeActAssert.Isolate.Swap">
+             <summary>
+             A read-only property, used to swap objects and behaviors
+             </summary>
+             <returns>
+             An <see cref="T:TypeMock.ArrangeActAssert.ISwapper"/> interface reference.
+             </returns>
+             <remarks>
+             Because of the nature of fluent interface, you need to use Swap with one of its proceeding methods - 
+             see <see cref="T:TypeMock.ArrangeActAssert.ISwapper"/> for details.
+             </remarks>
+             <example>
+             This example shows how to use Isolate.Swap.<see cref="M:TypeMock.ArrangeActAssert.ISwapper.NextInstance``1"/>.<see cref="M:TypeMock.ArrangeActAssert.IFutureSwapper`1.With(`0)"/> in order to fake a future instance:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void SwapAFutureInstance_StubIncrementMethod()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                 Isolate.Swap.NextInstance&lt;RealLogger&gt;().With(fake);
+            
+                 Isolate.WhenCalled(() =&gt; fake.Increment()).IgnoreCall();
+             
+                 // This object is swapped with the fake
+                 RealLogger logger = new RealLogger();
+             
+                 // Make sure Count is reset
+                 logger.Count = 0;
+             
+                 // This call is faked - count should not increment
+                 logger.Increment();
+            
+                 Assert.AreEqual(0, logger.Count);
+             }
+             </code>
+             This example shows how to use Isolate.Swap.<see cref="M:TypeMock.ArrangeActAssert.ISwapper.CallsOn(System.Object)"/>.<see cref="M:TypeMock.ArrangeActAssert.IDynamicSwapper.WithCallsTo(System.Object)"/> in order to 
+             redirect calls from an object to a stand-in object:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void SwapCallsOnObject_CallsRedirectedToTargetObject()
+             {
+                 // Create the object under test
+                 RealLogger logger = new RealLogger();
+                 // Create the object calls will be redirected to
+                 TestLogger swapped = new TestLogger();
+             
+                 // Redirect any calls from the object under test to the swapping target
+                 Isolate.Swap.CallsOn(logger).WithCallsTo(swapped);
+             
+                 // logger.Write() is redirected to TestLogger.Write() which writes to console instead of disk
+                 logger.Write("Hello World");
+             
+                 // We can still verify the call to logger.Write() happened
+                 Isolate.Verify.WasCalledWithAnyArguments(() =&gt; logger.Write(""));
+             }
+             
+             // excerpt code for the class under test:
+             public class RealLogger
+             {
+                 string logFilePath = ...;
+                 public void Write(string toWrite)
+                 {
+                     logFile.WriteAllText(logFilePath, toWrite);
+                 }
+             }
+             
+             // excerpt code for the replacement class:
+             public class TestLogger
+             {
+                 public void Write(string toWrite)
+                 {
+                     Console.WriteLine("RealLogger.Write() was called with {0}", toWrite);
+                 }
+             }
+             </code>
+             </example>
+        </member>
+        <member name="P:TypeMock.ArrangeActAssert.Isolate.Fake">
+             <summary>
+             A read-only property, used to fake a new object.
+             </summary>
+             <returns>
+             An <see cref="T:TypeMock.ArrangeActAssert.IFaker"/> interface reference.
+             </returns>
+             <remarks>
+             Because of the nature of fluent interface, you need to use Fake with its proceeding methods - 
+             see <see cref="T:TypeMock.ArrangeActAssert.IFaker"/> for details.
+             </remarks>
+             <example>
+             This example shows how to use Fake in order to fake a RealLogger instance:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_StubIncrementMethod()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                 
+                 // Increment call will be ignored (stubbed)
+                 Isolate.WhenCalled(() =&gt; fake.Increment()).IgnoreCall();
+             
+                 // Make sure Count is reset
+                 fake.Count = 0;
+             
+                 // This call is faked - count should not increment
+                 fake.Increment();
+            
+                 Assert.AreEqual(0, fake.Count);
+             }
+             </code>
+             </example>
+             <seealso cref="T:TypeMock.ArrangeActAssert.IFaker"/>
+        </member>
+        <member name="P:TypeMock.ArrangeActAssert.Isolate.NonPublic">
+             <summary>
+             A read-only property, used to fake non public members
+             </summary>
+             <returns>
+             An IIsolateNonPublic reference
+             </returns>
+             <remarks>
+             Because of the nature of fluent interface, you need to use NonPublic with one of its proceeding methods, see <see cref="T:TypeMock.ArrangeActAssert.IIsolateNonPublic"/>
+             <para>
+             When handling non public (private, protected, internal) class members all access to method names is string-based.
+             </para>
+             </remarks>
+             <example>
+             This example shows how to use NonPublic in order to set behavior on a private method:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void StubPrivateMethod()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                 
+                 // Avoid performing actual write to disk by ignoring (stubbing) a private call
+                 Isolate.NonPublic.WhenCalled(fake, "WriteToDisk").IgnoreCall();
+             
+                 // This call is faked - count should not increment
+                 fake.Log("Hello World");
+            
+                 Assert.AreEqual(1, fake.LineCount);
+                 // Verify the private call was actually made
+                 Isolate.Verify.NonPublic.WasCalled(fake, "WriteToDisk").WithArguments("Hello World");
+             }
+             </code>
+             </example>
+        </member>
+        <member name="P:TypeMock.ArrangeActAssert.Isolate.Verify">
+            <summary>
+            Return a verifying object that can verify calls were made or not, and check if their arguments were sent correctly.
+            </summary>
+            <returns>An ICallVerifier interface reference.</returns>
+            <remarks>
+            Because of the nature of fluent interface, you need to use Verify with one of its proceeding methods: 
+            <see cref="M:TypeMock.ArrangeActAssert.Verifier.WasCalledWithAnyArguments(System.Action)"/>, <see cref="M:TypeMock.ArrangeActAssert.Verifier.WasCalledWithExactArguments(System.Action)"/>, <see cref="M:TypeMock.ArrangeActAssert.Verifier.WasNotCalled(System.Action)"/>
+            and <see cref="P:TypeMock.ArrangeActAssert.IVerifyHandler.NonPublic"/> 
+            </remarks>
+            <example>
+            This example shows how to use Verify in order to check a method was called:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyStubWasCalled_FailWhenNotCalled()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+            
+               fake.Increment();
+            
+               Isolate.Verify.WasCalledWithAnyArguments(() =&gt; fake.Increment());
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.INonPublicVerifier">
+            <summary>
+            Returned by Isolate.Verify.<see cref="P:TypeMock.ArrangeActAssert.IVerifyHandler.NonPublic"/>, this interface contains methods for verifying non
+            public (private, protected and internal) method, property and index calls, and checking argumentrs.
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicVerifier.WasCalled(System.Object,System.String)">
+            <summary>
+            Overloaded. Verifies that a non-public method has been called
+            </summary>
+            <param name="fake">The fake object to verify method behavior on</param>
+            <param name="methodName">The method to verify behavior for</param>
+            <returns> An <see cref="T:TypeMock.ArrangeActAssert.IArguments"/> interface reference, used to add argument checking</returns>
+            <remarks>
+            In order to perform additional argument checking as part of the verification, use the proceeding <see cref="M:TypeMock.ArrangeActAssert.IArguments.WithArguments(System.Object,System.Object[])"/>
+            method.
+            </remarks>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the method was not called.
+            </exception>
+            <example>
+            This example shows how to use Isolate.Verify.NonPublic in order to check a method was called:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyMethodWasCalled()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+            
+               fake.Write("Hello");
+            
+               // Verify the internal call to WriteToDisk() was performed with correct arguments
+               Isolate.Verify.NonPublic.WasCalled(fake, "WriteToDisk").WithArguments("Hello");
+            }
+            </code>
+            </example>
+            <seealso cref="M:TypeMock.ArrangeActAssert.IArguments.WithArguments(System.Object,System.Object[])"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicVerifier.WasCalled(System.Type,System.String)">
+            <summary>
+            Overloaded. Verifies that a non-public static method has been called
+            </summary>
+            <param name="type">The type to verify static method behavior on</param>
+            <param name="methodName">The method to verify behavior for</param>
+            <returns> An <see cref="T:TypeMock.ArrangeActAssert.IArguments"/> interface reference, used to add argument checking</returns>
+            <remarks>
+            In order to perform additional argument checking as part of the verification, use the proceeding <see cref="M:TypeMock.ArrangeActAssert.IArguments.WithArguments(System.Object,System.Object[])"/>
+            method.
+            </remarks>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the method was not called.
+            </exception>
+            <example>
+            This example shows how to use Isolate.Verify.NonPublic in order to check a static method was called:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyStaticMethodWasCalled()
+            {
+               Isolate.Fake.Instance&lt;LoggerFactory&gt;(Members.CallOriginal);
+            
+               RealLogger logger = LoggerFactory.GetLogger("logfile.txt", Access.ReadWrite);
+            
+               // Verify the call to internal method LoggerFactory.GetRealLogger() has been made
+               Isolate.Verify.NonPublic.WasNotCalled(typeof(LoggerFactory), "GetRealLogger").
+                    WithArguments("logfile.txt", Access.ReadWrite); 
+            }
+            </code>
+            </example>
+            <seealso cref="M:TypeMock.ArrangeActAssert.IArguments.WithArguments(System.Object,System.Object[])"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicVerifier.WasNotCalled(System.Object,System.String)">
+            <summary>
+            Overloaded. Verifies that a non-public method was not called regardless of parameters.
+            </summary>
+            <param name="fake">The fake object to verify method behavior on</param>
+            <param name="methodName">The method to verify behavior for</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the method was called at least once.
+            </exception>
+            <example>
+            This example shows how to use Isolate.Verify.NonPublic in order to check a method was not called 
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyMethodWasNotCalled()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+            
+               fake.Write("Hello world!");
+            
+               // The logger write was called, so an internal WriteToDisk() was performed - 
+               // this verification should fail
+               Isolate.Verify.NonPublic.WasNotCalled(fake, "WriteToDisk"); 
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicVerifier.WasNotCalled(System.Type,System.String)">
+            <summary>
+            Overloaded. Verifies that a non-public static method was not called regardless of parameters.
+            </summary>
+            <param name="type">The type to verify static method behavior on</param>
+            <param name="methodName">The method to verify behavior for</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the method was called at least once.
+            </exception>
+            <example>
+            This example shows how to use Isolate.Verify.NonPublic in order to check a method was not called 
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyMethodWasNotCalled()
+            {
+               Isolate.Fake.Instance&lt;LoggerFactory&gt;(Members.CallOriginal);
+            
+               RealLogger logger = LoggerFactory.GetLogger();
+            
+               // We retrieved a RealLogger and an internal call to GetRealLogger() was made - 
+               // this verification should fail
+               Isolate.Verify.NonPublic.WasNotCalled(typeof(LoggerFactory), "GetRealLogger"); 
+            }
+            </code>
+            </example>
+        </member>
+        <member name="P:TypeMock.ArrangeActAssert.INonPublicVerifier.Property">
+            <summary>
+            A read only property, used to verify calls on non-public properties
+            </summary>
+            <returns>
+            An <see cref="T:TypeMock.ArrangeActAssert.INonPublicPropertyVerifier"/> reference
+            </returns>
+            <remarks>
+            Because of the nature of fluent interface, you need to use Property with one of its proceeding methods, see <see cref="T:TypeMock.ArrangeActAssert.INonPublicPropertyVerifier"/>.
+            <para>
+            When handling non public (private, protected, internal) properties all access to property names is string-based.
+            </para>
+            </remarks>
+            <example>
+            This example shows how to use Isolate.NonPublic.Property in order to verify the behavior of a private property getter:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyPropertyWasCalled()
+            {
+                RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+                
+                fake.Log("Hello World");
+            
+                // Verify an internal disk space check was performed
+                Isolate.Verify.NonPublic.Property.WasCalledGet(fake, "IsDiskFull");
+            }
+            </code>
+            </example>
+            <seealso cref="T:TypeMock.ArrangeActAssert.INonPublicPropertyVerifier"/>
+        </member>
+        <member name="P:TypeMock.ArrangeActAssert.INonPublicVerifier.Indexer">
+            <summary>
+            A read only property, used to verify calls on non-public indexers
+            </summary>
+            <returns>
+            An <see cref="T:TypeMock.ArrangeActAssert.IIndexerVerifier"/> reference
+            </returns>
+            <remarks>
+            Because of the nature of fluent interface, you need to use Indexer with one of its proceeding methods, see <see cref="T:TypeMock.ArrangeActAssert.IIndexerVerifier"/>.
+            </remarks>
+            <example>
+            This example shows how to use Isolate.NonPublic.Indexer in order to verify behavior on a private index setter:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyIndexSetterWasCalled()
+            {
+                LogFile fake = Isolate.Fake.Instance&lt;LogFile&gt;(Members.CallOriginal);
+                
+                fake.Write("Hello");
+            
+                // Verify a set call to the LogFile's internal indexer was made
+                Isolate.Verify.NonPublic.Indexer.WasSetCalled(fake);
+            }
+            </code>
+            </example>
+            <seealso cref="T:TypeMock.ArrangeActAssert.IIndexerVerifier"/>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.INonPublicPropertyRecorder">
+            <summary>
+            Returned by Isolate.NonPublic.<seealso cref="P:TypeMock.ArrangeActAssert.IIsolateNonPublic.Property"/>, this interface contains methods for faking and setting 
+            behavior for non-public (private, protected and internal) property get and set calls
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicPropertyRecorder.WhenGetCalled(System.Object,System.String)">
+            <summary>
+            Sets specific behavior for a non-public property getter on an object
+            </summary>
+            <param name="fake">The object to set property behavior for.</param>
+            <param name="propertyName">The name of a property to set behavior on.</param>
+            <returns>An <seealso cref="T:TypeMock.ArrangeActAssert.IReturnValueHandler`1"/> interface reference.</returns>
+            <remarks>
+            Because of the nature of fluent interface, <c>Property.WhenGetCalled</c> should be used with its proceeding methods. 
+            See <see cref="T:TypeMock.ArrangeActAssert.IReturnValueHandler`1"/>.</remarks>
+            <example>
+            Here is an example how to use Property.WhenGetCalled in order to set return value on a private property:
+            <code>
+            [TestMethod]
+            [Isolated]
+            [ExpectedExcetion(typeof(OutOfDiskSpaceException))]
+            public void ChangePrivatePropertyReturnValue_SimulateDiskError()
+            {
+                RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                
+                // Set the behavior on the internal IsDiskFull property to true
+                Isolate.NonPublic.Property.WhenGetCalled(fake, "IsDiskFull").WillReturn(true);
+            
+                // The fake object checks the disk is full before logging and throws an exception
+                fake.Log("Hello World");
+            }
+            
+            // Excerpt from class under test
+            public class RealLogger : ILogger
+            {
+                private string fileName;
+                // method under test
+                public override void Log(string message)
+                {
+                    if(IsDiskFull)
+                    {
+                        throw new OutOfDiskSpaceException();
+                    }
+                    
+                    AppendToFile(fileName, message);
+                }
+            
+                private bool IsDiskFull
+                {
+                    get { return ...; }
+                }
+            }
+            </code>
+            </example>
+            <seealso cref="T:TypeMock.ArrangeActAssert.IReturnValueHandler`1"/>
+            <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.Instance``1(TypeMock.ArrangeActAssert.Members)"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicPropertyRecorder.WhenGetCalled(System.Type,System.String)">
+            <summary>
+            Sets specific behavior for a non-public static property getter for a class type
+            </summary>
+            <param name="type">The type to set static property getter behavior on. Applies to static methods.</param>
+            <param name="propertyName">The name of a property to set behavior on.</param>
+            <returns>An <seealso cref="T:TypeMock.ArrangeActAssert.IReturnValueHandler`1"/> interface reference.</returns>
+            <remarks>
+            Because of the nature of fluent interface, <c>Property.WhenGetCalled</c> should be used with its proceeding methods. 
+            See <see cref="T:TypeMock.ArrangeActAssert.IReturnValueHandler`1"/>.</remarks>
+            <example>
+            Here is an example how to use Property.WhenGetCalled in order to set return value on a private property:
+            <code>
+            [TestMethod]
+            [Isolated]
+            [ExpectedException(typeof(OutOfDiskSpaceException))]
+            public void ChangePrivatePropertyReturnValue_SimulateDiskError()
+            {
+                Isolate.Fake.StaticMethods&lt;RealLogger&gt;();
+                
+                // Set the behavior on the internal IsDiskFull property to true
+                Isolate.NonPublic.Property.WhenGetCalled(typeof(RealLogger), "IsDiskFull").WillReturn(true);
+            
+                RealLogger logger = new RealLogger();
+                
+                // The logger object calls the static property to find out if the disk is full before logging and throws an exception
+                logger.Log("Hello World");
+            }
+            
+            // Excerpt from class under test
+            public class RealLogger : ILogger
+            {
+                private string fileName;
+                // method under test
+                public static override void Log(string message)
+                {
+                    if(IsDiskFull)
+                    {
+                        throw new OutOfDiskSpaceException();
+                    }
+                    
+                    AppendToFile(fileName, message);
+                }
+            
+                private static bool IsDiskFull
+                {
+                    get { return ...; }
+                }
+            }
+            </code>
+            </example>
+            <seealso cref="T:TypeMock.ArrangeActAssert.IVoidActionHandler"/>
+            <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.StaticMethods``1(TypeMock.ArrangeActAssert.Members)"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicPropertyRecorder.WhenSetCalled(System.Object,System.String)">
+            <summary>
+            Sets specific behavior for a non-public property setter on an object
+            </summary>
+            <param name="fake">The object to set property behavior for.</param>
+            <param name="propertyName">The name of a property to set behavior on.</param>
+            <returns>An <seealso cref="T:TypeMock.ArrangeActAssert.IReturnValueHandler`1"/> interface reference.</returns>
+            <remarks>
+            Because of the nature of fluent interface, <c>Property.WhenSetCalled</c> should be used with its proceeding methods. 
+            See <see cref="T:TypeMock.ArrangeActAssert.IReturnValueHandler`1"/>.</remarks>
+            <example>
+            Here is an example how to use Property.WhenSetCalled in order to simulate an error by throwing an exception
+            on an internal property setter call:
+            <code>
+            [TestMethod]
+            [Isolated]
+            [ExpectedException(typeof(OutOfDiskSpaceException))]
+            public void ThrowExceptionFromPrivatePropertySetter_SimulateDiskError()
+            {
+                RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                
+                // Set the behavior of the internal CurrentLine property to throw an exception when set
+                Isolate.NonPublic.Property.WhenSetCalled(fake, "CurrentLine").WillThrow(new OutOfDiskSpaceException());
+            
+                // The object under test tries to log to its internal container and fails because of the exception we set
+                fake.Log("Hello World");
+            }
+            
+            // Excerpt from classes under test
+            public class RealLogger : ILogger
+            {
+                private string fileName;
+                // method under test
+                public static override void Log(string message)
+                {
+                    if(IsDiskFull)
+                    {
+                        throw new OutOfDiskSpaceException();
+                    }
+                    
+                    CurrentLine = message;
+                }
+            
+                private static bool IsDiskFull
+                {
+                    get { return ...; }
+                }
+            
+                internal string CurrentLine
+                {
+                    get { return current; }
+                    set { WriteToLogFile(value); current = value; }
+                }
+            }
+            </code>
+            </example>
+            <seealso cref="T:TypeMock.ArrangeActAssert.IVoidActionHandler"/>
+            <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.Instance``1(TypeMock.ArrangeActAssert.Members)"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicPropertyRecorder.WhenSetCalled(System.Type,System.String)">
+            <summary>
+            Sets specific behavior for a non-public static property setter for a class 
+            </summary>
+            <param name="type">The type to set static property setter behavior on. Applies to static methods.</param>
+            <param name="propertyName">The name of a property to set behavior on.</param>
+            <returns>An <seealso cref="T:TypeMock.ArrangeActAssert.IReturnValueHandler`1"/> interface reference.</returns>
+            <remarks>
+            Because of the nature of fluent interface, <c>Property.WhenSetCalled</c> should be used with its proceeding methods. 
+            See <see cref="T:TypeMock.ArrangeActAssert.IReturnValueHandler`1"/>.</remarks>
+            <example>
+            Here is an example how to use Property.WhenSetCalled in order to simulate an error by throwing an exception
+            on an internal property setter call:
+            <code>
+            [TestMethod]
+            [Isolated]
+            [ExpectedException(typeof(OutOfMemoryException))]
+            public void ThrowExceptionFromPrivatePropertySetter_SimulateMemoryFull()
+            {
+                Isolate.Fake.Instance&lt;LogContainer&gt;();
+                
+                // Set the behavior on the internal IsDiskFull property to true
+                Isolate.NonPublic.Property.WhenSetCalled(typeof(LogContainer), "Cache").WillThrow(new OutOfMemoryException());
+            
+                // The object under test tries to log using the LogContainer.Cache internal container and fails because of the exception we set
+                fake.Log("Hello World");
+            }
+            
+            // Excerpt from class under test:
+            public class LogContainer
+            {
+                public void Log(string message)
+                {
+                    LogContainer.Cache.Add(message);
+                    WriteToDisk(message);
+                }
+            }
+            </code>
+            </example>
+            <seealso cref="T:TypeMock.ArrangeActAssert.IVoidActionHandler"/>
+            <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.StaticMethods``1(TypeMock.ArrangeActAssert.Members)"/>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.ISwapper">
+            <summary>
+            Interface used for swapping between object method calls and collection values.
+            </summary>
+            <remarks>
+            This interface is returned by the Isolate.<see cref="P:TypeMock.ArrangeActAssert.Isolate.Swap"/> property.
+            </remarks>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.ISwapper.NextInstance``1">
+             <summary>
+             Return a swapping object, in order to swap a future instance of type T with an existing fake object.
+             </summary>
+             <returns>An <c>IFutureSwapper</c> interface refernce.</returns>
+             <remarks>
+             Because of the nature of fluent interface, you need to use NextInstance with its proceeding method <see cref="M:TypeMock.ArrangeActAssert.IFutureSwapper`1.With(`0)"/>
+             </remarks>
+             <example>
+             This example shows using NextInstance in order to fake a future instance:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void SwapAFutureInstance_StubIncrementMethod()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                 Isolate.Swap.NextInstance&lt;RealLogger&gt;().With(fake);
+            
+                 Isolate.WhenCalled(() =&gt; fake.Increment()).IgnoreCall();
+             
+                 // This object is swapped with the fake
+                 RealLogger logger = new RealLogger();
+             
+                 // Make sure Count is reset
+                 logger.Count = 0;
+             
+                 // This call is faked - count should not increment
+                 logger.Increment();
+            
+                 Assert.AreEqual(0, logger.Count);
+             }
+             </code>
+             </example>
+             <typeparam name="T">Type of instance to swap.</typeparam>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.ISwapper.CallsOn(System.Object)">
+            <summary>
+            Enables swapping one object's implementation with another. Followed by the completing statement 
+            <see cref="M:TypeMock.ArrangeActAssert.IDynamicSwapper.WithCallsTo(System.Object)"/>.
+            </summary>
+            <param name="toSwap">The object to swap implementation for</param>
+            <returns>An <see cref="T:TypeMock.ArrangeActAssert.IDynamicSwapper"/> interface reference. </returns>
+            <remarks>
+            When a method is called on the swapped object, it is replaced with a corresponding implementation (a method
+            with the same signature) on the swapping object. This means that the swapped object will start behaving like
+            the object it was swapped with for all methods they have in common.
+            </remarks>
+            <example>
+            This example shows how to use Isolate.Swap.<see cref="M:TypeMock.ArrangeActAssert.ISwapper.CallsOn(System.Object)"/>.<see cref="M:TypeMock.ArrangeActAssert.IDynamicSwapper.WithCallsTo(System.Object)"/> 
+            in order to redirect calls from an object to a stand-in object:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void SwapCallsOnObject_CallsRedirectedToTargetObject()
+            {
+                // Create the object under test
+                RealLogger logger = new RealLogger();
+                // Create the object calls will be redirected to
+                TestLogger swapped = new TestLogger();
+            
+                // Redirect any calls from the object under test to the swapping target
+                Isolate.Swap.CallsOn(logger).WithCallsTo(swapped);
+            
+                // logger.Write() is redirected to TestLogger.Write() which writes to console instead of disk
+                logger.Write("Hello World");
+            
+                // We can still verify the call to logger.Write() happened
+                Isolate.Verify.WasCalledWithAnyArguments(() =&gt; logger.Write(""));
+            }
+            
+            // excerpt code for the class under test:
+            public class RealLogger
+            {
+                string logFilePath = ...;
+                public void Write(string toWrite)
+                {
+                    logFile.WriteAllText(logFilePath, toWrite);
+                }
+            }
+            
+            // excerpt code for the replacement class:
+            public class TestLogger
+            {
+                public void Write(string toWrite)
+                {
+                    Console.WriteLine("RealLogger.Write() was called with {0}", toWrite);
+                }
+            }
+            </code>
+            </example>
+            <seealso cref="M:TypeMock.ArrangeActAssert.IDynamicSwapper.WithCallsTo(System.Object)"/>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.INonPublicPropertyVerifier">
+            <summary>
+            Returned by Isolate.Verify.NonPublic.<see cref="P:TypeMock.ArrangeActAssert.INonPublicVerifier.Property"/>, this interface contains methods for verifying non
+            public (private, protected and internal) properties
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicPropertyVerifier.WasCalledGet(System.Object,System.String)">
+            <summary>
+            Overloaded. Verifies that a non-public property getter has been called
+            </summary>
+            <param name="fake">The fake object to verify property behavior on</param>
+            <param name="propertyName">The non-public property to verify behavior for</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the property get was not called.
+            </exception>
+            <example>
+            This example shows how to use Isolate.Verify.NonPublic.Property in order to check a private property
+            get has been called:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyPropertyWasCalled()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+            
+               fake.Write("Hello");
+            
+               // Verify the private property IsDiskFull has been called
+               Isolate.Verify.NonPublic.Property.WasCalledGet(fake, "IsDiskFull");
+            }
+            
+            // Exceprt from class under test
+            public class RealLogger : ILogger
+            {
+                private string fileName;
+                public void override Write(string message)
+                {
+                    if(IsDiskFull)
+                    {
+                        throw new OutOfDiskSpaceException();
+                    }
+            
+                    WriteToFile(fileName, message);
+                }
+            
+                private bool IsDiskFull
+                {
+                    get { return ...; }
+                }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicPropertyVerifier.WasCalledGet(System.Type,System.String)">
+            <summary>
+            Overloaded. Verifies that a non-public static property getter has been called
+            </summary>
+            <param name="type">The type to verify static property get behavior on</param>
+            <param name="propertyName">The non-public property to verify behavior for</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the property get was not called.
+            </exception>
+            <example>
+            This example shows how to use Isolate.Verify.NonPublic in order to check a private property
+            get has been called:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyPropertyWasCalled()
+            {
+               Isolate.Fake.Instance&lt;LoggerFactory&gt;(Members.CallOriginal);
+            
+               RealLogger logger = LoggerFactory.GetLogger();
+            
+               // Verify the private property DoesLoggerExist has been called
+               Isolate.Verify.NonPublic.Property.WasCalledGet(typeof(LoggerFactory), "DoesLoggerExist");
+            }
+            
+            // Excerpt from class under test
+            public class LoggerFactory
+            {
+                private ILogger logger;
+                public ILogger GetLogger()
+                {
+                    if(!DoesLoggerExist)
+                    {
+                        logger = new RealLogger();
+                    }
+                
+                    return logger;
+                }
+            
+                private bool DoesLoggerExist
+                {
+                    get { return logger != null; }
+                }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicPropertyVerifier.WasCalledSet(System.Object,System.String)">
+            <summary>
+            Overloaded. Verifies that a non-public property setter has been called with a specific value
+            </summary>
+            <param name="fake">The fake object to verify property behavior on</param>
+            <param name="propertyName">The non-public property to verify behavior for</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the property set was not called or if it was called with a mismatching value.
+            </exception>
+            <remarks>
+            In order to specify the argument to verify use the proceeding method <see cref="M:TypeMock.ArrangeActAssert.IArgumentVerifier.WithArgument(System.Object)"/>.
+            </remarks>
+            <example>
+            This example shows how to use Isolate.Verify.NonPublic in order to check a private property
+            set has been called with a specific value:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyPropertyWasCalled_WithSpecificArgument()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+            
+               fake.Write("Hello");
+            
+               // Verify the private property LineCount has been set to 1
+               Isolate.Verify.NonPublic.Property.WasCalledSetWithExactArgument(fake, "LineCount").WithArgument(1);
+            }
+            
+            // Excerpt from class under test
+            public class RealLogger : ILogger
+            {
+                public void override Write(string message)
+                {
+                    LineCount = lineCount + 1;
+                    WriteToDisk(lineCount, message);
+                }
+            
+                private int lineCount;
+                internal int LineCount
+                { get; set; }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicPropertyVerifier.WasCalledSet(System.Type,System.String)">
+            <summary>
+            Overloaded. Verifies that a non-public static property setter has been called with a specific value
+            </summary>
+            <param name="type">The type to verify static property get behavior on</param>
+            <param name="propertyName">The non-public property to verify behavior for</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the property set was not called or if it was called with a mismatching value.
+            </exception>
+            <remarks>
+            In order to specify the argument to verify use the proceeding method <see cref="M:TypeMock.ArrangeActAssert.IArgumentVerifier.WithArgument(System.Object)"/>.
+            </remarks>
+            <example>
+            This example shows how to use Isolate.Verify.NonPublic in order to check a private static property
+            set has been called with a specific value:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyPropertyWasCalled_WithSpecificArgument()
+            {
+               Isolate.Fake.Instance&lt;LoggerFactory&gt;(Members.CallOriginal);
+            
+               RealLogger logger = LoggerFactory.GetLogger();
+            
+               // Verify the private property LoggerCount has been set to 1
+               Isolate.Verify.NonPublic.Property.WasCalledSetWithExactArgument(typeof(LoggerFactory), "LoggerCount").WithArgument(1);
+            }
+            
+            // Excerpt from class under test
+            public class LoggerFactory
+            {
+                public ILogger GetLogger()
+                {
+                    LoggerCount++;
+                    return ...;
+                }
+            
+                private static int loggerCount = 0;
+                protected static int LoggerCount
+                { get; set; }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicPropertyVerifier.WasNotCalledGet(System.Object,System.String)">
+            <summary>
+            Overloaded. Verifies that a non-public property get was not called regardless of parameters.
+            </summary>
+            <param name="fake">The fake object to verify property behavior on</param>
+            <param name="propertyName">The property to verify behavior for</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the property getter was called at least once.
+            </exception>
+            <example>
+            This example shows how to use Isolate.Verify.NonPublic.Property in order to check a property get was not called 
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyPropertyWasNotCalled()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+            
+               fake.Write("Hello world!");
+            
+               // The logger write was called, so an internal call to the IsDiskFull property was performed - 
+               // this verification should fail
+               Isolate.Verify.NonPublic.Property.WasNotCalledGet(fake, "IsDiskFull"); 
+            }
+            
+            
+            // Exceprt from class under test
+            public class RealLogger : ILogger
+            {
+                private string fileName;
+                public void override Write(string message)
+                {
+                    if(IsDiskFull)
+                    {
+                        throw new OutOfDiskSpaceException();
+                    }
+            
+                    WriteToFile(fileName, message);
+                }
+            
+                private bool IsDiskFull
+                {
+                    get { return ...; }
+                }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicPropertyVerifier.WasNotCalledGet(System.Type,System.String)">
+            <summary>
+            Overloaded. Verifies that a non-public static property get was not called regardless of parameters.
+            </summary>
+            <param name="type">The type to verify static property behavior on</param>
+            <param name="propertyName">The property to verify behavior for</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the property getter was called at least once.
+            </exception>
+            <example>
+            This example shows how to use Isolate.Verify.NonPublic.Property in order to check a property get was not called 
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyPropertyWasNotCalled()
+            {
+               Isolate.Fake.Instance&lt;LoggerFactory&gt;(Members.CallOriginal);
+            
+               RealLogger logger = LoggerFactory.GetLogger();
+            
+               // We retrieved a RealLogger and an internal call to LoggerFactory.LoggerInstance was made - 
+               // this verification should fail
+               Isolate.Verify.NonPublic.Property.WasNotCalledGet(typeof(LoggerFactory), "LoggerInstance"); 
+            }
+            
+            // Excerpt from class under test
+            public class LoggerFactory
+            {
+                public ILogger GetLogger()
+                {
+                    if(LoggerInstance == null)
+                    {
+                        LoggerInstance = new ...;
+                    }
+                    return LoggerInstance;
+                }
+                
+                protected ILogger LoggerInstance
+                {
+                    get { ... }
+                    set { ... }
+                }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicPropertyVerifier.WasNotCalledSet(System.Object,System.String)">
+            <summary>
+            Overloaded. Verifies that a non-public property set was not called regardless of parameters.
+            </summary>
+            <param name="fake">The fake object to verify property behavior on</param>
+            <param name="propertyName">The property to verify behavior for</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the property setter was called at least once.
+            </exception>
+            <example>
+            This example shows how to use Isolate.Verify.NonPublic.Property in order to check a property set was not called 
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyPropertyWasNotCalled()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+            
+               fake.Write("Hello world!");
+            
+               // The logger write was called, so internal property LineCount was updated - 
+               // this verification should fail
+               Isolate.Verify.NonPublic.Property.WasNotCalledSet(fake, "LineCount"); 
+            }
+            
+            // Excerpt from class under test
+            public class RealLogger : ILogger
+            {
+                public void override Write(string message)
+                {
+                    LineCount = lineCount + 1;
+                    WriteToDisk(lineCount, message);
+                }
+            
+                private int lineCount;
+                internal int LineCount
+                { get; set; }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicPropertyVerifier.WasNotCalledSet(System.Type,System.String)">
+            <summary>
+            Overloaded. Verifies that a non-public static property set was not called regardless of parameters.
+            </summary>
+            <param name="type">The type to verify static property behavior on</param>
+            <param name="propertyName">The property to verify behavior for</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the property setter was called at least once.
+            </exception>
+            <example>
+            This example shows how to use Isolate.Verify.NonPublic.Property in order to check a property set was not called 
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyPropertyWasNotCalled()
+            {
+               Isolate.Fake.Instance&lt;LoggerFactory&gt;(Members.CallOriginal);
+            
+               RealLogger logger = LoggerFactory.GetLogger();
+            
+               // We created a RealLogger and an internal property LoggerFactory.LoggerCount was updated - 
+               // this verification should fail
+               Isolate.Verify.NonPublic.Property.WasNotCalledSet(typeof(LoggerFactory), "LoggerCount"); 
+            }
+            
+            // Excerpt from class under test
+            public class LoggerFactory
+            {
+                public ILogger GetLogger()
+                {
+                    LoggerCount++;
+                    return ...;
+                }
+            
+                private static int loggerCount = 0;
+                protected static int LoggerCount
+                { get; set; }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IArguments">
+            <summary>
+            Returned by Isolate.Verify.<see cref="M:TypeMock.ArrangeActAssert.INonPublicVerifier.WasCalled(System.Object,System.String)"/>, this interface is used to verify
+            the call was made with specific arguments 
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IArguments.WithArguments(System.Object,System.Object[])">
+            <summary>
+            Verify the call was made with the specified arguments
+            </summary>
+            <param name="argument">Mandatory. The first argument to verify.</param>
+            <param name="additionalArguments">Optional. Additional arguments to verify.</param>
+            <remarks>
+            <para>
+            This method is used to complement verifying calls, using 
+            Isolate.Verify.NonPublic.<see cref="M:TypeMock.ArrangeActAssert.INonPublicVerifier.WasCalled(System.Object,System.String)"/>, with specific argument verification.
+            </para>
+            <para>
+            All expected call arguments must be passed to this method in order for verification to be performed.
+            </para>
+            </remarks>
+            <exception cref="T:TypeMock.VerifyException">Thrown if the call was made with mismatching arguments</exception>
+            <example>
+            This example shows how to use Isolate.Verify.NonPublic in order to check a method was called with specific arguments:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyMethodWasCalled()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+            
+               fake.Write("Hello");
+            
+               // Verify the internal call to WriteToDisk() was performed with correct arguments
+               Isolate.Verify.NonPublic.WasCalled(fake, "WriteToDisk").WithArguments("Hello");
+            }
+            
+            // Excerpt from class under test
+            public class RealLogger : ILogger
+            {
+                public void override Write(string message)
+                {
+                    WriteToDisk(message);
+                }
+            
+                private void WriteToDisk(string content)
+                { ... }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IArgumentVerifier">
+            <summary>
+            Returned by Isolate.Verify.Property.<see cref="M:TypeMock.ArrangeActAssert.INonPublicPropertyVerifier.WasCalledSet(System.Object,System.String)"/> and 
+            Isolate.Verify.<see cref="M:TypeMock.ArrangeActAssert.INonPublicVerifier.WasCalled(System.Type,System.String)"/>, this interface is used to verify
+            a property setter call was made with the correct argument
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IArgumentVerifier.WithArgument(System.Object)">
+            <summary>
+            Verify the property set call was made with the specified argument
+            </summary>
+            <param name="argument">The property set value to verify.</param>
+            <remarks>
+            This method is used to complement verifying property set, using 
+            Isolate.Verify.NonPublic.Property.<see cref="M:TypeMock.ArrangeActAssert.INonPublicPropertyVerifier.WasCalledSet(System.Object,System.String)"/>, 
+            with specific argument verification.
+            </remarks>
+            <exception cref="T:TypeMock.VerifyException">Thrown if the property set call was made with a mismatching argument</exception>
+            <example>
+            This example shows how to use Isolate.Verify.NonPublic in order to check a private property
+            set has been called with a specific value:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyPropertyWasCalled_WithSpecificArgument()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+            
+               fake.Write("Hello");
+            
+               // Verify the private property LineCount has been set to 1
+               Isolate.Verify.NonPublic.Property.WasCalledSetWithExactArgument(fake, "LineCount").WithArgument(1);
+            }
+            
+            // Excerpt from class under test
+            public class RealLogger : ILogger
+            {
+                public override void Write(string message)
+                {
+                    LineCount++;
+                    WriteToDisk...;
+                }
+            
+                private int lineCount;
+                internal int LineCount
+                { get; set; }
+                
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IIndexerVerifier">
+            <summary>
+            Returned by Isolate.Verify.<see cref="P:TypeMock.ArrangeActAssert.INonPublicVerifier.Indexer"/>, this interface contains methods for verifying non
+            public (private, protected and internal) index calls.
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IIndexerVerifier.WasCalledGet(System.Object)">
+            <summary>
+            Verify a call has been made to a non-private index getter
+            </summary>
+            <returns>
+            An <see cref="T:TypeMock.ArrangeActAssert.IIndexerGetVerifier"/> reference
+            </returns>
+            <param name="fake">The fake object to verify index behavior on</param>
+            <remarks>
+            In order to verify the index getter has been called at a specific index location, use the proceeding method 
+            <see cref="M:TypeMock.ArrangeActAssert.IIndexerGetVerifier.WithIndex``1(``0)"/>.
+            </remarks>
+            <example>
+            This example shows how to use Isolate.NonPublic.Indexer.WasCalledGet() in order to verify behavior on a private index setter:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyIndexGetterWasCalled()
+            {
+                LogFile fake = Isolate.Fake.Instance&lt;LogFile&gt;(Members.CallOriginal);
+                
+                string line = fake.GetLineAt(10);
+            
+                // Verify a get call to the LogFile's internal indexer was made
+                Isolate.Verify.NonPublic.Indexer.WasGetCalled(fake).WithIndex(10);
+            }
+            
+            // Excerpt from class under test
+            public class LogFile
+            {
+                public string GetLineAt(int lineNumber)
+                {
+                    return this[lineNumber];
+                }
+                
+                protected string this[int line]
+                {
+                    get { return ...; }
+                }
+            }
+            </code>
+            </example>
+            <seealso cref="M:TypeMock.ArrangeActAssert.IIndexerGetVerifier.WithIndex``1(``0)"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IIndexerVerifier.WasCalledSet(System.Object)">
+             <summary>
+             Verify a call has been made to a non-private index setter
+             </summary>
+             <returns>
+             An <see cref="T:TypeMock.ArrangeActAssert.IIndexerGetVerifier"/> reference
+             </returns>
+             <param name="fake">The fake object to verify index behavior on</param>
+             <remarks>
+             In order to verify the index getter has been called at a specific index location and value, use the proceeding method 
+             <see cref="M:TypeMock.ArrangeActAssert.IIndexerSetVerifier.WithIndexAndValue``2(``0,``1)"/>.
+             </remarks>
+             <example>
+             This example shows how to use Isolate.NonPublic.Indexer.WasCalledSet() in 
+             order to verify behavior on a private index setter:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void VerifyIndexSetterWasCalled()
+             {
+                 LogFile fake = Isolate.Fake.Instance&lt;LogFile&gt;(Members.CallOriginal);
+            
+                 // set the position to write at - this will be used for internal index value
+                 fake.SetPosition(10);
+                 fake.Write("Hello World");
+             
+                 // Verify a set call to the LogFile's internal indexer was made at the correct index
+                 Isolate.Verify.NonPublic.Indexer.WasSetCalled(fake).WithIndexAndValue(10, "Hello World");
+             }
+             
+             // Excerpt from class under test
+             public class LogFile
+             {
+                 private int currentPosition = 0;
+                 public void Write(string message)
+                 {
+                     this[currentPosition] = message;
+                 }
+             
+                 public void SetPosition(int value)
+                 {
+                     currentPosition = value;
+                 }
+                 
+                 protected string this[int line]
+                 {
+                     set { WriteToFile(line, value); }
+                 }
+             }
+             </code>
+             </example>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IIndexerSetVerifier.WithIndexAndValue``2(``0,``1)"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IIndexerVerifier.WasNotCalledGet(System.Object)">
+             <summary>
+             Verify a call has not been made to a non-private index getter
+             </summary>
+             <param name="fake">The fake object to verify index behavior on</param>
+             <example>
+             This example shows how to use Isolate.NonPublic.Indexer.WasNotCalledGet() 
+             in order to verify a private index getter has not been called:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void VerifyIndexGetterWasNotCalled()
+             {
+                 LogFile fake = Isolate.Fake.Instance&lt;LogFile&gt;(Members.CallOriginal);
+            
+                 string line = fake.GetLineAt(10)
+             
+                 // The internal index was used to retrieve the log line - this verification should fail
+                 Isolate.Verify.NonPublic.Indexer.WasNotCalledGet(fake);
+             }
+             
+             
+             // Excerpt from class under test
+             public class LogFile
+             {
+                 public string GetLineAt(int lineNumber)
+                 {
+                     return this[lineNumber];
+                 }
+                 
+                 protected string this[int line]
+                 {
+                     get { return ...; }
+                 }
+             }
+             </code>
+             </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IIndexerVerifier.WasNotCalledSet(System.Object)">
+             <summary>
+             Verify a call has not been made to a non-private index setter
+             </summary>
+             <param name="fake">The fake object to verify index behavior on</param>
+             <example>
+             This example shows how to use Isolate.NonPublic.Indexer.WasNotCalledSet() 
+             in order to verify a private index getter has not been called:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void VerifyIndexSetterWasNotCalled()
+             {
+                 LogFile fake = Isolate.Fake.Instance&lt;LogFile&gt;(Members.CallOriginal);
+            
+                 // set the position to write at - this will be used for internal index value
+                 fake.SetPosition(10);
+                 fake.Write("Hello World");
+             
+                 // The internal index was set during the Write operation so this verification will fail
+                 Isolate.Verify.NonPublic.Indexer.WasNotCalledSet(fake);
+             }
+             
+             // Excerpt from class under test
+             public class LogFile
+             {
+                 private int currentPosition = 0;
+                 public void Write(string message)
+                 {
+                     this[currentPosition] = message;
+                 }
+             
+                 public void SetPosition(int value)
+                 {
+                     currentPosition = value;
+                 }
+                 
+                 protected string this[int line]
+                 {
+                     set { WriteToFile(line, value); }
+                 }
+             }
+             </code>
+             </example>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IIndexerGetVerifier">
+            <summary>
+            Returned by Isolate.Verify.<see cref="M:TypeMock.ArrangeActAssert.IIndexerVerifier.WasCalledGet(System.Object)"/>, this interface is used to verify an index
+            getter was called with a specific index.
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IIndexerGetVerifier.WithIndex``1(``0)">
+            <summary>
+            Verify the index getter was made with the specific index location
+            </summary>
+            <param name="index">The index location value to verify</param>
+            <typeparam name="T">The type of the index used. Can be inferred from <see cref="!:index"/></typeparam>
+            <remarks>
+            This method is used to complement verifying index getter calls, using 
+            Isolate.Verify.NonPublic.Indexer.<see cref="M:TypeMock.ArrangeActAssert.IIndexerVerifier.WasCalledGet(System.Object)"/>, with specific index location verification.
+            </remarks>
+            <example>
+            This example shows how to use Isolate.NonPublic.Indexer.WasCalledGet() in order to verify behavior on a private index setter:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyIndexGetterWasCalled()
+            {
+                LogFile fake = Isolate.Fake.Instance&lt;LogFile&gt;(Members.CallOriginal);
+                
+                string line = fake.GetLineAt(10);
+            
+                // Verify a get call to the LogFile's internal indexer was made
+                Isolate.Verify.NonPublic.Indexer.WasGetCalled(fake).WithIndex(10);
+            }
+            
+            // Excerpt from class under test
+            public class LogFile
+            {
+                public string GetLineAt(int index)
+                {
+                    return this[index];
+                }
+                
+                internal string this[int line]
+                {
+                    get { return GetFromLog(line); } 
+                }
+            }
+            </code>
+            </example>
+            <seealso cref="M:TypeMock.ArrangeActAssert.IIndexerVerifier.WasCalledGet(System.Object)"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IIndexerSetVerifier.WithIndexAndValue``2(``0,``1)">
+             <summary>
+             Verify the index setter was called with a specific index location and setter value
+             </summary>
+             <param name="index">The index location value to verify</param>
+             <param name="value">The setter value to verify</param>
+             <typeparam name="TIndex">The type of the index used. Can be inferred from <see cref="!:index"/></typeparam>
+             <typeparam name="TValue">The type of the setter value used. Can be inferred from <see cref="!:value"/></typeparam>
+             <remarks>
+             This method is used to complement verifying index setter calls, using 
+             Isolate.Verify.NonPublic.Indexer.<see cref="M:TypeMock.ArrangeActAssert.IIndexerVerifier.WasCalledSet(System.Object)"/>, with specific 
+             index location and value verification.
+             </remarks>
+             <example>
+             This example shows how to use Isolate.NonPublic.Indexer.WasCalledSet() in 
+             order to verify behavior on a private index setter:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void VerifyIndexSetterWasCalled()
+             {
+                 LogFile fake = Isolate.Fake.Instance&lt;LogFile&gt;(Members.CallOriginal);
+            
+                 // set the position to write at - this will be used for internal index value
+                 fake.SetPosition(10);
+                 fake.Write("Hello World");
+             
+                 // Verify a set call to the LogFile's internal indexer was made
+                 Isolate.Verify.NonPublic.Indexer.WasSetCalled(fake).WithIndexAndValue(10, "Hello World");
+             }
+             
+             // Excerpt from class under test
+             public class LogFile
+             {
+                 private int currentPosition = 0;
+                 public void Write(string message)
+                 {
+                     this[currentPosition] = message;
+                 }
+             
+                 public void SetPosition(int value)
+                 {
+                     currentPosition = value;
+                 }
+                 
+                 protected string this[int line]
+                 {
+                     set { WriteToFile(line, value); }
+                 }
+             }
+             </code>
+             </example>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IIndexerSetVerifier.WithIndexAndValue``2(``0,``1)"/>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.INonPublicMethodHandler">
+            <summary>
+            Returned by Isolate.NonPublic.<see cref="M:TypeMock.ArrangeActAssert.IIsolateNonPublic.WhenCalled(System.Object,System.String)"/>, this interface 
+            contains methods for defining behavior for non public methods, as will as a modifier for applying behavior for
+            generic methods
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicMethodHandler.WithGenericArguments(System.Type,System.Type[])">
+             <summary>
+             Specifies generic type arguments that apply to a non-public method to set behavior on. The behavior will 
+             be set only for a method bound to the passed type arguments
+             </summary>
+             <param name="genericType">The first generic type argument the method binds to</param>
+             <param name="additionalGenericTypes">Optional. Further generic type arguments the method binds to.</param>
+             <returns>an INonPublicMethodBehavior interface reference</returns>
+             <remarks>
+             WithGenericArguments() modifies a call to Isolate.NonPublic.<see cref="M:TypeMock.ArrangeActAssert.IIsolateNonPublic.WhenCalled(System.Object,System.String)"/>.
+             Due to the fluent nature of the AAA API it should be used with its proceeding methods; see <see cref="T:TypeMock.ArrangeActAssert.INonPublicMethodBehavior"/>.
+             </remarks>
+             <example>
+             Here is an example how to use WhenCalled with WithGenericArguments in order to simulate an error creating
+             a factory generated object:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void ThrowExceptionFromGenericMethod_SimulateErrorCreatingLogger()
+             {
+                 LoggerFactory fake = Isolate.Fake.Instance&lt;LoggerFactory&gt;();
+                 
+                 // Set the logger factory to throw an exception when trying to retrieve a RealLogger
+                 Isolate.NonPublic.WhenCalled(fake, "GetLogger").
+                     WithGenericArguments(typeof(RealLogger)).
+                     WillThrow(new ArgumentNullException());
+             
+                 // The following method call is not faked because it does not match the specified generic 
+                 // type arguments - no exception is thrown
+                 DiskLogger logger = fake.GetLogger&lt;DiskLogger&gt;();
+            
+                 // This call will throws an exception as specified
+                 try 
+                 {
+                     fake.GetLogger&lt;RealLogger&gt;();
+                     Assert.Fail("Retrieving a RealLogger should have failed with an ArgumentNullException");
+                 }
+                 catch(ArgumentNullException)
+                 {
+                 }
+             }
+             </code>
+             </example>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IsolatedAttribute">
+            <summary> Used to clean up the defined expectations. This attribute cant be inherited.</summary>
+            <remarks>Any method marks with this attribute will clean all set expectation
+            after the test is done. A marked class will do this for any test defined in
+            it. The attribute can be replaced with the <seealso cref="M:TypeMock.ArrangeActAssert.Isolate.CleanUp"/> method.</remarks>
+            <example>
+            <code lang="cs">
+            [TestFixture]
+            [Isolated]  // clear all mocks between tests
+            public TestClass
+            {
+                [Test]
+                public void MyTest1()
+                {
+                    // the test code
+                }
+            }</code>
+            
+            <code lang="vbnet">
+            &lt; TestFixture &gt;_
+            &lt; Isolated &gt;_ ' clear all mocks between tests
+            Public class TestClass
+                &lt; Test &gt;_
+                Public Sub MyTest1()
+                   ' the test code
+                End Sub
+            End Class
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IsolatedAttribute.Execute">
+            <summary>
+            Called by the framework instead of the original method. This will run the original method and 
+            afterwards clear the MockManager.
+            </summary>
+            <returns> the result of the original method</returns>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IIsolateNonPublic">
+            <summary>
+            Returned by <seealso cref="P:TypeMock.ArrangeActAssert.Isolate.NonPublic"/>, this interface contains methods for faking and setting 
+            behavior for method calls on non public methods, properties and indexers.
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IIsolateNonPublic.WhenCalled(System.Object,System.String)">
+             <summary>
+             Sets behavior for a specific method on a an object
+             </summary>
+             <param name="fakeObject">The object to set method behavior on.</param>
+             <param name="methodName">The name of a method to set behavior on.</param>
+             <returns>An <seealso cref="T:TypeMock.ArrangeActAssert.INonPublicMethodHandler"/> interface reference.</returns>
+             <remarks>
+             Because of the nature of fluent interface, <c>WhenCalled</c> should be used with its proceeding methods. 
+             See <see cref="T:TypeMock.ArrangeActAssert.INonPublicMethodHandler"/></remarks>
+             <example>
+             Here is an example how to use WhenCalled in order to ignore (stub) a private call:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void StubPrivateMethod_DoNotWriteToDisk()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                 
+                 // Avoid performing actual write to disk by ignoring (stubbing) a private call
+                 Isolate.NonPublic.WhenCalled(fake, "WriteToDisk").IgnoreCall();
+             
+                 // The private call is stubbed so no actual disk writes are performed
+                 fake.Log("Hello World");
+            
+                 Assert.AreEqual(1, fake.LineCount);
+             }
+             </code>
+             </example>
+             <seealso cref="T:TypeMock.ArrangeActAssert.INonPublicMethodHandler"/>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.Instance``1(TypeMock.ArrangeActAssert.Members)"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IIsolateNonPublic.WhenCalled(System.Type,System.String)">
+             <summary>
+             Sets behavior for a specific static method on a class
+             </summary>
+             <param name="type">The type to set method behavior on. Applies to static methods.</param>
+             <param name="methodName">The name of a static method to set behavior on.</param>
+             <returns>An <seealso cref="T:TypeMock.ArrangeActAssert.INonPublicMethodHandler"/> interface reference.</returns>
+             <remarks>
+             Because of the nature of fluent interface, <c>WhenCalled</c> should be used with its proceeding methods. 
+             See <see cref="T:TypeMock.ArrangeActAssert.INonPublicMethodHandler"/></remarks>
+             <example>
+             Here is an example how to use WhenCalled in order to ignore (stub) a private call:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void StubPrivateStaticMethod_FactoryCreate()
+             {
+                 Isolate.Fake.StaticMethods&lt;LoggerFactory&gt;();
+                 
+                 // Avoid performing to network access by ignoring (stubbing) a private call
+                 Isolate.NonPublic.WhenCalled(typeof(LoggerFactory), "ReportToControllerServer").IgnoreCall();
+             
+                 // The private method is stubbed and the unit test will not perform external calls
+                 RealLogger logger = LoggerFactory.CreateLogger();
+            
+                 Assert.IsNotNull(logger);
+             }
+             </code>
+             </example>
+             <seealso cref="T:TypeMock.ArrangeActAssert.INonPublicMethodHandler"/>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.StaticMethods``1(TypeMock.ArrangeActAssert.Members)"/>
+        </member>
+        <member name="P:TypeMock.ArrangeActAssert.IIsolateNonPublic.Property">
+            <summary>
+            A read only property, used to set behavior on non-public properties
+            </summary>
+            <returns>
+            An <see cref="T:TypeMock.ArrangeActAssert.INonPublicPropertyRecorder"/> reference
+            </returns>
+            <remarks>
+            Because of the nature of fluent interface, you need to use Property with one of its proceeding methods, see <see cref="T:TypeMock.ArrangeActAssert.INonPublicPropertyRecorder"/>.
+            <para>
+            When handling non public (private, protected, internal) properties all access to property names is string-based.
+            </para>
+            </remarks>
+            <example>
+            This example shows how to use Isolate.NonPublic.Property in order to set behavior on a private property getter:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void SetPrivatePropertyBehavior_ChangeReturnValue()
+            {
+                RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+                
+                // have private RealLogger.IsDiskFull property return true to simulate an error
+                Isolate.NonPublic.Property.WhenCalledGet(fake, "IsDiskFull").WillReturn(true);
+            
+                // Because we simulated a disk full error, this call should throw an exception
+                try
+                {
+                    fake.Log("Hello World");
+                    Assert.Fail("fake.Log() should have thrown because IsDiskFull is true");
+                }
+                catch(OutOfDiskSpaceException)
+                {
+                }
+            }
+            </code>
+            </example>
+            <seealso cref="T:TypeMock.ArrangeActAssert.INonPublicPropertyRecorder"/>
+        </member>
+        <member name="P:TypeMock.ArrangeActAssert.IIsolateNonPublic.Indexer">
+            <summary>
+            A read only property, used to set behavior on non-public indexers
+            </summary>
+            <returns>
+            An <see cref="T:TypeMock.ArrangeActAssert.INonPublicIndexerRecorder"/> reference
+            </returns>
+            <remarks>
+            Because of the nature of fluent interface, you need to use Indexer with one of its proceeding methods, see <see cref="T:TypeMock.ArrangeActAssert.INonPublicIndexerRecorder"/>.
+            </remarks>
+            <example>
+            This example shows how to use Isolate.NonPublic.Indexer in order to set behavior on a private index getter:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void SetPrivateIndexBehavior_ChangeReturnValue()
+            {
+                LogFile fake = Isolate.Fake.Instance&lt;LogFile&gt;(Members.CallOriginal);
+                
+                // have private LogFile[i] index return a specified log line
+                Isolate.NonPublic.Indexer.WhenCalledGet(fake).WillReturn("Info: this is a test log line");
+            
+                // We set the value of the next log line the internal implementation will look at
+                Assert.AreEqual("this is a test log line", fake.GetNextLogLine(Level.Info));
+            }
+            </code>
+            </example>
+            <seealso cref="T:TypeMock.ArrangeActAssert.INonPublicIndexerRecorder"/>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.INonPublicIndexerRecorder">
+            <summary>
+            Returned by Isolate.NonPublic.<seealso cref="P:TypeMock.ArrangeActAssert.IIsolateNonPublic.Indexer"/>, this interface contains methods for faking and setting 
+            behavior for non-public (private, protected and internal) index get and set calls
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicIndexerRecorder.WhenGetCalled(System.Object)">
+             <summary>
+             Sets specific behavior for a non-public index getter on a an object
+             </summary>
+             <param name="fake">The object to set indexer behavior for.</param>
+             <returns>An <seealso cref="T:TypeMock.ArrangeActAssert.IReturnValueHandler`1"/> interface reference.</returns>
+             <remarks>
+             Because of the nature of fluent interface, <c>WhenGetCalled</c> should be used with its proceeding methods. 
+             See <see cref="T:TypeMock.ArrangeActAssert.IReturnValueHandler`1"/>.</remarks>
+             <example>
+             Here is an example how to use Isolate.NonPublic.Indexer.WhenGetCalled() in order to set return value for an index call:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void ChangeIndexGetReturnValue()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;LogContainer&gt;();
+                 
+                 // Set the internal indexer to return a specific value
+                 Isolate.NonPublic.Indexer.WhenGetCalled(fake).WillReturn("hello");
+             
+                 // The object under test uses the private index get result as part of a calculation
+                 string result = fake.GetStringAt(10);
+                 Assert.AreEqual("hello", result);
+             }
+             
+             // Excerpt from class under test
+             public class LogContainer
+             {
+                 // method under test
+                 public string GetStringAt(int line)
+                 {
+                     return this[line];
+                 }
+            
+                 private string fileName = ...
+             
+                 // private indexer
+                 private string this[int line]
+                 {
+                     get { return ReadFromFile(fileName, line); }
+                 }
+             
+             }
+             </code>
+             </example>
+             <seealso cref="T:TypeMock.ArrangeActAssert.IReturnValueHandler`1"/>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.Instance``1(TypeMock.ArrangeActAssert.Members)"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.INonPublicIndexerRecorder.WhenSetCalled(System.Object)">
+             <summary>
+             Sets specific behavior for a non-public index set on a an object
+             </summary>
+             <param name="fake">The object to set indexer behavior for.</param>
+             <returns>An <seealso cref="T:TypeMock.ArrangeActAssert.IVoidActionHandler"/> interface reference.</returns>
+             <remarks>
+             Because of the nature of fluent interface, <c>WhenSetCalled</c> should be used with its proceeding methods. 
+             See <see cref="T:TypeMock.ArrangeActAssert.IVoidActionHandler"/>.</remarks>
+             <example>
+             Here is an example how to use Isolate.NonPublic.Indexer.WhenSetCalled() in order to simulate a memory error on index write access:
+             <code>
+             [TestMethod]
+             [Isolated]
+             [ExpectedException(typeof(OutOfMemoryException))
+             public void ThrowExceptionFromIndexSet_SimulateMemoryError()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;LogContainer&gt;();
+                 
+                 // Set the internal indexer to throw an exception on set
+                 Isolate.NonPublic.Indexer.WhenSetCalled(fake).WillThrow(new OutOfMemoryException());
+             
+                 // The object under test uses the private index setter when writing to log
+                 fake.WriteToLog("hello");
+             }
+             
+             // Excerpt from class under test
+             public class LogContainer
+             {
+                 // method under test
+                 public string WriteToLog(string message)
+                 {
+                     this[currentLine] = message;
+                     currentLine++;
+                 }
+            
+                 private string fileName = ...
+                 private int currentLine = 0;
+             
+                 // private indexer
+                 private string this[int line]
+                 {
+                     set { InternalWrite(fileName, line, value); }
+                 }
+             }
+             </code>
+             </example>
+             <seealso cref="T:TypeMock.ArrangeActAssert.IVoidActionHandler"/>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.Instance``1(TypeMock.ArrangeActAssert.Members)"/>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IFaker">
+            <summary>
+            Interface for specifying fake object creation settings. The interface is typed by the preceeding <c>Faker</c> property.
+            </summary>
+            <remarks>
+            This interface is returned by the <see cref="T:TypeMock.ArrangeActAssert.Faker"/> property.
+            </remarks>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IFaker.Instance``1">
+             <summary>
+             Overloaded. Returns a fake instance of type T. Using this overload is equal to using <c>Members.MustSpecifyReturnValues</c>.
+             </summary>
+             <typeparam name="T">The type of fake object to create.</typeparam>
+             <returns>A fake instance of type T.</returns>
+             <seealso cref="T:TypeMock.ArrangeActAssert.Members">Members Enum</seealso>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.StaticConstructor``1"/>
+             <example>
+             Here is an example how to use Instance in order to fake a RealLogger instance:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_StubIncrementMethod()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                 
+                 fake.Count = 0;
+             
+                 // This call is faked because we used the default Instance overload - count should not increment
+                 fake.Increment();
+            
+                 Assert.AreEqual(0, fake.Count);
+             }
+             </code>
+             </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IFaker.Instance``1(TypeMock.ArrangeActAssert.Members)">
+             <summary>
+             Overloaded. Returns a fake instance of type T.
+             </summary>
+             <remarks>
+             </remarks>
+             <typeparam name="T">The type of the fake instance to be created.</typeparam>
+             <param name="behavior">
+             Can be one of the following values:
+             <list type="table">
+             <listheader>
+             <term><c>Members</c> Value</term><description>Description</description></listheader>
+             <item>
+             <term><c>Members.MustSpecifyReturnValues</c></term>
+             <description>All void calls are ignored. Unless using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> on methods that return values and properties, they will throw a <seealso cref="T:TypeMock.TypeMockException"/>.
+             </description>
+             </item>
+             <item>
+             <term><c>Members.ReturnNulls</c></term>
+             <description>All void calls are ignored. Unless using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> on methods that return values and properties, they will return Null values (or zero for value types).
+             </description>
+             </item>
+             <item>
+             <term><c>Members.CallOriginal</c></term>
+             <description>All methods are called. Using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> allow to change this behavior.
+             </description>
+             </item>
+             <item>
+             <term><c>Members.ReturnRecursiveFakes</c></term>
+             <description>Default. All void calls are ignored. When calling the fake's methods returning values or properties, they will return a fake value, which presents this behavior recursively. Any deep call will never return a Null value.
+             </description>
+             </item>
+             </list>
+             </param>
+             <returns>A fake instance of Type T.</returns>
+             <seealso cref="T:TypeMock.TypeMockException"/>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.StaticConstructor``1"/>
+             <example>
+             The following test shows the faking an instance using Members.MustSpecifyReturnValue:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_MustSpecifyReturnValues()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.MustSpecifyReturnValues);
+                 
+                 fake.Count = 0;
+             
+                 // This call is faked because we used MustSpecifyReturnValues - count should not increment
+                 fake.Increment();
+                 Assert.AreEqual(0, fake.count);
+             
+                 // The following statement will throw, because we didn't set behavior on IntCall method.
+                 int x = fake.IntCall();
+             }
+             </code>
+             The next test shows the CallOriginal setting on Instance:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_UseCallOriginal()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+                 
+                 fake.Count = 0;
+             
+                 // This call is not faked. Count should be incremented.
+                 fake.Increment();
+                 Assert.AreEqual(1, fake.Count);
+             }
+             </code>
+             The next test shows what happens when using ReturnNulls:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_UseReturnNulls()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.ReturnNulls);
+                 
+                 fake.Count = 0;
+                 // This call is faked because we set faked method behavior using ReturnNulls 
+                 fake.Increment();
+                 Assert.AreEqual(0, fake.Count);
+             
+                 // Since we're returning Null by default the following Assert passes
+                 Assert.IsNull(fake.IntCall());
+             }
+             </code>
+             Finally, using recursive faking, this test should pass:
+             <code>
+            [TestMethod]
+            [Isolated]
+            public void RecursiveStubsChain()
+            {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.ReturnRecursiveFakes);
+            
+                 // This method returns a value type, and therefore, returns a fake 0.
+                 Assert.AreEqual(0, fake.ReturnFive());
+             
+                 // This method returns an object, and therefore returns a non-null object
+                 Assert.IsNotNull(fake.GetSon());
+             
+                 // And the result of GetSon also returns a non-null object 
+                 Assert.IsNotNull(fake.GetSon().GetNephew());
+            }
+             </code>
+             </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IFaker.Instance``1(TypeMock.ArrangeActAssert.Members,TypeMock.ArrangeActAssert.ConstructorWillBe)">
+             <summary>
+             Overloaded. Returns a fake instance of type T.
+             </summary>
+             <remarks>
+             </remarks>
+             <typeparam name="T">The type of the fake instance to be created.</typeparam>
+             <param name="behavior">
+             Can be one of the following values:
+             <list type="table">
+             <listheader>
+             <term><c>Members</c> Value</term><description>Description</description></listheader>
+             <item>
+             <term><c>Members.MustSpecifyReturnValues</c></term>
+             <description>All void calls are ignored. Unless using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> on methods that return values and properties, they will throw a <seealso cref="T:TypeMock.TypeMockException"/>.
+             </description>
+             </item>
+             <item>
+             <term><c>Members.ReturnNulls</c></term>
+             <description>All void calls are ignored. Unless using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> on methods that return values and properties, they will return Null values (or zero for value types).
+             </description>
+             </item>
+             <item>
+             <term><c>Members.CallOriginal</c></term>
+             <description>All methods are called. Using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> allow to change this behavior.
+             </description>
+             </item>
+             <item>
+             <term><c>Members.ReturnRecursiveFakes</c></term>
+             <description>Default. All void calls are ignored. When calling the fake's methods returning values or properties, they will return a fake value, which presents this behavior recursively. Any deep call will never return a Null value.
+             </description>
+             </item>
+             </list>
+             </param>
+             <param name="constructorBehavior">
+             Can Be One OF the following values:
+             <list type="table">
+             <listheader>
+             <term><c>ConstructorWillBe</c> Value</term><description>Description</description>
+             </listheader>
+             <item>
+             <term><c>ConstructorWillBe.Ignored</c></term>
+             <description>Constructor will not be executed when creating the fake object</description>
+             </item>
+             <item>
+             <term><c>ConstructorWillBe.Called</c></term>
+             <description>Execute Constructor when creating the fake object</description>
+             </item>
+             </list>
+             </param>
+             <returns>A fake instance of Type T.</returns>
+             <seealso cref="T:TypeMock.TypeMockException"/>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.StaticConstructor``1"/>
+             <example>
+             The following test shows the faking an instance using Members.MustSpecifyReturnValue:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_MustSpecifyReturnValues()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.MustSpecifyReturnValues, ConstructorWillBe.Ignored);
+                 
+                 fake.Count = 0;
+             
+                 // This call is faked because we used MustSpecifyReturnValues - count should not increment
+                 fake.Increment();
+                 Assert.AreEqual(0, fake.count);
+             
+                 // The following statement will throw, because we didn't set behavior on IntCall method.
+                 int x = fake.IntCall();
+             }
+             </code>
+             The next test shows the CallOriginal setting on Instance:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_UseCallOriginal()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal, ConstructorWillBe.Ignored);
+                 
+                 // Because constructor was not called Count was not initialized
+                 Assert.AreEqual(0, fake.Count);
+             
+                 // This call is not faked. Count should be incremented.
+                 fake.Increment();
+                 Assert.AreEqual(1, fake.Count);
+             }
+             </code>
+             The next test shows what happens when using ReturnNulls:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_UseReturnNulls()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.ReturnNulls, ConstructorWillBe.Ignored);
+                 
+                 fake.Count = 0;
+                 // This call is faked because we set faked method behavior using ReturnNulls 
+                 fake.Increment();
+                 Assert.AreEqual(0, fake.Count);
+             
+                 // Since we're returning Null by default the following Assert passes
+                 Assert.IsNull(fake.IntCall());
+             }
+             </code>
+             Finally, using recursive faking, this test should pass:
+             <code>
+            [TestMethod]
+            [Isolated]
+            public void RecursiveStubsChain()
+            {
+                 // We create a fake after running the real constructor that sets count field to 5
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.ReturnRecursiveFakes, ConstructorWillBe.Called);
+            
+                 // Because Constructor was called fake.count field was initialized
+                 Assert.AreEqual(5, fake.count);
+             
+                 // This method returns a value type, and therefore, returns a fake 0.
+                 Assert.AreEqual(0, fake.ReturnFive());
+             
+                 // This method returns an object, and therefore returns a non-null object
+                 Assert.IsNotNull(fake.GetSon());
+             
+                 // And the result of GetSon also returns a non-null object 
+                 Assert.IsNotNull(fake.GetSon().GetNephew());
+            }
+             </code>
+             </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IFaker.Instance``1(TypeMock.ArrangeActAssert.Members,TypeMock.ArrangeActAssert.ConstructorWillBe,System.Object[])">
+             <summary>
+             Overloaded. Returns a fake instance of type T.
+             </summary>
+             <remarks>
+             </remarks>
+             <typeparam name="T">The type of the fake instance to be created.</typeparam>
+             <param name="behavior">
+             Can be one of the following values:
+             <list type="table">
+             <listheader>
+             <term><c>Members</c> Value</term><description>Description</description></listheader>
+             <item>
+             <term><c>Members.MustSpecifyReturnValues</c></term>
+             <description>All void calls are ignored. Unless using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> on methods that return values and properties, they will throw a <seealso cref="T:TypeMock.TypeMockException"/>.
+             </description>
+             </item>
+             <item>
+             <term><c>Members.ReturnNulls</c></term>
+             <description>All void calls are ignored. Unless using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> on methods that return values and properties, they will return Null values (or zero for value types).
+             </description>
+             </item>
+             <item>
+             <term><c>Members.CallOriginal</c></term>
+             <description>All methods are called. Using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> allow to change this behavior.
+             </description>
+             </item>
+             <item>
+             <term><c>Members.ReturnRecursiveFakes</c></term>
+             <description>Default. All void calls are ignored. When calling the fake's methods returning values or properties, they will return a fake value, which presents this behavior recursively. Any deep call will never return a Null value.
+             </description>
+             </item>
+             </list>
+             </param>
+             <param name="constructorBehavior">
+             Can Be One of the following values:
+             <list type="table">
+             <listheader>
+             <term><c>ConstructorWillBe</c> Value</term><description>Description</description>
+             </listheader>
+             <item>
+             <term><c>ConstructorWillBe.Ignored</c></term>
+             <description>Constructor will not be executed when creating the fake object</description>
+             </item>
+             <item>
+             <term><c>ConstructorWillBe.Called</c></term>
+             <description>Execute Constructor when creating the fake object</description>
+             </item>
+             </list>
+             </param>
+             <param name="constructorParameters">
+             The parameters to pass to a specific constructor. 
+             If constructor behavior is set to <see cref="F:TypeMock.ArrangeActAssert.ConstructorWillBe.Ignored"/> and this value isn't empty a <see cref="T:TypeMock.TypeMockException"/> will be throw
+             </param>
+             <returns>A fake instance of Type T.</returns>
+             <seealso cref="T:TypeMock.TypeMockException"/>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.StaticConstructor``1"/>
+             <example>
+             The following test shows the faking an instance using Members.MustSpecifyReturnValue:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_MustSpecifyReturnValues()
+             {
+                 // Call class constructor passing a number that will be passed to count field
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.MustSpecifyReturnValues, ConstructorWillBe.Called, 10);
+                 
+                 // Check that the value we've passed to the constructor was passed to the field
+                 Assert.AreEqual(10, fake.count);
+                 fake.Count = 0;
+             
+                 // This call is faked because we used MustSpecifyReturnValues - count should not increment
+                 fake.Increment();
+                 Assert.AreEqual(0, fake.count);
+             
+                 // The following statement will throw, because we didn't set behavior on IntCall method.
+                 int x = fake.IntCall();
+             }
+             </code>
+             The next test shows the CallOriginal setting on Instance:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_UseCallOriginal()
+             {
+                 // Call class constructor passing a number that will be passed to count field
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal, ConstructorWillBe.Called, 10);
+              
+                 // Check that the value we've passed to the constructor was passed to the field
+                 Assert.AreEqual(10, fake.count);   
+             
+                 // Because constructor was not called Count was not initialized
+                 Assert.AreEqual(0, fake.Count);
+             
+                 // This call is not faked. Count should be incremented.
+                 fake.Increment();
+                 Assert.AreEqual(1, fake.Count);
+             }
+             </code>
+             The next test shows what happens when using ReturnNulls:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_UseReturnNulls()
+             {
+                 // Call class constructor passing a number that will be passed to count field
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.ReturnNulls, ConstructorWillBe.Called, 10);
+                 
+                 // Check that the value we've passed to the constructor was passed to the field
+                 Assert.AreEqual(10, fake.count); 
+             
+                 fake.Count = 0;
+                 // This call is faked because we set faked method behavior using ReturnNulls 
+                 fake.Increment();
+                 Assert.AreEqual(0, fake.Count);
+             
+                 // Since we're returning Null by default the following Assert passes
+                 Assert.IsNull(fake.IntCall());
+             }
+             </code>
+             Finally, using recursive faking, this test should pass:
+             <code>
+            [TestMethod]
+            [Isolated]
+            public void RecursiveStubsChain()
+            {
+                 // Call class constructor passing a number that will be passed to count field
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.ReturnRecursiveFakes, ConstructorWillBe.Called, 10);
+                 
+                 // Check that the value we've passed to the constructor was passed to the field
+                 Assert.AreEqual(10, fake.count); 
+             
+                 // This method returns a value type, and therefore, returns a fake 0.
+                 Assert.AreEqual(0, fake.ReturnFive());
+             
+                 // This method returns an object, and therefore returns a non-null object
+                 Assert.IsNotNull(fake.GetSon());
+             
+                 // And the result of GetSon also returns a non-null object 
+                 Assert.IsNotNull(fake.GetSon().GetNephew());
+            }
+             </code>
+             </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IFaker.StaticConstructor``1">
+            <summary>
+             Overloaded. Fake future calls to static constructors of the given type.
+            </summary>
+            <typeparam name="T">The type for which to fake static constructor calls</typeparam>
+             <exception cref="T:TypeMock.TypeMockException">
+                 Thown if the static constructor for the provided type has already been called, if an 
+                 instance fake of the type has already been created or if FakeStaticConstructors has already
+                 been called for it.
+             </exception>
+             <remarks>
+                 This overload for FakeStaticConstructor receives a generic parameter. Because static classes cannot be instantiated, they
+                 also cannot be used as generic type parameters. In order to fake the static constructors for a static class, use the non
+                 generic overload which receives a Type parameter.
+             </remarks>
+             <example>
+             This example shows using Isolate.Fake.StaticConstructor() to fake a call to a static constructor
+             <code lang="cs">
+             [TestMethod]
+             [Isolated]
+             public void FakeStaticConstructor_CCtorNotCalled()
+             {
+                 Isolate.Fake.StaticConstructor&lt;TestClass&gt;()
+             
+                 TestClass.DoSomething(); // this causes the static constructor to be called
+             
+                 // the call to the static constructor was faked so the flag equals false   
+                 Assert.IsFalse(TestClass.TrueIfCCtorHappened); 
+             }
+             </code>
+             </example>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.StaticConstructor(System.Type)"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IFaker.StaticConstructor(System.Type)">
+            <summary>
+             Overloaded. Fake future calls to static constructors of the given type.
+            </summary>
+            <param name="type">The type for which to fake static constructor calls</param>
+             <exception cref="T:TypeMock.TypeMockException">
+                 Thown if the static constructor for the provided type has already been called, if an 
+                 instance fake of the type has already been created or if FakeStaticConstructors has already
+                 been called for it.
+             </exception>
+             <remarks>
+                 This overload for FakeStaticConstructor receives a Type parameter which represents the class to fake static constructors for,
+                 and should be used when faking constructors for static classes. For other non-static classes it is generally recommended to use the 
+                 generic overload <see cref="M:TypeMock.ArrangeActAssert.IFaker.StaticConstructor``1"/>, which receives the class as a generic type argument.
+             </remarks>        
+             <example>
+             This example shows using Isolate.Fake.StaticConstructor() to fake a call to a static constructor
+             <code lang="cs">
+             [TestMethod]
+             [Isolated]
+             public void FakeStaticConstructor_CCtorNotCalled()
+             {
+                 Isolate.Fake.StaticConstructor( typeof(StaticTestClass))
+             
+                 StaticTestClass.DoSomething(); // this causes the static constructor to be called
+             
+                 // the call to the static constructor was faked so the flag equals false   
+                 Assert.IsFalse(StaticTestClass.TrueIfCCtorHappened); 
+             }
+             </code>
+             </example>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.StaticConstructor``1"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IFaker.StaticMethods``1">
+            <summary>
+            Overloaded. Fakes all static methods for type T. Using this overload is equal to using <c>Members.MustSpecifyReturnValues</c>.
+            </summary>
+            <typeparam name="T">The type to fake static methods for.</typeparam>
+            <seealso cref="T:TypeMock.ArrangeActAssert.Members">Members Enum</seealso>
+            <remarks>
+            Static class cannot be used as type argument.
+            Use IFaker.StaticMethods(Type type) or IFaker.StaticMethods(Type type, Members behavior) instead.
+            </remarks>
+            <example>
+            This example shows using FakeStaticMethods to stub all static void calls for a class
+            <code lang="cs">
+            [TestMethod]
+            [Isolated]
+            public void FakeStaticMethods_StubIncrementMethod()
+            {
+                Isolate.Fake.StaticMethods&lt;LoggerFactory&gt;();
+            
+                LoggerFactory.Count = 0;
+                // This call is faked because we used the default overload for FakeStaticMethods - 
+                // IncrementCount() is not really performed
+                LoggerFactory.IncrementCount();
+            
+                Assert.AreEqual(0, LoggerFactory.Count);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IFaker.StaticMethods(System.Type)">
+            <summary>
+            Overloaded. Fakes all static methods for the provided type. Using this overload is equal to using <c>Members.MustSpecifyReturnValues</c>.
+            </summary>
+            <param name="type">The type to fake static methods for.</param>
+            <seealso cref="T:TypeMock.ArrangeActAssert.Members">Members Enum</seealso>
+            <remarks>
+                This overload receives a Type parameter representing the class to fake static methods for, and should be used 
+                when faking methods for static classes. For other non-static classes it is generally recommended to use the 
+                generic overload <see cref="M:TypeMock.ArrangeActAssert.IFaker.StaticMethods``1"/>, which receives the class as a generic type argument.
+            </remarks>
+            <example>
+            This example shows using FakeStaticMethods to stub all static void calls for a class
+            <code lang="cs">
+            [TestMethod]
+            [Isolated]
+            public void FakeStaticMethods_StubIncrementMethod()
+            {
+                Isolate.Fake.StaticMethods( typeof(LoggerFactory));
+            
+                LoggerFactory.Count = 0;
+                // This call is faked because we used the default overload for FakeStaticMethods - 
+                // IncrementCount() is not really performed
+                LoggerFactory.IncrementCount();
+            
+                Assert.AreEqual(0, LoggerFactory.Count);
+            }
+            </code>
+            </example>
+            <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.StaticMethods``1"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IFaker.StaticMethods``1(TypeMock.ArrangeActAssert.Members)">
+             <summary>
+             Overloaded. Fakes all static methods for type T.
+             </summary>
+             <typeparam name="T">The type to fake static methods for.</typeparam>
+             <param name="behavior">
+             Can be one of the following values:
+             <list type="table">
+             <listheader>
+             <term><c>Members</c> Value</term><description>Description</description></listheader>
+             <item>
+             <term><c>Members.MustSpecifyReturnValues</c></term>
+             <description>Default. All void calls are ignored. Unless using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> on methods that return values and properties, they will throw a <seealso cref="T:TypeMock.TypeMockException"/>.
+             </description>
+             </item>
+             <item>
+             <term><c>Members.ReturnNulls</c></term>
+             <description>All void calls are ignored. Unless using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> on methods that return values and properties, they will return Null values (or zero for value types).
+             </description>
+             </item>
+             <item>
+             <term><c>Members.CallOriginal</c></term>
+             <description>All methods are called. Using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> allow to change this behavior.
+             </description>
+             </item>
+             <item>
+             <term><c>Members.ReturnRecursiveFakes</c></term>
+             <description>All void calls are ignored. When calling the fake's methods returning values or properties, they will return a fake value, which presents this behavior recursively. Any deep call will never return a Null value.
+             </description>
+             </item>
+             </list>
+             </param>
+             <returns>A fake instance of Type T.</returns>
+             <remarks>
+             Static class cannot be used as type argument.
+             Use IFaker.StaticMethods(Type type) or IFaker.StaticMethods(Type type, Members behavior) instead.
+             </remarks>        
+             <seealso cref="T:TypeMock.TypeMockException"/>
+             <seealso cref="T:TypeMock.ArrangeActAssert.Members"/>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.Instance``1(TypeMock.ArrangeActAssert.Members,TypeMock.ArrangeActAssert.ConstructorWillBe)"/>
+             <example>
+             The following test shows the default behavior of FakeStaticMethods():
+             <code lang="cs">
+             [TestMethod]
+             [Isolated]
+             public void FakeStaticMethods_UseDefault()
+             {
+                 Isolate.Fake.StaticMethods&lt;LoggerFactory&gt;();
+             
+                 LoggerFactory.Count = 0;
+                 // This call is faked because we used the default overload for FakeStaticMethods - 
+                 // IncrementCount() is not really performed
+                 LoggerFactory.IncrementCount();
+             
+                 Assert.AreEqual(0, LoggerFactory.Count);
+             
+                 // The following statement will throw, because we didn't set behavior on GetCount() method.
+                 int x = LoggerFactory.GetCount();
+             }
+             </code>
+             The next test shows the CallOriginal setting for FakeStaticMethods():
+             <code lang="cs">
+             [TestMethod]
+             [Isolated]
+             public void FakeStaticMethods_UseCallOriginal()
+             {
+                 Isolate.Fake.StaticMethods&lt;LoggerFactory&gt;(Members.CallOriginal);
+                 
+                 LoggerFactory.Count = 0;
+             
+                 // This call is not faked. Count should be incremented.
+                 LoggerFactory.Increment();
+                 Assert.AreEqual(1, fake.Count);
+             }
+             </code>
+             The next test shows what happens when using ReturnNulls:
+             <code lang="cs">
+             [TestMethod]
+             [Isolated]
+             public void FakeStaticMethods_UseReturnNulls()
+             {
+                 Isolate.Fake.StaticMethods&lt;LoggerFactory&gt;(Members.ReturnNulls);
+                 
+                 LoggerFactory.Count = 0;
+                 // This call is faked because we set faked method behavior using ReturnNulls 
+                 LoggerFactory.Increment();
+                 Assert.AreEqual(0, fake.Count);
+             
+                 // Since we're returning Null by default the following Assert passes
+                 Assert.IsNull(LoggerFactory.GetLogger());
+             }
+             </code>
+             Finally, using recursive faking, this test should pass:
+             <code lang="cs">
+            [TestMethod]
+            [Isolated]
+            public void RecursiveStubsChain()
+            {
+                 Isolate.Fake.StaticMethods&lt;LoggerFactory&gt;(Members.ReturnRecursiveFakes);
+            
+                 // This method returns a value type, and therefore, returns a fake 0.
+                 Assert.AreEqual(0, LoggerFactory.GetLoggerCount());
+             
+                 // This method returns an object, and therefore returns a non-null object
+                 Assert.IsNotNull(LoggerFactory.GetLogger());
+             
+                 // And the result of GetLogger also returns a non-null object 
+                 Assert.IsNotNull(LoggerFactory.GetLogger().GetWriter());
+            }
+             </code>
+             </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IFaker.StaticMethods(System.Type,TypeMock.ArrangeActAssert.Members)">
+             <summary>
+             Overloaded. Fakes all static methods for the given type.
+             </summary>
+             <param name="type">The type to fake static methods for.</param>
+             <param name="behavior">
+             Can be one of the following values:
+             <list type="table">
+             <listheader>
+             <term><c>Members</c> Value</term><description>Description</description></listheader>
+             <item>
+             <term><c>Members.MustSpecifyReturnValues</c></term>
+             <description>Default. All void calls are ignored. Unless using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> on methods that return values and properties, they will throw a <seealso cref="T:TypeMock.TypeMockException"/>.
+             </description>
+             </item>
+             <item>
+             <term><c>Members.ReturnNulls</c></term>
+             <description>All void calls are ignored. Unless using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> on methods that return values and properties, they will return Null values (or zero for value types).
+             </description>
+             </item>
+             <item>
+             <term><c>Members.CallOriginal</c></term>
+             <description>All methods are called. Using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> allow to change this behavior.
+             </description>
+             </item>
+             <item>
+             <term><c>Members.ReturnRecursiveFakes</c></term>
+             <description>All void calls are ignored. When calling the fake's methods returning values or properties, they will return a fake value, which presents this behavior recursively. Any deep call will never return a Null value.
+             </description>
+             </item>
+             </list>
+             </param>
+             <returns>A fake instance of Type T.</returns>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.StaticMethods``1(TypeMock.ArrangeActAssert.Members)"/>
+             <seealso cref="T:TypeMock.TypeMockException"/>
+             <seealso cref="T:TypeMock.ArrangeActAssert.Members"/>
+             <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.Instance``1(TypeMock.ArrangeActAssert.Members,TypeMock.ArrangeActAssert.ConstructorWillBe)"/>
+             <remarks>
+                 This overload receives a Type parameter representing the class to fake static methods for, and should be used 
+                 when faking methods for static classes. For other non-static classes it is generally recommended to use the 
+                 generic overload <see cref="M:TypeMock.ArrangeActAssert.IFaker.StaticMethods``1(TypeMock.ArrangeActAssert.Members)"/>, which receives the class as a generic type argument.
+             </remarks>
+             <example>
+             The following test shows the default behavior of FakeStaticMethods():
+             <code lang="cs">
+             [TestMethod]
+             [Isolated]
+             public void FakeStaticMethods_UseDefault()
+             {
+                 Isolate.Fake.StaticMethods(typeof (LoggerFactory));
+             
+                 LoggerFactory.Count = 0;
+                 // This call is faked because we used the default overload for FakeStaticMethods - 
+                 // IncrementCount() is not really performed
+                 LoggerFactory.IncrementCount();
+             
+                 Assert.AreEqual(0, LoggerFactory.Count);
+             
+                 // The following statement will throw, because we didn't set behavior on GetCount() method.
+                 int x = LoggerFactory.GetCount();
+             }
+             </code>
+             The next test shows the CallOriginal setting for FakeStaticMethods():
+             <code lang="cs">
+             [TestMethod]
+             [Isolated]
+             public void FakeStaticMethods_UseCallOriginal()
+             {
+                 Isolate.Fake.StaticMethods(typeof (LoggerFactory), Members.CallOriginal);
+                 
+                 LoggerFactory.Count = 0;
+             
+                 // This call is not faked. Count should be incremented.
+                 LoggerFactory.Increment();
+                 Assert.AreEqual(1, fake.Count);
+             }
+             </code>
+             The next test shows what happens when using ReturnNulls:
+             <code lang="cs">
+             [TestMethod]
+             [Isolated]
+             public void FakeStaticMethods_UseReturnNulls()
+             {
+                 Isolate.Fake.StaticMethods(typeof (LoggerFactory), Members.ReturnNulls);
+                 
+                 LoggerFactory.Count = 0;
+                 // This call is faked because we set faked method behavior using ReturnNulls 
+                 LoggerFactory.Increment();
+                 Assert.AreEqual(0, fake.Count);
+             
+                 // Since we're returning Null by default the following Assert passes
+                 Assert.IsNull(LoggerFactory.GetLogger());
+             }
+             </code>
+             Finally, using recursive faking, this test should pass:
+             <code lang="cs">
+            [TestMethod]
+            [Isolated]
+            public void RecursiveStubsChain()
+            {
+                 Isolate.Fake.StaticMethods(typeof (LoggerFactory), Members.ReturnRecursiveFakes);
+            
+                 // This method returns a value type, and therefore, returns a fake 0.
+                 Assert.AreEqual(0, LoggerFactory.GetLoggerCount());
+             
+                 // This method returns an object, and therefore returns a non-null object
+                 Assert.IsNotNull(LoggerFactory.GetLogger());
+             
+                 // And the result of GetLogger also returns a non-null object 
+                 Assert.IsNotNull(LoggerFactory.GetLogger().GetWriter());
+            }
+             </code>
+             </example>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IVerifyHandler">
+            <summary>
+            Returned by <seealso cref="P:TypeMock.ArrangeActAssert.Isolate.Verify"/>, this interface contains methods for verifying the method calls and checking their arguments.
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IVerifyHandler.WasCalledWithAnyArguments(System.Action)">
+            <summary>
+            Overloaded. Verifies that a method was called, without checking its arguments.
+            </summary>
+            <param name="action">A void method in the form of a Lambda Expression that we want to verify if was called.</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the method, or chain of methods was not called.
+            </exception>
+            <remarks>
+            This can also be a chain of methods. In that case, the verification is on the entire chain, and not part of it.
+            When arguments are specified, they are ignored in the verification.
+            </remarks>
+            <example>
+            This example shows how to use Isolate.Verify in order to check a method was called:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyMethodWasCalled()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+            
+               fake.Write("Hello");
+            
+               // We did not check the call for argument matching so this verification should pass
+               Isolate.Verify.WasCalledWithAnyArguments(() =&gt; fake.Write("Goodbye"));
+            }
+            </code>
+            </example>
+            <seealso cref="M:TypeMock.ArrangeActAssert.Verifier.WasCalledWithExactArguments(System.Action)"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IVerifyHandler.WasCalledWithAnyArguments``1(System.Func{``0})">
+            <summary>
+            Overloaded. Verifies that a method was called, without checking its arguments.
+            </summary>
+            <param name="func">A method returning a value in the form of a Lambda Expression that we want to verify if was called.</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the method, or chain of methods was not called.
+            </exception>
+            <remarks>
+            This can also be a chain of methods. In that case, the verification is on the entire chain, and not part of it.
+            When arguments are specified, they are ignored in the verification.
+            </remarks>
+            <example>
+            This example shows how to use Isolate.Verify in order to check a method was called:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyMethodWasCalled()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.ReturnNulls);
+            
+               int x = fake.GetCount();
+            
+               Isolate.Verify.WasCalledWithAnyArguments(() =&gt; fake.GetCount());
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IVerifyHandler.WasCalledWithExactArguments(System.Action)">
+            <summary>
+            Overloaded. Verifies that a method was called, and checking its arguments.
+            </summary>
+            <param name="action">A void method in the form of a Lambda Expression that we want to verify if was called.</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the method, or chain of methods was not called with the specified arguments.
+            </exception>
+            <remarks>
+            This can also be a chain of methods. In that case, the verification is on the entire chain, and not part of it.
+            </remarks>
+            <example>
+            This example shows how to use Isolate.Verify in order to check a method was called 
+            with a specific set of arguments:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyMethodWasCalled_WithExactArguments()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+            
+               fake.Write("Hello");
+            
+               // As we're verifying the call was made with exact arguments, this verification should fail
+               Isolate.Verify.WasCalledWithExactArguments(() =&gt; fake.Write("Goodbye")); 
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IVerifyHandler.WasCalledWithExactArguments``1(System.Func{``0})">
+            <summary>
+            Overloaded. Verifies that a method was called, and checking its arguments.
+            </summary>
+            <param name="func">A method returning a value in the form of a Lambda Expression that we want to verify if was called.</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the method, or chain of methods was not called with the specified arguments.
+            </exception>
+            <remarks>
+            This can also be a chain of methods. In that case, the verification is on the entire chain, and not part of it.
+            </remarks>
+            <example>
+            This example shows how to use Isolate.Verify in order to check a method was called 
+            with a specific set of arguments:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyMethodWasCalled_WithExactArguments()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+            
+               fake.Write("Hello");
+            
+               // As we're verifying the call was made with exact arguments, this verification should fail
+               Isolate.Verify.WasCalledWithExactArguments(() =&gt; fake.Write("Goodbye")); 
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IVerifyHandler.WasNotCalled(System.Action)">
+            <summary>
+            Overloaded. Verifies that a method was not called regardless of parameters.
+            </summary>
+            <param name="action">A void method in the form of a Lambda Expression that we want to verify if was called.</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the method, or chain of methods was called at least once.
+            </exception>
+            <remarks>
+            This can also be a chain of methods. In that case, the verification is on the entire chain, and not part of it.
+            </remarks>
+            <example>
+            This example shows how to use Isolate.Verify in order to check a method was not called 
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyMethodWasNotCalled()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+            
+               fake.Increment();
+            
+               // This verification should fail
+               Isolate.Verify.WasNotCalled(() =&gt; fake.Increment()); 
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IVerifyHandler.WasNotCalled``1(System.Func{``0})">
+            <summary>
+            Overloaded. Verifies that a method was not called regardless of parameters.
+            </summary>
+            <param name="func">A method returning a value in the form of a Lambda Expression that we want to verify if was called.</param>
+            <exception cref="T:TypeMock.VerifyException">
+            Thrown if the method, or chain of methods was called at least once.
+            </exception>
+            <remarks>
+            This can also be a chain of methods. In that case, the verification is on the entire chain, and not part of it.
+            </remarks>        
+            <example>
+            This example shows how to use Isolate.Verify in order to check a method was not called 
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void VerifyMethodWasNotCalled()
+            {
+               RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+            
+               fake.Increment();
+            
+               // This verification should fail
+               Isolate.Verify.WasNotCalled(() =&gt; fake.Increment()); 
+            }
+            </code>
+            </example>
+        </member>
+        <member name="P:TypeMock.ArrangeActAssert.IVerifyHandler.NonPublic">
+            <summary>
+            Provides an entry point to verify non-public (private, protected, internal) members
+            </summary>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IFutureSwapper`1">
+             <summary>
+             Interface used as part of the future object pattern. The pattern allows swapping of a 
+             given instance with a mocked instance on its creation
+             </summary>
+             <seealso cref="P:TypeMock.ArrangeActAssert.Isolate.Swap"/>
+             <example>
+             Here is an example how to use Isolate.Swap.NextInstance in order to fake a future instance:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void SwapAFutureInstance_StubIncrementMethod()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                 Isolate.Swap.NextInstance&lt;RealLogger&gt;().With(fake);
+            
+                 Isolate.WhenCalled(() =&gt; fake.Increment()).IgnoreCall();
+             
+                 // This object is swapped with the fake
+                 RealLogger logger = new RealLogger();
+             
+                 // Make sure Count is reset
+                 logger.Count = 0;
+             
+                 // This call is faked - count should not increment
+                 logger.Increment();
+            
+                 Assert.AreEqual(0, logger.Count);
+             }
+             </code>
+             </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IFutureSwapper`1.With(`0)">
+            <summary>
+            Specify the fake instance that will replace the created instance.
+            </summary>
+            <param name="fake">the fake instance that will replace the created instance</param>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IFutureSwapper`1.ConstructorWillThrow(System.Exception)">
+            <summary>
+            Specify that an exception will be thrown the next time a construction is encountered for the type
+            </summary>
+            <param name="ex">The exception that will be thrown when the constructor is called</param>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IPublicVoidActionHandler.WithExactArguments">
+            <summary>
+            Specifies that the behavior will only be set on method calls with the exact arguments.
+            </summary>
+            <remarks>
+            <para>
+            WithExactArguments() is a completing statement for <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/>. 
+            </para>
+            </remarks>
+            <example>
+            This example shows how to use WithExactArguments() to set behavior on specific method call
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void WithExactArguments_DifferentArgsReturnDifferentValues()
+            {
+                // create a fake logger which will behave as the original one
+                RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+                 
+                // Set return value according to exact arguments
+                Isolate.WhenCalled(() =&gt; fake.VoidCallWithArg(0)).WithExactArguments().IgnoreCall();
+                Isolate.WhenCalled(() =&gt; fake.VoidCallWithArg(1)).WithExactArguments().CallOriginal();
+                Isolate.WhenCalled(() =&gt; fake.VoidCallWithArg(2)).WithExactArguments().WillThrow(new Exception(""));
+            
+                // Check that the correct value returned
+                fake.VoidCallWithArg(0); // This call will be ignored
+                fake.VoidCallWithArg(1); // This call will call the real method
+                fake.VoidCallWithArg(2); // This call will throw an exception
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IDynamicSwapper">
+            <summary>
+            Interface for performing object to object method call swapping
+            </summary>
+            <remarks>
+            This interface is returned by calling Isolate.Swap.<see cref="M:TypeMock.ArrangeActAssert.ISwapper.CallsOn(System.Object)"/>. Follow it by calling
+            the <see cref="M:TypeMock.ArrangeActAssert.IDynamicSwapper.WithCallsTo(System.Object)"/> completing statement.
+            </remarks>
+            <seealso cref="M:TypeMock.ArrangeActAssert.ISwapper.CallsOn(System.Object)"/>
+            <seealso cref="M:TypeMock.ArrangeActAssert.IDynamicSwapper.WithCallsTo(System.Object)"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IDynamicSwapper.WithCallsTo(System.Object)">
+            <summary>
+            Completes swapping method calls for an object. Is called as a completing statement for Isolate.Swap.<see cref="M:TypeMock.ArrangeActAssert.ISwapper.CallsOn(System.Object)"/>,
+            and defines the target object to perform swapping on.
+            </summary>
+            <param name="swapped">The object whose implementation should be used</param>
+            <returns>An <see cref="T:TypeMock.ArrangeActAssert.IDynamicSwapper"/> interface reference. </returns>
+            <remarks>
+            When a method is called on the swapped object, it is replaced with a corresponding implementation (a method
+            with the same signature) on the swapping object. This means that the swapped object will start behaving like
+            the object it was swapped with for all methods they have in common.
+            <para>
+            When a method is called on the swapped object that does not exist in the target object, it will be called on the original
+            object.
+            </para>
+            </remarks>
+            <exception cref="T:TypeMock.TypeMockException">
+            If there are no compatible methods to swap between the swapping source and target objects.
+            </exception>
+            <example>
+            This example shows how to use Isolate.Swap.<see cref="M:TypeMock.ArrangeActAssert.ISwapper.CallsOn(System.Object)"/>.<see cref="M:TypeMock.ArrangeActAssert.IDynamicSwapper.WithCallsTo(System.Object)"/> in order to 
+            redirect calls from an object to a stand-in object:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void SwapCallsOnObject_CallsRedirectedToTargetObject()
+            {
+                // Create the object under test
+                RealLogger logger = new RealLogger();
+                // Create the object calls will be redirected to
+                TestLogger swapped = new TestLogger();
+            
+                // Redirect any calls from the object under test to the swapping target
+                Isolate.Swap.CallsOn(logger).WithCallsTo(swapped);
+            
+                // logger.Write() is redirected to TestLogger.Write() which writes to console instead of disk
+                logger.Write("Hello World");
+            
+                // We can still verify the call to logger.Write() happened
+                Isolate.Verify.WasCalledWithAnyArguments(() =&gt; logger.Write(""));
+            }
+            
+            // excerpt code for the class under test:
+            public class RealLogger
+            {
+                string logFilePath = ...;
+                public void Write(string toWrite)
+                {
+                    logFile.WriteAllText(logFilePath, toWrite);
+                }
+            }
+            
+            // excerpt code for the replacement class:
+            public class TestLogger
+            {
+                public void Write(string toWrite)
+                {
+                    Console.WriteLine("RealLogger.Write() was called with {0}", toWrite);
+                }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.ICollectionReturnHandler">
+            <summary>
+            Interface for tweaking behavior for methods returning collection types. This can be used to replace collection values returned
+            by a method or property with another test data collection.
+            This interface is returned by the <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled``1(System.Func{``0})"/> method.
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.ICollectionReturnHandler.WillReturnCollectionValuesOf(System.Collections.IEnumerable)">
+            <summary>
+            Swaps a collection returned by a method or property with a collection of test data. Follows a call to 
+            <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled``1(System.Func{``0})"/>.
+            </summary>
+            <param name="collection">The collection to use instead of the replaced collection</param>
+            <remarks>
+            <para>
+            This method is used as a completing statement to <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled``1(System.Func{``0})"/>, and is used to
+            replace the collection in the preceeding statement with the provided collection.
+            This is useful when the code under test uses collection data that is prepared externally and then iterated over.
+            The collection containing this data can be swapped with a test data collection prepared during the test set up and thus remove
+            the dependency on the code populating the collection.
+            </para>
+            <para>
+            <c>Note</c>: because Typemock Isolator does not currently support faking objects implemented in MsCorLib.dll, 
+            the source collection used with <c>WhenCalled()</c> cannot be one implemented in MsCorLib, such as 
+            <see cref="T:System.Collections.Generic.List`1"/> and <see cref="T:System.Collections.ArrayList"/>.
+            </para>
+            </remarks>
+            <exception cref="T:TypeMock.TypeMockException">
+            If the lambda expression provided in <c>Isolate.WhenCalled()</c> does not
+            evaluate to an object implementing <see cref="T:System.Collections.IEnumerable"/>.
+            </exception>
+            <example>
+            This example shows how to use Isolate.<see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled``1(System.Func{``0})"/>.<see cref="M:TypeMock.ArrangeActAssert.ICollectionReturnHandler.WillReturnCollectionValuesOf(System.Collections.IEnumerable)"/> in order to 
+            swap a collection data for test data:
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void SwapCollectionValues_ReplaceCollectionWithTestData()
+            {
+                // Create a logger to use as test data
+                RealLogger logger = new RealLogger();
+                // Swap the logger collection for the class under test with a collection containing the prepared test data
+                Isolate.WhenCalled(() =&gt; LoggerFactory.Loggers).WithValuesFrom(new[] { logger });
+            
+                // Verify the GetLogger() method returned the existing logger instead of creating a new one.
+                RealLogger actual = LoggerFactory.GetLogger();
+                Assert.AreSame(logger, actual);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.Members">
+            <summary>
+            A behavior setting on how the fake object is created.
+            </summary>
+        </member>
+        <member name="F:TypeMock.ArrangeActAssert.Members.MustSpecifyReturnValues">
+            <summary>
+            All void calls are ignored. Unless using WhenCalled on methods that return values and properties, they will throw a <see cref="T:TypeMock.TypeMockException"/>.
+            </summary>
+        </member>
+        <member name="F:TypeMock.ArrangeActAssert.Members.CallOriginal">
+            <summary>
+            All methods are called. Using WhenCalled allow to change this behavior.
+            </summary>
+        </member>
+        <member name="F:TypeMock.ArrangeActAssert.Members.ReturnNulls">
+            <summary>
+            All void calls are ignored. Unless using WhenCalled on methods that return values and properties, they will return Null values (or zero for value types).
+            </summary>
+        </member>
+        <member name="F:TypeMock.ArrangeActAssert.Members.ReturnRecursiveFakes">
+            <summary>
+            Default. All void calls are ignored. When calling the fake's methods returning values or properties, they will return a fake value, which presents this behavior recursively. Any deep call will never return a Null value.
+            </summary>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.ConstructorWillBe">
+            <summary>
+            A behavior setting on how the fake object is created.
+            </summary>
+        </member>
+        <member name="F:TypeMock.ArrangeActAssert.ConstructorWillBe.Ignored">
+            <summary>
+            Don't execute constructor when creating a fake object
+            </summary>
+        </member>
+        <member name="F:TypeMock.ArrangeActAssert.ConstructorWillBe.Called">
+            <summary>
+            Run constructor when creating a fake object
+            </summary>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.Faker.Instance``1">
+             <summary>
+             Overloaded. Returns a fake instance of type T. Using this overload is equal to using <c>Members.MustSpecifyReturnValues</c>.
+             </summary>
+             <typeparam name="T">The type of fake object to create.</typeparam>
+             <returns>A fake instance of type T.</returns>
+             <seealso cref="T:TypeMock.ArrangeActAssert.Members">Members Enum</seealso>
+             <example>
+             Here is an example how to use Instance in order to fake a RealLogger instance:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_StubIncrementMethod()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                 
+                 fake.Count = 0;
+             
+                 // This call is faked because we used the default Instance overload - count should not increment
+                 fake.Increment();
+            
+                 Assert.AreEqual(0, fake.Count);
+             }
+             </code>
+             </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.Faker.Instance``1(TypeMock.ArrangeActAssert.Members)">
+             <summary>
+             Overloaded. Returns a fake instance of type T.
+             </summary>
+             <remarks>
+             </remarks>
+             <typeparam name="T">The type of the fake instance to be created.</typeparam>
+             <param name="behavior">
+             Can be one of the following values:
+             <list type="table">
+             <listheader>
+             <term><c>Members</c> Value</term><description>Description</description></listheader>
+             <item>
+             <term><c>Members.MustSpecifyReturnValues</c></term>
+             <description>Default. All void calls are ignored. Unless using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> on methods that return values and properties, they will throw a <seealso cref="T:TypeMock.TypeMockException"/>.
+             </description>
+             </item>
+             <item>
+             <term><c>Members.ReturnNulls</c></term>
+             <description>All void calls are ignored. Unless using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> on methods that return values and properties, they will return Null values (or zero for value types).
+             </description>
+             </item>
+             <item>
+             <term><c>Members.CallOriginal</c></term>
+             <description>All methods are called. Using <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> allow to change this behavior.
+             </description>
+             </item>
+             <item>
+             <term><c>Members.ReturnRecursiveFakes</c></term>
+             <description>All void calls are ignored. When calling the fake's methods returning values or properties, they will return a fake value, which presents this behavior recursively. Any deep call will never return a Null value.
+             </description>
+             </item>
+             </list>
+             </param>
+             <returns>A fake instance of Type T.</returns>
+             <seealso cref="T:TypeMock.TypeMockException"/>
+             <example>
+             The following test shows the default behavior of Instance:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_UseDefault()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                 
+                 fake.Count = 0;
+             
+                 // This call is faked because we used Instance's default overload - count should not increment
+                 fake.Increment();
+                 Assert.AreEqual(0, fake.Count);
+             
+                 // The following statement will throw, because we didn't set behavior on IntCall method.
+                 int x = fake.IntCall();
+             }
+             </code>
+             The next test shows the CallOriginal setting on Instance:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_UseCallOriginal()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+                 
+                 fake.Count = 0;
+             
+                 // This call is not faked. Count should be incremented.
+                 fake.Increment();
+                 Assert.AreEqual(1, fake.Count);
+             }
+             </code>
+             The next test shows what happens when using ReturnNulls:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void FakeAnInstance_UseReturnNulls()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.ReturnNulls);
+                 
+                 fake.Count = 0;
+                 // This call is faked because we set faked method behavior using ReturnNulls 
+                 fake.Increment();
+                 Assert.AreEqual(0, fake.Count);
+             
+                 // Since we're returning Null by default the following Assert passes
+                 Assert.IsNull(fake.IntCall());
+             }
+             </code>
+             Finally, using recursive faking, this test should pass:
+             <code>
+            [TestMethod]
+            [Isolated]
+            public void RecursiveStubsChain()
+            {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.ReturnRecursiveFakes);
+            
+                 // This method returns a value type, and therefore, returns a fake 0.
+                 Assert.AreEqual(0, fake.ReturnFive());
+             
+                 // This method returns an object, and therefore returns a non-null object
+                 Assert.IsNotNull(fake.GetSon());
+             
+                 // And the result of GetSon also returns a non-null object 
+                 Assert.IsNotNull(fake.GetSon().GetNephew());
+            }
+             </code>
+             </example>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.IPublicNonVoidMethodHandler`1">
+            <summary>
+            Interface for specifying behavior for intercepted calls on public methods returning values. The interface is returned 
+            by the <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled(System.Action)"/> method.
+            </summary>
+            <remarks>
+            This interface allow tweaking the behavior of public methods that has return values.
+            </remarks>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IPublicNonVoidMethodHandler`1.ReturnRecursiveFake">
+            <summary>
+            Specify that the intercepted method will return a recursive fake.
+            The real implementation will not be executed.
+            </summary>
+            <remarks>
+            <para>
+            ReturnRecursiveFake() is a completing statement for <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled``1(System.Func{``0})"/>. It
+            is similar to using the <see cref="F:TypeMock.ArrangeActAssert.Members.ReturnRecursiveFakes"/> behavior setting when creating 
+            fake objects with <see cref="M:TypeMock.ArrangeActAssert.IFaker.Instance``1(TypeMock.ArrangeActAssert.Members)"/>, but applies only to a single method.
+            </para>
+            Use ReturnRecursiveFake() on a method to fake out calls to the method and any call chains 
+            beginning with it. When ReturnRecursiveFake() is called on a method returning an object, 
+            a fake object will be returned. That fake object in turn will return fake values for any 
+            method calls. 
+            ReturnRecursiveFake() on a method returning a value type will set the method to return 
+            the default value of that type. 
+            </remarks>
+            <seealso cref="M:TypeMock.ArrangeActAssert.IFaker.Instance``1(TypeMock.ArrangeActAssert.Members)"/>
+            <seealso cref="F:TypeMock.ArrangeActAssert.Members.ReturnRecursiveFakes"/>
+            <example>
+            This example shows using ReturnRecursiveFake() to fake out a call chain
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void ReturnRecursiveFake_ChainedCallsAreFake()
+            {
+                // create a fake logger which will behave as the original one
+                RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+                 
+                // exclude one method from the default behavior and return a recursive fake from it
+                Isolate.WhenCalled(() =&gt; fake.Storage).ReturnRecursiveFake();
+            
+                // subsequent calls to the method will not return null values
+                Assert.IsNotNull(fake.Storage);
+                Assert.IsNotNull(fake.Storage.FileSystem);
+                // methods returning a value type will return the default value for the type
+                Assert.AreEqual(0, fake.Storage.FreeSpaceInBytes);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.IPublicNonVoidMethodHandler`1.WithExactArguments">
+            <summary>
+            Specifies that the behavior will only be set on method calls with the exact arguments.
+            </summary>
+            <remarks>
+            <para>
+            WithExactArguments() is a completing statement for <see cref="M:TypeMock.ArrangeActAssert.Isolate.WhenCalled``1(System.Func{``0})"/>. 
+            </para>
+            </remarks>
+            <example>
+            This example shows how to use WithExactArguments() to set behavior on specific method call
+            <code>
+            [TestMethod]
+            [Isolated]
+            public void WithExactArguments_DifferentArgsReturnDifferentValues()
+            {
+                // create a fake logger which will behave as the original one
+                RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;(Members.CallOriginal);
+                 
+                // Set return value according to exact arguments
+                Isolate.WhenCalled(() =&gt; fake.IntCallWithArg(0)).WithExactArguments().WillReturn(10);
+                Isolate.WhenCalled(() =&gt; fake.IntCallWithArg(1)).WithExactArguments().WillReturn(20);
+            
+                // Check that the correct value returned
+                Assert.AreEqual(10, fake.IntCallWithArg(0));
+                Assert.AreEqual(20, fake.IntCallWithArg(1));
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:TypeMock.ArrangeActAssert.FutureSwapper`1">
+             <summary>
+             This class used as part of the future object pattern. The pattern allows swapping of a 
+             given instance with a mocked instance on its creation
+             </summary>
+             <seealso cref="M:TypeMock.ArrangeActAssert.Swapper.NextInstance``1"/>
+             <example>
+             Here is an example how to use NextInstance in order to fake a future instance:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void SwapAFutureInstance_StubIncrementMethod()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                 Isolate.Swap.NextInstance&lt;RealLogger&gt;().With(fake);
+            
+                 Isolate.WhenCalled(() =&gt; fake.Increment()).IgnoreCall();
+             
+                 // This object is swapped with the fake
+                 RealLogger logger = new RealLogger();
+             
+                 // Make sure Count is reset
+                 logger.Count = 0;
+             
+                 // This call is faked - count should not increment
+                 logger.Increment();
+            
+                 Assert.AreEqual(0, logger.Count);
+             }
+             </code>
+             </example>
+             <seealso cref="T:TypeMock.ArrangeActAssert.IFutureSwapper`1"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.FutureSwapper`1.With(`0)">
+            <summary>
+            Specify the fake instance that will replace the created instance.
+            </summary>
+            <param name="fake">the fake instance that will replace the created instance</param>
+            <seealso cref="T:TypeMock.ArrangeActAssert.IFutureSwapper`1"/>
+        </member>
+        <member name="M:TypeMock.ArrangeActAssert.FutureSwapper`1.TypeMock#ArrangeActAssert#IHideObjectMethods#GetType">
+             <summary>
+             This class used as part of the future object pattern. The pattern allows swapping of a 
+             given instance with a mocked instance on its creation
+             </summary>
+             <seealso cref="M:TypeMock.ArrangeActAssert.Swapper.NextInstance``1"/>
+             <example>
+             Here is an example how to use NextInstance in order to fake a future instance:
+             <code>
+             [TestMethod]
+             [Isolated]
+             public void SwapAFutureInstance_StubIncrementMethod()
+             {
+                 RealLogger fake = Isolate.Fake.Instance&lt;RealLogger&gt;();
+                 Isolate.Swap.NextInstance&lt;RealLogger&gt;().With(fake);
+            
+                 Isolate.WhenCalled(() =&gt; fake.Increment()).IgnoreCall();
+             
+                 // This object is swapped with the fake
+                 RealLogger logger = new RealLogger();
+             
+                 // Make sure Count is reset
+                 logger.Count = 0;
+             
+                 // This call is faked - count should not increment
+                 logger.Increment();
+            
+                 Assert.AreEqual(0, logger.Count);
+             }
+             </code>
+             </example>
+             <seealso cref="T:TypeMock.ArrangeActAssert.IFutureSwapper`1"/>
+        </member>
+    </members>
+</doc>

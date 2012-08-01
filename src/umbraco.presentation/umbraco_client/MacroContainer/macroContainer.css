@@ -1,0 +1,46 @@
+﻿.macroeditor 
+{
+    border: 2px dotted #33cc66;
+    padding: 8px 5px 10px 25px;
+    margin: 5px 0;
+}
+.macroeditor:hover 
+{
+    border: 2px solid #33cc66;
+    cursor: move;
+}
+
+.macroeditor td 
+{
+    padding: 10px 0;
+}
+
+.macroeditor h4 
+{
+    font-size: 14px;
+    font-weight: bold;
+}
+
+
+.macroeditor .macroDelete 
+{
+    float: right;
+    border: 1px solid #f00;
+    background-color: #fcc;
+    padding: 3px;
+    text-decoration: none;
+}
+
+.macroContainerAdd 
+{
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.macrocontainer 
+{
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    padding: 10px;
+}

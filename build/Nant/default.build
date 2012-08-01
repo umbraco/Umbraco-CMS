@@ -1,0 +1,495 @@
+﻿<?xml version="1.0" ?>
+<project name="umbraco" default="test" basedir=".">
+    <description>Build the umbraco 4.5 Application</description>
+
+    <!-- global properties, generally won't change -->
+    <!--
+    <property name="nant.settings.currentframework" value="net-2.0" />
+    -->
+    <property name="nant.settings.currentframework" value="net-4.0" />,
+
+    <property name="build.version" value="4.8.0"/>
+    <property name="build.configuration" value="Debug"/>
+
+
+    <!-- filenames and directories, generally won't change -->
+
+    <property name="web.dir" value="D:\inetpub\wwwroot\v4.umbraco.org" />
+    <property name="public.dir" value="C:\inetpub\wwwroot\_Live Sites\nightly.umbraco.org\umbraco 4.7.2" />
+    <property name="root.dir" value="${directory::get-current-directory()}" />
+    <property name="source.dir" value="${root.dir}\umbraco\presentation" />
+
+    <property name="build.dir" value="${root.dir}\build" />
+    <property name="build.symbolFiles.dir" value="${root.dir}\SymbolFiles" />
+    <property name="build.macroEnginesIron.dir" value="${root.dir}\umbraco.macroEngines.Iron_build" />
+
+    <property name="dlls.dir" value="${root.dir}\foreign dlls" />
+
+    <property name="WebPiAssets.dir" value="${root.dir}\config templates\WebPi" />
+
+
+
+    <property name="docs.dir" value="${root.dir}\docs" />
+
+    <property name="win.dir" value="c:\WINDOWS" />
+    <property name="Webdeploy.dir" value="C:\Program Files\MSBuild\Microsoft\WebDeployment\v8.0" />
+
+    <!-- Sandcastle Directories -->
+    <property name="sandcastle.dir" value="c:\Program Files\Sandcastle" />
+    <property name="sandcastle.workingdir" value="${root.dir}\docs\SandcastleWorkingDir" />
+    <property name="sandcastle.output.dir" value="${sandcastle.workingdir}\Output" />
+
+    <!-- Sandcastle -->
+    <property name="sandcastle.mrefbuilder"  value="${sandcastle.dir}\productiontools\mrefbuilder.exe" />
+    <property name="sandcastle.buildassembler" value="${sandcastle.dir}\productiontools\buildassembler.exe" />
+    <property name="sandcastle.xsltransform" value="${sandcastle.dir}\productiontools\xsltransform.exe" />
+
+    <!-- YUI -->
+    <property name="YUICompressor.dir" value="D:\inetpub\wwwroot\ccnet\buildTools\YUI" />
+
+    <!-- Build source -->
+    <target name="build" depends="init">
+
+        <!-- set everything to writable-->
+        <attrib normal="true" readonly="false">
+            <fileset basedir="${root.dir}">
+                <include name="**/*" />
+            </fileset>
+        </attrib>
+
+        <delete>
+            <fileset>
+                <include name="${source.dir}\bin\IronPython.dll" />
+                <include name="${source.dir}\bin\IronPython.Modules.dll" />
+                <include name="${source.dir}\bin\IronRuby.dll" />
+                <include name="${source.dir}\bin\IronRuby.Libraries.dll" />
+                <include name="${source.dir}\bin\IronRuby.Libraries.Yaml.dll" />
+                <include name="${source.dir}\bin\Microsoft.Dynamic.dll" />
+                <include name="${source.dir}\bin\Microsoft.ScriptinG.Core.dll" />
+                <include name="${source.dir}\bin\Microsoft.Scripting.Debugging.dll" />
+                <include name="${source.dir}\bin\Microsoft.Scripting.dll" />
+                <include name="${source.dir}\bin\Microsoft.Scripting.ExtensionAttribute.dll" />
+            </fileset>
+        </delete>
+
+
+        <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
+            <arg value="${root.dir}\umbraco.MacroEngines.Juno\umbraco.MacroEngines.csproj" />
+            <arg value="/v:n" />
+            <arg value="/p:WarningLevel=0" />
+            <arg value="/p:ToolsVersion=4.0" />
+            <arg value="/p:Configuration=${build.configuration}" />
+        </exec>
+
+
+        <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\${build.configuration}\umbraco.MacroEngines.dll" tofile="${source.dir}\bin\umbraco.MacroEngines.dll" failonerror="false" overwrite="true"/>
+
+        <copy todir="${source.dir}\bin" overwrite="true">
+            <fileset basedir="${dlls.dir}\WebPages">
+                <include name="*.dll" />
+            </fileset>
+        </copy>
+
+
+        <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\msbuild.exe">
+            <arg value="${root.dir}\umbraco.sln" />
+            <arg value="/v:n" />
+            <arg value="/p:WarningLevel=0" />
+            <arg value="/p:ToolsVersion=4.0" />
+            <arg value="/p:Configuration=${build.configuration}" />
+        </exec>
+        <exec program="${win.dir}\microsoft.net\framework\v4.0.30319\aspnet_compiler.exe" commandline="-f -u -p umbraco/presentation -v / &quot;${build.dir}&quot;"/>
+
+
+        <call target="buildMacroEnginesIron" />
+
+        <call target="buildSymbolFiles" />
+
+    </target>
+
+
+    <target name="buildMacroEnginesIron">
+
+        <mkdir dir="${build.macroEnginesIron.dir}" />
+        <mkdir dir="${build.macroEnginesIron.dir}\bin" />
+
+        <copy todir="${build.macroEnginesIron.dir}\bin" overwrite="true">
+            <fileset basedir="${dlls.dir}\DLR 4.0">
+                <include name="*.dll" />
+                <exclude name="Microsoft.Scripting.ExtensionAttribute.dll" />
+            </fileset>
+        </copy>
+
+        <copy file="${root.dir}\umbraco.MacroEngines.Iron\bin\${build.configuration}\umbraco.MacroEngines.Iron.dll" tofile="${build.macroEnginesIron.dir}\bin\umbraco.MacroEngines.Iron.dll" failonerror="false" overwrite="true"/>
+
+    </target>
+
+
+    <target name="buildSymbolFiles">
+
+        <!-- setup symbol files -->
+        <mkdir dir="${build.symbolFiles.dir}" />
+
+        <copy todir="${build.symbolFiles.dir}" flatten="true">
+            <fileset basedir="${build.dir}\bin">
+                <include name="*.xml" />
+                <include name="*.pdb" />
+            </fileset>
+        </copy>
+
+        <copy todir="${build.symbolFiles.dir}" flatten="true">
+            <fileset basedir="${root.dir}" >
+                <include name="**/*.pdb" />
+                <include name="**/bin/*.xml" />
+            </fileset>
+        </copy>
+
+        <copy todir="${build.symbolFiles.dir}" flatten="true">
+            <fileset basedir="${docs.dir}">
+                <include name="*.xml" />
+            </fileset>
+        </copy>
+
+    </target>
+
+
+
+    <!-- Directories and files -->
+    <target name="directories" depends="build">
+
+        <!-- setup docs files -->
+        <mkdir dir="${docs.dir}" />
+        <copy todir="${docs.dir}">
+            <fileset basedir="${build.dir}\bin">
+                <include name="*.xml" />
+            </fileset>
+        </copy>
+
+        <!-- DLR FILES -->
+        <delete>
+            <fileset>
+                <include name="${build.dir}\bin\Microsoft.Scripting.*" />
+                <include name="${build.dir}\bin\Microsoft.Dynamic.*" />
+                <include name="${build.dir}\bin\IronPython.*" />
+                <include name="${build.dir}\bin\IronRuby.*" />
+            </fileset>
+        </delete>
+
+        <!--
+        <copy todir="${build.dir}\bin" overwrite="true">
+            <fileset basedir="${dlls.dir}\DLR 4.0">
+                <include name="*.dll" />
+                <exclude name="Microsoft.Scripting.ExtensionAttribute.dll" />
+            </fileset>
+        </copy>
+        -->
+
+        <!--standard web.config-->
+        <copy file="${root.dir}\config templates\web.config" tofile="${build.dir}\web.config" failonerror="false" overwrite="true"/>
+
+        <!--standard /config files-->
+        <copy file="${root.dir}\config templates\config\404handlers.config" tofile="${build.dir}\config\404handlers.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\config\dashboard.config" tofile="${build.dir}\config\dashboard.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\config\formhandlers.config" tofile="${build.dir}\config\formhandlers.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\config\metablogconfig.config" tofile="${build.dir}\config\metablogconfig.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\config\restextensions.config" tofile="${build.dir}\config\restextensions.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\config\xsltextensions.config" tofile="${build.dir}\config\xsltextensions.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\config\tinymceconfig.config" tofile="${build.dir}\config\tinymceconfig.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\config\umbracosettings.config" tofile="${build.dir}\config\umbracosettings.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\config\urlrewriting.config" tofile="${build.dir}\config\urlrewriting.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\config\applications.config" tofile="${build.dir}\config\applications.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\config\trees.config" tofile="${build.dir}\config\trees.config" failonerror="false" overwrite="true"/>
+
+      <!-- new 4.5 files -->
+        <copy file="${root.dir}\config templates\config\ClientDependency.config" tofile="${build.dir}\config\ClientDependency.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\config\ExamineSettings.config" tofile="${build.dir}\config\ExamineSettings.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\config\ExamineIndex.config" tofile="${build.dir}\config\ExamineIndex.config" failonerror="false" overwrite="true"/>
+
+        <copy file="${root.dir}\config templates\config\scripting.config" tofile="${build.dir}\config\scripting.config" failonerror="false" overwrite="true"/>
+
+
+        <!-- Macro engines files + razor Files -->
+        <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\${build.configuration}\umbraco.MacroEngines.dll" tofile="${build.dir}\bin\umbraco.MacroEngines.dll" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\umbraco.MacroEngines.Juno\bin\${build.configuration}\umbraco.MacroEngines.pdb" tofile="${build.dir}\bin\umbraco.MacroEngines.pdb" failonerror="false" overwrite="true"/>
+        <copy todir="${build.dir}\bin" overwrite="true">
+            <fileset basedir="${dlls.dir}\WebPages">
+                <include name="*.dll" />
+            </fileset>
+        </copy>
+
+
+        <!--
+		<copy file="${root.dir}\foreign dlls\System.Web.Razor.dll" tofile="${build.dir}\bin\System.Web.Razor.dll" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\foreign dlls\RazorEngine.Core.dll" tofile="${build.dir}\bin\RazorEngine.Core.dll" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\foreign dlls\RazorEngine.Templates.dll" tofile="${build.dir}\bin\RazorEngine.Templates.dll" failonerror="false" overwrite="true"/>
+        -->
+
+        <!--standard /data/packages files-->
+        <mkdir dir="${build.dir}\App_Data" />
+        <copy file="${root.dir}\config templates\packages\installedPackages.config" tofile="${build.dir}\app_data\packages\installed\installedPackages.config" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\config templates\packages\createdPackages.config" tofile="${build.dir}\app_data\packages\created\createdPackages.config" failonerror="false" overwrite="true"/>
+
+        <!-- Standard access.xml file-->
+        <copy file="${root.dir}\config templates\access.xml" tofile="${build.dir}\app_data\access.config" failonerror="false" overwrite="true"/>
+
+        <!-- Standard create UI.xml-->
+        <copy file="${root.dir}\config templates\config\UI.xml" tofile="${build.dir}\umbraco\config\create\UI.xml" failonerror="false" overwrite="true"/>
+
+        <!-- Standard empty cache file -->
+        <copy file="${root.dir}\config templates\umbraco.config" tofile="${build.dir}\umbraco\app_data\umbraco.config" failonerror="false" overwrite="true"/>
+
+        <!-- Baseline Language file for translation tool -->
+        <copy file="${build.dir}\umbraco\config\lang\en.xml" tofile="${web.dir}\usercontrols\translation\langs\en.xml" failonerror="false" overwrite="true"/>
+
+        <!-- LINQ2UMB dll-->
+        <copy file="${root.dir}\LinqToUmbraco\src\umbraco.Linq\Core\bin\${build.configuration}\umbraco.Linq.Core.dll" tofile="${build.dir}\bin\umbraco.Linq.Core.dll" failonerror="false" overwrite="true"/>
+        <copy file="${root.dir}\LinqToUmbraco\src\umbraco.Linq\Core\bin\${build.configuration}\umbraco.Linq.Core.pdb" tofile="${build.dir}\bin\umbraco.Linq.Core.pdb" failonerror="false" overwrite="true"/>
+
+        <delete dir="${build.dir}\webservices" />
+        <delete dir="${build.dir}\umbracoBase" />
+        <delete dir="${build.dir}\Web References" />
+        <delete dir="${build.dir}\obj" />
+        <delete dir="${build.dir}\properties" />
+
+        <delete dir="${build.dir}\css" />
+        <delete dir="${build.dir}\masterpages" />
+        <delete dir="${build.dir}\scripts" />
+        <delete dir="${build.dir}\python" />
+        <delete dir="${build.dir}\macroScripts" />
+        <delete dir="${build.dir}\xslt" />
+        <delete dir="${build.dir}\usercontrols" />
+
+        <delete>
+            <fileset>
+                <include name="${build.dir}/**/*.build" />
+                <include name="${build.dir}/**/*.csproj" />
+                <include name="${build.dir}/**/*.vspscc" />
+                <include name="${build.dir}/**/*.scc" />
+                <include name="${build.dir}/**/*.sln" />
+                <include name="${build.dir}/**/*.compiled" />
+                <include name="${build.dir}/**/*.resx" />
+                <include name="${build.dir}/**/*.user" />
+                <include name="${build.dir}/**/*.bak" />
+
+                <include name="${build.dir}/**/*.orig" />
+
+                <include name="${build.dir}/PrecompiledApp.config" />
+                <include name="${build.dir}/web.config.template" />
+                <include name="${build.dir}/*.xslt" />
+                <include name="${build.dir}/web.*.config" />
+                <include name="${build.dir}/site.py" />
+                <include name="${build.dir}/bin/umbraco.MacroEngines.Legacy.*" />
+            </fileset>
+        </delete>
+
+        <if test="${build.configuration=='Release'}">
+            <delete>
+                <fileset>
+                    <include name="${build.dir}/**/*.pdb" />
+                    <include name="${build.dir}/bin/*.xml" />
+                </fileset>
+            </delete>
+        </if>
+
+        <!-- standard folders -->
+        <mkdir dir="${build.dir}\App_Code" />
+        <mkdir dir="${build.dir}\App_Data\ClientDependency" />
+        <mkdir dir="${build.dir}\App_Data\ExamineIndexes" />
+
+        <mkdir dir="${build.dir}\media" />
+        <mkdir dir="${build.dir}\masterpages" />
+        <mkdir dir="${build.dir}\scripts" />
+        <mkdir dir="${build.dir}\css" />
+        <mkdir dir="${build.dir}\macroScripts" />
+        <mkdir dir="${build.dir}\xslt" />
+        <mkdir dir="${build.dir}\usercontrols" />
+    </target>
+
+
+
+    <!-- Documentation -->
+    <target name="documentation" depends="directories">
+        <!-- Transformations -->
+        <property name="sandcastle.addfriendlyfilenames.xsl" value="${sandcastle.dir}\ProductionTransforms\AddFriendlyFilenames.xsl" />
+        <property name="sandcastle.reflectiontomanifest.xsl" value="${sandcastle.dir}\ProductionTransforms\ReflectionToManifest.xsl" />
+
+        <property name="sandcastle.buildassembler.config" value="${sandcastle.dir}\Presentation\wiki\configuration\sandcastle.config" />
+
+        <!-- Create a doc dir and move vs comment files to it-->
+        <mkdir dir="${docs.dir}" />
+        <copy todir="${docs.dir}">
+            <fileset basedir="${build.dir}\bin">
+                <include name="*.xml" />
+            </fileset>
+        </copy>
+
+        <!-- Create or Cleanup Working Directory -->
+        <mkdir dir="${sandcastle.workingdir}" if="${not directory::exists(sandcastle.workingdir)}" />
+        <delete>
+            <fileset basedir="${sandcastle.workingdir}">
+                <include name="**\*" />
+            </fileset>
+        </delete>
+
+        <copy file="${sandcastle.buildassembler.config}" tofile="${sandcastle.workingdir}\Sandcastle.config">
+            <filterchain>
+                <replacestring from="%DXROOT%\" to="${sandcastle.dir}" />
+                <replacestring from=".\comments.xml" to="${docs.dir}\*.xml" />
+            </filterchain>
+        </copy>
+
+        <!-- Run MRefBuilder (introspection on assemblies) to create basic Reflection XML -->
+        <exec program="${sandcastle.mrefbuilder}" workingdir="${sandcastle.workingdir}">
+            <arg value="&quot;${build.dir}\bin\businesslogic.dll&quot; " />
+            <arg value="&quot;${build.dir}\bin\cms.dll&quot; " />
+            <arg value="&quot;${build.dir}\bin\controls.dll&quot; " />
+            <arg value="&quot;${build.dir}\bin\interfaces.dll&quot; " />
+            <arg value="&quot;${build.dir}\bin\umbraco.datalayer.dll&quot; " />
+            <arg value="&quot;${build.dir}\bin\umbraco.dll&quot; " />
+            <arg value="&quot;${build.dir}\bin\umbraco.editorcontrols.dll&quot; " />
+            <arg value="&quot;${build.dir}\bin\umbraco.providers.dll&quot; " />
+            <arg value="&quot;${build.dir}\bin\umbraco.webservices.dll&quot; " />
+            <arg value="/out:reflection.org" />
+        </exec>
+
+        <!-- Regroup overloads -->
+        <exec program="${sandcastle.xsltransform}" workingdir="${sandcastle.workingdir}">
+            <arg value="reflection.org" />
+            <arg value="/xsl:&quot;${sandcastle.addfriendlyfilenames.xsl}&quot;" />
+            <arg value="/out:reflection.xml" />
+        </exec>
+
+
+        <exec program="${sandcastle.xsltransform}" workingdir="${sandcastle.workingdir}">
+            <arg value="reflection.org" />
+            <arg value="/xsl:&quot;${sandcastle.reflectiontomanifest.xsl}&quot;" />
+            <arg value="/out:manifest.xml" />
+        </exec>
+
+        <exec program="${sandcastle.buildassembler}" workingdir="${sandcastle.workingdir}">
+            <arg value="/config:Sandcastle.config" />
+            <arg value="manifest.xml" />
+        </exec>
+    </target>
+
+
+    <!-- do the full release with docs, minify and nightly file distribution -->
+    <target name="release" depends="zip">
+        <property name="assembly.name" value="${ assemblyname::get-version( assemblyname::get-assembly-name('umbraco/presentation/bin/umbraco.dll') ) }"/>
+        <property name="release.filename" value="${root.dir}\build_${build.version}_${assembly.name}.zip" />
+
+        <mkdir dir="${public.dir}\${build.version}" />
+        <copy file="${release.filename}" tofile="${public.dir}\${build.version}\${assembly.name}.zip" />
+    </target>
+
+    <!-- do the full release with docs, minify and nightly file distribution -->
+    <target name="zip" depends="directories">
+        <property name="assembly.name" value="${build.number}"/>
+        <property name="release.filename" value="${root.dir}\build_${build.version}_${assembly.name}.zip" />
+
+        <zip zipfile="${release.filename}" includeemptydirs="true" >
+            <fileset basedir="${root.dir}">
+                <include name="build/*" />
+                <include name="build/**/*" />
+            </fileset>
+        </zip>
+
+        <zip zipfile="${root.dir}\SymbolFiles.zip" includeemptydirs="true" >
+            <fileset basedir="${root.dir}">
+                <include name="SymbolFiles/*" />
+                <include name="SymbolFiles/**/*" />
+            </fileset>
+        </zip>
+
+        <zip zipfile="${root.dir}\Umbraco.MacroEngines.Iron.zip" includeemptydirs="true" >
+            <fileset basedir="${root.dir}">
+                <include name="umbraco.macroEngines.Iron_build/*" />
+                <include name="umbraco.macroEngines.Iron_build/**/*" />
+            </fileset>
+        </zip>
+    </target>
+
+
+    <!-- do a nightly build without the minification and docs -->
+    <target name="nightly" depends="zip">
+        <property name="assembly.name" value="${build.number}"/>
+        <property name="release.filename" value="${root.dir}\build_${build.version}_${assembly.name}.zip" />
+
+        <mkdir dir="${public.dir}\${build.version}" />
+
+        <copy file="${release.filename}" tofile="${public.dir}\${build.version}\${assembly.name}.zip" />
+        <copy file="${root.dir}\Umbraco.MacroEngines.Iron.zip" tofile="${public.dir}\${build.version}\Umbraco.MacroEngines.Iron.zip" />
+        <copy file="${root.dir}\SymbolFiles.zip" tofile="${public.dir}\${build.version}\SymbolFiles.zip" />
+
+    </target>
+
+    <!-- will produce the a clean /build folder and nothing else-->
+    <target name="test" depends="directories">
+
+    </target>
+
+    <target name="webPIRelease" depends="webPiFile">
+        <copy file="${root.dir}\webPi_sha.txt" tofile="${public.dir}\${build.version}\Umbraco_${build.version}_WebDeploy_sha.txt" />
+        <copy file="${root.dir}\Umbraco_${build.version}_WebDeploy.zip" tofile="${public.dir}\${build.version}\Umbraco_${build.version}_WebDeploy.zip" />
+    </target>
+
+    <!-- do the webdeploy release for web PI-->
+    <target name="webPiFile" depends="directories">
+
+        <property name="webpi.dir" value="${root.dir}\deploy" />
+
+        <delete dir="${webpi.dir}\umbraco" />
+
+        <mkdir dir="${webpi.dir}" />
+        <mkdir dir="${webpi.dir}\umbraco" />
+
+        <copy todir="${webpi.dir}\umbraco" includeemptydirs="true" >
+            <fileset basedir="${root.dir}\build">
+                <include name="*" />
+                <include name="**/*" />
+            </fileset>
+        </copy>
+
+        <copy todir="${webpi.dir}\umbraco\bin" includeemptydirs="true" >
+            <fileset basedir="${dlls.dir}\SQLCE4">
+                <include name="*" />
+                <include name="**/*" />
+            </fileset>
+        </copy>
+
+        <copy file="${root.dir}\components\SQLCE4Umbraco\bin\${build.configuration}\SQLCE4Umbraco.dll" tofile="${webpi.dir}\umbraco\bin\SQLCE4Umbraco.dll" failonerror="false" overwrite="true"/>
+
+        <copy file="${WebPiAssets.dir}\installSQL.sql" tofile="${webpi.dir}\installSQL.sql" failonerror="false"/>
+        <copy file="${WebPiAssets.dir}\manifest.xml" tofile="${webpi.dir}\manifest.xml" failonerror="false"/>
+        <copy file="${WebPiAssets.dir}\parameters.xml" tofile="${webpi.dir}\parameters.xml" failonerror="false"/>
+
+        <property name="webpi.filename" value="${root.dir}\Umbraco_${build.version}_WebDeploy.zip" />
+        <zip zipfile="${webpi.filename}" includeemptydirs="true" >
+            <fileset basedir="${webpi.dir}">
+                <include name="*" />
+                <include name="**/*" />
+            </fileset>
+        </zip>
+
+        <exec program="${win.dir}\hashMyFiles.exe">
+            <arg value="/file &quot;${webpi.filename}&quot;" />
+            <arg value="/stext &quot;${root.dir}\webPi_sha.txt&quot;" />
+        </exec>
+    </target>
+
+    <target name="init" description="init tasks for the build">
+
+        <!-- Clean the plugins dir any leftovers, only tinyMCE belongs in here -->
+        <delete>
+            <fileset>
+                <include name="${build.dir}\umbraco\plugins\*" />
+                <exclude name="${build.dir}\umbraco\plugins\tinymce3" />
+            </fileset>
+        </delete>
+
+        <delete dir="${build.dir}" />
+        <mkdir dir="${build.dir}" />
+    </target>
+
+
+</project>

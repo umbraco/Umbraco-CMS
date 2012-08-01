@@ -1,0 +1,37 @@
+@*
+USING RELATED LINKS (AND OTHER XML BASED TYPES
+==============================================
+This snippet shows how to work with properties that stores multiple values in XML such as the "Related Links" data type.
+When the Razor (or in fact the 'DynamicNode') detected XML, it automatically makes it possible to navigate the xml by
+using the name of the XML elements as properties. Be aware that the first xml element (the container) is always skipped
+and that the properties are case sensitive!
+
+How it works:
+- First we check if there's a property on the current page (Model) named 'relatedLinks'
+- Then we loop through the XML elements of the property 'RelatedLinks' (ie. all the links)
+- For each link we check if it should be opened in a new window (stored in an XML attribute called 'newwindow' which is
+  automatically translated into a property '.newwindow' by DynamicNode
+- Then we test if the link type is a internal or external link, and if it's an internal link we use the NiceUrl helper
+  method to convert the id of the page to a SEO friendly url
+  
+NOTE: It is safe to remove this comment (anything between @ * * @), the code that generates the list is only the below!
+*@
+
+@inherits umbraco.MacroEngines.DynamicNodeContext
+
+@{
+	if (Model.HasProperty("relatedLinks")) {
+	<ul>
+		@foreach (var link in @Model.RelatedLinks) {
+			string target = link.newwindow == "1" ? " target=\"_blank\"" : "";
+			<li>
+				@if (link.type == "internal") {
+					<a href="@umbraco.library.NiceUrl(int.Parse(link.link))"@Html.Raw(target)>@link.title</a>
+				} else {
+					<a href="@link.link"@Html.Raw(target)>@link.title</a>
+				}
+			</li>
+		}
+	</ul>
+	}
+}

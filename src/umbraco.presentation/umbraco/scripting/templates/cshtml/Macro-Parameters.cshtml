@@ -1,0 +1,16 @@
+@*
+MACRO PARAMETERS
+===================================
+This snippet is a very simple example on how to grab values specified via Macro Parameters. Macro Parameters are
+'attributes' that can be added to Macros (doesn't make sense when Razor is used inline) that makes it possible to
+re-use macros for multiple purposes. When you add a Macro Parameter to a Macro, the user can send different values
+to the Macro when it's inserted. Macro Parameters in Razor can be accessed via the Parameter property.
+
+How it works:
+- In this example it'll output the value specified in a Macro Parameter with the alias 'Who'.
+  
+NOTE: It is safe to remove this comment (anything between @ * * @), the code that generates the list is only the below!
+*@
+
+
+<h3>Hello @Parameter.Who</h3>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="nodeType">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="data">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="alias" type="xs:string" use="required" />
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="node" type="nodeType" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:int" use="required" />
+    <xs:attribute name="version" type="xs:string" use="required" />
+    <xs:attribute name="parentID" type="xs:int" use="required" />
+    <xs:attribute name="level" type="xs:int" use="required" />
+    <xs:attribute name="writerID" type="xs:int" use="required" />
+    <xs:attribute name="creatorID" type="xs:int" use="required" />
+    <xs:attribute name="nodeType" type="xs:int" use="required" />
+    <xs:attribute name="template" type="xs:int" use="required" />
+    <xs:attribute name="sortOrder" type="xs:int" use="required" />
+    <xs:attribute name="createDate" type="xs:dateTime" use="required" />
+    <xs:attribute name="updateDate" type="xs:dateTime" use="required" />
+    <xs:attribute name="nodeName" type="xs:string" use="required" />
+    <xs:attribute name="urlName" type="xs:string" use="required" />
+    <xs:attribute name="writerName" type="xs:string" use="required" />
+    <xs:attribute name="creatorName" type="xs:string" use="required" />
+    <xs:attribute name="nodeTypeAlias" type="xs:string" use="required" />
+    <xs:attribute name="path" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:element name="root">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="node" type="nodeType" />
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:int" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

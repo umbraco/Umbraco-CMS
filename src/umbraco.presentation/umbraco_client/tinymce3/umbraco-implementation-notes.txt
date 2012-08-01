@@ -1,0 +1,30 @@
+﻿Upgrade Instructions
+--------------------
+
+1. Plugins
+
+1.1 inlinepopups
+- Ensure Umbraco skin is maintained
+- Check for any changes to the Clearlook2 skin and port over
+  (NB: If the Clearlook2 skin hasn't changed, the Umbraco skin shouldn't need to either)
+
+1.2 umbracolink
+- Apply any changes that were applied to the default advLink plugin
+
+1.3 umbracoimg
+- Apply any changes that were applied to the default advImg plugin
+- Make sure you keep the existing settings (width/height/modal window location)
+
+1.4 umbracocontextmenu
+- Ensure ConextMenu item data hasn't moved internally (menu.items[n].settings)
+
+2. Themes
+The Umbraco theme is based off the Advanced theme which is included with TinyMCE.
+You will need to sync the changes made to the Advanced theme, while keeping the Umbraco-specific code.
+
+- Update the "langs" folder. Make sure to replace "advanced" with "umbraco" in each file.
+- Update editor_template.js to correctly inject the external toolbar in the Umbraco UI
+- Update the .html dialog files
+    - Head will contain a custom base-path & possibly encoding
+    - The Action Panel will contain custom markup surrounding the buttons. Make sure the buttons are up-to-date.
+    - Some labels are hardcoded in the Umbraco version

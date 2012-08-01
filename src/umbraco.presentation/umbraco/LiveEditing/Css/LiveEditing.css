@@ -1,0 +1,370 @@
+﻿/*****************************************************************
+
+	Live Editing placeholders
+
+/****************************************************************/
+
+umbraco\:iteminfo {
+	cursor: pointer;
+	border: 1px dashed #bbb;
+	padding: 5px;
+}
+
+.liveEditingForceBlockMode {
+	display: block;
+}
+
+umbraco\:iteminfo:hover 
+{
+	border: 2px dashed #f36f21;
+	padding: 5px;
+}
+
+/*****************************************************************
+
+	General Toolbar CSS
+
+/****************************************************************/
+
+html {
+	margin-top: 30px !important;	
+}
+
+#LiveEditingToolbar 
+{
+	font-family:"Trebuchet MS",verdana,arial;
+	background: url(../../../umbraco_client/tabView/images/background.gif) !important;
+	position: fixed !important;
+	width: 100% !important;
+	height: 34px !important;
+	top: 0 !important;
+	left: 0 !important;
+	text-align: left !important;
+	border-bottom: 1px solid #B0B0B0 !important;
+}
+
+#LiveEditingToolbar div {
+	padding: 4px !important;
+}
+
+#LiveEditingToolbar div div {
+	padding: inherit !important;
+}
+
+#LiveEditingToolbar div.ExtraMenuItems {
+	display: inline !important;
+}
+
+#LiveEditingToolbar div {
+	/*background: url(/umbraco/LiveEditing/Images/Canvas.gif) no-repeat right 4px; */
+	width: 100%;
+}
+
+#LiveEditingToolbar * div {
+	background: none;
+	width: auto;
+}
+
+#LiveEditingToolbar input.button {
+	cursor: hand !important;
+	width: 22px !important;
+	height: 23px !important;
+	background: none !important;
+	border: none !important;
+}
+
+#LiveEditingToolbar input.button:hover, #LiveEditingClientToolbar a.mceButtonEnabled:hover {
+	background-image: url(../../../umbraco_client/menuicon/images/buttonbg.gif) !important;
+	border: none !important;
+}
+
+#LiveEditingToolbar input.close {
+	position: absolute !important;
+	right: 7px !important;
+	top: 6px !important;
+	/*border: none !Important;
+	background: none !Important; */
+	color: #000;
+	width: 150px;
+}
+
+#LiveEditingToolbar input.close:hover {
+	opacity: 1 !important;
+}
+
+#LiveEditingToolbar img.about {
+	margin: 0 5px 5px 5px !important;
+}
+
+#LiveEditingClientToolbar, #LiveEditingClientToolbar div {
+	display: inline !important;
+}
+
+#LiveEditingToolbar span.separator {
+	padding-right: 7px !important;
+}
+
+#LiveEditingToolbar span.separator span {
+	border-left: 1px solid #999999 !important;
+	border-right: 1px solid #EEEEEE !important;
+	position: absolute !important;
+	top: 7px !important;
+	width: 0px !important;
+	overflow: hidden !important;
+}
+
+#LiveEditingToolbar .umbLabelButton 
+{
+	cursor: hand !important;
+	float: left;
+	margin: 1px 5px 1px 1px; 
+	padding: 0 !important;
+}
+
+#LiveEditingToolbar .umbLabelButton:hover 
+{
+	background: #EAEAEA;
+	border: 1px solid #CAC9C9 !Important;
+	margin: 0px 4px 0px 0px; 
+}
+
+#LiveEditingToolbar .umbLabelButton a 
+{
+	text-decoration: none;
+	font-size: 80%;
+	margin-right: 3px;
+	padding: 5px 0;
+}
+
+
+#LiveEditingToolbar .umbLabelButton input.button {
+	width: 22px !important;
+	height: 23px !important;
+	margin-right: 3px;
+	background: none !important;
+	border: none !important;
+	vertical-align: middle;
+}
+
+#LiveEditingToolbar .umbLabelButton input.button:hover {
+	background-image: none !important;
+	border: none !important;
+}
+
+/*****************************************************************
+
+	TinyMCE extra CSS
+
+/****************************************************************/
+
+/* hide the temporary TinyMCE container */
+.tinymceContainer {
+	position: absolute !important;
+	left: -1000px !important;
+}
+
+#LiveEditingClientToolbar .mceToolbarExternal table {
+	display: inline !important;
+	background: none !important;
+    margin: 0 !important;
+}
+
+#LiveEditingClientToolbar .mceToolbarExternal {
+	position: absolute !important;
+	top: 0 !important;	
+}
+
+#LiveEditingClientToolbar a.mceButtonEnabled {
+	width: 22px !important;
+	height: 23px !important;
+}
+
+/*****************************************************************
+
+	Datatypes extra CSS
+
+/****************************************************************/
+
+.relatedlinksdatatype
+{
+	background-color: #fff !important; 
+	border: 1px solid #999 !important;
+}
+
+/*****************************************************************
+
+	Modal dialogs
+
+/****************************************************************/
+
+.umbModalBox h1 
+{
+	font-size: larger !important;
+}
+
+.umbModalBox h2 
+{
+	font-size: medium !important;
+}
+
+.umbModalBox label 
+{
+	padding-bottom: 2px !Important; 
+	display: block !Important; 
+	color: #666 !Important; 
+	font-family:Trebuchet MS,Lucida Grande,verdana,arial ! important;
+}
+ 
+.umbModalBox p 
+{
+	font-size: 12px !important;
+	font-family:Trebuchet MS,Lucida Grande,verdana,arial ! important;
+	color:Black ! important;
+	margin-bottom:5px;
+}
+
+.umbModalBox p select
+{
+	margin-bottom:10px ! important;
+}
+
+.umbModalBox p{font-size: 11px !Important}
+
+
+#skins ul{list-style: none; padding: 0px; display: block; clear: both; height: 200px;}
+#skins ul li{margin-right: 12px; float: left; border: 1px solid #efefef; padding: 5px; width: 120px; text-align: center; font-weight: normal;}
+
+
+/*****************************************************************
+
+	Umbraco UI Components
+
+/****************************************************************/
+
+.propertypane {
+	position: relative;    
+	display: block;
+	line-height: 1.1;
+	background: #fff url('/umbraco_client/propertypane/images/propertyBackground.gif') top repeat-x !Important;
+	background-image:url(/umbraco_client/propertypane/images/propertyBackground.gif) !Important;
+	padding: 5px;
+	margin:7px 0px 0px 0px;
+	border: 1px solid #d9d7d7;
+	  text-align:left;
+	  clear: both;
+	  float: none;
+	  color: black;
+	  font-size: 11px !Important;
+	}
+ 
+	.propertypane th
+	  {
+	  vertical-align: top;
+	text-align:left;
+		font-weight:bold;
+		font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+		font-size:12px;
+		width: 16%;
+		}
+		
+		.propertypane,.propertypane td
+	  {
+	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+		font-size:12px;
+		}
+				
+		
+		.propertypane small 
+		{
+			font-weight: normal;
+			color: #666;
+		}
+		
+		.propertypane div.propertyItem{
+		  padding-bottom: 5px;
+		  clear: both;
+		  font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+		  font-size:12px;			  
+		}
+		
+		.propertypane div.propertyItem .propertyItemheader{
+		  width: 16%;
+		  padding-right: 1%;
+		  padding-bottom: 10px;
+		  float: left;
+		  clear: left;
+		  font-weight:bold;
+		}
+		
+		.propertypane div.propertyItem .propertyItemContent{
+		  float: left;
+		  padding-bottom: 5px;
+		  clear: right;
+		}
+		
+		h2.propertypaneTitel{font-size: 14px; color: #999;margin: 7px 0px 0px 0px; padding-bottom: 0px; line-height: 14px;}
+		
+		div.propertyPaneFooter{clear: both; height: 1px; overflow: hidden; color: #fff;}
+		
+#LiveEditingToolbar .ModuleSelector
+{
+    background-color:#FFF !important;
+    position:absolute;
+    top:36px;
+    left:270px;
+    color:#000;
+    border-left:5px solid #A3A3A3;
+    border-right:5px solid #A3A3A3;
+    border-bottom:5px solid #A3A3A3;
+    z-index:100;
+}
+
+#LiveEditingToolbar #moduleSelectorContainer
+{
+    padding:10px;
+}
+
+.umbModuleContainerSelector
+{
+    cursor:pointer;
+}
+
+p#installingModule img
+{
+    float:none;
+    margin:0;
+    padding:0;
+}
+
+#LiveEditingToolbar  #modules ul
+{
+    list-style-type:none;
+    margin-left:0px;
+    margin-right:0px;
+}
+
+#LiveEditingToolbar  #modules ul li
+{
+    display:block;
+    padding-bottom:5px;
+    padding-top:5px;
+    border-bottom:1px solid #c3c3c3;
+}
+
+ #LiveEditingToolbar .umbLabelButton a,  #LiveEditingToolbar .umbLabelButton a:hover
+{
+    color:Black !important;
+}   
+
+.umbModalBox a, .umbModalBox a:hover
+{
+    color:#888 !important;
+}
+
+/* skin customize dialog */
+#costumizeSkin #dependencies .propertypane
+{
+    height:205px;
+    overflow:scroll;
+    overflow-x: hidden;
+}

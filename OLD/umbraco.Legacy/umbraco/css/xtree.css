@@ -1,0 +1,120 @@
+.overlayHolder
+{
+	position: relative;
+	display: inline;
+}
+
+
+.treeOverlay
+{
+	filter: Alpha(Opacity=80);
+	position: absolute;
+	z-index: 500;
+	left: 8;
+	top: 6;
+}
+
+
+.newVersionOverlay
+{
+	position: absolute;
+	z-index: 500;
+	left: 0px;
+	top: 0px;
+	width: 8px;
+	height: 8px;
+	background: no-repeat url(../images/newVersion_overlay.png);
+	_filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/newVersion_overlay.png');
+}
+
+.newProtectOverlay
+{
+	position: absolute;
+	z-index: 500;
+	left: 6px;
+	top: 9px;
+	width: 8px;
+	height: 8px;
+	background: no-repeat url(../images/protect_overlay.gif);
+	_filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='images/protect_overlay.gif');
+}
+
+.webfx-tree-container
+{
+	margin: 0px;
+	padding: 0px;
+	font: icon;
+	white-space: nowrap;
+}
+
+.webfx-tree-item
+{
+	padding: 0px 0px 4px 0px;
+	margin: 0px;
+	font: icon;
+	color: WindowText;
+	white-space: nowrap;
+	height: 16px;
+}
+
+.webfx-tree-item a, .webfx-tree-item a:active, .webfx-tree-item a:hover
+{
+}
+
+
+.webfx-tree-item a
+{
+	color: #2f2f2f;
+	text-decoration: none;
+	outline: none;
+}
+
+.webfx-tree-item a:hover
+{
+	text-decoration: underline;
+}
+
+.webfx-tree-item a:active
+{
+	text-decoration: none;
+}
+
+.webfx-tree-item img
+{
+	vertical-align: middle;
+	border: 0px;
+}
+
+.webfx-tree-icon
+{
+	width: 16px;
+	height: 16px;
+	padding-right: 7px;
+}
+
+.umbraco-tree-icon-grey
+{
+	filter: Alpha(Opacity=30);
+}
+
+
+/*
+keep strong focus instead of different selector colors on inactive/active
+.webfx-tree-item a.selected-inactive, .webfx-tree-item a.selected  {
+	color: windowtext;
+	background: #e5e5e5;
+	border: 1px solid #d9d9d9;
+	padding: 2px;
+}
+*/
+
+
+.webfx-tree-item a.selected-inactive, .webfx-tree-item a.selected
+{
+	color: windowtext;
+	background: #d5effc;
+	border: 1px solid #99defd;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	padding: 1px;
+}

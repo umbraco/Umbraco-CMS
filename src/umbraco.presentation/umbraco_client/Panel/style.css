@@ -1,0 +1,101 @@
+  .panel {
+    margin: 0 auto; /* center for now */
+    width: 17em; /* ems so it will grow */
+    background: url(images/panel_bg.gif) top repeat-x;
+    font-size: 100%;
+    padding: 0px;
+    display: block;
+    border: 0px;
+    position: relative;
+    }
+    
+  .panelstatus {
+    margin: 0 auto; /* center for now */
+    width: 17em; /* ems so it will grow */
+    font-size: 100%;
+    }
+    
+  .panel .boxhead {
+    background: url(images/panel_boxhead_bg.gif) top left no-repeat;
+    margin: 0px;
+    padding: 0px;
+    text-align: center;
+    display: block;
+    width: auto;
+    border: 0px;
+    position: relative;
+    }
+    
+  .panel .boxhead h2, .panel .boxfooter h2 {
+    background: url(images/panel_boxhead_h2_bg.gif) top right no-repeat;
+    margin: 0px;
+    padding: 3px 0px 1px 10px;
+    font-weight: bold;
+    text-align: left;
+    font-family: "Trebuchet MS", verdana, arial;
+    font-size: 10px; color: #378080;
+    display: block;
+    height: 14px;
+    width: auto;    
+    }
+    
+   .panel .boxbody {
+    border-top: 1px solid #cac9c9;
+    border-right: 1px solid #cac9c9;
+    background: url(images/panel_boxfooter_bg.gif) bottom left repeat-y #fff;
+    padding: 0px;
+    margin: 0px; 
+    position: relative;
+    }
+    
+   .panel .boxfooter {
+    height: 12px;
+    margin: 0;
+    padding: 0px;
+    background: url(images/panel_boxfooter_bg.gif) 11px 11px repeat-x #fff;
+    }
+    
+    .panel .boxfooter .statusBar{height: 12px; margin: 0px; background: url(images/panel_boxfooter_statusBar_bg.gif) top left no-repeat;}
+    .panel .boxfooter .statusBar h2{display: block; height: 12px; margin: 0px; padding: 0px; background: url(images/panel_boxfooter_statusBar_h2_bg.gif) top right no-repeat;}
+    
+    
+  .panelstatus .boxfooter {
+    font-size: 9px;
+    color: #999;
+    height: 15px;
+    margin: 0;
+    padding: 5px 0 8px 15px;
+    }
+  
+  .panel .content {
+    overflow: auto;
+    padding: 0px 10px 0px 10px;
+	  margin:0px;
+	  position: relative;
+    width: auto !Important;
+    width: 10em;
+    }
+  
+  .panel .content .innerContent{padding: 0px; margin: 0px; width: 100%;}
+  
+  #treeWindow .innerContent{height: 100%;}
+  
+  .panel .menubar_panel {
+	background-image: url(../tabView/images/background.gif);
+	height:32px;
+	
+	display: block;
+	border-bottom:1px solid #CAC9C9;
+	border-left:1px solid #CAC9C9;
+	border-right:1px solid #CAC9C9 !Important;
+	
+	overflow:hidden;
+	padding: 0px; 
+	margin: 0px;
+  }
+  
+   
+  .guiDialogTinyMark {
+    font-family: "Trebuchet MS", verdana, arial;
+    font-size: 10px; color: #606057;
+  }

@@ -1,0 +1,83 @@
+
+.genericPropertyForm {
+  padding: 5px;
+}
+.genericPropertyForm h2 {
+  font-size: 15px;
+  margin-bottom: 0px;
+  padding-bottom: 2px;
+}
+
+.genericPropertyList {
+  padding: 10px;
+  margin: 0px;
+  list-style: none;
+}
+
+.genericPropertyList li {
+  padding: 7px;
+  display: block;
+  position: relative;
+  background: url(../tabView/images/background.gif) #EEEEEE repeat-x bottom;
+  border: 1px solid #ccc;
+  margin-bottom: 3px;
+  cursor: move;
+}
+.addNewProperty li {
+  cursor: default;
+}
+
+.genericPropertyList li div.propertypane{
+  background-image: none !Important;
+}
+.genericPropertyList li h3 {
+  font-size: 11px;
+  padding-left: 10px;
+}
+
+.genericPropertyList li table {
+  border-top: 1px solid #ccc;
+  display: block;
+  margin-top: 10px;
+}
+
+.genericPropertyList li table th {
+  width: 140px;
+  padding: 5px;
+}
+
+.propertyFormInput {
+  width: 300px;
+  z-index: 9999;
+}
+.propertyForm SELECT {
+  width: 300px;
+}
+
+
+.propertyForm h3 a {
+  color: #000;
+  text-decoration: none;
+}
+
+
+
+.genericPropertyList li img {
+  background: red;
+  z-index: 9999;
+  position: relative;
+  border-right: medium none;
+  border-top: medium none;
+  border-left: medium none;
+  margin-right: 5px;
+  border-bottom: medium none;
+}
+.genericPropertyList li h3 input {
+  position: relative;
+}
+
+.aliasValidationError 
+{
+    background-color: #ff9999;
+    border: 1px solid: red;
+}
