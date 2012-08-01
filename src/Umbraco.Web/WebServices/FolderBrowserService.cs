@@ -44,7 +44,7 @@ namespace Umbraco.Web.WebServices
                         x.PropertyType.DataTypeDefinition.DataType.Id == new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
 
                 var fileUrl = fileProp != null ? fileProp.Value.ToString() : "";
-                var thumbUrl = ThumbnailProviderManager.GetThumbnailUrl(fileUrl);
+                var thumbUrl = ThumbnailProviderManager.Current.GetThumbnailUrl(fileUrl);
                 
                 data.Add(new
                 {

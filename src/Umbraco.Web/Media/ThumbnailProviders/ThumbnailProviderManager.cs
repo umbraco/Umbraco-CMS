@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -11,34 +12,46 @@ namespace Umbraco.Web.Media.ThumbnailProviders
 {
     public class ThumbnailProviderManager
     {
-        private const string CacheKey = "ThumbnailProviderCache";
+        private static readonly IList<IThumbnailProvider> ProviderCache = new List<IThumbnailProvider>();
 
-        internal static IEnumerable<IThumbnailProvider> Providers
+        #region Singleton
+        
+        private static readonly ThumbnailProviderManager Instance = new ThumbnailProviderManager();
+
+        public static ThumbnailProviderManager Current
+        {
+            get { return Instance; }
+        }
+
+        #endregion
+
+        #region Constructors
+
+        static ThumbnailProviderManager()
+        {
+            PopulateCache();
+        }
+
+        #endregion
+
+        internal IEnumerable<IThumbnailProvider> Providers
         {
             get
             {
-                EnsureCache();
-
-                return HttpRuntime.Cache[CacheKey] as List<IThumbnailProvider>;
-            }
-            set
-            {
-                HttpRuntime.Cache.Insert(CacheKey, value);
+                var providers = ProviderCache.ToList();
+                providers.Sort((f1, f2) => f1.Priority.CompareTo(f2.Priority));
+                return providers;
             }
         }
 
-        public static string GetThumbnailUrl(string fileUrl)
+        internal string GetThumbnailUrl(string fileUrl)
         {
             var provider = Providers.FirstOrDefault(x => x.CanProvideThumbnail(fileUrl));
             return provider != null ? provider.GetThumbnailUrl(fileUrl) : string.Empty;
         }
 
-        private static void EnsureCache()
+        private static void PopulateCache()
         {
-            if (HttpRuntime.Cache[CacheKey] != null)
-                return;
-
-            var providers = new List<IThumbnailProvider>();
             var types = TypeFinder.FindClassesOfType<IThumbnailProvider>();
 
             foreach (var t in types)
@@ -58,7 +71,7 @@ namespace Umbraco.Web.Media.ThumbnailProviders
                 {
                     try
                     {
-                        providers.Add(typeInstance);
+                        ProviderCache.Add(typeInstance);
                     }
                     catch (Exception ee)
                     {
@@ -66,10 +79,6 @@ namespace Umbraco.Web.Media.ThumbnailProviders
                     }
                 }
             }
-
-            providers.Sort((f1, f2) => f1.Priority.CompareTo(f2.Priority));
-
-            Providers = providers;
         }
     }
 }
