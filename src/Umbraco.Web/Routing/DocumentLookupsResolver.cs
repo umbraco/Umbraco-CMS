@@ -41,7 +41,7 @@ namespace Umbraco.Web.Routing
 		{
 			foreach (var l in lookups)
 			{
-				this.Add(l);
+				this.AddType(l);
 			}
 		} 
 		#endregion

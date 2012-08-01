@@ -8,7 +8,6 @@ namespace Umbraco.Core.Resolving
 	internal abstract class ManyObjectResolverBase<TResolved>
 		where TResolved : class
 	{
-		private readonly bool _instancePerApplication = false;		
 		private List<TResolved> _applicationInstances = null;
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		
@@ -16,11 +15,43 @@ namespace Umbraco.Core.Resolving
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolved}"/> class with an empty list of objects.
 		/// </summary>
-		/// <param name="instancePerApplication">If set to true will resolve singleton objects which will be created once for the lifetime of the application</param>
-		protected ManyObjectResolverBase(bool instancePerApplication = true)
+		/// <param name="scope">The lifetime scope of instantiated objects, default is per Application</param>
+		protected ManyObjectResolverBase(ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
 		{
-			_instancePerApplication = instancePerApplication;
+			if (scope == ObjectLifetimeScope.HttpRequest)
+			{
+				if (HttpContext.Current == null)
+				{
+					throw new InvalidOperationException("Use alternative constructor accepting a HttpContextBase object in order to set the lifetime scope to HttpRequest when HttpContext.Current is null");		
+				}
+				CurrentHttpContext = new HttpContextWrapper(HttpContext.Current);
+			}
+
+			LifetimeScope = scope;
 			InstanceTypes = new List<Type>();
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolved}"/> class with an empty list of objects.
+		/// with creation of objects based on an HttpRequest lifetime scope.
+		/// </summary>
+		/// <param name="httpContext"></param>
+		protected ManyObjectResolverBase(HttpContextBase httpContext)
+		{
+			LifetimeScope = ObjectLifetimeScope.HttpRequest;
+			CurrentHttpContext = httpContext;
+			InstanceTypes = new List<Type>();
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolved}"/> class with an initial list of objects.
+		/// </summary>
+		/// <param name="value">The list of objects.</param>
+		/// <param name="scope">If set to true will resolve singleton objects which will be created once for the lifetime of the application</param>
+		protected ManyObjectResolverBase(IEnumerable<Type> value, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
+			: this(scope)
+		{			
+			InstanceTypes = new List<Type>(value);
 		}
 
 		/// <summary>
@@ -28,33 +59,11 @@ namespace Umbraco.Core.Resolving
 		/// with creation of objects based on an HttpRequest lifetime scope.
 		/// </summary>
 		/// <param name="httpContext"></param>
-		protected ManyObjectResolverBase(HttpContextBase httpContext)
-			: this(false)
-		{
-			CurrentHttpContext = httpContext;
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolved}"/> class with an initial list of objects.
-		/// </summary>
-		/// <param name="value">The list of objects.</param>
-		/// <param name="instancePerApplication">If set to true will resolve singleton objects which will be created once for the lifetime of the application</param>
-		protected ManyObjectResolverBase(IEnumerable<Type> value, bool instancePerApplication = true)
-		{
-			_instancePerApplication = instancePerApplication;
-			InstanceTypes = new List<Type>(value);
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolved}"/> class with an empty list of objects
-		/// with creation of objects based on an HttpRequest lifetime scope.
-		/// </summary>
-		/// <param name="httpContext"></param>
 		/// <param name="value"></param>
 		protected ManyObjectResolverBase(HttpContextBase httpContext, IEnumerable<Type> value)
-			: this(value, false)
+			: this(httpContext)
 		{
-			CurrentHttpContext = httpContext;
+			InstanceTypes = new List<Type>(value);
 		} 
 		#endregion
 
@@ -72,17 +81,7 @@ namespace Umbraco.Core.Resolving
 		/// <summary>
 		/// Returns the ObjectLifetimeScope for created objects
 		/// </summary>
-		protected ObjectLifetimeScope LifetimeScope
-		{
-			get
-			{
-				if (_instancePerApplication)
-					return ObjectLifetimeScope.Application;
-				if (CurrentHttpContext != null)
-					return ObjectLifetimeScope.HttpRequest;
-				return ObjectLifetimeScope.Transient;
-			}
-		}
+		protected ObjectLifetimeScope LifetimeScope { get; private set; }
 
 		/// <summary>
 		/// Returns the list of new object instances.
@@ -106,7 +105,7 @@ namespace Umbraco.Core.Resolving
 								CurrentHttpContext.Items[this.GetType().FullName] = new List<TResolved>(
 									PluginTypeResolver.Current.CreateInstances<TResolved>(InstanceTypes));
 							}
-							return _applicationInstances;
+							return (List<TResolved>)CurrentHttpContext.Items[this.GetType().FullName];
 						}
 					case ObjectLifetimeScope.Application:
 						//create new instances per application, this means we'll lazily create them and once created, cache them
@@ -132,7 +131,7 @@ namespace Umbraco.Core.Resolving
 		/// Removes a type.
 		/// </summary>
 		/// <param name="value">The type to remove.</param>
-		public void Remove(Type value)
+		public void RemoveType(Type value)
 		{	
 			EnsureCorrectType(value);
 			using (new WriteLock(_lock))
@@ -145,16 +144,16 @@ namespace Umbraco.Core.Resolving
 		/// Removes a type.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		public void Remove<T>()
+		public void RemoveType<T>()
 		{
-			Remove(typeof (T));
+			RemoveType(typeof (T));
 		}
 
 		/// <summary>
 		/// Adds a Type to the end of the list.
 		/// </summary>
 		/// <param name="value">The object to be added.</param>
-		public void Add(Type value)
+		public void AddType(Type value)
 		{
 			EnsureCorrectType(value);
 			using (var l = new UpgradeableReadLock(_lock))
@@ -173,9 +172,9 @@ namespace Umbraco.Core.Resolving
 		/// Adds a Type to the end of the list.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		public void Add<T>()
+		public void AddType<T>()
 		{
-			Add(typeof (T));
+			AddType(typeof (T));
 		}
 
 		/// <summary>
@@ -194,7 +193,7 @@ namespace Umbraco.Core.Resolving
 		/// </summary>
 		/// <param name="index">The zero-based index at which the object should be inserted.</param>
 		/// <param name="value">The object to insert.</param>
-		public void Insert(int index, Type value)
+		public void InsertType(int index, Type value)
 		{
 			EnsureCorrectType(value);
 			using (var l = new UpgradeableReadLock(_lock))
@@ -214,9 +213,9 @@ namespace Umbraco.Core.Resolving
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="index"></param>
-		public void Insert<T>(int index)
+		public void InsertType<T>(int index)
 		{
-			Insert(index, typeof (T));
+			InsertType(index, typeof (T));
 		}
 
 		private void EnsureCorrectType(Type t)
