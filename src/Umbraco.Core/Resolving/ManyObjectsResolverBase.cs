@@ -107,8 +107,7 @@ namespace Umbraco.Core.Resolving
 							{
 								l.UpgradeToWriteLock();
 								//add the items to the context items (based on full type name)
-								CurrentHttpContext.Items[this.GetType().FullName] = new List<TResolved>(
-									PluginManager.Current.CreateInstances<TResolved>(InstanceTypes));
+								CurrentHttpContext.Items[this.GetType().FullName] = new List<TResolved>(CreateInstances());
 							}
 							return (List<TResolved>)CurrentHttpContext.Items[this.GetType().FullName];
 						}
@@ -119,18 +118,22 @@ namespace Umbraco.Core.Resolving
 							if (_applicationInstances == null)
 							{
 								l.UpgradeToWriteLock();
-								_applicationInstances = new List<TResolved>(
-									PluginManager.Current.CreateInstances<TResolved>(InstanceTypes));
+								_applicationInstances = new List<TResolved>(CreateInstances());
 							}
 							return _applicationInstances;
 						}
 					case ObjectLifetimeScope.Transient:
 					default:
 						//create new instances each time
-						return PluginManager.Current.CreateInstances<TResolved>(InstanceTypes);
+						return CreateInstances();
 				}				
 			}
 		}
+
+		protected virtual IEnumerable<TResolved> CreateInstances()
+		{
+			return PluginManager.Current.CreateInstances<TResolved>(InstanceTypes);
+		} 
 
 		/// <summary>
 		/// Removes a type.

@@ -84,6 +84,9 @@ namespace Umbraco.Core
 
 			PackageActionsResolver.Current = new PackageActionsResolver(
 				PluginManager.Current.ResolvePackageActions());
+
+			ActionsResolver.Current = new ActionsResolver(
+				PluginManager.Current.ResolveActions());
 		}
 	}
 }

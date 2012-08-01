@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Reflection;
 using Umbraco.Core;
+using Umbraco.Core.Resolving;
 using umbraco.BasePages;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms;
@@ -11,6 +12,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.workflow;
 using umbraco.interfaces;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace umbraco.BusinessLogic.Actions
 {
@@ -29,10 +31,7 @@ namespace umbraco.BusinessLogic.Actions
     /// </summary>
     public class Action
     {
-        private static readonly List<IAction> Actions = new List<IAction>();
         private static readonly List<IActionHandler> ActionHandlers = new List<IActionHandler>();
-
-        private static readonly List<string> ActionJsReference = new List<string>();
         private static readonly Dictionary<string, string> ActionJs = new Dictionary<string, string>();
 
         private static readonly object Lock = new object();
@@ -42,20 +41,29 @@ namespace umbraco.BusinessLogic.Actions
             ReRegisterActionsAndHandlers();
         }
 
-        /// <summary>
-        /// This is used when an IAction or IActionHandler is installed into the system
-        /// and needs to be loaded into memory.
-        /// </summary>
-        public static void ReRegisterActionsAndHandlers()
-        {
-            lock (Lock)
-            {
-                Actions.Clear();
-                ActionHandlers.Clear();
-                RegisterIActions();
-                RegisterIActionHandlers();
-            }
-        }
+		/// <summary>
+		/// This is used when an IAction or IActionHandler is installed into the system
+		/// and needs to be loaded into memory.
+		/// </summary>
+		/// <remarks>
+		/// TODO: this shouldn't be needed... we should restart the app pool when a package is installed!
+		/// </remarks>
+		public static void ReRegisterActionsAndHandlers()
+		{
+			lock (Lock)
+			{
+
+				//TODO: Based on the above, this is a big hack as types should all be cleared on package install!
+				ActionsResolver.Reset();
+				ActionHandlers.Clear();
+
+				//TODO: Based on the above, this is a big hack as types should all be cleared on package install!
+				ActionsResolver.Current = new ActionsResolver(
+					TypeFinder2.FindClassesOfType<IAction>(PluginManager.Current.AssembliesToScan));
+
+				RegisterIActionHandlers();
+			}
+		}
 
         /// <summary>
         /// Stores all IActionHandlers that have been loaded into memory into a list
@@ -67,36 +75,6 @@ namespace umbraco.BusinessLogic.Actions
             	ActionHandlers.AddRange(
             		PluginManager.Current.CreateInstances<IActionHandler>(
             			PluginManager.Current.ResolveActionHandlers()));                
-            }
-
-        }
-
-        /// <summary>
-        /// Stores all IActions that have been loaded into memory into a list
-        /// </summary>
-        private static void RegisterIActions()
-        {
-
-            if (Actions.Count == 0)
-            {
-            	var foundIActions = PluginManager.Current.ResolveActions();
-                foreach (var type in foundIActions)
-                {
-                    IAction typeInstance;
-                    var instance = type.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
-                    //if the singletone initializer is not found, try simply creating an instance of the IAction if it supports public constructors
-					if (instance == null)
-						typeInstance = PluginManager.Current.CreateInstance<IAction>(type);
-					else
-						typeInstance = instance.GetValue(null, null) as IAction;
-
-                    if (typeInstance != null)
-                    {
-                        if (!string.IsNullOrEmpty(typeInstance.JsSource))
-                            ActionJsReference.Add(typeInstance.JsSource);
-                        Actions.Add(typeInstance);
-                    }
-                }
             }
 
         }
@@ -169,7 +147,8 @@ namespace umbraco.BusinessLogic.Actions
         /// <returns></returns>
         public static List<string> GetJavaScriptFileReferences()
         {
-            return ActionJsReference;
+        	return ActionsResolver.Current.Actions.Select(x => x.JsSource).ToList();
+        	//return ActionJsReference;
         }
 
         /// <summary>
@@ -186,7 +165,7 @@ namespace umbraco.BusinessLogic.Actions
             {
                 string _actionJsList = "";
 
-                foreach (IAction action in Actions)
+				foreach (IAction action in ActionsResolver.Current.Actions)
                 {
                     // Adding try/catch so this rutine doesn't fail if one of the actions fail
                     // Add to language JsList
@@ -223,9 +202,10 @@ namespace umbraco.BusinessLogic.Actions
         /// 
         /// </summary>
         /// <returns>An arraylist containing all javascript variables for the contextmenu in the tree</returns>
+		[Obsolete("Use ActionsResolver.Current.Actions instead")]
         public static ArrayList GetAll()
         {
-            return new ArrayList(Actions);
+			return new ArrayList(ActionsResolver.Current.Actions.ToList());
         }
 
         /// <summary>
@@ -239,7 +219,7 @@ namespace umbraco.BusinessLogic.Actions
             List<IAction> list = new List<IAction>();
             foreach (char c in actions.ToCharArray())
             {
-                IAction action = Actions.Find(
+				IAction action = ActionsResolver.Current.Actions.ToList().Find(
                     delegate(IAction a)
                     {
                         return a.Letter == c;
@@ -267,7 +247,7 @@ namespace umbraco.BusinessLogic.Actions
         /// <returns></returns>
         public static List<IAction> GetPermissionAssignable()
         {
-            return Actions.FindAll(
+			return ActionsResolver.Current.Actions.ToList().FindAll(
                 delegate(IAction a)
                 {
                     return (a.CanBePermissionAssigned);

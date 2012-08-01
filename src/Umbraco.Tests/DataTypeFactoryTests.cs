@@ -9,6 +9,7 @@ using System.Linq;
 
 namespace Umbraco.Tests
 {
+
 	[TestFixture]
 	public class DataTypeFactoryTests
 	{
