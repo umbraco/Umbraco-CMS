@@ -243,6 +243,12 @@
     <Compile Include="Routing\DefaultLastChanceLookup.cs" />
     <Compile Include="Routing\IDocumentLastChanceLookup.cs" />
     <Compile Include="Routing\LookupByAlias.cs" />
+    <Compile Include="Media\ThumbnailProviders\AbstractThumbnailProvider.cs" />
+    <Compile Include="Media\ThumbnailProviders\MediaTypeIconThumbnailProvider.cs" />
+    <Compile Include="Media\ThumbnailProviders\FileExtensionIconThumbnailProvider.cs" />
+    <Compile Include="Media\ThumbnailProviders\ImageThumbnailProvider.cs" />
+    <Compile Include="Media\ThumbnailProviders\ThumbnailProviderManager.cs" />
+    <Compile Include="UI\Controls\FolderBrowser.cs" />
     <Compile Include="Routing\LookupById.cs" />
     <Compile Include="Routing\LookupByNiceUrl.cs" />
     <Compile Include="Routing\LookupByNiceUrlAndTemplate.cs" />
@@ -1771,6 +1777,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="WebServices\FolderBrowserService.cs" />
     <Content Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx" />
@@ -1977,7 +1984,9 @@
     <Content Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\sort.aspx" />
     <Content Include="umbraco.presentation\umbraco\test.aspx" />
-    <Content Include="umbraco.presentation\umbraco\tree.aspx" />
+    <Content Include="umbraco.presentation\umbraco\tree.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\treeInit.aspx" />
     <Content Include="umbraco.presentation\umbraco\umbraco.aspx" />
     <Content Include="umbraco.presentation\umbraco\users\EditUser.aspx" />

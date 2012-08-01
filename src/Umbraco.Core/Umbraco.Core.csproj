@@ -81,6 +81,7 @@
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="IfExtensions.cs" />
     <Compile Include="PluginTypeResolver.cs" />
+    <Compile Include="Interfaces\IThumbnailProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringAliasCaseType.cs" />
     <Compile Include="StringExtensions.cs" />
