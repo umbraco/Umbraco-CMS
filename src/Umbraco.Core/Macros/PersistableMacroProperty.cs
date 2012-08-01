@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace umbraco.editorControls.macrocontainer
+namespace Umbraco.Core.Macros
 {
+
+	/// <summary>
+	/// NOTE: This is legacy code, might require a cleanup
+	/// </summary>
     [Serializable]
     internal class PersistableMacroProperty
     {

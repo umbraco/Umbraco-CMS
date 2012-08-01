@@ -11,9 +11,14 @@ namespace Umbraco.Core.Resolving
 		where TResolver : class
 	{
 		static TResolver _resolver;
-
-		//TODO: This is not correct, this will be the same lock for all ResolverBase classes!!
-		// this will work i suppose but not really ideal
+		
+		/// <summary>
+		/// The lock for the singleton
+		/// </summary>
+		/// <remarks>
+		/// Though resharper says this is in error, it is actually correct. We want a different lock object for each generic type.
+		/// See this for details: http://confluence.jetbrains.net/display/ReSharper/Static+field+in+generic+type
+		/// </remarks>
 		static readonly ReaderWriterLockSlim ResolversLock = new ReaderWriterLockSlim();
 
 		public static TResolver Current
@@ -39,6 +44,14 @@ namespace Umbraco.Core.Resolving
 					_resolver = value;
 				}
 			}
+		}
+
+		/// <summary>
+		/// used in unit tests to reset current to null
+		/// </summary>
+		internal static void Reset()
+		{
+			_resolver = null;
 		}
 	}
 }

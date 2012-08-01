@@ -14,7 +14,13 @@ namespace Umbraco.Core.Resolving
 	{
 		public static event EventHandler Frozen;
 
-		public static bool IsFrozen { get; private set; }
+		/// <summary>
+		/// Gets a value indicating that resolution is frozen
+		/// </summary>
+		/// <remarks>
+		/// The internal setter is normally used for unit tests
+		/// </remarks>
+		public static bool IsFrozen { get; internal set; }
 
 		public static void EnsureNotFrozen()
 		{

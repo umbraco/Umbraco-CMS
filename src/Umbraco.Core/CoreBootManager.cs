@@ -40,7 +40,10 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		public virtual IBootManager Startup(Action<ApplicationContext> afterStartup)
 		{
-			afterStartup(ApplicationContext.Current);
+			if (afterStartup != null)
+			{
+				afterStartup(ApplicationContext.Current);	
+			}			
 			return this;
 		}
 
@@ -57,7 +60,11 @@ namespace Umbraco.Core
 			//stop the timer and log the output
 			_timer.Dispose();
 
-			afterComplete(ApplicationContext.Current);
+			if (afterComplete != null)
+			{
+				afterComplete(ApplicationContext.Current);	
+			}
+			
 			return this;
 		}
 
@@ -71,6 +78,9 @@ namespace Umbraco.Core
 
 			DataTypesResolver.Current = new DataTypesResolver(
 				PluginManager.Current.ResolveDataTypes());
+
+			MacroFieldEditorsResolver.Current = new MacroFieldEditorsResolver(
+				PluginManager.Current.ResolveMacroRenderings());
 		}
 	}
 }

@@ -14,13 +14,22 @@ namespace Umbraco.Tests
 {
 	[TestFixture]
 	public class ManyObjectResolverTests
-	{		
+	{
+
+		[SetUp]
+		public void Initialize()
+		{
+			//reset each test
+			Resolution.IsFrozen = false;
+		}
 
 		[Test]
 		public void Ensure_Transient_Object_Creation()
 		{
 			var resolver = new TransientObjectsResolver();
 			resolver.AddType<TransientObject>();
+
+			Resolution.Freeze();
 
 			var instances1 = resolver.Objects;
 			var instances2 = resolver.Objects;
@@ -33,6 +42,8 @@ namespace Umbraco.Tests
 		{
 			var resolver = new ApplicationObjectsResolver();
 			resolver.AddType<TransientObject>();
+
+			Resolution.Freeze();
 
 			var instances1 = resolver.Objects;
 			var instances2 = resolver.Objects;
@@ -47,6 +58,8 @@ namespace Umbraco.Tests
 
 			var resolver = new HttpRequestObjectsResolver(httpContextFactory.HttpContext);
 			resolver.AddType<TransientObject>();
+
+			Resolution.Freeze();
 
 			var instances1 = resolver.Objects;
 			var instances2 = resolver.Objects;

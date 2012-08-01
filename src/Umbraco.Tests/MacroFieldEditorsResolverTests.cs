@@ -10,7 +10,7 @@ using umbraco.interfaces;
 namespace Umbraco.Tests
 {
 	[TestFixture]
-	public class MacroControlFactoryTests
+	public class MacroFieldEditorsResolverTests
 	{
 		[SetUp]
 		public void Initialize()
@@ -25,12 +25,15 @@ namespace Umbraco.Tests
 				{
 					this.GetType().Assembly
 				};
+
+			MacroFieldEditorsResolver.Current = new MacroFieldEditorsResolver(
+				PluginManager.Current.ResolveMacroRenderings());
 		}
 
 		[Test]
 		public void Find_Types()
 		{
-			var found = MacroControlFactory.MacroControlTypes;
+			var found = MacroFieldEditorsResolver.Current.MacroControlTypes;
 			Assert.AreEqual(2, found.Count());
 		}
 

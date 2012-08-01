@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Resolving;
 using Umbraco.Tests.TestHelpers;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.interfaces;
@@ -24,6 +25,18 @@ namespace Umbraco.Tests
 			    {
 			        this.GetType().Assembly
 			    };
+
+			DataTypesResolver.Current = new DataTypesResolver(
+				PluginManager.Current.ResolveDataTypes());
+
+			Resolution.Freeze();
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+			DataTypesResolver.Reset();
+			Resolution.IsFrozen = false;
 		}
 
 		[Test]

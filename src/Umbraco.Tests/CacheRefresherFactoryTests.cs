@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Resolving;
 using Umbraco.Tests.TestHelpers;
 using umbraco.interfaces;
 
@@ -23,6 +24,18 @@ namespace Umbraco.Tests
 				{
 					this.GetType().Assembly
 				};
+
+			CacheRefreshersResolver.Current = new CacheRefreshersResolver(
+				PluginManager.Current.ResolveCacheRefreshers());
+
+			Resolution.Freeze();
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+			CacheRefreshersResolver.Reset();
+			Resolution.IsFrozen = false;
 		}
 
 		[Test]

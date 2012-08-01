@@ -70,6 +70,8 @@
     <Compile Include="Logging\AsynchronousRollingFileAppender.cs" />
     <Compile Include="Logging\LoggingTaskExtension.cs" />
     <Compile Include="Logging\LogHelper.cs" />
+    <Compile Include="MacroFieldEditorsResolver.cs" />
+    <Compile Include="Macros\PersistableMacroProperty.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="RazorDataTypeModelStaticMappingItem.cs" />
     <Compile Include="Resolving\ManyObjectsResolverBase.cs" />

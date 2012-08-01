@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Web.UI.WebControls;
 using System.Web.UI;
+using Umbraco.Core;
+using Umbraco.Core.Macros;
 using umbraco.cms.businesslogic.macro;
 using System.Collections;
 using umbraco.presentation;
@@ -236,7 +238,7 @@ namespace umbraco.editorControls.macrocontainer
                 caption.Text = prop.Name;
 
                 //Get the MacroControl 
-                Control macroControl = MacroControlFactory.GetMacroRenderControlByType(prop, ID + "_" + prop.Alias);
+				Control macroControl = MacroFieldEditorsResolver.Current.GetMacroRenderControlByType(prop, ID + "_" + prop.Alias);
 
                 AddFormRow(caption, macroControl);
 
@@ -295,7 +297,7 @@ namespace umbraco.editorControls.macrocontainer
                 {
                     //Make sure we find the correct Unique ID
                     string ControlIdToFind = ID + "_" + prop.Alias;
-                    string value = MacroControlFactory.GetValueFromMacroControl(_formTable.FindControl(ControlIdToFind));
+					string value = MacroFieldEditorsResolver.Current.GetValueFromMacroControl(_formTable.FindControl(ControlIdToFind));
                     sb.AppendFormat(" {0}=\"{1}\" ", prop.Alias, value);
                 }
                 sb.Append(" />");

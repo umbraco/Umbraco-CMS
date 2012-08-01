@@ -59,7 +59,7 @@
     <Compile Include="CacheRefresherFactoryTests.cs" />
     <Compile Include="ContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
-    <Compile Include="MacroControlFactoryTests.cs" />
+    <Compile Include="MacroFieldEditorsResolverTests.cs" />
     <Compile Include="MacroEngineFactoryTests.cs" />
     <Compile Include="MediaFactoryTests.cs" />
     <Compile Include="PackageActionFactoryTests.cs" />
