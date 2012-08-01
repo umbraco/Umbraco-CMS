@@ -26,16 +26,8 @@ namespace Umbraco.Tests
 		}
 
 		[Test]
-		public void Find_All_Refreshers()
-		{
-			umbraco.presentation.cache.Factory.Initialize();
-			Assert.AreEqual(2, umbraco.presentation.cache.Factory._refreshers.Count);
-		}
-
-		[Test]
 		public void Get_All_Instances()
-		{
-			umbraco.presentation.cache.Factory.Initialize();
+		{			
 			var factory = new umbraco.presentation.cache.Factory();
 			Assert.AreEqual(2, factory.GetAll().Count());
 		}

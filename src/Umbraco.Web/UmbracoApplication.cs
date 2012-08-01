@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.Routing;
 using umbraco.businesslogic;
@@ -42,24 +43,6 @@ namespace Umbraco.Web
 				//find and initialize the application startup handlers
 				ApplicationStartupHandler.RegisterHandlers();
 
-				// create the resolvers...
-				
-				LastChanceLookupResolver.Current = new LastChanceLookupResolver(new DefaultLastChanceLookup());
-
-				DocumentLookupsResolver2.Current = new DocumentLookupsResolver2(
-					//add all known resolvers in the correct order, devs can then modify this list on application startup either by binding to events
-					//or in their own global.asax
-					new IDocumentLookup[]
-						{
-							new LookupByNiceUrl(),
-							new LookupById(), 
-							new LookupByNiceUrlAndTemplate(),
- 							new LookupByProfile(),
-							new LookupByAlias()  
-						},
-					LastChanceLookupResolver.Current);
-				RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache());
-
 				OnApplicationStarting(sender, e);
 
 				//all resolvers are now frozen and cannot be modified
@@ -67,7 +50,7 @@ namespace Umbraco.Web
 
 				OnApplicationStarted(sender, e);
 			}
-		}
+		}		
 
 		/// <summary>
 		/// Developers can override this method to modify objects on startup

@@ -6,15 +6,39 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// Resolves the <see cref="IRoutesCache"/> implementation.
 	/// </summary>
-	class RoutesCacheResolver : SingleObjectResolverBase<RoutesCacheResolver, IRoutesCache>
+	internal sealed class RoutesCacheResolver : SingleObjectResolverBase<IRoutesCache>
 	{
+		#region Singleton
+
+		private static readonly RoutesCacheResolver Instance = new RoutesCacheResolver(new DefaultRoutesCache());
+
+		public static RoutesCacheResolver Current
+		{
+			get { return Instance; }
+		}
+		#endregion
+
+		#region Constructors
+		static RoutesCacheResolver() { }
 		/// <summary>
-		/// Initializes a new instance of the <see cref="RoutesCacheResolve"/> class with an <see cref="IRoutesCache"/> implementation.
+		/// Initializes a new instance of the <see cref="RoutesCacheResolver"/> class with an <see cref="IRoutesCache"/> implementation.
 		/// </summary>
 		/// <param name="routesCache">The <see cref="IRoutesCache"/> implementation.</param>
 		internal RoutesCacheResolver(IRoutesCache routesCache)
 			: base(routesCache)
 		{ }
+		#endregion
+
+
+
+		/// <summary>
+		/// Can be used by developers at runtime to set their IRoutesCache at app startup
+		/// </summary>
+		/// <param name="routesCache"></param>
+		public void SetRoutesCache(IRoutesCache routesCache)
+		{
+			Value = routesCache;
+		}
 
 		/// <summary>
 		/// Gets or sets the <see cref="IRoutesCache"/> implementation.
@@ -22,7 +46,6 @@ namespace Umbraco.Web.Routing
 		public IRoutesCache RoutesCache
 		{
 			get { return this.Value; }
-			set { this.Value = value; }
 		}
 	}
 }

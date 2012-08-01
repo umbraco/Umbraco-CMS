@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using Umbraco.Core.Logging;
+using umbraco.interfaces;
 
 namespace Umbraco.Core
 {
@@ -40,21 +41,31 @@ namespace Umbraco.Core
 		{
 			get
 			{
-				if (_resolver == null)
+				using (var l = new UpgradeableReadLock(Lock))
 				{
-					using (new WriteLock(Lock))
+					if (_resolver == null)
 					{
+						l.UpgradeToWriteLock();
 						_resolver = new PluginTypeResolver();
-					}					
+					}
+					return _resolver;
 				}
-				return _resolver;
 			}
 			set { _resolver = value; }
 		}
-		
+
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		private readonly HashSet<TypeList> _types = new HashSet<TypeList>();
 		private IEnumerable<Assembly> _assemblies;
+
+		/// <summary>
+		/// Returns all classes attributed with XsltExtensionAttribute attribute
+		/// </summary>
+		/// <returns></returns>
+		internal IEnumerable<Type> ResolveCacheRefreshers()
+		{
+			return ResolveTypes<ICacheRefresher>();
+		}
 
 		/// <summary>
 		/// Gets/sets which assemblies to scan when type finding, generally used for unit testing, if not explicitly set
@@ -89,8 +100,8 @@ namespace Umbraco.Core
 		{
 			var typesAsArray = types.ToArray();
 			using (DisposableTimer.DebugDuration<PluginTypeResolver>(
-				string.Format("Starting instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName),
-				string.Format("Completed instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName)))
+				String.Format("Starting instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName),
+				String.Format("Completed instantiation of {0} objects of type {1}", typesAsArray.Length, typeof(T).FullName)))
 			{
 				var instances = new List<T>();
 				foreach (var t in typesAsArray)
@@ -102,17 +113,17 @@ namespace Umbraco.Core
 					}
 					catch (Exception ex)
 					{
-						
-						LogHelper.Error<PluginTypeResolver>(string.Format("Error creating type {0}", t.FullName), ex);
-						
+
+						LogHelper.Error<PluginTypeResolver>(String.Format("Error creating type {0}", t.FullName), ex);
+
 						if (throwException)
 						{
 							throw ex;
 						}
 					}
 				}
-				return instances;	
-			}			
+				return instances;
+			}
 		}
 
 		/// <summary>
@@ -124,7 +135,7 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		internal T CreateInstance<T>(Type type, bool throwException = false)
 		{
-			var instances = CreateInstances<T>(new[] {type}, throwException);
+			var instances = CreateInstances<T>(new[] { type }, throwException);
 			return instances.FirstOrDefault();
 		}
 
@@ -133,8 +144,8 @@ namespace Umbraco.Core
 			using (var readLock = new UpgradeableReadLock(_lock))
 			{
 				using (DisposableTimer.TraceDuration<PluginTypeResolver>(
-					string.Format("Starting resolution types of {0}", typeof(T).FullName),
-					string.Format("Completed resolution of types of {0}", typeof(T).FullName)))
+					String.Format("Starting resolution types of {0}", typeof(T).FullName),
+					String.Format("Completed resolution of types of {0}", typeof(T).FullName)))
 				{
 					//check if the TypeList already exists, if so return it, if not we'll create it
 					var typeList = _types.SingleOrDefault(x => x.GetListType().IsType<T>());
@@ -153,8 +164,8 @@ namespace Umbraco.Core
 						//add the type list to the collection
 						_types.Add(typeList);
 					}
-					return typeList.GetTypes();	
-				}				
+					return typeList.GetTypes();
+				}
 			}
 		}
 
@@ -185,13 +196,13 @@ namespace Umbraco.Core
 		/// </summary>
 		/// <typeparam name="TAttribute"></typeparam>
 		/// <returns></returns>
-		internal IEnumerable<Type> ResolveAttributedTypes<TAttribute>() 
+		internal IEnumerable<Type> ResolveAttributedTypes<TAttribute>()
 			where TAttribute : Attribute
 		{
 			return ResolveTypes<TAttribute>(
-				() => TypeFinder2.FindClassesWithAttribute<TAttribute>(AssembliesToScan), 
+				() => TypeFinder2.FindClassesWithAttribute<TAttribute>(AssembliesToScan),
 				true);
-		} 
+		}
 
 		/// <summary>
 		/// Used for unit tests
@@ -244,6 +255,5 @@ namespace Umbraco.Core
 			}
 		}
 		#endregion
-
 	}
 }

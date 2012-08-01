@@ -209,9 +209,8 @@ namespace Umbraco.Web.Routing
 			using (DisposableTimer.DebugDuration<PluginTypeResolver>(
 				string.Format("{0}Begin resolvers", tracePrefix),
 				string.Format("{0}End resolvers, {1}", tracePrefix, (this.HasNode ? "a document was found" : "no document was found"))))
-			{
-				var lookups = RoutingContext.DocumentLookupsResolver.DocumentLookups;
-				lookups.Any(lookup => lookup.TrySetDocument(this));	
+			{				
+				RoutingContext.DocumentLookups.Any(lookup => lookup.TrySetDocument(this));	
 			}			
 
             // fixme - not handling umbracoRedirect
@@ -251,7 +250,7 @@ namespace Umbraco.Web.Routing
 					LogHelper.Debug<DocumentRequest>("{0}No document, try last chance lookup", () => tracePrefix);                    
 
                     // if it fails then give up, there isn't much more that we can do
-					var lastChance = RoutingContext.DocumentLookupsResolver.DocumentLastChanceLookup;
+					var lastChance = RoutingContext.DocumentLastChanceLookup;
 					if (lastChance == null || !lastChance.TrySetDocument(this))
                     {
 						LogHelper.Debug<DocumentRequest>("{0}Failed to find a document, give up", () => tracePrefix);

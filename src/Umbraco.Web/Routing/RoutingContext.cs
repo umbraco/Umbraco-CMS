@@ -13,18 +13,21 @@ namespace Umbraco.Web.Routing
 		/// Initializes a new instance of the <see cref="RoutingContext"/> class.
 		/// </summary>
 		/// <param name="umbracoContext">The Umbraco context.</param>
-		/// <param name="documentLookupsResolver">The document lookups resolver.</param>
+		/// <param name="documentLookups">The document lookups resolver.</param>
+		/// <param name="documentLastChanceLookup"> </param>
 		/// <param name="contentStore">The content store.</param>
 		/// <param name="niceUrlResolver">The nice urls resolver.</param>
-        internal RoutingContext(
+		internal RoutingContext(
 			UmbracoContext umbracoContext,
-			DocumentLookupsResolver2 documentLookupsResolver,
+			IEnumerable<IDocumentLookup> documentLookups,
+			IDocumentLastChanceLookup documentLastChanceLookup,
             ContentStore contentStore,
 			NiceUrlProvider niceUrlResolver)
         {
         	this.UmbracoContext = umbracoContext;
-			this.DocumentLookupsResolver = documentLookupsResolver;
-            this.ContentStore = contentStore;
+			this.DocumentLookups = documentLookups;
+			DocumentLastChanceLookup = documentLastChanceLookup;
+			this.ContentStore = contentStore;
         	this.NiceUrlProvider = niceUrlResolver;
         }
 
@@ -36,7 +39,12 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Gets the document lookups resolver.
 		/// </summary>
-		internal DocumentLookupsResolver2 DocumentLookupsResolver { get; private set; }
+		internal IEnumerable<IDocumentLookup> DocumentLookups { get; private set; }
+
+		/// <summary>
+		/// Gets the last chance lookup
+		/// </summary>
+		internal IDocumentLastChanceLookup DocumentLastChanceLookup { get; private set; }
 
 		/// <summary>
 		/// Gets the content store.

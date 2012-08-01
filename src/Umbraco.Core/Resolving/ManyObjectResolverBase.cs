@@ -1,81 +1,187 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Web;
 
 namespace Umbraco.Core.Resolving
 {
-
-	/// <summary>
-	/// A Resolver which manages an ordered list of objects.
-	/// </summary>
-	/// <typeparam name="TResolver">The type of the resolver.</typeparam>
-	/// <typeparam name="TResolved">The type of the resolved objects.</typeparam>
-	/// <remarks>
-	/// Used to resolve multiple types from a collection. The collection can also be modified at runtime/application startup.
-	/// An example of this is MVCs ViewEngines collection.
-	/// </remarks>
-	internal abstract class ManyObjectResolverBase<TResolver, TResolved> : ResolverBase<TResolver> 
-		where TResolver : class 
+	internal abstract class ManyObjectResolverBase<TResolved>
 		where TResolved : class
 	{
-		readonly List<TResolved> _resolved;
-		protected readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
-
+		private readonly bool _instancePerApplication = false;		
+		private List<TResolved> _applicationInstances = null;
+		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+		
+		#region Constructors
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolver,TResolved}"/> class with an empty list of objects.
+		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolved}"/> class with an empty list of objects.
 		/// </summary>
-		protected ManyObjectResolverBase()
+		/// <param name="instancePerApplication">If set to true will resolve singleton objects which will be created once for the lifetime of the application</param>
+		protected ManyObjectResolverBase(bool instancePerApplication = true)
 		{
-			_resolved = new List<TResolved>();
+			_instancePerApplication = instancePerApplication;
+			InstanceTypes = new List<Type>();
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolver,TResolved}"/> class with an initial list of objects.
+		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolved}"/> class with an initial list of objects
+		/// with creation of objects based on an HttpRequest lifetime scope.
+		/// </summary>
+		/// <param name="httpContext"></param>
+		protected ManyObjectResolverBase(HttpContextBase httpContext)
+			: this(false)
+		{
+			CurrentHttpContext = httpContext;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolved}"/> class with an initial list of objects.
 		/// </summary>
 		/// <param name="value">The list of objects.</param>
-		protected ManyObjectResolverBase(IEnumerable<TResolved> value)
+		/// <param name="instancePerApplication">If set to true will resolve singleton objects which will be created once for the lifetime of the application</param>
+		protected ManyObjectResolverBase(IEnumerable<Type> value, bool instancePerApplication = true)
 		{
-			_resolved = new List<TResolved>(value);
+			_instancePerApplication = instancePerApplication;
+			InstanceTypes = new List<Type>(value);
 		}
 
 		/// <summary>
-		/// Gets the list of objects.
+		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolved}"/> class with an empty list of objects
+		/// with creation of objects based on an HttpRequest lifetime scope.
+		/// </summary>
+		/// <param name="httpContext"></param>
+		/// <param name="value"></param>
+		protected ManyObjectResolverBase(HttpContextBase httpContext, IEnumerable<Type> value)
+			: this(value, false)
+		{
+			CurrentHttpContext = httpContext;
+		} 
+		#endregion
+
+		/// <summary>
+		/// Returns the list of Types registered that instances will be created from
+		/// </summary>
+		protected List<Type> InstanceTypes { get; private set; }
+
+		/// <summary>
+		/// Returns the Current HttpContextBase used to construct this object if one exists. 
+		/// If one exists then the LifetimeScope will be ObjectLifetimeScope.HttpRequest
+		/// </summary>
+		protected HttpContextBase CurrentHttpContext { get; private set; }
+
+		/// <summary>
+		/// Returns the ObjectLifetimeScope for created objects
+		/// </summary>
+		protected ObjectLifetimeScope LifetimeScope
+		{
+			get
+			{
+				if (_instancePerApplication)
+					return ObjectLifetimeScope.Application;
+				if (CurrentHttpContext != null)
+					return ObjectLifetimeScope.HttpRequest;
+				return ObjectLifetimeScope.Transient;
+			}
+		}
+
+		/// <summary>
+		/// Returns the list of new object instances.
 		/// </summary>
 		protected IEnumerable<TResolved> Values
 		{
-			get { return _resolved; }
-		}
+			get
+			{
+				//we should not allow the returning/creating of objects if resolution is not yet frozen!
+				if (Resolution.IsFrozen)
+					throw new InvalidOperationException("Resolution is not frozen. It is not possible to instantiate and returng objects until resolution is frozen.");
 
-		/// <summary>
-		/// Removes an object.
-		/// </summary>
-		/// <param name="value">The object to remove.</param>
-		public void Remove(TResolved value)
-		{
-			Resolution.EnsureNotFrozen();
-			using (new WriteLock(Lock))
-			{							
-				_resolved.Remove(value);
+				switch (LifetimeScope)
+				{
+					case ObjectLifetimeScope.HttpRequest:
+						//create new instances per HttpContext, this means we'll lazily create them and once created, cache them in the HttpContext
+						//create new instances per application, this means we'll lazily create them and once created, cache them
+						using (var l = new UpgradeableReadLock(_lock))
+						{
+							//check if the items contain the key (based on the full type name)
+							if (CurrentHttpContext.Items[this.GetType().FullName] == null)
+							{
+								l.UpgradeToWriteLock();
+								//add the items to the context items (based on full type name)
+								CurrentHttpContext.Items[this.GetType().FullName] = new List<TResolved>(
+									PluginTypeResolver.Current.CreateInstances<TResolved>(InstanceTypes));
+							}
+							return _applicationInstances;
+						}
+					case ObjectLifetimeScope.Application:
+						//create new instances per application, this means we'll lazily create them and once created, cache them
+						using(var l = new UpgradeableReadLock(_lock))
+						{
+							if (_applicationInstances == null)
+							{
+								l.UpgradeToWriteLock();
+								_applicationInstances = new List<TResolved>(
+									PluginTypeResolver.Current.CreateInstances<TResolved>(InstanceTypes));
+							}
+							return _applicationInstances;
+						}
+					case ObjectLifetimeScope.Transient:
+					default:
+						//create new instances each time
+						return PluginTypeResolver.Current.CreateInstances<TResolved>(InstanceTypes);
+				}				
 			}
 		}
 
 		/// <summary>
-		/// Adds an object to the end of the list.
+		/// Removes a type.
+		/// </summary>
+		/// <param name="value">The type to remove.</param>
+		public void Remove(Type value)
+		{
+			Resolution.EnsureNotFrozen();
+			EnsureCorrectType(value);
+			using (new WriteLock(_lock))
+			{
+				InstanceTypes.Remove(value);
+			}
+		}
+
+		/// <summary>
+		/// Removes a type.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		public void Remove<T>()
+		{
+			Remove(typeof (T));
+		}
+
+		/// <summary>
+		/// Adds a Type to the end of the list.
 		/// </summary>
 		/// <param name="value">The object to be added.</param>
-		public void Add(TResolved value)
+		public void Add(Type value)
 		{
 			Resolution.EnsureNotFrozen();
-			using (var l = new UpgradeableReadLock(Lock))
+			EnsureCorrectType(value);
+			using (var l = new UpgradeableReadLock(_lock))
 			{
-				if (_resolved.Contains(value))
+				if (InstanceTypes.Contains(value))
 				{
-					throw new InvalidOperationException("The object " + value + " already exists in the collection");
+					throw new InvalidOperationException("The Type " + value + " already exists in the collection");
 				};
-				
+
 				l.UpgradeToWriteLock();
-				_resolved.Add(value);
+				InstanceTypes.Add(value);
 			}
+		}
+
+		/// <summary>
+		/// Adds a Type to the end of the list.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		public void Add<T>()
+		{
+			Add(typeof (T));
 		}
 
 		/// <summary>
@@ -84,31 +190,48 @@ namespace Umbraco.Core.Resolving
 		public void Clear()
 		{
 			Resolution.EnsureNotFrozen();
-			using (new WriteLock(Lock))
+			using (new WriteLock(_lock))
 			{
-				_resolved.Clear();
+				InstanceTypes.Clear();
 			}
 		}
 
 		/// <summary>
-		/// Inserts an object at the specified index.
+		/// Inserts a Type at the specified index.
 		/// </summary>
 		/// <param name="index">The zero-based index at which the object should be inserted.</param>
 		/// <param name="value">The object to insert.</param>
-		public void Insert(int index, TResolved value)
+		public void Insert(int index, Type value)
 		{
 			Resolution.EnsureNotFrozen();
-			using (var l = new UpgradeableReadLock(Lock))
+			EnsureCorrectType(value);
+			using (var l = new UpgradeableReadLock(_lock))
 			{
-				if (_resolved.Contains(value))
+				if (InstanceTypes.Contains(value))
 				{
-					throw new InvalidOperationException("The object " + value + " already exists in the collection");
+					throw new InvalidOperationException("The Type " + value + " already exists in the collection");
 				};
 
 				l.UpgradeToWriteLock();
-				_resolved.Insert(index, value);
+				InstanceTypes.Insert(index, value);
 			}
 		}
-		
+
+		/// <summary>
+		/// Inserts a Type at the specified index.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="index"></param>
+		public void Insert<T>(int index)
+		{
+			Insert(index, typeof (T));
+		}
+
+		private void EnsureCorrectType(Type t)
+		{
+			if (!TypeHelper.IsTypeAssignableFrom<TResolved>(t))
+				throw new InvalidOperationException("The resolver " + this.GetType() + " can only accept types of " + typeof(TResolved) + ". The Type passed in to this method is " + t);
+		}
+
 	}
 }

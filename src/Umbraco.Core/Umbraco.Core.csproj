@@ -50,6 +50,7 @@
     </Compile>
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="Attempt.cs" />
+    <Compile Include="CacheRefreshersResolver.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="Configuration\UmbracoSettings.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />
@@ -68,8 +69,8 @@
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="RazorDataTypeModelStaticMappingItem.cs" />
     <Compile Include="Resolving\ManyObjectResolverBase.cs" />
+    <Compile Include="Resolving\ObjectLifetimeScope.cs" />
     <Compile Include="Resolving\Resolution.cs" />
-    <Compile Include="Resolving\ResolverBase.cs" />
     <Compile Include="Resolving\SingleObjectResolverBase.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />
@@ -92,6 +93,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
+      <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
+      <Name>umbraco.interfaces</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

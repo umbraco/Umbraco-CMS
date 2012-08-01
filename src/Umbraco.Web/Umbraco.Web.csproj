@@ -163,6 +163,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\WebPages\System.Web.Helpers.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\WebPages\System.Web.Razor.dll</HintPath>
@@ -242,6 +243,7 @@
     <Compile Include="Mvc\ControllerExtensions.cs" />
     <Compile Include="Routing\DefaultLastChanceLookup.cs" />
     <Compile Include="Routing\IDocumentLastChanceLookup.cs" />
+    <Compile Include="Routing\LastChanceLookupResolver.cs" />
     <Compile Include="Routing\LookupByAlias.cs" />
     <Compile Include="Media\ThumbnailProviders\AbstractThumbnailProvider.cs" />
     <Compile Include="Media\ThumbnailProviders\MediaTypeIconThumbnailProvider.cs" />

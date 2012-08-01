@@ -44,15 +44,5 @@ namespace Umbraco.Web
 		{
 			return resolver.ResolveAttributedTypes<XsltExtensionAttribute>();
 		}
-
-		/// <summary>
-		/// Returns all classes attributed with XsltExtensionAttribute attribute
-		/// </summary>
-		/// <param name="resolver"></param>
-		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveCacheRefreshers(this PluginTypeResolver resolver)
-		{
-			return resolver.ResolveTypes<ICacheRefresher>();
-		}
 	}
 }

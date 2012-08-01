@@ -82,7 +82,7 @@ namespace umbraco.cms.businesslogic.datatype.controls
             return retVal;
         }
 
-        internal static void Initialize()
+        private static void Initialize()
         {
             // Get all datatypes from interface
         	var types = PluginTypeResolver.Current.ResolveDataTypes().ToArray();

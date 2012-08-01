@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Web;
@@ -12,40 +13,12 @@ namespace umbraco.presentation.cache
     /// <summary>
     /// cache.factory uses reflection to find all registered instances of ICacheRefresher.
     /// </summary>
+	[Obsolete("Use Umbraco.Core.CacheRefreshersResolver instead")]
     public class Factory
-    {
-        #region Declarations
-
-		internal static readonly ConcurrentDictionary<Guid, Type> _refreshers = new ConcurrentDictionary<Guid, Type>();
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        /// Initializes the <see cref="Factory"/> class.
-        /// </summary>
-        static Factory()
-        {
-            Initialize();
-        }
-
-        #endregion
+    {	
 
         #region Methods
-
-        internal static void Initialize()
-        {
-			foreach(var t in PluginTypeResolver.Current.ResolveCacheRefreshers())
-			{
-				var instance = PluginTypeResolver.Current.CreateInstance<ICacheRefresher>(t);
-				if (instance != null)
-				{
-					_refreshers.TryAdd(instance.UniqueIdentifier, t);	
-				}
-			}        	
-        }
-
+		
         public ICacheRefresher CacheRefresher(Guid CacheRefresherId)
         {
             return GetNewObject(CacheRefresherId);
@@ -58,9 +31,7 @@ namespace umbraco.presentation.cache
         /// <returns></returns>
         public ICacheRefresher GetNewObject(Guid CacheRefresherId)
         {
-        	return !_refreshers.ContainsKey(CacheRefresherId) 
-				? null 
-				: PluginTypeResolver.Current.CreateInstance<ICacheRefresher>(_refreshers[CacheRefresherId]);
+			return CacheRefreshersResolver.Current.GetById(CacheRefresherId);
         }
 
     	/// <summary>
@@ -68,18 +39,9 @@ namespace umbraco.presentation.cache
         /// </summary>
         /// <returns></returns>
         public ICacheRefresher[] GetAll()
-        {
-			var retVal = new ICacheRefresher[_refreshers.Count];
-			var c = 0;
-
-			foreach (var id in _refreshers.Keys)
-			{
-				retVal[c] = GetNewObject(id);
-				c++;
-			}
-
-			return retVal;
-        }
+    	{
+    		return CacheRefreshersResolver.Current.CacheResolvers.ToArray();    		
+    	}
 
         #endregion
     }

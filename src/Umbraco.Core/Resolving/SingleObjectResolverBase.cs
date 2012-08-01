@@ -5,14 +5,12 @@ namespace Umbraco.Core.Resolving
 	/// <summary>
 	/// A Resolver to return and set a Single registered object.
 	/// </summary>
-	/// <typeparam name="TResolver"></typeparam>
 	/// <typeparam name="TResolved"></typeparam>
 	/// <remarks>
 	/// Used for 'singly' registered objects. An example is like the MVC Controller Factory, only one exists application wide and it can
 	/// be get/set.
 	/// </remarks>
-	internal abstract class SingleObjectResolverBase<TResolver, TResolved> : ResolverBase<TResolver> 
-		where TResolver : class 
+	internal abstract class SingleObjectResolverBase<TResolved>
 		where TResolved : class
 	{
 		TResolved _resolved;

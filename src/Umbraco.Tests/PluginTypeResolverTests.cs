@@ -31,6 +31,7 @@ namespace Umbraco.Tests
 			PluginTypeResolver.Current = new PluginTypeResolver();
 
 			//for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
+			//TODO: Should probably update this so it only searches this assembly and add custom types to be found
 			PluginTypeResolver.Current.AssembliesToScan = new[]
 			    {
 			        this.GetType().Assembly, 
@@ -124,7 +125,7 @@ namespace Umbraco.Tests
 		public void Resolves_RestExtensions()
 		{
 			var types = PluginTypeResolver.Current.ResolveRestExtensions();
-			Assert.AreEqual(1, types.Count());
+			Assert.AreEqual(2, types.Count());
 		}
 
 		[Test]

@@ -14,19 +14,15 @@ namespace umbraco.BusinessLogic.Utils
     ///		{
     ///			get
     ///			{
-    ///				return Singleton<Form1>.Instance;
+    ///				return Singleton{Form1}.Instance;
     ///			}
     ///		}
     ///	}
     /// </summary>
     /// <typeparam name="T">Any class that implements default constructor</typeparam>
-    public sealed class Singleton<T> where T : new()
+    public static class Singleton<T> where T : new()
     {
-        private Singleton()
-        {
-        }
-
-        public static T Instance
+    	public static T Instance
         {
             get { return Nested.instance; }
         }

@@ -1,19 +1,10 @@
 using System;
 using NUnit.Framework;
-using SqlCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
-using umbraco.DataLayer;
-using umbraco.MacroEngines;
-using umbraco.MacroEngines.Iron;
-using umbraco.businesslogic;
-using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.interfaces;
-using umbraco.uicontrols;
 using System.Linq;
-using BaseDataType = umbraco.editorControls.BaseDataType;
 
 namespace Umbraco.Tests
 {
@@ -38,14 +29,13 @@ namespace Umbraco.Tests
 		[Test]
 		public void Find_All_DataTypes()
 		{
-			umbraco.cms.businesslogic.datatype.controls.Factory.Initialize();
+			var factory = new umbraco.cms.businesslogic.datatype.controls.Factory();
 			Assert.AreEqual(2, umbraco.cms.businesslogic.datatype.controls.Factory._controls.Count);
 		}
 
 		[Test]
 		public void Get_All_Instances()
 		{
-			umbraco.cms.businesslogic.datatype.controls.Factory.Initialize();
 			var factory = new umbraco.cms.businesslogic.datatype.controls.Factory();
 			Assert.AreEqual(2, factory.GetAll().Count());
 		}
