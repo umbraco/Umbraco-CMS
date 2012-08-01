@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Resolving;
 using umbraco.BusinessLogic.Utils;
 using umbraco.interfaces;
 using System.Collections.Generic;

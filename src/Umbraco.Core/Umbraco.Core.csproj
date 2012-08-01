@@ -56,7 +56,7 @@
     <Compile Include="Configuration\GlobalSettings.cs" />
     <Compile Include="Configuration\UmbracoSettings.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />
-    <Compile Include="DataTypesResolver.cs" />
+    <Compile Include="Resolving\DataTypesResolver.cs" />
     <Compile Include="DisposableObject.cs" />
     <Compile Include="DisposableTimer.cs" />
     <Compile Include="ExpressionHelper.cs" />

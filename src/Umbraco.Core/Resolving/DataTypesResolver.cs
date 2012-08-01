@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Umbraco.Core.Resolving;
 using umbraco.interfaces;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Resolving
 {
 	/// <summary>
 	/// A resolver to return all IDataType objects
