@@ -16,7 +16,7 @@ namespace Umbraco.Core
 	/// these old classes don't contain metadata, the objects need to be instantiated first to get their metadata, we then store this
 	/// for use in the GetById method.
 	/// </remarks>
-	internal abstract class LegacyTransientObjectsResolver<T> : ManyObjectResolverBase<T> 
+	internal abstract class LegacyTransientObjectsResolver<T> : ManyObjectsResolverBase<T> 
 		where T : class
 	{
 

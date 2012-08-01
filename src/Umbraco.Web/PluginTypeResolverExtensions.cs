@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core;
+using Umbraco.Core.Interfaces;
 using Umbraco.Web.Routing;
 using umbraco;
 using umbraco.interfaces;
@@ -43,6 +44,16 @@ namespace Umbraco.Web
 		internal static IEnumerable<Type> ResolveXsltExtensions(this PluginTypeResolver resolver)
 		{
 			return resolver.ResolveAttributedTypes<XsltExtensionAttribute>();
+		}
+
+		/// <summary>
+		/// Returns all IThumbnailProvider classes
+		/// </summary>
+		/// <param name="resolver"></param>
+		/// <returns></returns>
+		internal static IEnumerable<Type> ResolveThumbnailProviders(this PluginTypeResolver resolver)
+		{
+			return resolver.ResolveTypes<IThumbnailProvider>();
 		}
 	}
 }

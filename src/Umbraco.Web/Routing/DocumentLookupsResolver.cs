@@ -13,7 +13,7 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// A multiply registered resolver to manage all IDocumentLookup objects
 	/// </summary>
-	internal sealed class DocumentLookupsResolver : ManyObjectResolverBase<IDocumentLookup>
+	internal sealed class DocumentLookupsResolver : ManyObjectsResolverBase<IDocumentLookup>
 	{
 		#region Singleton
 		private static readonly DocumentLookupsResolver Instance = new DocumentLookupsResolver(

@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Umbraco.Core.Resolving
 {
-	internal abstract class ManyObjectResolverBase<TResolved>
+	internal abstract class ManyObjectsResolverBase<TResolved>
 		where TResolved : class
 	{
 		private List<TResolved> _applicationInstances = null;
@@ -13,10 +13,10 @@ namespace Umbraco.Core.Resolving
 		
 		#region Constructors
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolved}"/> class with an empty list of objects.
+		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolved}"/> class with an empty list of objects.
 		/// </summary>
 		/// <param name="scope">The lifetime scope of instantiated objects, default is per Application</param>
-		protected ManyObjectResolverBase(ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
+		protected ManyObjectsResolverBase(ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
 		{
 			if (scope == ObjectLifetimeScope.HttpRequest)
 			{
@@ -32,11 +32,11 @@ namespace Umbraco.Core.Resolving
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolved}"/> class with an empty list of objects.
+		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolved}"/> class with an empty list of objects.
 		/// with creation of objects based on an HttpRequest lifetime scope.
 		/// </summary>
 		/// <param name="httpContext"></param>
-		protected ManyObjectResolverBase(HttpContextBase httpContext)
+		protected ManyObjectsResolverBase(HttpContextBase httpContext)
 		{
 			LifetimeScope = ObjectLifetimeScope.HttpRequest;
 			CurrentHttpContext = httpContext;
@@ -44,23 +44,23 @@ namespace Umbraco.Core.Resolving
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolved}"/> class with an initial list of objects.
+		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolved}"/> class with an initial list of objects.
 		/// </summary>
 		/// <param name="value">The list of objects.</param>
 		/// <param name="scope">If set to true will resolve singleton objects which will be created once for the lifetime of the application</param>
-		protected ManyObjectResolverBase(IEnumerable<Type> value, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
+		protected ManyObjectsResolverBase(IEnumerable<Type> value, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
 			: this(scope)
 		{			
 			InstanceTypes = new List<Type>(value);
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ManyObjectResolverBase{TResolved}"/> class with an initial list of objects
+		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolved}"/> class with an initial list of objects
 		/// with creation of objects based on an HttpRequest lifetime scope.
 		/// </summary>
 		/// <param name="httpContext"></param>
 		/// <param name="value"></param>
-		protected ManyObjectResolverBase(HttpContextBase httpContext, IEnumerable<Type> value)
+		protected ManyObjectsResolverBase(HttpContextBase httpContext, IEnumerable<Type> value)
 			: this(httpContext)
 		{
 			InstanceTypes = new List<Type>(value);

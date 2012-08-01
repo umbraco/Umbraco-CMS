@@ -70,7 +70,7 @@
     <Compile Include="Logging\LogHelper.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="RazorDataTypeModelStaticMappingItem.cs" />
-    <Compile Include="Resolving\ManyObjectResolverBase.cs" />
+    <Compile Include="Resolving\ManyObjectsResolverBase.cs" />
     <Compile Include="Resolving\ObjectLifetimeScope.cs" />
     <Compile Include="Resolving\SingleObjectResolverBase.cs" />
     <Compile Include="TypeExtensions.cs" />

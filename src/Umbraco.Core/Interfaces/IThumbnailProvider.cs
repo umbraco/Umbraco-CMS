@@ -11,4 +11,5 @@ namespace Umbraco.Core.Interfaces
         bool CanProvideThumbnail(string fileUrl);
         string GetThumbnailUrl(string fileUrl);
     }
+
 }

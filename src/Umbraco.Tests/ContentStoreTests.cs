@@ -70,7 +70,7 @@ namespace Umbraco.Tests
 		{
 		}
 
-		private sealed class TransientObjectsResolver : ManyObjectResolverBase<ITestInterface>
+		private sealed class TransientObjectsResolver : ManyObjectsResolverBase<ITestInterface>
 		{
 			public TransientObjectsResolver()
 				: base(ObjectLifetimeScope.Transient)
@@ -83,7 +83,7 @@ namespace Umbraco.Tests
 			}
 		}
 
-		private sealed class ApplicationObjectsResolver : ManyObjectResolverBase<ITestInterface>
+		private sealed class ApplicationObjectsResolver : ManyObjectsResolverBase<ITestInterface>
 		{
 			public ApplicationObjectsResolver()
 				: base(ObjectLifetimeScope.Application)
@@ -96,7 +96,7 @@ namespace Umbraco.Tests
 			}
 		}
 
-		private sealed class HttpRequestObjectsResolver : ManyObjectResolverBase<ITestInterface>
+		private sealed class HttpRequestObjectsResolver : ManyObjectsResolverBase<ITestInterface>
 		{
 			public HttpRequestObjectsResolver(HttpContextBase httpContext)
 				: base(httpContext)
