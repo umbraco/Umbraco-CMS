@@ -72,7 +72,6 @@
     <Compile Include="RazorDataTypeModelStaticMappingItem.cs" />
     <Compile Include="Resolving\ManyObjectResolverBase.cs" />
     <Compile Include="Resolving\ObjectLifetimeScope.cs" />
-    <Compile Include="Resolving\Resolution.cs" />
     <Compile Include="Resolving\SingleObjectResolverBase.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />

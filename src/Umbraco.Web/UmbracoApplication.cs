@@ -17,8 +17,6 @@ namespace Umbraco.Web
 	{
 		public static event EventHandler ApplicationStarting;
 		
-		public static event EventHandler ApplicationStarted;
-
 		/// <summary>
 		/// Initializes the Umbraco application
 		/// </summary>
@@ -37,18 +35,13 @@ namespace Umbraco.Web
 				//create the ApplicationContext
 				ApplicationContext.Current = new ApplicationContext()
 				{
-					IsReady = true	// fixme
+					IsReady = true	// fixme, do we need this?
 				};
 
 				//find and initialize the application startup handlers
 				ApplicationStartupHandler.RegisterHandlers();
 
-				OnApplicationStarting(sender, e);
-
-				//all resolvers are now frozen and cannot be modified
-				Umbraco.Core.Resolving.Resolution.Freeze();
-
-				OnApplicationStarted(sender, e);
+				OnApplicationStarting(sender, e);				
 			}
 		}		
 
@@ -62,18 +55,7 @@ namespace Umbraco.Web
 			if (ApplicationStarting != null)
 				ApplicationStarting(sender, e);
 		}
-
-		/// <summary>
-		/// Developers can override this method to do anything they need to do once the application startup routine is completed.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		protected virtual void OnApplicationStarted(object sender, EventArgs e)
-		{
-			if (ApplicationStarted != null)
-				ApplicationStarted(sender, e);
-		}
-
+	
 		protected virtual void Application_Error(object sender, EventArgs e)
 		{
 

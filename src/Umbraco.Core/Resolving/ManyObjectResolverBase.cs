@@ -90,11 +90,7 @@ namespace Umbraco.Core.Resolving
 		protected IEnumerable<TResolved> Values
 		{
 			get
-			{
-				//we should not allow the returning/creating of objects if resolution is not yet frozen!
-				if (Resolution.IsFrozen)
-					throw new InvalidOperationException("Resolution is not frozen. It is not possible to instantiate and returng objects until resolution is frozen.");
-
+			{				
 				switch (LifetimeScope)
 				{
 					case ObjectLifetimeScope.HttpRequest:
@@ -137,8 +133,7 @@ namespace Umbraco.Core.Resolving
 		/// </summary>
 		/// <param name="value">The type to remove.</param>
 		public void Remove(Type value)
-		{
-			Resolution.EnsureNotFrozen();
+		{	
 			EnsureCorrectType(value);
 			using (new WriteLock(_lock))
 			{
@@ -161,7 +156,6 @@ namespace Umbraco.Core.Resolving
 		/// <param name="value">The object to be added.</param>
 		public void Add(Type value)
 		{
-			Resolution.EnsureNotFrozen();
 			EnsureCorrectType(value);
 			using (var l = new UpgradeableReadLock(_lock))
 			{
@@ -189,7 +183,6 @@ namespace Umbraco.Core.Resolving
 		/// </summary>
 		public void Clear()
 		{
-			Resolution.EnsureNotFrozen();
 			using (new WriteLock(_lock))
 			{
 				InstanceTypes.Clear();
@@ -203,7 +196,6 @@ namespace Umbraco.Core.Resolving
 		/// <param name="value">The object to insert.</param>
 		public void Insert(int index, Type value)
 		{
-			Resolution.EnsureNotFrozen();
 			EnsureCorrectType(value);
 			using (var l = new UpgradeableReadLock(_lock))
 			{

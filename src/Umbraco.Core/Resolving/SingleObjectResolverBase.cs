@@ -49,8 +49,6 @@ namespace Umbraco.Core.Resolving
 
 			set
 			{
-				Resolution.EnsureNotFrozen();
-
 				if (!_canBeNull && value == null)
 					throw new ArgumentNullException("value");
 				_resolved = value;
