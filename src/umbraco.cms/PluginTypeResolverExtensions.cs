@@ -40,16 +40,6 @@ namespace umbraco.cms
 		/// </summary>
 		/// <param name="resolver"></param>
 		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveDataTypes(this PluginTypeResolver resolver)
-		{
-			return resolver.ResolveTypes<IDataType>();
-		}
-
-		/// <summary>
-		/// Returns all available IDataType in application
-		/// </summary>
-		/// <param name="resolver"></param>
-		/// <returns></returns>
 		internal static IEnumerable<Type> ResolveMacroEngines(this PluginTypeResolver resolver)
 		{
 			return resolver.ResolveTypes<IMacroEngine>();

@@ -68,6 +68,15 @@ namespace Umbraco.Core
 		}
 
 		/// <summary>
+		/// Returns all available IDataType in application
+		/// </summary>
+		/// <returns></returns>
+		internal IEnumerable<Type> ResolveDataTypes()
+		{
+			return ResolveTypes<IDataType>();
+		}
+
+		/// <summary>
 		/// Gets/sets which assemblies to scan when type finding, generally used for unit testing, if not explicitly set
 		/// this will search all assemblies known to have plugins and exclude ones known to not have them.
 		/// </summary>

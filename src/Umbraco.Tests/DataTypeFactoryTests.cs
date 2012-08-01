@@ -27,13 +27,6 @@ namespace Umbraco.Tests
 		}
 
 		[Test]
-		public void Find_All_DataTypes()
-		{
-			var factory = new umbraco.cms.businesslogic.datatype.controls.Factory();
-			Assert.AreEqual(2, umbraco.cms.businesslogic.datatype.controls.Factory._controls.Count);
-		}
-
-		[Test]
 		public void Get_All_Instances()
 		{
 			var factory = new umbraco.cms.businesslogic.datatype.controls.Factory();
