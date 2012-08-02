@@ -22,10 +22,11 @@ namespace SqlCE4Umbraco
         #region Private Constants
        
         /// <summary>The latest database version this installer supports.</summary>
-        private const DatabaseVersion LatestVersionSupported = DatabaseVersion.Version4_1;
+        private const DatabaseVersion LatestVersionSupported = DatabaseVersion.Version4_8;
 
         /// <summary>The specifications to determine the database version.</summary>
         private static readonly VersionSpecs[] m_VersionSpecs = new VersionSpecs[] {
+					new VersionSpecs("CONSTRAINT_NAME","INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS", "FK_umbracoAppTree_umbracoApp", false, DatabaseVersion.Version4_8), 
 					new VersionSpecs("id","umbracoNode", "-21", DatabaseVersion.Version4_1),        
 					new VersionSpecs("action","umbracoAppTree",DatabaseVersion.Version4),
                     new VersionSpecs("description","cmsContentType",DatabaseVersion.Version3),
@@ -58,7 +59,7 @@ namespace SqlCE4Umbraco
         {
             get
             {
-                return false;
+                return CurrentVersion == DatabaseVersion.Version4_1;
             }
         }
 

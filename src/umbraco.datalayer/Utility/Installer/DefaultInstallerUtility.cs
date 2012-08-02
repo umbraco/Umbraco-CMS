@@ -198,7 +198,8 @@ namespace umbraco.DataLayer.Utility.Installer
 					if (!String.IsNullOrEmpty(v.Table) && !String.IsNullOrEmpty(v.Field) && !String.IsNullOrEmpty(v.Value))
 					{
 						IRecordsReader reader = SqlHelper.ExecuteReader(string.Format("SELECT {0} FROM {1} WHERE {0}={2}", v.Field, v.Table, v.Value));
-						if (!reader.Read())
+					    var canRead = reader.Read();
+                        if ((v.ShouldExist && !canRead) || (!v.ShouldExist && canRead))
 							continue;
 					}
 					else if (String.IsNullOrEmpty(v.Table))
@@ -257,6 +258,8 @@ namespace umbraco.DataLayer.Utility.Installer
 		/// The value to look for in the field, if this is left empty it will not be queried.
 		/// </summary>
 		public readonly string Value;
+        /// <summary>Boolean flag indicating whether the value should or shouldn't exist.</summary>
+        public readonly bool ShouldExist;
 
         /// <summary>The minimum version number of a database that contains the specified field.</summary>
         public readonly DatabaseVersion Version;
@@ -273,6 +276,7 @@ namespace umbraco.DataLayer.Utility.Installer
             Table = table;
             Version = version;
 			Value = "";
+            ShouldExist = true;
         }
 
 		/// <summary>
@@ -286,7 +290,23 @@ namespace umbraco.DataLayer.Utility.Installer
 			Field = field;
 			Table = table;
 			Value = value;
-			Version = version;
+            Version = version;
+            ShouldExist = true;
 		}
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VersionSpecs"/> struct.
+        /// </summary>
+        /// <param name="field">The field.</param>
+        /// <param name="table">The table.</param>
+        /// <param name="version">The version.</param>
+        public VersionSpecs(string field, string table, string value, bool shouldExist, DatabaseVersion version)
+        {
+            Field = field;
+            Table = table;
+            Value = value;
+            Version = version;
+            ShouldExist = shouldExist;
+        }
     }
 }
