@@ -195,17 +195,37 @@ namespace umbraco.DataLayer.Utility.Installer
             {
                 try
                 {
-					if (!String.IsNullOrEmpty(v.Table) && !String.IsNullOrEmpty(v.Field) && !String.IsNullOrEmpty(v.Value))
-					{
-						IRecordsReader reader = SqlHelper.ExecuteReader(string.Format("SELECT {0} FROM {1} WHERE {0}={2}", v.Field, v.Table, v.Value));
-					    var canRead = reader.Read();
-                        if ((v.ShouldExist && !canRead) || (!v.ShouldExist && canRead))
-							continue;
-					}
-					else if (String.IsNullOrEmpty(v.Table))
-						SqlHelper.ExecuteNonQuery(string.Format("SELECT {0}", v.Field));
-					else
-						SqlHelper.ExecuteNonQuery(string.Format("SELECT {0} FROM {1}", v.Field, v.Table));
+                    if(v.ExpectedRows > -1)
+                    {
+                        var reader = SqlHelper.ExecuteReader(v.Sql);
+                        var rowCount = 0;
+
+                        if(reader.HasRecords)
+                        {
+                            while (reader.Read())
+                                rowCount++;
+                        }
+
+                        if (v.ExpectedRows != rowCount)
+                            continue;
+                    }
+                    else
+                    {
+                        SqlHelper.ExecuteNonQuery(v.Sql);
+                    }
+
+                    //if (!String.IsNullOrEmpty(v.Table) && !String.IsNullOrEmpty(v.Field) && !String.IsNullOrEmpty(v.Value))
+                    //{
+                    //    IRecordsReader reader = SqlHelper.ExecuteReader(string.Format("SELECT {0} FROM {1} WHERE {0}={2}", v.Field, v.Table, v.Value));
+                    //    var canRead = reader.Read();
+                    //    if ((v.ShouldExist && !canRead) || (!v.ShouldExist && canRead))
+                    //        continue;
+                    //}
+                    //else if (String.IsNullOrEmpty(v.Table))
+                    //    SqlHelper.ExecuteNonQuery(string.Format("SELECT {0}", v.Field));
+                    //else
+                    //    SqlHelper.ExecuteNonQuery(string.Format("SELECT {0} FROM {1}", v.Field, v.Table));
+
                     return v.Version;
                 }
                 catch { }
@@ -250,16 +270,11 @@ namespace umbraco.DataLayer.Utility.Installer
 	/// </remarks>
     public struct VersionSpecs
     {
-        /// <summary>The name of the field that should exist in order to have at least the specified version.</summary>
-        public readonly string Field;
-        /// <summary>The name of the table whose field should exist in order to have at least the specified version.</summary>
-        public readonly string Table;
-		/// <summary>
-		/// The value to look for in the field, if this is left empty it will not be queried.
-		/// </summary>
-		public readonly string Value;
-        /// <summary>Boolean flag indicating whether the value should or shouldn't exist.</summary>
-        public readonly bool ShouldExist;
+        /// <summary>The SQL statament to execute in order to test for the specified version</summary>
+        public readonly string Sql;
+
+        /// <summary>An integer identifying the expected row count from the Sql statement</summary>
+        public readonly int ExpectedRows;
 
         /// <summary>The minimum version number of a database that contains the specified field.</summary>
         public readonly DatabaseVersion Version;
@@ -267,46 +282,23 @@ namespace umbraco.DataLayer.Utility.Installer
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionSpecs"/> struct.
         /// </summary>
-        /// <param name="field">The field.</param>
-        /// <param name="table">The table.</param>
+        /// <param name="sql">The sql statement to execute.</param>
         /// <param name="version">The version.</param>
-        public VersionSpecs(string field, string table, DatabaseVersion version)
-        {
-            Field = field;
-            Table = table;
-            Version = version;
-			Value = "";
-            ShouldExist = true;
-        }
+        public VersionSpecs(string sql, DatabaseVersion version)
+            : this(sql, -1, version)
+        { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="VersionSpecs"/> struct.
-		/// </summary>
-		/// <param name="field">The field.</param>
-		/// <param name="table">The table.</param>
-		/// <param name="version">The version.</param>
-		public VersionSpecs(string field, string table, string value, DatabaseVersion version)
-		{
-			Field = field;
-			Table = table;
-			Value = value;
-            Version = version;
-            ShouldExist = true;
-		}
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VersionSpecs"/> struct.
         /// </summary>
-        /// <param name="field">The field.</param>
-        /// <param name="table">The table.</param>
-        /// <param name="version">The version.</param>
-        public VersionSpecs(string field, string table, string value, bool shouldExist, DatabaseVersion version)
-        {
-            Field = field;
-            Table = table;
-            Value = value;
-            Version = version;
-            ShouldExist = shouldExist;
-        }
+        /// <param name="sql">The sql statement to execute.</param>
+        /// <param name="expectedRows">The expected row count.</param>
+		/// <param name="version">The version.</param>
+        public VersionSpecs(string sql, int expectedRows, DatabaseVersion version)
+		{
+		    Sql = sql;
+		    ExpectedRows = expectedRows;
+		    Version = version;
+		}
     }
 }
