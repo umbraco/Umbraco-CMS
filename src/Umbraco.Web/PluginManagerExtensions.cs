@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core;
-using Umbraco.Core.Interfaces;
+
 using Umbraco.Web.Routing;
 using umbraco;
 using umbraco.interfaces;

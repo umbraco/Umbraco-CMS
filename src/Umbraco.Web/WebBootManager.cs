@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core;
+using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Routing;
 using umbraco.businesslogic;
 
@@ -54,7 +55,11 @@ namespace Umbraco.Web
  							typeof(LookupByProfile),
 							typeof(LookupByAlias)  
 						});
+
 			RoutesCacheResolver.Current = new RoutesCacheResolver(new DefaultRoutesCache());
+
+			ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
+				PluginManager.Current.ResolveThumbnailProviders());
 		}
 
 	}
