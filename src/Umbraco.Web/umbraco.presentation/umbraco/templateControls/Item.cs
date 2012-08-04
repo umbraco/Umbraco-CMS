@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Security;
+using System.Security.Permissions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -14,7 +16,7 @@ namespace umbraco.presentation.templateControls
     /// </summary>
     [DefaultProperty("Field")]
     [ToolboxData("<{0}:Item runat=\"server\"></{0}:Item>")]
-    [Designer(typeof(ItemDesigner))]
+	[Designer("umbraco.presentation.templateControls.ItemDesigner, umbraco")]
     public class Item : CompositeControl
     {
         #region Private Fields

@@ -186,13 +186,13 @@
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Name>umbraco.interfaces</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Umbraco.Web\Umbraco.Web.csproj">
-      <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
-      <Name>umbraco.presentation</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\umbraco.providers\umbraco.providers.csproj">
       <Project>{D7636876-0756-43CB-A192-138C6F0D5E42}</Project>
       <Name>umbraco.providers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Umbraco.Web\Umbraco.Web.csproj">
+      <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
+      <Name>Umbraco.Web</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

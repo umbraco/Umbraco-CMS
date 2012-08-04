@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 //
 // General Information about an assembly is controlled through the following 
@@ -11,8 +12,14 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyProduct("Umbraco.Web.UI")]
 
-//tg forcing .NET 2.0 security rules, since otherwise it wasn't possible to run in medium trust
-//(got an inheritance security rules violated by type error)
-[assembly: System.Security.SecurityRules(System.Security.SecurityRuleSet.Level1)]
+// Setting ComVisible to false makes the types in this assembly not visible 
+// to COM components.  If you need to access a type in this assembly from 
+// COM, set the ComVisible attribute to true on that type.
+[assembly: ComVisible(false)]
 
-[assembly: log4net.Config.XmlConfigurator(Watch = true)]
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid("A87ADD48-9DB5-4068-BCC6-377CC54E7AE4")]
+
+//[assembly: System.Security.SecurityRules(System.Security.SecurityRuleSet.Level1)]
+
+[assembly: log4net.Config.XmlConfigurator(Watch = false)]

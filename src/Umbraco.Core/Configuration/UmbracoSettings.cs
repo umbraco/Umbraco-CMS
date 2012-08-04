@@ -1017,6 +1017,7 @@ namespace Umbraco.Core.Configuration
             }
         }
 
+		[Obsolete("This setting is not used anymore, the only file extensions that are supported are .cs and .vb files")]
     	public static IEnumerable<string> AppCodeFileExtensionsList
     	{
     		get
@@ -1027,7 +1028,7 @@ namespace Umbraco.Core.Configuration
     		}
     	}
 
-		[Obsolete("Use AppCodeFileExtensionsList instead")]
+		[Obsolete("This setting is not used anymore, the only file extensions that are supported are .cs and .vb files")]
         public static XmlNode AppCodeFileExtensions
         {
             get

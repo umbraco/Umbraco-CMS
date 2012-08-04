@@ -13,6 +13,8 @@ using System.Threading;
 using System.Web;
 using System.Web.Compilation;
 using System.Web.Hosting;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core
 {
@@ -50,7 +52,7 @@ namespace Umbraco.Core
 			{
 				using (new WriteLock(Locker))
 				{
-	
+					List<Assembly> assemblies = null;
 					try
 					{
 						var isHosted = HttpContext.Current != null;
@@ -59,7 +61,8 @@ namespace Umbraco.Core
 						{
 							if (isHosted)
 							{
-								_allAssemblies = new ReadOnlyCollection<Assembly>(BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToList());
+								assemblies = new List<Assembly>(BuildManager.GetReferencedAssemblies().Cast<Assembly>());
+								//_allAssemblies = new ReadOnlyCollection<Assembly>(BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToList());
 							}
 						}
 						catch (InvalidOperationException e)
@@ -68,27 +71,21 @@ namespace Umbraco.Core
 								throw;
 						}
 
-						_allAssemblies = _allAssemblies ?? new ReadOnlyCollection<Assembly>(AppDomain.CurrentDomain.GetAssemblies().ToList());
+						assemblies = assemblies ?? new List<Assembly>(AppDomain.CurrentDomain.GetAssemblies().ToList());
+						//_allAssemblies = _allAssemblies ?? new ReadOnlyCollection<Assembly>(AppDomain.CurrentDomain.GetAssemblies().ToList());
 
-						//here we are getting just the /bin folder assemblies, we may need to use these if we implement the App_Plugins
-						//stuff from v5.
+						//here we are trying to get the App_Code assembly
+						var fileExtensions = new[] {".cs", ".vb"}; //only vb and cs files are supported
+						var appCodeFolder = new DirectoryInfo(IOHelper.MapPath(IOHelper.ResolveUrl("~/App_code")));
+						//check if the folder exists and if there are any files in it with the supported file extensions
+						if (appCodeFolder.Exists && (fileExtensions.Any(x => appCodeFolder.GetFiles("*" + x).Any())))
+						{
+							var appCodeAssembly = Assembly.Load("App_Code");
+							assemblies.Add(appCodeAssembly);
+						}
 
-						var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-						var uri = new Uri(codeBase);
-						var path = uri.LocalPath;
-						var binFolder = new DirectoryInfo(Path.GetDirectoryName(path));
-
-						var dllFiles = Directory.GetFiles(binFolder.FullName, "*.dll",
-							SearchOption.TopDirectoryOnly).ToList();
-
-						var binFolderAssemblies = dllFiles.Select(AssemblyName.GetAssemblyName)
-							.Select(assemblyName =>
-									_allAssemblies.FirstOrDefault(a =>
-																 AssemblyName.ReferenceMatchesDefinition(a.GetName(), assemblyName)))
-							.Where(locatedAssembly => locatedAssembly != null)
-							.ToList();
-
-						_binFolderAssemblies = new ReadOnlyCollection<Assembly>(binFolderAssemblies);
+						//now set the _allAssemblies
+						_allAssemblies = new ReadOnlyCollection<Assembly>(assemblies);						
 
 					}
 					catch (InvalidOperationException e)
@@ -104,6 +101,68 @@ namespace Umbraco.Core
 			return _allAssemblies;
 		}		
 		
+		/// <summary>
+		/// Returns only assemblies found in the bin folder that have been loaded into the app domain.
+		/// </summary>
+		/// <returns></returns>
+		/// <remarks>
+		/// This will be used if we implement App_Plugins from Umbraco v5 but currently it is not used.
+		/// </remarks>
+		internal static IEnumerable<Assembly> GetBinAssemblies()
+		{
+
+			if (_binFolderAssemblies == null)
+			{
+				using (new WriteLock(Locker))
+				{
+					var assemblies = GetAssembliesWithKnownExclusions().ToArray();
+					var binFolder = Assembly.GetExecutingAssembly().GetAssemblyFile().Directory;
+					var binAssemblyFiles = Directory.GetFiles(binFolder.FullName, "*.dll", SearchOption.TopDirectoryOnly).ToList();
+					var domainAssemblyNames = binAssemblyFiles.Select(AssemblyName.GetAssemblyName);
+					var safeDomainAssemblies = new List<Assembly>();
+					var binFolderAssemblies = new List<Assembly>();
+
+					foreach (var a in assemblies)
+					{
+						try
+						{
+							//do a test to see if its queryable in med trust
+							var assemblyFile = a.GetAssemblyFile();
+							safeDomainAssemblies.Add(a);
+						}
+						catch (SecurityException)
+						{
+							//we will just ignore this because this will fail 
+							//in medium trust for system assemblies, we get an exception but we just want to continue until we get to 
+							//an assembly that is ok.
+						}
+					}
+
+					foreach (var assemblyName in domainAssemblyNames)
+					{
+						try
+						{
+							var foundAssembly = safeDomainAssemblies.FirstOrDefault(a => a.GetAssemblyFile() == assemblyName.GetAssemblyFile());
+							if (foundAssembly != null)
+							{
+								binFolderAssemblies.Add(foundAssembly);
+							}
+						}
+						catch (SecurityException)
+						{
+							//we will just ignore this because if we are trying to do a call to: 
+							// AssemblyName.ReferenceMatchesDefinition(a.GetName(), assemblyName)))
+							//in medium trust for system assemblies, we get an exception but we just want to continue until we get to 
+							//an assembly that is ok.
+						}
+					}
+
+					_binFolderAssemblies = new ReadOnlyCollection<Assembly>(binFolderAssemblies);
+				}
+			}
+			return _binFolderAssemblies;
+		} 
+
 		/// <summary>
 		/// Return a list of found local Assemblies excluding the known assemblies we don't want to scan 
 		/// and exluding the ones passed in and excluding the exclusion list filter, the results of this are
@@ -183,7 +242,6 @@ namespace Umbraco.Core
                     "Examine,",
                     "Examine."
                 };
-
 
 		public static IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>()
 			where TAttribute : Attribute

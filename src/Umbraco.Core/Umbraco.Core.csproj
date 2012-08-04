@@ -49,6 +49,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationContext.cs" />
+    <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Attempt.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="Resolving\ActionsResolver.cs" />
