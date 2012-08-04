@@ -4,11 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
-using Umbraco.Core.Interfaces;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-    public abstract class AbstractThumbnailProvider : IThumbnailProvider
+    internal abstract class AbstractThumbnailProvider : IThumbnailProvider
     {
         public abstract int Priority { get; }
 

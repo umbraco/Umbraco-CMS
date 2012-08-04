@@ -26,4 +26,3 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("cms")]
 [assembly: InternalsVisibleTo("umbraco.editorControls")]
 [assembly: InternalsVisibleTo("umbraco.MacroEngines")]
-

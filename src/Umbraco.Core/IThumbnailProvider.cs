@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Umbraco.Core.Interfaces
+namespace Umbraco.Core
 {
-    public interface IThumbnailProvider
+    internal interface IThumbnailProvider
     {
         int Priority { get; }
         bool CanProvideThumbnail(string fileUrl);

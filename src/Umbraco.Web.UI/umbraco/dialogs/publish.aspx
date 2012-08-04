@@ -20,7 +20,7 @@
 		}
 		
 		function showPublication() {
-	    var statusStr = '<%=umbraco.ui.Text("inProgressCounter")%>'; 
+		var statusStr = '<%=umbraco.ui.Text("inProgressCounter").Replace("'", "\\'")%>'; 
 		  document.getElementById("counter").innerHTML = statusStr.replace('%0%', '0').replace('%1%', pubTotal);
 			document.getElementById('formDiv').style.display = 'none'; 
 			document.getElementById('animDiv').style.display = 'block'; 
@@ -37,7 +37,7 @@
 		}
 		
 		function updatePublicationDo(retVal) {
-		  var statusStr = '<%=umbraco.ui.Text("inProgressCounter")%>'; 
+		var statusStr = '<%=umbraco.ui.Text("inProgressCounter").Replace("'", "\\'")%>'; 
 		  document.getElementById("counter").innerHTML = statusStr.replace('%0%', retVal).replace('%1%', pubTotal);
 			setTimeout("updatePublication()", 200);
 		}
