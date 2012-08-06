@@ -18,23 +18,23 @@ namespace Umbraco.Web.Routing
 		/// <param name="contentStore">The content store.</param>
 		/// <param name="niceUrlResolver">The nice urls resolver.</param>
 		internal RoutingContext(
-			UmbracoContext umbracoContext,
+			//UmbracoContext umbracoContext,
 			IEnumerable<IDocumentLookup> documentLookups,
 			IDocumentLastChanceLookup documentLastChanceLookup,
             ContentStore contentStore,
 			NiceUrlProvider niceUrlResolver)
         {
-        	this.UmbracoContext = umbracoContext;
+			//this.UmbracoContext = umbracoContext;
 			this.DocumentLookups = documentLookups;
 			DocumentLastChanceLookup = documentLastChanceLookup;
 			this.ContentStore = contentStore;
         	this.NiceUrlProvider = niceUrlResolver;
         }
 
-		/// <summary>
-		/// Gets the Umbraco context.
-		/// </summary>
-		public UmbracoContext UmbracoContext { get; private set; }
+		///// <summary>
+		///// Gets the Umbraco context.
+		///// </summary>
+		//public UmbracoContext UmbracoContext { get; private set; }
 
 		/// <summary>
 		/// Gets the document lookups resolver.

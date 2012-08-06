@@ -45,7 +45,7 @@ namespace Umbraco.Web.Routing
                     if (node != null)
                     {
 						//TODO: Should be handled by Context Items class manager (http://issues.umbraco.org/issue/U4-61)
-						docreq.RoutingContext.UmbracoContext.HttpContext.Items["umbMemberLogin"] = memberLogin;	
+						docreq.UmbracoContext.HttpContext.Items["umbMemberLogin"] = memberLogin;	
                     }                        
                     else
                     {

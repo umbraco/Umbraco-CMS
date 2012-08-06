@@ -24,10 +24,11 @@ namespace Umbraco.Web.Routing
 	/// </summary>
     internal class DocumentRequest
     {
-		public DocumentRequest(Uri uri, RoutingContext routingContext)
+		public DocumentRequest(Uri uri, UmbracoContext umbracoContext)
         {
 			this.Uri = uri;
-			RoutingContext = routingContext;
+			RoutingContext = umbracoContext.RoutingContext;
+			UmbracoContext = umbracoContext;
         }
 
 		/// <summary>
@@ -46,6 +47,8 @@ namespace Umbraco.Web.Routing
 		/// Returns the current RoutingContext
 		/// </summary>
 		public RoutingContext RoutingContext { get; private set; }
+
+		public UmbracoContext UmbracoContext { get; private set; }
 
 		public Uri Uri { get; private set; }
 
@@ -159,7 +162,7 @@ namespace Umbraco.Web.Routing
 			LogHelper.Debug<DocumentRequest>("{0}Uri=\"{1}\"", () => tracePrefix, () => this.Uri);
 
             // try to find a domain matching the current request
-			var domainAndUri = DomainHelper.DomainMatch(Domain.GetDomains(), RoutingContext.UmbracoContext.UmbracoUrl, false);
+			var domainAndUri = DomainHelper.DomainMatch(Domain.GetDomains(), UmbracoContext.UmbracoUrl, false);
 
             // handle domain
 			if (domainAndUri != null)
@@ -401,9 +404,9 @@ namespace Umbraco.Web.Routing
             if (this.Node == null)
                 throw new InvalidOperationException("There is no node.");
 
-			var templateAlias = RoutingContext.UmbracoContext.HttpContext.Request.QueryString["altTemplate"];
+			var templateAlias = UmbracoContext.HttpContext.Request.QueryString["altTemplate"];
             if (string.IsNullOrWhiteSpace(templateAlias))
-				templateAlias = RoutingContext.UmbracoContext.HttpContext.Request.Form["altTemplate"];
+				templateAlias = UmbracoContext.HttpContext.Request.Form["altTemplate"];
 
             // fixme - we might want to support cookies?!? NO but provide a hook to change the template
 

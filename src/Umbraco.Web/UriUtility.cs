@@ -3,6 +3,7 @@ using System.Text;
 using System.Web;
 
 using Umbraco.Core;
+using umbraco;
 
 namespace Umbraco.Web
 {
@@ -17,7 +18,7 @@ namespace Umbraco.Web
             _appVirtualPath = HttpRuntime.AppDomainAppVirtualPath ?? "/";
             _appVirtualPathPrefix = _appVirtualPath;
             if (_appVirtualPathPrefix == "/")
-                _appVirtualPathPrefix = string.Empty;
+                _appVirtualPathPrefix = String.Empty;
         }
 
 		// will be "/" or "/foo"
@@ -44,7 +45,37 @@ namespace Umbraco.Web
             return url;
         }
 
-        #region ResolveUrl
+		// fixme - what about vdir?
+		// path = path.Substring(UriUtility.AppVirtualPathPrefix.Length); // remove virtual directory
+
+    	public static Uri UriFromUmbraco(Uri uri)
+    	{
+    		var path = uri.GetSafeAbsolutePath();
+    		if (path == "/")
+    			return uri;
+
+    		if (!GlobalSettings.UseDirectoryUrls)
+    			path += ".aspx";
+    		else if (UmbracoSettings.AddTrailingSlash)
+    			path += "/";
+
+    		return uri.Rewrite(path);
+    	}
+
+    	public static Uri UriToUmbraco(Uri uri)
+    	{
+    		var path = uri.GetSafeAbsolutePath();
+
+    		path = path.ToLower();
+    		if (path != "/")
+    			path = path.TrimEnd('/');
+    		if (path.EndsWith(".aspx"))
+    			path = path.Substring(0, path.Length - ".aspx".Length);
+
+    		return uri.Rewrite(path);
+    	}
+
+    	#region ResolveUrl
 
         // http://www.codeproject.com/Articles/53460/ResolveUrl-in-ASP-NET-The-Perfect-Solution
         // note
@@ -123,7 +154,7 @@ namespace Umbraco.Web
 
 		public static string StartWithScheme(string uri, string scheme)
 		{
-			return HasScheme(uri) ? uri : string.Format("{0}://{1}", scheme ?? Uri.UriSchemeHttp, uri);
+			return HasScheme(uri) ? uri : String.Format("{0}://{1}", scheme ?? Uri.UriSchemeHttp, uri);
 		}
 
 		public static string EndPathWithSlash(string uri)
@@ -170,7 +201,7 @@ namespace Umbraco.Web
     	internal static Uri ToFullUrl(string absolutePath, HttpContextBase httpContext)
 		{
     		if (httpContext == null) throw new ArgumentNullException("httpContext");
-    		if (string.IsNullOrEmpty(absolutePath))
+    		if (String.IsNullOrEmpty(absolutePath))
 				throw new ArgumentNullException("absolutePath");
 			
 			if (!absolutePath.StartsWith("/"))
@@ -180,7 +211,7 @@ namespace Umbraco.Web
 			var url = httpContext.Request.Url;
 			var port = url.Port != 80 ? (":" + url.Port) : String.Empty;
 
-    		return new Uri(string.Format("{0}://{1}{2}{3}", url.Scheme, url.Host, port, absolutePath));
+    		return new Uri(String.Format("{0}://{1}{2}{3}", url.Scheme, url.Host, port, absolutePath));
 		}
     }
 }

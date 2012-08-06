@@ -133,12 +133,21 @@ namespace Umbraco.Tests
 		[TestCase("/default.aspx?path=/", true)]
 		[TestCase("/default.aspx?path=/home.aspx", true)]
 		[TestCase("/default.aspx?path=/home.aspx?altTemplate=blah", true)]
+		[TestCase("/default.aspx?p=/home.aspx", false)] //missing path
+		[TestCase("/defaul.aspx?path=/home.aspx", false)] //not default path
 		public void Process_Front_End_Document_Request(string url, bool assert)
 		{
 			var httpContextFactory = new FakeHttpContextFactory(url);
 			var httpContext = httpContextFactory.HttpContext;
 			var umbracoContext = new UmbracoContext(httpContext, ApplicationContext.Current, new DefaultRoutesCache(false));
-			
+			var contentStore = new ContentStore(umbracoContext);
+			var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
+			umbracoContext.RoutingContext = new RoutingContext(
+				new IDocumentLookup[] {new LookupByNiceUrl()},
+				new DefaultLastChanceLookup(),
+				contentStore,
+				niceUrls); 
+
 			StateHelper.HttpContext = httpContext;
 
 			//because of so much dependency on the db, we need to create som stuff here, i originally abstracted out stuff but 
@@ -152,9 +161,7 @@ namespace Umbraco.Tests
 
 			var result = _module.ProcessFrontEndDocumentRequest(
 				httpContext,
-				umbracoContext,
-				new IDocumentLookup[] {new LookupByNiceUrl()},
-				new DefaultLastChanceLookup());
+				umbracoContext);
 
 			Assert.AreEqual(assert, result);
 		}

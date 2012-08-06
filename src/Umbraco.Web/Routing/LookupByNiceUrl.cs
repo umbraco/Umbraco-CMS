@@ -28,6 +28,9 @@ namespace Umbraco.Web.Routing
 			else
 				route = docreq.Uri.AbsolutePath;
 
+			//format the path
+			route = route.Replace(".aspx", "");
+
             var node = LookupDocumentNode(docreq, route);
             return node != null;
         }
@@ -43,8 +46,8 @@ namespace Umbraco.Web.Routing
 			LogHelper.Debug<LookupByNiceUrl>("Test route \"{0}\"", () => route);
 
 			//return '0' if in preview mode!
-        	var nodeId = !docreq.RoutingContext.UmbracoContext.InPreviewMode
-							? docreq.RoutingContext.UmbracoContext.RoutesCache.GetNodeId(route)
+        	var nodeId = !docreq.UmbracoContext.InPreviewMode
+							? docreq.UmbracoContext.RoutesCache.GetNodeId(route)
         	             	: 0;
 
 
@@ -59,7 +62,7 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    docreq.RoutingContext.UmbracoContext.RoutesCache.ClearNode(nodeId);
+                    docreq.UmbracoContext.RoutesCache.ClearNode(nodeId);
                 }
             }
 
@@ -72,9 +75,9 @@ namespace Umbraco.Web.Routing
                     docreq.Node = node;
 					LogHelper.Debug<LookupByNiceUrl>("Query matches, id={0}", () => docreq.NodeId);
 
-					if (!docreq.RoutingContext.UmbracoContext.InPreviewMode)
+					if (!docreq.UmbracoContext.InPreviewMode)
 					{
-						docreq.RoutingContext.UmbracoContext.RoutesCache.Store(docreq.NodeId, route); // will not write if previewing	
+						docreq.UmbracoContext.RoutesCache.Store(docreq.NodeId, route); // will not write if previewing	
 					} 
                     
                 }

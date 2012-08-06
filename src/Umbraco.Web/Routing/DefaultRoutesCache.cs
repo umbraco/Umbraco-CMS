@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core;
@@ -10,9 +11,8 @@ namespace Umbraco.Web.Routing
 	/// </summary>
 	internal class DefaultRoutesCache : IRoutesCache
 	{
-		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
-		private Dictionary<int, string> _routes;
-        private Dictionary<string, int> _nodeIds;
+		private ConcurrentDictionary<int, string> _routes;
+		private ConcurrentDictionary<string, int> _nodeIds;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DefaultRoutesCache"/> class.
@@ -50,12 +50,9 @@ namespace Umbraco.Web.Routing
 		/// <param name="nodeId">The node identified.</param>
 		/// <param name="route">The route.</param>
         public void Store(int nodeId, string route)
-        {
-            using (new WriteLock(_lock))
-            {
-                _routes[nodeId] = route;
-                _nodeIds[route] = nodeId;
-            }
+		{
+			_routes.AddOrUpdate(nodeId, i => route, (i, s) => route);
+			_nodeIds.AddOrUpdate(route, i => nodeId, (i, s) => nodeId);
         }
 
 		/// <summary>
@@ -64,11 +61,10 @@ namespace Umbraco.Web.Routing
 		/// <param name="nodeId">The node identifier.</param>
 		/// <returns>The route for the node, else null.</returns>
         public string GetRoute(int nodeId)
-        {
-            lock (new ReadLock(_lock))
-            {
-                return _routes.ContainsKey(nodeId) ? _routes[nodeId] : null;
-            }
+		{
+			string val;
+			_routes.TryGetValue(nodeId, out val);
+			return val;
         }
 
 		/// <summary>
@@ -78,10 +74,9 @@ namespace Umbraco.Web.Routing
 		/// <returns>The node identified for the route, else zero.</returns>
         public int GetNodeId(string route)
         {
-            using (new ReadLock(_lock))
-            {
-                return _nodeIds.ContainsKey(route) ? _nodeIds[route] : 0;
-            }
+			int val;
+			_nodeIds.TryGetValue(route, out val);
+			return val;
         }
 
 		/// <summary>
@@ -90,15 +85,17 @@ namespace Umbraco.Web.Routing
 		/// <param name="nodeId">The node identifier.</param>
         public void ClearNode(int nodeId)
         {
-            using (var lck = new UpgradeableReadLock(_lock))
-            {
-                if (_routes.ContainsKey(nodeId))
-                {
-					lck.UpgradeToWriteLock();
-                    _nodeIds.Remove(_routes[nodeId]);
-                    _routes.Remove(nodeId);
-                }
-            }
+			if (_routes.ContainsKey(nodeId))
+			{
+				string key;
+				if (_routes.TryGetValue(nodeId, out key))
+				{
+					int val;
+					_nodeIds.TryRemove(key, out val);
+					string val2;
+					_routes.TryRemove(nodeId, out val2);
+				}				
+			}
         }
 
 		/// <summary>
@@ -106,11 +103,8 @@ namespace Umbraco.Web.Routing
 		/// </summary>
         public void Clear()
         {
-            using (new WriteLock(_lock))
-            {
-                _routes = new Dictionary<int, string>();
-                _nodeIds = new Dictionary<string, int>();
-            }
+			_routes = new ConcurrentDictionary<int, string>();
+			_nodeIds = new ConcurrentDictionary<string, int>();
         }
     }
 }

@@ -184,7 +184,7 @@ namespace Umbraco.Web.Routing
 					uri = new Uri(domainUri.GetLeftPart(UriPartial.Path).TrimEnd('/') + path); // absolute
 			}
 
-			return UriFromUmbraco(uri);
+			return UriUtility.UriFromUmbraco(uri);
 		}
 
 		IEnumerable<Uri> AssembleUrls(IEnumerable<Uri> domainUris, string path, Uri current)
@@ -222,39 +222,5 @@ namespace Umbraco.Web.Routing
 		}
 
 		#endregion
-
-		#region Map public urls to/from umbraco urls
-
-		// fixme - what about vdir?
-		// path = path.Substring(UriUtility.AppVirtualPathPrefix.Length); // remove virtual directory
-
-		public static Uri UriFromUmbraco(Uri uri)
-		{
-			var path = uri.GetSafeAbsolutePath();
-			if (path == "/")
-				return uri;
-
-			if (!global::umbraco.GlobalSettings.UseDirectoryUrls)
-				path += ".aspx";
-			else if (global::umbraco.UmbracoSettings.AddTrailingSlash)
-				path += "/";
-
-			return uri.Rewrite(path);
-		}
-
-		public static Uri UriToUmbraco(Uri uri)
-		{
-			var path = uri.GetSafeAbsolutePath();
-
-			path = path.ToLower();
-			if (path != "/")
-				path = path.TrimEnd('/');
-			if (path.EndsWith(".aspx"))
-				path = path.Substring(0, path.Length - ".aspx".Length);
-
-			return uri.Rewrite(path);
-		}
-
-		#endregion
-	}
+    }
 }

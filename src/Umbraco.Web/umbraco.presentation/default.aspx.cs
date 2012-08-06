@@ -218,7 +218,7 @@ namespace umbraco
 			// UmbracoModule has already set Response.Status to 404
 
 			Response.Write("<html><body><h1>Page not found</h1>");
-			UmbracoContext.Current.HttpContext.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(Request.Url.ToString()) + "'.</h3>");
+			UmbracoContext.Current.HttpContext.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(UmbracoContext.Current.ClientUrl) + "'.</h3>");
 
 			// fixme - should try to get infos from the DocumentRequest?
 

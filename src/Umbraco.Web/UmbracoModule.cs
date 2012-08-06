@@ -32,16 +32,13 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="httpContext"></param>
 		/// <param name="umbracoContext"> </param>
-		/// <param name="docLookups"> </param>
-		/// <param name="lastChanceLookup"> </param>
 		internal bool ProcessFrontEndDocumentRequest(
 			HttpContextBase httpContext, 
-			UmbracoContext umbracoContext,
-			IEnumerable<IDocumentLookup> docLookups,
-			IDocumentLastChanceLookup lastChanceLookup)
+			UmbracoContext umbracoContext)
 		{
 			if (httpContext == null) throw new ArgumentNullException("httpContext");
 			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+			if (umbracoContext.RoutingContext == null) throw new ArgumentNullException("umbracoContext.RoutingContext");
 
 			if (httpContext.Request.Url.LocalPath.InvariantStartsWith("/default.aspx")
 				&& !string.IsNullOrWhiteSpace(httpContext.Request.QueryString["path"]))
@@ -62,22 +59,11 @@ namespace Umbraco.Web
 					return false;
 				}
 
-				//create request based objects (one per http request)...
-
-				//create a content store
-				var contentStore = new ContentStore(umbracoContext);
-				//create the nice urls
-				var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
-				//create the RoutingContext
-				var routingContext = new RoutingContext(
-					umbracoContext,
-					docLookups,
-					lastChanceLookup,
-					contentStore,
-					niceUrls);
+				//Create a document request since we are rendering a document on the front-end
+				
 				// create the new document request which will cleanup the uri once and for all
-				var docreq = new DocumentRequest(uri, routingContext);
-				// initialize the DocumentRequest on the UmbracoContext (this is circular dependency but i think in this case is ok)
+				var docreq = new DocumentRequest(uri, umbracoContext);
+				//assign the routing context to the umbraco context
 				umbracoContext.DocumentRequest = docreq;
 
 				// note - at that point the original legacy module did something do handle IIS custom 404 errors
@@ -178,12 +164,23 @@ namespace Umbraco.Web
 				RoutesCacheResolver.Current.RoutesCache);
 			UmbracoContext.Current = umbracoContext;
 
+			//create a content store
+			var contentStore = new ContentStore(umbracoContext);
+			//create the nice urls
+			var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
+			//create the RoutingContext
+			var routingContext = new RoutingContext(
+				DocumentLookupsResolver.Current.DocumentLookups,
+				LastChanceLookupResolver.Current.LastChanceLookup,
+				contentStore,
+				niceUrls);
+			//assign the routing context back to the umbraco context
+			umbracoContext.RoutingContext = routingContext;
+
 			//Does a check to see if this current request contains the information in order to process the
 			//request as a front-end request. If not, then its because the rewrite hasn't taken place yet.
 			//if we need to rewrite, then we'll cleanup the query strings and rewrite to the front end handler.
-			if (!ProcessFrontEndDocumentRequest(httpContext, umbracoContext, 
-				DocumentLookupsResolver.Current.DocumentLookups,
-				LastChanceLookupResolver.Current.LastChanceLookup))
+			if (!ProcessFrontEndDocumentRequest(httpContext, umbracoContext))
 			{
 				var uri = httpContext.Request.Url;
 				var lpath = uri.AbsolutePath.ToLower();
@@ -469,9 +466,7 @@ namespace Umbraco.Web
 			// to rewriting happening too early in the chain (Alex Norcliffe 2010-02).
 			//app.PostResolveRequestCache += (sender, e) =>
 
-			//SD: changed to post map request handler so we can know what the handler actually is, this is a better fit for
-			//when we handle the routing
-			app.PostMapRequestHandler += (sender, e) =>
+			app.PostResolveRequestCache += (sender, e) =>
 			{
 				var httpContext = ((HttpApplication)sender).Context;
 				ProcessRequest(new HttpContextWrapper(httpContext));

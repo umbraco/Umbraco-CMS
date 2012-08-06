@@ -52,18 +52,19 @@ namespace Umbraco.Web
 
 			// set the urls
 			this.RequestUrl = httpContext.Request.Url;
-			this.ClientUrl = httpContext.Request.Url;
+			//RawUrl gets preserved across rewrites
+			this.ClientUrl = UriUtility.ToFullUrl(httpContext.Request.RawUrl, httpContext);
 
-			// from IIS Rewrite Module documentation:
-			// "The URL Rewrite Module preserves the original requested URL path in the following server variables:
-			// - HTTP_X_ORIGINAL_URL – this server variable contains the original URL in decoded format;
-			// - UNENCODED_URL – this server variable contains the original URL exactly as it was requested by a Web client, with all original encoding preserved."
-			//
-			// see also http://forums.iis.net/t/1152581.aspx
-			//
-			var iisOrig = httpContext.Request.ServerVariables["HTTP_X_ORIGINAL_URL"];
-			if (!string.IsNullOrWhiteSpace(iisOrig))
-				this.ClientUrl = new Uri(iisOrig); 
+			//// from IIS Rewrite Module documentation:
+			//// "The URL Rewrite Module preserves the original requested URL path in the following server variables:
+			//// - HTTP_X_ORIGINAL_URL – this server variable contains the original URL in decoded format;
+			//// - UNENCODED_URL – this server variable contains the original URL exactly as it was requested by a Web client, with all original encoding preserved."
+			////
+			//// see also http://forums.iis.net/t/1152581.aspx
+			////
+			//var iisOrig = httpContext.Request.ServerVariables["HTTP_X_ORIGINAL_URL"];
+			//if (!string.IsNullOrWhiteSpace(iisOrig))
+			//    this.ClientUrl = new Uri(iisOrig); 
         }
 
         /// <summary>
@@ -132,7 +133,7 @@ namespace Umbraco.Web
 			set
 			{
 				_requestUrl = value;
-				this.UmbracoUrl = NiceUrlProvider.UriToUmbraco(_requestUrl);
+				this.UmbracoUrl = UriUtility.UriToUmbraco(_requestUrl);
 			}
 		}
 
@@ -140,7 +141,7 @@ namespace Umbraco.Web
 		/// Gets the cleaned up url that is handled by Umbraco.
 		/// </summary>
 		/// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
-		internal Uri UmbracoUrl { get; set; }
+		internal Uri UmbracoUrl { get; private set; }
 
     	private Func<XmlDocument> _xmlDelegate; 
 
@@ -196,6 +197,11 @@ namespace Umbraco.Web
     	{
     		get { return DocumentRequest != null; }
     	}
+
+		/// <summary>
+		/// Gets/sets the RoutingContext object
+		/// </summary>
+		internal RoutingContext RoutingContext { get; set; }	
 
         /// <summary>
         /// Gets/sets the DocumentRequest object
