@@ -3,6 +3,27 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
 (function ($, Base, window, document, undefined) {
 
+    var itemMappingOptions = {
+        'create': function(o) {
+            var item = ko.mapping.fromJS(o.data);
+            item.selected = ko.observable(false);
+            item.toggleSelected = function (itm, e) {
+                
+                if (this.selected())
+                    return;
+
+                if (!e.ctrlKey) {
+                    for (var i = 0; i < o.parent().length; i++) {
+                        o.parent()[i].selected(false);
+                    }
+                }
+
+                this.selected(true);
+            };
+            return item;
+        }
+    };
+
     Umbraco.Controls.FolderBrowser = Base.extend({
         
         // Private
@@ -18,7 +39,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             
             $.getJSON(self._opts.basePath + "/FolderBrowserService/GetChildNodes/" + self._parentId + "/" + self._viewModel.filterTerm(), function (data) {
                 if (data != undefined && data.length > 0) {
-                    ko.mapping.fromJS(data, {}, self._viewModel.items);
+                    ko.mapping.fromJS(data, itemMappingOptions, self._viewModel.items);
                 } else {
                     self._viewModel.items([]);
                 }
@@ -33,14 +54,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 return item.Id() === id;
             });
 
-            return results.length == 1 ? results[0] : null;
+            return results.length == 1 ? results[0] : undefined;
         },
         
         _editItem: function (id) {
             var self = this;
 
             var item = self._getItemById(id);
-            if (item === null)
+            if (item === undefined)
                 throw Error("No item found with the id: " + id);
 
             window.location.href = "editMedia.aspx?id="+ item.Id();
@@ -50,7 +71,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             var self = this;
 
             var item = self._getItemById(id);
-            if (item === null)
+            if (item === undefined)
                 throw Error("No item found with the id: " + id);
 
             window.open(item.FileUrl(), "Download");
@@ -158,6 +179,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 instructions +
                 "<form action=\"/base/FolderBrowserService/Upload/" + this._parentId + "\" method=\"post\" enctype=\"multipart/form-data\">" +
                 "<input id='fileupload' type='file' name='file' multiple>" +
+                "<input type='hidden' name='overwriteExisting' />" +
                 "</form>" +
                 "<ul class='queued' data-bind='foreach: queued'><li>" +
                 "<span class='label' data-bind='text: name'></span>" +
@@ -165,6 +187,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 "<a href='' data-bind='click: cancel'><img src='images/delete.png' /></a>" +
                 "</li></ul>" +
                 "<button class='button upload' data-bind='enable: queued().length > 0'>Upload</button>" +
+                "<input type='checkbox' id='overwriteExisting' />" +
+                "<label for='overwriteExisting'>Overwrite existing?</label>" +
                 "<a href='#' class='cancel'>Cancel</a>" +
                 "</div>" +
                 "</div>");
@@ -221,6 +245,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 $("#fileupload").fileUploader("uploadAll");
             });
 
+            $(".upload-overlay #overwriteExisting").click(function() {
+                $("input[name=overwriteExisting]").val($(this).is(":checked"));
+            });
+
             $(".upload-overlay .cancel").click(function (e) {
                 e.preventDefault();
                 $("#fileupload").fileUploader("cancelAll");
@@ -272,6 +300,45 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 animation: { show: "fadeIn", hide: "fadeOut" }
             });
         },
+        
+        _initItems: function ()
+        {
+            var self = this;
+
+            $(".umbFolderBrowser .items").sortable({
+                helper: "clone",
+                opacity: 0.6 ,
+                start: function (e, ui) {
+                    // Add dragging class to container
+                    $(".umbFolderBrowser .items").addClass("ui-sortable-dragging");
+
+                    $(".umbFolderBrowser .items .ui-sortable-helper span").removeAttr("data-bind").text("Moving 1 item");
+                },
+                update: function (e, ui) {
+                    //var oldIndex = self._viewModel.items.indexOf(self._viewModel.tempItem());
+                    var newIndex = ui.item.index();
+
+                    $(".umbFolderBrowser .items .selected").sort(function (a,b) {
+                        return parseInt($(a).data("order")) > parseInt($(b).data("order")) ? 1 : -1;
+                    }).each(function(idx, itm) {
+                        var id = $(itm).data("id");
+                        var item = self._getItemById(id);
+                        if (item !== undefined) {
+                            var oldIndex = self._viewModel.items.indexOf(item);
+
+                            // Update the index of the current item in the array
+                            self._viewModel.items.splice((newIndex + idx), 0, self._viewModel.items.splice(oldIndex, 1)[0]);
+                        }
+                    });
+                    
+                },
+                stop: function (e, ui) {
+                    // Remove dragging class from container
+                    $(".umbFolderBrowser .items").removeClass("ui-sortable-dragging");
+                    //TODO: Update on server
+                }
+            });
+        },
 
         // Constructor
         constructor: function (el, opts)
@@ -294,6 +361,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             self._initToolbar();
             self._initOverlay();
             self._initContextMenu();
+            self._initItems();
 
             // Bind the viewmodel
             ko.applyBindings(self._viewModel, el);

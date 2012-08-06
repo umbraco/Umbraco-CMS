@@ -70,5 +70,14 @@ namespace Umbraco.Web.WebServices
                 success = true 
             });
         }
+
+        [RestExtensionMethod(returnXml = false)]
+        public static string UpdateSortOrder(int parentId, IDictionary<int, int> map)
+        {
+            return new JavaScriptSerializer().Serialize(new
+            {
+                success = true
+            });
+        }
     }
 }
