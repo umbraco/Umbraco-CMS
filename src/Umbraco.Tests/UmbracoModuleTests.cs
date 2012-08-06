@@ -1,3 +1,4 @@
+using System;
 using System.Configuration;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -58,8 +59,22 @@ namespace Umbraco.Tests
 			var uri = httpContext.Request.Url;
 			var lpath = uri.AbsolutePath.ToLower();
 
-			var result = _module.EnsureRequestRoutable(uri, lpath, httpContext);
+			var result = _module.EnsureUmbracoRoutablePage(uri, lpath, httpContext);
 
+			Assert.AreEqual(assert, result);
+		}
+
+		[TestCase("/favicon.ico", true)]
+		[TestCase("/umbraco_client/Tree/treeIcons.css", true)]
+		[TestCase("/umbraco_client/Tree/Themes/umbraco/style.css?cdv=37", true)]
+		[TestCase("/umbraco_client/scrollingmenu/style.css?cdv=37", true)]
+		[TestCase("/base/somebasehandler", false)]
+		[TestCase("/", false)]
+		[TestCase("/home.aspx", false)]
+		public void Is_Client_Side_Request(string url, bool assert)
+		{
+			var uri = new Uri("http://test.com" + url);			
+			var result = _module.IsClientSideRequest(uri);
 			Assert.AreEqual(assert, result);
 		}
 

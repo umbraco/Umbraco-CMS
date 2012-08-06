@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Web;
@@ -23,13 +24,26 @@ namespace Umbraco.Web
 	{
 
 		/// <summary>
+		/// This is a performance tweak to check if this is a .css, .js or .ico file request since
+		/// .Net will pass these requests through to the module when in integrated mode.
+		/// We want to ignore all of these requests immediately.
+		/// </summary>
+		/// <param name="url"></param>
+		/// <returns></returns>
+		internal bool IsClientSideRequest(Uri url)
+		{
+			var toIgnore = new[] {".js", ".css", ".ico"};
+			return toIgnore.Any(x => Path.GetExtension(url.LocalPath).InvariantEquals(x));
+		}
+
+		/// <summary>
 		/// Checks the current request and ensures that it is routable based on the structure of the request and URI
 		/// </summary>
 		/// <param name="uri"></param>
 		/// <param name="lpath"></param>
 		/// <param name="httpContext"></param>
 		/// <returns></returns>
-		internal bool EnsureRequestRoutable(Uri uri, string lpath, HttpContextBase httpContext)
+		internal bool EnsureUmbracoRoutablePage(Uri uri, string lpath, HttpContextBase httpContext)
 		{
 			// ensure this is a document request
 			if (!EnsureDocumentRequest(httpContext, uri, lpath))
@@ -55,16 +69,14 @@ namespace Umbraco.Web
 		{
 			LogHelper.Debug<UmbracoModule>("Start processing request");
 
-
 			var uri = httpContext.Request.Url;
 			var lpath = uri.AbsolutePath.ToLower();
 
-			//do not continue if this request is not routablehttpContextFactory
-			if (!EnsureRequestRoutable(uri, lpath, httpContext))
+			if (IsClientSideRequest(uri))
 			{
-				LogHelper.Debug<UmbracoModule>("End processing request, not transfering to handler");
+				LogHelper.Debug<UmbracoModule>("End processing request, not transfering to handler, this is a client side file request {0}", () => uri);
 				return;
-			}				
+			}
 
 			// add Umbraco's signature header
 			if (!UmbracoSettings.RemoveUmbracoVersionHeader)
@@ -101,9 +113,8 @@ namespace Umbraco.Web
 			// initialize the DocumentRequest on the UmbracoContext (this is circular dependency but i think in this case is ok)
 			umbracoContext.DocumentRequest = docreq;
 
-			//create the LegacyRequestInitializer (one per http request as it relies on the umbraco context!)
-			var legacyRequestInitializer = new LegacyRequestInitializer(umbracoContext);
-
+			//create the LegacyRequestInitializer
+			var legacyRequestInitializer = new LegacyRequestInitializer(httpContext.Request.Url, httpContext);
 			// legacy - initialize legacy stuff
 			legacyRequestInitializer.InitializeRequest();
 
@@ -114,19 +125,16 @@ namespace Umbraco.Web
 			//
 			//   to trigger Umbraco's not-found, one should configure IIS and/or ASP.NET custom 404 errors
 			//   so that they point to a non-existing page eg /redirect-404.aspx
-		
+
+			//do not continue if this request is not a front-end routable page
+			if (!EnsureUmbracoRoutablePage(uri, lpath, httpContext))
+			{
+				LogHelper.Debug<UmbracoModule>("End processing request, not transfering to handler {0}", () => uri);
+				return;
+			}			
 
 			// legacy - no idea what this is
 			LegacyCleanUmbPageFromQueryString(ref uri, ref lpath);
-
-
-			//TODO: Before this happens, we need to :
-			// * move all of this logic into a custom IHttpHandler (maybe)
-			// ** This is because of TransferRequest actual makes an internal request and the HttpContext is reset
-			//		which means that all HttpContext.Items setting need to occur after 
-			// * need to figure out if we can execute default.aspx as a handler from our IHttpHandler instead of rewriting to it
-			// * same goes for MVC
-			// * perhaps its even possible to do all of this without any Rewriting or TransferRequest!
 
 			//**THERE** we should create the doc request
 			// before, we're not sure we handling a doc request
