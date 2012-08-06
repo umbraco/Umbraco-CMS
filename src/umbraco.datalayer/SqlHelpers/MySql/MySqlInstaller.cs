@@ -21,14 +21,15 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
         #region Private Constants
 
         /// <summary>The latest database version this installer supports.</summary>
-        private const DatabaseVersion LatestVersionSupported = DatabaseVersion.Version4_1;
+        private const DatabaseVersion LatestVersionSupported = DatabaseVersion.Version4_8;
 
         /// <summary>The specifications to determine the database version.</summary>
         private static readonly VersionSpecs[] m_VersionSpecs = new VersionSpecs[] {
-					new VersionSpecs("id","umbracoNode", "-21", DatabaseVersion.Version4_1),
-                    new VersionSpecs("action","umbracoAppTree",DatabaseVersion.Version4),
-                    new VersionSpecs("description","cmsContentType",DatabaseVersion.Version3),
-                    new VersionSpecs("version()","",DatabaseVersion.None) };
+					new VersionSpecs("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS LEFT OUTER JOIN umbracoApp ON appAlias = appAlias WHERE CONSTRAINT_NAME = 'FK_umbracoUser2app_umbracoApp'", 0, DatabaseVersion.Version4_8), 
+					new VersionSpecs("SELECT id FROM umbracoNode WHERE id = -21", 1, DatabaseVersion.Version4_1),
+                    new VersionSpecs("SELECT action FROM umbracoAppTree", DatabaseVersion.Version4),
+                    new VersionSpecs("SELECT description FROM cmsContentType", DatabaseVersion.Version3),
+                    new VersionSpecs("SELECT version()", DatabaseVersion.None) };
 
         #endregion
 
@@ -45,7 +46,7 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
         {
             get
             {
-                return CurrentVersion == DatabaseVersion.Version4;
+                return CurrentVersion == DatabaseVersion.Version4_1;
             }
         }
 
