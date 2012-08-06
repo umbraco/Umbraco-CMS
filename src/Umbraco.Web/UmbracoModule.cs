@@ -32,65 +32,41 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="httpContext"></param>
 		/// <param name="umbracoContext"> </param>
-		internal bool ProcessFrontEndDocumentRequest(
+		/// <param name="uri"> </param>
+		internal void AssignDocumentRequest(
 			HttpContextBase httpContext, 
-			UmbracoContext umbracoContext)
+			UmbracoContext umbracoContext,
+			Uri uri)
 		{
 			if (httpContext == null) throw new ArgumentNullException("httpContext");
 			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 			if (umbracoContext.RoutingContext == null) throw new ArgumentNullException("umbracoContext.RoutingContext");
 
-			if (httpContext.Request.Url.LocalPath.InvariantStartsWith("/default.aspx")
-				&& !string.IsNullOrWhiteSpace(httpContext.Request.QueryString["path"]))
-			{
-				//the path is the original path that the request came in on before we've rewritten it,
-				//this is required because TransferRequest does not maintain the httpcontext
-				var path = httpContext.Request.QueryString["path"];
-				var qry = httpContext.Request.QueryString["qry"];
-				Uri uri;
-				try
-				{
-					uri = UriUtility.ToFullUrl(path + qry, httpContext);
-				}
-				catch (Exception ex)
-				{
-					//if this fails then the path could not be parsed to a Uri which could be something malicious
-					LogHelper.Error<UmbracoModule>(string.Format("Could not parse the path {0} into a full Uri", path), ex);
-					return false;
-				}
+			//Create a document request since we are rendering a document on the front-end
 
-				//Create a document request since we are rendering a document on the front-end
-				
-				// create the new document request which will cleanup the uri once and for all
-				var docreq = new DocumentRequest(uri, umbracoContext);
-				//assign the routing context to the umbraco context
-				umbracoContext.DocumentRequest = docreq;
+			// create the new document request which will cleanup the uri once and for all
+			var docreq = new DocumentRequest(uri, umbracoContext);
+			//assign the routing context to the umbraco context
+			umbracoContext.DocumentRequest = docreq;
 
-				// note - at that point the original legacy module did something do handle IIS custom 404 errors
-				//   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support
-				//   "directory urls" without having to do wildcard mapping to ASP.NET on old IIS. This is a pain
-				//   to maintain and probably not used anymore - removed as of 06/2012. @zpqrtbnk.
-				//
-				//   to trigger Umbraco's not-found, one should configure IIS and/or ASP.NET custom 404 errors
-				//   so that they point to a non-existing page eg /redirect-404.aspx
+			// note - at that point the original legacy module did something do handle IIS custom 404 errors
+			//   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support
+			//   "directory urls" without having to do wildcard mapping to ASP.NET on old IIS. This is a pain
+			//   to maintain and probably not used anymore - removed as of 06/2012. @zpqrtbnk.
+			//
+			//   to trigger Umbraco's not-found, one should configure IIS and/or ASP.NET custom 404 errors
+			//   so that they point to a non-existing page eg /redirect-404.aspx
 
-				docreq.LookupDomain();
-				if (docreq.IsRedirect)
-					httpContext.Response.Redirect(docreq.RedirectUrl, true);
-				Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = docreq.Culture;
-				docreq.LookupDocument();
-				if (docreq.IsRedirect)
-					httpContext.Response.Redirect(docreq.RedirectUrl, true);
+			docreq.LookupDomain();
+			if (docreq.IsRedirect)
+				httpContext.Response.Redirect(docreq.RedirectUrl, true);
+			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = docreq.Culture;
+			docreq.LookupDocument();
+			if (docreq.IsRedirect)
+				httpContext.Response.Redirect(docreq.RedirectUrl, true);
 
-				if (docreq.Is404)
-					httpContext.Response.StatusCode = 404;
-
-				// it is up to default.aspx to figure out what to display in case
-				// there is no document (ugly 404 page?) or no template (blank page?)
-				return true;
-			}
-
-			return false;
+			if (docreq.Is404)
+				httpContext.Response.StatusCode = 404;
 		}
 
 		/// <summary>
@@ -177,27 +153,23 @@ namespace Umbraco.Web
 			//assign the routing context back to the umbraco context
 			umbracoContext.RoutingContext = routingContext;
 
-			//Does a check to see if this current request contains the information in order to process the
-			//request as a front-end request. If not, then its because the rewrite hasn't taken place yet.
-			//if we need to rewrite, then we'll cleanup the query strings and rewrite to the front end handler.
-			if (!ProcessFrontEndDocumentRequest(httpContext, umbracoContext))
+			var uri = httpContext.Request.Url;
+			var lpath = uri.AbsolutePath.ToLower();
+
+			// legacy - no idea what this is
+			LegacyCleanUmbPageFromQueryString(ref uri, ref lpath);
+
+			//do not continue if this request is not a front-end routable page
+			if (EnsureUmbracoRoutablePage(uri, lpath, httpContext))
 			{
-				var uri = httpContext.Request.Url;
-				var lpath = uri.AbsolutePath.ToLower();
+				//create and assign the document request now that we know its a document being rendered on the front end
+				AssignDocumentRequest(httpContext, umbracoContext, uri);
 
-				// legacy - no idea what this is
-				LegacyCleanUmbPageFromQueryString(ref uri, ref lpath);
-
-				//do not continue if this request is not a front-end routable page
-				if (EnsureUmbracoRoutablePage(uri, lpath, httpContext))
-				{
-					RewriteToPath<Page>(HttpContext.Current, lpath, uri.Query);
-					//RewriteToPath<Page>(HttpContext.Current, "", docreq.Uri.Query);
-				}
-				else
-				{
-					LogHelper.Debug<UmbracoModule>("End processing request, not transfering to handler {0}", () => uri);
-				}
+				RewriteToUmbracoHandler(HttpContext.Current, uri.Query, false);
+			}
+			else
+			{
+				LogHelper.Debug<UmbracoModule>("End processing request, not transfering to handler {0}", () => uri);
 			}
 
 
@@ -343,71 +315,32 @@ namespace Umbraco.Web
 			return true;
 		}
 
-		private static void RewriteToPath<THandler>(HttpContext context, string currentPath, string currentQuery)
-			where THandler : IHttpHandler
+		/// <summary>
+		/// Rewrites to the Umbraco handler.
+		/// NOTE: this is a WIP until MVC is implemented properly, currently only webforms is supported.
+		/// </summary>		
+		/// <param name="context"></param>
+		/// <param name="currentQuery"></param>
+		/// <param name="isMvc"> </param>
+		private static void RewriteToUmbracoHandler(HttpContext context, string currentQuery, bool isMvc)
 		{
-
-			if ((context.CurrentHandler is THandler)) return;
-
-			var rewritePath = "~/default.aspx?path="
-							  + context.Server.UrlEncode(currentPath)
-							  + "&qry="
-							  + context.Server.UrlEncode(currentQuery);
-
-			if (currentPath.StartsWith(rewritePath, StringComparison.InvariantCultureIgnoreCase)) return;
-
-			var isMvc = TypeHelper.IsTypeAssignableFrom<THandler>(typeof(MvcHandler));
+			var rewritePath = "~/default.aspx" + currentQuery;
 
 			LogHelper.Debug<UmbracoModule>("Transfering to " + rewritePath);
 
-			if (HttpRuntime.UsingIntegratedPipeline)
+			//NOTE: We do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
+			//not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly
+			//rewritten url, but this is not what we want!
+			// http://forums.iis.net/t/1146511.aspx
+
+			// Pre MVC 3
+			context.RewritePath(rewritePath, false);
+			if (isMvc)
 			{
-				context.Server.TransferRequest(rewritePath, true);
-			}
-			else
-			{
-				// Pre MVC 3
-				context.RewritePath(rewritePath, false);
-				if (isMvc)
-				{
-					IHttpHandler httpHandler = new MvcHttpHandler();
-					httpHandler.ProcessRequest(context);
-				}
+				IHttpHandler httpHandler = new MvcHttpHandler();
+				httpHandler.ProcessRequest(context);
 			}
 		}
-
-		//// transfers the request using the fastest method available on the server
-		//void TransferRequest(string path, HttpContextBase httpContext)
-		//{
-		//    LogHelper.Debug<UmbracoModule>("Transfering to " + path);
-
-		//    var integrated = HttpRuntime.UsingIntegratedPipeline;
-
-		//    // fixme - are we doing this properly?
-		//    // fixme - handle virtual directory?
-		//    // fixme - this does not work 'cos it resets the HttpContext
-		//    //  so we should move the DocumentRequest stuff etc back to default.aspx?
-		//    //  but, also, with TransferRequest, auth & co will run on the new (default.aspx) url,
-		//    //  is that really what we want? I need to talk about it with others. @zpqrtbnk
-
-		//    // NOTE: SD: Need to look at how umbraMVCo does this. It is true that the TransferRequest initializes a new HttpContext,
-		//    //  what we need to do is when we transfer to the handler we send a query string with the found page Id to be looked up
-		//    //  after we have done our routing check. This however needs some though as we don't want to have to query for this
-		//    //  page twice. Again, I'll check how umbraMVCo is doing it as I had though about that when i created it :)
-
-		//    integrated = false;
-
-		//    // http://msmvps.com/blogs/luisabreu/archive/2007/10/09/are-you-using-the-new-transferrequest.aspx
-		//    // http://msdn.microsoft.com/en-us/library/aa344903.aspx
-		//    // http://forums.iis.net/t/1146511.aspx
-
-		//    if (integrated)
-		//        httpContext.Server.TransferRequest(path);
-		//    else
-		//        httpContext.RewritePath(path);
-		//}
-
-
 
 		#region Legacy
 

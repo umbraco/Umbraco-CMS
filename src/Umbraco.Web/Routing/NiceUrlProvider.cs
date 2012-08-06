@@ -70,8 +70,19 @@ namespace Umbraco.Web.Routing
 				// route is <id>/<path> eg "-1/", "-1/foo", "123/", "123/foo/bar"...
                 int pos = route.IndexOf('/');
                 path = route.Substring(pos);
-				int id = int.Parse(route.Substring(0, pos)); // will be -1 or 1234
-				domainUri = id > 0 ? DomainUriAtNode(id, current) : null;
+
+				//TODO: Fix this! When I view a node on the front-end (for example the root) it 
+				// caches the route as '/'
+				// then when i view that node in the back office, this used to throw an exception 
+				// because there was not '-1' prefixing it.
+				// If i reset the app pool, then go look at the node in the back office, it caches it as '-1/'
+				// so there are inconsistencies on how these routes are cached!
+
+				int id = int.Parse(route.Substring(0, pos));// will be -1 or 1234
+
+				domainUri = id > 0 ? DomainUriAtNode(id, current) : null;	
+
+				
 			}
 			else
 			{

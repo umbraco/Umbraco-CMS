@@ -130,11 +130,9 @@ namespace Umbraco.Tests
 			Assert.AreEqual(assert, result);
 		}
 
-		[TestCase("/default.aspx?path=/", true)]
-		[TestCase("/default.aspx?path=/home.aspx", true)]
-		[TestCase("/default.aspx?path=/home.aspx?altTemplate=blah", true)]
-		[TestCase("/default.aspx?p=/home.aspx", false)] //missing path
-		[TestCase("/defaul.aspx?path=/home.aspx", false)] //not default path
+		[TestCase("/", true)]
+		[TestCase("/home.aspx", true)]
+		[TestCase("/home.aspx?altTemplate=blah", true)]
 		public void Process_Front_End_Document_Request(string url, bool assert)
 		{
 			var httpContextFactory = new FakeHttpContextFactory(url);
@@ -159,11 +157,13 @@ namespace Umbraco.Tests
 
 			SetupUmbracoContextForTest(umbracoContext, template);
 
-			var result = _module.ProcessFrontEndDocumentRequest(
-				httpContext,
-				umbracoContext);
+			_module.AssignDocumentRequest(httpContext, umbracoContext, httpContext.Request.Url);
 
-			Assert.AreEqual(assert, result);
+			Assert.AreEqual(assert, umbracoContext.DocumentRequest != null);
+			if (assert)
+			{
+				Assert.AreEqual(assert, umbracoContext.DocumentRequest.Node != null);	
+			}			
 		}
 
 
