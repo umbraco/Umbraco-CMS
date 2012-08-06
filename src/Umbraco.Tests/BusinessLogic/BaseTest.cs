@@ -20,6 +20,7 @@ namespace Umbraco.Tests.BusinessLogic
         public void Dispose()
         {
             ClearDatabase();
+			ConfigurationManager.AppSettings.Set("umbracoDbDSN", "");
         }
 
         /// <summary>

@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Configuration;
 using System.Xml;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration
 {
@@ -20,6 +21,35 @@ namespace Umbraco.Core.Configuration
     /// </summary>
     internal class GlobalSettings
     {
+
+		private static HttpContextBase _customHttpContext;
+
+		/// <summary>
+		/// Gets/sets the HttpContext object, this is generally used for unit testing. By default this will 
+		/// use the HttpContext.Current
+		/// </summary>
+		internal static HttpContextBase HttpContext
+		{
+			get
+			{
+				if (_customHttpContext == null && System.Web.HttpContext.Current != null)
+				{
+					//return the current HttpContxt, do NOT store this in the _customHttpContext field
+					//as it will persist across reqeusts!
+					return new HttpContextWrapper(System.Web.HttpContext.Current);
+				}
+
+				if (_customHttpContext == null && System.Web.HttpContext.Current == null)
+				{
+					//throw new NullReferenceException("The HttpContext property has not been set or the object execution is not running inside of an HttpContext");
+					//NOTE: We should throw an exception here but the legacy code checks for null so we need to stick witht he legacy code for now.
+					return null; 
+				}
+				return _customHttpContext;
+			}
+			set { _customHttpContext = value; }
+		}
+
         #region Private static fields
         
 		// CURRENT UMBRACO VERSION ID
@@ -39,7 +69,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                if (HttpContext.Current != null)
+                if (HttpContext != null)
                     return ConfigurationManager.AppSettings["umbracoReservedUrls"];
                 return String.Empty;
             }
@@ -53,7 +83,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                if (HttpContext.Current != null)
+                if (HttpContext != null)
                     return ConfigurationManager.AppSettings["umbracoReservedPaths"];
                 return String.Empty;
             }
@@ -337,7 +367,7 @@ namespace Umbraco.Core.Configuration
             get
             {
                 int versionCheckPeriod = 7;
-                if (HttpContext.Current != null)
+                if (HttpContext != null)
                 {
                     if (int.TryParse(ConfigurationManager.AppSettings["umbracoVersionCheckPeriod"], out versionCheckPeriod))
                         return versionCheckPeriod;
@@ -355,7 +385,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                if (HttpContext.Current != null)
+                if (HttpContext != null)
                     return ConfigurationManager.AppSettings["umbracoUrlForbittenCharacters"];
                 return "";
             }
@@ -369,7 +399,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                if (HttpContext.Current != null)
+                if (HttpContext != null)
                     return ConfigurationManager.AppSettings["umbracoUrlSpaceCharacter"];
                 return "";
             }
@@ -407,7 +437,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                if (HttpContext.Current != null)
+                if (HttpContext != null)
                     return ConfigurationManager.AppSettings["umbracoDisableXsltExtensions"];
                 return "";
             }
@@ -421,7 +451,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                if (HttpContext.Current != null)
+                if (HttpContext != null)
                     return ConfigurationManager.AppSettings["umbracoEditXhtmlMode"];
                 return "";
             }
@@ -435,7 +465,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                if (HttpContext.Current != null)
+                if (HttpContext != null)
                     return ConfigurationManager.AppSettings["umbracoDefaultUILanguage"];
                 return "";
             }
@@ -449,7 +479,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                if (HttpContext.Current != null)
+                if (HttpContext != null)
                     return ConfigurationManager.AppSettings["umbracoProfileUrl"];
                 return "";
             }
@@ -465,7 +495,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                if (HttpContext.Current != null)
+                if (HttpContext != null)
                     return bool.Parse(ConfigurationManager.AppSettings["umbracoHideTopLevelNodeFromPath"]);
                 return false;
             }
@@ -584,7 +614,7 @@ namespace Umbraco.Core.Configuration
             {
                 string license =
                     "<A href=\"http://umbraco.org/redir/license\" target=\"_blank\">the open source license MIT</A>. The umbraco UI is freeware licensed under the umbraco license.";
-                if (HttpContext.Current != null)
+                if (HttpContext != null)
                 {
                     var versionDoc = new XmlDocument();
                     var versionReader = new XmlTextReader(IOHelper.MapPath(SystemDirectories.Umbraco + "/version.xml"));
@@ -624,31 +654,28 @@ namespace Umbraco.Core.Configuration
         internal static bool Test
         {
             get
-            {
-                try
-                {
-                    HttpContext.Current.Response.Write("ContentXML :" + ContentXml + "\n");
-                    HttpContext.Current.Response.Write("DbDSN :" + DbDsn + "\n");
-                    HttpContext.Current.Response.Write("DebugMode :" + DebugMode + "\n");
-                    HttpContext.Current.Response.Write("DefaultUILanguage :" + DefaultUILanguage + "\n");
-                    HttpContext.Current.Response.Write("VersionCheckPeriod :" + VersionCheckPeriod + "\n");
-                    HttpContext.Current.Response.Write("DisableXsltExtensions :" + DisableXsltExtensions + "\n");
-                    HttpContext.Current.Response.Write("EditXhtmlMode :" + EditXhtmlMode + "\n");
-                    HttpContext.Current.Response.Write("HideTopLevelNodeFromPath :" + HideTopLevelNodeFromPath + "\n");
-                    HttpContext.Current.Response.Write("Path :" + Path + "\n");
-                    HttpContext.Current.Response.Write("ProfileUrl :" + ProfileUrl + "\n");
-                    HttpContext.Current.Response.Write("ReservedPaths :" + ReservedPaths + "\n");
-                    HttpContext.Current.Response.Write("ReservedUrls :" + ReservedUrls + "\n");
-                    HttpContext.Current.Response.Write("StorageDirectory :" + StorageDirectory + "\n");
-                    HttpContext.Current.Response.Write("TimeOutInMinutes :" + TimeOutInMinutes + "\n");
-                    HttpContext.Current.Response.Write("UrlForbittenCharacters :" + UrlForbittenCharacters + "\n");
-                    HttpContext.Current.Response.Write("UrlSpaceCharacter :" + UrlSpaceCharacter + "\n");
-                    HttpContext.Current.Response.Write("UseDirectoryUrls :" + UseDirectoryUrls + "\n");
-                    return true;
-                }
-                catch
-                {
-                }
+            {            
+				if (HttpContext != null)
+				{
+					HttpContext.Response.Write("ContentXML :" + ContentXml + "\n");
+					HttpContext.Response.Write("DbDSN :" + DbDsn + "\n");
+					HttpContext.Response.Write("DebugMode :" + DebugMode + "\n");
+					HttpContext.Response.Write("DefaultUILanguage :" + DefaultUILanguage + "\n");
+					HttpContext.Response.Write("VersionCheckPeriod :" + VersionCheckPeriod + "\n");
+					HttpContext.Response.Write("DisableXsltExtensions :" + DisableXsltExtensions + "\n");
+					HttpContext.Response.Write("EditXhtmlMode :" + EditXhtmlMode + "\n");
+					HttpContext.Response.Write("HideTopLevelNodeFromPath :" + HideTopLevelNodeFromPath + "\n");
+					HttpContext.Response.Write("Path :" + Path + "\n");
+					HttpContext.Response.Write("ProfileUrl :" + ProfileUrl + "\n");
+					HttpContext.Response.Write("ReservedPaths :" + ReservedPaths + "\n");
+					HttpContext.Response.Write("ReservedUrls :" + ReservedUrls + "\n");
+					HttpContext.Response.Write("StorageDirectory :" + StorageDirectory + "\n");
+					HttpContext.Response.Write("TimeOutInMinutes :" + TimeOutInMinutes + "\n");
+					HttpContext.Response.Write("UrlForbittenCharacters :" + UrlForbittenCharacters + "\n");
+					HttpContext.Response.Write("UrlSpaceCharacter :" + UrlSpaceCharacter + "\n");
+					HttpContext.Response.Write("UseDirectoryUrls :" + UseDirectoryUrls + "\n");
+					return true;
+				}
                 return false;
             }
         }
@@ -701,7 +728,7 @@ namespace Umbraco.Core.Configuration
             foreach (string st in _reservedList._list.Keys)
                 res += st + ",";
 
-            HttpContext.Current.Trace.Write("umbracoGlobalsettings", "reserverd urls: '" + res + "'");
+			LogHelper.Debug<GlobalSettings>("reserverd urls: '" + res + "'");            
 
             // return true if url starts with an element of the reserved list
             return _reservedList.StartsWith(url.ToLower());

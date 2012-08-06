@@ -23,6 +23,31 @@ namespace Umbraco.Web
 	{
 
 		/// <summary>
+		/// Checks the current request and ensures that it is routable based on the structure of the request and URI
+		/// </summary>
+		/// <param name="uri"></param>
+		/// <param name="lpath"></param>
+		/// <param name="httpContext"></param>
+		/// <returns></returns>
+		internal bool EnsureRequestRoutable(Uri uri, string lpath, HttpContextBase httpContext)
+		{
+			// ensure this is a document request
+			if (!EnsureDocumentRequest(httpContext, uri, lpath))
+				return false;
+			// ensure Umbraco is ready to serve documents
+			if (!EnsureIsReady(httpContext, uri))
+				return false;
+			// ensure Umbraco is properly configured to serve documents
+			if (!EnsureIsConfigured(httpContext, uri))
+				return false;
+			// ensure that its not a base rest handler
+			if ((UmbracoSettings.EnableBaseRestHandler) && !EnsureNotBaseRestHandler(lpath))
+				return false;
+
+			return true;
+		}
+
+		/// <summary>
 		/// Entry point for a request
 		/// </summary>
 		/// <param name="httpContext"></param>
@@ -30,13 +55,16 @@ namespace Umbraco.Web
 		{
 			LogHelper.Debug<UmbracoModule>("Start processing request");
 
-			//TODO: We need to ensure the below only executes for real requests (i.e. not css, favicon, etc...)
-			// I'm pretty sure we need to bind to the PostHandlerAssigned (or whatever event) and follow the same 
-			// practices that is in umbraMVCo
-
 
 			var uri = httpContext.Request.Url;
 			var lpath = uri.AbsolutePath.ToLower();
+
+			//do not continue if this request is not routablehttpContextFactory
+			if (!EnsureRequestRoutable(uri, lpath, httpContext))
+			{
+				LogHelper.Debug<UmbracoModule>("End processing request, not transfering to handler");
+				return;
+			}				
 
 			// add Umbraco's signature header
 			if (!UmbracoSettings.RemoveUmbracoVersionHeader)
@@ -86,26 +114,19 @@ namespace Umbraco.Web
 			//
 			//   to trigger Umbraco's not-found, one should configure IIS and/or ASP.NET custom 404 errors
 			//   so that they point to a non-existing page eg /redirect-404.aspx
-
-			var ok = true;
-
-			// ensure this is a document request
-			ok = ok && EnsureDocumentRequest(httpContext, uri, lpath);
-			// ensure Umbraco is ready to serve documents
-			ok = ok && EnsureIsReady(httpContext, uri);
-			// ensure Umbraco is properly configured to serve documents
-			ok = ok && EnsureIsConfigured(httpContext, uri);
-			ok = ok && (!UmbracoSettings.EnableBaseRestHandler || EnsureNotBaseRestHandler(httpContext, lpath));
-			ok = ok && (EnsureNotBaseRestHandler(httpContext, lpath));
-
-			if (!ok)
-			{
-				LogHelper.Debug<UmbracoModule>("End processing request, not transfering to handler");
-				return;
-			}
+		
 
 			// legacy - no idea what this is
 			LegacyCleanUmbPageFromQueryString(ref uri, ref lpath);
+
+
+			//TODO: Before this happens, we need to :
+			// * move all of this logic into a custom IHttpHandler (maybe)
+			// ** This is because of TransferRequest actual makes an internal request and the HttpContext is reset
+			//		which means that all HttpContext.Items setting need to occur after 
+			// * need to figure out if we can execute default.aspx as a handler from our IHttpHandler instead of rewriting to it
+			// * same goes for MVC
+			// * perhaps its even possible to do all of this without any Rewriting or TransferRequest!
 
 			//**THERE** we should create the doc request
 			// before, we're not sure we handling a doc request
@@ -120,7 +141,7 @@ namespace Umbraco.Web
 			if (docreq.Is404)
 				httpContext.Response.StatusCode = 404;
 
-			TransferRequest("~/default.aspx" + docreq.Uri.Query);
+			TransferRequest("~/default.aspx" + docreq.Uri.Query, httpContext);
 
 			// it is up to default.aspx to figure out what to display in case
 			// there is no document (ugly 404 page?) or no template (blank page?)
@@ -216,7 +237,7 @@ namespace Umbraco.Web
 					// fixme ?orgurl=... ?retry=...
 				}
 
-				TransferRequest(bootUrl);
+				TransferRequest(bootUrl, httpContext);
 				return false;
 			}
 
@@ -242,7 +263,7 @@ namespace Umbraco.Web
 
 		// checks if the current request is a /base REST handler request
 		// returns false if it is, otherwise true
-		bool EnsureNotBaseRestHandler(HttpContextBase httpContext, string lpath)
+		bool EnsureNotBaseRestHandler(string lpath)
 		{
 			// the /base REST handler still lives in umbraco.dll and has
 			// not been refactored at the moment. it still is a module,
@@ -263,7 +284,7 @@ namespace Umbraco.Web
 		}
 
 		// transfers the request using the fastest method available on the server
-		void TransferRequest(string path)
+		void TransferRequest(string path, HttpContextBase httpContext)
 		{
 			LogHelper.Debug<UmbracoModule>("Transfering to " + path);
 
@@ -288,9 +309,9 @@ namespace Umbraco.Web
 			// http://forums.iis.net/t/1146511.aspx
 
 			if (integrated)
-				HttpContext.Current.Server.TransferRequest(path);
+				httpContext.Server.TransferRequest(path);
 			else
-				HttpContext.Current.RewritePath(path);
+				httpContext.RewritePath(path);
 		}
 
 
@@ -350,7 +371,11 @@ namespace Umbraco.Web
 		{
 			// used to be done in PostAuthorizeRequest but then it disabled OutputCaching due
 			// to rewriting happening too early in the chain (Alex Norcliffe 2010-02).
-			app.PostResolveRequestCache += (sender, e) =>
+			//app.PostResolveRequestCache += (sender, e) =>
+			
+			//SD: changed to post map request handler so we can know what the handler actually is, this is a better fit for
+			//when we handle the routing
+			app.PostMapRequestHandler += (sender, e) =>
 			{
 				var httpContext = ((HttpApplication)sender).Context;
 				ProcessRequest(new HttpContextWrapper(httpContext));

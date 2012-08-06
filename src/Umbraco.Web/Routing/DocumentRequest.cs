@@ -15,12 +15,15 @@ using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.language;
 namespace Umbraco.Web.Routing
 {
-	// represents a request for one specified Umbraco document to be rendered
-	// by one specified template, using one particular culture.
-	//
+
+
+
+	/// <summary>
+	/// represents a request for one specified Umbraco document to be rendered
+	/// by one specified template, using one particular culture.
+	/// </summary>
     public class DocumentRequest
     {
-
         public DocumentRequest(Uri uri, RoutingContext routingContext)
         {
 			this.Uri = uri;

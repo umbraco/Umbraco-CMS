@@ -79,6 +79,7 @@
     <Compile Include="StringExtensionsTests.cs" />
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
     <Compile Include="TypeFinderTests.cs" />
+    <Compile Include="UmbracoModuleTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -11,7 +11,7 @@ namespace umbraco.BusinessLogic
 	public class StateHelper
     {
 
-    	private static HttpContextBase _httpContext;
+    	private static HttpContextBase _customHttpContext;
 
 		/// <summary>
 		/// Gets/sets the HttpContext object, this is generally used for unit testing. By default this will 
@@ -21,17 +21,20 @@ namespace umbraco.BusinessLogic
     	{
     		get
     		{
-    			if (_httpContext == null && System.Web.HttpContext.Current != null)
+    			if (_customHttpContext == null && System.Web.HttpContext.Current != null)
     			{
-    				_httpContext = new HttpContextWrapper(System.Web.HttpContext.Current);
+					//return the current HttpContxt, do NOT store this in the _customHttpContext field
+					//as it will persist across reqeusts!
+    				return new HttpContextWrapper(System.Web.HttpContext.Current);
     			}
-				else if (_httpContext == null && System.Web.HttpContext.Current == null)
+				
+				if (_customHttpContext == null && System.Web.HttpContext.Current == null)
 				{
 					throw new NullReferenceException("The HttpContext property has not been set or the object execution is not running inside of an HttpContext");
 				}
-    			return _httpContext;
+    			return _customHttpContext;
     		}
-			set { _httpContext = value; }
+			set { _customHttpContext = value; }
     	}
 
 		#region Session Helpers
