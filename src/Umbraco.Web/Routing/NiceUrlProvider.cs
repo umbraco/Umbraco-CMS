@@ -25,11 +25,11 @@ namespace Umbraco.Web.Routing
 		public NiceUrlProvider(ContentStore contentStore, UmbracoContext umbracoContext)
         {
             _umbracoContext = umbracoContext;
-            _contentStore = contentStore;
+			_contentStore = contentStore;
         }
 
         private readonly UmbracoContext _umbracoContext;
-        private readonly ContentStore _contentStore;
+		private readonly ContentStore _contentStore;
 
         // note: this could be a parameter...
         const string UrlNameProperty = "@urlName";
@@ -207,7 +207,7 @@ namespace Umbraco.Web.Routing
 				return null;
 
 			// apply filter on domains defined on that node
-			var domainAndUri = Domains.DomainMatch(Domain.GetDomainsById(nodeId), current, true);
+			var domainAndUri = DomainHelper.DomainMatch(Domain.GetDomainsById(nodeId), current, true);
 			return domainAndUri == null ? null : domainAndUri.Uri;
 		}
 
@@ -217,7 +217,7 @@ namespace Umbraco.Web.Routing
 			if (nodeId <= 0)
 				return new Uri[] { };
 
-			var domainAndUris = Domains.DomainMatches(Domain.GetDomainsById(nodeId), current);
+			var domainAndUris = DomainHelper.DomainMatches(Domain.GetDomainsById(nodeId), current);
 			return domainAndUris.Select(d => d.Uri);
 		}
 

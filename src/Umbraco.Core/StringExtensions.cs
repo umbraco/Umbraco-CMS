@@ -405,6 +405,11 @@ namespace Umbraco.Core
             return String.Equals(compare, compareTo, StringComparison.InvariantCultureIgnoreCase);
         }
 
+		public static bool InvariantStartsWith(this string compare, string compareTo)
+		{
+			return compare.StartsWith(compareTo, StringComparison.InvariantCultureIgnoreCase);			
+		}
+
         public static bool InvariantContains(this string compare, string compareTo)
         {
             return compare.IndexOf(compareTo, StringComparison.OrdinalIgnoreCase) >= 0;

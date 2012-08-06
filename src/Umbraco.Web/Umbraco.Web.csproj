@@ -258,7 +258,7 @@
     <Compile Include="Routing\LookupByProfile.cs" />
     <Compile Include="Routing\NiceUrlProvider.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
-    <Compile Include="Routing\Domains.cs" />
+    <Compile Include="Routing\DefaultDomainHelper.cs" />
     <Compile Include="Routing\DocumentLookupsResolver.cs" />
     <Compile Include="Routing\DocumentRequest.cs" />
     <Compile Include="Routing\IDocumentLookup.cs" />

@@ -22,9 +22,9 @@ namespace Umbraco.Web.Routing
 	/// represents a request for one specified Umbraco document to be rendered
 	/// by one specified template, using one particular culture.
 	/// </summary>
-    public class DocumentRequest
+    internal class DocumentRequest
     {
-        public DocumentRequest(Uri uri, RoutingContext routingContext)
+		public DocumentRequest(Uri uri, RoutingContext routingContext)
         {
 			this.Uri = uri;
 			RoutingContext = routingContext;
@@ -159,7 +159,7 @@ namespace Umbraco.Web.Routing
 			LogHelper.Debug<DocumentRequest>("{0}Uri=\"{1}\"", () => tracePrefix, () => this.Uri);
 
             // try to find a domain matching the current request
-			var domainAndUri = Domains.DomainMatch(Domain.GetDomains(), RoutingContext.UmbracoContext.UmbracoUrl, false);
+			var domainAndUri = DomainHelper.DomainMatch(Domain.GetDomains(), RoutingContext.UmbracoContext.UmbracoUrl, false);
 
             // handle domain
 			if (domainAndUri != null)

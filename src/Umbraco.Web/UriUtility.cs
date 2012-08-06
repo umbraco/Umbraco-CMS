@@ -157,5 +157,30 @@ namespace Umbraco.Web
 		}
 
 		#endregion
+
+    	/// <summary>
+    	/// Returns an faull url with the host, port, etc...
+    	/// </summary>
+    	/// <param name="absolutePath">An absolute path (i.e. starts with a '/' )</param>
+    	/// <param name="httpContext"> </param>
+    	/// <returns></returns>
+    	/// <remarks>
+    	/// Based on http://stackoverflow.com/questions/3681052/get-absolute-url-from-relative-path-refactored-method
+    	/// </remarks>
+    	internal static Uri ToFullUrl(string absolutePath, HttpContextBase httpContext)
+		{
+    		if (httpContext == null) throw new ArgumentNullException("httpContext");
+    		if (string.IsNullOrEmpty(absolutePath))
+				throw new ArgumentNullException("absolutePath");
+			
+			if (!absolutePath.StartsWith("/"))
+				throw new FormatException("The absolutePath specified does not start with a '/'");
+			
+
+			var url = httpContext.Request.Url;
+			var port = url.Port != 80 ? (":" + url.Port) : String.Empty;
+
+    		return new Uri(string.Format("{0}://{1}{2}{3}", url.Scheme, url.Host, port, absolutePath));
+		}
     }
 }

@@ -11,7 +11,7 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// Provides utilities to handle domains.
 	/// </summary>
-	public class Domains
+	internal class DomainHelper
 	{
 		/// <summary>
 		/// Represents an Umbraco domain and its normalized uri.
@@ -20,7 +20,7 @@ namespace Umbraco.Web.Routing
 		/// <para>In Umbraco it is valid to create domains with name such as <c>example.com</c>, <c>https://www.example.com</c>, <c>example.com/foo/</c>.</para>
 		/// <para>The normalized uri of a domain begins with a scheme and ends with no slash, eg <c>http://example.com/</c>, <c>https://www.example.com/</c>, <c>http://example.com/foo/</c>.</para>
 		/// </remarks>
-		public class DomainAndUri
+		internal class DomainAndUri
 		{
 			/// <summary>
 			/// The Umbraco domain.

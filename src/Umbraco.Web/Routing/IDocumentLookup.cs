@@ -3,7 +3,7 @@ namespace Umbraco.Web.Routing
 	/// <summary>
 	/// Provides a method to try to find an assign an Umbraco document to a <c>DocumentRequest</c>.
 	/// </summary>
-	public interface IDocumentLookup
+	internal interface IDocumentLookup
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.

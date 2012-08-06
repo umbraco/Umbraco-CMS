@@ -28,7 +28,7 @@ namespace Umbraco.Web.Routing
 			string path = docreq.Uri.AbsolutePath;
 
 			if (docreq.HasDomain)
-				path = Domains.PathRelativeToDomain(docreq.DomainUri, path);
+				path = DomainHelper.PathRelativeToDomain(docreq.DomainUri, path);
 			if (path != "/") // no template if "/"
             {
 				var pos = docreq.Uri.AbsolutePath.LastIndexOf('/');

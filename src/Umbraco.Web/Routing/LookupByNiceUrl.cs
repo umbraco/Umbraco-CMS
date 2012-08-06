@@ -24,7 +24,7 @@ namespace Umbraco.Web.Routing
         {
 			string route;
 			if (docreq.HasDomain)
-				route = docreq.Domain.RootNodeId.ToString() + Domains.PathRelativeToDomain(docreq.DomainUri, docreq.Uri.AbsolutePath);
+				route = docreq.Domain.RootNodeId.ToString() + DomainHelper.PathRelativeToDomain(docreq.DomainUri, docreq.Uri.AbsolutePath);
 			else
 				route = docreq.Uri.AbsolutePath;
 

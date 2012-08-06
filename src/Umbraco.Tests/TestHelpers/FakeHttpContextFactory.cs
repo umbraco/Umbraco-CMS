@@ -60,6 +60,9 @@ namespace Umbraco.Tests.TestHelpers
 			request.Stub(x => x.ApplicationPath).Return("/");
 			request.Stub(x => x.Cookies).Return(new HttpCookieCollection());
 			request.Stub(x => x.ServerVariables).Return(new NameValueCollection());
+			var queryStrings = HttpUtility.ParseQueryString(fullUrl.Query);
+			request.Stub(x => x.QueryString).Return(queryStrings);
+			request.Stub(x => x.Form).Return(new NameValueCollection());
 
 			//Cache
 			var cache = MockRepository.GenerateMock<HttpCachePolicyBase>();

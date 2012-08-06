@@ -189,6 +189,14 @@ namespace Umbraco.Web
         	return GetXmlDelegate();
         }
 
+		/// <summary>
+		/// Boolean value indicating whether the current request is a front-end umbraco request
+		/// </summary>
+    	public bool IsFrontEndUmbracoRequest
+    	{
+    		get { return DocumentRequest != null; }
+    	}
+
         /// <summary>
         /// Gets/sets the DocumentRequest object
         /// </summary>
