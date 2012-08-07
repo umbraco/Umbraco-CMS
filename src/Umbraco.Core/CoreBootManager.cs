@@ -17,9 +17,15 @@ namespace Umbraco.Core
 	{
 
 		private DisposableTimer _timer;
+		private bool _isInitialized = false;
+		private bool _isStarted = false;
+		private bool _isComplete = false;
 
 		public virtual IBootManager Initialize()
 		{
+			if (_isInitialized)
+				throw new InvalidOperationException("The boot manager has already been initialized");
+
 			LogHelper.Info<CoreBootManager>("Umbraco application starting");
 			_timer = DisposableTimer.Start(x => LogHelper.Info<CoreBootManager>("Umbraco application startup complete" + " (took " + x + "ms)"));
 
@@ -30,6 +36,9 @@ namespace Umbraco.Core
 			};
 
 			InitializeResolvers();
+
+			_isInitialized = true;
+
 			return this;
 		}
 
@@ -40,10 +49,16 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		public virtual IBootManager Startup(Action<ApplicationContext> afterStartup)
 		{
+			if (_isStarted)
+				throw new InvalidOperationException("The boot manager has already been initialized");
+
 			if (afterStartup != null)
 			{
 				afterStartup(ApplicationContext.Current);	
-			}			
+			}
+
+			_isStarted = true;
+
 			return this;
 		}
 
@@ -54,6 +69,9 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		public virtual IBootManager Complete(Action<ApplicationContext> afterComplete)
 		{
+			if (_isComplete)
+				throw new InvalidOperationException("The boot manager has already been completed");
+
 			//freeze resolution to not allow Resolvers to be modified
 			Resolution.Freeze();
 
@@ -64,7 +82,9 @@ namespace Umbraco.Core
 			{
 				afterComplete(ApplicationContext.Current);	
 			}
-			
+
+			_isComplete = true;
+
 			return this;
 		}
 

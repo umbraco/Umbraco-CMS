@@ -104,6 +104,8 @@ namespace Umbraco.Web
             return CreateXpathQuery(startNodeId, path, GlobalSettings.HideTopLevelNodeFromPath);
         }
 
+		
+
         protected string CreateXpathQuery(int startNodeId, string path, bool hideTopLevelNodeFromPath)
         {
             string xpath;
@@ -131,7 +133,7 @@ namespace Umbraco.Web
                 int partsIndex = 0;
 
                 xpathBuilder.Append("/root");
-
+				
                 if (startNodeId == 0)
                 {
                     if (hideTopLevelNodeFromPath)

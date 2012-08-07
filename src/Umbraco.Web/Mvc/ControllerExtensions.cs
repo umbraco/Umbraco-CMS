@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Threading;
 
 namespace Umbraco.Web.Mvc
 {
-    public static class ControllerExtensions
+	public static class ControllerExtensions
     {
         /// <summary>
         /// Return the controller name from the controller type

@@ -239,6 +239,19 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ContentStore.cs" />
+    <Compile Include="Mvc\Constants.cs" />
+    <Compile Include="Mvc\FilteredControllerFactoriesResolver.cs" />
+    <Compile Include="Mvc\IFilteredControllerFactory.cs" />
+    <Compile Include="Mvc\MasterControllerFactory.cs" />
+    <Compile Include="Mvc\RenderActionInvoker.cs" />
+    <Compile Include="Mvc\RenderControllerFactory.cs" />
+    <Compile Include="Mvc\RenderModel.cs" />
+    <Compile Include="Mvc\RenderModelBinder.cs" />
+    <Compile Include="Mvc\RenderMvcController.cs" />
+    <Compile Include="Mvc\RenderRouteHandler.cs" />
+    <Compile Include="Mvc\RenderViewEngine.cs" />
+    <Compile Include="Mvc\RenderViewPage.cs" />
+    <Compile Include="Mvc\RouteDefinition.cs" />
     <Compile Include="WebBootManager.cs" />
     <Compile Include="LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />

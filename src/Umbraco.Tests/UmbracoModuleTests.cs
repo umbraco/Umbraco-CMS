@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Xml;
 using NUnit.Framework;
 using SqlCE4Umbraco;
@@ -92,6 +93,42 @@ namespace Umbraco.Tests
 			}
 		}
 
+		/// <summary>
+		/// Initlializes the UmbracoContext with specific XML
+		/// </summary>
+		/// <param name="umbracoContext"></param>
+		/// <param name="template"></param>
+		private void SetupUmbracoContextForTest(UmbracoContext umbracoContext, Template template)
+		{
+			umbracoContext.GetXmlDelegate = () =>
+			{
+				var xDoc = new XmlDocument();
+
+				//create a custom xml structure to return
+
+				xDoc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?><!DOCTYPE root[ 
+<!ELEMENT Home ANY>
+<!ATTLIST Home id ID #REQUIRED>
+
+]>
+<root id=""-1"">
+	<Home id=""1046"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""2"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Home"" urlName=""home"" writerName=""admin"" creatorName=""admin"" path=""-1,1046"" isDoc=""""><content><![CDATA[]]></content>
+		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""1"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc=""""><content><![CDATA[]]></content>
+			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""1"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc=""""><content><![CDATA[]]></content>
+			</Home>
+			<Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""2"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc=""""><content><![CDATA[]]></content>
+			</Home>
+		</Home>
+		<Home id=""1175"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""2"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub 2"" urlName=""sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1175"" isDoc=""""><content><![CDATA[]]></content>
+		</Home>
+	</Home>
+	<Home id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
+</root>");
+				//return the custom x doc
+				return xDoc;
+			};
+		}
+
 		[TestCase("/umbraco_client/Tree/treeIcons.css", false)]
 		[TestCase("/umbraco_client/Tree/Themes/umbraco/style.css?cdv=37", false)]
 		[TestCase("/umbraco_client/scrollingmenu/style.css?cdv=37", false)]
@@ -130,14 +167,19 @@ namespace Umbraco.Tests
 			Assert.AreEqual(assert, result);
 		}
 
-		[TestCase("/", true)]
-		[TestCase("/home.aspx", true)]
-		[TestCase("/home.aspx?altTemplate=blah", true)]
-		public void Process_Front_End_Document_Request(string url, bool assert)
+		//NOTE: This test shows how we can test most of the HttpModule, it however is testing too much, 
+		// we need to write unit tests for each of the components: NiceUrlProvider, all of the Lookup classes, etc...
+		// to ensure that each one is individually tested. 
+
+		[TestCase("/", 1046)]
+		[TestCase("/home.aspx", 1046)]
+		[TestCase("/home/sub1.aspx", 1173)]
+		[TestCase("/home.aspx?altTemplate=blah", 1046)]
+		public void Process_Front_End_Document_Request_Match_Node(string url, int nodeId)
 		{
 			var httpContextFactory = new FakeHttpContextFactory(url);
 			var httpContext = httpContextFactory.HttpContext;
-			var umbracoContext = new UmbracoContext(httpContext, ApplicationContext.Current, new DefaultRoutesCache(false));
+			var umbracoContext = new UmbracoContext(httpContext, ApplicationContext.Current, new NullRoutesCache());
 			var contentStore = new ContentStore(umbracoContext);
 			var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
 			umbracoContext.RoutingContext = new RoutingContext(
@@ -159,43 +201,46 @@ namespace Umbraco.Tests
 
 			_module.AssignDocumentRequest(httpContext, umbracoContext, httpContext.Request.Url);
 
-			Assert.AreEqual(assert, umbracoContext.DocumentRequest != null);
-			if (assert)
-			{
-				Assert.AreEqual(assert, umbracoContext.DocumentRequest.Node != null);	
-			}			
+			Assert.IsNotNull(umbracoContext.DocumentRequest);
+			Assert.IsNotNull(umbracoContext.DocumentRequest.Node);	
+			Assert.IsFalse(umbracoContext.DocumentRequest.IsRedirect);
+			Assert.IsFalse(umbracoContext.DocumentRequest.Is404);
+			Assert.AreEqual(umbracoContext.DocumentRequest.Culture, Thread.CurrentThread.CurrentCulture);
+			Assert.AreEqual(umbracoContext.DocumentRequest.Culture, Thread.CurrentThread.CurrentUICulture);
+			Assert.AreEqual(nodeId, umbracoContext.DocumentRequest.NodeId);
+			
 		}
 
-
-		private void SetupUmbracoContextForTest(UmbracoContext umbracoContext, Template template)
+		/// <summary>
+		/// Used for testing, does not cache anything
+		/// </summary>
+		private class NullRoutesCache : IRoutesCache
 		{
-			umbracoContext.GetXmlDelegate = () =>
+			public void Store(int nodeId, string route)
 			{
-				var xDoc = new XmlDocument();
+				
+			}
 
-				//create a custom xml structure to return
+			public string GetRoute(int nodeId)
+			{
+				return null; //default;
+			}
 
-				xDoc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?><!DOCTYPE root[ 
-<!ELEMENT Home ANY>
-<!ATTLIST Home id ID #REQUIRED>
+			public int GetNodeId(string route)
+			{
+				return 0; //default;
+			}
 
-]>
-<root id=""-1"">
-	<Home id=""1046"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""2"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Home"" urlName=""home"" writerName=""admin"" creatorName=""admin"" path=""-1,1046"" isDoc=""""><content><![CDATA[]]></content>
-		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""1"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc=""""><content><![CDATA[]]></content>
-			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""1"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc=""""><content><![CDATA[]]></content>
-			</Home>
-			<Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""2"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc=""""><content><![CDATA[]]></content>
-			</Home>
-		</Home>
-		<Home id=""1175"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""2"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub 2"" urlName=""sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1175"" isDoc=""""><content><![CDATA[]]></content>
-		</Home>
-	</Home>
-	<Home id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
-</root>");
-				//return the custom x doc
-				return xDoc;
-			};
+			public void ClearNode(int nodeId)
+			{
+				
+			}
+
+			public void Clear()
+			{
+				
+			}
 		}
+
 	}
 }

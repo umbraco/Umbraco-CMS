@@ -65,7 +65,7 @@ namespace Umbraco.Web.Routing
 				? null
 				: _umbracoContext.RoutesCache.GetRoute(nodeId);
 
-            if (route != null)
+            if (!string.IsNullOrEmpty(route))
             {
 				// route is <id>/<path> eg "-1/", "-1/foo", "123/", "123/foo/bar"...
                 int pos = route.IndexOf('/');

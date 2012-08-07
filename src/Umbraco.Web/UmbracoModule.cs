@@ -26,9 +26,8 @@ namespace Umbraco.Web
 	public class UmbracoModule : IHttpModule
 	{
 		/// <summary>
-		/// Checks if the current request should process the request as a front-end umbraco request, if this is tru
-		/// it then creates the DocumentRequest object, finds the document, domain and culture and stores this back 
-		/// to the UmbracoContext
+		/// Assogms a new DocumentRequest to the UmbracoContext and finds the document, 
+		/// domain and culture associated with the current front-end request.
 		/// </summary>
 		/// <param name="httpContext"></param>
 		/// <param name="umbracoContext"> </param>
