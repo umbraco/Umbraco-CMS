@@ -61,10 +61,13 @@
     padding: 2px 0 2px 20px;
 }
 
-.upload-panel .queued li span.label {
+.upload-panel .queued li .label {
     display: inline-block;
-    width: 150px;
-    overflow: hidden;
+    width: 145px;
+    margin: 0 5px 0 0;
+    border: solid 1px #e0e0e0;
+    height: 1.5em;
+    vertical-align: middle;
 }
 
 .upload-panel .queued li span.progress {
@@ -73,6 +76,7 @@
     border: solid 1px #e0e0e0;
     overflow: hidden;
     height: 1.5em;
+    vertical-align: middle;
 }
 
 .upload-panel .queued li span.progress span {
@@ -84,6 +88,7 @@
 
 .upload-panel .queued li img {
     margin-left: 5px;
+    vertical-align: middle;
 }
 
 .umbFolderBrowser .breadcrumb {

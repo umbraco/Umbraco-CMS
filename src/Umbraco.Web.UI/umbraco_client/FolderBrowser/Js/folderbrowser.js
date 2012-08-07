@@ -37,7 +37,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         {
             var self = this;
             
-            $.getJSON(self._opts.basePath + "/FolderBrowserService/GetChildNodes/" + self._parentId + "/" + self._viewModel.filterTerm(), function (data) {
+            $.getJSON(self._opts.basePath + "/FolderBrowserService/GetChildren/" + self._parentId + "/" + self._viewModel.filterTerm(), function (data) {
                 if (data != undefined && data.length > 0) {
                     ko.mapping.fromJS(data, itemMappingOptions, self._viewModel.items);
                 } else {
@@ -77,59 +77,30 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             window.open(item.FileUrl(), "Download");
         },
         
-        _deleteItem: function (id)
+        _deleteItems: function (ids)
         {
             var self = this;
 
-            var item = self._getItemById(id);
-            if (item === null)
-                throw Error("No item found with the id: " + id);
+            var msg = ids.length + " item" + ((ids.length > 1) ? "s" : "");
 
-            if (confirm(window.top.uiKeys['defaultdialogs_confirmdelete'] + ' "' + item.Name() + '"?\n\n'))
+            if (confirm(window.top.uiKeys['defaultdialogs_confirmdelete'] + ' the selected ' + msg + '?\n\n'))
             {
                 $(window.top).trigger("nodeDeleting", []);
 
-                var safePath = "," + item.Path() + ",";
+                $.getJSON(self._opts.basePath + "/FolderBrowserService/Delete/" + ids.join(), function (data) {
+                    if (data != undefined && data.success) {
+                        //raise nodeDeleted event
+                        $(window.top).trigger("nodeDeleted", []);
 
-                if (safePath.indexOf(",-20,") != -1 || safePath.indexOf(",-21,") != -1)
-                {
-                    window.top.umbraco.presentation.webservices.legacyAjaxCalls.DeleteContentPermanently(
-                        item.Id(),
-                        "media",
-                        function () {
-                            //raise nodeDeleted event
-                            $(window.top).trigger("nodeDeleted", []);
+                        //TODO: Reload current open node in tree
 
-                            //TODO: Reload current open node in tree
-
-                            // Reload nodes
-                            self._getChildNodes();
-                        });
-                }
-                else
-                {
-                    window.top.umbraco.presentation.webservices.legacyAjaxCalls.Delete(
-                        item.Id(), "",
-                        "media",
-                        function() {
-                            //raise nodeDeleted event
-                            $(window.top).trigger("nodeDeleted", []);
-
-                            //TODO: Reload current open node in tree
-
-                            // Reload nodes
-                            self._getChildNodes();
-                        },
-                        function(error) {
-                            //raise public error event
-                            $(window.top).trigger("publicError", [error]);
-
-                            //TODO: Reload current open node in tree
-
-                            // Reload nodes
-                            self._getChildNodes();
-                        });
-                }
+                        // Reload nodes
+                        self._getChildNodes();
+                        
+                    } else {
+                        throw Error("There was an error deleting the selected nodes: " + ids.join());
+                    }
+                });
             }
         },
         
@@ -144,6 +115,20 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 items: ko.observableArray([]),
                 queued: ko.observableArray([])
             });
+
+            self._viewModel.selected = ko.computed(function() {
+                return ko.utils.arrayFilter(this.items(), function(item) {
+                    return item.selected();
+                });
+            }, self._viewModel);
+            
+            self._viewModel.selectedIds = ko.computed(function() {
+                var ids = [];
+                ko.utils.arrayForEach(this.selected(), function(item) {
+                    ids.push(item.Id());
+                });
+                return ids;
+            }, self._viewModel);
 
             self._viewModel.filterTerm.subscribe(function (newValue) {
                 self._getChildNodes();
@@ -179,10 +164,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 instructions +
                 "<form action=\"/base/FolderBrowserService/Upload/" + this._parentId + "\" method=\"post\" enctype=\"multipart/form-data\">" +
                 "<input id='fileupload' type='file' name='file' multiple>" +
+                "<input type='hidden' name='name' />" +
                 "<input type='hidden' name='overwriteExisting' />" +
                 "</form>" +
                 "<ul class='queued' data-bind='foreach: queued'><li>" +
-                "<span class='label' data-bind='text: name'></span>" +
+                "<input type='text' class='label' data-bind=\"value: name, valueUpdate: 'afterkeydown', enable: progress() == 0\" />" +
                 "<span class='progress'><span data-bind=\"style: { width: progress() + '%' }\"></span></span>" +
                 "<a href='' data-bind='click: cancel'><img src='images/delete.png' /></a>" +
                 "</li></ul>" +
@@ -204,7 +190,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     var file = {
                         uploaderId: data.uploaderId,
                         itemId: data.itemId,
-                        name: data.name,
+                        name: ko.observable(data.name),
                         size: data.size,
                         progress: ko.observable(data.progress),
                         cancel: function () {
@@ -214,6 +200,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                                 self._viewModel.queued.remove(this);
                         }
                     };
+
+                    file.name.subscribe(function (newValue) {
+                        $("#fu-item-" + file.uploaderId + "-" + file.itemId + " input[name=name]").val(newValue);
+                    });
 
                     // Store item back in context for easy access later
                     data.context = file;
@@ -287,7 +277,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                             self._downloadItem(id);
                             break;
                         case "delete":
-                            self._deleteItem(id);
+                            self._deleteItems(self._viewModel.selectedIds());
                             break;
                     }
                 },
@@ -317,6 +307,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 update: function (e, ui) {
                     //var oldIndex = self._viewModel.items.indexOf(self._viewModel.tempItem());
                     var newIndex = ui.item.index();
+
+                    //TODO: Don't allow sorting on a filtered view
 
                     $(".umbFolderBrowser .items .selected").sort(function (a,b) {
                         return parseInt($(a).data("order")) > parseInt($(b).data("order")) ? 1 : -1;
