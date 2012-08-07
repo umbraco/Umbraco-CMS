@@ -114,7 +114,7 @@ namespace Umbraco.Web.UI.Controls
 
             // Create thumbnails container
             sb.Append("<ul class='items' data-bind='foreach: items'>" +
-                      "<li data-bind=\"attr: { 'data-id': Id }\"><a data-bind='attr: { href: EditUrl }'><span class='img'><img data-bind='attr: { src: ThumbnailUrl }' /></span><span data-bind='text: Name'></span></a></li>" +
+                      "<li data-bind=\"attr: { 'data-id': Id, 'data-order': $index() }, css: { selected: selected() }, event: { mousedown: toggleSelected, contextmenu: toggleSelected }\"><div><span class='img'><img data-bind='attr: { src: ThumbnailUrl }' /></span><span data-bind='text: Name'></span></div></li>" +
                       "</ul>");
 
             panel.Controls.Add(new LiteralControl(sb.ToString()));

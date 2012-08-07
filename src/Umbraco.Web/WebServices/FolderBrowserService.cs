@@ -18,7 +18,7 @@ namespace Umbraco.Web.WebServices
     public class FolderBrowserService
     {
         [RestExtensionMethod(returnXml = false)]
-        public static string GetChildNodes(int parentId, string filterTerm)
+        public static string GetChildren(int parentId, string filterTerm)
         {
             var parentMedia = new global::umbraco.cms.businesslogic.media.Media(parentId);
             var currentUser = User.GetCurrent();
@@ -64,10 +64,40 @@ namespace Umbraco.Web.WebServices
         }
 
         [RestExtensionMethod(returnXml = false)]
+        public static string Delete(string nodeIds)
+        {
+            var nodeIdParts = nodeIds.Split(',');
+
+            foreach (var nodeIdPart in nodeIdParts.Where(x => !string.IsNullOrEmpty(x)))
+            {
+                var nodeId = 0;
+                if (!Int32.TryParse(nodeIdPart, out nodeId)) 
+                    continue;
+                
+                var node = new global::umbraco.cms.businesslogic.media.Media(nodeId);
+                node.delete(("," + node.Path + ",").Contains(",-21,"));
+            }
+
+            return new JavaScriptSerializer().Serialize(new
+            {
+                success = true
+            });
+        }
+
+        [RestExtensionMethod(returnXml = false)]
         public static string Upload(int parentId)
         {
             return new JavaScriptSerializer().Serialize(new {
                 success = true 
+            });
+        }
+
+        [RestExtensionMethod(returnXml = false)]
+        public static string UpdateSortOrder(int parentId, IDictionary<int, int> map)
+        {
+            return new JavaScriptSerializer().Serialize(new
+            {
+                success = true
             });
         }
     }

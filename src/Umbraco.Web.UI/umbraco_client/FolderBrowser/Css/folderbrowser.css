@@ -61,10 +61,13 @@
     padding: 2px 0 2px 20px;
 }
 
-.upload-panel .queued li span.label {
+.upload-panel .queued li .label {
     display: inline-block;
-    width: 150px;
-    overflow: hidden;
+    width: 145px;
+    margin: 0 5px 0 0;
+    border: solid 1px #e0e0e0;
+    height: 1.5em;
+    vertical-align: middle;
 }
 
 .upload-panel .queued li span.progress {
@@ -73,6 +76,7 @@
     border: solid 1px #e0e0e0;
     overflow: hidden;
     height: 1.5em;
+    vertical-align: middle;
 }
 
 .upload-panel .queued li span.progress span {
@@ -84,6 +88,7 @@
 
 .upload-panel .queued li img {
     margin-left: 5px;
+    vertical-align: middle;
 }
 
 .umbFolderBrowser .breadcrumb {
@@ -129,7 +134,12 @@
 }
 
 .umbFolderBrowser .items li {
-    display: block;
+    display: inline-block;
+}
+
+.umbFolderBrowser .items li div {
+    display: inline-block;
+    position: relative;
     list-style: none;
     margin: 5px;
     padding: 0;
@@ -142,6 +152,7 @@
     -moz-box-shadow: 2px 2px 2px #e0e0e0;
     -webkit-box-shadow: 2px 2px 2px #e0e0e0;
     box-shadow: 2px 2px 2px #e0e0e0;
+    cursor: pointer;
 }
 
 .umbFolderBrowser .img {
@@ -167,4 +178,30 @@
     vertical-align: middle;
     max-width: 100px;
     max-height: 100px;
+}
+
+.umbFolderBrowser .items li.selected div {
+    background: #D5EFFC;
+	border-color: #99DEFD;
+}
+
+.umbFolderBrowser .items li.selected .img {
+    background: #99DEFD;
+}
+
+.umbFolderBrowser .items.ui-sortable-dragging li.selected {
+    display: none !important;
+}
+
+.umbFolderBrowser .items.ui-sortable-dragging li.ui-sortable-helper,
+.umbFolderBrowser .items.ui-sortable-dragging li.ui-sortable-placeholder {
+    display: inline-block !important;
+}
+
+.umbFolderBrowser .items li.ui-sortable-helper div {
+    border: dotted 5px #99DEFD;
+}
+
+.umbFolderBrowser .items li.ui-sortable-helper span {
+    display: none !important;
 }
