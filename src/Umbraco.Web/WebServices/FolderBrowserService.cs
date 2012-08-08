@@ -87,14 +87,6 @@ namespace Umbraco.Web.WebServices
         }
 
         [RestExtensionMethod(returnXml = false)]
-        public static string Upload(int parentId)
-        {
-            return new JavaScriptSerializer().Serialize(new {
-                success = true 
-            });
-        }
-
-        [RestExtensionMethod(returnXml = false)]
         public static string UpdateSortOrder(int parentId, IDictionary<int, int> map)
         {
             return new JavaScriptSerializer().Serialize(new
