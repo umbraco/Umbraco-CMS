@@ -144,7 +144,8 @@ namespace umbraco.presentation.umbraco.webservices
                     }
 
                     // Check whether to replace existing
-                    bool replaceExisting = (context.Request["replaceExisting"] == "1");
+                    var parsed = false;
+                    bool replaceExisting = (context.Request["replaceExisting"] == "1" || (bool.TryParse(context.Request["replaceExisting"], out parsed) && parsed));
 
                     // loop through uploaded files
                     for (var j = 0; j < context.Request.Files.Count; j++)
@@ -223,6 +224,11 @@ namespace umbraco.presentation.umbraco.webservices
 
                 if (isValid)
                     AuthenticatedUser = user;
+            }
+            else if (User.GetCurrent() != null)
+            {
+                isValid = true;
+                AuthenticatedUser = User.GetCurrent();
             }
 
             return isValid;

@@ -124,21 +124,11 @@ namespace Umbraco.Web.UI.Controls
 
             Controls.Add(panel);
 
-            var user = User.GetCurrent();
-            var ticket = new FormsAuthenticationTicket(1,
-                user != null ? user.LoginName : "",
-                DateTime.Now,
-                DateTime.Now,
-                false,
-                "");
-
             Page.ClientScript.RegisterStartupScript(typeof(FolderBrowser),
                 "RegisterFolderBrowsers",
-                string.Format("$(function () {{ $(\".umbFolderBrowser\").folderBrowser({{ umbracoPath : '{0}', basePath : '{1}', username: '{2}', ticket: '{3}' }}); }});",
+                string.Format("$(function () {{ $(\".umbFolderBrowser\").folderBrowser({{ umbracoPath : '{0}', basePath : '{1}' }}); }});",
                 IOHelper.ResolveUrl(SystemDirectories.Umbraco),
-                IOHelper.ResolveUrl(SystemDirectories.Base),
-                user != null ? user.LoginName : "",
-                FormsAuthentication.Encrypt(ticket)),
+                IOHelper.ResolveUrl(SystemDirectories.Base)),
                 true);
         }
 

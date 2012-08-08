@@ -170,10 +170,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             var overlay = $("<div class='upload-overlay'>" +
                 "<div class='upload-panel'>" +
                 instructions +
-                "<form action=\"/base/FolderBrowserService/Upload/" + this._parentId + "\" method=\"post\" enctype=\"multipart/form-data\">" +
+                "<form action=\"/umbraco/webservices/MediaUploader.ashx?format=json&action=upload&parentNodeId=" + this._parentId + "\" method=\"post\" enctype=\"multipart/form-data\">" +
                 "<input id='fileupload' type='file' name='file' multiple>" +
                 "<input type='hidden' name='name' />" +
-                "<input type='hidden' name='overwriteExisting' />" +
+                "<input type='hidden' name='replaceExisting' />" +
                 "</form>" +
                 "<ul class='queued' data-bind='foreach: queued'><li>" +
                 "<input type='text' class='label' data-bind=\"value: name, valueUpdate: 'afterkeydown', enable: progress() == 0\" />" +
@@ -181,8 +181,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 "<a href='' data-bind='click: cancel'><img src='images/delete.png' /></a>" +
                 "</li></ul>" +
                 "<button class='button upload' data-bind='enable: queued().length > 0'>Upload</button>" +
-                "<input type='checkbox' id='overwriteExisting' />" +
-                "<label for='overwriteExisting'>Overwrite existing?</label>" +
+                "<input type='checkbox' id='replaceExisting' />" +
+                "<label for='replaceExisting'>Overwrite existing?</label>" +
                 "<a href='#' class='cancel'>Cancel</a>" +
                 "</div>" +
                 "</div>");
@@ -243,8 +243,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 $("#fileupload").fileUploader("uploadAll");
             });
 
-            $(".upload-overlay #overwriteExisting").click(function() {
-                $("input[name=overwriteExisting]").val($(this).is(":checked"));
+            $(".upload-overlay #replaceExisting").click(function() {
+                $("input[name=replaceExisting]").val($(this).is(":checked"));
             });
 
             $(".upload-overlay .cancel").click(function (e) {
