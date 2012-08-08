@@ -43,18 +43,36 @@ namespace Umbraco.Web.Mvc
 			}
 		}
 		
-		public virtual ActionResult Index(RenderModel model)
+		/// <summary>
+		/// Checks to make sure the physical view file exists on disk
+		/// </summary>
+		/// <param name="template"></param>
+		/// <returns></returns>
+		protected bool EnsurePhsyicalViewExists(string template)
 		{
-			var template = ControllerContext.RouteData.Values["action"].ToString();
 			if (!System.IO.File.Exists(
 				Path.Combine(Server.MapPath(Constants.ViewLocation), template + ".cshtml")))
 			{
 				LogHelper.Warn<RenderMvcController>("No physical template file was found for template " + template);
+				return false;
+			}
+			return true;
+		}
+
+		/// <summary>
+		/// The default action to render the front-end view
+		/// </summary>
+		/// <param name="model"></param>
+		/// <returns></returns>
+		public virtual ActionResult Index(RenderModel model)
+		{
+			var template = ControllerContext.RouteData.Values["action"].ToString();
+			if (!EnsurePhsyicalViewExists(template))
+			{
 				return Content("");
 			}
 
 			return View(template, model);
-
 		}
 
 	}

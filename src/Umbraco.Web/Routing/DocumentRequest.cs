@@ -55,6 +55,9 @@ namespace Umbraco.Web.Routing
 
 		public UmbracoContext UmbracoContext { get; private set; }
 
+		/// <summary>
+		/// The cleaned up Uri used for routing
+		/// </summary>
 		public Uri Uri { get; private set; }
 
         /// <summary>

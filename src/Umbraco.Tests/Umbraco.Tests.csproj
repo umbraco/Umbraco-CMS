@@ -60,12 +60,14 @@
     <Compile Include="CacheRefresherFactoryTests.cs" />
     <Compile Include="ContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
+    <Compile Include="DocumentLookups\LookupByNiceUrlTests.cs" />
     <Compile Include="MacroFieldEditorsResolverTests.cs" />
     <Compile Include="MacroEngineFactoryTests.cs" />
     <Compile Include="MediaFactoryTests.cs" />
     <Compile Include="PackageActionsResolverTests.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="PluginManagerTests.cs" />
+    <Compile Include="Stubs\NullRoutesCache.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
     <Compile Include="PartialTrust\AbstractPartialTrustFixture.cs" />

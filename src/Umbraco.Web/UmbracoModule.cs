@@ -340,7 +340,7 @@ namespace Umbraco.Web
 
 		// "Clean umbPage from querystring, caused by .NET 2.0 default Auth Controls"
 		// but really, at the moment I have no idea what this does, and why...
-		void LegacyCleanUmbPageFromQueryString(ref Uri uri, ref string lpath)
+		internal static void LegacyCleanUmbPageFromQueryString(ref Uri uri, ref string lpath)
 		{
 			string receivedQuery = uri.Query;
 			string path = uri.AbsolutePath;
