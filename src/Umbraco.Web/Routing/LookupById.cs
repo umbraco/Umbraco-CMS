@@ -38,7 +38,7 @@ namespace Umbraco.Web.Routing
 					node = docreq.RoutingContext.ContentStore.GetNodeById(nodeId);
                     if (node != null)
                     {
-                        docreq.Node = node;
+                        docreq.XmlNode = node;
 						LogHelper.Debug<LookupById>("Found node with id={0}", () => docreq.NodeId);
                     }
                     else

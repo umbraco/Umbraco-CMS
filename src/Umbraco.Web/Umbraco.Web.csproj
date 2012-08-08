@@ -239,6 +239,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ContentStore.cs" />
+    <Compile Include="DocumentNotFoundHttpHandler.cs" />
     <Compile Include="Mvc\Constants.cs" />
     <Compile Include="Mvc\FilteredControllerFactoriesResolver.cs" />
     <Compile Include="Mvc\IFilteredControllerFactory.cs" />
@@ -271,7 +272,7 @@
     <Compile Include="Routing\LookupByProfile.cs" />
     <Compile Include="Routing\NiceUrlProvider.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
-    <Compile Include="Routing\DefaultDomainHelper.cs" />
+    <Compile Include="Routing\DomainHelper.cs" />
     <Compile Include="Routing\DocumentLookupsResolver.cs" />
     <Compile Include="Routing\DocumentRequest.cs" />
     <Compile Include="Routing\IDocumentLookup.cs" />

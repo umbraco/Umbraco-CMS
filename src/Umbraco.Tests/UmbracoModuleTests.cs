@@ -58,7 +58,7 @@ namespace Umbraco.Tests
 		[TearDown]
 		public void TearDown()
 		{
-			_module.Dispose();
+			_module.DisposeIfDisposable();
 			//reset the context on global settings
 			Umbraco.Core.Configuration.GlobalSettings.HttpContext = null;
 			//reset the app context
@@ -167,49 +167,49 @@ namespace Umbraco.Tests
 			Assert.AreEqual(assert, result);
 		}
 
-		//NOTE: This test shows how we can test most of the HttpModule, it however is testing too much, 
+		//NOTE: This test shows how we can test most of the HttpModule, it however is testing a method that no longer exists and is testing too much, 
 		// we need to write unit tests for each of the components: NiceUrlProvider, all of the Lookup classes, etc...
 		// to ensure that each one is individually tested. 
 
-		[TestCase("/", 1046)]
-		[TestCase("/home.aspx", 1046)]
-		[TestCase("/home/sub1.aspx", 1173)]
-		[TestCase("/home.aspx?altTemplate=blah", 1046)]
-		public void Process_Front_End_Document_Request_Match_Node(string url, int nodeId)
-		{
-			var httpContextFactory = new FakeHttpContextFactory(url);
-			var httpContext = httpContextFactory.HttpContext;
-			var umbracoContext = new UmbracoContext(httpContext, ApplicationContext.Current, new NullRoutesCache());
-			var contentStore = new ContentStore(umbracoContext);
-			var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
-			umbracoContext.RoutingContext = new RoutingContext(
-				new IDocumentLookup[] {new LookupByNiceUrl()},
-				new DefaultLastChanceLookup(),
-				contentStore,
-				niceUrls); 
+		//[TestCase("/", 1046)]
+		//[TestCase("/home.aspx", 1046)]
+		//[TestCase("/home/sub1.aspx", 1173)]
+		//[TestCase("/home.aspx?altTemplate=blah", 1046)]
+		//public void Process_Front_End_Document_Request_Match_Node(string url, int nodeId)
+		//{
+		//    var httpContextFactory = new FakeHttpContextFactory(url);
+		//    var httpContext = httpContextFactory.HttpContext;
+		//    var umbracoContext = new UmbracoContext(httpContext, ApplicationContext.Current, new NullRoutesCache());
+		//    var contentStore = new ContentStore(umbracoContext);
+		//    var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
+		//    umbracoContext.RoutingContext = new RoutingContext(
+		//        new IDocumentLookup[] {new LookupByNiceUrl()},
+		//        new DefaultLastChanceLookup(),
+		//        contentStore,
+		//        niceUrls); 
 
-			StateHelper.HttpContext = httpContext;
+		//    StateHelper.HttpContext = httpContext;
 
-			//because of so much dependency on the db, we need to create som stuff here, i originally abstracted out stuff but 
-			//was turning out to be quite a deep hole because ultimately we'd have to abstract the old 'Domain' and 'Language' classes
-			Domain.MakeNew("Test.com", 1000, Language.GetByCultureCode("en-US").id);
+		//    //because of so much dependency on the db, we need to create som stuff here, i originally abstracted out stuff but 
+		//    //was turning out to be quite a deep hole because ultimately we'd have to abstract the old 'Domain' and 'Language' classes
+		//    Domain.MakeNew("Test.com", 1000, Language.GetByCultureCode("en-US").id);
 
-			//need to create a template with id 1045
-			var template = Template.MakeNew("test", new User(0));
+		//    //need to create a template with id 1045
+		//    var template = Template.MakeNew("test", new User(0));
 
-			SetupUmbracoContextForTest(umbracoContext, template);
+		//    SetupUmbracoContextForTest(umbracoContext, template);
 
-			_module.AssignDocumentRequest(httpContext, umbracoContext, httpContext.Request.Url);
+		//    _module.AssignDocumentRequest(httpContext, umbracoContext, httpContext.Request.Url);
 
-			Assert.IsNotNull(umbracoContext.DocumentRequest);
-			Assert.IsNotNull(umbracoContext.DocumentRequest.Node);	
-			Assert.IsFalse(umbracoContext.DocumentRequest.IsRedirect);
-			Assert.IsFalse(umbracoContext.DocumentRequest.Is404);
-			Assert.AreEqual(umbracoContext.DocumentRequest.Culture, Thread.CurrentThread.CurrentCulture);
-			Assert.AreEqual(umbracoContext.DocumentRequest.Culture, Thread.CurrentThread.CurrentUICulture);
-			Assert.AreEqual(nodeId, umbracoContext.DocumentRequest.NodeId);
+		//    Assert.IsNotNull(umbracoContext.DocumentRequest);
+		//    Assert.IsNotNull(umbracoContext.DocumentRequest.XmlNode);	
+		//    Assert.IsFalse(umbracoContext.DocumentRequest.IsRedirect);
+		//    Assert.IsFalse(umbracoContext.DocumentRequest.Is404);
+		//    Assert.AreEqual(umbracoContext.DocumentRequest.Culture, Thread.CurrentThread.CurrentCulture);
+		//    Assert.AreEqual(umbracoContext.DocumentRequest.Culture, Thread.CurrentThread.CurrentUICulture);
+		//    Assert.AreEqual(nodeId, umbracoContext.DocumentRequest.NodeId);
 			
-		}
+		//}
 
 		/// <summary>
 		/// Used for testing, does not cache anything

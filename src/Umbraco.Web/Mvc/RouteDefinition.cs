@@ -18,6 +18,6 @@ namespace Umbraco.Web.Mvc
 		/// <summary>
 		/// The current RenderModel found for the request
 		/// </summary>
-		public object RenderModel { get; set; }
+		public object DocumentRequest { get; set; }
 	}
 }

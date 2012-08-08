@@ -28,6 +28,9 @@ namespace Umbraco.Web.Routing
 			else
 				route = docreq.Uri.AbsolutePath;
 
+			//TODO: When this is not IIS 7, this does not work for the root '/' request since it comes through as default.aspx!!
+			// this needs fixing.
+
 			//format the path
 			route = route.Replace(".aspx", "");
 
@@ -57,7 +60,7 @@ namespace Umbraco.Web.Routing
 				node = docreq.RoutingContext.ContentStore.GetNodeById(nodeId);
                 if (node != null)
                 {
-                    docreq.Node = node;
+                    docreq.XmlNode = node;
 					LogHelper.Debug<LookupByNiceUrl>("Cache hit, id={0}", () => nodeId);
                 }
                 else
@@ -72,7 +75,7 @@ namespace Umbraco.Web.Routing
 				node = docreq.RoutingContext.ContentStore.GetNodeByRoute(route);
                 if (node != null)
                 {
-                    docreq.Node = node;
+                    docreq.XmlNode = node;
 					LogHelper.Debug<LookupByNiceUrl>("Query matches, id={0}", () => docreq.NodeId);
 
 					if (!docreq.UmbracoContext.InPreviewMode)

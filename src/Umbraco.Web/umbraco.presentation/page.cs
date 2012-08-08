@@ -89,7 +89,7 @@ namespace umbraco
 			if (!docreq.HasNode)
 				throw new ArgumentException("Document request has no node.", "docreq");
 
-			populatePageData(docreq.Node);
+			populatePageData(docreq.XmlNode);
 
 			if (docreq.HasTemplate)
 			{
@@ -97,7 +97,7 @@ namespace umbraco
 				elements["template"] = this.template.ToString();
 			}
 
-			populateElementData(docreq.Node);
+			populateElementData(docreq.XmlNode);
 
 			HttpContext.Current.Trace.Write(TraceCategory, string.Format("Loaded \"{0}\" (id={1}, version={2})",
 				this.PageName, this.pageID, this.pageVersion));

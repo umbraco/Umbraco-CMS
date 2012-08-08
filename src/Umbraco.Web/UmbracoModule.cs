@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -25,98 +26,16 @@ namespace Umbraco.Web
 
 	public class UmbracoModule : IHttpModule
 	{
-		/// <summary>
-		/// Assogms a new DocumentRequest to the UmbracoContext and finds the document, 
-		/// domain and culture associated with the current front-end request.
-		/// </summary>
-		/// <param name="httpContext"></param>
-		/// <param name="umbracoContext"> </param>
-		/// <param name="uri"> </param>
-		internal void AssignDocumentRequest(
-			HttpContextBase httpContext, 
-			UmbracoContext umbracoContext,
-			Uri uri)
-		{
-			if (httpContext == null) throw new ArgumentNullException("httpContext");
-			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-			if (umbracoContext.RoutingContext == null) throw new ArgumentNullException("umbracoContext.RoutingContext");
-
-			//Create a document request since we are rendering a document on the front-end
-
-			// create the new document request which will cleanup the uri once and for all
-			var docreq = new DocumentRequest(uri, umbracoContext);
-			//assign the routing context to the umbraco context
-			umbracoContext.DocumentRequest = docreq;
-
-			// note - at that point the original legacy module did something do handle IIS custom 404 errors
-			//   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support
-			//   "directory urls" without having to do wildcard mapping to ASP.NET on old IIS. This is a pain
-			//   to maintain and probably not used anymore - removed as of 06/2012. @zpqrtbnk.
-			//
-			//   to trigger Umbraco's not-found, one should configure IIS and/or ASP.NET custom 404 errors
-			//   so that they point to a non-existing page eg /redirect-404.aspx
-
-			docreq.LookupDomain();
-			if (docreq.IsRedirect)
-				httpContext.Response.Redirect(docreq.RedirectUrl, true);
-			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = docreq.Culture;
-			docreq.LookupDocument();
-			if (docreq.IsRedirect)
-				httpContext.Response.Redirect(docreq.RedirectUrl, true);
-
-			if (docreq.Is404)
-				httpContext.Response.StatusCode = 404;
-		}
+		#region HttpModule event handlers
 
 		/// <summary>
-		/// This is a performance tweak to check if this is a .css, .js or .ico file request since
-		/// .Net will pass these requests through to the module when in integrated mode.
-		/// We want to ignore all of these requests immediately.
-		/// </summary>
-		/// <param name="url"></param>
-		/// <returns></returns>
-		internal bool IsClientSideRequest(Uri url)
-		{
-			var toIgnore = new[] { ".js", ".css", ".ico" };
-			return toIgnore.Any(x => Path.GetExtension(url.LocalPath).InvariantEquals(x));
-		}
-
-		/// <summary>
-		/// Checks the current request and ensures that it is routable based on the structure of the request and URI
-		/// </summary>
-		/// <param name="uri"></param>
-		/// <param name="lpath"></param>
-		/// <param name="httpContext"></param>
-		/// <returns></returns>
-		internal bool EnsureUmbracoRoutablePage(Uri uri, string lpath, HttpContextBase httpContext)
-		{
-			// ensure this is a document request
-			if (!EnsureDocumentRequest(httpContext, uri, lpath))
-				return false;
-			// ensure Umbraco is ready to serve documents
-			if (!EnsureIsReady(httpContext, uri))
-				return false;
-			// ensure Umbraco is properly configured to serve documents
-			if (!EnsureIsConfigured(httpContext, uri))
-				return false;
-			// ensure that its not a base rest handler
-			if ((UmbracoSettings.EnableBaseRestHandler) && !EnsureNotBaseRestHandler(lpath))
-				return false;
-
-			return true;
-		}
-
-		/// <summary>
-		/// Entry point for a request
+		/// Processses the Umbraco Request
 		/// </summary>
 		/// <param name="httpContext"></param>
 		void ProcessRequest(HttpContextBase httpContext)
 		{
-			LogHelper.Debug<UmbracoModule>("Start processing request");
-
 			if (IsClientSideRequest(httpContext.Request.Url))
 			{
-				LogHelper.Debug<UmbracoModule>("End processing request, not transfering to handler, this is a client side file request {0}", () => httpContext.Request.Url);
 				return;
 			}
 
@@ -161,17 +80,40 @@ namespace Umbraco.Web
 			//do not continue if this request is not a front-end routable page
 			if (EnsureUmbracoRoutablePage(uri, lpath, httpContext))
 			{
-				//create and assign the document request now that we know its a document being rendered on the front end
-				AssignDocumentRequest(httpContext, umbracoContext, uri);
+				//Create a document request since we are rendering a document on the front-end
 
-				RewriteToUmbracoHandler(HttpContext.Current, uri.Query, false);
+				// create the new document request which will cleanup the uri once and for all
+				var docreq = new DocumentRequest(uri, umbracoContext);
+				//assign the routing context to the umbraco context
+				umbracoContext.DocumentRequest = docreq;
+
+				// note - at that point the original legacy module did something do handle IIS custom 404 errors
+				//   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support
+				//   "directory urls" without having to do wildcard mapping to ASP.NET on old IIS. This is a pain
+				//   to maintain and probably not used anymore - removed as of 06/2012. @zpqrtbnk.
+				//
+				//   to trigger Umbraco's not-found, one should configure IIS and/or ASP.NET custom 404 errors
+				//   so that they point to a non-existing page eg /redirect-404.aspx
+
+				docreq.LookupDomain();
+				if (docreq.IsRedirect)
+					httpContext.Response.Redirect(docreq.RedirectUrl, true);
+				Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = docreq.Culture;
+				docreq.LookupDocument();
+				if (docreq.IsRedirect)
+					httpContext.Response.Redirect(docreq.RedirectUrl, true);
+
+				if (docreq.Is404)
+				{
+					httpContext.RemapHandler(new DocumentNotFoundHttpHandler());
+				}
+				else
+				{
+					//TODO: Detect MVC vs WebForms
+					var isMvc = true;
+					RewriteToUmbracoHandler(HttpContext.Current, uri.Query, isMvc);
+				}
 			}
-			else
-			{
-				LogHelper.Debug<UmbracoModule>("End processing request, not transfering to handler {0}", () => uri);
-			}
-
-
 		}
 
 		/// <summary>
@@ -188,6 +130,48 @@ namespace Umbraco.Web
 			{
 				content.Instance.PersistXmlToFile();
 			}
+		} 
+
+		#endregion
+
+		#region Route helper methods
+
+		/// <summary>
+		/// This is a performance tweak to check if this is a .css, .js or .ico file request since
+		/// .Net will pass these requests through to the module when in integrated mode.
+		/// We want to ignore all of these requests immediately.
+		/// </summary>
+		/// <param name="url"></param>
+		/// <returns></returns>
+		internal bool IsClientSideRequest(Uri url)
+		{
+			var toIgnore = new[] { ".js", ".css", ".ico" };
+			return toIgnore.Any(x => Path.GetExtension(url.LocalPath).InvariantEquals(x));
+		}
+
+		/// <summary>
+		/// Checks the current request and ensures that it is routable based on the structure of the request and URI
+		/// </summary>
+		/// <param name="uri"></param>
+		/// <param name="lpath"></param>
+		/// <param name="httpContext"></param>
+		/// <returns></returns>
+		internal bool EnsureUmbracoRoutablePage(Uri uri, string lpath, HttpContextBase httpContext)
+		{
+			// ensure this is a document request
+			if (!EnsureDocumentRequest(httpContext, uri, lpath))
+				return false;
+			// ensure Umbraco is ready to serve documents
+			if (!EnsureIsReady(httpContext, uri))
+				return false;
+			// ensure Umbraco is properly configured to serve documents
+			if (!EnsureIsConfigured(httpContext, uri))
+				return false;
+			// ensure that its not a base rest handler
+			if ((UmbracoSettings.EnableBaseRestHandler) && !EnsureNotBaseRestHandler(lpath))
+				return false;
+
+			return true;
 		}
 
 		/// <summary>
@@ -264,9 +248,6 @@ namespace Umbraco.Web
 					// fixme ?orgurl=... ?retry=...
 				}
 
-				//RewriteToPath<Page>(HttpContext.Current, bootUrl, "", "");
-				//TransferRequest(bootUrl, httpContext);
-
 				httpContext.RewritePath(bootUrl);
 
 				return false;
@@ -301,44 +282,58 @@ namespace Umbraco.Web
 			// although it should be a handler, or it should be replaced
 			// by clean WebAPI.
 
-			// fixme - do it once when initializing the module
-			string baseUrl = UriUtility.ToAbsolute(SystemDirectories.Base).ToLower();
+			// TODO: fixme - do it once when initializing the module
+			var baseUrl = UriUtility.ToAbsolute(SystemDirectories.Base).ToLower();
 			if (!baseUrl.EndsWith("/"))
 				baseUrl += "/";
-			if (lpath.StartsWith(baseUrl))
-			{
-				LogHelper.Debug<UmbracoModule>("Detected /base REST handler");
+			return !lpath.StartsWith(baseUrl);
+		} 
 
-				return false;
-			}
-			return true;
-		}
+		#endregion
 
 		/// <summary>
-		/// Rewrites to the Umbraco handler.
-		/// NOTE: this is a WIP until MVC is implemented properly, currently only webforms is supported.
+		/// Rewrites to the correct Umbraco handler, either WebForms or Mvc
 		/// </summary>		
 		/// <param name="context"></param>
 		/// <param name="currentQuery"></param>
 		/// <param name="isMvc"> </param>
-		private static void RewriteToUmbracoHandler(HttpContext context, string currentQuery, bool isMvc)
+		private void RewriteToUmbracoHandler(HttpContext context, string currentQuery, bool isMvc)
 		{
-			var rewritePath = "~/default.aspx" + currentQuery;
-
-			LogHelper.Debug<UmbracoModule>("Transfering to " + rewritePath);
+			string rewritePath;
+			if (isMvc)
+			{
+				//the Path is normally ~/umbraco but we need to remove the start ~/ of it and if someone modifies this
+				//then we should be rendering the MVC stuff in that location.
+				rewritePath = "~/" 
+					+ GlobalSettings.Path.TrimStart(new[] {'~', '/'}).TrimEnd(new[]{'/'})
+					+ "/RenderMvc" + currentQuery;
+			}
+			else
+			{
+				rewritePath = "~/default.aspx" + currentQuery;	
+			}
 
 			//NOTE: We do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
 			//not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly
 			//rewritten url, but this is not what we want!
 			// http://forums.iis.net/t/1146511.aspx
 
-			// Pre MVC 3
-			context.RewritePath(rewritePath, false);
+
+			//First we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
+			context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);	
+	
+			//if it is MVC we need to do something special, we are not using TransferRequest as this will 
+			//require us to rewrite the path with query strings and then reparse the query strings, this would 
+			//also mean that we need to handle IIS 7 vs pre-IIS 7 differently. Instead we are just going to create
+			//an instance of the UrlRoutingModule and call it's PostResolveRequestCache method. This does:
+			// * Looks up the route based on the new rewritten URL
+			// * Creates the RequestContext with all route parameters and then executes the correct handler that matches the route
+			//we could have re-written this functionality, but the code inside the PostResolveRequestCache is exactly what we want.
 			if (isMvc)
-			{
-				IHttpHandler httpHandler = new MvcHttpHandler();
-				httpHandler.ProcessRequest(context);
-			}
+			{				
+				var urlRouting = new UrlRoutingModule();
+				urlRouting.PostResolveRequestCache(new HttpContextWrapper(context));				
+			}			
 		}
 
 		#region Legacy
@@ -390,32 +385,34 @@ namespace Umbraco.Web
 
 		#region IHttpModule
 
-		// initialize the module,  this will trigger for each new application
-		// and there may be more than 1 application per application domain
+		/// <summary>
+		/// Initialize the module,  this will trigger for each new application 
+		/// and there may be more than 1 application per application domain
+		/// </summary>
+		/// <param name="app"></param>
 		public void Init(HttpApplication app)
 		{
-			// used to be done in PostAuthorizeRequest but then it disabled OutputCaching due
-			// to rewriting happening too early in the chain (Alex Norcliffe 2010-02).
-			//app.PostResolveRequestCache += (sender, e) =>
 
 			app.PostResolveRequestCache += (sender, e) =>
-			{
-				var httpContext = ((HttpApplication)sender).Context;
-				ProcessRequest(new HttpContextWrapper(httpContext));
-			};
-
+				{
+					var httpContext = ((HttpApplication) sender).Context;
+					ProcessRequest(new HttpContextWrapper(httpContext));
+				};
+			
 			// used to check if the xml cache file needs to be updated/persisted
 			app.PostRequestHandlerExecute += (sender, e) =>
-			{
-				var httpContext = ((HttpApplication)sender).Context;
-				PersistXmlCache(new HttpContextWrapper(httpContext));
-			};
+				{
+					var httpContext = ((HttpApplication) sender).Context;
+					PersistXmlCache(new HttpContextWrapper(httpContext));
+				};
 
 			// todo: initialize request errors handler
 		}
 
 		public void Dispose()
-		{ }
+		{
+			
+		}
 
 		#endregion
 

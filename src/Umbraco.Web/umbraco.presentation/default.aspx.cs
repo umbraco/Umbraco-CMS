@@ -38,11 +38,8 @@ namespace umbraco
 		void Page_PreInit(Object sender, EventArgs e)
 		{
 			Trace.Write(TraceCategory, "Begin PreInit");
-
-			// moved into LegacyRequestInitializer
-			// initialize the UmbracoContext instance
-			//if (UmbracoContext.Current == null)
-			//    UmbracoContext.Current = new UmbracoContext(HttpContext.Current);
+			
+			//TODO: This still a bunch of routing stuff being handled here, this all needs to be handled in the HttpModule instead
 
 			// get the document request
 			var docreq = UmbracoContext.Current.DocumentRequest;
@@ -89,6 +86,8 @@ namespace umbraco
 				}
 				else
 				{
+					//TODO: If there is no template but it has a node we shouldn't render a 404 I don't think
+
 					// if we know we're 404, display the ugly message, else a blank page
 					if (docreq.Is404)
 						RenderNotFound();
@@ -212,10 +211,11 @@ namespace umbraco
 			writer.Write(text);
 		}
 
-		//
+		//TODO: This should be removed, we should be handling all 404 stuff in the module and executing the 
+		// DocumentNotFoundHttpHandler instead.
 		void RenderNotFound()
 		{
-			// UmbracoModule has already set Response.Status to 404
+			Context.Response.StatusCode = 404;
 
 			Response.Write("<html><body><h1>Page not found</h1>");
 			UmbracoContext.Current.HttpContext.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(UmbracoContext.Current.ClientUrl) + "'.</h3>");
