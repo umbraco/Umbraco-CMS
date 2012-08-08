@@ -234,6 +234,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 },
                 onProgress: function (data) {
                     data.context.progress(data.progress);
+                },
+                onDoneAll: function () {
+                    self._getChildNodes();
                 }
             });
 
