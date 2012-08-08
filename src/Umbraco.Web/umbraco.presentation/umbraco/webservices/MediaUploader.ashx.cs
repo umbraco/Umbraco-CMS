@@ -6,8 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Configuration;
+using System.Web.Script.Serialization;
 using System.Web.Security;
 using System.Xml;
+using System.Xml.Serialization;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.media;
@@ -25,75 +27,100 @@ namespace umbraco.presentation.umbraco.webservices
 
         public void ProcessRequest(HttpContext context)
         {
-            context.Response.Clear();
-            context.Response.ContentType = @"text\xml";
-            context.Response.Charset = "UTF-8";
-            context.Response.Cache.SetCacheability(HttpCacheability.NoCache);
-            context.Response.Cache.SetAllowResponseInBrowserHistory(true);
+            MediaResponse response = null;
 
-            var xmlTextWriter = new XmlTextWriter(context.Response.OutputStream, Encoding.UTF8);
-            xmlTextWriter.WriteStartDocument();
-            xmlTextWriter.WriteStartElement("response");
+            var action = context.Request["action"];
 
-            string action = context.Request["action"];
-
-            if (IsValidRequest(context, xmlTextWriter) && !string.IsNullOrEmpty(action))
+            if (IsValidRequest(context) && !string.IsNullOrEmpty(action))
             {
                 switch (action.ToLower())
                 {
                     case "config":
-                        ProcessConfigRequest(context, xmlTextWriter);
+                        response = ProcessConfigRequest(context);
                         break;
                     case "folderlist":
-                        ProcessFolderListRequest(context, xmlTextWriter);
+                        response = ProcessFolderListRequest(context);
                         break;
                     case "upload":
-                        ProcessUploadRequest(context, xmlTextWriter);
+                        response = ProcessUploadRequest(context);
                         break;
                 }
             }
 
-            xmlTextWriter.WriteEndElement();
-            xmlTextWriter.WriteEndDocument();
-            xmlTextWriter.Flush();
-            xmlTextWriter.Close();
+            // Set success flag
+            if (response != null)
+                response.success = true;
+            else
+                response = new MediaResponse { success = false };
+
+            context.Response.Clear();
+            context.Response.Charset = "UTF-8";
+            context.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            context.Response.Cache.SetAllowResponseInBrowserHistory(true);
+
+            var format = context.Request["format"];
+            switch (format)
+            {
+                case "json":
+                    // Format as JSON 
+                    context.Response.ContentType = @"application/json";
+
+                    context.Response.Write(new JavaScriptSerializer().Serialize(response));
+
+                    break;
+                default:
+                    // Format as XML
+                    context.Response.ContentType = @"text/xml";
+
+                    var serializer = new XmlSerializer(response.GetType());
+                    serializer.Serialize(context.Response.OutputStream, response);
+
+                    break;
+            }
+            
 
             context.Response.End();
         }
 
-        public void ProcessConfigRequest(HttpContext context, XmlTextWriter xmlTextWriter)
+        public ConfigResponse ProcessConfigRequest(HttpContext context)
         {
-            xmlTextWriter.WriteElementString("displayName", new User(context.Request["username"]).Name);
-            xmlTextWriter.WriteElementString("umbracoPath", VirtualPathUtility.ToAbsolute(GlobalSettings.Path));
-            xmlTextWriter.WriteElementString("maxRequestLength", GetMaxRequestLength().ToString());
+            return new ConfigResponse
+            {
+                displayName = new User(context.Request["username"]).Name,
+                umbracoPath = VirtualPathUtility.ToAbsolute(GlobalSettings.Path),
+                maxRequestLength = GetMaxRequestLength()
+            };
         }
 
-        public void ProcessFolderListRequest(HttpContext context, XmlTextWriter xmlTextWriter)
+        public FolderListResponse ProcessFolderListRequest(HttpContext context)
         {
-            xmlTextWriter.WriteStartElement("folder");
+            var response = new FolderListResponse
+            {
+                folder = new FolderListItem()
+            };
 
             var startMediaId = AuthenticatedUser.StartMediaId;
             if (startMediaId < 1)
             {
-                xmlTextWriter.WriteAttributeString("id", "-1");
-                xmlTextWriter.WriteAttributeString("name", "Media");
+                response.folder.id = -1;
+                response.folder.name = "Media";
 
-                CreateMediaTree(Media.GetRootMedias(), xmlTextWriter);
+                CreateMediaTree(Media.GetRootMedias(), response.folder);
             }
             else
             {
                 var root = new Media(startMediaId);
 
-                xmlTextWriter.WriteAttributeString("id", root.Id.ToString());
-                xmlTextWriter.WriteAttributeString("name", root.Text);
+                response.folder.id = root.Id;
+                response.folder.name = root.Text;
 
-                CreateMediaTree(root.Children, xmlTextWriter);
+                CreateMediaTree(root.Children, response.folder);
             }
 
-            xmlTextWriter.WriteEndElement();
+            return response;
         }
 
-        public void ProcessUploadRequest(HttpContext context, XmlTextWriter xmlTextWriter)
+        public UploadResponse ProcessUploadRequest(HttpContext context)
         {
             int parentNodeId;
             if (int.TryParse(context.Request["parentNodeId"], out parentNodeId) && context.Request.Files.Count > 0)
@@ -158,11 +185,13 @@ namespace umbraco.presentation.umbraco.webservices
                 // log error
                 Log.Add(LogTypes.Error, -1, "Parent node id is in incorrect format");
             }
+
+            return new UploadResponse();
         }
 
         #region Helper Methods
 
-        private bool IsValidRequest(HttpContext context, XmlTextWriter xmlTextWriter)
+        private bool IsValidRequest(HttpContext context)
         {
             // check for secure connection
             if (GlobalSettings.UseSSL && !context.Request.IsSecureConnection)
@@ -196,25 +225,25 @@ namespace umbraco.presentation.umbraco.webservices
                     AuthenticatedUser = user;
             }
 
-            xmlTextWriter.WriteAttributeString("success", isValid.ToString().ToLower());
-
             return isValid;
         }
 
-        private void CreateMediaTree(IEnumerable<Media> nodes, XmlWriter xmlTextWriter)
+        private void CreateMediaTree(IEnumerable<Media> nodes, FolderListItem folder)
         {
             foreach (var media in nodes.Where(media => media != null && media.ContentType != null && media.ContentType.Alias == "Folder"))
             {
-                xmlTextWriter.WriteStartElement("folder");
-                xmlTextWriter.WriteAttributeString("id", media.Id.ToString());
-                xmlTextWriter.WriteAttributeString("name", media.Text);
+                var subFolder = new FolderListItem
+                {
+                    id = media.Id,
+                    name = media.Text
+                };
 
                 if (media.HasChildren)
                 {
-                    CreateMediaTree(media.Children, xmlTextWriter);
+                    CreateMediaTree(media.Children, subFolder);
                 }
 
-                xmlTextWriter.WriteEndElement();
+                folder.folders.Add(subFolder);
             }
         }
 
@@ -266,4 +295,46 @@ namespace umbraco.presentation.umbraco.webservices
 
         #endregion
     }
+
+    public class MediaResponse
+    {
+        [XmlAttribute]
+        public bool success { get; set; }
+    }
+
+    [XmlRoot("response")]
+    public class ConfigResponse : MediaResponse
+    {
+        public string displayName { get; set; }
+        public string umbracoPath { get; set; }
+        public int maxRequestLength { get; set; }
+    }
+
+    [XmlRoot("response")]
+    public class FolderListResponse : MediaResponse
+    {
+        public FolderListItem folder { get; set; }
+    }
+
+    [XmlType("folder")]
+    public class FolderListItem
+    {
+        [XmlAttribute]
+        public int id { get; set; }
+
+        [XmlAttribute]
+        public string name { get; set; }
+
+        [XmlElement("folder")]
+        public List<FolderListItem> folders { get; set; }
+
+        public FolderListItem()
+        {
+            folders = new List<FolderListItem>();
+        }
+    }
+
+    [XmlRoot("response")]
+    public class UploadResponse : MediaResponse
+    { }
 }

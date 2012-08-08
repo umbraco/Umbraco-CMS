@@ -4,7 +4,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 (function ($, Base, window, document, undefined) {
 
     var itemMappingOptions = {
-        'create': function(o) {
+        'create': function (o) {
             var item = ko.mapping.fromJS(o.data);
             item.selected = ko.observable(false);
             item.toggleSelected = function (itm, e) {
@@ -115,6 +115,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 items: ko.observableArray([]),
                 queued: ko.observableArray([])
             });
+            
+            self._viewModel.filtered = ko.computed(function () {
+                return self._viewModel.items();
+                return ko.utils.arrayFilter(this.items(), function (item) {
+                    return item.Name().toLowerCase().indexOf(self._viewModel.filterTerm()) > -1 || 
+                        item.Tags().toLowerCase().indexOf(self._viewModel.filterTerm()) > -1;
+                });
+            }, self._viewModel);
 
             self._viewModel.selected = ko.computed(function() {
                 return ko.utils.arrayFilter(this.items(), function(item) {
@@ -301,14 +309,15 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 start: function (e, ui) {
                     // Add dragging class to container
                     $(".umbFolderBrowser .items").addClass("ui-sortable-dragging");
-
-                    $(".umbFolderBrowser .items .ui-sortable-helper span").removeAttr("data-bind").text("Moving 1 item");
                 },
-                update: function (e, ui) {
+                update: function (e, ui)
+                {
+                    // Can't sort when filtered so just return
+                    if (self._viewModel.filterTerm().length > 0)
+                        return;
+                    
                     //var oldIndex = self._viewModel.items.indexOf(self._viewModel.tempItem());
                     var newIndex = ui.item.index();
-
-                    //TODO: Don't allow sorting on a filtered view
 
                     $(".umbFolderBrowser .items .selected").sort(function (a,b) {
                         return parseInt($(a).data("order")) > parseInt($(b).data("order")) ? 1 : -1;
@@ -327,7 +336,15 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 stop: function (e, ui) {
                     // Remove dragging class from container
                     $(".umbFolderBrowser .items").removeClass("ui-sortable-dragging");
-                    //TODO: Update on server
+                    
+                    if (self._viewModel.filterTerm().length > 0) {
+                        $(this).sortable("cancel");
+                        alert("Can't sort items which have been filtered");
+                    }
+                    else
+                    {
+                        //TODO: Update on server
+                    }
                 }
             });
         },
