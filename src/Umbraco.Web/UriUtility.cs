@@ -62,9 +62,18 @@ namespace Umbraco.Web
     		return uri.Rewrite(path);
     	}
 
+		/// <summary>
+		/// Converts a Uri to a path based URI that is lower cased
+		/// </summary>
+		/// <param name="uri"></param>
+		/// <returns></returns>
     	public static Uri UriToUmbraco(Uri uri)
     	{
     		var path = uri.GetSafeAbsolutePath();
+
+			//we need to check if the path is /default.aspx because this will occur when using a 
+			//web server pre IIS 7 when requesting the root document
+			//if this is the case we need to change it to '/'
 
     		path = path.ToLower();
     		if (path != "/")

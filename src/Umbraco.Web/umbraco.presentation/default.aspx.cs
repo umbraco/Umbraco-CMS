@@ -212,7 +212,8 @@ namespace umbraco
 		}
 
 		//TODO: This should be removed, we should be handling all 404 stuff in the module and executing the 
-		// DocumentNotFoundHttpHandler instead.
+		// DocumentNotFoundHttpHandler instead but we need to fix the above routing concerns so that this all
+		// takes place in the Module.
 		void RenderNotFound()
 		{
 			Context.Response.StatusCode = 404;

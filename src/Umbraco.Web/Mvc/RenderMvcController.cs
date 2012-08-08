@@ -50,7 +50,7 @@ namespace Umbraco.Web.Mvc
 				Path.Combine(Server.MapPath(Constants.ViewLocation), template + ".cshtml")))
 			{
 				LogHelper.Warn<RenderMvcController>("No physical template file was found for template " + template);
-				return Content("No template");
+				return Content("");
 			}
 
 			return View(template, model);

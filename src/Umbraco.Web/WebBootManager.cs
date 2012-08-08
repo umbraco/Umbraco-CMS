@@ -10,7 +10,6 @@ using umbraco.businesslogic;
 
 namespace Umbraco.Web
 {
-
 	/// <summary>
 	/// A bootstrapper for the Umbraco application which initializes all objects including the Web portion of the application 
 	/// </summary>

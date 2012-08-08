@@ -1,4 +1,5 @@
 using System.Web.Mvc;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
@@ -7,25 +8,30 @@ namespace Umbraco.Web.Mvc
 	/// </summary>
 	public abstract class RenderViewPage : WebViewPage<RenderModel>
 	{
-		//protected RenderViewPage()
-		//{
+		protected RenderViewPage()
+		{
 
-		//}
+		}
 
-		//protected override void InitializePage()
-		//{
-		//    //set the model to the current node if it is not set, this is generally not the case
-		//    if (Model != null)
-		//    {
-		//        //this.ViewData.Model = Model;
-		//        var backingItem = new DynamicBackingItem(Model.CurrentNode);
-		//        var dynamicNode = new DynamicNode(backingItem);
-		//        CurrentPage = dynamicNode;
-		//    }
-		//}
+		protected override void InitializePage()
+		{
+			//set the model to the current node if it is not set, this is generally not the case
+			if (Model != null)
+			{
+				////this.ViewData.Model = Model;
+				//var backingItem = new DynamicBackingItem(Model.CurrentNode);
+				//var dynamicNode = new DynamicNode(backingItem);
+				//CurrentPage = dynamicNode;
+			}
+			DocumentRequest = (DocumentRequest)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-doc-request");
+			UmbracoContext = (UmbracoContext)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-context");
+		}
 
+		public UmbracoContext UmbracoContext { get; private set; }
 
-		//public dynamic CurrentPage { get; private set; }
+		internal DocumentRequest DocumentRequest { get; private set; }
+
+		public dynamic CurrentPage { get; private set; }
 
 		//private ICultureDictionary _cultureDictionary;
 		//public string GetDictionary(string key)
