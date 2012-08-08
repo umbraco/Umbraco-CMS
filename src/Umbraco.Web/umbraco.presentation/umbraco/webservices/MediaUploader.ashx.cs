@@ -159,16 +159,18 @@ namespace umbraco.presentation.umbraco.webservices
                             var postedMediaFile = new PostedMediaFile
                             {
                                 FileName = uploadFile.FileName,
+                                DisplayName = context.Request["name"],
                                 ContentType = uploadFile.ContentType,
                                 ContentLength = uploadFile.ContentLength,
-                                InputStream = uploadFile.InputStream
+                                InputStream = uploadFile.InputStream,
+                                ReplaceExisting = replaceExisting
                             };
 
                             // Get concrete MediaFactory
                             var factory = MediaFactory.GetMediaFactory(parentNodeId, postedMediaFile, AuthenticatedUser);
 
                             // Handle media Item
-                            var media = factory.HandleMedia(parentNodeId, postedMediaFile, AuthenticatedUser, replaceExisting);
+                            var media = factory.HandleMedia(parentNodeId, postedMediaFile, AuthenticatedUser);
                         }
                     }
 
