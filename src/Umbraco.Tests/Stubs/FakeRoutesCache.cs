@@ -5,7 +5,7 @@ namespace Umbraco.Tests.Stubs
 	/// <summary>
 	/// Used for testing, does not cache anything
 	/// </summary>
-	public class NullRoutesCache : IRoutesCache
+	public class FakeRoutesCache : IRoutesCache
 	{
 		public void Store(int nodeId, string route)
 		{

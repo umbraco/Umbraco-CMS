@@ -41,7 +41,7 @@ namespace Umbraco.Tests
 			ConfigurationManager.AppSettings.Set("umbracoReservedPaths", "~/umbraco,~/install/");
 			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd");
 			Cache.ClearAllCache();
-			InitializeDatabase();
+			TestHelper.InitializeDatabase();
 
 			//create the not found handlers config
 			using(var sw = File.CreateText(IOHelper.MapPath(SystemFiles.NotFoundhandlersConfig, false)))
@@ -67,30 +67,8 @@ namespace Umbraco.Tests
 			ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", "");
 			ConfigurationManager.AppSettings.Set("umbracoReservedPaths", "");
 			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "");
-			ClearDatabase();
+			TestHelper.ClearDatabase();
 			Cache.ClearAllCache();
-		}
-
-		private void ClearDatabase()
-		{
-			var dataHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN) as SqlCEHelper;
-			if (dataHelper == null)
-				throw new InvalidOperationException("The sql helper for unit tests must be of type SqlCEHelper, check the ensure the connection string used for this test is set to use SQLCE");
-			dataHelper.ClearDatabase();
-		}
-
-		private void InitializeDatabase()
-		{
-			ConfigurationManager.AppSettings.Set("umbracoDbDSN", @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\Umbraco.sdf");
-
-			ClearDatabase();
-
-			var dataHelper = DataLayerHelper.CreateSqlHelper(GlobalSettings.DbDSN);
-			var installer = dataHelper.Utility.CreateInstaller();
-			if (installer.CanConnect)
-			{
-				installer.Install();
-			}
 		}
 
 		/// <summary>

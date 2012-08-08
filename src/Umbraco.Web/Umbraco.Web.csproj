@@ -254,6 +254,8 @@
     <Compile Include="Mvc\RenderViewPage.cs" />
     <Compile Include="Mvc\RouteDefinition.cs" />
     <Compile Include="RouteValueDictionaryExtensions.cs" />
+    <Compile Include="Routing\DocumentLookupBase.cs" />
+    <Compile Include="Routing\DocumentSearcher.cs" />
     <Compile Include="WebBootManager.cs" />
     <Compile Include="LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />

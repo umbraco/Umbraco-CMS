@@ -21,7 +21,7 @@ namespace Umbraco.Web.Mvc
 		/// </summary>
 		protected UmbracoContext UmbracoContext
 		{
-			get { return DocumentRequest.UmbracoContext; }
+			get { return DocumentRequest.RoutingContext.UmbracoContext; }
 		}
 
 		//TODO: make this protected once we make DocumentRequest not internal after we figure out what it should actually contain

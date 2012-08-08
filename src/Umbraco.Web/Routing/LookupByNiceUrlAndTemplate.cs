@@ -19,20 +19,20 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
 		/// </summary>
-		/// <param name="docreq">The <c>DocumentRequest</c>.</param>
+		/// <param name="docRequest">The <c>DocumentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		/// <remarks>If successful, also assigns the template.</remarks>
-		public override bool TrySetDocument(DocumentRequest docreq)
+		public override bool TrySetDocument(DocumentRequest docRequest)
         {
             XmlNode node = null;
-			string path = docreq.Uri.AbsolutePath;
+			string path = docRequest.Uri.AbsolutePath;
 
-			if (docreq.HasDomain)
-				path = DomainHelper.PathRelativeToDomain(docreq.DomainUri, path);
+			if (docRequest.HasDomain)
+				path = DomainHelper.PathRelativeToDomain(docRequest.DomainUri, path);
 			if (path != "/") // no template if "/"
             {
-				var pos = docreq.Uri.AbsolutePath.LastIndexOf('/');
-				var templateAlias = docreq.Uri.AbsolutePath.Substring(pos + 1);
+				var pos = docRequest.Uri.AbsolutePath.LastIndexOf('/');
+				var templateAlias = docRequest.Uri.AbsolutePath.Substring(pos + 1);
 				path = path.Substring(0, pos);
 
                 var template = Template.GetByAlias(templateAlias);
@@ -40,11 +40,11 @@ namespace Umbraco.Web.Routing
                 {
 					LogHelper.Debug<LookupByNiceUrlAndTemplate>("Valid template: \"{0}\"", () => templateAlias);
 
-                    var route = docreq.HasDomain ? (docreq.Domain.RootNodeId.ToString() + path) : path;
-                    node = LookupDocumentNode(docreq, route);
+					var route = docRequest.HasDomain ? (docRequest.Domain.RootNodeId.ToString() + path) : path;
+					node = LookupDocumentNode(docRequest, route);
 
                     if (node != null)
-                        docreq.Template = template;
+						docRequest.Template = template;
                 }
                 else
                 {

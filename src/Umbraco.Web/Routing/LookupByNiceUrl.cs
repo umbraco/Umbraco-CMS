@@ -12,21 +12,20 @@ namespace Umbraco.Web.Routing
 	/// <para>Handles <c>/foo/bar</c> where <c>/foo/bar</c> is the nice url of a document.</para>
 	/// </remarks>
 	//[ResolutionWeight(10)]
-    internal class LookupByNiceUrl : IDocumentLookup
+	internal class LookupByNiceUrl : IDocumentLookup
     {
-		
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
 		/// </summary>
-		/// <param name="docreq">The <c>DocumentRequest</c>.</param>
+		/// <param name="docRequest">The <c>DocumentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public virtual bool TrySetDocument(DocumentRequest docreq)
+		public virtual bool TrySetDocument(DocumentRequest docRequest)
         {
 			string route;
-			if (docreq.HasDomain)
-				route = docreq.Domain.RootNodeId.ToString() + DomainHelper.PathRelativeToDomain(docreq.DomainUri, docreq.Uri.AbsolutePath);
+			if (docRequest.HasDomain)
+				route = docRequest.Domain.RootNodeId.ToString() + DomainHelper.PathRelativeToDomain(docRequest.DomainUri, docRequest.Uri.AbsolutePath);
 			else
-				route = docreq.Uri.AbsolutePath;
+				route = docRequest.Uri.AbsolutePath;
 
 			//TODO: When this is not IIS 7, this does not work for the root '/' request since it comes through as default.aspx!!
 			// this needs fixing.
@@ -34,7 +33,7 @@ namespace Umbraco.Web.Routing
 			//format the path, thsi needs fixing when pre-IIS7
 			route = route.Replace(".aspx", "");
 
-            var node = LookupDocumentNode(docreq, route);
+			var node = LookupDocumentNode(docRequest, route);
             return node != null;
         }
 
@@ -49,8 +48,8 @@ namespace Umbraco.Web.Routing
 			LogHelper.Debug<LookupByNiceUrl>("Test route \"{0}\"", () => route);
 
 			//return '0' if in preview mode!
-        	var nodeId = !docreq.UmbracoContext.InPreviewMode
-							? docreq.UmbracoContext.RoutesCache.GetNodeId(route)
+        	var nodeId = !docreq.RoutingContext.UmbracoContext.InPreviewMode
+							? docreq.RoutingContext.UmbracoContext.RoutesCache.GetNodeId(route)
         	             	: 0;
 
 
@@ -65,7 +64,7 @@ namespace Umbraco.Web.Routing
                 }
                 else
                 {
-                    docreq.UmbracoContext.RoutesCache.ClearNode(nodeId);
+                    docreq.RoutingContext.UmbracoContext.RoutesCache.ClearNode(nodeId);
                 }
             }
 
@@ -78,9 +77,9 @@ namespace Umbraco.Web.Routing
                     docreq.XmlNode = node;
 					LogHelper.Debug<LookupByNiceUrl>("Query matches, id={0}", () => docreq.NodeId);
 
-					if (!docreq.UmbracoContext.InPreviewMode)
+					if (!docreq.RoutingContext.UmbracoContext.InPreviewMode)
 					{
-						docreq.UmbracoContext.RoutesCache.Store(docreq.NodeId, route); // will not write if previewing	
+						docreq.RoutingContext.UmbracoContext.RoutesCache.Store(docreq.NodeId, route); // will not write if previewing	
 					} 
                     
                 }

@@ -64,6 +64,7 @@ namespace Umbraco.Web
 			var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
 			//create the RoutingContext
 			var routingContext = new RoutingContext(
+				umbracoContext,
 				DocumentLookupsResolver.Current.DocumentLookups,
 				LastChanceLookupResolver.Current.LastChanceLookup,
 				contentStore,
@@ -83,8 +84,8 @@ namespace Umbraco.Web
 				//Create a document request since we are rendering a document on the front-end
 
 				// create the new document request which will cleanup the uri once and for all
-				var docreq = new DocumentRequest(uri, umbracoContext);
-				//assign the routing context to the umbraco context
+				var docreq = new DocumentRequest(uri, routingContext);
+				//assign the document request to the umbraco context now that we know its a front end request
 				umbracoContext.DocumentRequest = docreq;
 
 				// note - at that point the original legacy module did something do handle IIS custom 404 errors
@@ -95,14 +96,21 @@ namespace Umbraco.Web
 				//   to trigger Umbraco's not-found, one should configure IIS and/or ASP.NET custom 404 errors
 				//   so that they point to a non-existing page eg /redirect-404.aspx
 
-				docreq.LookupDomain();
+				//create the searcher
+				var searcher = new DocumentSearcher(docreq);
+				//find domain
+				searcher.LookupDomain();
+				//redirect if it has been flagged
 				if (docreq.IsRedirect)
 					httpContext.Response.Redirect(docreq.RedirectUrl, true);
+				//set the culture on the thread
 				Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = docreq.Culture;
-				docreq.LookupDocument();
+				//find the document
+				searcher.LookupDocument();
+				//redirect if it has been flagged
 				if (docreq.IsRedirect)
 					httpContext.Response.Redirect(docreq.RedirectUrl, true);
-
+				//if no doc is found, send to our not found handler
 				if (docreq.Is404)
 				{
 					httpContext.RemapHandler(new DocumentNotFoundHttpHandler());

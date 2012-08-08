@@ -67,7 +67,8 @@
     <Compile Include="PackageActionsResolverTests.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="PluginManagerTests.cs" />
-    <Compile Include="Stubs\NullRoutesCache.cs" />
+    <Compile Include="Stubs\FakeLastChanceLookup.cs" />
+    <Compile Include="Stubs\FakeRoutesCache.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
     <Compile Include="PartialTrust\AbstractPartialTrustFixture.cs" />

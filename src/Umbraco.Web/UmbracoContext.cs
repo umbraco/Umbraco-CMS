@@ -193,20 +193,20 @@ namespace Umbraco.Web
 		/// <summary>
 		/// Boolean value indicating whether the current request is a front-end umbraco request
 		/// </summary>
-    	public bool IsFrontEndUmbracoRequest
-    	{
-    		get { return DocumentRequest != null; }
-    	}
+		public bool IsFrontEndUmbracoRequest
+		{
+			get { return DocumentRequest != null; }
+		}
 
 		/// <summary>
 		/// Gets/sets the RoutingContext object
 		/// </summary>
 		internal RoutingContext RoutingContext { get; set; }	
 
-        /// <summary>
-        /// Gets/sets the DocumentRequest object
-        /// </summary>
-        internal DocumentRequest DocumentRequest { get; set; }	
+		/// <summary>
+		/// Gets/sets the DocumentRequest object
+		/// </summary>
+		internal DocumentRequest DocumentRequest { get; set; }	
 
         /// <summary>
         /// Exposes the HttpContext for the current request
