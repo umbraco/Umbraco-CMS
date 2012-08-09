@@ -71,15 +71,19 @@ namespace Umbraco.Web
     	{
     		var path = uri.GetSafeAbsolutePath();
 
+    		path = path.ToLower();
+
 			//we need to check if the path is /default.aspx because this will occur when using a 
 			//web server pre IIS 7 when requesting the root document
 			//if this is the case we need to change it to '/'
-
-    		path = path.ToLower();
+			if (path.EndsWith("default.aspx", StringComparison.InvariantCultureIgnoreCase))
+			{
+				path = path.Substring(0, path.Length - "default.aspx".Length);
+			}
     		if (path != "/")
     			path = path.TrimEnd('/');
-    		if (path.EndsWith(".aspx"))
-    			path = path.Substring(0, path.Length - ".aspx".Length);
+			if (path.EndsWith(".aspx"))
+				path = path.Substring(0, path.Length - ".aspx".Length);
 
     		return uri.Rewrite(path);
     	}

@@ -1,4 +1,3 @@
-using System;
 using System.Configuration;
 using System.Linq;
 using System.Web;
@@ -16,7 +15,6 @@ using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Tests.DocumentLookups
 {
-
 	[TestFixture, RequiresSTA]
 	public abstract class BaseTest
 	{
@@ -114,26 +112,11 @@ namespace Umbraco.Tests.DocumentLookups
 	public class LookupByNiceUrlTests : BaseTest
 	{
 
-		//[TestCase("/default.aspx")]
-		//public void Match_Document_By_Non_Directory_Url(string urlAsString)
-		//{
-		//    var template = Template.MakeNew("test", new User(0));
-		//    var routingContext = GetRoutingContext(urlAsString, template);
-		//    var cleanUrl = routingContext.UmbracoContext.HttpContext.Request.Url;
-		//    var path = routingContext.UmbracoContext.RequestUrl.AbsolutePath.ToLower();
-		//    UmbracoModule.LegacyCleanUmbPageFromQueryString(ref cleanUrl, ref path);
-
-		//    var docRequest = new DocumentRequest(cleanUrl, routingContext);
-
-		//    var lookup = new LookupByNiceUrl();
-		//    var result = lookup.TrySetDocument(docRequest);
-
-		//    Assert.IsTrue(result);
-		//}
-
 		[TestCase("/")]
+		[TestCase("/default.aspx")] //this one is actually rather important since this is the path that comes through when we are running in pre-IIS 7 for the root document '/' !
 		[TestCase("/Sub1")]
 		[TestCase("/sub1")]
+		[TestCase("/sub1.aspx")]
 		public void Match_Document_By_Directory_Url_Hide_Top_Level(string urlAsString)
 		{
 			var template = Template.MakeNew("test", new User(0));
@@ -150,13 +133,15 @@ namespace Umbraco.Tests.DocumentLookups
 		}
 
 		[TestCase("/")]
+		[TestCase("/default.aspx")] //this one is actually rather important since this is the path that comes through when we are running in pre-IIS 7 for the root document '/' !
 		[TestCase("/home/Sub1")]
 		[TestCase("/Home/Sub1")] //different cases
+		[TestCase("/home/Sub1.aspx")]
 		public void Match_Document_By_Directory_Url(string urlAsString)
 		{
 			var template = Template.MakeNew("test", new User(0));
 			var routingContext = GetRoutingContext(urlAsString, template);
-			var url = routingContext.UmbracoContext.HttpContext.Request.Url;			
+			var url = routingContext.UmbracoContext.UmbracoUrl;			
 			var docRequest = new DocumentRequest(url, routingContext);			
 			var lookup = new LookupByNiceUrl();
 

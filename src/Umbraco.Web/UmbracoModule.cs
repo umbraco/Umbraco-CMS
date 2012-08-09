@@ -72,8 +72,8 @@ namespace Umbraco.Web
 			//assign the routing context back to the umbraco context
 			umbracoContext.RoutingContext = routingContext;
 
-			var uri = httpContext.Request.Url;
-			var lpath = uri.AbsolutePath.ToLower();
+			var uri = umbracoContext.UmbracoUrl;
+			var lpath = umbracoContext.UmbracoUrl.AbsolutePath.ToLowerInvariant();
 
 			// legacy - no idea what this is
 			LegacyCleanUmbPageFromQueryString(ref uri, ref lpath);
@@ -348,6 +348,7 @@ namespace Umbraco.Web
 
 		// "Clean umbPage from querystring, caused by .NET 2.0 default Auth Controls"
 		// but really, at the moment I have no idea what this does, and why...
+		// SD: I also have no idea what this does, I've googled umbPage and really nothing shows up
 		internal static void LegacyCleanUmbPageFromQueryString(ref Uri uri, ref string lpath)
 		{
 			string receivedQuery = uri.Query;
