@@ -16,6 +16,9 @@ namespace Umbraco.Core.Configuration
 
 	//TODO: Re-enable Logging!!!!
 
+	//TODO: Remove checks for if HttpContext is null, why are we doing this? we should be checking if the config setting
+	// can be read and if not then return the default.
+
     /// <summary>
     /// The GlobalSettings Class contains general settings information for the entire Umbraco instance based on information from  web.config appsettings 
     /// </summary>

@@ -63,6 +63,7 @@
     <Compile Include="DocumentLookups\LookupByNiceUrlTests.cs" />
     <Compile Include="MacroFieldEditorsResolverTests.cs" />
     <Compile Include="MacroEngineFactoryTests.cs" />
+    <Compile Include="ManyObjectResolverTests.cs" />
     <Compile Include="MediaFactoryTests.cs" />
     <Compile Include="PackageActionsResolverTests.cs" />
     <Compile Include="PluginManagerExtensions.cs" />

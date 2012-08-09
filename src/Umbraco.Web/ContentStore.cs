@@ -31,8 +31,17 @@ namespace Umbraco.Web
             return GetXml().GetElementById(nodeId.ToString());
         }
 
-        public XmlNode GetNodeByRoute(string route)
+        public XmlNode GetNodeByRoute(string route, bool? hideTopLevelNode = null)
         {
+			//set the default to be what is in the settings
+			if (hideTopLevelNode == null)
+			{
+				hideTopLevelNode = GlobalSettings.HideTopLevelNodeFromPath;
+			}
+
+			//the route always needs to be lower case because we only store the urlName attribute in lower case
+        	route = route.ToLowerInvariant();
+
             string startNodeIdString = "0";
             string path = route;
             if (!route.StartsWith("/"))
@@ -43,8 +52,8 @@ namespace Umbraco.Web
             }
             int startNodeId = int.Parse(startNodeIdString);
 
-            var xpath = CreateXpathQuery(startNodeId, path);
-            //RequestContext.Current.Trace.Write(TraceCategory, "xpath='" + xpath + "'.");
+            var xpath = CreateXpathQuery(startNodeId, path, hideTopLevelNode.Value);
+            
             return GetXml().SelectSingleNode(xpath);
         }
 
@@ -97,14 +106,6 @@ namespace Umbraco.Web
         }
 
         static readonly char[] SlashChar = new char[] { '/' };
-
-        // allow hideTopLevelNodeFromPath overriding at runtime
-        protected virtual string CreateXpathQuery(int startNodeId, string path)
-        {
-            return CreateXpathQuery(startNodeId, path, GlobalSettings.HideTopLevelNodeFromPath);
-        }
-
-		
 
         protected string CreateXpathQuery(int startNodeId, string path, bool hideTopLevelNodeFromPath)
         {

@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Xml;
@@ -32,6 +33,7 @@ namespace Umbraco.Tests.DocumentLookups
 		{
 			//reset the context on global settings
 			Umbraco.Core.Configuration.GlobalSettings.HttpContext = null;
+			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "");
 			Resolution.IsFrozen = false;
 			TestHelper.ClearDatabase();
 			Cache.ClearAllCache();
@@ -111,22 +113,56 @@ namespace Umbraco.Tests.DocumentLookups
 	[TestFixture]
 	public class LookupByNiceUrlTests : BaseTest
 	{
-		
-		
-		[Test]
-		public void Test_Default_ASPX()
+
+		//[TestCase("/default.aspx")]
+		//public void Match_Document_By_Non_Directory_Url(string urlAsString)
+		//{
+		//    var template = Template.MakeNew("test", new User(0));
+		//    var routingContext = GetRoutingContext(urlAsString, template);
+		//    var cleanUrl = routingContext.UmbracoContext.HttpContext.Request.Url;
+		//    var path = routingContext.UmbracoContext.RequestUrl.AbsolutePath.ToLower();
+		//    UmbracoModule.LegacyCleanUmbPageFromQueryString(ref cleanUrl, ref path);
+
+		//    var docRequest = new DocumentRequest(cleanUrl, routingContext);
+
+		//    var lookup = new LookupByNiceUrl();
+		//    var result = lookup.TrySetDocument(docRequest);
+
+		//    Assert.IsTrue(result);
+		//}
+
+		[TestCase("/")]
+		[TestCase("/Sub1")]
+		[TestCase("/sub1")]
+		public void Match_Document_By_Directory_Url_Hide_Top_Level(string urlAsString)
 		{
-			var urlAsString = "/default.aspx";
 			var template = Template.MakeNew("test", new User(0));
 			var routingContext = GetRoutingContext(urlAsString, template);
-			var cleanUrl = routingContext.UmbracoContext.HttpContext.Request.Url;
-			var path = routingContext.UmbracoContext.RequestUrl.AbsolutePath.ToLower();
-			UmbracoModule.LegacyCleanUmbPageFromQueryString(ref cleanUrl, ref path);
-
-			var docRequest = new DocumentRequest(cleanUrl, routingContext);
-			
+			var url = routingContext.UmbracoContext.HttpContext.Request.Url;
+			var docRequest = new DocumentRequest(url, routingContext);
 			var lookup = new LookupByNiceUrl();
+			Umbraco.Core.Configuration.GlobalSettings.HttpContext = routingContext.UmbracoContext.HttpContext;
+			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
+
 			var result = lookup.TrySetDocument(docRequest);
+
+			Assert.IsTrue(result);
+		}
+
+		[TestCase("/")]
+		[TestCase("/home/Sub1")]
+		[TestCase("/Home/Sub1")] //different cases
+		public void Match_Document_By_Directory_Url(string urlAsString)
+		{
+			var template = Template.MakeNew("test", new User(0));
+			var routingContext = GetRoutingContext(urlAsString, template);
+			var url = routingContext.UmbracoContext.HttpContext.Request.Url;			
+			var docRequest = new DocumentRequest(url, routingContext);			
+			var lookup = new LookupByNiceUrl();
+
+			var result = lookup.TrySetDocument(docRequest);
+
+			Assert.IsTrue(result);
 		}
 
 	}
