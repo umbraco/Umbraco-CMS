@@ -234,6 +234,12 @@ namespace umbraco.BasePages
                     {
                         // we swallow this type of exception as it happens if a legacy (pre 4.8.1) cookie is set
                     }
+                    catch (ArgumentException ex)
+                    {
+                        // we swallow this one because it's 99.99% certaincy is legacy based. We'll still log it, though
+                        Log.Instance.AddException(ex);
+
+                    }
                 }
 
                 return "";

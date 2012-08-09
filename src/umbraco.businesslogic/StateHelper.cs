@@ -354,6 +354,8 @@ namespace umbraco.BusinessLogic
 				public void SetValue(string value)
 				{
 					HttpCookie cookie = new HttpCookie(_key, value);
+                    if (GlobalSettings.UseSSL)
+                        cookie.Secure = true;
 					if (!TimeSpan.Zero.Equals(_expires))
 						cookie.Expires = DateTime.Now + _expires;
 					ResponseCookie = cookie;
@@ -378,7 +380,9 @@ namespace umbraco.BusinessLogic
 				public void SetValue(string value, DateTime expires)
 				{
 					HttpCookie cookie = new HttpCookie(_key, value);
-					cookie.Expires = expires;
+                    if (GlobalSettings.UseSSL)
+                        cookie.Secure = true;
+                    cookie.Expires = expires;
 					ResponseCookie = cookie;
 
 					// original Umbraco code also does this
