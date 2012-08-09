@@ -26,13 +26,7 @@ namespace Umbraco.Web.Routing
 				route = docRequest.Domain.RootNodeId.ToString() + DomainHelper.PathRelativeToDomain(docRequest.DomainUri, docRequest.Uri.AbsolutePath);
 			else
 				route = docRequest.Uri.AbsolutePath;
-
-			//TODO: When this is not IIS 7, this does not work for the root '/' request since it comes through as default.aspx!!
-			// this needs fixing.
-
-			//format the path, thsi needs fixing when pre-IIS7
-			route = route.Replace(".aspx", "");
-
+			
 			var node = LookupDocumentNode(docRequest, route);
             return node != null;
         }

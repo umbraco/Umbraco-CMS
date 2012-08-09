@@ -83,7 +83,7 @@ namespace Umbraco.Web
 			{
 				//Create a document request since we are rendering a document on the front-end
 
-				// create the new document request which will cleanup the uri once and for all
+				// create the new document request 
 				var docreq = new DocumentRequest(uri, routingContext);
 				//assign the document request to the umbraco context now that we know its a front end request
 				umbracoContext.DocumentRequest = docreq;
@@ -95,6 +95,7 @@ namespace Umbraco.Web
 				//
 				//   to trigger Umbraco's not-found, one should configure IIS and/or ASP.NET custom 404 errors
 				//   so that they point to a non-existing page eg /redirect-404.aspx
+				//   TODO: SD: We need more information on this for when we release 4.10.0 as I'm not sure what this means.
 
 				//create the searcher
 				var searcher = new DocumentSearcher(docreq);

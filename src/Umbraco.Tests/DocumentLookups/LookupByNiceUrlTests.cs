@@ -121,7 +121,7 @@ namespace Umbraco.Tests.DocumentLookups
 		{
 			var template = Template.MakeNew("test", new User(0));
 			var routingContext = GetRoutingContext(urlAsString, template);
-			var url = routingContext.UmbracoContext.HttpContext.Request.Url;
+			var url = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
 			var docRequest = new DocumentRequest(url, routingContext);
 			var lookup = new LookupByNiceUrl();
 			Umbraco.Core.Configuration.GlobalSettings.HttpContext = routingContext.UmbracoContext.HttpContext;
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.DocumentLookups
 		{
 			var template = Template.MakeNew("test", new User(0));
 			var routingContext = GetRoutingContext(urlAsString, template);
-			var url = routingContext.UmbracoContext.UmbracoUrl;			
+			var url = routingContext.UmbracoContext.UmbracoUrl;	//very important to use the cleaned up umbraco url		
 			var docRequest = new DocumentRequest(url, routingContext);			
 			var lookup = new LookupByNiceUrl();
 
