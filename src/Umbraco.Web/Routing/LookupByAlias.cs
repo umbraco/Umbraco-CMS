@@ -34,9 +34,9 @@ namespace Umbraco.Web.Routing
 					docRequest.Uri.AbsolutePath);
 
 				if (node != null)
-				{
-					LogHelper.Debug<LookupByAlias>("Path \"{0}\" is an alias for id={1}", () => docRequest.Uri.AbsolutePath, () => docRequest.NodeId);
+				{					
 					docRequest.Node = node;
+					LogHelper.Debug<LookupByAlias>("Path \"{0}\" is an alias for id={1}", () => docRequest.Uri.AbsolutePath, () => docRequest.NodeId);
 				}
 			}
 

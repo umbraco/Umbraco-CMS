@@ -8,12 +8,6 @@ using umbraco.cms.businesslogic.template;
 namespace Umbraco.Tests.DocumentLookups
 {
 	[TestFixture]
-	public class LookupByAliasTests : BaseTest
-	{
-
-	}
-
-	[TestFixture]
 	public class LookupByNiceUrlTests : BaseTest
 	{
 

@@ -61,6 +61,7 @@
     <Compile Include="ContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
     <Compile Include="DocumentLookups\BaseTest.cs" />
+    <Compile Include="DocumentLookups\LookupByAliasTests.cs" />
     <Compile Include="DocumentLookups\LookupByNiceUrlTests.cs" />
     <Compile Include="UriUtilityTests.cs" />
     <Compile Include="MacroFieldEditorsResolverTests.cs" />
