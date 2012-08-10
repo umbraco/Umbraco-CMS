@@ -295,7 +295,7 @@ namespace Umbraco.Web.Routing
 			{
 				if (string.IsNullOrWhiteSpace(templateAlias))
 				{
-					templateAlias = _routingContext.ContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Node, "@template");
+					templateAlias = _routingContext.ContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Node, "@TemplateId");
 					LogHelper.Debug<DocumentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateAlias);
 					int templateId;
 					if (!int.TryParse(templateAlias, out templateId))

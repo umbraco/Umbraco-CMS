@@ -88,13 +88,12 @@ namespace Umbraco.Web
             {
 				//if it starts with an @ then its a property of the object, not a user defined property
             	var propName = propertyAlias.TrimStart('@');
-				var prop = TypeHelper.GetProperty(typeof(IDocument), propName);
+				var prop = TypeHelper.GetProperty(typeof(IDocument), propName, true, false, false, false);
 				if (prop == null)
 					throw new ArgumentException("The property name " + propertyAlias + " was not found on type " + typeof(IDocument));
-            	var val = prop.GetValue(node, null) as string;
-				//var attribute = node.Attributes.GetNamedItem(propertyAlias.Substring(1));
-                //return attribute == null ? null : attribute.Value;
-            	return val;
+            	var val = prop.GetValue(node, null);
+            	var valAsString = val == null ? "" : val.ToString();				
+				return valAsString;
             }
             else
             {

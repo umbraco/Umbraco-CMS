@@ -75,11 +75,21 @@ namespace Umbraco.Core
 		/// <param name="mustRead"></param>
 		/// <param name="mustWrite"></param>
 		/// <param name="includeIndexed"></param>
+		/// <param name="caseSensitive"> </param>
 		/// <returns></returns>
-		public static PropertyInfo GetProperty(Type type, string name, bool mustRead = true, bool mustWrite = true, bool includeIndexed = false)
+		public static PropertyInfo GetProperty(Type type, string name, 
+			bool mustRead = true, 
+			bool mustWrite = true, 
+			bool includeIndexed = false,
+			bool caseSensitive = true)
 		{
 			return CachedDiscoverableProperties(type, mustRead, mustWrite, includeIndexed)
-				.FirstOrDefault(x => x.Name == name);
+				.FirstOrDefault(x =>
+					{
+						if (caseSensitive)
+							return x.Name == name;
+						return x.Name.InvariantEquals(name);
+					});
 		}
 
 		/// <summary>
