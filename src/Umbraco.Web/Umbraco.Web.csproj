@@ -259,6 +259,9 @@
     <Compile Include="RouteValueDictionaryExtensions.cs" />
     <Compile Include="Routing\DocumentLookupBase.cs" />
     <Compile Include="Routing\DocumentSearcher.cs" />
+    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Node.cs" />
+    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Nodes.cs" />
+    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Property.cs" />
     <Compile Include="WebBootManager.cs" />
     <Compile Include="LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
@@ -1361,7 +1364,7 @@
     <Compile Include="umbraco.presentation\umbraco\members\ViewMembers.aspx.designer.cs">
       <DependentUpon>ViewMembers.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Page.cs">
+    <Compile Include="umbraco.presentation\umbraco\nodeFactory\Properties.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProvider.cs" />

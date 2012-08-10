@@ -123,6 +123,9 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="IApplicationStartupHandler.cs" />
+    <Compile Include="IProperty.cs" />
+    <Compile Include="ITag.cs" />
+    <Compile Include="ITaskReturnUrl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -169,6 +172,8 @@
     <Compile Include="IUseTags.cs" />
     <Compile Include="skinning\IDependencyType.cs" />
     <Compile Include="skinning\ITaskType.cs" />
+    <Compile Include="skinning\TaskExecutionDetails.cs" />
+    <Compile Include="skinning\TaskExecutionStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

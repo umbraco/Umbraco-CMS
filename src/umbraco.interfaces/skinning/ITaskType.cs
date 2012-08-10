@@ -19,18 +19,4 @@ namespace umbraco.interfaces.skinning
 
         XmlNode ToXml(string OriginalValue, string NewValue);
     }
-
-    public struct TaskExecutionDetails
-    {
-        public TaskExecutionStatus TaskExecutionStatus;
-        public string OriginalValue;
-        public string NewValue;
-    }
-
-    public enum TaskExecutionStatus
-    {
-        Failed,
-        Cancelled,
-        Completed
-    }
 }

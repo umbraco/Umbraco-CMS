@@ -33,12 +33,4 @@ namespace umbraco.interfaces
         DataTable ChildrenAsTable();
         DataTable ChildrenAsTable(string nodeTypeAliasFilter);
     }
-
-    public interface IProperty
-    {
-        string Alias { get; }
-        string Value { get; }
-        Guid Version { get; }
-        string ToString();
-    }
 }
