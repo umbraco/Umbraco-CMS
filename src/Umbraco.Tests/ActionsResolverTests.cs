@@ -1,7 +1,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Resolving;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
 using umbraco.BasePages;
 using umbraco.interfaces;

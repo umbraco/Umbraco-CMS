@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Umbraco.Core.Resolving
+namespace Umbraco.Core.ObjectResolution
 {
 	/// <summary>
 	/// A base resolver used for old legacy factories such as the DataTypeFactory or CacheResolverFactory.

@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Resolving
+namespace Umbraco.Core.ObjectResolution
 {
 	internal enum ObjectLifetimeScope
 	{

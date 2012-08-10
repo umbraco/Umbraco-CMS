@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Resolving;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core
 {

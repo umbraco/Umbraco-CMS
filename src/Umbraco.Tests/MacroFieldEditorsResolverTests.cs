@@ -3,7 +3,7 @@ using System.Linq;
 using System.Web.UI;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Resolving;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
 using umbraco.editorControls.macrocontainer;
 using umbraco.interfaces;

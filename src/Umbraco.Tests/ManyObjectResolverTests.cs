@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using NUnit.Framework;
-using Umbraco.Core.Resolving;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests

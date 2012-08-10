@@ -1,7 +1,7 @@
 using System;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Resolving;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.interfaces;

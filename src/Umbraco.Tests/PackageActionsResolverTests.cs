@@ -3,7 +3,7 @@ using System.Linq;
 using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Resolving;
+using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
 using umbraco.cms.businesslogic.packager;
 using umbraco.interfaces;

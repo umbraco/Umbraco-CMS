@@ -4,7 +4,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Tests;
 using umbraco.BusinessLogic;
-using Umbraco.Core.Resolving;
 
 namespace Umbraco.Tests
 {

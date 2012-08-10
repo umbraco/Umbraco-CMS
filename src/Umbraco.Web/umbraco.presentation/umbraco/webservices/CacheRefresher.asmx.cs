@@ -7,7 +7,6 @@ using System.Web;
 using System.Web.Services;
 using System.Xml;
 using Umbraco.Core;
-using Umbraco.Core.Resolving;
 
 namespace umbraco.presentation.webservices
 {

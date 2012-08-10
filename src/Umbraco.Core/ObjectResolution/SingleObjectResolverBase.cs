@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Resolving
+namespace Umbraco.Core.ObjectResolution
 {
 	/// <summary>
 	/// A Resolver to return and set a Single registered object.

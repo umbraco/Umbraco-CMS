@@ -6,7 +6,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Macros;
-using Umbraco.Core.Resolving;
+using Umbraco.Core.ObjectResolution;
 using umbraco.cms.businesslogic.macro;
 using System.Collections;
 using umbraco.presentation;

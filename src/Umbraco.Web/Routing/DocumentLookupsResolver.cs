@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 
 using Umbraco.Core;
-using Umbraco.Core.Resolving;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Routing
 {

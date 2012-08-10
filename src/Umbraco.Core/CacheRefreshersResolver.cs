@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.ObjectResolution;
 using umbraco.interfaces;
 
-namespace Umbraco.Core.Resolving
+namespace Umbraco.Core
 {
 	/// <summary>
 	/// A resolver to return all ICacheRefresher objects

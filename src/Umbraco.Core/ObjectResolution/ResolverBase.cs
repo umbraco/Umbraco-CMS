@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Umbraco.Core.Resolving
+namespace Umbraco.Core.ObjectResolution
 {
 	/// <summary>
 	/// base class for resolvers which declare a singleton accessor

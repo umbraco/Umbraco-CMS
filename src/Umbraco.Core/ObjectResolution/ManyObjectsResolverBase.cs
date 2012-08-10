@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Web;
 
-namespace Umbraco.Core.Resolving
+namespace Umbraco.Core.ObjectResolution
 {
 	internal abstract class ManyObjectsResolverBase<TResolver, TResolved> : ResolverBase<TResolver>
 		where TResolved : class 

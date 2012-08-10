@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using Umbraco.Core;
-
-using Umbraco.Core.Resolving;
+using Umbraco.Core.ObjectResolution;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Utils;
 

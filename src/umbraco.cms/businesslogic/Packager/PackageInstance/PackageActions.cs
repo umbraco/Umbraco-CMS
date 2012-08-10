@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Web;
 using System.Xml;
 using Umbraco.Core;
-using Umbraco.Core.Resolving;
 using umbraco.BasePages;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic.web;

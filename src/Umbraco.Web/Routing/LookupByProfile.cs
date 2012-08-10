@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Resolving;
 using umbraco;
 
 namespace Umbraco.Web.Routing

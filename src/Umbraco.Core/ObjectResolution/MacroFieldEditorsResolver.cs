@@ -4,7 +4,7 @@ using System.Web.UI;
 using Umbraco.Core.Macros;
 using umbraco.interfaces;
 
-namespace Umbraco.Core.Resolving
+namespace Umbraco.Core.ObjectResolution
 {
 	/// <summary>
 	/// A resolver to return all IMacroGuiRendering objects
