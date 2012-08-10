@@ -58,16 +58,14 @@ namespace Umbraco.Web
 				RoutesCacheResolver.Current.RoutesCache);
 			UmbracoContext.Current = umbracoContext;
 
-			//create a content store
-			var contentStore = new ContentStore(umbracoContext);
 			//create the nice urls
-			var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
+			var niceUrls = new NiceUrlProvider(ContentStoreResolver.Current.ContentStore, umbracoContext);
 			//create the RoutingContext
 			var routingContext = new RoutingContext(
 				umbracoContext,
 				DocumentLookupsResolver.Current.DocumentLookups,
 				LastChanceLookupResolver.Current.LastChanceLookup,
-				contentStore,
+				ContentStoreResolver.Current.ContentStore,
 				niceUrls);
 			//assign the routing context back to the umbraco context
 			umbracoContext.RoutingContext = routingContext;

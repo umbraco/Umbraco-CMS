@@ -12,6 +12,7 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RoutingContext"/> class.
 		/// </summary>
+		/// <param name="umbracoContext"> </param>
 		/// <param name="documentLookups">The document lookups resolver.</param>
 		/// <param name="documentLastChanceLookup"> </param>
 		/// <param name="contentStore">The content store.</param>
@@ -20,7 +21,7 @@ namespace Umbraco.Web.Routing
 			UmbracoContext umbracoContext,
 			IEnumerable<IDocumentLookup> documentLookups,
 			IDocumentLastChanceLookup documentLastChanceLookup,
-            ContentStore contentStore,
+            IContentStore contentStore,
 			NiceUrlProvider niceUrlResolver)
         {
 			this.UmbracoContext = umbracoContext;
@@ -48,7 +49,7 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Gets the content store.
 		/// </summary>
-		internal ContentStore ContentStore { get; private set; }
+		internal IContentStore ContentStore { get; private set; }
 
 		/// <summary>
 		/// Gets the nice urls provider.

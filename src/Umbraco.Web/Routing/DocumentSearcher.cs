@@ -183,7 +183,7 @@ namespace Umbraco.Web.Routing
 				throw new InvalidOperationException("There is no node.");
 
 			bool redirect = false;
-			string internalRedirect = _routingContext.ContentStore.GetDocumentProperty(_documentRequest.Node, "umbracoInternalRedirectId");
+			string internalRedirect = _routingContext.ContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Node, "umbracoInternalRedirectId");
 
 			if (!string.IsNullOrWhiteSpace(internalRedirect))
 			{
@@ -207,7 +207,10 @@ namespace Umbraco.Web.Routing
 				else
 				{
 					// redirect to another page
-					var node = _routingContext.ContentStore.GetDocumentById(internalRedirectId);
+					var node = _routingContext.ContentStore.GetDocumentById(
+						_umbracoContext,
+						internalRedirectId);
+					
 					_documentRequest.Node = node;
 					if (node != null)
 					{
@@ -235,7 +238,7 @@ namespace Umbraco.Web.Routing
 			if (_documentRequest.Node == null)
 				throw new InvalidOperationException("There is no node.");
 
-			var path = _routingContext.ContentStore.GetDocumentProperty(_documentRequest.Node, "@path");
+			var path = _routingContext.ContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Node, "@path");
 
 			if (Access.IsProtected(_documentRequest.NodeId, path))
 			{
@@ -248,14 +251,18 @@ namespace Umbraco.Web.Routing
 					LogHelper.Debug<DocumentRequest>("{0}Not logged in, redirect to login page", () => tracePrefix);
 					var loginPageId = Access.GetLoginPage(path);
 					if (loginPageId != _documentRequest.NodeId)
-						_documentRequest.Node = _routingContext.ContentStore.GetDocumentById(loginPageId);
+						_documentRequest.Node = _routingContext.ContentStore.GetDocumentById(
+							_umbracoContext,
+							loginPageId);
 				}
 				else if (!Access.HasAccces(_documentRequest.NodeId, user.ProviderUserKey))
 				{
 					LogHelper.Debug<DocumentRequest>("{0}Current member has not access, redirect to error page", () => tracePrefix);
 					var errorPageId = Access.GetErrorPage(path);
 					if (errorPageId != _documentRequest.NodeId)
-						_documentRequest.Node = _routingContext.ContentStore.GetDocumentById(errorPageId);
+						_documentRequest.Node = _routingContext.ContentStore.GetDocumentById(
+							_umbracoContext,
+							errorPageId);
 				}
 				else
 				{
@@ -288,7 +295,7 @@ namespace Umbraco.Web.Routing
 			{
 				if (string.IsNullOrWhiteSpace(templateAlias))
 				{
-					templateAlias = _routingContext.ContentStore.GetDocumentProperty(_documentRequest.Node, "@template");
+					templateAlias = _routingContext.ContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Node, "@template");
 					LogHelper.Debug<DocumentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateAlias);
 					int templateId;
 					if (!int.TryParse(templateAlias, out templateId))
@@ -330,7 +337,7 @@ namespace Umbraco.Web.Routing
 			if (_documentRequest.HasNode)
 			{
 				int redirectId;
-				if (!int.TryParse(_routingContext.ContentStore.GetDocumentProperty(_documentRequest.Node, "umbracoRedirect"), out redirectId))
+				if (!int.TryParse(_routingContext.ContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Node, "umbracoRedirect"), out redirectId))
 					redirectId = -1;
 				string redirectUrl = "#";
 				if (redirectId > 0)

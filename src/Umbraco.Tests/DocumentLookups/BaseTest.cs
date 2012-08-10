@@ -59,7 +59,7 @@ namespace Umbraco.Tests.DocumentLookups
 		protected RoutingContext GetRoutingContext(string url, Template template)
 		{
 			var umbracoContext = GetUmbracoContext(url, template);
-			var contentStore = new ContentStore(umbracoContext);
+			var contentStore = new XmlContentStore();
 			var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
 			var routingRequest = new RoutingContext(
 				umbracoContext,

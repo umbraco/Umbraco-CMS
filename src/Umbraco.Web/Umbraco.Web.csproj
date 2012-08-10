@@ -238,7 +238,8 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="ContentStore.cs" />
+    <Compile Include="XmlContentStore.cs" />
+    <Compile Include="ContentStoreResolver.cs" />
     <Compile Include="DocumentNotFoundHttpHandler.cs" />
     <Compile Include="IContentStore.cs" />
     <Compile Include="Models\XmlDocument.cs" />

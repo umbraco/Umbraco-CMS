@@ -63,6 +63,8 @@ namespace Umbraco.Web
 		{
 			base.InitializeResolvers();
 
+			ContentStoreResolver.Current = new ContentStoreResolver(new XmlContentStore());
+
 			FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
 				//add all known factories, devs can then modify this list on application startup either by binding to events
 				//or in their own global.asax

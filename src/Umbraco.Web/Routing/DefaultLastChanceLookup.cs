@@ -44,7 +44,9 @@ namespace Umbraco.Web.Routing
 				if (handler.Execute(docRequest.Uri.AbsolutePath) && handler.redirectID > 0)
                 {
                     //currentPage = umbracoContent.GetElementById(handler.redirectID.ToString());
-					currentPage = docRequest.RoutingContext.ContentStore.GetDocumentById(handler.redirectID);
+					currentPage = docRequest.RoutingContext.ContentStore.GetDocumentById(
+						docRequest.RoutingContext.UmbracoContext,
+						handler.redirectID);
 
                     // FIXME - could it be null?
 

@@ -51,7 +51,10 @@ namespace Umbraco.Web.Routing
             IDocument node = null;
             if (nodeId > 0)
             {
-				node = docreq.RoutingContext.ContentStore.GetDocumentById(nodeId);
+				node = docreq.RoutingContext.ContentStore.GetDocumentById(
+					docreq.RoutingContext.UmbracoContext,
+					nodeId);
+
                 if (node != null)
                 {
                     docreq.Node = node;
@@ -66,7 +69,10 @@ namespace Umbraco.Web.Routing
             if (node == null)
             {
 				LogHelper.Debug<LookupByNiceUrl>("Cache miss, query");
-				node = docreq.RoutingContext.ContentStore.GetDocumentByRoute(route);
+				node = docreq.RoutingContext.ContentStore.GetDocumentByRoute(
+					docreq.RoutingContext.UmbracoContext,
+					route);
+
                 if (node != null)
                 {
                     docreq.Node = node;

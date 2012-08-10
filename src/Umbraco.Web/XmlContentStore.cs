@@ -10,16 +10,11 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web
 {
-
-    /// <summary>
-    /// Used for the new routing system
+	/// <summary>
+    /// An IContentStore which uses the Xml cache system to return data
     /// </summary>
-    internal class ContentStore : IContentStore
+    internal class XmlContentStore : IContentStore
     {
-		/// <summary>
-		/// Delegate to return the current UmbracoContext
-		/// </summary>
-		private readonly UmbracoContext _umbracoContext;
 
     	private IDocument ConvertToDocument(XmlNode xmlNode)
 		{
@@ -28,23 +23,13 @@ namespace Umbraco.Web
 
 			return new Models.XmlDocument(xmlNode);
 		}
-
-    	/// <summary>
-    	/// Constructor accepting a delegate to resolve the UmbracoContext
-    	/// </summary>
-    	/// <param name="umbracoContext"></param>
-    	public ContentStore(UmbracoContext umbracoContext)
-		{
-			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-    		_umbracoContext = umbracoContext;
-		}
-
-    	public IDocument GetDocumentById(int nodeId)
+		
+    	public IDocument GetDocumentById(UmbracoContext umbracoContext, int nodeId)
         {
-        	return ConvertToDocument(GetXml().GetElementById(nodeId.ToString()));
+			return ConvertToDocument(GetXml(umbracoContext).GetElementById(nodeId.ToString()));
         }
 
-		public IDocument GetDocumentByRoute(string route, bool? hideTopLevelNode = null)
+		public IDocument GetDocumentByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null)
         {
 			//set the default to be what is in the settings
 			if (hideTopLevelNode == null)
@@ -67,10 +52,10 @@ namespace Umbraco.Web
 
             var xpath = CreateXpathQuery(startNodeId, path, hideTopLevelNode.Value);
 
-        	return ConvertToDocument(GetXml().SelectSingleNode(xpath));
+        	return ConvertToDocument(GetXml(umbracoContext).SelectSingleNode(xpath));
         }
 
-		public IDocument GetDocumentByUrlAlias(int rootNodeId, string alias)
+		public IDocument GetDocumentByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias)
         {
 
             // the alias may be "foo/bar" or "/foo/bar"
@@ -89,7 +74,7 @@ namespace Umbraco.Web
 
             var xpath = xpathBuilder.ToString();
 
-        	return ConvertToDocument(GetXml().SelectSingleNode(xpath));
+			return ConvertToDocument(GetXml(umbracoContext).SelectSingleNode(xpath));
         }
 
 		//public IDocument GetNodeParent(IDocument node)
@@ -97,7 +82,7 @@ namespace Umbraco.Web
 		//    return node.Parent;
 		//}
 
-		public string GetDocumentProperty(IDocument node, string propertyAlias)
+		public string GetDocumentProperty(UmbracoContext umbracoContext, IDocument node, string propertyAlias)
         {
             if (propertyAlias.StartsWith("@"))
             {
@@ -120,9 +105,9 @@ namespace Umbraco.Web
             }
         }
 
-        XmlDocument GetXml()
+        XmlDocument GetXml(UmbracoContext umbracoContext)
         {
-            return _umbracoContext.GetXml();
+			return umbracoContext.GetXml();
         }
 
         static readonly char[] SlashChar = new char[] { '/' };

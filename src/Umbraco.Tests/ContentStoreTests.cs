@@ -13,7 +13,7 @@ namespace Umbraco.Tests
 	{
 		private FakeHttpContextFactory _httpContextFactory;
 		private UmbracoContext _umbracoContext;
-		private ContentStore _contentStore;
+		private XmlContentStore _contentStore;
 
 		[SetUp]
 		public void SetUp()
@@ -56,7 +56,7 @@ namespace Umbraco.Tests
 					return xDoc;
 				};
 
-			_contentStore = new ContentStore(_umbracoContext);
+			_contentStore = new XmlContentStore();
 			
 		}
 
@@ -74,7 +74,7 @@ namespace Umbraco.Tests
 		[TestCase("/home/Sub1", 1173)] //test different cases
 		public void Get_Node_By_Route(string route, int nodeId)
 		{
-			var result = _contentStore.GetDocumentByRoute(route, false);
+			var result = _contentStore.GetDocumentByRoute(_umbracoContext, route, false);
 			Assert.IsNotNull(result);
 			Assert.AreEqual(nodeId, result.Id);
 		}
@@ -84,7 +84,7 @@ namespace Umbraco.Tests
 		[TestCase("/Sub1", 1173)]
 		public void Get_Node_By_Route_Hiding_Top_Level_Nodes(string route, int nodeId)
 		{
-			var result = _contentStore.GetDocumentByRoute(route, true);
+			var result = _contentStore.GetDocumentByRoute(_umbracoContext, route, true);
 			Assert.IsNotNull(result);
 			Assert.AreEqual(nodeId, result.Id);
 		}

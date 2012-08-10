@@ -28,7 +28,11 @@ namespace Umbraco.Web.Routing
 
 			if (docRequest.Uri.AbsolutePath != "/") // no alias if "/"
 			{
-				node = docRequest.RoutingContext.ContentStore.GetDocumentByUrlAlias(docRequest.HasDomain ? docRequest.Domain.RootNodeId : 0, docRequest.Uri.AbsolutePath);
+				node = docRequest.RoutingContext.ContentStore.GetDocumentByUrlAlias(
+					docRequest.RoutingContext.UmbracoContext, 
+					docRequest.HasDomain ? docRequest.Domain.RootNodeId : 0, 
+					docRequest.Uri.AbsolutePath);
+
 				if (node != null)
 				{
 					LogHelper.Debug<LookupByAlias>("Path \"{0}\" is an alias for id={1}", () => docRequest.Uri.AbsolutePath, () => docRequest.NodeId);
