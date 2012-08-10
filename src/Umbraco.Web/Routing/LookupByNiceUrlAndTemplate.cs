@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Xml;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Resolving;
 using umbraco.cms.businesslogic.template;
 
@@ -24,7 +25,7 @@ namespace Umbraco.Web.Routing
 		/// <remarks>If successful, also assigns the template.</remarks>
 		public override bool TrySetDocument(DocumentRequest docRequest)
         {
-            XmlNode node = null;
+            IDocument node = null;
 			string path = docRequest.Uri.AbsolutePath;
 
 			if (docRequest.HasDomain)

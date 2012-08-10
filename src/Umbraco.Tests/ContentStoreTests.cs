@@ -74,9 +74,9 @@ namespace Umbraco.Tests
 		[TestCase("/home/Sub1", 1173)] //test different cases
 		public void Get_Node_By_Route(string route, int nodeId)
 		{
-			var result = _contentStore.GetNodeByRoute(route, false);
+			var result = _contentStore.GetDocumentByRoute(route, false);
 			Assert.IsNotNull(result);
-			Assert.AreEqual(nodeId, result.AttributeValue<int>("id"));
+			Assert.AreEqual(nodeId, result.Id);
 		}
 
 		[TestCase("/", 1046)]		
@@ -84,9 +84,9 @@ namespace Umbraco.Tests
 		[TestCase("/Sub1", 1173)]
 		public void Get_Node_By_Route_Hiding_Top_Level_Nodes(string route, int nodeId)
 		{
-			var result = _contentStore.GetNodeByRoute(route, true);
+			var result = _contentStore.GetDocumentByRoute(route, true);
 			Assert.IsNotNull(result);
-			Assert.AreEqual(nodeId, result.AttributeValue<int>("id"));
+			Assert.AreEqual(nodeId, result.Id);
 		}
 	}
 }

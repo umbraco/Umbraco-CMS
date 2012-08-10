@@ -5,9 +5,11 @@ using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Xml;
+using Umbraco.Core.Models;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
+using umbraco.interfaces;
 
 namespace umbraco
 {
@@ -88,8 +90,11 @@ namespace umbraco
 
 			if (!docreq.HasNode)
 				throw new ArgumentException("Document request has no node.", "docreq");
-
-			populatePageData(docreq.XmlNode);
+			
+			populatePageData(docreq.Node.Id,
+				docreq.Node.Name, docreq.Node.DocumentTypeId, docreq.Node.DocumentTypeAlias,
+				docreq.Node.WriterName, docreq.Node.CreatorName, docreq.Node.CreateDate, docreq.Node.UpdateDate,
+				docreq.Node.Path, docreq.Node.Version, docreq.Node.Parent == null ? -1 : docreq.Node.Parent.Id);
 
 			if (docreq.HasTemplate)
 			{
@@ -97,7 +102,7 @@ namespace umbraco
 				elements["template"] = this.template.ToString();
 			}
 
-			populateElementData(docreq.XmlNode);
+			PopulateElementData(docreq.Node);
 
 			HttpContext.Current.Trace.Write(TraceCategory, string.Format("Loaded \"{0}\" (id={1}, version={2})",
 				this.PageName, this.pageID, this.pageVersion));
@@ -230,6 +235,21 @@ namespace umbraco
 			var attr = node.Attributes.GetNamedItem(attributeName);
 			var value = attr != null ? attr.Value : null;
 			return value;
+		}
+
+		/// <summary>
+		/// Puts the properties of the node into the elements table
+		/// </summary>
+		/// <param name="node"></param>
+		void PopulateElementData(IDocument node)
+		{
+			foreach(var p in node.Properties)
+			{
+				if (!elements.ContainsKey(p.Alias))				
+				{
+					elements[p.Alias] = p.Value;					
+				}
+			}			
 		}
 
 		void populateElementData(XmlNode node)

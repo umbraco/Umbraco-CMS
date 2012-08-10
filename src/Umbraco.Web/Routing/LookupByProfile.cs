@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Xml;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Resolving;
 using umbraco;
 
@@ -24,7 +25,7 @@ namespace Umbraco.Web.Routing
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public override bool TrySetDocument(DocumentRequest docRequest)
         {
-            XmlNode node = null;
+            IDocument node = null;
 
             bool isProfile = false;
 			var pos = docRequest.Uri.AbsolutePath.LastIndexOf('/');

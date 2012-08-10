@@ -2,7 +2,9 @@ using System;
 using System.Diagnostics;
 using System.Xml;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Resolving;
+using umbraco.interfaces;
 
 namespace Umbraco.Web.Routing
 {
@@ -22,7 +24,7 @@ namespace Umbraco.Web.Routing
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public bool TrySetDocument(DocumentRequest docRequest)
         {
-            XmlNode node = null;
+            IDocument node = null;
 
             int nodeId = -1;
 			if (docRequest.Uri.AbsolutePath != "/") // no id if "/"
@@ -35,10 +37,10 @@ namespace Umbraco.Web.Routing
                 if (nodeId > 0)
                 {
 					LogHelper.Debug<LookupById>("Id={0}", () => nodeId);
-					node = docRequest.RoutingContext.ContentStore.GetNodeById(nodeId);
+					node = docRequest.RoutingContext.ContentStore.GetDocumentById(nodeId);
                     if (node != null)
                     {
-						docRequest.XmlNode = node;
+						docRequest.Node = node;
 						LogHelper.Debug<LookupById>("Found node with id={0}", () => docRequest.NodeId);
                     }
                     else

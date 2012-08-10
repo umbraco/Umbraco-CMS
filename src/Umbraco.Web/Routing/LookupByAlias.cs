@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using System.Xml;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Resolving;
+using umbraco.interfaces;
 
 namespace Umbraco.Web.Routing
 {
@@ -22,15 +24,16 @@ namespace Umbraco.Web.Routing
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public bool TrySetDocument(DocumentRequest docRequest)
 		{
-			XmlNode node = null;
+			//XmlNode node = null;
+			IDocument node = null;
 
 			if (docRequest.Uri.AbsolutePath != "/") // no alias if "/"
 			{
-				node = docRequest.RoutingContext.ContentStore.GetNodeByUrlAlias(docRequest.HasDomain ? docRequest.Domain.RootNodeId : 0, docRequest.Uri.AbsolutePath);
+				node = docRequest.RoutingContext.ContentStore.GetDocumentByUrlAlias(docRequest.HasDomain ? docRequest.Domain.RootNodeId : 0, docRequest.Uri.AbsolutePath);
 				if (node != null)
 				{
 					LogHelper.Debug<LookupByAlias>("Path \"{0}\" is an alias for id={1}", () => docRequest.Uri.AbsolutePath, () => docRequest.NodeId);
-					docRequest.XmlNode = node;
+					docRequest.Node = node;
 				}
 			}
 

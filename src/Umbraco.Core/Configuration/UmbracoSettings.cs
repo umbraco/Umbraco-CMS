@@ -7,6 +7,7 @@ using System.Web.Caching;
 using System.Xml;
 
 using System.Collections.Generic;
+using Umbraco.Core.Logging;
 
 
 namespace Umbraco.Core.Configuration
@@ -72,7 +73,7 @@ namespace Umbraco.Core.Configuration
                 }
                 catch (Exception e)
                 {
-					//Log.Add(LogTypes.Error, new User(0), -1, "Error reading umbracoSettings file: " + e.ToString());
+					LogHelper.Error<UmbracoSettings>("Error reading umbracoSettings file: " + e.ToString(), e);
                 }
                 settingsReader.Close();
                 return temp;
@@ -1009,11 +1010,20 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                string value = GetKey("/settings/content/UseLegacyXmlSchema");
-                bool result;
-                if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
-                    return result;
-                return true;
+				try
+				{
+					string value = GetKey("/settings/content/UseLegacyXmlSchema");
+					bool result;
+					if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out result))
+						return result;
+					return true;
+				}
+				catch (Exception)
+				{
+					//default. TODO: When we change this to a real config section we won't have to worry about parse errors
+					// and should handle defaults with unit tests properly.
+					return false; 
+				}
             }
         }
 

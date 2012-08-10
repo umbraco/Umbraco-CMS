@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Web;
 using System.Xml;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using umbraco.IO;
 using umbraco.interfaces;
 
@@ -23,7 +24,7 @@ namespace Umbraco.Web.Routing
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public bool TrySetDocument(DocumentRequest docRequest)
         {
-			docRequest.XmlNode = HandlePageNotFound(docRequest);
+			docRequest.Node = HandlePageNotFound(docRequest);
             return docRequest.HasNode;
         }
 
@@ -31,18 +32,19 @@ namespace Umbraco.Web.Routing
 
 		//FIXME: this is temporary and should be obsoleted
 
-		XmlNode HandlePageNotFound(DocumentRequest docRequest)
+		IDocument HandlePageNotFound(DocumentRequest docRequest)
         {
 			LogHelper.Debug<DefaultLastChanceLookup>("Running for url='{0}'.", () => docRequest.Uri.AbsolutePath);
 			
-            XmlNode currentPage = null;
+			//XmlNode currentPage = null;
+			IDocument currentPage = null;
 
             foreach (var handler in GetNotFoundHandlers())
             {
 				if (handler.Execute(docRequest.Uri.AbsolutePath) && handler.redirectID > 0)
                 {
                     //currentPage = umbracoContent.GetElementById(handler.redirectID.ToString());
-					currentPage = docRequest.RoutingContext.ContentStore.GetNodeById(handler.redirectID);
+					currentPage = docRequest.RoutingContext.ContentStore.GetDocumentById(handler.redirectID);
 
                     // FIXME - could it be null?
 

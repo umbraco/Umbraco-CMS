@@ -52,6 +52,9 @@
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Attempt.cs" />
     <Compile Include="CoreBootManager.cs" />
+    <Compile Include="DocumentPropertyExtensions.cs" />
+    <Compile Include="Models\IDocument.cs" />
+    <Compile Include="Models\IDocumentProperty.cs" />
     <Compile Include="Resolving\ActionsResolver.cs" />
     <Compile Include="Resolving\CacheRefreshersResolver.cs" />
     <Compile Include="Configuration\GlobalSettings.cs" />
@@ -110,6 +113,7 @@
       <Name>umbraco.interfaces</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

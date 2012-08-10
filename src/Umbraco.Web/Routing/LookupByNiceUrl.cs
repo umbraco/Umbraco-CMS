@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using System.Xml;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Resolving;
+using umbraco.interfaces;
 
 namespace Umbraco.Web.Routing
 {
@@ -37,7 +39,7 @@ namespace Umbraco.Web.Routing
 		/// <param name="docreq">The document request.</param>
 		/// <param name="route">The route.</param>
 		/// <returns>The document node, or null.</returns>
-        protected XmlNode LookupDocumentNode(DocumentRequest docreq, string route)
+        protected IDocument LookupDocumentNode(DocumentRequest docreq, string route)
         {
 			LogHelper.Debug<LookupByNiceUrl>("Test route \"{0}\"", () => route);
 
@@ -47,13 +49,13 @@ namespace Umbraco.Web.Routing
         	             	: 0;
 
 
-            XmlNode node = null;
+            IDocument node = null;
             if (nodeId > 0)
             {
-				node = docreq.RoutingContext.ContentStore.GetNodeById(nodeId);
+				node = docreq.RoutingContext.ContentStore.GetDocumentById(nodeId);
                 if (node != null)
                 {
-                    docreq.XmlNode = node;
+                    docreq.Node = node;
 					LogHelper.Debug<LookupByNiceUrl>("Cache hit, id={0}", () => nodeId);
                 }
                 else
@@ -65,10 +67,10 @@ namespace Umbraco.Web.Routing
             if (node == null)
             {
 				LogHelper.Debug<LookupByNiceUrl>("Cache miss, query");
-				node = docreq.RoutingContext.ContentStore.GetNodeByRoute(route);
+				node = docreq.RoutingContext.ContentStore.GetDocumentByRoute(route);
                 if (node != null)
                 {
-                    docreq.XmlNode = node;
+                    docreq.Node = node;
 					LogHelper.Debug<LookupByNiceUrl>("Query matches, id={0}", () => docreq.NodeId);
 
 					if (!docreq.RoutingContext.UmbracoContext.InPreviewMode)

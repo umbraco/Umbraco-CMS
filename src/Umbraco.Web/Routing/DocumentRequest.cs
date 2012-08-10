@@ -8,6 +8,7 @@ using System.Diagnostics;
 // legacy
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using umbraco.BusinessLogic;
 using umbraco.NodeFactory;
 using umbraco.cms.businesslogic.web;
@@ -39,7 +40,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		XmlNode _xmlNode = null;
 
-		private INode _node = null;
+		private IDocument _node = null;
 
         #region Properties
 
@@ -76,42 +77,49 @@ namespace Umbraco.Web.Routing
         // TODO: fixme - do we want to have an ordered list of alternate cultures,
         //         to allow for fallbacks when doing dictionnary lookup and such?
 
-		public INode Node
+		public IDocument Node
 		{
-			get
+			//get
+			//{
+			//    if (!HasNode)
+			//        return null;
+			//    if (_node == null)
+			//    {
+			//        //TODO: See the note below, if we don't allow for a get/set INode then how would someone implement
+			//        // their own INode? it would not be possible since we're instantiating a specific Node object here.
+			//        _node = new Node(XmlNode);
+			//    }
+			//    return _node;
+			//}
+			get { return _node; }
+			set
 			{
-				if (!HasNode)
-					return null;
-				if (_node == null)
-				{
-					//TODO: See the note below, if we don't allow for a get/set INode then how would someone implement
-					// their own INode? it would not be possible since we're instantiating a specific Node object here.
-					_node = new Node(XmlNode);
-				}
-				return _node;
+				_node = value;
+				this.Template = null;
+				_nodeId = _node != null ? _node.Id : 0;
 			}
 		}
 
-		//TODO: Should we remove this somehow in place of an INode getter/setter? we are really bound to the xml structure here
-        /// <summary>
-        /// Gets or sets the document request's document xml node.
-        /// </summary>
-        internal XmlNode XmlNode
-        {
-            get
-            {
-                return _xmlNode;
-            }
-            set
-            {
-                _xmlNode = value;
-                this.Template = null;
-                if (_xmlNode != null)
-					_nodeId = int.Parse(RoutingContext.ContentStore.GetNodeProperty(_xmlNode, "@id"));
-                else
-                    _nodeId = 0;
-            }
-        }
+		////TODO: Should we remove this somehow in place of an INode getter/setter? we are really bound to the xml structure here
+		///// <summary>
+		///// Gets or sets the document request's document xml node.
+		///// </summary>
+		//internal XmlNode XmlNode
+		//{
+		//    get
+		//    {
+		//        return _xmlNode;
+		//    }
+		//    set
+		//    {
+		//        _xmlNode = value;
+		//        this.Template = null;
+		//        if (_xmlNode != null)
+		//            _nodeId = int.Parse(RoutingContext.ContentStore.GetNodeProperty(_xmlNode, "@id"));
+		//        else
+		//            _nodeId = 0;
+		//    }
+		//}
 
         /// <summary>
         /// Gets or sets the document request's template.
@@ -134,7 +142,7 @@ namespace Umbraco.Web.Routing
         {
             get
             {
-                if (this.XmlNode == null)
+                if (this.Node == null)
                     throw new InvalidOperationException("DocumentRequest has no document.");
                 return _nodeId;
             }
@@ -145,7 +153,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public bool HasNode
         {
-            get { return this.XmlNode != null; }
+            get { return this.Node != null; }
         }
 
         /// <summary>

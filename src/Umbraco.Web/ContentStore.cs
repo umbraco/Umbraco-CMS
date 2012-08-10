@@ -1,7 +1,11 @@
 using System;
 using System.Text;
 using System.Xml;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Web.Routing;
 using umbraco;
+using umbraco.NodeFactory;
 using umbraco.interfaces;
 
 namespace Umbraco.Web
@@ -10,28 +14,37 @@ namespace Umbraco.Web
     /// <summary>
     /// Used for the new routing system
     /// </summary>
-    internal class ContentStore
+    internal class ContentStore : IContentStore
     {
 		/// <summary>
 		/// Delegate to return the current UmbracoContext
 		/// </summary>
 		private readonly UmbracoContext _umbracoContext;
 
-		/// <summary>
-		/// Constructor accepting a delegate to resolve the UmbracoContext
-		/// </summary>
-		/// <param name="umbracoContext"></param>
-        public ContentStore(UmbracoContext umbracoContext)
+    	private IDocument ConvertToDocument(XmlNode xmlNode)
+		{
+			if (xmlNode == null)
+				return null;
+
+			return new Model.XmlDocument(xmlNode);
+		}
+
+    	/// <summary>
+    	/// Constructor accepting a delegate to resolve the UmbracoContext
+    	/// </summary>
+    	/// <param name="umbracoContext"></param>
+    	public ContentStore(UmbracoContext umbracoContext)
+		{
+			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+    		_umbracoContext = umbracoContext;
+		}
+
+    	public IDocument GetDocumentById(int nodeId)
         {
-            _umbracoContext = umbracoContext;
+        	return ConvertToDocument(GetXml().GetElementById(nodeId.ToString()));
         }
 
-        public XmlNode GetNodeById(int nodeId)
-        {
-            return GetXml().GetElementById(nodeId.ToString());
-        }
-
-        public XmlNode GetNodeByRoute(string route, bool? hideTopLevelNode = null)
+		public IDocument GetDocumentByRoute(string route, bool? hideTopLevelNode = null)
         {
 			//set the default to be what is in the settings
 			if (hideTopLevelNode == null)
@@ -53,11 +66,11 @@ namespace Umbraco.Web
             int startNodeId = int.Parse(startNodeIdString);
 
             var xpath = CreateXpathQuery(startNodeId, path, hideTopLevelNode.Value);
-            
-            return GetXml().SelectSingleNode(xpath);
+
+        	return ConvertToDocument(GetXml().SelectSingleNode(xpath));
         }
 
-        public XmlNode GetNodeByUrlAlias(int rootNodeId, string alias)
+		public IDocument GetDocumentByUrlAlias(int rootNodeId, string alias)
         {
 
             // the alias may be "foo/bar" or "/foo/bar"
@@ -75,33 +88,40 @@ namespace Umbraco.Web
             xpathBuilder.Append(")]");
 
             var xpath = xpathBuilder.ToString();
-            //RequestContext.Current.Trace.Write(TraceCategory, "xpath='" + xpath + "'.");
-            return GetXml().SelectSingleNode(xpath);
+
+        	return ConvertToDocument(GetXml().SelectSingleNode(xpath));
         }
 
-        public XmlNode GetNodeParent(XmlNode node)
-        {
-            return node.ParentNode;
-        }
+		//public IDocument GetNodeParent(IDocument node)
+		//{
+		//    return node.Parent;
+		//}
 
-        public string GetNodeProperty(XmlNode node, string propertyAlias)
+		public string GetDocumentProperty(IDocument node, string propertyAlias)
         {
             if (propertyAlias.StartsWith("@"))
             {
-                var attribute = node.Attributes.GetNamedItem(propertyAlias.Substring(1));
-                return attribute == null ? null : attribute.Value;
+				//if it starts with an @ then its a property of the object, not a user defined property
+            	var propName = propertyAlias.TrimStart('@');
+				var prop = TypeHelper.GetProperty(typeof(IDocument), propName);
+				if (prop == null)
+					throw new ArgumentException("The property name " + propertyAlias + " was not found on type " + typeof(IDocument));
+            	var val = prop.GetValue(node, null) as string;
+				//var attribute = node.Attributes.GetNamedItem(propertyAlias.Substring(1));
+                //return attribute == null ? null : attribute.Value;
+            	return val;
             }
             else
             {
-                var propertyNode = node.SelectSingleNode("./" + propertyAlias);
-                return propertyNode == null ? null : propertyNode.InnerText;
+            	var prop = node.GetProperty(propertyAlias);
+				return prop == null ? null : prop.Value;
+            	//var propertyNode = node.SelectSingleNode("./" + propertyAlias);
+            	//return propertyNode == null ? null : propertyNode.InnerText;
             }
         }
 
         XmlDocument GetXml()
         {
-            // UmbracoModule will call LegacyRequestInitializer before anything else
-            // and that will create an UmbracoContext... so we should be safe here.
             return _umbracoContext.GetXml();
         }
 

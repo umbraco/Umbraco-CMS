@@ -27,8 +27,6 @@ namespace umbraco
             get { return Umbraco.Core.Configuration.UmbracoSettings.UmbracoSettingsXmlDoc; }
         }
 
-    	private static string _path;
-
 		/// <summary>
 		/// Gets/sets the settings file path, the setter can be used in unit tests
 		/// </summary>
@@ -37,19 +35,6 @@ namespace umbraco
     		get { return Umbraco.Core.Configuration.UmbracoSettings.SettingsFilePath; }
 			set { Umbraco.Core.Configuration.UmbracoSettings.SettingsFilePath = value; }
     	}
-
-    	private const string Filename = Umbraco.Core.Configuration.UmbracoSettings.Filename;
-
-    	private static XmlDocument EnsureSettingsDocument()
-    	{
-    		return Umbraco.Core.Configuration.UmbracoSettings.EnsureSettingsDocument();
-    	}
-
-        private static void save()
-        {
-			Umbraco.Core.Configuration.UmbracoSettings.Save();
-        }
-
 
         /// <summary>
         /// Selects a xml node in the umbraco settings config file.

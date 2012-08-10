@@ -68,6 +68,21 @@ namespace Umbraco.Core
 		}
 
 		/// <summary>
+		/// Returns a PropertyInfo from a type
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="name"></param>
+		/// <param name="mustRead"></param>
+		/// <param name="mustWrite"></param>
+		/// <param name="includeIndexed"></param>
+		/// <returns></returns>
+		public static PropertyInfo GetProperty(Type type, string name, bool mustRead = true, bool mustWrite = true, bool includeIndexed = false)
+		{
+			return CachedDiscoverableProperties(type, mustRead, mustWrite, includeIndexed)
+				.FirstOrDefault(x => x.Name == name);
+		}
+
+		/// <summary>
 		/// Gets (and caches) <see cref="FieldInfo"/> discoverable in the current <see cref="AppDomain"/> for a given <paramref name="type"/>.
 		/// </summary>
 		/// <param name="type">The source.</param>

@@ -7,6 +7,7 @@ using System.IO;
 using System.Xml;
 using System.Text.RegularExpressions;
 using Umbraco.Web;
+using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic;
 
@@ -18,8 +19,8 @@ namespace umbraco
 	/// 
 	public partial class UmbracoDefault : Page
 	{
-		page _upage = null;
-
+		private page _upage = null;
+		private DocumentRequest _docRequest = null;
 		bool _validateRequest = true;
 
 		const string TraceCategory = "UmbracoDefault";
@@ -42,7 +43,7 @@ namespace umbraco
 			//TODO: This still a bunch of routing stuff being handled here, this all needs to be handled in the HttpModule instead
 
 			// get the document request
-			var docreq = UmbracoContext.Current.DocumentRequest;
+			_docRequest = UmbracoContext.Current.DocumentRequest;
 
 			// load request parameters
 			// any reason other than liveEditing why we want to do this?!
@@ -61,7 +62,7 @@ namespace umbraco
 					// security check
 					var bp = new BasePages.UmbracoEnsuredPage();
 					bp.ensureContext();
-					requestId = docreq.NodeId;
+					requestId = _docRequest.NodeId;
 				}
 			}
 			else
@@ -77,11 +78,11 @@ namespace umbraco
 				// use the DocumentRequest if it has resolved
 				// else it means that no lookup could find a document to render
 				// or that the document to render has no template... 
-				if (docreq.HasNode && docreq.HasTemplate)
+				if (_docRequest.HasNode && _docRequest.HasTemplate)
 				{
-					_upage = new page(docreq);
-					UmbracoContext.Current.HttpContext.Items["pageID"] = docreq.NodeId; // legacy - fixme
-					var templatePath = umbraco.IO.SystemDirectories.Masterpages + "/" + docreq.Template.Alias.Replace(" ", "") + ".master"; // fixme - should be in .Template!
+					_upage = new page(_docRequest);
+					UmbracoContext.Current.HttpContext.Items["pageID"] = _docRequest.NodeId; // legacy - fixme
+					var templatePath = umbraco.IO.SystemDirectories.Masterpages + "/" + _docRequest.Template.Alias.Replace(" ", "") + ".master"; // fixme - should be in .Template!
 					this.MasterPageFile = templatePath; // set the template
 				}
 				else
@@ -89,7 +90,7 @@ namespace umbraco
 					//TODO: If there is no template but it has a node we shouldn't render a 404 I don't think
 
 					// if we know we're 404, display the ugly message, else a blank page
-					if (docreq.Is404)
+					if (_docRequest.Is404)
 						RenderNotFound();
 					Response.End();
 					return;
