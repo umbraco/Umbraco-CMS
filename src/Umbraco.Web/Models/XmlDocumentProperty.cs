@@ -6,7 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 
-namespace Umbraco.Web.Model
+namespace Umbraco.Web.Models
 {
 
 	/// <summary>

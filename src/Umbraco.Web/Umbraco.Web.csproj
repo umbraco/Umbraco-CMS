@@ -241,8 +241,8 @@
     <Compile Include="ContentStore.cs" />
     <Compile Include="DocumentNotFoundHttpHandler.cs" />
     <Compile Include="IContentStore.cs" />
-    <Compile Include="Model\XmlDocument.cs" />
-    <Compile Include="Model\XmlDocumentProperty.cs" />
+    <Compile Include="Models\XmlDocument.cs" />
+    <Compile Include="Models\XmlDocumentProperty.cs" />
     <Compile Include="Mvc\Constants.cs" />
     <Compile Include="Mvc\FilteredControllerFactoriesResolver.cs" />
     <Compile Include="Mvc\IFilteredControllerFactory.cs" />

@@ -7,9 +7,8 @@ using System.Xml.Serialization;
 using System.Xml.XPath;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Web.Routing;
 
-namespace Umbraco.Web.Model
+namespace Umbraco.Web.Models
 {
 
 	/// <summary>

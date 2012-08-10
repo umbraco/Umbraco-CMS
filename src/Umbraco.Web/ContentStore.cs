@@ -26,7 +26,7 @@ namespace Umbraco.Web
 			if (xmlNode == null)
 				return null;
 
-			return new Model.XmlDocument(xmlNode);
+			return new Models.XmlDocument(xmlNode);
 		}
 
     	/// <summary>
