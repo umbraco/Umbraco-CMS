@@ -105,7 +105,7 @@ namespace umbraco.cms.businesslogic.relation
 
 		public void Delete() 
 		{
-			SqlHelper.ExecuteNonQuery("delete from umbracoRelation where id = @id", SqlHelper.CreateParameter("@id", this.Id));
+			SqlHelper.ExecuteNonQuery("DELETE FROM umbracoRelation WHERE id = @id", SqlHelper.CreateParameter("@id", this.Id));
 		}
 
         [MethodImpl(MethodImplOptions.Synchronized)]

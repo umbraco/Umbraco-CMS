@@ -93,6 +93,7 @@ namespace umbraco.DataLayer.SqlHelpers.MySql
             switch (typeof(T).FullName)
             {
                 case "System.Boolean": return (T)(object)((1).Equals(scalar));
+                case "System.Guid": return (T)(object)(Guid.Parse(scalar.ToString()));
                 default: return base.ConvertScalar<T>(scalar);
             }
         }
