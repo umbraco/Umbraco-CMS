@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web;
 
 namespace Umbraco.Core.IO
 {
@@ -10,6 +11,15 @@ namespace Umbraco.Core.IO
     {
         private readonly string _rootPath;
         private readonly string _rootUrl;
+
+        public PhysicalFileSystem(string virtualRoot)
+        {
+            if(HttpContext.Current == null)
+                throw new InvalidOperationException("The single parameter constructor can only be accessed when there is a valid HttpContext");
+
+            _rootPath = HttpContext.Current.Server.MapPath(virtualRoot);
+            _rootUrl = VirtualPathUtility.ToAbsolute(virtualRoot);
+        }
 
         public PhysicalFileSystem(string rootPath, string rootUrl)
         {
