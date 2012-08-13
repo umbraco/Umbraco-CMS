@@ -228,6 +228,8 @@ namespace umbraco.BasePages
                 if (StateHelper.Cookies.HasCookies && StateHelper.Cookies.UserContext.HasValue)
                     return StateHelper.Cookies.UserContext.GetValue();
                 else
+                {
+                    try
                     {
                         string encTicket = StateHelper.Cookies.UserContext.GetValue();
                         if (!String.IsNullOrEmpty(encTicket))
@@ -245,7 +247,7 @@ namespace umbraco.BasePages
                     }
                 }
 
-                    return "";
+                return "";
             }
             set
             {

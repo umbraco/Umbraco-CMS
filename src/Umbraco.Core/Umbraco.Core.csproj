@@ -47,6 +47,8 @@
     <Compile Include="DelegateEqualityComparer.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="IfExtensions.cs" />
+    <Compile Include="IO\IFileSystem.cs" />
+    <Compile Include="IO\PhysicalFileSystem.cs" />
     <Compile Include="IThumbnailProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringAliasCaseType.cs" />

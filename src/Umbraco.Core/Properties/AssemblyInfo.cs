@@ -21,3 +21,4 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("cms")]
 [assembly: InternalsVisibleTo("umbraco")]
 [assembly: InternalsVisibleTo("businesslogic")]
+[assembly: InternalsVisibleTo("Umbraco.Tests")]
