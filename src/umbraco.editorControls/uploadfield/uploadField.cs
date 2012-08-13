@@ -161,6 +161,7 @@ namespace umbraco.editorControls
 
         #endregion
 
+        [Obsolete("This method is now obsolete due to a change in the way that files are handled.  If you need to check if a URL for an uploaded file is safe you should implement your own as this method will be removed in a future version", false)]
         public string SafeUrl(string url)
         {
             if (!String.IsNullOrEmpty(url))
