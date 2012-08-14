@@ -23,3 +23,5 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("businesslogic")]
 [assembly: InternalsVisibleTo("umbraco.editorControls")]
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
+
+[assembly: InternalsVisibleTo("Our.Umbraco.AmazonS3FileSystem")]

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using umbraco.IO;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
@@ -36,8 +37,19 @@ namespace Umbraco.Web.Media.ThumbnailProviders
 
             // Make sure the thumbnail exists
             var tmpThumbUrl = fileUrl.Replace(ext, "_thumb.jpg");
-            if (!File.Exists(IOHelper.MapPath(tmpThumbUrl)))
+
+            try
+            {
+                var fs = FileSystemProviderManager.Current.GetFileSystemProvider(FileSystemProvider.Media);
+                var relativeThumbPath = fs.GetRelativePath(tmpThumbUrl);
+                if (!fs.FileExists(relativeThumbPath))
+                    return false;
+            }
+            catch (Exception)
+            {
+                // If something odd happens, just return false and move on
                 return false;
+            }
 
             // We've got this far, so thumbnail must exist
             thumbUrl = tmpThumbUrl;
