@@ -56,8 +56,8 @@ namespace umbraco
 
 
         /// <summary>
-        /// Returns the Document object of the starting node for the current User. This ensures
-        /// that the Document object is only instantiated once.
+        /// Returns the Media object of the starting node for the current User. This ensures
+        /// that the Media object is only instantiated once.
         /// </summary>
         protected Media StartNode
         {
