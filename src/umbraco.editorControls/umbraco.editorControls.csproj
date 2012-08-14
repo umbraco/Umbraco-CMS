@@ -172,6 +172,11 @@
     <Compile Include="AbstractJsonPrevalueEditor.cs" />
     <Compile Include="AbstractOptions.cs" />
     <Compile Include="AbstractPrevalueEditor.cs" />
+    <Compile Include="PickerRelations\PickerRelationsDataEditor.cs" />
+    <Compile Include="PickerRelations\PickerRelationsDataType.cs" />
+    <Compile Include="PickerRelations\PickerRelationsEventHandler.cs" />
+    <Compile Include="PickerRelations\PickerRelationsOptions.cs" />
+    <Compile Include="PickerRelations\PickerRelationsPreValueEditor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
