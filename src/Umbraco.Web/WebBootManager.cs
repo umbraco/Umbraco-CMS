@@ -51,12 +51,7 @@ namespace Umbraco.Web
 			ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
 
 			//set routes
-			var route = RouteTable.Routes.MapRoute(
-				"Umbraco_default",
-				"Umbraco/RenderMvc/{action}/{id}",
-				new { controller = "RenderMvc", action = "Index", id = UrlParameter.Optional }
-				);
-			route.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
+			CreateRoutes();
 
 			//find and initialize the application startup handlers, we need to initialize this resolver here because
 			//it is a special resolver where they need to be instantiated first before any other resolvers in order to bind to 
@@ -105,6 +100,20 @@ namespace Umbraco.Web
 				.ForEach(x => x.OnApplicationStarted(_umbracoApplication, ApplicationContext));
 
 			return this;
+		}
+
+		/// <summary>
+		/// Creates the routes
+		/// </summary>
+		protected internal void CreateRoutes()
+		{
+			//set routes
+			var route = RouteTable.Routes.MapRoute(
+				"Umbraco_default",
+				"Umbraco/RenderMvc/{action}/{id}",
+				new { controller = "RenderMvc", action = "Index", id = UrlParameter.Optional }
+				);
+			route.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
 		}
 
 		/// <summary>

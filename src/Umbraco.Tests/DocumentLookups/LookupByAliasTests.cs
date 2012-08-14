@@ -7,7 +7,7 @@ using umbraco.cms.businesslogic.template;
 namespace Umbraco.Tests.DocumentLookups
 {
 	[TestFixture]
-	public class LookupByAliasTests : BaseTest
+	public class LookupByAliasTests : BaseRoutingTest
 	{
 		[TestCase("/this/is/my/alias", 1046)]
 		[TestCase("/anotheralias", 1046)]

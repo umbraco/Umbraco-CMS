@@ -8,7 +8,7 @@ using umbraco.cms.businesslogic.template;
 namespace Umbraco.Tests.DocumentLookups
 {
 	[TestFixture]
-	public class LookupByNiceUrlTests : BaseTest
+	public class LookupByNiceUrlTests : BaseRoutingTest
 	{
 
 		[TestCase("/")]

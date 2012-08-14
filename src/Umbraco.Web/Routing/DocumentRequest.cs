@@ -78,19 +78,7 @@ namespace Umbraco.Web.Routing
         //         to allow for fallbacks when doing dictionnary lookup and such?
 
 		public IDocument Node
-		{
-			//get
-			//{
-			//    if (!HasNode)
-			//        return null;
-			//    if (_node == null)
-			//    {
-			//        //TODO: See the note below, if we don't allow for a get/set INode then how would someone implement
-			//        // their own INode? it would not be possible since we're instantiating a specific Node object here.
-			//        _node = new Node(XmlNode);
-			//    }
-			//    return _node;
-			//}
+		{			
 			get { return _node; }
 			set
 			{
@@ -99,27 +87,6 @@ namespace Umbraco.Web.Routing
 				_nodeId = _node != null ? _node.Id : 0;
 			}
 		}
-
-		////TODO: Should we remove this somehow in place of an INode getter/setter? we are really bound to the xml structure here
-		///// <summary>
-		///// Gets or sets the document request's document xml node.
-		///// </summary>
-		//internal XmlNode XmlNode
-		//{
-		//    get
-		//    {
-		//        return _xmlNode;
-		//    }
-		//    set
-		//    {
-		//        _xmlNode = value;
-		//        this.Template = null;
-		//        if (_xmlNode != null)
-		//            _nodeId = int.Parse(RoutingContext.ContentStore.GetNodeProperty(_xmlNode, "@id"));
-		//        else
-		//            _nodeId = 0;
-		//    }
-		//}
 
         /// <summary>
         /// Gets or sets the document request's template.

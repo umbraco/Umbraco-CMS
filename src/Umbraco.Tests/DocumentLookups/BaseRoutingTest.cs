@@ -1,5 +1,6 @@
 using System.Configuration;
 using System.Linq;
+using System.Web.Routing;
 using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -15,7 +16,7 @@ using umbraco.cms.businesslogic.template;
 namespace Umbraco.Tests.DocumentLookups
 {
 	[TestFixture, RequiresSTA]
-	public abstract class BaseTest
+	public abstract class BaseRoutingTest
 	{
 		[SetUp]
 		public virtual void Initialize()
@@ -23,6 +24,7 @@ namespace Umbraco.Tests.DocumentLookups
 			TestHelper.SetupLog4NetForTests();
 			TestHelper.InitializeDatabase();
 			Resolution.Freeze();
+			ApplicationContext = new ApplicationContext() { IsReady = true };
 		}
 
 		[TearDown]
@@ -36,9 +38,12 @@ namespace Umbraco.Tests.DocumentLookups
 			Cache.ClearAllCache();
 		}
 
-		protected FakeHttpContextFactory GetHttpContextFactory(string url)
+		protected FakeHttpContextFactory GetHttpContextFactory(string url, RouteData routeData = null)
 		{
-			var factory = new FakeHttpContextFactory(url);
+			var factory = routeData != null 
+				? new FakeHttpContextFactory(url, routeData) 
+				: new FakeHttpContextFactory(url);
+			
 
 			//set the state helper
 			StateHelper.HttpContext = factory.HttpContext;
@@ -46,19 +51,21 @@ namespace Umbraco.Tests.DocumentLookups
 			return factory;
 		}
 
-		private UmbracoContext GetUmbracoContext(string url, Template template)
+		protected ApplicationContext ApplicationContext { get; private set; }
+
+		private UmbracoContext GetUmbracoContext(string url, Template template, RouteData routeData = null)
 		{
 			var ctx = new UmbracoContext(
-				GetHttpContextFactory(url).HttpContext,
-				new ApplicationContext(),
+				GetHttpContextFactory(url, routeData).HttpContext,
+				ApplicationContext,
 				new FakeRoutesCache());
 			SetupUmbracoContextForTest(ctx, template);
 			return ctx;
 		}
 
-		protected RoutingContext GetRoutingContext(string url, Template template)
+		protected RoutingContext GetRoutingContext(string url, Template template, RouteData routeData = null)
 		{
-			var umbracoContext = GetUmbracoContext(url, template);
+			var umbracoContext = GetUmbracoContext(url, template, routeData);
 			var contentStore = new XmlContentStore();
 			var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
 			var routingRequest = new RoutingContext(
@@ -70,23 +77,14 @@ namespace Umbraco.Tests.DocumentLookups
 			return routingRequest;
 		}
 
-		/// <summary>
-		/// Initlializes the UmbracoContext with specific XML
-		/// </summary>
-		/// <param name="umbracoContext"></param>
-		/// <param name="template"></param>
-		protected void SetupUmbracoContextForTest(UmbracoContext umbracoContext, Template template)
+		protected virtual string GetXmlContent(Template template)
 		{
-			umbracoContext.GetXmlDelegate = () =>
-				{
-					var xDoc = new XmlDocument();
-
-					//create a custom xml structure to return
-
-					xDoc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?><!DOCTYPE root[ 
+			return @"<?xml version=""1.0"" encoding=""utf-8""?>
+<!DOCTYPE root[ 
 <!ELEMENT Home ANY>
 <!ATTLIST Home id ID #REQUIRED>
-
+<!ELEMENT CustomDocument ANY>
+<!ATTLIST CustomDocument id ID #REQUIRED>
 ]>
 <root id=""-1"">
 	<Home id=""1046"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""2"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Home"" urlName=""home"" writerName=""admin"" creatorName=""admin"" path=""-1,1046"" isDoc="""">
@@ -106,8 +104,24 @@ namespace Umbraco.Tests.DocumentLookups
 		<Home id=""1175"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""2"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub 2"" urlName=""sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1175"" isDoc=""""><content><![CDATA[]]></content>
 		</Home>
 	</Home>
-	<Home id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
-</root>");
+	<CustomDocument id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
+</root>";
+		}
+
+		/// <summary>
+		/// Initlializes the UmbracoContext with specific XML
+		/// </summary>
+		/// <param name="umbracoContext"></param>
+		/// <param name="template"></param>
+		protected void SetupUmbracoContextForTest(UmbracoContext umbracoContext, Template template)
+		{
+			umbracoContext.GetXmlDelegate = () =>
+				{
+					var xDoc = new XmlDocument();
+
+					//create a custom xml structure to return
+
+					xDoc.LoadXml(GetXmlContent(template));
 					//return the custom x doc
 					return xDoc;
 				};
