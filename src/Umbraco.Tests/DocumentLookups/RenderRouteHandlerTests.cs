@@ -31,6 +31,29 @@ namespace Umbraco.Tests.DocumentLookups
 			RouteTable.Routes.Clear();
 		}
 
+		/// <summary>
+		/// Will route to the default controller and action since no custom controller is defined for this node route
+		/// </summary>
+		[Test]
+		public void Umbraco_Route_Umbraco_Defined_Controller_Action()
+		{
+			var template = Template.MakeNew("homePage", new User(0));
+			var route = RouteTable.Routes["Umbraco_default"];
+			var routeData = new RouteData() { Route = route };
+			var routingContext = GetRoutingContext("~/dummy-page", template, routeData);
+			var docRequest = new DocumentRequest(routingContext.UmbracoContext.UmbracoUrl, routingContext)
+			{
+				Node = routingContext.ContentStore.GetDocumentById(routingContext.UmbracoContext, 1174),
+				Template = template
+			};
+
+			var handler = new RenderRouteHandler(new TestControllerFactory());
+
+			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
+			Assert.AreEqual("RenderMvc", routeData.Values["controller"].ToString());
+			Assert.AreEqual("Index", routeData.Values["action"].ToString());
+		}
+
 		//test all template name styles to match the ActionName
 		[TestCase("home-page")]
 		[TestCase("Home-Page")]
