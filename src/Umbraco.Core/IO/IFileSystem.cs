@@ -6,31 +6,36 @@ namespace Umbraco.Core.IO
 {
     internal interface IFileSystem
     {
+        IEnumerable<string> GetDirectories(string path);
+
         void DeleteDirectory(string path);
 
         void DeleteDirectory(string path, bool recursive);
 
-        IEnumerable<string> GetFiles(string path);
-
-        IEnumerable<string> GetFiles(string path, string filter);
-
-        IEnumerable<string> GetDirectories(string path);
-
-        string GetFullPath(string path);
-
-        string GetUrl(string path);
-
-        void DeleteFile(string path);
-
-        bool FileExists(string path);
-
         bool DirectoryExists(string path);
+
 
         void AddFile(string path, Stream stream);
 
         void AddFile(string path, Stream stream, bool overrideIfExists);
 
+        IEnumerable<string> GetFiles(string path);
+
+        IEnumerable<string> GetFiles(string path, string filter);
+
         Stream OpenFile(string path);
+
+        void DeleteFile(string path);
+
+        bool FileExists(string path);
+
+        string GetRelativePath(string fullPathOrUrl);
+
+        string GetFullPath(string path);
+
+        string GetUrl(string path);
+
+        long GetSize(string path);
 
         DateTimeOffset GetLastModified(string path);
 

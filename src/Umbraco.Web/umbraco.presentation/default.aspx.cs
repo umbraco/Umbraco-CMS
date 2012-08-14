@@ -4,6 +4,8 @@ using System.Web.UI;
 using System.IO;
 using System.Xml;
 using System.Text.RegularExpressions;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using umbraco.presentation;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic;

@@ -7,7 +7,7 @@ using System.Web;
 
 namespace Umbraco.Core.IO
 {
-    internal class PhysicalFileSystem : IFileSystem
+    internal class PhysicalFileSystem : AbstractFileSystem
     {
         private readonly string _rootPath;
         private readonly string _rootUrl;
@@ -33,14 +33,14 @@ namespace Umbraco.Core.IO
             _rootUrl = rootUrl;
         }
 
-        public IEnumerable<string> GetDirectories(string path)
+        public override IEnumerable<string> GetDirectories(string path)
         {
             path = EnsureTrailingSeparator(GetFullPath(path));
 
             try
             {
                 if (Directory.Exists(path))
-                    return Directory.EnumerateDirectories(path).Select(MakeRelativePath);
+                    return Directory.EnumerateDirectories(path).Select(GetRelativePath);
             }
             catch (UnauthorizedAccessException ex)
             { }
@@ -50,12 +50,12 @@ namespace Umbraco.Core.IO
             return Enumerable.Empty<string>();
         }
 
-        public virtual void DeleteDirectory(string path)
+        public override void DeleteDirectory(string path)
         {
             DeleteDirectory(path, false);
         }
 
-        public void DeleteDirectory(string path, bool recursive)
+        public override void DeleteDirectory(string path, bool recursive)
         {
             if (!DirectoryExists(path))
                 return;
@@ -68,17 +68,17 @@ namespace Umbraco.Core.IO
             { }
         }
 
-        public bool DirectoryExists(string path)
+        public override bool DirectoryExists(string path)
         {
             return Directory.Exists(GetFullPath(path));
         }
 
-        public void AddFile(string path, Stream stream)
+        public override void AddFile(string path, Stream stream)
         {
             AddFile(path, stream, true);
         }
 
-        public void AddFile(string path, Stream stream, bool overrideIfExists)
+        public override void AddFile(string path, Stream stream, bool overrideIfExists)
         {
             if (FileExists(path) && !overrideIfExists)
                 throw new InvalidOperationException(string.Format("A file at path '{0}' already exists",
@@ -90,19 +90,19 @@ namespace Umbraco.Core.IO
                 stream.CopyTo(destination);
         }
 
-        public IEnumerable<string> GetFiles(string path)
+        public override IEnumerable<string> GetFiles(string path)
         {
             return GetFiles(path, "*.*");
         }
 
-        public IEnumerable<string> GetFiles(string path, string filter)
+        public override IEnumerable<string> GetFiles(string path, string filter)
         {
             path = EnsureTrailingSeparator(GetFullPath(path));
 
             try
             {
                 if (Directory.Exists(path))
-                    return Directory.EnumerateFiles(path, filter).Select(MakeRelativePath);
+                    return Directory.EnumerateFiles(path, filter).Select(GetRelativePath);
             }
             catch (UnauthorizedAccessException ex)
             { }
@@ -112,12 +112,12 @@ namespace Umbraco.Core.IO
             return Enumerable.Empty<string>();
         }
 
-        public Stream OpenFile(string path)
+        public override Stream OpenFile(string path)
         {
             return File.OpenRead(GetFullPath(path));
         }
 
-        public void DeleteFile(string path)
+        public override void DeleteFile(string path)
         {
             if (!FileExists(path))
                 return;
@@ -130,33 +130,44 @@ namespace Umbraco.Core.IO
             { }
         }
 
-        public bool FileExists(string path)
+        public override bool FileExists(string path)
         {
             return File.Exists(GetFullPath(path));
         }
 
-        public string GetFullPath(string path)
+        public override string GetRelativePath(string fullPathOrUrl)
+        {
+            var relativePath = fullPathOrUrl
+                .TrimStart(_rootUrl)
+                .Replace('/', Path.DirectorySeparatorChar)
+                .TrimStart(_rootPath)
+                .TrimStart(Path.DirectorySeparatorChar);
+
+            return relativePath;
+        }
+
+        public override string GetFullPath(string path)
         {
             return !path.StartsWith(_rootPath) 
                 ? Path.Combine(_rootPath, path)
                 : path;
         }
 
-        public string GetUrl(string path)
+        public override string GetUrl(string path)
         {
             return _rootUrl.TrimEnd("/") + "/" + path
                 .TrimStart(Path.DirectorySeparatorChar)
                 .Replace(Path.DirectorySeparatorChar, '/');
         }
 
-        public DateTimeOffset GetLastModified(string path)
+        public override DateTimeOffset GetLastModified(string path)
         {
             return DirectoryExists(path) 
                 ? new DirectoryInfo(GetFullPath(path)).LastWriteTimeUtc 
                 : new FileInfo(GetFullPath(path)).LastWriteTimeUtc;
         }
 
-        public DateTimeOffset GetCreated(string path)
+        public override DateTimeOffset GetCreated(string path)
         {
             return DirectoryExists(path) 
                 ? Directory.GetCreationTimeUtc(GetFullPath(path)) 
@@ -164,14 +175,6 @@ namespace Umbraco.Core.IO
         }
 
         #region Helper Methods
-
-        protected string MakeRelativePath(string fullPath)
-        {
-            return fullPath.Substring(_rootPath.Length).TrimStart(new char[1]
-            {
-                Path.DirectorySeparatorChar
-            });
-        }
 
         protected virtual void EnsureDirectory(string path)
         {

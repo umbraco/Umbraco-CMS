@@ -136,6 +136,35 @@ namespace Umbraco.Tests.IO
              _fileSystem.DeleteFile("test.txt");
         }
 
+        [Test]
+        public void Can_Convert_Full_Path_And_Url_To_Relative_Path()
+        {
+            _fileSystem.AddFile("test.txt", CreateStream());
+
+            var url = _fileSystem.GetUrl("test.txt");
+            var fullPath = _fileSystem.GetFullPath("test.txt");
+
+            Assert.AreNotEqual("test.txt", url);
+            Assert.AreNotEqual("test.txt", fullPath);
+
+            Assert.AreEqual("test.txt", _fileSystem.GetRelativePath(url));
+            Assert.AreEqual("test.txt", _fileSystem.GetRelativePath(fullPath));
+
+            _fileSystem.DeleteFile("test.txt");
+        }
+
+        [Test]
+        public void Can_Get_Size()
+        {
+            var stream = CreateStream();
+            var streamLength = stream.Length;
+            _fileSystem.AddFile("test.txt", stream);
+
+            Assert.AreEqual(streamLength, _fileSystem.GetSize("test.txt"));
+
+            _fileSystem.DeleteFile("test.txt");
+        }
+
         #region Helper Methods
 
         protected Stream CreateStream(string contents = null)

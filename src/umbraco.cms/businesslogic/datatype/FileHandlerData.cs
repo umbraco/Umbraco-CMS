@@ -58,7 +58,7 @@ namespace umbraco.cms.businesslogic.datatype
                                               ? Path.Combine(PropertyId.ToString(), name)
                                               : PropertyId + "-" + name;
 
-                        fileName = Path.Combine(SystemDirectories.Media, fileName);
+                        //fileName = Path.Combine(SystemDirectories.Media, fileName);
                         um = UmbracoFile.Save(fileStream, fileName);
 
                         if (um.SupportsResizing)
@@ -111,7 +111,7 @@ namespace umbraco.cms.businesslogic.datatype
                             }
                         }
 
-                        base.Value = um.LocalName;
+                        base.Value = um.Url;
                     }
                     else
                     {

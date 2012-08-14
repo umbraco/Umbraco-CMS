@@ -51,6 +51,7 @@
     <Compile Include="DelegateEqualityComparer.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="IfExtensions.cs" />
+    <Compile Include="IO\AbstractFileSystem.cs" />
     <Compile Include="IO\FileSystemProvider.cs" />
     <Compile Include="IO\FileSystemProviderManager.cs" />
     <Compile Include="IO\IFileSystem.cs" />
