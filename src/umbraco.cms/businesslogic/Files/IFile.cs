@@ -9,7 +9,10 @@ namespace umbraco.cms.businesslogic.Files
     {
         string Filename { get; }
         string Extension { get; }
+        [Obsolete("LocalName is obsolete, please use URL instead", false)]
         string LocalName { get; }
+        string Path { get; }
+        string Url { get; }
         bool SupportsResizing { get; }
         string GetFriendlyName();
         System.Tuple<int, int> GetDimensions();

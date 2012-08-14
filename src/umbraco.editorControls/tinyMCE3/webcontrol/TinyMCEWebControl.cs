@@ -326,10 +326,9 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                         tempTag += " " + ide.Key.ToString() + "=\"" + ide.Value.ToString() + "\"";
 
                     // Find the original filename, by removing the might added width and height
+                    // NH, 4.8.1 - above replaced by loading the right media file from the db later!
                     orgSrc =
-                        IOHelper.ResolveUrl(orgSrc.Replace(
-                            "_" + helper.FindAttribute(ht, "width") + "x" + helper.FindAttribute(ht, "height"), "").
-                            Replace("%20", " "));
+                        IOHelper.ResolveUrl(orgSrc.Replace("%20", " "));
 
                     // Check for either id or guid from media
                     string mediaId = getIdFromSource(orgSrc, localMediaPath);
@@ -358,15 +357,10 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                     {
                         try
                         {
-                            // Check extention
-                            if (imageMedia.getProperty("umbracoExtension").Value.ToString() != orgSrc.Substring(orgSrc.LastIndexOf(".") + 1, orgSrc.Length - orgSrc.LastIndexOf(".") - 1))
-                                orgSrc = orgSrc.Substring(0, orgSrc.LastIndexOf(".") + 1) +
-                                         imageMedia.getProperty("umbracoExtension").Value.ToString();
-
                             // Format the tag
                             tempTag = tempTag + " rel=\"" +
                                       imageMedia.getProperty("umbracoWidth").Value.ToString() + "," +
-                                      imageMedia.getProperty("umbracoHeight").Value.ToString() + "\" src=\"" + orgSrc +
+                                      imageMedia.getProperty("umbracoHeight").Value.ToString() + "\" src=\"" + IOHelper.ResolveUrl(imageMedia.getProperty("umbracoFile").Value.ToString()) +
                                       "\"";
                             tempTag += "/>";
 

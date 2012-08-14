@@ -8,6 +8,8 @@ using System.Xml;
 using System.Text.RegularExpressions;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic;
 
@@ -171,7 +173,6 @@ namespace umbraco
 
 			if (ValidateRequest)
 				Request.ValidateInput();
-
 			// handle the infamous umbDebugShowTrace, etc
 			Page.Trace.IsEnabled &= GlobalSettings.DebugMode && !String.IsNullOrWhiteSpace(Request["umbDebugShowTrace"]);
 		}

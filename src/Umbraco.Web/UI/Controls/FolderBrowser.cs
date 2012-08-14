@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Web;
+using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using umbraco.BasePages;
+using umbraco.BusinessLogic;
 using umbraco.IO;
 using umbraco.cms.businesslogic.media;
 
@@ -113,7 +116,7 @@ namespace Umbraco.Web.UI.Controls
             sb.Append("<div class='filter'>Filter: <input type='text' data-bind=\"value: filterTerm, valueUpdate: 'afterkeydown'\" /></div>");
 
             // Create thumbnails container
-            sb.Append("<ul class='items' data-bind='foreach: items'>" +
+            sb.Append("<ul class='items' data-bind='foreach: filtered'>" +
                       "<li data-bind=\"attr: { 'data-id': Id, 'data-order': $index() }, css: { selected: selected() }, event: { mousedown: toggleSelected, contextmenu: toggleSelected }\"><div><span class='img'><img data-bind='attr: { src: ThumbnailUrl }' /></span><span data-bind='text: Name'></span></div></li>" +
                       "</ul>");
 

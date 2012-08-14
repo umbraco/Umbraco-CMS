@@ -45,19 +45,21 @@ namespace Umbraco.Web.WebServices
 
                 var fileUrl = fileProp != null ? fileProp.Value.ToString() : "";
                 var thumbUrl = ThumbnailProvidersResolver.Current.GetThumbnailUrl(fileUrl);
-                
-                data.Add(new
+                var item = new
                 {
                     Id = child.Id,
                     Path = child.Path,
                     Name = child.Text,
+                    Tags = string.Join(",", Tag.GetTags(child.Id).Select(x => x.TagCaption)),
                     MediaTypeAlias = child.ContentType.Alias,
                     EditUrl = string.Format("editMedia.aspx?id={0}", child.Id),
                     FileUrl = fileUrl,
-                    ThumbnailUrl = !string.IsNullOrEmpty(thumbUrl) 
-                        ? thumbUrl 
+                    ThumbnailUrl = !string.IsNullOrEmpty(thumbUrl)
+                        ? thumbUrl
                         : IOHelper.ResolveUrl(SystemDirectories.Umbraco + "/images/thumbnails/" + child.ContentType.Thumbnail)
-                });
+                };
+
+                data.Add(item);
             }
 
             return new JavaScriptSerializer().Serialize(data);
@@ -81,14 +83,6 @@ namespace Umbraco.Web.WebServices
             return new JavaScriptSerializer().Serialize(new
             {
                 success = true
-            });
-        }
-
-        [RestExtensionMethod(returnXml = false)]
-        public static string Upload(int parentId)
-        {
-            return new JavaScriptSerializer().Serialize(new {
-                success = true 
             });
         }
 

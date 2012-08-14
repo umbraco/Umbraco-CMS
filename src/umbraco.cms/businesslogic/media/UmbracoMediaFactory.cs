@@ -32,16 +32,13 @@ namespace umbraco.cms.businesslogic.media
 
         public Media HandleMedia(int parentNodeId, PostedMediaFile postedFile, User user)
         {
-            return HandleMedia(parentNodeId, postedFile, user, false);
-        }
-
-        public Media HandleMedia(int parentNodeId, PostedMediaFile postedFile, User user, bool replaceExisting)
-        {
             // Check to see if a file exists
             Media media;
-            string mediaName = extractTitleFromFileName(postedFile.FileName);
+            string mediaName = !string.IsNullOrEmpty(postedFile.DisplayName)
+                ? postedFile.DisplayName
+                : extractTitleFromFileName(postedFile.FileName);
 
-            if (replaceExisting && TryFindExistingMedia(parentNodeId, postedFile.FileName, out media))
+            if (postedFile.ReplaceExisting && TryFindExistingMedia(parentNodeId, postedFile.FileName, out media))
             {
                 // Do nothing as existing media is returned
             }
@@ -59,6 +56,14 @@ namespace umbraco.cms.businesslogic.media
             media.XmlGenerate(new XmlDocument());
 
             return media;
+        }
+
+        [Obsolete("Use HandleMedia(int, PostedMediaFile, User) and set the ReplaceExisting property on PostedMediaFile instead")]
+        public Media HandleMedia(int parentNodeId, PostedMediaFile postedFile, User user, bool replaceExisting)
+        {
+            postedFile.ReplaceExisting = replaceExisting;
+
+            return HandleMedia(parentNodeId, postedFile, user);
         }
 
         public abstract void DoHandleMedia(Media media, PostedMediaFile uploadedFile, User user);

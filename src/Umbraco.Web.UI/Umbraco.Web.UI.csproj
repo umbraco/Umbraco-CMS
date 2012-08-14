@@ -271,6 +271,9 @@
     <Content Include="config\log4net.config" />
     <Content Include="config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
+    <Content Include="config\FileSystemProviders.config" />
+    <Content Include="config\FileSystemProviders.Release.config">
+      <DependentUpon>FileSystemProviders.config</DependentUpon>
     </Content>
     <None Include="config\xsltExtensions.Release.config">
       <DependentUpon>xsltExtensions.config</DependentUpon>

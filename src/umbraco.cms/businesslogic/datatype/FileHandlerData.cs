@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
 using umbraco.cms.businesslogic.Files;
@@ -32,13 +33,13 @@ namespace umbraco.cms.businesslogic.datatype
                     if (value is HttpPostedFile)
                     {
                         var file = value as HttpPostedFile;
-                        name = file.FileName;
+                        name = SafeFileName(file.FileName.Substring(file.FileName.LastIndexOf(IOHelper.DirSepChar) + 1, file.FileName.Length - file.FileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
                         fileStream = file.InputStream;
                     }
                     else if (value is HttpPostedFileBase)
                     {
                         var file = value as HttpPostedFileBase;
-                        name = file.FileName;
+                        name = SafeFileName(file.FileName.Substring(file.FileName.LastIndexOf(IOHelper.DirSepChar) + 1, file.FileName.Length - file.FileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
                         fileStream = file.InputStream;
                     }
                     else if (value is HttpPostedFileWrapper)
@@ -57,7 +58,7 @@ namespace umbraco.cms.businesslogic.datatype
                                               ? Path.Combine(PropertyId.ToString(), name)
                                               : PropertyId + "-" + name;
 
-                        fileName = Path.Combine(SystemDirectories.Media, fileName);
+                        //fileName = Path.Combine(SystemDirectories.Media, fileName);
                         um = UmbracoFile.Save(fileStream, fileName);
 
                         if (um.SupportsResizing)
@@ -83,31 +84,34 @@ namespace umbraco.cms.businesslogic.datatype
 
                         // check for auto fill of other properties (width, height, extension and filesize)
                         string propertyTypeAlias = new Property(PropertyId).PropertyType.Alias;
-                        XmlNode uploadFieldConfigNode =
-                            UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
-                                string.Format("uploadField [@alias = \"{0}\"]", propertyTypeAlias));
-                        if (uploadFieldConfigNode != null)
+                        if (UmbracoSettings.ImageAutoFillImageProperties != null)
                         {
-                            // get the current document
-                            Content content = Content.GetContentFromVersion(Version);
-                            // only add dimensions to web images
-                            if (um.SupportsResizing)
+                            XmlNode uploadFieldConfigNode =
+                                UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
+                                    string.Format("uploadField [@alias = \"{0}\"]", propertyTypeAlias));
+                            if (uploadFieldConfigNode != null)
                             {
-                                updateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias",
-                                                      um.GetDimensions().Item1);
-                                updateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias",
-                                                      um.GetDimensions().Item2);
+                                // get the current document
+                                Content content = Content.GetContentFromVersion(Version);
+                                // only add dimensions to web images
+                                if (um.SupportsResizing)
+                                {
+                                    updateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias",
+                                                          um.GetDimensions().Item1);
+                                    updateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias",
+                                                          um.GetDimensions().Item2);
+                                }
+                                else
+                                {
+                                    updateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", String.Empty);
+                                    updateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", String.Empty);
+                                }
+                                updateContentProperty(uploadFieldConfigNode, content, "lengthFieldAlias", um.Length);
+                                updateContentProperty(uploadFieldConfigNode, content, "extensionFieldAlias", um.Extension);
                             }
-                            else
-                            {
-                                updateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", String.Empty);
-                                updateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", String.Empty);
-                            }
-                            updateContentProperty(uploadFieldConfigNode, content, "lengthFieldAlias", um.Length);
-                            updateContentProperty(uploadFieldConfigNode, content, "extensionFieldAlias", um.Extension);
                         }
 
-                        base.Value = um.LocalName;
+                        base.Value = um.Url;
                     }
                     else
                     {
@@ -126,21 +130,36 @@ namespace umbraco.cms.businesslogic.datatype
             }
         }
 
+        /// <summary>
+        /// Check to see if filename passed has any special chars in it and strips them to create a safe filename.  Used to overcome an issue when Umbraco is used in IE in an intranet environment.
+        /// </summary>
+        /// <param name="filePath">The filename passed to the file handler from the upload field.</param>
+        /// <returns>A safe filename without any path specific chars.</returns>
+        private string SafeFileName(string filePath)
+        {
+            if (!String.IsNullOrEmpty(filePath))
+                return Regex.Replace(filePath, @"[^a-zA-Z0-9\-\.\/\:]{1}", "_");
+            return String.Empty;
+        }
+
         private void clearRelatedValues()
         {
             string propertyTypeAlias = new Property(PropertyId).PropertyType.Alias;
-            XmlNode uploadFieldConfigNode =
-                UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
-                    string.Format("uploadField [@alias = \"{0}\"]", propertyTypeAlias));
-            if (uploadFieldConfigNode != null)
+            if (UmbracoSettings.ImageAutoFillImageProperties != null)
             {
-                // get the current document
-                Content content = Content.GetContentFromVersion(Version);
-                // only add dimensions to web images
-                updateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", String.Empty);
-                updateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", String.Empty);
-                updateContentProperty(uploadFieldConfigNode, content, "lengthFieldAlias", String.Empty);
-                updateContentProperty(uploadFieldConfigNode, content, "extensionFieldAlias", String.Empty);
+                XmlNode uploadFieldConfigNode =
+                    UmbracoSettings.ImageAutoFillImageProperties.SelectSingleNode(
+                        string.Format("uploadField [@alias = \"{0}\"]", propertyTypeAlias));
+                if (uploadFieldConfigNode != null)
+                {
+                    // get the current document
+                    Content content = Content.GetContentFromVersion(Version);
+                    // only add dimensions to web images
+                    updateContentProperty(uploadFieldConfigNode, content, "widthFieldAlias", String.Empty);
+                    updateContentProperty(uploadFieldConfigNode, content, "heightFieldAlias", String.Empty);
+                    updateContentProperty(uploadFieldConfigNode, content, "lengthFieldAlias", String.Empty);
+                    updateContentProperty(uploadFieldConfigNode, content, "extensionFieldAlias", String.Empty);
+                }
             }
         }
 

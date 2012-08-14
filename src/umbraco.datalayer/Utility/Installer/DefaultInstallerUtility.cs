@@ -171,7 +171,6 @@ namespace umbraco.DataLayer.Utility.Installer
         #endregion
 
         #region Protected Methods
-
 		
 		protected virtual void NewInstall(string sql)
 		{

@@ -7,7 +7,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
-
+using umbraco.cms.businesslogic.property;
 using umbraco.interfaces;
 using umbraco.editorControls;
 using umbraco.cms.businesslogic.datatype;
@@ -81,6 +81,14 @@ namespace umbraco.editorControls.userControlGrapper
                     catch (MissingMethodException) { }
                 }
                 
+            }
+
+            // Add property data to the usercontrol if it supports it
+            // TODO: Find the best way to test for an interface!
+		    IUsercontrolPropertyData propertyData = oControl as IUsercontrolPropertyData;
+            if (propertyData != null)
+            {
+                propertyData.PropertyObject = new Property(((usercontrolData)_data).PropertyId);
             }
 
             this.Controls.Add(oControl);

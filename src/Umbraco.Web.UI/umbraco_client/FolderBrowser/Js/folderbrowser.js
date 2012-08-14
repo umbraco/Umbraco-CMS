@@ -4,7 +4,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 (function ($, Base, window, document, undefined) {
 
     var itemMappingOptions = {
-        'create': function(o) {
+        'create': function (o) {
             var item = ko.mapping.fromJS(o.data);
             item.selected = ko.observable(false);
             item.toggleSelected = function (itm, e) {
@@ -115,6 +115,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 items: ko.observableArray([]),
                 queued: ko.observableArray([])
             });
+            
+            self._viewModel.filtered = ko.computed(function () {
+                return self._viewModel.items();
+                return ko.utils.arrayFilter(this.items(), function (item) {
+                    return item.Name().toLowerCase().indexOf(self._viewModel.filterTerm()) > -1 || 
+                        item.Tags().toLowerCase().indexOf(self._viewModel.filterTerm()) > -1;
+                });
+            }, self._viewModel);
 
             self._viewModel.selected = ko.computed(function() {
                 return ko.utils.arrayFilter(this.items(), function(item) {
@@ -162,10 +170,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             var overlay = $("<div class='upload-overlay'>" +
                 "<div class='upload-panel'>" +
                 instructions +
-                "<form action=\"/base/FolderBrowserService/Upload/" + this._parentId + "\" method=\"post\" enctype=\"multipart/form-data\">" +
+                "<form action=\"/umbraco/webservices/MediaUploader.ashx?format=json&action=upload&parentNodeId=" + this._parentId + "\" method=\"post\" enctype=\"multipart/form-data\">" +
                 "<input id='fileupload' type='file' name='file' multiple>" +
                 "<input type='hidden' name='name' />" +
-                "<input type='hidden' name='overwriteExisting' />" +
+                "<input type='hidden' name='replaceExisting' />" +
                 "</form>" +
                 "<ul class='queued' data-bind='foreach: queued'><li>" +
                 "<input type='text' class='label' data-bind=\"value: name, valueUpdate: 'afterkeydown', enable: progress() == 0\" />" +
@@ -173,8 +181,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 "<a href='' data-bind='click: cancel'><img src='images/delete.png' /></a>" +
                 "</li></ul>" +
                 "<button class='button upload' data-bind='enable: queued().length > 0'>Upload</button>" +
-                "<input type='checkbox' id='overwriteExisting' />" +
-                "<label for='overwriteExisting'>Overwrite existing?</label>" +
+                "<input type='checkbox' id='replaceExisting' />" +
+                "<label for='replaceExisting'>Overwrite existing?</label>" +
                 "<a href='#' class='cancel'>Cancel</a>" +
                 "</div>" +
                 "</div>");
@@ -226,6 +234,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 },
                 onProgress: function (data) {
                     data.context.progress(data.progress);
+                },
+                onDoneAll: function () {
+                    self._getChildNodes();
                 }
             });
 
@@ -235,8 +246,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 $("#fileupload").fileUploader("uploadAll");
             });
 
-            $(".upload-overlay #overwriteExisting").click(function() {
-                $("input[name=overwriteExisting]").val($(this).is(":checked"));
+            $(".upload-overlay #replaceExisting").click(function() {
+                $("input[name=replaceExisting]").val($(this).is(":checked"));
             });
 
             $(".upload-overlay .cancel").click(function (e) {
@@ -301,14 +312,15 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 start: function (e, ui) {
                     // Add dragging class to container
                     $(".umbFolderBrowser .items").addClass("ui-sortable-dragging");
-
-                    $(".umbFolderBrowser .items .ui-sortable-helper span").removeAttr("data-bind").text("Moving 1 item");
                 },
-                update: function (e, ui) {
+                update: function (e, ui)
+                {
+                    // Can't sort when filtered so just return
+                    if (self._viewModel.filterTerm().length > 0)
+                        return;
+                    
                     //var oldIndex = self._viewModel.items.indexOf(self._viewModel.tempItem());
                     var newIndex = ui.item.index();
-
-                    //TODO: Don't allow sorting on a filtered view
 
                     $(".umbFolderBrowser .items .selected").sort(function (a,b) {
                         return parseInt($(a).data("order")) > parseInt($(b).data("order")) ? 1 : -1;
@@ -327,7 +339,15 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 stop: function (e, ui) {
                     // Remove dragging class from container
                     $(".umbFolderBrowser .items").removeClass("ui-sortable-dragging");
-                    //TODO: Update on server
+                    
+                    if (self._viewModel.filterTerm().length > 0) {
+                        $(this).sortable("cancel");
+                        alert("Can't sort items which have been filtered");
+                    }
+                    else
+                    {
+                        //TODO: Update on server
+                    }
                 }
             });
         },

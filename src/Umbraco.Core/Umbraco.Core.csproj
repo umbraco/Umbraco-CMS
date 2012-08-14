@@ -35,7 +35,7 @@
       <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.configuration" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
@@ -51,6 +51,9 @@
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Attempt.cs" />
+    <Compile Include="Configuration\FileSystemProviderElement.cs" />
+    <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
+    <Compile Include="Configuration\FileSystemProvidersSection.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="DocumentPropertyExtensions.cs" />
     <Compile Include="Models\IDocument.cs" />
@@ -95,6 +98,11 @@
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="IfExtensions.cs" />
     <Compile Include="PluginManager.cs" />
+    <Compile Include="IO\AbstractFileSystem.cs" />
+    <Compile Include="IO\FileSystemProvider.cs" />
+    <Compile Include="IO\FileSystemProviderManager.cs" />
+    <Compile Include="IO\IFileSystem.cs" />
+    <Compile Include="IO\PhysicalFileSystem.cs" />
     <Compile Include="IThumbnailProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringAliasCaseType.cs" />

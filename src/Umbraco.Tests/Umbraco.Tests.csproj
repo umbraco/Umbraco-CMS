@@ -79,6 +79,8 @@
     <Compile Include="Stubs\FakeRoutesCache.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
+    <Compile Include="IO\AbstractFileSystemTests.cs" />
+    <Compile Include="IO\PhysicalFileSystemTests.cs" />
     <Compile Include="PartialTrust\AbstractPartialTrustFixture.cs" />
     <Compile Include="PartialTrust\IPartialTrustFixture.cs" />
     <Compile Include="PartialTrust\PartialTrustFixtureFixture.cs" />

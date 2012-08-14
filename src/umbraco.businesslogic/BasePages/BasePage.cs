@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Web;
 using System.Linq;
+using System.Web.Security;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.IO;
@@ -227,7 +228,26 @@ namespace umbraco.BasePages
                 if (StateHelper.Cookies.HasCookies && StateHelper.Cookies.UserContext.HasValue)
                     return StateHelper.Cookies.UserContext.GetValue();
                 else
-                    return "";
+                {
+                    try
+                    {
+                        string encTicket = StateHelper.Cookies.UserContext.GetValue();
+                        if (!String.IsNullOrEmpty(encTicket))
+                            return FormsAuthentication.Decrypt(encTicket).UserData;
+                    }
+                    catch (HttpException ex)
+                    {
+                        // we swallow this type of exception as it happens if a legacy (pre 4.8.1) cookie is set
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        // we swallow this one because it's 99.99% certaincy is legacy based. We'll still log it, though
+                        Log.Instance.AddException(ex);
+
+                    }
+                }
+
+                return "";
             }
             set
             {
@@ -238,8 +258,28 @@ namespace umbraco.BasePages
                     if (StateHelper.Cookies.UserContext.HasValue)
                         StateHelper.Cookies.ClearAll();
 
-                    // Create new cookie.
+                    if (!String.IsNullOrEmpty(value))
+                    {
+                        FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(1,
+                        value,
+                        DateTime.Now,
+                        DateTime.Now.AddDays(1),
+                        false,
+                        value,
+                        FormsAuthentication.FormsCookiePath);
+
+                        // Encrypt the ticket.
+                        string encTicket = FormsAuthentication.Encrypt(ticket);
+
+
+                        // Create new cookie.
                     StateHelper.Cookies.UserContext.SetValue(value, 1);
+                        
+
+                    } else
+                    {
+                        StateHelper.Cookies.UserContext.Clear();
+                    }
                 }
             }
         }
