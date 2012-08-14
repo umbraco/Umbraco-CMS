@@ -3313,9 +3313,6 @@
     <None Include="web.Template.SONIC.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
     </None>
-    <None Include="web.Template.PETER-PC.Debug.config">
-      <DependentUpon>Web.Template.config</DependentUpon>
-    </None>
     <None Include="web.Template.PETER-MAC.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
     </None>
@@ -3346,6 +3343,9 @@
     <None Include="web.Template.MBP13-PC.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
     </None>
+	<None Include="web.Template.PeterGregory-PC.Debug.config">
+		<DependentUpon>Web.Template.config</DependentUpon>
+	</None>
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />

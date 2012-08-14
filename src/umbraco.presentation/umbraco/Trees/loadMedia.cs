@@ -31,7 +31,7 @@ namespace umbraco
     [Tree("media", "media", "Media")]
     public class loadMedia : BaseMediaTree
     {
-
+        private Media m_media;
         private int _StartNodeID;
         /// <summary>
 		/// Create the linkable data types list and add the DataTypeUploadField guid to it.
@@ -52,15 +52,64 @@ namespace umbraco
 			: base(application)
 		{
             _StartNodeID = CurrentUser.StartMediaId;
-		}		
+		}
+
+
+        /// <summary>
+        /// Returns the Document object of the starting node for the current User. This ensures
+        /// that the Document object is only instantiated once.
+        /// </summary>
+        protected Media StartNode
+        {
+            get
+            {
+                if (m_media == null)
+                {
+                    m_media = new Media(StartNodeID);
+                }
+
+                if (!m_media.Path.Contains(CurrentUser.StartMediaId.ToString()))
+                {
+                    var media = new Media(CurrentUser.StartMediaId);
+                    if (!string.IsNullOrEmpty(media.Path) && media.Path.Contains(this.StartNodeID.ToString()))
+                    {
+                        m_media = media;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+
+                return m_media;
+            }
+        }
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
-        {            
-
-            if (this.IsDialog)
-                rootNode.Action = "javascript:openMedia(-1);";
+        {
+            if (StartNodeID != -1)
+            {
+                Media doc = StartNode;
+                if (doc == null)
+                {
+                    rootNode = new NullTree(this.app).RootNode;
+                    rootNode.Text = "You do not have permission for this content tree";
+                    rootNode.HasChildren = false;
+                    rootNode.Source = string.Empty;
+                }
+                else
+                {
+                    rootNode = CreateNode(doc);
+                }
+            }
             else
-                rootNode.Action = "javascript:" + ClientTools.Scripts.OpenDashboard("Media");
+            {
+                if (this.IsDialog)
+                    rootNode.Action = "javascript:openMedia(-1);";
+                else
+                    rootNode.Action = "javascript:" + ClientTools.Scripts.OpenDashboard("Media");
+            }
+        
         }
 
         protected override void CreateRootNodeActions(ref List<IAction> actions)
