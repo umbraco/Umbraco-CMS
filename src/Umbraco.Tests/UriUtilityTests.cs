@@ -14,6 +14,8 @@ namespace Umbraco.Tests
 		[TestCase("http://localhost/home/Sub1", "http://localhost/home/sub1")]
 		[TestCase("http://localhost/home/Sub1.aspx", "http://localhost/home/sub1")]
 		[TestCase("http://localhost/home/Sub1.aspx?test=blah", "http://localhost/home/sub1?test=blah")]
+		[TestCase("http://Localhost/home/sub1.aspx/blah", "http://localhost/home/sub1/blah")]
+		[TestCase("http://Localhost/home/sub1.aspx/blah?test=asdf", "http://localhost/home/sub1/blah?test=asdf")]
 		public void Uri_To_Umbraco(string url, string expected)
 		{
 			var uri = new Uri(url);

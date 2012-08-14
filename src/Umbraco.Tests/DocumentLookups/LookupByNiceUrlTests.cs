@@ -16,7 +16,7 @@ namespace Umbraco.Tests.DocumentLookups
 		[TestCase("/Sub1")]
 		[TestCase("/sub1")]
 		[TestCase("/sub1.aspx")]
-		public void Match_Document_By_Directory_Url_Hide_Top_Level(string urlAsString)
+		public void Match_Document_By_Url_Hide_Top_Level(string urlAsString)
 		{
 			var template = Template.MakeNew("test", new User(0));
 			var routingContext = GetRoutingContext(urlAsString, template);
@@ -36,7 +36,7 @@ namespace Umbraco.Tests.DocumentLookups
 		[TestCase("/home/Sub1")]
 		[TestCase("/Home/Sub1")] //different cases
 		[TestCase("/home/Sub1.aspx")]
-		public void Match_Document_By_Directory_Url(string urlAsString)
+		public void Match_Document_By_Url(string urlAsString)
 		{
 			var template = Template.MakeNew("test", new User(0));
 			var routingContext = GetRoutingContext(urlAsString, template);

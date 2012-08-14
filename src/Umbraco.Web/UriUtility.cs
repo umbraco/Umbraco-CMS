@@ -76,14 +76,18 @@ namespace Umbraco.Web
 			//we need to check if the path is /default.aspx because this will occur when using a 
 			//web server pre IIS 7 when requesting the root document
 			//if this is the case we need to change it to '/'
-			if (path.EndsWith("default.aspx", StringComparison.InvariantCultureIgnoreCase))
+			if (path.StartsWith("/default.aspx", StringComparison.InvariantCultureIgnoreCase))
 			{
-				path = path.Substring(0, path.Length - "default.aspx".Length);
+				path = "/" + path.Substring("/default.aspx".Length, path.Length - "/default.aspx".Length);
 			}
     		if (path != "/")
     			path = path.TrimEnd('/');
-			if (path.EndsWith(".aspx"))
-				path = path.Substring(0, path.Length - ".aspx".Length);
+
+			//if any part of the path contains .aspx, replace it with nothing.
+			//sometimes .aspx is not at the end since we might have /home/sub1.aspx/customtemplate
+			path = path.Replace(".aspx", "");
+			//if (path.EndsWith(".aspx"))
+			//    path = path.Substring(0, path.Length - ".aspx".Length);
 
     		return uri.Rewrite(path);
     	}

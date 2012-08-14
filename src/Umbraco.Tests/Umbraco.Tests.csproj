@@ -63,6 +63,7 @@
     <Compile Include="DocumentLookups\BaseRoutingTest.cs" />
     <Compile Include="DocumentLookups\LookupByAliasTests.cs" />
     <Compile Include="DocumentLookups\LookupByIdTests.cs" />
+    <Compile Include="DocumentLookups\LookupByNiceUrlAndTemplateTests.cs" />
     <Compile Include="DocumentLookups\LookupByNiceUrlTests.cs" />
     <Compile Include="DocumentLookups\RenderRouteHandlerTests.cs" />
     <Compile Include="DocumentLookups\RouteTestExtensions.cs" />
