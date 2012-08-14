@@ -646,7 +646,7 @@ namespace umbraco.cms.businesslogic.web
         {
             ArrayList docs = new ArrayList();
             IRecordsReader dr =
-                SqlHelper.ExecuteReader("select distinct nodeId from cmsDocument where newest = 1 and not expireDate is null and expireDate <= @today",
+                SqlHelper.ExecuteReader("select distinct nodeId from cmsDocument where published = 1 and not expireDate is null and expireDate <= @today",
                                         SqlHelper.CreateParameter("@today", DateTime.Now));
             while (dr.Read())
                 docs.Add(dr.GetInt("nodeId"));

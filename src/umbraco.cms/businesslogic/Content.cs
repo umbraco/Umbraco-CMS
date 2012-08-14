@@ -512,6 +512,9 @@ namespace umbraco.cms.businesslogic
 
             Guid newVersion = Guid.NewGuid();
             bool tempHasVersion = hasVersion();
+
+            // we need to ensure that a version in the db exist before we add related data
+            SqlHelper.ExecuteNonQuery("Insert into cmsContentVersion (ContentId,versionId) values (" + this.Id + ",'" + newVersion + "')");
             foreach (propertytype.PropertyType pt in this.ContentType.PropertyTypes)
             {
                 object oldValue = "";
@@ -526,7 +529,6 @@ namespace umbraco.cms.businesslogic
                 property.Property p = this.addProperty(pt, newVersion);
                 if (oldValue != null && oldValue.ToString() != "") p.Value = oldValue;
             }
-            SqlHelper.ExecuteNonQuery("Insert into cmsContentVersion (ContentId,versionId) values (" + this.Id + ",'" + newVersion + "')");
             this.Version = newVersion;
             return newVersion;
         }

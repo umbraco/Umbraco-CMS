@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using umbraco.BasePages;
@@ -61,61 +61,9 @@ function openMedia(id) {
 
             foreach (Media dd in docs)
             {
-                XmlTreeNode xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = dd.Id.ToString();
-                xNode.Text = dd.Text;
 
-                // Check for dialog behaviour
-                if (!this.IsDialog)
-                {
-                    if (!this.ShowContextMenu)
-                        xNode.Menu = null;
-                    xNode.Action = "javascript:openMedia(" + dd.Id + ");";
-                }
-                else
-                {
-                    if (this.ShowContextMenu)
-                        xNode.Menu = new List<IAction>(new IAction[] { ActionRefresh.Instance });
-                    else
-                        xNode.Menu = null;
-                    if (this.DialogMode == TreeDialogModes.fulllink)
-                    {
-                        string nodeLink = GetLinkValue(dd, dd.Id.ToString());
-                        if (!String.IsNullOrEmpty(nodeLink))
-                        {
-                            xNode.Action = "javascript:openMedia('" + nodeLink + "');";
-                        }
-                        else
-                        {
-                            if (dd.ContentType.Alias.ToLower() == "folder")
-                            {
-                                xNode.Action = "javascript:jQuery('.umbTree #" + dd.Id.ToString() + "').click();";
-                            }
-                            else
-                            {
-                                xNode.Action = null;
-                                xNode.Style.DimNode();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        xNode.Action = "javascript:openMedia('" + dd.Id.ToString() + "');";
-                    }
-                }
-
-				xNode.HasChildren = dd.HasChildren;
-                if (this.IsDialog)
-                    xNode.Source = GetTreeDialogUrl(dd.Id);
-                else
-                    xNode.Source = GetTreeServiceUrl(dd.Id);                    
-
-                if (dd.ContentType != null)
-                {
-                    xNode.Icon = dd.ContentType.IconUrl;
-                    xNode.OpenIcon = dd.ContentType.IconUrl;                    
-                }
-
+                XmlTreeNode xNode = CreateNode(dd);
+                
                 OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 if (xNode != null)
                 {
@@ -147,6 +95,60 @@ function openMedia(id) {
 				}
 			}
             return "";
+        }
+
+        protected XmlTreeNode CreateNode(Media dd)
+        {
+
+            XmlTreeNode xNode = XmlTreeNode.Create(this);
+            xNode.NodeID = dd.Id.ToString();
+            xNode.Text = dd.Text;
+
+            // Check for dialog behaviour
+            if (!this.IsDialog)
+            {
+                if (!this.ShowContextMenu)
+                    xNode.Menu = null;
+                xNode.Action = "javascript:openMedia(" + dd.Id + ");";
+            }
+            else
+            {
+                if (this.ShowContextMenu)
+                    xNode.Menu = new List<IAction>(new IAction[] { ActionRefresh.Instance });
+                else
+                    xNode.Menu = null;
+                if (this.DialogMode == TreeDialogModes.fulllink)
+                {
+                    string nodeLink = GetLinkValue(dd, dd.Id.ToString());
+                    if (!String.IsNullOrEmpty(nodeLink))
+                    {
+                        xNode.Action = "javascript:openMedia('" + nodeLink + "');";
+                    }
+                    else
+                    {
+                        xNode.Action = null;
+                        xNode.DimNode();
+                    }
+                }
+                else
+                {
+                    xNode.Action = "javascript:openMedia('" + dd.Id.ToString() + "');";
+                }
+            }
+
+            xNode.HasChildren = dd.HasChildren;
+            if (this.IsDialog)
+                xNode.Source = GetTreeDialogUrl(dd.Id);
+            else
+                xNode.Source = GetTreeServiceUrl(dd.Id);
+
+            if (dd.ContentType != null)
+            {
+                xNode.Icon = dd.ContentType.IconUrl;
+                xNode.OpenIcon = dd.ContentType.IconUrl;
+            }
+
+            return xNode;
         }
 
 		/// <summary>

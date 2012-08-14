@@ -26,42 +26,40 @@
         * @param {string} url Absolute URL to where the plugin is located.
         */
         init: function (ed) {
-            var t = this;
-
-            ed.plugins.contextmenu.onContextMenu.add(function (th, menu, event) {
-
-                var keys = UmbClientMgr.uiKeys();
-
-                $.each(menu.items, function (idx, el) {
+            if (ed.plugins.contextmenu) {
                 
-                    switch (el.settings.cmd) {
-                        case "Cut":
-                            el.settings.title = keys['defaultdialogs_cut'];
-                            break;
-                        case "Copy":
-                            el.settings.title = keys['general_copy'];
-                            break;
-                        case "Paste":
-                            el.settings.title = keys['defaultdialogs_paste'];
-                            break;
-                        case "mceAdvLink":
-                        case "mceLink":
-                            el.settings.title = keys['defaultdialogs_insertlink'];
-                            break;
-                        case "UnLink":
-                            el.settings.title = keys['relatedlinks_removeLink'];
-                            break;
-                        case "mceImage":
-                            el.settings.title = keys['defaultdialogs_insertimage'];
-                            el.settings.cmd = "mceUmbimage";
-                            break;
-                    }
+                ed.plugins.contextmenu.onContextMenu.add(function (th, menu, event) {
 
+                    var keys = UmbClientMgr.uiKeys();
+
+                    $.each(menu.items, function (idx, el) {
+
+                        switch (el.settings.cmd) {
+                            case "Cut":
+                                el.settings.title = keys['defaultdialogs_cut'];
+                                break;
+                            case "Copy":
+                                el.settings.title = keys['general_copy'];
+                                break;
+                            case "Paste":
+                                el.settings.title = keys['defaultdialogs_paste'];
+                                break;
+                            case "mceAdvLink":
+                            case "mceLink":
+                                el.settings.title = keys['defaultdialogs_insertlink'];
+                                break;
+                            case "UnLink":
+                                el.settings.title = keys['relatedlinks_removeLink'];
+                                break;
+                            case "mceImage":
+                                el.settings.title = keys['defaultdialogs_insertimage'];
+                                el.settings.cmd = "mceUmbimage";
+                                break;
+                        }
+                    });
                 });
-
-            });
+            }
         }
-
     });
 
     // Register plugin

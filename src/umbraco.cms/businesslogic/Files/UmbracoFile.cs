@@ -174,7 +174,7 @@ namespace umbraco.cms.businesslogic.Files
 
             string fileNameThumb = DoResize(width, height, 0, String.Empty);
 
-            return fileNameThumb.Substring(IO.IOHelper.MapPath(IO.SystemDirectories.Root).Length);
+            return fileNameThumb.Substring(IO.IOHelper.MapPath(IO.SystemDirectories.Root).Length-1);
         }
 
         public string Resize(int maxWidthHeight, string fileNameAddition)
@@ -197,7 +197,7 @@ namespace umbraco.cms.businesslogic.Files
             string fileNameThumb = String.IsNullOrEmpty(fileNameAddition) ?
                 string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", _fullFilePath.Substring(0, _fullFilePath.LastIndexOf("."))) :
                 string.Format("{0}_{1}.jpg", _fullFilePath.Substring(0, _fullFilePath.LastIndexOf(".")), fileNameAddition);
-            generateThumbnail(
+            fileNameThumb = generateThumbnail(
                 image,
                 maxWidthHeight,
                 width,
@@ -206,7 +206,7 @@ namespace umbraco.cms.businesslogic.Files
                 _extension,
                 fileNameThumb,
                 maxWidthHeight == 0
-                );
+                ).FileName;
             image.Dispose();
             return fileNameThumb;
         }
@@ -220,7 +220,7 @@ namespace umbraco.cms.businesslogic.Files
         }
 
 
-        private System.Tuple<int, int> generateThumbnail(System.Drawing.Image image, int maxWidthHeight, int fileWidth, int fileHeight, string fullFilePath, string ext, string thumbnailFileName, bool useFixedDimensions)
+        private ResizedImage generateThumbnail(System.Drawing.Image image, int maxWidthHeight, int fileWidth, int fileHeight, string fullFilePath, string ext, string thumbnailFileName, bool useFixedDimensions)
         {
             // Generate thumbnail
             float f = 1;
@@ -267,14 +267,35 @@ namespace umbraco.cms.businesslogic.Files
             ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 90L);
 
             // Save the new image using the dimensions of the image
-            bp.Save(thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL", string.Format("{0}x{1}", widthTh, heightTh)), codec, ep);
+            string newFileName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL",
+                                                           string.Format("{0}x{1}", widthTh, heightTh));
+            bp.Save(newFileName, codec, ep);
             bp.Dispose();
             g.Dispose();
 
-            return new System.Tuple<int, int>(widthTh, heightTh);
+            return new ResizedImage(widthTh, heightTh, newFileName);
 
         }
 
 
+    }
+
+    internal class ResizedImage
+    {
+        public ResizedImage()
+        {
+            
+        }
+
+        public ResizedImage(int width, int height, string fileName)
+        {
+            Width = width;
+            Height = height;
+            FileName = fileName;
+        }
+
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public string FileName { get; set; }
     }
 }
