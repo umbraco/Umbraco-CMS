@@ -268,13 +268,12 @@
     <None Include="config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
     </None>
-    <Content Include="config\log4net.config" />
-    <Content Include="config\log4net.Release.config">
+		<None Include="config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
-    <Content Include="config\FileSystemProviders.config" />
-    <Content Include="config\FileSystemProviders.Release.config">
+		</None>
+		<None Include="config\FileSystemProviders.Release.config">
       <DependentUpon>FileSystemProviders.config</DependentUpon>
-    </Content>
+    </None>
     <None Include="config\xsltExtensions.Release.config">
       <DependentUpon>xsltExtensions.config</DependentUpon>
     </None>
@@ -282,7 +281,6 @@
       <DependentUpon>UrlRewriting.config</DependentUpon>
     </None>
     <None Include="config\umbracoSettings.Release.config">
-      <SubType>Designer</SubType>
       <DependentUpon>umbracoSettings.config</DependentUpon>
     </None>
     <None Include="config\trees.Release.config">
@@ -1742,11 +1740,11 @@
     <Content Include="config\metablogConfig.config" />
     <Content Include="config\restExtensions.config" />
     <Content Include="config\tinyMceConfig.config" />
-    <Content Include="config\umbracoSettings.config">
-      <SubType>Designer</SubType>
-    </Content>
+		<Content Include="config\umbracoSettings.config"/>
     <Content Include="config\xsltExtensions.config" />
     <Content Include="config\UrlRewriting.config" />
+		<Content Include="config\log4net.config" />
+		<Content Include="config\FileSystemProviders.config" />
     <Content Include="web.config">
       <SubType>Designer</SubType>
     </Content>
