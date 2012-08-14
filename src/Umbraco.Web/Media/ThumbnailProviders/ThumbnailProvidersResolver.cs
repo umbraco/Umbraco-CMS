@@ -24,6 +24,9 @@ namespace Umbraco.Web.Media.ThumbnailProviders
 
 		}
 
+		/// <summary>
+		/// Return the providers
+		/// </summary>
 		public IEnumerable<IThumbnailProvider> Providers
 		{
 			get 

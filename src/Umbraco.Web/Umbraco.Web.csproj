@@ -238,6 +238,10 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ApplicationEventsResolver.cs" />
+    <Compile Include="IApplicationEvents.cs" />
+    <Compile Include="umbraco.presentation\LibraryCacheRefresher.cs" />
+    <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />
     <Compile Include="XmlContentStore.cs" />
     <Compile Include="ContentStoreResolver.cs" />
     <Compile Include="DocumentNotFoundHttpHandler.cs" />

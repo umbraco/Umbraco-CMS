@@ -5,6 +5,6 @@ using System.Text;
 
 namespace umbraco.interfaces
 {
-    public interface IApplicationStartupHandler
+	public interface IApplicationStartupHandler
     { }
 }

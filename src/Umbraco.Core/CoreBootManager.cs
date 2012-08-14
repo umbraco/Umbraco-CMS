@@ -21,6 +21,8 @@ namespace Umbraco.Core
 		private bool _isStarted = false;
 		private bool _isComplete = false;
 
+		protected ApplicationContext ApplicationContext { get; private set; }
+
 		public virtual IBootManager Initialize()
 		{
 			if (_isInitialized)
@@ -30,7 +32,7 @@ namespace Umbraco.Core
 			_timer = DisposableTimer.Start(x => LogHelper.Info<CoreBootManager>("Umbraco application startup complete" + " (took " + x + "ms)"));
 
 			//create the ApplicationContext
-			ApplicationContext.Current = new ApplicationContext()
+			ApplicationContext = ApplicationContext.Current = new ApplicationContext()
 			{
 				IsReady = true	// fixme
 			};

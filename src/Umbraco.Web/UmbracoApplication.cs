@@ -14,7 +14,12 @@ namespace Umbraco.Web
 	/// </summary>
 	public class UmbracoApplication : System.Web.HttpApplication
 	{
-		private readonly IBootManager _bootManager = new WebBootManager();
+		public UmbracoApplication()
+		{
+			_bootManager = new WebBootManager(this);
+		}
+
+		private readonly IBootManager _bootManager;
 
 		public static event EventHandler ApplicationStarting;		
 		public static event EventHandler ApplicationStarted;

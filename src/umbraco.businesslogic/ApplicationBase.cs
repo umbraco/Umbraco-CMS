@@ -14,7 +14,7 @@ namespace umbraco.BusinessLogic
     /// To use, inhirite the ApplicationBase Class and add an empty constructor. 
     /// </summary>
     [Obsolete("ApplicationBase has been depricated. Please use ApplicationStartupHandler instead.")]
-    public abstract class ApplicationBase : ApplicationStartupHandler
+    public abstract class ApplicationBase : IApplicationStartupHandler
     { }
 
 }

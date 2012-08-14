@@ -5,6 +5,8 @@ using umbraco.interfaces;
 
 namespace Umbraco.Core
 {
+	
+
 	/// <summary>
 	/// A resolver to return all ICacheRefresher objects
 	/// </summary>

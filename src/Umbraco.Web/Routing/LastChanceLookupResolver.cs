@@ -10,8 +10,8 @@ namespace Umbraco.Web.Routing
 	{
 	
 		internal LastChanceLookupResolver(IDocumentLastChanceLookup lastChanceLookup)
+			: base(lastChanceLookup)
 		{
-			Value = lastChanceLookup;
 		} 
 	
 		/// <summary>

@@ -122,6 +122,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="IApplication.cs" />
     <Compile Include="IApplicationStartupHandler.cs" />
     <Compile Include="IProperty.cs" />
     <Compile Include="ITag.cs" />
@@ -132,7 +133,6 @@
     <Compile Include="IAction.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IApplication.cs" />
     <Compile Include="ICacheRefresher.cs">
       <SubType>Code</SubType>
     </Compile>

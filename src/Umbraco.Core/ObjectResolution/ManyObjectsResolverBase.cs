@@ -13,12 +13,15 @@ namespace Umbraco.Core.ObjectResolution
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		
 		#region Constructors
+	
+		
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an empty list of objects.
 		/// </summary>
 		/// <param name="scope">The lifetime scope of instantiated objects, default is per Application</param>
 		protected ManyObjectsResolverBase(ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
 		{
+			CanResolveBeforeFrozen = false;
 			if (scope == ObjectLifetimeScope.HttpRequest)
 			{
 				if (HttpContext.Current == null)
@@ -39,6 +42,8 @@ namespace Umbraco.Core.ObjectResolution
 		/// <param name="httpContext"></param>
 		protected ManyObjectsResolverBase(HttpContextBase httpContext)
 		{
+			CanResolveBeforeFrozen = false;
+			if (httpContext == null) throw new ArgumentNullException("httpContext");
 			LifetimeScope = ObjectLifetimeScope.HttpRequest;
 			CurrentHttpContext = httpContext;
 			InstanceTypes = new List<Type>();
@@ -69,6 +74,11 @@ namespace Umbraco.Core.ObjectResolution
 		#endregion
 
 		/// <summary>
+		/// used internally for special resolvers to be able to resolve objects before resolution is frozen.
+		/// </summary>
+		internal bool CanResolveBeforeFrozen { get; set; }
+
+		/// <summary>
 		/// Returns the list of Types registered that instances will be created from
 		/// </summary>
 		protected List<Type> InstanceTypes { get; private set; }
@@ -92,7 +102,7 @@ namespace Umbraco.Core.ObjectResolution
 			get
 			{				
 				//We cannot return values unless resolution is locked
-				if (!Resolution.IsFrozen)
+				if (!CanResolveBeforeFrozen && !Resolution.IsFrozen)
 					throw new InvalidOperationException("Values cannot be returned until Resolution is frozen");
 
 				switch (LifetimeScope)
@@ -139,7 +149,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// Removes a type.
 		/// </summary>
 		/// <param name="value">The type to remove.</param>
-		public void RemoveType(Type value)
+		public virtual void RemoveType(Type value)
 		{	
 			EnsureCorrectType(value);
 			using (new WriteLock(_lock))
@@ -161,7 +171,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// Adds a Type to the end of the list.
 		/// </summary>
 		/// <param name="value">The object to be added.</param>
-		public void AddType(Type value)
+		public virtual void AddType(Type value)
 		{
 			EnsureCorrectType(value);
 			using (var l = new UpgradeableReadLock(_lock))
@@ -188,7 +198,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// <summary>
 		/// Clears the list.
 		/// </summary>
-		public void Clear()
+		public virtual void Clear()
 		{
 			using (new WriteLock(_lock))
 			{
@@ -201,7 +211,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// </summary>
 		/// <param name="index">The zero-based index at which the object should be inserted.</param>
 		/// <param name="value">The object to insert.</param>
-		public void InsertType(int index, Type value)
+		public virtual void InsertType(int index, Type value)
 		{
 			EnsureCorrectType(value);
 			using (var l = new UpgradeableReadLock(_lock))

@@ -15,8 +15,16 @@ namespace Umbraco.Web
 	/// </summary>
 	internal class WebBootManager : CoreBootManager
 	{
-		public void Boot()
+		private readonly UmbracoApplication _umbracoApplication;
+
+		public WebBootManager(UmbracoApplication umbracoApplication)
 		{
+			_umbracoApplication = umbracoApplication;
+			if (umbracoApplication == null) throw new ArgumentNullException("umbracoApplication");
+		}
+
+		public void Boot()
+		{			
 			InitializeResolvers();
 		}
 
@@ -50,8 +58,51 @@ namespace Umbraco.Web
 				);
 			route.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
 
-			//find and initialize the application startup handlers
-			ApplicationStartupHandler.RegisterHandlers();
+			//find and initialize the application startup handlers, we need to initialize this resolver here because
+			//it is a special resolver where they need to be instantiated first before any other resolvers in order to bind to 
+			//events and to call their events during bootup.
+			//ApplicationStartupHandler.RegisterHandlers();
+			ApplicationEventsResolver.Current = new ApplicationEventsResolver(
+				PluginManager.Current.ResolveApplicationStartupHandlers());
+
+			//set the special flag to let us resolve before frozen resolution
+			ApplicationEventsResolver.Current.CanResolveBeforeFrozen = true;
+
+			//now we need to call the initialize methods
+			ApplicationEventsResolver.Current.ApplicationEventHandlers
+				.ForEach(x => x.OnApplicationInitialized(_umbracoApplication, ApplicationContext));
+
+			return this;
+		}
+
+		/// <summary>
+		/// Ensure that the OnApplicationStarting methods of the IApplicationEvents are called
+		/// </summary>
+		/// <param name="afterStartup"></param>
+		/// <returns></returns>
+		public override IBootManager Startup(Action<ApplicationContext> afterStartup)
+		{
+			base.Startup(afterStartup);
+
+			//call OnApplicationStarting of each application events handler
+			ApplicationEventsResolver.Current.ApplicationEventHandlers
+				.ForEach(x => x.OnApplicationStarting(_umbracoApplication, ApplicationContext));
+
+			return this;
+		}
+
+		/// <summary>
+		/// Ensure that the OnApplicationStarted methods of the IApplicationEvents are called
+		/// </summary>
+		/// <param name="afterComplete"></param>
+		/// <returns></returns>
+		public override IBootManager Complete(Action<ApplicationContext> afterComplete)
+		{
+			base.Complete(afterComplete);
+
+			//call OnApplicationStarting of each application events handler
+			ApplicationEventsResolver.Current.ApplicationEventHandlers
+				.ForEach(x => x.OnApplicationStarted(_umbracoApplication, ApplicationContext));
 
 			return this;
 		}

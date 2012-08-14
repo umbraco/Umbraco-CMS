@@ -9,7 +9,7 @@ using umbraco.interfaces;
 
 namespace umbraco.BusinessLogic
 {
-    public class ApplicationTreeRegistrar : ApplicationStartupHandler
+    public class ApplicationTreeRegistrar : IApplicationStartupHandler
     {
         private ISqlHelper _sqlHelper;
         protected ISqlHelper SqlHelper

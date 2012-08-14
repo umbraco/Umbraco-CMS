@@ -5,10 +5,11 @@ using System.Linq;
 using System.Web;
 using umbraco.IO;
 using umbraco.businesslogic;
+using umbraco.interfaces;
 
 namespace umbraco.presentation
 {
-    public class EnsureSystemPathsApplicationStartupHandler : ApplicationStartupHandler
+    public class EnsureSystemPathsApplicationStartupHandler : IApplicationStartupHandler
     {
         public EnsureSystemPathsApplicationStartupHandler()
         {
