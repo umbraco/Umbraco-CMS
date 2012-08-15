@@ -299,6 +299,7 @@ namespace umbraco.cms.businesslogic
         private string _description;
         private string _thumbnail;
         private int m_masterContentType = 0;
+        private bool _isContainerContentType = false;
 
         private List<int> m_AllowedChildContentTypeIDs = null;
         private List<TabI> m_VirtualTabs = null;
@@ -308,6 +309,23 @@ namespace umbraco.cms.businesslogic
         #endregion
 
         #region Public Properties
+
+        /// <summary>
+        /// Get or Sets the Container status of the Content Type. A Container Content Type doesn't show its children in the tree,
+        /// but instead adds a tab when edited showing its children in a grid
+        /// </summary>
+        public bool IsContainerContentType
+        {
+            get { return _isContainerContentType; } 
+            set
+            {
+                _isContainerContentType = value;
+                SqlHelper.ExecuteNonQuery(
+                                          "update cmsContentType set isContainerContentType = @isContainerContentType where nodeId = @id",
+                                          SqlHelper.CreateParameter("@isContainerContentType", value),
+                                          SqlHelper.CreateParameter("@id", Id));
+            } 
+        }
 
         /// <summary>
         /// Gets or sets the description.
