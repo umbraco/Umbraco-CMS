@@ -334,28 +334,6 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Gets a value indicating whether umbraco shouldn't add X-Umbraco-Version to the http header.
-        /// </summary>
-        /// <value><c>true</c> if umbraco will not add header; otherwise, <c>false</c>.</value>
-        public static bool RemoveUmbracoVersionHeader
-        {
-            get
-            {
-                try
-                {
-                    bool result;
-                    if (bool.TryParse(GetKey("/settings/requestHandler/removeUmbracoVersionHeader"), out result))
-                        return result;
-                    return false;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-
-        /// <summary>
         /// This will add a trailing slash (/) to urls when in directory url mode
         /// NOTICE: This will always return false if Directory Urls in not active
         /// </summary>

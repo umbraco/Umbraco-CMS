@@ -1,4 +1,5 @@
 using System.Web.Mvc;
+using Umbraco.Core;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
@@ -33,15 +34,15 @@ namespace Umbraco.Web.Mvc
 
 		public dynamic CurrentPage { get; private set; }
 
-		//private ICultureDictionary _cultureDictionary;
-		//public string GetDictionary(string key)
-		//{
-		//    if (_cultureDictionary == null)
-		//    {
-		//        _cultureDictionary = new UmbracoCultureDictionary();
-		//    }
-		//    return _cultureDictionary[key];
-		//}
+		private ICultureDictionary _cultureDictionary;
+		public string GetDictionary(string key)
+		{
+			if (_cultureDictionary == null)
+			{
+				_cultureDictionary = new UmbracoCultureDictionary();
+			}
+			return _cultureDictionary[key];
+		}
 
 		//private RazorLibraryCore _library;
 		//public RazorLibraryCore Library

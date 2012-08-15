@@ -39,10 +39,6 @@ namespace Umbraco.Web
 				return;
 			}
 
-			// add Umbraco's signature header
-			if (!UmbracoSettings.RemoveUmbracoVersionHeader)
-				httpContext.Response.AddHeader("X-Umbraco-Version", string.Format("{0}.{1}", GlobalSettings.VersionMajor, GlobalSettings.VersionMinor));
-
 			//create the legacy UmbracoContext
 			global::umbraco.presentation.UmbracoContext.Current = new global::umbraco.presentation.UmbracoContext(httpContext);
 
