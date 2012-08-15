@@ -239,6 +239,8 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationEventsResolver.cs" />
+    <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
+    <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
     <Compile Include="IApplicationEvents.cs" />
     <Compile Include="umbraco.presentation\LibraryCacheRefresher.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />

@@ -1,30 +1,55 @@
 ﻿using System;
 using System.Dynamic;
+using System.Globalization;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.language;
 
-namespace umbraco.MacroEngines {
+namespace umbraco.MacroEngines
+{
 
-    public class UmbracoCultureDictionary : DynamicObject, ICultureDictionary {
+	//TODO: This is legacy code now since we have the Umbraco.Core.Dictionary.ICultureDictionary and we have a DefaultCultureDictionary 
+	// in the Umbraco.Web project. We need to keep this here though because the new ICultureDictionary is different and 
+	// doesn't expose the 'Language' property because this is really poor design since the Language object exposes business
+	// logic methods and designers could just call 'Delete' on the object and it will actually remove it from the database!! yikes.
 
-        public string this[string key] {
-            get {
-                try {
-                    return new Dictionary.DictionaryItem(key).Value(Language.id);
-                } catch (Exception) { }
-                return string.Empty;
-            }
-        }
+	[Obsolete("This class has been superceded by Umbraco.Web.Dictionary.DefaultCultureDictionary")]
+	public class UmbracoCultureDictionary : DynamicObject, ICultureDictionary, Umbraco.Core.Dictionary.ICultureDictionary
+	{
 
-        public Language Language {
-            get { return Language.GetByCultureCode(System.Threading.Thread.CurrentThread.CurrentUICulture.Name); }
-        }
+		public string this[string key]
+		{
+			get
+			{
+				try
+				{
+					return new Dictionary.DictionaryItem(key).Value(Language.id);
+				}
+				catch (Exception)
+				{
+					return string.Empty;
+				}
+			}
+		}
 
-        public override bool TryGetMember(GetMemberBinder binder, out object result) {
-            result = this[binder.Name];
-            return true;
-        }
+		CultureInfo Umbraco.Core.Dictionary.ICultureDictionary.Culture
+		{
+			get
+			{
+				return new CultureInfo(Language.CultureAlias);
+			}
+		}
 
-    }
+		public Language Language
+		{
+			get { return Language.GetByCultureCode(System.Threading.Thread.CurrentThread.CurrentUICulture.Name); }
+		}
+
+		public override bool TryGetMember(GetMemberBinder binder, out object result)
+		{
+			result = this[binder.Name];
+			return true;
+		}
+
+	}
 
 }

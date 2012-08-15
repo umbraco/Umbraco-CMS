@@ -55,8 +55,10 @@
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
     <Compile Include="CoreBootManager.cs" />
+    <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
+    <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="DocumentPropertyExtensions.cs" />
-    <Compile Include="ICultureDictionary.cs" />
+    <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Models\IDocument.cs" />
     <Compile Include="Models\IDocumentProperty.cs" />
     <Compile Include="ActionsResolver.cs" />

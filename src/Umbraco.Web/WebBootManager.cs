@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Dictionary;
+using Umbraco.Web.Dictionary;
 using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
@@ -151,6 +153,9 @@ namespace Umbraco.Web
 
 			ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
 				PluginManager.Current.ResolveThumbnailProviders());
+
+			CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
+				new DefaultCultureDictionaryFactory());
 		}
 
 	}
