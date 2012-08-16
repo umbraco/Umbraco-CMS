@@ -264,7 +264,9 @@
     <None Include="config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
     </None>
-    <Content Include="config\FileSystemProviders.config" />
+    <Content Include="config\FileSystemProviders.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="config\FileSystemProviders.Release.config">
       <DependentUpon>FileSystemProviders.config</DependentUpon>
     </Content>
