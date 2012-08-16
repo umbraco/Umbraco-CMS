@@ -117,7 +117,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             });
             
             self._viewModel.filtered = ko.computed(function () {
-                return self._viewModel.items();
+                //return self._viewModel.items();
                 return ko.utils.arrayFilter(this.items(), function (item) {
                     return item.Name().toLowerCase().indexOf(self._viewModel.filterTerm()) > -1 || 
                         item.Tags().toLowerCase().indexOf(self._viewModel.filterTerm()) > -1;
@@ -133,6 +133,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             self._viewModel.selectedIds = ko.computed(function() {
                 var ids = [];
                 ko.utils.arrayForEach(this.selected(), function(item) {
+                    ids.push(item.Id());
+                });
+                return ids;
+            }, self._viewModel);
+
+            self._viewModel.itemIds = ko.computed(function () {
+                var ids = [];
+                ko.utils.arrayForEach(this.items(), function (item) {
                     ids.push(item.Id());
                 });
                 return ids;
@@ -346,7 +354,16 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     }
                     else
                     {
-                        //TODO: Update on server
+                        $.post(self._opts.umbracoPath + "/webservices/nodeSorter.asmx/UpdateSortOrder", {
+                                ParentId : self._parentId, 
+                                SortOrder: self._viewModel.itemIds().join(","),
+                                app: "media"
+                        }, function (data, textStatus) {
+                            if(textStatus == "error") {
+                                alert("Oops. Could not update sort order");
+                                self._getChildNodes();
+                            }
+                        }, "json");
                     }
                 }
             });
