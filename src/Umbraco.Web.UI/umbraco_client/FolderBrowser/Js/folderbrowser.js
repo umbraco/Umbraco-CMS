@@ -20,6 +20,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 this.selected(true);
             };
+            item.edit = function () {
+                //TODO: Could do with a better way of getting to the parent control
+                $(".umbFolderBrowser").folderBrowserApi()._editItem(this.Id());
+            };
             return item;
         }
     };
