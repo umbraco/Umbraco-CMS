@@ -20,16 +20,16 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Initializes a new instance of the <see cref="NiceUrlProvider"/> class.
 		/// </summary>
-		/// <param name="contentStore">The content store.</param>
+		/// <param name="publishedContentStore">The content store.</param>
 		/// <param name="umbracoContext">The Umbraco context.</param>
-		public NiceUrlProvider(IContentStore contentStore, UmbracoContext umbracoContext)
+		public NiceUrlProvider(IPublishedContentStore publishedContentStore, UmbracoContext umbracoContext)
         {
             _umbracoContext = umbracoContext;
-			_contentStore = contentStore;
+			_publishedContentStore = publishedContentStore;
         }
 
         private readonly UmbracoContext _umbracoContext;
-		private readonly IContentStore _contentStore;
+		private readonly IPublishedContentStore _publishedContentStore;
 
         // note: this could be a parameter...
         const string UrlNameProperty = "@urlName";
@@ -86,7 +86,7 @@ namespace Umbraco.Web.Routing
 			}
 			else
 			{
-				var node = _contentStore.GetDocumentById(_umbracoContext, nodeId);
+				var node = _publishedContentStore.GetDocumentById(_umbracoContext, nodeId);
 				if (node == null)
 					return "#"; // legacy wrote to the log here...
 
@@ -95,9 +95,9 @@ namespace Umbraco.Web.Routing
 				domainUri = DomainUriAtNode(id, current);
 				while (domainUri == null && id > 0)
 				{
-					pathParts.Add(_contentStore.GetDocumentProperty(_umbracoContext, node, UrlNameProperty));
+					pathParts.Add(_publishedContentStore.GetDocumentProperty(_umbracoContext, node, UrlNameProperty));
 					node = node.Parent; // set to parent node
-					id = int.Parse(_contentStore.GetDocumentProperty(_umbracoContext, node, "@id")); // will be -1 or 1234
+					id = int.Parse(_publishedContentStore.GetDocumentProperty(_umbracoContext, node, "@id")); // will be -1 or 1234
 					domainUri = id > 0 ? DomainUriAtNode(id, current) : null;
 	            }
 
@@ -146,7 +146,7 @@ namespace Umbraco.Web.Routing
 			}
 			else
 			{
-				var node = _contentStore.GetDocumentById(_umbracoContext, nodeId);
+				var node = _publishedContentStore.GetDocumentById(_umbracoContext, nodeId);
 				if (node == null)
 					return new string[] { "#" }; // legacy wrote to the log here...
 
@@ -155,9 +155,9 @@ namespace Umbraco.Web.Routing
 				domainUris = DomainUrisAtNode(id, current);
 				while (!domainUris.Any() && id > 0)
 				{
-					pathParts.Add(_contentStore.GetDocumentProperty(_umbracoContext, node, UrlNameProperty));
+					pathParts.Add(_publishedContentStore.GetDocumentProperty(_umbracoContext, node, UrlNameProperty));
 					node = node.Parent; //set to parent node
-					id = int.Parse(_contentStore.GetDocumentProperty(_umbracoContext, node, "@id")); // will be -1 or 1234
+					id = int.Parse(_publishedContentStore.GetDocumentProperty(_umbracoContext, node, "@id")); // will be -1 or 1234
 					domainUris = id > 0 ? DomainUrisAtNode(id, current) : new Uri[] { };
 				}
 

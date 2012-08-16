@@ -13,6 +13,13 @@ namespace Umbraco.Core
 	public static class TypeExtensions
 	{
 
+		public static object GetDefaultValue(this Type t)
+		{
+			return t.IsValueType
+			       	? Activator.CreateInstance(t)
+			       	: null;
+		}
+
 		/// <summary>
 		/// Checks if the type is an anonymous type
 		/// </summary>

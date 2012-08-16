@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Dynamics;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Mvc;
@@ -125,7 +126,7 @@ namespace Umbraco.Web
 		{
 			base.InitializeResolvers();
 
-			ContentStoreResolver.Current = new ContentStoreResolver(new XmlContentStore());
+			ContentStoreResolver.Current = new ContentStoreResolver(new XmlPublishedContentStore());
 
 			FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
 				//add all known factories, devs can then modify this list on application startup either by binding to events
@@ -156,6 +157,10 @@ namespace Umbraco.Web
 
 			CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
 				new DefaultCultureDictionaryFactory());
+
+			//This exists only because the new business logic classes aren't created yet and we want Dynamics in the Core project,
+			//see the note in the DynamicNodeDataSourceResolver.cs class
+			DynamicNodeDataSourceResolver.Current = new DynamicNodeDataSourceResolver(new DefaultDynamicNodeDataSource());
 		}
 
 	}

@@ -2,7 +2,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web
 {
-	internal interface IContentStore
+	internal interface IPublishedContentStore
 	{
 		IDocument GetDocumentById(UmbracoContext umbracoContext, int nodeId);
 		IDocument GetDocumentByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null);

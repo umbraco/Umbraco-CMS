@@ -9,11 +9,11 @@ using umbraco.BusinessLogic;
 namespace Umbraco.Tests
 {
 	[TestFixture]
-	public class ContentStoreTests
+	public class PublishContentStoreTests
 	{
 		private FakeHttpContextFactory _httpContextFactory;
 		private UmbracoContext _umbracoContext;
-		private XmlContentStore _contentStore;
+		private XmlPublishedContentStore _publishedContentStore;
 
 		[SetUp]
 		public void SetUp()
@@ -56,7 +56,7 @@ namespace Umbraco.Tests
 					return xDoc;
 				};
 
-			_contentStore = new XmlContentStore();
+			_publishedContentStore = new XmlPublishedContentStore();
 			
 		}
 
@@ -74,7 +74,7 @@ namespace Umbraco.Tests
 		[TestCase("/home/Sub1", 1173)] //test different cases
 		public void Get_Node_By_Route(string route, int nodeId)
 		{
-			var result = _contentStore.GetDocumentByRoute(_umbracoContext, route, false);
+			var result = _publishedContentStore.GetDocumentByRoute(_umbracoContext, route, false);
 			Assert.IsNotNull(result);
 			Assert.AreEqual(nodeId, result.Id);
 		}
@@ -84,7 +84,7 @@ namespace Umbraco.Tests
 		[TestCase("/Sub1", 1173)]
 		public void Get_Node_By_Route_Hiding_Top_Level_Nodes(string route, int nodeId)
 		{
-			var result = _contentStore.GetDocumentByRoute(_umbracoContext, route, true);
+			var result = _publishedContentStore.GetDocumentByRoute(_umbracoContext, route, true);
 			Assert.IsNotNull(result);
 			Assert.AreEqual(nodeId, result.Id);
 		}

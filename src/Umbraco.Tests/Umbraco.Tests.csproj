@@ -58,7 +58,8 @@
     <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
     <Compile Include="BusinessLogic\BaseTest.cs" />
     <Compile Include="CacheRefresherFactoryTests.cs" />
-    <Compile Include="ContentStoreTests.cs" />
+    <Compile Include="DynamicNodeTests.cs" />
+    <Compile Include="PublishContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
     <Compile Include="DocumentLookups\BaseRoutingTest.cs" />
     <Compile Include="DocumentLookups\LookupByAliasTests.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="DocumentLookups\RenderRouteHandlerTests.cs" />
     <Compile Include="DocumentLookups\RouteTestExtensions.cs" />
     <Compile Include="Stubs\TestControllerFactory.cs" />
+    <Compile Include="TestHelpers\BaseWebTest.cs" />
     <Compile Include="UriUtilityTests.cs" />
     <Compile Include="MacroFieldEditorsResolverTests.cs" />
     <Compile Include="MacroEngineFactoryTests.cs" />

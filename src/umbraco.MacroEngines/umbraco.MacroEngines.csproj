@@ -99,6 +99,7 @@
     <Compile Include="RazorDynamicNode\HtmlTagWrapperBase.cs" />
     <Compile Include="RazorDynamicNode\HtmlTagWrapperTextNode.cs" />
     <Compile Include="RazorDynamicNode\IRazorDataTypeModel.cs" />
+    <Compile Include="RazorDynamicNode\PredicateBuilder.cs" />
     <Compile Include="RazorDynamicNode\PropertyResult.cs" />
     <Compile Include="RazorDynamicNode\RazorDataTypeModel.cs" />
     <Compile Include="RazorDynamicNode\RazorLibraryCore.cs" />

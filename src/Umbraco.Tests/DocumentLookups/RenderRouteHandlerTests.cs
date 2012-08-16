@@ -43,7 +43,7 @@ namespace Umbraco.Tests.DocumentLookups
 			var routingContext = GetRoutingContext("~/dummy-page", template, routeData);
 			var docRequest = new DocumentRequest(routingContext.UmbracoContext.UmbracoUrl, routingContext)
 			{
-				Node = routingContext.ContentStore.GetDocumentById(routingContext.UmbracoContext, 1174),
+				Node = routingContext.PublishedContentStore.GetDocumentById(routingContext.UmbracoContext, 1174),
 				Template = template
 			};
 
@@ -67,7 +67,7 @@ namespace Umbraco.Tests.DocumentLookups
 			var routingContext = GetRoutingContext("~/dummy-page", template, routeData);
 			var docRequest = new DocumentRequest(routingContext.UmbracoContext.UmbracoUrl, routingContext)
 				{
-					Node = routingContext.ContentStore.GetDocumentById(routingContext.UmbracoContext, 1172), 
+					Node = routingContext.PublishedContentStore.GetDocumentById(routingContext.UmbracoContext, 1172), 
 					Template = template
 				};
 

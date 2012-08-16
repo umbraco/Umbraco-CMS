@@ -15,19 +15,19 @@ namespace Umbraco.Web.Routing
 		/// <param name="umbracoContext"> </param>
 		/// <param name="documentLookups">The document lookups resolver.</param>
 		/// <param name="documentLastChanceLookup"> </param>
-		/// <param name="contentStore">The content store.</param>
+		/// <param name="publishedContentStore">The content store.</param>
 		/// <param name="niceUrlResolver">The nice urls resolver.</param>
 		internal RoutingContext(
 			UmbracoContext umbracoContext,
 			IEnumerable<IDocumentLookup> documentLookups,
 			IDocumentLastChanceLookup documentLastChanceLookup,
-            IContentStore contentStore,
+            IPublishedContentStore publishedContentStore,
 			NiceUrlProvider niceUrlResolver)
         {
 			this.UmbracoContext = umbracoContext;
 			this.DocumentLookups = documentLookups;
 			DocumentLastChanceLookup = documentLastChanceLookup;
-			this.ContentStore = contentStore;
+			this.PublishedContentStore = publishedContentStore;
         	this.NiceUrlProvider = niceUrlResolver;
         }
 
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Gets the content store.
 		/// </summary>
-		internal IContentStore ContentStore { get; private set; }
+		internal IPublishedContentStore PublishedContentStore { get; private set; }
 
 		/// <summary>
 		/// Gets the nice urls provider.

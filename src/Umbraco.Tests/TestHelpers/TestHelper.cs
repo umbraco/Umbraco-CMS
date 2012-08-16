@@ -4,11 +4,11 @@ using System.IO;
 using System.Reflection;
 using SqlCE4Umbraco;
 using log4net.Config;
-using umbraco;
 using umbraco.DataLayer;
+using GlobalSettings = umbraco.GlobalSettings;
 
 namespace Umbraco.Tests.TestHelpers
-{	
+{
 	/// <summary>
 	/// Common helper properties and methods useful to testing
 	/// </summary>

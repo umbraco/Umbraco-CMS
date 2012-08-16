@@ -13,7 +13,7 @@ namespace Umbraco.Web
 	/// <summary>
     /// An IContentStore which uses the Xml cache system to return data
     /// </summary>
-    internal class XmlContentStore : IContentStore
+    internal class XmlPublishedContentStore : IPublishedContentStore
     {
 
     	private IDocument ConvertToDocument(XmlNode xmlNode)

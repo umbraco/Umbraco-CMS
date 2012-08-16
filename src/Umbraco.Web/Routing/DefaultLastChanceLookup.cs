@@ -44,7 +44,7 @@ namespace Umbraco.Web.Routing
 				if (handler.Execute(docRequest.Uri.AbsolutePath) && handler.redirectID > 0)
                 {
                     //currentPage = umbracoContent.GetElementById(handler.redirectID.ToString());
-					currentPage = docRequest.RoutingContext.ContentStore.GetDocumentById(
+					currentPage = docRequest.RoutingContext.PublishedContentStore.GetDocumentById(
 						docRequest.RoutingContext.UmbracoContext,
 						handler.redirectID);
 
