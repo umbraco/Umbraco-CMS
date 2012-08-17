@@ -8,8 +8,13 @@ using System.Web;
 
 namespace umbraco.MacroEngines
 {
+
+	[Obsolete("This class has been superceded by Umbraco.Core.HtmlTagWrapper")]	
     public class HtmlTagWrapper : HtmlTagWrapperBase, IHtmlString
     {
+		//NOTE: We could not actually wrap these methods to proxy to the superceded class because many of these methods return
+		//instances of itself.
+
         public HtmlTagWrapper Parent;
         public List<HtmlTagWrapperBase> Children;
         public List<KeyValuePair<string, string>> Attributes;

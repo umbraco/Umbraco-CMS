@@ -6,36 +6,23 @@ using System.Dynamic;
 
 namespace umbraco.MacroEngines
 {
+
+	[Obsolete("This class has been superceded by Umbraco.Core.Dynamics.DynamicDictionary")]
     public class DynamicDictionary : DynamicObject
-    {
-        Dictionary<string, object> _dictionary;
+	{
+		private readonly Umbraco.Core.Dynamics.DynamicDictionary _internal;
+
         public DynamicDictionary(Dictionary<string, object> sourceItems)
         {
-            _dictionary = sourceItems;
+        	_internal = new Umbraco.Core.Dynamics.DynamicDictionary(sourceItems);
         }
         public override bool TrySetMember(SetMemberBinder binder, object value)
         {
-            if (_dictionary.ContainsKey(binder.Name))
-            {
-                _dictionary[binder.Name.ToLower()] = value;
-            }
-            else
-            {
-                _dictionary.Add(binder.Name.ToLower(), value);
-            }
-            return true;
+        	return _internal.TrySetMember(binder, value);
         }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            if (_dictionary != null)
-            {
-                if (_dictionary.TryGetValue(binder.Name.ToLower(), out result))
-                {
-                    return true;
-                }
-            }
-            result = null;
-            return true;
+        	return _internal.TryGetMember(binder, out result);
         }
     }
 }

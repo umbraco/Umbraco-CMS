@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Dynamics
+﻿namespace Umbraco.Core
 {
     internal class HtmlTagWrapperTextNode : IHtmlTagWrapper
     {

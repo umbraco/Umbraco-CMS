@@ -425,77 +425,77 @@ namespace Umbraco.Core.Dynamics
         public bool IsDescendant(DynamicXml other)
         {
             var ancestors = this.Ancestors();
-            return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null);
+            return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null);
         }
         public HtmlString IsDescendant(DynamicXml other, string valueIfTrue)
         {
             var ancestors = this.Ancestors();
-            return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue);
+			return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue);
         }
         public HtmlString IsDescendant(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
             var ancestors = this.Ancestors();
-            return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
+			return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
         }
         public bool IsDescendantOrSelf(DynamicXml other)
         {
             var ancestors = this.AncestorsOrSelf();
-            return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null);
+			return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null);
         }
         public HtmlString IsDescendantOrSelf(DynamicXml other, string valueIfTrue)
         {
             var ancestors = this.AncestorsOrSelf();
-            return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue);
+			return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue);
         }
         public HtmlString IsDescendantOrSelf(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
             var ancestors = this.AncestorsOrSelf();
-            return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
+			return IsHelper(n => ancestors.FirstOrDefault(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
         }
         public bool IsAncestor(DynamicXml other)
         {
             var descendants = this.Descendants();
-            return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null);
+			return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null);
         }
         public HtmlString IsAncestor(DynamicXml other, string valueIfTrue)
         {
             var descendants = this.Descendants();
-            return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue);
+			return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue);
         }
         public HtmlString IsAncestor(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
             var descendants = this.Descendants();
-            return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
+			return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
         }
         public bool IsAncestorOrSelf(DynamicXml other)
         {
             var descendants = this.DescendantsOrSelf();
-            return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null);
+			return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null);
         }
         public HtmlString IsAncestorOrSelf(DynamicXml other, string valueIfTrue)
         {
             var descendants = this.DescendantsOrSelf();
-            return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue);
+			return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue);
         }
         public HtmlString IsAncestorOrSelf(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
             var descendants = this.DescendantsOrSelf();
-            return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
+			return IsHelper(n => descendants.FirstOrDefault(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
         }
-        public List<DynamicXml> Descendants()
+        public IEnumerable<DynamicXml> Descendants()
         {
             return Descendants(n => true);
         }
-        public List<DynamicXml> Descendants(Func<XElement, bool> func)
+		public IEnumerable<DynamicXml> Descendants(Func<XElement, bool> func)
         {
             var flattenedNodes = this.BaseElement.Elements().Map(func, (XElement n) => { return n.Elements(); });
             return flattenedNodes.ToList().ConvertAll(n => new DynamicXml(n));
         }
-        public List<DynamicXml> DescendantsOrSelf()
+		public IEnumerable<DynamicXml> DescendantsOrSelf()
         {
             return DescendantsOrSelf(n => true);
         }
-        public List<DynamicXml> DescendantsOrSelf(Func<XElement, bool> func)
+		public IEnumerable<DynamicXml> DescendantsOrSelf(Func<XElement, bool> func)
         {
             var flattenedNodes = this.BaseElement.Elements().Map(func, (XElement n) => { return n.Elements(); });
             var list = new List<DynamicXml>();
@@ -503,11 +503,11 @@ namespace Umbraco.Core.Dynamics
             list.AddRange(flattenedNodes.ToList().ConvertAll(n => new DynamicXml(n)));
             return list;
         }
-        public List<DynamicXml> Ancestors()
+		public IEnumerable<DynamicXml> Ancestors()
         {
             return Ancestors(item => true);
         }
-        public List<DynamicXml> Ancestors(Func<XElement, bool> func)
+		public IEnumerable<DynamicXml> Ancestors(Func<XElement, bool> func)
         {
             List<XElement> ancestorList = new List<XElement>();
             var node = this.BaseElement;
@@ -538,11 +538,11 @@ namespace Umbraco.Core.Dynamics
             ancestorList.Reverse();
             return ancestorList.ConvertAll(item => new DynamicXml(item));
         }
-        public List<DynamicXml> AncestorsOrSelf()
+		public IEnumerable<DynamicXml> AncestorsOrSelf()
         {
             return AncestorsOrSelf(item => true);
         }
-        public List<DynamicXml> AncestorsOrSelf(Func<XElement, bool> func)
+		public IEnumerable<DynamicXml> AncestorsOrSelf(Func<XElement, bool> func)
         {
             List<XElement> ancestorList = new List<XElement>();
             var node = this.BaseElement;

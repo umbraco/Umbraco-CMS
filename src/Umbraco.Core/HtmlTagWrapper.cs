@@ -4,7 +4,7 @@ using System.Web.UI;
 using System.IO;
 using System.Web;
 
-namespace Umbraco.Core.Dynamics
+namespace Umbraco.Core
 {
     internal class HtmlTagWrapper : IHtmlTagWrapper, IHtmlString
     {
@@ -44,9 +44,9 @@ namespace Umbraco.Core.Dynamics
         public string Tag;
         public bool Visible;
 
-        public HtmlTagWrapper(string Tag)
+        public HtmlTagWrapper(string tag)
         {
-            this.Tag = Tag;
+            this.Tag = tag;
             this.Children = new List<IHtmlTagWrapper>();
             this.CssClasses = new List<string>();
             this.Attributes = new List<KeyValuePair<string, string>>();

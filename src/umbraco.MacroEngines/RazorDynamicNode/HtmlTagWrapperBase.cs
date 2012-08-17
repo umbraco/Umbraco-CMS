@@ -7,6 +7,8 @@ using System.Web;
 
 namespace umbraco.MacroEngines
 {
+
+	[Obsolete("This interface has been superceded by Umbraco.Core.IHtmlTagWrapper")]	
     public interface HtmlTagWrapperBase
     {
         void WriteToHtmlTextWriter(HtmlTextWriter html);

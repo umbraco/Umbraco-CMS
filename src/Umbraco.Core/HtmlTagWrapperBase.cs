@@ -1,6 +1,6 @@
 ﻿using System.Web.UI;
 
-namespace Umbraco.Core.Dynamics
+namespace Umbraco.Core
 {
     internal interface IHtmlTagWrapper
     {

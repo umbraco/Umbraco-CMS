@@ -82,9 +82,9 @@
     <Compile Include="Dynamics\ExtensionMethodFinder.cs" />
     <Compile Include="Dynamics\ExtensionMethods.cs" />
     <Compile Include="Dynamics\Grouping.cs" />
-    <Compile Include="Dynamics\HtmlTagWrapper.cs" />
-    <Compile Include="Dynamics\HtmlTagWrapperBase.cs" />
-    <Compile Include="Dynamics\HtmlTagWrapperTextNode.cs" />
+    <Compile Include="HtmlTagWrapper.cs" />
+    <Compile Include="HtmlTagWrapperBase.cs" />
+    <Compile Include="HtmlTagWrapperTextNode.cs" />
     <Compile Include="Dynamics\IDynamicNodeDataSource.cs" />
     <Compile Include="Dynamics\IRazorDataTypeModel.cs" />
     <Compile Include="Dynamics\ParseException.cs" />

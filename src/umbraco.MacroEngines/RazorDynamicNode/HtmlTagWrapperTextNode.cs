@@ -5,6 +5,8 @@ using System.Text;
 
 namespace umbraco.MacroEngines
 {
+
+	[Obsolete("This interface has been superceded by Umbraco.Core.HtmlTagWrapperTextNode")]	
     public class HtmlTagWrapperTextNode : HtmlTagWrapperBase
     {
         public string content;

@@ -11,156 +11,55 @@ using System.Web;
 
 namespace umbraco.MacroEngines
 {
+
+	[Obsolete("This class has been superceded by Umbraco.Core.Dynamics.DynamicXml")]	
     public class DynamicXml : DynamicObject, IEnumerable
-    {
-        public XElement BaseElement { get; set; }
+	{
+		private readonly Umbraco.Core.Dynamics.DynamicXml _inner;
+
+		public XElement BaseElement
+		{
+			get { return _inner.BaseElement; }
+			set { _inner.BaseElement = value; }
+		}
 
         public DynamicXml(XElement baseElement)
         {
-            this.BaseElement = baseElement;
+        	_inner = new Umbraco.Core.Dynamics.DynamicXml(baseElement);
         }
         public DynamicXml(string xml)
         {
-            var baseElement = XElement.Parse(xml);
-            this.BaseElement = baseElement;
+			_inner = new Umbraco.Core.Dynamics.DynamicXml(xml);
         }
         public DynamicXml(XPathNodeIterator xpni)
         {
-            if (xpni != null)
-            {
-                if (xpni.Current != null)
-                {
-                    var xml = xpni.Current.OuterXml;
-                    var baseElement = XElement.Parse(xml);
-                    this.BaseElement = baseElement;
-                }
-            }
+			_inner = new Umbraco.Core.Dynamics.DynamicXml(xpni);
         }
         public string InnerText
         {
-            get
-            {
-                return BaseElement.Value;
-            }
+            get { return _inner.InnerText; }
         }
         public string ToXml()
         {
-            return BaseElement.ToString(SaveOptions.DisableFormatting);
+        	return _inner.ToXml();
         }
         public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
         {
-            int index = 0;
-            if (indexes.Length > 0)
-            {
-                index = (int)indexes[0];
-                result = new DynamicXml(this.BaseElement.Elements().ToList()[index]);
-                return true;
-            }
-            return base.TryGetIndex(binder, indexes, out result);
+        	return _inner.TryGetIndex(binder, indexes, out result);
         }
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-            if (args.Length == 0 && binder.Name == "ToXml")
-            {
-                result = this.BaseElement.ToString();
-                return true;
-            }
-            if (args.Length == 1 && binder.Name == "XPath")
-            {
-                var elements = this.BaseElement.XPathSelectElements(args[0].ToString());
-                HandleIEnumerableXElement(elements, out result);
-                return true; //anyway
-            }
-            return base.TryInvokeMember(binder, args, out result);
+        	return _inner.TryInvokeMember(binder, args, out result);
         }
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            if (BaseElement == null || binder == null)
-            {
-                result = null;
-                return false;
-            }
-            //Go ahead and try to fetch all of the elements matching the member name, and wrap them
-            var elements = BaseElement.Elements(binder.Name);
-            if (elements.Count() == 0 && BaseElement.Name == "root" && BaseElement.Elements().Count() == 1)
-            {
-                //no elements matched, lets try first child
-                elements = BaseElement.Elements().ElementAt(0).Elements(binder.Name);
-            }
-            if (HandleIEnumerableXElement(elements, out result))
-            {
-                return true;
-            }
-            else
-            {
-
-                //Ok, so no elements matched, so lets try attributes
-                IEnumerable<string> attributes = BaseElement.Attributes(binder.Name).Select(attr => attr.Value);
-                int count = attributes.Count();
-
-                if (count > 0)
-                {
-                    if (count > 1)
-                        result = attributes; //more than one attribute matched, lets return the collection
-                    else
-                        result = attributes.FirstOrDefault(); //only one attribute matched, lets just return it
-
-                    return true; // return true because we matched
-                }
-                else
-                {
-                    //no attributes matched, lets try first child
-                    if (BaseElement.Name == "root" && BaseElement.Elements().Count() == 1)
-                    {
-                        attributes = BaseElement.Elements().ElementAt(0).Attributes(binder.Name).Select(attr => attr.Value);
-                        count = attributes.Count();
-                        if (count > 1)
-                            result = attributes; //more than one attribute matched, lets return the collection
-                        else
-                            result = attributes.FirstOrDefault(); //only one attribute matched, lets just return it
-
-                        return true; // return true because we matched
-                    }
-                }
-            }
-            return base.TryGetMember(binder, out result);
+        	return _inner.TryGetMember(binder, out result);
         }
 
-        private bool HandleIEnumerableXElement(IEnumerable<XElement> elements, out object result)
-        {
-            //Get the count now, so we don't have to call it twice
-            int count = elements.Count();
-            if (count > 0)
-            {
-                var firstElement = elements.FirstOrDefault();
-                //we have a single element, does it have any children?
-                if (firstElement != null && firstElement.Elements().Count() == 0 && !firstElement.HasAttributes)
-                {
-                    //no, return the text
-                    result = firstElement.Value;
-                    return true;
-                }
-                else
-                {
-                    //We have more than one matching element, so let's return the collection
-                    //elements is IEnumerable<DynamicXml>
-                    //but we want to be able to re-enter this code
-                    XElement root = new XElement(XName.Get("root"));
-                    root.Add(elements);
-                    result = new DynamicXml(root);
-
-                    //From here, you'll either end up back here (because you have <root><node><node>)
-                    //or you use [] indexing and you end up with a single element
-                    return true;
-                }
-            }
-            result = null;
-            return false;
-        }
         public DynamicXml XPath(string expression)
         {
-            var matched = this.BaseElement.XPathSelectElements(expression);
-            DynamicXml root = new DynamicXml("<results/>");
+			var matched = _inner.BaseElement.XPathSelectElements(expression);
+            var root = new DynamicXml("<results/>");
             foreach (var element in matched)
             {
                 root.BaseElement.Add(element);
@@ -169,427 +68,267 @@ namespace umbraco.MacroEngines
         }
         public IHtmlString ToHtml()
         {
-            return new HtmlString(this.ToXml());
+        	return _inner.ToHtml();
         }
         public DynamicXml Find(string expression)
         {
-            return new DynamicXml(this.BaseElement.XPathSelectElements(expression).FirstOrDefault());
+			return new DynamicXml(_inner.BaseElement.XPathSelectElements(expression).FirstOrDefault());
         }
 
         public DynamicXml Find(string attributeName, object value)
         {
             string expression = string.Format("//*[{0}='{1}']", attributeName, value);
-            return new DynamicXml(this.BaseElement.XPathSelectElements(expression).FirstOrDefault());
+			return new DynamicXml(_inner.BaseElement.XPathSelectElements(expression).FirstOrDefault());
         }
 
         public IEnumerator GetEnumerator()
         {
-            return this.BaseElement.Elements().Select(e => new DynamicXml(e)).GetEnumerator();
+        	return _inner.GetEnumerator();
         }
         public int Count()
         {
-            return this.BaseElement.Elements().Count();
+        	return _inner.Count();
         }
 
         public bool IsNull()
         {
-            return false;
+        	return _inner.IsNull();
         }
         public bool HasValue()
         {
-            return true;
+        	return _inner.HasValue();
         }
 
         public bool IsFirst()
         {
-            return IsHelper(n => n.Index() == 0);
+        	return _inner.IsFirst();
         }
         public HtmlString IsFirst(string valueIfTrue)
         {
-            return IsHelper(n => n.Index() == 0, valueIfTrue);
+        	return _inner.IsFirst(valueIfTrue);
         }
         public HtmlString IsFirst(string valueIfTrue, string valueIfFalse)
         {
-            return IsHelper(n => n.Index() == 0, valueIfTrue, valueIfFalse);
+        	return _inner.IsFirst(valueIfTrue, valueIfFalse);
         }
         public bool IsNotFirst()
         {
-            return !IsHelper(n => n.Index() == 0);
+        	return _inner.IsNotFirst();
         }
         public HtmlString IsNotFirst(string valueIfTrue)
         {
-            return IsHelper(n => n.Index() != 0, valueIfTrue);
+			return _inner.IsNotFirst(valueIfTrue);
         }
         public HtmlString IsNotFirst(string valueIfTrue, string valueIfFalse)
         {
-            return IsHelper(n => n.Index() != 0, valueIfTrue, valueIfFalse);
+			return _inner.IsNotFirst(valueIfTrue, valueIfFalse);
         }
         public bool IsPosition(int index)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return false;
-            }
-            return IsHelper(n => n.Index() == index);
+			return _inner.IsPosition(index);
         }
         public HtmlString IsPosition(int index, string valueIfTrue)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return new HtmlString(string.Empty);
-            }
-            return IsHelper(n => n.Index() == index, valueIfTrue);
+			return _inner.IsPosition(index, valueIfTrue);
         }
         public HtmlString IsPosition(int index, string valueIfTrue, string valueIfFalse)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return new HtmlString(valueIfFalse);
-            }
-            return IsHelper(n => n.Index() == index, valueIfTrue, valueIfFalse);
+			return _inner.IsPosition(index, valueIfTrue, valueIfFalse);
         }
         public bool IsModZero(int modulus)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return false;
-            }
-            return IsHelper(n => n.Index() % modulus == 0);
+			return _inner.IsModZero(modulus);
         }
         public HtmlString IsModZero(int modulus, string valueIfTrue)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return new HtmlString(string.Empty);
-            }
-            return IsHelper(n => n.Index() % modulus == 0, valueIfTrue);
+			return _inner.IsModZero(modulus, valueIfTrue);
         }
         public HtmlString IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return new HtmlString(valueIfFalse);
-            }
-            return IsHelper(n => n.Index() % modulus == 0, valueIfTrue, valueIfFalse);
+			return _inner.IsModZero(modulus, valueIfTrue, valueIfFalse);
         }
 
         public bool IsNotModZero(int modulus)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return false;
-            }
-            return IsHelper(n => n.Index() % modulus != 0);
+			return _inner.IsNotModZero(modulus);
         }
         public HtmlString IsNotModZero(int modulus, string valueIfTrue)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return new HtmlString(string.Empty);
-            }
-            return IsHelper(n => n.Index() % modulus != 0, valueIfTrue);
+			return _inner.IsNotModZero(modulus, valueIfTrue);
         }
         public HtmlString IsNotModZero(int modulus, string valueIfTrue, string valueIfFalse)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return new HtmlString(valueIfFalse);
-            }
-            return IsHelper(n => n.Index() % modulus != 0, valueIfTrue, valueIfFalse);
+			return _inner.IsNotModZero(modulus, valueIfTrue, valueIfFalse);
         }
         public bool IsNotPosition(int index)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return false;
-            }
-            return !IsHelper(n => n.Index() == index);
+			return _inner.IsNotPosition(index);
         }
         public HtmlString IsNotPosition(int index, string valueIfTrue)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return new HtmlString(string.Empty);
-            }
-            return IsHelper(n => n.Index() != index, valueIfTrue);
+			return _inner.IsNotPosition(index, valueIfTrue);
         }
         public HtmlString IsNotPosition(int index, string valueIfTrue, string valueIfFalse)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return new HtmlString(valueIfFalse);
-            }
-            return IsHelper(n => n.Index() != index, valueIfTrue, valueIfFalse);
+			return _inner.IsNotPosition(index, valueIfTrue);
         }
         public bool IsLast()
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return false;
-            }
-            int count = this.BaseElement.Parent.Elements().Count();
-            return IsHelper(n => n.Index() == count - 1);
+			return _inner.IsLast();
         }
         public HtmlString IsLast(string valueIfTrue)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return new HtmlString(string.Empty);
-            }
-            int count = this.BaseElement.Parent.Elements().Count();
-            return IsHelper(n => n.Index() == count - 1, valueIfTrue);
+			return _inner.IsLast(valueIfTrue);
         }
         public HtmlString IsLast(string valueIfTrue, string valueIfFalse)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return new HtmlString(valueIfFalse);
-            }
-            int count = this.BaseElement.Parent.Elements().Count();
-            return IsHelper(n => n.Index() == count - 1, valueIfTrue, valueIfFalse);
+			return _inner.IsLast(valueIfTrue, valueIfFalse);
         }
         public bool IsNotLast()
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return false;
-            }
-            int count = this.BaseElement.Parent.Elements().Count();
-            return !IsHelper(n => n.Index() == count - 1);
+			return _inner.IsNotLast();
         }
         public HtmlString IsNotLast(string valueIfTrue)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return new HtmlString(string.Empty);
-            }
-            int count = this.BaseElement.Parent.Elements().Count();
-            return IsHelper(n => n.Index() != count - 1, valueIfTrue);
+			return _inner.IsNotLast(valueIfTrue);
         }
         public HtmlString IsNotLast(string valueIfTrue, string valueIfFalse)
         {
-            if (this.BaseElement == null || this.BaseElement.Parent == null)
-            {
-                return new HtmlString(valueIfFalse);
-            }
-            int count = this.BaseElement.Parent.Elements().Count();
-            return IsHelper(n => n.Index() != count - 1, valueIfTrue, valueIfFalse);
+			return _inner.IsNotLast(valueIfTrue, valueIfFalse);
         }
         public bool IsEven()
         {
-            return IsHelper(n => n.Index() % 2 == 0);
+			return _inner.IsEven();
         }
         public HtmlString IsEven(string valueIfTrue)
         {
-            return IsHelper(n => n.Index() % 2 == 0, valueIfTrue);
+			return _inner.IsEven(valueIfTrue);
         }
         public HtmlString IsEven(string valueIfTrue, string valueIfFalse)
         {
-            return IsHelper(n => n.Index() % 2 == 0, valueIfTrue, valueIfFalse);
+			return _inner.IsEven(valueIfTrue, valueIfFalse);
         }
         public bool IsOdd()
         {
-            return IsHelper(n => n.Index() % 2 == 1);
+			return _inner.IsOdd();
         }
         public HtmlString IsOdd(string valueIfTrue)
         {
-            return IsHelper(n => n.Index() % 2 == 1, valueIfTrue);
+			return _inner.IsOdd(valueIfTrue);
         }
         public HtmlString IsOdd(string valueIfTrue, string valueIfFalse)
         {
-            return IsHelper(n => n.Index() % 2 == 1, valueIfTrue, valueIfFalse);
+			return _inner.IsOdd(valueIfTrue, valueIfFalse);
         }
+
         public bool IsEqual(DynamicXml other)
         {
-            return IsHelper(n => n.BaseElement == other.BaseElement);
+        	return _inner.IsEqual(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement));
         }
         public HtmlString IsEqual(DynamicXml other, string valueIfTrue)
         {
-            return IsHelper(n => n.BaseElement == other.BaseElement, valueIfTrue);
+			return _inner.IsEqual(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement), valueIfTrue);
         }
         public HtmlString IsEqual(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
-            return IsHelper(n => n.BaseElement == other.BaseElement, valueIfTrue, valueIfFalse);
+			return _inner.IsEqual(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement), valueIfTrue, valueIfFalse);
         }
         public bool IsNotEqual(DynamicXml other)
         {
-            return IsHelper(n => n.BaseElement != other.BaseElement);
+			return _inner.IsNotEqual(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement));
         }
         public HtmlString IsNotEqual(DynamicXml other, string valueIfTrue)
         {
-            return IsHelper(n => n.BaseElement != other.BaseElement, valueIfTrue);
+			return _inner.IsNotEqual(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement), valueIfTrue);
         }
         public HtmlString IsNotEqual(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
-            return IsHelper(n => n.BaseElement != other.BaseElement, valueIfTrue, valueIfFalse);
+			return _inner.IsNotEqual(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement), valueIfTrue, valueIfFalse);
         }
         public bool IsDescendant(DynamicXml other)
         {
-            var ancestors = this.Ancestors();
-            return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null);
+			return _inner.IsDescendant(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement));       
         }
         public HtmlString IsDescendant(DynamicXml other, string valueIfTrue)
         {
-            var ancestors = this.Ancestors();
-            return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue);
+			return _inner.IsDescendant(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement), valueIfTrue);       
         }
         public HtmlString IsDescendant(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
-            var ancestors = this.Ancestors();
-            return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
+			return _inner.IsDescendant(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement), valueIfTrue, valueIfFalse);       
         }
         public bool IsDescendantOrSelf(DynamicXml other)
         {
-            var ancestors = this.AncestorsOrSelf();
-            return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null);
+			return _inner.IsDescendantOrSelf(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement));       
         }
         public HtmlString IsDescendantOrSelf(DynamicXml other, string valueIfTrue)
         {
-            var ancestors = this.AncestorsOrSelf();
-            return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue);
+			return _inner.IsDescendantOrSelf(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement), valueIfTrue);   
         }
         public HtmlString IsDescendantOrSelf(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
-            var ancestors = this.AncestorsOrSelf();
-            return IsHelper(n => ancestors.Find(ancestor => ancestor.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
+			return _inner.IsDescendantOrSelf(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement), valueIfTrue, valueIfFalse);   
         }
         public bool IsAncestor(DynamicXml other)
         {
-            var descendants = this.Descendants();
-            return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null);
+			return _inner.IsAncestor(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement));   
         }
         public HtmlString IsAncestor(DynamicXml other, string valueIfTrue)
         {
-            var descendants = this.Descendants();
-            return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue);
+			return _inner.IsAncestor(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement), valueIfTrue);   
         }
         public HtmlString IsAncestor(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
-            var descendants = this.Descendants();
-            return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
+			return _inner.IsAncestor(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement), valueIfTrue, valueIfFalse);   
         }
         public bool IsAncestorOrSelf(DynamicXml other)
         {
-            var descendants = this.DescendantsOrSelf();
-            return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null);
+			return _inner.IsAncestorOrSelf(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement));   
         }
         public HtmlString IsAncestorOrSelf(DynamicXml other, string valueIfTrue)
         {
-            var descendants = this.DescendantsOrSelf();
-            return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue);
+			return _inner.IsAncestorOrSelf(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement), valueIfTrue);   
         }
         public HtmlString IsAncestorOrSelf(DynamicXml other, string valueIfTrue, string valueIfFalse)
         {
-            var descendants = this.DescendantsOrSelf();
-            return IsHelper(n => descendants.Find(descendant => descendant.BaseElement == other.BaseElement) != null, valueIfTrue, valueIfFalse);
+			return _inner.IsAncestorOrSelf(new Umbraco.Core.Dynamics.DynamicXml(other.BaseElement), valueIfTrue, valueIfFalse);   
         }
         public List<DynamicXml> Descendants()
         {
-            return Descendants(n => true);
+			return _inner.Descendants().Select(x => new DynamicXml(x.BaseElement)).ToList();   
         }
         public List<DynamicXml> Descendants(Func<XElement, bool> func)
         {
-            var flattenedNodes = this.BaseElement.Elements().Map(func, (XElement n) => { return n.Elements(); });
-            return flattenedNodes.ToList().ConvertAll(n => new DynamicXml(n));
+			return _inner.Descendants(func).Select(x => new DynamicXml(x.BaseElement)).ToList();   
         }
         public List<DynamicXml> DescendantsOrSelf()
         {
-            return DescendantsOrSelf(n => true);
+			return _inner.DescendantsOrSelf().Select(x => new DynamicXml(x.BaseElement)).ToList();   
         }
         public List<DynamicXml> DescendantsOrSelf(Func<XElement, bool> func)
         {
-            var flattenedNodes = this.BaseElement.Elements().Map(func, (XElement n) => { return n.Elements(); });
-            var list = new List<DynamicXml>();
-            list.Add(this);
-            list.AddRange(flattenedNodes.ToList().ConvertAll(n => new DynamicXml(n)));
-            return list;
+			return _inner.DescendantsOrSelf(func).Select(x => new DynamicXml(x.BaseElement)).ToList();   
         }
         public List<DynamicXml> Ancestors()
         {
-            return Ancestors(item => true);
+			return _inner.Ancestors().Select(x => new DynamicXml(x.BaseElement)).ToList();   
         }
         public List<DynamicXml> Ancestors(Func<XElement, bool> func)
         {
-            List<XElement> ancestorList = new List<XElement>();
-            var node = this.BaseElement;
-            while (node != null)
-            {
-                if (node.Parent == null) break;
-                XElement parent = node.Parent;
-                if (parent != null)
-                {
-                    if (this.BaseElement != parent)
-                    {
-                        node = parent;
-                        if (func(node))
-                        {
-                            ancestorList.Add(node);
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-            ancestorList.Reverse();
-            return ancestorList.ConvertAll(item => new DynamicXml(item));
+			return _inner.Ancestors(func).Select(x => new DynamicXml(x.BaseElement)).ToList();   
         }
         public List<DynamicXml> AncestorsOrSelf()
         {
-            return AncestorsOrSelf(item => true);
+			return _inner.AncestorsOrSelf().Select(x => new DynamicXml(x.BaseElement)).ToList();  
         }
         public List<DynamicXml> AncestorsOrSelf(Func<XElement, bool> func)
         {
-            List<XElement> ancestorList = new List<XElement>();
-            var node = this.BaseElement;
-            ancestorList.Add(node);
-            while (node != null)
-            {
-                if (node.Parent == null) break;
-                XElement parent = node.Parent;
-                if (parent != null)
-                {
-                    if (this.BaseElement != parent)
-                    {
-                        node = parent;
-                        if (func(node))
-                        {
-                            ancestorList.Add(node);
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-            ancestorList.Reverse();
-            return ancestorList.ConvertAll(item => new DynamicXml(item));
+			return _inner.AncestorsOrSelf(func).Select(x => new DynamicXml(x.BaseElement)).ToList();  
         }
 
         public int Index()
         {
-            if (this.BaseElement != null && this.BaseElement.Parent != null)
-            {
-                var elements = this.BaseElement.Parent.Elements();
-                int index = 0;
-                foreach (var element in elements)
-                {
-                    if (element == this.BaseElement) break;
-                    index++;
-                }
-                return index;
-            }
-            return 0;
+			return _inner.Index();  
         }
 
         public bool IsHelper(Func<DynamicXml, bool> test)
@@ -607,55 +346,7 @@ namespace umbraco.MacroEngines
 
         public static string StripDashesInElementOrAttributeNames(string xml)
         {
-            using (MemoryStream outputms = new MemoryStream())
-            {
-                using (TextWriter outputtw = new StreamWriter(outputms))
-                {
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        using (TextWriter tw = new StreamWriter(ms))
-                        {
-                            tw.Write(xml);
-                            tw.Flush();
-                            ms.Position = 0;
-                            using (TextReader tr = new StreamReader(ms))
-                            {
-                                bool IsInsideElement = false, IsInsideQuotes = false;
-                                int ic = 0;
-                                while ((ic = tr.Read()) != -1)
-                                {
-                                    if (ic == (int)'<' && !IsInsideQuotes)
-                                    {
-                                        if (tr.Peek() != (int)'!')
-                                        {
-                                            IsInsideElement = true;
-                                        }
-                                    }
-                                    if (ic == (int)'>' && !IsInsideQuotes)
-                                    {
-                                        IsInsideElement = false;
-                                    }
-                                    if (ic == (int)'"')
-                                    {
-                                        IsInsideQuotes = !IsInsideQuotes;
-                                    }
-                                    if (!IsInsideElement || ic != (int)'-' || IsInsideQuotes)
-                                    {
-                                        outputtw.Write((char)ic);
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                    outputtw.Flush();
-                    outputms.Position = 0;
-                    using (TextReader outputtr = new StreamReader(outputms))
-                    {
-                        return outputtr.ReadToEnd();
-                    }
-                }
-            }
+        	return Umbraco.Core.Dynamics.DynamicXml.StripDashesInElementOrAttributeNames(xml);
         }
     }
 }

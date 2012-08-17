@@ -52,10 +52,10 @@ namespace Umbraco.Core.Dynamics
             return all.Items.OrderBy(x => Guid.NewGuid()).First();
         }
 
-        public static bool ContainsAny(this string haystack, List<string> needles)
+        public static bool ContainsAny(this string haystack, IEnumerable<string> needles)
         {
         	if (haystack == null) throw new ArgumentNullException("haystack");
-        	if (!string.IsNullOrEmpty(haystack) || needles.Count > 0)
+        	if (!string.IsNullOrEmpty(haystack) || needles.Any())
             {
             	return needles.Any(haystack.Contains);
             }
@@ -70,10 +70,10 @@ namespace Umbraco.Core.Dynamics
             }
             return false;
         }
-        public static bool ContainsAny(this string haystack, StringComparison comparison, List<string> needles)
+		public static bool ContainsAny(this string haystack, StringComparison comparison, IEnumerable<string> needles)
         {
         	if (haystack == null) throw new ArgumentNullException("haystack");
-        	if (!string.IsNullOrEmpty(haystack) || needles.Count > 0)
+        	if (!string.IsNullOrEmpty(haystack) || needles.Any())
             {
             	return needles.Any(value => haystack.IndexOf(value, comparison) >= 0);
             }
