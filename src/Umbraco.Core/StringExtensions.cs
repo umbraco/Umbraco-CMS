@@ -115,6 +115,11 @@ namespace Umbraco.Core
             return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToLower();
         }
 
+		public static bool IsUpperCase(this char ch)
+		{
+			return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToUpper();
+		}
+
         /// <summary>Is null or white space.</summary>
         /// <param name="str">The str.</param>
         /// <returns>The is null or white space.</returns>

@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models
 			get { return _alias; }
 		}
 
-		public string Value
+		public object Value
 		{
 			get { return IOHelper.ResolveUrlsFromTextString(_value); }
 		}

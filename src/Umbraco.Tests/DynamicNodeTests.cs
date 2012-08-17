@@ -15,6 +15,21 @@ namespace Umbraco.Tests
 	[TestFixture]
 	public class DynamicNodeTests : BaseWebTest
 	{
+		public override void Initialize()
+		{
+			base.Initialize();
+
+			DynamicNodeDataSourceResolver.Current = new DynamicNodeDataSourceResolver(
+				new TestDynamicNodeDataSource());
+		}
+
+		public override void TearDown()
+		{
+			base.TearDown();
+
+			DynamicNodeDataSourceResolver.Reset();
+		}
+
 		private DynamicNode GetDynamicNode(int id)
 		{
 			var template = Template.MakeNew("test", new User(0));
@@ -25,6 +40,51 @@ namespace Umbraco.Tests
 			var dynamicNode = new DynamicNode(doc);
 			Assert.IsNotNull(dynamicNode);
 			return dynamicNode;
+		}
+
+		[Test]
+		public void GetPropertyValue_Non_Reflected()
+		{
+			var dynamicNode = GetDynamicNode(1174);
+			var asDynamic = dynamicNode.AsDynamic();
+
+			Assert.AreEqual("Custom data with same property name as the member name", asDynamic.GetPropertyValue("creatorName"));
+			Assert.AreEqual("Custom data with same property name as the member name", asDynamic.GetPropertyValue("CreatorName"));
+		}
+
+		[Test]
+		public void GetPropertyValue_Reflected()
+		{
+			var dynamicNode = GetDynamicNode(1174);
+			var asDynamic = dynamicNode.AsDynamic();
+
+			Assert.AreEqual("admin", asDynamic.GetPropertyValue("@creatorName"));
+			Assert.AreEqual("admin", asDynamic.GetPropertyValue("@CreatorName"));
+		}
+
+		[Test]
+		public void Get_User_Property_With_Same_Name_As_Member_Property()
+		{
+			var dynamicNode = GetDynamicNode(1174);
+			var asDynamic = dynamicNode.AsDynamic();
+
+			Assert.AreEqual("Custom data with same property name as the member name", asDynamic.creatorName);
+
+			//because CreatorName is defined on DynamicNode, it will not return the user defined property
+			Assert.AreEqual("admin", asDynamic.CreatorName);
+		}
+
+		[Test]
+		public void Get_Member_Property()
+		{
+			var dynamicNode = GetDynamicNode(1173);
+			var asDynamic = dynamicNode.AsDynamic();
+			
+			Assert.AreEqual(2, asDynamic.Level);
+			Assert.AreEqual(2, asDynamic.level);
+
+			Assert.AreEqual(1046, asDynamic.ParentId);
+			Assert.AreEqual(1046, asDynamic.parentId);
 		}
 
 		[Test]
@@ -188,5 +248,23 @@ namespace Umbraco.Tests
 
 			Assert.AreEqual(1174, result.Id);
 		}
+
+		#region Classes used in test
+
+		private class TestDynamicNodeDataSource : IDynamicNodeDataSource
+		{
+			public IEnumerable<string> GetAncestorOrSelfNodeTypeAlias(DynamicBackingItem node)
+			{
+				return Enumerable.Empty<string>();
+			}
+
+			public Guid GetDataType(string contentTypeAlias, string propertyTypeAlias)
+			{
+				//just return an empty Guid since we don't want to match anything currently.
+				return Guid.Empty;
+			}
+		}
+
+		#endregion
 	}
 }

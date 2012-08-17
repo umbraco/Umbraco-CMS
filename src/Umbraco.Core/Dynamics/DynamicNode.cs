@@ -29,11 +29,10 @@ namespace Umbraco.Core.Dynamics
 
 		public DynamicNode(DynamicBackingItem n)
 		{
-			if (n != null)
-				this._backingItem = n;
-			else
-				throw new ArgumentNullException("n", "A node must be provided to make a dynamic instance");
+			if (n == null) throw new ArgumentNullException("n");
+			_backingItem = n;
 		}
+
 		//public DynamicNode(int nodeId)
 		//{
 		//    this._n = new DynamicBackingItem(nodeId);
@@ -54,8 +53,10 @@ namespace Umbraco.Core.Dynamics
 		//}
 		public DynamicNode(IDocument node)
 		{
-			this._backingItem = new DynamicBackingItem(node);
+			if (node == null) throw new ArgumentNullException("node");
+			_backingItem = new DynamicBackingItem(node);
 		}
+
 		//public DynamicNode(object nodeId)
 		//{
 		//    var dynamicBackingItemId = 0;
@@ -281,15 +282,8 @@ namespace Umbraco.Core.Dynamics
 			{
 				try
 				{
-					var prop = _backingItem.GetProperty(name);
-					if (prop == null)
-					{
-						// check for nicer support of Pascal Casing EVEN if alias is camelCasing:
-						if (name.Substring(0, 1).ToUpper() == name.Substring(0, 1))
-						{
-							prop = _backingItem.GetProperty(name.Substring(0, 1).ToLower() + name.Substring((1)));
-						}
-					}
+					var prop = _backingItem.GetUserProperty(name);
+					
 					return (prop != null);
 				}
 				catch (Exception)
@@ -463,171 +457,165 @@ namespace Umbraco.Core.Dynamics
 
 		public override bool TryGetMember(GetMemberBinder binder, out object result)
 		{
+			if (binder == null) throw new ArgumentNullException("binder");
 
 			var name = binder.Name;
 			result = null; //this will never be returned
 
-			if (name == "ChildrenAsList" || name == "Children")
+			if (name.InvariantEquals("ChildrenAsList") || name.InvariantEquals("Children"))
 			{
 				result = GetChildren();
 				return true;
 			}
-			bool propertyExists = false;
-			if (_backingItem != null)
+			if (name.InvariantEquals("parentId"))
 			{
-				bool recursive = false;
-				if (name.StartsWith("_"))
+				var parent = Parent;
+				if (parent == null)
 				{
-					name = name.Substring(1, name.Length - 1);
-					recursive = true;
+					throw new InvalidOperationException(string.Format("The node {0} does not have a parent", Id));
 				}
-				var data = _backingItem.GetProperty(name, recursive, out propertyExists);
-				// check for nicer support of Pascal Casing EVEN if alias is camelCasing:
-				if (data == null && name.Substring(0, 1).ToUpper() == name.Substring(0, 1) && !propertyExists)
+				result = parent.Id;
+				return true;
+			}
+
+			var recursive = false;
+			if (name.StartsWith("_"))
+			{
+				name = name.Substring(1, name.Length - 1);
+				recursive = true;
+			}
+			var userProperty = _backingItem.GetUserProperty(name, recursive);					   
+
+			//check for a user defined property
+
+			if (userProperty != null)
+			{
+				result = userProperty.Value;
+				//special casing for true/false properties
+				//int/decimal are handled by ConvertPropertyValueByDataType
+				//fallback is stringT
+				if (_backingItem.NodeTypeAlias == null && userProperty.Alias == null)
 				{
-					data = _backingItem.GetProperty(name.Substring(0, 1).ToLower() + name.Substring((1)), recursive, out propertyExists);
+					throw new InvalidOperationException("No node alias or property alias available. Unable to look up the datatype of the property you are trying to fetch.");
 				}
 
-				if (data != null)
+				//contextAlias is the node which the property data was returned from
+				var dataType = DynamicNodeDataSourceResolver.Current.DataSource.GetDataType(userProperty.DocumentTypeAlias, userProperty.Alias);
+				//HttpContext.Current.Trace.Write(string.Format("RazorDynamicNode got datatype {0} for {1} on {2}", dataType, data.Alias, data.ContextAlias));
+
+				//HttpContext.Current.Trace.Write(string.Format("Checking for a RazorDataTypeModel for data type guid {0}...", dataType));
+				//HttpContext.Current.Trace.Write("Checking the RazorDataTypeModelTypes static mappings to see if there is a static mapping...");
+
+				//var staticMapping = UmbracoSettings.RazorDataTypeModelStaticMapping.FirstOrDefault(mapping =>
+				//{
+				//    return mapping.Applies(dataType, data.ContextAlias, data.Alias);
+				//});
+				//if (staticMapping != null)
+				//{
+				//    //HttpContext.Current.Trace.Write(string.Format("Found a staticMapping defined {0}, instantiating type and attempting to apply model...", staticMapping.Raw));
+				//    Type dataTypeType = Type.GetType(staticMapping.TypeName);
+				//    if (dataTypeType != null)
+				//    {
+				//        object instance = null;
+				//        if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
+				//        {
+				//            result = instance;
+				//            return true;
+				//        }
+				//        else
+				//        {
+				//            //HttpContext.Current.Trace.Write("Failed");
+				//            //HttpContext.Current.Trace.Warn(string.Format("Failed to create the instance of the model binder"));
+				//        }
+				//    }
+				//    else
+				//    {
+				//        //HttpContext.Current.Trace.Warn(string.Format("staticMapping type name {0} came back as null from Type.GetType; check the casing, assembly presence, assembly framework version, namespace", staticMapping.TypeName));
+				//    }
+				//}
+				//else
+				//{
+				//    //HttpContext.Current.Trace.Write(string.Format("There isn't a staticMapping defined so checking the RazorDataTypeModelTypes cache..."));
+				//}
+
+
+				//if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.Any(model => model.Key.Item1 == dataType) && dataType != Guid.Empty)
+				//{
+				//    var razorDataTypeModelDefinition = RazorDataTypeModelTypes.Where(model => model.Key.Item1 == dataType).OrderByDescending(model => model.Key.Item2).FirstOrDefault();
+				//    if (!(razorDataTypeModelDefinition.Equals(default(KeyValuePair<System.Tuple<Guid, int>, Type>))))
+				//    {
+				//        Type dataTypeType = razorDataTypeModelDefinition.Value;
+				//        object instance = null;
+				//        if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
+				//        {
+				//            result = instance;
+				//            return true;
+				//        }
+				//        else
+				//        {
+				//            //HttpContext.Current.Trace.Write("Failed");
+				//            //HttpContext.Current.Trace.Warn(string.Format("Failed to create the instance of the model binder"));
+				//        }
+				//    }
+				//    else
+				//    {
+				//        //HttpContext.Current.Trace.Write("Failed");
+				//        //HttpContext.Current.Trace.Warn(string.Format("Could not get the dataTypeType for the RazorDataTypeModel"));
+				//    }
+				//}
+				//else
+				//{
+				//    if (RazorDataTypeModelTypes == null)
+				//    {
+				//        //HttpContext.Current.Trace.Write(string.Format("RazorDataTypeModelTypes is null, probably an exception while building the cache, falling back to ConvertPropertyValueByDataType", dataType));
+				//    }
+				//    else
+				//    {
+				//        //HttpContext.Current.Trace.Write(string.Format("GUID {0} does not have a DataTypeModel, falling back to ConvertPropertyValueByDataType", dataType));
+				//    }
+
+				//}
+
+				//convert the string value to a known type
+				return ConvertPropertyValueByDataType(ref result, dataType);
+
+			}
+
+			//next, check if the alias is that of a child type
+			// I'm pretty sure this means that if we have a 'Home' document type as the current type and it has children types that are for example called 'NewsPage' then
+			// we can actually do this in the query: CurrentPage.NewsPages (plural) or CurrentPage.NewsPage (non-plural) and it will return the children of that type.
+
+			var typeChildren = _backingItem.Children;
+			if (typeChildren != null)
+			{
+				var filteredTypeChildren = typeChildren.Where(x =>
 				{
-					result = data.Value;
-					//special casing for true/false properties
-					//int/decimal are handled by ConvertPropertyValueByDataType
-					//fallback is stringT
-					if (_backingItem.NodeTypeAlias == null && data.Alias == null)
+					var ancestorAliases = DynamicNodeDataSourceResolver.Current.DataSource.GetAncestorOrSelfNodeTypeAlias(x);
+					if (ancestorAliases == null)
 					{
-						throw new ArgumentNullException("No node alias or property alias available. Unable to look up the datatype of the property you are trying to fetch.");
+						return false;
 					}
+					return ancestorAliases.Any(alias => alias == name || MakePluralName(alias) == name);
+				}).ToArray();
 
-					//contextAlias is the node which the property data was returned from
-					Guid dataType = DynamicNodeDataSourceResolver.Current.DataSource.GetDataType(data.ContextAlias, data.Alias);
-					//HttpContext.Current.Trace.Write(string.Format("RazorDynamicNode got datatype {0} for {1} on {2}", dataType, data.Alias, data.ContextAlias));
-
-					//HttpContext.Current.Trace.Write(string.Format("Checking for a RazorDataTypeModel for data type guid {0}...", dataType));
-					//HttpContext.Current.Trace.Write("Checking the RazorDataTypeModelTypes static mappings to see if there is a static mapping...");
-
-					//var staticMapping = UmbracoSettings.RazorDataTypeModelStaticMapping.FirstOrDefault(mapping =>
-					//{
-					//    return mapping.Applies(dataType, data.ContextAlias, data.Alias);
-					//});
-					//if (staticMapping != null)
-					//{
-					//    //HttpContext.Current.Trace.Write(string.Format("Found a staticMapping defined {0}, instantiating type and attempting to apply model...", staticMapping.Raw));
-					//    Type dataTypeType = Type.GetType(staticMapping.TypeName);
-					//    if (dataTypeType != null)
-					//    {
-					//        object instance = null;
-					//        if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
-					//        {
-					//            result = instance;
-					//            return true;
-					//        }
-					//        else
-					//        {
-					//            //HttpContext.Current.Trace.Write("Failed");
-					//            //HttpContext.Current.Trace.Warn(string.Format("Failed to create the instance of the model binder"));
-					//        }
-					//    }
-					//    else
-					//    {
-					//        //HttpContext.Current.Trace.Warn(string.Format("staticMapping type name {0} came back as null from Type.GetType; check the casing, assembly presence, assembly framework version, namespace", staticMapping.TypeName));
-					//    }
-					//}
-					//else
-					//{
-					//    //HttpContext.Current.Trace.Write(string.Format("There isn't a staticMapping defined so checking the RazorDataTypeModelTypes cache..."));
-					//}
-
-
-					//if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.Any(model => model.Key.Item1 == dataType) && dataType != Guid.Empty)
-					//{
-					//    var razorDataTypeModelDefinition = RazorDataTypeModelTypes.Where(model => model.Key.Item1 == dataType).OrderByDescending(model => model.Key.Item2).FirstOrDefault();
-					//    if (!(razorDataTypeModelDefinition.Equals(default(KeyValuePair<System.Tuple<Guid, int>, Type>))))
-					//    {
-					//        Type dataTypeType = razorDataTypeModelDefinition.Value;
-					//        object instance = null;
-					//        if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
-					//        {
-					//            result = instance;
-					//            return true;
-					//        }
-					//        else
-					//        {
-					//            //HttpContext.Current.Trace.Write("Failed");
-					//            //HttpContext.Current.Trace.Warn(string.Format("Failed to create the instance of the model binder"));
-					//        }
-					//    }
-					//    else
-					//    {
-					//        //HttpContext.Current.Trace.Write("Failed");
-					//        //HttpContext.Current.Trace.Warn(string.Format("Could not get the dataTypeType for the RazorDataTypeModel"));
-					//    }
-					//}
-					//else
-					//{
-					//    if (RazorDataTypeModelTypes == null)
-					//    {
-					//        //HttpContext.Current.Trace.Write(string.Format("RazorDataTypeModelTypes is null, probably an exception while building the cache, falling back to ConvertPropertyValueByDataType", dataType));
-					//    }
-					//    else
-					//    {
-					//        //HttpContext.Current.Trace.Write(string.Format("GUID {0} does not have a DataTypeModel, falling back to ConvertPropertyValueByDataType", dataType));
-					//    }
-
-					//}
-
-					//convert the string value to a known type
-					return ConvertPropertyValueByDataType(ref result, name, dataType);
-
-				}
-
-				//check if the alias is that of a child type
-
-				var typeChildren = _backingItem.Children;
-				if (typeChildren != null)
+				if (filteredTypeChildren.Any())
 				{
-					var filteredTypeChildren = typeChildren.Where(x =>
-						{
-							var ancestorAliases = DynamicNodeDataSourceResolver.Current.DataSource.GetAncestorOrSelfNodeTypeAlias(x);
-							if (ancestorAliases == null)
-							{
-								return false;
-							}
-							return ancestorAliases.Any(alias => alias == name || MakePluralName(alias) == name);
-						}).ToArray();
-
-					if (filteredTypeChildren.Any())
-					{
-						result = new DynamicNodeList(filteredTypeChildren.Select(x => new DynamicNode(x)));
-						return true;
-					}
-
-				}
-
-				try
-				{
-					result = _backingItem.GetType().InvokeMember(binder.Name,
-													  System.Reflection.BindingFlags.GetProperty |
-													  System.Reflection.BindingFlags.Instance |
-													  System.Reflection.BindingFlags.Public |
-													  System.Reflection.BindingFlags.NonPublic,
-													  null,
-													  _backingItem,
-													  null);
+					result = new DynamicNodeList(filteredTypeChildren.Select(x => new DynamicNode(x)));
 					return true;
 				}
-				catch
-				{
-					//result = null;
-					//return false;
-				}
+
 			}
+
+			//lastly, we'll try to get the property from the document object's member properties using reflection
+
+			var reflectedProperty = _backingItem.GetReflectedProperty(name);
+			result = reflectedProperty != null ? reflectedProperty.Value : null;
 
 			//if property access, type lookup and member invoke all failed
 			//at this point, we're going to return null
 			//instead, we return a DynamicNull - see comments in that file
 			//this will let things like Model.ChildItem work and return nothing instead of crashing
-			if (!propertyExists && result == null)
+			if (result == null)
 			{
 				//.Where explictly checks for this type
 				//and will make it false
@@ -638,6 +626,7 @@ namespace Umbraco.Core.Dynamics
 			}
 			return true;
 		}
+
 		//private bool TryCreateInstanceRazorDataTypeModel(Guid dataType, Type dataTypeType, string value, out object result)
 		//{
 		//    //HttpContext.Current.Trace.Write(string.Format("Found dataType {0} for GUID {1}", dataTypeType.FullName, dataType));
@@ -681,7 +670,7 @@ namespace Umbraco.Core.Dynamics
 		//    result = null;
 		//    return false;
 		//}
-		private bool ConvertPropertyValueByDataType(ref object result, string name, Guid dataType)
+		private bool ConvertPropertyValueByDataType(ref object result, Guid dataType)
 		{
 			//the resulting property is a string, but to support some of the nice linq stuff in .Where
 			//we should really check some more types
@@ -1085,11 +1074,7 @@ namespace Umbraco.Core.Dynamics
 		public DynamicNode Parent
 		{
 			get
-			{
-				if (_backingItem == null)
-				{
-					return null;
-				}
+			{				
 				if (_backingItem.Parent != null)
 				{
 					return new DynamicNode(_backingItem.Parent);
@@ -1106,24 +1091,24 @@ namespace Umbraco.Core.Dynamics
 	
 		public int TemplateId
 		{
-			get { if (_backingItem == null) return 0; return _backingItem.TemplateId; }
+			get { return _backingItem.TemplateId; }
 		}
 
 		public int SortOrder
 		{
-			get { if (_backingItem == null) return 0; return _backingItem.SortOrder; }
+			get { return _backingItem.SortOrder; }
 		}
 
 		public string Name
 		{
-			get { if (_backingItem == null) return null; return _backingItem.Name; }
+			get { return _backingItem.Name; }
 		}
 		public bool Visible
 		{
 			get
 			{
-				if (_backingItem == null) return true;
-				var umbracoNaviHide = _backingItem.GetProperty("umbracoNaviHide");
+				
+				var umbracoNaviHide = _backingItem.GetUserProperty("umbracoNaviHide");
 				if (umbracoNaviHide != null)
 				{
 					return umbracoNaviHide.Value != "1";
@@ -1138,32 +1123,32 @@ namespace Umbraco.Core.Dynamics
 
 		public string UrlName
 		{
-			get { if (_backingItem == null) return null; return _backingItem.UrlName; }
+			get { return _backingItem.UrlName; }
 		}
 
 		public string NodeTypeAlias
 		{
-			get { if (_backingItem == null) return null; return _backingItem.NodeTypeAlias; }
+			get { return _backingItem.NodeTypeAlias; }
 		}
 
 		public string WriterName
 		{
-			get { if (_backingItem == null) return null; return _backingItem.WriterName; }
+			get { return _backingItem.WriterName; }
 		}
 
 		public string CreatorName
 		{
-			get { if (_backingItem == null) return null; return _backingItem.CreatorName; }
+			get { return _backingItem.CreatorName; }
 		}
 
 		public int WriterId
 		{
-			get { if (_backingItem == null) return 0; return _backingItem.WriterId; }
+			get { return _backingItem.WriterId; }
 		}
 
 		public int CreatorId
 		{
-			get { if (_backingItem == null) return 0; return _backingItem.CreatorId; }
+			get { return _backingItem.CreatorId; }
 		}
 
 		public string Path
@@ -1173,21 +1158,21 @@ namespace Umbraco.Core.Dynamics
 
 		public DateTime CreateDate
 		{
-			get { if (_backingItem == null) return DateTime.MinValue; return _backingItem.CreateDate; }
+			get { return _backingItem.CreateDate; }
 		}
 		public int Id
 		{
-			get { if (_backingItem == null) return 0; return _backingItem.Id; }
+			get { return _backingItem.Id; }
 		}
 
 		public DateTime UpdateDate
 		{
-			get { if (_backingItem == null) return DateTime.MinValue; return _backingItem.UpdateDate; }
+			get { return _backingItem.UpdateDate; }
 		}
 
 		public Guid Version
 		{
-			get { if (_backingItem == null) return Guid.Empty; return _backingItem.Version; }
+			get { return _backingItem.Version; }
 		}
 
 		//public string NiceUrl
@@ -1197,12 +1182,12 @@ namespace Umbraco.Core.Dynamics
 
 		public int Level
 		{
-			get { if (_backingItem == null) return 0; return _backingItem.Level; }
+			get { return _backingItem.Level; }
 		}
 
 		public IEnumerable<IDocumentProperty> Properties
 		{
-			get { if (_backingItem == null) return null; return _backingItem.Properties; }
+			get { return _backingItem.Properties; }
 		}
 
 		//public IEnumerable<DynamicBackingItem> Children
@@ -1212,52 +1197,45 @@ namespace Umbraco.Core.Dynamics
 
 		public IEnumerable<DynamicNode> Children
 		{
-			get { if (_backingItem == null) return null; return GetChildren(); }
+			get { return GetChildren(); }
 		}
+
+		#region GetProperty methods which can be used with the dynamic object
 
 		public IDocumentProperty GetProperty(string alias)
 		{
-			if (_backingItem == null) return null;
-			return _backingItem.GetProperty(alias);
+			return GetProperty(alias, false);
 		}
 		public IDocumentProperty GetProperty(string alias, bool recursive)
 		{
-			if (!recursive) return GetProperty(alias);
-			if (_backingItem == null) return null;
-			DynamicBackingItem context = this._backingItem;
-			var prop = _backingItem.GetProperty(alias);
-			while (prop == null)
-			{
-				context = context.Parent;
-				if (context == null) break;
-				prop = context.GetProperty(alias);
-			}
-			if (prop != null)
-			{
-				return prop;
-			}
-			return null;
+			return alias.StartsWith("@")
+				? _backingItem.GetReflectedProperty(alias.TrimStart('@'))
+				: _backingItem.GetUserProperty(alias, recursive);
 		}
 		public string GetPropertyValue(string alias)
 		{
-			return GetPropertyValue(alias, null);
+			return GetPropertyValue(alias, false);
 		}
 		public string GetPropertyValue(string alias, string fallback)
 		{
-			var prop = GetProperty(alias);
-			if (prop != null) return prop.Value;
-			return fallback;
+			var prop = GetPropertyValue(alias);
+			return !prop.IsNullOrWhiteSpace() ? prop : fallback;
 		}
 		public string GetPropertyValue(string alias, bool recursive)
 		{
-			return GetPropertyValue(alias, recursive, null);
+			var p = alias.StartsWith("@")
+					? _backingItem.GetReflectedProperty(alias.TrimStart('@'))
+					: _backingItem.GetUserProperty(alias, recursive);
+			return p == null ? null : p.ValueAsString;
 		}
 		public string GetPropertyValue(string alias, bool recursive, string fallback)
 		{
-			var prop = GetProperty(alias, recursive);
-			if (prop != null) return prop.Value;
-			return fallback;
-		}
+			var prop = GetPropertyValue(alias, recursive);
+			return !prop.IsNullOrWhiteSpace() ? prop : fallback;
+		} 
+
+		#endregion
+
 		//public System.Data.DataTable ChildrenAsTable()
 		//{
 		//    if (_n == null) return null;
@@ -1271,9 +1249,9 @@ namespace Umbraco.Core.Dynamics
 		//}
 		public bool IsNull(string alias, bool recursive)
 		{
-			var prop = GetProperty(alias, recursive);
+			var prop = _backingItem.GetUserProperty(alias, recursive);
 			if (prop == null) return true;
-			return (prop as PropertyResult).IsNull();
+			return ((PropertyResult)prop).HasValue();
 		}
 		public bool IsNull(string alias)
 		{
@@ -1285,9 +1263,10 @@ namespace Umbraco.Core.Dynamics
 		}
 		public bool HasValue(string alias, bool recursive)
 		{
-			var prop = GetProperty(alias, recursive);
+			var prop = _backingItem.GetUserProperty(alias, recursive);
+			//var prop = GetProperty(alias, recursive);
 			if (prop == null) return false;
-			return (prop as PropertyResult).HasValue();
+			return prop.HasValue();
 		}
 		public IHtmlString HasValue(string alias, string valueIfTrue, string valueIfFalse)
 		{

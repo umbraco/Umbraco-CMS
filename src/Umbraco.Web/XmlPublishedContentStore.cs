@@ -98,7 +98,7 @@ namespace Umbraco.Web
             else
             {
             	var prop = node.GetProperty(propertyAlias);
-				return prop == null ? null : prop.Value;
+				return prop == null ? null : Convert.ToString(prop.Value);
             	//var propertyNode = node.SelectSingleNode("./" + propertyAlias);
             	//return propertyNode == null ? null : propertyNode.InnerText;
             }

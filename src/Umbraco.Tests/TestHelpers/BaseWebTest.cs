@@ -78,6 +78,7 @@ namespace Umbraco.Tests.TestHelpers
 			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""1"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc="""">
 				<content><![CDATA[]]></content>
 				<umbracoUrlAlias><![CDATA[only/one/alias]]></umbracoUrlAlias>
+				<creatorName><![CDATA[Custom data with same property name as the member name]]></creatorName>
 			</Home>
 			<Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""2"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc="""">
 				<content><![CDATA[]]></content>

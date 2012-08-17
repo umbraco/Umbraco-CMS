@@ -5,7 +5,7 @@ namespace Umbraco.Core.Models
 	public interface IDocumentProperty
 	{
 		string Alias { get; }
-		string Value { get; }
+		object Value { get; }
 		Guid Version { get; }
 	}
 }

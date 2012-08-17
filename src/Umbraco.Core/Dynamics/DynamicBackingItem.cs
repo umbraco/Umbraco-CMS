@@ -15,9 +15,11 @@ namespace Umbraco.Core.Dynamics
 		//internal ExamineBackedMedia media;
 		public DynamicBackingItemType Type;
 
-		public DynamicBackingItem(IDocument iNode)
+		public DynamicBackingItem(IDocument document)
 		{
-			this._content = iNode;
+			if (document == null) throw new ArgumentNullException("document");
+
+			this._content = document;
 			this.Type = DynamicBackingItemType.Content;
 		}
 		//public DynamicBackingItem(ExamineBackedMedia media)
@@ -64,25 +66,21 @@ namespace Umbraco.Core.Dynamics
 		//    this.Type = DynamicBackingItemType.Content;
 		//}
 
-		public bool IsNull()
-		{
-			//return (_content == null && media == null);
-			return (_content == null);
-		}
 		public IEnumerable<DynamicBackingItem> Children
 		{
 			get
 			{
 				if (_cachedChildren == null)
 				{
-					if (IsNull()) return null;
 					if (Type == DynamicBackingItemType.Content)
 					{
-						var children = _content.Children;
-						if (children != null)
+						var children = _content.Children.ToArray();
+						//testing, think this must be a special case for the root node ?
+						if (!children.Any() && _content.Id == 0)
 						{
-							_cachedChildren = children.Select(c => new DynamicBackingItem(c));
+							return new List<DynamicBackingItem>(new[] { this });
 						}
+						return children.Select(n => new DynamicBackingItem(n));
 					}
 					else
 					{
@@ -92,71 +90,76 @@ namespace Umbraco.Core.Dynamics
 						//    return children.ToList().ConvertAll(m => new DynamicBackingItem(m));
 						//}
 
-						_cachedChildren = new List<DynamicBackingItem>();
+						_cachedChildren = Enumerable.Empty<DynamicBackingItem>();
 					}
 					
 				}
 				return _cachedChildren;
 			}
-		}
+		}		
 
-		public PropertyResult GetProperty(string alias)
+		private PropertyResult GetPropertyInternal(string alias, IDocument content, bool checkUserProperty = true)
 		{
-			if (IsNull()) return null;
-			if (Type == DynamicBackingItemType.Content)
-			{
-				return GetPropertyInternal(alias, _content);
-			}
-			//else
-			//{
-			//    return GetPropertyInternal(alias, media);
-			//}
-			return null;
-		}
+			if (alias.IsNullOrWhiteSpace()) throw new ArgumentNullException("alias");
+			if (content == null) throw new ArgumentNullException("content");
 
-		private PropertyResult GetPropertyInternal(string alias, IDocument content)
-		{
-			var prop = content.GetProperty(alias);
-			if (prop != null)
+			//if we're looking for a user defined property
+			if (checkUserProperty)
 			{
-				return new PropertyResult(prop) { ContextAlias = content.DocumentTypeAlias, ContextId = content.Id };
+				var prop = content.GetProperty(alias)
+					   ?? (alias[0].IsUpperCase() //if it's null, try to get it with a different casing format (pascal vs camel)
+							? content.GetProperty(alias.ConvertCase(StringAliasCaseType.CamelCase))
+							: content.GetProperty(alias.ConvertCase(StringAliasCaseType.PascalCase)));
+
+				return prop == null
+				       	? null
+				       	: new PropertyResult(prop)
+				       		{
+				       			DocumentTypeAlias = content.DocumentTypeAlias,
+				       			DocumentId = content.Id
+				       		};				
 			}
-			else
-			{
-				if (alias.Substring(0, 1).ToUpper() == alias.Substring(0, 1))
-				{
-					prop = content.GetProperty(alias.Substring(0, 1).ToLower() + alias.Substring((1)));
-					if (prop != null)
+
+			//reflect
+			
+			Func<string, Attempt<object>> getMember =
+				memberAlias =>
 					{
-						return new PropertyResult(prop) { ContextAlias = content.DocumentTypeAlias, ContextId = content.Id };
-					}
-					else
-					{
-						//reflect
-						object result = null;
 						try
 						{
-							result = content.GetType().InvokeMember(alias,
-													  System.Reflection.BindingFlags.GetProperty |
-													  System.Reflection.BindingFlags.Instance |
-													  System.Reflection.BindingFlags.Public |
-													  System.Reflection.BindingFlags.NonPublic,
-													  null,
-													  content,
-													  null);
+							return new Attempt<object>(true,
+							                           content.GetType().InvokeMember(memberAlias,
+							                                                          System.Reflection.BindingFlags.GetProperty |
+							                                                          System.Reflection.BindingFlags.Instance |
+							                                                          System.Reflection.BindingFlags.Public |
+							                                                          System.Reflection.BindingFlags.NonPublic,
+							                                                          null,
+							                                                          content,
+							                                                          null));
 						}
-						catch (MissingMethodException)
+						catch (MissingMethodException ex)
 						{
+							return new Attempt<object>(ex);
+						}
+					};
 
-						}
-						if (result != null)
-						{
-							return new PropertyResult(alias, string.Format("{0}", result), Guid.Empty) { ContextAlias = content.DocumentTypeAlias, ContextId = content.Id };
-						}
-					}
-				}
+			//try with the current casing
+			var attempt = getMember(alias);
+			if (!attempt.Success)
+			{
+				//if we cannot get with the current alias, try changing it's case
+				attempt = alias[0].IsUpperCase()
+					? getMember(alias.ConvertCase(StringAliasCaseType.CamelCase))
+					: getMember(alias.ConvertCase(StringAliasCaseType.PascalCase));
 			}
-			return null;
+
+			return !attempt.Success
+			       	? null
+					: new PropertyResult(alias, attempt.Result, Guid.Empty, PropertyResultType.ReflectedProperty)
+			       		{
+			       			DocumentTypeAlias = content.DocumentTypeAlias,
+			       			DocumentId = content.Id
+			       		};
 		}
 		//private PropertyResult GetPropertyInternal(string alias, ExamineBackedMedia content)
 		//{
@@ -201,107 +204,112 @@ namespace Umbraco.Core.Dynamics
 		//    }
 		//    return null;
 		//}
-		public PropertyResult GetProperty(string alias, out bool propertyExists)
+		//public PropertyResult GetProperty(string alias, out bool propertyExists)
+		//{
+		//    if (IsNull())
+		//    {
+		//        propertyExists = false;
+		//        return null;
+		//    }
+		//    PropertyResult property = null;
+		//    if (Type == DynamicBackingItemType.Content)
+		//    {
+		//        var innerProperty = _content.GetProperty(alias);
+		//        propertyExists = innerProperty != null;
+		//        if (innerProperty != null)
+		//        {
+		//            property = new PropertyResult(innerProperty)
+		//                {
+		//                    ContextAlias = _content.DocumentTypeAlias, 
+		//                    ContextId = _content.Id
+		//                };
+		//        }
+		//    }
+		//    else
+		//    {
+		//        //string[] internalProperties = new string[] {
+		//        //    "id", "nodeName", "updateDate", "writerName", "path", "nodeTypeAlias",
+		//        //    "parentID", "__NodeId", "__IndexType", "__Path", "__NodeTypeAlias", 
+		//        //    "__nodeName", "umbracoBytes","umbracoExtension","umbracoFile","umbracoWidth",
+		//        //    "umbracoHeight"
+		//        //};
+		//        //if (media.WasLoadedFromExamine && !internalProperties.Contains(alias) && !media.Values.ContainsKey(alias))
+		//        //{
+		//        //    //examine doesn't load custom properties
+		//        //    innerProperty = media.LoadCustomPropertyNotFoundInExamine(alias, out propertyExists);
+		//        //    if (innerProperty != null)
+		//        //    {
+		//        //        property = new PropertyResult(innerProperty);
+		//        //        property.ContextAlias = media.NodeTypeAlias;
+		//        //        property.ContextId = media.Id;
+		//        //    }
+		//        //}
+		//        //else
+		//        //{
+		//        //    innerProperty = media.GetProperty(alias, out propertyExists);
+		//        //    if (innerProperty != null)
+		//        //    {
+		//        //        property = new PropertyResult(innerProperty);
+		//        //        property.ContextAlias = media.NodeTypeAlias;
+		//        //        property.ContextId = media.Id;
+		//        //    }
+		//        //}
+		//        propertyExists = false;
+		//    }
+		//    return property;
+		//}
+
+		//public PropertyResult GetProperty(string alias, bool recursive)
+		//{
+		//    bool propertyExists = false;
+		//    return GetProperty(alias, recursive, out propertyExists);
+		//}
+
+		/// <summary>
+		/// Returns a property defined on the document object as a member property using reflection
+		/// </summary>
+		/// <param name="alias"></param>
+		/// <returns></returns>
+		public PropertyResult GetReflectedProperty(string alias)
 		{
-			if (IsNull())
-			{
-				propertyExists = false;
-				return null;
-			}
-			PropertyResult property = null;
-			IDocumentProperty innerProperty = null;
+			return GetPropertyInternal(alias, _content, false);
+		}
+
+		/// <summary>
+		/// Return a user defined property
+		/// </summary>
+		/// <param name="alias"></param>
+		/// <param name="recursive"></param>
+		/// <returns></returns>
+		public PropertyResult GetUserProperty(string alias, bool recursive = false)
+		{
 			if (Type == DynamicBackingItemType.Content)
 			{
-				innerProperty = _content.GetProperty(alias);
-				propertyExists = innerProperty != null;
-				if (innerProperty != null)
+				if (!recursive)
 				{
-					property = new PropertyResult(innerProperty);
-					property.ContextAlias = _content.DocumentTypeAlias;
-					property.ContextId = _content.Id;
+					return GetPropertyInternal(alias, _content);
 				}
+				var context = this;
+				var prop = GetPropertyInternal(alias, _content);
+				while (prop == null || !prop.HasValue())
+				{
+					context = context.Parent;
+					if (context == null) break;
+					prop = context.GetPropertyInternal(alias, context._content);
+				}
+				return prop;
 			}
 			else
 			{
-				//string[] internalProperties = new string[] {
-				//    "id", "nodeName", "updateDate", "writerName", "path", "nodeTypeAlias",
-				//    "parentID", "__NodeId", "__IndexType", "__Path", "__NodeTypeAlias", 
-				//    "__nodeName", "umbracoBytes","umbracoExtension","umbracoFile","umbracoWidth",
-				//    "umbracoHeight"
-				//};
-				//if (media.WasLoadedFromExamine && !internalProperties.Contains(alias) && !media.Values.ContainsKey(alias))
-				//{
-				//    //examine doesn't load custom properties
-				//    innerProperty = media.LoadCustomPropertyNotFoundInExamine(alias, out propertyExists);
-				//    if (innerProperty != null)
-				//    {
-				//        property = new PropertyResult(innerProperty);
-				//        property.ContextAlias = media.NodeTypeAlias;
-				//        property.ContextId = media.Id;
-				//    }
-				//}
-				//else
-				//{
-				//    innerProperty = media.GetProperty(alias, out propertyExists);
-				//    if (innerProperty != null)
-				//    {
-				//        property = new PropertyResult(innerProperty);
-				//        property.ContextAlias = media.NodeTypeAlias;
-				//        property.ContextId = media.Id;
-				//    }
-				//}
-				propertyExists = false;
-			}
-			return property;
-		}
-
-		public PropertyResult GetProperty(string alias, bool recursive)
-		{
-			bool propertyExists = false;
-			return GetProperty(alias, recursive, out propertyExists);
-		}
-		public PropertyResult GetProperty(string alias, bool recursive, out bool propertyExists)
-		{
-			if (!recursive)
-			{
-				return GetProperty(alias, out propertyExists);
-			}
-			if (IsNull())
-			{
-				propertyExists = false;
+				//return GetPropertyInternal(alias, media);
 				return null;
 			}
-			DynamicBackingItem context = this;
-			PropertyResult prop = this.GetProperty(alias, out propertyExists);
-			while (prop == null || string.IsNullOrEmpty(prop.Value))
-			{
-				context = context.Parent;
-				if (context == null) break;
-				prop = context.GetProperty(alias, out propertyExists);
-			}
-			if (prop != null)
-			{
-				return prop;
-			}
-			return null;
 		}
-		public string GetPropertyValue(string alias)
-		{
-			var prop = GetProperty(alias);
-			if (prop != null) return prop.Value;
-			return null;
-		}
-		public string GetPropertyValue(string alias, bool recursive)
-		{
-			var prop = GetProperty(alias, recursive);
-			if (prop != null) return prop.Value;
-			return null;
-		}
+		
 		public IEnumerable<IDocumentProperty> Properties
 		{
 			get
 			{
-				if (IsNull()) return null;
 				if (Type == DynamicBackingItemType.Content)
 				{
 					return _content.Properties;
@@ -344,27 +352,26 @@ namespace Umbraco.Core.Dynamics
 		public int Level
 		{
 			//get { if (IsNull()) return 0; return Type == DynamicBackingItemType.Content ? _content.Level : media.Level; }
-			get { if (IsNull()) return 0; return Type == DynamicBackingItemType.Content ? _content.Level : 0; }
+			get { return Type == DynamicBackingItemType.Content ? _content.Level : 0; }
 		}
 
 
 		public int Id
 		{
 			//get { if (IsNull()) return 0; return Type == DynamicBackingItemType.Content ? _content.Id : media.Id; }
-			get { if (IsNull()) return 0; return Type == DynamicBackingItemType.Content ? _content.Id : 0; }
+			get { return Type == DynamicBackingItemType.Content ? _content.Id : 0; }
 		}
 
 		public string NodeTypeAlias
 		{
 			//get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? _content.NodeTypeAlias : media.NodeTypeAlias; }
-			get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? _content.DocumentTypeAlias : null; }
+			get { return Type == DynamicBackingItemType.Content ? _content.DocumentTypeAlias : null; }
 		}
 
 		public DynamicBackingItem Parent
 		{
 			get
 			{
-				if (IsNull()) return null;
 				if (Type == DynamicBackingItemType.Content)
 				{
 					var parent = _content.Parent;
@@ -389,23 +396,23 @@ namespace Umbraco.Core.Dynamics
 		public DateTime CreateDate
 		{
 			//get { if (IsNull()) return DateTime.MinValue; return Type == DynamicBackingItemType.Content ? _content.CreateDate : media.CreateDate; }
-			get { if (IsNull()) return DateTime.MinValue; return Type == DynamicBackingItemType.Content ? _content.CreateDate : DateTime.MinValue; }
+			get { return Type == DynamicBackingItemType.Content ? _content.CreateDate : DateTime.MinValue; }
 		}
 		public DateTime UpdateDate
 		{
 			//get { if (IsNull()) return DateTime.MinValue; return Type == DynamicBackingItemType.Content ? _content.UpdateDate : media.UpdateDate; }
-			get { if (IsNull()) return DateTime.MinValue; return Type == DynamicBackingItemType.Content ? _content.UpdateDate : DateTime.MinValue; }
+			get { return Type == DynamicBackingItemType.Content ? _content.UpdateDate : DateTime.MinValue; }
 		}
 
 		public string WriterName
 		{
-			get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? _content.WriterName : null; }
+			get { return Type == DynamicBackingItemType.Content ? _content.WriterName : null; }
 		}
 
 		public string Name
 		{
 			//get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? _content.Name : media.Name; }
-			get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? _content.Name : null; }
+			get { return Type == DynamicBackingItemType.Content ? _content.Name : null; }
 		}
 		public string nodeName
 		{
@@ -418,7 +425,7 @@ namespace Umbraco.Core.Dynamics
 		public Guid Version
 		{
 			//get { if (IsNull()) return Guid.Empty; return Type == DynamicBackingItemType.Content ? _content.Version : media.Version; }
-			get { if (IsNull()) return Guid.Empty; return Type == DynamicBackingItemType.Content ? _content.Version : Guid.Empty; }
+			get { return Type == DynamicBackingItemType.Content ? _content.Version : Guid.Empty; }
 		}
 
 		//public string Url
@@ -435,70 +442,42 @@ namespace Umbraco.Core.Dynamics
 
 		public string UrlName
 		{
-			get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? _content.UrlName : null; }
+			get { return Type == DynamicBackingItemType.Content ? _content.UrlName : null; }
 		}
 
 		public int TemplateId
 		{
-			get { if (IsNull()) return 0; return Type == DynamicBackingItemType.Content ? _content.TemplateId : 0; }
+			get { return Type == DynamicBackingItemType.Content ? _content.TemplateId : 0; }
 		}
 
 		public int SortOrder
 		{
 			//get { if (IsNull()) return 0; return Type == DynamicBackingItemType.Content ? _content.SortOrder : media.SortOrder; }
-			get { if (IsNull()) return 0; return Type == DynamicBackingItemType.Content ? _content.SortOrder : 0; }
+			get { return Type == DynamicBackingItemType.Content ? _content.SortOrder : 0; }
 		}
 
 
 		public string CreatorName
 		{
 			//get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? _content.CreatorName : media.CreatorName; }
-			get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? _content.CreatorName : null; }
+			get { return Type == DynamicBackingItemType.Content ? _content.CreatorName : null; }
 		}
 
 		public int WriterId
 		{
-			get { if (IsNull()) return 0; return Type == DynamicBackingItemType.Content ? _content.WriterId : 0; }
+			get { return Type == DynamicBackingItemType.Content ? _content.WriterId : 0; }
 		}
 
 		public int CreatorId
 		{
 			//get { if (IsNull()) return 0; return Type == DynamicBackingItemType.Content ? _content.CreatorID : media.CreatorID; }
-			get { if (IsNull()) return 0; return Type == DynamicBackingItemType.Content ? _content.CreatorId : 0; }
+			get { return Type == DynamicBackingItemType.Content ? _content.CreatorId : 0; }
 		}
 
 		public string Path
 		{
 			//get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? _content.Path : media.Path; }
-			get { if (IsNull()) return null; return Type == DynamicBackingItemType.Content ? _content.Path : null; }
-		}
-
-		public IEnumerable<DynamicBackingItem> GetChildren
-		{
-			get
-			{
-				if (Type == DynamicBackingItemType.Content)
-				{
-					var children = _content.Children.ToArray();
-					//testing
-					if (!children.Any() && _content.Id == 0)
-					{
-						return new List<DynamicBackingItem>(new DynamicBackingItem[] { this });
-					}
-					return children.Select(n => new DynamicBackingItem(n));
-				}
-				//else
-				//{
-				//    List<ExamineBackedMedia> children = media.ChildrenAsList.Value;
-				//    //testing
-				//    if (children.Count == 0 && _content.Id == 0)
-				//    {
-				//        return new List<DynamicBackingItem>(new DynamicBackingItem[] { this });
-				//    }
-				//    return children.ConvertAll(n => new DynamicBackingItem(n));
-				//}
-				return Enumerable.Empty<DynamicBackingItem>();
-			}
+			get { return Type == DynamicBackingItemType.Content ? _content.Path : null; }
 		}
 
 

@@ -87,7 +87,7 @@ namespace Umbraco.Core.IO
 
                 Debug.WriteLine("total: " + sw.ElapsedMilliseconds);
                 sw.Stop();
-                System.Web.HttpContext.Current.Trace.Write("Resolve Urls", sw.ElapsedMilliseconds.ToString());
+				Debug.WriteLine("Resolve Urls", sw.ElapsedMilliseconds.ToString());
 
             }
             return text;
