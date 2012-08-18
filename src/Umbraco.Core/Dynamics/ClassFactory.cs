@@ -47,7 +47,7 @@ namespace Umbraco.Core.Dynamics
 				Type type;
 				if (!classes.TryGetValue(signature, out type))
 				{
-					type = CreateDynamicClass(signature.properties);
+					type = CreateDynamicClass(signature.Properties);
 					classes.Add(signature, type);
 				}
 				return type;

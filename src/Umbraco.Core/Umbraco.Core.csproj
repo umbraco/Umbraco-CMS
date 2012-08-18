@@ -66,12 +66,12 @@
     <Compile Include="Dynamics\DynamicDictionary.cs" />
     <Compile Include="Dynamics\DynamicExpression.cs" />
     <Compile Include="Dynamics\DynamicGrouping.cs" />
-    <Compile Include="Dynamics\DynamicNode.cs" />
-    <Compile Include="Dynamics\DynamicNodeDataSourceResolver.cs" />
-    <Compile Include="Dynamics\DynamicNodeIdEqualityComparer.cs" />
-    <Compile Include="Dynamics\DynamicNodeList.cs" />
-    <Compile Include="Dynamics\DynamicNodeListOrdering.cs" />
-    <Compile Include="Dynamics\DynamicNodeWalker.cs" />
+    <Compile Include="Dynamics\DynamicDocument.cs" />
+    <Compile Include="Dynamics\DynamicDocumentDataSourceResolver.cs" />
+    <Compile Include="Dynamics\DynamicDocumentIdEqualityComparer.cs" />
+    <Compile Include="Dynamics\DynamicDocumentList.cs" />
+    <Compile Include="Dynamics\DynamicDocumentListOrdering.cs" />
+    <Compile Include="Dynamics\DynamicDocumentWalker.cs" />
     <Compile Include="Dynamics\DynamicNull.cs" />
     <Compile Include="Dynamics\DynamicOrdering.cs" />
     <Compile Include="Dynamics\DynamicProperty.cs" />
@@ -85,7 +85,7 @@
     <Compile Include="HtmlTagWrapper.cs" />
     <Compile Include="HtmlTagWrapperBase.cs" />
     <Compile Include="HtmlTagWrapperTextNode.cs" />
-    <Compile Include="Dynamics\IDynamicNodeDataSource.cs" />
+    <Compile Include="Dynamics\IDynamicDocumentDataSource.cs" />
     <Compile Include="Dynamics\IRazorDataTypeModel.cs" />
     <Compile Include="Dynamics\ParseException.cs" />
     <Compile Include="Dynamics\PropertyResult.cs" />

@@ -19,27 +19,46 @@ namespace Umbraco.Tests
 		{
 			base.Initialize();
 
-			DynamicNodeDataSourceResolver.Current = new DynamicNodeDataSourceResolver(
-				new TestDynamicNodeDataSource());
+			DynamicDocumentDataSourceResolver.Current = new DynamicDocumentDataSourceResolver(
+				new TestDynamicDocumentDataSource());
 		}
 
 		public override void TearDown()
 		{
 			base.TearDown();
 
-			DynamicNodeDataSourceResolver.Reset();
+			DynamicDocumentDataSourceResolver.Reset();
 		}
 
-		private DynamicNode GetDynamicNode(int id)
+		private DynamicDocument GetDynamicNode(int id)
 		{
 			var template = Template.MakeNew("test", new User(0));
 			var ctx = GetUmbracoContext("/test", template);
 			var contentStore = new XmlPublishedContentStore();
 			var doc = contentStore.GetDocumentById(ctx, id);
 			Assert.IsNotNull(doc);
-			var dynamicNode = new DynamicNode(doc);
+			var dynamicNode = new DynamicDocument(doc);
 			Assert.IsNotNull(dynamicNode);
 			return dynamicNode;
+		}
+
+		[Test]
+		public void Get_Children_With_Pluralized_Alias()
+		{
+			var dynamicNode = GetDynamicNode(1173);
+			var asDynamic = dynamicNode.AsDynamic();
+
+			Action<dynamic> doAssert = d =>
+				{
+					Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<IEnumerable>(d));
+					var casted = (IEnumerable<DynamicDocument>)d;
+					Assert.AreEqual(2, casted.Count());
+				};
+
+			doAssert(asDynamic.Homes); //pluralized alias
+			doAssert(asDynamic.homes); //pluralized alias
+			doAssert(asDynamic.CustomDocuments); //pluralized alias			
+			doAssert(asDynamic.customDocuments); //pluralized alias
 		}
 
 		[Test]
@@ -99,11 +118,11 @@ namespace Umbraco.Tests
 			var childrenAsList = asDynamic.ChildrenAsList; //test ChildrenAsList too
 			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<IEnumerable>(childrenAsList));
 
-			var castChildren = (IEnumerable<DynamicNode>)children;
-			Assert.AreEqual(2, castChildren.Count());
+			var castChildren = (IEnumerable<DynamicDocument>)children;
+			Assert.AreEqual(4, castChildren.Count());
 
-			var castChildrenAsList = (IEnumerable<DynamicNode>)childrenAsList;
-			Assert.AreEqual(2, castChildrenAsList.Count());
+			var castChildrenAsList = (IEnumerable<DynamicDocument>)childrenAsList;
+			Assert.AreEqual(4, castChildrenAsList.Count());
 		}
 
 		[Test]
@@ -129,7 +148,7 @@ namespace Umbraco.Tests
 
 			Assert.IsNotNull(result);
 
-			var list = (IEnumerable<DynamicNode>)result;
+			var list = (IEnumerable<DynamicDocument>)result;
 			Assert.AreEqual(3, list.Count());
 			Assert.IsTrue(list.Select(x => x.Id).ContainsAll(new[] { 1174, 1173, 1046 }));
 		}
@@ -144,7 +163,7 @@ namespace Umbraco.Tests
 
 			Assert.IsNotNull(result);
 
-			var list = (IEnumerable<DynamicNode>)result;
+			var list = (IEnumerable<DynamicDocument>)result;
 			Assert.AreEqual(2, list.Count());
 			Assert.IsTrue(list.Select(x => x.Id).ContainsAll(new[] { 1173, 1046 }));
 		}
@@ -159,8 +178,8 @@ namespace Umbraco.Tests
 
 			Assert.IsNotNull(result);
 
-			var list = (IEnumerable<DynamicNode>)result;
-			Assert.AreEqual(5, list.Count());
+			var list = (IEnumerable<DynamicDocument>)result;
+			Assert.AreEqual(7, list.Count());
 			Assert.IsTrue(list.Select(x => x.Id).ContainsAll(new[] { 1046, 1173, 1174, 1176, 1175 }));
 		}
 
@@ -174,8 +193,8 @@ namespace Umbraco.Tests
 
 			Assert.IsNotNull(result);
 
-			var list = (IEnumerable<DynamicNode>)result;
-			Assert.AreEqual(4, list.Count());
+			var list = (IEnumerable<DynamicDocument>)result;
+			Assert.AreEqual(6, list.Count());
 			Assert.IsTrue(list.Select(x => x.Id).ContainsAll(new[] { 1173, 1174, 1176, 1175 }));
 		}
 
@@ -221,7 +240,7 @@ namespace Umbraco.Tests
 		[Test]
 		public void Next_Without_Sibling()
 		{
-			var dynamicNode = GetDynamicNode(1176);
+			var dynamicNode = GetDynamicNode(1178);
 			var asDynamic = dynamicNode.AsDynamic();
 
 			Assert.IsNull(asDynamic.Next());
@@ -251,13 +270,8 @@ namespace Umbraco.Tests
 
 		#region Classes used in test
 
-		private class TestDynamicNodeDataSource : IDynamicNodeDataSource
+		private class TestDynamicDocumentDataSource : IDynamicDocumentDataSource
 		{
-			public IEnumerable<string> GetAncestorOrSelfNodeTypeAlias(DynamicBackingItem node)
-			{
-				return Enumerable.Empty<string>();
-			}
-
 			public Guid GetDataType(string contentTypeAlias, string propertyTypeAlias)
 			{
 				//just return an empty Guid since we don't want to match anything currently.

@@ -160,7 +160,7 @@ namespace Umbraco.Web
 
 			//This exists only because the new business logic classes aren't created yet and we want Dynamics in the Core project,
 			//see the note in the DynamicNodeDataSourceResolver.cs class
-			DynamicNodeDataSourceResolver.Current = new DynamicNodeDataSourceResolver(new DefaultDynamicNodeDataSource());
+			DynamicDocumentDataSourceResolver.Current = new DynamicDocumentDataSourceResolver(new DefaultDynamicDocumentDataSource());
 		}
 
 	}

@@ -507,7 +507,7 @@ namespace Umbraco.Core.Dynamics
 						(expr as LambdaExpression).Parameters.CopyTo(parameters, 0);
 						var invokedExpr = Expression.Invoke(expr, parameters);
 						var not = Expression.Not(Expression.TypeAs(invokedExpr, typeof(Nullable<bool>)));
-						expr = Expression.Lambda<Func<DynamicNode, bool>>(
+						expr = Expression.Lambda<Func<DynamicDocument, bool>>(
 							Expression.Condition(
 								Expression.Property(not, "HasValue"),
 								Expression.Property(not, "Value"),
@@ -854,11 +854,11 @@ namespace Umbraco.Core.Dynamics
 				Expression[] args = ParseArgumentList();
 				MethodBase mb;
 				LambdaExpression instanceAsString = null;
-				ParameterExpression instanceExpression = Expression.Parameter(typeof(DynamicNode), "instance");
+				ParameterExpression instanceExpression = Expression.Parameter(typeof(DynamicDocument), "instance");
 				if (type.IsGenericType && type != typeof(string))
 				{
 					var typeArgs = type.GetGenericArguments();
-					if (typeArgs[0] == typeof(DynamicNode))
+					if (typeArgs[0] == typeof(DynamicDocument))
 					{
 						if (instance != null && instance is LambdaExpression)
 						{
@@ -929,14 +929,14 @@ namespace Umbraco.Core.Dynamics
 						//this will invoke TryGetMember (but wrapped in an expression tree)
 						//so that when it's evaluated, DynamicNode should be supported
 
-						ParameterExpression instanceExpression = Expression.Parameter(typeof(DynamicNode), "instance");
+						ParameterExpression instanceExpression = Expression.Parameter(typeof(DynamicDocument), "instance");
 						ParameterExpression convertDynamicNullToBooleanFalse = Expression.Parameter(typeof(bool), "convertDynamicNullToBooleanFalse");
 						ParameterExpression result = Expression.Parameter(typeof(object), "result");
 						ParameterExpression binder = Expression.Variable(typeof(DynamicQueryableGetMemberBinder), "binder");
 						ParameterExpression ignoreCase = Expression.Variable(typeof(bool), "ignoreCase");
 						ConstructorInfo getMemberBinderConstructor = typeof(DynamicQueryableGetMemberBinder).GetConstructor(new Type[] { typeof(string), typeof(bool) });
 						LabelTarget blockReturnLabel = Expression.Label(typeof(object));
-						MethodInfo method = typeof(DynamicNode).GetMethod("TryGetMember");
+						MethodInfo method = typeof(DynamicDocument).GetMethod("TryGetMember");
 
 						BlockExpression block = Expression.Block(
 							typeof(object),
@@ -957,10 +957,10 @@ namespace Umbraco.Core.Dynamics
 							Expression.Return(blockReturnLabel, result),
 							Expression.Label(blockReturnLabel, Expression.Constant(-2, typeof(object)))
 							);
-						LambdaExpression lax = Expression.Lambda<Func<DynamicNode, object>>(block, instanceExpression);
+						LambdaExpression lax = Expression.Lambda<Func<DynamicDocument, object>>(block, instanceExpression);
 						return lax;
 					}
-					if (typeof(Func<DynamicNode, object>).IsAssignableFrom(type))
+					if (typeof(Func<DynamicDocument, object>).IsAssignableFrom(type))
 					{
 						//accessing a property off an already resolved DynamicNode TryGetMember call
 						//e.g. uBlogsyPostDate.Date
@@ -969,8 +969,8 @@ namespace Umbraco.Core.Dynamics
 						ParameterExpression result = Expression.Parameter(typeof(object), "result");
 						ParameterExpression idParam = Expression.Parameter(typeof(string), "id");
 						ParameterExpression lambdaResult = Expression.Parameter(typeof(object), "lambdaResult");
-						ParameterExpression lambdaInstanceExpression = Expression.Parameter(typeof(DynamicNode), "lambdaInstanceExpression");
-						ParameterExpression instanceExpression = Expression.Parameter(typeof(Func<DynamicNode, object>), "instance");
+						ParameterExpression lambdaInstanceExpression = Expression.Parameter(typeof(DynamicDocument), "lambdaInstanceExpression");
+						ParameterExpression instanceExpression = Expression.Parameter(typeof(Func<DynamicDocument, object>), "instance");
 						LabelTarget blockReturnLabel = Expression.Label(typeof(object));
 
 						BlockExpression block = Expression.Block(
@@ -989,7 +989,7 @@ namespace Umbraco.Core.Dynamics
 							Expression.Return(blockReturnLabel, result),
 							Expression.Label(blockReturnLabel, Expression.Constant(-2, typeof(object)))
 							);
-						LambdaExpression lax = Expression.Lambda<Func<DynamicNode, object>>(block, lambdaInstanceExpression);
+						LambdaExpression lax = Expression.Lambda<Func<DynamicDocument, object>>(block, lambdaInstanceExpression);
 						return lax;
 					}
 				}
@@ -1048,11 +1048,11 @@ namespace Umbraco.Core.Dynamics
 			switch (methodReturnType.Name)
 			{
 				case "String":
-					return Expression.Lambda<Func<DynamicNode, string>>(block, instanceExpression);
+					return Expression.Lambda<Func<DynamicDocument, string>>(block, instanceExpression);
 				case "Int32":
-					return Expression.Lambda<Func<DynamicNode, int>>(block, instanceExpression);
+					return Expression.Lambda<Func<DynamicDocument, int>>(block, instanceExpression);
 				case "Boolean":
-					return Expression.Lambda<Func<DynamicNode, bool>>(block, instanceExpression);
+					return Expression.Lambda<Func<DynamicDocument, bool>>(block, instanceExpression);
 			}
 			return Expression.Call(instance, (MethodInfo)method, args);
 		}
@@ -1090,8 +1090,8 @@ namespace Umbraco.Core.Dynamics
 				Expression.Return(cblockReturnLabel, cresult),
 				Expression.Label(cblockReturnLabel, Expression.Constant(null, typeof(string))));
 
-			LambdaExpression lax2 = Expression.Lambda<Func<DynamicNode, string>>(cblock, instanceExpression);
-			var expression = Expression.Lambda<Func<DynamicNode, string>>(cblock, instanceExpression);
+			LambdaExpression lax2 = Expression.Lambda<Func<DynamicDocument, string>>(cblock, instanceExpression);
+			var expression = Expression.Lambda<Func<DynamicDocument, string>>(cblock, instanceExpression);
 			return expression;
 
 		}
@@ -1408,7 +1408,7 @@ namespace Umbraco.Core.Dynamics
 			//if the type of the expression is a func<DynamicNode, object> - invokable returning object, 
 			//we are going to return it here, because we can get the real value when we actually have the instance
 			//if (typeof(Func<DynamicNode, object>).IsAssignableFrom(expr.Type)) return expr;
-			if (expr is LambdaExpression && ((LambdaExpression)expr).Parameters.Count > 0 && ((LambdaExpression)expr).Parameters[0].Type == typeof(DynamicNode))
+			if (expr is LambdaExpression && ((LambdaExpression)expr).Parameters.Count > 0 && ((LambdaExpression)expr).Parameters[0].Type == typeof(DynamicDocument))
 			{
 				return expr;
 			}
@@ -1687,12 +1687,12 @@ namespace Umbraco.Core.Dynamics
 			UnaryExpression unboxedLeft = null, unboxedRight = null;
 			ParameterExpression[] parameters = null;
 
-			if (left is LambdaExpression && (left as LambdaExpression).Type.GetGenericArguments().First() == typeof(DynamicNode))
+			if (left is LambdaExpression && (left as LambdaExpression).Type.GetGenericArguments().First() == typeof(DynamicDocument))
 			{
 				leftIsLambda = true;
 			}
 
-			if (right is LambdaExpression && (right as LambdaExpression).Type.GetGenericArguments().First() == typeof(DynamicNode))
+			if (right is LambdaExpression && (right as LambdaExpression).Type.GetGenericArguments().First() == typeof(DynamicDocument))
 			{
 				rightIsLambda = true;
 			}
@@ -1746,11 +1746,11 @@ namespace Umbraco.Core.Dynamics
 
 							if (expressionType == ExpressionType.AndAlso)
 							{
-								return ExpressionExtensions.And<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, right as Expression<Func<DynamicNode, bool>>);
+								return ExpressionExtensions.And<DynamicDocument>(left as Expression<Func<DynamicDocument, bool>>, right as Expression<Func<DynamicDocument, bool>>);
 							}
 							if (expressionType == ExpressionType.OrElse)
 							{
-								return ExpressionExtensions.Or<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, right as Expression<Func<DynamicNode, bool>>);
+								return ExpressionExtensions.Or<DynamicDocument>(left as Expression<Func<DynamicDocument, bool>>, right as Expression<Func<DynamicDocument, bool>>);
 							}
 
 						}
@@ -1781,11 +1781,11 @@ namespace Umbraco.Core.Dynamics
 										//left is invoked and unboxed to right's TOut, right was not boxed
 										if (expressionType == ExpressionType.AndAlso)
 										{
-											return ExpressionExtensions.And<DynamicNode>(right as Expression<Func<DynamicNode, bool>>, Expression.Lambda<Func<DynamicNode, bool>>(unboxedLeft, parameters) as Expression<Func<DynamicNode, bool>>);
+											return ExpressionExtensions.And<DynamicDocument>(right as Expression<Func<DynamicDocument, bool>>, Expression.Lambda<Func<DynamicDocument, bool>>(unboxedLeft, parameters) as Expression<Func<DynamicDocument, bool>>);
 										}
 										if (expressionType == ExpressionType.OrElse)
 										{
-											return ExpressionExtensions.And<DynamicNode>(right as Expression<Func<DynamicNode, bool>>, Expression.Lambda<Func<DynamicNode, bool>>(unboxedLeft, parameters) as Expression<Func<DynamicNode, bool>>);
+											return ExpressionExtensions.And<DynamicDocument>(right as Expression<Func<DynamicDocument, bool>>, Expression.Lambda<Func<DynamicDocument, bool>>(unboxedLeft, parameters) as Expression<Func<DynamicDocument, bool>>);
 										}
 									}
 									else
@@ -1802,11 +1802,11 @@ namespace Umbraco.Core.Dynamics
 										//right is invoked and unboxed to left's TOut, left was not boxed
 										if (expressionType == ExpressionType.AndAlso)
 										{
-											return ExpressionExtensions.And<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, Expression.Lambda<Func<DynamicNode, bool>>(unboxedRight, parameters) as Expression<Func<DynamicNode, bool>>);
+											return ExpressionExtensions.And<DynamicDocument>(left as Expression<Func<DynamicDocument, bool>>, Expression.Lambda<Func<DynamicDocument, bool>>(unboxedRight, parameters) as Expression<Func<DynamicDocument, bool>>);
 										}
 										if (expressionType == ExpressionType.OrElse)
 										{
-											return ExpressionExtensions.And<DynamicNode>(left as Expression<Func<DynamicNode, bool>>, Expression.Lambda<Func<DynamicNode, bool>>(unboxedRight, parameters) as Expression<Func<DynamicNode, bool>>);
+											return ExpressionExtensions.And<DynamicDocument>(left as Expression<Func<DynamicDocument, bool>>, Expression.Lambda<Func<DynamicDocument, bool>>(unboxedRight, parameters) as Expression<Func<DynamicDocument, bool>>);
 										}
 									}
 
@@ -1877,7 +1877,7 @@ namespace Umbraco.Core.Dynamics
 					break;
 				case ExpressionType.Modulo:
 					binaryExpression = Expression.Modulo(finalLeft, finalRight);
-					return (Expression.Lambda<Func<DynamicNode, int>>(binaryExpression, parameters));
+					return (Expression.Lambda<Func<DynamicDocument, int>>(binaryExpression, parameters));
 				case ExpressionType.AndAlso:
 					if ((leftIsLambda && rightIsLambda && sequenceEqual) || (!leftIsLambda && !rightIsLambda))
 					{
@@ -1885,7 +1885,7 @@ namespace Umbraco.Core.Dynamics
 					}
 					else
 					{
-						return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.AndAlso(finalLeft, finalRight), parameters));
+						return (Expression.Lambda<Func<DynamicDocument, Boolean>>(Expression.AndAlso(finalLeft, finalRight), parameters));
 					}
 				case ExpressionType.OrElse:
 					if (leftIsLambda && rightIsLambda && sequenceEqual || (!leftIsLambda && !rightIsLambda))
@@ -1894,7 +1894,7 @@ namespace Umbraco.Core.Dynamics
 					}
 					else
 					{
-						return (Expression.Lambda<Func<DynamicNode, Boolean>>(Expression.OrElse(finalLeft, finalRight), parameters));
+						return (Expression.Lambda<Func<DynamicDocument, Boolean>>(Expression.OrElse(finalLeft, finalRight), parameters));
 					}
 				default:
 					return Expression.Equal(left, right);
@@ -1902,7 +1902,7 @@ namespace Umbraco.Core.Dynamics
 			if (leftIsLambda || rightIsLambda)
 			{
 				var body = Expression.Condition(Expression.TypeEqual(innerLeft, right.Type), binaryExpression, Expression.Constant(false));
-				return Expression.Lambda<Func<DynamicNode, bool>>(body, parameters);
+				return Expression.Lambda<Func<DynamicDocument, bool>>(body, parameters);
 			}
 			else
 			{

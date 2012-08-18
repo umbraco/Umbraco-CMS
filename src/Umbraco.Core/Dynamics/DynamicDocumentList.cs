@@ -9,17 +9,17 @@ using System.Reflection;
 
 namespace Umbraco.Core.Dynamics
 {
-    internal class DynamicNodeList : DynamicObject, IEnumerable<DynamicNode>
+    internal class DynamicDocumentList : DynamicObject, IEnumerable<DynamicDocument>
     {
-		internal List<DynamicNode> Items { get; set; }
+		internal List<DynamicDocument> Items { get; set; }
         
-        public DynamicNodeList()
+        public DynamicDocumentList()
         {
-            Items = new List<DynamicNode>();
+            Items = new List<DynamicDocument>();
         }
-        public DynamicNodeList(IEnumerable<DynamicNode> items)
+        public DynamicDocumentList(IEnumerable<DynamicDocument> items)
         {
-            List<DynamicNode> list = items.ToList();
+            List<DynamicDocument> list = items.ToList();
             list.ForEach(node => node.OwnerList = this);
             Items = list;
         }
@@ -31,9 +31,9 @@ namespace Umbraco.Core.Dynamics
 		//    Items = list;
 		//}
 
-        public DynamicNodeList(IEnumerable<IDocument> items)
+        public DynamicDocumentList(IEnumerable<IDocument> items)
         {
-            List<DynamicNode> list = items.Select(x => new DynamicNode(x)).ToList();
+            List<DynamicDocument> list = items.Select(x => new DynamicDocument(x)).ToList();
 			list.ForEach(node => node.OwnerList = this);
             Items = list;
         }
@@ -58,12 +58,12 @@ namespace Umbraco.Core.Dynamics
             {
                 string predicate = args.First().ToString();
                 var values = args.Skip(1).ToArray();
-                result = new DynamicNodeList(this.Where<DynamicNode>(predicate, values).ToList());
+                result = new DynamicDocumentList(this.Where<DynamicDocument>(predicate, values).ToList());
                 return true;
             }
             if (name == "OrderBy")
             {
-                result = new DynamicNodeList(this.OrderBy<DynamicNode>(args.First().ToString()).ToList());
+                result = new DynamicDocumentList(this.OrderBy<DynamicDocument>(args.First().ToString()).ToList());
                 return true;
             }
             if (name == "InGroupsOf")
@@ -71,7 +71,7 @@ namespace Umbraco.Core.Dynamics
                 int groupSize = 0;
                 if (int.TryParse(args.First().ToString(), out groupSize))
                 {
-                    result = this.InGroupsOf<DynamicNode>(groupSize);
+                    result = this.InGroupsOf<DynamicDocument>(groupSize);
                     return true;
                 }
                 result = new DynamicNull();
@@ -82,7 +82,7 @@ namespace Umbraco.Core.Dynamics
                 int groupCount = 0;
                 if (int.TryParse(args.First().ToString(), out groupCount))
                 {
-                    result = this.GroupedInto<DynamicNode>(groupCount);
+                    result = this.GroupedInto<DynamicDocument>(groupCount);
                     return true;
                 }
                 result = new DynamicNull();
@@ -90,7 +90,7 @@ namespace Umbraco.Core.Dynamics
             }
             if (name == "GroupBy")
             {
-                result = this.GroupBy<DynamicNode>(args.First().ToString());
+                result = this.GroupBy<DynamicDocument>(args.First().ToString());
                 return true;
             }
             if (name == "Average" || name == "Min" || name == "Max" || name == "Sum")
@@ -100,46 +100,46 @@ namespace Umbraco.Core.Dynamics
             }
             if (name == "Union")
             {
-                if ((args.First() as IEnumerable<DynamicNode>) != null)
+                if ((args.First() as IEnumerable<DynamicDocument>) != null)
                 {
-                    result = new DynamicNodeList(this.Items.Union(args.First() as IEnumerable<DynamicNode>));
+                    result = new DynamicDocumentList(this.Items.Union(args.First() as IEnumerable<DynamicDocument>));
                     return true;
                 }
-                if ((args.First() as DynamicNodeList) != null)
+                if ((args.First() as DynamicDocumentList) != null)
                 {
-                    result = new DynamicNodeList(this.Items.Union((args.First() as DynamicNodeList).Items));
+                    result = new DynamicDocumentList(this.Items.Union((args.First() as DynamicDocumentList).Items));
                     return true;
                 }
             }
             if (name == "Except")
             {
-                if ((args.First() as IEnumerable<DynamicNode>) != null)
+                if ((args.First() as IEnumerable<DynamicDocument>) != null)
                 {
-                    result = new DynamicNodeList(this.Items.Except(args.First() as IEnumerable<DynamicNode>, new DynamicNodeIdEqualityComparer()));
+                    result = new DynamicDocumentList(this.Items.Except(args.First() as IEnumerable<DynamicDocument>, new DynamicDocumentIdEqualityComparer()));
                     return true;
                 }
-                if ((args.First() as DynamicNodeList) != null)
+                if ((args.First() as DynamicDocumentList) != null)
                 {
-                    result = new DynamicNodeList(this.Items.Except((args.First() as DynamicNodeList).Items, new DynamicNodeIdEqualityComparer()));
+                    result = new DynamicDocumentList(this.Items.Except((args.First() as DynamicDocumentList).Items, new DynamicDocumentIdEqualityComparer()));
                     return true;
                 }
             }
             if (name == "Intersect")
             {
-                if ((args.First() as IEnumerable<DynamicNode>) != null)
+                if ((args.First() as IEnumerable<DynamicDocument>) != null)
                 {
-                    result = new DynamicNodeList(this.Items.Intersect(args.First() as IEnumerable<DynamicNode>, new DynamicNodeIdEqualityComparer()));
+                    result = new DynamicDocumentList(this.Items.Intersect(args.First() as IEnumerable<DynamicDocument>, new DynamicDocumentIdEqualityComparer()));
                     return true;
                 }
-                if ((args.First() as DynamicNodeList) != null)
+                if ((args.First() as DynamicDocumentList) != null)
                 {
-                    result = new DynamicNodeList(this.Items.Intersect((args.First() as DynamicNodeList).Items, new DynamicNodeIdEqualityComparer()));
+                    result = new DynamicDocumentList(this.Items.Intersect((args.First() as DynamicDocumentList).Items, new DynamicDocumentIdEqualityComparer()));
                     return true;
                 }
             }
             if (name == "Distinct")
             {
-                result = new DynamicNodeList(this.Items.Distinct(new DynamicNodeIdEqualityComparer()));
+                result = new DynamicDocumentList(this.Items.Distinct(new DynamicDocumentIdEqualityComparer()));
                 return true;
             }
             if (name == "Pluck" || name == "Select")
@@ -189,7 +189,7 @@ namespace Umbraco.Core.Dynamics
                         //We do this to enable error checking of Razor Syntax when a method e.g. ElementAt(2) is used.
                         //When the Script is tested, there's no Children which means ElementAt(2) is invalid (IndexOutOfRange)
                         //Instead, we are going to return an empty DynamicNode.
-                        result = new DynamicNode();
+                        result = new DynamicDocument();
                         return true;
                     }
 
@@ -353,14 +353,14 @@ namespace Umbraco.Core.Dynamics
         {
             object result = null;
 
-            MethodInfo methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(IEnumerable<DynamicNode>), args, name, false);
+            MethodInfo methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(IEnumerable<DynamicDocument>), args, name, false);
             if (methodToExecute == null)
             {
-                methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(DynamicNodeList), args, name, false);
+                methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(DynamicDocumentList), args, name, false);
             }
             if (methodToExecute != null)
             {
-                if (methodToExecute.GetParameters().First().ParameterType == typeof(DynamicNodeList))
+                if (methodToExecute.GetParameters().First().ParameterType == typeof(DynamicDocumentList))
                 {
                     var genericArgs = (new[] { this }).Concat(args);
                     result = methodToExecute.Invoke(null, genericArgs.ToArray());
@@ -379,15 +379,15 @@ namespace Umbraco.Core.Dynamics
             {
                 if (result is IEnumerable<INode>)
                 {
-					result = new DynamicNodeList((IEnumerable<IDocument>)result);
+					result = new DynamicDocumentList((IEnumerable<IDocument>)result);
                 }
-                if (result is IEnumerable<DynamicNode>)
+                if (result is IEnumerable<DynamicDocument>)
                 {
-                    result = new DynamicNodeList((IEnumerable<DynamicNode>)result);
+                    result = new DynamicDocumentList((IEnumerable<DynamicDocument>)result);
                 }
                 if (result is INode)
                 {
-                    result = new DynamicNode((IDocument)result);
+                    result = new DynamicDocument((IDocument)result);
                 }
             }
             return result;
@@ -422,9 +422,9 @@ namespace Umbraco.Core.Dynamics
             return new DynamicGrouping(
                this
                .Items
-               .Select((node, index) => new KeyValuePair<int, DynamicNode>(index, node))
+               .Select((node, index) => new KeyValuePair<int, DynamicDocument>(index, node))
                .GroupBy(kv => (object)(kv.Key / groupSize))
-               .Select(item => new Grouping<object, DynamicNode>()
+               .Select(item => new Grouping<object, DynamicDocument>()
                {
                    Key = item.Key,
                    Elements = item.Select(inner => inner.Value)
@@ -435,9 +435,9 @@ namespace Umbraco.Core.Dynamics
             return new DynamicGrouping(
                 this
                 .Items
-                .Select((node, index) => new KeyValuePair<int, DynamicNode>(index, node))
+                .Select((node, index) => new KeyValuePair<int, DynamicDocument>(index, node))
                 .GroupBy(kv => (object)(kv.Key / groupSize))
-                .Select(item => new Grouping<object, DynamicNode>()
+                .Select(item => new Grouping<object, DynamicDocument>()
                 {
                     Key = item.Key,
                     Elements = item.Select(inner => inner.Value)
@@ -450,17 +450,17 @@ namespace Umbraco.Core.Dynamics
             return DynamicQueryable.Select(Items.AsQueryable(), predicate, values);
         }
 
-        public void Add(DynamicNode node)
+        public void Add(DynamicDocument document)
         {
-            node.OwnerList = this;
-            this.Items.Add(node);
+            document.OwnerList = this;
+            this.Items.Add(document);
         }
-        public void Remove(DynamicNode node)
+        public void Remove(DynamicDocument document)
         {
-            if (this.Items.Contains(node))
+            if (this.Items.Contains(document))
             {
-				node.OwnerList = null;
-                this.Items.Remove(node);
+				document.OwnerList = null;
+                this.Items.Remove(document);
             }
         }
         public bool IsNull()
@@ -472,7 +472,7 @@ namespace Umbraco.Core.Dynamics
             return true;
         }
 
-    	public IEnumerator<DynamicNode> GetEnumerator()
+    	public IEnumerator<DynamicDocument> GetEnumerator()
     	{
     		return Items.GetEnumerator();
     	}

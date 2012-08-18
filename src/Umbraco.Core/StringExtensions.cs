@@ -18,6 +18,48 @@ namespace Umbraco.Core
     ///</summary>
     public static class StringExtensions
     {
+		//this is from SqlMetal and just makes it a bit of fun to allow pluralisation
+		public static string MakePluralName(this string name)
+		{
+			if ((name.EndsWith("x", StringComparison.OrdinalIgnoreCase) || name.EndsWith("ch", StringComparison.OrdinalIgnoreCase)) || (name.EndsWith("ss", StringComparison.OrdinalIgnoreCase) || name.EndsWith("sh", StringComparison.OrdinalIgnoreCase)))
+			{
+				name = name + "es";
+				return name;
+			}
+			if ((name.EndsWith("y", StringComparison.OrdinalIgnoreCase) && (name.Length > 1)) && !IsVowel(name[name.Length - 2]))
+			{
+				name = name.Remove(name.Length - 1, 1);
+				name = name + "ies";
+				return name;
+			}
+			if (!name.EndsWith("s", StringComparison.OrdinalIgnoreCase))
+			{
+				name = name + "s";
+			}
+			return name;
+		}
+
+		public static bool IsVowel(this char c)
+		{
+			switch (c)
+			{
+				case 'O':
+				case 'U':
+				case 'Y':
+				case 'A':
+				case 'E':
+				case 'I':
+				case 'o':
+				case 'u':
+				case 'y':
+				case 'a':
+				case 'e':
+				case 'i':
+					return true;
+			}
+			return false;
+		}
+
         /// <summary>
         /// Trims the specified value from a string; accepts a string input whereas the in-built implementation only accepts char or char[].
         /// </summary>

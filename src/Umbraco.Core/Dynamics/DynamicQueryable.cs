@@ -21,22 +21,22 @@ namespace Umbraco.Core.Dynamics
             if (source == null) throw new ArgumentNullException("source");
             if (predicate == null) throw new ArgumentNullException("predicate");
             LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(bool), predicate, true, values);
-            if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
+            if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicDocument))
             {
                 //source list is DynamicNode and the lambda returns a Func<object>
-                IQueryable<DynamicNode> typedSource = source as IQueryable<DynamicNode>;
+                IQueryable<DynamicDocument> typedSource = source as IQueryable<DynamicDocument>;
                 var compiledFunc = lambda.Compile();
-                Func<DynamicNode, object> func = null;
-                Func<DynamicNode, bool> boolFunc = null;
-                if (compiledFunc is Func<DynamicNode, object>)
+                Func<DynamicDocument, object> func = null;
+                Func<DynamicDocument, bool> boolFunc = null;
+                if (compiledFunc is Func<DynamicDocument, object>)
                 {
-                    func = (Func<DynamicNode, object>)compiledFunc;
+                    func = (Func<DynamicDocument, object>)compiledFunc;
                 }
-                if (compiledFunc is Func<DynamicNode, bool>)
+                if (compiledFunc is Func<DynamicDocument, bool>)
                 {
-                    boolFunc = (Func<DynamicNode, bool>)compiledFunc;
+                    boolFunc = (Func<DynamicDocument, bool>)compiledFunc;
                 }
-                return typedSource.Where(delegate(DynamicNode node)
+                return typedSource.Where(delegate(DynamicDocument node)
                 {
                     object value = -1;
                     //value = func(node);
@@ -46,13 +46,13 @@ namespace Umbraco.Core.Dynamics
                         if (func != null)
                         {
                             var firstFuncResult = func(node);
-                            if (firstFuncResult is Func<DynamicNode, object>)
+                            if (firstFuncResult is Func<DynamicDocument, object>)
                             {
-                                value = (firstFuncResult as Func<DynamicNode, object>)(node);
+                                value = (firstFuncResult as Func<DynamicDocument, object>)(node);
                             }
-                            if (firstFuncResult is Func<DynamicNode, bool>)
+                            if (firstFuncResult is Func<DynamicDocument, bool>)
                             {
-                                value = (firstFuncResult as Func<DynamicNode, bool>)(node);
+                                value = (firstFuncResult as Func<DynamicDocument, bool>)(node);
                             }
                             if (firstFuncResult is bool)
                             {
@@ -86,28 +86,28 @@ namespace Umbraco.Core.Dynamics
             }
         }
 
-        public static IQueryable Select(this IQueryable<DynamicNode> source, string selector, params object[] values)
+        public static IQueryable Select(this IQueryable<DynamicDocument> source, string selector, params object[] values)
         {
             if (source == null) throw new ArgumentNullException("source");
             if (selector == null) throw new ArgumentNullException("selector");
             LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(object), selector, false, values);
-            if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
+            if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicDocument))
             {
                 //source list is DynamicNode and the lambda returns a Func<object>
-                IQueryable<DynamicNode> typedSource = source as IQueryable<DynamicNode>;
+                IQueryable<DynamicDocument> typedSource = source as IQueryable<DynamicDocument>;
                 var compiledFunc = lambda.Compile();
-                Func<DynamicNode, object> func = null;
-                if (compiledFunc is Func<DynamicNode, object>)
+                Func<DynamicDocument, object> func = null;
+                if (compiledFunc is Func<DynamicDocument, object>)
                 {
-                    func = (Func<DynamicNode, object>)compiledFunc;
+                    func = (Func<DynamicDocument, object>)compiledFunc;
                 }
-                return typedSource.Select(delegate(DynamicNode node)
+                return typedSource.Select(delegate(DynamicDocument node)
                 {
                     object value = null;
                     value = func(node);
-                    if (value is Func<DynamicNode, object>)
+                    if (value is Func<DynamicDocument, object>)
                     {
-                        var innerValue = (value as Func<DynamicNode, object>)(node);
+                        var innerValue = (value as Func<DynamicDocument, object>)(node);
                         return innerValue;
                     }
                     return value;
@@ -133,7 +133,7 @@ namespace Umbraco.Core.Dynamics
             if (source == null) throw new ArgumentNullException("source");
             if (ordering == null) throw new ArgumentNullException("ordering");
 
-            IQueryable<DynamicNode> typedSource = source as IQueryable<DynamicNode>;
+            IQueryable<DynamicDocument> typedSource = source as IQueryable<DynamicDocument>;
             if (!ordering.Contains(","))
             {
                 bool descending = false;
@@ -149,10 +149,10 @@ namespace Umbraco.Core.Dynamics
                 }
 
                 LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(object), ordering, false, values);
-                if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
+                if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicDocument))
                 {
                     //source list is DynamicNode and the lambda returns a Func<object>
-                    Func<DynamicNode, object> func = (Func<DynamicNode, object>)lambda.Compile();
+                    Func<DynamicDocument, object> func = (Func<DynamicDocument, object>)lambda.Compile();
                     //get the values out
                     var query = typedSource.ToList().ConvertAll(item => new { node = item, key = EvaluateDynamicNodeFunc(item, func) });
                     if (query.Count == 0)
@@ -214,7 +214,7 @@ namespace Umbraco.Core.Dynamics
                     //reroute each stacked Expression.Call into our own methods that know how to deal
                     //with DynamicNode
                     queryExpr = Expression.Call(
-                            typeof(DynamicNodeListOrdering),
+                            typeof(DynamicDocumentListOrdering),
                             o.Ascending ? methodAsc : methodDesc,
                             null,
                             queryExpr,
@@ -246,13 +246,13 @@ namespace Umbraco.Core.Dynamics
                 return null;
             }
         }
-        private static object EvaluateDynamicNodeFunc(DynamicNode node, Func<DynamicNode, object> func)
+        private static object EvaluateDynamicNodeFunc(DynamicDocument document, Func<DynamicDocument, object> func)
         {
             object value = -1;
-            var firstFuncResult = func(node);
-            if (firstFuncResult is Func<DynamicNode, object>)
+            var firstFuncResult = func(document);
+            if (firstFuncResult is Func<DynamicDocument, object>)
             {
-                value = (firstFuncResult as Func<DynamicNode, object>)(node);
+                value = (firstFuncResult as Func<DynamicDocument, object>)(document);
             }
             if (firstFuncResult.GetType().IsValueType || firstFuncResult is string)
             {

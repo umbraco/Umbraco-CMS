@@ -7,11 +7,11 @@ namespace Umbraco.Core.Dynamics
 	/// and currently the business logic part of Umbraco is still in the legacy project and we don't want to move that to the core so in the
 	/// meantime until the new APIs are made, we need to have this data source in place with a resolver which is set in the web project.
 	/// </summary>
-	internal class DynamicNodeDataSourceResolver : SingleObjectResolverBase<DynamicNodeDataSourceResolver, IDynamicNodeDataSource>
+	internal class DynamicDocumentDataSourceResolver : SingleObjectResolverBase<DynamicDocumentDataSourceResolver, IDynamicDocumentDataSource>
 	{
-		public IDynamicNodeDataSource DataSource { get; private set; }
+		public IDynamicDocumentDataSource DataSource { get; private set; }
 
-		public DynamicNodeDataSourceResolver(IDynamicNodeDataSource dataSource)
+		public DynamicDocumentDataSourceResolver(IDynamicDocumentDataSource dataSource)
 		{
 			DataSource = dataSource;
 		}

@@ -6,14 +6,14 @@ namespace Umbraco.Core.Dynamics
 {
     internal class DynamicGrouping : IEnumerable
     {
-        public IEnumerable<Grouping<object, DynamicNode>> Inner;
+        public IEnumerable<Grouping<object, DynamicDocument>> Inner;
 
         public DynamicGrouping OrderBy(string expression)
         {
             return this;
         }
 
-        public DynamicGrouping(DynamicNodeList list, string groupBy)
+        public DynamicGrouping(DynamicDocumentList list, string groupBy)
         {
             Inner =
               list
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Dynamics
               .Select(node =>
                 {
                     string predicate = groupBy;
-                    var internalList = new DynamicNodeList(new DynamicNode[] { node });
+                    var internalList = new DynamicDocumentList(new DynamicDocument[] { node });
                     var query = (IQueryable<object>)internalList.Select(predicate, new object[] { });
                     var key = query.FirstOrDefault();
                     return new
@@ -32,13 +32,13 @@ namespace Umbraco.Core.Dynamics
                 })
               .Where(item => item.Key != null)
               .GroupBy(item => item.Key)
-              .Select(item => new Grouping<object, DynamicNode>()
+              .Select(item => new Grouping<object, DynamicDocument>()
               {
                   Key = item.Key,
                   Elements = item.Select(inner => inner.Node)
               });
         }
-        public DynamicGrouping(IEnumerable<Grouping<object, DynamicNode>> source)
+        public DynamicGrouping(IEnumerable<Grouping<object, DynamicDocument>> source)
         {
             this.Inner = source;
         }

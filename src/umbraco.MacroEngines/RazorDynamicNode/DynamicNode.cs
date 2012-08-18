@@ -411,6 +411,12 @@ namespace umbraco.MacroEngines
                     CMSNode working = ContentType.GetByAlias(node.NodeTypeAlias);
                     while (working != null)
                     {
+						//NOTE: I'm not sure if anyone has ever tested this but if you get working.Parent it will return a CMSNode and
+						// it will never be castable to a 'ContentType' object
+						// pretty sure the only reason why this method works for the one place that it is used is that it returns
+						// the current node's alias which is all that is actually requried, this is just added overhead for no 
+						// reason
+
                         if ((working as ContentType) != null)
                         {
                             list.Add((working as ContentType).Alias);
