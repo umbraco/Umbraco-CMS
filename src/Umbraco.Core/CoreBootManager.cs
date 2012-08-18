@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core
 {
@@ -109,6 +110,14 @@ namespace Umbraco.Core
 
 			ActionsResolver.Current = new ActionsResolver(
 				PluginManager.Current.ResolveActions());
+
+			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
+				new []
+					{
+						typeof(DatePickerPropertyEditorValueConverter),
+						typeof(TinyMcePropertyEditorValueConverter),
+						typeof(YesNoPropertyEditorValueConverter)
+					});
 		}
 	}
 }

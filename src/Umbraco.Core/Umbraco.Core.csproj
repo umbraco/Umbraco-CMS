@@ -82,6 +82,8 @@
     <Compile Include="Dynamics\ExtensionMethodFinder.cs" />
     <Compile Include="Dynamics\ExtensionMethods.cs" />
     <Compile Include="Dynamics\Grouping.cs" />
+    <Compile Include="PropertyEditors\DatePickerPropertyEditorValueConverter.cs" />
+    <Compile Include="PropertyEditors\IPropertyEditorValueConverter.cs" />
     <Compile Include="HtmlTagWrapper.cs" />
     <Compile Include="HtmlTagWrapperBase.cs" />
     <Compile Include="HtmlTagWrapperTextNode.cs" />
@@ -120,6 +122,9 @@
     <Compile Include="ObjectResolution\MacroFieldEditorsResolver.cs" />
     <Compile Include="Macros\PersistableMacroProperty.cs" />
     <Compile Include="ObjectExtensions.cs" />
+    <Compile Include="PropertyEditors\PropertyEditorValueConvertersResolver.cs" />
+    <Compile Include="PropertyEditors\TinyMcePropertyEditorValueConverter.cs" />
+    <Compile Include="PropertyEditors\YesNoPropertyEditorValueConverter.cs" />
     <Compile Include="RazorDataTypeModelStaticMappingItem.cs" />
     <Compile Include="ObjectResolution\ManyObjectsResolverBase.cs" />
     <Compile Include="ObjectResolution\ObjectLifetimeScope.cs" />

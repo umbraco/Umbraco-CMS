@@ -135,23 +135,6 @@ namespace Umbraco.Core.Dynamics
 			return DynamicDocumentWalker.Sibling(this, nodeTypeAlias);
 		}
 
-		private DynamicDocumentList GetChildren()
-		{
-			if (_cachedChildren == null)
-			{
-				var children = _backingItem.Children;
-				//testing
-				if (!children.Any() && _backingItem.Id == 0)
-				{
-					_cachedChildren = new DynamicDocumentList(new List<DynamicDocument> { new DynamicDocument(this._backingItem) });
-				}
-				else
-				{
-					_cachedChildren = new DynamicDocumentList(_backingItem.Children.Select(x => new DynamicDocument(x)));
-				}
-			}
-			return _cachedChildren;
-		}
 		//public DynamicNodeList XPath(string xPath)
 		//{
 		//    //if this DN was initialized with an underlying NodeFactory.Node
@@ -464,7 +447,7 @@ namespace Umbraco.Core.Dynamics
 
 			if (name.InvariantEquals("ChildrenAsList") || name.InvariantEquals("Children"))
 			{
-				result = GetChildren();
+				result = Children;
 				return true;
 			}
 			if (name.InvariantEquals("parentId"))
@@ -660,37 +643,15 @@ namespace Umbraco.Core.Dynamics
 		//}
 		private bool ConvertPropertyValueByDataType(ref object result, Guid dataType)
 		{
+
+			//First lets check all registered converters:
+			// TODO: Look up new converters!
+
 			//the resulting property is a string, but to support some of the nice linq stuff in .Where
 			//we should really check some more types
 			string sResult = string.Format("{0}", result).Trim();
 
-			//boolean
-			if (dataType == DATATYPE_YESNO_GUID)
-			{
-				bool parseResult;
-				if (string.IsNullOrEmpty(string.Format("{0}", result)))
-				{
-					result = false;
-					return true;
-				}
-				if (Boolean.TryParse(sResult.Replace("1", "true").Replace("0", "false"), out parseResult))
-				{
-					result = parseResult;
-					return true;
-				}
-			}
-
-			////integer
-			////this will eat csv strings, so only do it if the decimal also includes a decimal seperator (according to the current culture)
-			//if (dataType == DATATYPE_INTEGER_GUID)
-			//{
-			//    int iResult = 0;
-			//    if (int.TryParse(sResult, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out iResult))
-			//    {
-			//        result = iResult;
-			//        return true;
-			//    }
-			//}
+			
 
 			//this will eat csv strings, so only do it if the decimal also includes a decimal seperator (according to the current culture)
 			if (sResult.Contains(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator))
@@ -703,28 +664,7 @@ namespace Umbraco.Core.Dynamics
 					return true;
 				}
 			}
-			if (dataType == DATATYPE_DATETIMEPICKER_GUID || dataType == DATATYPE_DATEPICKER_GUID)
-			{
-				//date
-				DateTime dtResult = DateTime.MinValue;
-				if (DateTime.TryParse(string.Format("{0}", result), out dtResult))
-				{
-					result = dtResult;
-					return true;
-				}
-				else
-				{
-					result = new DynamicNull();
-					return true;
-				}
-			}
-
-			// Rich text editor (return IHtmlString so devs doesn't need to decode html
-			if (dataType == DATATYPE_TINYMCE_GUID)
-			{
-				result = new HtmlString(result.ToString());
-				return true;
-			}
+		
 
 
 			if (string.Equals("true", sResult, StringComparison.CurrentCultureIgnoreCase))
@@ -1144,7 +1084,23 @@ namespace Umbraco.Core.Dynamics
 
 		public IEnumerable<DynamicDocument> Children
 		{
-			get { return GetChildren(); }
+			get
+			{
+				if (_cachedChildren == null)
+				{
+					var children = _backingItem.Children;
+					//testing
+					if (!children.Any() && _backingItem.Id == 0)
+					{
+						_cachedChildren = new DynamicDocumentList(new List<DynamicDocument> { new DynamicDocument(this._backingItem) });
+					}
+					else
+					{
+						_cachedChildren = new DynamicDocumentList(_backingItem.Children.Select(x => new DynamicDocument(x)));
+					}
+				}
+				return _cachedChildren;
+			}
 		}
 
 		#region GetProperty methods which can be used with the dynamic object
