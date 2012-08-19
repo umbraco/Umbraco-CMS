@@ -1229,55 +1229,56 @@ namespace umbraco
         /// <returns>The rendered template as a string</returns>
         public static string RenderTemplate(int PageId, int TemplateId)
         {
-            try
+            if (UmbracoSettings.UseAspNetMasterPages)
             {
-                if (UmbracoSettings.UseAspNetMasterPages)
+                if (!umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled)
                 {
-                    if (!umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled)
+                    System.Collections.Generic.Dictionary<object, object> items = getCurrentContextItems();
+                    HttpContext.Current.Items["altTemplate"] = null;
+
+                    HttpContext Context = HttpContext.Current;
+                    StringBuilder queryString = new StringBuilder();
+                    const string ONE_QS_PARAM = "&{0}={1}";
+                    foreach (object key in Context.Request.QueryString.Keys)
                     {
-                        System.Collections.Generic.Dictionary<object, object> items = getCurrentContextItems();
+                        if (!key.ToString().ToLower().Equals("umbpageid") && !key.ToString().ToLower().Equals("alttemplate"))
+                            queryString.Append(string.Format(ONE_QS_PARAM, key, Context.Request.QueryString[key.ToString()]));
+                    }
+                    StringWriter sw = new StringWriter();
 
-                        HttpContext Context = HttpContext.Current;
-                        StringBuilder queryString = new StringBuilder();
-                        const string ONE_QS_PARAM = "&{0}={1}";
-                        foreach (object key in Context.Request.QueryString.Keys)
-                        {
-                            if (!key.ToString().ToLower().Equals("umbpageid") && !key.ToString().ToLower().Equals("alttemplate"))
-                                queryString.Append(string.Format(ONE_QS_PARAM, key, Context.Request.QueryString[key.ToString()]));
-                        }
-                        StringWriter sw = new StringWriter();
-
-
+                    try
+                    {
                         Context.Server.Execute(
                             string.Format("~/default.aspx?umbPageID={0}&alttemplate={1}{2}",
                             PageId, new template(TemplateId).TemplateAlias, queryString), sw);
 
-                        // update the local page items again
-                        updateLocalContextItems(items, Context);
-
-                        return sw.ToString();
-
                     }
-                    else
+                    catch (Exception ee)
                     {
-                        return "RenderTemplate not supported in Canvas";
+                        sw.Write("<!-- Error generating macroContent: '{0}' -->", ee);
                     }
+
+                    // update the local page items again
+                    updateLocalContextItems(items, Context);
+
+                    return sw.ToString();
+
                 }
                 else
                 {
-                    page p = new page(((IHasXmlNode)GetXmlNodeById(PageId.ToString()).Current).GetNode());
-                    p.RenderPage(TemplateId);
-                    Control c = p.PageContentControl;
-                    StringWriter sw = new StringWriter();
-                    HtmlTextWriter hw = new HtmlTextWriter(sw);
-                    c.RenderControl(hw);
-
-                    return sw.ToString();
+                    return "RenderTemplate not supported in Canvas";
                 }
             }
-            catch (Exception ee)
+            else
             {
-                return string.Format("<!-- Error generating macroContent: '{0}' -->", ee);
+                page p = new page(((IHasXmlNode)GetXmlNodeById(PageId.ToString()).Current).GetNode());
+                p.RenderPage(TemplateId);
+                Control c = p.PageContentControl;
+                StringWriter sw = new StringWriter();
+                HtmlTextWriter hw = new HtmlTextWriter(sw);
+                c.RenderControl(hw);
+
+                return sw.ToString();
             }
         }
 
@@ -1310,48 +1311,46 @@ namespace umbraco
         /// <returns>The rendered template as a string.</returns>
         public static string RenderTemplate(int PageId)
         {
-            try
+            if (UmbracoSettings.UseAspNetMasterPages)
             {
-                if (UmbracoSettings.UseAspNetMasterPages)
+                if (!umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled)
                 {
-                    if (!umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled)
+                    System.Collections.Generic.Dictionary<object, object> items = getCurrentContextItems();
+                    HttpContext.Current.Items["altTemplate"] = null;
+
+                    HttpContext Context = HttpContext.Current;
+                    StringBuilder queryString = new StringBuilder();
+                    const string ONE_QS_PARAM = "&{0}={1}";
+                    foreach (object key in Context.Request.QueryString.Keys)
                     {
-                        System.Collections.Generic.Dictionary<object, object> items = getCurrentContextItems();
-
-                        HttpContext Context = HttpContext.Current;
-                        StringBuilder queryString = new StringBuilder();
-                        const string ONE_QS_PARAM = "&{0}={1}";
-                        foreach (object key in Context.Request.QueryString.Keys)
-                        {
-                            if (!key.ToString().ToLower().Equals("umbpageid") && !key.ToString().ToLower().Equals("alttemplate"))
-                                queryString.Append(string.Format(ONE_QS_PARAM, key, Context.Request.QueryString[key.ToString()]));
-                        }
-                        StringWriter sw = new StringWriter();
-
-                        Context.Server.Execute(
-                            string.Format("/default.aspx?umbPageID={0}{1}",
-                            PageId, queryString), sw);
-                                                
-                        // update the local page items again
-                        updateLocalContextItems(items, Context);
-
-                        return sw.ToString();
+                        if (!key.ToString().ToLower().Equals("umbpageid") && !key.ToString().ToLower().Equals("alttemplate"))
+                            queryString.Append(string.Format(ONE_QS_PARAM, key, Context.Request.QueryString[key.ToString()]));
                     }
-                    else
+                    StringWriter sw = new StringWriter();
+                    try
                     {
-                        return "RenderTemplate not supported in Canvas";
+                        Context.Server.Execute(string.Format("/default.aspx?umbPageID={0}{1}", PageId, queryString), sw);
                     }
+                    catch (Exception ee)
+                    {
+                        sw.Write("<!-- Error generating macroContent: '{0}' -->", ee);
+                    }
+   
+                    // update the local page items again
+                    updateLocalContextItems(items, Context);
+
+                    return sw.ToString();
                 }
                 else
                 {
-                    return
-                        RenderTemplate(PageId,
-                                       new page(((IHasXmlNode)GetXmlNodeById(PageId.ToString()).Current).GetNode()).Template);
+                    return "RenderTemplate not supported in Canvas";
                 }
             }
-            catch (Exception ee)
+            else
             {
-                return string.Format("<!-- Error generating macroContent: '{0}' -->", ee);
+                return
+                    RenderTemplate(PageId,
+                                    new page(((IHasXmlNode)GetXmlNodeById(PageId.ToString()).Current).GetNode()).Template);
             }
         }
 
