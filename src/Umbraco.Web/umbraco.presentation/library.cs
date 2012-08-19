@@ -1233,10 +1233,10 @@ namespace umbraco
             {
                 if (UmbracoSettings.UseAspNetMasterPages)
                 {
-                    System.Collections.Generic.Dictionary<object, object> items = getCurrentContextItems();
-
                     if (!umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled)
                     {
+                        System.Collections.Generic.Dictionary<object, object> items = getCurrentContextItems();
+
                         HttpContext Context = HttpContext.Current;
                         StringBuilder queryString = new StringBuilder();
                         const string ONE_QS_PARAM = "&{0}={1}";
@@ -1256,6 +1256,7 @@ namespace umbraco
                         updateLocalContextItems(items, Context);
 
                         return sw.ToString();
+
                     }
                     else
                     {
@@ -1315,12 +1316,14 @@ namespace umbraco
                 {
                     if (!umbraco.presentation.UmbracoContext.Current.LiveEditingContext.Enabled)
                     {
+                        System.Collections.Generic.Dictionary<object, object> items = getCurrentContextItems();
+
                         HttpContext Context = HttpContext.Current;
                         StringBuilder queryString = new StringBuilder();
                         const string ONE_QS_PARAM = "&{0}={1}";
                         foreach (object key in Context.Request.QueryString.Keys)
                         {
-                            if (!key.ToString().ToLower().Equals("umbpageid"))
+                            if (!key.ToString().ToLower().Equals("umbpageid") && !key.ToString().ToLower().Equals("alttemplate"))
                                 queryString.Append(string.Format(ONE_QS_PARAM, key, Context.Request.QueryString[key.ToString()]));
                         }
                         StringWriter sw = new StringWriter();
@@ -1328,6 +1331,9 @@ namespace umbraco
                         Context.Server.Execute(
                             string.Format("/default.aspx?umbPageID={0}{1}",
                             PageId, queryString), sw);
+                                                
+                        // update the local page items again
+                        updateLocalContextItems(items, Context);
 
                         return sw.ToString();
                     }
