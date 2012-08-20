@@ -19,18 +19,18 @@ namespace umbraco.cms.businesslogic.Files
         private string _url;
         private long _length;
 
-        private IFileSystem _fs;
+        private IMediaFileSystem _fs;
 
         #region Constructors
 
         public UmbracoFile()
         {
-            _fs = FileSystemProviderManager.Current.GetFileSystemProvider(FileSystemProvider.Media);
+            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
         }
 
         public UmbracoFile(string path)
         {
-            _fs = FileSystemProviderManager.Current.GetFileSystemProvider(FileSystemProvider.Media);
+            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
 
             _path = path;
 
@@ -55,7 +55,7 @@ namespace umbraco.cms.businesslogic.Files
 
         public static UmbracoFile Save(Stream inputStream, string path)
         {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider(FileSystemProvider.Media);
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
             fs.AddFile(path, inputStream);
 
             return new UmbracoFile(path);

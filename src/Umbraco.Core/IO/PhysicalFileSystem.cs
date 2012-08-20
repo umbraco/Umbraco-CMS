@@ -14,10 +14,7 @@ namespace Umbraco.Core.IO
 
         public PhysicalFileSystem(string virtualRoot)
         {
-            if(HttpContext.Current == null)
-                throw new InvalidOperationException("The single parameter constructor can only be accessed when there is a valid HttpContext");
-
-            _rootPath = HttpContext.Current.Server.MapPath(virtualRoot);
+            _rootPath = System.Web.Hosting.HostingEnvironment.MapPath(virtualRoot);
             _rootUrl = VirtualPathUtility.ToAbsolute(virtualRoot);
         }
 

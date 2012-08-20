@@ -29,6 +29,7 @@ namespace Umbraco.Core.IO
 
         bool FileExists(string path);
 
+
         string GetRelativePath(string fullPathOrUrl);
 
         string GetFullPath(string path);
