@@ -5,12 +5,18 @@ namespace Umbraco.Core.PropertyEditors
 {
 	internal interface IPropertyEditorValueConverter
 	{
+		//TODO: SD: I thinnk this should only support propertyEditorId since I see no reason why we would want 
+		// type converters specifically for docTypeAlias of property Alias!
+		// need to ask Gareth about his original intention.
+
 		/// <summary>
 		/// Returns true if this converter can perform the value conversion for the specified property editor id
 		/// </summary>
 		/// <param name="propertyEditorId"></param>
+		/// <param name="docTypeAlias"> </param>
+		/// <param name="propertyTypeAlias"> </param>
 		/// <returns></returns>
-		bool CanConvertForEditor(Guid propertyEditorId);
+		bool IsConverterFor(Guid propertyEditorId, string docTypeAlias, string propertyTypeAlias);
 
 		/// <summary>
 		/// Attempts to convert the value specified into a useable value on the front-end

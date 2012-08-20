@@ -5,8 +5,11 @@ using System.Text;
 
 namespace Umbraco.Core
 {
-	//NOTE: I'm not sure what this does or what it is used for, have emailed Gareth about it as the name really means nothing to me 
-	// and don't know where this class actually belongs.
+
+	//NOTE: This is used in the old DynamicNode for performing value conversions/mappings for certain data types.
+	// it has been obsoleted because we've replaced this with the PropertyEditorValueConvertersResolver which can 
+	// have converters registered in code so we don't have to rely on even more config sections. 
+	// These things probably won't need to be created all that often and in code is much easier to do.
 
     internal class RazorDataTypeModelStaticMappingItem
     {

@@ -13,9 +13,9 @@ namespace Umbraco.Web
 	/// </summary>
 	internal class DefaultDynamicDocumentDataSource : IDynamicDocumentDataSource
 	{
-		public Guid GetDataType(string contentTypeAlias, string propertyTypeAlias)
+		public Guid GetDataType(string docTypeAlias, string propertyAlias)
 		{
-			return ContentType.GetDataType(contentTypeAlias, propertyTypeAlias);
+			return ContentType.GetDataType(docTypeAlias, propertyAlias);
 		}
 	}
 }

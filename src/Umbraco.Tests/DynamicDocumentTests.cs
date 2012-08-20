@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using umbraco.BusinessLogic;
@@ -13,7 +15,7 @@ using umbraco.cms.businesslogic.template;
 namespace Umbraco.Tests
 {
 	[TestFixture]
-	public class DynamicNodeTests : BaseWebTest
+	public class DynamicDocumentTests : BaseWebTest
 	{
 		public override void Initialize()
 		{
@@ -21,6 +23,14 @@ namespace Umbraco.Tests
 
 			DynamicDocumentDataSourceResolver.Current = new DynamicDocumentDataSourceResolver(
 				new TestDynamicDocumentDataSource());
+
+			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
+				new[]
+					{
+						typeof(DatePickerPropertyEditorValueConverter),
+						typeof(TinyMcePropertyEditorValueConverter),
+						typeof(YesNoPropertyEditorValueConverter)
+					});
 		}
 
 		public override void TearDown()
@@ -28,6 +38,7 @@ namespace Umbraco.Tests
 			base.TearDown();
 
 			DynamicDocumentDataSourceResolver.Reset();
+			PropertyEditorValueConvertersResolver.Reset();
 		}
 
 		private DynamicDocument GetDynamicNode(int id)
@@ -40,6 +51,16 @@ namespace Umbraco.Tests
 			var dynamicNode = new DynamicDocument(doc);
 			Assert.IsNotNull(dynamicNode);
 			return dynamicNode;
+		}
+
+		[Test]
+		public void Ensure_TinyMCE_Converted_Type_User_Property()
+		{
+			var dynamicNode = GetDynamicNode(1173);
+			var asDynamic = dynamicNode.AsDynamic();
+
+			Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<IHtmlString>(asDynamic.Content.GetType()));
+			Assert.AreEqual("<div>This is some content</div>", asDynamic.Content.ToString());
 		}
 
 		[Test]
@@ -272,9 +293,15 @@ namespace Umbraco.Tests
 
 		private class TestDynamicDocumentDataSource : IDynamicDocumentDataSource
 		{
-			public Guid GetDataType(string contentTypeAlias, string propertyTypeAlias)
+			public Guid GetDataType(string docTypeAlias, string propertyAlias)
 			{
-				//just return an empty Guid since we don't want to match anything currently.
+				if (propertyAlias == "content")
+				{
+					//return the rte type id
+					return Guid.Parse("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
+				}
+
+
 				return Guid.Empty;
 			}
 		}

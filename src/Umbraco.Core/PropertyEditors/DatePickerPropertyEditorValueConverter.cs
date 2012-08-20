@@ -5,7 +5,7 @@ namespace Umbraco.Core.PropertyEditors
 {
 	internal class DatePickerPropertyEditorValueConverter : IPropertyEditorValueConverter
 	{
-		public bool CanConvertForEditor(Guid propertyEditorId)
+		public bool IsConverterFor(Guid propertyEditorId, string docTypeAlias, string propertyTypeAlias)
 		{
 			return (new[]
 				{

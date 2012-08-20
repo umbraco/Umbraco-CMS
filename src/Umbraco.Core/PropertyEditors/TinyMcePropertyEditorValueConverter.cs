@@ -5,7 +5,7 @@ namespace Umbraco.Core.PropertyEditors
 {
 	internal class TinyMcePropertyEditorValueConverter : IPropertyEditorValueConverter
 	{
-		public bool CanConvertForEditor(Guid propertyEditorId)
+		public bool IsConverterFor(Guid propertyEditorId, string docTypeAlias, string propertyTypeAlias)
 		{
 			return Guid.Parse("5e9b75ae-face-41c8-b47e-5f4b0fd82f83").Equals(propertyEditorId);
 		}

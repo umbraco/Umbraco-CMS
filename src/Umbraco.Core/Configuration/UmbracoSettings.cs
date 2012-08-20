@@ -407,6 +407,9 @@ namespace Umbraco.Core.Configuration
             }
         }
 
+		//TODO: I"m not sure why we need this, need to ask Gareth what the deal is, pretty sure we can remove it or change it, seems like
+		// massive overkill.
+
         /// <summary>
         /// razor DynamicNode typecasting detects XML and returns DynamicXml - Root elements that won't convert to DynamicXml
         /// </summary>
