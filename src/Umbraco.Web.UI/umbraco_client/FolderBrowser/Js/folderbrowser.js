@@ -41,7 +41,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         {
             var self = this;
             
-            $.getJSON(self._opts.basePath + "/FolderBrowserService/GetChildren/" + self._parentId + "/" + self._viewModel.filterTerm(), function (data) {
+            $.getJSON(self._opts.basePath + "/FolderBrowserService/GetChildren/" + self._parentId, function (data) {
                 if (data != undefined && data.length > 0) {
                     ko.mapping.fromJS(data, itemMappingOptions, self._viewModel.items);
                 } else {
@@ -121,7 +121,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             });
             
             self._viewModel.filtered = ko.computed(function () {
-                //return self._viewModel.items();
                 return ko.utils.arrayFilter(this.items(), function (item) {
                     return item.Name().toLowerCase().indexOf(self._viewModel.filterTerm()) > -1 || 
                         item.Tags().toLowerCase().indexOf(self._viewModel.filterTerm()) > -1;
@@ -150,9 +149,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 return ids;
             }, self._viewModel);
 
-            self._viewModel.filterTerm.subscribe(function (newValue) {
-                self._getChildNodes();
-            });
         },
         
         _initToolbar: function () 

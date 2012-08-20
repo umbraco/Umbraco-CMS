@@ -18,7 +18,7 @@ namespace Umbraco.Web.WebServices
     public class FolderBrowserService
     {
         [RestExtensionMethod(returnXml = false)]
-        public static string GetChildren(int parentId, string filterTerm)
+        public static string GetChildren(int parentId)
         {
             var parentMedia = new global::umbraco.cms.businesslogic.media.Media(parentId);
             var currentUser = User.GetCurrent();
@@ -35,9 +35,7 @@ namespace Umbraco.Web.WebServices
             // Get children and filter
             //TODO: Only fetch files, not containers
             //TODO: Cache responses to speed up susequent searches
-            foreach (var child in parentMedia.Children.Where(x => string.IsNullOrEmpty(filterTerm) ||
-                x.Text.InvariantContains(filterTerm) ||
-                Tag.GetTags(x.Id).Any(y => y.TagCaption.InvariantContains(filterTerm))))
+            foreach (var child in parentMedia.Children)
             {
                 var fileProp = child.getProperty("umbracoFile") ?? 
                     child.GenericProperties.FirstOrDefault(x =>
