@@ -83,6 +83,9 @@ namespace Umbraco.Core.IO
 
             EnsureDirectory(Path.GetDirectoryName(path));
 
+            if (stream.CanSeek)
+                stream.Seek(0, 0);
+
             using (var destination = (Stream)File.Create(GetFullPath(path)))
                 stream.CopyTo(destination);
         }
