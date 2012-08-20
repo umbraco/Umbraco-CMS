@@ -15,15 +15,6 @@ namespace Umbraco.Core.Dynamics
 {
 	internal class DynamicDocument : DynamicObject
 	{
-		#region consts
-		// these are private readonlys as const can't be Guids
-		private readonly Guid DATATYPE_YESNO_GUID = new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a");
-		private readonly Guid DATATYPE_TINYMCE_GUID = new Guid("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
-		private readonly Guid DATATYPE_DATETIMEPICKER_GUID = new Guid("b6fb1622-afa5-4bbf-a3cc-d9672a442222");
-		private readonly Guid DATATYPE_DATEPICKER_GUID = new Guid("23e93522-3200-44e2-9f29-e61a6fcbb79a");
-		//private readonly Guid DATATYPE_INTEGER_GUID = new Guid("1413afcb-d19a-4173-8e9a-68288d2a73b8");
-		#endregion
-
 		private readonly DynamicBackingItem _backingItem;
 		private DynamicDocumentList _cachedChildren;
 		private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
@@ -36,40 +27,12 @@ namespace Umbraco.Core.Dynamics
 			_backingItem = n;
 		}
 
-		//public DynamicNode(int nodeId)
-		//{
-		//    this._n = new DynamicBackingItem(nodeId);
-		//}
-		//public DynamicNode(int nodeId, DynamicBackingItemType itemType)
-		//{
-		//    this._n = new DynamicBackingItem(nodeId, itemType);
-		//}
-		//public DynamicNode(string nodeId)
-		//{
-		//    int DynamicBackingItemId = 0;
-		//    if (int.TryParse(nodeId, out DynamicBackingItemId))
-		//    {
-		//        this._n = new DynamicBackingItem(DynamicBackingItemId);
-		//        return;
-		//    }
-		//    throw new ArgumentException("Cannot instantiate a DynamicNode without an id");
-		//}
 		public DynamicDocument(IDocument node)
 		{
 			if (node == null) throw new ArgumentNullException("node");
 			_backingItem = new DynamicBackingItem(node);
 		}
 
-		//public DynamicNode(object nodeId)
-		//{
-		//    var dynamicBackingItemId = 0;
-		//    if (int.TryParse(string.Format("{0}", nodeId), out dynamicBackingItemId))
-		//    {
-		//        this._n = new DynamicBackingItem(dynamicBackingItemId);
-		//        return;
-		//    }
-		//    throw new ArgumentException("Cannot instantiate a DynamicNode without an id");
-		//}
 		public DynamicDocument()
 		{
 			//Empty constructor for a special case with Generic Methods
@@ -279,6 +242,14 @@ namespace Umbraco.Core.Dynamics
 			}
 			return false;
 		}
+
+		/// <summary>
+		/// Attempts to call a method on the dynamic object
+		/// </summary>
+		/// <param name="binder"></param>
+		/// <param name="args"></param>
+		/// <param name="result"></param>
+		/// <returns></returns>
 		public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
 		{
 			try
@@ -361,10 +332,6 @@ namespace Umbraco.Core.Dynamics
 			}
 			if (result != null)
 			{
-				//if (result is IEnumerable<DynamicBackingItem>)
-				//{
-				//    result = new DynamicNodeList((IEnumerable<DynamicBackingItem>)result);
-				//}
 				if (result is IEnumerable<DynamicDocument>)
 				{
 					result = new DynamicDocumentList((IEnumerable<DynamicDocument>)result);
@@ -377,69 +344,128 @@ namespace Umbraco.Core.Dynamics
 			return result;
 		}
 
-		//private static Dictionary<System.Tuple<Guid, int>, Type> _razorDataTypeModelTypes = null;
-		//private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
+		/// <summary>
+		/// Attempts to return a custom member (generally based on a string match)
+		/// </summary>
+		/// <param name="binder"></param>
+		/// <returns></returns>
+		protected virtual Attempt<object> TryGetCustomMember(GetMemberBinder binder)
+		{
+			if (binder.Name.InvariantEquals("ChildrenAsList") || binder.Name.InvariantEquals("Children"))
+			{
+				return new Attempt<object>(true, Children);
+			}
 
-		//internal static Dictionary<System.Tuple<Guid, int>, Type> RazorDataTypeModelTypes
-		//{
-		//    get
-		//    {
-		//        using (var l = new UpgradeableReadLock(Locker))
-		//        {
-		//            if (_razorDataTypeModelTypes == null)
-		//            {
-		//                l.UpgradeToWriteLock();
+			if (binder.Name.InvariantEquals("parentId"))
+			{
+				var parent = Parent;
+				if (parent == null)
+				{
+					throw new InvalidOperationException(string.Format("The node {0} does not have a parent", Id));
+				}
+				return new Attempt<object>(true, parent.Id);
+			}
+			return Attempt<object>.False;
+		}
 
-		//                var foundTypes = new Dictionary<System.Tuple<Guid, int>, Type>();
+		/// <summary>
+		/// Attempts to return the children by the document type's alias (for example: CurrentPage.NewsItems where NewsItem is the
+		/// document type alias)
+		/// </summary>
+		/// <param name="binder"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// This method will work by both the plural and non-plural alias (i.e. NewsItem and NewsItems)
+		/// </remarks>
+		protected virtual Attempt<object> TryGetChildrenByAlias(GetMemberBinder binder)
+		{
+			
+			var filteredTypeChildren = _backingItem.Children
+				.Where(x => x.NodeTypeAlias.InvariantEquals(binder.Name) || x.NodeTypeAlias.MakePluralName().InvariantEquals(binder.Name))
+				.ToArray();
+			if (filteredTypeChildren.Any())
+			{
+				return new Attempt<object>(true,
+				                           new DynamicDocumentList(filteredTypeChildren.Select(x => new DynamicDocument(x))));
+			}
+			return Attempt<object>.False;
+		}
 
-		//                //HttpContext.Current.Trace.Write("RazorDataTypeModelTypes cache is empty, populating cache using PluginTypeResolver...");
-		//                try
-		//                {
-		//                    PluginManager.Current.ResolveRazorDataTypeModels()
-		//                        .ToList()
-		//                        .ConvertAll(type =>
-		//                        {
-		//                            var razorDataTypeModelAttributes = type.GetCustomAttributes<RazorDataTypeModel>(true);
-		//                            return razorDataTypeModelAttributes.ToList().ConvertAll(razorDataTypeModelAttribute =>
-		//                            {
-		//                                var g = razorDataTypeModelAttribute.DataTypeEditorId;
-		//                                var priority = razorDataTypeModelAttribute.Priority;
-		//                                return new KeyValuePair<System.Tuple<Guid, int>, Type>(new System.Tuple<Guid, int>(g, priority), type);
-		//                            });
-		//                        })
-		//                        .SelectMany(item => item)
-		//                        .ToList()
-		//                        .ForEach(item =>
-		//                        {
-		//                            System.Tuple<Guid, int> key = item.Key;
-		//                            if (!foundTypes.ContainsKey(key))
-		//                            {
-		//                                foundTypes.Add(key, item.Value);
-		//                            }
-		//                        });
-		//                    //HttpContext.Current.Trace.Write(string.Format("{0} items added to cache...", foundTypes.Count));
-		//                    var i = 1;
-		//                    foreach (var item in foundTypes)
-		//                    {
-		//                        HttpContext.Current.Trace.Write(string.Format("{0}/{1}: {2}@{4} => {3}", i, foundTypes.Count, item.Key.Item1, item.Value.FullName, item.Key.Item2));
-		//                        i++;
-		//                    }
+		/// <summary>
+		/// Attempts to return a member based on the reflected document property
+		/// </summary>
+		/// <param name="binder"></param>
+		/// <returns></returns>
+		protected virtual Attempt<object> TryGetDocumentProperty(GetMemberBinder binder)
+		{
+			
+			var reflectedProperty = _backingItem.GetReflectedProperty(binder.Name);
+			var result = reflectedProperty != null
+				? reflectedProperty.Value
+				: null;
 
-		//                    //there is no error, so set the collection
-		//                    _razorDataTypeModelTypes = foundTypes;
+			return result == null
+			       	? Attempt<object>.False
+			       	: new Attempt<object>(true, result);			
+		}
 
-		//                }
-		//                catch (Exception ex)
-		//                {
-		//                    //HttpContext.Current.Trace.Warn("Exception occurred while populating cache, will keep RazorDataTypeModelTypes to null so that this error remains visible and you don't end up with an empty cache with silent failure.");
-		//                    //HttpContext.Current.Trace.Warn(string.Format("The exception was {0} and the message was {1}. {2}", ex.GetType().FullName, ex.Message, ex.StackTrace));							
-		//                }
+		/// <summary>
+		/// Attempts to return a member based on a user defined umbraco property
+		/// </summary>
+		/// <param name="binder"></param>
+		/// <returns></returns>
+		protected virtual Attempt<object> TryGetUserProperty(GetMemberBinder binder)
+		{
+			var name = binder.Name;
+			var recursive = false;
+			if (name.StartsWith("_"))
+			{
+				name = name.Substring(1, name.Length - 1);
+				recursive = true;
+			}
 
-		//            }
-		//            return _razorDataTypeModelTypes;
-		//        }
-		//    }
-		//}
+			var userProperty = _backingItem.GetUserProperty(name, recursive);
+
+			if (userProperty == null)
+			{
+				return Attempt<object>.False;
+			}
+			
+			var result = userProperty.Value;
+
+			if (_backingItem.NodeTypeAlias == null && userProperty.Alias == null)
+			{
+				throw new InvalidOperationException("No node alias or property alias available. Unable to look up the datatype of the property you are trying to fetch.");
+			}
+
+			//get the data type id for the current property
+			var dataType = DynamicDocumentDataSourceResolver.Current.DataSource.GetDataType(userProperty.DocumentTypeAlias, userProperty.Alias);
+
+			//convert the string value to a known type
+			var converted = ConvertPropertyValue(result, dataType, userProperty.DocumentTypeAlias, userProperty.Alias);
+			if (converted.Success)
+			{
+				result = converted.Result;
+			}
+
+			return new Attempt<object>(true, result);
+		}
+
+		/// <summary>
+		/// Returns the member match methods in the correct order and is used in the TryGetMember method.
+		/// </summary>
+		/// <returns></returns>
+		protected virtual IEnumerable<Func<GetMemberBinder, Attempt<object>>> GetMemberMatchMethods()
+		{
+			var memberMatchMethods = new List<Func<GetMemberBinder, Attempt<object>>>
+				{
+					b => TryGetCustomMember(b),		//match custom members
+					b => TryGetUserProperty(b),		//then match custom user defined umbraco properties
+					b => TryGetChildrenByAlias(b),	//then try to match children based on doc type alias
+					b => TryGetDocumentProperty(b)  //then try to match on a reflected document property
+				};
+			return memberMatchMethods;
+		} 
 
 		/// <summary>
 		/// Try to return an object based on the dynamic member accessor
@@ -455,7 +481,7 @@ namespace Umbraco.Core.Dynamics
 		public override bool TryGetMember(GetMemberBinder binder, out object result)
 		{
 			if (binder == null) throw new ArgumentNullException("binder");
-			
+
 			var name = binder.Name;
 
 			//TODO: Refactor the below into multiple methods that return Attempt<object> as this
@@ -465,155 +491,35 @@ namespace Umbraco.Core.Dynamics
 			if (_cachedMemberOutput.TryGetValue(name, out result))
 			{
 				return true;
-			}					
-
-			if (name.InvariantEquals("ChildrenAsList") || name.InvariantEquals("Children"))
-			{
-				result = Children;
 			}
-			else if (name.InvariantEquals("parentId"))
+			
+			//loop through each member match method and execute it. 
+			//If it is successful, cache the result and return it.
+			foreach (var attempt in GetMemberMatchMethods()
+				.Select(m => m(binder))
+				.Where(attempt => attempt.Success))
 			{
-				var parent = Parent;
-				if (parent == null)
-				{
-					throw new InvalidOperationException(string.Format("The node {0} does not have a parent", Id));
-				}
-				result = parent.Id;				
-			}
-			else
-			{
-				var recursive = false;
-				if (name.StartsWith("_"))
-				{
-					name = name.Substring(1, name.Length - 1);
-					recursive = true;
-				}
-
-				var userProperty = _backingItem.GetUserProperty(name, recursive);
-
-				//check for a user defined property
-
-				if (userProperty != null)
-				{
-					result = userProperty.Value;
-					
-					if (_backingItem.NodeTypeAlias == null && userProperty.Alias == null)
-					{
-						throw new InvalidOperationException("No node alias or property alias available. Unable to look up the datatype of the property you are trying to fetch.");
-					}
-
-					//get the data type id for the current property
-					var dataType = DynamicDocumentDataSourceResolver.Current.DataSource.GetDataType(userProperty.DocumentTypeAlias, userProperty.Alias);
-
-					//var staticMapping = UmbracoSettings.RazorDataTypeModelStaticMapping.FirstOrDefault(mapping =>
-					//{
-					//    return mapping.Applies(dataType, data.ContextAlias, data.Alias);
-					//});
-					//if (staticMapping != null)
-					//{
-					//    //HttpContext.Current.Trace.Write(string.Format("Found a staticMapping defined {0}, instantiating type and attempting to apply model...", staticMapping.Raw));
-					//    Type dataTypeType = Type.GetType(staticMapping.TypeName);
-					//    if (dataTypeType != null)
-					//    {
-					//        object instance = null;
-					//        if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
-					//        {
-					//            result = instance;
-					//            return true;
-					//        }
-					//    }
-					//}
-
-
-					//if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.Any(model => model.Key.Item1 == dataType) && dataType != Guid.Empty)
-					//{
-					//    var razorDataTypeModelDefinition = RazorDataTypeModelTypes.Where(model => model.Key.Item1 == dataType).OrderByDescending(model => model.Key.Item2).FirstOrDefault();
-					//    if (!(razorDataTypeModelDefinition.Equals(default(KeyValuePair<System.Tuple<Guid, int>, Type>))))
-					//    {
-					//        Type dataTypeType = razorDataTypeModelDefinition.Value;
-					//        object instance = null;
-					//        if (TryCreateInstanceRazorDataTypeModel(dataType, dataTypeType, data.Value, out instance))
-					//        {
-					//            result = instance;
-					//            return true;
-					//        }
-					//        else
-					//        {
-					//            //HttpContext.Current.Trace.Write("Failed");
-					//            //HttpContext.Current.Trace.Warn(string.Format("Failed to create the instance of the model binder"));
-					//        }
-					//    }
-					//    else
-					//    {
-					//        //HttpContext.Current.Trace.Write("Failed");
-					//        //HttpContext.Current.Trace.Warn(string.Format("Could not get the dataTypeType for the RazorDataTypeModel"));
-					//    }
-					//}
-					//else
-					//{
-					//    if (RazorDataTypeModelTypes == null)
-					//    {
-					//        //HttpContext.Current.Trace.Write(string.Format("RazorDataTypeModelTypes is null, probably an exception while building the cache, falling back to ConvertPropertyValueByDataType", dataType));
-					//    }
-					//    else
-					//    {
-					//        //HttpContext.Current.Trace.Write(string.Format("GUID {0} does not have a DataTypeModel, falling back to ConvertPropertyValueByDataType", dataType));
-					//    }
-
-					//}
-
-					//convert the string value to a known type
-					var converted = ConvertPropertyValue(result, dataType, userProperty.DocumentTypeAlias, userProperty.Alias);
-					if (converted.Success)
-					{
-						result = converted.Result;
-					}
-				}
-				else
-				{
-					//TODO: next, check for an extension method, we need to take the logic from v5!!
-
-					//next, check if the alias is that of a child type
-					// I'm pretty sure this means that if we have a 'Home' document type as the current type and it has children types that are for example called 'NewsPage' then
-					// we can actually do this in the query: CurrentPage.NewsPages (plural) or CurrentPage.NewsPage (non-plural) and it will return the children of that type.
-
-					var filteredTypeChildren = _backingItem.Children
-						.Where(x => x.NodeTypeAlias.InvariantEquals(name) || x.NodeTypeAlias.MakePluralName().InvariantEquals(name))
-						.ToArray();
-					if (filteredTypeChildren.Any())
-					{
-						result = new DynamicDocumentList(filteredTypeChildren.Select(x => new DynamicDocument(x)));
-					}
-					else
-					{
-						//lastly, we'll try to get the property from the document object's member properties using reflection
-
-						var reflectedProperty = _backingItem.GetReflectedProperty(name);
-						result = reflectedProperty != null
-							? reflectedProperty.Value
-							: null;
-
-						//if property access, type lookup and member invoke all failed
-						//at this point, we're going to return null
-						//instead, we return a DynamicNull - see comments in that file
-						//this will let things like Model.ChildItem work and return nothing instead of crashing
-						if (result == null)
-						{
-							//.Where explictly checks for this type
-							//and will make it false
-							//which means backwards equality (&& property != true) will pass
-							//forwwards equality (&& property or && property == true) will fail
-							result = new DynamicNull();
-						}	
-					}
-				}						
+				result = attempt.Result;
+				//cache the result so we don't have to re-process the whole thing
+				_cachedMemberOutput.TryAdd(name, result);
+				return true;
 			}
 
-			//cache the result so we don't have to re-process the whole thing
-			_cachedMemberOutput.TryAdd(name, result);
+			//if property access, type lookup and member invoke all failed
+			//at this point, we're going to return null
+			//instead, we return a DynamicNull - see comments in that file
+			//this will let things like Model.ChildItem work and return nothing instead of crashing
+			if (result == null)
+			{
+				//.Where explictly checks for this type
+				//and will make it false
+				//which means backwards equality (&& property != true) will pass
+				//forwwards equality (&& property or && property == true) will fail
+				result = new DynamicNull();
+			}
 
 			//alwasy return true if we haven't thrown an exception though I'm wondering if we return 'false' if .Net throws an exception for us??
-			return true; 
+			return true;
 		}
 
 		//private bool TryCreateInstanceRazorDataTypeModel(Guid dataType, Type dataTypeType, string value, out object result)
