@@ -425,17 +425,6 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
             return _id;
         }
 
-        private string getLocalMediaPath()
-        {
-            string[] umbracoPathSplit = IOHelper.ResolveUrl(SystemDirectories.Umbraco).Split('/');
-            string umbracoPath = "";
-
-            for (int i = 0; i < umbracoPathSplit.Length - 1; i++)
-                umbracoPath += umbracoPathSplit[i] + "/";
-
-            return umbracoPath + "media/";
-        }
-
 
         private string parseMacrosToHtml(string input)
         {
