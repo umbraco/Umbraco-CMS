@@ -18,6 +18,16 @@ namespace Umbraco.Core.IO
             return propertyId.ToString() + seperator + fileName;
         }
 
+        internal static IEnumerable<string> GetThumbnails(this IMediaFileSystem fs, string path)
+        {
+            var parentDirectory = System.IO.Path.GetDirectoryName(path);
+            var extension = System.IO.Path.GetExtension(path);
+
+            return fs.GetFiles(parentDirectory)
+                .Where(x => x.StartsWith(path.TrimEnd(extension) + "_thumb"))
+                .ToList();
+        }
+
         internal static void DeleteFile(this IMediaFileSystem fs, string path, bool deleteThumbnails)
         {
             fs.DeleteFile(path);
@@ -25,12 +35,12 @@ namespace Umbraco.Core.IO
             if(!deleteThumbnails)
                 return;
 
-            var parentDirectory = System.IO.Path.GetDirectoryName(path);
-            var extension = System.IO.Path.GetExtension(path);
+            fs.DeleteThumbnails(path);
+        }
 
-            fs.GetFiles(parentDirectory)
-                .Where(x => x.StartsWith(path.TrimEnd(extension)))
-                .ToList()
+        internal static void DeleteThumbnails(this IMediaFileSystem fs, string path)
+        {
+            fs.GetThumbnails(path)
                 .ForEach(fs.DeleteFile);
         }
     }

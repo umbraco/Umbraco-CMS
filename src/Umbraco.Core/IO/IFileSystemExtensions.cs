@@ -16,9 +16,9 @@ namespace Umbraco.Core.IO
             return size;
         }
 
-        internal static void CopyFile(string path, string newPath)
+        internal static void CopyFile(this IFileSystem fs, string path, string newPath)
         {
-            
+            fs.AddFile(newPath, fs.OpenFile(path));
         }
     }
 }
