@@ -36,8 +36,6 @@ namespace Umbraco.Core.IO
 
         string GetUrl(string path);
 
-        long GetSize(string path);
-
         DateTimeOffset GetLastModified(string path);
 
         DateTimeOffset GetCreated(string path);

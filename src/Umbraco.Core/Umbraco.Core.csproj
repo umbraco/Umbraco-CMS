@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="businesslogic">
+      <HintPath>..\Umbraco.Web\bin\businesslogic.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -52,12 +55,13 @@
     <Compile Include="DynamicWrapper.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="IfExtensions.cs" />
-    <Compile Include="IO\AbstractFileSystem.cs" />
     <Compile Include="IO\FileSystemProvider.cs" />
     <Compile Include="IO\FileSystemProviderAttribute.cs" />
     <Compile Include="IO\FileSystemProviderManager.cs" />
     <Compile Include="IO\IFileSystem.cs" />
+    <Compile Include="IO\IFileSystemExtensions.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
+    <Compile Include="IO\IMediaFileSystemExtensions.cs" />
     <Compile Include="IO\PhysicalFileSystem.cs" />
     <Compile Include="IThumbnailProvider.cs" />
     <Compile Include="ObjectExtensions.cs" />

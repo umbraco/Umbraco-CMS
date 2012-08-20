@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using umbraco.BusinessLogic;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -26,13 +27,11 @@ namespace umbraco.cms.businesslogic.media
             var propertyId = media.getProperty("umbracoFile").Id;
 
             // Get paths
-            var destFileName = ConstructDestFileName(propertyId, uploadedFile.FileName);
-            var destPath = ConstructDestPath(propertyId);
-            var destFilePath = VirtualPathUtility.Combine(destPath, destFileName);
-            var ext = VirtualPathUtility.GetExtension(destFileName).Substring(1);
+            var destFilePath = _fileSystem.GetRelativePath(propertyId, uploadedFile.FileName);
+            var ext = Path.GetExtension(destFilePath).Substring(1);
 
-            var absoluteDestPath = HttpContext.Current.Server.MapPath(destPath);
-            var absoluteDestFilePath = HttpContext.Current.Server.MapPath(destFilePath);
+            //var absoluteDestPath = HttpContext.Current.Server.MapPath(destPath);
+            //var absoluteDestFilePath = HttpContext.Current.Server.MapPath(destFilePath);
 
             // Set media properties
             media.getProperty("umbracoFile").Value = destFilePath;
@@ -44,15 +43,7 @@ namespace umbraco.cms.businesslogic.media
             if (media.getProperty("umbracoExtensio") != null)
                 media.getProperty("umbracoExtensio").Value = ext;
 
-            // Create directory
-            if (UmbracoSettings.UploadAllowDirectories)
-                Directory.CreateDirectory(absoluteDestPath);
-
-            // Save file
-            uploadedFile.SaveAs(absoluteDestFilePath);
-
-            // Close stream
-            uploadedFile.InputStream.Close();
+            _fileSystem.AddFile(destFilePath, uploadedFile.InputStream, uploadedFile.ReplaceExisting);
 
             // Save media
             media.Save();

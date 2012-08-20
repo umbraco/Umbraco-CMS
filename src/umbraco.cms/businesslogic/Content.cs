@@ -596,7 +596,6 @@ namespace umbraco.cms.businesslogic
                 {
                     var relativeFilePath = fs.GetRelativePath(p.Value.ToString());
                     var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
-                    var extension = System.IO.Path.GetExtension(relativeFilePath);
 
                     // don't want to delete the media folder if not using directories.
                     if (UmbracoSettings.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
@@ -605,10 +604,7 @@ namespace umbraco.cms.businesslogic
                     }
                     else
                     {
-                        fs.GetFiles(parentDirectory)
-                            .Where(x => x.StartsWith(relativeFilePath.TrimEnd(extension)))
-                            .ToList()
-                            .ForEach(fs.DeleteFile);
+                        fs.DeleteFile(relativeFilePath, true);
                     }
                 }
             }

@@ -68,14 +68,14 @@ namespace umbraco.cms.businesslogic.Files
 
         public static UmbracoFile Save(HttpPostedFile file)
         {
-            string tempDir = System.IO.Path.Combine(IO.SystemDirectories.Media, "uploads", Guid.NewGuid().ToString());
+            var tempDir = System.IO.Path.Combine("uploads", Guid.NewGuid().ToString());
             return Save(file, tempDir);
         }
 
         //filebase overload...
         public static UmbracoFile Save(HttpPostedFileBase file)
         {
-            string tempDir = System.IO.Path.Combine(IO.SystemDirectories.Media, "uploads", Guid.NewGuid().ToString());
+            var tempDir = System.IO.Path.Combine("uploads", Guid.NewGuid().ToString());
             return Save(file, tempDir);
         }
 

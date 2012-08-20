@@ -10,6 +10,7 @@ using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.datatype;
 using Encoder = System.Text.Encoder;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.media
 {
@@ -36,13 +37,8 @@ namespace umbraco.cms.businesslogic.media
             var propertyId = media.getProperty("umbracoFile").Id;
 
             // Get paths
-            var destFileName = ConstructDestFileName(propertyId, postedFile.FileName);
-            var destPath = ConstructDestPath(propertyId);
-            var destFilePath = VirtualPathUtility.Combine(destPath, destFileName);
-            var ext = VirtualPathUtility.GetExtension(destFileName).Substring(1);
-
-            var absoluteDestPath = HttpContext.Current.Server.MapPath(destPath);
-            var absoluteDestFilePath = HttpContext.Current.Server.MapPath(destFilePath);
+            var destFilePath = _fileSystem.GetRelativePath(propertyId, postedFile.FileName);
+            var ext = Path.GetExtension(destFilePath).Substring(1);
 
             // Set media properties
             media.getProperty("umbracoFile").Value = destFilePath;
@@ -56,12 +52,8 @@ namespace umbraco.cms.businesslogic.media
             if (media.getProperty("umbracoExtensio") != null)
                 media.getProperty("umbracoExtensio").Value = ext;
 
-            // Create directory
-            if (UmbracoSettings.UploadAllowDirectories)
-                Directory.CreateDirectory(absoluteDestPath);
-
             // Generate thumbnail
-            var thumbDestFilePath = Path.Combine(absoluteDestPath, Path.GetFileNameWithoutExtension(destFileName) + "_thumb");
+            var thumbDestFilePath = Path.Combine(Path.GetDirectoryName(destFilePath), Path.GetFileNameWithoutExtension(destFilePath) + "_thumb");
             GenerateThumbnail(image, 100, fileWidth, fileHeight, thumbDestFilePath + ".jpg");
 
             // Generate additional thumbnails based on PreValues set in DataTypeDefinition uploadField
@@ -69,17 +61,13 @@ namespace umbraco.cms.businesslogic.media
 
             image.Dispose();
 
-            // Save file
-            postedFile.SaveAs(absoluteDestFilePath);
-
-            // Close stream
-            postedFile.InputStream.Close();
+            _fileSystem.AddFile(destFilePath, postedFile.InputStream, postedFile.ReplaceExisting);
 
             // Save media
             media.Save();
         }
 
-        private static void GenerateAdditionalThumbnails(Image image, int fileWidth, int fileHeight, string destFilePath)
+        private void GenerateAdditionalThumbnails(Image image, int fileWidth, int fileHeight, string destFilePath)
         {
             var uploadFieldDataTypeId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
 
@@ -113,7 +101,7 @@ namespace umbraco.cms.businesslogic.media
             }
         }
 
-        private static void GenerateThumbnail(Image image, int maxWidthHeight, int fileWidth, int fileHeight, string thumbnailFileName)
+        private void GenerateThumbnail(Image image, int maxWidthHeight, int fileWidth, int fileHeight, string thumbnailFileName)
         {
             // Generate thumbnailee
             var fx = (float)fileWidth / maxWidthHeight;
@@ -157,7 +145,13 @@ namespace umbraco.cms.businesslogic.media
             // Save the new image
             if (codec != null)
             {
-                bp.Save(thumbnailFileName, codec, ep);
+                var ms = new MemoryStream();
+                bp.Save(ms, codec, ep);
+                ms.Seek(0, 0);
+
+                _fileSystem.AddFile(thumbnailFileName, ms);
+
+                ms.Close();
             }
             else
             {
