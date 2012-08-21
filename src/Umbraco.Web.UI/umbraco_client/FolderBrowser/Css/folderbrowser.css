@@ -142,6 +142,10 @@
     width: 200px;
 }
 
+.umbFolderBrowser .throbber {
+    margin: 0 20px;
+}
+
 .umbFolderBrowser .items {
     margin: 5px 15px;
     padding: 0;
