@@ -115,9 +115,18 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             // Setup the viewmode;
             self._viewModel = $.extend({}, {
                 parent: self,
+                thumbSize: ko.observable('large'),
                 filterTerm: ko.observable(''),
                 items: ko.observableArray([]),
                 queued: ko.observableArray([])
+            });
+            
+            self._viewModel.thumbSize.subscribe(function (newValue) {
+                $(".umbFolderBrowser .items")
+                    .removeClass("large")
+                    .removeClass("medium")
+                    .removeClass("small")
+                    .addClass(newValue);
             });
             
             self._viewModel.filtered = ko.computed(function () {

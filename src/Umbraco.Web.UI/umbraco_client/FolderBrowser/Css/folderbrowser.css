@@ -131,6 +131,19 @@
     margin-right: 5px;
 }
 
+.umbFolderBrowser .thumb-sizer {
+    position: absolute;
+    top: 18px;
+    right: 270px;
+    border-right: solid 1px #ccc;
+    padding-right: 15px;
+}
+
+.umbFolderBrowser .thumb-sizer input,
+.umbFolderBrowser .thumb-sizer img {
+    vertical-align: baseline;
+}
+
 .umbFolderBrowser .filter {
     position: absolute;
     top: 15px;
@@ -173,6 +186,16 @@
     cursor: pointer;
 }
 
+.umbFolderBrowser .items.medium li div {
+    width: 95px;
+    height: 125px;
+}
+
+.umbFolderBrowser .items.small li div {
+    width: 70px;
+    height: 100px;
+}
+
 .umbFolderBrowser .img {
     display: block;
     background: #e0e0e0;
@@ -180,6 +203,16 @@
     width: 100px;
     height: 100px;
     margin: 10px;
+}
+
+.umbFolderBrowser .items.medium .img {
+    width: 75px;
+    height: 75px;
+}
+
+.umbFolderBrowser .items.small .img {
+    width: 50px;
+    height: 50px;
 }
 
 .umbFolderBrowser .img:before {
@@ -196,6 +229,23 @@
     vertical-align: middle;
     max-width: 100px;
     max-height: 100px;
+}
+
+.umbFolderBrowser .items.medium .img img {
+    max-width: 75px;
+    max-height: 75px;
+}
+
+.umbFolderBrowser .items.small .img img {
+    max-width: 50px;
+    max-height: 50px;
+}
+
+.umbFolderBrowser li span {
+    display: block;
+    white-space: nowrap;
+    margin: 0 5px;
+    overflow: hidden;
 }
 
 .umbFolderBrowser .items li.selected div {

@@ -112,6 +112,16 @@ namespace Umbraco.Web.UI.Controls
             }
             sb.Append("</ul>");
 
+            // Create size changer
+            sb.Append("<div class='thumb-sizer'>" +
+                      "<input type='radio' name='thumb_size' value='small' data-bind='checked: thumbSize' />" +
+                      "<img src='images/thumbs_smll.png' alt='Small thumbnails' />" +
+                      "<input type='radio' name='thumb_size' value='medium' data-bind='checked: thumbSize' />" +
+                      "<img src='images/thumbs_med.png' alt='Medium thumbnails' />" +
+                      "<input type='radio' name='thumb_size' value='large' data-bind='checked: thumbSize' />" +
+                      "<img src='images/thumbs_lrg.png' alt='Large thumbnails' />" +
+                      "</div>");
+
             // Create the filter input
             sb.Append("<div class='filter'>Filter: <input type='text' data-bind=\"value: filterTerm, valueUpdate: 'afterkeydown'\" /></div>");
 
