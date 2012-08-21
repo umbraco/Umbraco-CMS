@@ -331,6 +331,7 @@
                 .error(function (jqXhr, textStatus, errorThrown)
                 {
                     data.status = 'error';
+                    data.message = errorThrown;
                     self.opts.onDone(data);
                 })
                 .complete(function (jqXhr, textStatus)
@@ -460,7 +461,6 @@
         {
             var self = this;
             var $item = $("#fu-item-" + self.uploaderId + "-" + itemId);
-            console.log("#fu-item-" + self.uploaderId + "-" + itemId);
             var data = $item.data('data');
 
             // If the item to cancel is in progress, abort the upload

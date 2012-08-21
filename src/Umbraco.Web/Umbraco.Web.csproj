@@ -1892,7 +1892,9 @@
     <Content Include="umbraco.presentation\umbraco\members\search.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\details.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\BrowseRepository.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx" />
+    <Content Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\installedPackage.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\LoadNitros.ascx" />
@@ -1936,7 +1938,9 @@
     <Content Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx" />
     <Content Include="umbraco.presentation\umbraco\members\ViewMembers.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertImage.aspx" />
-    <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertLink.aspx" />
+    <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertLink.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertMacro.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
     <None Include="Web References\org.umbraco.update\UpgradeResult1.datasource">
@@ -1991,7 +1995,9 @@
     <Content Include="umbraco.presentation\umbraco\editContent.aspx" />
     <Content Include="umbraco.presentation\umbraco\editMedia.aspx" />
     <Content Include="umbraco.presentation\umbraco\js\language.aspx" />
-    <Content Include="umbraco.presentation\umbraco\login.aspx" />
+    <Content Include="umbraco.presentation\umbraco\login.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\logout.aspx" />
     <Content Include="umbraco.presentation\umbraco\macroResultWrapper.aspx">
       <SubType>Form</SubType>
@@ -2134,8 +2140,11 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>xcopy /s /y "$(ProjectDir)umbraco.presentation\*.aspx" "$(ProjectDir)..\Umbraco.Web.UI\"
+xcopy /s /y "$(ProjectDir)umbraco.presentation\*.ascx" "$(ProjectDir)..\Umbraco.Web.UI\"
+xcopy /s /y "$(ProjectDir)umbraco.presentation\*.asmx" "$(ProjectDir)..\Umbraco.Web.UI\"
+xcopy /s /y "$(ProjectDir)umbraco.presentation\*.ashx" "$(ProjectDir)..\Umbraco.Web.UI\"
+xcopy /s /y "$(ProjectDir)umbraco.presentation\*.master" "$(ProjectDir)..\Umbraco.Web.UI\"</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />

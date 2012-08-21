@@ -40,7 +40,7 @@ namespace Umbraco.Web.Media.ThumbnailProviders
 
             try
             {
-                var fs = FileSystemProviderManager.Current.GetFileSystemProvider(FileSystemProvider.Media);
+                var fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
                 var relativeThumbPath = fs.GetRelativePath(tmpThumbUrl);
                 if (!fs.FileExists(relativeThumbPath))
                     return false;

@@ -7,17 +7,14 @@ using System.Web;
 
 namespace Umbraco.Core.IO
 {
-    internal class PhysicalFileSystem : AbstractFileSystem
+    internal class PhysicalFileSystem : IFileSystem
     {
         private readonly string _rootPath;
         private readonly string _rootUrl;
 
         public PhysicalFileSystem(string virtualRoot)
         {
-            if(HttpContext.Current == null)
-                throw new InvalidOperationException("The single parameter constructor can only be accessed when there is a valid HttpContext");
-
-            _rootPath = HttpContext.Current.Server.MapPath(virtualRoot);
+            _rootPath = System.Web.Hosting.HostingEnvironment.MapPath(virtualRoot);
             _rootUrl = VirtualPathUtility.ToAbsolute(virtualRoot);
         }
 
@@ -33,7 +30,7 @@ namespace Umbraco.Core.IO
             _rootUrl = rootUrl;
         }
 
-        public override IEnumerable<string> GetDirectories(string path)
+        public IEnumerable<string> GetDirectories(string path)
         {
             path = EnsureTrailingSeparator(GetFullPath(path));
 
@@ -50,12 +47,12 @@ namespace Umbraco.Core.IO
             return Enumerable.Empty<string>();
         }
 
-        public override void DeleteDirectory(string path)
+        public void DeleteDirectory(string path)
         {
             DeleteDirectory(path, false);
         }
 
-        public override void DeleteDirectory(string path, bool recursive)
+        public void DeleteDirectory(string path, bool recursive)
         {
             if (!DirectoryExists(path))
                 return;
@@ -68,17 +65,17 @@ namespace Umbraco.Core.IO
             { }
         }
 
-        public override bool DirectoryExists(string path)
+        public bool DirectoryExists(string path)
         {
             return Directory.Exists(GetFullPath(path));
         }
 
-        public override void AddFile(string path, Stream stream)
+        public void AddFile(string path, Stream stream)
         {
             AddFile(path, stream, true);
         }
 
-        public override void AddFile(string path, Stream stream, bool overrideIfExists)
+        public void AddFile(string path, Stream stream, bool overrideIfExists)
         {
             if (FileExists(path) && !overrideIfExists)
                 throw new InvalidOperationException(string.Format("A file at path '{0}' already exists",
@@ -86,16 +83,19 @@ namespace Umbraco.Core.IO
 
             EnsureDirectory(Path.GetDirectoryName(path));
 
+            if (stream.CanSeek)
+                stream.Seek(0, 0);
+
             using (var destination = (Stream)File.Create(GetFullPath(path)))
                 stream.CopyTo(destination);
         }
 
-        public override IEnumerable<string> GetFiles(string path)
+        public IEnumerable<string> GetFiles(string path)
         {
             return GetFiles(path, "*.*");
         }
 
-        public override IEnumerable<string> GetFiles(string path, string filter)
+        public IEnumerable<string> GetFiles(string path, string filter)
         {
             path = EnsureTrailingSeparator(GetFullPath(path));
 
@@ -112,12 +112,12 @@ namespace Umbraco.Core.IO
             return Enumerable.Empty<string>();
         }
 
-        public override Stream OpenFile(string path)
+        public Stream OpenFile(string path)
         {
             return File.OpenRead(GetFullPath(path));
         }
 
-        public override void DeleteFile(string path)
+        public void DeleteFile(string path)
         {
             if (!FileExists(path))
                 return;
@@ -130,12 +130,12 @@ namespace Umbraco.Core.IO
             { }
         }
 
-        public override bool FileExists(string path)
+        public bool FileExists(string path)
         {
             return File.Exists(GetFullPath(path));
         }
 
-        public override string GetRelativePath(string fullPathOrUrl)
+        public string GetRelativePath(string fullPathOrUrl)
         {
             var relativePath = fullPathOrUrl
                 .TrimStart(_rootUrl)
@@ -146,28 +146,29 @@ namespace Umbraco.Core.IO
             return relativePath;
         }
 
-        public override string GetFullPath(string path)
+        public string GetFullPath(string path)
         {
             return !path.StartsWith(_rootPath) 
                 ? Path.Combine(_rootPath, path)
                 : path;
         }
 
-        public override string GetUrl(string path)
+        public string GetUrl(string path)
         {
             return _rootUrl.TrimEnd("/") + "/" + path
                 .TrimStart(Path.DirectorySeparatorChar)
-                .Replace(Path.DirectorySeparatorChar, '/');
+                .Replace(Path.DirectorySeparatorChar, '/')
+                .TrimEnd("/");
         }
 
-        public override DateTimeOffset GetLastModified(string path)
+        public DateTimeOffset GetLastModified(string path)
         {
             return DirectoryExists(path) 
                 ? new DirectoryInfo(GetFullPath(path)).LastWriteTimeUtc 
                 : new FileInfo(GetFullPath(path)).LastWriteTimeUtc;
         }
 
-        public override DateTimeOffset GetCreated(string path)
+        public DateTimeOffset GetCreated(string path)
         {
             return DirectoryExists(path) 
                 ? Directory.GetCreationTimeUtc(GetFullPath(path)) 

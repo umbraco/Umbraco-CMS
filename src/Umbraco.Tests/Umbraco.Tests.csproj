@@ -83,6 +83,7 @@
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
     <Compile Include="IO\AbstractFileSystemTests.cs" />
+    <Compile Include="IO\FileSystemProviderManagerTests.cs" />
     <Compile Include="IO\PhysicalFileSystemTests.cs" />
     <Compile Include="PartialTrust\AbstractPartialTrustFixture.cs" />
     <Compile Include="PartialTrust\IPartialTrustFixture.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="UmbracoModuleTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="unit-test-log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

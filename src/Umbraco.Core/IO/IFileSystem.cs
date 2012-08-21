@@ -29,13 +29,12 @@ namespace Umbraco.Core.IO
 
         bool FileExists(string path);
 
+
         string GetRelativePath(string fullPathOrUrl);
 
         string GetFullPath(string path);
 
         string GetUrl(string path);
-
-        long GetSize(string path);
 
         DateTimeOffset GetLastModified(string path);
 

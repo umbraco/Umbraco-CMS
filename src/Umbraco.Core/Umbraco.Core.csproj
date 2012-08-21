@@ -31,8 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
+    <Reference Include="businesslogic">
+      <HintPath>..\Umbraco.Web\bin\businesslogic.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -138,15 +138,20 @@
     <Compile Include="TypeHelper.cs" />
     <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="DelegateEqualityComparer.cs" />
+    <Compile Include="DynamicWrapper.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="IfExtensions.cs" />
     <Compile Include="PluginManager.cs" />
-    <Compile Include="IO\AbstractFileSystem.cs" />
     <Compile Include="IO\FileSystemProvider.cs" />
+    <Compile Include="IO\FileSystemProviderAttribute.cs" />
     <Compile Include="IO\FileSystemProviderManager.cs" />
     <Compile Include="IO\IFileSystem.cs" />
+    <Compile Include="IO\IFileSystemExtensions.cs" />
+    <Compile Include="IO\IMediaFileSystem.cs" />
+    <Compile Include="IO\IMediaFileSystemExtensions.cs" />
     <Compile Include="IO\PhysicalFileSystem.cs" />
     <Compile Include="IThumbnailProvider.cs" />
+    <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringAliasCaseType.cs" />
     <Compile Include="StringExtensions.cs" />

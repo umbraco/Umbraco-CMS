@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using System.Web;
+using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.Files;
 using umbraco.IO;
@@ -135,6 +136,8 @@ namespace umbraco.editorControls.tinymce
 
         private static string doResize(Hashtable attributes, out int finalWidth, out int finalHeight)
         {
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+
             string resizeDim = helper.FindAttribute(attributes, "width") + "," +
                                helper.FindAttribute(attributes, "height");
             string[] resizeDimSplit = resizeDim.Split(',');
@@ -159,17 +162,21 @@ namespace umbraco.editorControls.tinymce
                 }
 
                 // update orgSrc to remove umbraco reference
-                string resolvedMedia = IOHelper.ResolveUrl(SystemDirectories.Media);
-                if (IOHelper.ResolveUrl(orgSrc).IndexOf(resolvedMedia) > -1)
+                //string resolvedMedia = IOHelper.ResolveUrl(SystemDirectories.Media);
+                //if (IOHelper.ResolveUrl(orgSrc).IndexOf(resolvedMedia) > -1)
+                //{
+                //    orgSrc = SystemDirectories.Media + orgSrc.Substring(orgSrc.IndexOf(resolvedMedia) + resolvedMedia.Length); //, orgSrc.Length - orgSrc.IndexOf(String.Format("/media/", SystemDirectories.Media)));
+
+                //}
+
+                //string fullSrc = IOHelper.MapPath(orgSrc);
+
+                var orgPath = fs.GetRelativePath(orgSrc);
+                if (fs.FileExists(orgPath))
                 {
-                    orgSrc = SystemDirectories.Media + orgSrc.Substring(orgSrc.IndexOf(resolvedMedia) + resolvedMedia.Length); //, orgSrc.Length - orgSrc.IndexOf(String.Format("/media/", SystemDirectories.Media)));
-
+                    var uf = new UmbracoFile(orgPath);
+                    newSrc = uf.Resize(newWidth, newHeight);
                 }
-
-                string fullSrc = IOHelper.MapPath(orgSrc);
-
-                UmbracoFile uf = new UmbracoFile(fullSrc);
-                newSrc = uf.Resize(newWidth, newHeight);
 
                 /*
                 // Load original image
@@ -214,8 +221,9 @@ namespace umbraco.editorControls.tinymce
             //the admin editor successfully displays the image because the HTML is rewritten, but when you get the RTE content in the template
             //it hasn't been replaced
             //2011-08-12 added a IOHelper.ResolveUrl call around newSrc
+            //2012-08-20 IFileSystem now takes care of URL resolution, so should be safe to assume newSrc is a full/absolute URL
             return
-                " src=\"" + IOHelper.ResolveUrl(newSrc) + "\"  width=\"" + newWidth.ToString() + "\"  height=\"" + newHeight.ToString() +
+                " src=\"" + newSrc + "\"  width=\"" + newWidth.ToString() + "\"  height=\"" + newHeight.ToString() +
                 "\"";
         }
     }

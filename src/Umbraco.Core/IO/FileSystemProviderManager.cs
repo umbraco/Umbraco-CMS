@@ -57,5 +57,18 @@ namespace Umbraco.Core.IO
 
             return (IFileSystem) constructor.Invoke(parameters);
         }
+
+        public TProviderTypeFilter GetFileSystemProvider<TProviderTypeFilter>()
+            where TProviderTypeFilter : class, IFileSystem
+        {
+            var attr =
+                (FileSystemProviderAttribute)typeof(TProviderTypeFilter).GetCustomAttributes(typeof(FileSystemProviderAttribute), false).
+                    SingleOrDefault();
+
+            if (attr == null)
+                throw new InvalidOperationException(string.Format("The provider type filter '{0}' is missing the required FileSystemProviderAttribute", typeof(FileSystemProviderAttribute).FullName));
+
+            return GetFileSystemProvider(attr.Alias).As<TProviderTypeFilter>();
+        }
     }
 }

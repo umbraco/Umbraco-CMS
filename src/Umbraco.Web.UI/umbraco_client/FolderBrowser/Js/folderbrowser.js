@@ -20,6 +20,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
                 this.selected(true);
             };
+            item.edit = function () {
+                //TODO: Could do with a better way of getting to the parent control
+                $(".umbFolderBrowser").folderBrowserApi()._editItem(this.Id());
+            };
             return item;
         }
     };
@@ -37,7 +41,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         {
             var self = this;
             
-            $.getJSON(self._opts.basePath + "/FolderBrowserService/GetChildren/" + self._parentId + "/" + self._viewModel.filterTerm(), function (data) {
+            $.getJSON(self._opts.basePath + "/FolderBrowserService/GetChildren/" + self._parentId, function (data) {
                 if (data != undefined && data.length > 0) {
                     ko.mapping.fromJS(data, itemMappingOptions, self._viewModel.items);
                 } else {
@@ -111,16 +115,24 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             // Setup the viewmode;
             self._viewModel = $.extend({}, {
                 parent: self,
+                thumbSize: ko.observable('large'),
                 filterTerm: ko.observable(''),
                 items: ko.observableArray([]),
                 queued: ko.observableArray([])
             });
             
+            self._viewModel.thumbSize.subscribe(function (newValue) {
+                $(".umbFolderBrowser .items")
+                    .removeClass("large")
+                    .removeClass("medium")
+                    .removeClass("small")
+                    .addClass(newValue);
+            });
+            
             self._viewModel.filtered = ko.computed(function () {
-                return self._viewModel.items();
                 return ko.utils.arrayFilter(this.items(), function (item) {
-                    return item.Name().toLowerCase().indexOf(self._viewModel.filterTerm()) > -1 || 
-                        item.Tags().toLowerCase().indexOf(self._viewModel.filterTerm()) > -1;
+                    return item.Name().toLowerCase().indexOf(self._viewModel.filterTerm().toLowerCase()) > -1 || 
+                        item.Tags().toLowerCase().indexOf(self._viewModel.filterTerm().toLowerCase()) > -1;
                 });
             }, self._viewModel);
 
@@ -138,9 +150,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 return ids;
             }, self._viewModel);
 
-            self._viewModel.filterTerm.subscribe(function (newValue) {
-                self._getChildNodes();
-            });
+            self._viewModel.itemIds = ko.computed(function () {
+                var ids = [];
+                ko.utils.arrayForEach(this.items(), function (item) {
+                    ids.push(item.Id());
+                });
+                return ids;
+            }, self._viewModel);
+
         },
         
         _initToolbar: function () 
@@ -177,13 +194,18 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 "</form>" +
                 "<ul class='queued' data-bind='foreach: queued'><li>" +
                 "<input type='text' class='label' data-bind=\"value: name, valueUpdate: 'afterkeydown', enable: progress() == 0\" />" +
-                "<span class='progress'><span data-bind=\"style: { width: progress() + '%' }\"></span></span>" +
+                "<span class='progress' data-bind='attr: { title : message }'><span data-bind=\"style: { width: progress() + '%' }, attr: { class: status() }\"></span></span>" +
                 "<a href='' data-bind='click: cancel'><img src='images/delete.png' /></a>" +
                 "</li></ul>" +
+                "<div class='buttons'>" +
+                "<span>" +
                 "<button class='button upload' data-bind='enable: queued().length > 0'>Upload</button>" +
-                "<input type='checkbox' id='replaceExisting' />" +
-                "<label for='replaceExisting'>Overwrite existing?</label>" +
-                "<a href='#' class='cancel'>Cancel</a>" +
+                "<input type='checkbox' id='replaceExisting' data-bind='enable: queued().length > 0' />" +
+                "<label for='replaceExisting'>Overwrite existing?</label> " +
+                "</span>" +
+                "<a href='#' class='cancel'>Cancel All</a> &nbsp; " +
+                "<a href='#' class='close'>Close</a>" +
+                "</div>" +
                 "</div>" +
                 "</div>");
 
@@ -191,6 +213,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             
             // Create uploader
             $("#fileupload").fileUploader({
+                allowedExtension: '',
                 dropTarget: ".upload-overlay",
                 onAdd: function (data) {
 
@@ -201,6 +224,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         name: ko.observable(data.name),
                         size: data.size,
                         progress: ko.observable(data.progress),
+                        status: ko.observable(''),
+                        message: ko.observable(''),
                         cancel: function () {
                             if (this.progress() < 100)
                                 $("#fileupload").fileUploader("cancelItem", this.itemId);
@@ -222,13 +247,18 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 onDone: function (data) {
                     switch (data.status) {
                         case 'success':
-                            //self._viewModel.queued.remove(data.context);
+                            self._viewModel.queued.remove(data.context);
                             break;
                         case 'error':
-                            self._viewModel.queued.remove(data.context);
+                            data.context.message(data.message);
+                            data.context.status(data.status);
+                            //self._viewModel.queued.remove(data.context);
                             break;
                         case 'canceled':
-                            self._viewModel.queued.remove(data.context);
+                            data.context.message("Canceled by user");
+                            data.context.progress(100);
+                            data.context.status(data.status);
+                            //self._viewModel.queued.remove(data.context);
                             break;
                     }
                 },
@@ -253,6 +283,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             $(".upload-overlay .cancel").click(function (e) {
                 e.preventDefault();
                 $("#fileupload").fileUploader("cancelAll");
+            });
+            
+            $(".upload-overlay .close").click(function (e) {
+                e.preventDefault();
+                $(".upload-overlay").hide();
             });
 
             // Listen for drag events
@@ -346,7 +381,16 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     }
                     else
                     {
-                        //TODO: Update on server
+                        $.post(self._opts.umbracoPath + "/webservices/nodeSorter.asmx/UpdateSortOrder", {
+                                ParentId : self._parentId, 
+                                SortOrder: self._viewModel.itemIds().join(","),
+                                app: "media"
+                        }, function (data, textStatus) {
+                            if(textStatus == "error") {
+                                alert("Oops. Could not update sort order");
+                                self._getChildNodes();
+                            }
+                        }, "json");
                     }
                 }
             });

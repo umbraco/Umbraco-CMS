@@ -6,6 +6,7 @@ using System.Web.Services;
 using umbraco.IO;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.property;
+using Umbraco.Core.IO;
 
 namespace umbraco.webservices.media
 {
@@ -14,6 +15,12 @@ namespace umbraco.webservices.media
     [ToolboxItem(false)]
     public class mediaService : BaseWebService
     {
+        internal IMediaFileSystem _fs;
+
+        public mediaService()
+        {
+            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+        }
 
         override public Services Service
         {
@@ -100,12 +107,9 @@ namespace umbraco.webservices.media
             {
                 if (!(p.Value == System.DBNull.Value))
                 {
-                    string fileName = (string)p.Value;
-                    string filePath = umbraco.IO.IOHelper.MapPath(fileName);
-                    if (File.Exists(filePath))
-                    {
-                        File.Delete(filePath);
-                    }
+                    var path = _fs.GetRelativePath(p.Value.ToString());
+                    if(_fs.FileExists(path))
+                        _fs.DeleteFile(path, true);
                 }
             }
 
@@ -124,16 +128,17 @@ namespace umbraco.webservices.media
 
             Media m = new Media(id);
 
+            var path = _fs.GetRelativePath(m.getProperty("umbracoFile").Id, filename);
 
-            System.IO.Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Media + "/" + m.getProperty("umbracoFile").Id));
-            string fullFilePath = IOHelper.MapPath(SystemDirectories.Media + "/" + m.getProperty("umbracoFile").Id + "/" + filename);
+            var stream = new MemoryStream();
+            stream.Write(contents, 0, contents.Length);
+            stream.Seek(0, 0);
 
-            File.WriteAllBytes(fullFilePath, contents);
+            _fs.AddFile(path, stream);
 
-            FileInfo f = new FileInfo(fullFilePath);
-            m.getProperty("umbracoFile").Value = SystemDirectories.Media + "/" + filename;
-            m.getProperty("umbracoExtension").Value = f.Extension.Replace(".", "");
-            m.getProperty("umbracoBytes").Value = f.Length.ToString();
+            m.getProperty("umbracoFile").Value = _fs.GetUrl(path);
+            m.getProperty("umbracoExtension").Value = Path.GetExtension(filename).Substring(1);
+            m.getProperty("umbracoBytes").Value = _fs.GetSize(path);
 
 
         }

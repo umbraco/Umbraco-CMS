@@ -19,18 +19,18 @@ namespace umbraco.cms.businesslogic.Files
         private string _url;
         private long _length;
 
-        private IFileSystem _fs;
+        private IMediaFileSystem _fs;
 
         #region Constructors
 
         public UmbracoFile()
         {
-            _fs = FileSystemProviderManager.Current.GetFileSystemProvider(FileSystemProvider.Media);
+            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
         }
 
         public UmbracoFile(string path)
         {
-            _fs = FileSystemProviderManager.Current.GetFileSystemProvider(FileSystemProvider.Media);
+            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
 
             _path = path;
 
@@ -55,7 +55,7 @@ namespace umbraco.cms.businesslogic.Files
 
         public static UmbracoFile Save(Stream inputStream, string path)
         {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider(FileSystemProvider.Media);
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
             fs.AddFile(path, inputStream);
 
             return new UmbracoFile(path);
@@ -68,14 +68,14 @@ namespace umbraco.cms.businesslogic.Files
 
         public static UmbracoFile Save(HttpPostedFile file)
         {
-            string tempDir = System.IO.Path.Combine(IO.SystemDirectories.Media, "uploads", Guid.NewGuid().ToString());
+            var tempDir = System.IO.Path.Combine("uploads", Guid.NewGuid().ToString());
             return Save(file, tempDir);
         }
 
         //filebase overload...
         public static UmbracoFile Save(HttpPostedFileBase file)
         {
-            string tempDir = System.IO.Path.Combine(IO.SystemDirectories.Media, "uploads", Guid.NewGuid().ToString());
+            var tempDir = System.IO.Path.Combine("uploads", Guid.NewGuid().ToString());
             return Save(file, tempDir);
         }
 

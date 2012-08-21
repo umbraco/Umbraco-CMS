@@ -271,6 +271,9 @@
 		<None Include="config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
 		</None>
+    <Content Include="config\FileSystemProviders.config">
+      <SubType>Designer</SubType>
+    </Content>
 		<None Include="config\FileSystemProviders.Release.config">
       <DependentUpon>FileSystemProviders.config</DependentUpon>
     </None>
@@ -345,6 +348,9 @@
     <Content Include="umbraco\images\information.png" />
     <Content Include="umbraco\images\listItemOrange.gif" />
     <Content Include="umbraco\images\pencil.png" />
+    <Content Include="umbraco\images\thumbs_lrg.png" />
+    <Content Include="umbraco\images\thumbs_med.png" />
+    <Content Include="umbraco\images\thumbs_smll.png" />
     <Content Include="umbraco\plugins\uGoLive\cog.png" />
     <Content Include="umbraco\plugins\uGoLive\cross.png" />
     <Content Include="umbraco\plugins\uGoLive\Dashboard.ascx" />
@@ -1757,6 +1763,10 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="web.Template.ShandemVaio.Debug.config">
+      <DependentUpon>Web.Template.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="web.Template.cln-vaio.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>

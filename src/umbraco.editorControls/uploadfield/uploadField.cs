@@ -19,11 +19,11 @@ namespace umbraco.editorControls
         private readonly String _thumbnails;
         private String _text;
 
-        private IFileSystem _fs; 
+        private IMediaFileSystem _fs; 
 
         public uploadField(IData Data, string ThumbnailSizes)
         {
-            _fs = FileSystemProviderManager.Current.GetFileSystemProvider(FileSystemProvider.Media);
+            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
             _data = (cms.businesslogic.datatype.DefaultData) Data;
             _thumbnails = ThumbnailSizes;
         }
