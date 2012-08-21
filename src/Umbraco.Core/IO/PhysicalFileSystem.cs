@@ -157,7 +157,8 @@ namespace Umbraco.Core.IO
         {
             return _rootUrl.TrimEnd("/") + "/" + path
                 .TrimStart(Path.DirectorySeparatorChar)
-                .Replace(Path.DirectorySeparatorChar, '/');
+                .Replace(Path.DirectorySeparatorChar, '/')
+                .TrimEnd("/");
         }
 
         public DateTimeOffset GetLastModified(string path)
