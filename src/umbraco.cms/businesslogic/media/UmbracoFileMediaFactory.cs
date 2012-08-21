@@ -34,7 +34,7 @@ namespace umbraco.cms.businesslogic.media
             //var absoluteDestFilePath = HttpContext.Current.Server.MapPath(destFilePath);
 
             // Set media properties
-            media.getProperty("umbracoFile").Value = destFilePath;
+            media.getProperty("umbracoFile").Value = _fileSystem.GetUrl(destFilePath);
             media.getProperty("umbracoBytes").Value = uploadedFile.ContentLength;
 
             if (media.getProperty("umbracoExtension") != null)

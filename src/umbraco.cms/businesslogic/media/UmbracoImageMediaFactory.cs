@@ -41,7 +41,7 @@ namespace umbraco.cms.businesslogic.media
             var ext = Path.GetExtension(destFilePath).Substring(1);
 
             // Set media properties
-            media.getProperty("umbracoFile").Value = destFilePath;
+            media.getProperty("umbracoFile").Value = _fileSystem.GetUrl(destFilePath);
             media.getProperty("umbracoWidth").Value = fileWidth;
             media.getProperty("umbracoHeight").Value = fileHeight;
             media.getProperty("umbracoBytes").Value = postedFile.ContentLength;

@@ -122,8 +122,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             
             self._viewModel.filtered = ko.computed(function () {
                 return ko.utils.arrayFilter(this.items(), function (item) {
-                    return item.Name().toLowerCase().indexOf(self._viewModel.filterTerm()) > -1 || 
-                        item.Tags().toLowerCase().indexOf(self._viewModel.filterTerm()) > -1;
+                    return item.Name().toLowerCase().indexOf(self._viewModel.filterTerm().toLowerCase()) > -1 || 
+                        item.Tags().toLowerCase().indexOf(self._viewModel.filterTerm().toLowerCase()) > -1;
                 });
             }, self._viewModel);
 
@@ -185,7 +185,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 "</form>" +
                 "<ul class='queued' data-bind='foreach: queued'><li>" +
                 "<input type='text' class='label' data-bind=\"value: name, valueUpdate: 'afterkeydown', enable: progress() == 0\" />" +
-                "<span class='progress'><span data-bind=\"style: { width: progress() + '%' }\"></span></span>" +
+                "<span class='progress' data-bind='attr: { title : message }'><span data-bind=\"style: { width: progress() + '%' }, attr: { class: status() }\"></span></span>" +
                 "<a href='' data-bind='click: cancel'><img src='images/delete.png' /></a>" +
                 "</li></ul>" +
                 "<div class='buttons'>" +
@@ -204,6 +204,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             
             // Create uploader
             $("#fileupload").fileUploader({
+                allowedExtension: '',
                 dropTarget: ".upload-overlay",
                 onAdd: function (data) {
 
@@ -214,6 +215,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                         name: ko.observable(data.name),
                         size: data.size,
                         progress: ko.observable(data.progress),
+                        status: ko.observable(''),
+                        message: ko.observable(''),
                         cancel: function () {
                             if (this.progress() < 100)
                                 $("#fileupload").fileUploader("cancelItem", this.itemId);
@@ -235,13 +238,18 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 onDone: function (data) {
                     switch (data.status) {
                         case 'success':
-                            //self._viewModel.queued.remove(data.context);
+                            self._viewModel.queued.remove(data.context);
                             break;
                         case 'error':
-                            self._viewModel.queued.remove(data.context);
+                            data.context.message(data.message);
+                            data.context.status(data.status);
+                            //self._viewModel.queued.remove(data.context);
                             break;
                         case 'canceled':
-                            self._viewModel.queued.remove(data.context);
+                            data.context.message("Canceled by user");
+                            data.context.progress(100);
+                            data.context.status(data.status);
+                            //self._viewModel.queued.remove(data.context);
                             break;
                     }
                 },
