@@ -91,6 +91,15 @@
     vertical-align: middle;
 }
 
+.upload-panel .buttons {
+    text-align: right;
+}
+
+.upload-panel .buttons span {
+    display: block;
+    float: left;
+}
+
 .umbFolderBrowser .breadcrumb {
     margin: 20px 20px 15px;
     padding: 0 0 10px;

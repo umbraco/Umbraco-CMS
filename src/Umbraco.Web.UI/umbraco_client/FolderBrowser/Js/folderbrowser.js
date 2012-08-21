@@ -188,10 +188,15 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 "<span class='progress'><span data-bind=\"style: { width: progress() + '%' }\"></span></span>" +
                 "<a href='' data-bind='click: cancel'><img src='images/delete.png' /></a>" +
                 "</li></ul>" +
+                "<div class='buttons'>" +
+                "<span>" +
                 "<button class='button upload' data-bind='enable: queued().length > 0'>Upload</button>" +
-                "<input type='checkbox' id='replaceExisting' />" +
-                "<label for='replaceExisting'>Overwrite existing?</label>" +
-                "<a href='#' class='cancel'>Cancel</a>" +
+                "<input type='checkbox' id='replaceExisting' data-bind='enable: queued().length > 0' />" +
+                "<label for='replaceExisting'>Overwrite existing?</label> " +
+                "</span>" +
+                "<a href='#' class='cancel'>Cancel All</a> &nbsp; " +
+                "<a href='#' class='close'>Close</a>" +
+                "</div>" +
                 "</div>" +
                 "</div>");
 
@@ -261,6 +266,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             $(".upload-overlay .cancel").click(function (e) {
                 e.preventDefault();
                 $("#fileupload").fileUploader("cancelAll");
+            });
+            
+            $(".upload-overlay .close").click(function (e) {
+                e.preventDefault();
+                $(".upload-overlay").hide();
             });
 
             // Listen for drag events
