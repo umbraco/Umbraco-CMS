@@ -54,6 +54,15 @@ namespace Umbraco.Tests
 		}
 
 		[Test]
+		public void Run_Custom_Extension_Method()
+		{
+			var dynamicNode = GetDynamicNode(1173);
+			var asDynamic = dynamicNode.AsDynamic();
+
+			Assert.AreEqual("Hello world", asDynamic.ReturnHelloWorld());
+		}
+
+		[Test]
 		public void Ensure_TinyMCE_Converted_Type_User_Property()
 		{
 			var dynamicNode = GetDynamicNode(1173);
@@ -307,5 +316,15 @@ namespace Umbraco.Tests
 		}
 
 		#endregion
+	}
+
+	public static class DynamicDocumentCustomExtensionMethods
+	{
+
+		internal static string ReturnHelloWorld(this DynamicDocument doc)
+		{
+			return "Hello world";
+		}
+
 	}
 }

@@ -311,7 +311,6 @@ namespace umbraco.MacroEngines
                 result = typeof(DynamicNode).InvokeMember(binder.Name,
                                                   System.Reflection.BindingFlags.Instance |
                                                   System.Reflection.BindingFlags.Public |
-                                                  System.Reflection.BindingFlags.NonPublic |
                                                   System.Reflection.BindingFlags.GetProperty,
                                                   null,
                                                   this,
@@ -326,7 +325,6 @@ namespace umbraco.MacroEngines
                     result = typeof(DynamicNode).InvokeMember(binder.Name,
                                                   System.Reflection.BindingFlags.Instance |
                                                   System.Reflection.BindingFlags.Public |
-                                                  System.Reflection.BindingFlags.NonPublic |
                                                   System.Reflection.BindingFlags.Static |
                                                   System.Reflection.BindingFlags.InvokeMethod,
                                                   null,
@@ -650,8 +648,7 @@ namespace umbraco.MacroEngines
                     result = n.GetType().InvokeMember(binder.Name,
                                                       System.Reflection.BindingFlags.GetProperty |
                                                       System.Reflection.BindingFlags.Instance |
-                                                      System.Reflection.BindingFlags.Public |
-                                                      System.Reflection.BindingFlags.NonPublic,
+                                                      System.Reflection.BindingFlags.Public,
                                                       null,
                                                       n,
                                                       null);

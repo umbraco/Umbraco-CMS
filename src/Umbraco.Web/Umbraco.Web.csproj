@@ -242,7 +242,7 @@
     <Compile Include="DefaultDynamicDocumentDataSource.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
-    <Compile Include="IApplicationEvents.cs" />
+    <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="umbraco.presentation\LibraryCacheRefresher.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />
     <Compile Include="XmlPublishedContentStore.cs" />

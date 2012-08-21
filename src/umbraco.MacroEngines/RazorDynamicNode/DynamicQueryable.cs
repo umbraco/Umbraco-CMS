@@ -1595,7 +1595,9 @@ namespace System.Linq.Dynamic
                     {
                         //accessing a property off an already resolved DynamicNode TryGetMember call
                         //e.g. uBlogsyPostDate.Date
-                        MethodInfo ReflectPropertyValue = this.GetType().GetMethod("ReflectPropertyValue", BindingFlags.NonPublic | BindingFlags.Static);
+						//SD: Removed the NonPublic accessor here because this will never work in medium trust, wondering why it is NonPublic vs Public ? Have changed to Public.
+						//MethodInfo ReflectPropertyValue = this.GetType().GetMethod("ReflectPropertyValue", BindingFlags.NonPublic | BindingFlags.Static);
+						MethodInfo ReflectPropertyValue = this.GetType().GetMethod("ReflectPropertyValue", BindingFlags.Public | BindingFlags.Static);
                         ParameterExpression convertDynamicNullToBooleanFalse = Expression.Parameter(typeof(bool), "convertDynamicNullToBooleanFalse");
                         ParameterExpression result = Expression.Parameter(typeof(object), "result");
                         ParameterExpression idParam = Expression.Parameter(typeof(string), "id");

@@ -102,7 +102,7 @@ namespace Umbraco.Core
 			return GetFieldsCache.GetOrAdd(
 				type,
 				x => type
-				     	.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+				     	.GetFields(BindingFlags.Public | BindingFlags.Instance)
 				     	.Where(y => !y.IsInitOnly)
 				     	.ToArray());
 		}
@@ -120,7 +120,7 @@ namespace Umbraco.Core
 			return GetPropertiesCache.GetOrAdd(
 				new Tuple<Type, bool, bool, bool>(type, mustRead, mustWrite, includeIndexed),
 				x => type
-				     	.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+				     	.GetProperties(BindingFlags.Public | BindingFlags.Instance)
 				     	.Where(y => (!mustRead || y.CanRead)
 				     	            && (!mustWrite || y.CanWrite)
 				     	            && (includeIndexed || !y.GetIndexParameters().Any()))

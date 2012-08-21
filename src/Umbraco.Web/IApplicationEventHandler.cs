@@ -6,7 +6,7 @@ namespace Umbraco.Web
 	/// <summary>
 	/// Custom IApplicationStartupHandler that auto subscribes to the applications events
 	/// </summary>
-	public interface IApplicationEvents : IApplicationStartupHandler
+	public interface IApplicationEventHandler : IApplicationStartupHandler
 	{
 		void OnApplicationInitialized(UmbracoApplication httpApplication, ApplicationContext applicationContext);
 		void OnApplicationStarting(UmbracoApplication httpApplication, ApplicationContext applicationContext);

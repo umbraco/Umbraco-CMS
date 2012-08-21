@@ -258,7 +258,6 @@ namespace Umbraco.Core.Dynamics
 				result = typeof(DynamicDocument).InvokeMember(binder.Name,
 												  System.Reflection.BindingFlags.Instance |
 												  System.Reflection.BindingFlags.Public |
-												  System.Reflection.BindingFlags.NonPublic |
 												  System.Reflection.BindingFlags.GetProperty,
 												  null,
 												  this,
@@ -273,7 +272,6 @@ namespace Umbraco.Core.Dynamics
 					result = typeof(DynamicDocument).InvokeMember(binder.Name,
 												  System.Reflection.BindingFlags.Instance |
 												  System.Reflection.BindingFlags.Public |
-												  System.Reflection.BindingFlags.NonPublic |
 												  System.Reflection.BindingFlags.Static |
 												  System.Reflection.BindingFlags.InvokeMethod,
 												  null,

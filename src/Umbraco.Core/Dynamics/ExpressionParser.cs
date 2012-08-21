@@ -11,9 +11,9 @@ namespace Umbraco.Core.Dynamics
 	{
 		struct Token
 		{
-			public TokenId id;
-			public string text;
-			public int pos;
+			public TokenId Id { get; set; }
+			public string Text { get; set; }
+			public int Pos { get; set; }
 		}
 
 		enum TokenId
@@ -250,7 +250,7 @@ namespace Umbraco.Core.Dynamics
 
 		public Expression Parse(Type resultType)
 		{
-			int exprPos = token.pos;
+			int exprPos = token.Pos;
 			Expression expr = ParseExpression();
 			if (resultType != null)
 				if ((expr = PromoteExpression(expr, resultType, true)) == null)
@@ -277,7 +277,7 @@ namespace Umbraco.Core.Dynamics
 					ascending = false;
 				}
 				orderings.Add(new DynamicOrdering { Selector = expr, Ascending = ascending });
-				if (token.id != TokenId.Comma) break;
+				if (token.Id != TokenId.Comma) break;
 				NextToken();
 			}
 			ValidateToken(TokenId.End, Res.SyntaxError);
@@ -288,9 +288,9 @@ namespace Umbraco.Core.Dynamics
 		// ?: operator
 		Expression ParseExpression()
 		{
-			int errorPos = token.pos;
+			int errorPos = token.Pos;
 			Expression expr = ParseLogicalOr();
-			if (token.id == TokenId.Question)
+			if (token.Id == TokenId.Question)
 			{
 				NextToken();
 				Expression expr1 = ParseExpression();
@@ -306,12 +306,12 @@ namespace Umbraco.Core.Dynamics
 		Expression ParseLogicalOr()
 		{
 			Expression left = ParseLogicalAnd();
-			while (token.id == TokenId.DoubleBar || TokenIdentifierIs("or"))
+			while (token.Id == TokenId.DoubleBar || TokenIdentifierIs("or"))
 			{
 				Token op = token;
 				NextToken();
 				Expression right = ParseLogicalAnd();
-				CheckAndPromoteOperands(typeof(ILogicalSignatures), op.text, ref left, ref right, op.pos);
+				CheckAndPromoteOperands(typeof(ILogicalSignatures), op.Text, ref left, ref right, op.Pos);
 				left = HandleDynamicNodeLambdas(ExpressionType.OrElse, left, right);
 			}
 			return left;
@@ -321,12 +321,12 @@ namespace Umbraco.Core.Dynamics
 		Expression ParseLogicalAnd()
 		{
 			Expression left = ParseComparison();
-			while (token.id == TokenId.DoubleAmphersand || TokenIdentifierIs("and"))
+			while (token.Id == TokenId.DoubleAmphersand || TokenIdentifierIs("and"))
 			{
 				Token op = token;
 				NextToken();
 				Expression right = ParseComparison();
-				CheckAndPromoteOperands(typeof(ILogicalSignatures), op.text, ref left, ref right, op.pos);
+				CheckAndPromoteOperands(typeof(ILogicalSignatures), op.Text, ref left, ref right, op.Pos);
 				left = HandleDynamicNodeLambdas(ExpressionType.AndAlso, left, right);
 			}
 			return left;
@@ -336,16 +336,16 @@ namespace Umbraco.Core.Dynamics
 		Expression ParseComparison()
 		{
 			Expression left = ParseAdditive();
-			while (token.id == TokenId.Equal || token.id == TokenId.DoubleEqual ||
-			       token.id == TokenId.ExclamationEqual || token.id == TokenId.LessGreater ||
-			       token.id == TokenId.GreaterThan || token.id == TokenId.GreaterThanEqual ||
-			       token.id == TokenId.LessThan || token.id == TokenId.LessThanEqual)
+			while (token.Id == TokenId.Equal || token.Id == TokenId.DoubleEqual ||
+			       token.Id == TokenId.ExclamationEqual || token.Id == TokenId.LessGreater ||
+			       token.Id == TokenId.GreaterThan || token.Id == TokenId.GreaterThanEqual ||
+			       token.Id == TokenId.LessThan || token.Id == TokenId.LessThanEqual)
 			{
 				Token op = token;
 				NextToken();
 				Expression right = ParseAdditive();
-				bool isEquality = op.id == TokenId.Equal || op.id == TokenId.DoubleEqual ||
-				                  op.id == TokenId.ExclamationEqual || op.id == TokenId.LessGreater;
+				bool isEquality = op.Id == TokenId.Equal || op.Id == TokenId.DoubleEqual ||
+				                  op.Id == TokenId.ExclamationEqual || op.Id == TokenId.LessGreater;
 				if (isEquality && !left.Type.IsValueType && !right.Type.IsValueType)
 				{
 					if (left.Type != right.Type)
@@ -364,7 +364,7 @@ namespace Umbraco.Core.Dynamics
 						}
 						else
 						{
-							throw IncompatibleOperandsError(op.text, left, right, op.pos);
+							throw IncompatibleOperandsError(op.Text, left, right, op.Pos);
 						}
 					}
 				}
@@ -383,16 +383,16 @@ namespace Umbraco.Core.Dynamics
 						}
 						else
 						{
-							throw IncompatibleOperandsError(op.text, left, right, op.pos);
+							throw IncompatibleOperandsError(op.Text, left, right, op.Pos);
 						}
 					}
 				}
 				else
 				{
 					CheckAndPromoteOperands(isEquality ? typeof(IEqualitySignatures) : typeof(IRelationalSignatures),
-					                        op.text, ref left, ref right, op.pos);
+					                        op.Text, ref left, ref right, op.Pos);
 				}
-				switch (op.id)
+				switch (op.Id)
 				{
 					case TokenId.Equal:
 					case TokenId.DoubleEqual:
@@ -423,22 +423,22 @@ namespace Umbraco.Core.Dynamics
 		Expression ParseAdditive()
 		{
 			Expression left = ParseMultiplicative();
-			while (token.id == TokenId.Plus || token.id == TokenId.Minus ||
-			       token.id == TokenId.Amphersand)
+			while (token.Id == TokenId.Plus || token.Id == TokenId.Minus ||
+			       token.Id == TokenId.Amphersand)
 			{
 				Token op = token;
 				NextToken();
 				Expression right = ParseMultiplicative();
-				switch (op.id)
+				switch (op.Id)
 				{
 					case TokenId.Plus:
 						if (left.Type == typeof(string) || right.Type == typeof(string))
 							goto case TokenId.Amphersand;
-						CheckAndPromoteOperands(typeof(IAddSignatures), op.text, ref left, ref right, op.pos);
+						CheckAndPromoteOperands(typeof(IAddSignatures), op.Text, ref left, ref right, op.Pos);
 						left = GenerateAdd(left, right);
 						break;
 					case TokenId.Minus:
-						CheckAndPromoteOperands(typeof(ISubtractSignatures), op.text, ref left, ref right, op.pos);
+						CheckAndPromoteOperands(typeof(ISubtractSignatures), op.Text, ref left, ref right, op.Pos);
 						left = GenerateSubtract(left, right);
 						break;
 					case TokenId.Amphersand:
@@ -453,14 +453,14 @@ namespace Umbraco.Core.Dynamics
 		Expression ParseMultiplicative()
 		{
 			Expression left = ParseUnary();
-			while (token.id == TokenId.Asterisk || token.id == TokenId.Slash ||
-			       token.id == TokenId.Percent || TokenIdentifierIs("mod"))
+			while (token.Id == TokenId.Asterisk || token.Id == TokenId.Slash ||
+			       token.Id == TokenId.Percent || TokenIdentifierIs("mod"))
 			{
 				Token op = token;
 				NextToken();
 				Expression right = ParseUnary();
-				CheckAndPromoteOperands(typeof(IArithmeticSignatures), op.text, ref left, ref right, op.pos);
-				switch (op.id)
+				CheckAndPromoteOperands(typeof(IArithmeticSignatures), op.Text, ref left, ref right, op.Pos);
+				switch (op.Id)
 				{
 					case TokenId.Asterisk:
 						left = Expression.Multiply(left, right);
@@ -480,27 +480,27 @@ namespace Umbraco.Core.Dynamics
 		// -, !, not unary operators
 		Expression ParseUnary()
 		{
-			if (token.id == TokenId.Minus || token.id == TokenId.Exclamation ||
+			if (token.Id == TokenId.Minus || token.Id == TokenId.Exclamation ||
 			    TokenIdentifierIs("not"))
 			{
 				Token op = token;
 				NextToken();
-				if (op.id == TokenId.Minus && (token.id == TokenId.IntegerLiteral ||
-				                               token.id == TokenId.RealLiteral))
+				if (op.Id == TokenId.Minus && (token.Id == TokenId.IntegerLiteral ||
+				                               token.Id == TokenId.RealLiteral))
 				{
-					token.text = "-" + token.text;
-					token.pos = op.pos;
+					token.Text = "-" + token.Text;
+					token.Pos = op.Pos;
 					return ParsePrimary();
 				}
 				Expression expr = ParseUnary();
-				if (op.id == TokenId.Minus)
+				if (op.Id == TokenId.Minus)
 				{
-					CheckAndPromoteOperand(typeof(INegationSignatures), op.text, ref expr, op.pos);
+					CheckAndPromoteOperand(typeof(INegationSignatures), op.Text, ref expr, op.Pos);
 					expr = Expression.Negate(expr);
 				}
 				else
 				{
-					CheckAndPromoteOperand(typeof(INotSignatures), op.text, ref expr, op.pos);
+					CheckAndPromoteOperand(typeof(INotSignatures), op.Text, ref expr, op.Pos);
 					if (expr is LambdaExpression)
 					{
 						ParameterExpression[] parameters = new ParameterExpression[(expr as LambdaExpression).Parameters.Count];
@@ -529,12 +529,12 @@ namespace Umbraco.Core.Dynamics
 			Expression expr = ParsePrimaryStart();
 			while (true)
 			{
-				if (token.id == TokenId.Dot)
+				if (token.Id == TokenId.Dot)
 				{
 					NextToken();
 					expr = ParseMemberAccess(null, expr);
 				}
-				else if (token.id == TokenId.OpenBracket)
+				else if (token.Id == TokenId.OpenBracket)
 				{
 					expr = ParseElementAccess(expr);
 				}
@@ -548,7 +548,7 @@ namespace Umbraco.Core.Dynamics
 
 		Expression ParsePrimaryStart()
 		{
-			switch (token.id)
+			switch (token.Id)
 			{
 				case TokenId.Identifier:
 					return ParseIdentifier();
@@ -568,8 +568,8 @@ namespace Umbraco.Core.Dynamics
 		Expression ParseStringLiteral()
 		{
 			ValidateToken(TokenId.StringLiteral);
-			char quote = token.text[0];
-			string s = token.text.Substring(1, token.text.Length - 2);
+			char quote = token.Text[0];
+			string s = token.Text.Substring(1, token.Text.Length - 2);
 			int start = 0;
 			while (true)
 			{
@@ -592,7 +592,7 @@ namespace Umbraco.Core.Dynamics
 		Expression ParseIntegerLiteral()
 		{
 			ValidateToken(TokenId.IntegerLiteral);
-			string text = token.text;
+			string text = token.Text;
 			if (text[0] != '-')
 			{
 				ulong value;
@@ -619,7 +619,7 @@ namespace Umbraco.Core.Dynamics
 		Expression ParseRealLiteral()
 		{
 			ValidateToken(TokenId.RealLiteral);
-			string text = token.text;
+			string text = token.Text;
 			object value = null;
 			char last = text[text.Length - 1];
 			if (last == 'F' || last == 'f')
@@ -658,7 +658,7 @@ namespace Umbraco.Core.Dynamics
 		{
 			ValidateToken(TokenId.Identifier);
 			object value;
-			if (keywords.TryGetValue(token.text, out value))
+			if (keywords.TryGetValue(token.Text, out value))
 			{
 				if (value is Type) return ParseTypeAccess((Type)value);
 				if (value == (object)keywordIt) return ParseIt();
@@ -667,8 +667,8 @@ namespace Umbraco.Core.Dynamics
 				NextToken();
 				return (Expression)value;
 			}
-			if (symbols.TryGetValue(token.text, out value) ||
-			    externals != null && externals.TryGetValue(token.text, out value))
+			if (symbols.TryGetValue(token.Text, out value) ||
+			    externals != null && externals.TryGetValue(token.Text, out value))
 			{
 				Expression expr = value as Expression;
 				if (expr == null)
@@ -684,7 +684,7 @@ namespace Umbraco.Core.Dynamics
 				return expr;
 			}
 			if (it != null) return ParseMemberAccess(null, it);
-			throw ParseError(Res.UnknownIdentifier, token.text);
+			throw ParseError(Res.UnknownIdentifier, token.Text);
 		}
 
 		Expression ParseIt()
@@ -697,7 +697,7 @@ namespace Umbraco.Core.Dynamics
 
 		Expression ParseIif()
 		{
-			int errorPos = token.pos;
+			int errorPos = token.Pos;
 			NextToken();
 			Expression[] args = ParseArgumentList();
 			if (args.Length != 3)
@@ -742,7 +742,7 @@ namespace Umbraco.Core.Dynamics
 			List<Expression> expressions = new List<Expression>();
 			while (true)
 			{
-				int exprPos = token.pos;
+				int exprPos = token.Pos;
 				Expression expr = ParseExpression();
 				string propName;
 				if (TokenIdentifierIs("as"))
@@ -759,7 +759,7 @@ namespace Umbraco.Core.Dynamics
 				}
 				expressions.Add(expr);
 				properties.Add(new DynamicProperty(propName, expr.Type));
-				if (token.id != TokenId.Comma) break;
+				if (token.Id != TokenId.Comma) break;
 				NextToken();
 			}
 			ValidateToken(TokenId.CloseParen, Res.CloseParenOrCommaExpected);
@@ -773,7 +773,7 @@ namespace Umbraco.Core.Dynamics
 
 		Expression ParseLambdaInvocation(LambdaExpression lambda)
 		{
-			int errorPos = token.pos;
+			int errorPos = token.Pos;
 			NextToken();
 			Expression[] args = ParseArgumentList();
 			MethodBase method;
@@ -784,16 +784,16 @@ namespace Umbraco.Core.Dynamics
 
 		Expression ParseTypeAccess(Type type)
 		{
-			int errorPos = token.pos;
+			int errorPos = token.Pos;
 			NextToken();
-			if (token.id == TokenId.Question)
+			if (token.Id == TokenId.Question)
 			{
 				if (!type.IsValueType || IsNullableType(type))
 					throw ParseError(errorPos, Res.TypeHasNoNullableForm, GetTypeName(type));
 				type = typeof(Nullable<>).MakeGenericType(type);
 				NextToken();
 			}
-			if (token.id == TokenId.OpenParen)
+			if (token.Id == TokenId.OpenParen)
 			{
 				Expression[] args = ParseArgumentList();
 				MethodBase method;
@@ -837,10 +837,10 @@ namespace Umbraco.Core.Dynamics
 		Expression ParseMemberAccess(Type type, Expression instance)
 		{
 			if (instance != null) type = instance.Type;
-			int errorPos = token.pos;
+			int errorPos = token.Pos;
 			string id = GetIdentifier();
 			NextToken();
-			if (token.id == TokenId.OpenParen)
+			if (token.Id == TokenId.OpenParen)
 			{
 				if (instance != null && type != typeof(string))
 				{
@@ -964,7 +964,9 @@ namespace Umbraco.Core.Dynamics
 					{
 						//accessing a property off an already resolved DynamicNode TryGetMember call
 						//e.g. uBlogsyPostDate.Date
-						MethodInfo ReflectPropertyValue = this.GetType().GetMethod("ReflectPropertyValue", BindingFlags.NonPublic | BindingFlags.Static);
+						//SD: Removed the NonPublic accessor here because this will never work in medium trust, wondering why it is NonPublic vs Public ? Have changed to Public.
+						//MethodInfo ReflectPropertyValue = this.GetType().GetMethod("ReflectPropertyValue", BindingFlags.NonPublic | BindingFlags.Static);
+						MethodInfo ReflectPropertyValue = this.GetType().GetMethod("ReflectPropertyValue", BindingFlags.Public | BindingFlags.Static);
 						ParameterExpression convertDynamicNullToBooleanFalse = Expression.Parameter(typeof(bool), "convertDynamicNullToBooleanFalse");
 						ParameterExpression result = Expression.Parameter(typeof(object), "result");
 						ParameterExpression idParam = Expression.Parameter(typeof(string), "id");
@@ -1129,7 +1131,7 @@ namespace Umbraco.Core.Dynamics
 		{
 			ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
 			NextToken();
-			Expression[] args = token.id != TokenId.CloseParen ? ParseArguments() : new Expression[0];
+			Expression[] args = token.Id != TokenId.CloseParen ? ParseArguments() : new Expression[0];
 			ValidateToken(TokenId.CloseParen, Res.CloseParenOrCommaExpected);
 			NextToken();
 			return args;
@@ -1141,7 +1143,7 @@ namespace Umbraco.Core.Dynamics
 			while (true)
 			{
 				argList.Add(ParseExpression());
-				if (token.id != TokenId.Comma) break;
+				if (token.Id != TokenId.Comma) break;
 				NextToken();
 			}
 			return argList.ToArray();
@@ -1149,7 +1151,7 @@ namespace Umbraco.Core.Dynamics
 
 		Expression ParseElementAccess(Expression expr)
 		{
-			int errorPos = token.pos;
+			int errorPos = token.Pos;
 			ValidateToken(TokenId.OpenBracket, Res.OpenParenExpected);
 			NextToken();
 			Expression[] args = ParseArguments();
@@ -2205,20 +2207,20 @@ namespace Umbraco.Core.Dynamics
 					}
 					throw ParseError(textPos, Res.InvalidCharacter, ch);
 			}
-			token.id = t;
-			token.text = text.Substring(tokenPos, textPos - tokenPos);
-			token.pos = tokenPos;
+			token.Id = t;
+			token.Text = text.Substring(tokenPos, textPos - tokenPos);
+			token.Pos = tokenPos;
 		}
 
 		bool TokenIdentifierIs(string id)
 		{
-			return token.id == TokenId.Identifier && String.Equals(id, token.text, StringComparison.OrdinalIgnoreCase);
+			return token.Id == TokenId.Identifier && String.Equals(id, token.Text, StringComparison.OrdinalIgnoreCase);
 		}
 
 		string GetIdentifier()
 		{
 			ValidateToken(TokenId.Identifier, Res.IdentifierExpected);
-			string id = token.text;
+			string id = token.Text;
 			if (id.Length > 1 && id[0] == '@') id = id.Substring(1);
 			return id;
 		}
@@ -2230,17 +2232,17 @@ namespace Umbraco.Core.Dynamics
 
 		void ValidateToken(TokenId t, string errorMessage)
 		{
-			if (token.id != t) throw ParseError(errorMessage);
+			if (token.Id != t) throw ParseError(errorMessage);
 		}
 
 		void ValidateToken(TokenId t)
 		{
-			if (token.id != t) throw ParseError(Res.SyntaxError);
+			if (token.Id != t) throw ParseError(Res.SyntaxError);
 		}
 
 		Exception ParseError(string format, params object[] args)
 		{
-			return ParseError(token.pos, format, args);
+			return ParseError(token.Pos, format, args);
 		}
 
 		Exception ParseError(int pos, string format, params object[] args)

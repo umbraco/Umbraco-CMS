@@ -153,7 +153,6 @@ namespace Umbraco.Core.Dynamics
                 result = Items.GetType().InvokeMember(binder.Name,
                                                   System.Reflection.BindingFlags.Instance |
                                                   System.Reflection.BindingFlags.Public |
-                                                  System.Reflection.BindingFlags.NonPublic |
                                                   System.Reflection.BindingFlags.GetProperty,
                                                   null,
                                                   Items,
@@ -168,7 +167,6 @@ namespace Umbraco.Core.Dynamics
                     result = Items.GetType().InvokeMember(binder.Name,
                                                   System.Reflection.BindingFlags.Instance |
                                                   System.Reflection.BindingFlags.Public |
-                                                  System.Reflection.BindingFlags.NonPublic |
                                                   System.Reflection.BindingFlags.Static |
                                                   System.Reflection.BindingFlags.InvokeMethod,
                                                   null,

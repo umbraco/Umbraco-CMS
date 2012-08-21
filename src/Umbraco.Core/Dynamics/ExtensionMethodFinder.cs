@@ -22,7 +22,7 @@ namespace Umbraco.Core.Dynamics
                 from type in assembly.GetTypes()
                 where (type.IsDefined(typeof(ExtensionAttribute), false)
                     && type.IsSealed && !type.IsGenericType && !type.IsNested)
-                from method in type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                from method in type.GetMethods(BindingFlags.Static | BindingFlags.Public)
                 // this filters extension methods
                 where method.IsDefined(typeof(ExtensionAttribute), false)
                 select method
@@ -31,7 +31,7 @@ namespace Umbraco.Core.Dynamics
             //search an explicit type (e.g. Enumerable, where most of the Linq methods are defined)
             //if (explicitTypeToSearch != null)
             //{
-            candidates = candidates.Concat(typeof(IEnumerable).GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
+            candidates = candidates.Concat(typeof(IEnumerable).GetMethods(BindingFlags.Static | BindingFlags.Public));
             //}
 
             //filter by name

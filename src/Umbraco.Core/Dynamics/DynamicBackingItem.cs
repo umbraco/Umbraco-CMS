@@ -131,8 +131,7 @@ namespace Umbraco.Core.Dynamics
 							                           content.GetType().InvokeMember(memberAlias,
 							                                                          System.Reflection.BindingFlags.GetProperty |
 							                                                          System.Reflection.BindingFlags.Instance |
-							                                                          System.Reflection.BindingFlags.Public |
-							                                                          System.Reflection.BindingFlags.NonPublic,
+							                                                          System.Reflection.BindingFlags.Public							                                                          ,
 							                                                          null,
 							                                                          content,
 							                                                          null));

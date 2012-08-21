@@ -23,11 +23,11 @@ namespace Umbraco.Web
 		}
 
 		/// <summary>
-		/// Gets the <see cref="IApplicationEvents"/> implementations.
+		/// Gets the <see cref="IApplicationEventHandler"/> implementations.
 		/// </summary>
-		public IEnumerable<IApplicationEvents> ApplicationEventHandlers
+		public IEnumerable<IApplicationEventHandler> ApplicationEventHandlers
 		{
-			get { return Values.OfType<IApplicationEvents>(); }
+			get { return Values.OfType<IApplicationEventHandler>(); }
 		}
 
 		public override void Clear()
