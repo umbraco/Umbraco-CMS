@@ -34,7 +34,7 @@ namespace Umbraco.Core.Dynamics
             candidates = candidates.Concat(typeof(IEnumerable).GetMethods(BindingFlags.Static | BindingFlags.Public));
             //}
 
-            //filter by name
+            //filter by name	
             var methodsByName = candidates.Where(m => m.Name == name);
 
             var isGenericAndRightParamCount = methodsByName.Where(m => m.GetParameters().Length == argumentCount + (argsContainsThis ? 0 : 1));

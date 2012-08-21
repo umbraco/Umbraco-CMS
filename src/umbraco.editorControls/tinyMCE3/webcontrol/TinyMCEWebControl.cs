@@ -73,7 +73,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
             base.Attributes.Add("style", "visibility: hidden");
             config.Add("mode", "exact");
             config.Add("theme", "umbraco");
-            config.Add("umbraco_path", IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+			config.Add("umbraco_path", global::Umbraco.Core.IO.IOHelper.ResolveUrl(global::Umbraco.Core.IO.SystemDirectories.Umbraco));
             CssClass = "tinymceContainer";
             plugin.ConfigSection configSection = (plugin.ConfigSection)System.Web.HttpContext.Current.GetSection("TinyMCE");
 
@@ -218,8 +218,8 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                     suffix = "_" + this.mode;
 
                 outURI = this.InstallPath + "/tiny_mce_src" + suffix + ".js";
-                if (!File.Exists(IOHelper.MapPath(outURI)))
-                    throw new Exception("Could not locate TinyMCE by URI:" + outURI + ", Physical path:" + IOHelper.MapPath(outURI) + ". Make sure that you configured the installPath to a valid location in your web.config. This path should be an relative or site absolute URI to where TinyMCE is located.");
+				if (!File.Exists(global::Umbraco.Core.IO.IOHelper.MapPath(outURI)))
+					throw new Exception("Could not locate TinyMCE by URI:" + outURI + ", Physical path:" + global::Umbraco.Core.IO.IOHelper.MapPath(outURI) + ". Make sure that you configured the installPath to a valid location in your web.config. This path should be an relative or site absolute URI to where TinyMCE is located.");
 
                 // Collect themes, languages and plugins and build gzip URI
                 // TODO: Make sure gzip is re-enabled
@@ -332,7 +332,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                     // Find the original filename, by removing the might added width and height
                     // NH, 4.8.1 - above replaced by loading the right media file from the db later!
                     orgSrc =
-                        IOHelper.ResolveUrl(orgSrc.Replace("%20", " "));
+						global::Umbraco.Core.IO.IOHelper.ResolveUrl(orgSrc.Replace("%20", " "));
 
                     // Check for either id or guid from media
                     string mediaId = getIdFromSource(orgSrc, rootMediaUrl);
@@ -364,7 +364,7 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol
                             // Format the tag
                             tempTag = tempTag + " rel=\"" +
                                       imageMedia.getProperty("umbracoWidth").Value.ToString() + "," +
-                                      imageMedia.getProperty("umbracoHeight").Value.ToString() + "\" src=\"" + IOHelper.ResolveUrl(imageMedia.getProperty("umbracoFile").Value.ToString()) +
+									  imageMedia.getProperty("umbracoHeight").Value.ToString() + "\" src=\"" + global::Umbraco.Core.IO.IOHelper.ResolveUrl(imageMedia.getProperty("umbracoFile").Value.ToString()) +
                                       "\"";
                             tempTag += "/>";
 

@@ -19,14 +19,6 @@ namespace Umbraco.Core
 			       	? Activator.CreateInstance(t)
 			       	: null;
 		}
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
-namespace Umbraco.Core
-{
-    public static class TypeExtensions
-    {
         internal static MethodInfo GetGenericMethod(this Type type, string name, params Type[] parameterTypes)
         {
             var methods = type.GetMethods().Where(method => method.Name == name);
@@ -112,8 +104,7 @@ namespace Umbraco.Core
                    from method in type.GetMethods()
                    select method;
         }
-    }
-}
+ 
 		/// <returns>
 		///   <c>true</c> if the specified type is enumerable; otherwise, <c>false</c>.
 		/// </returns>
@@ -228,27 +219,27 @@ namespace Umbraco.Core
 			return TypeHelper.IsTypeAssignableFrom<T>(actualType);
 		}
 
-		public static string GetCacheKeyFromParameters(this MemberInfo info)
-		{
-			var methodInfo = info as MethodInfo;
-			if (methodInfo != null)
-				return GetCacheKeyFromParameters(methodInfo.GetParameters());
-			return string.Empty;
-		}
+		//internal static string GetCacheKeyFromParameters(this MemberInfo info)
+		//{
+		//    var methodInfo = info as MethodInfo;
+		//    if (methodInfo != null)
+		//        return GetCacheKeyFromParameters(methodInfo.GetParameters());
+		//    return string.Empty;
+		//}
 
-		public static string GetCacheKeyFromParameters(IEnumerable<ParameterInfo> parameters)
-		{
-			var sb = new StringBuilder();
-			sb.Append("(");
-			foreach (var parameter in parameters)
-			{
-				sb.Append(parameter.ParameterType);
-				sb.Append(" ");
-				sb.Append(parameter.Name);
-				sb.Append(",");
-			}
-			sb.Append(")");
-			return sb.ToString();
-		}
+		//internal static string GetCacheKeyFromParameters(IEnumerable<ParameterInfo> parameters)
+		//{
+		//    var sb = new StringBuilder();
+		//    sb.Append("(");
+		//    foreach (var parameter in parameters)
+		//    {
+		//        sb.Append(parameter.ParameterType);
+		//        sb.Append(" ");
+		//        sb.Append(parameter.Name);
+		//        sb.Append(",");
+		//    }
+		//    sb.Append(")");
+		//    return sb.ToString();
+		//}
 	}
 }

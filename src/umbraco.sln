@@ -12,7 +12,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
 	ProjectSection(SolutionItems) = preProject
 		..\build\Build.bat = ..\build\Build.bat
-		..\build\Build.proj = ..\build\Build.proj
 		umbraco.presentation.targets = umbraco.presentation.targets
 	EndProjectSection
 EndProject

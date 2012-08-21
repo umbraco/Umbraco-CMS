@@ -121,7 +121,7 @@
       <Name>umbraco.cms</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
-      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
+      <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
       <Name>Umbraco.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
