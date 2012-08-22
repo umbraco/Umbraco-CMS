@@ -151,6 +151,9 @@ namespace umbraco.cms.presentation.developer
                 else
                     macro.GetMacro(macroID).removeFromCache();
 
+                base.speechBubble(speechBubbleIcon.save, "Macro saved", "");
+
+
                 // Check for assemblyBrowser
                 if (tempMacroType.IndexOf(".ascx") > 0)
                     assemblyBrowserUserControl.Controls.Add(
