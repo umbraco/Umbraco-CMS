@@ -1,23 +1,25 @@
 namespace System.Linq.Dynamic
 {
+
+	[Obsolete("This class has been superceded by Umbraco.Core.Dynamics.ParseException")]
 	public sealed class ParseException : Exception
 	{
-		int position;
+		private readonly Umbraco.Core.Dynamics.ParseException _inner;
 
 		public ParseException(string message, int position)
 			: base(message)
 		{
-			this.position = position;
+			_inner = new Umbraco.Core.Dynamics.ParseException(message, position);
 		}
 
 		public int Position
 		{
-			get { return position; }
+			get { return _inner.Position; }
 		}
 
 		public override string ToString()
 		{
-			return string.Format(Res.ParseExceptionFormat, Message, position);
+			return _inner.ToString();
 		}
 	}
 }

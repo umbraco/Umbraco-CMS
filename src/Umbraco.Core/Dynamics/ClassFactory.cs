@@ -17,7 +17,7 @@ namespace Umbraco.Core.Dynamics
 		int classCount;
 		ReaderWriterLock rwLock;
 
-		private ClassFactory()
+		protected ClassFactory()
 		{
 			AssemblyName name = new AssemblyName("DynamicClasses");
 			AssemblyBuilder assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);

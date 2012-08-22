@@ -1006,7 +1006,7 @@ namespace Umbraco.Core.Dynamics
 
 			}
 		}
-		static object ReflectPropertyValue(object o, string name)
+		public static object ReflectPropertyValue(object o, string name)
 		{
 			PropertyInfo propertyInfo = o.GetType().GetProperty(name);
 			if (propertyInfo != null)

@@ -1,26 +1,24 @@
 namespace System.Linq.Dynamic
 {
+
+	[Obsolete("This class has been superceded by Umbraco.Core.Dynamics.DynamicProperty")]
 	public class DynamicProperty
 	{
-		string name;
-		Type type;
+		private readonly Umbraco.Core.Dynamics.DynamicProperty _inner;
 
 		public DynamicProperty(string name, Type type)
 		{
-			if (name == null) throw new ArgumentNullException("name");
-			if (type == null) throw new ArgumentNullException("type");
-			this.name = name;
-			this.type = type;
+			_inner = new Umbraco.Core.Dynamics.DynamicProperty(name, type);
 		}
 
 		public string Name
 		{
-			get { return name; }
+			get { return _inner.Name; }
 		}
 
 		public Type Type
 		{
-			get { return type; }
+			get { return _inner.Type; }
 		}
 	}
 }

@@ -10,6 +10,8 @@ using System.Diagnostics;
 
 namespace System.Linq.Dynamic
 {
+	
+
     public static class DynamicQueryable
     {
         public static IQueryable<T> Where<T>(this IQueryable<T> source, string predicate, params object[] values)
@@ -21,7 +23,7 @@ namespace System.Linq.Dynamic
         {
             if (source == null) throw new ArgumentNullException("source");
             if (predicate == null) throw new ArgumentNullException("predicate");
-            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(bool), predicate, true, values);
+            LambdaExpression lambda = Umbraco.Core.Dynamics.DynamicExpression.ParseLambda(source.ElementType, typeof(bool), predicate, true, values);
             if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
             {
                 //source list is DynamicNode and the lambda returns a Func<object>
@@ -91,7 +93,7 @@ namespace System.Linq.Dynamic
         {
             if (source == null) throw new ArgumentNullException("source");
             if (selector == null) throw new ArgumentNullException("selector");
-            LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(object), selector, false, values);
+            LambdaExpression lambda = Umbraco.Core.Dynamics.DynamicExpression.ParseLambda(source.ElementType, typeof(object), selector, false, values);
             if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
             {
                 //source list is DynamicNode and the lambda returns a Func<object>
@@ -149,7 +151,7 @@ namespace System.Linq.Dynamic
                     descending = true;
                 }
 
-                LambdaExpression lambda = DynamicExpression.ParseLambda(source.ElementType, typeof(object), ordering, false, values);
+				LambdaExpression lambda = Umbraco.Core.Dynamics.DynamicExpression.ParseLambda(source.ElementType, typeof(object), ordering, false, values);
                 if (lambda.Parameters.Count > 0 && lambda.Parameters[0].Type == typeof(DynamicNode))
                 {
                     //source list is DynamicNode and the lambda returns a Func<object>
@@ -197,11 +199,11 @@ namespace System.Linq.Dynamic
             ParameterExpression[] parameters = new ParameterExpression[] {
                 Expression.Parameter(source.ElementType, "") };
             ExpressionParser parser = new ExpressionParser(parameters, ordering, values);
-            IEnumerable<DynamicOrdering> orderings = parser.ParseOrdering();
+            var orderings = parser.ParseOrdering();
             Expression queryExpr = source.Expression;
             string methodAsc = "OrderBy";
             string methodDesc = "OrderByDescending";
-            foreach (DynamicOrdering o in orderings)
+            foreach (var o in orderings)
             {
                 if (!isDynamicNodeList)
                 {
@@ -286,8 +288,8 @@ namespace System.Linq.Dynamic
             if (source == null) throw new ArgumentNullException("source");
             if (keySelector == null) throw new ArgumentNullException("keySelector");
             if (elementSelector == null) throw new ArgumentNullException("elementSelector");
-            LambdaExpression keyLambda = DynamicExpression.ParseLambda(source.ElementType, null, keySelector, true, values);
-            LambdaExpression elementLambda = DynamicExpression.ParseLambda(source.ElementType, null, elementSelector, true, values);
+            LambdaExpression keyLambda = Umbraco.Core.Dynamics.DynamicExpression.ParseLambda(source.ElementType, null, keySelector, true, values);
+            LambdaExpression elementLambda = Umbraco.Core.Dynamics.DynamicExpression.ParseLambda(source.ElementType, null, elementSelector, true, values);
             return source.Provider.CreateQuery(
                 Expression.Call(
                     typeof(Queryable), "GroupBy",
