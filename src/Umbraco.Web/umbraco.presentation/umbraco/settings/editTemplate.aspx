@@ -180,8 +180,8 @@
                 <asp:DropDownList ID="MasterTemplate" Width="350px" runat="server" />
             </cc1:PropertyPanel>
             <cc1:PropertyPanel ID="pp_source" runat="server">
-                <cc1:CodeArea ID="editorSource" runat="server" CodeBase="HTML" ClientSaveMethod="doSubmit"
-                    AutoResize="true" OffSetX="37" OffSetY="54" CssClass="codepress html" />
+                <cc1:CodeArea ID="editorSource" runat="server" CodeBase="HtmlMixed" EditorMimeType="text/html" ClientSaveMethod="doSubmit"
+                    AutoResize="true" OffSetX="37" OffSetY="54"/>
             </cc1:PropertyPanel>
         </cc1:Pane>
     </cc1:UmbracoPanel>

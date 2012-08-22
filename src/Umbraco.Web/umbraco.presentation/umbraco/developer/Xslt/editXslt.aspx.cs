@@ -24,7 +24,6 @@ namespace umbraco.cms.presentation.developer
         public editXslt()
         {
             CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
-
         }
         protected PlaceHolder buttons;
 
