@@ -1889,6 +1889,7 @@
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
+    <Content Include="web.Template.UMBRACOTESLA.Debug.config" />
     <None Include="web.Template.VERTINO-01.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
