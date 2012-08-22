@@ -41,6 +41,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         {
             var self = this;
             
+            $.ajaxSetup({ cache: false });
             $.getJSON(self._opts.basePath + "/FolderBrowserService/GetChildren/" + self._parentId, function (data) {
                 if (data != undefined && data.length > 0) {
                     ko.mapping.fromJS(data, itemMappingOptions, self._viewModel.items);
