@@ -33,7 +33,7 @@
             var codeVal = jQuery('#<%= editorSource.ClientID %>').val();
             //if CodeMirror is not defined, then the code editor is disabled.
             if (typeof (CodeMirror) != "undefined") {
-                codeVal = codeEditor.getCode();
+                codeVal = UmbEditor.GetCode();
             }
 
             umbraco.presentation.webservices.codeEditorSave.SaveXslt(jQuery('#<%= xsltFileName.ClientID %>').val(), '<%= xsltFileName.Text %>', codeVal, document.getElementById('<%= SkipTesting.ClientID %>').checked, submitSucces, submitFailure);
@@ -55,7 +55,6 @@
 
         function xsltVisualize() {
 
-
             xsltSnippet = UmbEditor.IsSimpleEditor
                 ? jQuery("#<%= editorSource.ClientID %>").getSelection().text
                     : UmbEditor._editor.selection();
@@ -63,7 +62,7 @@
             if (xsltSnippet == '') {
                 xsltSnippet = UmbEditor.IsSimpleEditor
                 ? jQuery("#<%= editorSource.ClientID %>").val()
-                    : UmbEditor._editor.getCode();
+                    : UmbEditor.GetCode();
                 //                alert('Please select the xslt to visualize');
             }
 
