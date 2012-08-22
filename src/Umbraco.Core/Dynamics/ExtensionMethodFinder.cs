@@ -11,13 +11,21 @@ namespace Umbraco.Core.Dynamics
 {
     internal static class ExtensionMethodFinder
     {
-		//TODO: This should be highly optimized!!! Calls to BuildManager.GetReferencedAssemblies() are really expensive!
+		
+
 
         private static List<MethodInfo> GetAllExtensionMethods(Type thisType, string name, int argumentCount, bool argsContainsThis)
         {
+			//only scan assemblies we know to contain extension methods (user assemblies)
+        	//var assembliesToScan = TypeFinder.GetAssembliesWithKnownExclusions();
+        	var assembliesToScan = new List<Assembly>()
+        		{
+        			Assembly.Load("Umbraco.Tests")
+        		};
+
             //get extension methods from runtime
             var candidates = (
-                from assembly in BuildManager.GetReferencedAssemblies().Cast<Assembly>()
+				from assembly in assembliesToScan
                 where assembly.IsDefined(typeof(ExtensionAttribute), false)
                 from type in assembly.GetTypes()
                 where (type.IsDefined(typeof(ExtensionAttribute), false)

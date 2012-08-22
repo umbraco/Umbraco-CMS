@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
 	/// A replacement for INode which needs to occur since INode doesn't contain the document type alias
 	/// and INode is poorly formatted with mutable properties (i.e. Lists instead of IEnumerable)
 	/// </remarks>
-	internal interface IDocument
+	public interface IDocument
 	{
 		IDocument Parent { get; }
 		int Id { get; }

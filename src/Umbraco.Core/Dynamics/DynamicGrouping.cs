@@ -4,9 +4,9 @@ using System.Collections;
 
 namespace Umbraco.Core.Dynamics
 {
-    internal class DynamicGrouping : IEnumerable
+    public class DynamicGrouping : IEnumerable
     {
-        public IEnumerable<Grouping<object, DynamicDocument>> Inner;
+        internal IEnumerable<Grouping<object, DynamicDocument>> Inner;
 
         public DynamicGrouping OrderBy(string expression)
         {
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Dynamics
                   Elements = item.Select(inner => inner.Node)
               });
         }
-        public DynamicGrouping(IEnumerable<Grouping<object, DynamicDocument>> source)
+        internal DynamicGrouping(IEnumerable<Grouping<object, DynamicDocument>> source)
         {
             this.Inner = source;
         }

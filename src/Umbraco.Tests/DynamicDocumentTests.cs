@@ -321,7 +321,7 @@ namespace Umbraco.Tests
 	public static class DynamicDocumentCustomExtensionMethods
 	{
 
-		internal static string ReturnHelloWorld(this DynamicDocument doc)
+		public static string ReturnHelloWorld(this DynamicDocument doc)
 		{
 			return "Hello world";
 		}

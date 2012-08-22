@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace Umbraco.Core.Dynamics
 {
-    internal class DynamicDocumentList : DynamicObject, IEnumerable<DynamicDocument>
+    public class DynamicDocumentList : DynamicObject, IEnumerable<DynamicDocument>
     {
 		internal List<DynamicDocument> Items { get; set; }
         
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Dynamics
 
                     try
                     {
-                        result = ExecuteExtensionMethod(args, name, false);
+                        result = ExecuteExtensionMethod(args, name);
                         return true;
                     }
                     catch (TargetInvocationException)
@@ -347,26 +347,37 @@ namespace Umbraco.Core.Dynamics
             return result;
         }
 
-        private object ExecuteExtensionMethod(object[] args, string name, bool argsContainsThis)
+        private object ExecuteExtensionMethod(object[] args, string name)
         {
             object result = null;
 
-            MethodInfo methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(IEnumerable<DynamicDocument>), args, name, false);
-            if (methodToExecute == null)
+        	var methodTypesToFind = new[]
+        		{
+					typeof(IEnumerable<IDocument>),
+					typeof(IEnumerable<DynamicDocument>),
+					typeof(DynamicDocumentList)
+        		};
+
+			//find known extension methods that match the first type in the list
+        	MethodInfo toExecute = null;
+			foreach(var t in methodTypesToFind)
+			{
+				toExecute = ExtensionMethodFinder.FindExtensionMethod(t, args, name, false);
+				if (toExecute != null)
+					break;
+			}
+
+			if (toExecute != null)
             {
-                methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(DynamicDocumentList), args, name, false);
-            }
-            if (methodToExecute != null)
-            {
-                if (methodToExecute.GetParameters().First().ParameterType == typeof(DynamicDocumentList))
+				if (toExecute.GetParameters().First().ParameterType == typeof(DynamicDocumentList))
                 {
                     var genericArgs = (new[] { this }).Concat(args);
-                    result = methodToExecute.Invoke(null, genericArgs.ToArray());
+					result = toExecute.Invoke(null, genericArgs.ToArray());
                 }
                 else
                 {
                     var genericArgs = (new[] { Items }).Concat(args);
-                    result = methodToExecute.Invoke(null, genericArgs.ToArray());
+					result = toExecute.Invoke(null, genericArgs.ToArray());
                 }
             }
             else
@@ -375,18 +386,22 @@ namespace Umbraco.Core.Dynamics
             }
             if (result != null)
             {
-                if (result is IEnumerable<INode>)
-                {
+				if (result is IDocument)
+				{
+					result = new DynamicDocument((IDocument)result);
+				}
+				if (result is DynamicBackingItem)
+				{
+					result = new DynamicDocument((DynamicBackingItem)result);
+				}
+				if (result is IEnumerable<IDocument>)
+				{
 					result = new DynamicDocumentList((IEnumerable<IDocument>)result);
-                }
-                if (result is IEnumerable<DynamicDocument>)
-                {
-                    result = new DynamicDocumentList((IEnumerable<DynamicDocument>)result);
-                }
-                if (result is INode)
-                {
-                    result = new DynamicDocument((IDocument)result);
-                }
+				}
+				if (result is IEnumerable<DynamicDocument>)
+				{
+					result = new DynamicDocumentList((IEnumerable<DynamicDocument>)result);
+				}		
             }
             return result;
         }

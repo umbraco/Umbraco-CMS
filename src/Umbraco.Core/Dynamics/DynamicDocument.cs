@@ -13,7 +13,7 @@ using System.Xml.Linq;
 
 namespace Umbraco.Core.Dynamics
 {
-	internal class DynamicDocument : DynamicObject
+	public class DynamicDocument : DynamicObject
 	{
 		private readonly DynamicBackingItem _backingItem;
 		private DynamicDocumentList _cachedChildren;
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Dynamics
 
 		internal DynamicDocumentList OwnerList { get; set; }
 
-		public DynamicDocument(DynamicBackingItem n)
+		internal DynamicDocument(DynamicBackingItem n)
 		{
 			if (n == null) throw new ArgumentNullException("n");
 			_backingItem = n;
@@ -313,16 +313,26 @@ namespace Umbraco.Core.Dynamics
 		private object ExecuteExtensionMethod(object[] args, string name, bool argsContainsThis)
 		{
 			object result = null;
+			
+			var methodTypesToFind = new[]
+        		{
+					typeof(IDocument),
+					typeof(DynamicDocument)
+        		};
 
-			MethodInfo methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(IEnumerable<DynamicDocument>), args, name, false);
-			if (methodToExecute == null)
+			//find known extension methods that match the first type in the list
+			MethodInfo toExecute = null;
+			foreach (var t in methodTypesToFind)
 			{
-				methodToExecute = ExtensionMethodFinder.FindExtensionMethod(typeof(DynamicDocumentList), args, name, false);
+				toExecute = ExtensionMethodFinder.FindExtensionMethod(t, args, name, false);
+				if (toExecute != null)
+					break;
 			}
-			if (methodToExecute != null)
+
+			if (toExecute != null)
 			{
 				var genericArgs = (new[] { this }).Concat(args);
-				result = methodToExecute.Invoke(null, genericArgs.ToArray());
+				result = toExecute.Invoke(null, genericArgs.ToArray());
 			}
 			else
 			{
@@ -330,14 +340,22 @@ namespace Umbraco.Core.Dynamics
 			}
 			if (result != null)
 			{
-				if (result is IEnumerable<DynamicDocument>)
+				if (result is IDocument)
 				{
-					result = new DynamicDocumentList((IEnumerable<DynamicDocument>)result);
-				}
+					result = new DynamicDocument((IDocument)result);
+				}				
 				if (result is DynamicBackingItem)
 				{
 					result = new DynamicDocument((DynamicBackingItem)result);
 				}
+				if (result is IEnumerable<IDocument>)
+				{
+					result = new DynamicDocumentList((IEnumerable<IDocument>)result);
+				}
+				if (result is IEnumerable<DynamicDocument>)
+				{
+					result = new DynamicDocumentList((IEnumerable<DynamicDocument>)result);
+				}				
 			}
 			return result;
 		}
@@ -808,7 +826,7 @@ namespace Umbraco.Core.Dynamics
 		{
 			return Descendants(n => true);
 		}
-		public DynamicDocumentList Descendants(Func<DynamicBackingItem, bool> func)
+		internal DynamicDocumentList Descendants(Func<DynamicBackingItem, bool> func)
 		{
 			var flattenedNodes = this._backingItem.Children.Map(func, (DynamicBackingItem n) => n.Children);
 			return new DynamicDocumentList(flattenedNodes.ToList().ConvertAll(dynamicBackingItem => new DynamicDocument(dynamicBackingItem)));
@@ -825,7 +843,7 @@ namespace Umbraco.Core.Dynamics
 		{
 			return DescendantsOrSelf(p => true);
 		}
-		public DynamicDocumentList DescendantsOrSelf(Func<DynamicBackingItem, bool> func)
+		internal DynamicDocumentList DescendantsOrSelf(Func<DynamicBackingItem, bool> func)
 		{
 			if (this._backingItem != null)
 			{
