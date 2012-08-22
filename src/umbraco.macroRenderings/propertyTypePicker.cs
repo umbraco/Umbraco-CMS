@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 
 namespace umbraco.macroRenderings
 {
@@ -70,7 +71,7 @@ namespace umbraco.macroRenderings
 			}
 
 			Hashtable ht = new Hashtable();
-			foreach(cms.businesslogic.propertytype.PropertyType pt in cms.businesslogic.propertytype.PropertyType.GetAll())
+			foreach(cms.businesslogic.propertytype.PropertyType pt in cms.businesslogic.propertytype.PropertyType.GetPropertyTypes().OrderBy(x => x.Name))
 			{
 				if (!ht.ContainsKey(pt.Alias)) 
 				{

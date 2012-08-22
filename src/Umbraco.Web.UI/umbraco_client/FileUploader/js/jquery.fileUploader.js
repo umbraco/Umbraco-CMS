@@ -350,19 +350,30 @@
             var data = $item.data('data');
 
             self._startDummyProgress(data);
-            
+
             $form.submit();
 
             $iframe.load(function ()
             {
-                // Read content returned
-                var response = $(this).contents().find('body').html();
-
-                //TODO: Check the response
-                
-                // Stop dummy progress
-                //TODO: Set success flag based upon response?
                 self._stopDummyProgress(data, true);
+                
+                // Read content returned
+                var rawResponse;
+
+                if (this.contentDocument) {
+                    rawResponse = this.contentDocument.body.innerHTML;
+                } else {
+                    rawResponse = this.contentWindow.document.body.innerHTML;
+                }
+
+                var response = $.parseJSON(rawResponse);
+
+                if(response.success) {
+                    data.status = 'success';
+                } else {
+                    data.status = 'error';
+                    data.message = 'An error occured whilst uploading.';
+                }
 
                 self.opts.onDone(data);
 
