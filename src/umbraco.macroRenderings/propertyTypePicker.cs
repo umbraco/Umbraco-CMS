@@ -71,7 +71,7 @@ namespace umbraco.macroRenderings
 			}
 
 			Hashtable ht = new Hashtable();
-			foreach(cms.businesslogic.propertytype.PropertyType pt in cms.businesslogic.propertytype.PropertyType.GetPropertyTypes().OrderBy(x => x.Name))
+			foreach(cms.businesslogic.propertytype.PropertyType pt in cms.businesslogic.propertytype.PropertyType.GetAll().OrderBy(x => x.Name))
 			{
 				if (!ht.ContainsKey(pt.Alias)) 
 				{
