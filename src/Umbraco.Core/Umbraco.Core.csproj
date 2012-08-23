@@ -56,8 +56,6 @@
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
-    <Compile Include="Configuration\GlobalSettings.cs" />
-    <Compile Include="Configuration\UmbracoSettings.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="DocumentPropertyExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
@@ -88,7 +86,6 @@
     <Compile Include="IO\FileSystemProviderAttribute.cs" />
     <Compile Include="IO\IFileSystemExtensions.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
-    <Compile Include="IO\IMediaFileSystemExtensions.cs" />
     <Compile Include="PropertyEditors\DatePickerPropertyEditorValueConverter.cs" />
     <Compile Include="PropertyEditors\IPropertyEditorValueConverter.cs" />
     <Compile Include="HtmlTagWrapper.cs" />
@@ -116,10 +113,6 @@
     <Compile Include="ExpressionHelper.cs" />
     <Compile Include="IBootManager.cs" />
     <Compile Include="IntExtensions.cs" />
-    <Compile Include="IO\FileSecurityException.cs" />
-    <Compile Include="IO\IOHelper.cs" />
-    <Compile Include="IO\SystemDirectories.cs" />
-    <Compile Include="IO\SystemFiles.cs" />
     <Compile Include="LambdaExpressionCacheKey.cs" />
     <Compile Include="PackageActionsResolver.cs" />
     <Compile Include="ObjectResolution\LegacyTransientObjectsResolver.cs" />
@@ -132,7 +125,6 @@
     <Compile Include="PropertyEditors\PropertyEditorValueConvertersResolver.cs" />
     <Compile Include="PropertyEditors\TinyMcePropertyEditorValueConverter.cs" />
     <Compile Include="PropertyEditors\YesNoPropertyEditorValueConverter.cs" />
-    <Compile Include="RazorDataTypeModelStaticMappingItem.cs" />
     <Compile Include="ObjectResolution\ManyObjectsResolverBase.cs" />
     <Compile Include="ObjectResolution\ObjectLifetimeScope.cs" />
     <Compile Include="ObjectResolution\Resolution.cs" />
@@ -140,7 +132,6 @@
     <Compile Include="ObjectResolution\SingleObjectResolverBase.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />
-    <Compile Include="SystemUtilities.cs" />
     <Compile Include="TypeFinder.cs" />
     <Compile Include="TypeHelper.cs" />
     <Compile Include="UpgradeableReadLock.cs" />
@@ -175,6 +166,7 @@
     <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Name>umbraco.interfaces</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
