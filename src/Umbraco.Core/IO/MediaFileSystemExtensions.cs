@@ -4,11 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Configuration;
-using umbraco;
 
 namespace Umbraco.Core.IO
 {
-    public static class IMediaFileSystemExtensions
+    public static class MediaFileSystemExtensions
     {
         internal static string GetRelativePath(this IMediaFileSystem fs, int propertyId, string fileName)
         {
