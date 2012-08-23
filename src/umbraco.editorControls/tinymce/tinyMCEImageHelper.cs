@@ -122,7 +122,7 @@ namespace umbraco.editorControls.tinymce
         {
             string src = helper.FindAttribute(ht, "src");
             //get the media folder, minus the starting '~'
-            string mediaRoot = SystemDirectories.Media.Replace("~", string.Empty);
+			string mediaRoot = Umbraco.Core.IO.SystemDirectories.Media.Replace("~", string.Empty);
 
             // update orgSrc to remove umbraco reference
             int mediaRootIndex = src.IndexOf(mediaRoot);

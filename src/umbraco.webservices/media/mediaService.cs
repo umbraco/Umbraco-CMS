@@ -122,9 +122,9 @@ namespace umbraco.webservices.media
         {
             Authenticate(username, password);
 
-            filename = filename.Replace("/", IOHelper.DirSepChar.ToString());
-            filename = filename.Replace(@"\", IOHelper.DirSepChar.ToString());
-            filename = filename.Substring(filename.LastIndexOf(IOHelper.DirSepChar) + 1, filename.Length - filename.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower();
+			filename = filename.Replace("/", Umbraco.Core.IO.IOHelper.DirSepChar.ToString());
+			filename = filename.Replace(@"\", Umbraco.Core.IO.IOHelper.DirSepChar.ToString());
+			filename = filename.Substring(filename.LastIndexOf(Umbraco.Core.IO.IOHelper.DirSepChar) + 1, filename.Length - filename.LastIndexOf(Umbraco.Core.IO.IOHelper.DirSepChar) - 1).ToLower();
 
             Media m = new Media(id);
 
