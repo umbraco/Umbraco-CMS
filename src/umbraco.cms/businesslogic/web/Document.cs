@@ -1213,7 +1213,7 @@ namespace umbraco.cms.businesslogic.web
         /// <returns></returns>
         public bool HasPendingChanges()
         {
-            return new TimeSpan(UpdateDate.Ticks - VersionDate.Ticks).TotalMilliseconds > 500;
+            return new TimeSpan(UpdateDate.Ticks - VersionDate.Ticks).TotalMilliseconds > 2000;
         }
 
         /// <summary>

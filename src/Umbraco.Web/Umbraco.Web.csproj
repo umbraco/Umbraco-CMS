@@ -1935,7 +1935,9 @@
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\cacheBrowser.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx" />
+    <Content Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\members\ViewMembers.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertImage.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertLink.aspx">
@@ -1960,7 +1962,9 @@
     <Content Include="umbraco.presentation\umbraco\users\PermissionsHandler.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\CheckForUpgrade.asmx" />
     <Content Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx" />
-    <Content Include="umbraco.presentation\umbraco\settings\scripts\editScript.aspx" />
+    <Content Include="umbraco.presentation\umbraco\settings\scripts\editScript.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\canvas.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\default.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\preview.aspx" />
@@ -1987,7 +1991,9 @@
     <Content Include="umbraco.presentation\umbraco\developer\autoDoc.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\DataTypes\editDatatype.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Xslt\editXslt.aspx" />
+    <Content Include="umbraco.presentation\umbraco\developer\Xslt\editXslt.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Cache\viewCacheItem.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
@@ -2018,9 +2024,13 @@
     <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx" />
-    <Content Include="umbraco.presentation\umbraco\settings\editTemplate.aspx" />
+    <Content Include="umbraco.presentation\umbraco\settings\editTemplate.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\settings\modals\ShowUmbracoTags.aspx" />
-    <Content Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx" />
+    <Content Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\sort.aspx" />
     <Content Include="umbraco.presentation\umbraco\test.aspx" />

@@ -75,9 +75,11 @@ namespace umbraco.presentation.umbracobase
                 int indexOfBase = url.ToLower().IndexOf(basedir);
                 url = url.Substring(indexOfBase);
 
-
                 if (url.ToLower().Contains(".aspx"))
                     url = url.Substring(0, url.IndexOf(".aspx"));
+
+                if (url.ToLower().Contains("?"))
+                    url = url.Substring(0, url.IndexOf("?"));
 
                 object[] urlArray = url.Split('/');
 

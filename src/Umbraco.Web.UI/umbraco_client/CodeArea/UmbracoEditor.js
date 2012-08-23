@@ -10,7 +10,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
         var _controlId = controlId;
         
         if (!_isSimpleEditor && typeof(codeEditor) == "undefined") {
-            throw "CodeMirror editor not found!";
+           throw "CodeMirror editor not found!";
         }        
         
         //create the inner object
@@ -28,7 +28,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                 }  
                 else {
                     //this is a wrapper for CodeMirror
-                    return this._editor.getCode();
+                    return this._editor.getValue();
                 }
             },
             SetCode: function(code) {
@@ -37,7 +37,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                 }
                 else {
                     //this is a wrapper for CodeMirror
-                    this._editor.setCode(code);
+                    this._editor.setValue(code);
                 }
             },            
             Insert: function(open, end, txtEl, arg3) {                
@@ -59,14 +59,15 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                     }                    
                 }
                 else {
-                    this._editor.win.document.body.focus(); //need to restore the focus to the editor body
+                    this._editor.focus(); //need to restore the focus to the editor body
                     
                     //if the saved selection (IE only) is not null, then               
                     if (this._cmSave != null) {
                         this._editor.selectLines(this._cmSave.start.line, this._cmSave.start.character, this._cmSave.end.line, this._cmSave.end.character);
                     }                    
                     
-                    var selection = this._editor.selection();
+                    var selection = this._editor.getSelection();
+
                     var replace = (arg3) ? open + arg3 : open; //concat open and arg3, if arg3 specified
                     if (end != "") {
                         replace = replace + selection + end;
