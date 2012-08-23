@@ -867,13 +867,13 @@ namespace umbraco
             {
                 m_PredefinedExtensions = new Dictionary<string, object>();
 
-                // add predefined EXSLT extensions
-                m_PredefinedExtensions.Add("Exslt.ExsltCommon", new ExsltCommon());
-                m_PredefinedExtensions.Add("Exslt.ExsltDatesAndTimes", new ExsltDatesAndTimes());
-                m_PredefinedExtensions.Add("Exslt.ExsltMath", new ExsltMath());
-                m_PredefinedExtensions.Add("Exslt.ExsltRegularExpressions", new ExsltRegularExpressions());
-                m_PredefinedExtensions.Add("Exslt.ExsltStrings", new ExsltStrings());
-                m_PredefinedExtensions.Add("Exslt.ExsltSets", new ExsltSets());
+                //// add predefined EXSLT extensions
+                //m_PredefinedExtensions.Add("Exslt.ExsltCommon", new ExsltCommon());
+                //m_PredefinedExtensions.Add("Exslt.ExsltDatesAndTimes", new ExsltDatesAndTimes());
+                //m_PredefinedExtensions.Add("Exslt.ExsltMath", new ExsltMath());
+                //m_PredefinedExtensions.Add("Exslt.ExsltRegularExpressions", new ExsltRegularExpressions());
+                //m_PredefinedExtensions.Add("Exslt.ExsltStrings", new ExsltStrings());
+                //m_PredefinedExtensions.Add("Exslt.ExsltSets", new ExsltSets());
             }
 
             return m_PredefinedExtensions;
