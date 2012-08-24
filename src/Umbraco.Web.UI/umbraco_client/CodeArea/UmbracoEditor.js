@@ -39,7 +39,16 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                     //this is a wrapper for CodeMirror
                     this._editor.setValue(code);
                 }
-            },            
+            },
+            GetSelection: function(code) {
+                if (this.IsSimpleEditor) {
+                    this._control.getSelection().text
+                }
+                else {
+                    //this is a wrapper for CodeMirror
+                    this._editor.getSelection();
+                }
+            },                  
             Insert: function(open, end, txtEl, arg3) {                
                 //arg3 gets appended to open, not actually sure why it's needed but we'll keep it for legacy, it's optional                
                 if (_isSimpleEditor) {
@@ -115,17 +124,25 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                         this._control.keyup( function() {storeCaret(this)} );
                     }
                     else {
+                        
+                        /*
+                        //Removed as its not needed in codemirror2 apparently
                         this._editor.options.cursorActivity = function() {
                             _this._cmSave = {
                                 start: _this._editor.cursorPosition(true), //save start position
                                 end: _this._editor.cursorPosition(false) //save end position
                             }
-                        }
+                        }*/
+
                     }                    
                 }
             }
         };
-        obj._IESelectionHelper();
+
+       // obj._IESelectionHelper();
+
+       // alert(obj);
+
         return obj;
     }    
 })(jQuery); 
