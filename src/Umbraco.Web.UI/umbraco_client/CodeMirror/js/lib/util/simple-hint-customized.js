@@ -28,13 +28,13 @@
             var opt = sel.appendChild(document.createElement("option"));
             var completion = completions[i];
 
-            if (typeof completion === 'string') {
-                opt.appendChild(document.createTextNode(completion));
-                opt.setAttribute("value", completion);
-            }
-            else {
+            if (typeof completion === 'object') {
                 opt.appendChild(document.createTextNode(completion[0]));
                 opt.setAttribute("value", completion[1]);
+            }
+            else if(typeof completion === 'string') {
+                opt.appendChild(document.createTextNode(completion));
+                opt.setAttribute("value", completion);
             }
         }
         sel.firstChild.selected = true;

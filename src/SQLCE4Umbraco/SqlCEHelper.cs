@@ -16,7 +16,6 @@ using System.Diagnostics;
 using umbraco.DataLayer;
 using umbraco.DataLayer.SqlHelpers.SqlServer;
 
-
 namespace SqlCE4Umbraco
 {
     /// <summary>
@@ -39,7 +38,7 @@ namespace SqlCE4Umbraco
         internal void CreateEmptyDatabase()
         {
             var localConnection = new SqlCeConnection(ConnectionString);
-            if (!System.IO.File.Exists(localConnection.Database))
+            if (!System.IO.File.Exists(ReplaceDataDirectory(localConnection.Database)))
             {
                 var sqlCeEngine = new SqlCeEngine(ConnectionString);
                 sqlCeEngine.CreateDatabase();
@@ -52,8 +51,7 @@ namespace SqlCE4Umbraco
         internal void ClearDatabase()
         {
             var localConnection = new SqlCeConnection(ConnectionString);
-            var dbFile = localConnection.Database;
-            if (System.IO.File.Exists(dbFile))
+            if (!System.IO.File.Exists(ReplaceDataDirectory(localConnection.Database)))
             {
                 var tables = new List<string>();
                 using (var reader = ExecuteReader("select table_name from information_schema.tables where TABLE_TYPE <> 'VIEW'"))
@@ -80,8 +78,27 @@ namespace SqlCE4Umbraco
                             //this will occur because there is no cascade option, so we just wanna try the next one       
                         }
                     }
-                }                               
+                }
             }
+        }
+
+        /// <summary>
+        /// Replaces the data directory with a local path.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns>A local path with the resolved 'DataDirectory' mapping.</returns>
+        private string ReplaceDataDirectory(string path)
+        {
+            if (!string.IsNullOrWhiteSpace(path) && path.Contains("|DataDirectory|"))
+            {
+                var dataDirectory = AppDomain.CurrentDomain.GetData("DataDirectory") as string;
+                if (!string.IsNullOrEmpty(dataDirectory))
+                {
+                    path = path.Replace("|DataDirectory|", dataDirectory);
+                }
+            }
+
+            return path;
         }
 
         /// <summary>

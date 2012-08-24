@@ -825,7 +825,7 @@ namespace umbraco
                     {
                         throw new Exception(
                             String.Format(
-                                "Could not load assembly {0} for XSLT extension {1}. Please check config/xsltExentions.config.",
+                                "Could not load assembly {0} for XSLT extension {1}. Please check config/xsltExtensions.config.",
                                 extensionFile, xsltEx.Attributes["alias"].Value), ex);
                     }
 
@@ -834,7 +834,7 @@ namespace umbraco
                     if (extensionType == null)
                         throw new Exception(
                             String.Format(
-                                "Could not load type {0} ({1}) for XSLT extension {1}. Please check config/xsltExentions.config.",
+                                "Could not load type {0} ({1}) for XSLT extension {1}. Please check config/xsltExtensions.config.",
                                 xsltEx.Attributes["type"].Value, extensionFile, xsltEx.Attributes["alias"].Value));
 
                     // create an instance and add it to the extensions list
@@ -876,13 +876,14 @@ namespace umbraco
             {
                 m_PredefinedExtensions = new Dictionary<string, object>();
 
-                // add predefined EXSLT extensions
-                m_PredefinedExtensions.Add("Exslt.ExsltCommon", new ExsltCommon());
-                m_PredefinedExtensions.Add("Exslt.ExsltDatesAndTimes", new ExsltDatesAndTimes());
-                m_PredefinedExtensions.Add("Exslt.ExsltMath", new ExsltMath());
-                m_PredefinedExtensions.Add("Exslt.ExsltRegularExpressions", new ExsltRegularExpressions());
-                m_PredefinedExtensions.Add("Exslt.ExsltStrings", new ExsltStrings());
-                m_PredefinedExtensions.Add("Exslt.ExsltSets", new ExsltSets());
+                // [LK] U4-86 Move EXSLT references from being predefined in core to xsltExtensions.config
+                //// add predefined EXSLT extensions
+                //m_PredefinedExtensions.Add("Exslt.ExsltCommon", new ExsltCommon());
+                //m_PredefinedExtensions.Add("Exslt.ExsltDatesAndTimes", new ExsltDatesAndTimes());
+                //m_PredefinedExtensions.Add("Exslt.ExsltMath", new ExsltMath());
+                //m_PredefinedExtensions.Add("Exslt.ExsltRegularExpressions", new ExsltRegularExpressions());
+                //m_PredefinedExtensions.Add("Exslt.ExsltStrings", new ExsltStrings());
+                //m_PredefinedExtensions.Add("Exslt.ExsltSets", new ExsltSets());
             }
 
             return m_PredefinedExtensions;

@@ -390,7 +390,7 @@
     <Content Include="umbraco_client\CodeMirror\js\lib\util\search.js" />
     <Content Include="umbraco_client\CodeMirror\js\lib\util\searchcursor.js" />
     <Content Include="umbraco_client\CodeMirror\js\lib\util\simple-hint.css" />
-    <Content Include="umbraco_client\CodeMirror\js\lib\util\simple-hint.js" />
+    <Content Include="umbraco_client\CodeMirror\js\lib\util\simple-hint-customized.js" />
     <Content Include="umbraco_client\CodeMirror\js\lib\util\xml-hint.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\clike\clike.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\clike\index.html" />
