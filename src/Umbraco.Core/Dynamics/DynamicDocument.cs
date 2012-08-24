@@ -252,6 +252,8 @@ namespace Umbraco.Core.Dynamics
 		/// <returns></returns>
 		public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
 		{
+			//TODO: We MUST cache the result here, it is very expensive to keep finding extension methods!
+
 			try
 			{
 				//Property?
@@ -294,6 +296,8 @@ namespace Umbraco.Core.Dynamics
 
 					catch
 					{
+						//TODO: LOg this!
+
 						result = null;
 						return false;
 					}
@@ -316,7 +320,6 @@ namespace Umbraco.Core.Dynamics
 			
 			var methodTypesToFind = new[]
         		{
-					typeof(IDocument),
 					typeof(DynamicDocument)
         		};
 

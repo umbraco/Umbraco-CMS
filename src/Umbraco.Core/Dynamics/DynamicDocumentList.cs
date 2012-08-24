@@ -53,6 +53,9 @@ namespace Umbraco.Core.Dynamics
         }
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
+
+			//TODO: We MUST cache the result here, it is very expensive to keep finding extension methods and processing this stuff!
+
             var name = binder.Name;
             if (name == "Where")
             {
@@ -353,7 +356,6 @@ namespace Umbraco.Core.Dynamics
 
         	var methodTypesToFind = new[]
         		{
-					typeof(IEnumerable<IDocument>),
 					typeof(IEnumerable<DynamicDocument>),
 					typeof(DynamicDocumentList)
         		};

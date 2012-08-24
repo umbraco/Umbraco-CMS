@@ -13,15 +13,21 @@ namespace Umbraco.Core.Dynamics
     {
 		
 
-
-        private static List<MethodInfo> GetAllExtensionMethods(Type thisType, string name, int argumentCount, bool argsContainsThis)
+		/// <summary>
+		/// Returns all extension methods found matching the definition
+		/// </summary>
+		/// <param name="thisType"></param>
+		/// <param name="name"></param>
+		/// <param name="argumentCount"></param>
+		/// <param name="argsContainsThis"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// NOTE: This will be an intensive method to call!! Results should be cached!
+		/// </remarks>
+        private static IEnumerable<MethodInfo> GetAllExtensionMethods(Type thisType, string name, int argumentCount, bool argsContainsThis)
         {
 			//only scan assemblies we know to contain extension methods (user assemblies)
-        	//var assembliesToScan = TypeFinder.GetAssembliesWithKnownExclusions();
-        	var assembliesToScan = new List<Assembly>()
-        		{
-        			Assembly.Load("Umbraco.Tests")
-        		};
+        	var assembliesToScan = TypeFinder.GetAssembliesWithKnownExclusions();        	
 
             //get extension methods from runtime
             var candidates = (
@@ -36,11 +42,8 @@ namespace Umbraco.Core.Dynamics
                 select method
                 );
 
-            //search an explicit type (e.g. Enumerable, where most of the Linq methods are defined)
-            //if (explicitTypeToSearch != null)
-            //{
-            candidates = candidates.Concat(typeof(IEnumerable).GetMethods(BindingFlags.Static | BindingFlags.Public));
-            //}
+            //add the extension methods defined in IEnumerable
+            candidates = candidates.Concat(typeof(IEnumerable).GetMethods(BindingFlags.Static | BindingFlags.Public));            
 
             //filter by name	
             var methodsByName = candidates.Where(m => m.Name == name);
@@ -57,7 +60,7 @@ namespace Umbraco.Core.Dynamics
                                                    method.t != null && MethodArgZeroHasCorrectTargetType(method.m, method.t, thisType)
                                                    select method);
 
-            return methodsWhereArgZeroIsTargetType.Select(mt => mt.m).ToList();
+            return methodsWhereArgZeroIsTargetType.Select(mt => mt.m);
         }
         private static bool MethodArgZeroHasCorrectTargetType(MethodInfo method, Type firstArgumentType, Type thisType)
         {
@@ -127,30 +130,28 @@ namespace Umbraco.Core.Dynamics
                 genericType = thisType.GetGenericArguments()[0];
             }
 
-            var methods = GetAllExtensionMethods(thisType, name, args.Length, argsContainsThis);
+        	var methods = GetAllExtensionMethods(thisType, name, args.Length, argsContainsThis)
+        		.ToArray();
 
-            if (methods.Count == 0)
+            if (!methods.Any())
             {
                 return null;
             }
             MethodInfo methodToExecute = null;
-            if (methods.Count > 1)
+            if (methods.Count() > 1)
             {
                 //Given the args, lets get the types and compare the type sequence to try and find the correct overload
                 var argTypes = args.ToList().ConvertAll(o =>
                 {
-                    Expression oe = (o as Expression);
+                    var oe = (o as Expression);
                     if (oe != null)
                     {
                         return oe.Type.FullName;
                     }
                     return o.GetType().FullName;
                 });
-                var methodsWithArgTypes = methods.ConvertAll(method => new { method = method, types = method.GetParameters().ToList().ConvertAll(pi => pi.ParameterType.FullName) });
-                var firstMatchingOverload = methodsWithArgTypes.FirstOrDefault(m =>
-                {
-                    return m.types.SequenceEqual(argTypes);
-                });
+				var methodsWithArgTypes = methods.Select(method => new {method, types = method.GetParameters().Select(pi => pi.ParameterType.FullName) });
+                var firstMatchingOverload = methodsWithArgTypes.FirstOrDefault(m => m.types.SequenceEqual(argTypes));
                 if (firstMatchingOverload != null)
                 {
                     methodToExecute = firstMatchingOverload.method;
@@ -159,9 +160,9 @@ namespace Umbraco.Core.Dynamics
 
             if (methodToExecute == null)
             {
-                MethodInfo firstMethod = methods.FirstOrDefault();
+                var firstMethod = methods.FirstOrDefault();
                 // NH: this is to ensure that it's always the correct one being chosen when using the LINQ extension methods
-                if (methods.Count > 1)
+                if (methods.Count() > 1)
                 {
                     var firstGenericMethod = methods.FirstOrDefault(x => x.IsGenericMethodDefinition);
                     if (firstGenericMethod != null)

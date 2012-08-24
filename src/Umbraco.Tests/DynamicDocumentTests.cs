@@ -6,6 +6,7 @@ using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -54,7 +55,21 @@ namespace Umbraco.Tests
 		}
 
 		[Test]
-		public void Run_Custom_Extension_Method()
+		public void Custom_Extension_Methods()
+		{
+			var dynamicNode = GetDynamicNode(1173);
+			var asDynamic = dynamicNode.AsDynamic();
+
+			Assert.AreEqual("Hello world", asDynamic.DynamicDocumentNoParameters());
+			Assert.AreEqual("Hello world!", asDynamic.DynamicDocumentCustomString("Hello world!"));
+			Assert.AreEqual("Hello world!" + 123 + false, asDynamic.DynamicDocumentMultiParam("Hello world!", 123, false));
+			Assert.AreEqual("Hello world!" + 123 + false, asDynamic.Children.DynamicDocumentListMultiParam("Hello world!", 123, false));
+			Assert.AreEqual("Hello world!" + 123 + false, asDynamic.Children.DynamicDocumentEnumerableMultiParam("Hello world!", 123, false));
+		}
+
+
+		[Test]
+		public void Custom_Extension_Method_With_Params()
 		{
 			var dynamicNode = GetDynamicNode(1173);
 			var asDynamic = dynamicNode.AsDynamic();
@@ -321,9 +336,29 @@ namespace Umbraco.Tests
 	public static class DynamicDocumentCustomExtensionMethods
 	{
 
-		public static string ReturnHelloWorld(this DynamicDocument doc)
+		public static string DynamicDocumentNoParameters(this DynamicDocument doc)
 		{
 			return "Hello world";
+		}
+		
+		public static string DynamicDocumentCustomString(this DynamicDocument doc, string custom)
+		{
+			return custom;
+		}
+
+		public static string DynamicDocumentMultiParam(this DynamicDocument doc, string custom, int i, bool b)
+		{
+			return custom + i + b;
+		}
+	
+		public static string DynamicDocumentListMultiParam(this DynamicDocumentList doc, string custom, int i, bool b)
+		{
+			return custom + i + b;
+		}
+
+		public static string DynamicDocumentEnumerableMultiParam(this IEnumerable<DynamicDocument> doc, string custom, int i, bool b)
+		{
+			return custom + i + b;
 		}
 
 	}
