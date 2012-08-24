@@ -55,7 +55,7 @@ namespace umbraco.uicontrols
         {
             get
             {
-                return !UmbracoSettings.ScriptDisableEditor && HttpContext.Current.Request.Browser.Browser != "IE";
+                return !UmbracoSettings.ScriptDisableEditor; // && HttpContext.Current.Request.Browser.Browser != "IE";
             }
         }
 
@@ -88,7 +88,7 @@ namespace umbraco.uicontrols
 
                 if (AutoSuggest)
                 {
-                    ClientDependencyLoader.Instance.RegisterDependency(3, "CodeMirror/js/lib/util/simple-hint.js", "UmbracoClient", ClientDependencyType.Javascript);
+                    ClientDependencyLoader.Instance.RegisterDependency(3, "CodeMirror/js/lib/util/simple-hint-customized.js", "UmbracoClient", ClientDependencyType.Javascript);
                     
                     ClientDependencyLoader.Instance.RegisterDependency(4, "CodeMirror/js/lib/util/" + CodeBase.ToString().ToLower() + "-hint.js", "UmbracoClient", ClientDependencyType.Javascript);
                     ClientDependencyLoader.Instance.RegisterDependency(5, "CodeMirror/js/lib/util/" + CodeBase.ToString().ToLower() + "-hints.js", "UmbracoClient", ClientDependencyType.Javascript);
