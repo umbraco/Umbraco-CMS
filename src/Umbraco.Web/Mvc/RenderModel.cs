@@ -8,7 +8,7 @@ namespace Umbraco.Web.Mvc
 	public class RenderModel
 	{
 		//public XmlNode CurrentXmlNode { get; set; }
-		internal IDocument CurrentNode { get; set; }		
+		internal IDocument CurrentDocument { get; set; }		
 		//internal page UmbracoPage { get; set; }
 	}
 }

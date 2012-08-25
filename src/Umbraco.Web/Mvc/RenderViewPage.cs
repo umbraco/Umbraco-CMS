@@ -1,6 +1,7 @@
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Dynamics;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
@@ -22,14 +23,16 @@ namespace Umbraco.Web.Mvc
 			{
 				////this.ViewData.Model = Model;
 				//var backingItem = new DynamicBackingItem(Model.CurrentNode);
-				//var dynamicNode = new DynamicNode(backingItem);
-				//CurrentPage = dynamicNode;
+				var dynamicNode = new DynamicDocument(Model.CurrentDocument);
+				CurrentPage = dynamicNode.AsDynamic();
 			}
 			DocumentRequest = (DocumentRequest)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-doc-request");
 			UmbracoContext = (UmbracoContext)ViewContext.RouteData.DataTokens.GetRequiredObject("umbraco-context");
+			ApplicationContext = UmbracoContext.Application;
 		}
 
 		public UmbracoContext UmbracoContext { get; private set; }
+		public ApplicationContext ApplicationContext { get; private set; }
 
 		internal DocumentRequest DocumentRequest { get; private set; }
 
