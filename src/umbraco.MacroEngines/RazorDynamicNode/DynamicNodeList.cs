@@ -12,7 +12,7 @@ using System.Linq.Expressions;
 using System.Linq.Dynamic;
 namespace umbraco.MacroEngines
 {
-    public class DynamicNodeList : DynamicObject, IEnumerable
+    public class DynamicNodeList : DynamicObject, IEnumerable<DynamicNode>
     {
         public List<DynamicNode> Items;
         public List<DynamicNode> get_Items()
@@ -403,10 +403,15 @@ namespace umbraco.MacroEngines
             return result;
         }
 
-        public IEnumerator GetEnumerator()
-        {
-            return Items.GetEnumerator();
-        }
+		public IEnumerator<DynamicNode> GetEnumerator()
+		{
+			return Items.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
 
         public IQueryable<T> Where<T>(string predicate, params object[] values)
         {

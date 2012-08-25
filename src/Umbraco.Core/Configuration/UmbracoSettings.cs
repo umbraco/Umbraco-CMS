@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Caching;
 using System.Xml;
@@ -434,59 +435,65 @@ namespace Umbraco.Core.Configuration
             }
         }
 
-        public static IEnumerable<RazorDataTypeModelStaticMappingItem> RazorDataTypeModelStaticMapping
+    	private static IEnumerable<RazorDataTypeModelStaticMappingItem> _razorDataTypeModelStaticMapping;
+    	private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
+
+		public static IEnumerable<RazorDataTypeModelStaticMappingItem> RazorDataTypeModelStaticMapping
         {
             get
             {
-                if (HttpContext.Current != null && HttpContext.Current.Cache != null && HttpContext.Current.Cache["settings.scripting.razor.dataTypeModelStaticMappings"] != null)
-                {
-                    return HttpContext.Current.Cache["settings.scripting.razor.dataTypeModelStaticMappings"] as List<RazorDataTypeModelStaticMappingItem>;
-                }
-                /*
-                <dataTypeModelStaticMappings>
-                    <mapping dataTypeGuid="ef94c406-9e83-4058-a780-0375624ba7ca">DigibizAdvancedMediaPicker.RazorModel.ModelBinder</mapping>
-                    <mapping documentTypeAlias="RoomPage" nodeTypeAlias="teaser">DigibizAdvancedMediaPicker.RazorModel.ModelBinder</mapping>
-                </dataTypeModelStaticMappings>
-                 */
-                List<RazorDataTypeModelStaticMappingItem> items = new List<RazorDataTypeModelStaticMappingItem>();
-                XmlNode root = GetKeyAsNode("/settings/scripting/razor/dataTypeModelStaticMappings");
-                if (root != null)
-                {
-                    foreach (XmlNode element in root.SelectNodes(".//mapping"))
-                    {
-                        string propertyTypeAlias = null, nodeTypeAlias = null;
-                        Guid? dataTypeGuid = null;
-                        if (!string.IsNullOrEmpty(element.InnerText))
-                        {
-                            if (element.Attributes["dataTypeGuid"] != null)
-                            {
-                                dataTypeGuid = (Guid?)new Guid(element.Attributes["dataTypeGuid"].Value);
-                            }
-                            if (element.Attributes["propertyTypeAlias"] != null && !string.IsNullOrEmpty(element.Attributes["propertyTypeAlias"].Value))
-                            {
-                                propertyTypeAlias = element.Attributes["propertyTypeAlias"].Value;
-                            }
-                            if (element.Attributes["nodeTypeAlias"] != null && !string.IsNullOrEmpty(element.Attributes["nodeTypeAlias"].Value))
-                            {
-                                nodeTypeAlias = element.Attributes["nodeTypeAlias"].Value;
-                            }
-                            items.Add(new RazorDataTypeModelStaticMappingItem()
-                            {
-                                DataTypeGuid = dataTypeGuid,
-                                PropertyTypeAlias = propertyTypeAlias,
-                                NodeTypeAlias = nodeTypeAlias,
-                                TypeName = element.InnerText,
-                                Raw = element.OuterXml
-                            });
-                        }
-                    }
-                }
-                if (HttpContext.Current != null && HttpContext.Current.Cache != null)
-                {
-                    HttpContext.Current.Cache.Add("settings.scripting.razor.dataTypeModelStaticMappings", items, null, Cache.NoAbsoluteExpiration, new TimeSpan(0, 20, 0), CacheItemPriority.AboveNormal, null);
-                }
-                return items;
+				/*
+				<dataTypeModelStaticMappings>
+					<mapping dataTypeGuid="ef94c406-9e83-4058-a780-0375624ba7ca">DigibizAdvancedMediaPicker.RazorModel.ModelBinder</mapping>
+					<mapping documentTypeAlias="RoomPage" nodeTypeAlias="teaser">DigibizAdvancedMediaPicker.RazorModel.ModelBinder</mapping>
+				</dataTypeModelStaticMappings>
+				 */
 
+				using (var l = new UpgradeableReadLock(Lock))
+				{
+					if (_razorDataTypeModelStaticMapping == null)
+					{
+						l.UpgradeToWriteLock();
+				
+						List<RazorDataTypeModelStaticMappingItem> items = new List<RazorDataTypeModelStaticMappingItem>();
+						XmlNode root = GetKeyAsNode("/settings/scripting/razor/dataTypeModelStaticMappings");
+						if (root != null)
+						{
+							foreach (XmlNode element in root.SelectNodes(".//mapping"))
+							{
+								string propertyTypeAlias = null, nodeTypeAlias = null;
+								Guid? dataTypeGuid = null;
+								if (!string.IsNullOrEmpty(element.InnerText))
+								{
+									if (element.Attributes["dataTypeGuid"] != null)
+									{
+										dataTypeGuid = (Guid?)new Guid(element.Attributes["dataTypeGuid"].Value);
+									}
+									if (element.Attributes["propertyTypeAlias"] != null && !string.IsNullOrEmpty(element.Attributes["propertyTypeAlias"].Value))
+									{
+										propertyTypeAlias = element.Attributes["propertyTypeAlias"].Value;
+									}
+									if (element.Attributes["nodeTypeAlias"] != null && !string.IsNullOrEmpty(element.Attributes["nodeTypeAlias"].Value))
+									{
+										nodeTypeAlias = element.Attributes["nodeTypeAlias"].Value;
+									}
+									items.Add(new RazorDataTypeModelStaticMappingItem()
+									{
+										DataTypeGuid = dataTypeGuid,
+										PropertyTypeAlias = propertyTypeAlias,
+										NodeTypeAlias = nodeTypeAlias,
+										TypeName = element.InnerText,
+										Raw = element.OuterXml
+									});
+								}
+							}
+						}
+
+						_razorDataTypeModelStaticMapping = items;
+					}
+
+					return _razorDataTypeModelStaticMapping;	
+				}				
             }
         }
 

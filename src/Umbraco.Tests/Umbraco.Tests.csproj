@@ -58,7 +58,10 @@
     <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
     <Compile Include="BusinessLogic\BaseTest.cs" />
     <Compile Include="CacheRefresherFactoryTests.cs" />
-    <Compile Include="DynamicDocumentTests.cs" />
+    <Compile Include="DynamicDocument\DynamicDocumentCustomExtensionMethods.cs" />
+    <Compile Include="DynamicDocument\DynamicDocumentTests.cs" />
+    <Compile Include="DynamicDocument\DynamicDocumentTestsBase.cs" />
+    <Compile Include="DynamicDocument\DynamicNodeTests.cs" />
     <Compile Include="PublishContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
     <Compile Include="DocumentLookups\BaseRoutingTest.cs" />
@@ -151,6 +154,7 @@
       <Name>Umbraco.Web</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(ProjectDir)"..\..\lib\SQLCE4\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /D

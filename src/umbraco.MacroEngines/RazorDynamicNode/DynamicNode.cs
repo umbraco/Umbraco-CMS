@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.interfaces;
 using System.Collections;
 using System.Reflection;
@@ -452,7 +453,6 @@ namespace umbraco.MacroEngines
 
     					var foundTypes = new Dictionary<System.Tuple<Guid, int>, Type>();
 
-						HttpContext.Current.Trace.Write("RazorDataTypeModelTypes cache is empty, populating cache using PluginTypeResolver...");
 						try
 						{
 							PluginManager.Current.ResolveRazorDataTypeModels()
@@ -477,13 +477,14 @@ namespace umbraco.MacroEngines
 										foundTypes.Add(key, item.Value);
 									}
 								});
-							HttpContext.Current.Trace.Write(string.Format("{0} items added to cache...", foundTypes.Count));
-							var i = 1;
-							foreach (var item in foundTypes)
-							{
-								HttpContext.Current.Trace.Write(string.Format("{0}/{1}: {2}@{4} => {3}", i, foundTypes.Count, item.Key.Item1, item.Value.FullName, item.Key.Item2));
-								i++;
-							}
+
+							//NOTE: We really dont need to log this?
+							//var i = 1;
+							//foreach (var item in foundTypes)
+							//{
+							//    HttpContext.Current.Trace.Write(string.Format("{0}/{1}: {2}@{4} => {3}", i, foundTypes.Count, item.Key.Item1, item.Value.FullName, item.Key.Item2));
+							//    i++;
+							//}
 
 							//there is no error, so set the collection
 							_razorDataTypeModelTypes = foundTypes;
@@ -491,8 +492,8 @@ namespace umbraco.MacroEngines
 						}
 						catch (Exception ex)
 						{
-							HttpContext.Current.Trace.Warn("Exception occurred while populating cache, will keep RazorDataTypeModelTypes to null so that this error remains visible and you don't end up with an empty cache with silent failure.");
-							HttpContext.Current.Trace.Warn(string.Format("The exception was {0} and the message was {1}. {2}", ex.GetType().FullName, ex.Message, ex.StackTrace));							
+							LogHelper.Warn<DynamicNode>("Exception occurred while populating cache, will keep RazorDataTypeModelTypes to null so that this error remains visible and you don't end up with an empty cache with silent failure."
+								+ string.Format("The exception was {0} and the message was {1}. {2}", ex.GetType().FullName, ex.Message, ex.StackTrace));							
 						}
 
     				}
@@ -541,18 +542,14 @@ namespace umbraco.MacroEngines
 
                     //contextAlias is the node which the property data was returned from
                     Guid dataType = ContentType.GetDataType(data.ContextAlias, data.Alias);
-                    HttpContext.Current.Trace.Write(string.Format("RazorDynamicNode got datatype {0} for {1} on {2}", dataType, data.Alias, data.ContextAlias));
                     
-                    HttpContext.Current.Trace.Write(string.Format("Checking for a RazorDataTypeModel for data type guid {0}...", dataType));
-                    HttpContext.Current.Trace.Write("Checking the RazorDataTypeModelTypes static mappings to see if there is a static mapping...");
-
                     var staticMapping = UmbracoSettings.RazorDataTypeModelStaticMapping.FirstOrDefault(mapping =>
                     {
                         return mapping.Applies(dataType, data.ContextAlias, data.Alias);
                     });
                     if (staticMapping != null)
                     {
-                        HttpContext.Current.Trace.Write(string.Format("Found a staticMapping defined {0}, instantiating type and attempting to apply model...", staticMapping.Raw));
+
                         Type dataTypeType = Type.GetType(staticMapping.TypeName);
                         if (dataTypeType != null)
                         {
@@ -564,21 +561,15 @@ namespace umbraco.MacroEngines
                             }
                             else
                             {
-                                HttpContext.Current.Trace.Write("Failed");
-                                HttpContext.Current.Trace.Warn(string.Format("Failed to create the instance of the model binder"));
+								LogHelper.Warn<DynamicNode>(string.Format("Failed to create the instance of the model binder"));                            
                             }
                         }
                         else
                         {
-                            HttpContext.Current.Trace.Warn(string.Format("staticMapping type name {0} came back as null from Type.GetType; check the casing, assembly presence, assembly framework version, namespace", staticMapping.TypeName));
+							LogHelper.Warn<DynamicNode>(string.Format("staticMapping type name {0} came back as null from Type.GetType; check the casing, assembly presence, assembly framework version, namespace", staticMapping.TypeName));                            
                         }
                     }
-                    else
-                    {
-                        HttpContext.Current.Trace.Write(string.Format("There isn't a staticMapping defined so checking the RazorDataTypeModelTypes cache..."));
-                    }
-
-
+                    
                     if (RazorDataTypeModelTypes != null && RazorDataTypeModelTypes.Any(model => model.Key.Item1 == dataType) && dataType != Guid.Empty)
                     {
                         var razorDataTypeModelDefinition = RazorDataTypeModelTypes.Where(model => model.Key.Item1 == dataType).OrderByDescending(model => model.Key.Item2).FirstOrDefault();
@@ -593,26 +584,25 @@ namespace umbraco.MacroEngines
                             }
                             else
                             {
-                                HttpContext.Current.Trace.Write("Failed");
-                                HttpContext.Current.Trace.Warn(string.Format("Failed to create the instance of the model binder"));
+								LogHelper.Warn<DynamicNode>(string.Format("Failed to create the instance of the model binder"));
                             }
                         }
                         else
                         {
-                            HttpContext.Current.Trace.Write("Failed");
-                            HttpContext.Current.Trace.Warn(string.Format("Could not get the dataTypeType for the RazorDataTypeModel"));
+							LogHelper.Warn<DynamicNode>(string.Format("Could not get the dataTypeType for the RazorDataTypeModel"));                            
                         }
                     }
                     else
                     {
-                        if (RazorDataTypeModelTypes == null)
-                        {
-                            HttpContext.Current.Trace.Write(string.Format("RazorDataTypeModelTypes is null, probably an exception while building the cache, falling back to ConvertPropertyValueByDataType", dataType));
-                        }
-                        else
-                        {
-                            HttpContext.Current.Trace.Write(string.Format("GUID {0} does not have a DataTypeModel, falling back to ConvertPropertyValueByDataType", dataType));
-                        }
+						//NOTE: Do we really want to log this? I'm not sure.
+						//if (RazorDataTypeModelTypes == null)
+						//{
+						//    HttpContext.Current.Trace.Write(string.Format("RazorDataTypeModelTypes is null, probably an exception while building the cache, falling back to ConvertPropertyValueByDataType", dataType));
+						//}
+						//else
+						//{
+						//    HttpContext.Current.Trace.Write(string.Format("GUID {0} does not have a DataTypeModel, falling back to ConvertPropertyValueByDataType", dataType));
+						//}
 
                     }
 
@@ -678,43 +668,30 @@ namespace umbraco.MacroEngines
         }
         private bool TryCreateInstanceRazorDataTypeModel(Guid dataType, Type dataTypeType, string value, out object result)
         {
-            HttpContext.Current.Trace.Write(string.Format("Found dataType {0} for GUID {1}", dataTypeType.FullName, dataType));
             IRazorDataTypeModel razorDataTypeModel = Activator.CreateInstance(dataTypeType, false) as IRazorDataTypeModel;
-            HttpContext.Current.Trace.Write(string.Format("Instantiating {0}...", dataTypeType.FullName));
             if (razorDataTypeModel != null)
             {
-                HttpContext.Current.Trace.Write("Success");
                 object instance = null;
-                HttpContext.Current.Trace.Write("Calling Init on razorDataTypeModel");
                 if (razorDataTypeModel.Init(n.Id, value, out instance))
                 {
-                    if (instance != null)
+                    if (instance == null)
                     {
-                        HttpContext.Current.Trace.Write(string.Format("razorDataTypeModel successfully instantiated and returned a valid instance of type {0}", instance.GetType().FullName));
+						LogHelper.Warn<DynamicNode>("razorDataTypeModel successfully instantiated but returned null for instance");
                     }
-                    else
-                    {
-                        HttpContext.Current.Trace.Warn("razorDataTypeModel successfully instantiated but returned null for instance");
-                    }
-                    result = instance;
+                	result = instance;
                     return true;
                 }
                 else
                 {
-                    if (instance != null)
+                    if (instance == null)
                     {
-                        HttpContext.Current.Trace.Write(string.Format("razorDataTypeModel returned false but returned a valid instance of type {0}", instance.GetType().FullName));
-                    }
-                    else
-                    {
-                        HttpContext.Current.Trace.Warn("razorDataTypeModel successfully instantiated but returned null for instance");
+						LogHelper.Warn<DynamicNode>("razorDataTypeModel successfully instantiated but returned null for instance");
                     }
                 }
             }
             else
             {
-                HttpContext.Current.Trace.Write("Failed");
-                HttpContext.Current.Trace.Warn(string.Format("DataTypeModel {0} failed to instantiate, perhaps it is lacking a parameterless constructor or doesn't implement IRazorDataTypeModel?", dataTypeType.FullName));
+				LogHelper.Warn<DynamicNode>(string.Format("DataTypeModel {0} failed to instantiate, perhaps it is lacking a parameterless constructor or doesn't implement IRazorDataTypeModel?", dataTypeType.FullName));
             }
             result = null;
             return false;
@@ -1335,9 +1312,13 @@ namespace umbraco.MacroEngines
             get { if (n == null) return null; return n.PropertiesAsList; }
         }
 
-        public List<DynamicBackingItem> ChildrenAsList
+        public DynamicNodeList ChildrenAsList
         {
-            get { if (n == null) return null; return n.ChildrenAsList; }
+            get
+            {
+            	return GetChildrenAsList;
+            	//if (n == null) return null; return n.ChildrenAsList;
+            }
         }
 
         public IProperty GetProperty(string alias)
@@ -1438,7 +1419,7 @@ namespace umbraco.MacroEngines
         {
             if (this.ownerList == null && this.Parent != null)
             {
-                var list = this.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
+                var list = this.Parent.ChildrenAsList.Select(n => new DynamicNode(n));
                 this.ownerList = new DynamicNodeList(list);
             }
             if (this.ownerList != null)

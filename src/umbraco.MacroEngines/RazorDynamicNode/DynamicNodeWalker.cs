@@ -80,8 +80,9 @@ namespace umbraco.MacroEngines
         {
             if (context.ownerList == null && context.Parent != null)
             {
-                var list = context.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
-                context.ownerList = new DynamicNodeList(list);
+                //var list = context.Parent.ChildrenAsList.Select(n => new DynamicNode(n));
+                //context.ownerList = new DynamicNodeList(list);
+            	context.ownerList = context.Parent.ChildrenAsList;
             }
             if (context.ownerList != null)
             {
@@ -105,7 +106,7 @@ namespace umbraco.MacroEngines
         {
             if (context.ownerList == null && context.Parent != null)
             {
-                var list = context.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
+                var list = context.Parent.ChildrenAsList.Select(n => new DynamicNode(n));
                 context.ownerList = new DynamicNodeList(list);
             }
             if (context.ownerList != null)
@@ -130,7 +131,7 @@ namespace umbraco.MacroEngines
         {
             if (context.ownerList == null && context.Parent != null)
             {
-                var list = context.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
+                var list = context.Parent.ChildrenAsList.Select(n => new DynamicNode(n));
                 context.ownerList = new DynamicNodeList(list);
             }
             if (context.ownerList != null)
@@ -169,7 +170,7 @@ namespace umbraco.MacroEngines
         {
             if (context.ownerList == null && context.Parent != null)
             {
-                var list = context.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
+                var list = context.Parent.ChildrenAsList.Select(n => new DynamicNode(n));
                 context.ownerList = new DynamicNodeList(list);
             }
             if (context.ownerList != null)
@@ -203,8 +204,9 @@ namespace umbraco.MacroEngines
         {
             if (context.ownerList == null && context.Parent != null)
             {
-                var list = context.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
-                context.ownerList = new DynamicNodeList(list);
+                //var list = context.Parent.ChildrenAsList.Select(n => new DynamicNode(n));
+                //context.ownerList = new DynamicNodeList(list);
+            	context.ownerList = context.Parent.ChildrenAsList;
             }
             if (context.ownerList != null)
             {
@@ -228,7 +230,7 @@ namespace umbraco.MacroEngines
         {
             if (context.ownerList == null && context.Parent != null)
             {
-                var list = context.Parent.ChildrenAsList.ConvertAll(n => new DynamicNode(n));
+                var list = context.Parent.ChildrenAsList.Select(n => new DynamicNode(n));
                 context.ownerList = new DynamicNodeList(list);
             }
             if (context.ownerList != null)
