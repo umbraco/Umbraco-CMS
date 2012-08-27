@@ -5,14 +5,17 @@ using System.Text;
 
 namespace umbraco.businesslogic.Exceptions
 {
-    public class FileSecurityException : Exception
+	[Obsolete("This class has been superceded by Umbraco.Core.UI.FileSecurityException")]
+	public class FileSecurityException : Umbraco.Core.IO.FileSecurityException
     {
         public FileSecurityException()
+			: base()
         {
             
         }
 
-        public FileSecurityException(string message) : base(message)
+        public FileSecurityException(string message) 
+			: base(message)
         {
             
         }

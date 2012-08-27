@@ -1,4 +1,4 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="noNodes.aspx.cs" Inherits="umbraco.presentation.config.splashes.noNodes" %>
+<%@ Page Language="C#" AutoEventWireup="true" Inherits="System.Web.UI.Page" %>
 
 <!DOCTYPE html>
 <html>

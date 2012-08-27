@@ -5,28 +5,45 @@ using System.Text;
 
 namespace umbraco.MacroEngines
 {
+	[Obsolete("use Umbraco.Core.RazorDataTypeModelStaticMappingItem instead")]
     public class RazorDataTypeModelStaticMappingItem
-    {
-        public string Raw;
+	{
+		private readonly Umbraco.Core.RazorDataTypeModelStaticMappingItem _realMappingItem = new Umbraco.Core.RazorDataTypeModelStaticMappingItem();
+
+		public string Raw
+		{
+			get { return _realMappingItem.Raw; }
+			set { _realMappingItem.Raw = value; }
+		}
 
         //if all of the set (non null) properties match the property data currently being evaluated
-        public string PropertyTypeAlias;
-        public string NodeTypeAlias;
-        public Guid? DataTypeGuid;
+		public string PropertyTypeAlias
+		{
+			get { return _realMappingItem.PropertyTypeAlias; }
+			set { _realMappingItem.PropertyTypeAlias = value; }
+		}
 
-        public string TypeName;
+		public string NodeTypeAlias
+		{
+			get { return _realMappingItem.NodeTypeAlias; }
+			set { _realMappingItem.NodeTypeAlias = value; }
+		}
 
-        public RazorDataTypeModelStaticMappingItem() { }
+		public Guid? DataTypeGuid
+		{
+			get { return _realMappingItem.DataTypeGuid; }
+			set { _realMappingItem.DataTypeGuid = value; }
+		}
 
-        public bool Applies(Guid dataTypeGuid, string nodeTypeAlias, string propertyTypeAlias)
-        {
-            return
-            (
-                (this.NodeTypeAlias != null || this.PropertyTypeAlias != null || this.DataTypeGuid != null) &&
-                ((this.DataTypeGuid != null && this.DataTypeGuid == dataTypeGuid) || this.DataTypeGuid == null) &&
-                ((this.PropertyTypeAlias != null && this.PropertyTypeAlias == propertyTypeAlias) || this.PropertyTypeAlias == null) &&
-                ((this.NodeTypeAlias != null && this.NodeTypeAlias == nodeTypeAlias) || this.NodeTypeAlias == null)
-            );
-        }
+		public string TypeName
+		{
+			get { return _realMappingItem.TypeName; }
+			set { _realMappingItem.TypeName = value; }
+		}
+
+		public bool Applies(Guid dataTypeGuid, string nodeTypeAlias, string propertyTypeAlias)
+		{
+			return _realMappingItem.Applies(dataTypeGuid, nodeTypeAlias, propertyTypeAlias);
+		}
     }
 }

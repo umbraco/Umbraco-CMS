@@ -198,6 +198,10 @@
       <Project>{5BA5425F-27A7-4677-865E-82246498AA2E}</Project>
       <Name>SqlCE4Umbraco</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\umbraco.macroRenderings\umbraco.macroRenderings.csproj">
       <Project>{52AB8F1F-FB76-4E8C-885F-0747B6CE71EC}</Project>
       <Name>umbraco.macroRenderings</Name>
@@ -233,6 +237,12 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Media\ThumbnailProviders\AbstractThumbnailProvider.cs" />
+    <Compile Include="Media\ThumbnailProviders\MediaTypeIconThumbnailProvider.cs" />
+    <Compile Include="Media\ThumbnailProviders\FileExtensionIconThumbnailProvider.cs" />
+    <Compile Include="Media\ThumbnailProviders\ImageThumbnailProvider.cs" />
+    <Compile Include="Media\ThumbnailProviders\ThumbnailProviderManager.cs" />
+    <Compile Include="UI\Controls\FolderBrowser.cs" />
     <Compile Include="umbraco.presentation\EnsureSystemPathsApplicationStartupHandler.cs" />
     <Compile Include="umbraco.presentation\install\steps\database.ascx.cs">
       <DependentUpon>database.ascx</DependentUpon>
@@ -1743,6 +1753,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="WebServices\FolderBrowserService.cs" />
     <Content Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx" />
@@ -1819,7 +1830,9 @@
     <Content Include="umbraco.presentation\umbraco\members\search.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\details.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\BrowseRepository.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx" />
+    <Content Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\installedPackage.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\LoadNitros.ascx" />
@@ -1860,10 +1873,14 @@
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\cacheBrowser.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx" />
+    <Content Include="umbraco.presentation\umbraco\developer\Python\editPython.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\members\ViewMembers.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertImage.aspx" />
-    <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertLink.aspx" />
+    <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertLink.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertMacro.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
     <None Include="Web References\org.umbraco.update\UpgradeResult1.datasource">
@@ -1883,7 +1900,9 @@
     <Content Include="umbraco.presentation\umbraco\users\PermissionsHandler.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\CheckForUpgrade.asmx" />
     <Content Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx" />
-    <Content Include="umbraco.presentation\umbraco\settings\scripts\editScript.aspx" />
+    <Content Include="umbraco.presentation\umbraco\settings\scripts\editScript.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\canvas.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\default.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\preview.aspx" />
@@ -1910,7 +1929,9 @@
     <Content Include="umbraco.presentation\umbraco\developer\autoDoc.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\DataTypes\editDatatype.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\Xslt\editXslt.aspx" />
+    <Content Include="umbraco.presentation\umbraco\developer\Xslt\editXslt.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Cache\viewCacheItem.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
@@ -1918,7 +1939,9 @@
     <Content Include="umbraco.presentation\umbraco\editContent.aspx" />
     <Content Include="umbraco.presentation\umbraco\editMedia.aspx" />
     <Content Include="umbraco.presentation\umbraco\js\language.aspx" />
-    <Content Include="umbraco.presentation\umbraco\login.aspx" />
+    <Content Include="umbraco.presentation\umbraco\login.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\logout.aspx" />
     <Content Include="umbraco.presentation\umbraco\macroResultWrapper.aspx">
       <SubType>Form</SubType>
@@ -1939,13 +1962,19 @@
     <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx" />
-    <Content Include="umbraco.presentation\umbraco\settings\editTemplate.aspx" />
+    <Content Include="umbraco.presentation\umbraco\settings\editTemplate.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\settings\modals\ShowUmbracoTags.aspx" />
-    <Content Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx" />
+    <Content Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\sort.aspx" />
     <Content Include="umbraco.presentation\umbraco\test.aspx" />
-    <Content Include="umbraco.presentation\umbraco\tree.aspx" />
+    <Content Include="umbraco.presentation\umbraco\tree.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\treeInit.aspx" />
     <Content Include="umbraco.presentation\umbraco\umbraco.aspx" />
     <Content Include="umbraco.presentation\umbraco\users\EditUser.aspx" />
@@ -2059,8 +2088,11 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>xcopy /s /y "$(ProjectDir)umbraco.presentation\*.aspx" "$(ProjectDir)..\Umbraco.Web.UI\"
+xcopy /s /y "$(ProjectDir)umbraco.presentation\*.ascx" "$(ProjectDir)..\Umbraco.Web.UI\"
+xcopy /s /y "$(ProjectDir)umbraco.presentation\*.asmx" "$(ProjectDir)..\Umbraco.Web.UI\"
+xcopy /s /y "$(ProjectDir)umbraco.presentation\*.ashx" "$(ProjectDir)..\Umbraco.Web.UI\"
+xcopy /s /y "$(ProjectDir)umbraco.presentation\*.master" "$(ProjectDir)..\Umbraco.Web.UI\"</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />

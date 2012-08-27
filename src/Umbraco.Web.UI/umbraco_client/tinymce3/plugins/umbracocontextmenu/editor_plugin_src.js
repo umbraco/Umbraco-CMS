@@ -26,7 +26,7 @@
         * @param {string} url Absolute URL to where the plugin is located.
         */
         init: function (ed) {
-            var t = this;
+            if (ed.plugins.contextmenu) {
 
             ed.plugins.contextmenu.onContextMenu.add(function (th, menu, event) {
 
@@ -61,7 +61,7 @@
 
             });
         }
-
+        }
     });
 
     // Register plugin

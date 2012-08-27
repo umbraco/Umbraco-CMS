@@ -77,12 +77,19 @@ namespace umbraco.MacroEngines
             var contextWrapper = new HttpContextWrapper(context);
 
             //inject http context - for request response
+            HttpContext.Current.Trace.Write("umbracoMacro", string.Format("Loading Macro Script Context (file: {0})", macro.Name));
             razorWebPage.Context = contextWrapper;
+            HttpContext.Current.Trace.Write("umbracoMacro", string.Format("Done Loading Macro Script Context (file: {0})", macro.Name));
 
             //Inject Macro Model And Parameters
             if (razorWebPage is IMacroContext) {
+                HttpContext.Current.Trace.Write("umbracoMacro", string.Format("Boxing Macro Script MacroContext (file: {0})", macro.Name));
                 var razorMacro = (IMacroContext)razorWebPage;
+                HttpContext.Current.Trace.Write("umbracoMacro", string.Format("Done Boxing Macro Script MacroContext (file: {0})", macro.Name));
+
+                HttpContext.Current.Trace.Write("umbracoMacro", string.Format("Loading Macro Script Model (file: {0})", macro.Name));
                 razorMacro.SetMembers(macro, currentPage);
+                HttpContext.Current.Trace.Write("umbracoMacro", string.Format("Done Loading Macro Script Model (file: {0})", macro.Name));
             }
         }
 
@@ -106,11 +113,16 @@ namespace umbraco.MacroEngines
                 return String.Empty; //No File Location
 
             var razorWebPage = CompileAndInstantiate(fileLocation);
+
+            HttpContext.Current.Trace.Write("umbracoMacro", string.Format("Loading Macro Script Context (file: {0})", macro.Name));
             InjectContext(razorWebPage, macro, currentPage);
+            HttpContext.Current.Trace.Write("umbracoMacro", string.Format("Done Loading Macro Script Context (file: {0})", macro.Name));
 
             //Output Razor To String
             var output = new StringWriter();
+            HttpContext.Current.Trace.Write("umbracoMacro", string.Format("Executing Macro Script (file: {0})", macro.Name));
             razorWebPage.ExecutePageHierarchy(new WebPageContext(contextWrapper, razorWebPage, null), output);
+            HttpContext.Current.Trace.Write("umbracoMacro", string.Format("Done Executing Macro Script (file: {0})", macro.Name));
             return output.ToString();
         }
 

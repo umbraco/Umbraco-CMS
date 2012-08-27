@@ -61,10 +61,14 @@
   
   <cc2:Pane runat="server">  
     <cc2:PropertyPanel ID="pp_icon" runat="server" Text="Icon">
-          <asp:DropDownList ID="ddlIcons"  CssClass="guiInputText guiInputStandardSize umbIconDropdownList" runat="server"/>
+        <div class="umbIconDropdownList">
+          <asp:DropDownList ID="ddlIcons"  CssClass="guiInputText guiInputStandardSize" runat="server"/>
+        </div>
     </cc2:PropertyPanel>
     <cc2:PropertyPanel ID="pp_thumbnail" runat="server" Text="Thumbnail">
+        <div class="umbThumbnailDropdownList">
           <asp:DropDownList ID="ddlThumbnails" CssClass="guiInputText guiInputStandardSize" runat="server"/>
+        </div>
     </cc2:PropertyPanel>
     <cc2:PropertyPanel ID="pp_description" runat="server" Text="Description">
           <asp:TextBox ID="description" runat="server" CssClass="guiInputText guiInputStandardSize" TextMode="MultiLine" Rows="3"/>

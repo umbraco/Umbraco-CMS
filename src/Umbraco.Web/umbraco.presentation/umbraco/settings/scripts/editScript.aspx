@@ -10,7 +10,7 @@
             var codeVal = jQuery('#<%= editorSource.ClientID %>').val();
             //if CodeMirror is not defined, then the code editor is disabled.
             if (typeof (CodeMirror) != "undefined") {
-                codeVal = codeEditor.getCode();
+                codeVal = UmbEditor.GetCode();
             }
             umbraco.presentation.webservices.codeEditorSave.SaveScript(jQuery('#<%= NameTxt.ClientID %>').val(), '<%= NameTxt.Text %>', codeVal, submitSucces, submitFailure);
         }

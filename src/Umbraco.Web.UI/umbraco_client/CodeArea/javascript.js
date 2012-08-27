@@ -3,10 +3,25 @@ function resizeTextArea(textEditor, offsetX, offsetY) {
     var clientWidth = getViewportWidth();
 
     if (textEditor != null) {
-        textEditor.style.width = (clientWidth - offsetX) + "px";
+       // textEditor.style.width = (clientWidth - offsetX) + "px";
         textEditor.style.height = (clientHeight - getY(textEditor) - offsetY) + "px";
     }
 }
+
+var currentHandle = null, currentLine;
+function updateLineInfo(cm) {
+    var line = cm.getCursor().line, handle = cm.getLineHandle(line);
+    if (handle == currentHandle && line == currentLine) return;
+
+    if (currentHandle) {
+        cm.setLineClass(currentHandle, null, null);
+        cm.clearMarker(currentHandle);
+    }
+    currentHandle = handle; currentLine = line;
+    cm.setLineClass(currentHandle, null, "activeline");
+    cm.setMarker(currentHandle, String(line + 1));
+} 
+
 
 function UmbracoCodeSnippet() {
     this.BeginTag = "";

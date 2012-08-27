@@ -163,7 +163,7 @@
 {
     width: 300px;
     float: left;
-    clear: none;
+    clear: left;
     margin-right: 10px;
     height: 210px;
 }

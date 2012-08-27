@@ -10,6 +10,7 @@
 <head runat="server">
     <title>Umbraco CMS -
         <%=Request.Url.Host.ToLower().Replace("www.", "") %></title>
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
     <cc1:UmbracoClientDependencyLoader runat="server" ID="ClientLoader" />
     <umb:CssInclude ID="CssInclude1" runat="server" FilePath="css/umbracoGui.css" PathNameAlias="UmbracoRoot" />
     <umb:CssInclude ID="CssInclude2" runat="server" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />
