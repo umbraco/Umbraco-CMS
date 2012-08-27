@@ -31,11 +31,24 @@ namespace Umbraco.Web.Mvc
 			ApplicationContext = UmbracoContext.Application;
 		}
 
+		/// <summary>
+		/// Returns the current UmbracoContext
+		/// </summary>
 		public UmbracoContext UmbracoContext { get; private set; }
+
+		/// <summary>
+		/// Returns the current ApplicationContext
+		/// </summary>
 		public ApplicationContext ApplicationContext { get; private set; }
 
+		/// <summary>
+		/// Returns the current DocumentRequest
+		/// </summary>
 		internal DocumentRequest DocumentRequest { get; private set; }
 
+		/// <summary>
+		/// Returns the a DynamicDocument object
+		/// </summary>
 		public dynamic CurrentPage { get; private set; }
 
 		private ICultureDictionary _cultureDictionary;
