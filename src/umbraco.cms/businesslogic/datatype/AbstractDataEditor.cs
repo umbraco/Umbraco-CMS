@@ -2,17 +2,32 @@
 {
     using System;
 
+    using umbraco.interfaces;
+
     /// <summary>
     /// A much easier way to build custom datatypes. Inherit from this class
     /// and change Id and DataTypeName and then set the RenderControl property
     /// to your .NET webcontrol to be displayed
-    /// Made by NH in flight SK 925 on his way to MIX09
     /// </summary>
-    public abstract class AbstractDataEditor : BaseDataType, interfaces.IDataType
+    /// <remarks>
+    /// Made by NH in flight SK 925 on his way to MIX09
+    /// </remarks>
+    public abstract class AbstractDataEditor : BaseDataType, IDataType
     {
-        private interfaces.IData baseData;
-        private interfaces.IDataPrevalue prevalueEditor;
-        private AbstractDataEditorControl editor;
+        /// <summary>
+        /// The data editor.
+        /// </summary>
+        private readonly AbstractDataEditorControl editor;
+
+        /// <summary>
+        /// The stored data.
+        /// </summary>
+        private IData baseData;
+
+        /// <summary>
+        /// The prevalue editor.
+        /// </summary>
+        private IDataPrevalue prevalueEditor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AbstractDataEditor" /> class.
@@ -53,7 +68,7 @@
         /// <value>
         /// The data editor.
         /// </value>
-        public override umbraco.interfaces.IDataEditor DataEditor
+        public override IDataEditor DataEditor
         {
             get { return this.editor; }
         }
@@ -64,7 +79,7 @@
         /// <value>
         /// The stored data.
         /// </value>
-        public override umbraco.interfaces.IData Data
+        public override IData Data
         {
             get
             {
@@ -78,7 +93,7 @@
         /// <value>
         /// The prevalue editor.
         /// </value>
-        public override umbraco.interfaces.IDataPrevalue PrevalueEditor
+        public override IDataPrevalue PrevalueEditor
         {
             get
             {

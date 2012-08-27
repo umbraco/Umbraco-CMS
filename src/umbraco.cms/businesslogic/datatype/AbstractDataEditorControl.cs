@@ -6,13 +6,16 @@ namespace umbraco.cms.businesslogic.datatype
 
     using umbraco.interfaces;
 
+    /// <summary>
+    /// Base class that defines the methods, properties and events for all datatype controls.
+    /// </summary>
     [ValidationProperty("Value")]
     public class AbstractDataEditorControl : WebControl, INamingContainer, IDataEditor
     {
         /// <summary>
         /// The base datatype.
         /// </summary>
-        private readonly cms.businesslogic.datatype.BaseDataType datatype;
+        private readonly BaseDataType datatype;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AbstractDataEditorControl" /> class.
@@ -52,14 +55,17 @@ namespace umbraco.cms.businesslogic.datatype
         {
             get
             {
-                var attr = this.Control.GetType().GetCustomAttributes(typeof(ValidationPropertyAttribute), true);
-
-                if (attr != null && attr.Length > 0)
+                if (this.Control != null) 
                 {
-                    // get value of marked property
-                    var info = this.Control.GetType().GetProperty(((ValidationPropertyAttribute)attr[0]).Name);
+                    var attr = this.Control.GetType().GetCustomAttributes(typeof(ValidationPropertyAttribute), true);
 
-                    return info.GetValue(this.Control, null);
+                    if (attr.Length > 0)
+                    {
+                        // get value of marked property
+                        var info = this.Control.GetType().GetProperty(((ValidationPropertyAttribute)attr[0]).Name);
+
+                        return info.GetValue(this.Control, null);
+                    }
                 }
 
                 // not marked so no validation
