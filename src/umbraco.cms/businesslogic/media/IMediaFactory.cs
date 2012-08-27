@@ -14,6 +14,8 @@ namespace umbraco.cms.businesslogic.media
         bool CanHandleMedia(int parentNodeId, PostedMediaFile postedFile, User user);
 
         Media HandleMedia(int parentNodeId, PostedMediaFile postedFile, User user);
+
+        [Obsolete("Use HandleMedia(int, PostedMediaFile, User) and set the ReplaceExisting property on PostedMediaFile instead")]
         Media HandleMedia(int parentNodeId, PostedMediaFile postedFile, User user, bool replaceExisting);
     }
 }

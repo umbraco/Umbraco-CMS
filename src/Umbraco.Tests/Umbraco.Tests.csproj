@@ -48,10 +48,14 @@
     <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
     <Compile Include="BusinessLogic\BaseTest.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
+    <Compile Include="IO\AbstractFileSystemTests.cs" />
+    <Compile Include="IO\FileSystemProviderManagerTests.cs" />
+    <Compile Include="IO\PhysicalFileSystemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,7 @@ namespace umbraco
     /// <summary>
     /// The xmlHelper class contains general helper methods for working with xml in umbraco.
     /// </summary>
+    [Obsolete("Use Umbraco.Core.XmlHelper instead")]
     public class xmlHelper
     {
         /// <summary>
@@ -17,8 +18,7 @@ namespace umbraco
         /// <returns></returns>
         public static XmlNode ImportXmlNodeFromText(string text, ref XmlDocument xmlDoc)
         {
-            xmlDoc.LoadXml(text);
-            return xmlDoc.FirstChild;
+        	return Umbraco.Core.XmlHelper.ImportXmlNodeFromText(text, ref xmlDoc);
         }
 
         /// <summary>
@@ -28,17 +28,7 @@ namespace umbraco
         /// <returns>Returns a XmlDocument class</returns>
         public static XmlDocument OpenAsXmlDocument(string filePath)
         {
-
-            XmlTextReader reader = new XmlTextReader(IOHelper.MapPath(filePath));
-
-            reader.WhitespaceHandling = WhitespaceHandling.All;
-            XmlDocument xmlDoc = new XmlDocument();
-            //Load the file into the XmlDocument
-            xmlDoc.Load(reader);
-            //Close off the connection to the file.
-            reader.Close();
-
-            return xmlDoc;
+			return Umbraco.Core.XmlHelper.OpenAsXmlDocument(filePath);
         }
 
         /// <summary>
@@ -50,9 +40,7 @@ namespace umbraco
         /// <returns>a XmlAttribute</returns>
         public static XmlAttribute addAttribute(XmlDocument Xd, string Name, string Value)
         {
-            XmlAttribute temp = Xd.CreateAttribute(Name);
-            temp.Value = Value;
-            return temp;
+			return Umbraco.Core.XmlHelper.AddAttribute(Xd, Name, Value);
         }
 
         /// <summary>
@@ -64,9 +52,7 @@ namespace umbraco
         /// <returns>a XmlNode</returns>
         public static XmlNode addTextNode(XmlDocument Xd, string Name, string Value)
         {
-            XmlNode temp = Xd.CreateNode(XmlNodeType.Element, Name, "");
-            temp.AppendChild(Xd.CreateTextNode(Value));
-            return temp;
+			return Umbraco.Core.XmlHelper.AddTextNode(Xd, Name, Value);
         }
 
         /// <summary>
@@ -78,9 +64,7 @@ namespace umbraco
         /// <returns>A XmlNode</returns>
         public static XmlNode addCDataNode(XmlDocument Xd, string Name, string Value)
         {
-            XmlNode temp = Xd.CreateNode(XmlNodeType.Element, Name, "");
-            temp.AppendChild(Xd.CreateCDataSection(Value));
-            return temp;
+			return Umbraco.Core.XmlHelper.AddCDataNode(Xd, Name, Value);
         }
 
         /// <summary>
@@ -90,18 +74,7 @@ namespace umbraco
         /// <returns>the value as a string</returns>
         public static string GetNodeValue(XmlNode n)
         {
-            string value = string.Empty;
-            if (n == null || n.FirstChild == null)
-                return value;
-            if (n.FirstChild.Value != null)
-            {
-                value = n.FirstChild.Value;
-            }
-            else
-            {
-                value = n.InnerXml;
-            }
-            return value.Replace("<!--CDATAOPENTAG-->", "<![CDATA[").Replace("<!--CDATACLOSETAG-->", "]]>");
+			return Umbraco.Core.XmlHelper.GetNodeValue(n);
         }
 
         /// <summary>
@@ -113,17 +86,7 @@ namespace umbraco
         /// </returns>
         public static bool CouldItBeXml(string xml)
         {
-            if (!string.IsNullOrEmpty(xml))
-            {
-                xml = xml.Trim();
-
-                if (xml.StartsWith("<") && xml.EndsWith(">"))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+			return Umbraco.Core.XmlHelper.CouldItBeXml(xml);
         }
 
         /// <summary>
@@ -136,7 +99,7 @@ namespace umbraco
         /// <returns>Returns an <c>System.Xml.XmlDocument</c> representation of the delimited string data.</returns>
         public static XmlDocument Split(string data, string[] separator, string rootName, string elementName)
         {
-            return Split(new XmlDocument(), data, separator, rootName, elementName);
+			return Umbraco.Core.XmlHelper.Split(data, separator, rootName, elementName);
         }
 
         /// <summary>
@@ -150,26 +113,7 @@ namespace umbraco
         /// <returns>Returns an <c>System.Xml.XmlDocument</c> representation of the delimited string data.</returns>
         public static XmlDocument Split(XmlDocument xml, string data, string[] separator, string rootName, string elementName)
         {
-            // load new XML document.
-            xml.LoadXml(string.Concat("<", rootName, "/>"));
-
-            // get the data-value, check it isn't empty.
-            if (!string.IsNullOrEmpty(data))
-            {
-                // explode the values into an array
-                var values = data.Split(separator, StringSplitOptions.None);
-
-                // loop through the array items.
-                foreach (string value in values)
-                {
-                    // add each value to the XML document.
-                    var xn = xmlHelper.addTextNode(xml, elementName, value);
-                    xml.DocumentElement.AppendChild(xn);
-                }
-            }
-
-            // return the XML node.
-            return xml;
+			return Umbraco.Core.XmlHelper.Split(xml, data, separator, rootName, elementName);
         }
     }
 }

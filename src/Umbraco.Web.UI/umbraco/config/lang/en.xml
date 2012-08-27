@@ -258,6 +258,7 @@
     <key alias="memberGroup" version="2.1">Member Groups</key>
     <key alias="memberRoles" version="4.0">Roles</key>
     <key alias="contentRecycleBin" version="4.0">Recycle Bin</key>
+    <key alias="packager" version="4.9">Packages</key>
     <key alias="packages" version="4.0">Packages</key>
     <key alias="repositories" version="4.0">Install from repository</key>
     <key alias="createdPackages" version="4.0">Created packages</key>

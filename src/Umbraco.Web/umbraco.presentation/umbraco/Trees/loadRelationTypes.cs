@@ -16,7 +16,7 @@ namespace umbraco
 	/// <summary>
 	/// RelationTypes tree for developer section
 	/// </summary>
-	//[Tree("developer", "relationTypes", "Relation Types", sortOrder: 4)]
+	[Tree("developer", "relationTypes", "Relation Types", sortOrder: 4)]
 	public class loadRelationTypes : BaseTree
 	{
 		/// <summary>

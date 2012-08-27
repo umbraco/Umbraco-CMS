@@ -6,109 +6,89 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Web;
+using Umbraco.Core.IO;
 using Encoder = System.Text.Encoder;
 
 namespace umbraco.cms.businesslogic.Files
 {
     public class UmbracoFile : IFile
     {
-        private string _fullFilePath;
+        private string _path;
         private string _fileName;
-        private string _directoryName;
         private string _extension;
-        private string _localName;
+        private string _url;
         private long _length;
+
+        private IMediaFileSystem _fs;
+
+        #region Constructors
 
         public UmbracoFile()
         {
-
+            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
         }
 
-        public UmbracoFile(string fullFilePath)
+        public UmbracoFile(string path)
         {
-            _fullFilePath = fullFilePath;
+            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+
+            _path = path;
+
             initialize();
         }
+        
+        #endregion
 
-        public static UmbracoFile Save(HttpPostedFile file, string fullFileName)
+        #region Static Methods
+
+        //MB: Do we really need all these overloads? looking through the code, only one of them is actually used
+
+        public static UmbracoFile Save(HttpPostedFile file, string path)
         {
-            byte[] fileData = null;
-            using (var binaryReader = new BinaryReader(file.InputStream))
-            {
-                fileData = binaryReader.ReadBytes(file.ContentLength);
-            }
-
-            return Save(fileData, fullFileName);
+            return Save(file.InputStream, path);
         }
 
-        public static UmbracoFile Save(HttpPostedFileBase file, string fullFileName)
+        public static UmbracoFile Save(HttpPostedFileBase file, string path)
         {
-            byte[] fileData = null;
-            using (var binaryReader = new BinaryReader(file.InputStream))
-            {
-                fileData = binaryReader.ReadBytes(file.ContentLength);
-            }
-
-            return Save(fileData, fullFileName);
+            return Save(file.InputStream, path);
         }
 
-        public static UmbracoFile Save(Stream inputStream, string fullFileName){
-           
-            byte[] fileData = null;
-            using (var binaryReader = new BinaryReader(inputStream))
-            {
-                fileData = binaryReader.ReadBytes((int)inputStream.Length);
-            }
+        public static UmbracoFile Save(Stream inputStream, string path)
+        {
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+            fs.AddFile(path, inputStream);
 
-            return Save(fileData, fullFileName);
+            return new UmbracoFile(path);
         }
 
-        public static UmbracoFile Save(byte[] file, string fullFileName)
+        public static UmbracoFile Save(byte[] file, string relativePath)
         {
-            string fullFilePath = IO.IOHelper.MapPath(fullFileName);
-
-            // create directories
-            DirectoryInfo di = new DirectoryInfo(IO.IOHelper.MapPath(fullFilePath.Substring(0, fullFilePath.LastIndexOf(Path.DirectorySeparatorChar))));
-            if (!di.Exists)
-            {
-                var currentDir = IO.IOHelper.MapPath(IO.SystemDirectories.Root);
-                var rootDir = IO.IOHelper.MapPath(IO.SystemDirectories.Root);
-                foreach (var dir in di.FullName.Substring(rootDir.Length).Split(Path.DirectorySeparatorChar))
-                {
-                    currentDir = Path.Combine(currentDir, dir);
-                    if (!new DirectoryInfo(currentDir).Exists)
-                    {
-                        Directory.CreateDirectory(currentDir);
-                    }
-                }
-            }
-
-            File.WriteAllBytes(fullFilePath, file);
-            return new UmbracoFile(fullFilePath);
+            return Save(new MemoryStream(file), relativePath);
         }
 
         public static UmbracoFile Save(HttpPostedFile file)
         {
-            string tempDir = Path.Combine(IO.SystemDirectories.Media, "uploads", Guid.NewGuid().ToString());
-            return Save(file, tempDir);
-        }
-        //filebase overload...
-        public static UmbracoFile Save(HttpPostedFileBase file)
-        {
-            string tempDir = Path.Combine(IO.SystemDirectories.Media, "uploads", Guid.NewGuid().ToString());
+            var tempDir = System.IO.Path.Combine("uploads", Guid.NewGuid().ToString());
             return Save(file, tempDir);
         }
 
+        //filebase overload...
+        public static UmbracoFile Save(HttpPostedFileBase file)
+        {
+            var tempDir = System.IO.Path.Combine("uploads", Guid.NewGuid().ToString());
+            return Save(file, tempDir);
+        }
+
+        #endregion
+
         private void initialize()
         {
-            var fi = new FileInfo(_fullFilePath);
-            _fileName = fi.Name;
-            _length = fi.Length;
-            _directoryName = fi.DirectoryName;
-            _extension = fi.Extension.Substring(1).ToLowerInvariant();
-            _localName =
-                "/" + fi.FullName.Substring(IO.IOHelper.MapPath(IO.SystemDirectories.Root).Length).Replace(
-                    Path.DirectorySeparatorChar.ToString(), "/");
+            _fileName = System.IO.Path.GetFileName(_path);
+            _length = _fs.GetSize(_path);
+            _extension = System.IO.Path.GetExtension(_path) != null
+                ? System.IO.Path.GetExtension(_path).Substring(1).ToLowerInvariant()
+                : "";
+            _url = _fs.GetUrl(_path);
         }
 
         #region IFile Members
@@ -124,9 +104,20 @@ namespace umbraco.cms.businesslogic.Files
             get { return _extension; }
         }
 
+        [Obsolete("LocalName is obsolete, please use Url instead", false)]
         public string LocalName
         {
-            get { return _localName; }
+            get { return Url; }
+        }
+
+        public string Path
+        {
+            get { return _path; }
+        }
+
+        public string Url
+        {
+            get { return _url; }
         }
 
         public long Length
@@ -155,11 +146,8 @@ namespace umbraco.cms.businesslogic.Files
         {
             throwNotAnImageException();
 
-
-            FileStream fs = new FileStream(_fullFilePath,
-                FileMode.Open, FileAccess.Read, FileShare.Read);
-
-            Image image = Image.FromStream(fs);
+            var fs = _fs.OpenFile(_path);
+            var image = Image.FromStream(fs);
             var fileWidth = image.Width;
             var fileHeight = image.Height;
             fs.Close();
@@ -172,42 +160,43 @@ namespace umbraco.cms.businesslogic.Files
         {
             throwNotAnImageException();
 
-            string fileNameThumb = DoResize(width, height, 0, String.Empty);
+            var fileNameThumb = DoResize(width, height, 0, String.Empty);
 
-            return fileNameThumb.Substring(IO.IOHelper.MapPath(IO.SystemDirectories.Root).Length);
+            return _fs.GetUrl(fileNameThumb);
         }
 
         public string Resize(int maxWidthHeight, string fileNameAddition)
         {
             throwNotAnImageException();
 
-            string fileNameThumb = DoResize(GetDimensions().Item1, GetDimensions().Item2, maxWidthHeight, fileNameAddition);
+            var fileNameThumb = DoResize(GetDimensions().Item1, GetDimensions().Item2, maxWidthHeight, fileNameAddition);
 
-            return fileNameThumb.Substring(IO.IOHelper.MapPath(IO.SystemDirectories.Root).Length);
+            return _fs.GetUrl(fileNameThumb);
         }
 
         private string DoResize(int width, int height, int maxWidthHeight, string fileNameAddition)
         {
-
-            FileStream fs = new FileStream(_fullFilePath,
-                                           FileMode.Open, FileAccess.Read, FileShare.Read);
-            Image image = Image.FromStream(fs);
+            var fs = _fs.OpenFile(_path);
+            var image = Image.FromStream(fs);
             fs.Close();
 
             string fileNameThumb = String.IsNullOrEmpty(fileNameAddition) ?
-                string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", _fullFilePath.Substring(0, _fullFilePath.LastIndexOf("."))) :
-                string.Format("{0}_{1}.jpg", _fullFilePath.Substring(0, _fullFilePath.LastIndexOf(".")), fileNameAddition);
-            generateThumbnail(
+                string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", _path.Substring(0, _path.LastIndexOf("."))) :
+                string.Format("{0}_{1}.jpg", _path.Substring(0, _path.LastIndexOf(".")), fileNameAddition);
+
+            fileNameThumb = generateThumbnail(
                 image,
                 maxWidthHeight,
                 width,
                 height,
-                _fullFilePath,
+                _path,
                 _extension,
                 fileNameThumb,
                 maxWidthHeight == 0
-                );
+                ).FileName;
+
             image.Dispose();
+            
             return fileNameThumb;
         }
 
@@ -220,7 +209,7 @@ namespace umbraco.cms.businesslogic.Files
         }
 
 
-        private System.Tuple<int, int> generateThumbnail(System.Drawing.Image image, int maxWidthHeight, int fileWidth, int fileHeight, string fullFilePath, string ext, string thumbnailFileName, bool useFixedDimensions)
+        private ResizedImage generateThumbnail(System.Drawing.Image image, int maxWidthHeight, int fileWidth, int fileHeight, string fullFilePath, string ext, string thumbnailFileName, bool useFixedDimensions)
         {
             // Generate thumbnail
             float f = 1;
@@ -256,7 +245,7 @@ namespace umbraco.cms.businesslogic.Files
             // Copy metadata
             var imageEncoders = ImageCodecInfo.GetImageEncoders();
             ImageCodecInfo codec = null;
-            if (Extension == "png" || Extension == ".gif")
+            if (Extension.ToLower() == "png" || Extension.ToLower() == "gif")
                 codec = imageEncoders.Single(t => t.MimeType.Equals("image/png"));
             else
                 codec = imageEncoders.Single(t => t.MimeType.Equals("image/jpeg"));
@@ -267,14 +256,41 @@ namespace umbraco.cms.businesslogic.Files
             ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 90L);
 
             // Save the new image using the dimensions of the image
-            bp.Save(thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL", string.Format("{0}x{1}", widthTh, heightTh)), codec, ep);
+            string newFileName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL",
+                                                           string.Format("{0}x{1}", widthTh, heightTh));
+            var ms = new MemoryStream();
+            bp.Save(ms, codec, ep);
+            ms.Seek(0, 0);
+
+            _fs.AddFile(newFileName, ms);
+            
+            ms.Close();
             bp.Dispose();
             g.Dispose();
 
-            return new System.Tuple<int, int>(widthTh, heightTh);
+            return new ResizedImage(widthTh, heightTh, newFileName);
 
         }
 
 
+    }
+
+    internal class ResizedImage
+    {
+        public ResizedImage()
+        {
+            
+        }
+
+        public ResizedImage(int width, int height, string fileName)
+        {
+            Width = width;
+            Height = height;
+            FileName = fileName;
+        }
+
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public string FileName { get; set; }
     }
 }

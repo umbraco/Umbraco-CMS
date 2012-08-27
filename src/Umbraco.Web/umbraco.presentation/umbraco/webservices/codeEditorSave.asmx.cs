@@ -148,9 +148,8 @@ namespace umbraco.presentation.webservices
                         }
                         else
                         {
-                            errorMessage = ui.Text("developer", "xsltErrorNoNodesPublished");
+                            //errorMessage = ui.Text("developer", "xsltErrorNoNodesPublished");
                             File.Delete(tempFileName);
-
                             //base.speechBubble(speechBubbleIcon.info, ui.Text("errors", "xsltErrorHeader", base.getUser()), "Unable to validate xslt as no published content nodes exist.");
                         }
                     }
@@ -287,23 +286,27 @@ namespace umbraco.presentation.webservices
                 var errorMessage = "";
                 if (!ignoreDebugging)
                 {
-                    var args = new Hashtable();
-                    var n = new Node(Document.GetRootDocuments()[0].Id);
-                    args.Add("currentPage", n);
+                    var root = Document.GetRootDocuments().FirstOrDefault();
+                    if (root != null)
+                    {
+                        var args = new Hashtable();
+                        var n = new Node(root.Id);
+                        args.Add("currentPage", n);
 
-                    try
-                    {
-                        var engine = MacroEngineFactory.GetByFilename(tempFileName);
-                        var tempErrorMessage = "";
-                        var xpath = UmbracoSettings.UseLegacyXmlSchema ? "/root/node" : "/root/*";
-                        if (
-                            !engine.Validate(fileContents, tempFileName, Node.GetNodeByXpath(xpath),
-                                             out tempErrorMessage))
-                            errorMessage = tempErrorMessage;
-                    }
-                    catch (Exception err)
-                    {
-                        errorMessage = err.ToString();
+                        try
+                        {
+                            var engine = MacroEngineFactory.GetByFilename(tempFileName);
+                            var tempErrorMessage = "";
+                            var xpath = UmbracoSettings.UseLegacyXmlSchema ? "/root/node" : "/root/*";
+                            if (
+                                !engine.Validate(fileContents, tempFileName, Node.GetNodeByXpath(xpath),
+                                                 out tempErrorMessage))
+                                errorMessage = tempErrorMessage;
+                        }
+                        catch (Exception err)
+                        {
+                            errorMessage = err.ToString();
+                        }
                     }
                 }
 

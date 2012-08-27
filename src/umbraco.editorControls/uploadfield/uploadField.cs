@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
+using Umbraco.Core.IO;
 using umbraco.interfaces;
 using umbraco.IO;
 using Content = umbraco.cms.businesslogic.Content;
@@ -18,8 +19,11 @@ namespace umbraco.editorControls
         private readonly String _thumbnails;
         private String _text;
 
+        private IMediaFileSystem _fs; 
+
         public uploadField(IData Data, string ThumbnailSizes)
         {
+            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
             _data = (cms.businesslogic.datatype.DefaultData) Data;
             _thumbnails = ThumbnailSizes;
         }
@@ -107,8 +111,6 @@ namespace umbraco.editorControls
                 // we update additional properties post image upload
                 if (_data.Value != DBNull.Value && !string.IsNullOrEmpty(_data.Value.ToString()))
                 {
-                    string fullFilePath = IOHelper.MapPath(_data.Value.ToString());
-
                     Content content = Content.GetContentFromVersion(_data.Version);
 
                     // update extension in UI
@@ -161,6 +163,7 @@ namespace umbraco.editorControls
 
         #endregion
 
+        [Obsolete("This method is now obsolete due to a change in the way that files are handled.  If you need to check if a URL for an uploaded file is safe you should implement your own as this method will be removed in a future version", false)]
         public string SafeUrl(string url)
         {
             if (!String.IsNullOrEmpty(url))
@@ -176,27 +179,29 @@ namespace umbraco.editorControls
                 Text = _data.Value.ToString();
         }
 
-        private void deleteFile(string file)
+        private void deleteFile(string fileUrl)
         {
-            if (file.Length > 0)
+            if (fileUrl.Length > 0)
             {
-                // delete old file
-                if (File.Exists(IOHelper.MapPath(file)))
-                    File.Delete(IOHelper.MapPath(file));
+                var relativeFilePath = _fs.GetRelativePath(fileUrl);
 
-                string extension = (file.Substring(file.LastIndexOf(".") + 1, file.Length - file.LastIndexOf(".") - 1));
+                // delete old file
+                if (_fs.FileExists(relativeFilePath))
+                    _fs.DeleteFile(relativeFilePath);
+
+                string extension = (relativeFilePath.Substring(relativeFilePath.LastIndexOf(".") + 1, relativeFilePath.Length - relativeFilePath.LastIndexOf(".") - 1));
                 extension = extension.ToLower();
 
                 //check for thumbnails
                 if (",jpeg,jpg,gif,bmp,png,tiff,tif,".IndexOf("," + extension + ",") > -1)
                 {
                     //delete thumbnails
-                    string thumbnailfile = file.Replace("." + extension, "_thumb");
+                    string relativeThumbFilePath = relativeFilePath.Replace("." + extension, "_thumb");
 
                     try
                     {
-                        if (File.Exists(IOHelper.MapPath(thumbnailfile + _thumbnailext)))
-                            File.Delete(IOHelper.MapPath(thumbnailfile + _thumbnailext));
+                        if (_fs.FileExists(relativeThumbFilePath + _thumbnailext))
+                            _fs.DeleteFile(relativeThumbFilePath + _thumbnailext);
                     }
                     catch
                     {
@@ -209,12 +214,12 @@ namespace umbraco.editorControls
                         {
                             if (thumb != "")
                             {
-                                string thumbnailextra = thumbnailfile + "_" + thumb + _thumbnailext;
+                                string relativeExtraThumbFilePath = relativeThumbFilePath + "_" + thumb + _thumbnailext;
 
                                 try
                                 {
-                                    if (File.Exists(IOHelper.MapPath(thumbnailextra)))
-                                        File.Delete(IOHelper.MapPath(thumbnailextra));
+                                    if (_fs.FileExists(relativeExtraThumbFilePath))
+                                        _fs.DeleteFile(relativeExtraThumbFilePath);
                                 }
                                 catch
                                 {
@@ -268,17 +273,18 @@ namespace umbraco.editorControls
         {
             if (!string.IsNullOrEmpty(Text))
             {
-                string ext = _text.Substring(_text.LastIndexOf(".") + 1, _text.Length - _text.LastIndexOf(".") - 1);
-                string fileNameThumb = _text.Replace("." + ext, "_thumb.jpg");
-                bool hasThumb = false;
+                var relativeFilePath = _fs.GetRelativePath(_text);
+                var ext = relativeFilePath.Substring(relativeFilePath.LastIndexOf(".") + 1, relativeFilePath.Length - relativeFilePath.LastIndexOf(".") - 1);
+                var relativeThumbFilePath = relativeFilePath.Replace("." + ext, "_thumb.jpg");
+                var hasThumb = false;
                 try
                 {
-                    hasThumb = File.Exists(IOHelper.MapPath(IOHelper.FindFile(fileNameThumb)));
+                    hasThumb = _fs.FileExists(relativeThumbFilePath);
                     // 4.8.0 added support for png thumbnails (but for legacy it might have been jpg - hence the check before)
                     if (!hasThumb && (ext == "gif" || ext == "png"))
                     {
-                        fileNameThumb = _text.Replace("." + ext, "_thumb.png");
-                        hasThumb = File.Exists(IOHelper.MapPath(IOHelper.FindFile(fileNameThumb)));
+                        relativeThumbFilePath = relativeFilePath.Replace("." + ext, "_thumb.png");
+                        hasThumb = _fs.FileExists(relativeThumbFilePath);
                     }
                 }
                 catch
@@ -286,17 +292,19 @@ namespace umbraco.editorControls
                 }
                 if (hasThumb)
                 {
-                    var thumb = new Image();
-                    thumb.ImageUrl = fileNameThumb;
-                    thumb.BorderStyle = BorderStyle.None;
+                    var thumb = new Image
+                    {
+                        ImageUrl = _fs.GetUrl(relativeThumbFilePath), 
+                        BorderStyle = BorderStyle.None
+                    };
 
-                    output.WriteLine("<a href=\"" + IOHelper.FindFile(_text) + "\" target=\"_blank\">");
+                    output.WriteLine("<a href=\"" + _fs.GetUrl(relativeFilePath) + "\" target=\"_blank\">");
                     thumb.RenderControl(output);
                     output.WriteLine("</a><br/>");
                 }
                 else
-                    output.WriteLine("<a href=\"" + IOHelper.FindFile(Text) + "\" target=\"_blank\">" +
-                                     IOHelper.FindFile(Text) + "</a><br/>");
+                    output.WriteLine("<a href=\"" + _fs.GetUrl(relativeFilePath) + "\" target=\"_blank\">" +
+                                     _fs.GetUrl(relativeFilePath) + "</a><br/>");
 
                 output.WriteLine("<input type=\"checkbox\" id=\"" + ClientID + "clear\" name=\"" + ClientID +
                                  "clear\" value=\"1\"/> <label for=\"" + ClientID + "clear\">" + ui.Text("uploadClear") +

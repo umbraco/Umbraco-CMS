@@ -4,6 +4,7 @@ using System.Linq;
 
 using System.Data;
 using System.Xml;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.DataLayer;
@@ -14,6 +15,7 @@ using umbraco.interfaces;
 using System.IO;
 using umbraco.IO;
 using umbraco.cms.businesslogic.datatype.controls;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic
 {
@@ -512,6 +514,11 @@ namespace umbraco.cms.businesslogic
 
             Guid newVersion = Guid.NewGuid();
             bool tempHasVersion = hasVersion();
+
+            // we need to ensure that a version in the db exist before we add related data
+            SqlHelper.ExecuteNonQuery("Insert into cmsContentVersion (ContentId,versionId,versionDate) values (" + this.Id + ",'" + newVersion + "', @updateDate)",
+                SqlHelper.CreateParameter("@updateDate", DateTime.Now));
+
             foreach (propertytype.PropertyType pt in this.ContentType.PropertyTypes)
             {
                 object oldValue = "";
@@ -526,7 +533,6 @@ namespace umbraco.cms.businesslogic
                 property.Property p = this.addProperty(pt, newVersion);
                 if (oldValue != null && oldValue.ToString() != "") p.Value = oldValue;
             }
-            SqlHelper.ExecuteNonQuery("Insert into cmsContentVersion (ContentId,versionId) values (" + this.Id + ",'" + newVersion + "')");
             this.Version = newVersion;
             return newVersion;
         }
@@ -566,8 +572,10 @@ namespace umbraco.cms.businesslogic
         protected void DeleteAssociatedMediaFiles()
         {
             // Remove all files
-            IDataType uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
 
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+            var uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+             
             foreach (Property p in GenericProperties)
             {               
                 var isUploadField = false;
@@ -575,7 +583,7 @@ namespace umbraco.cms.businesslogic
                 {
                     if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id
                          && p.Value.ToString() != ""
-                         && File.Exists(IOHelper.MapPath(p.Value.ToString())))
+                         && File.Exists(Umbraco.Core.IO.IOHelper.MapPath(p.Value.ToString())))
                     {
                         isUploadField = true;
                     }
@@ -587,14 +595,19 @@ namespace umbraco.cms.businesslogic
                     isUploadField = false;
                 }
                 if (isUploadField)
-                {                    
-                    var fi = new FileInfo(IOHelper.MapPath(p.Value.ToString()));
+                {
+                    var relativeFilePath = fs.GetRelativePath(p.Value.ToString());
+                    var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
 
-                    fi.Directory.GetFiles().ToList().ForEach(x =>
+                    // don't want to delete the media folder if not using directories.
+                    if (UmbracoSettings.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
                     {
-                        x.Delete();
-                    });
-                    fi.Directory.Delete(true);
+                        fs.DeleteDirectory(parentDirectory);
+                    }
+                    else
+                    {
+                        fs.DeleteFile(relativeFilePath, true);
+                    }
                 }
             }
         }

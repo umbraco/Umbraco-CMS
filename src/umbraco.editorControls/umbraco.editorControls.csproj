@@ -102,6 +102,10 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>Umbraco.Web</Name>
@@ -172,6 +176,11 @@
     <Compile Include="AbstractJsonPrevalueEditor.cs" />
     <Compile Include="AbstractOptions.cs" />
     <Compile Include="AbstractPrevalueEditor.cs" />
+    <Compile Include="PickerRelations\PickerRelationsDataEditor.cs" />
+    <Compile Include="PickerRelations\PickerRelationsDataType.cs" />
+    <Compile Include="PickerRelations\PickerRelationsEventHandler.cs" />
+    <Compile Include="PickerRelations\PickerRelationsOptions.cs" />
+    <Compile Include="PickerRelations\PickerRelationsPreValueEditor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -6,6 +6,7 @@ using System.Web;
 using CookComputing.Blogger;
 using CookComputing.MetaWeblog;
 using CookComputing.XmlRpc;
+using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.datatype;
@@ -24,6 +25,13 @@ namespace umbraco.presentation.channels
 {
     public abstract class UmbracoMetaWeblogAPI : XmlRpcService, IMetaWeblog
     {
+        internal readonly IMediaFileSystem _fs;
+
+        protected UmbracoMetaWeblogAPI()
+        {
+            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+        }
+
         [XmlRpcMethod("blogger.deletePost",
             Description = "Deletes a post.")]
         [return: XmlRpcReturnValue(Description = "Always returns true.")]
@@ -437,28 +445,20 @@ namespace umbraco.presentation.channels
                     Media m = Media.MakeNew(file.name, MediaType.GetByAlias(userChannel.MediaTypeAlias), u, rootNode.Id);
 
                     Property fileObject = m.getProperty(userChannel.MediaTypeFileProperty);
-                    string _fullFilePath;
-                    string filename = file.name.Replace("/", "_");
-                    // Generate file
-                    if (UmbracoSettings.UploadAllowDirectories)
-                    {
-                        // Create a new folder in the /media folder with the name /media/propertyid
-                        Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Media + "/" + fileObject.Id));
+                    
+                    var filename = file.name.Replace("/", "_");
+                    var relativeFilePath = _fs.GetRelativePath(fileObject.Id, filename);
 
-                        _fullFilePath = IOHelper.MapPath(SystemDirectories.Media + "/" + fileObject.Id + "/" + filename);
-                        fileObject.Value = SystemDirectories.Media + "/" + fileObject.Id + "/" + filename;
-                    }
-                    else
+                    fileObject.Value = _fs.GetUrl(relativeFilePath);
+                    fileUrl.url = fileObject.Value.ToString();
+
+                    if (!fileUrl.url.StartsWith("http"))
                     {
-                        filename = fileObject.Id + "-" + filename;
-                        _fullFilePath = IOHelper.MapPath(SystemDirectories.Media + "/" + filename);
-                        fileObject.Value = SystemDirectories.Media + "/" + filename;
+                        var protocol = GlobalSettings.UseSSL ? "https" : "http";
+                        fileUrl.url = protocol + "://" + HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + fileUrl.url;
                     }
 
-                    string protocol = GlobalSettings.UseSSL ? "https" : "http";
-                    fileUrl.url = protocol + "://" + HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + IOHelper.ResolveUrl(fileObject.Value.ToString());
-
-                    File.WriteAllBytes(_fullFilePath, file.bits);
+                    _fs.AddFile(relativeFilePath, new MemoryStream(file.bits));
 
                     // Try updating standard file values
                     try
@@ -484,13 +484,12 @@ namespace umbraco.presentation.channels
                             int fileWidth;
                             int fileHeight;
 
-                            FileStream fs = new FileStream(_fullFilePath,
-                                                           FileMode.Open, FileAccess.Read, FileShare.Read);
+                            var stream = _fs.OpenFile(relativeFilePath);
 
-                            Image image = Image.FromStream(fs);
+                            Image image = Image.FromStream(stream);
                             fileWidth = image.Width;
                             fileHeight = image.Height;
-                            fs.Close();
+                            stream.Close();
                             try
                             {
                                 m.getProperty("umbracoWidth").Value = fileWidth.ToString();

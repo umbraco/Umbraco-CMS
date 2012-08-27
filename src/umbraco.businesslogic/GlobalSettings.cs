@@ -16,34 +16,14 @@ namespace umbraco
     /// </summary>
     public class GlobalSettings
     {
-        #region Private static fields
-        // CURRENT UMBRACO VERSION ID
-        private static string _currentVersion = "4.8.0";
-
-        private static string _reservedUrlsCache;
-        private static string _reservedPathsCache;
-        private static StartsWithContainer _reservedList = new StartsWithContainer();
-        #endregion
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GlobalSettings"/> class.
-        /// </summary>
-        public GlobalSettings()
-        {
-        }
-
-        /// <summary>
+		
+    	/// <summary>
         /// Gets the reserved urls from web.config.
         /// </summary>
         /// <value>The reserved urls.</value>
         public static string ReservedUrls
         {
-            get
-            {
-                if (HttpContext.Current != null)
-                    return ConfigurationManager.AppSettings["umbracoReservedUrls"];
-                return String.Empty;
-            }
+            get { return Umbraco.Core.Configuration.GlobalSettings.ReservedUrls; }
         }
 
         /// <summary>
@@ -52,12 +32,7 @@ namespace umbraco
         /// <value>The reserved paths.</value>
         public static string ReservedPaths
         {
-            get
-            {
-                if (HttpContext.Current != null)
-                    return ConfigurationManager.AppSettings["umbracoReservedPaths"];
-                return String.Empty;
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.ReservedPaths; }
         }
 
         /// <summary>
@@ -66,17 +41,7 @@ namespace umbraco
         /// <value>The content XML.</value>
         public static string ContentXML
         {
-            get
-            {
-                try
-                {
-                    return ConfigurationManager.AppSettings["umbracoContentXML"];
-                }
-                catch
-                {
-                    return String.Empty;
-                }
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.ContentXml; }
         }
 
         /// <summary>
@@ -85,17 +50,7 @@ namespace umbraco
         /// <value>The storage directory.</value>
         public static string StorageDirectory
         {
-            get
-            {
-                try
-                {
-                    return ConfigurationManager.AppSettings["umbracoStorageDirectory"];
-                }
-                catch
-                {
-                    return String.Empty;
-                }
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.StorageDirectory; }
         }
 
         /// <summary>
@@ -104,18 +59,7 @@ namespace umbraco
         /// <value>The path.</value>
         public static string Path
         {
-            get
-            {
-
-                try
-                {
-                    return IOHelper.ResolveUrl(ConfigurationManager.AppSettings["umbracoPath"]);
-                }
-                catch
-                {
-                    return String.Empty;
-                }
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.Path; }
         }
 
         /// <summary>
@@ -126,10 +70,7 @@ namespace umbraco
         /// <value>The path.</value>
         public static string ClientPath
         {
-            get
-            {
-                return Path + "/../umbraco_client";
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.ClientPath; }
         }
 
         /// <summary>
@@ -138,24 +79,8 @@ namespace umbraco
         /// <value>The database connection string.</value>
         public static string DbDSN
         {
-            get
-            {
-                try
-                {
-                    return ConfigurationManager.AppSettings["umbracoDbDSN"];
-                }
-                catch
-                {
-                    return String.Empty;
-                }
-            }
-            set
-            {
-                if (DbDSN != value)
-                {
-                    SaveSetting("umbracoDbDSN", value);
-                }
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.DbDsn; }
+            set { Umbraco.Core.Configuration.GlobalSettings.DbDsn = value; }
         }
 
         /// <summary>
@@ -164,57 +89,13 @@ namespace umbraco
         /// <value>The configuration status.</value>
         public static string ConfigurationStatus
         {
-            get
-            {
-                try
-                {
-                    return ConfigurationManager.AppSettings["umbracoConfigurationStatus"];
-                }
-                catch
-                {
-                    return String.Empty;
-                }
-            }
-            set
-            {
-                SaveSetting("umbracoConfigurationStatus", value);
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus; }
+            set { Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus = value; }
         }
 
-        private static AspNetHostingPermissionLevel? m_ApplicationTrustLevel = null;
         public static AspNetHostingPermissionLevel ApplicationTrustLevel
         {
-            get
-            {
-                if (!m_ApplicationTrustLevel.HasValue)
-                {
-                    //set minimum
-                    m_ApplicationTrustLevel = AspNetHostingPermissionLevel.None;
-
-                    //determine maximum
-                    foreach (AspNetHostingPermissionLevel trustLevel in
-                            new AspNetHostingPermissionLevel[] {
-                                AspNetHostingPermissionLevel.Unrestricted,
-                                AspNetHostingPermissionLevel.High,
-                                AspNetHostingPermissionLevel.Medium,
-                                AspNetHostingPermissionLevel.Low,
-                                AspNetHostingPermissionLevel.Minimal 
-                            })
-                    {
-                        try
-                        {
-                            new AspNetHostingPermission(trustLevel).Demand();
-                            m_ApplicationTrustLevel = trustLevel;
-                            break; //we've set the highest permission we can
-                        }
-                        catch (System.Security.SecurityException)
-                        {
-                            continue;
-                        }                        
-                    }
-                }
-                return m_ApplicationTrustLevel.Value;
-            }
+			get { return Umbraco.Core.SystemUtilities.GetCurrentTrustLevel(); }
         }
 
 
@@ -224,20 +105,7 @@ namespace umbraco
         /// <value>If true, umbraco will be medium-trust compatible, no matter what Permission level the server is on.</value>
         public static bool UseMediumTrust
         {
-            get
-            {
-                try
-                {
-                    if (ApplicationTrustLevel == AspNetHostingPermissionLevel.High || ApplicationTrustLevel == AspNetHostingPermissionLevel.Unrestricted)
-                        return false;
-                    else
-                        return bool.Parse(ConfigurationManager.AppSettings["umbracoUseMediumTrust"]);
-                }
-                catch
-                {
-                    return false;
-                }
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.UseMediumTrust; }
         }
 
         /// <summary>
@@ -247,24 +115,7 @@ namespace umbraco
         /// <param name="value">Value of the setting to be saved.</param>
         protected static void SaveSetting(string key, string value)
         {
-            WebConfigurationFileMap webConfig = new WebConfigurationFileMap();
-            var vDirs = webConfig.VirtualDirectories;
-            var vDir = FullpathToRoot;
-            foreach (VirtualDirectoryMapping v in webConfig.VirtualDirectories)
-            {
-                if (v.IsAppRoot)
-                {
-                    vDir = v.PhysicalDirectory;
-                }
-            }
-            
-            XmlDocument doc = new XmlDocument();
-            doc.Load(String.Concat(vDir, "web.config"));
-            XmlNode root = doc.DocumentElement;
-            XmlNode setting = doc.SelectSingleNode(String.Concat("//appSettings/add[@key='", key, "']"));
-            setting.Attributes["value"].InnerText = value;
-            doc.Save(String.Concat(vDir, "web.config"));
-            ConfigurationManager.RefreshSection("appSettings");
+        	Umbraco.Core.Configuration.GlobalSettings.SaveSetting(key, value);
         }
 
         /// <summary>
@@ -273,7 +124,7 @@ namespace umbraco
         /// <value>The fullpath to root.</value>
         public static string FullpathToRoot
         {
-            get { return HttpRuntime.AppDomainAppPath; }
+			get { return Umbraco.Core.Configuration.GlobalSettings.FullpathToRoot; }
         }
 
         /// <summary>
@@ -282,17 +133,7 @@ namespace umbraco
         /// <value><c>true</c> if [debug mode]; otherwise, <c>false</c>.</value>
         public static bool DebugMode
         {
-            get
-            {
-                try
-                {
-                    return bool.Parse(ConfigurationManager.AppSettings["umbracoDebugMode"]);
-                }
-                catch
-                {
-                    return false;
-                }
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.DebugMode; }
         }
 
         /// <summary>
@@ -301,26 +142,7 @@ namespace umbraco
         /// <value><c>true</c> if configured; otherwise, <c>false</c>.</value>
         public static bool Configured
         {
-            get
-            {
-                try
-                {
-                    string configStatus = ConfigurationStatus;
-                    string currentVersion = CurrentVersion;
-
-
-                    if (currentVersion != configStatus)
-                        Log.Add(LogTypes.Debug, User.GetUser(0), -1,
-                                "CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus +
-                                "'");
-
-                    return (configStatus == currentVersion);
-                }
-                catch
-                {
-                    return false;
-                }
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.Configured; }
         }
 
         /// <summary>
@@ -329,17 +151,7 @@ namespace umbraco
         /// <value>The time out in minutes.</value>
         public static int TimeOutInMinutes
         {
-            get
-            {
-                try
-                {
-                    return int.Parse(ConfigurationManager.AppSettings["umbracoTimeOutInMinutes"]);
-                }
-                catch
-                {
-                    return 20;
-                }
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.TimeOutInMinutes; }
         }
 
         /// <summary>
@@ -348,17 +160,7 @@ namespace umbraco
         /// <value><c>true</c> if umbraco uses directory urls; otherwise, <c>false</c>.</value>
         public static bool UseDirectoryUrls
         {
-            get
-            {
-                try
-                {
-                    return bool.Parse(ConfigurationManager.AppSettings["umbracoUseDirectoryUrls"]);
-                }
-                catch
-                {
-                    return false;
-                }
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.UseDirectoryUrls; }
         }
 
         /// <summary>
@@ -367,17 +169,7 @@ namespace umbraco
         /// <value>The version check period in days (0 = never).</value>
         public static int VersionCheckPeriod
         {
-            get
-            {
-                int versionCheckPeriod = 7;
-                if (HttpContext.Current != null)
-                {
-                    if (int.TryParse(ConfigurationManager.AppSettings["umbracoVersionCheckPeriod"], out versionCheckPeriod))
-                        return versionCheckPeriod;
-
-                }
-                return versionCheckPeriod;
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.VersionCheckPeriod; }
         }
 
         /// <summary>
@@ -386,12 +178,7 @@ namespace umbraco
         /// <value>The URL forbitten characters.</value>
         public static string UrlForbittenCharacters
         {
-            get
-            {
-                if (HttpContext.Current != null)
-                    return ConfigurationManager.AppSettings["umbracoUrlForbittenCharacters"];
-                return "";
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.UrlForbittenCharacters; }
         }
 
         /// <summary>
@@ -400,12 +187,7 @@ namespace umbraco
         /// <value>The URL space character.</value>
         public static string UrlSpaceCharacter
         {
-            get
-            {
-                if (HttpContext.Current != null)
-                    return ConfigurationManager.AppSettings["umbracoUrlSpaceCharacter"];
-                return "";
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.UrlSpaceCharacter; }
         }
 
         /// <summary>
@@ -414,22 +196,7 @@ namespace umbraco
         /// <value>The SMTP server.</value>
         public static string SmtpServer
         {
-            get
-            {
-                try
-                {
-                    System.Net.Configuration.MailSettingsSectionGroup mailSettings = ConfigurationManager.GetSection("system.net/mailSettings") as System.Net.Configuration.MailSettingsSectionGroup;
-
-                    if (mailSettings != null)
-                        return mailSettings.Smtp.Network.Host;
-                    else
-                        return ConfigurationManager.AppSettings["umbracoSmtpServer"];
-                }
-                catch
-                {
-                    return "";
-                }
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.SmtpServer; }
         }
 
         /// <summary>
@@ -438,12 +205,7 @@ namespace umbraco
         /// <value><c>"true"</c> if version xslt extensions are disabled, otherwise, <c>"false"</c></value>
         public static string DisableXsltExtensions
         {
-            get
-            {
-                if (HttpContext.Current != null)
-                    return ConfigurationManager.AppSettings["umbracoDisableXsltExtensions"];
-                return "";
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.DisableXsltExtensions; }
         }
 
         /// <summary>
@@ -452,12 +214,7 @@ namespace umbraco
         /// <value><c>"true"</c> if Xhtml mode is enable, otherwise, <c>"false"</c></value>
         public static string EditXhtmlMode
         {
-            get
-            {
-                if (HttpContext.Current != null)
-                    return ConfigurationManager.AppSettings["umbracoEditXhtmlMode"];
-                return "";
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.EditXhtmlMode; }
         }
 
         /// <summary>
@@ -466,12 +223,7 @@ namespace umbraco
         /// <value>The default UI language.</value>
         public static string DefaultUILanguage
         {
-            get
-            {
-                if (HttpContext.Current != null)
-                    return ConfigurationManager.AppSettings["umbracoDefaultUILanguage"];
-                return "";
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.DefaultUILanguage; }
         }
 
         /// <summary>
@@ -480,12 +232,7 @@ namespace umbraco
         /// <value>The profile URL.</value>
         public static string ProfileUrl
         {
-            get
-            {
-                if (HttpContext.Current != null)
-                    return ConfigurationManager.AppSettings["umbracoProfileUrl"];
-                return "";
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.ProfileUrl; }
         }
 
         /// <summary>
@@ -496,12 +243,7 @@ namespace umbraco
         /// </value>
         public static bool HideTopLevelNodeFromPath
         {
-            get
-            {
-                if (HttpContext.Current != null)
-                    return bool.Parse(ConfigurationManager.AppSettings["umbracoHideTopLevelNodeFromPath"]);
-                return false;
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.HideTopLevelNodeFromPath; }
         }
 
         /// <summary>
@@ -510,11 +252,7 @@ namespace umbraco
         /// <value>The current version.</value>
         public static string CurrentVersion
         {
-            get
-            {
-                // change this to be hardcoded in the binary
-                return _currentVersion;
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.CurrentVersion; }
         }
 
         /// <summary>
@@ -523,11 +261,7 @@ namespace umbraco
         /// <value>The major version number.</value>
         public static int VersionMajor
         {
-            get
-            {
-                string[] version = CurrentVersion.Split(".".ToCharArray());
-                return int.Parse(version[0]);
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.VersionMajor; }
         }
 
         /// <summary>
@@ -536,11 +270,7 @@ namespace umbraco
         /// <value>The minor version number.</value>
         public static int VersionMinor
         {
-            get
-            {
-                string[] version = CurrentVersion.Split(".".ToCharArray());
-                return int.Parse(version[1]);
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.VersionMinor; }
         }
 
         /// <summary>
@@ -549,11 +279,7 @@ namespace umbraco
         /// <value>The patch version number.</value>
         public static int VersionPatch
         {
-            get
-            {
-                string[] version = CurrentVersion.Split(".".ToCharArray());
-                return int.Parse(version[2]);
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.VersionPatch; }
         }
 
         /// <summary>
@@ -562,14 +288,7 @@ namespace umbraco
         /// <value>The version comment.</value>
         public static string VersionComment
         {
-            get
-            {
-                string[] version = CurrentVersion.Split(".".ToCharArray());
-                if (version.Length > 3)
-                    return version[3];
-                else
-                    return "";
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.VersionComment; }
         }
 
 
@@ -580,12 +299,12 @@ namespace umbraco
         /// <returns></returns>
         public static bool RequestIsInUmbracoApplication(HttpContext context)
         {
-            return context.Request.Path.ToLower().IndexOf(IOHelper.ResolveUrl(SystemDirectories.Umbraco).ToLower()) > -1;
+        	return Umbraco.Core.Configuration.GlobalSettings.RequestIsInUmbracoApplication(context);
         }
 
         public static bool RequestIsLiveEditRedirector(HttpContext context)
         {
-            return context.Request.Path.ToLower().IndexOf(SystemDirectories.Umbraco.ToLower() + "/liveediting.aspx") > -1;
+			return Umbraco.Core.Configuration.GlobalSettings.RequestIsLiveEditRedirector(context);
         }
 
         /// <summary>
@@ -594,17 +313,7 @@ namespace umbraco
         /// <value><c>true</c> if [use SSL]; otherwise, <c>false</c>.</value>
         public static bool UseSSL
         {
-            get
-            {
-                try
-                {
-                    return bool.Parse(ConfigurationManager.AppSettings["umbracoUseSSL"]);
-                }
-                catch
-                {
-                    return false;
-                }
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.UseSSL; }
         }
 
         /// <summary>
@@ -613,40 +322,7 @@ namespace umbraco
         /// <value>The license.</value>
         public static string License
         {
-            get
-            {
-                string license =
-                    "<A href=\"http://umbraco.org/redir/license\" target=\"_blank\">the open source license MIT</A>. The umbraco UI is freeware licensed under the umbraco license.";
-                if (HttpContext.Current != null)
-                {
-                    XmlDocument versionDoc = new XmlDocument();
-                    XmlTextReader versionReader = new XmlTextReader(IOHelper.MapPath(SystemDirectories.Umbraco + "/version.xml"));
-                    versionDoc.Load(versionReader);
-                    versionReader.Close();
-
-                    // check for license
-                    try
-                    {
-                        string licenseUrl =
-                            versionDoc.SelectSingleNode("/version/licensing/licenseUrl").FirstChild.Value;
-                        string licenseValidation =
-                            versionDoc.SelectSingleNode("/version/licensing/licenseValidation").FirstChild.Value;
-                        string licensedTo =
-                            versionDoc.SelectSingleNode("/version/licensing/licensedTo").FirstChild.Value;
-
-                        if (licensedTo != "" && licenseUrl != "")
-                        {
-                            license = "umbraco Commercial License<br/><b>Registered to:</b><br/>" +
-                                      licensedTo.Replace("\n", "<br/>") + "<br/><b>For use with domain:</b><br/>" +
-                                      licenseUrl;
-                        }
-                    }
-                    catch
-                    {
-                    }
-                }
-                return license;
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.License; }
         }
 
 
@@ -656,34 +332,7 @@ namespace umbraco
         /// <value><c>true</c> if succesfull; otherwise, <c>false</c>.</value>
         public static bool test
         {
-            get
-            {
-                try
-                {
-                    HttpContext.Current.Response.Write("ContentXML :" + ContentXML + "\n");
-                    HttpContext.Current.Response.Write("DbDSN :" + DbDSN + "\n");
-                    HttpContext.Current.Response.Write("DebugMode :" + DebugMode + "\n");
-                    HttpContext.Current.Response.Write("DefaultUILanguage :" + DefaultUILanguage + "\n");
-                    HttpContext.Current.Response.Write("VersionCheckPeriod :" + VersionCheckPeriod + "\n");
-                    HttpContext.Current.Response.Write("DisableXsltExtensions :" + DisableXsltExtensions + "\n");
-                    HttpContext.Current.Response.Write("EditXhtmlMode :" + EditXhtmlMode + "\n");
-                    HttpContext.Current.Response.Write("HideTopLevelNodeFromPath :" + HideTopLevelNodeFromPath + "\n");
-                    HttpContext.Current.Response.Write("Path :" + Path + "\n");
-                    HttpContext.Current.Response.Write("ProfileUrl :" + ProfileUrl + "\n");
-                    HttpContext.Current.Response.Write("ReservedPaths :" + ReservedPaths + "\n");
-                    HttpContext.Current.Response.Write("ReservedUrls :" + ReservedUrls + "\n");
-                    HttpContext.Current.Response.Write("StorageDirectory :" + StorageDirectory + "\n");
-                    HttpContext.Current.Response.Write("TimeOutInMinutes :" + TimeOutInMinutes + "\n");
-                    HttpContext.Current.Response.Write("UrlForbittenCharacters :" + UrlForbittenCharacters + "\n");
-                    HttpContext.Current.Response.Write("UrlSpaceCharacter :" + UrlSpaceCharacter + "\n");
-                    HttpContext.Current.Response.Write("UseDirectoryUrls :" + UseDirectoryUrls + "\n");
-                    return true;
-                }
-                catch
-                {
-                }
-                return false;
-            }
+			get { return Umbraco.Core.Configuration.GlobalSettings.Test; }
         }
 
 
@@ -696,48 +345,7 @@ namespace umbraco
         /// </returns>
         public static bool IsReservedPathOrUrl(string url)
         {
-            // check if GlobalSettings.ReservedPaths and GlobalSettings.ReservedUrls are unchanged
-            if (!object.ReferenceEquals(_reservedPathsCache, GlobalSettings.ReservedPaths)
-                || !object.ReferenceEquals(_reservedUrlsCache, GlobalSettings.ReservedUrls))
-            {
-                // store references to strings to determine changes
-                _reservedPathsCache = GlobalSettings.ReservedPaths;
-                _reservedUrlsCache = GlobalSettings.ReservedUrls;
-
-                string _root = SystemDirectories.Root.Trim().ToLower();
-
-                // add URLs and paths to a new list
-                StartsWithContainer _newReservedList = new StartsWithContainer();
-                foreach (string reservedUrl in _reservedUrlsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    //resolves the url to support tilde chars
-                    string reservedUrlTrimmed = IOHelper.ResolveUrl(reservedUrl).Trim().ToLower();
-                    if (reservedUrlTrimmed.Length > 0)
-                        _newReservedList.Add(reservedUrlTrimmed);
-                }
-
-                foreach (string reservedPath in _reservedPathsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    bool trimEnd = !reservedPath.EndsWith("/");
-                    //resolves the url to support tilde chars
-                    string reservedPathTrimmed = IOHelper.ResolveUrl(reservedPath).Trim().ToLower();
-
-                    if (reservedPathTrimmed.Length > 0)
-                        _newReservedList.Add(reservedPathTrimmed + (reservedPathTrimmed.EndsWith("/") ? "" : "/"));
-                }
-
-                // use the new list from now on
-                _reservedList = _newReservedList;
-            }
-
-            string res = "";
-            foreach (string st in _reservedList._list.Keys)
-                res += st + ",";
-
-            HttpContext.Current.Trace.Write("umbracoGlobalsettings", "reserverd urls: '" + res + "'");
-
-            // return true if url starts with an element of the reserved list
-            return _reservedList.StartsWith(url.ToLower());
+        	return Umbraco.Core.Configuration.GlobalSettings.IsReservedPathOrUrl(url);
         }
     }
 
@@ -747,6 +355,7 @@ namespace umbraco
     /// Structure that checks in logarithmic time
     /// if a given string starts with one of the added keys.
     /// </summary>
+	[Obsolete("Use Umbraco.Core.Configuration.GlobalSettings.StartsWithContainer container instead")]
     public class StartsWithContainer
     {
         /// <summary>Internal sorted list of keys.</summary>

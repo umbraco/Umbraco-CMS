@@ -71,9 +71,11 @@ namespace umbraco.cms.businesslogic.media
     public class PostedMediaFile
     {
         public string FileName { get; set; }
+        public string DisplayName { get; set; }
         public string ContentType { get; set; }
         public int ContentLength { get; set; }
         public Stream InputStream { get; set; }
+        public bool ReplaceExisting { get; set; }
 
         public void SaveAs(string filename)
         {

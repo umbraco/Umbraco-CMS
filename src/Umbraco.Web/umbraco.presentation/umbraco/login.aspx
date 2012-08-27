@@ -6,7 +6,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" >
 <html>
 <head runat="server">
-    <title>Umbraco - login</title>
+    <title>Login - Umbraco - <%=Request.Url.Host.ToLower().Replace("www.", "") %></title>
     <cc1:UmbracoClientDependencyLoader runat="server" ID="ClientLoader" />
     <umb:CssInclude ID="CssInclude1" runat="server" FilePath="ui/default.css" PathNameAlias="UmbracoClient" />
     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" />
