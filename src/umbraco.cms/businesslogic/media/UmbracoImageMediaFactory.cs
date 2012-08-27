@@ -54,10 +54,10 @@ namespace umbraco.cms.businesslogic.media
 
             // Generate thumbnail
             var thumbDestFilePath = Path.Combine(Path.GetDirectoryName(destFilePath), Path.GetFileNameWithoutExtension(destFilePath) + "_thumb");
-            GenerateThumbnail(image, 100, fileWidth, fileHeight, thumbDestFilePath + ".jpg");
+            GenerateThumbnail(image, 100, fileWidth, fileHeight, ext, thumbDestFilePath + ".jpg");
 
             // Generate additional thumbnails based on PreValues set in DataTypeDefinition uploadField
-            GenerateAdditionalThumbnails(image, fileWidth, fileHeight, thumbDestFilePath);
+            GenerateAdditionalThumbnails(image, fileWidth, fileHeight, ext, thumbDestFilePath);
 
             image.Dispose();
 
@@ -67,7 +67,7 @@ namespace umbraco.cms.businesslogic.media
             media.Save();
         }
 
-        private void GenerateAdditionalThumbnails(Image image, int fileWidth, int fileHeight, string destFilePath)
+        private void GenerateAdditionalThumbnails(Image image, int fileWidth, int fileHeight, string ext, string destFilePath)
         {
             var uploadFieldDataTypeId = new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c");
 
@@ -94,14 +94,14 @@ namespace umbraco.cms.businesslogic.media
                     var thumbnailSizes = thumbnails.Split(";".ToCharArray());
                     foreach (var thumb in thumbnailSizes.Where(thumb => thumb != ""))
                     {
-                        GenerateThumbnail(image, int.Parse(thumb), fileWidth, fileHeight,
+                        GenerateThumbnail(image, int.Parse(thumb), fileWidth, fileHeight, ext,
                                           destFilePath + "_" + thumb + ".jpg");
                     }
                 }
             }
         }
 
-        private void GenerateThumbnail(Image image, int maxWidthHeight, int fileWidth, int fileHeight, string thumbnailFileName)
+        private void GenerateThumbnail(Image image, int maxWidthHeight, int fileWidth, int fileHeight, string ext, string thumbnailFileName)
         {
             // Generate thumbnailee
             var fx = (float)fileWidth / maxWidthHeight;
@@ -132,11 +132,10 @@ namespace umbraco.cms.businesslogic.media
             // Copy metadata
             var codecs = ImageCodecInfo.GetImageEncoders();
             ImageCodecInfo codec = null;
-            for (var i = 0; codec == null && i < codecs.Length; i++)
-            {
-                if (codecs[i].MimeType.Equals("image/jpeg"))
-                    codec = codecs[i];
-            }
+            if (ext.ToLower() == "png" || ext.ToLower() == "gif")
+                codec = codecs.Single(t => t.MimeType.Equals("image/png"));
+            else
+                codec = codecs.Single(t => t.MimeType.Equals("image/jpeg"));
 
             // Set compresion ratio to 90%
             var ep = new EncoderParameters();
