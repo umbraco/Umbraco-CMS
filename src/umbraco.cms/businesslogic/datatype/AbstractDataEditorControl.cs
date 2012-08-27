@@ -80,7 +80,7 @@ namespace umbraco.cms.businesslogic.datatype
         ///   <c>true</c> if [show label]; otherwise, <c>false</c>.
         /// </value>
         public virtual bool ShowLabel
-        {
+        { 
             get
             {
                 return true;
@@ -103,7 +103,7 @@ namespace umbraco.cms.businesslogic.datatype
         }
 
         /// <summary>
-        /// Gets the editor control
+        /// Gets the editor control.
         /// </summary>
         /// <value>
         /// The editor.
