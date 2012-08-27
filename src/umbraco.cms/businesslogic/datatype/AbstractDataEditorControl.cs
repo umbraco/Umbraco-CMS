@@ -26,7 +26,13 @@ namespace umbraco.cms.businesslogic.datatype
         /// <summary>
         /// The save event handler
         /// </summary>
-        public event EventHandler OnSave;
+        /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
+        public delegate void SaveEventHandler(EventArgs e);
+
+        /// <summary>
+        /// Occurs when [on save].
+        /// </summary>
+        public event SaveEventHandler OnSave;
 
         /// <summary>
         /// Gets or sets the control.
@@ -141,7 +147,7 @@ namespace umbraco.cms.businesslogic.datatype
         {
             if (this.OnSave != null)
             {
-                this.OnSave(this, e);
+                this.OnSave(e);
             }
         }
     }
