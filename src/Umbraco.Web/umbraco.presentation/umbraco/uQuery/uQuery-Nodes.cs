@@ -182,7 +182,7 @@ namespace umbraco
 			// TODO: [LK] use uQuery.GetNodeIdByPathLevel
 			var nodeIds = path.Split(',').ToList();
 
-			if (nodeIds.Count <= level)
+			if (nodeIds.Count > level)
 			{
 				return nodeIds[level];
 			}
