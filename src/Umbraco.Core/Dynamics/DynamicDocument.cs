@@ -13,6 +13,10 @@ using System.Xml.Linq;
 
 namespace Umbraco.Core.Dynamics
 {
+	
+	/// <summary>
+	/// The dynamic model for views
+	/// </summary>
 	public class DynamicDocument : DynamicObject
 	{
 		private readonly DynamicBackingItem _backingItem;
@@ -943,7 +947,7 @@ namespace Umbraco.Core.Dynamics
 				var umbracoNaviHide = _backingItem.GetUserProperty("umbracoNaviHide");
 				if (umbracoNaviHide != null)
 				{
-					return umbracoNaviHide.Value != "1";
+					return umbracoNaviHide.Value.ToString().Trim() != "1";
 				}
 				return true;
 			}
@@ -1083,18 +1087,7 @@ namespace Umbraco.Core.Dynamics
 		}
 
 		#endregion
-
-		//public System.Data.DataTable ChildrenAsTable()
-		//{
-		//    if (_n == null) return null;
-		//    return _n.ChildrenAsTable();
-		//}
-
-		//public System.Data.DataTable ChildrenAsTable(string nodeTypeAliasFilter)
-		//{
-		//    if (_n == null) return null;
-		//    return _n.ChildrenAsTable(nodeTypeAliasFilter);
-		//}
+		
 		public bool IsNull(string alias, bool recursive)
 		{
 			var prop = _backingItem.GetUserProperty(alias, recursive);
@@ -1481,6 +1474,15 @@ namespace Umbraco.Core.Dynamics
 				return true;
 			}
 			return false;
+		}
+
+		/// <summary>
+		/// Returns the value as as string regardless of xml content or data type
+		/// </summary>
+		/// <returns></returns>
+		public override string ToString()
+		{
+			return base.ToString();
 		}
 	}
 }

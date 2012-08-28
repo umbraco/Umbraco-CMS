@@ -56,20 +56,34 @@ namespace Umbraco.Core.Dynamics
 
 			//TODO: We MUST cache the result here, it is very expensive to keep finding extension methods and processing this stuff!
 
+			//TODO: Nowhere here are we checking if args is the correct length!
+
+			//NOTE: For many of these we could actually leave them out since we are executing custom extension methods and because
+			// we implement IEnumerable<T> they will execute just fine, however, to do that will be quite a bit slower than checking here.
+
             var name = binder.Name;
             if (name == "Where")
             {
                 string predicate = args.First().ToString();
                 var values = args.Skip(1).ToArray();
-                result = new DynamicDocumentList(this.Where<DynamicDocument>(predicate, values).ToList());
+				//TODO: We are pre-resolving the where into a ToList() here which will have performance impacts if there where clauses
+				// are nested! We should somehow support an QueryableDocumentList!
+				result = new DynamicDocumentList(this.Where<DynamicDocument>(predicate, values).ToList());				
                 return true;
             }
             if (name == "OrderBy")
             {
-                result = new DynamicDocumentList(this.OrderBy<DynamicDocument>(args.First().ToString()).ToList());
+				//TODO: We are pre-resolving the where into a ToList() here which will have performance impacts if there where clauses
+				// are nested! We should somehow support an QueryableDocumentList!
+				result = new DynamicDocumentList(this.OrderBy<DynamicDocument>(args.First().ToString()).ToList());
                 return true;
             }
-            if (name == "InGroupsOf")
+			if (name == "Take")
+			{
+				result = new DynamicDocumentList(this.Take((int)args.First()));
+				return true;
+			}
+        	if (name == "InGroupsOf")
             {
                 int groupSize = 0;
                 if (int.TryParse(args.First().ToString(), out groupSize))
@@ -105,12 +119,12 @@ namespace Umbraco.Core.Dynamics
             {
                 if ((args.First() as IEnumerable<DynamicDocument>) != null)
                 {
-                    result = new DynamicDocumentList(this.Items.Union(args.First() as IEnumerable<DynamicDocument>));
+					result = new DynamicDocumentList(this.Items.Union(args.First() as IEnumerable<DynamicDocument>));
                     return true;
                 }
                 if ((args.First() as DynamicDocumentList) != null)
                 {
-                    result = new DynamicDocumentList(this.Items.Union((args.First() as DynamicDocumentList).Items));
+					result = new DynamicDocumentList(this.Items.Union((args.First() as DynamicDocumentList).Items));				
                     return true;
                 }
             }
@@ -118,12 +132,12 @@ namespace Umbraco.Core.Dynamics
             {
                 if ((args.First() as IEnumerable<DynamicDocument>) != null)
                 {
-                    result = new DynamicDocumentList(this.Items.Except(args.First() as IEnumerable<DynamicDocument>, new DynamicDocumentIdEqualityComparer()));
+					result = new DynamicDocumentList(this.Items.Except(args.First() as IEnumerable<DynamicDocument>, new DynamicDocumentIdEqualityComparer()));					
                     return true;
                 }
                 if ((args.First() as DynamicDocumentList) != null)
                 {
-                    result = new DynamicDocumentList(this.Items.Except((args.First() as DynamicDocumentList).Items, new DynamicDocumentIdEqualityComparer()));
+					result = new DynamicDocumentList(this.Items.Except((args.First() as DynamicDocumentList).Items, new DynamicDocumentIdEqualityComparer()));
                     return true;
                 }
             }
@@ -131,12 +145,12 @@ namespace Umbraco.Core.Dynamics
             {
                 if ((args.First() as IEnumerable<DynamicDocument>) != null)
                 {
-                    result = new DynamicDocumentList(this.Items.Intersect(args.First() as IEnumerable<DynamicDocument>, new DynamicDocumentIdEqualityComparer()));
+					result = new DynamicDocumentList(this.Items.Intersect(args.First() as IEnumerable<DynamicDocument>, new DynamicDocumentIdEqualityComparer()));					
                     return true;
                 }
                 if ((args.First() as DynamicDocumentList) != null)
                 {
-                    result = new DynamicDocumentList(this.Items.Intersect((args.First() as DynamicDocumentList).Items, new DynamicDocumentIdEqualityComparer()));
+					result = new DynamicDocumentList(this.Items.Intersect((args.First() as DynamicDocumentList).Items, new DynamicDocumentIdEqualityComparer()));
                     return true;
                 }
             }
@@ -376,11 +390,17 @@ namespace Umbraco.Core.Dynamics
                     var genericArgs = (new[] { this }).Concat(args);
 					result = toExecute.Invoke(null, genericArgs.ToArray());
                 }
-                else
-                {
-                    var genericArgs = (new[] { Items }).Concat(args);
+				else if (TypeHelper.IsTypeAssignableFrom<IQueryable>(toExecute.GetParameters().First().ParameterType))
+				{
+					//if it is IQueryable, we'll need to cast Items AsQueryable
+					var genericArgs = (new[] { Items.AsQueryable() }).Concat(args);
 					result = toExecute.Invoke(null, genericArgs.ToArray());
-                }
+				}
+				else
+				{
+					var genericArgs = (new[] { Items }).Concat(args);
+					result = toExecute.Invoke(null, genericArgs.ToArray());
+				}
             }
             else
             {
@@ -418,6 +438,10 @@ namespace Umbraco.Core.Dynamics
 		//    return Items.GetEnumerator();
 		//}
 
+		//public IQueryable Take<T>(int count)
+		//{
+		//    return ((IQueryable<T>)Items.AsQueryable()).Take(count);
+		//}
         public IQueryable<T> Where<T>(string predicate, params object[] values)
         {
             return ((IQueryable<T>)Items.AsQueryable()).Where(predicate, values);
@@ -428,7 +452,7 @@ namespace Umbraco.Core.Dynamics
         }
         public DynamicGrouping GroupBy<T>(string key)
         {
-            DynamicGrouping group = new DynamicGrouping(this, key);
+            var group = new DynamicGrouping(this, key);
             return group;
         }
         public DynamicGrouping GroupedInto<T>(int groupCount)
@@ -462,7 +486,7 @@ namespace Umbraco.Core.Dynamics
 
         public IQueryable Select(string predicate, params object[] values)
         {
-            return DynamicQueryable.Select(Items.AsQueryable(), predicate, values);
+            return Items.AsQueryable().Select(predicate, values);
         }
 
         public void Add(DynamicDocument document)

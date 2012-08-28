@@ -18,7 +18,58 @@ namespace Umbraco.Tests.DynamicDocument
 		/// <param name="id"></param>
 		/// <returns></returns>
 		protected abstract dynamic GetDynamicNode(int id);
-		
+
+		[Test]
+		public void Children_Order_By_Update_Date()
+		{
+			var asDynamic = GetDynamicNode(1173);
+
+			var ordered = asDynamic.Children.OrderBy("UpdateDate");
+			var casted = (IEnumerable<TDocument>)ordered;
+
+			var correctOrder = new[] { 1178, 1177, 1174, 1176 };
+			for (var i = 0; i < correctOrder.Length ;i++)
+			{
+				Assert.AreEqual(correctOrder[i], ((dynamic)casted.ElementAt(i)).Id);
+			}
+
+		}
+
+		[Test]
+		public void Take()
+		{
+			var asDynamic = GetDynamicNode(1173);
+
+			var ordered = asDynamic.Children.OrderBy("UpdateDate");
+			var take = ordered.Take(2);
+			var casted = (IEnumerable<TDocument>)take;
+
+			Assert.AreEqual(2, casted.Count());
+
+		}
+
+		[Test]
+		public void Ancestors_Where_Visible()
+		{
+			var asDynamic = GetDynamicNode(1174);
+
+			var whereVisible = asDynamic.Ancestors().Where("Visible");
+			var casted = (IEnumerable<TDocument>)whereVisible;
+
+			Assert.AreEqual(1, casted.Count());
+			
+		}
+
+		[Test]
+		public void Visible()
+		{
+			var asDynamicHidden = GetDynamicNode(1046);
+			var asDynamicVisible = GetDynamicNode(1173);
+
+			Assert.IsFalse(asDynamicHidden.Visible);
+			Assert.IsTrue(asDynamicVisible.Visible);
+		}
+
 		[Test]
 		public void Ensure_TinyMCE_Converted_Type_User_Property()
 		{

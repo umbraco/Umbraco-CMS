@@ -52,6 +52,12 @@ namespace Umbraco.Web.Mvc
 		public dynamic CurrentPage { get; private set; }
 
 		private ICultureDictionary _cultureDictionary;
+
+		/// <summary>
+		/// Returns the dictionary value for the key specified
+		/// </summary>
+		/// <param name="key"></param>
+		/// <returns></returns>
 		public string GetDictionaryValue(string key)
 		{
 			if (_cultureDictionary == null)

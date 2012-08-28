@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Dynamic;
+using Umbraco.Core;
 using umbraco.interfaces;
 using System.Collections;
 using System.Reflection;
@@ -78,6 +79,11 @@ namespace umbraco.MacroEngines
                 result = new DynamicNodeList(this.OrderBy<DynamicNode>(args.First().ToString()).ToList());
                 return true;
             }
+			if (name == "Take")
+			{
+				result = new DynamicNodeList(this.Take((int)args.First()));
+				return true;
+			}
             if (name == "InGroupsOf")
             {
                 int groupSize = 0;
@@ -375,6 +381,12 @@ namespace umbraco.MacroEngines
                     var genericArgs = (new[] { this }).Concat(args);
                     result = methodToExecute.Invoke(null, genericArgs.ToArray());
                 }
+				else if (TypeHelper.IsTypeAssignableFrom<IQueryable>(methodToExecute.GetParameters().First().ParameterType))
+				{
+					//if it is IQueryable, we'll need to cast Items AsQueryable
+					var genericArgs = (new[] { Items.AsQueryable() }).Concat(args);
+					result = methodToExecute.Invoke(null, genericArgs.ToArray());
+				}
                 else
                 {
                     var genericArgs = (new[] { Items }).Concat(args);
