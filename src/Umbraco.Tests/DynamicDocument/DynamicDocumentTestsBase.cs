@@ -36,16 +36,39 @@ namespace Umbraco.Tests.DynamicDocument
 		}
 
 		[Test]
-		public void Take()
+		public void HasProperty()
 		{
 			var asDynamic = GetDynamicNode(1173);
 
-			var ordered = asDynamic.Children.OrderBy("UpdateDate");
-			var take = ordered.Take(2);
+			var hasProp = asDynamic.HasProperty("umbracoUrlAlias");
+
+			Assert.AreEqual(true, (bool)hasProp);
+
+		}
+
+		[Test]
+		public void Skip()
+		{
+			var asDynamic = GetDynamicNode(1173);
+
+			var skip = asDynamic.Children.Skip(2);
+			var casted = (IEnumerable<TDocument>)skip;
+
+			Assert.AreEqual(2, casted.Count());
+			Assert.IsTrue(casted.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[]{1177, 1178}));
+
+		}
+
+		[Test]
+		public void Take()
+		{
+			var asDynamic = GetDynamicNode(1173);
+			
+			var take = asDynamic.Children.Take(2);
 			var casted = (IEnumerable<TDocument>)take;
 
 			Assert.AreEqual(2, casted.Count());
-
+			Assert.IsTrue(casted.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1174, 1176 }));
 		}
 
 		[Test]

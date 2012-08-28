@@ -84,6 +84,11 @@ namespace umbraco.MacroEngines
 				result = new DynamicNodeList(this.Take((int)args.First()));
 				return true;
 			}
+			if (name == "Skip")
+			{
+				result = new DynamicNodeList(this.Skip((int)args.First()));
+				return true;
+			}
             if (name == "InGroupsOf")
             {
                 int groupSize = 0;

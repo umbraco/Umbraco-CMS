@@ -83,6 +83,11 @@ namespace Umbraco.Core.Dynamics
 				result = new DynamicDocumentList(this.Take((int)args.First()));
 				return true;
 			}
+			if (name == "Skip")
+			{
+				result = new DynamicDocumentList(this.Skip((int)args.First()));
+				return true;
+			}
         	if (name == "InGroupsOf")
             {
                 int groupSize = 0;
