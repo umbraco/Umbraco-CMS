@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Web;
 using log4net;
 
 namespace Umbraco.Core.Logging
@@ -190,7 +191,7 @@ namespace Umbraco.Core.Logging
 		}
 
 		/// <summary>
-		/// Debugs a message, only generating the message if tracing is actually enabled. Use this method to avoid calling any long-running methods such as "ToDebugString" if logging is disabled.
+		/// Debugs a message, only generating the message if debug is actually enabled. Use this method to avoid calling any long-running methods such as "ToDebugString" if logging is disabled.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="generateMessageFormat">The generate message format.</param>
@@ -200,6 +201,22 @@ namespace Umbraco.Core.Logging
 		{
 			Debug(typeof(T), generateMessageFormat, formatItems);
 		}
+
+		/// <summary>
+		/// Debugs a message and also writes to the TraceContext specified, useful for when you would like the debug
+		/// output also displayed in the Http trace output.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="generateMessageFormat"></param>
+		/// <param name="trace"></param>
+		/// <param name="formatItems"></param>
+		public static void Debug<T>(string generateMessageFormat, TraceContext trace, params Func<object>[] formatItems)
+		{
+			if (trace == null) throw new ArgumentNullException("trace");
+			trace.Write(string.Format(generateMessageFormat, formatItems.Select(x => x())));
+			Debug(typeof(T), generateMessageFormat, formatItems);
+		}
+
 		#endregion
 		
 	}

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Web;
 using System.Web.Routing;
@@ -6,6 +6,7 @@ using System.Web.UI;
 using System.IO;
 using System.Xml;
 using System.Text.RegularExpressions;
+using Umbraco.Core.Logging;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Configuration;
@@ -16,16 +17,17 @@ using umbraco.cms.businesslogic;
 namespace umbraco
 {
 	/// <summary>
-	/// Summary description for WebForm1.
+	/// The codebehind class for the main default.aspx page that does the webforms rendering in Umbraco
 	/// </summary>
-	/// 
-	public partial class UmbracoDefault : Page
+	/// <remarks>
+	/// We would move this to the UI project but there is a public API property and some protected properties which people may be using so 
+	/// we cannot move it.
+	/// </remarks>
+	public class UmbracoDefault : Page
 	{
 		private page _upage = null;
 		private DocumentRequest _docRequest = null;
 		bool _validateRequest = true;
-
-		const string TraceCategory = "UmbracoDefault";
 
 		/// <summary>
 		/// To turn off request validation set this to false before the PageLoad event. This equivalent to the validateRequest page directive
@@ -40,8 +42,7 @@ namespace umbraco
 		// fixme - switch over to OnPreInit override
 		void Page_PreInit(Object sender, EventArgs e)
 		{
-			Trace.Write(TraceCategory, "Begin PreInit");
-			
+
 			//TODO: This still a bunch of routing stuff being handled here, this all needs to be handled in the HttpModule instead
 
 			// get the document request
@@ -111,12 +112,10 @@ namespace umbraco
 			}
 
 			// reset the friendly path so it's used by forms, etc.
-			Trace.Write(TraceCategory, string.Format("Reset url to \"{0}\"", UmbracoContext.Current.RequestUrl));
+			LogHelper.Debug<UmbracoDefault>(string.Format("Reset url to \"{0}\"", UmbracoContext.Current.RequestUrl));
 			Context.RewritePath(UmbracoContext.Current.RequestUrl.PathAndQuery);
 
 			Context.Items.Add("pageElements", _upage.Elements); // legacy - fixme
-
-			Trace.Write(TraceCategory, "End PreInit");
 		}
 
 		void OnPreInitLegacy()
@@ -153,7 +152,7 @@ namespace umbraco
 
 				if (cultureAlias != null)
 				{
-					UmbracoContext.Current.HttpContext.Trace.Write("default.aspx", "Culture changed to " + cultureAlias);
+					LogHelper.Debug<UmbracoDefault>("Culture changed to " + cultureAlias, Context.Trace);
 					var culture = new System.Globalization.CultureInfo(cultureAlias);
 					Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = culture;
 				}
@@ -191,7 +190,7 @@ namespace umbraco
 			// filter / add preview banner
 			if (UmbracoContext.Current.InPreviewMode)
 			{
-				Trace.Write("Runtime Engine", "Umbraco is running in preview mode.");
+				LogHelper.Debug<UmbracoDefault>("Umbraco is running in preview mode.", Context.Trace);
 
 				if (Response.ContentType == "text/HTML") // ASP.NET default value
 				{
@@ -200,8 +199,8 @@ namespace umbraco
 					{
 						string htmlBadge =
 							String.Format(UmbracoSettings.PreviewBadge,
-								umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco),
-								umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco_client),
+								IOHelper.ResolveUrl(SystemDirectories.Umbraco),
+								IOHelper.ResolveUrl(SystemDirectories.UmbracoClient),
 								Server.UrlEncode(UmbracoContext.Current.HttpContext.Request.Path));
 
 						text = text.Substring(0, pos) + htmlBadge + text.Substring(pos, text.Length - pos);

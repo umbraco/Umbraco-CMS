@@ -60,6 +60,18 @@ namespace Umbraco.Tests.DynamicDocument
 		}
 
 		[Test]
+		public void HasValue()
+		{
+			var asDynamic = GetDynamicNode(1173);
+
+			var hasValue = asDynamic.HasValue("umbracoUrlAlias");
+			var noValue = asDynamic.HasValue("blahblahblah");
+
+			Assert.IsTrue(hasValue);
+			Assert.IsFalse(noValue);
+		}
+
+		[Test]
 		public void Take()
 		{
 			var asDynamic = GetDynamicNode(1173);
