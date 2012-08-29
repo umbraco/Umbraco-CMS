@@ -100,11 +100,15 @@ namespace Umbraco.Web
 					httpContext.Response.Redirect(docreq.RedirectUrl, true);
 				//set the culture on the thread
 				Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = docreq.Culture;
-				//find the document
-				searcher.LookupDocument();
+				//find the document, found will be true if the doc request has found BOTH a node and a template
+				var found = searcher.LookupDocument();
 				//redirect if it has been flagged
 				if (docreq.IsRedirect)
 					httpContext.Response.Redirect(docreq.RedirectUrl, true);
+				
+				//TODO: Here I think we need to put the logic in to do what default.aspx is doing for the most part, 
+				// especially assigning the pageID of the httpcontext so we can render macros in MVC 
+
 				//if no doc is found, send to our not found handler
 				if (docreq.Is404)
 				{
@@ -113,6 +117,7 @@ namespace Umbraco.Web
 				else
 				{
 					//TODO: Detect MVC vs WebForms
+					
 					var isMvc = true;
 					RewriteToUmbracoHandler(HttpContext.Current, uri.Query, isMvc);
 				}

@@ -81,11 +81,13 @@ namespace umbraco
 				// use the DocumentRequest if it has resolved
 				// else it means that no lookup could find a document to render
 				// or that the document to render has no template... 
+
+				//TODO: Will HasTemplate ever be false here??
 				if (_docRequest.HasNode && _docRequest.HasTemplate)
 				{
 					_upage = new page(_docRequest);
 					UmbracoContext.Current.HttpContext.Items["pageID"] = _docRequest.NodeId; // legacy - fixme
-					var templatePath = umbraco.IO.SystemDirectories.Masterpages + "/" + _docRequest.Template.Alias.Replace(" ", "") + ".master"; // fixme - should be in .Template!
+					var templatePath = SystemDirectories.Masterpages + "/" + _docRequest.Template.Alias.Replace(" ", "") + ".master"; // fixme - should be in .Template!
 					this.MasterPageFile = templatePath; // set the template
 				}
 				else

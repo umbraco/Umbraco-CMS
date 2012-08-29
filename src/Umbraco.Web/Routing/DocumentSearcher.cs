@@ -126,7 +126,6 @@ namespace Umbraco.Web.Routing
 				// handle not found
 				if (!_documentRequest.HasNode)
 				{
-					_documentRequest.Is404 = true;
 					LogHelper.Debug<DocumentRequest>("{0}No document, try last chance lookup", () => tracePrefix);
 
 					// if it fails then give up, there isn't much more that we can do
@@ -136,10 +135,8 @@ namespace Umbraco.Web.Routing
 						LogHelper.Debug<DocumentRequest>("{0}Failed to find a document, give up", () => tracePrefix);
 						break;
 					}
-					else
-					{
-						LogHelper.Debug<DocumentRequest>("{0}Found a document", () => tracePrefix);
-					}
+					
+					LogHelper.Debug<DocumentRequest>("{0}Found a document", () => tracePrefix);
 				}
 
 				// follow internal redirects as long as it's not running out of control ie infinite loop of some sort

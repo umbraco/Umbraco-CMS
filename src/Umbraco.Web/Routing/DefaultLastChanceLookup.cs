@@ -48,6 +48,12 @@ namespace Umbraco.Web.Routing
 						docRequest.RoutingContext.UmbracoContext,
 						handler.redirectID);
 
+					//SD: We are setting the Is404 to true here because these are 404 handlers. 
+					// if people in the future add their own last chance lookup resolver, they might not want things to be 404s
+					// and instead do their own thing so we should leave it up to the last chance resolver to set the 404, not the
+					// module.
+                	docRequest.Is404 = true;
+
                     // FIXME - could it be null?
 
 					LogHelper.Debug<DefaultLastChanceLookup>("Handler '{0}' found node with id={1}.", () => handler.GetType().FullName, () => handler.redirectID);                    
@@ -86,7 +92,7 @@ namespace Umbraco.Web.Routing
             _customHandlerTypes = new List<Type>();
 
             var customHandlers = new XmlDocument();
-            customHandlers.Load(IOHelper.MapPath(SystemFiles.NotFoundhandlersConfig));
+			customHandlers.Load(Umbraco.Core.IO.IOHelper.MapPath(Umbraco.Core.IO.SystemFiles.NotFoundhandlersConfig));
 
             foreach (XmlNode n in customHandlers.DocumentElement.ChildNodes)
             {
@@ -112,7 +118,7 @@ namespace Umbraco.Web.Routing
 					//TODO: This isn't a good way to load the assembly, its already in the Domain so we should be getting the type
 					// this loads the assembly into the wrong assembly load context!!
 
-                    var assembly = Assembly.LoadFrom(IOHelper.MapPath(SystemDirectories.Bin + "/" + assemblyName + ".dll"));
+					var assembly = Assembly.LoadFrom(Umbraco.Core.IO.IOHelper.MapPath(Umbraco.Core.IO.SystemDirectories.Bin + "/" + assemblyName + ".dll"));
                     type = assembly.GetType(ns + "." + typeName);
                 }
                 catch (Exception e)
