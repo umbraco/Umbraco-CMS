@@ -44,7 +44,7 @@ namespace Umbraco.Tests.DocumentLookups
 			var docRequest = new DocumentRequest(routingContext.UmbracoContext.UmbracoUrl, routingContext)
 			{
 				Node = routingContext.PublishedContentStore.GetDocumentById(routingContext.UmbracoContext, 1174),
-				Template = template
+				TemplateLookup = new TemplateLookup(template.Alias, template)
 			};
 
 			var handler = new RenderRouteHandler(new TestControllerFactory());
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.DocumentLookups
 			var docRequest = new DocumentRequest(routingContext.UmbracoContext.UmbracoUrl, routingContext)
 				{
 					Node = routingContext.PublishedContentStore.GetDocumentById(routingContext.UmbracoContext, 1172), 
-					Template = template
+					TemplateLookup = new TemplateLookup(template.Alias, template)
 				};
 
 			var handler = new RenderRouteHandler(new TestControllerFactory());

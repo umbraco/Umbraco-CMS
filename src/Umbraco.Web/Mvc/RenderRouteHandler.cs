@@ -100,7 +100,7 @@ namespace Umbraco.Web.Mvc
 
 					//check if the custom controller has an action with the same name as the template name (we convert ToUmbracoAlias since the template name might have invalid chars).
 					//NOTE: This also means that all custom actions MUST be PascalCase.. but that should be standard.
-					var templateName = documentRequest.Template.Alias.Split('.')[0].ToUmbracoAlias(StringAliasCaseType.PascalCase);
+					var templateName = documentRequest.TemplateLookup.TemplateAlias.Split('.')[0].ToUmbracoAlias(StringAliasCaseType.PascalCase);
 					def.ActionName = templateName;
 					
 				}

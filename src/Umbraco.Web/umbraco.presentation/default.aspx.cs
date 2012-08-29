@@ -87,7 +87,7 @@ namespace umbraco
 				{
 					_upage = new page(_docRequest);
 					UmbracoContext.Current.HttpContext.Items["pageID"] = _docRequest.NodeId; // legacy - fixme
-					var templatePath = SystemDirectories.Masterpages + "/" + _docRequest.Template.Alias.Replace(" ", "") + ".master"; // fixme - should be in .Template!
+					var templatePath = SystemDirectories.Masterpages + "/" + _docRequest.TemplateLookup.TemplateAlias.Replace(" ", "") + ".master"; // fixme - should be in .Template!
 					this.MasterPageFile = templatePath; // set the template
 				}
 				else

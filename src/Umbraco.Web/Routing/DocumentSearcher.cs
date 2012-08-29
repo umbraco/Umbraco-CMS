@@ -297,12 +297,27 @@ namespace Umbraco.Web.Routing
 					int templateId;
 					if (!int.TryParse(templateAlias, out templateId))
 						templateId = 0;
-					_documentRequest.Template = templateId > 0 ? new Template(templateId) : null;
+					
+					if (templateId > 0)
+					{
+						//TODO: Need to figure out if this is web forms or MVC based on template name somehow!!
+						var webFormsTemplate = new Template(templateId);
+						_documentRequest.TemplateLookup = new TemplateLookup(webFormsTemplate.Alias, webFormsTemplate);
+					}
+					else
+					{
+						_documentRequest.TemplateLookup = TemplateLookup.NoTemplate();
+					}					
 				}
 				else
 				{
+					//TODO: Is this required??? I thought that was the purpose of the other LookupByNiceUrlAndTemplate?
 					LogHelper.Debug<DocumentRequest>("{0}Look for template alias=\"{1}\" (altTemplate)", () => tracePrefix, () => templateAlias);
-					_documentRequest.Template = Template.GetByAlias(templateAlias);
+					//TODO: Need to figure out if this is web forms or MVC based on template name somehow!!
+					var webFormsTemplate = Template.GetByAlias(templateAlias);
+					_documentRequest.TemplateLookup = webFormsTemplate != null 
+						? new TemplateLookup(webFormsTemplate.Alias, webFormsTemplate) 
+						: TemplateLookup.NoTemplate();					
 				}
 
 				if (!_documentRequest.HasTemplate)

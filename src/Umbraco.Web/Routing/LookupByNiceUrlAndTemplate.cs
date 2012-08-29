@@ -35,6 +35,10 @@ namespace Umbraco.Web.Routing
 				var templateAlias = docRequest.Uri.AbsolutePath.Substring(pos + 1);
 				path = path.Substring(0, pos);
 
+				//TODO: We need to check if the altTemplate is for MVC or not, though I'm not exactly sure how the best
+				// way to do that would be since the template is just an alias and if we are not having a flag on the 
+				// doc type for rendering engine and basing it only on template name, then how would we handle this?
+
                 var template = Template.GetByAlias(templateAlias);
                 if (template != null)
                 {
@@ -44,7 +48,7 @@ namespace Umbraco.Web.Routing
 					node = LookupDocumentNode(docRequest, route);
 
                     if (node != null)
-						docRequest.Template = template;
+						docRequest.TemplateLookup = new TemplateLookup(template.Alias, template);
                 }
                 else
                 {

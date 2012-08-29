@@ -126,8 +126,8 @@ namespace Umbraco.Web
 					}
 
 					//TODO: Detect MVC vs WebForms
-					
-					var isMvc = true;
+					docreq.IsMvc = true; //TODO: This needs to be set in the ILookups based on the template
+					var isMvc = docreq.IsMvc;
 					RewriteToUmbracoHandler(HttpContext.Current, uri.Query, isMvc);
 				}
 			}

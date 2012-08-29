@@ -5,9 +5,11 @@ using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Xml;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.property;
+using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 
@@ -98,8 +100,22 @@ namespace umbraco
 
 			if (docreq.HasTemplate)
 			{
-				this.template = docreq.Template.Id;
-				elements["template"] = this.template.ToString();
+				//TODO: The template property which returns just an int will be obsoleted once we remove the need for templates
+				// in the database but I suspect this will take a bit of work! 
+				// Because the docrequest doesn't know about what template object we have (since the webforms template object is legacy)
+				// we need to check here to see if we can cast it. This should always work with webforms and the Template property of this 
+				// object only gets used in very few places, the worrying part is that it is used in library.RenderMacroContent and library.RenderTemplate so not sure
+				// what would happen if someone tried to execute this inside of MVC... perhaps we can do a check in those methods and throw an exception if
+				// they are executed in MVC for now?
+				if (TypeHelper.IsTypeAssignableFrom<Template>(docreq.TemplateLookup.TemplateObject))
+				{
+					this.template = ((Template)docreq.TemplateLookup.TemplateObject).Id;
+					elements["template"] = this.template.ToString();
+				}
+				else
+				{
+					// we can't get the ID because it doesn't exist for MVC, throw exception?
+				}				
 			}
 
 			PopulateElementData(docreq.Node);
