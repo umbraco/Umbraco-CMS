@@ -244,6 +244,9 @@
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
+    <Compile Include="umbraco.presentation\Default.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\LibraryCacheRefresher.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />
     <Compile Include="XmlPublishedContentStore.cs" />
@@ -353,13 +356,6 @@
     <Compile Include="umbraco.presentation\BasePageExtensions.cs" />
     <Compile Include="umbraco.presentation\content.cs">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\default.aspx.cs">
-      <DependentUpon>default.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\default.aspx.designer.cs">
-      <DependentUpon>default.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\helper.cs">
       <SubType>Code</SubType>
@@ -1867,7 +1863,6 @@
     <Content Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx" />
     <Content Include="umbraco.presentation\umbraco\Search\QuickSearch.ascx" />
-    <Content Include="umbraco.presentation\default.aspx" />
     <Content Include="umbraco.presentation\install\default.aspx" />
     <Content Include="umbraco.presentation\install\steps\license.ascx" />
     <Content Include="umbraco.presentation\umbraco\actions\delete.aspx" />

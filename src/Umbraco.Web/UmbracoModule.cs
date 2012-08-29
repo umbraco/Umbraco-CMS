@@ -116,6 +116,15 @@ namespace Umbraco.Web
 				}
 				else
 				{
+					if (!docreq.HasTemplate)
+					{
+						//TODO: If there is no template then we should figure out what to render, in v4 it is just a blank page but some think
+						// that it should be a 404. IMO I think it should just be a blank page because it is still a content item in the
+						//umbraco system, perhaps this should be put on the mail list? For now we will just make it a blank page
+						httpContext.Response.Clear();
+						httpContext.Response.End();
+					}
+
 					//TODO: Detect MVC vs WebForms
 					
 					var isMvc = true;
