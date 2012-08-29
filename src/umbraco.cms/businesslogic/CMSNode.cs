@@ -251,7 +251,7 @@ namespace umbraco.cms.businesslogic
             if (level > 0)
             {
                 parent = new CMSNode(parentId);
-                sortOrder = parent.ChildCount + 1;
+                sortOrder = Document.GetMaxDocumentSortOrder(parentId);
                 path = parent.Path;
             }
             else
@@ -293,8 +293,6 @@ namespace umbraco.cms.businesslogic
 
             return retVal;
         }
-
-
 
         /// <summary>
         /// Retrieve a list of the id's of all CMSNodes given the objecttype and the first letter of the name.
