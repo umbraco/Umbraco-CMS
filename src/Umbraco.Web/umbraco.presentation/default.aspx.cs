@@ -43,131 +43,65 @@ namespace umbraco
 		void Page_PreInit(Object sender, EventArgs e)
 		{
 
-			//TODO: This still a bunch of routing stuff being handled here, this all needs to be handled in the HttpModule instead
-
-			// get the document request
+			// get the document request and the page
 			_docRequest = UmbracoContext.Current.DocumentRequest;
-
-			// load request parameters
-			// any reason other than liveEditing why we want to do this?!
-			Guid requestVersion;
-			if (!Guid.TryParse(Request["umbVersion"], out requestVersion))
-				requestVersion = Guid.Empty;
-			int requestId;
-			if (!int.TryParse(Request["umbPageID"], out requestId))
-				requestId = -1;
-
-			if (requestId <= 0)
-			{
-				// asking for a different version of the default document
-				if (requestVersion != Guid.Empty)
-				{
-					// security check
-					var bp = new BasePages.UmbracoEnsuredPage();
-					bp.ensureContext();
-					requestId = _docRequest.NodeId;
-				}
-			}
-			else
-			{
-				// asking for a specific document (and maybe a specific version)
-				// security check
-				var bp = new BasePages.UmbracoEnsuredPage();
-				bp.ensureContext();
-			}
-
-			if (requestId <= 0)
-			{
-				// use the DocumentRequest if it has resolved
-				// else it means that no lookup could find a document to render
-				// or that the document to render has no template... 
-
-				//TODO: Will HasTemplate ever be false here??
-				if (_docRequest.HasNode && _docRequest.HasTemplate)
-				{
-					_upage = new page(_docRequest);
-					UmbracoContext.Current.HttpContext.Items["pageID"] = _docRequest.NodeId; // legacy - fixme
-					var templatePath = SystemDirectories.Masterpages + "/" + _docRequest.TemplateLookup.TemplateAlias.Replace(" ", "") + ".master"; // fixme - should be in .Template!
-					this.MasterPageFile = templatePath; // set the template
-				}
-				else
-				{
-					//TODO: If there is no template but it has a node we shouldn't render a 404 I don't think
-
-					// if we know we're 404, display the ugly message, else a blank page
-					if (_docRequest.Is404)
-						RenderNotFound();
-					Response.End();
-					return;
-				}
-			}
-			else
-			{
-				// override the document = ignore the DocumentRequest
-				// fixme - what if it fails?
-				var document = requestVersion == Guid.Empty ? new Document(requestId) : new Document(requestId, requestVersion);
-				_upage = new page(document);
-				UmbracoContext.Current.HttpContext.Items["pageID"] = requestId; // legacy - fixme
-
-				// must fall back to old code
-				OnPreInitLegacy();
-			}
-
-			// reset the friendly path so it's used by forms, etc.
-			LogHelper.Debug<UmbracoDefault>(string.Format("Reset url to \"{0}\"", UmbracoContext.Current.RequestUrl));
+			_upage = _docRequest.GetUmbracoPage();							
+			var templatePath = SystemDirectories.Masterpages + "/" + _docRequest.Template.Alias.Replace(" ", "") + ".master"; // fixme - should be in .Template!
+			this.MasterPageFile = templatePath; // set the template
+				
+			// reset the friendly path so it's used by forms, etc.			
 			Context.RewritePath(UmbracoContext.Current.RequestUrl.PathAndQuery);
-
-			Context.Items.Add("pageElements", _upage.Elements); // legacy - fixme
 		}
 
-		void OnPreInitLegacy()
-		{
-			if (_upage.Template == 0)
-			{
-				string custom404 = umbraco.library.GetCurrentNotFoundPageId();
-				if (!String.IsNullOrEmpty(custom404))
-				{
-					XmlNode xmlNodeNotFound = content.Instance.XmlContent.GetElementById(custom404);
-					if (xmlNodeNotFound != null)
-					{
-						_upage = new page(xmlNodeNotFound);
-					}
-				}
-			}
+		//SD: I'm nearly positive that this is taken care of in our DefaultLastChanceLookup class!
 
-			if (_upage.Template != 0)
-			{
-				this.MasterPageFile = template.GetMasterPageName(_upage.Template);
+		//void OnPreInitLegacy()
+		//{
+		//    if (_upage.Template == 0)
+		//    {
+		//        string custom404 = umbraco.library.GetCurrentNotFoundPageId();
+		//        if (!String.IsNullOrEmpty(custom404))
+		//        {
+		//            XmlNode xmlNodeNotFound = content.Instance.XmlContent.GetElementById(custom404);
+		//            if (xmlNodeNotFound != null)
+		//            {
+		//                _upage = new page(xmlNodeNotFound);
+		//            }
+		//        }
+		//    }
 
-				//TODO: The culture stuff needs to all be set in the module
+		//    if (_upage.Template != 0)
+		//    {
+		//        this.MasterPageFile = template.GetMasterPageName(_upage.Template);
 
-				string cultureAlias = null;
-				for (int i = _upage.SplitPath.Length - 1; i > 0; i--)
-				{
-					var domains = Domain.GetDomainsById(int.Parse(_upage.SplitPath[i]));
-					if (domains.Length > 0)
-					{
-						cultureAlias = domains[0].Language.CultureAlias;
-						break;
-					}
-				}
+		//        string cultureAlias = null;
+		//        for (int i = _upage.SplitPath.Length - 1; i > 0; i--)
+		//        {
+		//            var domains = Domain.GetDomainsById(int.Parse(_upage.SplitPath[i]));
+		//            if (domains.Length > 0)
+		//            {
+		//                cultureAlias = domains[0].Language.CultureAlias;
+		//                break;
+		//            }
+		//        }
 
-				if (cultureAlias != null)
-				{
-					LogHelper.Debug<UmbracoDefault>("Culture changed to " + cultureAlias, Context.Trace);
-					var culture = new System.Globalization.CultureInfo(cultureAlias);
-					Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = culture;
-				}
-			}
-			else
-			{
-				Response.StatusCode = 404;
-				RenderNotFound();
-				Response.End();
-			}
-		}
+		//        if (cultureAlias != null)
+		//        {
+		//            LogHelper.Debug<UmbracoDefault>("Culture changed to " + cultureAlias, Context.Trace);
+		//            var culture = new System.Globalization.CultureInfo(cultureAlias);
+		//            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = culture;
+		//        }
+		//    }
+		//    else
+		//    {
+		//        Response.StatusCode = 404;
+		//        RenderNotFound();
+		//        Response.End();
+		//    }
+		//}
 
 		//
+		
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);
@@ -214,21 +148,21 @@ namespace umbraco
 			writer.Write(text);
 		}
 
-		//TODO: This should be removed, we should be handling all 404 stuff in the module and executing the 
-		// DocumentNotFoundHttpHandler instead but we need to fix the above routing concerns so that this all
-		// takes place in the Module.
-		void RenderNotFound()
-		{
-			Context.Response.StatusCode = 404;
+		////TODO: This should be removed, we should be handling all 404 stuff in the module and executing the 
+		//// DocumentNotFoundHttpHandler instead but we need to fix the above routing concerns so that this all
+		//// takes place in the Module.
+		//void RenderNotFound()
+		//{
+		//    Context.Response.StatusCode = 404;
 
-			Response.Write("<html><body><h1>Page not found</h1>");
-			UmbracoContext.Current.HttpContext.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(UmbracoContext.Current.ClientUrl) + "'.</h3>");
+		//    Response.Write("<html><body><h1>Page not found</h1>");
+		//    UmbracoContext.Current.HttpContext.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(UmbracoContext.Current.ClientUrl) + "'.</h3>");
 
-			// fixme - should try to get infos from the DocumentRequest?
+		//    // fixme - should try to get infos from the DocumentRequest?
 
-			Response.Write("<p>This page can be replaced with a custom 404. Check the documentation for \"custom 404\".</p>");
-			Response.Write("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");
-			Response.Write("</body></html>");
-		}
+		//    Response.Write("<p>This page can be replaced with a custom 404. Check the documentation for \"custom 404\".</p>");
+		//    Response.Write("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");
+		//    Response.Write("</body></html>");
+		//}
 	}
 }

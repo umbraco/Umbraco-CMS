@@ -105,10 +105,7 @@ namespace Umbraco.Web
 				//redirect if it has been flagged
 				if (docreq.IsRedirect)
 					httpContext.Response.Redirect(docreq.RedirectUrl, true);
-				
-				//TODO: Here I think we need to put the logic in to do what default.aspx is doing for the most part, 
-				// especially assigning the pageID of the httpcontext so we can render macros in MVC 
-
+								
 				//if no doc is found, send to our not found handler
 				if (docreq.Is404)
 				{
@@ -118,17 +115,52 @@ namespace Umbraco.Web
 				{
 					if (!docreq.HasTemplate)
 					{
+						LogHelper.Debug<DocumentRequest>("No template was found");
+
 						//TODO: If there is no template then we should figure out what to render, in v4 it is just a blank page but some think
 						// that it should be a 404. IMO I think it should just be a blank page because it is still a content item in the
 						//umbraco system, perhaps this should be put on the mail list? For now we will just make it a blank page
+						//TODO: I like the idea of this new setting, but lets get this in to the core at a later time, for now lets just get the basics working.
+						//if (Settings.HandleMissingTemplateAs404)
+						//{
+						//    this.Node = null;
+						//    LogHelper.Debug<DocumentRequest>("{0}Assume page not found (404)", tracePrefix);
+						//}
 						httpContext.Response.Clear();
-						httpContext.Response.End();
+						httpContext.Response.End();						
 					}
+					else
+					{
+						//ok everything is ready to pass off to our handlers (mvc or webforms) but we need to setup a few things
+						//mostly to do with legacy code,etc...
 
-					//TODO: Detect MVC vs WebForms
-					docreq.IsMvc = true; //TODO: This needs to be set in the ILookups based on the template
-					var isMvc = docreq.IsMvc;
-					RewriteToUmbracoHandler(HttpContext.Current, uri.Query, isMvc);
+						//check for a specific version to be rendered for the document
+						Guid requestVersion;
+						if (Guid.TryParse(httpContext.Request["umbVersion"], out requestVersion))
+						{
+							// security check since it might not be a public version
+							var bp = new global::umbraco.BasePages.UmbracoEnsuredPage();
+							bp.ensureContext();			
+							docreq.DocumentVersion = requestVersion;
+						}
+
+						//we need to create an umbraco page object, again this is required for much of the legacy code to work						
+						var umbracoPage = new page(docreq);		
+						//we need to complete the request which assigns the page back to the docrequest to make it available for legacy handlers like default.aspx
+						docreq.CompleteRequest(umbracoPage);
+
+						//this is required for many legacy things in umbraco to work
+						httpContext.Items["pageID"] = docreq.DocumentId; 
+						//now we need to create the 'page' object, this is legacy again but is required by many things currently in umbraco to run
+						var page = new page(docreq);
+						//this is again required by many legacy objects
+						httpContext.Items.Add("pageElements", page.Elements);
+
+						//TODO: Detect MVC vs WebForms
+						docreq.IsMvc = true; //TODO: This needs to be set in the ILookups based on the template
+						var isMvc = docreq.IsMvc;
+						RewriteToUmbracoHandler(HttpContext.Current, uri.Query, isMvc);	
+					}
 				}
 			}
 		}

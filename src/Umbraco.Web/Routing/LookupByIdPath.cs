@@ -14,7 +14,7 @@ namespace Umbraco.Web.Routing
 	/// <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
 	/// </remarks>
 	//[ResolutionWeight(20)]
-	internal class LookupById : IDocumentLookup
+	internal class LookupByIdPath : IDocumentLookup
     {
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
@@ -35,15 +35,15 @@ namespace Umbraco.Web.Routing
 
                 if (nodeId > 0)
                 {
-					LogHelper.Debug<LookupById>("Id={0}", () => nodeId);
+					LogHelper.Debug<LookupByIdPath>("Id={0}", () => nodeId);
 					node = docRequest.RoutingContext.PublishedContentStore.GetDocumentById(
 						docRequest.RoutingContext.UmbracoContext,
 						nodeId);
 
                     if (node != null)
                     {
-						docRequest.Node = node;
-						LogHelper.Debug<LookupById>("Found node with id={0}", () => docRequest.NodeId);
+						docRequest.Document = node;
+						LogHelper.Debug<LookupByIdPath>("Found node with id={0}", () => docRequest.DocumentId);
                     }
                     else
                     {
@@ -53,7 +53,7 @@ namespace Umbraco.Web.Routing
             }
 
             if (nodeId == -1)
-				LogHelper.Debug<LookupById>("Not a node id");
+				LogHelper.Debug<LookupByIdPath>("Not a node id");
 
             return node != null;
         }

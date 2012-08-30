@@ -24,7 +24,7 @@ namespace Umbraco.Web.Routing
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public bool TrySetDocument(DocumentRequest docRequest)
         {
-			docRequest.Node = HandlePageNotFound(docRequest);
+			docRequest.Document = HandlePageNotFound(docRequest);
             return docRequest.HasNode;
         }
 
@@ -79,17 +79,17 @@ namespace Umbraco.Web.Routing
             return currentPage;
         }
 
-        static List<Type> _customHandlerTypes = null;
+        static IEnumerable<Type> _customHandlerTypes = null;
         static readonly object CustomHandlerTypesLock = new object();
 
-        void InitializeNotFoundHandlers()
+        IEnumerable<Type> InitializeNotFoundHandlers()
         {
             // initialize handlers
             // create the definition cache
 
 			LogHelper.Debug<DefaultLastChanceLookup>("Registering custom handlers.");                    
 
-            _customHandlerTypes = new List<Type>();
+            var customHandlerTypes = new List<Type>();
 
             var customHandlers = new XmlDocument();
 			customHandlers.Load(Umbraco.Core.IO.IOHelper.MapPath(Umbraco.Core.IO.SystemFiles.NotFoundhandlersConfig));
@@ -127,8 +127,10 @@ namespace Umbraco.Web.Routing
                 }
 
                 if (type != null)
-                    _customHandlerTypes.Add(type);
+					customHandlerTypes.Add(type);
             }
+
+        	return customHandlerTypes;
         }
 
         IEnumerable<INotFoundHandler> GetNotFoundHandlers()
@@ -139,7 +141,7 @@ namespace Umbraco.Web.Routing
             lock (CustomHandlerTypesLock)
             {
                 if (_customHandlerTypes == null)
-                    InitializeNotFoundHandlers();
+                    _customHandlerTypes = InitializeNotFoundHandlers();
             }
 
             var handlers = new List<INotFoundHandler>();

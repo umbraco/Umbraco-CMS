@@ -48,7 +48,7 @@ namespace Umbraco.Web.Routing
 					node = LookupDocumentNode(docRequest, route);
 
                     if (node != null)
-						docRequest.TemplateLookup = new TemplateLookup(template.Alias, template);
+						docRequest.Template = template;
                 }
                 else
                 {

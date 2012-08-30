@@ -162,7 +162,7 @@ namespace Umbraco.Web.Routing
 			if (i == maxLoop || j == maxLoop)
 			{
 				LogHelper.Debug<DocumentRequest>("{0}Looks like we're running into an infinite loop, abort", () => tracePrefix);
-				_documentRequest.Node = null;
+				_documentRequest.Document = null;
 			}
 			LogHelper.Debug<DocumentRequest>("{0}End", () => tracePrefix);
 		}
@@ -176,11 +176,11 @@ namespace Umbraco.Web.Routing
 		{
 			const string tracePrefix = "FollowInternalRedirects: ";
 
-			if (_documentRequest.Node == null)
+			if (_documentRequest.Document == null)
 				throw new InvalidOperationException("There is no node.");
 
 			bool redirect = false;
-			string internalRedirect = _routingContext.PublishedContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Node, "umbracoInternalRedirectId");
+			string internalRedirect = _routingContext.PublishedContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Document, "umbracoInternalRedirectId");
 
 			if (!string.IsNullOrWhiteSpace(internalRedirect))
 			{
@@ -193,10 +193,10 @@ namespace Umbraco.Web.Routing
 				if (internalRedirectId <= 0)
 				{
 					// bad redirect
-					_documentRequest.Node = null;
+					_documentRequest.Document = null;
 					LogHelper.Debug<DocumentRequest>("{0}Failed to redirect to id={1}: invalid value", () => tracePrefix, () => internalRedirect);
 				}
-				else if (internalRedirectId == _documentRequest.NodeId)
+				else if (internalRedirectId == _documentRequest.DocumentId)
 				{
 					// redirect to self
 					LogHelper.Debug<DocumentRequest>("{0}Redirecting to self, ignore", () => tracePrefix);
@@ -208,7 +208,7 @@ namespace Umbraco.Web.Routing
 						_umbracoContext,
 						internalRedirectId);
 					
-					_documentRequest.Node = node;
+					_documentRequest.Document = node;
 					if (node != null)
 					{
 						redirect = true;
@@ -232,12 +232,12 @@ namespace Umbraco.Web.Routing
 		{
 			const string tracePrefix = "EnsurePageAccess: ";
 
-			if (_documentRequest.Node == null)
+			if (_documentRequest.Document == null)
 				throw new InvalidOperationException("There is no node.");
 
-			var path = _routingContext.PublishedContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Node, "@path");
+			var path = _routingContext.PublishedContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Document, "@path");
 
-			if (Access.IsProtected(_documentRequest.NodeId, path))
+			if (Access.IsProtected(_documentRequest.DocumentId, path))
 			{
 				LogHelper.Debug<DocumentRequest>("{0}Page is protected, check for access", () => tracePrefix);
 
@@ -247,17 +247,17 @@ namespace Umbraco.Web.Routing
 				{
 					LogHelper.Debug<DocumentRequest>("{0}Not logged in, redirect to login page", () => tracePrefix);
 					var loginPageId = Access.GetLoginPage(path);
-					if (loginPageId != _documentRequest.NodeId)
-						_documentRequest.Node = _routingContext.PublishedContentStore.GetDocumentById(
+					if (loginPageId != _documentRequest.DocumentId)
+						_documentRequest.Document = _routingContext.PublishedContentStore.GetDocumentById(
 							_umbracoContext,
 							loginPageId);
 				}
-				else if (!Access.HasAccces(_documentRequest.NodeId, user.ProviderUserKey))
+				else if (!Access.HasAccces(_documentRequest.DocumentId, user.ProviderUserKey))
 				{
 					LogHelper.Debug<DocumentRequest>("{0}Current member has not access, redirect to error page", () => tracePrefix);
 					var errorPageId = Access.GetErrorPage(path);
-					if (errorPageId != _documentRequest.NodeId)
-						_documentRequest.Node = _routingContext.PublishedContentStore.GetDocumentById(
+					if (errorPageId != _documentRequest.DocumentId)
+						_documentRequest.Document = _routingContext.PublishedContentStore.GetDocumentById(
 							_umbracoContext,
 							errorPageId);
 				}
@@ -277,67 +277,42 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		private void LookupTemplate()
 		{
+			//return if the request already has a template assigned, this can be possible if an ILookup assigns one
+			if (_documentRequest.HasTemplate) return;
+
 			const string tracePrefix = "LookupTemplate: ";
 
-			if (_documentRequest.Node == null)
+			if (_documentRequest.Document == null)
 				throw new InvalidOperationException("There is no node.");
 
-			var templateAlias = _umbracoContext.HttpContext.Request.QueryString["altTemplate"];
-			if (string.IsNullOrWhiteSpace(templateAlias))
-				templateAlias = _umbracoContext.HttpContext.Request.Form["altTemplate"];
+			//gets item from query string, form, cookie or server vars
+			var templateAlias = _umbracoContext.HttpContext.Request["altTemplate"];
 
-			// fixme - we might want to support cookies?!? NO but provide a hook to change the template
-
-			if (!_documentRequest.HasTemplate || !string.IsNullOrWhiteSpace(templateAlias))
+			if (templateAlias.IsNullOrWhiteSpace())
 			{
-				if (string.IsNullOrWhiteSpace(templateAlias))
-				{
-					templateAlias = _routingContext.PublishedContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Node, "@TemplateId");
-					LogHelper.Debug<DocumentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateAlias);
-					int templateId;
-					if (!int.TryParse(templateAlias, out templateId))
-						templateId = 0;
+				//we don't have an alt template specified, so lookup the template id on the document and then lookup the template
+				// associated with it.
+				//TODO: When we remove the need for a database for templates, then this id should be irrelavent, not sure how were going to do this nicely.
+
+				var templateIdAsString = _routingContext.PublishedContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Document, "@TemplateId");
+				LogHelper.Debug<DocumentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateIdAsString);
+				int templateId;
+				if (!int.TryParse(templateIdAsString, out templateId))
+					templateId = 0;
 					
-					if (templateId > 0)
-					{
-						//TODO: Need to figure out if this is web forms or MVC based on template name somehow!!
-						var webFormsTemplate = new Template(templateId);
-						_documentRequest.TemplateLookup = new TemplateLookup(webFormsTemplate.Alias, webFormsTemplate);
-					}
-					else
-					{
-						_documentRequest.TemplateLookup = TemplateLookup.NoTemplate();
-					}					
-				}
-				else
+				if (templateId > 0)
 				{
-					//TODO: Is this required??? I thought that was the purpose of the other LookupByNiceUrlAndTemplate?
-					LogHelper.Debug<DocumentRequest>("{0}Look for template alias=\"{1}\" (altTemplate)", () => tracePrefix, () => templateAlias);
-					//TODO: Need to figure out if this is web forms or MVC based on template name somehow!!
-					var webFormsTemplate = Template.GetByAlias(templateAlias);
-					_documentRequest.TemplateLookup = webFormsTemplate != null 
-						? new TemplateLookup(webFormsTemplate.Alias, webFormsTemplate) 
-						: TemplateLookup.NoTemplate();					
-				}
-
-				if (!_documentRequest.HasTemplate)
-				{
-					LogHelper.Debug<DocumentRequest>("{0}No template was found", () => tracePrefix);
-
-					//TODO: I like the idea of this new setting, but lets get this in to the core at a later time, for now lets just get the basics working.
-					//if (Settings.HandleMissingTemplateAs404)
-					//{
-					//    this.Node = null;
-					//    LogHelper.Debug<DocumentRequest>("{0}Assume page not found (404)", tracePrefix);
-					//}
-
-					// else we have no template
-					// and there isn't much more we can do about it
-				}
-				else
-				{
-					LogHelper.Debug<DocumentRequest>("{0}Found", () => tracePrefix);
-				}
+					//NOTE: This will throw an exception if the template id doesn't exist, but that is ok to inform the front end.
+					var template = new Template(templateId);
+					_documentRequest.Template = template;
+				}									
+			}
+			else
+			{
+				LogHelper.Debug<DocumentRequest>("{0}Look for template alias=\"{1}\" (altTemplate)", () => tracePrefix, () => templateAlias);
+				//TODO: Need to figure out if this is web forms or MVC based on template name somehow!!
+				var template = Template.GetByAlias(templateAlias);
+				_documentRequest.Template = template;
 			}
 		}
 
@@ -349,7 +324,7 @@ namespace Umbraco.Web.Routing
 			if (_documentRequest.HasNode)
 			{
 				int redirectId;
-				if (!int.TryParse(_routingContext.PublishedContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Node, "umbracoRedirect"), out redirectId))
+				if (!int.TryParse(_routingContext.PublishedContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Document, "umbracoRedirect"), out redirectId))
 					redirectId = -1;
 				string redirectUrl = "#";
 				if (redirectId > 0)

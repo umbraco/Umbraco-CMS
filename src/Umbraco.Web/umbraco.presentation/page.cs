@@ -92,33 +92,23 @@ namespace umbraco
 
 			if (!docreq.HasNode)
 				throw new ArgumentException("Document request has no node.", "docreq");
-			
-			populatePageData(docreq.Node.Id,
-				docreq.Node.Name, docreq.Node.DocumentTypeId, docreq.Node.DocumentTypeAlias,
-				docreq.Node.WriterName, docreq.Node.CreatorName, docreq.Node.CreateDate, docreq.Node.UpdateDate,
-				docreq.Node.Path, docreq.Node.Version, docreq.Node.Parent == null ? -1 : docreq.Node.Parent.Id);
+
+			//get the correct requested version
+			var docVersion = docreq.DocumentVersion.HasValue ? docreq.DocumentVersion.Value : docreq.Document.Version;
+
+			populatePageData(docreq.Document.Id,
+				docreq.Document.Name, docreq.Document.DocumentTypeId, docreq.Document.DocumentTypeAlias,
+				docreq.Document.WriterName, docreq.Document.CreatorName, docreq.Document.CreateDate, docreq.Document.UpdateDate,
+				docreq.Document.Path, docVersion, docreq.Document.Parent == null ? -1 : docreq.Document.Parent.Id);
 
 			if (docreq.HasTemplate)
 			{
-				//TODO: The template property which returns just an int will be obsoleted once we remove the need for templates
-				// in the database but I suspect this will take a bit of work! 
-				// Because the docrequest doesn't know about what template object we have (since the webforms template object is legacy)
-				// we need to check here to see if we can cast it. This should always work with webforms and the Template property of this 
-				// object only gets used in very few places, the worrying part is that it is used in library.RenderMacroContent and library.RenderTemplate so not sure
-				// what would happen if someone tried to execute this inside of MVC... perhaps we can do a check in those methods and throw an exception if
-				// they are executed in MVC for now?
-				if (TypeHelper.IsTypeAssignableFrom<Template>(docreq.TemplateLookup.TemplateObject))
-				{
-					this.template = ((Template)docreq.TemplateLookup.TemplateObject).Id;
-					elements["template"] = this.template.ToString();
-				}
-				else
-				{
-					// we can't get the ID because it doesn't exist for MVC, throw exception?
-				}				
+
+				this.template = docreq.Template.Id;
+				elements["template"] = template.ToString();				
 			}
 
-			PopulateElementData(docreq.Node);
+			PopulateElementData(docreq.Document);
 
 			HttpContext.Current.Trace.Write(TraceCategory, string.Format("Loaded \"{0}\" (id={1}, version={2})",
 				this.PageName, this.pageID, this.pageVersion));

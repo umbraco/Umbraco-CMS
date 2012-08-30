@@ -9,6 +9,7 @@ using System.Diagnostics;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.NodeFactory;
 using umbraco.cms.businesslogic.web;
@@ -20,59 +21,10 @@ namespace Umbraco.Web.Routing
 {
 	
 	/// <summary>
-	/// Represents a found template that is resolved by the ILookups.
-	/// The TemplateObject is the business logic object that represents a template, this will be different for 
-	/// web forms and MVC. 
-	/// </summary>
-	/// <remarks>
-	/// NOTE: This is not the prettiest thing in the world and we cannot use generics but we need to avoid looking up 
-	/// template objects more than once which would occur if we were only storing the alias.
-	/// Once we take templates out of the db this becomes even more interesting because the templateId on the XML
-	/// will probably not be an integer Id anymore but more like an alias so the reprecussions will be big.
-	/// </remarks>
-	internal class TemplateLookup
-	{
-		/// <summary>
-		/// Static method to return an empty template lookup
-		/// </summary>
-		/// <returns></returns>
-		internal static TemplateLookup NoTemplate()
-		{
-			return new TemplateLookup();
-		}
-
-		private TemplateLookup()
-		{
-			
-		}
-
-		internal TemplateLookup(string alias, object templateObject)
-		{
-			TemplateAlias = alias;
-			TemplateObject = templateObject;
-		}
-
-		internal bool FoundTemplate
-		{
-			get { return TemplateObject != null; }
-		}
-
-		/// <summary>
-		/// The alias of the template found
-		/// </summary>
-		internal string TemplateAlias { get; private set; }
-
-		/// <summary>
-		/// The business logic template object that has been found, null if not found
-		/// </summary>
-		internal object TemplateObject { get; private set; }
-	}
-
-	/// <summary>
 	/// represents a request for one specified Umbraco document to be rendered
 	/// by one specified template, using one particular culture.
 	/// </summary>
-    internal class DocumentRequest
+	internal class DocumentRequest
     {
 		public DocumentRequest(Uri uri, RoutingContext routingContext)
         {
@@ -90,7 +42,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		XmlNode _xmlNode = null;
 
-		private IDocument _node = null;
+		private IDocument _document = null;
 
         #region Properties
 
@@ -129,42 +81,73 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public CultureInfo Culture { get; set; }
 
-        // TODO: fixme - do we want to have an ordered list of alternate cultures,
+		/// <summary>
+		/// Gets or sets a specific document version to render, by default this is null which means that
+		/// it will render the latest published version.
+		/// </summary>
+		internal Guid? DocumentVersion { get; set; }
+
+		private page _umbracoPage;
+
+		/// <summary>
+		/// Returns the Umbraco page object
+		/// </summary>
+		/// <remarks>
+		/// This value is only 
+		/// </remarks>
+		internal page GetUmbracoPage()
+		{
+			if (_umbracoPage == null)
+			{
+				throw new InvalidOperationException("The umbraco page object is only available once Finalize()");
+			}
+			return _umbracoPage;
+		}
+
+		/// <summary>
+		/// Called when all lookups are completed and before the module passes the request off to a handler
+		/// </summary>
+		internal void CompleteRequest(page umbracoPage)
+		{
+			_umbracoPage = umbracoPage;
+		}
+
+		// TODO: fixme - do we want to have an ordered list of alternate cultures,
         //         to allow for fallbacks when doing dictionnary lookup and such?
 
-		public IDocument Node
+		public IDocument Document
 		{			
-			get { return _node; }
+			get { return _document; }
 			set
 			{
-				_node = value;
-				this.TemplateLookup = null;
-				_nodeId = _node != null ? _node.Id : 0;
+				_document = value;
+				this.Template = null;
+				_nodeId = _document != null ? _document.Id : 0;
 			}
 		}
 
         /// <summary>
         /// Gets or sets the document request's template lookup
         /// </summary>
-		public TemplateLookup TemplateLookup { get; set; }
+		public Template Template { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the document request has a template.
         /// </summary>
         public bool HasTemplate
         {
-            get { return this.TemplateLookup != null && TemplateLookup.FoundTemplate; }
+            get { return this.Template != null ; }
         }
 
         /// <summary>
         /// Gets the id of the document.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown when the document request has no document.</exception>
-        public int NodeId
+        public int DocumentId
         {
             get
             {
-                if (this.Node == null)
+                if (this.Document == null)
                     throw new InvalidOperationException("DocumentRequest has no document.");
                 return _nodeId;
             }
@@ -175,7 +158,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public bool HasNode
         {
-            get { return this.Node != null; }
+            get { return this.Document != null; }
         }
 
         /// <summary>

@@ -27,7 +27,7 @@ namespace Umbraco.Tests.DocumentLookups
 			var result = lookup.TrySetDocument(docRequest);
 
 			Assert.IsTrue(result);
-			Assert.AreEqual(docRequest.NodeId, nodeMatch);
+			Assert.AreEqual(docRequest.DocumentId, nodeMatch);
 		}
 	}
 }

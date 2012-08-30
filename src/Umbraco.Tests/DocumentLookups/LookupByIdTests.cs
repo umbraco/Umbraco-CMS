@@ -16,13 +16,13 @@ namespace Umbraco.Tests.DocumentLookups
 			var routingContext = GetRoutingContext(urlAsString, template);
 			var url = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
 			var docRequest = new DocumentRequest(url, routingContext);
-			var lookup = new LookupById();
+			var lookup = new LookupByIdPath();
 			Umbraco.Core.Configuration.GlobalSettings.HttpContext = routingContext.UmbracoContext.HttpContext;
 
 			var result = lookup.TrySetDocument(docRequest);
 
 			Assert.IsTrue(result);
-			Assert.AreEqual(docRequest.NodeId, nodeMatch);
+			Assert.AreEqual(docRequest.DocumentId, nodeMatch);
 		}
 	}
 }

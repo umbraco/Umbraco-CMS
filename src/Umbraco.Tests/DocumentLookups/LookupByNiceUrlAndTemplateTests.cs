@@ -25,9 +25,9 @@ namespace Umbraco.Tests.DocumentLookups
 			var result = lookup.TrySetDocument(docRequest);
 
 			Assert.IsTrue(result);
-			Assert.IsNotNull(docRequest.Node);
-			Assert.IsNotNull(docRequest.TemplateLookup);
-			Assert.AreEqual("blah".ToUpperInvariant(), docRequest.TemplateLookup.TemplateAlias.ToUpperInvariant());
+			Assert.IsNotNull(docRequest.Document);
+			Assert.IsNotNull(docRequest.Template);
+			Assert.AreEqual("blah".ToUpperInvariant(), docRequest.Template.Alias.ToUpperInvariant());
 		}
 	}
 }

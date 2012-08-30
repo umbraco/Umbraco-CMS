@@ -27,7 +27,7 @@ namespace Umbraco.Web
 		}
 
 		public void Boot()
-		{			
+		{
 			InitializeResolvers();
 		}
 
@@ -143,8 +143,9 @@ namespace Umbraco.Web
 				//or in their own global.asax
 				new[]
 					{
+						typeof (LookupByPageIdQuery),
 						typeof (LookupByNiceUrl),
-						typeof (LookupById),
+						typeof (LookupByIdPath),
 						typeof (LookupByNiceUrlAndTemplate),
 						typeof (LookupByProfile),
 						typeof (LookupByAlias)

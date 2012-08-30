@@ -57,7 +57,7 @@ namespace Umbraco.Web.Routing
 
                 if (node != null)
                 {
-                    docreq.Node = node;
+                    docreq.Document = node;
 					LogHelper.Debug<LookupByNiceUrl>("Cache hit, id={0}", () => nodeId);
                 }
                 else
@@ -75,12 +75,12 @@ namespace Umbraco.Web.Routing
 
                 if (node != null)
                 {
-                    docreq.Node = node;
-					LogHelper.Debug<LookupByNiceUrl>("Query matches, id={0}", () => docreq.NodeId);
+                    docreq.Document = node;
+					LogHelper.Debug<LookupByNiceUrl>("Query matches, id={0}", () => docreq.DocumentId);
 
 					if (!docreq.RoutingContext.UmbracoContext.InPreviewMode)
 					{
-						docreq.RoutingContext.UmbracoContext.RoutesCache.Store(docreq.NodeId, route); // will not write if previewing	
+						docreq.RoutingContext.UmbracoContext.RoutesCache.Store(docreq.DocumentId, route); // will not write if previewing	
 					} 
                     
                 }

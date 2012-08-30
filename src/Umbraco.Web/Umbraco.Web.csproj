@@ -244,6 +244,7 @@
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
+    <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -287,7 +288,7 @@
     <Compile Include="Media\ThumbnailProviders\ImageThumbnailProvider.cs" />
     <Compile Include="Media\ThumbnailProviders\ThumbnailProvidersResolver.cs" />
     <Compile Include="UI\Controls\FolderBrowser.cs" />
-    <Compile Include="Routing\LookupById.cs" />
+    <Compile Include="Routing\LookupByIdPath.cs" />
     <Compile Include="Routing\LookupByNiceUrl.cs" />
     <Compile Include="Routing\LookupByNiceUrlAndTemplate.cs" />
     <Compile Include="Routing\LookupByProfile.cs" />

@@ -41,7 +41,7 @@ namespace Umbraco.Web.Mvc
 
 			var renderModel = new RenderModel()
 			{
-				CurrentDocument = docRequest.Node
+				CurrentDocument = docRequest.Document
 			};
 
 			//put essential data into the data tokens, the 'umbraco' key is required to be there for the view engine
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Mvc
 			{
 
 				//check if there's a custom controller assigned, base on the document type alias.
-				var controller = _controllerFactory.CreateController(requestContext, documentRequest.Node.DocumentTypeAlias);
+				var controller = _controllerFactory.CreateController(requestContext, documentRequest.Document.DocumentTypeAlias);
 
 
 				//check if that controller exists
@@ -93,14 +93,14 @@ namespace Umbraco.Web.Mvc
 					}
 					else
 					{
-						LogHelper.Warn<RenderRouteHandler>("The current Document Type {0} matches a locally declared controller of type {1}. Custom Controllers for Umbraco routing must inherit from '{2}'.", documentRequest.Node.DocumentTypeAlias, controller.GetType().FullName, typeof(RenderMvcController).FullName);
+						LogHelper.Warn<RenderRouteHandler>("The current Document Type {0} matches a locally declared controller of type {1}. Custom Controllers for Umbraco routing must inherit from '{2}'.", documentRequest.Document.DocumentTypeAlias, controller.GetType().FullName, typeof(RenderMvcController).FullName);
 						//exit as we cannnot route to the custom controller, just route to the standard one.
 						return def;
 					}
 
 					//check if the custom controller has an action with the same name as the template name (we convert ToUmbracoAlias since the template name might have invalid chars).
 					//NOTE: This also means that all custom actions MUST be PascalCase.. but that should be standard.
-					var templateName = documentRequest.TemplateLookup.TemplateAlias.Split('.')[0].ToUmbracoAlias(StringAliasCaseType.PascalCase);
+					var templateName = documentRequest.Template.Alias.Split('.')[0].ToUmbracoAlias(StringAliasCaseType.PascalCase);
 					def.ActionName = templateName;
 					
 				}
