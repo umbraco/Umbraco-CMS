@@ -1,50 +1,38 @@
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Xml;
 using NUnit.Framework;
-using SqlCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Web.Media.ThumbnailProviders;
-using Umbraco.Web.Routing;
-using umbraco.BusinessLogic;
-using umbraco.DataLayer;
 using umbraco.IO;
 using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.template;
-using umbraco.cms.businesslogic.web;
-using GlobalSettings = umbraco.GlobalSettings;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.Routing
 {
 	[TestFixture, RequiresSTA]
-	public class UmbracoModuleTests
+	public class UmbracoModuleTests : BaseRoutingTest
 	{
 		private UmbracoModule _module;
 
-		[SetUp]
-		public void Initialize()
+		public override void Initialize()
 		{
-			TestHelper.SetupLog4NetForTests();
-			ApplicationContext.Current = new ApplicationContext()
-				{
-					IsReady = true
-				};
+			base.Initialize();
+			
+			//the module requires that the singleton is setup
+			ApplicationContext.Current = ApplicationContext;
+
+			//create the module
 			_module = new UmbracoModule();
+
 			ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", Umbraco.Core.Configuration.GlobalSettings.CurrentVersion);
 			ConfigurationManager.AppSettings.Set("umbracoReservedPaths", "~/umbraco,~/install/");
 			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd");
-			Cache.ClearAllCache();
-			TestHelper.InitializeDatabase();
 
 			//create the not found handlers config
-			using(var sw = File.CreateText(IOHelper.MapPath(SystemFiles.NotFoundhandlersConfig, false)))
+			using (var sw = File.CreateText(Umbraco.Core.IO.IOHelper.MapPath(Umbraco.Core.IO.SystemFiles.NotFoundhandlersConfig, false)))
 			{
 				sw.Write(@"<NotFoundHandlers>
 	<notFound assembly='umbraco' type='SearchForAlias' />
@@ -55,56 +43,16 @@ namespace Umbraco.Tests
 			}
 		}
 
-		[TearDown]
-		public void TearDown()
+		public override void TearDown()
 		{
+			base.TearDown();
+
 			_module.DisposeIfDisposable();
-			//reset the context on global settings
-			Umbraco.Core.Configuration.GlobalSettings.HttpContext = null;
-			//reset the app context
-			ApplicationContext.Current = null;
+			
 			//reset the app config
 			ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", "");
 			ConfigurationManager.AppSettings.Set("umbracoReservedPaths", "");
-			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "");
-			TestHelper.ClearDatabase();
-			Cache.ClearAllCache();
-		}
-
-		/// <summary>
-		/// Initlializes the UmbracoContext with specific XML
-		/// </summary>
-		/// <param name="umbracoContext"></param>
-		/// <param name="template"></param>
-		private void SetupUmbracoContextForTest(UmbracoContext umbracoContext, Template template)
-		{
-			umbracoContext.GetXmlDelegate = () =>
-			{
-				var xDoc = new XmlDocument();
-
-				//create a custom xml structure to return
-
-				xDoc.LoadXml(@"<?xml version=""1.0"" encoding=""utf-8""?><!DOCTYPE root[ 
-<!ELEMENT Home ANY>
-<!ATTLIST Home id ID #REQUIRED>
-
-]>
-<root id=""-1"">
-	<Home id=""1046"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""2"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Home"" urlName=""home"" writerName=""admin"" creatorName=""admin"" path=""-1,1046"" isDoc=""""><content><![CDATA[]]></content>
-		<Home id=""1173"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""1"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""sub1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173"" isDoc=""""><content><![CDATA[]]></content>
-			<Home id=""1174"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""1"" createDate=""2012-07-20T18:07:54"" updateDate=""2012-07-20T19:10:27"" nodeName=""Sub2"" urlName=""sub2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1174"" isDoc=""""><content><![CDATA[]]></content>
-			</Home>
-			<Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""2"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc=""""><content><![CDATA[]]></content>
-			</Home>
-		</Home>
-		<Home id=""1175"" parentID=""1046"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""2"" createDate=""2012-07-20T18:08:01"" updateDate=""2012-07-20T18:49:32"" nodeName=""Sub 2"" urlName=""sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1175"" isDoc=""""><content><![CDATA[]]></content>
-		</Home>
-	</Home>
-	<Home id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + template.Id + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
-</root>");
-				//return the custom x doc
-				return xDoc;
-			};
+			ConfigurationManager.AppSettings.Set("umbracoReservedUrls", "");		
 		}
 
 		[TestCase("/umbraco_client/Tree/treeIcons.css", false)]
@@ -144,6 +92,9 @@ namespace Umbraco.Tests
 			var result = _module.IsClientSideRequest(uri);
 			Assert.AreEqual(assert, result);
 		}
+
+
+
 
 		//NOTE: This test shows how we can test most of the HttpModule, it however is testing a method that no longer exists and is testing too much, 
 		// we need to write unit tests for each of the components: NiceUrlProvider, all of the Lookup classes, etc...

@@ -3,7 +3,7 @@ using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.template;
 
-namespace Umbraco.Tests.DocumentLookups
+namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
 	public class LookupByNiceUrlAndTemplateTests : BaseRoutingTest

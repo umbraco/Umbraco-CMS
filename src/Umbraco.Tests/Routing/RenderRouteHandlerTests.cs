@@ -1,18 +1,14 @@
-﻿using System.Linq;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.Routing;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Tests.Stubs;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.template;
 
-namespace Umbraco.Tests.DocumentLookups
+namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
 	public class RenderRouteHandlerTests : BaseRoutingTest

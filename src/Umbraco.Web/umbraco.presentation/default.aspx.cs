@@ -25,8 +25,8 @@ namespace umbraco
 	/// </remarks>
 	public class UmbracoDefault : Page
 	{
-		private page _upage = null;
-		private DocumentRequest _docRequest = null;
+		private page _upage;
+		private DocumentRequest _docRequest;
 		bool _validateRequest = true;
 
 		/// <summary>
@@ -39,69 +39,53 @@ namespace umbraco
 			set { _validateRequest = value; }
 		}
 
-		// fixme - switch over to OnPreInit override
-		void Page_PreInit(Object sender, EventArgs e)
+		protected override void OnPreInit(EventArgs e)
 		{
+			base.OnPreInit(e);
 
 			// get the document request and the page
 			_docRequest = UmbracoContext.Current.DocumentRequest;
-			_upage = _docRequest.GetUmbracoPage();							
+			_upage = _docRequest.GetUmbracoPage();
+
+			var args = new RequestInitEventArgs()
+				{
+					Page = _upage,
+					PageId = _upage.PageID,
+					Context = Context
+				};
+			FireBeforeRequestInit(args);
+
+			//if we are cancelling then return and don't proceed
+			if (args.Cancel) return;
+			
 			var templatePath = SystemDirectories.Masterpages + "/" + _docRequest.Template.Alias.Replace(" ", "") + ".master"; // fixme - should be in .Template!
 			this.MasterPageFile = templatePath; // set the template
-				
+
 			// reset the friendly path so it's used by forms, etc.			
 			Context.RewritePath(UmbracoContext.Current.RequestUrl.PathAndQuery);
+
+			FireAfterRequestInit(args);
 		}
 
-		//SD: I'm nearly positive that this is taken care of in our DefaultLastChanceLookup class!
+		protected override void OnInit(EventArgs e)
+		{
+			base.OnInit(e);
 
-		//void OnPreInitLegacy()
-		//{
-		//    if (_upage.Template == 0)
-		//    {
-		//        string custom404 = umbraco.library.GetCurrentNotFoundPageId();
-		//        if (!String.IsNullOrEmpty(custom404))
-		//        {
-		//            XmlNode xmlNodeNotFound = content.Instance.XmlContent.GetElementById(custom404);
-		//            if (xmlNodeNotFound != null)
-		//            {
-		//                _upage = new page(xmlNodeNotFound);
-		//            }
-		//        }
-		//    }
+			//This is only here for legacy if people arent' using master pages... 
+			//TODO: We need to test that this still works!! Or do we ??
+			if (!UmbracoSettings.UseAspNetMasterPages)
+			{
+				var pageHolder = new umbraco.layoutControls.umbracoPageHolder
+					{
+						ID = "umbPageHolder"
+					};
+				Page.Controls.Add(pageHolder);
+				_upage.RenderPage(_upage.Template);
+				var umbPageHolder = (layoutControls.umbracoPageHolder)Page.FindControl("umbPageHolder");
+				umbPageHolder.Populate(_upage);
+			}
+		}
 
-		//    if (_upage.Template != 0)
-		//    {
-		//        this.MasterPageFile = template.GetMasterPageName(_upage.Template);
-
-		//        string cultureAlias = null;
-		//        for (int i = _upage.SplitPath.Length - 1; i > 0; i--)
-		//        {
-		//            var domains = Domain.GetDomainsById(int.Parse(_upage.SplitPath[i]));
-		//            if (domains.Length > 0)
-		//            {
-		//                cultureAlias = domains[0].Language.CultureAlias;
-		//                break;
-		//            }
-		//        }
-
-		//        if (cultureAlias != null)
-		//        {
-		//            LogHelper.Debug<UmbracoDefault>("Culture changed to " + cultureAlias, Context.Trace);
-		//            var culture = new System.Globalization.CultureInfo(cultureAlias);
-		//            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = culture;
-		//        }
-		//    }
-		//    else
-		//    {
-		//        Response.StatusCode = 404;
-		//        RenderNotFound();
-		//        Response.End();
-		//    }
-		//}
-
-		//
-		
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);
@@ -112,7 +96,6 @@ namespace umbraco
 			Page.Trace.IsEnabled &= GlobalSettings.DebugMode && !String.IsNullOrWhiteSpace(Request["umbDebugShowTrace"]);
 		}
 
-		//
 		protected override void Render(HtmlTextWriter writer)
 		{
 			// do the original rendering
@@ -148,21 +131,45 @@ namespace umbraco
 			writer.Write(text);
 		}
 
-		////TODO: This should be removed, we should be handling all 404 stuff in the module and executing the 
-		//// DocumentNotFoundHttpHandler instead but we need to fix the above routing concerns so that this all
-		//// takes place in the Module.
-		//void RenderNotFound()
-		//{
-		//    Context.Response.StatusCode = 404;
+		/// <summary>
+		/// The preinit event handler
+		/// </summary>
+		public delegate void RequestInitEventHandler(object sender, RequestInitEventArgs e);
+		/// <summary>
+		/// occurs before the umbraco page is initialized for rendering.
+		/// </summary>
+		public static event RequestInitEventHandler BeforeRequestInit;
+		/// <summary>
+		/// Raises the <see cref="BeforeRequestInit"/> event.
+		/// </summary>
+		/// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+		protected internal virtual void FireBeforeRequestInit(RequestInitEventArgs e)
+		{
+			if (BeforeRequestInit != null)
+				BeforeRequestInit(this, e);
+		}
 
-		//    Response.Write("<html><body><h1>Page not found</h1>");
-		//    UmbracoContext.Current.HttpContext.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(UmbracoContext.Current.ClientUrl) + "'.</h3>");
+		/// <summary>
+		/// Occurs when [after save].
+		/// </summary>
+		public static event RequestInitEventHandler AfterRequestInit;
+		/// <summary>
+		/// Raises the <see cref="AfterRequestInit"/> event.
+		/// </summary>
+		/// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+		protected virtual void FireAfterRequestInit(RequestInitEventArgs e)
+		{
+			if (AfterRequestInit != null)
+				AfterRequestInit(this, e);
 
-		//    // fixme - should try to get infos from the DocumentRequest?
+		}
+	}
 
-		//    Response.Write("<p>This page can be replaced with a custom 404. Check the documentation for \"custom 404\".</p>");
-		//    Response.Write("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");
-		//    Response.Write("</body></html>");
-		//}
+	public class RequestInitEventArgs : System.ComponentModel.CancelEventArgs
+	{
+		public page Page { get; internal set; }
+		public HttpContext Context { get; internal set; }
+		public string Url { get; internal set; }
+		public int PageId { get; internal set; }
 	}
 }

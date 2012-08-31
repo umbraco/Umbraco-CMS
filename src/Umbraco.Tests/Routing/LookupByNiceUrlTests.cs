@@ -1,11 +1,10 @@
 using System.Configuration;
-using System.Web;
 using NUnit.Framework;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.template;
 
-namespace Umbraco.Tests.DocumentLookups
+namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
 	public class LookupByNiceUrlTests : BaseRoutingTest

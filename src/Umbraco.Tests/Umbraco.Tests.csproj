@@ -64,13 +64,13 @@
     <Compile Include="DynamicDocument\DynamicNodeTests.cs" />
     <Compile Include="PublishContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
-    <Compile Include="DocumentLookups\BaseRoutingTest.cs" />
-    <Compile Include="DocumentLookups\LookupByAliasTests.cs" />
-    <Compile Include="DocumentLookups\LookupByIdTests.cs" />
-    <Compile Include="DocumentLookups\LookupByNiceUrlAndTemplateTests.cs" />
-    <Compile Include="DocumentLookups\LookupByNiceUrlTests.cs" />
-    <Compile Include="DocumentLookups\RenderRouteHandlerTests.cs" />
-    <Compile Include="DocumentLookups\RouteTestExtensions.cs" />
+    <Compile Include="Routing\BaseRoutingTest.cs" />
+    <Compile Include="Routing\LookupByAliasTests.cs" />
+    <Compile Include="Routing\LookupByIdTests.cs" />
+    <Compile Include="Routing\LookupByNiceUrlAndTemplateTests.cs" />
+    <Compile Include="Routing\LookupByNiceUrlTests.cs" />
+    <Compile Include="Routing\RenderRouteHandlerTests.cs" />
+    <Compile Include="Routing\RouteTestExtensions.cs" />
     <Compile Include="Stubs\TestControllerFactory.cs" />
     <Compile Include="TestHelpers\BaseWebTest.cs" />
     <Compile Include="UriUtilityTests.cs" />
@@ -99,7 +99,7 @@
     <Compile Include="StringExtensionsTests.cs" />
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
     <Compile Include="TypeFinderTests.cs" />
-    <Compile Include="UmbracoModuleTests.cs" />
+    <Compile Include="Routing\UmbracoModuleTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

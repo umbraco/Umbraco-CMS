@@ -3,7 +3,7 @@ using System.Web.Routing;
 using Rhino.Mocks;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.DocumentLookups
+namespace Umbraco.Tests.Routing
 {
 	public static class RouteTestExtensions
 	{

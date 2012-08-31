@@ -1,29 +1,27 @@
 using System.Configuration;
 using System.Linq;
 using System.Web.Routing;
-using System.Xml;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.Stubs;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.template;
 
-namespace Umbraco.Tests.DocumentLookups
+namespace Umbraco.Tests.Routing
 {
 	[TestFixture, RequiresSTA]
 	public abstract class BaseRoutingTest : BaseWebTest
 	{		
 		public override void Initialize()
-		{						
+		{					
+			base.Initialize();
 		}
 
 		public override void TearDown()
 		{			
+			base.TearDown();
+
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "");					
 		}	
 
