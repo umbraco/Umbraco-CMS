@@ -237,6 +237,14 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
+    <Compile Include="Media\EmbedProviders\AbstractProvider.cs" />
+    <Compile Include="Media\EmbedProviders\Flickr.cs" />
+    <Compile Include="Media\EmbedProviders\OEmbedRich.cs" />
+    <Compile Include="Media\EmbedProviders\OEmbedVideo.cs" />
+    <Compile Include="Media\EmbedProviders\Settings\Dictionary.cs" />
+    <Compile Include="Media\EmbedProviders\Settings\String.cs" />
+    <Compile Include="Media\EmbedProviders\Twitgoo.cs" />
     <Compile Include="Media\ThumbnailProviders\AbstractThumbnailProvider.cs" />
     <Compile Include="Media\ThumbnailProviders\MediaTypeIconThumbnailProvider.cs" />
     <Compile Include="Media\ThumbnailProviders\FileExtensionIconThumbnailProvider.cs" />
