@@ -2,17 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Reflection;
 using System.Web.Services;
 using umbraco.IO;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.property;
 using Umbraco.Core.IO;
+using Umbraco.Core.Embed;
+using System.Xml;
+using System.Web;
+using System.Text.RegularExpressions;
+using System.Linq;
+using System.Web.Script.Services;
 
 namespace umbraco.webservices.media
 {
     [WebService(Namespace = "http://umbraco.org/webservices/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [ToolboxItem(false)]
+    [ScriptService]
     public class mediaService : BaseWebService
     {
         internal IMediaFileSystem _fs;
@@ -180,6 +188,70 @@ namespace umbraco.webservices.media
 
             return carriers;
         }
+
+       
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public Umbraco.Core.Embed.Result Embed(string url, int width, int height)
+        {
+            Result r = new Result();
+            
+            //todo cache embed doc
+            var xmlConfig = new XmlDocument();
+            xmlConfig.Load(GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Embed.config");
+
+            foreach (XmlNode node in xmlConfig.SelectNodes("//provider"))
+            {
+                var regexPattern = new Regex(node.SelectSingleNode("./urlShemeRegex").InnerText, RegexOptions.IgnoreCase);
+                if (regexPattern.IsMatch(url))
+                {
+                    var type = node.Attributes["type"].Value;
+
+                    var prov = (IEmbedProvider)Activator.CreateInstance(Type.GetType(node.Attributes["type"].Value));
+
+                    if (node.Attributes["supportsDimensions"] != null)
+                        r.SupportsDimensions = node.Attributes["supportsDimensions"].Value == "True";
+                    else
+                        r.SupportsDimensions = prov.SupportsDimensions;
+
+                    var settings = node.ChildNodes.Cast<XmlNode>().ToDictionary(settingNode => settingNode.Name);
+
+                    foreach (var prop in prov.GetType().GetProperties().Where(prop => prop.IsDefined(typeof(ProviderSetting), true)))
+                    {
+
+                        if (settings.Any(s => s.Key.ToLower() == prop.Name.ToLower()))
+                        {
+                            XmlNode setting = settings.FirstOrDefault(s => s.Key.ToLower() == prop.Name.ToLower()).Value;
+                            var settingType = typeof(Umbraco.Web.Media.EmbedProviders.Settings.String);
+
+                            if (setting.Attributes["type"] != null)
+                                settingType = Type.GetType(setting.Attributes["type"].Value);
+
+                            var settingProv = (IEmbedSettingProvider)Activator.CreateInstance(settingType);
+                            prop.SetValue(prov, settingProv.GetSetting(settings.FirstOrDefault(s => s.Key.ToLower() == prop.Name.ToLower()).Value), null);
+
+                        }
+
+
+                    }
+                    try
+                    {
+                        r.Markup = prov.GetMarkup(url, width, height);
+                        r.Status = Status.Success;
+                    }
+                    catch
+                    {
+                        r.Status = Status.Error;
+                    }
+                    return r;
+                }
+            }
+
+            r.Status = Status.NotSupported;
+            return r;
+        }
+
 
         private mediaCarrier createCarrier(Media m)
         {
