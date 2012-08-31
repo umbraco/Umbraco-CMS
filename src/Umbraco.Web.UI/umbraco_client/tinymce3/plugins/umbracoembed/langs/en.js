@@ -1,5 +1,5 @@
 tinyMCE.addI18n('en.embed_dlg', {
-    title: 'Insert rich media',
+    title: 'Embed third party media',
     general: 'General',
     url: 'Url:',
     size: 'Size:',
