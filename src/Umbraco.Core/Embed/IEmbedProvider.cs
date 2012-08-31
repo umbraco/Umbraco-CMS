@@ -8,6 +8,6 @@ namespace Umbraco.Core.Embed
 
         string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
 
-        string GetPreview(string url, int maxWidth = 0, int maxHeight = 0);
+        //string GetPreview(string url, int maxWidth = 0, int maxHeight = 0);
     }
 }
