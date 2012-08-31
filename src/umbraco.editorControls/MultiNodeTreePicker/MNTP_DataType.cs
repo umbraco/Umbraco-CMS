@@ -13,15 +13,15 @@ namespace umbraco.editorControls.MultiNodeTreePicker
     public class MNTP_DataType : AbstractDataEditor
     {
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="MNTP_DataType"/> class.
-		/// </summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MNTP_DataType"/> class.
+        /// </summary>
         public MNTP_DataType()
         {
             RenderControl = m_Tree;
             m_Tree.Init += Tree_Init;
             m_Tree.Load += Tree_Load;
-            DataEditorControl.OnSave +=  DataEditorControl_OnSave;
+            DataEditorControl.OnSave += DataEditorControl_OnSave;
 
         }
 
@@ -30,12 +30,12 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         /// <summary>
         /// The internal tree picker control to render
         /// </summary>
-        readonly MNTP_DataEditor m_Tree = new MNTP_DataEditor();
+        private readonly MNTP_DataEditor m_Tree = new MNTP_DataEditor();
 
         /// <summary>
         /// Internal pre value editor to render
         /// </summary>
-        MNTP_PrevalueEditor m_PreValues;
+        private MNTP_PrevalueEditor m_PreValues;
 
         ///<summary>
         ///</summary>
@@ -65,7 +65,9 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             {
                 if (this.m_Data == null)
                 {
-                    m_Data = StoreAsCommaDelimited ? new umbraco.cms.businesslogic.datatype.DefaultData(this) : new XmlData(this);
+                    m_Data = StoreAsCommaDelimited
+                                 ? new umbraco.cms.businesslogic.datatype.DefaultData(this)
+                                 : new XmlData(this);
                 }
 
                 return m_Data;
@@ -89,8 +91,8 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Tree_Init(object sender, EventArgs e)
-        {           
+        private void Tree_Init(object sender, EventArgs e)
+        {
             var preVal = ((MNTP_PrevalueEditor)PrevalueEditor);
             m_Tree.TreeToRender = preVal.SelectedTreeType;
             m_Tree.XPathFilter = preVal.XPathFilter;
@@ -107,7 +109,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             m_Tree.ControlHeight = preVal.ControlHeight;
             m_Tree.MinNodeCount = preVal.MinNodeCount;
 
-            
+
         }
 
         /// <summary>
@@ -115,7 +117,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Tree_Load(object sender, EventArgs e)
+        private void Tree_Load(object sender, EventArgs e)
         {
             if (!m_Tree.Page.IsPostBack)
             {
@@ -154,14 +156,15 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                     }
                 }
             }
-           
+
         }
 
-		/// <summary>
-		/// Handle the saving event, need to give data to Umbraco
-		/// </summary>
-		/// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void DataEditorControl_OnSave(EventArgs e)
+        /// <summary>
+        /// Handle the saving event, need to give data to Umbraco
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs" /> instance containing the event data.</param>
+        private void DataEditorControl_OnSave(EventArgs e)
         {
             string val;
             if (StoreAsCommaDelimited)
@@ -181,7 +184,10 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         /// </summary>
         public override IDataPrevalue PrevalueEditor
         {
-            get { return m_PreValues ?? (m_PreValues = new MNTP_PrevalueEditor(this)); }
+            get
+            {
+                return m_PreValues ?? (m_PreValues = new MNTP_PrevalueEditor(this));
+            }
         }
 
         internal const string PersistenceCookieName = "MultiNodeTreePicker";
@@ -202,6 +208,5 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                 HttpContext.Current.Response.Cookies[PersistenceCookieName].Expires = DateTime.Now.AddDays(-1);
             }
         }
-
     }
 }

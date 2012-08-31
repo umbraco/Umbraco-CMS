@@ -245,7 +245,7 @@ namespace umbraco.cms.businesslogic.Files
             // Copy metadata
             var imageEncoders = ImageCodecInfo.GetImageEncoders();
             ImageCodecInfo codec = null;
-            if (Extension == "png" || Extension == ".gif")
+            if (Extension.ToLower() == "png" || Extension.ToLower() == "gif")
                 codec = imageEncoders.Single(t => t.MimeType.Equals("image/png"));
             else
                 codec = imageEncoders.Single(t => t.MimeType.Equals("image/jpeg"));
