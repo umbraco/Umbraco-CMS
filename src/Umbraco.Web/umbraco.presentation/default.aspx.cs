@@ -47,24 +47,30 @@ namespace umbraco
 			_docRequest = UmbracoContext.Current.DocumentRequest;
 			_upage = _docRequest.GetUmbracoPage();
 
-			var args = new RequestInitEventArgs()
+			//we need to check this for backwards compatibility in case people still arent' using master pages
+			if (UmbracoSettings.UseAspNetMasterPages)
+			{
+				var args = new RequestInitEventArgs()
 				{
 					Page = _upage,
 					PageId = _upage.PageID,
 					Context = Context
 				};
-			FireBeforeRequestInit(args);
+				FireBeforeRequestInit(args);
 
-			//if we are cancelling then return and don't proceed
-			if (args.Cancel) return;
+				//if we are cancelling then return and don't proceed
+				if (args.Cancel) return;
+
+				var templatePath = SystemDirectories.Masterpages + "/" + _docRequest.Template.Alias.Replace(" ", "") + ".master"; // fixme - should be in .Template!
+				this.MasterPageFile = templatePath; // set the template
+
+				// reset the friendly path so it's used by forms, etc.			
+				Context.RewritePath(UmbracoContext.Current.RequestUrl.PathAndQuery);
+
+				//fire the init finished event
+				FireAfterRequestInit(args);	
+			}
 			
-			var templatePath = SystemDirectories.Masterpages + "/" + _docRequest.Template.Alias.Replace(" ", "") + ".master"; // fixme - should be in .Template!
-			this.MasterPageFile = templatePath; // set the template
-
-			// reset the friendly path so it's used by forms, etc.			
-			Context.RewritePath(UmbracoContext.Current.RequestUrl.PathAndQuery);
-
-			FireAfterRequestInit(args);
 		}
 
 		protected override void OnInit(EventArgs e)
@@ -75,6 +81,17 @@ namespace umbraco
 			//TODO: We need to test that this still works!! Or do we ??
 			if (!UmbracoSettings.UseAspNetMasterPages)
 			{
+				var args = new RequestInitEventArgs()
+				{
+					Page = _upage,
+					PageId = _upage.PageID,
+					Context = Context
+				};
+				FireBeforeRequestInit(args);
+
+				//if we are cancelling then return and don't proceed
+				if (args.Cancel) return;
+
 				var pageHolder = new umbraco.layoutControls.umbracoPageHolder
 					{
 						ID = "umbPageHolder"
@@ -83,6 +100,9 @@ namespace umbraco
 				_upage.RenderPage(_upage.Template);
 				var umbPageHolder = (layoutControls.umbracoPageHolder)Page.FindControl("umbPageHolder");
 				umbPageHolder.Populate(_upage);
+
+				//fire the init finished event
+				FireAfterRequestInit(args);	
 			}
 		}
 
