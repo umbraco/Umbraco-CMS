@@ -57,8 +57,7 @@ namespace Umbraco.Web.Routing
 		/// <remarks>The url is absolute or relative depending on the current url, unless absolute is true, and then it is always absolute.</remarks>
 		public string GetNiceUrl(int nodeId, Uri current, bool absolute)
         {
-        	string path;
-			Uri domainUri;
+			Uri domainUri = null;
 
 			// will not read cache if previewing!
         	var route = _umbracoContext.InPreviewMode
@@ -67,20 +66,23 @@ namespace Umbraco.Web.Routing
 
             if (!string.IsNullOrEmpty(route))
             {
-				// route is <id>/<path> eg "-1/", "-1/foo", "123/", "123/foo/bar"...
-                int pos = route.IndexOf('/');
-                path = route.Substring(pos);
+				//NOTE: I have removed the following because it doesn't make sense, why would we cache the route like this?
+				// we already have the nodeId being passed in. Perhaps this code is leftover from implementation /testing.
+				
+				//// route is <id>/<path> eg "-1/", "-1/foo", "123/", "123/foo/bar"...
+				//int pos = route.IndexOf('/');
+				//path = route.Substring(pos);
 
-				//TODO: Fix this! When I view a node on the front-end (for example the root) it 
-				// caches the route as '/'
-				// then when i view that node in the back office, this used to throw an exception 
-				// because there was not '-1' prefixing it.
-				// If i reset the app pool, then go look at the node in the back office, it caches it as '-1/'
-				// so there are inconsistencies on how these routes are cached!
+				////TODO: Fix this! When I view a node on the front-end (for example the root) it 
+				//// caches the route as '/'
+				//// then when i view that node in the back office, this used to throw an exception 
+				//// because there was not '-1' prefixing it.
+				//// If i reset the app pool, then go look at the node in the back office, it caches it as '-1/'
+				//// so there are inconsistencies on how these routes are cached!
 
-				int id = int.Parse(route.Substring(0, pos));// will be -1 or 1234
+				//int id = int.Parse(route.Substring(0, pos));// will be -1 or 1234
 
-				domainUri = id > 0 ? DomainUriAtNode(id, current) : null;	
+				domainUri = nodeId > 0 ? DomainUriAtNode(nodeId, current) : null;	
 
 				
 			}
@@ -113,14 +115,14 @@ namespace Umbraco.Web.Routing
 					pathParts.RemoveAt(pathParts.Count - 1);
 
 				pathParts.Reverse();
-				path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
-				route = id.ToString() + path;
+				route = "/" + string.Join("/", pathParts);
+				//route = id.ToString() + path; //NOTE: I have removed this based on the note above, why would we cache it this way??			
 
 				if (!_umbracoContext.InPreviewMode)
 					_umbracoContext.RoutesCache.Store(nodeId, route);
 			}
 
-			return AssembleUrl(domainUri, path, current, absolute).ToString();
+			return AssembleUrl(domainUri, route, current, absolute).ToString();
 		}
 
 		/// <summary>
