@@ -70,6 +70,7 @@
     <Compile Include="Routing\LookupByNiceUrlAndTemplateTests.cs" />
     <Compile Include="Routing\LookupByNiceUrlTests.cs" />
     <Compile Include="Routing\LookupByPageIdQueryTests.cs" />
+    <Compile Include="Routing\NiceUrlProviderTests.cs" />
     <Compile Include="Routing\RenderRouteHandlerTests.cs" />
     <Compile Include="Routing\RouteTestExtensions.cs" />
     <Compile Include="Stubs\TestControllerFactory.cs" />

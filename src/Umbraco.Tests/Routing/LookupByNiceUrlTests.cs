@@ -10,6 +10,14 @@ namespace Umbraco.Tests.Routing
 	public class LookupByNiceUrlTests : BaseRoutingTest
 	{
 
+		/// <summary>
+		/// We don't need a db for this test, will run faster without one
+		/// </summary>
+		protected override bool RequiresDbSetup
+		{
+			get { return false; }
+		}
+
 		[TestCase("/")]
 		[TestCase("/default.aspx")] //this one is actually rather important since this is the path that comes through when we are running in pre-IIS 7 for the root document '/' !
 		[TestCase("/Sub1")]
@@ -17,8 +25,7 @@ namespace Umbraco.Tests.Routing
 		[TestCase("/sub1.aspx")]
 		public void Match_Document_By_Url_Hide_Top_Level(string urlAsString)
 		{
-			var template = Template.MakeNew("test", new User(0));
-			var routingContext = GetRoutingContext(urlAsString, template);
+			var routingContext = GetRoutingContext(urlAsString);
 			var url = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
 			var docRequest = new DocumentRequest(url, routingContext);
 			var lookup = new LookupByNiceUrl();
@@ -37,8 +44,7 @@ namespace Umbraco.Tests.Routing
 		[TestCase("/home/Sub1.aspx")]
 		public void Match_Document_By_Url(string urlAsString)
 		{
-			var template = Template.MakeNew("test", new User(0));
-			var routingContext = GetRoutingContext(urlAsString, template);
+			var routingContext = GetRoutingContext(urlAsString);
 			var url = routingContext.UmbracoContext.UmbracoUrl;	//very important to use the cleaned up umbraco url		
 			var docRequest = new DocumentRequest(url, routingContext);			
 			var lookup = new LookupByNiceUrl();

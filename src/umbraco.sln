@@ -25,17 +25,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-1
 		..\docs\ReleaseNotes.txt = ..\docs\ReleaseNotes.txt
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nant", "Nant", "{17E547B1-D89B-4C76-AB9C-F05888397FA4}"
-	ProjectSection(SolutionItems) = preProject
-		..\build\Nant\aspnet35.build = ..\build\Nant\aspnet35.build
-		..\build\Nant\aspnet35.config = ..\build\Nant\aspnet35.config
-		..\build\Nant\build.xml = ..\build\Nant\build.xml
-		..\build\Nant\default.build = ..\build\Nant\default.build
-		..\build\Nant\nuget.build = ..\build\Nant\nuget.build
-		..\build\Nant\umbraco weekly.build = ..\build\Nant\umbraco weekly.build
-		..\build\Nant\umbraco.build = ..\build\Nant\umbraco.build
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web", "Umbraco.Web\Umbraco.Web.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "umbraco.businesslogic", "umbraco.businesslogic\umbraco.businesslogic.csproj", "{E469A9CE-1BEC-423F-AC44-713CD72457EA}"
@@ -154,7 +143,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{17E547B1-D89B-4C76-AB9C-F05888397FA4} = {2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}
 		{6277C9FB-3A9A-4537-AA86-82DA9B2527FD} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{5D3B8245-ADA6-453F-A008-50ED04BFE770} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 	EndGlobalSection

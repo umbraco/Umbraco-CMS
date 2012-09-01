@@ -23,11 +23,21 @@ namespace Umbraco.Tests.Routing
 			base.TearDown();
 
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "");					
-		}	
+		}
 
-		protected RoutingContext GetRoutingContext(string url, Template template, RouteData routeData = null)
+		/// <summary>
+		/// Return a new RoutingContext
+		/// </summary>
+		/// <param name="url"></param>
+		/// <param name="templateId">
+		/// The template Id to insert into the Xml cache file for each node, this is helpful for unit testing with templates but you		 
+		/// should normally create the template in the database with this id
+		///</param>
+		/// <param name="routeData"></param>
+		/// <returns></returns>
+		protected RoutingContext GetRoutingContext(string url, int templateId, RouteData routeData = null)
 		{
-			var umbracoContext = GetUmbracoContext(url, template, routeData);
+			var umbracoContext = GetUmbracoContext(url, templateId, routeData);
 			var contentStore = new XmlPublishedContentStore();
 			var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
 			var routingRequest = new RoutingContext(
@@ -37,6 +47,29 @@ namespace Umbraco.Tests.Routing
 				contentStore,
 				niceUrls);
 			return routingRequest;
+		}
+
+		/// <summary>
+		/// Return a new RoutingContext
+		/// </summary>
+		/// <param name="url"></param>
+		/// <param name="template"></param>
+		/// <param name="routeData"></param>
+		/// <returns></returns>
+		protected RoutingContext GetRoutingContext(string url, Template template, RouteData routeData = null)
+		{
+			return GetRoutingContext(url, template.Id, routeData);
+		}
+
+		/// <summary>
+		/// Return a new RoutingContext that doesn't require testing based on template
+		/// </summary>
+		/// <param name="url"></param>
+		/// <param name="routeData"></param>
+		/// <returns></returns>
+		protected RoutingContext GetRoutingContext(string url, RouteData routeData = null)
+		{
+			return GetRoutingContext(url, 1234, routeData);
 		}
 
 		

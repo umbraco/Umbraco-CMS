@@ -9,18 +9,22 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class LookupByPageIdQueryTests : BaseRoutingTest
 	{
+		/// <summary>
+		/// We don't need a db for this test, will run faster without one
+		/// </summary>
+		protected override bool RequiresDbSetup
+		{
+			get { return false; }
+		}
+
 		[TestCase("/?umbPageId=1046", 1046)]
 		[TestCase("/?UMBPAGEID=1046", 1046)]
 		[TestCase("/default.aspx?umbPageId=1046", 1046)] //TODO: Should this match??
 		[TestCase("/some/other/page?umbPageId=1046", 1046)] //TODO: Should this match??
 		[TestCase("/some/other/page.aspx?umbPageId=1046", 1046)] //TODO: Should this match??
 		public void Lookup_By_Page_Id(string urlAsString, int nodeMatch)
-		{
-			
-
-
-			var template = Template.MakeNew("test", new User(0));
-			var routingContext = GetRoutingContext(urlAsString, template);
+		{		
+			var routingContext = GetRoutingContext(urlAsString);
 			var url = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
 			var docRequest = new DocumentRequest(url, routingContext);
 			var lookup = new LookupByPageIdQuery();

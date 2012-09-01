@@ -53,7 +53,7 @@ namespace Umbraco.Tests.DynamicDocument
 		protected override dynamic GetDynamicNode(int id)
 		{
 			var template = Template.MakeNew("test", new User(0));
-			var ctx = GetUmbracoContext("/test", template);
+			var ctx = GetUmbracoContext("/test", template.Id);
 			var contentStore = new XmlPublishedContentStore();
 			var doc = contentStore.GetDocumentById(ctx, id);
 			Assert.IsNotNull(doc);

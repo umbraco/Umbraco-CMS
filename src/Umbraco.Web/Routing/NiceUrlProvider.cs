@@ -97,7 +97,14 @@ namespace Umbraco.Web.Routing
 				{
 					pathParts.Add(_publishedContentStore.GetDocumentProperty(_umbracoContext, node, UrlNameProperty));
 					node = node.Parent; // set to parent node
-					id = int.Parse(_publishedContentStore.GetDocumentProperty(_umbracoContext, node, "@id")); // will be -1 or 1234
+					if (node == null)
+					{
+						id = -1;
+					}
+					else
+					{
+						id = int.Parse(_publishedContentStore.GetDocumentProperty(_umbracoContext, node, "@id")); // will be -1 or 1234	
+					}					
 					domainUri = id > 0 ? DomainUriAtNode(id, current) : null;
 	            }
 

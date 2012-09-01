@@ -498,9 +498,14 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                if (HttpContext != null)
-                    return bool.Parse(ConfigurationManager.AppSettings["umbracoHideTopLevelNodeFromPath"]);
-                return false;
+				try
+				{
+					return bool.Parse(ConfigurationManager.AppSettings["umbracoHideTopLevelNodeFromPath"]);
+				}
+				catch
+				{
+					return false;
+				}
             }
         }
 
