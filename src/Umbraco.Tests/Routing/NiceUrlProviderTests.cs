@@ -7,6 +7,14 @@ namespace Umbraco.Tests.Routing
 	public class NiceUrlProviderTests : BaseRoutingTest
 	{
 
+		public override void TearDown()
+		{
+			base.TearDown();
+
+			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "");
+			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "");
+		}
+
 		[TestCase(1046, "/home.aspx")]
 		[TestCase(1173, "/home/sub1.aspx")]
 		[TestCase(1174, "/home/sub1/sub2.aspx")]
