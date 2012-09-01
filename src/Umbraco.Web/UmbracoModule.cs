@@ -134,27 +134,14 @@ namespace Umbraco.Web
 						//ok everything is ready to pass off to our handlers (mvc or webforms) but we need to setup a few things
 						//mostly to do with legacy code,etc...
 
-						//check for a specific version to be rendered for the document
-						Guid requestVersion;
-						if (Guid.TryParse(httpContext.Request["umbVersion"], out requestVersion))
-						{
-							// security check since it might not be a public version
-							var bp = new global::umbraco.BasePages.UmbracoEnsuredPage();
-							bp.ensureContext();			
-							docreq.DocumentVersion = requestVersion;
-						}
-
-						//we need to create an umbraco page object, again this is required for much of the legacy code to work						
-						var umbracoPage = new page(docreq);		
 						//we need to complete the request which assigns the page back to the docrequest to make it available for legacy handlers like default.aspx
-						docreq.CompleteRequest(umbracoPage);
+						docreq.UmbracoPage = new page(docreq); 
 
 						//this is required for many legacy things in umbraco to work
 						httpContext.Items["pageID"] = docreq.DocumentId; 
-						//now we need to create the 'page' object, this is legacy again but is required by many things currently in umbraco to run
-						var page = new page(docreq);
+
 						//this is again required by many legacy objects
-						httpContext.Items.Add("pageElements", page.Elements);
+						httpContext.Items.Add("pageElements", docreq.UmbracoPage.Elements);
 
 						//TODO: Detect MVC vs WebForms
 						docreq.IsMvc = true; //TODO: This needs to be set in the ILookups based on the template

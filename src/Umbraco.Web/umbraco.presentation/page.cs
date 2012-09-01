@@ -92,14 +92,11 @@ namespace umbraco
 
 			if (!docreq.HasNode)
 				throw new ArgumentException("Document request has no node.", "docreq");
-
-			//get the correct requested version
-			var docVersion = docreq.DocumentVersion.HasValue ? docreq.DocumentVersion.Value : docreq.Document.Version;
-
+			
 			populatePageData(docreq.Document.Id,
 				docreq.Document.Name, docreq.Document.DocumentTypeId, docreq.Document.DocumentTypeAlias,
 				docreq.Document.WriterName, docreq.Document.CreatorName, docreq.Document.CreateDate, docreq.Document.UpdateDate,
-				docreq.Document.Path, docVersion, docreq.Document.Parent == null ? -1 : docreq.Document.Parent.Id);
+				docreq.Document.Path, docreq.Document.Version, docreq.Document.Parent == null ? -1 : docreq.Document.Parent.Id);
 
 			if (docreq.HasTemplate)
 			{

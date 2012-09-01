@@ -268,13 +268,10 @@
     <None Include="config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
     </None>
-		<None Include="config\log4net.Release.config">
+    <None Include="config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
-		</None>
-    <Content Include="config\FileSystemProviders.config">
-      <SubType>Designer</SubType>
-    </Content>
-		<None Include="config\FileSystemProviders.Release.config">
+    </None>
+    <None Include="config\FileSystemProviders.Release.config">
       <DependentUpon>FileSystemProviders.config</DependentUpon>
     </None>
     <None Include="config\xsltExtensions.Release.config">
@@ -309,9 +306,6 @@
     </None>
     <None Include="config\feedProxy.Release.config">
       <DependentUpon>feedProxy.config</DependentUpon>
-    </None>
-    <None Include="config\formHandlers.Release.config">
-      <DependentUpon>formHandlers.config</DependentUpon>
     </None>
     <None Include="config\ExamineIndex.Release.config">
       <DependentUpon>ExamineIndex.config</DependentUpon>
@@ -1883,15 +1877,14 @@
     </None>
     <Content Include="config\404handlers.config" />
     <Content Include="config\Dashboard.config" />
-    <Content Include="config\formHandlers.config" />
     <Content Include="config\metablogConfig.config" />
     <Content Include="config\restExtensions.config" />
     <Content Include="config\tinyMceConfig.config" />
-		<Content Include="config\umbracoSettings.config"/>
+    <Content Include="config\umbracoSettings.config" />
     <Content Include="config\xsltExtensions.config" />
     <Content Include="config\UrlRewriting.config" />
-		<Content Include="config\log4net.config" />
-		<Content Include="config\FileSystemProviders.config" />
+    <Content Include="config\log4net.config" />
+    <Content Include="config\FileSystemProviders.config" />
     <Content Include="web.config">
       <SubType>Designer</SubType>
     </Content>

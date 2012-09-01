@@ -45,7 +45,7 @@ namespace umbraco
 
 			// get the document request and the page
 			_docRequest = UmbracoContext.Current.DocumentRequest;
-			_upage = _docRequest.GetUmbracoPage();
+			_upage = _docRequest.UmbracoPage;
 
 			//we need to check this for backwards compatibility in case people still arent' using master pages
 			if (UmbracoSettings.UseAspNetMasterPages)

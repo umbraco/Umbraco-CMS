@@ -272,7 +272,7 @@ namespace Umbraco.Web
                 return
                     StateHelper.Cookies.Preview.HasValue // has preview cookie
                     && UmbracoUser != null // has user
-                    && !currentUrl.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)); // is not in admin UI
+					&& !currentUrl.StartsWith(Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco)); // is not in admin UI
             }
         }   
         

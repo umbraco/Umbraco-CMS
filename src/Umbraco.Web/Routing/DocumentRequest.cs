@@ -36,12 +36,7 @@ namespace Umbraco.Web.Routing
 		/// the id of the requested node, if any, else zero.
 		/// </summary>
 		int _nodeId = 0;
-
-		/// <summary>
-		/// the requested node, if any, else null.
-		/// </summary>
-		XmlNode _xmlNode = null;
-
+		
 		private IDocument _document = null;
 
         #region Properties
@@ -81,37 +76,27 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public CultureInfo Culture { get; set; }
 
-		/// <summary>
-		/// Gets or sets a specific document version to render, by default this is null which means that
-		/// it will render the latest published version.
-		/// </summary>
-		internal Guid? DocumentVersion { get; set; }
-
 		private page _umbracoPage;
 
 		/// <summary>
 		/// Returns the Umbraco page object
 		/// </summary>
 		/// <remarks>
-		/// This value is only 
+		/// This value is only used for legacy/webforms code.
 		/// </remarks>
-		internal page GetUmbracoPage()
+		internal page UmbracoPage
 		{
-			if (_umbracoPage == null)
+			get
 			{
-				throw new InvalidOperationException("The umbraco page object is only available once Finalize()");
+				if (_umbracoPage == null)
+				{
+					throw new InvalidOperationException("The umbraco page object is only available once Finalize()");
+				}
+				return _umbracoPage;
 			}
-			return _umbracoPage;
+			set { _umbracoPage = value; }
 		}
-
-		/// <summary>
-		/// Called when all lookups are completed and before the module passes the request off to a handler
-		/// </summary>
-		internal void CompleteRequest(page umbracoPage)
-		{
-			_umbracoPage = umbracoPage;
-		}
-
+		
 		// TODO: fixme - do we want to have an ordered list of alternate cultures,
         //         to allow for fallbacks when doing dictionnary lookup and such?
 

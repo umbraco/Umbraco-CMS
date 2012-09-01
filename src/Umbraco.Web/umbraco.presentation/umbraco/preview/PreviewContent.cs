@@ -27,11 +27,11 @@ namespace umbraco.presentation.preview
 
         public bool ValidPreviewSet { get; set; }
 
-        private int m_userId = -1;
+        private int _userId = -1;
 
         public PreviewContent(User user)
         {
-            m_userId = user.Id;
+            _userId = user.Id;
         }
 
         public PreviewContent(Guid previewSet)
@@ -40,14 +40,14 @@ namespace umbraco.presentation.preview
         }
         public PreviewContent(User user, Guid previewSet, bool validate)
         {
-            m_userId = user.Id;
+            _userId = user.Id;
             ValidPreviewSet = updatePreviewPaths(previewSet, validate);
         }
 
 
         public void PrepareDocument(User user, Document documentObject, bool includeSubs)
         {
-            m_userId = user.Id;
+            _userId = user.Id;
 
             // clone xml
             XmlContent = (XmlDocument)content.Instance.XmlContent.Clone();
@@ -68,18 +68,18 @@ namespace umbraco.presentation.preview
 
         private bool updatePreviewPaths(Guid previewSet, bool validate)
         {
-            if (m_userId == -1)
+            if (_userId == -1)
             {
                 throw new ArgumentException("No current Umbraco User registered in Preview", "m_userId");
             }
 
             PreviewSet = previewSet;
-            PreviewsetPath = GetPreviewsetPath(m_userId, previewSet);
+            PreviewsetPath = GetPreviewsetPath(_userId, previewSet);
 
             if (validate && !ValidatePreviewPath())
             {
                 // preview cookie failed so we'll log the error and clear the cookie
-                Log.Add(LogTypes.Error, User.GetUser(m_userId), -1, string.Format("Preview failed for preview set {0}", previewSet));
+                Log.Add(LogTypes.Error, User.GetUser(_userId), -1, string.Format("Preview failed for preview set {0}", previewSet));
                 PreviewSet = Guid.Empty;
                 PreviewsetPath = String.Empty;
 
@@ -127,7 +127,7 @@ namespace umbraco.presentation.preview
             }
 
             // check for old preview sets and try to clean
-            CleanPreviewDirectory(m_userId, dir);
+            CleanPreviewDirectory(_userId, dir);
 
             XmlContent.Save(PreviewsetPath);
         }

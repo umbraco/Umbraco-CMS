@@ -831,7 +831,7 @@
       <DependentUpon>MemberSearch.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Page_Legacy.cs" />
-    <Compile Include="umbraco.presentation\umbraco\preview\Preview.cs" />
+    <Compile Include="umbraco.presentation\umbraco\preview\PreviewContent.cs" />
     <Compile Include="umbraco.presentation\umbraco\Search\ExamineEvents.cs" />
     <Compile Include="umbraco.presentation\umbraco\Search\QuickSearch.ascx.cs">
       <DependentUpon>QuickSearch.ascx</DependentUpon>

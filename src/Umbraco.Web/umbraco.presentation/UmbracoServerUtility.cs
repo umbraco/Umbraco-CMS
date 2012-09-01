@@ -253,12 +253,14 @@ namespace umbraco.presentation
             }
         }
 
+		[Obsolete("This is no longer used in the codebase and will be removed. ")]
         private const string XDocumentCacheKey = "XDocumentCache";
 
         /// <summary>
         /// Gets the Umbraco XML cache
         /// </summary>
         /// <value>The content XML.</value>
+        [Obsolete("This is no longer used in the codebase and will be removed. If you need to access the current XML cache document you can use the Umbraco.Web.Umbraco.Context.GetXml() method.")]
         public XDocument ContentXml
         {
             get
