@@ -233,7 +233,6 @@ namespace Umbraco.Core
                     "SqlCE4Umbraco,",
                     "Umbraco.Core,",
                     "umbraco.datalayer,",
-                    "umbraco.editorControls,",
                     "umbraco.interfaces,",										
 					"umbraco.providers,",
 					"Umbraco.Web.UI,",
