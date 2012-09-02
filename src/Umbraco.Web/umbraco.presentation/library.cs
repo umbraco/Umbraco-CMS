@@ -191,16 +191,32 @@ namespace umbraco
         /// Publishes a Document by adding it to the runtime xml index. Note, prior to this the Document should be 
         /// marked published by calling Publish(User u) on the document object.
         /// </summary>
-        /// <param name="DocumentId">The Id of the Document to be published</param>
-        public static void UpdateDocumentCache(int DocumentId)
+        /// <param name="documentId">The Id of the Document to be published</param>
+        public static void UpdateDocumentCache(int documentId)
         {
-            if (UmbracoSettings.UseDistributedCalls)
-                dispatcher.Refresh(
-                    new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"),
-                    DocumentId);
-            else
-                content.Instance.UpdateDocumentCache(DocumentId);
+			var d = new Document(documentId);
+        	UpdateDocumentCache(d);
         }
+
+		/// <summary>
+		/// Publishes a Document by adding it to the runtime xml index. Note, prior to this the Document should be 
+		/// marked published by calling Publish(User u) on the document object.
+		/// </summary>
+		/// <param name="doc"></param>
+		/// <remarks>
+		/// NOTE: This method was created because before it was always calling the method with the documentId as a parameter 
+		/// which means we have to re-look up the document in the db again when we already have it, this should save on a few 
+		/// dozen sql calls when publishing.
+		/// </remarks>
+		internal static void UpdateDocumentCache(Document doc)
+		{
+			if (UmbracoSettings.UseDistributedCalls)
+				dispatcher.Refresh(
+					new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"),
+					doc.Id);
+			else
+				content.Instance.UpdateDocumentCache(doc);
+		}
 
 
         /// <summary>
@@ -1563,6 +1579,8 @@ namespace umbraco
             }
         }
 
+		//TODO: WTF, why is this here? This won't matter if there's an UmbracoContext or not, it will call the same underlying method!
+		// only difference is that the UmbracoContext way will check if its in preview mode.
         private static XmlDocument GetThreadsafeXmlDocument()
         {
             return UmbracoContext.Current != null

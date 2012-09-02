@@ -315,7 +315,7 @@ namespace umbraco.cms.presentation
                     {
 
                         ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editContentPublishedHeader", null), ui.Text("speechBubbles", "editContentPublishedText", null));
-                        library.UpdateDocumentCache(_document.Id);
+                        library.UpdateDocumentCache(_document);
 
                         BusinessLogic.Log.Add(BusinessLogic.LogTypes.Publish, base.getUser(), _document.Id, "");
                         littPublishStatus.Text = ui.Text("content", "lastPublished", base.getUser()) + ": " + _document.VersionDate.ToString() + "<br/>";

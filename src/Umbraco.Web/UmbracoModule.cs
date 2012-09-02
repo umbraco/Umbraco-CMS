@@ -164,6 +164,7 @@ namespace Umbraco.Web
 		{
 			if (content.Instance.IsXmlQueuedForPersistenceToFile)
 			{
+				content.Instance.RemoveXmlFilePersistenceQueue();
 				content.Instance.PersistXmlToFile();
 			}
 		} 

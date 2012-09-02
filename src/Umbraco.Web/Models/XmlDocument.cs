@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.XPath;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 
@@ -263,7 +264,7 @@ namespace Umbraco.Web.Models
 
 		public IDocumentProperty GetProperty(string alias)
 		{
-			return Properties.FirstOrDefault(p => p.Alias == alias);
+			return Properties.FirstOrDefault(p => p.Alias.InvariantEquals(alias));
 		}
 
 		private void InitializeStructure()
