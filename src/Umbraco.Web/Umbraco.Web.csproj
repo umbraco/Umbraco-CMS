@@ -243,6 +243,9 @@
     <Compile Include="DefaultDynamicDocumentDataSource.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
+    <Compile Include="FormlessPage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
@@ -250,6 +253,7 @@
     </Compile>
     <Compile Include="umbraco.presentation\LibraryCacheRefresher.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />
+    <Compile Include="UmbracoHelper.cs" />
     <Compile Include="XmlPublishedContentStore.cs" />
     <Compile Include="ContentStoreResolver.cs" />
     <Compile Include="DocumentNotFoundHttpHandler.cs" />

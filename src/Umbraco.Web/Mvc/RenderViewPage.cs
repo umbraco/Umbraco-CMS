@@ -68,11 +68,15 @@ namespace Umbraco.Web.Mvc
 			return _cultureDictionary[key];
 		}
 
-		//private RazorLibraryCore _library;
-		//public RazorLibraryCore Library
-		//{
-		//    get { return _library ?? (_library = new RazorLibraryCore(Model.CurrentNode)); }
-		//}
+		private UmbracoHelper _helper;
+
+		/// <summary>
+		/// Gets an UmbracoHelper
+		/// </summary>
+		public UmbracoHelper UmbracoHelper
+		{
+			get { return _helper ?? (_helper = new UmbracoHelper(UmbracoContext)); }
+		}
 
 	}
 }

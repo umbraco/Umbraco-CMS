@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Security;
 using System.Text;
+using System.Web.Mvc;
 using NUnit.Framework;
 using Umbraco.Core;
 
 namespace Umbraco.Tests
 {
-    [TestFixture]
+	[TestFixture]
     public class StringExtensionsTests
     {
         [TestCase("Hello this is my string", " string", "Hello this is my")]

@@ -62,6 +62,7 @@
     <Compile Include="DynamicDocument\DynamicDocumentTests.cs" />
     <Compile Include="DynamicDocument\DynamicDocumentTestsBase.cs" />
     <Compile Include="DynamicDocument\DynamicNodeTests.cs" />
+    <Compile Include="ObjectExtensionsTests.cs" />
     <Compile Include="PublishContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
     <Compile Include="Routing\BaseRoutingTest.cs" />
