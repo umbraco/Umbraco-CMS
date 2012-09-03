@@ -259,7 +259,8 @@
     <key alias="memberGroup"><![CDATA[成员组]]></key>
     <key alias="memberRoles"><![CDATA[角色]]></key>
     <key alias="contentRecycleBin"><![CDATA[回收站]]></key>
-    <key alias="packages"><![CDATA[包]]></key>
+    <key alias="packager"><![CDATA[包]]></key>
+	<key alias="packages"><![CDATA[包]]></key>
     <key alias="repositories"><![CDATA[从在线程序库安装]]></key>
     <key alias="createdPackages"><![CDATA[创建包]]></key>
     <key alias="installedPackages"><![CDATA[已安装的包]]></key>

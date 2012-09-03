@@ -267,6 +267,7 @@
 	<key alias="memberGroup" version="2.1">Mitgliedergruppen</key>
 	<key alias="memberRoles" version="4.0">Mitgliederrollen</key>
 	<key alias="contentRecycleBin" version="4.0">Papierkorb</key>
+	<key alias="packager" version="4.9">Pakete</key>
 	<key alias="packages" version="4.0">Pakete</key>
 	<key alias="repositories" version="4.0">Paket-Repositories</key>
 	<key alias="createdPackages" version="4.0">Erstellte Pakete</key>

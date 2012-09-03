@@ -244,7 +244,8 @@
         <key alias="memberType"><![CDATA[Medlemstype]]></key>
         <key alias="memberRoles"><![CDATA[Roller]]></key>
         <key alias="nodeTypes"><![CDATA[Dokumenttyper]]></key>
-        <key alias="packages"><![CDATA[Pakker]]></key>
+        <key alias="packager"><![CDATA[Pakker]]></key>
+		<key alias="packages"><![CDATA[Pakker]]></key>
         <key alias="runway"><![CDATA[Installer Runway]]></key>
         <key alias="runwayModules"><![CDATA[Runway-moduler]]></key>
         <key alias="stylesheets"><![CDATA[Stylesheets]]></key>

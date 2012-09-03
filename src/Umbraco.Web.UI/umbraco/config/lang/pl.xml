@@ -238,7 +238,8 @@
     <key alias="runway"><![CDATA[Zainstaluj Runway]]></key>
     <key alias="repositories"><![CDATA[Zainstaluj z repozytorium]]></key>
     <key alias="python"><![CDATA[Pliki Python]]></key>
-    <key alias="packages"><![CDATA[Pakiety]]></key>
+    <key alias="packager"><![CDATA[Pakiety]]></key>
+	<key alias="packages"><![CDATA[Pakiety]]></key>
     <key alias="nodeTypes"><![CDATA[Typy dokumentów]]></key>
     <key alias="memberType"><![CDATA[Typ członka]]></key>
     <key alias="memberRoles"><![CDATA[Role]]></key>

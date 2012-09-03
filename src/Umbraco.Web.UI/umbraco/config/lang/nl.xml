@@ -258,7 +258,8 @@
     <key alias="memberGroup">Ledengroepen</key>
     <key alias="memberRoles">Rollen</key>
     <key alias="contentRecycleBin">Prullenbak</key>
-    <key alias="packages">Packages</key>
+    <key alias="packager">Packages</key>
+	<key alias="packages">Packages</key>
     <key alias="repositories">Installeer uit repository</key>
     <key alias="createdPackages">Gemaakte packages</key>
     <key alias="installedPackages">Geïnstalleerde packages</key>
