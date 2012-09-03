@@ -146,11 +146,8 @@ function init() {
 }
 
 function checkPrefix(n) {
-	/* UMBRACO SPECIFIC
 	if (n.value && Validator.isEmail(n) && !/^\s*mailto:/i.test(n.value) && confirm(tinyMCEPopup.getLang('advlink_dlg.is_email')))
 		n.value = 'mailto:' + n.value;
-	* EO UMBRACO SPECIFIC
-	*/	
 
 	if (/^\s*www\./i.test(n.value) && confirm(tinyMCEPopup.getLang('advlink_dlg.is_external')))
 		n.value = 'http://' + n.value;

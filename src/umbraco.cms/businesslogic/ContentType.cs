@@ -316,7 +316,7 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         public bool IsContainerContentType
         {
-            get { return _isContainerContentType; } 
+            get { return _isContainerContentType; }
             set
             {
                 _isContainerContentType = value;
@@ -324,7 +324,7 @@ namespace umbraco.cms.businesslogic
                                           "update cmsContentType set isContainerContentType = @isContainerContentType where nodeId = @id",
                                           SqlHelper.CreateParameter("@isContainerContentType", value),
                                           SqlHelper.CreateParameter("@id", Id));
-            } 
+            }
         }
 
         /// <summary>
@@ -962,25 +962,38 @@ namespace umbraco.cms.businesslogic
         }
 
 
-
+        private readonly object _virtualTabLoadLock = new object();
         /// <summary>
         /// Checks if we've loaded the virtual tabs into memory and if not gets them from the databse.
         /// </summary>
         private void EnsureVirtualTabs()
         {
-            //optimize, lazy load the data only one time
+            // This class can be cached and potentially shared between multiple threads.
+            // Two or more threads can attempt to lazyily-load its virtual tabs at the same time.
+            // If that happens, the m_VirtualTabs will contain duplicates.
+            // We must prevent two threads from running InitializeVirtualTabs at the same time.
+            // We must also prevent m_VirtualTabs from being modified while it is being populated.
             if (m_VirtualTabs == null || m_VirtualTabs.Count == 0)
             {
-                InitializeVirtualTabs();
+                lock (_virtualTabLoadLock)
+                {
+                    //optimize, lazy load the data only one time
+                    if (m_VirtualTabs == null || m_VirtualTabs.Count == 0)
+                    {
+                        InitializeVirtualTabs();
+                    }
+                }
             }
         }
+
 
         /// <summary>
         /// Loads the tabs into memory from the database and stores them in a local list for retreival
         /// </summary>
         private void InitializeVirtualTabs()
         {
-            m_VirtualTabs = new List<TabI>();
+            // While we are initialising, we should not use the class-scoped list, as it may be used by other threads
+            var temporaryList = new List<TabI>();
             using (IRecordsReader dr = SqlHelper.ExecuteReader(
                                                               string.Format(
                                                                   "Select Id,text,sortOrder from cmsTab where contenttypeNodeId = {0} order by sortOrder",
@@ -988,21 +1001,21 @@ namespace umbraco.cms.businesslogic
             {
                 while (dr.Read())
                 {
-                    m_VirtualTabs.Add(new Tab(dr.GetInt("id"), dr.GetString("text"), dr.GetInt("sortOrder"), this));
+                    temporaryList.Add(new Tab(dr.GetInt("id"), dr.GetString("text"), dr.GetInt("sortOrder"), this));
                 }
             }
 
             // Master Content Type
             if (MasterContentType != 0)
             {
-                foreach (TabI t in ContentType.GetContentType(MasterContentType).getVirtualTabs.ToList())
-                {
-                    m_VirtualTabs.Add(t);
-                }
+                temporaryList.AddRange(GetContentType(MasterContentType).getVirtualTabs.ToList());
             }
 
             // sort all tabs
-            m_VirtualTabs.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+            temporaryList.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+
+            // now that we aren't going to modify the list, we can set it to the class-scoped variable.
+            m_VirtualTabs = temporaryList;
         }
 
         private void populateMasterContentTypes(PropertyType pt, int docTypeId)
