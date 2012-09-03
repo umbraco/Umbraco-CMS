@@ -20,7 +20,7 @@ var UmbracoEmbedDialog = {
                     {
                         type: 'POST',
                         async: true,
-                        url: '/umbraco/webservices/api/mediaservice.asmx/Embed',
+                        url: '../../../../umbraco/webservices/api/mediaservice.asmx/Embed',
                         data: '{ url: "' + url + '", width: "' + width + '", height: "' + height + '" }',
                         contentType: 'application/json; charset=utf-8',
                         dataType: 'json',
