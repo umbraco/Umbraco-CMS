@@ -260,7 +260,8 @@
     <key alias="memberGroup"><![CDATA[Grupos de Membros]]></key>
     <key alias="memberRoles"><![CDATA[Funções]]></key>
     <key alias="contentRecycleBin"><![CDATA[Lixeira]]></key>
-    <key alias="packages"><![CDATA[Pacotes]]></key>
+    <key alias="packager"><![CDATA[Pacotes]]></key>
+	<key alias="packages"><![CDATA[Pacotes]]></key>
     <key alias="repositories"><![CDATA[Instalar desde o repositório]]></key>
     <key alias="createdPackages"><![CDATA[Pacotes criados]]></key>
     <key alias="installedPackages"><![CDATA[Pacotes instalados]]></key>

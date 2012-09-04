@@ -244,6 +244,7 @@
 	<key alias="memberRoles"><![CDATA[Roller]]></key>
 	<key alias="memberType"><![CDATA[Medlemstyper]]></key>
 	<key alias="nodeTypes"><![CDATA[Dokumenttyper]]></key>
+	<key alias="packager"><![CDATA[Paket]]></key>
 	<key alias="packages"><![CDATA[Paket]]></key>
 	<key alias="repositories"><![CDATA[Installera från gemensamt bibliotek]]></key>
 	<key alias="runway"><![CDATA[Installera Runway]]></key>

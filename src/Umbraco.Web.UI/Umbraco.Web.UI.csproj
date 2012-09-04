@@ -271,6 +271,9 @@
       <DependentUpon>FileSystemProviders.config</DependentUpon>
     </Content>
     <Content Include="config\embed.config" />
+    <None Include="config\embed.Release.config">
+      <DependentUpon>embed.config</DependentUpon>
+    </None>
     <None Include="config\xsltExtensions.Release.config">
       <DependentUpon>xsltExtensions.config</DependentUpon>
     </None>

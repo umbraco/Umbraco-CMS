@@ -1727,6 +1727,9 @@
     <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltSets.cs" />
     <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltStrings.cs" />
     <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery.cs" />
+    <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-Content.cs">
+      <DependentUpon>uQuery.cs</DependentUpon>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-DataTypes.cs">
       <DependentUpon>uQuery.cs</DependentUpon>
     </Compile>

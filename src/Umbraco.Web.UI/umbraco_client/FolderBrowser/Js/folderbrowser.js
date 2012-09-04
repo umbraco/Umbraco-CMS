@@ -166,7 +166,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             var self = this;
             
             // Inject the upload button into the toolbar
-            var button = $("<input id='fbUploadToolbarButton' type='image' src='images/editor/upload.png' titl='Upload...' onmouseover=\"this.className='editorIconOver'\" onmouseout=\"this.className='editorIcon'\" onmouseup=\"this.className='editorIconOver'\" onmousedown=\"this.className='editorIconDown'\" />");
+            var button = $("<input id='fbUploadToolbarButton' type='image' src='images/editor/upload.png' title='Upload...' onmouseover=\"this.className='editorIconOver'\" onmouseout=\"this.className='editorIcon'\" onmouseup=\"this.className='editorIconOver'\" onmousedown=\"this.className='editorIconDown'\" />");
             button.click(function (e) {
                 e.preventDefault();
                 $(".upload-overlay").show();
