@@ -1727,6 +1727,9 @@
     <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltSets.cs" />
     <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltStrings.cs" />
     <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery.cs" />
+    <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-Content.cs">
+      <DependentUpon>uQuery.cs</DependentUpon>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-DataTypes.cs">
       <DependentUpon>uQuery.cs</DependentUpon>
     </Compile>
@@ -1969,7 +1972,9 @@
     <Content Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx" />
-    <Content Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx" />
+    <Content Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\settings\editTemplate.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

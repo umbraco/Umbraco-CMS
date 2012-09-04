@@ -271,6 +271,9 @@
       <DependentUpon>FileSystemProviders.config</DependentUpon>
     </Content>
     <Content Include="config\embed.config" />
+    <None Include="config\embed.Release.config">
+      <DependentUpon>embed.config</DependentUpon>
+    </None>
     <None Include="config\xsltExtensions.Release.config">
       <DependentUpon>xsltExtensions.config</DependentUpon>
     </None>
@@ -339,6 +342,7 @@
     <Content Include="umbraco\images\download.png" />
     <Content Include="umbraco\images\editor\doc.gif" />
     <Content Include="umbraco\images\editor\documentType.gif" />
+    <Content Include="umbraco\images\editor\upload.png" />
     <Content Include="umbraco\images\information.png" />
     <Content Include="umbraco\images\listItemOrange.gif" />
     <Content Include="umbraco\images\pencil.png" />
@@ -518,6 +522,14 @@
     <Content Include="umbraco_client\FileUploader\js\jquery.fileUploader.js" />
     <Content Include="umbraco_client\FolderBrowser\Css\folderbrowser.css" />
     <Content Include="umbraco_client\FolderBrowser\Js\folderbrowser.js" />
+    <Content Include="umbraco_client\Installer\images\bg-blog-repeat.jpg" />
+    <Content Include="umbraco_client\Installer\images\bg-normal-repeat.jpg" />
+    <Content Include="umbraco_client\Installer\images\bg-personal-repeat.jpg" />
+    <Content Include="umbraco_client\Installer\images\bg-simple-repeat.jpg" />
+    <Content Include="umbraco_client\Installer\images\btn-back.png" />
+    <Content Include="umbraco_client\Installer\images\btn-buisness-repeat.png" />
+    <Content Include="umbraco_client\Installer\images\btn-confirm.png" />
+    <Content Include="umbraco_client\Installer\images\pbar.gif" />
     <Content Include="umbraco_client\tags\css\jquery.tagsinput.css" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.js" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.min.js">
@@ -1455,10 +1467,6 @@
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="web.Template.KRAFTWERK.Debug.config">
-      <DependentUpon>web.Template.config</DependentUpon>
-      <SubType>Designer</SubType>
-    </Content>
     <None Include="web.Template.Release.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -1968,6 +1976,10 @@
     </None>
     <None Include="web.Template.MBP13-PC.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
+    </None>
+    <None Include="web.Template.KRAFTWERK.Debug.config">
+      <DependentUpon>web.Template.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>

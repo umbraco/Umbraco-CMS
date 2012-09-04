@@ -152,7 +152,8 @@
 
 .umbFolderBrowser .filter input {
     border: solid 1px #ccc;
-    width: 200px;
+    padding: 0 3px;
+    width: 194px;
 }
 
 .umbFolderBrowser .throbber {
