@@ -107,6 +107,9 @@ namespace Umbraco.Web.UI.Controls
             }
             sb.Append("</ul>");
 
+            // Path for tree refresh
+            Panel.Attributes.Add("data-nodepath", ParentNode.Path);
+
             // Create size changer
             sb.Append("<div class='thumb-sizer'>" +
                       "<input type='radio' name='thumb_size' value='small' data-bind='checked: thumbSize' />" +

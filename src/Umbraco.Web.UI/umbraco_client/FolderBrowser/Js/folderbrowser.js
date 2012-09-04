@@ -34,6 +34,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
         _el: null,
         _elId: null,
         _parentId: null,
+        _nodePath: null,
         _opts: null,
         _viewModel: null,
 
@@ -239,6 +240,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     switch (data.status) {
                         case 'success':
                             self._viewModel.queued.remove(data.context);
+                            UmbClientMgr.mainTree().syncTree(self._nodePath.toString(), true);
                             break;
                         case 'error':
                             data.context.message(data.message);
@@ -397,6 +399,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
             // Grab parent id from element
             self._parentId = $(el).data("parentid");
+            
+            // Grab node path from element
+            self._nodePath = $(el).data("nodepath");
 
             // Merge options with default
             self._opts = $.extend({
