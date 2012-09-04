@@ -522,6 +522,14 @@
     <Content Include="umbraco_client\FileUploader\js\jquery.fileUploader.js" />
     <Content Include="umbraco_client\FolderBrowser\Css\folderbrowser.css" />
     <Content Include="umbraco_client\FolderBrowser\Js\folderbrowser.js" />
+    <Content Include="umbraco_client\Installer\images\bg-blog-repeat.jpg" />
+    <Content Include="umbraco_client\Installer\images\bg-normal-repeat.jpg" />
+    <Content Include="umbraco_client\Installer\images\bg-personal-repeat.jpg" />
+    <Content Include="umbraco_client\Installer\images\bg-simple-repeat.jpg" />
+    <Content Include="umbraco_client\Installer\images\btn-back.png" />
+    <Content Include="umbraco_client\Installer\images\btn-buisness-repeat.png" />
+    <Content Include="umbraco_client\Installer\images\btn-confirm.png" />
+    <Content Include="umbraco_client\Installer\images\pbar.gif" />
     <Content Include="umbraco_client\tags\css\jquery.tagsinput.css" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.js" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.min.js">
