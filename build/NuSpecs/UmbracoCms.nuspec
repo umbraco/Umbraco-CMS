@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-16"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>UmbracoCms</id>
+        <version>4.9.0</version>
+        <title>Umbraco Cms</title>
+        <authors>Morten Christensen</authors>
+        <owners>Umbraco HQ</owners>
+        <licenseUrl>http://umbraco.codeplex.com/license</licenseUrl>
+        <projectUrl>http://umbraco.com/</projectUrl>
+        <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Installs Umbraco Cms in your Visual Studio ASP.NET Webforms project</description>
+        <summary>Installs Umbraco Cms in your Visual Studio ASP.NET Webforms project</summary>
+        <language>en-US</language>
+        <tags>umbraco</tags>
+        <dependencies>
+            <dependency id="UmbracoCms.Core" version="4.9.0" />
+        </dependencies>
+    </metadata>
+  <files>
+    <file src="..\_BuildOutput\WebApp\config\*.config" target="Content\config" />
+	<file src="..\_BuildOutput\WebApp\css\**" target="Content\css" />
+	<file src="..\_BuildOutput\WebApp\macroScripts\**" target="Content\macroScripts" />
+	<file src="..\_BuildOutput\WebApp\masterpages\**" target="Content\masterpages" />
+	<file src="..\_BuildOutput\WebApp\media\**" target="Content\media" />
+	<file src="..\_BuildOutput\WebApp\scripts\**" target="Content\scripts" />
+	<file src="..\_BuildOutput\WebApp\usercontrols\**" target="Content\usercontrols" />
+	<file src="..\_BuildOutput\WebApp\xslt\**" target="Content\xslt" />
+	<file src="..\_BuildOutput\WebApp\default.aspx" target="Content\default.aspx" />
+	<file src="..\_BuildOutput\WebApp\Web.config" target="Content\Web.config" />
+	<file src="..\_BuildOutput\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
+	<file src="..\_BuildOutput\WebApp\App_Code\**" target="UmbracoFiles\App_Code" />
+	<file src="..\_BuildOutput\WebApp\App_Data\**" target="UmbracoFiles\App_Data" />
+	<file src="..\_BuildOutput\WebApp\config\**" target="UmbracoFiles\config" />
+	<file src="..\_BuildOutput\WebApp\install\**" target="UmbracoFiles\install" />
+	<file src="..\_BuildOutput\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
+	<file src="..\_BuildOutput\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
+	<file src="..\_BuildOutput\WebApp\Web.config" target="UmbracoFiles\Web.config" />
+    <file src="tools\install.ps1" target="tools\install.ps1" />
+    <file src="tools\Readme.txt" target="tools\Readme.txt" />
+  </files>
+</package>
