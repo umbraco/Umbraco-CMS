@@ -39,7 +39,7 @@
 			ed.addButton('umbracoembed', {
 				title : 'Embed third party media',
 				cmd : 'mceUmbracoEmbed',
-				image : url + '/img/embed.png'
+				image : url + '/img/embed.gif'
 			});
 
 			// Add a node change handler, selects the button in the UI when a image is selected

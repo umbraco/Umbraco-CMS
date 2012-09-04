@@ -740,7 +740,7 @@
     <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\editor_plugin.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\editor_plugin_src.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\img\ajax-loader.gif" />
-    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\img\embed.png" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\img\embed.gif" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\js\dialog.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\en.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\en_dlg.js" />
