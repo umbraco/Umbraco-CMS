@@ -49,16 +49,13 @@
     FileUploader.prototype = {
 
         // Private methods
+
         _init: function () {
             var self = this;
 
             // Init vars
             self.wrapperId = 'fu-fileUploader-' + self.uploaderId;
-            self.wrapper = ' \
-			<div id="' + self.wrapperId + '" class="fu-fileUploader"> \
-				<div class="fu-formContainer"></div> \
-			    <div class="fu-itemContainer"></div> \
-            </div>';
+            self.wrapper = '<div id="' + self.wrapperId + '" class="fu-fileUploader"><div class="fu-formContainer"></div><div class="fu-itemContainer"></div></div>';
 
             self.wrapperSelector = '#' + self.wrapperId;
             self.formContainerSelector = self.wrapperSelector + " .fu-formContainer";
@@ -256,7 +253,7 @@
                 var response = self.opts.onUpload(data);
                 if (response === false) {
                     return false; //TODO: Raise onDone event?
-                } 
+                }
 
                 self.inProgressItemId = data.itemId;
 
@@ -364,7 +361,7 @@
             if (count === undefined) {
                 count = 0;
             }
-            
+
             if ($.fileUploader.percentageInterval[count]) {
                 data.progress = $.fileUploader.percentageInterval[count] + Math.floor(Math.random() * 5 + 1);
                 self.opts.onProgress(data);
