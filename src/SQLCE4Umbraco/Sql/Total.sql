@@ -873,7 +873,7 @@ add [description] nvarchar(1500) NULL
 ALTER TABLE umbracoLog ALTER COLUMN logComment NVARCHAR(4000) NULL
 ;
 !!!SET IDENTITY_INSERT [cmsDataTypePreValues] ON 
-|insert into cmsDataTypePreValues (id, dataTypeNodeId, [value], sortorder, alias) values (3,-87,',code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,mcecharmap,' + nchar(124) + '1' + nchar(124) + '1,2,3,' + nchar(124) + '0' + nchar(124) + '500,400' + nchar(124) + '1049,' + nchar(124) + 'true' + nchar(124) + '', 0, '')
+|insert into cmsDataTypePreValues (id, dataTypeNodeId, [value], sortorder, alias) values (3,-87,',code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,' + nchar(124) + '1' + nchar(124) + '1,2,3,' + nchar(124) + '0' + nchar(124) + '500,400' + nchar(124) + '1049,' + nchar(124) + 'true' + nchar(124) + '', 0, '')
 |insert into cmsDataTypePreValues (id, dataTypeNodeId, [value], sortorder, alias) values (4,1041,'default', 0, 'group')
 |SET IDENTITY_INSERT [cmsDataTypePreValues] OFF
 ;
