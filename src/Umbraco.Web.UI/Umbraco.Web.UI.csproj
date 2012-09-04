@@ -450,6 +450,8 @@
     <Content Include="umbraco_client\CodeMirror\js\mode\python\index.html" />
     <Content Include="umbraco_client\CodeMirror\js\mode\python\LICENSE.txt" />
     <Content Include="umbraco_client\CodeMirror\js\mode\python\python.js" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\razor\index.html" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\razor\razor.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\rpm\changes\changes.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\rpm\changes\index.html" />
     <Content Include="umbraco_client\CodeMirror\js\mode\rpm\spec\index.html" />
@@ -1460,6 +1462,7 @@
     <None Include="umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\perl\LICENSE" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\razor\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\ruby\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\r\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\xquery\LICENSE" />

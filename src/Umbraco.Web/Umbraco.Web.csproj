@@ -1947,7 +1947,9 @@
     <Content Include="umbraco.presentation\umbraco\developer\Cache\viewCacheItem.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx" />
-    <Content Include="umbraco.presentation\umbraco\editContent.aspx" />
+    <Content Include="umbraco.presentation\umbraco\editContent.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\editMedia.aspx" />
     <Content Include="umbraco.presentation\umbraco\js\language.aspx" />
     <Content Include="umbraco.presentation\umbraco\login.aspx">
