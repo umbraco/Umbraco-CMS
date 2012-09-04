@@ -35,7 +35,7 @@
         // Setup instance
         self.input = el;
         self.form = $el.parents("form");
-        self.uploaderId = $.fileUploader.count + 1;
+        self.uploaderId = ++$.fileUploader.count;
 
         self.opts = $.extend({}, defaultOptions, options);
 
@@ -49,7 +49,6 @@
     FileUploader.prototype = {
 
         // Private methods
-
         _init: function () {
             var self = this;
 
@@ -83,10 +82,10 @@
 
             // Hookup drag and drop support
             $(self.opts.dropTarget !== null ? self.opts.dropTarget : self.wrapperSelector).bind('dragenter dragover', false).bind('drop', function (e) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    self._addFileHtml5(e.dataTransfer);
-                });
+                e.stopPropagation();
+                e.preventDefault();
+                self._addFileHtml5(e.dataTransfer);
+            });
         },
 
         _getFileName: function (filePath) {
@@ -121,7 +120,7 @@
 
         _createNewForm: function () {
             var self = this;
-            var id = self.itemCount + 1;
+            var id = ++self.itemCount;
 
             var itemId = 'fu-item-' + self.uploaderId + '-' + id;
             var iframeId = 'fu-frame-' + self.uploaderId + '-' + id;
@@ -369,7 +368,7 @@
 
             if ($.fileUploader.timeInterval[count]) {
                 self.progressTimeout = setTimeout(function () {
-                    self._startDummyProgress(data, count + 1);
+                    self._startDummyProgress(data, ++count);
                 }, $.fileUploader.timeInterval[count] * 1000);
             }
         },
@@ -425,7 +424,7 @@
             $(self.formContainerSelector).empty();
 
             var queuedItems = $(self.itemContainerSelector + " .fu-item");
-            for (var i = 0; i < queuedItems.length; i + 1) {
+            for (var i = 0; i < queuedItems.length; i++) {
                 var data = $(queuedItems.get(i)).data('data');
                 self.cancelItem(data.itemId);
             }
@@ -473,7 +472,8 @@
             } else {
                 $.error('Method ' + o + ' does not exist on jQuery.fileUploader');
             }
-        } else if (typeof o === 'object' || !o) {
+        }
+        else if (typeof o === 'object' || !o) {
             return this.each(function () {
                 var fileUploader = new FileUploader(this, o);
                 $(this).data("fileuploader_api", fileUploader);
