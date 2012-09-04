@@ -342,6 +342,7 @@
     <Content Include="umbraco\images\download.png" />
     <Content Include="umbraco\images\editor\doc.gif" />
     <Content Include="umbraco\images\editor\documentType.gif" />
+    <Content Include="umbraco\images\editor\upload.png" />
     <Content Include="umbraco\images\information.png" />
     <Content Include="umbraco\images\listItemOrange.gif" />
     <Content Include="umbraco\images\pencil.png" />
@@ -1458,10 +1459,6 @@
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="web.Template.KRAFTWERK.Debug.config">
-      <DependentUpon>web.Template.config</DependentUpon>
-      <SubType>Designer</SubType>
-    </Content>
     <None Include="web.Template.Release.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -1971,6 +1968,10 @@
     </None>
     <None Include="web.Template.MBP13-PC.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
+    </None>
+    <None Include="web.Template.KRAFTWERK.Debug.config">
+      <DependentUpon>web.Template.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
