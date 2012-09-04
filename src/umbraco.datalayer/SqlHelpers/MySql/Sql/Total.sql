@@ -737,7 +737,7 @@ alter TABLE cmsContentType add description nvarchar(1500) NULL
 alter TABLE cmsContentType add masterContentType int NULL
 ;
 insert into cmsDataTypePreValues (id, dataTypeNodeId, value, sortorder, alias) values 
-(3,-87,',code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|', 0, ''),
+(3,-87,',code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|', 0, ''),
 (4,1041,'default', 0, 'group')
 ;
 
