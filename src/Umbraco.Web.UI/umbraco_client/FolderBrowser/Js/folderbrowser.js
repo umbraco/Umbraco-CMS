@@ -240,7 +240,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     switch (data.status) {
                         case 'success':
                             self._viewModel.queued.remove(data.context);
-                            UmbClientMgr.mainTree().syncTree(self._nodePath.toString(), true);
                             break;
                         case 'error':
                             data.context.message(data.message);
@@ -262,6 +261,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 },
                 onDoneAll: function () {
                     self._getChildNodes();
+                    $(".upload-overlay").hide();
+                    UmbClientMgr.mainTree().syncTree(self._nodePath.toString(), true);
                 }
             });
 
