@@ -212,8 +212,10 @@ namespace Umbraco.Core.Logging
 		/// <param name="formatItems"></param>
 		public static void Debug<T>(string generateMessageFormat, TraceContext trace, params Func<object>[] formatItems)
 		{
-			if (trace == null) throw new ArgumentNullException("trace");
-			trace.Write(string.Format(generateMessageFormat, formatItems.Select(x => x())));
+			if (trace != null)
+			{
+				trace.Write(string.Format(generateMessageFormat, formatItems.Select(x => x())));	
+			}			
 			Debug(typeof(T), generateMessageFormat, formatItems);
 		}
 

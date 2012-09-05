@@ -69,12 +69,12 @@ namespace Umbraco.Web
 			var uri = umbracoContext.UmbracoUrl;
 			var lpath = umbracoContext.UmbracoUrl.AbsolutePath.ToLowerInvariant();
 
-			// legacy - no idea what this is
-			LegacyCleanUmbPageFromQueryString(ref uri, ref lpath);
-
 			//do not continue if this request is not a front-end routable page
 			if (EnsureUmbracoRoutablePage(uri, lpath, httpContext))
 			{
+				// legacy - no idea what this is
+				LegacyCleanUmbPageFromQueryString(ref uri, ref lpath);
+
 				//Create a document request since we are rendering a document on the front-end
 
 				// create the new document request 

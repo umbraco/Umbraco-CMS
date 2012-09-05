@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.UI;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.property;
@@ -20,27 +21,42 @@ namespace umbraco
 	/// </summary>
 	public class page
 	{
-		const string TraceCategory = "UmbracoPage";
 
 		#region Private members and properties
 
-		string pageName;
-		int parentId;
-		string writerName;
-		string creatorName;
-		string path;
-		int nodeType;
-		string nodeTypeAlias;
-		string[] splitpath;
-		DateTime createDate;
-		DateTime updateDate;
-		int pageID;
-		Guid pageVersion;
-		int template;
+		string _pageName;
+		int _parentId;
+		string _writerName;
+		string _creatorName;
+		string _path;
+		int _nodeType;
+		string _nodeTypeAlias;
+		string[] _splitpath;
+		DateTime _createDate;
+		DateTime _updateDate;
+		int _pageId;
+		Guid _pageVersion;
+		readonly int _template;
 
-		Hashtable elements = new Hashtable();
-		StringBuilder pageContent = new StringBuilder();
-		Control pageContentControl = new Control();
+		readonly Hashtable _elements = new Hashtable();
+		readonly StringBuilder _pageContent = new StringBuilder();
+		Control _pageContentControl = new Control();
+
+		/// <summary>
+		/// Returns the trace context to use for debugging, this is for backwards compatibility as people may be execting some of this
+		/// information in the TraceContext.
+		/// </summary>
+		private TraceContext TraceContext
+		{
+			get
+			{
+				if (HttpContext.Current == null)
+				{
+					return null;
+				}
+				return HttpContext.Current.Trace;
+			}
+		}
 
 		#endregion
 
@@ -61,25 +77,28 @@ namespace umbraco
 		/// <param name="document">The document.</param>
 		public page(Document document)
 		{
-			HttpContext.Current.Trace.Write(TraceCategory, "Ctor(document)");
-
-			var parent = document.Parent;
+			var docParentId = -1;
+			try
+			{
+				docParentId = document.Parent.Id;
+			}
+			catch (ArgumentException)
+			{
+				//ignore if no parent
+			}
 
 			populatePageData(document.Id,
 				document.Text, document.ContentType.Id, document.ContentType.Alias,
 				document.User.Name, document.Creator.Name, document.CreateDateTime, document.UpdateDate,
-				document.Path, document.Version, parent == null ? -1 : parent.Id);
+				document.Path, document.Version, docParentId);
 
 			foreach (Property prop in document.GenericProperties)
 			{
 				string value = prop.Value != null ? prop.Value.ToString() : String.Empty;
-				elements.Add(prop.PropertyType.Alias, value);
+				_elements.Add(prop.PropertyType.Alias, value);
 			}
 
-			template = document.Template;
-
-			HttpContext.Current.Trace.Write(TraceCategory, string.Format("Loaded \"{0}\" (id={1}, version={2})",
-				this.PageName, this.pageID, this.pageVersion));
+			_template = document.Template;
 		}
 
 		/// <summary>
@@ -88,7 +107,6 @@ namespace umbraco
 		/// <param name="docreq">The <see cref="DocumentRequest"/> pointing to the document.</param>
 		internal page(DocumentRequest docreq)
 		{
-			HttpContext.Current.Trace.Write(TraceCategory, "Ctor(documentRequest)");
 
 			if (!docreq.HasNode)
 				throw new ArgumentException("Document request has no node.", "docreq");
@@ -101,14 +119,12 @@ namespace umbraco
 			if (docreq.HasTemplate)
 			{
 
-				this.template = docreq.Template.Id;
-				elements["template"] = template.ToString();				
+				this._template = docreq.Template.Id;
+				_elements["template"] = _template.ToString();				
 			}
 
 			PopulateElementData(docreq.Document);
 
-			HttpContext.Current.Trace.Write(TraceCategory, string.Format("Loaded \"{0}\" (id={1}, version={2})",
-				this.PageName, this.pageID, this.pageVersion));
 		}
 
 		/// <summary>
@@ -116,32 +132,30 @@ namespace umbraco
 		/// </summary>
 		/// <param name="node">The <c>XmlNode</c> representing the document.</param>
 		public page(XmlNode node)
-		{
-			HttpContext.Current.Trace.Write(TraceCategory, "Ctor(xmlNode)");
-
+		{			
 			populatePageData(node);
 
 			// Check for alternative template
 			if (HttpContext.Current.Items["altTemplate"] != null &&
 				HttpContext.Current.Items["altTemplate"].ToString() != String.Empty)
 			{
-				template =
+				_template =
 					umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(
 						HttpContext.Current.Items["altTemplate"].ToString());
-				elements.Add("template", template.ToString());
+				_elements.Add("template", _template.ToString());
 			}
 			else if (helper.Request("altTemplate") != String.Empty)
 			{
-				template =
+				_template =
 					umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(helper.Request("altTemplate").ToLower());
-				elements.Add("template", template.ToString());
+				_elements.Add("template", _template.ToString());
 			}
-			if (template == 0)
+			if (_template == 0)
 			{
 				try
 				{
-					template = Convert.ToInt32(node.Attributes.GetNamedItem("template").Value);
-					elements.Add("template", node.Attributes.GetNamedItem("template").Value);
+					_template = Convert.ToInt32(node.Attributes.GetNamedItem("template").Value);
+					_elements.Add("template", node.Attributes.GetNamedItem("template").Value);
 				}
 				catch
 				{
@@ -151,8 +165,6 @@ namespace umbraco
 
 			populateElementData(node);
 
-			HttpContext.Current.Trace.Write(TraceCategory, string.Format("Loaded \"{0}\" (id={1}, version={2})",
-				this.PageName, this.pageID, this.pageVersion));
 		}
 
 		#endregion
@@ -164,32 +176,32 @@ namespace umbraco
 			string writerName, string creatorName, DateTime createDate, DateTime updateDate,
 			string path, Guid pageVersion, int parentId)
 		{
-			this.pageID = pageID;
-			this.pageName = pageName;
-			this.nodeType = nodeType;
-			this.nodeTypeAlias = nodeTypeAlias;
-			this.writerName = writerName;
-			this.creatorName = creatorName;
-			this.createDate = createDate;
-			this.updateDate = updateDate;
-			this.parentId = parentId;
-			this.path = path;
-			this.splitpath = path.Split(',');
-			this.pageVersion = pageVersion;
+			this._pageId = pageID;
+			this._pageName = pageName;
+			this._nodeType = nodeType;
+			this._nodeTypeAlias = nodeTypeAlias;
+			this._writerName = writerName;
+			this._creatorName = creatorName;
+			this._createDate = createDate;
+			this._updateDate = updateDate;
+			this._parentId = parentId;
+			this._path = path;
+			this._splitpath = path.Split(',');
+			this._pageVersion = pageVersion;
 
 			// Update the elements hashtable
-			elements.Add("pageID", pageID);
-			elements.Add("parentID", parentId);
-			elements.Add("pageName", pageName);
-			elements.Add("nodeType", nodeType);
-			elements.Add("nodeTypeAlias", nodeTypeAlias);
-			elements.Add("writerName", writerName);
-			elements.Add("creatorName", creatorName);
-			elements.Add("createDate", createDate);
-			elements.Add("updateDate", updateDate);
-			elements.Add("path", path);
-			elements.Add("splitpath", splitpath);
-			elements.Add("pageVersion", pageVersion);
+			_elements.Add("pageID", pageID);
+			_elements.Add("parentID", parentId);
+			_elements.Add("pageName", pageName);
+			_elements.Add("nodeType", nodeType);
+			_elements.Add("nodeTypeAlias", nodeTypeAlias);
+			_elements.Add("writerName", writerName);
+			_elements.Add("creatorName", creatorName);
+			_elements.Add("createDate", createDate);
+			_elements.Add("updateDate", updateDate);
+			_elements.Add("path", path);
+			_elements.Add("splitpath", _splitpath);
+			_elements.Add("pageVersion", pageVersion);
 		}
 
 		void populatePageData(XmlNode node)
@@ -200,36 +212,36 @@ namespace umbraco
 			int i;
 
 			if (int.TryParse(attrValue(node, "id"), out i))
-				elements["pageID"] = this.pageID = i;
+				_elements["pageID"] = this._pageId = i;
 
 			if ((s = attrValue(node, "nodeName")) != null)
-				elements["pageName"] = this.pageName = s;
+				_elements["pageName"] = this._pageName = s;
 
 			if (int.TryParse(attrValue(node, "parentId"), out i))
-				elements["parentId"] = this.parentId = i;
+				_elements["parentId"] = this._parentId = i;
 
 			if (int.TryParse(attrValue(node, "nodeType"), out i))
-				elements["nodeType"] = this.nodeType = i;
+				_elements["nodeType"] = this._nodeType = i;
 			if ((s = attrValue(node, "nodeTypeAlias")) != null)
-				elements["nodeTypeAlias"] = this.nodeTypeAlias = s;
+				_elements["nodeTypeAlias"] = this._nodeTypeAlias = s;
 
 			if ((s = attrValue(node, "writerName")) != null)
-				elements["writerName"] = this.writerName = s;
+				_elements["writerName"] = this._writerName = s;
 			if ((s = attrValue(node, "creatorName")) != null)
-				elements["creatorName"] = this.creatorName = s;
+				_elements["creatorName"] = this._creatorName = s;
 
 			if (DateTime.TryParse(attrValue(node, "createDate"), out dt))
-				elements["createDate"] = this.createDate = dt;
+				_elements["createDate"] = this._createDate = dt;
 			if (DateTime.TryParse(attrValue(node, "updateDate"), out dt))
-				elements["updateDate"] = this.updateDate = dt;
+				_elements["updateDate"] = this._updateDate = dt;
 
 			if (Guid.TryParse(attrValue(node, "pageVersion"), out guid))
-				elements["pageVersion"] = this.pageVersion = guid;
+				_elements["pageVersion"] = this._pageVersion = guid;
 
 			if ((s = attrValue(node, "path")) != null)
 			{
-				elements["path"] = this.path = s;
-				elements["splitpath"] = this.splitpath = path.Split(',');
+				_elements["path"] = this._path = s;
+				_elements["splitpath"] = this._splitpath = _path.Split(',');
 			}
 		}
 
@@ -248,9 +260,9 @@ namespace umbraco
 		{
 			foreach(var p in node.Properties)
 			{
-				if (!elements.ContainsKey(p.Alias))				
+				if (!_elements.ContainsKey(p.Alias))				
 				{
-					elements[p.Alias] = p.Value;					
+					_elements[p.Alias] = p.Value;					
 				}
 			}			
 		}
@@ -276,16 +288,18 @@ namespace umbraco
 				//        HttpContext.Current.Response.Redirect(library.NiceUrl(int.Parse(data.FirstChild.Value)), true);
 				//}
 
-				if (elements.ContainsKey(alias))
+				if (_elements.ContainsKey(alias))
 				{
-					HttpContext.Current.Trace.Warn(TraceCategory,
-						string.Format("Aliases must be unique, an element with alias \"{0}\" has already been loaded!", alias));
+					LogHelper.Debug<page>(
+						string.Format("Aliases must be unique, an element with alias \"{0}\" has already been loaded!", alias), 
+						TraceContext);					
 				}
 				else
 				{
-					elements[alias] = value;
-					HttpContext.Current.Trace.Write(TraceCategory,
-						string.Format("Load element \"{0}\"", alias));
+					_elements[alias] = value;
+					LogHelper.Debug<page>(
+						string.Format("Load element \"{0}\"", alias),
+						TraceContext);					
 				}
 			}
 		}
@@ -297,18 +311,14 @@ namespace umbraco
 		public void RenderPage(int templateId)
 		{
 			if (templateId != 0)
-			{
-				HttpContext.Current.Trace.Write(TraceCategory, string.Format("RenderPage: loading template (id={0})", templateId));
+			{				
 				template templateDesign = new template(templateId);
-
-				HttpContext.Current.Trace.Write(TraceCategory, "RenderPage: template loaded");
+			
 				HttpContext.Current.Items["umbPageObject"] = this;
 
-				pageContentControl = templateDesign.ParseWithControls(this);
-				pageContent.Append(templateDesign.TemplateContent);
+				_pageContentControl = templateDesign.ParseWithControls(this);
+				_pageContent.Append(templateDesign.TemplateContent);
 			}
-			else
-				HttpContext.Current.Trace.Warn(TraceCategory, "RenderPage: no template (id=0)");
 		}
 
 		#endregion
@@ -317,72 +327,72 @@ namespace umbraco
 
 		public Control PageContentControl
 		{
-			get { return pageContentControl; }
+			get { return _pageContentControl; }
 		}
 
 		public string PageName
 		{
-			get { return pageName; }
+			get { return _pageName; }
 		}
 
 		public int ParentId
 		{
-			get { return parentId; }
+			get { return _parentId; }
 		}
 
 		public string NodeTypeAlias
 		{
-			get { return nodeTypeAlias; }
+			get { return _nodeTypeAlias; }
 		}
 
 		public int NodeType
 		{
-			get { return nodeType; }
+			get { return _nodeType; }
 		}
 
 		public string WriterName
 		{
-			get { return writerName; }
+			get { return _writerName; }
 		}
 
 		public string CreatorName
 		{
-			get { return creatorName; }
+			get { return _creatorName; }
 		}
 
 		public DateTime CreateDate
 		{
-			get { return createDate; }
+			get { return _createDate; }
 		}
 
 		public DateTime UpdateDate
 		{
-			get { return updateDate; }
+			get { return _updateDate; }
 		}
 
 		public int PageID
 		{
-			get { return pageID; }
+			get { return _pageId; }
 		}
 
 		public int Template
 		{
-			get { return template; }
+			get { return _template; }
 		}
 
 		public Hashtable Elements
 		{
-			get { return elements; }
+			get { return _elements; }
 		}
 
 		public string PageContent
 		{
-			get { return pageContent.ToString(); }
+			get { return _pageContent.ToString(); }
 		}
 
 		public string[] SplitPath
 		{
-			get { return this.splitpath; }
+			get { return this._splitpath; }
 		}
 
 		#endregion
@@ -391,7 +401,7 @@ namespace umbraco
 
 		public override string ToString()
 		{
-			return pageName;
+			return _pageName;
 		}
 
 		#endregion
