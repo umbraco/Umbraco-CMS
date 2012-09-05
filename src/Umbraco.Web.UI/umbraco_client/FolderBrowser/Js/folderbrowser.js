@@ -262,7 +262,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 onDoneAll: function () {
                     self._getChildNodes();
                     $(".upload-overlay").hide();
-                    UmbClientMgr.mainTree().syncTree(self._nodePath.toString(), true);
+                    UmbClientMgr.mainTree().syncTree(self._nodePath.toString(), true, false);
                 }
             });
 
