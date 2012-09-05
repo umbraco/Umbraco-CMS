@@ -34,6 +34,7 @@
             dataType: 'json',
             matchCase: true,
             matchContains: false,
+            selectFirst: false, // FR: This enabled the search popup to show, otherwise it selects the first item
             extraParams: {
                 //return the current app, if it's not media, then it's Content as this is the only searches that are supported.
                 app: function () {

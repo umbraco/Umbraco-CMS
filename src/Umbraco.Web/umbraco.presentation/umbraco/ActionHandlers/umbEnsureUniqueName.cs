@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic.Actions;
@@ -45,14 +47,17 @@ namespace umbraco.ActionHandlers
 
                 //store children array here because iterating over an Array property object is very inneficient.
                 var c = Document.GetChildrenBySearch(documentObject.ParentId, currentName + "%");
-                foreach (Document d in c)
+
+                // must sort the list or else duplicate name will exist if pages are out out sequence
+                //e.g. Page (1), Page (3), Page (2)
+                var results = c.OrderBy(x => x.Text, new SimilarNodeNameComparer());
+                foreach (Document d in results)
                 {
                     if (d.Id != documentObject.Id && d.Text.ToLower() == currentName.ToLower())
                     {
                         currentName = documentObject.Text + " (" + uniqueNumber.ToString() + ")";
                         uniqueNumber++;
                     }
-
                 }
 
                 // if name has been changed, update the documentobject
@@ -82,5 +87,45 @@ namespace umbraco.ActionHandlers
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// Comparer that takes into account the duplicate index of a node name
+    /// This is needed as a normal alphabetic sort would go Page (1), Page (10), Page (2) etc.
+    /// </summary>
+    public class SimilarNodeNameComparer : IComparer<string>
+    {
+        public int Compare(string x, string y)
+        {
+            if (x.LastIndexOf(')') == x.Length - 1 && y.LastIndexOf(')') == y.Length - 1)
+            {
+                if (x.ToLower().Substring(0, x.LastIndexOf('(')) == y.ToLower().Substring(0, y.LastIndexOf('(')))
+                {
+                    int xDuplicateIndex = ExtractDuplicateIndex(x);
+                    int yDuplicateIndex = ExtractDuplicateIndex(y);
+
+                    if (xDuplicateIndex != 0 && yDuplicateIndex != 0)
+                    {
+                        return xDuplicateIndex.CompareTo(yDuplicateIndex);
+                    }                    
+                }
+            }
+            return x.ToLower().CompareTo(y.ToLower());                   
+        }
+
+        private int ExtractDuplicateIndex(string text)
+        {
+            int index = 0;
+
+            if (text.LastIndexOf('(') != -1 && text.LastIndexOf('(') < text.Length - 2)
+            {
+                int startPos = text.LastIndexOf('(') + 1;
+                int length = text.Length - 1 - startPos;
+
+                int.TryParse(text.Substring(startPos, length), out index);
+            }
+
+            return index;
+        }
     }
 }

@@ -239,9 +239,7 @@
     <Compile Include="folderbrowser\DataTypeFolderbrowser.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="folderbrowser\folderBrowser.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="folderbrowser\folderBrowser.cs" />
     <Compile Include="imagecropper\Config.cs" />
     <Compile Include="imagecropper\Data.cs" />
     <Compile Include="imagecropper\DataEditor.cs" />

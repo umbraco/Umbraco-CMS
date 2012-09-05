@@ -68,7 +68,7 @@ namespace umbraco.presentation.webservices
 
             //check which parameters to pass depending on the types passed in
             int intNodeID;
-            if (int.TryParse(nodeId, out intNodeID))
+            if (int.TryParse(nodeId, out intNodeID) && nodeType != "member") // Fix for #26965 - numeric member login gets parsed as nodeId
                 presentation.create.dialogHandler_temp.Delete(nodeType, intNodeID, alias);
             else
                 presentation.create.dialogHandler_temp.Delete(nodeType, 0, nodeId);

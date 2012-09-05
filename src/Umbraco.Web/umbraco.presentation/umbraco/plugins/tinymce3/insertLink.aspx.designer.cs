@@ -67,6 +67,15 @@ namespace umbraco.presentation.plugins.tinymce3 {
         protected global::ClientDependency.Core.Controls.JsInclude JsInclude4;
         
         /// <summary>
+        /// JsInclude5 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::ClientDependency.Core.Controls.JsInclude JsInclude5;
+        
+        /// <summary>
         /// pane_url control.
         /// </summary>
         /// <remarks>

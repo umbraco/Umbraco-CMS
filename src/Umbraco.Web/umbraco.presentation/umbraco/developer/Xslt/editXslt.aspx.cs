@@ -112,7 +112,7 @@ namespace umbraco.cms.presentation.developer
             IOHelper.ValidateFileExtension(file, new List<string>() { "xslt", "xsl" });
 
 
-            xsltFileName.Text = file.Replace(IOHelper.MapPath(SystemDirectories.Xslt), "").Substring(1);
+            xsltFileName.Text = file.Replace(IOHelper.MapPath(SystemDirectories.Xslt), "").Substring(1).Replace(@"\", "/");
 
             StreamReader SR;
             string S;

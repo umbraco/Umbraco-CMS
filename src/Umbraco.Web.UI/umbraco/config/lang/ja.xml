@@ -266,7 +266,8 @@
     <key alias="memberGroup" version="2.1">メンバーのグループ</key>
     <key alias="memberRoles" version="4.0">役割</key>
     <key alias="contentRecycleBin" version="4.0">ごみ箱</key>
-    <key alias="packages" version="4.0">パッケージ</key>
+    <key alias="packager" version="4.9">パッケージ</key>
+	<key alias="packages" version="4.0">パッケージ</key>
     <key alias="repositories" version="4.0">リポジトリからインストール</key>
     <key alias="createdPackages" version="4.0">パッケージの作成</key>
     <key alias="installedPackages" version="4.0">インストール済のパッケージ</key>

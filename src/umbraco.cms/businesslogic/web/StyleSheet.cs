@@ -59,7 +59,7 @@ namespace umbraco.cms.businesslogic.web
                     StylesheetProperty[] retVal = new StylesheetProperty[tmp.Length];
                     for (int i = 0; i < tmp.Length; i++)
                     {
-                        retVal[i] = StylesheetProperty.GetStyleSheetProperty(this.ChildrenOfAllObjectTypes[i].Id);
+                        retVal[i] = StylesheetProperty.GetStyleSheetProperty(tmp[i].Id);
                     }
                     m_properties = retVal;
                 }

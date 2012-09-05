@@ -251,7 +251,7 @@ namespace umbraco.cms.businesslogic
             if (level > 0)
             {
                 parent = new CMSNode(parentId);
-                sortOrder = Document.GetMaxDocumentSortOrder(parentId);
+                sortOrder = GetNewDocumentSortOrder(parentId);
                 path = parent.Path;
             }
             else
@@ -294,6 +294,22 @@ namespace umbraco.cms.businesslogic
             return retVal;
         }
 
+        private static int GetNewDocumentSortOrder(int parentId)
+        {
+            var sortOrder = 0;
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(
+                        "SELECT MAX(sortOrder) AS sortOrder FROM umbracoNode WHERE parentID = @parentID AND nodeObjectType = @GuidForNodesOfTypeDocument",
+                        SqlHelper.CreateParameter("@parentID", parentId),
+                        SqlHelper.CreateParameter("@GuidForNodesOfTypeDocument", Document._objectType)
+                  ))
+            {
+                while (dr.Read())
+                    sortOrder = dr.GetInt("sortOrder") + 1;
+            }
+
+            return sortOrder;
+        }
+        
         /// <summary>
         /// Retrieve a list of the id's of all CMSNodes given the objecttype and the first letter of the name.
         /// </summary>

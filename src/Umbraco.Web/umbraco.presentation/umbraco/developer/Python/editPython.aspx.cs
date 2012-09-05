@@ -79,8 +79,7 @@ namespace umbraco.cms.presentation.developer
             // validate extension
             IOHelper.ValidateFileExtension(file, validScriptingExtensions());
 
-            // we need to move the full path and then the preceeding slash
-            pythonFileName.Text = file.Replace(IOHelper.MapPath(SystemDirectories.MacroScripts), "").Substring(1);
+            pythonFileName.Text = file.Replace(IOHelper.MapPath(SystemDirectories.MacroScripts), "").Substring(1).Replace(@"\", "/");
 
             StreamReader SR;
             string S;

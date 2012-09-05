@@ -136,6 +136,11 @@
     <Compile Include="TypeHelper.cs" />
     <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="DelegateEqualityComparer.cs" />
+    <Compile Include="Embed\IEmbedProvider.cs" />
+    <Compile Include="Embed\IEmbedSettingProvider.cs" />
+    <Compile Include="Embed\ProviderSetting.cs" />
+    <Compile Include="Embed\Result.cs" />
+    <Compile Include="Embed\Status.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="IfExtensions.cs" />
     <Compile Include="PluginManager.cs" />

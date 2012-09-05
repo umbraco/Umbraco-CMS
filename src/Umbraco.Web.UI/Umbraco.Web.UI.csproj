@@ -274,6 +274,10 @@
     <None Include="config\FileSystemProviders.Release.config">
       <DependentUpon>FileSystemProviders.config</DependentUpon>
     </None>
+    <Content Include="config\embed.config" />
+    <None Include="config\embed.Release.config">
+      <DependentUpon>embed.config</DependentUpon>
+    </None>
     <None Include="config\xsltExtensions.Release.config">
       <DependentUpon>xsltExtensions.config</DependentUpon>
     </None>
@@ -340,6 +344,7 @@
     <Content Include="umbraco\images\download.png" />
     <Content Include="umbraco\images\editor\doc.gif" />
     <Content Include="umbraco\images\editor\documentType.gif" />
+    <Content Include="umbraco\images\editor\upload.png" />
     <Content Include="umbraco\images\information.png" />
     <Content Include="umbraco\images\listItemOrange.gif" />
     <Content Include="umbraco\images\pencil.png" />
@@ -447,6 +452,8 @@
     <Content Include="umbraco_client\CodeMirror\js\mode\python\index.html" />
     <Content Include="umbraco_client\CodeMirror\js\mode\python\LICENSE.txt" />
     <Content Include="umbraco_client\CodeMirror\js\mode\python\python.js" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\razor\index.html" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\razor\razor.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\rpm\changes\changes.js" />
     <Content Include="umbraco_client\CodeMirror\js\mode\rpm\changes\index.html" />
     <Content Include="umbraco_client\CodeMirror\js\mode\rpm\spec\index.html" />
@@ -519,6 +526,14 @@
     <Content Include="umbraco_client\FileUploader\js\jquery.fileUploader.js" />
     <Content Include="umbraco_client\FolderBrowser\Css\folderbrowser.css" />
     <Content Include="umbraco_client\FolderBrowser\Js\folderbrowser.js" />
+    <Content Include="umbraco_client\Installer\images\bg-blog-repeat.jpg" />
+    <Content Include="umbraco_client\Installer\images\bg-normal-repeat.jpg" />
+    <Content Include="umbraco_client\Installer\images\bg-personal-repeat.jpg" />
+    <Content Include="umbraco_client\Installer\images\bg-simple-repeat.jpg" />
+    <Content Include="umbraco_client\Installer\images\btn-back.png" />
+    <Content Include="umbraco_client\Installer\images\btn-buisness-repeat.png" />
+    <Content Include="umbraco_client\Installer\images\btn-confirm.png" />
+    <Content Include="umbraco_client\Installer\images\pbar.gif" />
     <Content Include="umbraco_client\tags\css\jquery.tagsinput.css" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.js" />
     <Content Include="umbraco_client\tags\js\jquery.tagsinput.min.js">
@@ -737,6 +752,14 @@
     <Content Include="umbraco_client\tinymce3\plugins\umbracocss\js\dialog.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracocss\langs\en.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracocss\langs\en_dlg.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\dialog.htm" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\editor_plugin.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\editor_plugin_src.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\img\ajax-loader.gif" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\img\embed.gif" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\js\dialog.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\en.js" />
+    <Content Include="umbraco_client\tinymce3\plugins\umbracoembed\langs\en_dlg.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoimg\editor_plugin_src.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoimg\js\image.js" />
     <Content Include="umbraco_client\tinymce3\plugins\umbracoimg\langs\en_dlg.js" />
@@ -1442,6 +1465,7 @@
     <None Include="umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\perl\LICENSE" />
+    <Content Include="umbraco_client\CodeMirror\js\mode\razor\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\ruby\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\r\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\xquery\LICENSE" />
@@ -1449,10 +1473,6 @@
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="web.Template.KRAFTWERK.Debug.config">
-      <DependentUpon>web.Template.config</DependentUpon>
-      <SubType>Designer</SubType>
-    </Content>
     <None Include="web.Template.Release.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -1961,6 +1981,10 @@
     </None>
     <None Include="web.Template.MBP13-PC.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
+    </None>
+    <None Include="web.Template.KRAFTWERK.Debug.config">
+      <DependentUpon>web.Template.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>

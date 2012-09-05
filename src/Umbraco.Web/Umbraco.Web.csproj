@@ -247,6 +247,14 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="IApplicationEventHandler.cs" />
+    <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
+    <Compile Include="Media\EmbedProviders\AbstractProvider.cs" />
+    <Compile Include="Media\EmbedProviders\Flickr.cs" />
+    <Compile Include="Media\EmbedProviders\OEmbedRich.cs" />
+    <Compile Include="Media\EmbedProviders\OEmbedVideo.cs" />
+    <Compile Include="Media\EmbedProviders\Settings\Dictionary.cs" />
+    <Compile Include="Media\EmbedProviders\Settings\String.cs" />
+    <Compile Include="Media\EmbedProviders\Twitgoo.cs" />
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -1775,6 +1783,9 @@
     <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltSets.cs" />
     <Compile Include="umbraco.presentation\umbraco\xslt\eXslt\ExsltStrings.cs" />
     <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery.cs" />
+    <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-Content.cs">
+      <DependentUpon>uQuery.cs</DependentUpon>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\uQuery\uQuery-DataTypes.cs">
       <DependentUpon>uQuery.cs</DependentUpon>
     </Compile>
@@ -1999,7 +2010,9 @@
     <Content Include="umbraco.presentation\umbraco\developer\Cache\viewCacheItem.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx" />
-    <Content Include="umbraco.presentation\umbraco\editContent.aspx" />
+    <Content Include="umbraco.presentation\umbraco\editContent.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\editMedia.aspx" />
     <Content Include="umbraco.presentation\umbraco\js\language.aspx" />
     <Content Include="umbraco.presentation\umbraco\login.aspx">
@@ -2024,7 +2037,9 @@
     <Content Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx" />
-    <Content Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx" />
+    <Content Include="umbraco.presentation\umbraco\settings\EditNodeTypeNew.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\settings\editTemplate.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

@@ -257,7 +257,8 @@
     <key alias="memberGroup" version="2.1"><![CDATA[구성원 그룹]]></key>
     <key alias="memberRoles" version="4.0"><![CDATA[역할]]></key>
     <key alias="contentRecycleBin" version="4.0"><![CDATA[휴지통]]></key>
-    <key alias="packages" version="4.0"><![CDATA[패키지]]></key>
+    <key alias="packager" version="4.9"><![CDATA[패키지]]></key>
+	<key alias="packages" version="4.0"><![CDATA[패키지]]></key>
     <key alias="repositories" version="4.0"><![CDATA[저장소에 설치]]></key>
     <key alias="createdPackages" version="4.0"><![CDATA[생성된 패키지]]></key>
     <key alias="installedPackages" version="4.0"><![CDATA[설치된 패키지]]></key>

@@ -408,12 +408,6 @@ namespace umbraco.cms.businesslogic.web
                                       SqlHelper.CreateParameter("@versionId", tmp.Version),
                                       SqlHelper.CreateParameter("@text", tmp.Text));
 
-            // Update the sortOrder if the parent was the root!
-            if (ParentId == -1)
-            {
-                newNode.sortOrder = GetMaxDocumentSortOrder(-1);
-            }
-
             //read the whole object from the db
             Document d = new Document(newId);
 
@@ -431,22 +425,6 @@ namespace umbraco.cms.businesslogic.web
             d.Save();
 
             return d;
-        }
-
-        internal static int GetMaxDocumentSortOrder(int parentId)
-        {
-            var sortOrder = 0;
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                        "SELECT MAX(sortOrder) AS sortOrder FROM umbracoNode WHERE parentID = @parentID AND nodeObjectType = @GuidForNodesOfTypeDocument",
-                        SqlHelper.CreateParameter("@parentID", parentId),
-                        SqlHelper.CreateParameter("@GuidForNodesOfTypeDocument", Document._objectType)
-                  ))
-            {
-                while (dr.Read())
-                    sortOrder = dr.GetInt("sortOrder") + 1;
-            }
-
-            return sortOrder;
         }
 
         /// <summary>
