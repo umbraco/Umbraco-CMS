@@ -5,6 +5,9 @@ using System.Text;
 
 namespace umbraco.cms.helpers
 {
+	//TODO: Most of this logic now exists in the Umbraco.Core string extensions, whatever logic exists here that is not there
+	// should be moved there and this should be obsoleted.
+
     public class Casing
     {
         public const string VALID_ALIAS_CHARACTERS = "_-abcdefghijklmnopqrstuvwxyz1234567890";
