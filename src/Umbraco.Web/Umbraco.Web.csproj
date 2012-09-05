@@ -246,6 +246,7 @@
     <Compile Include="FormlessPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="HtmlHelperRenderExtensions.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
     <Compile Include="Media\EmbedProviders\AbstractProvider.cs" />
@@ -255,6 +256,9 @@
     <Compile Include="Media\EmbedProviders\Settings\Dictionary.cs" />
     <Compile Include="Media\EmbedProviders\Settings\String.cs" />
     <Compile Include="Media\EmbedProviders\Twitgoo.cs" />
+    <Compile Include="ModelStateExtensions.cs" />
+    <Compile Include="RenderFieldCaseType.cs" />
+    <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="Routing\LookupByPageIdQuery.cs" />
     <Compile Include="umbraco.presentation\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -262,6 +266,8 @@
     <Compile Include="umbraco.presentation\LibraryCacheRefresher.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />
     <Compile Include="UmbracoHelper.cs" />
+    <Compile Include="ViewContextExtensions.cs" />
+    <Compile Include="ViewDataContainerExtensions.cs" />
     <Compile Include="XmlPublishedContentStore.cs" />
     <Compile Include="ContentStoreResolver.cs" />
     <Compile Include="DocumentNotFoundHttpHandler.cs" />

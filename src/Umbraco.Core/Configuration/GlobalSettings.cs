@@ -150,6 +150,29 @@ namespace Umbraco.Core.Configuration
             }
         }
 
+		/// <summary>
+		/// This returns the string of the MVC Area route.
+		/// </summary>
+		/// <remarks>
+		/// THIS IS TEMPORARY AND SHOULD BE REMOVED WHEN WE MIGRATE/UPDATE THE CONFIG SETTINGS TO BE A REAL CONFIG SECTION
+		/// AND SHOULD PROBABLY BE HANDLED IN A MORE ROBUST WAY.
+		/// 
+		/// This will return the MVC area that we will route all custom routes through like surface controllers, etc...
+		/// We will use the 'Path' (default ~/umbraco) to create it but since it cannot contain '/' and people may specify a path of ~/asdf/asdf/admin
+		/// we will convert the '/' to '-' and use that as the path. its a bit lame but will work.
+		/// </remarks>
+    	internal static string MvcArea
+    	{
+    		get 
+			{ 
+				if (Path.IsNullOrWhiteSpace())
+				{
+					throw new InvalidOperationException("Cannot create an MVC Area path without the umbracoPath specified");
+				}
+				return Path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim();
+			}
+    	}
+
         /// <summary>
         /// Gets the path to umbraco's client directory (/umbraco_client by default).
         /// This is a relative path to the Umbraco Path as it always must exist beside the 'umbraco'
