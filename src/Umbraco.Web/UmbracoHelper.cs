@@ -117,7 +117,7 @@ namespace Umbraco.Web
 		/// <param name="valueAlias"></param>
 		/// <param name="altFieldAlias"></param>
 		/// <param name="altValueAlias"></param>
-		/// <param name="altText">TODO: This currently doesn't do anything!! we should implement it... it is static text that is displayed if all else fails</param>
+		/// <param name="altText"></param>
 		/// <param name="insertBefore"></param>
 		/// <param name="insertAfter"></param>
 		/// <param name="recursive"></param>
