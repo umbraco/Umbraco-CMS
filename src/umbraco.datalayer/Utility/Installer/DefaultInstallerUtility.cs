@@ -171,7 +171,6 @@ namespace umbraco.DataLayer.Utility.Installer
         #endregion
 
         #region Protected Methods
-
 		
 		protected virtual void NewInstall(string sql)
 		{
@@ -197,17 +196,19 @@ namespace umbraco.DataLayer.Utility.Installer
                 {
                     if(v.ExpectedRows > -1)
                     {
-                        var reader = SqlHelper.ExecuteReader(v.Sql);
-                        var rowCount = 0;
-
-                        if(reader.HasRecords)
+                        using (var reader = SqlHelper.ExecuteReader(v.Sql))
                         {
-                            while (reader.Read())
-                                rowCount++;
-                        }
+                            var rowCount = 0;
 
-                        if (v.ExpectedRows != rowCount)
-                            continue;
+                            //if (reader.HasRecords)
+                            //{
+                                while (reader.Read())
+                                    rowCount++;
+                            //}
+
+                            if (v.ExpectedRows != rowCount)
+                                continue;
+                        }
                     }
                     else
                     {

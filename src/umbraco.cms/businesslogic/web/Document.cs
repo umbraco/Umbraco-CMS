@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Xml;
+using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.property;
@@ -15,6 +16,7 @@ using umbraco.interfaces;
 using umbraco.cms.businesslogic.datatype.controls;
 using System.IO;
 using System.Diagnostics;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -405,12 +407,6 @@ namespace umbraco.cms.businesslogic.web
                                       u.Id + ", @versionId, @text)",
                                       SqlHelper.CreateParameter("@versionId", tmp.Version),
                                       SqlHelper.CreateParameter("@text", tmp.Text));
-
-            // Update the sortOrder if the parent was the root!
-            if (ParentId == -1)
-            {
-                newNode.sortOrder = CountLeafNodes(-1, Document._objectType) + 1;
-            }
 
             //read the whole object from the db
             Document d = new Document(newId);
@@ -1211,7 +1207,7 @@ namespace umbraco.cms.businesslogic.web
         /// <returns></returns>
         public bool HasPendingChanges()
         {
-            return new TimeSpan(UpdateDate.Ticks - VersionDate.Ticks).TotalMilliseconds > 500;
+            return new TimeSpan(UpdateDate.Ticks - VersionDate.Ticks).TotalMilliseconds > 2000;
         }
 
         /// <summary>
@@ -1283,6 +1279,8 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="RelateToOrignal"></param>
         public Document Copy(int CopyTo, User u, bool RelateToOrignal)
         {
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+
             CopyEventArgs e = new CopyEventArgs();
             e.CopyTo = CopyTo;
             FireBeforeCopy(e);
@@ -1312,48 +1310,23 @@ namespace umbraco.cms.businesslogic.web
 
                         if (p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id
                         && p.Value.ToString() != ""
-                        && File.Exists(IOHelper.MapPath(p.Value.ToString())))
+                        && fs.FileExists(fs.GetRelativePath(p.Value.ToString())))
                         {
+                            var currentPath = fs.GetRelativePath(p.Value.ToString());
 
-                            int propId = newDoc.getProperty(p.PropertyType.Alias).Id;
+                            var propId = newDoc.getProperty(p.PropertyType.Alias).Id;
+                            var newPath = fs.GetRelativePath(propId, System.IO.Path.GetFileName(currentPath));
 
-                            System.IO.Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Media + "/" + propId.ToString()));
+                            fs.CopyFile(currentPath, newPath);
 
-                            string fileCopy = IOHelper.MapPath(
-                                SystemDirectories.Media + "/" +
-                                propId.ToString() + "/" +
-                                new FileInfo(IOHelper.MapPath(p.Value.ToString())).Name);
-
-                            File.Copy(IOHelper.MapPath(p.Value.ToString()), fileCopy);
-
-                            string relFilePath =
-                                SystemDirectories.Media + "/" +
-                                propId.ToString() + "/" +
-                                new FileInfo(IOHelper.MapPath(p.Value.ToString())).Name;
-
-                            if (SystemDirectories.Root == string.Empty)
-                                relFilePath = relFilePath.TrimStart('~');
-
-                            newDoc.getProperty(p.PropertyType.Alias).Value = relFilePath;
+                            newDoc.getProperty(p.PropertyType.Alias).Value = fs.GetUrl(newPath);
 
                             //copy thumbs
-                            FileInfo origFile = new FileInfo(IOHelper.MapPath(p.Value.ToString()));
-
-                            foreach (FileInfo thumb in origFile.Directory.GetFiles("*_thumb*"))
+                            foreach (var thumbPath in fs.GetThumbnails(currentPath))
                             {
-                                if (!File.Exists(IOHelper.MapPath(
-                                                     SystemDirectories.Media + "/" +
-                                                     propId.ToString() + "/" +
-                                                     thumb.Name)))
-                                {
-                                    thumb.CopyTo(IOHelper.MapPath(
-                                    SystemDirectories.Media + "/" +
-                                    propId.ToString() + "/" +
-                                    thumb.Name));
-                                }
+                                var newThumbPath = fs.GetRelativePath(propId, System.IO.Path.GetFileName(thumbPath));
+                                fs.CopyFile(thumbPath, newThumbPath);
                             }
-
-
 
                         }
                         else

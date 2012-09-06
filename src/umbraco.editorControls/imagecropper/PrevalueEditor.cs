@@ -293,16 +293,17 @@ namespace umbraco.editorControls.imagecropper
 
         /// <summary>
         /// Serialize configuration to:
-        /// uploadPropertyAlias,generateImages,showLabel|presetTemplateName,targetWidth,targetHeight,keepAspect;
+        /// uploadPropertyAlias,generateImages,quality,showLabel|presetTemplateName,targetWidth,targetHeight,keepAspect;
         /// </summary>
         public void Save()
         {
             _dataType.DBType = (umbraco.cms.businesslogic.datatype.DBTypes)Enum.Parse(
                                                                                typeof(umbraco.cms.businesslogic.datatype.DBTypes), DBTypes.Ntext.ToString(), true);
-            string generalData = String.Format("{0},{1},{2}",
+            string generalData = String.Format("{0},{1},{2},{3}",
                                                txtPropertyAlias.Text,
                                                chkGenerateCrops.Checked ? "1" : "0",
-                                               chkShowLabel.Checked ? "1" : "0"
+                                               chkShowLabel.Checked ? "1" : "0",
+                                               txtQuality.Text
                 );
 
             string templateData = "";

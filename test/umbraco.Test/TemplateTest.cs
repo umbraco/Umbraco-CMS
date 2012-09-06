@@ -1,13 +1,10 @@
 ﻿using umbraco.cms.businesslogic.template;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Xml;
 using umbraco.BusinessLogic;
-using System.Collections;
 using umbraco.cms.businesslogic.web;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
     
     

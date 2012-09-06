@@ -18,3 +18,5 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("04436b0a-1dc6-4ee1-9d96-4c04f1a9f429")]
+
+[assembly: InternalsVisibleTo("Umbraco.Tests")]

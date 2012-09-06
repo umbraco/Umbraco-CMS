@@ -1,18 +1,15 @@
 ﻿using umbraco.cms.businesslogic.datatype;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Xml;
 using umbraco.BusinessLogic;
 using umbraco.interfaces;
 using umbraco.editorControls.textfield;
 using umbraco.cms.businesslogic.web;
 using System.Linq;
-using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.editorControls;
-using System.Linq;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
     
     

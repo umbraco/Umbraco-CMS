@@ -20,11 +20,11 @@ namespace umbraco.BasePages
     {
         private User _user;
         private bool _userisValidated = false;
-        private ClientTools m_clientTools;
+        private ClientTools _clientTools;
 
         // ticks per minute 600,000,000 
-        private static long _ticksPrMinute = 600000000;
-        private static int _umbracoTimeOutInMinutes = GlobalSettings.TimeOutInMinutes;
+        private const long TicksPrMinute = 600000000;
+        private static readonly int UmbracoTimeOutInMinutes = GlobalSettings.TimeOutInMinutes;
 
         /// <summary>
         /// The path to the umbraco root folder
@@ -76,9 +76,9 @@ namespace umbraco.BasePages
         {
             get
             {
-                if (m_clientTools == null)
-                    m_clientTools = new ClientTools(this);
-                return m_clientTools;
+                if (_clientTools == null)
+                    _clientTools = new ClientTools(this);
+                return _clientTools;
             }
         }
 
@@ -88,7 +88,7 @@ namespace umbraco.BasePages
             ClientTools.RefreshAdmin(Seconds);
         }
 
-        private void validateUser()
+        private void ValidateUser()
         {
             if ((umbracoUserContextID != ""))
             {
@@ -107,7 +107,7 @@ namespace umbraco.BasePages
                     else
                     {
                         _userisValidated = true;
-                        updateLogin();
+                        UpdateLogin();
                     }
 
                 }
@@ -117,7 +117,10 @@ namespace umbraco.BasePages
                 }
             }
             else
-                throw new ArgumentException("The user has no umbraco contextid - try logging in");
+            {
+                throw new InvalidOperationException("The user has no umbraco contextid - try logging in");
+            }
+
         }
 
         /// <summary>
@@ -134,11 +137,11 @@ namespace umbraco.BasePages
                     System.Web.HttpRuntime.Cache.Insert(
                         "UmbracoUserContext" + umbracoUserContextID,
                         SqlHelper.ExecuteScalar<int>("select userID from umbracoUserLogins where contextID = @contextId",
-                                      SqlHelper.CreateParameter("@contextId", new Guid(umbracoUserContextID))
-                        ),
+                                                     SqlHelper.CreateParameter("@contextId", new Guid(umbracoUserContextID))
+                            ),
                         null,
                         System.Web.Caching.Cache.NoAbsoluteExpiration,
-    new TimeSpan(0, (int)(_umbracoTimeOutInMinutes / 10), 0));
+                        new TimeSpan(0, (int) (UmbracoTimeOutInMinutes/10), 0));
 
 
                 }
@@ -184,7 +187,7 @@ namespace umbraco.BasePages
                     "UmbracoUserContextTimeout" + umbracoUserContextID,
                         GetTimeout(true),
                     null,
-                    DateTime.Now.AddMinutes(_umbracoTimeOutInMinutes / 10), System.Web.Caching.Cache.NoSlidingExpiration);
+                    DateTime.Now.AddMinutes(UmbracoTimeOutInMinutes / 10), System.Web.Caching.Cache.NoSlidingExpiration);
 
 
             }
@@ -223,6 +226,8 @@ namespace umbraco.BasePages
             {
                 // zb-00004 #29956 : refactor cookies names & handling
                 if (StateHelper.Cookies.HasCookies && StateHelper.Cookies.UserContext.HasValue)
+                    return StateHelper.Cookies.UserContext.GetValue();
+                else
                 {
                     try
                     {
@@ -268,7 +273,7 @@ namespace umbraco.BasePages
 
 
                         // Create new cookie.
-                        StateHelper.Cookies.UserContext.SetValue(encTicket, 1);
+                    StateHelper.Cookies.UserContext.SetValue(value, 1);
                         
 
                     } else
@@ -285,24 +290,24 @@ namespace umbraco.BasePages
         /// </summary>
         public void ClearLogin()
         {
-            deleteLogin();
+            DeleteLogin();
             umbracoUserContextID = "";
         }
 
-        private void deleteLogin()
+        private void DeleteLogin()
         {
             SqlHelper.ExecuteNonQuery(
                 "DELETE FROM umbracoUserLogins WHERE contextId = @contextId",
                 SqlHelper.CreateParameter("@contextId", umbracoUserContextID));
         }
 
-        private void updateLogin()
+        private void UpdateLogin()
         {
             // only call update if more than 1/10 of the timeout has passed
-            if (timeout - (((_ticksPrMinute * _umbracoTimeOutInMinutes) * 0.8)) < DateTime.Now.Ticks)
+            if (timeout - (((TicksPrMinute * UmbracoTimeOutInMinutes) * 0.8)) < DateTime.Now.Ticks)
                 SqlHelper.ExecuteNonQuery(
                     "UPDATE umbracoUserLogins SET timeout = @timeout WHERE contextId = @contextId",
-                    SqlHelper.CreateParameter("@timeout", DateTime.Now.Ticks + (_ticksPrMinute * _umbracoTimeOutInMinutes)),
+                    SqlHelper.CreateParameter("@timeout", DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)),
                     SqlHelper.CreateParameter("@contextId", umbracoUserContextID));
         }
 
@@ -311,7 +316,7 @@ namespace umbraco.BasePages
             // only call update if more than 1/10 of the timeout has passed
             SqlHelper.ExecuteNonQuery(
                 "UPDATE umbracoUserLogins SET timeout = @timeout WHERE contextId = @contextId",
-                SqlHelper.CreateParameter("@timeout", DateTime.Now.Ticks + (_ticksPrMinute * _umbracoTimeOutInMinutes)),
+                SqlHelper.CreateParameter("@timeout", DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)),
                 SqlHelper.CreateParameter("@contextId", umbracoUserContextID));
         }
 
@@ -324,7 +329,7 @@ namespace umbraco.BasePages
             Guid retVal = Guid.NewGuid();
             SqlHelper.ExecuteNonQuery(
                                       "insert into umbracoUserLogins (contextID, userID, timeout) values (@contextId,'" + u.Id + "','" +
-                                      (DateTime.Now.Ticks + (_ticksPrMinute * _umbracoTimeOutInMinutes)).ToString() +
+                                      (DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)).ToString() +
                                       "') ",
                                       SqlHelper.CreateParameter("@contextId", retVal));
             umbracoUserContextID = retVal.ToString();
@@ -338,7 +343,7 @@ namespace umbraco.BasePages
         /// <returns></returns>
         public User getUser()
         {
-            if (!_userisValidated) validateUser();
+            if (!_userisValidated) ValidateUser();
             return _user;
         }
 
@@ -347,7 +352,7 @@ namespace umbraco.BasePages
         /// </summary>
         public void ensureContext()
         {
-            validateUser();
+            ValidateUser();
         }
 
         [Obsolete("Use ClientTools instead")]

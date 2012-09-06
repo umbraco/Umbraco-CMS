@@ -1,0 +1,983 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<language alias="he" intName="Hebrew (Israel)" localName="Hebrew" lcid="" culture="he-IL">
+  <creator>
+    <name>Umbraco Hebrew 2011</name>
+    <link>http://umbraco.org</link>
+  </creator>
+  <area alias="main">
+    <key alias="sections">איזורים</key>
+    <key alias="dashboard">לוח הבקרה</key>
+    <key alias="tree">תוכן</key>
+  </area>
+  <area alias="defaultdialogs">
+    <key alias="cut">גזור</key>
+    <key alias="link">קישור</key>
+    <key alias="insertlink">הוסף קישור</key>
+    <key alias="insertgraphicheadline">הוסף פס גרפי</key>
+    <key alias="linknewwindow">לפתוח בחלון חדש?</key>
+    <key alias="linkinternal">קישור פנימי:</key>
+    <key alias="linklocaltip">בעת שימוש בקישוריים פנימיים, הוסף "#" בתחילת הקישור</key>
+    <key alias="insertimage">הוסף תמונה</key>
+    <key alias="treepicker">בחר פריט</key>
+    <key alias="confirmdelete">האם הינך בטוח שברצונך למחוק זאת?</key>
+    <key alias="confirmdisable" version="2.1">האם הינך בטוח שברצונך לכבות זאת?</key>
+    <key alias="confirmlogout">האם הינך בטוח?</key>
+    <key alias="insertAnchor">הוסף קישור מקומי</key>
+    <key alias="anchorInsert">שם</key>
+    <key alias="insertMacro">הוסף מאקרו</key>
+    <key alias="insertCharacter">הוסף תו</key>
+    <key alias="inserttable">הוסף טבלה</key>
+    <key alias="tableColumns">מספר עמודות</key>
+    <key alias="tableRows">מספר שורות</key>
+    <key alias="paste">הדבק</key>
+    <key alias="assignDomain">ניהול שם מתחם</key>
+    <key alias="confirmSure">האם אתה בטוח?</key>
+    <key alias="requiredField">שדה חובה</key>
+    <key alias="lastEdited">נערך לאחרונה</key>
+    <key alias="siterepublished">זיכרון המטמון של האתר רוענן בהצלחה. כל התוכן המפורסם כעת מעודכן, שאר התוכן המיועד לפירסום ימתין לפירסום</key>
+    <key alias="siterepublishHelp">זיכרון המטמון של האתר ירוענן. כל התוכן שפורסם ירוענן בהתאם, שאר התוכן המיועד לפירסום ימתין לפירסום</key>
+    <key alias="sitereindexed">האתר אונדקס מחדש</key>
+    <key alias="editdictionary">ערוך פרט מילון</key>
+    <key alias="editlanguage">ערוך שפה</key>
+    <key alias="permissionsEdit" version="2.1">ערוך הרשאות עבור</key>
+    <key alias="viewCacheItem">צפה בפרטי זיכרון מטמון</key>
+    <key alias="thumbnailimageclickfororiginal" version="2.1">לחץ על התמונה לגודל מלא</key>
+    <key alias="confirmEmptyTrashcan" version="3.0">סמן תיבה זו לאשר מחיקה סופית של %0% פריט/ים</key>
+    <key alias="recycleBinIsEmpty" version="3.0">סל המיחזור ריק כעת</key>
+    <key alias="recycleBinWarning" version="4.0">מחיקת פריטים מסל המיחזור תמחוק את הפריטים לצמיתות</key>
+    <key alias="recycleBinDeleting" version="4.0">הפריטים הנמצאים בסל המיחזור נמחקים כעת, השאר חלון זה פתוח עד לגמר פעולת המחיקה.</key>
+    <key alias="closeThisWindow" version="4.0">סגור חלון זה</key>
+    <key alias="removeMacro" version="4.5">הסר מאקרו</key>
+    <key alias="insertMacro" version="4.5">לחץ להוספת מאקרו חדש</key>
+    <key alias="macroContainerSettings" version="4.5">הגדרות מאקרו</key>
+    <key alias="templateContentAreaHelp" version="4.0">
+      <![CDATA[<strong>Set a placeholder id</strong> by setting an ID on your placeholder you can inject content into this template from child templates,
+      by refering this ID using a <code>&lt;asp:content /&gt;</code> element.]]>
+    </key>
+
+    <key alias="templateContentPlaceHolderHelp" version="4.0">
+      <![CDATA[<strong>Select a placeholder id</strong> from the list below. You can only
+      choose Id's from the current template's master.]]>
+    </key>
+    <key alias="regexSearchHelp" version="4.0">חיפוש ביטויים להוספת אימות עבור שדות טופס. לדוגמא: 'כתובת אימייל', 'מיקוד', 'כתובת אתר' ועוד</key>
+    <key alias="regexSearchError" version="4.0"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>
+
+    <key alias="macroDoesNotHaveProperties" version="4.0">
+      <![CDATA[This macro does not contain any properties you can edit]]>
+    </key>
+  </area>
+  <area alias="general">
+    <key alias="properties">הגדרות</key>
+    <key alias="elements">אלמנטים</key>
+    <key alias="new">חדש</key>
+    <key alias="add">הוסף</key>
+    <key alias="open">פתח</key>
+    <key alias="edit">עריכה</key>
+    <key alias="close">סגור</key>
+    <key alias="create">צור</key>
+    <key alias="delete">מחק</key>
+    <key alias="sort">סדר</key>
+    <key alias="move">הזז</key>
+    <key alias="copy">העתק</key>
+    <key alias="rename">שנה שם</key>
+    <key alias="logoff">התנתק</key>
+    <key alias="rights">הרשאות</key>
+    <key alias="choose">בחר</key>
+    <key alias="alias">כינוי</key>
+    <key alias="name">שם</key>
+    <key alias="icon">אייקון</key>
+    <key alias="default">ברירת מחדל</key>
+    <key alias="type">סוג</key>
+    <key alias="yes">כן</key>
+    <key alias="no">לא</key>
+    <key alias="ok">אישור</key>
+    <key alias="update">עדכן</key>
+    <key alias="cancel">בטל</key>
+    <key alias="macro">מקרו</key>
+    <key alias="insert">הוסף</key>
+    <key alias="size">גודל</key>
+    <key alias="layout">תכנית</key>
+    <key alias="design">עיצוב</key>
+    <key alias="width">רוחב</key>
+    <key alias="height">אורך</key>
+    <key alias="justify">ליישר</key>
+    <key alias="innerMargin">שוליים פנימיים</key>
+    <key alias="cellMargin">שוליים לתא</key>
+    <key alias="border">גבול</key>
+    <key alias="pleasewait">אנא המתן בבקשה...</key>
+    <key alias="areyousure">האם אתה בטוח?</key>
+    <key alias="error">שגיאה</key>
+    <key alias="username">שם משתמש</key>
+    <key alias="password">סיסמה</key>
+    <key alias="login">התחבר</key>
+    <key alias="welcome">ברוכים הבאים...</key>
+    <key alias="language">שפה</key>
+    <key alias="closewindow">סגור חלון</key>
+    <key alias="deleted">נמחק</key>
+    <key alias="edited">נערך</key>
+    <key alias="of">של</key>
+    <key alias="about">אודות</key>
+    <key alias="help">עזרה</key>
+    <key alias="logout">התנתק</key>
+    <key alias="findDocument">חפש</key>
+    <key alias="continue">המשך</key>
+    <key alias="value">ערך</key>
+    <key alias="reciept">כתובת אימייל לקבלת טופס</key>
+    <key alias="showPageOnSend">הצג עמוד בשליחה</key>
+    <key alias="show">הצג</key>
+    <key alias="view" version="2.1">צפיה</key>
+    <key alias="user" version="2.1">משתמש</key>
+    <key alias="action" version="2.1">פעולה</key>
+    <key alias="date" version="2.1">תאריך</key>
+    <key alias="comment" version="2.1">הערה</key>
+    <key alias="up" version="2.1">למעלה</key>
+    <key alias="down" version="2.1">למטה</key>
+    <key alias="recycleBin" version="3.0">סל מיחזור</key>
+    <key alias="deleting" version="3.0">מחיקה...</key>
+    <key alias="remaining" version="3.0">נשאר</key>
+    <key alias="import" version="3.0">ייבא</key>
+    <key alias="loading" version="3.0">טוען</key>
+    <key alias="path" version="4.0">נתיב</key>
+    <key alias="or" version="4.0">או</key>
+    <key alias="by" version="4.0">או</key>
+    <key alias="placeHolderID" version="4.0">Placeholder קוד זיהוי</key>
+    <key alias="typeToSearch" version="4.0">הקלד לחיפוש...</key>
+    <key alias="email" version="4.0">כתובת אימייל</key>
+    <key alias="url" version="4.0">כתובת URL </key>
+    <key alias="dimensions" version="4.0">מימדים</key>
+    <key alias="constrainProportions" version="4.0">שמור על פרופורציות</key>
+    <key alias="upload" version="4.0">העלאה</key>
+    <key alias="download" version="4.0">הורדה</key>
+    <key alias="confirm" version="4.0">אישור</key>
+    <key alias="database" version="4.0">בסיס נתונים</key>
+    <key alias="server" version="4.0">שרת</key>
+    <key alias="upgrade" version="4.0">שדרג</key>
+    <key alias="install" version="4.0">התקנה</key>
+    <key alias="retry" version="4.0">נסה שנית</key>
+    <key alias="next" version="4.0">הבא</key>
+    <key alias="previous" version="4.0">הקודם</key>
+      <key alias="search" version="4.0">חיפוש</key>
+      <key alias="renew">חידוש</key>
+      <key alias="locked">נעול</key>
+  </area>
+    <area alias="lockout">
+        <key alias="lockoutWillOccur">לא זוהתה פעילות כלשהי ותבוצע התנתקות אוטומטית בעוד</key>
+        <key alias="renewSession">יש לבצע חידוש פעילות על מנת לשמור על התוכן</key>
+    </area>
+  <area alias="dashboard">
+    <key alias="welcome">ברוכים הבאים</key>
+    <key alias="openinnew">נפתח בחלון חדש</key>
+    <key alias="nothinghappens">במידה ואומברקו לא פתוח, יש צורך לאשר חלונות קופצים מאתר זה.</key>
+    <key alias="restart">הפעל מחדש</key>
+    <key alias="browser">סייר באתר</key>
+    <key alias="visit">בקר</key>
+    <key alias="dontShowAgain">- הסתר מידע לצמיתות</key>
+  </area>
+  <area alias="sections">
+    <key alias="content">תוכן</key>
+    <key alias="media">מדיה</key>
+    <key alias="member">חברים</key>
+    <key alias="newsletters">עיתון</key>
+    <key alias="users">משתמשים</key>
+    <key alias="settings">הגדרות</key>
+    <key alias="developer">מפתח</key>
+    <key alias="statistics">סטטיסטיקות</key>
+    <key alias="courier">Courier</key>
+    <key alias="concierge">Concierge</key>
+    <key alias="translation">תירגום</key>
+    <key alias="installer">אשף הגדרת אומברקו</key>
+  </area>
+  <area alias="buttons">
+    <key alias="save">שמור</key>
+    <key alias="saveAndPublish">שמור ופרסם</key>
+    <key alias="saveToPublish" version="2.1">שמור ושלח לאישור</key>
+    <key alias="htmlEdit">ערוך -Html</key>
+    <key alias="relations">ערוך הקשר</key>
+    <key alias="showPage">תצוגה מקדימה</key>
+    <key alias="styleChoose">בחר עיצוב</key>
+    <key alias="styleShow">הצג עיצוב</key>
+    <key alias="bold">מודגש</key>
+    <key alias="italic">נטוי</key>
+    <key alias="graphicHeadline">הוספת קו גרפי</key>
+    <key alias="justifyLeft">מוצמד לשמאל</key>
+    <key alias="justifyCenter">ממורכז</key>
+    <key alias="justifyRight">מוצמד לימין</key>
+    <key alias="listBullet">רשימת תבליטים</key>
+    <key alias="listNumeric">רשימה ממוספרת</key>
+    <key alias="indent">מרחק שוליים מהפסקה</key>
+    <key alias="deindent">בטל מרחק שוליים מהפסקה</key>
+    <key alias="linkInsert">הוספת לינק</key>
+    <key alias="linkLocal">הוספת לינק מקומי (עוגן)</key>
+    <key alias="pictureInsert">הוספת תמונה</key>
+    <key alias="macroInsert">הוספת מקרו</key>
+    <key alias="tableInsert">הוספת טבלה</key>
+    <key alias="formFieldInsert">הוסף מתוך שדה</key>
+  </area>
+  <area alias="content">
+    <key alias="about">אודות עמוד זה</key>
+    <key alias="nodeName">כותרת עמוד</key>
+    <key alias="alias">קישור חלופי</key>
+    <key alias="createDate">נוצר בתאריך</key>
+    <key alias="createBy">נוצר על ידי</key>
+    <key alias="updateDate">נערך לאחרונה</key>
+    <key alias="lastPublished">פורסם לאחרונה</key>
+    <key alias="type">סוג</key>
+    <key alias="statistics">סטטיסטיקות</key>
+    <key alias="releaseDate">פורסם ב</key>
+    <key alias="expireDate">הוסר ב</key>
+    <key alias="publish">פרסם</key>
+    <key alias="otherElements">הגדרות</key>
+    <key alias="editing">עריכה</key>
+    <key alias="itemNotPublished">פריט זה לא פורסם</key>
+    <key alias="itemChanged">פריט זה שונה לאחר פירסומו</key>
+    <key alias="clickToEdit">לחץ לעריכת פריט זה</key>
+    <key alias="documentType">סוג מסמך</key>
+    <key alias="urls">קשר למסמך</key>
+    <key alias="alternativeUrls">קישור חלופי</key>
+    <key alias="unPublish">ממתין לפירסום</key>
+    <key alias="publishStatus">סטטוס פירסום</key>
+    <key alias="parentNotPublished">מסמך זה פורסם אך לא זמין לצפיה, עקב כך שמסמך האב '%0%' ממתין לפירסום</key>
+    <key alias="uploadClear">הסר קובץ</key>
+    <key alias="noDate" version="2.1">לא נבחר מידע</key>
+    <key alias="removeDate" version="2.1">נקה מידע</key>
+    <key alias="alternativeTextHelp" version="2.1">(תיאור התמונה בקצרה)</key>
+    <key alias="titleOptional" version="2.1">כותרת (לא חובה)</key>
+    <key alias="mediatype" version="2.1">סוג מדיה</key>
+    <key alias="membertype" version="2.1">סוג חבר</key>
+    <key alias="membergroup" version="2.1">קבוצת חברים</key>
+    <key alias="memberrole" version="4.0">תפקיד</key>
+    <key alias="sortHelp" version="3.0">כדי למיין את המסמכים, פשוט יש לגרור את המסמכים או ללחוץ על אחד מכותרות העמודות. ניתן לבחור מספר מסמכים בו זמנית על ידי לחיצת "Shift" או "Ctrl" בזמן הבחירה.</key>
+    <key alias="sortDone" version="3.0">סידור ממוין עודכן</key>
+  </area>
+  <area alias="treeHeaders" version="2.1">
+    <key alias="stylesheets" version="2.1">גיליונות סגנון</key>
+    <key alias="templates" version="2.1">תבניות</key>
+    <key alias="dictionary" version="2.1">מילון</key>
+    <key alias="languages" version="2.1">שפות</key>
+    <key alias="mediaTypes" version="2.1">סוגי מדיה</key>
+    <key alias="nodeTypes" version="2.1">סוגי מסמכים</key>
+    <key alias="cacheBrowser" version="2.1">זיכרון מטמון בדפדפן</key>
+    <key alias="datatype" version="2.1">סוגי מידע</key>
+    <key alias="macros" version="2.1">מקרו</key>
+    <key alias="xslt" version="2.1">קבצי XSLT</key>
+    <key alias="python" version="2.1">קבצי פייתון</key>
+    <key alias="member" version="2.1">משתמשים</key>
+    <key alias="memberType" version="2.1">סוגי משתמשים</key>
+    <key alias="memberGroup" version="2.1">קבוצות משתמשים</key>
+    <key alias="memberRoles" version="4.0">כללים</key>
+    <key alias="contentRecycleBin" version="4.0">סל מיחזור</key>
+    <key alias="packager" version="4.9">חבילות</key>
+	<key alias="packages" version="4.0">חבילות</key>
+    <key alias="repositories" version="4.0">התקן מתוך מאגר</key>
+    <key alias="createdPackages" version="4.0">יצירת חבילות</key>
+    <key alias="installedPackages" version="4.0">חבילות מותקנות</key>
+    <key alias="runway" version="4.0">התקן Runway</key>
+    <key alias="runwayModules" version="4.0">מודולי Runway</key>
+    <key alias="localPackage" version="4.0">התקן חבילה מקומית</key>
+    <key alias="scripts" version="4.0">סקריפטים</key>
+    <key alias="scripting" version="4.3">קבצי סקריפטים</key>
+    <key alias="installStarterKit" version="4.6">התקן ערכת התחלה</key>
+    <key alias="installSkin" version="4.6">התקן עיצוב</key>
+  </area>
+  <area alias="user">
+    <key alias="username">שם תצוגה</key>
+    <key alias="loginname">שם משתמש</key>
+    <key alias="password">סיסמה</key>
+
+    <key alias="usertype">סוג משתמש</key>
+    <key alias="userPermissions">הרשאות משתמש</key>
+    <key alias="userTypes">סוגי משתמש</key>
+    
+    <key alias="language">שפה</key>
+    <key alias="startnode">התחלה בפריט התוכן</key>
+    <key alias="mediastartnode">התחלה בפריט המדיה</key>
+    <key alias="modules">אזורים</key>
+    <key alias="administrators">מנהל ראשי</key>
+    <key alias="editors">עורך</key>
+    <key alias="writer">כותב</key>
+    <key alias="noConsole">נטרל גישת אומברקו</key>
+    <key alias="disabled">נטרל משתמש</key>
+    <key alias="defaultToLiveEditing" version="4.0">לאחר כניסה למערכת הפנה אוטומטית למצב עריכה "קנבס"</key>
+    <key alias="searchAllChildren" version="4.0">חפש בכל הפריטים</key>
+
+    <key alias="descriptionField" version="4.0">שדה תיאור</key>
+    <key alias="categoryField" version="4.0">שדה קטגוריה</key>
+    <key alias="excerptField" version="4.0">Excerpt field</key>
+    <key alias="documentType" version="4.0">שדה מסמך</key>
+    <key alias="contentChannel" version="4.0">ערוץ תוכן</key>
+
+    <key alias="permissionSelectPages" version="4.0">בחר עמוד/עמודים לשינוי הרשאות</key>
+    <key alias="permissionReplaceChildren" version="4.0">החלף הרשאות בכל תתי הפריטים</key>
+    <key alias="permissionSelectedPages" version="4.0"><![CDATA[הינך משנה הרשאות לעמודים הבאים:]]></key>
+
+
+    <key alias="changePassword" version="4.6">שנה את הסיסמה שלך</key>
+    <key alias="changePasswordDescription" version="4.6">בעמוד זה ניתן לשנות את הסיסמה שלך ולאחר מכן ללחוץ על הכפתור 'שנה סיסמה'	 למטה</key>
+    <key alias="passwordEnterNew" version="4.6">הזן את הסיסמה החדשה שלך</key>
+    <key alias="passwordConfirm" version="4.6">אישור סיסמה</key>
+    <key alias="passwordChanged" version="4.6">הסיסמה שונתה בהצלחה!</key>
+    <key alias="passwordIsDifferent" version="4.6">סיסמאות לא תואמות, אנא בדוק זאת ונסה שנית</key>
+    <key alias="passwordIsBlank" version="4.6">שדה סיסמה לא יכול להיות ריק !</key>
+    <key alias="passwordMismatch" version="4.6">אישור סיסמה לא תואם !</key>
+  </area>
+  <area alias="settings">
+    <key alias="nodetype">סוג פריט תוכן</key>
+    <key alias="tab">לשונית</key>
+    <key alias="tabs">לשוניות</key>
+    <key alias="tabname">כותרת לשונית</key>
+    <key alias="objecttype">סוג</key>
+    <key alias="defaulttemplate">תבנית ברירת מחדל</key>
+    <key alias="newtabname">כותרת לשונית חדשה</key>
+    <key alias="stylesheet" version="2.1">גליונות סגנון</key>
+    <key alias="stylesheet editor egenskab">תכונות גליונות סגנון</key>
+    <key alias="dictionary editor egenskab" version="2.1">מפתח מילון</key>
+    <key alias="importDocumentTypeHelp" version="3.0">על מנת לייבא סוג מסמך,מצא את הקובץ ".udt" במחשב שלך על ידי לחיצה על 'סייר' ואז 'ייבא' (ייתכן ותצטרך לבצע אימות במסך הבא)</key>
+  </area>
+  <area alias="graphicheadline">
+    <key alias="bold">מובלט</key>
+    <key alias="text">טקסט</key>
+    <key alias="font">פונט</key>
+    <key alias="color">צבע טקסט</key>
+    <key alias="backgroundcolor">צבע רקע</key>
+  </area>
+  <area alias="update">
+    <key alias="updateAvailable">עידכון חדש זמין</key>
+    <key alias="updateDownloadText">%0% זמין, כאן להורדה</key>
+    <key alias="updateNoServer">אין תקשורת עם השרת</key>
+    <key alias="updateNoServerError">בדיקת עידכונים נכשלה. בדוק את ה trace-stack למידע נוסף</key>
+  </area>
+  <area alias="actions">
+    <key alias="create">צור</key>
+    <key alias="move">הזז</key>
+    <key alias="copy">העתק</key>
+    <key alias="delete">מחק</key>
+    <key alias="sort">מיין</key>
+    <key alias="publish">פרסם</key>
+    <key alias="toPublish">שלח לפירסום</key>
+    <key alias="rights">הרשאות</key>
+    <key alias="protect">גישה ציבורית</key>
+    <key alias="refreshNode">רענן פריטי תוכן</key>
+    <key alias="update">עדכן</key>
+    <key alias="notify">התראות</key>
+    <key alias="logout">יציאה</key>
+    <key alias="republish">פרסם את כל האתר מחדש</key>
+    <key alias="assignDomain">נהל שמות מתחם</key>
+    <key alias="disable" version="2.1">נטרל</key>
+    <key alias="auditTrail" version="2.1">מעקב ביקורות</key>
+    <key alias="createPackage" version="2.1">צור חבילה</key>
+    <key alias="importPackage" version="2.1">ייבא חבילה</key>
+    <key alias="rollback" version="2.1">חזור לאחור</key>
+    <key alias="emptyTrashcan" version="3.0">רוקן סל מיחזור</key>
+    <key alias="exportDocumentType" version="3.0">ייצא סוג קובץ</key>
+    <key alias="exportDocumentTypeAsCode" version="3.0">ייצא אל.NET</key>
+    <key alias="exportDocumentTypeAsCode-Full" version="3.0">ייצא אל .NET</key>
+    <key alias="importDocumentType" version="3.0">ייבא סוג מסמך</key>
+    <key alias="sendToTranslate" version="3.0">שלח לתירגום</key>
+    <key alias="translate" version="3.0">תרגם</key>
+    <key alias="browse" version="4.0">צפה בתוכן</key>
+    <key alias="sendtopublish" version="4.0">שלח לפירסום</key>
+    <key alias="liveEdit" version="4.0">ערוך במצב "קנבס"</key>
+  </area>
+  <area alias="errors">
+    <key alias="startNodeDoesNotExists">הפריט תוכן ההתחלתי נמחק, צור קשר עם מנהל האתר.</key>
+    <key alias="stylesNoStylesOnPage">סגנונות עיצוב פעילים לא זמינים</key>
+    <key alias="stylesMustMarkBeforeSelect">תחילה יש לסמן תוכן לפני שינוי עיצוב</key>
+    <key alias="pictureResizeBiggerThanOrg">הינך עומד לשנות את התמונה לגודל גדול יותר מהמקור, האם ברצונך להמשיך</key>
+    <key alias="tableColMergeLeft">יש למקם את הסמן משמאל לשני התאים אותם תרצה למזג</key>
+    <key alias="tableSplitNotSplittable">אין אפשרות לפצל תא שלא מוזג לפני כן.</key>
+    <key alias="missingType">אנא בחר סוג</key>
+    <key alias="missingTitle">אנא בחר כותרת</key>
+    <key alias="xsltErrorHeader">שגיאה במקור xslt</key>
+    <key alias="xsltErrorText">קובץ ה- XSLT לא נשמר, הקובץ מכיל שגיאות.</key>
+    <key alias="pythonErrorHeader">שגיאות ב- python script</key>
+    <key alias="pythonErrorText">ה- python script לא נשמר, מכיל שגיאות</key>
+    <key alias="contentTypeAliasAndNameNotNull">אנא הזן את  את הכינוי והשם עבור סוג המידע!</key>
+    <key alias="filePermissionsError">קיימת בעיית הרשאות גישה בקריאה/כתיבה עבור הקובץ או התיקיה הזו</key>
+    <key alias="codemirroriewarning">שים לב! למרות ש- CodeMirror מופעל מההגדרות, הוא נמצא במצב כבוי באינטרנט אקספלורר מפאת חוסר יציבות.</key>
+  </area>
+  <area alias="speechBubbles">
+    <key alias="xsltSavedHeader">הקובץ Xslt נשמר</key>
+    <key alias="xsltSavedText">אין שגיאות ב- xslt</key>
+    <key alias="xsltErrorHeader">הקובץ Xslt לאנשמר</key>
+    <key alias="xsltPermissionErrorText">אין אפשרות לשמור את ה- Xslt, בדוק הרשאות קובץ לפני</key>
+    <key alias="xsltErrorText">הקובץ Xslt מכיל שגיאה</key>
+
+    <key alias="pythonSavedHeader">Python script נשמר</key>
+    <key alias="pythonSavedText">לא נמצאו שגיאות ב- python script</key>
+    <key alias="pythonErrorHeader">Python script לא נשמרו</key>
+    <key alias="pythonErrorText">Python script לא נשמרו עקב שגיאות</key>
+
+    <key alias="templateSavedHeader">התבנית נשמרה</key>
+    <key alias="templateSavedText">התבנית נשמרה ללא שגיאות!</key>
+    <key alias="templateErrorHeader">התבנית לא נשמרה</key>
+    <key alias="templateErrorText">שים לב שאין 2 תבניות עם אותו השם/כינוי</key>
+
+    <key alias="cssSavedHeader">סגנון עיצוב נשמר</key>
+    <key alias="cssSavedText">סגנון עיצוב נשמר ללא שגיאות</key>
+    <key alias="cssErrorHeader">סגנון עיצוב לא נשמר</key>
+
+    <key alias="fileErrorHeader">קובץ לא נשמר</key>
+    <key alias="fileErrorText">אין אפשרות לשמור את הקובץ, בדוק הרשאות</key>
+    <key alias="fileSavedHeader">הקובץ נשמר</key>
+    <key alias="fileSavedText">הקובץ נשמר ללא שגיאות</key>
+
+    <key alias="contentTypeSavedHeader">סוג מסמך נשמר</key>
+    <key alias="contentTypeTabCreated">נוצרה לשונית</key>
+    <key alias="contentTypeTabDeleted">לשונית נמחקה</key>
+    <key alias="contentTypeTabDeletedText">לשונית עם מזהה: %0% נמחקה</key>
+    <key alias="contentTypePropertyTypeCreated">סוג תכונה נשמר</key>
+    <key alias="contentTypeDublicatePropertyType">סוג תכונה כבר קיים</key>
+    <key alias="contentTypePropertyTypeCreatedText">שם: %0% &lt;br /&gt; סוג מידע: %1%</key>
+    <key alias="contentTypePropertyTypeDeleted">סוג תכונה נמחק</key>
+    <key alias="dataTypeSaved">סוג מידע נשמר</key>
+    <key alias="editContentSavedHeader">תוכן נשמר</key>
+    <key alias="editContentSavedText">זכור לפרסם את התוכן על מנת שהשינויים יוצגו</key>
+    <key alias="editContentPublishedHeader">התוכן פורסם</key>
+    <key alias="editContentPublishedText">ומוצג לצפיה באתר</key>
+    <key alias="editContentPublishedFailedByParent">הפירסום נכשל, עמוד האב לא מפורסם</key>
+    <key alias="contentPublishedFailedByEvent" version="4.0">הפירסום בוטל על ידי תוסף צד שלישי</key>
+    <key alias="editMemberSaved">חבר נשמר</key>
+    <key alias="editTemplateSaved">תבנית נשמרה</key>
+    <key alias="editStylesheetSaved">סגנון עיצוב נשמר</key>
+    <key alias="editStylesheetPropertySaved">תגונה של סגנון עיצוב נשמרה</key>
+    <key alias="editUserSaved">הגדרות משתמש נשמרו</key>
+    <key alias="editUserError">שגיאה בעת שמירת משתמש (בדוק Log)</key>
+    <key alias="editContentSendToPublish">נשלח לאישור</key>
+    <key alias="editContentSendToPublishText">השינויים נשלחו לאישור</key>
+
+    <key alias="dictionaryItemSaved">פריט במילון נשמר</key>
+    <key alias="languageSaved">שפה נשמרה</key>
+  </area>
+  <area alias="headers">
+    <key alias="page">עמוד</key>
+  </area>
+  <area alias="paste">
+    <key alias="errorMessage">הטקסט שאתה עומד להדביק מכיל עיצוב או תווים מיוחדים. דבר זה יגול להגרם בעת העתקה ממסמך בוורד. אומברקו יכולה להסיר את העיצוב או תווים מיוחדים על מנת שהטקסט המועתק יתאים ל- Web.</key>
+    <key alias="removeSpecialFormattering">הדבק אך הסר רק עיצוב (מומלץ)</key>
+    <key alias="removeAll">הסר עיצוב באופן מלא בהדבקה</key>
+    <key alias="doNothing">שמור עיצוב בהדבקה (לא מומלץ)</key>
+  </area>
+  <area alias="assignDomain">
+    <key alias="domain">דומיין</key>
+    <key alias="addNew">הוסף דומיין חדש</key>
+    <key alias="orEdit">ערוך דומיין נוכחי</key>
+    <key alias="domainDeleted">הדומיין %0% נמחק</key>
+    <key alias="domainCreated">הדומיין החדש %0% נוסף בהצלחה</key>
+    <key alias="domainUpdated">הדומיין %0% עודכן בהצלחה</key>
+    <key alias="domainHelp">לדוגמא: yourdomain.com, www.yourdomain.com</key>
+    <key alias="domainExists">הדומיין %0% כבר מוקצה</key>
+  </area>
+  <area alias="rollback">
+    <key alias="currentVersion">גירסה עדכנית</key>
+    <key alias="rollbackTo">חזור לאחור אל</key>
+    <key alias="view">תצוגה</key>
+    <key alias="diffHelp"><![CDATA[להלן ההבדלים בין הגירסא הנוכחית לבין הגרסא שנבחרה. <br />טקסט <del>אדום</del> לא יוצג בגרסא שנבחרה, טקסט <ins>ירוק</ins> מייצט טקסט שנוסף.]]></key>
+    <key alias="htmlHelp">
+      <![CDATA[להלן הגרסא שנבחרה כHTML, אם הינך לצפות בשינויים בין שתי הגרסאות בו זמנית, בחר ב diff]]>
+    </key>
+    <key alias="selectVersion">בחר גירסה</key>
+    <key alias="documentRolledBack">המסמך שוחזר בהצלחה</key>
+  </area>
+  <area alias="sort">
+    <key alias="sortPleaseWait"><![CDATA[פריטי התוכן ממיונים ברגע זה, תהליך זה לוקח זמן מה.<br/> <br/> נא לא לסגור את החלון בזמן המיון]]></key>
+    <key alias="sortHelp"><![CDATA[יש לגרור את הפריטים מעלה או מטה כדי להגדיר את סדר התוכן. או לחץ על כותרת העמודה כדי למיין את כל פריטי התוכן]]></key>
+    <key alias="sortDone">המיון הושלם.</key>
+  </area>
+  <area alias="publish">
+    <key alias="publishAll">פרסם את העמוד %0% ואת כל תתי העמודים</key>
+    <key alias="nodePublish">העמוד %0% פורסם.</key>
+    <key alias="nodePublishAll">העמוד %0% וכל תתי העמודים פורסמו</key>
+    <key alias="inProgress">אנא המתן - הפירסום בתהליך...</key>
+    <key alias="inProgressCounter">%0% מתוך %1% עמודים פורסמם בהצלחה...</key>
+    <key alias="includeUnpublished">כלול עמודי ילדים שלא פורסמו</key>
+    <key alias="publishHelp" version="4.0">
+      <![CDATA[לחץ <em>ok</em> כדי לפרסם <strong>%0%</strong> ולהפוך תוכן זה זמין לציבור הרחב<br/><br />
+      הינך יכולה לפרסם את כל תתי העמודים על ידי סימון  <em>פרסם את העמוד את כל תתי העמודים</em> למטה.
+      ]]>
+    </key>
+    <key alias="contentPublishedFailedByEvent" version="4.0">
+      אין אפשרות לפרסם את התוכן %0%, תוסף צד שלישי מונע זאת.
+    </key>
+  </area>
+  <area alias="moveOrCopy">
+    <key alias="moveTo">בחר להיכן המסמך %0% יועבר</key>
+    <key alias="copyTo">בחר לאן המסמך %0% יועתק</key>
+    <key alias="noNodeSelected">No node selected yet, please select a node in the list above before clicking 'ok'</key>
+    <key alias="nodeSelected">has been selected as the root of your new content, click 'ok' below.</key>
+    <key alias="choose">בחר עמוד מלמעלה...</key>
+    <key alias="notAllowedByContentType">The current node is not allowed under the chosen node because of its type</key>
+    <key alias="notAllowedByPath">The current node cannot be moved to one of its subpages</key>
+    <key alias="moveDone">%0% הועבר אל %1%</key>
+    <key alias="copyDone">%0% הועתק אל %1%</key>
+  </area>
+  <area alias="login">
+    <key alias="topText">ברוכים הבאים לאומברקו, יש להזין שם משתמש וסיסמה בשדות למטה:</key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+  </area>
+  <area alias="stylesheet">
+    <key alias="editstylesheet">ערוך סגנון עיצוב</key>
+    <key alias="editstylesheetproperty">ערוך הגדרות סגנון עיצוב</key>
+    <key alias="styles">עיצובים</key>
+    <key alias="preview">תצוגה מקדימה</key>
+    <key alias="aliasHelp">השתמש בסינטקס CSS לדוגמא: h1, .redHeader, .blueTex</key>
+    <key alias="nameHelp">שם לזיהוי הגדרות ה- style בעורך הטקסט העשיר</key>
+  </area>
+  <area alias="scripts">
+    <key alias="editscript">ערוך קובץ סקריפט</key>
+  </area>
+  <area alias="editcontenttype">
+    <key alias="newtab">לשונית חדשה</key>
+    <key alias="create">צור</key>
+    <key alias="allowedchildnodetypes">תת פריטי תוכן מאושרים:</key>
+    <key alias="tab">לשונית</key>
+    <key alias="deletetab">מחק לשונית</key>
+    <key alias="description">תיאור</key>
+    <key alias="thumbnail">תמונה ממוזערת</key>
+  </area>
+  <area alias="editdatatype">
+    <key alias="renderControl">הפוך שליטה</key>
+    <key alias="guid">Data Editor GUID</key>
+    <key alias="dataBaseDatatype">סוג מידע עבור בסיס נתונים</key>
+    <key alias="addPrevalue">הוסף ערך מקדים</key>
+    <key alias="rteButtons">כפתורים</key>
+    <key alias="rteRelatedStylesheets">סגנונות עיצוב קרובים</key>
+    <key alias="rteEnableAdvancedSettings">הפעל הגדרות מתקדמות עבור</key>
+    <key alias="rteEnableContextMenu">הפעל תפריט מקושר</key>
+    <key alias="rteWidthAndHeight">רוחב ואורך</key>
+    <key alias="rteMaximumDefaultImgSize">גודל תמונה מקסימלי כברירת מחדל עבור תמונות המתווספות</key>
+    <key alias="rteShowLabel">הצג תוויות</key>
+  </area>
+  <area alias="template">
+    <key alias="template">תבנית</key>
+    <key alias="mastertemplate">תבנית ראשית</key>
+    <key alias="edittemplate">ערוך תבנית</key>
+    <key alias="insertMacro" version="4.0">הוסף מקרו</key>
+    <key alias="insertDictionaryItem" version="4.0">הוסף פריט מילון</key>
+    <key alias="insertContentArea" version="4.0">הוסף איזור תוכן</key>
+    <key alias="insertContentAreaPlaceHolder" version="4.0">הוסף content area placeholder</key>
+    <key alias="quickGuide" version="4.0">מדריך מהיר עבור תבנית תגיות באומברקו</key>
+    <key alias="insertPageField" version="4.0">הוסף שדה עמוד לאומברקו</key>
+  </area>
+  <area alias="dictionaryItem">
+    <key alias="description">
+      <![CDATA[
+      ערוך את גרסאות השפות השונות לפריט המילון '<em>%0%</em>' למטה<br/>ניתן להוסיף שפות נוספות תחת "שפות" בתפריט בצד שמאל
+   ]]>
+   </key>
+    <key alias="displayName">שם התצוגה לשפה</key>
+  </area>
+  <area alias="language">
+    <key alias="cultureCode">קוד שפה</key>
+    <key alias="displayName">שם השפה</key>
+  </area>
+  <area alias="templateEditor">
+    <key alias="chooseField">בחר שדה</key>
+    <key alias="alternativeField">שדה אלטרנטיבי</key>
+    <key alias="usedIfEmpty">בשדה זה יבוצע שימוש אך ורק אם השדה העיקרי יהיה ריק</key>
+    <key alias="usedIfAllEmpty">יבוצע שימוש אך ורק עם ערך השדה יהיה ריק</key>
+    <key alias="alternativeText">טקסט חלופי</key>
+    <key alias="recursive">רקורסיבי</key>
+    <key alias="preContent">הוסף לפני השדה</key>
+    <key alias="postContent">הוסף אחרי השדה</key>
+    <key alias="insertedBefore">יוכנס לפני ערך השדה</key>
+    <key alias="insertedAfter">יוכנס אחרי ערך השדה</key>
+    <key alias="formatAsDate">פורמט תאריך</key>
+    <key alias="dateOnly">כן, תאריך בלבד</key>
+    <key alias="withTime">כן, עם שעה. תו מפריד: </key>
+    <key alias="casing">מסגרת</key>
+    <key alias="none">ללא</key>
+    <key alias="lowercase">אותיות קטנות</key>
+    <key alias="uppercase">אותיות גדולות</key>
+    <key alias="urlEncode">קידוד URL</key>
+    <key alias="htmlEncode">קידוד HTML</key>
+    <key alias="urlEncodeHelp">תווים מיוחדים יעוצבו ב- URL</key>
+    <key alias="htmlEncodeHelp">תווים מיוחדים יוחלפו בתווי HTML מתאימים.</key>
+    <key alias="convertLineBreaks">המרת מעברי שורה</key>
+    <key alias="convertLineBreaksHelp">החלף מעברי שורה עם תגית ה HTML &amp;lt;br&amp;gt;</key>
+    <key alias="removeParagraph">הסר תגי פסקה</key>
+    <key alias="removeParagraphHelp">מסיר את כל ה- &amp;lt;P&amp;gt; בתחילת ובסוף הטקסט</key>
+  </area>
+  <area alias="create">
+    <key alias="createUnder">צור ב</key>
+    <key alias="chooseNode">היכן ברצונך ליצור את %0%</key>
+    <key alias="updateData">בחר סוג וכותרת</key>
+  </area>
+  <area alias="errorHandling" version="2.1">
+    <key alias="errorHeader" version="2.1">התרחשו שגיאות:</key>
+    <key alias="errorHeaderWithoutTab" version="2.1">התרחשו שגיאות:</key>
+    <key alias="errorMandatory" version="2.1">השדה %0% בלשונית %1% הינו זה חובה</key>
+    <key alias="errorMandatoryWithoutTab" version="2.1">השדה %0% הינו זה חובה</key>
+    <key alias="errorExistsWithoutTab" version="2.1">השדה %0% כבר קיים</key>
+    <key alias="errorRegExp" version="2.1">%0% ב- %1% אינו הפורמט התקין</key>
+    <key alias="errorRegExpWithoutTab" version="2.1">%0% אינו פורמט תקין</key>
+    <key alias="errorIntegerWithoutTab" version="4.0">%0% חייב להיות מספר שלם</key>
+    <key alias="errorButDataWasSaved" version="4.0">המידע שלך נשמר, אך לפני שניתן יהיה לפרסם אותו יש צורך לתקן את השגיאות הבאות:</key>
+    <key alias="errorInPasswordFormat" version="4.0">הסיסמה חייבת להיות במינימום של %0% תווים characters long and contain at least %1% non-alpha numeric character(s)</key>
+    <key alias="errorChangingProviderPassword" version="4.0">ספק החברות הנוכחית לא תומך בשינוי סיסמה (EnablePasswordRetrieval צריך להיות מוגדר על true)</key>
+  </area>
+  <area alias="publicAccess" version="2.1">
+    <key alias="paHowWould" version="2.1">בחר איך להגביל את הגישה לעמוד זה</key>
+
+    <key alias="paSimple" version="2.1">הגנת משתמש יחיד</key>
+    <key alias="paSimpleHelp" version="4.0">אם ברצונך להגדיר הגנה פשוטה בעזרת שימוש בשם משתמש וסיסמה</key>
+
+    <key alias="paAdvanced" version="2.1">תפקיד בסיסי בהגנה</key>
+    <key alias="paAdvancedHelp" version="2.1"><![CDATA[אם הינך רוצה לשלוט בגישה לעמוד על ידי זיהוי תפקיד המשתמש,<br /> על ידי שימוש בקבוצות הקיימות ב umbraco.]]></key>
+    <key alias="paAdvancedNoGroups" version="4.0"><![CDATA[יש צורך ליצור קבוצה לפני שימוש  <br />בזיהוי תפקיד המשתמש.]]></key>
+
+    <key alias="paLoginPage" version="2.1">עמוד התחברות</key>
+    <key alias="paErrorPage" version="2.1">עמוד שגיאות</key>
+
+    <key alias="paSelectPages" version="4.0">בחר את העמודים המכילים פרטי התחברות והודעות שגיאה</key>
+    <key alias="paLoginPageHelp" version="2.1">בחר את העמוד המכיל טופס התחברות</key>
+    <key alias="paErrorPageHelp" version="2.1">השתמש בעת התחברות משתמשים וללא אפשרות גישה</key>
+
+    <key alias="paSelectRoles" version="4.0">בחר את הכללים אשר יש להם גישה לעמוד זה</key>
+    <key alias="paSetLogin" version="4.0">הגדר שם משתמש וסיסמה עבור עמוד זה</key>
+
+    <key alias="paIsProtected" version="2.1">%0% כעת מוגן</key>
+    <key alias="paIsRemoved" version="2.1">הגנה הוסרה עבור %0%</key>
+    <key alias="paRemoveProtection" version="2.1">הסר הגנה</key>
+  </area>
+  <area alias="auditTrails" version="2.1">
+    <key alias="atViewingFor" version="2.1">צופה עבור</key>
+  </area>
+  <area alias="notifications" version="2.1">
+    <key alias="notifications" version="2.1">התראות</key>
+    <key alias="editNotifications" version="2.1">ערוך את ההתראות עבור %0%</key>
+    <key alias="mailSubject" version="2.1">[%0%] התראות  %1% בוצעו ב %2%</key>
+    <key alias="mailBody" version="2.1">
+      שלום, %0%
+
+      זוהי הודעה אוטומטית המיידעת אותך שהמשימה %1%
+	  בוצעה בעמוד %2% על ידי המשתמש %3%
+
+      לעריכה, יש ללחוץ על הלינק הבא://%4%/actions/editContent.aspx?id=%5% .
+
+      המשך יום נעים!
+    </key>
+    <key alias="mailBodyHtml" version="3.0">
+      <![CDATA[<p>Hi %0%</p>
+
+		  <p>This is an automated mail to inform you that the task <strong>'%1%'</strong> 
+		  has been performed on the page <a href="%7%"><strong>'%2%'</strong></a>
+		  by the user <strong>'%3%'</strong>
+	  </p>
+		  <div style="margin: 8px 0; padding: 8px; display: block;">
+				<br />
+				<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISH&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;DELETE&nbsp;&nbsp;&nbsp;&nbsp;</a>
+				<br />
+		  </div>
+		  <p>
+			  <h3>Update summary:</h3>
+			  <table style="width: 100%;">
+						   %6%
+				</table>
+			 </p>
+
+		  <div style="margin: 8px 0; padding: 8px; display: block;">
+				<br />
+				<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISH&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;DELETE&nbsp;&nbsp;&nbsp;&nbsp;</a>
+				<br />
+		  </div>
+
+		  <p>Have a nice day!<br /><br />
+			  Cheers from the umbraco robot
+		  </p>]]>
+    </key>
+  </area>
+  <area alias="translation" version="3.0">
+    <key alias="pageHasBeenSendToTranslation" version="4.0">העמוד '%0%' נשלח לתירגום</key>
+    <key alias="sendToTranslate" version="4.0">שלח את העמוד '%0%' לתירגום</key>
+    <key alias="noTranslators" version="4.0">לא נמצאו משתמשמים המוגדרים כמתרגמים. יש ליצור משתמש המוגדר כמתרגם לפני שליחת תוכן לתירגום</key>
+    <key alias="translator" version="4.0">מתרגם</key>
+    <key alias="translateTo" version="4.0">תרגם עבור</key>
+    <key alias="includeSubpages" version="4.0">כלול דפי משנה</key>
+    <key alias="mailSubject" version="3.0">[%0%] משימות תירגום עבור %1%</key>
+    <key alias="mailBody" version="3.0">
+      שלום %0%
+
+	  זוהי הודעה אוטומטית הבאה ליידע אותך בנוגע למסמך '%1%'
+      שהוגשה בקשה לתירגום על '%5%' על ידי %2%.
+
+      לעריכה, לחץ על הלינק הבא: http://%3%/translation/details.aspx?id=%4% .
+
+      באפשרותך גם להיכנס למערכת על מנת לראות את כל משימות התירגום
+      http://%3%/umbraco.aspx
+      
+      המשך יום נעים.
+	  
+    </key>
+    <key alias="assignedTasks" version="4.0">משימות משוייכות אליך</key>
+    <key alias="assignedTasksHelp" version="4.0">
+      <![CDATA[ הרשימה הבאה מציגה את משימות התרגום <strong>שמשוייכות אלייך</strong>. כדי לצפות בפרטים נוספים הכוללים תגובות, יש ללחוץ על "פרטים" או על שם העמוד. 
+     ניתן בנוסף להוריד את הקובץ כ XML ישירות למחשב על ידי לחיצה ב"הורד קובץ XML".<br/>
+     כדי לסגור את משימת התרגום, אנא בחר בצפיה נרחבת ואז יש ללחוץ על כפתור "סגור משימה".
+    ]]>
+    </key>
+    <key alias="ownedTasks" version="4.0">משימות שנוצרו על ידך</key>
+    <key alias="ownedTasksHelp" version="4.0">
+      <![CDATA[ הרשימה הבאה מציגה עמודים <strong>שנוצרו על ידיך</strong>. כדי לצפות בפרטים נוספים הכוללים תגובות, 
+     יש ללחוץ על "פרטי תרגום" או על ידי שם העמוד. ניתן בנוסף להוריד את העמוד כקובץ XML ישירות למחשב על ידי לחיצה על "הורד קובץ XML". 
+     כדי לסגור את משימת התרגום, אנא בחר בצפיה נרחבת ואז יש ללחוץ על כפתור "סגור משימה".
+    ]]>
+    </key>
+
+    <key alias="downloadTaskAsXml" version="4.0">הורד קובץ  xml</key>
+    <key alias="downloadAllAsXml" version="4.0">הורד את כל התירגומים כקובץ xml</key>
+    
+    <key alias="DownloadXmlDTD" version="4.0">הורד xml DTD</key>
+    <key alias="closeTask" version="4.0">סגור משימה</key>
+    <key alias="uploadTranslationXml" version="4.0">העלה קובץ תירגום ב xml</key>
+
+    <key alias="taskOpened" version="4.0">משימה נפתחה</key>
+    <key alias="taskAssignedBy" version="4.0">הוקצה על ידי</key>
+    <key alias="totalWords" version="4.0">סך הכל מילים</key>
+    <key alias="details" version="4.0">פרטי תירגום</key>
+    <key alias="fields" version="4.0">שדות</key>
+    <key alias="translationOptions" version="4.0">אפשרויות תירגום</key>
+    <key alias="translationDone" version="4.0">התירגום הושלם.</key>
+    <key alias="translationFailed">התירגום נכשל, קובץ ה- xml עלול להיות מקולקל</key>
+    <key alias="translationDoneHelp" version="4.0">ניתן לראות תצוגה מקדימה של העמודים שכבר תורגמו על ידי לחיצה על הלינק למטה. If the original page is found, you will get a comparison of the 2 pages.</key>
+  </area>
+  <area alias="packager" version="4.0">
+    <key alias="packageMetaData" version="4.0">מטה דטה עבור החבילה</key>
+    <key alias="packageName" version="4.0">שם החבילה</key>
+    <key alias="packageVersion" version="4.0">גירסת החבילה</key>
+    <key alias="packageAuthor" version="4.0">יוצר החבילה</key>
+
+    <key alias="packageDocumentation" version="4.0">תיעוד</key>
+    <key alias="packageDemonstration" version="4.0">הדגמה</key>
+    <key alias="packageRepository" version="4.0">מאגר חבילות</key>
+
+    <key alias="packageReadme" version="4.0">תיאור החבילה</key>
+    <key alias="packageOptions" version="4.0">אפשרויות חבילה</key>
+    <key alias="viewPackageWebsite" version="4.0">צפה באתר החבילה</key>
+    <key alias="packageUninstallHeader" version="4.0">הסר חבילה</key>
+    <key alias="packageUninstallText" version="4.0">
+      <![CDATA[ניתן להוריד סימון מפריטים שאותם אינך רוצה להסיר, בזמן זה. כשילחץ כפתור "אשר הסרה" כל הפריטים המסומנים ימחקו.<br />
+      <span style="color: Red; font-weight: bold;">הערה:</span>כל מסמך, מדיה וכו' התלוים בפריטים שהסרת יפסיקו לעבוד, ויכולים להביא למצב של אי יציבות למערכת,
+      יש למחוק קבצים עם זהירות יתרה, אם יש ספק יש לפנות ליוצר החבילה.]]>
+    </key>
+    <key alias="packageUninstallConfirm" version="4.0">אשר הסרה</key>
+    <key alias="packageUninstalledHeader" version="4.0">החבילה הוסרה</key>
+    <key alias="packageUninstalledText" version="4.0">החבילה הוסרה בהצלחה!</key>
+
+    <key alias="packageNoItemsHeader" version="4.0">החבילה לא מכילה אף פריט</key>
+    <key alias="packageNoItemsText" version="4.0">
+      <![CDATA[החבילה אינה מכילה פריטים למחיקה.<br/><br/>
+      ניתן למחוק בבטיחות רבה את החבילה מהמערכת על ידי לחיצה על "הסר חבילה".]]>
+    </key>
+
+    <key alias="packageUpgradeHeader" version="4.0">שידרוג חבילה</key>
+    <key alias="packageUpgradeText" version="4.0"> קיים עידכון זמין עבור חבילה זו. ניתן להוריד אותו ישירות ממאגר החבילות של אומברקו.</key>
+    <key alias="packageNoUpgrades" version="4.0">אין עידכונים זמינים</key>
+    <key alias="packageUpgradeInstructions" version="4.0">הורדות שידרוג</key>
+    <key alias="packageUpgradeDownload" version="4.0">הורד עידכון מהמאגר</key>
+    <key alias="chooseLocalPackageText" version="4.0">
+      <![CDATA[
+      בחר חבילה מהמחשב שלך, על ידי לחיצה על כפתור ה "browse"<br />
+         ויש לבחור את החבילה הרצויה. לחבילות umbraco יש בד"כ יש סיומות בשם ".umb" או ".zip".
+      ]]>      
+    </key>
+  </area>
+  <area alias="installer" version="4.0">
+    <key alias="thankYou">תודה שבחרת באומברקו</key>
+    <key alias="welcomeIntro"><![CDATA[This wizard will guide you through the process of configuring <strong>umbraco %0%</strong> for a fresh install or upgrading from version 3.0.
+                                <br /><br />
+                                Press <strong>"next"</strong> to start the wizard.]]></key>
+    <key alias="greatStart">התחל מכאן, צפה בסרטוני ההדרכה עבור אומברקו</key>
+   
+    <key alias="watch">צפה</key>
+
+    <key alias="step1">צעד 1/5 אישור רשיון</key>
+    <key alias="licenseText">על ידי לחיצה על 'הבא', הנך מאשר את פרטי התקנון כפי שמפורט בתיבת הטקטס למטה. שים לב, הפצה זו של אומברקו כוללת שני גירסאות שונות של רשיון,קוד פתוח ברשיון MIT עבור ה- framework ורשיון umbraco freeware המכסה את ה- UI.</key>
+
+    <key alias="step2">צעד 2/5: הגדרת בסיס נתונים</key>
+    <key alias="databaseHeader">הגדרת בסיס נתונים</key>
+    <key alias="databaseText">
+      <![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
+        Please contact your ISP if necessary.
+        If you're installing on a local machine or server you might need information from your system administrator.]]>
+    </key>
+    <key alias="databaseFound">בסיס הנתונים שלך נמצא והוא מזוהה כ</key>
+    <key alias="databaseUpToDate"><![CDATA[Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard]]></key>
+    <key alias="databaseUpgrade">
+      <![CDATA[
+      <p>
+      Press the <strong>upgrade</strong> button to upgrade your database to Umbraco %0%</p>
+      <p>
+      Don't worry - no content will be deleted and everything will continue working afterwards!
+      </p>    
+      ]]>
+    </key>
+    <key alias="databaseInstall">
+      <![CDATA[
+      Press the <strong>install</strong> button to install the Umbraco %0% database
+    ]]>
+    </key>
+    <key alias="databaseNotFound">
+      <![CDATA[<p>Database not found! Please check that the information in the "connection string" of the “web.config” file is correct.</p>
+              <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "umbracoDbDSN" and save the file. </p>
+              <p>
+              Click the <strong>retry</strong> button when 
+              done.<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
+			              More information on editing web.config here.</a></p>]]>
+    </key>
+    <key alias="databaseInstallDone"><![CDATA[Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.]]></key>
+    <key alias="databaseUpgradeDone">
+      <![CDATA[Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to 
+      proceed. ]]>
+    </key>
+    <key alias="databaseErrorCannotConnect">ההתקנה לא מצליחה להתחבר לבסיס הנתונים.</key>
+    <key alias="databaseErrorWebConfig">אין אפשרות לשמור את הקובץ Web.config file. הגדר את ה- connection string באופן ידני.</key>
+    <key alias="Unavailable">ההתחברות לבסיס הנתונים נכשלה.</key>
+    <key alias="None">לא הותקן עדיין.</key>
+    <key alias="Version3">Umbraco גירסה 3</key>
+    <key alias="Version4">Umbraco גירסה 4</key>
+
+    <key alias="step3">צעד 3/5: אימות קובץ ההרשאות</key>
+    <key alias="permissionsText">
+	  אומברקו צריכה אישור כתיבה/עריכה עבור מספר ספריות על מנת למיין קבצים כמו תמונות וקבצי PDF's.
+      בנוסף ישמר מידע זמני (cache) על מנת לשפר את הביצועים של האתר.
+    </key>
+    <key alias="permissionsPerfect">
+      <![CDATA[<strong>Your permission settings are perfect!</strong><br /><br />
+              You are ready to run umbraco and install packages!]]>
+    </key>
+    <key alias="permissionsAlmostPerfect">
+      <![CDATA[<strong>Your permission settings are almost perfect!</strong><br /><br />
+        You can run umbraco without problems, but you will not be able to install packages which are recommended to take full advantage of umbraco.]]>
+    </key>
+    <key alias="permissionsNotReady">
+      <![CDATA[<strong>Your permission settings are not ready for umbraco!</strong>
+          <br /><br />
+          In order to run umbraco, you'll need to update your permission settings.]]>
+    </key>
+    <key alias="permissionsMaybeAnIssue">
+      <![CDATA[<strong>Your permission settings might be an issue!</strong>
+      <br/><br />
+      You can run umbraco without problems, but you will not be able to create folders or install packages which are recommended to take full advantage of umbraco.]]>
+    </key>
+
+    <key alias="permissionsHowtoResolve">איך לפתור</key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[Watch our <strong>video tutorial</strong> on setting up folder permissions for umbraco or read the text version.]]></key>
+    <key alias="permissionsHowtoResolveLink">לחץ כאן לקרוא את גירסת הטקסט</key>
+    
+    <key alias="permissionsSettingUpPermissions">הגדרת הרשאות לתיקיה</key>
+    <key alias="permissionsAffectedFolders">קבצים ותיקיות המושפעים</key>
+    <key alias="permissionsAffectedFoldersText">על מנת לבצע זאת, יש צורך לאפשר הרשאות ל ASP.NET לערוך את הקצבים או התיקיות הבאות</key>
+    <key alias="permissionsAffectedFoldersMoreInfo">מידע נוסף אודות התקנה ורשאות עבור אומרקו ניתן לקרוא כאן</key>
+    
+    <key alias="permissionsResolveFolderIssues">פתירת בעיות בתיקיה</key>
+    <key alias="permissionsResolveFolderIssuesLink">עקוב אחר הלינק המצורף על מנת לפתור בעיות עם ASP.NET ויצירת תיקיות חדשות.</key>
+
+
+    <key alias="step4">צעד 4/5: בדיקת האבטחה של אומברקו</key>
+    <key alias="defaultUserText">
+      <![CDATA[
+        <p>
+          umbraco creates a default user with a login <strong>('admin')</strong> and password <strong>('default')</strong>. It's <strong>important</strong> that the password is 
+          changed to something unique.
+        </p>
+        <p>
+          This step will check the default user's password and suggest if it needs to be changed.
+        </p>
+      ]]>
+    </key>
+    <key alias="defaultUserPasswordChanged">הסיסמה שונתה!</key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>The Default user has been disabled or has no access to umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
+    <key alias="defaultUserChangePass"><![CDATA[<strong>The Default users’ password needs to be changed!</strong>]]></key>
+
+    <key alias="step5">צעד 5/5: אומברקו מוכנה להתחיל</key>
+    <key alias="runwayHeader">סיימת להתקין את מערכת אומברקו, מה ברצונך לעשות כעת?</key>
+    <key alias="runwaySimpleSite">ברצוני להתחיל עם אתר פשוט</key>
+    <key alias="runwayFromScratch">אני רוצה להתחיל מאתר ריק</key>
+    <key alias="runwaySimpleSiteText">
+      <![CDATA[
+      <p>
+      "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically, 
+        but you can easily edit, extend or remove it. It’s not necessary and you can perfectly use Umbraco without it. However, 
+        Runway offers an easy foundation based on best practices to get you started faster than ever.
+        If you choose to install Runway, you can optionally select basic building blocks called Runway Modules to enhance your Runway pages.
+        </p>
+        <small>
+        <em>Included with Runway:</em> Home page, Getting Started page, Installing Modules page.<br />
+        <em>Optional Modules:</em> Top Navigation, Sitemap, Contact, Gallery.
+        </small>
+      ]]>
+    </key>
+    <key alias="runwayFromScratchText">
+      <![CDATA[
+        Your website is completely empty at the moment, so that’s perfect if you want to start from scratch and create your own document types and templates. 
+        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
+        You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
+      ]]>
+    </key>
+
+    <key alias="runwayWhatIsRunway">מה זה Runway</key>
+    <key alias="runwayInstalled">Runway הותקן</key>
+    <key alias="runwayInstalledText">
+      <![CDATA[
+      You have the foundation in place. Select what modules you wish to install on top of it.<br />
+      This is our list of recommended modules, check off the ones you would like to install, or view the <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">full list of modules</a>
+      ]]>
+    </key>
+    <key alias="runwayOnlyProUsers">המלצות עבור משתמשים מנוסים</key>
+
+    <key alias="theEndHeader">אומברקו %0% מותקנת ומוכנה לשימוש</key>
+    <key alias="theEndInstallFailed">
+      <![CDATA[To finish the installation, you'll need to 
+        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>umbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
+    <key alias="theEndInstallSuccess">
+      <![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to umbraco</strong>, 
+you can find plenty of resources on our getting started pages.]]></key>
+    <key alias="theEndBrowseSite">
+      <![CDATA[<h3>Browse your new site</h3>
+You installed Runway, so why not see how your new website looks.]]></key>
+    <key alias="theEndFurtherHelp">
+      <![CDATA[<h3>Further help and information</h3>
+Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the umbraco terminology]]></key>
+    <key alias="theEndOpenUmbraco">
+      <![CDATA[<h3>Launch Umbraco</h3>
+To manage your website, simply open the umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]>
+    </key>
+  </area>
+  <area alias="relatedlinks">
+    <key alias="modeUp">
+      <![CDATA[העלה למעלה]]>
+    </key>
+    <key alias="modeDown">
+      <![CDATA[הורד למטה]]>
+    </key>
+    <key alias="removeLink">
+      <![CDATA[הסר קישור]]>
+    </key>
+    <key alias="newWindow">
+      <![CDATA[פתח בחלון חדש]]>
+    </key>
+    <key alias="addInternal">
+      <![CDATA[הוסף קישור פנימי]]>
+    </key>
+    <key alias="addExternal">
+      <![CDATA[הוסף קישור חיצוני]]>
+    </key>
+    <key alias="caption">
+      <![CDATA[כותרת]]>
+    </key>
+    <key alias="linkurl">
+      <![CDATA[קישור]]>
+    </key>
+    <key alias="internalPage">
+      <![CDATA[עמוד פנימי]]>
+    </key>
+    <key alias="addlink">
+      <![CDATA[הוסף]]>
+    </key>
+  </area>
+</language>

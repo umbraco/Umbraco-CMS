@@ -70,6 +70,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -81,33 +82,33 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Common.cs" />
-    <Compile Include="DocumentService.asmx.cs">
-      <DependentUpon>DocumentService.asmx</DependentUpon>
+    <Compile Include="documents\documentCarrier.cs" />
+    <Compile Include="documents\documentProperty.cs" />
+    <Compile Include="files\fileService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="FileService.asmx.cs">
-      <DependentUpon>FileService.asmx</DependentUpon>
+    <Compile Include="maintenance\maintenanceService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="MaintanceService.asmx.cs">
-      <DependentUpon>MaintanceService.asmx</DependentUpon>
+    <Compile Include="media\mediaCarrier.cs" />
+    <Compile Include="media\mediaProperty.cs" />
+    <Compile Include="media\mediaService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="MediaService.asmx.cs">
-      <DependentUpon>MediaService.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="MemberService.asmx.cs">
-      <DependentUpon>MemberService.asmx</DependentUpon>
+    <Compile Include="members\memberCarrier.cs" />
+    <Compile Include="members\memberGroup.cs" />
+    <Compile Include="members\memberProperty.cs" />
+    <Compile Include="members\memberService.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StylesheetService.asmx.cs">
-      <DependentUpon>StylesheetService.asmx</DependentUpon>
+    <Compile Include="stylesheets\stylesheetService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="TemplateService.asmx.cs">
-      <DependentUpon>TemplateService.asmx</DependentUpon>
+    <Compile Include="templates\templateService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="documents\documentService.cs">
       <SubType>Component</SubType>
     </Compile>
   </ItemGroup>
@@ -120,19 +121,14 @@
       <Project>{CCD75EC3-63DB-4184-B49D-51C1DD337230}</Project>
       <Name>umbraco.cms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.presentation\umbraco.presentation.csproj">
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>umbraco.presentation</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="DocumentService.asmx" />
-    <Content Include="FileService.asmx" />
-    <Content Include="MaintanceService.asmx" />
-    <Content Include="MediaService.asmx" />
-    <Content Include="MemberService.asmx" />
-    <Content Include="StylesheetService.asmx" />
-    <Content Include="TemplateService.asmx" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -160,7 +156,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)" "$(ProjectDir)..\umbraco.presentation\bin\" /Y /F
-xcopy "$(ProjectDir)*.asmx" "$(ProjectDir)..\umbraco.presentation\umbraco\webservices\api\" /Y /F</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

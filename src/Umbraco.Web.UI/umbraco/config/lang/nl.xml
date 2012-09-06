@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="utf-8"?>
+<language alias="nl" intName="Dutch" localName="Nederlands" lcid="19" culture="nl-NL">
+  <creator>
+    <name>The umbraco community</name>
+    <link>http://umbraco.org/documentation/language-files</link>
+  </creator>
+  <area alias="main">
+    <key alias="sections">Secties</key>
+    <key alias="dashboard">Dashboard</key>
+    <key alias="tree">Inhoud</key>
+  </area>
+  <area alias="defaultdialogs">
+    <key alias="cut">Knippen</key>
+    <key alias="link">Link</key>
+    <key alias="insertlink">Link invoegen</key>
+    <key alias="insertgraphicheadline">Voeg grafische titel in</key>
+    <key alias="linknewwindow">In nieuw venster openen?</key>
+    <key alias="linkinternal">Interne link:</key>
+    <key alias="linklocaltip">Plaats een hekje (“#”) voor voor interne links.</key>
+    <key alias="insertimage">Afbeelding invoegen</key>
+    <key alias="treepicker">Kies een item</key>
+    <key alias="confirmdelete">Weet je zeker dat je dit wilt verwijderen</key>
+    <key alias="confirmdisable">Weet je zeker dat je dit wilt uitschakelen</key>
+    <key alias="confirmlogout">Weet je het zeker?</key>
+    <key alias="insertAnchor">Lokale link invoegen</key>
+    <key alias="anchorInsert">Naam</key>
+    <key alias="insertMacro">Macro invoegen</key>
+    <key alias="insertCharacter">Karakter invoegen</key>
+    <key alias="inserttable">Tabel invoegen</key>
+    <key alias="tableColumns">Aantal kolommen</key>
+    <key alias="tableRows">Aantal regels</key>
+    <key alias="paste">Plakken</key>
+    <key alias="assignDomain">Beheer domeinnamen</key>
+    <key alias="confirmSure">Weet je het zeker?</key>
+    <key alias="requiredField">Verplicht veld</key>
+    <key alias="lastEdited">Laatst aangepast op</key>
+    <key alias="siterepublished">De site is opnieuw gepubliceerd</key>
+    <key alias="siterepublishHelp">De cache zal worden vernieuwd. Alle gepubliseerde content zal worden ge-update, terwijl ongepubliseerde content ongepubliseerd zal blijven.</key>
+    <key alias="sitereindexed">Site is opnieuw geïndexeerd</key>
+    <key alias="editdictionary">Pas woordenboekitem aan</key>
+    <key alias="editlanguage">Taal aanpassen</key>
+    <key alias="permissionsEdit">Bewerk rechten voor</key>
+    <key alias="viewCacheItem">Toon cache item</key>
+    <key alias="thumbnailimageclickfororiginal">Klik op de afbeelding voor volledige grootte</key>
+    <key alias="confirmEmptyTrashcan">Vink aub dit keuzevak aan om het verwijderen van %0% item(s) te bevestigen</key>
+    <key alias="recycleBinIsEmpty">De prullenbak is nu leeg.</key>
+    <key alias="recycleBinWarning">Als items worden verwijderd uit de prullenbak, zijn ze voorgoed verwijderd.</key>
+    <key alias="recycleBinDeleting">De items worden nu uit de prullenbak verwijderd. Sluit dit venster niet terwijl de actie nog niet voltooid is.</key>
+    <key alias="closeThisWindow">Sluit dit venster</key>
+    <key alias="removeMacro" version="4.5">Verwijder Macro</key>
+    <key alias="insertMacro" version="4.5">Klik om een Macro toe te voegen</key>
+    <key alias="macroContainerSettings" version="4.5">Macro Settings</key>
+    <key alias="templateContentAreaHelp"><![CDATA[<strong>Plaats een placeholder id</strong> door een ID op uw placeholder te zetten kunt u content plaatsen in deze template vanuit onderliggende templates,
+      door te referreren naar deze ID door gebruik te maken van een <code>&lt;asp:content /&gt;</code> element.]]></key>
+    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Selecteer een placeholder id</strong> uit onderstaande lijst. U kunt alleen 
+      Id's kiezen van de master van de huidige template..]]></key>
+    <key alias="regexSearchHelp">Zoek naar een regular expressie om validatie aan een formulierveld toe te voegen. Voorbeeld: 'email, 'post-code' 'url'</key>
+    <key alias="regexSearchError"><![CDATA[De webservice van <a target='_blank' href='http://regexlib.com'>regexlib.com</a> ondervindt momenteel prolemen waarover we geen controle hebben. Onze excuses voor het ongemak.]]></key>
+    <key alias="macroDoesNotHaveProperties"><![CDATA[Deze macro heeft geen eigenschappen die u kunt bewerken]]></key>
+  </area>
+  <area alias="general">
+    <key alias="properties">Eigenschappen</key>
+    <key alias="elements">Elementen</key>
+    <key alias="new">Nieuw</key>
+    <key alias="add">Toevoegen</key>
+    <key alias="open">Open</key>
+    <key alias="edit">Aanpassen</key>
+    <key alias="close">Sluiten</key>
+    <key alias="create">Aanmaken</key>
+    <key alias="delete">Verwijderen</key>
+    <key alias="sort">Sorteren</key>
+    <key alias="move">Verplaats</key>
+    <key alias="copy">Kopiëren</key>
+    <key alias="rename">Hernoemen</key>
+    <key alias="logoff">Afmelden</key>
+    <key alias="rights">Rechten</key>
+    <key alias="choose">Kiezen</key>
+    <key alias="alias">Alias</key>
+    <key alias="name">Naam</key>
+    <key alias="icon">Icoon</key>
+    <key alias="default">Standaard</key>
+    <key alias="type">Type</key>
+    <key alias="yes">Ja</key>
+    <key alias="no">Nee</key>
+    <key alias="ok">Ok</key>
+    <key alias="update">Bijwerken</key>
+    <key alias="cancel">Annuleren</key>
+    <key alias="macro">Macro</key>
+    <key alias="insert">Invoegen</key>
+    <key alias="size">Formaat</key>
+    <key alias="layout">Layout</key>
+    <key alias="design">Ontwerp</key>
+    <key alias="width">Breedte</key>
+    <key alias="height">Hoogte</key>
+    <key alias="justify">Uitvullen</key>
+    <key alias="innerMargin">Binnen marge</key>
+    <key alias="cellMargin">Cel marge</key>
+    <key alias="border">Rand</key>
+    <key alias="pleasewait">Een ogenblik geduld a.u.b.</key>
+    <key alias="areyousure">Weet je het zeker?</key>
+    <key alias="error">Fout</key>
+    <key alias="username">Gebruikersnaam</key>
+    <key alias="password">Wachtwoord</key>
+    <key alias="login">Inloggen</key>
+    <key alias="welcome">Welkom...</key>
+    <key alias="language">Taal</key>
+    <key alias="closewindow">Venster sluiten</key>
+    <key alias="deleted">Verwijderd</key>
+    <key alias="edited">Aangepast</key>
+    <key alias="of">of</key>
+    <key alias="about">Over</key>
+    <key alias="help">Help</key>
+    <key alias="logout">Afmelden</key>
+    <key alias="findDocument">Zoeken</key>
+    <key alias="continue">Doorgaan</key>
+    <key alias="value">Waarde</key>
+    <key alias="reciept">Email om formulier te ontvangen</key>
+    <key alias="showPageOnSend">Toon pagina bij versturen</key>
+    <key alias="show">Tonen</key>
+    <key alias="view">Toon</key>
+    <key alias="user">Gebruiker</key>
+    <key alias="action">Actie</key>
+    <key alias="date">Datum</key>
+    <key alias="comment">Opmerking</key>
+    <key alias="up">Omhoog</key>
+    <key alias="down">Beneden</key>
+    <key alias="recycleBin">Prullenbak</key>
+    <key alias="deleting">Verwijderen...</key>
+    <key alias="remaining">Overgebleven</key>
+    <key alias="import">Importeer</key>
+    <key alias="loading">Bezig met laden</key>
+    <key alias="path">Pad</key>
+    <key alias="or">of</key>
+    <key alias="by">of</key>
+    <key alias="placeHolderID">Placeholder ID</key>
+    <key alias="typeToSearch">Type om te zoeken...</key>
+    <key alias="email">Email</key>
+    <key alias="url">Url</key>
+    <key alias="dimensions">Afmetingen</key>
+    <key alias="constrainProportions">Verhouding behouden</key>
+    <key alias="upload">Upload</key>
+    <key alias="download">Download</key>
+    <key alias="confirm">Bevestigen</key>
+    <key alias="database">Databank</key>
+    <key alias="server">Server</key>
+    <key alias="upgrade">Upgrade</key>
+    <key alias="install">Installeren</key>
+    <key alias="retry">Opnieuw proberen</key>
+    <key alias="next">Volgende</key>
+    <key alias="previous">Vorige</key>
+    <key alias="search">Zoek</key>
+    <key alias="renew">Vernieuw</key>
+    <key alias="locked">Geblokkeerd</key>
+  </area>
+  <area alias="lockout">
+    <key alias="lockoutWillOccur">Je bent inactief en zult automatisch worden uitgelogd over</key>
+    <key alias="renewSession">Vernieuw sessie om wijzigingen te behouden</key>
+  </area>
+  <area alias="dashboard">
+    <key alias="welcome">Welkom</key>
+    <key alias="openinnew">is geopend in een nieuw venster</key>
+    <key alias="nothinghappens">Als Umbraco niet geopend wordt dan moet je misschien popups toelaten voor deze site. </key>
+    <key alias="restart">Herstarten</key>
+    <key alias="browser">Open je website</key>
+    <key alias="visit">Bezoek</key>
+    <key alias="dontShowAgain">- Verberg</key>
+  </area>
+  <area alias="sections">
+    <key alias="content">Content</key>
+    <key alias="media">Media</key>
+    <key alias="member">Leden</key>
+    <key alias="newsletters">Nieuwsbrieven</key>
+    <key alias="users">Gebruikers</key>
+    <key alias="settings">Instellingen</key>
+    <key alias="developer">Ontwikkelaars</key>
+    <key alias="statistics">Statistieken</key>
+    <key alias="courier">Courier</key>
+    <key alias="concierge">Concierge</key>
+    <key alias="translation">Vertaling</key>
+    <key alias="installer">Umbraco Configuratie Wizard</key>
+  </area>
+  <area alias="buttons">
+    <key alias="save">Opslaan</key>
+    <key alias="saveAndPublish">Opslaan en publiceren</key>
+    <key alias="saveToPublish">Opslaan en verzenden voor goedkeuring</key>
+    <key alias="htmlEdit">Wijzig Html</key>
+    <key alias="relations">Relaties wijzigen</key>
+    <key alias="showPage">voorbeeld bekijken</key>
+    <key alias="styleChoose">Stijl kiezen</key>
+    <key alias="styleShow">Stijlen tonen</key>
+    <key alias="bold">Vet</key>
+    <key alias="italic">Cursief</key>
+    <key alias="graphicHeadline">Voeg grafische titel in</key>
+    <key alias="justifyLeft">Links Uitlijnen</key>
+    <key alias="justifyCenter">Centreren</key>
+    <key alias="justifyRight">Rechts Uitlijnen</key>
+    <key alias="listBullet">Opsomming</key>
+    <key alias="listNumeric">Nummering</key>
+    <key alias="indent">Paragraaf inspringen</key>
+    <key alias="deindent">Paragraaf uitspringen</key>
+    <key alias="linkInsert">Link Invoegen</key>
+    <key alias="linkLocal">Lokale link invoegen (anker)</key>
+    <key alias="pictureInsert">Afbeelding invoegen</key>
+    <key alias="macroInsert">Macro invoegen</key>
+    <key alias="tableInsert">Tabel invoegen</key>
+    <key alias="formFieldInsert">Voeg formulierveld in</key>
+  </area>
+  <area alias="content">
+    <key alias="about">Over deze pagina</key>
+    <key alias="nodeName">Pagina Titel</key>
+    <key alias="alias">Alternatieve link</key>
+    <key alias="createDate">Aangemaakt op</key>
+    <key alias="createBy">Aangemaakt door</key>
+    <key alias="updateDate">Laatst gewijzigd</key>
+    <key alias="lastPublished">laatst gepubliceerd op</key>
+    <key alias="type">Type</key>
+    <key alias="statistics">Statistieken</key>
+    <key alias="releaseDate">Publiceer op</key>
+    <key alias="expireDate">Verwijder op</key>
+    <key alias="publish">Publiceer</key>
+    <key alias="otherElements">Eigenschappen</key>
+    <key alias="editing">Aanpassen</key>
+    <key alias="itemNotPublished">Dit item is niet gepubliceerd</key>
+    <key alias="itemChanged">Dit item is gewijzigd na publicatie</key>
+    <key alias="clickToEdit">Klik om dit item te wijzigen</key>
+    <key alias="documentType">Documenttype</key>
+    <key alias="urls">Link naar het document</key>
+    <key alias="alternativeUrls">Alternatieve links</key>
+    <key alias="unPublish">Depubliceren</key>
+    <key alias="publishStatus">Publicatie Status</key>
+    <key alias="parentNotPublished">Dit document is gepubliceerd maar niet zichtbaar omdat de bovenliggende node '%0%' niet gepubliceerd is</key>
+    <key alias="uploadClear">Bestand verwijderen</key>
+    <key alias="noDate">Geen datum gekozen</key>
+    <key alias="removeDate">Datum Wissen</key>
+    <key alias="alternativeTextHelp">(hoe zou jij de foto beschrijven via de telefoon)</key>
+    <key alias="titleOptional">Titel (optioneel)</key>
+    <key alias="mediatype">Media Type</key>
+    <key alias="membertype">Ledentype</key>
+    <key alias="membergroup">Ledengroep</key>
+    <key alias="memberrole">Rol</key>
+    <key alias="sortHelp">Om nodes te sorteren, sleep de nodes of klik op één van de kolomtitels. Je kan meerdere nodes tegelijk selecteren door de "shift"- of "control"knop in te drukken tijdens het selecteren.</key>
+    <key alias="sortDone">De sorteervolgorde is gewijzigd</key>
+  </area>
+  <area alias="treeHeaders">
+    <key alias="stylesheets">Stylesheets</key>
+    <key alias="templates">Sjablonen</key>
+    <key alias="dictionary">Woordenboek</key>
+    <key alias="languages">Talen</key>
+    <key alias="mediaTypes">Mediatypes</key>
+    <key alias="nodeTypes">Documenttypes</key>
+    <key alias="cacheBrowser">Cachebrowser</key>
+    <key alias="datatype">Datatypes</key>
+    <key alias="macros">Macro's</key>
+    <key alias="xslt">XSLT Bestanden</key>
+    <key alias="python">Python-bestanden</key>
+    <key alias="member">Leden</key>
+    <key alias="memberType">Ledentypes</key>
+    <key alias="memberGroup">Ledengroepen</key>
+    <key alias="memberRoles">Rollen</key>
+    <key alias="contentRecycleBin">Prullenbak</key>
+    <key alias="packager">Packages</key>
+	<key alias="packages">Packages</key>
+    <key alias="repositories">Installeer uit repository</key>
+    <key alias="createdPackages">Gemaakte packages</key>
+    <key alias="installedPackages">Geïnstalleerde packages</key>
+    <key alias="runway">Installeer Runway</key>
+    <key alias="runwayModules">Runway modules</key>
+    <key alias="localPackage">Installeer een lokale package</key>
+    <key alias="scripts">Scripts</key>
+    <key alias="scripting">Script bestanden</key>
+    <key alias="installStarterKit">Installeer starter kit</key>
+    <key alias="installSkin">Installeer skin</key>
+  </area>
+  <area alias="user">
+    <key alias="username">Gebruikersnaam</key>
+    <key alias="loginname">Loginnaam</key>
+    <key alias="password">Wachtwoord</key>
+    <key alias="usertype">Gebruikerstype</key>
+    <key alias="userPermissions">Gebruikersrechten</key>
+    <key alias="userTypes">Gebruikerstypes</key>
+    <key alias="language">Taal</key>
+    <key alias="startnode">Startnode in Content</key>
+    <key alias="mediastartnode">Startnode in Mediabibliotheek</key>
+    <key alias="modules">Secties</key>
+    <key alias="administrators">Beheerders</key>
+    <key alias="editors">Redacteur</key>
+    <key alias="writer">Auteur</key>
+    <key alias="noConsole">Blokkeer Umbraco toegang</key>
+    <key alias="disabled">Geblokkeerde gebruiker</key>
+    <key alias="defaultToLiveEditing">Doorlinken naar Canvas bij inloggen</key>
+    <key alias="searchAllChildren">Doorzoek alle subnodes</key>
+    <key alias="descriptionField">Omschrijving</key>
+    <key alias="categoryField">Categorieveld</key>
+    <key alias="excerptField">Samenvattingsveld</key>
+    <key alias="documentType">Documenttype</key>
+    <key alias="contentChannel">Content Channel</key>
+    <key alias="permissionSelectPages">Selecteer pagina's om hun rechten aan te passen</key>
+    <key alias="permissionReplaceChildren">Vervang rechten op de subnodes</key>
+    <key alias="permissionSelectedPages"><![CDATA[U bent momenteel rechten aan het aanpassen voor volgende pagina's:]]></key>
+    <key alias="changePassword">Verander je wachtwoord</key>
+    <key alias="changePasswordDescription">Je kunt je wachtwoord veranderen door onderstaan formulier in te vullen en op de knop 'Verander wachtwoord' te klikken </key>
+    <key alias="passwordEnterNew">Voer nieuwe wachtwoord in</key>
+    <key alias="passwordConfirm">Herhaal nieuwe wachtwoord</key>
+    <key alias="passwordChanged">Je wachtwoord is veranderd!</key>
+    <key alias="passwordIsDifferent">Beide wachtwoorden waren niet hetzelfde. Probeer opnieuw!</key>
+    <key alias="passwordIsBlank">Je nieuwe wachtwoord mag niet leeg zijn!</key>
+    <key alias="passwordMismatch">Beide wachtwoorden zijn niet hetzelfde!</key>
+  </area>
+  <area alias="settings">
+    <key alias="nodetype">Node type</key>
+    <key alias="tab">Tab</key>
+    <key alias="tabs">Tabs</key>
+    <key alias="tabname">Tab titel</key>
+    <key alias="objecttype">Type</key>
+    <key alias="defaulttemplate">Standaard template</key>
+    <key alias="newtabname">Nieuwe tabtitel</key>
+    <key alias="stylesheet">Stylesheet</key>
+    <key alias="stylesheet editor egenskab">Stylesheet eigenschap</key>
+    <key alias="dictionary editor egenskab">Woordenboek sleutel</key>
+    <key alias="importDocumentTypeHelp">Om een bestaand documenttype te importeren, zoek het betreffende “.udt” bestand door op browse en import te klikken. (Je ziet een bevestigingspagina voordat de import start. Als het documenttype al bestaat dan wordt het bijgewerkt.)</key>
+  </area>
+  <area alias="graphicheadline">
+    <key alias="bold">Vet</key>
+    <key alias="text">Tekst</key>
+    <key alias="font">Font</key>
+    <key alias="color">Tekstkleur</key>
+    <key alias="backgroundcolor">Achtergrondkleur</key>
+  </area>
+  <area alias="update">
+    <key alias="updateAvailable">Nieuwe update beschikbaar</key>
+    <key alias="updateDownloadText">%0% is gereed, klik hier om te downloaden</key>
+    <key alias="updateNoServer">Er is geen verbinding met de server</key>
+    <key alias="updateNoServerError">Er is een fout opgetreden bij het zoeken naar een update. Bekijk de trace-stack voor verdere informatie.</key>
+  </area>
+  <area alias="actions">
+    <key alias="create">Nieuw</key>
+    <key alias="move">Verplaatsen</key>
+    <key alias="copy">Kopiëren</key>
+    <key alias="delete">Verwijderen</key>
+    <key alias="sort">Sorteren</key>
+    <key alias="publish">Publiceren</key>
+    <key alias="toPublish">Klaar voor publicatie</key>
+    <key alias="rights">Rechten</key>
+    <key alias="protect">Publieke toegang</key>
+    <key alias="refreshNode">Nodes opnieuw inladen</key>
+    <key alias="update">Bijwerken</key>
+    <key alias="notify">Meldingen</key>
+    <key alias="logout">Afsluiten</key>
+    <key alias="republish">Herpubliceer de volledige site</key>
+    <key alias="assignDomain">Beheer domeinnamen</key>
+    <key alias="disable">Uitschakelen</key>
+    <key alias="auditTrail">Documentgeschiedenis</key>
+    <key alias="createPackage">Nieuwe package</key>
+    <key alias="importPackage">Package importeren</key>
+    <key alias="rollback">Vorige versies</key>
+    <key alias="emptyTrashcan">Prullenbak leegmaken</key>
+    <key alias="exportDocumentType">Documenttype exporteren</key>
+    <key alias="exportDocumentTypeAsCode">Exporteer naar .NET</key>
+    <key alias="exportDocumentTypeAsCode-Full">Exporteer naar .NET</key>
+    <key alias="importDocumentType">Documenttype importeren</key>
+    <key alias="sendToTranslate">Klaar voor vertalen</key>
+    <key alias="translate">Vertalen</key>
+    <key alias="browse">Node bekijken</key>
+    <key alias="sendtopublish">Klaar voor publicatie</key>
+    <key alias="liveEdit">Aanpassen in Canvas</key>
+  </area>
+  <area alias="errors">
+    <key alias="startNodeDoesNotExists">Start node is verwijderd, neem contact op met uw systeembeheerder</key>
+    <key alias="stylesNoStylesOnPage">Geen actieve stijlen beschikbaar</key>
+    <key alias="stylesMustMarkBeforeSelect">Markeer de content voordat u de stijl aanpast</key>
+    <key alias="pictureResizeBiggerThanOrg">U wilt een afbeelding groter maken dan de originele afmetingen. Weet je zeker dat je wilt doorgaan?</key>
+    <key alias="tableColMergeLeft">Plaats de cursor links van de twee cellen die je wilt samenvoegen</key>
+    <key alias="tableSplitNotSplittable">Je kunt een cel die is samengevoegd niet delen</key>
+    <key alias="missingType">Selecteer een type</key>
+    <key alias="missingTitle">Vul een titel in</key>
+    <key alias="xsltErrorHeader">Fout in de xslt bron</key>
+    <key alias="xsltErrorText">De xslt is niet opgeslagen omdat deze fout(en) bevat</key>
+    <key alias="pythonErrorHeader">Fout in python script</key>
+    <key alias="pythonErrorText">Het python script is niet opgeslagen omdat het fouten bevat</key>
+    <key alias="contentTypeAliasAndNameNotNull">Zowel de alias als de naam van het nieuwe eigenschappen type moeten worden ingevuld!</key>
+    <key alias="filePermissionsError">Er is een probleem met de lees/schrijf rechten op een bestand of map</key>
+    <key alias="codemirroriewarning">OPMERKING! Ondanks dat CodeMiror is ingeschakeld, is het uitgeschakeld in Internet Explorer omdat het niet stabiel genoeg is.</key>
+  </area>
+  <area alias="speechBubbles">
+    <key alias="xsltSavedHeader">Xslt opgeslagen</key>
+    <key alias="xsltSavedText">Geen fouten in de xslt!</key>
+    <key alias="xsltErrorHeader">Xslt niet opgeslagen</key>
+    <key alias="xsltPermissionErrorText">Xslt kon niet worden opgeslagen, controleer de bestandsbeveiliging</key>
+    <key alias="xsltErrorText">Xslt bevat een fout</key>
+    <key alias="pythonSavedHeader">Python script opeslagen!</key>
+    <key alias="pythonSavedText">Geen fouten in python script!</key>
+    <key alias="pythonErrorHeader">Python script niet opgeslagen</key>
+    <key alias="pythonErrorText">Python script kon niet worden opgeslagen door een fout</key>
+    <key alias="templateSavedHeader">Template opgeslagen</key>
+    <key alias="templateSavedText">Template opgeslagen zonder fouten!</key>
+    <key alias="templateErrorHeader">Template niet opgeslagen</key>
+    <key alias="templateErrorText">Controleer dat je geen 2 tamplates met dezelfde naam hebt</key>
+    <key alias="cssSavedHeader">Stylesheet opgeslagen</key>
+    <key alias="cssSavedText">Stylesheet opgeslagen zonder fouten</key>
+    <key alias="cssErrorHeader">Stylesheet niet opgeslagen</key>
+    <key alias="fileErrorHeader">Bestand niet opgeslagen</key>
+    <key alias="fileErrorText">bestand kon niet worden opgeslagen. Controleer de bestandsbeveiliging</key>
+    <key alias="fileSavedHeader">Bestand opgeslagen</key>
+    <key alias="fileSavedText">Bestand opgeslagen zonder fouten</key>
+    <key alias="contentTypeSavedHeader">Content type opgeslagen</key>
+    <key alias="contentTypeTabCreated">Tab aangemaakt</key>
+    <key alias="contentTypeTabDeleted">Tab verwijderd</key>
+    <key alias="contentTypeTabDeletedText">Tab met id: %0% verwijderd</key>
+    <key alias="contentTypePropertyTypeCreated">Eigenschappen type aangemaakt</key>
+    <key alias="contentTypeDublicatePropertyType">Eigenschappen type bestaat al</key>
+    <key alias="contentTypePropertyTypeCreatedText">Naam: %0% &lt;br /&gt; Data type: %1%</key>
+    <key alias="contentTypePropertyTypeDeleted">Eigenschappen type verwijderd</key>
+    <key alias="dataTypeSaved">Datatype opgeslagen</key>
+    <key alias="editContentSavedHeader">Content opgeslagen</key>
+    <key alias="editContentSavedText">Vergeet niet te publiceren om de wijzigingen zichtbaar te maken</key>
+    <key alias="editContentPublishedHeader">Content gepubliceerd</key>
+    <key alias="editContentPublishedText">en zichtbaar op de website</key>
+    <key alias="editContentPublishedFailedByParent">Publicatie is mislukt omdat de bovenliggende pagina niet gepubliceerd is</key>
+    <key alias="contentPublishedFailedByEvent">Publicatie werd geannuleerd door een 3rd party plug-in</key>
+    <key alias="editMemberSaved">Lid opgeslagen</key>
+    <key alias="editTemplateSaved">Template opgeslagen</key>
+    <key alias="editStylesheetSaved">Stijlsheet opgeslagen</key>
+    <key alias="editStylesheetPropertySaved">Stijlsheet eigenschap opgeslagen</key>
+    <key alias="editUserSaved">Gebruiker opgeslagen</key>
+    <key alias="editUserError">Fout bij opslaan gebruiker (zie logboek)</key>
+    <key alias="editContentSendToPublish">Verzend voor goedkeuring</key>
+    <key alias="editContentSendToPublishText">Verandering zijn verstuurd voor goedkeuring</key>
+    <key alias="dictionaryItemSaved">Woordenboek item opgeslagen</key>
+    <key alias="languageSaved">Taal opgeslagen</key>
+  </area>
+  <area alias="headers">
+    <key alias="page">Pagina</key>
+  </area>
+  <area alias="paste">
+    <key alias="errorMessage">De tekst die je probeert te plakken bevat speciale karakters en/of opmaak. Dit kan veroorzaakt worden doordat de tekst vanuit Microsoft Word is gekopieerd. Umbraco kan deze speciale karakters en formattering automatisch verwijderen zodat de geplakte tekst geschikt is voor het web.</key>
+    <key alias="removeSpecialFormattering">Plakken, en verwijder de opmaak (aanbevolen)</key>
+    <key alias="removeAll">Plakken als ruwe tekst en alle opmaak verwijderen</key>
+    <key alias="doNothing">Plakken met alle opmaak (Niet aanbevolen)</key>
+  </area>
+  <area alias="assignDomain">
+    <key alias="domain">Domein</key>
+    <key alias="addNew">Nieuw domein toevoegen</key>
+    <key alias="orEdit">Bewerk huidige domeinen</key>
+    <key alias="domainDeleted">Domein '%0%' is verwijderd</key>
+    <key alias="domainCreated">Nieuw domein '%0%' is aangemaakt</key>
+    <key alias="domainUpdated">Domein '%0%' is aangepast</key>
+    <key alias="domainHelp">vb.: uwdomein.com, www.uwdomein.com</key>
+    <key alias="domainExists">Het domein '%0' is reeds toegekend</key>
+  </area>
+  <area alias="rollback">
+    <key alias="currentVersion">Huidige versie</key>
+    <key alias="rollbackTo">Terugzetten naar</key>
+    <key alias="view">Bekijk</key>
+    <key alias="diffHelp"><![CDATA[Hier worden de verschillen getoond tussen de huidige en de geselecteerde versie<br /><del>Rode</del> tekst wordt niet getoond in de geselecteerde versie , <ins>groen betekent toegevoegd</ins>]]></key>
+    <key alias="htmlHelp"><![CDATA[Hiermee wordt de geselecteerde versie als html getoond, als u de verschillen tussen de 2 versies tegelijk wilt zien, gebruik dan de diff view]]></key>
+    <key alias="selectVersion">Selecteer versie</key>
+    <key alias="documentRolledBack">Document is teruggezet</key>
+  </area>
+  <area alias="sort">
+    <key alias="sortPleaseWait"><![CDATA[Een ogenblik geduld. Paginas worden gesorteerd, dit kan even duren.<br/> <br/> Sluit dit venster niet tijdens het sorteren]]></key>
+    <key alias="sortHelp"><![CDATA[Sleep de pagina's omhoog of omlaag om de volgorde te veranderen. Of klik op de kolom-header om alle pagina's daarop te sorteren.]]></key>
+    <key alias="sortDone">Sorteren gereed.</key>
+  </area>
+  <area alias="publish">
+    <key alias="publishAll">Publiceer %0% en alle kinderen</key>
+    <key alias="nodePublish">%0% is gepubliceerd</key>
+    <key alias="nodePublishAll">%0% en onderliggende pagina’s zijn gepubliceerd</key>
+    <key alias="inProgress">Publicatie in uitvoering - even geduld...</key>
+    <key alias="inProgressCounter">%0% van %1% pagina’s zijn gepubliceerd...</key>
+    <key alias="includeUnpublished">Inclusief ongepubliceerde kinderen</key>
+    <key alias="publishHelp"><![CDATA[Klik <em>ok</em> om <strong>%0%</strong> te publiceren en de wijzigingen zichtbaar te maken voor bezoekers.<br/><br />
+      Je kunt deze pagina publiceren en alle onderliggende sub-pagina's door <em>publiceer alle kinderen</em> aan te vinken hieronder.
+      ]]></key>
+    <key alias="contentPublishedFailedByEvent">
+      %0% kon niet worden gepubliceerd doordat een 3rd party extentie het heeft geannuleerd.
+    
+        </key>
+  </area>
+  <area alias="moveOrCopy">
+    <key alias="notValid">Deze actie is niet toegestaan omdat je onvoldoende rechten hebt op 1 of meer kinderen.</key>
+    <key alias="moveTo">Verplaats naar</key>
+    <key alias="copyTo">Kopieer naar</key>
+    <key alias="noNodeSelected">Nog geen node geselecteerd, selecteer eerst een node in bovenstaade lijst voordat je op 'volgende' klikt</key>
+    <key alias="nodeSelected">is geselecteerd als root van je nieuwe pagina, klik hieronder op 'ok'.</key>
+    <key alias="choose">Selecteer pagina boven...</key>
+    <key alias="notAllowedByContentType">De huidige node is niet toegestaan onder de geselecteerde node vanwege het node type</key>
+    <key alias="notAllowedByPath">De huidige node kan niet naar een van zijn subpagina’s worden verplaatst.</key>
+    <key alias="moveDone">%0% is verplaatst naar %1%</key>
+    <key alias="copyDone">%0% is gekopieerd naar %1%</key>
+  </area>
+  <area alias="login">
+    <key alias="topText">Welkom bij umbraco, geef je gebruikersnaam en wachtwoord op in de onderstaande velden:</key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p>]]></key>
+  </area>
+  <area alias="stylesheet">
+    <key alias="editstylesheet">Stijlsheet aanpassen</key>
+    <key alias="editstylesheetproperty">Bewerk stylesheet eigenschap</key>
+    <key alias="styles">Stijlen</key>
+    <key alias="preview">Voorbeeld</key>
+    <key alias="aliasHelp">Gebruik CSS syntax bijv: h1, .redHeader, .blueTex</key>
+    <key alias="nameHelp">Naam waarmee de stijl in de editor te kiezen is</key>
+  </area>
+  <area alias="scripts">
+    <key alias="editscript">Bewerk script-bestand</key>
+  </area>
+  <area alias="editcontenttype">
+    <key alias="newtab">Nieuwe tab</key>
+    <key alias="create">Nieuw</key>
+    <key alias="allowedchildnodetypes">Toegelaten subnodetypes</key>
+    <key alias="tab">Tab</key>
+    <key alias="deletetab">Tab verwijderen</key>
+    <key alias="description">Omschrijving</key>
+    <key alias="thumbnail">Miniatuur</key>
+  </area>
+  <area alias="editdatatype">
+    <key alias="renderControl">Render control</key>
+    <key alias="guid">Data Editor GUID</key>
+    <key alias="dataBaseDatatype">Datebase datatype</key>
+    <key alias="addPrevalue">Prevalue toevoegen</key>
+    <key alias="rteButtons">Buttons</key>
+    <key alias="rteRelatedStylesheets">Gerelateerde stylesheets</key>
+    <key alias="rteEnableAdvancedSettings">Geavanceerde instellingen inschakelen voor</key>
+    <key alias="rteEnableContextMenu">Context menu inschakelen</key>
+    <key alias="rteWidthAndHeight">Breedte en hoogte</key>
+    <key alias="rteMaximumDefaultImgSize">Maximum standaard grootte van afbeeldingen</key>
+    <key alias="rteShowLabel">Toon label</key>
+  </area>
+  <area alias="template">
+    <key alias="template">Template</key>
+    <key alias="mastertemplate">Master template</key>
+    <key alias="edittemplate">Template aanpassen</key>
+    <key alias="insertMacro">Invoegen Macro</key>
+    <key alias="insertDictionaryItem">Invoegen dictionary item</key>
+    <key alias="insertContentArea">Invoegen content area</key>
+    <key alias="insertContentAreaPlaceHolder">Invoegen content area placeholder</key>
+    <key alias="quickGuide">Quick Guide voor umbraco template tags</key>
+    <key alias="insertPageField">Invoegen umbraco page field</key>
+  </area>
+  <area alias="dictionaryItem">
+    <key alias="description"><![CDATA[Wijzig de verschillende taalversies voor het woordenboek item '%0%'. Je kunt extra talen toevoegen bij 'talen' in het menu links.]]></key>
+    <key alias="displayName">Cultuurnaam</key>
+  </area>
+  <area alias="language">
+    <key alias="cultureCode">Culture Code</key>
+    <key alias="displayName">Culture Naam</key>
+  </area>
+  <area alias="templateEditor">
+    <key alias="chooseField">Selecteer veld</key>
+    <key alias="alternativeField">Alternatief veld</key>
+    <key alias="usedIfEmpty">Dit veld zal alleen worden gebruikt als het primaire veld leeg is</key>
+    <key alias="usedIfAllEmpty">Zal alleen worden gebruikt waneer de bovenstaande veld waardes leeg zijn</key>
+    <key alias="alternativeText">Alternatieve tekst</key>
+    <key alias="recursive">Recursief</key>
+    <key alias="preContent">Invoegen voor veld</key>
+    <key alias="postContent">Invoegen na veld</key>
+    <key alias="insertedBefore">Zal worden ingevoegd voor de veld waarde</key>
+    <key alias="insertedAfter">Zal worden ingevoegd na de veld waarde</key>
+    <key alias="formatAsDate">Opmaken als datum</key>
+    <key alias="dateOnly">Ja, alleen datum</key>
+    <key alias="withTime">Ja, met tijd. Scheidingsteken: </key>
+    <key alias="casing">Kapitalisatie</key>
+    <key alias="none">Geen</key>
+    <key alias="lowercase">Kleine letters</key>
+    <key alias="uppercase">Hoofdletters</key>
+    <key alias="urlEncode">URL-encoderen</key>
+    <key alias="htmlEncode">HTML-encoderen</key>
+    <key alias="urlEncodeHelp">Speciale karakters in URL's worden geëncodeerd</key>
+    <key alias="htmlEncodeHelp">Speciale karakters worden geëncodeerd naar HTML.</key>
+    <key alias="convertLineBreaks">Converteer regelafbreking</key>
+    <key alias="convertLineBreaksHelp">Vervang regelafbrekingen met html-tag &lt;br&gt;</key>
+    <key alias="removeParagraph">Verwijder paragraaf tags</key>
+    <key alias="removeParagraphHelp">Alle &lt;P&gt; tags aan het begin en einde van de tekst worden verwijderd</key>
+  </area>
+  <area alias="create">
+    <key alias="createUnder">Aanmaken op</key>
+    <key alias="chooseNode">Waar wil je de nieuwe %0% aanmaken?</key>
+    <key alias="updateData">Kies een type en een titel</key>
+  </area>
+  <area alias="errorHandling">
+    <key alias="errorHeader">Er zijn fouten geconstateerd:</key>
+    <key alias="errorHeaderWithoutTab">Er zijn fouten geconstateerd:</key>
+    <key alias="errorMandatory">%0% op tab %1% is een verplicht veld</key>
+    <key alias="errorMandatoryWithoutTab">%0% is een verplicht veld</key>
+    <key alias="errorExistsWithoutTab">%0% bestaat al</key>
+    <key alias="errorRegExp">%0% op tab %1% is niet in het correcte formaat</key>
+    <key alias="errorRegExpWithoutTab">%0% is niet in het correcte formaat</key>
+    <key alias="errorIntegerWithoutTab">%0% moet een geheel getal zijn</key>
+    <key alias="errorButDataWasSaved">Je data is opgeslagen, maar voordat je deze pagina kunt publiceren moet je eerst aan paar problemen herstellen:</key>
+    <key alias="errorInPasswordFormat">Het wachtwoord moet minstens %0% tekens lang zijn en moet minstens %1% cijfers bevatten</key>
+    <key alias="errorChangingProviderPassword">Het wachtwoord veranderen wordt door de huidige Membership Provider niet ondersteund (EnablePasswordRetrieval moet op true staan)</key>
+  </area>
+  <area alias="publicAccess">
+    <key alias="paHowWould">Hoe wil je de pagina beveiligen?</key>
+    <key alias="paSimple">Eenvoudig: Beveilig door middel van gebruikersnaam en wachtwoord</key>
+    <key alias="paSimpleHelp">Als je eenvoudige beveiliging wilt gebruiken met behulp van een enkele gebruikersnaam en wachtwoord</key>
+    <key alias="paAdvanced">Geavanceerd: Beveilig door de Member Groups te seecteren die toegang hebben op de pagina</key>
+    <key alias="paAdvancedHelp"><![CDATA[Als je toegang tot pagina's wilt regelen met behulp van role-based authenticatie,<br /> gebruik makend van umbraco's member groups.]]></key>
+    <key alias="paAdvancedNoGroups"><![CDATA[Je moet eerst een membergroup maken voordat je kunt werken met <br />role-based authentication.]]></key>
+    <key alias="paLoginPage">Login Pagina</key>
+    <key alias="paErrorPage">Error Pagina</key>
+    <key alias="paSelectPages">Kies de pagina's die het login-formulier en de error-berichten bevatten</key>
+    <key alias="paLoginPageHelp">Kies de pagina met het login-formulier</key>
+    <key alias="paErrorPageHelp">Gebruikt om te tonen als een gebruiker is ingelogd, maar geen rechten heeft om de pagina te bekijken</key>
+    <key alias="paSelectRoles">Kies de roles wie toegang hebben tot deze pagina</key>
+    <key alias="paSetLogin">Geef de gebruikersnaam en wachtwoord voor deze pagina</key>
+    <key alias="paIsProtected">%0% is nu beveiligd</key>
+    <key alias="paIsRemoved">Beveiliging verwijderd van %0%</key>
+    <key alias="paRemoveProtection">Verwijder beveiliging</key>
+  </area>
+  <area alias="auditTrails">
+    <key alias="atViewingFor">Tonen voor</key>
+  </area>
+  <area alias="notifications">
+    <key alias="notifications">Notificaties</key>
+    <key alias="editNotifications">Bewerk de notificatie voor %0%</key>
+    <key alias="mailSubject">[%0%] Notificatie over %1% uitgevoerd op %2%</key>
+    <key alias="mailBody">
+      Hallo %0%
+
+      Dit is een geautomatiseerd bericht om u te informeren over de taak '%1%'
+      is uitgevoerd op pagina '%2%'
+      door gebruiker '%3%'
+
+      Ga naar http://%4%/actions/editContent.aspx?id=%5% om te bewerken.
+
+      Een prettige dag!
+
+      Dit is een bericht van uw Content Management Systeem.
+    
+        </key>
+    <key alias="mailBodyHtml"><![CDATA[<p>Hi %0%</p>
+
+		  <p>Dit is een geautomatiseerde mail om u op de hoogte te brengen dat de taak <strong>'%1%'</strong> 
+		  is uitgevoerd op pagina <strong>'%2%'</strong> 
+		  door gebruiker <strong>'%3%'</strong>
+	  </p>
+		  <div class="buttons">
+				<br />
+				<a class="buttonPublish" href="http://%4%/umbraco/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISH&nbsp;&nbsp;</a> &nbsp; 
+				<a class="buttonEdit" href="http://%4%/umbraco/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a class="buttonDelete" href="http://%4%/umbraco/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;DELETE&nbsp;&nbsp;&nbsp;&nbsp;</a>
+				<br />
+		  </div>
+		  <p>
+			  <h3>Update samenvatting:</h3>
+			  <table class="updateSummary">
+						   %6%
+					   </table>
+			 </p>
+
+		  <div class="buttons">
+				<br />
+				<a class="buttonPublish" href="http://%4%/umbraco/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISH&nbsp;&nbsp;</a> &nbsp; 
+				<a class="buttonEdit" href="http://%4%/umbraco/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a class="buttonDelete" href="http://%4%/umbraco/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;DELETE&nbsp;&nbsp;&nbsp;&nbsp;</a>
+				<br />
+		  </div>
+
+		  <p>Een prettige dag!<br /><br />
+			  Dit is een bericht van uw Content Management Systeem.
+		  </p>
+        ]]></key>
+  </area>
+  <area alias="translation">
+    <key alias="pageHasBeenSendToTranslation">De pagina '%0%' is verstuurd voor vertaling</key>
+    <key alias="sendToTranslate">Stuur voor vertaling</key>
+    <key alias="noTranslators">Geen vertaal-gebruikers gevonden. Maak eerst een vertaal-gebruiker aan voordat je pagina's voor vertaling verstuurd</key>
+    <key alias="translator">Vertaler</key>
+    <key alias="translateTo">Vertaal naar</key>
+    <key alias="includeSubpages">Inclusief onderliggende pagina's</key>
+    <key alias="mailSubject">[%0%] Vertaalopdracht voor %1%</key>
+    <key alias="mailBody">
+      Hallo %0%
+
+      Dit is een geautomatiseerde mail om u op de hoogte te brengen dat document '%1%'
+      is aangevraagd voor vertaling naar '%5%' door %2%.
+
+      Ga naar http://%3%/umbraco/translation/default.aspx?id=%4% om te bewerken.
+
+      Een prettige dag!
+
+      Dit is een bericht van uw Content Management Systeem.
+    
+        </key>
+    <key alias="assignedTasks">Taken aan jou toegewezen</key>
+    <key alias="assignedTasksHelp"><![CDATA[Onderstaande lijst toont vertalingstaken aan jou toegewezen. Om een meer gedetailleerd overzicht te zien, met comments, klik op "Details" of de naam van de pagina. Je kan ook de pagina direct downloaden als XML door te klikken op "Download Xml".
+Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de "Sluit" knop.
+    ]]></key>
+    <key alias="ownedTasks">Taken aangemaakt door jou</key>
+    <key alias="ownedTasksHelp"><![CDATA[De lijst hieronder toont pagina's <strong>die je aanmaakte</strong>. Om een detailweergave met opmerkingen te zien, klik op "Detail" of op de paginanaam. Je kan ook de pagina in XML-formaat downloaden door op de "Download XML"-link te klikken. Om een vertalingstaak te sluiten, klik je op de "Sluiten"-knop in detailweergave.]]></key>
+    <key alias="downloadTaskAsXml">Download xml</key>
+    <key alias="downloadAllAsXml">Download alle vertalingstaken als xml</key>
+    <key alias="DownloadXmlDTD">Download xml DTD</key>
+    <key alias="closeTask">Sluit taak</key>
+    <key alias="uploadTranslationXml">Vertaald XML-document uploaden</key>
+    <key alias="taskOpened">Taak geopend</key>
+    <key alias="taskAssignedBy">Toegewezen door</key>
+    <key alias="totalWords">Totaal aantal woorden</key>
+    <key alias="details">Details van vertaling</key>
+    <key alias="fields">Velden</key>
+    <key alias="translationOptions">Vertalingsopties</key>
+    <key alias="translationDone">Vertaling voltooid.</key>
+    <key alias="translationFailed">Vertalen niet gelukt, het XML-bestand is mogelijk beschadigd.</key>
+    <key alias="translationDoneHelp">Je kan een voorbeeld van vertaalde pagina's bekijken door hieronder te klikken. Als de originele pagina gevonden werd, wordt een vergelijking van beide pagina's getoond.</key>
+  </area>
+  <area alias="packager">
+    <key alias="packageMetaData">Package meta data</key>
+    <key alias="packageName">Package naam</key>
+    <key alias="packageVersion">Package versie</key>
+    <key alias="packageAuthor">Auteur</key>
+    <key alias="packageDocumentation">Documentatie</key>
+    <key alias="packageDemonstration">Demonstratie</key>
+    <key alias="packageRepository">Package repository</key>
+    <key alias="packageReadme">Package leesmij</key>
+    <key alias="packageOptions">Package opties</key>
+    <key alias="viewPackageWebsite">Bekijk de package website</key>
+    <key alias="packageUninstallHeader">Verwijder package</key>
+    <key alias="packageUninstallText"><![CDATA[Je kunt de items die je niet wilt verwijderen deselecteren. Als je 'Bevestig verwijderen' klikt worden alle geselecteerde items verwijderd.<br />
+      <span style="color: Red; font-weight: bold;">Waarschuwing:</span> alle documenten, media etc, die afhankelijk zijn van de items die je verwijderd, zullen niet meer werken en kan leiden tot een instabiele installatie,
+      wees dus voorzichtig met verwijderen. Als je niet zeker bent, neem dan contact op met de auteur van de package.
+    ]]></key>
+    <key alias="packageUninstallConfirm">Bevestig verwijderen</key>
+    <key alias="packageUninstalledHeader">Package is verwijderd</key>
+    <key alias="packageUninstalledText">De package is succesvol verwijderd</key>
+    <key alias="packageNoItemsHeader">Package bevat geen items</key>
+    <key alias="packageNoItemsText"><![CDATA[Deze package bevat geen items om te verwijderen.<br/><br/>
+      Je kunt dit veilig verwijderen door 'verwijder paackage' te klikken.
+    ]]></key>
+    <key alias="packageUpgradeHeader">Upgrade package</key>
+    <key alias="packageUpgradeText"> Er is een upgrade beschikbaar voor deze package. Je kunt het direct downloaden uit de umbraco package repository.</key>
+    <key alias="packageNoUpgrades">Geen upgrades beschikbaar</key>
+    <key alias="packageUpgradeInstructions">Upgrade instructies</key>
+    <key alias="packageUpgradeDownload">Download update uit de repository</key>
+    <key alias="chooseLocalPackageText"><![CDATA[Kies een package op je computer door op "Bladeren" te klikken en de package te selecteren. Umbraco packages hebben meestal ".umb" of ".zip" als extensie.]]></key>
+  </area>
+  <area alias="installer">
+    <key alias="thankYou">Bedankt dat je voor Umbraco hebt gekozen</key>
+    <key alias="welcomeIntro"><![CDATA[Deze wizard helpt u met het configureren van <strong>umbraco %0%</strong> voor een nieuwe installatie of een upgrade van versie 3.0. <br /><br /> Druk op <strong>"volgende"</strong> om de wizard te starten.]]></key>
+    <key alias="greatStart">Neem een jumpstart en bekijk onze introductie videos</key>
+    <key alias="watch">Bekijken</key>
+    <key alias="step1">Stap 1/5: Licentie aanvaarden</key>
+    <key alias="licenseText">Door op de 'Volgende' knop te klikken (of door de umbracoConfigurationStatus in web.config te veranderen), accepteer je de licentie voor deze software zoals in het onderstaande kader is te lezen. Deze Umbraco distributie bevat twee verschillende licensies: de open-source MIT licensie voor het framework en de Umbraco freeware licensie die de gebruikersinterface behelst.
+
+        </key>
+    <key alias="step2">Stap 2/5: Database configureren</key>
+    <key alias="databaseHeader">Database configuratie </key>
+    <key alias="databaseText"><![CDATA[Om deze stap te voltooien moet je enkele gegevens weten over je database server ("connection string").<br/> Gelieve contact op te nemen met je ISP indien nodig. Wanneer je installeert op een lokale computer of server, dan heb je waarschijnlijk informatie nodig van je systeembeheerder.]]></key>
+    <key alias="databaseFound">Je database is gevonden en is geïdentificeerd als</key>
+    <key alias="databaseUpToDate"><![CDATA[De huidige database is up-to-date!. Klik <strong>volgende</strong> om door te gaan]]></key>
+    <key alias="databaseUpgrade"><![CDATA[<p> Klik de <strong>upgrade</strong> knop om je database te upgraden naar Umbraco %0%</p> <p> Maak je geen zorgen - er zal geen inhoud worden gewist en alles blijft gewoon werken! </p>]]></key>
+    <key alias="databaseInstall"><![CDATA[Druk op de knop <strong>installeer</strong> om de Umbraco %0% database te installeren]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>De database kon niet gevonden worden! Gelieve na te kijken of de informatie in de "connection string" van het "web.config" bestand correct is.</p><p> Om door te gaan, gelieve het "web.config" bestand aan te passen (met behulp van Visual Studio of je favoriete tekstverwerker), scroll in het bestand naar beneden, voeg de connection string voor je database toe in de key met naam "umbracoDbDSN" en sla het bestand op.</p><p>Klik op de knop <strong>opnieuw proberen</strong> als je hiermee klaar bent. <br/> <a href="http://umbraco.org/redir/installWebConfig" target="_blank">Meer informatie over het aanpassen van de web.config vind je hier.</a></p>]]></key>
+    <key alias="databaseInstallDone"><![CDATA[Umbraco %0% is nu gekopieerd naar je database. Druk op <strong>Volgende</strong> om door te gaan.]]></key>
+    <key alias="databaseUpgradeDone"><![CDATA[Je database is geupgrade naar de definitieve versie %0%.<br />Klik <strong>Volgende</strong> om verder te gaan.]]></key>
+    <key alias="databaseErrorCannotConnect">De installer kan geen connectie met de database maken.</key>
+    <key alias="databaseErrorWebConfig">De web.config kon niet worden opgeslagen. Gelieve de connectiestring handmatig aan te passen.</key>
+    <key alias="Unavailable">Verbinding met de database mislukt.</key>
+    <key alias="None">Nog niet geïnstalleerd.</key>
+    <key alias="Version3">Umbraco versie 3</key>
+    <key alias="Version4">Umbraco versie 4</key>
+    <key alias="step3">Stap 3/5: Controleren van rechten op bestanden</key>
+    <key alias="permissionsText">umbraco heeft write/modify toegang nodig op bepaalde mappen om bestanden zoals plaatjes en PDF's op te slaan. Het slaat ook tijdelijke data (ook bekend als 'de cache') op om de snelheid van je website te verbeteren.</key>
+    <key alias="permissionsPerfect"><![CDATA[<strong>Je machtigingen zijn perfect!</strong><br /><br /> Je bent nu klaar om umbraco te starten en om packages te installeren!]]></key>
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Je machtigingen zijn bijna perfect!</strong><br /><br /> Je kunt umbraco zonder problemen starten, maar je kunt nog geen packages installeren om volledig van umbraco te profiteren.]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Je machtigingen zijn nog niet gereed gemaakt voor umbraco!</strong> <br /><br /> Om umbraco te starten zul je je machtigingen moeten aanpassen.]]></key>
+    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Je machtigingen zijn misschien incorrect!</strong> <br/><br /> Je kunt umbraco probleemloos starten, maar je kunt nog geen mappen aanmaken of packages installeren om zo volledig van umbraco te profiteren.]]></key>
+    <key alias="permissionsHowtoResolve">Hoe op te lossen</key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[Bekijk onze <strong>video tutorial</strong> over het instellen van machtigingen voor umbraco, of lees de tekst versie.]]></key>
+    <key alias="permissionsHowtoResolveLink">Klik hier om de tekst versie te lezen</key>
+    <key alias="permissionsSettingUpPermissions">Machtigingen worden aangepast</key>
+    <key alias="permissionsAffectedFolders">Betreffende bestanden en mappen</key>
+    <key alias="permissionsAffectedFoldersText">Je dient ASP.NET 'modify' machtiging te geven voor de volgende bestanden/mappen</key>
+    <key alias="permissionsAffectedFoldersMoreInfo">Meer informatie over het instellen van machtigingen voor umbraco vind je hier</key>
+    <key alias="permissionsResolveFolderIssues">Map probleem wordt opgelost</key>
+    <key alias="permissionsResolveFolderIssuesLink">Volg deze link voor meer informatie over problemen met ASP.NET en het aanmaken van mappen</key>
+    <key alias="step4">Stap 4/5: Umbraco beveiliging controleren</key>
+    <key alias="defaultUserText"><![CDATA[<p> umbraco maakt een default gebruiker aan met login <strong>('admin')</strong> and wachtwoord <strong>('default')</strong>. Het is <strong>belangrijk</strong> dat dit wachtwoord wordt veranderd in iets unieks. </p> <p> Deze stap controleert het password van de default gebruiker en adviseert of het veranderd dient te worden. </p>]]></key>
+    <key alias="defaultUserPasswordChanged">Het wachtwoord is veranderd!</key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>De default gebruiker is geblokkeerd of heeft geen toegang tot Umbraco!</strong></p><p>Geen verdere actie noodzakelijk. Klik <b>Volgende</b> om verder te gaan.]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>Het wachtwoord van de default gebruiker is sinds installatie met succes veranderd.</strong></p><p>Geen verdere actie noodzakelijk. Klik <strong>Volgende</strong> om verder te gaan.]]></key>
+    <key alias="defaultUserChangePass"><![CDATA[<strong>Het wachtwoord van de default gebruiker dient veranderd te worden!</strong>]]></key>
+    <key alias="step5">Stap 5/5: Umbraco is klaar</key>
+    <key alias="runwayHeader">Je hebt zojuist een blanco Umbraco platform geinstalleerd. Wat wil je nu doen?</key>
+    <key alias="runwaySimpleSite">Ik wil met een eenvoudige website beginnen</key>
+    <key alias="runwayFromScratch">Ik wil met een lege website beginnen</key>
+    <key alias="runwaySimpleSiteText"><![CDATA[<p> "Runway" is een eenvoudige website die je van enkele elementaire documenttypes en templates voorziet. De installer kan Runway automatisch voor je opzetten, maar je kunt het gemakkelijk aanpassen, uitbreiden of verwijderen. Het is niet vereist en je kunt Umbraco prima zonder Runway gebruiken.
+
+Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je er voor kiest om Runway te installeren, dan kun je optioneel de bouwstenen (genaamd Runway Modules) kiezen om je Runway pagina's te verbeteren.</p> <small> <em>Runway omvat:</em> Home pagina, Getting Started pagina, Module installatie pagina.<br /> <em>Optionele Modules:</em> Top Navigatie, Sitemap, Contact, Gallery. </small> 
+    ]]></key>
+    <key alias="runwayFromScratchText"><![CDATA[Je website is momenteel helemaal leeg. Dat is prima als je vanaf nul wilt beginnen en je eigen documenttypes en templates wilt maken (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">leer hoe</a>). Je kunt er later alsnog voor kiezen om Runway te installeren. Ga dan naar de Ontwikkelaar sectie en kies Packages.]]></key>
+    <key alias="runwayWhatIsRunway">Wat is Runway</key>
+    <key alias="runwayInstalled">Runway is geinstalleerd</key>
+    <key alias="runwayInstalledText"><![CDATA[Je hebt de basis geinstallerd. Kies welke modules je er op wilt installeren.<br /> Dit is onze lijst van aanbevolen modules. Vink de modules die je wilt installeren, of bekijk de <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">volledige lijst modules</a>]]></key>
+    <key alias="runwayOnlyProUsers">Alleen aanbevolen voor gevorderde gebruikers</key>
+    <key alias="theEndHeader">Umbraco %0% is geïnstalleerd en klaar voor gebruik.</key>
+    <key alias="theEndInstallFailed"><![CDATA[Om de installatie af te sluiten, moet u de handmatig het <strong>/web.config bestand</strong> aanpassen, en de Appsetting key <strong>umbracoConfigurationStatus</strong> onder in het bestand veranderen naar <strong>'%0%'</strong>.]]></key>
+    <key alias="theEndInstallSuccess"><![CDATA[Je kunt <strong>meteen beginnen</strong> door de "Launch Umbraco" knop hieronder te klikken. <br />Als je een <strong>beginnende umbraco gebruiker</strong> bent, dan kun je you can find veel informatie op onze "getting started" pagina's vinden.]]></key>
+    <key alias="theEndBrowseSite"><![CDATA[<h3>Browse je nieuwe site</h3> Je hebt Runway geinstalleerd, dus kijk eens hoe je nieuwe site eruit ziet.]]></key>
+    <key alias="theEndFurtherHelp"><![CDATA[<h3>Meer hulp en informatie</h3> Vind hulp in onze bekroonde community, blader door de documentatie of bekijk enkele gratis videos over het bouwen van een eenvoudige site, het gebruiken van packages en een overzicht van umbraco terminologie]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3> Om je website te beheren open je simpelweg de umbraco back office en begin je content toe te voegen, templates en stylesheets aan te passen of nieuwe functionaliteit toe te voegen]]></key>
+  </area>
+  <area alias="relatedlinks">
+    <key alias="modeUp"><![CDATA[Verplaats omhoog]]></key>
+    <key alias="modeDown"><![CDATA[Verplaats omlaag]]></key>
+    <key alias="removeLink"><![CDATA[Verwijder link]]></key>
+    <key alias="newWindow"><![CDATA[Open in nieuw venster]]></key>
+    <key alias="addInternal"><![CDATA[Interne link toevoegen]]></key>
+    <key alias="addExternal"><![CDATA[Externe link toevoegen]]></key>
+    <key alias="caption"><![CDATA[Bijschrift]]></key>
+    <key alias="linkurl"><![CDATA[URL]]></key>
+    <key alias="internalPage"><![CDATA[Interne pagina]]></key>
+    <key alias="addlink"><![CDATA[Toevoegen]]></key>
+  </area>
+  <key alias="transferCourierRevision">Transfer</key>
+  <key alias="transferCourierItem">Transfer</key>
+</language>

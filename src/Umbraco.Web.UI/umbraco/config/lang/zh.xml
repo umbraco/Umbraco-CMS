@@ -1,0 +1,890 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<language alias="zh" intName="Chinese (Simple)" localName="中文（简体，中国）" lcid="0804" culture="zh-CN">
+  <creator>
+    <name>孙柱梁</name>
+    <link />
+  </creator>
+  <area alias="main">
+    <key alias="sections"><![CDATA[区域]]></key>
+    <key alias="dashboard"><![CDATA[仪表板]]></key>
+    <key alias="tree"><![CDATA[内容]]></key>
+  </area>
+  <area alias="defaultdialogs">
+    <key alias="cut"><![CDATA[剪切]]></key>
+    <key alias="link"><![CDATA[链接]]></key>
+    <key alias="insertlink"><![CDATA[插入链接]]></key>
+    <key alias="insertgraphicheadline"><![CDATA[插入图片标题]]></key>
+    <key alias="linknewwindow"><![CDATA[在新窗口中打开？]]></key>
+    <key alias="linkinternal"><![CDATA[内部链接：]]></key>
+    <key alias="linklocaltip"><![CDATA[本地链接请用“#”号开头]]></key>
+    <key alias="insertimage"><![CDATA[插入图片]]></key>
+    <key alias="treepicker"><![CDATA[拾取项]]></key>
+    <key alias="confirmdelete"><![CDATA[您确定要删除吗]]></key>
+    <key alias="confirmdisable"><![CDATA[您确定要禁用吗]]></key>
+    <key alias="confirmlogout"><![CDATA[您确定吗?]]></key>
+    <key alias="insertAnchor"><![CDATA[插入本地链接]]></key>
+    <key alias="anchorInsert"><![CDATA[锚点名称]]></key>
+    <key alias="insertCharacter"><![CDATA[插入字符]]></key>
+    <key alias="inserttable"><![CDATA[插入表格]]></key>
+    <key alias="tableColumns"><![CDATA[表格列数]]></key>
+    <key alias="tableRows"><![CDATA[表格行数]]></key>
+    <key alias="paste"><![CDATA[粘贴]]></key>
+    <key alias="assignDomain"><![CDATA[管理主机名]]></key>
+    <key alias="confirmSure"><![CDATA[您确定吗？]]></key>
+    <key alias="requiredField"><![CDATA[必填项]]></key>
+    <key alias="lastEdited"><![CDATA[最近编辑]]></key>
+    <key alias="siterepublished"><![CDATA[网站缓存已刷新，所有已发布的内容更新生效。]]></key>
+    <key alias="siterepublishHelp"><![CDATA[网站缓存将会刷新，所有已发布的内容将会更新。]]></key>
+    <key alias="sitereindexed"><![CDATA[站点已重建索引]]></key>
+    <key alias="editdictionary"><![CDATA[编辑字典项]]></key>
+    <key alias="editlanguage"><![CDATA[编辑语言]]></key>
+    <key alias="permissionsEdit"><![CDATA[编辑权限]]></key>
+    <key alias="viewCacheItem"><![CDATA[查看缓存项]]></key>
+    <key alias="thumbnailimageclickfororiginal"><![CDATA[点击图片查看完整大小]]></key>
+    <key alias="confirmEmptyTrashcan"><![CDATA[单击此框确定删除%0%项]]></key>
+    <key alias="recycleBinIsEmpty"><![CDATA[回收站已清空]]></key>
+    <key alias="recycleBinWarning"><![CDATA[从回收站删除的项目将不可恢复]]></key>
+    <key alias="recycleBinDeleting"><![CDATA[正在清空回收站，请不要关闭窗口。]]></key>
+    <key alias="closeThisWindow"><![CDATA[关闭窗口]]></key>
+    <key alias="removeMacro"><![CDATA[移除宏]]></key>
+    <key alias="insertMacro"><![CDATA[插入宏]]></key>
+    <key alias="insertMacro"><![CDATA[插入宏]]></key>
+    <key alias="macroContainerSettings"><![CDATA[宏设置]]></key>
+    <key alias="templateContentAreaHelp"><![CDATA[<strong>设置一个占位符id</strong> 您可以在子模板中通过该ID来插入内容，引用格式： <code>&lt;asp:content /&gt;</code>。
+    ]]></key>
+    <key alias="templateContentPlaceHolderHelp"><![CDATA[从下面的列表中<strong>选择一个占位符id</strong>。
+    ]]></key>
+    <key alias="regexSearchHelp"><![CDATA[查找正则表达式来验证输入，如: 'email、'zip-code'、'url'。]]></key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>的服务暂时出现问题。]]></key>
+    <key alias="macroDoesNotHaveProperties"><![CDATA[该宏没有可编辑的属性
+    ]]></key>
+  </area>
+  <area alias="general">
+    <key alias="properties"><![CDATA[属性]]></key>
+    <key alias="elements"><![CDATA[元素]]></key>
+    <key alias="new"><![CDATA[新的]]></key>
+    <key alias="add"><![CDATA[添加]]></key>
+    <key alias="open"><![CDATA[打开]]></key>
+    <key alias="edit"><![CDATA[编辑]]></key>
+    <key alias="close"><![CDATA[关闭]]></key>
+    <key alias="create"><![CDATA[创建]]></key>
+    <key alias="delete"><![CDATA[删除]]></key>
+    <key alias="sort"><![CDATA[排序]]></key>
+    <key alias="move"><![CDATA[移动]]></key>
+    <key alias="copy"><![CDATA[复制]]></key>
+    <key alias="rename"><![CDATA[重命名]]></key>
+    <key alias="logoff"><![CDATA[退出]]></key>
+    <key alias="rights"><![CDATA[权限]]></key>
+    <key alias="choose"><![CDATA[选择]]></key>
+    <key alias="alias"><![CDATA[别名]]></key>
+    <key alias="name"><![CDATA[名称]]></key>
+    <key alias="icon"><![CDATA[图标]]></key>
+    <key alias="default"><![CDATA[默认]]></key>
+    <key alias="type"><![CDATA[类型]]></key>
+    <key alias="yes"><![CDATA[是]]></key>
+    <key alias="no"><![CDATA[否]]></key>
+    <key alias="ok"><![CDATA[确定]]></key>
+    <key alias="update"><![CDATA[更新]]></key>
+    <key alias="cancel"><![CDATA[取消]]></key>
+    <key alias="macro"><![CDATA[宏]]></key>
+    <key alias="insert"><![CDATA[插入]]></key>
+    <key alias="size"><![CDATA[大小]]></key>
+    <key alias="layout"><![CDATA[布局]]></key>
+    <key alias="design"><![CDATA[设计]]></key>
+    <key alias="width"><![CDATA[宽]]></key>
+    <key alias="height"><![CDATA[高]]></key>
+    <key alias="justify"><![CDATA[对齐]]></key>
+    <key alias="innerMargin"><![CDATA[内边距]]></key>
+    <key alias="cellMargin"><![CDATA[单元格边距]]></key>
+    <key alias="border"><![CDATA[边框]]></key>
+    <key alias="pleasewait"><![CDATA[请稍候…]]></key>
+    <key alias="areyousure"><![CDATA[您确定吗？]]></key>
+    <key alias="error"><![CDATA[错误]]></key>
+    <key alias="username"><![CDATA[用户名]]></key>
+    <key alias="password"><![CDATA[密码]]></key>
+    <key alias="login"><![CDATA[登录]]></key>
+    <key alias="welcome"><![CDATA[欢迎…]]></key>
+    <key alias="language"><![CDATA[语言]]></key>
+    <key alias="closewindow"><![CDATA[关闭窗口]]></key>
+    <key alias="deleted"><![CDATA[已删除]]></key>
+    <key alias="edited"><![CDATA[已编辑]]></key>
+    <key alias="of"><![CDATA[属于]]></key>
+    <key alias="about"><![CDATA[关于]]></key>
+    <key alias="help"><![CDATA[帮助]]></key>
+    <key alias="logout"><![CDATA[注销]]></key>
+    <key alias="findDocument"><![CDATA[查找文档]]></key>
+    <key alias="continue"><![CDATA[继续]]></key>
+    <key alias="value"><![CDATA[值]]></key>
+    <key alias="reciept"><![CDATA[接收数据邮箱]]></key>
+    <key alias="showPageOnSend"><![CDATA[在发送时预览]]></key>
+    <key alias="show"><![CDATA[显示]]></key>
+    <key alias="view"><![CDATA[查看]]></key>
+    <key alias="user"><![CDATA[用户]]></key>
+    <key alias="action"><![CDATA[操作]]></key>
+    <key alias="date"><![CDATA[时间]]></key>
+    <key alias="comment"><![CDATA[备注]]></key>
+    <key alias="up"><![CDATA[上]]></key>
+    <key alias="down"><![CDATA[下]]></key>
+    <key alias="recycleBin"><![CDATA[回收站]]></key>
+    <key alias="deleting"><![CDATA[正在删除…]]></key>
+    <key alias="remaining"><![CDATA[保持状态中]]></key>
+    <key alias="import"><![CDATA[导入]]></key>
+    <key alias="loading"><![CDATA[加载中]]></key>
+    <key alias="path"><![CDATA[路径]]></key>
+    <key alias="or"><![CDATA[或]]></key>
+    <key alias="by"><![CDATA[或]]></key>
+    <key alias="placeHolderID"><![CDATA[占位符ID]]></key>
+    <key alias="typeToSearch"><![CDATA[输入内容开始查找…]]></key>
+    <key alias="email"><![CDATA[邮箱]]></key>
+    <key alias="url"><![CDATA[链接地址]]></key>
+    <key alias="dimensions"><![CDATA[规格]]></key>
+    <key alias="constrainProportions"><![CDATA[强制属性]]></key>
+    <key alias="upload"><![CDATA[上传]]></key>
+    <key alias="download"><![CDATA[下载]]></key>
+    <key alias="confirm"><![CDATA[确认]]></key>
+    <key alias="database"><![CDATA[数据库]]></key>
+    <key alias="server"><![CDATA[服务器]]></key>
+    <key alias="upgrade"><![CDATA[更新]]></key>
+    <key alias="install"><![CDATA[安装]]></key>
+    <key alias="retry"><![CDATA[重试]]></key>
+    <key alias="next"><![CDATA[下一步]]></key>
+    <key alias="previous"><![CDATA[上一步]]></key>
+    <key alias="search"><![CDATA[搜索]]></key>
+    <key alias="renew"><![CDATA[更新]]></key>
+    <key alias="locked"><![CDATA[锁定]]></key>
+  </area>
+  <area alias="lockout">
+    <key alias="lockoutWillOccur"><![CDATA[用户在空闲状态下将会自动注销]]></key>
+    <key alias="renewSession"><![CDATA[已更新，继续工作。]]></key>
+  </area>
+  <area alias="dashboard">
+    <key alias="welcome"><![CDATA[欢迎]]></key>
+    <key alias="openinnew"><![CDATA[已经在新窗口中打开]]></key>
+    <key alias="nothinghappens"><![CDATA[如果umbraco没有打开，您可能需要允许弹出式窗口。]]></key>
+    <key alias="restart"><![CDATA[重启]]></key>
+    <key alias="browser"><![CDATA[浏览您的网站]]></key>
+    <key alias="visit"><![CDATA[访问]]></key>
+    <key alias="dontShowAgain"><![CDATA[- 隐藏]]></key>
+  </area>
+  <area alias="sections">
+    <key alias="content"><![CDATA[内容]]></key>
+    <key alias="media"><![CDATA[媒体]]></key>
+    <key alias="member"><![CDATA[会员]]></key>
+    <key alias="newsletters"><![CDATA[消息]]></key>
+    <key alias="users"><![CDATA[用户]]></key>
+    <key alias="settings"><![CDATA[设置]]></key>
+    <key alias="developer"><![CDATA[开发]]></key>
+    <key alias="statistics"><![CDATA[统计]]></key>
+    <key alias="courier"><![CDATA[Courier]]></key>
+    <key alias="concierge"><![CDATA[Concierge]]></key>
+    <key alias="translation"><![CDATA[翻译]]></key>
+    <key alias="installer"><![CDATA[Umbraco配置向导]]></key>
+  </area>
+  <area alias="buttons">
+    <key alias="save"><![CDATA[保存]]></key>
+    <key alias="saveAndPublish"><![CDATA[保存并发布]]></key>
+    <key alias="saveToPublish"><![CDATA[保存并提交审核]]></key>
+    <key alias="htmlEdit"><![CDATA[编辑Html]]></key>
+    <key alias="relations"><![CDATA[编辑关联]]></key>
+    <key alias="showPage"><![CDATA[预览]]></key>
+    <key alias="styleChoose"><![CDATA[选择样式]]></key>
+    <key alias="styleShow"><![CDATA[显示样式]]></key>
+    <key alias="bold"><![CDATA[粗体]]></key>
+    <key alias="italic"><![CDATA[斜体]]></key>
+    <key alias="graphicHeadline"><![CDATA[插入图片标题]]></key>
+    <key alias="justifyLeft"><![CDATA[左对齐]]></key>
+    <key alias="justifyCenter"><![CDATA[居中]]></key>
+    <key alias="justifyRight"><![CDATA[右对齐]]></key>
+    <key alias="listBullet"><![CDATA[圆点列表]]></key>
+    <key alias="listNumeric"><![CDATA[数字列表]]></key>
+    <key alias="indent"><![CDATA[段落缩进]]></key>
+    <key alias="deindent"><![CDATA[取消段落缩进]]></key>
+    <key alias="linkInsert"><![CDATA[插入链接]]></key>
+    <key alias="linkLocal"><![CDATA[插入本地链接（锚点）]]></key>
+    <key alias="pictureInsert"><![CDATA[插入图片]]></key>
+    <key alias="macroInsert"><![CDATA[插入宏]]></key>
+    <key alias="tableInsert"><![CDATA[插入表格]]></key>
+    <key alias="formFieldInsert"><![CDATA[插入表单字段]]></key>
+  </area>
+  <area alias="content">
+    <key alias="about"><![CDATA[关于本页]]></key>
+    <key alias="nodeName"><![CDATA[页标题]]></key>
+    <key alias="alias"><![CDATA[替代链接]]></key>
+    <key alias="createDate"><![CDATA[创建时间]]></key>
+    <key alias="createBy"><![CDATA[创建者]]></key>
+    <key alias="updateDate"><![CDATA[最近编辑]]></key>
+    <key alias="lastPublished"><![CDATA[最近发布]]></key>
+    <key alias="type"><![CDATA[类型]]></key>
+    <key alias="statistics"><![CDATA[统计]]></key>
+    <key alias="releaseDate"><![CDATA[发布于]]></key>
+    <key alias="expireDate"><![CDATA[过期于]]></key>
+    <key alias="publish"><![CDATA[发布]]></key>
+    <key alias="otherElements"><![CDATA[属性]]></key>
+    <key alias="editing"><![CDATA[编辑]]></key>
+    <key alias="itemNotPublished"><![CDATA[该项没有发布]]></key>
+    <key alias="itemChanged"><![CDATA[该项发布之后有更改]]></key>
+    <key alias="clickToEdit"><![CDATA[点击编辑]]></key>
+    <key alias="documentType"><![CDATA[文档类型]]></key>
+    <key alias="urls"><![CDATA[链接到文档]]></key>
+    <key alias="alternativeUrls"><![CDATA[替代链接]]></key>
+    <key alias="unPublish"><![CDATA[未发布]]></key>
+    <key alias="publishStatus"><![CDATA[发布状态]]></key>
+    <key alias="parentNotPublished"><![CDATA[该文档不可见，因为其上级 '%0%' 未发布。]]></key>
+    <key alias="uploadClear"><![CDATA[移除文件]]></key>
+    <key alias="noDate"><![CDATA[没有选择时间]]></key>
+    <key alias="removeDate"><![CDATA[清空时间]]></key>
+    <key alias="alternativeTextHelp"><![CDATA[（图片的替代文本）]]></key>
+    <key alias="titleOptional"><![CDATA[标题（可选）]]></key>
+    <key alias="mediatype"><![CDATA[媒体类型]]></key>
+    <key alias="membertype"><![CDATA[会员类型]]></key>
+    <key alias="membergroup"><![CDATA[会员组]]></key>
+    <key alias="memberrole"><![CDATA[角色]]></key>
+    <key alias="sortHelp"><![CDATA[拖拽项目或单击列头即可排序，可以按住Shift多选。]]></key>
+    <key alias="sortDone"><![CDATA[排序完成]]></key>
+  </area>
+  <area alias="treeHeaders">
+    <key alias="stylesheets"><![CDATA[样式表]]></key>
+    <key alias="templates"><![CDATA[模板]]></key>
+    <key alias="dictionary"><![CDATA[字典]]></key>
+    <key alias="languages"><![CDATA[语言]]></key>
+    <key alias="mediaTypes"><![CDATA[媒体类型]]></key>
+    <key alias="nodeTypes"><![CDATA[文档类型]]></key>
+    <key alias="cacheBrowser"><![CDATA[缓存浏览]]></key>
+    <key alias="datatype"><![CDATA[数据类型]]></key>
+    <key alias="macros"><![CDATA[宏]]></key>
+    <key alias="xslt"><![CDATA[XSLT文件]]></key>
+    <key alias="python"><![CDATA[Python文件]]></key>
+    <key alias="member"><![CDATA[会员]]></key>
+    <key alias="memberType"><![CDATA[会员类型]]></key>
+    <key alias="memberGroup"><![CDATA[会员组]]></key>
+    <key alias="memberRoles"><![CDATA[角色]]></key>
+    <key alias="contentRecycleBin"><![CDATA[回收站]]></key>
+    <key alias="packager"><![CDATA[扩展包]]></key>
+    <key alias="packages"><![CDATA[扩展包]]></key>
+    <key alias="repositories"><![CDATA[从在线程序库安装]]></key>
+    <key alias="createdPackages"><![CDATA[创建扩展包]]></key>
+    <key alias="installedPackages"><![CDATA[已安装的扩展包]]></key>
+    <key alias="runway"><![CDATA[安装Runway]]></key>
+    <key alias="runwayModules"><![CDATA[Runway模块]]></key>
+    <key alias="localPackage"><![CDATA[安装本地扩展包]]></key>
+    <key alias="scripts"><![CDATA[脚本]]></key>
+    <key alias="scripting"><![CDATA[Scripting文件]]></key>
+    <key alias="installStarterKit"><![CDATA[安装新手套件]]></key>
+    <key alias="installSkin"><![CDATA[安装皮肤]]></key>
+  </area>
+  <area alias="user">
+    <key alias="username"><![CDATA[用户名]]></key>
+    <key alias="loginname"><![CDATA[登录]]></key>
+    <key alias="password"><![CDATA[密码]]></key>
+    <key alias="usertype"><![CDATA[用户类型]]></key>
+    <key alias="userPermissions"><![CDATA[用户权限]]></key>
+    <key alias="userTypes"><![CDATA[用户类型]]></key>
+    <key alias="language"><![CDATA[语言]]></key>
+    <key alias="startnode"><![CDATA[默认打开内容项]]></key>
+    <key alias="mediastartnode"><![CDATA[默认打开媒体项]]></key>
+    <key alias="modules"><![CDATA[区域]]></key>
+    <key alias="administrators"><![CDATA[管理员]]></key>
+    <key alias="editors"><![CDATA[编辑]]></key>
+    <key alias="writer"><![CDATA[撰稿人]]></key>
+    <key alias="noConsole"><![CDATA[禁用后台管理界面]]></key>
+    <key alias="disabled"><![CDATA[禁用用户]]></key>
+    <key alias="defaultToLiveEditing"><![CDATA[登录后进入实时编辑模式]]></key>
+    <key alias="searchAllChildren"><![CDATA[搜索子对象]]></key>
+    <key alias="descriptionField"><![CDATA[描述字段]]></key>
+    <key alias="categoryField"><![CDATA[分类字段]]></key>
+    <key alias="excerptField"><![CDATA[排除字段]]></key>
+    <key alias="documentType"><![CDATA[文档类型]]></key>
+    <key alias="contentChannel"><![CDATA[内容频道]]></key>
+    <key alias="permissionSelectPages"><![CDATA[选择要修改权限的页]]></key>
+    <key alias="permissionReplaceChildren"><![CDATA[替换子项权限设置]]></key>
+    <key alias="permissionSelectedPages"><![CDATA[您正在修改访问权限的页面：]]></key>
+    <key alias="changePassword"><![CDATA[更改密码]]></key>
+    <key alias="changePasswordDescription"><![CDATA[要改变密码，请在框中输入新密码，然后单击“更改密码”。]]></key>
+    <key alias="passwordEnterNew"><![CDATA[输入新密码]]></key>
+    <key alias="passwordConfirm"><![CDATA[重输密码]]></key>
+    <key alias="passwordChanged"><![CDATA[您的密码已更改！]]></key>
+    <key alias="passwordIsDifferent"><![CDATA[新密码和重输入的密码不一致，请重试！]]></key>
+    <key alias="passwordIsBlank"><![CDATA[新密码不能为空！]]></key>
+    <key alias="passwordMismatch"><![CDATA[重输的密码和原密码不一致！]]></key>
+  </area>
+  <area alias="settings">
+    <key alias="nodetype"><![CDATA[节点类型]]></key>
+    <key alias="tab"><![CDATA[选项卡]]></key>
+    <key alias="tabs"><![CDATA[选项卡]]></key>
+    <key alias="tabname"><![CDATA[选项卡标题]]></key>
+    <key alias="objecttype"><![CDATA[类型]]></key>
+    <key alias="defaulttemplate"><![CDATA[默认模板]]></key>
+    <key alias="newtabname"><![CDATA[新建选项卡标题]]></key>
+    <key alias="stylesheet"><![CDATA[样式表]]></key>
+    <key alias="stylesheet editor egenskab"><![CDATA[样式表属性]]></key>
+    <key alias="dictionary editor egenskab"><![CDATA[字典键]]></key>
+    <key alias="importDocumentTypeHelp"><![CDATA[要导入文档类型，请点击“浏览”按钮，再点击“导入”，然后在您电脑上查找 ".udt"文件导入（下一页中需要您再次确认）]]></key>
+  </area>
+  <area alias="graphicheadline">
+    <key alias="bold"><![CDATA[粗体]]></key>
+    <key alias="text"><![CDATA[文本]]></key>
+    <key alias="font"><![CDATA[字体]]></key>
+    <key alias="color"><![CDATA[前景色]]></key>
+    <key alias="backgroundcolor"><![CDATA[背景色]]></key>
+  </area>
+  <area alias="update">
+    <key alias="updateAvailable"><![CDATA[有可用更新]]></key>
+    <key alias="updateDownloadText"><![CDATA[%0%已就绪，点击这里下载]]></key>
+    <key alias="updateNoServer"><![CDATA[无到服务器的连接]]></key>
+    <key alias="updateNoServerError"><![CDATA[检查更新失败]]></key>
+  </area>
+  <area alias="actions">
+    <key alias="create"><![CDATA[创建]]></key>
+    <key alias="move"><![CDATA[移动]]></key>
+    <key alias="copy"><![CDATA[复制]]></key>
+    <key alias="delete"><![CDATA[删除]]></key>
+    <key alias="sort"><![CDATA[排序]]></key>
+    <key alias="publish"><![CDATA[发布]]></key>
+    <key alias="toPublish"><![CDATA[提交至发布者]]></key>
+    <key alias="rights"><![CDATA[权限]]></key>
+    <key alias="protect"><![CDATA[公众访问权限]]></key>
+    <key alias="refreshNode"><![CDATA[重新加载节点]]></key>
+    <key alias="update"><![CDATA[更新]]></key>
+    <key alias="notify"><![CDATA[提醒]]></key>
+    <key alias="logout"><![CDATA[退出]]></key>
+    <key alias="republish"><![CDATA[重新发布整站]]></key>
+    <key alias="assignDomain"><![CDATA[管理主机名]]></key>
+    <key alias="disable"><![CDATA[禁用]]></key>
+    <key alias="auditTrail"><![CDATA[跟踪审计]]></key>
+    <key alias="createPackage"><![CDATA[创建扩展包]]></key>
+    <key alias="importPackage"><![CDATA[导入扩展包]]></key>
+    <key alias="rollback"><![CDATA[回滚]]></key>
+    <key alias="emptyTrashcan"><![CDATA[清空回收站]]></key>
+    <key alias="exportDocumentType"><![CDATA[导出文档类型]]></key>
+    <key alias="exportDocumentTypeAsCode"><![CDATA[导出到.NET]]></key>
+    <key alias="exportDocumentTypeAsCode-Full"><![CDATA[导出到.NET]]></key>
+    <key alias="importDocumentType"><![CDATA[导入文档类型]]></key>
+    <key alias="sendToTranslate"><![CDATA[发送给翻译]]></key>
+    <key alias="translate"><![CDATA[翻译]]></key>
+    <key alias="browse"><![CDATA[浏览节点]]></key>
+    <key alias="sendtopublish"><![CDATA[提交至发布者]]></key>
+    <key alias="liveEdit"><![CDATA[实时编辑模式]]></key>
+  </area>
+  <area alias="errors">
+    <key alias="startNodeDoesNotExists"><![CDATA[默认打开页面不存在，请联系管理员]]></key>
+    <key alias="stylesNoStylesOnPage"><![CDATA[没有可用的样式]]></key>
+    <key alias="stylesMustMarkBeforeSelect"><![CDATA[请先选择内容，再设置样式。]]></key>
+    <key alias="pictureResizeBiggerThanOrg"><![CDATA[图片尺寸大于原始尺寸不会提高图片质量，您确定要把图片尺寸变大吗?]]></key>
+    <key alias="tableColMergeLeft"><![CDATA[请把光标放在您要合并的两个单元格中的左边单元格]]></key>
+    <key alias="tableSplitNotSplittable"><![CDATA[非合并单元格不能分离。]]></key>
+    <key alias="missingType"><![CDATA[请选择类型]]></key>
+    <key alias="missingTitle"><![CDATA[请输入标题]]></key>
+    <key alias="xsltErrorHeader"><![CDATA[xslt源码出错]]></key>
+    <key alias="xsltErrorText"><![CDATA[XSLT未保存，因为包含错误。]]></key>
+    <key alias="pythonErrorHeader"><![CDATA[python脚本错误]]></key>
+    <key alias="pythonErrorText"><![CDATA[python脚本未保存，因为包含错误。]]></key>
+    <key alias="contentTypeAliasAndNameNotNull"><![CDATA[请为新的属性类型填写名称和别名！]]></key>
+    <key alias="filePermissionsError"><![CDATA[权限有问题，访问指定文件或文件夹失败！]]></key>
+    <key alias="codemirroriewarning"><![CDATA[注意，尽管配置中允许CodeMirror，但是它在IE上不够稳定，所以无法在IE运行。]]></key>
+  </area>
+  <area alias="speechBubbles">
+    <key alias="xsltSavedHeader"><![CDATA[Xslt已保存]]></key>
+    <key alias="xsltSavedText"><![CDATA[xslt无错误]]></key>
+    <key alias="xsltErrorHeader"><![CDATA[Xslt未保存]]></key>
+    <key alias="xsltPermissionErrorText"><![CDATA[Xslt无法保存，请检查权限。]]></key>
+    <key alias="xsltErrorText"><![CDATA[Xslt有错误]]></key>
+    <key alias="pythonSavedHeader"><![CDATA[Python已保存]]></key>
+    <key alias="pythonSavedText"><![CDATA[python脚本无错误]]></key>
+    <key alias="pythonErrorHeader"><![CDATA[Python脚本未保存]]></key>
+    <key alias="pythonErrorText"><![CDATA[Python脚本因为错误未能保存]]></key>
+    <key alias="templateSavedHeader"><![CDATA[模板已保存]]></key>
+    <key alias="templateSavedText"><![CDATA[模板保存，无错误。]]></key>
+    <key alias="templateErrorHeader"><![CDATA[模板未保存]]></key>
+    <key alias="templateErrorText"><![CDATA[模板别名相同]]></key>
+    <key alias="cssSavedHeader"><![CDATA[样式表已保存]]></key>
+    <key alias="cssSavedText"><![CDATA[样式表保存，无错误。]]></key>
+    <key alias="cssErrorHeader"><![CDATA[样式表未保存]]></key>
+    <key alias="fileErrorHeader"><![CDATA[文件未保存]]></key>
+    <key alias="fileErrorText"><![CDATA[文件无法保存，请检查权限。]]></key>
+    <key alias="fileSavedHeader"><![CDATA[文件保存]]></key>
+    <key alias="fileSavedText"><![CDATA[文件保存，无错误。]]></key>
+    <key alias="contentTypeSavedHeader"><![CDATA[内容类型已保存]]></key>
+    <key alias="contentTypeTabCreated"><![CDATA[选项卡已创建]]></key>
+    <key alias="contentTypeTabDeleted"><![CDATA[选项卡已删除]]></key>
+    <key alias="contentTypeTabDeletedText"><![CDATA[id为%0%的选项卡已删除]]></key>
+    <key alias="contentTypePropertyTypeCreated"><![CDATA[属性类型已创建]]></key>
+    <key alias="contentTypeDublicatePropertyType"><![CDATA[属性类型已存在]]></key>
+    <key alias="contentTypePropertyTypeCreatedText"><![CDATA[名称：%0% <br />数据类型：%1%]]></key>
+    <key alias="contentTypePropertyTypeDeleted"><![CDATA[属性类型已删除]]></key>
+    <key alias="dataTypeSaved"><![CDATA[数据类型已保存]]></key>
+    <key alias="editContentSavedHeader"><![CDATA[内容已保存]]></key>
+    <key alias="editContentSavedText"><![CDATA[请发布以使更改生效]]></key>
+    <key alias="editContentPublishedHeader"><![CDATA[内容已发布]]></key>
+    <key alias="editContentPublishedText"><![CDATA[公众可见]]></key>
+    <key alias="editContentPublishedFailedByParent"><![CDATA[因为上级页面未发布导致发布失败！]]></key>
+    <key alias="contentPublishedFailedByEvent"><![CDATA[发布因为第三方插件取消]]></key>
+    <key alias="editMemberSaved"><![CDATA[会员已保存]]></key>
+    <key alias="editTemplateSaved"><![CDATA[模板已保存]]></key>
+    <key alias="editStylesheetSaved"><![CDATA[样式表已保存]]></key>
+    <key alias="editStylesheetPropertySaved"><![CDATA[样式表属性已保存]]></key>
+    <key alias="editUserSaved"><![CDATA[用户已保存]]></key>
+    <key alias="editUserError"><![CDATA[保存用户出错（请查看日志）]]></key>
+    <key alias="editContentSendToPublish"><![CDATA[提交审核]]></key>
+    <key alias="editContentSendToPublishText"><![CDATA[更改已提交审核]]></key>
+    <key alias="dictionaryItemSaved"><![CDATA[字典项已保存]]></key>
+    <key alias="languageSaved"><![CDATA[语言已保存]]></key>
+  </area>
+  <area alias="headers">
+    <key alias="page"><![CDATA[页面]]></key>
+  </area>
+  <area alias="paste">
+    <key alias="errorMessage"><![CDATA[您所粘贴的文本含有特殊字符或格式，umbraco将清除以适应网页。]]></key>
+    <key alias="removeSpecialFormattering"><![CDATA[粘贴并移除格式（推荐）]]></key>
+    <key alias="removeAll"><![CDATA[无格式粘贴]]></key>
+    <key alias="doNothing"><![CDATA[带格式粘贴（不推荐）]]></key>
+  </area>
+  <area alias="assignDomain">
+    <key alias="domain"><![CDATA[域名]]></key>
+    <key alias="addNew"><![CDATA[添加域名]]></key>
+    <key alias="orEdit"><![CDATA[编辑当前域名]]></key>
+    <key alias="domainDeleted"><![CDATA[域名 '%0%' 已删除]]></key>
+    <key alias="domainCreated"><![CDATA[新域名 '%0%' 已创建]]></key>
+    <key alias="domainUpdated"><![CDATA[域名 '%0%' 已更新]]></key>
+    <key alias="domainHelp"><![CDATA[例如：yourdomain.com、www.yourdomain.com]]></key>
+    <key alias="domainExists"><![CDATA[域名 '%0%' 已使用]]></key>
+  </area>
+  <area alias="rollback">
+    <key alias="currentVersion"><![CDATA[当前版本]]></key>
+    <key alias="rollbackTo"><![CDATA[回滚至]]></key>
+    <key alias="view"><![CDATA[查看]]></key>
+    <key alias="diffHelp"><![CDATA[显示当前版本和选择版本的差异<br /><del>红色</del>是选中版本中没有的。<ins>绿色是新增的</ins>]]></key>
+    <key alias="htmlHelp"><![CDATA[将选中版本显示为HTML，如果您想看到版本间的差异比较，请使用对比视图。
+    ]]></key>
+    <key alias="selectVersion"><![CDATA[选择版本]]></key>
+    <key alias="documentRolledBack"><![CDATA[文档已回滚]]></key>
+  </area>
+  <area alias="sort">
+    <key alias="sortPleaseWait"><![CDATA[正在排序请稍候…<br/><br/>请不要关闭窗口]]></key>
+    <key alias="sortHelp"><![CDATA[上下拖拽项目或单击列头进行排序]]></key>
+    <key alias="sortDone"><![CDATA[排序完成。]]></key>
+  </area>
+  <area alias="publish">
+    <key alias="publishAll"><![CDATA[发布 %0% 及其子项]]></key>
+    <key alias="nodePublish"><![CDATA[%0% 已发布]]></key>
+    <key alias="nodePublishAll"><![CDATA[%0% 及其子项已发布]]></key>
+    <key alias="inProgress"><![CDATA[正在发布，请稍候…]]></key>
+    <key alias="inProgressCounter"><![CDATA[%0% 中的 %1% 页面已发布…]]></key>
+    <key alias="includeUnpublished"><![CDATA[包含未发布的子项]]></key>
+    <key alias="publishHelp"><![CDATA[点 <em>确定</em> 发布 <strong>%0%</strong><br/><br />
+要发布当前页和所有子页，请选中 <em>全部发布</em> 发布所有子页。
+      
+    ]]></key>
+    <key alias="contentPublishedFailedByEvent"><![CDATA[%0% 无法发布，第三方组件造成失败。
+    ]]></key>
+  </area>
+  <area alias="moveOrCopy">
+    <key alias="notValid"><![CDATA[您在子项的权限不够，不允许该操作。]]></key>
+    <key alias="moveTo"><![CDATA[将 %0% 移动到]]></key>
+    <key alias="copyTo"><![CDATA[将 %0% 复制到]]></key>
+    <key alias="noNodeSelected"><![CDATA[尚未选择节点，请选择一个节点点击“确定”。]]></key>
+    <key alias="nodeSelected"><![CDATA[作为内容的根结点，点“确定”。]]></key>
+    <key alias="choose"><![CDATA[选择上面的页面…]]></key>
+    <key alias="notAllowedByContentType"><![CDATA[类型不符不允许选择]]></key>
+    <key alias="notAllowedByPath"><![CDATA[该项不能移到其子项]]></key>
+    <key alias="moveDone"><![CDATA[%0% 已被移动到 %1%]]></key>
+    <key alias="copyDone"><![CDATA[%0% 被复制到 %1%]]></key>
+  </area>
+  <area alias="login">
+    <key alias="topText"><![CDATA[欢迎使用umbraco，在下方输入用户名和密码]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0%</p> ]]></key>
+  </area>
+  <area alias="stylesheet">
+    <key alias="editstylesheet"><![CDATA[编辑样式表]]></key>
+    <key alias="editstylesheetproperty"><![CDATA[编辑样式属性]]></key>
+    <key alias="styles"><![CDATA[样式]]></key>
+    <key alias="preview"><![CDATA[预览]]></key>
+    <key alias="aliasHelp"><![CDATA[使用CSS语法，如：h1、.redHeader、.blueTex。]]></key>
+    <key alias="nameHelp"><![CDATA[编辑器中的样式属性名 ]]></key>
+  </area>
+  <area alias="scripts">
+    <key alias="editscript"><![CDATA[编辑脚本]]></key>
+  </area>
+  <area alias="editcontenttype">
+    <key alias="newtab"><![CDATA[新建选项卡]]></key>
+    <key alias="create"><![CDATA[创建]]></key>
+    <key alias="allowedchildnodetypes"><![CDATA[允许子项节点类型]]></key>
+    <key alias="tab"><![CDATA[选项卡]]></key>
+    <key alias="deletetab"><![CDATA[删除选项卡]]></key>
+    <key alias="description"><![CDATA[描述]]></key>
+    <key alias="thumbnail"><![CDATA[缩略图]]></key>
+  </area>
+  <area alias="editdatatype">
+    <key alias="renderControl"><![CDATA[渲染控件]]></key>
+    <key alias="guid"><![CDATA[数据类型唯一标识]]></key>
+    <key alias="dataBaseDatatype"><![CDATA[数据库数据类型]]></key>
+    <key alias="addPrevalue"><![CDATA[添加预设值]]></key>
+    <key alias="rteButtons"><![CDATA[按钮]]></key>
+    <key alias="rteRelatedStylesheets"><![CDATA[关联的样式表]]></key>
+    <key alias="rteEnableAdvancedSettings"><![CDATA[允许高级设置]]></key>
+    <key alias="rteEnableContextMenu"><![CDATA[允许快捷菜单]]></key>
+    <key alias="rteWidthAndHeight"><![CDATA[宽和高]]></key>
+    <key alias="rteMaximumDefaultImgSize"><![CDATA[插入图片默认最大]]></key>
+    <key alias="rteShowLabel"><![CDATA[显示标签]]></key>
+  </area>
+  <area alias="template">
+    <key alias="template"><![CDATA[模板]]></key>
+    <key alias="mastertemplate"><![CDATA[母版]]></key>
+    <key alias="edittemplate"><![CDATA[编辑模板]]></key>
+    <key alias="insertMacro"><![CDATA[插入宏]]></key>
+    <key alias="insertDictionaryItem"><![CDATA[插入字典项]]></key>
+    <key alias="insertContentArea"><![CDATA[插入内容区]]></key>
+    <key alias="insertContentAreaPlaceHolder"><![CDATA[插入内容占位符]]></key>
+    <key alias="quickGuide"><![CDATA[模板标签快速指南]]></key>
+    <key alias="insertPageField"><![CDATA[插入页字段]]></key>
+  </area>
+  <area alias="dictionaryItem">
+    <key alias="description"><![CDATA[
+      为字典项编辑不同语言的版本‘<em>%0%</em>’<br/>您可以在左侧的“语言”中添加一种语言
+   
+   ]]></key>
+    <key alias="displayName"><![CDATA[语言名称]]></key>
+  </area>
+  <area alias="language">
+    <key alias="cultureCode"><![CDATA[语言代码]]></key>
+    <key alias="displayName"><![CDATA[语言名称]]></key>
+  </area>
+  <area alias="templateEditor">
+    <key alias="chooseField"><![CDATA[选取字段]]></key>
+    <key alias="alternativeField"><![CDATA[替代字段]]></key>
+    <key alias="usedIfEmpty"><![CDATA[该字段仅在主字段为空时使用]]></key>
+    <key alias="usedIfAllEmpty"><![CDATA[当上面字段值为空时使用]]></key>
+    <key alias="alternativeText"><![CDATA[替代文本]]></key>
+    <key alias="recursive"><![CDATA[递归]]></key>
+    <key alias="preContent"><![CDATA[字段前插入]]></key>
+    <key alias="postContent"><![CDATA[字段后插入]]></key>
+    <key alias="insertedBefore"><![CDATA[将在字段值前插入]]></key>
+    <key alias="insertedAfter"><![CDATA[将在字段值后插入]]></key>
+    <key alias="formatAsDate"><![CDATA[格式化时间]]></key>
+    <key alias="dateOnly"><![CDATA[是，仅日期]]></key>
+    <key alias="withTime"><![CDATA[是，含时间，分隔符为： ]]></key>
+    <key alias="casing"><![CDATA[大小写]]></key>
+    <key alias="none"><![CDATA[无]]></key>
+    <key alias="lowercase"><![CDATA[小写]]></key>
+    <key alias="uppercase"><![CDATA[大写]]></key>
+    <key alias="urlEncode"><![CDATA[URL编码]]></key>
+    <key alias="htmlEncode"><![CDATA[HTML编码]]></key>
+    <key alias="urlEncodeHelp"><![CDATA[将格式化URL中的特殊字符]]></key>
+    <key alias="htmlEncodeHelp"><![CDATA[将替换HTML中的特殊字符]]></key>
+    <key alias="convertLineBreaks"><![CDATA[转换换行符]]></key>
+    <key alias="convertLineBreaksHelp"><![CDATA[将换行符转化为&lt;br&gt;]]></key>
+    <key alias="removeParagraph"><![CDATA[移除段落符号]]></key>
+    <key alias="removeParagraphHelp"><![CDATA[将移除&lt;P&gt;标签]]></key>
+    <key alias="encoding"><![CDATA[编码]]></key>
+  </area>
+  <area alias="create">
+    <key alias="createUnder"><![CDATA[创建在]]></key>
+    <key alias="chooseNode"><![CDATA[您想在哪里创建 %0%]]></key>
+    <key alias="updateData"><![CDATA[选择类型和标题]]></key>
+  </area>
+  <area alias="errorHandling">
+    <key alias="errorHeader"><![CDATA[发现错误：]]></key>
+    <key alias="errorHeaderWithoutTab"><![CDATA[发现错误：]]></key>
+    <key alias="errorMandatory"><![CDATA[%1% 中的 %0% 字段是必填项]]></key>
+    <key alias="errorMandatoryWithoutTab"><![CDATA[%0% 是必填项]]></key>
+    <key alias="errorExistsWithoutTab"><![CDATA[%0% 已存在]]></key>
+    <key alias="errorRegExp"><![CDATA[%1% 中的 %0% 格式不正确]]></key>
+    <key alias="errorRegExpWithoutTab"><![CDATA[%0% 格式不正确]]></key>
+    <key alias="errorIntegerWithoutTab"><![CDATA[%0% 必须是整数]]></key>
+    <key alias="errorButDataWasSaved"><![CDATA[数据已保存，但是发布前您需要修正一些错误：]]></key>
+    <key alias="errorInPasswordFormat"><![CDATA[密码最少%0%位，且至少包含%1%位非字母数字符号]]></key>
+    <key alias="errorChangingProviderPassword"><![CDATA[当前成员提供程序不支持修改密码(EnablePasswordRetrieval的值应该为true)]]></key>
+  </area>
+  <area alias="publicAccess">
+    <key alias="paHowWould"><![CDATA[选择限制访问此页的方式]]></key>
+    <key alias="paSimple"><![CDATA[单用户保护]]></key>
+    <key alias="paSimpleHelp"><![CDATA[如果您只希望提供一个用户名和密码就能访问]]></key>
+    <key alias="paAdvanced"><![CDATA[基于角色的保护]]></key>
+    <key alias="paAdvancedHelp"><![CDATA[基于角色的授权，<br /> 要使用的会员组。]]></key>
+    <key alias="paAdvancedNoGroups"><![CDATA[使用基于角色的授权需要首先建立会员组。]]></key>
+    <key alias="paLoginPage"><![CDATA[登录页]]></key>
+    <key alias="paErrorPage"><![CDATA[错误页]]></key>
+    <key alias="paSelectPages"><![CDATA[选择一个包含登录表单和提示信息的页]]></key>
+    <key alias="paLoginPageHelp"><![CDATA[选择公开的登录入口]]></key>
+    <key alias="paErrorPageHelp"><![CDATA[当用户登录后访问没有权限的页时显示该页]]></key>
+    <key alias="paSelectRoles"><![CDATA[选择访问该页的角色类型]]></key>
+    <key alias="paSetLogin"><![CDATA[为此页设置账号和密码]]></key>
+    <key alias="paIsProtected"><![CDATA[%0% 现在处于受保护状态]]></key>
+    <key alias="paIsRemoved"><![CDATA[%0% 的保护被取消 ]]></key>
+    <key alias="paRemoveProtection"><![CDATA[取消保护]]></key>
+  </area>
+  <area alias="auditTrails">
+    <key alias="atViewingFor"><![CDATA[查看]]></key>
+  </area>
+  <area alias="notifications">
+    <key alias="notifications"><![CDATA[通知]]></key>
+    <key alias="editNotifications"><![CDATA[为 %0% 编写通知]]></key>
+    <key alias="mailSubject"><![CDATA[在 %2%，[%0%] 关于 %1% 的通告已执行。]]></key>
+    <key alias="mailBody"><![CDATA[
+%0%：
+
+  您好！这是一封自动邮件，提醒您用户'%3%'执行'%1%'任务已经在完成'%2%'。
+      
+
+      转到 http://%4%/actions/editContent.aspx?id=%5% 进行编辑
+    
+    ]]></key>
+    <key alias="mailBodyHtml"><![CDATA[<p>%0%：</p>
+
+		  <p>您好！这是一封自动发送的邮件，告诉您任务<strong>'%1%'</strong>已在<a href="%7%"><strong>'%2%'</strong></a>被用户<strong>'%3%'</strong>执行
+	  </p>
+		  <div style="margin: 8px 0; padding: 8px; display: block;">
+				<br />
+				<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISH&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;DELETE&nbsp;&nbsp;&nbsp;&nbsp;</a>
+				<br />
+		  </div>
+		  <p>
+			  <h3>Update summary:</h3>
+			  <table style="width: 100%;">
+						   %6%
+				</table>
+			 </p>
+
+		  <div style="margin: 8px 0; padding: 8px; display: block;">
+				<br />
+				<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISH&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;DELETE&nbsp;&nbsp;&nbsp;&nbsp;</a>
+				<br />
+		  </div>
+
+		  <p>Have a nice day!<br /><br />
+			  Cheers from the umbraco robot
+		  </p>
+    ]]></key>
+  </area>
+  <area alias="translation">
+    <key alias="pageHasBeenSendToTranslation"><![CDATA[页面'%0%'已经发送给翻译]]></key>
+    <key alias="sendToTranslate"><![CDATA[发送页面'%0%'以便翻译]]></key>
+    <key alias="noTranslators"><![CDATA[没有翻译员，请创建翻译员角色的用户。]]></key>
+    <key alias="translator"><![CDATA[翻译员]]></key>
+    <key alias="translateTo"><![CDATA[翻译到]]></key>
+    <key alias="includeSubpages"><![CDATA[包含子页]]></key>
+    <key alias="mailSubject"><![CDATA[[%0%]翻译任务：%1%]]></key>
+    <key alias="mailBody"><![CDATA[
+     %0%：
+
+     您好！这是一封自动邮件来提醒您注意，%2%的文档'%1%'
+     需要您翻译为'%5%' 
+
+     转到 http://%3%/translation/details.aspx?id=%4% 进行编辑
+
+      或登录http://%3%/umbraco.aspx查看任务
+
+      祝好运!]]></key>
+    <key alias="assignedTasks"><![CDATA[标记为您的任务]]></key>
+    <key alias="assignedTasksHelp"><![CDATA[ 下面的翻译任务<strong>分配给您</strong>. 查看详情, 点击“详情”或页名。 
+     如果需要XML格式，请点击“下载 Xml”链接。<br/>
+     关闭翻译任务，请返回详细视图点击“关闭”按钮。
+    
+    ]]></key>
+    <key alias="ownedTasks"><![CDATA[您创建的任务]]></key>
+    <key alias="ownedTasksHelp"><![CDATA[ 下面是<strong>您创建</strong>的页面. 查看详情, 点击“详情” 或页名. 
+     如果需要XML格式，请点击“下载 Xml”链接。<br/>
+     关闭翻译任务，请返回详细视图点击“关闭”按钮。
+    
+    ]]></key>
+    <key alias="downloadTaskAsXml"><![CDATA[下载 xml]]></key>
+    <key alias="downloadAllAsXml"><![CDATA[将翻译任务下载为xml]]></key>
+    <key alias="DownloadXmlDTD"><![CDATA[下载 xml DTD]]></key>
+    <key alias="closeTask"><![CDATA[关闭任务]]></key>
+    <key alias="uploadTranslationXml"><![CDATA[上传翻译的xml]]></key>
+    <key alias="taskOpened"><![CDATA[任务开启]]></key>
+    <key alias="taskAssignedBy"><![CDATA[分配者]]></key>
+    <key alias="totalWords"><![CDATA[总字数]]></key>
+    <key alias="details"><![CDATA[翻译详情]]></key>
+    <key alias="fields"><![CDATA[字段]]></key>
+    <key alias="translationOptions"><![CDATA[翻译选项]]></key>
+    <key alias="translationDone"><![CDATA[翻译完成。]]></key>
+    <key alias="translationFailed"><![CDATA[翻译失败，XML可能损坏了。]]></key>
+    <key alias="translationDoneHelp"><![CDATA[您可以浏览刚翻译的页面，如果原始页存在，您将得到两者的比较。]]></key>
+  </area>
+  <area alias="packager">
+    <key alias="packageMetaData"><![CDATA[元数据]]></key>
+    <key alias="packageName"><![CDATA[名称]]></key>
+    <key alias="packageVersion"><![CDATA[版本]]></key>
+    <key alias="packageAuthor"><![CDATA[作者]]></key>
+    <key alias="packageDocumentation"><![CDATA[文档]]></key>
+    <key alias="packageDemonstration"><![CDATA[演示]]></key>
+    <key alias="packageRepository"><![CDATA[程序库]]></key>
+    <key alias="packageReadme"><![CDATA[说明]]></key>
+    <key alias="packageOptions"><![CDATA[选项]]></key>
+    <key alias="viewPackageWebsite"><![CDATA[访问扩展包网站]]></key>
+    <key alias="packageUninstallHeader"><![CDATA[卸载]]></key>
+    <key alias="packageUninstallText"><![CDATA[选择想要卸载的项目，点击“卸载”<br />
+      <span style="color: Red; font-weight: bold;">注意：</span>卸载包将导致所有依赖该包的东西失效，请确认。
+    ]]></key>
+    <key alias="packageUninstallConfirm"><![CDATA[确认卸载]]></key>
+    <key alias="packageUninstalledHeader"><![CDATA[已卸载]]></key>
+    <key alias="packageUninstalledText"><![CDATA[扩展包卸载成功]]></key>
+    <key alias="packageNoItemsHeader"><![CDATA[扩展包不含任何项]]></key>
+    <key alias="packageNoItemsText"><![CDATA[该扩展包不包含任何项<br/><br/>
+      点击下面的“卸载”，您可以安全的删除。
+    ]]></key>
+    <key alias="packageUpgradeHeader"><![CDATA[更新扩展包]]></key>
+    <key alias="packageUpgradeText"><![CDATA[扩展包有可用的更新，您可以从程序库网站更新。]]></key>
+    <key alias="packageNoUpgrades"><![CDATA[无可用更新]]></key>
+    <key alias="packageUpgradeInstructions"><![CDATA[更新说明]]></key>
+    <key alias="packageUpgradeDownload"><![CDATA[从程序库下载更新]]></key>
+    <key alias="chooseLocalPackageText"><![CDATA[
+      从本机安装扩展包，可以点击“浏览”按钮<br />
+      选择 ".umb" 或者 ".zip" 文件
+            
+    ]]></key>
+  </area>
+  <area alias="installer">
+    <key alias="thankYou"><![CDATA[感谢选择我们的产品]]></key>
+    <key alias="welcomeIntro"><![CDATA[本向导将指引您完成配置和安装（或升级安装）系统
+<br /><br />
+按 <strong>“下一步”</strong>进入向导。]]></key>
+    <key alias="greatStart"><![CDATA[作为入门者，从视频教程开始吧！]]></key>
+    <key alias="watch"><![CDATA[观看]]></key>
+    <key alias="step1"><![CDATA[步骤 1/5：接受许可协议]]></key>
+    <key alias="licenseText"><![CDATA[点击下一步 (或在Web.config中自行修改umbracoConfigurationStatus)，意味着您接受上述许可协议。]]></key>
+    <key alias="step2"><![CDATA[步骤 2/5：数据库配置]]></key>
+    <key alias="databaseHeader"><![CDATA[数据库配置]]></key>
+    <key alias="databaseText"><![CDATA[完成本步，需要配置一个正确的连接字符串（“connection string”）。<br />
+      如有必要，请联系您的系统管理员。
+      如果您是本机安装，请使用管理员账号。
+    ]]></key>
+    <key alias="databaseFound"><![CDATA[发现数据库]]></key>
+    <key alias="databaseUpToDate"><![CDATA[您的数据库已安装！点击<strong>下一步</strong>继续]]></key>
+    <key alias="databaseUpgrade"><![CDATA[
+      <p>
+     点击<strong>更新</strong>来更新系统到 %0%</p>
+      <p>
+      不用担心更新会丢失数据！
+      </p>    
+      
+    ]]></key>
+    <key alias="databaseInstall"><![CDATA[
+      点击<strong>安装</strong>进行 %0% 数据库配置
+    
+    ]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>数据库未找到！请检查数据库连接串设置。</p>
+              <p>您可以自行编辑“web.config”文件，键名为 “umbracoDbDSN”</p>
+              <p>
+             当自行编辑后，单击<strong>重试</strong>按钮<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">。
+			            如何编辑web.config</a></p>
+    ]]></key>
+    <key alias="databaseInstallDone"><![CDATA[%0%数据库安装完成。点击<strong>下一步</strong>继续。]]></key>
+    <key alias="databaseUpgradeDone"><![CDATA[数据库已更新到版本 %0%。<br />点击<strong>下一步</strong>继续。]]></key>
+    <key alias="databaseErrorCannotConnect"><![CDATA[无法连接到数据库。]]></key>
+    <key alias="databaseErrorWebConfig"><![CDATA[无法保存web.config文件，请手工修改。]]></key>
+    <key alias="Unavailable"><![CDATA[无法连接到数据库。]]></key>
+    <key alias="None"><![CDATA[安装失败。]]></key>
+    <key alias="Version3"><![CDATA[系统版本 3]]></key>
+    <key alias="Version4"><![CDATA[系统版本 4]]></key>
+    <key alias="step3"><![CDATA[步骤 3/5：文件权限验证]]></key>
+    <key alias="permissionsText"><![CDATA[
+      系统需要磁盘的读写权限以实现功能，比如模板文件、站点中Cache文件的的操作等。
+    ]]></key>
+    <key alias="permissionsPerfect"><![CDATA[<strong>您当前的权限设置正确！</strong><br /><br />
+             您可以运行系统并安装其它扩展包！
+    ]]></key>
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>您当前的安全设置满足要求!</strong><br /><br />
+        您可以毫无问题的运行系统，但您不能安装系统所推荐的扩展包的完整功能。
+    ]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>您当前的安全设置不适合于系统!</strong>
+          <br /><br />
+         您需要修改系统访问权限。
+    ]]></key>
+    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>您当前的安全设置有问题！</strong>
+      <br/><br />
+      您可以毫无问题的运行系统，但您不能新建文件夹、也不能安装系统所推荐的包的完整功能。
+    ]]></key>
+    <key alias="permissionsHowtoResolve"><![CDATA[如何解决]]></key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[观看我们的<strong>视频教程</strong> ]]></key>
+    <key alias="permissionsHowtoResolveLink"><![CDATA[点击阅读文字版]]></key>
+    <key alias="permissionsSettingUpPermissions"><![CDATA[设置文件夹权限]]></key>
+    <key alias="permissionsAffectedFolders"><![CDATA[受影响的文件和文件夹]]></key>
+    <key alias="permissionsAffectedFoldersText"><![CDATA[您需要对以下文件和文件夹授于ASP.NET用户修改权限]]></key>
+    <key alias="permissionsAffectedFoldersMoreInfo"><![CDATA[此处查看更多信息]]></key>
+    <key alias="permissionsResolveFolderIssues"><![CDATA[解决文件夹问题]]></key>
+    <key alias="permissionsResolveFolderIssuesLink"><![CDATA[点此查看ASP.NET和创建文件夹的问题解决方案]]></key>
+    <key alias="step4"><![CDATA[步骤 4/5：系统安全性]]></key>
+    <key alias="defaultUserText"><![CDATA[
+        <p>
+          系统创建了一个默认用户<strong>(‘admin’)</strong>和默认密码<strong>(‘default’)</strong>。现在密码是随机的。
+        </p>
+        <p>
+        该步骤建议您修改默认密码。
+        </p>
+      
+    ]]></key>
+    <key alias="defaultUserPasswordChanged"><![CDATA[密码已更改]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>默认账户已禁用或无权访问系统！</strong></p><p>点击<b>下一步</b>继续。]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>安装过程中默认用户密码已更改</strong></p><p>点击<strong>下一步</strong>继续。]]></key>
+    <key alias="defaultUserChangePass"><![CDATA[<strong>需要修改默认密码！</strong>]]></key>
+    <key alias="step5"><![CDATA[步骤 5/5：一切就绪，可以开始使用系统。]]></key>
+    <key alias="runwayHeader"><![CDATA[您刚刚安装了一个干净的系统，要继续吗？]]></key>
+    <key alias="runwaySimpleSite"><![CDATA[给我一个简单的网站]]></key>
+    <key alias="runwayFromScratch"><![CDATA[我要从头开始]]></key>
+    <key alias="runwaySimpleSiteText"><![CDATA[
+      <p>
+      “Runway”是一个简单的，包含文件类型和模板的示例网站。安装程序会自动为您安装。
+       您可以自行编辑和删除之。
+        “Runway”为新手提供了最佳的入门功能
+        </p>
+        <small>
+        <em>Runway:</em> Home page, Getting Started page, Installing Modules page.<br />
+        <em>可选模块:</em> Top Navigation, Sitemap, Contact, Gallery.
+        </small>
+      
+    ]]></key>
+    <key alias="runwayFromScratchText"><![CDATA[
+       此时您的网站是全空的,您应该首先建立您的文档类型和模板
+        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">如何操作？</a>)
+       您也可以安装晚一些安装“Runway”。
+      
+    ]]></key>
+    <key alias="runwayWhatIsRunway"><![CDATA[“Runway”是什么？]]></key>
+    <key alias="runwayInstalled"><![CDATA[“Runway”已安装]]></key>
+    <key alias="runwayInstalledText"><![CDATA[
+		在顶部选择您想要的功能模块<br />
+      这是我们推荐的模块，您也可以查看 <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">全部模块</a>
+      
+    ]]></key>
+    <key alias="runwayOnlyProUsers"><![CDATA[仅推荐高级用户使用]]></key>
+    <key alias="theEndHeader"><![CDATA[系统 %0% 安装完毕]]></key>
+    <key alias="theEndInstallFailed"><![CDATA[完成安装，您需要手工编辑<strong>/web.config file</strong> 的 AppSetting 键 <strong>umbracoConfigurationStatus</strong>为 <strong>'%0%'</strong>。]]></key>
+    <key alias="theEndInstallSuccess"><![CDATA[您想要<strong>立即开始</strong>请点“运行系统”<br />如果您是<strong>新手</strong>, 您可以得到相当丰富的学习资源。]]></key>
+    <key alias="theEndBrowseSite"><![CDATA[<h3>浏览您的新站点</h3>
+您安装了“Runway”，那么来瞧瞧吧。]]></key>
+    <key alias="theEndFurtherHelp"><![CDATA[<h3>更多的帮助信息</h3>
+从社区获取帮助]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>运行系统</h3>
+管理您的网站, 运行后台添加内容，也可以添加模板和功能。
+    ]]></key>
+  </area>
+  <area alias="relatedlinks">
+    <key alias="modeUp"><![CDATA[上移
+    ]]></key>
+    <key alias="modeDown"><![CDATA[下移
+    ]]></key>
+    <key alias="removeLink"><![CDATA[移除链接
+    ]]></key>
+    <key alias="newWindow"><![CDATA[新窗口打开
+    ]]></key>
+    <key alias="addInternal"><![CDATA[加入内部链接
+    ]]></key>
+    <key alias="addExternal"><![CDATA[加入外部链接
+    ]]></key>
+    <key alias="caption"><![CDATA[标题
+    ]]></key>
+    <key alias="linkurl"><![CDATA[链接地址
+    ]]></key>
+    <key alias="internalPage"><![CDATA[站内页面
+    ]]></key>
+    <key alias="addlink"><![CDATA[添加
+    ]]></key>
+  </area>
+  <key alias="transferCourierRevision">转换</key>
+  <key alias="transferCourierItem">转换</key>
+</language>

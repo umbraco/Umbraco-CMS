@@ -1,17 +1,12 @@
-﻿using System.Diagnostics;
-using umbraco.cms.businesslogic.web;
+﻿using umbraco.cms.businesslogic.web;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using umbraco.BusinessLogic;
-using System.Xml;
 using System.Linq;
-using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.datatype;
-using System.Data.SqlClient;
-using umbraco.cms.businesslogic;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
     
     

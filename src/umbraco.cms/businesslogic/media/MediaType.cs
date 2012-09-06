@@ -48,10 +48,15 @@ namespace umbraco.cms.businesslogic.media
         /// <returns>The MediaType with the alias</returns>
         public static new MediaType GetByAlias(string Alias)
         {
-            return new MediaType(
-                            SqlHelper.ExecuteScalar<int>(@"SELECT nodeid from cmsContentType INNER JOIN umbracoNode on cmsContentType.nodeId = umbracoNode.id WHERE nodeObjectType=@nodeObjectType AND alias=@alias",
-                                SqlHelper.CreateParameter("@nodeObjectType", MediaType._objectType),
-                                SqlHelper.CreateParameter("@alias", Alias)));
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(@"SELECT nodeid from cmsContentType INNER JOIN umbracoNode on cmsContentType.nodeId = umbracoNode.id WHERE nodeObjectType=@nodeObjectType AND alias=@alias",
+                               SqlHelper.CreateParameter("@nodeObjectType", MediaType._objectType),
+                               SqlHelper.CreateParameter("@alias", Alias)))
+            {
+                if(dr.Read())
+                    return new MediaType(dr.GetInt("nodeid"));
+                else
+                    return null;
+            }
         }
 
         /// <summary>

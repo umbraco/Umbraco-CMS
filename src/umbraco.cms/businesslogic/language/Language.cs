@@ -9,8 +9,6 @@ using umbraco.BusinessLogic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Umbraco.Test")]
-
 namespace umbraco.cms.businesslogic.language
 {
     /// <summary>

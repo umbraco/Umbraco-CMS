@@ -41,7 +41,7 @@ namespace umbraco.cms.businesslogic.relation
 		public RelationType(int id)
 		{
 			using (IRecordsReader dr = SqlHelper.ExecuteReader(
-				"select id, dual, name, alias from umbracoRelationType where id = @id", SqlHelper.CreateParameter("@id", id)))
+				"SELECT id, [dual], name, alias FROM umbracoRelationType WHERE id = @id", SqlHelper.CreateParameter("@id", id)))
 			{
                 if (dr.Read())
                 {
@@ -70,7 +70,7 @@ namespace umbraco.cms.businesslogic.relation
 			{
 				_name = value;
 				SqlHelper.ExecuteNonQuery(
-					"update umbracoRelationType set name = @name where id = " + this.Id.ToString(), SqlHelper.CreateParameter("@name", value));
+					"UPDATE umbracoRelationType SET name = @name WHERE id = " + this.Id.ToString(), SqlHelper.CreateParameter("@name", value));
 				this.InvalidateCache();
 			}
 		}
@@ -82,7 +82,7 @@ namespace umbraco.cms.businesslogic.relation
 			{
 				_alias = value;
 				SqlHelper.ExecuteNonQuery(
-					"update umbracoRelationType set alias = @alias where id = " + this.Id.ToString(), SqlHelper.CreateParameter("@alias", value));
+					"UPDATE umbracoRelationType SET alias = @alias WHERE id = " + this.Id.ToString(), SqlHelper.CreateParameter("@alias", value));
 				this.InvalidateCache();
 			}
 		}
@@ -94,7 +94,7 @@ namespace umbraco.cms.businesslogic.relation
 			{
 				_dual = value;
 				SqlHelper.ExecuteNonQuery(
-					"update umbracoRelationType set [dual] = @dual where id = " + this.Id.ToString(), SqlHelper.CreateParameter("@dual", value));
+					"UPDATE umbracoRelationType SET [dual] = @dual WHERE id = " + this.Id.ToString(), SqlHelper.CreateParameter("@dual", value));
 				this.InvalidateCache();
 			}
 		}
@@ -128,7 +128,7 @@ namespace umbraco.cms.businesslogic.relation
         {
             var relationTypes = new List<RelationType>();
 
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select id, dual, name, alias from umbracoRelationType"))
+            using (IRecordsReader dr = SqlHelper.ExecuteReader("SELECT id, [dual], name, alias FROM umbracoRelationType"))
             {
                 while (dr.Read())
                 {

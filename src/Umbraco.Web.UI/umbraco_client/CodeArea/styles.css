@@ -1,0 +1,10 @@
+ .CodeMirror { 
+        border: none !Important;
+        font-size: 14px !Important;
+    }
+    
+ .CodeMirror-gutter{background: none !Important; border: none; padding-rigth: 5px;}
+ 
+ span.cm-at{background: yellow !Important;}
+ 
+ textarea.codepress{display: block; width: 100% !Important; font-size: 14px;}

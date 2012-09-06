@@ -7,7 +7,7 @@ using umbraco.cms.businesslogic.member;
 using umbraco.BusinessLogic;
 using System.Linq;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
     
     

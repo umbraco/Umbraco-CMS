@@ -1,22 +1,19 @@
-﻿using System.Diagnostics;
-using umbraco.cms.businesslogic.web;
+﻿using umbraco.cms.businesslogic.web;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using System.Collections.Generic;
 using System.Xml;
-using Microsoft.VisualStudio.TestTools.UnitTesting.Web;
 using System.Linq;
 using System.Threading;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.editorControls.textfield;
-using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.language;
 using umbraco.BusinessLogic.console;
 
-namespace umbraco.Test
+namespace Umbraco.LegacyTests
 {
     
     
@@ -864,13 +861,14 @@ namespace umbraco.Test
         /// <returns></returns>
         internal static int GetExistingDocTypeId()
         {
+            System.Diagnostics.Debugger.Launch();
+
             var types = DocumentType.GetAllAsList();
             DocumentType found = null;
-            TextFieldDataType txtField = new TextFieldDataType();
+            var txtField = new TextFieldDataType();
             foreach (var d in types)
             {
-                var prop = d.PropertyTypes
-                    .Where(x => x.DataTypeDefinition.DataType.Id == txtField.Id).FirstOrDefault();
+                var prop = d.PropertyTypes.FirstOrDefault(x => x.DataTypeDefinition.DataType.Id == txtField.Id);
                 if (prop != null)
                 {
                     found = d;

@@ -39,27 +39,27 @@ namespace umbraco.BusinessLogic
             var inString = "'" + string.Join("','", allAliases) + "'";
 
             Application.LoadXml(doc =>
-            {
-                foreach (var attr in attrs)
                 {
-                    doc.Root.Add(new XElement("add",
-                                              new XAttribute("alias", attr.Alias),
-                                              new XAttribute("name", attr.Name),
-                                              new XAttribute("icon", attr.Icon),
-                                              new XAttribute("sortOrder", attr.SortOrder)));
-                }
+                    foreach (var attr in attrs)
+                    {
+                        doc.Root.Add(new XElement("add",
+                                                  new XAttribute("alias", attr.Alias),
+                                                  new XAttribute("name", attr.Name),
+                                                  new XAttribute("icon", attr.Icon),
+                                                  new XAttribute("sortOrder", attr.SortOrder)));
+                    }
 
-                var dbApps = SqlHelper.ExecuteReader("SELECT * FROM umbracoApp WHERE appAlias NOT IN (" + inString + ")");
-                while (dbApps.Read())
-                {
-                    doc.Root.Add(new XElement("add",
-                                              new XAttribute("alias", dbApps.GetString("appAlias")),
-                                              new XAttribute("name", dbApps.GetString("appName")),
-                                              new XAttribute("icon", dbApps.GetString("appIcon")),
-                                              new XAttribute("sortOrder", dbApps.GetByte("sortOrder"))));
-                }
+                    var dbApps = SqlHelper.ExecuteReader("SELECT * FROM umbracoApp WHERE appAlias NOT IN ("+ inString +")");
+                    while (dbApps.Read())
+                    {
+                        doc.Root.Add(new XElement("add",
+                                                  new XAttribute("alias", dbApps.GetString("appAlias")),
+                                                  new XAttribute("name", dbApps.GetString("appName")),
+                                                  new XAttribute("icon", dbApps.GetString("appIcon")),
+                                                  new XAttribute("sortOrder", dbApps.GetByte("sortOrder"))));
+                    }
 
-            }, true);
+                }, true);
 
             //SqlHelper.ExecuteNonQuery("DELETE FROM umbracoApp");
         }

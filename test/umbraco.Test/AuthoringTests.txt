@@ -20,3 +20,11 @@ and see if it works (For some reason on my machine in VS2010, i can't have the w
 unit tests, in VS2008 this did work)
 ** If the tests don't work, you'll need to investigate why... could be just a config issue, a data issue or could 
 just be bugs and the tests only work on my machine :)
+
+**** DEBUGGING INFO *******
+
+debugging unit tests for ASP.Net (because it runs in a context) can't be debugged directly in the same VS as your running the tests. 
+
+Unfortunately the only way to do it is to add this line to your unit test you want to debug:
+
+System.Diagnostics.Debugger.Launch();

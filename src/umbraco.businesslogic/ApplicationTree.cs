@@ -186,7 +186,7 @@ namespace umbraco.BusinessLogic
         {
             get { return _action; }
             set { _action = value; }
-        }
+        }        
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationTree"/> class.
@@ -408,9 +408,9 @@ namespace umbraco.BusinessLogic
         private static void EnsureCache()
         {
             //don't query the database if the cache is not null
-            if (HttpRuntime.Cache[CacheKey] != null)
+            if (HttpRuntime.Cache[CacheKey] != null) 
                 return;
-
+            
             lock (Locker)
             {
                 if (HttpRuntime.Cache[CacheKey] == null)
@@ -442,23 +442,23 @@ namespace umbraco.BusinessLogic
                     LoadXml(doc =>
                     {
                         foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
-                        {
-                            var sortOrderAttr = x.Attribute("sortOrder");
-                            return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
-                        }))
+                                {
+                                    var sortOrderAttr = x.Attribute("sortOrder");
+                                    return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
+                                }))
                         {
                             list.Add(new ApplicationTree(
-                                         addElement.Attribute("silent") != null ? Convert.ToBoolean(addElement.Attribute("silent").Value) : false,
-                                         addElement.Attribute("initialize") != null ? Convert.ToBoolean(addElement.Attribute("initialize").Value) : true,
-                                         addElement.Attribute("sortOrder") != null ? Convert.ToByte(addElement.Attribute("sortOrder").Value) : (byte)0,
-                                         addElement.Attribute("application").Value,
-                                         addElement.Attribute("alias").Value,
-                                         addElement.Attribute("title").Value,
-                                         addElement.Attribute("iconClosed").Value,
-                                         addElement.Attribute("iconOpen").Value,
-                                         addElement.Attribute("assembly").Value,
-                                         addElement.Attribute("type").Value,
-                                         addElement.Attribute("action") != null ? addElement.Attribute("action").Value : ""));
+                                             addElement.Attribute("silent") != null ? Convert.ToBoolean(addElement.Attribute("silent").Value) : false,
+                                             addElement.Attribute("initialize") != null ? Convert.ToBoolean(addElement.Attribute("initialize").Value) : true,
+                                             addElement.Attribute("sortOrder") != null ? Convert.ToByte(addElement.Attribute("sortOrder").Value) : (byte)0,
+                                             addElement.Attribute("application").Value,
+                                             addElement.Attribute("alias").Value,
+                                             addElement.Attribute("title").Value,
+                                             addElement.Attribute("iconClosed").Value,
+                                             addElement.Attribute("iconOpen").Value,
+                                             addElement.Attribute("assembly").Value,
+                                             addElement.Attribute("type").Value,
+                                             addElement.Attribute("action") != null ? addElement.Attribute("action").Value : ""));
                         }
                     }, false);
 

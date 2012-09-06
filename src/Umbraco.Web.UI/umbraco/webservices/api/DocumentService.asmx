@@ -1,0 +1,1 @@
+<%@ WebService Language="C#" CodeBehind="DocumentService.asmx.cs" Class="umbraco.webservices.documents.documentService" %>

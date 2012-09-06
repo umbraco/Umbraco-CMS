@@ -125,7 +125,7 @@ namespace umbraco.cms.businesslogic.member
 
             var tmp = new List<Member>();
             using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany.Trim(), "(ASCII(SUBSTRING(text, 1, 1)) NOT BETWEEN ASCII('a') AND ASCII('z')) AND (ASCII(SUBSTRING(text, 1, 1)) NOT BETWEEN ASCII('A') AND ASCII('Z'))", "umbracoNode.text"),
+                                        string.Format(m_SQLOptimizedMany.Trim(), "LOWER(SUBSTRING(text, 1, 1)) NOT IN ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z')", "umbracoNode.text"),
                                             SqlHelper.CreateParameter("@nodeObjectType", Member._objectType)))
             {
                 while (dr.Read())

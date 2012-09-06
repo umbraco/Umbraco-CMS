@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
 using System.Xml;
+using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
 
 namespace umbraco.cms.businesslogic.media
@@ -13,6 +15,13 @@ namespace umbraco.cms.businesslogic.media
         public abstract List<string> Extensions { get; }
         public virtual int Priority { get { return 1000; } }
         public abstract string MediaTypeAlias { get; }
+
+        internal readonly IMediaFileSystem _fileSystem;
+
+        protected UmbracoMediaFactory()
+        {
+            _fileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<IMediaFileSystem>();
+        }
 
         public virtual bool CanHandleMedia(int parentNodeId, PostedMediaFile postedFile, User user)
         {
@@ -32,16 +41,13 @@ namespace umbraco.cms.businesslogic.media
 
         public Media HandleMedia(int parentNodeId, PostedMediaFile postedFile, User user)
         {
-            return HandleMedia(parentNodeId, postedFile, user, false);
-        }
-
-        public Media HandleMedia(int parentNodeId, PostedMediaFile postedFile, User user, bool replaceExisting)
-        {
             // Check to see if a file exists
             Media media;
-            string mediaName = extractTitleFromFileName(postedFile.FileName);
+            string mediaName = !string.IsNullOrEmpty(postedFile.DisplayName)
+                ? postedFile.DisplayName
+                : extractTitleFromFileName(postedFile.FileName);
 
-            if (replaceExisting && TryFindExistingMedia(parentNodeId, postedFile.FileName, out media))
+            if (postedFile.ReplaceExisting && TryFindExistingMedia(parentNodeId, postedFile.FileName, out media))
             {
                 // Do nothing as existing media is returned
             }
@@ -61,29 +67,17 @@ namespace umbraco.cms.businesslogic.media
             return media;
         }
 
+        [Obsolete("Use HandleMedia(int, PostedMediaFile, User) and set the ReplaceExisting property on PostedMediaFile instead")]
+        public Media HandleMedia(int parentNodeId, PostedMediaFile postedFile, User user, bool replaceExisting)
+        {
+            postedFile.ReplaceExisting = replaceExisting;
+
+            return HandleMedia(parentNodeId, postedFile, user);
+        }
+
         public abstract void DoHandleMedia(Media media, PostedMediaFile uploadedFile, User user);
 
         #region Helper Methods
-
-        public string ConstructDestPath(int propertyId)
-        {
-            if (UmbracoSettings.UploadAllowDirectories)
-            {
-                var path = VirtualPathUtility.Combine(VirtualPathUtility.AppendTrailingSlash(IO.SystemDirectories.Media), propertyId.ToString());
-
-                return VirtualPathUtility.ToAbsolute(VirtualPathUtility.AppendTrailingSlash(path));
-            }
-
-            return VirtualPathUtility.ToAbsolute(VirtualPathUtility.AppendTrailingSlash(IO.SystemDirectories.Media));
-        }
-
-        public string ConstructDestFileName(int propertyId, string filename)
-        {
-            if (UmbracoSettings.UploadAllowDirectories)
-                return filename;
-
-            return propertyId + "-" + filename;
-        }
 
         public bool TryFindExistingMedia(int parentNodeId, string fileName, out Media existingMedia)
         {
@@ -95,11 +89,10 @@ namespace umbraco.cms.businesslogic.media
                     var prop = childMedia.getProperty("umbracoFile");
                     if (prop != null)
                     {
-                        var destFileName = ConstructDestFileName(prop.Id, fileName);
-                        var destPath = ConstructDestPath(prop.Id);
-                        var destFilePath = VirtualPathUtility.Combine(destPath, destFileName);
+                        var destFilePath = _fileSystem.GetRelativePath(prop.Id, fileName);
+                        var destFileUrl = _fileSystem.GetUrl(destFilePath);
 
-                        if (prop.Value.ToString() == destFilePath)
+                        if (prop.Value.ToString() == destFileUrl)
                         {
                             existingMedia = childMedia;
                             return true;

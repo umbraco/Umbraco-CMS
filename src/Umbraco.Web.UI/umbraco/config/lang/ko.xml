@@ -1,0 +1,963 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<language alias="ko" intName="Korean" localName="한국어" lcid="18" culture="ko-KR">
+  <creator>
+    <name>The Umbraco community</name>
+    <link>http://umbraco.org/documentation/language-files</link>
+  </creator>
+  <area alias="main">
+    <key alias="sections"><![CDATA[세부항목]]></key>
+    <key alias="dashboard"><![CDATA[대시보드]]></key>
+    <key alias="tree"><![CDATA[컨텐츠]]></key>
+  </area>
+  <area alias="defaultdialogs">
+    <key alias="link"><![CDATA[링크]]></key>
+    <key alias="insertlink"><![CDATA[링크 삽입]]></key>
+    <key alias="insertgraphicheadline"><![CDATA[그래픽 헤드라인 삽입]]></key>
+    <key alias="linknewwindow"><![CDATA[새 창으로 여시겠습니까?]]></key>
+    <key alias="linkinternal"><![CDATA[내부링크:]]></key>
+    <key alias="linklocaltip"><![CDATA[내부링크를 사용하실 때 링크앞에 "#"를 넣어주세요]]></key>
+    <key alias="insertimage"><![CDATA[그림삽입]]></key>
+    <key alias="treepicker"><![CDATA[아이템 선택]]></key>
+    <key alias="confirmdelete"><![CDATA[정말로 삭제하시겠습니까?]]></key>
+    <key alias="confirmdisable" version="2.1"><![CDATA[정말로 비활성화하시겠습니까?]]></key>
+    <key alias="confirmlogout"><![CDATA[로그아웃 하시겠습니까?]]></key>
+    <key alias="insertAnchor"><![CDATA[내부 링크삽입]]></key>
+    <key alias="anchorInsert"><![CDATA[이름]]></key>
+    <key alias="insertMacro"><![CDATA[매크로 삽입]]></key>
+    <key alias="insertCharacter"><![CDATA[문자열 삽입]]></key>
+    <key alias="inserttable"><![CDATA[테이블 삽입]]></key>
+    <key alias="tableColumns"><![CDATA[컬럼수]]></key>
+    <key alias="tableRows"><![CDATA[줄수]]></key>
+    <key alias="paste"><![CDATA[붙여넣기]]></key>
+    <key alias="assignDomain"><![CDATA[호스트네임 관리]]></key>
+    <key alias="confirmSure"><![CDATA[확실합니까?]]></key>
+    <key alias="requiredField"><![CDATA[필수 필드]]></key>
+    <key alias="lastEdited"><![CDATA[마지막 수정]]></key>
+    <key alias="siterepublished"><![CDATA[웹사이트 캐쉬가 재생되었습니다. 모든 발행컨텐츠가 업데이트되었습니다. 그러나 모든 미발행 컨텐츠는 여전히 미발행상태입니다.]]></key>
+    <key alias="siterepublishHelp"><![CDATA[웹사이트 캐쉬가 재생되었습니다. 모든 발행컨텐츠가 업데이트되었습니다. 그러나 모든 미발행 컨텐츠는 미발행상태로 남아있습니다.]]></key>
+    <key alias="sitereindexed"><![CDATA[사이트의 색인이 재생성되었습니다.]]></key>
+    <key alias="editdictionary"><![CDATA[사전 항목 편집]]></key>
+    <key alias="editlanguage"><![CDATA[언어 편집]]></key>
+    <key alias="permissionsEdit" version="2.1"><![CDATA[권한 편집]]></key>
+    <key alias="viewCacheItem"><![CDATA[캐쉬 아이템 보기]]></key>
+    <key alias="thumbnailimageclickfororiginal" version="2.1"><![CDATA[이미지를 전체크기로 보시려면 클릭하세요.]]></key>
+    <key alias="confirmEmptyTrashcan" version="3.0"><![CDATA[%0% 항목(들)을 삭제하시려면 이 박스를 체크하세요]]></key>
+    <key alias="recycleBinIsEmpty" version="3.0"><![CDATA[휴지통이 비었습니다.]]></key>
+    <key alias="recycleBinWarning" version="4.0"><![CDATA[휴지통에서 삭제하시면 완전히 삭제됩니다.]]></key>
+    <key alias="recycleBinDeleting" version="4.0"><![CDATA[휴지통안에 이 항목들이 완전히 삭제중 입니다. 작업이 완료되기전까지 창을 닫지마세요.]]></key>
+    <key alias="closeThisWindow" version="4.0"><![CDATA[이창 닫기]]></key>
+    <key alias="removeMacro" version="4.5"><![CDATA[매크로 삭제]]></key>
+    <key alias="insertMacro" version="4.5"><![CDATA[매크로 추가 클릭]]></key>
+    <key alias="macroContainerSettings" version="4.5"><![CDATA[매크로 세팅]]></key>
+    <key alias="templateContentAreaHelp" version="4.0">
+      <![CDATA[자식템플릿으로부터 이 템플릿에 컨텐츠를 삽입할 수 있는 Placeholder 아이디를 선택하시거나,
+    <code>&lt;asp:컨텐츠 /&gt;</code> 항목을 사용하는 아이디를 참조하여 <strong>Placeholder 아이디를 설정하세요</strong>.]]>
+    </key>
+
+    <key alias="templateContentPlaceHolderHelp" version="4.0">
+      <![CDATA[아래 리스트에서 <strong>Placeholder 아이디를 선택하세요</strong>. 현재 템플릿의 마스터에 아이디들만 선택할 수 있습니다.]]>
+    </key>
+    <key alias="regexSearchHelp" version="4.0"><![CDATA[필드 유효성검사를 위해 정규표현식을 검색합니다. 예: 'email, 'zip-code' 'url']]></key>
+    <key alias="regexSearchError" version="4.0"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>의 웹서비스는 현재 제어할 수 없는 몇가지 문제점이 보고되었습니다. 불편을 드려 대단히 죄송합니다.]]></key>
+
+    <key alias="macroDoesNotHaveProperties" version="4.0">
+      <![CDATA[이 매크로에는 편집할 수 있는 항목이 포함되어 있지 않습니다.]]>
+    </key>
+  </area>
+  <area alias="general">
+    <key alias="properties"><![CDATA[속성]]></key>
+    <key alias="elements"><![CDATA[항목]]></key>
+    <key alias="new"><![CDATA[새로]]></key>
+    <key alias="add"><![CDATA[추가]]></key>
+    <key alias="open"><![CDATA[열기]]></key>
+    <key alias="edit"><![CDATA[편집]]></key>
+    <key alias="close"><![CDATA[닫기]]></key>
+    <key alias="create"><![CDATA[생성]]></key>
+    <key alias="delete"><![CDATA[삭제]]></key>
+    <key alias="sort"><![CDATA[정렬]]></key>
+    <key alias="move"><![CDATA[이동]]></key>
+    <key alias="copy"><![CDATA[복사]]></key>
+    <key alias="rename"><![CDATA[이름바꾸기]]></key>
+    <key alias="logoff"><![CDATA[로그오프]]></key>
+    <key alias="rights"><![CDATA[권한]]></key>
+    <key alias="choose"><![CDATA[선택]]></key>
+    <key alias="alias"><![CDATA[별칭]]></key>
+    <key alias="name"><![CDATA[이름]]></key>
+    <key alias="icon"><![CDATA[아이콘]]></key>
+    <key alias="default"><![CDATA[기본]]></key>
+    <key alias="type"><![CDATA[타입]]></key>
+    <key alias="yes"><![CDATA[예]]></key>
+    <key alias="no"><![CDATA[아니요]]></key>
+    <key alias="ok"><![CDATA[완료]]></key>
+    <key alias="update"><![CDATA[업데이트]]></key>
+    <key alias="cancel"><![CDATA[취소]]></key>
+    <key alias="macro"><![CDATA[매크로]]></key>
+    <key alias="insert"><![CDATA[삽입]]></key>
+    <key alias="size"><![CDATA[사이즈]]></key>
+    <key alias="layout"><![CDATA[레이아웃]]></key>
+    <key alias="design"><![CDATA[디자인]]></key>
+    <key alias="width"><![CDATA[너비]]></key>
+    <key alias="height"><![CDATA[높이]]></key>
+    <key alias="justify"><![CDATA[적용]]></key>
+    <key alias="innerMargin"><![CDATA[내부 마진]]></key>
+    <key alias="cellMargin"><![CDATA[셀 마진]]></key>
+    <key alias="border"><![CDATA[경계선]]></key>
+    <key alias="pleasewait"><![CDATA[잠시만 기다려주세요...]]></key>
+    <key alias="areyousure"><![CDATA[확실합니까?]]></key>
+    <key alias="error"><![CDATA[에러]]></key>
+    <key alias="username"><![CDATA[사용자]]></key>
+    <key alias="password"><![CDATA[비밀번호]]></key>
+    <key alias="login"><![CDATA[로그인]]></key>
+    <key alias="welcome"><![CDATA[환영합니다...]]></key>
+    <key alias="language"><![CDATA[언어]]></key>
+    <key alias="closewindow"><![CDATA[창 닫기]]></key>
+    <key alias="deleted"><![CDATA[삭제됨]]></key>
+    <key alias="edited"><![CDATA[편집됨]]></key>
+    <key alias="of"><![CDATA[의]]></key>
+    <key alias="about"><![CDATA[정보]]></key>
+    <key alias="help"><![CDATA[도움말]]></key>
+    <key alias="logout"><![CDATA[로그아웃]]></key>
+    <key alias="findDocument"><![CDATA[찾기]]></key>
+    <key alias="continue"><![CDATA[계속]]></key>
+    <key alias="value"><![CDATA[값]]></key>
+    <key alias="reciept"><![CDATA[수신된 폼데이터 이메일전송]]></key>
+    <key alias="showPageOnSend"><![CDATA[전송된 페이지보기]]></key>
+    <key alias="show"><![CDATA[보기]]></key>
+    <key alias="view" version="2.1"><![CDATA[보기]]></key>
+    <key alias="user" version="2.1"><![CDATA[사용자]]></key>
+    <key alias="action" version="2.1"><![CDATA[액션]]></key>
+    <key alias="date" version="2.1"><![CDATA[날짜]]></key>
+    <key alias="comment" version="2.1"><![CDATA[코멘트]]></key>
+    <key alias="up" version="2.1"><![CDATA[위로]]></key>
+    <key alias="down" version="2.1"><![CDATA[아래로]]></key>
+    <key alias="recycleBin" version="3.0"><![CDATA[휴지통]]></key>
+    <key alias="deleting" version="3.0"><![CDATA[삭제중...]]></key>
+    <key alias="remaining" version="3.0"><![CDATA[남아있는]]></key>
+    <key alias="import" version="3.0"><![CDATA[가져오기]]></key>
+    <key alias="loading" version="3.0"><![CDATA[로딩]]></key>
+    <key alias="path" version="4.0"><![CDATA[경로]]></key>
+    <key alias="or" version="4.0"><![CDATA[또는]]></key>
+    <key alias="by" version="4.0"><![CDATA[또는]]></key>
+    <key alias="placeHolderID" version="4.0"><![CDATA[Placeholder 아이디]]></key>
+    <key alias="typeToSearch" version="4.0"><![CDATA[검색유형...]]></key>
+    <key alias="email" version="4.0"><![CDATA[이메일]]></key>
+    <key alias="url" version="4.0"><![CDATA[Url]]></key>
+    <key alias="dimensions" version="4.0"><![CDATA[범위]]></key>
+    <key alias="constrainProportions" version="4.0"><![CDATA[비율 맞추기]]></key>
+    <key alias="upload" version="4.0"><![CDATA[업로드]]></key>
+    <key alias="download" version="4.0"><![CDATA[다운로드]]></key>
+    <key alias="confirm" version="4.0"><![CDATA[확인]]></key>
+    <key alias="database" version="4.0"><![CDATA[데이타베이스]]></key>
+    <key alias="server" version="4.0"><![CDATA[서버]]></key>
+    <key alias="upgrade" version="4.0"><![CDATA[업그레이드]]></key>
+    <key alias="install" version="4.0"><![CDATA[설치]]></key>
+    <key alias="retry" version="4.0"><![CDATA[재시도]]></key>
+    <key alias="next" version="4.0"><![CDATA[다음]]></key>
+    <key alias="previous" version="4.0"><![CDATA[이전]]></key>
+    <key alias="search" version="4.0"><![CDATA[검색]]></key>
+  </area>
+  <area alias="dashboard">
+    <key alias="welcome"><![CDATA[환영합니다]]></key>
+    <key alias="openinnew"><![CDATA[새로운 창으로 열렸습니다]]></key>
+    <key alias="nothinghappens"><![CDATA[umbraco 가 열리지 않으면, 이 사이트의 팝업을 허용하여야 합니다]]></key>
+    <key alias="restart"><![CDATA[재시작]]></key>
+    <key alias="browser"><![CDATA[브라우저에서 보기]]></key>
+    <key alias="visit"><![CDATA[방문]]></key>
+  </area>
+  <area alias="sections">
+    <key alias="content"><![CDATA[컨텐츠]]></key>
+    <key alias="media"><![CDATA[미디어]]></key>
+    <key alias="member"><![CDATA[구성원]]></key>
+    <key alias="newsletters"><![CDATA[뉴스레터]]></key>
+    <key alias="users"><![CDATA[사용자]]></key>
+    <key alias="settings"><![CDATA[세팅]]></key>
+    <key alias="developer"><![CDATA[개발도구]]></key>
+    <key alias="statistics"><![CDATA[통계]]></key>
+    <key alias="courier"><![CDATA[가이드]]></key>
+    <key alias="concierge"><![CDATA[안내]]></key>
+    <key alias="translation"><![CDATA[변환]]></key>
+    <key alias="installer"><![CDATA[Umbraco 설치마법사]]></key>
+  </area>
+  <area alias="buttons">
+    <key alias="save"><![CDATA[저장]]></key>
+    <key alias="saveAndPublish"><![CDATA[저장 후 발행]]></key>
+    <key alias="saveToPublish" version="2.1"><![CDATA[저장 후 승인을 위해 전송]]></key>
+    <key alias="htmlEdit"><![CDATA[Html 편집]]></key>
+    <key alias="relations"><![CDATA[관계 편집]]></key>
+    <key alias="showPage"><![CDATA[미리보기]]></key>
+    <key alias="styleChoose"><![CDATA[스타일 선택]]></key>
+    <key alias="styleShow"><![CDATA[스타일 보기]]></key>
+    <key alias="bold"><![CDATA[굵게]]></key>
+    <key alias="italic"><![CDATA[기울임꼴]]></key>
+    <key alias="graphicHeadline"><![CDATA[그래픽 헤드라인 삽입]]></key>
+    <key alias="justifyLeft"><![CDATA[왼쪽 맞춤]]></key>
+    <key alias="justifyCenter"><![CDATA[가운데 맞춤]]></key>
+    <key alias="justifyRight"><![CDATA[오른쪽 맞춤]]></key>
+    <key alias="listBullet"><![CDATA[기호 목록]]></key>
+    <key alias="listNumeric"><![CDATA[번호 목록]]></key>
+    <key alias="indent"><![CDATA[단락 들여쓰기]]></key>
+    <key alias="deindent"><![CDATA[단락 들여쓰기 취소]]></key>
+    <key alias="linkInsert"><![CDATA[하이퍼 링크]]></key>
+    <key alias="linkLocal"><![CDATA[기호 삽입]]></key>
+    <key alias="pictureInsert"><![CDATA[이미지 삽입]]></key>
+    <key alias="macroInsert"><![CDATA[매크로 삽입]]></key>
+    <key alias="tableInsert"><![CDATA[테이블 삽입]]></key>
+    <key alias="formFieldInsert"><![CDATA[폼 필드 삽입]]></key>
+  </area>
+  <area alias="content">
+    <key alias="about"><![CDATA[이 페이지 정보]]></key>
+    <key alias="nodeName"><![CDATA[페이지 제목]]></key>
+    <key alias="alias"><![CDATA[대체 링크]]></key>
+    <key alias="createDate"><![CDATA[생성일]]></key>
+    <key alias="createBy"><![CDATA[작성자]]></key>
+    <key alias="updateDate"><![CDATA[마지막 수정일]]></key>
+    <key alias="lastPublished"><![CDATA[마지막 발행일]]></key>
+    <key alias="type"><![CDATA[유형]]></key>
+    <key alias="statistics"><![CDATA[통계]]></key>
+    <key alias="releaseDate"><![CDATA[발행됨]]></key>
+    <key alias="expireDate"><![CDATA[삭제됨]]></key>
+    <key alias="publish"><![CDATA[발행]]></key>
+    <key alias="otherElements"><![CDATA[속성]]></key>
+    <key alias="editing"><![CDATA[편집]]></key>
+    <key alias="itemNotPublished"><![CDATA[이 항목은 발행되지 않았습니다.]]></key>
+    <key alias="itemChanged"><![CDATA[이 항목은 발행후 변경되었습니다.]]></key>
+    <key alias="clickToEdit"><![CDATA[이 항목을 편집하시려면 클릭하세요.]]></key>
+    <key alias="documentType"><![CDATA[문서 유형]]></key>
+    <key alias="urls"><![CDATA[문서에 링크]]></key>
+    <key alias="alternativeUrls"><![CDATA[대체 링크]]></key>
+    <key alias="unPublish"><![CDATA[발행취소]]></key>
+    <key alias="publishStatus"><![CDATA[발행 상태]]></key>
+    <key alias="parentNotPublished"><![CDATA[이문서는 발행되었지만 부모문서 '%0%'가 발행되지 않아 볼 수 없습니다.]]></key>
+    <key alias="uploadClear"><![CDATA[파일 삭제]]></key>
+    <key alias="noDate" version="2.1"><![CDATA[날짜가 선택되지 않았습니다.]]></key>
+    <key alias="removeDate" version="2.1"><![CDATA[날짜 삭제]]></key>
+    <key alias="alternativeTextHelp" version="2.1"><![CDATA[(전화위에 그림을 어떻게 설명하시겠습니까)]]></key>
+    <key alias="titleOptional" version="2.1"><![CDATA[제목(옵션)]]></key>
+    <key alias="mediatype" version="2.1"><![CDATA[미디어 타입]]></key>
+    <key alias="membertype" version="2.1"><![CDATA[사용자 타입]]></key>
+    <key alias="membergroup" version="2.1"><![CDATA[사용자 그룹]]></key>
+    <key alias="memberrole" version="4.0"><![CDATA[역할]]></key>
+    <key alias="sortHelp" version="3.0"><![CDATA[노드를 드래그하거나 컬럼헤더를 클릭하면 노드가 정렬됩니다. 쉬프트키나 컨트롤키를 이용하면 여러노드선택이 가능합니다.]]></key>
+    <key alias="sortDone" version="3.0"><![CDATA[정렬이 업데이트되었습니다.]]></key>
+  </area>
+  <area alias="treeHeaders" version="2.1">
+    <key alias="stylesheets" version="2.1"><![CDATA[스타일시트]]></key>
+    <key alias="templates" version="2.1"><![CDATA[템플릿]]></key>
+    <key alias="dictionary" version="2.1"><![CDATA[사전]]></key>
+    <key alias="languages" version="2.1"><![CDATA[언어]]></key>
+    <key alias="mediaTypes" version="2.1"><![CDATA[미디어 타입]]></key>
+    <key alias="nodeTypes" version="2.1"><![CDATA[문서 타입]]></key>
+    <key alias="cacheBrowser" version="2.1"><![CDATA[캐시 브라우저]]></key>
+    <key alias="datatype" version="2.1"><![CDATA[데이터 타입]]></key>
+    <key alias="macros" version="2.1"><![CDATA[매크로]]></key>
+    <key alias="xslt" version="2.1"><![CDATA[XSLT 파일]]></key>
+    <key alias="python" version="2.1"><![CDATA[Python 파일]]></key>
+    <key alias="member" version="2.1"><![CDATA[구성원]]></key>
+    <key alias="memberType" version="2.1"><![CDATA[구성원 유형]]></key>
+    <key alias="memberGroup" version="2.1"><![CDATA[구성원 그룹]]></key>
+    <key alias="memberRoles" version="4.0"><![CDATA[역할]]></key>
+    <key alias="contentRecycleBin" version="4.0"><![CDATA[휴지통]]></key>
+    <key alias="packager" version="4.9"><![CDATA[패키지]]></key>
+	<key alias="packages" version="4.0"><![CDATA[패키지]]></key>
+    <key alias="repositories" version="4.0"><![CDATA[저장소에 설치]]></key>
+    <key alias="createdPackages" version="4.0"><![CDATA[생성된 패키지]]></key>
+    <key alias="installedPackages" version="4.0"><![CDATA[설치된 패키지]]></key>
+    <key alias="runway" version="4.0"><![CDATA[Runway 설치]]></key>
+    <key alias="runwayModules" version="4.0"><![CDATA[Runway 모듈]]></key>
+    <key alias="localPackage" version="4.0"><![CDATA[로컬 패키지 설치]]></key>
+    <key alias="scripts" version="4.0"><![CDATA[스크립트]]></key>
+    <key alias="scripting" version="4.3"><![CDATA[스크립트 파일]]></key>
+  </area>
+  <area alias="user">
+    <key alias="username"><![CDATA[사용자명]]></key>
+    <key alias="loginname"><![CDATA[로그인]]></key>
+    <key alias="password"><![CDATA[비밀번호]]></key>
+
+    <key alias="usertype"><![CDATA[사용자 타입]]></key>
+    <key alias="userPermissions"><![CDATA[사용자권한]]></key>
+    <key alias="userTypes"><![CDATA[사용자 타입]]></key>
+
+    <key alias="language"><![CDATA[언어]]></key>
+    <key alias="startnode"><![CDATA[컨텐츠의 시작노드]]></key>
+    <key alias="mediastartnode"><![CDATA[미디어 라이브러리에 시작노드]]></key>
+    <key alias="modules"><![CDATA[세부항목]]></key>
+    <key alias="administrators"><![CDATA[관리자]]></key>
+    <key alias="editors"><![CDATA[편집자]]></key>
+    <key alias="writer"><![CDATA[작성자]]></key>
+    <key alias="noConsole"><![CDATA[Umbraco 접속 비활성화]]></key>
+    <key alias="disabled"><![CDATA[사용자 비활성화]]></key>
+    <key alias="defaultToLiveEditing" version="4.0"><![CDATA[로그인시 canvas로 리다이렉트]]></key>
+    <key alias="searchAllChildren" version="4.0"><![CDATA[하위항목 모두찾기]]></key>
+
+    <key alias="descriptionField" version="4.0"><![CDATA[설명 필드]]></key>
+    <key alias="categoryField" version="4.0"><![CDATA[카테고리 필드]]></key>
+    <key alias="excerptField" version="4.0"><![CDATA[필드 발췌]]></key>
+    <key alias="documentType" version="4.0"><![CDATA[문서 타입]]></key>
+    <key alias="contentChannel" version="4.0"><![CDATA[컨텐츠 채널]]></key>
+
+    <key alias="permissionSelectPages" version="4.0"><![CDATA[권한변경할 페이지를 선택해주세요]]></key>
+    <key alias="permissionReplaceChildren" version="4.0"><![CDATA[자식노드 권한변경]]></key>
+    <key alias="permissionSelectedPages" version="4.0"><![CDATA[현재 이페이지의 권한을 수정하는 중입니다:]]></key>
+    <key alias="changePassword" version="4.6">Change Your Password</key>
+    <key alias="changePasswordDescription" version="4.6">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
+    <key alias="passwordEnterNew" version="4.6">Enter your new password</key>
+    <key alias="passwordConfirm" version="4.6">Please confirm the new password</key>
+    <key alias="passwordChanged" version="4.6">Your password has been changed!</key>
+    <key alias="passwordIsDifferent" version="4.6">There was a difference between the new password and the confirmed password. Please try again!</key>
+    <key alias="passwordIsBlank" version="4.6">Your new password cannot be blank!</key>
+    <key alias="passwordMismatch" version="4.6">The confirmed password doesn't match the new password!</key>
+  </area>
+  <area alias="settings">
+    <key alias="nodetype"><![CDATA[노드타입]]></key>
+    <key alias="tab"><![CDATA[색인]]></key>
+    <key alias="tabs"><![CDATA[색인]]></key>
+    <key alias="tabname"><![CDATA[색인 제목]]></key>
+    <key alias="objecttype"><![CDATA[타입]]></key>
+    <key alias="defaulttemplate"><![CDATA[기본 템플릿]]></key>
+    <key alias="newtabname"><![CDATA[새 색인 제목]]></key>
+    <key alias="stylesheet" version="2.1"><![CDATA[스타일시트]]></key>
+    <key alias="stylesheet editor egenskab"><![CDATA[스타일시트 속성]]></key>
+    <key alias="dictionary editor egenskab" version="2.1"><![CDATA[사전 키]]></key>
+    <key alias="importDocumentTypeHelp" version="3.0"><![CDATA[문서를 가져오시려면 사용하시는 컴퓨터에 ".udt"를 찾아 선택하시고 "가져오기"를 클릭하세요(다음 단계에서 확인여부를 문의합니다)]]></key>
+  </area>
+  <area alias="graphicheadline">
+    <key alias="bold"><![CDATA[굵게]]></key>
+    <key alias="text"><![CDATA[글꼴]]></key>
+    <key alias="font"><![CDATA[폰트]]></key>
+    <key alias="color"><![CDATA[글자색]]></key>
+    <key alias="backgroundcolor"><![CDATA[배경색]]></key>
+  </area>
+  <area alias="update">
+    <key alias="updateAvailable"><![CDATA[새 업데이트가 준비되었습니다.]]></key>
+    <key alias="updateDownloadText"><![CDATA[%0% 가 준비되었습니다. 다운로드를 위해 여기를 클릭하세요]]></key>
+    <key alias="updateNoServer"><![CDATA[연결할 서버가 없습니다]]><![CDATA[연결할 서버가 없습니다]]></key>
+    <key alias="updateNoServerError"><![CDATA[업데이트을 위해 에러를 체크합니다 더많은 정보를 보시려면 stack 추적을 하세요]]></key>
+  </area>
+  <area alias="actions">
+    <key alias="create"><![CDATA[새로 만들기]]></key>
+    <key alias="move"><![CDATA[이동]]></key>
+    <key alias="copy"><![CDATA[복사]]></key>
+    <key alias="delete"><![CDATA[삭제]]></key>
+    <key alias="sort"><![CDATA[정렬]]></key>
+    <key alias="publish"><![CDATA[발행]]></key>
+    <key alias="toPublish"><![CDATA[발행 항목으로 전달]]></key>
+    <key alias="rights"><![CDATA[권한]]></key>
+    <key alias="protect"><![CDATA[퍼블릭 접근]]></key>
+    <key alias="refreshNode"><![CDATA[노드 새로 고침]]></key>
+    <key alias="update"><![CDATA[업데이트]]></key>
+    <key alias="notify"><![CDATA[알림]]></key>
+    <key alias="logout"><![CDATA[종료]]></key>
+    <key alias="republish"><![CDATA[전체 사이트 재발행]]></key>
+    <key alias="assignDomain"><![CDATA[호스트명 관리]]></key>
+    <key alias="disable" version="2.1"><![CDATA[비활성]]></key>
+    <key alias="auditTrail" version="2.1"><![CDATA[감사 추적]]></key>
+    <key alias="createPackage" version="2.1"><![CDATA[패키지 새로 만들기]]></key>
+    <key alias="importPackage" version="2.1"><![CDATA[패키지 등록]]></key>
+    <key alias="rollback" version="2.1"><![CDATA[롤백]]></key>
+    <key alias="emptyTrashcan" version="3.0"><![CDATA[휴지통 비우기]]></key>
+    <key alias="exportDocumentType" version="3.0"><![CDATA[추출 문서 유형]]></key>
+    <key alias="exportDocumentTypeAsCode" version="3.0"><![CDATA[.NET으로 추출]]></key>
+    <key alias="exportDocumentTypeAsCode-Full" version="3.0"><![CDATA[.NET으로 추출]]></key>
+    <key alias="importDocumentType" version="3.0"><![CDATA[등록 문서 유형]]></key>
+    <key alias="sendToTranslate" version="3.0"><![CDATA[번역 항목으로 전달]]></key>
+    <key alias="translate" version="3.0"><![CDATA[번역]]></key>
+    <key alias="browse" version="4.0"><![CDATA[노드 탐색]]></key>
+    <key alias="sendtopublish" version="4.0"><![CDATA[발행 항목으로 전달]]></key>
+    <key alias="liveEdit" version="4.0"><![CDATA[캔버스 내용 편집]]></key>
+  </area>
+  <area alias="errors">
+    <key alias="startNodeDoesNotExists"><![CDATA[시작노드가 삭제되었습니다. 관리자에게 문의하세요]]></key>
+    <key alias="stylesNoStylesOnPage"><![CDATA[사용할 수 있는 스타일이 없습니다.]]></key>
+    <key alias="stylesMustMarkBeforeSelect"><![CDATA[스타일을 변경하시기 전에 컨텐츠를 체크하세요]]></key>
+    <key alias="pictureResizeBiggerThanOrg"><![CDATA[원본크기보다 큰사이즈의 이미지를 만들려고 합니다. 계속하시겠습니까?]]></key>
+    <key alias="tableColMergeLeft"><![CDATA[합치기 원하시는 두셀의 왼쪽에 커서를 가져다놓으세요]]></key>
+    <key alias="tableSplitNotSplittable"><![CDATA[병합되지 않은 셀을 분리할 수 없습니다.]]></key>
+    <key alias="missingType"><![CDATA[유형을 선택해주세요]]></key>
+    <key alias="missingTitle"><![CDATA[제목을 넣어주세요]]></key>
+    <key alias="xsltErrorHeader"><![CDATA[Xslt 소스에러]]></key>
+    <key alias="xsltErrorText"><![CDATA[에러를 포함하고 있어 XSLT가 저장되지 않았습니다.]]></key>
+    <key alias="pythonErrorHeader"><![CDATA[Python 스크립트 에러]]></key>
+    <key alias="pythonErrorText"><![CDATA[에러를 포함하고 있어 Python 스크립트가 저장되지 않았습니다.]]></key>
+    <key alias="contentTypeAliasAndNameNotNull"><![CDATA[새 속성타입에 이름과 별칭을 모두 채우세요!]]></key>
+    <key alias="filePermissionsError"><![CDATA[특정 파일또는 폴더에 읽기/쓰기 접근제한 문제가 있습니다]]></key>
+    <key alias="codemirroriewarning"><![CDATA[주의! CodeMirror가 설정에서 활성화 되었어도 충분히 안정적이지 않기 때문에 인터넷 익스플로러에선 비활성화 됩니다.]]></key>
+  </area>
+  <area alias="speechBubbles">
+    <key alias="xsltSavedHeader"><![CDATA[Xslt 저장]]></key>
+    <key alias="xsltSavedText"><![CDATA[Xslt 에러없음]]></key>
+    <key alias="xsltErrorHeader"><![CDATA[Xslt 저장되지 않음]]></key>
+    <key alias="xsltPermissionErrorText"><![CDATA[Xslt가 저장되지 않았습니다. 권한을 확인하세요]]></key>
+    <key alias="xsltErrorText"><![CDATA[Xslt 에 에러가 포함됨]]></key>
+
+    <key alias="pythonSavedHeader"><![CDATA[Python 스크립트 저장]]></key>
+    <key alias="pythonSavedText"><![CDATA[Python 스크립트 에러없음]]></key>
+    <key alias="pythonErrorHeader"><![CDATA[Python 스크립트가 저장되지 않았습니다.]]></key>
+    <key alias="pythonErrorText"><![CDATA[Python 스크립트가 에러때문에 저장되지 않았습니다.]]></key>
+
+    <key alias="templateSavedHeader"><![CDATA[템플릿 저장]]></key>
+    <key alias="templateSavedText"><![CDATA[탬플릿이 에러없이 저장되었습니다!]]></key>
+    <key alias="templateErrorHeader"><![CDATA[템플릿이 저장되지 않음]]></key>
+    <key alias="templateErrorText"><![CDATA[2 템플릿에 동일한 별칭이 적용되지 않았는지 확인하시기 바랍니다.]]></key>
+
+    <key alias="cssSavedHeader"><![CDATA[스타일시트 저장]]></key>
+    <key alias="cssSavedText"><![CDATA[스타일시트 에러없이 저장]]></key>
+    <key alias="cssErrorHeader"><![CDATA[스타일시트 저장되지 않음]]></key>
+
+    <key alias="fileErrorHeader"><![CDATA[파일 저장되지 않음]]></key>
+    <key alias="fileErrorText"><![CDATA[파일이 저장되지 않았습니다. 권한을 확인하세요]]></key>
+    <key alias="fileSavedHeader"><![CDATA[파일 저장]]></key>
+    <key alias="fileSavedText"><![CDATA[파일이 에러없이 저장]]></key>
+
+    <key alias="contentTypeSavedHeader"><![CDATA[컨텐츠타입 저장됨]]></key>
+    <key alias="contentTypeTabCreated"><![CDATA[색인 생성]]></key>
+    <key alias="contentTypeTabDeleted"><![CDATA[색인 삭제]]></key>
+    <key alias="contentTypeTabDeletedText">Tab with id: %0% 삭제됨</key>
+    <key alias="contentTypePropertyTypeCreated"><![CDATA[속성타입 생성되었습니다]]></key>
+    <key alias="contentTypeDublicatePropertyType"><![CDATA[속성타입이 이미존재합니다]]></key>
+    <key alias="contentTypePropertyTypeCreatedText">이름: %0% &lt;br /&gt; 데이터타입: %1%</key>
+    <key alias="contentTypePropertyTypeDeleted"><![CDATA[속성타입 삭제됨]]></key>
+    <key alias="dataTypeSaved"><![CDATA[데이터타입 저장됨]]></key>
+    <key alias="editContentSavedHeader"><![CDATA[컨텐츠 저장됨]]></key>
+    <key alias="editContentSavedText"><![CDATA[변경된 내용이 적용되어 발행됨을 기억하세요]]></key>
+    <key alias="editContentPublishedHeader"><![CDATA[컨텐츠 발행됨]]></key>
+    <key alias="editContentPublishedText"><![CDATA[and 웹사이트에서 보기]]></key>
+    <key alias="editContentPublishedFailedByParent"><![CDATA[부모페이지가 발행되지 않았기때문에 발행에 실패했습니다.]]></key>
+    <key alias="contentPublishedFailedByEvent" version="4.0"><![CDATA[3rd party add-in 때문에 발행이 취소되었습니다.]]></key>
+    <key alias="editMemberSaved"><![CDATA[사용자 저장됨]]></key>
+    <key alias="editTemplateSaved"><![CDATA[템플릿 저장됨]]></key>
+    <key alias="editStylesheetSaved"><![CDATA[스타일시트 저장됨]]></key>
+    <key alias="editStylesheetPropertySaved"><![CDATA[스타일시트 속성 저장됨]]></key>
+    <key alias="editUserSaved"><![CDATA[사용자 저장됨]]></key>
+    <key alias="editUserError"><![CDATA[사용자 저장에러(로그 확인)]]></key>
+    <key alias="editContentSendToPublish"><![CDATA[승인을 위해 전송]]></key>
+    <key alias="editContentSendToPublishText"><![CDATA[변경사항이 승인을 위해 전송되었습니다.]]></key>
+
+    <key alias="dictionaryItemSaved"><![CDATA[사전 항목 저장됨]]></key>
+    <key alias="languageSaved"><![CDATA[언어 저장됨]]></key>
+  </area>
+  <area alias="headers">
+    <key alias="page"><![CDATA[페이지]]></key>
+  </area>
+  <area alias="paste">
+    <key alias="errorMessage"><![CDATA[붙여넣으려는 텍스트에 특수한 문자나 포맷이 포함되어있습니다. Microsoft Word문서에서 바로 복사해와서 문제가 발생된것일 수 있습니다. Umbraco는 붙여넣으려는 컨텐츠가 웹에 적합하도록 특수한 문자나 포맷을 자동으로 제거합니다]]></key>
+    <key alias="removeSpecialFormattering"><![CDATA[포맷을 제거하고 붙여넣기(권장)]]></key>
+    <key alias="removeAll"><![CDATA[포맷을 전혀 적용하지 않고 붙여넣기]]></key>
+    <key alias="doNothing"><![CDATA[포맷을 포함여하 붙여넣기(권장하지 않음)]]></key>
+  </area>
+  <area alias="assignDomain">
+    <key alias="domain"><![CDATA[도메인]]></key>
+    <key alias="addNew"><![CDATA[새로운 도메인 추가]]></key>
+    <key alias="orEdit"><![CDATA[현재 도메인 수정]]></key>
+    <key alias="domainDeleted"><![CDATA['%0%' 도메인이 삭제되었습니다]]></key>
+    <key alias="domainCreated"><![CDATA[새로운 '%0%' 도메인이 생성되었습니다]]></key>
+    <key alias="domainUpdated"><![CDATA['%0%' 도메인이 업데이트 되었습니다]]></key>
+    <key alias="domainHelp"><![CDATA[예제: yourdomain.com, www.yourdomain.com]]></key>
+    <key alias="domainExists"><![CDATA['%0%' 도메인이 이미 존재합니다]]></key>
+  </area>
+  <area alias="rollback">
+    <key alias="currentVersion"><![CDATA[현재 버전]]></key>
+    <key alias="rollbackTo"><![CDATA[롤백]]></key>
+    <key alias="view"><![CDATA[보기]]></key>
+    <key alias="diffHelp"><![CDATA[현재 버전과 선택한 버전의 차이점을 보여줍니다<br /><del>빨간</del> 텍스트는 선택한 버전에선 보이지 않습니다. <ins>녹색은 추가되었음을 의미합니다</ins>]]></key>
+    <key alias="htmlHelp">
+      <![CDATA[선택한 버전을 html로 보여줍니다. 두 버전의 차이점을 동시에 보시려면, 차이점 보기를 사용하세요]]>
+    </key>
+    <key alias="selectVersion"><![CDATA[버전 선택]]></key>
+    <key alias="documentRolledBack"><![CDATA[문서가 롤백되었습니다.]]></key>
+  </area>
+  <area alias="sort">
+    <key alias="sortPleaseWait"><![CDATA[잠시 기다리십시오. 아이템을 정렬 하는데 잠시 시간이 소요될 수 있습니다<br/><br/>정렬하는 동안 이 창을 닫지 마십시오]]></key>
+    <key alias="sortHelp"><![CDATA[다른 아이템을 마우스로 위,아래로 드래그 하여 이동하거나 열의 헤더를 클릭하여 아이템을 정렬할 수 있습니다]]></key>
+    <key alias="sortDone"><![CDATA[정렬 완료]]></key>
+  </area>
+  <area alias="publish">
+    <key alias="publishAll"><![CDATA[%0% 와 모든 서브페이지 발행]]></key>
+    <key alias="nodePublish"><![CDATA[%0% 발행됨]]></key>
+    <key alias="nodePublishAll"><![CDATA[%0% 과 서브페이지가 발행되었습니다]]></key>
+    <key alias="inProgress"><![CDATA[발행 진행중 - 잠시만 기다리세요...]]></key>
+    <key alias="inProgressCounter"><![CDATA[%1% 페이지를 제외한 %0% 가 발행됨...]]></key>
+    <key alias="includeUnpublished"><![CDATA[미발행된 자식 문서 포함]]></key>
+    <key alias="publishHelp" version="4.0">
+      <![CDATA[<strong>%0%</strong>를 발행하기위해 <em>확인</em>를 클릭하세요 and thereby making it's content publicly available.<br/><br />
+    이 페이지와 모든 서브페이지를 아래 <em>모든 자식문서 발행</em>을 체크하여 발행할 수 있습니다.
+    ]]>
+    </key>
+    <key alias="contentPublishedFailedByEvent" version="4.0"><![CDATA[제3공급자 익스텐션 취소때문에 %0% 가 발행할 수없습니다.]]></key>
+  </area>
+  <area alias="moveOrCopy">
+    <key alias="moveTo"><![CDATA[%0%문서가 이동할 곳을 선택하세요]]></key>
+    <key alias="copyTo"><![CDATA[%0%문서가 복사될 곳을 선택하세요]]></key>
+    <key alias="noNodeSelected"><![CDATA[아직 노드가 선택되지 않았습니다, 확인 버튼을 누르기전에 리스트에 노드를 선택하세요.]]></key>
+    <key alias="nodeSelected"><![CDATA[새 컨텐츠의 루트로 선택되었습니다. 확인을 클릭하세요]]></key>
+    <key alias="choose"><![CDATA[페이지 상단 선택...]]></key>
+    <key alias="notAllowedByContentType"><![CDATA[현재노드는 타입때문에 선택된 노드아래로 갈 수 없습니다.]]></key>
+    <key alias="notAllowedByPath"><![CDATA[현재 노드는 서브페이지로 이동할 수 없습니다.]]></key>
+    <key alias="moveDone"><![CDATA[%0% 가 %1%로 이동되었습니다.]]></key>
+    <key alias="copyDone"><![CDATA[%0% 가 %1%로 복사되었습니다.]]></key>
+  </area>
+  <area alias="login">
+    <key alias="topText"><![CDATA[umbraco 에 오신것을 환영합니다. 사용자명과 비밀번호를 입력하십시오:]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+  </area>
+  <area alias="stylesheet">
+    <key alias="editstylesheet"><![CDATA[스타일시트 편집]]></key>
+    <key alias="editstylesheetproperty"><![CDATA[스타일시트 속성편집]]></key>
+    <key alias="styles"><![CDATA[스타일]]></key>
+    <key alias="preview"><![CDATA[미리보기]]></key>
+    <key alias="aliasHelp"><![CDATA[CSS 태그를 사용하세요 예: h1, .redHeader, .blueTex]]></key>
+    <key alias="nameHelp"><![CDATA[rich text editor 에 스타일속성을 확인할 수 있는 이름을 붙이세요]]></key>
+  </area>
+  <area alias="scripts">
+    <key alias="editscript"><![CDATA[스크립트 파일 편집]]></key>
+  </area>
+  <area alias="editcontenttype">
+    <key alias="newtab"><![CDATA[새 색인]]></key>
+    <key alias="create"><![CDATA[생성]]></key>
+    <key alias="allowedchildnodetypes"><![CDATA[자식노드 타입 허용]]></key>
+    <key alias="tab"><![CDATA[색인]]></key>
+    <key alias="deletetab"><![CDATA[색인 삭제]]></key>
+    <key alias="description"><![CDATA[설명]]></key>
+    <key alias="thumbnail"><![CDATA[썸네일]]></key>
+  </area>
+  <area alias="editdatatype">
+    <key alias="renderControl"><![CDATA[Render 컨트롤]]></key>
+    <key alias="guid"><![CDATA[데이터타입 GUID]]></key>
+    <key alias="dataBaseDatatype"><![CDATA[데이터베이스 데이터타입]]></key>
+    <key alias="addPrevalue"><![CDATA[이전값 더하기]]></key>
+    <key alias="rteButtons"><![CDATA[버튼]]></key>
+    <key alias="rteRelatedStylesheets"><![CDATA[관련 스타일시트]]></key>
+    <key alias="rteEnableAdvancedSettings"><![CDATA[고급설정 사용]]></key>
+    <key alias="rteEnableContextMenu"><![CDATA[context 메뉴 사용]]></key>
+    <key alias="rteWidthAndHeight"><![CDATA[너비와 높이]]></key>
+    <key alias="rteMaximumDefaultImgSize"><![CDATA[삽입이미지의 기본사이즈 최대값]]></key>
+    <key alias="rteShowLabel"><![CDATA[라벨 보기]]></key>
+  </area>
+  <area alias="template">
+    <key alias="template"><![CDATA[템플릿]]></key>
+    <key alias="mastertemplate"><![CDATA[마스터 템플릿]]></key>
+    <key alias="edittemplate"><![CDATA[템플릿 편집]]></key>
+    <key alias="insertMacro" version="4.0"><![CDATA[매크로 삽입]]></key>
+    <key alias="insertDictionaryItem" version="4.0"><![CDATA[사전 항목 삽입]]></key>
+    <key alias="insertContentArea" version="4.0"><![CDATA[컨텐츠범위 삽입]]></key>
+    <key alias="insertContentAreaPlaceHolder" version="4.0"><![CDATA[컨텐츠범위 Placeholder 삽입]]></key>
+    <key alias="quickGuide" version="4.0"><![CDATA[Umbraco 템플릿태그 퀵가이드]]></key>
+    <key alias="insertPageField" version="4.0"><![CDATA[Umbraco 페이지필드 삽입]]></key>
+  </area>
+  <area alias="dictionaryItem">
+    <key alias="description">
+      <![CDATA[
+    '<em>%0%</em>'사전 항목 아래에 다른 언어버전들을 편집하세요<br/>왼쪽 '언어'메뉴를 사용하여 추가 언어들을 설정할 수 있습니다.
+ ]]>
+    </key>
+    <key alias="displayName"><![CDATA[국가명]]></key>
+  </area>
+  <area alias="language">
+    <key alias="cultureCode"><![CDATA[국가 코드]]></key>
+    <key alias="displayName"><![CDATA[국가명]]></key>
+  </area>
+  <area alias="templateEditor">
+    <key alias="chooseField"><![CDATA[필드 선택]]></key>
+    <key alias="alternativeField"><![CDATA[대체 필드]]></key>
+    <key alias="usedIfEmpty"><![CDATA[이 필드는 최초필드가 비었을때만 사용가능합니다.]]></key>
+    <key alias="usedIfAllEmpty"><![CDATA[필드 위의 값들이 비었을때만 사용가능합니다.]]></key>
+    <key alias="alternativeText"><![CDATA[대체 글꼴]]></key>
+    <key alias="recursive">Recursive</key>
+    <key alias="preContent"><![CDATA[필드앞에 삽입]]></key>
+    <key alias="postContent"><![CDATA[필드뒤에 삽입]]></key>
+    <key alias="insertedBefore"><![CDATA[필드값 전에 삽입하시겠습니까]]></key>
+    <key alias="insertedAfter"><![CDATA[필드 값 후에 삽입하시겠습니까]]></key>
+    <key alias="formatAsDate"><![CDATA[날짜포맷으로]]></key>
+    <key alias="dateOnly"><![CDATA[예, 날짜만]]></key>
+    <key alias="withTime"><![CDATA[예, 시간를 :로 구분하여]]></key>
+    <key alias="casing">Casing</key>
+    <key alias="none"><![CDATA[없음]]></key>
+    <key alias="lowercase"><![CDATA[소문자]]></key>
+    <key alias="uppercase"><![CDATA[대문자]]></key>
+    <key alias="urlEncode"><![CDATA[URL 인코딩]]></key>
+    <key alias="htmlEncode"><![CDATA[HTML 인코딩]]></key>
+    <key alias="urlEncodeHelp"><![CDATA[URL의 특수문자를 포맷하겠습니까]]></key>
+    <key alias="htmlEncodeHelp"><![CDATA[HTML과 동일하게 특수문자를 변경하시겠습니까]]>
+    </key>
+    <key alias="convertLineBreaks"><![CDATA[줄바꿈문자 변환]]></key>
+    <key alias="convertLineBreaksHelp"><![CDATA[줄바꿈문자를 Html태그 &amp;lt;br&amp;gt; 로 변경]]></key>
+    <key alias="removeParagraph"><![CDATA[단락 태그삭제]]></key>
+    <key alias="removeParagraphHelp"><![CDATA[문서 시작과 끝의 &amp;lt;P&amp;gt; 를 삭제하시겠습니까]]></key>
+  </area>
+  <area alias="create">
+    <key alias="createUnder"><![CDATA[생성자]]></key>
+    <key alias="chooseNode"><![CDATA[새로운 %0% (을)를 생성할 위치를 지정하십시오]]></key>
+    <key alias="updateData"><![CDATA[타입과 제목을 선택하세요]]></key>
+  </area>
+  <area alias="errorHandling" version="2.1">
+    <key alias="errorHeader" version="2.1"><![CDATA[에러:]]></key>
+    <key alias="errorHeaderWithoutTab" version="2.1"><![CDATA[에러:]]></key>
+    <key alias="errorMandatory" version="2.1">The %0% field in the %1% tab is mandatory</key>
+    <key alias="errorMandatoryWithoutTab" version="2.1">%0% 은 필수선택 항목입니다.</key>
+    <key alias="errorExistsWithoutTab" version="2.1">%0% 은 이미 존재합니다.</key>
+    <key alias="errorRegExp" version="2.1">%0% at %1% 올바른 형식이 아닙니다.</key>
+    <key alias="errorRegExpWithoutTab" version="2.1">%0% 올바른 형식이 아닙니다.</key>
+    <key alias="errorIntegerWithoutTab" version="4.0">%0% must be an integer</key>
+    <key alias="errorButDataWasSaved" version="4.0">데이터가 저장되었지만, 이 페이지를 발행하기전에 에러들부터 수정하셔야 합니다</key>
+    <key alias="errorInPasswordFormat" version="4.0">암호는 최소 %0% 자 이상이며 적어도 %1% 개의 알파벳이 아닌 문자를 포함해야 합니다.</key>
+    <key alias="errorChangingProviderPassword" version="4.0">현재의 멤버쉽 프로바이더는 암호변경을 지원하지 않습니다(EnablePasswordRetrieval need to be true)</key>
+  </area>
+  <area alias="publicAccess" version="2.1">
+    <key alias="paHowWould" version="2.1"><![CDATA[이페이지의 접근제한을 어떻게 제한할지 선택하세요]]></key>
+
+    <key alias="paSimple" version="2.1"><![CDATA[사용자 제한]]></key>
+    <key alias="paSimpleHelp" version="4.0"><![CDATA[로그인과 암호를 이용해 사용자 제한]]></key>
+
+    <key alias="paAdvanced" version="2.1"><![CDATA[역할 기반 제한]]></key>
+    <key alias="paAdvancedHelp" version="2.1"><![CDATA[역할 기반인증을 사용하여 컨트롤 접근제한을 설정하시려면,<br /> Umbraco의 사용자그룹을 사용하세요.]]></key>
+    <key alias="paAdvancedNoGroups" version="4.0"><![CDATA[역할 기반인증을 사용하시기전에 <br />사용자 그룹부터 생성해야합니다.]]></key>
+
+    <key alias="paLoginPage" version="2.1"><![CDATA[로그인 페이지]]></key>
+    <key alias="paErrorPage" version="2.1"><![CDATA[에러 페이지]]></key>
+
+    <key alias="paSelectPages" version="4.0"><![CDATA[로그인 폼과 에러메세지가 포함된 페이지를 선택하세요]]></key>
+    <key alias="paLoginPageHelp" version="2.1"><![CDATA[로그인 폼 양식페이지를 선택하세요]]></key>
+    <key alias="paErrorPageHelp" version="2.1"><![CDATA[로그인을 시도할 때 접근할 수 없습니다.]]></key>
+
+    <key alias="paSelectRoles" version="4.0"><![CDATA[이 페이지에 접근할 역할을 선택하세요]]></key>
+    <key alias="paSetLogin" version="4.0"><![CDATA[이 페이지에 로그인과 암호 설정]]></key>
+
+    <key alias="paIsProtected" version="2.1"><![CDATA[%0% 제한되었습니다.]]></key>
+    <key alias="paIsRemoved" version="2.1"><![CDATA[%0% 의 제한이 제거되었습니다]]></key>
+    <key alias="paRemoveProtection" version="2.1"><![CDATA[제한 제거]]></key>
+  </area>
+  <area alias="auditTrails" version="2.1">
+    <key alias="atViewingFor" version="2.1"><![CDATA[보기]]></key>
+  </area>
+  <area alias="notifications" version="2.1">
+    <key alias="notifications" version="2.1"><![CDATA[알림]]></key>
+    <key alias="editNotifications" version="2.1"><![CDATA[%0% 에 대한 알림 편집]]></key>
+    <key alias="mailSubject" version="2.1"><![CDATA[%1%에 대한 [%0]알림이 %2%에 생성되었습니다]]></key>
+    <key alias="mailBody" version="2.1">
+      안녕하세요 %0%
+
+      사용자 '%3%' 가  작업 '%1%' 를 페이지 '%2%' 에서
+      진행했음을 알리는 자동 발송 메일입니다.
+      
+      편집하시려면 http://%4%/actions/editContent.aspx?id=%5% 로 이동하세요
+
+      좋은 하루 되세요!
+      
+    </key>
+    <key alias="mailBodyHtml" version="3.0">
+      <![CDATA[<p>안녕하세요 %0%</p>
+
+	  <p>사용자 <strong>'%3%'</strong> 가  작업 <strong>'%1%'</strong> 를 
+       페이지 <a href="%7%"> 에서
+       진행했음을 알리는 자동 발송 메일입니다.
+  </p>
+	  <div style="margin: 8px 0; padding: 8px; display: block;">
+			<br />
+			<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;발행&nbsp;&nbsp;</a> &nbsp; 
+			<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;편집&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+			<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;삭제&nbsp;&nbsp;&nbsp;&nbsp;</a>
+			<br />
+	  </div>
+	  <p>
+		  <h3>업데이트 요약:</h3>
+		  <table style="width: 100%;">
+					   %6%
+			</table>
+		 </p>
+
+	  <div style="margin: 8px 0; padding: 8px; display: block;">
+			<br />
+			<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;발행&nbsp;&nbsp;</a> &nbsp; 
+			<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;편집&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+			<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;삭제&nbsp;&nbsp;&nbsp;&nbsp;</a>
+			<br />
+	  </div>
+
+	  <p>좋은 하루 되세요!<br /><br />		  
+	  </p>]]>
+    </key>
+  </area>
+  <area alias="translation" version="3.0">
+    <key alias="pageHasBeenSendToTranslation" version="4.0"><![CDATA['%0%' 페이지가 번역을 위해 전송되었습니다.]]></key>
+    <key alias="sendToTranslate" version="4.0"><![CDATA[번역을 위해 '%0%' 페이지 전송하기]]>Send the page '%0%' to translation</key>
+    <key alias="noTranslators" version="4.0"><![CDATA[번역자를 찾을 수 없습니다. 컨텐츠를 번역하기위해 발송하시기 전에 번역자를 생성하세요.]]></key>
+    <key alias="translator" version="4.0"><![CDATA[번역자]]></key>
+    <key alias="translateTo" version="4.0"><![CDATA[번역]]></key>
+    <key alias="includeSubpages" version="4.0"><![CDATA[서브페이지 포함]]></key>
+    <key alias="mailSubject" version="3.0"><![CDATA[Translation task for %1%을 위한 [%0%] 번역작업]]></key>
+    <key alias="mailBody" version="3.0">
+      안녕하세요 %0%
+
+      %2% 에 의해 문서 '%1%' 가 '%5%' 로 번역요청되었음을
+      알리는 자동 발송 메일입니다.
+
+      편집하시려면 http://%3%/translation/details.aspx?id=%4% 로 
+      
+      번역작업을 전반적으로 보시려면 Umbraco에 로그인 하세요
+      http://%3%/umbraco.aspx
+
+      좋은 하루 되세요!
+    </key>
+    <key alias="assignedTasks" version="4.0"><![CDATA[할당된 작업]]></key>
+    <key alias="assignedTasksHelp" version="4.0">
+      <![CDATA[ 아래 리스트는 <strong>당신에게 할당된</strong> 번역작업들을 볼 수 있습니다. 
+      상세내역을 보시려면 "상세" 나 페이지 이름을 클릭하세요.
+      "Xml 다운로드" 링크를 클릭하시면 Xml로 페이지를 다운로드 할 수 있습니다.<br/>
+      번역작업을 닫으시려면, 상세보기로 가셔서 "닫기" 버튼을 클릭하세요.
+  ]]>
+    </key>
+    <key alias="ownedTasks" version="4.0"><![CDATA[생성한 작업]]></key>
+    <key alias="ownedTasksHelp" version="4.0">
+      <![CDATA[ 리스트 아래에서 <strong>생성한 작업</strong> 페이지를 볼 수 있습니다. 
+      상세내역을 보시려면 "상세" 나 페이지 이름을 클릭하세요.
+      "Xml 다운로드" 링크를 클릭하시면 Xml로 페이지를 다운로드 할 수 있습니다.<br/>
+      번역작업을 닫으시려면, 상세보기로 가셔서 "닫기" 버튼을 클릭하세요.
+  ]]>
+    </key>
+
+    <key alias="downloadTaskAsXml" version="4.0"><![CDATA[XML 다운로드]]></key>
+    <key alias="downloadAllAsXml" version="4.0"><![CDATA[모든 번역작업을 XML로 다운로드]]></key>
+
+    <key alias="DownloadXmlDTD" version="4.0"><![CDATA[다운로드 xml DTD]]></key>
+    <key alias="closeTask" version="4.0"><![CDATA[작업 닫기]]></key>
+    <key alias="uploadTranslationXml" version="4.0"><![CDATA[번역 XML 업로드]]></key>
+
+    <key alias="taskOpened" version="4.0"><![CDATA[작업 열기]]></key>
+    <key alias="taskAssignedBy" version="4.0"><![CDATA[할당자]]></key>
+    <key alias="totalWords" version="4.0"><![CDATA[총 단어 수]]></key>
+    <key alias="details" version="4.0"><![CDATA[번역 세부항목]]></key>
+    <key alias="fields" version="4.0"><![CDATA[필드]]></key>
+    <key alias="translationOptions" version="4.0"><![CDATA[번역 옵션]]></key>
+    <key alias="translationDone" version="4.0"><![CDATA[번역 완료]]></key>
+    <key alias="translationFailed"><![CDATA[번역에 실패했습니다. Xml 파일에 문제가 있을수 있습니다.]]></key>
+    <key alias="translationDoneHelp" version="4.0"><![CDATA[아래를 클릭하셔서 방금 번역한 페이지를 미리볼 수 있습니다. 원본 페이지가 있다면 두 페이지를 비교해보시기 바랍니다.]]></key>
+  </area>
+  <area alias="packager" version="4.0">
+    <key alias="packageMetaData" version="4.0"><![CDATA[패키지 메타데이터]]></key>
+    <key alias="packageName" version="4.0"><![CDATA[패키지 이름]]></key>
+    <key alias="packageVersion" version="4.0"><![CDATA[패키지 버전]]></key>
+    <key alias="packageAuthor" version="4.0"><![CDATA[저자]]></key>
+
+    <key alias="packageDocumentation" version="4.0"><![CDATA[문서화]]></key>
+    <key alias="packageDemonstration" version="4.0"><![CDATA[데모]]></key>
+    <key alias="packageRepository" version="4.0"><![CDATA[패키지 저장소]]></key>
+
+    <key alias="packageReadme" version="4.0"><![CDATA[패키지 정보]]></key>
+    <key alias="packageOptions" version="4.0"><![CDATA[패키지 옵션]]></key>
+    <key alias="viewPackageWebsite" version="4.0"><![CDATA[패키지 웹사이트 보기]]></key>
+    <key alias="packageUninstallHeader" version="4.0"><![CDATA[패키지 삭제]]></key>
+    <key alias="packageUninstallText" version="4.0">
+      <![CDATA[삭제하시려는 항목은 선택하지 않을 수 있습니다. "삭제 확인" 버튼을 누를때 체크되어있지 항목은 모두 삭제됩니다.<br />
+    <span style="color: Red; font-weight: bold;">알림:</span> 문서, 미디어등 삭제항목에 관련된 모든 항목이 삭제됩니다, 작업을 중단하면 시스템이 불안정적으로 동작할 수 있습니다.
+    삭제는 매우 주의를 요하기 때문에 의심스러운항목은 패키지 제작자에게 문의하시기 바랍니다.]]>
+    </key>
+    <key alias="packageUninstallConfirm" version="4.0"><![CDATA[삭제 확인]]></key>
+    <key alias="packageUninstalledHeader" version="4.0"><![CDATA[패키지가 삭제되었습니다.]]></key>
+    <key alias="packageUninstalledText" version="4.0"><![CDATA[패키지가 성공적으로 삭제되었습니다.]]></key>
+
+    <key alias="packageNoItemsHeader" version="4.0"><![CDATA[패키지가 포함한 아이템이 없습니다.]]></key>
+    <key alias="packageNoItemsText" version="4.0">
+      <![CDATA[이 패키지엔 삭제할 아이템이 포함되어 있지 않습니다.<br/><br/>
+    아래 "패키지 삭제"를 클릭하시면 안전하게 시스템에서 삭제하실 수 있습니다.]]>
+    </key>
+
+    <key alias="packageUpgradeHeader" version="4.0"><![CDATA[업그레이드 패키지]]></key>
+    <key alias="packageUpgradeText" version="4.0"><![CDATA[업그레이드할 패키지가 없습니다. Umbraco패키지 저장소에서 직접다운로드하실 수 있습니다.]]></key>
+    <key alias="packageNoUpgrades" version="4.0"><![CDATA[업그레이드할 패키지가 없습니다.]]></key>
+    <key alias="packageUpgradeInstructions" version="4.0"><![CDATA[업그레이드 지시사항]]></key>
+    <key alias="packageUpgradeDownload" version="4.0"><![CDATA[저장소에서 업데이트 다운로드]]></key>
+    <key alias="chooseLocalPackageText" version="4.0">
+      <![CDATA[
+    사용하시는 PC에서 패키지를 선택하세요<br />
+       umbraco 패키지는 보통 ".umb" 나 ".zip" 확장자를 가집니다.
+    ]]>
+    </key>
+  </area>
+  <area alias="installer" version="4.0">
+    <key alias="thankYou"><![CDATA[Umbraco를 선택해주셔서 감사합니다.]]></key>
+    <key alias="welcomeIntro">
+      <![CDATA[이 마법사는 버전 3.0에서 <strong>Umbraco %0%</strong> 로 신규설치나 업그레이드가 가능하도록 도와줍니다.
+                              <br /><br />
+                              마법사를 시작하시려면 <strong>"다음"</strong> 을 누르세요.]]>
+    </key>
+    <key alias="greatStart"><![CDATA[편리한 시작을 위해, 소개 Video를 시청하세요]]></key>
+
+    <key alias="watch"><![CDATA[보기]]></key>
+
+    <key alias="step1"><![CDATA[Step 1/5 라이센스 허가]]></key>
+    <key alias="licenseText"><![CDATA[다음버튼을 누르시면 (또는Web.config에 umbracoConfigurationStatus를 수정하시면), 여러분은 아래에 명시된 소프트웨어 라이센스를 수락합니다. Umbraco 배포는 2가지 다른 라이센스로 구성되어 있습니다. 프레임워크에는 오픈소스 MIT라이센스가 UI에는 Umbraco 프리웨어 라이센스가 적용됩니다.]]></key>
+
+    <key alias="step2"><![CDATA[Step 2/5 데이터베이스 설정]]></key>
+    <key alias="databaseHeader"><![CDATA[데이터베이스 설정]]></key>
+    <key alias="databaseText">
+      <![CDATA[이과정을 위해선, 당신의 DB서버 정보에 대해서 알고 계셔야합니다.("connection string").<br />
+      필요하시다면 사용하시는 ISP쪽에 문의하시기 바랍니다..
+      로컬 머신이나 서버에 설치되어 있다면 해당 시스템 관리자에게 문의하시기 바랍니다.]]>
+    </key>
+    <key alias="databaseFound"><![CDATA[데이터베이스가 확인되었으며 정보는 ]]></key>
+    <key alias="databaseUpToDate"><![CDATA[데이터베이스가 업데이트 되었습니다. <strong>다음</strong>을 클릭하시면 설정마법사를 계속 진행합니다.]]></key>
+    <key alias="databaseUpgrade">
+      <![CDATA[<p><strong>업그레이드</strong> 버튼을 누르면 여러분의 데이터베이스를 Umbraco %0% 로 업데이트합니다.</p><p>어떤 컨텐트도 삭제되지 않으니 걱정마세요!</p>]]>
+    </key>
+    <key alias="databaseInstall">
+      <![CDATA[<strong>설치</strong> 버튼을 누르면 Umbraco %0% 데이터베이스가 설치됩니다.]]>
+    </key>
+    <key alias="databaseNotFound">
+      <![CDATA[<p>데이터베이스를 찾을 수 없습니다. “web.config”파일의 "connection string"이 바르게 설정되었는지 확인하세요.</p>
+            <p>"web.config" 파일에 맨아래에 ,키네임을 "umbracoDbDSN"로 하여 사용하시는 데이터베이스의 connection string 정보를 입력하시고 파일을 저장하세요. </p>
+            <p>
+            완료 후<strong>재시도</strong>버튼을 누르세요.<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
+		               web.config의 더많은 정보는 여기에 있습니다.</a></p>]]>
+    </key>
+    <key alias="databaseInstallDone"><![CDATA[Umbraco %0% 가 데이터베이스에 복사되었습니다. 계속하시려면 <strong>다음</strong>을 누르세요.]]></key>
+    <key alias="databaseUpgradeDone">
+      <![CDATA[데이터베이스가 최신 버전 %0% 로 업그레이드 되었습니다.<br />계속 진행하시려면 <strong>다음</strong> 을 누르세요. ]]>
+    </key>
+    <key alias="databaseErrorCannotConnect"><![CDATA[인스톨러가 데이터베이스에 연결할 수 없습니다.]]></key>
+    <key alias="databaseErrorWebConfig"><![CDATA[web.config를 저장할 수 없습니다.connection string을 수동으로 수정하세요.]]></key>
+    <key alias="Unavailable"><![CDATA[데이터베이스에 연결 실패]]></key>
+    <key alias="None"><![CDATA[아직 설치되지 않았습니다.]]></key>
+    <key alias="Version3"><![CDATA[Umbraco 버전 3]]></key>
+    <key alias="Version4"><![CDATA[Umbraco 버전 4]]></key>
+
+    <key alias="step3"><![CDATA[Step 3/5 파일권한 확인]]></key>
+    <key alias="permissionsText">
+      <![CDATA[Umbraco 는 특정 디렉토리에 쓰기/수정 권한이 필요합니다. 이것은 PDF나 그림과 같은 파일을 저장하고 cache같은 임시데이터을 위해 사용됩니다.]]>      
+    </key>
+    <key alias="permissionsPerfect">
+      <![CDATA[<strong>권한세팅이 완벽합니다!</strong><br /><br />
+            Umbraco 패키지 설치를 진행할 준비가 되었습니다. ]]>
+    </key>
+    <key alias="permissionsAlmostPerfect">
+      <![CDATA[<strong>권한 설정이 대부분 완벽합니다!</strong><br /><br />
+      여러분은 문제없이 Umbraco사용이 가능하지만 일부 추천 패키지가 설치되지 않을 수 있습니다.]]>
+    </key>
+    <key alias="permissionsNotReady">
+      <![CDATA[<strong>권한 설정이 완료되지 않았습니다!</strong>
+        <br /><br />
+        Umbraco 실행을 위해, 권한설정을 업데이트하세요.]]>
+    </key>
+    <key alias="permissionsMaybeAnIssue">
+      <![CDATA[<strong>퍼미션 세팅에 문제가 있을 수 있습니다.</strong>
+    <br/><br />
+    Umbraco를 문제없이 실행할 수 있지만, 폴더를 만들거나 추천패키지를 설치하지 못할 수 있습니다.]]>
+    </key>
+
+    <key alias="permissionsHowtoResolve"><![CDATA[문제해결방법]]></key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[Umbraco를 위한 폴더권한세팅을 위해 텍스트 버전을 읽으시거나 저희 <strong>Video tutorial</strong>를 시청하세요.]]></key>
+    <key alias="permissionsHowtoResolveLink"><![CDATA[문서버전을 읽으시려면 클릭하세요]]></key>
+
+    <key alias="permissionsSettingUpPermissions"><![CDATA[폴더 권한 세팅]]></key>
+    <key alias="permissionsAffectedFolders"><![CDATA[영향받는 파일과 폴더]]></key>
+    <key alias="permissionsAffectedFoldersText"><![CDATA[다음 파일/폴더에 ASP.NET 수정권한이 필요합니다.]]></key>
+    <key alias="permissionsAffectedFoldersMoreInfo"><![CDATA[umbraco권한관리을 위해 더정보가 필요하시면 여기를 누르세요]]></key>
+
+    <key alias="permissionsResolveFolderIssues"><![CDATA[폴더 문제해결]]></key>
+    <key alias="permissionsResolveFolderIssuesLink"><![CDATA[다음 링크는 ASP.NET이나 폴더생성문제에 대한 더 많은 정보를 제공합니다.]]></key>
+
+
+    <key alias="step4"><![CDATA[Step 4/5 Umbraco 보안설정 확인]]></key>
+    <key alias="defaultUserText">
+      <![CDATA[
+      <p>
+        umbraco 는 로긴을 위한 기본 <strong>('admin')</strong> 사용자를 만들고 암호를 <strong>('default')</strong>로 설정합니다. 암호를 <strong>꼭</strong>변경하셔야 합니다.
+      </p>
+      <p>
+        이 과정은 기본 사용자의 암호를 체크하고 변경이 필요한 부분을 제안합니다.
+      </p>
+    ]]>
+    </key>
+    <key alias="defaultUserPasswordChanged"><![CDATA[비밀번호가 변경되었습니다!]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>기본 사용자가 비활성화되었거나 Umbraco에 접근할 수 없습니다!</strong></p><p>더 이상 과정이 필요없으시면 <b>다음</b>을 눌러주세요.]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>설치후 기본사용자의 암호가 성공적으로 변경되었습니다!</strong></p><p>더 이상 과정이 필요없으시면 <strong>다음</strong>을 눌러주세요.]]></key>
+    <key alias="defaultUserChangePass"><![CDATA[<strong>기본 사용자의 암호가 변경되어야 합니다!</strong>]]></key>
+
+    <key alias="step5"><![CDATA[Step 5/5 Umbraco를 시작할 준비가 되었습니다.]]></key>
+    <key alias="runwayHeader"><![CDATA[여러분은 Umbraco 플랫폼 설치를 완료하였습니다. 다음엔 어떤 작업을 원하십니까?]]></key>
+    <key alias="runwaySimpleSite"><![CDATA[간단한 웹사이트 생성을 원합니다.]]></key>
+    <key alias="runwayFromScratch"><![CDATA[scratch를 시작하기 원합니다.]]>
+    </key>
+    <key alias="runwaySimpleSiteText">
+      <![CDATA[
+    <p>
+    "Runway" 는 간단한 웹사이트 생성을 위한 기본 문서타입과 템플릿을 제공합니다. 인스톨러를 이용해 Runway를 자동으로 설치하신 후
+    여러분은 쉽게 수정, 확장, 삭제가 가능하십니다.
+    Umbraco에 익숙하시다면 Runway 가 필요없지만 그렇지 않으신경우 Runway는 가장 빨리 시작할 수 있는 최고의 예제를 제공합니다.
+    Runway 설치를 선택하시면, 여러분은 옵션으로 Runway 페이지에 쓰이는 Runway 모듈로 불리는 기본 빌딩 블록들을 선택하실 수 있습니다.
+    </p>
+      <small>
+      <em>Runway 포함사항:</em> 홈페이지, Getting Started 페이지, 모듈 설치페이지.<br />
+      <em>옵션 모듈들:</em> 네이게이션, 사이트맵, 연락처, 갤러리.
+      </small>
+    ]]>
+    </key>
+    <key alias="runwayFromScratchText">
+      <![CDATA[
+      사이트가 완전히 비어있는 상태입니다. 스크래치를 시작하시거나 문서유형, 템플릿을 만드시기에 완벽한 상태입니다. 
+      (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
+      Runway설치를 나중에 실행하실 수 있습니다. 개발도구 부분에서 패키지를 선택하세요.
+    ]]>
+    </key>
+
+    <key alias="runwayWhatIsRunway"><![CDATA[Runway 란?]]></key>
+    <key alias="runwayInstalled"><![CDATA[Runway 가 설치됨]]></key>
+    <key alias="runwayInstalledText">
+      <![CDATA[
+    이곳은 설치관리페이지입니다. 설치를 원하시는 모듈을 선택하세요.<br />
+    이것은 저희가 권장하는 모듈들입니다. 설치를 원하시는 모듈을 확인하세요 모듈이 없다면 <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">전체 모듈리스트</a>를 보세요
+    ]]>
+    </key>
+    <key alias="runwayOnlyProUsers"><![CDATA[경험이 있는 사용자 분들만 추천합니다.]]></key>
+    <key alias="theEndHeader"><![CDATA[Umbraco %0% 가 설치되어 사용준비가 되었습니다.]]></key>
+    <key alias="theEndInstallFailed">
+      <![CDATA[설치를 마치기 위해, <strong>/web.config file</strong>을 수동으로 편집해야 합니다. AppSetting 키의 <strong>umbracoConfigurationStatus</strong> 를 <strong>'%0%'</strong>의 값으로 설정하세요.]]>
+    </key>
+    <key alias="theEndInstallSuccess">
+      <![CDATA[<strong>Umbraco 와 첫만남</strong>이시면 <br />아래의 "Umbraco 접속하기" 버튼을 클릭하여 <strong>즉시 시작</strong>하실 수 있습니다. 
+    시작페이지에서 풍부한 리소소를 제공받을 수 있습니다.]]>
+    </key>
+    <key alias="theEndBrowseSite">
+      <![CDATA[<h3>새 사이트 보기</h3>
+      Runway가 설치되었습니다, 새 웹사이트를 볼 수 있습니다.]]>
+    </key>
+    <key alias="theEndFurtherHelp">
+      <![CDATA[<h3>고급 도움말과 정보</h3>
+     우수 커뮤니티에서 도음을 받으세요. 간단한 사이트제작이나 패키지 사용법, Umbraco기술의 퀵가이드를 제공하는 문서를 보시거나 무료 비디오를 시청하세요.]]>
+    </key>
+    <key alias="theEndOpenUmbraco">
+      <![CDATA[<h3>Umbraco 실행</h3>
+사이트 관리를 위해서 Umbraco 관리자를 여시고 컨텐츠를 추가하시거나 템플릿과 스타일시트 업데이트 또는 새기능을 추가하세요]]>
+    </key>
+  </area>
+  <area alias="relatedlinks">
+    <key alias="modeUp">
+      <![CDATA[위로 이동]]>
+    </key>
+    <key alias="modeDown">
+      <![CDATA[아래로 이동]]>
+    </key>
+    <key alias="removeLink">
+      <![CDATA[링크 삭제]]>
+    </key>
+    <key alias="newWindow">
+      <![CDATA[새 창 열기]]>
+    </key>
+    <key alias="addInternal">
+      <![CDATA[내부링크 추가]]>
+    </key>
+    <key alias="addExternal">
+      <![CDATA[외부링크 추가]]>
+    </key>
+    <key alias="caption">
+      <![CDATA[설명]]>
+    </key>
+    <key alias="linkurl">
+      <![CDATA[URL]]>
+    </key>
+    <key alias="internalPage">
+      <![CDATA[내부 페이지]]>
+    </key>
+    <key alias="addlink">
+      <![CDATA[추가]]>
+    </key>
+  </area>
+</language>
