@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Xml;
-using Umbraco.Core.Embed;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Web.Media.EmbedProviders.Settings
 {

@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
-    public class Twitgoo: AbstractProvider
+    public class Twitgoo : AbstractProvider
     {
         public override bool SupportsDimensions
         {
@@ -16,6 +11,7 @@ namespace Umbraco.Web.Media.EmbedProviders
                 return false;
             }
         }
+
         public override string GetMarkup(string url, int maxWidth, int maxHeight)
         {
             var web = new HtmlWeb();
@@ -26,6 +22,5 @@ namespace Umbraco.Web.Media.EmbedProviders
             return string.Format("<img src=\"{0}\"/>",
                img.Value);
         }
-
     }
 }

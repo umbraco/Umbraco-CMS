@@ -4,11 +4,11 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Web.Services;
+using Umbraco.Core.Media;
 using umbraco.IO;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.property;
 using Umbraco.Core.IO;
-using Umbraco.Core.Embed;
 using System.Xml;
 using System.Web;
 using System.Text.RegularExpressions;
@@ -193,7 +193,7 @@ namespace umbraco.webservices.media
 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public Umbraco.Core.Embed.Result Embed(string url, int width, int height)
+        public Result Embed(string url, int width, int height)
         {
             Result r = new Result();
             
