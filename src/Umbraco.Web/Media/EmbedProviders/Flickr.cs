@@ -2,7 +2,6 @@
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
-
     public class Flickr : AbstractOEmbedProvider
     {
         public override string GetMarkup(string url, int maxWidth, int maxHeight)
@@ -18,6 +17,5 @@ namespace Umbraco.Web.Media.EmbedProviders
             return string.Format("<img src=\"{0}\" width\"{1}\" height=\"{2}\" alt=\"{3}\" />",
                 imageUrl, imageWidth, imageHeight, HttpUtility.HtmlEncode(imageTitle));
         }
-
     }
 }

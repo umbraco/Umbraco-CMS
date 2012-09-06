@@ -1,11 +1,9 @@
-﻿using System;
-using System.Xml;
+﻿using System.Xml;
 
-namespace Umbraco.Core.Embed
+namespace Umbraco.Core.Media
 {
     public interface IEmbedSettingProvider
-    {
-       
+    {       
         object GetSetting(XmlNode settingNode);
     }
 }

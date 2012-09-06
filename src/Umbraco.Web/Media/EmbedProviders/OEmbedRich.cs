@@ -1,7 +1,6 @@
-﻿
-namespace Umbraco.Web.Media.EmbedProviders
+﻿namespace Umbraco.Web.Media.EmbedProviders
 {
-    public class OEmbedRich: OEmbedVideo
+    public class OEmbedRich : OEmbedVideo
     {
     }
 }

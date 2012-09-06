@@ -11,7 +11,6 @@ namespace Umbraco.Web.Media.EmbedProviders
             XmlDocument doc = GetXmlResponse(videoUrl);
            
             // add xslt transformation to return markup
-
             return doc.SelectSingleNode("/oembed/html").InnerText;
         }
     }

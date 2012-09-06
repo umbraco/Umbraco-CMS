@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Embed;
+﻿using Umbraco.Core.Media;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
@@ -10,10 +10,5 @@ namespace Umbraco.Web.Media.EmbedProviders
         }
 
         public abstract string GetMarkup(string url, int maxWidth, int maxHeight);
-
-        //public virtual string GetPreview(string url, int maxWidth, int maxHeight)
-        //{
-        //    return GetMarkup(url, maxWidth, maxHeight);
-        //}
     }
 }

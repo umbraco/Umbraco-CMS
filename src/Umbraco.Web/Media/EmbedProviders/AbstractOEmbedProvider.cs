@@ -1,8 +1,7 @@
-﻿using System;
-using Umbraco.Core.Embed;
-using System.Text;
+﻿using System.Text;
 using System.Xml;
 using System.Collections.Generic;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
@@ -20,11 +19,6 @@ namespace Umbraco.Web.Media.EmbedProviders
         public Dictionary<string, string> RequestParams{ get;set; }
 
         public abstract string GetMarkup(string url, int maxWidth, int maxHeight);
-
-        //public virtual string GetPreview(string url, int maxWidth, int maxHeight)
-        //{
-        //    return GetMarkup(url, maxWidth, maxHeight);
-        //}
 
         public virtual string BuildFullUrl(string url, int maxWidth, int maxHeight)
         {

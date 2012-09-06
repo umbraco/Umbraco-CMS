@@ -1,6 +1,4 @@
-﻿
-
-namespace Umbraco.Core.Embed
+﻿namespace Umbraco.Core.Media
 {
     public enum Status
     {
