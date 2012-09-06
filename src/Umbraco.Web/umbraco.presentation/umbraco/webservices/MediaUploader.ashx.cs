@@ -65,7 +65,9 @@ namespace umbraco.presentation.umbraco.webservices
             {
                 case "json":
                     // Format as JSON 
-                    context.Response.ContentType = @"application/json";
+                    // Weirdly, this should be set to text/html to make it respond as json according to:
+                    // http://stackoverflow.com/questions/6934393/resource-interpreted-as-document-but-transferred-with-mime-type-application-jso
+                    context.Response.ContentType = @"text/html";
 
                     context.Response.Write(new JavaScriptSerializer().Serialize(response));
 
