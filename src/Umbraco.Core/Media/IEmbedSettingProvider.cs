@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Media
 {
-    internal interface IEmbedSettingProvider
+    public interface IEmbedSettingProvider
     {       
         object GetSetting(XmlNode settingNode);
     }

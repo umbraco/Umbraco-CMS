@@ -199,7 +199,7 @@ namespace umbraco.webservices.media
             
             //todo cache embed doc
             var xmlConfig = new XmlDocument();
-            xmlConfig.Load(GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Embed.config");
+            xmlConfig.Load(GlobalSettings.FullpathToRoot + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "EmbeddedMedia.config");
 
             foreach (XmlNode node in xmlConfig.SelectNodes("//provider"))
             {
