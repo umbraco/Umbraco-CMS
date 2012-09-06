@@ -86,7 +86,7 @@ namespace umbraco.uicontrols
                 ClientDependencyLoader.Instance.RegisterDependency(2, "CodeMirror/js/lib/codemirror.css", "UmbracoClient", ClientDependencyType.Css);
                 ClientDependencyLoader.Instance.RegisterDependency(3, "CodeArea/styles.css", "UmbracoClient", ClientDependencyType.Css);
 
-                if (AutoSuggest)
+                if (AutoSuggest && HttpContext.Current.Request.Browser.Browser != "IE")
                 {
                     ClientDependencyLoader.Instance.RegisterDependency(3, "CodeMirror/js/lib/util/simple-hint-customized.js", "UmbracoClient", ClientDependencyType.Javascript);
                     

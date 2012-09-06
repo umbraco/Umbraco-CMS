@@ -87,12 +87,6 @@ namespace umbraco.cms.presentation.developer
             S = SR.ReadToEnd();
             SR.Close();
             pythonSource.Text = S;
-
-            //Autosuggest doesn't work properly in IE
-            if(HttpContext.Current.Request.Browser.Browser == "IE")
-            {
-                pythonSource.AutoSuggest = false;
-            }
         }
 
         private void InitializeComponent()
