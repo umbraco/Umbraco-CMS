@@ -309,7 +309,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 }
             },
 
-            syncTree: function(path, forceReload) {
+            syncTree: function(path, forceReload, supressChildReload) {
                 /// <summary>
                 /// Syncronizes the tree with the path supplied and makes that node visible/selected.
                 /// </summary>
@@ -321,7 +321,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 //set the flag so that multiple synces aren't attempted
                 this._isSyncing = true;
 
-                this._syncTree.call(this, path, forceReload, null, null);
+                this._syncTree.call(this, path, forceReload, null, null, supressChildReload);
 
             },
 
@@ -863,8 +863,8 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 liNode.children("ul:eq(0)").remove();
                 this._tree.open_branch(liNode, false, callback);
             },
-
-            _syncTree: function(path, forceReload, numPaths, numAsync) {
+            
+            _syncTree: function(path, forceReload, numPaths, numAsync, supressChildReload) {
                 /// <summary>
                 /// This is the internal method that will recursively search for the nodes to sync. If an invalid path is 
                 /// passed to this method, it will raise an event which can be handled.
@@ -917,7 +917,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                     this._debug("_syncTree: found! numAsync: " + numAsync + ", forceReload: " + forceReload + ", doReload: " + doReload);                                        
                     if (doReload) {
                         this._actionNode = this.getNodeDef(found);
-                        this.reloadActionNode(false, true, null);
+                        if (supressChildReload === undefined) {
+                            this.reloadActionNode(false, true, null);
+                        } else {
+                            this.reloadActionNode(false, supressChildReload, null); 
+                        }
                     }
                     else {
                         //we have found our node, select it but supress the selecting event
@@ -930,6 +934,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 }
             },
 
+            
             _getUrlParams: function(nodeSource) {
                 /// <summary>This converts Url query string params to json</summary>
                 var p = {};
