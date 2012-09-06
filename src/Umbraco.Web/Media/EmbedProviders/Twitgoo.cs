@@ -2,7 +2,7 @@
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
-    public class Twitgoo: AbstractProvider
+    public class Twitgoo : AbstractProvider
     {
         public override bool SupportsDimensions
         {

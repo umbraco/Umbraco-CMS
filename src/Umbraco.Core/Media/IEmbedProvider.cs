@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Media
 {
-    public interface IEmbedProvider
+    internal interface IEmbedProvider
     {
         bool SupportsDimensions { get; }
 
