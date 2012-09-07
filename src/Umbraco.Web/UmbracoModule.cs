@@ -115,7 +115,7 @@ namespace Umbraco.Web
 				//if no doc is found, send to our not found handler
 				if (docreq.Is404)
 				{
-					httpContext.RemapHandler(new DocumentNotFoundHttpHandler());
+					httpContext.RemapHandler(new DocumentNotFoundHandler());
 				}
 				else
 				{

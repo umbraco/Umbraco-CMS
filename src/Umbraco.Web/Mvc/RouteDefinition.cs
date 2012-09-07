@@ -5,7 +5,7 @@ namespace Umbraco.Web.Mvc
 	/// <summary>
 	/// Represents the data required to route to a specific controller/action during an Umbraco request
 	/// </summary>
-	public class RouteDefinition
+	internal class RouteDefinition
 	{
 		public string ControllerName { get; set; }
 		public string ActionName { get; set; }
@@ -19,5 +19,10 @@ namespace Umbraco.Web.Mvc
 		/// The current RenderModel found for the request
 		/// </summary>
 		public object DocumentRequest { get; set; }
+
+		/// <summary>
+		/// Gets/sets whether the current request has a hijacked route/user controller routed for it
+		/// </summary>
+		public bool HasHijackedRoute { get; set; }
 	}
 }

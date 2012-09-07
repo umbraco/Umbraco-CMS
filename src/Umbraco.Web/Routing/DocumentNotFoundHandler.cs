@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web;
+﻿using System.Web;
 
-namespace Umbraco.Web
+namespace Umbraco.Web.Routing
 {
-
 	/// <summary>
 	/// Gets executed when no document can be found in Umbraco
 	/// </summary>
-	public class DocumentNotFoundHttpHandler : IHttpHandler
+	internal class DocumentNotFoundHandler : IHttpHandler
 	{
 		public void ProcessRequest(HttpContext context)
 		{

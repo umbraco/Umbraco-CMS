@@ -16,6 +16,7 @@ namespace umbraco {
     /// <summary>
     /// Summary description for requestHandler.
     /// </summary>
+    [Obsolete("This class is no longer used and will be removed in future versions")]
     public class requestHandler {
         #region public properties
 
