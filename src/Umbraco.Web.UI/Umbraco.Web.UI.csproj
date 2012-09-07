@@ -274,7 +274,9 @@
     <None Include="config\FileSystemProviders.Release.config">
       <DependentUpon>FileSystemProviders.config</DependentUpon>
     </None>
-    <Content Include="config\embed.config" />
+    <Content Include="config\embed.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="config\embed.Release.config">
       <DependentUpon>embed.config</DependentUpon>
     </None>

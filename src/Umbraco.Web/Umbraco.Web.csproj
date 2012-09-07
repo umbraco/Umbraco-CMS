@@ -289,7 +289,7 @@
     <Compile Include="Mvc\RouteDefinition.cs" />
     <Compile Include="RouteValueDictionaryExtensions.cs" />
     <Compile Include="Routing\DocumentLookupBase.cs" />
-    <Compile Include="Routing\DocumentSearcher.cs" />
+    <Compile Include="Routing\DocumentRequestBuilder.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Node.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Nodes.cs" />
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\Property.cs" />

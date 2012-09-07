@@ -68,6 +68,15 @@ namespace Umbraco.Core.IO
             }
         }
 
+		public static string MvcViews
+		{
+			get
+			{
+				//NOTE: this is not configurable and shouldn't need to be
+				return "~/Views";
+			}
+		}
+
        
         public static string Media
         {

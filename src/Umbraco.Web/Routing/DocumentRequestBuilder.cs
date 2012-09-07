@@ -1,7 +1,9 @@
 using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.member;
@@ -10,17 +12,73 @@ using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web.Routing
 {
-	internal class DocumentSearcher
+	/// <summary>
+	/// Looks up the document using ILookup's and sets any additional properties required on the DocumentRequest object
+	/// </summary>
+	internal class DocumentRequestBuilder
 	{
 		private readonly DocumentRequest _documentRequest;
 		private readonly UmbracoContext _umbracoContext;
 		private readonly RoutingContext _routingContext;
 
-		public DocumentSearcher(DocumentRequest documentRequest)
+		public DocumentRequestBuilder(DocumentRequest documentRequest)
 		{
 			_documentRequest = documentRequest;
 			_umbracoContext = documentRequest.RoutingContext.UmbracoContext;
 			_routingContext = documentRequest.RoutingContext;
+		}
+
+		/// <summary>
+		/// Determines the rendering engine to use and sets the flag on the DocumentRequest
+		/// </summary>
+		internal void DetermineRenderingEngine()
+		{
+			//First, if there is no template, we will default to use MVC because MVC supports Hijacking routes which
+			//sometimes don't require a template since the developer may want full control over the rendering. 
+			//Webforms doesn't support this so MVC it is. MVC will also handle what to do if no template or hijacked route
+			//is there (i.e. blank page)
+			if (!_documentRequest.HasTemplate)
+			{
+				_documentRequest.RenderingEngine = RenderingEngine.Mvc;
+				return;
+			}
+
+			var templateAlias = _documentRequest.Template.Alias;
+
+			Func<DirectoryInfo, string, string[], RenderingEngine, bool> determineEngine =
+				(directory, alias, extensions, renderingEngine) =>
+					{
+						//so we have a template, now we need to figure out where the template is, this is done just by the Alias field					
+						//ensure it exists
+						if (!directory.Exists) Directory.CreateDirectory(directory.FullName);
+						var file = directory.GetFiles()
+							.FirstOrDefault(x => x.Extension.InvariantEquals(".cshtml") || x.Extension.InvariantEquals(".vbhtml"));
+						if (file != null)
+						{
+							//it is mvc since we have a template there that exists with this alias
+							_documentRequest.RenderingEngine = renderingEngine;
+							return true;
+						}
+						return false;
+					};
+
+			//first determine if it is MVC, we will favor mvc if there is a template with the same name in both 
+			// folders, if it is then MVC will be selected
+			if (!determineEngine(
+				new DirectoryInfo(IOHelper.MapPath(SystemDirectories.MvcViews)),
+				templateAlias,
+				new[]{".cshtml", ".vbhtml"},
+				RenderingEngine.Mvc))
+			{
+				//if not, then determine if it is webforms (this should def match if a template is assigned and its not in the MVC folder)
+				// if it doesn't match, then MVC will be used by default anyways.
+				determineEngine(
+					new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages)),
+					templateAlias,
+					new[] {".master"},
+					RenderingEngine.WebForms);
+			}
+
 		}
 
 		/// <summary>
@@ -43,10 +101,10 @@ namespace Umbraco.Web.Routing
 			{
 				// matching an existing domain
 				LogHelper.Debug<DocumentRequest>("{0}Matches domain=\"{1}\", rootId={2}, culture=\"{3}\"",
-				                                 () => tracePrefix,
-				                                 () => domainAndUri.Domain.Name,
-				                                 () => domainAndUri.Domain.RootNodeId,
-				                                 () => domainAndUri.Domain.Language.CultureAlias);
+												 () => tracePrefix,
+												 () => domainAndUri.Domain.Name,
+												 () => domainAndUri.Domain.RootNodeId,
+												 () => domainAndUri.Domain.Language.CultureAlias);
 
 				_documentRequest.Domain = domainAndUri.Domain;
 				_documentRequest.DomainUri = domainAndUri.Uri;
@@ -135,7 +193,7 @@ namespace Umbraco.Web.Routing
 						LogHelper.Debug<DocumentRequest>("{0}Failed to find a document, give up", () => tracePrefix);
 						break;
 					}
-					
+
 					LogHelper.Debug<DocumentRequest>("{0}Found a document", () => tracePrefix);
 				}
 
@@ -207,7 +265,7 @@ namespace Umbraco.Web.Routing
 					var node = _routingContext.PublishedContentStore.GetDocumentById(
 						_umbracoContext,
 						internalRedirectId);
-					
+
 					_documentRequest.Document = node;
 					if (node != null)
 					{
@@ -299,13 +357,13 @@ namespace Umbraco.Web.Routing
 				int templateId;
 				if (!int.TryParse(templateIdAsString, out templateId))
 					templateId = 0;
-					
+
 				if (templateId > 0)
 				{
 					//NOTE: This will throw an exception if the template id doesn't exist, but that is ok to inform the front end.
 					var template = new Template(templateId);
 					_documentRequest.Template = template;
-				}									
+				}
 			}
 			else
 			{

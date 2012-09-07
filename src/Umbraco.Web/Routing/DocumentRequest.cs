@@ -19,6 +19,12 @@ using umbraco.interfaces;
 
 namespace Umbraco.Web.Routing
 {
+
+	internal enum RenderingEngine
+	{
+		Mvc,
+		WebForms
+	}
 	
 	/// <summary>
 	/// represents a request for one specified Umbraco document to be rendered
@@ -30,6 +36,7 @@ namespace Umbraco.Web.Routing
         {
 			this.Uri = uri;
 			RoutingContext = routingContext;
+			RenderingEngine = RenderingEngine.Mvc;			
         }
 
 		/// <summary>
@@ -61,7 +68,7 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Gets or sets whether the rendering engine is MVC or WebForms
 		/// </summary>
-		public bool IsMvc { get; internal set; }
+		public RenderingEngine RenderingEngine { get; internal set; }
 
         /// <summary>
         /// Gets a value indicating whether the document request has a domain.

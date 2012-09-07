@@ -92,7 +92,7 @@ namespace Umbraco.Web
 				//   TODO: SD: We need more information on this for when we release 4.10.0 as I'm not sure what this means.
 
 				//create the searcher
-				var searcher = new DocumentSearcher(docreq);
+				var searcher = new DocumentRequestBuilder(docreq);
 				//find domain
 				searcher.LookupDomain();
 				//redirect if it has been flagged
@@ -101,11 +101,17 @@ namespace Umbraco.Web
 				//set the culture on the thread
 				Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = docreq.Culture;
 				//find the document, found will be true if the doc request has found BOTH a node and a template
+				// though currently we don't use this value.
 				var found = searcher.LookupDocument();
+				//this could be called in the LookupDocument method, but I've just put it here for clarity.
+				searcher.DetermineRenderingEngine();
+
+				//TODO: here we should launch an event so that people can modify the doc request to do whatever they want.
+
 				//redirect if it has been flagged
 				if (docreq.IsRedirect)
 					httpContext.Response.Redirect(docreq.RedirectUrl, true);
-								
+
 				//if no doc is found, send to our not found handler
 				if (docreq.Is404)
 				{
@@ -113,24 +119,27 @@ namespace Umbraco.Web
 				}
 				else
 				{
-					if (!docreq.HasTemplate)
-					{
-						LogHelper.Debug<DocumentRequest>("No template was found");
 
-						//TODO: If there is no template then we should figure out what to render, in v4 it is just a blank page but some think
-						// that it should be a 404. IMO I think it should just be a blank page because it is still a content item in the
-						//umbraco system, perhaps this should be put on the mail list? For now we will just make it a blank page
-						//TODO: I like the idea of this new setting, but lets get this in to the core at a later time, for now lets just get the basics working.
-						//if (Settings.HandleMissingTemplateAs404)
-						//{
-						//    this.Node = null;
-						//    LogHelper.Debug<DocumentRequest>("{0}Assume page not found (404)", tracePrefix);
-						//}
-						httpContext.Response.Clear();
-						httpContext.Response.End();						
-					}
-					else
-					{
+					//TODO: Have removed the no template handler from here as it will now be handled by MVC but we need to implement that.
+					
+					//if (!docreq.HasTemplate)
+					//{
+					//    LogHelper.Debug<DocumentRequest>("No template was found");
+
+					//    //TODO: If there is no template then we should figure out what to render, in v4 it is just a blank page but some think
+					//    // that it should be a 404. IMO I think it should just be a blank page because it is still a content item in the
+					//    //umbraco system, perhaps this should be put on the mail list? For now we will just make it a blank page
+					//    //TODO: I like the idea of this new setting, but lets get this in to the core at a later time, for now lets just get the basics working.
+					//    //if (Settings.HandleMissingTemplateAs404)
+					//    //{
+					//    //    this.Node = null;
+					//    //    LogHelper.Debug<DocumentRequest>("{0}Assume page not found (404)", tracePrefix);
+					//    //}
+					//    httpContext.Response.Clear();
+					//    httpContext.Response.End();						
+					//}
+					//else
+					//{
 						//ok everything is ready to pass off to our handlers (mvc or webforms) but we need to setup a few things
 						//mostly to do with legacy code,etc...
 
@@ -144,10 +153,9 @@ namespace Umbraco.Web
 						httpContext.Items.Add("pageElements", docreq.UmbracoPage.Elements);
 
 						//TODO: Detect MVC vs WebForms
-						docreq.IsMvc = true; //TODO: This needs to be set in the ILookups based on the template
-						var isMvc = docreq.IsMvc;
-						RewriteToUmbracoHandler(HttpContext.Current, uri.Query, isMvc);	
-					}
+						docreq.RenderingEngine = RenderingEngine.Mvc;						
+						RewriteToUmbracoHandler(HttpContext.Current, uri.Query, docreq.RenderingEngine);	
+					//}
 				}
 			}
 		}
@@ -334,43 +342,45 @@ namespace Umbraco.Web
 		/// <param name="context"></param>
 		/// <param name="currentQuery"></param>
 		/// <param name="isMvc"> </param>
-		private void RewriteToUmbracoHandler(HttpContext context, string currentQuery, bool isMvc)
+		private void RewriteToUmbracoHandler(HttpContext context, string currentQuery, RenderingEngine engine)
 		{
-			string rewritePath;
-			if (isMvc)
-			{
-				//the Path is normally ~/umbraco but we need to remove the start ~/ of it and if someone modifies this
-				//then we should be rendering the MVC stuff in that location.
-				rewritePath = "~/" 
-					+ GlobalSettings.Path.TrimStart(new[] {'~', '/'}).TrimEnd(new[]{'/'})
-					+ "/RenderMvc" + currentQuery;
-			}
-			else
-			{
-				rewritePath = "~/default.aspx" + currentQuery;	
-			}
 
 			//NOTE: We do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
 			//not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly
 			//rewritten url, but this is not what we want!
 			// http://forums.iis.net/t/1146511.aspx
 
+			string rewritePath;
+			switch (engine)
+			{
+				case RenderingEngine.Mvc:
+					//the Path is normally ~/umbraco but we need to remove the start ~/ of it and if someone modifies this
+					//then we should be rendering the MVC stuff in that location.
+					rewritePath = "~/"
+						+ GlobalSettings.Path.TrimStart(new[] { '~', '/' }).TrimEnd(new[] { '/' })
+						+ "/RenderMvc" + currentQuery;
+					//First we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
+					context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);
 
-			//First we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
-			context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);	
-	
-			//if it is MVC we need to do something special, we are not using TransferRequest as this will 
-			//require us to rewrite the path with query strings and then reparse the query strings, this would 
-			//also mean that we need to handle IIS 7 vs pre-IIS 7 differently. Instead we are just going to create
-			//an instance of the UrlRoutingModule and call it's PostResolveRequestCache method. This does:
-			// * Looks up the route based on the new rewritten URL
-			// * Creates the RequestContext with all route parameters and then executes the correct handler that matches the route
-			//we could have re-written this functionality, but the code inside the PostResolveRequestCache is exactly what we want.
-			if (isMvc)
-			{				
-				var urlRouting = new UrlRoutingModule();
-				urlRouting.PostResolveRequestCache(new HttpContextWrapper(context));				
-			}			
+					//if it is MVC we need to do something special, we are not using TransferRequest as this will 
+					//require us to rewrite the path with query strings and then reparse the query strings, this would 
+					//also mean that we need to handle IIS 7 vs pre-IIS 7 differently. Instead we are just going to create
+					//an instance of the UrlRoutingModule and call it's PostResolveRequestCache method. This does:
+					// * Looks up the route based on the new rewritten URL
+					// * Creates the RequestContext with all route parameters and then executes the correct handler that matches the route
+					//we could have re-written this functionality, but the code inside the PostResolveRequestCache is exactly what we want.					
+					var urlRouting = new UrlRoutingModule();
+					urlRouting.PostResolveRequestCache(new HttpContextWrapper(context));
+								
+					break;
+				case RenderingEngine.WebForms:
+				default:
+					rewritePath = "~/default.aspx" + currentQuery;
+					//First we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
+					context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);	
+					break;
+			}
+
 		}
 
 		#region Legacy
