@@ -2,11 +2,12 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web
 {
-	internal interface IPublishedContentStore
-	{
-		IDocument GetDocumentById(UmbracoContext umbracoContext, int nodeId);
+	/// <summary>
+	/// Defines the methods to access published content
+	/// </summary>
+	internal interface IPublishedContentStore : IPublishedMediaStore
+	{		
 		IDocument GetDocumentByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null);
 		IDocument GetDocumentByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias);
-		string GetDocumentProperty(UmbracoContext umbracoContext, IDocument node, string propertyAlias);
 	}
 }

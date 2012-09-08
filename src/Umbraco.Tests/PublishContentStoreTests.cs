@@ -13,7 +13,7 @@ namespace Umbraco.Tests
 	{
 		private FakeHttpContextFactory _httpContextFactory;
 		private UmbracoContext _umbracoContext;
-		private XmlPublishedContentStore _publishedContentStore;
+		private DefaultPublishedContentStore _publishedContentStore;
 
 		[SetUp]
 		public void SetUp()
@@ -56,7 +56,7 @@ namespace Umbraco.Tests
 					return xDoc;
 				};
 
-			_publishedContentStore = new XmlPublishedContentStore();
+			_publishedContentStore = new DefaultPublishedContentStore();
 			
 		}
 

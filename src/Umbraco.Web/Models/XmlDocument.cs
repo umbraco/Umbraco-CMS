@@ -236,11 +236,6 @@ namespace Umbraco.Web.Models
 			}
 		}
 
-		//public string NiceUrl
-		//{
-		//    get { return _niceUrlProvider.GetNiceUrl(Id); }
-		//}
-
 		public int Level
 		{
 			get
@@ -260,12 +255,7 @@ namespace Umbraco.Web.Models
 				return _properties;
 			}
 		}
-			
-
-		public IDocumentProperty GetProperty(string alias)
-		{
-			return Properties.FirstOrDefault(p => p.Alias.InvariantEquals(alias));
-		}
+		
 
 		private void InitializeStructure()
 		{

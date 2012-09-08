@@ -241,6 +241,7 @@
     </Compile>
     <Compile Include="ApplicationEventsResolver.cs" />
     <Compile Include="DefaultDynamicDocumentDataSource.cs" />
+    <Compile Include="DefaultPublishedMediaStore.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
     <Compile Include="DynamicDocumentSearchExtensions.cs" />
@@ -249,6 +250,7 @@
     </Compile>
     <Compile Include="HtmlHelperRenderExtensions.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
+    <Compile Include="IPublishedMediaStore.cs" />
     <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
     <Compile Include="Media\EmbedProviders\AbstractProvider.cs" />
     <Compile Include="Media\EmbedProviders\Flickr.cs" />
@@ -271,7 +273,7 @@
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="ViewContextExtensions.cs" />
     <Compile Include="ViewDataContainerExtensions.cs" />
-    <Compile Include="XmlPublishedContentStore.cs" />
+    <Compile Include="DefaultPublishedContentStore.cs" />
     <Compile Include="PublishedContentStoreResolver.cs" />
     <Compile Include="Routing\DocumentNotFoundHandler.cs" />
     <Compile Include="IPublishedContentStore.cs" />

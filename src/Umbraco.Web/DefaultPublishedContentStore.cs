@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 using System.Xml;
-using Umbraco.Core;
+using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Web.Routing;
 using umbraco;
@@ -11,9 +11,9 @@ using umbraco.interfaces;
 namespace Umbraco.Web
 {
 	/// <summary>
-    /// An IContentStore which uses the Xml cache system to return data
+    /// An IPublishedContentStore which uses the Xml cache system to return data
     /// </summary>
-    internal class XmlPublishedContentStore : IPublishedContentStore
+    internal class DefaultPublishedContentStore : DefaultPublishedMediaStore, IPublishedContentStore
     {
 
     	private IDocument ConvertToDocument(XmlNode xmlNode)
@@ -24,7 +24,7 @@ namespace Umbraco.Web
 			return new Models.XmlDocument(xmlNode);
 		}
 		
-    	public IDocument GetDocumentById(UmbracoContext umbracoContext, int nodeId)
+    	public override IDocument GetDocumentById(UmbracoContext umbracoContext, int nodeId)
     	{
     		if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 
@@ -83,37 +83,6 @@ namespace Umbraco.Web
 
 			return ConvertToDocument(GetXml(umbracoContext).SelectSingleNode(xpath));
         }
-
-		//public IDocument GetNodeParent(IDocument node)
-		//{
-		//    return node.Parent;
-		//}
-
-		public string GetDocumentProperty(UmbracoContext umbracoContext, IDocument node, string propertyAlias)
-		{
-			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-			if (node == null) throw new ArgumentNullException("node");
-			if (propertyAlias == null) throw new ArgumentNullException("propertyAlias");
-
-			if (propertyAlias.StartsWith("@"))
-            {
-				//if it starts with an @ then its a property of the object, not a user defined property
-            	var propName = propertyAlias.TrimStart('@');
-				var prop = TypeHelper.GetProperty(typeof(IDocument), propName, true, false, false, false);
-				if (prop == null)
-					throw new ArgumentException("The property name " + propertyAlias + " was not found on type " + typeof(IDocument));
-            	var val = prop.GetValue(node, null);
-            	var valAsString = val == null ? "" : val.ToString();				
-				return valAsString;
-            }
-            else
-            {
-            	var prop = node.GetProperty(propertyAlias);
-				return prop == null ? null : Convert.ToString(prop.Value);
-            	//var propertyNode = node.SelectSingleNode("./" + propertyAlias);
-            	//return propertyNode == null ? null : propertyNode.InnerText;
-            }
-		}
 
 		XmlDocument GetXml(UmbracoContext umbracoContext)
 		{

@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Routing
 		protected RoutingContext GetRoutingContext(string url, int templateId, RouteData routeData = null)
 		{
 			var umbracoContext = GetUmbracoContext(url, templateId, routeData);
-			var contentStore = new XmlPublishedContentStore();
+			var contentStore = new DefaultPublishedContentStore();
 			var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
 			var routingRequest = new RoutingContext(
 				umbracoContext,

@@ -31,7 +31,6 @@ namespace Umbraco.Core.Models
 		Guid Version { get; }
 		int Level { get; }
 		Collection<IDocumentProperty> Properties { get; }
-		IEnumerable<IDocument> Children { get; }
-		IDocumentProperty GetProperty(string alias);		
+		IEnumerable<IDocument> Children { get; }	
 	}
 }

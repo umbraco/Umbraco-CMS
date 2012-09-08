@@ -54,7 +54,7 @@ namespace Umbraco.Tests.DynamicDocument
 		{
 			var template = Template.MakeNew("test", new User(0));
 			var ctx = GetUmbracoContext("/test", template.Id);
-			var contentStore = new XmlPublishedContentStore();
+			var contentStore = new DefaultPublishedContentStore();
 			var doc = contentStore.GetDocumentById(ctx, id);
 			Assert.IsNotNull(doc);
 			var dynamicNode = new Core.Dynamics.DynamicDocument(doc);

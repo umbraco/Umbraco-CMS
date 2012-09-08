@@ -106,10 +106,7 @@ namespace Umbraco.Core.Dynamics
 			//if we're looking for a user defined property
 			if (checkUserProperty)
 			{
-				var prop = content.GetProperty(alias)
-					   ?? (alias[0].IsUpperCase() //if it's null, try to get it with a different casing format (pascal vs camel)
-							? content.GetProperty(alias.ConvertCase(StringAliasCaseType.CamelCase))
-							: content.GetProperty(alias.ConvertCase(StringAliasCaseType.PascalCase)));
+				var prop = content.GetProperty(alias);
 
 				return prop == null
 				       	? null
