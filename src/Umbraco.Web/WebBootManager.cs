@@ -5,9 +5,11 @@ using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Routing;
 using umbraco.businesslogic;
 
@@ -125,6 +127,11 @@ namespace Umbraco.Web
 		protected override void InitializeResolvers()
 		{
 			base.InitializeResolvers();
+
+			//the base creates the PropertyEditorValueConvertersResolver but we want to modify it in the web app and replace
+			//the TinyMcePropertyEditorValueConverter with the RteMacroRenderingPropertyEditorValueConverter
+			PropertyEditorValueConvertersResolver.Current.RemoveType<TinyMcePropertyEditorValueConverter>();
+			PropertyEditorValueConvertersResolver.Current.AddType<RteMacroRenderingPropertyEditorValueConverter>();
 
 			ContentStoreResolver.Current = new ContentStoreResolver(new XmlPublishedContentStore());
 

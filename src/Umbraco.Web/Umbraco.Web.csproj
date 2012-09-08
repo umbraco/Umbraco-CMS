@@ -257,6 +257,7 @@
     <Compile Include="Media\EmbedProviders\Settings\String.cs" />
     <Compile Include="Media\EmbedProviders\Twitgoo.cs" />
     <Compile Include="ModelStateExtensions.cs" />
+    <Compile Include="PropertyEditors\RteMacroRenderingPropertyEditorValueConverter.cs" />
     <Compile Include="RenderFieldCaseType.cs" />
     <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="Routing\LookupByPageIdQuery.cs" />

@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections;
 
 namespace Umbraco.Core.Macros
 {
-
 	/// <summary>
 	/// NOTE: This is legacy code, might require a cleanup
 	/// </summary>

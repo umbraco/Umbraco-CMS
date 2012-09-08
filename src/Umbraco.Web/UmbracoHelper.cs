@@ -22,6 +22,7 @@ namespace Umbraco.Web
 
 		internal UmbracoHelper(UmbracoContext umbracoContext)
 		{
+			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 			_umbracoContext = umbracoContext;
 			_currentPage = _umbracoContext.DocumentRequest.Document;
 		}
@@ -47,6 +48,17 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public IHtmlString RenderMacro(string alias, object parameters)
 		{
+			return RenderMacro(alias, parameters.ToDictionary<object>());
+		}
+
+		/// <summary>
+		/// Renders the macro with the specified alias, passing in the specified parameters.
+		/// </summary>
+		/// <param name="alias">The alias.</param>
+		/// <param name="parameters">The parameters.</param>
+		/// <returns></returns>
+		public IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters)
+		{
 			if (alias == null) throw new ArgumentNullException("alias");
 			var containerPage = new FormlessPage();
 			var m = macro.GetMacro(alias);
@@ -59,20 +71,20 @@ namespace Umbraco.Web
 				throw new InvalidOperationException("Cannot render a macro when there is no current DocumentRequest.");
 			}
 			var macroProps = new Hashtable();
-			foreach(var i in parameters.ToDictionary<object>())
+			foreach (var i in parameters)
 			{
 				//TODO: We are doing at ToLower here because for some insane reason the UpdateMacroModel method of macro.cs 
 				// looks for a lower case match. WTF. the whole macro concept needs to be rewritten.
 				macroProps.Add(i.Key.ToLower(), i.Value);
-			}			
-			var macroControl = m.renderMacro(macroProps, 
-				UmbracoContext.Current.DocumentRequest.UmbracoPage.Elements, 
+			}
+			var macroControl = m.renderMacro(macroProps,
+				UmbracoContext.Current.DocumentRequest.UmbracoPage.Elements,
 				_umbracoContext.PageId.Value);
 			containerPage.Controls.Add(macroControl);
 			using (var output = new StringWriter())
 			{
 				_umbracoContext.HttpContext.Server.Execute(containerPage, output, false);
-				return new HtmlString(output.ToString());	
+				return new HtmlString(output.ToString());
 			}
 		}
 

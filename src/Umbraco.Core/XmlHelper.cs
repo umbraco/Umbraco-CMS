@@ -1,4 +1,8 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml;
 using Umbraco.Core.IO;
 
@@ -164,5 +168,20 @@ namespace Umbraco.Core
             // return the XML node.
             return xml;
         }
+
+		/// <summary>
+		/// Return a dictionary of attributes found for a string based tag
+		/// </summary>
+		/// <param name="tag"></param>
+		/// <returns></returns>
+		public static Dictionary<string, string> GetAttributesFromElement(string tag)
+		{
+			var m =
+				Regex.Matches(tag, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",
+							  RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+			// fix for issue 14862: return lowercase attributes for case insensitive matching
+			var d = m.Cast<Match>().ToDictionary(attributeSet => attributeSet.Groups["attributeName"].Value.ToString().ToLower(), attributeSet => attributeSet.Groups["attributeValue"].Value.ToString());
+			return d;
+		}
     }
 }
