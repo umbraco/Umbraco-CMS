@@ -133,7 +133,7 @@ namespace Umbraco.Web
 			PropertyEditorValueConvertersResolver.Current.RemoveType<TinyMcePropertyEditorValueConverter>();
 			PropertyEditorValueConvertersResolver.Current.AddType<RteMacroRenderingPropertyEditorValueConverter>();
 
-			ContentStoreResolver.Current = new ContentStoreResolver(new XmlPublishedContentStore());
+			PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(new XmlPublishedContentStore());
 
 			FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
 				//add all known factories, devs can then modify this list on application startup either by binding to events

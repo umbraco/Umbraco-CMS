@@ -5,9 +5,9 @@ namespace Umbraco.Web
 	/// <summary>
 	/// An object resolver to return the IContentStore
 	/// </summary>
-	internal class ContentStoreResolver : SingleObjectResolverBase<ContentStoreResolver, IPublishedContentStore>
+	internal class PublishedContentStoreResolver : SingleObjectResolverBase<PublishedContentStoreResolver, IPublishedContentStore>
 	{
-		internal ContentStoreResolver(IPublishedContentStore publishedContentStore)
+		internal PublishedContentStoreResolver(IPublishedContentStore publishedContentStore)
 			: base(publishedContentStore)
 		{
 		}

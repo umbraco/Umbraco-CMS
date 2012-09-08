@@ -84,6 +84,7 @@
     <Compile Include="Dynamics\ExtensionMethodFinder.cs" />
     <Compile Include="Dynamics\ExtensionMethods.cs" />
     <Compile Include="Dynamics\Grouping.cs" />
+    <Compile Include="Dynamics\PropertyResultType.cs" />
     <Compile Include="DynamicWrapper.cs" />
     <Compile Include="IO\FileSystemProviderAttribute.cs" />
     <Compile Include="IO\IFileSystemExtensions.cs" />

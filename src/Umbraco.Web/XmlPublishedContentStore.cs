@@ -25,12 +25,17 @@ namespace Umbraco.Web
 		}
 		
     	public IDocument GetDocumentById(UmbracoContext umbracoContext, int nodeId)
-        {
-			return ConvertToDocument(GetXml(umbracoContext).GetElementById(nodeId.ToString()));
-        }
+    	{
+    		if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+
+    		return ConvertToDocument(GetXml(umbracoContext).GetElementById(nodeId.ToString()));
+    	}
 
 		public IDocument GetDocumentByRoute(UmbracoContext umbracoContext, string route, bool? hideTopLevelNode = null)
         {
+			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+			if (route == null) throw new ArgumentNullException("route");
+
 			//set the default to be what is in the settings
 			if (hideTopLevelNode == null)
 			{
@@ -57,8 +62,10 @@ namespace Umbraco.Web
 
 		public IDocument GetDocumentByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias)
         {
+			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+			if (alias == null) throw new ArgumentNullException("alias");
 
-            // the alias may be "foo/bar" or "/foo/bar"
+			// the alias may be "foo/bar" or "/foo/bar"
             // there may be spaces as in "/foo/bar,  /foo/nil"
             // these should probably be taken care of earlier on
 
@@ -83,8 +90,12 @@ namespace Umbraco.Web
 		//}
 
 		public string GetDocumentProperty(UmbracoContext umbracoContext, IDocument node, string propertyAlias)
-        {
-            if (propertyAlias.StartsWith("@"))
+		{
+			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+			if (node == null) throw new ArgumentNullException("node");
+			if (propertyAlias == null) throw new ArgumentNullException("propertyAlias");
+
+			if (propertyAlias.StartsWith("@"))
             {
 				//if it starts with an @ then its a property of the object, not a user defined property
             	var propName = propertyAlias.TrimStart('@');
@@ -102,14 +113,16 @@ namespace Umbraco.Web
             	//var propertyNode = node.SelectSingleNode("./" + propertyAlias);
             	//return propertyNode == null ? null : propertyNode.InnerText;
             }
-        }
+		}
 
-        XmlDocument GetXml(UmbracoContext umbracoContext)
-        {
+		XmlDocument GetXml(UmbracoContext umbracoContext)
+		{
+			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+
 			return umbracoContext.GetXml();
-        }
+		}
 
-        static readonly char[] SlashChar = new char[] { '/' };
+		static readonly char[] SlashChar = new char[] { '/' };
 
         protected string CreateXpathQuery(int startNodeId, string path, bool hideTopLevelNodeFromPath)
         {

@@ -274,7 +274,7 @@ namespace umbraco.MacroEngines
                 s = searchProvider;
             
             var results = s.Search(criteria);
-            return ExamineSearchUtill.convertSearchResultToDynamicNode(results);
+            return ExamineSearchUtill.ConvertSearchResultToDynamicNode(results);
         }
 
 

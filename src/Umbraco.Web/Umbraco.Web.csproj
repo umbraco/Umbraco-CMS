@@ -243,6 +243,7 @@
     <Compile Include="DefaultDynamicDocumentDataSource.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
+    <Compile Include="DynamicDocumentSearchExtensions.cs" />
     <Compile Include="FormlessPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -271,7 +272,7 @@
     <Compile Include="ViewContextExtensions.cs" />
     <Compile Include="ViewDataContainerExtensions.cs" />
     <Compile Include="XmlPublishedContentStore.cs" />
-    <Compile Include="ContentStoreResolver.cs" />
+    <Compile Include="PublishedContentStoreResolver.cs" />
     <Compile Include="Routing\DocumentNotFoundHandler.cs" />
     <Compile Include="IPublishedContentStore.cs" />
     <Compile Include="Models\XmlDocument.cs" />

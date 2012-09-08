@@ -13,7 +13,7 @@ using System.Xml.Linq;
 
 namespace Umbraco.Core.Dynamics
 {
-	
+
 	/// <summary>
 	/// The dynamic model for views
 	/// </summary>
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Dynamics
 			return DynamicDocumentWalker.Sibling(this, nodeTypeAlias);
 		}
 
-		//public DynamicNodeList XPath(string xPath)
+		//public DynamicDocumentList XPath(string xPath)
 		//{
 		//    //if this DN was initialized with an underlying NodeFactory.Node
 		//    if (n != null && n.Type == DynamicBackingItemType.Content)
@@ -122,7 +122,7 @@ namespace Umbraco.Core.Dynamics
 		//            if (n.Id == 0)
 		//            {
 		//                List<DynamicNode> selfList = new List<DynamicNode>() { this };
-		//                return new DynamicNodeList(selfList);
+		//                return new DynamicDocumentList(selfList);
 		//            }
 		//            XmlNode node = doc.SelectSingleNode(string.Format("//*[@id='{0}']", n.Id));
 		//            if (node != null)
@@ -142,7 +142,7 @@ namespace Umbraco.Core.Dynamics
 		//                        }
 		//                        catch (Exception) { } //swallow the exceptions - the returned nodes might not be full nodes, e.g. property
 		//                    }
-		//                    //Wanted to do this, but because we return DynamicNodeList here, the only
+		//                    //Wanted to do this, but because we return DynamicDocumentList here, the only
 		//                    //common parent class is DynamicObject
 		//                    //maybe some future refactoring will solve this?
 		//                    //if (nodeFactoryNodeList.Count == 0)
@@ -152,13 +152,13 @@ namespace Umbraco.Core.Dynamics
 		//                    //    //return 
 		//                    //    return new DynamicXml(xElement);
 		//                    //}
-		//                    //convert the NodeFactory nodelist to IEnumerable<DynamicNode> and return it as a DynamicNodeList
-		//                    return new DynamicNodeList(nodeFactoryNodeList.ConvertAll(nfNode => new DynamicNode((INode)nfNode)));
+		//                    //convert the NodeFactory nodelist to IEnumerable<DynamicNode> and return it as a DynamicDocumentList
+		//                    return new DynamicDocumentList(nodeFactoryNodeList.ConvertAll(nfNode => new DynamicNode((INode)nfNode)));
 		//                }
 		//                else
 		//                {
-		//                    // XPath returned no nodes, return an empty DynamicNodeList
-		//                    return new DynamicNodeList();
+		//                    // XPath returned no nodes, return an empty DynamicDocumentList
+		//                    return new DynamicDocumentList();
 		//                }
 		//            }
 		//            else
@@ -178,7 +178,7 @@ namespace Umbraco.Core.Dynamics
 		//}
 
 
-		//public DynamicNodeList Search(string term, bool useWildCards = true, string searchProvider = null)
+		//public DynamicDocumentList Search(string term, bool useWildCards = true, string searchProvider = null)
 		//{
 		//    var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
 		//    if(!string.IsNullOrEmpty(searchProvider))
@@ -194,12 +194,12 @@ namespace Umbraco.Core.Dynamics
 		//    return Search(crit, searcher);
 		//}
 
-		//public DynamicNodeList SearchDescendants(string term, bool useWildCards = true, string searchProvider = null)
+		//public DynamicDocumentList SearchDescendants(string term, bool useWildCards = true, string searchProvider = null)
 		//{
 		//    return Search(term, useWildCards, searchProvider);
 		//}
 
-		//public DynamicNodeList SearchChildren(string term, bool useWildCards = true, string searchProvider = null)
+		//public DynamicDocumentList SearchChildren(string term, bool useWildCards = true, string searchProvider = null)
 		//{
 		//    var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
 		//    if (!string.IsNullOrEmpty(searchProvider))
@@ -216,7 +216,7 @@ namespace Umbraco.Core.Dynamics
 		//}
 
 
-		//public DynamicNodeList Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+		//public DynamicDocumentList Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
 		//{
 		//    var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
 		//    if (searchProvider != null)
@@ -1147,12 +1147,12 @@ namespace Umbraco.Core.Dynamics
 				}
 				else
 				{
-					throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicNodeList but could not retrieve the index for it's position in the list", this.Id));
+					throw new IndexOutOfRangeException(string.Format("Node {0} belongs to a DynamicDocumentList but could not retrieve the index for it's position in the list", this.Id));
 				}
 			}
 			else
 			{
-				throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicNodeList", this.Id));
+				throw new ArgumentNullException(string.Format("Node {0} has been orphaned and doesn't belong to a DynamicDocumentList", this.Id));
 			}
 		}
 		public bool IsFirst()
@@ -1465,9 +1465,9 @@ namespace Umbraco.Core.Dynamics
 		public bool Where(string predicate)
 		{
 			//Totally gonna cheat here
-			var dynamicNodeList = new DynamicDocumentList();
-			dynamicNodeList.Add(this);
-			var filtered = dynamicNodeList.Where<DynamicDocument>(predicate);
+			var dynamicDocumentList = new DynamicDocumentList();
+			dynamicDocumentList.Add(this);
+			var filtered = dynamicDocumentList.Where<DynamicDocument>(predicate);
 			if (Queryable.Count(filtered) == 1)
 			{
 				//this node matches the predicate

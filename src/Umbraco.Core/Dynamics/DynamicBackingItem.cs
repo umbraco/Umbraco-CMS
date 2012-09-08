@@ -113,7 +113,7 @@ namespace Umbraco.Core.Dynamics
 
 				return prop == null
 				       	? null
-				       	: new PropertyResult(prop)
+				       	: new PropertyResult(prop, PropertyResultType.UserProperty)
 				       		{
 				       			DocumentTypeAlias = content.DocumentTypeAlias,
 				       			DocumentId = content.Id

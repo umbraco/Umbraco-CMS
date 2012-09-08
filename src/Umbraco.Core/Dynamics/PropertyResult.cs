@@ -5,29 +5,16 @@ using System.Web;
 
 namespace Umbraco.Core.Dynamics
 {
-	internal enum PropertyResultType
-	{
-		/// <summary>
-		/// The property resolved was a normal document property
-		/// </summary>
-		NormalProperty,
-
-		/// <summary>
-		/// The property resolved was a property defined as a member on the document object (IDocument) itself
-		/// </summary>
-		ReflectedProperty
-	}
-
 	internal class PropertyResult : IDocumentProperty, IHtmlString
     {
-		public PropertyResult(IDocumentProperty source)
+		public PropertyResult(IDocumentProperty source, PropertyResultType type)
         {
     		if (source == null) throw new ArgumentNullException("source");
 
     		Alias = source.Alias;
 			Value = source.Value;
 			Version = source.Version;
-			PropertyType = PropertyResultType.NormalProperty;
+			PropertyType = type;
         }
         public PropertyResult(string alias, object value, Guid version, PropertyResultType type)
         {

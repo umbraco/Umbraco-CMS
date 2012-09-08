@@ -136,7 +136,7 @@ namespace umbraco.MacroEngines.Library
                 searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
 
             var results = searcher.Search(term, useWildCards);
-            return ExamineSearchUtill.convertSearchResultToDynamicNode(results);
+            return ExamineSearchUtill.ConvertSearchResultToDynamicNode(results);
         }
 
         public dynamic Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
@@ -146,7 +146,7 @@ namespace umbraco.MacroEngines.Library
                 s = searchProvider;
 
             var results = s.Search(criteria);
-            return ExamineSearchUtill.convertSearchResultToDynamicNode(results);
+            return ExamineSearchUtill.ConvertSearchResultToDynamicNode(results);
         }
 
 
