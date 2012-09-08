@@ -28,3 +28,4 @@ using System.Security;
 [assembly: System.Security.SecurityRules(System.Security.SecurityRuleSet.Level1)]
 
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
+[assembly: InternalsVisibleTo("umbraco.MacroEngines")]

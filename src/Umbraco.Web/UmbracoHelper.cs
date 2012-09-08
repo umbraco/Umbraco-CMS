@@ -202,7 +202,6 @@ namespace Umbraco.Web
 				ItemRenderer.Instance.Init(item);
 				ItemRenderer.Instance.Load(item);
 				ItemRenderer.Instance.Render(item, htmlWriter);
-				_umbracoContext.HttpContext.Server.Execute(containerPage, output, false);
 				return new HtmlString(output.ToString());
 			}
 		}

@@ -3,14 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using Umbraco.Core;
+using Umbraco.Core.Macros;
+using Umbraco.Web;
 
 namespace umbraco.MacroEngines.RazorDataTypeModels
 {
+	/// <summary>
+	/// This ensures that the RTE renders with HtmlString encoding and also ensures that the macro contents in it
+	/// render properly too.
+	/// </summary>
+	[RazorDataTypeModel("5e9b75ae-face-41c8-b47e-5f4b0fd82f83", 90)]
     public class HtmlStringDataTypeModel : IRazorDataTypeModel
     {
         public bool Init(int CurrentNodeId, string PropertyData, out object instance)
         {
-            instance = new HtmlString(PropertyData);
+			//we're going to send the string through the macro parser and create the output string.
+			var sb = new StringBuilder();
+			var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
+			MacroTagParser.ParseMacros(
+				PropertyData,
+				//callback for when text block is found
+				textBlock => sb.Append(textBlock),
+				//callback for when macro syntax is found
+				(macroAlias, macroAttributes) => sb.Append(umbracoHelper.RenderMacro(
+					macroAlias,
+					//needs to be explicitly casted to Dictionary<string, object>
+					macroAttributes.ConvertTo(x => (string)x, x => (object)x)).ToString()));
+
+			instance = new HtmlString(sb.ToString());
             return true;
         }
     }

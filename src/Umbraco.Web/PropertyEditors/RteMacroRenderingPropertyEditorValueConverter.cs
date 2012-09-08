@@ -22,11 +22,7 @@ namespace Umbraco.Web.PropertyEditors
 		/// <returns></returns>
 		public override Attempt<object> ConvertPropertyValue(object value)
 		{
-			//TODO: we need to make a few new classes, like a new MacroParser, etc... and move a bunch of the logic
-			// out of 'Item' that does all of this but it will be tricky because of the way that it creates a 'Macro' class
-			// we may have to do some server Execute trickyness.
-			// Then, we need to add this to the resolver and remove the base class and make it abstract.
-
+			//we're going to send the string through the macro parser and create the output string.
 			var sb = new StringBuilder();
 			var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
 			MacroTagParser.ParseMacros(
