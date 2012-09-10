@@ -258,7 +258,6 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Content Include="App_Code\TestClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="config\splashes\booting.aspx" />
     <Content Include="config\splashes\noNodes.aspx" />
@@ -1990,6 +1989,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="App_Code\" />
     <Folder Include="App_Data\" />
     <Folder Include="css\" />
     <Folder Include="macroScripts\" />
