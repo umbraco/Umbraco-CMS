@@ -238,8 +238,8 @@ namespace Umbraco.Web.Routing
 				throw new InvalidOperationException("There is no node.");
 
 			bool redirect = false;
-			string internalRedirect = _routingContext.PublishedContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Document, "umbracoInternalRedirectId");
-
+			var internalRedirect = _documentRequest.Document.GetPropertyValue<string>("umbracoInternalRedirectId");
+			
 			if (!string.IsNullOrWhiteSpace(internalRedirect))
 			{
 				LogHelper.Debug<DocumentRequest>("{0}Found umbracoInternalRedirectId={1}", () => tracePrefix, () => internalRedirect);
@@ -293,7 +293,7 @@ namespace Umbraco.Web.Routing
 			if (_documentRequest.Document == null)
 				throw new InvalidOperationException("There is no node.");
 
-			var path = _routingContext.PublishedContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Document, "@path");
+			var path = _documentRequest.Document.Path;
 
 			if (Access.IsProtected(_documentRequest.DocumentId, path))
 			{
@@ -352,12 +352,9 @@ namespace Umbraco.Web.Routing
 				// associated with it.
 				//TODO: When we remove the need for a database for templates, then this id should be irrelavent, not sure how were going to do this nicely.
 
-				var templateIdAsString = _routingContext.PublishedContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Document, "@TemplateId");
-				LogHelper.Debug<DocumentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateIdAsString);
-				int templateId;
-				if (!int.TryParse(templateIdAsString, out templateId))
-					templateId = 0;
-
+				var templateId = _documentRequest.Document.TemplateId;
+				LogHelper.Debug<DocumentRequest>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
+				
 				if (templateId > 0)
 				{
 					//NOTE: This will throw an exception if the template id doesn't exist, but that is ok to inform the front end.
@@ -381,9 +378,8 @@ namespace Umbraco.Web.Routing
 		{
 			if (_documentRequest.HasNode)
 			{
-				int redirectId;
-				if (!int.TryParse(_routingContext.PublishedContentStore.GetDocumentProperty(_umbracoContext, _documentRequest.Document, "umbracoRedirect"), out redirectId))
-					redirectId = -1;
+				var redirectId = _documentRequest.Document.GetPropertyValue<int>("umbracoRedirect", -1);
+				
 				string redirectUrl = "#";
 				if (redirectId > 0)
 					redirectUrl = _routingContext.NiceUrlProvider.GetNiceUrl(redirectId);

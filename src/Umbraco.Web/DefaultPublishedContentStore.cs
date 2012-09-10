@@ -13,7 +13,7 @@ namespace Umbraco.Web
 	/// <summary>
     /// An IPublishedContentStore which uses the Xml cache system to return data
     /// </summary>
-    internal class DefaultPublishedContentStore : DefaultPublishedMediaStore, IPublishedContentStore
+    internal class DefaultPublishedContentStore : IPublishedContentStore
     {
 
     	private IDocument ConvertToDocument(XmlNode xmlNode)
@@ -24,7 +24,7 @@ namespace Umbraco.Web
 			return new Models.XmlDocument(xmlNode);
 		}
 		
-    	public override IDocument GetDocumentById(UmbracoContext umbracoContext, int nodeId)
+    	public virtual IDocument GetDocumentById(UmbracoContext umbracoContext, int nodeId)
     	{
     		if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 

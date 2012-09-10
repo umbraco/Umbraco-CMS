@@ -59,7 +59,7 @@
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
-    <Compile Include="DocumentPropertyExtensions.cs" />
+    <Compile Include="DocumentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dynamics\ClassFactory.cs" />
     <Compile Include="Dynamics\DynamicBackingItem.cs" />
@@ -90,7 +90,6 @@
     <Compile Include="IO\IFileSystemExtensions.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="Macros\MacroTagParser.cs" />
-    <Compile Include="Models\DocumentExtensions.cs" />
     <Compile Include="PropertyEditors\DatePickerPropertyEditorValueConverter.cs" />
     <Compile Include="PropertyEditors\IPropertyEditorValueConverter.cs" />
     <Compile Include="HtmlTagWrapper.cs" />

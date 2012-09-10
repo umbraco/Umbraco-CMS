@@ -79,7 +79,8 @@ namespace Umbraco.Web.Routing
 				domainUri = DomainUriAtNode(id, current);
 				while (domainUri == null && id > 0)
 				{
-					pathParts.Add(_publishedContentStore.GetDocumentProperty(_umbracoContext, node, UrlNameProperty));
+					var urlName = node.GetPropertyValue<string>(UrlNameProperty);
+					pathParts.Add(urlName);
 					node = node.Parent; // set to parent node
 					if (node == null)
 					{
@@ -87,7 +88,7 @@ namespace Umbraco.Web.Routing
 					}
 					else
 					{
-						id = int.Parse(_publishedContentStore.GetDocumentProperty(_umbracoContext, node, "@id")); // will be -1 or 1234	
+						id = node.Id;
 					}					
 					domainUri = id > 0 ? DomainUriAtNode(id, current) : null;
 	            }
@@ -145,9 +146,10 @@ namespace Umbraco.Web.Routing
 				domainUris = DomainUrisAtNode(id, current);
 				while (!domainUris.Any() && id > 0)
 				{
-					pathParts.Add(_publishedContentStore.GetDocumentProperty(_umbracoContext, node, UrlNameProperty));
+					var urlName = node.GetPropertyValue<string>(UrlNameProperty);
+					pathParts.Add(urlName);
 					node = node.Parent; //set to parent node
-					id = int.Parse(_publishedContentStore.GetDocumentProperty(_umbracoContext, node, "@id")); // will be -1 or 1234
+					id = node.Id;
 					domainUris = id > 0 ? DomainUrisAtNode(id, current) : new Uri[] { };
 				}
 

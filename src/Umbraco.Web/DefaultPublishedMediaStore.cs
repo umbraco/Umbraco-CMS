@@ -21,32 +21,6 @@ namespace Umbraco.Web
 			return GetUmbracoMedia(nodeId);
 		}
 
-		public virtual string GetDocumentProperty(UmbracoContext umbracoContext, IDocument node, string propertyAlias)
-		{
-			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-			if (node == null) throw new ArgumentNullException("node");
-			if (propertyAlias == null) throw new ArgumentNullException("propertyAlias");
-
-			if (propertyAlias.StartsWith("@"))
-			{
-				//if it starts with an @ then its a property of the object, not a user defined property
-				var propName = propertyAlias.TrimStart('@');
-				var prop = TypeHelper.GetProperty(typeof(IDocument), propName, true, false, false, false);
-				if (prop == null)
-					throw new ArgumentException("The property name " + propertyAlias + " was not found on type " + typeof(IDocument));
-				var val = prop.GetValue(node, null);
-				var valAsString = val == null ? "" : val.ToString();
-				return valAsString;
-			}
-			else
-			{
-				var prop = node.GetProperty(propertyAlias);
-				return prop == null ? null : Convert.ToString(prop.Value);
-				//var propertyNode = node.SelectSingleNode("./" + propertyAlias);
-				//return propertyNode == null ? null : propertyNode.InnerText;
-			}
-		}
-
 		private IDocument GetUmbracoMedia(int id)
 		{
 
