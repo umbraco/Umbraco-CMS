@@ -1462,7 +1462,6 @@
       <DependentUpon>applications.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Views\Home.cshtml" />
     <None Include="umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\perl\LICENSE" />
@@ -1999,6 +1998,7 @@
     <Folder Include="umbraco_client\FolderBrowser\Images\" />
     <Folder Include="umbraco_client\tags\images\" />
     <Folder Include="usercontrols\" />
+    <Folder Include="Views\" />
     <Folder Include="xslt\" />
   </ItemGroup>
   <PropertyGroup>
