@@ -33,8 +33,9 @@ namespace Umbraco.Tests.DynamicDocument
 
 		protected override dynamic GetDynamicNode(int id)
 		{
-			var template = Template.MakeNew("test", new User(0));
-			var ctx = GetUmbracoContext("/test", template.Id);
+			//var template = Template.MakeNew("test", new User(0));
+			//var ctx = GetUmbracoContext("/test", template.Id);
+			var ctx = GetUmbracoContext("/test", 1234);
 			var contentStore = new DefaultPublishedContentStore();
 			var node = new DynamicNode(
 				new DynamicBackingItem(

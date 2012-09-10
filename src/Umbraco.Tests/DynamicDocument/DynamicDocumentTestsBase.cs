@@ -12,6 +12,11 @@ namespace Umbraco.Tests.DynamicDocument
 	[TestFixture]
 	public abstract class DynamicDocumentTestsBase<TDocument, TDocumentList> : BaseWebTest
 	{
+		protected override bool RequiresDbSetup
+		{
+			get { return false; }
+		}
+
 		/// <summary>
 		/// Returns the dynamic node/document to run tests against
 		/// </summary>
