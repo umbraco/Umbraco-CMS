@@ -65,6 +65,8 @@ namespace Umbraco.Tests.Routing
 		[TestCase("/base/somebasehandler", false)]
 		[TestCase("/", true)]
 		[TestCase("/home.aspx", true)]
+		[TestCase("/umbraco-test", true)]
+		[TestCase("/install-test", true)]
 		public void Ensure_Request_Routable(string url, bool assert)
 		{
 			var httpContextFactory = new FakeHttpContextFactory(url);

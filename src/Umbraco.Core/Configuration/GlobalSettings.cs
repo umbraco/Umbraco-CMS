@@ -834,12 +834,12 @@ namespace Umbraco.Core.Configuration
 				public int Compare(string part, string whole)
 				{
 					// let the default string comparer deal with null or when part is not smaller then whole
-					if (part == null || whole == null)
+					if (part == null || whole == null || part.Length >= whole.Length)
 						return _stringComparer.Compare(part, whole);
 
-					//trim the end '/' of each
-					part = part.TrimEnd('/');
-					whole = whole.TrimEnd('/');
+					//ensure both have a / on the end
+					part = part.EndsWith("/") ? part : part + "/"; 
+					whole = whole.EndsWith("/") ? whole : whole + "/";
 					if (part.Length >= whole.Length)
 						return _stringComparer.Compare(part, whole);
 

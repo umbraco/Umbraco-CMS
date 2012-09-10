@@ -8,6 +8,13 @@ using umbraco.interfaces;
 
 namespace Umbraco.Tests
 {
+
+	[TestFixture]
+	public class GlobalSettingsTests
+	{
+
+	}
+
 	[TestFixture]
 	public class ActionsResolverTests
 	{
