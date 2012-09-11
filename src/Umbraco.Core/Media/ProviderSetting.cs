@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Media
 {
-    internal class ProviderSetting : Attribute
+    public class ProviderSetting : Attribute
     {
     }
 }

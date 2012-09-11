@@ -62,7 +62,7 @@ namespace umbraco.uicontrols
         public EditorType CodeBase { get; set; }
         public string ClientSaveMethod { get; set; }
 
-        public enum EditorType { JavaScript, Css, Python, XML, HTML, Razor, HtmlMixed}
+        public enum EditorType { JavaScript, Css, Python, XML, HTML, Razor, HtmlMixed }
 
         protected override void OnInit(EventArgs e)
         {
@@ -72,8 +72,8 @@ namespace umbraco.uicontrols
             if (CodeMirrorEnabled)
             {
                 ClientDependencyLoader.Instance.RegisterDependency(0, "CodeMirror/js/lib/codemirror.js", "UmbracoClient", ClientDependencyType.Javascript);
-                
-                
+
+
                 ClientDependencyLoader.Instance.RegisterDependency(2, "CodeMirror/js/mode/" + CodeBase.ToString().ToLower() + "/" + CodeBase.ToString().ToLower() + ".js", "UmbracoClient", ClientDependencyType.Javascript);
                 if (CodeBase == EditorType.HtmlMixed)
                 {
@@ -82,19 +82,21 @@ namespace umbraco.uicontrols
                     ClientDependencyLoader.Instance.RegisterDependency(1, "CodeMirror/js/mode/css/css.js", "UmbracoClient", ClientDependencyType.Javascript);
                 }
 
-                
+
                 ClientDependencyLoader.Instance.RegisterDependency(2, "CodeMirror/js/lib/codemirror.css", "UmbracoClient", ClientDependencyType.Css);
                 ClientDependencyLoader.Instance.RegisterDependency(3, "CodeArea/styles.css", "UmbracoClient", ClientDependencyType.Css);
 
-                if (AutoSuggest && HttpContext.Current.Request.Browser.Browser != "IE")
-                {
-                    ClientDependencyLoader.Instance.RegisterDependency(3, "CodeMirror/js/lib/util/simple-hint-customized.js", "UmbracoClient", ClientDependencyType.Javascript);
-                    
-                    ClientDependencyLoader.Instance.RegisterDependency(4, "CodeMirror/js/lib/util/" + CodeBase.ToString().ToLower() + "-hint.js", "UmbracoClient", ClientDependencyType.Javascript);
-                    ClientDependencyLoader.Instance.RegisterDependency(5, "CodeMirror/js/lib/util/" + CodeBase.ToString().ToLower() + "-hints.js", "UmbracoClient", ClientDependencyType.Javascript);
-                    
-                    ClientDependencyLoader.Instance.RegisterDependency(4, "CodeMirror/js/lib/util/simple-hint.css", "UmbracoClient", ClientDependencyType.Css);
-                }
+
+
+                //if (AutoSuggest && HttpContext.Current.Request.Browser.Browser != "IE")
+                //{
+                //    ClientDependencyLoader.Instance.RegisterDependency(3, "CodeMirror/js/lib/util/simple-hint-customized.js", "UmbracoClient", ClientDependencyType.Javascript);
+
+                //    ClientDependencyLoader.Instance.RegisterDependency(4, "CodeMirror/js/lib/util/" + CodeBase.ToString().ToLower() + "-hint.js", "UmbracoClient", ClientDependencyType.Javascript);
+                //    ClientDependencyLoader.Instance.RegisterDependency(5, "CodeMirror/js/lib/util/" + CodeBase.ToString().ToLower() + "-hints.js", "UmbracoClient", ClientDependencyType.Javascript);
+
+                //    ClientDependencyLoader.Instance.RegisterDependency(4, "CodeMirror/js/lib/util/simple-hint.css", "UmbracoClient", ClientDependencyType.Css);
+                //}
             }
         }
 
@@ -137,7 +139,7 @@ namespace umbraco.uicontrols
             EnsureChildControls();
 
             var jsEventCode = "";
-            
+
 
             if (!CodeMirrorEnabled)
             {
@@ -167,8 +169,6 @@ namespace umbraco.uicontrols
                     OffSetX += 20;
                 }
 
-                
-                
                 jsEventCode += @"                    
 
                     //create the editor
@@ -181,11 +181,11 @@ namespace umbraco.uicontrols
                    jQuery(window).resize(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });
             	   jQuery(document).ready(function(){  resizeTextArea(m_textEditor, " + OffSetX.ToString() + "," + OffSetY.ToString() + @"); });";
 
-                 /* 
-                if (!UmbracoSettings.ScriptDisableEditor && HttpContext.Current.Request.Browser.Browser == "IE")
-                {
-                    jsEventCode += "jQuery('<p style=\"color:#999\">" + ui.Text("codemirroriewarning").Replace("'", "\\'") + "</p>').insertAfter('#" + this.ClientID + "');";
-                }*/
+                /* 
+               if (!UmbracoSettings.ScriptDisableEditor && HttpContext.Current.Request.Browser.Browser == "IE")
+               {
+                   jsEventCode += "jQuery('<p style=\"color:#999\">" + ui.Text("codemirroriewarning").Replace("'", "\\'") + "</p>').insertAfter('#" + this.ClientID + "');";
+               }*/
 
             }
 
@@ -209,15 +209,16 @@ namespace umbraco.uicontrols
             var extraKeys = "";
             var editorMimetype = "";
 
-            if (AutoSuggest)
-            {
-                extraKeys = @",
-                               extraKeys: {
-                                    ""'@'"": function(cm) { CodeMirror.{lang}Hint(cm, '@'); },
-                                    ""'.'"": function(cm) { CodeMirror.{lang}Hint(cm, '.'); },
-                                    ""Ctrl-Space"": function(cm) { CodeMirror.{lang}Hint(cm, ''); }
-                                }".Replace("{lang}", CodeBase.ToString().ToLower());
-            }
+//            if (AutoSuggest && HttpContext.Current.Request.Browser.Browser != "IE")
+//            {
+//                extraKeys = @",
+//                               extraKeys: {
+//                                    ""'@'"": function(cm) { CodeMirror.{lang}Hint(cm, '@'); },
+//                                    ""'.'"": function(cm) { CodeMirror.{lang}Hint(cm, '.'); },
+//                                    ""Ctrl-Space"": function(cm) { CodeMirror.{lang}Hint(cm, ''); }
+//                                }".Replace("{lang}", CodeBase.ToString().ToLower());
+//            }
+
 
             if (!string.IsNullOrEmpty(EditorMimeType))
                 editorMimetype = @", 
@@ -235,18 +236,17 @@ namespace umbraco.uicontrols
                                                 indentUnit: 4,
                                                 indentWithTabs: true,
                                                 enterMode: ""keep"",
-                                                textWrapping: false" +
-                                                editorMimetype + @",
-                                                gutter: true,
                                                 onCursorActivity: updateLineInfo,
-                                                onChange: updateLineInfo" +
+                                                lineWrapping: false" +
+                                                editorMimetype + @",
+                                                lineNumbers: true" +
                                                 extraKeys + @"
                                                 });
-
-                                updateLineInfo(codeEditor);
+                                  
+                                    updateLineInfo(codeEditor);
                                 ";
 
-            
+
             /*
             string[] parserFiles = new string[] { "tokenizejavascript.js", "parsejavascript.js" };
             string[] cssFile = new string[] { "jscolors.css", "umbracoCustom.css" };
