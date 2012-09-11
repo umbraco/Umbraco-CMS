@@ -273,9 +273,6 @@
     <None Include="config\FileSystemProviders.Release.config">
       <DependentUpon>FileSystemProviders.config</DependentUpon>
     </None>
-    <Content Include="config\EmbeddedMedia.config" />
-      <SubType>Designer</SubType>
-    </Content>
     <None Include="config\EmbeddedMedia.Release.config">
       <DependentUpon>EmbeddedMedia.config</DependentUpon>
     </None>
@@ -1905,6 +1902,7 @@
     <Content Include="config\UrlRewriting.config" />
     <Content Include="config\log4net.config" />
     <Content Include="config\FileSystemProviders.config" />
+    <Content Include="config\EmbeddedMedia.config" />
     <Content Include="web.config">
       <SubType>Designer</SubType>
     </Content>
