@@ -10,6 +10,33 @@ namespace umbraco.BusinessLogic
     /// </summary>
     public class StateHelper
     {
+
+        private static HttpContextBase _customHttpContext;
+
+        /// <summary>
+        /// Gets/sets the HttpContext object, this is generally used for unit testing. By default this will 
+        /// use the HttpContext.Current
+        /// </summary>
+        internal static HttpContextBase HttpContext
+        {
+            get
+            {
+                if (_customHttpContext == null && System.Web.HttpContext.Current != null)
+                {
+                    //return the current HttpContxt, do NOT store this in the _customHttpContext field
+                    //as it will persist across reqeusts!
+                    return new HttpContextWrapper(System.Web.HttpContext.Current);
+                }
+
+                if (_customHttpContext == null && System.Web.HttpContext.Current == null)
+                {
+                    throw new NullReferenceException("The HttpContext property has not been set or the object execution is not running inside of an HttpContext");
+                }
+                return _customHttpContext;
+            }
+            set { _customHttpContext = value; }
+        }
+
         #region Session Helpers
 
         /// <summary>
@@ -20,7 +47,7 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public static T GetSessionValue<T>(string key)
         {
-            return GetSessionValue<T>(HttpContext.Current, key);
+            return GetSessionValue<T>(HttpContext, key);
         }
 
         /// <summary>
@@ -30,7 +57,20 @@ namespace umbraco.BusinessLogic
         /// <param name="context">The context.</param>
         /// <param name="key">The key.</param>
         /// <returns></returns>
+        [Obsolete("Use the GetSessionValue accepting an HttpContextBase instead")]
         public static T GetSessionValue<T>(HttpContext context, string key)
+        {
+            return GetSessionValue<T>(new HttpContextWrapper(context), key);
+        }
+
+        /// <summary>
+        /// Gets the session value.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="context">The context.</param>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        public static T GetSessionValue<T>(HttpContextBase context, string key)
         {
             if (context == null)
                 return default(T);
@@ -47,7 +87,7 @@ namespace umbraco.BusinessLogic
         /// <param name="value">The value.</param>
         public static void SetSessionValue(string key, object value)
         {
-            SetSessionValue(HttpContext.Current, key, value);
+            SetSessionValue(HttpContext, key, value);
         }
 
         /// <summary>
@@ -56,7 +96,19 @@ namespace umbraco.BusinessLogic
         /// <param name="context">The context.</param>
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
+        [Obsolete("Use the SetSessionValue accepting an HttpContextBase instead")]
         public static void SetSessionValue(HttpContext context, string key, object value)
+        {
+            SetSessionValue(new HttpContextWrapper(context), key, value);
+        }
+
+        /// <summary>
+        /// Sets the session value.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        public static void SetSessionValue(HttpContextBase context, string key, object value)
         {
             if (context == null)
                 return;
@@ -75,7 +127,7 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public static T GetContextValue<T>(string key)
         {
-            return GetContextValue<T>(HttpContext.Current, key);
+            return GetContextValue<T>(HttpContext, key);
         }
 
         /// <summary>
@@ -85,7 +137,20 @@ namespace umbraco.BusinessLogic
         /// <param name="context">The context.</param>
         /// <param name="key">The key.</param>
         /// <returns></returns>
+        [Obsolete("Use the GetContextValue accepting an HttpContextBase instead")]
         public static T GetContextValue<T>(HttpContext context, string key)
+        {
+            return GetContextValue<T>(new HttpContextWrapper(context), key);
+        }
+
+        /// <summary>
+        /// Gets the context value.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="context">The context.</param>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        public static T GetContextValue<T>(HttpContextBase context, string key)
         {
             if (context == null)
                 return default(T);
@@ -102,7 +167,7 @@ namespace umbraco.BusinessLogic
         /// <param name="value">The value.</param>
         public static void SetContextValue(string key, object value)
         {
-            SetContextValue(HttpContext.Current, key, value);
+            SetContextValue(HttpContext, key, value);
         }
 
         /// <summary>
@@ -111,7 +176,19 @@ namespace umbraco.BusinessLogic
         /// <param name="context">The context.</param>
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
+        [Obsolete("Use the SetContextValue accepting an HttpContextBase instead")]
         public static void SetContextValue(HttpContext context, string key, object value)
+        {
+            SetContextValue(new HttpContextWrapper(context), key, value);
+        }
+
+        /// <summary>
+        /// Sets the context value.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        public static void SetContextValue(HttpContextBase context, string key, object value)
         {
             if (context == null)
                 return;
@@ -128,15 +205,15 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         private static StateBag GetStateBag()
         {
-            if (HttpContext.Current == null)
-                return null;
+            //if (HttpContext.Current == null)
+            //    return null;
 
-            Page page = HttpContext.Current.CurrentHandler as Page;
+            var page = HttpContext.CurrentHandler as Page;
             if (page == null)
                 return null;
 
-            Type pageType = typeof(Page);
-            PropertyInfo viewState = pageType.GetProperty("ViewState", BindingFlags.GetProperty | BindingFlags.Instance);
+            var pageType = typeof(Page);
+            var viewState = pageType.GetProperty("ViewState", BindingFlags.GetProperty | BindingFlags.Instance);
             if (viewState == null)
                 return null;
 
@@ -221,7 +298,7 @@ namespace umbraco.BusinessLogic
         {
             if (!Cookies.HasCookies)
                 return null;
-            var cookie = HttpContext.Current.Request.Cookies[key];
+            var cookie = HttpContext.Request.Cookies[key];
             return cookie == null ? null : cookie.Value;
         }
 
@@ -245,7 +322,7 @@ namespace umbraco.BusinessLogic
         {
             if (!Cookies.HasCookies)
                 return;
-            var context = HttpContext.Current;
+            var context = HttpContext;
 
             HttpCookie cookie = new HttpCookie(key, value);
             cookie.Expires = DateTime.Now.AddDays(daysToPersist);
@@ -282,7 +359,7 @@ namespace umbraco.BusinessLogic
             {
                 get
                 {
-                    System.Web.HttpContext context = HttpContext.Current;
+                    var context = HttpContext;
                     // although just checking context should be enough?!
                     // but in some (replaced) umbraco code, everything is checked...
                     return context != null
@@ -293,7 +370,7 @@ namespace umbraco.BusinessLogic
 
             public static void ClearAll()
             {
-                HttpContext.Current.Response.Cookies.Clear();
+                HttpContext.Response.Cookies.Clear();
             }
 
             public class Cookie
@@ -350,7 +427,6 @@ namespace umbraco.BusinessLogic
                 {
                     return RequestCookie == null ? null : RequestCookie.Value;
                 }
-
                 public void SetValue(string value)
                 {
                     SetValueWithDate(value, DateTime.Now + _expires);
@@ -402,14 +478,14 @@ namespace umbraco.BusinessLogic
                 {
                     // beware! will not clear browser's cookie
                     // you probably want to use .Clear()
-                    HttpContext.Current.Response.Cookies.Remove(_key);
+                    HttpContext.Response.Cookies.Remove(_key);
                 }
 
                 public HttpCookie RequestCookie
                 {
                     get
                     {
-                        return HttpContext.Current.Request.Cookies[_key];
+                        return HttpContext.Request.Cookies[_key];
                     }
                 }
 
@@ -417,13 +493,13 @@ namespace umbraco.BusinessLogic
                 {
                     get
                     {
-                        return HttpContext.Current.Response.Cookies[_key];
+                        return HttpContext.Response.Cookies[_key];
                     }
                     set
                     {
                         // .Set() ensures the uniqueness of cookies in the cookie collection
                         // ie it is the same as .Remove() + .Add() -- .Add() allows duplicates
-                        HttpContext.Current.Response.Cookies.Set(value);
+                        HttpContext.Response.Cookies.Set(value);
                     }
                 }
             }
