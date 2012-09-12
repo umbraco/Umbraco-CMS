@@ -324,7 +324,6 @@
     <Content Include="umbraco\config\lang\ja.xml" />
     <Content Include="umbraco\config\lang\pl.xml" />
     <Content Include="umbraco\config\lang\pt.xml" />
-    <Content Include="umbraco\config\lang\se.xml" />
     <Content Include="umbraco\config\lang\zh.xml" />
     <Content Include="umbraco\controls\Tree\CustomTreeService.asmx" />
     <Content Include="umbraco\dashboard\scripts\swfobject.js" />
