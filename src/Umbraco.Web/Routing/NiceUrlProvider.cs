@@ -100,6 +100,7 @@ namespace Umbraco.Web.Routing
 				pathParts.Reverse();
 				route = "/" + string.Join("/", pathParts);	
 
+				//FIX THIS, it stores over the top of a real route!
 				if (!_umbracoContext.InPreviewMode)
 					_umbracoContext.RoutesCache.Store(nodeId, route);
 			}
