@@ -15,6 +15,11 @@ namespace Umbraco.Tests.DynamicDocument
 	[TestFixture]
 	public class DynamicNodeTests : DynamicDocumentTestsBase<DynamicNode, DynamicNodeList>
 	{
+		protected override bool RequiresDbSetup
+		{
+			get { return true; }
+		}
+
 		public override void Initialize()
 		{
 			base.Initialize();
