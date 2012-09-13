@@ -27,8 +27,7 @@ namespace Umbraco.Tests.Routing
 			var routingContext = GetRoutingContext(urlAsString);
 			var url = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
 			var docRequest = new DocumentRequest(url, routingContext);
-			var lookup = new LookupByPageIdQuery();
-			Umbraco.Core.Configuration.GlobalSettings.HttpContext = routingContext.UmbracoContext.HttpContext;
+			var lookup = new LookupByPageIdQuery();			
 
 			//we need to manually stub the return output of HttpContext.Request["umbPageId"]
 			routingContext.UmbracoContext.HttpContext.Request.Stub(x => x["umbPageID"])

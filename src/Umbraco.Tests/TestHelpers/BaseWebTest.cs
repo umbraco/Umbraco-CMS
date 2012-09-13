@@ -30,8 +30,6 @@ namespace Umbraco.Tests.TestHelpers
 		{
 			//reset the app context
 			ApplicationContext.Current = null;
-			//reset the context on global settings
-			Umbraco.Core.Configuration.GlobalSettings.HttpContext = null;
 			Resolution.IsFrozen = false;
 			if (RequiresDbSetup)
 				TestHelper.ClearDatabase();

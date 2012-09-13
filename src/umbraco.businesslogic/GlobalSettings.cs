@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.Hosting;
 using System.Web.Configuration;
 using System.Xml;
-
+using Umbraco.Core;
 using umbraco.BusinessLogic;
 using umbraco.IO;
 
@@ -41,7 +41,7 @@ namespace umbraco
         /// <value>The content XML.</value>
         public static string ContentXML
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.ContentXml; }
+			get { return Umbraco.Core.Configuration.GlobalSettings.ContentXmlFile; }
         }
 
         /// <summary>
@@ -103,9 +103,24 @@ namespace umbraco
         /// Forces umbraco to be medium trust compatible
         /// </summary>
         /// <value>If true, umbraco will be medium-trust compatible, no matter what Permission level the server is on.</value>
+        [Obsolete("This property is no longer used and will be removed in future versions")]
         public static bool UseMediumTrust
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.UseMediumTrust; }
+			get
+			{
+				try
+				{
+					var trustLevel = SystemUtilities.GetCurrentTrustLevel();
+					if (trustLevel == AspNetHostingPermissionLevel.High || trustLevel == AspNetHostingPermissionLevel.Unrestricted)
+						return false;
+					else
+						return bool.Parse(ConfigurationManager.AppSettings["umbracoUseMediumTrust"]);
+				}
+				catch
+				{
+					return false;
+				}
+			}
         }
 
         /// <summary>
@@ -176,27 +191,55 @@ namespace umbraco
         /// Gets the URL forbitten characters.
         /// </summary>
         /// <value>The URL forbitten characters.</value>
+		[Obsolete("This property is no longer used and will be removed in future versions")]
         public static string UrlForbittenCharacters
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.UrlForbittenCharacters; }
+			get
+			{
+				return ConfigurationManager.AppSettings.ContainsKey("umbracoUrlForbittenCharacters")
+					? ConfigurationManager.AppSettings["umbracoUrlForbittenCharacters"]
+					: string.Empty;
+			}
         }
 
         /// <summary>
         /// Gets the URL space character.
         /// </summary>
         /// <value>The URL space character.</value>
+		[Obsolete("This property is no longer used and will be removed in future versions")]
         public static string UrlSpaceCharacter
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.UrlSpaceCharacter; }
+			get
+			{
+				return ConfigurationManager.AppSettings.ContainsKey("umbracoUrlSpaceCharacter")
+					? ConfigurationManager.AppSettings["umbracoUrlSpaceCharacter"]
+					: string.Empty;
+			}
         }
 
         /// <summary>
         /// Gets the SMTP server IP-address or hostname.
         /// </summary>
         /// <value>The SMTP server.</value>
+		[Obsolete("This property is no longer used and will be removed in future versions")]
         public static string SmtpServer
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.SmtpServer; }
+			get
+			{
+				try
+				{
+					var mailSettings = ConfigurationManager.GetSection("system.net/mailSettings") as System.Net.Configuration.MailSettingsSectionGroup;
+
+					if (mailSettings != null)
+						return mailSettings.Smtp.Network.Host;
+					else
+						return ConfigurationManager.AppSettings["umbracoSmtpServer"];
+				}
+				catch
+				{
+					return "";
+				}
+			}
         }
 
         /// <summary>
@@ -330,9 +373,34 @@ namespace umbraco
         /// Developer method to test if configuration settings are loaded properly.
         /// </summary>
         /// <value><c>true</c> if succesfull; otherwise, <c>false</c>.</value>
+        [Obsolete("This method is no longer used and will be removed in future versions")]
         public static bool test
         {
-			get { return Umbraco.Core.Configuration.GlobalSettings.Test; }
+			get
+			{
+				if (HttpContext.Current != null)
+				{
+					HttpContext.Current.Response.Write("ContentXML :" + ContentXML + "\n");
+					HttpContext.Current.Response.Write("DbDSN :" + DbDSN + "\n");
+					HttpContext.Current.Response.Write("DebugMode :" + DebugMode + "\n");
+					HttpContext.Current.Response.Write("DefaultUILanguage :" + DefaultUILanguage + "\n");
+					HttpContext.Current.Response.Write("VersionCheckPeriod :" + VersionCheckPeriod + "\n");
+					HttpContext.Current.Response.Write("DisableXsltExtensions :" + DisableXsltExtensions + "\n");
+					HttpContext.Current.Response.Write("EditXhtmlMode :" + EditXhtmlMode + "\n");
+					HttpContext.Current.Response.Write("HideTopLevelNodeFromPath :" + HideTopLevelNodeFromPath + "\n");
+					HttpContext.Current.Response.Write("Path :" + Path + "\n");
+					HttpContext.Current.Response.Write("ProfileUrl :" + ProfileUrl + "\n");
+					HttpContext.Current.Response.Write("ReservedPaths :" + ReservedPaths + "\n");
+					HttpContext.Current.Response.Write("ReservedUrls :" + ReservedUrls + "\n");
+					HttpContext.Current.Response.Write("StorageDirectory :" + StorageDirectory + "\n");
+					HttpContext.Current.Response.Write("TimeOutInMinutes :" + TimeOutInMinutes + "\n");
+					//HttpContext.Current.Response.Write("UrlForbittenCharacters :" + UrlForbittenCharacters + "\n");
+					//HttpContext.Current.Response.Write("UrlSpaceCharacter :" + UrlSpaceCharacter + "\n");
+					HttpContext.Current.Response.Write("UseDirectoryUrls :" + UseDirectoryUrls + "\n");
+					return true;
+				}
+				return false;				
+			}
         }
 
 

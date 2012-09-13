@@ -29,7 +29,6 @@ namespace Umbraco.Tests.Routing
 			var url = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
 			var docRequest = new DocumentRequest(url, routingContext);
 			var lookup = new LookupByNiceUrl();
-			Umbraco.Core.Configuration.GlobalSettings.HttpContext = routingContext.UmbracoContext.HttpContext;
 			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
 
 			var result = lookup.TrySetDocument(docRequest);

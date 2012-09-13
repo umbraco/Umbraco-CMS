@@ -65,15 +65,14 @@ namespace Umbraco.Web
 				niceUrls);
 			//assign the routing context back to the umbraco context
 			umbracoContext.RoutingContext = routingContext;
-
-			var uri = umbracoContext.UmbracoUrl;
-			var lpath = umbracoContext.UmbracoUrl.AbsolutePath.ToLowerInvariant();
-
+			
 			//do not continue if this request is not a front-end routable page
-			if (EnsureUmbracoRoutablePage(uri, lpath, httpContext))
+			if (EnsureUmbracoRoutablePage(umbracoContext, httpContext))
 			{
+				var uri = umbracoContext.RequestUrl;
+
 				// legacy - no idea what this is
-				LegacyCleanUmbPageFromQueryString(ref uri, ref lpath);
+				LegacyCleanUmbPageFromQueryString(ref uri);
 
 				//Create a document request since we are rendering a document on the front-end
 
@@ -196,15 +195,16 @@ namespace Umbraco.Web
 
 		/// <summary>
 		/// Checks the current request and ensures that it is routable based on the structure of the request and URI
-		/// </summary>
-		/// <param name="uri"></param>
-		/// <param name="lpath"></param>
+		/// </summary>		
+		/// <param name="context"></param>
 		/// <param name="httpContext"></param>
 		/// <returns></returns>
-		internal bool EnsureUmbracoRoutablePage(Uri uri, string lpath, HttpContextBase httpContext)
+		internal bool EnsureUmbracoRoutablePage(UmbracoContext context, HttpContextBase httpContext)
 		{
+			var uri = context.RequestUrl;
+
 			// ensure this is a document request
-			if (!EnsureDocumentRequest(httpContext, uri, lpath))
+			if (!EnsureDocumentRequest(httpContext, uri))
 				return false;
 			// ensure Umbraco is ready to serve documents
 			if (!EnsureIsReady(httpContext, uri))
@@ -213,7 +213,7 @@ namespace Umbraco.Web
 			if (!EnsureIsConfigured(httpContext, uri))
 				return false;
 			// ensure that its not a base rest handler
-			if ((UmbracoSettings.EnableBaseRestHandler) && !EnsureNotBaseRestHandler(lpath))
+			if ((UmbracoSettings.EnableBaseRestHandler) && !EnsureNotBaseRestHandler(uri))
 				return false;
 
 			return true;
@@ -224,11 +224,11 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="httpContext"></param>
 		/// <param name="uri"></param>
-		/// <param name="lpath"></param>
 		/// <returns></returns>
-		bool EnsureDocumentRequest(HttpContextBase httpContext, Uri uri, string lpath)
+		bool EnsureDocumentRequest(HttpContextBase httpContext, Uri uri)
 		{
 			var maybeDoc = true;
+			var lpath = uri.AbsolutePath.ToLowerInvariant();
 
 			// handle directory-urls used for asmx
 			// legacy - what's the point really?
@@ -320,8 +320,10 @@ namespace Umbraco.Web
 
 		// checks if the current request is a /base REST handler request
 		// returns false if it is, otherwise true
-		bool EnsureNotBaseRestHandler(string lpath)
+		bool EnsureNotBaseRestHandler(Uri uri)
 		{
+			var lpath = uri.AbsolutePath.ToLowerInvariant();
+
 			// the /base REST handler still lives in umbraco.dll and has
 			// not been refactored at the moment. it still is a module,
 			// although it should be a handler, or it should be replaced
@@ -388,7 +390,7 @@ namespace Umbraco.Web
 		// "Clean umbPage from querystring, caused by .NET 2.0 default Auth Controls"
 		// but really, at the moment I have no idea what this does, and why...
 		// SD: I also have no idea what this does, I've googled umbPage and really nothing shows up
-		internal static void LegacyCleanUmbPageFromQueryString(ref Uri uri, ref string lpath)
+		internal static void LegacyCleanUmbPageFromQueryString(ref Uri uri)
 		{
 			string receivedQuery = uri.Query;
 			string path = uri.AbsolutePath;
@@ -419,13 +421,7 @@ namespace Umbraco.Web
 
 					// --added when refactoring--
 					uri = uri.Rewrite(path, query);
-					lpath = path.ToLower();
-				}
-				//else
-				//{
-				//    // strip off question mark
-				//    query = receivedQuery.Substring(1);
-				//}
+				}				
 			}
 		}
 

@@ -66,6 +66,7 @@
     <Compile Include="PublishContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
     <Compile Include="Routing\BaseRoutingTest.cs" />
+    <Compile Include="GlobalSettingsTests.cs" />
     <Compile Include="Routing\LookupByAliasTests.cs" />
     <Compile Include="Routing\LookupByIdTests.cs" />
     <Compile Include="Routing\LookupByNiceUrlAndTemplateTests.cs" />

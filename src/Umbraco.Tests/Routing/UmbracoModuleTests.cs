@@ -61,7 +61,10 @@ namespace Umbraco.Tests.Routing
 		[TestCase("/umbraco/umbraco.aspx", false)]
 		[TestCase("/umbraco/editContent.aspx", false)]
 		[TestCase("/install/default.aspx", false)]
+		[TestCase("/install/?installStep=license", false)]
+		[TestCase("/install?installStep=license", false)]
 		[TestCase("/install/test.aspx", false)]
+		[TestCase("/config/splashes/noNodes.aspx", false)]
 		[TestCase("/base/somebasehandler", false)]
 		[TestCase("/", true)]
 		[TestCase("/home.aspx", true)]
@@ -71,12 +74,9 @@ namespace Umbraco.Tests.Routing
 		{
 			var httpContextFactory = new FakeHttpContextFactory(url);
 			var httpContext = httpContextFactory.HttpContext;
-			//set the context on global settings
-			Umbraco.Core.Configuration.GlobalSettings.HttpContext = httpContext;
-			var uri = httpContext.Request.Url;
-			var lpath = uri.AbsolutePath.ToLower();
-
-			var result = _module.EnsureUmbracoRoutablePage(uri, lpath, httpContext);
+			var umbracoContext = GetUmbracoContext(url, 1234);
+			
+			var result = _module.EnsureUmbracoRoutablePage(umbracoContext, httpContext);
 
 			Assert.AreEqual(assert, result);
 		}
