@@ -38,6 +38,7 @@ namespace Umbraco.Tests
 		{
 			MacroFieldEditorsResolver.Reset();
 			Resolution.IsFrozen = false;
+			PluginManager.Current.AssembliesToScan = null;
 		}
 
 		[Test]

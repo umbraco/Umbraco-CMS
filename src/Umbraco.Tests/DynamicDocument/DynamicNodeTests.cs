@@ -1,5 +1,6 @@
 using System.IO;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -7,8 +8,10 @@ using umbraco.BusinessLogic;
 using umbraco.IO;
 using umbraco.MacroEngines;
 using umbraco.NodeFactory;
+using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.template;
 using System.Linq;
+using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Tests.DynamicDocument
 {
@@ -34,6 +37,20 @@ namespace Umbraco.Tests.DynamicDocument
 				true);
 
 			UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config, false);
+
+			//for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
+			PluginManager.Current.AssembliesToScan = new[]
+				{
+					typeof(DynamicNode).Assembly
+				};
+
+		}
+
+		public override void TearDown()
+		{
+			base.TearDown();
+
+			PluginManager.Current.AssembliesToScan = null;
 		}
 
 		protected override dynamic GetDynamicNode(int id)

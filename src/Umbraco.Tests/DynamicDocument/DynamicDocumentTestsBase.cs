@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Dynamics;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.DynamicDocument
@@ -12,9 +13,38 @@ namespace Umbraco.Tests.DynamicDocument
 	[TestFixture]
 	public abstract class DynamicDocumentTestsBase<TDocument, TDocumentList> : BaseWebTest
 	{
+		public override void Initialize()
+		{
+			base.Initialize();
+
+			DynamicDocumentDataSourceResolver.Current = new DynamicDocumentDataSourceResolver(
+				new TestDynamicDocumentDataSource());
+		}
+
+		public override void TearDown()
+		{
+			base.TearDown();
+			DynamicDocumentDataSourceResolver.Reset();
+		}
+
 		protected override bool RequiresDbSetup
 		{
 			get { return false; }
+		}
+
+		private class TestDynamicDocumentDataSource : IDynamicDocumentDataSource
+		{
+			public Guid GetDataType(string docTypeAlias, string propertyAlias)
+			{
+				if (propertyAlias == "content")
+				{
+					//return the rte type id
+					return Guid.Parse("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
+				}
+
+
+				return Guid.Empty;
+			}
 		}
 
 		/// <summary>

@@ -15,9 +15,6 @@ namespace Umbraco.Tests.DynamicDocument
 		{
 			base.Initialize();
 
-			DynamicDocumentDataSourceResolver.Current = new DynamicDocumentDataSourceResolver(
-				new TestDynamicDocumentDataSource());
-
 			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				new[]
 					{
@@ -30,25 +27,11 @@ namespace Umbraco.Tests.DynamicDocument
 		public override void TearDown()
 		{
 			base.TearDown();
-
-			DynamicDocumentDataSourceResolver.Reset();
+			
 			PropertyEditorValueConvertersResolver.Reset();
 		}
 
-		private class TestDynamicDocumentDataSource : IDynamicDocumentDataSource
-		{
-			public Guid GetDataType(string docTypeAlias, string propertyAlias)
-			{
-				if (propertyAlias == "content")
-				{
-					//return the rte type id
-					return Guid.Parse("5e9b75ae-face-41c8-b47e-5f4b0fd82f83");
-				}
-
-
-				return Guid.Empty;
-			}
-		}
+		
 
 		protected override dynamic GetDynamicNode(int id)
 		{
