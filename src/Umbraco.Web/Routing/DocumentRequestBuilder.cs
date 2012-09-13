@@ -52,7 +52,8 @@ namespace Umbraco.Web.Routing
 						//ensure it exists
 						if (!directory.Exists) Directory.CreateDirectory(directory.FullName);
 						var file = directory.GetFiles()
-							.FirstOrDefault(x => x.Extension.InvariantEquals(".cshtml") || x.Extension.InvariantEquals(".vbhtml"));
+							.FirstOrDefault(x => extensions.Any(e => x.Name.InvariantEquals(alias + e)));
+											
 						if (file != null)
 						{
 							//it is mvc since we have a template there that exists with this alias

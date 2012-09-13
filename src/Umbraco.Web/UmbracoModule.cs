@@ -65,7 +65,7 @@ namespace Umbraco.Web
 				niceUrls);
 			//assign the routing context back to the umbraco context
 			umbracoContext.RoutingContext = routingContext;
-			
+
 			//do not continue if this request is not a front-end routable page
 			if (EnsureUmbracoRoutablePage(umbracoContext, httpContext))
 			{
@@ -121,42 +121,20 @@ namespace Umbraco.Web
 				else
 				{
 
-					//TODO: Have removed the no template handler from here as it will now be handled by MVC but we need to implement that.
-					
-					//if (!docreq.HasTemplate)
-					//{
-					//    LogHelper.Debug<DocumentRequest>("No template was found");
+					//ok everything is ready to pass off to our handlers (mvc or webforms) but we need to setup a few things
+					//mostly to do with legacy code,etc...
 
-					//    //TODO: If there is no template then we should figure out what to render, in v4 it is just a blank page but some think
-					//    // that it should be a 404. IMO I think it should just be a blank page because it is still a content item in the
-					//    //umbraco system, perhaps this should be put on the mail list? For now we will just make it a blank page
-					//    //TODO: I like the idea of this new setting, but lets get this in to the core at a later time, for now lets just get the basics working.
-					//    //if (Settings.HandleMissingTemplateAs404)
-					//    //{
-					//    //    this.Node = null;
-					//    //    LogHelper.Debug<DocumentRequest>("{0}Assume page not found (404)", tracePrefix);
-					//    //}
-					//    httpContext.Response.Clear();
-					//    httpContext.Response.End();						
-					//}
-					//else
-					//{
-						//ok everything is ready to pass off to our handlers (mvc or webforms) but we need to setup a few things
-						//mostly to do with legacy code,etc...
+					//we need to complete the request which assigns the page back to the docrequest to make it available for legacy handlers like default.aspx
+					docreq.UmbracoPage = new page(docreq);
 
-						//we need to complete the request which assigns the page back to the docrequest to make it available for legacy handlers like default.aspx
-						docreq.UmbracoPage = new page(docreq); 
+					//this is required for many legacy things in umbraco to work
+					httpContext.Items["pageID"] = docreq.DocumentId;
 
-						//this is required for many legacy things in umbraco to work
-						httpContext.Items["pageID"] = docreq.DocumentId; 
+					//this is again required by many legacy objects
+					httpContext.Items.Add("pageElements", docreq.UmbracoPage.Elements);
 
-						//this is again required by many legacy objects
-						httpContext.Items.Add("pageElements", docreq.UmbracoPage.Elements);
+					RewriteToUmbracoHandler(HttpContext.Current, uri.Query, docreq.RenderingEngine);
 
-						//TODO: Detect MVC vs WebForms
-						docreq.RenderingEngine = RenderingEngine.Mvc;						
-						RewriteToUmbracoHandler(HttpContext.Current, uri.Query, docreq.RenderingEngine);	
-					//}
 				}
 			}
 		}
@@ -176,7 +154,7 @@ namespace Umbraco.Web
 				content.Instance.RemoveXmlFilePersistenceQueue();
 				content.Instance.PersistXmlToFile();
 			}
-		} 
+		}
 
 		#endregion
 
@@ -336,7 +314,7 @@ namespace Umbraco.Web
 			if (!baseUrl.EndsWith("/"))
 				baseUrl += "/";
 			return !lpath.StartsWith(baseUrl);
-		} 
+		}
 
 		#endregion
 
@@ -375,13 +353,13 @@ namespace Umbraco.Web
 					//we could have re-written this functionality, but the code inside the PostResolveRequestCache is exactly what we want.					
 					var urlRouting = new UrlRoutingModule();
 					urlRouting.PostResolveRequestCache(new HttpContextWrapper(context));
-								
+
 					break;
 				case RenderingEngine.WebForms:
 				default:
 					rewritePath = "~/default.aspx" + currentQuery;
 					//First we rewrite the path to the path of the handler (i.e. default.aspx or /umbraco/RenderMvc )
-					context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);	
+					context.RewritePath(rewritePath, "", currentQuery.TrimStart(new[] { '?' }), false);
 					break;
 			}
 
@@ -423,7 +401,7 @@ namespace Umbraco.Web
 
 					// --added when refactoring--
 					uri = uri.Rewrite(path, query);
-				}				
+				}
 			}
 		}
 
@@ -441,14 +419,14 @@ namespace Umbraco.Web
 
 			app.PostResolveRequestCache += (sender, e) =>
 				{
-					var httpContext = ((HttpApplication) sender).Context;
+					var httpContext = ((HttpApplication)sender).Context;
 					ProcessRequest(new HttpContextWrapper(httpContext));
 				};
-			
+
 			// used to check if the xml cache file needs to be updated/persisted
 			app.PostRequestHandlerExecute += (sender, e) =>
 				{
-					var httpContext = ((HttpApplication) sender).Context;
+					var httpContext = ((HttpApplication)sender).Context;
 					PersistXmlCache(new HttpContextWrapper(httpContext));
 				};
 
@@ -457,7 +435,7 @@ namespace Umbraco.Web
 
 		public void Dispose()
 		{
-			
+
 		}
 
 		#endregion

@@ -7,6 +7,7 @@ using Umbraco.Web.Routing;
 using umbraco;
 using umbraco.NodeFactory;
 using umbraco.interfaces;
+using System.Linq;
 
 namespace Umbraco.Web
 {
@@ -57,7 +58,19 @@ namespace Umbraco.Web
 
             var xpath = CreateXpathQuery(startNodeId, path, hideTopLevelNode.Value);
 
-        	return ConvertToDocument(GetXml(umbracoContext).SelectSingleNode(xpath));
+			//check if we can find the node in our xml cache
+			var found = GetXml(umbracoContext).SelectSingleNode(xpath);
+
+			//this check is because we allow root nodes that don't have a domain assigned, if 
+			//the previous check fails, we will check if this is a root node (based purely on it having a path with only 1 '/' which it is prefixed with)
+			//if it is a root node, we'll try to find it again without hiding top level nodes
+			if (found == null && path.ToCharArray().Count(x => x == '/') == 1)
+			{
+				xpath = CreateXpathQuery(startNodeId, path, false);
+				found = GetXml(umbracoContext).SelectSingleNode(xpath);
+			}
+
+        	return ConvertToDocument(found);
         }
 
 		public IDocument GetDocumentByUrlAlias(UmbracoContext umbracoContext, int rootNodeId, string alias)
