@@ -77,7 +77,9 @@ namespace Umbraco.Web
 				//Create a document request since we are rendering a document on the front-end
 
 				// create the new document request 
-				var docreq = new DocumentRequest(uri, routingContext);
+				var docreq = new DocumentRequest(
+					umbracoContext.UmbracoUrl, //very important to use this url! it is the path only lowercased version of the current URL. 
+					routingContext);
 				//assign the document request to the umbraco context now that we know its a front end request
 				umbracoContext.DocumentRequest = docreq;
 

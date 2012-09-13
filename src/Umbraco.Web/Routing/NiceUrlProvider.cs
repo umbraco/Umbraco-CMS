@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
 
 using umbraco;
@@ -30,10 +31,7 @@ namespace Umbraco.Web.Routing
 
         private readonly UmbracoContext _umbracoContext;
 		private readonly IPublishedContentStore _publishedContentStore;
-
-        // note: this could be a parameter...
-        const string UrlNameProperty = "@urlName";
-
+        
 		#region GetNiceUrl
 
 		/// <summary>
@@ -70,37 +68,61 @@ namespace Umbraco.Web.Routing
 			}
 			else
 			{
-				var node = _publishedContentStore.GetDocumentById(_umbracoContext, nodeId);
-				if (node == null)
-					return "#"; // legacy wrote to the log here...
+				var originalNode = _publishedContentStore.GetDocumentById(_umbracoContext, nodeId);
+				if (originalNode == null)
+				{
+					LogHelper.Warn<NiceUrlProvider>(
+						"Couldn't find any page with the nodeId = {0}. This is most likely caused by the page isn't published!",
+						nodeId);
+
+					return "#"; 
+				}
+					
 
 				var pathParts = new List<string>();
 				int id = nodeId;
 				domainUri = DomainUriAtNode(id, current);
+				var recursiveNode = originalNode;
 				while (domainUri == null && id > 0)
 				{
-					var urlName = node.GetPropertyValue<string>(UrlNameProperty);
+					var urlName = recursiveNode.UrlName;
 					pathParts.Add(urlName);
-					node = node.Parent; // set to parent node
-					if (node == null)
+					recursiveNode = recursiveNode.Parent; // set to parent node
+					if (recursiveNode == null)
 					{
 						id = -1;
 					}
 					else
 					{
-						id = node.Id;
+						id = recursiveNode.Id;
 					}					
 					domainUri = id > 0 ? DomainUriAtNode(id, current) : null;
 	            }
 
 				// no domain, respect HideTopLevelNodeFromPath for legacy purposes
 				if (domainUri == null && global::umbraco.GlobalSettings.HideTopLevelNodeFromPath)
-					pathParts.RemoveAt(pathParts.Count - 1);
+				{
+					//here we need to determine if this node is another root node (next sibling(s) to the first) because
+					// in that case, we do not remove the path part. In theory, like in v5, this node would require 
+					// a domain assigned but to maintain compatibility we'll add this check
+					if (originalNode.Parent == null)
+					{
+						var rootNode = _publishedContentStore.GetDocumentByRoute(_umbracoContext, "/", true);
+						if (rootNode.Id == originalNode.Id)
+						{
+							pathParts.RemoveAt(pathParts.Count - 1);
+						}
+					}
+					else
+					{
+						pathParts.RemoveAt(pathParts.Count - 1);
+					}
+				}
+					
 
 				pathParts.Reverse();
 				route = "/" + string.Join("/", pathParts);	
 
-				//FIX THIS, it stores over the top of a real route!
 				if (!_umbracoContext.InPreviewMode)
 					_umbracoContext.RoutesCache.Store(nodeId, route);
 			}
@@ -147,7 +169,7 @@ namespace Umbraco.Web.Routing
 				domainUris = DomainUrisAtNode(id, current);
 				while (!domainUris.Any() && id > 0)
 				{
-					var urlName = node.GetPropertyValue<string>(UrlNameProperty);
+					var urlName = node.UrlName;
 					pathParts.Add(urlName);
 					node = node.Parent; //set to parent node
 					id = node.Id;

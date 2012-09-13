@@ -39,10 +39,26 @@ namespace Umbraco.Web.Routing
 
 				global::umbraco.content.AfterRefreshContent += (sender, e) => Clear();
 				global::umbraco.content.AfterUpdateDocumentCache += (sender, e) => Clear();
-			}
-
-			
+			}			
 		}
+
+		/// <summary>
+		/// Used ONLY for unit tests
+		/// </summary>
+		/// <returns></returns>
+		internal IDictionary<int, string> GetCachedRoutes()
+		{
+			return _routes;
+		}
+
+		/// <summary>
+		/// Used ONLY for unit tests
+		/// </summary>
+		/// <returns></returns>
+		internal IDictionary<string, int> GetCachedIds()
+		{
+			return _nodeIds;
+		} 
 
 		/// <summary>
 		/// Stores a route for a node.

@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.Stubs;
 using Umbraco.Web;
+using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.template;
@@ -59,12 +60,17 @@ namespace Umbraco.Tests.TestHelpers
 
 		protected ApplicationContext ApplicationContext { get; private set; }
 
+		internal virtual IRoutesCache GetRoutesCache()
+		{
+			return new FakeRoutesCache();
+		}
+
 		protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null)
 		{
 			var ctx = new UmbracoContext(
 				GetHttpContextFactory(url, routeData).HttpContext,
 				ApplicationContext,
-				new FakeRoutesCache());
+				GetRoutesCache());
 			SetupUmbracoContextForTest(ctx, templateId);
 			return ctx;
 		}
