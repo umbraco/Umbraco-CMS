@@ -15,8 +15,6 @@
     <key alias="disable">Disable</key>
     <key alias="emptyTrashcan">Empty recycle bin</key>
     <key alias="exportDocumentType">Export Document Type</key>
-    <key alias="exportDocumentTypeAsCode">Export to .NET</key>
-    <key alias="exportDocumentTypeAsCode-Full">Export to .NET</key>
     <key alias="importDocumentType">Import Document Type</key>
     <key alias="importPackage">Import Package</key>
     <key alias="liveEdit">Edit in Canvas</key>

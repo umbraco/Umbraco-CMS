@@ -871,13 +871,6 @@
     <Compile Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx.designer.cs">
       <DependentUpon>xsltVisualize.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\ExportCode.aspx.cs">
-      <DependentUpon>ExportCode.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\ExportCode.aspx.designer.cs">
-      <DependentUpon>ExportCode.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx.cs">
       <DependentUpon>insertMasterpageContent.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1899,7 +1892,6 @@
     <Content Include="umbraco.presentation\umbraco\actions\publish.aspx" />
     <Content Include="umbraco.presentation\umbraco\channels\rsd.aspx" />
     <Content Include="umbraco.presentation\umbraco\channels\wlwmanifest.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\ExportCode.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\mediaPicker.aspx" />
     <Content Include="umbraco.presentation\umbraco\webservices\MacroContainerService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx" />
