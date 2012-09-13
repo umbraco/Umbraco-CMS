@@ -48,12 +48,6 @@ namespace Umbraco.Web.Routing
 						docRequest.RoutingContext.UmbracoContext,
 						handler.redirectID);
 
-					//SD: We are setting the Is404 to true here because these are 404 handlers. 
-					// if people in the future add their own last chance lookup resolver, they might not want things to be 404s
-					// and instead do their own thing so we should leave it up to the last chance resolver to set the 404, not the
-					// module.
-                	docRequest.Is404 = true;
-
                     // FIXME - could it be null?
 
 					LogHelper.Debug<DefaultLastChanceLookup>("Handler '{0}' found node with id={1}.", () => handler.GetType().FullName, () => handler.redirectID);                    
@@ -75,6 +69,12 @@ namespace Umbraco.Web.Routing
                     break;
                 }
             }
+
+			//SD: We are setting the Is404 to true here because these are 404 handlers. 
+			// if people in the future add their own last chance lookup resolver, they might not want things to be 404s
+			// and instead do their own thing so we should leave it up to the last chance resolver to set the 404, not the
+			// module.
+			docRequest.Is404 = true;
 
             return currentPage;
         }
