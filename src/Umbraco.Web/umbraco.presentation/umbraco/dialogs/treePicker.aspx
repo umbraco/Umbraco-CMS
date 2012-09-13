@@ -18,6 +18,6 @@
     </script>
 
     <umb2:Tree runat="server" ID="DialogTree" App='<%#TreeParams.App %>' TreeType='<%#TreeParams.TreeType %>'
-        IsDialog="true" ShowContextMenu="false" DialogMode="id" FunctionToCall="dialogHandler" />
+        IsDialog="true" ShowContextMenu="false" DialogMode="id" FunctionToCall="dialogHandler" NodeKey='<%#TreeParams.NodeKey %>' />
         
 </asp:Content>
