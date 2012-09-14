@@ -8,7 +8,6 @@ using System.Web;
 using System.Web.UI;
 using System.Xml;
 using Umbraco.Core.Macros;
-using Umbraco.Web.umbraco.templateControls;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
@@ -203,7 +202,7 @@ namespace umbraco.presentation.templateControls
 				}
 
 				// add the XSLT expression into the full XSLT document, together with the needed parameters
-				string xslt = string.Format(Resources.InlineXslt, xpathExpression, disableEscaping ? "yes" : "no",
+                string xslt = string.Format(Umbraco.Web.umbraco.presentation.umbraco.templateControls.Resources.InlineXslt, xpathExpression, disableEscaping ? "yes" : "no",
 																  namespaceList, namespaceDeclaractions);
 
 				// create the parameter
