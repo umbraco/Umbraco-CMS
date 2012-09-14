@@ -62,8 +62,6 @@
     <Compile Include="DocumentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dynamics\ClassFactory.cs" />
-    <Compile Include="Dynamics\DynamicBackingItem.cs" />
-    <Compile Include="Dynamics\DynamicBackingItemType.cs" />
     <Compile Include="Dynamics\DynamicClass.cs" />
     <Compile Include="Dynamics\DynamicDictionary.cs" />
     <Compile Include="Dynamics\DynamicExpression.cs" />
