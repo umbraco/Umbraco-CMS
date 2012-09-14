@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
-using Examine;
 using Examine.LuceneEngine.SearchCriteria;
 using Umbraco.Core.Dynamics;
 
@@ -57,26 +52,9 @@ namespace Umbraco.Web
 				s = searchProvider;
 
 			var results = s.Search(criteria);
-			return ConvertSearchResultToDynamicNode(results);
+			return results.ConvertSearchResultToDynamicDocument(PublishedContentStoreResolver.Current.PublishedContentStore);
 		}
 
-		private static DynamicDocumentList ConvertSearchResultToDynamicNode(IEnumerable<SearchResult> results)
-		{
-			var list = new DynamicDocumentList();
-			var xd = new XmlDocument();
-
-			foreach (var result in results.OrderByDescending(x => x.Score))
-			{
-				var doc = PublishedContentStoreResolver.Current.PublishedContentStore.GetDocumentById(
-					UmbracoContext.Current,
-					result.Id);
-				if (doc == null) continue; //skip if this doesn't exist in the cache				
-				doc.Properties.Add(
-					new PropertyResult("examineScore", result.Score.ToString(), Guid.Empty, PropertyResultType.CustomProperty));
-				var dynamicDoc = new DynamicDocument(doc);				
-				list.Add(dynamicDoc);
-			}
-			return list;
-		}
+		
 	}
 }

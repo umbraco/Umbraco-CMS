@@ -134,6 +134,7 @@ namespace Umbraco.Web
 			PropertyEditorValueConvertersResolver.Current.AddType<RteMacroRenderingPropertyEditorValueConverter>();
 
 			PublishedContentStoreResolver.Current = new PublishedContentStoreResolver(new DefaultPublishedContentStore());
+			PublishedMediaStoreResolver.Current = new PublishedMediaStoreResolver(new DefaultPublishedMediaStore());
 
 			FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
 				//add all known factories, devs can then modify this list on application startup either by binding to events

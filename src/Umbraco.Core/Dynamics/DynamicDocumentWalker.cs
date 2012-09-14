@@ -30,7 +30,7 @@ namespace Umbraco.Core.Dynamics
 			}
 			else
 			{
-				while ((context = context.Parent) != null && context.NodeTypeAlias != nodeTypeAlias) ;
+				while ((context = context.Parent) != null && context.DocumentTypeAlias != nodeTypeAlias) ;
 				return context;
 			}
 		}
@@ -144,7 +144,7 @@ namespace Umbraco.Core.Dynamics
 					while (workingIndex != currentIndex)
 					{
 						var working = container.ElementAtOrDefault(workingIndex);
-						if (working != null && working.NodeTypeAlias == nodeTypeAlias)
+						if (working != null && working.DocumentTypeAlias == nodeTypeAlias)
 						{
 							return working;
 						}
@@ -180,7 +180,7 @@ namespace Umbraco.Core.Dynamics
 				var currentIndex = container.FindIndex(n => n.Id == context.Id);
 				if (currentIndex != -1)
 				{
-					var newIndex = container.FindIndex(currentIndex, n => n.NodeTypeAlias == nodeTypeAlias);
+					var newIndex = container.FindIndex(currentIndex, n => n.DocumentTypeAlias == nodeTypeAlias);
 					if (newIndex != -1)
 					{
 						return container.ElementAt(newIndex);
@@ -242,7 +242,7 @@ namespace Umbraco.Core.Dynamics
 				if (currentIndex != -1)
 				{
 					var previousNodes = container.Take(currentIndex).ToList();
-					int newIndex = previousNodes.FindIndex(n => n.NodeTypeAlias == nodeTypeAlias);
+					int newIndex = previousNodes.FindIndex(n => n.DocumentTypeAlias == nodeTypeAlias);
 					if (newIndex != -1)
 					{
 						return container.ElementAt(newIndex);

@@ -245,6 +245,7 @@
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionaryFactory.cs" />
     <Compile Include="DynamicDocumentSearchExtensions.cs" />
+    <Compile Include="ExamineExtensions.cs" />
     <Compile Include="FormlessPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -262,6 +263,7 @@
     <Compile Include="Media\EmbedProviders\Twitgoo.cs" />
     <Compile Include="ModelStateExtensions.cs" />
     <Compile Include="PropertyEditors\RteMacroRenderingPropertyEditorValueConverter.cs" />
+    <Compile Include="PublishedMediaStoreResolver.cs" />
     <Compile Include="RenderFieldCaseType.cs" />
     <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="Routing\LookupByPageIdQuery.cs" />

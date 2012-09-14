@@ -3,7 +3,7 @@ using Umbraco.Core.ObjectResolution;
 namespace Umbraco.Web
 {
 	/// <summary>
-	/// An object resolver to return the IContentStore
+	/// An object resolver to return the IPublishedContentStore
 	/// </summary>
 	internal class PublishedContentStoreResolver : SingleObjectResolverBase<PublishedContentStoreResolver, IPublishedContentStore>
 	{

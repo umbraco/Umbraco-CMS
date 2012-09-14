@@ -843,7 +843,7 @@ namespace Umbraco.Core.Dynamics
 		}
 		public DynamicDocument AncestorOrSelf(string nodeTypeAlias)
 		{
-			return AncestorOrSelf(node => node.NodeTypeAlias == nodeTypeAlias);
+			return AncestorOrSelf(node => node.DocumentTypeAlias == nodeTypeAlias);
 		}
 		public DynamicDocument AncestorOrSelf(Func<DynamicDocument, bool> func)
 		{
@@ -908,7 +908,7 @@ namespace Umbraco.Core.Dynamics
 		}
 		public DynamicDocumentList AncestorsOrSelf(string nodeTypeAlias)
 		{
-			return AncestorsOrSelf(n => n.NodeTypeAlias == nodeTypeAlias);
+			return AncestorsOrSelf(n => n.DocumentTypeAlias == nodeTypeAlias);
 		}
 		public DynamicDocumentList AncestorsOrSelf(int level)
 		{
@@ -963,7 +963,7 @@ namespace Umbraco.Core.Dynamics
 		}
 		public DynamicDocumentList Ancestors(string nodeTypeAlias)
 		{
-			return Ancestors(n => n.NodeTypeAlias == nodeTypeAlias);
+			return Ancestors(n => n.DocumentTypeAlias == nodeTypeAlias);
 		}
 		public DynamicDocumentList Ancestors()
 		{
@@ -1049,7 +1049,7 @@ namespace Umbraco.Core.Dynamics
 			get { return _backingItem.UrlName; }
 		}
 
-		public string NodeTypeAlias
+		public string DocumentTypeAlias
 		{
 			get { return _backingItem.DocumentTypeAlias; }
 		}
