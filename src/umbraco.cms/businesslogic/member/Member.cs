@@ -223,7 +223,7 @@ namespace umbraco.cms.businesslogic.member
             if (Email != "" && Member.GetMemberFromEmail(Email) != null)
                 throw new Exception(String.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
             else if (Member.GetMemberFromLoginName(loginName) != null)
-                throw new Exception(String.Format("Duplicate User name! A member with the user name {0} already exists", Name));
+                throw new Exception(String.Format("Duplicate User name! A member with the user name {0} already exists", loginName));
 
             Guid newId = Guid.NewGuid();
 
