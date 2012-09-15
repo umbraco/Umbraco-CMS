@@ -22,15 +22,15 @@ namespace umbraco.MacroEngines.Library
 
 		internal static INode ConvertToNode(this DynamicDocument doc)
 		{
-			var node = new SimpleNode(doc);	
+			var node = new ConvertedNode(doc);	
 			return node;
 		}
 
-		private class SimpleNode : INode
+		private class ConvertedNode : INode
 		{
 			private readonly DynamicDocument _doc;
 
-			public SimpleNode(DynamicDocument doc)
+			public ConvertedNode(DynamicDocument doc)
 			{
 				_doc = doc;
 				template = doc.TemplateId;

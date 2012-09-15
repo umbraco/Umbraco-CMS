@@ -9,6 +9,7 @@ using System.Xml.XPath;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.interfaces;
+using Umbraco.Core;
 
 namespace umbraco.NodeFactory
 {
@@ -358,30 +359,11 @@ namespace umbraco.NodeFactory
 
 		public DataTable ChildrenAsTable()
 		{
-			if (Children.Count > 0)
-			{
-				DataTable dt = generateDataTable(Children[0]);
-
-				string firstNodeTypeAlias = Children[0].NodeTypeAlias;
-
-				foreach (Node n in Children)
-				{
-					if (n.NodeTypeAlias == firstNodeTypeAlias)
-					{
-						DataRow dr = dt.NewRow();
-						populateRow(ref dr, n, getPropertyHeaders(n));
-						dt.Rows.Add(dr);
-					}
-				}
-				return dt;
-			}
-			else
-				return new DataTable();
+			return Children.Count > 0 ? GenerateDataTable(Children[0]) : new DataTable();
 		}
 
 		public DataTable ChildrenAsTable(string nodeTypeAliasFilter)
 		{
-
 			if (Children.Count > 0)
 			{
 
@@ -399,93 +381,57 @@ namespace umbraco.NodeFactory
 
 				if (nodeFound)
 				{
-					DataTable dt = generateDataTable(Firstnode);
-
-					foreach (Node n in Children)
-					{
-						if (n.NodeTypeAlias == nodeTypeAliasFilter)
-						{
-							DataRow dr = dt.NewRow();
-							populateRow(ref dr, n, getPropertyHeaders(n));
-							dt.Rows.Add(dr);
-						}
-					}
-					return dt;
+					return GenerateDataTable(Firstnode);
 				}
-				else
-				{
-					return new DataTable();
-				}
-			}
-			else
 				return new DataTable();
+			}
+			return new DataTable();
 		}
 
-		private DataTable generateDataTable(Node SchemaNode)
+		private DataTable GenerateDataTable(INode node)
 		{
-			DataTable NodeAsDataTable = new DataTable(SchemaNode.NodeTypeAlias);
-			string[] defaultColumns = {
-			                          	"Id", "NodeName", "NodeTypeAlias", "CreateDate", "UpdateDate", "CreatorName",
-			                          	"WriterName", "Url"
-			                          };
-			foreach (string s in defaultColumns)
-			{
-				DataColumn dc = new DataColumn(s);
-				NodeAsDataTable.Columns.Add(dc);
-			}
-
-			// add properties
-			Hashtable propertyHeaders = getPropertyHeaders(SchemaNode);
-			IDictionaryEnumerator ide = propertyHeaders.GetEnumerator();
-			while (ide.MoveNext())
-			{
-				DataColumn dc = new DataColumn(ide.Value.ToString());
-				NodeAsDataTable.Columns.Add(dc);
-			}
-
-			return NodeAsDataTable;
+			//use new utility class to create table so that we don't have to maintain code in many places, just one
+			var dt = Umbraco.Core.DataTableExtensions.GenerateDataTable(
+				//pass in the alias
+				node.NodeTypeAlias,				
+				//pass in the callback to extract the Dictionary<string, string> of user defined aliases to their names
+				alias =>
+					{
+						var ct = ContentType.GetByAlias(alias);
+						return ct.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
+					},
+				//pass in a callback to populate the datatable, yup its a bit ugly but it's already legacy and we just want to maintain code in one place.
+				() =>
+					{
+						//create all row data
+						var tableData = Umbraco.Core.DataTableExtensions.CreateTableData();
+						//loop through each child and create row data for it
+						foreach (Node n in Children)
+						{
+							var standardVals = new Dictionary<string, object>()
+								{
+									{"Id", n.Id},
+									{"NodeName", n.Name},
+									{"NodeTypeAlias", n.NodeTypeAlias},
+									{"CreateDate", n.CreateDate},
+									{"UpdateDate", n.UpdateDate},
+									{"CreatorName", n.CreatorName},
+									{"WriterName", n.WriterName},
+									{"Url", library.NiceUrl(n.Id)}
+								};
+							var userVals = new Dictionary<string, object>();
+							foreach (var p in from Property p in n.Properties where p.Value != null select p)
+							{
+								userVals[p.Alias] = p.Value;
+							}
+							//add the row data
+							Umbraco.Core.DataTableExtensions.AddRowData(tableData, standardVals, userVals);
+						}
+						return tableData;
+					}
+				);
+			return dt;
 		}
-
-		private Hashtable getPropertyHeaders(Node SchemaNode)
-		{
-			if (_aliasToNames.ContainsKey(SchemaNode.NodeTypeAlias))
-				return (Hashtable)_aliasToNames[SchemaNode.NodeTypeAlias];
-			else
-			{
-				ContentType ct = ContentType.GetByAlias(SchemaNode.NodeTypeAlias);
-				Hashtable def = new Hashtable();
-				foreach (PropertyType pt in ct.PropertyTypes)
-					def.Add(pt.Alias, pt.Name);
-				System.Web.HttpContext.Current.Application.Lock();
-				_aliasToNames.Add(SchemaNode.NodeTypeAlias, def);
-				System.Web.HttpContext.Current.Application.UnLock();
-
-				return def;
-			}
-		}
-
-		private void populateRow(ref DataRow dr, Node n, Hashtable AliasesToNames)
-		{
-			dr["Id"] = n.Id;
-			dr["NodeName"] = n.Name;
-			dr["NodeTypeAlias"] = n.NodeTypeAlias;
-			dr["CreateDate"] = n.CreateDate;
-			dr["UpdateDate"] = n.UpdateDate;
-			dr["CreatorName"] = n.CreatorName;
-			dr["WriterName"] = n.WriterName;
-			dr["Url"] = library.NiceUrl(n.Id);
-
-			int counter = 8;
-			foreach (Property p in n.Properties)
-			{
-				if (p.Value != null)
-				{
-					dr[AliasesToNames[p.Alias].ToString()] = p.Value;
-					counter++;
-				}
-			}
-		}
-
 
 		private void initializeStructure()
 		{
