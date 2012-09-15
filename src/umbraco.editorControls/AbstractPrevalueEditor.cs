@@ -50,7 +50,7 @@ namespace umbraco.editorControls
             this.EnsureChildControls();
 
             // Adds the client dependencies.
-            this.RegisterEmbeddedClientResource("umbraco.editorControls.PrevalueEditor.css", ClientDependencyType.Css);
+            this.RegisterEmbeddedClientResource(typeof(AbstractPrevalueEditor), "umbraco.editorControls.PrevalueEditor.css", ClientDependencyType.Css);
         }
 
         /// <summary>

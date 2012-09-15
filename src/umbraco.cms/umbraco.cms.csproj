@@ -171,7 +171,6 @@
     <Compile Include="Actions\ActionAssignDomain.cs" />
     <Compile Include="Actions\ActionAudit.cs" />
     <Compile Include="Actions\ActionBrowse.cs" />
-    <Compile Include="Actions\ActionCodeExport.cs" />
     <Compile Include="Actions\ActionCopy.cs" />
     <Compile Include="Actions\ActionDelete.cs" />
     <Compile Include="Actions\ActionDisable.cs" />
