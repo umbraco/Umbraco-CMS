@@ -728,6 +728,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="chooseField">Choose field</key>
     <key alias="convertLineBreaks">Convert Linebreaks</key>
     <key alias="convertLineBreaksHelp">Replaces linebreaks with html-tag &amp;lt;br&amp;gt;</key>
+    <key alias="customFields">Custom Fields</key>
     <key alias="dateOnly">Yes, Date only</key>
     <key alias="formatAsDate">Format as date</key>
     <key alias="htmlEncode">HTML encode</key>
@@ -741,6 +742,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="recursive">Recursive</key>
     <key alias="removeParagraph">Remove Paragraph tags</key>
     <key alias="removeParagraphHelp">Will remove any &amp;lt;P&amp;gt; in the beginning and end of the text</key>
+    <key alias="standardFields">Standard Fields</key>
     <key alias="uppercase">Uppercase</key>
     <key alias="urlEncode">URL encode</key>
     <key alias="urlEncodeHelp">Will format special characters in URLs</key>

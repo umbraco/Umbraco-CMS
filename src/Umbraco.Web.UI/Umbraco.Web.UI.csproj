@@ -1417,7 +1417,9 @@
     </Content>
     <Content Include="umbraco\cacheBrowser.aspx" />
     <Content Include="umbraco\config\create\UI.xml" />
-    <Content Include="umbraco\config\lang\en.xml" />
+    <Content Include="umbraco\config\lang\en.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="umbraco\developer\Python\editPython.aspx" />
     <Content Include="umbraco\images\developer\customControlIcon.png" />
     <Content Include="umbraco\images\developer\pythonIcon.png" />
