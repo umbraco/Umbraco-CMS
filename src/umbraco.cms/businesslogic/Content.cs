@@ -602,7 +602,8 @@ namespace umbraco.cms.businesslogic
                     // don't want to delete the media folder if not using directories.
                     if (UmbracoSettings.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
                     {
-                        fs.DeleteDirectory(parentDirectory);
+                        //issue U4-771: if there is a parent directory the recursive parameter should be true
+                        fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);
                     }
                     else
                     {
