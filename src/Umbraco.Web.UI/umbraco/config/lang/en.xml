@@ -88,6 +88,7 @@
     <key alias="itemNotPublished">This item is not published</key>
     <key alias="lastPublished">Last published</key>
     <key alias="mediatype">Media Type</key>
+    <key alias="mediaLinks">Link to media item(s)</key>
     <key alias="membergroup">Member Group</key>
     <key alias="memberrole">Role</key>
     <key alias="membertype">Member Type</key>
