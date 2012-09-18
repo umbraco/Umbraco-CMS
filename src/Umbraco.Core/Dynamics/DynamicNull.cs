@@ -11,7 +11,7 @@ namespace Umbraco.Core.Dynamics
     //Because it's IEnumerable, if the user is actually trying @Model.TextPages or similar
     //it will still return an enumerable object (assuming the call actually failed because there were no children of that type)
     //but in .Where, if they use a property that doesn't exist, the lambda will bypass this and return false
-    internal class DynamicNull : DynamicObject, IEnumerable, IHtmlString
+    public class DynamicNull : DynamicObject, IEnumerable, IHtmlString
     {
         public IEnumerator GetEnumerator()
         {

@@ -59,9 +59,13 @@ namespace umbraco.dialogs
             else
             {
                 fieldSql = "select distinct alias from cmsPropertyType order by alias";
-                pp_insertField.Text = umbraco.ui.Text("templateEditor", "chooseField");
+                pp_insertField.Text = ui.Text("templateEditor", "chooseField");
             }
-            
+
+            fieldPicker.ChooseText = ui.Text("templateEditor", "chooseField");
+            fieldPicker.StandardPropertiesLabel = ui.Text("templateEditor", "standardFields");
+            fieldPicker.CustomPropertiesLabel = ui.Text("templateEditor", "customFields");
+                        
             IRecordsReader dataTypes = SqlHelper.ExecuteReader(fieldSql);
 			fieldPicker.DataTextField = "alias";
 			fieldPicker.DataValueField = "alias";
@@ -70,6 +74,10 @@ namespace umbraco.dialogs
             fieldPicker.Attributes.Add("onChange", "document.forms[0].field.value = document.forms[0]." + fieldPicker.ClientID + "[document.forms[0]." + fieldPicker.ClientID + ".selectedIndex].value;");
 			dataTypes.Close();
 
+            altFieldPicker.ChooseText = ui.Text("templateEditor", "chooseField");
+            altFieldPicker.StandardPropertiesLabel = ui.Text("templateEditor", "standardFields");
+            altFieldPicker.CustomPropertiesLabel = ui.Text("templateEditor", "customFields");
+            
 			IRecordsReader dataTypes2 = SqlHelper.ExecuteReader(fieldSql);
 			altFieldPicker.DataTextField = "alias";
 			altFieldPicker.DataValueField = "alias";
@@ -77,9 +85,6 @@ namespace umbraco.dialogs
 			altFieldPicker.DataBind();
             altFieldPicker.Attributes.Add("onChange", "document.forms[0].useIfEmpty.value = document.forms[0]." + altFieldPicker.ClientID + "[document.forms[0]." + altFieldPicker.ClientID + ".selectedIndex].value;");
 			dataTypes2.Close();
-
-			fieldPicker.Items.Insert(0,new ListItem(ui.Text("general", "choose", base.getUser())));
-			altFieldPicker.Items.Insert(0,new ListItem(ui.Text("general", "choose", base.getUser())));
 
 			// Pre values
             if (!m_IsDictionaryMode)

@@ -1,7 +1,10 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" %>
-<%@ Register Namespace="umbraco.uicontrols" Assembly="controls" TagPrefix="umb" %>
-<script type="text/javascript" src="/umbraco/dashboard/scripts/jquery.jfeed.pack.js"></script>
-<link href="/umbraco_client/propertypane/style.css" rel="stylesheet" />
+<%@ Register Assembly="controls" Namespace="umbraco.uicontrols" TagPrefix="umb" %>
+<%@ Register Assembly="ClientDependency.Core" Namespace="ClientDependency.Core.Controls" TagPrefix="umb" %>
+
+<umb:CssInclude runat="server" FilePath="propertypane/style.css" PathNameAlias="UmbracoClient" />
+<umb:JsInclude runat="server" FilePath="dashboard/scripts/jquery.jfeed.pack.js" PathNameAlias="UmbracoRoot" />
+
 <style type="text/css">
     .formList, .tvList
     {
@@ -66,16 +69,12 @@
     }
 </style>
 <script type="text/javascript">
-
     jQuery(function () {
-
         jQuery.ajax({
             type: 'GET',
             url: 'dashboard/feedproxy.aspx?url=http://umbraco.org/feeds/videos/members',
             dataType: 'xml',
             success: function (xml) {
-
-
                 var html = "<div class='tvList'>";
 
                 jQuery('item', xml).each(function () {
@@ -95,25 +94,14 @@
 
                 jQuery('#latestformvids').html(html);
             }
-
         });
-
-
-
     });
-
-
 </script>
-  <div class="dashboardWrapper">
+<div class="dashboardWrapper">
     <h2>Watch and learn</h2>
     <img src="./dashboard/images/tv.png" alt="Videos" class="dashboardIcon" />
-        <h3>Hours of Umbraco training videos are only a click away</h3>
-        <p>
-            Want to master Umbraco Members? Spend a couple of minutes learning some best practices
-            by watching one of these videos about using Umbraco. And visit <a href="http://umbraco.tv"
-                target="_blank">umbraco.tv</a> for even more Umbraco videos</p>
-                <h3>To get you started:</h3>
-     <div id="latestformvids">
-            Loading...
-     </div>
+    <h3>Hours of Umbraco training videos are only a click away</h3>
+    <p>Want to master Umbraco Members? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="http://umbraco.tv" target="_blank">umbraco.tv</a> for even more Umbraco videos</p>
+    <h3>To get you started:</h3>
+    <div id="latestformvids">Loading...</div>
 </div>

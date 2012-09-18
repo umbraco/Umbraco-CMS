@@ -19,27 +19,29 @@ namespace Umbraco.Core.Dynamics
 	/// </summary>
 	public class DynamicDocument : DynamicObject
 	{
-		private readonly DynamicBackingItem _backingItem;
+		private readonly IDocument _backingItem;
 		private DynamicDocumentList _cachedChildren;
 		private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
 
 		internal DynamicDocumentList OwnerList { get; set; }
 
-		internal DynamicDocument(DynamicBackingItem n)
-		{
-			if (n == null) throw new ArgumentNullException("n");
-			_backingItem = n;
-		}
-
 		public DynamicDocument(IDocument node)
 		{
 			if (node == null) throw new ArgumentNullException("node");
-			_backingItem = new DynamicBackingItem(node);
+			_backingItem = node;
 		}
 
-		public DynamicDocument()
+		/// <summary>
+		/// Returns an empty/blank DynamicDocument, this is used for special case scenarios
+		/// </summary>
+		/// <returns></returns>
+		internal static DynamicDocument Empty()
 		{
-			//Empty constructor for a special case with Generic Methods
+			return new DynamicDocument();
+		}
+
+		private DynamicDocument()
+		{			
 		}
 
 		public dynamic AsDynamic()
@@ -235,7 +237,7 @@ namespace Umbraco.Core.Dynamics
 			{
 				try
 				{
-					var prop = _backingItem.GetUserProperty(name);
+					var prop = GetUserProperty(name);
 
 					return (prop != null);
 				}
@@ -351,10 +353,6 @@ namespace Umbraco.Core.Dynamics
 				{
 					result = new DynamicDocument((IDocument)result);
 				}				
-				if (result is DynamicBackingItem)
-				{
-					result = new DynamicDocument((DynamicBackingItem)result);
-				}
 				if (result is IEnumerable<IDocument>)
 				{
 					result = new DynamicDocumentList((IEnumerable<IDocument>)result);
@@ -404,7 +402,7 @@ namespace Umbraco.Core.Dynamics
 		{
 			
 			var filteredTypeChildren = _backingItem.Children
-				.Where(x => x.NodeTypeAlias.InvariantEquals(binder.Name) || x.NodeTypeAlias.MakePluralName().InvariantEquals(binder.Name))
+				.Where(x => x.DocumentTypeAlias.InvariantEquals(binder.Name) || x.DocumentTypeAlias.MakePluralName().InvariantEquals(binder.Name))
 				.ToArray();
 			if (filteredTypeChildren.Any())
 			{
@@ -422,7 +420,7 @@ namespace Umbraco.Core.Dynamics
 		protected virtual Attempt<object> TryGetDocumentProperty(GetMemberBinder binder)
 		{
 			
-			var reflectedProperty = _backingItem.GetReflectedProperty(binder.Name);
+			var reflectedProperty = GetReflectedProperty(binder.Name);
 			var result = reflectedProperty != null
 				? reflectedProperty.Value
 				: null;
@@ -447,7 +445,7 @@ namespace Umbraco.Core.Dynamics
 				recursive = true;
 			}
 
-			var userProperty = _backingItem.GetUserProperty(name, recursive);
+			var userProperty = GetUserProperty(name, recursive);
 
 			if (userProperty == null)
 			{
@@ -456,7 +454,7 @@ namespace Umbraco.Core.Dynamics
 			
 			var result = userProperty.Value;
 
-			if (_backingItem.NodeTypeAlias == null && userProperty.Alias == null)
+			if (_backingItem.DocumentTypeAlias == null && userProperty.Alias == null)
 			{
 				throw new InvalidOperationException("No node alias or property alias available. Unable to look up the datatype of the property you are trying to fetch.");
 			}
@@ -588,6 +586,101 @@ namespace Umbraco.Core.Dynamics
 		//    result = null;
 		//    return false;
 		//}
+
+		/// <summary>
+		/// Returns a property defined on the document object as a member property using reflection
+		/// </summary>
+		/// <param name="alias"></param>
+		/// <returns></returns>
+		private PropertyResult GetReflectedProperty(string alias)
+		{
+			return GetPropertyInternal(alias, _backingItem, false);
+		}
+
+		/// <summary>
+		/// Return a user defined property
+		/// </summary>
+		/// <param name="alias"></param>
+		/// <param name="recursive"></param>
+		/// <returns></returns>
+		private PropertyResult GetUserProperty(string alias, bool recursive = false)
+		{
+			if (!recursive)
+			{
+				return GetPropertyInternal(alias, _backingItem);
+			}
+			var context = this;
+			var prop = GetPropertyInternal(alias, _backingItem);
+			while (prop == null || !prop.HasValue())
+			{
+				context = context.Parent;
+				if (context == null) break;
+				prop = context.GetPropertyInternal(alias, context._backingItem);
+			}
+			return prop;
+		}
+
+
+		private PropertyResult GetPropertyInternal(string alias, IDocument content, bool checkUserProperty = true)
+		{
+			if (alias.IsNullOrWhiteSpace()) throw new ArgumentNullException("alias");
+			if (content == null) throw new ArgumentNullException("content");
+
+			//if we're looking for a user defined property
+			if (checkUserProperty)
+			{
+				var prop = content.GetProperty(alias);
+
+				return prop == null
+						? null
+						: new PropertyResult(prop, PropertyResultType.UserProperty)
+						{
+							DocumentTypeAlias = content.DocumentTypeAlias,
+							DocumentId = content.Id
+						};
+			}
+
+			//reflect
+
+			Func<string, Attempt<object>> getMember =
+				memberAlias =>
+				{
+					try
+					{
+						return new Attempt<object>(true,
+												   content.GetType().InvokeMember(memberAlias,
+																				  System.Reflection.BindingFlags.GetProperty |
+																				  System.Reflection.BindingFlags.Instance |
+																				  System.Reflection.BindingFlags.Public,
+																				  null,
+																				  content,
+																				  null));
+					}
+					catch (MissingMethodException ex)
+					{
+						return new Attempt<object>(ex);
+					}
+				};
+
+			//try with the current casing
+			var attempt = getMember(alias);
+			if (!attempt.Success)
+			{
+				//if we cannot get with the current alias, try changing it's case
+				attempt = alias[0].IsUpperCase()
+					? getMember(alias.ConvertCase(StringAliasCaseType.CamelCase))
+					: getMember(alias.ConvertCase(StringAliasCaseType.PascalCase));
+			}
+
+			return !attempt.Success
+					? null
+					: new PropertyResult(alias, attempt.Result, Guid.Empty, PropertyResultType.ReflectedProperty)
+					{
+						DocumentTypeAlias = content.DocumentTypeAlias,
+						DocumentId = content.Id
+					};
+		}
+
 
 		/// <summary>
 		/// Converts the currentValue to a correctly typed value based on known registered converters, then based on known standards.
@@ -750,7 +843,7 @@ namespace Umbraco.Core.Dynamics
 		}
 		public DynamicDocument AncestorOrSelf(string nodeTypeAlias)
 		{
-			return AncestorOrSelf(node => node.NodeTypeAlias == nodeTypeAlias);
+			return AncestorOrSelf(node => node.DocumentTypeAlias == nodeTypeAlias);
 		}
 		public DynamicDocument AncestorOrSelf(Func<DynamicDocument, bool> func)
 		{
@@ -815,7 +908,7 @@ namespace Umbraco.Core.Dynamics
 		}
 		public DynamicDocumentList AncestorsOrSelf(string nodeTypeAlias)
 		{
-			return AncestorsOrSelf(n => n.NodeTypeAlias == nodeTypeAlias);
+			return AncestorsOrSelf(n => n.DocumentTypeAlias == nodeTypeAlias);
 		}
 		public DynamicDocumentList AncestorsOrSelf(int level)
 		{
@@ -823,7 +916,7 @@ namespace Umbraco.Core.Dynamics
 		}
 		public DynamicDocumentList Descendants(string nodeTypeAlias)
 		{
-			return Descendants(p => p.NodeTypeAlias == nodeTypeAlias);
+			return Descendants(p => p.DocumentTypeAlias == nodeTypeAlias);
 		}
 		public DynamicDocumentList Descendants(int level)
 		{
@@ -833,9 +926,9 @@ namespace Umbraco.Core.Dynamics
 		{
 			return Descendants(n => true);
 		}
-		internal DynamicDocumentList Descendants(Func<DynamicBackingItem, bool> func)
+		internal DynamicDocumentList Descendants(Func<IDocument, bool> func)
 		{
-			var flattenedNodes = this._backingItem.Children.Map(func, (DynamicBackingItem n) => n.Children);
+			var flattenedNodes = this._backingItem.Children.Map(func, (IDocument n) => n.Children);
 			return new DynamicDocumentList(flattenedNodes.ToList().ConvertAll(dynamicBackingItem => new DynamicDocument(dynamicBackingItem)));
 		}
 		public DynamicDocumentList DescendantsOrSelf(int level)
@@ -844,22 +937,22 @@ namespace Umbraco.Core.Dynamics
 		}
 		public DynamicDocumentList DescendantsOrSelf(string nodeTypeAlias)
 		{
-			return DescendantsOrSelf(p => p.NodeTypeAlias == nodeTypeAlias);
+			return DescendantsOrSelf(p => p.DocumentTypeAlias == nodeTypeAlias);
 		}
 		public DynamicDocumentList DescendantsOrSelf()
 		{
 			return DescendantsOrSelf(p => true);
 		}
-		internal DynamicDocumentList DescendantsOrSelf(Func<DynamicBackingItem, bool> func)
+		internal DynamicDocumentList DescendantsOrSelf(Func<IDocument, bool> func)
 		{
 			if (this._backingItem != null)
 			{
-				var thisNode = new List<DynamicBackingItem>();
+				var thisNode = new List<IDocument>();
 				if (func(this._backingItem))
 				{
 					thisNode.Add(this._backingItem);
 				}
-				var flattenedNodes = this._backingItem.Children.Map(func, (DynamicBackingItem n) => n.Children);
+				var flattenedNodes = this._backingItem.Children.Map(func, (IDocument n) => n.Children);
 				return new DynamicDocumentList(thisNode.Concat(flattenedNodes).ToList().ConvertAll(dynamicBackingItem => new DynamicDocument(dynamicBackingItem)));
 			}
 			return new DynamicDocumentList(Enumerable.Empty<IDocument>());
@@ -870,7 +963,7 @@ namespace Umbraco.Core.Dynamics
 		}
 		public DynamicDocumentList Ancestors(string nodeTypeAlias)
 		{
-			return Ancestors(n => n.NodeTypeAlias == nodeTypeAlias);
+			return Ancestors(n => n.DocumentTypeAlias == nodeTypeAlias);
 		}
 		public DynamicDocumentList Ancestors()
 		{
@@ -923,8 +1016,6 @@ namespace Umbraco.Core.Dynamics
 			}
 		}
 
-		//private readonly Lazy<RazorLibraryCore> _razorLibrary = new Lazy<RazorLibraryCore>(() => new RazorLibraryCore(null));
-
 		public int TemplateId
 		{
 			get { return _backingItem.TemplateId; }
@@ -944,7 +1035,7 @@ namespace Umbraco.Core.Dynamics
 			get
 			{
 
-				var umbracoNaviHide = _backingItem.GetUserProperty("umbracoNaviHide");
+				var umbracoNaviHide = GetUserProperty("umbracoNaviHide");
 				if (umbracoNaviHide != null)
 				{
 					return umbracoNaviHide.Value.ToString().Trim() != "1";
@@ -952,19 +1043,15 @@ namespace Umbraco.Core.Dynamics
 				return true;
 			}
 		}
-		//public string Url
-		//{
-		//    get { if (_n == null) return null; return _n.Url; }
-		//}
 
 		public string UrlName
 		{
 			get { return _backingItem.UrlName; }
 		}
 
-		public string NodeTypeAlias
+		public string DocumentTypeAlias
 		{
-			get { return _backingItem.NodeTypeAlias; }
+			get { return _backingItem.DocumentTypeAlias; }
 		}
 
 		public string WriterName
@@ -1010,12 +1097,7 @@ namespace Umbraco.Core.Dynamics
 		{
 			get { return _backingItem.Version; }
 		}
-
-		//public string NiceUrl
-		//{
-		//    get { if (_n == null) return null; return _n.NiceUrl; }
-		//}
-
+		
 		public int Level
 		{
 			get { return _backingItem.Level; }
@@ -1025,12 +1107,7 @@ namespace Umbraco.Core.Dynamics
 		{
 			get { return _backingItem.Properties; }
 		}
-
-		//public IEnumerable<DynamicBackingItem> Children
-		//{
-		//    get { if (_n == null) return null; return _n.Children; }
-		//}
-
+		
 		public IEnumerable<DynamicDocument> Children
 		{
 			get
@@ -1038,7 +1115,7 @@ namespace Umbraco.Core.Dynamics
 				if (_cachedChildren == null)
 				{
 					var children = _backingItem.Children;
-					//testing
+					//testing, think this must be a special case for the root node ?
 					if (!children.Any() && _backingItem.Id == 0)
 					{
 						_cachedChildren = new DynamicDocumentList(new List<DynamicDocument> { new DynamicDocument(this._backingItem) });
@@ -1061,8 +1138,8 @@ namespace Umbraco.Core.Dynamics
 		public IDocumentProperty GetProperty(string alias, bool recursive)
 		{
 			return alias.StartsWith("@")
-				? _backingItem.GetReflectedProperty(alias.TrimStart('@'))
-				: _backingItem.GetUserProperty(alias, recursive);
+				? GetReflectedProperty(alias.TrimStart('@'))
+				: GetUserProperty(alias, recursive);
 		}
 		public string GetPropertyValue(string alias)
 		{
@@ -1076,8 +1153,8 @@ namespace Umbraco.Core.Dynamics
 		public string GetPropertyValue(string alias, bool recursive)
 		{
 			var p = alias.StartsWith("@")
-					? _backingItem.GetReflectedProperty(alias.TrimStart('@'))
-					: _backingItem.GetUserProperty(alias, recursive);
+					? GetReflectedProperty(alias.TrimStart('@'))
+					: GetUserProperty(alias, recursive);
 			return p == null ? null : p.ValueAsString;
 		}
 		public string GetPropertyValue(string alias, bool recursive, string fallback)
@@ -1090,7 +1167,7 @@ namespace Umbraco.Core.Dynamics
 		
 		public bool IsNull(string alias, bool recursive)
 		{
-			var prop = _backingItem.GetUserProperty(alias, recursive);
+			var prop = GetUserProperty(alias, recursive);
 			if (prop == null) return true;
 			return ((PropertyResult)prop).HasValue();
 		}
@@ -1104,8 +1181,7 @@ namespace Umbraco.Core.Dynamics
 		}
 		public bool HasValue(string alias, bool recursive)
 		{
-			var prop = _backingItem.GetUserProperty(alias, recursive);
-			//var prop = GetProperty(alias, recursive);
+			var prop = GetUserProperty(alias, recursive);
 			if (prop == null) return false;
 			return prop.HasValue();
 		}

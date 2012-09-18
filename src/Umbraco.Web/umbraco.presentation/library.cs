@@ -194,29 +194,29 @@ namespace umbraco
         /// <param name="documentId">The Id of the Document to be published</param>
         public static void UpdateDocumentCache(int documentId)
         {
-			var d = new Document(documentId);
-        	UpdateDocumentCache(d);
+            var d = new Document(documentId);
+            UpdateDocumentCache(d);
         }
 
-		/// <summary>
-		/// Publishes a Document by adding it to the runtime xml index. Note, prior to this the Document should be 
-		/// marked published by calling Publish(User u) on the document object.
-		/// </summary>
-		/// <param name="doc"></param>
-		/// <remarks>
-		/// NOTE: This method was created because before it was always calling the method with the documentId as a parameter 
-		/// which means we have to re-look up the document in the db again when we already have it, this should save on a few 
-		/// dozen sql calls when publishing.
-		/// </remarks>
-		internal static void UpdateDocumentCache(Document doc)
-		{
-			if (UmbracoSettings.UseDistributedCalls)
-				dispatcher.Refresh(
-					new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"),
-					doc.Id);
-			else
-				content.Instance.UpdateDocumentCache(doc);
-		}
+        /// <summary>
+        /// Publishes a Document by adding it to the runtime xml index. Note, prior to this the Document should be 
+        /// marked published by calling Publish(User u) on the document object.
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <remarks>
+        /// NOTE: This method was created because before it was always calling the method with the documentId as a parameter 
+        /// which means we have to re-look up the document in the db again when we already have it, this should save on a few 
+        /// dozen sql calls when publishing.
+        /// </remarks>
+        internal static void UpdateDocumentCache(Document doc)
+        {
+            if (UmbracoSettings.UseDistributedCalls)
+                dispatcher.Refresh(
+                    new Guid("27ab3022-3dfa-47b6-9119-5945bc88fd66"),
+                    doc.Id);
+            else
+                content.Instance.UpdateDocumentCache(doc);
+        }
 
 
         /// <summary>
@@ -370,8 +370,8 @@ namespace umbraco
         /// <returns>String with a friendly url from a node</returns>
         public static string NiceUrl(int nodeID)
         {
-			var niceUrlsProvider = Umbraco.Web.UmbracoContext.Current.RoutingContext.NiceUrlProvider;
-			return niceUrlsProvider.GetNiceUrl(nodeID);
+            var niceUrlsProvider = Umbraco.Web.UmbracoContext.Current.RoutingContext.NiceUrlProvider;
+            return niceUrlsProvider.GetNiceUrl(nodeID);
         }
 
         /// <summary>
@@ -380,23 +380,36 @@ namespace umbraco
         /// </summary>
         /// <param name="nodeID">Identifier for the node that should be returned</param>
         /// <returns>String with a friendly url from a node</returns>
-		[Obsolete]
+        [Obsolete]
         public static string NiceUrlFullPath(int nodeID)
         {
-			throw new NotImplementedException("It was broken anyway...");
+            throw new NotImplementedException("It was broken anyway...");
+        }
+
+        /// <summary>
+        /// This method will always add the domain to the path if the hostnames are set up correctly. 
+        /// </summary>
+        /// <param name="nodeID">Identifier for the node that should be returned</param>
+        /// <returns>String with a friendly url with full domain from a node</returns>
+        public static string NiceUrlWithDomain(int nodeID)
+        {
+            var niceUrlsProvider = Umbraco.Web.UmbracoContext.Current.RoutingContext.NiceUrlProvider;
+            return niceUrlsProvider.GetNiceUrl(nodeID, Umbraco.Web.UmbracoContext.Current.UmbracoUrl, true);
         }
 
         /// <summary>
         /// This method will always add the domain to the path. 
         /// </summary>
         /// <param name="nodeID">Identifier for the node that should be returned</param>
+        /// <param name="ignoreUmbracoHostNames">Ignores the umbraco hostnames and returns the url prefixed with the requested host (including scheme and port number)</param>
         /// <returns>String with a friendly url with full domain from a node</returns>
-        public static string NiceUrlWithDomain(int nodeID)
+        internal static string NiceUrlWithDomain(int nodeID, bool ignoreUmbracoHostNames)
         {
-			var niceUrlsProvider = Umbraco.Web.UmbracoContext.Current.RoutingContext.NiceUrlProvider;
-			return niceUrlsProvider.GetNiceUrl(nodeID, Umbraco.Web.UmbracoContext.Current.UmbracoUrl, true);
-        }
+            if (ignoreUmbracoHostNames)
+                return HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority) + NiceUrl(nodeID);
 
+            return NiceUrlWithDomain(nodeID);
+        }
 
         public static string ResolveVirtualPath(string path)
         {
@@ -426,7 +439,7 @@ namespace umbraco
                         IndexOf("," + alias + ",") > -1)
                     return umbracoXML.GetElementById(nodeID.ToString()).Attributes.GetNamedItem(alias).Value;
                 else if (
-                    umbracoXML.GetElementById(nodeID.ToString()).SelectSingleNode(string.Format(xpath,alias)) !=
+                    umbracoXML.GetElementById(nodeID.ToString()).SelectSingleNode(string.Format(xpath, alias)) !=
                     null)
                     return
                         umbracoXML.GetElementById(nodeID.ToString()).SelectSingleNode(string.Format(xpath, alias)).ChildNodes[0].
@@ -1195,7 +1208,7 @@ namespace umbraco
                     {
                         sw.Write("<!-- Error generating macroContent: '{0}' -->", ee);
                     }
-   
+
                     // update the local page items again
                     updateLocalContextItems(items, Context);
 
@@ -1579,8 +1592,8 @@ namespace umbraco
             }
         }
 
-		//TODO: WTF, why is this here? This won't matter if there's an UmbracoContext or not, it will call the same underlying method!
-		// only difference is that the UmbracoContext way will check if its in preview mode.
+        //TODO: WTF, why is this here? This won't matter if there's an UmbracoContext or not, it will call the same underlying method!
+        // only difference is that the UmbracoContext way will check if its in preview mode.
         private static XmlDocument GetThreadsafeXmlDocument()
         {
             return UmbracoContext.Current != null
@@ -2112,10 +2125,10 @@ namespace umbraco
                     if (cultureErrorNode != null && cultureErrorNode.FirstChild != null)
                         error404 = cultureErrorNode.FirstChild.Value;
                 }
-                else if(error404Node.SelectSingleNode(string.Format("errorPage [@culture = '{0}']",System.Threading.Thread.CurrentThread.CurrentUICulture.Name)) != null)
+                else if (error404Node.SelectSingleNode(string.Format("errorPage [@culture = '{0}']", System.Threading.Thread.CurrentThread.CurrentUICulture.Name)) != null)
                 {
                     cultureErrorNode = error404Node.SelectSingleNode(string.Format("errorPage [@culture = '{0}']", System.Threading.Thread.CurrentThread.CurrentUICulture.Name));
-                    if(cultureErrorNode.FirstChild != null)
+                    if (cultureErrorNode.FirstChild != null)
                         error404 = cultureErrorNode.FirstChild.Value;
                 }
                 else

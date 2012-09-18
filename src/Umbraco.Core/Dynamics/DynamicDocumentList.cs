@@ -24,13 +24,6 @@ namespace Umbraco.Core.Dynamics
             Items = list;
         }
 
-		//public DynamicNodeList(IEnumerable<DynamicBackingItem> items)
-		//{
-		//    List<DynamicNode> list = items.ToList().ConvertAll(n => new DynamicNode(n));
-		//    list.ForEach(node => node.OwnerList = this);
-		//    Items = list;
-		//}
-
         public DynamicDocumentList(IEnumerable<IDocument> items)
         {
             List<DynamicDocument> list = items.Select(x => new DynamicDocument(x)).ToList();
@@ -209,7 +202,7 @@ namespace Umbraco.Core.Dynamics
                         //We do this to enable error checking of Razor Syntax when a method e.g. ElementAt(2) is used.
                         //When the Script is tested, there's no Children which means ElementAt(2) is invalid (IndexOutOfRange)
                         //Instead, we are going to return an empty DynamicNode.
-                        result = new DynamicDocument();
+                    	result = DynamicDocument.Empty();
                         return true;
                     }
 
@@ -417,10 +410,6 @@ namespace Umbraco.Core.Dynamics
 				{
 					result = new DynamicDocument((IDocument)result);
 				}
-				if (result is DynamicBackingItem)
-				{
-					result = new DynamicDocument((DynamicBackingItem)result);
-				}
 				if (result is IEnumerable<IDocument>)
 				{
 					result = new DynamicDocumentList((IEnumerable<IDocument>)result);
@@ -433,20 +422,6 @@ namespace Umbraco.Core.Dynamics
             return result;
         }
 
-		//IEnumerator<DynamicNode> IEnumerable<DynamicNode>.GetEnumerator()
-		//{
-		//    return Items.GetEnumerator();
-		//}
-
-		//public IEnumerator GetEnumerator()
-		//{
-		//    return Items.GetEnumerator();
-		//}
-
-		//public IQueryable Take<T>(int count)
-		//{
-		//    return ((IQueryable<T>)Items.AsQueryable()).Take(count);
-		//}
         public IQueryable<T> Where<T>(string predicate, params object[] values)
         {
             return ((IQueryable<T>)Items.AsQueryable()).Where(predicate, values);

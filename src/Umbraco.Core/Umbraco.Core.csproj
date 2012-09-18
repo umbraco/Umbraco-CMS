@@ -56,14 +56,13 @@
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
     <Compile Include="CoreBootManager.cs" />
+    <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="DocumentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dynamics\ClassFactory.cs" />
-    <Compile Include="Dynamics\DynamicBackingItem.cs" />
-    <Compile Include="Dynamics\DynamicBackingItemType.cs" />
     <Compile Include="Dynamics\DynamicClass.cs" />
     <Compile Include="Dynamics\DynamicDictionary.cs" />
     <Compile Include="Dynamics\DynamicExpression.cs" />

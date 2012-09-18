@@ -661,16 +661,7 @@ namespace Umbraco.Core.Configuration
                     return false;
             }
         }
-
-        /// <summary>
-        /// Gets the graphic headline format - png or gif
-        /// </summary>
-        /// <value>The graphic headline format.</value>
-        public static string GraphicHeadlineFormat
-        {
-            get { return GetKey("/settings/content/graphicHeadlineFormat"); }
-        }
-
+        
         /// <summary>
         /// Gets a value indicating whether umbraco will ensure unique node naming.
         /// This will ensure that nodes cannot have the same url, but will add extra characters to a url.

@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.UI;
+using System.Xml.Linq;
+using System.Xml.XPath;
+using HtmlAgilityPack;
 using Umbraco.Core;
+using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using umbraco;
 using System.Collections.Generic;
@@ -12,6 +18,7 @@ using umbraco.presentation.templateControls;
 
 namespace Umbraco.Web
 {
+	
 	/// <summary>
 	/// A helper class that provides many useful methods and functionality for using Umbraco in templates
 	/// </summary>
@@ -208,5 +215,432 @@ namespace Umbraco.Web
 
 		#endregion
 
+		#region Content
+
+		public dynamic ContentById(int id)
+		{
+			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+		}
+
+		public dynamic ContentById(string id)
+		{
+			return DocumentById(id, PublishedContentStoreResolver.Current.PublishedContentStore);
+		}
+
+		public dynamic ContentByIds(params int[] ids)
+		{
+			return DocumentByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+		}
+
+		public dynamic ContentByIds(params string[] ids)
+		{
+			return DocumentByIds(PublishedContentStoreResolver.Current.PublishedContentStore, ids);
+		}
+		
+		#endregion
+
+		#region Media
+
+		public dynamic MediaById(int id)
+		{
+			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+		}
+
+		public dynamic MediaById(string id)
+		{
+			return DocumentById(id, PublishedMediaStoreResolver.Current.PublishedMediaStore);
+		}
+
+		public dynamic MediaByIds(params int[] ids)
+		{
+			return DocumentByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+		}
+
+		public dynamic MediaByIds(params string[] ids)
+		{
+			return DocumentByIds(PublishedMediaStoreResolver.Current.PublishedMediaStore, ids);
+		}
+
+		#endregion
+
+		#region Used by Content/Media
+
+		private dynamic DocumentById(int id, IPublishedStore store)
+		{
+			var doc = store.GetDocumentById(UmbracoContext.Current, id);
+			return doc == null
+					? new DynamicNull()
+					: new DynamicDocument(doc).AsDynamic();
+		}
+
+		private dynamic DocumentById(string id, IPublishedStore store)
+		{
+			int docId;
+			return int.TryParse(id, out docId) 
+				? DocumentById(docId, store) 
+				: new DynamicNull();
+		}
+
+		private dynamic DocumentByIds(IPublishedStore store, params int[] ids)
+		{
+			var nodes = ids.Select(eachId => DocumentById(eachId, store))
+				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
+				.Cast<DynamicDocument>();
+			return new DynamicDocumentList(nodes);
+		}
+
+		private dynamic DocumentByIds(IPublishedStore store, params string[] ids)
+		{
+			var nodes = ids.Select(eachId => DocumentById(eachId, store))
+				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
+				.Cast<DynamicDocument>();
+			return new DynamicDocumentList(nodes);
+		}
+
+		#endregion
+
+		#region Search
+
+		/// <summary>
+		/// Searches content
+		/// </summary>
+		/// <param name="term"></param>
+		/// <param name="useWildCards"></param>
+		/// <param name="searchProvider"></param>
+		/// <returns></returns>
+		public dynamic Search(string term, bool useWildCards = true, string searchProvider = null)
+		{
+			var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
+			if (!string.IsNullOrEmpty(searchProvider))
+				searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
+
+			var results = searcher.Search(term, useWildCards);
+			return results.ConvertSearchResultToDynamicDocument(PublishedContentStoreResolver.Current.PublishedContentStore);
+		}
+
+		/// <summary>
+		/// Searhes content
+		/// </summary>
+		/// <param name="criteria"></param>
+		/// <param name="searchProvider"></param>
+		/// <returns></returns>
+		public dynamic Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+		{
+			var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
+			if (searchProvider != null)
+				s = searchProvider;
+
+			var results = s.Search(criteria);
+			return results.ConvertSearchResultToDynamicDocument(PublishedContentStoreResolver.Current.PublishedContentStore);
+		}
+
+		#endregion
+
+		#region Xml
+
+		public dynamic ToDynamicXml(string xml)
+		{
+			if (string.IsNullOrWhiteSpace(xml)) return null;
+			var xElement = XElement.Parse(xml);
+			return new DynamicXml(xElement);
+		}
+
+		public dynamic ToDynamicXml(XElement xElement)
+		{
+			return new DynamicXml(xElement);
+		}
+
+		public dynamic ToDynamicXml(XPathNodeIterator xpni)
+		{
+			return new DynamicXml(xpni);
+		}
+
+		#endregion
+
+		#region Strings
+
+		public HtmlString StripHtml(IHtmlString html, params string[] tags)
+		{
+			return StripHtml(html.ToHtmlString(), tags);
+		}
+		public HtmlString StripHtml(DynamicNull html, params string[] tags)
+		{
+			return new HtmlString(string.Empty);
+		}
+		public HtmlString StripHtml(string html, params string[] tags)
+		{
+			return StripHtmlTags(html, tags);
+		}
+
+		private HtmlString StripHtmlTags(string html, params string[] tags)
+		{
+			var doc = new HtmlDocument();
+			doc.LoadHtml("<p>" + html + "</p>");
+			using (var ms = new MemoryStream())
+			{
+				var targets = new List<HtmlNode>();
+
+				var nodes = doc.DocumentNode.FirstChild.SelectNodes(".//*");
+				if (nodes != null)
+				{
+					foreach (var node in nodes)
+					{
+						//is element
+						if (node.NodeType != HtmlNodeType.Element) continue;
+						var filterAllTags = (tags == null || !tags.Any());
+						if (filterAllTags || tags.Any(tag => string.Equals(tag, node.Name, StringComparison.CurrentCultureIgnoreCase)))
+						{
+							targets.Add(node);
+						}
+					}
+					foreach (var target in targets)
+					{
+						HtmlNode content = doc.CreateTextNode(target.InnerText);
+						target.ParentNode.ReplaceChild(content, target);
+					}
+				}
+				else
+				{
+					return new HtmlString(html);
+				}
+				return new HtmlString(doc.DocumentNode.FirstChild.InnerHtml);
+			}
+		}
+
+		public string Coalesce(params object[] args)
+		{
+			return Coalesce<DynamicNull>(args);
+		}
+
+		internal string Coalesce<TIgnore>(params object[] args)
+		{
+			foreach (var sArg in args.Where(arg => arg != null && arg.GetType() != typeof(TIgnore)).Select(arg => string.Format("{0}", arg)).Where(sArg => !string.IsNullOrWhiteSpace(sArg)))
+			{
+				return sArg;
+			}
+			return string.Empty;
+		}
+
+		public string Concatenate(params object[] args)
+		{
+			return Concatenate<DynamicNull>(args);
+		}
+
+		internal string Concatenate<TIgnore>(params object[] args)
+		{
+			var result = new StringBuilder();
+			foreach (var sArg in args.Where(arg => arg != null && arg.GetType() != typeof(TIgnore)).Select(arg => string.Format("{0}", arg)).Where(sArg => !string.IsNullOrWhiteSpace(sArg)))
+			{
+				result.Append(sArg);
+			}
+			return result.ToString();
+		}
+
+		public string Join(string seperator, params object[] args)
+		{
+			return Join<DynamicNull>(seperator, args);
+		}
+
+		internal string Join<TIgnore>(string seperator, params object[] args)
+		{
+			var results = args.Where(arg => arg != null && arg.GetType() != typeof (TIgnore)).Select(arg => string.Format("{0}", arg)).Where(sArg => !string.IsNullOrWhiteSpace(sArg)).ToList();
+			return string.Join(seperator, results);
+		}
+
+		public IHtmlString Truncate(IHtmlString html, int length)
+		{
+			return Truncate(html.ToHtmlString(), length, true, false);
+		}
+		public IHtmlString Truncate(IHtmlString html, int length, bool addElipsis)
+		{
+			return Truncate(html.ToHtmlString(), length, addElipsis, false);
+		}
+		public IHtmlString Truncate(IHtmlString html, int length, bool addElipsis, bool treatTagsAsContent)
+		{
+			return Truncate(html.ToHtmlString(), length, addElipsis, treatTagsAsContent);
+		}
+		public IHtmlString Truncate(DynamicNull html, int length)
+		{
+			return new HtmlString(string.Empty);
+		}
+		public IHtmlString Truncate(DynamicNull html, int length, bool addElipsis)
+		{
+			return new HtmlString(string.Empty);
+		}
+		public IHtmlString Truncate(DynamicNull html, int length, bool addElipsis, bool treatTagsAsContent)
+		{
+			return new HtmlString(string.Empty);
+		}
+		public IHtmlString Truncate(string html, int length)
+		{
+			return Truncate(html, length, true, false);
+		}
+		public IHtmlString Truncate(string html, int length, bool addElipsis)
+		{
+			return Truncate(html, length, addElipsis, false);
+		}
+		public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
+		{
+			using (var outputms = new MemoryStream())
+			{
+				using (var outputtw = new StreamWriter(outputms))
+				{
+					using (var ms = new MemoryStream())
+					{
+						using (var tw = new StreamWriter(ms))
+						{
+							tw.Write(html);
+							tw.Flush();
+							ms.Position = 0;
+							var tagStack = new Stack<string>();
+							using (TextReader tr = new StreamReader(ms))
+							{
+								bool IsInsideElement = false;
+								bool lengthReached = false;
+								int ic = 0;
+								int currentLength = 0, currentTextLength = 0;
+								string currentTag = string.Empty;
+								string tagContents = string.Empty;
+								bool insideTagSpaceEncountered = false;
+								bool isTagClose = false;
+								while ((ic = tr.Read()) != -1)
+								{
+									bool write = true;
+
+									if (ic == (int)'<')
+									{
+										if (!lengthReached)
+										{
+											IsInsideElement = true;
+										}
+										insideTagSpaceEncountered = false;
+										currentTag = string.Empty;
+										tagContents = string.Empty;
+										isTagClose = false;
+										if (tr.Peek() == (int)'/')
+										{
+											isTagClose = true;
+										}
+									}
+									else if (ic == (int)'>')
+									{
+										//if (IsInsideElement)
+										//{
+										IsInsideElement = false;
+										//if (write)
+										//{
+										//  outputtw.Write('>');
+										//}
+										currentTextLength++;
+										if (isTagClose && tagStack.Count > 0)
+										{
+											string thisTag = tagStack.Pop();
+											outputtw.Write("</" + thisTag + ">");
+										}
+										if (!isTagClose && currentTag.Length > 0)
+										{
+											if (!lengthReached)
+											{
+												tagStack.Push(currentTag);
+												outputtw.Write("<" + currentTag);
+												if (tr.Peek() != (int)' ')
+												{
+													if (!string.IsNullOrEmpty(tagContents))
+													{
+														if (tagContents.EndsWith("/"))
+														{
+															//short close
+															tagStack.Pop();
+														}
+														outputtw.Write(tagContents);
+													}
+													outputtw.Write(">");
+												}
+											}
+										}
+										//}
+										continue;
+									}
+									else
+									{
+										if (IsInsideElement)
+										{
+											if (ic == (int)' ')
+											{
+												if (!insideTagSpaceEncountered)
+												{
+													insideTagSpaceEncountered = true;
+													//if (!isTagClose)
+													//{
+													// tagStack.Push(currentTag);
+													//}
+												}
+											}
+											if (!insideTagSpaceEncountered)
+											{
+												currentTag += (char)ic;
+											}
+										}
+									}
+									if (IsInsideElement || insideTagSpaceEncountered)
+									{
+										write = false;
+										if (insideTagSpaceEncountered)
+										{
+											tagContents += (char)ic;
+										}
+									}
+									if (!IsInsideElement || treatTagsAsContent)
+									{
+										currentTextLength++;
+									}
+									currentLength++;
+									if (currentTextLength <= length || (lengthReached && IsInsideElement))
+									{
+										if (write)
+										{
+											outputtw.Write((char)ic);
+										}
+									}
+									if (!lengthReached && currentTextLength >= length)
+									{
+										//reached truncate point
+										if (addElipsis)
+										{
+											outputtw.Write("&hellip;");
+										}
+										lengthReached = true;
+									}
+
+								}
+
+							}
+						}
+					}
+					outputtw.Flush();
+					outputms.Position = 0;
+					using (TextReader outputtr = new StreamReader(outputms))
+					{
+						return new HtmlString(outputtr.ReadToEnd().Replace("  ", " ").Trim());
+					}
+				}
+			}
+		}
+
+
+		#endregion
+
+		#region If
+
+		public HtmlString If(bool test, string valueIfTrue, string valueIfFalse)
+		{
+			return test ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
+		}
+		public HtmlString If(bool test, string valueIfTrue)
+		{
+			return test ? new HtmlString(valueIfTrue) : new HtmlString(string.Empty);
+		}
+
+		#endregion
 	}
 }

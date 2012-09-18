@@ -14,6 +14,9 @@ namespace Umbraco.Web
 	/// <summary>
 	/// An IPublishedMediaStore that first checks for the media in Examine, and then reverts to the database
 	/// </summary>
+	/// <remarks>
+	/// NOTE: In the future if we want to properly cache all media this class can be extended or replaced when these classes/interfaces are exposed publicly.
+	/// </remarks>
 	internal class DefaultPublishedMediaStore : IPublishedMediaStore
 	{
 		public virtual IDocument GetDocumentById(UmbracoContext umbracoContext, int nodeId)
@@ -60,6 +63,8 @@ namespace Umbraco.Web
 		internal IDocument ConvertFromSearchResult(SearchResult searchResult)
 		{
 			//TODO: Unit test this
+			//NOTE: we could just use the ExamineExtensions.ConvertFromSearchResult method but it will be faster to just
+			// use the data store in Examine cache.
 			throw new NotImplementedException();
 		}
 

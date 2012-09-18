@@ -1,17 +1,15 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" %>
 <%@ Register Namespace="umbraco.uicontrols" Assembly="controls" TagPrefix="umb" %>
-<link href="/umbraco_client/propertypane/style.css" rel="stylesheet" />
+<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+
+<umb:CssInclude runat="server" FilePath="propertypane/style.css"  PathNameAlias="UmbracoClient" />
+
 <div class="dashboardWrapper">
-    <h2>
-        Start here</h2>
+    <h2>Start here</h2>
     <img src="./dashboard/images/logo32x32.png" alt="Umbraco" class="dashboardIcon" />
-    <h3>
-        Get started with Media right now</h3>
-    <p>
-        Use the tool below to upload your images or documents to a media folder.
-    </p>
-    <h3>
-        Follow these steps:</h3>
+    <h3>Get started with Media right now</h3>
+    <p>Use the tool below to upload your images or documents to a media folder.</p>
+    <h3>Follow these steps:</h3>
     <div class="dashboardColWrapper">
         <div class="dashboardCols">
             <div class="dashboardCol">

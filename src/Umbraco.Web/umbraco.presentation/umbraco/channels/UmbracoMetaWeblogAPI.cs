@@ -540,7 +540,7 @@ namespace umbraco.presentation.channels
                 BlogInfo bInfo = new BlogInfo();
                 bInfo.blogName = userChannel.Name;
                 bInfo.blogid = rootDoc.Id.ToString();
-                bInfo.url = HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + library.NiceUrl(rootDoc.Id);
+                bInfo.url = library.NiceUrlWithDomain(rootDoc.Id, true);
                 blogs[0] = bInfo;
 
                 return blogs;
