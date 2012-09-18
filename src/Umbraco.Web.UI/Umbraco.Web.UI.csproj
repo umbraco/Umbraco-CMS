@@ -1985,6 +1985,9 @@
       <DependentUpon>web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
+    <None Include="web.Template.NILSJO.Debug.config">
+      <DependentUpon>web.Template.config</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Code\" />

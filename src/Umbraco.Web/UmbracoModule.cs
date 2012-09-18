@@ -66,6 +66,13 @@ namespace Umbraco.Web
 			//assign the routing context back to the umbraco context
 			umbracoContext.RoutingContext = routingContext;
 
+			// remap to handler if it is a base rest request
+			if (Umbraco.Web.BaseRest.BaseRestHandler.IsBaseRestRequest(umbracoContext.RequestUrl))
+			{
+				httpContext.RemapHandler(new Umbraco.Web.BaseRest.BaseRestHandler());
+			}
+			else
+
 			//do not continue if this request is not a front-end routable page
 			if (EnsureUmbracoRoutablePage(umbracoContext, httpContext))
 			{
@@ -192,9 +199,6 @@ namespace Umbraco.Web
 			// ensure Umbraco is properly configured to serve documents
 			if (!EnsureIsConfigured(httpContext, uri))
 				return false;
-			// ensure that its not a base rest handler
-			if ((UmbracoSettings.EnableBaseRestHandler) && !EnsureNotBaseRestHandler(uri))
-				return false;
 
 			return true;
 		}
@@ -296,24 +300,6 @@ namespace Umbraco.Web
 				return false;
 			}
 			return true;
-		}
-
-		// checks if the current request is a /base REST handler request
-		// returns false if it is, otherwise true
-		bool EnsureNotBaseRestHandler(Uri uri)
-		{
-			var lpath = uri.AbsolutePath.ToLowerInvariant();
-
-			// the /base REST handler still lives in umbraco.dll and has
-			// not been refactored at the moment. it still is a module,
-			// although it should be a handler, or it should be replaced
-			// by clean WebAPI.
-
-			// TODO: fixme - do it once when initializing the module
-			var baseUrl = UriUtility.ToAbsolute(SystemDirectories.Base).ToLower();
-			if (!baseUrl.EndsWith("/"))
-				baseUrl += "/";
-			return !lpath.StartsWith(baseUrl);
 		}
 
 		#endregion

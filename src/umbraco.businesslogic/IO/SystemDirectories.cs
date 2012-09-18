@@ -9,7 +9,7 @@ using System.IO;
 
 namespace umbraco.IO
 {
-	[Obsolete("Use Umbraco.Core.UI.SystemDirectories instead")]
+    [Obsolete("Use Umbraco.Core.IO.SystemDirectories instead")]
     public class SystemDirectories
     {
         public static string Bin

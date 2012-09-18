@@ -240,6 +240,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationEventsResolver.cs" />
+    <Compile Include="BaseRest\BaseRestHandler.cs" />
     <Compile Include="DefaultDynamicDocumentDataSource.cs" />
     <Compile Include="DefaultPublishedMediaStore.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
