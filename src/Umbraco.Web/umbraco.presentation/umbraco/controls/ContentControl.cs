@@ -252,10 +252,10 @@ namespace umbraco.controls
                         //the data type definition may not exist anymore at this point because another thread may
                         //have deleted it.
                     }
-
-                    tpProp.Controls.AddAt(0, PropertiesPane);
-                    tpProp.Style.Add("text-align", "center");
                 }
+
+                tpProp.Controls.AddAt(0, PropertiesPane);
+                tpProp.Style.Add("text-align", "center");
             }
         }
 
