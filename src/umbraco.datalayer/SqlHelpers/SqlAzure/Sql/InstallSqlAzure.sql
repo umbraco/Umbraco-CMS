@@ -1313,13 +1313,13 @@ BEGIN
 		;
 		ALTER TABLE [cmsTemplate] CHECK CONSTRAINT [FK_cmsTemplate_umbracoNode]
 		;
-
+/*
 		ALTER TABLE [umbracoAppTree]  WITH CHECK ADD  CONSTRAINT [FK_umbracoAppTree_umbracoApp] FOREIGN KEY([appAlias])
 		REFERENCES [umbracoApp] ([appAlias])
 		;
 		ALTER TABLE [umbracoAppTree] CHECK CONSTRAINT [FK_umbracoAppTree_umbracoApp]
 		;
-
+*/
 		ALTER TABLE [umbracoDomains]  WITH CHECK ADD  CONSTRAINT [FK_umbracoDomains_umbracoNode] FOREIGN KEY([domainRootStructureID])
 		REFERENCES [umbracoNode] ([id])
 		;
@@ -1355,13 +1355,13 @@ BEGIN
 		;
 		ALTER TABLE [umbracoUser] CHECK CONSTRAINT [FK_user_userType]
 		;
-
+/*
 		ALTER TABLE [umbracoUser2app]  WITH CHECK ADD  CONSTRAINT [FK_umbracoUser2app_umbracoApp] FOREIGN KEY([app])
 		REFERENCES [umbracoApp] ([appAlias])
 		;
 		ALTER TABLE [umbracoUser2app] CHECK CONSTRAINT [FK_umbracoUser2app_umbracoApp]
 		;
-
+*/
 		ALTER TABLE [umbracoUser2NodeNotify]  WITH CHECK ADD  CONSTRAINT [FK_umbracoUser2NodeNotify_umbracoNode] FOREIGN KEY([nodeId])
 		REFERENCES [umbracoNode] ([id])
 		;
