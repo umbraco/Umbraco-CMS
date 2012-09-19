@@ -33,13 +33,13 @@ namespace umbraco.cms.businesslogic.datatype
                     if (value is HttpPostedFile)
                     {
                         var file = value as HttpPostedFile;
-                        name = SafeFileName(file.FileName.Substring(file.FileName.LastIndexOf(IOHelper.DirSepChar) + 1, file.FileName.Length - file.FileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
+                        name = Umbraco.Core.IO.IOHelper.SafeFileName(file.FileName.Substring(file.FileName.LastIndexOf(IOHelper.DirSepChar) + 1, file.FileName.Length - file.FileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
                         fileStream = file.InputStream;
                     }
                     else if (value is HttpPostedFileBase)
                     {
                         var file = value as HttpPostedFileBase;
-                        name = SafeFileName(file.FileName.Substring(file.FileName.LastIndexOf(IOHelper.DirSepChar) + 1, file.FileName.Length - file.FileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
+                        name = Umbraco.Core.IO.IOHelper.SafeFileName(file.FileName.Substring(file.FileName.LastIndexOf(IOHelper.DirSepChar) + 1, file.FileName.Length - file.FileName.LastIndexOf(IOHelper.DirSepChar) - 1).ToLower());
                         fileStream = file.InputStream;
                     }
                     else if (value is HttpPostedFileWrapper)
@@ -129,19 +129,7 @@ namespace umbraco.cms.businesslogic.datatype
                 }
             }
         }
-
-        /// <summary>
-        /// Check to see if filename passed has any special chars in it and strips them to create a safe filename.  Used to overcome an issue when Umbraco is used in IE in an intranet environment.
-        /// </summary>
-        /// <param name="filePath">The filename passed to the file handler from the upload field.</param>
-        /// <returns>A safe filename without any path specific chars.</returns>
-        private string SafeFileName(string filePath)
-        {
-            if (!String.IsNullOrEmpty(filePath))
-                return Regex.Replace(filePath, @"[^a-zA-Z0-9\-\.\/\:]{1}", "_");
-            return String.Empty;
-        }
-
+        
         private void clearRelatedValues()
         {
             string propertyTypeAlias = new Property(PropertyId).PropertyType.Alias;

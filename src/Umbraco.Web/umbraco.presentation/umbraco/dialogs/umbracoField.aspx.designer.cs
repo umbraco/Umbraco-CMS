@@ -55,7 +55,7 @@ namespace umbraco.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ListBox fieldPicker;
+        protected global::umbraco.uicontrols.FieldDropDownList fieldPicker;
         
         /// <summary>
         /// pp_insertAltField control.
@@ -73,7 +73,7 @@ namespace umbraco.dialogs {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ListBox altFieldPicker;
+        protected global::umbraco.uicontrols.FieldDropDownList altFieldPicker;
         
         /// <summary>
         /// pp_insertAltText control.

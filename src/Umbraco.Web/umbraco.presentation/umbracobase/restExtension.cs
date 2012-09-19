@@ -143,10 +143,10 @@ namespace umbraco.presentation.umbracobase
 
                                 if (allowed)
                                 {
-                                    this.isAllowed = true;
+									this.method = t.GetMethod(methodName);
+									this.isAllowed = this.method != null;
                                     this.alias = extensionAlias;
                                     this.assembly = t.Assembly;
-                                    this.method = t.GetMethod(methodName);
                                     this.type = t;
                                     this.returnXML = attribute.returnXml;
                                 } 
@@ -172,10 +172,10 @@ namespace umbraco.presentation.umbracobase
                     if (baseExt.Attributes["returnXml"] != null && baseExt.Attributes["returnXml"].Value.ToLower() == "false")
                         this.returnXML = false;
 
-                    this.isAllowed = true;
+					this.method = returnType.GetMethod(methodName);
+					this.isAllowed = this.method != null;
                     this.alias = extensionAlias;
                     this.assembly = returnAssembly;
-                    this.method = returnType.GetMethod(methodName);
                     this.type = returnType;
                 }
             }

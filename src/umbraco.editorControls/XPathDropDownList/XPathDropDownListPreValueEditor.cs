@@ -153,7 +153,10 @@ namespace umbraco.editorControls.XPathDropDownList
         /// <param name="writer"></param>
         protected override void RenderContents(HtmlTextWriter writer)
         {
-            writer.AddPrevalueRow("XPath Expression", this.xPathTextBox, this.xPathRequiredFieldValidator, this.xPathCustomValidator);
+            writer.AddPrevalueRow("XPath Expression", @"can use the tokens <strong>$ancestorOrSelf</strong>, <strong>$parentPage</strong> and <strong>$currentPage</strong>, eg.<br />
+                                                        <br />                                            
+                                                        all siblings: $parentPage//*[@id != $currentPage/@id] <br />                                                        
+                                                        ", this.xPathTextBox, this.xPathRequiredFieldValidator, this.xPathCustomValidator);
             writer.AddPrevalueRow("Value", this.valueTypeDropDownList);
         }
 

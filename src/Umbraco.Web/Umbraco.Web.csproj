@@ -240,6 +240,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationEventsResolver.cs" />
+    <Compile Include="BaseRest\BaseRestHandler.cs" />
     <Compile Include="DefaultDynamicDocumentDataSource.cs" />
     <Compile Include="DefaultPublishedMediaStore.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
@@ -1937,7 +1938,9 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\treePicker.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\umbracoField.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\umbracoField.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\uploadImage.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx" />
     <Content Include="umbraco.presentation\install\steps\defaultUser.ascx">

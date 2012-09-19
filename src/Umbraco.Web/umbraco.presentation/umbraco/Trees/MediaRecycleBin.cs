@@ -29,7 +29,7 @@ using umbraco.cms.presentation.Trees;
 
 namespace umbraco.cms.presentation.Trees
 {
-    [Tree("media", "mediaRecycleBin", "Recycle Bin", "folder.gif", "folder_o.gif")]
+    [Tree("media", "mediaRecycleBin", "Recycle Bin", "folder.gif", "folder_o.gif", initialize : false)]
 	public class MediaRecycleBin : BaseMediaTree
 	{
 		public MediaRecycleBin(string application)

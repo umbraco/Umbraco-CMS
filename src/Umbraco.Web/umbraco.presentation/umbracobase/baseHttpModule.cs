@@ -16,6 +16,8 @@ using System.Web.SessionState;
 
 namespace umbraco.presentation.umbracobase
 {
+	// as of 4.10 the module has been replaced by Umbraco.Web.BaseRest.BaseRestHandler - stephan @zpqrtbnk
+	[Obsolete("Has been replaced by BaseRestHandler.")]
     public class requestModule : IHttpModule
     {
 

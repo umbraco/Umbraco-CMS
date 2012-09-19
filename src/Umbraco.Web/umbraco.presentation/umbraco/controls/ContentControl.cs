@@ -2,11 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.IO;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic;
+using umbraco.cms.businesslogic.datatype.controls;
+using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
@@ -14,7 +18,7 @@ using umbraco.interfaces;
 using umbraco.uicontrols;
 using Content = umbraco.cms.businesslogic.Content;
 using System.Linq;
-using umbraco.IO;
+using SystemDirectories = umbraco.IO.SystemDirectories;
 
 namespace umbraco.controls
 {
@@ -212,9 +216,46 @@ namespace umbraco.controls
                 ltt.Text = _content.Id.ToString();
                 PropertiesPane.addProperty("Id", ltt);
 
+                if (_content is Media)
+                {
+                    PropertiesPane.addProperty(ui.Text("content", "mediatype"), new LiteralControl(_content.ContentType.Alias));
+
+                    var uploadField = new Factory().GetNewObject(new Guid("5032a6e6-69e3-491d-bb28-cd31cd11086c"));
+
+                    try
+                    {
+                        var uploadProperties = _content.GenericProperties
+                            .Where(p => p.PropertyType.DataTypeDefinition.DataType.Id == uploadField.Id
+                                        && p.Value.ToString() != ""
+                                        && File.Exists(IOHelper.MapPath(p.Value.ToString())));
+
+                        var properties = uploadProperties as List<Property> ?? uploadProperties.ToList();
+
+                        if (properties.Any())
+                        {
+                            var linkProperties = new Pane();
+                            var literal = new LiteralControl { Text = String.Empty };
+                            
+                            literal.Text += "<table>";
+
+                            foreach (var property in properties)
+                                literal.Text += string.Format("<tr><td>{0}&nbsp;</td><td><a href=\"{1}\" target=\"_blank\">{1}</a></td></tr>", property.PropertyType.Name, property.Value);
+
+                            literal.Text += "</table>";
+
+                            linkProperties.addProperty(ui.Text("content", "mediaLinks"), literal);
+                            tpProp.Controls.AddAt(1, linkProperties);
+                        }
+                    }
+                    catch
+                    {
+                        //the data type definition may not exist anymore at this point because another thread may
+                        //have deleted it.
+                    }
+                }
+
                 tpProp.Controls.AddAt(0, PropertiesPane);
                 tpProp.Style.Add("text-align", "center");
-                //tpProp.Style.Add("padding", "10px");
             }
         }
 
@@ -245,7 +286,7 @@ namespace umbraco.controls
                 df.Save();
             }
 
-            if(!string.IsNullOrEmpty(NameTxt.Text))
+            if (!string.IsNullOrEmpty(NameTxt.Text))
                 _content.Text = NameTxt.Text;
 
             Save(this, new EventArgs());
