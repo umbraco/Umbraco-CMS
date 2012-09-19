@@ -202,5 +202,14 @@ namespace Umbraco.Core.IO
 
         }
 
+        /// <summary>
+        /// Check to see if filename passed has any special chars in it and strips them to create a safe filename.  Used to overcome an issue when Umbraco is used in IE in an intranet environment.
+        /// </summary>
+        /// <param name="filePath">The filename passed to the file handler from the upload field.</param>
+        /// <returns>A safe filename without any path specific chars.</returns>
+        internal static string SafeFileName(string filePath)
+        {
+            return !String.IsNullOrEmpty(filePath) ? Regex.Replace(filePath, @"[^a-zA-Z0-9\-\.\/\:]{1}", "_") : String.Empty;
+        }
     }
 }

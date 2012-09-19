@@ -37,11 +37,11 @@ namespace umbraco.cms.businesslogic.media
             var propertyId = media.getProperty("umbracoFile").Id;
 
             // Get paths
-            var destFilePath = _fileSystem.GetRelativePath(propertyId, postedFile.FileName);
+            var destFilePath = FileSystem.GetRelativePath(propertyId, postedFile.FileName);
             var ext = Path.GetExtension(destFilePath).Substring(1);
 
             // Set media properties
-            media.getProperty("umbracoFile").Value = _fileSystem.GetUrl(destFilePath);
+            media.getProperty("umbracoFile").Value = FileSystem.GetUrl(destFilePath);
             media.getProperty("umbracoWidth").Value = fileWidth;
             media.getProperty("umbracoHeight").Value = fileHeight;
             media.getProperty("umbracoBytes").Value = postedFile.ContentLength;
@@ -61,7 +61,7 @@ namespace umbraco.cms.businesslogic.media
 
             image.Dispose();
 
-            _fileSystem.AddFile(destFilePath, postedFile.InputStream, postedFile.ReplaceExisting);
+            FileSystem.AddFile(destFilePath, postedFile.InputStream, postedFile.ReplaceExisting);
 
             // Save media
             media.Save();
@@ -148,7 +148,7 @@ namespace umbraco.cms.businesslogic.media
                 bp.Save(ms, codec, ep);
                 ms.Seek(0, 0);
 
-                _fileSystem.AddFile(thumbnailFileName, ms);
+                FileSystem.AddFile(thumbnailFileName, ms);
 
                 ms.Close();
             }
