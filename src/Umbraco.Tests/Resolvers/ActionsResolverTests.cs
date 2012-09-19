@@ -6,7 +6,7 @@ using Umbraco.Tests.TestHelpers;
 using umbraco.BasePages;
 using umbraco.interfaces;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.Resolvers
 {
 
 	[TestFixture]

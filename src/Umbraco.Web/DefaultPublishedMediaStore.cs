@@ -107,7 +107,10 @@ namespace Umbraco.Web
 				}
 			}
 
-			return new DictionaryDocument(values, d => d.ParentId.HasValue ? GetUmbracoMedia(d.ParentId.Value) : null);
+			return new DictionaryDocument(values, 
+				d => d.ParentId.HasValue ? GetUmbracoMedia(d.ParentId.Value) : null,
+				//TODO: Fix this!
+				d => Enumerable.Empty<IDocument>());
 		}
 
 		/// <summary>
@@ -122,13 +125,17 @@ namespace Umbraco.Web
 			
 			//TODO: Unit test this!
 
-			public DictionaryDocument(IDictionary<string, string> valueDictionary, Func<DictionaryDocument, IDocument> getParent)
+			public DictionaryDocument(
+				IDictionary<string, string> valueDictionary, 
+				Func<DictionaryDocument, IDocument> getParent,
+				Func<DictionaryDocument, IEnumerable<IDocument>> getChildren)
 			{
 				if (valueDictionary == null) throw new ArgumentNullException("valueDictionary");
 				if (getParent == null) throw new ArgumentNullException("getParent");
 				
 				_getParent = getParent;
-				
+				_getChildren = getChildren;
+
 				ValidateAndSetProperty(valueDictionary, val => Id = int.Parse(val), "id", "nodeId", "__NodeId"); //should validate the int!
 				ValidateAndSetProperty(valueDictionary, val => TemplateId = int.Parse(val), "template", "templateId");
 				ValidateAndSetProperty(valueDictionary, val => SortOrder = int.Parse(val), "sortOrder");
@@ -166,6 +173,8 @@ namespace Umbraco.Web
 			}
 
 			private readonly Func<DictionaryDocument, IDocument> _getParent;
+			private readonly Func<DictionaryDocument, IEnumerable<IDocument>> _getChildren;
+
 			public IDocument Parent
 			{
 				get { return _getParent(this); }
@@ -189,7 +198,10 @@ namespace Umbraco.Web
 			public Guid Version { get; private set; }
 			public int Level { get; private set; }
 			public Collection<IDocumentProperty> Properties { get; private set; }
-			public IEnumerable<IDocument> Children { get; private set; }
+			public IEnumerable<IDocument> Children
+			{
+				get { return _getChildren(this); }
+			}
 
 			private readonly List<string> _keysAdded = new List<string>();
 			private void ValidateAndSetProperty(IDictionary<string, string> valueDictionary, Action<string> setProperty, params string[] potentialKeys)

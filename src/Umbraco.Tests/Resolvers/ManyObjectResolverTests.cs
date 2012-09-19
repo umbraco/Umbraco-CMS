@@ -5,7 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.Resolvers
 {
 	[TestFixture]
 	public class ManyObjectResolverTests

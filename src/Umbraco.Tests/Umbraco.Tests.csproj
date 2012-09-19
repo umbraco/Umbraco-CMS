@@ -52,7 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActionsResolverTests.cs" />
+    <Compile Include="ContentStores\PublishMediaStoreTests.cs" />
+    <Compile Include="Resolvers\ActionsResolverTests.cs" />
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
     <Compile Include="BusinessLogic\ApplicationTest.cs" />
     <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
@@ -63,7 +64,7 @@
     <Compile Include="DynamicDocument\DynamicDocumentTestsBase.cs" />
     <Compile Include="DynamicDocument\DynamicNodeTests.cs" />
     <Compile Include="ObjectExtensionsTests.cs" />
-    <Compile Include="PublishContentStoreTests.cs" />
+    <Compile Include="ContentStores\PublishContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
     <Compile Include="Routing\BaseRoutingTest.cs" />
     <Compile Include="GlobalSettingsTests.cs" />
@@ -78,11 +79,11 @@
     <Compile Include="Stubs\TestControllerFactory.cs" />
     <Compile Include="TestHelpers\BaseWebTest.cs" />
     <Compile Include="UriUtilityTests.cs" />
-    <Compile Include="MacroFieldEditorsResolverTests.cs" />
+    <Compile Include="Resolvers\MacroFieldEditorsResolverTests.cs" />
     <Compile Include="MacroEngineFactoryTests.cs" />
-    <Compile Include="ManyObjectResolverTests.cs" />
+    <Compile Include="Resolvers\ManyObjectResolverTests.cs" />
     <Compile Include="MediaFactoryTests.cs" />
-    <Compile Include="PackageActionsResolverTests.cs" />
+    <Compile Include="Resolvers\PackageActionsResolverTests.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="PluginManagerTests.cs" />
     <Compile Include="Stubs\FakeLastChanceLookup.cs" />

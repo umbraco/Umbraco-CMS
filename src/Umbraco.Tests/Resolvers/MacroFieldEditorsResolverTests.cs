@@ -5,10 +5,9 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
-using umbraco.editorControls.macrocontainer;
 using umbraco.interfaces;
 
-namespace Umbraco.Tests
+namespace Umbraco.Tests.Resolvers
 {
 	[TestFixture]
 	public class MacroFieldEditorsResolverTests
