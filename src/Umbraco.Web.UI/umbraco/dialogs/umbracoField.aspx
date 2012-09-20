@@ -86,11 +86,11 @@
     <input type="hidden" name="tagName" runat="server" id="tagName" value="?UMBRACO_GETITEM">
     <cc1:Pane ID="pane_form" runat="server">
         <cc1:PropertyPanel ID="pp_insertField" runat="server">
-            <asp:ListBox ID="fieldPicker" Width="170px" Rows="1" runat="server"></asp:ListBox>
+            <cc1:FieldDropDownList ID="fieldPicker" Width="170px" Rows="1" runat="server"></cc1:FieldDropDownList>            
             <input type="text" size="25" name="field" class="guiInputTextTiny">
         </cc1:PropertyPanel>
         <cc1:PropertyPanel ID="pp_insertAltField" runat="server">
-            <asp:ListBox ID="altFieldPicker" Width="170px" Rows="1" runat="server"></asp:ListBox>
+            <cc1:FieldDropDownList ID="altFieldPicker" Width="170px" Rows="1" runat="server"></cc1:FieldDropDownList>
             <input type="text" size="25" name="useIfEmpty" class="guiInputTextTiny"><br />
             <span class="guiDialogTiny">
                 <%=umbraco.ui.Text("templateEditor", "usedIfEmpty")%></span>
