@@ -286,21 +286,21 @@ namespace umbraco {
                     IOHelper.MapPath( SystemFiles.NotFoundhandlersConfig ) );
                 }
 
-                for (int i = 0; i < _customHandlers.DocumentElement.ChildNodes.Count; i++) {
+                foreach (XmlNode notFoundHandler in _customHandlers.DocumentElement.SelectNodes("notFound")) 
+                {
+
                     // Load handler
-                    string _chAssembly =
-                        _customHandlers.DocumentElement.ChildNodes[i].Attributes.GetNamedItem("assembly").Value;
-                    string _chType = _customHandlers.DocumentElement.ChildNodes[i].Attributes.GetNamedItem("type").Value;
+                    string _chAssembly = notFoundHandler.Attributes.GetNamedItem("assembly").Value;
+                    string _chType = notFoundHandler.Attributes.GetNamedItem("type").Value;
                     // check for namespace
                     string _chNameSpace = _chAssembly;
-                    if (_customHandlers.DocumentElement.ChildNodes[i].Attributes.GetNamedItem("namespace") != null)
-                        _chNameSpace =
-                            _customHandlers.DocumentElement.ChildNodes[i].Attributes.GetNamedItem("namespace").Value;
+                    if (notFoundHandler.Attributes.GetNamedItem("namespace") != null)
+                        _chNameSpace = notFoundHandler.Attributes.GetNamedItem("namespace").Value;
+
                     try {
                         // Reflect to execute and check whether the type is umbraco.main.IFormhandler
                         HttpContext.Current.Trace.Write("notFoundHandler",
-                                                        string.Format("Trying NotFoundHandler '{0}.{1}'...", _chAssembly,
-                                                                      _chType));
+                                                string.Format("Trying NotFoundHandler '{0}.{1}'...", _chAssembly, _chType));
                         Assembly assembly =
                             Assembly.LoadFrom(
                                 IOHelper.MapPath( SystemDirectories.Bin + "/" + _chAssembly + ".dll"));
@@ -313,9 +313,8 @@ namespace umbraco {
                                 int redirectID = typeInstance.redirectID;
                                 currentPage = umbracoContent.GetElementById(redirectID.ToString());
                                 HttpContext.Current.Trace.Write("notFoundHandler",
-                                                                string.Format(
-                                                                    "NotFoundHandler '{0}.{1} found node matching {2} with id: {3}",
-                                                                    _chAssembly, _chType, url, redirectID));
+                                                string.Format("NotFoundHandler '{0}.{1} found node matching {2} with id: {3}",
+                                                              _chAssembly, _chType, url, redirectID));
 
                                 // check for caching
                                 if (typeInstance.CacheUrl) {

@@ -94,7 +94,7 @@ namespace Umbraco.Web.Routing
             var customHandlers = new XmlDocument();
 			customHandlers.Load(Umbraco.Core.IO.IOHelper.MapPath(Umbraco.Core.IO.SystemFiles.NotFoundhandlersConfig));
 
-            foreach (XmlNode n in customHandlers.DocumentElement.ChildNodes)
+            foreach (XmlNode n in customHandlers.DocumentElement.SelectNodes("notFound"))
             {
                 var assemblyName = n.Attributes.GetNamedItem("assembly").Value;
 

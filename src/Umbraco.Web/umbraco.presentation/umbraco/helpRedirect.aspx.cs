@@ -19,9 +19,8 @@ namespace umbraco.presentation.umbraco
 
             HelpConfigPages = new List<HelpConfigPage>();
 
-            foreach (XmlNode linkNode in helpConfigNode.ChildNodes)
+            foreach (XmlNode linkNode in helpConfigNode.SelectNodes("link"))
             {
-                if (linkNode.NodeType != XmlNodeType.Element) continue;
 
                 HelpConfigPages.Add(new HelpConfigPage
                 {
