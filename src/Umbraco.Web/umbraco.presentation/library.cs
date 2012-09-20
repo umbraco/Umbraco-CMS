@@ -2113,7 +2113,7 @@ namespace umbraco
         {
             string error404 = "";
             XmlNode error404Node = UmbracoSettings.GetKeyAsNode("/settings/content/errors/error404");
-            if (error404Node.ChildNodes.Count > 0 && error404Node.ChildNodes[0].HasChildNodes)
+            if (error404Node.SelectNodes("errorPage").Count > 0 && error404Node.SelectNodes("errorPage")[0].HasChildNodes)
             {
                 // try to get the 404 based on current culture (via domain)
                 XmlNode cultureErrorNode;
