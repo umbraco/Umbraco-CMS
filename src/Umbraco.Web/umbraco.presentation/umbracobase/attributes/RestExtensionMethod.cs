@@ -5,6 +5,7 @@ using System.Web;
 
 namespace umbraco.presentation.umbracobase
 {
+	[Obsolete("Use Umbraco.Web.BaseRest.RestExtensionMethodAttribute")]
     [System.AttributeUsage(System.AttributeTargets.Method, AllowMultiple = false)]
     public class RestExtensionMethod : System.Attribute
     {

@@ -10,6 +10,7 @@ using umbraco.IO;
 
 namespace umbraco.presentation.umbracobase
 {
+	[Obsolete]
     public class restExtension
     {
         private Type _type;
