@@ -41,7 +41,7 @@
 			<div class="t">&nbsp;</div>
 			<div class="c">
 				<div class="title">
-					<span><strong>Choose not to install a stater kit</strong></span>
+					<span><strong>Choose not to install a starter kit</strong></span>
 				</div>
 			</div>
 			<div class="b">&nbsp;</div>
