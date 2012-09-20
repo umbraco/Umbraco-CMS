@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>UmbracoCms.Core</id>
-        <version>4.9.0</version>
+        <version>4.10.0</version>
         <title>Umbraco Cms Core Binaries</title>
         <authors>Morten Christensen</authors>
         <owners>Umbraco HQ</owners>
