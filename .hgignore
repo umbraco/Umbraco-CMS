@@ -41,6 +41,7 @@ _BuildOutput/*
 build/UmbracoCms.AllBinaries.zip
 build/UmbracoCms.WebPI.zip
 build/UmbracoCms.zip
+build/*.nupkg
 src/Umbraco.Tests/config/applications.config
 src/Umbraco.Tests/config/trees.config
 src/Umbraco.Web.UI/web.config
