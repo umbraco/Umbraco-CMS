@@ -16,6 +16,10 @@ namespace Umbraco.Web
 			this IEnumerable<SearchResult> results,
 			IPublishedStore store)
 		{
+			//TODO: The search result has already returned a result which SHOULD include all of the data to create an IDocument, 
+			// however thsi is currently not the case: 
+			// http://examine.codeplex.com/workitem/10350
+
 			var list = new DynamicDocumentList();
 			var xd = new XmlDocument();
 

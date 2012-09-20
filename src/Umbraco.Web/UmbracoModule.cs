@@ -67,83 +67,83 @@ namespace Umbraco.Web
 			umbracoContext.RoutingContext = routingContext;
 
 			// remap to handler if it is a base rest request
-			if (Umbraco.Web.BaseRest.BaseRestHandler.IsBaseRestRequest(umbracoContext.RequestUrl))
+			if (BaseRestHandler.IsBaseRestRequest(umbracoContext.RequestUrl))
 			{
-				httpContext.RemapHandler(new Umbraco.Web.BaseRest.BaseRestHandler());
+				httpContext.RemapHandler(new BaseRestHandler());
 			}
 			else
 
-			//do not continue if this request is not a front-end routable page
-			if (EnsureUmbracoRoutablePage(umbracoContext, httpContext))
-			{
-				var uri = umbracoContext.RequestUrl;
-
-				// legacy - no idea what this is
-				LegacyCleanUmbPageFromQueryString(ref uri);
-
-				//Create a document request since we are rendering a document on the front-end
-
-				// create the new document request 
-				var docreq = new DocumentRequest(
-					umbracoContext.UmbracoUrl, //very important to use this url! it is the path only lowercased version of the current URL. 
-					routingContext);
-				//assign the document request to the umbraco context now that we know its a front end request
-				umbracoContext.DocumentRequest = docreq;
-
-				// note - at that point the original legacy module did something do handle IIS custom 404 errors
-				//   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support
-				//   "directory urls" without having to do wildcard mapping to ASP.NET on old IIS. This is a pain
-				//   to maintain and probably not used anymore - removed as of 06/2012. @zpqrtbnk.
-				//
-				//   to trigger Umbraco's not-found, one should configure IIS and/or ASP.NET custom 404 errors
-				//   so that they point to a non-existing page eg /redirect-404.aspx
-				//   TODO: SD: We need more information on this for when we release 4.10.0 as I'm not sure what this means.
-
-				//create the searcher
-				var searcher = new DocumentRequestBuilder(docreq);
-				//find domain
-				searcher.LookupDomain();
-				//redirect if it has been flagged
-				if (docreq.IsRedirect)
-					httpContext.Response.Redirect(docreq.RedirectUrl, true);
-				//set the culture on the thread
-				Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = docreq.Culture;
-				//find the document, found will be true if the doc request has found BOTH a node and a template
-				// though currently we don't use this value.
-				var found = searcher.LookupDocument();
-				//this could be called in the LookupDocument method, but I've just put it here for clarity.
-				searcher.DetermineRenderingEngine();
-
-				//TODO: here we should launch an event so that people can modify the doc request to do whatever they want.
-
-				//redirect if it has been flagged
-				if (docreq.IsRedirect)
-					httpContext.Response.Redirect(docreq.RedirectUrl, true);
-
-				//if no doc is found, send to our not found handler
-				if (docreq.Is404)
+				//do not continue if this request is not a front-end routable page
+				if (EnsureUmbracoRoutablePage(umbracoContext, httpContext))
 				{
-					httpContext.RemapHandler(new DocumentNotFoundHandler());
+					var uri = umbracoContext.RequestUrl;
+
+					// legacy - no idea what this is
+					LegacyCleanUmbPageFromQueryString(ref uri);
+
+					//Create a document request since we are rendering a document on the front-end
+
+					// create the new document request 
+					var docreq = new DocumentRequest(
+						umbracoContext.UmbracoUrl, //very important to use this url! it is the path only lowercased version of the current URL. 
+						routingContext);
+					//assign the document request to the umbraco context now that we know its a front end request
+					umbracoContext.DocumentRequest = docreq;
+
+					// note - at that point the original legacy module did something do handle IIS custom 404 errors
+					//   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support
+					//   "directory urls" without having to do wildcard mapping to ASP.NET on old IIS. This is a pain
+					//   to maintain and probably not used anymore - removed as of 06/2012. @zpqrtbnk.
+					//
+					//   to trigger Umbraco's not-found, one should configure IIS and/or ASP.NET custom 404 errors
+					//   so that they point to a non-existing page eg /redirect-404.aspx
+					//   TODO: SD: We need more information on this for when we release 4.10.0 as I'm not sure what this means.
+
+					//create the searcher
+					var searcher = new DocumentRequestBuilder(docreq);
+					//find domain
+					searcher.LookupDomain();
+					//redirect if it has been flagged
+					if (docreq.IsRedirect)
+						httpContext.Response.Redirect(docreq.RedirectUrl, true);
+					//set the culture on the thread
+					Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = docreq.Culture;
+					//find the document, found will be true if the doc request has found BOTH a node and a template
+					// though currently we don't use this value.
+					var found = searcher.LookupDocument();
+					//this could be called in the LookupDocument method, but I've just put it here for clarity.
+					searcher.DetermineRenderingEngine();
+
+					//TODO: here we should launch an event so that people can modify the doc request to do whatever they want.
+
+					//redirect if it has been flagged
+					if (docreq.IsRedirect)
+						httpContext.Response.Redirect(docreq.RedirectUrl, true);
+
+					//if no doc is found, send to our not found handler
+					if (docreq.Is404)
+					{
+						httpContext.RemapHandler(new DocumentNotFoundHandler());
+					}
+					else
+					{
+
+						//ok everything is ready to pass off to our handlers (mvc or webforms) but we need to setup a few things
+						//mostly to do with legacy code,etc...
+
+						//we need to complete the request which assigns the page back to the docrequest to make it available for legacy handlers like default.aspx
+						docreq.UmbracoPage = new page(docreq);
+
+						//this is required for many legacy things in umbraco to work
+						httpContext.Items["pageID"] = docreq.DocumentId;
+
+						//this is again required by many legacy objects
+						httpContext.Items.Add("pageElements", docreq.UmbracoPage.Elements);
+
+						RewriteToUmbracoHandler(HttpContext.Current, uri.Query, docreq.RenderingEngine);
+
+					}
 				}
-				else
-				{
-
-					//ok everything is ready to pass off to our handlers (mvc or webforms) but we need to setup a few things
-					//mostly to do with legacy code,etc...
-
-					//we need to complete the request which assigns the page back to the docrequest to make it available for legacy handlers like default.aspx
-					docreq.UmbracoPage = new page(docreq);
-
-					//this is required for many legacy things in umbraco to work
-					httpContext.Items["pageID"] = docreq.DocumentId;
-
-					//this is again required by many legacy objects
-					httpContext.Items.Add("pageElements", docreq.UmbracoPage.Elements);
-
-					RewriteToUmbracoHandler(HttpContext.Current, uri.Query, docreq.RenderingEngine);
-
-				}
-			}
 		}
 
 		/// <summary>

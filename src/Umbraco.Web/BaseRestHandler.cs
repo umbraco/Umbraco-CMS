@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Reflection;
 using System.Xml;
 using System.IO;
 
-namespace Umbraco.Web.BaseRest
+namespace Umbraco.Web
 {
 	internal class BaseRestHandler : IHttpHandler, IRequiresSessionState
 	{

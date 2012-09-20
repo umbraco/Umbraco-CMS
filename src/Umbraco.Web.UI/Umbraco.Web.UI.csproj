@@ -266,6 +266,7 @@
     </None>
     <None Include="config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
@@ -1447,7 +1448,9 @@
     <Content Include="umbraco\plugins\tinymce3\insertLink.aspx" />
     <Content Include="umbraco\plugins\tinymce3\insertMacro.aspx" />
     <Content Include="umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
-    <Content Include="config\ClientDependency.config" />
+    <Content Include="config\ClientDependency.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="config\ExamineSettings.config" />
     <Content Include="config\ExamineIndex.config" />
     <Content Include="config\scripting.config" />

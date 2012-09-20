@@ -8,6 +8,7 @@ using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using umbraco;
 
 namespace Umbraco.Web
 {
@@ -62,30 +63,68 @@ namespace Umbraco.Web
 
 		internal IDocument ConvertFromSearchResult(SearchResult searchResult)
 		{
-			//TODO: Unit test this
-			//NOTE: we could just use the ExamineExtensions.ConvertFromSearchResult method but it will be faster to just
-			// use the data store in Examine cache.
-			throw new NotImplementedException();
+			//TODO: Some fields will not be included, that just the way it is unfortunatley until this is fixed:
+			// http://examine.codeplex.com/workitem/10350
+
+			var values = new Dictionary<string, string>(searchResult.Fields);
+			//we need to ensure some fields exist, because of the above issue
+			if (!new []{"template", "templateId"}.Any(values.ContainsKey)) 
+				values.Add("template", 0.ToString());
+			if (!new[] { "sortOrder" }.Any(values.ContainsKey))
+				values.Add("sortOrder", 0.ToString());
+			if (!new[] { "urlName" }.Any(values.ContainsKey))
+				values.Add("urlName", "");
+			if (!new[] { "nodeType" }.Any(values.ContainsKey))
+				values.Add("nodeType", 0.ToString());
+			if (!new[] { "creatorName" }.Any(values.ContainsKey))
+				values.Add("creatorName", "");
+			if (!new[] { "writerID" }.Any(values.ContainsKey))
+				values.Add("writerID", 0.ToString());
+			if (!new[] { "creatorID" }.Any(values.ContainsKey))
+				values.Add("creatorID", 0.ToString());
+			if (!new[] { "createDate" }.Any(values.ContainsKey))
+				values.Add("createDate", default(DateTime).ToString("yyyy-MM-dd HH:mm:ss"));
+			if (!new[] { "level" }.Any(values.ContainsKey))
+			{				
+				values.Add("level", values["__Path"].Split(',').Length.ToString());
+			}
+				
+
+			return new DictionaryDocument(values,
+				d => d.ParentId != -1 //parent should be null if -1
+					? GetUmbracoMedia(d.ParentId)
+					: null,
+				//callback to return the children of the current node
+				d => GetChildrenMedia(d.ParentId));
 		}
 
 		internal IDocument ConvertFromXPathNavigator(XPathNavigator xpath)
 		{
-			//TODO: Unit test this
-			
 			if (xpath == null) throw new ArgumentNullException("xpath");
 
 			var values = new Dictionary<string, string> {{"nodeName", xpath.GetAttribute("nodeName", "")}};
-
+			if (!UmbracoSettings.UseLegacyXmlSchema)
+			{
+				values.Add("nodeTypeAlias", xpath.Name);
+			}
+			
 			var result = xpath.SelectChildren(XPathNodeType.Element);
 			//add the attributes e.g. id, parentId etc
 			if (result.Current != null && result.Current.HasAttributes)
 			{
 				if (result.Current.MoveToFirstAttribute())
 				{
-					values.Add(result.Current.Name, result.Current.Value);
+					//checking for duplicate keys because of the 'nodeTypeAlias' might already be added above.
+					if (!values.ContainsKey(result.Current.Name))
+					{
+						values.Add(result.Current.Name, result.Current.Value);	
+					}
 					while (result.Current.MoveToNextAttribute())
 					{
-						values.Add(result.Current.Name, result.Current.Value);
+						if (!values.ContainsKey(result.Current.Name))
+						{
+							values.Add(result.Current.Name, result.Current.Value);
+						}						
 					}
 					result.Current.MoveToParent();
 				}
@@ -108,9 +147,78 @@ namespace Umbraco.Web
 			}
 
 			return new DictionaryDocument(values, 
-				d => d.ParentId.HasValue ? GetUmbracoMedia(d.ParentId.Value) : null,
-				//TODO: Fix this!
-				d => Enumerable.Empty<IDocument>());
+				d => d.ParentId != -1 //parent should be null if -1
+					? GetUmbracoMedia(d.ParentId) 
+					: null,
+				//callback to return the children of the current node based on the xml structure already found
+				d => GetChildrenMedia(d.ParentId, xpath));
+		}
+
+		/// <summary>
+		/// A Helper methods to return the children for media whther it is based on examine or xml
+		/// </summary>
+		/// <param name="parentId"></param>
+		/// <param name="xpath"></param>
+		/// <returns></returns>
+		private IEnumerable<IDocument> GetChildrenMedia(int parentId, XPathNavigator xpath = null)
+		{	
+
+			//if there is no navigator, try examine first, then re-look it up
+			if (xpath == null)
+			{
+				try
+				{
+					//first check in Examine as this is WAY faster
+					var criteria = ExamineManager.Instance
+						.SearchProviderCollection["InternalSearcher"]
+						.CreateSearchCriteria("media");
+					var filter = criteria.ParentId(parentId);
+					var results = ExamineManager
+						.Instance.SearchProviderCollection["InternalSearcher"]
+						.Search(filter.Compile());
+					if (results.Any())
+					{
+						return results.Select(ConvertFromSearchResult);
+					}
+				}
+				catch (FileNotFoundException)
+				{
+					//Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+					//See this thread: http://examine.cdodeplex.com/discussions/264341
+					//Catch the exception here for the time being, and just fallback to GetMedia
+				}
+
+				var media = library.GetMedia(parentId, true);
+				if (media != null && media.Current != null)
+				{
+					if (!media.MoveNext())
+						return null;
+					xpath = media.Current;
+				}
+			}
+
+			var children = xpath.SelectChildren(XPathNodeType.Element);
+			var mediaList = new List<IDocument>();
+			while (children.Current != null)
+			{
+				if (!children.MoveNext())
+				{
+					break;
+				}
+
+				//NOTE: I'm not sure why this is here, it is from legacy code of ExamineBackedMedia, but
+				// will leave it here as it must have done something!
+				if (children.Current.Name != "contents")
+				{
+					//make sure it's actually a node, not a property 
+					if (!string.IsNullOrEmpty(children.Current.GetAttribute("path", "")) &&
+						!string.IsNullOrEmpty(children.Current.GetAttribute("id", "")))
+					{
+						mediaList.Add(ConvertFromXPathNavigator(children.Current));
+					}
+				}
+			}
+			return mediaList;
 		}
 
 		/// <summary>
@@ -122,8 +230,6 @@ namespace Umbraco.Web
 		/// </remarks>
 		internal class DictionaryDocument : IDocument
 		{
-			
-			//TODO: Unit test this!
 
 			public DictionaryDocument(
 				IDictionary<string, string> valueDictionary, 
@@ -149,11 +255,12 @@ namespace Umbraco.Web
 				ValidateAndSetProperty(valueDictionary, val => CreatorId = int.Parse(val), "creatorID");
 				ValidateAndSetProperty(valueDictionary, val => Path = val, "path", "__Path");
 				ValidateAndSetProperty(valueDictionary, val => CreateDate = DateTime.Parse(val), "createDate");
+				ValidateAndSetProperty(valueDictionary, val => UpdateDate = DateTime.Parse(val), "updateDate");
 				ValidateAndSetProperty(valueDictionary, val => Level = int.Parse(val), "level");
 				ValidateAndSetProperty(valueDictionary, val =>
 					{
 						int pId;
-						ParentId = null;
+						ParentId = -1;
 						if (int.TryParse(val, out pId))
 						{
 							ParentId = pId;
@@ -180,7 +287,7 @@ namespace Umbraco.Web
 				get { return _getParent(this); }
 			}
 
-			public int? ParentId { get; private set; }
+			public int ParentId { get; private set; }
 			public int Id { get; private set; }
 			public int TemplateId { get; private set; }
 			public int SortOrder { get; private set; }
@@ -206,15 +313,14 @@ namespace Umbraco.Web
 			private readonly List<string> _keysAdded = new List<string>();
 			private void ValidateAndSetProperty(IDictionary<string, string> valueDictionary, Action<string> setProperty, params string[] potentialKeys)
 			{
-				foreach (var s in potentialKeys)
+				var key = potentialKeys.FirstOrDefault(x => valueDictionary.ContainsKey(x) && valueDictionary[x] != null);
+				if (key == null)
 				{
-					if (valueDictionary[s] == null)
-						throw new FormatException("The valueDictionary is not formatted correctly and is missing the '" + s + "' element");
-					setProperty(valueDictionary[s]);
-					_keysAdded.Add(s);
-					break;
+					throw new FormatException("The valueDictionary is not formatted correctly and is missing any of the  '" + string.Join(",", potentialKeys) + "' elements");
 				}
 
+				setProperty(valueDictionary[key]);
+				_keysAdded.Add(key);
 			}
 		}
 	}
