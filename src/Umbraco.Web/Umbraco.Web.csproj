@@ -264,6 +264,9 @@
     <Compile Include="Media\EmbedProviders\Settings\String.cs" />
     <Compile Include="Media\EmbedProviders\Twitgoo.cs" />
     <Compile Include="ModelStateExtensions.cs" />
+    <Compile Include="Mvc\HtmlTagWrapper.cs" />
+    <Compile Include="Mvc\HtmlTagWrapperTextNode.cs" />
+    <Compile Include="Mvc\IHtmlTagWrapper.cs" />
     <Compile Include="PropertyEditors\RteMacroRenderingPropertyEditorValueConverter.cs" />
     <Compile Include="PublishedMediaStoreResolver.cs" />
     <Compile Include="RenderFieldCaseType.cs" />

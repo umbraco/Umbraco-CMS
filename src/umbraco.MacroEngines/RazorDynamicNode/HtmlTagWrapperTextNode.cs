@@ -6,18 +6,15 @@ using System.Text;
 namespace umbraco.MacroEngines
 {
 
-	[Obsolete("This interface has been superceded by Umbraco.Core.HtmlTagWrapperTextNode")]	
-    public class HtmlTagWrapperTextNode : HtmlTagWrapperBase
+	[Obsolete("This interface has been superceded by Umbraco.Web.Mvc.HtmlTagWrapperTextNode")]	
+    public class HtmlTagWrapperTextNode : Umbraco.Web.Mvc.HtmlTagWrapperTextNode
     {
-        public string content;
+        
         public HtmlTagWrapperTextNode(string content)
+			: base(content)
         {
-            this.content = content;
+            
         }
 
-        public void WriteToHtmlTextWriter(System.Web.UI.HtmlTextWriter html)
-        {
-            html.Write(content);
-        }
     }
 }

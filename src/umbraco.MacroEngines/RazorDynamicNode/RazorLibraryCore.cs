@@ -193,99 +193,43 @@ namespace umbraco.MacroEngines.Library
         	return _umbracoHelper.If(test, valueIfTrue);
         }
 
-        public HtmlTagWrapper Wrap(string tag, string innerText, params HtmlTagWrapperBase[] Children)
+		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, string innerText, params Umbraco.Web.Mvc.IHtmlTagWrapper[] children)
         {
-            var item = Wrap(tag, innerText, (object)null);
-            foreach (var child in Children)
-            {
-                item.AddChild(child);
-            }
-            return item;
+        	return _umbracoHelper.Wrap(tag, innerText, children);
         }
-        public HtmlTagWrapper Wrap(string tag, string innerText)
+		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, string innerText)
         {
             return Wrap(tag, innerText, (object)null);
         }
-        public HtmlTagWrapper Wrap(string tag, object inner, object anonymousAttributes)
-        {
-            string innerText = null;
-            if (inner != null && inner.GetType() != typeof(DynamicNull))
-            {
-                innerText = string.Format("{0}", inner);
-            }
-            return Wrap(tag, innerText, anonymousAttributes);
-        }
+		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, object inner, object anonymousAttributes)
+		{
+			return _umbracoHelper.Wrap(tag, inner, anonymousAttributes);
+		}
+		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, object inner, object anonymousAttributes, params Umbraco.Web.Mvc.IHtmlTagWrapper[] children)
+		{
+			return _umbracoHelper.Wrap(tag, inner, anonymousAttributes, children);
+		}
+		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, object inner)
+		{
+			return _umbracoHelper.Wrap(tag, inner);
+		}
+		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, string innerText, object anonymousAttributes)
+		{
+			return _umbracoHelper.Wrap(tag, innerText, anonymousAttributes);
+		}
+		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, string innerText, object anonymousAttributes, params Umbraco.Web.Mvc.IHtmlTagWrapper[] children)
+		{
+			return _umbracoHelper.Wrap(tag, innerText, anonymousAttributes, children);
+		}
+		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(bool visible, string tag, string innerText, object anonymousAttributes)
+		{
+			return _umbracoHelper.Wrap(visible, tag, innerText, anonymousAttributes);
+		}
+		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(bool visible, string tag, string innerText, object anonymousAttributes, params Umbraco.Web.Mvc.IHtmlTagWrapper[] children)
+		{
+			return _umbracoHelper.Wrap(visible, tag, innerText, anonymousAttributes, children);
+		}
 
-        public HtmlTagWrapper Wrap(string tag, object inner, object anonymousAttributes, params HtmlTagWrapperBase[] Children)
-        {
-            string innerText = null;
-            if (inner != null && inner.GetType() != typeof(DynamicNull))
-            {
-                innerText = string.Format("{0}", inner);
-            }
-            var item = Wrap(tag, innerText, anonymousAttributes);
-            foreach (var child in Children)
-            {
-                item.AddChild(child);
-            }
-            return item;
-        }
-        public HtmlTagWrapper Wrap(string tag, object inner)
-        {
-            string innerText = null;
-            if (inner != null && inner.GetType() != typeof(DynamicNull))
-            {
-                innerText = string.Format("{0}", inner);
-            }
-            return Wrap(tag, innerText, null);
-        }
-        public HtmlTagWrapper Wrap(string tag, string innerText, object anonymousAttributes)
-        {
-            HtmlTagWrapper wrap = new HtmlTagWrapper(tag);
-            if (anonymousAttributes != null)
-            {
-                wrap.ReflectAttributesFromAnonymousType(anonymousAttributes);
-            }
-            if (!string.IsNullOrWhiteSpace(innerText))
-            {
-                wrap.Children.Add(new HtmlTagWrapperTextNode(innerText));
-            }
-            return wrap;
-        }
-        public HtmlTagWrapper Wrap(string tag, string innerText, object anonymousAttributes, params HtmlTagWrapperBase[] Children)
-        {
-            HtmlTagWrapper wrap = new HtmlTagWrapper(tag);
-            if (anonymousAttributes != null)
-            {
-                wrap.ReflectAttributesFromAnonymousType(anonymousAttributes);
-            }
-            if (!string.IsNullOrWhiteSpace(innerText))
-            {
-                wrap.Children.Add(new HtmlTagWrapperTextNode(innerText));
-            }
-            foreach (var child in Children)
-            {
-                wrap.AddChild(child);
-            }
-            return wrap;
-        }
-
-        public HtmlTagWrapper Wrap(bool visible, string tag, string innerText, object anonymousAttributes)
-        {
-            var item = Wrap(tag, innerText, anonymousAttributes);
-            item.Visible = visible;
-            return item;
-        }
-        public HtmlTagWrapper Wrap(bool visible, string tag, string innerText, object anonymousAttributes, params HtmlTagWrapperBase[] Children)
-        {
-            var item = Wrap(tag, innerText, anonymousAttributes, Children);
-            item.Visible = visible;
-            foreach (var child in Children)
-            {
-                item.AddChild(child);
-            }
-            return item;
-        }
         public IHtmlString Truncate(IHtmlString html, int length)
         {
             return Truncate(html.ToHtmlString(), length, true, false);

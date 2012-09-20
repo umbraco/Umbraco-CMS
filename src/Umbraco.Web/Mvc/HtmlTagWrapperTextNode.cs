@@ -1,8 +1,10 @@
-﻿namespace Umbraco.Core
+﻿using Umbraco.Core;
+
+namespace Umbraco.Web.Mvc
 {
-    internal class HtmlTagWrapperTextNode : IHtmlTagWrapper
+    public class HtmlTagWrapperTextNode : IHtmlTagWrapper
     {
-		public string Content { get; set; }
+		public string Content { get; private set; }
         public HtmlTagWrapperTextNode(string content)
         {
             this.Content = content;

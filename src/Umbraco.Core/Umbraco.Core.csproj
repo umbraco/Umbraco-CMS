@@ -92,9 +92,6 @@
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="PropertyEditors\DatePickerPropertyEditorValueConverter.cs" />
     <Compile Include="PropertyEditors\IPropertyEditorValueConverter.cs" />
-    <Compile Include="HtmlTagWrapper.cs" />
-    <Compile Include="HtmlTagWrapperBase.cs" />
-    <Compile Include="HtmlTagWrapperTextNode.cs" />
     <Compile Include="Dynamics\IDynamicDocumentDataSource.cs" />
     <Compile Include="Dynamics\ParseException.cs" />
     <Compile Include="Dynamics\PropertyResult.cs" />
