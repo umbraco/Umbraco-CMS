@@ -75,6 +75,11 @@ namespace Umbraco.Web.Models
 			}
 		}
 
+		public IDocumentProperty GetProperty(string alias)
+		{
+			return Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+		}
+
 		public IDocument Parent
 		{
 			get

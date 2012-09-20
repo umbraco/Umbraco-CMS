@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using umbraco;
+using umbraco.cms.businesslogic;
 
 namespace Umbraco.Web
 {
@@ -88,14 +89,18 @@ namespace Umbraco.Web
 			{				
 				values.Add("level", values["__Path"].Split(',').Length.ToString());
 			}
-				
+
 
 			return new DictionaryDocument(values,
-				d => d.ParentId != -1 //parent should be null if -1
-					? GetUmbracoMedia(d.ParentId)
-					: null,
-				//callback to return the children of the current node
-				d => GetChildrenMedia(d.ParentId));
+			                              d => d.ParentId != -1 //parent should be null if -1
+			                                   	? GetUmbracoMedia(d.ParentId)
+			                                   	: null,
+			                              //callback to return the children of the current node
+			                              d => GetChildrenMedia(d.ParentId),
+			                              GetProperty)
+				{
+					LoadedFromExamine = true
+				};
 		}
 
 		internal IDocument ConvertFromXPathNavigator(XPathNavigator xpath)
@@ -151,7 +156,52 @@ namespace Umbraco.Web
 					? GetUmbracoMedia(d.ParentId) 
 					: null,
 				//callback to return the children of the current node based on the xml structure already found
-				d => GetChildrenMedia(d.ParentId, xpath));
+				d => GetChildrenMedia(d.ParentId, xpath),
+				GetProperty);
+		}
+
+		/// <summary>
+		/// We will need to first check if the document was loaded by Examine, if so we'll need to check if this property exists 
+		/// in the results, if it does not, then we'll have to revert to looking up in the db. 
+		/// </summary>
+		/// <param name="dd"> </param>
+		/// <param name="alias"></param>
+		/// <returns></returns>
+		private IDocumentProperty GetProperty(DictionaryDocument dd, string alias)
+		{
+			if (dd.LoadedFromExamine)
+			{
+				//if this is from Examine, lets check if the alias does not exist on the document
+				if (dd.Properties.All(x => x.Alias != alias))
+				{
+					//ok it doesn't exist, we might assume now that Examine didn't index this property because the index is not set up correctly
+					//so before we go loading this from the database, we can check if the alias exists on the content type at all, this information
+					//is cached so will be quicker to look up.
+					if (dd.Properties.Any(x => x.Alias == "__NodeTypeAlias"))
+					{
+						var aliasesAndNames = ContentType.GetAliasesAndNames(dd.Properties.First(x => x.Alias.InvariantEquals("__NodeTypeAlias")).Value.ToString());
+						if (aliasesAndNames != null)
+						{
+							if (!aliasesAndNames.ContainsKey(alias))
+							{
+								//Ok, now we know it doesn't exist on this content type anyways
+								return null;
+							}
+						}
+					}
+
+					//if we've made it here, that means it does exist on the content type but not in examine, we'll need to query the db :(
+					var media = global::umbraco.library.GetMedia(dd.Id, true);
+					if (media != null && media.Current != null)
+					{
+						media.MoveNext();
+						var mediaDoc = ConvertFromXPathNavigator(media.Current);
+						return mediaDoc.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+					}					
+				}							
+			}
+			
+			return dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 		}
 
 		/// <summary>
@@ -234,13 +284,18 @@ namespace Umbraco.Web
 			public DictionaryDocument(
 				IDictionary<string, string> valueDictionary, 
 				Func<DictionaryDocument, IDocument> getParent,
-				Func<DictionaryDocument, IEnumerable<IDocument>> getChildren)
+				Func<DictionaryDocument, IEnumerable<IDocument>> getChildren,
+				Func<DictionaryDocument, string, IDocumentProperty> getProperty)
 			{
 				if (valueDictionary == null) throw new ArgumentNullException("valueDictionary");
 				if (getParent == null) throw new ArgumentNullException("getParent");
-				
+				if (getProperty == null) throw new ArgumentNullException("getProperty");
+
 				_getParent = getParent;
 				_getChildren = getChildren;
+				_getProperty = getProperty;
+
+				LoadedFromExamine = false; //default to false
 
 				ValidateAndSetProperty(valueDictionary, val => Id = int.Parse(val), "id", "nodeId", "__NodeId"); //should validate the int!
 				ValidateAndSetProperty(valueDictionary, val => TemplateId = int.Parse(val), "template", "templateId");
@@ -279,8 +334,14 @@ namespace Umbraco.Web
 				}
 			}
 
+			/// <summary>
+			/// Flag to get/set if this was laoded from examine cache
+			/// </summary>
+			internal bool LoadedFromExamine { get; set; }
+
 			private readonly Func<DictionaryDocument, IDocument> _getParent;
 			private readonly Func<DictionaryDocument, IEnumerable<IDocument>> _getChildren;
+			private readonly Func<DictionaryDocument, string, IDocumentProperty> _getProperty;
 
 			public IDocument Parent
 			{
@@ -308,6 +369,11 @@ namespace Umbraco.Web
 			public IEnumerable<IDocument> Children
 			{
 				get { return _getChildren(this); }
+			}
+
+			public IDocumentProperty GetProperty(string alias)
+			{
+				return _getProperty(this, alias);
 			}
 
 			private readonly List<string> _keysAdded = new List<string>();

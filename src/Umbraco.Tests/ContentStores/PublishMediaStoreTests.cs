@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml;
 using Examine;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web;
 
@@ -189,9 +190,11 @@ namespace Umbraco.Tests
 					//there is no parent
 						a => null,
 					//we're not going to test this so ignore
-						a => new List<IDocument>()),
+						a => new List<IDocument>(),
+						(dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a))),
 				//callback to get the children
-				d => children);
+				d => children,
+				(dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a)));
 			return dicDoc;
 		}
 
