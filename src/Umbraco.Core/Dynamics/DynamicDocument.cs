@@ -180,57 +180,6 @@ namespace Umbraco.Core.Dynamics
 		//}
 
 
-		//public DynamicDocumentList Search(string term, bool useWildCards = true, string searchProvider = null)
-		//{
-		//    var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
-		//    if(!string.IsNullOrEmpty(searchProvider))
-		//        searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
-
-		//    var t = term.Escape().Value;
-		//    if (useWildCards)
-		//        t = term.MultipleCharacterWildcard().Value;
-
-		//    string luceneQuery = "+__Path:(" + this.Path.Replace("-", "\\-") + "*) +" + t;
-		//    var crit = searcher.CreateSearchCriteria().RawQuery(luceneQuery);
-
-		//    return Search(crit, searcher);
-		//}
-
-		//public DynamicDocumentList SearchDescendants(string term, bool useWildCards = true, string searchProvider = null)
-		//{
-		//    return Search(term, useWildCards, searchProvider);
-		//}
-
-		//public DynamicDocumentList SearchChildren(string term, bool useWildCards = true, string searchProvider = null)
-		//{
-		//    var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
-		//    if (!string.IsNullOrEmpty(searchProvider))
-		//        searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
-
-		//    var t = term.Escape().Value;
-		//    if (useWildCards)
-		//        t = term.MultipleCharacterWildcard().Value;
-
-		//    string luceneQuery = "+parentID:" + this.Id.ToString() + " +" + t;
-		//    var crit = searcher.CreateSearchCriteria().RawQuery(luceneQuery);
-
-		//    return Search(crit, searcher);
-		//}
-
-
-		//public DynamicDocumentList Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
-		//{
-		//    var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
-		//    if (searchProvider != null)
-		//        s = searchProvider;
-
-		//    var results = s.Search(criteria);
-		//    return ExamineSearchUtill.convertSearchResultToDynamicNode(results);
-		//}
-
-
-
-
 		public bool HasProperty(string name)
 		{
 			if (_backingItem != null)
@@ -505,9 +454,6 @@ namespace Umbraco.Core.Dynamics
 
 			var name = binder.Name;
 
-			//TODO: Refactor the below into multiple methods that return Attempt<object> as this
-			// will be much easier to read
-
 			//check the cache first!
 			if (_cachedMemberOutput.TryGetValue(name, out result))
 			{
@@ -541,51 +487,7 @@ namespace Umbraco.Core.Dynamics
 
 			//alwasy return true if we haven't thrown an exception though I'm wondering if we return 'false' if .Net throws an exception for us??
 			return true;
-		}
-
-		//private bool TryCreateInstanceRazorDataTypeModel(Guid dataType, Type dataTypeType, string value, out object result)
-		//{
-		//    //HttpContext.Current.Trace.Write(string.Format("Found dataType {0} for GUID {1}", dataTypeType.FullName, dataType));
-		//    IRazorDataTypeModel razorDataTypeModel = Activator.CreateInstance(dataTypeType, false) as IRazorDataTypeModel;
-		//    //HttpContext.Current.Trace.Write(string.Format("Instantiating {0}...", dataTypeType.FullName));
-		//    if (razorDataTypeModel != null)
-		//    {
-		//        //HttpContext.Current.Trace.Write("Success");
-		//        object instance = null;
-		//        //HttpContext.Current.Trace.Write("Calling Init on razorDataTypeModel");
-		//        if (razorDataTypeModel.Init(_n.Id, value, out instance))
-		//        {
-		//            if (instance != null)
-		//            {
-		//                //HttpContext.Current.Trace.Write(string.Format("razorDataTypeModel successfully instantiated and returned a valid instance of type {0}", instance.GetType().FullName));
-		//            }
-		//            else
-		//            {
-		//                //HttpContext.Current.Trace.Warn("razorDataTypeModel successfully instantiated but returned null for instance");
-		//            }
-		//            result = instance;
-		//            return true;
-		//        }
-		//        else
-		//        {
-		//            if (instance != null)
-		//            {
-		//                //HttpContext.Current.Trace.Write(string.Format("razorDataTypeModel returned false but returned a valid instance of type {0}", instance.GetType().FullName));
-		//            }
-		//            else
-		//            {
-		//                //HttpContext.Current.Trace.Warn("razorDataTypeModel successfully instantiated but returned null for instance");
-		//            }
-		//        }
-		//    }
-		//    else
-		//    {
-		//        //HttpContext.Current.Trace.Write("Failed");
-		//        //HttpContext.Current.Trace.Warn(string.Format("DataTypeModel {0} failed to instantiate, perhaps it is lacking a parameterless constructor or doesn't implement IRazorDataTypeModel?", dataTypeType.FullName));
-		//    }
-		//    result = null;
-		//    return false;
-		//}
+		}		
 
 		/// <summary>
 		/// Returns a property defined on the document object as a member property using reflection

@@ -2,6 +2,7 @@
 using System.Web.Routing;
 using NUnit.Framework;
 using Umbraco.Tests.Stubs;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;

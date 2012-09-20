@@ -11,5 +11,6 @@ namespace Umbraco.Core.Dynamics
 	internal interface IDynamicDocumentDataSource
 	{
 		Guid GetDataType(string docTypeAlias, string propertyAlias);
+
 	}
 }

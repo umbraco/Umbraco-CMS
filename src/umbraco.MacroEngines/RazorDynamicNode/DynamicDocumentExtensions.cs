@@ -26,6 +26,9 @@ namespace umbraco.MacroEngines.Library
 			return node;
 		}
 
+		/// <summary>
+		/// Internal custom INode class used for conversions from DynamicDocument
+		/// </summary>
 		private class ConvertedNode : INode
 		{
 			private readonly DynamicDocument _doc;

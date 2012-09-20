@@ -3,12 +3,11 @@ using System.Linq;
 using System.Web.Routing;
 using NUnit.Framework;
 using Umbraco.Tests.Stubs;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.template;
 
-namespace Umbraco.Tests.Routing
+namespace Umbraco.Tests.TestHelpers
 {
 	[TestFixture, RequiresSTA]
 	public abstract class BaseRoutingTest : BaseWebTest
@@ -40,13 +39,17 @@ namespace Umbraco.Tests.Routing
 			var umbracoContext = GetUmbracoContext(url, templateId, routeData);
 			var contentStore = new DefaultPublishedContentStore();
 			var niceUrls = new NiceUrlProvider(contentStore, umbracoContext);
-			var routingRequest = new RoutingContext(
+			var routingContext = new RoutingContext(
 				umbracoContext,
 				Enumerable.Empty<IDocumentLookup>(),
 				new FakeLastChanceLookup(),
 				contentStore,
 				niceUrls);
-			return routingRequest;
+
+			//assign the routing context back to the umbraco context
+			umbracoContext.RoutingContext = routingContext;
+
+			return routingContext;
 		}
 
 		/// <summary>

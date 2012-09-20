@@ -67,7 +67,7 @@
     <Compile Include="ObjectExtensionsTests.cs" />
     <Compile Include="ContentStores\PublishContentStoreTests.cs" />
     <Compile Include="DataTypeFactoryTests.cs" />
-    <Compile Include="Routing\BaseRoutingTest.cs" />
+    <Compile Include="TestHelpers\BaseRoutingTest.cs" />
     <Compile Include="GlobalSettingsTests.cs" />
     <Compile Include="Routing\LookupByAliasTests.cs" />
     <Compile Include="Routing\LookupByIdTests.cs" />

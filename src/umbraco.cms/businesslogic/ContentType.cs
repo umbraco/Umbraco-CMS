@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Runtime.CompilerServices;
@@ -100,8 +101,36 @@ namespace umbraco.cms.businesslogic
 
         #region Static Methods
 
+		/// <summary>
+		/// Used for cache so we don't have to lookup column names all the time, this is actually only used for the ChildrenAsTable methods
+		/// </summary>
+		private static readonly ConcurrentDictionary<string, IDictionary<string, string>> AliasToNames = new ConcurrentDictionary<string, IDictionary<string, string>>();
+
         private static Dictionary<Tuple<string, string>, Guid> _propertyTypeCache = new Dictionary<Tuple<string, string>, Guid>();
-        public static void RemoveFromDataTypeCache(string contentTypeAlias)
+        
+		/// <summary>
+		/// Returns a content type's columns alias -> name mapping
+		/// </summary>
+		/// <param name="contentTypeAlias"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// This is currently only used for ChildrenAsTable methods, caching is moved here instead of in the app logic so we can clear the cache
+		/// </remarks>
+		internal static IDictionary<string, string> GetAliasesAndNames(string contentTypeAlias)
+		{
+			IDictionary<string, string> cached;
+			if (AliasToNames.TryGetValue(contentTypeAlias, out cached))
+			{
+				return cached;
+			}
+
+			var ct = ContentType.GetByAlias(contentTypeAlias);
+			var userFields = ct.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
+			AliasToNames.TryAdd(contentTypeAlias, userFields);
+			return userFields;
+		}
+		
+		public static void RemoveFromDataTypeCache(string contentTypeAlias)
         {
             lock (_propertyTypeCache)
             {
@@ -116,8 +145,10 @@ namespace umbraco.cms.businesslogic
                 foreach (Tuple<string, string> key in toDelete)
                 {
                     _propertyTypeCache.Remove(key);
-                }
+                }				
             }
+			//don't put lock around this as it is ConcurrentDictionary.
+			AliasToNames.Clear();
         }
         public static Guid GetDataType(string contentTypeAlias, string propertyTypeAlias)
         {

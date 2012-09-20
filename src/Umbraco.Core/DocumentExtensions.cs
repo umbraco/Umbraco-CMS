@@ -1,9 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Umbraco.Core.Models;
+using umbraco.interfaces;
 
 namespace Umbraco.Core
 {
-	internal static class DocumentExtensions
+	public static class DocumentExtensions
 	{
 		/// <summary>
 		/// Returns the property as the specified type, if the property is not found or does not convert
@@ -39,5 +43,6 @@ namespace Umbraco.Core
 		{
 			return d.Properties.FirstOrDefault(p => p.Alias.InvariantEquals(alias));
 		}
+		
 	}
 }

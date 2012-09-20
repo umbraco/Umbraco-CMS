@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.template;

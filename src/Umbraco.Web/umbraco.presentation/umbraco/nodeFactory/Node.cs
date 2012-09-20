@@ -359,46 +359,49 @@ namespace umbraco.NodeFactory
 
 		public DataTable ChildrenAsTable()
 		{
-			return Children.Count > 0 ? GenerateDataTable(Children[0]) : new DataTable();
+			return GenerateDataTable(this);
 		}
 
 		public DataTable ChildrenAsTable(string nodeTypeAliasFilter)
 		{
-			if (Children.Count > 0)
-			{
-
-				Node Firstnode = null;
-				Boolean nodeFound = false;
-				foreach (Node n in Children)
-				{
-					if (n.NodeTypeAlias == nodeTypeAliasFilter && !nodeFound)
-					{
-						Firstnode = n;
-						nodeFound = true;
-						break;
-					}
-				}
-
-				if (nodeFound)
-				{
-					return GenerateDataTable(Firstnode);
-				}
-				return new DataTable();
-			}
-			return new DataTable();
+			return GenerateDataTable(this, nodeTypeAliasFilter);
 		}
 
-		private DataTable GenerateDataTable(INode node)
+		private DataTable GenerateDataTable(INode node, string nodeTypeAliasFilter = "")
 		{
+			var firstNode = nodeTypeAliasFilter.IsNullOrWhiteSpace()
+			                	? node.ChildrenAsList.Any()
+			                	  	? node.ChildrenAsList[0]
+			                	  	: null
+			                	: node.ChildrenAsList.FirstOrDefault(x => x.NodeTypeAlias == nodeTypeAliasFilter);
+			if (firstNode == null)
+				return new DataTable(); //no children found 
+
 			//use new utility class to create table so that we don't have to maintain code in many places, just one
 			var dt = Umbraco.Core.DataTableExtensions.GenerateDataTable(
-				//pass in the alias
-				node.NodeTypeAlias,				
-				//pass in the callback to extract the Dictionary<string, string> of user defined aliases to their names
+				//pass in the alias of the first child node since this is the node type we're rendering headers for
+				firstNode.NodeTypeAlias,				
+				//pass in the callback to extract the Dictionary<string, string> of column aliases to names
 				alias =>
 					{
-						var ct = ContentType.GetByAlias(alias);
-						return ct.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
+						var userFields = ContentType.GetAliasesAndNames(alias);						
+						//ensure the standard fields are there
+						var allFields = new Dictionary<string, string>()
+							{
+								{"Id", "Id"},
+								{"NodeName", "NodeName"},
+								{"NodeTypeAlias", "NodeTypeAlias"},
+								{"CreateDate", "CreateDate"},
+								{"UpdateDate", "UpdateDate"},
+								{"CreatorName", "CreatorName"},
+								{"WriterName", "WriterName"},
+								{"Url", "Url"}
+							};
+						foreach (var f in userFields.Where(f => !allFields.ContainsKey(f.Key)))
+						{
+							allFields.Add(f.Key, f.Value);
+						}
+						return allFields;
 					},
 				//pass in a callback to populate the datatable, yup its a bit ugly but it's already legacy and we just want to maintain code in one place.
 				() =>
@@ -408,6 +411,12 @@ namespace umbraco.NodeFactory
 						//loop through each child and create row data for it
 						foreach (Node n in Children)
 						{
+							if (!nodeTypeAliasFilter.IsNullOrWhiteSpace())
+							{
+								if (n.NodeTypeAlias != nodeTypeAliasFilter)
+									continue; //skip this one, it doesn't match the filter
+							}
+
 							var standardVals = new Dictionary<string, object>()
 								{
 									{"Id", n.Id},
