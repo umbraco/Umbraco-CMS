@@ -73,7 +73,7 @@ namespace Umbraco.Web.Mvc
 		/// <summary>
 		/// Gets an UmbracoHelper
 		/// </summary>
-		public UmbracoHelper UmbracoHelper
+		public UmbracoHelper Umbraco
 		{
 			get { return _helper ?? (_helper = new UmbracoHelper(UmbracoContext)); }
 		}
