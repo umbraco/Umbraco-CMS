@@ -197,14 +197,6 @@ namespace umbraco.MacroEngines.Library
         {
         	return _umbracoHelper.Wrap(tag, innerText, children);
         }
-		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, string innerText)
-        {
-            return Wrap(tag, innerText, (object)null);
-        }
-		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, object inner, object anonymousAttributes)
-		{
-			return _umbracoHelper.Wrap(tag, inner, anonymousAttributes);
-		}
 		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, object inner, object anonymousAttributes, params Umbraco.Web.Mvc.IHtmlTagWrapper[] children)
 		{
 			return _umbracoHelper.Wrap(tag, inner, anonymousAttributes, children);
@@ -213,17 +205,9 @@ namespace umbraco.MacroEngines.Library
 		{
 			return _umbracoHelper.Wrap(tag, inner);
 		}
-		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, string innerText, object anonymousAttributes)
-		{
-			return _umbracoHelper.Wrap(tag, innerText, anonymousAttributes);
-		}
 		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(string tag, string innerText, object anonymousAttributes, params Umbraco.Web.Mvc.IHtmlTagWrapper[] children)
 		{
 			return _umbracoHelper.Wrap(tag, innerText, anonymousAttributes, children);
-		}
-		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(bool visible, string tag, string innerText, object anonymousAttributes)
-		{
-			return _umbracoHelper.Wrap(visible, tag, innerText, anonymousAttributes);
 		}
 		public Umbraco.Web.Mvc.HtmlTagWrapper Wrap(bool visible, string tag, string innerText, object anonymousAttributes, params Umbraco.Web.Mvc.IHtmlTagWrapper[] children)
 		{
