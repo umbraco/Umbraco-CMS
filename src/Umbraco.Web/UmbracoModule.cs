@@ -67,9 +67,9 @@ namespace Umbraco.Web
 			umbracoContext.RoutingContext = routingContext;
 
 			// remap to handler if it is a base rest request
-			if (BaseRestHandler.IsBaseRestRequest(umbracoContext.RequestUrl))
+			if (BaseRest.BaseRestHandler.IsBaseRestRequest(umbracoContext.RequestUrl))
 			{
-				httpContext.RemapHandler(new BaseRestHandler());
+				httpContext.RemapHandler(new BaseRest.BaseRestHandler());
 			}
 			else
 

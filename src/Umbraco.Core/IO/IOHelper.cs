@@ -209,7 +209,37 @@ namespace Umbraco.Core.IO
         /// <returns>A safe filename without any path specific chars.</returns>
         internal static string SafeFileName(string filePath)
         {
-            return !String.IsNullOrEmpty(filePath) ? Regex.Replace(filePath, @"[^a-zA-Z0-9\-\.\/\:]{1}", "_") : String.Empty;
+            if (String.IsNullOrEmpty(filePath))
+                return String.Empty;
+
+            if (!String.IsNullOrWhiteSpace(filePath))
+            {
+                foreach (var character in Path.GetInvalidFileNameChars())
+                {
+                    filePath = filePath.Replace(character, '_');
+                }
+            }
+            else
+            {
+                filePath = String.Empty;
+            }
+
+            // Adapted from: http://stackoverflow.com/a/4827510/5018
+            // Combined both Reserved Characters and Character Data 
+            // from http://en.wikipedia.org/wiki/Percent-encoding
+            var stringBuilder = new StringBuilder();
+
+            const string reservedCharacters = "!*'();:@&=+$,/?%#[]-~{}\"<>\\^`| ";
+
+            foreach (var character in filePath)
+            {
+                if (reservedCharacters.IndexOf(character) == -1)
+                    stringBuilder.Append(character);
+                else
+                    stringBuilder.Append("_");
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }

@@ -81,7 +81,8 @@ namespace Umbraco.Core
 						if (appCodeFolder.Exists && (fileExtensions.Any(x => appCodeFolder.GetFiles("*" + x).Any())))
 						{
 							var appCodeAssembly = Assembly.Load("App_Code");
-							assemblies.Add(appCodeAssembly);
+							if (!assemblies.Contains(appCodeAssembly)) // BuildManager will find App_Code already
+								assemblies.Add(appCodeAssembly);
 						}
 
 						//now set the _allAssemblies

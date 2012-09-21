@@ -958,7 +958,7 @@ namespace umbraco
                         currentNode = macroXML.ImportNode(umbracoXML.GetElementById(currentID.ToString()), true);
 
                     // remove all sub content nodes
-                    foreach (XmlNode n in currentNode.SelectNodes("./node"))
+                    foreach (XmlNode n in currentNode.SelectNodes("node|*[@isDoc]"))
                         currentNode.RemoveChild(n);
 
                     macroXmlNode.AppendChild(currentNode);
@@ -979,7 +979,7 @@ namespace umbraco
                     XmlNode source = umbracoXML.GetElementById(macroPropertyValue);
                     if (source != null)
                     {
-                        XmlNodeList sourceList = source.SelectNodes("node");
+                        XmlNodeList sourceList = source.SelectNodes("node|*[@isDoc]");
                         if (sourceList.Count > 0)
                         {
                             int rndNumber;
@@ -990,7 +990,7 @@ namespace umbraco
                             }
                             XmlNode node = macroXML.ImportNode(sourceList[rndNumber], true);
                             // remove all sub content nodes
-                            foreach (XmlNode n in node.SelectNodes("./node"))
+                            foreach (XmlNode n in node.SelectNodes("node|*[@isDoc]"))
                                 node.RemoveChild(n);
 
                             macroXmlNode.AppendChild(node);

@@ -240,7 +240,11 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationEventsResolver.cs" />
-    <Compile Include="BaseRestHandler.cs" />
+    <Compile Include="BaseRest\BaseRestHandler.cs" />
+    <Compile Include="BaseRest\MemberRest.cs" />
+    <Compile Include="BaseRest\RestExtensionAttribute.cs" />
+    <Compile Include="BaseRest\RestExtensionMethodAttribute.cs" />
+    <Compile Include="BaseRest\RestExtensionMethodInfo.cs" />
     <Compile Include="DefaultDynamicDocumentDataSource.cs" />
     <Compile Include="DefaultPublishedMediaStore.cs" />
     <Compile Include="Dictionary\UmbracoCultureDictionary.cs" />
@@ -2007,7 +2011,9 @@
     <Content Include="umbraco.presentation\umbraco\editContent.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\editMedia.aspx" />
+    <Content Include="umbraco.presentation\umbraco\editMedia.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\js\language.aspx" />
     <Content Include="umbraco.presentation\umbraco\login.aspx">
       <SubType>ASPXCodeBehind</SubType>

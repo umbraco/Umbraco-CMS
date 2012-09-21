@@ -11,7 +11,6 @@ using umbraco.MacroEngines.Iron;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
 using umbraco.editorControls;
-using umbraco.presentation.umbracobase;
 using umbraco.uicontrols;
 using umbraco.cms;
 
@@ -129,6 +128,13 @@ namespace Umbraco.Tests
 		}
 
 		[Test]
+		public void Resolves_LegacyRestExtensions()
+		{
+			var types = PluginManager.Current.ResolveLegacyRestExtensions();
+			Assert.AreEqual(1, types.Count());
+		}
+
+		[Test]
 		public void Resolves_XsltExtensions()
 		{
 			var types = PluginManager.Current.ResolveXsltExtensions();
@@ -141,10 +147,16 @@ namespace Umbraco.Tests
 
 		}
 
-		[RestExtension("Blah")]
-		public class MyRestExtension
+		[umbraco.presentation.umbracobase.RestExtension("Blah")]
+		public class MyLegacyRestExtension
 		{
 			
+		}
+
+		[Umbraco.Web.BaseRest.RestExtension("Blah")]
+		public class MyRestExtesion
+		{ 
+		
 		}
 
 		public interface IFindMe
