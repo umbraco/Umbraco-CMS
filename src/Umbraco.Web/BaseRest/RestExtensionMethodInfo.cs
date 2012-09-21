@@ -64,6 +64,10 @@ namespace Umbraco.Web.BaseRest
 
 		#region Discovery
 
+		// gets a RestExtensionMethodInfo matching extensionAlias and methodName
+		// by looking everywhere (configuration, attributes, legacy attributes)
+		// returns MissingMethod (ie .Exists == false) if not found
+		//
 		public static RestExtensionMethodInfo GetMethod(string extensionAlias, string methodName)
 		{
 			return GetFromConfiguration(extensionAlias, methodName)
@@ -72,14 +76,18 @@ namespace Umbraco.Web.BaseRest
 				?? MissingMethod;
 		}
 
+		// gets a RestExtensionMethodInfo matching extensionAlias and methodName
+		// by looking at the configuration file
+		// returns null if not found
+		//
 		static RestExtensionMethodInfo GetFromConfiguration(string extensionAlias, string methodName)
 		{
 			const string ExtensionXPath = "/RestExtensions/ext [@alias='{0}']";
 			const string MethodXPath = "./permission [@method='{0}']";
 
-			// fixme
-			// because we reload the config file each time we can't really have a cache here
-			// or we'd need to set a watcher on the config file?
+			// fixme - at the moment we reload the config file each time
+			//   we have to support live edits of the config file for backward compatibility reason
+			//   so if we want to cache, we'd also need to implement a watcher on the config file...
 
 			var doc = new XmlDocument();
 			doc.Load(IOHelper.MapPath(SystemFiles.RestextensionsConfig));
@@ -94,9 +102,14 @@ namespace Umbraco.Web.BaseRest
 			if (mNode == null)
 				return null; // does not exist
 
+			// fixme - legacy loaded assemblies in the /bin folder using LoadFrom
+			//   which means that it is not possible to load App_Code
+			//   plus there is no point?
+
 			string assemblyName = eNode.Attributes["assembly"].Value;
-			string assemblyPath = IOHelper.MapPath(string.Format("{0}/{1}.dll", SystemDirectories.Bin, assemblyName.TrimStart('/')));
-			Assembly assembly = Assembly.LoadFrom(assemblyPath);
+			//string assemblyPath = IOHelper.MapPath(string.Format("{0}/{1}.dll", SystemDirectories.Bin, assemblyName.TrimStart('/')));
+			//var assembly = Assembly.LoadFrom(assemblyPath);
+			var assembly = Assembly.Load(assemblyName);
 
 			string typeName = eNode.Attributes["type"].Value;
 			Type type = assembly.GetType(typeName);
@@ -117,16 +130,25 @@ namespace Umbraco.Web.BaseRest
 			return info;
 		}
 
+		// gets a RestExtensionMethodInfo matching extensionAlias and methodName
+		// by looking for the legacy attributes
+		// returns null if not found
+		//
 		static RestExtensionMethodInfo GetFromLegacyAttribute(string extensionAlias, string methodName)
 		{
-			// here we can cache because any change would trigger an app restart
+			// here we can cache because any change would trigger an app restart anyway
 
 			string cacheKey = extensionAlias + "." + methodName;
 			lock (_cache)
 			{
+				// if it's in the cache, return
 				if (_cache.ContainsKey(cacheKey))
 					return _cache[cacheKey];
 			}
+
+			// find an extension with that alias, then find a method with that name,
+			// which has been properly marked with the attribute, and use the attribute
+			// properties to setup a RestExtensionMethodInfo
 
 			var extensions = PluginManager.Current.ResolveLegacyRestExtensions();
 			var extension = extensions
@@ -146,18 +168,23 @@ namespace Umbraco.Web.BaseRest
 							attribute.GetAllowGroup(), attribute.GetAllowType(), attribute.GetAllowMember(),
 							attribute.returnXml,
 							method);
+
+						// looks good, cache
+						lock (_cache)
+						{
+							_cache[cacheKey] = info;
+						}
 					}
 				}
-			}
-
-			lock (_cache)
-			{
-				_cache[cacheKey] = info;
 			}
 
 			return info;
 		}
 
+		// gets a RestExtensionMethodInfo matching extensionAlias and methodName
+		// by looking for the attributes
+		// returns null if not found
+		//
 		static RestExtensionMethodInfo GetFromAttribute(string extensionAlias, string methodName)
 		{
 			// here we can cache because any change would trigger an app restart
@@ -165,9 +192,14 @@ namespace Umbraco.Web.BaseRest
 			string cacheKey = extensionAlias + "." + methodName;
 			lock (_cache)
 			{
+				// if it's in the cache, return
 				if (_cache.ContainsKey(cacheKey))
 					return _cache[cacheKey];
 			}
+
+			// find an extension with that alias, then find a method with that name,
+			// which has been properly marked with the attribute, and use the attribute
+			// properties to setup a RestExtensionMethodInfo
 
 			var extensions = PluginManager.Current.ResolveRestExtensions();
 			var extension = extensions
@@ -187,13 +219,14 @@ namespace Umbraco.Web.BaseRest
 							attribute.AllowGroup, attribute.AllowType, attribute.AllowMember,
 							attribute.ReturnXml,
 							method);
+
+						// looks good, cache
+						lock (_cache)
+						{
+							_cache[cacheKey] = info;
+						}
 					}
 				}
-			}
-
-			lock (_cache)
-			{
-				_cache[cacheKey] = info;
 			}
 
 			return info;
