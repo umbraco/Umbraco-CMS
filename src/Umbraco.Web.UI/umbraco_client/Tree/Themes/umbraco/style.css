@@ -18,6 +18,7 @@
 	background-repeat:no-repeat !important;
 	line-height: 18px;
 	height: 18px;
+    width: 100%;
 }
 .tree.tree-umbraco ul {margin-left:0px;}
 .tree.tree-umbraco ul li ul {padding-left:5px;}
@@ -59,6 +60,8 @@
 	background: #D5EFFC;
 	border:1px solid #99DEFD;
 	-moz-border-radius: 2px;
+    display: inline;
+    width: auto;
 }
 
 
