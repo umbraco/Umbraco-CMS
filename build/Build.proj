@@ -48,8 +48,6 @@
  <ItemGroup>
    <SystemFolders Include="$(WebAppFolder)App_Code" />
    <SystemFolders Include="$(WebAppFolder)App_Data" />
-   <SystemFolders Include="$(WebAppFolder)App_Data\ClientDependency" />
-   <SystemFolders Include="$(WebAppFolder)App_Data\ExamineIndexes" />
    <SystemFolders Include="$(WebAppFolder)media" />
    <SystemFolders Include="$(WebAppFolder)masterpages" />
    <SystemFolders Include="$(WebAppFolder)scripts" />
