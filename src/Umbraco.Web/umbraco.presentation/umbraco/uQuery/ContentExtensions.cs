@@ -36,8 +36,19 @@ namespace umbraco
 		/// <returns>default(T) or property value cast to (T)</returns>
 		public static T GetProperty<T>(this Content item, string propertyAlias)
         {
-            var typeConverter = TypeDescriptor.GetConverter(typeof(T));
+            // check to see if return object handles it's own object hydration
+            if (typeof(T).GetInterface(typeof(uQuery.IGetProperty).Name) != null)
+            {
+                // create new instance of T with empty constructor
+                uQuery.IGetProperty t = (uQuery.IGetProperty)Activator.CreateInstance<T>();
 
+                // call method to hydrate the object from a string value
+                t.LoadPropertyValue(item.GetProperty<string>(propertyAlias));
+
+                return (T)t;
+            }
+
+            var typeConverter = TypeDescriptor.GetConverter(typeof(T));
             if (typeConverter != null)
             {
                 // Boolean

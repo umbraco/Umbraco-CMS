@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Xml;
-using umbraco;
 using umbraco.cms.businesslogic.web;
 using umbraco.NodeFactory;
 
@@ -271,10 +270,22 @@ namespace umbraco
         /// <returns>default(T) or property cast to (T)</returns>
         public static T GetProperty<T>(this Node node, string propertyAlias)
         {
-            var typeConverter = TypeDescriptor.GetConverter(typeof(T));
+            // check to see if return object handles it's own object hydration
+            if (typeof(T).GetInterface(typeof(uQuery.IGetProperty).Name) != null)
+            {
+                // create new instance of T with empty constructor
+                uQuery.IGetProperty t = (uQuery.IGetProperty)Activator.CreateInstance<T>();
 
+                // call method to hydrate the object from a string value
+                t.LoadPropertyValue(node.GetProperty<string>(propertyAlias));
+
+                return (T)t;
+            }
+
+            var typeConverter = TypeDescriptor.GetConverter(typeof(T));
             if (typeConverter != null)
             {
+
                 // Boolean
                 if (typeof(T) == typeof(bool))
                 {

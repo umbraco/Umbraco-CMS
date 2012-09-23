@@ -291,6 +291,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\nodeFactory\UmbracoSiteMapProviderAccessUpdate.cs" />
+    <Compile Include="umbraco.presentation\umbraco\uQuery\IGetProperty.cs" />
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="ViewContextExtensions.cs" />
     <Compile Include="ViewDataContainerExtensions.cs" />
