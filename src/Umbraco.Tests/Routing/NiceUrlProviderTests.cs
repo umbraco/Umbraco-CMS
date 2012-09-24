@@ -1,5 +1,6 @@
 using System;
 using System.Configuration;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
@@ -30,46 +31,71 @@ namespace Umbraco.Tests.Routing
 		[Test]
 		public void Ensure_Cache_Is_Correct()
 		{
-			
 			var routingContext = GetRoutingContext("/test", 1111);
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			var ids = new[]
-				{
-					new Tuple<int, string>(1046, "/home"),
-					new Tuple<int, string>(1173, "/home/sub1"),
-					new Tuple<int, string>(1174, "/home/sub1/sub2"),
-					new Tuple<int, string>(1176, "/home/sub1/sub-3"),
-					new Tuple<int, string>(1177, "/home/sub1/custom-sub-1"),
-					new Tuple<int, string>(1178, "/home/sub1/custom-sub-2"),
-					new Tuple<int, string>(1175, "/home/sub-2"),
-					new Tuple<int, string>(1172, "/test-page")
-				};
-			foreach(var i in ids)
+
+			var samples = new Dictionary<int, string> {
+				{ 1046, "/home" },
+				{ 1173, "/home/sub1" },
+				{ 1174, "/home/sub1/sub2" },
+				{ 1176, "/home/sub1/sub-3" },
+				{ 1177, "/home/sub1/custom-sub-1" },
+				{ 1178, "/home/sub1/custom-sub-2" },
+				{ 1175, "/home/sub-2" },
+				{ 1172, "/test-page" }
+			};
+
+			foreach (var sample in samples)
 			{
-				var result = routingContext.NiceUrlProvider.GetNiceUrl(i.Item1);
-				Assert.AreEqual(i.Item2, result);
+				var result = routingContext.NiceUrlProvider.GetNiceUrl(sample.Key);
+				Assert.AreEqual(sample.Value, result);
 			}
-			Assert.AreEqual(8, ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedRoutes().Count);
-			Assert.AreEqual(8, ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedIds().Count);
+
+			var randomSample = new KeyValuePair<int, string>(1177, "/home/sub1/custom-sub-1");
+			for (int i = 0; i < 5; i++)
+			{
+				var result = routingContext.NiceUrlProvider.GetNiceUrl(randomSample.Key);
+				Assert.AreEqual(randomSample.Value, result);
+			}
+
+			var cachedRoutes = ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedRoutes();
+			Assert.AreEqual(8, cachedRoutes.Count);
+
+			foreach (var sample in samples)
+			{
+				Assert.IsTrue(cachedRoutes.ContainsKey(sample.Key));
+				Assert.AreEqual(sample.Value, cachedRoutes[sample.Key]);
+			}
+
+			var cachedIds = ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedIds();
+			Assert.AreEqual(8, cachedIds.Count);
+
+			foreach (var sample in samples)
+			{
+				var key = sample.Value;
+				Assert.IsTrue(cachedIds.ContainsKey(key));
+				Assert.AreEqual(sample.Key, cachedIds[key]);
+			}
 		}
 
-		[TestCase(1046, "/home.aspx")]
-		[TestCase(1173, "/home/sub1.aspx")]
-		[TestCase(1174, "/home/sub1/sub2.aspx")]
-		[TestCase(1176, "/home/sub1/sub-3.aspx")]
-		[TestCase(1177, "/home/sub1/custom-sub-1.aspx")]
-		[TestCase(1178, "/home/sub1/custom-sub-2.aspx")]
-		[TestCase(1175, "/home/sub-2.aspx")]
-		[TestCase(1172, "/test-page.aspx")]
-		public void Get_Nice_Url_Not_Hiding_Top_Level_No_Directory_Urls(int nodeId, string niceUrlMatch)
-		{
-			var routingContext = GetRoutingContext("/test", 1111);
+		//[TestCase(1046, "/home.aspx")]
+		//[TestCase(1173, "/home/sub1.aspx")]
+		//[TestCase(1174, "/home/sub1/sub2.aspx")]
+		//[TestCase(1176, "/home/sub1/sub-3.aspx")]
+		//[TestCase(1177, "/home/sub1/custom-sub-1.aspx")]
+		//[TestCase(1178, "/home/sub1/custom-sub-2.aspx")]
+		//[TestCase(1175, "/home/sub-2.aspx")]
+		//[TestCase(1172, "/test-page.aspx")]
+		//public void Get_Nice_Url_Not_Hiding_Top_Level_No_Directory_Urls(int nodeId, string niceUrlMatch)
+		//{
+		//    var routingContext = GetRoutingContext("/test", 1111);
 			
-			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId);
+		//    var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId);
 
-			Assert.AreEqual(niceUrlMatch, result);
-		}
+		//    Assert.AreEqual(niceUrlMatch, result);
+		//}
 
+		// test hideTopLevelNodeFromPath false
 		[TestCase(1046, "/home")]
 		[TestCase(1173, "/home/sub1")]
 		[TestCase(1174, "/home/sub1/sub2")]
@@ -78,36 +104,40 @@ namespace Umbraco.Tests.Routing
 		[TestCase(1178, "/home/sub1/custom-sub-2")]
 		[TestCase(1175, "/home/sub-2")]
 		[TestCase(1172, "/test-page")]
-		public void Get_Nice_Url_Not_Hiding_Top_Level_With_Directory_Urls(int nodeId, string niceUrlMatch)
+
+		public void Get_Nice_Url_Not_Hiding_Top_Level(int nodeId, string niceUrlMatch)
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
 
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
+			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false");
 
 			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId);
-
 			Assert.AreEqual(niceUrlMatch, result);
 		}
 
-		[TestCase(1046, "/")]
-		[TestCase(1173, "/sub1.aspx")]
-		[TestCase(1174, "/sub1/sub2.aspx")]
-		[TestCase(1176, "/sub1/sub-3.aspx")]
-		[TestCase(1177, "/sub1/custom-sub-1.aspx")]
-		[TestCase(1178, "/sub1/custom-sub-2.aspx")]
-		[TestCase(1175, "/sub-2.aspx")]
-		[TestCase(1172, "/test-page.aspx")]
-		public void Get_Nice_Url_Hiding_Top_Level_No_Directory_Urls(int nodeId, string niceUrlMatch)
-		{
-			var routingContext = GetRoutingContext("/test", 1111);
+		// no need for umbracoUseDirectoryUrls test = should be handled by UriUtilityTests
 
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
+		//[TestCase(1046, "/")]
+		//[TestCase(1173, "/sub1.aspx")]
+		//[TestCase(1174, "/sub1/sub2.aspx")]
+		//[TestCase(1176, "/sub1/sub-3.aspx")]
+		//[TestCase(1177, "/sub1/custom-sub-1.aspx")]
+		//[TestCase(1178, "/sub1/custom-sub-2.aspx")]
+		//[TestCase(1175, "/sub-2.aspx")]
+		//[TestCase(1172, "/test-page.aspx")]
+		//public void Get_Nice_Url_Hiding_Top_Level_No_Directory_Urls(int nodeId, string niceUrlMatch)
+		//{
+		//    var routingContext = GetRoutingContext("/test", 1111);
 
-			 var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId);
+		//    ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
 
-			Assert.AreEqual(niceUrlMatch, result);
-		}
+		//     var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId);
 
+		//    Assert.AreEqual(niceUrlMatch, result);
+		//}
+
+		// test hideTopLevelNodeFromPath true
 		[TestCase(1046, "/")]
 		[TestCase(1173, "/sub1")]
 		[TestCase(1174, "/sub1/sub2")]
@@ -115,16 +145,16 @@ namespace Umbraco.Tests.Routing
 		[TestCase(1177, "/sub1/custom-sub-1")]
 		[TestCase(1178, "/sub1/custom-sub-2")]
 		[TestCase(1175, "/sub-2")]
-		[TestCase(1172, "/test-page")]
-		public void Get_Nice_Url_Hiding_Top_Level_With_Directory_Urls(int nodeId, string niceUrlMatch)
+		[TestCase(1172, "/test-page")] // not hidden because not first root
+
+		public void Get_Nice_Url_Hiding_Top_Level(int nodeId, string niceUrlMatch)
 		{
 			var routingContext = GetRoutingContext("/test", 1111);
 
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
+			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
 
 			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId);
-
 			Assert.AreEqual(niceUrlMatch, result);
 		}
 	}

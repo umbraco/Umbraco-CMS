@@ -42,12 +42,14 @@ namespace Umbraco.Web.Routing
         {
 			LogHelper.Debug<LookupByNiceUrl>("Test route \"{0}\"", () => route);
 
-			//return '0' if in preview mode!
+			// first ask the cache for a node
+			// return '0' if in preview mode
         	var nodeId = !docreq.RoutingContext.UmbracoContext.InPreviewMode
 							? docreq.RoutingContext.UmbracoContext.RoutesCache.GetNodeId(route)
         	             	: 0;
 
-
+			// if a node was found, get it by id and ensure it exists
+			// else clear the cache
             IDocument node = null;
             if (nodeId > 0)
             {
@@ -66,6 +68,7 @@ namespace Umbraco.Web.Routing
                 }
             }
 
+			// if we still have no node, get it by route
             if (node == null)
             {
 				LogHelper.Debug<LookupByNiceUrl>("Cache miss, query");
@@ -78,10 +81,9 @@ namespace Umbraco.Web.Routing
                     docreq.Document = node;
 					LogHelper.Debug<LookupByNiceUrl>("Query matches, id={0}", () => docreq.DocumentId);
 
+					// do not store if previewing
 					if (!docreq.RoutingContext.UmbracoContext.InPreviewMode)
-					{
-						docreq.RoutingContext.UmbracoContext.RoutesCache.Store(docreq.DocumentId, route); // will not write if previewing	
-					} 
+						docreq.RoutingContext.UmbracoContext.RoutesCache.Store(docreq.DocumentId, route);
                     
                 }
                 else

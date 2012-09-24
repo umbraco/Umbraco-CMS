@@ -185,6 +185,7 @@ namespace Umbraco.Web.Routing
 				// handle not found
 				if (!_documentRequest.HasNode)
 				{
+					_documentRequest.Is404 = true;
 					LogHelper.Debug<DocumentRequest>("{0}No document, try last chance lookup", () => tracePrefix);
 
 					// if it fails then give up, there isn't much more that we can do
@@ -369,6 +370,17 @@ namespace Umbraco.Web.Routing
 				//TODO: Need to figure out if this is web forms or MVC based on template name somehow!!
 				var template = Template.GetByAlias(templateAlias);
 				_documentRequest.Template = template;
+			}
+
+			if (!_documentRequest.HasTemplate)
+			{
+				LogHelper.Debug<DocumentRequest>("{0}No template was found.");
+				// do not do it if we're already 404 else it creates an infinite loop
+				if (Umbraco.Core.Configuration.UmbracoSettings.HandleMissingTemplateAs404 && !_documentRequest.Is404)
+				{
+					LogHelper.Debug<DocumentRequest>("{0}Assume page not found (404).");
+					_documentRequest.Document = null;
+				}
 			}
 		}
 

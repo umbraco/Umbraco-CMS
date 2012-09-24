@@ -103,7 +103,7 @@ namespace Umbraco.Web
 					var searcher = new DocumentRequestBuilder(docreq);
 					//find domain
 					searcher.LookupDomain();
-					//redirect if it has been flagged
+					// redirect if it has been flagged
 					if (docreq.IsRedirect)
 						httpContext.Response.Redirect(docreq.RedirectUrl, true);
 					//set the culture on the thread
@@ -116,32 +116,37 @@ namespace Umbraco.Web
 
 					//TODO: here we should launch an event so that people can modify the doc request to do whatever they want.
 
-					//redirect if it has been flagged
+					// redirect if it has been flagged
 					if (docreq.IsRedirect)
 						httpContext.Response.Redirect(docreq.RedirectUrl, true);
 
-					//if no doc is found, send to our not found handler
+					// handle 404
 					if (docreq.Is404)
 					{
-						httpContext.RemapHandler(new DocumentNotFoundHandler());
+						httpContext.Response.StatusCode = 404;
+
+						if (!docreq.HasNode)
+							httpContext.RemapHandler(new DocumentNotFoundHandler());
+						else if (!docreq.HasTemplate)
+							httpContext.RemapHandler(new NoTemplateHandler());
+
+						// else we have a document to render
 					}
-					else
+
+					if (docreq.HasNode && docreq.HasTemplate)
 					{
+						// everything is ready to pass off to our handlers (mvc or webforms)
+						// still need to setup a few things to deal with legacy code
 
-						//ok everything is ready to pass off to our handlers (mvc or webforms) but we need to setup a few things
-						//mostly to do with legacy code,etc...
-
-						//we need to complete the request which assigns the page back to the docrequest to make it available for legacy handlers like default.aspx
+						// assign the legagcy page back to the docrequest
+						// handlers like default.aspx will want it
 						docreq.UmbracoPage = new page(docreq);
 
-						//this is required for many legacy things in umbraco to work
+						// these two are used by many legacy objects
 						httpContext.Items["pageID"] = docreq.DocumentId;
-
-						//this is again required by many legacy objects
-						httpContext.Items.Add("pageElements", docreq.UmbracoPage.Elements);
+						httpContext.Items["pageElements"] = docreq.UmbracoPage.Elements;
 
 						RewriteToUmbracoHandler(HttpContext.Current, uri.Query, docreq.RenderingEngine);
-
 					}
 				}
 		}

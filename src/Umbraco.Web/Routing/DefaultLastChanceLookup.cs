@@ -16,6 +16,20 @@ namespace Umbraco.Web.Routing
 	/// </summary>
     internal class DefaultLastChanceLookup : IDocumentLastChanceLookup
     {
+		// notes
+		//
+		// at the moment we load the legacy INotFoundHandler
+		// excluding those that have been replaced by proper lookups,
+		// and run them.
+		//
+		// when we finaly obsolete INotFoundHandler, we'll have to move
+		// over here code from legacy requestHandler.hande404, which
+		// basically uses umbraco.library.GetCurrentNotFoundPageId();
+		// which also would need to be refactored / migrated here.
+		//
+		// the best way to do this would be to create a DefaultLastChanceLookup2
+		// that would do everything by itself, and let ppl use it if they
+		// want, then make it the default one, then remove this one.
 
 		/// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>DocumentRequest</c>.
@@ -98,22 +112,24 @@ namespace Umbraco.Web.Routing
             {
                 var assemblyName = n.Attributes.GetNamedItem("assembly").Value;
 
-                // skip those that are in umbraco.dll because we have
-                // replaced them with ILookups already -- so we just
-                // want to load user-defined NotFound handlers...
-                if (assemblyName == "umbraco")
-                    continue;
-
                 var typeName = n.Attributes.GetNamedItem("type").Value;
                 string ns = assemblyName;
                 var nsAttr = n.Attributes.GetNamedItem("namespace");
                 if (nsAttr != null && !string.IsNullOrWhiteSpace(nsAttr.Value))
                     ns = nsAttr.Value;
-                Type type = null;
 
-				LogHelper.Debug<DefaultLastChanceLookup>("Registering '{0}.{1},{2}'.", () => ns, () => typeName, () => assemblyName);      
-                
-                try
+				if (assemblyName == "umbraco" && (ns + "." + typeName) != "umbraco.handle404")
+				{
+					// skip those that are in umbraco.dll because we have replaced them with IDocumentLookups
+					// but do not skip "handle404" as that's the built-in legacy final handler, and for the time
+					// being people will have it in their config.
+					continue;
+				}
+
+				LogHelper.Debug<DefaultLastChanceLookup>("Registering '{0}.{1},{2}'.", () => ns, () => typeName, () => assemblyName);
+
+				Type type = null;
+				try
                 {
 					//TODO: This isn't a good way to load the assembly, its already in the Domain so we should be getting the type
 					// this loads the assembly into the wrong assembly load context!!

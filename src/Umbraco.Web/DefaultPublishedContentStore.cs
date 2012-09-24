@@ -38,33 +38,24 @@ namespace Umbraco.Web
 			if (route == null) throw new ArgumentNullException("route");
 
 			//set the default to be what is in the settings
-			if (hideTopLevelNode == null)
-			{
-				hideTopLevelNode = GlobalSettings.HideTopLevelNodeFromPath;
-			}
+			hideTopLevelNode = hideTopLevelNode ?? GlobalSettings.HideTopLevelNodeFromPath;
 
 			//the route always needs to be lower case because we only store the urlName attribute in lower case
         	route = route.ToLowerInvariant();
 
-            string startNodeIdString = "0";
-            string path = route;
-            if (!route.StartsWith("/"))
-            {
-                int pos = route.IndexOf('/');
-                startNodeIdString = route.Substring(0, pos);
-                path = route.Substring(pos + 1);
-            }
-            int startNodeId = int.Parse(startNodeIdString);
+			int pos = route.IndexOf('/');
+			string path = pos == 0 ? route : route.Substring(pos);
+			int startNodeId = pos == 0 ? 0 : int.Parse(route.Substring(0, pos));
 
             var xpath = CreateXpathQuery(startNodeId, path, hideTopLevelNode.Value);
 
 			//check if we can find the node in our xml cache
 			var found = GetXml(umbracoContext).SelectSingleNode(xpath);
 
-			//this check is because we allow root nodes that don't have a domain assigned, if 
-			//the previous check fails, we will check if this is a root node (based purely on it having a path with only 1 '/' which it is prefixed with)
-			//if it is a root node, we'll try to find it again without hiding top level nodes
-			if (found == null && path.ToCharArray().Count(x => x == '/') == 1)
+			// if hideTopLevelNodePath is true then for url /foo we looked for /*/foo
+			// but maybe that was the url of a non-default top-level node, so we also
+			// have to look for /foo (see note in NiceUrlProvider).
+			if (found == null && hideTopLevelNode.Value && path.Length > 1 && path.IndexOf('/', 1) < 0)
 			{
 				xpath = CreateXpathQuery(startNodeId, path, false);
 				found = GetXml(umbracoContext).SelectSingleNode(xpath);

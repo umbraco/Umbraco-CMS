@@ -14,21 +14,32 @@ namespace Umbraco.Web.Routing
 
 		internal void WriteOutput(HttpContext context)
 		{
-			context.Response.StatusCode = 404;
+			var response = context.Response;
 
-			context.Response.Write("<html><body><h1>Page not found</h1>");
-			UmbracoContext.Current.HttpContext.Response.Write("<h3>No umbraco document matches the url '" + HttpUtility.HtmlEncode(UmbracoContext.Current.ClientUrl) + "'.</h3>");
+			response.Clear();
+			response.StatusCode = 404;
 
-			// fixme - should try to get infos from the DocumentRequest?
+			var docreq = UmbracoContext.Current.DocumentRequest;
+			var reason = "Cannot render the page at url '{0}'.";
+			if (!docreq.HasNode)
+				reason = "No umbraco document matches the url '{0}'.";
+			else if (!docreq.HasTemplate)
+				reason = "No template exists to render the document at url '{0}'.";
 
-			context.Response.Write("<p>This page can be replaced with a custom 404. Check the documentation for \"custom 404\".</p>");
-			context.Response.Write("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");
-			context.Response.Write("</body></html>");
+			response.Write("<html><body><h1>Page not found</h1>");
+			response.Write("<h3>");
+			response.Write(string.Format(reason, HttpUtility.HtmlEncode(UmbracoContext.Current.ClientUrl)));
+			response.Write("</h3");
+			response.Write("<p>This page can be replaced with a custom 404. Check the documentation for \"custom 404\".</p>");
+			response.Write("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");
+			response.Write("</body></html>");
+
+			response.End();
 		}
 
 		public bool IsReusable
 		{
-			get { return false; }
+			get { return true; }
 		}
 	}
 }

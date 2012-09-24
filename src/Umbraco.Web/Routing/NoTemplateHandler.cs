@@ -14,18 +14,16 @@ namespace Umbraco.Web.Routing
 
 		internal void WriteOutput(HttpContext context)
 		{
-			context.Response.Clear();
-			context.Response.Write("");
-			context.Response.End();
+			var response = context.Response;
+
+			response.Clear();
+			response.Write("");
+			response.End();
 		}
 
 		public bool IsReusable
 		{
-			get
-			{
-				//yes this is reusable since it always returns the same thing
-				return true;
-			}
+			get { return true; }
 		}
 	}
 }

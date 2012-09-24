@@ -4,11 +4,11 @@ using System.Linq;
 using System.Web;
 
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Routing;
 
 using umbraco;
-using umbraco.IO;
 using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web.Routing
@@ -55,63 +55,67 @@ namespace Umbraco.Web.Routing
 		/// <remarks>The url is absolute or relative depending on the current url, unless absolute is true, and then it is always absolute.</remarks>
 		public string GetNiceUrl(int nodeId, Uri current, bool absolute)
         {
-			Uri domainUri = null;
+			Uri domainUri;
+			string path;
 
-			// will not read cache if previewing!
+			// do not read cache if previewing
         	var route = _umbracoContext.InPreviewMode
 				? null
 				: _umbracoContext.RoutesCache.GetRoute(nodeId);
 
             if (!string.IsNullOrEmpty(route))
             {
-				domainUri = nodeId > 0 ? DomainUriAtNode(nodeId, current) : null;				
+				// there was a route in the cache - extract domainUri and path
+				// route is /<path> or <domainRootId>/<path>
+				int pos = route.IndexOf('/');
+				path = pos == 0 ? route : route.Substring(pos);
+				domainUri = pos == 0 ? null : DomainUriAtNode(int.Parse(route.Substring(0, pos)), current);
 			}
 			else
 			{
-				var originalNode = _publishedContentStore.GetDocumentById(_umbracoContext, nodeId);
-				if (originalNode == null)
+				// there was no route in the cache - create a route
+				var node = _publishedContentStore.GetDocumentById(_umbracoContext, nodeId);
+				if (node == null)
 				{
 					LogHelper.Warn<NiceUrlProvider>(
-						"Couldn't find any page with the nodeId = {0}. This is most likely caused by the page isn't published!",
+						"Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
 						nodeId);
 
 					return "#"; 
 				}
-					
-
+				
+				// walk up from that node until we hit a node with a domain,
+				// or we reach the content root, collecting urls in the way
 				var pathParts = new List<string>();
-				int id = nodeId;
-				domainUri = DomainUriAtNode(id, current);
-				var recursiveNode = originalNode;
-				while (domainUri == null && id > 0)
+				var n = node;
+				domainUri = DomainUriAtNode(n.Id, current);
+				while (domainUri == null && n != null) // n is null at root
 				{
-					var urlName = recursiveNode.UrlName;
+					// get the url
+					var urlName = n.UrlName;
 					pathParts.Add(urlName);
-					recursiveNode = recursiveNode.Parent; // set to parent node
-					if (recursiveNode == null)
-					{
-						id = -1;
-					}
-					else
-					{
-						id = recursiveNode.Id;
-					}					
-					domainUri = id > 0 ? DomainUriAtNode(id, current) : null;
+
+					// move to parent node
+					n = n.Parent;
+					domainUri = n == null ? null : DomainUriAtNode(n.Id, current);
 	            }
 
 				// no domain, respect HideTopLevelNodeFromPath for legacy purposes
 				if (domainUri == null && global::umbraco.GlobalSettings.HideTopLevelNodeFromPath)
 				{
-					//here we need to determine if this node is another root node (next sibling(s) to the first) because
-					// in that case, we do not remove the path part. In theory, like in v5, this node would require 
-					// a domain assigned but to maintain compatibility we'll add this check
-					if (originalNode.Parent == null)
+					// in theory if hideTopLevelNodeFromPath is true, then there should be only once
+					// top-level node, or else domains should be assigned. but for backward compatibility
+					// we add this check - we look for the document matching "/" and if it's not us, then
+					// we do not hide the top level path
+					// it has to be taken care of in IPublishedContentStore.GetDocumentByRoute too so if
+					// "/foo" fails (looking for "/*/foo") we try also "/foo". 
+					// this does not make much sense anyway esp. if both "/foo/" and "/bar/foo" exist, but
+					// that's the way it works pre-4.10 and we try to be backward compat for the time being
+					if (node.Parent == null)
 					{
 						var rootNode = _publishedContentStore.GetDocumentByRoute(_umbracoContext, "/", true);
-						if (rootNode.Id == originalNode.Id)
-						{
+						if (rootNode.Id == node.Id) // remove only if we're the default node
 							pathParts.RemoveAt(pathParts.Count - 1);
-						}
 					}
 					else
 					{
@@ -119,15 +123,18 @@ namespace Umbraco.Web.Routing
 					}
 				}
 					
-
+				// assemble the route
 				pathParts.Reverse();
-				route = "/" + string.Join("/", pathParts);	
+				path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
+				route = (n == null ? "" : n.Id.ToString()) + path;
 
+				// do not store if previewing
 				if (!_umbracoContext.InPreviewMode)
 					_umbracoContext.RoutesCache.Store(nodeId, route);
 			}
 
-			return AssembleUrl(domainUri, route, current, absolute).ToString();
+			// assemble the url from domainUri (maybe null) and path
+			return AssembleUrl(domainUri, path, current, absolute).ToString();
 		}
 
 		/// <summary>
@@ -198,19 +205,25 @@ namespace Umbraco.Web.Routing
 			if (domainUri == null)
 			{
 				// no domain was found : return a relative url,  add vdir if any
-				uri = new Uri(global::umbraco.IO.SystemDirectories.Root + path, UriKind.Relative);
+				uri = new Uri(SystemDirectories.Root + path, UriKind.Relative);
 			}
 			else
 			{
 				// a domain was found : return an absolute or relative url
 				// cannot handle vdir, has to be in domain uri
 				if (!absolute && current != null && domainUri.GetLeftPart(UriPartial.Authority) == current.GetLeftPart(UriPartial.Authority))
-					uri = new Uri(domainUri.AbsolutePath.TrimEnd('/') + path, UriKind.Relative); // relative
+					uri = new Uri(CombinePaths(domainUri.AbsolutePath, path), UriKind.Relative); // relative
 				else
-					uri = new Uri(domainUri.GetLeftPart(UriPartial.Path).TrimEnd('/') + path); // absolute
+					uri = new Uri(CombinePaths(domainUri.GetLeftPart(UriPartial.Path), path)); // absolute
 			}
 
 			return UriUtility.UriFromUmbraco(uri);
+		}
+
+		string CombinePaths(string path1, string path2)
+		{
+			string path = path1.TrimEnd('/') + path2;
+			return path == "/" ? path : path.TrimEnd('/');
 		}
 
 		IEnumerable<Uri> AssembleUrls(IEnumerable<Uri> domainUris, string path, Uri current)
@@ -222,7 +235,7 @@ namespace Umbraco.Web.Routing
 			else
 			{
 				// no domain was found : return a relative url,  add vdir if any
-				return new Uri[] { new Uri(global::umbraco.IO.SystemDirectories.Root + path, UriKind.Relative) };
+				return new Uri[] { new Uri(SystemDirectories.Root + path, UriKind.Relative) };
 			}
 		}
 

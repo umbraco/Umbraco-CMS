@@ -334,6 +334,8 @@ namespace Umbraco.Core.Configuration
             }
         }
 
+		static bool? _addTrailingSlash = null;
+
         /// <summary>
         /// This will add a trailing slash (/) to urls when in directory url mode
         /// NOTICE: This will always return false if Directory Urls in not active
@@ -346,6 +348,8 @@ namespace Umbraco.Core.Configuration
                 {
                     if (GlobalSettings.UseDirectoryUrls)
                     {
+						if (_addTrailingSlash.HasValue)
+							return _addTrailingSlash.Value;
                         bool result;
                         if (bool.TryParse(GetKey("/settings/requestHandler/addTrailingSlash"), out result))
                             return result;
@@ -361,6 +365,10 @@ namespace Umbraco.Core.Configuration
                     return false;
                 }
             }
+			internal set
+			{
+				_addTrailingSlash = value;
+			}
         }
 
         /// <summary>
@@ -384,6 +392,24 @@ namespace Umbraco.Core.Configuration
                 }
             }
         }
+
+		public static bool HandleMissingTemplateAs404
+		{
+			get
+			{
+				try
+				{
+					bool result;
+					if (bool.TryParse(GetKey("/settings/templates/handleMissingTemplateAs404"), out result))
+						return result;
+					return false;
+				}
+				catch
+				{
+					return false;
+				}
+			}
+		}
 
 
         /// <summary>

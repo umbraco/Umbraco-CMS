@@ -1,28 +1,90 @@
 using System;
+using System.Configuration;
 using NUnit.Framework;
 using Umbraco.Web;
 
 namespace Umbraco.Tests
 {
+	// fixme - not testing virtual directory!
+
 	[TestFixture]
 	public class UriUtilityTests
 	{
+		// test normal urls
+		[TestCase("http://LocalHost/", "http://localhost/")]
+		[TestCase("http://LocalHost/?x=y", "http://localhost/?x=y")]
+		[TestCase("http://LocalHost/Home", "http://localhost/home")]
+		[TestCase("http://LocalHost/Home?x=y", "http://localhost/home?x=y")]
+		[TestCase("http://LocalHost/Home/Sub1", "http://localhost/home/sub1")]
+		[TestCase("http://LocalHost/Home/Sub1?x=y", "http://localhost/home/sub1?x=y")]
 
-		[TestCase("http://Localhost/", "http://localhost/")]
-		[TestCase("http://localhost/default.aspx", "http://localhost/")]
-		[TestCase("http://localhost/default.aspx?test=blah", "http://localhost/?test=blah")]
-		[TestCase("http://localhost/home/Sub1", "http://localhost/home/sub1")]
-		[TestCase("http://localhost/home/Sub1.aspx", "http://localhost/home/sub1")]
-		[TestCase("http://localhost/home/Sub1.aspx?test=blah", "http://localhost/home/sub1?test=blah")]
-		[TestCase("http://Localhost/home/sub1.aspx/blah", "http://localhost/home/sub1/blah")]
-		[TestCase("http://Localhost/home/sub1.aspx/blah?test=asdf", "http://localhost/home/sub1/blah?test=asdf")]
-		public void Uri_To_Umbraco(string url, string expected)
+		// same with .aspx
+		[TestCase("http://LocalHost/Home.aspx", "http://localhost/home")]
+		[TestCase("http://LocalHost/Home.aspx?x=y", "http://localhost/home?x=y")]
+		[TestCase("http://LocalHost/Home/Sub1.aspx", "http://localhost/home/sub1")]
+		[TestCase("http://LocalHost/Home/Sub1.aspx?x=y", "http://localhost/home/sub1?x=y")]
+
+		// test that the trailing slash goes but not on hostname
+		[TestCase("http://LocalHost/", "http://localhost/")]
+		[TestCase("http://LocalHost/Home/", "http://localhost/home")]
+		[TestCase("http://LocalHost/Home/?x=y", "http://localhost/home?x=y")]
+		[TestCase("http://LocalHost/Home/Sub1/", "http://localhost/home/sub1")]
+		[TestCase("http://LocalHost/Home/Sub1/?x=y", "http://localhost/home/sub1?x=y")]
+
+		// test that default.aspx goes, even with parameters
+		[TestCase("http://LocalHost/deFault.aspx", "http://localhost/")]
+		[TestCase("http://LocalHost/deFault.aspx?x=y", "http://localhost/?x=y")]
+
+		// test with inner .aspx
+		[TestCase("http://Localhost/Home/Sub1.aspx/Sub2", "http://localhost/home/sub1/sub2")]
+		[TestCase("http://Localhost/Home/Sub1.aspx/Sub2?x=y", "http://localhost/home/sub1/sub2?x=y")]
+		[TestCase("http://Localhost/Home.aspx/Sub1.aspx/Sub2?x=y", "http://localhost/home/sub1/sub2?x=y")]
+		[TestCase("http://Localhost/deFault.aspx/Home.aspx/deFault.aspx/Sub1.aspx", "http://localhost/home/default/sub1")]
+
+		public void Uri_To_Umbraco(string sourceUrl, string expectedUrl)
 		{
-			var uri = new Uri(url);
-			var expectedUri = new Uri(expected);
-			var result = UriUtility.UriToUmbraco(uri);			
+			var expectedUri = new Uri(expectedUrl);
+			var sourceUri = new Uri(sourceUrl);
+			var resultUri = UriUtility.UriToUmbraco(sourceUri);			
 
-			Assert.AreEqual(expectedUri.ToString(), result.ToString());
+			Assert.AreEqual(expectedUri.ToString(), resultUri.ToString());
+		}
+
+		// test directoryUrl false, trailingSlash false
+		[TestCase("/", "/", false, false)]
+		[TestCase("/home", "/home.aspx", false, false)]
+		[TestCase("/home/sub1", "/home/sub1.aspx", false, false)]
+
+		// test directoryUrl false, trailingSlash true
+		[TestCase("/", "/", false, true)]
+		[TestCase("/home", "/home.aspx", false, true)]
+		[TestCase("/home/sub1", "/home/sub1.aspx", false, true)]
+
+		// test directoryUrl true, trailingSlash false
+		[TestCase("/", "/", true, false)]
+		[TestCase("/home", "/home", true, false)]
+		[TestCase("/home/sub1", "/home/sub1", true, false)]
+
+		// test directoryUrl true, trailingSlash true
+		[TestCase("/", "/", true, true)]
+		[TestCase("/home", "/home/", true, true)]
+		[TestCase("/home/sub1", "/home/sub1/", true, true)]
+
+		public void Uri_From_Umbraco(string sourceUrl, string expectedUrl, bool directoryUrls, bool trailingSlash)
+		{
+			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", directoryUrls ? "true" : "false");
+			Umbraco.Core.Configuration.UmbracoSettings.AddTrailingSlash = trailingSlash;
+
+			var expectedUri = NewUri(expectedUrl);
+			var sourceUri = NewUri(sourceUrl);
+			var resultUri = UriUtility.UriFromUmbraco(sourceUri);
+
+			Assert.AreEqual(expectedUri.ToString(), resultUri.ToString());
+		}
+
+		Uri NewUri(string url)
+		{
+			return new Uri(url, url.StartsWith("http:") ? UriKind.Absolute : UriKind.Relative);
 		}
 	}
 }
