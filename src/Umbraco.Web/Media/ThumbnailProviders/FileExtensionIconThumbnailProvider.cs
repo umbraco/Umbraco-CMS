@@ -7,7 +7,7 @@ using umbraco.IO;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-    internal class FileExtensionIconThumbnailProvider : AbstractThumbnailProvider
+    public class FileExtensionIconThumbnailProvider : AbstractThumbnailProvider
     {
         public override int Priority
         {

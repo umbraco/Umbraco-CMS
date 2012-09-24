@@ -75,7 +75,7 @@
   </area>
   <area alias="content">
     <key alias="about">About this page</key>
-    <key alias="alias">Alternative link</key>
+    <key alias="alias">Alias</key>
     <key alias="alternativeTextHelp">(how would you describe the picture over the phone)</key>
     <key alias="alternativeUrls">Alternative Links</key>
     <key alias="clickToEdit">Click to edit this item</key>

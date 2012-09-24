@@ -7,7 +7,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-    internal abstract class AbstractThumbnailProvider : IThumbnailProvider
+    public abstract class AbstractThumbnailProvider : IThumbnailProvider
     {
         public abstract int Priority { get; }
 
