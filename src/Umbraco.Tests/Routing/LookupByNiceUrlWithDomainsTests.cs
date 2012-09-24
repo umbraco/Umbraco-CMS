@@ -2,31 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Configuration;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.language;
+using System.Configuration;
 
 namespace Umbraco.Tests.Routing
 {
 	[TestFixture]
-	public class NiceUrlsProviderWithDomainsTests : BaseRoutingTest
+	public class LookupByNiceUrlWithDomainsTests : BaseRoutingTest
 	{
 		public override void TearDown()
 		{
 			base.TearDown();
-
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "");
-
 			ClearLanguagesAndDomains();
-		}
-
-		internal override IRoutesCache GetRoutesCache()
-		{
-			return new DefaultRoutesCache(false);
 		}
 
 		void ClearLanguagesAndDomains()
@@ -53,38 +44,14 @@ namespace Umbraco.Tests.Routing
 			Language.MakeNew("fr-FR");
 		}
 
-		void SetDomains1()
-		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
-
-			Domain.MakeNew("domain1.com", 1001, langFr.id);
-		}
-
-		void SetDomains2()
-		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
-
-			Domain.MakeNew("http://domain1.com/foo", 1001, langFr.id);
-		}
-
-		void SetDomains3()
-		{
-			var langEn = Language.GetByCultureCode("en-US");
-			var langFr = Language.GetByCultureCode("fr-FR");
-
-			Domain.MakeNew("http://domain1.com/", 10011, langFr.id);
-		}
-
 		void SetDomains4()
 		{
 			var langEn = Language.GetByCultureCode("en-US");
 			var langFr = Language.GetByCultureCode("fr-FR");
 
-			Domain.MakeNew("http://domain1.com/", 1001, langEn.id);
-			Domain.MakeNew("http://domain1.com/en", 10011, langEn.id);
-			Domain.MakeNew("http://domain1.com/fr", 10012, langFr.id);
+			Domain.MakeNew("domain1.com/", 1001, langEn.id);
+			Domain.MakeNew("domain1.com/en", 10011, langEn.id);
+			Domain.MakeNew("domain1.com/fr", 10012, langFr.id);
 
 			Domain.MakeNew("http://domain3.com/", 1003, langEn.id);
 			Domain.MakeNew("http://domain3.com/en", 10031, langEn.id);
@@ -174,168 +141,45 @@ namespace Umbraco.Tests.Routing
 </root>";
 		}
 
-		// with one simple domain "domain1.com"
-		// basic tests
-		[TestCase(1001, "http://domain1.com", false, "/")]
-		[TestCase(10011, "http://domain1.com", false, "/1001-1")]
-		[TestCase(1002, "http://domain1.com", false, "/1002")]
-		// absolute tests
-		[TestCase(1001, "http://domain1.com", true, "http://domain1.com/")]
-		[TestCase(10011, "http://domain1.com", true, "http://domain1.com/1001-1")]
-		// different current tests
-		[TestCase(1001, "http://domain2.com", false, "http://domain1.com/")]
-		[TestCase(10011, "http://domain2.com", false, "http://domain1.com/1001-1")]
-		[TestCase(1001, "https://domain1.com", false, "/")]
-		[TestCase(10011, "https://domain1.com", false, "/1001-1")]
+		[TestCase("http://domain1.com/", 1001, "en-US")]
+		[TestCase("http://domain1.com/en", 10011, "en-US")]
+		[TestCase("http://domain1.com/en/1001-1-1", 100111, "en-US")]
+		[TestCase("http://domain1.com/fr", 10012, "fr-FR")]
+		[TestCase("http://domain1.com/fr/1001-2-1", 100121, "fr-FR")]
+		[TestCase("http://domain1.com/1001-3", 10013, "en-US")]
 
-		public void Get_Nice_Url_SimpleDomain(int nodeId, string currentUrl, bool absolute, string expected)
+		[TestCase("http://domain2.com/1002", 1002, "en-US")]
+
+		[TestCase("http://domain3.com/", 1003, "en-US")]
+		[TestCase("http://domain3.com/en", 10031, "en-US")]
+		[TestCase("http://domain3.com/en/1003-1-1", 100311, "en-US")]
+		[TestCase("http://domain3.com/fr", 10032, "fr-FR")]
+		[TestCase("http://domain3.com/fr/1003-2-1", 100321, "fr-FR")]
+		[TestCase("http://domain3.com/1003-3", 10033, "en-US")]
+
+		[TestCase("https://domain1.com/", 1001, "en-US")]
+		[TestCase("https://domain3.com/", 1001, "en-US")] // because domain3 is explicitely set on http
+
+		public void Lookup_NestedDomains(string url, int expectedId, string expectedCulture)
 		{
-			var routingContext = GetRoutingContext("/test", 1111);
-
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
-
-			InitializeLanguagesAndDomains();
-			SetDomains1();
-
-			var currentUri = new Uri(currentUrl);
-			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId, currentUri, absolute);
-			Assert.AreEqual(expected, result);
-		}
-
-		// with one complete domain "http://domain1.com/foo"
-		// basic tests
-		[TestCase(1001, "http://domain1.com", false, "/foo")]
-		[TestCase(10011, "http://domain1.com", false, "/foo/1001-1")]
-		[TestCase(1002, "http://domain1.com", false, "/1002")]
-		// absolute tests
-		[TestCase(1001, "http://domain1.com", true, "http://domain1.com/foo")]
-		[TestCase(10011, "http://domain1.com", true, "http://domain1.com/foo/1001-1")]
-		// different current tests
-		[TestCase(1001, "http://domain2.com", false, "http://domain1.com/foo")]
-		[TestCase(10011, "http://domain2.com", false, "http://domain1.com/foo/1001-1")]
-		[TestCase(1001, "https://domain1.com", false, "http://domain1.com/foo")]
-		[TestCase(10011, "https://domain1.com", false, "http://domain1.com/foo/1001-1")]
-
-		public void Get_Nice_Url_SimpleWithSchemeAndPath(int nodeId, string currentUrl, bool absolute, string expected)
-		{
-			var routingContext = GetRoutingContext("/test", 1111);
-
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
-
-			InitializeLanguagesAndDomains();
-			SetDomains2();
-
-			var currentUri = new Uri(currentUrl);
-			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId, currentUri, absolute);
-			Assert.AreEqual(expected, result);
-		}
-
-		// with one domain, not at root
-		[TestCase(1001, "http://domain1.com", false, "/1001")]
-		[TestCase(10011, "http://domain1.com", false, "/")]
-		[TestCase(100111, "http://domain1.com", false, "/1001-1-1")]
-		[TestCase(1002, "http://domain1.com", false, "/1002")]
-
-		public void Get_Nice_Url_DeepDomain(int nodeId, string currentUrl, bool absolute, string expected)
-		{
-			var routingContext = GetRoutingContext("/test", 1111);
-
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
-
-			InitializeLanguagesAndDomains();
-			SetDomains3();
-
-			var currentUri = new Uri(currentUrl);
-			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId, currentUri, absolute);
-			Assert.AreEqual(expected, result);
-		}
-
-		// with nested domains
-		[TestCase(1001, "http://domain1.com", false, "/")]
-		[TestCase(10011, "http://domain1.com", false, "/en")]
-		[TestCase(100111, "http://domain1.com", false, "/en/1001-1-1")]
-		[TestCase(10012, "http://domain1.com", false, "/fr")]
-		[TestCase(100121, "http://domain1.com", false, "/fr/1001-2-1")]
-		[TestCase(10013, "http://domain1.com", false, "/1001-3")]
-		[TestCase(1002, "http://domain1.com", false, "/1002")]
-		[TestCase(1003, "http://domain3.com", false, "/")]
-		[TestCase(10031, "http://domain3.com", false, "/en")]
-		[TestCase(100321, "http://domain3.com", false, "/fr/1003-2-1")]
-
-		public void Get_Nice_Url_NestedDomains(int nodeId, string currentUrl, bool absolute, string expected)
-		{
-			var routingContext = GetRoutingContext("/test", 1111);
-
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
-
 			InitializeLanguagesAndDomains();
 			SetDomains4();
 
-			var currentUri = new Uri(currentUrl);
-			var result = routingContext.NiceUrlProvider.GetNiceUrl(nodeId, currentUri, absolute);
-			Assert.AreEqual(expected, result);
-		}
+			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "true");
 
-		[Test]
-		public void Get_Nice_Url_DomainsAndCache()
-		{
-			var routingContext = GetRoutingContext("/test", 1111);
+			var routingContext = GetRoutingContext(url);
+			var uri = routingContext.UmbracoContext.UmbracoUrl; //very important to use the cleaned up umbraco url
+			var docreq = new DocumentRequest(uri, routingContext);
 
-			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", "true");
-			ConfigurationManager.AppSettings.Set("umbracoHideTopLevelNodeFromPath", "false"); // ignored w/domains
+			// must lookup domain else lookup by url fails
+			var builder = new DocumentRequestBuilder(docreq);
+			builder.LookupDomain();
+			Assert.AreEqual(expectedCulture, docreq.Culture.Name);
 
-			InitializeLanguagesAndDomains();
-			SetDomains4();
-
-			string ignore;
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(1001, new Uri("http://domain1.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(10011, new Uri("http://domain1.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(100111, new Uri("http://domain1.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(10012, new Uri("http://domain1.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(100121, new Uri("http://domain1.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(10013, new Uri("http://domain1.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(1002, new Uri("http://domain1.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(1001, new Uri("http://domain2.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(10011, new Uri("http://domain2.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(100111, new Uri("http://domain2.com"), false);
-			ignore = routingContext.NiceUrlProvider.GetNiceUrl(1002, new Uri("http://domain2.com"), false);
-
-			var cachedRoutes = ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedRoutes();
-			Assert.AreEqual(7, cachedRoutes.Count);
-
-			var cachedIds = ((DefaultRoutesCache)routingContext.UmbracoContext.RoutesCache).GetCachedIds();
-			Assert.AreEqual(7, cachedIds.Count);
-
-			CheckRoute(cachedRoutes, cachedIds, 1001, "1001/");
-			CheckRoute(cachedRoutes, cachedIds, 10011, "10011/");
-			CheckRoute(cachedRoutes, cachedIds, 100111, "10011/1001-1-1");
-			CheckRoute(cachedRoutes, cachedIds, 10012, "10012/");
-			CheckRoute(cachedRoutes, cachedIds, 100121, "10012/1001-2-1");
-			CheckRoute(cachedRoutes, cachedIds, 10013, "1001/1001-3");
-			CheckRoute(cachedRoutes, cachedIds, 1002, "/1002");
-
-			// use the cache
-			Assert.AreEqual("/", routingContext.NiceUrlProvider.GetNiceUrl(1001, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/en", routingContext.NiceUrlProvider.GetNiceUrl(10011, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/en/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/fr", routingContext.NiceUrlProvider.GetNiceUrl(10012, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/fr/1001-2-1", routingContext.NiceUrlProvider.GetNiceUrl(100121, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/1001-3", routingContext.NiceUrlProvider.GetNiceUrl(10013, new Uri("http://domain1.com"), false));
-			Assert.AreEqual("/1002", routingContext.NiceUrlProvider.GetNiceUrl(1002, new Uri("http://domain1.com"), false));
-
-			Assert.AreEqual("http://domain1.com/fr/1001-2-1", routingContext.NiceUrlProvider.GetNiceUrl(100121, new Uri("http://domain2.com"), false));
-		}
-
-		void CheckRoute(IDictionary<int, string> routes, IDictionary<string, int> ids, int id, string route)
-		{
-			Assert.IsTrue(routes.ContainsKey(id));
-			Assert.AreEqual(route, routes[id]);
-			Assert.IsTrue(ids.ContainsKey(route));
-			Assert.AreEqual(id, ids[route]);
+			var lookup = new LookupByNiceUrl();
+			var result = lookup.TrySetDocument(docreq);
+			Assert.IsTrue(result);
+			Assert.AreEqual(expectedId, docreq.DocumentId);
 		}
 	}
 }

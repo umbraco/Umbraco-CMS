@@ -25,13 +25,19 @@ namespace Umbraco.Tests.TestHelpers
 		[SecuritySafeCritical]
 		public FakeHttpContextFactory(string path)
 		{
-			CreateContext(new Uri("http://mysite" + VirtualPathUtility.ToAbsolute(path, "/")));
+			if (path.StartsWith("http://") || path.StartsWith("https://"))
+				CreateContext(new Uri(path));
+			else
+				CreateContext(new Uri("http://mysite" + VirtualPathUtility.ToAbsolute(path, "/")));
 		}
 
 		[SecuritySafeCritical]
 		public FakeHttpContextFactory(string path, RouteData routeData)
 		{
-			CreateContext(new Uri("http://mysite" + VirtualPathUtility.ToAbsolute(path, "/")), routeData);
+			if (path.StartsWith("http://") || path.StartsWith("https://"))
+				CreateContext(new Uri(path), routeData);
+			else
+				CreateContext(new Uri("http://mysite" + VirtualPathUtility.ToAbsolute(path, "/")), routeData);
 		}
 
 		public HttpContextBase HttpContext { get; private set; }

@@ -17,7 +17,6 @@ namespace Umbraco.Web.Routing
 			var response = context.Response;
 
 			response.Clear();
-			response.StatusCode = 404;
 
 			var docreq = UmbracoContext.Current.DocumentRequest;
 			var reason = "Cannot render the page at url '{0}'.";
