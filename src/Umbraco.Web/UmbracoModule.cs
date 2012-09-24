@@ -29,42 +29,50 @@ namespace Umbraco.Web
 		#region HttpModule event handlers
 
 		/// <summary>
-		/// Processses the Umbraco Request
+		/// Begins to process a request.
 		/// </summary>
 		/// <param name="httpContext"></param>
-		void ProcessRequest(HttpContextBase httpContext)
+		void BeginRequest(HttpContextBase httpContext)
 		{
 			if (IsClientSideRequest(httpContext.Request.Url))
-			{
 				return;
-			}
 
-			//create the legacy UmbracoContext
-			global::umbraco.presentation.UmbracoContext.Current = new global::umbraco.presentation.UmbracoContext(httpContext);
-
-			//create the LegacyRequestInitializer
+			// create the LegacyRequestInitializer
+			// and initialize legacy stuff
 			var legacyRequestInitializer = new LegacyRequestInitializer(httpContext.Request.Url, httpContext);
-			// legacy - initialize legacy stuff
 			legacyRequestInitializer.InitializeRequest();
 
-			//create the UmbracoContext singleton, one per request!!
+			// create the UmbracoContext singleton, one per request, and assign
 			var umbracoContext = new UmbracoContext(
 				httpContext,
 				ApplicationContext.Current,
 				RoutesCacheResolver.Current.RoutesCache);
 			UmbracoContext.Current = umbracoContext;
 
-			//create the nice urls
+			// create the nice urls provider
 			var niceUrls = new NiceUrlProvider(PublishedContentStoreResolver.Current.PublishedContentStore, umbracoContext);
-			//create the RoutingContext
+
+			// create the RoutingContext, and assign
 			var routingContext = new RoutingContext(
 				umbracoContext,
 				DocumentLookupsResolver.Current.DocumentLookups,
 				LastChanceLookupResolver.Current.LastChanceLookup,
 				PublishedContentStoreResolver.Current.PublishedContentStore,
 				niceUrls);
-			//assign the routing context back to the umbraco context
 			umbracoContext.RoutingContext = routingContext;
+		}
+
+		/// <summary>
+		/// Processses the Umbraco Request
+		/// </summary>
+		/// <param name="httpContext"></param>
+		void ProcessRequest(HttpContextBase httpContext)
+		{
+			if (IsClientSideRequest(httpContext.Request.Url))
+				return;
+
+			var umbracoContext = UmbracoContext.Current;
+			var routingContext = umbracoContext.RoutingContext;
 
 			// remap to handler if it is a base rest request
 			if (BaseRest.BaseRestHandler.IsBaseRestRequest(umbracoContext.RequestUrl))
@@ -407,6 +415,11 @@ namespace Umbraco.Web
 		/// <param name="app"></param>
 		public void Init(HttpApplication app)
 		{
+			app.BeginRequest += (sender, e) =>
+				{
+					var httpContext = ((HttpApplication)sender).Context;
+					BeginRequest(new HttpContextWrapper(httpContext));
+				};
 
 			app.PostResolveRequestCache += (sender, e) =>
 				{

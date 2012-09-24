@@ -21,6 +21,8 @@ namespace Umbraco.Web
         {
             var uri = _requestUrl;
 
+			global::umbraco.presentation.UmbracoContext.Current = new global::umbraco.presentation.UmbracoContext(_httpContext);
+
             // legacy - umbOriginalUrl used by default.aspx to rewritepath so forms are happy
             // legacy - umbOriginalUrl used by presentation/umbraco/urlRewriter/UrlRewriterFormWriter which handles <form action="..."
             // legacy - umbOriginalUrl also in Umbraco's back-end!
