@@ -271,7 +271,7 @@ namespace umbraco
         public static T GetProperty<T>(this Node node, string propertyAlias)
         {
             // check to see if return object handles it's own object hydration
-            if (typeof(T).GetInterface(typeof(uQuery.IGetProperty).Name) != null)
+            if (typeof(uQuery.IGetProperty).IsAssignableFrom(typeof(T)))
             {
                 // create new instance of T with empty constructor
                 uQuery.IGetProperty t = (uQuery.IGetProperty)Activator.CreateInstance<T>();
