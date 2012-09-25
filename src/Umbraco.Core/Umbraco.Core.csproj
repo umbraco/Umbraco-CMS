@@ -90,6 +90,7 @@
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="Macros\MacroTagParser.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
+    <Compile Include="ObjectResolution\WeightedPluginAttribute.cs" />
     <Compile Include="PropertyEditors\DatePickerPropertyEditorValueConverter.cs" />
     <Compile Include="PropertyEditors\IPropertyEditorValueConverter.cs" />
     <Compile Include="Dynamics\IDynamicDocumentDataSource.cs" />

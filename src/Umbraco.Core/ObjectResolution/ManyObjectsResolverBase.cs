@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Web;
 
 namespace Umbraco.Core.ObjectResolution
 {
+
 	internal abstract class ManyObjectsResolverBase<TResolver, TResolved> : ResolverBase<TResolver>
 		where TResolved : class 
 		where TResolver : class
@@ -93,6 +95,40 @@ namespace Umbraco.Core.ObjectResolution
 		/// Returns the ObjectLifetimeScope for created objects
 		/// </summary>
 		protected ObjectLifetimeScope LifetimeScope { get; private set; }
+
+		private int _defaultPluginWeight = 10;
+
+		/// <summary>
+		/// Used in conjunction with GetSortedValues and WeightedPluginAttribute, if any of the objects
+		/// being resolved do not contain the WeightedPluginAttribute then this will be the default weight applied
+		/// to the object.
+		/// </summary>
+		protected virtual int DefaultPluginWeight
+		{
+			get { return _defaultPluginWeight; }
+			set { _defaultPluginWeight = value; }
+		}
+
+		/// <summary>
+		/// If a resolver requries that objects are resolved with a specific order using the WeightedPluginAttribute
+		/// then this method should be used instead of the Values property.
+		/// </summary>
+		/// <returns></returns>
+		protected IEnumerable<TResolved> GetSortedValues()
+		{
+			var vals = Values.ToList();
+			//ensure they are sorted
+			vals.Sort((f1, f2) =>
+				{
+					Func<object, int> getWeight = o =>
+						{
+							var weightAttribute = f1.GetType().GetCustomAttribute<WeightedPluginAttribute>(true);
+							return weightAttribute != null ? weightAttribute.Weight : DefaultPluginWeight;
+						};
+					return getWeight(f1).CompareTo(getWeight(f2));
+				});
+			return vals;
+		}  
 
 		/// <summary>
 		/// Returns the list of new object instances.

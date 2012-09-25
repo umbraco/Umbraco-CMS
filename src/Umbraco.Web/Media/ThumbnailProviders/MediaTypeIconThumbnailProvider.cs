@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.ObjectResolution;
 using umbraco.IO;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
+	[WeightedPlugin(3000)]
     public class MediaTypeIconThumbnailProvider : AbstractThumbnailProvider
     {
-        public override int Priority
-        {
-            get { return 3000; }
-        }
-
+        
         protected override IEnumerable<string> SupportedExtensions
         {
             get { return new List<string> { "*" }; }
