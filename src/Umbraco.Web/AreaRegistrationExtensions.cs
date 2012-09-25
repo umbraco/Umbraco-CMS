@@ -59,6 +59,10 @@ namespace Umbraco.Web
 				//set the namespace of the controller to match
 				new[] { controllerType.Namespace });
 
+			//TODO: FIx this!!
+			//By setting the default this will always route even without specifying the surfaceId syntax in the URL,
+			// we need to unit test this and ensure it is correct
+
 			//set defaults
 			controllerPluginRoute.Defaults = new RouteValueDictionary(
 				new Dictionary<string, object>

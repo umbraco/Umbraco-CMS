@@ -10,9 +10,17 @@ namespace Umbraco.Web.Mvc
 	{
 		public Guid Id { get; private set; }
 
-		public SurfaceControllerAttribute(Guid id)
+		public SurfaceControllerAttribute(string id)
 		{
-			Id = id;
+			Guid gid;
+			if (Guid.TryParse(id, out gid))
+			{
+				Id = gid;
+			}
+			else
+			{
+				throw new InvalidCastException("Cannot convert the value " + id + " to a Guid");	
+			}
 		}
 	}
 }

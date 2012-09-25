@@ -39,7 +39,7 @@ namespace Umbraco.Web.Mvc
 			var areaName = GlobalSettings.UmbracoMvcArea;
 
 			//local surface controllers do not contain the attribute 			
-			var localSurfaceControlleres = surfaceControllers.Where(x => TypeExtensions.GetCustomAttribute<SurfaceControllerAttribute>(x.GetType(), false) == null);
+			var localSurfaceControlleres = surfaceControllers.Where(x => x.GetType().GetCustomAttribute<SurfaceControllerAttribute>(false) == null);
 			foreach (var s in localSurfaceControlleres)
 			{
 				var meta = s.GetMetadata();

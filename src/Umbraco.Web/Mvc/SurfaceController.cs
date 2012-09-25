@@ -6,6 +6,15 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Mvc
 {
+	[SurfaceController("DD307F95-6D90-4593-8C97-093AC7C12573")]
+	public class TestSurfaceController : SurfaceController
+	{
+		public ActionResult Index()
+		{
+			return Content("<html><body>hello</body></html>");
+		}
+	}
+
 	/// <summary>
 	/// The base controller that all Presentation Add-in controllers should inherit from
 	/// </summary>
