@@ -29,10 +29,21 @@ namespace Umbraco.Web.Mvc
 		/// <param name="request">The request.</param>
 		/// <returns><c>true</c> if this instance can handle the specified request; otherwise, <c>false</c>.</returns>
 		/// <remarks></remarks>
-		public bool CanHandle(RequestContext request)
+		public virtual bool CanHandle(RequestContext request)
 		{
 			var dataToken = request.RouteData.DataTokens["area"];
 			return dataToken == null || string.IsNullOrWhiteSpace(dataToken.ToString());
+		}
+
+		/// <summary>
+		/// Returns the controller type for the controller name otherwise null if not found
+		/// </summary>
+		/// <param name="requestContext"></param>
+		/// <param name="controllerName"></param>
+		/// <returns></returns>
+		protected Type GetControllerType(RequestContext requestContext, string controllerName)
+		{
+			return _innerFactory.GetControllerType(requestContext, controllerName);
 		}
 
 		/// <summary>
@@ -42,9 +53,9 @@ namespace Umbraco.Web.Mvc
 		/// The controller.
 		/// </returns>
 		/// <param name="requestContext">The request context.</param><param name="controllerName">The name of the controller.</param>
-		public IController CreateController(RequestContext requestContext, string controllerName)
+		public virtual IController CreateController(RequestContext requestContext, string controllerName)
 		{
-			Type controllerType = _innerFactory.GetControllerType(requestContext, controllerName) ??
+			Type controllerType = GetControllerType(requestContext, controllerName) ??
 			                      _innerFactory.GetControllerType(requestContext, ControllerExtensions.GetControllerName(typeof(RenderMvcController)));
 
 			return _innerFactory.GetControllerInstance(requestContext, controllerType);
@@ -77,7 +88,7 @@ namespace Umbraco.Web.Mvc
 		/// this nested class changes the visibility of <see cref="DefaultControllerFactory"/>'s internal methods in order to not have to rely on a try-catch.
 		/// </summary>
 		/// <remarks></remarks>
-		public class OverridenDefaultControllerFactory : DefaultControllerFactory
+		internal class OverridenDefaultControllerFactory : DefaultControllerFactory
 		{
 			public new IController GetControllerInstance(RequestContext requestContext, Type controllerType)
 			{

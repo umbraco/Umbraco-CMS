@@ -49,6 +49,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ActivatorHelper.cs" />
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Attempt.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="IO\IFileSystemExtensions.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="Macros\MacroTagParser.cs" />
+    <Compile Include="Mandate.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="ObjectResolution\WeightedPluginAttribute.cs" />
     <Compile Include="PropertyEditors\DatePickerPropertyEditorValueConverter.cs" />

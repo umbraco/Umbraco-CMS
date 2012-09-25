@@ -115,7 +115,7 @@ namespace Umbraco.Core.Configuration
 		/// We will use the 'Path' (default ~/umbraco) to create it but since it cannot contain '/' and people may specify a path of ~/asdf/asdf/admin
 		/// we will convert the '/' to '-' and use that as the path. its a bit lame but will work.
 		/// </remarks>
-    	internal static string MvcArea
+    	internal static string UmbracoMvcArea
     	{
     		get 
 			{ 

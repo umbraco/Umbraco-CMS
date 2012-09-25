@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.PropertyEditors;
@@ -12,6 +13,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Routing;
 using umbraco.businesslogic;
+
 
 namespace Umbraco.Web
 {
@@ -55,8 +57,6 @@ namespace Umbraco.Web
 			//set model binder
 			ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
 
-			//set routes
-			CreateRoutes();
 
 			//find and initialize the application startup handlers, we need to initialize this resolver here because
 			//it is a special resolver where they need to be instantiated first before any other resolvers in order to bind to 
@@ -100,6 +100,9 @@ namespace Umbraco.Web
 		{
 			base.Complete(afterComplete);
 
+			//set routes
+			CreateRoutes();
+
 			//call OnApplicationStarting of each application events handler
 			ApplicationEventsResolver.Current.ApplicationEventHandlers
 				.ForEach(x => x.OnApplicationStarted(_umbracoApplication, ApplicationContext));
@@ -112,14 +115,24 @@ namespace Umbraco.Web
 		/// </summary>
 		protected internal void CreateRoutes()
 		{
+
 			//set routes
-			var route = RouteTable.Routes.MapRoute(
+			var defaultRoute = RouteTable.Routes.MapRoute(
 				"Umbraco_default",
 				"Umbraco/RenderMvc/{action}/{id}",
 				new { controller = "RenderMvc", action = "Index", id = UrlParameter.Optional }
 				);
-			route.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
+			defaultRoute.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
+
+			//now we need to find the surface controllers and route them too
+			var surfaceControllers = SurfaceControllerResolver.Current.SurfaceControllers;
+			//create a custom area for them
+			var surfaceControllerArea = new SurfaceControllerArea(surfaceControllers);
+			//register it
+			RouteTable.Routes.RegisterArea(surfaceControllerArea);
 		}
+
+		
 
 		/// <summary>
 		/// Initializes all web based and core resolves 
@@ -127,6 +140,9 @@ namespace Umbraco.Web
 		protected override void InitializeResolvers()
 		{
 			base.InitializeResolvers();
+
+			SurfaceControllerResolver.Current = new SurfaceControllerResolver(
+				PluginManager.Current.ResolveSurfaceControllers());
 
 			//the base creates the PropertyEditorValueConvertersResolver but we want to modify it in the web app and replace
 			//the TinyMcePropertyEditorValueConverter with the RteMacroRenderingPropertyEditorValueConverter

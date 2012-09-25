@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Umbraco.Core;
-
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using umbraco;
 using umbraco.interfaces;
@@ -14,6 +14,11 @@ namespace Umbraco.Web
 	/// </summary>
 	public static class PluginManagerExtensions
 	{
+		internal static IEnumerable<Type> ResolveSurfaceControllers(this PluginManager resolver)
+		{
+			return resolver.ResolveTypes<SurfaceController>();
+		}
+
 		/// <summary>
 		/// Returns all available ITrees in application
 		/// </summary>

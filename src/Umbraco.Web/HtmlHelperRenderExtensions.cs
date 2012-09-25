@@ -167,7 +167,7 @@ namespace Umbraco.Web
 		                                       IDictionary<string, object> htmlAttributes)
 		{
 			var settings = DependencyResolver.Current.GetService<UmbracoSettings>();
-			var area = Umbraco.Core.Configuration.GlobalSettings.MvcArea;
+			var area = Umbraco.Core.Configuration.GlobalSettings.UmbracoMvcArea;
 			var formAction = html.ViewContext.HttpContext.Request.Url.AbsolutePath;
 
 			return html.RenderForm(formAction, FormMethod.Post, htmlAttributes, controllerName, action, area, null);
