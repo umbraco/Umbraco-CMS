@@ -271,6 +271,11 @@
     <Compile Include="Mvc\HtmlTagWrapper.cs" />
     <Compile Include="Mvc\HtmlTagWrapperTextNode.cs" />
     <Compile Include="Mvc\IHtmlTagWrapper.cs" />
+    <Compile Include="Mvc\Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
     <Compile Include="PropertyEditors\RteMacroRenderingPropertyEditorValueConverter.cs" />
     <Compile Include="PublishedMediaStoreResolver.cs" />
     <Compile Include="RenderFieldCaseType.cs" />
@@ -1959,6 +1964,7 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertMacro.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
+    <None Include="Mvc\web.config.template" />
     <None Include="Web References\org.umbraco.update\UpgradeResult1.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
@@ -2096,6 +2102,10 @@
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <EmbeddedResource Include="Mvc\Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="umbraco.presentation\install\steps\database.ascx.resx">
       <DependentUpon>database.ascx.cs</DependentUpon>
       <SubType>Designer</SubType>

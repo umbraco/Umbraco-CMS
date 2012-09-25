@@ -1662,6 +1662,7 @@
     <None Include="umbraco_client\CodeMirror\js\mode\ruby\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\r\LICENSE" />
     <None Include="umbraco_client\CodeMirror\js\mode\xquery\LICENSE" />
+    <Content Include="Views\web.config" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -2195,7 +2196,6 @@
     <Folder Include="umbraco_client\FolderBrowser\Images\" />
     <Folder Include="umbraco_client\tags\images\" />
     <Folder Include="usercontrols\" />
-    <Folder Include="Views\" />
     <Folder Include="xslt\" />
   </ItemGroup>
   <PropertyGroup>
